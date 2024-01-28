@@ -1,141 +1,132 @@
-Return-Path: <netdev+bounces-66457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C86583F504
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 11:38:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E602583F521
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 12:24:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33E2C282990
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 10:38:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BD8A1F2122B
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 11:24:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D4061B286;
-	Sun, 28 Jan 2024 10:38:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE4FA1EB3F;
+	Sun, 28 Jan 2024 11:24:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="HGIuwS2W"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UK+cUsN7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A02461EB20
-	for <netdev@vger.kernel.org>; Sun, 28 Jan 2024 10:38:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 229BF1EB20;
+	Sun, 28 Jan 2024 11:24:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706438324; cv=none; b=kh4zfaXWFKYYbHQSTZ1JKeBpe8LzNRbuVQF30gL5K+jinw/MPrGCbPsDt/P7Z+iK8YV0ykAqgFHfxIMqV++LugYDR14iKDpFonrVlxGTHYMvZdC4wN+n6ibi2+LkZ3BgiptcA/tYuzxR6Zm2+ytH6fpqZOq5WMUq7TiaoTvgaKc=
+	t=1706441077; cv=none; b=WyRk9GaeocEAUVtGPIcIZLFCbCUYbq3C4o/RAGvXQyPVNDKcfuthIB83v/8+ydZrUQkKcDQq2Ic6CSp06gfJjpA8aARJWAd9d9iMECg+7ff/b+DhQX3VaCsBUXasTvU9ai6nPm51koMN5hbJ1srJgTPaxMonYn5N1FmsZLXfe+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706438324; c=relaxed/simple;
-	bh=n5TwMpOanVmCHTym/cBbHtlt0jT+DzWUDXuB2JwkOso=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZhBgejz98jXLpdroMz4+tFQwtYEpayQCEijKoBDrTn2v5TF+NwckGv57TReoLsl3X1g8UACDUGEoNdFrPl+1oXfv70iDgFaHEbj+4X1jM08ZqyLKzTweG9N3oekpV6vk9gO5x0InuUxRjVoumm8+mq+cyGtA9LAl6j1rbIX9n8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=HGIuwS2W; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1706438323; x=1737974323;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=reF9tv+X0ZpvN+LgefQ3hBJ/zDlDPsQP+Sb6wsrzhfk=;
-  b=HGIuwS2Wj3i9yPrlDNOCe5VBt2+oQvvxSmt7LKKzWA1RKIeBUborrGIf
-   /4yetLUyrNvPb9uH8wMkSh6sWYPCuADdHeSTbtUeG1hXE0fxsebX3NVo8
-   GqCxww3/u/Lo5cyW05eGA6q4xJbk/122X321DqtxLxSFXvh6hXt4ux7pN
-   Y=;
-X-IronPort-AV: E=Sophos;i="6.05,220,1701129600"; 
-   d="scan'208";a="609230264"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-529f0975.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2024 10:38:41 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
-	by email-inbound-relay-iad-1e-m6i4x-529f0975.us-east-1.amazon.com (Postfix) with ESMTPS id D88EA4A735;
-	Sun, 28 Jan 2024 10:38:38 +0000 (UTC)
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:12882]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.31.136:2525] with esmtp (Farcaster)
- id 02c15e7f-08ff-4b70-b2bb-8fa79c0c983c; Sun, 28 Jan 2024 10:38:38 +0000 (UTC)
-X-Farcaster-Flow-ID: 02c15e7f-08ff-4b70-b2bb-8fa79c0c983c
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Sun, 28 Jan 2024 10:38:36 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.48) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Sun, 28 Jan 2024 10:38:33 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kent Overstreet <kent.overstreet@linux.dev>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
-	<netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 2/2] af_unix: Don't hold client's sk_peer_lock in copy_peercred().
-Date: Sun, 28 Jan 2024 02:37:32 -0800
-Message-ID: <20240128103732.18185-3-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240128103732.18185-1-kuniyu@amazon.com>
-References: <20240128103732.18185-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1706441077; c=relaxed/simple;
+	bh=KNaq6FiBBjclWVzp6k4jvy23iUnCG4CcpVAGv3MI8Uw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R3mE4iWT0yjZJRjWDwtEoQkPI8p9LresDv0lYwM272m/9M3Hw9RpzL8uzKOcEuni6RwcFWVHnYwiu6bSPaNKnJ2bynAkKKtD4g3b/OF3VVqs1jIex4eVU7pAmmG76vq3htb3xYyYvh87lNcJRwR8YdLe6zjHCsMCn4pEPiP2j60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UK+cUsN7; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706441075; x=1737977075;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=KNaq6FiBBjclWVzp6k4jvy23iUnCG4CcpVAGv3MI8Uw=;
+  b=UK+cUsN7A+IxZNjrOEE+vz9gkfXhwlFWIJWxRMS3hH2oAfxkf+1HaDjz
+   huTAm2nsB28FrCaZbcCnKCUdAiZx1PrA+4O8ricJ0yDEmG2nhnHVZg90V
+   aTe+zglgMKBlpHiTtEZr/zcuQL8kzgmZvpou93nGa14pr12MXIfkgx+Pv
+   9xZWFV7m+iUBdAVXY2BmNQTBPELE7y7nbnpnZ7ZbICnFUikWTxlsXsWQY
+   pLowVFdcB81kqhaP4fkO7uGJjcxqO8p9Q6TEPRbJtMIgdWJkhGfMRjZof
+   UU+yiuNVKww1xMTIXb/xh/TV0auNmgtCLrRFS+dfVUKj18jivS79k6EQr
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10966"; a="2592988"
+X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
+   d="scan'208";a="2592988"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2024 03:24:34 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
+   d="scan'208";a="3187856"
+Received: from lkp-server01.sh.intel.com (HELO 370188f8dc87) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 28 Jan 2024 03:24:26 -0800
+Received: from kbuild by 370188f8dc87 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rU3Gx-0003LS-0y;
+	Sun, 28 Jan 2024 11:24:23 +0000
+Date: Sun, 28 Jan 2024 19:24:02 +0800
+From: kernel test robot <lkp@intel.com>
+To: Joe Damato <jdamato@fastly.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, chuck.lever@oracle.com,
+	jlayton@kernel.org, linux-api@vger.kernel.org, brauner@kernel.org,
+	edumazet@google.com, davem@davemloft.net, alexander.duyck@gmail.com,
+	sridhar.samudrala@intel.com, kuba@kernel.org,
+	willemdebruijn.kernel@gmail.com, weiwan@google.com,
+	Joe Damato <jdamato@fastly.com>, Jonathan Corbet <corbet@lwn.net>,
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nathan Lynch <nathanl@linux.ibm.com>,
+	Steve French <stfrench@microsoft.com>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Julien Panis <jpanis@baylibre.com>, Arnd Bergmann <arnd@arndb.de>,
+	Andrew Waterman <waterman@eecs.berkeley.edu>,
+	Thomas Huth <thuth@redhat.com>, Palmer Dabbelt <palmer@dabbelt.com>,
+	linux-doc@vger.kernel.org,
+	"(open list:FILESYSTEMS (VFS and infrastructure))" <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 3/3] eventpoll: Add epoll ioctl for
+ epoll_params
+Message-ID: <202401281917.WeFbZE56-lkp@intel.com>
+References: <20240125225704.12781-4-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWB001.ant.amazon.com (10.13.138.82) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240125225704.12781-4-jdamato@fastly.com>
 
-When (AF_UNIX, SOCK_STREAM) socket connect()s to a listening socket,
-the listener's sk_peer_pid/sk_peer_cred are copied to the client in
-copy_peercred().
+Hi Joe,
 
-Then, two sk_peer_locks are held there; one is client's and another
-is listener's.  However, we need not hold the client's lock.
+kernel test robot noticed the following build errors:
 
-The only place where the client's sk_peer_pid/sk_peer_cred are set
-is copy_peercred(), and once they are set, they never change.
+[auto build test ERROR on net-next/main]
 
-Let's not hold client's sk_peer_lock in copy_peercred().
+url:    https://github.com/intel-lab-lkp/linux/commits/Joe-Damato/eventpoll-support-busy-poll-per-epoll-instance/20240126-070250
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240125225704.12781-4-jdamato%40fastly.com
+patch subject: [PATCH net-next v3 3/3] eventpoll: Add epoll ioctl for epoll_params
+config: i386-buildonly-randconfig-002-20240127 (https://download.01.org/0day-ci/archive/20240128/202401281917.WeFbZE56-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240128/202401281917.WeFbZE56-lkp@intel.com/reproduce)
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/unix/af_unix.c | 20 ++------------------
- 1 file changed, 2 insertions(+), 18 deletions(-)
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202401281917.WeFbZE56-lkp@intel.com/
 
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index f07374d31f7c..c5c292393be8 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -706,26 +706,10 @@ static void update_peercred(struct sock *sk)
- 
- static void copy_peercred(struct sock *sk, struct sock *peersk)
- {
--	const struct cred *old_cred;
--	struct pid *old_pid;
--
--	if (sk < peersk) {
--		spin_lock(&sk->sk_peer_lock);
--		spin_lock_nested(&peersk->sk_peer_lock, SINGLE_DEPTH_NESTING);
--	} else {
--		spin_lock(&peersk->sk_peer_lock);
--		spin_lock_nested(&sk->sk_peer_lock, SINGLE_DEPTH_NESTING);
--	}
--	old_pid = sk->sk_peer_pid;
--	old_cred = sk->sk_peer_cred;
--	sk->sk_peer_pid  = get_pid(peersk->sk_peer_pid);
-+	spin_lock(&peersk->sk_peer_lock);
-+	sk->sk_peer_pid = get_pid(peersk->sk_peer_pid);
- 	sk->sk_peer_cred = get_cred(peersk->sk_peer_cred);
--
--	spin_unlock(&sk->sk_peer_lock);
- 	spin_unlock(&peersk->sk_peer_lock);
--
--	put_pid(old_pid);
--	put_cred(old_cred);
- }
- 
- static int unix_listen(struct socket *sock, int backlog)
+All errors (new ones prefixed by >>):
+
+   In file included from <command-line>:
+>> ./usr/include/linux/eventpoll.h:89:9: error: unknown type name 'u64'
+      89 |         u64 busy_poll_usecs;
+         |         ^~~
+>> ./usr/include/linux/eventpoll.h:90:9: error: unknown type name 'u16'
+      90 |         u16 busy_poll_budget;
+         |         ^~~
+>> ./usr/include/linux/eventpoll.h:93:9: error: unknown type name 'u8'
+      93 |         u8 data[118];
+         |         ^~
+
 -- 
-2.30.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
