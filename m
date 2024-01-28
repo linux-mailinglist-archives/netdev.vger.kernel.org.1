@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-66488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4497483F7F0
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 17:45:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA1EE83F813
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 17:48:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D88F91F20F64
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 16:45:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 950A228ABB6
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 16:48:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11D4413EFF6;
-	Sun, 28 Jan 2024 16:16:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0FB5145B27;
+	Sun, 28 Jan 2024 16:16:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lrVuYkwu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YJnFoJ13"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B171613EFF2;
-	Sun, 28 Jan 2024 16:16:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A243F524BB;
+	Sun, 28 Jan 2024 16:16:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706458582; cv=none; b=XQM6uwZcUqBSnbH6l9wo+I9JCmFTw68W2hIId48QZWjzmPXEour1Q/HjpNTlYrRKMofGzbCbFVg7U1FLdJBbGPBwr0ztkJ2pKaWnsmjrVqDdpUMXKoR8TvQLqwPAffAfN80otF829vUXzjmlOJB8atB1V7cSgsp8969LgfNqJ4A=
+	t=1706458612; cv=none; b=jZTBbazXgvnAIgv0IMipJnvSvHj6ikgGKHOfLQZDXbyDODvY7ynH7JRrl71tkaBMtCiLfA07UBzLmyt0+edY3vAVKgUUpo+bZHsC8vKIxRrzY5X0y5bUfej2v8KIke+XutrXjizSAUkxGWwRC4gY5bTqVWbn9wrU4+2kNmqgESM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706458582; c=relaxed/simple;
-	bh=7Kp44MPEO518X45JgupiIiwnSsKyoLWbfcEh7akAEOQ=;
+	s=arc-20240116; t=1706458612; c=relaxed/simple;
+	bh=17+TA5YRK2OnCwpOtW5/xDu4vsGekw4PjGMIc719mzk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=G/VKRIM+bVN2vzyVkKFrRHF+Wn0M/eAFZnOqjZ9mmvHIMmASCF3oA4rNRjCs6WtSXlccGR0yo6nBrFiBJcryX1CdGp0nwh5X4Aa0lMLiUQTAySGZcYUROQv0UWW5GPFE4lbUNHwEEPu7v63idC+Rd2Hxa+x0EbEmT6p3ggA4QyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lrVuYkwu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDCE1C433B1;
-	Sun, 28 Jan 2024 16:16:20 +0000 (UTC)
+	 MIME-Version:Content-Type; b=oheTBEwXHk3yrIqIw8XuRsg7MI+JYT2WEmZt3TZazxbV1ecEvoGiGfujPksApaF5fc8CugjX1B9B42xh/wJONJdH+b1OYpgRfgxdV+qMRnlsq6a4iItFYTn+DydK2F8VqcA5S8yQVde57/2kkiti4SLNNKoY+Lz51M2iW2SVibc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YJnFoJ13; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D36E3C43390;
+	Sun, 28 Jan 2024 16:16:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706458582;
-	bh=7Kp44MPEO518X45JgupiIiwnSsKyoLWbfcEh7akAEOQ=;
+	s=k20201202; t=1706458612;
+	bh=17+TA5YRK2OnCwpOtW5/xDu4vsGekw4PjGMIc719mzk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lrVuYkwuHGIVZWxfNq09OCW2+0ZHpLe6NrgrsBnTrHSSSvor+RWtjzWhHDG9TV/0i
-	 CA3wOVkpkXWkymKV6ki0zh+3qpRKnycC9nVWqgicU1VYuMNxev2ioR+V93nqwRV65h
-	 Yd1iNbN2CGC9TxQf45ADxjPnRc/6ACwU5kimBNcR/yF7XRNPsg7apdGiPP6gjWM37L
-	 6kihEqkjDyJ2t6Eo2QOyJs+3Z8bag7Pc7YJ1/YW6NIxxrrQc0Q9MLfOxr+5l/QrSe0
-	 w1aYMen6mP5DOOaIztZAM+dPJFlnY3ixfx99geNeu41XZ3aY5EGE0z2XLc6zIfKJX6
-	 LT93hPmf+7auw==
+	b=YJnFoJ13ITfd7/lIZcUb27UNtniCGQfVie7s2e+Fi3zbld0E1RkucROpBE+b2Z+UO
+	 C3YM2HgBfLGk2qqbQDAN7L7MBdyw8oo2MNfbohK1LcXdN0gc+PFLYbS9FWpMlDQf5h
+	 s1N8ClMsrWHtdez5HndBDvwNWxQ80LtKNdbwRZq0ATNquuDc2iNOITeBfFglHmv7/O
+	 ol5sZUlX6oFgT/QT49aDo6E8PDr83/+t4ljB/G56KaRfZaOredzbP77H9qk9Kva9KX
+	 XBywYXHXAdY/cThWFamk8Zm7sZzNk0F0Cv1uGvKfwC406JLRvgGoSgUVG/8b8iodnt
+	 46FEqYKhjtRag==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -55,12 +55,12 @@ Cc: Zhu Yanjun <yanjun.zhu@linux.dev>,
 	pabeni@redhat.com,
 	virtualization@lists.linux.dev,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 09/13] =?UTF-8?q?virtio=5Fnet:=20Fix=20"?= =?UTF-8?q?=E2=80=98%d=E2=80=99=20directive=20writing=20between=201=20and?= =?UTF-8?q?=2011=20bytes=20into=20a=20region=20of=20size=2010"=20warnings?=
-Date: Sun, 28 Jan 2024 11:15:55 -0500
-Message-ID: <20240128161606.205221-9-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 08/11] =?UTF-8?q?virtio=5Fnet:=20Fix=20"?= =?UTF-8?q?=E2=80=98%d=E2=80=99=20directive=20writing=20between=201=20and?= =?UTF-8?q?=2011=20bytes=20into=20a=20region=20of=20size=2010"=20warnings?=
+Date: Sun, 28 Jan 2024 11:16:29 -0500
+Message-ID: <20240128161637.205509-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240128161606.205221-1-sashal@kernel.org>
-References: <20240128161606.205221-1-sashal@kernel.org>
+In-Reply-To: <20240128161637.205509-1-sashal@kernel.org>
+References: <20240128161637.205509-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,7 +70,7 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.10.209
+X-stable-base: Linux 5.4.268
 Content-Transfer-Encoding: 8bit
 
 From: Zhu Yanjun <yanjun.zhu@linux.dev>
@@ -116,10 +116,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 2fd5d2b7a209..4029c56dfcf0 100644
+index f6a6678f43b9..4faf3275b1f6 100644
 --- a/drivers/net/virtio_net.c
 +++ b/drivers/net/virtio_net.c
-@@ -2819,10 +2819,11 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+@@ -2864,10 +2864,11 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
  {
  	vq_callback_t **callbacks;
  	struct virtqueue **vqs;
@@ -133,7 +133,7 @@ index 2fd5d2b7a209..4029c56dfcf0 100644
  
  	/* We expect 1 RX virtqueue followed by 1 TX virtqueue, followed by
  	 * possible N-1 RX/TX queue pairs used in multiqueue mode, followed by
-@@ -2859,8 +2860,8 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+@@ -2904,8 +2905,8 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
  	for (i = 0; i < vi->max_queue_pairs; i++) {
  		callbacks[rxq2vq(i)] = skb_recv_done;
  		callbacks[txq2vq(i)] = skb_xmit_done;
