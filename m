@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-66545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1E3883FB16
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 00:52:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD1FB83FB1A
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 00:54:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20D091C20819
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 23:52:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9E111C2094C
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 23:54:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC27D44C7C;
-	Sun, 28 Jan 2024 23:52:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69289446A3;
+	Sun, 28 Jan 2024 23:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="g+plIkOH"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hELPDoGd"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F84844375;
-	Sun, 28 Jan 2024 23:52:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B42D645954
+	for <netdev@vger.kernel.org>; Sun, 28 Jan 2024 23:54:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706485940; cv=none; b=Cp/2FFUdJ5sinVf9thXw7VzI6bhdVCYvbZKAUL/Y22yYDs6dLuCPHa1fHovZYm4cR6er0HjqO0YPkSvCWcGLcYjhtDpnL0Uerqv4OUgxloUq0hsGLm4fg+Nbpu7sBr1+TRh6HQZCqWbNWxvFnMDPHBhD76lIjzVwPpI5b/ZTD6A=
+	t=1706486079; cv=none; b=DH4dzLjsuQnYvvtGpVtX7YtgxBOXZuH2CdwT8EryAkbCd91EzQvr3+r3E3X/zVBwTZHv6eJG1t9Qb8nTUF1KhCTCzwq4Ibwo8EDCGE6JyHMuHQ4SBC95VEspq4QyMTg2VqnN5gNGh/4rtA25qiABsnMgvBdJgWKgXfhXgMlSG7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706485940; c=relaxed/simple;
-	bh=SHqmM3uu0EufouKxED5u9CkeQtajdNFY1EgMtL8k/Ow=;
+	s=arc-20240116; t=1706486079; c=relaxed/simple;
+	bh=Ddw4508Wbq2c/pY4vDL30UAxNbk0oa+JON+ap1Z1Ccw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mOMnXIfjuci/wWUysgqTkKTsBFaebuRRwPfi7ayypzlJBEzM7Z/nBd7rTJsUm6k+0Ctd15VzZE1IUCMuxQEZNrAXRFnHyFOMuLK9/oacwqvJBHFP0FvcWBG7M2iSLkWkOUTEwfNZvt11m8AhE98vuK1iNTYV8xr3e3L9h9MRDCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=g+plIkOH; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=ntOcakEH9xVvMhQ3MatpTHD1Ld/Z9NORvskZ7apA7+6Fd70EchPwJrmlJKFi+z+SM4tHOW0GnkzNr2AqAuRrTw2B6tXAqnYdp3g8DW5pXmkI9UXA/rOUxxj9TzDjlJ+Q2RNkdgZiJmQeGLNJXbGQBiFY6olofg+oliY6hrXWmqo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hELPDoGd; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,29 +36,25 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=g9+FPcUGtHUPTu+7RnkMJkCX5s0s8bZFoyllSulMMCU=; b=g+plIkOHBwfFBwOAvpjtWn+Ag/
-	+4euHrCao+cFGm1zCEmNeH1Y7oSy/IXdVBjtJ7s7d+1/KADd0CfOpMGYj7uYprqds4CQCKGnuXcnJ
-	k4wYaxvbkME6S6VeZnX8lo9PjVo2xo0AgXaNbt9QDQ/yEoSxB8ODBpQU9O0r66axS99k=;
+	bh=5q8fIwEXMm9D6CYHXgtOYXfIZRSa19Zi7jH17N4n1h8=; b=hELPDoGd7qV2BF9hHy7G81KTtB
+	UuZyUDHttyV+tOQipGxuqGXgFN67114Sfb+L6gWlII07EO82SzqjRBcaUghEk1aJdnXXIg6zizH4b
+	wMY0v5emHQLBzE488s4/NIycOnZJKITjjSPj1feUN4cfqwXrz53RbguPfSEcRDo8bM6o=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rUEwd-006Kj0-FT; Mon, 29 Jan 2024 00:52:11 +0100
-Date: Mon, 29 Jan 2024 00:52:11 +0100
+	id 1rUEys-006Kjl-40; Mon, 29 Jan 2024 00:54:30 +0100
+Date: Mon, 29 Jan 2024 00:54:30 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [net-next PATCH v3 5/5] net: phy: qcom: detach qca808x PHY
- driver from at803x
-Message-ID: <0e6dd47d-3dd2-4c8f-99f7-1c3d105ddc82@lunn.ch>
-References: <20240128120451.31219-1-ansuelsmth@gmail.com>
- <20240128120451.31219-6-ansuelsmth@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Russell King - ARM Linux <linux@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	David Miller <davem@davemloft.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next v4 1/6] ethtool: replace struct ethtool_eee with
+ a new struct ethtool_keee on kernel side
+Message-ID: <1dc1eba4-d74c-47b5-95db-ad2dfde2cbd7@lunn.ch>
+References: <7d82de21-9bde-4f66-99ce-f03ff994ef34@gmail.com>
+ <a3842379-1f85-4a62-9bf3-53a17f813668@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,25 +63,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240128120451.31219-6-ansuelsmth@gmail.com>
+In-Reply-To: <a3842379-1f85-4a62-9bf3-53a17f813668@gmail.com>
 
-On Sun, Jan 28, 2024 at 01:04:26PM +0100, Christian Marangi wrote:
-> Almost all the QCA8081 PHY driver OPs are specific and only some of them
-> use the generic at803x.
+On Sat, Jan 27, 2024 at 02:25:09PM +0100, Heiner Kallweit wrote:
+> In order to pass EEE link modes beyond bit 32 to userspace we have to
+> complement the 32 bit bitmaps in struct ethtool_eee with linkmode
+> bitmaps. Therefore, similar to ethtool_link_settings and
+> ethtool_link_ksettings, add a struct ethtool_keee. In a first step
+> it's an identical copy of ethtool_eee. This patch simply does a
+> s/ethtool_eee/ethtool_keee/g for all users.
+> No functional change intended.
 > 
-> To make the at803x code slimmer, move all the specific qca808x regs and
-> functions to a dedicated PHY driver.
-> 
-> Probe function and priv struct is reworked to allocate and use only the
-> qca808x specific data. Unused data from at803x PHY driver are dropped
-> from at803x priv struct.
-> 
-> Also a new Kconfig is introduced QCA808X_PHY, to compile the newly
-> introduced PHY driver for QCA8081 PHY.
-> 
-> As the Kconfig name starts with Qualcomm the same order is kept.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> Suggested-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+
+Lets see if it passes 0-day. But:
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
