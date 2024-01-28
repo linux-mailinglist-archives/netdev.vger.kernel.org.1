@@ -1,200 +1,172 @@
-Return-Path: <netdev+bounces-66467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F63283F57F
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 13:35:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FD9B83F5B9
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 15:07:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98DBD283138
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 12:35:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29A38283BE1
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 14:07:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A7E01E884;
-	Sun, 28 Jan 2024 12:35:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="DoOsqjuQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CF6A2376A;
+	Sun, 28 Jan 2024 14:07:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05olkn2040.outbound.protection.outlook.com [40.92.91.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 237BD210F2
-	for <netdev@vger.kernel.org>; Sun, 28 Jan 2024 12:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.21
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706445312; cv=none; b=Ho1b/AI0WSsDDCHdRNFBuzSoJVM+fqCJVUQflg9gdxuwq4qyCxXj2CI9d5L9bKaVBBorVLq3ehWK2SgRK4Vvpw6x6BEWRRRc18jIlyx+vOJxA3lO2uLuE2ZOmOoZ/F+Q0qbhFs3JSlwchZGneNUzX8FNNOPLnBxoKVmQyuJu5ec=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706445312; c=relaxed/simple;
-	bh=235h4BEOqyTuoeLPsjBKoYZ1qvynA8GqDq9T7lGs49E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eJ59mG/d+ZueCvXhrvgqockp/OhXQZys5Ljk83bJ4oexUzcvElSeQ22ij6DR15RdMfb4LYhi5p+YKLdRRQVC40QeOMEDidoMuSKgErhRqqowW6WrI1qgNNQ+1NfjNCVOmRd9GrkWOz0jr3eyyqJIuP251RtM5V4ikp5+ZfCX8v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=DoOsqjuQ; arc=none smtp.client-ip=64.147.123.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-	by mailout.west.internal (Postfix) with ESMTP id E25AD3200A7C;
-	Sun, 28 Jan 2024 07:35:08 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute3.internal (MEProxy); Sun, 28 Jan 2024 07:35:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1706445308; x=1706531708; bh=A8yfdxkc5LJDjdzO6XU529bgC5ry
-	RdJzvslQkbmN4LI=; b=DoOsqjuQjh+k4MKEFgZ1Gnvmg3dDmCOi1ZEcegA96d5D
-	cLUwuerhcJhONj7SvPvPWWVSmYqv1WePCMJHQX4EPZiqgCcWB3wBHXQ7tUzfu5VL
-	6g7U7dhgGKA5Ntdtaqkx0misnmVb6VTKVG8NuNj1/x0wr0YlTVgnKUvqXViqZ1Aq
-	aqhNgCbSHxw0Xj3fY76PikxnwnFgZPB35VHG9L3Mrua5OmxtajjOyDAeIxxvJi24
-	kxLRY72j7iGXsggDMzQoDRK4A/CrwHcDkVRdcdIUQB+//Ldmt+DSgplJlztkqz7/
-	JyNxrZmC/BGv9+wfVx3CKi0c983OiWltJ0+PGe9v5g==
-X-ME-Sender: <xms:_Em2ZTgRe9kXpyD7D__krPFbUQXJfAiTuS-3d6IhCmaCzH-V7epyLA>
-    <xme:_Em2ZQDBdOJeAXroil5h7_xHG2sjp2ajXFoaZNlXTngHm0-3-IxyNgm94rQwv8RFs
-    7tQOZNfReY72gE>
-X-ME-Received: <xmr:_Em2ZTGFfDQktdpB3wmxwaJSt2w4geWT9vqVeYf5ylk_Q9l7H-ZAU8mRPR85>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrfedtvddggeduucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvdenucfhrhhomhepkfguohcu
-    ufgthhhimhhmvghluceoihguohhstghhsehiughoshgthhdrohhrgheqnecuggftrfgrth
-    htvghrnhepvddufeevkeehueegfedtvdevfefgudeifeduieefgfelkeehgeelgeejjeeg
-    gefhnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepih
-    guohhstghhsehiughoshgthhdrohhrgh
-X-ME-Proxy: <xmx:_Em2ZQQovsR3ZbEe7kVc4Cdq0Yj4U_Nttbo7WwdQu8Ex4TY33pqmYw>
-    <xmx:_Em2ZQxm3jSVl4ALHnGnK8Ap10MkAIUcrHavk1W8ikdnE5VSewCmAg>
-    <xmx:_Em2ZW7XVk4UabIJPIdih9cpOq1TaTT0G7V_8JYduu7tHP64ZUF9DQ>
-    <xmx:_Em2Zb-ok-JWlM9aQekvA-BhBnNPJl0KNcCvcHyeXOwazOnWkjt_-g>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 28 Jan 2024 07:35:07 -0500 (EST)
-Date: Sun, 28 Jan 2024 14:35:04 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: David Ahern <dsahern@gmail.com>
-Cc: Vincent Bernat <vincent@bernat.ch>, Alce Lafranque <alce@lafranque.net>,
-	netdev@vger.kernel.org, stephen@networkplumber.org
-Subject: Re: [PATCH iproute2] vxlan: add support for flowlab inherit
-Message-ID: <ZbZJ-IS20fe8wmQv@shredder>
-References: <20240120124418.26117-1-alce@lafranque.net>
- <Za5eizfgzl5mwt50@shredder>
- <f24380fc-a346-4c81-ae78-e0828d40836e@gmail.com>
- <1793b6c1-9dba-4794-ae0d-5eda4f6db663@bernat.ch>
- <1fb36101-5a3c-4c81-8271-4002768fa0bd@gmail.com>
- <41582fa0-1330-42c5-b4eb-44f70713e77e@bernat.ch>
- <1e2ff78d-d130-46d4-b7ad-31a0f6796e1a@gmail.com>
- <e60e2cc1-02c0-452b-8bb1-b2fb741e7b43@bernat.ch>
- <fa8e2b04-5ddf-4121-be34-c57690f06c63@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B7FB23748;
+	Sun, 28 Jan 2024 14:06:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.91.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706450821; cv=fail; b=MM/h+6Y9c1h1THKJ904NoMUfX0+G6fQmEXUCdKDNsNx0KXAgltuZJXs+lOUsf087/O8N8hH769wwGhGrxdwMHLgcyP5yAI2CBGqBeGZJrRdNwG4nuxs3NWZIkh0XeBZ6hkB7lHw7EJ/A1/Gu8zLyHhNj5GwCV+oZ9zyMU5OlW3M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706450821; c=relaxed/simple;
+	bh=Pwy3+XnTJFvvlQdROLru3bEVpmPaK+4+cIH3qbGxrWk=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=XVqUhHHuDAqIeKLNsmjdoiEjSbqQrOHXtiObMcO18prziQns+Z6PZsboJDlOSJ3MUhlbZFwx4ubuvc/QlhxYgieMP4oWwk+8PKrvV1GVUbtE65geN6rCz81hJuemnP9H5wkGE3oHDDQOTsmoKQaEe7KYJdfWwHbylfCSEyNaaiY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.it; spf=pass smtp.mailfrom=outlook.it; arc=fail smtp.client-ip=40.92.91.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.it
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JP3/FRp0CMeL8eu8lz8vGE2qBtSY25rfuAkYOaVb+N+9P0USvsATA1gaToJl2zohTO4kwVuaHSt8zwoyhYm9r2yDnn4tTUPck6w70YnjqL6WTT432eeFuicEd+o+4iKPOI/Xoo02J8DFbWWmuaZW1NFcKT9IGC2NhzfCAFHfxYz96XbNuX8FuBLDX5Nhy4tUJ9gJOu8IfyWKL2yFDlDXpSbNRmQO0ltRewV+0LKrf8JmMaHebHBcHOkDk9tU6wE6tdfBA5D0kDYuQm2kFABRnthQhVhm+/84dllTbrnN8LL0eHsWuhyo8HKhioLI5XzWsySFaGaMSLn15yKWYcfCog==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=q2sEBf9r0iv6Sdjil6/yna65vQCMIk1zB8mnfFh3XNY=;
+ b=Wu/ysNzX6Qh7cZwZ5qhcLYVNF2vp4WJE5K1zE5TlAC2DuTqtoJNN/pusW5z9Z/ls3EbwodzvxWE8NOKK4liRXwYH31w8HEK1jq/HJDoZCJEmh1EQvOuGfpIVSGyI6BlNubKDeNuNlz2jo6s72tygFtaMwNU3zF/NQQEB3zrCkdJlk6boQDrVFpZubz8J9TRsIiT/Cbe6F9//xOgavDcdZHUFoz18V30I1xgNIkZccdsEmqSRIP2/YOdBnGwZoHXKMmc6ENnNv2cE081vh/cZh8cU5FOyoxgf07F99U+DeNXra3lNNSRunyeDdZyk8k9vDsu12D/l06iS5vpxKW4Jng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+Received: from AS1PR03MB8189.eurprd03.prod.outlook.com (2603:10a6:20b:47d::10)
+ by AM9PR03MB7742.eurprd03.prod.outlook.com (2603:10a6:20b:3dc::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.32; Sun, 28 Jan
+ 2024 14:06:56 +0000
+Received: from AS1PR03MB8189.eurprd03.prod.outlook.com
+ ([fe80::ffb3:3ff8:6ea9:52b5]) by AS1PR03MB8189.eurprd03.prod.outlook.com
+ ([fe80::ffb3:3ff8:6ea9:52b5%5]) with mapi id 15.20.7202.035; Sun, 28 Jan 2024
+ 14:06:50 +0000
+From: Sergio Palumbo <palumbo.ser@outlook.it>
+To: Russell King <linux@armlinux.org.uk>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: sfp: add quirk for OEM DFP-34X-2C2 GPON ONU SFP
+Date: Sun, 28 Jan 2024 15:06:33 +0100
+Message-ID:
+ <AS1PR03MB8189AD85CEB6E139F27307D3827F2@AS1PR03MB8189.eurprd03.prod.outlook.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [G3Q7lYVxeWH//9HFfIlTk0Lwc/MFRxg+]
+X-ClientProxiedBy: MRXP264CA0041.FRAP264.PROD.OUTLOOK.COM
+ (2603:10a6:500:14::29) To AS1PR03MB8189.eurprd03.prod.outlook.com
+ (2603:10a6:20b:47d::10)
+X-Microsoft-Original-Message-ID:
+ <20240128140633.8753-1-palumbo.ser@outlook.it>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fa8e2b04-5ddf-4121-be34-c57690f06c63@gmail.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS1PR03MB8189:EE_|AM9PR03MB7742:EE_
+X-MS-Office365-Filtering-Correlation-Id: 580f6c84-c2cf-4a8f-cf06-08dc200a5f61
+X-MS-Exchange-SLBlob-MailProps:
+	Mga27o8vReGfIc1VICO0dmEM3GFX/n+pKij/noRrFm5eFC94ZWVs7OYPy+eLKYealSEu5Rzm/dABZiPST74dh61UzERh93w7y3bX71sJMMvxmLxDTGRXcdXyLLRhX5FTzvUTBEy0XMEl+WRF0RFeXdng11PrDpAU3h0WkRLchHNz+NzbO0t5iRK2OlX0HTxYmNXuOmXs9RQ0G2dlpw/ASOPdjCY3syvBlN+N/RyjCYMbYkr22y03yuvPdih0kV4zdYBub4OnCOex2ot0OvlelHLG2C5n97igNHkuldirVOOFkvTCBSEOlVD8zlChjRT5DPZuN8hPJTonZE8HWcPJybWBPGM5wdxXjuCpJLfqTOAGwZlAdoljWqAmjyB8Xjv9xujboEmO1f3FYEaxmIRRQXsnty+UUeV0/LRRS+WsLoZvo7In+b7GjVNErw3lRMiQTWx7caHpB40l8Z5sXphFfX26ebEW/7tpQzWkapsKeElk32+7y1DNr/oVU5uQuOcXvAHtKywMQ+t5Afachk4u+bgzw9tq+ilBWr8XSUxAxuWvJj8TnqPBuzzVY7SiqCThRrNzAnmQ5m83EuZ7H0njpS7+6gMGke7oScoBf7WHAo6yiZPcnOMXZ7+5fT5nLym2xizIAvNNqlGt3D1wh0ELPqx2KddEBeBDrLz/DljpnGDve25UJdnQBxO4SFhuwaAev8tAKMO1JDQGC5HflGCVfNI2GU7sV53/4vfBSub8sGdK8KNXq/H2NBQlCfYO8tfwZMFD2kRa5dZseUqKlCg1HT11K0BD+bUqFhmRS855vLTqA3iUdJFSzQ==
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	ak8hi434v3xz7Tn78UWuVLpWQsrwIQANht/5qTK+zamYtdUbDDq+mOvjgQQtBTnMS8EqlSYTa0GV3dINEg+HStzsSmTml3FOFOssmW42e0fZUKdz1r6st8nJZREmMs0PgSTtTeKCUi5g0XkNZz+GVT5WQ4fnuwkW/NnZ76XNl/4ieum9w0jFAWM87EhSAUcZSHeFMU8nTFzVNJVGYRXI4ZhDlHvhEtl2mPYI+XcpE98uYzF7GkvZzQBP5GFn2/QDLrf5vdF5LZ70BEXSyNm4n5KVNaKJxP+umUY2IgA+O6KnTCgVHLmk8JRSVoEKgAJ/m5QSM9IlTNqlmprq4gUpoxqgSWqaJZLFUqhzGkfdD+bw34xZNaZWw/xUTjUp27IfJZS0LXV2nT4HPRHnkgEtJjY3QOS5Dfhqcw6riPi0YVDcULNwFbGt2gERWvsTTsk8N5mbnyHCQcY2Q56ytDcYhBnwbSs6WOJnLLgMDnTOJbAcyoLat7HJWYWri8BfKWD4954Ap+h+HOp7+qPyEFrBsp/n30cN1seTN6aQZd7+0lyRUoKoGscjvSBIcJ6cS2R+Tx+13r6sJXDe4M4h0m+AdtQVlFBT1nwkhFQIfdL05cA=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?KbDQ63AFflgVaYndOCD6qC/+10O+kcLDLAzqVP45YostgMlitnAZJIcaml/d?=
+ =?us-ascii?Q?QWiVrj2BI1g5Bo8sp/46AiO3nJChH16AoNSOHC/vvNOIbaPS+x77oGMmgvIU?=
+ =?us-ascii?Q?PiBkzzNWd8yvov5hBruWTIM4LAKgvLqmzlNV7x+nlgra9Gbp6te17LGkEznT?=
+ =?us-ascii?Q?qzaeWYfKucwDCpizVM7jxrPnmNqCffeTUW5oyLiQU6hCHCnd6vCF5g6vosFv?=
+ =?us-ascii?Q?owqK5VgjDhbtBJUi7Cd6vo1Qo55dF6lEZ3GI0ikq5aWvDeo3ImE0/SriymTp?=
+ =?us-ascii?Q?F08t2sN8SjMp2UPY4bVp7BEOxOovpaWMQ8c+m2nzeFAqxbRV36OhREfog7T0?=
+ =?us-ascii?Q?FrLbDKDC7jzL5kUXcMfpsoUNvwq8QNv0COH/FO1mz7h9H9rvswHiMXqNL5ta?=
+ =?us-ascii?Q?G7PG4zVZpxpbtwgVWg6tAhdMNZYJlsZB1XfgG51H95AZRPVcyfXd4d7IunqD?=
+ =?us-ascii?Q?1jUK5M8qobQyQUop9jir60jYfCUSecqi8XRHEE/BmhK4n5ZqiSmvfpUlS2kz?=
+ =?us-ascii?Q?Dp5dwYghKvy1OhLyqt7l6wxIOd89yHPf1xxZT8wY+1jh81H1Ln2vKNjnAtjJ?=
+ =?us-ascii?Q?a6Bf3s10PSXWKSXsuiwLzc1K/GmiXng3Ho8V1fRFGULulXokqBdI7ftjtDEv?=
+ =?us-ascii?Q?07PtaTexmf5XkxWyiGIDcsa7+G+10evdhutBZwKTXwdY3oUyva0hneBaT+6x?=
+ =?us-ascii?Q?Bv3ACSIP4kL8rsgcPNu9SeNlfiqCM82XpN92rsK+E4R93RFLQqCidjSkqBR+?=
+ =?us-ascii?Q?6v6XndP5QsTU2VzyBb9u3TSGZiItUxWutVHNrKqQ0/l/Mqa6p66/O1G+eNsj?=
+ =?us-ascii?Q?uKEhXawKY75o3I8EII/bYSBpHJxMkPgtZP0UNL6WWYaH1pzu4zmiWw+mFbr1?=
+ =?us-ascii?Q?p5ZXMGHKqX/Ts2DpQ5irNqWDTRdgTmOeXqaFROW+/Slhj0OICXKq57nYxmDI?=
+ =?us-ascii?Q?8YQY7ZfFWggIW7ol+WOX4YQP4Z/n6VLj4uLXZc5N3y1uFmiGV5Rd7+hitLDp?=
+ =?us-ascii?Q?Y6uyBsojABSsE5vgIw/fStjc/h5Lcq+gteiEJY2dI4oVlVpstrJgEM04nK/W?=
+ =?us-ascii?Q?mkm5eNCT+3KPz1wrAgXZOIYgK1/YLkvT7qrV6Ja5jpfNe2r4FhMFrGo4lgef?=
+ =?us-ascii?Q?32X4Q9/T0KktmTOeqT6iCocoe8WypKY6kPdLKFuJCXXZJPXjw56P4GnaO4Jb?=
+ =?us-ascii?Q?pETr2Z1U+8GvEn0j/IKqyIerNHDOAvjZF9s9vJegpvuwwCq6GUhy9o7FHAE?=
+ =?us-ascii?Q?=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-76d7b.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 580f6c84-c2cf-4a8f-cf06-08dc200a5f61
+X-MS-Exchange-CrossTenant-AuthSource: AS1PR03MB8189.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2024 14:06:50.3777
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR03MB7742
 
-On Fri, Jan 26, 2024 at 10:17:36AM -0700, David Ahern wrote:
-> On 1/25/24 11:28 PM, Vincent Bernat wrote:
-> > Honestly, I have a hard time finding a real downside. The day we need to
-> > specify both a value and a policy, it will still be time to introduce a
-> > new keyword. For now, it seems better to be consistent with the other
-> > protocols and with the other keywords (ttl, for example) using the same
-> > approach.
-> 
-> ok. let's move forward without the new keyword with the understanding it
-> is not perfect, but at least consistent across commands should a problem
-> arise. Consistency allows simpler workarounds.
+     DFP-34X-2C2 is a GPON spf module working at both 1000baseX
+     and 2500baseX.
+     Setting the module to LAN_SDS_MODE=6 the module is working
+     at 2500baseX with auto negotiation see at
+     https://hack-gpon.org/ont-odi-realtek-dfp-34x-2c2/
+     Unfortunatly the module's PHY is accessible at 1000baseX only.
+     ethtool returning:
+     Supported ports: [ Fibre ]
+     Supported link modes: 1000baseX/Full
 
-I find it weird that the argument for the current approach is
-consistency when the commands are already inconsistent:
+     After applying the quirk:
+     Supported ports: [ Fibre ]
+     Supported link modes: 1000baseX/Full
+                           2500baseX/Full
+     Tested on BANANA PI R3 in OpenWRT v 23.05.2 Kernel 5.15.137
+     Tested on sfp to ethernet Media Converter.
+     Autonegotiating 1000baseX or 2500baseX according to the
+     connected host speed.
 
-1. VXLAN flow label can be specified either in decimal or hex, but the
-expectation is decimal according to the help message. ip6gre flow label
-can only be configured as hex:
+     This module is existing in 2 versions:
+     Vendor = "ODI"
+     Vendor = "OEM"
+     This is the patch for vendor "OEM"
 
-# ip link help vxlan
-[...]
-        LABEL := 0-1048575
+     Patch has been inserted keeping the list in alphabetical order
+     first by vendor first and then by part string.
 
-# ip link help ip6gre
-[...]
-        FLOWLABEL := { 0x0..0xfffff | inherit }
+Signed-off-by: Sergio Palumbo <palumbo.ser@outlook.it>
+---
+ drivers/net/phy/sfp.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-# ip link add name vx0 up type vxlan vni 10010 local 2001:db8:1::1 flowlabel 100 dstport 4789
-# ip -d -j -p link show dev vx0 | jq '.[]["linkinfo"]["info_data"]["label"]'
-"0x64"
-
-# ip link add name g6 up type ip6gre local 2001:db8:1::1 flowlabel 100
-# ip -d -j -p link show dev g6 | jq '.[]["linkinfo"]["info_data"]["flowlabel"]'
-"0x00100"
-
-2. The keywords in the JSON output are different as you can see above.
-The format of the value is also different.
-
-3. Value of 0 is not printed for VXLAN, but is printed for ip6gre:
-
-# ip link add name vx0 up type vxlan vni 10010 local 2001:db8:1::1 flowlabel 0 dstport 4789
-# ip -d -j -p link show dev vx0 | jq '.[]["linkinfo"]["info_data"]["label"]'
-null
-
-# ip link add name g6 up type ip6gre local 2001:db8:1::1 flowlabel 0
-# ip -d -j -p link show dev g6 | jq '.[]["linkinfo"]["info_data"]["flowlabel"]'
-"0x00000"
-
-If you do decide to move forward with the current approach, then at
-least the JSON output needs to be modified to print something when
-"inherit" is set. With current patch:
-
-# ip link add name vx0 up type vxlan vni 10010 local 2001:db8:1::1 flowlabel inherit dstport 4789
-# ip -d -j -p link show dev vx0 | jq '.[]["linkinfo"]["info_data"]["label"]'
-null
-
-I would also try to avoid sending the new 'IFLA_VXLAN_LABEL_POLICY' attribute
-for existing use cases: When creating a VXLAN device with a fixed flow label or
-when simply modifying an already fixed flow label. I would expect kernels
-6.5-6.7 to reject the new attribute as since kernel 6.5 the VXLAN driver
-enforces strict validation. However, it's not the case:
-
-# uname -r
-6.7.0-custom
-# ip link help vxlan | grep LABEL | grep inherit
-        LABEL   := { 0-1048575 | inherit }
-# ip link add name vx0 up type vxlan vni 10010 local 2001:db8:1::1 flowlabel 100 dstport 4789
-# echo $?
-0
-
-It seems to be an oversight in kernel commit 56738f460841 ("netlink: add strict
-parsing for future attributes") which states "Also, for new attributes, we need
-not accept them when the policy doesn't declare their usage". I do get a
-failure with the following diff [1] (there's probably a nicer way):
-
-# uname -r
-6.7.0-custom-dirty
-# ip link help vxlan | grep LABEL | grep inherit
-        LABEL   := { 0-1048575 | inherit }
-# ip link add name vx0 up type vxlan vni 10010 local 2001:db8:1::1 flowlabel 100 dstport 4789
-Error: Unknown attribute type.
-
-Regarding the comment about the
-"inherit-during-the-day-fixed-during-the-night" policy, I'm familiar
-with at least one hardware implementation that supports a policy of
-"inherit flow label when IPv6, otherwise set flow label to X" and it
-indeed won't be possible to express it with the single keyword approach.
-
-[1]
-diff --git a/lib/nlattr.c b/lib/nlattr.c
-index dc15e7888fc1..8da3be8a76dd 100644
---- a/lib/nlattr.c
-+++ b/lib/nlattr.c
-@@ -619,7 +619,9 @@ static int __nla_validate_parse(const struct nlattr *head, int len, int maxtype,
-                u16 type = nla_type(nla);
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index f75c9eb3958e..3c0028a4af92 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -502,6 +502,9 @@ static const struct sfp_quirk sfp_quirks[] = {
+ 	SFP_QUIRK_F("Walsun", "HXSX-ATRC-1", sfp_fixup_fs_10gt),
+ 	SFP_QUIRK_F("Walsun", "HXSX-ATRI-1", sfp_fixup_fs_10gt),
  
-                if (type == 0 || type > maxtype) {
--                       if (validate & NL_VALIDATE_MAXTYPE) {
-+                       if ((validate & NL_VALIDATE_MAXTYPE) ||
-+                           (policy && policy[0].strict_start_type &&
-+                            type >= policy[0].strict_start_type)) {
-                                NL_SET_ERR_MSG_ATTR(extack, nla,
-                                                    "Unknown attribute type");
-                                return -EINVAL;
++	// OEM DFP-34X-2C2 GPON ONU support 2500base-X
++	SFP_QUIRK_M("OEM", "DFP-34X-2C2", sfp_quirk_2500basex),
++
+ 	SFP_QUIRK_F("OEM", "SFP-10G-T", sfp_fixup_rollball_cc),
+ 	SFP_QUIRK_M("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
+ 	SFP_QUIRK_F("OEM", "RTSFP-10", sfp_fixup_rollball_cc),
+-- 
+2.34.1
+
 
