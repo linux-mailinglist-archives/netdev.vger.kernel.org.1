@@ -1,212 +1,129 @@
-Return-Path: <netdev+bounces-66447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 097E083F485
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 08:33:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8479883F491
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 09:13:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65751283EC0
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 07:33:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 319B1283D6D
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 08:13:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52F2E8BE0;
-	Sun, 28 Jan 2024 07:33:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA62FD50F;
+	Sun, 28 Jan 2024 08:13:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IbNzb0fZ"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="D43eZIFb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48280C129
-	for <netdev@vger.kernel.org>; Sun, 28 Jan 2024 07:33:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706427191; cv=fail; b=HkWc+2QUTVKlm4Nw6pxbAZchy6Mcy0hLXkd3WhbrVl3R2hBrpXMA7rL9mLoVeeN4Dfux1O9KxBr4mRYnXZ5Gd+ulDZs8glrlGbCVR8v4yvr2LvZDgj6pR/t9eusVEY0yHF/D59svY4pfCTMBkpYaXqAXWjjyWgF+wS5X01SrJdI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706427191; c=relaxed/simple;
-	bh=gulMwUzLSUtxf2MSx0a+vAJS214wBiQNC+6VanMfbG0=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=K6xmXA/5oqJOtfZyBLF3PqwHjG3aVTgoM2I5sNP7QrNAnHFozakhBJvFlz/+q4a+FhtnroXMYjCWPJL+e2cuPaslAG1YvI3voO1z/J3pTFamteOOe5TI9Tut/yG0y2Fnm2/DtaIGusY4ZtBObyjzcUUK3sT677vtDCAGEK8pzWU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IbNzb0fZ; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706427189; x=1737963189;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=gulMwUzLSUtxf2MSx0a+vAJS214wBiQNC+6VanMfbG0=;
-  b=IbNzb0fZ+a9Z4r/3U6cJGrqKFT2WSIT+PuKKMXGlMuQWYCwWzYSOa8Hk
-   LmoeQ4RL3cA8W8JsNfrU3Iwdcz8sah0Tv9mWr3mqfFNK0KqAc9F0F1YHs
-   AusMuDFaIQuoou6JMbHNerthvfdurvX+2K74jRXbGp7VybSAt9mPHHYwv
-   teE/hGIVhj0ftq3erxSWzA/I/VZZ41F5A9YRy3si7JiNalCNqVTWwD+LR
-   aay0mYLGPw5UG5tOoer0irJ/yDYQSftWQRtD1lPENXlRwE99cH73lwaoq
-   0KuLA2bSnjYIAwb02ftUvyNhkZGqiQBrfiut86bJUONJ81A2+8h275N1u
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10966"; a="16274916"
-X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="16274916"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2024 23:33:08 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10966"; a="877775835"
-X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
-   d="scan'208";a="877775835"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by FMSMGA003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 27 Jan 2024 23:33:08 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sat, 27 Jan 2024 23:33:07 -0800
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sat, 27 Jan 2024 23:33:07 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Sat, 27 Jan 2024 23:33:07 -0800
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22596D51A
+	for <netdev@vger.kernel.org>; Sun, 28 Jan 2024 08:13:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706429635; cv=none; b=Pu7R7l+sS3HRxpfwPB4iO37c73yzC+HG55G441RTrNuV7vvekTQQ+Qh2xd6tsUGO3ZqBz+0yGY9hsbrSlKgxyzAa9u9cjQk5z9CyxvsDgkizIal86HhbuGsEXdbgSEkOP4wCqydARQxBIWrsT1PiEnbA0tGpnXEhP3tU/aPfq+Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706429635; c=relaxed/simple;
+	bh=oiuezi+p9fcVBCmML8h5GbRPOKxgyvl/5Bi0k5NehEU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YwlyIhu1OT9gCO5UOHmXb06jYggbKH6kCyenc308MCth0vPcV3Qb0IWjzVwp2mp1vok6827Wkdl9Jvdj2S0wDbRAA8YPwboAC55d8IJowRhlhvEe6fqQYFYqa8TXntC5Im7kFOGR6/cKwel6p4qBH0u6pPFCrAd6FtMh0W3PPbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=D43eZIFb; arc=none smtp.client-ip=99.78.197.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1706429634; x=1737965634;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=uhWaMOp6Cth5WtpkeNlSYWUHuUszKknIZr/Yn36/Ry0=;
+  b=D43eZIFb1OGPg2v7e1WEfN1lTCu07zKoa8kS5PE+uZBSCMubEyeToUDe
+   KjpCioQotlnsQVimILcgR2LDTrl/5+QoafD/rNeB84MjJKuPuFpesz8m/
+   R1k27OhdFZy1m2o+Mn2GO1g6+yzbf3lHaG7jV2fYa6jlPlL16StBUtoi5
+   0=;
+X-IronPort-AV: E=Sophos;i="6.05,220,1701129600"; 
+   d="scan'208";a="270007618"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1d-m6i4x-e651a362.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2024 08:13:52 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
+	by email-inbound-relay-iad-1d-m6i4x-e651a362.us-east-1.amazon.com (Postfix) with ESMTPS id C7D5080679;
+	Sun, 28 Jan 2024 08:13:48 +0000 (UTC)
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:35453]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.23.214:2525] with esmtp (Farcaster)
+ id f5618c40-7b02-4b52-b413-3d701d05460a; Sun, 28 Jan 2024 08:13:47 +0000 (UTC)
+X-Farcaster-Flow-ID: f5618c40-7b02-4b52-b413-3d701d05460a
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Sat, 27 Jan 2024 23:33:06 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KzhQDWBzoKf2jRiHhSHZMBHFZGxjPVgQ0LiGOGT1UaQ6fCgbd2k9/IHv5bEU/Z1NTQUs/T1r1rH8oVsqKrButQ1L62jIIGFwuTNWMzy2SW2g9Sftpuc15p9k6gUiZSLV3IrTf7sFX7XYl7Rj+g7b4gpzba80shaIl9OERwWpNUVSG1y3BcOb8wmG/Vi9LFV9OfBz1h4KobQwjjIxhpsXyxbSLDTjMzqQAFiy54J2eAY9fWBoSbgHQo9InWxBuX+o/9gWYxe1flw6wARljRI++KmQuFXCnCB6fuOJywuOLHSSo5dkR3/SNjauLlF5bWc8w+WjPilFUVxX8Gopw/D/uQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=a7TB8J/2erQAQ5yEQ8Jr/usk+TTZkcPTi4HWNPsXcLQ=;
- b=AyqrcbldoWAMxWJ3qjzxe745HhDPoy51/og69c78e1F1akuarN3xif4b9vzyfRREAMg1iXA7i5INBjMdtKltxkAoKm+jwQkcu6IX257HuDpDjGVP+6ys5FDon13KaAilPKfZ9C0TSIPG9aaZ35Vsevxa5daUR1CDNxE3JhVd4N/19NYZDb8k+eWo1+Y3Flaj4QDCblU8tv4w+FODdq2n+3GnYu2MHeY/lp08zxIdCVJSBPUTyW4ZEj9GMtZkCwGWERXs9FN8TFnro/RqNOBr0DAQRRP9wOxFtmjM6vswh5B7SgRkw8yYVrZ8EZntC7uLB1fnUWfHyt6UYJwdY+Qlug==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW4PR11MB6738.namprd11.prod.outlook.com (2603:10b6:303:20c::13)
- by SJ1PR11MB6249.namprd11.prod.outlook.com (2603:10b6:a03:45a::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.27; Sun, 28 Jan
- 2024 07:33:00 +0000
-Received: from MW4PR11MB6738.namprd11.prod.outlook.com
- ([fe80::5e2f:2e89:8708:a92d]) by MW4PR11MB6738.namprd11.prod.outlook.com
- ([fe80::5e2f:2e89:8708:a92d%4]) with mapi id 15.20.7228.029; Sun, 28 Jan 2024
- 07:33:00 +0000
-Message-ID: <8d3340c4-81f8-4617-849e-e1fba96d0a19@intel.com>
-Date: Sun, 28 Jan 2024 09:32:54 +0200
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] I225-V (rev 03) LOM + Linux kernel 6.7.0 power
- save issues
-To: S. <strykar@hotmail.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Ruinskiy, Dima" <dima.ruinskiy@intel.com>, "Lifshits, Vitaly"
-	<vitaly.lifshits@intel.com>
-References: <MW4PR17MB42749868DA9C32BBDA50F4F4BB792@MW4PR17MB4274.namprd17.prod.outlook.com>
-Content-Language: en-US
-From: Sasha Neftin <sasha.neftin@intel.com>
-In-Reply-To: <MW4PR17MB42749868DA9C32BBDA50F4F4BB792@MW4PR17MB4274.namprd17.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR0P281CA0248.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:af::7) To MW4PR11MB6738.namprd11.prod.outlook.com
- (2603:10b6:303:20c::13)
+ 15.2.1118.40; Sun, 28 Jan 2024 08:13:46 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.48) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Sun, 28 Jan 2024 08:13:44 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <ebiggers@google.com>, <eric.dumazet@gmail.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <syzbot+32b89eaa102b372ff76d@syzkaller.appspotmail.com>
+Subject: Re: [PATCH net] llc: call sock_orphan() at release time
+Date: Sun, 28 Jan 2024 00:13:33 -0800
+Message-ID: <20240128081333.2392-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240126165532.3396702-1-edumazet@google.com>
+References: <20240126165532.3396702-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB6738:EE_|SJ1PR11MB6249:EE_
-X-MS-Office365-Filtering-Correlation-Id: b1762816-589a-4379-0bc7-08dc1fd35abf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vYGr6zCSP5IrYRc7TIUe+/yTM+zk5IcW37C6Fb673DKrq8M9mga/Fp5ehVmAEHVVmirngbULXouvNNZld1HEFxON9GOIWhxXvBk7/Xhq+zDkNVPAQP/4WxW4NVW4QdiCSPwu6+rP64AkAsZA8nd/DW2sn7Q50vJ4b5BfaFOyLSEf+/gS3D/ozn3DlSrCYrM/2qvFG1IuTxS9VSm1aARZij19FRoYqVuPs/JKafRGXsEBBb3qyxgByRpRyvYWwsAZi/1F5UOEfqgpcjk+gsAMmyu/alM0Gn/YnrIndxMUFMLBEBDJ+skzdSB9ktArK1yG7jKT9qoKx5x0CeOzN3o5DKJBhc0tOyUuT+8qiGONvNEjZ0Q/ZwEH6QvGxhc6lyLoKSGQedeJeJbcV496DVynO8CuumFKsHZHtG4Lsmb5/2kaKJO5YRbdbPJbiyVL9iTicFjTF8WkqFIrd66Fo/L3JqV+A7UPiikwWMIpBN1yo2LxELmduSbInW+YI5SSrt/dmjWzjB0Tdzl9Dy9EWkTxdswaN3o44mAYf+5elhJYi8qEFVtzkBmgkKt3+BFMRfY+7B3Hiip2lf3ukG2a4I5UxZURRCVIeciw5UNYQ23xbDhxLlMcjcvd1e+s9seEuyjFwnV9dvBiJBkO9RmSe108yQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB6738.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(39860400002)(396003)(346002)(366004)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(31686004)(83380400001)(107886003)(36756003)(53546011)(31696002)(86362001)(82960400001)(44832011)(4326008)(8676002)(8936002)(5660300002)(2616005)(26005)(38100700002)(316002)(66476007)(66946007)(110136005)(2906002)(6512007)(41300700001)(54906003)(6666004)(66556008)(478600001)(6486002)(966005)(6506007)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cGdrMi82NDNtK3pEMm5LWDlaUTJPNVBoQmhXTVl6TXJEbitaaGw2bmNROWtC?=
- =?utf-8?B?ZWY5bHV4Kzl5VENsdG9pQm5NbVdLRkJ2MVBoZnJqWDVjNnJOSEQwTkJiZ2hJ?=
- =?utf-8?B?Sm9Sby9kWVRDUWoxdW5ZbTFab2hOcUdzbjZSVUVrUmlrQVVsdnFkbDA5VTJH?=
- =?utf-8?B?aGFKR0ljWkpBb1VON1Y3RFZzUUI1TDZDeGsvZlA1MGNCUkZtbUZZWmxWTjU4?=
- =?utf-8?B?ejM5emllSzRPcVJOTzZ6TUNQaElHcTlhZEpoUWkvQVk4MGIxV1BvdDU0SjVs?=
- =?utf-8?B?bEdlV1lSeDdVcG5OOU5ZczdzUWZFSXRGR21EUnVxcVg3d2x6SDRsT1lwckVw?=
- =?utf-8?B?VVhFUURlN3JEbkQ5Zks5cUdMRkR6TkxEL0VVZGtPRE1MT0tpSGVNejQ4MUpq?=
- =?utf-8?B?Yk1lWXB3bFYxVkJEVGUwZ0xRYm9KeWhqODdLTEUwbXVicnlYTldTaG0rTjBH?=
- =?utf-8?B?YWhUL1RIM1ZBKzM3bjBlSGZPblZUMXZRSGlSRnVKazgwMEN2V1c1ME4xekVq?=
- =?utf-8?B?NC96SkdJQWEwdy9vOVZmaytEdUMzaWZLWlgvY0w2NlhUKytyeG10Mk5XV1Zy?=
- =?utf-8?B?NVI5VkFSVXlnRHRuNVdjMnVQYWo4cTIxRHkzWHlRSFhrMnJEbERaTHZhQUow?=
- =?utf-8?B?YzZyWitNcVhvaVZpbFdqSlBkWVZIdUFDUzJXZ1g3SkVCRSt3Y0NYemh6QTZa?=
- =?utf-8?B?S2dMVFR6NjhsUmdTdmExeTMzalp4Y1FjMVVJWC9VMVllYlJ3Qm9lTWxwVmdr?=
- =?utf-8?B?MXN6WVhXQmxXOWZzbHNhdVpyMFNtTVU5R2tKZDBRaXRtUStjejF1TU5wM0ZL?=
- =?utf-8?B?MlZHcHhheDJ3dEY1d0pXc0UxUDBoZEpxZE5ISzVBNWp2emFkdi85ajVVYUYr?=
- =?utf-8?B?WG5LTFlpd3lkc2dqdEZGb3oxUjVCUktEakk3c3VycHh6VXprVGwwUDlpOU90?=
- =?utf-8?B?TkdzUGRObGlwbzh6TXU2QzNaZmtqYm92WWU1ZEtwNHNUL01TQitnc01Ud2JG?=
- =?utf-8?B?cGxTR284czBRTkxkYmN6NnBtNmozYWFtRkVIMERCd0JEdnlqOTl0WlBSVjZ0?=
- =?utf-8?B?NHZ2cVhNck9yU2ZtREVseFliU25JcVp3aVl0UWhLTFAxbE5kREFoeDJGSFIr?=
- =?utf-8?B?Y005M0d0a08rTDRUV0YwWmlVRVFJb05PSjVLQlUrZnIvYlV0TGxkVldWU3Z1?=
- =?utf-8?B?RnRFdmlFUnBPZXVoN29ncldUQ0ZTbmJTempzaVhBTklUcFZReWx6ZmRlV2RP?=
- =?utf-8?B?Nko2MDFTMlVrMkpjcm4wN1daNHg0aldxcVFEbnFpbmFXSGlONzZ6YUI1ZUxv?=
- =?utf-8?B?UjBjYmRRTkVTTTZKVHIzWlgwL2ZaRFBKMEZrcG83UzZDUk1KTkoyZGFCU3hI?=
- =?utf-8?B?bGN6eGdIaGNOcVM1d2N4enMzdWJMMm84MXhRdUlLQXZzc1B6Q2svdHZsU0FP?=
- =?utf-8?B?aCtoVFRpWFVRcHBERWxFdUgxWXQwMFRMRGlGVC9HeStmUEFSQklGYW52Zmdh?=
- =?utf-8?B?eitvcDZQTTl4Z2pjdC9BbERzbXBQdHIrbGpwOEhJWTQxaTUzR3VBZTEweEF5?=
- =?utf-8?B?aGNKcmNrTndGSWxOZVRrZW9LamVLWHArdFEwWUY3VXdOQThNZ3JYMjNLd1ZE?=
- =?utf-8?B?cHF3NEYyM25XZER4V2xESnNTVk40eWhCTGF0NmdmWTBMNTJUSUV2ZmUxSlJI?=
- =?utf-8?B?bGNOZFR0MHJOdmRkOXBwYUpjU09jV1BYK2Z6Q2V2SnQrUUNkZ3ZWSXNodXZ3?=
- =?utf-8?B?MWhyVU1FT1NCYWJPVXRSVFRvek1HcnhNL3NlY1pxVExuUFRVWlFsYm9yNDNn?=
- =?utf-8?B?b1hYZE9EQ2JZWEV6cGs2Z0ZTMzFicDFCeERMTjA4WDNBN2IwVDlHZm9CQVdx?=
- =?utf-8?B?NEVLc2RWQUFCZ05za0ZON0srWEJiemU3UENRZlpCZHh4S1FtbE80bE4zUytJ?=
- =?utf-8?B?eUhMSXB0aGNFR25uUnUzTmkxQlp3aVgrN2R0VXlQMjNxS044Y1Z6UmUxdHdH?=
- =?utf-8?B?eEY1eGZseEJCaVpta281VFo1bitLUUxZclhXekxZVWVoWTZYMjlTMTV0NVFR?=
- =?utf-8?B?TUt0S2xYNGtaTHBBdEdPUCtIZ1JFZTBEZnI5ZDczU0ZHVkx4NkdBZytlcW83?=
- =?utf-8?B?YlRSbmNzaFc5V1lYNkdtTmM5dis0ZHZGSnRiNkYyWjVXMUpGcGVwMkExeVhW?=
- =?utf-8?B?VWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b1762816-589a-4379-0bc7-08dc1fd35abf
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB6738.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jan 2024 07:33:00.3354
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6kHkIhmKSlndUTGfwnW3nD9zRAtlo4phDBEWnd3Gb5YkUAgfjicOPKVhi8x4L4Tt23PDxX4+cqicNYZ6a0cPQg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6249
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D044UWA001.ant.amazon.com (10.13.139.100) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-On 26/01/2024 13:37, S. wrote:
-> Hi,
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 26 Jan 2024 16:55:32 +0000
+> syzbot reported an interesting trace [1] caused by a stale sk->sk_wq
+> pointer in a closed llc socket.
 > 
-> This was tested on a recently assembled Asus X670E-E ROG Gaming Wifi 
-> motherboard running a standard Arch linux install - "Linux r912 
-> 6.7.0-arch3-1 #1 SMP PREEMPT_DYNAMIC Sat, 13 Jan 2024 14:37:14 +0000 
-> x86_64 GNU/Linux."
+> In commit ff7b11aa481f ("net: socket: set sock->sk to NULL after
+> calling proto_ops::release()") Eric Biggers hinted that some protocols
+> are missing a sock_orphan(), we need to perform a full audit.
 > 
-> The NIC will only connect at 100 Mbit, forcing 1000 logs "igc 
-> 0000:0a:00.0 eno1: Force mode currently not supported".
+> In net-next, I plan to clear sock->sk from sock_orphan() and
+> amend Eric patch to add a warning.
+[...]
+> 
+> Fixes: 43815482370c ("net: sock_def_readable() and friends RCU conversion")
+> Reported-and-tested-by: syzbot+32b89eaa102b372ff76d@syzkaller.appspotmail.com
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Eric Biggers <ebiggers@google.com>
+> Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-1000M works only with auto-negotiation. (but it is not related)
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-> 
-> When Gnome / kernel attempt to power save to standby, it logs "igc: 
-> Failed to read reg 0xc030!" and proceeds to hang the machine for about 5 
-> minutes, post which it resets back to GDM login.
-> After discussing the symptoms on IRC, it was suggested to drop an email 
-> to the igc driver maintainer.
-> 
-> Some notes and logs at - 
-> https://gist.github.com/Strykar/c78c292ca0a8ef942af846a1272a044e
-> The issue persists even on kernel 6.7.1
+The plan sounds good to me, thanks!
 
- From the log I can see that PCIe link loss - this maybe come from 
-HW/platform or BIOS settings. As a first step, I suggest contacting the 
-vendor (ASUS).
 
+> ---
+>  net/llc/af_llc.c | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
-> Is this a known issue?
-> 
-> Best,
-> Avi
-
+> diff --git a/net/llc/af_llc.c b/net/llc/af_llc.c
+> index 20551cfb7da6d8dd098c906477895e26c080fe32..fde1140d899efc7ba02e6bc3998cb857ef30df14 100644
+> --- a/net/llc/af_llc.c
+> +++ b/net/llc/af_llc.c
+> @@ -226,6 +226,8 @@ static int llc_ui_release(struct socket *sock)
+>  	}
+>  	netdev_put(llc->dev, &llc->dev_tracker);
+>  	sock_put(sk);
+> +	sock_orphan(sk);
+> +	sock->sk = NULL;
+>  	llc_sk_free(sk);
+>  out:
+>  	return 0;
+> -- 
+> 2.43.0.429.g432eaa2c6b-goog
 
