@@ -1,205 +1,123 @@
-Return-Path: <netdev+bounces-66449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CD3E83F49A
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 09:29:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 506FE83F4B7
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 10:06:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43E5D28330F
-	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 08:29:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D247F1F21AC7
+	for <lists+netdev@lfdr.de>; Sun, 28 Jan 2024 09:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7D91DDA0;
-	Sun, 28 Jan 2024 08:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5FCDF49;
+	Sun, 28 Jan 2024 09:06:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="VgHeaGEL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AkcVwVM1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A03E8D536;
-	Sun, 28 Jan 2024 08:28:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49514DDC5;
+	Sun, 28 Jan 2024 09:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706430535; cv=none; b=i4V9AnslqtD5iCsdjxeaJDms+v3Wet0BjyiL4q3B0clgnomHFQcG9dt/wfT4ucYRBan9RLBLy0km4J9utxsZIS/PFn95v+2xx4FO+IhksERVjPR44Ksl54Cade1qZX+HTu+b1e4GESWkO509r/TPxJsoIfTVHA+TZUQZdttNHZQ=
+	t=1706432788; cv=none; b=rhtDs29gqZB31MmnwU1BDxzjR8eiDf+CpiFm/hCV+kAIVf0UXxUUAjvS2dKWhiaoU0L0o7dKlurbNOIXVYsa6KglvFxarD6OdEsSVkAa4tPo2ksT18rBwi5ziT5OyCU+i7vHLh7UO0YRsBHapE/6tZDwel+LgE92UJqJfmQPC7k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706430535; c=relaxed/simple;
-	bh=VZJ32uBSnHeYLRqyWtoGJ+vKF2durp0l+kmkeHMQY4g=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uB/ua+2Igt6iGv9TOb81S6d8Ab95AJdoAB+s2TBymZ2Q5zIaSnSA9DngXCP5iiuV6ln6/EQsItkhr5V7FSEPzJa2YLoxGliz8CTXTeYNzNnyxTNGIY61wYu7XqXahThpcVxggYWKLtPrWOYkqIJVid3dcvIVBcTJQbG1MfE26ok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=VgHeaGEL; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1706430533; x=1737966533;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Aer27LddC3vgYFmEG+ckZUqU4qn8n6YISCTG6G1GZy8=;
-  b=VgHeaGELqUwp7GAJTzhRXTiNKRZy5doIseqYQYbIP0Em+fusrfWfImOp
-   2lTPH/sQslDYPUUE7dgkDTLyC48CjZJznQpoFe6ITEzrHlhxaK4eomVBE
-   MebhBQjDGOSiIdVy3aWpOy+elbi8LgMwgMnM5GiLNdumoadZxCvAbboWM
-   c=;
-X-IronPort-AV: E=Sophos;i="6.05,220,1701129600"; 
-   d="scan'208";a="630396084"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-8c5b1df3.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2024 08:28:51 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
-	by email-inbound-relay-pdx-2c-m6i4x-8c5b1df3.us-west-2.amazon.com (Postfix) with ESMTPS id 1D98440D4A;
-	Sun, 28 Jan 2024 08:28:50 +0000 (UTC)
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.7.35:28618]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.3.8:2525] with esmtp (Farcaster)
- id a741d178-266c-4cf2-9742-14a26ef5d16b; Sun, 28 Jan 2024 08:28:49 +0000 (UTC)
-X-Farcaster-Flow-ID: a741d178-266c-4cf2-9742-14a26ef5d16b
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Sun, 28 Jan 2024 08:28:49 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.48) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Sun, 28 Jan 2024 08:28:46 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kent.overstreet@linux.dev>
-CC: <boqun.feng@gmail.com>, <linux-fsdevel@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<peterz@infradead.org>, <kuniyu@amazon.com>
-Subject: Re: [PATCH 4/4] af_unix: convert to lock_cmp_fn
-Date: Sun, 28 Jan 2024 00:28:38 -0800
-Message-ID: <20240128082838.3961-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240127020833.487907-5-kent.overstreet@linux.dev>
-References: <20240127020833.487907-5-kent.overstreet@linux.dev>
+	s=arc-20240116; t=1706432788; c=relaxed/simple;
+	bh=YAWRcL+76J78dm5IBZqJe3yaGnvEhoK8TSf93uvaj/A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N43hBWKWi1ap+qDTK4gUxTkVOOTLMMlOeq0baYxgURen/s0sIRrMsq9WkZdn4naQURyOHLo4bRrKQFxuBqLSgSN284ZbE/LNfFQv0JjBin3zuRakFoUqa0+0Y17gHIlGjEhPEpsnhLXBl1hVwPDU13n4u78N2EGFzkTVwLFGj4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AkcVwVM1; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706432787; x=1737968787;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=YAWRcL+76J78dm5IBZqJe3yaGnvEhoK8TSf93uvaj/A=;
+  b=AkcVwVM1IYf3lI5/vc76QUXOtxGOjEAURemyEqjZEKgtBkBowosAVzqG
+   +tV41u6q8VowpPpl2LC2G+kDJeETBqm/i4Bzi/eNf1dI/lTu6hpF4z3dq
+   lfDdh/hCF0U+ZgbtrSkJvNS4Dw0guDW1Oh+kdeEVey4cD2H+ewTL3gQBq
+   /vLOnoKNFFD1fkvO6BWeIUnlPEOQoxh+PY/SBMFvoDMIJW5O0ZBBuzpFp
+   6wD4kLDq0WracxC9UcqINq1/bDhiEYFkhoJ3GoqZ6fhByf34JTvkVDmT8
+   pVGxa1TpuH6BOBH+JLhCE45Bi3vOjYY4wrxgtVqSuKsnoUaGosUXb88TP
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10966"; a="10139148"
+X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
+   d="scan'208";a="10139148"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jan 2024 01:06:25 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,220,1701158400"; 
+   d="scan'208";a="3016775"
+Received: from lkp-server01.sh.intel.com (HELO 370188f8dc87) ([10.239.97.150])
+  by fmviesa005.fm.intel.com with ESMTP; 28 Jan 2024 01:06:22 -0800
+Received: from kbuild by 370188f8dc87 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rU17L-0003GS-1R;
+	Sun, 28 Jan 2024 09:06:19 +0000
+Date: Sun, 28 Jan 2024 17:05:26 +0800
+From: kernel test robot <lkp@intel.com>
+To: Yunjian Wang <wangyunjian@huawei.com>, mst@redhat.com,
+	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	kuba@kernel.org, davem@davemloft.net, magnus.karlsson@intel.com
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, xudingke@huawei.com,
+	Yunjian Wang <wangyunjian@huawei.com>
+Subject: Re: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
+Message-ID: <202401281639.yBaJZ4Sh-lkp@intel.com>
+References: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D038UWB003.ant.amazon.com (10.13.139.157) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1706089075-16084-1-git-send-email-wangyunjian@huawei.com>
 
-From: Kent Overstreet <kent.overstreet@linux.dev>
-Date: Fri, 26 Jan 2024 21:08:31 -0500
-> Kill
->  - unix_state_lock_nested
->  - _nested usage for net->unx.table.locks[].
-> 
-> replace both with lock_set_cmp_fn_ptr_order(&u->lock).
-> 
-> The lock ordering in sk_diag_dump_icons() looks suspicious; this may
-> turn up a real issue.
+Hi Yunjian,
 
-Yes, you cannot use lock_cmp_fn() for unix_state_lock_nested().
+kernel test robot noticed the following build warnings:
 
-The lock order in sk_diag_dump_icons() is
+[auto build test WARNING on net-next/main]
 
-  listening socket -> child socket in the listener's queue
+url:    https://github.com/intel-lab-lkp/linux/commits/Yunjian-Wang/xsk-Remove-non-zero-dma_page-check-in-xp_assign_dev/20240124-174011
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/1706089075-16084-1-git-send-email-wangyunjian%40huawei.com
+patch subject: [PATCH net-next 2/2] tun: AF_XDP Rx zero-copy support
+config: s390-defconfig (https://download.01.org/0day-ci/archive/20240128/202401281639.yBaJZ4Sh-lkp@intel.com/config)
+compiler: s390-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240128/202401281639.yBaJZ4Sh-lkp@intel.com/reproduce)
 
-, and the inverse order never happens.  ptr comparison does not make
-sense in this case, and lockdep will complain about false positive.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202401281639.yBaJZ4Sh-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/tun.c:1298:5: warning: no previous prototype for 'tun_xsk_pool_setup' [-Wmissing-prototypes]
+    1298 | int tun_xsk_pool_setup(struct net_device *dev, struct xsk_buff_pool *pool,
+         |     ^~~~~~~~~~~~~~~~~~
 
 
-> 
-> Cc: netdev@vger.kernel.org
-> Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
-> ---
->  include/net/af_unix.h |  3 ---
->  net/unix/af_unix.c    | 20 ++++++++------------
->  net/unix/diag.c       |  2 +-
->  3 files changed, 9 insertions(+), 16 deletions(-)
-> 
-> diff --git a/include/net/af_unix.h b/include/net/af_unix.h
-> index 49c4640027d8..4eff0a089640 100644
-> --- a/include/net/af_unix.h
-> +++ b/include/net/af_unix.h
-> @@ -48,9 +48,6 @@ struct scm_stat {
->  
->  #define unix_state_lock(s)	spin_lock(&unix_sk(s)->lock)
->  #define unix_state_unlock(s)	spin_unlock(&unix_sk(s)->lock)
-> -#define unix_state_lock_nested(s) \
-> -				spin_lock_nested(&unix_sk(s)->lock, \
-> -				SINGLE_DEPTH_NESTING)
->  
->  /* The AF_UNIX socket */
->  struct unix_sock {
-> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> index d013de3c5490..1a0d273799c1 100644
-> --- a/net/unix/af_unix.c
-> +++ b/net/unix/af_unix.c
-> @@ -170,7 +170,7 @@ static void unix_table_double_lock(struct net *net,
->  		swap(hash1, hash2);
->  
->  	spin_lock(&net->unx.table.locks[hash1]);
-> -	spin_lock_nested(&net->unx.table.locks[hash2], SINGLE_DEPTH_NESTING);
-> +	spin_lock(&net->unx.table.locks[hash2]);
->  }
->  
->  static void unix_table_double_unlock(struct net *net,
-> @@ -997,6 +997,7 @@ static struct sock *unix_create1(struct net *net, struct socket *sock, int kern,
->  	u->path.dentry = NULL;
->  	u->path.mnt = NULL;
->  	spin_lock_init(&u->lock);
-> +	lock_set_cmp_fn_ptr_order(&u->lock);
->  	atomic_long_set(&u->inflight, 0);
->  	INIT_LIST_HEAD(&u->link);
->  	mutex_init(&u->iolock); /* single task reading lock */
-> @@ -1340,17 +1341,11 @@ static int unix_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
->  
->  static void unix_state_double_lock(struct sock *sk1, struct sock *sk2)
->  {
-> -	if (unlikely(sk1 == sk2) || !sk2) {
-> -		unix_state_lock(sk1);
-> -		return;
-> -	}
-> -	if (sk1 < sk2) {
-> +	if (sk1 > sk2)
-> +		swap(sk1, sk2);
-> +	if (sk1 && sk1 != sk2)
->  		unix_state_lock(sk1);
-> -		unix_state_lock_nested(sk2);
-> -	} else {
-> -		unix_state_lock(sk2);
-> -		unix_state_lock_nested(sk1);
-> -	}
-> +	unix_state_lock(sk2);
->  }
->  
->  static void unix_state_double_unlock(struct sock *sk1, struct sock *sk2)
-> @@ -1591,7 +1586,7 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr *uaddr,
->  		goto out_unlock;
->  	}
->  
-> -	unix_state_lock_nested(sk);
-> +	unix_state_lock(sk);
->  
->  	if (sk->sk_state != st) {
->  		unix_state_unlock(sk);
-> @@ -3575,6 +3570,7 @@ static int __net_init unix_net_init(struct net *net)
->  
->  	for (i = 0; i < UNIX_HASH_SIZE; i++) {
->  		spin_lock_init(&net->unx.table.locks[i]);
-> +		lock_set_cmp_fn_ptr_order(&net->unx.table.locks[i]);
->  		INIT_HLIST_HEAD(&net->unx.table.buckets[i]);
->  	}
->  
-> diff --git a/net/unix/diag.c b/net/unix/diag.c
-> index bec09a3a1d44..8ab5e2217e4c 100644
-> --- a/net/unix/diag.c
-> +++ b/net/unix/diag.c
-> @@ -84,7 +84,7 @@ static int sk_diag_dump_icons(struct sock *sk, struct sk_buff *nlskb)
->  			 * queue lock. With the other's queue locked it's
->  			 * OK to lock the state.
->  			 */
-> -			unix_state_lock_nested(req);
-> +			unix_state_lock(req);
->  			peer = unix_sk(req)->peer;
->  			buf[i++] = (peer ? sock_i_ino(peer) : 0);
->  			unix_state_unlock(req);
-> -- 
-> 2.43.0
+vim +/tun_xsk_pool_setup +1298 drivers/net/tun.c
+
+  1297	
+> 1298	int tun_xsk_pool_setup(struct net_device *dev, struct xsk_buff_pool *pool,
+  1299			       u16 qid)
+  1300	{
+  1301		return pool ? tun_xsk_pool_enable(dev, pool, qid) :
+  1302			tun_xsk_pool_disable(dev, qid);
+  1303	}
+  1304	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
