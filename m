@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-66684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CA7084049E
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:10:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B10F8404A0
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:10:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B14171F22592
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 12:10:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E58761F238D6
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 12:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0DF35FDB2;
-	Mon, 29 Jan 2024 12:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3778B60265;
+	Mon, 29 Jan 2024 12:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KOZt2HEz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G5jxudOO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A12425FEED;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1265FEFE;
 	Mon, 29 Jan 2024 12:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706530226; cv=none; b=qBh8EgurjmU8NGiao0FLmtlV7xJKQvPBlv89sGphzftfnkpnNcpabSoV8PMWW0yEuzQVCBd089VlZ3nHBs0tpxb918jT5ceUrxorKTqKEFBK6ot2iJvbl5aWo7v3FCAatUkMR90o9Sjn49Qtfab94KYW1+2P+E9FMrv1djGeY8E=
+	t=1706530227; cv=none; b=hhIkIEToauYuAFlR1Vmdtz08TufYDm/8rOOTqa9ZkUbbWk32YqxRYK7kDcN0aj0YpZJtd042WVOUZ0+KXNOq2uJkzPdp21q3wxG21dS5bhiiemib7gX3J6pOrmXsNgz2Hk38kbQx7fOB1u0YsVha04HwLEMz8MOBh/rBXu0K0a4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706530226; c=relaxed/simple;
-	bh=VMNNZAKKjNfjAMNm8kPJWl4AR3VxVa0/bOc+xLjjHEA=;
+	s=arc-20240116; t=1706530227; c=relaxed/simple;
+	bh=iz0dFAW58yqZGL7j3dGGKZP1Ew+s3LKz5hSYf4xXUX8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kWPptxNre7d9wSTdt9pEon+m7i0uQZgKyfDkayt7jT5+v4bQQ9RXOldbEbacXPnqX9PkRgDq/cctUnx+LDoRlc2hZBgz+8n5xauOiPCBrHP2UgKUIC5ncYrG5K/RsTce8l2OwPqm3Tcgp4pQJQEEqVkCpeMKTXo5DwoedrTCsXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KOZt2HEz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 692D0C433F1;
+	 In-Reply-To:To:Cc; b=C1U8/LsGb8SIwk4UVuXJoGHVeNwLIUSrvGe7VHD3q6loyaIGdiUmxww82O7nWeP+Rb4m6ax/UR44ZQHiMqNF4yQU+/eCwpb/jPb6CWJd3Zn6YxAVxG1nUzJrct07fF+6fx0P4tzjuYQ3jzc2cgIeu1UfnPhfeHqYRoK+JaQ1PM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G5jxudOO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 60207C43390;
 	Mon, 29 Jan 2024 12:10:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1706530226;
-	bh=VMNNZAKKjNfjAMNm8kPJWl4AR3VxVa0/bOc+xLjjHEA=;
+	bh=iz0dFAW58yqZGL7j3dGGKZP1Ew+s3LKz5hSYf4xXUX8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KOZt2HEzcnvRs3ueWVxY9C2ZaMfVonH8797M/Fpio9r/dqtoPe+4iNnVDz06ReLn7
-	 E9xWhvjGUgT9VDU10wZ5YQzg+HZwZtnoeGGDKWkRw9vvMGmUaRBYfTsjMvP2IRyT++
-	 m7dDQzwN6O/jW0Db4o2I+JWQW7/LWCnJj4Rmt2t1YuVAeFKl97nmLCI9EWzDt3q+ph
-	 fyvjH0KPjslF7LEN00Rj+fNR7ttNNhpmKedKnUmYwDhdDAeerUWNA7SRgXzjOMwyBO
-	 QFfCq6CS5jnfe6H+gl1bMOpIBeZk1Q+CVy3N8kh5qzrZPMMgwjdf5YfMl0n3M+ViCo
-	 A5eiLjk+koNnw==
+	b=G5jxudOOJatUSgnbdRkuNGRkJOo05pOEKVhsBDXosMqDaPKFnO/9gHGx1QJhCIvDy
+	 DvYW7XhmBXf0nrUMsJIUPN74N4hzL+k2UrUv/3FmldQHFa9zQuYp0sJYpRWFa8UGGL
+	 6xZruGiaDBY9sFwlxWEsEJervZ9hQ3YfTGLZxT7IoA3Z/dmjOueRzii2Ncj4nvQrlX
+	 zINGsk8+mVIrBFmxH7Lu1CQnp/HL9CLTkiMWrHoQUufiMj9JoWz3b3akScTDFmGpnZ
+	 MGOVUQreD6oFLAlqe+VzAB+ouabb+wiHTP+KUsY1cYKFZlbfTO/z0UVDtiIWeEnqUJ
+	 VANtvh2KUyhPA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 509BAC595C3;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 46912C561EE;
 	Mon, 29 Jan 2024 12:10:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,43 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] nfc: nci: free rx_data_reassembly skb on NCI device
- cleanup
+Subject: Re: [PATCH net] tcp: add sanity checks to rx zerocopy
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170653022632.12593.11211557853168091033.git-patchwork-notify@kernel.org>
+ <170653022628.12593.4708063524897046829.git-patchwork-notify@kernel.org>
 Date: Mon, 29 Jan 2024 12:10:26 +0000
-References: <20240125095310.15738-1-pchelkin@ispras.ru>
-In-Reply-To: <20240125095310.15738-1-pchelkin@ispras.ru>
-To: Fedor Pchelkin <pchelkin@ispras.ru>
-Cc: krzysztof.kozlowski@linaro.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, jeremy@jcline.org, horms@kernel.org,
- leitao@debian.org, ilane@ti.com, linville@tuxdriver.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, khoroshilov@ispras.ru,
- lvc-project@linuxtesting.org, stable@vger.kernel.org,
- syzbot+6b7c68d9c21e4ee4251b@syzkaller.appspotmail.com
+References: <20240125103317.2334989-1-edumazet@google.com>
+In-Reply-To: <20240125103317.2334989-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ ncardwell@google.com, netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ zhangpeng362@huawei.com, arjunroy@google.com, willy@infradead.org,
+ linux-mm@vger.kernel.org, akpm@linux-foundation.org,
+ linux-fsdevel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 25 Jan 2024 12:53:09 +0300 you wrote:
-> rx_data_reassembly skb is stored during NCI data exchange for processing
-> fragmented packets. It is dropped only when the last fragment is processed
-> or when an NTF packet with NCI_OP_RF_DEACTIVATE_NTF opcode is received.
-> However, the NCI device may be deallocated before that which leads to skb
-> leak.
+On Thu, 25 Jan 2024 10:33:17 +0000 you wrote:
+> TCP rx zerocopy intent is to map pages initially allocated
+> from NIC drivers, not pages owned by a fs.
 > 
-> As by design the rx_data_reassembly skb is bound to the NCI device and
-> nothing prevents the device to be freed before the skb is processed in
-> some way and cleaned, free it on the NCI device cleanup.
+> This patch adds to can_map_frag() these additional checks:
+> 
+> - Page must not be a compound one.
+> - page->mapping must be NULL.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] nfc: nci: free rx_data_reassembly skb on NCI device cleanup
-    https://git.kernel.org/netdev/net/c/bfb007aebe6b
+  - [net] tcp: add sanity checks to rx zerocopy
+    https://git.kernel.org/netdev/net/c/577e4432f3ac
 
 You are awesome, thank you!
 -- 
