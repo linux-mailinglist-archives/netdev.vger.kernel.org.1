@@ -1,79 +1,72 @@
-Return-Path: <netdev+bounces-66585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E9E383FD93
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 06:13:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B64683FDB5
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 06:23:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4FBFB218C2
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 05:13:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 296A81F223A0
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 05:23:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2234344C99;
-	Mon, 29 Jan 2024 05:12:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A6F433CF;
+	Mon, 29 Jan 2024 05:23:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="HuJDUIkF"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="buZQcte2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1605DDD5;
-	Mon, 29 Jan 2024 05:12:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EA6433D0;
+	Mon, 29 Jan 2024 05:23:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706505155; cv=none; b=jG26JniszCtNBVFmGluekpaJcrJNtASF0RhsIJMyw2csBeKHQfaGkZpZsdYWmP9p1qUK9+OesxECxNAuchEGNDGg/wJP0ynk0i4AaILouKRfhtnYk64r7UNPE1n6n0ZudTciM94gJKOZ894W/aTJ426iHUliqJoxYe+izwGGaTc=
+	t=1706505818; cv=none; b=VRVCBzocEdz21UETe22SrIgdzLaVBktGHy8lHu/3OZgewHDi8PYZEAUaI+hfPkKH+2GfyM7eoUkaBS25TBsp1VCleu6x6fuxcpBwjQ5LR8ZtJ2Il8wJNdwwDgSzXWm6Cb6me5BgBQ6kVJMKes+Chv+v1C4GnGtX+a6ZtovTNZUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706505155; c=relaxed/simple;
-	bh=Ikg5x3d/f+jULVMCH44rw4+PXLyN4ZWT9A0HMbatL0c=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ufn6JVfoPMxgG9yYhMpEOPIhyIm5PTofSQY7m4a7r7ujqpXApDwNI8Uwck0/igBx72laG7GnHUc5zcdXxkpKWBZL49rX6YBkMByuaAaui4aWWNtvkcsd1WYadezDYPACSYU2eui1ePP5jFwvgjRvyRjLOEZQMMBtrXE0IiLs7II=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=HuJDUIkF; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40T4P1Ro020025;
-	Mon, 29 Jan 2024 05:12:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	qcppdkim1; bh=fzQb6bK072ThF6/59Q0ni+RYed6Os6bEI5ulHIPo1LA=; b=Hu
-	JDUIkFPxVp6ue5kerX4vdEXJ4vE64aFUqK3FsGGQ9hS4jK5zYMlVy0wKLO5mP3w5
-	AomfyCyRDDXBqGORMgdP4Z+xvCUoI0DAjo0VegBlDA4cRefpfjNtGxy+oTzEDsWj
-	uiqu9b88mOifYURQB9qQPd3CeP7N3m8+GmSgdIZQGN/91UzS6uugd8eQ76KIl145
-	9UhOcR+I7enD9rZGKL61pau22DOrGLmwpw2OuXQlQ+vfRqf4D6pniu+VrbCBjSqw
-	MvawV7N3PE40L/AtkVabazoqiU6plJJ/kYxiJrBRHEhByHaB5OUmSZrDE65b9UY5
-	2k10Es3pOSrQa4/B82ZQ==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vvt272t9k-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 29 Jan 2024 05:12:13 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40T5CDiI021540
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 29 Jan 2024 05:12:13 GMT
-Received: from hu-devipriy-blr.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Sun, 28 Jan 2024 21:12:06 -0800
-From: Devi Priya <quic_devipriy@quicinc.com>
-To: <andersson@kernel.org>, <konrad.dybcio@linaro.org>,
-        <mturquette@baylibre.com>, <sboyd@kernel.org>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <catalin.marinas@arm.com>, <will@kernel.org>, <p.zabel@pengutronix.de>,
-        <richardcochran@gmail.com>, <geert+renesas@glider.be>, <arnd@arndb.de>,
-        <neil.armstrong@linaro.org>, <nfraprado@collabora.com>,
-        <m.szyprowski@samsung.com>
-CC: <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <quic_devipriy@quicinc.com>
-Subject: [PATCH V3 7/7] arm64: defconfig: Build NSS Clock Controller driver for IPQ9574
-Date: Mon, 29 Jan 2024 10:41:04 +0530
-Message-ID: <20240129051104.1855487-8-quic_devipriy@quicinc.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240129051104.1855487-1-quic_devipriy@quicinc.com>
-References: <20240129051104.1855487-1-quic_devipriy@quicinc.com>
+	s=arc-20240116; t=1706505818; c=relaxed/simple;
+	bh=WuGXrGunI7ZDPJMpuvINTAUYckE1gSj0UUksCGgPmws=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=lVvh2hixGBwJx4RQ3lt768JF0JTaZNbT8OF0YcfBpkj47OgVNjQgmaJRWD7OA8b3k+Z47r0RTjJgjV+ETNy6u7Vk7Hsr8dD6RRtas804gyMZzwbLZ8a2hFv5Hj7EN1mBUFjuL3HiRO39augnEMdNXhoz4T+oHR/m78X35KVp/Cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=buZQcte2; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40SMwEpN003458;
+	Sun, 28 Jan 2024 21:23:28 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=pfpt0220; bh=Qa9HhoVz
+	n4zP1E253GRsSQ1puLdjOdNbtpymgd+miZE=; b=buZQcte2JG+XSx+hiEXfr2Uv
+	BIPzNoutgIumc21+C987ecYG28fkzPbPO7rTkIWhMZvV6Oxp/t4UyXHLyFW3NGEw
+	9y2RAwLYNw/g6pJjJrVZy762f9+7jePWI5BpIXDZU77oT1hvEpjVyb65WUX3lrAN
+	qU9e42yEbcX1XXat2nayjfefrGPlMzdDfxyKKVCO3UvZyCMLE4Bwr4mGy4fex2Dg
+	cj5ho/UDGdVdEPjJ9pqPClenfGsd7hNumKDObT5WcvlO3uctn7zmwjosIQMWy9tN
+	Gtv3ieaK7a/QaE6k/bra6cOD7lpIXpL+kXRKSLSX0Anzy3QcOLaAfEPdzWIAow==
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3vw27nbkm2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Sun, 28 Jan 2024 21:23:27 -0800 (PST)
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 28 Jan
+ 2024 21:23:25 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Sun, 28 Jan 2024 21:23:25 -0800
+Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id BA1A83F703F;
+	Sun, 28 Jan 2024 21:23:21 -0800 (PST)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <horms@kernel.org>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <bcreeley@amd.com>, <sbhatta@marvell.com>, <gakula@marvell.com>,
+        <hkelam@marvell.com>, <sumang@marvell.com>,
+        Ratheesh Kannoth
+	<rkannoth@marvell.com>
+Subject: [PATCH net v2] octeontx2-af: Initialize bitmap arrays.
+Date: Mon, 29 Jan 2024 10:53:19 +0530
+Message-ID: <20240129052319.4093083-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,45 +75,158 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 8euuNwnrCUEEcQYCFcC8QwIBwD6hIS8g
-X-Proofpoint-ORIG-GUID: 8euuNwnrCUEEcQYCFcC8QwIBwD6hIS8g
+X-Proofpoint-ORIG-GUID: tFf9j0uh9YRSlsGmlA8JdK7GPsqtvsfc
+X-Proofpoint-GUID: tFf9j0uh9YRSlsGmlA8JdK7GPsqtvsfc
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-01-29_02,2024-01-25_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 adultscore=0
- phishscore=0 suspectscore=0 lowpriorityscore=0 mlxlogscore=823
- clxscore=1015 spamscore=0 mlxscore=0 impostorscore=0 malwarescore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2401190000 definitions=main-2401290035
 
-NSSCC driver is needed to enable the ethernet interfaces and not
-necessary for the bootup of the SoC, hence build it as a module.
+kmalloc_array() without __GFP_ZERO flag does not initialize
+memory to zero. This causes issues with bitmap.
+Use bitmap_zalloc() API to fix this issue.
 
-Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
+Fixes: dd7842878633 ("octeontx2-af: Add new devlink param to configure maximum usable NIX block LFs")
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+
+ChangeLogs:
+v1 -> v2: Used bitmap_zalloc() API.
+v0 -> v1: Removed devm_kcalloc()._
 ---
- Changes in V3:
-	- No change
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   | 10 ++--
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 48 ++++++++-----------
+ 2 files changed, 26 insertions(+), 32 deletions(-)
 
- arch/arm64/configs/defconfig | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/arch/arm64/configs/defconfig b/arch/arm64/configs/defconfig
-index e6cf3e5d63c3..00e7f3112d53 100644
---- a/arch/arm64/configs/defconfig
-+++ b/arch/arm64/configs/defconfig
-@@ -1255,6 +1255,7 @@ CONFIG_IPQ_GCC_5332=y
- CONFIG_IPQ_GCC_6018=y
- CONFIG_IPQ_GCC_8074=y
- CONFIG_IPQ_GCC_9574=y
-+CONFIG_IPQ_NSSCC_9574=m
- CONFIG_MSM_GCC_8916=y
- CONFIG_MSM_MMCC_8994=m
- CONFIG_MSM_GCC_8994=y
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+index 43be37dd1f32..679bd6e87066 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu.h
+@@ -184,11 +184,11 @@ struct npc_mcam {
+ 	unsigned long	*bmap_reverse;	/* Reverse bitmap, bmap_entries => 0 */
+ 	u16	bmap_entries;	/* Number of unreserved MCAM entries */
+ 	u16	bmap_fcnt;	/* MCAM entries free count */
+-	u16	*entry2pfvf_map;
+-	u16	*entry2cntr_map;
+-	u16	*cntr2pfvf_map;
+-	u16	*cntr_refcnt;
+-	u16	*entry2target_pffunc;
++	unsigned long	*entry2pfvf_map;
++	unsigned long	*entry2cntr_map;
++	unsigned long	*cntr2pfvf_map;
++	unsigned long	*cntr_refcnt;
++	unsigned long	*entry2target_pffunc;
+ 	u8	keysize;	/* MCAM keysize 112/224/448 bits */
+ 	u8	banks;		/* Number of MCAM banks */
+ 	u8	banks_per_entry;/* Number of keywords in key */
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+index 167145bdcb75..367f842e365d 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+@@ -1850,13 +1850,13 @@ void npc_mcam_rsrcs_deinit(struct rvu *rvu)
+ {
+ 	struct npc_mcam *mcam = &rvu->hw->mcam;
+ 
+-	kfree(mcam->bmap);
+-	kfree(mcam->bmap_reverse);
+-	kfree(mcam->entry2pfvf_map);
+-	kfree(mcam->cntr2pfvf_map);
+-	kfree(mcam->entry2cntr_map);
+-	kfree(mcam->cntr_refcnt);
+-	kfree(mcam->entry2target_pffunc);
++	bitmap_free(mcam->bmap);
++	bitmap_free(mcam->bmap_reverse);
++	bitmap_free(mcam->entry2pfvf_map);
++	bitmap_free(mcam->cntr2pfvf_map);
++	bitmap_free(mcam->entry2cntr_map);
++	bitmap_free(mcam->cntr_refcnt);
++	bitmap_free(mcam->entry2target_pffunc);
+ 	kfree(mcam->counters.bmap);
+ }
+ 
+@@ -1904,21 +1904,18 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+ 	mcam->pf_offset = mcam->nixlf_offset + nixlf_count;
+ 
+ 	/* Allocate bitmaps for managing MCAM entries */
+-	mcam->bmap = kmalloc_array(BITS_TO_LONGS(mcam->bmap_entries),
+-				   sizeof(long), GFP_KERNEL);
++	mcam->bmap = bitmap_zalloc(mcam->bmap_entries, GFP_KERNEL);
+ 	if (!mcam->bmap)
+ 		return -ENOMEM;
+ 
+-	mcam->bmap_reverse = kmalloc_array(BITS_TO_LONGS(mcam->bmap_entries),
+-					   sizeof(long), GFP_KERNEL);
++	mcam->bmap_reverse = bitmap_zalloc(mcam->bmap_entries, GFP_KERNEL);
+ 	if (!mcam->bmap_reverse)
+ 		goto free_bmap;
+ 
+ 	mcam->bmap_fcnt = mcam->bmap_entries;
+ 
+ 	/* Alloc memory for saving entry to RVU PFFUNC allocation mapping */
+-	mcam->entry2pfvf_map = kmalloc_array(mcam->bmap_entries,
+-					     sizeof(u16), GFP_KERNEL);
++	mcam->entry2pfvf_map = bitmap_zalloc(mcam->bmap_entries, GFP_KERNEL);
+ 	if (!mcam->entry2pfvf_map)
+ 		goto free_bmap_reverse;
+ 
+@@ -1941,27 +1938,24 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+ 	if (err)
+ 		goto free_entry_map;
+ 
+-	mcam->cntr2pfvf_map = kmalloc_array(mcam->counters.max,
+-					    sizeof(u16), GFP_KERNEL);
++	mcam->cntr2pfvf_map = bitmap_zalloc(mcam->counters.max, GFP_KERNEL);
+ 	if (!mcam->cntr2pfvf_map)
+ 		goto free_cntr_bmap;
+ 
+ 	/* Alloc memory for MCAM entry to counter mapping and for tracking
+ 	 * counter's reference count.
+ 	 */
+-	mcam->entry2cntr_map = kmalloc_array(mcam->bmap_entries,
+-					     sizeof(u16), GFP_KERNEL);
++	mcam->entry2cntr_map = bitmap_zalloc(mcam->bmap_entries, GFP_KERNEL);
+ 	if (!mcam->entry2cntr_map)
+ 		goto free_cntr_map;
+ 
+-	mcam->cntr_refcnt = kmalloc_array(mcam->counters.max,
+-					  sizeof(u16), GFP_KERNEL);
++	mcam->cntr_refcnt = bitmap_zalloc(mcam->counters.max, GFP_KERNEL);
+ 	if (!mcam->cntr_refcnt)
+ 		goto free_entry_cntr_map;
+ 
+ 	/* Alloc memory for saving target device of mcam rule */
+-	mcam->entry2target_pffunc = kmalloc_array(mcam->total_entries,
+-						  sizeof(u16), GFP_KERNEL);
++	mcam->entry2target_pffunc = bitmap_zalloc(mcam->total_entries,
++						  GFP_KERNEL);
+ 	if (!mcam->entry2target_pffunc)
+ 		goto free_cntr_refcnt;
+ 
+@@ -1978,19 +1972,19 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+ 	return 0;
+ 
+ free_cntr_refcnt:
+-	kfree(mcam->cntr_refcnt);
++	bitmap_free(mcam->cntr_refcnt);
+ free_entry_cntr_map:
+-	kfree(mcam->entry2cntr_map);
++	bitmap_free(mcam->entry2cntr_map);
+ free_cntr_map:
+-	kfree(mcam->cntr2pfvf_map);
++	bitmap_free(mcam->cntr2pfvf_map);
+ free_cntr_bmap:
+ 	kfree(mcam->counters.bmap);
+ free_entry_map:
+-	kfree(mcam->entry2pfvf_map);
++	bitmap_free(mcam->entry2pfvf_map);
+ free_bmap_reverse:
+-	kfree(mcam->bmap_reverse);
++	bitmap_free(mcam->bmap_reverse);
+ free_bmap:
+-	kfree(mcam->bmap);
++	bitmap_free(mcam->bmap);
+ 
+ 	return -ENOMEM;
+ }
 -- 
-2.34.1
+2.25.1
 
 
