@@ -1,91 +1,168 @@
-Return-Path: <netdev+bounces-66833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FFF284111A
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 18:46:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3E3684116E
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 18:58:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C80A9B25DA4
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:46:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 844DC1F24650
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:58:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD573F9D3;
-	Mon, 29 Jan 2024 17:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EACE3F9D6;
+	Mon, 29 Jan 2024 17:58:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="fO68IfSF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tN9f5VGw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F0376C87
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 17:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252033F9CE;
+	Mon, 29 Jan 2024 17:58:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706550326; cv=none; b=OWzth1A98FjDBg3RdBQmBmQmcOi9yevsSDmQKzfdi6CIYB+Snz8/WxcMICvn+aP1e6jdBotnvxUUqKL9ye06hsh0OWjF0NqEIhdmwlOniHglg5OrB0CRce1KO5O5tTNY88Lri9iLJwNCAgDawdBloLZNiu5WW1oi1F+82W6UUjI=
+	t=1706551094; cv=none; b=e8dW/BSyWzXiDMb0n6TPVm9Nrbo65MLRvIobUrdCk0VxsbT2eU8oBOAA3TmLZRL4Wnu5YpH3RrNoygopsN+nNHz7uD6JpVexcZpQJ4tNUfBDv0fkAGGFuqVYLIZSdOLqsOdMX1C+OYFMpXQViJ36+vUlP2d2EZ31oKaiis2hFIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706550326; c=relaxed/simple;
-	bh=RoAgDl9YkrPT80LsXfwgN+DR/Vjp62ly2cwn32dx/fg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eK5a1UfN0IV6prrLP+t9En+jQH3KpvQFjr+20R3lKn9M608WMlhKRE3JuBlp964d5/hU+EjQ6rTvloHchG9I2pqVP+DJa3tWvJbB7kONxz5nMZ0h1ts7uDI98RPY/WufFPCvsHEzYWBo6USV2yWLUtyEKFQgJiRKWRTv1vsnJdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=fO68IfSF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4646CC433C7;
-	Mon, 29 Jan 2024 17:45:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1706550326;
-	bh=RoAgDl9YkrPT80LsXfwgN+DR/Vjp62ly2cwn32dx/fg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fO68IfSFus08nFkZ6GKgFEnRJM2XRrbeOkWe8mO/AHYHFBcKatW6advYl9gQ6IhfS
-	 PhcQNkZSlrbk9s7f6yx7Oko8ZhSdwgOKvIhv3RuS3U2clVOxwmTBvdO5H9S8iCCRHN
-	 z5Cd/j6FZ6ev46Rce5sWjZvenCvFULghUtnpyBqo=
-Date: Mon, 29 Jan 2024 12:45:24 -0500
-From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>, 
-	Vladimir Oltean <olteanv@gmail.com>, Luiz Angelo Daros de Luca <luizluca@gmail.com>, 
-	netdev@vger.kernel.org, alsi@bang-olufsen.dk, andrew@lunn.ch, f.fainelli@gmail.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Subject: Re: [PATCH net-next v3 0/8] net: dsa: realtek: variants to drivers,
- interfaces to a common module
-Message-ID: <20240129-astute-winged-barnacle-eeffad@lemur>
-References: <20231223005253.17891-1-luizluca@gmail.com>
- <20240115215432.o3mfcyyfhooxbvt5@skbuf>
- <9183aa21-6efb-4e90-96f8-bc1fedf5ceab@arinc9.com>
- <CACRpkdaXV=P7NZZpS8YC67eQ2BDvR+oMzgJcjJ+GW9vFhy+3iQ@mail.gmail.com>
- <ccaf46ca-e1a3-4cba-87eb-53bf427b5d68@arinc9.com>
+	s=arc-20240116; t=1706551094; c=relaxed/simple;
+	bh=6DH4cAVVB5IcyXxT68rpRBwUIyW1lmrOSidCGZgTXeE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RAvcWcA5ZFvykeTIQA3PLZr2ySI1Mb1VZGghkgIK1uD8xw0VAVlvtsNdS/cV+OFHlR+RnDISbmiRmESUgnRxeRD7dMXcunZB5ddIvdGpNQ26vPkgwR0Q4I0eiiUH0E6dYiVgHGPjTm/ujX0BfYCZjTgV3oVPQjVzu4xPTN/I4aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tN9f5VGw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BBD9C433C7;
+	Mon, 29 Jan 2024 17:58:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706551093;
+	bh=6DH4cAVVB5IcyXxT68rpRBwUIyW1lmrOSidCGZgTXeE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=tN9f5VGwGgojQP6IzYYRXYugWHQwG78L4hEUcTUhpoilWnsUKCxiFkP0+ypaB6m5y
+	 6oX+4SEwBtP9ZMs7qwnlTFqS8G+97GIDjDJmq1og3W6X922gic3QO9hCYdP83NkjaM
+	 FJfmIgPqOhs+jDrvktT7s+EpjvqfIOpPFc7WmdK18CAO3Aq/58ed9KvNQufLQopgsk
+	 X7vKbWX+/NFrq5ez5XyKIxVrdUqlezQHb2OGwF9qg4T0aVe8jXpm1WQcY82QHNzQeO
+	 yQsEbA22uVkF85AbBRrUyfkBOWQ7ORjNpjKId7CXSjX2gwvozuQJ/tlJwhj7pPZrEV
+	 JRtYViUiM5kRw==
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-510218c4a0eso3699737e87.1;
+        Mon, 29 Jan 2024 09:58:13 -0800 (PST)
+X-Gm-Message-State: AOJu0Yw8TE6MpneNCD3PnF7j5L3eMUY5C0TQJ3fLSp2DY/maF5w/E/Vs
+	1mmgwB1NbkQC32oJ4nt9gyqXUxYZWnOLv7RT5ztnYbKpdCuEvWhNvf95ZFGakxfoI6YVgCiEvPD
+	asMb+KHwIkUV/fv4q78CZLTp8/Yo=
+X-Google-Smtp-Source: AGHT+IF+SMAtsL8GekK8AArEA+PlT6pcaQajQuzdNtzKFztkBVunkhn84LwsBdVN1dgRWBtHedf519s3rYYkb+uEYbQ=
+X-Received: by 2002:a19:6414:0:b0:510:16ef:14cf with SMTP id
+ y20-20020a196414000000b0051016ef14cfmr2319781lfb.31.1706551091851; Mon, 29
+ Jan 2024 09:58:11 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ccaf46ca-e1a3-4cba-87eb-53bf427b5d68@arinc9.com>
+References: <20240123103241.2282122-1-pulehui@huaweicloud.com> <20240123103241.2282122-3-pulehui@huaweicloud.com>
+In-Reply-To: <20240123103241.2282122-3-pulehui@huaweicloud.com>
+From: Song Liu <song@kernel.org>
+Date: Mon, 29 Jan 2024 09:58:00 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW67c8NYxBhwrq8JK8HP95P1Wwq1zHEDqooAOgP+aru13g@mail.gmail.com>
+Message-ID: <CAPhsuW67c8NYxBhwrq8JK8HP95P1Wwq1zHEDqooAOgP+aru13g@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 2/3] bpf: Keep im address consistent between dry
+ run and real patching
+To: Pu Lehui <pulehui@huaweicloud.com>
+Cc: bpf@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	netdev@vger.kernel.org, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Puranjay Mohan <puranjay12@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Yonghong Song <yhs@fb.com>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Luke Nelson <luke.r.nels@gmail.com>, 
+	Pu Lehui <pulehui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jan 21, 2024 at 01:13:36AM +0300, Arınç ÜNAL wrote:
-> I've had trouble with every mail provider's SMTP server that I've ever used
-> for submitting patches, so the web endpoint is a godsend. It would've been
-> great if b4 supported openssh keys to submit patches via the web endpoint.
+On Tue, Jan 23, 2024 at 2:32=E2=80=AFAM Pu Lehui <pulehui@huaweicloud.com> =
+wrote:
+>
+> From: Pu Lehui <pulehui@huawei.com>
+>
+> In __arch_prepare_bpf_trampoline, we emit instructions to store the
+> address of im to register and then pass it to __bpf_tramp_enter and
+> __bpf_tramp_exit functions. Currently we use fake im in
+> arch_bpf_trampoline_size for the dry run, and then allocate new im for
+> the real patching. This is fine for architectures that use fixed
+> instructions to generate addresses. However, for architectures that use
+> dynamic instructions to generate addresses, this may make the front and
+> rear images inconsistent, leading to patching overflow. We can extract
+> the im allocation ahead of the dry run and pass the allocated im to
+> arch_bpf_trampoline_size, so that we can ensure that im is consistent in
+> dry run and real patching.
 
-The only reason it's not currently supported is because we don't have a recent
-enough version of openssh on the system where the endpoint is listening. This
-will change in the near future, at which point using ssh keys will be
-possible.
+IIUC, this is required because emit_imm() for riscv may generate variable
+size instructions (depends on the value of im). I wonder we can fix this by
+simply set a special value for fake im in arch_bpf_trampoline_size() to
+so that emit_imm() always gives biggest value for the fake im.
 
-> Patatt at least supports it to sign patches. I've got a single ed25519
-> openssh keypair I use across all my devices, now I'll have to backup
-> another key pair. Or create a new key and authenticate with the web
-> endpoint on each device.
-> 
-> Safe to say, I will submit my next patch series using b4. Thanks for
-> telling me about this tool Linus!
+>
+> Signed-off-by: Pu Lehui <pulehui@huawei.com>
+> ---
+[...]
+>
+>  static int bpf_trampoline_update(struct bpf_trampoline *tr, bool lock_di=
+rect_mutex)
+> @@ -432,23 +425,27 @@ static int bpf_trampoline_update(struct bpf_trampol=
+ine *tr, bool lock_direct_mut
+>                 tr->flags |=3D BPF_TRAMP_F_ORIG_STACK;
+>  #endif
+>
+> -       size =3D arch_bpf_trampoline_size(&tr->func.model, tr->flags,
+> +       im =3D kzalloc(sizeof(*im), GFP_KERNEL);
+> +       if (!im) {
+> +               err =3D -ENOMEM;
+> +               goto out;
+> +       }
+> +
+> +       size =3D arch_bpf_trampoline_size(im, &tr->func.model, tr->flags,
+>                                         tlinks, tr->func.addr);
+>         if (size < 0) {
+>                 err =3D size;
+> -               goto out;
+> +               goto out_free_im;
+>         }
+>
+>         if (size > PAGE_SIZE) {
+>                 err =3D -E2BIG;
+> -               goto out;
+> +               goto out_free_im;
+>         }
+>
+> -       im =3D bpf_tramp_image_alloc(tr->key, size);
+> -       if (IS_ERR(im)) {
+> -               err =3D PTR_ERR(im);
+> -               goto out;
+> -       }
+> +       err =3D bpf_tramp_image_alloc(im, tr->key, size);
+> +       if (err < 0)
+> +               goto out_free_im;
 
-\o/
+I feel this change just makes bpf_trampoline_update() even
+more confusing.
 
-Please feel free to provide any feedback you have to the tools@kernel.org
-list.
+>
+>         err =3D arch_prepare_bpf_trampoline(im, im->image, im->image + si=
+ze,
+>                                           &tr->func.model, tr->flags, tli=
+nks,
+> @@ -496,6 +493,8 @@ static int bpf_trampoline_update(struct bpf_trampolin=
+e *tr, bool lock_direct_mut
+>
+>  out_free:
+>         bpf_tramp_image_free(im);
+> +out_free_im:
+> +       kfree_rcu(im, rcu);
 
--K
+If we goto out_free above, we will call kfree_rcu(im, rcu)
+twice, right? Once in bpf_tramp_image_free(), and again
+here.
+
+Thanks,
+Song
+
+[...]
 
