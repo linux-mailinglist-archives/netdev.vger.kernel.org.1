@@ -1,97 +1,117 @@
-Return-Path: <netdev+bounces-66817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CB3A840C70
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:54:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CFF2840C7D
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:55:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EF141C21B82
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:54:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08468282D89
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:55:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D7115698D;
-	Mon, 29 Jan 2024 16:53:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20F23157020;
+	Mon, 29 Jan 2024 16:54:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WDNlfGs3"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wboEuH0q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD23155A50;
-	Mon, 29 Jan 2024 16:53:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19847156967;
+	Mon, 29 Jan 2024 16:54:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706547236; cv=none; b=cRjs+JGmogEs4WyZ14B1t8dyoJ3bNO78WJgQRMVIOuYkh8WhK03Mon229UeuwFehqHwthua64Xwhh12eLj5RZcUDSTWf6nHYccSGeaKX5go0BVEfFNqQmyYcUtfcsD6HGCFMCD5B+KnYWKG7y+arjtnjmxGSPupJxR+rfKDg7sw=
+	t=1706547288; cv=none; b=B8h8KisXezPHHDu3eAdIdy2Yl6BLzVgAdYaISJRJTzxpR1xpuTdO50xH9+3vWdIOEPqN4VComqq///0EZjFN2xD/JK6xJkRQKkW2FfdxGDak7q0AzK16fHR/vaV3HmXpnspNwavVSuEoQfOvjEHXsBaMLDu1xc7zeBrQZyfUfBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706547236; c=relaxed/simple;
-	bh=Zg4p2X8pso/5Q2jnhHjqcMGLZEqNtvMlUk7th8fO7+k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JNDNq0d27fj4hpWkj2U3xEJtEYUsfccRe7xIlEb43hv6lMlD0OvPY25KTCHFTV4YaXe+JuyqVKFU5QE6G13Bl06N6P1GftiFHu3AUq/Td0fq9ivlmXfPVwhWjs/ciqcJ/WrUhitsSRy484CGtxi0pcK2vG9qAb/siPgdoeVBegE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WDNlfGs3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CE98C433C7;
-	Mon, 29 Jan 2024 16:53:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706547235;
-	bh=Zg4p2X8pso/5Q2jnhHjqcMGLZEqNtvMlUk7th8fO7+k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WDNlfGs3efcvNr+1nH1qbHDkJF8WsJKbXBeBjETLapo82eIWgelKr38zywLJBM7de
-	 wTjsxGkAMRuBuMudQARvh8nNT7GM5d1CpA+Gtr2L3AFDr1a8kdkFrOc7GApwe7/sDC
-	 o6+XdoG68aOw6rKhhn+HKDiZ9bhf07+IOOk913BaFvLLUZSeF81+VS9qzHnA/xwnYl
-	 VUYn2e55+BWh5GiLxJfLr0Vb+iEIHk4rAtNIUIQYCg5kSCcW4oM350BhEh9Z0jKdbk
-	 MLFEs22KdLPJJlZv7EmHEQbpC/iP4TMPDNgBnwTay11m6HtbHUR2NuqLCRkYyVVGSP
-	 336mTtQiGSJUA==
-Date: Mon, 29 Jan 2024 08:53:54 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Ahern <dsahern@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, Hangbin Liu <liuhangbin@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "netdev-driver-reviewers@vger.kernel.org"
- <netdev-driver-reviewers@vger.kernel.org>
-Subject: Re: [ANN] net-next is OPEN
-Message-ID: <20240129085354.49c3c586@kernel.org>
-In-Reply-To: <a2df88e6-5ecc-407c-a579-8c8b7b4fbd2b@kernel.org>
-References: <20240122091612.3f1a3e3d@kernel.org>
-	<Za98C_rCH8iO_yaK@Laptop-X1>
-	<20240123072010.7be8fb83@kernel.org>
-	<d0e28c67-51ad-4da1-a6df-7ebdbd45cd2b@kernel.org>
-	<20240123133925.4b8babdc@kernel.org>
-	<256ae085-bf8f-419b-bcea-8cdce1b64dce@kernel.org>
-	<7ae6317ee2797c659e2f14b336554a9e5694858e.camel@redhat.com>
-	<20240124070755.1c8ef2a4@kernel.org>
-	<20240124081919.4c79a07e@kernel.org>
-	<aae9edba-e354-44fe-938b-57f5a9dd2718@kernel.org>
-	<20240124085919.316a48f9@kernel.org>
-	<bd985576-cc99-49c5-a2e0-09622fd6027a@kernel.org>
-	<c8420e51-691d-4dd9-8b81-0597e7593d07@kernel.org>
-	<20240126171346.14647a6f@kernel.org>
-	<317aa139-78f8-424b-834a-3730a4c4ad04@kernel.org>
-	<ef884f08937fcaab4e4020eb3fca91a938385c75.camel@redhat.com>
-	<20240129070304.3f33dcf2@kernel.org>
-	<a2df88e6-5ecc-407c-a579-8c8b7b4fbd2b@kernel.org>
+	s=arc-20240116; t=1706547288; c=relaxed/simple;
+	bh=9g45N6/MADpyEGs1h43irAmI5VQUJUrNHZl1OlCSX+4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iNIX+uy4hn2tdaQ2HBHKhjcCO8rXT5LKDt8FD3Ot5N0Yc2xWyGrG77yg1o9CNsJMx6lwSy4i3dskxWb9tcHPdJ/Ldxa6PBmO9lLWENGzVxPAOKtuLUjbDVP0GMbnnhh7ryxHPxvS6EsmVxukakBNK7o3uiKCbFR1o4KXBrpJX5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wboEuH0q; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=jVE+ke8oHRNLw6ovCoac3QPP9D2Or5p/ykbfeULK/JM=; b=wboEuH0qdKTwrGwunnLYH4BPPy
+	aFRzEaeDha1B60zPjw3n1PLzrTh2zsicbVTNQer1YeBcm4spDdqd/LiAAQSEVNo9LNPaOoT/0r6TO
+	LlvSt652JHIJ0AxGsNz3av1VyyPwzDdz46TbU9CwPNkgnMUHuutYRb06nLdAQBp6W8Cw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rUUto-006P1D-9x; Mon, 29 Jan 2024 17:54:20 +0100
+Date: Mon, 29 Jan 2024 17:54:20 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Samin Guo <samin.guo@starfivetech.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+Subject: Re: [PATCH v4 1/2] dt-bindings: net: starfive,jh7110-dwmac: Add
+ JH7100 SoC compatible
+Message-ID: <e99e72b3-e0f6-4a80-82c8-bd60c36d180a@lunn.ch>
+References: <20240126191319.1209821-1-cristian.ciocaltea@collabora.com>
+ <20240126191319.1209821-2-cristian.ciocaltea@collabora.com>
+ <0a6f6dcb-18b0-48d5-8955-76bce0e1295d@linaro.org>
+ <e29ae12b-5823-4fba-8029-e8e490462138@collabora.com>
+ <56f3bd3c-c099-405b-837b-16d8aeb4cc4b@lunn.ch>
+ <8c4cfc54-bd23-4d56-a4ae-9f3dd5cedb59@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8c4cfc54-bd23-4d56-a4ae-9f3dd5cedb59@collabora.com>
 
-On Mon, 29 Jan 2024 08:32:33 -0700 David Ahern wrote:
-> >> Could the script validate the 'ping' command WRT the bad behavior/bug
-> >> and  eventually skip the related tests?  
+On Mon, Jan 29, 2024 at 06:38:27PM +0200, Cristian Ciocaltea wrote:
+> On 1/29/24 15:34, Andrew Lunn wrote:
+> >>> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> >>
+> >> Thank you for the review!
+> >>
+> >> Could you please apply it to the RESEND version [1] instead, as this one 
+> >> had an issue collecting the latest tags, as indicated in [2].
+> >>
+> >> Regards,
+> >> Cristian
 > > 
-> > Skipping if the package has a bug would be best, if we can figure that
-> > out. The latest version is fixed, right? I can build it locally, just
-> > like pretty much everything else..  
+> > Hi Cristian
+> > 
+> > IT is your job as developers to collect together such reviewed-by:
+> > tags add apply them to the latest version. So long as there are no
+> > major changes, they are still consider applicable.
 > 
-> yes, that is why Ubuntu 23.10 passes. I downloaded iputils, built ping
-> locally at the Amazon release version and did a side by side comparison
-> of behavior to verify it is the ping command.
+> Hi Andrew,
+> 
+> Jakub requested a rebase, but I missed a tag and that's why I submitted
+> the RESEND.  Now we got this new tag which is not on the RESEND
+> submission, that's why I asked Krzysztof if he could add his R-b on that
+> one.  Unless the maintainers' tooling is able to fetch tags from both
+> submissions?!
 
-Built iputils from git manually.
-Could not figure out how to convince mason not to insert /local/ into
-the install dir path so I copied the binaries manually :/ Seems to work,
-tho.
+Well, b4 can do that:
+
+https://b4.docs.kernel.org/en/latest/contributor/trailers.html
+
+But i've no idea if the netdev tooling actual does.
+
+    Andrew
 
