@@ -1,82 +1,95 @@
-Return-Path: <netdev+bounces-66829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EDCE8410A3
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 18:29:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0273A8410B0
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 18:30:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 427D21C23CD4
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:29:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34B8B1C23ECA
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D526776C9F;
-	Mon, 29 Jan 2024 17:18:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93C0F157E97;
+	Mon, 29 Jan 2024 17:22:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XVAVvMo+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WuSJcWsK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA7CE76C9B;
-	Mon, 29 Jan 2024 17:18:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4EA6166D;
+	Mon, 29 Jan 2024 17:22:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706548691; cv=none; b=G/k6XNgIaRFekn0H+/7iudyuyxl/5s6MX6mxpUTxothIJoJAUWkeCGVNDsPILg4A5gLAIvN7naUeAeu6NfOt4L0jW4W+5v4G4NtIVmuvyyN1fgFhtB/aCyF1Q2odg+1H4HVh2Em6FGpTomku+8o5jtNm623jjK/wYTsksMJyXK4=
+	t=1706548923; cv=none; b=YLHkYWe1EHxRzD4L3QHU6btEbuKBsaI2s8HjXohPHp6KwnftVnvUBHOUuOWpEwSkG+jYXZSMUpaJgXWlxQKt7K+cfP7HsNir94V5mg+9Z1RZj8QHNTKpEQB6Q+OPNe47Sf67Oj3bJv36s+icFhZQ/luw09vpSpD9HHIu40fAUxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706548691; c=relaxed/simple;
-	bh=ItY/kcIqNm1rdDzu5CBPiUuZZCMBdOuHaO1R4dtYASI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f2aBWAj2vNbjLAF7wB+bZLNOeYHuvesIS5HtaB7DEaLjCJ3+f2n0tkQEBsEI8UY+TVayXYTKLCDh0xugRaBgrhbwVqNMCYpZEXuWLMFRsNADSIqPjWSj4DKs22UxxETBEDPb4vLeGoDCawgSElUuarNu56oDR3fPPpocu6Qrtrw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XVAVvMo+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41920C433C7;
-	Mon, 29 Jan 2024 17:18:11 +0000 (UTC)
+	s=arc-20240116; t=1706548923; c=relaxed/simple;
+	bh=JYBbAYWNibVPSsm2aZM9pxXWuL6jTBf0j8mHiaK44Ow=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pTUabhWI/zT+bvR+du/PURsC4h64iGE8aI1gbRkyBokUzn4ki/XGbaTMZWAFw/Z9yLJcHYHtyzRHICw1rjjscDX9kE3JQPMgfXVrgx9NE5Qq5rdsPbGdxlVCS+ehVz64hzS0mCrwXaw10PdHyJpvVzngYSgc40r5mhaIds3w4L4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WuSJcWsK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE569C43394;
+	Mon, 29 Jan 2024 17:22:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706548691;
-	bh=ItY/kcIqNm1rdDzu5CBPiUuZZCMBdOuHaO1R4dtYASI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XVAVvMo+6Kmz62BtKuov1v3LkpZ8BVEjTqGOGq1xDQbrdFbkIJrDJCPYwfsBjrHDU
-	 DziyXWVw9/FT8JGsGaLlZ23MxAyIVVroSHWS5tuufmuVCR8xw3HhwoU/PPziWw3djM
-	 msJM1LNMYT5vLny6/cL9KU2CbLoe7h4d/DJDmeSvhJLuwFBB2/kqMXZ/vp0DI66vka
-	 2Q4yVvUq5O7jrQQK2WRP1h80/b9kuRep+xbVY6zxCKh/URPZzm8rOPGoGvj3KzUqa8
-	 8W6VtI5WqclCHPNedT5aHFbx98bhtFPPj3IFJMpVNCgxKy0IVtfo8HCFIAJFW5sBsp
-	 RNs1FGKt4r7ZA==
-Date: Mon, 29 Jan 2024 09:18:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ido Schimmel <idosch@idosch.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "netdev-driver-reviewers@vger.kernel.org"
- <netdev-driver-reviewers@vger.kernel.org>
-Subject: Re: [ANN] net-next is OPEN
-Message-ID: <20240129091810.0af6b81a@kernel.org>
-In-Reply-To: <ZbfZwZrqdBieYvPi@shredder>
-References: <20240122091612.3f1a3e3d@kernel.org>
-	<ZbedgjUqh8cGGcs3@shredder>
-	<ZbeeKFke4bQ_NCFd@shredder>
-	<20240129070057.62d3f18d@kernel.org>
-	<ZbfZwZrqdBieYvPi@shredder>
+	s=k20201202; t=1706548923;
+	bh=JYBbAYWNibVPSsm2aZM9pxXWuL6jTBf0j8mHiaK44Ow=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=WuSJcWsKXENTUCDGo/2nsNi6XSHrUZkGChuEAemYPjjWcD24F3le6iVqtY5fwq+UK
+	 dHRcUvJZnQPfqFvyR8tEV0GnOh5pPWNl3rmy5mb35Ox3L+Mxp6T5T5hQ7+7gV6gAL1
+	 l6HCG62UU0EHCKnyebU+Ti+Bh1ECzWaKwuDdJnixKEqgf7mU+j5enjgXz9SkeXWyav
+	 AIpWIf3fuc5wt3yzSwoGrtZHY4xrn35E6Suj5d+7w/LlBI+4oVTqHPLFnm1zFD59EB
+	 akVkxhg9PAkJ5oh6k/W4QYOTg/5/VuExl0z8aV7Kj1j6HqKvZKij4FAXSL6cQT4/UO
+	 KAcKErCsFpkBg==
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2cf3a0b2355so36483251fa.0;
+        Mon, 29 Jan 2024 09:22:02 -0800 (PST)
+X-Gm-Message-State: AOJu0YwNm39VZQxhm9sf74jwCo6cOjBggLocfQeyAEfyVXKeg8wta0IR
+	i2UlcfXUsTge+R1MXQeitGYUL9dDDHZZ1AuzLsIoEs+UkIkHVBEFgLKESHiak99oWG9IjB9z9Dg
+	AoO5Iq+biVE9gCEHxSaJi1HMndjc=
+X-Google-Smtp-Source: AGHT+IG0VAb/ekeITVOF0bS7rfDDvzjNwelO3EtNC/hYjAZLD6sUGghOToyiYKiqSggijHySxsSuWcZVmbTpRn3TFGY=
+X-Received: by 2002:a2e:b8d1:0:b0:2cf:457e:61fa with SMTP id
+ s17-20020a2eb8d1000000b002cf457e61famr4993469ljp.37.1706548921169; Mon, 29
+ Jan 2024 09:22:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240123103241.2282122-1-pulehui@huaweicloud.com> <20240123103241.2282122-2-pulehui@huaweicloud.com>
+In-Reply-To: <20240123103241.2282122-2-pulehui@huaweicloud.com>
+From: Song Liu <song@kernel.org>
+Date: Mon, 29 Jan 2024 09:21:49 -0800
+X-Gmail-Original-Message-ID: <CAPhsuW5fr5-wz1Q_AvuVCwSJ=byE+wVrKcKXrnJQjshn8Hc-sw@mail.gmail.com>
+Message-ID: <CAPhsuW5fr5-wz1Q_AvuVCwSJ=byE+wVrKcKXrnJQjshn8Hc-sw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 1/3] bpf: Use precise image size for struct_ops trampoline
+To: Pu Lehui <pulehui@huaweicloud.com>
+Cc: bpf@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	netdev@vger.kernel.org, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Puranjay Mohan <puranjay12@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Yonghong Song <yhs@fb.com>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Luke Nelson <luke.r.nels@gmail.com>, 
+	Pu Lehui <pulehui@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 29 Jan 2024 19:00:49 +0200 Ido Schimmel wrote:
-> > Installed both (from source) just in time for the
-> > net-next-2024-01-29--15-00 run.. let's see.  
-> 
-> Thanks!
-> 
-> The last two tests look good now, but the first still fails. Can you
-> share the ndisc6 version information? I tested with [1] from [2].
-> 
-> If your copy of ndisc6 indeed works, then I might be missing some
-> sysctl. I will be AFK tomorrow so I will look into it later this week.
+On Tue, Jan 23, 2024 at 2:32=E2=80=AFAM Pu Lehui <pulehui@huaweicloud.com> =
+wrote:
+>
+> From: Pu Lehui <pulehui@huawei.com>
+>
+> For trampoline using bpf_prog_pack, we need to generate a rw_image
+> buffer with size of (image_end - image). For regular trampoline, we use
+> the precise image size generated by arch_bpf_trampoline_size to allocate
+> rw_image. But for struct_ops trampoline, we allocate rw_image directly
+> using close to PAGE_SIZE size. We do not need to allocate for that much,
+> as the patch size is usually much smaller than PAGE_SIZE. Let's use
+> precise image size for it too.
+>
+> Signed-off-by: Pu Lehui <pulehui@huawei.com>
 
-Hm. Looks like our versions match. I put the entire tools root dir up on
-HTTP now: https://netdev-2.bots.linux.dev/tools/fs/ in case you wanna
-fetch the exact binary, it only links with libc, it seems.
+Acked-by: Song Liu <song@kernel.org>
 
