@@ -1,84 +1,100 @@
-Return-Path: <netdev+bounces-66770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41BDB8409AA
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:19:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70DFB8409C5
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:22:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65D191C23576
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 15:19:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F004A1F22C10
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 15:22:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FFFE15350B;
-	Mon, 29 Jan 2024 15:19:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B8B9153512;
+	Mon, 29 Jan 2024 15:22:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZtI7OV3K"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="HmA/JxQ2";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="79asHS5e";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Xd4VoyPF";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="lA4JvDbm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 951CB1534F9
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 15:19:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A60153500;
+	Mon, 29 Jan 2024 15:22:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706541553; cv=none; b=mrU9gmHsLC09ixOItx+n0/3CTkCeH0SsulITmGRt2zJORcqJIAGcbw22nvnHy+sxa/t6UzLzNvfN4QRQiKtCzj9uAL1WRlAWpCM2B+Z+dh/R8aU5xAjoNQl1dzsTU1alIevwPT46XKTq03tpZaPEJT9wELe12DzyJPCHYSYpOeE=
+	t=1706541726; cv=none; b=Yjmq5U3H076NXrapl3G+eeXC0ldnszktJNh4Pv2BGjuroGOj3sts/3i3OHg7fRt17VSwaMOF3SHhfJHBfx/npi6YU6VrRKcqN0kLqBrQcYB73XcQL3D0wqkvmFCbwT3okj5Ssxk/doPvfyzv1iXugbuKQffD/cI7ElO+5RiX9Rg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706541553; c=relaxed/simple;
-	bh=FHvl7OkjMdJ9ONk61j/M1LHWFH72kpB12mSVLjU0l0Q=;
+	s=arc-20240116; t=1706541726; c=relaxed/simple;
+	bh=/u7yXK6pKxgNrbYc1C4sFX/A8nwLrqK9V9ngyk83kTo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fTtHboSJhdTYWIDe79as5NG9stl5x1bZ4hbZ2QQheRM0CUwx7VQ7jtlwTCYRybfDvmYE/4/3sXcZhluPhKz/snP5F6BJqIkjoRXgSL+sjmn/zgl3B5UuUqanaX06BAbmMPZUpCG6LMM9c+7VMV71VQ3PJSAZcCDQLxvsM0m6RQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZtI7OV3K; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2cf1524cb17so35065751fa.2
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 07:19:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706541549; x=1707146349; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=11BFmQjC5NqBQHAKxyodJb3OBiyAzJ3FtSvWbAQgMbo=;
-        b=ZtI7OV3KfcSgvlaXdWyxiM5CKyxMN2kpxLPsoaprPsqVhSow55p4LlITHYJk7qBWxg
-         sVtm6wRpnFCLPDp/oOfmABYtdROvCFX2hCd9vWFckZAFA0v5ef1EsH5FnhAgfLLG4QVb
-         1Chwj2unUaMz+p9fec5OkSTUCPmARmbaa4Typw1E7IyLMoWij/PbAjA2cmDnoml4s33U
-         SX6nZ8AXm98GpdR+ePVQFzHgtC+BEEVuimldMQxvq+Om523y4c4YT6Wqhm79veg1hZJx
-         yDQKYmMrJeS0E6SuUjaNwLfWfAU+bs3f5ktFOMbc5pOl32Vha970bPyBvLUvyLAlC+hn
-         w5Tw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706541549; x=1707146349;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=11BFmQjC5NqBQHAKxyodJb3OBiyAzJ3FtSvWbAQgMbo=;
-        b=VA2SILba2Af94gkxrNbL5I1ZJWdat9hAHLiXKZPKOEkmC1GqAvhlNkJLfBKdPkAdci
-         RiTNmW8YfyRnuqSVuRqhDvtdEYlaIfrLVaIwsnwu55bHsbk/n+6BE0PBs9Tokdp/cRyg
-         58uBX6+TTbm2u0Cvap3GADjeqBrHvq+8fRbiytce/gGYThyyB2cpmRR4W6amAoPLY+bd
-         xncUpkCcmgvCqZUEAo7s3NjEzSP6kB3Dtn3zR75d2e4xKT/ZZNcNO84IQPrDhvi1ieHX
-         GrTD5uLztSp+JlsWIN7XSEIMADxegLulV/cwdbbXCP2b07i1Am6PYQdnakvWLxCM1/6y
-         slOg==
-X-Gm-Message-State: AOJu0YxMzGI8GnKAafT5GcEX17Dq+SeRa5zLhdQjDogvij/lQIoy3bJY
-	PCLJA2EOqSjvy5Dz5FGv9PQ3wJwRXRVbe0+EvVt1p+fCldwZdfT57mCj113HH0o=
-X-Google-Smtp-Source: AGHT+IHg4MijYyqROkJU+ZQUlJHAR+uo/QDKqyeS2tFsaUOMGkD+0Oct+degBc2qBHyLHB3C07W5rg==
-X-Received: by 2002:a2e:3819:0:b0:2cf:1b96:5af5 with SMTP id f25-20020a2e3819000000b002cf1b965af5mr3448982lja.17.1706541549382;
-        Mon, 29 Jan 2024 07:19:09 -0800 (PST)
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id f19-20020a056402195300b0055e96290001sm2944030edz.27.2024.01.29.07.19.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 07:19:09 -0800 (PST)
-Date: Mon, 29 Jan 2024 17:19:06 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
-	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	arinc.unal@arinc9.com, ansuelsmth@gmail.com
-Subject: Re: [PATCH net-next v4 09/11] net: dsa: realtek: migrate
- user_mii_bus setup to realtek-dsa
-Message-ID: <20240129151906.a6oeyh7qyq7c3ow4@skbuf>
-References: <20240123215606.26716-1-luizluca@gmail.com>
- <20240123215606.26716-10-luizluca@gmail.com>
- <20240125160511.pskpwroyrdmooxrg@skbuf>
- <CAJq09z5KJE1D=gCd5WX_B26FxYN_eGn7LwENwNQZ0BSe7aDwOA@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=sHjwwKPRYZ+aJo1bhNLLo/YALOboxXugUBh+BnnNETGCektn20DBUiKV8/Q3CCS3laEGDFmmI2AGIckrG/nQ3+bu5trdkiqTqiVprUWpEDdQtKAF/GUE8Ed8ur1mKBJiY+2svIppzB/SJ9wby5b/iGPD7/S1s1FJzpU26zr2fY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=HmA/JxQ2; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=79asHS5e; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Xd4VoyPF; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=lA4JvDbm; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:98])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 1AD94216ED;
+	Mon, 29 Jan 2024 15:22:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1706541722; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=03pj/0PXBIlRKMN1CP7MRdO6/XgIj2+x8GVXnnQRLBA=;
+	b=HmA/JxQ2VOeOnvHtU0oM+c6PK2w9s2EPq63d74NtPLLX4aButnX0tqnhV2+iBSmYrPymC2
+	M/h8HAV333kNKuE1rNOUMxzoI6ODNjZnzoLv7wggc4GVDXLwY70pcWA9jO/EBnPaEOlftH
+	cilNX7kdGLN9avqkiOW0YUTGc9odMhk=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1706541722;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=03pj/0PXBIlRKMN1CP7MRdO6/XgIj2+x8GVXnnQRLBA=;
+	b=79asHS5evxqzUqmpEKgB4UK4ZsSF9ccbORalo5Qar0zxHGflEYXIWWC3YtuLKEB3QX36tu
+	0jI1LeN7PIgfdoBw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1706541720; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=03pj/0PXBIlRKMN1CP7MRdO6/XgIj2+x8GVXnnQRLBA=;
+	b=Xd4VoyPFMlxZmP19+nUERbBkuBekYr58PiNqYE3alYswRp0yO3uPJOnrBxd4hUeSdGWUCJ
+	RIYeA2THp7B8884zCm9LyQUU6lJjmXLV3pyV27OHb2/navr2+dskypy55f9xxpC2lvcBz7
+	WKJo/ZywGpsUS9BgtrIxUXF+f3lt8sw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1706541720;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=03pj/0PXBIlRKMN1CP7MRdO6/XgIj2+x8GVXnnQRLBA=;
+	b=lA4JvDbmIusZESsX+JFu9UrLB+3Br8WXWn+rAEeD6HA4EQaxne1Y513Q2RsoTiy9I9cX2w
+	bAEXXFXyo8d5vjDA==
+Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 0D4C713911;
+	Mon, 29 Jan 2024 15:22:00 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap2.dmz-prg2.suse.org with ESMTPSA
+	id 7047A5jCt2UPGQAAn2gu4w
+	(envelope-from <jack@suse.cz>); Mon, 29 Jan 2024 15:22:00 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 87346A0807; Mon, 29 Jan 2024 16:21:59 +0100 (CET)
+Date: Mon, 29 Jan 2024 16:21:59 +0100
+From: Jan Kara <jack@suse.cz>
+To: Kent Overstreet <kent.overstreet@linux.dev>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-fsdevel@vgerkernel.org, peterz@infradead.org,
+	boqun.feng@gmail.com, Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
+Subject: Re: [PATCH 1/4] fs/pipe: Convert to lockdep_cmp_fn
+Message-ID: <20240129152159.ija7oppzsw7nf4oi@quack3>
+References: <20240127020111.487218-1-kent.overstreet@linux.dev>
+ <20240127020111.487218-2-kent.overstreet@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,85 +103,324 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAJq09z5KJE1D=gCd5WX_B26FxYN_eGn7LwENwNQZ0BSe7aDwOA@mail.gmail.com>
+In-Reply-To: <20240127020111.487218-2-kent.overstreet@linux.dev>
+X-Spam-Level: 
+Authentication-Results: smtp-out1.suse.de;
+	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=Xd4VoyPF;
+	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=lA4JvDbm
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-2.51 / 50.00];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:98:from];
+	 TO_DN_SOME(0.00)[];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_TRACE(0.00)[suse.cz:+];
+	 MX_GOOD(-0.01)[];
+	 RCPT_COUNT_SEVEN(0.00)[9];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 BAYES_HAM(-3.00)[100.00%];
+	 ARC_NA(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 FROM_HAS_DN(0.00)[];
+	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 TAGGED_RCPT(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,suse.cz:email,suse.com:email,colorfullife.com:email,linux.dev:email,linux.org.uk:email];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 MID_RHS_NOT_FQDN(0.50)[];
+	 FREEMAIL_CC(0.00)[vger.kernel.org,vgerkernel.org,infradead.org,gmail.com,zeniv.linux.org.uk,kernel.org,suse.cz];
+	 RCVD_TLS_ALL(0.00)[];
+	 SUSPICIOUS_RECIPS(1.50)[]
+X-Spam-Score: -2.51
+X-Rspamd-Queue-Id: 1AD94216ED
+X-Spam-Flag: NO
 
-On Sun, Jan 28, 2024 at 11:49:42PM -0300, Luiz Angelo Daros de Luca wrote:
-> Using mii_bus will also prevent an easy way for the driver to query
-> those registers (although not used anymore after ds_switch_ops
-> .phy_read/write are gone)
+On Fri 26-01-24 21:01:05, Kent Overstreet wrote:
+> *_lock_nested() is fundamentally broken; lockdep needs to check lock
+> ordering, but we cannot device a total ordering on an unbounded number
+> of elements with only a few subclasses.
+> 
+> the replacement is to define lock ordering with a proper comparison
+> function.
+> 
+> fs/pipe.c was already doing everything correctly otherwise, nothing
+> much changes here.
+> 
+> Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+> Cc: Christian Brauner <brauner@kernel.org>
+> Cc: Jan Kara <jack@suse.cz>
+> Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
 
-Exactly, there is no other remaining call to priv->ops->phy_read() and
-priv->ops->phy_write(), so their prototypes can be tailored such that
-they need no extra adapter.
+Looks good to me. Feel free to add:
 
-> I guess the best approach is to append something that identifies the
-> other mdio bus, for example ":user_mii". The result is something like
-> this:
-> 
-> mdio-bus:1d
-> mdio-bus:1d:user_mii:00
-> mdio-bus:1d:user_mii:01
-> ...
-> 
-> Or, for SMI:
-> 
-> switch:user_mii:00
-> switch:user_mii:01
-> ...
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-This looks good.
+								Honza
 
-> 
-> It is good enough for me as these switches have only one MDIO bus.
-> 
-> We could also bring up some kind of a general suggestion for naming
-> user_mii buses. In that case, we should be prepared for multiple mdio
-> buses and the mdio node name+@unit (%pOFP) might be appropriate. We
-> would get something like this:
-> 
-> mdio-bus:1d:mdio:00
-> mdio-bus:1d:mdio:01
-> 
-> Or, for SMI:
-> 
-> switch:mdio:00
-> switch:mdio:01
-> 
-> If there are multiple MDIO buses, it will be mdio@N (not tested).
-> 
-> mdio-bus:1d:mdio@0:00
-> mdio-bus:1d:mdio@0:01
-> ...
-> mdio-bus:1d:mdio@1:00
-> mdio-bus:1d:mdio@1:01
-> ...
 
-SJA1110 has 2 MDIO buses and they are named:
-
-	snprintf(bus->id, MII_BUS_ID_SIZE, "%s-base-tx",
-		 dev_name(priv->ds->dev));
-	snprintf(bus->id, MII_BUS_ID_SIZE, "%s-base-t1",
-		 dev_name(priv->ds->dev));
-
-which I think is more descriptive, because in its case, the indices in
-"mdio@0" and "mdio@1" are arbitrary numbers.
-
-I don't think we'll find a way to unify the naming convention across the
-board. Let's use dev_name(dev) + "-some-driver-specific-qualifier" here,
-and hopefully also as a convention from now on.
-
-> I also considered %pOFf but it gives a more verbose device name
-> without adding too much useful information:
+> ---
+>  fs/pipe.c | 81 +++++++++++++++++++++++++------------------------------
+>  1 file changed, 36 insertions(+), 45 deletions(-)
 > 
-> !ethernet@10100000!mdio-bus!switch1@29:00
-> !ethernet@10100000!mdio-bus!switch1@29:01
-> !ethernet@10100000!mdio-bus!switch1@29:02
+> diff --git a/fs/pipe.c b/fs/pipe.c
+> index f1adbfe743d4..50c8a8596b52 100644
+> --- a/fs/pipe.c
+> +++ b/fs/pipe.c
+> @@ -76,18 +76,20 @@ static unsigned long pipe_user_pages_soft = PIPE_DEF_BUFFERS * INR_OPEN_CUR;
+>   * -- Manfred Spraul <manfred@colorfullife.com> 2002-05-09
+>   */
+>  
+> -static void pipe_lock_nested(struct pipe_inode_info *pipe, int subclass)
+> +#define cmp_int(l, r)		((l > r) - (l < r))
+> +
+> +#ifdef CONFIG_PROVE_LOCKING
+> +static int pipe_lock_cmp_fn(const struct lockdep_map *a,
+> +			    const struct lockdep_map *b)
+>  {
+> -	if (pipe->files)
+> -		mutex_lock_nested(&pipe->mutex, subclass);
+> +	return cmp_int((unsigned long) a, (unsigned long) b);
+>  }
+> +#endif
+>  
+>  void pipe_lock(struct pipe_inode_info *pipe)
+>  {
+> -	/*
+> -	 * pipe_lock() nests non-pipe inode locks (for writing to a file)
+> -	 */
+> -	pipe_lock_nested(pipe, I_MUTEX_PARENT);
+> +	if (pipe->files)
+> +		mutex_lock(&pipe->mutex);
+>  }
+>  EXPORT_SYMBOL(pipe_lock);
+>  
+> @@ -98,28 +100,16 @@ void pipe_unlock(struct pipe_inode_info *pipe)
+>  }
+>  EXPORT_SYMBOL(pipe_unlock);
+>  
+> -static inline void __pipe_lock(struct pipe_inode_info *pipe)
+> -{
+> -	mutex_lock_nested(&pipe->mutex, I_MUTEX_PARENT);
+> -}
+> -
+> -static inline void __pipe_unlock(struct pipe_inode_info *pipe)
+> -{
+> -	mutex_unlock(&pipe->mutex);
+> -}
+> -
+>  void pipe_double_lock(struct pipe_inode_info *pipe1,
+>  		      struct pipe_inode_info *pipe2)
+>  {
+>  	BUG_ON(pipe1 == pipe2);
+>  
+> -	if (pipe1 < pipe2) {
+> -		pipe_lock_nested(pipe1, I_MUTEX_PARENT);
+> -		pipe_lock_nested(pipe2, I_MUTEX_CHILD);
+> -	} else {
+> -		pipe_lock_nested(pipe2, I_MUTEX_PARENT);
+> -		pipe_lock_nested(pipe1, I_MUTEX_CHILD);
+> -	}
+> +	if (pipe1 > pipe2)
+> +		swap(pipe1, pipe2);
+> +
+> +	pipe_lock(pipe1);
+> +	pipe_lock(pipe2);
+>  }
+>  
+>  static void anon_pipe_buf_release(struct pipe_inode_info *pipe,
+> @@ -271,7 +261,7 @@ pipe_read(struct kiocb *iocb, struct iov_iter *to)
+>  		return 0;
+>  
+>  	ret = 0;
+> -	__pipe_lock(pipe);
+> +	mutex_lock(&pipe->mutex);
+>  
+>  	/*
+>  	 * We only wake up writers if the pipe was full when we started
+> @@ -368,7 +358,7 @@ pipe_read(struct kiocb *iocb, struct iov_iter *to)
+>  			ret = -EAGAIN;
+>  			break;
+>  		}
+> -		__pipe_unlock(pipe);
+> +		mutex_unlock(&pipe->mutex);
+>  
+>  		/*
+>  		 * We only get here if we didn't actually read anything.
+> @@ -400,13 +390,13 @@ pipe_read(struct kiocb *iocb, struct iov_iter *to)
+>  		if (wait_event_interruptible_exclusive(pipe->rd_wait, pipe_readable(pipe)) < 0)
+>  			return -ERESTARTSYS;
+>  
+> -		__pipe_lock(pipe);
+> +		mutex_lock(&pipe->mutex);
+>  		was_full = pipe_full(pipe->head, pipe->tail, pipe->max_usage);
+>  		wake_next_reader = true;
+>  	}
+>  	if (pipe_empty(pipe->head, pipe->tail))
+>  		wake_next_reader = false;
+> -	__pipe_unlock(pipe);
+> +	mutex_unlock(&pipe->mutex);
+>  
+>  	if (was_full)
+>  		wake_up_interruptible_sync_poll(&pipe->wr_wait, EPOLLOUT | EPOLLWRNORM);
+> @@ -462,7 +452,7 @@ pipe_write(struct kiocb *iocb, struct iov_iter *from)
+>  	if (unlikely(total_len == 0))
+>  		return 0;
+>  
+> -	__pipe_lock(pipe);
+> +	mutex_lock(&pipe->mutex);
+>  
+>  	if (!pipe->readers) {
+>  		send_sig(SIGPIPE, current, 0);
+> @@ -582,19 +572,19 @@ pipe_write(struct kiocb *iocb, struct iov_iter *from)
+>  		 * after waiting we need to re-check whether the pipe
+>  		 * become empty while we dropped the lock.
+>  		 */
+> -		__pipe_unlock(pipe);
+> +		mutex_unlock(&pipe->mutex);
+>  		if (was_empty)
+>  			wake_up_interruptible_sync_poll(&pipe->rd_wait, EPOLLIN | EPOLLRDNORM);
+>  		kill_fasync(&pipe->fasync_readers, SIGIO, POLL_IN);
+>  		wait_event_interruptible_exclusive(pipe->wr_wait, pipe_writable(pipe));
+> -		__pipe_lock(pipe);
+> +		mutex_lock(&pipe->mutex);
+>  		was_empty = pipe_empty(pipe->head, pipe->tail);
+>  		wake_next_writer = true;
+>  	}
+>  out:
+>  	if (pipe_full(pipe->head, pipe->tail, pipe->max_usage))
+>  		wake_next_writer = false;
+> -	__pipe_unlock(pipe);
+> +	mutex_unlock(&pipe->mutex);
+>  
+>  	/*
+>  	 * If we do do a wakeup event, we do a 'sync' wakeup, because we
+> @@ -629,7 +619,7 @@ static long pipe_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+>  
+>  	switch (cmd) {
+>  	case FIONREAD:
+> -		__pipe_lock(pipe);
+> +		mutex_lock(&pipe->mutex);
+>  		count = 0;
+>  		head = pipe->head;
+>  		tail = pipe->tail;
+> @@ -639,16 +629,16 @@ static long pipe_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
+>  			count += pipe->bufs[tail & mask].len;
+>  			tail++;
+>  		}
+> -		__pipe_unlock(pipe);
+> +		mutex_unlock(&pipe->mutex);
+>  
+>  		return put_user(count, (int __user *)arg);
+>  
+>  #ifdef CONFIG_WATCH_QUEUE
+>  	case IOC_WATCH_QUEUE_SET_SIZE: {
+>  		int ret;
+> -		__pipe_lock(pipe);
+> +		mutex_lock(&pipe->mutex);
+>  		ret = watch_queue_set_size(pipe, arg);
+> -		__pipe_unlock(pipe);
+> +		mutex_unlock(&pipe->mutex);
+>  		return ret;
+>  	}
+>  
+> @@ -734,7 +724,7 @@ pipe_release(struct inode *inode, struct file *file)
+>  {
+>  	struct pipe_inode_info *pipe = file->private_data;
+>  
+> -	__pipe_lock(pipe);
+> +	mutex_lock(&pipe->mutex);
+>  	if (file->f_mode & FMODE_READ)
+>  		pipe->readers--;
+>  	if (file->f_mode & FMODE_WRITE)
+> @@ -747,7 +737,7 @@ pipe_release(struct inode *inode, struct file *file)
+>  		kill_fasync(&pipe->fasync_readers, SIGIO, POLL_IN);
+>  		kill_fasync(&pipe->fasync_writers, SIGIO, POLL_OUT);
+>  	}
+> -	__pipe_unlock(pipe);
+> +	mutex_unlock(&pipe->mutex);
+>  
+>  	put_pipe_info(inode, pipe);
+>  	return 0;
+> @@ -759,7 +749,7 @@ pipe_fasync(int fd, struct file *filp, int on)
+>  	struct pipe_inode_info *pipe = filp->private_data;
+>  	int retval = 0;
+>  
+> -	__pipe_lock(pipe);
+> +	mutex_lock(&pipe->mutex);
+>  	if (filp->f_mode & FMODE_READ)
+>  		retval = fasync_helper(fd, filp, on, &pipe->fasync_readers);
+>  	if ((filp->f_mode & FMODE_WRITE) && retval >= 0) {
+> @@ -768,7 +758,7 @@ pipe_fasync(int fd, struct file *filp, int on)
+>  			/* this can happen only if on == T */
+>  			fasync_helper(-1, filp, 0, &pipe->fasync_readers);
+>  	}
+> -	__pipe_unlock(pipe);
+> +	mutex_unlock(&pipe->mutex);
+>  	return retval;
+>  }
+>  
+> @@ -834,6 +824,7 @@ struct pipe_inode_info *alloc_pipe_info(void)
+>  		pipe->nr_accounted = pipe_bufs;
+>  		pipe->user = user;
+>  		mutex_init(&pipe->mutex);
+> +		lock_set_cmp_fn(&pipe->mutex, pipe_lock_cmp_fn, NULL);
+>  		return pipe;
+>  	}
+>  
+> @@ -1144,7 +1135,7 @@ static int fifo_open(struct inode *inode, struct file *filp)
+>  	filp->private_data = pipe;
+>  	/* OK, we have a pipe and it's pinned down */
+>  
+> -	__pipe_lock(pipe);
+> +	mutex_lock(&pipe->mutex);
+>  
+>  	/* We can only do regular read/write on fifos */
+>  	stream_open(inode, filp);
+> @@ -1214,7 +1205,7 @@ static int fifo_open(struct inode *inode, struct file *filp)
+>  	}
+>  
+>  	/* Ok! */
+> -	__pipe_unlock(pipe);
+> +	mutex_unlock(&pipe->mutex);
+>  	return 0;
+>  
+>  err_rd:
+> @@ -1230,7 +1221,7 @@ static int fifo_open(struct inode *inode, struct file *filp)
+>  	goto err;
+>  
+>  err:
+> -	__pipe_unlock(pipe);
+> +	mutex_unlock(&pipe->mutex);
+>  
+>  	put_pipe_info(inode, pipe);
+>  	return ret;
+> @@ -1411,7 +1402,7 @@ long pipe_fcntl(struct file *file, unsigned int cmd, unsigned int arg)
+>  	if (!pipe)
+>  		return -EBADF;
+>  
+> -	__pipe_lock(pipe);
+> +	mutex_lock(&pipe->mutex);
+>  
+>  	switch (cmd) {
+>  	case F_SETPIPE_SZ:
+> @@ -1425,7 +1416,7 @@ long pipe_fcntl(struct file *file, unsigned int cmd, unsigned int arg)
+>  		break;
+>  	}
+>  
+> -	__pipe_unlock(pipe);
+> +	mutex_unlock(&pipe->mutex);
+>  	return ret;
+>  }
+>  
+> -- 
+> 2.43.0
 > 
-> And I'm reluctant to add those "!" as they may not play nice with some
-> non-ideal scripts reading sysfs. I would, at least, replace them with
-> ":" .
-
-I'm also not in love with the exclamation marks that the sysfs code has
-to use, to replace the forward slashes that can't be represented in the
-filesystem.
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
 
