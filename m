@@ -1,118 +1,100 @@
-Return-Path: <netdev+bounces-66695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0356840514
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:35:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 538E4840516
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:37:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65B991F21534
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 12:35:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6F701F21F26
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 12:37:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D5C60DE6;
-	Mon, 29 Jan 2024 12:34:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBAF160EC5;
+	Mon, 29 Jan 2024 12:37:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g/TARmz4"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SQASCoUf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44F2D5B1EE
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 12:34:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45BB560DE6
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 12:37:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706531695; cv=none; b=Tyg+ivMU0xUcDagx+ueM1ubjPHgmE/w4RhgqiyWZXMWF2cZUfdbsHzIQq4Wji2gQVRzGxvrKVZcUD5EUH+7JDhRZb6fIc5XZOihqND7jKkWPCc/NDf2wLXkVBSJ05khp8zFNNvUAfCVirwz0yRh+my1inFCxFqN5+4naruRsxVk=
+	t=1706531827; cv=none; b=NSNH1OiUgZSkvb/E+8sJLYp3N+8NYSATPbNDpfh+qchOdfRpTF9igLfCBJ86FHxs3TaG4+3GmX0rV6eERTu70R5k0555ueN9ZJt5caXCbjwT6Mwkd5EGHljcbhRTsE4EY90AUfBNLsK48bHc52Jw77MSWaiJ+wgaKmiqX6O3TPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706531695; c=relaxed/simple;
-	bh=WCznlEBsDcJ4w6nek8MJ0Kte80pdPo1Tji9v/NnQcTA=;
+	s=arc-20240116; t=1706531827; c=relaxed/simple;
+	bh=svAOlluFAEpLJPpw9FnVbsi+CXhuZrXwZt0T28PPxZg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tBK/BG/4ytTWd9hjxitT/TFHgiUVXEgst4xj/axOWgHhNWhPjrEQJZg6AF+gmiZXKUNvVKi6oLIiIc5UL8uKt06p1eFPOjBLxInp3HkGUoIsm8RppHOA2hErTGURDvyQMmQ1R9HiZfEQ7ZX//QfAikPLiyWLl43RlC2j7CUGwOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g/TARmz4; arc=none smtp.client-ip=209.85.208.49
+	 To:Cc:Content-Type; b=G7W2UeZAnWP/o095Wjz1g+CbQheP0cL67Bi+9kNUoehi2WcKtFqipuugZrtpZ0ekeKf3gVHfZWgYtAhlDtxVUGLRuqkegSKVj+QWtqIr9ZLHVhkthpHowpgjiS2FQ4I54oK6ElYzG1j+Hhdse4xkwIWYACgKuMfL67uGedqVLJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SQASCoUf; arc=none smtp.client-ip=209.85.208.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-55eda7c5bffso8015a12.1
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 04:34:54 -0800 (PST)
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-55f06dc2b47so4481a12.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 04:37:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706531692; x=1707136492; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1706531824; x=1707136624; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=RtTiJ+l2KgzEu48Tog5tRcF/hIqq1A5D/kAMV4wmY9g=;
-        b=g/TARmz4LR3Xwd3PzoSQmEoaZ4J0ZVoLVZestpvQ3DPoTsxciQooymtBDL9aaq8caB
-         tahQ5Tqh7kW8OLEGzYiVvYtuKl+IWf7rpdTX8XlE2D0ANMCNwigcidXgeDwobige/KSc
-         0j9tBhMimPfdloj4oPwtviy22YQUkW3nHUw1rCzHobjXnwsBw7BTEFxA4OlD+hCXtADJ
-         naltRW8YILSSpO5aC+unaGZxgb+N/TG8BXnyiTGwu5raIQ+/zgIn6ietWYYoo6FcHzSS
-         d8SU41kvqeDa8rkAARCwdasAm3hPr9MaAMnrxhT17+VmbOkvDkHb3mCA3LTpfBJtrZLO
-         qdGA==
+        bh=svAOlluFAEpLJPpw9FnVbsi+CXhuZrXwZt0T28PPxZg=;
+        b=SQASCoUf9GofJRhnp75xx9rLbs6au+zU1kiJ3p4Z8pBQS6u/Fe0NuyIHOYc5ZaX4ZD
+         5+e6Eqg3piOH95AfvPTt0Lw3XLgqyHFSx3xOOFYW4uLlxXg0qW3ScYL3hI9aPzryghtd
+         yX51arpMps08MHgG1FlfOMhRE/8kJobD/DOStkJifFPOuqlcUAilVELPgeWScWqIeUF9
+         QUb7tn6RLjN9z/zFwZRIBEwfH46T0SPOPZt77as1cUVln0/Gzcgiz5NnZtTxDL36hhLU
+         bbAN7qWtsltWqNVrRpHHbL8DSyu2atm+n+ybb6XtmuM2F60fkJ5yv04G+NdOntEKK02M
+         m3zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706531692; x=1707136492;
+        d=1e100.net; s=20230601; t=1706531824; x=1707136624;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=RtTiJ+l2KgzEu48Tog5tRcF/hIqq1A5D/kAMV4wmY9g=;
-        b=md74ZBtEayOAGnpkHHOGyKkohqEzA5f7jKNfLW2N8+mWCJk/JJSqUQUUCHhSTdJfgU
-         oiMxKsuQSul6byqP4evvfGV+jw8QjjaTTo4ETV/RnaVtXgMfib0WR60kgA+YRq1InGhr
-         BxBe5MunQKHBjMo3qUBiXBe6391KQw1BwRrgViy/nJ3scpTggiGRRE5GNvF72P7W4fIW
-         z42uL9mH4+sDuL2Wz78l+uzlTQh9H3OzEkdksVxwG6lVqORIL/eX8HqmgUu+Qu21q8yv
-         lapZVOWW20Oxc0i8OvQiySXSPJNQYSBRns94Bp693QVeDf6PaxN17dAgFC8INQMJ9QFV
-         Oxdg==
-X-Gm-Message-State: AOJu0Yz/yQ0PHjZvXPeaDroZYjfZ9kUOyScGFMYG/jhTlwW7HOKgG653
-	IRbiRpgMni0AJ0bIKO+Or6wR2l03C/f2I4FiIHf1ejXTPZH5kFyeTSmPhWPEBVQGDRPQHLC90Lg
-	B02RoJ7eMK75TwTAhe0Nvtak+GCkqUeNnhNEH
-X-Google-Smtp-Source: AGHT+IFac2cOSYnbtc5nL6f/ebKgEFYhurJcihUOwmwj6XVYapzlZkuj7gCxrZxRlkGppkax+HRVY5uuR0k9jncBC8U=
-X-Received: by 2002:a05:6402:22cf:b0:55e:f115:3a95 with SMTP id
- dm15-20020a05640222cf00b0055ef1153a95mr141763edb.0.1706531692260; Mon, 29 Jan
- 2024 04:34:52 -0800 (PST)
+        bh=svAOlluFAEpLJPpw9FnVbsi+CXhuZrXwZt0T28PPxZg=;
+        b=rO0ciKC+gQ/9zQc6fUTfvMn1vJm60pexGV4O+AjqKJCbcKhJwhrtI3J9qa6BhIBq7N
+         BSEyAtJ9z7LHkX3WgahvRJQtGIP60j8yGQhRxvjuR6N25vJWmIjGI516yP6s4576zTDU
+         I+L5IvivE+Ln7gNYweS5u+D+XO322R+BUYtf6OSDJR3s0ADtFD2e8o/fmjbJ3ABkrQQk
+         GmuJXwYNbikK/PkAmd6viJiZUgjDuiOkPgKJ1GU0OEPZSyPd7ceAEFS4PSX3/iW56/0J
+         vPn0w7d9R0UfciG1lyib1bWZYcdy0h/EDMpaK2CX2xloWa9ySvNhUUVtW+HtuHOL104V
+         9MaQ==
+X-Gm-Message-State: AOJu0Yze0bQrjhaesWWUK/QUHh7Kfd9eDRF78s3shJwwTiY2yaBVKi8e
+	zb9LjBKePnRZvJ9L5gcczPpsKQMdvp/ueiULIEP0APQJ/ZvXWjcAG5JWqcB5q3Rup/3xRYm7AtY
+	fdB5HP5vXx/+1RjgNCRFLxiojzFR2xiFQB14GUk2iQ5KxORK5/A==
+X-Google-Smtp-Source: AGHT+IGv2cixMO/xmqEAGqfDdKYYL/e/273QHm1vHPZFapfBguO6yUPBkqiwUoJjEjyN2tK36T1v5/x/1ctUJrFASOw=
+X-Received: by 2002:a05:6402:2065:b0:55f:2888:3941 with SMTP id
+ bd5-20020a056402206500b0055f28883941mr13995edb.3.1706531824048; Mon, 29 Jan
+ 2024 04:37:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240126040519.1846345-1-menglong8.dong@gmail.com>
-In-Reply-To: <20240126040519.1846345-1-menglong8.dong@gmail.com>
+References: <20240126201449.2904078-1-kuba@kernel.org>
+In-Reply-To: <20240126201449.2904078-1-kuba@kernel.org>
 From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 29 Jan 2024 13:34:38 +0100
-Message-ID: <CANn89iLOx0R62gkTmk7Wq9OwnfB25a4xqtYkw712sqZeNyMRQg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] net: tcp: accept old ack during closing
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Mon, 29 Jan 2024 13:36:53 +0100
+Message-ID: <CANn89iJ1RR6Hkezdg_xDZjvDcMcZHeo-aw3v8Z6erzrhwM8-tg@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: free altname using an RCU callback
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	daniel@iogearbox.net, jiri@resnulli.us, lucien.xin@gmail.com, 
+	johannes.berg@intel.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 26, 2024 at 5:04=E2=80=AFAM Menglong Dong <menglong8.dong@gmail=
-.com> wrote:
+On Fri, Jan 26, 2024 at 9:14=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> For now, the packet with an old ack is not accepted if we are in
-> FIN_WAIT1 state, which can cause retransmission. Taking the following
-> case as an example:
+> We had to add another synchronize_rcu() in recent fix.
+> Bite the bullet and add an rcu_head to netdev_name_node,
+> free from RCU.
 >
->     Client                               Server
->       |                                    |
->   FIN_WAIT1(Send FIN, seq=3D10)          FIN_WAIT1(Send FIN, seq=3D20, ac=
-k=3D10)
->       |                                    |
->       |                                Send ACK(seq=3D21, ack=3D11)
->    Recv ACK(seq=3D21, ack=3D11)
->       |
->    Recv FIN(seq=3D20, ack=3D10)
+> Note that name_node does not hold any reference on dev
+> to which it points, but there must be a synchronize_rcu()
+> on device removal path, so we should be fine.
 >
-> In the case above, simultaneous close is happening, and the FIN and ACK
-> packet that send from the server is out of order. Then, the FIN will be
-> dropped by the client, as it has an old ack. Then, the server has to
-> retransmit the FIN, which can cause delay if the server has set the
-> SO_LINGER on the socket.
->
-> Old ack is accepted in the ESTABLISHED and TIME_WAIT state, and I think
-> it should be better to keep the same logic.
->
-> In this commit, we accept old ack in FIN_WAIT1/FIN_WAIT2/CLOSING/LAST_ACK
-> states. Maybe we should limit it to FIN_WAIT1 for now?
->
-> Signed-off-by: Menglong Dong <menglong8.dong@gmail.com>
->
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 
