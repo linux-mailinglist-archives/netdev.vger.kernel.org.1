@@ -1,117 +1,144 @@
-Return-Path: <netdev+bounces-66654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45307840156
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:23:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 217C3840106
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:12:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00C562819C7
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:23:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 45BA21C225CF
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:12:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B03755765;
-	Mon, 29 Jan 2024 09:23:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF5A54F86;
+	Mon, 29 Jan 2024 09:12:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EFf6mSDo"
 X-Original-To: netdev@vger.kernel.org
-Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E5B20B29;
-	Mon, 29 Jan 2024 09:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.39.64
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA8595576C
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 09:12:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706520208; cv=none; b=OHN/A6RTkeM3Jva6c3pBdKAP89qoy8ySqkjuiaJFhpHPIGFCAwwa2smEJ+NdjCTaZHE5nUkk1xL+dp20sINrEGiF/esqnxs1yAA29PoTOsAhgoAXHMxJUC/8bYjKYOVTDAnMVf/LO5pQcwZlr7hgjuw71TmYtKBa6Rm/5Drhiu8=
+	t=1706519524; cv=none; b=UUXTnQIfp7TaiYegi4EK/2ZUOCXiHYJ9lkuoyRUEhMIQkIKskwSWvNwx8u502Chm0XsEiqGdxQnM98scjWhyh/s2JJwPYusxYynsdpRACt3j2G+6AdYHB3CgfDPdBP8Th2l9A9zBmjUCC7fY2e2q2up0xbVpdCfko8BkzIcEo3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706520208; c=relaxed/simple;
-	bh=Msg8F5IL/0AenrkHit9Ad5Txza0O1ySzpyON+YbB29Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=a3XfHlQolpmBCqvTqRXe2iccWQAvBXZQi34BfwoH8O1uWDxE9Fc/JiwzN8X+CIOuWJ/WkthFHzyQztSuQtfuJyVQHDTFes9Ky/MJeFPx21bPiLLAtQ4FCiGDr0GuudjRJkDujYUk2OsitcD+OCTGDwmkc2/Ode5pEWVIAvjNVqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=129.150.39.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
-Received: from luzhipeng.223.5.5.5 (unknown [183.159.96.158])
-	by mail-app2 (Coremail) with SMTP id by_KCgCnfKx4brdlpzb9AA--.35670S2;
-	Mon, 29 Jan 2024 17:23:05 +0800 (CST)
-From: Zhipeng Lu <alexious@zju.edu.cn>
-To: alexious@zju.edu.cn
-Cc: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] [v2] net: ipv4: fix a memleak in ip_setup_cork
-Date: Mon, 29 Jan 2024 17:10:17 +0800
-Message-Id: <20240129091017.2938835-1-alexious@zju.edu.cn>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1706519524; c=relaxed/simple;
+	bh=LqBkBGTAm6oybIMF3P1Kb1YffmGgr5KxITxp2gE5Ssw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OAhxJW9Im7Z5d+e4nSRy0h+R0QRfXPNS73BPkLSmK7iBMcvFphyCJrjvCuz4baKfD/51/T+jpEoS6s/VMjcIp7/fODIadeuF6rgIwSAFoKh9pJMFNSex/pFX40lNqPZ7UCHL/v80LEPX5/N5T07H2C4hwhEWDgGOsboeOzNdpSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EFf6mSDo; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706519520;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=61gVbeeuFx/zhWGnZ5Oevqxqi7AWMc0Ap5lSoiBqd5U=;
+	b=EFf6mSDoV6xsC4WusByBdtD+gyvfDJhvNTjBPd9xtvYmL6UBkQmFQfn+5M6lKPB2Ytk8y6
+	6D0ZCoI/lQe//YsLWSb53k+NEVwGcLbExAZBENB/eoZMgNUSHfg2BLSrj6bsTrrwkm9hMZ
+	1ySWCfhfAU9V/LOM393lFbywAdLOHGA=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-523-IwtX4bv-OX6JrpskiiTo1g-1; Mon, 29 Jan 2024 04:11:58 -0500
+X-MC-Unique: IwtX4bv-OX6JrpskiiTo1g-1
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-510146aa159so390734e87.0
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 01:11:58 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706519517; x=1707124317;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=61gVbeeuFx/zhWGnZ5Oevqxqi7AWMc0Ap5lSoiBqd5U=;
+        b=Du7dObWWJnC1gkLgJAw16KVGbW5LYJnRCflNY1lBDKFAnr/ANzMaIuAYkGL1wcd9HZ
+         Kl53sezMdFeeFehiD7KmsKwByRPhkch3sK84MrrI9O4DMErJ6mV7NXExZQ4WUwPBC4XD
+         4KjTePpu+6ovXcnoNJEjlvzc6SwU5t6p2JIe+HraWl+Ap7TzwS3Uk7gNhIsCzn1AKcbJ
+         N6wVtmIj5qv7pzn6rauO4YRehKssQC6LW67GiG9vcC72Z0BPofxU4vLMPEoOjG/1Ave9
+         D3kYulo4upLo8NohXUo6F4rqYwS5cNETGUgNk+r41Z8GpMdBPlky1MAlaunnhHaHP+G9
+         dg5A==
+X-Gm-Message-State: AOJu0YzcJQHvjp01ByeGXe4gAHqxb7ava7His9G53fJ743B0i/X1agYN
+	WZiLWIsn1hI53sfL44tQOmFjchCW2rYwJUa55iki2EQUGCauYMLEKbna/kLWXG9Y3WHktnkvGfa
+	xOKyGachwo1Y0tCBun/o51ILJPNwj0e5tyywSZAMMY1rVusMLvESl6g==
+X-Received: by 2002:ac2:5f86:0:b0:510:1758:f3f6 with SMTP id r6-20020ac25f86000000b005101758f3f6mr3747430lfe.0.1706519517189;
+        Mon, 29 Jan 2024 01:11:57 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH/EhJvQcElL09+My1qrH6FIUytKNMug1gSGXt7Ly+HVcXD3NGwNuoZVZnEM40zqLz0C2v+rg==
+X-Received: by 2002:ac2:5f86:0:b0:510:1758:f3f6 with SMTP id r6-20020ac25f86000000b005101758f3f6mr3747415lfe.0.1706519516816;
+        Mon, 29 Jan 2024 01:11:56 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-230-151.dyn.eolo.it. [146.241.230.151])
+        by smtp.gmail.com with ESMTPSA id bd19-20020a05600c1f1300b0040ed1d6ce7csm9576688wmb.46.2024.01.29.01.11.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jan 2024 01:11:56 -0800 (PST)
+Message-ID: <a090936028c28b480cf3f8a66a9c3d924b7fd6ec.camel@redhat.com>
+Subject: Re: [PATCH net] selftests: net: add missing config for big tcp tests
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>, Xin Long
+ <lucien.xin@gmail.com>,  Florian Westphal <fw@strlen.de>, Aaron Conole
+ <aconole@redhat.com>, Nikolay Aleksandrov <razor@blackwall.org>,
+ linux-kselftest@vger.kernel.org
+Date: Mon, 29 Jan 2024 10:11:55 +0100
+In-Reply-To: <20240126115551.176e3888@kernel.org>
+References: 
+	<21630ecea872fea13f071342ac64ef52a991a9b5.1706282943.git.pabeni@redhat.com>
+	 <20240126115551.176e3888@kernel.org>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:by_KCgCnfKx4brdlpzb9AA--.35670S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7Ww1fGF1kuFWrAF13Kw43Awb_yoW8JFWUpr
-	Z8KayrJrW8Xr17KFsFyrW5ZFWfWw1vyFyjgw4ava4Y93WvqryaqrnrKFWa9FyavayxJ3Wr
-	Cwn7J34UWr18XFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
-	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
-	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
-	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
-	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
-	JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
-	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
-	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
-	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
-	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUYCJmUU
-	UUU
-X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/
 
-When inetdev_valid_mtu fails, cork->opt should be freed if it is
-allocated in ip_setup_cork. Otherwise there could be a memleak.
+On Fri, 2024-01-26 at 11:55 -0800, Jakub Kicinski wrote:
+> On Fri, 26 Jan 2024 16:32:36 +0100 Paolo Abeni wrote:
+> > The big_tcp test-case requires a few kernel knobs currently
+> > not specified in the net selftests config, causing the
+> > following failure:
+> >=20
+> >   # selftests: net: big_tcp.sh
+> >   # Error: Failed to load TC action module.
+> >   # We have an error talking to the kernel
+> > ...
+> >   # Testing for BIG TCP:
+> >   # CLI GSO | GW GRO | GW GSO | SER GRO
+> >   # ./big_tcp.sh: line 107: test: !=3D: unary operator expected
+> > ...
+> >   # on        on       on       on      : [FAIL_on_link1]
+> >=20
+> > Add the missing configs
+> >=20
+> > Fixes: 6bb382bcf742 ("selftests: add a selftest for big tcp")
+> > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+>=20
+> Ah, great, I was missing RF_RAW in the local hack.
+> I applied manually because looks like this change is on top of
+> something:
+>=20
+> patching file tools/testing/selftests/net/config
+> Hunk #3 succeeded at 73 with fuzz 1 (offset -1 lines).
+> Hunk #4 succeeded at 82 (offset -1 lines).
 
-Fixes: 501a90c94510 ("inet: protect against too small mtu values.")
-Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
----
-Changelog:
+Ooops... yes, indeed it's on top of the few patches I sent in the past
+days.
 
-v2: fix memleak by placing the malloc as the last error-handling.
----
- net/ipv4/ip_output.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+> While at it I reordered the values a little bit to be closer to what=20
+> I think would get us closer to alphasort. Hope you don't mind.
 
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index b06f678b03a1..41537d18eecf 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -1287,6 +1287,12 @@ static int ip_setup_cork(struct sock *sk, struct inet_cork *cork,
- 	if (unlikely(!rt))
- 		return -EFAULT;
- 
-+	cork->fragsize = ip_sk_use_pmtu(sk) ?
-+			 dst_mtu(&rt->dst) : READ_ONCE(rt->dst.dev->mtu);
-+
-+	if (!inetdev_valid_mtu(cork->fragsize))
-+		return -ENETUNREACH;
-+
- 	/*
- 	 * setup for corking.
- 	 */
-@@ -1303,12 +1309,6 @@ static int ip_setup_cork(struct sock *sk, struct inet_cork *cork,
- 		cork->addr = ipc->addr;
- 	}
- 
--	cork->fragsize = ip_sk_use_pmtu(sk) ?
--			 dst_mtu(&rt->dst) : READ_ONCE(rt->dst.dev->mtu);
--
--	if (!inetdev_valid_mtu(cork->fragsize))
--		return -ENETUNREACH;
--
- 	cork->gso_size = ipc->gso_size;
- 
- 	cork->dst = &rt->dst;
--- 
-2.34.1
+Sure thing I don't mind! I'm sorry for the extra work on you.
+
+Cheers,
+
+Paolo
 
 
