@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-66636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 314548400AD
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:56:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1997B8400AF
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:56:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5FA61F22ED5
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 08:56:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D3061F210D6
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 08:56:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1594954BEC;
-	Mon, 29 Jan 2024 08:56:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE14354BFA;
+	Mon, 29 Jan 2024 08:56:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="tKUL3w15"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="FXjGRcjD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675BF54BE1
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 08:56:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F42454BF4
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 08:56:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706518570; cv=none; b=NCfljdwVN0SqsjF5m5QlxqaNjG/P3Zj4hQlvq5MQZfMNoQXnZHN4t8tFQR64n5FO9Qs9OHmr5m0n89p8ITaHDFBmqshktjZOSZ0SOoeplDuGxxX9sFwTmAyzwLmAH9jKOcHzn+y0xxW50gtPbXP19Lm+btVE8ZTRcmaqhbLiMCY=
+	t=1706518577; cv=none; b=A6PuRvyfYpFaO6chw25MDaNt2D76wAkHEcahjg5C5T8Q5YmgKeqIDBujTs2GwFKRY4Dzs6u2AGFW+ESfdQAodtKR2N3P0pHVTMFvdhAYQfJdub9akwAbOBIxkoGV4dZASj3FH3EJ1xpsW7kBPrNpjPY2DFH8ImUsHgM4HugWPzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706518570; c=relaxed/simple;
-	bh=QDcdsBs13RZu01K3X9ndaimnDjibKIW0uWiJ1PUzU9I=;
+	s=arc-20240116; t=1706518577; c=relaxed/simple;
+	bh=iQc89UFFtZLhiLLnPAahFLTOTj7yF81e9V+65p0uYeE=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OBwCRkc7WMyBbGZoDs7VAAh5xt+pTd55nYuZip+EBxFOPzUrQEWRNZfJkoqthKKaJRyjbVN09FM5nseziadmJwNfATwhY8ogVKid5ACVOr0kvm2wYMl8UugQxOjhlgSk7t6WfJIpA/3uqhyx9AzQexPN135D7dYIgNjQWmcUaRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=tKUL3w15; arc=none smtp.client-ip=52.119.213.156
+	 MIME-Version:Content-Type; b=hXmyR7BBH2XqbnCQ9H0yy30AthS0A/CHDeA+H7YsuSBk/LbQ1Ro72AeWHZZbGHzmr6wMyjCZjDtR+Z7mY7R0vVpDsfEDKx0ZMeDP3igZyo5iKBveXglAbILcfuyyPHNOKkpxHqSRq82OhTMLy+/uErpo4JlGvC6/E7/hekPAbuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=FXjGRcjD; arc=none smtp.client-ip=99.78.197.219
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1706518569; x=1738054569;
+  t=1706518576; x=1738054576;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=pITjmpnl+RzydiZdCQnhlYTbWGoxjIFXYGSb1wk8CzQ=;
-  b=tKUL3w15NEsk/TMc3MRgyy5m6AXGwpQ/0uR7OTu6iINqdPaDfC6ejdWc
-   GD7fWRibcOYozXppp1NW0PFQO1v8DEDEEbiPR5rHbyYe2vT6Gz8HwxO9D
-   YAdy/agFtKlX2mmg0xoMBoclUMx5xO36P9uyHZi89zfmUn7KsyDRXbhxm
-   U=;
+  bh=mnzyTh8BwF4/EL/wTM9wffLJO2Pc4A/RjdxlKGoo7Ak=;
+  b=FXjGRcjDo67nzf0diH3n7A5TLy+i2GymvoHBDGqZ2JpvC86EVYRxYwSN
+   lHa5Q4gy1qUg8/dz+x8aC+Aqn0bkDUdqcRb9g345ulNKfOBJk8VEMO5Ci
+   AHRgukfkb2HBbP57KK3xHJznkHWOF36RGCtwZsqLZSpgpWHIt8o/tHSHw
+   4=;
 X-IronPort-AV: E=Sophos;i="6.05,226,1701129600"; 
-   d="scan'208";a="630522351"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-f323d91c.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2024 08:56:07 +0000
-Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-2b-m6i4x-f323d91c.us-west-2.amazon.com (Postfix) with ESMTPS id 49B2D40BD2;
-	Mon, 29 Jan 2024 08:56:05 +0000 (UTC)
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:46347]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.17.103:2525] with esmtp (Farcaster)
- id 1f5f1718-4fff-4484-89e2-aba2edefa5e4; Mon, 29 Jan 2024 08:56:05 +0000 (UTC)
-X-Farcaster-Flow-ID: 1f5f1718-4fff-4484-89e2-aba2edefa5e4
+   d="scan'208";a="61883170"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-b5bd57cf.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2024 08:56:12 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (iad7-ws-svc-p70-lb3-vlan3.iad.amazon.com [10.32.235.38])
+	by email-inbound-relay-iad-1a-m6i4x-b5bd57cf.us-east-1.amazon.com (Postfix) with ESMTPS id 8C10D4A683;
+	Mon, 29 Jan 2024 08:56:11 +0000 (UTC)
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:14730]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.31.136:2525] with esmtp (Farcaster)
+ id 591b8421-ac34-4b81-9722-df1743a71c45; Mon, 29 Jan 2024 08:56:10 +0000 (UTC)
+X-Farcaster-Flow-ID: 591b8421-ac34-4b81-9722-df1743a71c45
 Received: from EX19D010UWB003.ant.amazon.com (10.13.138.81) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 29 Jan 2024 08:56:04 +0000
+ 15.2.1118.40; Mon, 29 Jan 2024 08:56:08 +0000
 Received: from EX19MTAUWA001.ant.amazon.com (10.250.64.204) by
  EX19D010UWB003.ant.amazon.com (10.13.138.81) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 29 Jan 2024 08:56:03 +0000
+ 15.2.1118.40; Mon, 29 Jan 2024 08:56:07 +0000
 Received: from dev-dsk-darinzon-1c-05962a8d.eu-west-1.amazon.com
  (172.19.80.187) by mail-relay.amazon.com (10.250.64.204) with Microsoft SMTP
- Server id 15.2.1118.40 via Frontend Transport; Mon, 29 Jan 2024 08:56:00
+ Server id 15.2.1118.40 via Frontend Transport; Mon, 29 Jan 2024 08:56:04
  +0000
 From: <darinzon@amazon.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
@@ -78,9 +78,9 @@ CC: David Arinzon <darinzon@amazon.com>, "Woodhouse, David" <dwmw@amazon.com>,
 	"Abboud, Osama" <osamaabb@amazon.com>, "Ostrovsky, Evgeny"
 	<evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>, "Koler, Nati"
 	<nkolder@amazon.com>
-Subject: [PATCH v1 net-next 06/11] net: ena: Change error print during ena_device_init()
-Date: Mon, 29 Jan 2024 08:55:26 +0000
-Message-ID: <20240129085531.15608-7-darinzon@amazon.com>
+Subject: [PATCH v1 net-next 07/11] net: ena: Add more information on TX timeouts
+Date: Mon, 29 Jan 2024 08:55:27 +0000
+Message-ID: <20240129085531.15608-8-darinzon@amazon.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240129085531.15608-1-darinzon@amazon.com>
 References: <20240129085531.15608-1-darinzon@amazon.com>
@@ -96,35 +96,174 @@ Precedence: Bulk
 
 From: David Arinzon <darinzon@amazon.com>
 
-The print was re-worded to a more informative one.
+The function responsible for polling TX completions might not receive
+the CPU resources it needs due to higher priority tasks running on the
+requested core.
 
-Signed-off-by: Shahar Itzko <itzko@amazon.com>
+The driver might not be able to recognize such cases, but it can use its
+state to suspect that they happened. If both conditions are met:
+
+- napi hasn't been executed more than the TX completion timeout value
+- napi is scheduled (meaning that we've received an interrupt)
+
+Then it's more likely that the napi handler isn't scheduled because of
+an overloaded CPU.
+It was decided that for this case, the driver would wait twice as long
+as the regular timeout before scheduling a reset.
+The driver uses ENA_REGS_RESET_SUSPECTED_POLL_STARVATION reset reason to
+indicate this case to the device.
+
+This patch also adds more information to the ena_tx_timeout() callback.
+This function is called by the kernel when it detects that a specific TX
+queue has been closed for too long.
+
+Signed-off-by: Shay Agroskin <shayagr@amazon.com>
 Signed-off-by: David Arinzon <darinzon@amazon.com>
 ---
- drivers/net/ethernet/amazon/ena/ena_netdev.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/amazon/ena/ena_netdev.c  | 77 +++++++++++++++----
+ .../net/ethernet/amazon/ena/ena_regs_defs.h   |  1 +
+ 2 files changed, 64 insertions(+), 14 deletions(-)
 
 diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-index cd75e5a..18acb76 100644
+index 18acb76..ae9291b 100644
 --- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
 +++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-@@ -3071,6 +3071,7 @@ static int ena_device_init(struct ena_adapter *adapter, struct pci_dev *pdev,
- 			   bool *wd_state)
+@@ -47,19 +47,44 @@ static int ena_restore_device(struct ena_adapter *adapter);
+ 
+ static void ena_tx_timeout(struct net_device *dev, unsigned int txqueue)
  {
- 	struct ena_com_dev *ena_dev = adapter->ena_dev;
-+	struct net_device *netdev = adapter->netdev;
- 	struct ena_llq_configurations llq_config;
- 	struct device *dev = &pdev->dev;
- 	bool readless_supported;
-@@ -3160,7 +3161,7 @@ static int ena_device_init(struct ena_adapter *adapter, struct pci_dev *pdev,
- 	rc = ena_set_queues_placement_policy(pdev, ena_dev, &get_feat_ctx->llq,
- 					     &llq_config);
- 	if (rc) {
--		dev_err(dev, "ENA device init failed\n");
-+		netdev_err(netdev, "Cannot set queues placement policy rc= %d\n", rc);
- 		goto err_admin_init;
++	enum ena_regs_reset_reason_types reset_reason = ENA_REGS_RESET_OS_NETDEV_WD;
+ 	struct ena_adapter *adapter = netdev_priv(dev);
++	unsigned int time_since_last_napi, threshold;
++	struct ena_ring *tx_ring;
++	int napi_scheduled;
++
++	if (txqueue >= adapter->num_io_queues) {
++		netdev_err(dev, "TX timeout on invalid queue %u\n", txqueue);
++		goto schedule_reset;
++	}
++
++	threshold = jiffies_to_usecs(dev->watchdog_timeo);
++	tx_ring = &adapter->tx_ring[txqueue];
++
++	time_since_last_napi = jiffies_to_usecs(jiffies - tx_ring->tx_stats.last_napi_jiffies);
++	napi_scheduled = !!(tx_ring->napi->state & NAPIF_STATE_SCHED);
+ 
++	netdev_err(dev,
++		   "TX q %d is paused for too long (threshold %u). Time since last napi %u usec. napi scheduled: %d\n",
++		   txqueue,
++		   threshold,
++		   time_since_last_napi,
++		   napi_scheduled);
++
++	if (threshold < time_since_last_napi && napi_scheduled) {
++		netdev_err(dev,
++			   "napi handler hasn't been called for a long time but is scheduled\n");
++			   reset_reason = ENA_REGS_RESET_SUSPECTED_POLL_STARVATION;
++	}
++schedule_reset:
+ 	/* Change the state of the device to trigger reset
+ 	 * Check that we are not in the middle or a trigger already
+ 	 */
+-
+ 	if (test_and_set_bit(ENA_FLAG_TRIGGER_RESET, &adapter->flags))
+ 		return;
+ 
+-	ena_reset_device(adapter, ENA_REGS_RESET_OS_NETDEV_WD);
++	ena_reset_device(adapter, reset_reason);
+ 	ena_increase_stat(&adapter->dev_stats.tx_timeout, 1, &adapter->syncp);
+-
+-	netif_err(adapter, tx_err, dev, "Transmit time out\n");
+ }
+ 
+ static void update_rx_ring_mtu(struct ena_adapter *adapter, int mtu)
+@@ -3374,14 +3399,18 @@ static int check_missing_comp_in_tx_queue(struct ena_adapter *adapter,
+ 					  struct ena_ring *tx_ring)
+ {
+ 	struct ena_napi *ena_napi = container_of(tx_ring->napi, struct ena_napi, napi);
++	enum ena_regs_reset_reason_types reset_reason = ENA_REGS_RESET_MISS_TX_CMPL;
+ 	unsigned int time_since_last_napi;
+ 	unsigned int missing_tx_comp_to;
+ 	bool is_tx_comp_time_expired;
+ 	struct ena_tx_buffer *tx_buf;
+ 	unsigned long last_jiffies;
++	int napi_scheduled;
+ 	u32 missed_tx = 0;
+ 	int i, rc = 0;
+ 
++	missing_tx_comp_to = jiffies_to_msecs(adapter->missing_tx_completion_to);
++
+ 	for (i = 0; i < tx_ring->ring_size; i++) {
+ 		tx_buf = &tx_ring->tx_buffer_info[i];
+ 		last_jiffies = tx_buf->last_jiffies;
+@@ -3408,25 +3437,45 @@ static int check_missing_comp_in_tx_queue(struct ena_adapter *adapter,
+ 			adapter->missing_tx_completion_to);
+ 
+ 		if (unlikely(is_tx_comp_time_expired)) {
+-			if (!tx_buf->print_once) {
+-				time_since_last_napi = jiffies_to_usecs(jiffies - tx_ring->tx_stats.last_napi_jiffies);
+-				missing_tx_comp_to = jiffies_to_msecs(adapter->missing_tx_completion_to);
+-				netif_notice(adapter, tx_err, adapter->netdev,
+-					     "Found a Tx that wasn't completed on time, qid %d, index %d. %u usecs have passed since last napi execution. Missing Tx timeout value %u msecs\n",
+-					     tx_ring->qid, i, time_since_last_napi, missing_tx_comp_to);
++			time_since_last_napi =
++				jiffies_to_usecs(jiffies - tx_ring->tx_stats.last_napi_jiffies);
++			napi_scheduled = !!(ena_napi->napi.state & NAPIF_STATE_SCHED);
++
++			if (missing_tx_comp_to < time_since_last_napi && napi_scheduled) {
++				/* We suspect napi isn't called because the
++				 * bottom half is not run. Require a bigger
++				 * timeout for these cases
++				 */
++				if (!time_is_before_jiffies(last_jiffies +
++					2 * adapter->missing_tx_completion_to))
++					continue;
++
++				reset_reason = ENA_REGS_RESET_SUSPECTED_POLL_STARVATION;
+ 			}
+ 
+-			tx_buf->print_once = 1;
+ 			missed_tx++;
++
++			if (tx_buf->print_once)
++				continue;
++
++			netif_notice(adapter, tx_err, adapter->netdev,
++				     "TX hasn't completed, qid %d, index %d. %u usecs from last napi execution, napi scheduled: %d\n",
++				     tx_ring->qid, i, time_since_last_napi, napi_scheduled);
++
++			tx_buf->print_once = 1;
+ 		}
  	}
  
+ 	if (unlikely(missed_tx > adapter->missing_tx_completion_threshold)) {
+ 		netif_err(adapter, tx_err, adapter->netdev,
+-			  "The number of lost tx completions is above the threshold (%d > %d). Reset the device\n",
++			  "Lost TX completions are above the threshold (%d > %d). Completion transmission timeout: %u.\n",
+ 			  missed_tx,
+-			  adapter->missing_tx_completion_threshold);
+-		ena_reset_device(adapter, ENA_REGS_RESET_MISS_TX_CMPL);
++			  adapter->missing_tx_completion_threshold,
++			  missing_tx_comp_to);
++		netif_err(adapter, tx_err, adapter->netdev,
++			  "Resetting the device\n");
++
++		ena_reset_device(adapter, reset_reason);
+ 		rc = -EIO;
+ 	}
+ 
+diff --git a/drivers/net/ethernet/amazon/ena/ena_regs_defs.h b/drivers/net/ethernet/amazon/ena/ena_regs_defs.h
+index 1e007a4..2c3d6a7 100644
+--- a/drivers/net/ethernet/amazon/ena/ena_regs_defs.h
++++ b/drivers/net/ethernet/amazon/ena/ena_regs_defs.h
+@@ -21,6 +21,7 @@ enum ena_regs_reset_reason_types {
+ 	ENA_REGS_RESET_USER_TRIGGER                 = 12,
+ 	ENA_REGS_RESET_GENERIC                      = 13,
+ 	ENA_REGS_RESET_MISS_INTERRUPT               = 14,
++	ENA_REGS_RESET_SUSPECTED_POLL_STARVATION    = 15,
+ };
+ 
+ /* ena_registers offsets */
 -- 
 2.40.1
 
