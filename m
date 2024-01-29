@@ -1,158 +1,104 @@
-Return-Path: <netdev+bounces-66812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1B7E840BF4
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:43:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99D47840BF6
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:44:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CEEC289E0B
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:43:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC30C1C22F12
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:43:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C3DD156998;
-	Mon, 29 Jan 2024 16:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE3915697A;
+	Mon, 29 Jan 2024 16:43:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="laRNPT3c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MevcjHxZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F12A15696E;
-	Mon, 29 Jan 2024 16:43:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22AF15531E
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 16:43:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706546609; cv=none; b=kuNj0dJHWDIm08Gz+Iywlyibg6P5JIOk3CnSoGKWbUXhY8MRjIY7eYTUgIhzowUUMFQQsmYjVQ+IXAV27SzPkTSCtF7DrvVWjAvmRP/5mKHEFXQZIjNbkvULLMOD6wa8c780D9LkLfAQTC3s1+wYIameZMsK+hc8nsfHwmgLD50=
+	t=1706546636; cv=none; b=fyyhLYI6NbuvP2NauqnjXbfSknj0yKDftiozveG0wqpPMGJBX2RUQL+uxilG8S9bof7zEpUFGfzW4Ce4HZPvRZs1OJwmslc+tQFAdig/JXy3Na/YzPwhy9DN9zxxCM+hn3UoD/MoLmHHPCw0TVuzBdmfta5e6dlhskkdUSESlo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706546609; c=relaxed/simple;
-	bh=voj97DXC6XBrs98JAwhjCQUkvl5U2tQpl3APSKbLqyI=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=gCZ82/xDxSKe8Ki0KK54YirXJzt0+aSDX0E3h5QniveFNm6C+SyerAOWc/BQZIUFtt06AvsX1yIdElBQF5v1k4I+wbttZiMXwZ2soXP/zCQwcCenlpnvdalPT0Ihm4gN+gwcu22k5hh++kESM7W9TLjEX6gKbzuSLfSYWnkYVUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=laRNPT3c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EBFCCC433F1;
-	Mon, 29 Jan 2024 16:43:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706546608;
-	bh=voj97DXC6XBrs98JAwhjCQUkvl5U2tQpl3APSKbLqyI=;
-	h=From:Date:Subject:To:Cc:From;
-	b=laRNPT3cOAwnQoEFi3BWxg44C7ZxS1WSuHp4MA7uMGDaOp2GkeTHIXBRppySguNeV
-	 zIm/Q9MeLm3smjFn8s177bZPzIgKHhYx61fkXfnO8bDJpkyiPr534K3g/TiWW637eq
-	 Uiy9Lq4eXf6k4lRiJNYFCnhtAXTSx0Ce9L4ZZeZciykEgois3svBp5qefEtc7O/h7w
-	 Wh26qh9Y28cBikTd7OYuh/l4H8cNhcX3uzLEv/WyGApedFwBz/HczZBiEnIS+hqNhD
-	 Pq9oJzuRvQ42fEkxscPIcqoyeIBP7n0HoDVU4SfriVPL3DV6H7mxHjmRRNWj+npqkU
-	 2VEcSL1WZskQQ==
-From: Jeff Layton <jlayton@kernel.org>
-Date: Mon, 29 Jan 2024 11:43:15 -0500
-Subject: [PATCH] sunrpc: fix assignment of to_retries in svc_process_bc
+	s=arc-20240116; t=1706546636; c=relaxed/simple;
+	bh=QOSp0TVjLDIEYg1JmkEEci9I6bi6XXfpbscbDmazf6c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kw3QD2cxItTTjDpCkPZ4PWqMxXsLcrb7PIJBbONt/29Ui8zhdKdMStLW9eIgijtCki/B+u8svV9NJC73BdT6e+sVrHnBNigZOYICc3zRTgC8R5kYJjX5897XJ3D/GW2vALEKbyddY4OPYBDFF6laaVYvUdEMehaQYJZI0Q1vai0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MevcjHxZ; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-55f19a3ca7aso1143049a12.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 08:43:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706546633; x=1707151433; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QOSp0TVjLDIEYg1JmkEEci9I6bi6XXfpbscbDmazf6c=;
+        b=MevcjHxZLqdkz20gJegXMZUfT4gNBQM0Lzby3Y7BCUqnOSuxKMDmahZreCFcS735UK
+         0FjZMnMOI6WVSQaMAiPiyiq0BNx7gd27AQ3zDcK6yQnSq78Mrxi8TNOak4wqIOcysVYM
+         2V5VuTi8prl05flm1DZrEVWDjxmyBlQ2SkDjiemetuZduUQsMxOuKYdqd0sfkhkVWOgG
+         CvSa4NtudyGRU3fofR4SsYXSDC/ti2Y7WtuBR2B3J/Q7DtjONSEOFSJqjrzjLOT6oEh3
+         o0mB0nZwQdmYsoRGr5zWEcU2WxXX3/zEtkP/rR0T+txFYJMm0NqKEYFY9keyLqik8aEF
+         Nqrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706546633; x=1707151433;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QOSp0TVjLDIEYg1JmkEEci9I6bi6XXfpbscbDmazf6c=;
+        b=ERXQ35MQavaYCg+Yy3x1PgZb5khoNg1MdUEz5iODuK9cRH3oM/yKUWkMkihW0cEeg3
+         ughriJLzOLKafK/vVP284BBSjhJtvpEJlwujadPTUoYwZwmseHULwr22oysPpae27Yw2
+         zDq9TyH2cAHxqlZmxzrkqtCgCvMxtQEHMYKGRQliaoUQB6rIlzFcZF4RuMpxYtnF4u+m
+         6EnW2g231c6oIca3+5PjRmMtYs5ap6vXajSouKT+Hy9D9jYU4Z8fMuwDBiOxhV4ttfNZ
+         WSDH0gqihfqNJpbWrPLzE7YfsXh9SfKaAB/DiyA8/htzPA2z2cpTlUTcqmcdmApiDLem
+         OmXQ==
+X-Gm-Message-State: AOJu0Yx9WgyosfNknUBJ2YfiudkFT9VQYe9v+Qq9pFhxNaw3/+TN7Ly2
+	nTbu42aZrd16kW3sWdoL5B9lwvpDYCJEAUlUtKhSAQenweickOm8
+X-Google-Smtp-Source: AGHT+IGVkWs2G0GgvqZOZZDEjs7sNWg2//Kwa0I0AuC2N9w1OgI9jVgNNc3sOAX6kKNzrUTIc3/mqw==
+X-Received: by 2002:a17:907:cb87:b0:a35:5b80:18dc with SMTP id un7-20020a170907cb8700b00a355b8018dcmr5734747ejc.2.1706546632826;
+        Mon, 29 Jan 2024 08:43:52 -0800 (PST)
+Received: from skbuf ([188.25.173.195])
+        by smtp.gmail.com with ESMTPSA id ti10-20020a170907c20a00b00a35b4edb266sm1329543ejc.87.2024.01.29.08.43.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jan 2024 08:43:51 -0800 (PST)
+Date: Mon, 29 Jan 2024 18:43:49 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org,
+	linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, arinc.unal@arinc9.com, ansuelsmth@gmail.com
+Subject: Re: [PATCH net-next v4 08/11] net: dsa: realtek: clean user_mii_bus
+ setup
+Message-ID: <20240129164349.rcuj5hvmoqtzsuxr@skbuf>
+References: <20240123215606.26716-1-luizluca@gmail.com>
+ <20240123215606.26716-9-luizluca@gmail.com>
+ <20240125111718.armzsazgcjnicc2h@skbuf>
+ <CAJq09z64o96jURg-2ROgMRjQ9FTnL51kXQQcEpff1=TN11ShKw@mail.gmail.com>
+ <20240129161532.sub4yfbjkpfgqfwh@skbuf>
+ <95752e6d-82da-4cd3-b162-4fb88d7ffd13@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240129-nfsd-fixes-v1-1-49a3a45bd750@kernel.org>
-X-B4-Tracking: v=1; b=H4sIAKLVt2UC/x2LQQqAIBAAvxJ7bkGlKPtKdDBday8WLkQg/j3pO
- MxMAaHMJLB0BTI9LHylBrrvwJ8uHYQcGoNRZlDaWExRAkZ+SVAFO056dmr3DtpwZ/pF69et1g8
- /ZnwAXAAAAA==
-To: Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>, 
- Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
- Tom Talpey <tom@talpey.com>, 
- Trond Myklebust <trond.myklebust@hammerspace.com>, 
- Anna Schumaker <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Benjamin Coddington <bcodding@redhat.com>
-Cc: Anna Schumaker <Anna.Schumaker@Netapp.com>, linux-nfs@vger.kernel.org, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Alexander Aring <aahringo@redhat.com>, Jeff Layton <jlayton@kernel.org>
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3126; i=jlayton@kernel.org;
- h=from:subject:message-id; bh=voj97DXC6XBrs98JAwhjCQUkvl5U2tQpl3APSKbLqyI=;
- b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBlt9Wo3maIIq7zxY5nmGdTf+p0pbNUVaGRsBRZl
- dsQCOfFqFyJAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCZbfVqAAKCRAADmhBGVaC
- FfXkD/45Y8ftsDp8DK1GXuy+/AT0x3FQytqhaMUXtSnfYnUsx79OWGVAIUNoKCx0G8+LI4DKWUk
- fN/Vs/YRtn2oZ7UOjpUA2aLn9jTWOk73KMtbEjtt4AaT6i92C0LK65TXaQS4z8i2WF8Ck6xJXCk
- Kx8gm9VkpgYjMLgIrhJdDZk3JDJ0mtWZQunqmm+oc2D6UPYbvbB0qKYDApcVqwk0CW4ZPvp7Qnl
- N8Ug9RzE2DyJIVWs1mXmgRrmBHR1z25+vI4CDS2Y5GHexCHQ9+gyKUGBg8aC3TMNqP/I+eU7/0t
- Dmh37QFdrmY+YDxT6cXM4B22Bsjb5LZof5bZLG0+ZKTHbAjhUMYfXXWFm7mj39auWROWMjXSB1/
- QkMsdx8zV3Zj+XM/Tr0Zv8ZtQ0lMXjzAETlyQPmgS8+TVlQ8qrBlEBLZE+bl08r88HCo14cNiMm
- ZsO1mIE4Sj7HymHwCNwQdGNvVVAMAx/p2sfKi0STPBy0YvokRYwh03pOgw2RVuBRz7UxJf/ixLv
- TymzJcd3vgky1AuoaNN+NUu0q5PQLIufoXwEpoBqYmOwIHBPLUVIw60WC6Fa3tVNac8S/8p2mQC
- z2BkMgwc76tHX5Sn4i4NZj+eOx9yaDriYiMJdROZzXpCUlbjv2sJ/7Y0Xkxg/mlLU98wu3tTyHJ
- ydUw+goaJXhjdYQ==
-X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
- fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <95752e6d-82da-4cd3-b162-4fb88d7ffd13@gmail.com>
 
-Alex reported seeing this:
+On Mon, Jan 29, 2024 at 08:22:47AM -0800, Florian Fainelli wrote:
+> It does seem however universally acceptable to stop any DMAs and
+> packets from flowing as a default and safe implementation to the
+> upstream kernel.
 
-    [   18.238266] ------------[ cut here ]------------
-    [   18.239286] UBSAN: shift-out-of-bounds in net/sunrpc/xprt.c:660:14
-    [   18.240699] shift exponent 60000 is too large for 64-bit type 'long unsigned int'
-    [   18.242277] CPU: 1 PID: 290 Comm: NFSv4 callback Not tainted 6.8.0-rc1devtest5+ #5814
-    [   18.243846] Hardware name: Red Hat KVM/RHEL-AV, BIOS 1.16.0-4.module+el8.9.0+19570+14a90618 04/01/2014
-    [   18.245460] Call Trace:
-    [   18.245855]  <TASK>
-    [   18.246200]  dump_stack_lvl+0x93/0xb0
-    [   18.246785]  dump_stack+0x10/0x20
-    [   18.247308]  ubsan_epilogue+0x9/0x40
-    [   18.247875]  __ubsan_handle_shift_out_of_bounds+0x110/0x170
-    [   18.248727]  ? ktime_get+0x130/0x2a0
-    [   18.249317]  xprt_calc_majortimeo.isra.13.cold.45+0x12/0x23
-    [   18.250184]  xprt_init_majortimeo.isra.27+0x9c/0x150
-    [   18.251062]  xprt_init_bc_request+0xc1/0xd0
-    [   18.251728]  rpc_run_bc_task+0xd3/0x1b0
-    [   18.252328]  ? __pfx_rpc_run_bc_task+0x10/0x10
-    [   18.253045]  ? __this_cpu_preempt_check+0x13/0x20
-    [   18.253780]  ? xdr_inline_decode+0x5b/0x260
-    [   18.254447]  svc_process_bc+0x3b2/0x4d0
-    [   18.255069]  ? __pfx_svc_process_bc+0x10/0x10
-    [   18.255755]  ? __lwq_dequeue+0x5c/0xe0
-    [   18.256350]  ? __kasan_check_read+0x11/0x20
-    [   18.257002]  ? svc_thread_should_sleep+0x15d/0x190
-    [   18.257754]  ? svc_recv+0x918/0x13b0
-    [   18.258321]  svc_recv+0xa7e/0x13b0
-    [   18.258892]  nfs4_callback_svc+0x53/0xb0
-    [   18.259508]  ? __pfx_nfs4_callback_svc+0x10/0x10
-    [   18.260227]  kthread+0x1c2/0x210
-    [   18.260744]  ? kthread+0x103/0x210
-    [   18.261278]  ? __pfx_kthread+0x10/0x10
-    [   18.261872]  ret_from_fork+0x3a/0x50
-    [   18.262433]  ? __pfx_kthread+0x10/0x10
-    [   18.263024]  ret_from_fork_asm+0x1b/0x30
-    [   18.263684]  </TASK>
-    [   18.264348] ---[ end trace ]---
-
-to_initval can be very large and cause a shift overflow later. Ensure we
-copy the correct value into to_retries.
-
-Cc: Benjamin Coddington <bcodding@redhat.com>
-Reported-by: Alexander Aring <aahringo@redhat.com>
-Fixes: 57331a59ac0d NFSv4.1: Use the nfs_client's rpc timeouts for backchannel
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- net/sunrpc/svc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/sunrpc/svc.c b/net/sunrpc/svc.c
-index f60c93e5a25d..d86bf5b051fa 100644
---- a/net/sunrpc/svc.c
-+++ b/net/sunrpc/svc.c
-@@ -1598,7 +1598,7 @@ void svc_process_bc(struct rpc_rqst *req, struct svc_rqst *rqstp)
- 	/* Finally, send the reply synchronously */
- 	if (rqstp->bc_to_initval > 0) {
- 		timeout.to_initval = rqstp->bc_to_initval;
--		timeout.to_retries = rqstp->bc_to_initval;
-+		timeout.to_retries = rqstp->bc_to_retries;
- 	} else {
- 		timeout.to_initval = req->rq_xprt->timeout->to_initval;
- 		timeout.to_initval = req->rq_xprt->timeout->to_retries;
-
----
-base-commit: 41bccc98fb7931d63d03f326a746ac4d429c1dd3
-change-id: 20240129-nfsd-fixes-0d95718a0bca
-
-Best regards,
--- 
-Jeff Layton <jlayton@kernel.org>
-
+DMA I can understand, because you wouldn't want the hardware to notify
+you of a buffer you have no idea about. But DSA doesn't assume that
+switches have DMA, and generally speaking, stopping the offloaded
+traffic path seems unnecessary. It will be stopped when the new kernel
+sets up the interfaces as standalone, renegotiates the link, etc.
 
