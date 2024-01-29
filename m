@@ -1,99 +1,79 @@
-Return-Path: <netdev+bounces-66816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2BA6840C65
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:52:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 513B5840C71
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:54:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B09E5289AF3
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:52:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E46BB1F251BC
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:54:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5B6B157025;
-	Mon, 29 Jan 2024 16:52:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HD3wc0SO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAEB215444C;
+	Mon, 29 Jan 2024 16:53:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from air.basealt.ru (air.basealt.ru [194.107.17.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC9D155A50
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 16:52:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4744155A5F;
+	Mon, 29 Jan 2024 16:53:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706547168; cv=none; b=HvAd2CAzgLbhBpGyjGPojxNyrj1s71PAgJOLbJsTdFGfVdSDNwLH4oY3qirj3X2OTNe6LpQ2aSRG4RKKtZ+Yiv9aRUuSEW2hf4nJx6vDfUsyvtQ3y/duXQmbBPuyWkwDNoEcbktEVvvuPEqM66PTuZPO7pq+an37Kv/ZOM06Fwg=
+	t=1706547237; cv=none; b=gV5T3B4Cd7CaDduuOVmv5e98THryBCYyQ7fYg+KwJeNxTjtLSKqQrUqvvFrX6Ua6QaYT9ynhxS8fo8HA6vJaEFqNLWuo/CEYQrCY5VILeP6M67oNrqPhhW3qzOMvuhu9iGhyNrBWfDlbE7ruqWiY0Td0dZlWDN0oPoG3mKY4iRY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706547168; c=relaxed/simple;
-	bh=+2vYmMu+8lO2Fuf970O8rtomflacmswxjDEKbtSt7Q4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XZcn9Gy4OC6QG18/qrMH9rMAd3vVwryRsIldECozktv4PGaz80Fd9qfQVhOhU9CwUXOBdCzbgVCf6wUm27/AgLUHw/Fik/O+D10VqV4jLryaLhJfh3RYXfNJSbsMhPJhd+DcGgKjj6eJsXKPN2DaCKldBkgl45E7FrzHs+h8qyI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HD3wc0SO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706547166;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=joV8o3HwnUOaBbQesaf1wAX+mFWokC/5Mf+L6dXpBsc=;
-	b=HD3wc0SOYQj6hBwDByPsfeJt7GoyLGmwQBx86wyWkJxk3/JCefmJz+mzn9mCfk2/mhC4IR
-	hAhemiqXLnr+leRYxFyQkQsE+Md1ryKTUhCAS7KZWwMGoAjxO4jsYoi2tsfBLQSWOseJxN
-	3hDH+/4AOOeF0rE5leylpIDGYlR2bZQ=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-671-sYseXnQ0PN2DetQoIlmBlg-1; Mon, 29 Jan 2024 11:52:42 -0500
-X-MC-Unique: sYseXnQ0PN2DetQoIlmBlg-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 31B4F10AFD6A;
-	Mon, 29 Jan 2024 16:52:41 +0000 (UTC)
-Received: from [192.168.37.1] (ovpn-0-9.rdu2.redhat.com [10.22.0.9])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 43ED92166B31;
-	Mon, 29 Jan 2024 16:52:38 +0000 (UTC)
-From: Benjamin Coddington <bcodding@redhat.com>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>,
- Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
- Tom Talpey <tom@talpey.com>,
- Trond Myklebust <trond.myklebust@hammerspace.com>,
- Anna Schumaker <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Anna Schumaker <Anna.Schumaker@Netapp.com>,
- linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Alexander Aring <aahringo@redhat.com>
-Subject: Re: [PATCH] sunrpc: fix assignment of to_retries in svc_process_bc
-Date: Mon, 29 Jan 2024 11:52:36 -0500
-Message-ID: <7E6930D1-14BC-4CBC-9833-531BF6F5D874@redhat.com>
-In-Reply-To: <20240129-nfsd-fixes-v1-1-49a3a45bd750@kernel.org>
-References: <20240129-nfsd-fixes-v1-1-49a3a45bd750@kernel.org>
+	s=arc-20240116; t=1706547237; c=relaxed/simple;
+	bh=yKVwxPL9/WhewZ+dYuTA0bQAlhJjqWdNUHkstcnn35Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=peeNDg+n7asnHsvq8UI7Cya/69Dbgujai2gtNzQs/ZcNt8IuSEVFIzQDg2JDjNmYoRQ2ad3h0zDNxcArLPwN3G+f6+9sKQ3z4mUOj37KZspMGy7nqDbHRK3uRSMrwcOv/b8Z+l+Bn1OqLaFOSv0JaN+SicYl0/Pls7wEI5Jlj1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
+Received: by air.basealt.ru (Postfix, from userid 490)
+	id 2E9922F2023D; Mon, 29 Jan 2024 16:53:52 +0000 (UTC)
+X-Spam-Level: 
+Received: from [10.88.144.178] (obninsk.basealt.ru [217.15.195.17])
+	by air.basealt.ru (Postfix) with ESMTPSA id 160432F2023F;
+	Mon, 29 Jan 2024 16:53:50 +0000 (UTC)
+Message-ID: <f0e01978-cd8b-3670-2b31-fd39f90a92fb@basealt.ru>
+Date: Mon, 29 Jan 2024 19:53:49 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 1/1] gtp: fix use-after-free and null-ptr-deref in
+ gtp_genl_dump_pdp()
+Content-Language: en-US
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: Eric Dumazet <edumazet@google.com>, laforge@gnumonks.org,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ osmocom-net-gprs@lists.osmocom.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, nickel@altlinux.org, oficerovas@altlinux.org,
+ dutyrok@altlinux.org
+References: <20240124101404.161655-1-kovalev@altlinux.org>
+ <20240124101404.161655-2-kovalev@altlinux.org>
+ <CANn89iLKc8-hwvSBE=aSTRg=52Pn9B0HmFDneGCe6PMawPFCnQ@mail.gmail.com>
+ <1144600e-52f1-4c1a-4854-c53e05af5b45@basealt.ru>
+ <ZbeT31rUh0h3CctO@calendula>
+From: kovalev@altlinux.org
+In-Reply-To: <ZbeT31rUh0h3CctO@calendula>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On 29 Jan 2024, at 11:43, Jeff Layton wrote:
-
-> Alex reported seeing this:
+29.01.2024 15:02, Pablo Neira Ayuso wrote:
+> __netlink_dump_start() is called at the beginning of the dump, which is
+> grabbing a reference on this module.
 >
->     [   18.238266] ------------[ cut here ]------------
-> ...
+> do you have a reproducer?
+Hi, yes, in the cover letter [PATCH 0/1] 
+https://lore.kernel.org/all/20240124101404.161655-1-kovalev@altlinux.org/
 
-This one got fixed already, just waiting for a maintainer to send it alon=
-g:
-
-https://lore.kernel.org/linux-nfs/20240123053509.3592653-1-samasth.norway=
-=2Eananda@oracle.com/
-
-Ben
+-- 
+Regards,
+Vasiliy Kovalev
 
 
