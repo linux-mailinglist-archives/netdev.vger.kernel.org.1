@@ -1,120 +1,147 @@
-Return-Path: <netdev+bounces-66645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD4E484010D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:13:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8D1F840119
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:15:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 642EF1F218C6
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:13:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2837B1C22845
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:15:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B1F54F8D;
-	Mon, 29 Jan 2024 09:13:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7189854FAC;
+	Mon, 29 Jan 2024 09:15:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B7EE54F8A;
-	Mon, 29 Jan 2024 09:13:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C070254F91
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 09:15:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706519595; cv=none; b=IuTrb4sEhLjpVKsQX29kUy9kKVLK8i25cAx1ytEqKhi/thP7vBR+6G0nIBR15vPA2KUydqUEbkRtE2Q2Ght4ev2BkPax3KDQhZN0FlhkHTi2YV+cglYBZ7PgwsHHWt06wK3mFIr6BB+Tvjbpe2MVfdezPfSa+cAjq/LwVwHp9Aw=
+	t=1706519734; cv=none; b=adqcxZiQSJqXXDi+DwAPTGpxRr8ctieO7qAx6Itwe91UPWSF2aJz6fn0SJayvyo3T4AOOxn+cH7hHjSil2LuzD8JkaJUkzw5YelW+zoxYlyaJYnRJ5J8i4Wl96ohIuMIOA42Jje/4+1JvOMx5SOkHnTJ5hKb8JKIA9yCd/13oxQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706519595; c=relaxed/simple;
-	bh=fUwawlo+6mog1liGVL6Imvc8CtK/LPifYJCNZrjGVdE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=XWYuZgm682WrXodWnoLehwPJNLuuMLr88zjdwnCqEle8eZ1i7B//p1m4K4BrJfr3JgzA7e5Mdyl4+012zNBkog1LS+UtQlkKGhuM4bVuKDNfkO0/3/sCWdgASaBtSWlW6jAJZXQyxT8Jx54YLT1+Ar2nvhe5EW5LFy0IYWAcMuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TNjGJ63hCz1gy0l;
-	Mon, 29 Jan 2024 17:11:20 +0800 (CST)
-Received: from kwepemd100009.china.huawei.com (unknown [7.221.188.135])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4393E14011D;
-	Mon, 29 Jan 2024 17:13:09 +0800 (CST)
-Received: from [10.67.109.184] (10.67.109.184) by
- kwepemd100009.china.huawei.com (7.221.188.135) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1258.28; Mon, 29 Jan 2024 17:13:08 +0800
-Message-ID: <03ebc63f-7b96-4a70-ad10-a4ffc1d5b1cc@huawei.com>
-Date: Mon, 29 Jan 2024 17:13:07 +0800
+	s=arc-20240116; t=1706519734; c=relaxed/simple;
+	bh=n7Ro5k4D41eeTFxjV8kRtk8Tw9u96xuxYfBmFbbhtsc=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=BbKPqT9CeuEfSPMlwJXEHw7lHWuL9F51xm2RQNIyvno14eC0Pwx6w5hf1GxFbRRGBKVgN04T/BwD69AGz7ZeBsCGBfEjzEulMyu+/Fq4OqbAThoH05tzf45zI9P4R1USmhuOMP3QvRbibsNHqh4TXVIVE+55aMXGuOLMnhe4kQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7bfeed5ff3aso71113639f.2
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 01:15:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706519732; x=1707124532;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=O1CgmN53Ha8muyWD5yoizAce+SqLZpQJ1VOlNUG1ZJo=;
+        b=v5LuxCmWZFbEDQBC3V5bCcbmjE6M01aS5VQJ2B1S+w4kcorog9kJv8nZ+vO0SLjCq5
+         Uj9K7Ej86hATeISownmO86T2Czo3QRL4iqzsLJ9SY21z22FWyhDnRAW/DrXuOVFjZMop
+         dQqs60MjYegUTuV+JO3Bzc4k85dLosS406SMzVShOP/0v9+mwK4v9tbAm8zZWY/jZRQI
+         BWcC2vy8FeV5UCZZMexNn9dBTVexU10I1OfDQcGd+Opt4KhBa6LIyKKjTLfDt76w8F0z
+         LsQOomhBCHgGfOE8J9Wgc8UixUYv3QQmwwviWdhQToz9xZ7wADRZqS5F80YL/c8mbiBh
+         75Ww==
+X-Gm-Message-State: AOJu0YxmpVh44NQm68n14vwwK4SFT4Y/xKBeXwQN7orTpqQ4ECwOg3zK
+	l3P+SUADS0Kx3cXTttOjK1K5bFsztA2g2lbz9hBI04vYedVuL7CRIgiKk3vnwcpYBrBKXHqRsWq
+	VO/CiAhyHpubfPG5fm8CCnsiVSL556FHC0Dz/fPIxsyMCwLVxvMskrHM=
+X-Google-Smtp-Source: AGHT+IHGNTNEnWBcHA9v1y9pBI6lXDWy2prvEkvn6kkXysbgTUPGP231HcCZJ8r4y/NvqOeXaISP/fG7jvzbXzII4euT4F39+Q3x
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESEND bpf-next v3 4/6] riscv, bpf: Add necessary Zbb
- instructions
-Content-Language: en-US
-To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, Pu Lehui
-	<pulehui@huaweicloud.com>, <bpf@vger.kernel.org>,
-	<linux-riscv@lists.infradead.org>, <netdev@vger.kernel.org>
-CC: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
-	<martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
-	<yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
-	<kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
-	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt
-	<palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>, Luke Nelson
-	<luke.r.nels@gmail.com>
-References: <20240115131235.2914289-1-pulehui@huaweicloud.com>
- <20240115131235.2914289-5-pulehui@huaweicloud.com>
- <871qa2zog6.fsf@all.your.base.are.belong.to.us>
-From: Pu Lehui <pulehui@huawei.com>
-In-Reply-To: <871qa2zog6.fsf@all.your.base.are.belong.to.us>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemd100009.china.huawei.com (7.221.188.135)
+X-Received: by 2002:a05:6e02:1d95:b0:361:a961:b31a with SMTP id
+ h21-20020a056e021d9500b00361a961b31amr535681ila.5.1706519731972; Mon, 29 Jan
+ 2024 01:15:31 -0800 (PST)
+Date: Mon, 29 Jan 2024 01:15:31 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000006d31170610121646@google.com>
+Subject: [syzbot] [net?] [nfc?] KMSAN: uninit-value in nci_rsp_packet
+From: syzbot <syzbot+685805de744584f4d24b@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, krzysztof.kozlowski@linaro.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    9f8413c4a66f Merge tag 'cgroup-for-6.8' of git://git.kerne..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=154b0f30180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=656820e61b758b15
+dashboard link: https://syzkaller.appspot.com/bug?extid=685805de744584f4d24b
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/79d9f2f4b065/disk-9f8413c4.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/cbc68430d9c6/vmlinux-9f8413c4.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/9740ad9fc172/bzImage-9f8413c4.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+685805de744584f4d24b@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in nci_core_init_rsp_packet_v2 net/nfc/nci/rsp.c:107 [inline]
+BUG: KMSAN: uninit-value in nci_core_init_rsp_packet net/nfc/nci/rsp.c:131 [inline]
+BUG: KMSAN: uninit-value in nci_rsp_packet+0x294d/0x29a0 net/nfc/nci/rsp.c:376
+ nci_core_init_rsp_packet_v2 net/nfc/nci/rsp.c:107 [inline]
+ nci_core_init_rsp_packet net/nfc/nci/rsp.c:131 [inline]
+ nci_rsp_packet+0x294d/0x29a0 net/nfc/nci/rsp.c:376
+ nci_rx_work+0x1f3/0x500 net/nfc/nci/core.c:1518
+ process_one_work kernel/workqueue.c:2633 [inline]
+ process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2706
+ worker_thread+0xf45/0x1490 kernel/workqueue.c:2787
+ kthread+0x3ed/0x540 kernel/kthread.c:388
+ ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+
+Uninit was created at:
+ slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
+ slab_alloc_node mm/slub.c:3478 [inline]
+ kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
+ __alloc_skb+0x318/0x740 net/core/skbuff.c:651
+ alloc_skb include/linux/skbuff.h:1286 [inline]
+ virtual_ncidev_write+0x6d/0x280 drivers/nfc/virtual_ncidev.c:120
+ vfs_write+0x48b/0x1200 fs/read_write.c:588
+ ksys_write+0x20f/0x4c0 fs/read_write.c:643
+ __do_sys_write fs/read_write.c:655 [inline]
+ __se_sys_write fs/read_write.c:652 [inline]
+ __x64_sys_write+0x93/0xd0 fs/read_write.c:652
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x6d/0x140 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+CPU: 0 PID: 5070 Comm: kworker/u4:3 Not tainted 6.7.0-syzkaller-00562-g9f8413c4a66f #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+Workqueue: nfc2_nci_rx_wq nci_rx_work
+=====================================================
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-On 2024/1/28 1:16, Björn Töpel wrote:
-> Pu Lehui <pulehui@huaweicloud.com> writes:
-> 
->> From: Pu Lehui <pulehui@huawei.com>
->>
->> Add necessary Zbb instructions introduced by [0] to reduce code size and
->> improve performance of RV64 JIT. Meanwhile, a runtime deteted helper is
->> added to check whether the CPU supports Zbb instructions.
->>
->> Link: https://github.com/riscv/riscv-bitmanip/releases/download/1.0.0/bitmanip-1.0.0-38-g865e7a7.pdf [0]
->> Signed-off-by: Pu Lehui <pulehui@huawei.com>
->> ---
->>   arch/riscv/net/bpf_jit.h | 32 ++++++++++++++++++++++++++++++++
->>   1 file changed, 32 insertions(+)
->>
->> diff --git a/arch/riscv/net/bpf_jit.h b/arch/riscv/net/bpf_jit.h
->> index e30501b46f8f..51f6d214086f 100644
->> --- a/arch/riscv/net/bpf_jit.h
->> +++ b/arch/riscv/net/bpf_jit.h
->> @@ -18,6 +18,11 @@ static inline bool rvc_enabled(void)
->>   	return IS_ENABLED(CONFIG_RISCV_ISA_C);
->>   }
->>   
->> +static inline bool rvzbb_enabled(void)
->> +{
->> +	return IS_ENABLED(CONFIG_RISCV_ISA_ZBB) && riscv_has_extension_likely(RISCV_ISA_EXT_ZBB);
-> 
-> Hmm, I'm thinking about the IS_ENABLED(CONFIG_RISCV_ISA_ZBB) semantics
-> for a kernel JIT compiler.
-> 
-> IS_ENABLED(CONFIG_RISCV_ISA_ZBB) affects the kernel compiler flags.
-> Should it be enough to just have the run-time check? Should a kernel
-> built w/o Zbb be able to emit Zbb from the JIT?
-> 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-Not enough, because riscv_has_extension_likely(RISCV_ISA_EXT_ZBB) is a 
-platform capability check, and the other one is a kernel image 
-capability check. We can pass the check 
-riscv_has_extension_likely(RISCV_ISA_EXT_ZBB) when 
-CONFIG_RISCV_ISA_ZBB=n. And my local test prove it.
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-> 
-> Björn
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
