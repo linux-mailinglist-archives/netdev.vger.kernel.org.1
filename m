@@ -1,213 +1,196 @@
-Return-Path: <netdev+bounces-66704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1F898405B2
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:54:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 955308405B5
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:55:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 980471F2438F
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 12:54:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B4C3283B6D
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 12:55:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E08862805;
-	Mon, 29 Jan 2024 12:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F778629F8;
+	Mon, 29 Jan 2024 12:52:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=systec-electronic.com header.i=@systec-electronic.com header.b="NId3Dbh/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fa7O4HpB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.systec-electronic.com (mail.systec-electronic.com [77.220.239.22])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23E8F6168E;
-	Mon, 29 Jan 2024 12:51:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.220.239.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C89C629F0
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 12:52:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706532698; cv=none; b=PYJUvgC1nSVc2M4VetYxzO4K9XpPX8Ce1G1pE+2YcQAvPRrhcjCPIQuiNkoFTQ0H1MWDHG+vmDMmmpCehXNI6sbn3jfRuxStYPPuh3A8rSK74qaQqnggTSGl1WlH+Dx7IBg9uB07LQXzg+6ys5zIPFL7WpvKcueVO8KaKUtKgyg=
+	t=1706532759; cv=none; b=KN5Se3fS75VV+eUfXVADNATIzqa2/nXyshpvQyOs3gYIO8mJmSRIiw0N/sNGAUf/C6pKvq/4aPqiw23x2V94y/8vtd/5jZO6p0BiYh8TGjCVxkwalilaGTW6gCzIrc3Yq39YXto0P2spyLp6SfOaLyS164wDSyfJdTcJJ0VkcJw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706532698; c=relaxed/simple;
-	bh=QnBqzmhKuV4DkLRqe3+Uw6hRSHSCsEpTmcXzgBwWtE4=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=nMTk2TgoFFUtU8DmhKztRmmUtbhJywA1e/fZyTdVA+MSZhV0TKJ69R/SOAacyFapmZ4RCo2FZFttRkRdBOa1oaFq7wp3I2K1OwHm38/hLri7dkOQQQ7bqrmTgdDHw5I8t7ObvRIHuVxNq9omG9jxnKFeRKCi4cCkFHipr9xZxrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=systec-electronic.com; spf=pass smtp.mailfrom=systec-electronic.com; dkim=pass (2048-bit key) header.d=systec-electronic.com header.i=@systec-electronic.com header.b=NId3Dbh/; arc=none smtp.client-ip=77.220.239.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=systec-electronic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=systec-electronic.com
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.systec-electronic.com (Postfix) with ESMTP id DF8E0941A5CF;
-	Mon, 29 Jan 2024 13:51:24 +0100 (CET)
-Received: from mail.systec-electronic.com ([127.0.0.1])
- by localhost (mail.systec-electronic.com [127.0.0.1]) (amavis, port 10032)
- with ESMTP id jeapObYxi3VM; Mon, 29 Jan 2024 13:51:24 +0100 (CET)
-Received: from localhost (localhost.localdomain [127.0.0.1])
-	by mail.systec-electronic.com (Postfix) with ESMTP id B3EDC941A5D4;
-	Mon, 29 Jan 2024 13:51:24 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.10.3 mail.systec-electronic.com B3EDC941A5D4
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=systec-electronic.com; s=B34D3B04-5DC7-11EE-83E3-4D8CAB78E8CD;
-	t=1706532684; bh=P7HFrtGN4X3oSqy0NlKdSgb4AicwOFSWBTQe23Uieuc=;
-	h=Date:From:To:Message-ID:MIME-Version;
-	b=NId3Dbh/rj1YZ1Ff9YY4cE058j4pexV6MAlri/kvILCyucXOi6MEtPILzbe6Y8VLp
-	 /VhfWLK4HKcYc5iiBff1CNvGMKxXBdclF9lW24scuCYd2TWwhl0uDGQPBA26sh5zPY
-	 mLoPCZTU72j4k1OOEqVjZf2Sfx8l1KmKeOjVME1XoTNWuQgpQMxco4YqCV6+dQRkBJ
-	 UjfQNmeixvz0Jd5fPDMz38egPVFM/UiY0esaV96DUvWvvddi6wWzhbtTb7E/QhZK6V
-	 R8YSxv+/M+Q1bx9r8llNUJgLhuwmEje2cv/7Autpo1/rS1HvE1v2fKBvv01ufpGzXw
-	 Z9Nr63S04uBag==
-X-Virus-Scanned: amavis at systec-electronic.com
-Received: from mail.systec-electronic.com ([127.0.0.1])
- by localhost (mail.systec-electronic.com [127.0.0.1]) (amavis, port 10026)
- with ESMTP id cWs2srkwjCFC; Mon, 29 Jan 2024 13:51:24 +0100 (CET)
-Received: from ws-565760.systec.local (unknown [212.185.67.148])
-	by mail.systec-electronic.com (Postfix) with ESMTPSA id 58D2C941A5CF;
-	Mon, 29 Jan 2024 13:51:24 +0100 (CET)
-Date: Mon, 29 Jan 2024 13:51:11 +0100 (CET)
-From: Andre Werner <andre.werner@systec-electronic.com>
-Reply-To: Andre Werner <andre.werner@systec-electronic.com>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-cc: Andre Werner <andre.werner@systec-electronic.com>, andrew@lunn.ch, 
-    hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com, 
-    kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk, 
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC net-next v4 2/2] net: phy: adin1100: Add interrupt support
- for link change
-In-Reply-To: <20240122074258.zmbzngrl7dzhkvwo@DEN-DL-M31836.microchip.com>
-Message-ID: <e8a14edd-0879-a6f8-0e7a-edf09998f6e9@systec-electronic.com>
-References: <20240121201511.8997-1-andre.werner@systec-electronic.com> <20240121201511.8997-3-andre.werner@systec-electronic.com> <20240122074258.zmbzngrl7dzhkvwo@DEN-DL-M31836.microchip.com>
+	s=arc-20240116; t=1706532759; c=relaxed/simple;
+	bh=9QaSZLiCN1wf4oQCl/cYFudoj/IZujYRa+tug9ga+Os=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q+VZ1yDP9TgV8/hnCAw0yfFS67QA4ez6Md6aUQ8uVqFBrP7RbADQseovUqUCceVykBM0tnX9CDUkTMTt7nExaCr0zG6BrsUlhM3R+KdTxc3w24QUAEsVNIAb/XLkc5lAEK1ZvwFxIGedB87kVYLj7Ddp+e4RnoXzxflTIhgHwZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fa7O4HpB; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706532756;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=HFGou14JoZNUFYFvgdT1vD08s06+DwHZnpkq7nELQBc=;
+	b=Fa7O4HpBrsyRC2p3H8d03XGvEN+E3xD+I00Ti9pN64fmuS0TRM7+smmWwDCVjFGi3qwj5K
+	IidVP9Lfhg6s7xDVARjogvuODGw0aPcRRCjao9T1YuSdWTubYM1YPeW60J/norjWOSUpf6
+	pCUs77wKKmLZifQxSfrEVl6lqP4wL4c=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-651-BKzlMzseMpGSdJV8yXT8Yw-1; Mon, 29 Jan 2024 07:52:34 -0500
+X-MC-Unique: BKzlMzseMpGSdJV8yXT8Yw-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40e74860cb0so23522545e9.3
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 04:52:34 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706532753; x=1707137553;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HFGou14JoZNUFYFvgdT1vD08s06+DwHZnpkq7nELQBc=;
+        b=kJd4RdlcwfjETIdRQF7b3pd1XaHBx58PwT8Vu0EFTWa9VB1KSioP3xK0AjBFpI0/rK
+         SYXhIENkRsVCkaDYxCQ/rYhgEgyQE+OLVgEBoRb4boUoIa3+w5tlFPrfxJW9pbLxQ4t3
+         7bQCgFNDJYOmpp0JRua3OABkkT5cde2ckZBzLrN6Cv8cqFno07o4A99M/ITVJRc/g+gC
+         FAJt6utKWMNs4Ibovrs4S2LJ/dy5lapCwR7VKofpo+T24H400Xvd79rKcb2SKWE219cH
+         TB9osoeUlsH3+vfZJuM8X4g8mJXssBCWEWpSLCOEGS22Rtrk0hKQ/OZfGRbRLWBxQucK
+         XgaA==
+X-Gm-Message-State: AOJu0Yxw3akR2fGUuuiL25XWPnhSPtRfs6W0kqOlGUa7k9cqBAMMxIzv
+	sCza3U+l/7LTIXaemXwFJbRmvV+s67hh/E/UsXEPQy4BHeEREP9uiQAmfVv0xw6HNU2GiP1MfSa
+	Wry8FFfPr/nKLZPbN1TopUkQ2UzAqe/FmzWtALm1lduNC7aWdrfxa9g==
+X-Received: by 2002:a1c:7903:0:b0:40e:ce03:e61f with SMTP id l3-20020a1c7903000000b0040ece03e61fmr5019845wme.11.1706532753678;
+        Mon, 29 Jan 2024 04:52:33 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEQEfBWuBXgVTSkJU7aaKjF34oJdO8b+R18K0tXiJxOntO8oyDdgVOUZH7C9pfQwNKpimYr8Q==
+X-Received: by 2002:a1c:7903:0:b0:40e:ce03:e61f with SMTP id l3-20020a1c7903000000b0040ece03e61fmr5019830wme.11.1706532753378;
+        Mon, 29 Jan 2024 04:52:33 -0800 (PST)
+Received: from localhost (net-93-71-3-198.cust.vodafonedsl.it. [93.71.3.198])
+        by smtp.gmail.com with ESMTPSA id l5-20020a05600c4f0500b0040e5951f199sm10137605wmq.34.2024.01.29.04.52.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jan 2024 04:52:31 -0800 (PST)
+Date: Mon, 29 Jan 2024 13:52:29 +0100
+From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
+Cc: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
+	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+	pabeni@redhat.com, bpf@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	sdf@google.com, hawk@kernel.org, ilias.apalodimas@linaro.org
+Subject: Re: [PATCH v6 net-next 1/5] net: add generic per-cpu page_pool
+ allocator
+Message-ID: <ZbefjZvKUMtaCbm1@lore-desk>
+References: <cover.1706451150.git.lorenzo@kernel.org>
+ <5b0222d3df382c22fe0fa96154ae7b27189f7ecd.1706451150.git.lorenzo@kernel.org>
+ <87jzns1f71.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
-
-Dear Maintainers,
-
-I'm a bit confused about the patch submitting process for net-next.
-Do I need to send the patchset again, if the merge window is opened again and
-the patchset was previously submitted as RFC?
-
-Best regards.
-Andre
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="5WpXeB60xZqPdpub"
+Content-Disposition: inline
+In-Reply-To: <87jzns1f71.fsf@toke.dk>
 
 
-On Mon, 22 Jan 2024, Horatiu Vultur wrote:
+--5WpXeB60xZqPdpub
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> The 01/21/2024 20:54, Andre Werner wrote:
->
-> Hi Andre,
->
->
->> An interrupt handler was added to the driver as well as functions
->> to enable interrupts at the phy.
->>
->> There are several interrupts maskable at the phy, but only link change
->> interrupts are handled by the driver yet.
->>
->> Signed-off-by: Andre Werner <andre.werner@systec-electronic.com>
->> ---
->> v4:
->> - Change read-modify-write behavior as suggested to phy_modify_mmd.
->
-> Usually it is good to keep the change log also from the previous
-> versions, so it is easier to see what has been changed.
->
->> ---
->>  drivers/net/phy/adin1100.c | 56 ++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 56 insertions(+)
->>
->> diff --git a/drivers/net/phy/adin1100.c b/drivers/net/phy/adin1100.c
->> index 7619d6185801..7c82384e5d30 100644
->> --- a/drivers/net/phy/adin1100.c
->> +++ b/drivers/net/phy/adin1100.c
->> @@ -18,6 +18,12 @@
->>  #define PHY_ID_ADIN1110                                0x0283bc91
->>  #define PHY_ID_ADIN2111                                0x0283bca1
->>
->> +#define ADIN_PHY_SUBSYS_IRQ_MASK               0x0021
->> +#define   ADIN_LINK_STAT_CHNG_IRQ_EN           BIT(1)
->> +
->> +#define ADIN_PHY_SUBSYS_IRQ_STATUS             0x0011
->> +#define   ADIN_LINK_STAT_CHNG                  BIT(1)
->> +
->>  #define ADIN_FORCED_MODE                       0x8000
->>  #define   ADIN_FORCED_MODE_EN                  BIT(0)
->>
->> @@ -136,6 +142,54 @@ static int adin_config_aneg(struct phy_device *phydev)
->>         return genphy_c45_config_aneg(phydev);
->>  }
->>
->> +static int adin_phy_ack_intr(struct phy_device *phydev)
->> +{
->> +       /* Clear pending interrupts */
->> +       int rc = phy_read_mmd(phydev, MDIO_MMD_VEND2,
->> +                             ADIN_PHY_SUBSYS_IRQ_STATUS);
->> +
->> +       return rc < 0 ? rc : 0;
->> +}
->> +
->> +static int adin_config_intr(struct phy_device *phydev)
->> +{
->> +       int ret;
->> +       u16 irq_mask;
->
-> Please use reverse x-mas notation here.
->
->> +
->> +       ret = adin_phy_ack_intr(phydev);
->> +
->
-> No new line here, between ret and if.
->
->> +       if (ret)
->> +               return ret;
->> +
->> +       if (phydev->interrupts == PHY_INTERRUPT_ENABLED)
->> +               irq_mask = ADIN_LINK_STAT_CHNG_IRQ_EN;
->> +       else
->> +               irq_mask = 0;
->> +
->> +       return phy_modify_mmd(phydev, MDIO_MMD_VEND2,
->> +                             ADIN_PHY_SUBSYS_IRQ_MASK,
->> +                             ADIN_LINK_STAT_CHNG_IRQ_EN, irq_mask);
->> +}
->> +
->> +static irqreturn_t adin_phy_handle_interrupt(struct phy_device *phydev)
->> +{
->> +       int irq_status;
->> +
->> +       irq_status = phy_read_mmd(phydev, MDIO_MMD_VEND2,
->> +                                 ADIN_PHY_SUBSYS_IRQ_STATUS);
->> +       if (irq_status < 0) {
->> +               phy_error(phydev);
->> +               return IRQ_NONE;
->> +       }
->> +
->> +       if (!(irq_status & ADIN_LINK_STAT_CHNG))
->> +               return IRQ_NONE;
->> +
->> +       phy_trigger_machine(phydev);
->> +
->> +       return IRQ_HANDLED;
->> +}
->> +
->>  static int adin_set_powerdown_mode(struct phy_device *phydev, bool en)
->>  {
->>         int ret;
->> @@ -275,6 +329,8 @@ static struct phy_driver adin_driver[] = {
->>                 .probe                  = adin_probe,
->>                 .config_aneg            = adin_config_aneg,
->>                 .read_status            = adin_read_status,
->> +               .config_intr            = adin_config_intr,
->> +               .handle_interrupt       = adin_phy_handle_interrupt,
->>                 .set_loopback           = adin_set_loopback,
->>                 .suspend                = adin_suspend,
->>                 .resume                 = adin_resume,
->> --
->> 2.43.0
->>
->>
->
-> -- 
-> /Horatiu
->
+> Lorenzo Bianconi <lorenzo@kernel.org> writes:
+>=20
+> > Introduce generic percpu page_pools allocator.
+> > Moreover add page_pool_create_percpu() and cpuid filed in page_pool str=
+uct
+> > in order to recycle the page in the page_pool "hot" cache if
+> > napi_pp_put_page() is running on the same cpu.
+> > This is a preliminary patch to add xdp multi-buff support for xdp runni=
+ng
+> > in generic mode.
+> >
+> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > ---
+> >  include/net/page_pool/types.h |  3 +++
+> >  net/core/dev.c                | 40 +++++++++++++++++++++++++++++++++++
+> >  net/core/page_pool.c          | 23 ++++++++++++++++----
+> >  net/core/skbuff.c             |  5 +++--
+> >  4 files changed, 65 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/include/net/page_pool/types.h b/include/net/page_pool/type=
+s.h
+> > index 76481c465375..3828396ae60c 100644
+> > --- a/include/net/page_pool/types.h
+> > +++ b/include/net/page_pool/types.h
+> > @@ -128,6 +128,7 @@ struct page_pool_stats {
+> >  struct page_pool {
+> >  	struct page_pool_params_fast p;
+> > =20
+> > +	int cpuid;
+> >  	bool has_init_callback;
+> > =20
+> >  	long frag_users;
+> > @@ -203,6 +204,8 @@ struct page *page_pool_alloc_pages(struct page_pool=
+ *pool, gfp_t gfp);
+> >  struct page *page_pool_alloc_frag(struct page_pool *pool, unsigned int=
+ *offset,
+> >  				  unsigned int size, gfp_t gfp);
+> >  struct page_pool *page_pool_create(const struct page_pool_params *para=
+ms);
+> > +struct page_pool *page_pool_create_percpu(const struct page_pool_param=
+s *params,
+> > +					  int cpuid);
+> > =20
+> >  struct xdp_mem_info;
+> > =20
+> > diff --git a/net/core/dev.c b/net/core/dev.c
+> > index cb2dab0feee0..bf9ec740b09a 100644
+> > --- a/net/core/dev.c
+> > +++ b/net/core/dev.c
+> > @@ -153,6 +153,8 @@
+> >  #include <linux/prandom.h>
+> >  #include <linux/once_lite.h>
+> >  #include <net/netdev_rx_queue.h>
+> > +#include <net/page_pool/types.h>
+> > +#include <net/page_pool/helpers.h>
+> > =20
+> >  #include "dev.h"
+> >  #include "net-sysfs.h"
+> > @@ -442,6 +444,8 @@ static RAW_NOTIFIER_HEAD(netdev_chain);
+> >  DEFINE_PER_CPU_ALIGNED(struct softnet_data, softnet_data);
+> >  EXPORT_PER_CPU_SYMBOL(softnet_data);
+> > =20
+> > +DEFINE_PER_CPU_ALIGNED(struct page_pool *, page_pool);
+>=20
+> I think we should come up with a better name than just "page_pool" for
+> this global var. In the code below it looks like it's a local variable
+> that's being referenced. Maybe "global_page_pool" or "system_page_pool"
+> or something along those lines?
+
+ack, I will fix it. system_page_pool seems better, agree?
+
+Regards,
+Lorenzo
+
+>=20
+> -Toke
+>=20
+
+--5WpXeB60xZqPdpub
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZbefjQAKCRA6cBh0uS2t
+rOS+AQD8Av/Pk3dzrbbWX6Azk82mOQCadq59+rhpP+c148nyyAEA7K4Q7Sk9a/0P
+uj8xfcE1334l4jwcAsUL2mPy18gatQI=
+=DD6I
+-----END PGP SIGNATURE-----
+
+--5WpXeB60xZqPdpub--
 
 
