@@ -1,133 +1,89 @@
-Return-Path: <netdev+bounces-66723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 505EF840651
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 14:10:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC58B840656
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 14:11:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82E741C23001
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:10:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A950128A1C7
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:11:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8531862A17;
-	Mon, 29 Jan 2024 13:07:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25B5C5BAD2;
+	Mon, 29 Jan 2024 13:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iTJFAb49"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ow9464dL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E773A627F6
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 13:07:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0258E62A02
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 13:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706533669; cv=none; b=WCiYGfmyUs16k7z00yayIxQ/Fp0IwNkpMFHpkhgwTbVfS4hbtEOrw3NV2VbY6fwRX0mSBLgxFb47+ZZfrVRwcjNU1EkJOzdmS9B1PS+ghL+2DzrhMDqhPHroNvCJ2xke/k8d9wQZ06Q4u1m++qC9dbkqWKZnQDy5bghgWk8cCYs=
+	t=1706533827; cv=none; b=aE9J9WO9/PiY8eh/P1SHyG3d3FhnFGPY4Cvp8ktW1ff95G19FNO07V3X83mFdt3MBKRMvfZZVPv9Xy1ON9YUV7o/tikOHx99wPSigNOR7yiDGRWQX1NagjQ2UxR7lpKH/mX3nJOQAUWqAKR+kGENxgAJ1c1kBXhRR+dRLQBUaAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706533669; c=relaxed/simple;
-	bh=v3pFngetfRn5EzEB1NDrmSiNevTrv4qOYrVy9TnfCEg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TvMCKN6qlbaPQd+2/MQUg2hGTfUvXtOFLRgdE8GOl1fUn+uot9WXAWesbyRlTYWraHu4GAcskGMIKg0c58DP8/VA7AqsHTTUioIOUjwVihs6g4+VkpeAWjUOxOUhFoN7czkwQPdd9oM2RGKQv+RuO23AUS0zYrjqYR+VQEzvwJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iTJFAb49; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706533666;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v3pFngetfRn5EzEB1NDrmSiNevTrv4qOYrVy9TnfCEg=;
-	b=iTJFAb498qVdLQEKNRchLTQjla9cFKXvCvzBKqLIR9RMrXSwVESR+3XSeh/mU/UIv6yIE/
-	2Bx4nzqLdVAgcoSDIPDJG7QRfIlIyktsizjMOCYGKkmlTHJiNcZyIhoKbnx/cLYIP6o2YC
-	jM461/sx/2d+YsgyZm1RGw/GJ7UZz3o=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-530-CIEP3Ef-MWOpmR378RXTsw-1; Mon, 29 Jan 2024 08:07:42 -0500
-X-MC-Unique: CIEP3Ef-MWOpmR378RXTsw-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2cf3568559fso15171221fa.2
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 05:07:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706533661; x=1707138461;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v3pFngetfRn5EzEB1NDrmSiNevTrv4qOYrVy9TnfCEg=;
-        b=BAtvLjAk7wwtP7neoRwKRNW4vcVkBbQXgH3iamoICjR9IuTTUJ4cYsG5qeKOCPeOsU
-         i8O+d4uLF9aX8S2A4Kk4KT/FJitFF7I6E+WhiIQSVL0toQrHXTfyCsATtRwLWMd0K24B
-         hcz9CYYRfmQzVyqNeeHSiOosec8hXmRp68MJ/XqtCJgIPUF9LFYAPCKAmq+o449GhKJv
-         K13q5lwS8U87X2WyOch07HUwa6DZdhj5yJ5yNfA6n3rnDfHwMvwLx/UILQYzIfBnQ/hP
-         afRP6fjIFnVjKEsOODQRNUxo2oHn0R1EppSgrqEGGzkslvkj+ScPuOWlSZS3vInc1Q6M
-         +MKg==
-X-Gm-Message-State: AOJu0YxntTwnyMfqgIvpu+toiDF8/YTmatDXbGWaUhJhvkuCM0RUoBM+
-	aAz0VPnXYfFYiHjeTZZUMD0wK3cCuU9y4YKGOgmKpJaJe4E2FciSXPpCT5v3trGIzIjhW++Lyi/
-	8z+Cvw988QZzlKOBnaa2pR+IN7xAitWZuhgGw3ltzhThUeIYDt2T+DOdfd3tQ9Q==
-X-Received: by 2002:a2e:bcc6:0:b0:2d0:48d8:1eb1 with SMTP id z6-20020a2ebcc6000000b002d048d81eb1mr2470663ljp.0.1706533660952;
-        Mon, 29 Jan 2024 05:07:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGT6crec8m2HFtDOFEy6UU3Q+re1aM0TkHBbsF0YbVqzKDq3z0zInecTZ5NC19BoPwU3uhdSg==
-X-Received: by 2002:a2e:bcc6:0:b0:2d0:48d8:1eb1 with SMTP id z6-20020a2ebcc6000000b002d048d81eb1mr2470646ljp.0.1706533660644;
-        Mon, 29 Jan 2024 05:07:40 -0800 (PST)
-Received: from localhost (net-93-71-3-198.cust.vodafonedsl.it. [93.71.3.198])
-        by smtp.gmail.com with ESMTPSA id v1-20020a5d59c1000000b0033aeab6f75fsm3757049wry.79.2024.01.29.05.07.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 05:07:40 -0800 (PST)
-Date: Mon, 29 Jan 2024 14:07:38 +0100
-From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, bpf@vger.kernel.org, toke@redhat.com,
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	sdf@google.com, hawk@kernel.org, ilias.apalodimas@linaro.org
-Subject: Re: [PATCH v6 net-next 4/5] net: page_pool: make stats available
- just for global pools
-Message-ID: <ZbejGhc8K4J4dLbL@lore-desk>
-References: <cover.1706451150.git.lorenzo@kernel.org>
- <9f0a571c1f322ff6c4e6facfd7d6d508e73a8f2f.1706451150.git.lorenzo@kernel.org>
- <bc5dc202-de63-4dee-5eb4-efd63dcb162b@huawei.com>
+	s=arc-20240116; t=1706533827; c=relaxed/simple;
+	bh=uZ/WPf33GubLfo2XYIw6O8PlYdncTLYyQH5So2uaLvs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hqN/GjcDYyr/dIW6XfcyBPbqTgHJ0KIwqIYLnIhJDp90w+GlN5scVPik+iyQkbDmr3XvjOUTZOJSPk2dhzKsi4Xc23oQSs2KY3gmX25mD4SNYX+OUF3Gq0zbTbje6dP82LrBvv+rMGWtohbIR9J0VfeBJs++yqSuTzr8v74LCos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ow9464dL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 74CC2C433C7;
+	Mon, 29 Jan 2024 13:10:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706533826;
+	bh=uZ/WPf33GubLfo2XYIw6O8PlYdncTLYyQH5So2uaLvs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Ow9464dL1zDEcRK3K2p+8XCYusewp/hVZduwZNwArr4faD4sXwlUoeTlsOQWmkG+Q
+	 xAXAcCjTWCniw1j7TmOz3jz/1h4r8dIsb3mlx4BHeMkBZtq88bNZFpW/cYiqnNdKN2
+	 2iv0qr8IxOV45VFe1KrvEALKWZ+m29pneS6VdZt0QXpfHwYK0gf/QM61wo9UtFgsd3
+	 PthAubCv1YY+h9ZkB4HpuCQoC3+c9CKVOffpNV8F9ukS1y14u8WsOp94+U/Zpx45Ls
+	 fnNLYLfYmR8XG5M6eGOLAdAC5BJVE5I4YhHXdkeJH7Zn09uPTFG2P1w7xXjQuDXWGZ
+	 a6lg1HcdP2Yww==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4F5ECC561EE;
+	Mon, 29 Jan 2024 13:10:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="BeQHw7o9DS5E/2ZF"
-Content-Disposition: inline
-In-Reply-To: <bc5dc202-de63-4dee-5eb4-efd63dcb162b@huawei.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] dt-bindings: nfc: ti,trf7970a: fix usage example
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170653382631.16154.6112552138889640140.git-patchwork-notify@kernel.org>
+Date: Mon, 29 Jan 2024 13:10:26 +0000
+References: <20240125201505.1117039-1-t.schramm@manjaro.org>
+In-Reply-To: <20240125201505.1117039-1-t.schramm@manjaro.org>
+To: Tobias Schramm <t.schramm@manjaro.org>
+Cc: netdev@vger.kernel.org, krzysztof.kozlowski@linaro.org
 
+Hello:
 
---BeQHw7o9DS5E/2ZF
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-> On 2024/1/28 22:20, Lorenzo Bianconi wrote:
-> > Move page_pool stats allocation in page_pool_create routine and get rid
-> > of it for percpu page_pools.
->=20
-> Is there any reason why we do not need those kind stats for per cpu
-> page_pool?
->=20
+On Thu, 25 Jan 2024 21:15:05 +0100 you wrote:
+> The TRF7970A is a SPI device, not I2C.
+> 
+> Signed-off-by: Tobias Schramm <t.schramm@manjaro.org>
+> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+>  Documentation/devicetree/bindings/net/nfc/ti,trf7970a.yaml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-IIRC discussing with Jakub, we decided to not support them since the pool i=
-s not
-associated to any net_device in this case.
+Here is the summary with links:
+  - [net-next] dt-bindings: nfc: ti,trf7970a: fix usage example
+    https://git.kernel.org/netdev/net-next/c/9e1aa985d61e
 
-Regards,
-Lorenzo
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
---BeQHw7o9DS5E/2ZF
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZbejGgAKCRA6cBh0uS2t
-rI41AP4sSIQMPOWj4JFrRlg5LcvVBxuM5EAt5SBxiXNrjgBk4QEApBgcPYTRp1vi
-j4kOlOCJa8v6tQa5d3cn6j/hLr4xSQc=
-=EGVm
------END PGP SIGNATURE-----
-
---BeQHw7o9DS5E/2ZF--
 
 
