@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-66894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3415F8415C2
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 23:36:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CCD48415C3
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 23:36:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B33FEB23A11
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 22:36:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23D251F22334
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 22:36:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422CB5B1EC;
-	Mon, 29 Jan 2024 22:35:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A38F159571;
+	Mon, 29 Jan 2024 22:35:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X+zzDs2j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qtlm+oHh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89A3854666;
-	Mon, 29 Jan 2024 22:35:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3BE53E07;
+	Mon, 29 Jan 2024 22:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706567736; cv=none; b=tWYaVv3ruSU8s7XrvGmf6s0x2i5Cq9nhktnYUdUQWkw0ZmergoPdKm9nkNwyVt0QIjRMXHw3TGU72z3dWl/XBOS1dnCOi0UhmXGxkDTgbxxZ82szKplof7mqP9fa1K8blqdQp7Rhb6ifLX6iJjFMPeh420TqPvGwmQcQw8iP3fQ=
+	t=1706567737; cv=none; b=ZjwZ2HXf+c/gBklAl8+IbMG4ELFyxRPOttqq0n3iDvUN91EP7EWeGBdSevJrxtU2wkHSnQ68+44dB7QJWhf8Zlao6Fpi6rz+sXmOTOlLBr57H4xk6nMy69YtIVA8hrLq5bay8aALXq4w+R+jcas4XGODuXGC9XcU7ztXBhSKV0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706567736; c=relaxed/simple;
-	bh=/zsXTUB3sjsImCCK9upNqx8I9wVeovJbph39RKjkwx4=;
+	s=arc-20240116; t=1706567737; c=relaxed/simple;
+	bh=OdvP8j6NATYldZfJ2QxJSvvvX/SxB4R5gU9B3uI+VYQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MBTTBqhjvOdUJw4K6MW8sjJDBsRpcBNYpbtzXJBmypaaJ9tqY+nUS9O+5vzpjYBvfW8jasTu0XM4dXSCZie+x7E4lI8gQSP6CF0O5zJWz/8/rhBWuZ2AQ3P22rVRQ1enrKF4ulobwMVnjL+s25iZ4cUbI+yo8374UOZWIFfWWFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X+zzDs2j; arc=none smtp.client-ip=209.85.128.54
+	 MIME-Version; b=P8jmwqT1ZyD4QZNcbStvTDLF8vcUTUIwoDIToPyqu4RqJmQDEIFBlWSqe5i7vj74wCs4bYSbR3uKwlJ9PJvPD2ohLUx2jKbmlAmjXPXk3W5opfQC6+juwZWcGMbDwBAp+kXSuX/3a/ryD2OIbVcq+Drr0zuQQJ9MZB6sT3dieUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qtlm+oHh; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40ed356a6ecso29309795e9.2;
-        Mon, 29 Jan 2024 14:35:34 -0800 (PST)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40eec4984acso26170395e9.2;
+        Mon, 29 Jan 2024 14:35:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706567732; x=1707172532; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706567733; x=1707172533; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WqSkYHAmR43l7wpB22/dLWRzx8oLOkfvDSmsds3Q2K4=;
-        b=X+zzDs2jeGvGJcWJPXQqPtvoAkRpc5cJ6987kgqMM7EQr7dpAJFJ4oO07c/2SgZf9a
-         3CcS8Ls6zXvpOzUa+xArqWVQriSfPKqBtz/y8T34MkuiGEaV94YpIV0mao10oLuxY+Kc
-         F+W670lR8nqszqZsCEPiBjlAMYZuLUs2N4BF70RUWaJRgHymKnCw/wxbU2FJIijsV9/k
-         wW0fPFlz2y5u61NF9kFMSYmstbHcfovyK38CAdyQSPj6g2K93JI60mq3INdXZuj+iZw7
-         yt1vV+EI9wqC4ryXh3dUf7TnJNpL4rvKqnRdfmsxYAnBRgWJsAWPd9kvfZcoxcju3V6p
-         28bA==
+        bh=ClXG9uTDgBMA81lLT/nmnwAaiOCypQE3e9mwTp7YT8E=;
+        b=Qtlm+oHhMmoUafbHyU2IwpI8sj2WcKr9FerNTpbpEWrH3hNSiE93zUEH94O9q/0y8J
+         CCPigCe2HJLTnX3jqPCRZhyhX9+l/jRUrVs79uz7WGRZ7pHuKQnmXITJho+bjIGb7TyO
+         PrNk+qqnCZDyk4HirzyZR7Te+oOYjPCobXgoiKLXZot7WeY/q1c3OeNU92FcAZofyRw/
+         KI8VZENBC7Jnw7cHZCSySwKkRBjWbmbKlfHn0Bj3Q4ss4eAKoDQvC9TRkBkaHmiDbTKm
+         JvE97rH5k0yUxf20Pbvd/nRxVwnWBves4kU4Ngq09nGjGxM+Exz+GATfWiI3CM54UpOi
+         g8LA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706567732; x=1707172532;
+        d=1e100.net; s=20230601; t=1706567733; x=1707172533;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WqSkYHAmR43l7wpB22/dLWRzx8oLOkfvDSmsds3Q2K4=;
-        b=P+RkmYyTNO6DP42Lglfa0nxlpRMDhKhjOwYlHsEe9OhGwXGy38NQtOkYxPXaF5sQyo
-         GqKPTiWLe1dJWoMPmKhyKFf7n27JpHd+D51vH1ZIAO7l16SVxYtRaw5ZYSg6JdYaWqrO
-         VBdRt8lc7x8FS9Dq5lsdt31ORTfnYbIql9PU+2tR1g3X/Y95OJ5yuUdiGLcpU4ZYdGBn
-         9r34xGmY01n+x6+rXielXR+Xbr4DCdc0okuoIDKiJJ+prRk3aM9FmRrawtEiQdzPmfcZ
-         rKjIP6CbfqaneMcDtH68j5Egi6H7NfSSMqF2P5J4+hxHmm9u/YeSDJ0+njkrJ6kWaqe9
-         BN0Q==
-X-Gm-Message-State: AOJu0YxitKApvF/s+GqnCCn/j1cxPTbzoOQMxpuwbaaJ373rS+6P2lNY
-	QdRI14SFcxESvwAyv+jAsxo7WUoAyJykdc2kjrr1Hvz+++0qEI23kU1sGm1k0lQ=
-X-Google-Smtp-Source: AGHT+IGFR4Pfb1zlHg1h0N+vtD1O0WHmdcvf/w22FftA+PBZvJeX0mHNgQrPEi1nCuEoj4ThBSj4iA==
-X-Received: by 2002:a1c:7914:0:b0:40e:ccca:33e with SMTP id l20-20020a1c7914000000b0040eccca033emr6275758wme.31.1706567732462;
-        Mon, 29 Jan 2024 14:35:32 -0800 (PST)
+        bh=ClXG9uTDgBMA81lLT/nmnwAaiOCypQE3e9mwTp7YT8E=;
+        b=NMoP+b3JXoL9VoWgCmILGbzmXggcgkX5VlH9L8VGkIijw1D0hvPf3XtUPnrwRk/ITD
+         im9byL6GWFl7oxjmetnfSQUlxjmul97f1MiQ1HycXdA5Ao9YUZHKvvVnVzY1MfcnGoO7
+         Ua+zBsefdtnZArlCYpDOT0sc3Gbq1a5dDFQbIeNl98BK3rMfHdSEFH5ZavyeXS3vy+H8
+         9Wuw/cMKmyofMxrlXeelSKepjzITKS4cNWpgWZu07MWJixQn2XxH6Z+IfqVJMR+8qpdn
+         Zn4F3ciTTM3qSj3luwohYZkCYTV2kh2edTg6i9RDNYSUAPs4vpe98rRn5igIzp+H8B9m
+         epzg==
+X-Gm-Message-State: AOJu0YyjHWwaTHuu8qEvni+0kVD6VtMUPBVDvoHZWE4hOPnRM6qcN3ZO
+	fBAZKzaHOF9IbxTdSMIbLBV/x4lzwZYeqW+17bjdnOupZFHaa1ZmISqcHUMz1GI=
+X-Google-Smtp-Source: AGHT+IGv8t7aMEWyLzZQD5Q/4Rxbz1k5hTzsoMtXeeA+qcD2zSfHq3xkcCA0yrs8A54AM1p6KU83Ew==
+X-Received: by 2002:a05:600c:3b28:b0:40e:e2eb:bea8 with SMTP id m40-20020a05600c3b2800b0040ee2ebbea8mr5944049wms.0.1706567733466;
+        Mon, 29 Jan 2024 14:35:33 -0800 (PST)
 Received: from imac.fritz.box ([2a02:8010:60a0:0:9c2b:323d:b44d:b76d])
-        by smtp.gmail.com with ESMTPSA id je16-20020a05600c1f9000b0040ec66021a7sm11357281wmb.1.2024.01.29.14.35.31
+        by smtp.gmail.com with ESMTPSA id je16-20020a05600c1f9000b0040ec66021a7sm11357281wmb.1.2024.01.29.14.35.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 14:35:32 -0800 (PST)
+        Mon, 29 Jan 2024 14:35:33 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -80,9 +80,9 @@ To: netdev@vger.kernel.org,
 	Alessandro Marcolini <alessandromarcolini99@gmail.com>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v2 11/13] doc/netlink: Describe nested structs in netlink raw docs
-Date: Mon, 29 Jan 2024 22:34:56 +0000
-Message-ID: <20240129223458.52046-12-donald.hunter@gmail.com>
+Subject: [PATCH net-next v2 12/13] tools/net/ynl: Add type info to struct members in generated docs
+Date: Mon, 29 Jan 2024 22:34:57 +0000
+Message-ID: <20240129223458.52046-13-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240129223458.52046-1-donald.hunter@gmail.com>
 References: <20240129223458.52046-1-donald.hunter@gmail.com>
@@ -94,56 +94,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add a description and example of nested struct definitions
-to the netlink raw documentation.
+Extend the ynl doc generator to include type information for struct
+members, ignoring the pad type.
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- .../userspace-api/netlink/netlink-raw.rst     | 34 +++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ tools/net/ynl/ynl-gen-rst.py | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/Documentation/userspace-api/netlink/netlink-raw.rst b/Documentation/userspace-api/netlink/netlink-raw.rst
-index 32197f3cb40e..1990eea772d0 100644
---- a/Documentation/userspace-api/netlink/netlink-raw.rst
-+++ b/Documentation/userspace-api/netlink/netlink-raw.rst
-@@ -158,3 +158,37 @@ alongside a sub-message selector and also in a top level ``attribute-set``, then
- the selector will be resolved using the value 'closest' to the selector. If the
- value is not present in the message at the same level as defined in the spec
- then this is an error.
-+
-+Nested struct definitions
-+-------------------------
-+
-+Many raw netlink families such as :doc:`tc<../../networking/netlink_spec/tc>`
-+make use of nested struct definitions. The ``netlink-raw`` schema makes it
-+possible to embed a struct within a struct definition using the ``struct``
-+property. For example, the following struct definition embeds the
-+``tc-ratespec`` struct definition for both the ``rate`` and the ``peakrate``
-+members of ``struct tc-tbf-qopt``.
-+
-+.. code-block:: yaml
-+
-+  -
-+    name: tc-tbf-qopt
-+    type: struct
-+    members:
-+      -
-+        name: rate
-+        type: binary
-+        struct: tc-ratespec
-+      -
-+        name: peakrate
-+        type: binary
-+        struct: tc-ratespec
-+      -
-+        name: limit
-+        type: u32
-+      -
-+        name: buffer
-+        type: u32
-+      -
-+        name: mtu
-+        type: u32
+diff --git a/tools/net/ynl/ynl-gen-rst.py b/tools/net/ynl/ynl-gen-rst.py
+index 262d88f88696..927407b3efb3 100755
+--- a/tools/net/ynl/ynl-gen-rst.py
++++ b/tools/net/ynl/ynl-gen-rst.py
+@@ -189,12 +189,19 @@ def parse_operations(operations: List[Dict[str, Any]]) -> str:
+ 
+ def parse_entries(entries: List[Dict[str, Any]], level: int) -> str:
+     """Parse a list of entries"""
++    ignored = ["pad"]
+     lines = []
+     for entry in entries:
+         if isinstance(entry, dict):
+             # entries could be a list or a dictionary
++            field_name = entry.get("name", "")
++            if field_name in ignored:
++                continue
++            type_ = entry.get("type")
++            if type_:
++                field_name += f" ({inline(type_)})"
+             lines.append(
+-                rst_fields(entry.get("name", ""), sanitize(entry.get("doc", "")), level)
++                rst_fields(field_name, sanitize(entry.get("doc", "")), level)
+             )
+         elif isinstance(entry, list):
+             lines.append(rst_list_inline(entry, level))
 -- 
 2.42.0
 
