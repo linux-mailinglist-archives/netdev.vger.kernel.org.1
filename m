@@ -1,120 +1,117 @@
-Return-Path: <netdev+bounces-66657-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66658-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46C01840205
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:47:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACE22840212
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:49:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1A4A1F22631
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:47:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 45C6AB210AE
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:49:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF31D55789;
-	Mon, 29 Jan 2024 09:47:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06F2455C27;
+	Mon, 29 Jan 2024 09:49:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UM3si/uz"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="jVYbEqyD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17AEE41C63;
-	Mon, 29 Jan 2024 09:47:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59A7055E49;
+	Mon, 29 Jan 2024 09:49:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706521667; cv=none; b=DeyaZ+n/QrKh09lImbyHV4ummQkw9AUsqlw27w3O1e4Q8Z231uD6jtsxEeQCpnAF0uvvlZ2ua9i3LgQw2zIt1rNrWsZ4gnI3vbEp2Hnrp0+Cr6K+3ufI2k6m4DFfD6U2MXolp7G/+QDP/A471Qnvt9dinUHB/KuwGm3NHjk+uv4=
+	t=1706521765; cv=none; b=gwAKoDNm4IawnrqHXy+IqLVYC8LcploCQ6uS/qFR+VqKMkglQMJDZrbY1ru0W/B9edoOx0mfXrWkw91MGXtWlrCpwm0V3kUrNYqzYDUFAw0w4OQYl0S/i2wcETH8433TWarnOWrVkBjs0sbnuSfwkM6bz9NLvS+SKg5rDEoEfvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706521667; c=relaxed/simple;
-	bh=VBR7uHoh5G4bx356M7+wqgaO8/xBmXdJrn7Uz3rJrXU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ceFMYS4wADgNE3Lr7AiY2P9gor5sJgUvWYDiADqpIeQ5YR5k9VQ/KruLZ10F9QmiFcDxDP8B78dnYQ+2KD3DN9TQQzTFllFSUK5o1evvVGSALN8KnfTuyVwE9AYiRH/Ubs4RFArQ3rG9JatAgeq4tMEAXmpGNFREme9mC6uYwfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UM3si/uz; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706521666; x=1738057666;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=VBR7uHoh5G4bx356M7+wqgaO8/xBmXdJrn7Uz3rJrXU=;
-  b=UM3si/uzuk9wzk7/1AR6iRl8NMahd8GHdLsM1Fg5lxXmfyXukbiFruu+
-   G4XXzip2yNhktO0OwSF1H/VZm3hgNhXI/39c2hSWcwxRP+D9XBIl+I4hY
-   VVKzhiVbSOBL6lxoq1YqgqayNN3Qo/4GLatWSqM4TZekaQesXn3pVo2Pt
-   WxNFJmN6rR3dC2oKCMJ6u/YTZu1ovojxpqP2GFpgx4cfYaRIOITf4yKCJ
-   tJdfD2kOPJy1Z179AhkFg5YMXM6hxmFHiHLL8m0Am/InCrc6n2Q340Sr5
-   X6MXMeBb0EK9jUjnGHgStr9gOW8abpQbtomGHI1waS7Si9NWZzmEfjBDD
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10967"; a="9652174"
-X-IronPort-AV: E=Sophos;i="6.05,226,1701158400"; 
-   d="scan'208";a="9652174"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2024 01:47:45 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10967"; a="787778209"
-X-IronPort-AV: E=Sophos;i="6.05,226,1701158400"; 
-   d="scan'208";a="787778209"
-Received: from hbrandbe-mobl.ger.corp.intel.com (HELO localhost) ([10.252.59.53])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2024 01:47:40 -0800
-From: Jani Nikula <jani.nikula@linux.intel.com>
-To: David Laight <David.Laight@ACULAB.COM>, "'linux-kernel@vger.kernel.org'"
- <linux-kernel@vger.kernel.org>, 'Linus
- Torvalds' <torvalds@linux-foundation.org>, 'Netdev'
- <netdev@vger.kernel.org>, "'dri-devel@lists.freedesktop.org'"
- <dri-devel@lists.freedesktop.org>
-Cc: 'Jens Axboe' <axboe@kernel.dk>, "'Matthew Wilcox (Oracle)'"
- <willy@infradead.org>, 'Christoph Hellwig' <hch@infradead.org>,
- "'linux-btrfs@vger.kernel.org'" <linux-btrfs@vger.kernel.org>, 'Andrew
- Morton' <akpm@linux-foundation.org>, 'Andy Shevchenko'
- <andriy.shevchenko@linux.intel.com>, "'David S . Miller'"
- <davem@davemloft.net>, 'Dan Carpenter' <dan.carpenter@linaro.org>
-Subject: RE: [PATCH next 10/11] block: Use a boolean expression instead of
- max() on booleans
-In-Reply-To: <963d1126612347dd8c398a9449170e16@AcuMS.aculab.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-References: <0ca26166dd2a4ff5a674b84704ff1517@AcuMS.aculab.com>
- <b564df3f987e4371a445840df1f70561@AcuMS.aculab.com>
- <87sf2gjyn9.fsf@intel.com>
- <963d1126612347dd8c398a9449170e16@AcuMS.aculab.com>
-Date: Mon, 29 Jan 2024 11:47:37 +0200
-Message-ID: <87il3cjwsm.fsf@intel.com>
+	s=arc-20240116; t=1706521765; c=relaxed/simple;
+	bh=BcsHhEXWi5xMJWTtz5/c5ki18Idpl9aWenNr9qUQymg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IckgAX2NK5cd/1HquhtETzj7DN1iJaKiymdhNomnlkuAkA8J0eY7cMzWPWCmo1TyiMtD6WDq1bQNLSFMPjTlX5SNjasnuF8/r0ZacK7kAu65YNDGCpEUTrnn2g406uqz4Fg+2yOC7+yoAbFmJgqqyA3iUXXK2ZQA0xUKc/paJUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=jVYbEqyD; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1706521762;
+	bh=BcsHhEXWi5xMJWTtz5/c5ki18Idpl9aWenNr9qUQymg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=jVYbEqyDuZW+HE+sdCpLKAAKTpOEi8F0b29iUJ0QWx1IxYqdkztJpU1N1zHnOqtUQ
+	 xmcF2ZVfLMveGB5RbvT+pDLrpIjqKuiBuXyEWbI8NZKNN8qrendUhDEum03NJ1QAPW
+	 jSd79i5YCAy4XBVBNNcGbYQPUSJE/6l2YZ74nImp7ljO2RSpRdc+xoHViHElBzo5l4
+	 xx7L0RssUdwqXf55PCqO6cHGyIrceKkwCl9Qy8iDuSN2adxhfufQed1930I9dc87mE
+	 aGWiAgewzYzk3kvftAPR0BwGLrd+3DlBGfxc6cxOXMz2D1GTAQJYisqlGIka15by4n
+	 AXSbspLqZMO6g==
+Received: from [100.115.223.179] (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: cristicc)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 23AF13781F92;
+	Mon, 29 Jan 2024 09:49:21 +0000 (UTC)
+Message-ID: <e29ae12b-5823-4fba-8029-e8e490462138@collabora.com>
+Date: Mon, 29 Jan 2024 11:49:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 1/2] dt-bindings: net: starfive,jh7110-dwmac: Add
+ JH7100 SoC compatible
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
+ Samin Guo <samin.guo@starfivetech.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>, Andrew Lunn <andrew@lunn.ch>,
+ Jacob Keller <jacob.e.keller@intel.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+References: <20240126191319.1209821-1-cristian.ciocaltea@collabora.com>
+ <20240126191319.1209821-2-cristian.ciocaltea@collabora.com>
+ <0a6f6dcb-18b0-48d5-8955-76bce0e1295d@linaro.org>
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+In-Reply-To: <0a6f6dcb-18b0-48d5-8955-76bce0e1295d@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, 29 Jan 2024, David Laight <David.Laight@ACULAB.COM> wrote:
-> From: Jani Nikula
->> Sent: 29 January 2024 09:08
->> 
->> On Sun, 28 Jan 2024, David Laight <David.Laight@ACULAB.COM> wrote:
->> > blk_stack_limits() contains:
->> > 	t->zoned = max(t->zoned, b->zoned);
->> > These are bool, so it is just a bitwise or.
->> 
->> Should be a logical or, really. And || in code.
->
-> Not really, bitwise is fine for bool (especially for 'or')
-> and generates better code.
+Hi Krzysztof,
 
-Logical operations for booleans are more readable for humans than
-bitwise. And semantically correct.
+On 1/29/24 10:26, Krzysztof Kozlowski wrote:
+> On 26/01/2024 20:13, Cristian Ciocaltea wrote:
+>> The Synopsys DesignWare MAC found on StarFive JH7100 SoC is mostly
+>> similar to the newer JH7110, but it requires only two interrupts and a
+>> single reset line, which is 'ahb' instead of the commonly used
+>> 'stmmaceth'.
+>>
+>> Since the common binding 'snps,dwmac' allows selecting 'ahb' only in
+>> conjunction with 'stmmaceth', extend the logic to also permit exclusive
+>> usage of the 'ahb' reset name.  This ensures the following use cases are
+>> supported:
+>>
+>>   JH7110: reset-names = "stmmaceth", "ahb";
+>>   JH7100: reset-names = "ahb";
+>>   other:  reset-names = "stmmaceth";
+> 
+> 
+> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-With a = b || c you know what happens regardless of the types in
-question. a = b | c you have to look up the types to know what's going
-on.
+Thank you for the review!
 
-To me, better code only matters if it's a hotpath.
+Could you please apply it to the RESEND version [1] instead, as this one 
+had an issue collecting the latest tags, as indicated in [2].
 
-That said, not my are of maintenance, so *shrug*.
+Regards,
+Cristian
 
-
-BR,
-Jani.
-
-
--- 
-Jani Nikula, Intel
+[1] https://lore.kernel.org/lkml/20240126192128.1210579-2-cristian.ciocaltea@collabora.com/
+[2] https://lore.kernel.org/lkml/920e764c-4fa3-4298-bb49-d31416fc3dd6@collabora.com/
 
