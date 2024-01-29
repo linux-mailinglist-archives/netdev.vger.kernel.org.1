@@ -1,232 +1,156 @@
-Return-Path: <netdev+bounces-66660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63D6D840251
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:58:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AF65840286
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 11:11:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DC281C20432
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:58:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD2011C21CD8
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:11:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72DE55E4B;
-	Mon, 29 Jan 2024 09:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC20355E51;
+	Mon, 29 Jan 2024 10:11:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gA+U7ENh"
+	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="yyS6D+u3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E39055774;
-	Mon, 29 Jan 2024 09:58:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57AA155784;
+	Mon, 29 Jan 2024 10:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706522291; cv=none; b=OgDL3dnPZlB96FL5OiSsBe1bD4S/DGxpEVHAno3LKMNcDAs20lN83P1hFrUtJzaGPUTk4Nn9YCKKmjIm8IQwA8UyCSiLy+xIhc1X+qHtoMwslBhKxaQStRV8apXp3DVn3NG9ZJTn0VuWELqR0JHITPDPi1lqDBEkNbPzj9TlBts=
+	t=1706523101; cv=none; b=IAuJEVJ1kJ9tK/fzpPbvuhL5IptScjnSyQJAKixvYNZnImeB1bX3QoJTWSoZSGjjI8sGpn56fXdtKzWko680u5/AacO3vAgjGQD4WFjnhzqy2ME0sLBn+vgwrzrMSCfPBkI3yO5VaIHVJBA/iB9nPN9AAxnykcEvQ7ibyCqjdtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706522291; c=relaxed/simple;
-	bh=yBmF8atRzE/jKjGYvhm71cL0rw5MHTlNp0e8Kl6OdBk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n6Ysreb0FL6s99i+rUDs4fkRiVyLf7pJiSS5Ac4DWlex6yTrM6Fbur4CEgTGLIMGtP0CfGMQkx7yGt/h2SaeCT/P5y/w6OEkIdA4keZJl0Y+nv7bFIEuiHhKBlywqr5/btLIe9+Oxwn/hlT3wAr7rQjyfWDyDIj0IRRu4Csk6zY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gA+U7ENh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BDDBC433F1;
-	Mon, 29 Jan 2024 09:58:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706522291;
-	bh=yBmF8atRzE/jKjGYvhm71cL0rw5MHTlNp0e8Kl6OdBk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=gA+U7ENhiiFgN0DaPbq96cWnQZZ98kgesGEs/f2zqHBhXs6zTQZZOLNr3lhCNFnBd
-	 nWFxeI9nbR832RT/7Q6aWR/J1wsphnTuEUX8wBOo3sYn4xF1sB104qTDlqss55QfyL
-	 vmXWUlz4ITr6BtUDMdWMh+kMsrwEflPe6cpyRDzRWTio4DVUIKHtT/exXbaaG8jzbL
-	 jRQ0OntOGYScm7/9cusVELTD2Z9Gp9VmCEjDpqaRJjjv79xx6qovzNb3eWnrmKd4ca
-	 B/eNEW9dk9yaVRz1cxfYXpmZVtYWHC6jgrZzMqwvAzfRKT2nXZjeEJ42s2oggjojI5
-	 v61vbVE5sKP5Q==
-Date: Mon, 29 Jan 2024 10:58:07 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Cc: netdev@vger.kernel.org, lorenzo.bianconi@redhat.com,
-	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, bpf@vger.kernel.org, toke@redhat.com,
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	sdf@google.com, hawk@kernel.org
-Subject: Re: [PATCH v6 net-next 2/5] xdp: rely on skb pointer reference in
- do_xdp_generic and netif_receive_generic_xdp
-Message-ID: <Zbd2r_F0ob4_dh2j@lore-desk>
-References: <cover.1706451150.git.lorenzo@kernel.org>
- <7fd76e88e2aadc03f14b040ffc762e88d05afc8c.1706451150.git.lorenzo@kernel.org>
- <CAC_iWj+qTUmzD6Du-FRf7yhQj-euG3cFHcT5hZccdeP6tB=jGg@mail.gmail.com>
+	s=arc-20240116; t=1706523101; c=relaxed/simple;
+	bh=aP6nppY5vuDWhdT1EKho5Ztj2YLfKifFJSnO2YmYNGk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=LcIxr8oMP7bHnwaQz3KbMGI/xIDNY7s5TmwduVDtG99ZDFGF8BcPOzT7XK14FAi+eAM5ocs48yIw35ESEJrnwnMlzIRLTylb2Xzzj538IHZ/ckny10AGwRStfD61mWVbb3N8BRpqvJgxjaTCYIflTvtYJp6FZrHN1HtauFUUzO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=yyS6D+u3; arc=none smtp.client-ip=188.40.30.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
+	s=default2211; h=Content-Type:MIME-Version:Message-ID:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Sender:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=F3JBR5y9GKGAqMtonNzwpD3YmZTrMPQTqcJ9HmXVvzc=; b=yyS6D+u3TeFvuc2yHwCeZfP0JR
+	OgJzuLndRUYv7v6AM35molg6u0/YwdUERsHc8tZMxqn4K2hr9aEaDYuPlIkH8MsfguYVjxS2jB4p+
+	f0zW2O9ytkKSensR9kvABo/dufznu3EUbn5pPFyiUxi6aPMkypV8NRJnHskaOev8kpF9yRVf5pIor
+	/JBu+YIOUz4t97i3qloAd31bpDL3fdttH97a8GDHfb229B1FoRwfryShX/KDEZ4MUuCYMBIwVMxJg
+	h/SxO4AKTNVlJTzVRYFpCNYUmOa3bpBPeplerPFb3R3Khms9eXPk6uUoM/pE4VuXXMi1ZvPpy2H+o
+	sWfhyh5g==;
+Received: from sslproxy04.your-server.de ([78.46.152.42])
+	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <esben@geanix.com>)
+	id 1rUObn-0003SD-7S; Mon, 29 Jan 2024 11:11:19 +0100
+Received: from [87.49.42.9] (helo=localhost)
+	by sslproxy04.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <esben@geanix.com>)
+	id 1rUObm-000XU1-3Y; Mon, 29 Jan 2024 11:11:18 +0100
+From: Esben Haabendal <esben@geanix.com>
+To: rohan.g.thomas@intel.com
+Cc: alexandre.torgue@foss.st.com,  conor+dt@kernel.org,
+  davem@davemloft.net,  devicetree@vger.kernel.org,  edumazet@google.com,
+  fancer.lancer@gmail.com,  joabreu@synopsys.com,
+  krzysztof.kozlowski+dt@linaro.org,  kuba@kernel.org,
+  linux-arm-kernel@lists.infradead.org,  linux-kernel@vger.kernel.org,
+  linux-stm32@st-md-mailman.stormreply.com,  mcoquelin.stm32@gmail.com,
+  netdev@vger.kernel.org,  pabeni@redhat.com,  peppe.cavallaro@st.com,
+  robh+dt@kernel.org
+Subject: Re: [PATCH net-next 2/2] net: stmmac: TBS support for platform driver
+In-Reply-To: <20240126173925.16794-1-rohan.g.thomas@intel.com> (rohan g.
+	thomas's message of "Sat, 27 Jan 2024 01:39:25 +0800")
+References: <87v87g4hmy.fsf@geanix.com>
+	<20240126173925.16794-1-rohan.g.thomas@intel.com>
+Date: Mon, 29 Jan 2024 11:11:17 +0100
+Message-ID: <87plxktpoa.fsf@geanix.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="vs4wSioN5QIjyM7p"
-Content-Disposition: inline
-In-Reply-To: <CAC_iWj+qTUmzD6Du-FRf7yhQj-euG3cFHcT5hZccdeP6tB=jGg@mail.gmail.com>
+Content-Type: text/plain
+X-Authenticated-Sender: esben@geanix.com
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27168/Sun Jan 28 10:37:47 2024)
 
+rohan.g.thomas@intel.com writes:
 
---vs4wSioN5QIjyM7p
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> From: Rohan G Thomas <rohan.g.thomas@intel.com>
+>
+> On Fri, 26 Jan 2024 09:35:01 +0100, Esben Haabendal wrote:
+>
+>> > +	/* If TBS feature is supported(i.e. tbssel is true), then at least 1 Tx
+>> > +	 * DMA channel supports TBS. So if tbs_ch_num is 0 and tbssel is true,
+>> > +	 * assume all Tx DMA channels support TBS. TBS_CH field, which gives
+>> > +	 * number of Tx DMA channels with TBS support is only available only
+>> for
+>> > +	 * DW xGMAC IP. For other DWMAC IPs all Tx DMA channels can
+>> support TBS.
+>> 
+>> The Ethernet QOS controllers found in various i.MX socs does not support TBS
+>> on TX queue 0. I believe this patch would break the dwmac driver for these
+>> platforms.
+>
+> AFAIU from Synopsys DWMAC5 Databook, all queues support TBS. But TBS
+> cannot coexist with TSO. So all glue drivers enabling TBS feature are
+> avoiding queue 0 to support TSO. Also packets requesting TSO are
+> always directed to queue 0 by stmmac driver.
 
-> Hi Lorenzo,
->=20
-> On Sun, 28 Jan 2024 at 16:22, Lorenzo Bianconi <lorenzo@kernel.org> wrote:
-> >
-> > Rely on skb pointer reference instead of the skb pointer in do_xdp_gene=
-ric and
-> > netif_receive_generic_xdp routine signatures. This is a preliminary pat=
-ch to add
-> > multi-buff support for xdp running in generic mode.
->=20
-> The patch looks fine, but can we tweak the commit message explaining
-> in more detail  why this is needed?
+After re-reading the i.MX8MP documentation, and making a few
+experiments, I have to agree with you. Enabling TBS (enhanced
+descriptors) for Q0 should be ok on i.MX.
 
-ack, I will update commit log in the next iteration.
+>> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> > @@ -3773,12 +3773,18 @@ stmmac_setup_dma_desc(struct stmmac_priv
+>> *priv, unsigned int mtu)
+>> >  		dma_conf->dma_rx_size = DMA_DEFAULT_RX_SIZE;
+>> >
+>> >  	/* Earlier check for TBS */
+>> > -	for (chan = 0; chan < priv->plat->tx_queues_to_use; chan++) {
+>> > -		struct stmmac_tx_queue *tx_q = &dma_conf-
+>> >tx_queue[chan];
+>> > -		int tbs_en = priv->plat->tx_queues_cfg[chan].tbs_en;
+>> > +	if (priv->dma_cap.tbssel) {
+>> > +		/* TBS is available only for tbs_ch_num of Tx DMA channels,
+>> > +		 * starting from the highest Tx DMA channel.
+>> > +		 */
+>> > +		chan = priv->dma_cap.number_tx_channel - priv-
+>> >dma_cap.tbs_ch_num;
+>
+> For IPs which don't have tbs_ch_num, this loop goes from 0 to
+> number_tx_channel to check if tbs_enable is set by glue driver.
+> Existing logic is also the same. Unless you set tbs_en flag of
+> queue 0 from the glue driver or dts configuration this patch doesn't
+> set tbs flag for queue 0. This is a sanity check to avoid wrong
+> configuration for IPs which support tbs only in a few number of
+> queues.
 
-Regards,
-Lorenzo
+Sounds good.
 
->=20
-> Thanks
-> /Ilias
-> >
-> > Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > ---
-> >  drivers/net/tun.c         |  4 ++--
-> >  include/linux/netdevice.h |  2 +-
-> >  net/core/dev.c            | 16 +++++++++-------
-> >  3 files changed, 12 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> > index 4a4f8c8e79fa..5bd98bdaddf2 100644
-> > --- a/drivers/net/tun.c
-> > +++ b/drivers/net/tun.c
-> > @@ -1927,7 +1927,7 @@ static ssize_t tun_get_user(struct tun_struct *tu=
-n, struct tun_file *tfile,
-> >                 rcu_read_lock();
-> >                 xdp_prog =3D rcu_dereference(tun->xdp_prog);
-> >                 if (xdp_prog) {
-> > -                       ret =3D do_xdp_generic(xdp_prog, skb);
-> > +                       ret =3D do_xdp_generic(xdp_prog, &skb);
-> >                         if (ret !=3D XDP_PASS) {
-> >                                 rcu_read_unlock();
-> >                                 local_bh_enable();
-> > @@ -2517,7 +2517,7 @@ static int tun_xdp_one(struct tun_struct *tun,
-> >         skb_record_rx_queue(skb, tfile->queue_index);
-> >
-> >         if (skb_xdp) {
-> > -               ret =3D do_xdp_generic(xdp_prog, skb);
-> > +               ret =3D do_xdp_generic(xdp_prog, &skb);
-> >                 if (ret !=3D XDP_PASS) {
-> >                         ret =3D 0;
-> >                         goto out;
-> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> > index 118c40258d07..7eee99a58200 100644
-> > --- a/include/linux/netdevice.h
-> > +++ b/include/linux/netdevice.h
-> > @@ -3958,7 +3958,7 @@ static inline void dev_consume_skb_any(struct sk_=
-buff *skb)
-> >  u32 bpf_prog_run_generic_xdp(struct sk_buff *skb, struct xdp_buff *xdp,
-> >                              struct bpf_prog *xdp_prog);
-> >  void generic_xdp_tx(struct sk_buff *skb, struct bpf_prog *xdp_prog);
-> > -int do_xdp_generic(struct bpf_prog *xdp_prog, struct sk_buff *skb);
-> > +int do_xdp_generic(struct bpf_prog *xdp_prog, struct sk_buff **pskb);
-> >  int netif_rx(struct sk_buff *skb);
-> >  int __netif_rx(struct sk_buff *skb);
-> >
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index bf9ec740b09a..960f39ac5e33 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -4924,10 +4924,11 @@ u32 bpf_prog_run_generic_xdp(struct sk_buff *sk=
-b, struct xdp_buff *xdp,
-> >         return act;
-> >  }
-> >
-> > -static u32 netif_receive_generic_xdp(struct sk_buff *skb,
-> > +static u32 netif_receive_generic_xdp(struct sk_buff **pskb,
-> >                                      struct xdp_buff *xdp,
-> >                                      struct bpf_prog *xdp_prog)
-> >  {
-> > +       struct sk_buff *skb =3D *pskb;
-> >         u32 act =3D XDP_DROP;
-> >
-> >         /* Reinjected packets coming from act_mirred or similar should
-> > @@ -5008,24 +5009,24 @@ void generic_xdp_tx(struct sk_buff *skb, struct=
- bpf_prog *xdp_prog)
-> >
-> >  static DEFINE_STATIC_KEY_FALSE(generic_xdp_needed_key);
-> >
-> > -int do_xdp_generic(struct bpf_prog *xdp_prog, struct sk_buff *skb)
-> > +int do_xdp_generic(struct bpf_prog *xdp_prog, struct sk_buff **pskb)
-> >  {
-> >         if (xdp_prog) {
-> >                 struct xdp_buff xdp;
-> >                 u32 act;
-> >                 int err;
-> >
-> > -               act =3D netif_receive_generic_xdp(skb, &xdp, xdp_prog);
-> > +               act =3D netif_receive_generic_xdp(pskb, &xdp, xdp_prog);
-> >                 if (act !=3D XDP_PASS) {
-> >                         switch (act) {
-> >                         case XDP_REDIRECT:
-> > -                               err =3D xdp_do_generic_redirect(skb->de=
-v, skb,
-> > +                               err =3D xdp_do_generic_redirect((*pskb)=
-->dev, *pskb,
-> >                                                               &xdp, xdp=
-_prog);
-> >                                 if (err)
-> >                                         goto out_redir;
-> >                                 break;
-> >                         case XDP_TX:
-> > -                               generic_xdp_tx(skb, xdp_prog);
-> > +                               generic_xdp_tx(*pskb, xdp_prog);
-> >                                 break;
-> >                         }
-> >                         return XDP_DROP;
-> > @@ -5033,7 +5034,7 @@ int do_xdp_generic(struct bpf_prog *xdp_prog, str=
-uct sk_buff *skb)
-> >         }
-> >         return XDP_PASS;
-> >  out_redir:
-> > -       kfree_skb_reason(skb, SKB_DROP_REASON_XDP);
-> > +       kfree_skb_reason(*pskb, SKB_DROP_REASON_XDP);
-> >         return XDP_DROP;
-> >  }
-> >  EXPORT_SYMBOL_GPL(do_xdp_generic);
-> > @@ -5356,7 +5357,8 @@ static int __netif_receive_skb_core(struct sk_buf=
-f **pskb, bool pfmemalloc,
-> >                 int ret2;
-> >
-> >                 migrate_disable();
-> > -               ret2 =3D do_xdp_generic(rcu_dereference(skb->dev->xdp_p=
-rog), skb);
-> > +               ret2 =3D do_xdp_generic(rcu_dereference(skb->dev->xdp_p=
-rog),
-> > +                                     &skb);
-> >                 migrate_enable();
-> >
-> >                 if (ret2 !=3D XDP_PASS) {
-> > --
-> > 2.43.0
-> >
+>> > +		for (; chan < priv->plat->tx_queues_to_use; chan++) {
+>> > +			struct stmmac_tx_queue *tx_q = &dma_conf-
+>> >tx_queue[chan];
+>> > +			int tbs_en = priv->plat->tx_queues_cfg[chan].tbs_en;
+>> >
+>> > -		/* Setup per-TXQ tbs flag before TX descriptor alloc */
+>> > -		tx_q->tbs |= tbs_en ? STMMAC_TBS_AVAIL : 0;
+>> > +			/* Setup per-TXQ tbs flag before TX descriptor alloc
+>> */
+>> > +			tx_q->tbs |= tbs_en ? STMMAC_TBS_AVAIL : 0;
+>> > +		}
+>> >  	}
+>
+> Please correct me if I've misstated anything.
 
---vs4wSioN5QIjyM7p
-Content-Type: application/pgp-signature; name="signature.asc"
+No corrections for now :)
 
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZbd2rwAKCRA6cBh0uS2t
-rAgcAP9/aGP8AS8uS4F+3kWSheURWTvv0X06ScOvUty7MYTUvwD/VWCBNuOVqVQl
-Ae/RKb64sUJbDw9QpVCfwzBfKKvSiAc=
-=SOBX
------END PGP SIGNATURE-----
-
---vs4wSioN5QIjyM7p--
+/Esben
 
