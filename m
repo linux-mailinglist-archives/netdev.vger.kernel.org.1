@@ -1,105 +1,113 @@
-Return-Path: <netdev+bounces-66801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FF02840B37
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:22:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68C4A840B3F
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:22:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 724531C2040B
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:22:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE157B2422F
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:22:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 013FD155A58;
-	Mon, 29 Jan 2024 16:22:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 044A4155A5D;
+	Mon, 29 Jan 2024 16:22:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZIL7PiXF"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="h3InIN03"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55725155315
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 16:22:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06CAB155A58;
+	Mon, 29 Jan 2024 16:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706545322; cv=none; b=MiPegBDs5iGplmXbC/AQVgataywDR8yi4+Mg3lY4uOHi8+N1Y7+gYUOaKFS1wPVV3lXxc2MOmgfM60tOerYyKOLLX21zzR0P+Qeh+5TX90b4vW/2sG8wF+/lLwmrMwsPE8quHEdZ0jcbjeVz6huutVUScXSPlnDXFlw8RnP76jM=
+	t=1706545365; cv=none; b=GRRzOoZE2CaG8dV6HPvGbmDyGt2DzYEY6EzZqY9tVTiw6oo6CGoKLj0Q6BJAxQ8iYDgYAL/ueLc30s3eQi+dlNOrHWoewrk3ePaxzFq6T+BCkjf0YRCEwmFSxJaukUK+oCT98nufdqtQAbfpGVxG+nbcid5UiEROgngLC1r4nio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706545322; c=relaxed/simple;
-	bh=sbkQHHZFrgIdSWCYVdrd55Jz1lALDxQx9DQd1ctdtyo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JCPK2ZPZNZsFN7iAHfbBaH44ESw2us1UjL3xQTwqslKHoV5avoCB5uLdfuKea8+t+BuIS6fA0mKOaxdruDRBco5Yrph9z7GZDbEBmRNVSe2QrJSEJj4vzYARmLu5KJHnHFQG1V/5Lr0vmmcZvBFkvsYwySJyULM9xyntYk5cLGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZIL7PiXF; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a28fb463a28so332386866b.3
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 08:22:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706545319; x=1707150119; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zCOzyVpb1L6ncPLL7jfGOryqXeuK8VvBf/5+sy6Xscs=;
-        b=ZIL7PiXFm/K+kahDGex/GDT3wVf9154P5MKrDpy3ACRqI7R75RbOtRdeGzudLypAqC
-         41cKHrxhvQxLCST9ZF6VBpBXj+MXeqrA9kdjLT5zYSL5yBDa+Ba7/wJ/Mh68sC0pmqIz
-         Wdukp2Bl7LovZgAarf2XdZxPxrRxCRx4Y8T7TdvEywMqVH/OvhzDQOM+Ego3Fqu22IS9
-         riaAbKMtUUqFKElUtBk73aLMzujd9xvSOZJx+YsxBbfRVzGl9sd7g/SVHC7j8Wl8wQD9
-         /t3tbRS5clwhPJbN/nIuyMgLZL+sCw/HM1xOLtvsudheMzFe/oVDay2j/d9jo6U05SXR
-         E88A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706545319; x=1707150119;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zCOzyVpb1L6ncPLL7jfGOryqXeuK8VvBf/5+sy6Xscs=;
-        b=jIrW9lUtLT2+y66nQSYAc/dKDdI3Tfsq1CCPE5DqSqPHcLdzby/+Xpxfh8Lr2yTJ1w
-         0JU1AI7/wOpbFFJYqf3zi+1V1YhRMKGT4W0jM0QMbbS+vU6xtZVruWdEglhA7b6WInOs
-         JCZ3cq0/+QW3TCOBAjj911L3q5mpARa8u9VZiEb/aIAwoGZixtuHrdcOFVZL7ajKK9NO
-         AwK+hQmAoXa9W1+fXxZnr5SVwaOTEaINK4IIY+g8KHIMINcM55uC0XDmqOzWt9mAAQYy
-         7xzPRCOkltj4nXjiyZNMO9qVjIfl9TXQ6aBin1sA7rMeafcIBjtasIwuVp1oAnojo9gO
-         eQWw==
-X-Gm-Message-State: AOJu0Yy8TsDyhAClxIKsyYtgXprVVO90QkCqgKd1AjSrbxti0PHgu54I
-	y1NIGlAoycxLfweDWSia8xze5zztXObnLUs+aB8hfYs+yZ76ivwXQl+c911LYn4=
-X-Google-Smtp-Source: AGHT+IFeglagYXgCfwRHn6wRG5fG6PBF+wZ3xr6Si/qLfq1o6DdkXuFbnbARGDjfJsds0DhHBEzHbw==
-X-Received: by 2002:a17:906:2354:b0:a35:7191:d952 with SMTP id m20-20020a170906235400b00a357191d952mr3573632eja.53.1706545319404;
-        Mon, 29 Jan 2024 08:21:59 -0800 (PST)
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id kq18-20020a170906abd200b00a35c8897a16sm995261ejb.80.2024.01.29.08.21.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 08:21:59 -0800 (PST)
-Date: Mon, 29 Jan 2024 18:21:56 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
-	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	arinc.unal@arinc9.com, ansuelsmth@gmail.com
-Subject: Re: [PATCH net-next v4 03/11] net: dsa: realtek: convert variants
- into real drivers
-Message-ID: <20240129162156.wrahfl4rdev45ro5@skbuf>
-References: <20240123215606.26716-1-luizluca@gmail.com>
- <20240123215606.26716-4-luizluca@gmail.com>
- <20240125102525.5kowvatb6rvb72m5@skbuf>
- <CAJq09z4dOF4_XzKFRSP_ABoqN8y8ZXD1kOgxuL7TvC=8_M9Ojw@mail.gmail.com>
+	s=arc-20240116; t=1706545365; c=relaxed/simple;
+	bh=dk2iePkKQ8WbTc/CyWOkKphWL6R6O1SRme8w1LVKSd0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kPZsthMTWwtdAk05VscNBFt7aIu7PWhp63Dpk5UOOUJF8oHWtqVThAjG94/4u0V7TlkVRdG1+FcaL7JhGrER5WokpvRKVJK9GA9E64j4WA/MyJfWprgLyFzsK7/brbBjAGm6kKQnNPSUDcimiFEwubqLb39yWuTCHm/wa6wklL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=h3InIN03; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 069DCE000D;
+	Mon, 29 Jan 2024 16:22:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1706545355;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jfalacopj05NBro973M+ZIGKXKczGFxAKP3QzKWb2R4=;
+	b=h3InIN03yzv4r1p1AceaEKvatMaRv+Vz4cv+wuVpgHnZ99PedXpFWaffXGs9sQVzxtpO9l
+	9gYZhkgjR7Vl3rpSK4+PSCeiwXtlSPaZFnuH8pjLDVqEkudBjE7Y32v64syOpZC8EnZVO5
+	Z7WSrGvgYGaH0SAE+pNSt1yVxJnOPQTGnymjVcGmcdTLQuMJRjsUcXHWvRhFXlj57sMaZ/
+	e/ZSUD6cYhjGOsYmBaAJ542QIU0lV57bMwCglw0MBXbH1D7pXz70MeSmB+Qjpk4YWSs+pw
+	AyjokGotuJYUWPCgNGwfjtP7y1w+jKN+y2mtjRX3EnNjv67xx1WyMj/arujzfg==
+Message-ID: <431750cc-fb6b-4f7a-9123-b6986d359742@arinc9.com>
+Date: Mon, 29 Jan 2024 19:22:28 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAJq09z4dOF4_XzKFRSP_ABoqN8y8ZXD1kOgxuL7TvC=8_M9Ojw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 6/7] net: dsa: mt7530: do not set
+ priv->p5_interface on mt7530_setup_port5()
+Content-Language: en-US
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Daniel Golle <daniel@makrotopia.org>,
+ Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Russell King <linux@armlinux.org.uk>, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20240122-for-netnext-mt7530-improvements-1-v3-0-042401f2b279@arinc9.com>
+ <20240122-for-netnext-mt7530-improvements-1-v3-6-042401f2b279@arinc9.com>
+ <20240129125241.gu4srgufad6hpwor@skbuf>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20240129125241.gu4srgufad6hpwor@skbuf>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-On Sun, Jan 28, 2024 at 08:34:29PM -0300, Luiz Angelo Daros de Luca wrote:
-> > > + * This function should be used as the .shutdown in an mdio_driver. It shuts
-> > > + * down the DSA switch and cleans the platform driver data.
-> >
-> > , to prevent realtek_mdio_remove() from running afterwards, which is
-> > possible if the parent bus implements its own .shutdown() as .remove().
+On 29.01.2024 15:52, Vladimir Oltean wrote:
+> On Mon, Jan 22, 2024 at 08:35:57AM +0300, Arınç ÜNAL via B4 Relay wrote:
+>> From: Arınç ÜNAL <arinc.unal@arinc9.com>
+>>
+>> Running mt7530_setup_port5() from mt7530_setup() used to handle all cases
+>> of configuring port 5, including phylink.
+>>
+>> Setting priv->p5_interface under mt7530_setup_port5() makes sure that
+>> mt7530_setup_port5() from mt753x_phylink_mac_config() won't run.
+>>
+>> The commit ("net: dsa: mt7530: improve code path for setting up port 5")
+>> makes so that mt7530_setup_port5() from mt7530_setup() runs only on
+>> non-phylink cases.
+>>
+>> Get rid of unnecessarily setting priv->p5_interface under
+>> mt7530_setup_port5() as port 5 phylink configuration will be done by
+>> running mt7530_setup_port5() from mt753x_phylink_mac_config() now.
+>>
+>> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+>> ---
 > 
-> I didn't think that both could be called in sequence. I learned
-> something today. Thanks.
+> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+> 
+> I hope this moves the patch set out of the 'deferred' state.
+> 
+> ---
+> pw-bot: under-review
 
-And neither did I, until it happened to a user... More details in commit
-0650bf52b31f ("net: dsa: be compatible with masters which unregister on
-shutdown") after "However, complications arise really quickly".
+I still see deferred. I guess I'll have to submit this again. :/
+
+Arınç
 
