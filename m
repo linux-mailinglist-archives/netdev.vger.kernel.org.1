@@ -1,81 +1,103 @@
-Return-Path: <netdev+bounces-66864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FC008413E3
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 20:56:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 841A58413EC
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 20:57:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C259A1C2361E
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 19:56:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B72AD1C2381B
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 19:57:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E5C615A494;
-	Mon, 29 Jan 2024 19:54:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1047F76041;
+	Mon, 29 Jan 2024 19:55:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C5TC8IDq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RS44bL+n"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DC715A491
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 19:54:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD66615696E;
+	Mon, 29 Jan 2024 19:55:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706558053; cv=none; b=qFhgz00rhFs4boWZPoDioNknGSMOgPsEd9P6OuMtl93JYak6bAM8fscz/V7ph7cN2HgNKTHfbLY6/7i7Wwj/+EaPNXdSecZV+sMrR3VFqPVTE1rQ26J0kfZS0hfEFukUoUPUFKhRLktOCEH8vlZHJ6R3NbQt4AY8vbdsTnnHzw4=
+	t=1706558107; cv=none; b=OLQbd0JVxi7sdefoSWm1/+Z1L8TSJd/axxhPnjKi8cVB0+Sz7kPCPLed+UU8CBDxzMcDmaDMVEixumAS0n+Ho4qPsczp0YaySIDV6teUtHtnwhzHSSsuyvNfNHBz8+fsdtMUT64VWn7zdo656tdmva5dImenX2RQNm2yfqw7F58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706558053; c=relaxed/simple;
-	bh=uVTpFfi9jRPvunUX21rw8sIbOfx3r8wCUcO4hwEEXSU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nSNA6qarmIZ+l2O2snd3Nqbs1VkcD9kitzDTXKRWcY1D8PF8q95JOuUiWwA8FRIpCy2XyXUVtgbC2K4YwT5EEFz9ISbfOABjWK5BTIrVewbiKKyNk+I6XH4zxNt/4NKukmuoxnC9u3Y5vAV/7WUjOrSGTCmgV5AUKirEAfpQTcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C5TC8IDq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E62EC43390;
-	Mon, 29 Jan 2024 19:54:11 +0000 (UTC)
+	s=arc-20240116; t=1706558107; c=relaxed/simple;
+	bh=0CIB0/TlrT+oPT3ZqRHquCd+EJ3N1LFnuMsYqCwim6k=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jD13hhgYbunR4zyPy0XxLVkacMIAno4IOpaFpF8QKLCIKhmJKlK6SCSdNtKQf38863jRQ8QAYjnxtvnBp5VTxj9i4kWy1tresNlcTpXd1c1XZ/En/tA5SXRuqsrnbC6v7vngz8RPQyfYoCe1C8TsRONcWv3bImr+9Z58GaA0yUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RS44bL+n; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3478CC433C7;
+	Mon, 29 Jan 2024 19:55:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706558053;
-	bh=uVTpFfi9jRPvunUX21rw8sIbOfx3r8wCUcO4hwEEXSU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=C5TC8IDqVVFCZFA8deEXxoXhnVBrMSBBgmWwpJ8kSwuPTWkHSA2uBoxEoiEidfcoT
-	 XEzU2Pqhs52YAbhm+FTy8QrkWwtZmhNeBFTN0UatQLhppBTn3czrY3mbosCIsfj9bG
-	 fAmx/tNKkQQ3HuXDeWClh0Lyfb0AuTcQT5d81BbFkZ1+h6hACVIE4VT9RpUTaipeKu
-	 75QJBi4cBNfOUM6nL+ASoiia54Tw+L1JvnLyk4LFjVIbYK97L+E8LPltB9Rr1x3cW1
-	 XzMdGlij5FksavPyG6O/LXVsjsDglTaLIbc4T0WLnEi4acwuIy6S3gOZKaPNVpvW7i
-	 Sq2kfn0i+4YyA==
-Date: Mon, 29 Jan 2024 19:54:08 +0000
-From: Simon Horman <horms@kernel.org>
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>,
-	Amit Cohen <amcohen@nvidia.com>, mlxsw@nvidia.com
-Subject: Re: [PATCH net-next 6/6] mlxsw: Use refcount_t for reference counting
-Message-ID: <20240129195408.GQ401354@kernel.org>
-References: <cover.1706293430.git.petrm@nvidia.com>
- <4ffc173920a7b0780dee4f5af91e0d44d0b898f3.1706293430.git.petrm@nvidia.com>
+	s=k20201202; t=1706558106;
+	bh=0CIB0/TlrT+oPT3ZqRHquCd+EJ3N1LFnuMsYqCwim6k=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RS44bL+n3cWWI3YmR+NKdfZUD1FMgwtFVMDo+YkeK/PsEj/HC9zP0r0PGQ0zzS+ZC
+	 0XGNulIQK8xzir+f3JRroE/90GaAJ1+ICttRODDqCT8PJClVQ/dik3ZR5JTm1PEqdF
+	 DuFjtxi74OXPi6GfuBrg7hAUqBZatGq4IyN7E3v3P6KSlfc9BIC1/vArZEld5ClULi
+	 54yihZl51XqGF1kea/if9S2u1pNCjT4+/z7x5KsHFSpPBhu73FliT7E0wX9pSY0/io
+	 Pl0BdTZlCsFXhlrwClK12UiJ0sMXdQjsevZ3Qxpw0dWsBmdrohQgHHW5AJdnoQQzsC
+	 Z7jGK/vKSaUTw==
+Date: Mon, 29 Jan 2024 11:55:05 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kalle Valo <kvalo@kernel.org>
+Cc: Arend Van Spriel <arend.vanspriel@broadcom.com>,
+ <netdev@vger.kernel.org>, <linux-wireless@vger.kernel.org>
+Subject: Re: pull-request: wireless-next-2024-01-25
+Message-ID: <20240129115505.76d35e31@kernel.org>
+In-Reply-To: <87mssrxf44.fsf@kernel.org>
+References: <20240125104030.B6CA6C433C7@smtp.kernel.org>
+	<20240125165128.7e43a1f3@kernel.org>
+	<87r0i4zl92.fsf@kernel.org>
+	<18d447cc0b8.279b.9b12b7fc0a3841636cfb5e919b41b954@broadcom.com>
+	<877cjwz9ya.fsf@kernel.org>
+	<20240126105255.5476cf85@kernel.org>
+	<87mssrxf44.fsf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4ffc173920a7b0780dee4f5af91e0d44d0b898f3.1706293430.git.petrm@nvidia.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 26, 2024 at 07:58:31PM +0100, Petr Machata wrote:
-> From: Amit Cohen <amcohen@nvidia.com>
+On Sat, 27 Jan 2024 12:08:59 +0200 Kalle Valo wrote:
+> Jakub Kicinski <kuba@kernel.org> writes:
+> >> I don't run checkpatch except for ath10k/ath11k/ath12k, too much noise.
+> >> I ended up adding this to my script:  
+> >
+> > We run build with sparse and W=1 and then diff the number of warnings 
+> > to weed out the pre-existing ones, FWIW.   
 > 
-> mlxsw driver uses 'unsigned int' for reference counters in several
-> structures. Instead, use refcount_t type which allows us to catch overflow
-> and underflow issues. Change the type of the counters and use the
-> appropriate API.
+> So for wireless and wireless-next I now check W=1 warnings every time I
+> push. We are mostly warning free now but I'm not checking the linker
+> warnings, for example the current MODULE_DESCRIPTION() warnings.
 > 
-> Signed-off-by: Amit Cohen <amcohen@nvidia.com>
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-> Signed-off-by: Petr Machata <petrm@nvidia.com>
+> It's really annoying, and extra work, that people enable new W=1
+> warnings before fixing them. Could we somehow push back on those and
+> require that warnings are fixed before enabling with W=1 level?
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+My quite possibly incorrect understanding is that "giving people time
+to fix" is the main point of W=1 :( W=2 is for stuff which may false
+positive, W=1 is for stuff which does not false positive but we can't
+enable it in formal builds because the tree is full of it.
 
+> In wireless there is a significant number of sparse warnings. I have
+> tried the cleanup people to fix them but it seems there's no interest,
+> instead we get to receive pointless cleanups wasting our time. <loud sigh>
+
+Tell me about it.. :)
+
+> BTW the 'no new line at end of file' warning is indeed from sparse, like
+> Arend suspected:
+> 
+> drivers/net/wireless/broadcom/brcm80211/brcmfmac/fwil.c:432:49: warning: no newline at end of file
+
+BTW I'd happy to help you set up an instance of our build testing bot,
+if you have a VM that can be used. It does take a bit of care and
+feeding, but seeing the build failures in patchwork pays the time back.
 
