@@ -1,90 +1,89 @@
-Return-Path: <netdev+bounces-66709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6147A8405FA
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 14:04:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9B0184060D
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 14:06:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83B371C21FAA
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:04:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E5B51F2471F
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:06:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49369627E9;
-	Mon, 29 Jan 2024 13:04:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C9F362804;
+	Mon, 29 Jan 2024 13:05:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SuyLjV0x"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YAA9dVaT"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AC48612FC
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 13:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7D43633E0
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 13:05:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706533488; cv=none; b=nBXwDSPEnBC/bVGWH7Mi6S2wdIH2zcacHmRvFA/PfzBTJ3wKZfLQxxNywuWK0PPivdHwecYwIe7XCJ16AkDvDbBXlRJlzqF5TLVsBZgS8z1mQbz1bm6JKvKVLvdElwxbcTSH6Pylwr7cJTBFDvDIoQ78CAC9ZMJ/A7CQvrFFlL0=
+	t=1706533525; cv=none; b=NVaDGfB0OvfrAJUvqiLRbdelje4mLvWpAV8Mu9K634dupmM9qySmGdXAHJi3HithciJDygYql3MR1nKttNjuMHvnUnrJXHXiwzeM95WneKuBpMDMJLo1YfvqQ/jYZyTT5Rkv04462GZPF4noy78yMYMyeZ6acUNgtd3CkkdmeBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706533488; c=relaxed/simple;
-	bh=hUDcLPxTWBVh758l5satDFc80w73JtYQL5IlyNLMEXY=;
+	s=arc-20240116; t=1706533525; c=relaxed/simple;
+	bh=jhSXJBAa4IAI3G0hqBJhMzYpQuBKW9LSRNp5pHW1sMw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IEB7uwShgFwski7WcAmGmY5lGJhUb0UuNwrY6Z3YS20Lr9lJzLfcTwjGmzBlS+tjBUQoq0P3IHRqrdRKAy39paZSfvKAvd7m7jmxJDGzehe0PajXPiL78psXfsIkkzLigzXDZx1J6szwhFvijFOFfgRedqJzg7qOLI6y2pk/4yM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SuyLjV0x; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=BOr/PWSK+IAypLfsbPvaBLpfisd3+nv6XNiA/nai3g2Fqhi0fGzrHWRqVVXHc2QY5yV//x9B5OY1jkaF6pKKbtI5qPOFZAyC3IE6KOSz5wLw27M2qOhWQT/IAvnOfNIo+x2Y1c+sPqccBQ/Wbv8DQOdSWV0WceSxe25bAko8P3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YAA9dVaT; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706533483;
+	s=mimecast20190719; t=1706533522;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=5u9+rqZEDkYDVIagmMTSVu3GUhA/FISTOqo0Vf+Xld8=;
-	b=SuyLjV0xvflXYZOt1xN60q84XK4k6SzyGZTl9nZ9Gk9Iyl0p2SkAHswcaF/z841eB+nMzd
-	mClr5f4xsOUF7HZYv1YKA5GrHFZcKjFtMB2F84iIwZstyFW9zavjrQA6kXNTOGPbDxC9zE
-	6foz43+I6vnTEnEjsBiTRhz8iLAWm8E=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=jhSXJBAa4IAI3G0hqBJhMzYpQuBKW9LSRNp5pHW1sMw=;
+	b=YAA9dVaTuWzMOlE2ogYJtKB7NQCGIF29MS5DXbJ/iwUzzXwjwf6Sg+pOnF1xhhjc4Xk0Pt
+	Q413XuBAY+rJwY61FCYp5c/oldcwKHruCSn1lytQV3w6HFjji5CSHhpICI/vjV3KGE+6/p
+	+S/D6YFiKALnTzb7yHDIVobTQWcumI0=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-28-qCSgjBFAMf2_KgSwyb-7wA-1; Mon, 29 Jan 2024 08:04:41 -0500
-X-MC-Unique: qCSgjBFAMf2_KgSwyb-7wA-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-51014392c67so1993173e87.1
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 05:04:41 -0800 (PST)
+ us-mta-610-8ItPQLQqNuCcFF-QcB9t6Q-1; Mon, 29 Jan 2024 08:05:17 -0500
+X-MC-Unique: 8ItPQLQqNuCcFF-QcB9t6Q-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-339250f6515so1109495f8f.2
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 05:05:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706533480; x=1707138280;
+        d=1e100.net; s=20230601; t=1706533516; x=1707138316;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5u9+rqZEDkYDVIagmMTSVu3GUhA/FISTOqo0Vf+Xld8=;
-        b=spfjmTTWvTCQogrev9lFptKGgkymlEGgmp+wkVpCTtUlBS8O0iPz7Q9auU3rCO8Uih
-         7oihYbEwnxiEEtwZT+VcPUKexs+iFmcnaUUcB6LPGzjv+N5LoTWctSxvzKBzgSojEnW0
-         qLiQ0OMh5Fpmwp67d6Hu1NN2AHCouhb6vvRfpSG7LxaQ+oOU0gMM5b2ow3EK63CV4rO+
-         SL6UAsXXAUFfqcLhJfiagVne/QhlU6eHZS996pivkAIziY2+IrTUQvMFw9amR7OcUZH9
-         gT8UxjkF3s6bEXUfPg9rzB9sSfB6kJyrw5QZ+sKITV5XASye09KT9W7tfgbeQVJQu9kD
-         gcMw==
-X-Gm-Message-State: AOJu0YzsC8IwqJJv6yVO/3OKsMyhBAAvaIomm6R8Os0yUvXBREgwHJpC
-	tSVUSTp+kgCLiLcA5m5vUd58XchIhYLpYXbl3F5nDGUmmbhktbz6o5PCFRwjlQJ6TJ4IVrZPkBJ
-	jU1ICgoVqrq7Io2lA34l6S7MIGT8r5t8PHT2Y3qYmMS+VxuJ9rEXLlA==
-X-Received: by 2002:a05:6512:390a:b0:511:e7d:7ccb with SMTP id a10-20020a056512390a00b005110e7d7ccbmr2091537lfu.67.1706533479984;
-        Mon, 29 Jan 2024 05:04:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEPuLeGuj0HqqLM0ujALnFVdJ8umbAk2oV1aS/oyJ3j0StOqm/I4MZvQjNS8hiY44ql48oEhQ==
-X-Received: by 2002:a05:6512:390a:b0:511:e7d:7ccb with SMTP id a10-20020a056512390a00b005110e7d7ccbmr2091511lfu.67.1706533479607;
-        Mon, 29 Jan 2024 05:04:39 -0800 (PST)
+        bh=jhSXJBAa4IAI3G0hqBJhMzYpQuBKW9LSRNp5pHW1sMw=;
+        b=T4AdHHQT14WW6uxG9tshh9a/VrjITizxQMQ4NBWv5rTHF7QPI3AtlbLkArEj0FU9Mr
+         TOCkIsnvqTiXODPWat5Envmz+2Dgh8aSJ4A6W9pydbAQO007D8mtiDWtkgsPzv2KS2Ns
+         +OXB7cyOAhUmdVG5943nrwWfrFmnXfOI874Le6HKuCptMgXkosEPuwlgTEGSIgse7qyG
+         bswb92Mbn7mvpxVvVgc54UZSUsENr9/MaJ0wbTiXKHW7d9VQYY7/falWGSin/I9XktWy
+         PHbDdU6elL81b/qXTXTW8J4A7Y7PE7Mx1t65jozLfXRiYwFyhmfZP7Gju/MCoE1Tl+pc
+         +uNg==
+X-Gm-Message-State: AOJu0YxX0JZiJgxmemkUpWq0Lq8M+r0PJMv4+xkqhwG2yXijtdLn1CMX
+	pC8O+/IDrlplvtM48l+DQSyhpe3LxRYsmPB1bVl7ks4b98HSpbZiquEYTG3OaxH86W7b8QCauNp
+	n2MIl2RM5g0TDPOzQQxJeZb8tRwSRfQB0J36u0y693LlPPIn2MHVtyw==
+X-Received: by 2002:adf:ea51:0:b0:33a:e89f:1dc5 with SMTP id j17-20020adfea51000000b0033ae89f1dc5mr2668839wrn.23.1706533516564;
+        Mon, 29 Jan 2024 05:05:16 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGU83hZ2kx/bGUSTN6uw3JgXRUj/C6gYltlkxClcBEqa8p9rlT/xqzClncFGJThJD88kRnF0w==
+X-Received: by 2002:adf:ea51:0:b0:33a:e89f:1dc5 with SMTP id j17-20020adfea51000000b0033ae89f1dc5mr2668828wrn.23.1706533516337;
+        Mon, 29 Jan 2024 05:05:16 -0800 (PST)
 Received: from localhost (net-93-71-3-198.cust.vodafonedsl.it. [93.71.3.198])
-        by smtp.gmail.com with ESMTPSA id fa6-20020a05600c518600b0040ee8765901sm8323688wmb.43.2024.01.29.05.04.38
+        by smtp.gmail.com with ESMTPSA id c17-20020a5d5291000000b00337d980a68asm5721310wrv.106.2024.01.29.05.05.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 05:04:39 -0800 (PST)
-Date: Mon, 29 Jan 2024 14:04:37 +0100
+        Mon, 29 Jan 2024 05:05:15 -0800 (PST)
+Date: Mon, 29 Jan 2024 14:05:14 +0100
 From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>
+To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
 Cc: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
 	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, bpf@vger.kernel.org, toke@redhat.com,
+	pabeni@redhat.com, bpf@vger.kernel.org,
 	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
 	sdf@google.com, hawk@kernel.org, ilias.apalodimas@linaro.org
-Subject: Re: [PATCH v6 net-next 1/5] net: add generic per-cpu page_pool
- allocator
-Message-ID: <ZbeiZaUrWoj39_LZ@lore-desk>
+Subject: Re: [PATCH v6 net-next 0/5] add multi-buff support for xdp running
+ in generic mode
+Message-ID: <ZbeiijYT0ZodYq4p@lore-desk>
 References: <cover.1706451150.git.lorenzo@kernel.org>
- <5b0222d3df382c22fe0fa96154ae7b27189f7ecd.1706451150.git.lorenzo@kernel.org>
- <f6273e01-a826-4182-a5b5-564b51f2d9ae@huawei.com>
+ <87msso1f9e.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,135 +91,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="t7HFx7zhTzopyoJv"
+	protocol="application/pgp-signature"; boundary="QapcWhyXNDEADOc1"
 Content-Disposition: inline
-In-Reply-To: <f6273e01-a826-4182-a5b5-564b51f2d9ae@huawei.com>
+In-Reply-To: <87msso1f9e.fsf@toke.dk>
 
 
---t7HFx7zhTzopyoJv
+--QapcWhyXNDEADOc1
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-> On 2024/1/28 22:20, Lorenzo Bianconi wrote:
+> Lorenzo Bianconi <lorenzo@kernel.org> writes:
 >=20
-> >  #ifdef CONFIG_LOCKDEP
-> >  /*
-> >   * register_netdevice() inits txq->_xmit_lock and sets lockdep class
-> > @@ -11686,6 +11690,27 @@ static void __init net_dev_struct_check(void)
-> >   *
-> >   */
-> > =20
-> > +#define SD_PAGE_POOL_RING_SIZE	256
+> > Introduce multi-buffer support for xdp running in generic mode not alwa=
+ys
+> > linearizing the skb in netif_receive_generic_xdp routine.
+> > Introduce page_pool in softnet_data structure
 >=20
-> I might missed that if there is a reason we choose 256 here, do we
-> need to use different value for differe page size, for 64K page size,
-> it means we might need to reserve 16MB memory for each CPU.
+> This last line is not accurate anymore... :)
 
-honestly I have not spent time on it, most of the current page_pool users s=
-et
-pool_size to 256. Anyway, do you mean something like:
-
-diff --git a/net/core/dev.c b/net/core/dev.c
-index f70fb6cad2b2..3934a3fc5c45 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11806,12 +11806,11 @@ static void __init net_dev_struct_check(void)
-  *
-  */
-=20
--#define SD_PAGE_POOL_RING_SIZE	256
- static int net_page_pool_alloc(int cpuid)
- {
- #if IS_ENABLED(CONFIG_PAGE_POOL)
- 	struct page_pool_params page_pool_params =3D {
--		.pool_size =3D SD_PAGE_POOL_RING_SIZE,
-+		.pool_size =3D PAGE_SIZE < SZ_64K ? 256 : 16,
- 		.nid =3D NUMA_NO_NODE,
- 	};
- 	struct page_pool *pp_ptr;
-
->=20
-> > +static int net_page_pool_alloc(int cpuid)
-> > +{
-> > +#if IS_ENABLED(CONFIG_PAGE_POOL)
-> > +	struct page_pool_params page_pool_params =3D {
-> > +		.pool_size =3D SD_PAGE_POOL_RING_SIZE,
-> > +		.nid =3D NUMA_NO_NODE,
-> > +	};
-> > +	struct page_pool *pp_ptr;
-> > +
-> > +	pp_ptr =3D page_pool_create_percpu(&page_pool_params, cpuid);
-> > +	if (IS_ERR(pp_ptr)) {
-> > +		pp_ptr =3D NULL;
->=20
-> unnecessary NULL setting?
-
-ack, I will get rid of it.
-
->=20
-> > +		return -ENOMEM;
-> > +	}
-> > +
-> > +	per_cpu(page_pool, cpuid) =3D pp_ptr;
-> > +#endif
-> > +	return 0;
-> > +}
-> > +
-> >  /*
-> >   *       This is called single threaded during boot, so no need
-> >   *       to take the rtnl semaphore.
-> > @@ -11738,6 +11763,9 @@ static int __init net_dev_init(void)
-> >  		init_gro_hash(&sd->backlog);
-> >  		sd->backlog.poll =3D process_backlog;
-> >  		sd->backlog.weight =3D weight_p;
-> > +
-> > +		if (net_page_pool_alloc(i))
-> > +			goto out;
-> >  	}
-> > =20
-> >  	dev_boot_phase =3D 0;
-> > @@ -11765,6 +11793,18 @@ static int __init net_dev_init(void)
-> >  	WARN_ON(rc < 0);
-> >  	rc =3D 0;
-> >  out:
-> > +	if (rc < 0) {
-> > +		for_each_possible_cpu(i) {
-> > +			struct page_pool *pp_ptr =3D this_cpu_read(page_pool);
->=20
-> this_cpu_read() -> per_cpu_ptr()?
-
-ack, I will fix it.
+ack, I just copied it from v5. I will fix it.
 
 Regards,
 Lorenzo
 
 >=20
-> > +
-> > +			if (!pp_ptr)
-> > +				continue;
-> > +
-> > +			page_pool_destroy(pp_ptr);
-> > +			per_cpu(page_pool, i) =3D NULL;
-> > +		}
-> > +	}
-> > +
-> >  	return rc;
-> >  }
->=20
+> -Toke
 >=20
 
---t7HFx7zhTzopyoJv
+--QapcWhyXNDEADOc1
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZbeiZQAKCRA6cBh0uS2t
-rPrfAQDWVTEyiJb6xP1bIrl2vekhXG29VwHF7IKXJC/eup9Y0AEA6EqHOog0YCva
-u7qA1QY4Kmy11xuk24H3A4HBd+UkwgQ=
-=QKN6
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZbeiigAKCRA6cBh0uS2t
+rLRSAQDLhngsfTJ/SkubtC4AZWQp8GJbJge2crWzr7Bday/t1AD/Z7x2KgJQgCnx
+R3gJ2Z0WLiPby+RIC7SQmLmT9l/YXQ8=
+=aIyH
 -----END PGP SIGNATURE-----
 
---t7HFx7zhTzopyoJv--
+--QapcWhyXNDEADOc1--
 
 
