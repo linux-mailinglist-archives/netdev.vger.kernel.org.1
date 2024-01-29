@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-66891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8B3A8415BC
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 23:36:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B39638415BD
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 23:36:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B93BB23E6D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 22:36:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AEF828A531
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 22:36:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 128A853E24;
-	Mon, 29 Jan 2024 22:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1625F5465B;
+	Mon, 29 Jan 2024 22:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U5ibpr6d"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XL3CS2kD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6931753802;
-	Mon, 29 Jan 2024 22:35:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB4953E07;
+	Mon, 29 Jan 2024 22:35:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706567733; cv=none; b=WVuMDJhQgN9gIzmYKZ9V+17/nu3IY3CMuwveIVjeAETMegFCK6WCc7P+Br4MqM+opn9mrUcJJLcKLzFrgnvLP8v5daFLPiLGvKk/4+rTm9QPcHSASZGUBS1MdbpbMKjYagPmyv5R1AGNXpCsib4tX105k+x8+BfJ3lWWj1YAtoE=
+	t=1706567734; cv=none; b=YM0HuF35fHD/IaIuyuRtOlcM4w1udK3pjZtJ3Rd/C3nJG4beSLcRb1bSYku+3I45gdSpNKO+gYyUPwAu4dSVDnj0/MBe/nsQmYUdRT176/hRMs0hqdzzloeSTIqrdyCLt7fI2Je7GaJVWE+ofI6Uko125ljmMsutAfGtNe1ONIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706567733; c=relaxed/simple;
-	bh=v7mHrXLQRTCNsbXYMNkSWpZBqQ2SOM37cEmn1Anbty0=;
+	s=arc-20240116; t=1706567734; c=relaxed/simple;
+	bh=1mZRqWZII3pMTZWLi8ep1djbp4wRvSZDAG85K3O66ck=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=TI5wjuXP97kzV3R8Jq+fCeJzdav3KzcSjlUCwT5YTZIZsVWPSmhCli4NLfu97vVSd3zBalJ+p2YJ1EKezlpFQU8deeXxOz8L5vxcB+io5K0pTEY5eDad5E9awFHwEWLDwIXqXc9c6imJujcSFVDy19Ugrd51DR7tfgNCqDxuH6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U5ibpr6d; arc=none smtp.client-ip=209.85.221.44
+	 MIME-Version; b=tgu6CksRWt4AFNw/vyWxgIsEbYmnTPnnVP3H4Yoxg7dKvuC7jEZDU+E8nSJSI6SrCVBlQ5Z14/91LH7fh2iRFRXJPJFnkusKVp1zDDoZqsNOyaODHimWQ0NLe/huHnGkp+rUJapqoHiH/scm12AhHRF2EzEzngAXiEFDwy3lcO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XL3CS2kD; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-33934567777so2685153f8f.1;
-        Mon, 29 Jan 2024 14:35:31 -0800 (PST)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40eec4984acso26169955e9.2;
+        Mon, 29 Jan 2024 14:35:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706567729; x=1707172529; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706567730; x=1707172530; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=bfXnxN6LhrHnAn4S/DiUOKAmUqQTDXqkpo6xUmXayic=;
-        b=U5ibpr6dFSjLt2ctg0dkK3IJ+5qNEvPVvQj9qu2E6NPmXKGGyxop02mlUy6PTo8C3a
-         FaAySscRofrfZh/Vq1c3PrUBQILksY5aeNofPuH9yBkQoHN+ClbQ1sAOFsGeNOx3epbA
-         +U8BhuDWHiiwc7WdmHSvhQOTGEq43qjoECke8G9aSRvtvmsAdU39CosF5GlzgSYmFRPA
-         XjBLsV6pT4AsrSSPU8uT0BVq3ZR2W4D73YjuOPfcPxsbTmhFeHhOkEx+p5AWVQGN/LLl
-         6sxhmMzn6yhld2BU4j4DqM9yJ1BWQckw5ZTflzXYCqRaUu88m5vKTsXPkWJbWqtDioz3
-         g9Kg==
+        bh=xyCHyvffOH+oRJ6ypOtqrlTb6yApdanhXfSR1Ucu//I=;
+        b=XL3CS2kDBSp0zxPVQdVTBc/pgy7vV7cdkKL6qJYQwsA/uBHjQN3s/Sxb38sjRtcdtz
+         YPKN5aDCJYhYfmWQWvTAzxhoFr794zuG09OOBi119CKJdus8MBN11yyomuyCoBO2/UiJ
+         YlVT+VqITqIWA3cA/Zkcd4Q82CPh1Mbjgq63sxwsIrdK4DJjpmo51ETnNGxZXXC6ejRx
+         ZduSu/kAJ8xyN8QdXHo/4KArLV+RDZaqGtM8aTRfYg0XwCtFuInRGRyRzXgNfGruYIS1
+         qHsaKCfkoSfWgV4RJtBNf28GRg3TgtxuMxe3z1v9sV9AnhSkYSLCXYutJjx0SMXNX3fb
+         rqVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706567729; x=1707172529;
+        d=1e100.net; s=20230601; t=1706567730; x=1707172530;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bfXnxN6LhrHnAn4S/DiUOKAmUqQTDXqkpo6xUmXayic=;
-        b=ZM+E0e4uzwhCQg1os0cnyZDOTJ/2t9xLa6/DO/mwq6iJzI7X169FOiZfzwNb3VmTsL
-         soIVj5MeLryF0VpQ/VbwsB9jeDGp5ZR4D0O8WOW/KvMuQkOcn+JJOBXuN72L0qNZgCeN
-         Kt9UzvtAooEVnMb/cL75Oy2662pXvwMUPoYjJof2uk3bTxSEIrbuXmElrgZ4IHNrrYEr
-         nWgGDYdd08UDGEj+KbWg5lgiUWurwQtX1YwPMtDohkumnziCp1RUC3qWELEvuOJvEqg1
-         Y+IjeSKCl7iilDdW0BBaYoZClgncbM30UywP9DkNA5o84BB6Mae+vTg+kA4x8H9Dgi7b
-         OASw==
-X-Gm-Message-State: AOJu0Yx+CzmojQO+Tdvbn9nlRXM9l7YXVQTTW0SOWcLY8ud5hueni2qb
-	Tn3WDEAYB10+QzGMwdhwYIJCsD61nZ60XePCRmF65afpO7ujaswQeBRjKd/mGpM=
-X-Google-Smtp-Source: AGHT+IGGZF5jQl3IIWuAsaM2aU2t9r80+mOvCIo7AYjYGPJYMksXZy09TOB84rzzslqknE19i6lktg==
-X-Received: by 2002:a5d:49d1:0:b0:33a:e756:bd21 with SMTP id t17-20020a5d49d1000000b0033ae756bd21mr3602846wrs.43.1706567729446;
-        Mon, 29 Jan 2024 14:35:29 -0800 (PST)
+        bh=xyCHyvffOH+oRJ6ypOtqrlTb6yApdanhXfSR1Ucu//I=;
+        b=pjJGDhgn9cfHT7Inzx2uKpiOD9FsB5C+7dB++o1GEHQJqzKEudyscm+95ksViziff9
+         pQIUvJIEsdQVJM9roH5YobSNCSNuMhjZmMpOKC5985kQUkezJI2qyiow9OKwfKgmaAW8
+         WkHli7cFG+SF33PE78sCA614IM46GbEVDtM8CsqjRhxJXCBxvYQFu5lapYN3Ma2nZyCG
+         mVl/yOrC7gR+MNhOOIH/9A0xg/YUSsmQq1NfGUAQEMaIXacN+VJFAto+3EMzqzggOMc9
+         1wRawfpiLHumcN3ei32l1Pa3u53CtkIcqdUEgDy/NfQsiBGawwLhdk0ht9UqYUv6li9g
+         vhcw==
+X-Gm-Message-State: AOJu0Yx3dgISv7qE+tV0PZQ0ypMQfsauCaP6jKBPK8Xj3m4QhdW0w8zE
+	dPYHRgYbSwrhc0fvUqCYWcA/RRvX4iw2veYKBlF+Jdw6daXtEJJ7UEk8cgSDphw=
+X-Google-Smtp-Source: AGHT+IF62LOUAk04aWRddh9fCzf/eGijkdKw+5e6vuL03XW6DU3uUY4iVsnmXygxkY8W6MlSvXdbKg==
+X-Received: by 2002:a05:600c:350b:b0:40e:d176:1c98 with SMTP id h11-20020a05600c350b00b0040ed1761c98mr5292202wmq.18.1706567730451;
+        Mon, 29 Jan 2024 14:35:30 -0800 (PST)
 Received: from imac.fritz.box ([2a02:8010:60a0:0:9c2b:323d:b44d:b76d])
-        by smtp.gmail.com with ESMTPSA id je16-20020a05600c1f9000b0040ec66021a7sm11357281wmb.1.2024.01.29.14.35.28
+        by smtp.gmail.com with ESMTPSA id je16-20020a05600c1f9000b0040ec66021a7sm11357281wmb.1.2024.01.29.14.35.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 14:35:29 -0800 (PST)
+        Mon, 29 Jan 2024 14:35:30 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -80,9 +80,9 @@ To: netdev@vger.kernel.org,
 	Alessandro Marcolini <alessandromarcolini99@gmail.com>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v2 08/13] tools/net/ynl: Rename _fixed_header_size() to _struct_size()
-Date: Mon, 29 Jan 2024 22:34:53 +0000
-Message-ID: <20240129223458.52046-9-donald.hunter@gmail.com>
+Subject: [PATCH net-next v2 09/13] tools/net/ynl: Move formatted_string method out of NlAttr
+Date: Mon, 29 Jan 2024 22:34:54 +0000
+Message-ID: <20240129223458.52046-10-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240129223458.52046-1-donald.hunter@gmail.com>
 References: <20240129223458.52046-1-donald.hunter@gmail.com>
@@ -94,59 +94,79 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Refactor the _fixed_header_size() method to be _struct_size() so that
-naming is consistent with _encode_struct() and _decode_struct().
+The formatted_string() class method was in NlAttr so that it could be
+accessed by NlAttr.as_struct(). Now that as_struct() has been removed,
+move formatted_string() to YnlFamily as an internal helper method.
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+Reviewed-by: Breno Leitao <leitao@debian.org>
 ---
- tools/net/ynl/lib/ynl.py | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ tools/net/ynl/lib/ynl.py | 31 +++++++++++++++----------------
+ 1 file changed, 15 insertions(+), 16 deletions(-)
 
 diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index 0e7e9f60ab7e..173ef4489e38 100644
+index 173ef4489e38..2b0ca61deaf8 100644
 --- a/tools/net/ynl/lib/ynl.py
 +++ b/tools/net/ynl/lib/ynl.py
-@@ -353,7 +353,7 @@ class NetlinkProtocol:
-         fixed_header_size = 0
-         if ynl:
-             op = ynl.rsp_by_value[msg.cmd()]
--            fixed_header_size = ynl._fixed_header_size(op.fixed_header)
-+            fixed_header_size = ynl._struct_size(op.fixed_header)
-         msg.raw_attrs = NlAttrs(msg.raw, fixed_header_size)
-         return msg
+@@ -113,20 +113,6 @@ class NlAttr:
+                 else format.little
+         return format.native
  
-@@ -585,7 +585,7 @@ class YnlFamily(SpecFamily):
-         offset = 0
-         if msg_format.fixed_header:
-             decoded.update(self._decode_struct(attr.raw, msg_format.fixed_header));
--            offset = self._fixed_header_size(msg_format.fixed_header)
-+            offset = self._struct_size(msg_format.fixed_header)
-         if msg_format.attr_set:
-             if msg_format.attr_set in self.attr_sets:
-                 subdict = self._decode(NlAttrs(attr.raw, offset), msg_format.attr_set)
-@@ -675,18 +675,18 @@ class YnlFamily(SpecFamily):
-             return
+-    @classmethod
+-    def formatted_string(cls, raw, display_hint):
+-        if display_hint == 'mac':
+-            formatted = ':'.join('%02x' % b for b in raw)
+-        elif display_hint == 'hex':
+-            formatted = bytes.hex(raw, ' ')
+-        elif display_hint in [ 'ipv4', 'ipv6' ]:
+-            formatted = format(ipaddress.ip_address(raw))
+-        elif display_hint == 'uuid':
+-            formatted = str(uuid.UUID(bytes=raw))
+-        else:
+-            formatted = raw
+-        return formatted
+-
+     def as_scalar(self, attr_type, byte_order=None):
+         format = self.get_format(attr_type, byte_order)
+         return format.unpack(self.raw)[0]
+@@ -530,7 +516,7 @@ class YnlFamily(SpecFamily):
+         else:
+             decoded = attr.as_bin()
+             if attr_spec.display_hint:
+-                decoded = NlAttr.formatted_string(decoded, attr_spec.display_hint)
++                decoded = self._formatted_string(decoded, attr_spec.display_hint)
+         return decoded
  
-         msg = self.nlproto.decode(self, NlMsg(request, 0, op.attr_set))
--        offset = 20 + self._fixed_header_size(op.fixed_header)
-+        offset = 20 + self._struct_size(op.fixed_header)
-         path = self._decode_extack_path(msg.raw_attrs, op.attr_set, offset,
-                                         extack['bad-attr-offs'])
-         if path:
-             del extack['bad-attr-offs']
-             extack['bad-attr'] = path
+     def _decode_array_nest(self, attr, attr_spec):
+@@ -715,7 +701,7 @@ class YnlFamily(SpecFamily):
+                 if m.enum:
+                     value = self._decode_enum(value, m)
+                 elif m.display_hint:
+-                    value = NlAttr.formatted_string(value, m.display_hint)
++                    value = self._formatted_string(value, m.display_hint)
+                 attrs[m.name] = value
+         return attrs
  
--    def _fixed_header_size(self, name):
-+    def _struct_size(self, name):
-         if name:
--            fixed_header_members = self.consts[name].members
-+            members = self.consts[name].members
-             size = 0
--            for m in fixed_header_members:
-+            for m in members:
-                 if m.type in ['pad', 'binary']:
-                     size += m.len
-                 else:
+@@ -738,6 +724,19 @@ class YnlFamily(SpecFamily):
+                 attr_payload += format.pack(value)
+         return attr_payload
+ 
++    def _formatted_string(self, raw, display_hint):
++        if display_hint == 'mac':
++            formatted = ':'.join('%02x' % b for b in raw)
++        elif display_hint == 'hex':
++            formatted = bytes.hex(raw, ' ')
++        elif display_hint in [ 'ipv4', 'ipv6' ]:
++            formatted = format(ipaddress.ip_address(raw))
++        elif display_hint == 'uuid':
++            formatted = str(uuid.UUID(bytes=raw))
++        else:
++            formatted = raw
++        return formatted
++
+     def handle_ntf(self, decoded):
+         msg = dict()
+         if self.include_raw:
 -- 
 2.42.0
 
