@@ -1,105 +1,161 @@
-Return-Path: <netdev+bounces-66700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 319ED840539
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:44:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B23E784053F
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:45:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 633B91C226FB
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 12:44:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F2FCB21624
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 12:45:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DB8361673;
-	Mon, 29 Jan 2024 12:43:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C297612F6;
+	Mon, 29 Jan 2024 12:45:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ADpsDb1y"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eB9SiH5l"
 X-Original-To: netdev@vger.kernel.org
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F36F61667;
-	Mon, 29 Jan 2024 12:43:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.111.4.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87B84612CD
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 12:45:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706532232; cv=none; b=DFDBS6xZvHmdBOGUtuFTnqhdejHPrRc+jVLRlx4V37RFDJWFbeK9pMNCKiMypVzvaAH5V8ZQiPDFw9ZMHnO55+qwBvZGt+rgYTwUk4mvEDvgJEFONDaj+X5h3V4DlKMpyJ2d4dKAr1Z6KNxFYJrL1hfYSPFUmL6Hcoa27rNaTWk=
+	t=1706532313; cv=none; b=NoWFgrWKntXSLbPqzNoT/xXtxI3bswNdYcx4qudexc05X59VdxbuaexkuFw/iCpddbgdovoCsXpfDaHfMWM2CRtJuQMpfBrVU0TB9UZ/oHvfqjPOu415MvKskq4RSYipe9ylzuhd8gQvTpcL1eS9YGaLrHn13LLQUfCXafiYMa8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706532232; c=relaxed/simple;
-	bh=8JHvl0H6ZLu9gZtMeor/rCKrEwR+9VVtAw5oJL9w5tQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UDgMM2iZUZOaEeIRBAffL+fVxlCT/VgMucIVNp96spH7L5TA6+m71Oj0EUGtzPGTH/DEhn8uuF1fz+ZZZW71lj4NSU/h/qZNuaEg1M0HUUO5bALhIZsPN5p3pfiVG/KlnR1YvYeqqTHDT1YBAuLEcKxo9OZOJ47bwX20CQMmeR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ADpsDb1y; arc=none smtp.client-ip=66.111.4.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
-	by mailout.nyi.internal (Postfix) with ESMTP id 255FB5C00AE;
-	Mon, 29 Jan 2024 07:43:49 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute4.internal (MEProxy); Mon, 29 Jan 2024 07:43:49 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1706532229; x=1706618629; bh=bp/pipxnwgOmSTkoS3C9RemBsqQz
-	I/iQDFUJKf+Dm38=; b=ADpsDb1yJZOAOyio1BZdHAl1bXVKZzRd/RcwZtWQjuLh
-	Hg6KxNDgsf5teDxr40wAHopm+Nh/J5AJeKWSg8oh4rLCiNOLzSLu7eJP/jC24cGB
-	R6hFy0nyglgQLUlMzklrM+Qw6IIAxxMI2asiaSDKglfamDURpUGSV3oVBPLA7187
-	MZ4CjwKxBfbiJ6SXQlR7HTbpBAZdEGquQjXSC78AnHn7tBC437f3Sm1+0qoQGvIt
-	fuj2DVSgowfy0iFLhRA/Z00yYt+DejqPtyL5li103iRTAvR7kfPrAuBQO6j6aU/O
-	qjwX+q+gKQ2kU9P93Q7iE64Swl0MyFp/hyxG18zKdA==
-X-ME-Sender: <xms:hJ23ZUozl30O0ZFM4eXmOJG7oIpF7EhmILr_T1lT4DrT3s4zt83D2w>
-    <xme:hJ23Zapuow25JEspZ9WQUxd-ohKoUo20VODBUL0U2tY2O1kauv8jlTbGrTs-jgtnH
-    7Zi14fyIImsu7s>
-X-ME-Received: <xmr:hJ23ZZMyGww3GCOZ2KYP9EcWmx2imACrgJRCna6ij10h4ygRoHAyxch2sLOS>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrfedtgedgfeegucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfhfgggtuggjsehttd
-    ertddttddvnecuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihgu
-    ohhstghhrdhorhhgqeenucggtffrrghtthgvrhhnpeehhfdtjedviefffeduuddvffegte
-    eiieeguefgudffvdfftdefheeijedthfejkeenucffohhmrghinhepkhgvrhhnvghlrdho
-    rhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepih
-    guohhstghhsehiughoshgthhdrohhrgh
-X-ME-Proxy: <xmx:hJ23Zb4GbPVxa__XK5y0pezgXF9WM3si31bC_4n8SFKz9I8psP7JTw>
-    <xmx:hJ23ZT5XecQ8L2BPKVZ4UcaEM_6Xe7t-lPRZDIs-TjJYMhu-phdC0Q>
-    <xmx:hJ23Zbh1Gl5aDcA7sNgg9G47NSEp9A6Po9WZCr60SI0tqKhldijdKg>
-    <xmx:hZ23ZQjvdjhgmhCtA7nGMob_foW74g1CwXof3ZGHYHvqLZ4zTf7ySw>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 29 Jan 2024 07:43:48 -0500 (EST)
-Date: Mon, 29 Jan 2024 14:43:46 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"netdev-driver-reviewers@vger.kernel.org" <netdev-driver-reviewers@vger.kernel.org>
-Subject: Re: [ANN] net-next is OPEN
-Message-ID: <ZbedgjUqh8cGGcs3@shredder>
-References: <20240122091612.3f1a3e3d@kernel.org>
+	s=arc-20240116; t=1706532313; c=relaxed/simple;
+	bh=xt7U0pXOWeoRr1tS+yqHOjKUB1zGPQaEq9j9juQ83wg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=uD5zrUggESASKOL2IG96uCPl+RjmuyHciHHlaNiTMxTtr2lqI2UYIx6KU0y7Jmsk3bywLLNKkSqthb577Bkm5z1ZlZ9Ya2rEF7k+a4O3l/A14XXNP/LBaOGJOUJUSTnqfizBhPoNg68JwwzX03kRssoecjwUjPiEQYcv8J7gEeY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eB9SiH5l; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706532310;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zOHq5R6RS4aXuEAbxphuLTS1ANe6B3awYdbO/5rbdCc=;
+	b=eB9SiH5lwjGbOgCvjvUoTtU4rn1uSj1Bdcd3WpI7IuT5jRqi/CgNA55ZAhksZOyc+IWVNJ
+	OfsZHq777mjJ2QQR2ohbut0s7Baxqsd7Vvx8KmMuLRlo4vEShVToxcE8dt6oA0DMzc4oKS
+	xiaUc8jH3kh/oLfxCiqrYufZ1G/6fEQ=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-584-PDd1ZZOvOem5IlJj6lAa3Q-1; Mon, 29 Jan 2024 07:45:09 -0500
+X-MC-Unique: PDd1ZZOvOem5IlJj6lAa3Q-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5102ed61056so1354358e87.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 04:45:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706532307; x=1707137107;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zOHq5R6RS4aXuEAbxphuLTS1ANe6B3awYdbO/5rbdCc=;
+        b=KYZgAvtJ89bZa/OVspHwWgcJfcpG6aFpTeq11NLB4pmmy0DMtzDLpbj84WKWBmplT0
+         7M6mo65hA0X+yvlUmuR7CBJY6/w/1PGXwVdGpKzpvI8co6VoQpBUWx0s3ObQkGpU3dyl
+         QBZqeqfZFQiyAqpFd5VEI9bJd1tuHwEto1AcA7b8pccmqw0jzYJFmap1mNduA8LzYZSf
+         MfpWRluBGAZJEJaWxQz/9qh1xow2tkSiZ5/NzMKM5vl30V39MkHI5GVRl7xhehdXqaL9
+         TR05No5x4N8dKHYQ0z/AzUG0dixBe3Pqnd6h+XjKfqf3YCAPl7B3HfnnauJlb1GKWygU
+         r+2w==
+X-Gm-Message-State: AOJu0Yy+RwcnYX5ZlzKJUp4GNMICED9YDC3m8UmPK4y6zQUMF2HJ6PY+
+	zYYNRalnVXlbzSwrQGzQVcU5VGvmVxtC/FMHDQ1y9opW1wDB1j4MwjuieutZkhOlkVrlBjUDZu0
+	xUUrImj+J4kniMK1MJbnhIb2J0GV9FySG8XunBwI2mSRvuqxNJ297Sw==
+X-Received: by 2002:ac2:5b9a:0:b0:50e:6878:a70b with SMTP id o26-20020ac25b9a000000b0050e6878a70bmr3644049lfn.54.1706532307602;
+        Mon, 29 Jan 2024 04:45:07 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFlRyML/Bn6KOOjb+UGIG8m2q4PMeg13vqJyOVWC4pRq2gvGLPhWpCR7POZDHx5VHoKK6YK0w==
+X-Received: by 2002:ac2:5b9a:0:b0:50e:6878:a70b with SMTP id o26-20020ac25b9a000000b0050e6878a70bmr3644037lfn.54.1706532307273;
+        Mon, 29 Jan 2024 04:45:07 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id cf12-20020a170906b2cc00b00a2c467ec72bsm3905386ejb.60.2024.01.29.04.45.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jan 2024 04:45:07 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 70771108A01A; Mon, 29 Jan 2024 13:45:06 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org
+Cc: lorenzo.bianconi@redhat.com, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, bpf@vger.kernel.org,
+ willemdebruijn.kernel@gmail.com, jasowang@redhat.com, sdf@google.com,
+ hawk@kernel.org, ilias.apalodimas@linaro.org
+Subject: Re: [PATCH v6 net-next 1/5] net: add generic per-cpu page_pool
+ allocator
+In-Reply-To: <5b0222d3df382c22fe0fa96154ae7b27189f7ecd.1706451150.git.lorenzo@kernel.org>
+References: <cover.1706451150.git.lorenzo@kernel.org>
+ <5b0222d3df382c22fe0fa96154ae7b27189f7ecd.1706451150.git.lorenzo@kernel.org>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Mon, 29 Jan 2024 13:45:06 +0100
+Message-ID: <87jzns1f71.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240122091612.3f1a3e3d@kernel.org>
+Content-Type: text/plain
 
-On Mon, Jan 22, 2024 at 09:16:12AM -0800, Jakub Kicinski wrote:
-> If you authored any net or drivers/net selftests, please look around
-> and see if they are passing. If not - send patches or LMK what I need
-> to do to make them pass on the runner.. Make sure to scroll down to 
-> the "Not reporting to patchwork" section.
+Lorenzo Bianconi <lorenzo@kernel.org> writes:
 
-selftests-net/test-bridge-neigh-suppress-sh should be fixed by:
+> Introduce generic percpu page_pools allocator.
+> Moreover add page_pool_create_percpu() and cpuid filed in page_pool struct
+> in order to recycle the page in the page_pool "hot" cache if
+> napi_pp_put_page() is running on the same cpu.
+> This is a preliminary patch to add xdp multi-buff support for xdp running
+> in generic mode.
+>
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  include/net/page_pool/types.h |  3 +++
+>  net/core/dev.c                | 40 +++++++++++++++++++++++++++++++++++
+>  net/core/page_pool.c          | 23 ++++++++++++++++----
+>  net/core/skbuff.c             |  5 +++--
+>  4 files changed, 65 insertions(+), 6 deletions(-)
+>
+> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+> index 76481c465375..3828396ae60c 100644
+> --- a/include/net/page_pool/types.h
+> +++ b/include/net/page_pool/types.h
+> @@ -128,6 +128,7 @@ struct page_pool_stats {
+>  struct page_pool {
+>  	struct page_pool_params_fast p;
+>  
+> +	int cpuid;
+>  	bool has_init_callback;
+>  
+>  	long frag_users;
+> @@ -203,6 +204,8 @@ struct page *page_pool_alloc_pages(struct page_pool *pool, gfp_t gfp);
+>  struct page *page_pool_alloc_frag(struct page_pool *pool, unsigned int *offset,
+>  				  unsigned int size, gfp_t gfp);
+>  struct page_pool *page_pool_create(const struct page_pool_params *params);
+> +struct page_pool *page_pool_create_percpu(const struct page_pool_params *params,
+> +					  int cpuid);
+>  
+>  struct xdp_mem_info;
+>  
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index cb2dab0feee0..bf9ec740b09a 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -153,6 +153,8 @@
+>  #include <linux/prandom.h>
+>  #include <linux/once_lite.h>
+>  #include <net/netdev_rx_queue.h>
+> +#include <net/page_pool/types.h>
+> +#include <net/page_pool/helpers.h>
+>  
+>  #include "dev.h"
+>  #include "net-sysfs.h"
+> @@ -442,6 +444,8 @@ static RAW_NOTIFIER_HEAD(netdev_chain);
+>  DEFINE_PER_CPU_ALIGNED(struct softnet_data, softnet_data);
+>  EXPORT_PER_CPU_SYMBOL(softnet_data);
+>  
+> +DEFINE_PER_CPU_ALIGNED(struct page_pool *, page_pool);
 
-dnf install ndisc6
+I think we should come up with a better name than just "page_pool" for
+this global var. In the code below it looks like it's a local variable
+that's being referenced. Maybe "global_page_pool" or "system_page_pool"
+or something along those lines?
 
-selftests-net/test-bridge-backup-port-sh should be fixed by:
+-Toke
 
-https://lore.kernel.org/netdev/20240129123703.1857843-1-idosch@nvidia.com/
-
-selftests-net/drop-monitor-tests-sh should be fixed by:
-
-dnf install dropwatch
 
