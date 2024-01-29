@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-66734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24ABD8406F9
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 14:31:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF65384070C
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 14:34:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6552291E12
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:31:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E3041C21E0F
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5883634E6;
-	Mon, 29 Jan 2024 13:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BD8464CFF;
+	Mon, 29 Jan 2024 13:34:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="wl2qKrAS"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ymukBF1m"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C25C867732;
-	Mon, 29 Jan 2024 13:29:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7578A64CF8;
+	Mon, 29 Jan 2024 13:34:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706534967; cv=none; b=Noy0XNvDpI7Gwfsi5POqDtBwuaPJDOAfzOmHFWyPSh58fDJklGu+lJXf4z036a6Ti+uDCWGZp32HKWUrv4Ua5g8ov6PQFQ9monOmsknu5p3kZaCadeaa2DT50f5Qyy3rXOL4gTnMKxDbyEb9X5H3e+I8HsvVs9uLefhKteMv+V4=
+	t=1706535277; cv=none; b=VnZDzGZC3rW1bIdTmeVxcIZhuhsW8h+TZNB+YG0FX1ag8/5xCYlD3dEzsrU4asfs1VD5/S1qUpn5JZEh2gV/+9WFeovK/a5FpvvCpYi+beiJMJnAky2NJRhPXkQ/+w9p05DMExoc9CwklwgjD8USb8QGbxJ0zF2OQ/r/++EIv5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706534967; c=relaxed/simple;
-	bh=b1pZyK7FsCUmhPlvju8roc6IUuWpgZNleb3xFjmFVeo=;
+	s=arc-20240116; t=1706535277; c=relaxed/simple;
+	bh=/v6jv4eq+mfToHNxJ6RHn6Z5EZCjZlX7IDopru1EQvc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NawWaP1De/cfsgGizZnKYLLd7Nz+sY0TSAy3S7MCzwsPquaMaI+fzCf2x6vNclaLsI5+3iUYGiO4tzRgr5xfP28AgSYxOxD7zxIXLN98wnl758VUcd0AqNSe+TLY6O58Gjt/wt5HM8nLbQGr4N1nas1d66wK8k1u6azgZ9LYmUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=wl2qKrAS; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=dZx/LVUhZlTrc60lxiBFEkaDnRgU+gLckNc5TtraDLOEya04CITZdv8wMSR6Ksdoz6TZl5lnAhZIrOHFiin5vkb0ovxkZ3iSrYAjMSK1UYl1gIzyvxskLi6N8wZrkDlBNJeWMOwhbcX/iYNih0ZtiyewVlg3baeu6WPn80kr214=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ymukBF1m; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,23 +36,39 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=BK3kTu4rO51T+6hQ0GXL+VPtTV0TrbToYj9UeX6NjHI=; b=wl2qKrASfp/BvbBxyEVBLUfG3u
-	ykI+KQnWsL+wI8c9s7TpjzZCUrnpfB3ZAUGyH0T/myQ8773F0GoMV100LR7FlWQF3UvVLgTxCDAQp
-	xbt2ZG4lQtplPSlSKcLiFVr+62ZNmVg+MBcgXJ1t1HnaHcrcBf7Yq04WaHlyaWgrUdYA=;
+	bh=Sw+Uc8eIUTOSmcpYyqc0Pr30gRLyGicqOuK7mBwSw0Y=; b=ymukBF1mJOtwGiyHpcUelZv6sQ
+	63xYTF/lfTF2ATMCsUEPgXODnKa2XIWjBFZp9W1OF7lNIViDmsczfg9EbE+TbJylYFdmCP2i9GXWr
+	onVSVf6tp4Kv6vkPtgi+ap0JxlJwIuZSZdhIAXpZ//2ikqatf1QUXT0Gf37wHTE0QeRc=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rURhO-006Nix-ME; Mon, 29 Jan 2024 14:29:18 +0100
-Date: Mon, 29 Jan 2024 14:29:18 +0100
+	id 1rURmB-006NkS-Kr; Mon, 29 Jan 2024 14:34:15 +0100
+Date: Mon, 29 Jan 2024 14:34:15 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Andre Werner <andre.werner@systec-electronic.com>
-Cc: hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [RFC net-next v4 1/2] net: phy: phy_device: Prevent nullptr
- exceptions on ISR
-Message-ID: <57ea16c1-530b-40c9-8f94-973c9595923c@lunn.ch>
-References: <20240121201511.8997-1-andre.werner@systec-electronic.com>
- <20240121201511.8997-2-andre.werner@systec-electronic.com>
+To: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Samin Guo <samin.guo@starfivetech.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+Subject: Re: [PATCH v4 1/2] dt-bindings: net: starfive,jh7110-dwmac: Add
+ JH7100 SoC compatible
+Message-ID: <56f3bd3c-c099-405b-837b-16d8aeb4cc4b@lunn.ch>
+References: <20240126191319.1209821-1-cristian.ciocaltea@collabora.com>
+ <20240126191319.1209821-2-cristian.ciocaltea@collabora.com>
+ <0a6f6dcb-18b0-48d5-8955-76bce0e1295d@linaro.org>
+ <e29ae12b-5823-4fba-8029-e8e490462138@collabora.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,16 +77,23 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240121201511.8997-2-andre.werner@systec-electronic.com>
+In-Reply-To: <e29ae12b-5823-4fba-8029-e8e490462138@collabora.com>
 
-On Sun, Jan 21, 2024 at 08:54:48PM +0100, Andre Werner wrote:
-> If phydev->irq is set unconditionally, check
-> for valid interrupt handler or fall back to polling mode to prevent
-> nullptr exceptions in interrupt service routine.
+> > Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 > 
-> Signed-off-by: Andre Werner <andre.werner@systec-electronic.com>
+> Thank you for the review!
+> 
+> Could you please apply it to the RESEND version [1] instead, as this one 
+> had an issue collecting the latest tags, as indicated in [2].
+> 
+> Regards,
+> Cristian
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Hi Cristian
 
-    Andrew
+IT is your job as developers to collect together such reviewed-by:
+tags add apply them to the latest version. So long as there are no
+major changes, they are still consider applicable.
+
+	 Andrew
 
