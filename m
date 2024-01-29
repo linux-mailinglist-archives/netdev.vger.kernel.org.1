@@ -1,100 +1,78 @@
-Return-Path: <netdev+bounces-66771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70DFB8409C5
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:22:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B91E8409E8
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:29:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F004A1F22C10
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 15:22:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56D331C226C8
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 15:29:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B8B9153512;
-	Mon, 29 Jan 2024 15:22:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE49C153BC7;
+	Mon, 29 Jan 2024 15:29:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="HmA/JxQ2";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="79asHS5e";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="Xd4VoyPF";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="lA4JvDbm"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="n/FsBQcO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3A60153500;
-	Mon, 29 Jan 2024 15:22:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894EC153502;
+	Mon, 29 Jan 2024 15:29:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706541726; cv=none; b=Yjmq5U3H076NXrapl3G+eeXC0ldnszktJNh4Pv2BGjuroGOj3sts/3i3OHg7fRt17VSwaMOF3SHhfJHBfx/npi6YU6VrRKcqN0kLqBrQcYB73XcQL3D0wqkvmFCbwT3okj5Ssxk/doPvfyzv1iXugbuKQffD/cI7ElO+5RiX9Rg=
+	t=1706542167; cv=none; b=hCl8aoGKykAnc8wIFsGxWDNhCWUzBOBYUguasIxqXrzhwT/e+kTZ/Kmp09jocavdP23wUy+37qvRkvj/aHK7hZxnSzC06ZJvW1SQl71ug1RLK5FFKFRyNiAdUoG/3I4EVkfDQ3++Cd/DztVfVnKzuxEDm/bDO8311cc0Ij7fNh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706541726; c=relaxed/simple;
-	bh=/u7yXK6pKxgNrbYc1C4sFX/A8nwLrqK9V9ngyk83kTo=;
+	s=arc-20240116; t=1706542167; c=relaxed/simple;
+	bh=temvw+fKuDYFx07W/PqfCRAulSyTIn2NnJqhzpa3B60=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sHjwwKPRYZ+aJo1bhNLLo/YALOboxXugUBh+BnnNETGCektn20DBUiKV8/Q3CCS3laEGDFmmI2AGIckrG/nQ3+bu5trdkiqTqiVprUWpEDdQtKAF/GUE8Ed8ur1mKBJiY+2svIppzB/SJ9wby5b/iGPD7/S1s1FJzpU26zr2fY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=HmA/JxQ2; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=79asHS5e; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=Xd4VoyPF; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=lA4JvDbm; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 1AD94216ED;
-	Mon, 29 Jan 2024 15:22:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1706541722; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=03pj/0PXBIlRKMN1CP7MRdO6/XgIj2+x8GVXnnQRLBA=;
-	b=HmA/JxQ2VOeOnvHtU0oM+c6PK2w9s2EPq63d74NtPLLX4aButnX0tqnhV2+iBSmYrPymC2
-	M/h8HAV333kNKuE1rNOUMxzoI6ODNjZnzoLv7wggc4GVDXLwY70pcWA9jO/EBnPaEOlftH
-	cilNX7kdGLN9avqkiOW0YUTGc9odMhk=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1706541722;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=03pj/0PXBIlRKMN1CP7MRdO6/XgIj2+x8GVXnnQRLBA=;
-	b=79asHS5evxqzUqmpEKgB4UK4ZsSF9ccbORalo5Qar0zxHGflEYXIWWC3YtuLKEB3QX36tu
-	0jI1LeN7PIgfdoBw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1706541720; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=03pj/0PXBIlRKMN1CP7MRdO6/XgIj2+x8GVXnnQRLBA=;
-	b=Xd4VoyPFMlxZmP19+nUERbBkuBekYr58PiNqYE3alYswRp0yO3uPJOnrBxd4hUeSdGWUCJ
-	RIYeA2THp7B8884zCm9LyQUU6lJjmXLV3pyV27OHb2/navr2+dskypy55f9xxpC2lvcBz7
-	WKJo/ZywGpsUS9BgtrIxUXF+f3lt8sw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1706541720;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=03pj/0PXBIlRKMN1CP7MRdO6/XgIj2+x8GVXnnQRLBA=;
-	b=lA4JvDbmIusZESsX+JFu9UrLB+3Br8WXWn+rAEeD6HA4EQaxne1Y513Q2RsoTiy9I9cX2w
-	bAEXXFXyo8d5vjDA==
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 0D4C713911;
-	Mon, 29 Jan 2024 15:22:00 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id 7047A5jCt2UPGQAAn2gu4w
-	(envelope-from <jack@suse.cz>); Mon, 29 Jan 2024 15:22:00 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 87346A0807; Mon, 29 Jan 2024 16:21:59 +0100 (CET)
-Date: Mon, 29 Jan 2024 16:21:59 +0100
-From: Jan Kara <jack@suse.cz>
-To: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-fsdevel@vgerkernel.org, peterz@infradead.org,
-	boqun.feng@gmail.com, Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>
-Subject: Re: [PATCH 1/4] fs/pipe: Convert to lockdep_cmp_fn
-Message-ID: <20240129152159.ija7oppzsw7nf4oi@quack3>
-References: <20240127020111.487218-1-kent.overstreet@linux.dev>
- <20240127020111.487218-2-kent.overstreet@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GDtdKdVkDDYZXyf4QehpGk2zwB91dpWMiqDwMZsc47tCCVB/U4xjAhmMrqZ7X9Auw6pulyeK5nb+O3PwbyhVjRPBy3grQ7PzNUjk57jfkBjfOEjosMFIOI14Vy8goUAkmJ/nwXR9qHZtfMXNwmjCG3twps8MjAN/S3OIphfqCtk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=n/FsBQcO; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=byNfiL/pkoggyG/+oatuw7eueKrFjxfS3K9FZq27IAg=; b=n/FsBQcOafh31HIhCxKunlMYhY
+	BINs0xUg+zirDh74DZomBMBrgPTUg6s+YKFk/eyPkCDp/foDwi2JN6quuX1kkblEZiSbOzXZpnlhP
+	4ghCJVX3y19TyJLpl+W3QY5JDnD9jcKr+o01DYgJzsz6Qek3YsJcsL41l1McDcFMbpBY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rUTZP-006OKZ-UE; Mon, 29 Jan 2024 16:29:11 +0100
+Date: Mon, 29 Jan 2024 16:29:11 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Jie Luo <quic_luoj@quicinc.com>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Robert Marko <robert.marko@sartura.hr>,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Subject: Re: [net-next PATCH 0/3] net: mdio-ipq4019: fix wrong default MDC
+ rate
+Message-ID: <df0e0ddc-4134-41d0-94f4-aba1186f0ede@lunn.ch>
+References: <20240124213640.7582-1-ansuelsmth@gmail.com>
+ <53445feb-a02c-4859-a993-ccf957208115@quicinc.com>
+ <f8a9e328-5284-4f24-be5d-7e9804869ecd@lunn.ch>
+ <5d778fc0-864c-4e91-9722-1e39551ffc45@quicinc.com>
+ <CAA8EJppUGH1pMg579nJmG2iTHGsOJdgDL93kfOvKofANTGGdHw@mail.gmail.com>
+ <65b3ecd7.050a0220.9e26c.0d9e@mx.google.com>
+ <cdd0e481-2738-465b-9ef8-b7ab79981fbe@quicinc.com>
+ <65b7b565.170a0220.2666a.0d2b@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,324 +81,76 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240127020111.487218-2-kent.overstreet@linux.dev>
-X-Spam-Level: 
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=Xd4VoyPF;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=lA4JvDbm
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-2.51 / 50.00];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:98:from];
-	 TO_DN_SOME(0.00)[];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_TRACE(0.00)[suse.cz:+];
-	 MX_GOOD(-0.01)[];
-	 RCPT_COUNT_SEVEN(0.00)[9];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 BAYES_HAM(-3.00)[100.00%];
-	 ARC_NA(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 FROM_HAS_DN(0.00)[];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 TAGGED_RCPT(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,suse.cz:email,suse.com:email,colorfullife.com:email,linux.dev:email,linux.org.uk:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 MID_RHS_NOT_FQDN(0.50)[];
-	 FREEMAIL_CC(0.00)[vger.kernel.org,vgerkernel.org,infradead.org,gmail.com,zeniv.linux.org.uk,kernel.org,suse.cz];
-	 RCVD_TLS_ALL(0.00)[];
-	 SUSPICIOUS_RECIPS(1.50)[]
-X-Spam-Score: -2.51
-X-Rspamd-Queue-Id: 1AD94216ED
-X-Spam-Flag: NO
+In-Reply-To: <65b7b565.170a0220.2666a.0d2b@mx.google.com>
 
-On Fri 26-01-24 21:01:05, Kent Overstreet wrote:
-> *_lock_nested() is fundamentally broken; lockdep needs to check lock
-> ordering, but we cannot device a total ordering on an unbounded number
-> of elements with only a few subclasses.
+On Mon, Jan 29, 2024 at 03:25:09PM +0100, Christian Marangi wrote:
+> On Mon, Jan 29, 2024 at 09:59:03PM +0800, Jie Luo wrote:
+> > 
+> > 
+> > On 1/27/2024 1:33 AM, Christian Marangi wrote:
+> > > On Fri, Jan 26, 2024 at 07:20:03PM +0200, Dmitry Baryshkov wrote:
+> > > > On Fri, 26 Jan 2024 at 18:03, Jie Luo <quic_luoj@quicinc.com> wrote:
+> > > > > 
+> > > > > 
+> > > > > 
+> > > > > On 1/26/2024 1:18 AM, Andrew Lunn wrote:
+> > > > > > > Hi Christian,
+> > > > > > > Just a gentle reminder.
+> > > > > > > 
+> > > > > > > The MDIO frequency config is already added by the following patch series.
+> > > > > > > https://lore.kernel.org/netdev/28c8b31c-8dcb-4a19-9084-22c77a74b9a1@linaro.org/T/#m840cb8d269dca133c3ad3da3d112c63382ec2058
+> > > > > > 
+> > > > > > I admit this version was posted first. However, its embedded in a
+> > > > > > patch series which is not making much progress, and i doubt will make
+> > > > > > progress any time soon.
+> > > > > > 
+> > > > > > If you really want your version to be used, please split it out into a
+> > > > > > standalone patch series adding just MDIO clock-frequency support, with
+> > > > > > its binding, and nothing else.
+> > > > > > 
+> > > > > >       Andrew
+> > > > > 
+> > > > > Hi Andrew,
+> > > > > We will rework the patch series to include only MDIO frequency related
+> > > > > function and frequency dt binding, and post the updated patch series
+> > > > > on th/Tuesdae Mondayy of next week. We will work with Christian to
+> > > > > ensure he can re-use this patch as well.
+> > > > 
+> > > > Can you do the other way around: rebase your patches on top of Chritian's work?
+> > 
+> > Hi Dmitry,
+> > Sure, we can take this approach if fine by Andrew as well.
+> > 
+> > > > 
+> > > 
+> > > Would be ideal, also I have to send v2 that handle the 802.3 suggested
+> > > MDC rate (ready I just need to send after this has been handled).
+> > > 
+> > > Also I can see some problem with Lui patch where thse divior
+> > > value is not reapplied after MDIO reset effectively reverting to the
+> > > default value.
+> > 
+> > Hi Christian,
+> > In my version, the divisor is programmed in every MDIO operation and hence I
+> > did not add the code to revert to configured value in reset function. But
+> > sure. we can program it once during the probe/reset and avoid doing it
+> > during read/write ops.
+> > 
+> > In addition, the MDIO divisor 1, 2 and 4 are not supported by the MDIO
+> > hardware block, maybe we can remove these macros to avoid confusion, or add
+> > a comment mentioning that these are not supported.
+> >
 > 
-> the replacement is to define lock ordering with a proper comparison
-> function.
-> 
-> fs/pipe.c was already doing everything correctly otherwise, nothing
-> much changes here.
-> 
-> Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-> Cc: Christian Brauner <brauner@kernel.org>
-> Cc: Jan Kara <jack@suse.cz>
-> Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
+> Hi, thanks for confirming it! In v2 I already changed the logic to start
+> looping from divisor 8 and added comments in DT and driver about not
+> assuring correct funcionality with those divisor.
 
-Looks good to me. Feel free to add:
+Hi Christian
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+Lets go with your version. Please post V2 whenever you are ready.
 
-								Honza
+Jie, please spend some time reviewing to patches, make any comments
+you have, and if everything is O.K, you can add a Reviewed-by:
 
-
-> ---
->  fs/pipe.c | 81 +++++++++++++++++++++++++------------------------------
->  1 file changed, 36 insertions(+), 45 deletions(-)
-> 
-> diff --git a/fs/pipe.c b/fs/pipe.c
-> index f1adbfe743d4..50c8a8596b52 100644
-> --- a/fs/pipe.c
-> +++ b/fs/pipe.c
-> @@ -76,18 +76,20 @@ static unsigned long pipe_user_pages_soft = PIPE_DEF_BUFFERS * INR_OPEN_CUR;
->   * -- Manfred Spraul <manfred@colorfullife.com> 2002-05-09
->   */
->  
-> -static void pipe_lock_nested(struct pipe_inode_info *pipe, int subclass)
-> +#define cmp_int(l, r)		((l > r) - (l < r))
-> +
-> +#ifdef CONFIG_PROVE_LOCKING
-> +static int pipe_lock_cmp_fn(const struct lockdep_map *a,
-> +			    const struct lockdep_map *b)
->  {
-> -	if (pipe->files)
-> -		mutex_lock_nested(&pipe->mutex, subclass);
-> +	return cmp_int((unsigned long) a, (unsigned long) b);
->  }
-> +#endif
->  
->  void pipe_lock(struct pipe_inode_info *pipe)
->  {
-> -	/*
-> -	 * pipe_lock() nests non-pipe inode locks (for writing to a file)
-> -	 */
-> -	pipe_lock_nested(pipe, I_MUTEX_PARENT);
-> +	if (pipe->files)
-> +		mutex_lock(&pipe->mutex);
->  }
->  EXPORT_SYMBOL(pipe_lock);
->  
-> @@ -98,28 +100,16 @@ void pipe_unlock(struct pipe_inode_info *pipe)
->  }
->  EXPORT_SYMBOL(pipe_unlock);
->  
-> -static inline void __pipe_lock(struct pipe_inode_info *pipe)
-> -{
-> -	mutex_lock_nested(&pipe->mutex, I_MUTEX_PARENT);
-> -}
-> -
-> -static inline void __pipe_unlock(struct pipe_inode_info *pipe)
-> -{
-> -	mutex_unlock(&pipe->mutex);
-> -}
-> -
->  void pipe_double_lock(struct pipe_inode_info *pipe1,
->  		      struct pipe_inode_info *pipe2)
->  {
->  	BUG_ON(pipe1 == pipe2);
->  
-> -	if (pipe1 < pipe2) {
-> -		pipe_lock_nested(pipe1, I_MUTEX_PARENT);
-> -		pipe_lock_nested(pipe2, I_MUTEX_CHILD);
-> -	} else {
-> -		pipe_lock_nested(pipe2, I_MUTEX_PARENT);
-> -		pipe_lock_nested(pipe1, I_MUTEX_CHILD);
-> -	}
-> +	if (pipe1 > pipe2)
-> +		swap(pipe1, pipe2);
-> +
-> +	pipe_lock(pipe1);
-> +	pipe_lock(pipe2);
->  }
->  
->  static void anon_pipe_buf_release(struct pipe_inode_info *pipe,
-> @@ -271,7 +261,7 @@ pipe_read(struct kiocb *iocb, struct iov_iter *to)
->  		return 0;
->  
->  	ret = 0;
-> -	__pipe_lock(pipe);
-> +	mutex_lock(&pipe->mutex);
->  
->  	/*
->  	 * We only wake up writers if the pipe was full when we started
-> @@ -368,7 +358,7 @@ pipe_read(struct kiocb *iocb, struct iov_iter *to)
->  			ret = -EAGAIN;
->  			break;
->  		}
-> -		__pipe_unlock(pipe);
-> +		mutex_unlock(&pipe->mutex);
->  
->  		/*
->  		 * We only get here if we didn't actually read anything.
-> @@ -400,13 +390,13 @@ pipe_read(struct kiocb *iocb, struct iov_iter *to)
->  		if (wait_event_interruptible_exclusive(pipe->rd_wait, pipe_readable(pipe)) < 0)
->  			return -ERESTARTSYS;
->  
-> -		__pipe_lock(pipe);
-> +		mutex_lock(&pipe->mutex);
->  		was_full = pipe_full(pipe->head, pipe->tail, pipe->max_usage);
->  		wake_next_reader = true;
->  	}
->  	if (pipe_empty(pipe->head, pipe->tail))
->  		wake_next_reader = false;
-> -	__pipe_unlock(pipe);
-> +	mutex_unlock(&pipe->mutex);
->  
->  	if (was_full)
->  		wake_up_interruptible_sync_poll(&pipe->wr_wait, EPOLLOUT | EPOLLWRNORM);
-> @@ -462,7 +452,7 @@ pipe_write(struct kiocb *iocb, struct iov_iter *from)
->  	if (unlikely(total_len == 0))
->  		return 0;
->  
-> -	__pipe_lock(pipe);
-> +	mutex_lock(&pipe->mutex);
->  
->  	if (!pipe->readers) {
->  		send_sig(SIGPIPE, current, 0);
-> @@ -582,19 +572,19 @@ pipe_write(struct kiocb *iocb, struct iov_iter *from)
->  		 * after waiting we need to re-check whether the pipe
->  		 * become empty while we dropped the lock.
->  		 */
-> -		__pipe_unlock(pipe);
-> +		mutex_unlock(&pipe->mutex);
->  		if (was_empty)
->  			wake_up_interruptible_sync_poll(&pipe->rd_wait, EPOLLIN | EPOLLRDNORM);
->  		kill_fasync(&pipe->fasync_readers, SIGIO, POLL_IN);
->  		wait_event_interruptible_exclusive(pipe->wr_wait, pipe_writable(pipe));
-> -		__pipe_lock(pipe);
-> +		mutex_lock(&pipe->mutex);
->  		was_empty = pipe_empty(pipe->head, pipe->tail);
->  		wake_next_writer = true;
->  	}
->  out:
->  	if (pipe_full(pipe->head, pipe->tail, pipe->max_usage))
->  		wake_next_writer = false;
-> -	__pipe_unlock(pipe);
-> +	mutex_unlock(&pipe->mutex);
->  
->  	/*
->  	 * If we do do a wakeup event, we do a 'sync' wakeup, because we
-> @@ -629,7 +619,7 @@ static long pipe_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
->  
->  	switch (cmd) {
->  	case FIONREAD:
-> -		__pipe_lock(pipe);
-> +		mutex_lock(&pipe->mutex);
->  		count = 0;
->  		head = pipe->head;
->  		tail = pipe->tail;
-> @@ -639,16 +629,16 @@ static long pipe_ioctl(struct file *filp, unsigned int cmd, unsigned long arg)
->  			count += pipe->bufs[tail & mask].len;
->  			tail++;
->  		}
-> -		__pipe_unlock(pipe);
-> +		mutex_unlock(&pipe->mutex);
->  
->  		return put_user(count, (int __user *)arg);
->  
->  #ifdef CONFIG_WATCH_QUEUE
->  	case IOC_WATCH_QUEUE_SET_SIZE: {
->  		int ret;
-> -		__pipe_lock(pipe);
-> +		mutex_lock(&pipe->mutex);
->  		ret = watch_queue_set_size(pipe, arg);
-> -		__pipe_unlock(pipe);
-> +		mutex_unlock(&pipe->mutex);
->  		return ret;
->  	}
->  
-> @@ -734,7 +724,7 @@ pipe_release(struct inode *inode, struct file *file)
->  {
->  	struct pipe_inode_info *pipe = file->private_data;
->  
-> -	__pipe_lock(pipe);
-> +	mutex_lock(&pipe->mutex);
->  	if (file->f_mode & FMODE_READ)
->  		pipe->readers--;
->  	if (file->f_mode & FMODE_WRITE)
-> @@ -747,7 +737,7 @@ pipe_release(struct inode *inode, struct file *file)
->  		kill_fasync(&pipe->fasync_readers, SIGIO, POLL_IN);
->  		kill_fasync(&pipe->fasync_writers, SIGIO, POLL_OUT);
->  	}
-> -	__pipe_unlock(pipe);
-> +	mutex_unlock(&pipe->mutex);
->  
->  	put_pipe_info(inode, pipe);
->  	return 0;
-> @@ -759,7 +749,7 @@ pipe_fasync(int fd, struct file *filp, int on)
->  	struct pipe_inode_info *pipe = filp->private_data;
->  	int retval = 0;
->  
-> -	__pipe_lock(pipe);
-> +	mutex_lock(&pipe->mutex);
->  	if (filp->f_mode & FMODE_READ)
->  		retval = fasync_helper(fd, filp, on, &pipe->fasync_readers);
->  	if ((filp->f_mode & FMODE_WRITE) && retval >= 0) {
-> @@ -768,7 +758,7 @@ pipe_fasync(int fd, struct file *filp, int on)
->  			/* this can happen only if on == T */
->  			fasync_helper(-1, filp, 0, &pipe->fasync_readers);
->  	}
-> -	__pipe_unlock(pipe);
-> +	mutex_unlock(&pipe->mutex);
->  	return retval;
->  }
->  
-> @@ -834,6 +824,7 @@ struct pipe_inode_info *alloc_pipe_info(void)
->  		pipe->nr_accounted = pipe_bufs;
->  		pipe->user = user;
->  		mutex_init(&pipe->mutex);
-> +		lock_set_cmp_fn(&pipe->mutex, pipe_lock_cmp_fn, NULL);
->  		return pipe;
->  	}
->  
-> @@ -1144,7 +1135,7 @@ static int fifo_open(struct inode *inode, struct file *filp)
->  	filp->private_data = pipe;
->  	/* OK, we have a pipe and it's pinned down */
->  
-> -	__pipe_lock(pipe);
-> +	mutex_lock(&pipe->mutex);
->  
->  	/* We can only do regular read/write on fifos */
->  	stream_open(inode, filp);
-> @@ -1214,7 +1205,7 @@ static int fifo_open(struct inode *inode, struct file *filp)
->  	}
->  
->  	/* Ok! */
-> -	__pipe_unlock(pipe);
-> +	mutex_unlock(&pipe->mutex);
->  	return 0;
->  
->  err_rd:
-> @@ -1230,7 +1221,7 @@ static int fifo_open(struct inode *inode, struct file *filp)
->  	goto err;
->  
->  err:
-> -	__pipe_unlock(pipe);
-> +	mutex_unlock(&pipe->mutex);
->  
->  	put_pipe_info(inode, pipe);
->  	return ret;
-> @@ -1411,7 +1402,7 @@ long pipe_fcntl(struct file *file, unsigned int cmd, unsigned int arg)
->  	if (!pipe)
->  		return -EBADF;
->  
-> -	__pipe_lock(pipe);
-> +	mutex_lock(&pipe->mutex);
->  
->  	switch (cmd) {
->  	case F_SETPIPE_SZ:
-> @@ -1425,7 +1416,7 @@ long pipe_fcntl(struct file *file, unsigned int cmd, unsigned int arg)
->  		break;
->  	}
->  
-> -	__pipe_unlock(pipe);
-> +	mutex_unlock(&pipe->mutex);
->  	return ret;
->  }
->  
-> -- 
-> 2.43.0
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+    Andrew
 
