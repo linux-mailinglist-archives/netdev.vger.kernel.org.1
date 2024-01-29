@@ -1,248 +1,177 @@
-Return-Path: <netdev+bounces-66648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1A75840136
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:18:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79988840148
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:20:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F0331F233B3
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:18:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E0FB282ADA
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6844E54FA9;
-	Mon, 29 Jan 2024 09:18:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB0EA55762;
+	Mon, 29 Jan 2024 09:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="ivw4DOmr"
 X-Original-To: netdev@vger.kernel.org
-Received: from air.basealt.ru (air.basealt.ru [194.107.17.39])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F22E654F93;
-	Mon, 29 Jan 2024 09:18:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 367A154FA9
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 09:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706519901; cv=none; b=aSyXcbnywSM/V4ib/q2hyyBgBcFqI1dq0G6rcKQmAkhP4WwYHr/2L3O1m4M7Nw8+396qCUQWcFb9XrRea6bx4zkbVF82QbWKtb2npLgkm9Dr7bNp8taHKBzu84cSJl8uE2xv23SYlJJOIXH+FNrxQfz8z+G8eHxApZjtzpamnAE=
+	t=1706520029; cv=none; b=Jtp089IXGCKgGaG9KVrx90BfZvLCeQWNU0/FkyXzwfsgrW6v7sF9Q5Mk29kILeJcjgWEvahxoUOTXTpIJ5fV0skO5CO2UOeSe8LUQvd0ULxHcttnYGVgOyHXJNI5MFb5cWnMEXV3ABjWTEiTx6Lbzt+x0cWUkWw4c98uKAMPhYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706519901; c=relaxed/simple;
-	bh=P8ynzDwz5GrtNYNcuVcBHM0772BqNg+2Sc8rLmRjSCk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gWjyWwhX+9QkaivuR2r6isQrcsrI5oJRtfdDq8+ZlVUmH2RUgq5MZMwYHckVJrB+uHSENCLHHeNh+r0h9ZXyU1Wmr7CnpTfxhz+Bj+Yh6HtgvD6NEv30VTCISfw7Q5IboaIeb451doAYboaLDvjXGzqFvwAbmH+Pzp6qp9Nhjvk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: by air.basealt.ru (Postfix, from userid 490)
-	id F19F92F20226; Mon, 29 Jan 2024 09:18:15 +0000 (UTC)
-X-Spam-Level: 
-Received: from altlinux.malta.altlinux.ru (obninsk.basealt.ru [217.15.195.17])
-	by air.basealt.ru (Postfix) with ESMTPSA id 771F12F2024A;
-	Mon, 29 Jan 2024 09:18:13 +0000 (UTC)
-From: kovalev@altlinux.org
-To: stable@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	kpsingh@kernel.org,
-	john.fastabend@gmail.com,
-	yhs@fb.com,
-	songliubraving@fb.com,
-	kafai@fb.com,
-	andrii@kernel.org,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	kovalev@altlinux.org,
-	nickel@altlinux.org,
-	oficerovas@altlinux.org,
-	dutyrok@altlinux.org
-Subject: [PATCH 5.10.y 1/1] bpf: Convert BPF_DISPATCHER to use static_call() (not ftrace)
-Date: Mon, 29 Jan 2024 12:17:46 +0300
-Message-Id: <20240129091746.260538-2-kovalev@altlinux.org>
-X-Mailer: git-send-email 2.33.8
-In-Reply-To: <20240129091746.260538-1-kovalev@altlinux.org>
-References: <20240129091746.260538-1-kovalev@altlinux.org>
+	s=arc-20240116; t=1706520029; c=relaxed/simple;
+	bh=XePu6ESbP1u4t/MnFXgEgs+74bLx1n7p+r7l+mLX2yI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gg92MNx5KIwz1U+W7V7EFBVJ72ymJfoVs6smqSr3ENhVdsYApaXC78G8CHC3ahuYzCVUfAzcNv8M0FmrmRo1wn4cAmuMG0u7rdxYLPbZEAHlCOyBMvdvED/r6k5cMOiTu0JMhaVgF56H1hEBpoSYicDMKAfCVMtgYaC7jXrrhsA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=ivw4DOmr; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-40ef3f351d2so4537975e9.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 01:20:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706520024; x=1707124824; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SIipjDj72opyEFtxoDCTsvfMZXSlHdKPwPEDXfFHcYE=;
+        b=ivw4DOmrzHVBhMZ5PWvdAI4O9Z3E5E7AeehvXy6CrME6XRRFssNrxRbSjUaiCxDgEz
+         5ylOxvFAQOHfQZL0N9qx6V8PWBrJUgYoufaGA2Tp5DF3HPYF9JcGBl5FyHMAx6tJfwUy
+         C4rIuj8PacUkwcKK7FfgbrQPOB2lC780nH2/DbOUSs/ZVkJvuIb73AYURMEocxz9QCAk
+         R2tfYSojqAabQzX8j3tCk5DyUwlm+WOK7RT/gtOTK9lsbWre459FJLPQyn7OMtux0nYL
+         /APCfJgBkvdGuYXtyK5LJKgIgTI9hEivGOGyz+H1+0iSNh9NcEauDX0MP06e4BnGOuKE
+         bklg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706520024; x=1707124824;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SIipjDj72opyEFtxoDCTsvfMZXSlHdKPwPEDXfFHcYE=;
+        b=jc5elyPSCEUMirB/FrBAwZAgaLPO88SOMCavhLFDZs++rno7bW1CXqbF4VqkLCP6LN
+         WBt+nBa+Q+YNdmAsfCIpml2Eqn02NUeplL1j28XWtXfGqU130nxlS2QrTvzImjAyG8lZ
+         p8rjzSnx1DGFBrP6U94d4GCqOJ6PLQRJamjLj6fPI5zhQdt8izmZqohbdEC/D5/Ry5ll
+         /6PctrCI72cqpC9LEZm3hB6DJ59wxEzvuq3H+J1gc3xcm7X9EMz88uS/0NAl2uhcxH2P
+         CJ8VhnZsyPH1oK168VEKUL0jsBYkqcwbl+xDhA2DTjdezOPP7C+CcSLQIk/3qCiL+il+
+         APOQ==
+X-Gm-Message-State: AOJu0YxAaeN3+ulqdGo6H5ACuP+JcToFTkU+Dz/SrHASUoxY43H0fQS4
+	phcSH6Aeh2QtbmkehfAdE3dHiHWptSSvqI/UEDegNyj29P1XdExpeOWx0/DplgQ=
+X-Google-Smtp-Source: AGHT+IG2hr0oACHmCWtP4hJn4m+aVt8htuFB/yKzQfRP9dDjBRG0JJ3mpfw2aK7/JsjcWDNW1xfBZw==
+X-Received: by 2002:a05:600c:1c12:b0:40e:fa51:3526 with SMTP id j18-20020a05600c1c1200b0040efa513526mr780424wms.10.1706520024197;
+        Mon, 29 Jan 2024 01:20:24 -0800 (PST)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id k7-20020a05600c1c8700b0040ef3ae26cdsm4103365wms.37.2024.01.29.01.20.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jan 2024 01:20:23 -0800 (PST)
+Date: Mon, 29 Jan 2024 10:20:22 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: Saeed Mahameed <saeed@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>
+Subject: Re: [net-next 07/15] net/mlx5: SD, Add informative prints in kernel
+ log
+Message-ID: <Zbdt1vy9WLRqMqGK@nanopsycho>
+References: <20231221005721.186607-1-saeed@kernel.org>
+ <20231221005721.186607-8-saeed@kernel.org>
+ <ZZfySfG4VClzDKTr@nanopsycho>
+ <6e17498c-2499-4c91-bc50-33bab8201965@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6e17498c-2499-4c91-bc50-33bab8201965@gmail.com>
 
-From: Peter Zijlstra <peterz@infradead.org>
+Thu, Jan 25, 2024 at 08:42:41AM CET, ttoukan.linux@gmail.com wrote:
+>
+>
+>On 05/01/2024 14:12, Jiri Pirko wrote:
+>> Thu, Dec 21, 2023 at 01:57:13AM CET, saeed@kernel.org wrote:
+>> > From: Tariq Toukan <tariqt@nvidia.com>
+>> > 
+>> > Print to kernel log when an SD group moves from/to ready state.
+>> > 
+>> > Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+>> > Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+>> > ---
+>> > .../net/ethernet/mellanox/mlx5/core/lib/sd.c  | 21 +++++++++++++++++++
+>> > 1 file changed, 21 insertions(+)
+>> > 
+>> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+>> > index 3309f21d892e..f68942277c62 100644
+>> > --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+>> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
+>> > @@ -373,6 +373,21 @@ static void sd_cmd_unset_secondary(struct mlx5_core_dev *secondary)
+>> > 	mlx5_fs_cmd_set_l2table_entry_silent(secondary, 0);
+>> > }
+>> > 
+>> > +static void sd_print_group(struct mlx5_core_dev *primary)
+>> > +{
+>> > +	struct mlx5_sd *sd = mlx5_get_sd(primary);
+>> > +	struct mlx5_core_dev *pos;
+>> > +	int i;
+>> > +
+>> > +	sd_info(primary, "group id %#x, primary %s, vhca %u\n",
+>> > +		sd->group_id, pci_name(primary->pdev),
+>> > +		MLX5_CAP_GEN(primary, vhca_id));
+>> > +	mlx5_sd_for_each_secondary(i, primary, pos)
+>> > +		sd_info(primary, "group id %#x, secondary#%d %s, vhca %u\n",
+>> > +			sd->group_id, i - 1, pci_name(pos->pdev),
+>> > +			MLX5_CAP_GEN(pos, vhca_id));
+>> > +}
+>> > +
+>> > int mlx5_sd_init(struct mlx5_core_dev *dev)
+>> > {
+>> > 	struct mlx5_core_dev *primary, *pos, *to;
+>> > @@ -410,6 +425,10 @@ int mlx5_sd_init(struct mlx5_core_dev *dev)
+>> > 			goto err_unset_secondaries;
+>> > 	}
+>> > 
+>> > +	sd_info(primary, "group id %#x, size %d, combined\n",
+>> > +		sd->group_id, mlx5_devcom_comp_get_size(sd->devcom));
+>> 
+>> Can't you rather expose this over sysfs or debugfs? I mean, dmesg print
+>> does not seem like a good idea.
+>> 
+>> 
+>
+>I think that the events of netdev combine/uncombine are important enough to
+>be logged in the kernel dmesg.
 
-[ Upstream commit c86df29d11dfba27c0a1f5039cd6fe387fbf4239 ]
+Why? I believe that the best amount od dmesg log is exactly 0. You
+should find proper interfaces. Definitelly for new features. Why do you
+keep asking user to look for random messages in dmesg? Does not make any
+sense :/
 
-The dispatcher function is currently abusing the ftrace __fentry__
-call location for its own purposes -- this obviously gives trouble
-when the dispatcher and ftrace are both in use.
 
-A previous solution tried using __attribute__((patchable_function_entry()))
-which works, except it is GCC-8+ only, breaking the build on the
-earlier still supported compilers. Instead use static_call() -- which
-has its own annotations and does not conflict with ftrace -- to
-rewrite the dispatch function.
 
-By using: return static_call()(ctx, insni, bpf_func) you get a perfect
-forwarding tail call as function body (iow a single jmp instruction).
-By having the default static_call() target be bpf_dispatcher_nop_func()
-it retains the default behaviour (an indirect call to the argument
-function). Only once a dispatcher program is attached is the target
-rewritten to directly call the JIT'ed image.
-
-Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
-Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
-Tested-by: Björn Töpel <bjorn@kernel.org>
-Tested-by: Jiri Olsa <jolsa@kernel.org>
-Acked-by: Björn Töpel <bjorn@kernel.org>
-Acked-by: Jiri Olsa <jolsa@kernel.org>
-Link: https://lkml.kernel.org/r/Y1/oBlK0yFk5c/Im@hirez.programming.kicks-ass.net
-Link: https://lore.kernel.org/bpf/20221103120647.796772565@infradead.org
-Signed-off-by: Vasiliy Kovalev <kovalev@altlinux.org>
----
- include/linux/bpf.h     | 39 ++++++++++++++++++++++++++++++++++++++-
- kernel/bpf/dispatcher.c | 22 ++++++++--------------
- 2 files changed, 46 insertions(+), 15 deletions(-)
-
-diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-index 8f4379e93ad49b..2c8c7515609a07 100644
---- a/include/linux/bpf.h
-+++ b/include/linux/bpf.h
-@@ -21,6 +21,7 @@
- #include <linux/kallsyms.h>
- #include <linux/capability.h>
- #include <linux/percpu-refcount.h>
-+#include <linux/static_call.h>
- 
- struct bpf_verifier_env;
- struct bpf_verifier_log;
-@@ -650,6 +651,10 @@ struct bpf_dispatcher {
- 	void *image;
- 	u32 image_off;
- 	struct bpf_ksym ksym;
-+#ifdef CONFIG_HAVE_STATIC_CALL
-+	struct static_call_key *sc_key;
-+	void *sc_tramp;
-+#endif
- };
- 
- static __always_inline unsigned int bpf_dispatcher_nop_func(
-@@ -667,6 +672,34 @@ struct bpf_trampoline *bpf_trampoline_get(u64 key,
- 					  struct bpf_attach_target_info *tgt_info);
- void bpf_trampoline_put(struct bpf_trampoline *tr);
- int arch_prepare_bpf_dispatcher(void *image, s64 *funcs, int num_funcs);
-+
-+/*
-+ * When the architecture supports STATIC_CALL replace the bpf_dispatcher_fn
-+ * indirection with a direct call to the bpf program. If the architecture does
-+ * not have STATIC_CALL, avoid a double-indirection.
-+ */
-+#ifdef CONFIG_HAVE_STATIC_CALL
-+
-+#define __BPF_DISPATCHER_SC_INIT(_name)				\
-+	.sc_key = &STATIC_CALL_KEY(_name),			\
-+	.sc_tramp = STATIC_CALL_TRAMP_ADDR(_name),
-+
-+#define __BPF_DISPATCHER_SC(name)				\
-+	DEFINE_STATIC_CALL(bpf_dispatcher_##name##_call, bpf_dispatcher_nop_func)
-+
-+#define __BPF_DISPATCHER_CALL(name)				\
-+	static_call(bpf_dispatcher_##name##_call)(ctx, insnsi, bpf_func)
-+
-+#define __BPF_DISPATCHER_UPDATE(_d, _new)			\
-+	__static_call_update((_d)->sc_key, (_d)->sc_tramp, (_new))
-+
-+#else
-+#define __BPF_DISPATCHER_SC_INIT(name)
-+#define __BPF_DISPATCHER_SC(name)
-+#define __BPF_DISPATCHER_CALL(name)		bpf_func(ctx, insnsi)
-+#define __BPF_DISPATCHER_UPDATE(_d, _new)
-+#endif
-+
- #define BPF_DISPATCHER_INIT(_name) {				\
- 	.mutex = __MUTEX_INITIALIZER(_name.mutex),		\
- 	.func = &_name##_func,					\
-@@ -678,20 +711,23 @@ int arch_prepare_bpf_dispatcher(void *image, s64 *funcs, int num_funcs);
- 		.name  = #_name,				\
- 		.lnode = LIST_HEAD_INIT(_name.ksym.lnode),	\
- 	},							\
-+	__BPF_DISPATCHER_SC_INIT(_name##_call)			\
- }
- 
- #define DEFINE_BPF_DISPATCHER(name)					\
-+	__BPF_DISPATCHER_SC(name);					\
- 	noinline unsigned int bpf_dispatcher_##name##_func(		\
- 		const void *ctx,					\
- 		const struct bpf_insn *insnsi,				\
- 		unsigned int (*bpf_func)(const void *,			\
- 					 const struct bpf_insn *))	\
- 	{								\
--		return bpf_func(ctx, insnsi);				\
-+		return __BPF_DISPATCHER_CALL(name);			\
- 	}								\
- 	EXPORT_SYMBOL(bpf_dispatcher_##name##_func);			\
- 	struct bpf_dispatcher bpf_dispatcher_##name =			\
- 		BPF_DISPATCHER_INIT(bpf_dispatcher_##name);
-+
- #define DECLARE_BPF_DISPATCHER(name)					\
- 	unsigned int bpf_dispatcher_##name##_func(			\
- 		const void *ctx,					\
-@@ -699,6 +735,7 @@ int arch_prepare_bpf_dispatcher(void *image, s64 *funcs, int num_funcs);
- 		unsigned int (*bpf_func)(const void *,			\
- 					 const struct bpf_insn *));	\
- 	extern struct bpf_dispatcher bpf_dispatcher_##name;
-+
- #define BPF_DISPATCHER_FUNC(name) bpf_dispatcher_##name##_func
- #define BPF_DISPATCHER_PTR(name) (&bpf_dispatcher_##name)
- void bpf_dispatcher_change_prog(struct bpf_dispatcher *d, struct bpf_prog *from,
-diff --git a/kernel/bpf/dispatcher.c b/kernel/bpf/dispatcher.c
-index 2444bd15cc2d03..4c6c2e3ac56459 100644
---- a/kernel/bpf/dispatcher.c
-+++ b/kernel/bpf/dispatcher.c
-@@ -4,6 +4,7 @@
- #include <linux/hash.h>
- #include <linux/bpf.h>
- #include <linux/filter.h>
-+#include <linux/static_call.h>
- 
- /* The BPF dispatcher is a multiway branch code generator. The
-  * dispatcher is a mechanism to avoid the performance penalty of an
-@@ -104,17 +105,11 @@ static int bpf_dispatcher_prepare(struct bpf_dispatcher *d, void *image)
- 
- static void bpf_dispatcher_update(struct bpf_dispatcher *d, int prev_num_progs)
- {
--	void *old, *new;
--	u32 noff;
--	int err;
--
--	if (!prev_num_progs) {
--		old = NULL;
--		noff = 0;
--	} else {
--		old = d->image + d->image_off;
-+	void *new, *tmp;
-+	u32 noff = 0;
-+
-+	if (prev_num_progs)
- 		noff = d->image_off ^ (PAGE_SIZE / 2);
--	}
- 
- 	new = d->num_progs ? d->image + noff : NULL;
- 	if (new) {
-@@ -122,11 +117,10 @@ static void bpf_dispatcher_update(struct bpf_dispatcher *d, int prev_num_progs)
- 			return;
- 	}
- 
--	err = bpf_arch_text_poke(d->func, BPF_MOD_JUMP, old, new);
--	if (err || !new)
--		return;
-+	__BPF_DISPATCHER_UPDATE(d, new ?: &bpf_dispatcher_nop_func);
- 
--	d->image_off = noff;
-+	if (new)
-+		d->image_off = noff;
- }
- 
- void bpf_dispatcher_change_prog(struct bpf_dispatcher *d, struct bpf_prog *from,
--- 
-2.33.8
-
+>I can implement a debugfs as an addition, not replacing the print.
+>
+>> > +	sd_print_group(primary);
+>> > +
+>> > 	return 0;
+>> > 
+>> > err_unset_secondaries:
+>> > @@ -440,6 +459,8 @@ void mlx5_sd_cleanup(struct mlx5_core_dev *dev)
+>> > 	mlx5_sd_for_each_secondary(i, primary, pos)
+>> > 		sd_cmd_unset_secondary(pos);
+>> > 	sd_cmd_unset_primary(primary);
+>> > +
+>> > +	sd_info(primary, "group id %#x, uncombined\n", sd->group_id);
+>> > out:
+>> > 	sd_unregister(dev);
+>> > 	sd_cleanup(dev);
+>> > -- 
+>> > 2.43.0
+>> > 
+>> > 
 
