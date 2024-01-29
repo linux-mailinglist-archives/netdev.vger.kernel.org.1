@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-66792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67E15840AD6
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:09:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6426D840ADF
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:10:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22B39286B1E
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:09:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2FE21F2300D
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6DC61552E9;
-	Mon, 29 Jan 2024 16:09:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6115115530D;
+	Mon, 29 Jan 2024 16:10:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S2tQ9QZi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SDNszNXe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46992155A31
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 16:09:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD511552F0
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 16:10:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706544557; cv=none; b=gJU8CaXLW/L5LAS0oVDXYyJjMheb/LVWPOpES1e1dShLRGG7kNqxHgKmMh1nd3WCiOP/vEtXkjAv0eOCVM7OqAoHMsRjGlb9dbAajOtah9UQhmJ85miUs+eb+4fK4F6SCBEtU6Xwv77VVDG4prH0JUdGrMDyut+3+lze50atyQ8=
+	t=1706544638; cv=none; b=D1ET12OZJRo/Q7XjxRFS42cVvFB8fBuie/K6kqmNOZGEGpmQPpvMXoq/lArFuf9FmBWYgx78d5hRwrYmh6Vw+E3SizwwmWdjpRK0yHgFzARDAnk3iUtRucgulUDnx6CtPz2jj0oGGRW2sb5PqUe9Gai1HOkgA8lyC3/Qxa6vqLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706544557; c=relaxed/simple;
-	bh=XYo5urh0s1tvuA740GxXQLnBXtDAMRYcwYJp2XYvqz0=;
+	s=arc-20240116; t=1706544638; c=relaxed/simple;
+	bh=6rSRI2QI4j1oNMuMnM7Vlac0VWIiDSMt5/GovMCFjSY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YBSk+DFzbS8k4nk3nUDyBkR36X8IttG5GTIYth1Rddr+Y2oZV8nniyQMZH5gPzQmdiw4Hlmq+O1fFaZsJ2q4Qxy1MhXtRoPJnc/6Cs5JRtGse0VNZ72nD2OUGvo80lDU6Rjf7jCL/nJVN0zsoeQSHHxVNfZzNFOkEo8eJyDXCcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S2tQ9QZi; arc=none smtp.client-ip=209.85.210.173
+	 In-Reply-To:Content-Type; b=rLKTnlaJkPqRd13sqhnXnftD5lXhCxbxlwDWms+RW6BBOgnC1hpE7/0r6jBCUPirLA5YmXHRDTXuNGV364YziwIqh+miYs6ujqyEN6ZWi6xzGns1WMmZMmv2MAElERBOGlzpNb+emoLmElmQzlO+YW8sXgLaGKBn2oEjb0ebi+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SDNszNXe; arc=none smtp.client-ip=209.85.214.177
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6de287449f1so563244b3a.2
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 08:09:15 -0800 (PST)
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1d748d43186so13763895ad.0
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 08:10:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706544555; x=1707149355; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706544636; x=1707149436; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=eZI9G6h/T7CCUwJEOjoq18GTDGu+35ULUtX/OdT5s2I=;
-        b=S2tQ9QZiQyO/Cy7KCUxegTMekpthQ3q1Hqe4F8MvP/SChsdj9LQtFcEARKLaBBnHlO
-         cIPwJLaOGq6IrjeaFhTVnV6EO6/IC+JDIswNsddgeAdbOZqZP24E5qmdLwIp9G2TKG4q
-         o4hgutpeVGgoJTMgYQtYVMQ8/T4yEKCnVdto5YcXlIUDUoLn1h61ux083avxfzk6DXAd
-         7HgZ7SGiGQ28aZ5hKaxNdBUH5pN4J0B9Dj6TREmkmMmiBGkYGB93207YCfbhVOSCNoTT
-         KSRrxKx5dz4vFCqXT6dznWW/F6SAJygYIIytOD3WiZX992dvbPTfKS/P4smeal9AxQBI
-         Ngwg==
+        bh=BNrVLetu+gTUFiDz8iSxZ3dn0tJKLzI6V7Bx276mGKE=;
+        b=SDNszNXegUtsSW5tB+YFSB9+ZNSzT15LT0HHTBjCQx1/GCRCxWCXVkbcu/THGXIKd7
+         +IjhASdszgesHUWCabbX94S+sP8ED2Nr9dbgpLLYmmU6cS6rGIp8gSFOSxnSKSWTpVNy
+         hZmmh+5qIsoAlZzv+/4RHIR1eJkGfw+z018Ej507ElTQ48OHlc1K4+B+zH0faovB6EtZ
+         Y2VYxbbUSGlbCdzMD6i2dBm16YMRnob2skUqUhHtnDdE4GFfEqhYJSVxO8J1gq/oBS+5
+         YL9jT3BzeP7UiOcDe0Ua1G3Zgo56DCev1kJhjqACLDOaQAUbsc9MzA7iJ9sUJWG6Lt3v
+         YX5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706544555; x=1707149355;
+        d=1e100.net; s=20230601; t=1706544636; x=1707149436;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eZI9G6h/T7CCUwJEOjoq18GTDGu+35ULUtX/OdT5s2I=;
-        b=o9oTTTe2bEBUBJFLlz7vqdjMQaUL3GzhTKrINwArWugansZTZhnnAqPb0/JngqlTgn
-         qqT5dJVy7dnIhMu6MTiTjI4LI84gMgmz82B8qMh1mCzPNsEiz0MajAhAUMTzqN8ei7ca
-         UbrwjSugHC6XltYuq2HLY/YcttqhXyA1E6VWB2d18Na7xBbpEMBDlMfbuIG/OYeQcv3G
-         TX9yHG2+ZKZ7ADtFB5FQWuc2x3tAwjxf74DUbyPxbNybVXAiWaBvQkWD0SCevr4pl0KH
-         CYzACvyYp1ZWQT54Q2hUku8D6VB9krMCEWimBDmdEImzM4APQnYLBFPpN3bqZ9RSnOag
-         4jqQ==
-X-Gm-Message-State: AOJu0YzJmVNekhnqoEYaXFOpx/iGO2c5kcTLrQRdXe2echQ3p3+XlwfB
-	sQeyCBbnKN8jFZvqq20Rdj/vb87k4bHS6ATtVmG/BKOw+tHIyTp+
-X-Google-Smtp-Source: AGHT+IHIylvr4ZnpsYM3zyjIUOl9EtbS2FlbyFRqQd9qY7/3n5YehGmDwEPFj4bcDhs6BWqhkm4ryQ==
-X-Received: by 2002:a05:6a20:68a1:b0:19c:8d73:721e with SMTP id n33-20020a056a2068a100b0019c8d73721emr2169185pzj.36.1706544555467;
-        Mon, 29 Jan 2024 08:09:15 -0800 (PST)
+        bh=BNrVLetu+gTUFiDz8iSxZ3dn0tJKLzI6V7Bx276mGKE=;
+        b=fSTEA7Mrbrgqui8FbKsM0IrextF47uGvhPPLSWISKog/RNWrc34ZmiiOr6MsvWH/Yd
+         /WkhLZCK3YWxK2Mg8N7l94QhNcxGuxzQo+6wDd+lIekopP+E/mdZSc4bqiHn0wf6bUev
+         0jRt3FOiGb8mZkYxpZBU6hDH2FtmaL+0bfpuFfDdwUD2zIlwWA01JrA9XEcl6/T5hC/c
+         YBwTonQKNpNwvSTsdBY3TRVaUXVpp5sw0yYOpRhlKmnxJp65Lg4uD0Riwh/NZIRVEqNy
+         t6B3tTBYkdi2rqikYCCAv0cntw9xpW+DGoPXHXxyr+t6fPnAHgbSf9DJrLYCRZbumvGv
+         TDAw==
+X-Gm-Message-State: AOJu0YwiZXiu1ALeikTWad70PGBTc+jHTqnDbHrE5+P6gEWOm2Yi/jBS
+	nKzj5tMPtpi8d1lSdGB2FZt8IMdyW/L9g+ULmX2H6SGiW+HK26lu
+X-Google-Smtp-Source: AGHT+IFI9Cj21uqMaaiF3MTRFD0XY3v5LLVgxPDH95w5NnywQEoODqOO88RlUyXCe9l6ReLBfmd2zA==
+X-Received: by 2002:a17:902:d512:b0:1d8:e2af:f7a3 with SMTP id b18-20020a170902d51200b001d8e2aff7a3mr2347446plg.60.1706544636110;
+        Mon, 29 Jan 2024 08:10:36 -0800 (PST)
 Received: from ?IPV6:2600:8802:b00:ba1:8853:5abd:d9f3:2a01? ([2600:8802:b00:ba1:8853:5abd:d9f3:2a01])
-        by smtp.gmail.com with ESMTPSA id kr12-20020a170903080c00b001d8f82c61cdsm850632plb.231.2024.01.29.08.09.14
+        by smtp.gmail.com with ESMTPSA id kr12-20020a170903080c00b001d8f82c61cdsm850632plb.231.2024.01.29.08.10.34
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Jan 2024 08:09:14 -0800 (PST)
-Message-ID: <d6c42a7a-3558-4d2b-92f8-d56776ce70d7@gmail.com>
-Date: Mon, 29 Jan 2024 08:09:14 -0800
+        Mon, 29 Jan 2024 08:10:35 -0800 (PST)
+Message-ID: <4f81c6d3-b74f-4f61-9862-83ee84258880@gmail.com>
+Date: Mon, 29 Jan 2024 08:10:34 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,8 +75,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 02/11] net: dsa: realtek: introduce
- REALTEK_DSA namespace
+Subject: Re: [PATCH net-next v4 04/11] net: dsa: realtek: keep variant
+ reference in realtek_priv
 Content-Language: en-US
 To: Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org
 Cc: linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
@@ -84,7 +84,7 @@ Cc: linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
  kuba@kernel.org, pabeni@redhat.com, arinc.unal@arinc9.com,
  ansuelsmth@gmail.com
 References: <20240123215606.26716-1-luizluca@gmail.com>
- <20240123215606.26716-3-luizluca@gmail.com>
+ <20240123215606.26716-5-luizluca@gmail.com>
 From: Florian Fainelli <f.fainelli@gmail.com>
 Autocrypt: addr=f.fainelli@gmail.com; keydata=
  xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
@@ -119,16 +119,50 @@ Autocrypt: addr=f.fainelli@gmail.com; keydata=
  y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
  X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
  HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20240123215606.26716-3-luizluca@gmail.com>
+In-Reply-To: <20240123215606.26716-5-luizluca@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
 On 1/23/2024 1:55 PM, Luiz Angelo Daros de Luca wrote:
-> Create a namespace to group the exported symbols.
+> Instead of copying values from the variant, we can keep a reference in
+> realtek_priv.
+> 
+> This is a preliminary change for sharing code betwen interfaces. It will
+> allow to move most of the probe into a common module while still allow
+> code specific to each interface to read variant fields.
 > 
 > Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> ---
+
+[snip]
+
+> diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
+> index e9ee778665b2..0c51b5132c61 100644
+> --- a/drivers/net/dsa/realtek/realtek.h
+> +++ b/drivers/net/dsa/realtek/realtek.h
+> @@ -58,9 +58,6 @@ struct realtek_priv {
+>   	struct mii_bus		*bus;
+>   	int			mdio_addr;
+>   
+> -	unsigned int		clk_delay;
+> -	u8			cmd_read;
+> -	u8			cmd_write;
+>   	spinlock_t		lock; /* Locks around command writes */
+>   	struct dsa_switch	*ds;
+>   	struct irq_domain	*irqdomain;
+> @@ -79,6 +76,8 @@ struct realtek_priv {
+>   	int			vlan_enabled;
+>   	int			vlan4k_enabled;
+>   
+> +	const struct realtek_variant *variant;
+
+This is not probably performance sensitive but should the variant 
+pointer be moved where clk_delay was such that we preserve a somewhat 
+similar cacheline alignment?
+
+Regardless of that:
 
 Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
