@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-66794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5DD2840AEC
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:11:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A640840B0A
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:14:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81A6528C4FC
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:11:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 006A328DAD9
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:14:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF49715530E;
-	Mon, 29 Jan 2024 16:11:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17776155A31;
+	Mon, 29 Jan 2024 16:13:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E0djxLq/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EqjR61/p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826DF155315
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 16:11:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A273B155A2B
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 16:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706544667; cv=none; b=Pt0E8q4WX/+nlnxxM5AyQfMAoPV4TNrUbSzyRkBrc2dgRKiMn//bBGu44q4WlgTvJNYhoVWtZWtFW1c6ReSOOsz1r3TLLHEedIoBQu88LuqyaVgbZ5ikGfIoOcOqYryCsv+/bf8aOJkCe8bpm6GVhcGPKpvZ9z/DrG7Uik1ZyOk=
+	t=1706544816; cv=none; b=nrsULzjuJz5liRoZr41/p5jTDcsGl5bF40XCu0yzeFfGryibKRe64uhN5ZbUANI7DNq0aeHIqCDpyrpwJUmNAT2zcpIerBxtTdvwjL7GzF57J6yC3CYXJQpJMnUwqLXqPIETdLZdyueqHKr995sYCUdm0JFcBgvdTWvkB9eV/wE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706544667; c=relaxed/simple;
-	bh=7/pkoIB31RnP/BFRo3uwRe6tZEJPIzei79uUoGIC0qs=;
+	s=arc-20240116; t=1706544816; c=relaxed/simple;
+	bh=GuTrkPVtTfp3gaSXDnTZmtw3Qq6ip6G9yN5aeq2cJes=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W6CrRr5pxS74am/oXFNgTupSjehMGSiAfNgpIaaVCGdM2uQ8wFvgQca9+EM0erD8IMbv4tocytXi76da+SKtUiyAgRASVHIfX31/NwiPYorL5XPNmQXHJcu4oombehwsm/QD2panxBVirK5lKPL5USTozbTbsHgaxkeB+bqLAU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E0djxLq/; arc=none smtp.client-ip=209.85.210.174
+	 In-Reply-To:Content-Type; b=cxuvbhVuUKwXYY7THMFqTs/C9KyFN/4bRKUnX/eF+mICGGj7j2HFM/vJi13vQvE4ayE/qGTSo3RBdXLqKKTPbrIvVkNMpf9RRzKGixBz5EDxJESY8YL82vxk/Sotu9gWMs6h0EvMAMzFP2cyw24aPke1onLCBBFEiIYs81ut044=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EqjR61/p; arc=none smtp.client-ip=209.85.215.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6de2e24ea87so573482b3a.3
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 08:11:06 -0800 (PST)
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-5cddfe0cb64so1339001a12.0
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 08:13:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706544666; x=1707149466; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706544814; x=1707149614; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=o7PYUWiqsb1zSfjWHETqhik/5uw/thvb/V9wubr+ozo=;
-        b=E0djxLq/sGHi08xni/ynEGA5nBXB1e4cjtYcXB35UCnZr3N651zT8S3nD9MyFK1mZ8
-         vXhj+k2iJx7oKysrsDoNp6Gmy82hIjioyb/OYan5/rwRA8fCiHRJEbnrC1Q+Hbmzkdzb
-         hYTUTG2aD3drsNgj9UO8Lmnl7OPJ4nouxsaRhIZ/sEsxaTvIiaXvxmwbitzFjQ2+usmT
-         GZI6WILyXnDlzG34Tl9rmIzajjtJGpaCDZ208N1MADQWv3MYnNaNyPF031v4KQk8gL2k
-         A+vyb/TuYDo8rVnhGGyUHEF3Xk0qfwZAK/pV/VocO186Sz/P6S6wSy2OgX6Nyb82dFYM
-         JjyQ==
+        bh=7Dwdg+oyupRSZU6pjXvtV9lpQKQTS76WHL59uibN+zs=;
+        b=EqjR61/pRv/nTSzat9KOyr4v27yhssWtTdZdQbh9wK1Qey7TJXrl8+qIkyOvG8c7QU
+         rb1/vtpYctSVJYRJVVjwKbQR+n4bzlOhDEtt9FD5EwzyArg3pHWDOAXNslHyFrqv4csH
+         y9gJy6axhWdHZEsDhfEHijCKNYyeVRmKpHtYAR0C8GK4oRUcv3EQPCt9hndqeT8rueoq
+         DDZwmMmSpceacfuvlH87RTqrEMQ7aDFBcxd3bmSUmACjdI/E0OyXJN/X/EYILiZivwaw
+         1AhmpXQWNSNzATFz6ZZJ49jlecbDCfgudLRqCwIMt9jPSwa9Tc7nqmxrI0W9MLjdUnE5
+         ay2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706544666; x=1707149466;
+        d=1e100.net; s=20230601; t=1706544814; x=1707149614;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o7PYUWiqsb1zSfjWHETqhik/5uw/thvb/V9wubr+ozo=;
-        b=roXb/bc+Wg9C33HiJpzW5k5B+7okymPwdGIWVXxiOqb16vpgdXCaMfcNXX9SlX6ZyQ
-         2yzE415gb/F85zBQEfW17kbdXyERn9UHw8pLHQl4CoXA/L4qTWPw16k/CiH3zYLVuEkd
-         VcxHaAArqt5b2Kmrx2EuXJheb9kxTPYhKaLzjiPosiGKprJt2CoUiU974/mCU9Wia8nn
-         aunQnMJuplmMfEZebUppqBIJQkWD3QWT2wjfWl+tY8yUpvNlBud4/bimZOeAsrjEKqxm
-         fvAFo1cDypcit/4tkhyDkXF5WCTKFO4t/J1ny2djdEWF+IGpskmO34GyJGbVGLdVULgi
-         CEnw==
-X-Gm-Message-State: AOJu0Yz/zx+whugGfHSA3NEmujPaTP6G982kLT8cf2p5Qwpw/4kXmMmL
-	llzuUZJe2RTLYlJdXSxpL3ltMKJc+UVKLDrr/fHtLetT9caqhpc9
-X-Google-Smtp-Source: AGHT+IEOUAH8cHGJNALnkqQH88qFF97N/rwZZLEGJMS9+L49fyhBh6w92vV07KViwaZM1ODoTdSA8Q==
-X-Received: by 2002:a17:902:820c:b0:1d6:f263:5699 with SMTP id x12-20020a170902820c00b001d6f2635699mr3206701pln.30.1706544665759;
-        Mon, 29 Jan 2024 08:11:05 -0800 (PST)
+        bh=7Dwdg+oyupRSZU6pjXvtV9lpQKQTS76WHL59uibN+zs=;
+        b=USNCoGF2t4p6L8tepFsI4kMb15HK5Ge3nHZeN8lrXQJAkuBpxRC0Ojw4D6PPjdCBjJ
+         BrerlDVKmxnIUmLLE5Q2II+Hhi34A/lf5xwKizWtR07CNAeHUT7mNXtlVszIIFnPfjtM
+         1b00jjKBqkljIfAsp0AxNl+/6saDsKhnhkGhbxBYJVKB73Fwe7fCbJ+5ulrhmrK0VV/5
+         5u2iiZ0YXgMwxDWH90e6ijJ8fXzKwy+FATBRvcIT/CBT0VHNfVb96drxv72ezvsI3FMs
+         euw3v64xb0gc+zCShZ7eMbuQiwKGlkQjcKosvn14QWmNE3X8JLl+AoCMxrePKU7gKcst
+         T/jw==
+X-Gm-Message-State: AOJu0YzG+N2WZ7m3pQO/jG2GRxoWl6A05BlwJdQp0AGcZAcjypGgD3LK
+	+sl5zVBtj3wsz7VpjGOQb03m8O3Q80fCvs3tubeJwHrGLIoCrKS9IOJZ80Z5
+X-Google-Smtp-Source: AGHT+IF+l5C4ebagL2PFS8ckD0hgYJX+UWPO/Mkxo3YssCfQWRtVwohG4XOgMr3sBZuVYHnfocj/gQ==
+X-Received: by 2002:a05:6a20:2d0f:b0:19c:a389:dd6b with SMTP id g15-20020a056a202d0f00b0019ca389dd6bmr2498617pzl.20.1706544813825;
+        Mon, 29 Jan 2024 08:13:33 -0800 (PST)
 Received: from ?IPV6:2600:8802:b00:ba1:8853:5abd:d9f3:2a01? ([2600:8802:b00:ba1:8853:5abd:d9f3:2a01])
-        by smtp.gmail.com with ESMTPSA id kr12-20020a170903080c00b001d8f82c61cdsm850632plb.231.2024.01.29.08.11.04
+        by smtp.gmail.com with ESMTPSA id ne1-20020a17090b374100b00295494f6c45sm3770065pjb.2.2024.01.29.08.13.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 29 Jan 2024 08:11:05 -0800 (PST)
-Message-ID: <adc078dd-9085-4a46-92d7-38983c59cbe4@gmail.com>
-Date: Mon, 29 Jan 2024 08:11:04 -0800
+        Mon, 29 Jan 2024 08:13:33 -0800 (PST)
+Message-ID: <b154d03f-1194-48e3-909d-d26498a689ba@gmail.com>
+Date: Mon, 29 Jan 2024 08:13:32 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,8 +75,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 07/11] net: dsa: realtek: get internal MDIO
- node by name
+Subject: Re: [PATCH net-next v4 06/11] net: dsa: realtek: merge rtl83xx and
+ interface modules into realtek-dsa
 Content-Language: en-US
 To: Luiz Angelo Daros de Luca <luizluca@gmail.com>, netdev@vger.kernel.org
 Cc: linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
@@ -84,7 +84,7 @@ Cc: linus.walleij@linaro.org, alsi@bang-olufsen.dk, andrew@lunn.ch,
  kuba@kernel.org, pabeni@redhat.com, arinc.unal@arinc9.com,
  ansuelsmth@gmail.com
 References: <20240123215606.26716-1-luizluca@gmail.com>
- <20240123215606.26716-8-luizluca@gmail.com>
+ <20240123215606.26716-7-luizluca@gmail.com>
 From: Florian Fainelli <f.fainelli@gmail.com>
 Autocrypt: addr=f.fainelli@gmail.com; keydata=
  xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
@@ -119,24 +119,18 @@ Autocrypt: addr=f.fainelli@gmail.com; keydata=
  y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
  X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
  HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20240123215606.26716-8-luizluca@gmail.com>
+In-Reply-To: <20240123215606.26716-7-luizluca@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
 On 1/23/2024 1:55 PM, Luiz Angelo Daros de Luca wrote:
-> The binding docs requires for SMI-connected devices that the switch
-> must have a child node named "mdio" and with a compatible string of
-> "realtek,smi-mdio". Meanwile, for MDIO-connected switches, the binding
-> docs only requires a child node named "mdio".
-> 
-> This patch changes the driver to use the common denominator for both
-> interfaces, looking for the MDIO node by name, ignoring the compatible
-> string.
+> Since rtl83xx and realtek-{smi,mdio} are always loaded together,
+> we can optimize resource usage by consolidating them into a single
+> module.
 > 
 > Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
 Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
