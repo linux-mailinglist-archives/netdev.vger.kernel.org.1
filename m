@@ -1,87 +1,132 @@
-Return-Path: <netdev+bounces-66807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D640B840B9C
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:34:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F159840BDB
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:41:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7EE21C22DF3
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:34:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 920AD1C20473
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:41:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B43C158D87;
-	Mon, 29 Jan 2024 16:31:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC52C15A4B6;
+	Mon, 29 Jan 2024 16:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EK6Yi77V"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="asPnCp/H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD6A157E71;
-	Mon, 29 Jan 2024 16:31:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E387A15A4A7;
+	Mon, 29 Jan 2024 16:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706545914; cv=none; b=Ab9uEqyISsrh1oyxdtqKiQJDWhTwGADNXGzCDV5uYxA/Prl8iLHxmsm5BrV5ItYXQp2Al4JQZjdDoz7c0+RNE2Z9oO8fJMmiNNsqNZMMk+FVmEpxGiLGeBFWyGZ6R5HYbRn1rPD8TYPRQuN4KhCP2vca7ehbLdOjFa5U8nCu4Vc=
+	t=1706546209; cv=none; b=qx/L1CBYOfxCDq1MvYIJETe+PpTM0z9uSCCoLcEULO0L6psVlcciRPpB6B9KB4kU3drChH2kWYA4Fy5IJiz3xyaLdPRcFzCTWMwEICmsglk5ARuLBw4m9WnCrGZwsf6rI4lnklcF+7wL5cAdfwn49cn7EUBhCil1B9Th4vZH6H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706545914; c=relaxed/simple;
-	bh=JWhkThM5HLpNAscJoDRfAdaXQ5RtNuQoWcA3TFK0gy8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=k6w0Tq650NgnwFTp+IkZCwvRCBjEOQ3TAReTLdwi9VKfmPJLepACEmvsmgGzGi/R0SRv5aoGkh6Mp03yt9delgCsAhp5uXiZ+DNv6tjGv+aGrgdeTnKd3SCvgZVNPY1POXL1856IxxSZZVCZAP0kwScr3/2s43yVTXrSRMi51nM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EK6Yi77V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EE89C433F1;
-	Mon, 29 Jan 2024 16:31:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706545913;
-	bh=JWhkThM5HLpNAscJoDRfAdaXQ5RtNuQoWcA3TFK0gy8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EK6Yi77V6SDCy01q1J50677XZiXDmd8zaLFHmndYsP5/PBrsI3M9gWrvWS5y8FNmk
-	 IrRNXVp+jKfunBpgh2wN02+jW0bfOad7roru5CecBPtDECjXe1o8Gv4hhIyvcQtj+h
-	 LrzgmXam9MyTeOIxnBV999XtyNfKIeasNWveJfDpF7wkAmYc4P5e25Xg96yYotZhtB
-	 xj3HJDnEUw7cYQPa7zTVDqYMp5A+gUOf1xO3bOtaxfbR+6XDDUP46GhqOAHqBEzj9k
-	 vlGBd2wFSAcSSGwKniHtIpQh30x99HRyhGPrc4rGVGa92auklVg2GeVpexU7cpyEqi
-	 LRMQTql/I4NWA==
-Date: Mon, 29 Jan 2024 08:31:52 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Daniel Golle
- <daniel@makrotopia.org>, Landen Chao <Landen.Chao@mediatek.com>, DENG
- Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, Andrew
- Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Russell King <linux@armlinux.org.uk>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, Bartel Eerdekens <bartel.eerdekens@constell8.be>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v3 6/7] net: dsa: mt7530: do not set
- priv->p5_interface on mt7530_setup_port5()
-Message-ID: <20240129083152.34d899cd@kernel.org>
-In-Reply-To: <431750cc-fb6b-4f7a-9123-b6986d359742@arinc9.com>
-References: <20240122-for-netnext-mt7530-improvements-1-v3-0-042401f2b279@arinc9.com>
-	<20240122-for-netnext-mt7530-improvements-1-v3-6-042401f2b279@arinc9.com>
-	<20240129125241.gu4srgufad6hpwor@skbuf>
-	<431750cc-fb6b-4f7a-9123-b6986d359742@arinc9.com>
+	s=arc-20240116; t=1706546209; c=relaxed/simple;
+	bh=KeRmE3stTSKqTV2GA+O/3KWIiAY8DmL3ppn/fIpoFW4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DIMvyhfG/Icc5KhP6qsKiJ4JOwe2he79E25vErEDpen4vpLL5TkH/CI7t5iugjOOPSUAUTXfINUWq5FHVPx/UFT4W7y6AG/o21UBZuo5D6a0ng87g/fn1tT3X5ds4iRxh7fbdA30+IT9u31VLsjPyxj6jUt4qDUC5wBb+fCnzJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=asPnCp/H; arc=none smtp.client-ip=46.235.227.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1706546205;
+	bh=KeRmE3stTSKqTV2GA+O/3KWIiAY8DmL3ppn/fIpoFW4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=asPnCp/H8h6+VqbZ9tIYh5Vh4PY+FTVb/PmHnNL/1zsecKppZyoIPp6JiTq7LLyCY
+	 DjSK1ST1Y8SghrKCQfbsE5r2QFu0gSpmvqzYdtw5wzzKN3mblPkrMoUTZwnS65X3aB
+	 ndXrMWUF9aB1C8AhF3+RS4X1bEIZvOqQBFzIuYI8/mu4ICZ9gJZfhlDt84px+ixQ9+
+	 bTXJSWaqccLPFvt8H+gTH/8Y0VE31bsGxo6K39iH4kQGSUGoIceR8cBndhMOySlwom
+	 EuTIczHvBeR5nwOOVCcBK0ML05D5Tyt2GUrMuBEABJZyKVGCEqbp40RDeKN5AF5WQ3
+	 pZiLyMHQIBeEg==
+Received: from [100.113.186.2] (cola.collaboradmins.com [195.201.22.229])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: kholk11)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id E834137814A4;
+	Mon, 29 Jan 2024 16:36:44 +0000 (UTC)
+Message-ID: <627c9ff9-06b3-4735-92ea-8c0ecfc2faf6@collabora.com>
+Date: Mon, 29 Jan 2024 17:36:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] arm64: dts: mediatek: mt8183-pico6: Fix bluetooth
+ node
+Content-Language: en-US
+To: Paul Menzel <pmenzel@molgen.mpg.de>, Chen-Yu Tsai <wenst@chromium.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
+ <matthias.bgg@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20240126063500.2684087-1-wenst@chromium.org>
+ <20240126063500.2684087-3-wenst@chromium.org>
+ <2c37a716-e4bb-4db3-a95f-a40e05b28cad@molgen.mpg.de>
+From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+In-Reply-To: <2c37a716-e4bb-4db3-a95f-a40e05b28cad@molgen.mpg.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Mon, 29 Jan 2024 19:22:28 +0300 Ar=C4=B1n=C3=A7 =C3=9CNAL wrote:
-> > I hope this moves the patch set out of the 'deferred' state.
-> >=20
-> > ---
-> > pw-bot: under-review =20
->=20
-> I still see deferred. I guess I'll have to submit this again. :/
+Il 29/01/24 17:31, Paul Menzel ha scritto:
+> Dear Chen-Yu,
+> 
+> 
+> Thank you for your patch.
+> 
+> Am 26.01.24 um 07:34 schrieb Chen-Yu Tsai:
+>> Bluetooth is not a random device connected to the MMC/SD controller. It
+>> is function 2 of the SDIO device.
+>>
+>> Fix the address of the bluetooth node. Also fix the node name and drop
+>> the label.
+> 
+> Excuse my ignorance: Is this a cosmetic fix or does it fix the device somehow?
+> 
+>> Fixes: 055ef10ccdd4 ("arm64: dts: mt8183: Add jacuzzi pico/pico6 board")
+>> Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
+>> Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+>> ---
+>> Changes since v1:
+>> - Collected reviewed-by
+>>
+>>   arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts | 3 ++-
+>>   1 file changed, 2 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts 
+>> b/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts
+>> index a2e74b829320..6a7ae616512d 100644
+>> --- a/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts
+>> +++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts
+>> @@ -82,7 +82,8 @@ pins-clk {
+>>   };
+>>   &mmc1 {
+>> -    bt_reset: bt-reset {
+>> +    bluetooth@2 {
+>> +        reg = <2>;
+> 
+> To avoid confusion, would it be possible to use sdio as a “name”.
+> 
 
-Took me an hour to fix the mailbot:
-https://github.com/kuba-moo/nipa/commit/6766e97e72ac91ffb42ed2259bc8e2ace44=
-6d0ef
-email is the most quirky thing ever.
+Names must be generic and descriptive; this is the Bluetooth part of the MT7921s
+hence it's called "bluetooth". If its functionality was "sdio", it'd be as such,
+but this is BT anyway.
+
+"sdio@xxx" would be applicable to, for example, a controller that provides support
+exclusively for SDIO (with no support for eMMC/SD).
+
+Regards,
+Angelo
+
+
 
