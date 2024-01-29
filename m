@@ -1,55 +1,55 @@
-Return-Path: <netdev+bounces-66809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F159840BDB
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:41:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E6A6840BE5
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:42:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 920AD1C20473
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:41:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1A031C228E9
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:42:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC52C15A4B6;
-	Mon, 29 Jan 2024 16:36:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16EF015B101;
+	Mon, 29 Jan 2024 16:38:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="asPnCp/H"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="ryz3Ho7x"
 X-Original-To: netdev@vger.kernel.org
 Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E387A15A4A7;
-	Mon, 29 Jan 2024 16:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4A715B0F2;
+	Mon, 29 Jan 2024 16:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706546209; cv=none; b=qx/L1CBYOfxCDq1MvYIJETe+PpTM0z9uSCCoLcEULO0L6psVlcciRPpB6B9KB4kU3drChH2kWYA4Fy5IJiz3xyaLdPRcFzCTWMwEICmsglk5ARuLBw4m9WnCrGZwsf6rI4lnklcF+7wL5cAdfwn49cn7EUBhCil1B9Th4vZH6H4=
+	t=1706546313; cv=none; b=hSc6g1K29+8Q690elht+kvtbP+2trJBUIPjwVFnxcOvTWMvu8prXZy8DxoIXsMIV9IzaMyVvqUo1vL/JRXE4IcPIQiCsDhkGn0zcfFJhzPQaWJTglnmOJSgEUm58zJi8zcxskvT/DoAbo18eXcGxL+icW7lQ4jxfmbJo+k2060c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706546209; c=relaxed/simple;
-	bh=KeRmE3stTSKqTV2GA+O/3KWIiAY8DmL3ppn/fIpoFW4=;
+	s=arc-20240116; t=1706546313; c=relaxed/simple;
+	bh=W9vkODe01nZU/vsOeFljqJlU/NDJWJCqj+YoON9Vw/o=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DIMvyhfG/Icc5KhP6qsKiJ4JOwe2he79E25vErEDpen4vpLL5TkH/CI7t5iugjOOPSUAUTXfINUWq5FHVPx/UFT4W7y6AG/o21UBZuo5D6a0ng87g/fn1tT3X5ds4iRxh7fbdA30+IT9u31VLsjPyxj6jUt4qDUC5wBb+fCnzJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=asPnCp/H; arc=none smtp.client-ip=46.235.227.194
+	 In-Reply-To:Content-Type; b=ZjcoSz1WFGJJ/zq4S4Gv7NygwAkGVPIoGpLwHSfiQHkxsEoBRcAVgymx4cLMOktB4V3hzfiRIpOO50G25XSG97eqR5e3F6b5ZYv9JQ7Ag/1wybYCDoEmrhYxiJMQJPZhwQqEskLBCErYApjvFilN8BoktH05BO7xMBhC8r6BerU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=ryz3Ho7x; arc=none smtp.client-ip=46.235.227.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1706546205;
-	bh=KeRmE3stTSKqTV2GA+O/3KWIiAY8DmL3ppn/fIpoFW4=;
+	s=mail; t=1706546309;
+	bh=W9vkODe01nZU/vsOeFljqJlU/NDJWJCqj+YoON9Vw/o=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=asPnCp/H8h6+VqbZ9tIYh5Vh4PY+FTVb/PmHnNL/1zsecKppZyoIPp6JiTq7LLyCY
-	 DjSK1ST1Y8SghrKCQfbsE5r2QFu0gSpmvqzYdtw5wzzKN3mblPkrMoUTZwnS65X3aB
-	 ndXrMWUF9aB1C8AhF3+RS4X1bEIZvOqQBFzIuYI8/mu4ICZ9gJZfhlDt84px+ixQ9+
-	 bTXJSWaqccLPFvt8H+gTH/8Y0VE31bsGxo6K39iH4kQGSUGoIceR8cBndhMOySlwom
-	 EuTIczHvBeR5nwOOVCcBK0ML05D5Tyt2GUrMuBEABJZyKVGCEqbp40RDeKN5AF5WQ3
-	 pZiLyMHQIBeEg==
-Received: from [100.113.186.2] (cola.collaboradmins.com [195.201.22.229])
+	b=ryz3Ho7xG3VZ/wYLhKXp90cwOJ07dcV0//QRevsVQw8Xk0DtIqZGGQdQcypWEi4XG
+	 z1El1hlesOFhFoSVgKKoHlv624qElDryQM6P5lya85UF6Rxx/KE6eqnJySdWy58WHc
+	 xFs6ZZwU35BmBX2WDySf9HfHmT2M3muyPPPqv1sBN8Y5UmFaB6FJRd/3dhJUldcOAZ
+	 HuexK+dRwRxiTuYcLf19UIojelxUE+Sh9CSU0hJvghURFGURV5hDC3gJpj8qxaVRpU
+	 GMLvuQtpHIU9Pka/aHWBNDN2gAsxE8yshklBkgotL+a8D++UbLwz2EGGRDGqx2r7Nj
+	 9rxbPS3qdnHJQ==
+Received: from [100.115.223.179] (cola.collaboradmins.com [195.201.22.229])
 	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id E834137814A4;
-	Mon, 29 Jan 2024 16:36:44 +0000 (UTC)
-Message-ID: <627c9ff9-06b3-4735-92ea-8c0ecfc2faf6@collabora.com>
-Date: Mon, 29 Jan 2024 17:36:44 +0100
+	(Authenticated sender: cristicc)
+	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 30A6C37814A4;
+	Mon, 29 Jan 2024 16:38:28 +0000 (UTC)
+Message-ID: <8c4cfc54-bd23-4d56-a4ae-9f3dd5cedb59@collabora.com>
+Date: Mon, 29 Jan 2024 18:38:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,76 +57,60 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] arm64: dts: mediatek: mt8183-pico6: Fix bluetooth
- node
+Subject: Re: [PATCH v4 1/2] dt-bindings: net: starfive,jh7110-dwmac: Add
+ JH7100 SoC compatible
 Content-Language: en-US
-To: Paul Menzel <pmenzel@molgen.mpg.de>, Chen-Yu Tsai <wenst@chromium.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>,
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
  Rob Herring <robh+dt@kernel.org>,
  Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Matthias Brugger
- <matthias.bgg@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
- linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <20240126063500.2684087-1-wenst@chromium.org>
- <20240126063500.2684087-3-wenst@chromium.org>
- <2c37a716-e4bb-4db3-a95f-a40e05b28cad@molgen.mpg.de>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-In-Reply-To: <2c37a716-e4bb-4db3-a95f-a40e05b28cad@molgen.mpg.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+ Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
+ Samin Guo <samin.guo@starfivetech.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, kernel@collabora.com
+References: <20240126191319.1209821-1-cristian.ciocaltea@collabora.com>
+ <20240126191319.1209821-2-cristian.ciocaltea@collabora.com>
+ <0a6f6dcb-18b0-48d5-8955-76bce0e1295d@linaro.org>
+ <e29ae12b-5823-4fba-8029-e8e490462138@collabora.com>
+ <56f3bd3c-c099-405b-837b-16d8aeb4cc4b@lunn.ch>
+From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
+In-Reply-To: <56f3bd3c-c099-405b-837b-16d8aeb4cc4b@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Il 29/01/24 17:31, Paul Menzel ha scritto:
-> Dear Chen-Yu,
-> 
-> 
-> Thank you for your patch.
-> 
-> Am 26.01.24 um 07:34 schrieb Chen-Yu Tsai:
->> Bluetooth is not a random device connected to the MMC/SD controller. It
->> is function 2 of the SDIO device.
+On 1/29/24 15:34, Andrew Lunn wrote:
+>>> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 >>
->> Fix the address of the bluetooth node. Also fix the node name and drop
->> the label.
-> 
-> Excuse my ignorance: Is this a cosmetic fix or does it fix the device somehow?
-> 
->> Fixes: 055ef10ccdd4 ("arm64: dts: mt8183: Add jacuzzi pico/pico6 board")
->> Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
->> Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
->> ---
->> Changes since v1:
->> - Collected reviewed-by
+>> Thank you for the review!
 >>
->>   arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts | 3 ++-
->>   1 file changed, 2 insertions(+), 1 deletion(-)
+>> Could you please apply it to the RESEND version [1] instead, as this one 
+>> had an issue collecting the latest tags, as indicated in [2].
 >>
->> diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts 
->> b/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts
->> index a2e74b829320..6a7ae616512d 100644
->> --- a/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts
->> +++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts
->> @@ -82,7 +82,8 @@ pins-clk {
->>   };
->>   &mmc1 {
->> -    bt_reset: bt-reset {
->> +    bluetooth@2 {
->> +        reg = <2>;
+>> Regards,
+>> Cristian
 > 
-> To avoid confusion, would it be possible to use sdio as a “name”.
+> Hi Cristian
 > 
+> IT is your job as developers to collect together such reviewed-by:
+> tags add apply them to the latest version. So long as there are no
+> major changes, they are still consider applicable.
 
-Names must be generic and descriptive; this is the Bluetooth part of the MT7921s
-hence it's called "bluetooth". If its functionality was "sdio", it'd be as such,
-but this is BT anyway.
+Hi Andrew,
 
-"sdio@xxx" would be applicable to, for example, a controller that provides support
-exclusively for SDIO (with no support for eMMC/SD).
+Jakub requested a rebase, but I missed a tag and that's why I submitted
+the RESEND.  Now we got this new tag which is not on the RESEND
+submission, that's why I asked Krzysztof if he could add his R-b on that
+one.  Unless the maintainers' tooling is able to fetch tags from both
+submissions?!
 
-Regards,
-Angelo
-
-
+Thanks,
+Cristian
 
