@@ -1,82 +1,122 @@
-Return-Path: <netdev+bounces-66756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38008840851
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 15:30:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2B79840853
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 15:30:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1D181F23B40
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 14:30:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 541CBB25E65
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 14:30:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35ADE12C52E;
-	Mon, 29 Jan 2024 14:29:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lEotKr4T"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C13E12CD81;
+	Mon, 29 Jan 2024 14:29:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79BD412DDB8;
-	Mon, 29 Jan 2024 14:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FDEE679E0;
+	Mon, 29 Jan 2024 14:29:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706538569; cv=none; b=ACurfjrD8Eh8HJBMuVvpJCXeNjrhTV4S7rpUgOtrf6On0w2L3tJS+XeZ2l+oIjIZTwidDGQy4oeS83PN4gZBzlfx0mGoOWjqbkP1KgCMIMVjfdfsJXLuX8lO7EMXszQJoM9r3stjEqcsNbBQbcBJWatfaVt2leyuXMTaMnp5Ip0=
+	t=1706538591; cv=none; b=VLnvgPiKlJg05rcuGK1YgvllKDHnRIfJeDGY4JkJb9/tey8aDhJ4N9fqMILutmloa14bDTjgR+KsUNVmOv3QRYXpbcgY84TqJzU4NB7yNxws34UETRy4biGu47lM6+Vkd+1RxwC+OM+fmuo1B+H0fjXs4MQL49qunFndMCxrZq8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706538569; c=relaxed/simple;
-	bh=klGW4JOU0ClALuDIqAMnJ+Upbz3StGj/hOFT5SNXbgQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=stFpGjpu3Zx03w8g48q58bwYZdaiVZmSFzpZ4tI7zKvpUvNw13U3Bay/iSJwPBAKgbIdjCO4YLINRFg/cX9oYXzz5kTTPiBvZMxWeO65HpdL92VME2tmlPBkGHjCf7u9vR7Vkk5/qQKRTqhCmUM/NKec7A7tiwsqe9K7+5aNZ70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lEotKr4T; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=eEk2jH9LZt5ObdKA94XJk1IMNwEaHrVFcULWWP+KBAI=; b=lEotKr4T0fkUQPW3qw7TD1yeTn
-	CJa48VP/EhsWS+dKqsgkKE3mEyvX/eK55hToX/B0C6wwq4g4X+JnASUxW6GSwIE0uxkzyCRYOgs1R
-	AvU5uPSievCvVtiRpot9DHjF69MUZqxC+uT3TDcTljuOCqDxdpiR9TLfn84xF07MudlE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rUSdR-006O6T-Sh; Mon, 29 Jan 2024 15:29:17 +0100
-Date: Mon, 29 Jan 2024 15:29:17 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Andre Werner <andre.werner@systec-electronic.com>
-Cc: hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next v5 1/2] net: phy: phy_device: Prevent nullptr
- exceptions on ISR
-Message-ID: <b507e17b-da8b-4616-b0d0-af9995bf8fc7@lunn.ch>
-References: <20240129135734.18975-1-andre.werner@systec-electronic.com>
- <20240129135734.18975-2-andre.werner@systec-electronic.com>
+	s=arc-20240116; t=1706538591; c=relaxed/simple;
+	bh=sUOl21AQ9QP1KxLqMgEvOcJJpRIJ5FdSCV60Ux3RHr8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fYSwsE8rBGVmu5VVlg5EKwAgg1gBc286hEu2upppUNXse+5NxBZ7y9UU+J4UBPi8AQW9w4gEqq1wUgLY7xv/C2luhDJO/+OhNaSN5VRP+D7POXPB9KKx7iyx826a+9v3O3Upu6qzKyr/pluIPEQKzyCzzuXPFlq5XiZxYtvT6EE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 13FF4DA7;
+	Mon, 29 Jan 2024 06:30:32 -0800 (PST)
+Received: from [10.57.77.253] (unknown [10.57.77.253])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 5C1D33F5A1;
+	Mon, 29 Jan 2024 06:29:45 -0800 (PST)
+Message-ID: <9ab3aa81-294c-4b16-a4e3-97b4fe358be8@arm.com>
+Date: Mon, 29 Jan 2024 14:29:43 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240129135734.18975-2-andre.werner@systec-electronic.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/7] dma: avoid expensive redundant calls for
+ sync operations
+Content-Language: en-GB
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Christoph Hellwig <hch@lst.de>,
+ Marek Szyprowski <m.szyprowski@samsung.com>, Joerg Roedel <joro@8bytes.org>,
+ Will Deacon <will@kernel.org>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>,
+ Magnus Karlsson <magnus.karlsson@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Alexander Duyck <alexanderduyck@fb.com>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, iommu@lists.linux.dev, linux-kernel@vger.kernel.org
+References: <20240126135456.704351-1-aleksander.lobakin@intel.com>
+ <20240126135456.704351-3-aleksander.lobakin@intel.com>
+ <0f6f550c-3eee-46dc-8c42-baceaa237610@arm.com>
+ <7ff3cf5d-b3ff-4b52-9031-30a1cb71c0c9@intel.com>
+ <3d9f7f89-9d62-4916-8f3f-a4aaad85a8e2@intel.com>
+From: Robin Murphy <robin.murphy@arm.com>
+In-Reply-To: <3d9f7f89-9d62-4916-8f3f-a4aaad85a8e2@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 29, 2024 at 02:55:04PM +0100, Andre Werner wrote:
-> If phydev->irq is set unconditionally, check
-> for valid interrupt handler or fall back to polling mode to prevent
-> nullptr exceptions in interrupt service routine.
+On 2024-01-29 2:07 pm, Alexander Lobakin wrote:
+> From: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Date: Fri, 26 Jan 2024 17:45:11 +0100
 > 
-> Signed-off-by: Andre Werner <andre.werner@systec-electronic.com>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+>> From: Robin Murphy <robin.murphy@arm.com>
+>> Date: Fri, 26 Jan 2024 15:48:54 +0000
+>>
+>>> On 26/01/2024 1:54 pm, Alexander Lobakin wrote:
+>>>> From: Eric Dumazet <edumazet@google.com>
+>>>>
+>>>> Quite often, NIC devices do not need dma_sync operations on x86_64
+>>>> at least.
+>>>> Indeed, when dev_is_dma_coherent(dev) is true and
+>>>> dev_use_swiotlb(dev) is false, iommu_dma_sync_single_for_cpu()
+>>>> and friends do nothing.
+>>>>
+>>>> However, indirectly calling them when CONFIG_RETPOLINE=y consumes about
+>>>> 10% of cycles on a cpu receiving packets from softirq at ~100Gbit rate.
+>>>> Even if/when CONFIG_RETPOLINE is not set, there is a cost of about 3%.
+>>>>
+>>>> Add dev->skip_dma_sync boolean which is set during the device
+>>>> initialization depending on the setup: dev_is_dma_coherent() for direct
+>>>> DMA, !(sync_single_for_device || sync_single_for_cpu) or positive result
+>>>> from the new callback, dma_map_ops::can_skip_sync for non-NULL DMA ops.
+>>>> Then later, if/when swiotlb is used for the first time, the flag
+>>>> is turned off, from swiotlb_tbl_map_single().
+>>>
+>>> I think you could probably just promote the dma_uses_io_tlb flag from
+>>> SWIOTLB_DYNAMIC to a general SWIOTLB thing to serve this purpose now.
+>>
+>> Nice catch!
+> 
+> BTW, this implies such hotpath check:
+> 
+> 	if (dev->dma_skip_sync && !READ_ONCE(dev->dma_uses_io_tlb))
+> 		// ...
+> 
+> This seems less effective than just resetting dma_skip_sync on first
+> allocation.
 
-Nitpick:
+Well, my point is not to have a dma_skip_sync at all; I'm suggesting the 
+check would be:
 
-Your Signed-off-by: should go last.
+	if (dev_is_dma_coherent(dev) && dev_uses_io_tlb(dev))
+		...
 
-Its not enough to need a respin, but please keep this in mind for
-future patches.
+where on the platform which cares about this most, that first condition 
+is a compile-time constant (and as implied, the second would want to be 
+similarly wrapped for !SWIOTLB configs).
 
-       Andrew
+Thanks,
+Robin.
 
