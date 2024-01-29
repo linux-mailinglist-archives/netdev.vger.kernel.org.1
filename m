@@ -1,150 +1,265 @@
-Return-Path: <netdev+bounces-66653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52F6C840154
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:23:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2EE38401DB
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:38:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09B662810EE
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:23:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8AA5DB20DF2
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:38:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D45D054FB0;
-	Mon, 29 Jan 2024 09:23:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF1E55765;
+	Mon, 29 Jan 2024 09:38:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="D06slObg"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nl0TWa5S"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f175.google.com (mail-yw1-f175.google.com [209.85.128.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2001754F86
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 09:23:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD36655761
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 09:38:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706520204; cv=none; b=Qj48993bkjv04AJfZ2OsBOUiprT+WjfoucwTT8oPAhm9stgGo7u0ItBLEG6BUsRPFtzZaoVbOIIk+ZIziakpqOZzJ2zyOXe/mFXkOST6WcM/0aoDKhCdsdus54fmI1KoP9Uqkx5oGscVwTD53gxrGoKtmYXRTTpP9dd4ZPi+arU=
+	t=1706521088; cv=none; b=HuFYnq5aA0KJ/kMo2LkF94cEJGGyAv+peAibpAi1mFfyXbnYlh82f1AYgi8CReqKIJOxAZHGuhQWArzJ6w0xNXlJCvlZTNgbdxntbGXR5PWiVOIMFDYuvImwWy8pauv1/lF2ESOsTGHcAb3bSVwZ9ZgJlqtHcXFN9CNpdrgvb6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706520204; c=relaxed/simple;
-	bh=Dn2c12XIiMV/+Rvdj+OiTXeDdTdPbeUo1p6RSVs23vg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Szo8iAA32Whgmts1O1ChSKPbH68/wmgmWrqN2yk6ethtxeR5GRdden996F9oV0Pgqt7EfJxViYCDqyCufQJRbpJbiBeIB2rJpp0EsRv7fjo0zWnq3uPG4kt+WaCMGMW7yLx+kRZA77HFm6lwDZ51xZH9hH0nn1w88ezwt2S/YCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=D06slObg; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706520201;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=OlOkg8ik+RYxbLDWO73VX5eqpjOS24ltjKQhJp/x3NI=;
-	b=D06slObg6eQiXqozWqABaBKZ7jB2/Ng5hGbgSVK3xQ2iAW2VYEnFRKMsIXMginIF4w8EmP
-	MAE4OIipMAZgaaGj6UqXTNIhJ2fcMo6SVWqcfmA80EvSozSnyHKQH0RIpfT12Y0HfwPiv3
-	FVlSHaO+uZ3ihCL+xXrhCq3CN4zddzY=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-277-qmZZLHHKPnK8weoPAl6I7g-1; Mon, 29 Jan 2024 04:23:18 -0500
-X-MC-Unique: qmZZLHHKPnK8weoPAl6I7g-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40efaee41dbso185515e9.1
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 01:23:18 -0800 (PST)
+	s=arc-20240116; t=1706521088; c=relaxed/simple;
+	bh=Ldj1FDg/nEnZb9STOe9WZ7ecK09+3FkjkQDPFWHzixs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hC4gKjwDoLimw0olxqJAIaQeVjtU7fljCq1Oz0gBzHusNh+ksmfVPFjpeUkpHIdUwDSY2w0RWf3u2gJQbrVOF+qUwrAY6w3dSqTbhh0o2PVSG02TsqQWTFwzFwX+YdU8+htd5zhV3W6TfFthLbh7x28m1209ilrLY0SnJoZoTAE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nl0TWa5S; arc=none smtp.client-ip=209.85.128.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f175.google.com with SMTP id 00721157ae682-5ffa694d8e5so31443997b3.0
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 01:38:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1706521086; x=1707125886; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=7GUkQLMq88GAXuh3Eqx0lD6UD7ww86b8Rhtv6iqBIbU=;
+        b=nl0TWa5SnLrytGAWQRk0g4SW80M2Vo4gZU8aO+ILxSlBU6DlflrmukDGMWwy3fKHuj
+         NfBj+FGfE+hWjxiPdNrya5S4r/Q17k4mcLM+Zeg8aTFUXbePSS0gjYkBPvm+Uc3ZJ6SF
+         JB0L74Xb8+JkitijWhxS+1tw0QETuMbpiQY4la1GCCo9YygJRvtu/hp5oaWx/DNzk4sz
+         1O5rScmqiieFOSr8k+mnIjucTQ7wbFCmom+1JFY9oWZZwVB45IbT6F262ShYPeSR/V2G
+         8AYFlS73+LG1OyDmQ2fGG5NMe0/GRdrfY7uK+RGp2VWro1r+sdF+PiZkl5l9oMwGlgFw
+         AxFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706520197; x=1707124997;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OlOkg8ik+RYxbLDWO73VX5eqpjOS24ltjKQhJp/x3NI=;
-        b=sNUatHhjaE+L3Hrj3B2pUfbSp6uOBI9YMATa7Uypccb82CfhVthcXCjOgYIu1J0l05
-         jH1CO6dEalFnJKQsZlIqAgTPgI0q4Jnuq65xadUeTa85hz/3pApfD9/HVLVda8xdMRmG
-         eHPZnQr86axuVBz5lsuod2FaP1UZ34/CtUg7go8Dcg6a6YlPi79R/9KIdcSuJ0AGkQwV
-         POG8P+rdZdMq+HuFZlZX+6eFh/xJUMfACyC6f3sDxi8Zz3HbJNJRdOxoAymeM33xZJoE
-         mHBFMxDhcs/YasqRSf9Ihz9betlhJBhLkB76zjuY6ndC3gxOalnI5W2DrkvbYZmGGymh
-         CGfA==
-X-Gm-Message-State: AOJu0YyPAzv+SXkk1DFKfMZ7PtBte2E84YIwn0p1EC+ZMBXRXF+Eamul
-	2dpluQawiFI7su1WNSL/bv58JCQfzlwRbQF/9kXjxwYe1u5av5ce4IpMq1WrdnSt+Az4CK3YnSf
-	L8KySipEpTctVUXEWzDwolSvK8BtHcNStGH7hbDP80E1xGSfXabq96A==
-X-Received: by 2002:a5d:4ec1:0:b0:33a:e381:b03e with SMTP id s1-20020a5d4ec1000000b0033ae381b03emr3475038wrv.7.1706520197517;
-        Mon, 29 Jan 2024 01:23:17 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEgOxz/yp5duraO2cactFUk3e6tk3d+xJFdgQnyNN+lPZXKEoeUXM8qcGzzXdctbUkNJvpDJQ==
-X-Received: by 2002:a5d:4ec1:0:b0:33a:e381:b03e with SMTP id s1-20020a5d4ec1000000b0033ae381b03emr3475029wrv.7.1706520197169;
-        Mon, 29 Jan 2024 01:23:17 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-230-151.dyn.eolo.it. [146.241.230.151])
-        by smtp.gmail.com with ESMTPSA id n4-20020a5d4c44000000b0033aeda49732sm2180494wrt.33.2024.01.29.01.23.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 01:23:16 -0800 (PST)
-Message-ID: <ef884f08937fcaab4e4020eb3fca91a938385c75.camel@redhat.com>
-Subject: Re: [ANN] net-next is OPEN
-From: Paolo Abeni <pabeni@redhat.com>
-To: David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Cc: Hangbin Liu <liuhangbin@gmail.com>, "netdev@vger.kernel.org"
-	 <netdev@vger.kernel.org>, "netdev-driver-reviewers@vger.kernel.org"
-	 <netdev-driver-reviewers@vger.kernel.org>
-Date: Mon, 29 Jan 2024 10:23:15 +0100
-In-Reply-To: <317aa139-78f8-424b-834a-3730a4c4ad04@kernel.org>
-References: <20240122091612.3f1a3e3d@kernel.org>
-	 <Za98C_rCH8iO_yaK@Laptop-X1> <20240123072010.7be8fb83@kernel.org>
-	 <d0e28c67-51ad-4da1-a6df-7ebdbd45cd2b@kernel.org>
-	 <20240123133925.4b8babdc@kernel.org>
-	 <256ae085-bf8f-419b-bcea-8cdce1b64dce@kernel.org>
-	 <7ae6317ee2797c659e2f14b336554a9e5694858e.camel@redhat.com>
-	 <20240124070755.1c8ef2a4@kernel.org> <20240124081919.4c79a07e@kernel.org>
-	 <aae9edba-e354-44fe-938b-57f5a9dd2718@kernel.org>
-	 <20240124085919.316a48f9@kernel.org>
-	 <bd985576-cc99-49c5-a2e0-09622fd6027a@kernel.org>
-	 <c8420e51-691d-4dd9-8b81-0597e7593d07@kernel.org>
-	 <20240126171346.14647a6f@kernel.org>
-	 <317aa139-78f8-424b-834a-3730a4c4ad04@kernel.org>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+        d=1e100.net; s=20230601; t=1706521086; x=1707125886;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7GUkQLMq88GAXuh3Eqx0lD6UD7ww86b8Rhtv6iqBIbU=;
+        b=TpkTYug2zm5+3HOaJptPVjuIHtc2qQUawMZe8FPawzFH060fq1qMcZOilM6K8EmObQ
+         a1tVPB4ncWq4Z3aPW+UXS502nFzeJYOc2l3fpsYBEoRcfYwQh9JI/Er7dmApeOOQhndy
+         0Ae4vPbCxpYiAbcRovoOLOBXOfCF9U3ex1U4FRbbQVxROUWD7dRfEvBa4P3CpheO4hr2
+         Xx1c09Hc0jy5SEpPj1mYculpQlbnaJI1zJd4a/zIV3eU1O+ZIf2QuHCUqgaUZ7sHbo7C
+         vM6FBgY/1HT9k157856WtvKjX723hv2Jk0TNKflMbl7UQTYwkf5W8W4a/RLZhwJLMb6A
+         sq/A==
+X-Gm-Message-State: AOJu0YxS8VooxUSttE6BFBJ4q+R10xugEgYrJXjicfieExBQKV4/r4AL
+	ujVJq2QV2f2ocQhtchHjmXyagFguI8reJF8KNRGKyX1Miqf6Z9I5/KR9ene5NsIT2UgO3Xjan+p
+	AP2E4/+lopNG0ELV5MMPRSouW7RWsMCh+X3sDdQ==
+X-Google-Smtp-Source: AGHT+IEeoJUoLMtBvZJFkIJY4mg0SVO8RrXIC2eL8rV9XVO7o4cYzCCwHONGiBoxbodpc9WxXQGklKeSWkdZplHmeNA=
+X-Received: by 2002:a81:aa12:0:b0:5ff:5406:e064 with SMTP id
+ i18-20020a81aa12000000b005ff5406e064mr2222313ywh.10.1706521085719; Mon, 29
+ Jan 2024 01:38:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240129051104.1855487-1-quic_devipriy@quicinc.com> <20240129051104.1855487-4-quic_devipriy@quicinc.com>
+In-Reply-To: <20240129051104.1855487-4-quic_devipriy@quicinc.com>
+From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date: Mon, 29 Jan 2024 11:37:54 +0200
+Message-ID: <CAA8EJppG0NehyLPkML5_Xe__Vy_aEu=qNYAd8WU5rsgLjrW8CA@mail.gmail.com>
+Subject: Re: [PATCH V3 3/7] clk: qcom: gcc-ipq9574: Add gpll0_out_aux clock &
+ enable few nssnoc clocks
+To: Devi Priya <quic_devipriy@quicinc.com>
+Cc: andersson@kernel.org, konrad.dybcio@linaro.org, mturquette@baylibre.com, 
+	sboyd@kernel.org, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, 
+	conor+dt@kernel.org, catalin.marinas@arm.com, will@kernel.org, 
+	p.zabel@pengutronix.de, richardcochran@gmail.com, geert+renesas@glider.be, 
+	arnd@arndb.de, neil.armstrong@linaro.org, nfraprado@collabora.com, 
+	m.szyprowski@samsung.com, linux-arm-msm@vger.kernel.org, 
+	linux-clk@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, 2024-01-27 at 21:26 -0700, David Ahern wrote:
-> On 1/26/24 6:13 PM, Jakub Kicinski wrote:
-> > On Fri, 26 Jan 2024 17:56:26 -0700 David Ahern wrote:
-> > > On 1/24/24 2:48 PM, David Ahern wrote:
-> > > https://netdev-2.bots.linux.dev/vmksft-net-mp/results/438381/1-fcnal-=
-test-sh/stdout
-> > >=20
-> > > still shows those 4 tests failing. since they pass on default Ubuntu
-> > > 23.10, I need some information about the setup. What is the OS image =
-in
-> > > use and any known changes to the sysctl settings?
-> > >=20
-> > > Can I get `sysctl net > /tmp/sysctl.net` ? I will compare to Ubuntu a=
-nd
-> > > see if I can figure out the difference and get those added to the scr=
-ipt.
-> >=20
-> > Here's a boot and run of the command (not sure how to export the file
-> > form the VM so I captured all of stdout):
-> >=20
-> > https://netdev-2.bots.linux.dev/vmksft-net-mp/results/sysctl-for-david
-> >=20
-> > The OS is Amazon Linux, annoyingly.
->=20
-> It's a bug in that version of iputils ping. It sets the BINDTODEVICE and
-> then resets it because the source address is not set on the command line
-> (it should not be required).
->=20
-> There are a couple of workarounds - one which might not age well (ie.,
-> amazon linux moving forward to newer packages -I <addr> -I <vrf>) and
-> one that bypasses the purpose of the test (ip vrf exec)).
+On Mon, 29 Jan 2024 at 07:13, Devi Priya <quic_devipriy@quicinc.com> wrote:
+>
+> gcc_nssnoc_nsscc_clk, gcc_nssnoc_snoc_clk, gcc_nssnoc_snoc_1_clk are
+> enabled by default and the RCGs are properly configured by the bootloader.
+>
+> Some of the NSS clocks needs these clocks to be enabled. To avoid
+> these clocks being disabled by clock framework, drop these entries
+> from the clock table and enable it in the driver probe itself.
 
-Could the script validate the 'ping' command WRT the bad behavior/bug
-and  eventually skip the related tests?
+Obvious NAK for mixing two independent changes into a single patch.
 
-Cheers,
+>
+> Also, add support for gpll0_out_aux clock which acts as the parent for
+> certain networking subsystem (nss) clocks.
+>
+> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
+> ---
+>  Changes in V3:
+>         - Dropped flags for gpll0_out_aux
+>         - Dropped few nss clock entries from the clock table and enabled
+>           them in the probe
+>
+>  drivers/clk/qcom/gcc-ipq9574.c | 83 ++++++++++++----------------------
+>  1 file changed, 28 insertions(+), 55 deletions(-)
+>
+> diff --git a/drivers/clk/qcom/gcc-ipq9574.c b/drivers/clk/qcom/gcc-ipq9574.c
+> index e8190108e1ae..987703431b5b 100644
+> --- a/drivers/clk/qcom/gcc-ipq9574.c
+> +++ b/drivers/clk/qcom/gcc-ipq9574.c
+> @@ -105,6 +105,20 @@ static struct clk_alpha_pll_postdiv gpll0 = {
+>         },
+>  };
+>
+> +static struct clk_alpha_pll_postdiv gpll0_out_aux = {
+> +       .offset = 0x20000,
+> +       .regs = clk_alpha_pll_regs[CLK_ALPHA_PLL_TYPE_DEFAULT],
+> +       .width = 4,
+> +       .clkr.hw.init = &(const struct clk_init_data) {
+> +               .name = "gpll0_out_aux",
+> +               .parent_hws = (const struct clk_hw *[]) {
+> +                       &gpll0_main.clkr.hw
+> +               },
+> +               .num_parents = 1,
+> +               .ops = &clk_alpha_pll_postdiv_ro_ops,
+> +       },
+> +};
+> +
+>  static struct clk_alpha_pll gpll4_main = {
+>         .offset = 0x22000,
+>         .regs = clk_alpha_pll_regs[CLK_ALPHA_PLL_TYPE_DEFAULT],
+> @@ -2186,23 +2200,6 @@ static struct clk_branch gcc_nsscfg_clk = {
+>         },
+>  };
+>
+> -static struct clk_branch gcc_nssnoc_nsscc_clk = {
+> -       .halt_reg = 0x17030,
+> -       .clkr = {
+> -               .enable_reg = 0x17030,
+> -               .enable_mask = BIT(0),
+> -               .hw.init = &(const struct clk_init_data) {
+> -                       .name = "gcc_nssnoc_nsscc_clk",
+> -                       .parent_hws = (const struct clk_hw *[]) {
+> -                               &pcnoc_bfdcd_clk_src.clkr.hw
+> -                       },
+> -                       .num_parents = 1,
+> -                       .flags = CLK_SET_RATE_PARENT,
+> -                       .ops = &clk_branch2_ops,
+> -               },
+> -       },
+> -};
+> -
 
-Paolo
+What is the actual consumer for these clocks? Why are you trying to
+hide them instead of making them used by the consumer device?
 
+>  static struct clk_branch gcc_nsscc_clk = {
+>         .halt_reg = 0x17034,
+>         .clkr = {
+> @@ -2585,40 +2582,6 @@ static struct clk_branch gcc_q6ss_boot_clk = {
+>         },
+>  };
+>
+> -static struct clk_branch gcc_nssnoc_snoc_clk = {
+> -       .halt_reg = 0x17028,
+> -       .clkr = {
+> -               .enable_reg = 0x17028,
+> -               .enable_mask = BIT(0),
+> -               .hw.init = &(const struct clk_init_data) {
+> -                       .name = "gcc_nssnoc_snoc_clk",
+> -                       .parent_hws = (const struct clk_hw *[]) {
+> -                               &system_noc_bfdcd_clk_src.clkr.hw
+> -                       },
+> -                       .num_parents = 1,
+> -                       .flags = CLK_SET_RATE_PARENT,
+> -                       .ops = &clk_branch2_ops,
+> -               },
+> -       },
+> -};
+> -
+> -static struct clk_branch gcc_nssnoc_snoc_1_clk = {
+> -       .halt_reg = 0x1707c,
+> -       .clkr = {
+> -               .enable_reg = 0x1707c,
+> -               .enable_mask = BIT(0),
+> -               .hw.init = &(const struct clk_init_data) {
+> -                       .name = "gcc_nssnoc_snoc_1_clk",
+> -                       .parent_hws = (const struct clk_hw *[]) {
+> -                               &system_noc_bfdcd_clk_src.clkr.hw
+> -                       },
+> -                       .num_parents = 1,
+> -                       .flags = CLK_SET_RATE_PARENT,
+> -                       .ops = &clk_branch2_ops,
+> -               },
+> -       },
+> -};
+> -
+>  static struct clk_branch gcc_qdss_etr_usb_clk = {
+>         .halt_reg = 0x2d060,
+>         .clkr = {
+> @@ -4043,7 +4006,6 @@ static struct clk_regmap *gcc_ipq9574_clks[] = {
+>         [GCC_SDCC1_AHB_CLK] = &gcc_sdcc1_ahb_clk.clkr,
+>         [PCNOC_BFDCD_CLK_SRC] = &pcnoc_bfdcd_clk_src.clkr,
+>         [GCC_NSSCFG_CLK] = &gcc_nsscfg_clk.clkr,
+> -       [GCC_NSSNOC_NSSCC_CLK] = &gcc_nssnoc_nsscc_clk.clkr,
+>         [GCC_NSSCC_CLK] = &gcc_nsscc_clk.clkr,
+>         [GCC_NSSNOC_PCNOC_1_CLK] = &gcc_nssnoc_pcnoc_1_clk.clkr,
+>         [GCC_QDSS_DAP_AHB_CLK] = &gcc_qdss_dap_ahb_clk.clkr,
+> @@ -4059,8 +4021,6 @@ static struct clk_regmap *gcc_ipq9574_clks[] = {
+>         [GCC_CMN_12GPLL_AHB_CLK] = &gcc_cmn_12gpll_ahb_clk.clkr,
+>         [GCC_CMN_12GPLL_APU_CLK] = &gcc_cmn_12gpll_apu_clk.clkr,
+>         [SYSTEM_NOC_BFDCD_CLK_SRC] = &system_noc_bfdcd_clk_src.clkr,
+> -       [GCC_NSSNOC_SNOC_CLK] = &gcc_nssnoc_snoc_clk.clkr,
+> -       [GCC_NSSNOC_SNOC_1_CLK] = &gcc_nssnoc_snoc_1_clk.clkr,
+>         [GCC_QDSS_ETR_USB_CLK] = &gcc_qdss_etr_usb_clk.clkr,
+>         [WCSS_AHB_CLK_SRC] = &wcss_ahb_clk_src.clkr,
+>         [GCC_Q6_AHB_CLK] = &gcc_q6_ahb_clk.clkr,
+> @@ -4140,6 +4100,7 @@ static struct clk_regmap *gcc_ipq9574_clks[] = {
+>         [GCC_SNOC_PCIE1_1LANE_S_CLK] = &gcc_snoc_pcie1_1lane_s_clk.clkr,
+>         [GCC_SNOC_PCIE2_2LANE_S_CLK] = &gcc_snoc_pcie2_2lane_s_clk.clkr,
+>         [GCC_SNOC_PCIE3_2LANE_S_CLK] = &gcc_snoc_pcie3_2lane_s_clk.clkr,
+> +       [GPLL0_OUT_AUX] = &gpll0_out_aux.clkr,
+>  };
+>
+>  static const struct qcom_reset_map gcc_ipq9574_resets[] = {
+> @@ -4326,7 +4287,19 @@ static const struct qcom_cc_desc gcc_ipq9574_desc = {
+>
+>  static int gcc_ipq9574_probe(struct platform_device *pdev)
+>  {
+> -       return qcom_cc_probe(pdev, &gcc_ipq9574_desc);
+> +       struct regmap *regmap;
+> +
+> +       regmap = qcom_cc_map(pdev, &gcc_ipq9574_desc);
+> +
+> +       if (IS_ERR(regmap))
+> +               return PTR_ERR(regmap);
+> +
+> +       /* Keep the critical clocks always-On */
+> +       regmap_update_bits(regmap, 0x17030, BIT(0), BIT(0)); /* gcc_nssnoc_nsscc_clk */
+> +       regmap_update_bits(regmap, 0x17028, BIT(0), BIT(0)); /* gcc_nssnoc_snoc_clk */
+> +       regmap_update_bits(regmap, 0x1707C, BIT(0), BIT(0)); /* gcc_nssnoc_snoc_1_clk */
+> +
+> +       return qcom_cc_really_probe(pdev, &gcc_ipq9574_desc, regmap);
+>  }
+>
+>  static struct platform_driver gcc_ipq9574_driver = {
+> --
+> 2.34.1
+>
+>
+
+
+-- 
+With best wishes
+Dmitry
 
