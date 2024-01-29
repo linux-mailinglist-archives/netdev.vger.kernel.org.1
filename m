@@ -1,75 +1,94 @@
-Return-Path: <netdev+bounces-66683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFA2A840496
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:06:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0A878404A1
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:10:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E5D51C21C79
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 12:06:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 529061F213B2
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 12:10:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C33015F544;
-	Mon, 29 Jan 2024 12:06:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5948860275;
+	Mon, 29 Jan 2024 12:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UuxlOh3J"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263E05FB84;
-	Mon, 29 Jan 2024 12:06:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33EA660259
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 12:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706530007; cv=none; b=iRUJaQogulVEPkleX608q2ogFTBgdwSlqg1PkMFgB5n1Z7SFb3qHJiSduRpM0FkcXY/lpmgVLCjKdkiGyK3tWCJe04ueDPdUrzNnTID0SJtqLPWUF77t/1Ti/yFTAuFgWuXPuDXeg3L+I3T7GBUM2SrZgOuYoYSbJ9hMRgLAWP0=
+	t=1706530227; cv=none; b=qPYayUt7Y3xgf0/SeK4JtmGE6D7W/fyc362CXvOPjibFQ5k53+e7Tsh6Kv3YxAJo37TTtdhbk2whMKSitFkSJq4mMpq1hjVuTB4hpdA2FLETIJLmxAe0Q04zteUo18Df5rSqQIaJHUWMaZUZXRlLTMH4Aj4PmDt8sRDWFRV4Z+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706530007; c=relaxed/simple;
-	bh=t6LkJ01vvW/rXZtVIG+IWUs51vMwwbSUr66QJREtVlo=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=MDJ392A1VuXuk5XE/IBD3bW40QSzqWgu5u0X5efemetTIEpo4ilGx2AvpYrCigcJ1458cx7d2YCA6TrrOtaU66fIRfFgeJxmuj41kNd5on+iIb8+CGOG/4B/IZ9Mch2woEdxSdZqZNiW2cPCaQFiQeYtJPfO+ObqfINkU+zynR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4TNn702Bk4zXh0X;
-	Mon, 29 Jan 2024 20:05:16 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 381FA1404F8;
-	Mon, 29 Jan 2024 20:06:36 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Mon, 29 Jan
- 2024 20:06:35 +0800
-Subject: Re: [PATCH v6 net-next 4/5] net: page_pool: make stats available just
- for global pools
-To: Lorenzo Bianconi <lorenzo@kernel.org>, <netdev@vger.kernel.org>
-CC: <lorenzo.bianconi@redhat.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <bpf@vger.kernel.org>,
-	<toke@redhat.com>, <willemdebruijn.kernel@gmail.com>, <jasowang@redhat.com>,
-	<sdf@google.com>, <hawk@kernel.org>, <ilias.apalodimas@linaro.org>
-References: <cover.1706451150.git.lorenzo@kernel.org>
- <9f0a571c1f322ff6c4e6facfd7d6d508e73a8f2f.1706451150.git.lorenzo@kernel.org>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <bc5dc202-de63-4dee-5eb4-efd63dcb162b@huawei.com>
-Date: Mon, 29 Jan 2024 20:06:35 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	s=arc-20240116; t=1706530227; c=relaxed/simple;
+	bh=8YA2FgbsekI/HLAKQrFlpL77L4R7NFzOtMr4krLFGLc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=A3pKpHOXUPmiYtsr3NjKOQo0hgzdlhhg8eGr2nXxOv9lG+biaWh6tKgllObgUs4u62SwnAm5V/dw8Fi6DTHiYse+erO1Zi2U+BOJ+zTlBByKaCpXZIDevc3Cf0FsqFuabvRIBLMxaqF854QcW2EXPWwFEsR8tG3CpimBBFtBxrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UuxlOh3J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A425EC43601;
+	Mon, 29 Jan 2024 12:10:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706530226;
+	bh=8YA2FgbsekI/HLAKQrFlpL77L4R7NFzOtMr4krLFGLc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=UuxlOh3JpsfvdJeAqI9HjSZvIOprUTyIh9dZbO16JC1Tn4ok9uhGTwy7BbEpzYjQZ
+	 p6RufoXrQEpdcBDi3SyQp2E+kzukR/R/MtnNemzSq88xEz9XgBeIXkU0vryGOuLKRz
+	 UUKNPjo1FIDwHLj6aboOMRC1K6BTbx5cuUjBXodRuZsEGEwdFgPnwDgA8osofv8hlT
+	 /3porHfQWAkUppQq+1Cv3qtU+o0x6swt3GqkV8o6wO3yo3s+rI1Y9OsBuCya/8elCx
+	 bBVCLbsBZrJzW+HYSEzH0krnC2/NbuZL1VKft2L5/AQCrp3G2F6zSmqTsiZEK06n00
+	 ui9/H42f8Kbgw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8FE86E3237E;
+	Mon, 29 Jan 2024 12:10:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <9f0a571c1f322ff6c4e6facfd7d6d508e73a8f2f.1706451150.git.lorenzo@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 net-next] taprio: validate TCA_TAPRIO_ATTR_FLAGS through
+ policy instead of open-coding
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170653022658.12593.16621412774806621216.git-patchwork-notify@kernel.org>
+Date: Mon, 29 Jan 2024 12:10:26 +0000
+References: <20240125165942.37920-1-alessandromarcolini99@gmail.com>
+In-Reply-To: <20240125165942.37920-1-alessandromarcolini99@gmail.com>
+To: Alessandro Marcolini <alessandromarcolini99@gmail.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
 
-On 2024/1/28 22:20, Lorenzo Bianconi wrote:
-> Move page_pool stats allocation in page_pool_create routine and get rid
-> of it for percpu page_pools.
+Hello:
 
-Is there any reason why we do not need those kind stats for per cpu
-page_pool?
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Thu, 25 Jan 2024 17:59:42 +0100 you wrote:
+> As of now, the field TCA_TAPRIO_ATTR_FLAGS is being validated by manually
+> checking its value, using the function taprio_flags_valid().
+> 
+> With this patch, the field will be validated through the netlink policy
+> NLA_POLICY_MASK, where the mask is defined by TAPRIO_SUPPORTED_FLAGS.
+> The mutual exclusivity of the two flags TCA_TAPRIO_ATTR_FLAG_FULL_OFFLOAD
+> and TCA_TAPRIO_ATTR_FLAG_TXTIME_ASSIST is still checked manually.
+> 
+> [...]
+
+Here is the summary with links:
+  - [v3,net-next] taprio: validate TCA_TAPRIO_ATTR_FLAGS through policy instead of open-coding
+    https://git.kernel.org/netdev/net-next/c/0efc7e541fd5
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
