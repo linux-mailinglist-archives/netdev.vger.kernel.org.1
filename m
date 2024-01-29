@@ -1,116 +1,94 @@
-Return-Path: <netdev+bounces-66810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66811-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E6A6840BE5
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:42:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CE90840BED
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 17:42:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1A031C228E9
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:42:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 973901C22B8A
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:42:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16EF015B101;
-	Mon, 29 Jan 2024 16:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2898315698D;
+	Mon, 29 Jan 2024 16:39:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="ryz3Ho7x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nzTtLe2v"
 X-Original-To: netdev@vger.kernel.org
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4A715B0F2;
-	Mon, 29 Jan 2024 16:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2C81157026;
+	Mon, 29 Jan 2024 16:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706546313; cv=none; b=hSc6g1K29+8Q690elht+kvtbP+2trJBUIPjwVFnxcOvTWMvu8prXZy8DxoIXsMIV9IzaMyVvqUo1vL/JRXE4IcPIQiCsDhkGn0zcfFJhzPQaWJTglnmOJSgEUm58zJi8zcxskvT/DoAbo18eXcGxL+icW7lQ4jxfmbJo+k2060c=
+	t=1706546375; cv=none; b=gfGJjPLcdg9vGUiK9cYcEoAePM6ar5Jt8iW4LNDL7RpBnQZMcaNnExCnSndy4REmmg2ZGmWFRmZFrqx39ICyabLGbAAIu0qy32jL/1JtzxK8dRJsUcvUFmIfhpcZZKuNVUeLWRzspLCYiIrww5aAE9Whk2MI7dxH2AFb1/7/vM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706546313; c=relaxed/simple;
-	bh=W9vkODe01nZU/vsOeFljqJlU/NDJWJCqj+YoON9Vw/o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZjcoSz1WFGJJ/zq4S4Gv7NygwAkGVPIoGpLwHSfiQHkxsEoBRcAVgymx4cLMOktB4V3hzfiRIpOO50G25XSG97eqR5e3F6b5ZYv9JQ7Ag/1wybYCDoEmrhYxiJMQJPZhwQqEskLBCErYApjvFilN8BoktH05BO7xMBhC8r6BerU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=ryz3Ho7x; arc=none smtp.client-ip=46.235.227.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1706546309;
-	bh=W9vkODe01nZU/vsOeFljqJlU/NDJWJCqj+YoON9Vw/o=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ryz3Ho7xG3VZ/wYLhKXp90cwOJ07dcV0//QRevsVQw8Xk0DtIqZGGQdQcypWEi4XG
-	 z1El1hlesOFhFoSVgKKoHlv624qElDryQM6P5lya85UF6Rxx/KE6eqnJySdWy58WHc
-	 xFs6ZZwU35BmBX2WDySf9HfHmT2M3muyPPPqv1sBN8Y5UmFaB6FJRd/3dhJUldcOAZ
-	 HuexK+dRwRxiTuYcLf19UIojelxUE+Sh9CSU0hJvghURFGURV5hDC3gJpj8qxaVRpU
-	 GMLvuQtpHIU9Pka/aHWBNDN2gAsxE8yshklBkgotL+a8D++UbLwz2EGGRDGqx2r7Nj
-	 9rxbPS3qdnHJQ==
-Received: from [100.115.223.179] (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: cristicc)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 30A6C37814A4;
-	Mon, 29 Jan 2024 16:38:28 +0000 (UTC)
-Message-ID: <8c4cfc54-bd23-4d56-a4ae-9f3dd5cedb59@collabora.com>
-Date: Mon, 29 Jan 2024 18:38:27 +0200
+	s=arc-20240116; t=1706546375; c=relaxed/simple;
+	bh=Wx2ncxs11cOVQIR52Fc1zeUx2i2z6BCmR5mLf3EPhcQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QxGhDXtHDQTjrutpvcAV/tmDIPJ7+jwRkNuApGgud3XNBm711QIZScUQBqjq9Iq6PBnRgMsoC4OyBhYRfqW7iFoTh42zSGTuw+ScYxelcYO5/57aIG/qf0Wnk9TOFMZT0GirrY7ALYgIeQBBFjQx6dyrYmb1MEwbpgsyM2hMJ/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nzTtLe2v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03CB7C433F1;
+	Mon, 29 Jan 2024 16:39:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706546374;
+	bh=Wx2ncxs11cOVQIR52Fc1zeUx2i2z6BCmR5mLf3EPhcQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nzTtLe2vx7jkI7Ww83TJ3QP+5hmAV3MgM1XL8f8QuA2SUHHUKVe+ojnhGGk5g0UeI
+	 AjtvGTIMuCBXeiBUs5T2GXbtBWvr8dNy2zQ3kJ4+gwrPVWg9Xn2BhceTbKJI/Ce/BS
+	 mfO1ISSf5I4vR8ZZWB5LXBduALN8N7fvtJkubkzw5tp9p3wE8o/sV64PZXcvWFT1mw
+	 MNfuFHmZz3wSCnEMo0LrBzwxU/4ZAMOgJu8IBV9m0bCBv53mDSizZk2qotC0vGyixP
+	 Un0IjgSLLrhlFFGzWsdjyXfBy/Q+vMW4nxrdNhCFYuvnGfPAJ3jEjwcPvask3ZWG3K
+	 I0AVhYN9KnN/g==
+Date: Mon, 29 Jan 2024 08:39:33 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>, Xin Long
+ <lucien.xin@gmail.com>, Florian Westphal <fw@strlen.de>, Aaron Conole
+ <aconole@redhat.com>, Nikolay Aleksandrov <razor@blackwall.org>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net] selftests: net: add missing config for big tcp
+ tests
+Message-ID: <20240129083933.6b964b3f@kernel.org>
+In-Reply-To: <d67d7e4a77c8aec7778f378e7a95916c89f52973.camel@redhat.com>
+References: <21630ecea872fea13f071342ac64ef52a991a9b5.1706282943.git.pabeni@redhat.com>
+	<20240126115551.176e3888@kernel.org>
+	<a090936028c28b480cf3f8a66a9c3d924b7fd6ec.camel@redhat.com>
+	<d67d7e4a77c8aec7778f378e7a95916c89f52973.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 1/2] dt-bindings: net: starfive,jh7110-dwmac: Add
- JH7100 SoC compatible
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Emil Renner Berthing <kernel@esmil.dk>,
- Samin Guo <samin.guo@starfivetech.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, kernel@collabora.com
-References: <20240126191319.1209821-1-cristian.ciocaltea@collabora.com>
- <20240126191319.1209821-2-cristian.ciocaltea@collabora.com>
- <0a6f6dcb-18b0-48d5-8955-76bce0e1295d@linaro.org>
- <e29ae12b-5823-4fba-8029-e8e490462138@collabora.com>
- <56f3bd3c-c099-405b-837b-16d8aeb4cc4b@lunn.ch>
-From: Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-In-Reply-To: <56f3bd3c-c099-405b-837b-16d8aeb4cc4b@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On 1/29/24 15:34, Andrew Lunn wrote:
->>> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
->>
->> Thank you for the review!
->>
->> Could you please apply it to the RESEND version [1] instead, as this one 
->> had an issue collecting the latest tags, as indicated in [2].
->>
->> Regards,
->> Cristian
+On Mon, 29 Jan 2024 17:31:33 +0100 Paolo Abeni wrote:
+> Uhm... while the self-test doesn't emit anymore the message related to
+> the missing modules, it still fails in the CI env and I can't reproduce
+> the failures in my local env (the same for the gro.sh script).
 > 
-> Hi Cristian
-> 
-> IT is your job as developers to collect together such reviewed-by:
-> tags add apply them to the latest version. So long as there are no
-> major changes, they are still consider applicable.
+> If I understand correctly, the tests run under double virtualization (a
+> VM on top AWS?), is that correct? I guess the extra slowdown/overhead
+> will need more care.
 
-Hi Andrew,
+Yes, it's VM inside a VM without nested virtualization support.
+A weird setup, granted, but when we move to bare metal I'd like
+to enable KASAN, which will probably cause a similar slowdown..
 
-Jakub requested a rebase, but I missed a tag and that's why I submitted
-the RESEND.  Now we got this new tag which is not on the RESEND
-submission, that's why I asked Krzysztof if he could add his R-b on that
-one.  Unless the maintainers' tooling is able to fetch tags from both
-submissions?!
+You could possibly get a similar slowdown by disabling HW virt /
+KVM?
 
-Thanks,
-Cristian
+FWIW far the 4 types of issues we've seen were:
+ - config missing
+ - OS doesn't ifup by default
+ - OS tools are old / buggy
+ - VM-in-VM is just too slow.
+
+There's a bunch of failures in forwarding which look like perf issues.
+I wonder if we should introduce something in the settings file to let
+tests know that they are running in very slow env?
 
