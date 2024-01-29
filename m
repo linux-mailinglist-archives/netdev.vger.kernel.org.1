@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-66893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91E558415C0
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 23:36:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3415F8415C2
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 23:36:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F4CA1F252CE
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 22:36:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B33FEB23A11
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 22:36:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C9795467B;
-	Mon, 29 Jan 2024 22:35:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422CB5B1EC;
+	Mon, 29 Jan 2024 22:35:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QpJ7rh0A"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X+zzDs2j"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3CA54276;
-	Mon, 29 Jan 2024 22:35:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89A3854666;
+	Mon, 29 Jan 2024 22:35:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706567735; cv=none; b=oW8XzYCz8jVBw5Pc9cYpFz78KoYVYUh+9yjAtoCm1iixpAZSTfZwEVtW+f4GM9Tv435mzA+jFVOMPkd2e7991McT0VveHxV+Kv9fICTk2+q7IREz5O6rdgASobVVgzTpNLTQR4i76xwf0+vvtz+rqkXKKYnmLdFdf6DOos3mrnE=
+	t=1706567736; cv=none; b=tWYaVv3ruSU8s7XrvGmf6s0x2i5Cq9nhktnYUdUQWkw0ZmergoPdKm9nkNwyVt0QIjRMXHw3TGU72z3dWl/XBOS1dnCOi0UhmXGxkDTgbxxZ82szKplof7mqP9fa1K8blqdQp7Rhb6ifLX6iJjFMPeh420TqPvGwmQcQw8iP3fQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706567735; c=relaxed/simple;
-	bh=hG82PmU96foe+hKO0K3H/9CAb3vxzu+h0O9pK1YlwpE=;
+	s=arc-20240116; t=1706567736; c=relaxed/simple;
+	bh=/zsXTUB3sjsImCCK9upNqx8I9wVeovJbph39RKjkwx4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VxCQfUtQd4vXaJoAYPhk+cSyMTZ/FpCazjtbzcH4w3Kt/GyOPYh/l2aqDewZ7et9F2Vq2HHvY9wViHqa8SMY7TeSinzLNY1WNbwjjGL1/nvrdnoo2NWp3s3lSH5PZCWGznaT35LX60IuwGxDlVZSZzcNCdMOPrn65DyuVZorvpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QpJ7rh0A; arc=none smtp.client-ip=209.85.128.54
+	 MIME-Version; b=MBTTBqhjvOdUJw4K6MW8sjJDBsRpcBNYpbtzXJBmypaaJ9tqY+nUS9O+5vzpjYBvfW8jasTu0XM4dXSCZie+x7E4lI8gQSP6CF0O5zJWz/8/rhBWuZ2AQ3P22rVRQ1enrKF4ulobwMVnjL+s25iZ4cUbI+yo8374UOZWIFfWWFI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X+zzDs2j; arc=none smtp.client-ip=209.85.128.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40ef75adf44so11996905e9.3;
-        Mon, 29 Jan 2024 14:35:33 -0800 (PST)
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40ed356a6ecso29309795e9.2;
+        Mon, 29 Jan 2024 14:35:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706567731; x=1707172531; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706567732; x=1707172532; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JLRsyiBLlG1o/uwlyldd0juZuNiwvnE4YR1zXRqyT+w=;
-        b=QpJ7rh0A/KxE1As8+lEQiBzmzQdUGl4zTzPCFKCAbdQ9OFZ9hCLQJRhKfFRRRhUspG
-         UPAb6EmE728GUWJOaR+Dwe8n+yA0RbbdECzyNsjbMVcCWXRuvpsZ/RrXjUKDIPgxV+v6
-         MYLz4lCAr5CRZTG2u9zjHoScSD6plFN4Dt8kPxLN0k24eTbWn9dbSHyjwA+v3vniutfr
-         mv8wtIR/njXeHbzbuF/8dxax4XhavCZI4pU+VQz5EJQWnSxEo2jfgdY+kcTMVBcmvexA
-         dd6SgACFUzWfydygLk0wWxVmTcM3uSiYMjWR1aIpV5BoCjdRjQDYm5wgUHbHY/GK78No
-         CiMA==
+        bh=WqSkYHAmR43l7wpB22/dLWRzx8oLOkfvDSmsds3Q2K4=;
+        b=X+zzDs2jeGvGJcWJPXQqPtvoAkRpc5cJ6987kgqMM7EQr7dpAJFJ4oO07c/2SgZf9a
+         3CcS8Ls6zXvpOzUa+xArqWVQriSfPKqBtz/y8T34MkuiGEaV94YpIV0mao10oLuxY+Kc
+         F+W670lR8nqszqZsCEPiBjlAMYZuLUs2N4BF70RUWaJRgHymKnCw/wxbU2FJIijsV9/k
+         wW0fPFlz2y5u61NF9kFMSYmstbHcfovyK38CAdyQSPj6g2K93JI60mq3INdXZuj+iZw7
+         yt1vV+EI9wqC4ryXh3dUf7TnJNpL4rvKqnRdfmsxYAnBRgWJsAWPd9kvfZcoxcju3V6p
+         28bA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706567731; x=1707172531;
+        d=1e100.net; s=20230601; t=1706567732; x=1707172532;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JLRsyiBLlG1o/uwlyldd0juZuNiwvnE4YR1zXRqyT+w=;
-        b=dUi1C75YV59GxtTNO5GxdCIwbykRYI6d3PxtVjTYPjVlSZxJV4478sTxOS09oPTD4W
-         F+tJfZFQKTO7YCSRaiL1/X29Yn0xmJUE7oZS5Di3ADCoPtIsPDwj0TOxuRzKPwFnwBac
-         HMEEkWtkgmKU01JRJZqbKVbTQWmc/OEhOpcOVzeuiXmUujOYx4a4PsHPZmbtj26xw9+C
-         CbHF3fPSO6awAUDqSyAcvpoYz0YDgfyLyPWkC51Rx9HB7yuQ7CkbWXL7tB0iE7nt3LLg
-         L8vwaOQSfkuu1Yn4lw4Z9BdohsGmMLY50p2KRsFw8RRmoZUc0fVgUO//elic/9NDAdMG
-         lAzg==
-X-Gm-Message-State: AOJu0YzlFVEgIm59XFzyLeZPXvDqJvfz3hdfuiOBsP/1OFcvDiTzvaKG
-	BbCgYwTfASM7w72FtgkjzAx7qwmkIqxNW/o0l6zSRzDgxL7WxxEjfgsfC2h9P+E=
-X-Google-Smtp-Source: AGHT+IGTz9LEWhX0dX3SS/wuQaV5Jr6/xP6h8h41ftyAq3MUnlT5aqD8ZRaNstpm/25mwUVjKTbydA==
-X-Received: by 2002:a05:600c:4ecb:b0:40e:4f81:3f68 with SMTP id g11-20020a05600c4ecb00b0040e4f813f68mr6042883wmq.16.1706567731452;
-        Mon, 29 Jan 2024 14:35:31 -0800 (PST)
+        bh=WqSkYHAmR43l7wpB22/dLWRzx8oLOkfvDSmsds3Q2K4=;
+        b=P+RkmYyTNO6DP42Lglfa0nxlpRMDhKhjOwYlHsEe9OhGwXGy38NQtOkYxPXaF5sQyo
+         GqKPTiWLe1dJWoMPmKhyKFf7n27JpHd+D51vH1ZIAO7l16SVxYtRaw5ZYSg6JdYaWqrO
+         VBdRt8lc7x8FS9Dq5lsdt31ORTfnYbIql9PU+2tR1g3X/Y95OJ5yuUdiGLcpU4ZYdGBn
+         9r34xGmY01n+x6+rXielXR+Xbr4DCdc0okuoIDKiJJ+prRk3aM9FmRrawtEiQdzPmfcZ
+         rKjIP6CbfqaneMcDtH68j5Egi6H7NfSSMqF2P5J4+hxHmm9u/YeSDJ0+njkrJ6kWaqe9
+         BN0Q==
+X-Gm-Message-State: AOJu0YxitKApvF/s+GqnCCn/j1cxPTbzoOQMxpuwbaaJ373rS+6P2lNY
+	QdRI14SFcxESvwAyv+jAsxo7WUoAyJykdc2kjrr1Hvz+++0qEI23kU1sGm1k0lQ=
+X-Google-Smtp-Source: AGHT+IGFR4Pfb1zlHg1h0N+vtD1O0WHmdcvf/w22FftA+PBZvJeX0mHNgQrPEi1nCuEoj4ThBSj4iA==
+X-Received: by 2002:a1c:7914:0:b0:40e:ccca:33e with SMTP id l20-20020a1c7914000000b0040eccca033emr6275758wme.31.1706567732462;
+        Mon, 29 Jan 2024 14:35:32 -0800 (PST)
 Received: from imac.fritz.box ([2a02:8010:60a0:0:9c2b:323d:b44d:b76d])
-        by smtp.gmail.com with ESMTPSA id je16-20020a05600c1f9000b0040ec66021a7sm11357281wmb.1.2024.01.29.14.35.30
+        by smtp.gmail.com with ESMTPSA id je16-20020a05600c1f9000b0040ec66021a7sm11357281wmb.1.2024.01.29.14.35.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 14:35:31 -0800 (PST)
+        Mon, 29 Jan 2024 14:35:32 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -80,9 +80,9 @@ To: netdev@vger.kernel.org,
 	Alessandro Marcolini <alessandromarcolini99@gmail.com>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v2 10/13] tools/net/ynl: Add support for nested structs
-Date: Mon, 29 Jan 2024 22:34:55 +0000
-Message-ID: <20240129223458.52046-11-donald.hunter@gmail.com>
+Subject: [PATCH net-next v2 11/13] doc/netlink: Describe nested structs in netlink raw docs
+Date: Mon, 29 Jan 2024 22:34:56 +0000
+Message-ID: <20240129223458.52046-12-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20240129223458.52046-1-donald.hunter@gmail.com>
 References: <20240129223458.52046-1-donald.hunter@gmail.com>
@@ -94,145 +94,56 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Make it possible for struct definitions to reference other struct
-definitions ofr binary members. For example, the tbf qdisc uses this
-struct definition for its parms attribute:
-
-  -
-    name: tc-tbf-qopt
-    type: struct
-    members:
-      -
-        name: rate
-        type: binary
-        struct: tc-ratespec
-      -
-        name: peakrate
-        type: binary
-        struct: tc-ratespec
-      -
-        name: limit
-        type: u32
-      -
-        name: buffer
-        type: u32
-      -
-        name: mtu
-        type: u32
-
-This adds the necessary schema changes and adds nested struct encoding
-and decoding to ynl.
+Add a description and example of nested struct definitions
+to the netlink raw documentation.
 
 Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- Documentation/netlink/netlink-raw.yaml | 15 ++++++++++++---
- tools/net/ynl/lib/nlspec.py            |  2 ++
- tools/net/ynl/lib/ynl.py               | 26 ++++++++++++++++++++------
- 3 files changed, 34 insertions(+), 9 deletions(-)
+ .../userspace-api/netlink/netlink-raw.rst     | 34 +++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
-diff --git a/Documentation/netlink/netlink-raw.yaml b/Documentation/netlink/netlink-raw.yaml
-index 04b92f1a5cd6..ac4e05415f2f 100644
---- a/Documentation/netlink/netlink-raw.yaml
-+++ b/Documentation/netlink/netlink-raw.yaml
-@@ -152,14 +152,23 @@ properties:
-                   the right formatting mechanism when displaying values of this
-                   type.
-                 enum: [ hex, mac, fddi, ipv4, ipv6, uuid ]
-+              struct:
-+                description: Name of the nested struct type.
-+                type: string
-             if:
-               properties:
-                 type:
--                  oneOf:
--                    - const: binary
--                    - const: pad
-+                  const: pad
-             then:
-               required: [ len ]
-+            if:
-+              properties:
-+                type:
-+                  const: binary
-+            then:
-+              oneOf:
-+                - required: [ len ]
-+                - required: [ struct ]
-         # End genetlink-legacy
- 
-   attribute-sets:
-diff --git a/tools/net/ynl/lib/nlspec.py b/tools/net/ynl/lib/nlspec.py
-index 44f13e383e8a..5d197a12ab8d 100644
---- a/tools/net/ynl/lib/nlspec.py
-+++ b/tools/net/ynl/lib/nlspec.py
-@@ -248,6 +248,7 @@ class SpecStructMember(SpecElement):
-         len         integer, optional byte length of binary types
-         display_hint  string, hint to help choose format specifier
-                       when displaying the value
-+        struct      string, name of nested struct type
-     """
-     def __init__(self, family, yaml):
-         super().__init__(family, yaml)
-@@ -256,6 +257,7 @@ class SpecStructMember(SpecElement):
-         self.enum = yaml.get('enum')
-         self.len = yaml.get('len')
-         self.display_hint = yaml.get('display-hint')
-+        self.struct = yaml.get('struct')
- 
- 
- class SpecStruct(SpecElement):
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index 2b0ca61deaf8..0f4193cc2e3b 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -674,7 +674,10 @@ class YnlFamily(SpecFamily):
-             size = 0
-             for m in members:
-                 if m.type in ['pad', 'binary']:
--                    size += m.len
-+                    if m.struct:
-+                        size += self._struct_size(m.struct)
-+                    else:
-+                        size += m.len
-                 else:
-                     format = NlAttr.get_format(m.type, m.byte_order)
-                     size += format.size
-@@ -691,8 +694,14 @@ class YnlFamily(SpecFamily):
-             if m.type == 'pad':
-                 offset += m.len
-             elif m.type == 'binary':
--                value = data[offset : offset + m.len]
--                offset += m.len
-+                if m.struct:
-+                    len = self._struct_size(m.struct)
-+                    value = self._decode_struct(data[offset : offset + len],
-+                                                m.struct)
-+                    offset += len
-+                else:
-+                    value = data[offset : offset + m.len]
-+                    offset += m.len
-             else:
-                 format = NlAttr.get_format(m.type, m.byte_order)
-                 [ value ] = format.unpack_from(data, offset)
-@@ -713,10 +722,15 @@ class YnlFamily(SpecFamily):
-             if m.type == 'pad':
-                 attr_payload += bytearray(m.len)
-             elif m.type == 'binary':
--                if value is None:
--                    attr_payload += bytearray(m.len)
-+                if m.struct:
-+                    if value is None:
-+                        value = dict()
-+                    attr_payload += self._encode_struct(m.struct, value)
-                 else:
--                    attr_payload += bytes.fromhex(value)
-+                    if value is None:
-+                        attr_payload += bytearray(m.len)
-+                    else:
-+                        attr_payload += bytes.fromhex(value)
-             else:
-                 if value is None:
-                     value = 0
+diff --git a/Documentation/userspace-api/netlink/netlink-raw.rst b/Documentation/userspace-api/netlink/netlink-raw.rst
+index 32197f3cb40e..1990eea772d0 100644
+--- a/Documentation/userspace-api/netlink/netlink-raw.rst
++++ b/Documentation/userspace-api/netlink/netlink-raw.rst
+@@ -158,3 +158,37 @@ alongside a sub-message selector and also in a top level ``attribute-set``, then
+ the selector will be resolved using the value 'closest' to the selector. If the
+ value is not present in the message at the same level as defined in the spec
+ then this is an error.
++
++Nested struct definitions
++-------------------------
++
++Many raw netlink families such as :doc:`tc<../../networking/netlink_spec/tc>`
++make use of nested struct definitions. The ``netlink-raw`` schema makes it
++possible to embed a struct within a struct definition using the ``struct``
++property. For example, the following struct definition embeds the
++``tc-ratespec`` struct definition for both the ``rate`` and the ``peakrate``
++members of ``struct tc-tbf-qopt``.
++
++.. code-block:: yaml
++
++  -
++    name: tc-tbf-qopt
++    type: struct
++    members:
++      -
++        name: rate
++        type: binary
++        struct: tc-ratespec
++      -
++        name: peakrate
++        type: binary
++        struct: tc-ratespec
++      -
++        name: limit
++        type: u32
++      -
++        name: buffer
++        type: u32
++      -
++        name: mtu
++        type: u32
 -- 
 2.42.0
 
