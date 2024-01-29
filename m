@@ -1,312 +1,205 @@
-Return-Path: <netdev+bounces-66851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D599841304
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 20:05:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8D51841314
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 20:09:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B17341C20EDC
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 19:05:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1440FB223C3
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 19:09:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168971E53A;
-	Mon, 29 Jan 2024 19:05:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852F447F50;
+	Mon, 29 Jan 2024 19:09:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tySxWspg"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="rIkU6Ws2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3433F1EEEA
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 19:05:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB4033CE7
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 19:09:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706555123; cv=none; b=T3NzUVajYv4Eb55PQRR0bl3T9Bk9m3zh3yQ+EYJsbQrXi+xKuz4z8O2UBROPRHsfBnicAd2HBmZa/3bDb02LGY0XM7PA+IIK1qG8GtqFiHI2UP6S8CJYBM2HCosPTqUB9zb5LPOQfGRgdZ/7zUjgUzzHE7E7qPoti0r81HBMn3g=
+	t=1706555370; cv=none; b=Y4Z1u758nJBIsCNKSvncuZ3VRVxnHH9007bPmOEiwHf9ibwZMt1RWaKs7dnZEYKcdhSoZi8b4/VDm5KAFQRqAfulsYnvRdtbCFNR6fbPldHYInE58v2kppHyIvReXzagdIOVH+iUb8lgh1/JkyBZlFU2A0Sx3xP+Tlky0CRtEC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706555123; c=relaxed/simple;
-	bh=H5Fl3vXZbIqi2bkbYYkNud2iJouymQNe1Yq7b16K/5A=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=o/UdhGbFrMIWwfneCYRztCs1OIbQa17jhWOMhGkykZK25VV+2H5gyQuAVHapRscdy+nNN5lubthfvin32OaWVYe1lcRfwjtwN0sowUF0QpvZkuew06S8d4d/G9i+OUTrK+geDpVlqpvBdccHGAmcf4Q+9bw/c1zTa9iCtwT75is=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tySxWspg; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc69b4b45feso274345276.2
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 11:05:20 -0800 (PST)
+	s=arc-20240116; t=1706555370; c=relaxed/simple;
+	bh=511hvbc1Pbq2+EOuaGOVAprY+/qc4fIDXxmZ7B+0s2w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hl/2x/gGECoKw85SoCSMyN8cI5FiS05mOlWPGvenO8x8lBlkuE0cDoSD//hWUcEE4cbe9OvoftyU9FFJZ51UkV3uoaWiEOt8WfSsEPGPIrg7IXzwWpxrfIBnMNOvZsLk6yHiTQRW+ETkOcC9dbZWQtymrCu+poBnjhZcosXQhAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=rIkU6Ws2; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6ddd19552e6so1424302b3a.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 11:09:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706555120; x=1707159920; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5Rai+m5Og01nItylTtz7qoM1kP+1DRgKoHb6WA6ArYk=;
-        b=tySxWspgKmkrT79u42gbThI6PtM75Cg5nhNO1hpUxZEWYFqrFmH5eUP8hNRzX12NB+
-         A8KxxaGHv0StItBSFk0RVd1r4W7A29/IaAM7sHDw1vGyy3L8DJESa5Wo4EatlMRR5dLJ
-         2UwI+5ZO0VJzcUgonqINPrJ0x5QWx66eJB8EL/ldjnc/VjAxUlUafzFCL1M4E7ClzdY8
-         T27B8jgpadUCA7m2UcUxHcG/OcwghLMc8QvblvzBM3D8TFKdxGGJLFbjvnuRWeOA5sU6
-         fWpv3YmxXCiI14mk14QdKHsjXtJM8jQz52KQNdE9l7YUdBdmwXvpiOJvjxVHYGHGgwcV
-         imfw==
+        d=fastly.com; s=google; t=1706555368; x=1707160168; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=A+pfwsAR7dQEMZaUbmAmf7P3tGpaqey93GDUy/LCXUY=;
+        b=rIkU6Ws2QKHii+1VfbHJ2qXmJcqT+IfmpgjYD4xzI5MIRFiSvC+xRxCq3OP1SGpSgF
+         4TglgnOJTGktPRPsH8rsgF7lN7JIo5WrTDlJVg1OO4glT8goQETCjiwYdIofMJ5z+XVc
+         D3eVlvTYsLHUwtw4Ginkr08ZTdGu83VGHMZK4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706555120; x=1707159920;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5Rai+m5Og01nItylTtz7qoM1kP+1DRgKoHb6WA6ArYk=;
-        b=uSL0Ls8qT3vvBXoAQ1UqyfBYBa88bgftEZ1lUDDm8Yhtx50zDYr+8ukYo/aOqvbQ+c
-         4Bt2mSHaHx2q3Weqo8H+TWtTJL8j192ETPOZ7T+80tLahxCfMZ0HiBHc4ol4vd6FFBnO
-         04beVsVf/ZsZ7t0WX8m8s6aEIlPdIHlVGDvCQEbh7nkI7Us/k77mSE45pYmB0OOEgZ+o
-         8P+q8GRlmSY6jFFIJTp1mr4Z+zmLVQ6tKTuWJ1ApRtI2xYdjFNJN8rUP90G1Jz87L1S4
-         bMBGT/v737jdUwQmWrJWN0nwwbcb5/nMTR1SBFMXOAt1k2iHblRlkbXP3CKe+w42+nEn
-         mJKg==
-X-Gm-Message-State: AOJu0Yyr1CHt9FN0PqABkK3fHAfHdrMb2q8uow8W52e/MHTz9xQ+I/ad
-	yaNZzqC2WbfMjl6tmJlXJ5OvAc2AUGXNLQDBi1YhEDB6ycGpqpAccsrVOhP4S2lq4ua00VE1BxX
-	IxewwD32RBg==
-X-Google-Smtp-Source: AGHT+IH7yysONf2q+zKSEXl3uM6qXELf3HBleprypXBaylxs3zH3vzOOszdfblQXLL2Ha5m8E50QRrTzuNKhrQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:2611:b0:dc2:4ab7:3d89 with SMTP
- id dw17-20020a056902261100b00dc24ab73d89mr2440693ybb.1.1706555120048; Mon, 29
- Jan 2024 11:05:20 -0800 (PST)
-Date: Mon, 29 Jan 2024 19:05:18 +0000
+        d=1e100.net; s=20230601; t=1706555368; x=1707160168;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=A+pfwsAR7dQEMZaUbmAmf7P3tGpaqey93GDUy/LCXUY=;
+        b=nbzwZsb+mUQ2/oRFgFMVO2Wc/6FKsRoPE2AYToMv0YXLQgbb5LeTrxJLjI63XyVAeu
+         6fR7GrjDvNDfSG1BfxKqZUfBJ4R93o2MHIfuDIY9BMjGv/vDYORI9UmlD60EFmhfLJpM
+         To4hgEpL3v/4UQsSRbqIp6QuRZOkLRWG9ETNWkFjUqLQ8onRFF27LqnCueO0uq25RLO6
+         mW7i3Tm7Nnu3jQl6E4Yn7sbsjVJQSRDoiaXr2GtwvoCwT/RfEjftn0aXhcgvznRDlII9
+         nGfBqgPd/0VJjYcjOrzDNXjpW+c5EJpcDZETzDDEl3QYYU9oKTrX6kWFBst2gRW8hsIx
+         V3TQ==
+X-Gm-Message-State: AOJu0Yx2/TPT4Ut9cnqYuLbz9YdwX6Yw5iNwNZa4v2dUBYS025SI9EBa
+	dqmBVggQZCBuQjfV9fNz740bet4aJ98frUdThBsny5WJ0RE+ySOEvolicbqKUlo=
+X-Google-Smtp-Source: AGHT+IESoPfU8AaOOY4JrFQlBadzLfIdEEVi2A6ryh3PYylu1gurZgUOMvs8PMQt3gmoBwZrfVF57g==
+X-Received: by 2002:a05:6a00:939c:b0:6dd:8767:2fa1 with SMTP id ka28-20020a056a00939c00b006dd87672fa1mr4221676pfb.0.1706555367798;
+        Mon, 29 Jan 2024 11:09:27 -0800 (PST)
+Received: from fastly.com (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id gu7-20020a056a004e4700b006db105027basm6234279pfb.50.2024.01.29.11.09.24
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 29 Jan 2024 11:09:27 -0800 (PST)
+Date: Mon, 29 Jan 2024 11:09:23 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	chuck.lever@oracle.com, jlayton@kernel.org,
+	linux-api@vger.kernel.org, brauner@kernel.org, edumazet@google.com,
+	davem@davemloft.net, alexander.duyck@gmail.com,
+	sridhar.samudrala@intel.com, kuba@kernel.org, weiwan@google.com,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Andrew Waterman <waterman@eecs.berkeley.edu>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Dominik Brodowski <linux@dominikbrodowski.net>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Jan Kara <jack@suse.cz>, Jiri Slaby <jirislaby@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Julien Panis <jpanis@baylibre.com>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	"(open list:FILESYSTEMS \\(VFS and infrastructure\\))" <linux-fsdevel@vger.kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nathan Lynch <nathanl@linux.ibm.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Steve French <stfrench@microsoft.com>,
+	Thomas Huth <thuth@redhat.com>,
+	Thomas Zimmermann <tzimmermann@suse.de>
+Subject: Re: [PATCH net-next v3 0/3] Per epoll context busy poll support
+Message-ID: <20240129190922.GA1315@fastly.com>
+References: <20240125225704.12781-1-jdamato@fastly.com>
+ <65b52d6381de7_3a9e0b2943d@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-Message-ID: <20240129190518.585134-1-edumazet@google.com>
-Subject: [PATCH net] af_unix: fix lockdep positive in sk_diag_dump_icons()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <65b52d6381de7_3a9e0b2943d@willemb.c.googlers.com.notmuch>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 
-syzbot reported a lockdep splat [1].
+On Sat, Jan 27, 2024 at 11:20:51AM -0500, Willem de Bruijn wrote:
+> Joe Damato wrote:
+> > Greetings:
+> > 
+> > Welcome to v3. Cover letter updated from v2 to explain why ioctl and
+> > adjusted my cc_cmd to try to get the correct people in addition to folks
+> > who were added in v1 & v2. Labeled as net-next because it seems networking
+> > related to me even though it is fs code.
+> > 
+> > TL;DR This builds on commit bf3b9f6372c4 ("epoll: Add busy poll support to
+> > epoll with socket fds.") by allowing user applications to enable
+> > epoll-based busy polling and set a busy poll packet budget on a per epoll
+> > context basis.
+> > 
+> > This makes epoll-based busy polling much more usable for user
+> > applications than the current system-wide sysctl and hardcoded budget.
+> > 
+> > To allow for this, two ioctls have been added for epoll contexts for
+> > getting and setting a new struct, struct epoll_params.
+> > 
+> > ioctl was chosen vs a new syscall after reviewing a suggestion by Willem
+> > de Bruijn [1]. I am open to using a new syscall instead of an ioctl, but it
+> > seemed that: 
+> >   - Busy poll affects all existing epoll_wait and epoll_pwait variants in
+> >     the same way, so new verions of many syscalls might be needed. It
+> 
+> There is no need to support a new feature on legacy calls. Applications have
+> to be upgraded to the new ioctl, so they can also be upgraded to the latest
+> epoll_wait variant.
 
-Blamed commit hinted about the possible lockdep
-violation, and code used unix_state_lock_nested()
-in an attempt to silence lockdep.
+Sure, that's a fair point. I think we could probably make reasonable
+arguments in both directions about the pros/cons of each approach.
 
-It is not sufficient, because unix_state_lock_nested()
-is already used from unix_state_double_lock().
+It's still not clear to me that a new syscall is the best way to go on
+this, and IMO it does not offer a clear advantage. I understand that part
+of the premise of your argument is that ioctls are not recommended, but in
+this particular case it seems like a good use case and there have been
+new ioctls added recently (at least according to git log).
 
-We need to use a separate subclass.
+This makes me think that while their use is not recommended, they can serve
+a purpose in specific use cases. To me, this use case seems very fitting.
 
-This patch adds a distinct enumeration to makes things
-more explicit.
+More of a joke and I hate to mention this, but this setting is changing how
+io is done and it seems fitting that this done via an ioctl ;)
 
-Also use swap() in unix_state_double_lock() as a clean up.
+> epoll_pwait extends epoll_wait with a sigmask.
+> epoll_pwait2 extends extends epoll_pwait with nsec resolution timespec.
+> Since they are supersets, nothing is lots by limiting to the most recent API.
+> 
+> In the discussion of epoll_pwait2 the addition of a forward looking flags
+> argument was discussed, but eventually dropped. Based on the argument that
+> adding a syscall is not a big task and does not warrant preemptive code.
+> This decision did receive a suitably snarky comment from Jonathan Corbet [1].
+> 
+> It is definitely more boilerplate, but essentially it is as feasible to add an
+> epoll_pwait3 that takes an optional busy poll argument. In which case, I also
+> believe that it makes more sense to configure the behavior of the syscall
+> directly, than through another syscall and state stored in the kernel.
 
-[1]
-WARNING: possible circular locking dependency detected
-6.8.0-rc1-syzkaller-00356-g8a696a29c690 #0 Not tainted
+I definitely hear what you are saying; I think I'm still not convinced, but
+I am thinking it through.
 
-syz-executor.1/2542 is trying to acquire lock:
- ffff88808b5df9e8 (rlock-AF_UNIX){+.+.}-{2:2}, at: skb_queue_tail+0x36/0x120 net/core/skbuff.c:3863
+In my mind, all of the other busy poll settings are configured by setting
+options on the sockets using various SO_* options, which modify some state
+in the kernel. The existing system-wide busy poll sysctl also does this. It
+feels strange to me to diverge from that pattern just for epoll.
 
-but task is already holding lock:
- ffff88808b5dfe70 (&u->lock/1){+.+.}-{2:2}, at: unix_dgram_sendmsg+0xfc7/0x2200 net/unix/af_unix.c:2089
+In the case of epoll_pwait2 the addition of a new syscall is an approach
+that I think makes a lot of sense. The new system call is also probably
+better from an end-user usability perspective, as well. For busy poll, I
+don't see a clear reasoning why a new system call is better, but maybe I am
+still missing something.
 
-which lock already depends on the new lock.
+> I don't think that the usec fine grain busy poll argument is all that useful.
+> Documentation always suggests setting it to 50us or 100us, based on limited
+> data. Main point is to set it to exceed the round-trip delay of whatever the
+> process is trying to wait on. Overestimating is not costly, as the call
+> returns as soon as the condition is met. An epoll_pwait3 flag EPOLL_BUSY_POLL
+> with default 100us might be sufficient.
+> 
+> [1] https://lwn.net/Articles/837816/
 
-the existing dependency chain (in reverse order) is:
+Perhaps I am misunderstanding what you are suggesting, but I am opposed to
+hardcoding a value. If it is currently configurable system-wide and via
+SO_* options for other forms of busy poll, I think it should similarly be
+configurable for epoll busy poll.
 
--> #1 (&u->lock/1){+.+.}-{2:2}:
-        lock_acquire+0x1e3/0x530 kernel/locking/lockdep.c:5754
-        _raw_spin_lock_nested+0x31/0x40 kernel/locking/spinlock.c:378
-        sk_diag_dump_icons net/unix/diag.c:87 [inline]
-        sk_diag_fill+0x6ea/0xfe0 net/unix/diag.c:157
-        sk_diag_dump net/unix/diag.c:196 [inline]
-        unix_diag_dump+0x3e9/0x630 net/unix/diag.c:220
-        netlink_dump+0x5c1/0xcd0 net/netlink/af_netlink.c:2264
-        __netlink_dump_start+0x5d7/0x780 net/netlink/af_netlink.c:2370
-        netlink_dump_start include/linux/netlink.h:338 [inline]
-        unix_diag_handler_dump+0x1c3/0x8f0 net/unix/diag.c:319
-       sock_diag_rcv_msg+0xe3/0x400
-        netlink_rcv_skb+0x1df/0x430 net/netlink/af_netlink.c:2543
-        sock_diag_rcv+0x2a/0x40 net/core/sock_diag.c:280
-        netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
-        netlink_unicast+0x7e6/0x980 net/netlink/af_netlink.c:1367
-        netlink_sendmsg+0xa37/0xd70 net/netlink/af_netlink.c:1908
-        sock_sendmsg_nosec net/socket.c:730 [inline]
-        __sock_sendmsg net/socket.c:745 [inline]
-        sock_write_iter+0x39a/0x520 net/socket.c:1160
-        call_write_iter include/linux/fs.h:2085 [inline]
-        new_sync_write fs/read_write.c:497 [inline]
-        vfs_write+0xa74/0xca0 fs/read_write.c:590
-        ksys_write+0x1a0/0x2c0 fs/read_write.c:643
-        do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-        do_syscall_64+0xf5/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x63/0x6b
+I may yet be convinced by the new syscall argument, but I don't think I'd
+agree on imposing a default. The value can be modified by other forms of
+busy poll and the goal of my changes are to:
+  - make epoll-based busy poll per context
+  - allow applications to configure (within reason) how epoll-based busy
+    poll behaves, like they can do now with the existing SO_* options for
+    other busy poll methods.
 
--> #0 (rlock-AF_UNIX){+.+.}-{2:2}:
-        check_prev_add kernel/locking/lockdep.c:3134 [inline]
-        check_prevs_add kernel/locking/lockdep.c:3253 [inline]
-        validate_chain+0x1909/0x5ab0 kernel/locking/lockdep.c:3869
-        __lock_acquire+0x1345/0x1fd0 kernel/locking/lockdep.c:5137
-        lock_acquire+0x1e3/0x530 kernel/locking/lockdep.c:5754
-        __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-        _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
-        skb_queue_tail+0x36/0x120 net/core/skbuff.c:3863
-        unix_dgram_sendmsg+0x15d9/0x2200 net/unix/af_unix.c:2112
-        sock_sendmsg_nosec net/socket.c:730 [inline]
-        __sock_sendmsg net/socket.c:745 [inline]
-        ____sys_sendmsg+0x592/0x890 net/socket.c:2584
-        ___sys_sendmsg net/socket.c:2638 [inline]
-        __sys_sendmmsg+0x3b2/0x730 net/socket.c:2724
-        __do_sys_sendmmsg net/socket.c:2753 [inline]
-        __se_sys_sendmmsg net/socket.c:2750 [inline]
-        __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2750
-        do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-        do_syscall_64+0xf5/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&u->lock/1);
-                               lock(rlock-AF_UNIX);
-                               lock(&u->lock/1);
-  lock(rlock-AF_UNIX);
-
- *** DEADLOCK ***
-
-1 lock held by syz-executor.1/2542:
-  #0: ffff88808b5dfe70 (&u->lock/1){+.+.}-{2:2}, at: unix_dgram_sendmsg+0xfc7/0x2200 net/unix/af_unix.c:2089
-
-stack backtrace:
-CPU: 1 PID: 2542 Comm: syz-executor.1 Not tainted 6.8.0-rc1-syzkaller-00356-g8a696a29c690 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-Call Trace:
- <TASK>
-  __dump_stack lib/dump_stack.c:88 [inline]
-  dump_stack_lvl+0x1e7/0x2d0 lib/dump_stack.c:106
-  check_noncircular+0x366/0x490 kernel/locking/lockdep.c:2187
-  check_prev_add kernel/locking/lockdep.c:3134 [inline]
-  check_prevs_add kernel/locking/lockdep.c:3253 [inline]
-  validate_chain+0x1909/0x5ab0 kernel/locking/lockdep.c:3869
-  __lock_acquire+0x1345/0x1fd0 kernel/locking/lockdep.c:5137
-  lock_acquire+0x1e3/0x530 kernel/locking/lockdep.c:5754
-  __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-  _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
-  skb_queue_tail+0x36/0x120 net/core/skbuff.c:3863
-  unix_dgram_sendmsg+0x15d9/0x2200 net/unix/af_unix.c:2112
-  sock_sendmsg_nosec net/socket.c:730 [inline]
-  __sock_sendmsg net/socket.c:745 [inline]
-  ____sys_sendmsg+0x592/0x890 net/socket.c:2584
-  ___sys_sendmsg net/socket.c:2638 [inline]
-  __sys_sendmmsg+0x3b2/0x730 net/socket.c:2724
-  __do_sys_sendmmsg net/socket.c:2753 [inline]
-  __se_sys_sendmmsg net/socket.c:2750 [inline]
-  __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2750
-  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-  do_syscall_64+0xf5/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7f26d887cda9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f26d95a60c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007f26d89abf80 RCX: 00007f26d887cda9
-RDX: 000000000000003e RSI: 00000000200bd000 RDI: 0000000000000004
-RBP: 00007f26d88c947a R08: 0000000000000000 R09: 0000000000000000
-R10: 00000000000008c0 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f26d89abf80 R15: 00007ffcfe081a68
-
-Fixes: 2aac7a2cb0d9 ("unix_diag: Pending connections IDs NLA")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- include/net/af_unix.h | 20 ++++++++++++++------
- net/unix/af_unix.c    | 14 ++++++--------
- net/unix/diag.c       |  2 +-
- 3 files changed, 21 insertions(+), 15 deletions(-)
-
-diff --git a/include/net/af_unix.h b/include/net/af_unix.h
-index 49c4640027d8a6b93e903a6238d21e8541e31da4..e3a400150e73286902be94f62cb12aea9a9d65c1 100644
---- a/include/net/af_unix.h
-+++ b/include/net/af_unix.h
-@@ -46,12 +46,6 @@ struct scm_stat {
- 
- #define UNIXCB(skb)	(*(struct unix_skb_parms *)&((skb)->cb))
- 
--#define unix_state_lock(s)	spin_lock(&unix_sk(s)->lock)
--#define unix_state_unlock(s)	spin_unlock(&unix_sk(s)->lock)
--#define unix_state_lock_nested(s) \
--				spin_lock_nested(&unix_sk(s)->lock, \
--				SINGLE_DEPTH_NESTING)
--
- /* The AF_UNIX socket */
- struct unix_sock {
- 	/* WARNING: sk has to be the first member */
-@@ -77,6 +71,20 @@ struct unix_sock {
- #define unix_sk(ptr) container_of_const(ptr, struct unix_sock, sk)
- #define unix_peer(sk) (unix_sk(sk)->peer)
- 
-+#define unix_state_lock(s)	spin_lock(&unix_sk(s)->lock)
-+#define unix_state_unlock(s)	spin_unlock(&unix_sk(s)->lock)
-+enum unix_socket_lock_class {
-+	U_LOCK_NORMAL,
-+	U_LOCK_SECOND,	/* for double locking, see unix_state_double_lock(). */
-+	U_LOCK_DIAG, /* used while dumping icons, see sk_diag_dump_icons(). */
-+};
-+
-+static void unix_state_lock_nested(struct sock *sk,
-+				   enum unix_socket_lock_class subclass)
-+{
-+	spin_lock_nested(&unix_sk(sk)->lock, subclass);
-+}
-+
- #define peer_wait peer_wq.wait
- 
- long unix_inq_len(struct sock *sk);
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index ac1f2bc18fc9685652c26ac3b68f19bfd82f8332..30b178ebba60aa810e8442a326a14edcee071061 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -1344,13 +1344,11 @@ static void unix_state_double_lock(struct sock *sk1, struct sock *sk2)
- 		unix_state_lock(sk1);
- 		return;
- 	}
--	if (sk1 < sk2) {
--		unix_state_lock(sk1);
--		unix_state_lock_nested(sk2);
--	} else {
--		unix_state_lock(sk2);
--		unix_state_lock_nested(sk1);
--	}
-+	if (sk1 > sk2)
-+		swap(sk1, sk2);
-+
-+	unix_state_lock(sk1);
-+	unix_state_lock_nested(sk2, U_LOCK_SECOND);
- }
- 
- static void unix_state_double_unlock(struct sock *sk1, struct sock *sk2)
-@@ -1591,7 +1589,7 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr *uaddr,
- 		goto out_unlock;
- 	}
- 
--	unix_state_lock_nested(sk);
-+	unix_state_lock_nested(sk, U_LOCK_SECOND);
- 
- 	if (sk->sk_state != st) {
- 		unix_state_unlock(sk);
-diff --git a/net/unix/diag.c b/net/unix/diag.c
-index bec09a3a1d44ce56d43e16583fdf3b417cce4033..be19827eca36dbb68ec97b2e9b3c80e22b4fa4be 100644
---- a/net/unix/diag.c
-+++ b/net/unix/diag.c
-@@ -84,7 +84,7 @@ static int sk_diag_dump_icons(struct sock *sk, struct sk_buff *nlskb)
- 			 * queue lock. With the other's queue locked it's
- 			 * OK to lock the state.
- 			 */
--			unix_state_lock_nested(req);
-+			unix_state_lock_nested(req, U_LOCK_DIAG);
- 			peer = unix_sk(req)->peer;
- 			buf[i++] = (peer ? sock_i_ino(peer) : 0);
- 			unix_state_unlock(req);
--- 
-2.43.0.429.g432eaa2c6b-goog
-
+> >     seems much simpler for users to use the correct
+> >     epoll_wait/epoll_pwait for their app and add a call to ioctl to enable
+> >     or disable busy poll as needed. This also probably means less work to
+> >     get an existing epoll app using busy poll.
+> 
 
