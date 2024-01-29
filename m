@@ -1,100 +1,132 @@
-Return-Path: <netdev+bounces-66784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 797E7840A10
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:32:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B501840A1B
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:33:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB59C1C24C7C
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 15:32:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C2DF1F28E1A
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 15:33:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFEB2153BDB;
-	Mon, 29 Jan 2024 15:32:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34624153BE2;
+	Mon, 29 Jan 2024 15:33:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GdN4Q/nQ"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="jB4DDqb1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8183153BC7;
-	Mon, 29 Jan 2024 15:32:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD7A0153BD0;
+	Mon, 29 Jan 2024 15:33:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706542355; cv=none; b=oy8X+mcb59RgAJbXlBqWXed/sIrCa/8uyegkf84wUM5oxWa9jvP8320mc+hCUmBbzT/rYeag4L8uQGGNak/Fn3j4F8Np1/WY84pkgqwqjzL02f4AhYe6Sp6djNXxK1v/AsJISbETT1bF+YBa5c/obNuSKEo7KeciwCuFG5FBI8I=
+	t=1706542394; cv=none; b=U5L95C4oXkwnFS6pG9aW7VVqWlC3TbONtK9CMTU+JIgheHHl3K7CA9b7JiqzUuCqOiV/TiIEbNH0946j4Zbd3TTgC7Vdw7l9Zyj5o7JOEOPX5tF+zTgBxlp4ACZLuCj1TUh1OVlWAPrnThs9H58tCtNe7wG2aAOAKy9zKavsZfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706542355; c=relaxed/simple;
-	bh=rv/tQCSdhSHyc1IowdjtuKIaCWqNlueesyQh5p9dlV4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=P7pLmLZYU+msGtMNfyvFA+FMyyl+Ku1KkXS+AmbeWf/VO656ZZj+adr/RFXk9+JUP6ioFURBrpfVxPDvi97P5fJkm1H/BHEBf7Tti6k+dpYKw5124WTjWtTmsgXWUr79WpFlN4bWMLdn0/GZzCz+3fRPbaVdgC772kh5X1rVZv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GdN4Q/nQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 140DCC433F1;
-	Mon, 29 Jan 2024 15:32:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706542355;
-	bh=rv/tQCSdhSHyc1IowdjtuKIaCWqNlueesyQh5p9dlV4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GdN4Q/nQbgAf8yKBLR3LkHv8ybB7aoXGqEd19/YX1luHqYjEWpHbyMYEryVtC4Paf
-	 KyYZJe78HUxC7kWDJiPL7YH19Lr+H89QpJxtdD81BLEJYoIB8Oep0svC8Dh2MF3Etr
-	 izhQq3TXqaoZJSYinGcZ4vk2kL4/3UKKOxC/H/2Pfc0UtRYEBA6Ums5SKmvPvnsOpI
-	 QhxQUhSiRevULlG7MeiDZKWBq9GoxSC/kMtSIKb1HkXe4s6X5ztd/IhONGPXn2fEfb
-	 nXrBry34dIMlVW8BIAUwPN/bB67J2eOl16/k3cPIyKlcoJlGNLf5EvG5ERyWpfQA81
-	 LuTX3wf4SC20g==
-Message-ID: <a2df88e6-5ecc-407c-a579-8c8b7b4fbd2b@kernel.org>
-Date: Mon, 29 Jan 2024 08:32:33 -0700
+	s=arc-20240116; t=1706542394; c=relaxed/simple;
+	bh=KK1fR8EQlrJ6EUBT39fCtHr57DrrXCl3EaeExEW7aE4=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=rmUDPJ+9oVTlniZHqYR+PLOF2wJ3cP6cXVUvjQbLAdfsSTTmVUrVPANYWctleZWUNQ75DpZIg6TuyrfhP6aO5QOBvnM6mvcSSBvg8Cuk1u5ffa7yImPVBEJhAtw4Hk1ORvbPHeJCy9OnQr5U/XnGJ22orzk+Z351BpxN2ruIYH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=jB4DDqb1; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=ekJI84jz9Cz4AFQVBZBV9I87QpFYwV1HOZxh1PFt9/U=; b=jB4DDqb1cCAWQswNqcJfN7MjqC
+	xaPle6dW5aS9NhxvIKcaBFRrDZUY1cQOzojKgUFRFnrGK4G5d/60OAGNloPPXCZZo+DF0OaA/8HgF
+	JAt35RV4WNtk4XCCmM8mb+IkdHKTGQSbGX5XZGNc66bLlf31Wp8A1MLHtofuG2D9ZE/mr0h2fwTPs
+	YA201eg9HpAW5vRtztivcKi27HIiZ9OBDSCGzP7aMOWKuExxmpdaU/JZhKcr9yZTOTGuEVJ64z47n
+	fZQzOPdtWtbOKHYwgLlZ6veoXCVSkGGVRMvTWcQst431WbyLDIQ1UMzMIIvRYcdA2caVsPNcSC32s
+	oWEy/eNg==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rUTd0-000Dvz-HP; Mon, 29 Jan 2024 16:32:54 +0100
+Received: from [85.1.206.226] (helo=linux.home)
+	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rUTcz-000N5e-Ey; Mon, 29 Jan 2024 16:32:53 +0100
+Subject: Re: [PATCH RESEND bpf-next v3 4/6] riscv, bpf: Add necessary Zbb
+ instructions
+To: Pu Lehui <pulehui@huawei.com>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
+ <bjorn@kernel.org>, Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
+ linux-riscv@lists.infradead.org, netdev@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>,
+ Luke Nelson <luke.r.nels@gmail.com>
+References: <20240115131235.2914289-1-pulehui@huaweicloud.com>
+ <20240115131235.2914289-5-pulehui@huaweicloud.com>
+ <871qa2zog6.fsf@all.your.base.are.belong.to.us>
+ <03ebc63f-7b96-4a70-ad10-a4ffc1d5b1cc@huawei.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <0b2bb6aa-e114-157b-94d1-4acb091b48b8@iogearbox.net>
+Date: Mon, 29 Jan 2024 16:32:52 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [ANN] net-next is OPEN
+In-Reply-To: <03ebc63f-7b96-4a70-ad10-a4ffc1d5b1cc@huawei.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>, Hangbin Liu <liuhangbin@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "netdev-driver-reviewers@vger.kernel.org"
- <netdev-driver-reviewers@vger.kernel.org>
-References: <20240122091612.3f1a3e3d@kernel.org> <Za98C_rCH8iO_yaK@Laptop-X1>
- <20240123072010.7be8fb83@kernel.org>
- <d0e28c67-51ad-4da1-a6df-7ebdbd45cd2b@kernel.org>
- <20240123133925.4b8babdc@kernel.org>
- <256ae085-bf8f-419b-bcea-8cdce1b64dce@kernel.org>
- <7ae6317ee2797c659e2f14b336554a9e5694858e.camel@redhat.com>
- <20240124070755.1c8ef2a4@kernel.org> <20240124081919.4c79a07e@kernel.org>
- <aae9edba-e354-44fe-938b-57f5a9dd2718@kernel.org>
- <20240124085919.316a48f9@kernel.org>
- <bd985576-cc99-49c5-a2e0-09622fd6027a@kernel.org>
- <c8420e51-691d-4dd9-8b81-0597e7593d07@kernel.org>
- <20240126171346.14647a6f@kernel.org>
- <317aa139-78f8-424b-834a-3730a4c4ad04@kernel.org>
- <ef884f08937fcaab4e4020eb3fca91a938385c75.camel@redhat.com>
- <20240129070304.3f33dcf2@kernel.org>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240129070304.3f33dcf2@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27169/Mon Jan 29 10:39:53 2024)
 
-On 1/29/24 8:03 AM, Jakub Kicinski wrote:
-> On Mon, 29 Jan 2024 10:23:15 +0100 Paolo Abeni wrote:
->>> It's a bug in that version of iputils ping. It sets the BINDTODEVICE and
->>> then resets it because the source address is not set on the command line
->>> (it should not be required).
->>>
->>> There are a couple of workarounds - one which might not age well (ie.,
->>> amazon linux moving forward to newer packages -I <addr> -I <vrf>) and
->>> one that bypasses the purpose of the test (ip vrf exec)).  
+On 1/29/24 10:13 AM, Pu Lehui wrote:
+> On 2024/1/28 1:16, Björn Töpel wrote:
+>> Pu Lehui <pulehui@huaweicloud.com> writes:
 >>
->> Could the script validate the 'ping' command WRT the bad behavior/bug
->> and  eventually skip the related tests?
+>>> From: Pu Lehui <pulehui@huawei.com>
+>>>
+>>> Add necessary Zbb instructions introduced by [0] to reduce code size and
+>>> improve performance of RV64 JIT. Meanwhile, a runtime deteted helper is
+>>> added to check whether the CPU supports Zbb instructions.
+>>>
+>>> Link: https://github.com/riscv/riscv-bitmanip/releases/download/1.0.0/bitmanip-1.0.0-38-g865e7a7.pdf [0]
+>>> Signed-off-by: Pu Lehui <pulehui@huawei.com>
+>>> ---
+>>>   arch/riscv/net/bpf_jit.h | 32 ++++++++++++++++++++++++++++++++
+>>>   1 file changed, 32 insertions(+)
+>>>
+>>> diff --git a/arch/riscv/net/bpf_jit.h b/arch/riscv/net/bpf_jit.h
+>>> index e30501b46f8f..51f6d214086f 100644
+>>> --- a/arch/riscv/net/bpf_jit.h
+>>> +++ b/arch/riscv/net/bpf_jit.h
+>>> @@ -18,6 +18,11 @@ static inline bool rvc_enabled(void)
+>>>       return IS_ENABLED(CONFIG_RISCV_ISA_C);
+>>>   }
+>>> +static inline bool rvzbb_enabled(void)
+>>> +{
+>>> +    return IS_ENABLED(CONFIG_RISCV_ISA_ZBB) && riscv_has_extension_likely(RISCV_ISA_EXT_ZBB);
+>>
+>> Hmm, I'm thinking about the IS_ENABLED(CONFIG_RISCV_ISA_ZBB) semantics
+>> for a kernel JIT compiler.
+>>
+>> IS_ENABLED(CONFIG_RISCV_ISA_ZBB) affects the kernel compiler flags.
+>> Should it be enough to just have the run-time check? Should a kernel
+>> built w/o Zbb be able to emit Zbb from the JIT?
 > 
-> Skipping if the package has a bug would be best, if we can figure that
-> out. The latest version is fixed, right? I can build it locally, just
-> like pretty much everything else..
+> Not enough, because riscv_has_extension_likely(RISCV_ISA_EXT_ZBB) is a platform capability check, and the other one is a kernel image capability check. We can pass the check riscv_has_extension_likely(RISCV_ISA_EXT_ZBB) when CONFIG_RISCV_ISA_ZBB=n. And my local test prove it.
 
-yes, that is why Ubuntu 23.10 passes. I downloaded iputils, built ping
-locally at the Amazon release version and did a side by side comparison
-of behavior to verify it is the ping command.
+So if I understand you correctly, only relying on the riscv_has_extension_likely(RISCV_ISA_EXT_ZBB)
+part would not work - iow, the IS_ENABLED(CONFIG_RISCV_ISA_ZBB) is mandatory here?
+
+Thanks,
+Daniel
+
+P.s.: Given Bjorn's review and tests I took the series into bpf-next now. Thanks everyone!
 
