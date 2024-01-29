@@ -1,121 +1,92 @@
-Return-Path: <netdev+bounces-66651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C642484014C
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:21:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F121840151
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:23:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68297B22CAB
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:21:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B14328500C
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:23:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD5054FA2;
-	Mon, 29 Jan 2024 09:21:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="lzkUOkI5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2610454F86;
+	Mon, 29 Jan 2024 09:23:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DBE54BF7
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 09:21:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34C8E5576E
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 09:23:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706520087; cv=none; b=o3VuUWaFKZwwq7ZMOCsbtadMa2Au+Gu4dDXjYp0S6AnkvrQq3w1QxFTZTAEU7hdRaIMjjTJq6piZoa8XY9wX4KtX34wcnpxmKx8+MINhwKnh8zyLv3WVTz1gN7YnUt0qqnbYawuRiQm8Xc8wGoNeluXxandy43O/Faf/QaoxlF8=
+	t=1706520192; cv=none; b=mJ9r1djbcohdvcJ7Cxm0BMAcO53F1j7yXXlgGUwSKkMS9ANiKdqBAUhpYdJnD0icbh2+xBLx/Lkc+i1WEnlHKz1tmYDpeYa67FcmYsaCmi7J01fCjwVBShHwuM/W9WHy/TNR7lim597b5XpBULx33vvXMSIAYMbhQiBo2BhNfss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706520087; c=relaxed/simple;
-	bh=2wjNbV7klGZn+cgj4LYLLvwYAyZSfwOMZmXBO6exB5w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=byza4OYzsE2gemoyAyy1PVqQSBlYP4S4dNGYkwOMTlceY6R5JV2hAQ21/VhURCwTj8SjQXnVIl1tU7T88s3Sp/dKgaQrmawRW5QgqKzV0h1BG3ZIToFxtwTnU0ShKb0t7F7XPRGPXhYSfXUY+XdhEq+47VoAwfkz413oW67dYE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=lzkUOkI5; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40ef75adf44so4631435e9.3
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 01:21:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706520084; x=1707124884; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=96cmwipeg0gkLics9mVD1KcMJe0+Fi1RU4sBfgvMJAU=;
-        b=lzkUOkI5uL6ZWf+Ex7Pmlo/W6nScpplrXfg4lgp0+G6HLcWqoMZ2b6+fGG+3GU6wfV
-         /sV5hkce9AUKAr12JqHkwT9TnlxWlXq9WydMomX3TB9B3RUY70myxWW5e/tpFyCEUUFh
-         hA6AFXpOTRDZPXnzEkzjs8M6HylzTHCUkii81ye5qzDDZy+G9cpyaApYVIJmd4w6BRso
-         6j7o0hZoJZo9HKfGuJhEs6KW2JlGkzOEbuRD7XPo/3120zyhFbOjyzd7VQ/UqgYWYhUZ
-         PC02obCR9GpJZ4y22XoEva2o1yUmICMPSRq2lPbW8VGDizVgWj7NpHdeRvvpf2eRHu2N
-         8yqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706520084; x=1707124884;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=96cmwipeg0gkLics9mVD1KcMJe0+Fi1RU4sBfgvMJAU=;
-        b=N50u4jFjAD2LvsHgwCtGGM45NeEyqAm+Nbr5nOW/VqNX9lrXwGY6E8qHM4NaMl4tAj
-         Mocekd5QNaSr5eZWS5T50d3UdyMRrlVdGaItJmRZcC3MnyG3Vocld9G/ueSm7tfYDsiR
-         UGqEZX1gyf4nxIRbLVt7+RJepFmVlDcdRz7EdMXpFp6AU0URuOinfnpLFgMuJz8OJull
-         R9uHcziBaENa5uGALviTGMTxBL69gZZ/e+9L6xJ7nL4pXFRtHbwEhCnl0GfMWzWWhZ+l
-         e5z6y40diUal/pDpvQ2IaTsIdG1ZiVbSdpe0X33vIFnKNsyujwJeb8VRKNhpe1ds7pKl
-         hJRQ==
-X-Gm-Message-State: AOJu0YxBlR0ob/iEv0I22L33yTMt0G4ihnJpn9wYakg3UoHOF8BMyAno
-	UVyKposrFYK9/pVFQIOMvOx53Emr1E12tFr172hwd2//y+UMGHJ2Triyjx+XatU=
-X-Google-Smtp-Source: AGHT+IHbwmBdo0rKS9EgkMoRd2pXGS0fTM3EgfRbh9i3UdzVu+V14UMFbJ+KqKjxXWZ5EdydTLyhzA==
-X-Received: by 2002:a05:6000:1972:b0:337:b315:5643 with SMTP id da18-20020a056000197200b00337b3155643mr3577592wrb.6.1706520083883;
-        Mon, 29 Jan 2024 01:21:23 -0800 (PST)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id v8-20020a5d59c8000000b0033af2a91b47sm1075732wry.70.2024.01.29.01.21.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 01:21:23 -0800 (PST)
-Date: Mon, 29 Jan 2024 10:21:22 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: Saeed Mahameed <saeed@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [net-next 04/15] net/mlx5: SD, Implement basic query and
- instantiation
-Message-ID: <ZbduEnFa8ULWxDt_@nanopsycho>
-References: <20231221005721.186607-1-saeed@kernel.org>
- <20231221005721.186607-5-saeed@kernel.org>
- <ZZfyx2ZFEjELQ7ZD@nanopsycho>
- <0a4ebbe2-93d5-490f-ae97-9b64bdfeeb45@gmail.com>
+	s=arc-20240116; t=1706520192; c=relaxed/simple;
+	bh=6G8K2vrcWsK8/sbuRZURPEgtHaWjvBNgWTy/Ndz5Peo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=d3yDipMLUex2RtgrzSHDhBw/dCD3d6kGrbwXPJUUg+iOjdt6VIbHANFR5QnAre7UzquJZcgHnbfIDWblVHglK075s578OJYv4XLCTc3hZ76TAmgoUcSz9dVZ4hNweRAd2ddLQP5VPw/DpGDHi4hniS+m4qaqbawlWIwIYEfMOME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-31-yT1IZiFMOyGriZohOn-eyA-1; Mon, 29 Jan 2024 09:23:07 +0000
+X-MC-Unique: yT1IZiFMOyGriZohOn-eyA-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 29 Jan
+ 2024 09:22:40 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Mon, 29 Jan 2024 09:22:40 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Jani Nikula' <jani.nikula@linux.intel.com>,
+	"'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>, "'Linus
+ Torvalds'" <torvalds@linux-foundation.org>, 'Netdev'
+	<netdev@vger.kernel.org>, "'dri-devel@lists.freedesktop.org'"
+	<dri-devel@lists.freedesktop.org>
+CC: 'Jens Axboe' <axboe@kernel.dk>, "'Matthew Wilcox (Oracle)'"
+	<willy@infradead.org>, 'Christoph Hellwig' <hch@infradead.org>,
+	"'linux-btrfs@vger.kernel.org'" <linux-btrfs@vger.kernel.org>, "'Andrew
+ Morton'" <akpm@linux-foundation.org>, 'Andy Shevchenko'
+	<andriy.shevchenko@linux.intel.com>, "'David S . Miller'"
+	<davem@davemloft.net>, 'Dan Carpenter' <dan.carpenter@linaro.org>
+Subject: RE: [PATCH next 10/11] block: Use a boolean expression instead of
+ max() on booleans
+Thread-Topic: [PATCH next 10/11] block: Use a boolean expression instead of
+ max() on booleans
+Thread-Index: AdpSITDgD70hEVnBTjm/gYoTnRBnpgAcWocAAAB9+7A=
+Date: Mon, 29 Jan 2024 09:22:40 +0000
+Message-ID: <963d1126612347dd8c398a9449170e16@AcuMS.aculab.com>
+References: <0ca26166dd2a4ff5a674b84704ff1517@AcuMS.aculab.com>
+ <b564df3f987e4371a445840df1f70561@AcuMS.aculab.com>
+ <87sf2gjyn9.fsf@intel.com>
+In-Reply-To: <87sf2gjyn9.fsf@intel.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0a4ebbe2-93d5-490f-ae97-9b64bdfeeb45@gmail.com>
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-Thu, Jan 25, 2024 at 08:34:25AM CET, ttoukan.linux@gmail.com wrote:
->
->
->On 05/01/2024 14:15, Jiri Pirko wrote:
->> Thu, Dec 21, 2023 at 01:57:10AM CET, saeed@kernel.org wrote:
->> > From: Tariq Toukan <tariqt@nvidia.com>
->> 
->> [...]
->> 
->> > +static int sd_init(struct mlx5_core_dev *dev)
->> 
->> Could you maintain "mlx5_" prefix here and in the rest of the patches?
->> 
->> 
->
->Hi Jiri,
->
->We do not necessarily maintain this prefix for non-exposed static functions.
+RnJvbTogSmFuaSBOaWt1bGENCj4gU2VudDogMjkgSmFudWFyeSAyMDI0IDA5OjA4DQo+IA0KPiBP
+biBTdW4sIDI4IEphbiAyMDI0LCBEYXZpZCBMYWlnaHQgPERhdmlkLkxhaWdodEBBQ1VMQUIuQ09N
+PiB3cm90ZToNCj4gPiBibGtfc3RhY2tfbGltaXRzKCkgY29udGFpbnM6DQo+ID4gCXQtPnpvbmVk
+ID0gbWF4KHQtPnpvbmVkLCBiLT56b25lZCk7DQo+ID4gVGhlc2UgYXJlIGJvb2wsIHNvIGl0IGlz
+IGp1c3QgYSBiaXR3aXNlIG9yLg0KPiANCj4gU2hvdWxkIGJlIGEgbG9naWNhbCBvciwgcmVhbGx5
+LiBBbmQgfHwgaW4gY29kZS4NCg0KTm90IHJlYWxseSwgYml0d2lzZSBpcyBmaW5lIGZvciBib29s
+IChlc3BlY2lhbGx5IGZvciAnb3InKQ0KYW5kIGdlbmVyYXRlcyBiZXR0ZXIgY29kZS4NCg0KCURh
+dmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVzcyBMYWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3Vu
+dCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEgMVBULCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3
+Mzg2IChXYWxlcykNCg==
 
-Yet, it is very common all over mlx5 driver. It is much more common than
-no prefix. Why this is exception?
-
-
->
->> > +{
->> 
->> [...]
 
