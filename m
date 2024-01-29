@@ -1,105 +1,151 @@
-Return-Path: <netdev+bounces-66839-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66841-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64B3284120D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 19:34:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D3488412AC
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 19:49:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE3F1B23965
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 18:34:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A2C91F21985
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 18:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7FF7241EC;
-	Mon, 29 Jan 2024 18:34:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1F0476051;
+	Mon, 29 Jan 2024 18:41:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="h6VFowvm"
 X-Original-To: netdev@vger.kernel.org
-Received: from air.basealt.ru (air.basealt.ru [194.107.17.39])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 640911F5F3;
-	Mon, 29 Jan 2024 18:34:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20C03433AB
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 18:41:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706553245; cv=none; b=R1X6c85EHObT2ELZxkmIHzmCTg6bxRXo79bikuTXcLbas56rFQ8KSCNzCEukU35uprZHCdbo/gG6sJU9c3GsIte9hCYeJNy6VVB8u/gpZd2cXFhamkip10OxX5vx5aTIdfNI+p0NbzC55RRPTkd/Pq8a9p8rIF/88/lFmW5x56w=
+	t=1706553698; cv=none; b=oVy31t9q18fd8g9STs0kyDu5qX6z9fIcwF0avSHtc1cxzd18l99nbaJOBOfHThSWS0xtOnlNDn/YFLMKw14wg20wlMl9YHKyO0S2sSqIPC4tcFNU23i4UC3l+cTkeDjXPnSDPSjOiVnItcgp6SeRHA4Zgz/2KrLjOUIwtdfjhh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706553245; c=relaxed/simple;
-	bh=ORkeZWLFQ9ycMvgJfUxmGqowOG9g7Z2OntLQycdITVI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KmoWc5FSHxTw13Q7zruM3hkT1XftHAWPmvb5rsnl/DSi7L2tX6/L6bIf3DdOYia9xRmy9bFUu3Ot3Drzk/m/QIcxRRh4FGYrcyp8BLQ22azjlIDnOZkWuJTUNcSObtztY54lBr+iL323M77X8K4QQt/vmWhs1eHvJ/l3aY44qZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
-Received: by air.basealt.ru (Postfix, from userid 490)
-	id AF7592F2023D; Mon, 29 Jan 2024 18:34:01 +0000 (UTC)
-X-Spam-Level: 
-Received: from [10.88.144.178] (obninsk.basealt.ru [217.15.195.17])
-	by air.basealt.ru (Postfix) with ESMTPSA id 3CBBA2F2022A;
-	Mon, 29 Jan 2024 18:33:59 +0000 (UTC)
-Message-ID: <87f74eab-ae51-08a4-5b7e-261f437146f4@basealt.ru>
-Date: Mon, 29 Jan 2024 21:33:59 +0300
+	s=arc-20240116; t=1706553698; c=relaxed/simple;
+	bh=sI+wVpVBlVV5zXXNQYw0I1X7JOlBI8EHsIAt7iOEThI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u8nA7n5tsAmiGFhxrZc73afkeA1JZ7A765gOYfrfrwXRukLhwzAIGMVn9ileZBYARQtdwlce50Gg8HDlMOFh8/nVMxYEbj/cwPeiup2/RqTXPVyrHdShrpC+vHoqUwjZuoBqb/LQ5x8YdWpy4KLYkNakmDGQE5Vd87QreOpViB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=h6VFowvm; arc=none smtp.client-ip=192.55.52.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706553693; x=1738089693;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=sI+wVpVBlVV5zXXNQYw0I1X7JOlBI8EHsIAt7iOEThI=;
+  b=h6VFowvmfOTdE4d5XkUuU0IU+p4vNyEBiznttKMhLHjq+IeIDchyFyOo
+   18Ztt29PZwkwefE4SlCOXodAa7fv/4oija6rzBrdC2xMUTqAYp196SVsP
+   UGB9v2CGZ2itSFGMUPdNLxnhk/0kQZjt12kHxY1aSvTT1Mc+IBCuP+cQj
+   n+sH4VQJsPV9vLojSU/3tEWOVACq50MW/Lqa4DOvKaGLSemCfg9wuHbBW
+   rdm5zd2H+PVaX4XFssFurw5073aPbb4CsciKp03X2TRoFSMfse0hLj4B3
+   rbVuox5Z7i+knHf0VwdVBJNw0iQL2410bATtOV1ibElO7imvVsy5k+5lC
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10968"; a="401920051"
+X-IronPort-AV: E=Sophos;i="6.05,227,1701158400"; 
+   d="scan'208";a="401920051"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2024 10:41:29 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,227,1701158400"; 
+   d="scan'208";a="36233542"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa001.jf.intel.com with ESMTP; 29 Jan 2024 10:41:29 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Pavan Kumar Linga <pavan.kumar.linga@intel.com>,
+	anthony.l.nguyen@intel.com,
+	willemb@google.com,
+	David.Laight@ACULAB.COM,
+	kernel test robot <lkp@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net v2] idpf: avoid compiler padding in virtchnl2_ptype struct
+Date: Mon, 29 Jan 2024 10:41:14 -0800
+Message-ID: <20240129184116.627648-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH 5.10.y 0/1] bpf: fix warning ftrace_verify_code
-Content-Language: en-US
-To: Greg KH <greg@kroah.com>
-Cc: stable@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, netdev@vger.kernel.org, kpsingh@kernel.org,
- john.fastabend@gmail.com, yhs@fb.com, songliubraving@fb.com, kafai@fb.com,
- andrii@kernel.org, daniel@iogearbox.net, ast@kernel.org,
- nickel@altlinux.org, oficerovas@altlinux.org, dutyrok@altlinux.org
-References: <20240129091746.260538-1-kovalev@altlinux.org>
- <2024012954-disfigure-barbell-21b9@gregkh>
-From: kovalev@altlinux.org
-In-Reply-To: <2024012954-disfigure-barbell-21b9@gregkh>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-29.01.2024 19:20, Greg KH wrote:
-> On Mon, Jan 29, 2024 at 12:17:45PM +0300, kovalev@altlinux.org wrote:
->> Syzkaller hit 'WARNING in ftrace_verify_code' bug.
->>
->> This bug is not a vulnerability and is reproduced only when running
->> with root privileges on stable 5.10 kernel.
-> What about 5.15.y?  We can't take a patch for older kernels and not for
-> newer ones, right?
+From: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
 
-Indeed, this patch was not backported at 5.15.
+In the arm random config file, kconfig option 'CONFIG_AEABI' is
+disabled which results in adding the compiler flag '-mabi=apcs-gnu'.
+This causes the compiler to add padding in virtchnl2_ptype
+structure to align it to 8 bytes, resulting in the following
+size check failure:
 
-I fixed it, successfully tested it on the 5.15.148 kernel and sent the 
-patch [1]
+include/linux/build_bug.h:78:41: error: static assertion failed: "(6) == sizeof(struct virtchnl2_ptype)"
+      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+         |                                         ^~~~~~~~~~~~~~
+include/linux/build_bug.h:77:34: note: in expansion of macro '__static_assert'
+      77 | #define static_assert(expr, ...) __static_assert(expr, ##__VA_ARGS__, #expr)
+         |                                  ^~~~~~~~~~~~~~~
+drivers/net/ethernet/intel/idpf/virtchnl2.h:26:9: note: in expansion of macro 'static_assert'
+      26 |         static_assert((n) == sizeof(struct X))
+         |         ^~~~~~~~~~~~~
+drivers/net/ethernet/intel/idpf/virtchnl2.h:982:1: note: in expansion of macro 'VIRTCHNL2_CHECK_STRUCT_LEN'
+     982 | VIRTCHNL2_CHECK_STRUCT_LEN(6, virtchnl2_ptype);
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~
 
-However, at the time of the kernel build, I noticed a compiler warning 
-about an unused "*tmp" variable,
+Avoid the compiler padding by using "__packed" structure
+attribute for the virtchnl2_ptype struct. Also align the
+structure by using "__aligned(2)" for better code optimization.
+While at it, swap the static_assert conditional statement
+variables.
 
-that I fixed in the patch for 5.15, but remained in this patch 5.10:
+Fixes: 0d7502a9b4a7 ("virtchnl: add virtchnl version 2 ops")
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202312220250.ufEm8doQ-lkp@intel.com
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+---
+v2:
+- swap the static_assert conditional statement variables
 
-...
+v1: https://lore.kernel.org/netdev/20240122175202.512762-1-anthony.l.nguyen@intel.com/
 
-+	void *new, *tmp;
-...
-need to fix on
-...
-+	void *new;
-...
+ drivers/net/ethernet/intel/idpf/virtchnl2.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Therefore, I resend the patch with a fix (deleted the unused tmp 
-pointer). [2]
-
-[1] 
-https://lore.kernel.org/bpf/20240129180108.284057-1-kovalev@altlinux.org/T/#u
-
-[2] 
-https://lore.kernel.org/bpf/20240129183120.284801-1-kovalev@altlinux.org/T/#u
-
+diff --git a/drivers/net/ethernet/intel/idpf/virtchnl2.h b/drivers/net/ethernet/intel/idpf/virtchnl2.h
+index 8dc837889723..506036e7df06 100644
+--- a/drivers/net/ethernet/intel/idpf/virtchnl2.h
++++ b/drivers/net/ethernet/intel/idpf/virtchnl2.h
+@@ -23,7 +23,7 @@
+  * is not exactly the correct length.
+  */
+ #define VIRTCHNL2_CHECK_STRUCT_LEN(n, X)	\
+-	static_assert((n) == sizeof(struct X))
++	static_assert(sizeof(struct X) == (n))
+ 
+ /* New major set of opcodes introduced and so leaving room for
+  * old misc opcodes to be added in future. Also these opcodes may only
+@@ -978,7 +978,7 @@ struct virtchnl2_ptype {
+ 	u8 proto_id_count;
+ 	__le16 pad;
+ 	__le16 proto_id[];
+-};
++} __packed __aligned(2);
+ VIRTCHNL2_CHECK_STRUCT_LEN(6, virtchnl2_ptype);
+ 
+ /**
 -- 
-
-Regards,
-Vasiliy Kovalev
+2.41.0
 
 
