@@ -1,129 +1,117 @@
-Return-Path: <netdev+bounces-66642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 942FE8400EB
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:08:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 45307840156
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:23:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50815285658
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:08:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00C562819C7
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:23:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2428B54FAE;
-	Mon, 29 Jan 2024 09:07:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EpC6GTJP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B03755765;
+	Mon, 29 Jan 2024 09:23:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F0654F91;
-	Mon, 29 Jan 2024 09:07:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+Received: from sgoci-sdnproxy-4.icoremail.net (sgoci-sdnproxy-4.icoremail.net [129.150.39.64])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E5B20B29;
+	Mon, 29 Jan 2024 09:23:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.150.39.64
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706519271; cv=none; b=b1HH4vkGubqbtSMVijOKtCT69cvKdEjqD3dHhhJIKdwAjw30sVIW32Sl5/Mo1XFek+Dye768xNbv2QAGQoif2xXClvb6/bBEgAnDmjOR/XKjQYnI6YESAvBmoR3MDZAphIL2uMsIm4nxwZiBH5W8bPpqlwxAPaNn1irnnFBFoeU=
+	t=1706520208; cv=none; b=OHN/A6RTkeM3Jva6c3pBdKAP89qoy8ySqkjuiaJFhpHPIGFCAwwa2smEJ+NdjCTaZHE5nUkk1xL+dp20sINrEGiF/esqnxs1yAA29PoTOsAhgoAXHMxJUC/8bYjKYOVTDAnMVf/LO5pQcwZlr7hgjuw71TmYtKBa6Rm/5Drhiu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706519271; c=relaxed/simple;
-	bh=msuiibqFBcGfMgzA/fC14fkBPBHd7u1JVKZzOwMA6L0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=UoJ2TkQyTu8J3osRVa3L22V1YVgkgdwz6SPqxRCJar2vwlHdsLYrvaNbnV3r5OavuZIRWl/R4NdjSnsLOx4yR8aJT2gBuhxH6yUBgknTJwKDnT1iOVM37/bKx511hfbTfdRbKORN39UK6/IILlFQX7by/iJqunLJBarWD/NWV1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EpC6GTJP; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706519269; x=1738055269;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version:content-transfer-encoding;
-  bh=msuiibqFBcGfMgzA/fC14fkBPBHd7u1JVKZzOwMA6L0=;
-  b=EpC6GTJPEFrBY3j4uMsQQSyMtlU0Lt8uqNm2BqWamkTPIdMI++13IG6R
-   4QZgVcolVOGUQdzJxf26mbEmGV/7g07E7sWHuj1D0gBDUrMV0kRi/7GtJ
-   aH0NVfRg+qS2nvpPLM6xmcqDY6ccPloIFQkXj9ogCSmW/E55p4TSIYwKT
-   A095MQJriI45GCeJu3cYLtcqW9XN4W1utD9jgXUTE5Gc2r5epuFNGagM4
-   rvAFQhLsA+gTn/Cu+pTTB9H1b+59BYG1pneGMC5y/Ecg2WBYQ8zB2O85D
-   SyQ7yWBLrZYlt/wvfqWvpnlTeqwSGsNDX19SGvfiX1LTwiiKkSiAls4Ro
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10967"; a="2724897"
-X-IronPort-AV: E=Sophos;i="6.05,226,1701158400"; 
-   d="scan'208";a="2724897"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2024 01:07:47 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,226,1701158400"; 
-   d="scan'208";a="3407220"
-Received: from hbrandbe-mobl.ger.corp.intel.com (HELO localhost) ([10.252.59.53])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2024 01:07:42 -0800
-From: Jani Nikula <jani.nikula@linux.intel.com>
-To: David Laight <David.Laight@ACULAB.COM>, "'linux-kernel@vger.kernel.org'"
- <linux-kernel@vger.kernel.org>, 'Linus
- Torvalds' <torvalds@linux-foundation.org>, 'Netdev'
- <netdev@vger.kernel.org>, "'dri-devel@lists.freedesktop.org'"
- <dri-devel@lists.freedesktop.org>
-Cc: 'Jens Axboe' <axboe@kernel.dk>, "'Matthew Wilcox (Oracle)'"
- <willy@infradead.org>, 'Christoph Hellwig' <hch@infradead.org>,
- "'linux-btrfs@vger.kernel.org'" <linux-btrfs@vger.kernel.org>, 'Andrew
- Morton' <akpm@linux-foundation.org>, 'Andy Shevchenko'
- <andriy.shevchenko@linux.intel.com>, "'David S . Miller'"
- <davem@davemloft.net>, 'Dan
- Carpenter' <dan.carpenter@linaro.org>
-Subject: Re: [PATCH next 10/11] block: Use a boolean expression instead of
- max() on booleans
-In-Reply-To: <b564df3f987e4371a445840df1f70561@AcuMS.aculab.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
-References: <0ca26166dd2a4ff5a674b84704ff1517@AcuMS.aculab.com>
- <b564df3f987e4371a445840df1f70561@AcuMS.aculab.com>
-Date: Mon, 29 Jan 2024 11:07:38 +0200
-Message-ID: <87sf2gjyn9.fsf@intel.com>
+	s=arc-20240116; t=1706520208; c=relaxed/simple;
+	bh=Msg8F5IL/0AenrkHit9Ad5Txza0O1ySzpyON+YbB29Y=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=a3XfHlQolpmBCqvTqRXe2iccWQAvBXZQi34BfwoH8O1uWDxE9Fc/JiwzN8X+CIOuWJ/WkthFHzyQztSuQtfuJyVQHDTFes9Ky/MJeFPx21bPiLLAtQ4FCiGDr0GuudjRJkDujYUk2OsitcD+OCTGDwmkc2/Ode5pEWVIAvjNVqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=129.150.39.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from luzhipeng.223.5.5.5 (unknown [183.159.96.158])
+	by mail-app2 (Coremail) with SMTP id by_KCgCnfKx4brdlpzb9AA--.35670S2;
+	Mon, 29 Jan 2024 17:23:05 +0800 (CST)
+From: Zhipeng Lu <alexious@zju.edu.cn>
+To: alexious@zju.edu.cn
+Cc: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] [v2] net: ipv4: fix a memleak in ip_setup_cork
+Date: Mon, 29 Jan 2024 17:10:17 +0800
+Message-Id: <20240129091017.2938835-1-alexious@zju.edu.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:by_KCgCnfKx4brdlpzb9AA--.35670S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Ww1fGF1kuFWrAF13Kw43Awb_yoW8JFWUpr
+	Z8KayrJrW8Xr17KFsFyrW5ZFWfWw1vyFyjgw4ava4Y93WvqryaqrnrKFWa9FyavayxJ3Wr
+	Cwn7J34UWr18XFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
+	JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67
+	AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIY
+	rxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14
+	v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8
+	JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUYCJmUU
+	UUU
+X-CM-SenderInfo: qrsrjiarszq6lmxovvfxof0/
 
-On Sun, 28 Jan 2024, David Laight <David.Laight@ACULAB.COM> wrote:
-> blk_stack_limits() contains:
-> 	t->zoned =3D max(t->zoned, b->zoned);
-> These are bool, so it is just a bitwise or.
+When inetdev_valid_mtu fails, cork->opt should be freed if it is
+allocated in ip_setup_cork. Otherwise there could be a memleak.
 
-Should be a logical or, really. And || in code.
+Fixes: 501a90c94510 ("inet: protect against too small mtu values.")
+Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
+---
+Changelog:
 
-BR,
-Jani.
+v2: fix memleak by placing the malloc as the last error-handling.
+---
+ net/ipv4/ip_output.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index b06f678b03a1..41537d18eecf 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -1287,6 +1287,12 @@ static int ip_setup_cork(struct sock *sk, struct inet_cork *cork,
+ 	if (unlikely(!rt))
+ 		return -EFAULT;
+ 
++	cork->fragsize = ip_sk_use_pmtu(sk) ?
++			 dst_mtu(&rt->dst) : READ_ONCE(rt->dst.dev->mtu);
++
++	if (!inetdev_valid_mtu(cork->fragsize))
++		return -ENETUNREACH;
++
+ 	/*
+ 	 * setup for corking.
+ 	 */
+@@ -1303,12 +1309,6 @@ static int ip_setup_cork(struct sock *sk, struct inet_cork *cork,
+ 		cork->addr = ipc->addr;
+ 	}
+ 
+-	cork->fragsize = ip_sk_use_pmtu(sk) ?
+-			 dst_mtu(&rt->dst) : READ_ONCE(rt->dst.dev->mtu);
+-
+-	if (!inetdev_valid_mtu(cork->fragsize))
+-		return -ENETUNREACH;
+-
+ 	cork->gso_size = ipc->gso_size;
+ 
+ 	cork->dst = &rt->dst;
+-- 
+2.34.1
 
-> However it generates:
-> error: comparison of constant =C3=A2=E2=82=AC=CB=9C0=C3=A2=E2=82=AC=E2=84=
-=A2 with boolean expression is always true [-Werror=3Dbool-compare]
-> inside the signedness check that max() does unless a '+ 0' is added.
-> It is a shame the compiler generates this warning for code that will
-> be optimised away.
->
-> Change so that the extra '+ 0' can be removed.
->
-> Signed-off-by: David Laight <david.laight@aculab.com>
-> ---
->  block/blk-settings.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/block/blk-settings.c b/block/blk-settings.c
-> index 06ea91e51b8b..9ca21fea039d 100644
-> --- a/block/blk-settings.c
-> +++ b/block/blk-settings.c
-> @@ -688,7 +688,7 @@ int blk_stack_limits(struct queue_limits *t, struct q=
-ueue_limits *b,
->  						   b->max_secure_erase_sectors);
->  	t->zone_write_granularity =3D max(t->zone_write_granularity,
->  					b->zone_write_granularity);
-> -	t->zoned =3D max(t->zoned, b->zoned);
-> +	t->zoned =3D t->zoned | b->zoned;
->  	return ret;
->  }
->  EXPORT_SYMBOL(blk_stack_limits);
-
---=20
-Jani Nikula, Intel
 
