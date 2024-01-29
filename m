@@ -1,169 +1,118 @@
-Return-Path: <netdev+bounces-66787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FD55840A60
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:45:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95B5B840A6D
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:47:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF2731F276F8
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 15:45:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8CAB1C22008
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 15:47:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10518154445;
-	Mon, 29 Jan 2024 15:44:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D8DD15444C;
+	Mon, 29 Jan 2024 15:47:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Op4plzqa"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="fE4W5cm2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f51.google.com (mail-vs1-f51.google.com [209.85.217.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58216153BC6
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 15:44:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C129154448
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 15:47:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706543089; cv=none; b=soeOuABjy5BH9NfbN+V+XaiSj/YojYOP9Q89Qx5H/b4IgpcNSZ2SU3fldrxRhvlyUB1gOd1lsFv5RR02WkW9CFZvqojdltwnxmVwfgPh8g63fbLw7Q/DxfVVs/H2hpUewLFdQYmlvaE5hZL+7J4D9PS04F0GzQ0ahgyb8Wsn6zg=
+	t=1706543265; cv=none; b=BgtRWPr5+YQQbgDSiN2u9mlIeG8w0TYSdUXx9GQ641sddnvBdk3C46LT5Ie0V9mSA2Y//iVSUuIk2eT/9iUlf0DvOAMGqK+z7WrlNlOrQAfwVrvnCFeDTzu18EKuVZM6tID/UZP4dWAOeqBA9LPyQxLEnaTdzqi41cfnsYv39vI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706543089; c=relaxed/simple;
-	bh=hc9w6fHB6GNc2uSOz6ErX7jduiBxLNfZzksxtRecrAw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ri0PCgICC0A5UkYVeMphR67RoQ1K3eNEWt/zJzPdbwC2W0g581JjzoFGChIXmcAO2yAdaCHzaFGDMz/seRZan/iO4t7/mQxkYr9pEkd2fHj8nF5O4jaK2+fKQg1Ayhap7bDhevqwNxdKVh0sVZ9LJpHxxvjOqQaSvp3vjU899k4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Op4plzqa; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706543086;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EDC7vuXA9lRBLGT1HPb1LtCn5oK4rQZH3750GlIB9Gs=;
-	b=Op4plzqahAdRmL/QveftL5aMn1JC4IDLR9jD/ZbXBKsodP2nPMUvdlOJvfBPXY0EktlSqX
-	l7+c7QyVcbhwbWu0kIBBXryZEoVePP9tAXwAYe+o8z+kIPq2awe1bEFAaP1YBXrxS3ZApc
-	USUvsM4SH/GbDzzXpPb1kwfmOTWZASo=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-25-_BPBTfbJNI2VKxLm09JG8w-1; Mon, 29 Jan 2024 10:44:44 -0500
-X-MC-Unique: _BPBTfbJNI2VKxLm09JG8w-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2cf2ea2d70dso21459591fa.3
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 07:44:43 -0800 (PST)
+	s=arc-20240116; t=1706543265; c=relaxed/simple;
+	bh=e71rTvtPxDFneWq3ZzMAOdNG39+x8/faX2BoKUgmBvA=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=aMyi1rCNndBFvU/LJ5ahMG6MYDW6ZXTUJ/KioSk2I8811qp9CvCAPyBvSbNtDnRHj0WoxTUXk0G/D/PtWC4J+djdN5PkQlgCUuJ171xRlBvETmNllOtHpNBs5a3ZaPNfIwuQEE5uhRxncLW1UgyPRK6H08ZSTrRGsCmy5j3646Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=fE4W5cm2; arc=none smtp.client-ip=209.85.217.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-vs1-f51.google.com with SMTP id ada2fe7eead31-467e4a04086so438055137.3
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 07:47:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1706543262; x=1707148062; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=oJOfHja10uqFUW21l2U+7rJfVn+PAsABlarxrannHD8=;
+        b=fE4W5cm2t97bHMqhisbL84cN061EiNx+Rc1358mDmTNqr4ZPK14R465cjzL8GQrlQE
+         g0V/9PrqAIPRFYuCTDNOzeg0ZL8bYPEEoNKb5J8UXK5qfAvsMetASdAd5w0Nv73vSlHP
+         7P4kGbcl9h8DPMIOkVo+nySBSyyjty3OqbBQ8WrOmNPR6rdcLSBi5JdC+gxCqottd/6d
+         CE1q+Y6V1N1zUBCSMIhwR/J0pkBRq7DZLhFVR8ihP2nQyuqKoXLY9dgHxtR9b6TkghIj
+         UaPBKuvxhgPzAZcieuCU4zaFODmz4E906YdEM/ux+rz83PYATjKI7SFzd9jgIeKKlXQe
+         sShw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706543082; x=1707147882;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EDC7vuXA9lRBLGT1HPb1LtCn5oK4rQZH3750GlIB9Gs=;
-        b=lY3PIA+ES5Bk/fWyswla29wHGURtHRjbR4UL11fgdoM/PMJAidCz7b/oWAuKPK3Tem
-         67oXK0nFjL+cauWVrXwgPnqU5vH0gvs+LFiMO5Gbm2A74bJrFgCOfsai64yr0tKCa+X5
-         sNWKJIYsLc3bga/E42cGHmJRYp7KXTiyUK0PJnWa9BSb1mlSXGvo+a4o7cnpnq3RZfh6
-         cRqQF5EfsVfjWEekIjE3DcJt0d9k2YnNYtzT2zzPVyFJcoyu/M3gaqk0+gjxo4i7F0AV
-         hM22dblFEL5ZSCKLIWMR6YmpBnOoP64SRXFLGp/zNY8KE6OvOsNOkJYurTkSJjT0pO3p
-         MZ0w==
-X-Gm-Message-State: AOJu0Yx0COGlPy7lcAtgsr+HN10dmrpJGMKiLAvBYnFKjxbOAw8pV8zL
-	G4s5iv0GUTlbhQ996sxAAHn9eY5E94JB3LKeQb/RMEqhtaotecaHYe7E7ZFZsbOPGsrlfKPipTZ
-	5xihhReoDx0unHsYq6QfRB92CD+8I4csOkEMa47FhQFgRhrKruA/kHQ==
-X-Received: by 2002:ac2:5dd5:0:b0:50e:4fcb:dc28 with SMTP id x21-20020ac25dd5000000b0050e4fcbdc28mr3663341lfq.35.1706543082449;
-        Mon, 29 Jan 2024 07:44:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHXOf5GKJqQt9EEoWWWjHDzHTLeOkDX165FBk5E6e9jH/XuSgJ8s/voFvPCMEEQIIbYcaVbpw==
-X-Received: by 2002:ac2:5dd5:0:b0:50e:4fcb:dc28 with SMTP id x21-20020ac25dd5000000b0050e4fcbdc28mr3663322lfq.35.1706543082105;
-        Mon, 29 Jan 2024 07:44:42 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id gy14-20020a170906f24e00b00a28f51adc39sm4048229ejb.61.2024.01.29.07.44.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 07:44:41 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 389A8108A04D; Mon, 29 Jan 2024 16:44:41 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
- davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, bpf@vger.kernel.org, willemdebruijn.kernel@gmail.com,
- jasowang@redhat.com, sdf@google.com, hawk@kernel.org,
- ilias.apalodimas@linaro.org
-Subject: Re: [PATCH v6 net-next 1/5] net: add generic per-cpu page_pool
- allocator
-In-Reply-To: <ZbefjZvKUMtaCbm1@lore-desk>
-References: <cover.1706451150.git.lorenzo@kernel.org>
- <5b0222d3df382c22fe0fa96154ae7b27189f7ecd.1706451150.git.lorenzo@kernel.org>
- <87jzns1f71.fsf@toke.dk> <ZbefjZvKUMtaCbm1@lore-desk>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 29 Jan 2024 16:44:41 +0100
-Message-ID: <87bk9416vq.fsf@toke.dk>
+        d=1e100.net; s=20230601; t=1706543262; x=1707148062;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=oJOfHja10uqFUW21l2U+7rJfVn+PAsABlarxrannHD8=;
+        b=TKgh27dxqQHWwxJ7GJ7e9cEoGB0YWIj1oUoDUuJLBBteKhXeSc8WRcnHdmW5VYRW8j
+         9VkWPtZpPDuE5Vg515Xt1uZk2vJf7vB4yZQqdTu5XI0w1r8wNO+2gX2VRQSecklD2d0w
+         /2IprNXMZ7wnjkMvL6gBwH08JCyfx4MKd5JVttX/ApNtK+Am4eS72f58RtobsiTB6mDG
+         gtCLfsFlxxt24Nbq8KNQW7kduLNgaX218qgKQWchYcAPcnQ4WGCoMVw6rHVcPse1hBTH
+         80njfBDb3KjdBEZr+o+yImZudPObEzkLItuXgd8TKPlECbHGcIE8qoMetyi9xbSR0MJ4
+         FMgQ==
+X-Gm-Message-State: AOJu0YyivQKeW9XpZ/+K4Ag2dN9hKEn5MJR0nPVhl0FWr59KbaAgXMNj
+	EpR+2VLhxTRxEcvhajr8QNGitOf1rD1wtPnrBQIdg+5zg+en/9GP7VqGhGzfL4/eqnyxugzhqqj
+	J+1mbvKHsk9ijKQjRAN3fpFYmKoakpiOfhyE1vw==
+X-Google-Smtp-Source: AGHT+IHmSl2fS1dbhrXEFwChru7nCooY7CV03h6IE8myHIF3fsDlAyU2AUGEY1tYOslEsEj5iyXZpNsdl2G7Re3ey70=
+X-Received: by 2002:a05:6102:2267:b0:46b:57b4:ad3d with SMTP id
+ v7-20020a056102226700b0046b57b4ad3dmr1102566vsd.21.1706543262416; Mon, 29 Jan
+ 2024 07:47:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Mon, 29 Jan 2024 21:17:31 +0530
+Message-ID: <CA+G9fYvYQRnBbZhHknSKbwYiCr_3vPwC5zPz2NsV9_1F7=paQQ@mail.gmail.com>
+Subject: stable-rc: 6.1: mlx5: params.c:994:53: error: 'MLX5_IPSEC_CAP_CRYPTO'
+ undeclared (first use in this function)
+To: linux-stable <stable@vger.kernel.org>, Netdev <netdev@vger.kernel.org>, 
+	linux-rdma@vger.kernel.org, lkft-triage@lists.linaro.org
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Sasha Levin <sashal@kernel.org>, 
+	Leon Romanovsky <leonro@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	"David S. Miller" <davem@davemloft.net>, Dan Carpenter <dan.carpenter@linaro.org>, 
+	Arnd Bergmann <arnd@arndb.de>
+Content-Type: text/plain; charset="UTF-8"
 
-Lorenzo Bianconi <lorenzo.bianconi@redhat.com> writes:
+Following build errors noticed on stable-rc linux-6.1.y for arm64.
 
->> Lorenzo Bianconi <lorenzo@kernel.org> writes:
->> 
->> > Introduce generic percpu page_pools allocator.
->> > Moreover add page_pool_create_percpu() and cpuid filed in page_pool struct
->> > in order to recycle the page in the page_pool "hot" cache if
->> > napi_pp_put_page() is running on the same cpu.
->> > This is a preliminary patch to add xdp multi-buff support for xdp running
->> > in generic mode.
->> >
->> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
->> > ---
->> >  include/net/page_pool/types.h |  3 +++
->> >  net/core/dev.c                | 40 +++++++++++++++++++++++++++++++++++
->> >  net/core/page_pool.c          | 23 ++++++++++++++++----
->> >  net/core/skbuff.c             |  5 +++--
->> >  4 files changed, 65 insertions(+), 6 deletions(-)
->> >
->> > diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
->> > index 76481c465375..3828396ae60c 100644
->> > --- a/include/net/page_pool/types.h
->> > +++ b/include/net/page_pool/types.h
->> > @@ -128,6 +128,7 @@ struct page_pool_stats {
->> >  struct page_pool {
->> >  	struct page_pool_params_fast p;
->> >  
->> > +	int cpuid;
->> >  	bool has_init_callback;
->> >  
->> >  	long frag_users;
->> > @@ -203,6 +204,8 @@ struct page *page_pool_alloc_pages(struct page_pool *pool, gfp_t gfp);
->> >  struct page *page_pool_alloc_frag(struct page_pool *pool, unsigned int *offset,
->> >  				  unsigned int size, gfp_t gfp);
->> >  struct page_pool *page_pool_create(const struct page_pool_params *params);
->> > +struct page_pool *page_pool_create_percpu(const struct page_pool_params *params,
->> > +					  int cpuid);
->> >  
->> >  struct xdp_mem_info;
->> >  
->> > diff --git a/net/core/dev.c b/net/core/dev.c
->> > index cb2dab0feee0..bf9ec740b09a 100644
->> > --- a/net/core/dev.c
->> > +++ b/net/core/dev.c
->> > @@ -153,6 +153,8 @@
->> >  #include <linux/prandom.h>
->> >  #include <linux/once_lite.h>
->> >  #include <net/netdev_rx_queue.h>
->> > +#include <net/page_pool/types.h>
->> > +#include <net/page_pool/helpers.h>
->> >  
->> >  #include "dev.h"
->> >  #include "net-sysfs.h"
->> > @@ -442,6 +444,8 @@ static RAW_NOTIFIER_HEAD(netdev_chain);
->> >  DEFINE_PER_CPU_ALIGNED(struct softnet_data, softnet_data);
->> >  EXPORT_PER_CPU_SYMBOL(softnet_data);
->> >  
->> > +DEFINE_PER_CPU_ALIGNED(struct page_pool *, page_pool);
->> 
->> I think we should come up with a better name than just "page_pool" for
->> this global var. In the code below it looks like it's a local variable
->> that's being referenced. Maybe "global_page_pool" or "system_page_pool"
->> or something along those lines?
->
-> ack, I will fix it. system_page_pool seems better, agree?
+arm64:
+--------
+  * build/gcc-13-lkftconfig
+  * build/gcc-13-lkftconfig-kunit
+  * build/clang-nightly-lkftconfig
+  * build/clang-17-lkftconfig-no-kselftest-frag
+  * build/gcc-13-lkftconfig-devicetree
+  * build/clang-lkftconfig
+  * build/gcc-13-lkftconfig-perf
 
-Yeah, agreed :)
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
 
--Toke
+Build errors:
+------
+drivers/net/ethernet/mellanox/mlx5/core/en/params.c: In function
+'mlx5e_build_sq_param':
+drivers/net/ethernet/mellanox/mlx5/core/en/params.c:994:53: error:
+'MLX5_IPSEC_CAP_CRYPTO' undeclared (first use in this function)
+  994 |                     (mlx5_ipsec_device_caps(mdev) &
+MLX5_IPSEC_CAP_CRYPTO);
+      |
+^~~~~~~~~~~~~~~~~~~~~
 
+Suspecting commit:
+  net/mlx5e: Allow software parsing when IPsec crypto is enabled
+  [ Upstream commit 20f5468a7988dedd94a57ba8acd65ebda6a59723 ]
+
+Links:
+ - https://qa-reports.linaro.org/lkft/linux-stable-rc-linux-6.1.y/build/v6.1.75-143-g87ae8e32051d/testrun/22361778/suite/build/test/gcc-13-lkftconfig-debug/details/
+
+--
+Linaro LKFT
+https://lkft.linaro.org
 
