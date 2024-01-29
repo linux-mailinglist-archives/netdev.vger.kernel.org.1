@@ -1,172 +1,211 @@
-Return-Path: <netdev+bounces-66605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C963E83FF7C
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 08:57:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE27883FF9B
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 09:06:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F6B51F2173A
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 07:57:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9371C282A08
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 08:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 669EF51C43;
-	Mon, 29 Jan 2024 07:54:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3EF951C43;
+	Mon, 29 Jan 2024 08:06:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="iuAouQQ5";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="aUEYNvl2";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="tuxm7eM5";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="jnciFc7z"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="C0MZB9Bc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F419951C42;
-	Mon, 29 Jan 2024 07:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8B1A537FF
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 08:06:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706514883; cv=none; b=UmjQkztE+GvVRKCBjSKG7jf584KmbHGYre+1R++4NOpnTGxt34QrqWA7s59kduHcaKvAZrHNa1KtbT/6dTDe46GVznjbPrFelqEJXCcKbE5oV+n2B3E71oa0DCYuWsQc+uPRAgnGJTdKCl/JvUZIL1SQ6uoY9VIQ73TSsRZ92gE=
+	t=1706515585; cv=none; b=DQ00SlM9hKnBldEpQKys96QZmdQgh/g1dnvtQ9jtLsIKhZkDHgk7neXjnY+gRf6o3wI4uq67SQZ4NDwhw7ZUjDkZbQNBmXnmAamL+OUR5YWI5xXGr++NHnX9YOnH7eBcwbISjxnwH01XeSJ9ZNa5FiSJjsqHGo+y3uGMkJNZRDM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706514883; c=relaxed/simple;
-	bh=BQf0nwkY15IeK3dUsXzHeiJbkcJ3qQ8FaKnHviomCcI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LFVnDsjy3XuU0WzyrgWpPGcoMIYVNmceeSBCIwRadHLMHLlucRR1HLSNkIHOQ3OCiZN7Szj1e8Fd4MNrQLOr+mwriXC37mJd+8X45ge7ktiFXyfvH/cWV8FOcQALi7J2j6vIASWLw7eckjGok02/VLa76bXYaGf0sT7QNM/z82I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=iuAouQQ5; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=aUEYNvl2; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=tuxm7eM5; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=jnciFc7z; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id E512F22009;
-	Mon, 29 Jan 2024 07:54:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1706514879;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OcDPuDxI6AGFAM73OJg3OdByb6XRoKn9BIxXoVm50Eg=;
-	b=iuAouQQ5JrZzjA3PyBpQyG78kLzj1qghUdpXecNYuUPKy5rxdR375P/q/whFV4zLHreM2E
-	DAun9YmyWxsusgdqYDF9Eh5FrNf8ejHUoskTob07PjYMC8Gcrj5UF/VzO/knF/hd6MaZPq
-	e9XFxZqbqC/yCIxNPmleId1n81MjCZE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1706514879;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OcDPuDxI6AGFAM73OJg3OdByb6XRoKn9BIxXoVm50Eg=;
-	b=aUEYNvl2odurgExx0gog7hIoRiBov4bu/+K52cZk9CQLPbyg5cQr+o1282tPs4T2QrYo/Q
-	iz5/YsoUQDh+1jAA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1706514876;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OcDPuDxI6AGFAM73OJg3OdByb6XRoKn9BIxXoVm50Eg=;
-	b=tuxm7eM5A8+iwM9Z+lrSnYN63//kVQ5Mqsnjo50wU5pFatYPUJIABv/ZxdQ6aNE87OBc7S
-	NlRO+rtYQKoehAnbc5V3qfTo2YgyNcFr3if2E3wqsbIkGTmHgFLdETN1ADQArKxOY9dImh
-	9EBX10FrfUCBehM2U6UcXIr3GPY18wE=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1706514876;
-	h=from:from:reply-to:reply-to:date:date:message-id:message-id:to:to:
-	 cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OcDPuDxI6AGFAM73OJg3OdByb6XRoKn9BIxXoVm50Eg=;
-	b=jnciFc7zONesv0gEhWuRwz1NohpFpkMBkiPVVAFJbe8p43pAqDrsgh1jm52UbOnt2ZObGL
-	VU/moVBSArAW/oCw==
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id C26C3132FA;
-	Mon, 29 Jan 2024 07:54:36 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id Qtr4LrxZt2WxLQAAn2gu4w
-	(envelope-from <dsterba@suse.cz>); Mon, 29 Jan 2024 07:54:36 +0000
-Date: Mon, 29 Jan 2024 08:54:12 +0100
-From: David Sterba <dsterba@suse.cz>
-To: David Laight <David.Laight@ACULAB.COM>
-Cc: "'linux-kernel@vger.kernel.org'" <linux-kernel@vger.kernel.org>,
-	'Linus Torvalds' <torvalds@linux-foundation.org>,
-	'Netdev' <netdev@vger.kernel.org>,
-	"'dri-devel@lists.freedesktop.org'" <dri-devel@lists.freedesktop.org>,
-	'Andy Shevchenko' <andriy.shevchenko@linux.intel.com>,
-	'Andrew Morton' <akpm@linux-foundation.org>,
-	"'Matthew Wilcox (Oracle)'" <willy@infradead.org>,
-	'Christoph Hellwig' <hch@infradead.org>,
-	'Dan Carpenter' <dan.carpenter@linaro.org>,
-	'Linus Walleij' <linus.walleij@linaro.org>,
-	"'David S . Miller'" <davem@davemloft.net>,
-	"'linux-btrfs@vger.kernel.org'" <linux-btrfs@vger.kernel.org>,
-	'Jens Axboe' <axboe@kernel.dk>
-Subject: Re: [PATCH next 09/11] tree-wide: minmax: Replace all the uses of
- max() for array sizes with max_const()
-Message-ID: <20240129075412.GU31555@twin.jikos.cz>
-Reply-To: dsterba@suse.cz
-References: <0ca26166dd2a4ff5a674b84704ff1517@AcuMS.aculab.com>
- <10638249b13c43cab9a5522271aa99e2@AcuMS.aculab.com>
+	s=arc-20240116; t=1706515585; c=relaxed/simple;
+	bh=wizf/N1yiuWXS86LJIaK6ePscQYmOHU1hT1ODhjDqGI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=P0+DoX3YLPVBwkzP6p/ssLr25o7TU955VM6jBldBI9dLkFfmJHdQbxDPqMJRqduPVhHsjwlfT9Bu4PcTbWPjN51XndEcebXssKlb7g0wQYaIJOQR2TVf2nNSQgbGqdugRjjkttz3nHTgLXOuI8iKGSMvBCk3KYCKslo24Z/geQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=C0MZB9Bc; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-510faac8c57so1156437e87.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 00:06:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1706515582; x=1707120382; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9e8ScksLMa1kSFGa4MeqkycZDTxe116Rjce2WdVB6bY=;
+        b=C0MZB9BcINGxpYwSYO1ote1mv69ONaek5kkKUp4yOFRaq0RfpRcgUvrb60Iw48OvPp
+         F28x9G7+040f1j9udreQL5f57I8YiAoMwX0PgnKaq1q3lUvdzJObbLAkMq1mwmbdUqZw
+         pIiQMX/xKw7D6KWUFLqEJK46I3FEy4wVuO/gcrd89qEiKQi4DgjKi1GTHVmXmZIO4//u
+         TZNsITT9QyHZySOVexM9gDJjeuDv2sGKRV/7PPtQ6Rrxu3os6/97b8KqRkiUbQqCXvmv
+         ICv70e35FEeVLUkTxOEEzMFHw5ppx0h/5L+YSel7ZLM5NHFkOvywHXE6WMVbKAWPNmLt
+         q5Hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706515582; x=1707120382;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9e8ScksLMa1kSFGa4MeqkycZDTxe116Rjce2WdVB6bY=;
+        b=dNXdOGDAoDXKjPgyFzuNGIIeu8aoBzhszuxc2NJDJLe3iyLoIgWpAPPy4GfP3ZIF+G
+         PqQYpDhuZJJUYVPFsqoOaKGPOHhhuoGeqkngeYplcQ+GDaYrqZcnX4x66g1GbdrNgqW5
+         JbbLmLqg+bZBCbtsQxTPe+TmsqaoEZEqCx550+U0yjd5DJ0C2CQA5T8mJUv5MtoBfDSp
+         qCz+TOL8wMJFvT2FxDwMR89ETMKvfk+hIZ85jucBo637AhY3NvrizJYo/5CTujYcVLTW
+         hWV8bo3IQ/inJv3PKbaYv8b7uvheokELD7g9+6LwC7D6+1d3HBs9Qi8sR68w4V59YKcE
+         ucfA==
+X-Gm-Message-State: AOJu0YzapkQDX7Zq/Lbyf1h7wGTMqJIJhW7rPytJmDxBPxdLwtdG67wl
+	2FxAJN7swCIAqRt8YEFa79KueO+GVZUkuMyt+Ss7N8gUsh7G7+7ZFLl4xvNhTp1kpPswVikLNBW
+	7XR5OVuwg88AH221oJC/aNJGg1lLN+y6xz9DHmg==
+X-Google-Smtp-Source: AGHT+IE3GFzRTK+gEYhAKVDdNv5dFPD9sD0dkQBG91cWCF8DdnJBOEHg4VxPLo6WJDQ2akkzMsQX3aJpjWz+q3rAypA=
+X-Received: by 2002:ac2:4d82:0:b0:50e:797c:249a with SMTP id
+ g2-20020ac24d82000000b0050e797c249amr2622926lfe.12.1706515581936; Mon, 29 Jan
+ 2024 00:06:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <10638249b13c43cab9a5522271aa99e2@AcuMS.aculab.com>
-User-Agent: Mutt/1.5.23.1-rc1 (2014-03-12)
-X-Spam-Level: 
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.cz header.s=susede2_rsa header.b=tuxm7eM5;
-	dkim=pass header.d=suse.cz header.s=susede2_ed25519 header.b=jnciFc7z
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-1.33 / 50.00];
-	 HAS_REPLYTO(0.30)[dsterba@suse.cz];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 ARC_NA(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 MIME_GOOD(-0.10)[text/plain];
-	 REPLYTO_ADDR_EQ_FROM(0.00)[];
-	 DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:98:from];
-	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:98:from];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 TO_DN_ALL(0.00)[];
-	 DKIM_TRACE(0.00)[suse.cz:+];
-	 MX_GOOD(-0.01)[];
-	 RCPT_COUNT_TWELVE(0.00)[14];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.cz:dkim,suse.com:email,aculab.com:email];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 RCVD_TLS_ALL(0.00)[];
-	 BAYES_HAM(-0.12)[67.06%]
-X-Spam-Score: -1.33
-X-Rspamd-Queue-Id: E512F22009
-X-Spam-Flag: NO
+References: <cover.1706451150.git.lorenzo@kernel.org> <7fd76e88e2aadc03f14b040ffc762e88d05afc8c.1706451150.git.lorenzo@kernel.org>
+In-Reply-To: <7fd76e88e2aadc03f14b040ffc762e88d05afc8c.1706451150.git.lorenzo@kernel.org>
+From: Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Date: Mon, 29 Jan 2024 10:05:45 +0200
+Message-ID: <CAC_iWj+qTUmzD6Du-FRf7yhQj-euG3cFHcT5hZccdeP6tB=jGg@mail.gmail.com>
+Subject: Re: [PATCH v6 net-next 2/5] xdp: rely on skb pointer reference in
+ do_xdp_generic and netif_receive_generic_xdp
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: netdev@vger.kernel.org, lorenzo.bianconi@redhat.com, davem@davemloft.net, 
+	kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, bpf@vger.kernel.org, 
+	toke@redhat.com, willemdebruijn.kernel@gmail.com, jasowang@redhat.com, 
+	sdf@google.com, hawk@kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, Jan 28, 2024 at 07:34:23PM +0000, David Laight wrote:
-> These are the only uses of max() that require a constant value
-> from constant parameters.
-> There don't seem to be any similar uses of min().
-> 
-> Replacing the max() by max_const() lets min()/max() be simplified
-> speeding up compilation.
-> 
-> max_const() will convert enums to int (or unsigned int) so that the
-> casts added by max_t() are no longer needed.
-> 
-> Signed-off-by: David Laight <david.laight@aculab.com>
+Hi Lorenzo,
+
+On Sun, 28 Jan 2024 at 16:22, Lorenzo Bianconi <lorenzo@kernel.org> wrote:
+>
+> Rely on skb pointer reference instead of the skb pointer in do_xdp_generic and
+> netif_receive_generic_xdp routine signatures. This is a preliminary patch to add
+> multi-buff support for xdp running in generic mode.
+
+The patch looks fine, but can we tweak the commit message explaining
+in more detail  why this is needed?
+
+Thanks
+/Ilias
+>
+> Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 > ---
-
-For
-
->  fs/btrfs/tree-checker.c                        | 2 +-
-
-Acked-by: David Sterba <dsterba@suse.com>
+>  drivers/net/tun.c         |  4 ++--
+>  include/linux/netdevice.h |  2 +-
+>  net/core/dev.c            | 16 +++++++++-------
+>  3 files changed, 12 insertions(+), 10 deletions(-)
+>
+> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+> index 4a4f8c8e79fa..5bd98bdaddf2 100644
+> --- a/drivers/net/tun.c
+> +++ b/drivers/net/tun.c
+> @@ -1927,7 +1927,7 @@ static ssize_t tun_get_user(struct tun_struct *tun, struct tun_file *tfile,
+>                 rcu_read_lock();
+>                 xdp_prog = rcu_dereference(tun->xdp_prog);
+>                 if (xdp_prog) {
+> -                       ret = do_xdp_generic(xdp_prog, skb);
+> +                       ret = do_xdp_generic(xdp_prog, &skb);
+>                         if (ret != XDP_PASS) {
+>                                 rcu_read_unlock();
+>                                 local_bh_enable();
+> @@ -2517,7 +2517,7 @@ static int tun_xdp_one(struct tun_struct *tun,
+>         skb_record_rx_queue(skb, tfile->queue_index);
+>
+>         if (skb_xdp) {
+> -               ret = do_xdp_generic(xdp_prog, skb);
+> +               ret = do_xdp_generic(xdp_prog, &skb);
+>                 if (ret != XDP_PASS) {
+>                         ret = 0;
+>                         goto out;
+> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> index 118c40258d07..7eee99a58200 100644
+> --- a/include/linux/netdevice.h
+> +++ b/include/linux/netdevice.h
+> @@ -3958,7 +3958,7 @@ static inline void dev_consume_skb_any(struct sk_buff *skb)
+>  u32 bpf_prog_run_generic_xdp(struct sk_buff *skb, struct xdp_buff *xdp,
+>                              struct bpf_prog *xdp_prog);
+>  void generic_xdp_tx(struct sk_buff *skb, struct bpf_prog *xdp_prog);
+> -int do_xdp_generic(struct bpf_prog *xdp_prog, struct sk_buff *skb);
+> +int do_xdp_generic(struct bpf_prog *xdp_prog, struct sk_buff **pskb);
+>  int netif_rx(struct sk_buff *skb);
+>  int __netif_rx(struct sk_buff *skb);
+>
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index bf9ec740b09a..960f39ac5e33 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -4924,10 +4924,11 @@ u32 bpf_prog_run_generic_xdp(struct sk_buff *skb, struct xdp_buff *xdp,
+>         return act;
+>  }
+>
+> -static u32 netif_receive_generic_xdp(struct sk_buff *skb,
+> +static u32 netif_receive_generic_xdp(struct sk_buff **pskb,
+>                                      struct xdp_buff *xdp,
+>                                      struct bpf_prog *xdp_prog)
+>  {
+> +       struct sk_buff *skb = *pskb;
+>         u32 act = XDP_DROP;
+>
+>         /* Reinjected packets coming from act_mirred or similar should
+> @@ -5008,24 +5009,24 @@ void generic_xdp_tx(struct sk_buff *skb, struct bpf_prog *xdp_prog)
+>
+>  static DEFINE_STATIC_KEY_FALSE(generic_xdp_needed_key);
+>
+> -int do_xdp_generic(struct bpf_prog *xdp_prog, struct sk_buff *skb)
+> +int do_xdp_generic(struct bpf_prog *xdp_prog, struct sk_buff **pskb)
+>  {
+>         if (xdp_prog) {
+>                 struct xdp_buff xdp;
+>                 u32 act;
+>                 int err;
+>
+> -               act = netif_receive_generic_xdp(skb, &xdp, xdp_prog);
+> +               act = netif_receive_generic_xdp(pskb, &xdp, xdp_prog);
+>                 if (act != XDP_PASS) {
+>                         switch (act) {
+>                         case XDP_REDIRECT:
+> -                               err = xdp_do_generic_redirect(skb->dev, skb,
+> +                               err = xdp_do_generic_redirect((*pskb)->dev, *pskb,
+>                                                               &xdp, xdp_prog);
+>                                 if (err)
+>                                         goto out_redir;
+>                                 break;
+>                         case XDP_TX:
+> -                               generic_xdp_tx(skb, xdp_prog);
+> +                               generic_xdp_tx(*pskb, xdp_prog);
+>                                 break;
+>                         }
+>                         return XDP_DROP;
+> @@ -5033,7 +5034,7 @@ int do_xdp_generic(struct bpf_prog *xdp_prog, struct sk_buff *skb)
+>         }
+>         return XDP_PASS;
+>  out_redir:
+> -       kfree_skb_reason(skb, SKB_DROP_REASON_XDP);
+> +       kfree_skb_reason(*pskb, SKB_DROP_REASON_XDP);
+>         return XDP_DROP;
+>  }
+>  EXPORT_SYMBOL_GPL(do_xdp_generic);
+> @@ -5356,7 +5357,8 @@ static int __netif_receive_skb_core(struct sk_buff **pskb, bool pfmemalloc,
+>                 int ret2;
+>
+>                 migrate_disable();
+> -               ret2 = do_xdp_generic(rcu_dereference(skb->dev->xdp_prog), skb);
+> +               ret2 = do_xdp_generic(rcu_dereference(skb->dev->xdp_prog),
+> +                                     &skb);
+>                 migrate_enable();
+>
+>                 if (ret2 != XDP_PASS) {
+> --
+> 2.43.0
+>
 
