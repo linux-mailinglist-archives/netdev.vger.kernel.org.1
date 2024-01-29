@@ -1,262 +1,120 @@
-Return-Path: <netdev+bounces-66680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D753840408
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 12:45:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FE14840487
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:03:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5664B2452D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 11:45:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C24BD1C214D5
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 12:02:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 872A45C5E4;
-	Mon, 29 Jan 2024 11:45:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80CE55D8FE;
+	Mon, 29 Jan 2024 12:02:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 972ED5BADD
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 11:45:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45AD35F544;
+	Mon, 29 Jan 2024 12:02:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706528745; cv=none; b=s9P0/5PQg0+K6u3E03hrxifmwYtH8W3aXnJH6Z62ajK+iCXLam3f76bOw/J71w1WBNC+PpqcNIWCM+jesDNWnU8HhkGW1K8kaYTymWOHF2abA7ysU+8PCJASOJl6N9r02zj9mfZbEwfrYsdgDCeiBbMqcZ1NOdqPunbYzG9xXXc=
+	t=1706529776; cv=none; b=J3d6g5vHuUIuWjEGyQUbQvW0X/x8H17OW12LwsHsDSGNj+JvxwcqET89tgYJy0vzfd86430IluJOP7aoL/GAyqB7ihzaHIhrm539gCi/C/9aqEyCUNkRbtJSnq/APaaA9yy5x+q0UESulXJCswWDcohDYZs7xR1d3pYYEcYq9GE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706528745; c=relaxed/simple;
-	bh=hqklHqiJPl6nFG2DUoMBOpk0pmuyq8NFuB5a/zroB+g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sO4hHdHgl7QJeSEI85VEZDC1KKJWGDNPCqz2y3b1CH3IVVgZvmJLx5BZpyvFzHQlkUy6tb2vjZxLhj8O/wMGCsBK/bNUflwzY2HDp3yUiryDK4rcyktEIzCSKqc81WMcX3Kzc0jjbEHDTxInO8BCaMuAnDsC8WlGAAjBfkU+2JQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.112.150])
-	by gateway (Coremail) with SMTP id _____8DxmfDkj7dl3MIHAA--.24614S3;
-	Mon, 29 Jan 2024 19:45:40 +0800 (CST)
-Received: from [192.168.100.8] (unknown [112.20.112.150])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxTs3hj7dlB5klAA--.15973S3;
-	Mon, 29 Jan 2024 19:45:38 +0800 (CST)
-Message-ID: <76dc71b5-21e7-4ee1-b57e-8edff3f0d01b@loongson.cn>
-Date: Mon, 29 Jan 2024 19:45:36 +0800
+	s=arc-20240116; t=1706529776; c=relaxed/simple;
+	bh=pGbJ27JnYljmxLcfm9joJeRrsJ7Caqlg7bLtcQgUIhk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CotbZ3B1CIharL16B77Uz9DOnKeVk/1vO3hqKL3tPucIlOaqFyx65CTGjDAIGwMD9BG5nqr626z55DyB0JUFZiG9QxN9VZPWZCCH/BtHLTZSf+M09cQU4FGcxmnd/w7bzAtM3GBTxnbAjL5R5iBbHNK0RLO5rrerTyw8Bcgg6Sg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.41.52] (port=53984 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1rUQLY-00DalQ-0n; Mon, 29 Jan 2024 13:02:42 +0100
+Date: Mon, 29 Jan 2024 13:02:39 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: kovalev@altlinux.org
+Cc: Eric Dumazet <edumazet@google.com>, laforge@gnumonks.org,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	osmocom-net-gprs@lists.osmocom.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, nickel@altlinux.org,
+	oficerovas@altlinux.org, dutyrok@altlinux.org
+Subject: Re: [PATCH 1/1] gtp: fix use-after-free and null-ptr-deref in
+ gtp_genl_dump_pdp()
+Message-ID: <ZbeT31rUh0h3CctO@calendula>
+References: <20240124101404.161655-1-kovalev@altlinux.org>
+ <20240124101404.161655-2-kovalev@altlinux.org>
+ <CANn89iLKc8-hwvSBE=aSTRg=52Pn9B0HmFDneGCe6PMawPFCnQ@mail.gmail.com>
+ <1144600e-52f1-4c1a-4854-c53e05af5b45@basealt.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 7/9] net: stmmac: dwmac-loongson: Add GNET
- support
-Content-Language: en-US
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
- chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn,
- netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-References: <cover.1702990507.git.siyanteng@loongson.cn>
- <caf9e822c2f628f09e02760cfa81a1bd4af0b8d6.1702990507.git.siyanteng@loongson.cn>
- <pbju43fy4upk32xcgrerkafnwjvs55p5x4kdaavhia4z7wjoqm@mk55pgs7eczz>
- <ac7cc7fc-60fa-4624-b546-bb31cd5136cb@loongson.cn>
- <y6pomse5ekphiysbfoabd35bxi6zs3hmoezfbjiv5nh7ogpxg5@23fnkt2vbkgb>
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <y6pomse5ekphiysbfoabd35bxi6zs3hmoezfbjiv5nh7ogpxg5@23fnkt2vbkgb>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8AxTs3hj7dlB5klAA--.15973S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoW3GF4xtFWrXw1DGr4rtry8Xrc_yoWxWrW7p3
-	yUAa4jkrWUXr17GwnYqws8AF9IyrW3trZrWr47tw17KFyqyF9IqryUtFWUCr97Cr4DuF17
-	Xr4j9r4fuF98CrgCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMxCIbckI1I0E14v26r1q6r43MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
-	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
-	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8uc_3UUUUU==
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1144600e-52f1-4c1a-4854-c53e05af5b45@basealt.ru>
+X-Spam-Score: -1.9 (-)
 
+Hi,
 
-在 2024/1/2 09:22, Serge Semin 写道:
-> On Mon, Jan 01, 2024 at 03:27:07PM +0800, Yanteng Si wrote:
->> 在 2023/12/21 10:34, Serge Semin 写道:
->>> On Tue, Dec 19, 2023 at 10:26:47PM +0800, Yanteng Si wrote:
->>>> Add Loongson GNET (GMAC with PHY) support. Current GNET does not support
->>>> half duplex mode, and GNET on LS7A only supports ANE when speed is set to
->>>> 1000M.
->>>>
->>>> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
->>>> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
->>>> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
->>>> ---
->>>>    .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 79 +++++++++++++++++++
->>>>    .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  6 ++
->>>>    include/linux/stmmac.h                        |  2 +
->>>>    3 files changed, 87 insertions(+)
->>>>
->>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
->>>> index 2c08d5495214..9e4953c7e4e0 100644
->>>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
->>>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
->>>> @@ -168,6 +168,83 @@ static struct stmmac_pci_info loongson_gmac_pci_info = {
->>>>    	.config = loongson_gmac_config,
->>>>    };
->>>> +static void loongson_gnet_fix_speed(void *priv, unsigned int speed, unsigned int mode)
->>>> +{
->>>> +	struct net_device *ndev = dev_get_drvdata(priv);
->>>> +	struct stmmac_priv *ptr = netdev_priv(ndev);
->>>> +
->>>> +	/* The controller and PHY don't work well together.
->>>> +	 * We need to use the PS bit to check if the controller's status
->>>> +	 * is correct and reset PHY if necessary.
->>>> +	 */
->>>> +	if (speed == SPEED_1000)
->>>> +		if (readl(ptr->ioaddr + MAC_CTRL_REG) & (1 << 15) /* PS */)
->>>> +			phy_restart_aneg(ndev->phydev);
->>> {} around the outer if please.
->> OK.
->>>> +}
->>>> +
->>>> +static int loongson_gnet_data(struct pci_dev *pdev,
->>>> +			      struct plat_stmmacenet_data *plat)
->>>> +{
->>>> +	loongson_default_data(pdev, plat);
->>>> +
->>>> +	plat->multicast_filter_bins = 256;
->>>> +
->>>> +	plat->mdio_bus_data->phy_mask = 0xfffffffb;
->>> ~BIT(2)?
->> I still need to confirm, please allow me to get back to you later.
->>>> +
->>>> +	plat->phy_addr = 2;
->>>> +	plat->phy_interface = PHY_INTERFACE_MODE_INTERNAL;
->>>> +
->>>> +	plat->bsp_priv = &pdev->dev;
->>>> +	plat->fix_mac_speed = loongson_gnet_fix_speed;
->>>> +
->>>> +	plat->dma_cfg->pbl = 32;
->>>> +	plat->dma_cfg->pblx8 = true;
->>>> +
->>>> +	plat->clk_ref_rate = 125000000;
->>>> +	plat->clk_ptp_rate = 125000000;
->>>> +
->>>> +	return 0;
->>>> +}
->>>> +
->>>> +static int loongson_gnet_config(struct pci_dev *pdev,
->>>> +				struct plat_stmmacenet_data *plat,
->>>> +				struct stmmac_resources *res,
->>>> +				struct device_node *np)
->>>> +{
->>>> +	int ret;
->>>> +	u32 version = readl(res->addr + GMAC_VERSION);
->>>> +
->>>> +	switch (version & 0xff) {
->>>> +	case DWLGMAC_CORE_1_00:
->>>> +		ret = loongson_dwmac_config_multi_msi(pdev, plat, res, np, 8);
->>>> +		break;
->>>> +	default:
->>>> +		ret = loongson_dwmac_config_legacy(pdev, plat, res, np);
->>> Hm, do you have two versions of Loongson GNET? What does the second
->> Yes.
->>> one contain in the GMAC_VERSION register then? Can't you distinguish
->>> them by the PCI IDs (device, subsystem, revision)?
->> I'm afraid that's not possible.
->>
->> Because they have the same pci id and revision.
-> Please provide more details about what platform/devices support you
-> are adding and what PCI IDs and DW GMAC IP-core version they have.
-
-DWLGMAC_CORE_1_00 has been removed and I am already making patches.
-
-
-Thanks,
-
-Yanteng
-
+On Wed, Jan 24, 2024 at 02:20:04PM +0300, kovalev@altlinux.org wrote:
+> 24.01.2024 13:57, Eric Dumazet wrote:
+> > Oh wait, this is a 5.10 kernel ?
 >
->>
->> Thanks,
->>
->> Yanteng
->>
->>> -Serge(y)
->>>
->>>> +		break;
->>>> +	}
->>>> +
->>>> +	switch (pdev->revision) {
->>>> +	case 0x00:
->>>> +		plat->flags |=
->>>> +			FIELD_PREP(STMMAC_FLAG_DISABLE_HALF_DUPLEX, 1) |
->>>> +			FIELD_PREP(STMMAC_FLAG_DISABLE_FORCE_1000, 1);
->>>> +		break;
->>>> +	case 0x01:
->>>> +		plat->flags |=
->>>> +			FIELD_PREP(STMMAC_FLAG_DISABLE_HALF_DUPLEX, 1);
->>>> +		break;
->>>> +	default:
->>>> +		break;
->>>> +	}
->>>> +
->>>> +	return ret;
->>>> +}
->>>> +
->>>> +static struct stmmac_pci_info loongson_gnet_pci_info = {
->>>> +	.setup = loongson_gnet_data,
->>>> +	.config = loongson_gnet_config,
->>>> +};
->>>> +
->>>>    static int loongson_dwmac_probe(struct pci_dev *pdev,
->>>>    				const struct pci_device_id *id)
->>>>    {
->>>> @@ -318,9 +395,11 @@ static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loongson_dwmac_suspend,
->>>>    			 loongson_dwmac_resume);
->>>>    #define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
->>>> +#define PCI_DEVICE_ID_LOONGSON_GNET	0x7a13
->>>>    static const struct pci_device_id loongson_dwmac_id_table[] = {
->>>>    	{ PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
->>>> +	{ PCI_DEVICE_DATA(LOONGSON, GNET, &loongson_gnet_pci_info) },
->>>>    	{}
->>>>    };
->>>>    MODULE_DEVICE_TABLE(pci, loongson_dwmac_id_table);
->>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
->>>> index 8105ce47c6ad..d6939eb9a0d8 100644
->>>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
->>>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
->>>> @@ -420,6 +420,12 @@ stmmac_ethtool_set_link_ksettings(struct net_device *dev,
->>>>    		return 0;
->>>>    	}
->>>> +	if (FIELD_GET(STMMAC_FLAG_DISABLE_FORCE_1000, priv->plat->flags)) {
->>>> +		if (cmd->base.speed == SPEED_1000 &&
->>>> +		    cmd->base.autoneg != AUTONEG_ENABLE)
->>>> +			return -EOPNOTSUPP;
->>>> +	}
->>>> +
->>>>    	return phylink_ethtool_ksettings_set(priv->phylink, cmd);
->>>>    }
->>>> diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
->>>> index f07f79d50b06..067030cdb60f 100644
->>>> --- a/include/linux/stmmac.h
->>>> +++ b/include/linux/stmmac.h
->>>> @@ -222,6 +222,8 @@ struct dwmac4_addrs {
->>>>    #define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(11)
->>>>    #define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(12)
->>>>    #define STMMAC_FLAG_HAS_LGMAC			BIT(13)
->>>> +#define STMMAC_FLAG_DISABLE_HALF_DUPLEX	BIT(14)
-> Just noticed. I do not see this flag affecting any part of the code.
-> Drop it if no actual action is implied by it.
+> Yes, but the bug is reproduced on the latest stable kernels.
 >
-> -Serge(y)
->
->>>> +#define STMMAC_FLAG_DISABLE_FORCE_1000	BIT(15)
->>>>    struct plat_stmmacenet_data {
->>>>    	int bus_id;
->>>> -- 
->>>> 2.31.4
->>>>
+> > Please generate a stack trace using a recent tree, it is possible the
+> > bug has been fixed already.
 
+__netlink_dump_start() is called at the beginning of the dump, which is
+grabbing a reference on this module.
+
+do you have a reproducer?
+
+> See [PATCH 0/1] above, there's a stack for the 6.6.13 kernel at the bottom
+> of the message.
+> 
+> [  523.915255] Call Trace:
+> [  523.915255]  <TASK>
+> [  523.915255]  ? __die+0x1f/0x70
+> [  523.915255]  ? page_fault_oops+0x14d/0x4a0
+> [  523.915255]  ? exc_page_fault+0x7b/0x180
+> [  523.915255]  ? asm_exc_page_fault+0x22/0x30
+> [  523.915255]  ? gtp_genl_dump_pdp+0x82/0x190 [gtp]
+> [  523.915255]  ? gtp_genl_dump_pdp+0x82/0x190 [gtp]
+> [  523.915255]  genl_dumpit+0x2f/0x90
+> [  523.915255]  netlink_dump+0x126/0x320
+> [  523.915255]  __netlink_dump_start+0x1da/0x2a0
+> [  523.915255]  genl_family_rcv_msg_dumpit+0x93/0x100
+> [  523.915255]  ? __pfx_genl_start+0x10/0x10
+> [  523.915255]  ? __pfx_genl_dumpit+0x10/0x10
+> [  523.915255]  ? __pfx_genl_done+0x10/0x10
+> [  523.915255]  genl_rcv_msg+0x112/0x2a0
+> [  523.915255]  ? __pfx_gtp_genl_dump_pdp+0x10/0x10 [gtp]
+> [  523.915255]  ? __pfx_genl_rcv_msg+0x10/0x10
+> [  523.915255]  netlink_rcv_skb+0x54/0x110
+> [  523.915255]  genl_rcv+0x24/0x40
+> [  523.915255]  netlink_unicast+0x19f/0x290
+> [  523.915255]  netlink_sendmsg+0x250/0x4e0
+> [  523.915255]  ____sys_sendmsg+0x376/0x3b0
+> [  523.915255]  ? copy_msghdr_from_user+0x6d/0xb0
+> [  523.915255]  ___sys_sendmsg+0x86/0xe0
+> [  523.915255]  ? do_fault+0x296/0x470
+> [  523.915255]  ? __handle_mm_fault+0x771/0xda0
+> [  523.915255]  __sys_sendmsg+0x57/0xb0
+> [  523.915255]  do_syscall_64+0x59/0x90
+> [  523.915255]  ? ct_kernel_exit.isra.0+0x71/0x90
+> [  523.915255]  ? __ct_user_enter+0x5a/0xd0
+> [  523.915255]  entry_SYSCALL_64_after_hwframe+0x6e/0xd8
+> [  523.915255] RIP: 0033:0x7f2bcb93cd49
+> 
+> -- 
+> Regards,
+> Vasiliy Kovalev
+> 
 
