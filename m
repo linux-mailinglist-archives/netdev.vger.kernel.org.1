@@ -1,84 +1,102 @@
-Return-Path: <netdev+bounces-66592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BCFD83FE02
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 07:11:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83B8783FE2D
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 07:21:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9548F284633
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 06:11:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28279B22BED
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 06:21:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8845045BEF;
-	Mon, 29 Jan 2024 06:11:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49BB74C3CD;
+	Mon, 29 Jan 2024 06:21:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="jSZtqzg7"
 X-Original-To: netdev@vger.kernel.org
-Received: from verein.lst.de (verein.lst.de [213.95.11.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E6BF45BE8;
-	Mon, 29 Jan 2024 06:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.11.211
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA3424E1BA;
+	Mon, 29 Jan 2024 06:21:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706508702; cv=none; b=soDO5bk7r5Qb/pbQSuedH5quWexZbsdxWSw1TUhzckux3xUwYZY4miIaYH9Gea8oUiYkTACPnG520KFXNnyGHj0KbhY9iJcTV/pXEXgt5YhZ6Nms3JCM9qSP+t0Szp+JXtMMdTNHp+6D8uZEdmUM88GFrtPuzhwZaBn3dAXxJtQ=
+	t=1706509291; cv=none; b=QWSir/IqRCoH8YjZtzc3b7UO8+GGuW3eGyWhyMLZyMme4b5UHB7jEuA7T4vuiECjoNcovW2DKl5AhPmU5Yo3hbvkmi0sTrUginyzcjTuUROnzvghJFBoVVotbyBCoJUfsDAdUeXqMTPGF2QX7Jx3iN+YOW81UJQlPEDlsZ33/9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706508702; c=relaxed/simple;
-	bh=LcxMe8nXcndnUrfBfP/5djB7IjR0n6rkBIDeoH73Ly4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mel6zIdeumNQxWqigMQOEmw4Fw/SMJhKdWHVosMC35qbNUOXPr3Eg3qkGGbpRfRAXuMMcNjvW27L4Hy7Tsr02kGT1aOdB8x39Ye7KTIvQTObmUZZ9xeLsMwuQ1VgG0b0pih7q8ymEsJTjgC2kWpB00hxiqKWqZDElpy9h1QgWTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de; spf=pass smtp.mailfrom=lst.de; arc=none smtp.client-ip=213.95.11.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=lst.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lst.de
-Received: by verein.lst.de (Postfix, from userid 2407)
-	id 8165668B05; Mon, 29 Jan 2024 07:11:36 +0100 (CET)
-Date: Mon, 29 Jan 2024 07:11:36 +0100
-From: Christoph Hellwig <hch@lst.de>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Alexander Duyck <alexanderduyck@fb.com>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, iommu@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/7] dma: compile-out DMA sync op calls when
- not used
-Message-ID: <20240129061136.GD19258@lst.de>
-References: <20240126135456.704351-1-aleksander.lobakin@intel.com> <20240126135456.704351-2-aleksander.lobakin@intel.com>
+	s=arc-20240116; t=1706509291; c=relaxed/simple;
+	bh=ec1CV2THC3H1N8o33FHc4Q4ijpR0Th7MXa1oozMc+Ew=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=Cgzwo5g4fFeP7Asaamc+syDeScPW7t6xZZY5XAoYeqjA3Pmqi6PIBzWBXBTQTPkvs2AbJmxxj3ruepnD9wJVVZQ0YHiKqE9F8xtko0VPuZ5dJYGzveaANAcPrskVV0H4ThwV0xdfcZq7pF9JZb3PqemLz8xWThBi1lKqJoK7rTI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=jSZtqzg7; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1099)
+	id 108FC20E67C9; Sun, 28 Jan 2024 22:21:23 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 108FC20E67C9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1706509283;
+	bh=jcQHPDqDH8my6Yg3JLMYBYEVM6vbGA15v2Ma7JnnpbI=;
+	h=From:To:Cc:Subject:Date:From;
+	b=jSZtqzg7Z/LHGLI+tcluq4k/xiPa8sO7gsoNtcAZaeIUYAXXZzaeeBvOtRXMg+DFM
+	 QFr1bU7qG+LYs+qrJB3HGsQsvviftwdDy2sF6wAyoUZRq7llrFBht1cVV+OH+8WwFD
+	 lg0saiuaj7R/A/qWiKyRJCsbZp7mfwD8F3OaywkQ=
+From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	longli@microsoft.com,
+	yury.norov@gmail.com,
+	leon@kernel.org,
+	cai.huoqing@linux.dev,
+	ssengar@linux.microsoft.com,
+	vkuznets@redhat.com,
+	tglx@linutronix.de,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: schakrabarti@microsoft.com,
+	paulros@microsoft.com,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Subject: [PATCH 0/4 V3 net-next] net: mana: Assigning IRQ affinity on HT cores
+Date: Sun, 28 Jan 2024 22:21:03 -0800
+Message-Id: <1706509267-17754-1-git-send-email-schakrabarti@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240126135456.704351-2-aleksander.lobakin@intel.com>
-User-Agent: Mutt/1.5.17 (2007-11-01)
 
-On Fri, Jan 26, 2024 at 02:54:50PM +0100, Alexander Lobakin wrote:
-> Some platforms do have DMA, but DMA there is always direct and coherent.
-> Currently, even on such platforms DMA sync operations are compiled and
-> called.
-> Add a new hidden Kconfig symbol, DMA_NEED_SYNC, and set it only when
-> either sync operations are needed or there is DMA ops or swiotlb
-> enabled. Set dma_need_sync() and dma_skip_sync() (stub for now)
-> depending on this symbol state and don't call sync ops when
-> dma_skip_sync() is true.
-> The change allows for future optimizations of DMA sync calls depending
-> on compile-time or runtime conditions.
+This patch set introduces a new helper function irq_setup(),
+to optimize IRQ distribution for MANA network devices.
+The patch set makes the driver working 15% faster than
+with cpumask_local_spread().
 
-So the idea of compiling out the calls sounds fine to me.  But what
-is the point of the extra indirection through the __-prefixed calls?
+Souradeep Chakrabarti (1):
+  net: mana: Assigning IRQ affinity on HT cores
 
-And if we need that (please document it in the commit log), please
-make the wrappers proper inline functions and not macros.
+Yury Norov (3):
+  cpumask: add cpumask_weight_andnot()
+  cpumask: define cleanup function for cpumasks
+  net: mana: add a function to spread IRQs per CPUs
+
+ .../net/ethernet/microsoft/mana/gdma_main.c   | 88 ++++++++++++++++---
+ include/linux/bitmap.h                        | 12 +++
+ include/linux/cpumask.h                       | 16 ++++
+ lib/bitmap.c                                  |  7 ++
+ 4 files changed, 113 insertions(+), 10 deletions(-)
+--
+Change:
+V1 -> V2:
+Added some details on the performance study on the patch 4/4.
+
+V2 -> V3:
+Commit message has been modified, fixed the table in patch 4/4.
+-- 
+2.34.1
 
 
