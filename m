@@ -1,200 +1,182 @@
-Return-Path: <netdev+bounces-66568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5063583FCE0
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 04:39:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 960DC83FD51
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 06:03:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 74F7F1C22036
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 03:39:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 447EE28242E
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 05:03:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 497D910949;
-	Mon, 29 Jan 2024 03:39:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69EE73C484;
+	Mon, 29 Jan 2024 05:03:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="NhLmcjLE"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="YtNf6NFD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712A1101F2
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 03:39:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BEE33C68E;
+	Mon, 29 Jan 2024 05:03:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706499544; cv=none; b=ACnYpxbBC0t0t8aI9Sw/nvVdEoUNWS8Tjr55ZMPEU1UyQQkENwPtzci5d33zb/45YRAbMRsRE2oSRt3YvZSYIFC8zrpMzqrTyaz3WaWLA61lRpGYT3QRKo4ehu6bGoT9uY37OS5IvkDwynnPiZWjeBNeSr7nZIRaH8GYt8PRsCE=
+	t=1706504597; cv=none; b=Nx/iPwSCr7bBMdgUnRerFe0ymRE9DKkUJfeyYEDjENsnmYBLTRffGDLeBM/qGnr1lCTvEckfVv6GufZNgX3IA3ZR10kfhTixFxUh1KQ1i+QQU4xBG9jI76E9FPF9HBq2dgDYz8xEXpDBqV09/lAcN9yHQfafv7KTlYzGcyqIUiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706499544; c=relaxed/simple;
-	bh=wE4cixn0oIglWKeS/zIrvtFsWbeheeYOTmOIKWPKXCE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A1P1tKK5wE1AkiYd/h6S95eiYMocwEClFmkdBLZ7rNwnqSMuafGVQaHIXB3ZyymNf+GgVvGJLeSe/dqo+NbVMxVJpz+XUM/R7LznDlKNIxtLAs9n61eKWEmeHXEqD1yyhIYFQG402p6QT7Um1U1FJ0vPCMm9hFf4iMfIC2VQtj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=NhLmcjLE; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5110f515deaso845193e87.2
-        for <netdev@vger.kernel.org>; Sun, 28 Jan 2024 19:39:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1706499540; x=1707104340; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/yyUGF5rIxxEr8wGxy6mzO1hK1BzZ2gmE5L9TwgfgxA=;
-        b=NhLmcjLEUKN0XxvcQ/70ZW2TkD9d3g8WQqvTjI3yX8UCNlQ/CJtbE2ApB9meI5+TDD
-         zLtc948i1kSVgFnzBQqed5AHQyx2WT6BZL2t49gCmqte/vrmPc0r7DULnucETTnP0HP3
-         ut/5ujrsQ0b8wjeFQqdJ+O7lkdfuLAYhny6R0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706499540; x=1707104340;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/yyUGF5rIxxEr8wGxy6mzO1hK1BzZ2gmE5L9TwgfgxA=;
-        b=uaNhk/rZMwwjfio1diAGImTG7W5lOsAwzvVy36Pp1uOufIl3bdlmmmDFSIPveyUIed
-         wEb+QxvP03dFlHRZJjSkInJ6Fp7E4rUKF8twcuCy9ljPmasw8rR+25ktsD54OcmfxCcq
-         T92mwdTGPCynCqbSp2q/LgB3kfvlBebdVNf6Gw0dGQ7mCZAHZIn7AgkRCKflaYdvco7q
-         /m2BF5KQE0Y03XQgSCyWNG1Ugk8/fI6bgZw6dTHJ7pPqutwUc6Fk1hmKGd1cMBfHevZ4
-         2NntQS8Ob5yEy9Pns06AIVaS34eVlyxmLXKgT2zu2wk1BaLcwdNuucmKECprqohFjqy8
-         v2JA==
-X-Gm-Message-State: AOJu0Yx9GuDsAxBnK0kHeS+9uRkFY99aPX28EWCW/tBtYiS6lRX+4X7K
-	hEHWXU2J4Pypphl9qWtSBzwkzhwpCKUunYxla07jA1eL5a2r6iLBPLBhCkVva8OqJON9f0NWi+0
-	N+rPfyIDG8jzNsjGKFqkjZB0spKID8YaQbLu8
-X-Google-Smtp-Source: AGHT+IEXgMUgHt38rJa9lkZWY3kg2sc8NUxr6P4rZVQj9hDCI16H5nC2o9tzHW8pEEyFHfhwuR4GhhyhIWVA70eTXH0=
-X-Received: by 2002:a05:6512:280e:b0:50e:b25e:94d8 with SMTP id
- cf14-20020a056512280e00b0050eb25e94d8mr3488177lfb.41.1706499540469; Sun, 28
- Jan 2024 19:39:00 -0800 (PST)
+	s=arc-20240116; t=1706504597; c=relaxed/simple;
+	bh=2cPCgKCL9oHVmZVdo3Cx2J07fyLL6Gf3esVI0v1s9Wc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QenJAnMl/qnb45A7bUAZNdpXAMwjJAd/0HQ/2GTfzyw4hY7r5cScAfkWaTsJ0cv4qoPcr45wQxm0cKtBZ/kNWn5NYX3FwxJ3gzA0y11RX7QNzFkdY7IMLFLDyXwBQewZVlkEuSI8VhU+wKDWgpE20CAsFp1GqcIfDNPUVvztWBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=YtNf6NFD; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40T4JfwM026826;
+	Sun, 28 Jan 2024 21:02:58 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=pfpt0220; bh=DVsZRYQB
+	Tvhr7iUeJv18qgbyYpacseiPyRfLLN27DQo=; b=YtNf6NFDQzEya5cGAtZyZEox
+	YiUatMDfKynn7NiyzvIdh8JD8VMUlI7q8pZsqyv0qO3i1T2rcS4OeymiJiiQSlIE
+	ID6EaM0cSrOJaDvBQz7YPGRM8zdTSIdjRiQ3jL2N/kbSYlSxTi2HOXopiP5v/aYk
+	XxtQhm5dNzcdTOdj/oeDQrNcqSLj6J1I33tFhHd04iIecSVNotEf+chHZWWljpBK
+	1ViTBsQsj1BtPJcdUqQ8dCaaghym3vRA+DOcGsQWrEzRv8DpeV7RqxYCIAt0bBtQ
+	3hm19rjJ2RmScTAZxZnfLO+5dzFg/CYm6EtYfEvK7yv1fbeIHoXcComzIXlH/A==
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3vx4vr82c1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Sun, 28 Jan 2024 21:02:57 -0800 (PST)
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Sun, 28 Jan
+ 2024 21:02:56 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Sun, 28 Jan 2024 21:02:56 -0800
+Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
+	by maili.marvell.com (Postfix) with ESMTP id 06AF83F7048;
+	Sun, 28 Jan 2024 21:02:56 -0800 (PST)
+From: Shinas Rasheed <srasheed@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <hgani@marvell.com>, <vimleshk@marvell.com>, <sedara@marvell.com>,
+        <srasheed@marvell.com>, <egallen@redhat.com>, <mschmidt@redhat.com>,
+        <pabeni@redhat.com>, <kuba@kernel.org>, <horms@kernel.org>,
+        <wizhao@redhat.com>, <kheib@redhat.com>, <konguyen@redhat.com>
+Subject: [PATCH net-next v5 0/8] add octeon_ep_vf driver
+Date: Sun, 28 Jan 2024 21:02:46 -0800
+Message-ID: <20240129050254.3047778-1-srasheed@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240126063500.2684087-1-wenst@chromium.org> <20240126063500.2684087-2-wenst@chromium.org>
- <74b9f249-fcb4-4338-bf7b-8477de6c935c@linaro.org>
-In-Reply-To: <74b9f249-fcb4-4338-bf7b-8477de6c935c@linaro.org>
-From: Chen-Yu Tsai <wenst@chromium.org>
-Date: Mon, 29 Jan 2024 11:38:49 +0800
-Message-ID: <CAGXv+5Hu+KsTBd1JtnKcaE3qUzPhHbunoVaH2++yfNopHtFf4g@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
- SDIO Bluetooth
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: _NLogbpFaZ3r6SkIp7Rv9rHQhpoQcpEq
+X-Proofpoint-GUID: _NLogbpFaZ3r6SkIp7Rv9rHQhpoQcpEq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-29_02,2024-01-25_01,2023-05-22_02
 
-On Fri, Jan 26, 2024 at 6:40=E2=80=AFPM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
->
-> On 26/01/2024 07:34, Chen-Yu Tsai wrote:
-> > The MediaTek MT7921S is a WiFi/Bluetooth combo chip that works over
-> > SDIO. While the Bluetooth function is fully discoverable, the chip
-> > has a pin that can reset just the Bluetooth side, as opposed to the
-> > full chip. This needs to be described in the device tree.
-> >
-> > Add a device tree binding for MT7921S Bluetooth over SDIO specifically
-> > ot document the reset line.
->
-> s/ot/to/
->
-> >
-> > Cc: Sean Wang <sean.wang@mediatek.com>
-> > Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
-> > ---
-> > Changes since v1:
-> > - Reworded descriptions
-> > - Moved binding maintainer section before description
-> > - Added missing reference to bluetooth-controller.yaml
-> > - Added missing GPIO header to example
-> >
-> >  .../bluetooth/mediatek,mt7921s-bluetooth.yaml | 53 +++++++++++++++++++
-> >  MAINTAINERS                                   |  1 +
-> >  2 files changed, 54 insertions(+)
-> >  create mode 100644 Documentation/devicetree/bindings/net/bluetooth/med=
-iatek,mt7921s-bluetooth.yaml
-> >
-> > diff --git a/Documentation/devicetree/bindings/net/bluetooth/mediatek,m=
-t7921s-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/med=
-iatek,mt7921s-bluetooth.yaml
-> > new file mode 100644
-> > index 000000000000..ff11c95c816c
-> > --- /dev/null
-> > +++ b/Documentation/devicetree/bindings/net/bluetooth/mediatek,mt7921s-=
-bluetooth.yaml
-> > @@ -0,0 +1,53 @@
-> > +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> > +%YAML 1.2
-> > +---
-> > +$id: http://devicetree.org/schemas/net/bluetooth/mediatek,mt7921s-blue=
-tooth.yaml#
-> > +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> > +
-> > +title: MediaTek MT7921S Bluetooth
-> > +
-> > +maintainers:
-> > +  - Sean Wang <sean.wang@mediatek.com>
-> > +
-> > +description:
-> > +  MT7921S is an SDIO-attached dual-radio WiFi+Bluetooth Combo chip; ea=
-ch
-> > +  function is its own SDIO function on a shared SDIO interface. The ch=
-ip
-> > +  has two dedicated reset lines, one for each function core.
-> > +  This binding only covers the Bluetooth part of the chip.
-> > +
-> > +allOf:
-> > +  - $ref: bluetooth-controller.yaml#
-> > +
-> > +properties:
-> > +  compatible:
-> > +    enum:
-> > +      - mediatek,mt7921s-bluetooth
->
-> Can it be also WiFi on separate bus? How many device nodes do you need
-> for this device?
+This driver implements networking functionality of Marvell's Octeon
+PCI Endpoint NIC VF.
 
-For the "S" variant, WiFi is also on SDIO. For the other two variants,
-"U" and "E", WiFi goes over USB and PCIe respectively. On both those
-variants, Bluetooth can either go over USB or UART. That is what I
-gathered from the pinouts. There are a dozen GPIO pins which don't
-have detailed descriptions though. If you want a comprehensive
-binding of the whole chip and all its variants, I suggest we ask
-MediaTek to provide it instead. My goal with the binding is to document
-existing usage and allow me to upstream new device trees.
+This driver support following devices:
+ * Network controller: Cavium, Inc. Device b203
+ * Network controller: Cavium, Inc. Device b403
+ * Network controller: Cavium, Inc. Device b103
+ * Network controller: Cavium, Inc. Device b903
+ * Network controller: Cavium, Inc. Device ba03
+ * Network controller: Cavium, Inc. Device bc03
+ * Network controller: Cavium, Inc. Device bd03
 
-For now we only need the Bluetooth node. The WiFi part is perfectly
-detectable, and the driver doesn't seem to need the WiFi reset pin.
-The Bluetooth driver only uses its reset pin to reset a hung controller.
+Changes:
+V5:
+  - Changed unchecked return types to void and removed unnecessary
+    initializations in [2/8] patch.
 
-> Missing blank line.
+V4: https://lore.kernel.org/all/20240108124213.2966536-1-srasheed@marvell.com/
+  - Moved some stats from ethtool and added more to ndo_get_stats64
+  - Replaced code in IQ full check function to use helper from
+    net/netdev_queues.h
+  - Refactored code so that NETDEV_TX_BUSY is avoided
 
-Will fix.
+V3: https://lore.kernel.org/all/20240105203823.2953604-1-srasheed@marvell.com/
+  - Removed UINT64_MAX, which is unused
+  - Replaced masks and ULL declarations with GENMASK_ULL(), ULL() and
+    other linux/bits.h macros, corrected declarations to conform to xmas tree format in patch [2/8]
+  - Moved vfree and vzalloc null pointer casting corrections to patch
+    [3/8], and corrected return values to follow standard kernel error codes in same
+   - Set static budget of 64 for tx completion processing in NAPI
+  - Replaces napi_complete and build_skb APIs to napi_complete_done and
+    napi_build_skb APIs respectively
+  - Replaced code with helper from net/netdev_queues.h to wake queues in TX completion
+    processing
+  - Removed duplicate reporting of TX/RX packets/bytes, which is already
+    done during ndo_get_stats64
 
-> > +  reg:
-> > +    const: 2
-> > +
-> > +  reset-gpios:
-> > +    maxItems: 1
-> > +    description:
-> > +      An active-low reset line for the Bluetooth core; on typical M.2
-> > +      key E modules this is the W_DISABLE2# pin.
-> > +
-> > +required:
-> > +  - compatible
-> > +  - reg
-> > +
-> > +additionalProperties: false
->
-> Instead 'unevaluatedProperties: false'
+V2: https://lore.kernel.org/all/20231223134000.2906144-1-srasheed@marvell.com/
+  - Removed linux/version.h header file from inclusion in
+    octep_vf_main.c
+  - Corrected Makefile entry to include building octep_vf_mbox.c in
+    [6/8] patch.
+  - Removed redundant vzalloc pointer cast and vfree pointer check in
+    [6/8] patch.
 
-Will fix.
+V1: https://lore.kernel.org/all/20231221092844.2885872-1-srasheed@marvell.com/
 
+Shinas Rasheed (8):
+  octeon_ep_vf: Add driver framework and device initialization
+  octeon_ep_vf: add hardware configuration APIs
+  octeon_ep_vf: add VF-PF mailbox communication.
+  octeon_ep_vf: add Tx/Rx ring resource setup and cleanup
+  octeon_ep_vf: add support for ndo ops
+  octeon_ep_vf: add Tx/Rx processing and interrupt support
+  octeon_ep_vf: add ethtool support
+  octeon_ep_vf: update MAINTAINERS
 
-Thanks
-ChenYu
+ .../device_drivers/ethernet/index.rst         |    1 +
+ .../ethernet/marvell/octeon_ep_vf.rst         |   24 +
+ MAINTAINERS                                   |    9 +
+ drivers/net/ethernet/marvell/Kconfig          |    1 +
+ drivers/net/ethernet/marvell/Makefile         |    1 +
+ .../net/ethernet/marvell/octeon_ep_vf/Kconfig |   19 +
+ .../ethernet/marvell/octeon_ep_vf/Makefile    |   10 +
+ .../marvell/octeon_ep_vf/octep_vf_cn9k.c      |  491 +++++++
+ .../marvell/octeon_ep_vf/octep_vf_cnxk.c      |  502 +++++++
+ .../marvell/octeon_ep_vf/octep_vf_config.h    |  160 +++
+ .../marvell/octeon_ep_vf/octep_vf_ethtool.c   |  273 ++++
+ .../marvell/octeon_ep_vf/octep_vf_main.c      | 1240 +++++++++++++++++
+ .../marvell/octeon_ep_vf/octep_vf_main.h      |  334 +++++
+ .../marvell/octeon_ep_vf/octep_vf_mbox.c      |  430 ++++++
+ .../marvell/octeon_ep_vf/octep_vf_mbox.h      |  166 +++
+ .../marvell/octeon_ep_vf/octep_vf_regs_cn9k.h |  154 ++
+ .../marvell/octeon_ep_vf/octep_vf_regs_cnxk.h |  162 +++
+ .../marvell/octeon_ep_vf/octep_vf_rx.c        |  510 +++++++
+ .../marvell/octeon_ep_vf/octep_vf_rx.h        |  224 +++
+ .../marvell/octeon_ep_vf/octep_vf_tx.c        |  330 +++++
+ .../marvell/octeon_ep_vf/octep_vf_tx.h        |  276 ++++
+ 21 files changed, 5317 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/marvell/octeon_ep_vf.rst
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/Kconfig
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/Makefile
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cn9k.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cnxk.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_config.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_ethtool.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_mbox.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_mbox.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_regs_cn9k.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_regs_cnxk.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_tx.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_tx.h
+
+-- 
+2.25.1
+
 
