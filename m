@@ -1,189 +1,242 @@
-Return-Path: <netdev+bounces-66835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57FE5841177
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 19:00:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B789584118F
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 19:03:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CFD51C24405
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 18:00:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7824A28A3C0
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 18:03:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E76B3F9DA;
-	Mon, 29 Jan 2024 18:00:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="4NXaR1kW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A9ED6F06E;
+	Mon, 29 Jan 2024 18:01:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2043.outbound.protection.outlook.com [40.107.101.43])
+Received: from air.basealt.ru (air.basealt.ru [194.107.17.39])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1123F9CF
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 18:00:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.43
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706551224; cv=fail; b=raOiuIThx+/GmkMr5d75CqX+5dHJ4OGtLINIW+eIln7/sSJbOI8vrb20zo/M7hNk1Z4uW0Gf5IvgEJCytk9wQHp6vVCJRnSKzGZitF+42g/W+nb7p2IPbiOjbWGRTLY21CuCIpM1GfF69o6zV0g89X3t/USrbMEavsoPzkpMzKs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706551224; c=relaxed/simple;
-	bh=+ke/k1IAreNBrU3l6kvxOUcXh7/SuSeJtnW8jIDB1Uk=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Y9wKyJintbhSJqtjziDEHOk6KbH8wiaqTpnOtsbj8nWn5CjK43LJJp1sMkknO6tluMW3ePm7RoljrPRuUiSpYYv93YGQ7AFCDDpjJI+wjh3Y+YaFwVfxQGJ/+UUYGk6HCrGNDyTJItb7uhUnCe9+kCuBLCRkSluLyWHmfY2t8EM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=4NXaR1kW; arc=fail smtp.client-ip=40.107.101.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=B/fAI5jyc/ErRZ/fYZlNYRbo6kXZznTRM5qsv5rxMyTU6yKSl543HBF2Tz3VRNmMQybm2A0cUFVBbAymVeS0PD6Fn5cR7aVcHYqpXLNzpUvLySg+dr13tg+ivejIK7XFcRNaYNWq3cnAV43nufvUdWCKgiFH73aFcFDhjbUhJJXZlGQhY/hvM/vvquvTi55VKl8xHH1XRw59i77z13Aavre57FPjpmnLCJmlGUcwodFmmsXH3iPxmR1JabzzV6p8Hl4SWAx213gRmYSlQ7eL9tHZv+r4pQVbqMsHhJAauhb/KHlan3vZ7Q3QdgtTX385MM9Cnn6dk21r5LzBxtNRKQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4p6O6svSyHxb7Pa6Y60gH8QJAo7Ms0cHXAesod1ZZDg=;
- b=WrL/37Lu7iuKRdCuc6o0A9fyt2qed3nqj4VcSpQ0In5Cc3uyUKL9p3yuaTEr1gJ7DR6aeVBP+++xovaKD2KKmG7CD6jvTQtWXU8aVZ1ZzgQtNNTiaXZAZncXXJ49wzSerj1LCD/B+kdRXrGgyPwzT0S8t9EL0ZvXyxrBbiaCnXDnDOazum4Cp4ULBF/dYzUkSJJBD5X8HwwXEcTe1Ep4fd9gN8BJ1qHNXBVXXcboZVevWf9f7LRKYmSh5lRtwqT+W2O7lNf7BVo5KjPJvHYsaxeqPof7NuSEyqTp3OCTqyuaQAjhoOhrZGQPttpCU6DfreHJw1rET7ByX4FPB8Dp3Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=4p6O6svSyHxb7Pa6Y60gH8QJAo7Ms0cHXAesod1ZZDg=;
- b=4NXaR1kW06ov4GeswYjKqnDiA2PLwXFbXiCusLykyh+A1QJhcjX08xT3dKJ+g5KCu1ZJ+e6qb1B9CU7Z5/u66VYb8E/9dTGJd5mWg4LoWgJTLaPS7xI7/+C39DgNuQIoRwHBbqJqfF8U0vcaU9I2/1fylRNeRIb4JEB81jDGai0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by DS0PR12MB8295.namprd12.prod.outlook.com (2603:10b6:8:f6::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.32; Mon, 29 Jan
- 2024 18:00:19 +0000
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::e9c7:35dd:23f8:74a1]) by PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::e9c7:35dd:23f8:74a1%4]) with mapi id 15.20.7228.029; Mon, 29 Jan 2024
- 18:00:18 +0000
-Message-ID: <9f2e462d-e034-47e3-a2b5-6618faf1d470@amd.com>
-Date: Mon, 29 Jan 2024 10:00:16 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-next v3] ice: Remove and readd netdev during devlink
- reload
-Content-Language: en-US
-To: Wojciech Drewek <wojciech.drewek@intel.com>,
- intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, przemyslaw.kitszel@intel.com,
- vadim.fedorenko@linux.dev, paul.m.stillwell.jr@intel.com
-References: <20240129123231.31136-1-wojciech.drewek@intel.com>
-From: Brett Creeley <bcreeley@amd.com>
-In-Reply-To: <20240129123231.31136-1-wojciech.drewek@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR13CA0027.namprd13.prod.outlook.com
- (2603:10b6:a03:2c0::32) To PH0PR12MB7982.namprd12.prod.outlook.com
- (2603:10b6:510:28d::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D78523F9CE;
+	Mon, 29 Jan 2024 18:01:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.107.17.39
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706551279; cv=none; b=DrrADzmp9MG+0x+/Yx4n23ZhR9yqiXIhNExlNz0jEYU/hS2Khfo1TuTADoXpXwLOtUOnH4rZm7CC/d0jv+gl6DRH2ap0VDXULQtN9fveFo17r7Bc3NtvrvVZsPZaLx9R1sbJKdJGh6PdD8EtVmrebKK43l0y2OaeTSyNdGDbg0M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706551279; c=relaxed/simple;
+	bh=Hrejm2+nPiXGDrGvpmgjccNwyZv7ISowuAb2TxHXSww=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=pYEMetUNq1VRlgU5wpc4lw9Ri53JkZ+H1eY71LUEv0KMeO/rWjWPQDIFXiLu9bOeKWfuH8RWHCvjn7aQOR/tu34Hg4VRgzipHjdsKXv3mnVSgP++xRy21SIel7oUm92wmshPo50H2UdzEFnd0nx5F6cXE2gp8LTDCYJuO1eWuCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=194.107.17.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
+Received: by air.basealt.ru (Postfix, from userid 490)
+	id 9615E2F2023F; Mon, 29 Jan 2024 18:01:13 +0000 (UTC)
+X-Spam-Level: 
+Received: from altlinux.malta.altlinux.ru (obninsk.basealt.ru [217.15.195.17])
+	by air.basealt.ru (Postfix) with ESMTPSA id C090E2F2022A;
+	Mon, 29 Jan 2024 18:01:08 +0000 (UTC)
+From: kovalev@altlinux.org
+To: stable@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	kpsingh@kernel.org,
+	john.fastabend@gmail.com,
+	yhs@fb.com,
+	songliubraving@fb.com,
+	kafai@fb.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	kovalev@altlinux.org
+Subject: [PATCH 5.15.y] bpf: Convert BPF_DISPATCHER to use static_call() (not ftrace)
+Date: Mon, 29 Jan 2024 21:01:08 +0300
+Message-Id: <20240129180108.284057-1-kovalev@altlinux.org>
+X-Mailer: git-send-email 2.33.8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|DS0PR12MB8295:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8faf4429-f36d-44dd-8d52-08dc20f4273d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	tqVKz1aB/hlpPVZjiVkQWn3vRdg5VhU1Ged3K6f1+7ZHV7sZ+YyILrspsUSywmTGwH50zir6XjNv7F/Vkb1C2cVgKrRgUgvRavmomSlIjJyA2kVC+Bet8ez9R1fOtMhJGEmFwKxxMEcraE6fx1QwU5YsNl2B3cvY/UG4GY6tepfOl+8v2OAfXf38zZU6CnaBqKfDFzuGjZkplhmF4LfrlwofSx7OmgqrSoA3QIU/+hLc7qFzwWrx/olhdtYB5Tw7XF+GdbIbHcgCXJw9GdNITkUJxcPoKzkThnw90lqv+Ew6G3dCaj/0Qyrhl99XObkwOu7DtcUUxuLabxsVVGu4UdmjRnlQv4dx0rQSmXtKwuP2G4lkYCa8nzxs3XaMa9ZPdWqtcOg+syO4cJHIif3ihzuKDWdGmIYFtfhOzBOmlvWnYAhf94Nn1WHq1Y3M5xoX1otkWYSV3ZRChDIIg/DvtEz7ndikfFRy4DxoP5gaDY/Bz499d7DvfCO3htJu3iHyUVKBkqb0H3qn0D5ZuNXhgp4hFSeSZmOcKlNYIDwca386ZuPRWd85CeC80F3lPiDD6Qf9YVYMn8s9rBfBcjeDVV42T5V7jpKGgtcJIL3EMoMNNHkmCidf9yZDNynZkk/5Pz02RVSjvGAqV/Xd3jaFJoflOQCAt1Dt14JMrJ1E6OO9s42O8rwDZwYPB9Uj0xtI
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(346002)(366004)(136003)(396003)(39860400002)(230922051799003)(230173577357003)(230273577357003)(451199024)(1800799012)(186009)(64100799003)(8936002)(316002)(66476007)(66556008)(66946007)(8676002)(4326008)(26005)(83380400001)(31686004)(478600001)(31696002)(38100700002)(5660300002)(2906002)(6486002)(2616005)(6512007)(53546011)(6506007)(36756003)(41300700001)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?WVE5QTJXRC9sbG5NSmJJd1RYckMxOUdOSzAwT1dkZStOUVVoWDE1Z21sVDV1?=
- =?utf-8?B?SVdrV3BtbHpoaVR4RlR2azBITURsK052blBMNUh6WjhpKy9ZbExQL2Q4cjlj?=
- =?utf-8?B?Ymd6WnJ0ZndCeWtjaWEzd2wwNlBZSkxUQ0lwODVQUithQy9wSUgwRGU3Y05v?=
- =?utf-8?B?NFFiUDRUNHZYS1RacXZWYmhpMm1OYmZRWDg2U1ZndC9qZjlZQ0dFWXZxd0tP?=
- =?utf-8?B?K0I2TEJvUnZpM3g0M0tQenhCNzZNWHdQK1BaeWRDSWxYd09KazRhc1QxVytu?=
- =?utf-8?B?Ulh2MU44dzI2OXhzQnRpYlhJbmhUSzQwTHZFeWZIcWVQYXpKNHMyQm5YUVk3?=
- =?utf-8?B?ckZGb3J2YXA4cW9NalJFMy9HNE5qVUYzMVZBaE9kL0NsZVdrRTlwampiNHFX?=
- =?utf-8?B?ZnZibUhIVVp2TWErSVJnWW1wQlVHbEdnanRmZndlaWIrK3hwMFdvU2R0TEN5?=
- =?utf-8?B?NWQvbWptbVIvMGQ4RGtDTUZNZVFidTV3c2RudGRINXhsaW9KakIzOVVwVG1Q?=
- =?utf-8?B?MkVzcGR0cSt4alUwSGtWR1Q3MG5wUkRWb3U0Z3VvZjA4K2J5M0JyOTY1R0JL?=
- =?utf-8?B?b3gyN2s1bnp5T3MrNUkxSTExUHdVTlpudS9pQ3BmZDVjTVN0a0pHZWlhM2tx?=
- =?utf-8?B?cGxuUG5Ma3VkVWhlT29mOEVna3QvOEI5QThGbytGUkR0WkhKYW1Qc3Z2MjNs?=
- =?utf-8?B?UUp2RE9tM0pGVklkOEd6dWZhK3Z0WVRvZ01mSlJEdkFFZ2Z3UWRsT3k0ZEpT?=
- =?utf-8?B?MkwvcEI3MFJpS2Rqc3VHZWwrSnZrOWordnBFK05CQ3VEQlBqV3dSVDhrUVBU?=
- =?utf-8?B?V2Q2VXdJNUZ0UUs1Rk9LRmFFak9ibGxvdjRrMkg3aGU3RzYrNHVqMU9DS251?=
- =?utf-8?B?UjhYUnVLVnhoV05YdlRIR2hEdVZJamU2TEdJZjdoTTEzcXlOMlFXOG9iZGho?=
- =?utf-8?B?dkc3bWRUUk9HdTFpQloyWHY3dHZjVk5WdS90aTh2MlZ6RXltWEdYMEJ2enBC?=
- =?utf-8?B?T1ZHSTllbHdtbVVYZHBrbFcrRndvRnd5Y1pqOUVUNGZtcjltOVc5eE01Zk8v?=
- =?utf-8?B?SmQ1ek1BUkhVc0JPNnJ4ZTBhMmphNDI0eDNlTVlRc1J0T3hQejMybGFrQVZI?=
- =?utf-8?B?NStnQ1BJK081VWJUeGJmaU1QaW1WRmRZT3ZmYUNqMVBOeFRPZENESDYrTUd3?=
- =?utf-8?B?WklHZEZPUjJpSDJGa3RmaTlpc3ovTnduM2dNNmtiYjV3L0hmYThkc3Z4bDBM?=
- =?utf-8?B?cmJlajkxTXZoQ1lBQlNjQUZGUXM3TVA5ZUttOGl2MFBISng0aklQY3VMWW42?=
- =?utf-8?B?WUExMm9qS2pDR3VRa2tjclF5ZVUyOFlWbUlrTUdVQ1hCeEl3ajlCVUhYa0c2?=
- =?utf-8?B?UmtLNktmakNJNVVYUm1VQTNqTStnVGJ3VVl6U3EwL1Q4ZGlzdm1sTVc3TmtV?=
- =?utf-8?B?Vy9QLzQvY2FWdmhiSlg0S3Q1dHBza1krbjVEcGFCdmNYeDFROVJKSURwdEJx?=
- =?utf-8?B?V1BUUnhZU0xVYnRHdGtZajlVWkFhZVdEUnM3Z2FsTHM3UFpyRnVkbyt2U1h6?=
- =?utf-8?B?Q1VLOXNHM0VJY0xGazF1KzI4T1JHbGFkcXNITG1vZ1lFSGl1S3QzcmRJUE9R?=
- =?utf-8?B?dSsxWHZLQU0rcHFVRU1lYjRrK3JtUmN3S29kQURqam5ZMmp4cW5DQks3N28v?=
- =?utf-8?B?MU1QS1dlTUg2VHhLOFZtcVZtWlAzTVUvLzJFalhhbVBrWk84S0R1OTBtVUNB?=
- =?utf-8?B?QWpGYm5ZTVJhV2hyYUpkeGhWb0NROFVZWFVQZ29MeG9XWU02NDYwUlRpL1NQ?=
- =?utf-8?B?L1NCN3VSNFFDQlA5WUZMSXVpckhaMFBFNGVkdzJPRnRobExFV3BlalJzNEgz?=
- =?utf-8?B?WTVaRC9oZVA0RzhZNnlZNXA1S3JCL3FwMG1Ncy9KLzFOdnc1RzZsVTk4UXhV?=
- =?utf-8?B?UGNkWnJudjV5L0FYeDBJc3hkeUJ4YjA4dzUxa01hN05Xb0o5VFpNc3pOR3lX?=
- =?utf-8?B?SGQ5MXRvaEZ4TGJTRWplSTB5QnIxdTZmK0RqalZGemVuNi85S01WbkxtVzNJ?=
- =?utf-8?B?UUMzcjU3T01KVEg5TTUyR05DSzZxZ0VWR3dKc3VkU3duTktDaWsvcC9GSk55?=
- =?utf-8?Q?WEWuKvLHGy9vfWYp6I4IzR/Rx?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8faf4429-f36d-44dd-8d52-08dc20f4273d
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2024 18:00:18.3498
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: jzbFvHvHKgyYNG7oHJN30LvfbqEBfHl0uZk50DdyKnViP7Wxt0vcchZ5yCkhN/eu+gtPR4k/WfHaENRNqewXNg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB8295
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+From: Peter Zijlstra <peterz@infradead.org>
 
+[ Upstream commit c86df29d11dfba27c0a1f5039cd6fe387fbf4239 ]
 
-On 1/29/2024 4:32 AM, Wojciech Drewek wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
-> 
-> 
-> Recent changes to the devlink reload (commit 9b2348e2d6c9
-> ("devlink: warn about existing entities during reload-reinit"))
-> force the drivers to destroy devlink ports during reinit.
-> Adjust ice driver to this requirement, unregister netdvice, destroy
-> devlink port. ice_init_eth() was removed and all the common code
-> between probe and reload was moved to ice_load().
-> 
-> During devlink reload we can't take devl_lock (it's already taken)
-> and in ice_probe() we have to lock it. Use devl_* variant of the API
-> which does not acquire and release devl_lock. Guard ice_load()
-> with devl_lock only in case of probe.
-> 
-> Introduce ice_debugfs_fwlog_deinit() in order to release PF's
-> debugfs entries. Move ice_debugfs_exit() call to ice_module_exit().
+The dispatcher function is currently abusing the ftrace __fentry__
+call location for its own purposes -- this obviously gives trouble
+when the dispatcher and ftrace are both in use.
 
-Nit, but the function is no longer ice_debugfs_fwlog_deinit() as it 
-changed from v2->v3.
+A previous solution tried using __attribute__((patchable_function_entry()))
+which works, except it is GCC-8+ only, breaking the build on the
+earlier still supported compilers. Instead use static_call() -- which
+has its own annotations and does not conflict with ftrace -- to
+rewrite the dispatch function.
 
-Other than that, LGTM.
+By using: return static_call()(ctx, insni, bpf_func) you get a perfect
+forwarding tail call as function body (iow a single jmp instruction).
+By having the default static_call() target be bpf_dispatcher_nop_func()
+it retains the default behaviour (an indirect call to the argument
+function). Only once a dispatcher program is attached is the target
+rewritten to directly call the JIT'ed image.
 
-Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+Signed-off-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+Tested-by: Björn Töpel <bjorn@kernel.org>
+Tested-by: Jiri Olsa <jolsa@kernel.org>
+Acked-by: Björn Töpel <bjorn@kernel.org>
+Acked-by: Jiri Olsa <jolsa@kernel.org>
+Link: https://lkml.kernel.org/r/Y1/oBlK0yFk5c/Im@hirez.programming.kicks-ass.net
+Link: https://lore.kernel.org/bpf/20221103120647.796772565@infradead.org
+Signed-off-by: Vasiliy Kovalev <kovalev@altlinux.org>
+---
+ include/linux/bpf.h     | 39 ++++++++++++++++++++++++++++++++++++++-
+ kernel/bpf/dispatcher.c | 22 ++++++++--------------
+ 2 files changed, 46 insertions(+), 15 deletions(-)
 
-> 
-> Suggested-by: Jiri Pirko <jiri@nvidia.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> ---
-> v2: empty init removed in ice_devlink_reinit_up
-> v3: refactor locking pattern as Brett suggested
-> ---
->   drivers/net/ethernet/intel/ice/ice.h         |   3 +
->   drivers/net/ethernet/intel/ice/ice_debugfs.c |  10 +
->   drivers/net/ethernet/intel/ice/ice_devlink.c |  68 ++++++-
->   drivers/net/ethernet/intel/ice/ice_fwlog.c   |   2 +
->   drivers/net/ethernet/intel/ice/ice_main.c    | 189 ++++++-------------
->   5 files changed, 139 insertions(+), 133 deletions(-)
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index 00c615fc8ec3c3..633b8842e617e8 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -23,6 +23,7 @@
+ #include <linux/slab.h>
+ #include <linux/percpu-refcount.h>
+ #include <linux/bpfptr.h>
++#include <linux/static_call.h>
+ 
+ struct bpf_verifier_env;
+ struct bpf_verifier_log;
+@@ -765,6 +766,10 @@ struct bpf_dispatcher {
+ 	void *image;
+ 	u32 image_off;
+ 	struct bpf_ksym ksym;
++#ifdef CONFIG_HAVE_STATIC_CALL
++	struct static_call_key *sc_key;
++	void *sc_tramp;
++#endif
+ };
+ 
+ static __always_inline __nocfi unsigned int bpf_dispatcher_nop_func(
+@@ -782,6 +787,34 @@ struct bpf_trampoline *bpf_trampoline_get(u64 key,
+ 					  struct bpf_attach_target_info *tgt_info);
+ void bpf_trampoline_put(struct bpf_trampoline *tr);
+ int arch_prepare_bpf_dispatcher(void *image, s64 *funcs, int num_funcs);
++
++/*
++ * When the architecture supports STATIC_CALL replace the bpf_dispatcher_fn
++ * indirection with a direct call to the bpf program. If the architecture does
++ * not have STATIC_CALL, avoid a double-indirection.
++ */
++#ifdef CONFIG_HAVE_STATIC_CALL
++
++#define __BPF_DISPATCHER_SC_INIT(_name)				\
++	.sc_key = &STATIC_CALL_KEY(_name),			\
++	.sc_tramp = STATIC_CALL_TRAMP_ADDR(_name),
++
++#define __BPF_DISPATCHER_SC(name)				\
++	DEFINE_STATIC_CALL(bpf_dispatcher_##name##_call, bpf_dispatcher_nop_func)
++
++#define __BPF_DISPATCHER_CALL(name)				\
++	static_call(bpf_dispatcher_##name##_call)(ctx, insnsi, bpf_func)
++
++#define __BPF_DISPATCHER_UPDATE(_d, _new)			\
++	__static_call_update((_d)->sc_key, (_d)->sc_tramp, (_new))
++
++#else
++#define __BPF_DISPATCHER_SC_INIT(name)
++#define __BPF_DISPATCHER_SC(name)
++#define __BPF_DISPATCHER_CALL(name)		bpf_func(ctx, insnsi)
++#define __BPF_DISPATCHER_UPDATE(_d, _new)
++#endif
++
+ #define BPF_DISPATCHER_INIT(_name) {				\
+ 	.mutex = __MUTEX_INITIALIZER(_name.mutex),		\
+ 	.func = &_name##_func,					\
+@@ -793,20 +826,23 @@ int arch_prepare_bpf_dispatcher(void *image, s64 *funcs, int num_funcs);
+ 		.name  = #_name,				\
+ 		.lnode = LIST_HEAD_INIT(_name.ksym.lnode),	\
+ 	},							\
++	__BPF_DISPATCHER_SC_INIT(_name##_call)			\
+ }
+ 
+ #define DEFINE_BPF_DISPATCHER(name)					\
++	__BPF_DISPATCHER_SC(name);					\
+ 	noinline __nocfi unsigned int bpf_dispatcher_##name##_func(	\
+ 		const void *ctx,					\
+ 		const struct bpf_insn *insnsi,				\
+ 		unsigned int (*bpf_func)(const void *,			\
+ 					 const struct bpf_insn *))	\
+ 	{								\
+-		return bpf_func(ctx, insnsi);				\
++		return __BPF_DISPATCHER_CALL(name);			\
+ 	}								\
+ 	EXPORT_SYMBOL(bpf_dispatcher_##name##_func);			\
+ 	struct bpf_dispatcher bpf_dispatcher_##name =			\
+ 		BPF_DISPATCHER_INIT(bpf_dispatcher_##name);
++
+ #define DECLARE_BPF_DISPATCHER(name)					\
+ 	unsigned int bpf_dispatcher_##name##_func(			\
+ 		const void *ctx,					\
+@@ -814,6 +850,7 @@ int arch_prepare_bpf_dispatcher(void *image, s64 *funcs, int num_funcs);
+ 		unsigned int (*bpf_func)(const void *,			\
+ 					 const struct bpf_insn *));	\
+ 	extern struct bpf_dispatcher bpf_dispatcher_##name;
++
+ #define BPF_DISPATCHER_FUNC(name) bpf_dispatcher_##name##_func
+ #define BPF_DISPATCHER_PTR(name) (&bpf_dispatcher_##name)
+ void bpf_dispatcher_change_prog(struct bpf_dispatcher *d, struct bpf_prog *from,
+diff --git a/kernel/bpf/dispatcher.c b/kernel/bpf/dispatcher.c
+index 2444bd15cc2d03..23042cfb5e809b 100644
+--- a/kernel/bpf/dispatcher.c
++++ b/kernel/bpf/dispatcher.c
+@@ -4,6 +4,7 @@
+ #include <linux/hash.h>
+ #include <linux/bpf.h>
+ #include <linux/filter.h>
++#include <linux/static_call.h>
+ 
+ /* The BPF dispatcher is a multiway branch code generator. The
+  * dispatcher is a mechanism to avoid the performance penalty of an
+@@ -104,17 +105,11 @@ static int bpf_dispatcher_prepare(struct bpf_dispatcher *d, void *image)
+ 
+ static void bpf_dispatcher_update(struct bpf_dispatcher *d, int prev_num_progs)
+ {
+-	void *old, *new;
+-	u32 noff;
+-	int err;
+-
+-	if (!prev_num_progs) {
+-		old = NULL;
+-		noff = 0;
+-	} else {
+-		old = d->image + d->image_off;
++	void *new;
++	u32 noff = 0;
++
++	if (prev_num_progs)
+ 		noff = d->image_off ^ (PAGE_SIZE / 2);
+-	}
+ 
+ 	new = d->num_progs ? d->image + noff : NULL;
+ 	if (new) {
+@@ -122,11 +117,10 @@ static void bpf_dispatcher_update(struct bpf_dispatcher *d, int prev_num_progs)
+ 			return;
+ 	}
+ 
+-	err = bpf_arch_text_poke(d->func, BPF_MOD_JUMP, old, new);
+-	if (err || !new)
+-		return;
++	__BPF_DISPATCHER_UPDATE(d, new ?: &bpf_dispatcher_nop_func);
+ 
+-	d->image_off = noff;
++	if (new)
++		d->image_off = noff;
+ }
+ 
+ void bpf_dispatcher_change_prog(struct bpf_dispatcher *d, struct bpf_prog *from,
+-- 
+2.33.8
 
-[...]
 
