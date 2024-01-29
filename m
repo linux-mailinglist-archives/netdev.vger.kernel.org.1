@@ -1,156 +1,106 @@
-Return-Path: <netdev+bounces-66772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B91E8409E8
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:29:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ED178409F4
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 16:30:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56D331C226C8
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 15:29:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 703AF1C235C3
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 15:30:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE49C153BC7;
-	Mon, 29 Jan 2024 15:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20FF7153BCD;
+	Mon, 29 Jan 2024 15:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="n/FsBQcO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a5gwh+QI"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 894EC153502;
-	Mon, 29 Jan 2024 15:29:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC517153BC8;
+	Mon, 29 Jan 2024 15:30:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706542167; cv=none; b=hCl8aoGKykAnc8wIFsGxWDNhCWUzBOBYUguasIxqXrzhwT/e+kTZ/Kmp09jocavdP23wUy+37qvRkvj/aHK7hZxnSzC06ZJvW1SQl71ug1RLK5FFKFRyNiAdUoG/3I4EVkfDQ3++Cd/DztVfVnKzuxEDm/bDO8311cc0Ij7fNh0=
+	t=1706542227; cv=none; b=duZ65ez1ipnOgbPt2hT+7g+e8WAsL8LHFyBDTlAomocFZmtyBNOOXUoJ3h/f0Qa3h2C/GI2k4zOYasQYEvwVEXpR2NxFZNk9GLGgEz7KC/6fN1Ns6I0994PY/xu342uv2FXSjivqVBL5WGp9sXD0gYfnrWlrLgP7Tuxb2gGNo4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706542167; c=relaxed/simple;
-	bh=temvw+fKuDYFx07W/PqfCRAulSyTIn2NnJqhzpa3B60=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GDtdKdVkDDYZXyf4QehpGk2zwB91dpWMiqDwMZsc47tCCVB/U4xjAhmMrqZ7X9Auw6pulyeK5nb+O3PwbyhVjRPBy3grQ7PzNUjk57jfkBjfOEjosMFIOI14Vy8goUAkmJ/nwXR9qHZtfMXNwmjCG3twps8MjAN/S3OIphfqCtk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=n/FsBQcO; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=byNfiL/pkoggyG/+oatuw7eueKrFjxfS3K9FZq27IAg=; b=n/FsBQcOafh31HIhCxKunlMYhY
-	BINs0xUg+zirDh74DZomBMBrgPTUg6s+YKFk/eyPkCDp/foDwi2JN6quuX1kkblEZiSbOzXZpnlhP
-	4ghCJVX3y19TyJLpl+W3QY5JDnD9jcKr+o01DYgJzsz6Qek3YsJcsL41l1McDcFMbpBY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rUTZP-006OKZ-UE; Mon, 29 Jan 2024 16:29:11 +0100
-Date: Mon, 29 Jan 2024 16:29:11 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Jie Luo <quic_luoj@quicinc.com>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Robert Marko <robert.marko@sartura.hr>,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Subject: Re: [net-next PATCH 0/3] net: mdio-ipq4019: fix wrong default MDC
- rate
-Message-ID: <df0e0ddc-4134-41d0-94f4-aba1186f0ede@lunn.ch>
-References: <20240124213640.7582-1-ansuelsmth@gmail.com>
- <53445feb-a02c-4859-a993-ccf957208115@quicinc.com>
- <f8a9e328-5284-4f24-be5d-7e9804869ecd@lunn.ch>
- <5d778fc0-864c-4e91-9722-1e39551ffc45@quicinc.com>
- <CAA8EJppUGH1pMg579nJmG2iTHGsOJdgDL93kfOvKofANTGGdHw@mail.gmail.com>
- <65b3ecd7.050a0220.9e26c.0d9e@mx.google.com>
- <cdd0e481-2738-465b-9ef8-b7ab79981fbe@quicinc.com>
- <65b7b565.170a0220.2666a.0d2b@mx.google.com>
+	s=arc-20240116; t=1706542227; c=relaxed/simple;
+	bh=ixi8kL7I86gBrHfmeQ/hZc+GdJatpUL8KGDJK72LYAs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=muilmh1Erdnkg2j4j1U2PSG83lIijfNp/QhaFB0z8ngx31DNpRg7qnmu1OB0h6BC8iEhL/ce0/yAL8SvEQ7oorkfFEZS6KSfIKw/M9pHDLQzK3xSkZWOkVakVAEacKmj1HCDnKsuj06ktnXITsPe4N8bPE/1tZ8bZ8C6txedMvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a5gwh+QI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 85D23C433C7;
+	Mon, 29 Jan 2024 15:30:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706542226;
+	bh=ixi8kL7I86gBrHfmeQ/hZc+GdJatpUL8KGDJK72LYAs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=a5gwh+QIq4ZeTsxtmZ8+aIsNKWJ/brKgOggIog+p3Jk5uZqM1l8Qyrt6CL3F+aX72
+	 bLF1Gyuk0+aeINi5T5tVR9gcNJgfoJ4hzC9HEIKaFpDfoXYQcn9B2toux7xLXLV0IP
+	 Z0s1PUogO6Xa3EMQH1sVdWvVvMDb9hj85f5NaJt+hvKSdqdDTL1cThAIHywL1/IAPj
+	 jgAHEJTfO1n5XwXaJHTGWRHnzEsuJ4tTyuzpmC5ya1qLJwUcud67O1hVNyZjdB85Ww
+	 QR5ba/9MXfzlGJ8bfjYY8tM7FsCjn2a+GtsEUvoClIUMAA3kurhKvsxCy73h89Ta5U
+	 jFsUYDN+CU14A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 64CF4C3274C;
+	Mon, 29 Jan 2024 15:30:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65b7b565.170a0220.2666a.0d2b@mx.google.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH RESEND bpf-next v3 0/6] Zbb support and code simplification
+ for RV64 JIT
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170654222640.3521.12964970085967863074.git-patchwork-notify@kernel.org>
+Date: Mon, 29 Jan 2024 15:30:26 +0000
+References: <20240115131235.2914289-1-pulehui@huaweicloud.com>
+In-Reply-To: <20240115131235.2914289-1-pulehui@huaweicloud.com>
+To: Pu Lehui <pulehui@huaweicloud.com>
+Cc: bpf@vger.kernel.org, linux-riscv@lists.infradead.org,
+ netdev@vger.kernel.org, bjorn@kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+ song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@google.com, haoluo@google.com, jolsa@kernel.org, palmer@dabbelt.com,
+ conor@kernel.org, luke.r.nels@gmail.com, pulehui@huawei.com
 
-On Mon, Jan 29, 2024 at 03:25:09PM +0100, Christian Marangi wrote:
-> On Mon, Jan 29, 2024 at 09:59:03PM +0800, Jie Luo wrote:
-> > 
-> > 
-> > On 1/27/2024 1:33 AM, Christian Marangi wrote:
-> > > On Fri, Jan 26, 2024 at 07:20:03PM +0200, Dmitry Baryshkov wrote:
-> > > > On Fri, 26 Jan 2024 at 18:03, Jie Luo <quic_luoj@quicinc.com> wrote:
-> > > > > 
-> > > > > 
-> > > > > 
-> > > > > On 1/26/2024 1:18 AM, Andrew Lunn wrote:
-> > > > > > > Hi Christian,
-> > > > > > > Just a gentle reminder.
-> > > > > > > 
-> > > > > > > The MDIO frequency config is already added by the following patch series.
-> > > > > > > https://lore.kernel.org/netdev/28c8b31c-8dcb-4a19-9084-22c77a74b9a1@linaro.org/T/#m840cb8d269dca133c3ad3da3d112c63382ec2058
-> > > > > > 
-> > > > > > I admit this version was posted first. However, its embedded in a
-> > > > > > patch series which is not making much progress, and i doubt will make
-> > > > > > progress any time soon.
-> > > > > > 
-> > > > > > If you really want your version to be used, please split it out into a
-> > > > > > standalone patch series adding just MDIO clock-frequency support, with
-> > > > > > its binding, and nothing else.
-> > > > > > 
-> > > > > >       Andrew
-> > > > > 
-> > > > > Hi Andrew,
-> > > > > We will rework the patch series to include only MDIO frequency related
-> > > > > function and frequency dt binding, and post the updated patch series
-> > > > > on th/Tuesdae Mondayy of next week. We will work with Christian to
-> > > > > ensure he can re-use this patch as well.
-> > > > 
-> > > > Can you do the other way around: rebase your patches on top of Chritian's work?
-> > 
-> > Hi Dmitry,
-> > Sure, we can take this approach if fine by Andrew as well.
-> > 
-> > > > 
-> > > 
-> > > Would be ideal, also I have to send v2 that handle the 802.3 suggested
-> > > MDC rate (ready I just need to send after this has been handled).
-> > > 
-> > > Also I can see some problem with Lui patch where thse divior
-> > > value is not reapplied after MDIO reset effectively reverting to the
-> > > default value.
-> > 
-> > Hi Christian,
-> > In my version, the divisor is programmed in every MDIO operation and hence I
-> > did not add the code to revert to configured value in reset function. But
-> > sure. we can program it once during the probe/reset and avoid doing it
-> > during read/write ops.
-> > 
-> > In addition, the MDIO divisor 1, 2 and 4 are not supported by the MDIO
-> > hardware block, maybe we can remove these macros to avoid confusion, or add
-> > a comment mentioning that these are not supported.
-> >
+Hello:
+
+This series was applied to bpf/bpf-next.git (master)
+by Daniel Borkmann <daniel@iogearbox.net>:
+
+On Mon, 15 Jan 2024 13:12:29 +0000 you wrote:
+> Add Zbb support [0] to optimize code size and performance of RV64 JIT.
+> Meanwhile, adjust the code for unification and simplification. Tests
+> test_bpf.ko and test_verifier have passed, as well as the relative
+> testcases of test_progs*.
 > 
-> Hi, thanks for confirming it! In v2 I already changed the logic to start
-> looping from divisor 8 and added comments in DT and driver about not
-> assuring correct funcionality with those divisor.
+> Link: https://github.com/riscv/riscv-bitmanip/releases/download/1.0.0/bitmanip-1.0.0-38-g865e7a7.pdf [0]
+> 
+> [...]
 
-Hi Christian
+Here is the summary with links:
+  - [RESEND,bpf-next,v3,1/6] riscv, bpf: Unify 32-bit sign-extension to emit_sextw
+    https://git.kernel.org/bpf/bpf-next/c/e33758f7493c
+  - [RESEND,bpf-next,v3,2/6] riscv, bpf: Unify 32-bit zero-extension to emit_zextw
+    https://git.kernel.org/bpf/bpf-next/c/914c7a5ff18a
+  - [RESEND,bpf-next,v3,3/6] riscv, bpf: Simplify sext and zext logics in branch instructions
+    https://git.kernel.org/bpf/bpf-next/c/361db44c3c59
+  - [RESEND,bpf-next,v3,4/6] riscv, bpf: Add necessary Zbb instructions
+    https://git.kernel.org/bpf/bpf-next/c/647b93f65daa
+  - [RESEND,bpf-next,v3,5/6] riscv, bpf: Optimize sign-extention mov insns with Zbb support
+    https://git.kernel.org/bpf/bpf-next/c/519fb722bea0
+  - [RESEND,bpf-next,v3,6/6] riscv, bpf: Optimize bswap insns with Zbb support
+    https://git.kernel.org/bpf/bpf-next/c/06a33d024838
 
-Lets go with your version. Please post V2 whenever you are ready.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Jie, please spend some time reviewing to patches, make any comments
-you have, and if everything is O.K, you can add a Reviewed-by:
 
-    Andrew
 
