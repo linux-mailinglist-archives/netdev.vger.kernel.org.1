@@ -1,205 +1,147 @@
-Return-Path: <netdev+bounces-66854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8D51841314
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 20:09:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B146E841318
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 20:11:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1440FB223C3
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 19:09:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A9301F24D07
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 19:11:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 852F447F50;
-	Mon, 29 Jan 2024 19:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9A713C068;
+	Mon, 29 Jan 2024 19:11:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="rIkU6Ws2"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="DJzyx2Df"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2067.outbound.protection.outlook.com [40.107.223.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FB4033CE7
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 19:09:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706555370; cv=none; b=Y4Z1u758nJBIsCNKSvncuZ3VRVxnHH9007bPmOEiwHf9ibwZMt1RWaKs7dnZEYKcdhSoZi8b4/VDm5KAFQRqAfulsYnvRdtbCFNR6fbPldHYInE58v2kppHyIvReXzagdIOVH+iUb8lgh1/JkyBZlFU2A0Sx3xP+Tlky0CRtEC0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706555370; c=relaxed/simple;
-	bh=511hvbc1Pbq2+EOuaGOVAprY+/qc4fIDXxmZ7B+0s2w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hl/2x/gGECoKw85SoCSMyN8cI5FiS05mOlWPGvenO8x8lBlkuE0cDoSD//hWUcEE4cbe9OvoftyU9FFJZ51UkV3uoaWiEOt8WfSsEPGPIrg7IXzwWpxrfIBnMNOvZsLk6yHiTQRW+ETkOcC9dbZWQtymrCu+poBnjhZcosXQhAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=rIkU6Ws2; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6ddd19552e6so1424302b3a.1
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 11:09:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1706555368; x=1707160168; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A+pfwsAR7dQEMZaUbmAmf7P3tGpaqey93GDUy/LCXUY=;
-        b=rIkU6Ws2QKHii+1VfbHJ2qXmJcqT+IfmpgjYD4xzI5MIRFiSvC+xRxCq3OP1SGpSgF
-         4TglgnOJTGktPRPsH8rsgF7lN7JIo5WrTDlJVg1OO4glT8goQETCjiwYdIofMJ5z+XVc
-         D3eVlvTYsLHUwtw4Ginkr08ZTdGu83VGHMZK4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706555368; x=1707160168;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=A+pfwsAR7dQEMZaUbmAmf7P3tGpaqey93GDUy/LCXUY=;
-        b=nbzwZsb+mUQ2/oRFgFMVO2Wc/6FKsRoPE2AYToMv0YXLQgbb5LeTrxJLjI63XyVAeu
-         6fR7GrjDvNDfSG1BfxKqZUfBJ4R93o2MHIfuDIY9BMjGv/vDYORI9UmlD60EFmhfLJpM
-         To4hgEpL3v/4UQsSRbqIp6QuRZOkLRWG9ETNWkFjUqLQ8onRFF27LqnCueO0uq25RLO6
-         mW7i3Tm7Nnu3jQl6E4Yn7sbsjVJQSRDoiaXr2GtwvoCwT/RfEjftn0aXhcgvznRDlII9
-         nGfBqgPd/0VJjYcjOrzDNXjpW+c5EJpcDZETzDDEl3QYYU9oKTrX6kWFBst2gRW8hsIx
-         V3TQ==
-X-Gm-Message-State: AOJu0Yx2/TPT4Ut9cnqYuLbz9YdwX6Yw5iNwNZa4v2dUBYS025SI9EBa
-	dqmBVggQZCBuQjfV9fNz740bet4aJ98frUdThBsny5WJ0RE+ySOEvolicbqKUlo=
-X-Google-Smtp-Source: AGHT+IESoPfU8AaOOY4JrFQlBadzLfIdEEVi2A6ryh3PYylu1gurZgUOMvs8PMQt3gmoBwZrfVF57g==
-X-Received: by 2002:a05:6a00:939c:b0:6dd:8767:2fa1 with SMTP id ka28-20020a056a00939c00b006dd87672fa1mr4221676pfb.0.1706555367798;
-        Mon, 29 Jan 2024 11:09:27 -0800 (PST)
-Received: from fastly.com (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id gu7-20020a056a004e4700b006db105027basm6234279pfb.50.2024.01.29.11.09.24
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 29 Jan 2024 11:09:27 -0800 (PST)
-Date: Mon, 29 Jan 2024 11:09:23 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	chuck.lever@oracle.com, jlayton@kernel.org,
-	linux-api@vger.kernel.org, brauner@kernel.org, edumazet@google.com,
-	davem@davemloft.net, alexander.duyck@gmail.com,
-	sridhar.samudrala@intel.com, kuba@kernel.org, weiwan@google.com,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Andrew Waterman <waterman@eecs.berkeley.edu>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Dominik Brodowski <linux@dominikbrodowski.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jan Kara <jack@suse.cz>, Jiri Slaby <jirislaby@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Julien Panis <jpanis@baylibre.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	"(open list:FILESYSTEMS \\(VFS and infrastructure\\))" <linux-fsdevel@vger.kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nathan Lynch <nathanl@linux.ibm.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Steve French <stfrench@microsoft.com>,
-	Thomas Huth <thuth@redhat.com>,
-	Thomas Zimmermann <tzimmermann@suse.de>
-Subject: Re: [PATCH net-next v3 0/3] Per epoll context busy poll support
-Message-ID: <20240129190922.GA1315@fastly.com>
-References: <20240125225704.12781-1-jdamato@fastly.com>
- <65b52d6381de7_3a9e0b2943d@willemb.c.googlers.com.notmuch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D1E276C85
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 19:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.67
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706555495; cv=fail; b=d9lOfvE/E2pYpD9O9mEJaUC7wLmYW0tBPJpbhbDlzvhVH0rh2Z94/A6YPzxzvl8qThgsBbo3vHjW8XBTiVuizhn7tjt5gMr0pihWYFwTPxL1UIHm3Jz6og499r//X62Rzw38vXr87B9dfN31Ma4MiJ502JSqzXljni7hO4Wb/7U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706555495; c=relaxed/simple;
+	bh=M2TlnsjoVf+MlwM/rGXYdOv/hmpwA0d4aUIYWiJZsOA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jfcqh1Q4wwq2+1YPhT9pyYMS0BXcHvB5MwSmv10dri/ML2MiBAGG90rIvqog0XOieO6bP3Z+sAUkNElvyPgLGbsWiNs2ZyXsbClo9EkfbaDzt3XiW3t9iEkj2GfAH6LiXoTGr1RXF+ZLVWG6fpj6eZo4yP5e+9e1GqhpMlaFQz4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=DJzyx2Df; arc=fail smtp.client-ip=40.107.223.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XEXhoPc7SAiE5fG9AFe2m8a/goCoR/cfx2pF6EAc9IQTmDz7egPbF6PEbYHKtAblJcLO2SmFmfcoPtfkGjVPoeyL2IiQDehl/T4oNRtp7t2EFs1achAicQWiw2I7FZDl8lFJ+wAJvi819N7gAAz4Og7Ag/bgrLo9R+/7wD/+ewNoYILsWA8tfZ4vjF1ADW3rLDRzpzovN65WvUsGS4G5+vBqJKoKMH0U2GXCG9ti1m580n0lWLMj8h7QkZVxYY2Nj53KDBc4mdwZqau8onnOcojclHmYBRBKQubHNa5xaJRVBq5rHr1dpvmZ5bZO4+Xi5GeSKAT7wXoIaaTf1R/Ikw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hP2UMNb3ctTOYfgbBOPYbsG19JcckZVIpbOYtE+txp4=;
+ b=NUanx5eaW2CA0iY4wn1YCrwcv1MaD/8M9HCByjMIvCFm1OdApSktXCQJagSiMoqNWwMTBqQTuzsm7qRTs618bum1O5Iqoft/M9BKNzpqkii0hPtGrJPs9cn2xAenlpQj2SPqOngK1R154T8TV8GCYfU+v1eMBN6WDYwqJDGvC1QXl7TjkA/XlVabyTnmlIvbv4nJCseMnRCZHSPbxYQTqaN4HVaYrcTbxNWnRA6XcASlRfyu9/h/L9RME43QlYtjaBvJNgk6FaJaAGofo4roWQphY0mGB0PtPNo4BDuRkC6rOH1pwmw0O18vscaN+MYsWqJiGtuaG1exYiLzXZewjg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hP2UMNb3ctTOYfgbBOPYbsG19JcckZVIpbOYtE+txp4=;
+ b=DJzyx2DfXa35X77Bzw6DU3p4/G65qZpBS+wMp3zPsPhoyaKLgvRPeCuF5DLSP+toXk6TsLClwbxmwJBfZbGLg2BJYB3lhUhM0ZAktsjt3pRCICShTzFuq7HyPwxds2yFEy4S/hwZk8UZuip0+ymY+97nMe4+4MTFZz8ANnxsd+izuPffafjOvfJCF/lM/leXgf6T5tWpkto4eU6uEeuM41nN7vIlRO3YT9qb2boMcKhNH+Iyj+/HMvOMof4ncI4Pc0S+D2+FkJPGowYeuUaBfzKh2dlIAN4HR2DxASmLOOGf1OIzGZtTD8wMI0DJAIofTW1WiDVZ1Mm+E2yq86+/RQ==
+Received: from BN9PR03CA0294.namprd03.prod.outlook.com (2603:10b6:408:f5::29)
+ by CH0PR12MB5385.namprd12.prod.outlook.com (2603:10b6:610:d4::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.33; Mon, 29 Jan
+ 2024 19:11:31 +0000
+Received: from BN2PEPF0000449F.namprd02.prod.outlook.com
+ (2603:10b6:408:f5:cafe::5) by BN9PR03CA0294.outlook.office365.com
+ (2603:10b6:408:f5::29) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.34 via Frontend
+ Transport; Mon, 29 Jan 2024 19:11:31 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN2PEPF0000449F.mail.protection.outlook.com (10.167.243.150) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7249.19 via Frontend Transport; Mon, 29 Jan 2024 19:11:30 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 29 Jan
+ 2024 11:11:16 -0800
+Received: from sw-mtx-036.mtx.labs.mlnx (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.41; Mon, 29 Jan 2024 11:11:15 -0800
+From: Parav Pandit <parav@nvidia.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <shayd@nvidia.com>, <netdev@vger.kernel.org>
+CC: Parav Pandit <parav@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
+Subject: [PATCH net] devlink: Fix referring to hw_addr attribute during state validation
+Date: Mon, 29 Jan 2024 21:10:59 +0200
+Message-ID: <20240129191059.129030-1-parav@nvidia.com>
+X-Mailer: git-send-email 2.26.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65b52d6381de7_3a9e0b2943d@willemb.c.googlers.com.notmuch>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF0000449F:EE_|CH0PR12MB5385:EE_
+X-MS-Office365-Filtering-Correlation-Id: cbb0d0cc-2636-429a-ca4c-08dc20fe19cf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	PMRsqCOkraq83W0ojtll1jd/5G6Ob06648RrhsyEXUtPG4C2ch0BCetGwIeFRy096AJOpge/4g1WkS+tynz/bOjYJjKaPIk/7RzePjnOdportXuGGmpwta1c4CNCsUO+LL684DiqLxy6RzXw29jlRTx9HruN97YqPIcnFJBV8+8/owVrjmEF8XstZlvBjIwAmOj7npAv5TRcGjfMuTtELgFjuNtsZGEN9JiWE1gvLmmATRh/bT7Yyk6KSgi+byCXO4eR0/9sEjc0jL1jdQrokAkZCUQ/dioGIN9S8IAaSMppnwKuwb2FHqq24FQJsso9jeOOsmIEkvILQ6GHVsgFzmwhsGdxqRa9sTLSayfS6q3vTyxKLuswylh/H66m6ZdDbzsSW/c+Qd2+X/dEBz/LwP85GtQg5CKta9u+kgoeyZgfb3DuaVkrmwL3AYKbPjkMRjDaDcW+zL63bhzYcpzPOVsbICfb9nyqHfqYec3sni950jz+/SEey2oZYB+GtU9BDDY6pC22ygKdYoqeEUCaPwRtmTYc83chq+2q/ZGNTiE7Uams0AnGMfCuAcRUTigb5CeyTHoy+UPQLkSizs83BKWwYQgUFiPS8BgxtMZ0+neg82u6jo5KQGLFHoHaZiCydLKn85lGQPFnJA2fgCFdEmn0VOg4M5DK/GuIFlWEKUggWnLOJqPV+5wDgmKbOQsKgT4RSkqOfuCOA5zCHlXPPZ9Dmw+ZQF1uRXgKIhOOLwHkCnbxIxfNfejlvMxSG4wI
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(136003)(346002)(376002)(396003)(39860400002)(230922051799003)(82310400011)(64100799003)(186009)(451199024)(1800799012)(46966006)(40470700004)(36840700001)(26005)(40460700003)(40480700001)(16526019)(426003)(83380400001)(6666004)(336012)(1076003)(36756003)(86362001)(82740400003)(356005)(7636003)(8676002)(8936002)(41300700001)(4326008)(5660300002)(36860700001)(478600001)(107886003)(316002)(47076005)(110136005)(70206006)(54906003)(2616005)(2906002)(70586007);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2024 19:11:30.4566
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: cbb0d0cc-2636-429a-ca4c-08dc20fe19cf
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF0000449F.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR12MB5385
 
-On Sat, Jan 27, 2024 at 11:20:51AM -0500, Willem de Bruijn wrote:
-> Joe Damato wrote:
-> > Greetings:
-> > 
-> > Welcome to v3. Cover letter updated from v2 to explain why ioctl and
-> > adjusted my cc_cmd to try to get the correct people in addition to folks
-> > who were added in v1 & v2. Labeled as net-next because it seems networking
-> > related to me even though it is fs code.
-> > 
-> > TL;DR This builds on commit bf3b9f6372c4 ("epoll: Add busy poll support to
-> > epoll with socket fds.") by allowing user applications to enable
-> > epoll-based busy polling and set a busy poll packet budget on a per epoll
-> > context basis.
-> > 
-> > This makes epoll-based busy polling much more usable for user
-> > applications than the current system-wide sysctl and hardcoded budget.
-> > 
-> > To allow for this, two ioctls have been added for epoll contexts for
-> > getting and setting a new struct, struct epoll_params.
-> > 
-> > ioctl was chosen vs a new syscall after reviewing a suggestion by Willem
-> > de Bruijn [1]. I am open to using a new syscall instead of an ioctl, but it
-> > seemed that: 
-> >   - Busy poll affects all existing epoll_wait and epoll_pwait variants in
-> >     the same way, so new verions of many syscalls might be needed. It
-> 
-> There is no need to support a new feature on legacy calls. Applications have
-> to be upgraded to the new ioctl, so they can also be upgraded to the latest
-> epoll_wait variant.
+When port function state change is requested, and when the driver
+does not support it, it refers to the hw address attribute instead
+of state attribute. Seems like a copy paste error.
 
-Sure, that's a fair point. I think we could probably make reasonable
-arguments in both directions about the pros/cons of each approach.
+Fix it by referring to the port function state attribute.
 
-It's still not clear to me that a new syscall is the best way to go on
-this, and IMO it does not offer a clear advantage. I understand that part
-of the premise of your argument is that ioctls are not recommended, but in
-this particular case it seems like a good use case and there have been
-new ioctls added recently (at least according to git log).
+Fixes: c0bea69d1ca7 ("devlink: Validate port function request")
+Signed-off-by: Parav Pandit <parav@nvidia.com>
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+---
+ net/devlink/port.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This makes me think that while their use is not recommended, they can serve
-a purpose in specific use cases. To me, this use case seems very fitting.
+diff --git a/net/devlink/port.c b/net/devlink/port.c
+index 62e54e152ecf..78592912f657 100644
+--- a/net/devlink/port.c
++++ b/net/devlink/port.c
+@@ -674,7 +674,7 @@ static int devlink_port_function_validate(struct devlink_port *devlink_port,
+ 		return -EOPNOTSUPP;
+ 	}
+ 	if (tb[DEVLINK_PORT_FN_ATTR_STATE] && !ops->port_fn_state_set) {
+-		NL_SET_ERR_MSG_ATTR(extack, tb[DEVLINK_PORT_FUNCTION_ATTR_HW_ADDR],
++		NL_SET_ERR_MSG_ATTR(extack, tb[DEVLINK_PORT_FN_ATTR_STATE],
+ 				    "Function does not support state setting");
+ 		return -EOPNOTSUPP;
+ 	}
+-- 
+2.26.2
 
-More of a joke and I hate to mention this, but this setting is changing how
-io is done and it seems fitting that this done via an ioctl ;)
-
-> epoll_pwait extends epoll_wait with a sigmask.
-> epoll_pwait2 extends extends epoll_pwait with nsec resolution timespec.
-> Since they are supersets, nothing is lots by limiting to the most recent API.
-> 
-> In the discussion of epoll_pwait2 the addition of a forward looking flags
-> argument was discussed, but eventually dropped. Based on the argument that
-> adding a syscall is not a big task and does not warrant preemptive code.
-> This decision did receive a suitably snarky comment from Jonathan Corbet [1].
-> 
-> It is definitely more boilerplate, but essentially it is as feasible to add an
-> epoll_pwait3 that takes an optional busy poll argument. In which case, I also
-> believe that it makes more sense to configure the behavior of the syscall
-> directly, than through another syscall and state stored in the kernel.
-
-I definitely hear what you are saying; I think I'm still not convinced, but
-I am thinking it through.
-
-In my mind, all of the other busy poll settings are configured by setting
-options on the sockets using various SO_* options, which modify some state
-in the kernel. The existing system-wide busy poll sysctl also does this. It
-feels strange to me to diverge from that pattern just for epoll.
-
-In the case of epoll_pwait2 the addition of a new syscall is an approach
-that I think makes a lot of sense. The new system call is also probably
-better from an end-user usability perspective, as well. For busy poll, I
-don't see a clear reasoning why a new system call is better, but maybe I am
-still missing something.
-
-> I don't think that the usec fine grain busy poll argument is all that useful.
-> Documentation always suggests setting it to 50us or 100us, based on limited
-> data. Main point is to set it to exceed the round-trip delay of whatever the
-> process is trying to wait on. Overestimating is not costly, as the call
-> returns as soon as the condition is met. An epoll_pwait3 flag EPOLL_BUSY_POLL
-> with default 100us might be sufficient.
-> 
-> [1] https://lwn.net/Articles/837816/
-
-Perhaps I am misunderstanding what you are suggesting, but I am opposed to
-hardcoding a value. If it is currently configurable system-wide and via
-SO_* options for other forms of busy poll, I think it should similarly be
-configurable for epoll busy poll.
-
-I may yet be convinced by the new syscall argument, but I don't think I'd
-agree on imposing a default. The value can be modified by other forms of
-busy poll and the goal of my changes are to:
-  - make epoll-based busy poll per context
-  - allow applications to configure (within reason) how epoll-based busy
-    poll behaves, like they can do now with the existing SO_* options for
-    other busy poll methods.
-
-> >     seems much simpler for users to use the correct
-> >     epoll_wait/epoll_pwait for their app and add a call to ioctl to enable
-> >     or disable busy poll as needed. This also probably means less work to
-> >     get an existing epoll app using busy poll.
-> 
 
