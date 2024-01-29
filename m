@@ -1,55 +1,58 @@
-Return-Path: <netdev+bounces-66667-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62D8684034C
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 11:56:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86018840355
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 11:59:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE48FB22D18
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:56:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1AFC51F22562
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 10:59:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6769C5B5BA;
-	Mon, 29 Jan 2024 10:56:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23D955A0FD;
+	Mon, 29 Jan 2024 10:59:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y1teB6vR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B9NmIx0h"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43B795B5B6
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 10:56:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFF3A5A791;
+	Mon, 29 Jan 2024 10:59:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706525768; cv=none; b=hcymwFGn0QuiDpIXJOHWDoeLxfMGwgmmX/8clfbT2cJaNB04wEmtIcr9MseQFU0BlFC2+trGlwFXgsO76Nmj2GGLxtd7NorK0oREdKOGbt+Z3HtXBw9Jyr3Q2aVF8Nkpyr8z2/r6c6ilOpSXMmtFzykBLZRcHlj/wtr6tmQgpI4=
+	t=1706525966; cv=none; b=sjW5MH4Nwt5ifhLLwUXdAeTnYe3fhKW4e0mQxH6THgzsd1/WhVPzjocmGk/OAssCFXEVEk8eq+fGvrocfE9P5TdQBcSYicx4GkV80rH+H1i3Vz1JYUDEpesfAu5khAtYjV5REDuTsodexn7QRGRb27e4MK63biIsq/N2kZG2t1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706525768; c=relaxed/simple;
-	bh=SfFWuAygcHizF+f996dYYVed86TOjiGLRxPpMN/Tj2M=;
+	s=arc-20240116; t=1706525966; c=relaxed/simple;
+	bh=2168ndFnkTOwy1W7Dx7tqWHb2Pb29S7aUYNrNolsgZ4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dnk4bOHS6OG4qRE0JDsRVjaYcV2O1o+nOUTqEITwkJBCWeOH04+ULlTDaNErI60oAQG/OFisWH4ajt7U83kVtTFV6ptckxKO4unEuQMs0+KMS/pJwMm3iY+HhAWW+ZvDvVdoAu9lvMusV5z9ISPdnnHIhQH2Ahao564dR3VsmHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y1teB6vR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7B9EC41674;
-	Mon, 29 Jan 2024 10:56:06 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=EgwkikpSRHZSJHGZ4wUI4s5xuUH3FqNSS9N7YaEjusILsvV1FwUcARQ2Wm4DTPPJrDtiDohSOPSeXNG+j5MsPZwPhEEPCa4QYU5cYZplHFi8RKDNJX7TqC94OG1CYvrGnFxPL56kaxm07RY/MUopQtTXuEKsO8mztponrYoPDHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B9NmIx0h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69A13C433C7;
+	Mon, 29 Jan 2024 10:59:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706525768;
-	bh=SfFWuAygcHizF+f996dYYVed86TOjiGLRxPpMN/Tj2M=;
+	s=k20201202; t=1706525965;
+	bh=2168ndFnkTOwy1W7Dx7tqWHb2Pb29S7aUYNrNolsgZ4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Y1teB6vR9MO6jzB6ki44PdyRCAAfewj3kV7qnqPQ6foSsGRSVj3Hg1yWnYdpHb0/v
-	 og5NtpMEyaAOlYzrmFWH2Kj+3Q60ysCA7ddr0fU+RpA7KQ298no/ZWc55DIFiP8RF8
-	 qdG+tgxZ2Vk+c5dXCgmJVX1qBoWYtv3otY+sRZz2nwHSRjrEwSjVyoP/H5HYm7j1H1
-	 uFZPSEoj3uTo1E5tGFNrDFVenOZy56hTiBywHtCsAkRVK4BDYT2F7WvQiwHOS18+CW
-	 0oZ7EeHptgLnIqE7wGj+LaZZnZxiR5bh92Z/JCigk65jv4QTNCYWMo1XoIsp6hyFmZ
-	 XA69veebyl71w==
-Date: Mon, 29 Jan 2024 10:56:04 +0000
+	b=B9NmIx0hCKcLFWUkZX6pTSPgdsLxvMqWu3TX4fznAwdFCzXRIJZZWDzVBPT/Q3st1
+	 67HpuCje5vvNd8AfzKK+1o31PbuBjGFmMcZHz1vkhbB8anF9bLMJvO76vDxMQngFgE
+	 3ujoKHgAnYdk0CUopuPkXXrfbNJAUwXDX/gwH6+6JK5bwUY1hv8utfQgwC0CCE5XhX
+	 8juxdJKClDgcVpoUgyuRRbu8cDj02IPwqrjrgo+87tNlu5b6Gk43+WcZ17Yi7N4/YE
+	 lpHseaMZR7VhtKj2zpBqOsgNARM9tHV9LgVWzCqDaFWQTYM0O57BYPhsSPTo3r+6fF
+	 Jah3zb4SpzWtw==
+Date: Mon, 29 Jan 2024 10:59:21 +0000
 From: Simon Horman <horms@kernel.org>
-To: William Tu <witu@nvidia.com>
-Cc: bodong@nvidia.com, jiri@nvidia.com, kuba@kernel.org,
-	netdev@vger.kernel.org, saeedm@nvidia.com
-Subject: Re: [RFC PATCH v3 net-next] Documentation: devlink: Add devlink-sd
-Message-ID: <20240129105604.GI401354@kernel.org>
-References: <20240125045624.68689-1-witu@nvidia.com>
- <20240125223617.7298-1-witu@nvidia.com>
+To: Sai Krishna <saikrishnag@marvell.com>
+Cc: richardcochran@gmail.com, davem@davemloft.net, kuba@kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	sgoutham@marvell.com, gakula@marvell.com, lcherian@marvell.com,
+	hkelam@marvell.com, sbhatta@marvell.com,
+	Naveen Mamindlapalli <naveenm@marvell.com>
+Subject: Re: [net-next PATCH] octeontx2: Add PTP clock driver for Octeon PTM
+ clock.
+Message-ID: <20240129105921.GJ401354@kernel.org>
+References: <20240124064156.2577119-1-saikrishnag@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,49 +61,161 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240125223617.7298-1-witu@nvidia.com>
+In-Reply-To: <20240124064156.2577119-1-saikrishnag@marvell.com>
 
-On Thu, Jan 25, 2024 at 02:36:17PM -0800, William Tu wrote:
-> Add devlink-sd, shared descriptor, documentation. The devlink-sd
-> mechanism is targeted for configuration of the shared rx descriptors
-> that server as a descriptor pool for ethernet reprsentors (reps)
-> to better utilize memory. Following operations are provided:
->  * add/delete a shared descriptor pool
->  * Configure the pool's properties
->  * Bind/unbind a representor's rx channel to a descriptor pool
+On Wed, Jan 24, 2024 at 12:11:56PM +0530, Sai Krishna wrote:
+> The PCIe PTM(Precision time measurement) protocol provides precise
+> coordination of events across multiple components like PCIe host
+> clock, PCIe EP PHC local clocks of PCIe devices. This patch adds
+> support for ptp clock based PTM clock. We can use this PTP device
+> to sync the PTM time with CLOCK_REALTIME or other PTP PHC
+> devices using phc2sys.
 > 
-> Propose new devlink objects because existing solutions below do
-> not fit our use cases:
-> 1) devlink params: Need to add many new params to support
->    the shared descriptor pool. It doesn't seem to be a good idea.
-> 2) devlink-sb (shared buffer): very similar to the API proposed in
->    this patch, but devlink-sb is used in ASIC hardware switch buffer
->    and switch's port. Here the use case is switchdev mode with
->    reprensentor ports and its rx queues.
-> 
-> Signed-off-by: William Tu <witu@nvidia.com>
-> Change-Id: I1de0d9544ff8371955c6976b2d301b1630023100
-> ---
-> v3: read again myself and explain NAPI context and descriptor pool
-> v2: work on Jiri's feedback
-> - use more consistent device name, p0, pf0vf0, etc
-> - several grammar and spelling errors
-> - several changes to devlink sd api
->   - remove hex, remove sd show, make output 1:1 mapping, use
->   count instead of size, use "add" instead of "create"
->   - remove the use of "we"
-> - remove the "default" and introduce "shared-descs" in switchdev mode
-> - make description more consistent with definitions in ethtool,
-> such as ring, channel, queue.
-> ---
->  .../networking/devlink/devlink-sd.rst         | 296 ++++++++++++++++++
->  1 file changed, 296 insertions(+)
->  create mode 100644 Documentation/networking/devlink/devlink-sd.rst
+> Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
+> Signed-off-by: Naveen Mamindlapalli <naveenm@marvell.com>
+> Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
 
-Hi William,
+Hi Sai,
 
-a minor nit from my side:
-I think that devlink-sd should be added to the toc in index.rst.
+some minor review items from my side.
+
+> diff --git a/drivers/ptp/ptp_octeon_ptm.c b/drivers/ptp/ptp_octeon_ptm.c
 
 ...
+
+> +static u32 read_pcie_config32(int ep_pem, int cfg_addr)
+> +{
+> +	void __iomem *addr;
+> +	u64 val;
+> +
+> +	if (oct_ptp_clock.cn10k_variant) {
+> +		addr  = ioremap(PEMX_PFX_CSX_PFCFGX(ep_pem, 0, cfg_addr), 8);
+> +		if (!addr) {
+> +			pr_err("PTM_EP: Failed to ioremap Octeon CSR space\n");
+> +			return -1U;
+> +		}
+> +		val = readl(addr);
+> +		iounmap(addr);
+> +	} else {
+> +		addr  = ioremap(PEMX_CFG_RD(ep_pem), 8);
+> +		if (!addr) {
+> +			pr_err("PTM_EP: Failed to ioremap Octeon CSR space\n");
+> +			return -1U;
+> +		}
+> +		val = ((1 << 15) | (cfg_addr & 0xfff));
+> +		writeq(val, addr);
+
+This causes a build failure on x86_32 because writeq() is undefined.
+
+> +		val = readq(addr) >> 32;
+> +		iounmap(addr);
+> +	}
+> +	return (val & 0xffffffff);
+> +}
+> +
+> +static uint64_t octeon_csr_read(u64 csr_addr)
+> +{
+> +	u64 val;
+> +	void __iomem *addr;
+
+nit: In Networking code, please consider arranging local variables
+     in reverse xmas tree order - longest line to shortest.
+
+> +
+> +	addr = ioremap(csr_addr, 8);
+> +	if (!addr) {
+> +		pr_err("PTM_EP: Failed to ioremap CSR space\n");
+> +		return -1UL;
+> +	}
+> +	val = (u64)READ_ONCE(*(u64 __iomem *)addr);
+
+Sparse seems unhappy about this cast.
+So if this is really what you want to do then probably a
+__force is needed in the cast.
+
+But I do wonder if there is an endian consideration
+that needs to be taken care of here. And, moreover,
+if a standard routine, such as ioread64(), could be
+used instead of this function.
+
+N.B. as per the note on writeq, possibly this only works on 64bit systems.
+
+Likewise elsewhere in this patch.
+
+> +	iounmap(addr);
+> +	return val;
+> +}
+
+...
+
+> +static int __init ptp_oct_ptm_init(void)
+> +{
+> +	struct pci_dev *pdev = NULL;
+> +
+> +	pdev = pci_get_device(PCI_VENDOR_ID_CAVIUM,
+> +			      PCI_DEVID_OCTEONTX2_PTP, pdev);
+> +	if (!pdev)
+> +		return 0;
+> +
+> +	if (octeon_csr_read(PEMX_CFG) & 0x1ULL) {
+> +		pr_err("PEM0 is configured as RC\n");
+> +		return 0;
+> +	}
+> +
+> +	if (is_otx2_support_ptm(pdev)) {
+> +		oct_ptp_clock.cn10k_variant = 0;
+> +	} else if (is_cn10k_support_ptm(pdev)) {
+> +		oct_ptp_clock.cn10k_variant = 1;
+> +	} else {
+> +		/* PTM_EP: unsupported processor */
+> +		return 0;
+> +	}
+> +
+> +	ptm_ctl_addr = ioremap(PEMX_PTM_CTL, 8);
+> +	if (!ptm_ctl_addr) {
+> +		pr_err("PTM_EP: Failed to ioremap CSR space\n");
+> +		return 0;
+> +	}
+> +
+> +	ptm_lcl_addr = ioremap(PEMX_PTM_LCL_TIME, 8);
+> +	if (!ptm_lcl_addr) {
+> +		pr_err("PTM_EP: Failed to ioremap CSR space\n");
+> +		return 0;
+> +	}
+> +
+> +	oct_ptp_clock.caps = ptp_oct_caps;
+> +
+> +	oct_ptp_clock.ptp_clock = ptp_clock_register(&oct_ptp_clock.caps, NULL);
+> +
+> +	pr_info("PTP device index for PTM clock:%d\n", oct_ptp_clock.ptp_clock->index);
+
+It seems that the pr_info() call above assumes that oct_ptp_clock.ptp_clock
+is not an error, but it may be.
+
+Perhaps something like this is more appropriate:
+
+	oct_ptp_clock.ptp_clock = ...
+	if (IS_ERR(oct_ptp_clock.ptp_clock))
+		ERR_PTR(oct_ptp_clock.ptp_clock);
+
+	pr_info(...)
+	...
+
+	return 0;
+
+Flagged by Smatch.
+
+> +	pr_info("cn10k_variant %d\n", oct_ptp_clock.cn10k_variant);
+> +
+> +	return PTR_ERR_OR_ZERO(oct_ptp_clock.ptp_clock);
+> +}
+> +
+> +module_init(ptp_oct_ptm_init);
+> +module_exit(ptp_oct_ptm_exit);
+> +
+> +MODULE_AUTHOR("Marvell Inc.");
+> +MODULE_DESCRIPTION("PTP PHC clock using PTM");
+> +MODULE_LICENSE("GPL");
+> -- 
+> 2.25.1
 
