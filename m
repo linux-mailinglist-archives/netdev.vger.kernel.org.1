@@ -1,196 +1,130 @@
-Return-Path: <netdev+bounces-66705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 955308405B5
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:55:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6A798405BC
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 13:55:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B4C3283B6D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 12:55:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8335B1F236DF
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 12:55:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F778629F8;
-	Mon, 29 Jan 2024 12:52:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C028E633FF;
+	Mon, 29 Jan 2024 12:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Fa7O4HpB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U8q0z7j8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C89C629F0
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 12:52:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B7DD629E1;
+	Mon, 29 Jan 2024 12:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706532759; cv=none; b=KN5Se3fS75VV+eUfXVADNATIzqa2/nXyshpvQyOs3gYIO8mJmSRIiw0N/sNGAUf/C6pKvq/4aPqiw23x2V94y/8vtd/5jZO6p0BiYh8TGjCVxkwalilaGTW6gCzIrc3Yq39YXto0P2spyLp6SfOaLyS164wDSyfJdTcJJ0VkcJw=
+	t=1706532767; cv=none; b=OrnvjJiTqRc55rcezKpy95NTimPaa9LIUERrk2gBc/T52CiFWLdeZFDef5ZO46yswbe4dCcTONmC9WDwc+EzgqBHbxUaOLtWiVgncpX8sqMu9S8TsBe4BJVpfDqWthQ18OHfSINBg2SJa9IMSt09ew+AKM99NvVNFHWQHk7RJoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706532759; c=relaxed/simple;
-	bh=9QaSZLiCN1wf4oQCl/cYFudoj/IZujYRa+tug9ga+Os=;
+	s=arc-20240116; t=1706532767; c=relaxed/simple;
+	bh=km4zzHCmyYIUYlVLRRXqA6v9RwUyR2+jwg1Lubr/1JI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q+VZ1yDP9TgV8/hnCAw0yfFS67QA4ez6Md6aUQ8uVqFBrP7RbADQseovUqUCceVykBM0tnX9CDUkTMTt7nExaCr0zG6BrsUlhM3R+KdTxc3w24QUAEsVNIAb/XLkc5lAEK1ZvwFxIGedB87kVYLj7Ddp+e4RnoXzxflTIhgHwZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Fa7O4HpB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706532756;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HFGou14JoZNUFYFvgdT1vD08s06+DwHZnpkq7nELQBc=;
-	b=Fa7O4HpBrsyRC2p3H8d03XGvEN+E3xD+I00Ti9pN64fmuS0TRM7+smmWwDCVjFGi3qwj5K
-	IidVP9Lfhg6s7xDVARjogvuODGw0aPcRRCjao9T1YuSdWTubYM1YPeW60J/norjWOSUpf6
-	pCUs77wKKmLZifQxSfrEVl6lqP4wL4c=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-651-BKzlMzseMpGSdJV8yXT8Yw-1; Mon, 29 Jan 2024 07:52:34 -0500
-X-MC-Unique: BKzlMzseMpGSdJV8yXT8Yw-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40e74860cb0so23522545e9.3
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 04:52:34 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=kFscUW1ZX1ozxPpg1gIuEjPydikynIFmfZk61v0rLgs7yXaxa04gHPHq6jO2EmyXGmRsTuXm6RoMe/oXnONsTFQJDDJcxdnaKohQuhwHjzeN1vK7yJ9uKdLnq0yY0NOs5SJCADuIegnXrRM53+p1z1a3wcbGQ4fIsnOv6jlbNug=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U8q0z7j8; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-55a8fd60af0so2541491a12.1;
+        Mon, 29 Jan 2024 04:52:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706532764; x=1707137564; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=wh5PJX6dWm7kSDwjmqjlz8KtwMMRblZ6e8LLH/QNoIo=;
+        b=U8q0z7j8v0vckkUhC998/pQCZV0bzqSqvCjV5h0T9NMzYELaft5Gn7CSXVitvYKM4B
+         PhKZAfSjMYJOwT7qzy0buPNqP2DAbhzgqaO3j3QjpALHl0DxU6opQn5LL1ZLEAOhViK3
+         yEf3hBvyfzViR8qiqgSF5UqMHYhiMTH/trKPL9YBLIMtncBV5Tw8NO1DqTGOkAmilWnH
+         WnP4XUNArbm6L3cF7wq41A6Dews83WtMjqlCsH1ep5xKCbmDH86KqVJ+VEiii1fCvgb2
+         8OYZdkKK0zbU2O3fIzD4TGazXbINyUpUpCGFa8PuxPfPk+gXAni+byqRPKpNwSR+jdkH
+         GfEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706532753; x=1707137553;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HFGou14JoZNUFYFvgdT1vD08s06+DwHZnpkq7nELQBc=;
-        b=kJd4RdlcwfjETIdRQF7b3pd1XaHBx58PwT8Vu0EFTWa9VB1KSioP3xK0AjBFpI0/rK
-         SYXhIENkRsVCkaDYxCQ/rYhgEgyQE+OLVgEBoRb4boUoIa3+w5tlFPrfxJW9pbLxQ4t3
-         7bQCgFNDJYOmpp0JRua3OABkkT5cde2ckZBzLrN6Cv8cqFno07o4A99M/ITVJRc/g+gC
-         FAJt6utKWMNs4Ibovrs4S2LJ/dy5lapCwR7VKofpo+T24H400Xvd79rKcb2SKWE219cH
-         TB9osoeUlsH3+vfZJuM8X4g8mJXssBCWEWpSLCOEGS22Rtrk0hKQ/OZfGRbRLWBxQucK
-         XgaA==
-X-Gm-Message-State: AOJu0Yxw3akR2fGUuuiL25XWPnhSPtRfs6W0kqOlGUa7k9cqBAMMxIzv
-	sCza3U+l/7LTIXaemXwFJbRmvV+s67hh/E/UsXEPQy4BHeEREP9uiQAmfVv0xw6HNU2GiP1MfSa
-	Wry8FFfPr/nKLZPbN1TopUkQ2UzAqe/FmzWtALm1lduNC7aWdrfxa9g==
-X-Received: by 2002:a1c:7903:0:b0:40e:ce03:e61f with SMTP id l3-20020a1c7903000000b0040ece03e61fmr5019845wme.11.1706532753678;
-        Mon, 29 Jan 2024 04:52:33 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEQEfBWuBXgVTSkJU7aaKjF34oJdO8b+R18K0tXiJxOntO8oyDdgVOUZH7C9pfQwNKpimYr8Q==
-X-Received: by 2002:a1c:7903:0:b0:40e:ce03:e61f with SMTP id l3-20020a1c7903000000b0040ece03e61fmr5019830wme.11.1706532753378;
-        Mon, 29 Jan 2024 04:52:33 -0800 (PST)
-Received: from localhost (net-93-71-3-198.cust.vodafonedsl.it. [93.71.3.198])
-        by smtp.gmail.com with ESMTPSA id l5-20020a05600c4f0500b0040e5951f199sm10137605wmq.34.2024.01.29.04.52.31
+        d=1e100.net; s=20230601; t=1706532764; x=1707137564;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wh5PJX6dWm7kSDwjmqjlz8KtwMMRblZ6e8LLH/QNoIo=;
+        b=erMyaywMoHHCcTTxGdbC0qz48WQfRd/FOWDGaRdkd8zJgNV948CVenT9AQLXUfpojh
+         12pEV54aoZPQrGsN4qPeY/15wcdQkEKmB7UZOL+VsYepDiPB/1v+2STxEfcO7M5NbOHx
+         I/MmnJ+baS0TlTy8H+sc+drAf+YoJG2lqnV3saF3lLIOmIUNmW9Hp1ltMP9+roYmDJru
+         Zx4iU7kUmjAh8c11mM45KhfaV2Nx94STbtoiukkOcS1c00CyU43Mbs5e54V7n1F+G2qV
+         nKPGpx7FpfB7KtwPXIKxIh2iF9qGs7WS3ikHNVIvsnFM6swsATlPvmHffNVgjscTCIsd
+         iGSg==
+X-Gm-Message-State: AOJu0YxW+zk8YCaKtRsxirTAvL0x48ZvkV9bUGgLO4EOVxyEg8Xp+Fkg
+	7DiSrjF9xrcnEp6agepXHNVRYVSEyJH4kPDNzDXdSOgaCzQWxLMfJ4LqXKFg8dA=
+X-Google-Smtp-Source: AGHT+IGbC5F/QL2xZapUcYogbDNebCDs/L/gjri3hScnNm/4bpqmoUfd2F93xmirprhA8WNJe/FXiA==
+X-Received: by 2002:a17:906:a45:b0:a28:fec2:ca17 with SMTP id x5-20020a1709060a4500b00a28fec2ca17mr3525460ejf.0.1706532764054;
+        Mon, 29 Jan 2024 04:52:44 -0800 (PST)
+Received: from skbuf ([188.25.173.195])
+        by smtp.gmail.com with ESMTPSA id cu12-20020a170906ba8c00b00a27a32e6502sm3847552ejd.117.2024.01.29.04.52.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 04:52:31 -0800 (PST)
-Date: Mon, 29 Jan 2024 13:52:29 +0100
-From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-To: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, bpf@vger.kernel.org,
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	sdf@google.com, hawk@kernel.org, ilias.apalodimas@linaro.org
-Subject: Re: [PATCH v6 net-next 1/5] net: add generic per-cpu page_pool
- allocator
-Message-ID: <ZbefjZvKUMtaCbm1@lore-desk>
-References: <cover.1706451150.git.lorenzo@kernel.org>
- <5b0222d3df382c22fe0fa96154ae7b27189f7ecd.1706451150.git.lorenzo@kernel.org>
- <87jzns1f71.fsf@toke.dk>
+        Mon, 29 Jan 2024 04:52:43 -0800 (PST)
+Date: Mon, 29 Jan 2024 14:52:41 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: arinc.unal@arinc9.com
+Cc: Daniel Golle <daniel@makrotopia.org>,
+	Landen Chao <Landen.Chao@mediatek.com>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Russell King <linux@armlinux.org.uk>, mithat.guner@xeront.com,
+	erkin.bozoglu@xeront.com,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v3 6/7] net: dsa: mt7530: do not set
+ priv->p5_interface on mt7530_setup_port5()
+Message-ID: <20240129125241.gu4srgufad6hpwor@skbuf>
+References: <20240122-for-netnext-mt7530-improvements-1-v3-0-042401f2b279@arinc9.com>
+ <20240122-for-netnext-mt7530-improvements-1-v3-6-042401f2b279@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="5WpXeB60xZqPdpub"
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <87jzns1f71.fsf@toke.dk>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240122-for-netnext-mt7530-improvements-1-v3-6-042401f2b279@arinc9.com>
 
+On Mon, Jan 22, 2024 at 08:35:57AM +0300, Arınç ÜNAL via B4 Relay wrote:
+> From: Arınç ÜNAL <arinc.unal@arinc9.com>
+> 
+> Running mt7530_setup_port5() from mt7530_setup() used to handle all cases
+> of configuring port 5, including phylink.
+> 
+> Setting priv->p5_interface under mt7530_setup_port5() makes sure that
+> mt7530_setup_port5() from mt753x_phylink_mac_config() won't run.
+> 
+> The commit ("net: dsa: mt7530: improve code path for setting up port 5")
+> makes so that mt7530_setup_port5() from mt7530_setup() runs only on
+> non-phylink cases.
+> 
+> Get rid of unnecessarily setting priv->p5_interface under
+> mt7530_setup_port5() as port 5 phylink configuration will be done by
+> running mt7530_setup_port5() from mt753x_phylink_mac_config() now.
+> 
+> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> ---
 
---5WpXeB60xZqPdpub
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
-> Lorenzo Bianconi <lorenzo@kernel.org> writes:
->=20
-> > Introduce generic percpu page_pools allocator.
-> > Moreover add page_pool_create_percpu() and cpuid filed in page_pool str=
-uct
-> > in order to recycle the page in the page_pool "hot" cache if
-> > napi_pp_put_page() is running on the same cpu.
-> > This is a preliminary patch to add xdp multi-buff support for xdp runni=
-ng
-> > in generic mode.
-> >
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > ---
-> >  include/net/page_pool/types.h |  3 +++
-> >  net/core/dev.c                | 40 +++++++++++++++++++++++++++++++++++
-> >  net/core/page_pool.c          | 23 ++++++++++++++++----
-> >  net/core/skbuff.c             |  5 +++--
-> >  4 files changed, 65 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/include/net/page_pool/types.h b/include/net/page_pool/type=
-s.h
-> > index 76481c465375..3828396ae60c 100644
-> > --- a/include/net/page_pool/types.h
-> > +++ b/include/net/page_pool/types.h
-> > @@ -128,6 +128,7 @@ struct page_pool_stats {
-> >  struct page_pool {
-> >  	struct page_pool_params_fast p;
-> > =20
-> > +	int cpuid;
-> >  	bool has_init_callback;
-> > =20
-> >  	long frag_users;
-> > @@ -203,6 +204,8 @@ struct page *page_pool_alloc_pages(struct page_pool=
- *pool, gfp_t gfp);
-> >  struct page *page_pool_alloc_frag(struct page_pool *pool, unsigned int=
- *offset,
-> >  				  unsigned int size, gfp_t gfp);
-> >  struct page_pool *page_pool_create(const struct page_pool_params *para=
-ms);
-> > +struct page_pool *page_pool_create_percpu(const struct page_pool_param=
-s *params,
-> > +					  int cpuid);
-> > =20
-> >  struct xdp_mem_info;
-> > =20
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index cb2dab0feee0..bf9ec740b09a 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -153,6 +153,8 @@
-> >  #include <linux/prandom.h>
-> >  #include <linux/once_lite.h>
-> >  #include <net/netdev_rx_queue.h>
-> > +#include <net/page_pool/types.h>
-> > +#include <net/page_pool/helpers.h>
-> > =20
-> >  #include "dev.h"
-> >  #include "net-sysfs.h"
-> > @@ -442,6 +444,8 @@ static RAW_NOTIFIER_HEAD(netdev_chain);
-> >  DEFINE_PER_CPU_ALIGNED(struct softnet_data, softnet_data);
-> >  EXPORT_PER_CPU_SYMBOL(softnet_data);
-> > =20
-> > +DEFINE_PER_CPU_ALIGNED(struct page_pool *, page_pool);
->=20
-> I think we should come up with a better name than just "page_pool" for
-> this global var. In the code below it looks like it's a local variable
-> that's being referenced. Maybe "global_page_pool" or "system_page_pool"
-> or something along those lines?
+I hope this moves the patch set out of the 'deferred' state.
 
-ack, I will fix it. system_page_pool seems better, agree?
-
-Regards,
-Lorenzo
-
->=20
-> -Toke
->=20
-
---5WpXeB60xZqPdpub
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZbefjQAKCRA6cBh0uS2t
-rOS+AQD8Av/Pk3dzrbbWX6Azk82mOQCadq59+rhpP+c148nyyAEA7K4Q7Sk9a/0P
-uj8xfcE1334l4jwcAsUL2mPy18gatQI=
-=DD6I
------END PGP SIGNATURE-----
-
---5WpXeB60xZqPdpub--
-
+---
+pw-bot: under-review
 
