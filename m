@@ -1,125 +1,118 @@
-Return-Path: <netdev+bounces-66761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B91DF84091E
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 15:56:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0610184092F
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 15:59:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF4521C24C0D
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 14:56:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A2F51F27FDD
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 14:59:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F6A8152E0E;
-	Mon, 29 Jan 2024 14:56:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0ABE153BC8;
+	Mon, 29 Jan 2024 14:59:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zq+PBRE4"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="PwQOMa0V"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901DD60DEF;
-	Mon, 29 Jan 2024 14:56:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95CB71534FE
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 14:59:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706540199; cv=none; b=L2g/8QPcABCjk//00pO9wxXcN6vrFa5cltxqXvvGKJFaYQtEQJYVZIDMmrSzOmbjyybzMVi51tTjhsSFPz9HY5KMoryTCthonwxf0PuGtJfumFQSPSVKtlaLPsaLeuS8SIuBhAo3ruzenmTzISgNuORPCy1MLHwwueKLUTyWk+U=
+	t=1706540363; cv=none; b=sEEQ8INimEZ7yoX4UT3/mcGqUhX+qngS+kNjSZiAq1X6XBPm3iak+U7LWNru348FBb+62lizRqNLPc+VRunVONKbuMfwc2HadLBqEvZk0IX+ywEbZzzxsn5Hw1N6cMCwvyKL8m/um0lIkl4iq4LSS7ulTqf6kOU03UuXAO8BpAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706540199; c=relaxed/simple;
-	bh=kaaVpI7LDaG0uH0fkT3XOQiB7JqvFksV/AM/Syz+XVI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PNpb3tP6L6rW1yNItqpUSEuRaGPKVIqidiAkThISD9c5SsXTH0nNVKtaVpeGzM0mQ/WXo8ecxbIHH9+TbxvJeDC6ot3t9FJ12cbVZe0G3Va2qGY9gNhXtfyRd0h8ZPJRGLQYwcmkvCePnsTMgWU9i+wq1unVuphyK6zBwlWThmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zq+PBRE4; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5110ef21c76so1785137e87.1;
-        Mon, 29 Jan 2024 06:56:37 -0800 (PST)
+	s=arc-20240116; t=1706540363; c=relaxed/simple;
+	bh=8fyWiu78TUx1qjw/rHKWezThYy2WmsDxNXXasG4Etpk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HfBSCCVo3WDsFP7u+9eG2O8vs3lPJEIrk+rcoP08rtVXAZ7z01QbzwDf1CQjtIpVyMV+lRzftU28Df9d+lwv+Cpip/tSXxsyInepAZ93IXbCJaJAHILHUmySWojfOY3TOkQ+t8c4lhXUjV7o3jhM+GIgLwrnH/IMv/rqRq53A9g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=PwQOMa0V; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-55a179f5fa1so3155167a12.0
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 06:59:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706540195; x=1707144995; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=NAJkJkcPwG8nuRAAgJpfIK0vVFsBkG5KrzaQLnD/SnY=;
-        b=Zq+PBRE41tf1vYgoM3IBdJUziIGE9wdjEGuZZMQLbYaV/xPWzPNgcfY7fWTBQRk4zk
-         MS7MQUzWavx30ygoTbcomXjdTdkdnDK0lbOMFNSOC+Jge3QKu3NtgMGhkZakX/D3+0Mg
-         GS6yd9mAQ0ryDzXSA5f8JbJbDWBCWBeSTzcTnZkThmuErWDhEp06azJ50Xh2e0uVWa8G
-         k0VcgBYs+R4o5MfEDjBfPm1c0m5HCDEYQzQXvPMlwNSCuU1EVmyU9XjI73bP9Rv6boeO
-         fQ+22zSwF4MByA6ZDbH7eC2YLxawNGCHgJgsDUFTG0XXta5WDZ4W8iWDWdoKo9R7phF2
-         ImPA==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706540359; x=1707145159; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gtLmwrFuP5GfbtBwMBRzTK5bww1wqvpYAP+tbeJpdVo=;
+        b=PwQOMa0VotE1EiqeImKXDrmAkk8zvKSB0ZQRZpqBqIU6GLAq09Ak8mKPY9c01UeoW1
+         G3FqKrvcIhv53+CtQcee2lTuX6ikgaqOUPKqx3Y+zWU+cGUKDFU7Ueo/kBLYhH2TOj3E
+         6cb7NYOw/7c5JSmRjUo79GJx0VQFOTS4cShhijIN/tj5Y8ML2sQLTl5QFFbQzZ4liUTI
+         HYSVK0JhhcVfJ8Tf6o+QfLrCmGbABevkPpvk2xGw4VzvpAxAORBI9d990BIm84n60yZW
+         JOjJtSPjFcOxNFujJw39JQW3jR0cTKrU3GLrrJor0zdDt515nRO2ye+ruXMHv0A6Z1vA
+         i4BA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706540195; x=1707144995;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NAJkJkcPwG8nuRAAgJpfIK0vVFsBkG5KrzaQLnD/SnY=;
-        b=Ty//+Slnr8Y4Em1L6KeGxzjiUPJI5It5FNavBFmWQBt3sWbNlU7BgKnn1U7XMhlSF/
-         SeqLWMH5FszW7Jbs3zA27jx5oHJtfLkUVir6TZTAf5odm3Phu/SxI8n4ot+EVfCkOE9d
-         Y7Gimi5lcDxX9OKb18A+jYMUPKwBsLMticKQBa6aAxAEykZ3/saTA1NmJo3EWTSf573Z
-         a2s79jSbJhGzfD4rXuZT5154THlu3YSjQXzdzgDFUvn+H7v+r2PHQkq87sQ5wEM8fSql
-         bcIHMCAhqQAIBuCDjThtKmQjWOvz/REft8YaQm6lAXNt5jm8vP5YdzX1zuDr+P8PBMOz
-         iQyw==
-X-Gm-Message-State: AOJu0YyTOyO5y/j01hIYmvS0fJUJX4Q+0xOoN8kyxuVGVzenSmkxsRNn
-	RcJkWrP3uahb1Kj7dUfY1EfWhmL8ZvhQRj8LfOwCWlqQRHBG/KSm
-X-Google-Smtp-Source: AGHT+IGacQrN++ehCAVKGus4IrAPseuvrd7OjNWz6Lp7W5tyukehnQ014tLZGJdF3E7iJXqrnB5sAg==
-X-Received: by 2002:a19:7506:0:b0:510:6e7:6999 with SMTP id y6-20020a197506000000b0051006e76999mr3854595lfe.45.1706540195125;
-        Mon, 29 Jan 2024 06:56:35 -0800 (PST)
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id h14-20020a17090634ce00b00a35a11fd795sm1561216ejb.129.2024.01.29.06.56.34
+        d=1e100.net; s=20230601; t=1706540359; x=1707145159;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gtLmwrFuP5GfbtBwMBRzTK5bww1wqvpYAP+tbeJpdVo=;
+        b=XsfoDYT9qO1L9d9xhuvmU2RVhvgcKhlPRk2WYBBQzLXxX1Fb7TKH2URFfYBN+8hb+p
+         +1frIConqsZ+Ke6eKWVthNgSNhCQV1RnAXDTZtut5l9amGQKKEUauziPTD8ofjcDLgoz
+         70/rgXWNUz+3Xg3vPuSbURWoaLgEEJi94t4WlnFEoCAZh0tlhlXGS+37sGvM8uZAKKOK
+         Tiy8ocET+Zd9m75LyFc7v1D4kfzhIweph2djUhohJ7IVmyM5o7sGlvzMHPFC/BTCzyrd
+         Z5r/D/QtXDOUXaAHefjVSS7Oile9pjNRnyRyf06AsWLMGD2/wH9v+Ea5uuVG3w4z+O2g
+         aOvg==
+X-Gm-Message-State: AOJu0YwWhtiEr5aaV3jv+rD8mPBhpkDpUd9GKm8mnwh89vU80ml0P5Lq
+	Lj9HW+v8bMhhPVCAqI9hDVx09Fi7NO0+YK2hEjkzKVsY8r1Xc713onpO4JIcrA7qUMfBAMJFtmR
+	0RDT17g==
+X-Google-Smtp-Source: AGHT+IHSibIdcm8lrff2QysP5Bm9dN4brJRvGC1GdrSyBD0qcYp4b2nn1TGKAU1AlCeW7hZ1nE0hhQ==
+X-Received: by 2002:a17:906:d14f:b0:a32:31f0:f0e9 with SMTP id br15-20020a170906d14f00b00a3231f0f0e9mr4543622ejb.25.1706540359495;
+        Mon, 29 Jan 2024 06:59:19 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id vg10-20020a170907d30a00b00a3522154450sm3329797ejc.12.2024.01.29.06.59.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 06:56:34 -0800 (PST)
-Date: Mon, 29 Jan 2024 16:56:32 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: dsa: remove OF-based MDIO bus registration
- from DSA core
-Message-ID: <20240129145632.d2mu6vbwcqhjpyty@skbuf>
-References: <20240122053348.6589-1-arinc.unal@arinc9.com>
- <20240123154431.gwhufnatxjppnm64@skbuf>
- <d32d17ed-87b5-4032-b310-f387cea72837@arinc9.com>
- <CAJq09z6pidHvtv=3F_yKHDdY89kzYSF+xh89pzg1raAiQPMyMg@mail.gmail.com>
+        Mon, 29 Jan 2024 06:59:18 -0800 (PST)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	vadim.fedorenko@linux.dev,
+	arkadiusz.kubalewski@intel.com,
+	saeedm@nvidia.com,
+	leon@kernel.org,
+	jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	rrameshbabu@nvidia.com
+Subject: [patch net-next 0/3] dpll: expose lock status error value to user
+Date: Mon, 29 Jan 2024 15:59:13 +0100
+Message-ID: <20240129145916.244193-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJq09z6pidHvtv=3F_yKHDdY89kzYSF+xh89pzg1raAiQPMyMg@mail.gmail.com>
 
-On Sat, Jan 27, 2024 at 11:23:33PM -0300, Luiz Angelo Daros de Luca wrote:
-> > > IIUC, Luiz made the original patch for the realtek switches. Shouldn't
-> > > we wait until realtek registers ds->user_mii_bus on its own, before
-> > > reverting? Otherwise, you're basically saying that Luiz made the DSA
-> > > core patch without needing it.
-> >
-> > My findings point to that. Luiz made the patch to optionally register the
-> > MDIO bus of the MDIO controlled Realtek switches OF-based. So it's not
-> > necessary to wait.
-> 
-> Back in the time when I wrote that code, with the phy_read/write in
-> dsa_switch_ops, the OF node was only required to associate IRQ to each
-> port. Until my patch to register its own mdiobus driver lands (I hope
-> that happens before the next version), the port status will fall back
-> to polling. I don't think it is a critical feature but I'll let the
-> maintainers decide. ACK for me.
-> 
-> Regards,
-> 
-> Luiz
+From: Jiri Pirko <jiri@nvidia.com>
 
-It isn't really great that this loses IRQ support for Realtek internal PHYs,
-especially since Arınç's commit message did not estimate this would happen.
+Allow to expose lock status errort value over new DPLL generic netlink
+attribute. Extend the lock_status_get() op by new argument to get the
+value from the driver. Implement this new argument fill-up
+in mlx5 driver.
 
-I don't see why this patch could not wait until you resubmit the realtek
-consolidation set and it gets accepted.
+Jiri Pirko (3):
+  dpll: extend uapi by lock status error attribute
+  dpll: extend lock_status_get() op by status error and expose to user
+  net/mlx5: DPLL, Implement lock status error value
+
+ Documentation/netlink/specs/dpll.yaml         | 39 +++++++++++++++++++
+ drivers/dpll/dpll_netlink.c                   |  9 ++++-
+ drivers/net/ethernet/intel/ice/ice_dpll.c     |  1 +
+ .../net/ethernet/mellanox/mlx5/core/dpll.c    | 32 +++++++++++++--
+ drivers/ptp/ptp_ocp.c                         |  9 +++--
+ include/linux/dpll.h                          |  1 +
+ include/linux/mlx5/mlx5_ifc.h                 |  8 ++++
+ include/uapi/linux/dpll.h                     | 30 ++++++++++++++
+ 8 files changed, 120 insertions(+), 9 deletions(-)
+
+-- 
+2.43.0
+
 
