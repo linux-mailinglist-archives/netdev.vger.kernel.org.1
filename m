@@ -1,61 +1,65 @@
-Return-Path: <netdev+bounces-66849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 258B88412FF
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 20:05:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8B02841302
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 20:05:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B83481F22E84
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 19:05:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A45C028458A
+	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 19:05:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C805114290;
-	Mon, 29 Jan 2024 19:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579BA1EB42;
+	Mon, 29 Jan 2024 19:05:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="U32fXG6I"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="N7b5Q+H2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B3FC12E74
-	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 19:04:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53FF1E53A
+	for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 19:05:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706555095; cv=none; b=O3J+J1EC4rhk0+y/R3R3ix8IbnDGn876onOvDcF05rC9GfwCPE55fMSkmuosLkU0qxutBme5tuJZ029glq3/R9iA8d5Rwjp07MPcytec1mO6wv7ZVRauvODc8RJQM+IMPdGQsqgH2h1kYk5nbjXk3GwM2Tn5uoFKA+Ij7uSqqg0=
+	t=1706555118; cv=none; b=KO+e+E/XQPgKh/uJW+HqwhtSCtCIk+nEZci6cH/+lvE/zjtIQ/Bsp37BkOcrVpj6/XkBF+O3CwuKuFmbAnkKe+8R+IjtAfZ8sYDMMWT8XDN+fmB3MIy9OEQwbgWtd85gVJalF6UfittxORea1ckH7iG2jHRIglwwGvNLanhh+i0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706555095; c=relaxed/simple;
-	bh=4uwPElnOZe5qmuxnqusPQKxxmjLjKvRBSmRjMS1sFt0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ad76KFzl1jbhp8Cp4RCi3v8MfaMQIN0pGU+/f5DsIa4jMjn9OxHLbmgk3CyswzmFBRVyLISuw9Xmk7K0lbpmWr3wYf2csDcm0ovEEpqX8rX2B+iqbm4mgRMjxavSR0re4pgBuDP3aBv/3/i4FDw5DsBCOQYUGiUvcoT0Mah/ObY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=U32fXG6I; arc=none smtp.client-ip=52.119.213.156
+	s=arc-20240116; t=1706555118; c=relaxed/simple;
+	bh=l2K/XP1LdQqZt63RxEKBPTgMvCldISf07kgjjcLcc5o=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FKHyWlf1r8DfFKjXt5W7aQktUdnt41aIIPb8gkuezu2zLcXQOd088aRymOkOD+rnrbYjYYtt272oaRwaBVwrK24e2rg4PRpDESdUhRk6Un1E7OPEugKwWA93zFB4BnyEYehSHjIMWZgYMpzZd8ipDQfIGaF/ddG9Htn8qcirH7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=N7b5Q+H2; arc=none smtp.client-ip=99.78.197.220
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1706555094; x=1738091094;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=fP/BOUuR6hVMyYO10iBzlnpfyM2HMCeYrcoQLi4WZJU=;
-  b=U32fXG6Id2GM66oDP0oyigvLI22dqJXbSCg5H86SXbrW9A3rNtddC8BU
-   IbI6OLqH8euzOYlj7pumFiCHBgspBNYerlAKKPu9RehcnigskhZpCro4d
-   CkoEEnJQo4fLF33LBsCrGBsKHWvbXlbs0YB4ekNVsRSOWOJsNJ44tkvXK
-   4=;
+  t=1706555116; x=1738091116;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=LaS4EizUAbZv3kpVKKVchDO2MZDVueYrOyrJy0GBc4E=;
+  b=N7b5Q+H2fhWHH2Zoyx0TEdWakpzydb3xG1tBRtMm6eT5JcWixlQoXVSB
+   FsT8FC8oyt99ruc5GvErKeR3mOlWWxQYh5RA8nf8C272P0Sz4xsw3SS8J
+   BAQ+LxvGjk3CIowI0NIbeR73UfcZw2lZyFNA5WbQ5NthHtTeBpKzssh96
+   o=;
 X-IronPort-AV: E=Sophos;i="6.05,227,1701129600"; 
-   d="scan'208";a="630650243"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2024 19:04:51 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:1870]
+   d="scan'208";a="62008087"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2024 19:05:14 +0000
+Received: from smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
+	by email-inbound-relay-pdx-2c-m6i4x-f7c754c9.us-west-2.amazon.com (Postfix) with ESMTPS id 3705940BD2;
+	Mon, 29 Jan 2024 19:05:14 +0000 (UTC)
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:30725]
  by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.48.50:2525] with esmtp (Farcaster)
- id baa4a042-80fd-4d8e-b653-307c61c12c57; Mon, 29 Jan 2024 19:04:49 +0000 (UTC)
-X-Farcaster-Flow-ID: baa4a042-80fd-4d8e-b653-307c61c12c57
+ id 74b4dae0-e082-46b9-a60f-d765d59c5f5f; Mon, 29 Jan 2024 19:05:13 +0000 (UTC)
+X-Farcaster-Flow-ID: 74b4dae0-e082-46b9-a60f-d765d59c5f5f
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Mon, 29 Jan 2024 19:04:48 +0000
+ 15.2.1118.40; Mon, 29 Jan 2024 19:05:13 +0000
 Received: from 88665a182662.ant.amazon.com (10.106.101.20) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
- Mon, 29 Jan 2024 19:04:45 +0000
+ Mon, 29 Jan 2024 19:05:10 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -63,10 +67,12 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>,
 	Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 0/3] af_unix: Remove io_uring dead code in GC.
-Date: Mon, 29 Jan 2024 11:04:32 -0800
-Message-ID: <20240129190435.57228-1-kuniyu@amazon.com>
+Subject: [PATCH v1 net-next 1/3] af_unix: Replace BUG_ON() with WARN_ON_ONCE().
+Date: Mon, 29 Jan 2024 11:04:33 -0800
+Message-ID: <20240129190435.57228-2-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240129190435.57228-1-kuniyu@amazon.com>
+References: <20240129190435.57228-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,33 +81,80 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D045UWA001.ant.amazon.com (10.13.139.83) To
+X-ClientProxiedBy: EX19D035UWA001.ant.amazon.com (10.13.139.101) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
 
-I will post another series that rewrites the garbage collector for
-AF_UNIX socket.
+This is a prep patch for the last patch in this series so that
+checkpatch will not warn about BUG_ON().
 
-This is a prep series to clean up changes to GC made by io_uring but
-now not necessary.
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ net/unix/garbage.c | 8 ++++----
+ net/unix/scm.c     | 8 ++++----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-
-Kuniyuki Iwashima (3):
-  af_unix: Replace BUG_ON() with WARN_ON_ONCE().
-  af_unix: Remove io_uring code for GC.
-  af_unix: Remove CONFIG_UNIX_SCM.
-
- include/net/af_unix.h |   8 +--
- net/Makefile          |   2 +-
- net/unix/Kconfig      |   5 --
- net/unix/Makefile     |   2 -
- net/unix/af_unix.c    |  63 ++++++++++++++++-
- net/unix/garbage.c    | 106 ++++++++++++++++++++--------
- net/unix/scm.c        | 156 ------------------------------------------
- net/unix/scm.h        |  10 ---
- 8 files changed, 143 insertions(+), 209 deletions(-)
- delete mode 100644 net/unix/scm.c
- delete mode 100644 net/unix/scm.h
-
+diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+index 4046c606f0e6..af676bb8fb67 100644
+--- a/net/unix/garbage.c
++++ b/net/unix/garbage.c
+@@ -145,7 +145,7 @@ static void scan_children(struct sock *x, void (*func)(struct unix_sock *),
+ 			/* An embryo cannot be in-flight, so it's safe
+ 			 * to use the list link.
+ 			 */
+-			BUG_ON(!list_empty(&u->link));
++			WARN_ON_ONCE(!list_empty(&u->link));
+ 			list_add_tail(&u->link, &embryos);
+ 		}
+ 		spin_unlock(&x->sk_receive_queue.lock);
+@@ -213,8 +213,8 @@ static void __unix_gc(struct work_struct *work)
+ 
+ 		total_refs = file_count(u->sk.sk_socket->file);
+ 
+-		BUG_ON(!u->inflight);
+-		BUG_ON(total_refs < u->inflight);
++		WARN_ON_ONCE(!u->inflight);
++		WARN_ON_ONCE(total_refs < u->inflight);
+ 		if (total_refs == u->inflight) {
+ 			list_move_tail(&u->link, &gc_candidates);
+ 			__set_bit(UNIX_GC_CANDIDATE, &u->gc_flags);
+@@ -294,7 +294,7 @@ static void __unix_gc(struct work_struct *work)
+ 		list_move_tail(&u->link, &gc_inflight_list);
+ 
+ 	/* All candidates should have been detached by now. */
+-	BUG_ON(!list_empty(&gc_candidates));
++	WARN_ON_ONCE(!list_empty(&gc_candidates));
+ 
+ 	/* Paired with READ_ONCE() in wait_for_unix_gc(). */
+ 	WRITE_ONCE(gc_in_progress, false);
+diff --git a/net/unix/scm.c b/net/unix/scm.c
+index b5ae5ab16777..505e56cf02a2 100644
+--- a/net/unix/scm.c
++++ b/net/unix/scm.c
+@@ -51,10 +51,10 @@ void unix_inflight(struct user_struct *user, struct file *fp)
+ 
+ 	if (u) {
+ 		if (!u->inflight) {
+-			BUG_ON(!list_empty(&u->link));
++			WARN_ON_ONCE(!list_empty(&u->link));
+ 			list_add_tail(&u->link, &gc_inflight_list);
+ 		} else {
+-			BUG_ON(list_empty(&u->link));
++			WARN_ON_ONCE(list_empty(&u->link));
+ 		}
+ 		u->inflight++;
+ 		/* Paired with READ_ONCE() in wait_for_unix_gc() */
+@@ -71,8 +71,8 @@ void unix_notinflight(struct user_struct *user, struct file *fp)
+ 	spin_lock(&unix_gc_lock);
+ 
+ 	if (u) {
+-		BUG_ON(!u->inflight);
+-		BUG_ON(list_empty(&u->link));
++		WARN_ON_ONCE(!u->inflight);
++		WARN_ON_ONCE(list_empty(&u->link));
+ 
+ 		u->inflight--;
+ 		if (!u->inflight)
 -- 
 2.30.2
 
