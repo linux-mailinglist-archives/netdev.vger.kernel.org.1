@@ -1,69 +1,71 @@
-Return-Path: <netdev+bounces-66983-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66984-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE48C841AB3
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 04:52:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC84C841AB5
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 04:52:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D4E81F26287
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:52:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DDA61F263B4
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:52:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53638376F1;
-	Tue, 30 Jan 2024 03:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2B353770F;
+	Tue, 30 Jan 2024 03:52:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="WMwvuKG7"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="DKBNEd5N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C35374FB
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 03:52:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBB1C36AE5
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 03:52:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706586723; cv=none; b=Y/KNVfGJIAS/kUpogH1DZ7KJftCisoQcFuqv4vP27ysAYd3NSZrlZXitgplOr9iI6lnxoyim88s/IwRA7v7p3r+iE/0f/+XYloBdXaePuy7CSKOIURIBfNPIEX32hbY5qUkTMhKSHdYzIMaxWxm1nDvPtV8JucTArJFGorRA3c8=
+	t=1706586724; cv=none; b=UfOsyYdXim24mjiw4p1gX/qZGhMAdDGkq6wBFz54KcdwLodkAc/pf7YqEfs5AA5pUzZapS6c3FEMKPrp/t338eKl/a5RfBPmLa64iIsBD6z0kKN5qabzlz9bcxv0v2Dc+1URCpc3vbXcIz87eJS+x2qnRVygogCci2MFJ9VgYDc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706586723; c=relaxed/simple;
-	bh=mrSUsYr40vZLSd08HCa9ghUj2kZmeOFNxhdsAlHKBFc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RK04/f3pc/+tRN16yoxohk7EVlHPBhXwWy3fgQ+ZDvZTV/r5ViSN+aPsMHnVU31NKnRyD2oWvmWBID0rLKilcY+7cbSChk+wO1J4XO3i7iwMLxTFW4xQkwIgF/9hNedDFub5ykSR6axN66bjUXYkAXyYHLThnfIzPQyCPOk8/Tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=WMwvuKG7; arc=none smtp.client-ip=209.85.221.43
+	s=arc-20240116; t=1706586724; c=relaxed/simple;
+	bh=g3LZEPq6heJ2PjzSdX/5RGenjQC82aVAzQinn15OdBU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JEBdQ7RP/cnecnx/JvRkjNI2e9vu1xk2GtZ3HzH4peVlkvvNS9Ty5+o/SHpLC122jcZ4J+BbRU6OCyYju0hLXXypLSDNHiGHma8aaANTHxB/inItrJimJP1jVkQfVSy6zQttBvN0bV6Rtpd5JOjwaYiWDQmZ4DyVpxCRR900B9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=DKBNEd5N; arc=none smtp.client-ip=209.85.128.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-33929364bdaso2440263f8f.2
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 19:52:01 -0800 (PST)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-40e76626170so39961165e9.2
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 19:52:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1706586719; x=1707191519; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3IAAtpYMk4Ivb7jeyKnDj3sOOnhVdi6sq/asAwlVHv0=;
-        b=WMwvuKG7/TZq0DtcrOUKeNIi/YzL8SAR6/eYBRfInMYk35qTUihSVGabsN2y8Yqw82
-         NdteorllG884xr66l8dkAf7qE/tu/rsBga+UiSlwDNGYQeTXJaPzPaicO1AbdCFu3j/A
-         G5MnoTCR+AlsHVal7nK4jOa46AqfEJNvOc0Zzn1BRPzU96Pxk0DXH+aq7ynH1wbtHqCX
-         VUuRuNyZsp0a23q4hZ9h5NriLK/OTFPo/f936MvWbxZojeTX47Rq3Z3rRDWnEnbdMna3
-         Dvtx+NKuJAed/WsZunwNuZImE6YV9WwU++lhlM+Hn4JOuOqtGfbTThuQr839DC/wHQfi
-         Ohuw==
+        d=arista.com; s=google; t=1706586721; x=1707191521; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IBB0GD/+gXda5aeiB3X+LkFjStia1JqAQuf0Qc5+FME=;
+        b=DKBNEd5NyO1LzWKUkgp61coQZ+2+d7CTpQzs5a/uQEuxa21S3RdpMKuffZ1yCeHRWS
+         htCLIEgjwpvKgOrsggpt6cW+ia5bREhdbEdA66U3QIG+P4JB8tWSDv5MZLbs7LWCtaSj
+         IBIJ6fQ7liOBIdr0F3pGQUSv3LpbLECJsNiRTLlvXLf0kCw5ijDJQOJvE7FZEAbly7Gu
+         NEf05K/gCCqpC9lna5sePVq1HpRW1lMfXnH7aYMTm6nflmQvef95oVDuLm4TbX4H8dK3
+         rIAO6nk5maVdWmceQ0IOIP02xTtdtYt8CD157KY4O3nDOFx/jX9VThQW62aHHtaQhf+Q
+         xwfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706586719; x=1707191519;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3IAAtpYMk4Ivb7jeyKnDj3sOOnhVdi6sq/asAwlVHv0=;
-        b=ElmDLF2wfaqgsM8LkQu0Bn5wJBinat1QVODfNZvmPTKxiM9e6TePvKGEr2tG33XUwu
-         d2LysTzx7UP9qOiu6jndSwE6zJfCNBIc6L300fo6H1gusdd8YNBv9/QvimCDaMpCB/1d
-         YbO5IyUhyN7Kq7bCJbIdNSoPZSbkUTMKrTT0Wn/BevaszCRnIiRbvm2OJN8HiZqMGTzy
-         QieynEBxncgHOwhVUHSV47IOz8haucr3kaDt5ldQ0EXWpEOvrSwofcXgfANtVyumpnGU
-         msxW/9/RmNhD65GnXUEIHSc4bCLjSRsS0tU88pdBHjMk1DjLYwrSYKSDI6MGfEu3Dw+2
-         qMeg==
-X-Gm-Message-State: AOJu0YxLAq5WN4eRL1qAPOAhlKxz1dbVOi6m55rfQpghOtake7Wv0VRc
-	ekQjQj2xAY/PsxOPrI0RzHQ+X/BtnLN5sc3mA01IUhpcch9v/nV9pQ641JrFZg==
-X-Google-Smtp-Source: AGHT+IFgxB0xmRcPBgUyJL72I2YQDnGZRrMzC2LF6+dllvtCE0U8JpF0s4du7/8eXY30bDYq8rdv/A==
-X-Received: by 2002:a05:6000:2c8:b0:33a:f521:7062 with SMTP id o8-20020a05600002c800b0033af5217062mr1762641wry.3.1706586719581;
-        Mon, 29 Jan 2024 19:51:59 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706586721; x=1707191521;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IBB0GD/+gXda5aeiB3X+LkFjStia1JqAQuf0Qc5+FME=;
+        b=C75R3ElR+IoxCqVoiJKqMlTU3nsgFWDF5hizcuPz+dh21Yki3zL5qjEuoLy7MRumt9
+         NqANWUt7FJnOeTAGtGzCj0BKhV6ToO6Jwp8wZmibMhv4vl+t3P2dHN/VLoSQtXqvrgn0
+         19UW0DKEkjVkizuLcjWGYZE6wiHo7FLeu+k4+ndXAQvwHrFzElzCZBuaipaWMhVytIfI
+         T3GXCq+sDMsvmsBFIW+l+iMR6BuhazFMR7YrWjZxHx/Mxu9E6zo6oSvKl8UXhoG6P33f
+         f8KOZO4slHA1eFdn5k9ydczbQLVeRGst6msmVTJCLVfOunpm/F8Mq6aUAUF0h8IfkNOC
+         8Ohg==
+X-Gm-Message-State: AOJu0YymhE4PKJN3zsygp70XD5wRb5PXAf83qTUxWyiv/48YqN2T4cMi
+	xjqeha+wPWacKO3IYwU3TVDsTuRdjDkTKQKhpL7aHqQASgCqKPQYySOYIzgf2g==
+X-Google-Smtp-Source: AGHT+IFltZVkqklBjWCImfIKZmnuL//3dK2NohBsMAZhtTrRR64UxLbjxRfLFy3PgEbCWICzKFexwQ==
+X-Received: by 2002:a5d:64e3:0:b0:33a:e9cc:69b0 with SMTP id g3-20020a5d64e3000000b0033ae9cc69b0mr4114355wri.11.1706586721013;
+        Mon, 29 Jan 2024 19:52:01 -0800 (PST)
 Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id ay13-20020a5d6f0d000000b00337d6aa3912sm9513207wrb.10.2024.01.29.19.51.58
+        by smtp.gmail.com with ESMTPSA id ay13-20020a5d6f0d000000b00337d6aa3912sm9513207wrb.10.2024.01.29.19.51.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 19:51:58 -0800 (PST)
+        Mon, 29 Jan 2024 19:52:00 -0800 (PST)
 From: Dmitry Safonov <dima@arista.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -77,10 +79,12 @@ Cc: Dmitry Safonov <dima@arista.com>,
 	netdev@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 0/3] selftests/net: A couple of typos fixes in key-management/rst tests
-Date: Tue, 30 Jan 2024 03:51:51 +0000
-Message-ID: <20240130-tcp-ao-test-key-mgmt-v2-0-d190430a6c60@arista.com>
+Subject: [PATCH v2 1/3] selftests/net: Argument value mismatch when calling verify_counters()
+Date: Tue, 30 Jan 2024 03:51:52 +0000
+Message-ID: <20240130-tcp-ao-test-key-mgmt-v2-1-d190430a6c60@arista.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240130-tcp-ao-test-key-mgmt-v2-0-d190430a6c60@arista.com>
+References: <20240130-tcp-ao-test-key-mgmt-v2-0-d190430a6c60@arista.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,38 +93,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 X-Mailer: b4 0.13-dev-b6b4b
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1706586711; l=1089; i=dima@arista.com; s=20231212; h=from:subject:message-id; bh=mrSUsYr40vZLSd08HCa9ghUj2kZmeOFNxhdsAlHKBFc=; b=neGs9rbOA+EqGzLfMqyu3VFWcABDrXh0tWgdIRGzuXY3D1GWlihFguJm9kCKBjjMSM9vWnxAZ xt7XFjrr9fKA0St+JyMBuYUlSkQFRgyc0lvx0z3G+8M10EKps+dqft3
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1706586711; l=1578; i=dima@arista.com; s=20231212; h=from:subject:message-id; bh=oDDbsLWpXr1cc2nzkZ+D8Lfqh5gwTIMhKVDrcVIHxuQ=; b=wOh80+80UVdeb8USEOeN8k210twHOJCkW6S4WeORL7Duxc0gwL3jIHLaEP1GvAkoXjSqJR4Na lIWOvijjVxnDjPY1gZnOmWexs8GlGDerBeQ8uimxPHJH2DCcgQRSp8y
 X-Developer-Key: i=dima@arista.com; a=ed25519; pk=hXINUhX25b0D/zWBKvd6zkvH7W2rcwh/CH6cjEa3OTk=
 Content-Transfer-Encoding: 8bit
 
-Changes in v2:
-- Dropped "selftests/net: Clean-up double assignment", going to send it
-  to net-next with other changes (Simon)
-- Added a patch to rectify RST selftests.
-- Link to v1: https://lore.kernel.org/r/20240118-tcp-ao-test-key-mgmt-v1-0-3583ca147113@arista.com
+From: Mohammad Nassiri <mnassiri@ciena.com>
 
-Two typo fixes, noticed by Mohammad's review.
-And a fix for an issue that got uncovered.
+The end_server() function only operates in the server thread
+and always takes an accept socket instead of a listen socket as
+its input argument. To align with this, invert the boolean values
+used when calling verify_counters() within the end_server() function.
 
+As a result of this typo, the test didn't correctly check for
+the non-symmetrical scenario, where i.e. peer-A uses a key <100:200>
+to send data, but peer-B uses another key <105:205> to send its data.
+So, in simple words, different keys for TX and RX.
+
+Fixes: 3c3ead555648 ("selftests/net: Add TCP-AO key-management test")
+Signed-off-by: Mohammad Nassiri <mnassiri@ciena.com>
+Link: https://lore.kernel.org/all/934627c5-eebb-4626-be23-cfb134c01d1a@arista.com/
+[amended 'Fixes' tag, added the issue description and carried-over to lkml]
 Signed-off-by: Dmitry Safonov <dima@arista.com>
 ---
-Dmitry Safonov (2):
-      selftests/net: Rectify key counters checks
-      selftests/net: Repair RST passive reset selftest
+ tools/testing/selftests/net/tcp_ao/key-management.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Mohammad Nassiri (1):
-      selftests/net: Argument value mismatch when calling verify_counters()
+diff --git a/tools/testing/selftests/net/tcp_ao/key-management.c b/tools/testing/selftests/net/tcp_ao/key-management.c
+index c48b4970ca17..f6a9395e3cd7 100644
+--- a/tools/testing/selftests/net/tcp_ao/key-management.c
++++ b/tools/testing/selftests/net/tcp_ao/key-management.c
+@@ -843,7 +843,7 @@ static void end_server(const char *tst_name, int sk,
+ 	synchronize_threads(); /* 4: verified => closed */
+ 	close(sk);
+ 
+-	verify_counters(tst_name, true, false, begin, &end);
++	verify_counters(tst_name, false, true, begin, &end);
+ 	synchronize_threads(); /* 5: counters */
+ }
+ 
 
- .../testing/selftests/net/tcp_ao/key-management.c  |  46 ++++---
- tools/testing/selftests/net/tcp_ao/lib/sock.c      |  12 +-
- tools/testing/selftests/net/tcp_ao/rst.c           | 138 ++++++++++++++-------
- 3 files changed, 124 insertions(+), 72 deletions(-)
----
-base-commit: ecb1b8288dc7ccbdcb3b9df005fa1c0e0c0388a7
-change-id: 20240118-tcp-ao-test-key-mgmt-bb51a5fe15a2
-
-Best regards,
 -- 
-Dmitry Safonov <dima@arista.com>
+2.43.0
 
 
