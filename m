@@ -1,131 +1,155 @@
-Return-Path: <netdev+bounces-67314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67D6D842BD5
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 19:33:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 326C8842BFD
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 19:41:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B1E81C23B3F
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 18:33:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B11C9282D0F
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 18:41:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 027B5762CD;
-	Tue, 30 Jan 2024 18:33:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C6178B7A;
+	Tue, 30 Jan 2024 18:41:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z4kgCRVw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iL3dZpdY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A3E762C8
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 18:33:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 985BC6997A
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 18:41:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706639634; cv=none; b=u9VW8HUZsqO3FyeDrkntxHzmwNrO8voxFaODqvY76zDirhex3OHqicONckJyISFQq2Y0Ygy1o03U+hWJKN6dfyCJ/y16qcdyxEO+qVNtmzin4QjA30Ar7TElOb6yau/eOhdVPY0uhOcJCgTXN6nw8jtw50jWXBaiMv6eSiTog6M=
+	t=1706640082; cv=none; b=PpWCs8NmktvXWPxChGWIWAoMAnXsXHXUzuObCNZONK5IPLZyIwJUTaNy91Izbr6njNRc/9TKsGok7B3x0U1ZzQShmoyJCdtHcWQO7bYk8HRKfdNpI8OovJFhwy2TT5PXN4WY1jtoIQUkJu55h5+4LeXpme0f63MrUFzGLGeRCyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706639634; c=relaxed/simple;
-	bh=k47AUJB6ROgRfOT0WDPnEsj9abjtahVi1B2DJyIixs0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UEPqubo5dZ+m6Nzc+8F3iWkUtz9ba65YtaV7JVXOlUtETZPYZ9F4Uil+/tIFZnCniuNcU6rxCEVdkYusMtE6g4PsonR3OS0t+SIGaLS82qHQDB/EYaA6TvJMYF6cRW/BlCgzXh6WAdwscnjguBMBjPEHL8pm1xgHi9NkWdePxR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z4kgCRVw; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-55f5d62d024so506a12.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 10:33:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706639631; x=1707244431; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kdGWsc0oH3bWWgxR/5+ywKCOsUUjq3kFGwbUvLrZ40E=;
-        b=Z4kgCRVwW/yqvzqU1dzZN8rePeH9ZeskmRhgLRkPG9+tug6IlMMU+6ThXb4RO4mt8C
-         F79OVn7aNMInBzhDphe80BoPcczxSeFNmS0vIYECVC54N5IkQDf5+OoMreOf2BIY2lQ6
-         jkc50l6SMbwcjX+Sum6S7PCyJA+09LKTLwOUtPIp/33zMEW6crSYZgLLMa3pGKKIUGRr
-         LsKv9rhoyy31fA9e9/SV+jj/SdZCtshbGoG98+QGirrS01jw7KWvOEhkxKWlC1B1oI/g
-         JcFQYBRTvrP6x5My/V6l9kEm1TMt+3UztLp0IWQhFMy1nqoTThvp62rxn+jDa+selh8S
-         U/6g==
+	s=arc-20240116; t=1706640082; c=relaxed/simple;
+	bh=gDDcUE6g9gBwt1NmVrUfXXqqkDrzBbdo/C9YjtcIXG0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=KfJ7xXgXZFxlI9j6d2LA3FVxu6sWz3LOPr3WrnQDepVv8Uf2U8qRV8ujDsLZnGD3w9d3j3mZXFGaF2IQraUi/s+9XvVjcTVS5F391BR+cIdLh94bNAmiKu41hIRsr4PKsgou4eS2fZacPoMAUYhXDOd1eOIT+AI3Vmb59EWXD/0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iL3dZpdY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706640079;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=2bwc+mQL6C/91m4UiYWrsmKalc17+Sz1UB9Xs7+dNW0=;
+	b=iL3dZpdYxJwzP9xZDk+BdWQEF5rR7+sK9eB0bIxf0TiOzkV4PagTiblFiaSI7QRudAlV91
+	t9AtmgZvaf42dC1ZTpDS+U0xFZq3j2FQxT9ltHNw5ctJ6SawtJTIcgpUsfalgGMVmyyIP5
+	u4ldR3NsVOYeif1oBZt5KANWBNUnjeE=
+Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
+ [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-594-2MLubLauMhybbjDx7REZTQ-1; Tue, 30 Jan 2024 13:41:14 -0500
+X-MC-Unique: 2MLubLauMhybbjDx7REZTQ-1
+Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2cf3ef1465dso6670551fa.1
+        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 10:41:14 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706639631; x=1707244431;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kdGWsc0oH3bWWgxR/5+ywKCOsUUjq3kFGwbUvLrZ40E=;
-        b=AVsZyiy6mj/x8DnDJUh3Btiw4t9mQuAldyt0+o9BeAswHblFojCKgFgSun3ojq+Env
-         DK07dTg1j/OOpY1EP2mLLdkIJxGhPHbRgVvGvPpiV7BFNFNcQjUznIsWu4e1k7oPCbVP
-         Pc3r05pLFWqt5oUUxyWWMZ1hhSYH5rY0o7RvMcvyM7pRljLguZWmOJc+7GW9QjFnHSDN
-         YjwLAAO8vQddDwW6HwTz+qbVNUbHBgLmT5Vvt/gAw8z1g5EPKUpmzf5RYzX6Fse7ssKF
-         cK79XVyNZHa83Ol5GfSTtqFHXnHT6YTTTGUdOOtwoqPfmO8DKByLT8BSFDu4IfSp9zvQ
-         HBAw==
-X-Gm-Message-State: AOJu0YzEYE9+wgOssIDGcChz1lCz7tdEV6ZrfAlhtdscUYIAPZNgBtKL
-	QoWCabHC2OtmBep9ZsQRIDuVeacjcyqdhKyUMdhS0XmdrtA4LbqrECXdYRvaRHKNvun2diYkwDb
-	N+oMaKyL0ELdOrjDMGr9I4rnzfc/SgTMohZdj
-X-Google-Smtp-Source: AGHT+IH0JnOwUNezNYdu4ljeiaqCHb1sKUhLBrQ2scptHLSnMIcNrZY0sfa0isfpckBxUC/zPaZay20bdb3kAZQTrH0=
-X-Received: by 2002:a05:6402:1d96:b0:55f:5229:5e34 with SMTP id
- dk22-20020a0564021d9600b0055f52295e34mr124078edb.5.1706639631088; Tue, 30 Jan
- 2024 10:33:51 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706640073; x=1707244873;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2bwc+mQL6C/91m4UiYWrsmKalc17+Sz1UB9Xs7+dNW0=;
+        b=TwGSJC+3tUTfyycTpImmHwOKHQTvLNY8a1JMik//Dv490hWf18qph+Wd5Vurd+bKXF
+         o5IY6Kqwy7XqAVrFiwtLcO1i9NbrgTidvZIFqcLRzSOJyPIvl+illvqvD3+7cPhxiYEQ
+         +8RadRCG8S+4eybTLyXTyrC24msLfj8ryIOOPd7Uyl7Sgka68GgLOIVgpm5XUvLWamcP
+         6p7+pp6oukLtjgFYpY0krng64BXQEoWICxBcmcSKHvrK6Wfv+AJDxZmUlOgrs222Smpa
+         FIR78jbCwlPD+60ITspBtYj7r5TVMH7+xWzP82Wkqs3WldGBbMlRi2Ccd15gHvMdrLLk
+         +Hjw==
+X-Gm-Message-State: AOJu0YwK3+SNUjThjzc+fyWTLXIYSvpXPq1LEcyWFOmfYq2we19TsdRk
+	j54Jdy5ultW5oixhKMayUYxKW0gQugE4BkFKXDr5dWiAj2XuFRUVF7qgtGg0Dlym7eTquQklyo3
+	e5ifd5B4USSIT+Vgu394ee8u+OloOZkcsnwhO9Eg46fOqFB4CA6UlYA==
+X-Received: by 2002:a19:914b:0:b0:510:544:792 with SMTP id y11-20020a19914b000000b0051005440792mr6330661lfj.0.1706640073412;
+        Tue, 30 Jan 2024 10:41:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH7CiSZRQ04X8yuecqu3jcW/CBGI0gl0b5ZeN7gMChTG8Vk6qSxcVxFuUatqpdJUJypOgKUCg==
+X-Received: by 2002:a19:914b:0:b0:510:544:792 with SMTP id y11-20020a19914b000000b0051005440792mr6330648lfj.0.1706640073001;
+        Tue, 30 Jan 2024 10:41:13 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-232-203.dyn.eolo.it. [146.241.232.203])
+        by smtp.gmail.com with ESMTPSA id u15-20020a05600c19cf00b0040e39cbf2a4sm17868663wmq.42.2024.01.30.10.41.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jan 2024 10:41:12 -0800 (PST)
+Message-ID: <785a9d7b1ce68f8131e6f9c8802981ac7ad75948.camel@redhat.com>
+Subject: Re: [PATCH net] selftests: net: add missing config for big tcp tests
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>, Xin Long
+ <lucien.xin@gmail.com>,  Florian Westphal <fw@strlen.de>, Aaron Conole
+ <aconole@redhat.com>, Nikolay Aleksandrov <razor@blackwall.org>,
+ linux-kselftest@vger.kernel.org
+Date: Tue, 30 Jan 2024 19:41:10 +0100
+In-Reply-To: <20240129083933.6b964b3f@kernel.org>
+References: 
+	<21630ecea872fea13f071342ac64ef52a991a9b5.1706282943.git.pabeni@redhat.com>
+	 <20240126115551.176e3888@kernel.org>
+	 <a090936028c28b480cf3f8a66a9c3d924b7fd6ec.camel@redhat.com>
+	 <d67d7e4a77c8aec7778f378e7a95916c89f52973.camel@redhat.com>
+	 <20240129083933.6b964b3f@kernel.org>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240129190518.585134-1-edumazet@google.com>
-In-Reply-To: <20240129190518.585134-1-edumazet@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 30 Jan 2024 19:33:38 +0100
-Message-ID: <CANn89iL6jEVPf3=zoxZSqME6gqRPttat_bZb7yYnRYYPLUcpQw@mail.gmail.com>
-Subject: Re: [PATCH net] af_unix: fix lockdep positive in sk_diag_dump_icons()
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot <syzkaller@googlegroups.com>, Kuniyuki Iwashima <kuniyu@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 29, 2024 at 8:05=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> syzbot reported a lockdep splat [1].
->
-> Blamed commit hinted about the possible lockdep
-> violation, and code used unix_state_lock_nested()
-> in an attempt to silence lockdep.
->
-> It is not sufficient, because unix_state_lock_nested()
-> is already used from unix_state_double_lock().
->
-> We need to use a separate subclass.
->
-> This patch adds a distinct enumeration to make things
-> more explicit.
->
-> Also use swap() in unix_state_double_lock() as a clean up.
->
->
+On Mon, 2024-01-29 at 08:39 -0800, Jakub Kicinski wrote:
+> On Mon, 29 Jan 2024 17:31:33 +0100 Paolo Abeni wrote:
+> > Uhm... while the self-test doesn't emit anymore the message related to
+> > the missing modules, it still fails in the CI env and I can't reproduce
+> > the failures in my local env (the same for the gro.sh script).
+> >=20
+> > If I understand correctly, the tests run under double virtualization (a
+> > VM on top AWS?), is that correct? I guess the extra slowdown/overhead
+> > will need more care.
+>=20
+> Yes, it's VM inside a VM without nested virtualization support.
+> A weird setup, granted, but when we move to bare metal I'd like
+> to enable KASAN, which will probably cause a similar slowdown..
+>=20
+> You could possibly get a similar slowdown by disabling HW virt /
+> KVM?
 
-...
+Thanks, the above helped - that is, I can reproduce the failure running
+the self-tests in a VM with KVM disabled in the host. Funnily enough I
+can't use plain virtme for that - the virtme VM crashes on boot,
+possibly due to the wrong 'machine' argument passed to qemu.
 
-> +#define unix_state_lock(s)     spin_lock(&unix_sk(s)->lock)
-> +#define unix_state_unlock(s)   spin_unlock(&unix_sk(s)->lock)
-> +enum unix_socket_lock_class {
-> +       U_LOCK_NORMAL,
-> +       U_LOCK_SECOND,  /* for double locking, see unix_state_double_lock=
-(). */
-> +       U_LOCK_DIAG, /* used while dumping icons, see sk_diag_dump_icons(=
-). */
-> +};
-> +
-> +static void unix_state_lock_nested(struct sock *sk,
-> +                                  enum unix_socket_lock_class subclass)
+In any case I can't see a sane way to cope with such slow environments
+except skipping the sensitive cases.
 
-I will add an inline keyword in v2. Not sure why I did not see the
-compiler warning.
+> FWIW far the 4 types of issues we've seen were:
+>  - config missing
+>  - OS doesn't ifup by default
+>  - OS tools are old / buggy
+>  - VM-in-VM is just too slow.
+>=20
+> There's a bunch of failures in forwarding which look like perf issues.
+> I wonder if we should introduce something in the settings file to let
+> tests know that they are running in very slow env?
 
-> +{
-> +       spin_lock_nested(&unix_sk(sk)->lock, subclass);
-> +}
-> +
->  #define peer_wait peer_wq.wait
->
+I was wondering about passing such info to the test e.g. via an env
+variable:
+
+vng --run . --user root -- HOST_IS_DAMN_SLOW=3Dtrue
+./tools/testing/selftests/kselftest_install/run_kselftest.sh -t
+<whatever>
+
+In any case some tests should be updated to skip the relevant cases
+accordingly, right?
+
+Cheers,
+
+Paolo
+
 
