@@ -1,169 +1,217 @@
-Return-Path: <netdev+bounces-67274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5FFF8428A8
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 17:02:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65F9F8428AE
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 17:03:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A183B25FAA
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 16:02:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FDFB1C23EDC
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 16:03:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93E441272C3;
-	Tue, 30 Jan 2024 16:02:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EECB8612E;
+	Tue, 30 Jan 2024 16:03:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OyRCmpb2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JrbbTJ07"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AEB31272A3;
-	Tue, 30 Jan 2024 16:02:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74FCE54656;
+	Tue, 30 Jan 2024 16:03:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706630535; cv=none; b=WqYZHoN+6TPFXM7lNKkPR5PwRZtReTwSqP7mApUf7VNPOyataaTPkKkBLY1AxcwtDzIoUaeWMNxjiicubY5zavTAqXlx7IqWjIOQQGGgwMzTqBDIw/gbU33uB7qLiC9OL8NfJkbDkcppaoicSWXQL7ztxdT3Cmj7AEDQEUa2hL4=
+	t=1706630633; cv=none; b=uLC5floItpenvX6nJQtf25smvGN2qMg18VV1ridOA9HAg/RD52f/2KvD3QA9oIhfNBZa7I9Bgrt5HTtZsBCEZZDqXjWudPEM4YnpTIpzzzyVvXj24UOOQt/AOTYGunF4kSkc+Pt+29uCg9sQauE6BMd4jFByHuqvjwCbTB+I9BY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706630535; c=relaxed/simple;
-	bh=6AyaDJwd1sc4HKIf54mJ2fAVwmOtAbULU8y4KjsSRL4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Tt8KSW/756SDDCp94cP5F9mZ9LJ6q/ta71/2zZdHkRA1d3S5SCuwPzqr+LenOx/ObM2+Kf/zloZvvXKYWOCQ10zBsw26ZPtgGAUl+yistvmxR6Gz0urahG2op0bG02+TkOa4oKM9r9m/0M4wWF/7/NmXHhZHH/gAD2rAGtsU5oA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OyRCmpb2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21CDBC433C7;
-	Tue, 30 Jan 2024 16:02:14 +0000 (UTC)
+	s=arc-20240116; t=1706630633; c=relaxed/simple;
+	bh=0OAd4/SGcsXtRJucrF8w9F4Yv4qA0oFmytL+aja1oCI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=YlZjjL5ASKMZI+If/vsvAlVSICc805FMlzk3wnYVTZ0ubn0OBkqP44bsIq7EaKLiZ560UX57K3uk4As1FfYWlxhHZ8YDbVTGsQM2GDsQA/LtA97pBRmV9ajGte8pS4KscIOzAjSF/F3o8Lx3ZAE850j4BQU30/zeBVcPuPWxkF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JrbbTJ07; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88E90C433C7;
+	Tue, 30 Jan 2024 16:03:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706630534;
-	bh=6AyaDJwd1sc4HKIf54mJ2fAVwmOtAbULU8y4KjsSRL4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OyRCmpb2uVuSl7Apfk3AeEPrXL52NPhXFkwtVrLT/ultTeCvWdCD43P3kNXtSwrc4
-	 ivaHARnlwl3MA7ZI/DteRSPjQpPhsY/+lmF60MVUt0mbvACxRTfU94rKHcsu+XJIIu
-	 htKgYgCbf67lmZKBZntG/RLgyHjG6JxzoZc32rsp/Hi1ktFJqkWGDvTi9kaNUU+wDk
-	 PcAHrVvbhKH8yCRYMjQGM7OhFFHoh+zppYxMFgB5icPCWQOdmSpNnT6ob1Yx0zy3Yb
-	 SSKOIgcduL+IBylk3v3hQPpFzdaysVkkXJpBi8T8kyZ6LIIR8q5LGi9gu6EcvI78mQ
-	 tMam2MUSjQg8A==
-Date: Tue, 30 Jan 2024 08:02:13 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>, Daniel Golle
- <daniel@makrotopia.org>, Landen Chao <Landen.Chao@mediatek.com>, DENG
- Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, Andrew
- Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Russell King <linux@armlinux.org.uk>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, Bartel Eerdekens <bartel.eerdekens@constell8.be>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v3 6/7] net: dsa: mt7530: do not set
- priv->p5_interface on mt7530_setup_port5()
-Message-ID: <20240130080213.0c3b65c1@kernel.org>
-In-Reply-To: <8b7e1d9d-70ec-4664-be04-48a2e2877891@arinc9.com>
-References: <20240122-for-netnext-mt7530-improvements-1-v3-0-042401f2b279@arinc9.com>
-	<20240122-for-netnext-mt7530-improvements-1-v3-6-042401f2b279@arinc9.com>
-	<20240129125241.gu4srgufad6hpwor@skbuf>
-	<431750cc-fb6b-4f7a-9123-b6986d359742@arinc9.com>
-	<20240129083152.34d899cd@kernel.org>
-	<20240129165201.s4oiuk3sxtk6zcsw@skbuf>
-	<20240129090034.01c11667@kernel.org>
-	<8b7e1d9d-70ec-4664-be04-48a2e2877891@arinc9.com>
+	s=k20201202; t=1706630632;
+	bh=0OAd4/SGcsXtRJucrF8w9F4Yv4qA0oFmytL+aja1oCI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=JrbbTJ07iy3fISOtBKNwGJMdtKzfHoUc5ee0NEJiI65vu4fevP7DeP4XHwHHtCvsa
+	 ai6lAYJFiHrwcl3IY5X5hgMNE0UxWYROdjWIsKjahokMNHsUYbdT7fORM15vBn99oN
+	 lQpOmJaZ4ayJvzGih2hPvKv4FHr5X0pCxF2WHKGbkS4hZPNoLNiYkMNrNVi9WKscLv
+	 8vgJY6+d2gWzui5REpKfUy+L+G7u1GyPdCu6wTt1OTrSgLYqRb/v4jDdCzTFZGsN/M
+	 UN7Ba/Ow8Q4EdAlctsfH4OSLbvru1kj/DXIILcBpHJXpSP9h/r4QfjF8PihfiQzJGz
+	 AS6NQxJWoZJew==
+From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To: Pu Lehui <pulehui@huawei.com>, Pu Lehui <pulehui@huaweicloud.com>,
+ bpf@vger.kernel.org, linux-riscv@lists.infradead.org,
+ netdev@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
+ <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
+ <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt
+ <palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>, Luke Nelson
+ <luke.r.nels@gmail.com>
+Subject: Re: [PATCH bpf-next 4/4] riscv, bpf: Mixing bpf2bpf and tailcalls
+In-Reply-To: <5a30caa3-3351-41e7-a77f-91e5959b2da6@huawei.com>
+References: <20230919035711.3297256-1-pulehui@huaweicloud.com>
+ <20230919035711.3297256-5-pulehui@huaweicloud.com>
+ <87lecqobyb.fsf@all.your.base.are.belong.to.us>
+ <4e73b095-0c08-4a6f-b2ee-8f7a071b14ee@huaweicloud.com>
+ <87cytjusud.fsf@all.your.base.are.belong.to.us>
+ <5d776261-338b-4ebb-bb9b-1dbc91cd06c3@huawei.com>
+ <87zfwnympo.fsf@all.your.base.are.belong.to.us>
+ <5a30caa3-3351-41e7-a77f-91e5959b2da6@huawei.com>
+Date: Tue, 30 Jan 2024 17:03:49 +0100
+Message-ID: <87le86q04a.fsf@all.your.base.are.belong.to.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, 30 Jan 2024 17:26:29 +0300 Ar=C4=B1n=C3=A7 =C3=9CNAL wrote:
-> I don't claim to be an email expert. I've received Vladimir's email with
-> the "Content-Transfer-Encoding: 8bit" header. The body was plaintext, not
-> base64 encoded. I have checked how the netdev mailing list distributed
-> Vladimir's email, its body is plaintext as well, not base64 encoded. Only
-> the linux-arm-kernel mailing list distributed the body base64 encoded, the
-> header is "Content-Transfer-Encoding: base64".
->=20
-> And the attachment you've provided seems to be from the raw output of
-> lore.kernel.org/all which seems to put together the email distribution fr=
-om
-> all mailing lists.
->=20
-> raw from all:
->=20
-> https://lore.kernel.org/all/20240129125241.gu4srgufad6hpwor@skbuf/raw
->=20
-> raw from netdev:
->=20
-> https://lore.kernel.org/netdev/20240129125241.gu4srgufad6hpwor@skbuf/raw
->=20
-> raw from linux-arm-kernel:
->=20
-> https://lore.kernel.org/linux-arm-kernel/20240129125241.gu4srgufad6hpwor@=
-skbuf/raw
->=20
-> I don't know which mailing list mailbot looks at in case of an email is
-> sent with multiple mailing lists being CC'd or TO'd. It seems to be that =
-it
-> looked at linux-arm-kernel in this instance.
+Pu Lehui <pulehui@huawei.com> writes:
 
-It's the Python library that base-encodes it for some reason :o
+> On 2024/1/30 21:28, Bj=C3=B6rn T=C3=B6pel wrote:
+>> Pu Lehui <pulehui@huawei.com> writes:
+>>=20
+>>> On 2024/1/30 16:29, Bj=C3=B6rn T=C3=B6pel wrote:
+>>>> Pu Lehui <pulehui@huaweicloud.com> writes:
+>>>>
+>>>>> On 2023/9/28 17:59, Bj=C3=B6rn T=C3=B6pel wrote:
+>>>>>> Pu Lehui <pulehui@huaweicloud.com> writes:
+>>>>>>
+>>>>>>> From: Pu Lehui <pulehui@huawei.com>
+>>>>>>>
+>>>>>>> In the current RV64 JIT, if we just don't initialize the TCC in sub=
+prog,
+>>>>>>> the TCC can be propagated from the parent process to the subprocess=
+, but
+>>>>>>> the TCC of the parent process cannot be restored when the subprocess
+>>>>>>> exits. Since the RV64 TCC is initialized before saving the callee s=
+aved
+>>>>>>> registers into the stack, we cannot use the callee saved register to
+>>>>>>> pass the TCC, otherwise the original value of the callee saved regi=
+ster
+>>>>>>> will be destroyed. So we implemented mixing bpf2bpf and tailcalls
+>>>>>>> similar to x86_64, i.e. using a non-callee saved register to transf=
+er
+>>>>>>> the TCC between functions, and saving that register to the stack to
+>>>>>>> protect the TCC value. At the same time, we also consider the scena=
+rio
+>>>>>>> of mixing trampoline.
+>>>>>>
+>>>>>> Hi!
+>>>>>>
+>>>>>> The RISC-V JIT tries to minimize the stack usage, e.g. it doesn't ha=
+ve a
+>>>>>> fixed pro/epilogue like some of the other JITs. I think we can do be=
+tter
+>>>>>> here, so that the pass-TCC-via-register can be used, and the additio=
+nal
+>>>>>> stack access can be avoided.
+>>>>>>
+>>>>>> Today, the TCC is passed via a register (a6) and can be viewed as a
+>>>>>> "state" variable/transparent argument/return value. As you point out=
+, we
+>>>>>> loose this when we do a call. On (any) calls we move the TCC to a
+>>>>>> callee-saved register.
+>>>>>>
+>>>>>> WDYT about the following scheme:
+>>>>>>
+>>>>>> 1 Pickup the arm64 bpf2bpf/tailmix mechanism of just clearing the TCC
+>>>>>>      for the main program.
+>>>>>> 2 For BPF helper calls, move TCC to s6, perform the call, and restore
+>>>>>>      a6. Dito for kfunc calls (BPF_PSEUDO_KFUNC_CALL).
+>>>>>> 3 For all other calls, a6 is passed transparently.
+>>>>>>
+>>>>>> For 2 bpf_jit_get_func_addr() can be used to determine if the callee=
+ is
+>>>>>> a BPF helper or not.
+>>>>>>
+>>>>>> In summary; Determine in the JIT if we're leaving BPF-land, and need=
+ to
+>>>>>> move the TCC to a callee-saved reg, or not, and save us a bunch of s=
+tack
+>>>>>> store/loads.
+>>>>>>
+>>>>>
+>>>>> Valuable scheme. But we need to consider TCC back propagation. Let me
+>>>>> show an example of calling subprog with TCC stored in A6:
+>>>>>
+>>>>> prog1(TCC=3D=3D1){
+>>>>>        subprog1(TCC=3D=3D1)
+>>>>>            -> tailcall1(TCC=3D=3D0)
+>>>>>                -> subprog2(TCC=3D=3D0)
+>>>>>        subprog3(TCC=3D=3D0) <--- should be TCC=3D=3D1
+>>>>>            -\-> tailcall2 <--- can't be called
+>>>>> }
+>>>
+>>> Let's back with this example again. Imagine that the tailcall chain is a
+>>> list limited to 33 elements. When the list has 32 elements, we call
+>>> subprog1 and then tailcall1. At this time, the list elements count
+>>> becomes 33. Then we call subprog2 and return prog1. At this time, the
+>>> list removes 1 element and becomes 32 elements. At this time, there
+>>> still can perform 1 tailcall.
+>>>
+>>> I've attached a diagram that shows mixing tailcall and subprogs is
+>>> nearly a "call". It can return to caller function.
+>>=20
+>> Hmm. Let me put my Q in another way.
+>>=20
+>> The kernel calls into BPF_PROG_RUN() (~a BPF context). Would it ever be
+>> OK to do more than 33 tail calls, regardless of subprogs or not?
+>>=20
+>> In your example, TCC is 1. You are allowed to perform one tail call. In
+>> your example prog1 performs two.
+>>=20
+>> My view of TCC has always been ~a counter of the number of tailcalls~.
+>>=20
+>> With your example expanded:
+>> prog1(TCC=3D=3D33){
+>>        subprog1(TCC=3D=3D33)
+>>            -> tailcall1(TCC=3D=3D33) -> tailcall1(TCC=3D=3D32) -> tailca=
+ll1(TCC=3D=3D31) -> ... // 33 times
+>>        // Lehui says TCC should be 33 again.
+>>        // Bj=C3=B6rn says "it's the number of tailcalls", and subprog3 c=
+annot perform a tail call
+>>        subprog3(TCC=3D=3D?)
+>
+> Yes, my view is take this something like a stack=EF=BC=8Cwhile you take t=
+his as=20
+> a fixed global value.
+>
+> prog1(TCC=3D=3D33){
+>      subprog1(TCC=3D=3D33)
+>          -> tailcall1(TCC=3D=3D33) -> tailcall1(TCC=3D=3D32) ->=20
+> tailcall1(TCC=3D=3D31) -> ... // 33 times -> subprog2(TCC=3D=3D0)
+>      subprog3(TCC=3D=3D33)
+> 	-> tailcall1(TCC=3D=3D33) -> tailcall1(TCC=3D=3D32) -> tailcall1(TCC=3D=
+=3D31) ->=20
+> ... // 33 times
+>
+>>=20=20=20=20=20=20=20=20=20=20=20=20
+>> My view has, again, been than TCC is a run-time count of the number
+>> tailcalls (fentry/fexit patch bpf-programs included).
+>>=20
+>> What does x86 and arm64 do?
+>
+> When subprog return back to caller bpf program, they both restore TCC to=
+=20
+> the value when enter into subprog. The ARM64 uses the callee saved=20
+> register to store the TCC. When the ARM64 exits, the TCC is restored to=20
+> the value when it enter. The while x86 uses the stack to do the same thin=
+g.
 
->>>>> $ tail -20 raw.5=20
-> mt7530_setup_port5() from mt753x_phylink_mac_config() won't run.
->=20
-> The commit ("net: dsa: mt7530: improve code path for setting up port 5")
-> makes so that mt7530_setup_port5() from mt7530_setup() runs only on
-> non-phylink cases.
->=20
-> Get rid of unnecessarily setting priv->p5_interface under
-> mt7530_setup_port5() as port 5 phylink configuration will be done by
-> running mt7530_setup_port5() from mt753x_phylink_mac_config() now.
->=20
-> Signed-off-by: Ar=C4=B1n=C3=A7 =C3=9CNAL <arinc.unal@arinc9.com>
-> ---
+Ok! Thanks for clarifying. I'll continue reviewing the v2 of your
+series!
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+BTW, I wonder if we can trigger this [1] on RV64 -- i.e. calling the
+main prog, will reset the tcc count.
 
-I hope this moves the patch set out of the 'deferred' state.
-
----
-pw-bot: under-review
-
-
->>>>> $ cat /tmp/p.py
-#!/bin/env python3
-
-import email
-from email.policy import default
-import sys
-
-with open(sys.argv[1], 'rb') as fp:
-    raw =3D fp.read()
-
-msg =3D email.message_from_bytes(raw, policy=3Ddefault)
-print(msg.get_body())
-
-
->>>>> $ /tmp/p.py  raw.5 | tail -20
- <20240122-for-netnext-mt7530-improvements-1-v3-6-042401f2b279@arinc9.com>
-
-T24gTW9uLCBKYW4gMjIsIDIwMjQgYXQgMDg6MzU6NTdBTSArMDMwMCwgQXLEsW7DpyDDnE5BTCB2
-aWEgQjQgUmVsYXkgd3JvdGU6Cj4gRnJvbTogQXLEsW7DpyDDnE5BTCA8YXJpbmMudW5hbEBhcmlu
-YzkuY29tPgo+IAo+IFJ1bm5pbmcgbXQ3NTMwX3NldHVwX3BvcnQ1KCkgZnJvbSBtdDc1MzBfc2V0
-dXAoKSB1c2VkIHRvIGhhbmRsZSBhbGwgY2FzZXMKPiBvZiBjb25maWd1cmluZyBwb3J0IDUsIGlu
-Y2x1ZGluZyBwaHlsaW5rLgo+IAo+IFNldHRpbmcgcHJpdi0+cDVfaW50ZXJmYWNlIHVuZGVyIG10
-NzUzMF9zZXR1cF9wb3J0NSgpIG1ha2VzIHN1cmUgdGhhdAo+IG10NzUzMF9zZXR1cF9wb3J0NSgp
-IGZyb20gbXQ3NTN4X3BoeWxpbmtfbWFjX2NvbmZpZygpIHdvbid0IHJ1bi4KPiAKPiBUaGUgY29t
-bWl0ICgibmV0OiBkc2E6IG10NzUzMDogaW1wcm92ZSBjb2RlIHBhdGggZm9yIHNldHRpbmcgdXAg
-cG9ydCA1IikKPiBtYWtlcyBzbyB0aGF0IG10NzUzMF9zZXR1cF9wb3J0NSgpIGZyb20gbXQ3NTMw
-X3NldHVwKCkgcnVucyBvbmx5IG9uCj4gbm9uLXBoeWxpbmsgY2FzZXMuCj4gCj4gR2V0IHJpZCBv
-ZiB1bm5lY2Vzc2FyaWx5IHNldHRpbmcgcHJpdi0+cDVfaW50ZXJmYWNlIHVuZGVyCj4gbXQ3NTMw
-X3NldHVwX3BvcnQ1KCkgYXMgcG9ydCA1IHBoeWxpbmsgY29uZmlndXJhdGlvbiB3aWxsIGJlIGRv
-bmUgYnkKPiBydW5uaW5nIG10NzUzMF9zZXR1cF9wb3J0NSgpIGZyb20gbXQ3NTN4X3BoeWxpbmtf
-bWFjX2NvbmZpZygpIG5vdy4KPiAKPiBTaWduZWQtb2ZmLWJ5OiBBcsSxbsOnIMOcTkFMIDxhcmlu
-Yy51bmFsQGFyaW5jOS5jb20+Cj4gLS0tCgpSZXZpZXdlZC1ieTogVmxhZGltaXIgT2x0ZWFuIDxv
-bHRlYW52QGdtYWlsLmNvbT4KCkkgaG9wZSB0aGlzIG1vdmVzIHRoZSBwYXRjaCBzZXQgb3V0IG9m
-IHRoZSAnZGVmZXJyZWQnIHN0YXRlLgoKLS0tCnB3LWJvdDogdW5kZXItcmV2aWV3Cgo=3D
-
+[1] https://lore.kernel.org/bpf/20240104142226.87869-1-hffilwlqm@gmail.com/
 
