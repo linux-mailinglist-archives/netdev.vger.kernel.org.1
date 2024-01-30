@@ -1,110 +1,128 @@
-Return-Path: <netdev+bounces-67104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19CD284210A
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:20:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60DD784211D
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:22:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A1A81C24E6D
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:20:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12CC0B28B42
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:22:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6613760BBB;
-	Tue, 30 Jan 2024 10:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA5CA60DCB;
+	Tue, 30 Jan 2024 10:21:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="dbeFUlKH";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="RmMuECqy"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="N4FnxJtY"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B019260B8D;
-	Tue, 30 Jan 2024 10:20:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFDA466B22
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 10:21:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706610022; cv=none; b=dmKU2ink7UJ5bAfSH9KVRPm2YJDbt904E0L9trkqCKyvt/ryE+G0FKIW0M7bRSvq+LqEu5Y2KwbY1zhmLeqQ2aBHX9Wz7qYPNJs1is3XFIx22NnNbCtxRok1U7SyXg82Tbzds/6r/x200uI10Mx3sUga6nb0/MuUJB1Jc6xnLII=
+	t=1706610068; cv=none; b=nVeuJJQiHE5ykNz6Qnw1uGrz2gJMVnk4Upmww2yHov/8+VuYAUjZrorvuKw7r8zZvJirWX2c5HGSh7hY+RuXQ8KpfOBd5ieEoiV6NXIOMK2ddFzyWs5GGx54y+mDbd8D5qf6XRrmIRSMXKFeilgGLxta+TxURS+5trBKnbEzZK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706610022; c=relaxed/simple;
-	bh=Vu3/rb2+o9A3xavD6zhieunf/6dYSlSau376+ZTpvg0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N+nHkcKbfCsxZ7bKvT/Iw0TRXEask8woEHkbzuCJViu4CMkHNTQCMCudM4riomvJR0vz+aVffuQRxvKTWAd1Nr08IVWU1x1aKD+BJia0xTRSCLJsknV86zq3EH4VEdrtqif/G3LG1Oul48DflOlQDM2MNZSJhq9TjTAWVtY/69A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=dbeFUlKH; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=RmMuECqy; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Tue, 30 Jan 2024 11:20:11 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1706610013;
+	s=arc-20240116; t=1706610068; c=relaxed/simple;
+	bh=0kR2ZJwiMlO7uSFYtG5ZGdZxQ0kV1bZdzHqxyq2JU2s=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=hhMExMTkrKRoKa2k6yxyd1koil/AQkqgmiJPVbup1MgKC5n3Erjk2pWy5st3ldQ3jPbFMDGDgV3pjrJLha8I33nlan8u3EN1twdrylm+QFJMO7MffdQKdqjDidRb7tYPQEROezzuBNU5Yq+lgsj9lUpZrzO7oCoLeUotbWaO2wE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=N4FnxJtY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706610065;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=33I6KUptN215uQ8/TCY4CSKquwhpzQOMErJY2s/Iee0=;
-	b=dbeFUlKHES4fesoAHnLXHJ+VSYqlpTZw1eJPWS31UM8nLcj3mswTX5ykMcL2FtN/QiNDD2
-	fYKdSvcPQLz33oL+y/Xj3PL2IBBqzAZq0GCAIOMAvIn0vHHkERJMr3BCoCvCB/bLp/cRFn
-	8hPmIJKDqlDM82IvxIlTSu39xkFreBDnB/Jl4+B5Y1YoIVRHTIR2yGonu4WdLUvmrDV1xq
-	GuHgWKh2dDJw77bwgVlUPXd56YEPBJyq1rRRTG+0U9w+Am3AdqiUynzZog8cejZDYibWmC
-	aSSFol7cgwyOHlyoL+iX5KN0uj7Y2A/njaw2KtTYqMxPrSpV5bCSFeq0NsF1Lw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1706610013;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=33I6KUptN215uQ8/TCY4CSKquwhpzQOMErJY2s/Iee0=;
-	b=RmMuECqyH8DIcdQfe7Trm2myMgd3pEznT6Bm+Y1jq2PCdSuiRKCXyvehmLz1jJDFtmE4Av
-	KcY1D98rUSikL6DA==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Tejun Heo <tj@kernel.org>
-Cc: torvalds@linux-foundation.org, mpatocka@redhat.com,
-	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
-	msnitzer@redhat.com, ignat@cloudflare.com, damien.lemoal@wdc.com,
-	bob.liu@oracle.com, houtao1@huawei.com, peterz@infradead.org,
-	mingo@kernel.org, netdev@vger.kernel.org, allen.lkml@gmail.com,
-	kernel-team@meta.com, tglx@linutronix.de
-Subject: Re: [PATCHSET wq/for-6.9] workqueue: Implement BH workqueue and
- convert several tasklet users
-Message-ID: <20240130102011.rX9Qjnp1@linutronix.de>
-References: <20240130091300.2968534-1-tj@kernel.org>
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=0kR2ZJwiMlO7uSFYtG5ZGdZxQ0kV1bZdzHqxyq2JU2s=;
+	b=N4FnxJtYnpc9Fo4ju+zASR9NaYm63mXCAqmL0045t+TXQFGimzbEZ9k4fF6uD3+qwI4NtX
+	WpEZz9Kef0SouJ84+jqu+tTAscVbOK2ZpNArdF8xgHUtdSxTDd+aXIaUPwZZp1gm0v1cp5
+	lB+w+yFSAGmp54rxBvMX5EAfRWCm4Kg=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-564--5ad-bklN8mTp7-94rEpNg-1; Tue, 30 Jan 2024 05:21:03 -0500
+X-MC-Unique: -5ad-bklN8mTp7-94rEpNg-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33930673253so259196f8f.1
+        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 02:21:03 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706610062; x=1707214862;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0kR2ZJwiMlO7uSFYtG5ZGdZxQ0kV1bZdzHqxyq2JU2s=;
+        b=Vs1Ex7sPLrpJpYVNEjxAuVMSquTn448NNn1rfGdsUsmYYtH0DzvdrOLw8tHFPm8TGx
+         XLxs9jm+WE/xYm061GAIGlVR3uOad2HXxYutETq7vz5qv6IW5CB7nkw1wwTIb2bKEz3F
+         aSVqemzkgVo2AiCtL3cV5qTZAcvU0HwEmNZxdX5VXFxZVvBwknejLDHMFlQ6YhUiSaKU
+         4nCr/Zue7AIEvFgMRRBNN+ClMWQm3fOtC0+8BEmDSjGvrCSx8f3+m30/ZaCIvSjufg78
+         LxZ072/9HJVyjgUBAxC7IXUipUQrqNoDePzkFjYhC16gB5E3N5momju+DTJvFXc8zhAF
+         M3RA==
+X-Gm-Message-State: AOJu0YyEX3/kNKdVGsCu9y0Jv2qjXUym/bpy+/dVQdV84EqMJxRzy+eo
+	EzxMu87oS0pqE6WiuTFlWV8q9CIXKNljTQhgT9iNVOewJvoOHuJ4JE00ljFuAtifEnSH3SxoqhA
+	HntouXYTAFDEpqlvxco+yzJWiJXrxtlq47lbtEl0v/a1mjzBeTswhpA==
+X-Received: by 2002:adf:ab19:0:b0:33a:ed38:b5a4 with SMTP id q25-20020adfab19000000b0033aed38b5a4mr4124061wrc.1.1706610062736;
+        Tue, 30 Jan 2024 02:21:02 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHKMl2ELf+dM9BlQZeEwFOTCPTV3MXImHfO26cx/fI+ZPufXBcCCkIlebJ0ZPpi/kSoswzq1w==
+X-Received: by 2002:adf:ab19:0:b0:33a:ed38:b5a4 with SMTP id q25-20020adfab19000000b0033aed38b5a4mr4124046wrc.1.1706610062412;
+        Tue, 30 Jan 2024 02:21:02 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-232-203.dyn.eolo.it. [146.241.232.203])
+        by smtp.gmail.com with ESMTPSA id ce6-20020a5d5e06000000b0033af3a43e91sm3676075wrb.46.2024.01.30.02.21.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jan 2024 02:21:02 -0800 (PST)
+Message-ID: <ee36e8d9f29b42590b371a2c0d0b540195bad223.camel@redhat.com>
+Subject: Re: [net-next v6 3/4] net: wwan: t7xx: Infrastructure for early
+ port configuration
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jinjian Song <songjinjian@hotmail.com>, netdev@vger.kernel.org
+Cc: chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com, 
+ haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com, 
+ ricardo.martinez@linux.intel.com, loic.poulain@linaro.org, 
+ ryazanov.s.a@gmail.com, johannes@sipsolutions.net, davem@davemloft.net, 
+ edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.com, 
+ vsankar@lenovo.com, danielwinkler@google.com, nmarupaka@google.com, 
+ joey.zhao@fibocom.com, liuqf@fibocom.com, felix.yan@fibocom.com, Jinjian
+ Song <jinjian.song@fibocom.com>
+Date: Tue, 30 Jan 2024 11:21:00 +0100
+In-Reply-To: <MEYP282MB26972B5DA665DF10282EB108BB7B2@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
+References: <20240124170010.19445-1-songjinjian@hotmail.com>
+	 <MEYP282MB26972B5DA665DF10282EB108BB7B2@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240130091300.2968534-1-tj@kernel.org>
 
-On 2024-01-29 23:11:47 [-1000], Tejun Heo wrote:
-> Hello,
-Hi,
+On Thu, 2024-01-25 at 01:00 +0800, Jinjian Song wrote:
+> From: Jinjian Song <jinjian.song@fibocom.com>
+>=20
+> To support cases such as FW update or Core dump, the t7xx
+> device is capable of signaling the host that a special port
+> needs to be created before the handshake phase.
+>=20
+> Adds the infrastructure required to create the early ports
+> which also requires a different configuration of CLDMA queues.
+>=20
+> Base on the v5 patch version of follow series:
+> 'net: wwan: t7xx: fw flashing & coredump support'
+> (https://patchwork.kernel.org/project/netdevbpf/patch/3777bb382f4b0395cb5=
+94a602c5c79dbab86c9e0.1674307425.git.m.chetan.kumar@linux.intel.com/)
+>=20
+> Signed-off-by: Jinjian Song <jinjian.song@fibocom.com>
 
-> As suggested, this patchset implements BH workqueues which are like regular
-> workqueues but executes work items in the BH (softirq) context and converts
-> several tasklet users.
-> 
-> - The name bh is used instead of the suggested atomic as it's more in line
->   with widely used execution context interface - local_bh_enable/disable()
->   and friends.
-> 
-> - The system default BH workqueues - system_bh_wq and system_bh_highpri_wq -
->   are provided. As queue-wide flushing doesn't exist in tasklet, all
->   existing tasklet users should be able to use the system BH workqueues
->   without creating their own.
-> 
-> - BH workqueues currently use tasklet to run the work items to avoid
->   priority inversions involving tasklet_hi and WQ_BH | WQ_HIGHPRI. Once all
->   tasklet users are converted, tasklet code can be removed and BH workqueues
->   can take over its softirqs.
+It would be nice if someone @intel with knowledge of this specific H/W
+could have a better look here, thanks!
 
-If one context creates multiple work item which are then moved to
-tasklet I don't see the difference vs workqueue with a bh_disable()
-around it.
-Looking at the USB changes, I would prefer to see it converted to
-threaded interrupts instead of using tasklet or workqueue. Both
-approaches (current tasklet, suggested workqueue) lose the original
-context where the request was created. Having threaded interrupts would
-allow to keep everything in the same "context" so you could prioritize
-according to your needs.
+Paolo
 
-Sebastian
 
