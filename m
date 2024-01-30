@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-67190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 959D3842481
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 13:10:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4261E842491
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 13:13:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9D321C23D08
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 12:10:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19B7FB2F4B2
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 12:10:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1AF56A326;
-	Tue, 30 Jan 2024 12:08:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0696B6A32D;
+	Tue, 30 Jan 2024 12:08:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="gw7wOrGE"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="i0d0jqMU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30C39679F1
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 12:08:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 234526A018
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 12:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706616521; cv=none; b=sjZyTIg3QkLPGTGPo7Cdbe3i8t+2/nng4JsjwouBxrPPIAxt9xa6UToveHt9MkL5SJTfXIOVMsoF9IFuVv0A8g1PO9LzsUAQVTh/nxfCjvZ+cvs4sJM5U58MIMiEoT+E98tzANtROlsa9J9EElS/2jMNeaIcW/BIwqvZMmYHo8Y=
+	t=1706616525; cv=none; b=pdV/tJJBjxuLUeZocyZk/GTFxZaDlpYdXkT0PndEIEmroCC4IGtT+KvZ4PGPURE5o980Bmdyg1A4lhBXCsQT617Cn3tdXMLbtMe0MjIiGXUbvjk3opLQJLSWptEAEBEro2rTmksEWcYIi6kA1i1TeSD2gsS+DbzG8dZ0hJBWQ/o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706616521; c=relaxed/simple;
-	bh=cunQVUiQTJ/qT2fXX5skiLlpR0rFVpqpMADSPcBfbNo=;
+	s=arc-20240116; t=1706616525; c=relaxed/simple;
+	bh=fS4CJWwyBmbltHls+QhHmewDlYt4g3QeHa1ai74pIlg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qkBLMaYPKfN17xYjUikBsTceGlWCWR5AeaoKFn0+CPNGePC8CDvkhzFShHAVRGl1gfHr9PeCa3yF19P2xj8Nrt/hknZ0Ox1N1ICe9xU59+k1TqeIDWefD2HkLTWcxwtKXn1TW4O6geUfgXKjZEZzMWVUMyx6e8SCEkZr2HzElgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=gw7wOrGE; arc=none smtp.client-ip=209.85.128.54
+	 MIME-Version; b=d7+7+tW7M+4gw1p9xWQ3+GQjrFPrQWLSkczIPrB2kgXWzo57T28WhS+CsI2wquDaBzDH7BxydC8QSCRUANVY1XMve7y3NvnmPi+AkSr1PMJd2Npu/0lDR50BY30XE0nbBn3+/h8HpuzML/NZx8jyJ8OqnE7UjkLyltBKQEM+14E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=i0d0jqMU; arc=none smtp.client-ip=209.85.167.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40ed3101ce3so52283675e9.2
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 04:08:39 -0800 (PST)
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-51030667cedso4682820e87.3
+        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 04:08:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706616518; x=1707221318; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706616522; x=1707221322; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xxfFOMPuRccX2RJ2AQIWh0HVQfb+lH5dr1aKaZmo7m4=;
-        b=gw7wOrGEbfNmnjxPSON+RDc9YUuUr3bfBKdu3djPNRItH2DKL6xr/U79XeGypL/773
-         yd/Fu7NW/fN52Mh4L69UQg/6CbIbdoyU+pkoRaJLgwhYE3djduFapfoQawOvM3WdTHWn
-         lUNw4RdxFuxqVzdMfGBDL5lXejs8nTOHLydsM4VnBzwlcmBXfkDRp55IhoNHMf6RKcHv
-         LbZYWx93sGHM1RTajTWgqKs0KVffIjzPt0bf2cJ1sK8ZHAiThBMImsSTO/ReRq6iymZZ
-         v17Xx5IwMucIc0hGvsne7g1TDFa98CCHS9FDnGhPlS3MGcNB3jWe16wqM7DIy//jxUws
-         0VuA==
+        bh=2R4lrMjk0YHZK4LHiPYNPIRorykEP/3engsxDnFu06A=;
+        b=i0d0jqMUAsDws42Xw4qd/KWlqq4beyweXgjQAwpFWhNgwUhzQLk/uWyeEI3O7yQfNn
+         a0spheAy9P1DE/PesrWdnekdfoofB9RU+tRJk4M4iGktP4teGvKtXwwFXHbZVifk6vr0
+         eE8ZJO7ki8g69IwYCGCE4aZ2F2y+d0ISpZi1TzdcaqzVTQhl4zo+Q+XmY7kOoCoRrGTj
+         FKeVMLy7H82+OhctP1/6yjQTUi3hgz/oF4dQEkvMF56puyrEuzD4tOc+BTA6qygvXSZu
+         Y6W50rjHo/wXd+BrGoAaCFBLdQb+bcOjiPGdrjDujQvP+e62mbf35pBRy1OGuU7A/6IN
+         lm0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706616518; x=1707221318;
+        d=1e100.net; s=20230601; t=1706616522; x=1707221322;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xxfFOMPuRccX2RJ2AQIWh0HVQfb+lH5dr1aKaZmo7m4=;
-        b=wMALyfQuhiEJXrg1YupY080rjKeD1RXBsrAmuEVIrLD+7Lf87whslu+wLVZ1nEYKOX
-         XclesxBc+pGPD7sMmhRTsmFmYSxvcKVU4uCkhKXRMCBaQhYLDnmv+YZYGLmMnxr6oqUY
-         3UMBbQMMpKvPRFrXewO3zs2gUmsqhOKeSJaO9XyaytK2sLoIrd79v8GBpLbjr6s0kHOm
-         ZO8R0KVt8F8sQFhN3qEW5FQIv5hSs5jjJ3ba1GKQ8RDn1DW5EGnvQh/kRgQQdV/elJpQ
-         OO1WkY60CVLcCn5kaeMNyYdKmCav5ux0wj71qvsxee8gGbliaZviDHBMrK40/y28b/nT
-         C32A==
-X-Gm-Message-State: AOJu0YwW7aTyrquTiSUWyxwzhNUfgnKt7H7u5h9C0U4f6uzhJ3gXTAwO
-	Jsgx1lMwKzWBDdbbsIjaSK6iO26au7nGC2oEurLhwbHFrJJqlEOEd5lXTxlGBEsOpJTlLlkMC2k
-	8HtI=
-X-Google-Smtp-Source: AGHT+IG+i6aC18/3DDzkYJc8VbUFswjHEL65LrqwnDdBcKQGQghDv/LfWTuVSOqUu5qXjaNlM0fx0A==
-X-Received: by 2002:a05:600c:1d1b:b0:40e:d332:bb8f with SMTP id l27-20020a05600c1d1b00b0040ed332bb8fmr6553595wms.5.1706616518463;
-        Tue, 30 Jan 2024 04:08:38 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVoG7HP6f87zK5fUYTv8MjdIjEvPCPQdWAh2D/18j+b78Il60ssEiwwd1DylwT522U0ZafjL5JV8ez8ZJHHJBPY3JQA4ZAoc/ezflxKBxblpOSmRtVpFHAP2FTQbUaLU2wvENFc6n62sM2qupoYqNNuSdzSvCejLsHq5g/5TBwNxhHe+h5JLBAqyRKX7n/7rYRRycl9Byl7rymZGMoG2YXGCQVHwoOUNkni9RgwvNZisWefoSFtQoGpxRkFjYSr7t7lbZC6PBB/rlQ2uWprv72joYj2SqkmGp4fgHo/mJKZPej6MxmnwB4Hyx+9+owpDMFv6/W6+WKylUjA9BuFVtILBjpLqkQOXULMm35Yda/xGSENVNU0y18cFGJQJcSclpSN9SnjxG6gtsz43nc=
+        bh=2R4lrMjk0YHZK4LHiPYNPIRorykEP/3engsxDnFu06A=;
+        b=t7vhd3xScGaYbj88D+qOH3w/afIVdbC8Dr3UKlyqhRuWszquUODebpgOzdScCZ2Wbq
+         aUFohvPcB7GanX9hcmQFsX1DdnLcLoBBo0/gNWch9zccxwuL7RIrwDfZqU7YL2WWAwYj
+         t9KBokZedNPQKw+/c1YLu/j91pSSdVIIknZhArkNp3yEdK1L67/Kkd5v7ifvcseIG+mi
+         D4d/4nky6S2fQmoSpHGJQcOsQKzuhPaoAsmJyvD8rlSQrSv7boHnFkB5lzhl7QqdS8PM
+         ihk6F3ghZai7IFHGLkVp2Lfqc8gLLbXy9nhV4484vIDm+TOI2NBEJNJE6cOTbsSEWw0h
+         QK4g==
+X-Gm-Message-State: AOJu0YznEzK3mcmHD8ATeEYDNQIt1i6dPir+csE2epv0OS/mXgTKmoZk
+	+3gA6838g5NUnquWVkfO91Qf9nRBUA7jkoeiJgJAzgfsWLnFSZh1cDqVmEyLFffZR0GiKH8lS56
+	DSM8=
+X-Google-Smtp-Source: AGHT+IHSg5ZcoIviYwFLhUk+W40+LsC1sVBtZlBQGn0M7oQSVmR3PhdyAFr5nl5UlcdxMEYABLP8CA==
+X-Received: by 2002:a05:6512:2209:b0:50e:4098:3798 with SMTP id h9-20020a056512220900b0050e40983798mr6578146lfu.60.1706616522078;
+        Tue, 30 Jan 2024 04:08:42 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXhiJs6c+6h7L+9CyEicNSZupRirwGeMrgJrZrhaSArpPxFlP2yoZ1wKm1fnzkA8xyHXUNjtBVJ4MTCqqbPwzODmU+CAcvn6CqJxLkmArNJGWgeXGjiPEv+cOKXjuNUWEEpoDUKAAnqTXgpoCelbMekTsT/pGkd4AmNZKtIao4TXNi7Br3sOJosni84B9mAhpD93g4EHljjLpqW9ZkKnltjSlhsLfg2wVgF2xy8UfpZuBC9fmWmI/lpLsrp/AHWKQUvpsqrUr/bM/jDzXjxsMoI6REDrEaWSY4Z3S2HsAb6sSUn1GNvAgbmyVbsUaPh/nBL58nlKy27V9BBrzE3jRdV6tdiUxUbTJVEdCnIOaGhZiN4r6aODBjngX5O0/LFxFbcxp5eLceZa9uUclA=
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id l22-20020a05600c1d1600b0040ef95e1c78sm4909525wms.3.2024.01.30.04.08.37
+        by smtp.gmail.com with ESMTPSA id t5-20020a05600c450500b0040e9d507424sm12984262wmo.5.2024.01.30.04.08.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 04:08:38 -0800 (PST)
+        Tue, 30 Jan 2024 04:08:41 -0800 (PST)
 From: Jiri Pirko <jiri@resnulli.us>
 To: netdev@vger.kernel.org
 Cc: kuba@kernel.org,
@@ -81,9 +81,9 @@ Cc: kuba@kernel.org,
 	jesse.brandeburg@intel.com,
 	anthony.l.nguyen@intel.com,
 	rrameshbabu@nvidia.com
-Subject: [patch net-next v2 1/3] dpll: extend uapi by lock status error attribute
-Date: Tue, 30 Jan 2024 13:08:29 +0100
-Message-ID: <20240130120831.261085-2-jiri@resnulli.us>
+Subject: [patch net-next v2 2/3] dpll: extend lock_status_get() op by status error and expose to user
+Date: Tue, 30 Jan 2024 13:08:30 +0100
+Message-ID: <20240130120831.261085-3-jiri@resnulli.us>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240130120831.261085-1-jiri@resnulli.us>
 References: <20240130120831.261085-1-jiri@resnulli.us>
@@ -97,129 +97,124 @@ Content-Transfer-Encoding: 8bit
 
 From: Jiri Pirko <jiri@nvidia.com>
 
-If the dpll devices goes to state "unlocked" or "holdover", it may be
-caused by an error. In that case, allow user to see what the error was.
-Introduce a new attribute and values it can carry.
+Pass additional argunent status_error over lock_status_get()
+so drivers can fill it up. In case they do, expose the value over
+previously introduced attribute to user. Do it only in case the
+current lock_status is either "unlocked" or "holdover".
 
 Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 Acked-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 ---
- Documentation/netlink/specs/dpll.yaml | 39 +++++++++++++++++++++++++++
- include/uapi/linux/dpll.h             | 30 +++++++++++++++++++++
- 2 files changed, 69 insertions(+)
+v1->v2:
+- fixed warning caused by a missed arg description in comment of
+  a static function in ice driver :O
+---
+ drivers/dpll/dpll_netlink.c                    | 9 ++++++++-
+ drivers/net/ethernet/intel/ice/ice_dpll.c      | 2 ++
+ drivers/net/ethernet/mellanox/mlx5/core/dpll.c | 9 +++++----
+ drivers/ptp/ptp_ocp.c                          | 9 +++++----
+ include/linux/dpll.h                           | 1 +
+ 5 files changed, 21 insertions(+), 9 deletions(-)
 
-diff --git a/Documentation/netlink/specs/dpll.yaml b/Documentation/netlink/specs/dpll.yaml
-index b14aed18065f..1755066d8308 100644
---- a/Documentation/netlink/specs/dpll.yaml
-+++ b/Documentation/netlink/specs/dpll.yaml
-@@ -51,6 +51,40 @@ definitions:
-           if dpll lock-state was not DPLL_LOCK_STATUS_LOCKED_HO_ACQ, the
-           dpll's lock-state shall remain DPLL_LOCK_STATUS_UNLOCKED)
-     render-max: true
-+  -
-+    type: enum
-+    name: lock-status-error
-+    doc: |
-+      if previous status change was done due to a failure, this provides
-+      information of dpll device lock status error.
-+      Valid values for DPLL_A_LOCK_STATUS_ERROR attribute
-+    entries:
-+      -
-+        name: none
-+        doc: |
-+          dpll device lock status was changed without any error
-+        value: 1
-+      -
-+        name: undefined
-+        doc: |
-+          dpll device lock status was changed due to undefined error.
-+          Driver fills this value up in case it is not able
-+          to obtain suitable exact error type.
-+      -
-+        name: media-down
-+        doc: |
-+          dpll device lock status was changed because of associated
-+          media got down.
-+          This may happen for example if dpll device was previously
-+          locked on an input pin of type PIN_TYPE_SYNCE_ETH_PORT.
-+      -
-+        name: fractional-frequency-offset-too-high
-+        doc: |
-+          the FFO (Fractional Frequency Offset) between the RX and TX
-+          symbol rate on the media got too high.
-+          This may happen for example if dpll device was previously
-+          locked on an input pin of type PIN_TYPE_SYNCE_ETH_PORT.
-+    render-max: true
-   -
-     type: const
-     name: temp-divider
-@@ -214,6 +248,10 @@ attribute-sets:
-         name: type
-         type: u32
-         enum: type
-+      -
-+        name: lock-status-error
-+        type: u32
-+        enum: lock-status-error
-   -
-     name: pin
-     enum-name: dpll_a_pin
-@@ -379,6 +417,7 @@ operations:
-             - mode
-             - mode-supported
-             - lock-status
-+            - lock-status-error
-             - temp
-             - clock-id
-             - type
-diff --git a/include/uapi/linux/dpll.h b/include/uapi/linux/dpll.h
-index b4e947f9bfbc..0c13d7f1a1bc 100644
---- a/include/uapi/linux/dpll.h
-+++ b/include/uapi/linux/dpll.h
-@@ -50,6 +50,35 @@ enum dpll_lock_status {
- 	DPLL_LOCK_STATUS_MAX = (__DPLL_LOCK_STATUS_MAX - 1)
- };
+diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+index 314bb3775465..cf3313517ae1 100644
+--- a/drivers/dpll/dpll_netlink.c
++++ b/drivers/dpll/dpll_netlink.c
+@@ -121,14 +121,21 @@ dpll_msg_add_lock_status(struct sk_buff *msg, struct dpll_device *dpll,
+ 			 struct netlink_ext_ack *extack)
+ {
+ 	const struct dpll_device_ops *ops = dpll_device_ops(dpll);
++	enum dpll_lock_status_error status_error = 0;
+ 	enum dpll_lock_status status;
+ 	int ret;
  
-+/**
-+ * enum dpll_lock_status_error - if previous status change was done due to a
-+ *   failure, this provides information of dpll device lock status error. Valid
-+ *   values for DPLL_A_LOCK_STATUS_ERROR attribute
-+ * @DPLL_LOCK_STATUS_ERROR_NONE: dpll device lock status was changed without
-+ *   any error
-+ * @DPLL_LOCK_STATUS_ERROR_UNDEFINED: dpll device lock status was changed due
-+ *   to undefined error. Driver fills this value up in case it is not able to
-+ *   obtain suitable exact error type.
-+ * @DPLL_LOCK_STATUS_ERROR_MEDIA_DOWN: dpll device lock status was changed
-+ *   because of associated media got down. This may happen for example if dpll
-+ *   device was previously locked on an input pin of type
-+ *   PIN_TYPE_SYNCE_ETH_PORT.
-+ * @DPLL_LOCK_STATUS_ERROR_FRACTIONAL_FREQUENCY_OFFSET_TOO_HIGH: the FFO
-+ *   (Fractional Frequency Offset) between the RX and TX symbol rate on the
-+ *   media got too high. This may happen for example if dpll device was
-+ *   previously locked on an input pin of type PIN_TYPE_SYNCE_ETH_PORT.
-+ */
-+enum dpll_lock_status_error {
-+	DPLL_LOCK_STATUS_ERROR_NONE = 1,
-+	DPLL_LOCK_STATUS_ERROR_UNDEFINED,
-+	DPLL_LOCK_STATUS_ERROR_MEDIA_DOWN,
-+	DPLL_LOCK_STATUS_ERROR_FRACTIONAL_FREQUENCY_OFFSET_TOO_HIGH,
-+
-+	/* private: */
-+	__DPLL_LOCK_STATUS_ERROR_MAX,
-+	DPLL_LOCK_STATUS_ERROR_MAX = (__DPLL_LOCK_STATUS_ERROR_MAX - 1)
-+};
-+
- #define DPLL_TEMP_DIVIDER	1000
+-	ret = ops->lock_status_get(dpll, dpll_priv(dpll), &status, extack);
++	ret = ops->lock_status_get(dpll, dpll_priv(dpll), &status,
++				   &status_error, extack);
+ 	if (ret)
+ 		return ret;
+ 	if (nla_put_u32(msg, DPLL_A_LOCK_STATUS, status))
+ 		return -EMSGSIZE;
++	if (status_error &&
++	    (status == DPLL_LOCK_STATUS_UNLOCKED ||
++	     status == DPLL_LOCK_STATUS_HOLDOVER) &&
++	    nla_put_u32(msg, DPLL_A_LOCK_STATUS_ERROR, status_error))
++		return -EMSGSIZE;
  
- /**
-@@ -150,6 +179,7 @@ enum dpll_a {
- 	DPLL_A_LOCK_STATUS,
- 	DPLL_A_TEMP,
- 	DPLL_A_TYPE,
-+	DPLL_A_LOCK_STATUS_ERROR,
+ 	return 0;
+ }
+diff --git a/drivers/net/ethernet/intel/ice/ice_dpll.c b/drivers/net/ethernet/intel/ice/ice_dpll.c
+index b9c5eced6326..c0256564e998 100644
+--- a/drivers/net/ethernet/intel/ice/ice_dpll.c
++++ b/drivers/net/ethernet/intel/ice/ice_dpll.c
+@@ -488,6 +488,7 @@ ice_dpll_hw_input_prio_set(struct ice_pf *pf, struct ice_dpll *dpll,
+  * @dpll: registered dpll pointer
+  * @dpll_priv: private data pointer passed on dpll registration
+  * @status: on success holds dpll's lock status
++ * @status_error: status error value
+  * @extack: error reporting
+  *
+  * Dpll subsystem callback, provides dpll's lock status.
+@@ -500,6 +501,7 @@ ice_dpll_hw_input_prio_set(struct ice_pf *pf, struct ice_dpll *dpll,
+ static int
+ ice_dpll_lock_status_get(const struct dpll_device *dpll, void *dpll_priv,
+ 			 enum dpll_lock_status *status,
++			 enum dpll_lock_status_error *status_error,
+ 			 struct netlink_ext_ack *extack)
+ {
+ 	struct ice_dpll *d = dpll_priv;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/dpll.c b/drivers/net/ethernet/mellanox/mlx5/core/dpll.c
+index 18fed2b34fb1..07f43d5c90c6 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/dpll.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/dpll.c
+@@ -118,10 +118,11 @@ mlx5_dpll_pin_ffo_get(struct mlx5_dpll_synce_status *synce_status,
+ 	return 0;
+ }
  
- 	__DPLL_A_MAX,
- 	DPLL_A_MAX = (__DPLL_A_MAX - 1)
+-static int mlx5_dpll_device_lock_status_get(const struct dpll_device *dpll,
+-					    void *priv,
+-					    enum dpll_lock_status *status,
+-					    struct netlink_ext_ack *extack)
++static int
++mlx5_dpll_device_lock_status_get(const struct dpll_device *dpll, void *priv,
++				 enum dpll_lock_status *status,
++				 enum dpll_lock_status_error *status_error,
++				 struct netlink_ext_ack *extack)
+ {
+ 	struct mlx5_dpll_synce_status synce_status;
+ 	struct mlx5_dpll *mdpll = priv;
+diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+index 5f858e426bbd..9507681e0d12 100644
+--- a/drivers/ptp/ptp_ocp.c
++++ b/drivers/ptp/ptp_ocp.c
+@@ -4209,10 +4209,11 @@ ptp_ocp_detach(struct ptp_ocp *bp)
+ 	device_unregister(&bp->dev);
+ }
+ 
+-static int ptp_ocp_dpll_lock_status_get(const struct dpll_device *dpll,
+-					void *priv,
+-					enum dpll_lock_status *status,
+-					struct netlink_ext_ack *extack)
++static int
++ptp_ocp_dpll_lock_status_get(const struct dpll_device *dpll, void *priv,
++			     enum dpll_lock_status *status,
++			     enum dpll_lock_status_error *status_error,
++			     struct netlink_ext_ack *extack)
+ {
+ 	struct ptp_ocp *bp = priv;
+ 
+diff --git a/include/linux/dpll.h b/include/linux/dpll.h
+index 9cf896ea1d41..9cb02ad73d51 100644
+--- a/include/linux/dpll.h
++++ b/include/linux/dpll.h
+@@ -19,6 +19,7 @@ struct dpll_device_ops {
+ 			enum dpll_mode *mode, struct netlink_ext_ack *extack);
+ 	int (*lock_status_get)(const struct dpll_device *dpll, void *dpll_priv,
+ 			       enum dpll_lock_status *status,
++			       enum dpll_lock_status_error *status_error,
+ 			       struct netlink_ext_ack *extack);
+ 	int (*temp_get)(const struct dpll_device *dpll, void *dpll_priv,
+ 			s32 *temp, struct netlink_ext_ack *extack);
 -- 
 2.43.0
 
