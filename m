@@ -1,87 +1,111 @@
-Return-Path: <netdev+bounces-67340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8D87842DB4
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 21:26:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4E63842DEA
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 21:33:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE0E51C226FC
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 20:26:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8A271C238C9
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 20:33:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D024F71B4B;
-	Tue, 30 Jan 2024 20:26:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABAB438DD7;
+	Tue, 30 Jan 2024 20:33:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GtIC7mMf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lIuzTLaf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+Received: from mail-vs1-f44.google.com (mail-vs1-f44.google.com [209.85.217.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE7069E14
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 20:26:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB04D273FB;
+	Tue, 30 Jan 2024 20:33:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706646414; cv=none; b=C1VIScvvmptn0xdgaykEsoOLuVfmazXrasGSr8GGv9CzKvEqu5eVlpKmCbpUVYtrUg8/SJbtz74EDYD6HPOGtNhUd001EWEmbQ75aoGY0VY1SdWRMNT1PfP87R+S9KfDD4y1Wl5LjjZlufMvxSy4/OMNbZQTCpr72sxGw7YtVao=
+	t=1706646817; cv=none; b=pPwIMIl/jDgIrFTNEF3CXkDA/8iqU07FfOPQqhbyY3UHoOjeuUg9TDnYWFcdYz6nlbRb4r2cD3EUOFDuHMNh4VTm7Ttz4LyIidvRrZENHjRLqXqZ+gdxV6+ehBd9d1jEErN6JumEJeGrTYzpQcNtUPNnffQOBi088LymJ6YCYCg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706646414; c=relaxed/simple;
-	bh=KuTmKyvCKc/JzV7yLDBEVAywdYQYYiHwg6FUaoKHR9I=;
+	s=arc-20240116; t=1706646817; c=relaxed/simple;
+	bh=9gLly5nSMO7HAGLG55biRNk6bSu5VfxJFyy+lw6JMsE=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=aEQwtrWUm1ppq7gcGRBW41kftPtlOZj8yiOiHBHEQe7ELVPE7XOUvpImWIK9oju0f/WFzi4t5YBIu9UdpPBDGM0r0+kPmjuF5wnnbHzJwPAGw4TOzLZr9xaHndlLpG9H5VkaEa8K8TKeuemSUA7sbegrl9hvmAbphUDXK0fMJok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GtIC7mMf; arc=none smtp.client-ip=209.85.167.171
+	 Mime-Version:Content-Type; b=I3DmFIi+ixvD7leGNteW/sUoZrwQmt5h77oAcsVFLezBJyAfXU7ESnu0Jl+LQ4hHXje6Ar5n6wpAns+ksITdalictmFzPlUqkHipbo69mxegQATNglmYDAgQmaEcW0vKwCdGeFTxwsTkFkQ0G+vtDDOtLlYh8QwGOmgv3aQOxNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lIuzTLaf; arc=none smtp.client-ip=209.85.217.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3beb1d4d872so122082b6e.2
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 12:26:52 -0800 (PST)
+Received: by mail-vs1-f44.google.com with SMTP id ada2fe7eead31-46b165745deso1160903137.0;
+        Tue, 30 Jan 2024 12:33:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706646412; x=1707251212; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706646815; x=1707251615; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=kbTJjKCrOfDgTy9smq7m24U8CMjAHxM02Wx3bo7/ZAA=;
-        b=GtIC7mMfKfwxazY0g26q//xdqZzes9RAkCYdT3CBMyPHrCSN3O6OOKuTr0XXKNfsof
-         jCkMedKxKDACs6dqU61PHvXNKJFScdjxQceczYGDWK6BrmrRypFhY9LL2t/yyVQGazup
-         NZhs2NeW8z8XJ07HIPTuFIjdU5ISdSnu/U37uYzKE2wfYaXsIXdsYxjsAYwmYxZ6yrqM
-         crjNMj/EYXk3MPQY/Y8bvdwwI2g4pDVWO8Jw6yghphDBsFJkJJYUtSMmvfQoNJq6ffTQ
-         yvIx8R/2DnInfh7MxL+Z2tgZAl2yVIH+4EWn8b8LvRt+9QWo2Ny+MRv9a95GmzrfqS4n
-         C+BQ==
+        bh=Gl6S+h5X5duCZxOHIFlZf9cbhJJlXCS97B8qluDa6Fo=;
+        b=lIuzTLaf8TPrNQ1CPEuArNYUGqlHg86UGf4TmlatvhNwdVX8YccFKOdZEJ+eIRe5MP
+         guVgh9x5ISF/RZgHhBRi3rfZ837it9zxc5DkOfcLtNQel+nUXYVCOmq3lML6ceSsjaJp
+         63QrsVUY1O5GlWf4BirslJ8vlgBcByyZnNkkXdBGnRuQT++AU/m5uvuh8cnD+zEgNkLg
+         Ltj9rRssvNFP1qfsLUulFHh/T5Jo69Ui3YBTNdrL1w6SsJ3uO1j2KEMyI4KHaLCsgDO2
+         0zpV02zho05m4pna7C5CFp/PIXgR9uz/k5zmSM7zNgTgd20R+Ij6dhtSN7+eONzi0RUO
+         EH9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706646412; x=1707251212;
+        d=1e100.net; s=20230601; t=1706646815; x=1707251615;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=kbTJjKCrOfDgTy9smq7m24U8CMjAHxM02Wx3bo7/ZAA=;
-        b=Vyi74t/93vW+TIZhIwgjUKues1NvYAHYBDBJ/7g8jXKtC26nNzusdHlDkojMPg94P3
-         vv6hRfTgL2xY1s38+IQIcixQ6BN/Wg5Vd/Y4JGAIXSGwy7QD5IAF7W21oFjUmrPIRaST
-         emBGSXixVdn4JCSA/XzbBPTr5zlGmK9TN/x/GA3SvUfeXnvx+8rttr1cYBULMoLvARKY
-         886Sp+WYearqgHDUAAOOCC13iF38UHkWO2hKtZBrFrpsCDUnXnVkHK2YXKMVcuOXFDlc
-         atwSemPtMgDfeqKQUH1aRvwu6J6+oFT875l2avCMlNMG8DfzgcCdmcNBgemJznLGFDBg
-         StDA==
-X-Gm-Message-State: AOJu0YxNtrZL7I7MX1QH1vY5zYcqKDn54QgNhBFWqbTHdiaBOb4jW+dX
-	PyM19rZR7mU5eRCQ1FfX06cSsqaBwCo36p9JK6Hn58F4qhvUYMoa
-X-Google-Smtp-Source: AGHT+IGErMPVqryARc+ypYYa6CsfppsSKWQVv3v+CIQOp/QRyBr1CrmzM7TpHUs/xSGdi6woOB763Q==
-X-Received: by 2002:a05:6870:d0c2:b0:218:4755:559b with SMTP id k2-20020a056870d0c200b002184755559bmr8099044oaa.7.1706646411905;
-        Tue, 30 Jan 2024 12:26:51 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVa114iTK3tFQmxPj+H1jrSOUV+WNAI2ihbK9JBtYldvfV1t2yr12OhJijOgAUABSvf9paxdo0NNo0TJkP4dj1T6fOUKJLlUyIGbhl2J4YgFXSsHeJpJ09NSDht0w2uDAHDyR6z+d2UiaXRacSu34rVLvu1tm+RnWXHVBCyMHXdaZ09cw3hh8A5rLQCd74USNWoMX3FT8gatbegNTMI5rNbSeBngj0FQTLexNmvWV+H
+        bh=Gl6S+h5X5duCZxOHIFlZf9cbhJJlXCS97B8qluDa6Fo=;
+        b=Oh71yCIy+uRnpZxC7rsOb2H6s8csznPQRzU3jwmQpOFCU5pQ0gwyS2RYTdicBd7vUH
+         44J4rAp6L7UW06SQwJ9ORpwW36m9zPtQ6z++iPfbkdqj0M6JqTUUb97SyaXJLt0e/BVi
+         k0KRvK9L8gVRXieZn/D9uCcV62W9/4FLdyeLwySUz4FQvWm2Gq/d7iC630eAcobAKg6b
+         DCmJ71P4FlhV/35LBrkJZe8hk+JgEHwO56Y1IwzqvaFZZrydk650sCJ/GTLQwcNGsxrw
+         X05uZOZe18UobdtDpVhK6UTNz6Aim7x+9KaOwcmvHqDkSrVd1szj6eq0pGa9GQF3129m
+         t5qw==
+X-Gm-Message-State: AOJu0Yy0/ak6s6zEpW4+dd6b9/ZRzWdVOlvTZeUvQA2AOeBicadFSuCh
+	Wwhs0zFBKei+1JsTCeg4o7jwBtdOtIDFjf5cmMKgYJ6Tdo01qwzV
+X-Google-Smtp-Source: AGHT+IGnLs35Tq5pjgU99zjKmp5t5xNf1KEIT+2QAXcXD1XG3HZaCBraj1YrCi+8U4OFhv+0ZMvuJw==
+X-Received: by 2002:a05:6102:492:b0:46b:1fd4:8024 with SMTP id n18-20020a056102049200b0046b1fd48024mr5333967vsa.18.1706646814532;
+        Tue, 30 Jan 2024 12:33:34 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVCRgXTxafdHn0X3SBiFyJL5ihtpS2Y7c8OLuPQHyjXeiDROoF6Z6jgOJ58EayoNo7PuRpw9n7/Y8D4DgbmLGB3um7pf/CYRcutKNYyQRsZcrs8gvoFZiSb8skE0KBwpW0j9YWbDQ5lGJplLPRsHLDIz70XsK/e+bGQNLkHKLHwFmiIpgHN/Q5vX5Bw0hQji3UtWUubBfrV0BPRnE5AkGlC87tRIkgsA5sdnwm57zrzTHg+pOD8qQ0nUS+d1EEYLvHZ4jB2LJmhA6L7bJW4l+0INb21N++ZR93SKjJSzw68bl0WRMECqvcpAhwNwCfShv8uF+EnL4xlG9zoOER0xvPBkfLRxDx83rsKK5mOtSxpQOFTk5b5UCSIWNNHDhI4r4/ZJ7zSlV/hSoeJ94l2FZ6BmKiEz8oDghqaybEj2fGK9PP5Dz2Fx1PzhkJ7PuUnoNxc6Nq05JTUo+B5FXCF9JXCRUcer0YVrCDyMwNZXnSm5KBeu7Q7y0PbI/KW2D3NrGEwAjMTuOhsLHGewt5glmUocmP5Q4ePvWPC89+VzcGNLa9L7BFZGTbBpwOLfbBW4vKOpU92lC/yTLPMmjrgGBCe75MMjoDSJM1Nb2h66gS8uYG+8k9TY/PbvEABuSjRhOo6Xk/FJfz0Zd05xUrX3XK8XQXspq2w6//008TyO6qrttjpZx5cks8R+e34jrNcuSmdQPEqpGzymW81fIWLcIfy6ZDktoPCDYVF6LpdTQPuSLpPXSNJycIntg6r/ocUSjKMuZIvwrXNKIgd4wBVuGSwQfwpoFL6l5HKVYsjSy3cZ5YFK7dtVn1j3q16bId8JFjumr65pwHS8sX2HiOyuKq8M+7soJ4ISbkwyV+t+c+PTj7bunCrX4E/nNUh7ls6mF6dcUziMs6FQvxA5w1RjsroVadz/52j6oWe2xExswapF/7S3TWO
 Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
-        by smtp.gmail.com with ESMTPSA id m18-20020a05622a119200b0042a882de47fsm4284216qtk.41.2024.01.30.12.26.51
+        by smtp.gmail.com with ESMTPSA id oj12-20020a056214440c00b0068c4b445991sm2621485qvb.67.2024.01.30.12.33.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 12:26:51 -0800 (PST)
-Date: Tue, 30 Jan 2024 15:26:51 -0500
+        Tue, 30 Jan 2024 12:33:34 -0800 (PST)
+Date: Tue, 30 Jan 2024 15:33:33 -0500
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Sitnicki <jakub@cloudflare.com>, 
+To: Joe Damato <jdamato@fastly.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: linux-kernel@vger.kernel.org, 
  netdev@vger.kernel.org, 
- Willem de Bruijn <willemb@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- kernel-team@cloudflare.com
-Message-ID: <65b95b8b3e4d0_ce3aa29444@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240130131422.135965-1-jakub@cloudflare.com>
-References: <20240130131422.135965-1-jakub@cloudflare.com>
-Subject: Re: [PATCH net-next] selftests: udpgso: Pull up network setup into
- shell script
+ chuck.lever@oracle.com, 
+ jlayton@kernel.org, 
+ linux-api@vger.kernel.org, 
+ brauner@kernel.org, 
+ edumazet@google.com, 
+ davem@davemloft.net, 
+ alexander.duyck@gmail.com, 
+ sridhar.samudrala@intel.com, 
+ kuba@kernel.org, 
+ weiwan@google.com, 
+ Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Andrew Waterman <waterman@eecs.berkeley.edu>, 
+ Arnd Bergmann <arnd@arndb.de>, 
+ Dominik Brodowski <linux@dominikbrodowski.net>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ Jan Kara <jack@suse.cz>, 
+ Jiri Slaby <jirislaby@kernel.org>, 
+ Jonathan Corbet <corbet@lwn.net>, 
+ Julien Panis <jpanis@baylibre.com>, 
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>, 
+ "(open list:FILESYSTEMS \\(VFS and infrastructure\\))" <linux-fsdevel@vger.kernel.org>, 
+ Michael Ellerman <mpe@ellerman.id.au>, 
+ Nathan Lynch <nathanl@linux.ibm.com>, 
+ Palmer Dabbelt <palmer@dabbelt.com>, 
+ Steve French <stfrench@microsoft.com>, 
+ Thomas Huth <thuth@redhat.com>, 
+ Thomas Zimmermann <tzimmermann@suse.de>
+Message-ID: <65b95d1de41cc_ce3aa294fa@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240129190922.GA1315@fastly.com>
+References: <20240125225704.12781-1-jdamato@fastly.com>
+ <65b52d6381de7_3a9e0b2943d@willemb.c.googlers.com.notmuch>
+ <20240129190922.GA1315@fastly.com>
+Subject: Re: [PATCH net-next v3 0/3] Per epoll context busy poll support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,302 +116,118 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-Jakub Sitnicki wrote:
-> udpgso regression test configures routing and device MTU directly through
-> uAPI (Netlink, ioctl) to do its job. While there is nothing wrong with it,
-> it takes more effort than doing it from shell.
+Joe Damato wrote:
+> On Sat, Jan 27, 2024 at 11:20:51AM -0500, Willem de Bruijn wrote:
+> > Joe Damato wrote:
+> > > Greetings:
+> > > 
+> > > Welcome to v3. Cover letter updated from v2 to explain why ioctl and
+> > > adjusted my cc_cmd to try to get the correct people in addition to folks
+> > > who were added in v1 & v2. Labeled as net-next because it seems networking
+> > > related to me even though it is fs code.
+> > > 
+> > > TL;DR This builds on commit bf3b9f6372c4 ("epoll: Add busy poll support to
+> > > epoll with socket fds.") by allowing user applications to enable
+> > > epoll-based busy polling and set a busy poll packet budget on a per epoll
+> > > context basis.
+> > > 
+> > > This makes epoll-based busy polling much more usable for user
+> > > applications than the current system-wide sysctl and hardcoded budget.
+> > > 
+> > > To allow for this, two ioctls have been added for epoll contexts for
+> > > getting and setting a new struct, struct epoll_params.
+> > > 
+> > > ioctl was chosen vs a new syscall after reviewing a suggestion by Willem
+> > > de Bruijn [1]. I am open to using a new syscall instead of an ioctl, but it
+> > > seemed that: 
+> > >   - Busy poll affects all existing epoll_wait and epoll_pwait variants in
+> > >     the same way, so new verions of many syscalls might be needed. It
+> > 
+> > There is no need to support a new feature on legacy calls. Applications have
+> > to be upgraded to the new ioctl, so they can also be upgraded to the latest
+> > epoll_wait variant.
 > 
-> Looking forward, we would like to extend the udpgso regression tests to
-> cover the EIO corner case [1], once it gets addressed. That will require a
-> dummy device and device feature manipulation to set it up. Which means more
-> Netlink code.
+> Sure, that's a fair point. I think we could probably make reasonable
+> arguments in both directions about the pros/cons of each approach.
 > 
-> So, in preparation, pull out network configuration into the shell script
-> part of the test, so it is easily extendable in the future.
+> It's still not clear to me that a new syscall is the best way to go on
+> this, and IMO it does not offer a clear advantage. I understand that part
+> of the premise of your argument is that ioctls are not recommended, but in
+> this particular case it seems like a good use case and there have been
+> new ioctls added recently (at least according to git log).
 > 
-> Also, because it now easy to setup routing, add a second local IPv6
-> address. Because the second address is not managed by the kernel, we can
-> "replace" the corresponding local route with a reduced-MTU one. This
-> unblocks the disabled "ipv6 connected" test case. Add a similar setup for
-> IPv4 for symmetry.
-
-Nice!
-
-Just a few small nits.
-
+> This makes me think that while their use is not recommended, they can serve
+> a purpose in specific use cases. To me, this use case seems very fitting.
 > 
-> [1] https://lore.kernel.org/netdev/87jzqsld6q.fsf@cloudflare.com/
+> More of a joke and I hate to mention this, but this setting is changing how
+> io is done and it seems fitting that this done via an ioctl ;)
 > 
-> Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
-> ---
->  tools/testing/selftests/net/udpgso.c  | 134 ++------------------------
->  tools/testing/selftests/net/udpgso.sh |  50 ++++++++--
->  2 files changed, 48 insertions(+), 136 deletions(-)
+> > epoll_pwait extends epoll_wait with a sigmask.
+> > epoll_pwait2 extends extends epoll_pwait with nsec resolution timespec.
+> > Since they are supersets, nothing is lots by limiting to the most recent API.
+> > 
+> > In the discussion of epoll_pwait2 the addition of a forward looking flags
+> > argument was discussed, but eventually dropped. Based on the argument that
+> > adding a syscall is not a big task and does not warrant preemptive code.
+> > This decision did receive a suitably snarky comment from Jonathan Corbet [1].
+> > 
+> > It is definitely more boilerplate, but essentially it is as feasible to add an
+> > epoll_pwait3 that takes an optional busy poll argument. In which case, I also
+> > believe that it makes more sense to configure the behavior of the syscall
+> > directly, than through another syscall and state stored in the kernel.
 > 
-> diff --git a/tools/testing/selftests/net/udpgso.c b/tools/testing/selftests/net/udpgso.c
-> index 7badaf215de2..79fd3287ff60 100644
-> --- a/tools/testing/selftests/net/udpgso.c
-> +++ b/tools/testing/selftests/net/udpgso.c
-> @@ -56,7 +56,6 @@ static bool		cfg_do_msgmore;
->  static bool		cfg_do_setsockopt;
->  static int		cfg_specific_test_id = -1;
->  
-> -static const char	cfg_ifname[] = "lo";
->  static unsigned short	cfg_port = 9000;
->  
->  static char buf[ETH_MAX_MTU];
-> @@ -69,8 +68,13 @@ struct testcase {
->  	int r_len_last;		/* recv(): size of last non-mss dgram, if any */
->  };
->  
-> -const struct in6_addr addr6 = IN6ADDR_LOOPBACK_INIT;
-> -const struct in_addr addr4 = { .s_addr = __constant_htonl(INADDR_LOOPBACK + 2) };
-> +const struct in6_addr addr6 = {
-> +	{ { 0x20, 0x01, 0x0d, 0xb8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0x00, 0x01 } },
-> +};
-> +
-> +const struct in_addr addr4 = {
-> +	__constant_htonl(0xc0000201), /* 192.0.2.1 */
-> +};
-
-Prefer an address from a private range?
-
->  struct testcase testcases_v4[] = {
->  	{
-> @@ -274,48 +278,6 @@ struct testcase testcases_v6[] = {
->  	}
->  };
->  
-> -static unsigned int get_device_mtu(int fd, const char *ifname)
-> -{
-> -	struct ifreq ifr;
-> -
-> -	memset(&ifr, 0, sizeof(ifr));
-> -
-> -	strcpy(ifr.ifr_name, ifname);
-> -
-> -	if (ioctl(fd, SIOCGIFMTU, &ifr))
-> -		error(1, errno, "ioctl get mtu");
-> -
-> -	return ifr.ifr_mtu;
-> -}
-> -
-> -static void __set_device_mtu(int fd, const char *ifname, unsigned int mtu)
-> -{
-> -	struct ifreq ifr;
-> -
-> -	memset(&ifr, 0, sizeof(ifr));
-> -
-> -	ifr.ifr_mtu = mtu;
-> -	strcpy(ifr.ifr_name, ifname);
-> -
-> -	if (ioctl(fd, SIOCSIFMTU, &ifr))
-> -		error(1, errno, "ioctl set mtu");
-> -}
-> -
-> -static void set_device_mtu(int fd, int mtu)
-> -{
-> -	int val;
-> -
-> -	val = get_device_mtu(fd, cfg_ifname);
-> -	fprintf(stderr, "device mtu (orig): %u\n", val);
-> -
-> -	__set_device_mtu(fd, cfg_ifname, mtu);
-> -	val = get_device_mtu(fd, cfg_ifname);
-> -	if (val != mtu)
-> -		error(1, 0, "unable to set device mtu to %u\n", val);
-> -
-> -	fprintf(stderr, "device mtu (test): %u\n", val);
-> -}
-> -
->  static void set_pmtu_discover(int fd, bool is_ipv4)
->  {
->  	int level, name, val;
-> @@ -354,81 +316,6 @@ static unsigned int get_path_mtu(int fd, bool is_ipv4)
->  	return mtu;
->  }
->  
-> -/* very wordy version of system("ip route add dev lo mtu 1500 127.0.0.3/32") */
-> -static void set_route_mtu(int mtu, bool is_ipv4)
-> -{
-> -	struct sockaddr_nl nladdr = { .nl_family = AF_NETLINK };
-> -	struct nlmsghdr *nh;
-> -	struct rtattr *rta;
-> -	struct rtmsg *rt;
-> -	char data[NLMSG_ALIGN(sizeof(*nh)) +
-> -		  NLMSG_ALIGN(sizeof(*rt)) +
-> -		  NLMSG_ALIGN(RTA_LENGTH(sizeof(addr6))) +
-> -		  NLMSG_ALIGN(RTA_LENGTH(sizeof(int))) +
-> -		  NLMSG_ALIGN(RTA_LENGTH(0) + RTA_LENGTH(sizeof(int)))];
-> -	int fd, ret, alen, off = 0;
-> -
-> -	alen = is_ipv4 ? sizeof(addr4) : sizeof(addr6);
-> -
-> -	fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
-> -	if (fd == -1)
-> -		error(1, errno, "socket netlink");
-> -
-> -	memset(data, 0, sizeof(data));
-> -
-> -	nh = (void *)data;
-> -	nh->nlmsg_type = RTM_NEWROUTE;
-> -	nh->nlmsg_flags = NLM_F_REQUEST | NLM_F_CREATE;
-> -	off += NLMSG_ALIGN(sizeof(*nh));
-> -
-> -	rt = (void *)(data + off);
-> -	rt->rtm_family = is_ipv4 ? AF_INET : AF_INET6;
-> -	rt->rtm_table = RT_TABLE_MAIN;
-> -	rt->rtm_dst_len = alen << 3;
-> -	rt->rtm_protocol = RTPROT_BOOT;
-> -	rt->rtm_scope = RT_SCOPE_UNIVERSE;
-> -	rt->rtm_type = RTN_UNICAST;
-> -	off += NLMSG_ALIGN(sizeof(*rt));
-> -
-> -	rta = (void *)(data + off);
-> -	rta->rta_type = RTA_DST;
-> -	rta->rta_len = RTA_LENGTH(alen);
-> -	if (is_ipv4)
-> -		memcpy(RTA_DATA(rta), &addr4, alen);
-> -	else
-> -		memcpy(RTA_DATA(rta), &addr6, alen);
-> -	off += NLMSG_ALIGN(rta->rta_len);
-> -
-> -	rta = (void *)(data + off);
-> -	rta->rta_type = RTA_OIF;
-> -	rta->rta_len = RTA_LENGTH(sizeof(int));
-> -	*((int *)(RTA_DATA(rta))) = 1; //if_nametoindex("lo");
-> -	off += NLMSG_ALIGN(rta->rta_len);
-> -
-> -	/* MTU is a subtype in a metrics type */
-> -	rta = (void *)(data + off);
-> -	rta->rta_type = RTA_METRICS;
-> -	rta->rta_len = RTA_LENGTH(0) + RTA_LENGTH(sizeof(int));
-> -	off += NLMSG_ALIGN(rta->rta_len);
-> -
-> -	/* now fill MTU subtype. Note that it fits within above rta_len */
-> -	rta = (void *)(((char *) rta) + RTA_LENGTH(0));
-> -	rta->rta_type = RTAX_MTU;
-> -	rta->rta_len = RTA_LENGTH(sizeof(int));
-> -	*((int *)(RTA_DATA(rta))) = mtu;
-> -
-> -	nh->nlmsg_len = off;
-> -
-> -	ret = sendto(fd, data, off, 0, (void *)&nladdr, sizeof(nladdr));
-> -	if (ret != off)
-> -		error(1, errno, "send netlink: %uB != %uB\n", ret, off);
-> -
-> -	if (close(fd))
-> -		error(1, errno, "close netlink");
-> -
-> -	fprintf(stderr, "route mtu (test): %u\n", mtu);
-> -}
-> -
-
-Oh no, my handcrafted artisanal netlink code!
-
-Yeah, concise shell commands are a better model.
-
->  static bool __send_one(int fd, struct msghdr *msg, int flags)
->  {
->  	int ret;
-> @@ -591,15 +478,10 @@ static void run_test(struct sockaddr *addr, socklen_t alen)
->  	/* Do not fragment these datagrams: only succeed if GSO works */
->  	set_pmtu_discover(fdt, addr->sa_family == AF_INET);
->  
-> -	if (cfg_do_connectionless) {
-> -		set_device_mtu(fdt, CONST_MTU_TEST);
-> +	if (cfg_do_connectionless)
->  		run_all(fdt, fdr, addr, alen);
-> -	}
->  
->  	if (cfg_do_connected) {
-> -		set_device_mtu(fdt, CONST_MTU_TEST + 100);
-> -		set_route_mtu(CONST_MTU_TEST, addr->sa_family == AF_INET);
-> -
->  		if (connect(fdt, addr, alen))
->  			error(1, errno, "connect");
->  
-> diff --git a/tools/testing/selftests/net/udpgso.sh b/tools/testing/selftests/net/udpgso.sh
-> index fec24f584fe9..d7fb71e132bb 100755
-> --- a/tools/testing/selftests/net/udpgso.sh
-> +++ b/tools/testing/selftests/net/udpgso.sh
-> @@ -3,27 +3,57 @@
->  #
->  # Run a series of udpgso regression tests
->  
-> +set -o errexit
-> +set -o nounset
-> +# set -o xtrace
-
-Leftover debug comment?
-
-> +
-> +setup_loopback() {
-> +  ip addr add dev lo 192.0.2.1/32
-> +  ip addr add dev lo 2001:db8::1/128 nodad noprefixroute
-> +}
-> +
-> +test_dev_mtu() {
-> +  setup_loopback
-> +  # Reduce loopback MTU
-> +  ip link set dev lo mtu 1500
-> +}
-> +
-> +test_route_mtu() {
-> +  setup_loopback
-> +  # Remove default local routes
-> +  ip route del local 192.0.2.1/32 table local dev lo
-> +  ip route del local 2001:db8::1/128 table local dev lo
-> +  # Install local routes with reduced MTU
-> +  ip route add local 192.0.2.1/32 table local dev lo mtu 1500
-> +  ip route add local 2001:db8::1/128 table local dev lo mtu 1500
-
-ip route change?
-
-> +}
-> +
-> +if [ "$#" -gt 0 ]; then
-> +  "$1"
-> +  shift 2 # pop "test_*" function arg and "--" delimiter
-> +  exec "$@"
-> +fi
-> +
->  echo "ipv4 cmsg"
-> -./in_netns.sh ./udpgso -4 -C
-> +./in_netns.sh "$0" test_dev_mtu -- ./udpgso -4 -C
->  
->  echo "ipv4 setsockopt"
-> -./in_netns.sh ./udpgso -4 -C -s
-> +./in_netns.sh "$0" test_dev_mtu -- ./udpgso -4 -C -s
->  
->  echo "ipv6 cmsg"
-> -./in_netns.sh ./udpgso -6 -C
-> +./in_netns.sh "$0" test_dev_mtu -- ./udpgso -6 -C
->  
->  echo "ipv6 setsockopt"
-> -./in_netns.sh ./udpgso -6 -C -s
-> +./in_netns.sh "$0" test_dev_mtu -- ./udpgso -6 -C -s
->  
->  echo "ipv4 connected"
-> -./in_netns.sh ./udpgso -4 -c
-> +./in_netns.sh "$0" test_route_mtu -- ./udpgso -4 -c
->  
-> -# blocked on 2nd loopback address
-> -# echo "ipv6 connected"
-> -# ./in_netns.sh ./udpgso -6 -c
-> +echo "ipv6 connected"
-> +./in_netns.sh "$0" test_route_mtu -- ./udpgso -6 -c
->  
->  echo "ipv4 msg_more"
-> -./in_netns.sh ./udpgso -4 -C -m
-> +./in_netns.sh "$0" test_dev_mtu -- ./udpgso -4 -C -m
->  
->  echo "ipv6 msg_more"
-> -./in_netns.sh ./udpgso -6 -C -m
-> +./in_netns.sh "$0" test_dev_mtu -- ./udpgso -6 -C -m
-> -- 
-> 2.43.0
+> I definitely hear what you are saying; I think I'm still not convinced, but
+> I am thinking it through.
 > 
+> In my mind, all of the other busy poll settings are configured by setting
+> options on the sockets using various SO_* options, which modify some state
+> in the kernel. The existing system-wide busy poll sysctl also does this. It
+> feels strange to me to diverge from that pattern just for epoll.
+
+I think the stateful approach for read is because there we do want
+to support all variants: read, readv, recv, recvfrom, recvmsg,
+recvmmsg. So there is no way to pass it directly.
+
+That said, I don't mean to argue strenously for this API or against
+yours. Want to make sure the option space is explored. There does not
+seem to be much other feedback. I don't hold a strong opinion either.
+
+> In the case of epoll_pwait2 the addition of a new syscall is an approach
+> that I think makes a lot of sense. The new system call is also probably
+> better from an end-user usability perspective, as well. For busy poll, I
+> don't see a clear reasoning why a new system call is better, but maybe I am
+> still missing something.
+>
+> > I don't think that the usec fine grain busy poll argument is all that useful.
+> > Documentation always suggests setting it to 50us or 100us, based on limited
+> > data. Main point is to set it to exceed the round-trip delay of whatever the
+> > process is trying to wait on. Overestimating is not costly, as the call
+> > returns as soon as the condition is met. An epoll_pwait3 flag EPOLL_BUSY_POLL
+> > with default 100us might be sufficient.
+> > 
+> > [1] https://lwn.net/Articles/837816/
+> 
+> Perhaps I am misunderstanding what you are suggesting, but I am opposed to
+> hardcoding a value. If it is currently configurable system-wide and via
+> SO_* options for other forms of busy poll, I think it should similarly be
+> configurable for epoll busy poll.
+> 
+> I may yet be convinced by the new syscall argument, but I don't think I'd
+> agree on imposing a default. The value can be modified by other forms of
+> busy poll and the goal of my changes are to:
+>   - make epoll-based busy poll per context
+>   - allow applications to configure (within reason) how epoll-based busy
+>     poll behaves, like they can do now with the existing SO_* options for
+>     other busy poll methods.
+
+Okay. I expected some push back. Was curious if people would come back
+with examples of where the full range is actually being used.
+
+> > >     seems much simpler for users to use the correct
+> > >     epoll_wait/epoll_pwait for their app and add a call to ioctl to enable
+> > >     or disable busy poll as needed. This also probably means less work to
+> > >     get an existing epoll app using busy poll.
+> > 
 
 
 
