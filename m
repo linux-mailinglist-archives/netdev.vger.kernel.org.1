@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-66946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 742CF841969
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:40:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 477DD841968
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:40:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B9172855B3
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 02:40:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A58C1C242D7
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 02:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A80FD36102;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C2F2E62A;
 	Tue, 30 Jan 2024 02:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dv7v+6vH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I8eY5A1f"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76253364DB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F785364C6;
 	Tue, 30 Jan 2024 02:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706582424; cv=none; b=CWkIXWJ6ZdGq0dJW6EmV7HyWxc+Mae0ssOB1InvY+TdN7or1wbAXroOnP/+3WLjs3YC727ZcQU0/3/4rqOXuRofprEI/fmWqRluJaQGh1s+FeXyZxPyNiVaF4cSm/34c2BMixSAi0B9BedGGYS3LYHpT/4fdFsMG+YjB+x4b9hk=
+	t=1706582424; cv=none; b=lLX07U6CFxqyYVfdh2Nt5rWQxF4LEMVQ/jDg8EqKc7M1aJvHZMn5dDoBnyOT1Er9m2jkARuYOPftxF4KqvWyBnrCSsxhEmjRUmLWQRBAHZUIQKmhQ5hLR0EbonELku5nbdhAA0HqOyblVm/vkXbCqaYv3m5377ueWCZ14WIJFV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706582424; c=relaxed/simple;
-	bh=l7iNsmx66/1U9HxfyV71kF0ouS2w3G1prRYjdiYH400=;
+	bh=/+JJ+5Dh8JPDLWVZZFqERw8ATKk3+XmkeQhdjQ1wYW0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jxaNNtsZ62xcXzgkORBGbbSdbSh7iiAvAJaE8i5bnC4bF2wGv2ukdISbM8EGHS/7dtNyqD9oQ8JNg1w78UQqqcugLugFimMiQUFR191jc8d1ohK/4YYQl0jztCwvHFle+xOXLmiI0QQzxMW3wkGvZz3tGlfyF/tKYVWdB0sXMUo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dv7v+6vH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E108DC43390;
+	 In-Reply-To:To:Cc; b=V56nQWZQE2JgbjejCX5q0zl/9IN+TBHsF1bBmSvg8OuafCxn8P1KTYThXLCeCT9eSmER/RDtJLTKSphelKYrLIQxj3IYx9ZxlcWMf7FpZOw48IQhui5/+GH8VKQsRsSjSyX/cUbGPlo2t6zhIOvTL5WXpLYH1yPxeQGVePCBJLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I8eY5A1f; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D5187C433F1;
 	Tue, 30 Jan 2024 02:40:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706582424;
-	bh=l7iNsmx66/1U9HxfyV71kF0ouS2w3G1prRYjdiYH400=;
+	s=k20201202; t=1706582423;
+	bh=/+JJ+5Dh8JPDLWVZZFqERw8ATKk3+XmkeQhdjQ1wYW0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Dv7v+6vHX7w2nWdv48sCcWYELRt2RoCzt/qpZHXF070TN+XywaUZpAmTWgwvy3q7H
-	 yo2cZlOyL17Q5VwvpnZYMgiCilBmDyM/PF3kIf8NyUj2ubSomhRc8sjHXtl5mDP3C1
-	 nJiQ/Lri9CklZD71VlGHFuMrQ3usJZqR/owPBxvBrPPMncLgN861fh7V8fWJR1RpeE
-	 +OLqtSVSXMjapWKItQMpKf6ow90Z7dUn3YZsdM1XvtEdfz7M4x3+e4tpqXaFfCMdYn
-	 PUJCqZRqE9S8wwda1svYllQd5Q/zCBV7fjjNX8uWiPUWWDQ0JqrPvH/5l4aGtmAQCO
-	 sI9RvLe5IX8/A==
+	b=I8eY5A1f54PN37rmXdRJhto6xA2Jbn8/5k35WaQ72nv9DmrHwmkRWxTJ6qD8MKnYJ
+	 Kn5r4xbI4V2l4qgpgSNbTbqmmoZQzVcCYIWkJA6ujefibnFWDKvUQ8mzroOm492QPE
+	 /2F3LGuTyPsHY8aXuWufH9llKYcZLF00PRRH6P2jBTO/BF2IY5gcPGwEsjJiyVVyuW
+	 j0MciY4VJtpLpjrcqazRsWDrzezYM8h52ntEPIfD59CZ2Z+XK3aSLRBuIoaoRKoQ4L
+	 nw1zcyXrIaXck/nbAVLSZ3o0iULYQMBuytVWtP0QyUHzXw8frlZbhP+1jZYdLfZ3JO
+	 rcxpGaD6cKcfw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C668CC561EE;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BDB38C43153;
 	Tue, 30 Jan 2024 02:40:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,41 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] net: dsa: qca8k: fix illegal usage of GPIO
+Subject: Re: [PATCH net] selftests: net: add missing config for nftables-backed
+ iptables
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170658242380.31723.8345340437270157023.git-patchwork-notify@kernel.org>
+ <170658242377.31723.2754949438054475014.git-patchwork-notify@kernel.org>
 Date: Tue, 30 Jan 2024 02:40:23 +0000
-References: <1706266175-3408-1-git-send-email-michal.vokac@ysoft.com>
-In-Reply-To: <1706266175-3408-1-git-send-email-michal.vokac@ysoft.com>
-To: =?utf-8?b?TWljaGFsIFZva8OhxI0gPG1pY2hhbC52b2thY0B5c29mdC5jb20+?=@codeaurora.org
-Cc: andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- ansuelsmth@gmail.com, rmk+kernel@armlinux.org.uk, kabel@kernel.org,
- chunkeey@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- petr.benes@ysoft.com
+References: <20240126201308.2903602-1-kuba@kernel.org>
+In-Reply-To: <20240126201308.2903602-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 26 Jan 2024 11:49:35 +0100 you wrote:
-> When working with GPIO, its direction must be set either when the GPIO is
-> requested by gpiod_get*() or later on by one of the gpiod_direction_*()
-> functions. Neither of this is done here which results in undefined
-> behavior on some systems.
+On Fri, 26 Jan 2024 12:13:08 -0800 you wrote:
+> Modern OSes use iptables implementation with nf_tables as a backend,
+> e.g.:
 > 
-> As the reset GPIO is used right after it is requested here, it makes sense
-> to configure it as GPIOD_OUT_HIGH right away. With that, the following
-> gpiod_set_value_cansleep(1) becomes redundant and can be safely
-> removed.
+> $ iptables -V
+> iptables v1.8.8 (nf_tables)
+> 
+> Pablo points out that we need CONFIG_NFT_COMPAT to make that work,
+> otherwise we see a lot of:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v3] net: dsa: qca8k: fix illegal usage of GPIO
-    https://git.kernel.org/netdev/net/c/c44fc98f0a8f
+  - [net] selftests: net: add missing config for nftables-backed iptables
+    https://git.kernel.org/netdev/net/c/59c93583491a
 
 You are awesome, thank you!
 -- 
