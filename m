@@ -1,72 +1,70 @@
-Return-Path: <netdev+bounces-67037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF93B841E8F
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:00:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 499E1841F11
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:15:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0D071C2656C
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:00:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9583B2F61D
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C06958108;
-	Tue, 30 Jan 2024 09:00:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADE659165;
+	Tue, 30 Jan 2024 09:04:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="gJ98xZGU"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="iUGHGvxO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F179B57883
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 09:00:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5639D66B46;
+	Tue, 30 Jan 2024 09:04:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706605256; cv=none; b=T6Ih/SlubpRgL9gsfBI11L8l0AR1IbNIFeBAgrcCr+FrUN1OhYiPXc4Y7xRkBTbYYSR94SzMsrr5yu5gYicMEnoYTTDNOXDSjYTimJ8rJWdgil6SR3Q2IaIcJdyyVv6X2pVO7DTszQHxU3adiCthqi8PDrloSuGPJ+ITsDp67vg=
+	t=1706605477; cv=none; b=Im1Mkgp+XF8cT6udfAHFZiBPsrBEY9ZD6SZ16j7irj0ED9+KfhVfchC+oQQFCAcjoTlrWpeRG02gaBfD0ZeuLHZ1k94VWs0BzRj/5vR0EvYAg9IKaHM/IwRowDuVU4xI67A72rynMPnK0bSPwmUjih8b08Dqf40IiMfvM4R/yvw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706605256; c=relaxed/simple;
-	bh=rHmb+EnY552iAwyThZzrxep75BZoEz2Kwh8tIxuy7S8=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dpW7U3SBYQ6bphr87IQQbccU3B/dZgyXtPCTljhIkbsQMLsjwGhzbAcvoALFmx8Y6ekgQdmLvStBylUsr+2lAHmjHFHaBuzebF+84vYHqYkg4jPIqp9/CbQXGQ35mOxYO2q30ogtOrxPtTKdkxJzKQP7kG+tWT5dmpWJj2gDk58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=gJ98xZGU; arc=none smtp.client-ip=93.104.207.81
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
-  t=1706605253; x=1738141253;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Tvz70IdctJnKsbqofsJWErVfvjXtAjx0RF9ovOR/Eak=;
-  b=gJ98xZGUjGfanfsjXjvT7NXnUo3jJm1vniYtTiuWupcwV4yroU8TDRRF
-   rwWuzt8A3Drn97Vw2B9ePSh2881NUSUQPXoSoqSth2KTbCQ6ZX+92tptd
-   f1i1Q3JP3D40qs+5z5e4mwaqJ7BrEcsCtXOz16h1Zsc2TVWTrLoXvgKEP
-   x98UP2r1IxVZPQjMI59+Chmftc2wT9jerLCBtdac70tJLSgzpdqQ2XuEk
-   KqiFDVvllFpkDj2okUDKDN193Hi+SFn6ChdNPleTaXt7+Hkpg1tvBFF2s
-   ABPqRb4sN7DhjDeRO34/548hJGPUI68tqIkLIPy1Wec0OX+Z/seXZa6tl
-   Q==;
-X-IronPort-AV: E=Sophos;i="6.05,707,1701126000"; 
-   d="scan'208";a="35141042"
-Received: from vtuxmail01.tq-net.de ([10.115.0.20])
-  by mx1.tq-group.com with ESMTP; 30 Jan 2024 10:00:45 +0100
-Received: from steina-w.tq-net.de (steina-w.tq-net.de [10.123.53.25])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id 2E4F6280075;
-	Tue, 30 Jan 2024 10:00:45 +0100 (CET)
-From: Alexander Stein <alexander.stein@ew.tq-group.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1706605477; c=relaxed/simple;
+	bh=4XgBQQ3juSbUpkKMMs7aW+PfhE8Y3xmTKKHhjIsTQQk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=fg4Xdiyzf3ZxzUUjA1fMl+HUM8cf3T+NkejtyffVG7lM18Fte34LyAU+2TgXV/6zbtkLxZnR3kkCZGumChIlmyH+TCus/jyDtmWzjJk3OJ7tkwVNl3mOhDYxjm8HqLTTjj+J9DxrYd2I3uAW/2REadZOCXHoEGrJvuPiuUUeJGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=iUGHGvxO; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPA id 61C9D240007;
+	Tue, 30 Jan 2024 09:04:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1706605472;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=pAKHzaNOMh1xHR6FDCCFSU4eCbm5CK+UjZM9xHkQa8I=;
+	b=iUGHGvxOvWQVhG6pKA6+GztCmARC7ypRb4ct0JuFrly0QTecU6wJg7AfIhfwOyUKWU0hmo
+	7y472mX3bH4k3UTRj7R9OdA56fnl0ZKxKzMiB9rRtbljEu75I8ppsLTHdO4mtveuz/cuxN
+	SYAaLuxWgXFwM+CF9USTNfj5qTcQecvp2oOc1uAGWSOsFipboAqmREulYJ2X6AA8z1Eukn
+	1XI5hZQqRLBxR7uh4fRCCwiBlzzwWn7ehd/78fw9s5FXOaMBh42KukeY07NdPwxcryi8oc
+	FSuvNW4rBGOS+XdJXnwdvNSwbpILSW+aafpC+nhNQuJZ8TUv9ACkR+tabtJV6g==
+From: Bastien Curutchet <bastien.curutchet@bootlin.com>
+To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Stein <alexander.stein@ew.tq-group.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH 1/1] net: phy: dp83867: Add support for active-low LEDs
-Date: Tue, 30 Jan 2024 10:00:43 +0100
-Message-Id: <20240130090043.663865-1-alexander.stein@ew.tq-group.com>
-X-Mailer: git-send-email 2.34.1
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Bastien Curutchet <bastien.curutchet@bootlin.com>
+Cc: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Herve Codina <herve.codina@bootlin.com>
+Subject: [PATCH 0/2] Add device tree binding support to TI's DP83640
+Date: Tue, 30 Jan 2024 09:59:33 +0100
+Message-ID: <20240130085935.33722-1-bastien.curutchet@bootlin.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,76 +72,31 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: bastien.curutchet@bootlin.com
 
-Add the led_polarity_set callback for setting LED polarity.
+Hi everyone,
 
-Signed-off-by: Alexander Stein <alexander.stein@ew.tq-group.com>
----
-With the addition of LED polarity modes, PHY LEDs attached to this PHY can
-be configured as active-low.
+This short patch series adds a device-tree binding support to the TI's PHY
+DP83640. The goal is to be able to enable or disable the following features
+through the device tree:
+   - Energy Detect Mode
+   - PHY Control Frames
+   - LED Configuration
+   - Fiber Mode
 
-Note1: This callback is only called if at least once bit of 'enum phy_led_modes'
-  is set. This works only because active-high is default on this hardware.
+Bastien Curutchet (2):
+  dt-bindings: net: Add TI DP83640
+  net: phy: Add some configuration from device-tree
 
-Note2: DP83867_SW_RESET in dp83867_phy_reset clears any previously set config.
-  This needs to be addressed as well. Same for interface down/up cycle which
-  might include a hardware reset as well. So LED config needs to be cached.
+ .../devicetree/bindings/net/ti,dp83640.yaml   | 113 +++++++++++++++
+ drivers/net/phy/dp83640.c                     | 131 +++++++++++++++++-
+ drivers/net/phy/dp83640_reg.h                 |  21 ++-
+ include/dt-bindings/net/ti-dp83640.h          |  18 +++
+ 4 files changed, 281 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/ti,dp83640.yaml
+ create mode 100644 include/dt-bindings/net/ti-dp83640.h
 
-But that's independent from this change.
-
-[1] https://lore.kernel.org/all/20240125203702.4552-4-ansuelsmth@gmail.com/
-
- drivers/net/phy/dp83867.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
-
-diff --git a/drivers/net/phy/dp83867.c b/drivers/net/phy/dp83867.c
-index 5f08f9d38bd7a..4120385c5a79d 100644
---- a/drivers/net/phy/dp83867.c
-+++ b/drivers/net/phy/dp83867.c
-@@ -158,6 +158,7 @@
- /* LED_DRV bits */
- #define DP83867_LED_DRV_EN(x)	BIT((x) * 4)
- #define DP83867_LED_DRV_VAL(x)	BIT((x) * 4 + 1)
-+#define DP83867_LED_POLARITY(x)	BIT((x) * 4 + 2)
- 
- #define DP83867_LED_FN(idx, val)	(((val) & 0xf) << ((idx) * 4))
- #define DP83867_LED_FN_MASK(idx)	(0xf << ((idx) * 4))
-@@ -1152,6 +1153,26 @@ static int dp83867_led_hw_control_get(struct phy_device *phydev, u8 index,
- 	return 0;
- }
- 
-+static int dp83867_led_polarity_set(struct phy_device *phydev, int index,
-+				    unsigned long modes)
-+{
-+	/* Default active high */
-+	u16 polarity = DP83867_LED_POLARITY(index);
-+	u32 mode;
-+
-+	for_each_set_bit(mode, &modes, __PHY_LED_MODES_NUM) {
-+		switch (mode) {
-+		case PHY_LED_ACTIVE_LOW:
-+			polarity = 0;
-+			break;
-+		default:
-+			return -EINVAL;
-+		}
-+	}
-+	return phy_modify(phydev, DP83867_LEDCR2,
-+			  DP83867_LED_POLARITY(index), polarity);
-+}
-+
- static struct phy_driver dp83867_driver[] = {
- 	{
- 		.phy_id		= DP83867_PHY_ID,
-@@ -1184,6 +1205,7 @@ static struct phy_driver dp83867_driver[] = {
- 		.led_hw_is_supported = dp83867_led_hw_is_supported,
- 		.led_hw_control_set = dp83867_led_hw_control_set,
- 		.led_hw_control_get = dp83867_led_hw_control_get,
-+		.led_polarity_set = dp83867_led_polarity_set,
- 	},
- };
- module_phy_driver(dp83867_driver);
 -- 
-2.34.1
+2.43.0
 
 
