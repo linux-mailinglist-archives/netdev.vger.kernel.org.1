@@ -1,363 +1,187 @@
-Return-Path: <netdev+bounces-67298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1804F842AFD
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 18:31:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58524842B02
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 18:32:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CB1B1C263C6
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 17:31:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C8BC1C20FBF
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 17:32:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FCC212BF20;
-	Tue, 30 Jan 2024 17:30:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sa4nBNSZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60AD712A147;
+	Tue, 30 Jan 2024 17:32:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11021006.outbound.protection.outlook.com [40.93.193.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282FA12BF1C;
-	Tue, 30 Jan 2024 17:30:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706635845; cv=none; b=fGaekwPdfZygY1g/JB9dOBXTqFspYXkUsD8tlLBSVyfX1GwScfeNEajbjG1qFc2zv0i1rrHuFXlYbFip2iMqpXshTAO1O+kw2JpWoszqJmDEVJ66dJYujDfHFSxJRh7nSJ2jaet6QzbcwuXtNuYUaRBkWr4rBooEfTaNNCcXorI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706635845; c=relaxed/simple;
-	bh=j/MRAZd4rO27lR/Js7eHNUbRnA5tSc70U658SLN+caw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=A8CCwcM2k3Bb8+SYp1DzdRqwk0vGu9wy7XxfIIvX0WooeflaRzCm2NOpbseEJ5AVc8MB3buTMlQ4UbfRKCnRGQX/x1Yl8T6ZOL9c7gbnYPi9WaCCdCZLaDeDZ1jjXXnHvO/YU36Iz2sXAAavBqzJagOpyRaIIdXu/cxPta3iVHw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sa4nBNSZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1D00C433F1;
-	Tue, 30 Jan 2024 17:30:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706635844;
-	bh=j/MRAZd4rO27lR/Js7eHNUbRnA5tSc70U658SLN+caw=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=Sa4nBNSZDYxsCNog9y0VHk9V6m4A/iGbJauhtcegzBj/5RlpEShpWtGgMlDVSt764
-	 COxlhQB0hEz4wNOCt9bV0NtrYRPONWJh+RonU3Svupit0xZrTesSTeJmYEak8RZjNL
-	 QLpCkTVWW1TRVB+njwvV6qZTmE7UJ4Pe4eLR7eOJSNf1E1hZ4Y+lS1afEVH6BGn4Gh
-	 gKOTPSQJ0Hq5p6SpaxUtEWeq4l/LfTriG3bYaTVQtyv9nd+d4n7tm7EEQ5snEk3wAy
-	 9il95kRmvn//UgqgTlFZ/sK/SzU2Jx95lt/Jx1WIJG91hdCDw0GklkUNZA+XjrlF2C
-	 WXUzJCL0yC8Ww==
-From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org
-Cc: Song Liu <song@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Yonghong Song <yhs@fb.com>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Luke Nelson
- <luke.r.nels@gmail.com>, Pu Lehui <pulehui@huawei.com>, Pu Lehui
- <pulehui@huaweicloud.com>
-Subject: Re: [PATCH bpf-next v2 4/4] riscv, bpf: Mixing bpf2bpf and tailcalls
-In-Reply-To: <20240130040958.230673-5-pulehui@huaweicloud.com>
-References: <20240130040958.230673-1-pulehui@huaweicloud.com>
- <20240130040958.230673-5-pulehui@huaweicloud.com>
-Date: Tue, 30 Jan 2024 18:30:41 +0100
-Message-ID: <87sf2eohj2.fsf@all.your.base.are.belong.to.us>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6361128382;
+	Tue, 30 Jan 2024 17:32:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.193.6
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706635949; cv=fail; b=ZpCSFuBdIfHYTSrsSBxNsiWN0o3EBdnpx+eX9SpyTpF0rYa8p/Lilxnn6uUCzD7FwFTEdq5vJtxfF1wGG3YwEEWyaNgtiEuwwU1945dhtm1Ybru1Ga/zOZbsuqFHgCgOcfmLsj9U6dtLGyOCcb7evaizZESj0YvkFNVNNYcGh/Y=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706635949; c=relaxed/simple;
+	bh=6eW6bez4l6+vVj6IBTt5kKG+UMhOfeZOXCfsLSRkimo=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=GuhAhd7oelWMTzOgeOyyT7DTegOuX+jXqlXAqT1m5B91ocYIxIM64cswzyQqwuBUEHjkK+BuR5YO905munUYD76qZJ3SRAXocCu5dClo2BeactrhoBkd+j0jdFKTRWVWzQ1RNd5RkKUvSQkrWyWXGjes4MOrntIvSm3/U3/xEGM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; arc=fail smtp.client-ip=40.93.193.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Qjk74iZrrcUH1QrA923lc7b26HmKX7Yu14jdValx++mmqZwBoSdi7Iz0jMBLO/aOCYNsS/KqoBKjfZ7xvgdetKbGFqnTAV3ofGPq7GkircZ3Xlv9Rf9cCzHmk6OanPEzUp7fVRwdISeyLia7kkL/zNV9pNVKK499Fh7FTI2n0ED/FEGfKCm/yKsYQPNdkYGajKm+hEj7xIfAwPDjgz7vb3mc9LpnQw354miPjAhCfFsGkpmwK05xIH+nTCGF0S2QRp9XERoBgzY/uRc2NoVXoxJaFk7ZbQnCpNWHdQ4OJQI3A4scF+KiGQlJrARzmjntARQ/F9aEDfkOBkYBPaMAqA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6eW6bez4l6+vVj6IBTt5kKG+UMhOfeZOXCfsLSRkimo=;
+ b=jqlIt72z11UtpRJDe7ubdLKRhI9wyB5+tjXhtSRp+uTjQpTnrlYHibU/tDVpOrlZczWfLEHQ/xoWZ1OuescPN2qK6zAGulMg+5QlxhdsqNhdI6X/4ZFXZ1THqfOFlCDWWECT5dMFSrGJazF0Clz8radfJxlxGWhHuhjfrvHYE6jdVOBw8DVcVgPkHYyJTc/HKDGJxmMYT3GD/JVpsPcuZZWkP01rcl6srEs9hCtWeLB0B7kq7TIhjJRX4hdhuAru06rlbcoBMHypkBitV7RYEckSsZfVTWJJ2y3Rg/yjYNeGxWq9foS0f/dz1S3l8THiJlTNZ2SfD+FbbLuQNyHCKg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+Received: from SA1PR21MB1335.namprd21.prod.outlook.com (2603:10b6:806:1f2::11)
+ by IA1PR21MB3595.namprd21.prod.outlook.com (2603:10b6:208:3e0::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.6; Tue, 30 Jan
+ 2024 17:32:23 +0000
+Received: from SA1PR21MB1335.namprd21.prod.outlook.com
+ ([fe80::5d07:5716:225f:f717]) by SA1PR21MB1335.namprd21.prod.outlook.com
+ ([fe80::5d07:5716:225f:f717%4]) with mapi id 15.20.7270.007; Tue, 30 Jan 2024
+ 17:32:23 +0000
+From: Dexuan Cui <decui@microsoft.com>
+To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>, KY Srinivasan
+	<kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	Long Li <longli@microsoft.com>, "yury.norov@gmail.com"
+	<yury.norov@gmail.com>, "leon@kernel.org" <leon@kernel.org>,
+	"cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
+	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+	"vkuznets@redhat.com" <vkuznets@redhat.com>, "tglx@linutronix.de"
+	<tglx@linutronix.de>, "linux-hyperv@vger.kernel.org"
+	<linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>
+CC: Souradeep Chakrabarti <schakrabarti@microsoft.com>
+Subject: RE: [PATCH net] hv_netvsc: Fix race condition between netvsc_probe
+ and netvsc_remove
+Thread-Topic: [PATCH net] hv_netvsc: Fix race condition between netvsc_probe
+ and netvsc_remove
+Thread-Index: AQHaU2VfpkrJr+izKkeQOwCcE2c/2bDyl7Xw
+Date: Tue, 30 Jan 2024 17:32:23 +0000
+Message-ID:
+ <SA1PR21MB13357264DB2B49C20B8C375BBF7D2@SA1PR21MB1335.namprd21.prod.outlook.com>
+References:
+ <1706609772-5783-1-git-send-email-schakrabarti@linux.microsoft.com>
+In-Reply-To:
+ <1706609772-5783-1-git-send-email-schakrabarti@linux.microsoft.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=8fd91f70-2d72-48db-9f9a-ccb2b66334dd;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2024-01-30T17:10:39Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR21MB1335:EE_|IA1PR21MB3595:EE_
+x-ms-office365-filtering-correlation-id: b801d3af-7c9a-4e6d-f143-08dc21b96b37
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ tGcAteZWtjdbt0XVpQqi1EK7J7BigNFwr7YVooLjhU7HTyR2xOvX9RbJc2k15HOsoXzQ8zmj/KRTSWcWbtuKrruUDSFqiabkQV4uVfnpHuoFozsC4NPfNpk2SHgBs8cqYQ8w1pA18pE3H3j3BpKrH40k0TUidSoWZCZ6nU9p2CSv2YJwp9L23RJFIg2/KyM3xDZhHfSSLyNmxyTOPBlTCk7O4osh2H1oq9XsXanxViq6kG76DgPbJtx7OrVv3a5LSAqsNza3IQN8E3fBP0mXpfXww3R4CqD6spVMSL9YiZfiYt5x8/xI3xXJbMY88w5DDTQU30SZWpfikqp0o7yiHcRdybfR2rlZlbQfaVdGu2ND6Axqg3HCbTYUZZqWnZV7oMv0O9vLH1tQdi742tBrbVJPlPdM1CIYGhPxZnxsgIJaN5he6jIMQgfX+Us3DWvAV7iSOMSz0btM4NPrZY//8gpBEoS2JKZxx/uIW4BdXlEVc+O6So+hzjL5WferYcfsrJ2M14+T5a1wHCTHZNxFOyteIQarxdfxNpmSg5l5bMHFINwGOsKTuxAqTWG3hlfo30+8qs6rvsM0Z9NIFbCC8UurnTF0nyKnaSUdolo12LsQqwsCdb7ueLCQq8bigUQ5LK+ugJklfqMSH6YgTM26IA==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR21MB1335.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(366004)(39860400002)(396003)(376002)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(38070700009)(7416002)(33656002)(8990500004)(2906002)(41300700001)(921011)(55016003)(6506007)(83380400001)(26005)(10290500003)(478600001)(71200400001)(86362001)(110136005)(66446008)(316002)(107886003)(66476007)(76116006)(64756008)(66556008)(66946007)(9686003)(122000001)(7696005)(5660300002)(82960400001)(82950400001)(52536014)(38100700002)(4326008)(8676002)(8936002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?aYmKhr9Er9OmqnTGwsxo1jyswljc35D5ZMDsAkpHQ+z8A9c6rnm5tkn/6h1z?=
+ =?us-ascii?Q?v5kvn+sBiHjlbaBYfK6Knn0rS8vSzmr52UZc6VuHX3Hie2jREpjS1lueNxtU?=
+ =?us-ascii?Q?ixiQsb8JF7+s7l61D8clZacho+oA2UVGJWWa3cYXCf+Ls+tbIYh/xCaTYofC?=
+ =?us-ascii?Q?Q30CMTG49Dwqf+NlcbaFM9RQnsGjhP/uNe5Hg2QwVuTz7mIIz10oCG0J+ZPG?=
+ =?us-ascii?Q?ubBjIghv67NQs0rmR/E+vM7HAG8xsUC84MtjzCRwfmIoOox5dEwyrhPlqLjx?=
+ =?us-ascii?Q?Aqy0TpCyNAsjZsoCLFrGcIewYiltCD78afDshvTaeKxp3q2BYy0dRP6ZI6g+?=
+ =?us-ascii?Q?3q3KUvwo/vhp2G9Rd8YNzHt4dB00LIUG+1RPXTyN+aDOpEfGv8nm+VVhh7Ti?=
+ =?us-ascii?Q?DesovmdlUy3qI6sTwyTmz79xUJvl3gAHdsBJf9xubpXTSRf895KCUHMciGg2?=
+ =?us-ascii?Q?vr8uA2qOEy5vLsIvusLY90F6t7xj6WWG1ZIb4fyAchAHQkgpb0Z4BuakZpSg?=
+ =?us-ascii?Q?gGwr8oAv1xwj8aAXrOyXhrxEPWuUnvl8dM4/M2LrhCxdFO6tCdizLEFscet0?=
+ =?us-ascii?Q?D0HmJW5XeYQbmKMYhQRupNPbKSw1/8kGl8VuaAWGYwbPAMIZ8yoP6PhaS77o?=
+ =?us-ascii?Q?gkazLSgsut534VTqpzpcuzmkqIqb4rtFpA9RRaQ1A1xJWk0Mb2A7y3kslUFD?=
+ =?us-ascii?Q?Bs7Q5vPFHoQcXJVmAxIIXWAT19wgbQKZOsA+qUyxphm9PnlztQ+umdYggHvs?=
+ =?us-ascii?Q?KcL8CVq0gCaVzXlVi2FvK5evnHHbvyfbUz7Lo7fRWKK6Mwaq45ZOqhm1Gm7K?=
+ =?us-ascii?Q?OsKzjxqG17KPDYdqntA0DLSgUv1Qfp3VAiA57Ajcaxf0kc7NgTHMmGxwoU/M?=
+ =?us-ascii?Q?9Tg3skKj81KTR2dnYDY+ULzrYPlzRC6+2p7+cJ55cTz4evZVsBLeG2il+iIi?=
+ =?us-ascii?Q?vb1QzGMOoI3ISoM4tZtCTqilPg5ePZpaP2KkSNfL+HtrwJqFD0d0pfZdCu0n?=
+ =?us-ascii?Q?n4WkvU4mAEcwU6ygPFSAqzKuUhJz5eLwx+TD12RhQKg8DVSXa20bAKixSeze?=
+ =?us-ascii?Q?BunF6fGsCb1/iQc7nlpRzvi1YEOcsGL11Uxmo6f7bigfRM7REgKW5SuzfqMv?=
+ =?us-ascii?Q?NHUNAW1UMZL4I+jCVOfHYWamBVbMnZclOyDJzc3HYinNhDvrZgiUhmKSBRFx?=
+ =?us-ascii?Q?Ma5tOWQ8qvOx0mzcEehD3vicagBELrgllV8DvirKtRadixTFQiJR1/usXD2t?=
+ =?us-ascii?Q?d00tqSGZ6DEYZ31C+r8hJTnQJ7PLeLQiB8uir0cy/H1idAQPpKjaD1BqUZA3?=
+ =?us-ascii?Q?Gw4P3v9PDhfOVpLqvxl6sub04s4hut0raTVQoVzAlvuZBjL61v4aA2hCCNFD?=
+ =?us-ascii?Q?xmdmuHGPBSbugqkVWV5DwgE5i9249OtO62ZisVQVkFw9pK1ccaVON1KYzInP?=
+ =?us-ascii?Q?y93OJ3QH7yFcIqpYi9k2N1z49M8d9hWs97U4oddv7kXlTFBXyT0TvsK+QYEX?=
+ =?us-ascii?Q?FSWcOrGwKavvIEgS8tGSWMCUPkVng/yTcFBAdyq8fpfs0B75XCRor7D6xKXn?=
+ =?us-ascii?Q?bw5DroiwhKLVGZihAnA=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR21MB1335.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b801d3af-7c9a-4e6d-f143-08dc21b96b37
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jan 2024 17:32:23.0658
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: piAQD3nN5ikCFjNRMeJfrsVH9gVCMX2YuS2ZrMSmF1/uVeg/AIwqY4Ok/Qy0KHbo+NgUE14SCh4cqnqR8OthjA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR21MB3595
 
-Pu Lehui <pulehui@huaweicloud.com> writes:
+> From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+> Sent: Tuesday, January 30, 2024 2:16 AM
+> [...]
+> In commit ac5047671758 ("hv_netvsc: Disable NAPI before closing the
+> VMBus channel"), napi_disable was getting called for all channels,
+> including all subchannels without confirming if they are enabled or not.
 
-> From: Pu Lehui <pulehui@huawei.com>
->
-> In the current RV64 JIT, if we just don't initialize the TCC in subprog,
-> the TCC can be propagated from the parent process to the subprocess, but
-> the TCC of the parent process cannot be restored when the subprocess
-> exits. Since the RV64 TCC is initialized before saving the callee saved
-> registers into the stack, we cannot use the callee saved register to
-> pass the TCC, otherwise the original value of the callee saved register
-> will be destroyed. So we implemented mixing bpf2bpf and tailcalls
-> similar to x86_64, i.e. using a non-callee saved register to transfer
-> the TCC between functions, and saving that register to the stack to
-> protect the TCC value. At the same time, we also consider the scenario
-> of mixing trampoline.
->
-> Tests test_bpf.ko and test_verifier have passed, as well as the relative
-> testcases of test_progs*.
+s/enabled/created/
 
-Ok, I'll summarize, so that I know that I get it. ;-)
+> Which caused hv_netvsc getting hung at napi_disable, when
+> netvsc_probe()
+> and netvsc_remove() are happening simultaneously and netvsc_remove()
 
-All BPF progs (except the main), get the current TCC passed in a6. TCC
-is stored in each BPF stack frame.
+Technically, they are not happening simultaneously: netvsc_probe() itself h=
+as
+finished, but the work item scheduled by it has not started yet.
 
-During tail calls, the TCC from the stack is loaded, decremented, and
-stored to the stack again.
+> calls cancel_work_sync(&nvdev->subchan_work) before netvsc_sc_open()
+> calls napi_enable for the sub channels. Which causes NAPIF_STATE_SCHED
 
-Mixing bpf2bpf/tailcalls means that each *BPF stackframe* can perform up
-to "current TCC to max_tailscalls" number of calls.
+Technically, nvdev->subchan_work has not started to run yet, i.e.
+netvsc_subchan_work() -> rndis_set_subchannel() has not created the
+sub-channels yet, so netvsc_sc_open() can't run.
 
-main_prog() calls subprog1(). subprog1() can perform max_tailscalls.
-subprog1() returns, and main_prog() calls subprog2(). subprog2() can
-also perform max_tailscalls.
+It would be great if you could briefly explain how the NAPIF_STATE_SCHED bi=
+t
+is set and cleared, e.g. it's pre-set in rndis_filter_device_add() -> netif=
+_napi_add()
+so if the sub-channels are not created, netvsc_sc_open() -> napi_enable() w=
+on't
+clear the flag and the flag remains set for ever for the sub-channels.=20
 
-Correct?
+> bit not getting cleared for the subchannels.
+>=20
+> Now during netvsc_device_remove(), when napi_disable is called for those
+> subchannels, napi_disable gets stuck on infinite msleep.
 
-Some comments below as well.
+The patch body looks good to me. Please post v2 with an updated changelog.
 
-> Signed-off-by: Pu Lehui <pulehui@huawei.com>
-> ---
->  arch/riscv/net/bpf_jit.h        |  1 +
->  arch/riscv/net/bpf_jit_comp64.c | 89 +++++++++++++--------------------
->  2 files changed, 37 insertions(+), 53 deletions(-)
->
-> diff --git a/arch/riscv/net/bpf_jit.h b/arch/riscv/net/bpf_jit.h
-> index 8b35f12a4452..d8be89dadf18 100644
-> --- a/arch/riscv/net/bpf_jit.h
-> +++ b/arch/riscv/net/bpf_jit.h
-> @@ -81,6 +81,7 @@ struct rv_jit_context {
->  	int nexentries;
->  	unsigned long flags;
->  	int stack_size;
-> +	int tcc_offset;
->  };
->=20=20
->  /* Convert from ninsns to bytes. */
-> diff --git a/arch/riscv/net/bpf_jit_comp64.c b/arch/riscv/net/bpf_jit_com=
-p64.c
-> index 3516d425c5eb..64e0c86d60c4 100644
-> --- a/arch/riscv/net/bpf_jit_comp64.c
-> +++ b/arch/riscv/net/bpf_jit_comp64.c
-> @@ -13,13 +13,11 @@
->  #include <asm/patch.h>
->  #include "bpf_jit.h"
->=20=20
-> +#define RV_REG_TCC		RV_REG_A6
->  #define RV_FENTRY_NINSNS	2
->  /* fentry and TCC init insns will be skipped on tailcall */
->  #define RV_TAILCALL_OFFSET	((RV_FENTRY_NINSNS + 1) * 4)
->=20=20
-> -#define RV_REG_TCC RV_REG_A6
-> -#define RV_REG_TCC_SAVED RV_REG_S6 /* Store A6 in S6 if program do calls=
- */
-> -
->  static const int regmap[] =3D {
->  	[BPF_REG_0] =3D	RV_REG_A5,
->  	[BPF_REG_1] =3D	RV_REG_A0,
-> @@ -51,14 +49,12 @@ static const int pt_regmap[] =3D {
->  };
->=20=20
->  enum {
-> -	RV_CTX_F_SEEN_TAIL_CALL =3D	0,
->  	RV_CTX_F_SEEN_CALL =3D		RV_REG_RA,
->  	RV_CTX_F_SEEN_S1 =3D		RV_REG_S1,
->  	RV_CTX_F_SEEN_S2 =3D		RV_REG_S2,
->  	RV_CTX_F_SEEN_S3 =3D		RV_REG_S3,
->  	RV_CTX_F_SEEN_S4 =3D		RV_REG_S4,
->  	RV_CTX_F_SEEN_S5 =3D		RV_REG_S5,
-> -	RV_CTX_F_SEEN_S6 =3D		RV_REG_S6,
->  };
->=20=20
->  static u8 bpf_to_rv_reg(int bpf_reg, struct rv_jit_context *ctx)
-> @@ -71,7 +67,6 @@ static u8 bpf_to_rv_reg(int bpf_reg, struct rv_jit_cont=
-ext *ctx)
->  	case RV_CTX_F_SEEN_S3:
->  	case RV_CTX_F_SEEN_S4:
->  	case RV_CTX_F_SEEN_S5:
-> -	case RV_CTX_F_SEEN_S6:
->  		__set_bit(reg, &ctx->flags);
->  	}
->  	return reg;
-> @@ -86,7 +81,6 @@ static bool seen_reg(int reg, struct rv_jit_context *ct=
-x)
->  	case RV_CTX_F_SEEN_S3:
->  	case RV_CTX_F_SEEN_S4:
->  	case RV_CTX_F_SEEN_S5:
-> -	case RV_CTX_F_SEEN_S6:
->  		return test_bit(reg, &ctx->flags);
->  	}
->  	return false;
-> @@ -102,32 +96,6 @@ static void mark_call(struct rv_jit_context *ctx)
->  	__set_bit(RV_CTX_F_SEEN_CALL, &ctx->flags);
->  }
->=20=20
-> -static bool seen_call(struct rv_jit_context *ctx)
-> -{
-> -	return test_bit(RV_CTX_F_SEEN_CALL, &ctx->flags);
-> -}
-> -
-> -static void mark_tail_call(struct rv_jit_context *ctx)
-> -{
-> -	__set_bit(RV_CTX_F_SEEN_TAIL_CALL, &ctx->flags);
-> -}
-> -
-> -static bool seen_tail_call(struct rv_jit_context *ctx)
-> -{
-> -	return test_bit(RV_CTX_F_SEEN_TAIL_CALL, &ctx->flags);
-> -}
-> -
-> -static u8 rv_tail_call_reg(struct rv_jit_context *ctx)
-> -{
-> -	mark_tail_call(ctx);
-> -
-> -	if (seen_call(ctx)) {
-> -		__set_bit(RV_CTX_F_SEEN_S6, &ctx->flags);
-> -		return RV_REG_S6;
-> -	}
-> -	return RV_REG_A6;
-> -}
-> -
->  static bool is_32b_int(s64 val)
->  {
->  	return -(1L << 31) <=3D val && val < (1L << 31);
-> @@ -252,10 +220,7 @@ static void __build_epilogue(bool is_tail_call, stru=
-ct rv_jit_context *ctx)
->  		emit_ld(RV_REG_S5, store_offset, RV_REG_SP, ctx);
->  		store_offset -=3D 8;
->  	}
-> -	if (seen_reg(RV_REG_S6, ctx)) {
-> -		emit_ld(RV_REG_S6, store_offset, RV_REG_SP, ctx);
-> -		store_offset -=3D 8;
-> -	}
-> +	emit_ld(RV_REG_TCC, store_offset, RV_REG_SP, ctx);
-
-Why do you need to restore RV_REG_TCC? We're passing RV_REG_TCC (a6) as
-an argument at all call-sites, and for tailcalls we're loading from the
-stack.
-
-Is this to fake the a6 argument for the tail-call? If so, it's better to
-move it to emit_bpf_tail_call(), instead of letting all programs pay for
-it.
-
->=20=20
->  	emit_addi(RV_REG_SP, RV_REG_SP, stack_adjust, ctx);
->  	/* Set return value. */
-> @@ -343,7 +308,6 @@ static void emit_branch(u8 cond, u8 rd, u8 rs, int rv=
-off,
->  static int emit_bpf_tail_call(int insn, struct rv_jit_context *ctx)
->  {
->  	int tc_ninsn, off, start_insn =3D ctx->ninsns;
-> -	u8 tcc =3D rv_tail_call_reg(ctx);
->=20=20
->  	/* a0: &ctx
->  	 * a1: &array
-> @@ -366,9 +330,11 @@ static int emit_bpf_tail_call(int insn, struct rv_ji=
-t_context *ctx)
->  	/* if (--TCC < 0)
->  	 *     goto out;
->  	 */
-> -	emit_addi(RV_REG_TCC, tcc, -1, ctx);
-> +	emit_ld(RV_REG_TCC, ctx->tcc_offset, RV_REG_SP, ctx);
-> +	emit_addi(RV_REG_TCC, RV_REG_TCC, -1, ctx);
->  	off =3D ninsns_rvoff(tc_ninsn - (ctx->ninsns - start_insn));
->  	emit_branch(BPF_JSLT, RV_REG_TCC, RV_REG_ZERO, off, ctx);
-> +	emit_sd(RV_REG_SP, ctx->tcc_offset, RV_REG_TCC, ctx);
->=20=20
->  	/* prog =3D array->ptrs[index];
->  	 * if (!prog)
-> @@ -767,7 +733,7 @@ static int __arch_prepare_bpf_trampoline(struct bpf_t=
-ramp_image *im,
->  	int i, ret, offset;
->  	int *branches_off =3D NULL;
->  	int stack_size =3D 0, nregs =3D m->nr_args;
-> -	int retval_off, args_off, nregs_off, ip_off, run_ctx_off, sreg_off;
-> +	int retval_off, args_off, nregs_off, ip_off, run_ctx_off, sreg_off, tcc=
-_off;
->  	struct bpf_tramp_links *fentry =3D &tlinks[BPF_TRAMP_FENTRY];
->  	struct bpf_tramp_links *fexit =3D &tlinks[BPF_TRAMP_FEXIT];
->  	struct bpf_tramp_links *fmod_ret =3D &tlinks[BPF_TRAMP_MODIFY_RETURN];
-> @@ -812,6 +778,8 @@ static int __arch_prepare_bpf_trampoline(struct bpf_t=
-ramp_image *im,
->  	 *
->  	 * FP - sreg_off    [ callee saved reg	]
->  	 *
-> +	 * FP - tcc_off     [ tail call count	] BPF_TRAMP_F_TAIL_CALL_CTX
-> +	 *
->  	 *		    [ pads              ] pads for 16 bytes alignment
->  	 */
->=20=20
-> @@ -853,6 +821,11 @@ static int __arch_prepare_bpf_trampoline(struct bpf_=
-tramp_image *im,
->  	stack_size +=3D 8;
->  	sreg_off =3D stack_size;
->=20=20
-> +	if (flags & BPF_TRAMP_F_TAIL_CALL_CTX) {
-> +		stack_size +=3D 8;
-> +		tcc_off =3D stack_size;
-> +	}
-> +
->  	stack_size =3D round_up(stack_size, 16);
->=20=20
->  	if (!is_struct_ops) {
-> @@ -879,6 +852,10 @@ static int __arch_prepare_bpf_trampoline(struct bpf_=
-tramp_image *im,
->  		emit_addi(RV_REG_FP, RV_REG_SP, stack_size, ctx);
->  	}
->=20=20
-> +	/* store tail call count */
-> +	if (flags & BPF_TRAMP_F_TAIL_CALL_CTX)
-> +		emit_sd(RV_REG_FP, -tcc_off, RV_REG_TCC, ctx);
-> +
->  	/* callee saved register S1 to pass start time */
->  	emit_sd(RV_REG_FP, -sreg_off, RV_REG_S1, ctx);
->=20=20
-> @@ -932,6 +909,9 @@ static int __arch_prepare_bpf_trampoline(struct bpf_t=
-ramp_image *im,
->=20=20
->  	if (flags & BPF_TRAMP_F_CALL_ORIG) {
->  		restore_args(nregs, args_off, ctx);
-> +		/* restore TCC to RV_REG_TCC before calling the original function */
-> +		if (flags & BPF_TRAMP_F_TAIL_CALL_CTX)
-> +			emit_ld(RV_REG_TCC, -tcc_off, RV_REG_FP, ctx);
->  		ret =3D emit_call((const u64)orig_call, true, ctx);
->  		if (ret)
->  			goto out;
-> @@ -963,6 +943,9 @@ static int __arch_prepare_bpf_trampoline(struct bpf_t=
-ramp_image *im,
->  		ret =3D emit_call((const u64)__bpf_tramp_exit, true, ctx);
->  		if (ret)
->  			goto out;
-> +	} else if (flags & BPF_TRAMP_F_TAIL_CALL_CTX) {
-> +		/* restore TCC to RV_REG_TCC before calling the original function */
-> +		emit_ld(RV_REG_TCC, -tcc_off, RV_REG_FP, ctx);
->  	}
->=20=20
->  	if (flags & BPF_TRAMP_F_RESTORE_REGS)
-> @@ -1455,6 +1438,9 @@ int bpf_jit_emit_insn(const struct bpf_insn *insn, =
-struct rv_jit_context *ctx,
->  		if (ret < 0)
->  			return ret;
->=20=20
-> +		/* restore TCC from stack to RV_REG_TCC */
-> +		emit_ld(RV_REG_TCC, ctx->tcc_offset, RV_REG_SP, ctx);
-> +
->  		ret =3D emit_call(addr, fixed_addr, ctx);
->  		if (ret)
->  			return ret;
-> @@ -1733,8 +1719,7 @@ void bpf_jit_build_prologue(struct rv_jit_context *=
-ctx)
->  		stack_adjust +=3D 8;
->  	if (seen_reg(RV_REG_S5, ctx))
->  		stack_adjust +=3D 8;
-> -	if (seen_reg(RV_REG_S6, ctx))
-> -		stack_adjust +=3D 8;
-> +	stack_adjust +=3D 8; /* RV_REG_TCC */
->=20=20
->  	stack_adjust =3D round_up(stack_adjust, 16);
->  	stack_adjust +=3D bpf_stack_adjust;
-> @@ -1749,7 +1734,8 @@ void bpf_jit_build_prologue(struct rv_jit_context *=
-ctx)
->  	 * (TCC) register. This instruction is skipped for tail calls.
->  	 * Force using a 4-byte (non-compressed) instruction.
->  	 */
-> -	emit(rv_addi(RV_REG_TCC, RV_REG_ZERO, MAX_TAIL_CALL_CNT), ctx);
-> +	if (!bpf_is_subprog(ctx->prog))
-> +		emit(rv_addi(RV_REG_TCC, RV_REG_ZERO, MAX_TAIL_CALL_CNT), ctx);
-
-You're conditionally emitting the instruction. Doesn't this break
-RV_TAILCALL_OFFSET?
-
-
-Bj=C3=B6rn
+Reviewed-by: Dexuan Cui <decui@microsoft.com>
 
