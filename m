@@ -1,174 +1,159 @@
-Return-Path: <netdev+bounces-67181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AEFF842450
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 13:03:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D070684246F
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 13:07:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D7341C24AA5
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 12:03:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0EC2D1C26563
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 12:07:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54269679E1;
-	Tue, 30 Jan 2024 12:03:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7276B67A10;
+	Tue, 30 Jan 2024 12:06:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="pNB6zqQD"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Rkx4k3O6"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2079.outbound.protection.outlook.com [40.107.20.79])
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95906679E6;
-	Tue, 30 Jan 2024 12:03:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.79
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706616224; cv=fail; b=DVlY3RhFjDsUp4pZmbcBztCHCvYhmh6VexLFdUD27/zvbt4TdrVg4x0iNIhTKS69HF+TZRJLv7ayikGWSKmxVOSB6Cf8SZBayV7LlWQL2L2/M7LciUvSOy9qVOOZtG150+KF4PnrK/r4AFsAFcHxC5qg5y0uLhKzMO0r0ODChcs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706616224; c=relaxed/simple;
-	bh=FuOi/uHNMbsjbvfzjatKjpO66f3pYMe8zeeg4sRT1Hg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=EG9wd5FGvBnZVcg8g9bdD4xt2ENRL2Sw8CF+zX4HIiX1LW/L3WVi1jqNO/cwPsJlnQIrEAq9W1bB8C6V9tOnylO7HDkaL1TrTDH/1PmkRnUhWyXg/nbrg1zfF+GO2ILyBCtOu9KHDZmUj6jnEnVlVJFZebHM2v+XnvJHCRugjoE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=pNB6zqQD; arc=fail smtp.client-ip=40.107.20.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SBJ2APzzG6W1kddyh6S3i3baPOm8zeH+akkc6WopfdA53LaYhhy08DexryGq4HDTa+YlfeYVA5gEuJjgdt1GDkJGqjNgJvSR4icYmV+CTgzcUM+HsUFF640b0DKEThMV8oFiX5r91f7gnY8UcqLo1K3l0XE/gt/W1M2cuAVRvUz8fCllVRzrmwkqIwFwvqaIduyW/t8rbcgap0Dy4oAneuh7nyW+3xLCnQAXZqLbG4Bd4llfwaIDYGQj6zeGSFavx9kjc+U5M+YCWc0QZFFHxtYpi8gWFjMHUWnuDhRvbGLapCKC3WCYm67MBLbVC012nPhDkVDOCvesLTWpGk1n5Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=xwaoW742bVEOeuLDDUae5bKhjvL65eFUacQEXadq7wU=;
- b=AHNcfVgum3rYujJoIGe6IbR3/J77+VfJPKRpUng7EOIdbKuo3xj8HnM3wqqEuy3uU+TQXhFjJ5LEUBmoiww1vM4aCrjfpjcHj8Daj1ZnGf851nmpgMEEZjMBzQQLHhKM7sh8QoOvBNTxSfWnHbhrnEkOEqsbnvPwSfGZ1KEYmR3+/eW3QHauk2Jokbp1v4067FKoQV2UQ+ap/g4gTgBPH8qNigXctu1aLYzV4D25Tbd52ANYMs5XZqNQEaVftfKNtmwzGzM/tn6rWpjL6QHO9MD9tAmR9n8f0gWH7L0lF+LvlsnUHk2ZwNciuc4dBnQ+09pJUutriXH4g4VlEPlKBQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=xwaoW742bVEOeuLDDUae5bKhjvL65eFUacQEXadq7wU=;
- b=pNB6zqQDLmaMLigSx+kwZqlV4JUCqZ3LuMsjSKtC5ph5sCiwXZ9rL5mvcesKZrdi6nlMAwuOdTQshXmUA8CL5hzBM6cuOLQgCyrS/Uq+qPi5NV3YJ4c65legrYMEtocOHBDhPUhxIvD4T/e/89qAeYyG9s3sRCjAmyJJJ2sT0MM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from DBAPR04MB7368.eurprd04.prod.outlook.com (2603:10a6:10:1ad::19)
- by AS8PR04MB8294.eurprd04.prod.outlook.com (2603:10a6:20b:3f7::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.34; Tue, 30 Jan
- 2024 12:03:32 +0000
-Received: from DBAPR04MB7368.eurprd04.prod.outlook.com
- ([fe80::5795:6dd5:bf:6ca9]) by DBAPR04MB7368.eurprd04.prod.outlook.com
- ([fe80::5795:6dd5:bf:6ca9%5]) with mapi id 15.20.7228.029; Tue, 30 Jan 2024
- 12:03:32 +0000
-Date: Tue, 30 Jan 2024 14:03:28 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Breno Leitao <leitao@debian.org>, kuba@kernel.org, davem@davemloft.net,
-	pabeni@redhat.com, edumazet@google.com,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com, dsahern@kernel.org, weiwan@google.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Horatiu Vultur <horatiu.vultur@microchip.com>
-Subject: Re: [PATCH net 02/10] net: fill in MODULE_DESCRIPTION()s for ocelot
-Message-ID: <20240130120328.rmmbgeywvj6jvqkm@skbuf>
-References: <20240125193420.533604-1-leitao@debian.org>
- <20240125193420.533604-3-leitao@debian.org>
- <20240130101134.GG349047@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240130101134.GG349047@kernel.org>
-X-ClientProxiedBy: VI1P194CA0036.EURP194.PROD.OUTLOOK.COM
- (2603:10a6:803:3c::25) To DBAPR04MB7368.eurprd04.prod.outlook.com
- (2603:10a6:10:1ad::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CE30679E5;
+	Tue, 30 Jan 2024 12:06:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706616416; cv=none; b=fDKyHQ8cZAVNBcNQHK+jZiIaunZJ/p01pVAl4X9odLYHiugRRwfztFTEMyBRDWcTWUequIPIVb+gkWrVb7PHn3uEQtlTB7M0q8a9EzEjIOTOIG0LUzkAjpsjThkB6AqWsQN9AcMkXft2bC9+8s5oZ8wSeY4fZNKyI7OLXWCtuOQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706616416; c=relaxed/simple;
+	bh=adWxji5JCkpeR4Tg54o4IjDz9Q6/P4r5JmGOGBT7y6E=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=CAPHFnqGJdrr0HJQPQyDWKrGIFDJWDHJf5STOY8DYPnRXozuggEJBztsDdzzoA8GRSXKfwaSoh+UApzxJkGnD7Hy9AmK1WH4w9d0MDblKKPiI72mBx7hFA1YlyT5N6bMrXARDoN4vWEvEddD7BmWWim7UFZObL/z2TXraLb1kgs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Rkx4k3O6; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40UAorfc027107;
+	Tue, 30 Jan 2024 04:06:24 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type; s=
+	pfpt0220; bh=62dZ6GBkhNBWzuByxFX6B3fDWKM6s7akNOoK7y5IauE=; b=Rkx
+	4k3O66nkmPsiMnpVgijMgB9TTffnq0n875iCkn3usKxsay/j/PjxkibBUYAClpPJ
+	Q98IvxSr5+ghm5Al+M6pFzEDZRSh8yhWfKcZkok9RWEIN9M1znEcT3eoztGjjSyg
+	Jpzjc/Hex5Y2AX3jMgMtCy7ZvmzzUgzlS42CEUK8VOvbUqby97fFDWwxKtpSx9PO
+	w/YX5QItwokG3rZ4jYiMUKpcfkmPhoUboBpHxeX9Z0Qsw9tpBVr9uUFaf1ql7v4F
+	hSkrRuXRMBbTstzCU/Rhowz0HhH27HSIgQXX9cHN62x/q2lUUBD1iBQW7iISGQqw
+	AD4xGS1iIgBYNLO0dfw==
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3vx4vre4k5-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Tue, 30 Jan 2024 04:06:23 -0800 (PST)
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 30 Jan
+ 2024 04:06:22 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Tue, 30 Jan 2024 04:06:22 -0800
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 937CF3F70BD;
+	Tue, 30 Jan 2024 04:06:16 -0800 (PST)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <bpf@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <ast@kernel.org>, <daniel@iogearbox.net>,
+        <hawk@kernel.org>, <john.fastabend@gmail.com>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>
+Subject: [net PATCH] octeontx2-pf: Remove xdp queues on program detach
+Date: Tue, 30 Jan 2024 17:36:10 +0530
+Message-ID: <20240130120610.16673-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DBAPR04MB7368:EE_|AS8PR04MB8294:EE_
-X-MS-Office365-Filtering-Correlation-Id: b3891d5f-cd9e-4a76-4bc4-08dc218b7a84
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	h3g4NVWLUYwqkb4U32n7MW9ihHRzla9ICYuSfpdLxeqXbTHE7gtZuB/RFvZs6I37VGDsvDQit3S3rUMFzin1zN/RxfG0NVetuETnPZe+zEw3dpttl6BlOzHRxHQXvLVg40eP5K5WleHinwpAYAUVtuDNWBrMSGKZf6BTisSWdwwvWO3DNHlditX8J5+ELLkgt/Vu6A/Gr1LP02JZEFtxGBnIgg6dxp4j1H1xolYdqfbaATDf0d3q6okQTGu9yreRM4bqePFIAJNeDUEAKguhoGs9PFiscaaPWsDUWR9TNMpx8LcS2+awapku+s7ZZhIW+njWUtTWsvpT8JqASJr75iIowKHLHMPZZUsbs6vdIH8scH14U6CJ3+RiJmCHhBtqcjhb4VjFslvuipwrkkPnGl0J9YZeRV+mZBv10OHKJSm/c5fh+Q6PTcxtj3+XrXMFUr/GMcIiyoQ6K44KcN2fZL5OnxWHO0z2c+8ssgfapqPuVD6ZgkVGWVQfR/zu7Kr6VcCrhk/nPlxUsIueA5RqVuk4l3v2WAVPPv9XwBnXFn/Z1mymRU3FvFKgoKXgP7dC
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DBAPR04MB7368.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(396003)(39860400002)(376002)(366004)(136003)(346002)(230922051799003)(64100799003)(1800799012)(451199024)(186009)(66476007)(41300700001)(6506007)(9686003)(6512007)(1076003)(26005)(4326008)(6916009)(8676002)(316002)(54906003)(66556008)(478600001)(6666004)(6486002)(8936002)(38100700002)(66946007)(33716001)(7416002)(2906002)(5660300002)(44832011)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?br4hfnNYn+wOC+emar7wSKajtRiRyKi2OW24Uva95G737pR1Xvq+/MJALBXt?=
- =?us-ascii?Q?9dHHfV9so9K9sJWwpB2piwNZy9s+ChVmRVoEepASHuhXqcetuTafY5afX+Za?=
- =?us-ascii?Q?GE/9MXJ5RbBbs2LLvfa4kxuDhBvRygHS5qtA0lpq9uUHi+Kvv22EO7rPUvQE?=
- =?us-ascii?Q?gq01+0EdyvDb+twUpb7YtCZhfJx9j2PNM3Bp5ZXVBLOJfyJCw/R8wN2tAfye?=
- =?us-ascii?Q?20lAKGFiwgmucVX9K2agV4n4zCCcOMowLlDH97sCAOMeugzoBJlm/D4oZTMG?=
- =?us-ascii?Q?uSwrD4EhtAOD9dafeqtNYmYRrXj7/USrjqbsq1w1oKdbhb1QQlJI8nTLuQ6Q?=
- =?us-ascii?Q?pUW4oMQmpcRJQqFvqwE87nEP/i51NRaLSBBxZHmTjMYwQpTY75NIo35dKi7T?=
- =?us-ascii?Q?Oo2YLSxcMZzqfbf+4jRjGA94zTGh/xgJL/SfZq1dp2cEvRwAToA1nvOwzKyu?=
- =?us-ascii?Q?YkY9avWAoSdfSXPMD/C8OZ9eUb8Zz4d/2nySx1kfJYCpzxIiDQfYye4UoHCY?=
- =?us-ascii?Q?BCJENjRIxCpb7P9UBPTlFHNz0K/AeTz3LJFYpnbqhngyjnQ3Wlc441QsdJpL?=
- =?us-ascii?Q?P9mnz+0oDyPoD0lg1nagRWFvwx60MxptJFJxEDtsUHcgQeNf7TCKDtigake+?=
- =?us-ascii?Q?wXHoGobSIoa4tvRv3pMjFYu+DTHSnBHETITS1JXSFO8N2gJ82itnA5Z2rBSN?=
- =?us-ascii?Q?fqS5MgatmFOO7+wdMJuRH9MtdJiJAQDGzCH/Pro0MY/xM+qSh6YgaiQw2jqJ?=
- =?us-ascii?Q?3UYYBRPbHUiAaG4WT8yriSHTTHTFhlt/gj+hnQOSo/LkXFXbOuQD4fxj1p/0?=
- =?us-ascii?Q?vRTCWj5wd6mtTgt4DQZAaLKZGA0Y+ZnzNJFw5OwZEJE3vTp2QNkYpRyWtiCr?=
- =?us-ascii?Q?lvDhC+socgRnXqjAbD1UPdprRXlyuuw3oziX9e+OOqLBXSH9cc4BHYwrppmP?=
- =?us-ascii?Q?2jxA/XPn8cUFMGn1H+9P3rgi2IBdrPu7yWm+qQky1HJY0lLFqU7zyvNngYNf?=
- =?us-ascii?Q?NefGFIUHMOiEKt5qwi2jKx2xMzIS0mKQ+RF5M9IRC+58cwadHGusrLDZDxsr?=
- =?us-ascii?Q?yBWbZzSFmWrqoW66KKvFu+Yo3qVgvVhGi+nfMw9bFNwlCOrymIoy5BxsrD/g?=
- =?us-ascii?Q?wNYqZl3LdGcEJAGLzAhKPziASD5f0O39gUOtHwOgNps79K3gr4lJSUA3Id9p?=
- =?us-ascii?Q?CM2fLDUkGnd/oM2r1qGdNa0glskIv2CpvpV6bGVD4mRqo3Hz1wZhqTyQTgz8?=
- =?us-ascii?Q?NqQhyatBZC1RDBz/iWtZbYvy4VELvCefQ90XNpuS594Uv/7QZBVtnRzJ4H/f?=
- =?us-ascii?Q?VlwY2b70qgoMJu9A5T6uIC0GXva28/HBI6ewnPgHF83xnthtTgjcw+JcrY5c?=
- =?us-ascii?Q?5zR6uHC2YeIRfdfg9dTzRTis6cFgYNXupP9yFv2pquoCp9uA7g6cjv0B726P?=
- =?us-ascii?Q?UlUVTy8dHo+2Indf9bX+inj4+0gj8t7+LJURdkrbVJldAW4ky7cr3ckYqCaX?=
- =?us-ascii?Q?ZwFccn69NHpOIfUuZyTpzOfG7aUf5OxhIH7o2ShZNvl74QKs3adVwweWNs1E?=
- =?us-ascii?Q?XnD/Rgnq4zNIpjLv+kVcnrGdcIcTaypU3B7355geR7MDMKu1lCdutQrH/RbC?=
- =?us-ascii?Q?mg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b3891d5f-cd9e-4a76-4bc4-08dc218b7a84
-X-MS-Exchange-CrossTenant-AuthSource: DBAPR04MB7368.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jan 2024 12:03:32.0858
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: WMP3qYoYvp0dVUdOFlL5LUGtmLqH4/NNYlSPduEvesnMfiQnsiwKConHPx0EvERE3C8lJld91dTAx4nttMGdAQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8294
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: VlQYAd3mFYDWfMeXr004MyGsqQWC6c5B
+X-Proofpoint-GUID: VlQYAd3mFYDWfMeXr004MyGsqQWC6c5B
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-30_05,2024-01-30_01,2023-05-22_02
 
-On Tue, Jan 30, 2024 at 10:11:34AM +0000, Simon Horman wrote:
-> On Thu, Jan 25, 2024 at 11:34:12AM -0800, Breno Leitao wrote:
-> > W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-> > Add descriptions to the Ocelot SoCs (VSC7514) helpers driver.
-> > 
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > Reviewed-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-> > ---
-> >  drivers/net/ethernet/mscc/ocelot.c | 1 +
-> >  1 file changed, 1 insertion(+)
-> > 
-> > diff --git a/drivers/net/ethernet/mscc/ocelot.c b/drivers/net/ethernet/mscc/ocelot.c
-> > index 56ccbd4c37fe..2194f2a7ab27 100644
-> > --- a/drivers/net/ethernet/mscc/ocelot.c
-> > +++ b/drivers/net/ethernet/mscc/ocelot.c
-> > @@ -3078,4 +3078,5 @@ void ocelot_deinit_port(struct ocelot *ocelot, int port)
-> >  }
-> >  EXPORT_SYMBOL(ocelot_deinit_port);
-> >  
-> > +MODULE_DESCRIPTION("Microsemi Ocelot (VSC7514) Switch driver");
-> 
-> Hi Breno,
-> 
-> I really appreciate your work in this area.
-> 
-> WRT this patch, I could well be wrong, but I think this code is also used
-> by Felix (VSC9959). If so the description might want tweaking.
-> 
-> Vladimir, can you shed some light on this?
+XDP queues are created/destroyed when a XDP program
+is attached/detached. In current driver xdp_queues are not
+getting destroyed on program exit due to incorrect xdp_queue
+and tot_tx_queue count values.
 
-Thanks for pointing this out, Simon, you are correct. This would be better:
+This patch fixes the issue by setting tot_tx_queue and xdp_queue
+count to correct values. It also fixes xdp.data_hard_start address.
 
-MODULE_DESCRIPTION("Microsemi Ocelot switch family library");
+Fixes: 06059a1a9a4a ("octeontx2-pf: Add XDP support to netdev PF")
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c | 1 -
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c      | 3 +--
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c    | 7 +++----
+ 3 files changed, 4 insertions(+), 7 deletions(-)
 
-Also, the commit prefix for this driver should be "net: mscc: ocelot:
-fill in MODULE_DESCRIPTION()".
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+index 2928898c7f8d..7f786de61014 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_ethtool.c
+@@ -314,7 +314,6 @@ static int otx2_set_channels(struct net_device *dev,
+ 	pfvf->hw.tx_queues = channel->tx_count;
+ 	if (pfvf->xdp_prog)
+ 		pfvf->hw.xdp_queues = channel->rx_count;
+-	pfvf->hw.non_qos_queues =  pfvf->hw.tx_queues + pfvf->hw.xdp_queues;
+ 
+ 	if (if_up)
+ 		err = dev->netdev_ops->ndo_open(dev);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index a57455aebff6..e5fe67e73865 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -1744,6 +1744,7 @@ int otx2_open(struct net_device *netdev)
+ 	/* RQ and SQs are mapped to different CQs,
+ 	 * so find out max CQ IRQs (i.e CINTs) needed.
+ 	 */
++	pf->hw.non_qos_queues =  pf->hw.tx_queues + pf->hw.xdp_queues;
+ 	pf->hw.cint_cnt = max3(pf->hw.rx_queues, pf->hw.tx_queues,
+ 			       pf->hw.tc_tx_queues);
+ 
+@@ -2643,8 +2644,6 @@ static int otx2_xdp_setup(struct otx2_nic *pf, struct bpf_prog *prog)
+ 		xdp_features_clear_redirect_target(dev);
+ 	}
+ 
+-	pf->hw.non_qos_queues += pf->hw.xdp_queues;
+-
+ 	if (if_up)
+ 		otx2_open(pf->netdev);
+ 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+index 4d519ea833b2..f828d32737af 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+@@ -1403,7 +1403,7 @@ static bool otx2_xdp_rcv_pkt_handler(struct otx2_nic *pfvf,
+ 				     struct otx2_cq_queue *cq,
+ 				     bool *need_xdp_flush)
+ {
+-	unsigned char *hard_start, *data;
++	unsigned char *hard_start;
+ 	int qidx = cq->cq_idx;
+ 	struct xdp_buff xdp;
+ 	struct page *page;
+@@ -1417,9 +1417,8 @@ static bool otx2_xdp_rcv_pkt_handler(struct otx2_nic *pfvf,
+ 
+ 	xdp_init_buff(&xdp, pfvf->rbsize, &cq->xdp_rxq);
+ 
+-	data = (unsigned char *)phys_to_virt(pa);
+-	hard_start = page_address(page);
+-	xdp_prepare_buff(&xdp, hard_start, data - hard_start,
++	hard_start = (unsigned char *)phys_to_virt(pa);
++	xdp_prepare_buff(&xdp, hard_start, OTX2_HEAD_ROOM,
+ 			 cqe->sg.seg_size, false);
+ 
+ 	act = bpf_prog_run_xdp(prog, &xdp);
+-- 
+2.25.1
+
 
