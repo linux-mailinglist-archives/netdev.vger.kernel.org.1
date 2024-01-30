@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-67052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3DCB841F35
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:19:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FE1C841F3E
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:20:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A5701F2AE76
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:19:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 927611C24963
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:20:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C31706089E;
-	Tue, 30 Jan 2024 09:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF03757889;
+	Tue, 30 Jan 2024 09:19:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ES2iWGBB"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="xF12tB6u"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 925ED6089C;
-	Tue, 30 Jan 2024 09:18:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1736565BD1;
+	Tue, 30 Jan 2024 09:19:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706606334; cv=none; b=ofZcUOuPvnv9SFivnRezsGOWl7sCNfQ74ZhHpKmXSTXaLGVIE3oEuhYLrNoYyCB+ZKxZ+iN2vC+kmU2PkTNgokoIwNoJr/yVMzk5y5XYYqYnUlfv+c69yLWu8nt48Lxs2PhG9lIGiSepGqUl/+FLV6FeCq0fu2TolgGk78EnIMc=
+	t=1706606378; cv=none; b=mg2TBW2X8e9J8iFuC/9keHgmT3EbfDHQJQlg9wHtW3EUPbKy71eU2MYvM7yZTMcGwWtteDme6sA1VWtCpNd/VevnN9+cvbiotTMhAOPRoWqe5gqsPmA7oZKomYDNDUdoWm3bFpZGoAlhTqPUTDdgvT3BV+aljENjfjiLCo8UyA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706606334; c=relaxed/simple;
-	bh=T+QgwgampQETDJNda5F9UsxgSzpjEdFNDMDizKY4OZA=;
+	s=arc-20240116; t=1706606378; c=relaxed/simple;
+	bh=mZEotDZ+SGxElmOQBjckvcNfNNM2pdGS73nEJ+umJ9c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lZh8TXUwI5NwYkkFBKDBCpo8PH1pW8uA2SfOyifwXRrGb4F0MXYkFmA8W89HHR7AGLanvoxzpkaLNmtT9Ybgnb24k+mu5bRhGcOzatNgmaAR+L2hDdocFmQjZAF3g7Hdu6iBvdGf9sJDaK38ieNrCKF7lTtssfUm17mjgqkRT3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ES2iWGBB; arc=none smtp.client-ip=78.32.30.218
+	 Content-Type:Content-Disposition:In-Reply-To; b=aTGcAProQDqjQJBnJCXTX/8sSyhzXK7IiUyK6KpO/y/oG+OkoF/h+aavRwN5aJ++GHaULdrTnhOFDxoT7N7lP3ZbNyarIoHcYRTTRmlOLPR2eag7R5nQ6aOiPa1eifz8TxY3mvhGz/S+j+c17zNC2VK+wZG1RXzicCucm4j/OWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=xF12tB6u; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,37 +37,35 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ppSRHczfCYqsFW0Z83JIkYK4TUwJET7+q/2wnNCsxN4=; b=ES2iWGBBKIXFheif3vyFDRwFaI
-	T+JgoPdEQ+xg6FZ7obnV/wVxh1g5kqHi7DhXtTYkH8EdOHsadZ3+dE984LC30O9sSLDJPUYrWH2H5
-	Vjs0yxNsuIQgCc7D9/xdp4o9ZGhFRvRVwKCRk5+1h43Tnp5qxJqnQTqpdu0staoJFIV2Ph71ZA5ed
-	xmJ+G37a7Pe7yR7YbXScjeldXLYM+fOhadRlScQszsYvJZJVy4KY7CT/Co5d+MTw4f3miSqZ83f70
-	oo5ZZ0FVK+wWf7uHkJnK6ra48cjLuRRZFFW6e4d3mBIM3TTF6WfVkNyu4q6cSq2zfTrguyV/qVZU1
-	4hrYbGlg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35996)
+	bh=kU36CYdnPcH+FrO8kgFOVGAhAwd9owDMjxmJHm6nww0=; b=xF12tB6utNFsLwI11k2Rhw2bFF
+	zhzjR638ZTG/PznXjSSPmesH6QDSGNANbH6YdKQxpt7Fnsj1N2BW4D4hsQ9nI0lMw9UXEIKQvJLQK
+	bN5DwlJ3h7zarhJAb1YDz69K90AJxRfxjAVDbAq4UVvzuqscI3kPMP/rLZ9tz3M2W0pFSKqMVxG2d
+	J2/IPsWJYGZTx9IzSyjLteQ5lg3sX2HMbFViiePGxFFeKSHgTednvFMWA/dfXuIyF1bgF8NKqt1bl
+	6NX3+1xoEHPXda6UBymKGxfCdJ/F667BF4o0+xW5RPPkLoqDrzWn8TdfDmI0Eqoj6jql+Tlaz4re2
+	X1l1TrbQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48146)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1rUkGJ-0001Uj-1t;
-	Tue, 30 Jan 2024 09:18:35 +0000
+	id 1rUkHE-0001V1-1T;
+	Tue, 30 Jan 2024 09:19:32 +0000
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rUkGG-0005OD-2R; Tue, 30 Jan 2024 09:18:32 +0000
-Date: Tue, 30 Jan 2024 09:18:31 +0000
+	id 1rUkHC-0005OK-Re; Tue, 30 Jan 2024 09:19:30 +0000
+Date: Tue, 30 Jan 2024 09:19:30 +0000
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
 To: Dimitri Fedrau <dima.fedrau@gmail.com>
 Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jean Delvare <jdelvare@suse.com>,
-	Guenter Roeck <linux@roeck-us.net>,
 	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org
-Subject: Re: [PATCH v5 net-next 08/13] net: phy: marvell-88q2xxx: add support
- for temperature sensor
-Message-ID: <Zbi+5ymzbL9sckdi@shell.armlinux.org.uk>
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 net-next 09/13] net: phy: marvell-88q2xxx: add cable
+ test support
+Message-ID: <Zbi/In/qWrW1qmP0@shell.armlinux.org.uk>
 References: <20240122212848.3645785-1-dima.fedrau@gmail.com>
- <20240122212848.3645785-9-dima.fedrau@gmail.com>
+ <20240122212848.3645785-10-dima.fedrau@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,73 +74,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240122212848.3645785-9-dima.fedrau@gmail.com>
+In-Reply-To: <20240122212848.3645785-10-dima.fedrau@gmail.com>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Mon, Jan 22, 2024 at 10:28:41PM +0100, Dimitri Fedrau wrote:
-
-	int tmp;
-
-> +	switch (attr) {
-> +	case hwmon_temp_input:
-> +		ret = phy_read_mmd(phydev, MDIO_MMD_PCS,
-> +				   MDIO_MMD_PCS_MV_TEMP_SENSOR3);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		*val = ((ret & MDIO_MMD_PCS_MV_TEMP_SENSOR3_MASK) - 75) * 1000;
-
-		tmp = FIELD_GET(MDIO_MMD_PCS_MV_TEMP_SENSOR3_MASK, ret);
-		*val = (tmp - 75) * 1000;
-
-> +		return 0;
-> +	case hwmon_temp_max:
-> +		ret = phy_read_mmd(phydev, MDIO_MMD_PCS,
-> +				   MDIO_MMD_PCS_MV_TEMP_SENSOR3);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		*val = (((ret & MDIO_MMD_PCS_MV_TEMP_SENSOR3_INT_THRESH_MASK) >>
-> +			MDIO_MMD_PCS_MV_TEMP_SENSOR3_INT_THRESH_SHIFT) - 75) *
-> +			1000;
-
-		tmp = FIELD_GET(MDIO_MMD_PCS_MV_TEMP_SENSOR3_INT_THRESH_MASK,
-				ret);
-		*val = (tmp - 75) * 1000;
-
-> +		return 0;
-> +	case hwmon_temp_alarm:
-> +		ret = phy_read_mmd(phydev, MDIO_MMD_PCS,
-> +				   MDIO_MMD_PCS_MV_TEMP_SENSOR1);
-> +		if (ret < 0)
-> +			return ret;
-> +
-> +		*val = !!(ret & MDIO_MMD_PCS_MV_TEMP_SENSOR1_RAW_INT);
-> +		return 0;
-> +	default:
-> +		return -EOPNOTSUPP;
-> +	}
-> +}
-> +
-> +static int mv88q2xxx_hwmon_write(struct device *dev,
-> +				 enum hwmon_sensor_types type, u32 attr,
-> +				 int channel, long val)
+On Mon, Jan 22, 2024 at 10:28:42PM +0100, Dimitri Fedrau wrote:
+> +static int mv88q222x_cable_test_get_status(struct phy_device *phydev,
+> +					   bool *finished)
 > +{
-> +	struct phy_device *phydev = dev_get_drvdata(dev);
+> +	int ret;
+> +	u32 dist;
 > +
-> +	switch (attr) {
-> +	case hwmon_temp_max:
-> +		if (val < -75000 || val > 180000)
-> +			return -EINVAL;
+> +	ret = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_MMD_PCS_MV_TDR_STATUS);
+> +	if (ret < 0)
+> +		return ret;
 > +
-> +		val = ((val / 1000) + 75) <<
-> +		       MDIO_MMD_PCS_MV_TEMP_SENSOR3_INT_THRESH_SHIFT;
+> +	*finished = true;
+> +	/* fault length in meters */
+> +	dist = ((ret & MDIO_MMD_PCS_MV_TDR_STATUS_DIST_MASK) >>
+> +		MDIO_MMD_PCS_MV_TDR_STATUS_DIST_SHIFT) * 100;
 
-		val = (val / 1000) + 75;
-		val = FIELD_PREP(MDIO_MMD_PCS_MV_TEMP_SENSOR3_INT_THRESH_MASK,
-				 val);
+	dist = FIELD_GET(MDIO_MMD_PCS_MV_TDR_STATUS_DIST_MASK, ret) * 100;
 
-... and therefore no need for the _SHIFT constants.
 
 -- 
 RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
