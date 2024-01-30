@@ -1,93 +1,86 @@
-Return-Path: <netdev+bounces-67210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6C6B8425C0
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:06:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FBD38425E0
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:12:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE958B2C4CB
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 13:00:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B095F1C254C0
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 13:12:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88C16A03B;
-	Tue, 30 Jan 2024 13:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1332C6A32D;
+	Tue, 30 Jan 2024 13:11:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cy+tidcS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f2uErQRl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F084C66
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 13:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E465860876
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 13:11:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706619627; cv=none; b=btYaJLAefW7WCKdewy5pzQ8TgR1Z2nUSnUGvl+xpTXMGv5uwmg9MXrLmDauGBA+PiNaDGT4yGRUbLX8/38+EukErVTrK1QaE+mCzrzcvAmqNsYgzJ6zZe82iVM3dwPMYhEPuXE4nwUZQxuQHGS5ha64FhNFjSrau2s9sd77VpKw=
+	t=1706620319; cv=none; b=O06XlmmxEhshQyugTjg1EKboDbDVqQXfqZ1xSlJKBfGxiwu2qPj5qdeXCRBpiKPT5Jly/31oX7R2BGJFmE7a1SXVDJWBeIB6rj0wv9WHAcjU5xwKaKgqTMVNcaWQYzrLTrSPYWZNDOHgH5fwAlwJ204ghf6bPBZEbK5PeU/xHcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706619627; c=relaxed/simple;
-	bh=ok6OgG3Z+LqAEOxpfLCLaYnPb9PsLqyjjTlcDdVjgzs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CTRfxBI9oCRhMj3t/f3ws7G7y38WubWXBxNCuvRiM16MqMghZfDzapg733qr2F2ngNZYuQZyhDndLPZvEnxX4MV3DWvkPO49mM7kyh4cj/7tyjwbJ/hOgdkqe7uuxi/nuBYnmQF3feG3fzyLfUudIiVmtVuPlK7/OLMPN734VUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cy+tidcS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1DB40C43390;
-	Tue, 30 Jan 2024 13:00:27 +0000 (UTC)
+	s=arc-20240116; t=1706620319; c=relaxed/simple;
+	bh=EJ7lOS3Ds/Vj4BBISEpE3TpcTQc+OaYbGCsQqTvbFTM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gfwUfwrqkBZuhh1hseu1VVm/2JnRB/Wj4mjfH1jr7zkGv8GJSgtWKRn0VlrjK/38kOGvxPRuKpzIJtFafRUKQ17j/SXSz7IYUPURc5RyitlcDH8RjiWIBR/RuEFGHpdgTIW9fYFklow5jeeuS3LVwl4UBZFldzcGRQxpC2W4MgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f2uErQRl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D12BAC433F1;
+	Tue, 30 Jan 2024 13:11:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706619627;
-	bh=ok6OgG3Z+LqAEOxpfLCLaYnPb9PsLqyjjTlcDdVjgzs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Cy+tidcS1K5L+3v7JAeajukvUKma3QAdyBaHCRPwyfDA8X1v5sT6PKSjz2Cvcmksr
-	 9n9u9CGW3kqPu/5yVgCwkAqcFUB1HfOT4beLHhZjTRZgBk+geC4LZspWER49ARjcsq
-	 BIckzYGjLILZxC8NcteQsUj8momXzlVqClFUPTTy5SDjoMl6D1SRXNDn4SybUgNCTz
-	 73uImZe1PX5xmy6iKIotjtZH7Gmh146TRVctUUOTvHNfjxqEIQYxmWAjmrdGL1IbwG
-	 FAcAhg55jseAIMT9GndB3By2ugyEgJc/cpeSqtlNqVqCJ7GVc4mwqwtC+aiguEtdek
-	 rNUT1pc+FBoQQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 04270E3237E;
-	Tue, 30 Jan 2024 13:00:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1706620318;
+	bh=EJ7lOS3Ds/Vj4BBISEpE3TpcTQc+OaYbGCsQqTvbFTM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=f2uErQRlD08eQ7ERt8Ru9DLzLIVy/uvJ3xUgzzW4e49v67dTtFngHQXX3A5Js2pwN
+	 +dKMV+T/4sI9y79Z+LYA/DEuFz81Haf7E2sktHAqBhl4qPUEcdBdLQ7k8OdnC+jWxx
+	 7zyvd9eT05Ek12b68PNaA9rFiqFuH9sO3Bb7p00sORoHfNidnYtWL/lkNQNip8Eyuq
+	 cC93/1llLN5Fect6XXuPbwNf31TuKuXksoADSqTGv28ujHbMeHTfk7Q2On1anzBadb
+	 i8yDziEuftqwzfj9HklzPZXzRod+LUJg4E6R2P3eWsYmI/eYT9v0yZ7/NL96eAAfLc
+	 S8eWXPVnIbWow==
+Date: Tue, 30 Jan 2024 13:11:37 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org, kernel test robot <lkp@intel.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>
+Subject: Re: [PATCH iwl-next v4 3/3] ixgbe: Clarify the values of the
+ returning status
+Message-ID: <20240130131137.GH351311@kernel.org>
+References: <20240126130503.14197-1-jedrzej.jagielski@intel.com>
+ <20240126130503.14197-3-jedrzej.jagielski@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] llc: call sock_orphan() at release time
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170661962701.22779.6523636010595073464.git-patchwork-notify@kernel.org>
-Date: Tue, 30 Jan 2024 13:00:27 +0000
-References: <20240126165532.3396702-1-edumazet@google.com>
-In-Reply-To: <20240126165532.3396702-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com,
- syzbot+32b89eaa102b372ff76d@syzkaller.appspotmail.com, ebiggers@google.com,
- kuniyu@amazon.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240126130503.14197-3-jedrzej.jagielski@intel.com>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 26 Jan 2024 16:55:32 +0000 you wrote:
-> syzbot reported an interesting trace [1] caused by a stale sk->sk_wq
-> pointer in a closed llc socket.
+On Fri, Jan 26, 2024 at 02:05:03PM +0100, Jedrzej Jagielski wrote:
+> Converting s32 functions to regular int in the previous patch of the series
+> caused triggering smatch warnings about missing error code.
 > 
-> In commit ff7b11aa481f ("net: socket: set sock->sk to NULL after
-> calling proto_ops::release()") Eric Biggers hinted that some protocols
-> are missing a sock_orphan(), we need to perform a full audit.
+> New smatch warnings:
+> drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c:2884 ixgbe_get_lcd_t_x550em() warn: missing error code? 'status'
+> drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c:3130 ixgbe_enter_lplu_t_x550em() warn: missing error code? 'status'
 > 
-> [...]
+> Old smatch warnings:
+> drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c:2890 ixgbe_get_lcd_t_x550em() warn: missing error code? 'status'
+> 
+> Fix it by clearly stating returning error code as 0.
+> 
+> Reported-by: kernel test robot <lkp@intel.com>
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Closes: https://lore.kernel.org/r/202401041701.6QKTsZmx-lkp@intel.com/
+> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
 
-Here is the summary with links:
-  - [net] llc: call sock_orphan() at release time
-    https://git.kernel.org/netdev/net/c/aa2b2eb39348
+Thanks, nice to see this cleaned up.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
