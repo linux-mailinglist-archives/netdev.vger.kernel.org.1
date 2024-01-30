@@ -1,152 +1,97 @@
-Return-Path: <netdev+bounces-66944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38D00841958
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:32:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 742CF841969
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:40:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C00DEB2390C
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 02:32:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B9172855B3
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 02:40:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71D8436102;
-	Tue, 30 Jan 2024 02:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A80FD36102;
+	Tue, 30 Jan 2024 02:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bu8Gp+rW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dv7v+6vH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E9BB36B18
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 02:31:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76253364DB;
+	Tue, 30 Jan 2024 02:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706581904; cv=none; b=eHHLokVQcNG3KALiZK01pZPLYXi/0XrFjZRhdv+Sfo5uykR7imGzbYDZaoF0l+/hUaxilN+pLdwMv5HS9MdHHo7ODgHxg6q2EmGI2NqSCOZAIZTbxgbo/bwcvxTIKY0yXT2KQRwpZsZY8P/T8ZgAiQPwYvhzmHk6mY/rhcT86Io=
+	t=1706582424; cv=none; b=CWkIXWJ6ZdGq0dJW6EmV7HyWxc+Mae0ssOB1InvY+TdN7or1wbAXroOnP/+3WLjs3YC727ZcQU0/3/4rqOXuRofprEI/fmWqRluJaQGh1s+FeXyZxPyNiVaF4cSm/34c2BMixSAi0B9BedGGYS3LYHpT/4fdFsMG+YjB+x4b9hk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706581904; c=relaxed/simple;
-	bh=lob+0G7PLz8i8v2ac9xmv3Exl8aHcGewldvgdVqzh+8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NGZ4fp66K3rpwfI8bHgfiSk+CD/XBp0jEjzqZkNU0Ku7wwfOnXFOz9xQ0N6TPx0JSAfZdUmVQkbQ7uT6DIx9aAV+lnI7YS2EON1oBhOhEnJ4drqoCC9TiEdcJlURcDMnCvNrCNOfy8+cLkTe5XOC3PpDZs/l5SiffrL/z4yIjr4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bu8Gp+rW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53371C433F1;
-	Tue, 30 Jan 2024 02:31:43 +0000 (UTC)
+	s=arc-20240116; t=1706582424; c=relaxed/simple;
+	bh=l7iNsmx66/1U9HxfyV71kF0ouS2w3G1prRYjdiYH400=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=jxaNNtsZ62xcXzgkORBGbbSdbSh7iiAvAJaE8i5bnC4bF2wGv2ukdISbM8EGHS/7dtNyqD9oQ8JNg1w78UQqqcugLugFimMiQUFR191jc8d1ohK/4YYQl0jztCwvHFle+xOXLmiI0QQzxMW3wkGvZz3tGlfyF/tKYVWdB0sXMUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dv7v+6vH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E108DC43390;
+	Tue, 30 Jan 2024 02:40:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706581903;
-	bh=lob+0G7PLz8i8v2ac9xmv3Exl8aHcGewldvgdVqzh+8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bu8Gp+rWz92YC5zBpsSo7Pdxd3Vijd4ZGICgx07egaywqkTQ1geb+i4C4PuNWmOML
-	 sFV0tLSSj3zrJ/NVgTtBcJYQiCXuA01LvMTIzbbKh3ppzjEQImvKV250L1jf8CEV7U
-	 q3hzUwWk29WR1X+8vHxF5zHnzC/+xUdLfujfJHnNEOasv54rXG5nFNI4ze+PuLqPz1
-	 WycYA7kxOdI4TgfcP1t4CNYLLLx9zxAtLEE2IPTmqL47bHj+qfkBZIIvHl0VaE6J2M
-	 KZf4Wqp9vSJIjfQTuCyLG1HwVtLltkree4GSJtMYpFyt2gylseH8LZWeDCI17UgcTb
-	 mhoxR0LDt/zaQ==
-Date: Mon, 29 Jan 2024 18:31:42 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- <netdev@vger.kernel.org>, David Ahern <dsahern@gmail.com>, Ido Schimmel
- <idosch@idosch.org>, Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCH net-next] selftests: forwarding: Add missing config
- entries
-Message-ID: <20240129183142.5b7ba871@kernel.org>
-In-Reply-To: <87le88l6qz.fsf@nvidia.com>
-References: <025abded7ff9cea5874a7fe35dcd3fd41bf5e6ac.1706286755.git.petrm@nvidia.com>
-	<20240126112538.2a4f8710@kernel.org>
-	<87le88l6qz.fsf@nvidia.com>
+	s=k20201202; t=1706582424;
+	bh=l7iNsmx66/1U9HxfyV71kF0ouS2w3G1prRYjdiYH400=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Dv7v+6vHX7w2nWdv48sCcWYELRt2RoCzt/qpZHXF070TN+XywaUZpAmTWgwvy3q7H
+	 yo2cZlOyL17Q5VwvpnZYMgiCilBmDyM/PF3kIf8NyUj2ubSomhRc8sjHXtl5mDP3C1
+	 nJiQ/Lri9CklZD71VlGHFuMrQ3usJZqR/owPBxvBrPPMncLgN861fh7V8fWJR1RpeE
+	 +OLqtSVSXMjapWKItQMpKf6ow90Z7dUn3YZsdM1XvtEdfz7M4x3+e4tpqXaFfCMdYn
+	 PUJCqZRqE9S8wwda1svYllQd5Q/zCBV7fjjNX8uWiPUWWDQ0JqrPvH/5l4aGtmAQCO
+	 sI9RvLe5IX8/A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C668CC561EE;
+	Tue, 30 Jan 2024 02:40:23 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] net: dsa: qca8k: fix illegal usage of GPIO
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170658242380.31723.8345340437270157023.git-patchwork-notify@kernel.org>
+Date: Tue, 30 Jan 2024 02:40:23 +0000
+References: <1706266175-3408-1-git-send-email-michal.vokac@ysoft.com>
+In-Reply-To: <1706266175-3408-1-git-send-email-michal.vokac@ysoft.com>
+To: =?utf-8?b?TWljaGFsIFZva8OhxI0gPG1pY2hhbC52b2thY0B5c29mdC5jb20+?=@codeaurora.org
+Cc: andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ ansuelsmth@gmail.com, rmk+kernel@armlinux.org.uk, kabel@kernel.org,
+ chunkeey@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ petr.benes@ysoft.com
 
-On Mon, 29 Jan 2024 11:45:07 +0100 Petr Machata wrote:
-> Jakub Kicinski <kuba@kernel.org> writes:
-> > Thanks a lot for fixing this stuff! The patch went into the
-> > net-next-2024-01-26--18-00 branch we got: pass 94 / skip 2 / fail 15
-> >
-> > https://netdev.bots.linux.dev/contest.html?branch=net-next-2024-01-26--18-00&executor=vmksft-forwarding&pw-y=0
-> >
-> > Clicking thru a handful of the failures it looks like it's about a 50/50
-> > split between timeouts and perf mismatch.   
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 26 Jan 2024 11:49:35 +0100 you wrote:
+> When working with GPIO, its direction must be set either when the GPIO is
+> requested by gpiod_get*() or later on by one of the gpiod_direction_*()
+> functions. Neither of this is done here which results in undefined
+> behavior on some systems.
 > 
-> Looking at some recent runs. A number of failures are probably due to
-> the system failing to oversubscribe the interface with the tested
-> qdiscs. That's sch_ets, sch_tbf_ets, sch_tbf_prio, sch_tbf_root,
-> tc_police.
+> As the reset GPIO is used right after it is requested here, it makes sense
+> to configure it as GPIOD_OUT_HIGH right away. With that, the following
+> gpiod_set_value_cansleep(1) becomes redundant and can be safely
+> removed.
 > 
-> Not sure what to do about it. Maybe separate out heavy traffic tests,
-> and add a make run_lotraf_tests?
+> [...]
 
-Either that or the other way - express the expectation that the
-environment is slow to the test. It came up in the "net-next is OPEN"
-thread and also off-list. Perhaps we should discuss tomorrow on the
-netdev call?
+Here is the summary with links:
+  - [net,v3] net: dsa: qca8k: fix illegal usage of GPIO
+    https://git.kernel.org/netdev/net/c/c44fc98f0a8f
 
-https://lore.kernel.org/all/20240129112057.26f5fc19@kernel.org/
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-To make sure I've done my homework I kicked off few more instances of
-the tester metal-* and metal-*-dbg. They are running in AWS (AWS Linux,
-again) but on bare metal. Former are identical to the previous ones,
-just with KVM / HW virt support now, so those should really be all
-green. The metal-*-dbg ones have kernel/configs/debug.config and
-kernel/configs/x86_debug.config configed in, so "worst case slow".
-
-> tc_actions started getting a passible deadlocking warning between Jan 27
-> 00:37 and Jan 28 18:27:
-> 
->     https://netdev-2.bots.linux.dev/vmksft-forwarding/results/438201/108-tc-actions-sh/
->     https://netdev-2.bots.linux.dev/vmksft-forwarding/results/438566/109-tc-actions-sh/
-> 
-> So either something landed that broke it, or the host kernel now has
-> more debugging enabled, so it now gives a citation.
-
-Hm. configs are identical.
-
-$ git diff net-next-2024-01-26--18-00..net-next-2024-01-27--00-04 --stat 
- Documentation/devicetree/bindings/net/snps,dwmac.yaml            |  11 +++---
- Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml |  72 +++++++++++++++++++++++++++------------
- drivers/net/ethernet/amd/pds_core/adminq.c                       |  74 +++++++++++++++++++++++++++-------------
- drivers/net/ethernet/amd/pds_core/core.c                         | 130 +++++++++++++++++++++++++++++++++++++++++-----------------------------
- drivers/net/ethernet/amd/pds_core/core.h                         |   3 +-
- drivers/net/ethernet/amd/pds_core/debugfs.c                      |  12 ++++---
- drivers/net/ethernet/amd/pds_core/dev.c                          |  30 ++++++++++++-----
- drivers/net/ethernet/amd/pds_core/devlink.c                      |   3 +-
- drivers/net/ethernet/amd/pds_core/fw.c                           |   3 ++
- drivers/net/ethernet/amd/pds_core/main.c                         |  26 +++++++++++---
- drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_actions.c      |  16 ++++-----
- drivers/net/ethernet/mellanox/mlxsw/core_acl_flex_keys.c         |   9 ++---
- drivers/net/ethernet/mellanox/mlxsw/spectrum.c                   | 160 +++++++++++++++++++++++++++++++++++++++++++++++----------------------------------------
- drivers/net/ethernet/mellanox/mlxsw/spectrum.h                   |  15 ++-------
- drivers/net/ethernet/mellanox/mlxsw/spectrum_acl.c               |  11 +++---
- drivers/net/ethernet/mellanox/mlxsw/spectrum_acl_tcam.c          |  17 +++++-----
- drivers/net/ethernet/mellanox/mlxsw/spectrum_router.c            |  15 +++++----
- drivers/net/ethernet/mellanox/mlxsw/spectrum_switchdev.c         |   8 ++---
- drivers/net/ethernet/stmicro/stmmac/Kconfig                      |   6 ++--
- drivers/net/ethernet/stmicro/stmmac/dwmac-starfive.c             |  32 +++++++++++++++---
- net/core/dev.c                                                   |  27 +++++++++------
- net/core/dev.h                                                   |   1 +
- net/ipv4/ip_output.c                                             |   9 +----
- tools/testing/selftests/net/config                               |  14 ++++----
- 24 files changed, 430 insertions(+), 274 deletions(-)
-
-No idea.
-
-> ip6gre_inner_v6_multipath is just noisy? It failed the last run, but
-> passed several before.
-
-FWIW I made this: https://netdev.bots.linux.dev/flakes.html
-
-> router_multicast and router get a complaint about a missing control
-> socket. I think at first approximation they need:
-> 
->     # mkdir -p /usr/local/var/run
-> 
-> But even then I'm getting a fail. This and the others seem to all be in
-> IPv6 multicast.
 
 
