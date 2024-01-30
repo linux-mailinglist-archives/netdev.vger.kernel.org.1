@@ -1,129 +1,127 @@
-Return-Path: <netdev+bounces-67299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58524842B02
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 18:32:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7096842B13
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 18:34:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C8BC1C20FBF
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 17:32:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28A89B23EC6
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 17:34:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60AD712A147;
-	Tue, 30 Jan 2024 17:32:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E67814E2C6;
+	Tue, 30 Jan 2024 17:34:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="n4UCLTbE"
 X-Original-To: netdev@vger.kernel.org
-Received: from SA9PR02CU001.outbound.protection.outlook.com (mail-southcentralusazon11021006.outbound.protection.outlook.com [40.93.193.6])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2086.outbound.protection.outlook.com [40.107.93.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6361128382;
-	Tue, 30 Jan 2024 17:32:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.193.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39E5E14D42D
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 17:33:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.86
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706635949; cv=fail; b=ZpCSFuBdIfHYTSrsSBxNsiWN0o3EBdnpx+eX9SpyTpF0rYa8p/Lilxnn6uUCzD7FwFTEdq5vJtxfF1wGG3YwEEWyaNgtiEuwwU1945dhtm1Ybru1Ga/zOZbsuqFHgCgOcfmLsj9U6dtLGyOCcb7evaizZESj0YvkFNVNNYcGh/Y=
+	t=1706636041; cv=fail; b=GkgGAco6eWkOSuOmAkiWFNPbY1dqsyn9ZTws6+rxMOyunuPLvbRIrqokJTL0jBdQKlbQEG+UsBzXIk7DPeK1jYV0GmtgF+qU04XCD+6yCLnXVKcR8FE6l9NvlsHscOvpccKcJ3COfBCHwoRjdXtZ8ZktioZu1a2QSFEp08mM+rI=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706635949; c=relaxed/simple;
-	bh=6eW6bez4l6+vVj6IBTt5kKG+UMhOfeZOXCfsLSRkimo=;
+	s=arc-20240116; t=1706636041; c=relaxed/simple;
+	bh=0bobV7zFZiOskAffg+cfsczOk/TYWYpJmvqZZH7QmLk=;
 	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=GuhAhd7oelWMTzOgeOyyT7DTegOuX+jXqlXAqT1m5B91ocYIxIM64cswzyQqwuBUEHjkK+BuR5YO905munUYD76qZJ3SRAXocCu5dClo2BeactrhoBkd+j0jdFKTRWVWzQ1RNd5RkKUvSQkrWyWXGjes4MOrntIvSm3/U3/xEGM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; arc=fail smtp.client-ip=40.93.193.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+	 Content-Type:MIME-Version; b=ObukbdFDI3Si9Q17sA28q0UuKug0x2ekQM65FfVR4Ff4z4Pw4GUr+X5SSCF+SjkJRSr359cZuUeCcwDfXWIuvBi6La8hP7Fyd1QdspQMYhjBJ826xtXBtC+BkBpoy7U1RrdlNJks0TFAsirxFIocuIO7Tfwb9T1urgi/Xpt71OU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=n4UCLTbE; arc=fail smtp.client-ip=40.107.93.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Qjk74iZrrcUH1QrA923lc7b26HmKX7Yu14jdValx++mmqZwBoSdi7Iz0jMBLO/aOCYNsS/KqoBKjfZ7xvgdetKbGFqnTAV3ofGPq7GkircZ3Xlv9Rf9cCzHmk6OanPEzUp7fVRwdISeyLia7kkL/zNV9pNVKK499Fh7FTI2n0ED/FEGfKCm/yKsYQPNdkYGajKm+hEj7xIfAwPDjgz7vb3mc9LpnQw354miPjAhCfFsGkpmwK05xIH+nTCGF0S2QRp9XERoBgzY/uRc2NoVXoxJaFk7ZbQnCpNWHdQ4OJQI3A4scF+KiGQlJrARzmjntARQ/F9aEDfkOBkYBPaMAqA==
+ b=a9StF9JtA2qc92VsMTwuxL4h5sqTYE5MniBcGfkDd2sErZln3Kc/cPLD52cq0TDPyyG+jZBQZb5Z5ID8LnNUTpEBSJeS3A/a9zMwrCuXVLyqHSRmXuSHf6ELNLi0BiaOu6tuo9m0M0b9aItQbSYOdT/ClYUZ2b+DEtocR9e2eAZZbrNT6br8PBpTfZQJoeGuUke/PL43q5RJPVclV5Y+RrR9KKmhuD80v45IGx79N2xUqZlJUdZLtHZ0+usdcp+e5pGNR5PasrLig+lpUN+NeKqiUsAXAyAhI8RfteSbcY2wqjUKO87f6tkrQ6pJq3JFEk255B6n5q9nDus4Ng9uPw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6eW6bez4l6+vVj6IBTt5kKG+UMhOfeZOXCfsLSRkimo=;
- b=jqlIt72z11UtpRJDe7ubdLKRhI9wyB5+tjXhtSRp+uTjQpTnrlYHibU/tDVpOrlZczWfLEHQ/xoWZ1OuescPN2qK6zAGulMg+5QlxhdsqNhdI6X/4ZFXZ1THqfOFlCDWWECT5dMFSrGJazF0Clz8radfJxlxGWhHuhjfrvHYE6jdVOBw8DVcVgPkHYyJTc/HKDGJxmMYT3GD/JVpsPcuZZWkP01rcl6srEs9hCtWeLB0B7kq7TIhjJRX4hdhuAru06rlbcoBMHypkBitV7RYEckSsZfVTWJJ2y3Rg/yjYNeGxWq9foS0f/dz1S3l8THiJlTNZ2SfD+FbbLuQNyHCKg==
+ bh=OtuHhEJICMjSX01Pm///wKP440qaK6V3dj8NCP/gciU=;
+ b=FNgcDdgOBnCl8/kBoqxnO43OnIHHKugMsb4kSiHFc5aMUwtcvRLAZvgacoAb1qHZiobpWQ02qsf7tDs8tLnG2XQiZQ22CutaRtQMc4VavMHMvKoF5d5KRtMzCn1QQLparZ+HUkhMFX1UXRDWICI8jEKMM6RxJMQqnMECG/ddJIF2L5xKlwrihWvmqsIm8uBcK2m2FwgfHqbeU7wxW6AvtOGU/XQ8IKogPnChMZzd8qpfIdXF030iWmff3ECiUqDVVytMvfpijk9V12B0rTD8C7sxFaW6jNNkNTPxJoI/1xXZg0sLXbyGm12KDxzpPv4jEsfa4sR0kwtnRjew9Arirw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-Received: from SA1PR21MB1335.namprd21.prod.outlook.com (2603:10b6:806:1f2::11)
- by IA1PR21MB3595.namprd21.prod.outlook.com (2603:10b6:208:3e0::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.6; Tue, 30 Jan
- 2024 17:32:23 +0000
-Received: from SA1PR21MB1335.namprd21.prod.outlook.com
- ([fe80::5d07:5716:225f:f717]) by SA1PR21MB1335.namprd21.prod.outlook.com
- ([fe80::5d07:5716:225f:f717%4]) with mapi id 15.20.7270.007; Tue, 30 Jan 2024
- 17:32:23 +0000
-From: Dexuan Cui <decui@microsoft.com>
-To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>, KY Srinivasan
-	<kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>, "davem@davemloft.net"
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OtuHhEJICMjSX01Pm///wKP440qaK6V3dj8NCP/gciU=;
+ b=n4UCLTbEu7qJE9ukKUaJzTy2wJGb9oqpkbzmVftIbHGC6PyZ0JqG7/ourWYDJTdTX6QW3FkGG/V3IAYjBt9VoQyDx5s4b89VXYwl4N1suLXX+o0YfY4LORi3XnSFF55Xqg/rXWbvQhKI3WarHZY6Y5aLxi52MPOguG/1/yZ6deiHfE7/k/F3eTFvHuIPtdP819GNs4IaeGOGr+KVUYiKs4e6J4sO8fsU9aMU0jn5bKX4rXlZPTWyYT+iTAQmjjD6cqA8VpDmpYm5SLne4rBe8QfUfsugH9Z+6eiyOTOZO1Rzo0oGQppkD1BgEPjk6q2gaAA6vib28BGR9oGQkQG1kA==
+Received: from CH0PR12MB8580.namprd12.prod.outlook.com (2603:10b6:610:192::6)
+ by DS0PR12MB6439.namprd12.prod.outlook.com (2603:10b6:8:c9::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7228.32; Tue, 30 Jan 2024 17:33:57 +0000
+Received: from CH0PR12MB8580.namprd12.prod.outlook.com
+ ([fe80::8825:1827:3273:bbbf]) by CH0PR12MB8580.namprd12.prod.outlook.com
+ ([fe80::8825:1827:3273:bbbf%3]) with mapi id 15.20.7228.029; Tue, 30 Jan 2024
+ 17:33:57 +0000
+From: Daniel Jurgens <danielj@nvidia.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jasowang@redhat.com"
+	<jasowang@redhat.com>, "xuanzhuo@linux.alibaba.com"
+	<xuanzhuo@linux.alibaba.com>, "virtualization@lists.linux.dev"
+	<virtualization@lists.linux.dev>, "davem@davemloft.net"
 	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	Long Li <longli@microsoft.com>, "yury.norov@gmail.com"
-	<yury.norov@gmail.com>, "leon@kernel.org" <leon@kernel.org>,
-	"cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
-	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
-	"vkuznets@redhat.com" <vkuznets@redhat.com>, "tglx@linutronix.de"
-	<tglx@linutronix.de>, "linux-hyperv@vger.kernel.org"
-	<linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>
-CC: Souradeep Chakrabarti <schakrabarti@microsoft.com>
-Subject: RE: [PATCH net] hv_netvsc: Fix race condition between netvsc_probe
- and netvsc_remove
-Thread-Topic: [PATCH net] hv_netvsc: Fix race condition between netvsc_probe
- and netvsc_remove
-Thread-Index: AQHaU2VfpkrJr+izKkeQOwCcE2c/2bDyl7Xw
-Date: Tue, 30 Jan 2024 17:32:23 +0000
+	"kuba@kernel.org" <kuba@kernel.org>, "abeni@redhat.com" <abeni@redhat.com>,
+	Parav Pandit <parav@nvidia.com>
+Subject: RE: [PATCH net-next] virtio_net: Add TX stop and wake counters
+Thread-Topic: [PATCH net-next] virtio_net: Add TX stop and wake counters
+Thread-Index:
+ AQHaU4g6jvRyzH1tPUCIs6q7Q9im2rDycmwAgAAGRTCAAAXXAIAAAcJwgAABlYCAABui0A==
+Date: Tue, 30 Jan 2024 17:33:57 +0000
 Message-ID:
- <SA1PR21MB13357264DB2B49C20B8C375BBF7D2@SA1PR21MB1335.namprd21.prod.outlook.com>
-References:
- <1706609772-5783-1-git-send-email-schakrabarti@linux.microsoft.com>
-In-Reply-To:
- <1706609772-5783-1-git-send-email-schakrabarti@linux.microsoft.com>
+ <CH0PR12MB858067B9DB6BCEE10519F957C97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
+References: <20240130142521.18593-1-danielj@nvidia.com>
+ <20240130095645-mutt-send-email-mst@kernel.org>
+ <CH0PR12MB85809CB7678CADCC892B2259C97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
+ <20240130104107-mutt-send-email-mst@kernel.org>
+ <CH0PR12MB8580CCF10308B9935810C21DC97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
+ <20240130105246-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20240130105246-mutt-send-email-mst@kernel.org>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach:
 X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=8fd91f70-2d72-48db-9f9a-ccb2b66334dd;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2024-01-30T17:10:39Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
 authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
 x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA1PR21MB1335:EE_|IA1PR21MB3595:EE_
-x-ms-office365-filtering-correlation-id: b801d3af-7c9a-4e6d-f143-08dc21b96b37
+x-ms-traffictypediagnostic: CH0PR12MB8580:EE_|DS0PR12MB6439:EE_
+x-ms-office365-filtering-correlation-id: 1a434541-2220-4ea8-d2a9-08dc21b9a354
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
 x-microsoft-antispam-message-info:
- tGcAteZWtjdbt0XVpQqi1EK7J7BigNFwr7YVooLjhU7HTyR2xOvX9RbJc2k15HOsoXzQ8zmj/KRTSWcWbtuKrruUDSFqiabkQV4uVfnpHuoFozsC4NPfNpk2SHgBs8cqYQ8w1pA18pE3H3j3BpKrH40k0TUidSoWZCZ6nU9p2CSv2YJwp9L23RJFIg2/KyM3xDZhHfSSLyNmxyTOPBlTCk7O4osh2H1oq9XsXanxViq6kG76DgPbJtx7OrVv3a5LSAqsNza3IQN8E3fBP0mXpfXww3R4CqD6spVMSL9YiZfiYt5x8/xI3xXJbMY88w5DDTQU30SZWpfikqp0o7yiHcRdybfR2rlZlbQfaVdGu2ND6Axqg3HCbTYUZZqWnZV7oMv0O9vLH1tQdi742tBrbVJPlPdM1CIYGhPxZnxsgIJaN5he6jIMQgfX+Us3DWvAV7iSOMSz0btM4NPrZY//8gpBEoS2JKZxx/uIW4BdXlEVc+O6So+hzjL5WferYcfsrJ2M14+T5a1wHCTHZNxFOyteIQarxdfxNpmSg5l5bMHFINwGOsKTuxAqTWG3hlfo30+8qs6rvsM0Z9NIFbCC8UurnTF0nyKnaSUdolo12LsQqwsCdb7ueLCQq8bigUQ5LK+ugJklfqMSH6YgTM26IA==
+ BnBuX7FD5UbwHd0wx2Imdhks3uLCYLaXdFcOqTYQLnOeR5xtH59/alc7fJgx/v5ouTfXuKZdkTmBzWxQ7k92Wqg9A7uoKf3CvOtmeLKcDzIgeThW+6VeQGxYOyLn5R5MDt0oucnY44wXoChqFJV3dAOxmeQtLA8Cwt5rSPRIYEyOt02kNrhEeLyPFlV0ePaz7GI7yRRaVaeY3WRhJHAeJke+XvHAri9x2v0Cg1BahjvtwTyE1UQCG+nVk4Yv1iXALQmrr649iIvS+me32jlfDxB/W3RczZKm+Gb3Z06bRr9RP8Q/ZHLvPekM5bpcWu44RUiKbrXkNJM/w4Od/oHBBDNHgvvG+qo8nCTIkQLgX/jhrR3cSgaKtyackhlSyJUaYk850nWwLKrn7cJc8UYpZUEuIkNlX0mFP4uqYwGh5o110/VvvHUyuGEE3QuvbiKNOWh7Ricwvoc8e7p/4vXWaEfdbC9+1XrdhOgQF1w/X0M8AZQ04SA/71PwkdN9YDC1R7fjfgH2CF8aFPOCyp0dmlvhiMnWdjtSQsP4nuZgFAvZGBHH9XyP8mCLUCskA9+WVBsuY5j8NTHbE+uZEO5F77Y82odD1OrvCnih3DXwOhOR3HirOc07uQhD6XB8vt6y
 x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR21MB1335.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(136003)(366004)(39860400002)(396003)(376002)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(38070700009)(7416002)(33656002)(8990500004)(2906002)(41300700001)(921011)(55016003)(6506007)(83380400001)(26005)(10290500003)(478600001)(71200400001)(86362001)(110136005)(66446008)(316002)(107886003)(66476007)(76116006)(64756008)(66556008)(66946007)(9686003)(122000001)(7696005)(5660300002)(82960400001)(82950400001)(52536014)(38100700002)(4326008)(8676002)(8936002);DIR:OUT;SFP:1102;
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR12MB8580.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(366004)(39860400002)(346002)(136003)(230922051799003)(451199024)(1800799012)(186009)(64100799003)(83380400001)(7696005)(6506007)(122000001)(66946007)(478600001)(9686003)(38100700002)(71200400001)(107886003)(8936002)(316002)(41300700001)(5660300002)(4326008)(52536014)(2906002)(66476007)(8676002)(54906003)(6916009)(76116006)(66446008)(64756008)(66556008)(26005)(33656002)(86362001)(38070700009)(55016003);DIR:OUT;SFP:1101;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
 x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?aYmKhr9Er9OmqnTGwsxo1jyswljc35D5ZMDsAkpHQ+z8A9c6rnm5tkn/6h1z?=
- =?us-ascii?Q?v5kvn+sBiHjlbaBYfK6Knn0rS8vSzmr52UZc6VuHX3Hie2jREpjS1lueNxtU?=
- =?us-ascii?Q?ixiQsb8JF7+s7l61D8clZacho+oA2UVGJWWa3cYXCf+Ls+tbIYh/xCaTYofC?=
- =?us-ascii?Q?Q30CMTG49Dwqf+NlcbaFM9RQnsGjhP/uNe5Hg2QwVuTz7mIIz10oCG0J+ZPG?=
- =?us-ascii?Q?ubBjIghv67NQs0rmR/E+vM7HAG8xsUC84MtjzCRwfmIoOox5dEwyrhPlqLjx?=
- =?us-ascii?Q?Aqy0TpCyNAsjZsoCLFrGcIewYiltCD78afDshvTaeKxp3q2BYy0dRP6ZI6g+?=
- =?us-ascii?Q?3q3KUvwo/vhp2G9Rd8YNzHt4dB00LIUG+1RPXTyN+aDOpEfGv8nm+VVhh7Ti?=
- =?us-ascii?Q?DesovmdlUy3qI6sTwyTmz79xUJvl3gAHdsBJf9xubpXTSRf895KCUHMciGg2?=
- =?us-ascii?Q?vr8uA2qOEy5vLsIvusLY90F6t7xj6WWG1ZIb4fyAchAHQkgpb0Z4BuakZpSg?=
- =?us-ascii?Q?gGwr8oAv1xwj8aAXrOyXhrxEPWuUnvl8dM4/M2LrhCxdFO6tCdizLEFscet0?=
- =?us-ascii?Q?D0HmJW5XeYQbmKMYhQRupNPbKSw1/8kGl8VuaAWGYwbPAMIZ8yoP6PhaS77o?=
- =?us-ascii?Q?gkazLSgsut534VTqpzpcuzmkqIqb4rtFpA9RRaQ1A1xJWk0Mb2A7y3kslUFD?=
- =?us-ascii?Q?Bs7Q5vPFHoQcXJVmAxIIXWAT19wgbQKZOsA+qUyxphm9PnlztQ+umdYggHvs?=
- =?us-ascii?Q?KcL8CVq0gCaVzXlVi2FvK5evnHHbvyfbUz7Lo7fRWKK6Mwaq45ZOqhm1Gm7K?=
- =?us-ascii?Q?OsKzjxqG17KPDYdqntA0DLSgUv1Qfp3VAiA57Ajcaxf0kc7NgTHMmGxwoU/M?=
- =?us-ascii?Q?9Tg3skKj81KTR2dnYDY+ULzrYPlzRC6+2p7+cJ55cTz4evZVsBLeG2il+iIi?=
- =?us-ascii?Q?vb1QzGMOoI3ISoM4tZtCTqilPg5ePZpaP2KkSNfL+HtrwJqFD0d0pfZdCu0n?=
- =?us-ascii?Q?n4WkvU4mAEcwU6ygPFSAqzKuUhJz5eLwx+TD12RhQKg8DVSXa20bAKixSeze?=
- =?us-ascii?Q?BunF6fGsCb1/iQc7nlpRzvi1YEOcsGL11Uxmo6f7bigfRM7REgKW5SuzfqMv?=
- =?us-ascii?Q?NHUNAW1UMZL4I+jCVOfHYWamBVbMnZclOyDJzc3HYinNhDvrZgiUhmKSBRFx?=
- =?us-ascii?Q?Ma5tOWQ8qvOx0mzcEehD3vicagBELrgllV8DvirKtRadixTFQiJR1/usXD2t?=
- =?us-ascii?Q?d00tqSGZ6DEYZ31C+r8hJTnQJ7PLeLQiB8uir0cy/H1idAQPpKjaD1BqUZA3?=
- =?us-ascii?Q?Gw4P3v9PDhfOVpLqvxl6sub04s4hut0raTVQoVzAlvuZBjL61v4aA2hCCNFD?=
- =?us-ascii?Q?xmdmuHGPBSbugqkVWV5DwgE5i9249OtO62ZisVQVkFw9pK1ccaVON1KYzInP?=
- =?us-ascii?Q?y93OJ3QH7yFcIqpYi9k2N1z49M8d9hWs97U4oddv7kXlTFBXyT0TvsK+QYEX?=
- =?us-ascii?Q?FSWcOrGwKavvIEgS8tGSWMCUPkVng/yTcFBAdyq8fpfs0B75XCRor7D6xKXn?=
- =?us-ascii?Q?bw5DroiwhKLVGZihAnA=3D?=
+ =?us-ascii?Q?o2r1YEM+MJ7WChvPq4S8hvGX6x6+8RXx/J2U1NnjK+1bxyEiNQuPy4LWnHPu?=
+ =?us-ascii?Q?Hu15s8R5Czz3QR6SQoA1dzWE693gTAs/oaki238S9vf/evvEJPQzyfAx1ux8?=
+ =?us-ascii?Q?8+BEEkAjacjl4tWqqVTKr5aIzEH2FHrsT5pEeYc9xvirB8vCfmSBJCWZtWhh?=
+ =?us-ascii?Q?BN5/R94YJgsAc+FeiOzNo50JF67VDr+pHkhKDIUJ7E2pl7ljmRF4fUpKib9c?=
+ =?us-ascii?Q?o56CR+1set1cQcHdbxqRvvYTSP+8d3UAH9Az2UIQSV/OziKytqHnHoHeWma/?=
+ =?us-ascii?Q?W4PnRhGtr84OFKLrrAWuX7ACf8RWO5Mno8kRrTcHpyHuOynF2sT9/l1bF6g/?=
+ =?us-ascii?Q?H+zsgu5VAZZT0NdzRmT24EAo05msNqqZzwjgst39B0l0yrzFYupZm5sBuxgn?=
+ =?us-ascii?Q?1dVzFVtFDg386f8e6KBF6ACq1Mp2Djh2/Acjp9cqs7zT0+kCvk+05pxO/NF4?=
+ =?us-ascii?Q?iMeLaRxprzO7nrHiIZ/1GmdoiQn8I4EM7VH/c7lHA3SB2MYfkLB69oASR03t?=
+ =?us-ascii?Q?XsYUszyT/p++YpNWmuMWpraaIM4aFtmdXezc3W8wRb/ljLeiUMBqLuK8HgQM?=
+ =?us-ascii?Q?dGS0DWdYDAxYXurNwC4U9yvzuA6s05JwD4DFG6WwZ2S37F69w8yD1f+dLRnM?=
+ =?us-ascii?Q?nZfnuLEzRyjW5oKlhcc1tn+xzPo9ij0Tg/2PSVFA8Z+A0fkWpmzEZE7Thd8U?=
+ =?us-ascii?Q?s5QLUy1sLFQ+HldP+IR/LpgFxBm3aeSKaRQGP7yQmMoGuCt6/klMiGcrVwYz?=
+ =?us-ascii?Q?v3r/7ySHKA78xMlwPlJhsFDcLXBObjEGkrlvpe5YL1r+7iyit0uE0g13rb0a?=
+ =?us-ascii?Q?/YxupOL02XQqXndMxqXfX6oRiW37an9a3mrRMzghmBzU3yPtLD2Lk+kXKUj2?=
+ =?us-ascii?Q?hfCosFqVowow4qclCeAr3N5e7Uzgz5fJ7s2/Sa7kThEWx1G57VnPe6Bvkrny?=
+ =?us-ascii?Q?jEfdkDoVx1jLb1rCwx10RHfncd6xYLS8uIuL3tJFvgu5V5TI8JZHVNRwSvPm?=
+ =?us-ascii?Q?i9YItue1uxIkc91ixmDQnDrNHWO1CWBx4QlutxRhcaJ3RZWcqfhF0XxB0DfK?=
+ =?us-ascii?Q?4LOdvCSDt36Zpcz0jBaypVSnwuuEsJM0MV6XUByeVYjjn7Morp3wUjQS3lmg?=
+ =?us-ascii?Q?rwio0CAskLXd6OIB5jm/fSbij8HF8L7DoiZfwPmYzeaS4vr7CTvqdo1aJnO9?=
+ =?us-ascii?Q?MI6MSBBAztVmCpBnrGdeJ+VQAdKLRdNgsIQ7FexPRtCXWDTh0iRMEz5UTlTs?=
+ =?us-ascii?Q?7sAzWeDMqs51hkYxx6NWEa9i8JL92CKiI5oPbBQ9Hhirc8MLULMJdW00Hj+T?=
+ =?us-ascii?Q?lKTrq0fbMaM5SedBM4HuBrZHfzoS5849WZISLuU1wNKOERwN3zU21F4XLbxP?=
+ =?us-ascii?Q?URbAZ6WD0Bwj44XeQh48j43VEPv6+mMowOCE+ZwF+OboG2KbE3D3quOm4iOB?=
+ =?us-ascii?Q?xWo+kGbIL0p12+8aA0hFUgnDPxu+5RbwDJ8aWT3GfU440JepYENxCfZQv+9F?=
+ =?us-ascii?Q?kBpTZqy6iICF5e0v78NsumXkOUwLqu9sWHgfdhovK8XKi6CZXkDyI8XqL+Ew?=
+ =?us-ascii?Q?DjjgfsBT44B6nBt3BKE=3D?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
@@ -132,56 +130,189 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
+X-OriginatorOrg: Nvidia.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR21MB1335.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b801d3af-7c9a-4e6d-f143-08dc21b96b37
-X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jan 2024 17:32:23.0658
+X-MS-Exchange-CrossTenant-AuthSource: CH0PR12MB8580.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1a434541-2220-4ea8-d2a9-08dc21b9a354
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jan 2024 17:33:57.2038
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: piAQD3nN5ikCFjNRMeJfrsVH9gVCMX2YuS2ZrMSmF1/uVeg/AIwqY4Ok/Qy0KHbo+NgUE14SCh4cqnqR8OthjA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR21MB3595
+X-MS-Exchange-CrossTenant-userprincipalname: I0KQ8LNLPLiD+pRO6tzI8WK56h16/cvXrpJW0L9Icszp2EKWGxsxA8uIcki2+Dh8r+8ZJzwIx7wEKcODU8NUHQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6439
 
-> From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-> Sent: Tuesday, January 30, 2024 2:16 AM
-> [...]
-> In commit ac5047671758 ("hv_netvsc: Disable NAPI before closing the
-> VMBus channel"), napi_disable was getting called for all channels,
-> including all subchannels without confirming if they are enabled or not.
-
-s/enabled/created/
-
-> Which caused hv_netvsc getting hung at napi_disable, when
-> netvsc_probe()
-> and netvsc_remove() are happening simultaneously and netvsc_remove()
-
-Technically, they are not happening simultaneously: netvsc_probe() itself h=
-as
-finished, but the work item scheduled by it has not started yet.
-
-> calls cancel_work_sync(&nvdev->subchan_work) before netvsc_sc_open()
-> calls napi_enable for the sub channels. Which causes NAPIF_STATE_SCHED
-
-Technically, nvdev->subchan_work has not started to run yet, i.e.
-netvsc_subchan_work() -> rndis_set_subchannel() has not created the
-sub-channels yet, so netvsc_sc_open() can't run.
-
-It would be great if you could briefly explain how the NAPIF_STATE_SCHED bi=
-t
-is set and cleared, e.g. it's pre-set in rndis_filter_device_add() -> netif=
-_napi_add()
-so if the sub-channels are not created, netvsc_sc_open() -> napi_enable() w=
-on't
-clear the flag and the flag remains set for ever for the sub-channels.=20
-
-> bit not getting cleared for the subchannels.
+> From: Michael S. Tsirkin <mst@redhat.com>
+> Sent: Tuesday, January 30, 2024 9:53 AM
+> On Tue, Jan 30, 2024 at 03:50:29PM +0000, Daniel Jurgens wrote:
+> > > From: Michael S. Tsirkin <mst@redhat.com>
+> > > Sent: Tuesday, January 30, 2024 9:42 AM On Tue, Jan 30, 2024 at
+> > > 03:40:21PM +0000, Daniel Jurgens wrote:
+> > > > > From: Michael S. Tsirkin <mst@redhat.com>
+> > > > > Sent: Tuesday, January 30, 2024 8:58 AM
+> > > > >
+> > > > > On Tue, Jan 30, 2024 at 08:25:21AM -0600, Daniel Jurgens wrote:
+> > > > > > Add a tx queue stop and wake counters, they are useful for
+> debugging.
+> > > > > >
+> > > > > > 	$ ethtool -S ens5f2 | grep 'tx_stop\|tx_wake'
+> > > > > > 	...
+> > > > > > 	tx_queue_1_tx_stop: 16726
+> > > > > > 	tx_queue_1_tx_wake: 16726
+> > > > > > 	...
+> > > > > > 	tx_queue_8_tx_stop: 1500110
+> > > > > > 	tx_queue_8_tx_wake: 1500110
+> > > > > >
+> > > > > > Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
+> > > > > > Reviewed-by: Parav Pandit <parav@nvidia.com>
+> > > > >
+> > > > > Hmm isn't one always same as the other, except when queue is
+> stopped?
+> > > > > And when it is stopped you can see that in the status?
+> > > > > So how is having two useful?
+> > > >
+> > > > At idle the counters will be the same, unless a tx_timeout occurs.
+> > > > But
+> > > under load they can be monitored to see which queues are stopped and
+> > > get an idea of how long they are stopped.
+> > >
+> > > how does it give you the idea of how long they are stopped?
+> >
+> > By serially monitoring the counter you can see stops that persist long
+> intervals that are less than the tx_timeout time.
 >=20
-> Now during netvsc_device_remove(), when napi_disable is called for those
-> subchannels, napi_disable gets stuck on infinite msleep.
+> Why don't you monitor queue status directly?
 
-The patch body looks good to me. Please post v2 with an updated changelog.
+How? I don't know of any interface to check if a queue is stopped.
 
-Reviewed-by: Dexuan Cui <decui@microsoft.com>
+>=20
+> > >
+> > > > Other net drivers (not all), also have the wake counter.
+> > >
+> > > Examples?
+> >
+> > [danielj@sw-mtx-051 upstream]$ ethtool -i ens2f1np1
+> > driver: mlx5_core
+> > version: 6.7.0+
+> > ...
+> > [danielj@sw-mtx-051 upstream]$ ethtool -S ens2f1np1 | grep wake
+> >      tx_queue_wake: 0
+> >      tx0_wake: 0
+>=20
+> Do they have a stop counter too?
+
+Yes:
+[danielj@sw-mtx-051 upstream]$ ethtool -S ens2f1np1 | grep 'stop\|wake'
+     tx_queue_stopped: 0
+     tx_queue_wake: 0
+     tx0_stopped: 0
+     tx0_wake: 0
+     ....
+
+>=20
+> > >
+> > > > In my opinion it makes the stop counter more useful, at little cost=
+.
+> > > >
+> > > > >
+> > > > >
+> > > > > > ---
+> > > > > >  drivers/net/virtio_net.c | 26 ++++++++++++++++++++++++--
+> > > > > >  1 file changed, 24 insertions(+), 2 deletions(-)
+> > > > > >
+> > > > > > diff --git a/drivers/net/virtio_net.c
+> > > > > > b/drivers/net/virtio_net.c index 3cb8aa193884..7e3c31ceaf7e
+> > > > > > 100644
+> > > > > > --- a/drivers/net/virtio_net.c
+> > > > > > +++ b/drivers/net/virtio_net.c
+> > > > > > @@ -88,6 +88,8 @@ struct virtnet_sq_stats {
+> > > > > >  	u64_stats_t xdp_tx_drops;
+> > > > > >  	u64_stats_t kicks;
+> > > > > >  	u64_stats_t tx_timeouts;
+> > > > > > +	u64_stats_t tx_stop;
+> > > > > > +	u64_stats_t tx_wake;
+> > > > > >  };
+> > > > > >
+> > > > > >  struct virtnet_rq_stats {
+> > > > > > @@ -112,6 +114,8 @@ static const struct virtnet_stat_desc
+> > > > > virtnet_sq_stats_desc[] =3D {
+> > > > > >  	{ "xdp_tx_drops",	VIRTNET_SQ_STAT(xdp_tx_drops) },
+> > > > > >  	{ "kicks",		VIRTNET_SQ_STAT(kicks) },
+> > > > > >  	{ "tx_timeouts",	VIRTNET_SQ_STAT(tx_timeouts) },
+> > > > > > +	{ "tx_stop",		VIRTNET_SQ_STAT(tx_stop) },
+> > > > > > +	{ "tx_wake",		VIRTNET_SQ_STAT(tx_wake) },
+> > > > > >  };
+> > > > > >
+> > > > > >  static const struct virtnet_stat_desc virtnet_rq_stats_desc[]
+> > > > > > =3D { @@
+> > > > > > -843,6 +847,9 @@ static void check_sq_full_and_disable(struct
+> > > > > > virtnet_info
+> > > > > *vi,
+> > > > > >  	 */
+> > > > > >  	if (sq->vq->num_free < 2+MAX_SKB_FRAGS) {
+> > > > > >  		netif_stop_subqueue(dev, qnum);
+> > > > > > +		u64_stats_update_begin(&sq->stats.syncp);
+> > > > > > +		u64_stats_inc(&sq->stats.tx_stop);
+> > > > > > +		u64_stats_update_end(&sq->stats.syncp);
+> > > > > >  		if (use_napi) {
+> > > > > >  			if
+> (unlikely(!virtqueue_enable_cb_delayed(sq->vq)))
+> > > > > >  				virtqueue_napi_schedule(&sq->napi,
+> sq- vq);
+> > > @@ -851,6 +858,9
+> > > > > >@@  static void check_sq_full_and_disable(struct virtnet_info *v=
+i,
+> > > > > >  			free_old_xmit_skbs(sq, false);
+> > > > > >  			if (sq->vq->num_free >=3D
+> 2+MAX_SKB_FRAGS) {
+> > > > > >  				netif_start_subqueue(dev, qnum);
+> > > > > > +				u64_stats_update_begin(&sq-
+> >stats.syncp);
+> > > > > > +				u64_stats_inc(&sq->stats.tx_wake);
+> > > > > > +				u64_stats_update_end(&sq-
+> >stats.syncp);
+> > > > > >  				virtqueue_disable_cb(sq->vq);
+> > > > > >  			}
+> > > > > >  		}
+> > > > > > @@ -2163,8 +2173,14 @@ static void virtnet_poll_cleantx(struct
+> > > > > receive_queue *rq)
+> > > > > >  			free_old_xmit_skbs(sq, true);
+> > > > > >  		} while (unlikely(!virtqueue_enable_cb_delayed(sq-
+> >vq)));
+> > > > > >
+> > > > > > -		if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS)
+> > > > > > +		if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS) {
+> > > > > > +			if (netif_tx_queue_stopped(txq)) {
+> > > > > > +				u64_stats_update_begin(&sq-
+> >stats.syncp);
+> > > > > > +				u64_stats_inc(&sq->stats.tx_wake);
+> > > > > > +				u64_stats_update_end(&sq-
+> >stats.syncp);
+> > > > > > +			}
+> > > > > >  			netif_tx_wake_queue(txq);
+> > > > > > +		}
+> > > > > >
+> > > > > >  		__netif_tx_unlock(txq);
+> > > > > >  	}
+> > > > > > @@ -2310,8 +2326,14 @@ static int virtnet_poll_tx(struct
+> > > > > > napi_struct
+> > > > > *napi, int budget)
+> > > > > >  	virtqueue_disable_cb(sq->vq);
+> > > > > >  	free_old_xmit_skbs(sq, true);
+> > > > > >
+> > > > > > -	if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS)
+> > > > > > +	if (sq->vq->num_free >=3D 2 + MAX_SKB_FRAGS) {
+> > > > > > +		if (netif_tx_queue_stopped(txq)) {
+> > > > > > +			u64_stats_update_begin(&sq->stats.syncp);
+> > > > > > +			u64_stats_inc(&sq->stats.tx_wake);
+> > > > > > +			u64_stats_update_end(&sq->stats.syncp);
+> > > > > > +		}
+> > > > > >  		netif_tx_wake_queue(txq);
+> > > > > > +	}
+> > > > > >
+> > > > > >  	opaque =3D virtqueue_enable_cb_prepare(sq->vq);
+> > > > > >
+> > > > > > --
+> > > > > > 2.42.0
+
 
