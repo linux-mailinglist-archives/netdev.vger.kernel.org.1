@@ -1,127 +1,116 @@
-Return-Path: <netdev+bounces-67258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 447038427EC
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 16:22:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8E5684281A
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 16:33:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00964289395
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:22:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3C8C1C2204A
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:33:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76EB61272CD;
-	Tue, 30 Jan 2024 15:20:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E1A823C9;
+	Tue, 30 Jan 2024 15:33:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PImc+K2x"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YEUZmIfF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B0AF86133;
-	Tue, 30 Jan 2024 15:20:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A03B7F7CF;
+	Tue, 30 Jan 2024 15:33:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706628057; cv=none; b=FyLFi334jq4PISjEHelspeFvTls9YCoaFSArt4wW65nwyDJhqvDaSZk7kJnNyOLMG0HXxHPQGdL2Mr4FyJXR3Bxagfyn/qFs6oyOU9PvSNoloCrKIs8O5YToS5WTPzfEf1yBJi+nd2KB5lj5DX7km/6lugkkk6LFP/U7KC/n/KM=
+	t=1706628807; cv=none; b=tokEfzQudBwbjhr4bM6PvIzF+rhv/CupW/gBvGDij+J/ZYqkGZbCfEaVdh4yv62pcDEqcY+M2kBTrzJgNUL5GNd5RSA/2r9DUrSiOIwuISSujYFnf25u71m+ospwu/YqapQfvLIy5r5712bKNbpmQv4nD4rVE6pHSY4Qy7Fz1Cg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706628057; c=relaxed/simple;
-	bh=BWFAhmyDn0dXC/zsLj0S9ZBcFvRqLWZWxXogBiUuX9g=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=NW7i/YDuA7sZgVHbIjuePpMSb8+feztP7VuxlL4+pKbbMsGBsvREXqP6yKAl13+hFEum/XfWXNw6rmZqhOMqJzM/oSSyYqVt0s2gpTc/Be8wlV5OgCQVVOeQuuHumugvnI70OHMcqrSPWsHLJ72JaslVPc8U7C4ViR94wT8tQOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PImc+K2x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E2752C32785;
-	Tue, 30 Jan 2024 15:20:56 +0000 (UTC)
+	s=arc-20240116; t=1706628807; c=relaxed/simple;
+	bh=xL9kFnUvGlP9fBkvgK0in4ewf6ZPO4qQZEK2ExFEHDc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pZPHlAgUbtbS+H+C8B61WuIkHA36QZXGRY+pGgrKK6mWDI73z5cpYSoTfvcEwjDXKIJ9kWJP7hXcN5tourfxZwGbKz777oZ2SDaOiZSonxSbHjSiC97GNQ/YGVMqHgtipCS0jjtODSk86sO1qXt5ZA1yRUAy7txngiZUpDd7EQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YEUZmIfF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BEC3C433F1;
+	Tue, 30 Jan 2024 15:33:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706628056;
-	bh=BWFAhmyDn0dXC/zsLj0S9ZBcFvRqLWZWxXogBiUuX9g=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=PImc+K2xGIY3JI7K1VzqFSMwNhNDTd+mmgZRG5Dtu3FjvAy4u9y6Yhkrci4/zmRuF
-	 ofdhV+HG8+vNoCc94jYlN8SpfDUHdpqceg++Rip6HvePausq1+tGU8L1RU0hK2tA0h
-	 YXTZzoKtgt+9U9g5N68kVACh2ebgMieF/8AIZ6bL+KAGdre5S5BObNNLge0AhO7j9h
-	 p2A652nHe7YTytfYdKQmlWzf1F8ScQD9GjtyCoRNNb9fepcDW3RIHOUMFTxAIpX698
-	 luZcFgVGmw9KdJTovbZqwU6eV3JsyGFHN1Hnw0yVncKcM7N12ZVHRQWdi2AC2UL44F
-	 QWp6bYHabvSIw==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D147EC48285;
-	Tue, 30 Jan 2024 15:20:56 +0000 (UTC)
-From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= via B4 Relay
- <devnull+arinc.unal.arinc9.com@kernel.org>
-Date: Tue, 30 Jan 2024 18:20:53 +0300
-Subject: [PATCH net-next v2 7/7] net: dsa: mt7530: do not clear
- config->supported_interfaces
+	s=k20201202; t=1706628806;
+	bh=xL9kFnUvGlP9fBkvgK0in4ewf6ZPO4qQZEK2ExFEHDc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YEUZmIfF+/ZFfhkJ3j7kTnmXvKgFiXwU2qigFrT46q3b8HIMfyqkw+WzXrm9Mhkh4
+	 LZNOEMSgh85IO6caMHOLwHdKOohDvsEo3cgbbsQjw4m9c9lofKrVQ3k6yh4SNcwBoa
+	 Dan/4pjo9RcTNFU+BvpwXuRRtJxKgfg1EPWjWohZCKy2VqmS8iCmpGC48n4PHfjk6X
+	 I4Cmxyb+XMMh7NpYq0Lg9UZW1VjxvUBrilF0PRAuiQLlRj7p9jn/NYTj/IZx86z3le
+	 Eqsjgl06VCmBYhZu1PY+rAhK+lJnKpnxkgtzVZotG2k8sHTWulLXTaGFITD1+1EUxv
+	 RBELXLAODvuXA==
+Date: Tue, 30 Jan 2024 21:03:22 +0530
+From: Vinod Koul <vkoul@kernel.org>
+To: Andrew Halaney <ahalaney@redhat.com>, bhupesh.linux@gmail.com
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH] MAINTAINERS: Drop unreachable reviewer for Qualcomm
+ ETHQOS ethernet driver
+Message-ID: <ZbkWwn-oN5wqoPfJ@matsya>
+References: <20240129-remove-dwmac-qcom-ethqos-reviewer-v1-1-2645eab61451@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id:
- <20240130-for-netnext-mt7530-improvements-2-v2-7-ba06f5dd9eb0@arinc9.com>
-References:
- <20240130-for-netnext-mt7530-improvements-2-v2-0-ba06f5dd9eb0@arinc9.com>
-In-Reply-To:
- <20240130-for-netnext-mt7530-improvements-2-v2-0-ba06f5dd9eb0@arinc9.com>
-To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
- Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Russell King <linux@armlinux.org.uk>
-Cc: mithat.guner@xeront.com, erkin.bozoglu@xeront.com, 
- Bartel Eerdekens <bartel.eerdekens@constell8.be>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, 
- =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
-X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1706628055; l=1237;
- i=arinc.unal@arinc9.com; s=arinc9-patatt; h=from:subject:message-id;
- bh=70kaAwqHDH0P1Gv6EzSD7mSiNMADYZJtk+fSkbKHmfQ=;
- b=TVVtN8mEHO79+KmnGvUmpew6seoWm0EKReP4aGo60q2n8tH+h0uxilLoOtvKujMITR2Roclq1
- 7txFrBKy1ZXC/IkCurmACM0cfdaxQ/GD9jjN++kpstZGGdCu3GugObA
-X-Developer-Key: i=arinc.unal@arinc9.com; a=ed25519;
- pk=VmvgMWwm73yVIrlyJYvGtnXkQJy9CvbaeEqPQO9Z4kA=
-X-Endpoint-Received:
- by B4 Relay for arinc.unal@arinc9.com/arinc9-patatt with auth_id=115
-X-Original-From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Reply-To: <arinc.unal@arinc9.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240129-remove-dwmac-qcom-ethqos-reviewer-v1-1-2645eab61451@redhat.com>
 
-From: Arınç ÜNAL <arinc.unal@arinc9.com>
+On 29-01-24, 11:12, Andrew Halaney wrote:
+> Bhupesh's email responds indicating they've changed employers and with
+> no new contact information. Let's drop the line from MAINTAINERS to
+> avoid getting the same response over and over.
 
-There's no need to clear the config->supported_interfaces bitmap before
-reporting the supported interfaces as all bits in the bitmap will already
-be initialized to zero when the phylink_config structure is allocated. The
-"config" pointer points to &dp->phylink_config, and "dp" is allocated by
-dsa_port_touch() with kzalloc(), so all its fields are filled with zeroes.
+Looks like Bhupesh sent the patch changing but never followed up with a
+v2 for this:
+lore.kernel.org/r/20230915191600.3410862-1-bhupesh.linux@gmail.com
 
-There's no code that would change the bitmap beforehand. Remove it.
+Would prefer if this is changed to his email (copied him as well)
 
-Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-Acked-by: Daniel Golle <daniel@makrotopia.org>
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
----
- drivers/net/dsa/mt7530.c | 2 --
- 1 file changed, 2 deletions(-)
 
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 638cd3f2a495..c6b40ca277f5 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -2573,8 +2573,6 @@ static void mt7531_mac_port_get_caps(struct dsa_switch *ds, int port,
- static void mt7988_mac_port_get_caps(struct dsa_switch *ds, int port,
- 				     struct phylink_config *config)
- {
--	phy_interface_zero(config->supported_interfaces);
--
- 	switch (port) {
- 	/* Ports which are connected to switch PHYs. There is no MII pinout. */
- 	case 0 ... 3:
+> 
+> Signed-off-by: Andrew Halaney <ahalaney@redhat.com>
+> ---
+> If anyone knows how to contact Bhupesh / if they're willing to continue
+> being a reviewer feel free to suggest an alternative, but for the moment
+> this is better than nothing.
+> ---
+>  MAINTAINERS | 1 -
+>  1 file changed, 1 deletion(-)
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 939f6dd0ef6a..b285d9a123ce 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -18080,7 +18080,6 @@ F:	drivers/net/ethernet/qualcomm/emac/
+>  
+>  QUALCOMM ETHQOS ETHERNET DRIVER
+>  M:	Vinod Koul <vkoul@kernel.org>
+> -R:	Bhupesh Sharma <bhupesh.sharma@linaro.org>
+>  L:	netdev@vger.kernel.org
+>  L:	linux-arm-msm@vger.kernel.org
+>  S:	Maintained
+> 
+> ---
+> base-commit: 596764183be8ebb13352b281a442a1f1151c9b06
+> change-id: 20240129-remove-dwmac-qcom-ethqos-reviewer-1a37d8c71383
+> 
+> Best regards,
+> -- 
+> Andrew Halaney <ahalaney@redhat.com>
 
 -- 
-2.40.1
-
+~Vinod
 
