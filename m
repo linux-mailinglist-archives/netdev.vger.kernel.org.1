@@ -1,333 +1,99 @@
-Return-Path: <netdev+bounces-66951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1E7D84199D
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:52:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 200B98419CD
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 04:04:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9DBE28878A
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 02:52:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C31901F242A7
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:03:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9091536AE5;
-	Tue, 30 Jan 2024 02:51:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873AE36B17;
+	Tue, 30 Jan 2024 03:03:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QnjQeedt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cetHROQn"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3EB736AE0
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 02:51:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03ECA1E87F
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 03:03:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706583116; cv=none; b=ReJD+c122FEqzJ2wJGO4EMkmRVox66Il7HKlp3/XpdWm3kTk3fSakiB0g4ySvHWnf5ycquAmEAfZWVPDf0UCVfnFH6hO7I1Uk/kqpPTBE/oyu98wriC/bdSIVx0vojLI+hvTt3dwpiFFb8C2FgXAHETr7IJTq4L9s6EytknOCqo=
+	t=1706583836; cv=none; b=pqEfBpghV3TN9CC92Krkceo7sHxuM7DgUYe2zOjM3Flq3ka/6II0pEWC5OVOKYoIdLrk8GHSh0a++a7NdShBBG7lpk/8OfWhbpG54dhoiRXgf0OKjKY3XWC9Y9G4XVOUtukTdrSBqsBtmy7h4rSmt0Jl+5M2UqzfQus85XNLoyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706583116; c=relaxed/simple;
-	bh=vgq+Ttq5SHy3Cgg4sV/r4OhPHssGn0FpEv7dLES0sQI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZU9ZeLLjDsLfOcVWwz7iFhMGT4md/e96qMSX/zHP6j3zuOcxPczFoQh5SVdP7cMsoCAlIoP3AyYlKHEGoJDS3UenDyx5eXgrN4culFZY17IWvM2iSv9JsQMeLXf32KwCtFzJNWfpNXDVwQy2c9YJQ+oA7QlruBO9ZeZM71ccc8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QnjQeedt; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706583113;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Mwsc7i1S3wArMkM1oy1GToKS0uxEPrds5sbdUzc2prc=;
-	b=QnjQeedtR0b4mWPcflkSdYRiAD56AYPztJigm/raxhmN1KOLNc5Bw3ST/uyAFB+ghRXJpg
-	HHDZq0n08lLcDN3C8fXrPP0O0rY5S+lchxKF8hK3mcggknlVS/YjSD+nakIMZD0F5lcrQS
-	Ktp14rmthUaXGyHQIAvT8AGu9Xw79Mg=
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com
- [209.85.161.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-669-W06ZE-yUMtetc66jIbO9zg-1; Mon, 29 Jan 2024 21:51:52 -0500
-X-MC-Unique: W06ZE-yUMtetc66jIbO9zg-1
-Received: by mail-oo1-f72.google.com with SMTP id 006d021491bc7-59a2129fe88so2657936eaf.3
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 18:51:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706583109; x=1707187909;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Mwsc7i1S3wArMkM1oy1GToKS0uxEPrds5sbdUzc2prc=;
-        b=iO+ONMbPwgGbzwCVPBNkdKxRyVS5y9LGMWezwBmqUh4ZQr0jouGrqTDobrpcLPhH/g
-         GFA+X/MXBkFZ0PZP8N9ZhX4UtNo8w+yQxU70tCmYD2p/+BUYMPh6Rs1FgIMfIKtvjuED
-         Eo3a6IRaaWUS1JfZQstF3roqfORU6GkAIQnaTRa3yiFOvELoDrtyqNcn6tMCkofwR/Kb
-         Zw4muUE1eYp8o6TdJu94c6AiR5lBvJcDv91+PHy8DnCx2k51GfvvRgkXFGap15VG6RNd
-         NzVPCjJmy2SmbN4CBSCzRfJ1YMEJ/f2m3U7gESC/D15kcpAxfemtzuSIS54svvVFwOiu
-         WsQA==
-X-Gm-Message-State: AOJu0YwGGYl1ErXJCPoumOwM1QuURWLlzE6JAd9xqUbB3j4q3VH8Qyyh
-	Gw2stVNWe/GOnOcvH5sKo8wcgLLswcs3mCxJ5lHyX4l628cw25+bYLKbXYN6XiBPKXtRj+G77kf
-	5ZHSALvLRv4NMN4m61pnQo8ZsKzZpFdPToSrtCdd3vOGkSS4R7q9AlWE2dG2YFBp3TczZOriXv7
-	BB/VSzqoL/8OI1AGgfhwO3Anatgd2i
-X-Received: by 2002:a05:6358:d59b:b0:176:4f31:75de with SMTP id ms27-20020a056358d59b00b001764f3175demr6243943rwb.6.1706583109256;
-        Mon, 29 Jan 2024 18:51:49 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE7AvjpjzDtmO20yYGtALv7t+1dPk9EFNC0UibJRoJbl208BySo70o9vW7SMSNg2pJTjN1TduhBYIT4BPhhBDk=
-X-Received: by 2002:a05:6358:d59b:b0:176:4f31:75de with SMTP id
- ms27-20020a056358d59b00b001764f3175demr6243920rwb.6.1706583108916; Mon, 29
- Jan 2024 18:51:48 -0800 (PST)
+	s=arc-20240116; t=1706583836; c=relaxed/simple;
+	bh=lzFLBAut8yM5tB+UhaTZSmCibKMmV25eq3SsNLBe5hs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RKrNQBimuLdN+ldObjFSw/hdW3++FPBf/qXQH0eq5jyenHqlk3mox4v+A/n2RtCicKTE663mBBn5S4L+QY3FCW0Z/b2RiJF+TbdFN0IcvWNRdzXlBEF1PiXObV/8nfPiPTIMyb1lBnp9YH56E7NmK5zDu6CqGU3+prjGJa5wxsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cetHROQn; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706583835; x=1738119835;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=lzFLBAut8yM5tB+UhaTZSmCibKMmV25eq3SsNLBe5hs=;
+  b=cetHROQnhL9hdd4jDd/Ar+UnjPzGq6KL/DxJhmZGQLxm8yiS9sw2I090
+   lKeUJCEllO33Jpg740nVH0/msn9cGKPdKdYp3qtmqYrxfqpku+sZ86v9T
+   w4xVQgktu0fgvMMuM/PZ/7slytW/WxRESx2eLwSyTK1cOHJriCKfcFDCQ
+   SBvUE3jkMuRnRefL0bM9zVjVi1NUzkJfjR3TVxqeQzA4o4Z9Uytm3vkvp
+   uehvwPBVYE4jBkSMDGF9+C6HVv1n5Jo9CbuIHr603LOSy9/76sRi9e6Nk
+   tP68ywkx+BZPaDqfes7/AQl4I9yYxncRhJAS1aR+xKPX3mv707SzqvSSP
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10968"; a="9892439"
+X-IronPort-AV: E=Sophos;i="6.05,707,1701158400"; 
+   d="scan'208";a="9892439"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2024 19:03:54 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,707,1701158400"; 
+   d="scan'208";a="3521609"
+Received: from wp3.sh.intel.com ([10.240.108.102])
+  by orviesa005.jf.intel.com with ESMTP; 29 Jan 2024 19:03:52 -0800
+From: Steven Zou <steven.zou@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	przemyslaw.kitszel@intel.com,
+	andriy.shevchenko@linux.intel.com,
+	aleksander.lobakin@intel.com,
+	andrii.staikov@intel.com,
+	jan.sokolowski@intel.com,
+	steven.zou@intel.com
+Subject: [PATCH RESEND iwl-next 0/2] ice: Introduce switch recipe reusing
+Date: Tue, 30 Jan 2024 10:51:44 +0800
+Message-Id: <20240130025146.30265-1-steven.zou@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240116075924.42798-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEuvubWfg8Wc+=eNqg1rHR+PD6jsH7_QEJV6=S+DUVdThQ@mail.gmail.com>
- <1706161325.4430635-1-xuanzhuo@linux.alibaba.com> <1706161768.900584-2-xuanzhuo@linux.alibaba.com>
- <CACGkMEug-=C+VQhkMYSgUKMC==04m7-uem_yC21bgGkKZh845w@mail.gmail.com>
- <1706163935.2439404-5-xuanzhuo@linux.alibaba.com> <CACGkMEvq0No8QGC46U4mGsMtuD44fD_cfLcPaVmJ3rHYqRZxYg@mail.gmail.com>
- <1706499476.9318902-3-xuanzhuo@linux.alibaba.com> <1706509439.850925-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1706509439.850925-1-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 30 Jan 2024 10:51:37 +0800
-Message-ID: <CACGkMEsSXeXEHAHjpK5VJQXCD4NRrtjAgSjTB4MJPC3PiEKFBw@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/5] virtio-net: sq support premapped mode
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, virtualization@lists.linux.dev, 
-	bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 29, 2024 at 2:28=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
->
-> On Mon, 29 Jan 2024 11:37:56 +0800, Xuan Zhuo <xuanzhuo@linux.alibaba.com=
-> wrote:
-> > On Mon, 29 Jan 2024 11:14:43 +0800, Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > On Thu, Jan 25, 2024 at 2:33=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.ali=
-baba.com> wrote:
-> > > >
-> > > > On Thu, 25 Jan 2024 14:14:58 +0800, Jason Wang <jasowang@redhat.com=
-> wrote:
-> > > > > On Thu, Jan 25, 2024 at 1:52=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux=
-.alibaba.com> wrote:
-> > > > > >
-> > > > > > On Thu, 25 Jan 2024 13:42:05 +0800, Xuan Zhuo <xuanzhuo@linux.a=
-libaba.com> wrote:
-> > > > > > > On Thu, 25 Jan 2024 11:39:28 +0800, Jason Wang <jasowang@redh=
-at.com> wrote:
-> > > > > > > > On Tue, Jan 16, 2024 at 3:59=E2=80=AFPM Xuan Zhuo <xuanzhuo=
-@linux.alibaba.com> wrote:
-> > > > > > > > >
-> > > > > > > > > This is the second part of virtio-net support AF_XDP zero=
- copy.
-> > > > > > > > >
-> > > > > > > > > The whole patch set
-> > > > > > > > > http://lore.kernel.org/all/20231229073108.57778-1-xuanzhu=
-o@linux.alibaba.com
-> > > > > > > > >
-> > > > > > > > > ## About the branch
-> > > > > > > > >
-> > > > > > > > > This patch set is pushed to the net-next branch, but some=
- patches are about
-> > > > > > > > > virtio core. Because the entire patch set for virtio-net =
-to support AF_XDP
-> > > > > > > > > should be pushed to net-next, I hope these patches will b=
-e merged into net-next
-> > > > > > > > > with the virtio core maintains's Acked-by.
-> > > > > > > > >
-> > > > > > > > > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D
-> > > > > > > > >
-> > > > > > > > > ## AF_XDP
-> > > > > > > > >
-> > > > > > > > > XDP socket(AF_XDP) is an excellent bypass kernel network =
-framework. The zero
-> > > > > > > > > copy feature of xsk (XDP socket) needs to be supported by=
- the driver. The
-> > > > > > > > > performance of zero copy is very good. mlx5 and intel ixg=
-be already support
-> > > > > > > > > this feature, This patch set allows virtio-net to support=
- xsk's zerocopy xmit
-> > > > > > > > > feature.
-> > > > > > > > >
-> > > > > > > > > At present, we have completed some preparation:
-> > > > > > > > >
-> > > > > > > > > 1. vq-reset (virtio spec and kernel code)
-> > > > > > > > > 2. virtio-core premapped dma
-> > > > > > > > > 3. virtio-net xdp refactor
-> > > > > > > > >
-> > > > > > > > > So it is time for Virtio-Net to complete the support for =
-the XDP Socket
-> > > > > > > > > Zerocopy.
-> > > > > > > > >
-> > > > > > > > > Virtio-net can not increase the queue num at will, so xsk=
- shares the queue with
-> > > > > > > > > kernel.
-> > > > > > > > >
-> > > > > > > > > On the other hand, Virtio-Net does not support generate i=
-nterrupt from driver
-> > > > > > > > > manually, so when we wakeup tx xmit, we used some tips. I=
-f the CPU run by TX
-> > > > > > > > > NAPI last time is other CPUs, use IPI to wake up NAPI on =
-the remote CPU. If it
-> > > > > > > > > is also the local CPU, then we wake up napi directly.
-> > > > > > > > >
-> > > > > > > > > This patch set includes some refactor to the virtio-net t=
-o let that to support
-> > > > > > > > > AF_XDP.
-> > > > > > > > >
-> > > > > > > > > ## performance
-> > > > > > > > >
-> > > > > > > > > ENV: Qemu with vhost-user(polling mode).
-> > > > > > > > > Host CPU: Intel(R) Xeon(R) Platinum 8163 CPU @ 2.50GHz
-> > > > > > > > >
-> > > > > > > > > ### virtio PMD in guest with testpmd
-> > > > > > > > >
-> > > > > > > > > testpmd> show port stats all
-> > > > > > > > >
-> > > > > > > > >  ######################## NIC statistics for port 0 #####=
-###################
-> > > > > > > > >  RX-packets: 19531092064 RX-missed: 0     RX-bytes: 10937=
-41155584
-> > > > > > > > >  RX-errors: 0
-> > > > > > > > >  RX-nombuf: 0
-> > > > > > > > >  TX-packets: 5959955552 TX-errors: 0     TX-bytes: 371030=
-645664
-> > > > > > > > >
-> > > > > > > > >
-> > > > > > > > >  Throughput (since last show)
-> > > > > > > > >  Rx-pps:   8861574     Rx-bps:  3969985208
-> > > > > > > > >  Tx-pps:   8861493     Tx-bps:  3969962736
-> > > > > > > > >  ########################################################=
-####################
-> > > > > > > > >
-> > > > > > > > > ### AF_XDP PMD in guest with testpmd
-> > > > > > > > >
-> > > > > > > > > testpmd> show port stats all
-> > > > > > > > >
-> > > > > > > > >   ######################## NIC statistics for port 0  ###=
-#####################
-> > > > > > > > >   RX-packets: 68152727   RX-missed: 0          RX-bytes: =
- 3816552712
-> > > > > > > > >   RX-errors: 0
-> > > > > > > > >   RX-nombuf:  0
-> > > > > > > > >   TX-packets: 68114967   TX-errors: 33216      TX-bytes: =
- 3814438152
-> > > > > > > > >
-> > > > > > > > >   Throughput (since last show)
-> > > > > > > > >   Rx-pps:      6333196          Rx-bps:   2837272088
-> > > > > > > > >   Tx-pps:      6333227          Tx-bps:   2837285936
-> > > > > > > > >   #######################################################=
-#####################
-> > > > > > > > >
-> > > > > > > > > But AF_XDP consumes more CPU for tx and rx napi(100% and =
-86%).
-> > > > > > > > >
-> > > > > > > > > ## maintain
-> > > > > > > > >
-> > > > > > > > > I am currently a reviewer for virtio-net. I commit to mai=
-ntain AF_XDP support in
-> > > > > > > > > virtio-net.
-> > > > > > > > >
-> > > > > > > > > Please review.
-> > > > > > > > >
-> > > > > > > >
-> > > > > > > > Rethink of the whole design, I have one question:
-> > > > > > > >
-> > > > > > > > The reason we need to store DMA information is to harden th=
-e virtqueue
-> > > > > > > > to make sure the DMA unmap is safe. This seems redundant wh=
-en the
-> > > > > > > > buffer were premapped by the driver, for example:
-> > > > > > > >
-> > > > > > > > Receive queue maintains DMA information, so it doesn't need=
- desc_extra to work.
-> > > > > > > >
-> > > > > > > > So can we simply
-> > > > > > > >
-> > > > > > > > 1) when premapping is enabled, store DMA information by dri=
-ver itself
-> > > > > > >
-> > > > > > > YES. this is simpler. And this is more convenience.
-> > > > > > > But the driver must allocate memory to store the dma info.
-> > > > >
-> > > > > Right, and this looks like the common practice for most of the NI=
-C drivers.
-> > > > >
-> > > > > > >
-> > > > > > > > 2) don't store DMA information in desc_extra
-> > > > > > >
-> > > > > > > YES. But the desc_extra memory is wasted. The "next" item is =
-used.
-> > > > > > > Do you think should we free the desc_extra when the vq is pre=
-mapped mode?
-> > > > > >
-> > > > > >
-> > > > > > struct vring_desc_extra {
-> > > > > >         dma_addr_t addr;                /* Descriptor DMA addr.=
- */
-> > > > > >         u32 len;                        /* Descriptor length. *=
-/
-> > > > > >         u16 flags;                      /* Descriptor flags. */
-> > > > > >         u16 next;                       /* The next desc state =
-in a list. */
-> > > > > > };
-> > > > > >
-> > > > > >
-> > > > > > The flags and the next are used whatever premapped or not.
-> > > > > >
-> > > > > > So I think we can add a new array to store the addr and len.
-> > > > >
-> > > > > Yes.
-> > > > >
-> > > > > > If the vq is premappd, the memory can be freed.
-> > > > >
-> > > > > Then we need to make sure the premapped is set before find_vqs() =
-etc.
-> > > >
-> > > >
-> > > > Yes. We can start from the parameters of the find_vqs().
-> > > >
-> > > > But actually we can free the dma array when the driver sets premapp=
-ed mode.
-> > >
-> > > Probably, but that's kind of odd.
-> > >
-> > > init()
-> > >     alloc()
-> > >
-> > > set_premapped()
-> > >     free()
-> >
-> > If so, the premapped option will be a find_vqs parameter,
-> > the api virtqueue_set_dma_premapped will be removed.
-> > And we can put the buffer_is_premapped to the struct virtqueue,
-> > The use can access it on the fly. (You asked on #4)
->
->
-> I try to pass the option to find_vqs.
->
-> You know, the find_vqs has too many parameters.
-> And everytime we try to add new parameter is a difficult work.
-> Many places need to be changed.
->
->
->         int (*find_vqs)(struct virtio_device *, unsigned nvqs,
->                         struct virtqueue *vqs[], vq_callback_t *callbacks=
-[],
->                         const char * const names[], const bool *ctx,
->                         const bool *premapped,
->                         struct irq_affinity *desc);
->
-> Do you have any preference if I try to refactor this to pass a struct?
->
-> Thanks.
+This patch series firstly fix the bitmap casting issue in getting/mapping
+recipe to profile association that is used in both legacy and recipe
+reusing mode, then introduce switch recipe reusing feature as new E810
+firmware supports the corresponding functionality. 
 
-This should be fine.
+Steven Zou (2):
+  ice: Refactor FW data type and fix bitmap casting issue
+  ice: Add switch recipe reusing feature
 
-Thanks
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   5 +-
+ drivers/net/ethernet/intel/ice/ice_common.c   |   2 +
+ drivers/net/ethernet/intel/ice/ice_lag.c      |   4 +-
+ drivers/net/ethernet/intel/ice/ice_switch.c   | 211 +++++++++++++++---
+ drivers/net/ethernet/intel/ice/ice_switch.h   |   5 +-
+ drivers/net/ethernet/intel/ice/ice_type.h     |   2 +
+ 6 files changed, 197 insertions(+), 32 deletions(-)
+
+
+base-commit: f2aae2089368d8e5abb4ec01542c31bc4d011a74
+-- 
+2.31.1
 
 
