@@ -1,134 +1,110 @@
-Return-Path: <netdev+bounces-67230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 402F68426BE
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:17:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 957448426CD
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:22:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9E9A2828D6
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:17:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50507287F69
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:22:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A4C6D1C3;
-	Tue, 30 Jan 2024 14:17:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 808776DD11;
+	Tue, 30 Jan 2024 14:22:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FZD66PQl"
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="bUiPb6WF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 025D26D1BA
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 14:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BCBC6E2AA;
+	Tue, 30 Jan 2024 14:22:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706624238; cv=none; b=FTEDQzDhX6pQ9ejYIQ4z9GcEHU+0jvJHv1smsg0gc5NwJlYcBCaWaTip/PuwmaBFRbgo6ONU9SHpi6WclCmMdmjoeVgB1s1p2LfkIl7MSMISbxJwUjJ8xn+rEWqzvMvCygM291DZrtSg0+El2DtqV61lbCUKpWcCXiJpq6LSbwA=
+	t=1706624538; cv=none; b=ZvEzhtSeLYB7f//ZwbPX8u01SL8HZOSDdj/iKx87FKI7RNW1otoqhxNoPkO24elZPlaWUmSReitC1G8lwV0ilwhPNnJvfCKscCVx+VG0PjLf4rsnuCRQJN1OVp+NOTPN5VoxQoBgChf3YZ6yzimEIhlSq+tcB85bHIyanTOdJkg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706624238; c=relaxed/simple;
-	bh=1xBIl8GZkB7K5VFi0QysmWLfiKb/D7WCdMvy9HJqmSs=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ZptZG5B4ml8xG9gxG6eYio7G7XI2ZrJ5beYhD/0hTSd6oj25kwSiP9dlbJG3ZKkjIThF7FEIE6G4ibgH8TFSDhqIodkAuCz9Az0keLmZoRz8l5PMA2ArvP1VVUV5ZLFBPb2YPsKFftg2Qjwk3JU7ZumkeD2YI7zw8qj6cwShtgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FZD66PQl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E04CC43390;
-	Tue, 30 Jan 2024 14:17:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706624237;
-	bh=1xBIl8GZkB7K5VFi0QysmWLfiKb/D7WCdMvy9HJqmSs=;
-	h=Date:From:To:Cc:Subject:From;
-	b=FZD66PQlE/M/vlHNkJRe+O2oygcLs56dtHrmvozy2L8c3obi8xEGJsqfM8qAfdusi
-	 JLUVIMQBvFdF6ZBTPhlSS8nW2YgAMgyxnFNfWKp2ZI0COeb/yGDbNpKs1rkjZx4p+f
-	 XWBmeoTN0sTR5d7VkwCxbdtS+pdy5jxg88kGhgCyp0c47INV/wjMMTfdVrLmMFqpqe
-	 6DTXdctO5Loc4VwysTyiL1/zzZlS+VhFrobs20b5+3h7PP8kBrMplqec3FwU1ObOim
-	 nB3UPJsXiFabFAMrOVadozDHbd/dgZ4LXehvbR2l/7i2xdvKuRuAkWL+rtGawe0fii
-	 4iH8Qq2H9JUPA==
-Date: Tue, 30 Jan 2024 08:17:16 -0600
-From: Seth Forshee <sforshee@kernel.org>
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
-Subject: i40e XDP program stops transmitting after link down/up
-Message-ID: <ZbkE7Ep1N1Ou17sA@do-x1extreme>
+	s=arc-20240116; t=1706624538; c=relaxed/simple;
+	bh=kFWxblNSjHD+cbzRAEcBA2MhN+GXikvkOgx5Epvujdc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=CLZhq6Z+9V0Nhum5Wt8FK54n1uhSp5NACxJGV7CbDPU//8CFWFfZw4u87XcIx5bLoTl4+3iMB/6o9JO9gThN+0ufNVuZglEnjkVFIMh4wCoGHpjFjPZWBS1z0LqRThZdTbq950abwpl9Qm4LE5AFvJFFUQg0ZwixJ7yxmBk3Y+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=bUiPb6WF; arc=none smtp.client-ip=45.79.88.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 8C58E47AA5
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1706624529; bh=LRJd8PXbeyglrfd0aYEb8xott5XUDLLLBejxVX91ujI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=bUiPb6WFkF+jj18AUbYpvNSHoLPwgJ5iw3M6uKAKA9ZzTbkFs+tLl4SHbRizrNo6Y
+	 B6nrxy2R8Jh9S0UhqVm/cXODSvf6g5N2AZBfv8WPKfgwR4QHP6XHtBGzOR9EJgO+ca
+	 8vqetC3JjOQm0rsf0qhPAA+j7W5KH9J0DMq6NwU/f2brynxv8r1xMtib9O8sQnN1Kq
+	 EIONzTR/BSIHtH3xDaZJTarfzaa3lQHXe1SaU6k+r009+s553geLu4IxjErriGBNNG
+	 Pm012VaQfb/9enJTcU71Z4F6E6ppaE3Te2DykGbt5uF79gYwyoKVK1lHtn2bGN7UiQ
+	 Cr8RkE33tn/Zw==
+Received: from localhost (unknown [IPv6:2601:280:5e00:7e19::646])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id 8C58E47AA5;
+	Tue, 30 Jan 2024 14:22:09 +0000 (UTC)
+From: Jonathan Corbet <corbet@lwn.net>
+To: Jani Nikula <jani.nikula@linux.intel.com>, Breno Leitao
+ <leitao@debian.org>, kuba@kernel.org, "David
+ S. Miller" <davem@davemloft.net>
+Cc: linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, pabeni@redhat.com, edumazet@google.com
+Subject: Re: [PATCH v3] Documentation: Document each netlink family
+In-Reply-To: <874jevjgvo.fsf@intel.com>
+References: <20231121114831.3033560-1-leitao@debian.org>
+ <874jevjgvo.fsf@intel.com>
+Date: Tue, 30 Jan 2024 07:22:08 -0700
+Message-ID: <87jznqewa7.fsf@meer.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain
 
-I got a inquiry from a colleague about a behavior he's seeing with i40e
-but not with other NICs. The interfaces are bonded with a XDP
-load-balancer program attached to them. After 'ip link set ethX down; ip
-link set ethX up' on one of the interfaces the XDP program on that
-interface is no longer transmitting packets. He found that tx starts
-again after running 'sudo ethtool -t ethX'.
+Jani Nikula <jani.nikula@linux.intel.com> writes:
 
-There's a 'i40e 0000:d8:00.1: VSI seid 391 XDP Tx ring 0 disable
-timeout' message in dmesg when disabling the interface. I've included
-the relevant portions from dmesg below.
+> On Tue, 21 Nov 2023, Breno Leitao <leitao@debian.org> wrote:
+>> This is a simple script that parses the Netlink YAML spec files
+>> (Documentation/netlink/specs/), and generates RST files to be rendered
+>> in the Network -> Netlink Specification documentation page.
+>
+> First of all, my boilerplate complaint: All extra processing for Sphinx
+> should really be done using Sphinx extensions instead of adding Makefile
+> hacks. I don't think it's sustainable to keep adding this stuff. We
+> chose Sphinx because it is extensible, and to avoid the Rube Goldberg
+> machine that the previous documentation build system was.
 
-This was first observed with a 6.1 kernel, but we've confirmed that the
-behavior is the same in 6.7. I realize the firmware is pretty old, so
-far our attempts to update the NVM have failed.
+So I feel like we've (me included) have kind of sent Breno around in
+circles on this one.  This *was* implemented as an extension once:
+
+  https://lore.kernel.org/netdev/20231103135622.250314-1-leitao@debian.org/
+
+At that time it seemed too complex, and I thought that an external
+script would lead to a simpler implementation overall.  Perhaps I was
+wrong.
+
+I worry that a proliferation of extensions adds its own sort of
+complexity and hazards - look at the things Vegard has fixed recently,
+for example.  Relatively few people can work in that environment, and
+extensions can make our version-support troubles worse.  So I'm not
+fully sold on the idea that everything should be an extension,
+especially if it can be expressed as a simple dependency and build step
+in the makefile.
+
+Some of the uglier makefile stuff we have is a different story...
+
+Anyway, I apologize for my role in making this particular addition
+harder than it needed to be.  Perhaps, for the future, we should put
+together and agree on a document (of all things) on how we think this
+sort of functionality should be added.
 
 Thanks,
-Seth
 
-[    0.000000] Linux version 6.7.0 (root@616a530b3729) (gcc (Ubuntu 11.3.0-1ubuntu1~22.04) 11.3.0, GNU ld (GNU Binutils for Ubuntu) 2.38) #2 SMP Thu Jan 25 10:37:21 EST 2024
-...
-[    9.038171] i40e: Intel(R) Ethernet Connection XL710 Network Driver
-[    9.044447] i40e: Copyright (c) 2013 - 2019 Intel Corporation.
-...
-[    9.064833] i40e 0000:d8:00.0: fw 7.0.50775 api 1.8 nvm 7.00 0x80004c97 1.2154.0 [8086:1583] [8086:0002]
-...
-[    9.320886] i40e 0000:d8:00.0: MAC address: xx:xx:xx:xx:xx:xx
-[    9.327030] i40e 0000:d8:00.0: FW LLDP is enabled
-[    9.344331] i40e 0000:d8:00.0 eth0: NIC Link is Up, 40 Gbps Full Duplex, Flow Control: None
-[    9.355552] i40e 0000:d8:00.0: PCI-Express: Speed 8.0GT/s Width x8
-[    9.374074] i40e 0000:d8:00.0: Features: PF-id[0] VFs: 64 VSIs: 66 QP: 32 RSS FD_ATR FD_SB NTUPLE DCB VxLAN Geneve PTP VEPA
-...
-[    9.401522] i40e 0000:d8:00.1: fw 7.0.50775 api 1.8 nvm 7.00 0x80004c97 1.2154.0 [8086:1583] [8086:0002]
-...
-[    9.652066] i40e 0000:d8:00.1: MAC address: xx:xx:xx:xx:xx:xx
-[    9.658040] i40e 0000:d8:00.1: FW LLDP is enabled
-[    9.688622] i40e 0000:d8:00.1 eth1: NIC Link is Up, 40 Gbps Full Duplex, Flow Control: None
-[    9.699822] i40e 0000:d8:00.1: PCI-Express: Speed 8.0GT/s Width x8
-[    9.719259] i40e 0000:d8:00.1: Features: PF-id[1] VFs: 64 VSIs: 66 QP: 32 RSS FD_ATR FD_SB NTUPLE DCB VxLAN Geneve PTP VEPA
-[    9.401522] i40e 0000:d8:00.1: fw 7.0.50775 api 1.8 nvm 7.00 0x80004c97 1.2154.0 [8086:1583] [8086:0002]
-...
-[   13.948968] i40e 0000:d8:00.0: FW LLDP is disabled, attempting SW DCB
-[   13.956753] i40e 0000:d8:00.0: SW DCB initialization succeeded.
-[   13.970005] i40e 0000:d8:00.0: FW LLDP is disabled
-...
-[   14.113004] i40e 0000:d8:00.1: FW LLDP is disabled, attempting SW DCB
-[   14.120800] i40e 0000:d8:00.1: SW DCB initialization succeeded.
-[   14.133940] i40e 0000:d8:00.1: FW LLDP is disabled
-...
-[   14.267874] bonding: bond0 is being created...
-[   14.979070] i40e 0000:d8:00.1 eth1: set new mac address xx:xx:xx:xx:xx:xx
-[   14.994445] bond0: (slave eth1): Enslaving as a backup interface with an up link
-[   14.994681] i40e 0000:d8:00.0 eth0: set new mac address xx:xx:xx:xx:xx:xx
-[   15.010359] bond0: (slave eth0): Enslaving as a backup interface with an up link
-[   15.912874] i40e 0000:d8:00.0: Stop LLDP AQ command failed =0x1
-[   15.944842] i40e 0000:d8:00.1: Stop LLDP AQ command failed =0x1
-[   41.262871] 8021q: 802.1Q VLAN Support v1.8
-[   41.262890] 8021q: adding VLAN 0 to HW filter on device eth0
-[   41.262902] 8021q: adding VLAN 0 to HW filter on device eth1
-[   41.262914] 8021q: adding VLAN 0 to HW filter on device bond0
-[   48.272456] i40e 0000:d8:00.0: FW LLDP is disabled, attempting SW DCB
-[   48.280233] i40e 0000:d8:00.0: SW DCB initialization succeeded.
-[   48.307415] i40e 0000:d8:00.0: User requested queue count/HW max RSS count:  12/32
-[   48.440266] i40e 0000:d8:00.1: FW LLDP is disabled, attempting SW DCB
-[   48.448025] i40e 0000:d8:00.1: SW DCB initialization succeeded.
-[   48.475051] i40e 0000:d8:00.1: User requested queue count/HW max RSS count:  12/32
-[   58.935900] i40e 0000:d8:00.0: FW LLDP is disabled, attempting SW DCB
-[   58.945123] i40e 0000:d8:00.0: SW DCB initialization succeeded.
-[   59.131772] i40e 0000:d8:00.1: FW LLDP is disabled, attempting SW DCB
-[   59.139560] i40e 0000:d8:00.1: SW DCB initialization succeeded.
-[  336.363825] i40e 0000:d8:00.1: VSI seid 391 XDP Tx ring 0 disable timeout
-[  336.603619] bond0: (slave eth1): link status definitely down, disabling slave
-[  345.464976] 8021q: adding VLAN 0 to HW filter on device eth1
-[  345.547358] bond0: (slave eth1): link status definitely up, 40000 Mbps full duplex
-[  345.547379] bond0: active interface up!
+jon
 
