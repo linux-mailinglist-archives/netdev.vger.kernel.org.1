@@ -1,501 +1,129 @@
-Return-Path: <netdev+bounces-66957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9E4B8419D2
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 04:04:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D78E18419A2
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:53:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 54C16B25A02
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:04:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 938CD289B73
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 02:53:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5590337153;
-	Tue, 30 Jan 2024 03:04:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 276D036AF6;
+	Tue, 30 Jan 2024 02:53:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XDjSraxG"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rUCjDFcT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE903717D
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 03:03:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B51E36AFD
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 02:53:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706583841; cv=none; b=o9Oc7awWCkyQ+x0JzHkkl2d4CKFf51WfFY2Zk2qU4ajrF1pk+AVdibDEhqJ/aVUGhbPChwshIjnnrKF2HrOqgKnOSFz8P9Y+HohV1NUye1bYanXtFrD9NDrcR6ZyeM948kxFm2AosXBYL3UxhOC+9//vVSJqH+G6CBmtahXRl/4=
+	t=1706583192; cv=none; b=jRyNigmi3cBMPZqQ6qtdB/fXaaivNE7+7fDvRjlAkaBVd8r2V77WDkpDjnCsW4iTMJ1YU/8YcXkmgNIuAe6QLMBGMrEHIv610uULFbGXFsGuLaJSKPvoclyJlfno+PzCyJAVbGN5cphX4H1qayluuMt+LLvyTqPI1jpxwCXEBNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706583841; c=relaxed/simple;
-	bh=kGJsfsQzmjMWtR77dnY7N6wjg/eJ6L9nBmKCLSJqgPM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=TgD9+2HyRbI6Drbi8C6f6W9ainolLbTpMk0tXOdNtNqq8n3A60CbsbzZ/yg4zyvzonO2FvRWV/XU8rXzPkFqKB6dHz8QjBHR8AIbP2XT0d6bI3z9GlRTnztfH+54PG0RgRkbY5wzogAJEkebnm5JAYdh+4D1mhDdzRdHTP4YKrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XDjSraxG; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706583839; x=1738119839;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=kGJsfsQzmjMWtR77dnY7N6wjg/eJ6L9nBmKCLSJqgPM=;
-  b=XDjSraxG3ZJ7hjgrkpB0ffXxTcX7Xmf0GqCjfIpve0oE02HP/6CQjqMG
-   1rfEJaK9iuPWRje+L9gMBH8bogTfIQkvYs9OJ4ApPxc7V1g5SJKgRht12
-   6+R+Qj+s6Jw2wJY/0lesM/wXV30RA6MsFH/q1aywPXKy3o+hUzwfMkz8M
-   kkyrusWklL+/Ca7/tn5e9BywhI2yF+3vVjiT01mnEJUDo5ox2BueYES7A
-   JRiC4L9WWg2zlRyP+z9XE80dK/6ZTdJNgk31eIz8ubli0lDrchd+ysHQ9
-   ezbvjaIi72FzAXez9FJob4ZDuybulWiuD/3fY3kjUqPQ16hXuL4f4r5p3
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10968"; a="9892447"
-X-IronPort-AV: E=Sophos;i="6.05,707,1701158400"; 
-   d="scan'208";a="9892447"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2024 19:03:59 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,707,1701158400"; 
-   d="scan'208";a="3521631"
-Received: from wp3.sh.intel.com ([10.240.108.102])
-  by orviesa005.jf.intel.com with ESMTP; 29 Jan 2024 19:03:56 -0800
-From: Steven Zou <steven.zou@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	przemyslaw.kitszel@intel.com,
-	andriy.shevchenko@linux.intel.com,
-	aleksander.lobakin@intel.com,
-	andrii.staikov@intel.com,
-	jan.sokolowski@intel.com,
-	steven.zou@intel.com
-Subject: [PATCH RESEND iwl-next 2/2] ice: Add switch recipe reusing feature
-Date: Tue, 30 Jan 2024 10:51:46 +0800
-Message-Id: <20240130025146.30265-3-steven.zou@intel.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20240130025146.30265-1-steven.zou@intel.com>
-References: <20240130025146.30265-1-steven.zou@intel.com>
+	s=arc-20240116; t=1706583192; c=relaxed/simple;
+	bh=OOF/JDmoqHvxt3xDStMdND3Dl+I0UaElu3NVskxz6QI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iaLaBlzPemAhO8ggpyL2ELDyWeYVYu1PIw+lSIjfQMTdu/xMVtr+/0+SAS07lvQznvLRhLnQH0aUmV/uycb/29hM6ca1MhjCNPBmzxjGYNp+COxXoCpjmQ0FZdakNE1VoBlXN25m4vOgT7I5NCTy5ylDxh5pll1lC2k1yczWSBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rUCjDFcT; arc=none smtp.client-ip=209.85.221.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-4bfdedd2833so122657e0c.3
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 18:53:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1706583189; x=1707187989; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=57LE80XzKkgz02q7vJPpQ7bcLsrc6ltxHobo6paNwmk=;
+        b=rUCjDFcTCg+BfuzSHV0N88CKReKiYRpF1kdOUGx0toW5+M+XmZ7Gmhw02fSHY/kvOn
+         b5909k6zYnPFcyXnwPe7dC/Mz+GE3imEwB4TrDo3NZ4KMEvA1XCfwQcih85h/vf7JkBA
+         qMgaIr7DSsPuFzSugqiBjNNREUKYcTTgyWCC80QGPv70q4zELYhMTHgyh5aH9l14+4CK
+         jj0mlmbIMqwOOBIJEzFz6AVcbZF4dtwsSsB7Zh1Repf9XLHUNq0MLbCHqEyZyvnZZDbE
+         nkdbKcntVXOICuVNrMFWeT3vVoQkZ6dQvetir7spAvQC3kd2IQeMdQAM+wfuxpOxawBD
+         F/8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706583189; x=1707187989;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=57LE80XzKkgz02q7vJPpQ7bcLsrc6ltxHobo6paNwmk=;
+        b=YWugGsuXlz29Y3p5QqpUtRXhb0mMUR2NldYW3+L61Fb5gqSMM62A33IC7saz+oqCMO
+         ECa00ddcof3F2L4RZ68C39WOFkP5WSCoRVylNU2Pw8cWUamCkyWdBG7/IbzMu4xiN4i8
+         LauRrMyd1GXSJkISevHdXpYM1vqjy5JYFmVkVIMlSvO1SqxTKemedj307XUIp6Cfh/r3
+         ZyUidMHr3yNvGwiaNqB2C2i3eWAfM5r/M9te3Gd4McNhRomZo5lpBjnadf4x82i5LQ7M
+         ozpnBOrrCc97V5tFCRJ4ZSgD6Fn6Ye00p+PIfzaA88mY83i+xEsW2dDywiiBTqEA/Z4E
+         OcVw==
+X-Gm-Message-State: AOJu0YwwMNeKd/CKmjj1Yrt5Y8BXWAupPzPfL8V2o7dHdTmAB/FRvZDU
+	2rfdA/SDZwsIjPXkJsQgD1BXnlGqnShvrGVcmsbQPDtwMb9Eqj7I92HyG/gce4yuNQ5krsfmTAp
+	UViMyvsG8/lR0aYjX9lc30LoWb0dvroOekadeRw==
+X-Google-Smtp-Source: AGHT+IFPagv02V2zOXAR72eV7Vs2i0Z8fygeiffO01wqRFPgeSauIELXHJpdbzeVRYwyL5VmLdct4Vw6DioyPFoo6Q8=
+X-Received: by 2002:a05:6122:288b:b0:4bd:73cb:e6d1 with SMTP id
+ fl11-20020a056122288b00b004bd73cbe6d1mr3120076vkb.15.1706583189172; Mon, 29
+ Jan 2024 18:53:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CA+G9fYvYQRnBbZhHknSKbwYiCr_3vPwC5zPz2NsV9_1F7=paQQ@mail.gmail.com>
+ <2024012915-enlighten-dreadlock-54e9@gregkh>
+In-Reply-To: <2024012915-enlighten-dreadlock-54e9@gregkh>
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Tue, 30 Jan 2024 08:22:57 +0530
+Message-ID: <CA+G9fYs3_M9E3w+uWky5X1hEgoJU4e92ECqSywerqSkF8KVGvA@mail.gmail.com>
+Subject: Re: stable-rc: 6.1: mlx5: params.c:994:53: error: 'MLX5_IPSEC_CAP_CRYPTO'
+ undeclared (first use in this function)
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-stable <stable@vger.kernel.org>, Netdev <netdev@vger.kernel.org>, 
+	linux-rdma@vger.kernel.org, lkft-triage@lists.linaro.org, 
+	Sasha Levin <sashal@kernel.org>, Leon Romanovsky <leonro@nvidia.com>, 
+	Saeed Mahameed <saeedm@nvidia.com>, "David S. Miller" <davem@davemloft.net>, 
+	Dan Carpenter <dan.carpenter@linaro.org>, Arnd Bergmann <arnd@arndb.de>
+Content-Type: text/plain; charset="UTF-8"
 
-New E810 firmware supports the corresponding functionality, so the driver
-allows PFs to subscribe the same switch recipes. Then when the PF is done
-with a switch recipes, the PF can ask firmware to free that switch recipe.
+On Mon, 29 Jan 2024 at 21:58, Greg Kroah-Hartman
+<gregkh@linuxfoundation.org> wrote:
+>
+> On Mon, Jan 29, 2024 at 09:17:31PM +0530, Naresh Kamboju wrote:
+> > Following build errors noticed on stable-rc linux-6.1.y for arm64.
+> >
+> > arm64:
+> > --------
+> >   * build/gcc-13-lkftconfig
+> >   * build/gcc-13-lkftconfig-kunit
+> >   * build/clang-nightly-lkftconfig
+> >   * build/clang-17-lkftconfig-no-kselftest-frag
+> >   * build/gcc-13-lkftconfig-devicetree
+> >   * build/clang-lkftconfig
+> >   * build/gcc-13-lkftconfig-perf
+> >
+> > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> >
+> > Build errors:
+> > ------
+> > drivers/net/ethernet/mellanox/mlx5/core/en/params.c: In function
+> > 'mlx5e_build_sq_param':
+> > drivers/net/ethernet/mellanox/mlx5/core/en/params.c:994:53: error:
+> > 'MLX5_IPSEC_CAP_CRYPTO' undeclared (first use in this function)
+> >   994 |                     (mlx5_ipsec_device_caps(mdev) &
+> > MLX5_IPSEC_CAP_CRYPTO);
+> >       |
+> > ^~~~~~~~~~~~~~~~~~~~~
+> >
+> > Suspecting commit:
+> >   net/mlx5e: Allow software parsing when IPsec crypto is enabled
+> >   [ Upstream commit 20f5468a7988dedd94a57ba8acd65ebda6a59723 ]
+>
+> Something looks very odd here, as the proper .h file is being included,
+> AND this isn't a build failure on x86, so why is this only arm64 having
+> problems?  What's causing this not to show up?
 
-When users configure a rule to PFn into E810 switch component, if there is
-no existing recipe matching this rule's pattern, the driver will request
-firmware to allocate and return a new recipe resource for the rule by
-calling ice_add_sw_recipe() and ice_alloc_recipe(). If there is an existing
-recipe matching this rule's pattern with different key value, or this is a
-same second rule to PFm into switch component, the driver checks out this
-recipe by calling ice_find_recp(), the driver will tell firmware to share
-using this same recipe resource by calling ice_subscribable_recp_shared()
-and ice_subscribe_recipe().
+As per the Daniel report on stable-rc review on 6.1, these build failures also
+reported on System/390.
 
-When firmware detects that all subscribing PFs have freed the switch
-recipe, firmware will free the switch recipe so that it can be reused.
-
-This feature also fixes a problem where all switch recipes would eventually
-be exhausted because switch recipes could not be freed, as freeing a shared
-recipe could potentially break other PFs that were using it.
-
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Andrii Staikov <andrii.staikov@intel.com>
-Signed-off-by: Steven Zou <steven.zou@intel.com>
----
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   2 +
- drivers/net/ethernet/intel/ice/ice_common.c   |   2 +
- drivers/net/ethernet/intel/ice/ice_switch.c   | 187 ++++++++++++++++--
- drivers/net/ethernet/intel/ice/ice_switch.h   |   1 +
- drivers/net/ethernet/intel/ice/ice_type.h     |   2 +
- 5 files changed, 177 insertions(+), 17 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-index 5df50a0b7867..b315c734455a 100644
---- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-+++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
-@@ -273,6 +273,8 @@ struct ice_aqc_set_port_params {
- #define ICE_AQC_RES_TYPE_FLAG_SHARED			BIT(7)
- #define ICE_AQC_RES_TYPE_FLAG_SCAN_BOTTOM		BIT(12)
- #define ICE_AQC_RES_TYPE_FLAG_IGNORE_INDEX		BIT(13)
-+#define ICE_AQC_RES_TYPE_FLAG_SUBSCRIBE_SHARED		BIT(14)
-+#define ICE_AQC_RES_TYPE_FLAG_SUBSCRIBE_CTL		BIT(15)
- 
- #define ICE_AQC_RES_TYPE_FLAG_DEDICATED			0x00
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index d04a057f53fe..090a2b8b5ff2 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -1146,6 +1146,8 @@ int ice_init_hw(struct ice_hw *hw)
- 	if (status)
- 		goto err_unroll_fltr_mgmt_struct;
- 	mutex_init(&hw->tnl_lock);
-+	ice_init_chk_recipe_reuse_support(hw);
-+
- 	return 0;
- 
- err_unroll_fltr_mgmt_struct:
-diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
-index ba0ef91e4c19..53dd64768035 100644
---- a/drivers/net/ethernet/intel/ice/ice_switch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_switch.c
-@@ -2074,6 +2074,18 @@ ice_aq_get_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u64 *r_assoc,
- 	return status;
- }
- 
-+/**
-+ * ice_init_chk_recipe_reuse_support - check if recipe reuse is supported
-+ * @hw: pointer to the hardware structure
-+ */
-+void ice_init_chk_recipe_reuse_support(struct ice_hw *hw)
-+{
-+	struct ice_nvm_info *nvm = &hw->flash.nvm;
-+
-+	hw->recp_reuse = (nvm->major == 0x4 && nvm->minor >= 0x30) ||
-+			 nvm->major > 0x4;
-+}
-+
- /**
-  * ice_alloc_recipe - add recipe resource
-  * @hw: pointer to the hardware structure
-@@ -2083,12 +2095,16 @@ int ice_alloc_recipe(struct ice_hw *hw, u16 *rid)
- {
- 	DEFINE_FLEX(struct ice_aqc_alloc_free_res_elem, sw_buf, elem, 1);
- 	u16 buf_len = __struct_size(sw_buf);
-+	u16 res_type;
- 	int status;
- 
- 	sw_buf->num_elems = cpu_to_le16(1);
--	sw_buf->res_type = cpu_to_le16((ICE_AQC_RES_TYPE_RECIPE <<
--					ICE_AQC_RES_TYPE_S) |
--					ICE_AQC_RES_TYPE_FLAG_SHARED);
-+	res_type = FIELD_PREP(ICE_AQC_RES_TYPE_M, ICE_AQC_RES_TYPE_RECIPE);
-+	if (hw->recp_reuse)
-+		res_type |= ICE_AQC_RES_TYPE_FLAG_SUBSCRIBE_SHARED;
-+	else
-+		res_type |= ICE_AQC_RES_TYPE_FLAG_SHARED;
-+	sw_buf->res_type = cpu_to_le16(res_type);
- 	status = ice_aq_alloc_free_res(hw, sw_buf, buf_len,
- 				       ice_aqc_opc_alloc_res);
- 	if (!status)
-@@ -2097,6 +2113,70 @@ int ice_alloc_recipe(struct ice_hw *hw, u16 *rid)
- 	return status;
- }
- 
-+/**
-+ * ice_free_recipe_res - free recipe resource
-+ * @hw: pointer to the hardware structure
-+ * @rid: recipe ID to free
-+ *
-+ * Return: 0 on success, and others on error
-+ */
-+static int ice_free_recipe_res(struct ice_hw *hw, u16 rid)
-+{
-+	return ice_free_hw_res(hw, ICE_AQC_RES_TYPE_RECIPE, 1, &rid);
-+}
-+
-+/**
-+ * ice_release_recipe_res - disassociate and free recipe resource
-+ * @hw: pointer to the hardware structure
-+ * @recp: the recipe struct resource to unassociate and free
-+ *
-+ * Return: 0 on success, and others on error
-+ */
-+static int ice_release_recipe_res(struct ice_hw *hw,
-+				  struct ice_sw_recipe *recp)
-+{
-+	DECLARE_BITMAP(r_bitmap, ICE_MAX_NUM_RECIPES);
-+	struct ice_switch_info *sw = hw->switch_info;
-+	u64 recp_assoc;
-+	u32 rid, prof;
-+	int status;
-+
-+	for_each_set_bit(rid, recp->r_bitmap, ICE_MAX_NUM_RECIPES) {
-+		for_each_set_bit(prof, recipe_to_profile[rid],
-+				 ICE_MAX_NUM_PROFILES) {
-+			status = ice_aq_get_recipe_to_profile(hw, prof,
-+							      &recp_assoc,
-+							      NULL);
-+			if (status)
-+				return status;
-+
-+			bitmap_from_arr64(r_bitmap, &recp_assoc,
-+					  ICE_MAX_NUM_RECIPES);
-+			bitmap_andnot(r_bitmap, r_bitmap, recp->r_bitmap,
-+				      ICE_MAX_NUM_RECIPES);
-+			bitmap_to_arr64(&recp_assoc, r_bitmap,
-+					ICE_MAX_NUM_RECIPES);
-+			ice_aq_map_recipe_to_profile(hw, prof,
-+						     recp_assoc, NULL);
-+
-+			clear_bit(rid, profile_to_recipe[prof]);
-+			clear_bit(prof, recipe_to_profile[rid]);
-+		}
-+
-+		status = ice_free_recipe_res(hw, rid);
-+		if (status)
-+			return status;
-+
-+		sw->recp_list[rid].recp_created = false;
-+		sw->recp_list[rid].adv_rule = false;
-+		memset(&sw->recp_list[rid].lkup_exts, 0,
-+		       sizeof(sw->recp_list[rid].lkup_exts));
-+		clear_bit(rid, recp->r_bitmap);
-+	}
-+
-+	return 0;
-+}
-+
- /**
-  * ice_get_recp_to_prof_map - updates recipe to profile mapping
-  * @hw: pointer to hardware structure
-@@ -2146,6 +2226,7 @@ ice_collect_result_idx(struct ice_aqc_recipe_data_elem *buf,
-  * @recps: struct that we need to populate
-  * @rid: recipe ID that we are populating
-  * @refresh_required: true if we should get recipe to profile mapping from FW
-+ * @is_add: flag of adding recipe
-  *
-  * This function is used to populate all the necessary entries into our
-  * bookkeeping so that we have a current list of all the recipes that are
-@@ -2153,7 +2234,7 @@ ice_collect_result_idx(struct ice_aqc_recipe_data_elem *buf,
-  */
- static int
- ice_get_recp_frm_fw(struct ice_hw *hw, struct ice_sw_recipe *recps, u8 rid,
--		    bool *refresh_required)
-+		    bool *refresh_required, bool is_add)
- {
- 	DECLARE_BITMAP(result_bm, ICE_MAX_FV_WORDS);
- 	struct ice_aqc_recipe_data_elem *tmp;
-@@ -2270,8 +2351,12 @@ ice_get_recp_frm_fw(struct ice_hw *hw, struct ice_sw_recipe *recps, u8 rid,
- 			recps[idx].chain_idx = ICE_INVAL_CHAIN_IND;
- 		}
- 
--		if (!is_root)
-+		if (!is_root) {
-+			if (hw->recp_reuse && is_add)
-+				recps[idx].recp_created = true;
-+
- 			continue;
-+		}
- 
- 		/* Only do the following for root recipes entries */
- 		memcpy(recps[idx].r_bitmap, root_bufs.recipe_bitmap,
-@@ -2295,7 +2380,8 @@ ice_get_recp_frm_fw(struct ice_hw *hw, struct ice_sw_recipe *recps, u8 rid,
- 
- 	/* Copy result indexes */
- 	bitmap_copy(recps[rid].res_idxs, result_bm, ICE_MAX_FV_WORDS);
--	recps[rid].recp_created = true;
-+	if (is_add)
-+		recps[rid].recp_created = true;
- 
- err_unroll:
- 	kfree(tmp);
-@@ -4573,12 +4659,13 @@ static struct ice_protocol_entry ice_prot_id_tbl[ICE_PROTOCOL_LAST] = {
-  * @hw: pointer to the hardware structure
-  * @lkup_exts: extension sequence to match
-  * @rinfo: information regarding the rule e.g. priority and action info
-+ * @is_add: flag of adding recipe
-  *
-  * Returns index of matching recipe, or ICE_MAX_NUM_RECIPES if not found.
-  */
- static u16
- ice_find_recp(struct ice_hw *hw, struct ice_prot_lkup_ext *lkup_exts,
--	      const struct ice_adv_rule_info *rinfo)
-+	      const struct ice_adv_rule_info *rinfo, bool is_add)
- {
- 	bool refresh_required = true;
- 	struct ice_sw_recipe *recp;
-@@ -4592,11 +4679,12 @@ ice_find_recp(struct ice_hw *hw, struct ice_prot_lkup_ext *lkup_exts,
- 		 * entry update it in our SW bookkeeping and continue with the
- 		 * matching.
- 		 */
--		if (!recp[i].recp_created)
-+		if (hw->recp_reuse) {
- 			if (ice_get_recp_frm_fw(hw,
- 						hw->switch_info->recp_list, i,
--						&refresh_required))
-+						&refresh_required, is_add))
- 				continue;
-+		}
- 
- 		/* Skip inverse action recipes */
- 		if (recp[i].root_buf && recp[i].root_buf->content.act_ctrl &
-@@ -5277,6 +5365,49 @@ ice_get_compat_fv_bitmap(struct ice_hw *hw, struct ice_adv_rule_info *rinfo,
- 	ice_get_sw_fv_bitmap(hw, prof_type, bm);
- }
- 
-+/**
-+ * ice_subscribe_recipe - subscribe to an existing recipe
-+ * @hw: pointer to the hardware structure
-+ * @rid: recipe ID to subscribe to
-+ *
-+ * Return: 0 on success, and others on error
-+ */
-+static int ice_subscribe_recipe(struct ice_hw *hw, u16 rid)
-+{
-+	DEFINE_FLEX(struct ice_aqc_alloc_free_res_elem, sw_buf, elem, 1);
-+	u16 buf_len = __struct_size(sw_buf);
-+	u16 res_type;
-+	int status;
-+
-+	/* Prepare buffer to allocate resource */
-+	sw_buf->num_elems = cpu_to_le16(1);
-+	res_type = FIELD_PREP(ICE_AQC_RES_TYPE_M, ICE_AQC_RES_TYPE_RECIPE) |
-+		   ICE_AQC_RES_TYPE_FLAG_SUBSCRIBE_SHARED |
-+		   ICE_AQC_RES_TYPE_FLAG_SUBSCRIBE_CTL;
-+	sw_buf->res_type = cpu_to_le16(res_type);
-+
-+	sw_buf->elem[0].e.sw_resp = cpu_to_le16(rid);
-+
-+	status = ice_aq_alloc_free_res(hw, sw_buf, buf_len,
-+				       ice_aqc_opc_alloc_res);
-+
-+	return status;
-+}
-+
-+/**
-+ * ice_subscribable_recp_shared - share an existing subscribable recipe
-+ * @hw: pointer to the hardware structure
-+ * @rid: recipe ID to subscribe to
-+ */
-+static void ice_subscribable_recp_shared(struct ice_hw *hw, u16 rid)
-+{
-+	struct ice_sw_recipe *recps = hw->switch_info->recp_list;
-+	u16 sub_rid;
-+
-+	for_each_set_bit(sub_rid, recps[rid].r_bitmap, ICE_MAX_NUM_RECIPES)
-+		ice_subscribe_recipe(hw, sub_rid);
-+}
-+
- /**
-  * ice_add_adv_recipe - Add an advanced recipe that is not part of the default
-  * @hw: pointer to hardware structure
-@@ -5299,6 +5430,7 @@ ice_add_adv_recipe(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 	struct ice_sw_fv_list_entry *tmp;
- 	struct ice_sw_recipe *rm;
- 	int status = 0;
-+	u16 rid_tmp;
- 	u8 i;
- 
- 	if (!lkups_cnt)
-@@ -5376,10 +5508,14 @@ ice_add_adv_recipe(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 	}
- 
- 	/* Look for a recipe which matches our requested fv / mask list */
--	*rid = ice_find_recp(hw, lkup_exts, rinfo);
--	if (*rid < ICE_MAX_NUM_RECIPES)
-+	*rid = ice_find_recp(hw, lkup_exts, rinfo, true);
-+	if (*rid < ICE_MAX_NUM_RECIPES) {
- 		/* Success if found a recipe that match the existing criteria */
-+		if (hw->recp_reuse)
-+			ice_subscribable_recp_shared(hw, *rid);
-+
- 		goto err_unroll;
-+	}
- 
- 	rm->tun_type = rinfo->tun_type;
- 	/* Recipe we need does not exist, add a recipe */
-@@ -5398,14 +5534,14 @@ ice_add_adv_recipe(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 		status = ice_aq_get_recipe_to_profile(hw, fvit->profile_id,
- 						      &recp_assoc, NULL);
- 		if (status)
--			goto err_unroll;
-+			goto err_free_recipe;
- 
- 		bitmap_from_arr64(r_bitmap, &recp_assoc, ICE_MAX_NUM_RECIPES);
- 		bitmap_or(r_bitmap, r_bitmap, rm->r_bitmap,
- 			  ICE_MAX_NUM_RECIPES);
- 		status = ice_acquire_change_lock(hw, ICE_RES_WRITE);
- 		if (status)
--			goto err_unroll;
-+			goto err_free_recipe;
- 
- 		bitmap_to_arr64(&recp_assoc, r_bitmap, ICE_MAX_NUM_RECIPES);
- 		status = ice_aq_map_recipe_to_profile(hw, fvit->profile_id,
-@@ -5413,7 +5549,7 @@ ice_add_adv_recipe(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 		ice_release_change_lock(hw);
- 
- 		if (status)
--			goto err_unroll;
-+			goto err_free_recipe;
- 
- 		/* Update profile to recipe bitmap array */
- 		bitmap_copy(profile_to_recipe[fvit->profile_id], r_bitmap,
-@@ -5427,6 +5563,16 @@ ice_add_adv_recipe(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 	*rid = rm->root_rid;
- 	memcpy(&hw->switch_info->recp_list[*rid].lkup_exts, lkup_exts,
- 	       sizeof(*lkup_exts));
-+	goto err_unroll;
-+
-+err_free_recipe:
-+	if (hw->recp_reuse) {
-+		for_each_set_bit(rid_tmp, rm->r_bitmap, ICE_MAX_NUM_RECIPES) {
-+			if (!ice_free_recipe_res(hw, rid_tmp))
-+				clear_bit(rid_tmp, rm->r_bitmap);
-+		}
-+	}
-+
- err_unroll:
- 	list_for_each_entry_safe(r_entry, r_tmp, &rm->rg_list, l_entry) {
- 		list_del(&r_entry->l_entry);
-@@ -6440,7 +6586,7 @@ ice_rem_adv_rule(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 			return -EIO;
- 	}
- 
--	rid = ice_find_recp(hw, &lkup_exts, rinfo);
-+	rid = ice_find_recp(hw, &lkup_exts, rinfo, false);
- 	/* If did not find a recipe that match the existing criteria */
- 	if (rid == ICE_MAX_NUM_RECIPES)
- 		return -EINVAL;
-@@ -6484,14 +6630,21 @@ ice_rem_adv_rule(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
- 					 ice_aqc_opc_remove_sw_rules, NULL);
- 		if (!status || status == -ENOENT) {
- 			struct ice_switch_info *sw = hw->switch_info;
-+			struct ice_sw_recipe *r_list = sw->recp_list;
- 
- 			mutex_lock(rule_lock);
- 			list_del(&list_elem->list_entry);
- 			devm_kfree(ice_hw_to_dev(hw), list_elem->lkups);
- 			devm_kfree(ice_hw_to_dev(hw), list_elem);
- 			mutex_unlock(rule_lock);
--			if (list_empty(&sw->recp_list[rid].filt_rules))
--				sw->recp_list[rid].adv_rule = false;
-+			if (list_empty(&r_list[rid].filt_rules)) {
-+				r_list[rid].adv_rule = false;
-+
-+				/* All rules for this recipe are now removed */
-+				if (hw->recp_reuse)
-+					ice_release_recipe_res(hw,
-+							       &r_list[rid]);
-+			}
- 		}
- 		kfree(s_rule);
- 	}
-diff --git a/drivers/net/ethernet/intel/ice/ice_switch.h b/drivers/net/ethernet/intel/ice/ice_switch.h
-index 89ffa1b51b5a..9cf819b20d9c 100644
---- a/drivers/net/ethernet/intel/ice/ice_switch.h
-+++ b/drivers/net/ethernet/intel/ice/ice_switch.h
-@@ -429,5 +429,6 @@ ice_aq_get_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u64 *r_assoc,
- int
- ice_aq_map_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u64 r_assoc,
- 			     struct ice_sq_cd *cd);
-+void ice_init_chk_recipe_reuse_support(struct ice_hw *hw);
- 
- #endif /* _ICE_SWITCH_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index 3ecfdebc0473..17bf07663ebb 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -850,6 +850,8 @@ struct ice_hw {
- 
- 	u16 max_burst_size;	/* driver sets this value */
- 
-+	u8 recp_reuse:1;	/* indicates whether FW supports recipe reuse */
-+
- 	/* Tx Scheduler values */
- 	u8 num_tx_sched_layers;
- 	u8 num_tx_sched_phys_layers;
--- 
-2.31.1
-
+- Naresh
 
