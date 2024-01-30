@@ -1,133 +1,118 @@
-Return-Path: <netdev+bounces-66937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0056C841856
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 02:32:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EF5784185B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 02:33:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 97F76B22B90
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 01:32:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 221BAB214E2
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 01:33:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30516374C4;
-	Tue, 30 Jan 2024 01:31:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68BD34CEA;
+	Tue, 30 Jan 2024 01:33:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ATsRK54z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ruN2F5rJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.115])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35F9236139;
-	Tue, 30 Jan 2024 01:31:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.115
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9CF339AD;
+	Tue, 30 Jan 2024 01:33:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706578284; cv=none; b=Wju+NxR9kHYqhxHswXyB2cPpA+eoLS3BgBul/+Dwr2bvbbDRaoBz/ao1qYbG12tjS5kON/jjBhVFKp8e+chv59a+i+Uz53rRCHe2JrlgH+frKX4xTNHP2IbrMbs3TkV7iIxfhL1DvtWkFDySzc4uuWENSszxbrd/qr9BJVe/VoQ=
+	t=1706578381; cv=none; b=cCNvAIPI2M6hpqdpzBo81t6zXZG56Guj3MrTcfZg/5oI8F2COIptDN0yyhXUPs25Lzbdd3Tj/wg5UlzlAZMdSy7cV/WjfJYM15ghTOS50AwRzNTmOzzgvHz14I6Gv9tr8gTm4csQLoqbLYVAXM5a4l2mK6CnfpY5dq2Y4J8K/Ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706578284; c=relaxed/simple;
-	bh=pdiLzVVJ6IINEY+dX9MjF6XRC5ht/E67cJ1XtKl6k/k=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=SBsLNsLhkrMSZ5FBirV2E8GG9fNsXhcMiZkafhAG1P+cXGFYyHhMTkAiLtUxXkZ8lIE9syeFvnUJPfoZremJaIQRgcnQ8UQTNmjsiXf+udfA4YyKXpRvgGLr3txtfyJWnQ9HVRlQZ2ZJT5UegWmaK5mujKZK8pSKNNYxl7uN1gg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ATsRK54z; arc=none smtp.client-ip=192.55.52.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706578282; x=1738114282;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=pdiLzVVJ6IINEY+dX9MjF6XRC5ht/E67cJ1XtKl6k/k=;
-  b=ATsRK54z78W/xVVkXARI+f6mmXmLAB4INi5rioaPWILICsKsZG1/mWyM
-   AC7SezX7p4GhlOzRNlweoROtAMr4rdk/T3oOVBXnm2apU4qhxk9UVb6GI
-   mKhQtQsldoGS3y2BuUKyPDZfklyeZZ4aFlcG7bTqAsqivWPeeUTtZO90W
-   RY8B70TIWPXyc9rK5I/T3IntsPh2iTcsFm+Eb6UJZJwqSwrr/cHHlb67O
-   rsIXSTj3kAq/xXjYp/QwgyPFSi6vGW83B5VgmeiJSeTsTmOZicTVNkcOD
-   qe4Cj6LM+pfC+5d7JfMmM8FmnGB3K2zdKuyOpONNsmJNlMtyrHtmliJFc
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10968"; a="402767516"
-X-IronPort-AV: E=Sophos;i="6.05,227,1701158400"; 
-   d="scan'208";a="402767516"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2024 17:31:13 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10968"; a="788015350"
-X-IronPort-AV: E=Sophos;i="6.05,227,1701158400"; 
-   d="scan'208";a="788015350"
-Received: from sriramja-mobl.amr.corp.intel.com (HELO vcostago-mobl3) ([10.125.16.208])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2024 17:31:12 -0800
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Sai Krishna Gajula <saikrishnag@marvell.com>, "richardcochran@gmail.com"
- <richardcochran@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>,
- "kuba@kernel.org" <kuba@kernel.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, Sunil Kovvuri
- Goutham <sgoutham@marvell.com>, Geethasowjanya Akula <gakula@marvell.com>,
- Linu Cherian <lcherian@marvell.com>, Hariprasad Kelam
- <hkelam@marvell.com>, Subbaraya Sundeep Bhatta <sbhatta@marvell.com>
-Cc: Naveen Mamindlapalli <naveenm@marvell.com>
-Subject: Re: [net-next PATCH] octeontx2: Add PTP clock driver for Octeon PTM
- clock.
-In-Reply-To: <BY3PR18MB4707BB7ADFB58EC7032FBAF7A07E2@BY3PR18MB4707.namprd18.prod.outlook.com>
-References: <20240124064156.2577119-1-saikrishnag@marvell.com>
- <87h6j154yx.fsf@intel.com>
- <BY3PR18MB4707BB7ADFB58EC7032FBAF7A07E2@BY3PR18MB4707.namprd18.prod.outlook.com>
-Date: Mon, 29 Jan 2024 17:31:12 -0800
-Message-ID: <87jznrr4in.fsf@intel.com>
+	s=arc-20240116; t=1706578381; c=relaxed/simple;
+	bh=jKVXSUHnuGD6UfpTwd8Rf6+GCaEio67YadwFP6z0OJk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CpCWdIs6HLIp1D03x3l20hifOqJkWxRB7OUeLr3NH8mw43Jd2tiOkSPwD/FV3UXDw1hjzpZX5ZorAxCosdcZZUP0mCHgX7tBjK+gTuGJibY9isEYLboaeJVviAJPB1F1HAlRspOc6c3eEqlsTKxZ589wKsTDAEALyM/Ck/iji5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ruN2F5rJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4860C433C7;
+	Tue, 30 Jan 2024 01:33:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706578381;
+	bh=jKVXSUHnuGD6UfpTwd8Rf6+GCaEio67YadwFP6z0OJk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ruN2F5rJAMlRDAEsQoLNolTUWIfv7P4yBbvtegSJyJ1aEUnamWwVeL3omGloDjH/a
+	 vCuGMt/7YR6a308erYs8Lp34/2MgcGT0+Eu8DkFfMEqMpeCKDO+vBo9MfjArJClZTD
+	 i448HTnKby/rXqZAg39WZhiFnDGKTpYNFTeI4Xt0w3on9zsNNy93xs2Re3VHVA0UZb
+	 frd5cRDgN+C+Sb5EtZXAQZIgBWCeYog9muf5onZutb5NtmYk+aYM6LwgmN5iZ2ngI4
+	 9JeUNmCO86WoZCiWNklDeBfoU3dL0sTucwY99OMSIaEazJMnmo9kyNTwC2Ti26HUG2
+	 +HxOemffu6kwQ==
+Date: Mon, 29 Jan 2024 17:32:59 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: Alessandro Marcolini <alessandromarcolini99@gmail.com>,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan
+ Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org, Jacob Keller
+ <jacob.e.keller@intel.com>, Breno Leitao <leitao@debian.org>, Jiri Pirko
+ <jiri@resnulli.us>, donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v1 02/12] tools/net/ynl: Support sub-messages
+ in nested attribute spaces
+Message-ID: <20240129173259.1a2451df@kernel.org>
+In-Reply-To: <m2bk95w8qq.fsf@gmail.com>
+References: <20240123160538.172-1-donald.hunter@gmail.com>
+	<20240123160538.172-3-donald.hunter@gmail.com>
+	<20240123161804.3573953d@kernel.org>
+	<m2ede7xeas.fsf@gmail.com>
+	<20240124073228.0e939e5c@kernel.org>
+	<m2ttn0w9fa.fsf@gmail.com>
+	<20240126105055.2200dc36@kernel.org>
+	<m2jznuwv7g.fsf@gmail.com>
+	<fcf9630e-26fd-4474-a791-68c548a425b6@gmail.com>
+	<m2bk95w8qq.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Sai Krishna Gajula <saikrishnag@marvell.com> writes:
+On Sun, 28 Jan 2024 19:36:29 +0000 Donald Hunter wrote:
+> > from collections import ChainMap
+> >
+> > class LevelChainMap(ChainMap):
+> > =C2=A0=C2=A0=C2=A0 def __getitem__(self, key):
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 for mapping in self.maps:
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 try:
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 return mapping[key], self.maps[::-1].index(mapping)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 exce=
+pt KeyError:
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 pass
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return self.__missing__(key)
+> >
+> > =C2=A0=C2=A0=C2=A0 def get(self, key, default=3DNone, level=3DNone):
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 val, lvl =3D self[key] if ke=
+y in self else (default, None)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if level:
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if l=
+vl !=3D level:
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 raise Exception("Level mismatch")
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 return val, lvl
+> >
+> > # example usage
+> > c =3D LevelChainMap({'a':1}, {'inner':{'a':1}}, {'outer': {'inner':{'a'=
+:1}}})
+> > print(c.get('a', level=3D2))
+> > print(c.get('a', level=3D1)) #raise err
+> >
+> > This will leave the spec as it is and will require small changes.
+> >
+> > What do you think? =20
+>=20
+> The more I think about it, the more I agree that using path-like syntax
+> in the selector is overkill. It makes sense to resolve the selector
+> level from the spec and then directly access the mappings from the
+> correct scope level.
 
->> -----Original Message-----
->> From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
->> Sent: Friday, January 26, 2024 5:41 AM
->> To: Sai Krishna Gajula <saikrishnag@marvell.com>;
->> richardcochran@gmail.com; davem@davemloft.net; kuba@kernel.org;
->> netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Sunil Kovvuri
->> Goutham <sgoutham@marvell.com>; Geethasowjanya Akula
->> <gakula@marvell.com>; Linu Cherian <lcherian@marvell.com>; Hariprasad
->> Kelam <hkelam@marvell.com>; Subbaraya Sundeep Bhatta
->> <sbhatta@marvell.com>
->> Cc: Sai Krishna Gajula <saikrishnag@marvell.com>; Naveen Mamindlapalli
->> <naveenm@marvell.com>
->> Subject: Re: [net-next PATCH] octeontx2: Add PTP clock driver for
->> Octeon PTM clock.
->> 
->> Sai Krishna <saikrishnag@marvell.com> writes:
->> 
->> > The PCIe PTM(Precision time measurement) protocol provides precise
->> > coordination of events across multiple components like PCIe host
->> > clock, PCIe EP PHC local clocks of PCIe devices. This patch adds
->> > support for ptp clock based PTM clock. We can use this PTP device to
->> > sync the PTM time with CLOCK_REALTIME or other PTP PHC devices using
->> > phc2sys.
->> >
->> > Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
->> > Signed-off-by: Naveen Mamindlapalli <naveenm@marvell.com>
->> > Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
->> > ---
->> 
->> I can see that the same device id (PCI_DEVID_OCTEONTX2_PTP) is used by a
->> ethernet driver.
->> 
->> That brings me a question: why expose a different PTP chardev? In other
->> words, why can't you just implement .getcrosststamp() for that ethernet
->> device?
->
-> This driver runs on endpoint device and not on the host.
-> getcrosststamp() needs ART time, frequency details in case of x86 host
-> system. Our use case is to sync the host's PTP/PTM time to the
-> endpoint device via PTM interface.
-
-Ah! I see. This is for "the other side", cool :-)
-
-
-Cheers,
--- 
-Vinicius
+Plus if we resolve from the spec that's easily reusable in C / C++=20
+code gen :)
 
