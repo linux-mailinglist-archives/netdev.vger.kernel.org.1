@@ -1,101 +1,119 @@
-Return-Path: <netdev+bounces-67092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A55BB842068
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:02:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDA7584206D
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:03:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7FBE1C244C7
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:02:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5D9A51F272BE
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:03:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0D867A19;
-	Tue, 30 Jan 2024 09:59:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A8F36773B;
+	Tue, 30 Jan 2024 09:59:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="NaYDMDNi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nPHfBZJG"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E090067A04;
-	Tue, 30 Jan 2024 09:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6EA4605D5;
+	Tue, 30 Jan 2024 09:59:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.134.136.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706608741; cv=none; b=RiHTeBLS1Pxs7z5U1n3pXCb1rxFW390xE0x2zho+dT/nUsoCfhERRGTQbma7IMHjXzAH2H7ZPqdJZsx2HRID2aRTdwnTmuirY2Vgqeyy245FKGc/Z0UPq2iNVb8Ggh1etP4X9Sgvm9deBxOWR5b4mFpr6F9q7vZtlQTxqrkU9xs=
+	t=1706608793; cv=none; b=EG4Wv+dbB2ZZk1Z9ihbagPxjvqgnT9bkb3EL70OJEKuYlyBMuCcYASD86qjA4+24bIf73/ClK5szjv2fb7+BXfKnAKhMUvyWiKhe+eCA3SesjGhykPXi4f4UWUEUwzyCi2FNeBuH6CyZbo//hXTYhm7yvN9prgxzEz16HAuq1i0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706608741; c=relaxed/simple;
-	bh=MKUXB6V1YAzEGEtln10mgT2VHpJUBVlj85vGbaEeyiM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HKhaADrG5amb1zjgucocTO759rYqCCOcPvGunQ2oupg/gcbqLYNSttIbRCvTEPHY2OPeJusjvgf2E9zkk5A/5xtymYnjlmoeb6wO7bEagtc45f5JzgIm2ryI+wNNTnEmkKkD8Nk/FWZnpoVGRWORvaM6bABN7IAzS7/370r8uQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=NaYDMDNi; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E1D651C000F;
-	Tue, 30 Jan 2024 09:58:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1706608730;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EiSQPHlZvuMGh0EjQQ581BSXae/FdZolbIAXca57poU=;
-	b=NaYDMDNij0V/pTIkkBOPp9SLHn7uDFROO8ky6uETO5MB2EwwAbehy+a6sA18wvGiuG7d56
-	CiF4IoJBq2/RnpaAMFibw2GB9OUgYzF4J0KLp5jF9NmU9LEvoaFtl/vpfNaT2EeqarbNdB
-	UNzLq+SjLxotlw2FoyxXYv7ElxC5tSlfEVQ1JW6/4GXtDeeUvS5sq4MmdZSUulyIG4Y2he
-	cdhSXqL4do3DMAi5xF2t11JSMx8iW/EOVtNPnYDtWs/d9ze7mKYlBwWeZMJfdrQJKPKaX2
-	odkK/WErvb4sAOdYBdzS8C2asLbEX/Zc6WH3AxTJFx5pYY86vb+VMIQGHe5I3A==
-Date: Tue, 30 Jan 2024 10:58:47 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?=
- <clement.leger@bootlin.com>, Miquel Raynal <miquel.raynal@bootlin.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org,
- Clark Wang <xiaoning.wang@nxp.com>
-Subject: Re: [PATCH net-next v2 0/7] Fix missing PHY-to-MAC RX clock
-Message-ID: <20240130105847.08a2d958@device-28.home>
-In-Reply-To: <20240130-rxc_bugfix-v2-0-5e6c3168e5f0@bootlin.com>
-References: <20240130-rxc_bugfix-v2-0-5e6c3168e5f0@bootlin.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1706608793; c=relaxed/simple;
+	bh=6P5FfbFKXvpTVgfjV2JFIycWosCzugB7elVDu3wefxI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oMK2BF2PUUwtUpjGLXVUIJDy1BUe3Oh8FZioRcMXlZE3kuDk3ougA9I/5Gt6cLzmBKNxwFUesLlG3w8zIHZ9j3q+D8EXwyfDg9TDwfTNNfCIfPnOaKg56r2VdPG1lAPKR3Jjx3/adiWC+xYlzex7YwbezWouPAUzHDHHRa9aPHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nPHfBZJG; arc=none smtp.client-ip=134.134.136.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706608791; x=1738144791;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=6P5FfbFKXvpTVgfjV2JFIycWosCzugB7elVDu3wefxI=;
+  b=nPHfBZJG1kw4TxyPAx+BJReQtlMBJCyo2M8ZUJXATbhuN13eD0Gqykf5
+   20JZYfhVN0T7mSkAKzxYrJ+0EbxOA91FIln4cnBe5lLr9pQVFZTdz3FtK
+   wlsj4bFeiNfWQmSwruWwRnHDpPWX6VUVggjRJujuy9mkz6UKl4atBfg+W
+   R3z2BfYHFEnvJ2c7DOwQIFxaWd9WLAK3L70BFJtWeNgR6S4BtdKu0s0Xn
+   GPVdJuskmHJGCVB7xOdm6j3+FHljvarYIiK6A06t+UqXkhXppFh/ckHCO
+   nTn5y0y/s89wNy51L9TlgmR/hV56LK9Fqk+XVazIQ8SB6eRJiPhTlPJ9T
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10968"; a="393662032"
+X-IronPort-AV: E=Sophos;i="6.05,707,1701158400"; 
+   d="scan'208";a="393662032"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2024 01:59:50 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10968"; a="911388471"
+X-IronPort-AV: E=Sophos;i="6.05,707,1701158400"; 
+   d="scan'208";a="911388471"
+Received: from mszycik-mobl1.ger.corp.intel.com (HELO [10.246.34.225]) ([10.246.34.225])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2024 01:59:46 -0800
+Message-ID: <92958c7b-7e5f-4e25-819f-4e52f9ffcf7b@linux.intel.com>
+Date: Tue, 30 Jan 2024 10:59:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next RESENT v3] ethtool: ice:
+ Support for RSS settings to GTP from ethtool
+To: takeru hayasaka <hayatake396@gmail.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+ vladimir.oltean@nxp.com, linux-kernel@vger.kernel.org, laforge@gnumonks.org,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ mailhol.vincent@wanadoo.fr
+References: <20240127140747.905552-1-hayatake396@gmail.com>
+ <154f979e-a335-461b-b72e-5e9c54fe940c@linux.intel.com>
+ <CADFiAcJShbgBLXdVgs1vK1jqDFopkRcw-se4b4h0V3Yd60xLVw@mail.gmail.com>
+Content-Language: en-US
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+In-Reply-To: <CADFiAcJShbgBLXdVgs1vK1jqDFopkRcw-se4b4h0V3Yd60xLVw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hello Romain,
 
-On Tue, 30 Jan 2024 10:28:35 +0100
-Romain Gantois <romain.gantois@bootlin.com> wrote:
 
-> Hello everyone,
+On 30.01.2024 07:39, takeru hayasaka wrote:
+> Hi Marcin-san
+> Thanks for your review!
 > 
-> This is version two of my series that addresses the issue with some MAC/PHY
-> combinations. Version one was sent on net, not net-next.
+>> Do I understand correctly that all gtpu* include TEID? Maybe write it here.
+> Yes, that's correct.
 > 
-> Notable changes in v2:
->   - Introduced a pcs op for initializing hardware required for MAC
->     initialization, instead of using phylink_validate() for this purpose.
->   - Refactored stmmac to use a generic PCS reference in mac_device_info
->     instead of a model-specific field.
+>> It would be nice to see a link to the patch that added GTP and 'e' flag support
+> to ethtool itself ("ethtool: add support for rx-flow-hash gtp").
+> I will send you the link.
+> The one I sent earlier was outdated, so I've updated it to match this patch.
+> https://lore.kernel.org/netdev/20240130053742.946517-1-hayatake396@gmail.com/
+> 
+>> gtpc(4|6) doesn't include TEID, so what is its purpose?
+> In GTPC communication, there is no TEID in the CSR (Create Session Request).
+> Therefore, there are cases of GTPC that do not include TEID.
 
-As this impacts the dwmac-socfpga lynx integration, I'd like to give it
-a try, I'll be able to give some feedback on that part probably
-tomorrow.
+The way I understand it now, this patch (and the ethtool one) adds hashing on
+TEID field in GTP* headers. So I wanted to ask why do we have a case (gtpc(4|6))
+that doesn't include TEID? Do we hash on other fields in this header?
+
+> 
+>> s/TEID(4byte)/TEID (4bytes)/
+>> Also, I think two newlines should remain here.
+> I will correct the TEID notation in the next patch!
 
 Thanks,
+Marcin
 
-Maxime
+---8<---
 
