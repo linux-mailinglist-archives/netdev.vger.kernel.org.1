@@ -1,110 +1,124 @@
-Return-Path: <netdev+bounces-67059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E6CF841FAA
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:36:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F15F841F6D
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:28:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B1A4B2BA7E
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:26:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B69A28357E
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:28:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BCA96086F;
-	Tue, 30 Jan 2024 09:25:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21E535915B;
+	Tue, 30 Jan 2024 09:28:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="CAJAYaog"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D4C59165;
-	Tue, 30 Jan 2024 09:25:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C653605BE;
+	Tue, 30 Jan 2024 09:28:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706606758; cv=none; b=qFpWU07/70jXDkdgfRXux9gHgG5PUuH3XApbhn+LsIwVC9GhTDy9as8M4hCwFh5ciiyBMYzL8F8n/zZLzeLNg38/TxYX6qpLQzb1MtrARCaRkRix+ybph6Pn2198umM3HnxFpnrPrbexC0AsXdKWF0cH6Fl/m5YLw358EzdIiI8=
+	t=1706606887; cv=none; b=i5lTBulUTtyO/LhyoyoWIi+JLt18JeEJr77G5Xe5zEaQnZhFFI8NRFlP4uJl2Ui4C4M0Wt3mo2iwWSgmzAd72VFnw++DwuS50f3VNcNhDyYNj1mZn0gcEYwVMXyxuPQXYC/VHFHx/nIEFokyaFI1xIqbPVWWFzufRshMylyLLw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706606758; c=relaxed/simple;
-	bh=Q1D2Qua3GXjBcUCsDMqOLa6GLF12L1EvbvlN/oSCpQ4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gl9UZ9ByicC0xg9R6UZYUOh/jxSRXDtRjE7wSPBHoJbYs2U1MvKS2Oq2c9dSxO6W122l7Oul6X31eZFmGQbG/d29QXZqdtzc/Er7HDQNGgBavt5xN7Q1VuMFJ3qsnDFlWlhJBpUv5k2i3hW9gSUPF0RWYdmwhX/PLcg63V9zKh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 0bf179d996444cc293d435d5babfbdee-20240130
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:d687b045-17cd-48e7-8110-96ada6d493ec,IP:20,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:5
-X-CID-INFO: VERSION:1.1.35,REQID:d687b045-17cd-48e7-8110-96ada6d493ec,IP:20,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:5
-X-CID-META: VersionHash:5d391d7,CLOUDID:191bea7f-4f93-4875-95e7-8c66ea833d57,B
-	ulkID:240130172548ZPLOI4XG,BulkQuantity:0,Recheck:0,SF:66|38|24|17|19|44|1
-	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
-	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
-X-UUID: 0bf179d996444cc293d435d5babfbdee-20240130
-Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 1661973547; Tue, 30 Jan 2024 17:25:47 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id F413BE000EB9;
-	Tue, 30 Jan 2024 17:25:46 +0800 (CST)
-X-ns-mid: postfix-65B8C09A-7931421039
-Received: from kernel.. (unknown [172.20.15.213])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 93986E000EB9;
-	Tue, 30 Jan 2024 17:25:43 +0800 (CST)
-From: Kunwu Chan <chentao@kylinos.cn>
-To: roopa@nvidia.com,
-	razor@blackwall.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: bridge@lists.linux.dev,
-	netdev@vger.kernel.org,
+	s=arc-20240116; t=1706606887; c=relaxed/simple;
+	bh=WeXsrjerVgdjp7ERsnWmrusKzZmU1eEbSH9QDZQMrwo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PCLivti3F77qlZTbNpmgrgaV76ASA4PXGuqXHblssPQQysbAAFLMmARQEtN0bSSwhDIGj8ejDedoABgWqZSaLNzgC8gX0OsJJ2yt9134WoXASP/0RcEkf3d+YulYEW6Rt4Ie/qo9i3eL9y8s4wwqO9dN4C028W1iWPTkkEh8/e4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=CAJAYaog; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=wBVJH31eVDzBpyupvBp7B4u8sfC8jD1DSOL/7C0GLE4=; b=CAJAYaogKroU2lJyjJipR7b8uy
+	+6k0mduJVPIEKPyCwBjAt72D44vvkyqqgwx/LuZV9D66NjKAIOEZqy04A3PSqNZawfNP5oiAx6Sk4
+	DuztLAxmu8Cjt/01yLc+BuMEBDb/T0XhppzZVslMM5vVy+0QD68VAnOl1U+4N2E+WjIPGlhCYsq/1
+	//v9869QKVkEJQ6lX6Y7ieG6OCziOncVZsVdAtQ1lwDzwS0oLQki0brLtUkNQL3Mce9N4LVnBCMyX
+	vg5NXQJDrsGxZ3rxYTz5psJXGH61lSehIaDitqzKVOyC45Db1jkwmiLDUMT0M65RYreibsYpRKRSi
+	WTA0Za9w==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60964)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rUkP8-0001Vq-02;
+	Tue, 30 Jan 2024 09:27:42 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rUkP1-0005OV-T1; Tue, 30 Jan 2024 09:27:35 +0000
+Date: Tue, 30 Jan 2024 09:27:35 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+Cc: Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
+	David E Box <david.e.box@linux.intel.com>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Mark Gross <markgross@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Simon Horman <simon.horman@corigine.com>,
+	Serge Semin <fancer.lancer@gmail.com>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Kunwu Chan <chentao@kylinos.cn>
-Subject: [PATCH net-next] net: bridge: Use KMEM_CACHE instead of kmem_cache_create
-Date: Tue, 30 Jan 2024 17:25:36 +0800
-Message-Id: <20240130092536.73623-1-chentao@kylinos.cn>
-X-Mailer: git-send-email 2.39.2
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	platform-driver-x86@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	bpf@vger.kernel.org, Voon Wei Feng <weifeng.voon@intel.com>,
+	Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
+	Lai Peter Jun Ann <jun.ann.lai@intel.com>,
+	Abdul Rahim Faizal <faizal.abdul.rahim@intel.com>
+Subject: Re: [PATCH net-next v4 01/11] net: phylink: publish ethtool link
+ modes that supported and advertised
+Message-ID: <ZbjBB81+Jh5uTqnz@shell.armlinux.org.uk>
+References: <20240129130253.1400707-1-yong.liang.choong@linux.intel.com>
+ <20240129130253.1400707-2-yong.liang.choong@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240129130253.1400707-2-yong.liang.choong@linux.intel.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-commit 0a31bd5f2bbb ("KMEM_CACHE(): simplify slab cache creation")
-introduces a new macro.
-Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-to simplify the creation of SLAB caches.
+On Mon, Jan 29, 2024 at 09:02:43PM +0800, Choong Yong Liang wrote:
+> Adding the allow_switch_interface flag to publish all the ethtool
+> link modes that can be supported and advertised.
+> 
+> This will allow the interface switching based on different ethtool
+> link modes.
 
-Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
----
- net/bridge/br_fdb.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+I don't think you need this at all. You seem to be suggesting that you
+have a PHY which switches between different interface modes on its host
+interface. We already support several PHYs with this capability.
 
-diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
-index c622de5eccd0..c77591e63841 100644
---- a/net/bridge/br_fdb.c
-+++ b/net/bridge/br_fdb.c
-@@ -35,10 +35,7 @@ static struct kmem_cache *br_fdb_cache __read_mostly;
-=20
- int __init br_fdb_init(void)
- {
--	br_fdb_cache =3D kmem_cache_create("bridge_fdb_cache",
--					 sizeof(struct net_bridge_fdb_entry),
--					 0,
--					 SLAB_HWCACHE_ALIGN, NULL);
-+	br_fdb_cache =3D KMEM_CACHE(net_bridge_fdb_entry, SLAB_HWCACHE_ALIGN);
- 	if (!br_fdb_cache)
- 		return -ENOMEM;
-=20
---=20
-2.39.2
+Generic support for this was added, and you need the PHY driver to
+fill in phydev->possible_interfaces so phylink knows which interface
+modes the PHY can switch between.
 
+Instead, you are modifying the legacy path, which eventually I want
+to get rid of.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
