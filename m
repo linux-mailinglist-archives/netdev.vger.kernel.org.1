@@ -1,64 +1,59 @@
-Return-Path: <netdev+bounces-66941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C08658418C8
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:08:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FBA28418ED
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:14:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64310B22649
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 02:08:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 25F651F270ED
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 02:14:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D09E364BE;
-	Tue, 30 Jan 2024 02:08:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31E9436AE5;
+	Tue, 30 Jan 2024 02:10:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UBVG57rU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XXUgv+ey"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E35BE364A9;
-	Tue, 30 Jan 2024 02:08:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A85915B0EC;
+	Tue, 30 Jan 2024 02:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706580529; cv=none; b=SrnYWWYuwdt//OPFE+GZLIbRBKQPdsM+L0GjvuUpS4R15+GSYRUjX6+K8zfPlufUR/E5vsdYSlcciC9qJ3gn559secdjWrP3tqQSJFowqPChrVIFRNBumye4ghrSJJM253mKEWuQgHNpjLx6dA5u+aqW2H08SBUrKsPSHEgG0Qw=
+	t=1706580602; cv=none; b=qXp1HanysdkD0oEbQBF4BWLvHd0VzNMYaY62EvQfRRc0xqnj5WF7O5UXCGPIxWP7AfZiyEgnppDe/+QEuFcwZ27ghgLqg+sTN2KLT/L351Y+wC0VeJxdDW2PHB2Wl7Yf4HQuEx27IcsUhTJoFl4Eb8m8PD6ZNe8ivuQ11rLlMRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706580529; c=relaxed/simple;
-	bh=9rbN2HvYm15Z2jwGzV6r+HBEJq7Isl2UPLyDTEbxcjM=;
+	s=arc-20240116; t=1706580602; c=relaxed/simple;
+	bh=MslyLyLtkNeZN/XbS7LDK6PTpQDHaV2q6pV5kODuDUE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gdP2KmYgF+4aYCE9NAH7urAPMhnusF56Es2mvrFizOiqYLaKpgwQtKf9gLJgqil8VxR9gjU0MKHGR4Mcbdd0fzhO46KOiV0Ig9lHwy+0BUPAB3oGJWHtfJxN9ZTnrJriV8S0b0IAjv0guS5FZl8jvKbcJ7wZasBd74XBVu6aQ+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UBVG57rU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C41EFC433F1;
-	Tue, 30 Jan 2024 02:08:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=VIl9bfbecjwuTtSRrTnxdDxEU+2iLimR/7OVhz/BF4WQEITcWxHwXVpMeih4mAhkxRsqKOQGN47p2X2DocssoVvRf7JRfu/g7tgcfX1oVw2FoVLqgpqWN2oD/P6K56HXfAb5idPTJ940oRQ7Y87Ve3y4gylAtAaE2yWy4Jwk6EI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XXUgv+ey; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0A1DDC433C7;
+	Tue, 30 Jan 2024 02:10:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706580528;
-	bh=9rbN2HvYm15Z2jwGzV6r+HBEJq7Isl2UPLyDTEbxcjM=;
+	s=k20201202; t=1706580601;
+	bh=MslyLyLtkNeZN/XbS7LDK6PTpQDHaV2q6pV5kODuDUE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UBVG57rUvVFDePmvUcPAd+PIDQANfElIL1ePro+BBViUpKJ/HTkpE5y+oZ5Eukrt/
-	 JEm+qIOOGnDf4jqxB0kqK0pwNOnwBMYtM47azf4GIKyw02aZWYbbo5ii6kTZ/xOr6h
-	 XDK+vHOhHR34NJZowx5ckdxhcA6Fugqk1iJJsmIGwBtg9uOv+tV85O0BgrzviuGV2k
-	 OskNhrEDxptrz3K75gqGAAq7rE2Zf10aOoKBQ8yI7BUIcsZEKuYQNsY2dGg7ug3q43
-	 1/L811yqtyystB+COy/Ta3HfQP9suund893FsdIQa35x/kdQWOEnJ8XSDN9h8wKPiU
-	 4CPcffBZb8jeA==
-Date: Mon, 29 Jan 2024 18:08:46 -0800
+	b=XXUgv+eyKYSfK8nkDipNeihYKctwmL6GxBrOEeBmH4XTIfcFC1SF5QmUljCLUWJXy
+	 WGhrLCOy0hsmcqnaikbDsuysG7SEfvuqBNouu4WR3x8lf+BZ7Lik7SWs93edKIoY9L
+	 H04vM4e94IFjjTuCA+shNEWnvq6PhzDNanh1DeetQ+ycozz6XJ2DdTMWHnHkvvpyqO
+	 CGwzkmqrT0B1k64u1lWn4HJEcSC3fHimZ/06dwldjxNJIpp8MKn+Y3zfhTqiCBLFKY
+	 oFdhqM6Fvtx8kEQ0XaUZmUwckvSqalqOYiGBFMemNZSh+BTiLc2QzuC8dUhqSU5UKe
+	 lzaTXso+brnJw==
+Date: Mon, 29 Jan 2024 18:09:59 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: <davem@davemloft.net>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>,
- <linux-arm-kernel@lists.infradead.org>,
- <linux-mediatek@lists.infradead.org>, <bpf@vger.kernel.org>, "Michael S.
- Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>
-Subject: Re: [PATCH net-next v3 0/5] remove page frag implementation in
- vhost_net
-Message-ID: <20240129180846.28937389@kernel.org>
-In-Reply-To: <65eb8581-5cd8-8759-d598-c6711608b0c7@huawei.com>
-References: <20240123104250.9103-1-linyunsheng@huawei.com>
-	<65eb8581-5cd8-8759-d598-c6711608b0c7@huawei.com>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>
+Cc: Dimitri Fedrau <dima.fedrau@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Stefan Eichenberger <eichest@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 net-next 00/13] net: phy: marvell-88q2xxx: add driver
+ for the Marvell 88Q2220 PHY
+Message-ID: <20240129180959.582dbc88@kernel.org>
+In-Reply-To: <20240122212848.3645785-1-dima.fedrau@gmail.com>
+References: <20240122212848.3645785-1-dima.fedrau@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,15 +63,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 29 Jan 2024 20:40:37 +0800 Yunsheng Lin wrote:
-> Is this patchset supposed to go through vhost tree instead of net-next?
-> As the state is changed to 'Not applicable' in the netdevbpf patchwork,
-> according to maintainer-netdev.rst:
-> 
-> Not applicable     patch is expected to be applied outside of the networking
->                    subsystem
+On Mon, 22 Jan 2024 22:28:33 +0100 Dimitri Fedrau wrote:
+> Changes in V5:
+> 	- add missing statics for mv88q222x_revb0_init_seq0 and
+> 	  mv88q222x_revb0_init_seq1
+> 	- fix typo in commit message: autonegotiation
+> 	- fix ordering of Signed-off-by and Reviewed-by in commit messages
+> 	- add interrupt support for link detection
+> 	- add suspend / resume ops
+> 	- add support for internal temperature sensor
+> 	- add cable test support
+> 	- call .soft_reset in mv88q2xxx_config_aneg, this makes
+> 	  mv88q2xxx_config_aneg compatible for Marvell88Q222x devices and
+> 	  remove mv88q222x_config_aneg which is then just duplicated code
+> 	- cleanup mv88q2xxx_config_init and make it compatible with
+> 	  Marvell88Q222x devices
+> 	- move parts from mv88q222x_config_init to mv88q2xxx_config_init
+> 	  that are applicable for all Marvell88Q2xxx devices.
 
-Sorry about the confusion, DaveM changed the way he uses the states
-since they were documented. There were concurrent changes to the gve
-driver, patches no longer apply. Could you rebase?
+PHY maintainers - could anyone take a look at these patches?
 
