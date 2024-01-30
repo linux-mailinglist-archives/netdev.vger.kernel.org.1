@@ -1,122 +1,302 @@
-Return-Path: <netdev+bounces-67102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF1968420FE
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:18:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2B45842104
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:19:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D43341C21393
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:18:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A378283F80
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:19:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BE9960B8D;
-	Tue, 30 Jan 2024 10:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF7560B97;
+	Tue, 30 Jan 2024 10:19:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="blVGrEj7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RfEYFvKs"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF9A160869
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 10:18:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2213960B89;
+	Tue, 30 Jan 2024 10:19:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706609921; cv=none; b=rWUv5PvA69hnWX3znb+mhbn8PBSFVsGZrVYrXifHe9qyATbQ/t4YNoBrGCdryM8zsvz65wZ5o+zp8C6GSVHrYXaqkZPwh+quXxSr6MvORRTR5ZhiuF3cl1WEDTnGRDPMA+GhHjfQvOAXjojZwAhUbiEyCqUdTeyDc0nVQN4HfmU=
+	t=1706609960; cv=none; b=BpwAsdgWPQnLZVaI/U1P3QvoyKh0MbrHNxFxyPMqlZepw6LfLjzdH/VyHcETTQstvof4Xk1cxadAr1R30xg+XGEI4tWS6oVXl3gTEMpCGNH0w8n1FvfTTaMOLh3ZDnNzvRKlD0jkcYJTzoYs2IoMefNN5YhEOt02Z9Ep0lu0/Bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706609921; c=relaxed/simple;
-	bh=4TP+2pDSW/hwqAmEi97tuFXblX4QTnYCuHydZUDiKyI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SZBbigRUT4R91DVcndVHSrIfoaA9dwGmi+C+xMXM5335/oELLSq7yke1F9kI7fFAONidlXROp13OaNmVSDUq0HMV1gb5UGBpJmtalggyNALyFJUCwe8xairF9fIK3ua9J4CZNrm1Zg+zdtDkKLn7hnFTohtAwW6alpodhOywytA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=blVGrEj7; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706609918;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=4TP+2pDSW/hwqAmEi97tuFXblX4QTnYCuHydZUDiKyI=;
-	b=blVGrEj7JQ8e+7LLwd5VRrw2nimCeYzht4VAYVJyH6cCuG9O8Sr7mLIYlhMueu942sgHEM
-	hjAHDRL6+6+iCvUfDSfTSIARERfAJmLCbHsxL3Y2sykD03AXg2a7YldL2Ic0IEofZQALTf
-	CA/B2yTY+UR14zyGTextIs0x5Mm+QS8=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-15-YI3ellidM1y4jvROr0hWgA-1; Tue, 30 Jan 2024 05:18:36 -0500
-X-MC-Unique: YI3ellidM1y4jvROr0hWgA-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33930673253so258837f8f.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 02:18:36 -0800 (PST)
+	s=arc-20240116; t=1706609960; c=relaxed/simple;
+	bh=fKB9dzpAY93VunbxxIOucvP+WBk79nghQn/sAFXmGrs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sts2qCZsWwWLiJyTG3dJXghTaNA79MfB1vjCI8KtocRB2Kys4MpSQzjEdL0nnfIabSMyg0jv6Nj4gmTSxkJcLkf47NS/7Y4IsTVQVNJuSoqxDB04YFT8g3Jk6a3GGlVqyjTJC9YJn4R7Bgl884m064rtpJ9j23fd7Vpi/0JzJNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RfEYFvKs; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-510322d5363so4044202e87.1;
+        Tue, 30 Jan 2024 02:19:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706609956; x=1707214756; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=bqQQDhRRVdivtCR2RnVp4C+rg441BFeJmpW269ZUjvc=;
+        b=RfEYFvKshkM/tcnp3zfVB3NoSUQwE7PuNNYY5rHJP3+JpNlXPmrmLTeHS9AuhPRp3W
+         t37N7OLSrkFQoyYHwRZp7TYOLQSfyS8mEP5kLuVWWVvLqu4su6wmFC5Sxs+ph47SiHMu
+         zsJFXsr0bJgvGvz/M7UCd6e2Oq32IskW4GgZ4TmQWHOG71r7vCXae5JyJ1N+H8sgIX/5
+         ouq+CtXMK0JeYMnM3a8JQhn4PLkguNfFs3EJOS+LNrw0Kx9A+aALsmvqomup4KtcdyWQ
+         TE6WKIFGUJB0e8Nkpxdo6g4f8bsn/agIMf8hOWSZx7Py9klVf6PapcTzHcDKkwOAjFgb
+         G3Kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706609915; x=1707214715;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4TP+2pDSW/hwqAmEi97tuFXblX4QTnYCuHydZUDiKyI=;
-        b=sD01rgDNj9IbvFqHn4xPpb5/YsUXQECRl2MnoP1CrD2bHAPABMd2h7+U7bp11Kb3Y7
-         qObDab/Op+5A/IR4ka6BMRmMdGxzRrtpcOJ0ibxJAugROQfCzfm+yRIjRbTTOcFq/2eH
-         Zn9VFnWwceExqBLgX2zE0iuswsjsxb1/FIzmsF2Qf8HBdBi6aQN07d5RJ5UImav8ylrn
-         BgL4vZIYAmIe1qEw+EKYR7DcECFWb90TeAHetgY4vdOA+1uuijqjLoTHGmzze26Ger9W
-         gPowI0AxHC6s75BMR0uKkIpQvMHdtIHgLzDUQOqcTJgXSqbFOCM4tgx/w33hOJkxp3Lt
-         TvNw==
-X-Gm-Message-State: AOJu0YzB+ubwpbp5Ss/7T1fwgl7OSBCklM8Cg+34QoYb+Eq7I5k7uiL/
-	LTzTcvuI9oD0+lTN36KlBma4bTpxHXFEBnjlJC2dQVcYdU1LGpyBs6nubstkFgJP/8Vd2x8/as/
-	dwe9xUr87asQivCIMYFB3QzRiwufsqTlr60c6ujIu61lVTthv4LpB0Q==
-X-Received: by 2002:adf:c793:0:b0:337:c4c8:92f with SMTP id l19-20020adfc793000000b00337c4c8092fmr6766499wrg.3.1706609915647;
-        Tue, 30 Jan 2024 02:18:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH+844atY5uHJ3m9UogB9trmk575vzY0CsSl+JmNif5x7p/efSdhW/kDww3eCWU1/h+yIWJmg==
-X-Received: by 2002:adf:c793:0:b0:337:c4c8:92f with SMTP id l19-20020adfc793000000b00337c4c8092fmr6766487wrg.3.1706609915265;
-        Tue, 30 Jan 2024 02:18:35 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-232-203.dyn.eolo.it. [146.241.232.203])
-        by smtp.gmail.com with ESMTPSA id x11-20020adfec0b000000b0033afc875fd5sm919133wrn.49.2024.01.30.02.18.33
+        d=1e100.net; s=20230601; t=1706609956; x=1707214756;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bqQQDhRRVdivtCR2RnVp4C+rg441BFeJmpW269ZUjvc=;
+        b=LfWia+3ljYRhi3WaZtPdAWdSeZIGhnJ/j5TvQghKnBBgqMylR/ojf8dXLQMel1xG/6
+         EYNvG3G63SGpWSWXnt3N1X7NACv1j02iXNXXeRThxQW5S+ROM19FIXT1xn/2ElOqrEvW
+         vp5LsLW/PWmclktC3P0VM1r9NHX5Ndb8eGj2Q5utIAXw9atqs0AJf3XtnoLAXYFkA9xe
+         PROl5XBzTn/dW91+ujATEGH9bJDYRgPphAH2WUturPmAgMM1GrXmC2Ev2VF7ihUSoWeV
+         fw5zpQq+0qspDw1hNo58L2eQI/XMDdCR7vYBVfsBI4h+3Z5AJT4styhkhietZNs+iQFy
+         7OjQ==
+X-Gm-Message-State: AOJu0Yz/CMxBsWWW7B3hEgLDdgOV7ec3TlSmQnR1JulIiaLGZeTTjgag
+	B88SvMHHOUcnxjHqFOoeOiLty061P+9tKZe/0kcEJWovfU3Hxuz/
+X-Google-Smtp-Source: AGHT+IGkfWodCAd1V4VL3ykTegESEJ5oK9yDXZxXBUS94LBvk3lIzAz/vdRHyu2Bb1UwWde0cjKpZg==
+X-Received: by 2002:ac2:47f8:0:b0:510:153a:6bdc with SMTP id b24-20020ac247f8000000b00510153a6bdcmr4918922lfp.19.1706609955922;
+        Tue, 30 Jan 2024 02:19:15 -0800 (PST)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id f3-20020a056512360300b005101bcd1d8esm1407264lfs.292.2024.01.30.02.19.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 02:18:34 -0800 (PST)
-Message-ID: <8f53e63311f6e6c353768bf86775402735dc9b5a.camel@redhat.com>
-Subject: Re: [net-next v6 2/4] net: wwan: t7xx: Add sysfs attribute for
- device state machine
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jinjian Song <songjinjian@hotmail.com>, netdev@vger.kernel.org
-Cc: chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com, 
- haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com, 
- ricardo.martinez@linux.intel.com, loic.poulain@linaro.org, 
- ryazanov.s.a@gmail.com, johannes@sipsolutions.net, davem@davemloft.net, 
- edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.com, 
- vsankar@lenovo.com, danielwinkler@google.com, nmarupaka@google.com, 
- joey.zhao@fibocom.com, liuqf@fibocom.com, felix.yan@fibocom.com, Jinjian
- Song <jinjian.song@fibocom.com>
-Date: Tue, 30 Jan 2024 11:18:33 +0100
-In-Reply-To: <MEYP282MB2697447F0AFBA93A9033DE23BB7B2@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
-References: <20240124170010.19445-1-songjinjian@hotmail.com>
-	 <MEYP282MB2697447F0AFBA93A9033DE23BB7B2@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+        Tue, 30 Jan 2024 02:19:15 -0800 (PST)
+Date: Tue, 30 Jan 2024 13:19:12 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Andrew Halaney <ahalaney@redhat.com>
+Cc: Suraj Jaiswal <quic_jsuraj@quicinc.com>, Vinod Koul <vkoul@kernel.org>, 
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Andy Gross <agross@kernel.org>, 
+	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, Prasad Sodagudi <psodagud@quicinc.com>, 
+	Rob Herring <robh@kernel.org>, kernel@quicinc.com
+Subject: Re: [PATCH net-next v10 3/3] net: stmmac: Add driver support for
+ common safety IRQ
+Message-ID: <bavqej4yjxjyqubofpgwl2ixkvbbevr5kvtwnkx24qxh7jznjp@hdbcl4bfcpqh>
+References: <20240129121129.3581530-1-quic_jsuraj@quicinc.com>
+ <20240129121129.3581530-4-quic_jsuraj@quicinc.com>
+ <zfnh5lfz63zlxm6ysexlfv2xstaw4pfnqazmmhdtywxdpwihqu@dfh6wwhcziuo>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <zfnh5lfz63zlxm6ysexlfv2xstaw4pfnqazmmhdtywxdpwihqu@dfh6wwhcziuo>
 
-On Thu, 2024-01-25 at 01:00 +0800, Jinjian Song wrote:
-> From: Jinjian Song <jinjian.song@fibocom.com>
->=20
-> Add support for userspace to get/set the device mode,
-> e.g., reset/ready/fastboot mode.
->=20
-> Signed-off-by: Jinjian Song <jinjian.song@fibocom.com>
+Hi Andrew, Suraj
 
-It would be nice to add a reference to the fastboot documentation and a
-more functional description of what can be achieved using this new
-interface.=20
+On Mon, Jan 29, 2024 at 10:20:18AM -0600, Andrew Halaney wrote:
+> On Mon, Jan 29, 2024 at 05:41:29PM +0530, Suraj Jaiswal wrote:
+> > Add support to listen HW safety IRQ like ECC(error
+> > correction code), DPP(data path parity), FSM(finite state
+> > machine) fault in common IRQ line.
+> > 
+> > Signed-off-by: Suraj Jaiswal <quic_jsuraj@quicinc.com>
+> > ---
+> >  drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
+> >  drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  3 ++
+> >  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 41 ++++++++++++++++++-
+> >  .../ethernet/stmicro/stmmac/stmmac_platform.c |  8 ++++
+> >  4 files changed, 51 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+> > index 721c1f8e892f..b9233b09b80f 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/common.h
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+> > @@ -344,6 +344,7 @@ enum request_irq_err {
+> >  	REQ_IRQ_ERR_ALL,
+> >  	REQ_IRQ_ERR_TX,
+> >  	REQ_IRQ_ERR_RX,
+> > +	REQ_IRQ_ERR_SFTY,
+> >  	REQ_IRQ_ERR_SFTY_UE,
+> >  	REQ_IRQ_ERR_SFTY_CE,
+> >  	REQ_IRQ_ERR_LPI,
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac.h b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> > index 9f89acf31050..ca3d93851bed 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac.h
+> > @@ -31,6 +31,7 @@ struct stmmac_resources {
+> >  	int wol_irq;
+> >  	int lpi_irq;
+> >  	int irq;
+> > +	int sfty_irq;
+> >  	int sfty_ce_irq;
+> >  	int sfty_ue_irq;
+> >  	int rx_irq[MTL_MAX_RX_QUEUES];
+> > @@ -297,6 +298,7 @@ struct stmmac_priv {
+> >  	void __iomem *ptpaddr;
+> >  	void __iomem *estaddr;
+> >  	unsigned long active_vlans[BITS_TO_LONGS(VLAN_N_VID)];
+> > +	int sfty_irq;
+> >  	int sfty_ce_irq;
+> >  	int sfty_ue_irq;
+> >  	int rx_irq[MTL_MAX_RX_QUEUES];
+> > @@ -305,6 +307,7 @@ struct stmmac_priv {
+> >  	char int_name_mac[IFNAMSIZ + 9];
+> >  	char int_name_wol[IFNAMSIZ + 9];
+> >  	char int_name_lpi[IFNAMSIZ + 9];
+> > +	char int_name_sfty[IFNAMSIZ + 10];
+> >  	char int_name_sfty_ce[IFNAMSIZ + 10];
+> >  	char int_name_sfty_ue[IFNAMSIZ + 10];
+> >  	char int_name_rx_irq[MTL_MAX_TX_QUEUES][IFNAMSIZ + 14];
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > index 47de466e432c..e0192a282121 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > @@ -3592,6 +3592,10 @@ static void stmmac_free_irq(struct net_device *dev,
+> >  		if (priv->wol_irq > 0 && priv->wol_irq != dev->irq)
+> >  			free_irq(priv->wol_irq, dev);
+> >  		fallthrough;
+> > +	case REQ_IRQ_ERR_SFTY:
+> > +		if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq)
+> > +			free_irq(priv->sfty_irq, dev);
+> > +		fallthrough;
+> >  	case REQ_IRQ_ERR_WOL:
+> >  		free_irq(dev->irq, dev);
+> >  		fallthrough;
+> > @@ -3661,6 +3665,23 @@ static int stmmac_request_irq_multi_msi(struct net_device *dev)
+> >  		}
+> >  	}
+> >  
+> > +	/* Request the common Safety Feature Correctible/Uncorrectible
+> > +	 * Error line in case of another line is used
+> > +	 */
+> > +	if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq) {
+> > +		int_name = priv->int_name_sfty;
+> > +		sprintf(int_name, "%s:%s", dev->name, "safety");
+> > +		ret = request_irq(priv->sfty_irq, stmmac_safety_interrupt,
+> > +				  0, int_name, dev);
+> > +		if (unlikely(ret < 0)) {
+> > +			netdev_err(priv->dev,
+> > +				   "%s: alloc sfty MSI %d (error: %d)\n",
+> > +				   __func__, priv->sfty_irq, ret);
+> > +			irq_err = REQ_IRQ_ERR_SFTY;
+> > +			goto irq_error;
+> > +		}
+> > +	}
+> > +
+> >  	/* Request the Safety Feature Correctible Error line in
+> >  	 * case of another line is used
+> >  	 */
+> > @@ -3798,6 +3819,21 @@ static int stmmac_request_irq_single(struct net_device *dev)
+> >  		}
+> >  	}
+> >  
+> > +	/* Request the common Safety Feature Correctible/Uncorrectible
+> > +	 * Error line in case of another line is used
+> > +	 */
+> > +	if (priv->sfty_irq > 0 && priv->sfty_irq != dev->irq) {
+> > +		ret = request_irq(priv->sfty_irq, stmmac_safety_interrupt,
+> > +				  IRQF_SHARED, dev->name, dev);
+> > +		if (unlikely(ret < 0)) {
+> > +			netdev_err(priv->dev,
+> > +				   "%s: ERROR: allocating the sfty IRQ %d (%d)\n",
+> > +				   __func__, priv->sfty_irq, ret);
+> > +			irq_err = REQ_IRQ_ERR_SFTY;
+> > +			goto irq_error;
+> > +		}
+> > +	}
+> > +
+> >  	return 0;
+> >  
+> >  irq_error:
+> > @@ -6022,8 +6058,8 @@ static irqreturn_t stmmac_interrupt(int irq, void *dev_id)
+> >  	if (test_bit(STMMAC_DOWN, &priv->state))
+> >  		return IRQ_HANDLED;
+> >  
+> > -	/* Check if a fatal error happened */
+> > -	if (stmmac_safety_feat_interrupt(priv))
+> > +	/* Check ASP error if it isn't delivered via an individual IRQ */
+> > +	if (priv->sfty_irq <= 0 && stmmac_safety_feat_interrupt(priv))
+> >  		return IRQ_HANDLED;
+> >  
+> >  	/* To handle Common interrupts */
+> > @@ -7462,6 +7498,7 @@ int stmmac_dvr_probe(struct device *device,
+> >  	priv->dev->irq = res->irq;
+> >  	priv->wol_irq = res->wol_irq;
+> >  	priv->lpi_irq = res->lpi_irq;
+> > +	priv->sfty_irq = res->sfty_irq;
+> >  	priv->sfty_ce_irq = res->sfty_ce_irq;
+> >  	priv->sfty_ue_irq = res->sfty_ue_irq;
+> >  	for (i = 0; i < MTL_MAX_RX_QUEUES; i++)
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > index 70eadc83ca68..ab250161fd79 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> > @@ -743,6 +743,14 @@ int stmmac_get_platform_resources(struct platform_device *pdev,
+> >  		dev_info(&pdev->dev, "IRQ eth_lpi not found\n");
+> >  	}
+> >  
+> > +	stmmac_res->sfty_irq =
+> > +		platform_get_irq_byname_optional(pdev, "sfty");
+> > +	if (stmmac_res->sfty_irq < 0) {
+> > +		if (stmmac_res->sfty_irq == -EPROBE_DEFER)
+> > +			return -EPROBE_DEFER;
 
-Thanks!
+> > +		dev_info(&pdev->dev, "IRQ safety IRQ not found\n");
+> 
+> Serge had this comment on v9: https://lore.kernel.org/netdev/giimpexp3qk3byb725r3ot3aund2bwmi45yrctkydatm73d5af@e36xmjf2ehvu/
+> 
+>     s/IRQ safety IRQ/IRQ sfty
+>     * Although I would have also converted this to just dev_dbg() since
+>     * the IRQ line is optional and is present on a single platform you
+>     * have.
+> 
+> 
+>     With the subject and the log-message fixed feel free to add:
+> 
+>     Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+> 
+>     -Serge(y)
+> 
+> If you would have changed the dev_info() here it would have been
+> appropriate to add his "Reviewed-by:" tag, which makes your series more
+> likely to get merged. I assume you just misunderstood/didn't see the
+> request (I'd expect a comment somewhere about why you *don't* want to do
+> that if you did see it but decided not to do it), but in the future my
+> advice is for a minor change like this to just make it and take the
+> Reviewed-by tag on your patch!
 
-Paolo
+Right. Suraj likely has just missed that part, because having "IRQ
+safety IRQ" statement sounds clumsy and not looking alike the others
+optional IRQ info-messages, meanwhile having "IRQ sfty" instead would
+be more correct.
 
+Anyway, Suraj, could you please at least fix the info-string and
+resubmit the series? With that fixed feel free to add my tag:
+
+Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+
+Note I am not insisting in using dev_dbg() instead of dev_info() since
+from one side the sfty IRQ line getting procedure would look alike to
+the others optional IRQs retrieved in this method, from another side
+using dbg log-level here and info-level for others IRQ wouldn't look
+coherent. So it seems reasonable to use info-level everywhere and
+convert to dbg-level at once (eventually).
+
+-Serge(y)
+
+> 
+> > +	}
+> > +
+> >  	stmmac_res->addr = devm_platform_ioremap_resource(pdev, 0);
+> >  
+> >  	return PTR_ERR_OR_ZERO(stmmac_res->addr);
+> > -- 
+> > 2.25.1
+> > 
+> 
+> 
 
