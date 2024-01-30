@@ -1,118 +1,272 @@
-Return-Path: <netdev+bounces-67271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 641D7842884
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 16:58:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7AB884288D
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 17:00:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 024DC1F25BF7
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:58:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F10A286827
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 16:00:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA48585C6C;
-	Tue, 30 Jan 2024 15:58:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="PQ8Sh66q"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F4CD85C7E;
+	Tue, 30 Jan 2024 16:00:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 078EA85C61
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 15:58:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED0385C67;
+	Tue, 30 Jan 2024 16:00:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706630302; cv=none; b=ESW6Me8l5KrH3M7yg5bCeVIK0b+Y0nDTkTZ9iQrSMlMPOyI+/KA4eq/RjSNntNMLymBzaZunfzNDt4/uTBpkogI/fYNQjZdDbxlwtXPUwF9tTT7EfTvHMyCJbO/LzGwktQV79D8cKOrd0jDGqnppuuBmcOJDrY85GFYmxZu0eOk=
+	t=1706630412; cv=none; b=nkaiiqjFILxYI+IlpNNYgqRhILVfuynhzv6gHbvJS7w7htao/1zfI7nVBdY67TB/lYv76PAs0t2PT8RLdIcIxwx6XIgY5dl4Nd0ss64dH1YSlce0pNZfueuKl7Aar9c3RCL7OFJuffZlGJdJ9O62ct1duIfqUBU9sbH5LEBRKUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706630302; c=relaxed/simple;
-	bh=vGngBmxXTomuP/vpBIQ3bf01KEfPj3CLlspWz8I9tyo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qCWc4HXtNptcASpxWFsBjm9Uqt2RnwpTghy7Rg9cjc0C3BzkwBAsfv1yoU7MunYK5v/yk8ZwZ/KAQ+GWI3cFceVIbzXeyOzdur3c+djd6hGJ81PKxFAwk3NApHKEWz71aMxsfZHiglmY6xrh6tJh0pmWlXZS2qRGRYC1d46Z+wQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=PQ8Sh66q; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40faff092a2so2841415e9.2
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 07:58:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706630298; x=1707235098; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kp7BtQrHgEbPedtnBZofKASR1P5L52u8moyoZoK43Z8=;
-        b=PQ8Sh66q/ifr1kQpiBcoV1pol1jNva4MnztpxgwZMsbkeSgBvykdFdY9/ruyx5fZor
-         YuZKzuGvCpgKYYIMH7lSuJD5cxeweQPR++Ph2nmWJwHpEL5pYdHeLx0dGIAFBaKEIeLa
-         4nFg+v/Hc1P7ztAFSGknrU6NDWLlsVlQ5jrpdqJyKZr6Qwi0Zg8DaZAM5oBEGgMKmk3p
-         lPT61RZZwdUS1kEwRNuKmNfcxcjGSr1REJxnzwpraT7rRHTcVgCpO2yox8VXvCwmq8e9
-         Ae3EPcms+x/NU6FR2rPaBHaGjgH0geUuOVcZRhqcuVaOxBzhVSvuxYRNIEKHNo0bNZHe
-         cPOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706630298; x=1707235098;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kp7BtQrHgEbPedtnBZofKASR1P5L52u8moyoZoK43Z8=;
-        b=O8CLL05s0WBkAoAlf9qAaJcHwKICH0X1ypn1CdbZygZdxtIFXsvuzSF7zT5G0KadPC
-         g08T0uPUTKk/LqO2LT8/ZmcIMgBNGO4RNvTdDBHNHeZglXqept/Wf3UA9gYTWUunlg4I
-         QnJhV2U+l7mLUnmWthQ8ubRI4SRySetD9Zx1QAvRSZ+XjI4bOyXawAlFsnMHAn8l32px
-         adKvN47kWMhFwE+kPLsWeepOIhAH9Pu6DEBWjkCNLuR419E5scwC3HKiv629yDEdafvT
-         lcEuoTRb8al8JxWe5K9uybsBfJvMGYgh42rAydWbsI0iysd/DzXMAdvxonPHDHtXwt4Z
-         +bNw==
-X-Gm-Message-State: AOJu0YwIPShS5G9vU6ytaC/oQgPu1wpvpt/xpvXu/WmeFvUBpQ6ls3s+
-	Sm1nTVlkO3++0ejimtZhzVLoKOs15q+yvGkfV83ydwkLGTK9TW1LGQRTFplXbw3JVsrqMz/QluY
-	tlmKJYg==
-X-Google-Smtp-Source: AGHT+IH1cDW91fUA6vTUDWB+GC7K4rsNJbGXOmR7ryO1ddDwAavdHSKehpdm7sJ/Fm7YxvyGdQAtIg==
-X-Received: by 2002:adf:f884:0:b0:33a:e4da:2214 with SMTP id u4-20020adff884000000b0033ae4da2214mr5708782wrp.50.1706630298031;
-        Tue, 30 Jan 2024 07:58:18 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXgkBSCZUFb6zn3saaEq/l5yGnq+DljSDAjpFghRF1VyPIrcXohivd9uGgf0ZoR7pO3BuNmvgGUnVLwQRkWVysSPnCZi9VfAIDobUXEFNTYiXWZlzOUdDZnFC/74lTr4wXZB3y53BQo9VvlAxOEZVYVfYYdwZod+1Qy/3XwMBnu8Cf7lu7Ef2PhcOhy7zM8kEpnhnOg1JgmTk/Mw9dW+B0zDwtr1KhYm3BEO6TgAkvk+6Shn0n+yX7v
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id z18-20020adfec92000000b0033afbd1962esm1885919wrn.69.2024.01.30.07.58.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 07:58:17 -0800 (PST)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	vadim.fedorenko@linux.dev,
-	arkadiusz.kubalewski@intel.com
-Subject: [patch net-next] dpll: move xa_erase() call in to match dpll_pin_alloc() error path order
-Date: Tue, 30 Jan 2024 16:58:14 +0100
-Message-ID: <20240130155814.268622-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1706630412; c=relaxed/simple;
+	bh=f0XoKKeF4VVk0TM0xyBbuFY+at07XPMAZt17aHCkvGc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WNWxqYLaRX0ZIcAS74affFizp9x2rRdfAtba1NvDCgWC5jqyOkH78Qk3NgYLg7CE/kPwabIif4AOfn/bvHTfhdI2iOtcC7UnL6HwqNqiD0M1qpIVSH6DMVrIubS7cq37UqNdT5wCXtj00bncxijlx4PaOcMhWItghWOmlq0zgMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1rUqWS-0007GW-1O;
+	Tue, 30 Jan 2024 15:59:40 +0000
+Date: Tue, 30 Jan 2024 15:59:28 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: arinc.unal@arinc9.com
+Cc: DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Russell King <linux@armlinux.org.uk>, mithat.guner@xeront.com,
+	erkin.bozoglu@xeront.com,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v2 5/7] net: dsa: mt7530: simplify
+ mt7530_setup_port6() and change to void
+Message-ID: <Zbkc4BRORWYu79GZ@makrotopia.org>
+References: <20240130-for-netnext-mt7530-improvements-2-v2-0-ba06f5dd9eb0@arinc9.com>
+ <20240130-for-netnext-mt7530-improvements-2-v2-5-ba06f5dd9eb0@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240130-for-netnext-mt7530-improvements-2-v2-5-ba06f5dd9eb0@arinc9.com>
 
-From: Jiri Pirko <jiri@nvidia.com>
+On Tue, Jan 30, 2024 at 06:20:51PM +0300, Arınç ÜNAL via B4 Relay wrote:
+> From: Arınç ÜNAL <arinc.unal@arinc9.com>
+> 
+> This code is from before this driver was converted to phylink API. Phylink
+> deals with the unsupported interface cases before mt7530_setup_port6() is
+> run. Therefore, the default case would never run. However, it must be
+> defined nonetheless to handle all the remaining enumeration values, the
+> phy-modes.
+> 
+> Switch to if statement for RGMII and return which simplifies the code and
+> saves an indent.
+> 
+> Set P6_INTF_MODE, which is the the three least significant bits of the
+> MT7530_P6ECR register, to 0 for RGMII even though it will already be 0
+> after reset. This is to keep supporting dynamic reconfiguration of the port
+> in the case the interface changes from TRGMII to RGMII. The core operations
+> for TRGMII does not interfere with RGMII so no need to undo them.
 
-This is cosmetics. Move the call of xa_erase() in dpll_pin_put()
-so the order of cleanup calls matches the error path of
-dpll_pin_alloc().
+That last sentence doesn't parse English gramar.
+"operations": plural
+"does": singular
 
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- drivers/dpll/dpll_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Should probably be either "The core operation for TRGMII does not..."
+or "The core operations for TRGMII do not..."
 
-diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
-index 5152bd1b0daf..61e5c607a72f 100644
---- a/drivers/dpll/dpll_core.c
-+++ b/drivers/dpll/dpll_core.c
-@@ -560,9 +560,9 @@ void dpll_pin_put(struct dpll_pin *pin)
- {
- 	mutex_lock(&dpll_lock);
- 	if (refcount_dec_and_test(&pin->refcount)) {
-+		xa_erase(&dpll_pin_xa, pin->id);
- 		xa_destroy(&pin->dpll_refs);
- 		xa_destroy(&pin->parent_refs);
--		xa_erase(&dpll_pin_xa, pin->id);
- 		dpll_pin_prop_free(&pin->prop);
- 		kfree(pin);
- 	}
--- 
-2.43.0
+As you are mentioning it, I'm now curious if you consider to
+dynamically reconfiguring TRGIII<->RGMII on port 6 depending on
+whether there is more then 1 GBit/s possible bandwidth needed between
+port 6 and the remaining ports? That could make sense for power
+management, but then we should at least again switch off the TRGMII
+clocks in the RGMII case before returning, see my suggestion inline
+below.
 
+> 
+> Read XTAL after checking for RGMII as it's only needed for the TRGMII
+> interface mode.
+> 
+> Change mt7530_setup_port6() to void now that there're no error cases left.
+> 
+> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+
+Reviewed-by: Daniel Golle <daniel@makrotopia.org>
+
+> ---
+>  drivers/net/dsa/mt7530.c | 103 ++++++++++++++++++++---------------------------
+>  1 file changed, 43 insertions(+), 60 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+> index c4d492e29fdf..36dc2bbcf3b6 100644
+> --- a/drivers/net/dsa/mt7530.c
+> +++ b/drivers/net/dsa/mt7530.c
+> @@ -414,70 +414,57 @@ mt753x_preferred_default_local_cpu_port(struct dsa_switch *ds)
+>  }
+>  
+>  /* Setup port 6 interface mode and TRGMII TX circuit */
+> -static int
+> +static void
+>  mt7530_setup_port6(struct dsa_switch *ds, phy_interface_t interface)
+>  {
+>  	struct mt7530_priv *priv = ds->priv;
+> -	u32 ncpo1, ssc_delta, trgint, xtal;
+> -
+> -	xtal = mt7530_read(priv, MT7530_MHWTRAP) & HWTRAP_XTAL_MASK;
+> +	u32 ncpo1, ssc_delta, xtal;
+>  
+> -	switch (interface) {
+> -	case PHY_INTERFACE_MODE_RGMII:
+> -		trgint = 0;
+> -		break;
+> -	case PHY_INTERFACE_MODE_TRGMII:
+> -		trgint = 1;
+> -		if (xtal == HWTRAP_XTAL_25MHZ)
+> -			ssc_delta = 0x57;
+> -		else
+> -			ssc_delta = 0x87;
+> -		if (priv->id == ID_MT7621) {
+> -			/* PLL frequency: 125MHz: 1.0GBit */
+> -			if (xtal == HWTRAP_XTAL_40MHZ)
+> -				ncpo1 = 0x0640;
+> -			if (xtal == HWTRAP_XTAL_25MHZ)
+> -				ncpo1 = 0x0a00;
+> -		} else { /* PLL frequency: 250MHz: 2.0Gbit */
+> -			if (xtal == HWTRAP_XTAL_40MHZ)
+> -				ncpo1 = 0x0c80;
+> -			if (xtal == HWTRAP_XTAL_25MHZ)
+> -				ncpo1 = 0x1400;
+> -		}
+> -		break;
+> -	default:
+> -		dev_err(priv->dev, "xMII interface %d not supported\n",
+> -			interface);
+> -		return -EINVAL;
+> +	if (interface == PHY_INTERFACE_MODE_RGMII) {
+> +		mt7530_rmw(priv, MT7530_P6ECR, P6_INTF_MODE_MASK,
+> +			   P6_INTF_MODE(0));
+
+Maybe at least switch off TRGMIICK here because we are sure we don't need it
+in the RGMII case, ie:
+core_clear(priv, CORE_TRGMII_GSW_CLK_CG, REG_TRGMIICK_EN);
+
+And that then is another line of code already present just below which
+means you could keep variable trgint as it was and return after
+switching off TRGMIICK below anyway...
+
+> +		return;
+>  	}
+>  
+> -	mt7530_rmw(priv, MT7530_P6ECR, P6_INTF_MODE_MASK,
+> -		   P6_INTF_MODE(trgint));
+> +	mt7530_rmw(priv, MT7530_P6ECR, P6_INTF_MODE_MASK, P6_INTF_MODE(1));
+>  
+> -	if (trgint) {
+> -		/* Disable the MT7530 TRGMII clocks */
+> -		core_clear(priv, CORE_TRGMII_GSW_CLK_CG, REG_TRGMIICK_EN);
+> +	xtal = mt7530_read(priv, MT7530_MHWTRAP) & HWTRAP_XTAL_MASK;
+>  
+> -		/* Setup the MT7530 TRGMII Tx Clock */
+> -		core_write(priv, CORE_PLL_GROUP5, RG_LCDDS_PCW_NCPO1(ncpo1));
+> -		core_write(priv, CORE_PLL_GROUP6, RG_LCDDS_PCW_NCPO0(0));
+> -		core_write(priv, CORE_PLL_GROUP10, RG_LCDDS_SSC_DELTA(ssc_delta));
+> -		core_write(priv, CORE_PLL_GROUP11, RG_LCDDS_SSC_DELTA1(ssc_delta));
+> -		core_write(priv, CORE_PLL_GROUP4,
+> -			   RG_SYSPLL_DDSFBK_EN | RG_SYSPLL_BIAS_EN |
+> -			   RG_SYSPLL_BIAS_LPF_EN);
+> -		core_write(priv, CORE_PLL_GROUP2,
+> -			   RG_SYSPLL_EN_NORMAL | RG_SYSPLL_VODEN |
+> -			   RG_SYSPLL_POSDIV(1));
+> -		core_write(priv, CORE_PLL_GROUP7,
+> -			   RG_LCDDS_PCW_NCPO_CHG | RG_LCCDS_C(3) |
+> -			   RG_LCDDS_PWDB | RG_LCDDS_ISO_EN);
+> +	if (xtal == HWTRAP_XTAL_25MHZ)
+> +		ssc_delta = 0x57;
+> +	else
+> +		ssc_delta = 0x87;
+>  
+> -		/* Enable the MT7530 TRGMII clocks */
+> -		core_set(priv, CORE_TRGMII_GSW_CLK_CG, REG_TRGMIICK_EN);
+> +	if (priv->id == ID_MT7621) {
+> +		/* PLL frequency: 125MHz: 1.0GBit */
+> +		if (xtal == HWTRAP_XTAL_40MHZ)
+> +			ncpo1 = 0x0640;
+> +		if (xtal == HWTRAP_XTAL_25MHZ)
+> +			ncpo1 = 0x0a00;
+> +	} else { /* PLL frequency: 250MHz: 2.0Gbit */
+> +		if (xtal == HWTRAP_XTAL_40MHZ)
+> +			ncpo1 = 0x0c80;
+> +		if (xtal == HWTRAP_XTAL_25MHZ)
+> +			ncpo1 = 0x1400;
+>  	}
+>  
+> -	return 0;
+> +	/* Disable the MT7530 TRGMII clocks */
+> +	core_clear(priv, CORE_TRGMII_GSW_CLK_CG, REG_TRGMIICK_EN);
+
+... by moving this line up and letting it happen unconditionally for
+both RGMII and TRGMII (in case that works and doesn't break the RGMII
+case, but I assume it doesn't)
+
+> +
+> +	/* Setup the MT7530 TRGMII Tx Clock */
+> +	core_write(priv, CORE_PLL_GROUP5, RG_LCDDS_PCW_NCPO1(ncpo1));
+> +	core_write(priv, CORE_PLL_GROUP6, RG_LCDDS_PCW_NCPO0(0));
+> +	core_write(priv, CORE_PLL_GROUP10, RG_LCDDS_SSC_DELTA(ssc_delta));
+> +	core_write(priv, CORE_PLL_GROUP11, RG_LCDDS_SSC_DELTA1(ssc_delta));
+> +	core_write(priv, CORE_PLL_GROUP4, RG_SYSPLL_DDSFBK_EN |
+> +		   RG_SYSPLL_BIAS_EN | RG_SYSPLL_BIAS_LPF_EN);
+> +	core_write(priv, CORE_PLL_GROUP2, RG_SYSPLL_EN_NORMAL |
+> +		   RG_SYSPLL_VODEN | RG_SYSPLL_POSDIV(1));
+> +	core_write(priv, CORE_PLL_GROUP7, RG_LCDDS_PCW_NCPO_CHG |
+> +		   RG_LCCDS_C(3) | RG_LCDDS_PWDB | RG_LCDDS_ISO_EN);
+> +
+> +	/* Enable the MT7530 TRGMII clocks */
+> +	core_set(priv, CORE_TRGMII_GSW_CLK_CG, REG_TRGMIICK_EN);
+>  }
+>  
+>  static void
+> @@ -2609,15 +2596,11 @@ mt7530_mac_config(struct dsa_switch *ds, int port, unsigned int mode,
+>  		  phy_interface_t interface)
+>  {
+>  	struct mt7530_priv *priv = ds->priv;
+> -	int ret;
+>  
+> -	if (port == 5) {
+> +	if (port == 5)
+>  		mt7530_setup_port5(priv->ds, interface);
+> -	} else if (port == 6) {
+> -		ret = mt7530_setup_port6(priv->ds, interface);
+> -		if (ret)
+> -			return ret;
+> -	}
+> +	else if (port == 6)
+> +		mt7530_setup_port6(priv->ds, interface);
+>  
+>  	return 0;
+>  }
+> 
+> -- 
+> 2.40.1
+> 
+> 
 
