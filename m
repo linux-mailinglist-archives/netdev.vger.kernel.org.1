@@ -1,130 +1,112 @@
-Return-Path: <netdev+bounces-67234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0113D8426E4
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:26:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 876F18426F0
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:30:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7DA31C253DE
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:26:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B99771C2506B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC1CE6F08E;
-	Tue, 30 Jan 2024 14:26:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3572BF4EE;
+	Tue, 30 Jan 2024 14:30:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="lIpVxYMX"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="X8Ecblo8"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 369906E2C1;
-	Tue, 30 Jan 2024 14:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FE0612E5B
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 14:30:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706624799; cv=none; b=Y+PPAl3wMpt+gGdf74b9my3sdU1Ho1JgmbXyVDz6QyITe0aq3VI4JK0WzrZAlwzerkQ/lkHkkvM6aZz+fvoIUf0SlOXaT2Kl3Ni6+SQeEStbuoyHMbwM+62uh//SvpuhpMQhANfe5BRwBVT+Jai9Rln/cF4iaIBX8hpqj9iIjHg=
+	t=1706625057; cv=none; b=uUIldOHxZzUVas6pDxpHELcEwsMYJ8f1usydBY4m8p/u0P9dDOu/B6lgdPmC9Vz0a2veQlRnew1AH1JIRPSCROheYZOR2SpIjZznMcGoEB5Mr/KsxUjWjqHuOszhKJ7BK5BJdc0TdEVTUYrXpfiFGP1x9DJcKrix/dzU1hDXcYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706624799; c=relaxed/simple;
-	bh=f9nVK+++urQNiYuRkZtGBcJA2X/ZFOMRIO09d7zR0Vo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mJHZjqI+X6cwjdM4AR2nIkodAwl3JdSYi0C5Grr3V4We5nEtZvxm18G042t+89af5UuUoAWkdZjm9VfCVq8BfoySeTd57rXAVqZfLP8Qzi0TZ06yt4qOv5bCEJPfai1+LPKX6HJqK4+RiAc4rAgZN7dyB7uZKlpY6OFo6ixTnK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=lIpVxYMX; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8E3C81C000E;
-	Tue, 30 Jan 2024 14:26:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1706624795;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EiU+vp3jmxj1RQvTE/aNTb9Remw5rmZoUoKv2t5MunA=;
-	b=lIpVxYMXZCa4HN5li0menqRxSUg6vkEUPhvFUqJ5VTxetW7YHyR0ScfsR5g7qFNFfQFhsU
-	/GRQVAzrasNhW3ICz/tX6L/w3LV2YslSM2K9TCMk14M7u60E0lSISz63YaS/yKVmfzFyXN
-	La1rgFSd4Wg22M/jvjqLFGvyAXXclRwiNc0cpQJkY+iVUO5v0BZH4e/PTBE2xYRyGRFOn0
-	6ZLys8l9Cl/y/3+x2mcuOVqm4b7ctVFruZkFU9CWmQc0zjDRQG4cvgbQXf64kxuzbuiggH
-	3LB5RhFoLEwzk2Ah0CiuvGh5lHSNE9Inw99BkBBpBWsZ37RHmjJf1Tjg8frtEA==
-Message-ID: <8b7e1d9d-70ec-4664-be04-48a2e2877891@arinc9.com>
-Date: Tue, 30 Jan 2024 17:26:29 +0300
+	s=arc-20240116; t=1706625057; c=relaxed/simple;
+	bh=9JuXSW7FVow1F3Kdl1e6VyrD170a+y5aAKbooQWMwjs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bFuLPpRXXcVGbBA7zcPtrEutlh51BqiXoLBhRS4SXDZIpTQxb6K/DZkd7z7k14sMoA9URU0WMv6YTYwirMC+uqwZE8ccldMmuZk/lNuoKhsroUgyXFzHXSevXNT4PsimiNVxcJUwWB3a40W+c+D7OPDTDl6UyArLAQhaOwnEupg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=X8Ecblo8; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40e80046264so49564705e9.0
+        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 06:30:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706625052; x=1707229852; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9JuXSW7FVow1F3Kdl1e6VyrD170a+y5aAKbooQWMwjs=;
+        b=X8Ecblo8RDgEUc35evhUBxi9kb7gDRyZ2vjLyMl+eYW8ZS71aesQ2bVpb9OMSZpNup
+         lKFci2WkFyNz06vY/tEl6Cp5Ajamkje7X3NqGZmw0WFfEAA04hoqUQdPdEkuECs3MIrS
+         WLaSZCvM5CqlB4+3eh34nKMbbtGTjl/+UddvQRRwzao8sA53/Q4oN8NOlfd5Gr0VJNwF
+         Ox+qRp4nlsoSHnVN06xmKrPpwvuozp1PVhRPXnCZ+RbFLDgX7i4MyoaIRnC8DhguJTUy
+         YY6eNOQ3jh8xsbqsVgjX1JsblmwOzmFZJ8Y935RE4wCgqYvuNPcIllDmkuX9C5wnmUFz
+         RRCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706625052; x=1707229852;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9JuXSW7FVow1F3Kdl1e6VyrD170a+y5aAKbooQWMwjs=;
+        b=TlZz5tJX4nduMharhnPyg/RR4Xra6obWp2SHttu9ZYmMRalIqzP0Gl2aHF5A4CTKvE
+         tMLdOH6icQIAq89KldIxkJa3HcZ2ggsDMjbld6/Ya06FrX5Cm9GiKxyXrxjpDWhCZFyr
+         FuWf02EQuVJ5JsNF0HfOsp6lSc00O/AZmovuWlvXmOQH1xAN4OzrEB4iJAQQWVixxfRj
+         JRN3AObOFKv69VowxlhJZBCCTQaEYjwvTNqSYdbyYnJWc8+wwiMXmQGC7gIb+dajBQlV
+         rq0Y0cfEZc2MmxGjI24B/fFWeGzq85n1uzQzGVzgwUFz+Gx6ILWMmIcr+JWAp/h6DbO9
+         0dOA==
+X-Gm-Message-State: AOJu0Yywmi4uFFWsE1O9NxV17AgPPVwe7NdUpeqrasUJ5fFGfOsrKC1R
+	tslyAGYwQR5CNLrXaaFytaRDnb9ESIghMT2h8dCRVz5PxLS893iH0LWVnQxmjoVf9mnE+mkMQK4
+	h9qI=
+X-Google-Smtp-Source: AGHT+IEV1W36bEkv99WLtAZxdr/nsHmeCj/uU/gH7fTxc26J7tGx8juRLjxrqd1oyhF0ySY8x6pLQQ==
+X-Received: by 2002:adf:cf11:0:b0:33a:f95e:9f14 with SMTP id o17-20020adfcf11000000b0033af95e9f14mr1578640wrj.30.1706625052052;
+        Tue, 30 Jan 2024 06:30:52 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUXgNoBOMkDkON5dF5aYygsz21Qtyn2IQRZz8HHGrAm250GxX/tKhACqtOvtMDXuGb9eH7We7sj9xFDP0K/YTAWiJD1FzKatJQqvl3Oxt0ukgaw50vYUVMqBbRWO8LTAy3ye+tetbJzFQ1CnJmGS5yFby7idNaDZB/k+B/QXbacTkjf8aUHaRoFOfbyuBgH+cJE
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id by5-20020a056000098500b0033afef9bdfbsm128988wrb.8.2024.01.30.06.30.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jan 2024 06:30:47 -0800 (PST)
+Date: Tue, 30 Jan 2024 15:30:46 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Petr Machata <petrm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] selftests: forwarding: Add missing config
+ entries
+Message-ID: <ZbkIFrruZO5DXODm@nanopsycho>
+References: <025abded7ff9cea5874a7fe35dcd3fd41bf5e6ac.1706286755.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 6/7] net: dsa: mt7530: do not set
- priv->p5_interface on mt7530_setup_port5()
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, Vladimir Oltean <olteanv@gmail.com>
-Cc: Daniel Golle <daniel@makrotopia.org>,
- Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Russell King <linux@armlinux.org.uk>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, Bartel Eerdekens <bartel.eerdekens@constell8.be>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <20240122-for-netnext-mt7530-improvements-1-v3-0-042401f2b279@arinc9.com>
- <20240122-for-netnext-mt7530-improvements-1-v3-6-042401f2b279@arinc9.com>
- <20240129125241.gu4srgufad6hpwor@skbuf>
- <431750cc-fb6b-4f7a-9123-b6986d359742@arinc9.com>
- <20240129083152.34d899cd@kernel.org> <20240129165201.s4oiuk3sxtk6zcsw@skbuf>
- <20240129090034.01c11667@kernel.org>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <20240129090034.01c11667@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <025abded7ff9cea5874a7fe35dcd3fd41bf5e6ac.1706286755.git.petrm@nvidia.com>
 
+Fri, Jan 26, 2024 at 05:36:16PM CET, petrm@nvidia.com wrote:
+>The config file contains a partial kernel configuration to be used by
+>`virtme-configkernel --custom'. The presumption is that the config file
+>contains all Kconfig options needed by the selftests from the directory.
+>
+>In net/forwarding/config, many are missing, which manifests as spurious
+>failures when running the selftests, with messages about unknown device
+>types, qdisc kinds or classifier actions. Add the missing configurations.
+>
+>Tested the resulting configuration using virtme-ng as follows:
+>
+> # vng -b -f tools/testing/selftests/net/forwarding/config
+> # vng --user root
+> (within the VM:)
+> # make -C tools/testing/selftests TARGETS=net/forwarding run_tests
 
+For me, all tests end up with:
+SKIP: Cannot create interface. Name not specified
 
-On 29.01.2024 20:00, Jakub Kicinski wrote:
-> On Mon, 29 Jan 2024 18:52:01 +0200 Vladimir Oltean wrote:
->>>> I still see deferred. I guess I'll have to submit this again. :/
->>>
->>> Took me an hour to fix the mailbot:
->>> https://github.com/kuba-moo/nipa/commit/6766e97e72ac91ffb42ed2259bc8e2ace446d0ef
->>> email is the most quirky thing ever.
->>
->> Ah, so it was my neomutt encoding email as base64...
-> 
-> Something magical going on there, the email is encoded.. twice?
-> See the attachment. That's already thru a round of base64 decode
-> and there's another copy of the email with base64 inside it :o
-> Anyway, unwrapping it once is good enough for the bot to see the
-> command, and enough time spent on this ;)
-
-I don't claim to be an email expert. I've received Vladimir's email with
-the "Content-Transfer-Encoding: 8bit" header. The body was plaintext, not
-base64 encoded. I have checked how the netdev mailing list distributed
-Vladimir's email, its body is plaintext as well, not base64 encoded. Only
-the linux-arm-kernel mailing list distributed the body base64 encoded, the
-header is "Content-Transfer-Encoding: base64".
-
-And the attachment you've provided seems to be from the raw output of
-lore.kernel.org/all which seems to put together the email distribution from
-all mailing lists.
-
-raw from all:
-
-https://lore.kernel.org/all/20240129125241.gu4srgufad6hpwor@skbuf/raw
-
-raw from netdev:
-
-https://lore.kernel.org/netdev/20240129125241.gu4srgufad6hpwor@skbuf/raw
-
-raw from linux-arm-kernel:
-
-https://lore.kernel.org/linux-arm-kernel/20240129125241.gu4srgufad6hpwor@skbuf/raw
-
-I don't know which mailing list mailbot looks at in case of an email is
-sent with multiple mailing lists being CC'd or TO'd. It seems to be that it
-looked at linux-arm-kernel in this instance.
-
-Arınç
+Do I miss some config file? If yes, can't we have some default testing
+ifnames in case the config is not there?
 
