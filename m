@@ -1,106 +1,195 @@
-Return-Path: <netdev+bounces-67228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C290F842693
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:02:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 503018426AE
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:10:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F16D01C254AB
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:02:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03F7128D7AC
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:10:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 914CF6D1CB;
-	Tue, 30 Jan 2024 14:02:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="gwySDtMv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 434AC6D1DB;
+	Tue, 30 Jan 2024 14:10:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F65F6D1A8;
-	Tue, 30 Jan 2024 14:02:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A7F6BB3C;
+	Tue, 30 Jan 2024 14:10:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706623356; cv=none; b=eXUeJrvW2FRVbErsI3FES1GwCxZMSH+t06E7CwJn1ictwcv09DeNsOuA6Dz6aTGFT0iyIz4FlTbrh+qCw6vbrzB6KytB/R/6EK4gUxCbPhSxk9dSyjmAVzIcYolhtXJfhCb69A6s4tjyU7vnbNBf87EQvvx8bbe3GXqKn4LsU7M=
+	t=1706623820; cv=none; b=FZUXOjTsULbSP7tnXGyIwSEOxcZ0lwQLKscCpL1SVbm1iOe8x8WmoLDU7ikIrxRxsHq0tBsb9J/XcGxYPNBkwEGTtI2CEWzvUVqVYEbMZ+dHp5DOjhyQsrqn70hpQlNdG7Ls6SyT2GG8pYAeGePyCranzGp1RcsCikDb7U9M1f8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706623356; c=relaxed/simple;
-	bh=Tlhx9lLGri5Vk8TUJgjTZ43H+PbmPnQke0ODX79ZyC8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HaFWagSja+LbM9hLNUqTLPumMLw1SrfubOW9unJVEJCCFQhsNawNHLdPTUZqK9vmVUPuKzd/vHXMQ1GLz2vm0UeAg531jg1wZgGgmtOwyAi5LJvd+DnodWdKJndhdrpUbkXosz3iNbg5YBrbJD6rChsW8Y5lGM7MUsvI5DAah8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=gwySDtMv; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=B+qqCMS/lknoBXhTRlhfXHK7D4gHB5v8JSzkpcRldtE=; b=gwySDtMvJgokkQQEsZ7zsFDcUD
-	iMsZL8ktSjeZ/04CwdzjTluKIpxBhO75Chs9HpAEBk1i37cS11wCx98d6zpOsoYF+oBMLQ40BY2w1
-	b9dlQ9S4mgx2TWrAAwmyW4U29XhtvOEBX6C8M4zldexpS2Xa7MXUJN1TSpIQ9na58HqeE19ak+8rl
-	hiF6kSf4hrL9CFcEbopeT4GyFY+TFyP5qTFZUHCm8HiKLET5qnHbKLBXhI44itJ9w8Oe5/AgcgAwe
-	C1htZBHaqVodvNJZ/6/jEh1dblWhOWJU+JD0UQnjJ/7DFrHQbu9nHKh4XVlmeSpq7WmXevl87woHQ
-	pTja/jXw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44332)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rUogr-0001ub-0v;
-	Tue, 30 Jan 2024 14:02:17 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rUogm-0005Yl-RT; Tue, 30 Jan 2024 14:02:12 +0000
-Date: Tue, 30 Jan 2024 14:02:12 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Romain Gantois <romain.gantois@bootlin.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/7] net: phy: add PHY_F_RXC_ALWAYS_ON to PHY
- dev flags
-Message-ID: <ZbkBZPm2R9LgYYCI@shell.armlinux.org.uk>
-References: <20240130-rxc_bugfix-v2-0-5e6c3168e5f0@bootlin.com>
- <20240130-rxc_bugfix-v2-1-5e6c3168e5f0@bootlin.com>
- <78ee61dc-3f1e-4092-b2a3-5831f8caf132@lunn.ch>
+	s=arc-20240116; t=1706623820; c=relaxed/simple;
+	bh=jJXfbb/IS81FZ0fo7h7ykJXehvtxlzre6FqF9MmiTJo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=SD2DfKjFkICBhQr8Xq2KEJAILsou8imG+eKkaQBERdXOxIEg3pxgu08Fz+o9hE/hsEHQny8fwrCsP0g63SOesjoWLimn9Jt1xhRC0jsk3JPlG5SuKBiwr/yLyXmwFBC4AEJ4JGNZqq6+6/qprOax/PK0aReuLH9lbqgOXswqlXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4TPRqZ6WBszJpQM;
+	Tue, 30 Jan 2024 22:09:14 +0800 (CST)
+Received: from kwepemd100009.china.huawei.com (unknown [7.221.188.135])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5D25C1402CD;
+	Tue, 30 Jan 2024 22:10:14 +0800 (CST)
+Received: from [10.67.109.184] (10.67.109.184) by
+ kwepemd100009.china.huawei.com (7.221.188.135) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1258.28; Tue, 30 Jan 2024 22:10:13 +0800
+Message-ID: <5a30caa3-3351-41e7-a77f-91e5959b2da6@huawei.com>
+Date: Tue, 30 Jan 2024 22:10:12 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <78ee61dc-3f1e-4092-b2a3-5831f8caf132@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next 4/4] riscv, bpf: Mixing bpf2bpf and tailcalls
+Content-Language: en-US
+To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, Pu Lehui
+	<pulehui@huaweicloud.com>, <bpf@vger.kernel.org>,
+	<linux-riscv@lists.infradead.org>, <netdev@vger.kernel.org>
+CC: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+	<martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
+	<yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
+	<kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt
+	<palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>, Luke Nelson
+	<luke.r.nels@gmail.com>
+References: <20230919035711.3297256-1-pulehui@huaweicloud.com>
+ <20230919035711.3297256-5-pulehui@huaweicloud.com>
+ <87lecqobyb.fsf@all.your.base.are.belong.to.us>
+ <4e73b095-0c08-4a6f-b2ee-8f7a071b14ee@huaweicloud.com>
+ <87cytjusud.fsf@all.your.base.are.belong.to.us>
+ <5d776261-338b-4ebb-bb9b-1dbc91cd06c3@huawei.com>
+ <87zfwnympo.fsf@all.your.base.are.belong.to.us>
+From: Pu Lehui <pulehui@huawei.com>
+In-Reply-To: <87zfwnympo.fsf@all.your.base.are.belong.to.us>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemd100009.china.huawei.com (7.221.188.135)
 
-On Tue, Jan 30, 2024 at 02:55:50PM +0100, Andrew Lunn wrote:
-> > @@ -768,6 +768,7 @@ struct phy_device {
-> >  
-> >  /* Generic phy_device::dev_flags */
-> >  #define PHY_F_NO_IRQ		0x80000000
-> > +#define PHY_F_RXC_ALWAYS_ON	BIT(30)
+
+
+On 2024/1/30 21:28, Björn Töpel wrote:
+> Pu Lehui <pulehui@huawei.com> writes:
 > 
-> It is a bit odd mixing 0x numbers and BIT() macros for the same class
-> of thing. I would use 0x40000000, or convert PHY_F_NO_IRQ to BIT(31)
+>> On 2024/1/30 16:29, Björn Töpel wrote:
+>>> Pu Lehui <pulehui@huaweicloud.com> writes:
+>>>
+>>>> On 2023/9/28 17:59, Björn Töpel wrote:
+>>>>> Pu Lehui <pulehui@huaweicloud.com> writes:
+>>>>>
+>>>>>> From: Pu Lehui <pulehui@huawei.com>
+>>>>>>
+>>>>>> In the current RV64 JIT, if we just don't initialize the TCC in subprog,
+>>>>>> the TCC can be propagated from the parent process to the subprocess, but
+>>>>>> the TCC of the parent process cannot be restored when the subprocess
+>>>>>> exits. Since the RV64 TCC is initialized before saving the callee saved
+>>>>>> registers into the stack, we cannot use the callee saved register to
+>>>>>> pass the TCC, otherwise the original value of the callee saved register
+>>>>>> will be destroyed. So we implemented mixing bpf2bpf and tailcalls
+>>>>>> similar to x86_64, i.e. using a non-callee saved register to transfer
+>>>>>> the TCC between functions, and saving that register to the stack to
+>>>>>> protect the TCC value. At the same time, we also consider the scenario
+>>>>>> of mixing trampoline.
+>>>>>
+>>>>> Hi!
+>>>>>
+>>>>> The RISC-V JIT tries to minimize the stack usage, e.g. it doesn't have a
+>>>>> fixed pro/epilogue like some of the other JITs. I think we can do better
+>>>>> here, so that the pass-TCC-via-register can be used, and the additional
+>>>>> stack access can be avoided.
+>>>>>
+>>>>> Today, the TCC is passed via a register (a6) and can be viewed as a
+>>>>> "state" variable/transparent argument/return value. As you point out, we
+>>>>> loose this when we do a call. On (any) calls we move the TCC to a
+>>>>> callee-saved register.
+>>>>>
+>>>>> WDYT about the following scheme:
+>>>>>
+>>>>> 1 Pickup the arm64 bpf2bpf/tailmix mechanism of just clearing the TCC
+>>>>>      for the main program.
+>>>>> 2 For BPF helper calls, move TCC to s6, perform the call, and restore
+>>>>>      a6. Dito for kfunc calls (BPF_PSEUDO_KFUNC_CALL).
+>>>>> 3 For all other calls, a6 is passed transparently.
+>>>>>
+>>>>> For 2 bpf_jit_get_func_addr() can be used to determine if the callee is
+>>>>> a BPF helper or not.
+>>>>>
+>>>>> In summary; Determine in the JIT if we're leaving BPF-land, and need to
+>>>>> move the TCC to a callee-saved reg, or not, and save us a bunch of stack
+>>>>> store/loads.
+>>>>>
+>>>>
+>>>> Valuable scheme. But we need to consider TCC back propagation. Let me
+>>>> show an example of calling subprog with TCC stored in A6:
+>>>>
+>>>> prog1(TCC==1){
+>>>>        subprog1(TCC==1)
+>>>>            -> tailcall1(TCC==0)
+>>>>                -> subprog2(TCC==0)
+>>>>        subprog3(TCC==0) <--- should be TCC==1
+>>>>            -\-> tailcall2 <--- can't be called
+>>>> }
+>>
+>> Let's back with this example again. Imagine that the tailcall chain is a
+>> list limited to 33 elements. When the list has 32 elements, we call
+>> subprog1 and then tailcall1. At this time, the list elements count
+>> becomes 33. Then we call subprog2 and return prog1. At this time, the
+>> list removes 1 element and becomes 32 elements. At this time, there
+>> still can perform 1 tailcall.
+>>
+>> I've attached a diagram that shows mixing tailcall and subprogs is
+>> nearly a "call". It can return to caller function.
+> 
+> Hmm. Let me put my Q in another way.
+> 
+> The kernel calls into BPF_PROG_RUN() (~a BPF context). Would it ever be
+> OK to do more than 33 tail calls, regardless of subprogs or not?
+> 
+> In your example, TCC is 1. You are allowed to perform one tail call. In
+> your example prog1 performs two.
+> 
+> My view of TCC has always been ~a counter of the number of tailcalls~.
+> 
+> With your example expanded:
+> prog1(TCC==33){
+>        subprog1(TCC==33)
+>            -> tailcall1(TCC==33) -> tailcall1(TCC==32) -> tailcall1(TCC==31) -> ... // 33 times
+>        // Lehui says TCC should be 33 again.
+>        // Björn says "it's the number of tailcalls", and subprog3 cannot perform a tail call
+>        subprog3(TCC==?)
 
-If I used 0x40000000, there would be review comments suggesting the use
-of BIT(). Can't win!
+Yes, my view is take this something like a stack，while you take this as 
+a fixed global value.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+prog1(TCC==33){
+     subprog1(TCC==33)
+         -> tailcall1(TCC==33) -> tailcall1(TCC==32) -> 
+tailcall1(TCC==31) -> ... // 33 times -> subprog2(TCC==0)
+     subprog3(TCC==33)
+	-> tailcall1(TCC==33) -> tailcall1(TCC==32) -> tailcall1(TCC==31) -> 
+... // 33 times
+
+>            
+> My view has, again, been than TCC is a run-time count of the number
+> tailcalls (fentry/fexit patch bpf-programs included).
+> 
+> What does x86 and arm64 do?
+
+When subprog return back to caller bpf program, they both restore TCC to 
+the value when enter into subprog. The ARM64 uses the callee saved 
+register to store the TCC. When the ARM64 exits, the TCC is restored to 
+the value when it enter. The while x86 uses the stack to do the same thing.
+
+> 
+> 
+> Björn
 
