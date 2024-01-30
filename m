@@ -1,155 +1,314 @@
-Return-Path: <netdev+bounces-67315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 326C8842BFD
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 19:41:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9AF0842BFE
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 19:42:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B11C9282D0F
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 18:41:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F952285D26
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 18:42:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C6178B7A;
-	Tue, 30 Jan 2024 18:41:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77B1E78B61;
+	Tue, 30 Jan 2024 18:42:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iL3dZpdY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eBLUrkhX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 985BC6997A
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 18:41:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A9D78B57
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 18:42:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706640082; cv=none; b=PpWCs8NmktvXWPxChGWIWAoMAnXsXHXUzuObCNZONK5IPLZyIwJUTaNy91Izbr6njNRc/9TKsGok7B3x0U1ZzQShmoyJCdtHcWQO7bYk8HRKfdNpI8OovJFhwy2TT5PXN4WY1jtoIQUkJu55h5+4LeXpme0f63MrUFzGLGeRCyE=
+	t=1706640160; cv=none; b=iCHI0E/LbtdZ/at+STJlh/9CDLFt3PZtZdL81Fq8TEOId3mAPSRSsG8OBiSExS+oQ6ku89WSHUmSt2ntcusf8BUBuS+9wFP1aaBsSmrg9rwc8bNOUKdZuJP+ZsStqMt2ZIGW+JjoLKwkLJdjXyj75OUSVPoOwQOcPSpGEu6TobE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706640082; c=relaxed/simple;
-	bh=gDDcUE6g9gBwt1NmVrUfXXqqkDrzBbdo/C9YjtcIXG0=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=KfJ7xXgXZFxlI9j6d2LA3FVxu6sWz3LOPr3WrnQDepVv8Uf2U8qRV8ujDsLZnGD3w9d3j3mZXFGaF2IQraUi/s+9XvVjcTVS5F391BR+cIdLh94bNAmiKu41hIRsr4PKsgou4eS2fZacPoMAUYhXDOd1eOIT+AI3Vmb59EWXD/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iL3dZpdY; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706640079;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=2bwc+mQL6C/91m4UiYWrsmKalc17+Sz1UB9Xs7+dNW0=;
-	b=iL3dZpdYxJwzP9xZDk+BdWQEF5rR7+sK9eB0bIxf0TiOzkV4PagTiblFiaSI7QRudAlV91
-	t9AtmgZvaf42dC1ZTpDS+U0xFZq3j2FQxT9ltHNw5ctJ6SawtJTIcgpUsfalgGMVmyyIP5
-	u4ldR3NsVOYeif1oBZt5KANWBNUnjeE=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-594-2MLubLauMhybbjDx7REZTQ-1; Tue, 30 Jan 2024 13:41:14 -0500
-X-MC-Unique: 2MLubLauMhybbjDx7REZTQ-1
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2cf3ef1465dso6670551fa.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 10:41:14 -0800 (PST)
+	s=arc-20240116; t=1706640160; c=relaxed/simple;
+	bh=NPj4VP9n8cMMqR6NwFFjcohOJlp685904szjOyhPtPI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=imrieVd5W6RjY3w89d6hmebEC5RYSQjD83a7BOjQzk4Qgqk25Y6VtnFl+KRotSHr3tDu2MyQgR2rmYm3AXqbpq2yMR77COi1On8rwvqMQiskNuzbu87MpGfBi7o+UnOBkYGH/8XSH3fgscsWKhWhERKYoVt95kkjdvrm+Qk5nXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eBLUrkhX; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6b26845cdso433256276.3
+        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 10:42:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706640157; x=1707244957; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nhNzJGLNCDMNE2Qr1YSnuLmefaQ3JZkl6zWTD4qPogA=;
+        b=eBLUrkhXkoZfuwf0ZyyYqtZyVn1gNxHe+Qk78W0r6RuRLF77ewLRY0iua8SFa2GwA5
+         LqX+VjiAfUbkp+X8KqCR/oibyy2pD9YIVWk7mKbcgq8OzFQEhCbjRcFS8ncDP3aG2n61
+         dLwxPrOiBQGWMTRWBRgbM9JYNImU+1eRAVNOlug8l3Op5IZNk3Ow06O5stxjBebMuHj5
+         KfT6ZfIYBmJ1oBB6NYistGM4dPlw3ldUqnppiYqp3fVsfgw3k+kRNIzmxlVqwk+cXqU7
+         f8CKj5mOZx9IKNLCMrjUn4uKos8g5/RDM3AIW9rB768y65irGtD2F/CceRMswaRSBGjG
+         8seg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706640073; x=1707244873;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2bwc+mQL6C/91m4UiYWrsmKalc17+Sz1UB9Xs7+dNW0=;
-        b=TwGSJC+3tUTfyycTpImmHwOKHQTvLNY8a1JMik//Dv490hWf18qph+Wd5Vurd+bKXF
-         o5IY6Kqwy7XqAVrFiwtLcO1i9NbrgTidvZIFqcLRzSOJyPIvl+illvqvD3+7cPhxiYEQ
-         +8RadRCG8S+4eybTLyXTyrC24msLfj8ryIOOPd7Uyl7Sgka68GgLOIVgpm5XUvLWamcP
-         6p7+pp6oukLtjgFYpY0krng64BXQEoWICxBcmcSKHvrK6Wfv+AJDxZmUlOgrs222Smpa
-         FIR78jbCwlPD+60ITspBtYj7r5TVMH7+xWzP82Wkqs3WldGBbMlRi2Ccd15gHvMdrLLk
-         +Hjw==
-X-Gm-Message-State: AOJu0YwK3+SNUjThjzc+fyWTLXIYSvpXPq1LEcyWFOmfYq2we19TsdRk
-	j54Jdy5ultW5oixhKMayUYxKW0gQugE4BkFKXDr5dWiAj2XuFRUVF7qgtGg0Dlym7eTquQklyo3
-	e5ifd5B4USSIT+Vgu394ee8u+OloOZkcsnwhO9Eg46fOqFB4CA6UlYA==
-X-Received: by 2002:a19:914b:0:b0:510:544:792 with SMTP id y11-20020a19914b000000b0051005440792mr6330661lfj.0.1706640073412;
-        Tue, 30 Jan 2024 10:41:13 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH7CiSZRQ04X8yuecqu3jcW/CBGI0gl0b5ZeN7gMChTG8Vk6qSxcVxFuUatqpdJUJypOgKUCg==
-X-Received: by 2002:a19:914b:0:b0:510:544:792 with SMTP id y11-20020a19914b000000b0051005440792mr6330648lfj.0.1706640073001;
-        Tue, 30 Jan 2024 10:41:13 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-232-203.dyn.eolo.it. [146.241.232.203])
-        by smtp.gmail.com with ESMTPSA id u15-20020a05600c19cf00b0040e39cbf2a4sm17868663wmq.42.2024.01.30.10.41.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 10:41:12 -0800 (PST)
-Message-ID: <785a9d7b1ce68f8131e6f9c8802981ac7ad75948.camel@redhat.com>
-Subject: Re: [PATCH net] selftests: net: add missing config for big tcp tests
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>, Xin Long
- <lucien.xin@gmail.com>,  Florian Westphal <fw@strlen.de>, Aaron Conole
- <aconole@redhat.com>, Nikolay Aleksandrov <razor@blackwall.org>,
- linux-kselftest@vger.kernel.org
-Date: Tue, 30 Jan 2024 19:41:10 +0100
-In-Reply-To: <20240129083933.6b964b3f@kernel.org>
-References: 
-	<21630ecea872fea13f071342ac64ef52a991a9b5.1706282943.git.pabeni@redhat.com>
-	 <20240126115551.176e3888@kernel.org>
-	 <a090936028c28b480cf3f8a66a9c3d924b7fd6ec.camel@redhat.com>
-	 <d67d7e4a77c8aec7778f378e7a95916c89f52973.camel@redhat.com>
-	 <20240129083933.6b964b3f@kernel.org>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+        d=1e100.net; s=20230601; t=1706640157; x=1707244957;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nhNzJGLNCDMNE2Qr1YSnuLmefaQ3JZkl6zWTD4qPogA=;
+        b=fmKGBk5eODZY6/nIRmG409PDUe/Au9ZOO9NnK3753+wjgaOsInYezwTlq6VDxBX+Gw
+         9npzuQkrQ/dynM6vlC/owkv4uXo4bEGslSpBPuw8B3drLLr0M/qrAV0JcYkagPMn+bF/
+         vQexzjLbaeUzAG9bAfuKTTB6yA3SUHYNj9l6FIARdsbMOCaVFgoh38hxVHt1jidNrGrq
+         h76Lm5g6cE9ZsRYNRM3hJX63mD8/zajx3ZVbMJ5vJqdxjkd2xWMXd56WOHxTKYKU1NEa
+         NcgaZC3LSw/2gGvsC3atxVuPBBCgPYShEzFGPHiNfkfL4G/wxWIxSfdyo//TYgxqH5Y9
+         WOAw==
+X-Gm-Message-State: AOJu0YxaWNQ4BofytfS1RTz4lVN5yQH/VfJ9JDjlaCFEraOM5NTEN+fP
+	jgUm9MHURwogBzmPAeq0FU8BNSrtfU/ejIFIPgbLtuuP9mPR+CvdG4Oe6tBZmHthdb+0RbSMZu5
+	y9G6IBhagKA==
+X-Google-Smtp-Source: AGHT+IHaVFm5ulrRY5JnurfMLemJhkb1jDLA3NNh6WtAqgd3JjYpyRZE+KbCrMKSOsXA+2bt2wh8juy2JazjFg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1345:b0:dc6:6da5:1a23 with SMTP
+ id g5-20020a056902134500b00dc66da51a23mr2180019ybu.4.1706640157369; Tue, 30
+ Jan 2024 10:42:37 -0800 (PST)
+Date: Tue, 30 Jan 2024 18:42:35 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
+Message-ID: <20240130184235.1620738-1-edumazet@google.com>
+Subject: [PATCH v2 net] af_unix: fix lockdep positive in sk_diag_dump_icons()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 2024-01-29 at 08:39 -0800, Jakub Kicinski wrote:
-> On Mon, 29 Jan 2024 17:31:33 +0100 Paolo Abeni wrote:
-> > Uhm... while the self-test doesn't emit anymore the message related to
-> > the missing modules, it still fails in the CI env and I can't reproduce
-> > the failures in my local env (the same for the gro.sh script).
-> >=20
-> > If I understand correctly, the tests run under double virtualization (a
-> > VM on top AWS?), is that correct? I guess the extra slowdown/overhead
-> > will need more care.
->=20
-> Yes, it's VM inside a VM without nested virtualization support.
-> A weird setup, granted, but when we move to bare metal I'd like
-> to enable KASAN, which will probably cause a similar slowdown..
->=20
-> You could possibly get a similar slowdown by disabling HW virt /
-> KVM?
+syzbot reported a lockdep splat [1].
 
-Thanks, the above helped - that is, I can reproduce the failure running
-the self-tests in a VM with KVM disabled in the host. Funnily enough I
-can't use plain virtme for that - the virtme VM crashes on boot,
-possibly due to the wrong 'machine' argument passed to qemu.
+Blamed commit hinted about the possible lockdep
+violation, and code used unix_state_lock_nested()
+in an attempt to silence lockdep.
 
-In any case I can't see a sane way to cope with such slow environments
-except skipping the sensitive cases.
+It is not sufficient, because unix_state_lock_nested()
+is already used from unix_state_double_lock().
 
-> FWIW far the 4 types of issues we've seen were:
->  - config missing
->  - OS doesn't ifup by default
->  - OS tools are old / buggy
->  - VM-in-VM is just too slow.
->=20
-> There's a bunch of failures in forwarding which look like perf issues.
-> I wonder if we should introduce something in the settings file to let
-> tests know that they are running in very slow env?
+We need to use a separate subclass.
 
-I was wondering about passing such info to the test e.g. via an env
-variable:
+This patch adds a distinct enumeration to make things
+more explicit.
 
-vng --run . --user root -- HOST_IS_DAMN_SLOW=3Dtrue
-./tools/testing/selftests/kselftest_install/run_kselftest.sh -t
-<whatever>
+Also use swap() in unix_state_double_lock() as a clean up.
 
-In any case some tests should be updated to skip the relevant cases
-accordingly, right?
+v2: add a missing inline keyword to unix_state_lock_nested()
 
-Cheers,
+[1]
+WARNING: possible circular locking dependency detected
+6.8.0-rc1-syzkaller-00356-g8a696a29c690 #0 Not tainted
 
-Paolo
+syz-executor.1/2542 is trying to acquire lock:
+ ffff88808b5df9e8 (rlock-AF_UNIX){+.+.}-{2:2}, at: skb_queue_tail+0x36/0x120 net/core/skbuff.c:3863
+
+but task is already holding lock:
+ ffff88808b5dfe70 (&u->lock/1){+.+.}-{2:2}, at: unix_dgram_sendmsg+0xfc7/0x2200 net/unix/af_unix.c:2089
+
+which lock already depends on the new lock.
+
+the existing dependency chain (in reverse order) is:
+
+-> #1 (&u->lock/1){+.+.}-{2:2}:
+        lock_acquire+0x1e3/0x530 kernel/locking/lockdep.c:5754
+        _raw_spin_lock_nested+0x31/0x40 kernel/locking/spinlock.c:378
+        sk_diag_dump_icons net/unix/diag.c:87 [inline]
+        sk_diag_fill+0x6ea/0xfe0 net/unix/diag.c:157
+        sk_diag_dump net/unix/diag.c:196 [inline]
+        unix_diag_dump+0x3e9/0x630 net/unix/diag.c:220
+        netlink_dump+0x5c1/0xcd0 net/netlink/af_netlink.c:2264
+        __netlink_dump_start+0x5d7/0x780 net/netlink/af_netlink.c:2370
+        netlink_dump_start include/linux/netlink.h:338 [inline]
+        unix_diag_handler_dump+0x1c3/0x8f0 net/unix/diag.c:319
+       sock_diag_rcv_msg+0xe3/0x400
+        netlink_rcv_skb+0x1df/0x430 net/netlink/af_netlink.c:2543
+        sock_diag_rcv+0x2a/0x40 net/core/sock_diag.c:280
+        netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
+        netlink_unicast+0x7e6/0x980 net/netlink/af_netlink.c:1367
+        netlink_sendmsg+0xa37/0xd70 net/netlink/af_netlink.c:1908
+        sock_sendmsg_nosec net/socket.c:730 [inline]
+        __sock_sendmsg net/socket.c:745 [inline]
+        sock_write_iter+0x39a/0x520 net/socket.c:1160
+        call_write_iter include/linux/fs.h:2085 [inline]
+        new_sync_write fs/read_write.c:497 [inline]
+        vfs_write+0xa74/0xca0 fs/read_write.c:590
+        ksys_write+0x1a0/0x2c0 fs/read_write.c:643
+        do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+        do_syscall_64+0xf5/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+-> #0 (rlock-AF_UNIX){+.+.}-{2:2}:
+        check_prev_add kernel/locking/lockdep.c:3134 [inline]
+        check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+        validate_chain+0x1909/0x5ab0 kernel/locking/lockdep.c:3869
+        __lock_acquire+0x1345/0x1fd0 kernel/locking/lockdep.c:5137
+        lock_acquire+0x1e3/0x530 kernel/locking/lockdep.c:5754
+        __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+        _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
+        skb_queue_tail+0x36/0x120 net/core/skbuff.c:3863
+        unix_dgram_sendmsg+0x15d9/0x2200 net/unix/af_unix.c:2112
+        sock_sendmsg_nosec net/socket.c:730 [inline]
+        __sock_sendmsg net/socket.c:745 [inline]
+        ____sys_sendmsg+0x592/0x890 net/socket.c:2584
+        ___sys_sendmsg net/socket.c:2638 [inline]
+        __sys_sendmmsg+0x3b2/0x730 net/socket.c:2724
+        __do_sys_sendmmsg net/socket.c:2753 [inline]
+        __se_sys_sendmmsg net/socket.c:2750 [inline]
+        __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2750
+        do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+        do_syscall_64+0xf5/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+other info that might help us debug this:
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&u->lock/1);
+                               lock(rlock-AF_UNIX);
+                               lock(&u->lock/1);
+  lock(rlock-AF_UNIX);
+
+ *** DEADLOCK ***
+
+1 lock held by syz-executor.1/2542:
+  #0: ffff88808b5dfe70 (&u->lock/1){+.+.}-{2:2}, at: unix_dgram_sendmsg+0xfc7/0x2200 net/unix/af_unix.c:2089
+
+stack backtrace:
+CPU: 1 PID: 2542 Comm: syz-executor.1 Not tainted 6.8.0-rc1-syzkaller-00356-g8a696a29c690 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+Call Trace:
+ <TASK>
+  __dump_stack lib/dump_stack.c:88 [inline]
+  dump_stack_lvl+0x1e7/0x2d0 lib/dump_stack.c:106
+  check_noncircular+0x366/0x490 kernel/locking/lockdep.c:2187
+  check_prev_add kernel/locking/lockdep.c:3134 [inline]
+  check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+  validate_chain+0x1909/0x5ab0 kernel/locking/lockdep.c:3869
+  __lock_acquire+0x1345/0x1fd0 kernel/locking/lockdep.c:5137
+  lock_acquire+0x1e3/0x530 kernel/locking/lockdep.c:5754
+  __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+  _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
+  skb_queue_tail+0x36/0x120 net/core/skbuff.c:3863
+  unix_dgram_sendmsg+0x15d9/0x2200 net/unix/af_unix.c:2112
+  sock_sendmsg_nosec net/socket.c:730 [inline]
+  __sock_sendmsg net/socket.c:745 [inline]
+  ____sys_sendmsg+0x592/0x890 net/socket.c:2584
+  ___sys_sendmsg net/socket.c:2638 [inline]
+  __sys_sendmmsg+0x3b2/0x730 net/socket.c:2724
+  __do_sys_sendmmsg net/socket.c:2753 [inline]
+  __se_sys_sendmmsg net/socket.c:2750 [inline]
+  __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2750
+  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+  do_syscall_64+0xf5/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7f26d887cda9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f26d95a60c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
+RAX: ffffffffffffffda RBX: 00007f26d89abf80 RCX: 00007f26d887cda9
+RDX: 000000000000003e RSI: 00000000200bd000 RDI: 0000000000000004
+RBP: 00007f26d88c947a R08: 0000000000000000 R09: 0000000000000000
+R10: 00000000000008c0 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007f26d89abf80 R15: 00007ffcfe081a68
+
+Fixes: 2aac7a2cb0d9 ("unix_diag: Pending connections IDs NLA")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+ include/net/af_unix.h | 20 ++++++++++++++------
+ net/unix/af_unix.c    | 14 ++++++--------
+ net/unix/diag.c       |  2 +-
+ 3 files changed, 21 insertions(+), 15 deletions(-)
+
+diff --git a/include/net/af_unix.h b/include/net/af_unix.h
+index 49c4640027d8a6b93e903a6238d21e8541e31da4..afd40dce40f3d593f6fa0a11828aee9fd1582de3 100644
+--- a/include/net/af_unix.h
++++ b/include/net/af_unix.h
+@@ -46,12 +46,6 @@ struct scm_stat {
+ 
+ #define UNIXCB(skb)	(*(struct unix_skb_parms *)&((skb)->cb))
+ 
+-#define unix_state_lock(s)	spin_lock(&unix_sk(s)->lock)
+-#define unix_state_unlock(s)	spin_unlock(&unix_sk(s)->lock)
+-#define unix_state_lock_nested(s) \
+-				spin_lock_nested(&unix_sk(s)->lock, \
+-				SINGLE_DEPTH_NESTING)
+-
+ /* The AF_UNIX socket */
+ struct unix_sock {
+ 	/* WARNING: sk has to be the first member */
+@@ -77,6 +71,20 @@ struct unix_sock {
+ #define unix_sk(ptr) container_of_const(ptr, struct unix_sock, sk)
+ #define unix_peer(sk) (unix_sk(sk)->peer)
+ 
++#define unix_state_lock(s)	spin_lock(&unix_sk(s)->lock)
++#define unix_state_unlock(s)	spin_unlock(&unix_sk(s)->lock)
++enum unix_socket_lock_class {
++	U_LOCK_NORMAL,
++	U_LOCK_SECOND,	/* for double locking, see unix_state_double_lock(). */
++	U_LOCK_DIAG, /* used while dumping icons, see sk_diag_dump_icons(). */
++};
++
++static inline void unix_state_lock_nested(struct sock *sk,
++				   enum unix_socket_lock_class subclass)
++{
++	spin_lock_nested(&unix_sk(sk)->lock, subclass);
++}
++
+ #define peer_wait peer_wq.wait
+ 
+ long unix_inq_len(struct sock *sk);
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index ac1f2bc18fc9685652c26ac3b68f19bfd82f8332..30b178ebba60aa810e8442a326a14edcee071061 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -1344,13 +1344,11 @@ static void unix_state_double_lock(struct sock *sk1, struct sock *sk2)
+ 		unix_state_lock(sk1);
+ 		return;
+ 	}
+-	if (sk1 < sk2) {
+-		unix_state_lock(sk1);
+-		unix_state_lock_nested(sk2);
+-	} else {
+-		unix_state_lock(sk2);
+-		unix_state_lock_nested(sk1);
+-	}
++	if (sk1 > sk2)
++		swap(sk1, sk2);
++
++	unix_state_lock(sk1);
++	unix_state_lock_nested(sk2, U_LOCK_SECOND);
+ }
+ 
+ static void unix_state_double_unlock(struct sock *sk1, struct sock *sk2)
+@@ -1591,7 +1589,7 @@ static int unix_stream_connect(struct socket *sock, struct sockaddr *uaddr,
+ 		goto out_unlock;
+ 	}
+ 
+-	unix_state_lock_nested(sk);
++	unix_state_lock_nested(sk, U_LOCK_SECOND);
+ 
+ 	if (sk->sk_state != st) {
+ 		unix_state_unlock(sk);
+diff --git a/net/unix/diag.c b/net/unix/diag.c
+index bec09a3a1d44ce56d43e16583fdf3b417cce4033..be19827eca36dbb68ec97b2e9b3c80e22b4fa4be 100644
+--- a/net/unix/diag.c
++++ b/net/unix/diag.c
+@@ -84,7 +84,7 @@ static int sk_diag_dump_icons(struct sock *sk, struct sk_buff *nlskb)
+ 			 * queue lock. With the other's queue locked it's
+ 			 * OK to lock the state.
+ 			 */
+-			unix_state_lock_nested(req);
++			unix_state_lock_nested(req, U_LOCK_DIAG);
+ 			peer = unix_sk(req)->peer;
+ 			buf[i++] = (peer ? sock_i_ino(peer) : 0);
+ 			unix_state_unlock(req);
+-- 
+2.43.0.429.g432eaa2c6b-goog
 
 
