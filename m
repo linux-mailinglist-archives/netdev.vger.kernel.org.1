@@ -1,257 +1,147 @@
-Return-Path: <netdev+bounces-66904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8FFF841716
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 00:42:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 881ED841780
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 01:36:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 413431F2209A
-	for <lists+netdev@lfdr.de>; Mon, 29 Jan 2024 23:42:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADC001C221E7
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 00:36:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6C315B10A;
-	Mon, 29 Jan 2024 23:41:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09175171D1;
+	Tue, 30 Jan 2024 00:36:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="sAdhE35i"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U7H1f7kt"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2073.outbound.protection.outlook.com [40.107.223.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9758B15B0E9;
-	Mon, 29 Jan 2024 23:41:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706571665; cv=fail; b=Q+3LMH/16jpGpRx6tlovDkJL0jyiLB31pTg5oILIfdP9Q/SHqxil2O1NqQRDT1IGOunnSvgwCSaagFqjr16CuyFEoyBI+zB7ybokgmJvcTzgSJ6IzbknOENwNpWGX5xeMujcGk1VQeboCyAfr/t03t6uooU+8T63nIy7uhAXGac=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706571665; c=relaxed/simple;
-	bh=kAbiPAPiUUF1HdZwMDCEif9mPkAv22BEx4ggATOOqWQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Z/xqsFDwyFbm1QSjkkglPBNTsbo4U+rJuy3iK5TWYRCq1jLEptLt6nwPFx5DJm76bt+e/GKWh2KsTeE7OZPad1LSnmKDjNgtS9zYS0eDIQS+Q5nBbzGECw8ORASGCEucbuEOKs8N8JAwENZjmPcHe0V3V23jCjEz4v8Bc37WDtw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=sAdhE35i; arc=fail smtp.client-ip=40.107.223.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=axUOJaSLkWVRylhnyrd0M/RCFu4Io9EFpUv8Rtm0bqaXVegfZaOJbnFJKsyTz0w3gcl1p24wcrENtTzWhN9Akz4scjgfZT5J/XwMyCR0mHUmN6SojSd8DiUMK4mKvO2yISVSj3OrdIJBR8ph/0o0ood4olY2Hn4SDCqFNY0JS9YSYiOJiFwZDt0zV/Qdtq9O9hHl9IJL1pwf4GH4448qC1zBzHBre0ps2jMO3pMVvFwdh/3nCvgAQbw8Hvv7aGOhB71WTwH5FCvCFxODumAK2dTN0jf9uCpYbZKz839VWziVTfgcScurBxKPTYI1XCc+4wuSz3lkgbRUADM1IkX/Pw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qlMZ2kmqsrNMYSMuguAx/DnwQHh9k1F0G+qJJCfFcjg=;
- b=iv99nT2GZzTnVF8DnJhdzhnkMK01LsiFUiOeq1nXYbOhMf4rCPjZzpLDnnBjcJ1yu4kL6/rGuNiGgpWmB0l/ufKMQFHubn5qJHaVqO4dieuj6d7QEIOLMn2BonXAsE0YHPkFVxqEDM8Sfti10AuAEsNk9Gmg7sZD+aDbrj8NF2jbr90KYTrf99l5FXZB6gKa+G8r022u24ArKSS6sbHogxb1dMpSnOhXdZIclngtVQ5JWcWA25bU8GsWZbFx9EFshBMTrPrWmWh+K2V5kSXQuc6dakTIZVksbBK/+3xRWGas51/MtNl3t4slKeEk24MKjnumAcSFGJoYTSW8tIohRQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=qlMZ2kmqsrNMYSMuguAx/DnwQHh9k1F0G+qJJCfFcjg=;
- b=sAdhE35ihgp8EXWgYMPqOxGv5acX+16zx1rTnYdqdCqlOszUhesvTChbHMuFzbIqNQD7gXuKvm38l8pEOSZCl/3KXaTTcfs/MXjbr3bqldhhDGDGP2PxGTu1U0mY6RMOuoES3Ru7RVx3LAs2pZ66y147VJi18plAfIgXQdaz9Sk=
-Received: from CH0PR03CA0035.namprd03.prod.outlook.com (2603:10b6:610:b3::10)
- by SA1PR12MB7198.namprd12.prod.outlook.com (2603:10b6:806:2bf::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.32; Mon, 29 Jan
- 2024 23:40:58 +0000
-Received: from CH2PEPF000000A0.namprd02.prod.outlook.com
- (2603:10b6:610:b3:cafe::e6) by CH0PR03CA0035.outlook.office365.com
- (2603:10b6:610:b3::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.34 via Frontend
- Transport; Mon, 29 Jan 2024 23:40:58 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- CH2PEPF000000A0.mail.protection.outlook.com (10.167.244.26) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.7249.19 via Frontend Transport; Mon, 29 Jan 2024 23:40:57 +0000
-Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Mon, 29 Jan
- 2024 17:40:53 -0600
-From: Brett Creeley <brett.creeley@amd.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <shannon.nelson@amd.com>, <brett.creeley@amd.com>
-Subject: [PATCH net 6/6] pds_core: Rework teardown/setup flow to be more common
-Date: Mon, 29 Jan 2024 15:40:35 -0800
-Message-ID: <20240129234035.69802-7-brett.creeley@amd.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20240129234035.69802-1-brett.creeley@amd.com>
-References: <20240129234035.69802-1-brett.creeley@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B7ED53C;
+	Tue, 30 Jan 2024 00:36:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706574964; cv=none; b=k74Si18KkK5duOtQJvdVnApRDZiCc7FKWCvP8XPEw0HtSoVJ0Dvcy/wrgMDeOGRbd3n+POIW8AxEzYPz2KnsQpuRP/sNJGrMulpYlDj0MXnkVaKHPzF2ejrZFCs7viWko3TetQMsk4mayvg0VEHysI2hAiuDhropmPo41mVW0SM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706574964; c=relaxed/simple;
+	bh=Suw9KF5ktIVTK5uerX+D/DxxdHAK+pd3QV3U4IsNHGM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mVWw7xkIzWYMkB5tZkz8X8cLfOB07CUtsLmVXXSvURX1Zw9WXuYWCwOrsHTTwIbxjblDJmZr8tdgp4kIh9/LFQMvBGlSdl2ei9l6ubJ+B70WbHQJGgiHvWD38FTns7RUFWzsjnV2mawncZPkt/JTtQGuEzmXY4PyC+w7K8LqEEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U7H1f7kt; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33aeb088324so1239140f8f.2;
+        Mon, 29 Jan 2024 16:36:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706574961; x=1707179761; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TKfKNYMatjFN+InDvnfGVCOEtv8nXBV5jhJHJ4q+47M=;
+        b=U7H1f7ktTXjyAEv78fPV4xO4vS6e8Dk9kb3AVMEwztOGkuXDwerZrManR4N5gzt9Fy
+         PIsvU2gbm0p5+z7WwotfKTdfvsMVt+csSPIyq4NfjXWKHQvmTcDE1AgLr2PoKSJdVvhm
+         h1PF09vuQ3siRlfZkL6UdoXdI1lry7AvVs+TusggtbMp6N47jow0IBJwJvDM33wvVBoO
+         7EKBC9jIcQVVcwrslvalMWB7SlS+6WFHjtFQTGyPGsP8oqblAYbOp84FghBa8kBk43aR
+         1iW3Pg5u7VrMpNXuqTiQLh7IYTKRHoRBWqWo7vhuyHf0Cw8A4SsL19njr9GqBwpxhcGh
+         xC5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706574961; x=1707179761;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TKfKNYMatjFN+InDvnfGVCOEtv8nXBV5jhJHJ4q+47M=;
+        b=GdnEIoB4hetaMFadyBxMa+HeGdEascRgJIILbTBPKqfOu+bFormf8hs9kdGt4RnI69
+         BLO/lbA+rX/ki7n4WDETvXnw0k5upTl6b3PxXRuvwTtIO/ATO3YajlVhGhT2QeUhPf/H
+         eTD3yAQPISzRSfFEhJS1gSHzkMY7110AANJY5YhlTG1HfUe4aTM/BIylsfENsN4R5ww3
+         C4PW5C0YXYpF9SrCJ6kh3wh4hG/CDW53Rd9LxrYGKvW+iCG1qHXAnHYmlEnoYqgnatZw
+         xey419/xbzEDZUFFWf3UXeJ/zUMGv74DSoRIi/Mf8CTJgHFZjjmbkR1xbLbGSK/ytyni
+         jn+Q==
+X-Gm-Message-State: AOJu0Ywuj3+tX6NxBrlwcDZJZfXh6OTdY4Wp1LUgzY+jxyN6g6x0JzjG
+	49/rgZmw0YFFoVD+A8STaeScz1x7Xv1yeKK972Iuzt6RjGBpNfM9YFA/ABTs
+X-Google-Smtp-Source: AGHT+IGnxM/5A0fh67ZbMcGvRkzCWTBA5FTDG41xGcZ243wX66/qk48SoC+dJFNHI4/Vx9z2o1pV/A==
+X-Received: by 2002:a05:6000:dcb:b0:33a:ea63:90cb with SMTP id dw11-20020a0560000dcb00b0033aea6390cbmr4128799wrb.55.1706574960959;
+        Mon, 29 Jan 2024 16:36:00 -0800 (PST)
+Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.googlemail.com with ESMTPSA id l10-20020a056000022a00b0033af350fb88sm2542167wrz.25.2024.01.29.16.35.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jan 2024 16:36:00 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Robert Marko <robert.marko@sartura.hr>,
+	linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jie Luo <quic_luoj@quicinc.com>
+Cc: Christian Marangi <ansuelsmth@gmail.com>
+Subject: [net-next PATCH v2 0/3] net: mdio-ipq4019: fix wrong default MDC rate
+Date: Tue, 30 Jan 2024 01:35:19 +0100
+Message-ID: <20240130003546.1546-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF000000A0:EE_|SA1PR12MB7198:EE_
-X-MS-Office365-Filtering-Correlation-Id: eb199083-4905-4328-03fa-08dc2123be51
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	5ro93ffGEhOhf7nUf+yex/VlHz6nw10h6RaPKn61KAqoKbAObutKJnDOElklNPnX0Lxn4icFF0IMvOWg3jdW8DkpYbSlX7DUehr9H0IzyfnOYeKi/qYVtkDMBkwtM6HDV+G6sB0UT7sodZ6Hg3YUUvk8bXRdor93xQ8CRu4+xPyTkIi48EE4noChBkXWTn3diT2+WEgaJSbEujUMXMh5Bf0DfhZNwtCla05dPECyXdZcj0E1+8L1DQnxtR2Z2x7KLilBrqGwCdDtVfcFcMg+4lWW2Szxxm04ySpFo4JVhmweFyA3/X89bPjxl41HwgmyYehMInt2GjJ+71GHw8vFG51KUmHPBT++vfQ3b6S6t5bCrSaXxrbu4apngWVkWX1Q+EBh0IAT6jYqTDoXJJCAZpC34v+Sqj0bljprIb1kHRq4KhquuYEURKTXbJboyYGOB8Xq6XIKJvZb8HoIx/BaHAu+skP6ihHNTdhZ+uAQV9sOuCthbro4KYqSHg9vcyL9v5Y/rVRte1IKsgSpiTu2fKqP28nGaKWaazcJlnTAl8TF2mOAkakqTCLHECjyiNkkf+3Nr81Ow+bf8Q3c9vzitHUngGFJmc2iOA4Kot+RE9MLlMB3eZ3+0kdplNyiQrggb6MdAdEK+fgZlZXayvL1nDCbMjOFJCZspvXcLP2F1M/Wgzdy7vgOC9cu2dXNJV65IIDvxOYMtME9b3Ju33gL/fxdqiMPdu+JgInnXQrTbM9in971Gk33BQtvuvJ3LNn9GVReTC3oEBL9NIVy+z0ZGw==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(346002)(39860400002)(396003)(376002)(136003)(230922051799003)(64100799003)(451199024)(1800799012)(82310400011)(186009)(36840700001)(40470700004)(46966006)(41300700001)(2906002)(36756003)(1076003)(316002)(47076005)(70586007)(86362001)(110136005)(40480700001)(83380400001)(70206006)(54906003)(478600001)(40460700003)(2616005)(6666004)(426003)(16526019)(5660300002)(356005)(4326008)(8936002)(336012)(44832011)(81166007)(82740400003)(8676002)(36860700001)(26005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2024 23:40:57.9851
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: eb199083-4905-4328-03fa-08dc2123be51
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF000000A0.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7198
+Content-Transfer-Encoding: 8bit
 
-Currently the teardown/setup flow for driver probe/remove is quite
-a bit different from the reset flows in pdsc_fw_down()/pdsc_fw_up().
-One key piece that's missing are the calls to pci_alloc_irq_vectors()
-and pci_free_irq_vectors(). The pcie reset case is calling
-pci_free_irq_vectors() on reset_prepare, but not calling the
-corresponding pci_alloc_irq_vectors() on reset_done. This is causing
-unexpected/unwanted interrupt behavior due to the adminq interrupt
-being accidentally put into legacy interrupt mode. Also, the
-pci_alloc_irq_vectors()/pci_free_irq_vectors() functions are being
-called directly in probe/remove respectively.
+This was a long journey to arrive and discover this problem.
 
-Fix this inconsistency by making the following changes:
-  1. Always call pdsc_dev_init() in pdsc_setup(), which calls
-     pci_alloc_irq_vectors() and get rid of the now unused
-     pds_dev_reinit().
-  2. Always free/clear the pdsc->intr_info in pdsc_teardown()
-     since this structure will get re-alloced in pdsc_setup().
-  3. Move the calls of pci_free_irq_vectors() to pdsc_teardown()
-     since pci_alloc_irq_vectors() will always be called in
-     pdsc_setup()->pdsc_dev_init() for both the probe/remove and
-     reset flows.
-  4. Make sure to only create the debugfs "identity" entry when it
-     doesn't already exist, which it will in the reset case because
-     it's already been created in the initial call to pdsc_dev_init().
+To not waste too much char, there is a race problem with PHY and driver
+probe. This was observed with Aquantia PHY firmware loading.
 
-Fixes: ffa55858330f ("pds_core: implement pci reset handlers")
-Signed-off-by: Brett Creeley <brett.creeley@amd.com>
-Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
----
- drivers/net/ethernet/amd/pds_core/core.c    | 13 +++++--------
- drivers/net/ethernet/amd/pds_core/core.h    |  1 -
- drivers/net/ethernet/amd/pds_core/debugfs.c |  4 ++++
- drivers/net/ethernet/amd/pds_core/dev.c     |  7 -------
- drivers/net/ethernet/amd/pds_core/main.c    |  2 --
- 5 files changed, 9 insertions(+), 18 deletions(-)
+With some hacks the race problem was workarounded but an interesting
+thing was notice. It took more than a minute for the firmware to load
+via MDIO.
 
-diff --git a/drivers/net/ethernet/amd/pds_core/core.c b/drivers/net/ethernet/amd/pds_core/core.c
-index 65c8a7072e35..7658a7286767 100644
---- a/drivers/net/ethernet/amd/pds_core/core.c
-+++ b/drivers/net/ethernet/amd/pds_core/core.c
-@@ -404,10 +404,7 @@ int pdsc_setup(struct pdsc *pdsc, bool init)
- 	int numdescs;
- 	int err;
- 
--	if (init)
--		err = pdsc_dev_init(pdsc);
--	else
--		err = pdsc_dev_reinit(pdsc);
-+	err = pdsc_dev_init(pdsc);
- 	if (err)
- 		return err;
- 
-@@ -479,10 +476,9 @@ void pdsc_teardown(struct pdsc *pdsc, bool removing)
- 		for (i = 0; i < pdsc->nintrs; i++)
- 			pdsc_intr_free(pdsc, i);
- 
--		if (removing) {
--			kfree(pdsc->intr_info);
--			pdsc->intr_info = NULL;
--		}
-+		kfree(pdsc->intr_info);
-+		pdsc->intr_info = NULL;
-+		pdsc->nintrs = 0;
- 	}
- 
- 	if (pdsc->kern_dbpage) {
-@@ -490,6 +486,7 @@ void pdsc_teardown(struct pdsc *pdsc, bool removing)
- 		pdsc->kern_dbpage = NULL;
- 	}
- 
-+	pci_free_irq_vectors(pdsc->pdev);
- 	set_bit(PDSC_S_FW_DEAD, &pdsc->state);
- }
- 
-diff --git a/drivers/net/ethernet/amd/pds_core/core.h b/drivers/net/ethernet/amd/pds_core/core.h
-index cbd5716f46e6..110c4b826b22 100644
---- a/drivers/net/ethernet/amd/pds_core/core.h
-+++ b/drivers/net/ethernet/amd/pds_core/core.h
-@@ -281,7 +281,6 @@ int pdsc_devcmd_locked(struct pdsc *pdsc, union pds_core_dev_cmd *cmd,
- 		       union pds_core_dev_comp *comp, int max_seconds);
- int pdsc_devcmd_init(struct pdsc *pdsc);
- int pdsc_devcmd_reset(struct pdsc *pdsc);
--int pdsc_dev_reinit(struct pdsc *pdsc);
- int pdsc_dev_init(struct pdsc *pdsc);
- 
- void pdsc_reset_prepare(struct pci_dev *pdev);
-diff --git a/drivers/net/ethernet/amd/pds_core/debugfs.c b/drivers/net/ethernet/amd/pds_core/debugfs.c
-index 8ec392299b7d..4e8579ca1c8c 100644
---- a/drivers/net/ethernet/amd/pds_core/debugfs.c
-+++ b/drivers/net/ethernet/amd/pds_core/debugfs.c
-@@ -64,6 +64,10 @@ DEFINE_SHOW_ATTRIBUTE(identity);
- 
- void pdsc_debugfs_add_ident(struct pdsc *pdsc)
- {
-+	/* This file will already exist in the reset flow */
-+	if (debugfs_lookup("identity", pdsc->dentry))
-+		return;
-+
- 	debugfs_create_file("identity", 0400, pdsc->dentry,
- 			    pdsc, &identity_fops);
- }
-diff --git a/drivers/net/ethernet/amd/pds_core/dev.c b/drivers/net/ethernet/amd/pds_core/dev.c
-index 62a38e0a8454..e65a1632df50 100644
---- a/drivers/net/ethernet/amd/pds_core/dev.c
-+++ b/drivers/net/ethernet/amd/pds_core/dev.c
-@@ -316,13 +316,6 @@ static int pdsc_identify(struct pdsc *pdsc)
- 	return 0;
- }
- 
--int pdsc_dev_reinit(struct pdsc *pdsc)
--{
--	pdsc_init_devinfo(pdsc);
--
--	return pdsc_identify(pdsc);
--}
--
- int pdsc_dev_init(struct pdsc *pdsc)
- {
- 	unsigned int nintrs;
-diff --git a/drivers/net/ethernet/amd/pds_core/main.c b/drivers/net/ethernet/amd/pds_core/main.c
-index 05fdeb235e5f..cdbf053b5376 100644
---- a/drivers/net/ethernet/amd/pds_core/main.c
-+++ b/drivers/net/ethernet/amd/pds_core/main.c
-@@ -438,7 +438,6 @@ static void pdsc_remove(struct pci_dev *pdev)
- 		mutex_destroy(&pdsc->config_lock);
- 		mutex_destroy(&pdsc->devcmd_lock);
- 
--		pci_free_irq_vectors(pdev);
- 		pdsc_unmap_bars(pdsc);
- 		pci_release_regions(pdev);
- 	}
-@@ -470,7 +469,6 @@ void pdsc_reset_prepare(struct pci_dev *pdev)
- 	pdsc_stop_health_thread(pdsc);
- 	pdsc_fw_down(pdsc);
- 
--	pci_free_irq_vectors(pdev);
- 	pdsc_unmap_bars(pdsc);
- 	pci_release_regions(pdev);
- 	pci_disable_device(pdev);
+This was strange as the same operation was done by UBoot in at max 5
+second and the same data was loaded.
+
+A similar problem was observed on a mtk board that also had an
+Aquantia PHY where the load was very slow. It was notice that the cause
+was the MDIO bus running at a very low speed and the firmware
+was missing a property (present in mtk sdk) that set the right frequency
+to the MDIO bus.
+
+It was fun to find that THE VERY SAME PROBLEM is present on IPQ in a
+different form. The MDIO apply internally a division to the feed clock
+resulting in the bus running at 390KHz instead of 6.25Mhz.
+
+Searching around the web for some documentation and some include and
+analyzing the uboot codeflow resulted in the divider being set wrongly
+at /256 instead of /16 as the value was actually never set.
+Applying the value restore the original load time for the Aquantia PHY.
+
+This series mainly handle this by adding support for the "clock-frequency"
+property.
+
+Changes v2:
+- Use DIV_ROUND_UP
+- Introduce logic to chose a default value for 802.3 spec 2.5MHz
+
+Christian Marangi (3):
+  dt-bindings: net: ipq4019-mdio: document now supported clock-frequency
+  net: mdio: ipq4019: add support for clock-frequency property
+  arm64: dts: qcom: ipq8074: add clock-frequency to MDIO node
+
+ .../bindings/net/qcom,ipq4019-mdio.yaml       |  15 +++
+ arch/arm64/boot/dts/qcom/ipq8074.dtsi         |   2 +
+ drivers/net/mdio/mdio-ipq4019.c               | 109 +++++++++++++++++-
+ 3 files changed, 120 insertions(+), 6 deletions(-)
+
 -- 
-2.17.1
+2.43.0
 
 
