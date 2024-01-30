@@ -1,148 +1,145 @@
-Return-Path: <netdev+bounces-67125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BAD98421D9
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:48:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25FC18421E2
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:49:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7F691F2310A
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:48:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D196A2962ED
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:49:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B513B664D4;
-	Tue, 30 Jan 2024 10:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A52106280D;
+	Tue, 30 Jan 2024 10:48:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bjb0xnxc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CyVxNvH0"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB437679FD
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 10:46:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C347E65BA9
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 10:48:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706611582; cv=none; b=rCmcHd2cQHQ77U368jRwNWz/2ya/1gkSR6ef44N0S0ePNWiiaGs3O9aHRAccRIkbAiHACo4TeHazxHhLFJO1cpv+zgv+RYASQAdpYwrvXgGzx6jrta+4eSekNJbGhl1WBTGY2tTDfbvdSQzW0XmakKHiSHHyIuMjM72pKWPHhlY=
+	t=1706611683; cv=none; b=ZUtbxQRUi3EaUEYO8E2GBTqEg8U7AmTIlUMPr11q/IF+IVYb3G1nk50/SI7StIDf8kYgRnTZo+AFqd+0xjZ/0qGIFZPRy6sqRANNe2wH9DCnEDsw8+Kq25Wm8zHFZS1b3qkZk00lGcgiKQZ9CN848vuxo+VZQBegkOivo3Yh1sg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706611582; c=relaxed/simple;
-	bh=5+GU6d8OWQbe1S6BsSm7oztahDCxzh4L9G0V9oIWkrc=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=WBuGW8u8eQIYtoEwcmYLsCH9p9o1U935NWAwt4+ifMc8w7YDWiox0w8/n/UCrsZBR5ZIQFO+DrkZ7gv3HDupsvRgeopsPVN2hYN5mXKNhM9YTptrTWsr44cp42JmUWDGuoeBdQTLG6VGCE+SvgWd50p8MVd/5hAetKTDkTiD2PU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bjb0xnxc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706611579;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=Z80Hx2erJNylQNU1U+dHgUxyZGWnukv64kv2ToGfIMQ=;
-	b=Bjb0xnxccU9cYYppDnbuO5H2zug+fduUpJ6kVFKVmkCsFNwocq5X9aUrIOUZwN2VnIhnWX
-	09BOINxGfXfn3wJv231HiGo2yzbNhrhtPiO0Xb0izC4TjjUpz3+AD2ZOz7sig3PTcNS2Cz
-	qPTido2rE1AzyUDM7ZPibLu+2gLl6jQ=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-467-Qc9kQbspPiOMkCsuWZrOBg-1; Tue, 30 Jan 2024 05:46:18 -0500
-X-MC-Unique: Qc9kQbspPiOMkCsuWZrOBg-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-78130939196so140671185a.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 02:46:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706611577; x=1707216377;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z80Hx2erJNylQNU1U+dHgUxyZGWnukv64kv2ToGfIMQ=;
-        b=T+gfAj683xKSbPN7jkw1yE9ayGKMv4WkWpvCuTpdxUU2QWByhHxLq9/0MvexyNCDlT
-         ZZ/lMUV5gMQ+uNADflHwwIRDYbmk7Bi495DFoDrFPIru7auGRTNt4mf5Ji9tsrLOh5Ey
-         Mz9k4efTKPbG91U8AwSKD4ufzTE0Sf7eSoom1r4kkrYFVuiVk2xvUlFPzzZtYBXGxtRn
-         lHdmEPTV/cdkdjDC5yWrtlCoET/3crNUQWAt3TL79sYdoJ7j3wmr0cDZSUxy6jzwSpJC
-         jRoleGbLXANsvxxN/kIbsM9JO9mOJNqpS9BkE8BewMAdFm1HkvegLFPMbvevwLdGEzP/
-         +fyw==
-X-Gm-Message-State: AOJu0YymCc8QLiHP1yGnIxmX41ihSrfVLZaqn0SywAapHLmbsjpH6UHf
-	MGl7cCYiCP5pGGuMM5IaBrfGwY4//rbY1uowN8NZtORau2GuxFXmxyLAYbsb2LLoPZbL4BXHJ9q
-	opvLoLvhsbkyDxbRBmdK50evG+EUMDNQwd2d+peRg3DOCa6fHXVO+1g==
-X-Received: by 2002:a05:620a:460c:b0:785:d26:44b5 with SMTP id br12-20020a05620a460c00b007850d2644b5mr502008qkb.4.1706611577513;
-        Tue, 30 Jan 2024 02:46:17 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFZ23xw/dzPC/GDtGo5so8tcGBtsXKzsvltN0Fyfq6SuiB74vztqMaC9gd+GqH0c1guhvYDBQ==
-X-Received: by 2002:a05:620a:460c:b0:785:d26:44b5 with SMTP id br12-20020a05620a460c00b007850d2644b5mr501992qkb.4.1706611577196;
-        Tue, 30 Jan 2024 02:46:17 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-232-203.dyn.eolo.it. [146.241.232.203])
-        by smtp.gmail.com with ESMTPSA id po30-20020a05620a385e00b00783e3b030e7sm2930173qkn.33.2024.01.30.02.46.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 02:46:16 -0800 (PST)
-Message-ID: <2c2e4c0e5c0413c9697b8924d6ccae8fe357ee74.camel@redhat.com>
-Subject: Re: [PATCH net-next] net: ipv6/addrconf: make regen_advance
- independent of retrans time
-From: Paolo Abeni <pabeni@redhat.com>
-To: Alex Henrie <alexhenrie24@gmail.com>, netdev@vger.kernel.org,
- dan@danm.net,  bagasdotme@gmail.com, davem@davemloft.net,
- dsahern@kernel.org, edumazet@google.com,  kuba@kernel.org, jikos@kernel.org
-Date: Tue, 30 Jan 2024 11:46:14 +0100
-In-Reply-To: <20240125035710.32118-1-alexhenrie24@gmail.com>
-References: <20240125035710.32118-1-alexhenrie24@gmail.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1706611683; c=relaxed/simple;
+	bh=5ayV37HZAa5vqSs+fvizolbsu3yLLh5lJ7gUCC3xJkQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N0RZbGHquurXEMY6hmzYt6ble1bBsap3M0oG1q3tNglF9Q1AEXzNhRXkD+5aB2d1tlQ1s5ng1Hf3mo9WEWYMcHfq/R92r35Ce01LtXORULhrl+Ztl2A4mMqSFsp+IheVOrDLijqyg4XdcG+kf3LHj6We+nKLlccu/ZIFs+EZkFo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CyVxNvH0; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706611682; x=1738147682;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5ayV37HZAa5vqSs+fvizolbsu3yLLh5lJ7gUCC3xJkQ=;
+  b=CyVxNvH0QFhzvYpz60GsSXSnC/Q9qRIIP/ZbP+g9u9H7NPtRkrfdUqrQ
+   qhy/b59DYmvHbf2LXOjJdp1C+UoRkPVL819b96sX0KsIZ+IyBTzVFWXkS
+   pMtpEGdH2regIi3VmiWYdox7xUWkU7zq4L251+Kf31MGflzusH9z9iEC6
+   Yb7QyNaMjbt9GQZFbuDGCdUWUqDwKjQzNaK133SbLuHHjkRrYSBz5MuQt
+   CXQvIIaAJcPJoLdOhbs7TMgIX0DjfyVs3Q/lBI3Ng+L58arospIPkdgcU
+   H12WWawwXRtYeqSSWGoKT3I9zqDGU3jmgXjJrk03l9aQ40cBLkd2F7Rq/
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10968"; a="2177340"
+X-IronPort-AV: E=Sophos;i="6.05,707,1701158400"; 
+   d="scan'208";a="2177340"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2024 02:47:58 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10968"; a="822152991"
+X-IronPort-AV: E=Sophos;i="6.05,707,1701158400"; 
+   d="scan'208";a="822152991"
+Received: from lkp-server02.sh.intel.com (HELO 59f4f4cd5935) ([10.239.97.151])
+  by orsmga001.jf.intel.com with ESMTP; 30 Jan 2024 02:47:54 -0800
+Received: from kbuild by 59f4f4cd5935 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rUlec-0000Cu-1i;
+	Tue, 30 Jan 2024 10:47:47 +0000
+Date: Tue, 30 Jan 2024 18:46:15 +0800
+From: kernel test robot <lkp@intel.com>
+To: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, edumazet@google.com, vadim.fedorenko@linux.dev,
+	arkadiusz.kubalewski@intel.com, saeedm@nvidia.com, leon@kernel.org,
+	jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+	rrameshbabu@nvidia.com
+Subject: Re: [patch net-next 2/3] dpll: extend lock_status_get() op by status
+ error and expose to user
+Message-ID: <202401301831.QfsB6gZg-lkp@intel.com>
+References: <20240129145916.244193-3-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240129145916.244193-3-jiri@resnulli.us>
 
-On Wed, 2024-01-24 at 20:57 -0700, Alex Henrie wrote:
-> In RFC 4941, REGEN_ADVANCE is a constant value of 5 seconds, and the RFC
-> does not permit the creation of temporary addresses with lifetimes
-> shorter than that:
->=20
-> > When processing a Router Advertisement with a Prefix
-> > Information option carrying a global scope prefix for the purposes of
-> > address autoconfiguration (i.e., the A bit is set), the node MUST
-> > perform the following steps:
->=20
-> > 5.  A temporary address is created only if this calculated Preferred
-> >     Lifetime is greater than REGEN_ADVANCE time units.
->=20
-> Moreover, using a non-constant regen_advance has undesirable side
-> effects. If regen_advance swelled above temp_prefered_lft,
-> ipv6_create_tempaddr would error out without creating any new address.
+Hi Jiri,
 
-RFC 4941 has been obsoleted by RFC 8981, which in turns makes
-REGEN_ADVANCE non constant:
+kernel test robot noticed the following build warnings:
 
-3.8. Defined Protocol Parameters and Configuration Variables=20
+[auto build test WARNING on net-next/main]
 
-REGEN_ADVANCE
-   2 + (TEMP_IDGEN_RETRIES * DupAddrDetectTransmits * RetransTimer /
-   1000)
+url:    https://github.com/intel-lab-lkp/linux/commits/Jiri-Pirko/dpll-extend-uapi-by-lock-status-error-attribute/20240129-230433
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240129145916.244193-3-jiri%40resnulli.us
+patch subject: [patch net-next 2/3] dpll: extend lock_status_get() op by status error and expose to user
+config: openrisc-allyesconfig (https://download.01.org/0day-ci/archive/20240130/202401301831.QfsB6gZg-lkp@intel.com/config)
+compiler: or1k-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240130/202401301831.QfsB6gZg-lkp@intel.com/reproduce)
 
-> On my machine and network, this error happened immediately with the
-> preferred lifetime set to 1 second, after a few minutes with the
-> preferred lifetime set to 4 seconds, and not at all with the preferred
-> lifetime set to 5 seconds. During my investigation, I found a Stack
-> Exchange post from another person who seems to have had the same
-> problem: They stopped getting new addresses if they lowered the
-> preferred lifetime below 3 seconds, and they didn't really know why.
->=20
-> Some users want to change their IPv6 address as frequently as possible
-> regardless of the RFC's arbitrary minimum lifetime. For the benefit of
-> those users, add a regen_advance sysctl parameter that can be set to
-> below or above 5 seconds.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202401301831.QfsB6gZg-lkp@intel.com/
 
-I guess we can't accommodate every user desire while speaking the same
-protocol.
+All warnings (new ones prefixed by >>):
 
-Perhaps emitting a kernel message when user settings do not allow the
-address regeneration could be a better option?
+>> drivers/net/ethernet/intel/ice/ice_dpll.c:505: warning: Function parameter or struct member 'status_error' not described in 'ice_dpll_lock_status_get'
 
-Cheers,
 
-Paolo
+vim +505 drivers/net/ethernet/intel/ice/ice_dpll.c
 
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  485  
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  486  /**
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  487   * ice_dpll_lock_status_get - get dpll lock status callback
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  488   * @dpll: registered dpll pointer
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  489   * @dpll_priv: private data pointer passed on dpll registration
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  490   * @status: on success holds dpll's lock status
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  491   * @extack: error reporting
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  492   *
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  493   * Dpll subsystem callback, provides dpll's lock status.
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  494   *
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  495   * Context: Acquires pf->dplls.lock
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  496   * Return:
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  497   * * 0 - success
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  498   * * negative - failure
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  499   */
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  500  static int
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  501  ice_dpll_lock_status_get(const struct dpll_device *dpll, void *dpll_priv,
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  502  			 enum dpll_lock_status *status,
+0bbc9a9d0d8c32 Jiri Pirko           2024-01-29  503  			 enum dpll_lock_status_error *status_error,
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  504  			 struct netlink_ext_ack *extack)
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13 @505  {
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  506  	struct ice_dpll *d = dpll_priv;
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  507  	struct ice_pf *pf = d->pf;
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  508  
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  509  	mutex_lock(&pf->dplls.lock);
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  510  	*status = d->dpll_state;
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  511  	mutex_unlock(&pf->dplls.lock);
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  512  
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  513  	return 0;
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  514  }
+d7999f5ea64bb1 Arkadiusz Kubalewski 2023-09-13  515  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
