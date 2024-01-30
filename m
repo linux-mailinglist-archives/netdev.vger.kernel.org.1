@@ -1,232 +1,419 @@
-Return-Path: <netdev+bounces-67036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F325E841E86
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:59:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 998C1841E51
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:49:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83A06B280CA
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 08:52:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1281F1F22418
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 08:49:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 394A357883;
-	Tue, 30 Jan 2024 08:52:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AhAJ79Ld"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBB3458AA3;
+	Tue, 30 Jan 2024 08:48:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F4A57867;
-	Tue, 30 Jan 2024 08:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 688A55733C
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 08:48:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706604756; cv=none; b=bD/EmtqHiEItGbw122ss8AwbTTiDjs23YE3dqXbMcFDvZRRDdCoUMqVpPU4e3KEriNRZrab0w8N7BVxdGVLOsVQ8oHNogGaVx5Rvn2GDU4NLfcjFMomaJmqa+EwwoCdMMxoi5IdOs87K+9UU7hk8fryAJHjKu1K7m8XwR8MSSSo=
+	t=1706604519; cv=none; b=R96GZpT/RaZsOZ9t6QjSpJowM2AVX66SDKvhbsE8haPt73EyKRoLKhFwNZRQkvakXRWyzm9yQQhQb9S5QCkEeujG+dljUmcryxlAYZRHXzuhjkLZUYfrZCuIAnHx8eQbrLojO8RdSP0SI1Am5FCFIiLSrCEwWfce6Qlsg3rtXHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706604756; c=relaxed/simple;
-	bh=2h2lKDVDe0Qt6DafrcvNa34Fl+qhtWodrVVJ81QUTO0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Be16AEyTrFS4cPh9mATSqZ3oiGoK4oD9aUfaWeqrvAJ9SiRCfdXrAat0a3ESzvFIeIPNoYojwwnqDjRweMN7wndH3jWOGOgf81zBBzaachc03BvYHxjD12ahl84t+VJYfrjCLIFo2nSXnBFGIV0ThAlilf8RTBIAiYaz+Fn5gME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AhAJ79Ld; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706604754; x=1738140754;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=2h2lKDVDe0Qt6DafrcvNa34Fl+qhtWodrVVJ81QUTO0=;
-  b=AhAJ79LdFf6ZfRnWl5RZxjS/sEAauHD6ktHX10zQ4DhS3Ruvy++ZbdzE
-   h7yc8E4dr5V9owfHInxwLvNVt7stIUN0GXxyzI5ZCMTak9dSYckrt7frG
-   QwBUrz0i9DPwM4WOuCyWRMPhMgclPkJTy+MkZaeCqWj+f4NPJ9kHdJleh
-   /8Ib1QKVRT3idN1R7o9fCJR6oZz1mST3svFIdrWejT6R0BPg7TMsMaJGd
-   TkHgLj20RQIxsZa8X/YM4Sikn91n9fQOHHLCWE0aQapPSnGHSsrGYfXgd
-   Cl05RGkX1ZQgG4GXcmGmUInlaHNTSN6IBybZ+bBjK9fc8cwjAsipj98ik
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10968"; a="10602345"
-X-IronPort-AV: E=Sophos;i="6.05,707,1701158400"; 
-   d="scan'208";a="10602345"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2024 00:52:32 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10968"; a="788126949"
-X-IronPort-AV: E=Sophos;i="6.05,707,1701158400"; 
-   d="scan'208";a="788126949"
-Received: from lkp-server02.sh.intel.com (HELO 59f4f4cd5935) ([10.239.97.151])
-  by orsmga002.jf.intel.com with ESMTP; 30 Jan 2024 00:52:17 -0800
-Received: from kbuild by 59f4f4cd5935 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rUjou-00009I-0m;
-	Tue, 30 Jan 2024 08:50:34 +0000
-Date: Tue, 30 Jan 2024 16:48:06 +0800
-From: kernel test robot <lkp@intel.com>
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
-	David E Box <david.e.box@linux.intel.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Mark Gross <markgross@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>
-Cc: Paul Gazzillo <paul@pgazz.com>,
-	Necip Fazil Yildiran <fazilyildiran@gmail.com>,
-	oe-kbuild-all@lists.linux.dev, Andrew Halaney <ahalaney@redhat.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	Serge Semin <fancer.lancer@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	platform-driver-x86@vger.kernel.org, linux-hwmon@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v4 08/11] stmmac: intel: configure SerDes
- according to the interface mode
-Message-ID: <202401301610.XVvNEdG4-lkp@intel.com>
-References: <20240129130253.1400707-9-yong.liang.choong@linux.intel.com>
+	s=arc-20240116; t=1706604519; c=relaxed/simple;
+	bh=HIyXHbsH9htJ/UW4xXRxFHYQvkCrC6/FEldroWWESx4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=GK99itZYOVTx57rUhMaC92BBW47Wm9SdiieIktuohhtE32MwdtLQ33E535EiU0noEylWIQ3FYKuYF8YzrY+P+N50FAjUbsBGEvWFIr6jrk+Ni2fBRVU+Nqi0XdRheP7BEXExBVVha+JBtZ6v5wogZoR4/Wbv4qrikF59XTAfl60=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.112.150])
+	by gateway (Coremail) with SMTP id _____8DxWPDht7hlQUUIAA--.25317S3;
+	Tue, 30 Jan 2024 16:48:33 +0800 (CST)
+Received: from localhost.localdomain (unknown [112.20.112.150])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxrhPet7hl0bAnAA--.34545S2;
+	Tue, 30 Jan 2024 16:48:31 +0800 (CST)
+From: Yanteng Si <siyanteng@loongson.cn>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	fancer.lancer@gmail.com
+Cc: Yanteng Si <siyanteng@loongson.cn>,
+	Jose.Abreu@synopsys.com,
+	chenhuacai@loongson.cn,
+	linux@armlinux.org.uk,
+	guyinggang@loongson.cn,
+	netdev@vger.kernel.org,
+	chris.chenfeiyang@gmail.com
+Subject: [PATCH net-next v8 05/11] net: stmmac: dwmac-loongson: Add Loongson-specific register definitions
+Date: Tue, 30 Jan 2024 16:48:17 +0800
+Message-Id: <e7e265e2d9d2f9d18d4633d037305cef3c5a18ca.1706601050.git.siyanteng@loongson.cn>
+X-Mailer: git-send-email 2.31.4
+In-Reply-To: <cover.1706601050.git.siyanteng@loongson.cn>
+References: <cover.1706601050.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240129130253.1400707-9-yong.liang.choong@linux.intel.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8CxrhPet7hl0bAnAA--.34545S2
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW3urWrWF4UGr1kZF45Cw48GrX_yoWkCFW3pa
+	45Aa98WrW8tr4rGa1kJrWUury5J3y5KFy7uFWkGw1aga9xKw13uFWUKFWUZF9rJrWkZ347
+	XrWjyw48CayDt3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBSb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
+	wI0_Gr1j6F4UJwAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
+	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
+	Wrv_ZF1lYx0Ex4A2jsIE14v26r4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvY0x
+	0EwIxGrwCY1x0262kKe7AKxVWUAVWUtwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkE
+	bVWUJVW8JwCFI7km07C267AKxVWUAVWUtwC20s026c02F40E14v26r1j6r18MI8I3I0E74
+	80Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_GFylIxkGc2Ij64vIr41lIxAIcVC0
+	I7IYx2IY67AKxVW7JVWDJwCI42IY6xIIjxv20xvEc7CjxVAFwI0_Cr0_Gr1UMIIF0xvE42
+	xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF
+	7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUVWrXDUUUU
 
-Hi Choong,
+There are two types of Loongson DWGMAC. The first type shares the same
+register definitions and has similar logic as dwmac1000. The second type
+uses several different register definitions, we think it is necessary to
+distinguish rx and tx, so we split these bits into two.
 
-kernel test robot noticed the following build warnings:
+Simply put, we split some single bit fields into double bits fileds:
 
-[auto build test WARNING on net-next/main]
+     Name              Tx          Rx
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Choong-Yong-Liang/net-phylink-publish-ethtool-link-modes-that-supported-and-advertised/20240129-211219
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20240129130253.1400707-9-yong.liang.choong%40linux.intel.com
-patch subject: [PATCH net-next v4 08/11] stmmac: intel: configure SerDes according to the interface mode
-config: x86_64-kismet-CONFIG_INTEL_PMC_IPC-CONFIG_DWMAC_INTEL-0-0 (https://download.01.org/0day-ci/archive/20240130/202401301610.XVvNEdG4-lkp@intel.com/config)
-reproduce: (https://download.01.org/0day-ci/archive/20240130/202401301610.XVvNEdG4-lkp@intel.com/reproduce)
+DMA_INTR_ENA_NIE = 0x00040000 | 0x00020000;
+DMA_INTR_ENA_AIE = 0x00010000 | 0x00008000;
+DMA_STATUS_NIS   = 0x00040000 | 0x00020000;
+DMA_STATUS_AIS   = 0x00010000 | 0x00008000;
+DMA_STATUS_FBI   = 0x00002000 | 0x00001000;
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202401301610.XVvNEdG4-lkp@intel.com/
+Therefore, when using, TX and RX must be set at the same time.
 
-kismet warnings: (new ones prefixed by >>)
->> kismet: WARNING: unmet direct dependencies detected for INTEL_PMC_IPC when selected by DWMAC_INTEL
-   .config:21:warning: symbol value 'n' invalid for AIC79XX_DEBUG_MASK
-   .config:51:warning: symbol value 'n' invalid for BLK_DEV_LOOP_MIN_COUNT
-   .config:114:warning: symbol value 'n' invalid for SQUASHFS_FRAGMENT_CACHE_SIZE
-   .config:205:warning: symbol value 'n' invalid for FB_OMAP2_NUM_FBS
-   .config:209:warning: symbol value 'n' invalid for CMA_SIZE_MBYTES
-   .config:254:warning: symbol value 'n' invalid for SATA_MOBILE_LPM_POLICY
-   .config:337:warning: symbol value 'n' invalid for CFAG12864B_RATE
-   .config:351:warning: symbol value 'n' invalid for PSTORE_BLK_MAX_REASON
-   .config:355:warning: symbol value 'n' invalid for AIC79XX_CMDS_PER_DEVICE
-   .config:437:warning: symbol value 'n' invalid for PANEL_LCD_PIN_SDA
-   .config:459:warning: symbol value 'n' invalid for KFENCE_SAMPLE_INTERVAL
-   .config:574:warning: symbol value 'n' invalid for AIC7XXX_DEBUG_MASK
-   .config:646:warning: symbol value 'n' invalid for CRYPTO_DEV_QCE_SW_MAX_LEN
-   .config:653:warning: symbol value 'n' invalid for DRM_XE_JOB_TIMEOUT_MIN
-   .config:690:warning: symbol value 'n' invalid for FAT_DEFAULT_CODEPAGE
-   .config:752:warning: symbol value 'n' invalid for PANEL_LCD_CHARSET
-   .config:838:warning: symbol value 'n' invalid for SND_AC97_POWER_SAVE_DEFAULT
-   .config:868:warning: symbol value 'n' invalid for MAGIC_SYSRQ_DEFAULT_ENABLE
-   .config:885:warning: symbol value 'n' invalid for DRM_I915_MAX_REQUEST_BUSYWAIT
-   .config:919:warning: symbol value 'n' invalid for SND_AT73C213_TARGET_BITRATE
-   .config:957:warning: symbol value 'n' invalid for DRM_XE_PREEMPT_TIMEOUT_MIN
-   .config:969:warning: symbol value 'n' invalid for VMCP_CMA_SIZE
-   .config:1154:warning: symbol value 'n' invalid for NODES_SHIFT
-   .config:1224:warning: symbol value 'n' invalid for RCU_CPU_STALL_TIMEOUT
-   .config:1253:warning: symbol value 'n' invalid for MTDRAM_ERASE_SIZE
-   .config:1327:warning: symbol value 'n' invalid for SERIAL_UARTLITE_NR_UARTS
-   .config:1492:warning: symbol value 'n' invalid for INPUT_MOUSEDEV_SCREEN_Y
-   .config:1506:warning: symbol value 'n' invalid for LEGACY_PTY_COUNT
-   .config:1667:warning: symbol value 'n' invalid for AIC7XXX_RESET_DELAY_MS
-   .config:1833:warning: symbol value 'n' invalid for USB_GADGET_STORAGE_NUM_BUFFERS
-   .config:1883:warning: symbol value 'n' invalid for IBM_EMAC_POLL_WEIGHT
-   .config:1951:warning: symbol value 'n' invalid for PANEL_PROFILE
-   .config:1967:warning: symbol value 'n' invalid for DRM_I915_STOP_TIMEOUT
-   .config:2289:warning: symbol value 'n' invalid for SND_HDA_PREALLOC_SIZE
-   .config:2301:warning: symbol value 'n' invalid for PANEL_LCD_PIN_E
-   .config:2336:warning: symbol value 'n' invalid for SND_SOC_SOF_DEBUG_IPC_FLOOD_TEST_NUM
-   .config:2339:warning: symbol value 'n' invalid for RCU_FANOUT_LEAF
-   .config:2443:warning: symbol value 'n' invalid for DRM_XE_TIMESLICE_MAX
-   .config:2500:warning: symbol value 'n' invalid for PANEL_LCD_BWIDTH
-   .config:2763:warning: symbol value 'n' invalid for PANEL_PARPORT
-   .config:2773:warning: symbol value 'n' invalid for PSTORE_BLK_CONSOLE_SIZE
-   .config:2860:warning: symbol value 'n' invalid for NOUVEAU_DEBUG_DEFAULT
-   .config:2938:warning: symbol value 'n' invalid for BOOKE_WDT_DEFAULT_TIMEOUT
-   .config:3061:warning: symbol value 'n' invalid for KCSAN_REPORT_ONCE_IN_MS
-   .config:3171:warning: symbol value 'n' invalid for KCSAN_UDELAY_INTERRUPT
-   .config:3194:warning: symbol value 'n' invalid for PANEL_LCD_PIN_BL
-   .config:3216:warning: symbol value 'n' invalid for DEBUG_OBJECTS_ENABLE_DEFAULT
-   .config:3223:warning: symbol value 'n' invalid for INITRAMFS_ROOT_GID
-   .config:3345:warning: symbol value 'n' invalid for ATM_FORE200E_TX_RETRY
-   .config:3389:warning: symbol value 'n' invalid for FB_OMAP2_DSS_MIN_FCK_PER_PCK
-   .config:3450:warning: symbol value 'n' invalid for AIC79XX_RESET_DELAY_MS
-   .config:3538:warning: symbol value 'n' invalid for KCSAN_UDELAY_TASK
-   .config:3574:warning: symbol value 'n' invalid for STACK_MAX_DEFAULT_SIZE_MB
-   .config:3759:warning: symbol value 'n' invalid for MMC_BLOCK_MINORS
-   .config:3806:warning: symbol value 'n' invalid for SCSI_NCR53C8XX_SYNC
-   .config:3894:warning: symbol value 'n' invalid for SERIAL_MCF_BAUDRATE
-   .config:3936:warning: symbol value 'n' invalid for UCLAMP_BUCKETS_COUNT
-   .config:3963:warning: symbol value 'n' invalid for X86_AMD_PSTATE_DEFAULT_MODE
-   .config:3985:warning: symbol value 'n' invalid for DE2104X_DSL
-   .config:3993:warning: symbol value 'n' invalid for BLK_DEV_RAM_COUNT
-   .config:4233:warning: symbol value 'n' invalid for IP_VS_SH_TAB_BITS
-   .config:4347:warning: symbol value 'n' invalid for SERIAL_ALTERA_UART_BAUDRATE
-   .config:4385:warning: symbol value 'n' invalid for USBIP_VHCI_HC_PORTS
-   .config:4492:warning: symbol value 'n' invalid for CMA_AREAS
-   .config:4493:warning: symbol value 'n' invalid for DUMMY_CONSOLE_ROWS
-   .config:4551:warning: symbol value 'n' invalid for INPUT_MOUSEDEV_SCREEN_X
-   .config:4670:warning: symbol value 'n' invalid for RIONET_RX_SIZE
-   .config:4736:warning: symbol value 'n' invalid for RADIO_TYPHOON_PORT
-   .config:4854:warning: symbol value 'n' invalid for SERIAL_TXX9_NR_UARTS
-   .config:4899:warning: symbol value 'n' invalid for MTRR_SANITIZER_SPARE_REG_NR_DEFAULT
-   .config:5001:warning: symbol value 'n' invalid for IBM_EMAC_TXB
-   .config:5148:warning: symbol value 'n' invalid for FTRACE_RECORD_RECURSION_SIZE
-   .config:5510:warning: symbol value 'n' invalid for DRM_I915_FENCE_TIMEOUT
-   .config:5532:warning: symbol value 'n' invalid for TTY_PRINTK_LEVEL
-   .config:5585:warning: symbol value 'n' invalid for CRYPTO_DEV_FSL_CAAM_INTC_TIME_THLD
-   .config:5701:warning: symbol value 'n' invalid for MIPS_EJTAG_FDC_KGDB_CHAN
-   .config:5772:warning: symbol value 'n' invalid for PPC_EARLY_DEBUG_EHV_BC_HANDLE
-   .config:5796:warning: symbol value 'n' invalid for KDB_DEFAULT_ENABLE
-   .config:5816:warning: symbol value 'n' invalid for SERIAL_ALTERA_UART_MAXPORTS
-   .config:5933:warning: symbol value 'n' invalid for IP_VS_MH_TAB_INDEX
-   .config:6101:warning: symbol value 'n' invalid for PANEL_LCD_HWIDTH
-   .config:6131:warning: symbol value 'n' invalid for LOCKDEP_CHAINS_BITS
-   .config:6230:warning: symbol value 'n' invalid for DRM_I915_HEARTBEAT_INTERVAL
-   .config:6236:warning: symbol value 'n' invalid for KCSAN_SKIP_WATCH
-   .config:6244:warning: symbol value 'n' invalid for EFI_MAX_FAKE_MEM
-   .config:6260:warning: symbol value 'n' invalid for PSTORE_BLK_KMSG_SIZE
-   .config:6358:warning: symbol value 'n' invalid for PANEL_LCD_PIN_RW
-   .config:6481:warning: symbol value 'n' invalid for SERIAL_8250_RUNTIME_UARTS
-   .config:6517:warning: symbol value 'n' invalid for KVM_MAX_NR_VCPUS
-   .config:6584:warning: symbol value 'n' invalid for ARCH_MMAP_RND_COMPAT_BITS
-   .config:6633:warning: symbol value 'n' invalid for SERIAL_SH_SCI_NR_UARTS
-   .config:6766:warning: symbol value 'n' invalid for RADIO_TRUST_PORT
-   .config:6852:warning: symbol value 'n' invalid for SND_MAX_CARDS
-   .config:7006:warning: symbol value 'n' invalid for RCU_BOOST_DELAY
-   .config:7177:warning: symbol value 'n' invalid for DVB_MAX_ADAPTERS
-   .config:7180:warning: symbol value 'n' invalid for SCSI_NCR53C8XX_MAX_TAGS
-   .config:7187:warning: symbol value 'n' invalid for CMA_SIZE_PERCENTAGE
-   .config:7213:warning: symbol value 'n' invalid for SCSI_SYM53C8XX_DMA_ADDRESSING_MODE
-   .config:7257:warning: symbol value 'n' invalid for ZSMALLOC_CHAIN_SIZE
-   .config:7354:warning: symbol value 'n' invalid for DRM_XE_TIMESLICE_MIN
+How to use them:
+1. Create the Loongson GNET-specific
+stmmac_dma_ops.dma_interrupt()
+stmmac_dma_ops.init_chan()
+methods in the dwmac-loongson.c driver. Adding all the
+Loongson-specific macros
 
+2. Create a Loongson GNET-specific platform setup method with the next
+semantics:
+   + allocate stmmac_dma_ops instance and initialize it with
+     dwmac1000_dma_ops.
+   + override the stmmac_dma_ops.{dma_interrupt, init_chan} with
+     the pointers to the methods defined in 2.
+   + allocate mac_device_info instance and initialize the
+     mac_device_info.dma field with a pointer to the new
+     stmmac_dma_ops instance.
+   + initialize mac_device_info in a way it's done in
+     dwmac1000_setup().
+
+3. Initialize plat_stmmacenet_data.setup() with the pointer to the
+method created in 2.
+
+Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+---
+ .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 248 ++++++++++++++++++
+ 1 file changed, 248 insertions(+)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+index e7ce027cc14e..3b3578318cc1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+@@ -8,6 +8,193 @@
+ #include <linux/device.h>
+ #include <linux/of_irq.h>
+ #include "stmmac.h"
++#include "dwmac_dma.h"
++#include "dwmac1000.h"
++
++#define DMA_INTR_ENA_NIE_TX_LOONGSON 0x00040000	/* Normal Loongson Tx Summary */
++#define DMA_INTR_ENA_NIE_RX_LOONGSON 0x00020000	/* Normal Loongson Rx Summary */
++#define DMA_INTR_NORMAL_LOONGSON	(DMA_INTR_ENA_NIE_TX_LOONGSON | \
++			 DMA_INTR_ENA_NIE_RX_LOONGSON | DMA_INTR_ENA_RIE | \
++			 DMA_INTR_ENA_TIE)
++
++#define DMA_INTR_ENA_AIE_TX_LOONGSON 0x00010000	/* Abnormal Loongson Tx Summary */
++#define DMA_INTR_ENA_AIE_RX_LOONGSON 0x00008000	/* Abnormal Loongson Rx Summary */
++
++#define DMA_INTR_ABNORMAL_LOONGSON	(DMA_INTR_ENA_AIE_TX_LOONGSON | \
++				DMA_INTR_ENA_AIE_RX_LOONGSON | DMA_INTR_ENA_FBE | \
++				DMA_INTR_ENA_UNE)
++
++#define DMA_INTR_DEFAULT_MASK_LOONGSON	(DMA_INTR_NORMAL_LOONGSON | DMA_INTR_ABNORMAL_LOONGSON)
++
++#define DMA_STATUS_NIS_TX_LOONGSON	0x00040000	/* Normal Loongson Tx Interrupt Summary */
++#define DMA_STATUS_NIS_RX_LOONGSON	0x00020000	/* Normal Loongson Rx Interrupt Summary */
++
++#define DMA_STATUS_AIS_TX_LOONGSON	0x00010000	/* Abnormal Loongson Tx Interrupt Summary */
++#define DMA_STATUS_AIS_RX_LOONGSON	0x00008000	/* Abnormal Loongson Rx Interrupt Summary */
++
++#define DMA_STATUS_FBI_TX_LOONGSON	0x00002000	/* Fatal Loongson Tx Bus Error Interrupt */
++#define DMA_STATUS_FBI_RX_LOONGSON	0x00001000	/* Fatal Loongson Rx Bus Error Interrupt */
++
++#define DMA_STATUS_MSK_COMMON_LOONGSON		(DMA_STATUS_NIS_TX_LOONGSON | \
++					 DMA_STATUS_NIS_RX_LOONGSON | DMA_STATUS_AIS_TX_LOONGSON | \
++					 DMA_STATUS_AIS_RX_LOONGSON | DMA_STATUS_FBI_TX_LOONGSON | \
++					 DMA_STATUS_FBI_RX_LOONGSON)
++
++#define DMA_STATUS_MSK_RX_LOONGSON		(DMA_STATUS_ERI | \
++					 DMA_STATUS_RWT | \
++					 DMA_STATUS_RPS | \
++					 DMA_STATUS_RU | \
++					 DMA_STATUS_RI | \
++					 DMA_STATUS_OVF | \
++					 DMA_STATUS_MSK_COMMON_LOONGSON)
++
++#define DMA_STATUS_MSK_TX_LOONGSON		(DMA_STATUS_ETI | \
++					 DMA_STATUS_UNF | \
++					 DMA_STATUS_TJT | \
++					 DMA_STATUS_TU | \
++					 DMA_STATUS_TPS | \
++					 DMA_STATUS_TI | \
++					 DMA_STATUS_MSK_COMMON_LOONGSON)
++
++struct loongson_data {
++	struct device *dev;
++	u32 lgmac_version;
++	struct stmmac_dma_ops dwlgmac_dma_ops;
++};
++
++static void dwlgmac_dma_init_channel(struct stmmac_priv *priv,
++				     void __iomem *ioaddr,
++				     struct stmmac_dma_cfg *dma_cfg, u32 chan)
++{
++	u32 value;
++	int txpbl = dma_cfg->txpbl ?: dma_cfg->pbl;
++	int rxpbl = dma_cfg->rxpbl ?: dma_cfg->pbl;
++
++	/* common channel control register config */
++	value = readl(ioaddr + DMA_CHAN_BUS_MODE(chan));
++
++	/* Set the DMA PBL (Programmable Burst Length) mode.
++	 *
++	 * Note: before stmmac core 3.50 this mode bit was 4xPBL, and
++	 * post 3.5 mode bit acts as 8*PBL.
++	 */
++	if (dma_cfg->pblx8)
++		value |= DMA_BUS_MODE_MAXPBL;
++	value |= DMA_BUS_MODE_USP;
++	value &= ~(DMA_BUS_MODE_PBL_MASK | DMA_BUS_MODE_RPBL_MASK);
++	value |= (txpbl << DMA_BUS_MODE_PBL_SHIFT);
++	value |= (rxpbl << DMA_BUS_MODE_RPBL_SHIFT);
++
++	/* Set the Fixed burst mode */
++	if (dma_cfg->fixed_burst)
++		value |= DMA_BUS_MODE_FB;
++
++	/* Mixed Burst has no effect when fb is set */
++	if (dma_cfg->mixed_burst)
++		value |= DMA_BUS_MODE_MB;
++
++	value |= DMA_BUS_MODE_ATDS;
++
++	if (dma_cfg->aal)
++		value |= DMA_BUS_MODE_AAL;
++
++	writel(value, ioaddr + DMA_BUS_MODE);
++
++	/* Mask interrupts by writing to CSR7 */
++	writel(DMA_INTR_DEFAULT_MASK_LOONGSON, ioaddr + DMA_INTR_ENA);
++}
++
++static int dwlgmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
++				 struct stmmac_extra_stats *x, u32 chan, u32 dir)
++{
++	struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[chan];
++	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[chan];
++	int ret = 0;
++	/* read the status register (CSR5) */
++	u32 nor_intr_status;
++	u32 abnor_intr_status;
++	u32 fb_intr_status;
++	u32 intr_status = readl(ioaddr + DMA_CHAN_STATUS(chan));
++
++#ifdef DWMAC_DMA_DEBUG
++	/* Enable it to monitor DMA rx/tx status in case of critical problems */
++	pr_debug("%s: [CSR5: 0x%08x]\n", __func__, intr_status);
++	show_tx_process_state(intr_status);
++	show_rx_process_state(intr_status);
++#endif
++
++	if (dir == DMA_DIR_RX)
++		intr_status &= DMA_STATUS_MSK_RX_LOONGSON;
++	else if (dir == DMA_DIR_TX)
++		intr_status &= DMA_STATUS_MSK_TX_LOONGSON;
++
++	nor_intr_status = intr_status & (DMA_STATUS_NIS_TX_LOONGSON |
++		DMA_STATUS_NIS_RX_LOONGSON);
++	abnor_intr_status = intr_status & (DMA_STATUS_AIS_TX_LOONGSON |
++		DMA_STATUS_AIS_RX_LOONGSON);
++	fb_intr_status = intr_status & (DMA_STATUS_FBI_TX_LOONGSON |
++		DMA_STATUS_FBI_RX_LOONGSON);
++
++	/* ABNORMAL interrupts */
++	if (unlikely(abnor_intr_status)) {
++		if (unlikely(intr_status & DMA_STATUS_UNF)) {
++			ret = tx_hard_error_bump_tc;
++			x->tx_undeflow_irq++;
++		}
++		if (unlikely(intr_status & DMA_STATUS_TJT))
++			x->tx_jabber_irq++;
++
++		if (unlikely(intr_status & DMA_STATUS_OVF))
++			x->rx_overflow_irq++;
++
++		if (unlikely(intr_status & DMA_STATUS_RU))
++			x->rx_buf_unav_irq++;
++		if (unlikely(intr_status & DMA_STATUS_RPS))
++			x->rx_process_stopped_irq++;
++		if (unlikely(intr_status & DMA_STATUS_RWT))
++			x->rx_watchdog_irq++;
++		if (unlikely(intr_status & DMA_STATUS_ETI))
++			x->tx_early_irq++;
++		if (unlikely(intr_status & DMA_STATUS_TPS)) {
++			x->tx_process_stopped_irq++;
++			ret = tx_hard_error;
++		}
++		if (unlikely(intr_status & fb_intr_status)) {
++			x->fatal_bus_error_irq++;
++			ret = tx_hard_error;
++		}
++	}
++	/* TX/RX NORMAL interrupts */
++	if (likely(nor_intr_status)) {
++		if (likely(intr_status & DMA_STATUS_RI)) {
++			u32 value = readl(ioaddr + DMA_INTR_ENA);
++			/* to schedule NAPI on real RIE event. */
++			if (likely(value & DMA_INTR_ENA_RIE)) {
++				u64_stats_update_begin(&rxq_stats->syncp);
++				rxq_stats->rx_normal_irq_n++;
++				u64_stats_update_end(&rxq_stats->syncp);
++				ret |= handle_rx;
++			}
++		}
++		if (likely(intr_status & DMA_STATUS_TI)) {
++			u64_stats_update_begin(&txq_stats->syncp);
++			txq_stats->tx_normal_irq_n++;
++			u64_stats_update_end(&txq_stats->syncp);
++			ret |= handle_tx;
++		}
++		if (unlikely(intr_status & DMA_STATUS_ERI))
++			x->rx_early_irq++;
++	}
++	/* Optional hardware blocks, interrupts should be disabled */
++	if (unlikely(intr_status &
++		     (DMA_STATUS_GPI | DMA_STATUS_GMI | DMA_STATUS_GLI)))
++		pr_warn("%s: unexpected status %08x\n", __func__, intr_status);
++
++	/* Clear the interrupt by writing a logic 1 to the CSR5[15-0] */
++	writel((intr_status & 0x7ffff), ioaddr + DMA_CHAN_STATUS(chan));
++
++	return ret;
++}
+ 
+ struct stmmac_pci_info {
+ 	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
+@@ -121,6 +308,48 @@ static struct stmmac_pci_info loongson_gmac_pci_info = {
+ 	.config = loongson_gmac_config,
+ };
+ 
++static struct mac_device_info *loongson_setup(void *apriv)
++{
++	struct stmmac_priv *priv = apriv;
++	struct mac_device_info *mac;
++	struct loongson_data *ld;
++
++	mac = devm_kzalloc(priv->device, sizeof(*mac), GFP_KERNEL);
++	if (!mac)
++		return NULL;
++
++	ld = priv->plat->bsp_priv;
++	mac->dma = &ld->dwlgmac_dma_ops;
++
++	/* Pre-initialize the respective "mac" fields as it's done in
++	 * dwmac1000_setup()
++	 */
++	priv->dev->priv_flags |= IFF_UNICAST_FLT;
++	mac->pcsr = priv->ioaddr;
++	mac->multicast_filter_bins = priv->plat->multicast_filter_bins;
++	mac->unicast_filter_entries = priv->plat->unicast_filter_entries;
++	mac->mcast_bits_log2 = 0;
++
++	if (mac->multicast_filter_bins)
++		mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
++
++	mac->link.duplex = GMAC_CONTROL_DM;
++	mac->link.speed10 = GMAC_CONTROL_PS;
++	mac->link.speed100 = GMAC_CONTROL_PS | GMAC_CONTROL_FES;
++	mac->link.speed1000 = 0;
++	mac->link.speed_mask = GMAC_CONTROL_PS | GMAC_CONTROL_FES;
++	mac->mii.addr = GMAC_MII_ADDR;
++	mac->mii.data = GMAC_MII_DATA;
++	mac->mii.addr_shift = 11;
++	mac->mii.addr_mask = 0x0000F800;
++	mac->mii.reg_shift = 6;
++	mac->mii.reg_mask = 0x000007C0;
++	mac->mii.clk_csr_shift = 2;
++	mac->mii.clk_csr_mask = GENMASK(5, 2);
++
++	return mac;
++}
++
+ static int loongson_dwmac_probe(struct pci_dev *pdev,
+ 				const struct pci_device_id *id)
+ {
+@@ -129,6 +358,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
+ 	struct stmmac_pci_info *info;
+ 	struct stmmac_resources res;
+ 	struct device_node *np;
++	struct loongson_data *ld;
+ 
+ 	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
+ 	if (!plat)
+@@ -145,6 +375,10 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
+ 	if (!plat->dma_cfg)
+ 		return -ENOMEM;
+ 
++	ld = devm_kzalloc(&pdev->dev, sizeof(*ld), GFP_KERNEL);
++	if (!ld)
++		return -ENOMEM;
++
+ 	np = dev_of_node(&pdev->dev);
+ 	plat->mdio_node = of_get_child_by_name(np, "mdio");
+ 	if (plat->mdio_node) {
+@@ -197,6 +431,20 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
+ 	if (ret)
+ 		goto err_disable_device;
+ 
++	ld->dev = &pdev->dev;
++	ld->lgmac_version = readl(res.addr + GMAC_VERSION) & 0xff;
++
++	/* Activate loongson custom ip */
++	if (ld->lgmac_version < DWMAC_CORE_3_50) {
++		ld->dwlgmac_dma_ops = dwmac1000_dma_ops;
++		ld->dwlgmac_dma_ops.init_chan = dwlgmac_dma_init_channel;
++		ld->dwlgmac_dma_ops.dma_interrupt = dwlgmac_dma_interrupt;
++
++		plat->setup = loongson_setup;
++	}
++
++	plat->bsp_priv = ld;
++
+ 	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+ 	if (ret)
+ 		goto err_disable_device;
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.31.4
+
 
