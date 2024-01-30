@@ -1,125 +1,73 @@
-Return-Path: <netdev+bounces-67202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4571584253C
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 13:46:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C79E842587
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 13:56:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DADFF1F25532
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 12:46:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF18F1C216E7
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 12:56:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0E4F6A347;
-	Tue, 30 Jan 2024 12:46:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 915316BB24;
+	Tue, 30 Jan 2024 12:54:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q8ehWSMb"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D061A6A032;
-	Tue, 30 Jan 2024 12:46:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69DB16A358;
+	Tue, 30 Jan 2024 12:54:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706618777; cv=none; b=mwn48a/z1Krus3ANQGkn+Fsyaba0fZGlhpzNr/dkDraTUfOxPSJmfwKqAkLQxFG5G3L56lm1CBTJQlDjxviQrzHzNGOMZP+9i3sz8xJ7D+y2b81CrfJGcdHnDdSVRmwWjtOf2fIq6OYLikzp/GWQ09ZZ+ClHIxLy9M9xw8fakxo=
+	t=1706619271; cv=none; b=V+geR1/4a3KpWDkAuYbhtaJoEEDQPqAh+UMW6YWnOsJ8njgkkBXWxz0U7Aa0IS2j14WRN5NzhKH1FRYaRV/vp0oCLWGdZxgfKbc0vfZ/gd+RTzYLgw20Y198c7R2xIVKj8beM9lKhYuEVTaBjGDph6kC1B2lI0Op1mMHIqMNXZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706618777; c=relaxed/simple;
-	bh=ctPoFLZ6fDg+iLDjvbhC5ihAV2hg0GOft31nUZc2tNg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=esobjbJ5rl+HideRAbOY56PISH/UiVW86INogb74e6t/tVXoP8qiRKe6zHOQMJpA0vZvt76Vo8Fbi7KSFyAr3A7r3zqQVj3vcM8FTniatewGrwzOftk397m6ItniAcNszjqJjU5K4PP2J0s9o1vKzNMJUFekFnd7F0vjV6NJNqo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4TPPzc60XBz4f3m6f;
-	Tue, 30 Jan 2024 20:46:04 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 4F7CB1A0232;
-	Tue, 30 Jan 2024 20:46:11 +0800 (CST)
-Received: from ultra.huawei.com (unknown [10.90.53.71])
-	by APP1 (Coremail) with SMTP id cCh0CgCXZg+S77hllrfLCQ--.28270S4;
-	Tue, 30 Jan 2024 20:46:11 +0800 (CST)
-From: Pu Lehui <pulehui@huaweicloud.com>
-To: bpf@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	netdev@vger.kernel.org
-Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Hou Tao <houtao1@huawei.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Luke Nelson <luke.r.nels@gmail.com>,
-	Pu Lehui <pulehui@huawei.com>,
-	Pu Lehui <pulehui@huaweicloud.com>
-Subject: [PATCH bpf-next 2/2] selftests/bpf: Enable inline bpf_kptr_xchg() test for RV64
-Date: Tue, 30 Jan 2024 12:46:59 +0000
-Message-Id: <20240130124659.670321-3-pulehui@huaweicloud.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240130124659.670321-1-pulehui@huaweicloud.com>
-References: <20240130124659.670321-1-pulehui@huaweicloud.com>
+	s=arc-20240116; t=1706619271; c=relaxed/simple;
+	bh=6vo7FvUQHTzqjILs/LLq8FUpPcpbRTX+rPznUSEtmcw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UgFHSZ8z7SXt46EtSpc+gqnWld3h63lzx8KvvPxmiMN52p0lAvq35QQ1G1hHBx8eVYrciAffH6PTd416Jqx7uJJWmqRkTju1f1Rtwe1EcOespz/n4Qo4nXqx0XkcdkFomwi0ZgbeMUoXf9N6RDPouho842DTuIk6lAL8x19LwQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q8ehWSMb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 066DEC433C7;
+	Tue, 30 Jan 2024 12:54:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706619270;
+	bh=6vo7FvUQHTzqjILs/LLq8FUpPcpbRTX+rPznUSEtmcw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Q8ehWSMb+wwIT0UrfxX3n5vC0oicE7lD86UeIGvti6L9lT6FIIHtgn9Gw27WsnhJj
+	 iIuQbaYzyCvdFsDNI8IzCXN3EUmEQuJ29ErJS/KQHBQtgO+qGRAiJIrM6m4No5RB9g
+	 KsbgOnVNASc+H9B7SvCBfj1ghlzVJ+JrOx9XPs6woCWkZjadFQBPBzjAc6uQBi1gYR
+	 gt7z+v77H5QaoKoYs+mie3FGNFAeeUdgEC9TYusjdza4ZwZpeyTbwVvOWuZSSXLZnS
+	 ZoDojb+DH6Eb0l+QvCbtvwa6/yTjs9a8mGRyFHE9hxCRK1cIsQalMxi8HmnLKBuDkl
+	 iqn6tIvwHZi8A==
+Date: Tue, 30 Jan 2024 12:54:25 +0000
+From: Simon Horman <horms@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+	edumazet@google.com, dsahern@kernel.org, weiwan@google.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 01/10] net: fill in MODULE_DESCRIPTION()s for
+ encx24j600
+Message-ID: <20240130125425.GA351311@kernel.org>
+References: <20240125193420.533604-1-leitao@debian.org>
+ <20240125193420.533604-2-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgCXZg+S77hllrfLCQ--.28270S4
-X-Coremail-Antispam: 1UD129KBjvdXoW7XrWxGFWUWr4rGr4UCr15Arb_yoWDJwb_ur
-	y2qr1kAFWkuFn2vr18C3W5WFW8uw4UWrWfWFyrWr17Aw17tF45J3WkZ3s8J3yfursxXry7
-	tr4kJ343Gr42kjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbD8FF20E14v26rWj6s0DM7CY07I20VC2zVCF04k26cxKx2IYs7xG
-	6rWj6s0DM7CIcVAFz4kK6r1j6r18M28IrcIa0xkI8VA2jI8067AKxVWUXwA2048vs2IY02
-	0Ec7CjxVAFwI0_Xr0E3s1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxSw2x7M28EF7xv
-	wVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxVWxJVW8Jr1l84
-	ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I2
-	62IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcV
-	AFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG
-	0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2Y2ka0xkIwI
-	1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWU
-	JVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7V
-	AKI48JMIIF0xvE2Ix0cI8IcVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIx
-	AIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYxBIdaVFxhVjvjDU0xZFpf9x0JUAGYLUUUUU
-	=
-X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240125193420.533604-2-leitao@debian.org>
 
-From: Pu Lehui <pulehui@huawei.com>
+On Thu, Jan 25, 2024 at 11:34:11AM -0800, Breno Leitao wrote:
+> W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add descriptions to the Microchip ENCX24J600 helpers driver.
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-Enable inline bpf_kptr_xchg() test for RV64, and the test have passed as
-show below:
-
-Summary: 1/0 PASSED, 0 SKIPPED, 0 FAILED
-
-Signed-off-by: Pu Lehui <pulehui@huawei.com>
----
- tools/testing/selftests/bpf/prog_tests/kptr_xchg_inline.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/kptr_xchg_inline.c b/tools/testing/selftests/bpf/prog_tests/kptr_xchg_inline.c
-index 15144943e88b..7def158da9eb 100644
---- a/tools/testing/selftests/bpf/prog_tests/kptr_xchg_inline.c
-+++ b/tools/testing/selftests/bpf/prog_tests/kptr_xchg_inline.c
-@@ -13,7 +13,8 @@ void test_kptr_xchg_inline(void)
- 	unsigned int cnt;
- 	int err;
- 
--#if !(defined(__x86_64__) || defined(__aarch64__))
-+#if !(defined(__x86_64__) || defined(__aarch64__) || \
-+      (defined(__riscv) && __riscv_xlen == 64))
- 	test__skip();
- 	return;
- #endif
--- 
-2.34.1
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
