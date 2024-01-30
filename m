@@ -1,96 +1,89 @@
-Return-Path: <netdev+bounces-67140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A82D68422D5
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 12:22:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7093F8422DB
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 12:23:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB69B1C21265
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:22:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 094B11F20356
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:23:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36FF2679F1;
-	Tue, 30 Jan 2024 11:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="phV+ecMC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D268F66B24;
+	Tue, 30 Jan 2024 11:21:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE1B6772C;
-	Tue, 30 Jan 2024 11:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082BB60ED3;
+	Tue, 30 Jan 2024 11:21:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706613626; cv=none; b=I9jXKGmG4f3K0vbLIkJ83hx0UiNQG/NwkvrdaJlbaGPw4yi0rqgzRkszQFX9y740Byxf8jiDP9yWt2S/TxM6ci4HobEd0OpKfqCFU7dvaM1HLPzNjF9UKQqomo9lYcp43lDqgPTF6kg9fzkU45evHVIspexVWk49yT65BY2pAAA=
+	t=1706613687; cv=none; b=qYcQ51KMp2Uxj381YNMJpz29v2aqByErtowxlXPfeQT1R23FpuNTi+GojxI67OHqNPPhgjDDGg4K4Axi4gYBeFw9YOBUAgHIcz0Ae6NuzNpGPzlo+gh7G2a8QBeAl8fMxiaXoFevK76VVA7Tf+sKCzoJPmacomcH5yxrdZsMaTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706613626; c=relaxed/simple;
-	bh=4WgsHwRacn2qpJFE/ea6xcPHbCY586oacAAWQwCer34=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SpbD+Q7sa66fwpuf76Ky7ZwK1wmAyWwc9x1xWdDAZtHKbiNCZF03sy9vt+pOG/n1W36O7pMertF2uqTSeyvd8ho8YybXZwOnxd2HrJR0mToyLSJar0LmfYWsadptrRYQM9KVhcpQFE/U6kv8jq/zT2VXdsCVrXN1df3ueo7Fn2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=phV+ecMC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 79848C43390;
-	Tue, 30 Jan 2024 11:20:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706613625;
-	bh=4WgsHwRacn2qpJFE/ea6xcPHbCY586oacAAWQwCer34=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=phV+ecMClYA83sfpcAh1ZtpJ3NAmc6D4IAdKe18PBDsEjWc4eMoo1O2RdlZmNudos
-	 ZRR0C8qI8PQoX87v6hmv/EJZtqoRUJNXtksypOXw3NWB49uZL1rVHm+kFADeqEtTjm
-	 CwPIeCCakD4gz4mStIctGko/eZclVA/eyNCZvoLc9Wpl278TeTSwlRAaofyc2qWREb
-	 fyUl6O0De56d57AwQxmFJ4Fw5Gg5dnOcyECW52rxMB0o6HxtH5e4hRtIBrOxEwV16j
-	 F17NZJde0UXfT54wq2ozGqvHBU+UYKGBVwVY9aNZqtmlJpj8rBj9rvyZEW9m2eZT4P
-	 Zq3Qa2tQQ9Bew==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5F9B7C395F3;
-	Tue, 30 Jan 2024 11:20:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1706613687; c=relaxed/simple;
+	bh=r7E9aI8PsQzjJF0xE6OvvXDFFiTiekJb0tpJzhwd5k8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jJ8dS/6/DN3iXhagZYMUFxDnj7T8BN4nnaYUI9vl+S9VQ8Cp1IteHIE2aAYKIsYyRPpKryT0MSFUt2iG3yoApyk0tKs/SaszKfva1F8n9gnqIt/qyxe1z6kkc0SMBJ2vmKCg8sgdkNXEGSG3b6mLGKO/T6EFcZ17CmGnRPfzgmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-55f13b682d4so2479463a12.1;
+        Tue, 30 Jan 2024 03:21:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706613682; x=1707218482;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XsybA84RDFiKJs5uUFCm5D1iyOzOmdHrpIqq5Pbn3Gk=;
+        b=qMkLpBskCo956qq764KnSuLuqFyQTrc/Dq2JwrxAtuKqJdiOqgX5GVenEKiJiCeHyl
+         LlwexqLPfooZD5549vw2zrdp6kRG9OOc/SRaEbZko6DA9F4yP57lea8chWVgezt6XR/w
+         uvEnZUA2b9EgfEgiVXDXdb075uByXKEp08AHOZk23BBffR/xUAt2CH6rlHW5u/jx4tRf
+         JygloX+SeV/pYssyWrmozgJlXEfO9zRZVL8wtyk+UIAoV1vBQgcXZCoOtjPVk78h92Vq
+         37fHOvcO7BnJpkjjImo6PPRNQgS1fKKk/mCn8nrytJCTtl8YXQIbKUoZvOJiy4DRwKBt
+         rs7g==
+X-Gm-Message-State: AOJu0YzEhAz5Cy8s6oCpbFMJRRqmijvWG0GNfyecChVgaZPct0RdjlnX
+	2YGX3pId6xFSf/kD5uxjELr74pvU9bjEin7PQfJTxBCYCd/NVUKP/KTkBKFsEpTklSax
+X-Google-Smtp-Source: AGHT+IFXiCLKcSRrQ7w1s9lFeg3HKhnbiyCrKrdd5UsPMQvcYKPs5+YW6e8Y2OXMxxQzYl4bACzMcQ==
+X-Received: by 2002:a05:6402:504:b0:55e:f164:7765 with SMTP id m4-20020a056402050400b0055ef1647765mr4099903edv.32.1706613681803;
+        Tue, 30 Jan 2024 03:21:21 -0800 (PST)
+Received: from gmail.com (fwdproxy-cln-013.fbsv.net. [2a03:2880:31ff:d::face:b00c])
+        by smtp.gmail.com with ESMTPSA id s4-20020a056402014400b0055f4558c602sm443726edu.67.2024.01.30.03.21.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jan 2024 03:21:21 -0800 (PST)
+Date: Tue, 30 Jan 2024 03:21:19 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Alessandro Marcolini <alessandromarcolini99@gmail.com>,
+	donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v2 04/13] tools/net/ynl: Refactor fixed header
+ encoding into separate method
+Message-ID: <Zbjbr0eAqx8u5jW4@gmail.com>
+References: <20240129223458.52046-1-donald.hunter@gmail.com>
+ <20240129223458.52046-5-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: micrel: Fix set/get PHC time for lan8814
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170661362538.28487.10813020145691135794.git-patchwork-notify@kernel.org>
-Date: Tue, 30 Jan 2024 11:20:25 +0000
-References: <20240126073042.1845153-1-horatiu.vultur@microchip.com>
-In-Reply-To: <20240126073042.1845153-1-horatiu.vultur@microchip.com>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, UNGLinuxDriver@microchip.com,
- maxime.chevallier@bootlin.com, divya.koppera@microchip.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240129223458.52046-5-donald.hunter@gmail.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 26 Jan 2024 08:30:42 +0100 you wrote:
-> When setting or getting PHC time, the higher bits of the second time (>32
-> bits) they were ignored. Meaning that setting some time in the future like
-> year 2150, it was failing to set this.
+On Mon, Jan 29, 2024 at 10:34:49PM +0000, Donald Hunter wrote:
+> Refactor the fixed header encoding into a separate _encode_struct method
+> so that it can be reused for fixed headers in sub-messages and for
+> encoding structs.
 > 
-> The issue can be reproduced like this:
-> 
->  # phc_ctl /dev/ptp1 set 10000000000
->  phc_ctl[12.290]: set clock time to 10000000000.000000000 or Sat Nov 20 17:46:40 2286
-> 
-> [...]
+> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 
-Here is the summary with links:
-  - [net-next] net: micrel: Fix set/get PHC time for lan8814
-    https://git.kernel.org/netdev/net-next/c/8e41d6644f9a
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Breno Leitao <leitao@debian.org>
 
