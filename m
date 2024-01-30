@@ -1,220 +1,152 @@
-Return-Path: <netdev+bounces-67267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39DA6842870
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 16:52:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2B84842872
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 16:53:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EFAC1C24A61
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:52:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5AD9A1F21649
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:53:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA24B85C61;
-	Tue, 30 Jan 2024 15:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0688885C5C;
+	Tue, 30 Jan 2024 15:53:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XGxi8YEr"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GR9WAink"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2677285C56
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 15:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 648C781AB9
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 15:53:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706629957; cv=none; b=MevutJBAyFdk4MNfFc1XLyiU+oWCdcsWaaCv/zy97rnxY0/XU1S51pA/HudghBVrH30hZaQyMyN+Q/hKbVQFRGa9vjyjJDxwtpzqBoid0jedaZ+Bs5zydLxtA3uWzLbuDilJLXeOAsRVL8/xbE39f5JDE4HDmlW7lr7B7uHqkUg=
+	t=1706630009; cv=none; b=AHFDS8I2xm7tjnK15SvWls9P0Xj7JGQiu7rE1RJirekYzi1SVGh4M4StrRnATBZQXzYmo8DpiwN+5fgIZrsrDeH4nrIQM2WSpfH48DxaHS1hvhi52UwABSIcjc9XKYcBsGznD+qFuyqsPlkbL1fCtteNkRmXDlMhjCC1TUiIIzE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706629957; c=relaxed/simple;
-	bh=b3xCECl7daa75S5e/tVE28JymMLYdLRiBfoE00efHJA=;
+	s=arc-20240116; t=1706630009; c=relaxed/simple;
+	bh=5gq9bk2CACo+T8MhwqInhSIy3rOGWTcRWK1IgBCsVxI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HuUu/50MeL4xs/AaPUFOwvluFP+YF55erY5aeIM75F/T9NOp2WjznKBsY2AVQaEvhgqiE1h4llMkxYrZtJw6K+/oi/acWR0joSh2oew9mnMu/hxsCH+RgzXUUuWE55tZY8wDWwpdA0SWxAE7EKzLz0lIomiw3D/9WhLPaN4Ucug=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XGxi8YEr; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y5TtIhOWq29yDgeSYenMrd4JyEl2LDDraQrPexMN1krbaF3BGUcMYGKmASezSvJwB7pJb79C9OuJtyqM879LGYL4eZOyTzJzNL9y0U5RQfxTqwSzaT5XYOFPAaOP0vUQxmDRppWl5QSIcsfZegjWEgUgrxdvqFRAkGok90PQmrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GR9WAink; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706629955;
+	s=mimecast20190719; t=1706630007;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=6LnSnMipv5LKpnY+ROHJ4HynxucA3AedN0f+qbjLs4o=;
-	b=XGxi8YErxRDTsbtAGnlyMKQmb63KIpexHqNtqrFyNuqEScPP/Qif0uTqM6Nq0m+BiLzvk0
-	3xFAqGbCFHNogz3CZaDOURuWMbs1E9PucocMc9IxIrNAq6dxWsehsbu0XMDo4K33wXezLg
-	zTNhNprDccUojLr6mv+pH012k+7Q9XY=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=oSj1lyNclmh9b1DFiLfFnvUIxkzThYLUPlpLm9/wz/A=;
+	b=GR9WAinkFlc1Al3y3wDJjnzJCzkBrKqJh6NUE2gPN7SoL7G2v9PhSE66RnTgoATvarwRiU
+	VCnECWLACEvc+ONqb00FhAKeXIVpxFOx99FMiwKseCPVx8KSslBpHEDFJNHWLFBk7k2/CL
+	0HSUGSlm9KtBupuAH2U2Z8AnFy7qtSk=
+Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
+ [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-249-0sHWdgKJN3qzpTKg4yQnsA-1; Tue, 30 Jan 2024 10:52:32 -0500
-X-MC-Unique: 0sHWdgKJN3qzpTKg4yQnsA-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40efd8d7ed1so6024075e9.0
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 07:52:32 -0800 (PST)
+ us-mta-693-gYrHTOZyPEuf0DuRZKXEyA-1; Tue, 30 Jan 2024 10:53:25 -0500
+X-MC-Unique: gYrHTOZyPEuf0DuRZKXEyA-1
+Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-42aaaba1bdbso23444541cf.0
+        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 07:53:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706629951; x=1707234751;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6LnSnMipv5LKpnY+ROHJ4HynxucA3AedN0f+qbjLs4o=;
-        b=MJ89HExSwJsjv7KrY9XmEQKmw0Q5KiuTKMygdMPNu3B5IBoDzmVZwx+E9H0GOXgBY2
-         O0CVLNQQn04L65ZipW5EGbWz15hkp5IIYFW6vbAQ1c2hN3utINzHlHuUDYEEalr7kN2U
-         sCBJ1UftMJraq+n2nh8D2Np4eBVm7V8JzRIbYDaBtSFhGLgIJYwNcDoi3HjWn8K7yA7J
-         sVpVE6rr0hLqN+NeSBf6GpNlSbPQBH71mwD6iyhMk4tbK6yvoUFCA1zRDKzNtg1xGBvA
-         lrc+fWS+nsgxYbyWVfkybb/fWEpOmluFqqN+0yBzoV6KTcABXDPJf0qzK9d0w2xDDFxC
-         nOjQ==
-X-Gm-Message-State: AOJu0Ywcu84Ury2O7vpwyLovthTUuaf8bhNrAXJfdNg+HBHY7xfnWxDY
-	DwoAaZt4i439MpR6wo+a+AeHSHJYpkDswXitGPdVjac0jdDM+2S5EgyBGll03hDb3RSj5yE1O/y
-	XnCcWBuiZKpzvpzji1STh+sL4Gk1a3OjwuOOihJ3CVqFXNj8cNnsNWw==
-X-Received: by 2002:a05:600c:4f54:b0:40f:b011:d2fd with SMTP id m20-20020a05600c4f5400b0040fb011d2fdmr428149wmq.35.1706629951581;
-        Tue, 30 Jan 2024 07:52:31 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEvvmdJvyjFjXE3L12/Z80n7VBws0Lbv1/oky6pfwXSb35n+EroP6uZfv3GndVl7PiEfzgQPg==
-X-Received: by 2002:a05:600c:4f54:b0:40f:b011:d2fd with SMTP id m20-20020a05600c4f5400b0040fb011d2fdmr428131wmq.35.1706629951253;
-        Tue, 30 Jan 2024 07:52:31 -0800 (PST)
-Received: from redhat.com ([2.52.129.159])
-        by smtp.gmail.com with ESMTPSA id az29-20020a05600c601d00b0040ee6ff86f6sm12305875wmb.0.2024.01.30.07.52.28
+        d=1e100.net; s=20230601; t=1706630005; x=1707234805;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oSj1lyNclmh9b1DFiLfFnvUIxkzThYLUPlpLm9/wz/A=;
+        b=uu2R6kPbCa38t2xRdOLdiZ2KYsrRvU8vTtSXO+igm+nBJi3nSg5SxSrXKj1Ck2pUKW
+         KWRzYFokrwqr7oV+yGWHptWpROpUUg/FH0phZJYrhRM7Cy67lzw5w2sZEIxB5U3Hg0sb
+         ovO1UgxeIf2erQSQY6m24RpfPFR8oAyVDuZ3SwUYKGfTu40Nt0Qy8jcyFNGQSn8fqeR2
+         VQilbY/SreSuKcxs8huaNmfFZQMk90PLKE35hag4TO3DDXzTFwIL1gtXmMVW2Ija8KsR
+         jB2c12aedyUOu3nLGJc+PfqrhFzEyPO8uOGVf0ZyQacqhGpPf6drPu15bQsjuZdSmCNh
+         2Dsg==
+X-Gm-Message-State: AOJu0YzA295ty8oQY8t4pv3olemZ6Nc0JOX5tgAG9sLtNs0A+2ohO/xb
+	QWZIXIVdjoql3mudQAWqSAN7IsHLJ8VhQK9qwARH+9AQZyoQYgUfN1vpubG/xRn+oDGyO+IVw6f
+	fE6AyLL4q0swZ6nFGbpGg5A/dxCxJB6YoFVbK+2/ZJAxSqjiqSbYeQQ==
+X-Received: by 2002:ac8:5950:0:b0:42a:6df3:1f1d with SMTP id 16-20020ac85950000000b0042a6df31f1dmr12272884qtz.74.1706630005307;
+        Tue, 30 Jan 2024 07:53:25 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFVEawnHTN95Z6HJiyigSQy1AJjcgY3k8TnIlbRXYXuot4rDh5Z3hGCkiEuIFI9fTvFfvDK0Q==
+X-Received: by 2002:ac8:5950:0:b0:42a:6df3:1f1d with SMTP id 16-20020ac85950000000b0042a6df31f1dmr12272860qtz.74.1706630005018;
+        Tue, 30 Jan 2024 07:53:25 -0800 (PST)
+Received: from fedora ([2600:1700:1ff0:d0e0::47])
+        by smtp.gmail.com with ESMTPSA id z12-20020ac87cac000000b0042a1223cb9bsm3313663qtv.70.2024.01.30.07.53.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 07:52:30 -0800 (PST)
-Date: Tue, 30 Jan 2024 10:52:26 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Daniel Jurgens <danielj@nvidia.com>
-Cc: Heng Qi <hengqi@linux.alibaba.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"jasowang@redhat.com" <jasowang@redhat.com>,
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"abeni@redhat.com" <abeni@redhat.com>,
-	Parav Pandit <parav@nvidia.com>
-Subject: Re: [PATCH net-next] virtio_net: Add TX stop and wake counters
-Message-ID: <20240130104523-mutt-send-email-mst@kernel.org>
-References: <20240130142521.18593-1-danielj@nvidia.com>
- <081f6d4c-bc44-4afe-ba51-d7c14966a536@linux.alibaba.com>
- <CH0PR12MB8580571225697B1ABDD55541C97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
+        Tue, 30 Jan 2024 07:53:24 -0800 (PST)
+Date: Tue, 30 Jan 2024 09:53:22 -0600
+From: Andrew Halaney <ahalaney@redhat.com>
+To: Vinod Koul <vkoul@kernel.org>
+Cc: bhupesh.linux@gmail.com, 
+	Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: Re: [PATCH] MAINTAINERS: Drop unreachable reviewer for Qualcomm
+ ETHQOS ethernet driver
+Message-ID: <ual3c4fuuz5trgn2ekklsfeslwvswfjg5nij5epbnuf5mihfay@pp32fs6btwxk>
+References: <20240129-remove-dwmac-qcom-ethqos-reviewer-v1-1-2645eab61451@redhat.com>
+ <ZbkWwn-oN5wqoPfJ@matsya>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CH0PR12MB8580571225697B1ABDD55541C97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
+In-Reply-To: <ZbkWwn-oN5wqoPfJ@matsya>
 
-On Tue, Jan 30, 2024 at 03:43:48PM +0000, Daniel Jurgens wrote:
-> > From: Heng Qi <hengqi@linux.alibaba.com>
-> > Sent: Tuesday, January 30, 2024 9:17 AM
-> > 在 2024/1/30 下午10:25, Daniel Jurgens 写道:
-> > > Add a tx queue stop and wake counters, they are useful for debugging.
-> > >
-> > > 	$ ethtool -S ens5f2 | grep 'tx_stop\|tx_wake'
-> > > 	...
-> > > 	tx_queue_1_tx_stop: 16726
-> > > 	tx_queue_1_tx_wake: 16726
-> > > 	...
-> > > 	tx_queue_8_tx_stop: 1500110
-> > > 	tx_queue_8_tx_wake: 1500110
-> > >
-> > > Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
-> > > Reviewed-by: Parav Pandit <parav@nvidia.com>
-> > > ---
-> > >   drivers/net/virtio_net.c | 26 ++++++++++++++++++++++++--
-> > >   1 file changed, 24 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c index
-> > > 3cb8aa193884..7e3c31ceaf7e 100644
-> > > --- a/drivers/net/virtio_net.c
-> > > +++ b/drivers/net/virtio_net.c
-> > > @@ -88,6 +88,8 @@ struct virtnet_sq_stats {
-> > >   	u64_stats_t xdp_tx_drops;
-> > >   	u64_stats_t kicks;
-> > >   	u64_stats_t tx_timeouts;
-> > > +	u64_stats_t tx_stop;
-> > > +	u64_stats_t tx_wake;
-> > >   };
-> > 
-> > Hi Daniel!
-> > 
-> > tx_stop/wake only counts the status in the I/O path.
-> > Do the status of virtnet_config_changed_work and virtnet_tx_resize need to
-> > be counted?
-> > 
+On Tue, Jan 30, 2024 at 09:03:22PM +0530, Vinod Koul wrote:
+> On 29-01-24, 11:12, Andrew Halaney wrote:
+> > Bhupesh's email responds indicating they've changed employers and with
+> > no new contact information. Let's drop the line from MAINTAINERS to
+> > avoid getting the same response over and over.
 > 
-> My motivation for the counter is detecting full TX queues. I don't think counting them in the control path is useful, but it can be done if you disagree.
+> Looks like Bhupesh sent the patch changing but never followed up with a
+> v2 for this:
+> lore.kernel.org/r/20230915191600.3410862-1-bhupesh.linux@gmail.com
+> 
+> Would prefer if this is changed to his email (copied him as well)
+> 
 
-Do we then just want "tx full" counter?
+Thanks for finding that! Bhupesh, do you plan on spinning a v2 soon? If
+so I will not send a v2, otherwise I can respin this with your email and
+no .mailmap change.
 
-> > Thanks,
-> > Heng
+> 
 > > 
-> > >
-> > >   struct virtnet_rq_stats {
-> > > @@ -112,6 +114,8 @@ static const struct virtnet_stat_desc
-> > virtnet_sq_stats_desc[] = {
-> > >   	{ "xdp_tx_drops",	VIRTNET_SQ_STAT(xdp_tx_drops) },
-> > >   	{ "kicks",		VIRTNET_SQ_STAT(kicks) },
-> > >   	{ "tx_timeouts",	VIRTNET_SQ_STAT(tx_timeouts) },
-> > > +	{ "tx_stop",		VIRTNET_SQ_STAT(tx_stop) },
-> > > +	{ "tx_wake",		VIRTNET_SQ_STAT(tx_wake) },
-> > >   };
-> > >
-> > >   static const struct virtnet_stat_desc virtnet_rq_stats_desc[] = { @@
-> > > -843,6 +847,9 @@ static void check_sq_full_and_disable(struct virtnet_info
-> > *vi,
-> > >   	 */
-> > >   	if (sq->vq->num_free < 2+MAX_SKB_FRAGS) {
-> > >   		netif_stop_subqueue(dev, qnum);
-> > > +		u64_stats_update_begin(&sq->stats.syncp);
-> > > +		u64_stats_inc(&sq->stats.tx_stop);
-> > > +		u64_stats_update_end(&sq->stats.syncp);
-> > >   		if (use_napi) {
-> > >   			if (unlikely(!virtqueue_enable_cb_delayed(sq->vq)))
-> > >   				virtqueue_napi_schedule(&sq->napi, sq-
-> > >vq); @@ -851,6 +858,9 @@
-> > > static void check_sq_full_and_disable(struct virtnet_info *vi,
-> > >   			free_old_xmit_skbs(sq, false);
-> > >   			if (sq->vq->num_free >= 2+MAX_SKB_FRAGS) {
-> > >   				netif_start_subqueue(dev, qnum);
-> > > +				u64_stats_update_begin(&sq->stats.syncp);
-> > > +				u64_stats_inc(&sq->stats.tx_wake);
-> > > +				u64_stats_update_end(&sq->stats.syncp);
-> > >   				virtqueue_disable_cb(sq->vq);
-> > >   			}
-> > >   		}
-> > > @@ -2163,8 +2173,14 @@ static void virtnet_poll_cleantx(struct
-> > receive_queue *rq)
-> > >   			free_old_xmit_skbs(sq, true);
-> > >   		} while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
-> > >
-> > > -		if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS)
-> > > +		if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
-> > > +			if (netif_tx_queue_stopped(txq)) {
-> > > +				u64_stats_update_begin(&sq->stats.syncp);
-> > > +				u64_stats_inc(&sq->stats.tx_wake);
-> > > +				u64_stats_update_end(&sq->stats.syncp);
-> > > +			}
-> > >   			netif_tx_wake_queue(txq);
-> > > +		}
-> > >
-> > >   		__netif_tx_unlock(txq);
-> > >   	}
-> > > @@ -2310,8 +2326,14 @@ static int virtnet_poll_tx(struct napi_struct
-> > *napi, int budget)
-> > >   	virtqueue_disable_cb(sq->vq);
-> > >   	free_old_xmit_skbs(sq, true);
-> > >
-> > > -	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS)
-> > > +	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
-> > > +		if (netif_tx_queue_stopped(txq)) {
-> > > +			u64_stats_update_begin(&sq->stats.syncp);
-> > > +			u64_stats_inc(&sq->stats.tx_wake);
-> > > +			u64_stats_update_end(&sq->stats.syncp);
-> > > +		}
-> > >   		netif_tx_wake_queue(txq);
-> > > +	}
-> > >
-> > >   	opaque = virtqueue_enable_cb_prepare(sq->vq);
-> > >
+> > Signed-off-by: Andrew Halaney <ahalaney@redhat.com>
+> > ---
+> > If anyone knows how to contact Bhupesh / if they're willing to continue
+> > being a reviewer feel free to suggest an alternative, but for the moment
+> > this is better than nothing.
+> > ---
+> >  MAINTAINERS | 1 -
+> >  1 file changed, 1 deletion(-)
+> > 
+> > diff --git a/MAINTAINERS b/MAINTAINERS
+> > index 939f6dd0ef6a..b285d9a123ce 100644
+> > --- a/MAINTAINERS
+> > +++ b/MAINTAINERS
+> > @@ -18080,7 +18080,6 @@ F:	drivers/net/ethernet/qualcomm/emac/
+> >  
+> >  QUALCOMM ETHQOS ETHERNET DRIVER
+> >  M:	Vinod Koul <vkoul@kernel.org>
+> > -R:	Bhupesh Sharma <bhupesh.sharma@linaro.org>
+> >  L:	netdev@vger.kernel.org
+> >  L:	linux-arm-msm@vger.kernel.org
+> >  S:	Maintained
+> > 
+> > ---
+> > base-commit: 596764183be8ebb13352b281a442a1f1151c9b06
+> > change-id: 20240129-remove-dwmac-qcom-ethqos-reviewer-1a37d8c71383
+> > 
+> > Best regards,
+> > -- 
+> > Andrew Halaney <ahalaney@redhat.com>
+> 
+> -- 
+> ~Vinod
 > 
 
 
