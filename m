@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-67137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 416B3842254
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 12:11:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0393C842255
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 12:11:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0E9128DFBD
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:11:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B595B28E5D9
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:11:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AE3A664CC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAB8166B26;
 	Tue, 30 Jan 2024 11:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WwM+jnfS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u6+qj4Cv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 468A9664AE
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 11:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9441A664D9;
+	Tue, 30 Jan 2024 11:10:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706613032; cv=none; b=CytpRiUEP5RxskgzLdrShT1dl+f1fMrkmfq8gNSpSDHKbtTIwb9saT9lwOPeNuFmUOmJBZICkjF4+uxHc1DLoQ3eGggTba1O6MFrqUG43Hf4Vjw+9Y/bRR0PwgfotrGP5DdU+NiBFBw7S1aQ7k42/4Bs10+OBgm3us/0NBQAWEQ=
+	t=1706613032; cv=none; b=QKftqG841fGesiIdiuwPfR/dSGA9z8WDzCVCFPvr9KVkfFU5fokZk9Pl8oxAx1xgCmAw0PFmT9wgwW/STjSnR/06kYh334k/9TaXRfsFtB9bdZ9M43BkF8fBRQcjjg3KKrsDLCCH6cfUqQZ9u98YcZrgvbHVlhidrRy6GdaRakk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706613032; c=relaxed/simple;
-	bh=IKMsE08EIB2gNmC9ygTBh8s8tU5qDq1kEAmAJNqzuq0=;
+	bh=jaw4K6A04pMut7r0Mu9LnNd3WREiAQkRJloYXC3dL08=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=eYg2avWYEaB/XEUPYs226gdPXg74kBONAnenlrzavBg3XKlwJ6kH4SMcS+QtvWphz2HdLgmtQPbMnPZH6HCyR036dv+L9A5ZWqPKWAzmjSdC+vDSr7U7B81lR8ygtxLNNXZ1qptg5guAX2u9jAdNYSg6VHrVujrKEjn+W5AIQh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WwM+jnfS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 11B3EC43394;
+	 In-Reply-To:To:Cc; b=k3OaR5Bkho+0cyTOyp9L8LgEiuzdMH+5x9c3N/4u/2Va0rzi75D4jrY38ag+Su5biQOUBH0VPgvvGlCxXwGeiXbxbUYx0g7P5TCR9Kdi8ZnAbQeo4tXnZU/KqlyZNvLZowK4cQ3Q8lzFAxIxjsKJs5W/a1u3dBFoCIZXpdmNb1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u6+qj4Cv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0D2D0C433F1;
 	Tue, 30 Jan 2024 11:10:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1706613032;
-	bh=IKMsE08EIB2gNmC9ygTBh8s8tU5qDq1kEAmAJNqzuq0=;
+	bh=jaw4K6A04pMut7r0Mu9LnNd3WREiAQkRJloYXC3dL08=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WwM+jnfS/aGVNjm7vZ73Zw+6scNsNmo/qi4BO0sr61W/4Ghr9x0P4r9uwMNzdxpP6
-	 1m2qgJMCB5khF1HWWBmpFk7PyhjyJwnAzVZsBppzOsBt6XmkC92RF0NcDTVae9wln8
-	 jdEcLYpxJ2nrp86w97a9IN88w4UY3ScXiVLpWPHds6kE1iUpBe4gzY2LkBW/uUfqlz
-	 UM0CFDYWPiG6VG0Qu9MMWrzF/JdGAvXomrIf1jX9PvEQmcsCSUnCSPBxSBfExrcXXh
-	 0UBbOALruk6YFh94B+IYGvXRUpAEuH9lS3asgKfJm1Ne7+idvtOBC4euiLM51W5UO4
-	 WaysqPh/GW8iA==
+	b=u6+qj4Cvjks+U/iSA3T9mHO69j6Nf5ISA1so79/Iz6u3jTG9Kfysw8OMFTX3MVu5l
+	 RecpZOsvk0aseYB7eBCtHVn/gNqwNqxx3Rpf1Q3HULmPKzO7OhyBGXRpwBF3AoJCLK
+	 932Q+F3HcNMiMcNkOU82hl7FUj+2Ksm6c3GG93+2BLdc9A4g6PLZb4nEqpJKp8I8Mz
+	 8p9qP7tQ4QoROb3wHfnllHLiZMYu3EMtfQsewz6gNVTq121WKdTrIzXKPB9eoNaRSZ
+	 isStjdumkKBxnDhr/IJ7DAZKAb2TN5+f/8UpmSwZzyRfCEBnBc0UoPa2bC6XNrk5Hv
+	 zDMgBT5VAJlng==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E707BD8C96C;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DF9EFE3237E;
 	Tue, 30 Jan 2024 11:10:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,50 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/7][pull request] ice: fix timestamping in reset
- process
+Subject: Re: [PATCH] net/tun: use reciprocal_scale
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170661303194.21939.11991755421301289279.git-patchwork-notify@kernel.org>
+ <170661303191.21939.5608794279879592159.git-patchwork-notify@kernel.org>
 Date: Tue, 30 Jan 2024 11:10:31 +0000
-References: <20240125215757.2601799-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20240125215757.2601799-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, richardcochran@gmail.com,
- karol.kolacinski@intel.com, jacob.e.keller@intel.com
+References: <20240126002550.169608-1-stephen@networkplumber.org>
+In-Reply-To: <20240126002550.169608-1-stephen@networkplumber.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org, willemdebruijn.kernel@gmail.com,
+ jasowang@redhat.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Thu, 25 Jan 2024 13:57:48 -0800 you wrote:
-> Karol Kolacinski says:
+On Thu, 25 Jan 2024 16:25:11 -0800 you wrote:
+> Use the inline function reciprocal_scale rather than open coding
+> the scale optimization.  Also, remove unnecessary initializations.
+> Resulting compiled code is unchanged (according to godbolt).
 > 
-> PTP reset process has multiple places where timestamping can end up in
-> an incorrect state.
-> 
-> This series introduces a proper state machine for PTP and refactors
-> a large part of the code to ensure that timestamping does not break.
-> 
-> [...]
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+> ---
+>  drivers/net/tun.c | 7 +++----
+>  1 file changed, 3 insertions(+), 4 deletions(-)
 
 Here is the summary with links:
-  - [net-next,1/7] ice: introduce PTP state machine
-    https://git.kernel.org/netdev/net-next/c/8293e4cb2ff5
-  - [net-next,2/7] ice: pass reset type to PTP reset functions
-    https://git.kernel.org/netdev/net-next/c/c75d5e675a85
-  - [net-next,3/7] ice: rename verify_cached to has_ready_bitmap
-    https://git.kernel.org/netdev/net-next/c/3f2216e8dbce
-  - [net-next,4/7] ice: don't check has_ready_bitmap in E810 functions
-    https://git.kernel.org/netdev/net-next/c/fea82915fca6
-  - [net-next,5/7] ice: rename ice_ptp_tx_cfg_intr
-    https://git.kernel.org/netdev/net-next/c/1abefdca85e8
-  - [net-next,6/7] ice: factor out ice_ptp_rebuild_owner()
-    https://git.kernel.org/netdev/net-next/c/803bef817807
-  - [net-next,7/7] ice: stop destroying and reinitalizing Tx tracker during reset
-    https://git.kernel.org/netdev/net-next/c/7a25fe5cd5fb
+  - net/tun: use reciprocal_scale
+    https://git.kernel.org/netdev/net-next/c/3f3ebe536208
 
 You are awesome, thank you!
 -- 
