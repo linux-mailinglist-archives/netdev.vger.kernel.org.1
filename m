@@ -1,283 +1,161 @@
-Return-Path: <netdev+bounces-67023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9B1F841E25
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:43:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5629841E07
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:41:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7449E2857B0
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 08:43:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA49C1C24170
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 08:41:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B376B58AC6;
-	Tue, 30 Jan 2024 08:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A2AF56745;
+	Tue, 30 Jan 2024 08:40:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b="cKk37AcR"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MsIQ/ckY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-42a9.mail.infomaniak.ch (smtp-42a9.mail.infomaniak.ch [84.16.66.169])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC01558AA4
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 08:41:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.66.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F274345BE7;
+	Tue, 30 Jan 2024 08:40:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706604106; cv=none; b=t36M6E3ZvBuGrlWYkC6sYLIcLXaUD8tAIACY5+OkVDQ1jL6SqF7R9um2rGDXwiF5nH8L5qDHWUBSG5Uw4h3VVzXxO3uQZ9QwJsFC5Yf557iAvnzZcn75tm6nQJKI46zJI7AGMg7Qx284y5mOFYg7B931KqPrOrvaVLePYvfjdFw=
+	t=1706604057; cv=none; b=Aut9pG1nEepQDiNa/6BJv2qcgwVIqpEjBxXDJ6d4Isjedmfsyail03EvVUXQ5PIzTP0FAhwGG6mq+NWBumO/V/h34VkNsFF04WdzknBP3TDQRin7zFTPkZYqhUECl4QElEWHUqxBM8P54g3WtkDOg9L+pfrffuz6y53ah2F8uR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706604106; c=relaxed/simple;
-	bh=rEPPzbtp7T8BNnKZfxSdq728QVo3IoiRwZKsrO9GbLY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dM3XNfQ6fpdlvWnbBIX+sfdJ3XtcqagRZCT5k6mH3+/2gkEjofgjfOvvHftigDE0s6dHR28wxMPytqAlYHLnmVETtLPvhMiIFOUlzLrXVUjkU4GZxW01jDGg5MEpehXMFzuEQ/aNHrAW/H78wYLuOCgBg5MbaMVPJveGJy9dmX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pschenker.ch; spf=pass smtp.mailfrom=pschenker.ch; dkim=pass (1024-bit key) header.d=pschenker.ch header.i=@pschenker.ch header.b=cKk37AcR; arc=none smtp.client-ip=84.16.66.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=pschenker.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pschenker.ch
-Received: from smtp-3-0000.mail.infomaniak.ch (smtp-3-0000.mail.infomaniak.ch [10.4.36.107])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4TPJPD0pzpzZ47;
-	Tue, 30 Jan 2024 09:34:24 +0100 (CET)
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4TPJPC3HYmzDMG;
-	Tue, 30 Jan 2024 09:34:23 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=pschenker.ch;
-	s=20220412; t=1706603664;
-	bh=rEPPzbtp7T8BNnKZfxSdq728QVo3IoiRwZKsrO9GbLY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cKk37AcR+LkM+OY/V2qGKlAait3MxrdmdgByMTkEdbfr99RxEMu8M/R4x8WxHfCaC
-	 2L6byxE/05zxqe/oyBOyVkvbEimN1BRjxkDHP9my9UHwbLent+DJq4CE/UKZLGmCil
-	 tJ62wAf/wT7ZszYYt9YEFuE7CU3FIBb/PCmQuLT8=
-From: Philippe Schenker <dev@pschenker.ch>
-To: netdev@vger.kernel.org
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Marek Vasut <marex@denx.de>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	UNGLinuxDriver@microchip.com,
-	devicetree@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	stefan.portmann@impulsing.ch,
+	s=arc-20240116; t=1706604057; c=relaxed/simple;
+	bh=3mCnULYUvuVIm9YefuIi3uDv+OP/G/w+ho5xbSCVtSg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GVwciCWI73rKrFVhXtwywvYZ3C/DUYIQlbGqEQEBSu48E4vwVruJTv8qjZIEFIE3zhMouya4TeToGJzUm86f5R9r/Kjk7pdKjB8vyDtUOTdxd3WmkMKSe03z0gJ18hidsb/yxzPka16G76db6DO3dNPaMJAoun/3MSsijGLLBtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MsIQ/ckY; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPA id 5EA5960004;
+	Tue, 30 Jan 2024 08:40:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1706604046;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=AUeV+yMhbxDVAjRgWk2k0aDLQD1BT6Nz6bBduK/S5sI=;
+	b=MsIQ/ckYWPcngblsFQZGtyAcbNgNbSOxM/uyYSWrBoI9SM0ZBpH8rtdFeA7pHblETcOOIN
+	efPRUQZn6IcKQodfZGfhc2xGqOTWlSxVx4WyPiyVHBMyidiJsOyIyLCkv9Z+x32KPQfMYD
+	jIDY9iwmb6UDFZKVoboPJ57r4G89T/nAro4ppMgxon1JnOF0MH7nxMGX5tELjzpIfnx8XF
+	P8wr/2woAGhiHUrJ40p/2iTAQtbs8+jtF4MM4zCCakjEff6HGofSUdySLpbWKxVh+4zgLj
+	AnI/qlnkw6yQsIn4UMCZRPKUD+BEhjM0yf9OBgYWGV9Tsq8plsTIccl5KEk/nQ==
+From: Herve Codina <herve.codina@bootlin.com>
+To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Philippe Schenker <philippe.schenker@impulsing.ch>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>
-Subject: [PATCH net-next v3 2/2] net: dsa: Add KSZ8567 switch support
-Date: Tue, 30 Jan 2024 09:34:19 +0100
-Message-Id: <20240130083419.135763-2-dev@pschenker.ch>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240130083419.135763-1-dev@pschenker.ch>
-References: <20240130083419.135763-1-dev@pschenker.ch>
+	Paolo Abeni <pabeni@redhat.com>,
+	Herve Codina <herve.codina@bootlin.com>
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Mark Brown <broonie@kernel.org>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: [PATCH v2 0/6] Add support for QMC HDLC
+Date: Tue, 30 Jan 2024 09:40:15 +0100
+Message-ID: <20240130084035.115086-1-herve.codina@bootlin.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
+X-GND-Sasl: herve.codina@bootlin.com
 
-From: Philippe Schenker <philippe.schenker@impulsing.ch>
+Hi,
 
-This commit introduces support for the KSZ8567, a robust 7-port
-Ethernet switch. The KSZ8567 features two RGMII/MII/RMII interfaces,
-each capable of gigabit speeds, complemented by five 10/100 Mbps
-MAC/PHYs.
+This series introduces the QMC HDLC support.
 
-Signed-off-by: Philippe Schenker <philippe.schenker@impulsing.ch>
-Acked-by: Arun Ramadoss <arun.ramadoss@microchip.com>
+Patches were previously sent as part of a full feature series and were
+previously reviewed in that context:
+"Add support for QMC HDLC, framer infrastructure and PEF2256 framer" [1]
 
----
+In order to ease the merge, the full feature series has been split and
+needed parts were merged in v6.8-rc1:
+ - "Prepare the PowerQUICC QMC and TSA for the HDLC QMC driver" [2]
+ - "Add support for framer infrastructure and PEF2256 framer" [3]
 
-Changes in v3:
-- Move KSZ8567_CHIP_ID also next to KSZ9567 in microchip-ksz.h
-- Fix 80 chars warning.
-- Add Arun's Acked-by. Thanks!
+This series contains patches related to the QMC HDLC part (QMC HDLC
+driver):
+ - Introduce the QMC HDLC driver (patches 1 and 2)
+ - Add timeslots change support in QMC HDLC (patch 3)
+ - Add framer support as a framer consumer in QMC HDLC (patch 4)
 
-Changes in v2:
-- Move the definition of KSZ8567 next to similar KSZ9567
+Compare to the original full feature series, a modification was done on
+patch 3 in order to use a coherent prefix in the commit title.
 
- drivers/net/dsa/microchip/ksz9477_i2c.c     |  4 ++
- drivers/net/dsa/microchip/ksz_common.c      | 43 ++++++++++++++++++++-
- drivers/net/dsa/microchip/ksz_common.h      |  1 +
- drivers/net/dsa/microchip/ksz_spi.c         |  5 +++
- include/linux/platform_data/microchip-ksz.h |  1 +
- 5 files changed, 53 insertions(+), 1 deletion(-)
+I kept the patches unsquashed as they were previously sent and reviewed.
+Of course, I can squash them if needed.
 
-diff --git a/drivers/net/dsa/microchip/ksz9477_i2c.c b/drivers/net/dsa/microchip/ksz9477_i2c.c
-index cac4a607e54a..82bebee4615c 100644
---- a/drivers/net/dsa/microchip/ksz9477_i2c.c
-+++ b/drivers/net/dsa/microchip/ksz9477_i2c.c
-@@ -103,6 +103,10 @@ static const struct of_device_id ksz9477_dt_ids[] = {
- 		.compatible = "microchip,ksz8563",
- 		.data = &ksz_switch_chips[KSZ8563]
- 	},
-+	{
-+		.compatible = "microchip,ksz8567",
-+		.data = &ksz_switch_chips[KSZ8567]
-+	},
- 	{
- 		.compatible = "microchip,ksz9567",
- 		.data = &ksz_switch_chips[KSZ9567]
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 245dfb7a7a31..6ae08de54061 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -1476,6 +1476,39 @@ const struct ksz_chip_data ksz_switch_chips[] = {
- 		.gbit_capable = {true, true, true},
- 	},
- 
-+	[KSZ8567] = {
-+		.chip_id = KSZ8567_CHIP_ID,
-+		.dev_name = "KSZ8567",
-+		.num_vlans = 4096,
-+		.num_alus = 4096,
-+		.num_statics = 16,
-+		.cpu_ports = 0x7F,	/* can be configured as cpu port */
-+		.port_cnt = 7,		/* total port count */
-+		.port_nirqs = 3,
-+		.num_tx_queues = 4,
-+		.tc_cbs_supported = true,
-+		.tc_ets_supported = true,
-+		.ops = &ksz9477_dev_ops,
-+		.mib_names = ksz9477_mib_names,
-+		.mib_cnt = ARRAY_SIZE(ksz9477_mib_names),
-+		.reg_mib_cnt = MIB_COUNTER_NUM,
-+		.regs = ksz9477_regs,
-+		.masks = ksz9477_masks,
-+		.shifts = ksz9477_shifts,
-+		.xmii_ctrl0 = ksz9477_xmii_ctrl0,
-+		.xmii_ctrl1 = ksz9477_xmii_ctrl1,
-+		.supports_mii	= {false, false, false, false,
-+				   false, true, true},
-+		.supports_rmii	= {false, false, false, false,
-+				   false, true, true},
-+		.supports_rgmii = {false, false, false, false,
-+				   false, true, true},
-+		.internal_phy	= {true, true, true, true,
-+				   true, false, false},
-+		.gbit_capable	= {false, false, false, false, false,
-+				   true, true},
-+	},
-+
- 	[KSZ9567] = {
- 		.chip_id = KSZ9567_CHIP_ID,
- 		.dev_name = "KSZ9567",
-@@ -2649,6 +2682,7 @@ static void ksz_port_teardown(struct dsa_switch *ds, int port)
- 
- 	switch (dev->chip_id) {
- 	case KSZ8563_CHIP_ID:
-+	case KSZ8567_CHIP_ID:
- 	case KSZ9477_CHIP_ID:
- 	case KSZ9563_CHIP_ID:
- 	case KSZ9567_CHIP_ID:
-@@ -2705,7 +2739,8 @@ static enum dsa_tag_protocol ksz_get_tag_protocol(struct dsa_switch *ds,
- 	    dev->chip_id == KSZ9563_CHIP_ID)
- 		proto = DSA_TAG_PROTO_KSZ9893;
- 
--	if (dev->chip_id == KSZ9477_CHIP_ID ||
-+	if (dev->chip_id == KSZ8567_CHIP_ID ||
-+	    dev->chip_id == KSZ9477_CHIP_ID ||
- 	    dev->chip_id == KSZ9896_CHIP_ID ||
- 	    dev->chip_id == KSZ9897_CHIP_ID ||
- 	    dev->chip_id == KSZ9567_CHIP_ID)
-@@ -2813,6 +2848,7 @@ static int ksz_max_mtu(struct dsa_switch *ds, int port)
- 	case KSZ8830_CHIP_ID:
- 		return KSZ8863_HUGE_PACKET_SIZE - VLAN_ETH_HLEN - ETH_FCS_LEN;
- 	case KSZ8563_CHIP_ID:
-+	case KSZ8567_CHIP_ID:
- 	case KSZ9477_CHIP_ID:
- 	case KSZ9563_CHIP_ID:
- 	case KSZ9567_CHIP_ID:
-@@ -2839,6 +2875,7 @@ static int ksz_validate_eee(struct dsa_switch *ds, int port)
- 
- 	switch (dev->chip_id) {
- 	case KSZ8563_CHIP_ID:
-+	case KSZ8567_CHIP_ID:
- 	case KSZ9477_CHIP_ID:
- 	case KSZ9563_CHIP_ID:
- 	case KSZ9567_CHIP_ID:
-@@ -3183,6 +3220,7 @@ static int ksz_switch_detect(struct ksz_device *dev)
- 		case KSZ9896_CHIP_ID:
- 		case KSZ9897_CHIP_ID:
- 		case KSZ9567_CHIP_ID:
-+		case KSZ8567_CHIP_ID:
- 		case LAN9370_CHIP_ID:
- 		case LAN9371_CHIP_ID:
- 		case LAN9372_CHIP_ID:
-@@ -3220,6 +3258,7 @@ static int ksz_cls_flower_add(struct dsa_switch *ds, int port,
- 
- 	switch (dev->chip_id) {
- 	case KSZ8563_CHIP_ID:
-+	case KSZ8567_CHIP_ID:
- 	case KSZ9477_CHIP_ID:
- 	case KSZ9563_CHIP_ID:
- 	case KSZ9567_CHIP_ID:
-@@ -3239,6 +3278,7 @@ static int ksz_cls_flower_del(struct dsa_switch *ds, int port,
- 
- 	switch (dev->chip_id) {
- 	case KSZ8563_CHIP_ID:
-+	case KSZ8567_CHIP_ID:
- 	case KSZ9477_CHIP_ID:
- 	case KSZ9563_CHIP_ID:
- 	case KSZ9567_CHIP_ID:
-@@ -4142,6 +4182,7 @@ static int ksz_parse_drive_strength(struct ksz_device *dev)
- 	case KSZ8794_CHIP_ID:
- 	case KSZ8765_CHIP_ID:
- 	case KSZ8563_CHIP_ID:
-+	case KSZ8567_CHIP_ID:
- 	case KSZ9477_CHIP_ID:
- 	case KSZ9563_CHIP_ID:
- 	case KSZ9567_CHIP_ID:
-diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
-index 15612101a155..060c5de9aa05 100644
---- a/drivers/net/dsa/microchip/ksz_common.h
-+++ b/drivers/net/dsa/microchip/ksz_common.h
-@@ -187,6 +187,7 @@ struct ksz_device {
- /* List of supported models */
- enum ksz_model {
- 	KSZ8563,
-+	KSZ8567,
- 	KSZ8795,
- 	KSZ8794,
- 	KSZ8765,
-diff --git a/drivers/net/dsa/microchip/ksz_spi.c b/drivers/net/dsa/microchip/ksz_spi.c
-index 6f6d878e742c..c8166fb440ab 100644
---- a/drivers/net/dsa/microchip/ksz_spi.c
-+++ b/drivers/net/dsa/microchip/ksz_spi.c
-@@ -164,6 +164,10 @@ static const struct of_device_id ksz_dt_ids[] = {
- 		.compatible = "microchip,ksz8563",
- 		.data = &ksz_switch_chips[KSZ8563]
- 	},
-+	{
-+		.compatible = "microchip,ksz8567",
-+		.data = &ksz_switch_chips[KSZ8567]
-+	},
- 	{
- 		.compatible = "microchip,ksz9567",
- 		.data = &ksz_switch_chips[KSZ9567]
-@@ -204,6 +208,7 @@ static const struct spi_device_id ksz_spi_ids[] = {
- 	{ "ksz9893" },
- 	{ "ksz9563" },
- 	{ "ksz8563" },
-+	{ "ksz8567" },
- 	{ "ksz9567" },
- 	{ "lan9370" },
- 	{ "lan9371" },
-diff --git a/include/linux/platform_data/microchip-ksz.h b/include/linux/platform_data/microchip-ksz.h
-index f177416635a2..8c659db4da6b 100644
---- a/include/linux/platform_data/microchip-ksz.h
-+++ b/include/linux/platform_data/microchip-ksz.h
-@@ -33,6 +33,7 @@ enum ksz_chip_id {
- 	KSZ9897_CHIP_ID = 0x00989700,
- 	KSZ9893_CHIP_ID = 0x00989300,
- 	KSZ9563_CHIP_ID = 0x00956300,
-+	KSZ8567_CHIP_ID = 0x00856700,
- 	KSZ9567_CHIP_ID = 0x00956700,
- 	LAN9370_CHIP_ID = 0x00937000,
- 	LAN9371_CHIP_ID = 0x00937100,
+Compared to the previous iteration:
+  https://lore.kernel.org/lkml/20240123164912.249540-1-herve.codina@bootlin.com/
+this v2 series:
+- Update the qmc_hdlc initialisation in qmc_hcld_recv_complete()
+- Use WARN_ONCE()
+- Add a new bitmap function and use bitmap_*() in the QMC HDLC driver.
+
+Best regards,
+Hervé
+
+[1]: https://lore.kernel.org/linux-kernel/20231115144007.478111-1-herve.codina@bootlin.com/
+[2]: https://lore.kernel.org/linux-kernel/20231205152116.122512-1-herve.codina@bootlin.com/
+[3]: https://lore.kernel.org/linux-kernel/20231128132534.258459-1-herve.codina@bootlin.com/
+
+Changes v1 -> v2
+  - Patch 1
+    Use the same qmc_hdlc initialisation in qmc_hcld_recv_complete()
+    than the one present in qmc_hcld_xmit_complete().
+    Use WARN_ONCE()
+
+  - Patch 3 (new patch in v2)
+    Make bitmap_onto() available to users
+
+  - Patch 4 (new patch in v2)
+    Introduce bitmap_off()
+
+  - Patch 5 (patch 3 in v1)
+    Use bitmap_*() functions
+
+  - Patch 6 (patch 4 in v1)
+    No changes
+
+Changes compare to the full feature series:
+  - Patch 3
+    Use 'net: wan: fsl_qmc_hdlc:' as commit title prefix
+
+Patches extracted:
+  - Patch 1 : full feature series patch 7
+  - Patch 2 : full feature series patch 8
+  - Patch 3 : full feature series patch 20
+  - Patch 4 : full feature series patch 27
+
+Herve Codina (6):
+  net: wan: Add support for QMC HDLC
+  MAINTAINERS: Add the Freescale QMC HDLC driver entry
+  bitmap: Make bitmap_onto() available to users
+  bitmap: Introduce bitmap_off()
+  net: wan: fsl_qmc_hdlc: Add runtime timeslots changes support
+  net: wan: fsl_qmc_hdlc: Add framer support
+
+ MAINTAINERS                    |   7 +
+ drivers/net/wan/Kconfig        |  12 +
+ drivers/net/wan/Makefile       |   1 +
+ drivers/net/wan/fsl_qmc_hdlc.c | 806 +++++++++++++++++++++++++++++++++
+ include/linux/bitmap.h         |   3 +
+ lib/bitmap.c                   |  45 +-
+ 6 files changed, 873 insertions(+), 1 deletion(-)
+ create mode 100644 drivers/net/wan/fsl_qmc_hdlc.c
+
 -- 
-2.34.1
+2.43.0
 
 
