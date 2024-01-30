@@ -1,370 +1,194 @@
-Return-Path: <netdev+bounces-66986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C31D1841ABB
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 04:52:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88E1C841AD6
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 05:04:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54F3F2820A1
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:52:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76C931C24A09
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 04:04:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF9D383BA;
-	Tue, 30 Jan 2024 03:52:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7B6A374FE;
+	Tue, 30 Jan 2024 04:04:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="DGnvXXRu"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="tKXEV2kp";
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="2k8nZQhb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6CAA381C7
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 03:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706586727; cv=none; b=IRYNDqwiVjkk1RMz1yirTxL4i336vpgcEgEqeMQ0t0NBQDn/J+wT7TNKEJ0SJV0la9YeRRuNs3tlVy3QCMWwiCJs7L4UxzU8iKgOlJpf/Q+rmRvVH4dXUJfeVz1QXuz5expsTG6en3Vh5EaMRB9LdE5VxprM4UWbYzRjcpy+wVM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706586727; c=relaxed/simple;
-	bh=DuT4NF02kaC5BQypY3Hf8nScd/Iyn4+41SidW6J8xxQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iEmB/v5oECtZByp9PeyVdQT1RdqqOEz6jP8UoPCC9OBCSNEqAUsfKqAX1+ZpAp7ot3pgg98IdLyHUCaA+QUI9X6y1wEMpbz2DuAouQ5alX2SrEI0ehe+3O3B1DFb860t60cMTcHcevlM9P4NWD52ngznlgz3aiv2k/QJ09br8dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=DGnvXXRu; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-33af2823edbso796960f8f.0
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 19:52:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=arista.com; s=google; t=1706586724; x=1707191524; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0Gr9RawEoMTLBvWixWLQ9InE8ituKnBm/PO3iDLKMTs=;
-        b=DGnvXXRuP7fHeGwlHfotvtB7NDR+lSt0QCfkiQoLqF5RVdEjJdv26339kCqSLbQu1C
-         U4ZC/yL7jeEvEfFivqrxG5BE9r6rsQwr4QJ/tlGHXAX6lPZ93LKB0tIQt0bsCRhf1JA9
-         JSaQA8zevL3rUMaour/Vft5Sc3UCcpJWexai1T+O0D8VRW+eo6deBOw/h3LxvC0KIGRA
-         Z9ID25Xvlzu8vDwp0uTA40vOjBaGeR6tFDubIvEV0wP4EAMd810zlbhDi1VpOvWffO+6
-         y0x93kJlUUjgVeaJAlV86Tz6yQ0DY3SxbqrIFE8EfGVD1pQSiU+CtRCG8uyeS+LhaPdb
-         PPuw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706586724; x=1707191524;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0Gr9RawEoMTLBvWixWLQ9InE8ituKnBm/PO3iDLKMTs=;
-        b=YZgqRzxTquBpKPGFhVCtS8OGrcSqFAbHllA6uUDI2bVCABauwjy95TZWq3SN9aNWWT
-         /H2CbvGc91LcvG6TwL1jIJA/fSFOAG6llNSGiMosz5K71xk0LABr7ulqJ1FHn1+zpBEs
-         5HHtTIe++iYOQpRVWBXhlfl4NLdzGPAnGsu9yQmL/KjokGqBxYLNVpIEbXz47KTooOcl
-         nogtLOffsT0dJVVBqxCSxSykRCnkHvyttVB0Rn6fShz+ADWA3CP1p596+m+9wLUB7fL9
-         kILNGY9tZHu34Pa/NxqWQjPdaSdwUKSUtftDQwu/dD06uIuJ9KcHbefTX2wjTcZl2Hmb
-         witg==
-X-Gm-Message-State: AOJu0YwnToiFUsId0+EdqSw1RZqw0vvVLZlxgIaGrVY5k6b42bQnfDy3
-	YXKOrfMdghfMOj+OvETVqBArmxdKHPvVbuc37Xl/P4S4+3Bli8eA3I7PrCGxZg==
-X-Google-Smtp-Source: AGHT+IFyQ4LX2Vm/L7+rQkFA1LfPv+lk7PmRWfGl1yd8VKGXI87EoFvDwGgcnYP/KPnoH9kGWbiYcA==
-X-Received: by 2002:a5d:6383:0:b0:33a:ed8c:1a6a with SMTP id p3-20020a5d6383000000b0033aed8c1a6amr3210242wru.64.1706586724106;
-        Mon, 29 Jan 2024 19:52:04 -0800 (PST)
-Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
-        by smtp.gmail.com with ESMTPSA id ay13-20020a5d6f0d000000b00337d6aa3912sm9513207wrb.10.2024.01.29.19.52.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 19:52:03 -0800 (PST)
-From: Dmitry Safonov <dima@arista.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Dmitry Safonov <0x7f454c46@gmail.com>
-Cc: Dmitry Safonov <dima@arista.com>,
-	Mohammad Nassiri <mnassiri@ciena.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 3/3] selftests/net: Repair RST passive reset selftest
-Date: Tue, 30 Jan 2024 03:51:54 +0000
-Message-ID: <20240130-tcp-ao-test-key-mgmt-v2-3-d190430a6c60@arista.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240130-tcp-ao-test-key-mgmt-v2-0-d190430a6c60@arista.com>
-References: <20240130-tcp-ao-test-key-mgmt-v2-0-d190430a6c60@arista.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9385B374EE;
+	Tue, 30 Jan 2024 04:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.154.123
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706587451; cv=fail; b=pLh9VzgR+DUsqB2vlW5DIHh7bQEaZFbvJ2RaEr/QwKiMie8bp5lEWnyr5kniCsUsMRXTyCaem/QVx4IGOVFUWTYz5ueiJ/OPtGEWPCMFnhoB+oRSGdq9/HT0JK2wnYoKUYQGg9qLhD7bFySxHNIHciXK1N6LjZtQlBLgrL8j8PY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706587451; c=relaxed/simple;
+	bh=V880FAtmvgNy5CYuS508ati9KyrVV5HEn6j/geDowDw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=T7fwYcmAJK+gt9AjHhDeXV9YQ4Qm71CmaQ8qGwZVC7CbOow/rlO7WcPMeY63CHR46RMjdMXOEF1+iZIX0nW/UM5Xn0ayqAY02xtae9eo1kCvIpYQWusIVR3+1cTzLgdkGt5n4M7FKWANZP7Is+6MtNurAJyvoe2pUVHAxA3bXlc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=tKXEV2kp; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=2k8nZQhb; arc=fail smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1706587449; x=1738123449;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=V880FAtmvgNy5CYuS508ati9KyrVV5HEn6j/geDowDw=;
+  b=tKXEV2kpncnkpVsDZtHIJyJh79v5TRzU8lrNXbdEWA3MucYEba9pGZmO
+   ad+/IWetwkNbbAXuaPkW++M73VVddJ4RzQ8R7b1yjEnWtwIuJFbZKLDqC
+   UQu1OOSWLPCY8JQVlZwmncQqYCJ13+J8dMEQHIFVb+ygvOOgI1lnYri4X
+   +XdxnJeMbOxuesiHkIhH7THYEzhuW6MOvISnjEM+jzP2Ma219auDfJQNJ
+   ey5gq+g/jKKetJ8fxRzXx6OViMK3YIVgtGoDFitT0IYtGs1rPGEPUm7Mx
+   CgPfm2D8zQEQvMG9bZ/4OK4AdI8oef52qDndUHLffzzJaTfcnxWlcBrvk
+   w==;
+X-CSE-ConnectionGUID: 9low22QMQTmx+2YtM3y18Q==
+X-CSE-MsgGUID: 6iSCTbA9RfK3/7GvR4OJrA==
+X-IronPort-AV: E=Sophos;i="6.05,707,1701154800"; 
+   d="scan'208";a="15478389"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 29 Jan 2024 21:04:02 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 29 Jan 2024 21:03:36 -0700
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (10.10.215.250)
+ by email.microchip.com (10.10.87.72) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 29 Jan 2024 21:03:36 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fBVPtBRjBawAEtn1BbZaIerMQFcvGSNFlGjboKVmamqayB9Yx/pUl6t7eW5XbhShLZD8C19zmIK+f2q7QV5/hZKHNDQZjePPm39cUxwuHkBRqkEbEnwquMsEM2WAMe+kN93HTiPvrGZO0dKw2//UudLppFvUMPhZgLNNn+UW6obi9r9hohEzsqeRERqbV0tLrk3IZGfEuIWiyvSqlIuHExl7eGYcLvPdY9+8VL2pOqISTBfERUSMgE4T7UnEj9SGv7i63hR5OjkAWU73vaxosgciVz6IKjKovVvDZ+UoiPZXqSskCY86al5vCoxY/Jz/l9a+5IoOndgYHEMX4JCV5g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=V880FAtmvgNy5CYuS508ati9KyrVV5HEn6j/geDowDw=;
+ b=k6q/FuY9jjOWJiUSShQlGeoeil+epoZj6mvDDd11wgLs8Vnw0lShZoKEBRe/zpOVT+hOGbu+dyH4l8vEp1U9a6UgC9sTHEN3svWnEIYPmh5QCVYhSCanpswLs0xRBb4vuK0QDn9PlfzPYruzzldPxSC6O78ByrZgB9Jx3YG3wKRD5LQCXY64ZvOz67WZrQ/xFPSr9BXGAL5gzppHnJhME+YC6QlKoYn2N51V1ZCkqPxZhLgmZS15ZsdKCzLIMsqznxxEjipeUHe9WCwYWdmXeJRN3bSjJZGvbqouogXx6ZFi8kj4+WLQILQUNEPfPm4oiPi3ayzxrL1QMarDNp8F1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=V880FAtmvgNy5CYuS508ati9KyrVV5HEn6j/geDowDw=;
+ b=2k8nZQhbMtMy9fSnvqs14PDM5BtFh87QQ+70t1nnhM5XrbE0tH2ubXOqPUWHS7Lpg0iXf6y2LDbDQvTwi3ci33q9E6CbogbxyCyTDI6JIzjJB8/Ht+ou8ipA1/wzGTJRM6BfMwFNovkxzqNL2yy/C/7SIaEAhP2Urvm8qhVZUk3Z/2JS1ZdSUfhS5/KGR+DH7sMoI9qUj7E658IF5Ff7sd6K+MWo5J5he3WadNKQQrQ87Ig6yU7Dzxkc3+Pcy7+B2Dpo1BFQtbJ0tb2LuO3NUEh/G+cBV4fkDkar9yqu1jEHlKKesezKgZrk9xz7Ln3HF+YFSIVNLZVtJBY9mWxgJQ==
+Received: from PH7PR11MB8033.namprd11.prod.outlook.com (2603:10b6:510:246::12)
+ by PH8PR11MB6659.namprd11.prod.outlook.com (2603:10b6:510:1c2::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.33; Tue, 30 Jan
+ 2024 04:03:33 +0000
+Received: from PH7PR11MB8033.namprd11.prod.outlook.com
+ ([fe80::18cb:134a:e51a:2ce4]) by PH7PR11MB8033.namprd11.prod.outlook.com
+ ([fe80::18cb:134a:e51a:2ce4%7]) with mapi id 15.20.7228.029; Tue, 30 Jan 2024
+ 04:03:33 +0000
+From: <Arun.Ramadoss@microchip.com>
+To: <dev@pschenker.ch>, <netdev@vger.kernel.org>
+CC: <andrew@lunn.ch>, <olteanv@gmail.com>,
+	<krzysztof.kozlowski+dt@linaro.org>, <Woojung.Huh@microchip.com>,
+	<davem@davemloft.net>, <philippe.schenker@impulsing.ch>,
+	<linux-kernel@vger.kernel.org>, <edumazet@google.com>, <conor+dt@kernel.org>,
+	<marex@denx.de>, <devicetree@vger.kernel.org>,
+	<UNGLinuxDriver@microchip.com>, <stefan.portmann@impulsing.ch>,
+	<kuba@kernel.org>, <robh+dt@kernel.org>, <pabeni@redhat.com>,
+	<f.fainelli@gmail.com>
+Subject: Re: [PATCH net-next v2 2/2] net: dsa: Add KSZ8567 switch support
+Thread-Topic: [PATCH net-next v2 2/2] net: dsa: Add KSZ8567 switch support
+Thread-Index: AQHaT2VsOIA/ZpTWWUSbcFa7xMGyRLDxxAkA
+Date: Tue, 30 Jan 2024 04:03:32 +0000
+Message-ID: <8b6575afdba8c3207752ebfa1cddc490f7bee5a4.camel@microchip.com>
+References: <20240125080504.62061-1-dev@pschenker.ch>
+	 <20240125080504.62061-2-dev@pschenker.ch>
+In-Reply-To: <20240125080504.62061-2-dev@pschenker.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Evolution 3.36.5-0ubuntu1 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH7PR11MB8033:EE_|PH8PR11MB6659:EE_
+x-ms-office365-filtering-correlation-id: 172ab114-efab-4776-04c7-08dc21486d02
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 1v4T5IS0jiOEb7y014UgHCronI6JyY3tZAfscZp8p22trwVVgJ7xxwXU6xZ4t2kwl07kN7grAYb6O4FE1v5qkYbpqlBSI+pDRuevNfWPQB68zqYYIGYgBmc6+uoD23VoWdMt4pPow8Uigqc5OIw9QKr6V2XveLN5MJdOMHiAViPEorsJjdtrrMIex199WwQ5wy6u/zzwhVQOEzqfvuHGRvQYUADmfWXrgusrpqHUN1B474kq2Z/R10EFtxi93tVorx1x71mwgP4Ilt5u/+722B76rPaudKyHTVfOsdYqNY1yovI+PR8UpcK6OnDPWdg+bDSu1dMn+pYK9r9FSOWDidS7TWN8tPF+oE5erV+dcKCs8yApRZgs+FYCF8SubBSL70PTqnZ6kGFmwzMqhqpTA+lLPFqegEMiB8rV2iJ5k/xYSITwHaabo4GnqR6FlAZo74VhZyRsczYl8trrOW4Lxj6TrwYUMnRmrNeNn39hG8Bm83Hn9zm2v+3KLmWK540QsMGfr1YYoiYczzfxMfvrLe2D4zVc/cddSKR0WGQSp2v2KsAMT30DbFKX+J917IZQzXDizxwSUSt7EBz3ygvnxkqEPjPdUYEqzwCIDvnn/tqj4No+FKkaNdyLOSUlepxy
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH7PR11MB8033.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(376002)(39860400002)(366004)(346002)(136003)(230922051799003)(451199024)(1800799012)(186009)(64100799003)(6512007)(6506007)(66946007)(478600001)(122000001)(38100700002)(316002)(8936002)(4744005)(8676002)(5660300002)(4326008)(41300700001)(2616005)(71200400001)(6486002)(7416002)(2906002)(64756008)(91956017)(66476007)(76116006)(54906003)(110136005)(66556008)(66446008)(38070700009)(36756003)(86362001)(26005);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?RkNTQUFiT1JhSXpNUmkwQzB6ekJiUUhsVW85YjU3NTI3UjAwZmhCM0xkWEc1?=
+ =?utf-8?B?MEZHQjRUL3p3b2o5aC9SdldZRzZHcm1rdEp2bkFpeUhabzR2TUhidHpiUWty?=
+ =?utf-8?B?dVo2UUtydCtMWEw3MlM5SGp3dk5Dby9zMDJCY0Z0L1pHenFYUHNiUUNFTHp5?=
+ =?utf-8?B?OS9pV1lYSVlHMTErZGVyOFBiZkVRTElqaU0vc0lXMVVsK0Zib1JGbTZRVVRX?=
+ =?utf-8?B?TmZsWmEzMG9BZzRKaTJ0WGNJa3I0cVhrYml0WW9DTXNXNUxxRlFuNE5VQXlz?=
+ =?utf-8?B?dEFJZ2x3RVRXZnNYT2M3N0dDVlFLbEUvN29Tc1JkTzVRbWxiS2dRRE9TRVlt?=
+ =?utf-8?B?a3lGM2hCcVFZdWFGTUxXdHU2VXZxTVRtR1pPWXViZmptWi90SjNhalRNZjhI?=
+ =?utf-8?B?bVY2Wkk5SHVpUUdxekFVZzhQYjdKdjl6R242MFdSQXNVV29pd0Qra1diQjY2?=
+ =?utf-8?B?azE0azJyTjBrUnl1Nm9ieFdISGNDN0xyNkNGWXpWMjN1WDYrVVhSajllS3V6?=
+ =?utf-8?B?VkhmWWp3aGVKRGVnWEllNEJ1aWJSU1Y0aVFFNU5YMkx1cnR6Y1VUNFNoTEhI?=
+ =?utf-8?B?dm0reENLdVNib0xNazI5YWg4SW83TjN1TXpRMUc3WWRiUFdSbEkvMUlsRWdw?=
+ =?utf-8?B?TWRKTUV3cTJLdHFsWnIrSTRqbU5OeVd3S3lTWXVBR0tleE5tbGxsRUVraFRs?=
+ =?utf-8?B?dXU0bXpPQU1ic0ZyTnAzV3RqRzdobTBvaFBLWUZMOVh1ZG5YN2FGNGJrcWc1?=
+ =?utf-8?B?WDZhUzBqRytnRVFQa1I3a1lYQ3hFT1hQTVhKd1VQT1g3ZHBSZGI1UHJFYkJa?=
+ =?utf-8?B?ejBCUERaKzZ6UzRwUHhBUnhPdzJTWVY1VWdOcGVLUUxpdkQ4bGEzZ3N3Vytp?=
+ =?utf-8?B?bWxrVHc0d3plWDRrYlM1cnhScUVtcjdPdHhqbmVYc0FqTEdROERQd3VkdlZC?=
+ =?utf-8?B?ZVBBRDVqNmpsQVJTZ2lSeWEyRHRWb2kzWDJqa2x6SjRqV28veFN5dVNyWmIv?=
+ =?utf-8?B?bHNXV2l5ZGZZRXducWQ5YmRlTnZpS1Z1TkR6eW5POG94R1JKRGxlODFLeGJE?=
+ =?utf-8?B?WnhKWTZHVkFXSzBuMVZyWjVDV016dlZEYllvZktnSnFDaEt0a3o2Q1lUNytz?=
+ =?utf-8?B?ZHVnL0g5OFcwR3RZditOSEcrcUVwVXIzNmtxWjNXSEpia2RQNERhc0ZOVzE4?=
+ =?utf-8?B?VUVVUFpOMXp1L1NSZVI2Z3R5Z2dFMm5ZRWVuYStXQjJrbjdiYnZZejIrZExu?=
+ =?utf-8?B?RmhvUjFkc21JVFBMWEtsaE5UUis5MS9lTVlXUkgyRmxJMGt6UTR5TmN3KzIy?=
+ =?utf-8?B?S0tuL3cvZmhPMXdoZG0rNDAzR0tPRUtBK0QvcjBHamhiTFJScWNVTDBpODkw?=
+ =?utf-8?B?MnV6OXV0RUp6clNtQzBKMGM2V0NNQmFjQ1I2aTlWalZuc2M2ZEYrRzRDSFVN?=
+ =?utf-8?B?TzF2NGtyOW1IU1B4dVN0dkIrc1ZDclh6RDVERXYrcDAwTTd3eXBhd1JmSUds?=
+ =?utf-8?B?MEhCdUE5YmVGLyszeHh2ellKOXVwUll0a2xyZzBOTG5hcUhlYUk1VFVZU1B2?=
+ =?utf-8?B?cjh4alpEK1B2SVBQVmVBSkQvd2l0aERzYmpnMVNhaFh3dnB2V3ZNOFhlb2Fh?=
+ =?utf-8?B?eWdNbXFHcFZFME5UU1dNcmpseUJEazh2dndaOGpidmtrZGpNbXFqWUJFOEZG?=
+ =?utf-8?B?VXc0MnVyUkU4NSs0KyswcUxnRGhJVTA0Wkhodk9mSWRSZFZoTVYwNHpNKzhI?=
+ =?utf-8?B?SHJUemRXekdma0k5R0NaUmgxV2JBNDdoUnU5a2NrTGZscy9lV2VvdGpHRDZi?=
+ =?utf-8?B?cUhjSE5RMkY0WEZVdU1kWENUMFNWZUZLR0FvU0RyNEwxcTBrWTRYWHFNS05i?=
+ =?utf-8?B?Rkh5TllUeTJ6ZDJpL2U0UHJvLy9SaXdTZEFBeDRHMW5hU29qWlJSajAxRXdk?=
+ =?utf-8?B?YUtWQ0hwN2U3eG9CbWJHeTE1YlVQZ3pHVEdjOTJjdzVTaWsrRUV6SU9lR2tE?=
+ =?utf-8?B?YVYzSWt4L2M4TkFYRGx0OUV5ZFIxb1lZaGFvNjJRMm1NZUxGaE5za2hpKzJX?=
+ =?utf-8?B?YUxYaFRHeVdRVW5VQWxTZldKbGZSeFQ5K015d2dmQUIwSVpnSzlTRnpyWXFr?=
+ =?utf-8?B?WnIrL3B1eG5tUisyU1dLOG1uRUEwTUV4UTB1emxkR2gzVmkwaHZBSXFIWTM1?=
+ =?utf-8?B?VHc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <B17CD8475E2AD64FAA8F9D3416347C54@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Mailer: b4 0.13-dev-b6b4b
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1706586712; l=10409; i=dima@arista.com; s=20231212; h=from:subject:message-id; bh=DuT4NF02kaC5BQypY3Hf8nScd/Iyn4+41SidW6J8xxQ=; b=hVifgR7SD4AW3xgOjLDaRTI8uyXtdFHKystQvRiDYKg0wi1PLgz3Z0GbL21ICkratszmwTvRa Zp+6bx35hcFA7KVhrfFGvinbcdzCGuxxOKAOBIEy/o2UH2NILXl9eNo
-X-Developer-Key: i=dima@arista.com; a=ed25519; pk=hXINUhX25b0D/zWBKvd6zkvH7W2rcwh/CH6cjEa3OTk=
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH7PR11MB8033.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 172ab114-efab-4776-04c7-08dc21486d02
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jan 2024 04:03:32.9412
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: HhEPESp2YvRWTOwqPUQdx7MavIKQwhk04Uccl96nFXxvLbIPs1mnRDWb1G9/oNVG9xXtZJme/JIKBX8WAAy12MTYqkgL5IcjZOXOQTiag4c=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6659
 
-Currently, the test is racy and seems to not pass anymore.
-
-In order to rectify it, aim on TCP_TW_RST.
-Doesn't seem way too good with this sleep() part, but it seems as
-a reasonable compromise for the test. There is a plan in-line comment on
-how-to improve it, going to do it on the top, at this moment I want it
-to run on netdev/patchwork selftests dashboard.
-
-It also slightly changes tcp_ao-lib in order to get SO_ERROR propagated
-to test_client_verify() return value.
-
-Fixes: c6df7b2361d7 ("selftests/net: Add TCP-AO RST test")
-Signed-off-by: Dmitry Safonov <dima@arista.com>
----
- tools/testing/selftests/net/tcp_ao/lib/sock.c |  12 ++-
- tools/testing/selftests/net/tcp_ao/rst.c      | 138 +++++++++++++++++---------
- 2 files changed, 98 insertions(+), 52 deletions(-)
-
-diff --git a/tools/testing/selftests/net/tcp_ao/lib/sock.c b/tools/testing/selftests/net/tcp_ao/lib/sock.c
-index c75d82885a2e..15aeb0963058 100644
---- a/tools/testing/selftests/net/tcp_ao/lib/sock.c
-+++ b/tools/testing/selftests/net/tcp_ao/lib/sock.c
-@@ -62,7 +62,9 @@ int test_wait_fd(int sk, time_t sec, bool write)
- 		return -ETIMEDOUT;
- 	}
- 
--	if (getsockopt(sk, SOL_SOCKET, SO_ERROR, &ret, &slen) || ret)
-+	if (getsockopt(sk, SOL_SOCKET, SO_ERROR, &ret, &slen))
-+		return -errno;
-+	if (ret)
- 		return -ret;
- 	return 0;
- }
-@@ -584,9 +586,11 @@ int test_client_verify(int sk, const size_t msg_len, const size_t nr,
- {
- 	size_t buf_sz = msg_len * nr;
- 	char *buf = alloca(buf_sz);
-+	ssize_t ret;
- 
- 	randomize_buffer(buf, buf_sz);
--	if (test_client_loop(sk, buf, buf_sz, msg_len, timeout_sec) != buf_sz)
--		return -1;
--	return 0;
-+	ret = test_client_loop(sk, buf, buf_sz, msg_len, timeout_sec);
-+	if (ret < 0)
-+		return (int)ret;
-+	return ret != buf_sz ? -1 : 0;
- }
-diff --git a/tools/testing/selftests/net/tcp_ao/rst.c b/tools/testing/selftests/net/tcp_ao/rst.c
-index ac06009a7f5f..7df8b8700e39 100644
---- a/tools/testing/selftests/net/tcp_ao/rst.c
-+++ b/tools/testing/selftests/net/tcp_ao/rst.c
-@@ -1,10 +1,33 @@
- // SPDX-License-Identifier: GPL-2.0
--/* Author: Dmitry Safonov <dima@arista.com> */
-+/*
-+ * The test checks that both active and passive reset have correct TCP-AO
-+ * signature. An "active" reset (abort) here is procured from closing
-+ * listen() socket with non-accepted connections in the queue:
-+ * inet_csk_listen_stop() => inet_child_forget() =>
-+ *                        => tcp_disconnect() => tcp_send_active_reset()
-+ *
-+ * The passive reset is quite hard to get on established TCP connections.
-+ * It could be procured from non-established states, but the synchronization
-+ * part from userspace in order to reliably get RST seems uneasy.
-+ * So, instead it's procured by corrupting SEQ number on TIMED-WAIT state.
-+ *
-+ * It's important to test both passive and active RST as they go through
-+ * different code-paths:
-+ * - tcp_send_active_reset() makes no-data skb, sends it with tcp_transmit_skb()
-+ * - tcp_v*_send_reset() create their reply skbs and send them with
-+ *   ip_send_unicast_reply()
-+ *
-+ * In both cases TCP-AO signatures have to be correct, which is verified by
-+ * (1) checking that the TCP-AO connection was reset and (2) TCP-AO counters.
-+ *
-+ * Author: Dmitry Safonov <dima@arista.com>
-+ */
- #include <inttypes.h>
- #include "../../../../include/linux/kernel.h"
- #include "aolib.h"
- 
- const size_t quota = 1000;
-+const size_t packet_sz = 100;
- /*
-  * Backlog == 0 means 1 connection in queue, see:
-  * commit 64a146513f8f ("[NET]: Revert incorrect accept queue...")
-@@ -59,26 +82,6 @@ static void close_forced(int sk)
- 	close(sk);
- }
- 
--static int test_wait_for_exception(int sk, time_t sec)
--{
--	struct timeval tv = { .tv_sec = sec };
--	struct timeval *ptv = NULL;
--	fd_set efds;
--	int ret;
--
--	FD_ZERO(&efds);
--	FD_SET(sk, &efds);
--
--	if (sec)
--		ptv = &tv;
--
--	errno = 0;
--	ret = select(sk + 1, NULL, NULL, &efds, ptv);
--	if (ret < 0)
--		return -errno;
--	return ret ? sk : 0;
--}
--
- static void test_server_active_rst(unsigned int port)
- {
- 	struct tcp_ao_counters cnt1, cnt2;
-@@ -155,17 +158,16 @@ static void test_server_passive_rst(unsigned int port)
- 			test_fail("server returned %zd", bytes);
- 	}
- 
--	synchronize_threads(); /* 3: chekpoint/restore the connection */
-+	synchronize_threads(); /* 3: checkpoint the client */
-+	synchronize_threads(); /* 4: close the server, creating twsk */
- 	if (test_get_tcp_ao_counters(sk, &ao2))
- 		test_error("test_get_tcp_ao_counters()");
--
--	synchronize_threads(); /* 4: terminate server + send more on client */
--	bytes = test_server_run(sk, quota, TEST_RETRANSMIT_SEC);
- 	close(sk);
-+
-+	synchronize_threads(); /* 5: restore the socket, send more data */
- 	test_tcp_ao_counters_cmp("passive RST server", &ao1, &ao2, TEST_CNT_GOOD);
- 
--	synchronize_threads(); /* 5: verified => closed */
--	close(sk);
-+	synchronize_threads(); /* 6: server exits */
- }
- 
- static void *server_fn(void *arg)
-@@ -284,7 +286,7 @@ static void test_client_active_rst(unsigned int port)
- 		test_error("test_wait_fds(): %d", err);
- 
- 	synchronize_threads(); /* 3: close listen socket */
--	if (test_client_verify(sk[0], 100, quota / 100, TEST_TIMEOUT_SEC))
-+	if (test_client_verify(sk[0], packet_sz, quota / packet_sz, TEST_TIMEOUT_SEC))
- 		test_fail("Failed to send data on connected socket");
- 	else
- 		test_ok("Verified established tcp connection");
-@@ -323,7 +325,6 @@ static void test_client_passive_rst(unsigned int port)
- 	struct tcp_sock_state img;
- 	sockaddr_af saddr;
- 	int sk, err;
--	socklen_t slen = sizeof(err);
- 
- 	sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
- 	if (sk < 0)
-@@ -337,18 +338,51 @@ static void test_client_passive_rst(unsigned int port)
- 		test_error("failed to connect()");
- 
- 	synchronize_threads(); /* 2: accepted => send data */
--	if (test_client_verify(sk, 100, quota / 100, TEST_TIMEOUT_SEC))
-+	if (test_client_verify(sk, packet_sz, quota / packet_sz, TEST_TIMEOUT_SEC))
- 		test_fail("Failed to send data on connected socket");
- 	else
- 		test_ok("Verified established tcp connection");
- 
--	synchronize_threads(); /* 3: chekpoint/restore the connection */
-+	synchronize_threads(); /* 3: checkpoint the client */
- 	test_enable_repair(sk);
- 	test_sock_checkpoint(sk, &img, &saddr);
- 	test_ao_checkpoint(sk, &ao_img);
--	test_kill_sk(sk);
-+	test_disable_repair(sk);
- 
--	img.out.seq += quota;
-+	synchronize_threads(); /* 4: close the server, creating twsk */
-+
-+	/*
-+	 * The "corruption" in SEQ has to be small enough to fit into TCP
-+	 * window, see tcp_timewait_state_process() for out-of-window
-+	 * segments.
-+	 */
-+	img.out.seq += 5; /* 5 is more noticeable in tcpdump than 1 */
-+
-+	/*
-+	 * FIXME: This is kind-of ugly and dirty, but it works.
-+	 *
-+	 * At this moment, the server has close'ed(sk).
-+	 * The passive RST that is being targeted here is new data after
-+	 * half-duplex close, see tcp_timewait_state_process() => TCP_TW_RST
-+	 *
-+	 * What is needed here is:
-+	 * (1) wait for FIN from the server
-+	 * (2) make sure that the ACK from the client went out
-+	 * (3) make sure that the ACK was received and processed by the server
-+	 *
-+	 * Otherwise, the data that will be sent from "repaired" socket
-+	 * post SEQ corruption may get to the server before it's in
-+	 * TCP_FIN_WAIT2.
-+	 *
-+	 * (1) is easy with select()/poll()
-+	 * (2) is possible by polling tcpi_state from TCP_INFO
-+	 * (3) is quite complex: as server's socket was already closed,
-+	 *     probably the way to do it would be tcp-diag.
-+	 */
-+	sleep(TEST_RETRANSMIT_SEC);
-+
-+	synchronize_threads(); /* 5: restore the socket, send more data */
-+	test_kill_sk(sk);
- 
- 	sk = socket(test_family, SOCK_STREAM, IPPROTO_TCP);
- 	if (sk < 0)
-@@ -366,25 +400,33 @@ static void test_client_passive_rst(unsigned int port)
- 	test_disable_repair(sk);
- 	test_sock_state_free(&img);
- 
--	synchronize_threads(); /* 4: terminate server + send more on client */
--	if (test_client_verify(sk, 100, quota / 100, 2 * TEST_TIMEOUT_SEC))
--		test_ok("client connection broken post-seq-adjust");
-+	/*
-+	 * This is how "passive reset" is acquired in this test from TCP_TW_RST:
-+	 *
-+	 * IP 10.0.254.1.7011 > 10.0.1.1.59772: Flags [P.], seq 901:1001, ack 1001, win 249,
-+	 *    options [tcp-ao keyid 100 rnextkeyid 100 mac 0x10217d6c36a22379086ef3b1], length 100
-+	 * IP 10.0.254.1.7011 > 10.0.1.1.59772: Flags [F.], seq 1001, ack 1001, win 249,
-+	 *    options [tcp-ao keyid 100 rnextkeyid 100 mac 0x104ffc99b98c10a5298cc268], length 0
-+	 * IP 10.0.1.1.59772 > 10.0.254.1.7011: Flags [.], ack 1002, win 251,
-+	 *    options [tcp-ao keyid 100 rnextkeyid 100 mac 0xe496dd4f7f5a8a66873c6f93,nop,nop,sack 1 {1001:1002}], length 0
-+	 * IP 10.0.1.1.59772 > 10.0.254.1.7011: Flags [P.], seq 1006:1106, ack 1001, win 251,
-+	 *    options [tcp-ao keyid 100 rnextkeyid 100 mac 0x1b5f3330fb23fbcd0c77d0ca], length 100
-+	 * IP 10.0.254.1.7011 > 10.0.1.1.59772: Flags [R], seq 3215596252, win 0,
-+	 *    options [tcp-ao keyid 100 rnextkeyid 100 mac 0x0bcfbbf497bce844312304b2], length 0
-+	 */
-+	err = test_client_verify(sk, packet_sz, quota / packet_sz, 2 * TEST_TIMEOUT_SEC);
-+	/* Make sure that the connection was reset, not timeouted */
-+	if (err && err == -ECONNRESET)
-+		test_ok("client sock was passively reset post-seq-adjust");
-+	else if (err)
-+		test_fail("client sock was not reset post-seq-adjust: %d", err);
- 	else
--		test_fail("client connection still works post-seq-adjust");
--
--	test_wait_for_exception(sk, TEST_TIMEOUT_SEC);
--
--	if (getsockopt(sk, SOL_SOCKET, SO_ERROR, &err, &slen))
--		test_error("getsockopt()");
--	if (err != ECONNRESET && err != EPIPE)
--		test_fail("client connection was not reset: %d", err);
--	else
--		test_ok("client connection was reset");
-+		test_fail("client sock is yet connected post-seq-adjust");
- 
- 	if (test_get_tcp_ao_counters(sk, &ao2))
- 		test_error("test_get_tcp_ao_counters()");
- 
--	synchronize_threads(); /* 5: verified => closed */
-+	synchronize_threads(); /* 6: server exits */
- 	close(sk);
- 	test_tcp_ao_counters_cmp("client passive RST", &ao1, &ao2, TEST_CNT_GOOD);
- }
-@@ -410,6 +452,6 @@ static void *client_fn(void *arg)
- 
- int main(int argc, char *argv[])
- {
--	test_init(15, server_fn, client_fn);
-+	test_init(14, server_fn, client_fn);
- 	return 0;
- }
-
--- 
-2.43.0
-
+SGkgUGhpbGlwcGUsDQoNCk9uIFRodSwgMjAyNC0wMS0yNSBhdCAwOTowNSArMDEwMCwgUGhpbGlw
+cGUgU2NoZW5rZXIgd3JvdGU6DQo+IA0KPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9saW51eC9wbGF0
+Zm9ybV9kYXRhL21pY3JvY2hpcC1rc3ouaA0KPiBiL2luY2x1ZGUvbGludXgvcGxhdGZvcm1fZGF0
+YS9taWNyb2NoaXAta3N6LmgNCj4gaW5kZXggZjE3NzQxNjYzNWEyLi5jNDQ2NmU1NmQ5ZDcgMTAw
+NjQ0DQo+IC0tLSBhL2luY2x1ZGUvbGludXgvcGxhdGZvcm1fZGF0YS9taWNyb2NoaXAta3N6LmgN
+Cj4gKysrIGIvaW5jbHVkZS9saW51eC9wbGF0Zm9ybV9kYXRhL21pY3JvY2hpcC1rc3ouaA0KPiBA
+QCAtMjQsNiArMjQsNyBAQA0KPiANCj4gIGVudW0ga3N6X2NoaXBfaWQgew0KPiAgICAgICAgIEtT
+Wjg1NjNfQ0hJUF9JRCA9IDB4ODU2MywNCj4gKyAgICAgICBLU1o4NTY3X0NISVBfSUQgPSAweDAw
+ODU2NzAwLA0KPiAgICAgICAgIEtTWjg3OTVfQ0hJUF9JRCA9IDB4ODc5NSwNCj4gICAgICAgICBL
+U1o4Nzk0X0NISVBfSUQgPSAweDg3OTQsDQo+ICAgICAgICAgS1NaODc2NV9DSElQX0lEID0gMHg4
+NzY1LA0KDQpuaXRwaWNrOiBjYW4geW91IG1vdmUgS1NaODU2NyBhZGphY2VudCB0byBLU1o5NTY3
+LiBTaW5jZSBmaXJzdCBLU1o4eA0KY2hpcHMgaGF2ZSBjaGlwaWQgb2YgMTYgYml0cyBsZW5ndGgu
+IE90aGVycyBoYXZlIDMyIGJpdHMgbGVuZ3RoLg0KDQpvdGhlcndpc2UgaXQgbG9va3MgZ29vZCB0
+byBtZS4gDQoNCkFja2VkLWJ5OiBBcnVuIFJhbWFkb3NzIDxhcnVuLnJhbWFkb3NzQG1pY3JvY2hp
+cC5jb20+IA0KPiAtLQ0KPiAyLjM0LjENCj4gDQo=
 
