@@ -1,70 +1,55 @@
-Return-Path: <netdev+bounces-67022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3F39841E14
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:42:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF432841E33
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:45:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8A011C27CCF
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 08:42:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48CAD1F2D63E
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 08:45:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AAAC605D0;
-	Tue, 30 Jan 2024 08:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="c4sz7cgL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CDB759150;
+	Tue, 30 Jan 2024 08:43:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E837E57883;
-	Tue, 30 Jan 2024 08:40:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB70D5914E
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 08:43:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706604060; cv=none; b=M6US6NNcl2AADfc13hEeSE9JbnXRV5v6nZffjDYd3lmS/RhPRX7GDJryXYIFKL9SFARILkK9ZajsDioIhd6wq+zTNpgUb1xbX/+u1jEcYfR2lEWyEuPVpzueW5lU1W7R9YU9jUq3xJhsE3XmZxZJ8DxbYiqn9ITYtogJ5T1HFCY=
+	t=1706604231; cv=none; b=pJVbmse1vYe+bWiwiiTlIO+6NZ7rIX18R08V6wvkFlgkNTDK2BvMyA19Zk0xNQZPLKsdkrvnUlkujPvbVxNKpUvRtyi6FXRfEesxJvMo4g1GejIFbUX+lE9zqFT2w+eA4NEjd4PgI8mqOm/jlNJRg7jUmXlybyZm/k7jnTbz8Oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706604060; c=relaxed/simple;
-	bh=0+33A2fDfM+Pf1jm2y/0lJiIDRsAnV0lVfxWoOhkotI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=qj/Ggd3nWKkXIpEwSa/d6kp9wG/dDkH90Q/pVLhmhsYb3orJCp13ysxvLZYsEQi1Q/0O0mDaBmBLT9XI+npvXW5bLlTbVp70NKVNuOniPOq2Xj6SoTGEsAGxnWxNvt3nE2ZXEaWlQ92DXyeo14b+2BropVMp+lmODIMbwZzgKhQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=c4sz7cgL; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPA id E745B60013;
-	Tue, 30 Jan 2024 08:40:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1706604050;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7gu6XjSXx72QSPfbvEMAOKmCJHwRSWYKS/n8dDrRJZ4=;
-	b=c4sz7cgL8XOoRJh3a2KeNSJ6j9/P7M6rsCU5oOIXi5i9aSuS5Fs9ana8gu86AhTdhDQ+NF
-	EqHDgQYqG5HOSat0VoXByxGvoSEsKqGdq3zv+XNjLzWudf+Ss0l0p+l+l510G29eAciBqL
-	15zzapUC/6TIESQvgBLovuPEpWaJScsZep+UZ3GqN5e++p+ggeKh0OcxK2oaMFeOlvDp6u
-	W9pGV9SSjRvrSQGujfsXTWLa7cEbOhNTwnU3Gofl4j8N8eAKFuNBEhbfw0O547kXFopMTa
-	0ooJyEjdDgZ9sI1KzhM8ZN0n8J7wExGBjXZhJVE85NzNnJpE7LPvlAx0YRdCtA==
-From: Herve Codina <herve.codina@bootlin.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Herve Codina <herve.codina@bootlin.com>
-Cc: linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1706604231; c=relaxed/simple;
+	bh=e47rzHCjnuGN2Y5ILV00Dwy8Cxh+z96ASqeJe0TLs5A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BMAhyEUy3YvPvAFlNfuz4RrWFoUBEFWWnIsRfefKagjRPifDLIUUutcONA0gqFrLutKVA9tZAHoAXGUgwNf7EbsPMXohpvxPqs/BEoo6eb2nJoWwhgPb26RYMdDDniUb/ameIOUb/3Anand2VrOG65L9hgLSUKSxDw5JmaO5x0Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.112.150])
+	by gateway (Coremail) with SMTP id _____8DxqejCtrhlr0MIAA--.6028S3;
+	Tue, 30 Jan 2024 16:43:46 +0800 (CST)
+Received: from localhost.localdomain (unknown [112.20.112.150])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxZMy+trhltK4nAA--.30345S2;
+	Tue, 30 Jan 2024 16:43:43 +0800 (CST)
+From: Yanteng Si <siyanteng@loongson.cn>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	fancer.lancer@gmail.com
+Cc: Yanteng Si <siyanteng@loongson.cn>,
+	Jose.Abreu@synopsys.com,
+	chenhuacai@loongson.cn,
+	linux@armlinux.org.uk,
+	guyinggang@loongson.cn,
 	netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Mark Brown <broonie@kernel.org>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: [PATCH v2 6/6] net: wan: fsl_qmc_hdlc: Add framer support
-Date: Tue, 30 Jan 2024 09:40:21 +0100
-Message-ID: <20240130084035.115086-7-herve.codina@bootlin.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240130084035.115086-1-herve.codina@bootlin.com>
-References: <20240130084035.115086-1-herve.codina@bootlin.com>
+	chris.chenfeiyang@gmail.com
+Subject: [PATCH net-next v8 00/11] stmmac: Add Loongson platform support
+Date: Tue, 30 Jan 2024 16:43:20 +0800
+Message-Id: <cover.1706601050.git.siyanteng@loongson.cn>
+X-Mailer: git-send-email 2.31.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,369 +57,152 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+X-CM-TRANSID:AQAAf8CxZMy+trhltK4nAA--.30345S2
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW3Ar1rZF4fCr4UZrykXw45CFX_yoW7XF4rpF
+	W3Ca45Cr4ktr4fAan3Aw1UZry5ZryYyrW7Wan7KwnIka9xWw1jvrySgayYqF17ZrWDZF1I
+	qr4F9w1DWF1qk3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUB2b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcxkI7V
+	AKI48JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY
+	6r1j6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
+	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
+	jxv20xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
+	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
+	67AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcbAwUUUUU
 
-Add framer support in the fsl_qmc_hdlc driver in order to be able to
-signal carrier changes to the network stack based on the framer status
-Also use this framer to provide information related to the E1/T1 line
-interface on IF_GET_IFACE and configure the line interface according to
-IF_IFACE_{E1,T1} information.
+v8:
+* The biggest change is according to Serge's comment in the previous
+  edition:
+   Seeing the patch in the current state would overcomplicate the generic
+   code and the only functions you need to update are
+   dwmac_dma_interrupt()
+   dwmac1000_dma_init_channel()
+   you can have these methods re-defined with all the Loongson GNET
+   specifics in the low-level platform driver (dwmac-loongson.c). After
+   that you can just override the mac_device_info.dma pointer with a
+   fixed stmmac_dma_ops descriptor. Here is what should be done for that:
 
-Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
----
- drivers/net/wan/fsl_qmc_hdlc.c | 239 ++++++++++++++++++++++++++++++++-
- 1 file changed, 235 insertions(+), 4 deletions(-)
+   1. Keep the Patch 4/9 with my comments fixed. First it will be partly
+   useful for your GNET device. Second in general it's a correct
+   implementation of the normal DW GMAC v3.x multi-channels feature and
+   will be useful for the DW GMACs with that feature enabled.
 
-diff --git a/drivers/net/wan/fsl_qmc_hdlc.c b/drivers/net/wan/fsl_qmc_hdlc.c
-index 8316f2984864..388d909ad0c8 100644
---- a/drivers/net/wan/fsl_qmc_hdlc.c
-+++ b/drivers/net/wan/fsl_qmc_hdlc.c
-@@ -9,6 +9,7 @@
- 
- #include <linux/bitmap.h>
- #include <linux/dma-mapping.h>
-+#include <linux/framer/framer.h>
- #include <linux/hdlc.h>
- #include <linux/module.h>
- #include <linux/of.h>
-@@ -28,6 +29,9 @@ struct qmc_hdlc {
- 	struct device *dev;
- 	struct qmc_chan *qmc_chan;
- 	struct net_device *netdev;
-+	struct framer *framer;
-+	spinlock_t carrier_lock; /* Protect carrier detection */
-+	struct notifier_block nb;
- 	bool is_crc32;
- 	spinlock_t tx_lock; /* Protect tx descriptors */
- 	struct qmc_hdlc_desc tx_descs[8];
-@@ -41,6 +45,195 @@ static inline struct qmc_hdlc *netdev_to_qmc_hdlc(struct net_device *netdev)
- 	return dev_to_hdlc(netdev)->priv;
- }
- 
-+static int qmc_hdlc_framer_set_carrier(struct qmc_hdlc *qmc_hdlc)
-+{
-+	struct framer_status framer_status;
-+	unsigned long flags;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	spin_lock_irqsave(&qmc_hdlc->carrier_lock, flags);
-+
-+	ret = framer_get_status(qmc_hdlc->framer, &framer_status);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "get framer status failed (%d)\n", ret);
-+		goto end;
-+	}
-+	if (framer_status.link_is_on)
-+		netif_carrier_on(qmc_hdlc->netdev);
-+	else
-+		netif_carrier_off(qmc_hdlc->netdev);
-+
-+end:
-+	spin_unlock_irqrestore(&qmc_hdlc->carrier_lock, flags);
-+	return ret;
-+}
-+
-+static int qmc_hdlc_framer_notifier(struct notifier_block *nb, unsigned long action,
-+				    void *data)
-+{
-+	struct qmc_hdlc *qmc_hdlc = container_of(nb, struct qmc_hdlc, nb);
-+	int ret;
-+
-+	if (action != FRAMER_EVENT_STATUS)
-+		return NOTIFY_DONE;
-+
-+	ret = qmc_hdlc_framer_set_carrier(qmc_hdlc);
-+	return ret ? NOTIFY_DONE : NOTIFY_OK;
-+}
-+
-+static int qmc_hdlc_framer_start(struct qmc_hdlc *qmc_hdlc)
-+{
-+	struct framer_status framer_status;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_power_on(qmc_hdlc->framer);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer power-on failed (%d)\n", ret);
-+		return ret;
-+	}
-+
-+	/* Be sure that get_status is supported */
-+	ret = framer_get_status(qmc_hdlc->framer, &framer_status);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "get framer status failed (%d)\n", ret);
-+		goto framer_power_off;
-+	}
-+
-+	qmc_hdlc->nb.notifier_call = qmc_hdlc_framer_notifier;
-+	ret = framer_notifier_register(qmc_hdlc->framer, &qmc_hdlc->nb);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer notifier register failed (%d)\n", ret);
-+		goto framer_power_off;
-+	}
-+
-+	return 0;
-+
-+framer_power_off:
-+	framer_power_off(qmc_hdlc->framer);
-+	return ret;
-+}
-+
-+static void qmc_hdlc_framer_stop(struct qmc_hdlc *qmc_hdlc)
-+{
-+	if (!qmc_hdlc->framer)
-+		return;
-+
-+	framer_notifier_unregister(qmc_hdlc->framer, &qmc_hdlc->nb);
-+	framer_power_off(qmc_hdlc->framer);
-+}
-+
-+static int qmc_hdlc_framer_set_iface(struct qmc_hdlc *qmc_hdlc, int if_iface,
-+				     const te1_settings *te1)
-+{
-+	struct framer_config config;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_get_config(qmc_hdlc->framer, &config);
-+	if (ret)
-+		return ret;
-+
-+	switch (if_iface) {
-+	case IF_IFACE_E1:
-+		config.iface = FRAMER_IFACE_E1;
-+		break;
-+	case IF_IFACE_T1:
-+		config.iface = FRAMER_IFACE_T1;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	switch (te1->clock_type) {
-+	case CLOCK_DEFAULT:
-+		/* Keep current value */
-+		break;
-+	case CLOCK_EXT:
-+		config.clock_type = FRAMER_CLOCK_EXT;
-+		break;
-+	case CLOCK_INT:
-+		config.clock_type = FRAMER_CLOCK_INT;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+	config.line_clock_rate = te1->clock_rate;
-+
-+	return framer_set_config(qmc_hdlc->framer, &config);
-+}
-+
-+static int qmc_hdlc_framer_get_iface(struct qmc_hdlc *qmc_hdlc, int *if_iface, te1_settings *te1)
-+{
-+	struct framer_config config;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer) {
-+		*if_iface = IF_IFACE_E1;
-+		return 0;
-+	}
-+
-+	ret = framer_get_config(qmc_hdlc->framer, &config);
-+	if (ret)
-+		return ret;
-+
-+	switch (config.iface) {
-+	case FRAMER_IFACE_E1:
-+		*if_iface = IF_IFACE_E1;
-+		break;
-+	case FRAMER_IFACE_T1:
-+		*if_iface = IF_IFACE_T1;
-+		break;
-+	}
-+
-+	if (!te1)
-+		return 0; /* Only iface type requested */
-+
-+	switch (config.clock_type) {
-+	case FRAMER_CLOCK_EXT:
-+		te1->clock_type = CLOCK_EXT;
-+		break;
-+	case FRAMER_CLOCK_INT:
-+		te1->clock_type = CLOCK_INT;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+	te1->clock_rate = config.line_clock_rate;
-+	return 0;
-+}
-+
-+static int qmc_hdlc_framer_init(struct qmc_hdlc *qmc_hdlc)
-+{
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_init(qmc_hdlc->framer);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer init failed (%d)\n", ret);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static void qmc_hdlc_framer_exit(struct qmc_hdlc *qmc_hdlc)
-+{
-+	if (!qmc_hdlc->framer)
-+		return;
-+
-+	framer_exit(qmc_hdlc->framer);
-+}
-+
- static int qmc_hdlc_recv_queue(struct qmc_hdlc *qmc_hdlc, struct qmc_hdlc_desc *desc, size_t size);
- 
- #define QMC_HDLC_RX_ERROR_FLAGS (QMC_RX_FLAG_HDLC_OVF | \
-@@ -299,6 +492,12 @@ static int qmc_hdlc_set_iface(struct qmc_hdlc *qmc_hdlc, int if_iface, const te1
- 
- 	qmc_hdlc->slot_map = te1->slot_map;
- 
-+	ret = qmc_hdlc_framer_set_iface(qmc_hdlc, if_iface, te1);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer set iface failed %d\n", ret);
-+		return ret;
-+	}
-+
- 	return 0;
- }
- 
-@@ -306,11 +505,16 @@ static int qmc_hdlc_ioctl(struct net_device *netdev, struct if_settings *ifs)
- {
- 	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(netdev);
- 	te1_settings te1;
-+	int ret;
- 
- 	switch (ifs->type) {
- 	case IF_GET_IFACE:
--		ifs->type = IF_IFACE_E1;
- 		if (ifs->size < sizeof(te1)) {
-+			/* Retrieve type only */
-+			ret = qmc_hdlc_framer_get_iface(qmc_hdlc, &ifs->type, NULL);
-+			if (ret)
-+				return ret;
-+
- 			if (!ifs->size)
- 				return 0; /* only type requested */
- 
-@@ -320,6 +524,11 @@ static int qmc_hdlc_ioctl(struct net_device *netdev, struct if_settings *ifs)
- 
- 		memset(&te1, 0, sizeof(te1));
- 
-+		/* Retrieve info from framer */
-+		ret = qmc_hdlc_framer_get_iface(qmc_hdlc, &ifs->type, &te1);
-+		if (ret)
-+			return ret;
-+
- 		/* Update slot_map */
- 		te1.slot_map = qmc_hdlc->slot_map;
- 
-@@ -353,10 +562,17 @@ static int qmc_hdlc_open(struct net_device *netdev)
- 	int ret;
- 	int i;
- 
--	ret = hdlc_open(netdev);
-+	ret = qmc_hdlc_framer_start(qmc_hdlc);
- 	if (ret)
- 		return ret;
- 
-+	ret = hdlc_open(netdev);
-+	if (ret)
-+		goto framer_stop;
-+
-+	/* Update carrier */
-+	qmc_hdlc_framer_set_carrier(qmc_hdlc);
-+
- 	chan_param.mode = QMC_HDLC;
- 	/* HDLC_MAX_MRU + 4 for the CRC
- 	 * HDLC_MAX_MRU + 4 + 8 for the CRC and some extraspace needed by the QMC
-@@ -406,6 +622,8 @@ static int qmc_hdlc_open(struct net_device *netdev)
- 	}
- hdlc_close:
- 	hdlc_close(netdev);
-+framer_stop:
-+	qmc_hdlc_framer_stop(qmc_hdlc);
- 	return ret;
- }
- 
-@@ -441,6 +659,7 @@ static int qmc_hdlc_close(struct net_device *netdev)
- 	}
- 
- 	hdlc_close(netdev);
-+	qmc_hdlc_framer_stop(qmc_hdlc);
- 	return 0;
- }
- 
-@@ -489,6 +708,7 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 
- 	qmc_hdlc->dev = &pdev->dev;
- 	spin_lock_init(&qmc_hdlc->tx_lock);
-+	spin_lock_init(&qmc_hdlc->carrier_lock);
- 
- 	qmc_hdlc->qmc_chan = devm_qmc_chan_get_bychild(qmc_hdlc->dev, np);
- 	if (IS_ERR(qmc_hdlc->qmc_chan)) {
-@@ -517,10 +737,19 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 	if (ret)
- 		return ret;
- 
-+	qmc_hdlc->framer = devm_framer_optional_get(qmc_hdlc->dev, "fsl,framer");
-+	if (IS_ERR(qmc_hdlc->framer))
-+		return PTR_ERR(qmc_hdlc->framer);
-+
-+	ret = qmc_hdlc_framer_init(qmc_hdlc);
-+	if (ret)
-+		return ret;
-+
- 	qmc_hdlc->netdev = alloc_hdlcdev(qmc_hdlc);
- 	if (!qmc_hdlc->netdev) {
- 		dev_err(qmc_hdlc->dev, "failed to alloc hdlc dev\n");
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto framer_exit;
- 	}
- 
- 	hdlc = dev_to_hdlc(qmc_hdlc->netdev);
-@@ -536,11 +765,12 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 	}
- 
- 	platform_set_drvdata(pdev, qmc_hdlc);
--
- 	return 0;
- 
- free_netdev:
- 	free_netdev(qmc_hdlc->netdev);
-+framer_exit:
-+	qmc_hdlc_framer_exit(qmc_hdlc);
- 	return ret;
- }
- 
-@@ -550,6 +780,7 @@ static int qmc_hdlc_remove(struct platform_device *pdev)
- 
- 	unregister_hdlc_device(qmc_hdlc->netdev);
- 	free_netdev(qmc_hdlc->netdev);
-+	qmc_hdlc_framer_exit(qmc_hdlc);
- 
- 	return 0;
- }
+   2. Create the Loongson GNET-specific
+   stmmac_dma_ops.dma_interrupt()
+   stmmac_dma_ops.init_chan()
+   methods in the dwmac-loongson.c driver. Don't forget to move all the
+   Loongson-specific macros from dwmac_dma.h to dwmac-loongson.c.
+
+   3. Create a Loongson GNET-specific platform setup method with the next
+   semantics:
+      + allocate stmmac_dma_ops instance and initialize it with
+        dwmac1000_dma_ops.
+      + override the stmmac_dma_ops.{dma_interrupt, init_chan} with
+        the pointers to the methods defined in 2.
+      + allocate mac_device_info instance and initialize the
+        mac_device_info.dma field with a pointer to the new
+        stmmac_dma_ops instance.
+      + call dwmac1000_setup() or initialize mac_device_info in a way
+        it's done in dwmac1000_setup() (the later might be better so you
+        wouldn't need to export the dwmac1000_setup() function).
+      + override stmmac_priv.synopsys_id with a correct value.
+
+   4. Initialize plat_stmmacenet_data.setup() with the pointer to the
+   method created in 3.
+
+* Others:
+  Re-split the patch.
+  Passed checkpatch.pl test.
+
+v7:
+* Refer to andrew's suggestion:
+  - Add DMA_INTR_ENA_NIE_RX and DMA_INTR_ENA_NIE_TX #define's, etc.
+
+* Others:
+  - Using --subject-prefix="PATCH net-next vN" to indicate that the
+    patches are for the networking tree.
+  - Rebase to the latest networking tree:
+    <git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git>
+
+
+v6:
+
+* Refer to Serge's suggestion:
+  - Add new platform feature flag:
+    include/linux/stmmac.h:
+    +#define STMMAC_FLAG_HAS_LGMAC			BIT(13)
+
+  - Add the IRQs macros specific to the Loongson Multi-channels GMAC:
+     drivers/net/ethernet/stmicro/stmmac/dwmac_dma.h:
+     +#define DMA_INTR_ENA_NIE_LOONGSON 0x00060000      /* ...*/
+     #define DMA_INTR_ENA_NIE 0x00010000	/* Normal Summary */
+     ...
+
+  - Drop all of redundant changes that don't require the
+    prototypes being converted to accepting the stmmac_priv
+    pointer.
+
+* Refer to andrew's suggestion:
+  - Drop white space changes.
+  - break patch up into lots of smaller parts.
+     Some small patches have been put into another series as a preparation
+     see <https://lore.kernel.org/loongarch/cover.1702289232.git.siyanteng@loongson.cn/T/#t>
+     
+     *note* : This series of patches relies on the three small patches above.
+* others
+  - Drop irq_flags changes.
+  - Changed patch order.
+
+
+v4 -> v5:
+
+* Remove an ugly and useless patch (fix channel number).
+* Remove the non-standard dma64 driver code, and also remove
+  the HWIF entries, since the associated custom callbacks no
+  longer exist.
+* Refer to Serge's suggestion: Update the dwmac1000_dma.c to
+  support the multi-DMA-channels controller setup.
+
+See:
+v4: <https://lore.kernel.org/loongarch/cover.1692696115.git.chenfeiyang@loongson.cn/>
+v3: <https://lore.kernel.org/loongarch/cover.1691047285.git.chenfeiyang@loongson.cn/>
+v2: <https://lore.kernel.org/loongarch/cover.1690439335.git.chenfeiyang@loongson.cn/>
+v1: <https://lore.kernel.org/loongarch/cover.1689215889.git.chenfeiyang@loongson.cn/>
+
+
+Yanteng Si (11):
+  net: stmmac: Add multi-channel support
+  net: stmmac: dwmac-loongson: Refactor code for loongson_dwmac_probe()
+  net: stmmac: dwmac-loongson: Add full PCI support
+  net: stmmac: dwmac-loongson: Move irq config to loongson_gmac_config
+  net: stmmac: dwmac-loongson: Add Loongson-specific register
+    definitions
+  net: stmmac: dwmac-loongson: Add GNET support
+  net: stmmac: dwmac-loongson: Add multi-channel supports for loongson
+  net: stmmac: dwmac-loongson: Fix MAC speed for GNET
+  net: stmmac: dwmac-loongson: Fix half duplex
+  net: stmmac: dwmac-loongson: Disable flow control for GMAC
+  net: stmmac: dwmac-loongson: Disable coe for some Loongson GNET
+
+ .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 561 ++++++++++++++++--
+ .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |   2 +-
+ .../ethernet/stmicro/stmmac/dwmac1000_dma.c   |  36 +-
+ .../net/ethernet/stmicro/stmmac/dwmac_dma.h   |  19 +-
+ .../net/ethernet/stmicro/stmmac/dwmac_lib.c   |  32 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |   2 +-
+ .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |   6 +
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |  15 +-
+ include/linux/stmmac.h                        |   3 +
+ 9 files changed, 582 insertions(+), 94 deletions(-)
+
 -- 
-2.43.0
+2.31.4
 
 
