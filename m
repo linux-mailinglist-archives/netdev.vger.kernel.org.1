@@ -1,170 +1,138 @@
-Return-Path: <netdev+bounces-67049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88FFC841F1C
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:16:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F742841F3A
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:20:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB9341C21F53
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:16:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAAEE29575D
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5A4067729;
-	Tue, 30 Jan 2024 09:13:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CAB56027C;
+	Tue, 30 Jan 2024 09:19:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V6Pe6k+U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IT59q9/r"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f41.google.com (mail-ot1-f41.google.com [209.85.210.41])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11580679EC;
-	Tue, 30 Jan 2024 09:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 492B3657DC;
+	Tue, 30 Jan 2024 09:19:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706605999; cv=none; b=GkDTpyxZi27W9n9AQDn+KqvktuXLyqFrRQjNgf0Xz81EANEftCpI6zkeO+/mzBVXgEEKLw8vC50O+RRfCf7KsKmwHUwuBYiKnubQ03zIS8pU6LLvneYhzwycCuEsri4Nai2uJNg0guSHgLajdgh9EEDwWT8xLFliDT3yvc/PA1M=
+	t=1706606345; cv=none; b=Zp6X+bZ58KVKxfmh4tOxj+cmUdXeGU4swaSDKZMR83kFJzAaGhWGl7GU8d+bXOBmaVTY7R/dNRK2Ss5bZG9R/YwbYY6RHENqVC4bsZOXlBASCY9u519Be1K11yQT0kUFPAsEvf5sJW7O+Abn0Trj+AJJZV+N8M2iQ+gdwxwoHMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706605999; c=relaxed/simple;
-	bh=yxd9IHSWjzcBrPuUDO7+SCI1N0zvICZf05uTKbbfPXA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=AvGxjly5iM+H29jokXv6wgFDDUN6c7XxxYyyTis9zougPD3eHiWFy1LpwYNrZhG+mhVTzlezvzGGO7MnJc8zRjFN6N+UuU3sMymfJN1n6pxUMJFx1WlPw4yVd6go6veHfPswnSl85hjr+e4dNFEumlRauUtvGvOq0mpnxKqW6vU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V6Pe6k+U; arc=none smtp.client-ip=209.85.210.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+	s=arc-20240116; t=1706606345; c=relaxed/simple;
+	bh=CDEVKAukMSd4Ch9/i4zmBazocJf38KDwE3Uzg9xR78I=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=sM47Fk7E7suPZN7CN2TbkkvKoSOSBLW4lq3cBsNSECg856ui1S+xwJG0wcxc0H6wv10gvmTpP3gR8iF2OnS7T7VzltarVH6eU+jD+jXX6lgwybueMhPKK0H2O16poXBVFQh3Wt8bi7vp2i8QC+RfgHlCxk7lc1C3qWo1h2WYE/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IT59q9/r; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-6e1214ae9d4so1189040a34.3;
-        Tue, 30 Jan 2024 01:13:17 -0800 (PST)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40fafae5532so402415e9.1;
+        Tue, 30 Jan 2024 01:19:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706605997; x=1707210797; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kP7G/zPUbEjcGqCRjgaQMWAAf9wDrODicb4k9l2g++8=;
-        b=V6Pe6k+UGrgqV7xqpVrcPSh4/WagxZcW6mVw87SxgkRJqAjxyXUfuq2csLKHoPFYOA
-         wbEWNj/drHXX/UXtPMGayfKC3QAjqL4BkL6SvcXYHK1gUBvDzisitzOiU8/EluqgcxAU
-         yM3wcUZ9bG1xzuosC4eeY1cI5pXwhlprp2M8yYW0nDZeXwOK9dtuHLVM3ys2zeLCCwrt
-         WMoTZp6CKUqK9y7noEWv+KxA0ekazZqNWanG2o8HAMSQIgocy4ipIfENpe+ggCd8bSys
-         vDvkGo0HvH+JYn10rcnvBpFvOk+8aPh7hO8Io8e6fokvd1IPZnQknoZhpICYsZDms35i
-         04wg==
+        d=gmail.com; s=20230601; t=1706606341; x=1707211141; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=0bdstY2hKysbHEBB9RD/YGo6z98AGMmpK58OyypNypM=;
+        b=IT59q9/rnbvK6hmEpXD5CyqswL1MX63PTHFYFremYQxcfzQVJ/tFh94u+3gDUYihSD
+         nmja7HaQcWuSjoRaKfTrxjEutYPrir+Dv8uDCWbLYCm8pRoRM4Tu+h0k3UdEg9x2h7Xd
+         7KuLJCsgmbQ+ScVKPR0EG9tuR3ke0OTleG3L/A5ogc43N4uxp9nArj/0V+1j2bV0IU0E
+         Yy9eufWjDo09vgVQu+XqYxQPbd61/lwK6ItHZL624DYIDZhlUUa8XA9YjonWV7j303rZ
+         1i4gzwIWHA7hBX1QTIabU4dMAD5JJModEa1GEKtqI1iILQtXKBDqgNvZqpBeCDiIWtny
+         ey2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706605997; x=1707210797;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=kP7G/zPUbEjcGqCRjgaQMWAAf9wDrODicb4k9l2g++8=;
-        b=pSkpwMqZzWGQgELxlm9IEkN8M4GHSQMYjjnlCDZCHyMpI2LtV3I7++gKkfjSzo+0FZ
-         FsASvyi1TYC0aKhRLC0qpXJOb/UTMa2f0eQ5PhhY6K0yyNBm3T39vy4fWgUixuDaUTeD
-         RgDyeWSOk5+aWpupZCFLVm7fM87kZyyUqqISZ8KAVe2wS952yj3XByeUU338SFTU3lyD
-         kSdHXdwHRN+LuirjVKDSCCasyJjsYAXuoGyzHFxk1Oc0Y2SY5kzLJ8noAb0FpR6JlQ6y
-         i8ihZWm6mkwMYUhcpekAcN2eZSKwieAGEdwkr87vGkXOnobKKytsfEPwqKEN+o5eVvRA
-         btjw==
-X-Gm-Message-State: AOJu0Yw7CM89QiNGnN+7I/mM+wrBryMcw5P9ScZW0wew9y6om/UiX2ft
-	zDU1i6h+u3f+m8E3N2QdDEiqE6Endj6QXS/1KLTE2whcaI3jGNtV
-X-Google-Smtp-Source: AGHT+IE8Q4KG3NbeQFqt34/6WaZTRJSkgwKNvSafvHvYRaM+fZtDCLEugDIup6U8STh4gXX2K2JK/g==
-X-Received: by 2002:a05:6358:7e83:b0:178:7f7d:91a6 with SMTP id o3-20020a0563587e8300b001787f7d91a6mr2601345rwn.46.1706605997066;
-        Tue, 30 Jan 2024 01:13:17 -0800 (PST)
-Received: from localhost (dhcp-141-239-144-21.hawaiiantel.net. [141.239.144.21])
-        by smtp.gmail.com with ESMTPSA id b4-20020a056a000a8400b006dde023cce8sm7211721pfl.57.2024.01.30.01.13.16
+        d=1e100.net; s=20230601; t=1706606341; x=1707211141;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0bdstY2hKysbHEBB9RD/YGo6z98AGMmpK58OyypNypM=;
+        b=OiMDLspaS+7uBmBsfinHpdpUZMAiDIfuZpUgluKxdGOtoJOZDlKBiD/B+Si/lE+qsc
+         YbTN0wYEf6d4Hgv6pe98rbagR+m4XvonpZlCWvS/fjIjN/h0dGc4hwl9mZAFrxqcecxT
+         1yE0t1qV4INcdfecdkUPqqJH3BQduffe61zj8q3ZF4Kk76TDICrPy7txWyx6AcNhLyAv
+         hk6XTfvJWkxFk9O9F1Pai9cRP4TmcheDwqoSqbqrJpzp/2mS6vsp+8XU8+TICQPSjxrB
+         Eva0nveWgRjMEthiqS5BsTMns1eqtl8ySHdi2D/RUyOBTxCbEY80eTtCqai13Q9PjOvZ
+         hzZw==
+X-Gm-Message-State: AOJu0YxypD00wHz2k9i/rsUZjwE2Y8usE8fYZgyQDiUMX/ikYCKzj8sd
+	dtbTSWJBQhO8/C33/XK+aNe+KWqk8KzIgnUWNnhxlMpT7SZEZ1y7
+X-Google-Smtp-Source: AGHT+IHtrAvZTqRVMu8om+eVDC5NRwRPwHIwC5z52RQNL0KsaPyjesn72We47CmYayg3wlQscbydaA==
+X-Received: by 2002:a05:600c:3592:b0:40f:a661:ee6b with SMTP id p18-20020a05600c359200b0040fa661ee6bmr281363wmq.7.1706606341324;
+        Tue, 30 Jan 2024 01:19:01 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:9c2b:323d:b44d:b76d])
+        by smtp.gmail.com with ESMTPSA id b7-20020adfee87000000b0033aebf727b2sm5464150wro.60.2024.01.30.01.19.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 01:13:16 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-From: Tejun Heo <tj@kernel.org>
-To: torvalds@linux-foundation.org,
-	mpatocka@redhat.com
-Cc: linux-kernel@vger.kernel.org,
-	dm-devel@lists.linux.dev,
-	msnitzer@redhat.com,
-	ignat@cloudflare.com,
-	damien.lemoal@wdc.com,
-	bob.liu@oracle.com,
-	houtao1@huawei.com,
-	peterz@infradead.org,
-	mingo@kernel.org,
-	netdev@vger.kernel.org,
-	allen.lkml@gmail.com,
-	kernel-team@meta.com,
-	Tejun Heo <tj@kernel.org>,
-	Alasdair Kergon <agk@redhat.com>,
-	Mike Snitzer <snitzer@kernel.org>
-Subject: [PATCH 8/8] dm-verity: Convert from tasklet to BH workqueue
-Date: Mon, 29 Jan 2024 23:11:55 -1000
-Message-ID: <20240130091300.2968534-9-tj@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240130091300.2968534-1-tj@kernel.org>
-References: <20240130091300.2968534-1-tj@kernel.org>
+        Tue, 30 Jan 2024 01:19:00 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
+ Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Jonathan
+ Corbet <corbet@lwn.net>,  linux-doc@vger.kernel.org,  Jacob Keller
+ <jacob.e.keller@intel.com>,  Breno Leitao <leitao@debian.org>,  Jiri Pirko
+ <jiri@resnulli.us>,  Alessandro Marcolini
+ <alessandromarcolini99@gmail.com>,  donald.hunter@redhat.com
+Subject: Re: [PATCH net-next v1 02/12] tools/net/ynl: Support sub-messages
+ in nested attribute spaces
+In-Reply-To: <20240129174220.65ac1755@kernel.org> (Jakub Kicinski's message of
+	"Mon, 29 Jan 2024 17:42:20 -0800")
+Date: Tue, 30 Jan 2024 09:12:47 +0000
+Message-ID: <m2zfwnuquo.fsf@gmail.com>
+References: <20240123160538.172-1-donald.hunter@gmail.com>
+	<20240123160538.172-3-donald.hunter@gmail.com>
+	<20240123161804.3573953d@kernel.org> <m2ede7xeas.fsf@gmail.com>
+	<20240124073228.0e939e5c@kernel.org> <m2ttn0w9fa.fsf@gmail.com>
+	<20240126105055.2200dc36@kernel.org> <m2jznuwv7g.fsf@gmail.com>
+	<20240129174220.65ac1755@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-The only generic interface to execute asynchronously in the BH context is
-tasklet; however, it's marked deprecated and has some design flaws. To
-replace tasklets, BH workqueue support was recently added. A BH workqueue
-behaves similarly to regular workqueues except that the queued work items
-are executed in the BH context.
+Jakub Kicinski <kuba@kernel.org> writes:
 
-This patch converts dm-verity from tasklet to BH workqueue.
+> On Sat, 27 Jan 2024 17:18:59 +0000 Donald Hunter wrote:
+>> > Hah, required attrs. I have been sitting on patches for the kernel for
+>> > over a year - https://github.com/kuba-moo/linux/tree/req-args
+>> > Not sure if they actually work but for the kernel I was curious if it's
+>> > possible to do the validation in constant time (in relation to the
+>> > policy size, i.e. without scanning the entire policy at the end to
+>> > confirm that all required attrs are present). And that's what I came up
+>> > with.  
+>> 
+>> Interesting. It's definitely a thorny problem with varying sets of
+>> 'required' attributes. It could be useful to report the absolutely
+>> required attributes in policy responses, without any actual enforcement.
+>> Would it be possible to report policy for legacy netlink-raw families?
+>
+> It's a simple matter of plumbing. We care reuse the genetlink policy
+> dumping, just need to add a new attr to make "classic" family IDs
+> distinct from genetlink ones.
+>
+> The policy vs spec is another interesting question. When I started
+> thinking about YNL my intuition was to extend policies to carry all
+> relevant info. But the more I thought about it the less sense it made.
+>
+> Whether YNL specs should replace policy dumps completely (by building
+> the YAML into the kernel, and exposing via sysfs like kheaders or btf)
+>  - I'm not sure. I think I used policy dumps twice in my life. They
+> are not all that useful, IMVHO...
 
-This is a minimal conversion which doesn't rename the related names
-including the "try_verify_in_tasklet" option. If this patch is applied, a
-follow-up patch would be necessary. I couldn't decide whether the option
-name would need to be updated too.
+Yeah, fair point. I don't think I've used policy dumps in any meaningful
+way either. Maybe no real value in exporting it for netlink-raw.
 
-Only compile tested. I don't know how to verity.
+>> Thinking about it, usability would probably be most improved by adding
+>> extack messages to more of the tc error paths.
+>
+> TC was one of the first netlink families, so we shouldn't judge it too
+> harshly. With that preface - it should only be used as "lessons learned"
+> not to inform modern designs.
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
-Cc: Alasdair Kergon <agk@redhat.com>
-Cc: Mike Snitzer <snitzer@kernel.org>
-Cc: Mikulas Patocka <mpatocka@redhat.com>
-Cc: dm-devel@lists.linux.dev
----
- drivers/md/dm-verity-target.c | 8 ++++----
- drivers/md/dm-verity.h        | 2 +-
- 2 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/md/dm-verity-target.c b/drivers/md/dm-verity-target.c
-index 14e58ae70521..911261de2d08 100644
---- a/drivers/md/dm-verity-target.c
-+++ b/drivers/md/dm-verity-target.c
-@@ -645,9 +645,9 @@ static void verity_work(struct work_struct *w)
- 	verity_finish_io(io, errno_to_blk_status(verity_verify_io(io)));
- }
- 
--static void verity_tasklet(unsigned long data)
-+static void verity_bh_work(struct work_struct *w)
- {
--	struct dm_verity_io *io = (struct dm_verity_io *)data;
-+	struct dm_verity_io *io = container_of(w, struct dm_verity_io, bh_work);
- 	int err;
- 
- 	io->in_tasklet = true;
-@@ -675,8 +675,8 @@ static void verity_end_io(struct bio *bio)
- 	}
- 
- 	if (static_branch_unlikely(&use_tasklet_enabled) && io->v->use_tasklet) {
--		tasklet_init(&io->tasklet, verity_tasklet, (unsigned long)io);
--		tasklet_schedule(&io->tasklet);
-+		INIT_WORK(&io->bh_work, verity_bh_work);
-+		queue_work(system_bh_wq, &io->bh_work);
- 	} else {
- 		INIT_WORK(&io->work, verity_work);
- 		queue_work(io->v->verify_wq, &io->work);
-diff --git a/drivers/md/dm-verity.h b/drivers/md/dm-verity.h
-index f9d522c870e6..7c16f834f31a 100644
---- a/drivers/md/dm-verity.h
-+++ b/drivers/md/dm-verity.h
-@@ -83,7 +83,7 @@ struct dm_verity_io {
- 	struct bvec_iter iter;
- 
- 	struct work_struct work;
--	struct tasklet_struct tasklet;
-+	struct work_struct bh_work;
- 
- 	/*
- 	 * Three variably-size fields follow this struct:
--- 
-2.43.0
-
+Oh, not judging TC, just considering whether it would be useful to throw
+some extack patches at it.
 
