@@ -1,121 +1,159 @@
-Return-Path: <netdev+bounces-67247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8253984277C
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 16:03:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D49784277E
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 16:04:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4F631C20B61
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:03:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF8D528C262
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:04:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1EB560ED9;
-	Tue, 30 Jan 2024 15:02:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80E547E771;
+	Tue, 30 Jan 2024 15:04:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dpkzXTht"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Zc9UAHgY"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B25C7CF08
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 15:02:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC41E60ED9;
+	Tue, 30 Jan 2024 15:03:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706626979; cv=none; b=sx4DEZODsPtXyT8/3ILuskzGdh9hL53CnJwTjKKkZY50wZsnFyF77btG+5sFzdiYWbT2VK3WGP29rj71n8ddUSjcd+zkHdAX4YqE52E9ceNgoMRQ9/fMu6LgVhJ2PZLFNt5ifkBUZVnp7vAq0qQFqCpPhQTTgZCbtQJqQXjurrQ=
+	t=1706627040; cv=none; b=NeZzftfeqSVPzSb9bS9VV5UN+S19umwWER/4dxrE3iN/prTYlRwWg+KDZ3nVjEBVxH4I5cI/z7VN66dOw2e4zi37gazkvxd3tR7Y6tz/9yUsK+CwcpqyG32W/fy+SvA+Mk2CpnLBB4LzaHEu9aaiwnXi04MptKtiBoataz9Cxi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706626979; c=relaxed/simple;
-	bh=ekhS35aTtIRuYnh1gdo6mGpL/s1t6jkFHW2ZHUQFpnw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V83Gkop3PWTXKQ2kJmqu77AbWJlEfBa4DTTrp56zciPeKc5Pix1GuhUuldGrpd+Xl1iAeeakDeJV/jfdFvioJkvuas8zKtl1G3znYiFQYE1EPPouBi/5QQhlt1apta4zsPXoSQu37jlCooQ5BCuCnyAPGfVVs01uM5rQf88xKQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dpkzXTht; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=vywR6FZxwGLiiVFuwjMUW7E3nmDQ7HTBIPMCNkMGrM8=; b=dp
-	kzXThtw9e4ioHba+DNuvhEzVedflxSHeV44XkHMQQHgRdWTHugjPVROTP3lh1jztYV6aNqcNVRr9C
-	Wdz4UMQXlpv85MJMhCeVAuGQ1RXTeuN4DnnfC5s6qUaAnZfKyrDK9ZSLZt+cHOEyJfv5mLB0OYBip
-	llwd59xrSiJwKEk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rUpdT-006VGq-Aj; Tue, 30 Jan 2024 16:02:51 +0100
-Date: Tue, 30 Jan 2024 16:02:51 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Luiz Angelo Daros de Luca <luizluca@gmail.com>,
-	netdev@vger.kernel.org, linus.walleij@linaro.org,
-	alsi@bang-olufsen.dk, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, ansuelsmth@gmail.com
-Subject: Re: [PATCH net-next v4 08/11] net: dsa: realtek: clean user_mii_bus
- setup
-Message-ID: <9657a15e-7c60-4244-9c27-327d96b7b76b@lunn.ch>
-References: <20240123215606.26716-1-luizluca@gmail.com>
- <20240123215606.26716-9-luizluca@gmail.com>
- <20240125111718.armzsazgcjnicc2h@skbuf>
- <CAJq09z64o96jURg-2ROgMRjQ9FTnL51kXQQcEpff1=TN11ShKw@mail.gmail.com>
- <20240129161532.sub4yfbjkpfgqfwh@skbuf>
- <95752e6d-82da-4cd3-b162-4fb88d7ffd13@gmail.com>
- <a50ca71f-e0b9-43ad-a08f-b4ee8a349387@arinc9.com>
+	s=arc-20240116; t=1706627040; c=relaxed/simple;
+	bh=//kFKSouwAE4cOJHqMCMPzz68JKEdAOc+2/aJyyBShg=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=kvXDYBoXPQk0uz58oFJ8SPKEMAOo9gWIyFCGWx6CDJJZrOKGXg2mVX/nn9IrSh010SUofWe8kk2vxq5QJ6+pj/mjPfkqhG90IAKzblsAo42ilXERFZvB96R6RRia1iniCMVR9cznUJFnAnRUNKlJ+PZ62XwZTpOdmyeoo7hc054=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Zc9UAHgY; arc=none smtp.client-ip=192.55.52.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706627038; x=1738163038;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=//kFKSouwAE4cOJHqMCMPzz68JKEdAOc+2/aJyyBShg=;
+  b=Zc9UAHgYXO5H5YGJDKCAZBhjsb+3IgMIbOZbsvYn2UGiqn664d9+Muh3
+   ilGokoDwLX4hf/B5XKFVoVcFq/HZszEFC6nb2dl4ReJRbZWx3YFG3wORX
+   6oepYk9i7gl6eQAncKFDdq4eJIl0Cxo/qJD9clKVLO7O8n0ImiALW4uxj
+   3F/rUCjCh48oqD+D0s01iFHZ2ZdABN6GxcgL8Ba7103GQgkPV8a9k9PD3
+   lJMEyUugp/N6V2SjQsrMk7qxYbDqFyhe98Kjg08JlvtjWck/1MTiMgRuf
+   55qQj/uYn/ekdnzyM42EFw8HhMnZuP3vSj3RmCnvz8FwlWF5j/E2RQ1OP
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10968"; a="434478342"
+X-IronPort-AV: E=Sophos;i="6.05,707,1701158400"; 
+   d="scan'208";a="434478342"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2024 07:03:57 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10968"; a="737803418"
+X-IronPort-AV: E=Sophos;i="6.05,707,1701158400"; 
+   d="scan'208";a="737803418"
+Received: from dcarleto-mobl.ger.corp.intel.com (HELO localhost) ([10.252.59.176])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2024 07:03:53 -0800
+From: Jani Nikula <jani.nikula@linux.intel.com>
+To: Jonathan Corbet <corbet@lwn.net>, Breno Leitao <leitao@debian.org>,
+ kuba@kernel.org, "David S. Miller" <davem@davemloft.net>
+Cc: linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, pabeni@redhat.com, edumazet@google.com
+Subject: Re: [PATCH v3] Documentation: Document each netlink family
+In-Reply-To: <87jznqewa7.fsf@meer.lwn.net>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <20231121114831.3033560-1-leitao@debian.org>
+ <874jevjgvo.fsf@intel.com> <87jznqewa7.fsf@meer.lwn.net>
+Date: Tue, 30 Jan 2024 17:03:50 +0200
+Message-ID: <87wmrqj221.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <a50ca71f-e0b9-43ad-a08f-b4ee8a349387@arinc9.com>
+Content-Type: text/plain
 
-On Tue, Jan 30, 2024 at 05:40:26PM +0300, Arınç ÜNAL wrote:
-> On 29.01.2024 19:22, Florian Fainelli wrote:
-> > 
-> > 
-> > On 1/29/2024 8:15 AM, Vladimir Oltean wrote:
-> > >  From other discussions I've had, there seems to be interest in quite the
-> > > opposite thing, in fact. Reboot the SoC running Linux, but do not
-> > > disturb traffic flowing through the switch, and somehow pick up the
-> > > state from where the previous kernel left it.
-> > 
-> > Yes this is actually an use case that is very dear to the users of DSA in an airplane. The entertainment system in the seat in front of you typically has a left, CPU/display and right set of switch ports. Across the 300+ units in the plane each entertainment systems runs STP to avoid loops being created when one of the display units goes bad. Occasionally cabin crew members will have to swap those units out since they tend to wear out. When they do, the switch operates in a headless mode and it would be unfortunate that plugging in a display unit into the network again would be disrupting existing traffic. I have seen out of tree patches doing that, but there was not a good way to make them upstream quality.
-> 
-> This piqued my interest. I'm trying to understand how exactly plugging in a
-> display unit into the network would disrupt the traffic flow. Is this about
-> all network interfaces attached to the bridge interface being blocked when
-> a new link is established to relearn the changed topology?
+On Tue, 30 Jan 2024, Jonathan Corbet <corbet@lwn.net> wrote:
+> Jani Nikula <jani.nikula@linux.intel.com> writes:
+>
+>> On Tue, 21 Nov 2023, Breno Leitao <leitao@debian.org> wrote:
+>>> This is a simple script that parses the Netlink YAML spec files
+>>> (Documentation/netlink/specs/), and generates RST files to be rendered
+>>> in the Network -> Netlink Specification documentation page.
+>>
+>> First of all, my boilerplate complaint: All extra processing for Sphinx
+>> should really be done using Sphinx extensions instead of adding Makefile
+>> hacks. I don't think it's sustainable to keep adding this stuff. We
+>> chose Sphinx because it is extensible, and to avoid the Rube Goldberg
+>> machine that the previous documentation build system was.
+>
+> So I feel like we've (me included) have kind of sent Breno around in
+> circles on this one.  This *was* implemented as an extension once:
+>
+>   https://lore.kernel.org/netdev/20231103135622.250314-1-leitao@debian.org/
+>
+> At that time it seemed too complex, and I thought that an external
+> script would lead to a simpler implementation overall.  Perhaps I was
+> wrong.
+>
+> I worry that a proliferation of extensions adds its own sort of
+> complexity and hazards - look at the things Vegard has fixed recently,
+> for example.
 
-The hardware is split into two parts, a cradle and the display
-unit. The switch itself is in the cradle embedded in the seat
-back. The display unit contains the CPU, GPU, storage etc. There is a
-single Ethernet interface between the display unit and the cradle,
-along with MDIO, power, audio cables for the headphone jack etc.
+If we're talking about the same things, I think one of the main problems
+there was shelling out to an external script while it could all have
+been trivially implemented directly in the extension. ;)
 
-When you take out the display unit, you disconnect the switches
-management plain. The CPU has gone, and its the CPU running STP,
-sending and receiving BPDUs, etc. But the switch is still powered, and
-switching packets, keeping the network going, at least for a while.
+> Relatively few people can work in that environment, and
+> extensions can make our version-support troubles worse.  So I'm not
+> fully sold on the idea that everything should be an extension,
+> especially if it can be expressed as a simple dependency and build step
+> in the makefile.
 
-When you plug in a display unit, it boots. As typical for any computer
-booting, it assumes the hardware is in an unknown state, and hits the
-switch with a reset. That then kills the local networking, and it
-takes a little while of the devices around it to swap to a redundant
-path. The move from STP to RSTP has been made, which speeds this all
-up, but you do get some disruption.
+I think we're just going to have to agree to disagree here. And,
+ultimately, it's your call as the documentation maintainer.
 
-It can take a while for the display unit to boot into user space and
-reconfigure the switch. Its only when that is complete can the switch
-rejoin the network.
+I'm sure some individual things are simple to put in the makefiles, but
+I believe overall the entire thing would be simpler if we avoided that.
 
-Rather than hit the switch with a reset, it would be better to somehow
-suck the current configuration out of the switch and prime the Linux
-network stack with that configuration. But that is a totally alien
-concept to Linux.
+> Some of the uglier makefile stuff we have is a different story...
+>
+> Anyway, I apologize for my role in making this particular addition
+> harder than it needed to be.  Perhaps, for the future, we should put
+> together and agree on a document (of all things) on how we think this
+> sort of functionality should be added.
 
-	Andrew
+Perhaps. The problem at hand, though, is that after 'make
+O=/path/to/build htmldocs' I have this cruft in my source tree:
+
+$ git ls-files -oi --exclude-per-directory=.gitignore
+Documentation/networking/netlink_spec/devlink.rst
+Documentation/networking/netlink_spec/dpll.rst
+Documentation/networking/netlink_spec/ethtool.rst
+Documentation/networking/netlink_spec/fou.rst
+Documentation/networking/netlink_spec/handshake.rst
+Documentation/networking/netlink_spec/index.rst
+Documentation/networking/netlink_spec/mptcp_pm.rst
+Documentation/networking/netlink_spec/netdev.rst
+Documentation/networking/netlink_spec/nfsd.rst
+Documentation/networking/netlink_spec/ovs_datapath.rst
+Documentation/networking/netlink_spec/ovs_flow.rst
+Documentation/networking/netlink_spec/ovs_vport.rst
+Documentation/networking/netlink_spec/rt_addr.rst
+Documentation/networking/netlink_spec/rt_link.rst
+Documentation/networking/netlink_spec/rt_route.rst
+Documentation/networking/netlink_spec/tc.rst
+
+I'm not even sure what the best way to fix that would be. (Apart from
+turning it into an extension, of course. ;)
+
+
+BR,
+Jani.
+
+
+-- 
+Jani Nikula, Intel
 
