@@ -1,186 +1,130 @@
-Return-Path: <netdev+bounces-67233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3B608426E0
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:26:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0113D8426E4
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:26:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8F3E1C24FAF
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:26:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7DA31C253DE
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11BE16DD19;
-	Tue, 30 Jan 2024 14:26:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC1CE6F08E;
+	Tue, 30 Jan 2024 14:26:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f+so500j"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="lIpVxYMX"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 811176DD08
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 14:26:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 369906E2C1;
+	Tue, 30 Jan 2024 14:26:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706624793; cv=none; b=fmsGRrVMlSgXE58O42KxI82jYTvB6uiS6XMBnPBsp2uDVrauu6exKnB1ek1mbhB9k3L6MiTiMWivlqvKlDAtDcVpdXQTH+rXdwlcA51JwSryZBn8e04uKRaAhXBAauJRi1yvXlaMc5RJXz8YzhW+4t2qjrbTYk+intsZS/OdUFg=
+	t=1706624799; cv=none; b=Y+PPAl3wMpt+gGdf74b9my3sdU1Ho1JgmbXyVDz6QyITe0aq3VI4JK0WzrZAlwzerkQ/lkHkkvM6aZz+fvoIUf0SlOXaT2Kl3Ni6+SQeEStbuoyHMbwM+62uh//SvpuhpMQhANfe5BRwBVT+Jai9Rln/cF4iaIBX8hpqj9iIjHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706624793; c=relaxed/simple;
-	bh=Z/oi0TD9rbRhOMY02/K6GmzYztRqlv+XAYiT0wztfMY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BQL0yOg/Kcf+cLn2478hq84oaiDlWdZysLYYDP1oMGwa9qiUcJKY5GoWKcSnDynV6tcRkenPZfBqoWO63Fu1UR2JqrWutZNfmXI1DFcJeC8MbXaEFG/5G8pQTssiA4uy56iPEwt2BdxczXiajcJYeUR7kitMHFwi76J6fgi74LQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f+so500j; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706624790;
+	s=arc-20240116; t=1706624799; c=relaxed/simple;
+	bh=f9nVK+++urQNiYuRkZtGBcJA2X/ZFOMRIO09d7zR0Vo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mJHZjqI+X6cwjdM4AR2nIkodAwl3JdSYi0C5Grr3V4We5nEtZvxm18G042t+89af5UuUoAWkdZjm9VfCVq8BfoySeTd57rXAVqZfLP8Qzi0TZ06yt4qOv5bCEJPfai1+LPKX6HJqK4+RiAc4rAgZN7dyB7uZKlpY6OFo6ixTnK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=lIpVxYMX; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 8E3C81C000E;
+	Tue, 30 Jan 2024 14:26:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1706624795;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Gc5CUVQVf9N+E+8WHXLrMTrpzxHA+Wq5e9QjeRUgRxM=;
-	b=f+so500j8NNq7YJi/JBNaAvCvDpAu85cbZD0ypJpH217lAXwRHzyHucPtVZEHk8OeUolAB
-	9t0dvU0upw+hvgEJtfDM1FtyqvDH+6wjvI4k5bXSMwExQ69DLAXCgWT+aueP+Ew8NEgeLx
-	bAJ5fjGiPxUQ41rNWQIJxkE59v4dzh0=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-582-__v0kdjoMD2-bDJQdYLWag-1; Tue, 30 Jan 2024 09:26:26 -0500
-X-MC-Unique: __v0kdjoMD2-bDJQdYLWag-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33af105d951so829758f8f.2
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 06:26:26 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706624785; x=1707229585;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Gc5CUVQVf9N+E+8WHXLrMTrpzxHA+Wq5e9QjeRUgRxM=;
-        b=hsybAOW4ySPJ/B+UT1gR25osVGuvkEGde+jEUm3uQErVKR0GOs4+yNncXSWwMgNoau
-         9xVR08zpwo9yU37Ou/zb64gLxsDrrZOyL9NQsnS3uSXY9IqmQNxizDCq6vfq2AlrI987
-         9TXar5qK0oa3ed0Fi2FL0+XR/UqcUocCtifhpeSqPeMbOWiu3LJNglPW76oMCHof0OQl
-         /55e9iBNxLzl/nyDYZ1Xs21c6RE8kMWtlAHdTF0CCDUiDoVma8gyHS/7sIZ2/GCniJim
-         YVZ65gKyIrQ4bqqPDlu4jKveykICmjP3anRTsK151FvMnM/jbc1q6D17F18ElGcsRKou
-         CY7Q==
-X-Gm-Message-State: AOJu0Yz/AwCtxm4GheLwL5yXMYyRqnHwjk6aSvAWoSUbHYNEnR4GO9Lm
-	7xkW9cUr1XuaNwMFU10NSc1eqhErkzP5JqLAvyJU9/zvdcIWFyEapBHuYCtZKfuz2hxh2a6k1HF
-	ABadRQwpAaqyP7S0/vRq8H+7smVCIiMNlhFG98MoKV85Q+X0OrU8wSA==
-X-Received: by 2002:adf:ea4b:0:b0:33a:f024:271f with SMTP id j11-20020adfea4b000000b0033af024271fmr3823616wrn.68.1706624785529;
-        Tue, 30 Jan 2024 06:26:25 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE1Fu0yrcn3zw0ib7zkT6uPNbKttY5Gi+aywjWNqmMpJQAGVVfyJINjAiPLrfDW5s52YxUnyQ==
-X-Received: by 2002:adf:ea4b:0:b0:33a:f024:271f with SMTP id j11-20020adfea4b000000b0033af024271fmr3823595wrn.68.1706624785219;
-        Tue, 30 Jan 2024 06:26:25 -0800 (PST)
-Received: from localhost (net-93-71-3-198.cust.vodafonedsl.it. [93.71.3.198])
-        by smtp.gmail.com with ESMTPSA id z18-20020adfec92000000b0033afbd1962esm1698784wrn.69.2024.01.30.06.26.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 06:26:24 -0800 (PST)
-Date: Tue, 30 Jan 2024 15:26:22 +0100
-From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, bpf@vger.kernel.org, toke@redhat.com,
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	sdf@google.com, hawk@kernel.org, ilias.apalodimas@linaro.org
-Subject: Re: [PATCH v6 net-next 1/5] net: add generic per-cpu page_pool
- allocator
-Message-ID: <ZbkHDo4bxcWtGP9X@lore-desk>
-References: <cover.1706451150.git.lorenzo@kernel.org>
- <5b0222d3df382c22fe0fa96154ae7b27189f7ecd.1706451150.git.lorenzo@kernel.org>
- <f6273e01-a826-4182-a5b5-564b51f2d9ae@huawei.com>
- <ZbeiZaUrWoj39_LZ@lore-desk>
- <7343292d-3273-a10a-9167-420f3232dbdd@huawei.com>
+	bh=EiU+vp3jmxj1RQvTE/aNTb9Remw5rmZoUoKv2t5MunA=;
+	b=lIpVxYMXZCa4HN5li0menqRxSUg6vkEUPhvFUqJ5VTxetW7YHyR0ScfsR5g7qFNFfQFhsU
+	/GRQVAzrasNhW3ICz/tX6L/w3LV2YslSM2K9TCMk14M7u60E0lSISz63YaS/yKVmfzFyXN
+	La1rgFSd4Wg22M/jvjqLFGvyAXXclRwiNc0cpQJkY+iVUO5v0BZH4e/PTBE2xYRyGRFOn0
+	6ZLys8l9Cl/y/3+x2mcuOVqm4b7ctVFruZkFU9CWmQc0zjDRQG4cvgbQXf64kxuzbuiggH
+	3LB5RhFoLEwzk2Ah0CiuvGh5lHSNE9Inw99BkBBpBWsZ37RHmjJf1Tjg8frtEA==
+Message-ID: <8b7e1d9d-70ec-4664-be04-48a2e2877891@arinc9.com>
+Date: Tue, 30 Jan 2024 17:26:29 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="cHXY2NtUZpqv9sEn"
-Content-Disposition: inline
-In-Reply-To: <7343292d-3273-a10a-9167-420f3232dbdd@huawei.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 6/7] net: dsa: mt7530: do not set
+ priv->p5_interface on mt7530_setup_port5()
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>, Vladimir Oltean <olteanv@gmail.com>
+Cc: Daniel Golle <daniel@makrotopia.org>,
+ Landen Chao <Landen.Chao@mediatek.com>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Russell King <linux@armlinux.org.uk>, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20240122-for-netnext-mt7530-improvements-1-v3-0-042401f2b279@arinc9.com>
+ <20240122-for-netnext-mt7530-improvements-1-v3-6-042401f2b279@arinc9.com>
+ <20240129125241.gu4srgufad6hpwor@skbuf>
+ <431750cc-fb6b-4f7a-9123-b6986d359742@arinc9.com>
+ <20240129083152.34d899cd@kernel.org> <20240129165201.s4oiuk3sxtk6zcsw@skbuf>
+ <20240129090034.01c11667@kernel.org>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20240129090034.01c11667@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
 
---cHXY2NtUZpqv9sEn
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-> On 2024/1/29 21:04, Lorenzo Bianconi wrote:
-> >> On 2024/1/28 22:20, Lorenzo Bianconi wrote:
-> >>
-> >>>  #ifdef CONFIG_LOCKDEP
-> >>>  /*
-> >>>   * register_netdevice() inits txq->_xmit_lock and sets lockdep class
-> >>> @@ -11686,6 +11690,27 @@ static void __init net_dev_struct_check(void)
-> >>>   *
-> >>>   */
-> >>> =20
-> >>> +#define SD_PAGE_POOL_RING_SIZE	256
-> >>
-> >> I might missed that if there is a reason we choose 256 here, do we
-> >> need to use different value for differe page size, for 64K page size,
-> >> it means we might need to reserve 16MB memory for each CPU.
-> >=20
-> > honestly I have not spent time on it, most of the current page_pool use=
-rs set
-> > pool_size to 256. Anyway, do you mean something like:
-> >=20
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index f70fb6cad2b2..3934a3fc5c45 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -11806,12 +11806,11 @@ static void __init net_dev_struct_check(void)
-> >   *
-> >   */
-> > =20
-> > -#define SD_PAGE_POOL_RING_SIZE	256
-> >  static int net_page_pool_alloc(int cpuid)
-> >  {
-> >  #if IS_ENABLED(CONFIG_PAGE_POOL)
->=20
-> Isn't better to have a config like CONFIG_PER_CPU_PAGE_POOL to enable
-> this feature? and this config can be selected by whoever needs this
-> feature?
+On 29.01.2024 20:00, Jakub Kicinski wrote:
+> On Mon, 29 Jan 2024 18:52:01 +0200 Vladimir Oltean wrote:
+>>>> I still see deferred. I guess I'll have to submit this again. :/
+>>>
+>>> Took me an hour to fix the mailbot:
+>>> https://github.com/kuba-moo/nipa/commit/6766e97e72ac91ffb42ed2259bc8e2ace446d0ef
+>>> email is the most quirky thing ever.
+>>
+>> Ah, so it was my neomutt encoding email as base64...
+> 
+> Something magical going on there, the email is encoded.. twice?
+> See the attachment. That's already thru a round of base64 decode
+> and there's another copy of the email with base64 inside it :o
+> Anyway, unwrapping it once is good enough for the bot to see the
+> command, and enough time spent on this ;)
 
-since it will be used for generic xdp (at least) I think this will be 99%
-enabled when we have bpf enabled, right?
+I don't claim to be an email expert. I've received Vladimir's email with
+the "Content-Transfer-Encoding: 8bit" header. The body was plaintext, not
+base64 encoded. I have checked how the netdev mailing list distributed
+Vladimir's email, its body is plaintext as well, not base64 encoded. Only
+the linux-arm-kernel mailing list distributed the body base64 encoded, the
+header is "Content-Transfer-Encoding: base64".
 
->=20
-> >  	struct page_pool_params page_pool_params =3D {
-> > -		.pool_size =3D SD_PAGE_POOL_RING_SIZE,
-> > +		.pool_size =3D PAGE_SIZE < SZ_64K ? 256 : 16,
->=20
-> What about other page size? like 16KB?
-> How about something like below:
-> PAGE_SIZE << get_order(PER_CPU_PAGE_POOL_MAX_SIZE)
+And the attachment you've provided seems to be from the raw output of
+lore.kernel.org/all which seems to put together the email distribution from
+all mailing lists.
 
-since pool_size is the number of elements in the ptr_ring associated to the=
- pool,
-assuming we want to consume PER_CPU_PAGE_POOL_MAX_SIZE for each cpu, someth=
-ing
-like:
+raw from all:
 
-PER_CPU_PAGE_POOL_MAX_SIZE / PAGE_SIZE
+https://lore.kernel.org/all/20240129125241.gu4srgufad6hpwor@skbuf/raw
 
-Regards,
-Lorenzo
+raw from netdev:
 
->=20
-> >  		.nid =3D NUMA_NO_NODE,
-> >  	};
-> >  	struct page_pool *pp_ptr;
->=20
+https://lore.kernel.org/netdev/20240129125241.gu4srgufad6hpwor@skbuf/raw
 
---cHXY2NtUZpqv9sEn
-Content-Type: application/pgp-signature; name="signature.asc"
+raw from linux-arm-kernel:
 
------BEGIN PGP SIGNATURE-----
+https://lore.kernel.org/linux-arm-kernel/20240129125241.gu4srgufad6hpwor@skbuf/raw
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZbkHDgAKCRA6cBh0uS2t
-rFBwAQCfFe/onm1LzNi7Yk+HxHQYideq3uQK0NB+AFZ5Ad3RLgEAlk8x2QwNxNQs
-IyRRcRVgU3GdlOxFX+kHd744W6F4AAs=
-=k4fY
------END PGP SIGNATURE-----
+I don't know which mailing list mailbot looks at in case of an email is
+sent with multiple mailing lists being CC'd or TO'd. It seems to be that it
+looked at linux-arm-kernel in this instance.
 
---cHXY2NtUZpqv9sEn--
-
+Arınç
 
