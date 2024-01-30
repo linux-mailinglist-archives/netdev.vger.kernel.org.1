@@ -1,159 +1,154 @@
-Return-Path: <netdev+bounces-67008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECAA4841CDC
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 08:46:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BD52841CE4
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 08:48:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 696C71F21CDB
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 07:46:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9ED581C23721
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 07:48:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F298B537E0;
-	Tue, 30 Jan 2024 07:46:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD36854F8E;
+	Tue, 30 Jan 2024 07:47:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UL6du7hr"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="c1ISUHC/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-lj1-f177.google.com (mail-lj1-f177.google.com [209.85.208.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7690853E07;
-	Tue, 30 Jan 2024 07:46:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 139A053E13
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 07:47:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706600767; cv=none; b=A335lqfk8nkLcb3ZVp6TwaPpSxSEFIv3azxLSOSwLX81nBTU+RQb5XiZGw4mMWzRAkMdwz7XH0C0nyxCY63s0Vui/mEpvNp+FgxycNw+o0mcb9P81SXGJeih0hCpXL4PgnVhQs37KOlwIWEXsm6/O4zVe73piTcrBGRmjDr4beo=
+	t=1706600878; cv=none; b=DQr8z5A/+o/8YkVzWHQ4tkwgjRCObMAxUFiIhC6Vry578JU6ua7uFpYafwBkgkeZPd+g2gIoYOHtpT4COLHnUhLAyY0R/YOImcOoS5rpG4DKtWikbuTDwO2TaQxaJSdwUxsDzCzsgkpIAi9KWENrAx+IE3gsKYLukUe0W6FxYPU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706600767; c=relaxed/simple;
-	bh=AkGwsk78SYVj3QkKhupfNGuYhyJ3mkDX4xS2J2NQkPc=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=LfCsAiJSODqui+wrFKFcoZ9TNeIpEolGjrfgc45YbQQ6MXieKE5HF+xXCnNx5z6/itY7UDv9QGLRSN/E5f1xeFiRLzL9PKP8OTUADORRo4eKV5NNZZdCQtwbz+t/e5KGfEDnc+HuJK+f73EM8lRwNlR16PYBjsBNuuvNqs3WI7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UL6du7hr; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1d8f3acc758so9288495ad.1;
-        Mon, 29 Jan 2024 23:46:06 -0800 (PST)
+	s=arc-20240116; t=1706600878; c=relaxed/simple;
+	bh=fe9RoJ7uIEL7hCMIEw33xQ4RK3TqAFvgh1skAFVlC+M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RvlOm3x18k3j0tACfyKIqk5k5DIzsDsvKSuMMsIjjWRFDKPQMFdNBjI6WZCmAW254Fc058taJIK0tlbyhPWjNOuiuHi3WOTaPxfy/blcDrje0DxEBemNxoDXlOrMbKiZEjMDXCOHtEuvbVAaX7x0EednEAFyVg4NbpFx39TDioE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=c1ISUHC/; arc=none smtp.client-ip=209.85.208.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-lj1-f177.google.com with SMTP id 38308e7fff4ca-2cf42ca9bb2so43276091fa.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 23:47:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706600766; x=1707205566; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=lIBszCx+QIzycUsQUzGrkuia87lRjitTl5A16QTacjc=;
-        b=UL6du7hrpxkniAovUTYHV3o0VaZz7l0oIlkEVDAJ08PXGvHEVRfUVXakNb0cLlbk5J
-         o0jIIJEVX40zGLxaigwQz0lVXXRrV6rnYu3mgr4FU2DRA649uH8a0KSVvpnFJHMEUHCw
-         33qBAOyfOq65FOIxNCDcnb1ukpmIpo3DsB5cVmKGPVjN8Bi2Q3xlvk5u+UItH6qYuBFn
-         iGqUb8lNk558yg+51PEKOuqzGpKYj0nCPjsDiORU57jtfPbMPg67s+eiSudW9vkMSKz/
-         Q+pMy/LnlbXBW6RP/bSFDoFnwClHSF4XFh3FPEuy47AZxNzEmuPAIChQBxw22guwkVlO
-         XLcw==
+        d=chromium.org; s=google; t=1706600875; x=1707205675; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yrrtCIWXL3eiBU/IKZjiGTOMDFzcQj7B56yYFQBrFdY=;
+        b=c1ISUHC/CAOMlQULakPGmdjoDYkECksEWpDpMafZBc/2gDLcssChTWGTLpKqQoO0H3
+         l7AG4z+4NKSSCwTN5rpfPrtP0oVCRWdA27+AZTQU10+mFDEZ3gUBn0T4fFmubkC8VGzZ
+         BpSLVqfc6taYpXNLo+9meQOEVoEFCRpn/PxCo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706600766; x=1707205566;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lIBszCx+QIzycUsQUzGrkuia87lRjitTl5A16QTacjc=;
-        b=wibMLe148+oBs1pVuqIUAHb97aBAcbFVLEk3/oT2luUbpmqm8VrMLGvgYoa9WdmSAX
-         ja4ItkT1KC6fZ5oEhmp11JvNy78Mw0si5Icy8q4BCfAdZREycA+elkotgy5kcLQc+oYI
-         IA4QrGN3lSEcdxFpL9nQ6rPluL96BdV1dvuROSRmStru+0I84JeM5m6QHwKIJ3bjGFmf
-         h/Do8CNZIAM2/HPd6d0+hls+acU2ufm55CjI7qk4BLqC6qszxhDnzRQnBQ8KVVv4JA4p
-         O6ERPXv3YVdTV9IZDcbYMZYphSa02UITUcKhzOAtsAJyXYmwuu4i/H+lOS5mEa3MiROv
-         St2A==
-X-Gm-Message-State: AOJu0YwWw/88zTeCEV/HQT57wpweFrEQDMRqV5kZoPdNpEORkU65t5rU
-	gg1wg+HuUvkEKnhxDRDvUkmscPTL8NfUkm0kAOZEKMERmUGNA0OrB4BlAuVtkR0=
-X-Google-Smtp-Source: AGHT+IEYXgOLOU5Zo4xUkARpQNfTQH16+hQNmRSvBPhUlbJFQGcaNsfb+iHP67DVmMZVPRdobKxwtg==
-X-Received: by 2002:a17:902:f544:b0:1d8:e5f9:19b0 with SMTP id h4-20020a170902f54400b001d8e5f919b0mr845318plf.30.1706600765640;
-        Mon, 29 Jan 2024 23:46:05 -0800 (PST)
-Received: from archie.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id a11-20020a170902eccb00b001c407fac227sm6511401plh.41.2024.01.29.23.46.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 23:46:04 -0800 (PST)
-Received: by archie.me (Postfix, from userid 1000)
-	id A78DA18638724; Tue, 30 Jan 2024 14:46:00 +0700 (WIB)
-Date: Tue, 30 Jan 2024 14:46:00 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Ma Ke <make_ruc2021@163.com>, Deming Wang <wangdeming@inspur.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Wang Ming <machel@vivo.com>,
-	Eric Biggers <ebiggers@google.com>,
-	Sabrina Dubroca <sd@queasysnail.net>
-Subject: CONFIG_INET_{AH,ESP} say y if unsure - rationale?
-Message-ID: <ZbipOApntQMw8q0S@archie.me>
+        d=1e100.net; s=20230601; t=1706600875; x=1707205675;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yrrtCIWXL3eiBU/IKZjiGTOMDFzcQj7B56yYFQBrFdY=;
+        b=bV7p9rqyjYUxmSHot9YTny5e6Cdf9oPJukrIjcDlfzonYjADIQ0czPxhk8F3tUXdwb
+         r1Zl+5drUzelyU8rMFn/zuD1TsPXnxrM2TYpk9qLvSEFzzPoYRECOGzp4zSpGEWaHT4u
+         uw7llMJDYyIykc36Ui0I57qJ25COJFWdWrVbQhHNzMD/vtTQRyne+vLsGtMvAIbAltBW
+         kJgqJpu6dqzPsDFRkIBxzVuIAYIoZ71+TUdWWCpeGz3M2dsm13hthKW/oOUFgZmDBb/T
+         mlad/wGt1/N9D6z504ZGFMed0AolEXJDJ4BDGXEzi43mHxDkXN0s4/oi3ZWTE6jr2ZXw
+         6hjw==
+X-Gm-Message-State: AOJu0YybPqPJOnqHtZiDG9umPdR0wUKvcza48E+KyJsY6O1hn+/Z7Fo/
+	32LR9MBpXgXIph45EhJOKVsPUgMwAa/4Os95NXcN57zLx9I3KeNYR6yAJNiASsX/ObL4kwLFKVM
+	PD8b/9Ze8mTpGc6/wHKQYAZQMx4PkfshD8+Rc
+X-Google-Smtp-Source: AGHT+IFXKjnS+us0d6V3OrZKd3SFgNJjm8Z8sdbBJxjxbvtvtuMmj6Rg5rbxK84S2bRJqhxRvRxcNPSPjSDkjD+diCE=
+X-Received: by 2002:a05:651c:b07:b0:2cf:4c49:a8fc with SMTP id
+ b7-20020a05651c0b0700b002cf4c49a8fcmr6437489ljr.22.1706600875032; Mon, 29 Jan
+ 2024 23:47:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="7zL6UcHUWgrAwMc6"
-Content-Disposition: inline
-
-
---7zL6UcHUWgrAwMc6
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+References: <20240126063500.2684087-1-wenst@chromium.org> <20240126063500.2684087-2-wenst@chromium.org>
+ <74b9f249-fcb4-4338-bf7b-8477de6c935c@linaro.org> <CAGXv+5Hu+KsTBd1JtnKcaE3qUzPhHbunoVaH2++yfNopHtFf4g@mail.gmail.com>
+ <21568334-b21f-429e-81cd-5ce77accaf3c@linaro.org> <CAGXv+5HxXzjigN3Bp96vkv71WfTJ1S2b7Wgafc4GxLmhu6+jMg@mail.gmail.com>
+ <a4324473-e0c6-4d53-8de0-03b69480e40b@linaro.org>
+In-Reply-To: <a4324473-e0c6-4d53-8de0-03b69480e40b@linaro.org>
+From: Chen-Yu Tsai <wenst@chromium.org>
+Date: Tue, 30 Jan 2024 15:47:43 +0800
+Message-ID: <CAGXv+5HAqmUizXztMH_nY6e+6oQh01hCtxEJXKtCn3_74-sOsQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
+ SDIO Bluetooth
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Tue, Jan 30, 2024 at 3:37=E2=80=AFPM Krzysztof Kozlowski
+<krzysztof.kozlowski@linaro.org> wrote:
+>
+> On 30/01/2024 04:32, Chen-Yu Tsai wrote:
+> > On Mon, Jan 29, 2024 at 3:34=E2=80=AFPM Krzysztof Kozlowski
+> > <krzysztof.kozlowski@linaro.org> wrote:
+> >>
+> >> On 29/01/2024 04:38, Chen-Yu Tsai wrote:
+> >>
+> >>>>> +allOf:
+> >>>>> +  - $ref: bluetooth-controller.yaml#
+> >>>>> +
+> >>>>> +properties:
+> >>>>> +  compatible:
+> >>>>> +    enum:
+> >>>>> +      - mediatek,mt7921s-bluetooth
+> >>>>
+> >>>> Can it be also WiFi on separate bus? How many device nodes do you ne=
+ed
+> >>>> for this device?
+> >>>
+> >>> For the "S" variant, WiFi is also on SDIO. For the other two variants=
+,
+> >>> "U" and "E", WiFi goes over USB and PCIe respectively. On both those
+> >>> variants, Bluetooth can either go over USB or UART. That is what I
+> >>> gathered from the pinouts. There are a dozen GPIO pins which don't
+> >>> have detailed descriptions though. If you want a comprehensive
+> >>> binding of the whole chip and all its variants, I suggest we ask
+> >>> MediaTek to provide it instead. My goal with the binding is to docume=
+nt
+> >>> existing usage and allow me to upstream new device trees.
+> >>>
+> >>> For now we only need the Bluetooth node. The WiFi part is perfectly
+> >>> detectable, and the driver doesn't seem to need the WiFi reset pin.
+> >>> The Bluetooth driver only uses its reset pin to reset a hung controll=
+er.
+> >>
+> >> Then suffix "bluetooth" seems redundant.
+> >
+> > I think keeping the suffix makes more sense though. The chip is a two
+> > function piece, and this only targets one of the functions. Also, the
+>
+> That's why I asked and you said there is only one interface: SDIO.
 
-I stumbled upon CONFIG_INET_AH and CONFIG_INET_ESP every time I configure
-my custom kernels. Kconfig description of each options says:
+There's only one interface, SDIO, but two SDIO functions. The two
+functions, if both were to be described in the device tree, would
+be two separate nodes. We just don't have any use for the WiFi one
+right now. Does that make sense to keep the suffix?
 
-> Support for IPsec AH (Authentication Header).
->=20
-> AH can be used with various authentication algorithms.  Besides
-> enabling AH support itself, this option enables the generic
-> implementations of the algorithms that RFC 8221 lists as MUST be
-> implemented.  If you need any other algorithms, you'll need to enable
-> them in the crypto API.  You should also enable accelerated
-> implementations of any needed algorithms when available.
->=20
-> If unsure, say Y.
-=20
-> Support for IPsec ESP (Encapsulating Security Payload).
->=20
-> ESP can be used with various encryption and authentication algorithms.
-> Besides enabling ESP support itself, this option enables the generic
-> implementations of the algorithms that RFC 8221 lists as MUST be
-> implemented.  If you need any other algorithms, you'll need to enable
-> them in the crypto API.  You should also enable accelerated
-> implementations of any needed algorithms when available.
->=20
-> If unsure, say Y.
+> > compatible string is already used in an existing driver [1] and
+> > soon-to-be in-tree device tree [2].
+>
+> That's not the way to upstream compatible. You cannot send it bypassing
+> bindings and review and later claim that's an ABI.
 
-Yet, distributions like Debian ([1]), Fedora ([2]), and Arch ([3]) instead
-enable both options as module, but I followed the Kconfig recommendation
-above.
+I get that. I can fix up the existing users where necessary. A proper
+binding would make the driver lookup be more efficient as well.
 
-I was wonder the rationale behind "say Y if unsure" for both
-options, and whether `default Y` should be justified or not.
 
-Thanks.
-
-[1]: https://salsa.debian.org/kernel-team/linux/-/raw/master/debian/config/=
-config?ref_type=3Dheads
-[2]: https://src.fedoraproject.org/rpms/kernel/raw/rawhide/f/kernel-x86_64-=
-fedora.config
-[3]: https://gitlab.archlinux.org/archlinux/packaging/packages/linux/-/raw/=
-main/config?ref_type=3Dheads
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---7zL6UcHUWgrAwMc6
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZbipMwAKCRD2uYlJVVFO
-o7bEAP47vu8LywxU4Q4VtItyckJTrKh/VznPmIw0wHdE0SkfcAEA4QZYjIFRSqAt
-GLIgnj/wkkYth9LWWHkEe99fb3miXQs=
-=S8O9
------END PGP SIGNATURE-----
-
---7zL6UcHUWgrAwMc6--
+Thanks
+ChenYu
 
