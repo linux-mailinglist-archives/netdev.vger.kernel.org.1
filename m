@@ -1,176 +1,157 @@
-Return-Path: <netdev+bounces-67097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF6ED8420D1
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:11:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C59CB8420D4
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:11:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6753E28799D
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:11:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D21921C23673
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:11:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B617C605B4;
-	Tue, 30 Jan 2024 10:11:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA9576087E;
+	Tue, 30 Jan 2024 10:11:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="JfrL0mLt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cfne4MM+"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07C7D60DC9;
-	Tue, 30 Jan 2024 10:11:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5212E605B1;
+	Tue, 30 Jan 2024 10:11:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706609480; cv=none; b=rAl88wkYzVqzsaLD08+4nRoCGw6pe0rSLiEaD5jJNNaJm64gDylJQP39DWl02iq+oZpJOh2oHsT7fU6RjlETABZ9DI/d4XrgdI0Y/0oQUhzmgLuFmWeNdM9V4hgeTBbMoVBsAN9ymReOuXkv/4oord4ck56fSg8UTrmDh0LVUwU=
+	t=1706609499; cv=none; b=j0cnNUd3noPqF0geQ8edyaCMFWRVuDY/bkJ4qCZoZc+/gY6GCrCa43u6/4yiW1CeBQCS3+dQjgi7JT16BKkyAqHZycj4o4MZ+NdB9u+8jgnUE5CdNQaUnHGI4uccFnnYwZZFVoyNhqXDLKQoJvdAAQSykmgyyeTeDSUYMORtviM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706609480; c=relaxed/simple;
-	bh=W7QoO6iHgwZjAZsVyUc+ghmM/zWF/h6xMYSv88tUaAs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m+0v6zG0qigCkooweauANEdigCQfAeJJ3DWkANptyv587LVccYU0s9t0mfi6dE6HjutX7QM997tRb9lS9hWFXSt2+t8rH0uesA6IcYn7TbcAr22erPuWeAyKEYctMe3rJ0MbGGrLBuaJygPSdKm5uWv44Wu4CggWNOnA8Iglnyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=JfrL0mLt; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=9dRwOtvvYYVVB2IliD6ZhiJqf0MxLPS/IjbSsebQhBA=; b=JfrL0mLtG1TD0e6GhhCsVGjpGM
-	0O0EouCiyqwAId/45+/giUJrsH9jdrLQMp5YV9No6ugeK+3F0jE6OEYih0dKOqnrHEgP3/y+Zzmwp
-	Nli35PRdH7jRs0Jn1g8C4u/T2CcB2TB78w2XxK+NLq3tyZYAa0WpWGBN6PoHvbdiP+PP4O0SN067l
-	9KwaO2xIc6j+9kGSJY+81MQGBlFViZquMbLMKyEjsOWa8Ed/uTQU6X470qmddesTtclYJ9jLlY68V
-	UxWo1eVipwWdN/mhdEaJIY8uFZBO8j96NnTNuETgCZ6WTf399crIF/53o7ZxJSIjx+Lo4cp4SKRvl
-	1pnP0pfA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49382)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rUl59-0001cF-0L;
-	Tue, 30 Jan 2024 10:11:07 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rUl55-0005QY-CY; Tue, 30 Jan 2024 10:11:03 +0000
-Date: Tue, 30 Jan 2024 10:11:03 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Romain Gantois <romain.gantois@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	=?iso-8859-1?Q?Cl=E9ment_L=E9ger?= <clement.leger@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/7] net: phy: add rxc_always_on flag to
- phylink_pcs
-Message-ID: <ZbjLN+FzBSohg1c2@shell.armlinux.org.uk>
-References: <20240130-rxc_bugfix-v2-0-5e6c3168e5f0@bootlin.com>
- <20240130-rxc_bugfix-v2-2-5e6c3168e5f0@bootlin.com>
+	s=arc-20240116; t=1706609499; c=relaxed/simple;
+	bh=lmOeyMwWYgVH9cF8GPIvshL3MIJRZ/YHOwbCDZdOR50=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RQ7enoLGZIaBozYThipx8GP604w5cEU7iq9JmU259HeJvSoWUEOvQwRWW5YtMWhiKFB9tWHGz9rIs6IfK4iNScYAIZ7ww3ax4mvmtgAPDzDxtwc5Plz74dZlMHxTFKZsoSgCpCHtGCYP7T54JCRSOfasrfHOhZ9NRfzPiifoM7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cfne4MM+; arc=none smtp.client-ip=209.85.219.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-dbed0710c74so3896562276.1;
+        Tue, 30 Jan 2024 02:11:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706609497; x=1707214297; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lmOeyMwWYgVH9cF8GPIvshL3MIJRZ/YHOwbCDZdOR50=;
+        b=cfne4MM+gEwiBpnK+Oyx5nisbmWmrfMRXUTm4stwzNrOy3+xmEXllUFRcpaw9FIyAZ
+         1nvx4Tgs3/gZlbI+UOLmWtX6e33q+mW/gPlfgNcq230CuPeZHdN+Pic6dCQ2jmZ0nVdY
+         kSID51gRQC5j58FNnBE8R1j2OGjMjDMElwhTByRL2wZIVX9gnPs1S1Vh+XoPnFCr5rtw
+         Mw6Ki97WZMMtQlqiKxafUDtwsZ/ZOfQh81RlUaoFD5yRDwglQ7NbdxgmdaGtaN0uvbS7
+         il5XgDIW2l5+jMQJmAUNO31BNQRSWa4TRr99L+CC4DPIDzDwFiWlcQwq/+SQ0JCioBLm
+         zs9A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706609497; x=1707214297;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lmOeyMwWYgVH9cF8GPIvshL3MIJRZ/YHOwbCDZdOR50=;
+        b=Q+T7wMG/4QOEPVmNXAA28lv0ir5+7JMyB9txeOE71dsrYgAdgZQu6wzEV3hAk0xms4
+         NZ+UT3V0XsVFyVpupWjTaHXZfJQT8wvhXwWseTOsNCpJCsC8TlXvtaa3Tr69nPOOl8BC
+         mdEhgFGfQCHeAu5FiiRq2Kk47LN+jQ/koPf7feJv18sAEy1IrJfwNpag2hKmneTa7yui
+         qPuJ2qKgHKTYwlFkrt+pISLQH9JHdssY56VlO5E4OlMHbv5fi24CkP/S1AIQOjbPxR51
+         uyPjFA7fjX1FRmWkbhgTClKQl3tBOIRxBM50yGv0amdApAOeMoIe7Igfbv8GMFAwTjli
+         HlAA==
+X-Gm-Message-State: AOJu0Yzb0PDdMd7bHm5jICH5Lg9004MuerRA7Jgbr0LAOW6BhpamKgVb
+	Tg72mj8ZjKuM7HUU8j0Hp4GN31OxqNSLjiSGCpDTzUV9Ctw6oiW7A3FLQyv+ldkbIcGmV+s53Tk
+	9x64/r5PxTrEHP1Abs3DflwQVnX0=
+X-Google-Smtp-Source: AGHT+IFRK4YrafkFlOPeBC9SYD6/OCZjylW/dLDByDsvbyNSUSM6fgkeRBu+0v3hZktbmcW8jzax9bO7QB1UvHQI25I=
+X-Received: by 2002:a25:9b44:0:b0:dc6:9c4f:9e7f with SMTP id
+ u4-20020a259b44000000b00dc69c4f9e7fmr1139552ybo.18.1706609497124; Tue, 30 Jan
+ 2024 02:11:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240130-rxc_bugfix-v2-2-5e6c3168e5f0@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20240127140747.905552-1-hayatake396@gmail.com>
+ <154f979e-a335-461b-b72e-5e9c54fe940c@linux.intel.com> <CADFiAcJShbgBLXdVgs1vK1jqDFopkRcw-se4b4h0V3Yd60xLVw@mail.gmail.com>
+ <92958c7b-7e5f-4e25-819f-4e52f9ffcf7b@linux.intel.com>
+In-Reply-To: <92958c7b-7e5f-4e25-819f-4e52f9ffcf7b@linux.intel.com>
+From: takeru hayasaka <hayatake396@gmail.com>
+Date: Tue, 30 Jan 2024 19:11:26 +0900
+Message-ID: <CADFiAc+0G2ncXKDQ+p8aZ98HtfsqNBHoSZVTYhgXUHu+=dof+A@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH net-next RESENT v3] ethtool: ice:
+ Support for RSS settings to GTP from ethtool
+To: Marcin Szycik <marcin.szycik@linux.intel.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	linux-doc@vger.kernel.org, vladimir.oltean@nxp.com, 
+	linux-kernel@vger.kernel.org, laforge@gnumonks.org, 
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	mailhol.vincent@wanadoo.fr
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 30, 2024 at 10:28:37AM +0100, Romain Gantois wrote:
-> Some MAC drivers (e.g. stmmac) require a continuous receive clock signal to
-> be generated by a PCS that is handled by a standalone PCS driver.
-> 
-> Such a PCS driver does not have access to a PHY device, thus cannot check
-> the PHY_F_RXC_ALWAYS_ON flag. They cannot check max_requires_rxc in the
-> phylink config either, since it is a private member. Therefore, a new flag
-> is needed to signal to the PCS that it should keep the RX clock signal up
-> at all times.
-> 
-> Suggested-by: Russell King <linux@armlinux.org.uk>
-> Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
-> ---
->  drivers/net/phy/phylink.c | 14 ++++++++++++++
->  include/linux/phylink.h   | 11 +++++++++++
->  2 files changed, 25 insertions(+)
-> 
-> diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-> index 851049096488..6fcc0a8ba122 100644
-> --- a/drivers/net/phy/phylink.c
-> +++ b/drivers/net/phy/phylink.c
-> @@ -1042,6 +1042,20 @@ static void phylink_pcs_poll_start(struct phylink *pl)
->  		mod_timer(&pl->link_poll, jiffies + HZ);
->  }
->  
-> +int phylink_pcs_pre_init(struct phylink *pl, struct phylink_pcs *pcs)
-> +{
-> +	int ret = 0;
-> +
-> +	/* Signal to PCS driver that MAC requires RX clock for init */
-> +	if (pl->config->mac_requires_rxc)
-> +		pcs->rxc_always_on = true;
-> +
-> +	if (pcs->ops->pcs_pre_init)
-> +		ret = pcs->ops->pcs_pre_init(pcs, pl->link_config.interface);
+Hi Marcin-san
+Thank you for your comment:)
 
-Given that:
-1) phylink supports switching between mutliple different interfaces,
-2) from what I can see you are only calling this from stmmac's
-   initialisation path,
-3) you pass the interface mode to the PCS here
+> The way I understand it now, this patch (and the ethtool one) adds hashin=
+g on
+> TEID field in GTP* headers. So I wanted to ask why do we have a case (gtp=
+c(4|6))
+> that doesn't include TEID? Do we hash on other fields in this header?
 
-then we don't want the PCS to configure itself for the interface mode
-passed in, because this function won't be called when the interface
-mode changes - and PCS driver authors will have to bear that in mind.
-So...
+I understand your question to be asking why it is necessary to have
+the option to select gtpc(4|6) for RSS when it doesn't include the
+TEID.
 
-> diff --git a/include/linux/phylink.h b/include/linux/phylink.h
-> index fcee99632964..71e970271fd3 100644
-> --- a/include/linux/phylink.h
-> +++ b/include/linux/phylink.h
-> @@ -422,6 +427,8 @@ struct phylink_pcs {
->   * @pcs_an_restart: restart 802.3z BaseX autonegotiation.
->   * @pcs_link_up: program the PCS for the resolved link configuration
->   *               (where necessary).
-> + * @pcs_pre_init: configure PCS components necessary for MAC hardware
-> + *                initialization e.g. RX clock for stmmac.
+When hashing in cases where TEID is not included, it can be done with
+the IMSI (telephone number) or the SeqNum of the GTPC in this header.
+Essentially, it depends on the implementation, but there is a reason
+for differentiation as the context is different between cases where
+GTPC includes TEID and those where it does not.
 
-This is fine as a short description.
+Thanks,
+Takeru
 
->   */
->  struct phylink_pcs_ops {
->  	int (*pcs_validate)(struct phylink_pcs *pcs, unsigned long *supported,
-> @@ -441,6 +448,8 @@ struct phylink_pcs_ops {
->  	void (*pcs_an_restart)(struct phylink_pcs *pcs);
->  	void (*pcs_link_up)(struct phylink_pcs *pcs, unsigned int neg_mode,
->  			    phy_interface_t interface, int speed, int duplex);
-> +	int (*pcs_pre_init)(struct phylink_pcs *pcs,
-> +			    phy_interface_t interface);
-
-... I would prefer this to be called initial_interface to make it
-clear that it's just the initial interface mode.
-
-However, do we really need it - if the PCS is supplying the RXC to
-the MAC, then is the interface mode between the PCS and PHY all that
-relevant at this point?
-
-Also, please note that this is poor documentation for this function
-(encouraged by broken kernel doc not able to properly describe "ops"
-structures). See further down in the #if 0..#endif block where each
-and every function in this ops structure is fully documented. Please
-do the same for any new functions added.
-
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2024=E5=B9=B41=E6=9C=8830=E6=97=A5(=E7=81=AB) 18:59 Marcin Szycik <marcin.s=
+zycik@linux.intel.com>:
+>
+>
+>
+> On 30.01.2024 07:39, takeru hayasaka wrote:
+> > Hi Marcin-san
+> > Thanks for your review!
+> >
+> >> Do I understand correctly that all gtpu* include TEID? Maybe write it =
+here.
+> > Yes, that's correct.
+> >
+> >> It would be nice to see a link to the patch that added GTP and 'e' fla=
+g support
+> > to ethtool itself ("ethtool: add support for rx-flow-hash gtp").
+> > I will send you the link.
+> > The one I sent earlier was outdated, so I've updated it to match this p=
+atch.
+> > https://lore.kernel.org/netdev/20240130053742.946517-1-hayatake396@gmai=
+l.com/
+> >
+> >> gtpc(4|6) doesn't include TEID, so what is its purpose?
+> > In GTPC communication, there is no TEID in the CSR (Create Session Requ=
+est).
+> > Therefore, there are cases of GTPC that do not include TEID.
+>
+> The way I understand it now, this patch (and the ethtool one) adds hashin=
+g on
+> TEID field in GTP* headers. So I wanted to ask why do we have a case (gtp=
+c(4|6))
+> that doesn't include TEID? Do we hash on other fields in this header?
+>
+> >
+> >> s/TEID(4byte)/TEID (4bytes)/
+> >> Also, I think two newlines should remain here.
+> > I will correct the TEID notation in the next patch!
+>
+> Thanks,
+> Marcin
+>
+> ---8<---
 
