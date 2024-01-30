@@ -1,167 +1,161 @@
-Return-Path: <netdev+bounces-67250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7C628427CE
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 16:17:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A5DF8427E0
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 16:21:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9493D28C61F
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:17:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3E6F0B2607A
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:21:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E1537F7CF;
-	Tue, 30 Jan 2024 15:17:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18BD081ACB;
+	Tue, 30 Jan 2024 15:20:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ZkZGZRQ7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tysz8r3Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5BA5427E
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 15:17:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A2E67E75;
+	Tue, 30 Jan 2024 15:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706627827; cv=none; b=PG/w+087I/otPKQsuxFwVib+rxJuBTGRq5cd4c8vIw5srcxLFq+9GZoAp/Ak/fepHwa9yb1c+uN5HG50pjsgZpWMsXjbd1ltngJ5te91aO39ZxMGGXpJwTXcQZzbmbquhPpTj1c7TNc+smwQWedMULlPRJ2hcKom9iwVwNE2mL4=
+	t=1706628057; cv=none; b=dr01/T3p6Gtyox1km06UOGii1fQQQLTKKLDSRBkC8RhJzCLqHFl2eUlaqfCH7m5aOA0PGqyfeJXkS+92ZrMELxOBC4ZY3OAdk2NdB4W8L5C37oWQb94xW1Gr2epJGbtffL/h0gqnv2E4DrobDBmALdoWHJYloV3nNikF2lk+nrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706627827; c=relaxed/simple;
-	bh=oBDBDDM2ZeXfB3x+4Y0EF7XZ6s9ga2JRC1WufWdZV/Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PzQ0XP2S8KAKWbOnlP0oLlXhqv9FxFXEca3f4bnrJ1oAJU5aRJ6XR8R7/tfMhkcKaIu2H6jn+7DBT92g6cvZ8NlxpZvgd+jKpJxo4eNWWXs+AFMbOTIsygl4XtkaYEOicY3TNhQc7ZujbwvNtJM4smolHOPxSTgX/Dxnird3CiY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ZkZGZRQ7; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1706627822; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=RRQctVTAEb/sCyj0hDI9F/Ci+YcS4C7areI81tVA8WE=;
-	b=ZkZGZRQ7Y+haHcD3dhKfoqRVzHvECCsBajzkN2rSu77i87UGC9ESxtMkuaE+MpzLagEj0IJ2YU+XPt9bYaXmumbG4US519yKexl6brRZxpRVy/jzlUBByADK6vxYVjnHzP2eytE9PEo9a8zVe49njjR2YMpfVC8yWMSkEXeqXwY=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0W.gXTgS_1706627820;
-Received: from 30.120.159.82(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W.gXTgS_1706627820)
-          by smtp.aliyun-inc.com;
-          Tue, 30 Jan 2024 23:17:01 +0800
-Message-ID: <081f6d4c-bc44-4afe-ba51-d7c14966a536@linux.alibaba.com>
-Date: Tue, 30 Jan 2024 23:16:59 +0800
+	s=arc-20240116; t=1706628057; c=relaxed/simple;
+	bh=LGaZ3YTJBfQ0lG0YcC/NrSyyzu8IUICWtPtIKqoiP3Q=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=hhzK6EGo5/sx6tQujTWPfR1TDGlirwa67Jl8LScs7zI1gEbEBT57tQtHgc8vzoKenhyS9X2dCYd3oDL4thwHutuj6PIq3KliG6YwHz75C6C0LjguaEVZrxjcDZp8m5kKg5u/8VXnkJp1bh+pK3ka5+2VQKFmdiyHyOxHYWBeTuY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tysz8r3Y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 84975C433B2;
+	Tue, 30 Jan 2024 15:20:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706628056;
+	bh=LGaZ3YTJBfQ0lG0YcC/NrSyyzu8IUICWtPtIKqoiP3Q=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=tysz8r3YwVsemLIq+hMfVkBJfC/H0mgK7ddeEQchHcTp2nc8sk0YTF1yxWcwl0SkX
+	 mJB7Kmvq6aI8j6yMG+F9EW6tNTQC5HkoQsIL6CiFQZTBNqg4EkTRrP0ulKmjrEbVSE
+	 JC4/QfYaMvj8aq74szTuLVwVaO2BakfeGUrIJqHpYmh9tyPg5rje0d4YoZCuuiMxuP
+	 xM/Bx/0tPObZEiiYQTTd/kEEzOxYqi+zzseoUIxijPgFcxrGzVBl1lojhBq0deQfJE
+	 njEe0e4W6wpnCTZRFOZi3LDvxxtqITUIC/K+a4IAVJyLxR2Q19Q4cztDMkaQhr+h2U
+	 Z5HY1W+jwbP3A==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E082C47DDB;
+	Tue, 30 Jan 2024 15:20:56 +0000 (UTC)
+From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= via B4 Relay
+ <devnull+arinc.unal.arinc9.com@kernel.org>
+Subject: [PATCH net-next v2 0/7] MT7530 DSA Subdriver Improvements Act II
+Date: Tue, 30 Jan 2024 18:20:46 +0300
+Message-Id:
+ <20240130-for-netnext-mt7530-improvements-2-v2-0-ba06f5dd9eb0@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] virtio_net: Add TX stop and wake counters
-To: Daniel Jurgens <danielj@nvidia.com>, netdev@vger.kernel.org
-Cc: mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
- virtualization@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, abeni@redhat.com, Parav Pandit <parav@nvidia.com>
-References: <20240130142521.18593-1-danielj@nvidia.com>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <20240130142521.18593-1-danielj@nvidia.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAM4TuWUC/yWNyw6CMBREf4XctZf0xcuV/2FYAF6kiW1JWwmG8
+ O/WupvJ5Mw5IJDXFOBaHOBp00E7m4q4FDAtg30S6kfqIJhQjAuOs/NoKVraI5rYVJKhNqt3Gxm
+ yMaDAUc1K1jUfVVtB+lk9zXrPjjskFH8s9GlZdIjOf7J843n/e7jkTFSiK1smG44cB6/tVL7t8
+ Lrl2JWTM9Cf5/kFtSUfRcIAAAA=
+To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: mithat.guner@xeront.com, erkin.bozoglu@xeront.com, 
+ Bartel Eerdekens <bartel.eerdekens@constell8.be>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, 
+ =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
+X-Mailer: b4 0.12.4
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1706628054; l=2695;
+ i=arinc.unal@arinc9.com; s=arinc9-patatt; h=from:subject:message-id;
+ bh=LGaZ3YTJBfQ0lG0YcC/NrSyyzu8IUICWtPtIKqoiP3Q=;
+ b=soUoCM9RUYqLpUSzNO6lqpgNpfqmqya/NbkPWl1MK6QH7ak+HzZWqpZSeJgHq3RlCvMIo7lr1
+ j3B7IBb1T0ZC2LfVcKaKKaijupISylgykgjzqG1/m9ccuzWbVT1QuBx
+X-Developer-Key: i=arinc.unal@arinc9.com; a=ed25519;
+ pk=VmvgMWwm73yVIrlyJYvGtnXkQJy9CvbaeEqPQO9Z4kA=
+X-Endpoint-Received:
+ by B4 Relay for arinc.unal@arinc9.com/arinc9-patatt with auth_id=115
+X-Original-From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Reply-To: <arinc.unal@arinc9.com>
 
+Hello!
 
+This is the second patch series with the goal of simplifying the MT7530 DSA
+subdriver and improving support for MT7530, MT7531, and the switch on the
+MT7988 SoC.
 
-在 2024/1/30 下午10:25, Daniel Jurgens 写道:
-> Add a tx queue stop and wake counters, they are useful for debugging.
->
-> 	$ ethtool -S ens5f2 | grep 'tx_stop\|tx_wake'
-> 	...
-> 	tx_queue_1_tx_stop: 16726
-> 	tx_queue_1_tx_wake: 16726
-> 	...
-> 	tx_queue_8_tx_stop: 1500110
-> 	tx_queue_8_tx_wake: 1500110
->
-> Signed-off-by: Daniel Jurgens <danielj@nvidia.com>
-> Reviewed-by: Parav Pandit <parav@nvidia.com>
-> ---
->   drivers/net/virtio_net.c | 26 ++++++++++++++++++++++++--
->   1 file changed, 24 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 3cb8aa193884..7e3c31ceaf7e 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -88,6 +88,8 @@ struct virtnet_sq_stats {
->   	u64_stats_t xdp_tx_drops;
->   	u64_stats_t kicks;
->   	u64_stats_t tx_timeouts;
-> +	u64_stats_t tx_stop;
-> +	u64_stats_t tx_wake;
->   };
+I have done a simple ping test to confirm basic communication on all switch
+ports on MCM and standalone MT7530, and MT7531 switch with this patch
+series applied.
 
-Hi Daniel!
+MT7621 Unielec, MCM MT7530:
 
-tx_stop/wake only counts the status in the I/O path.
-Do the status of virtnet_config_changed_work and virtnet_tx_resize need 
-to be counted?
+rgmii-only-gmac0-mt7621-unielec-u7621-06-16m.dtb
+gmac0-and-gmac1-mt7621-unielec-u7621-06-16m.dtb
 
-Thanks,
-Heng
+tftpboot 0x80008000 mips-uzImage.bin; tftpboot 0x83000000 mips-rootfs.cpio.uboot; tftpboot 0x83f00000 $dtb; bootm 0x80008000 0x83000000 0x83f00000
 
->   
->   struct virtnet_rq_stats {
-> @@ -112,6 +114,8 @@ static const struct virtnet_stat_desc virtnet_sq_stats_desc[] = {
->   	{ "xdp_tx_drops",	VIRTNET_SQ_STAT(xdp_tx_drops) },
->   	{ "kicks",		VIRTNET_SQ_STAT(kicks) },
->   	{ "tx_timeouts",	VIRTNET_SQ_STAT(tx_timeouts) },
-> +	{ "tx_stop",		VIRTNET_SQ_STAT(tx_stop) },
-> +	{ "tx_wake",		VIRTNET_SQ_STAT(tx_wake) },
->   };
->   
->   static const struct virtnet_stat_desc virtnet_rq_stats_desc[] = {
-> @@ -843,6 +847,9 @@ static void check_sq_full_and_disable(struct virtnet_info *vi,
->   	 */
->   	if (sq->vq->num_free < 2+MAX_SKB_FRAGS) {
->   		netif_stop_subqueue(dev, qnum);
-> +		u64_stats_update_begin(&sq->stats.syncp);
-> +		u64_stats_inc(&sq->stats.tx_stop);
-> +		u64_stats_update_end(&sq->stats.syncp);
->   		if (use_napi) {
->   			if (unlikely(!virtqueue_enable_cb_delayed(sq->vq)))
->   				virtqueue_napi_schedule(&sq->napi, sq->vq);
-> @@ -851,6 +858,9 @@ static void check_sq_full_and_disable(struct virtnet_info *vi,
->   			free_old_xmit_skbs(sq, false);
->   			if (sq->vq->num_free >= 2+MAX_SKB_FRAGS) {
->   				netif_start_subqueue(dev, qnum);
-> +				u64_stats_update_begin(&sq->stats.syncp);
-> +				u64_stats_inc(&sq->stats.tx_wake);
-> +				u64_stats_update_end(&sq->stats.syncp);
->   				virtqueue_disable_cb(sq->vq);
->   			}
->   		}
-> @@ -2163,8 +2173,14 @@ static void virtnet_poll_cleantx(struct receive_queue *rq)
->   			free_old_xmit_skbs(sq, true);
->   		} while (unlikely(!virtqueue_enable_cb_delayed(sq->vq)));
->   
-> -		if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS)
-> +		if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
-> +			if (netif_tx_queue_stopped(txq)) {
-> +				u64_stats_update_begin(&sq->stats.syncp);
-> +				u64_stats_inc(&sq->stats.tx_wake);
-> +				u64_stats_update_end(&sq->stats.syncp);
-> +			}
->   			netif_tx_wake_queue(txq);
-> +		}
->   
->   		__netif_tx_unlock(txq);
->   	}
-> @@ -2310,8 +2326,14 @@ static int virtnet_poll_tx(struct napi_struct *napi, int budget)
->   	virtqueue_disable_cb(sq->vq);
->   	free_old_xmit_skbs(sq, true);
->   
-> -	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS)
-> +	if (sq->vq->num_free >= 2 + MAX_SKB_FRAGS) {
-> +		if (netif_tx_queue_stopped(txq)) {
-> +			u64_stats_update_begin(&sq->stats.syncp);
-> +			u64_stats_inc(&sq->stats.tx_wake);
-> +			u64_stats_update_end(&sq->stats.syncp);
-> +		}
->   		netif_tx_wake_queue(txq);
-> +	}
->   
->   	opaque = virtqueue_enable_cb_prepare(sq->vq);
->   
+MT7622 Bananapi, MT7531:
+
+gmac0-and-gmac1-mt7622-bananapi-bpi-r64.dtb
+
+tftpboot 0x40000000 arm64-Image; tftpboot 0x45000000 arm64-rootfs.cpio.uboot; tftpboot 0x4a000000 $dtb; booti 0x40000000 0x45000000 0x4a000000
+
+MT7623 Bananapi, standalone MT7530:
+
+rgmii-only-gmac0-mt7623n-bananapi-bpi-r2.dtb
+gmac0-and-gmac1-mt7623n-bananapi-bpi-r2.dtb
+
+tftpboot 0x80008000 arm-zImage; tftpboot 0x83000000 arm-rootfs.cpio.uboot; tftpboot 0x83f00000 $dtb; bootz 0x80008000 0x83000000 0x83f00000
+
+This patch series is the continuation of the patch series linked below.
+
+https://lore.kernel.org/r/20230522121532.86610-1-arinc.unal@arinc9.com
+
+Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+---
+Changes in v2:
+- Update the patches with the latest received trailers.
+- Remove 'net: dsa: mt7530: move enabling port 6 to mt7530_setup_port6()'
+  which was patch 5. I will bring a more appropriate change with a later
+  patch series.
+- Patch 5
+  - Set P6_INTF_MODE(0) and explain why on the patch log.
+- Patch 6
+  - Mention the MT7988 document and explain more on the patch log.
+- Patch 7
+  - Explain more on the patch log.
+- Link to v1: https://lore.kernel.org/r/20240113102529.80371-1-arinc.unal@arinc9.com
+
+---
+Arınç ÜNAL (7):
+      net: dsa: mt7530: empty default case on mt7530_setup_port5()
+      net: dsa: mt7530: call port 6 setup from mt7530_mac_config()
+      net: dsa: mt7530: remove pad_setup function pointer
+      net: dsa: mt7530: move XTAL check to mt7530_setup()
+      net: dsa: mt7530: simplify mt7530_setup_port6() and change to void
+      net: dsa: mt7530: correct port capabilities of MT7988
+      net: dsa: mt7530: do not clear config->supported_interfaces
+
+ drivers/net/dsa/mt7530.c | 154 +++++++++++++++++------------------------------
+ drivers/net/dsa/mt7530.h |   3 -
+ 2 files changed, 54 insertions(+), 103 deletions(-)
+---
+base-commit: 4acf4e62cd572b0c806035046b3698f5585ab821
+change-id: 20240121-for-netnext-mt7530-improvements-2-b4f43661b485
+
+Best regards,
+-- 
+Arınç ÜNAL <arinc.unal@arinc9.com>
 
 
