@@ -1,155 +1,95 @@
-Return-Path: <netdev+bounces-67238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 525D1842707
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:38:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3232284270B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:40:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFA0D1F273AE
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:38:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC0F51F27AAE
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17BDD7A731;
-	Tue, 30 Jan 2024 14:38:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 435C57C0A9;
+	Tue, 30 Jan 2024 14:40:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="F1OWWn+b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B19A7A72B
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 14:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3D457C08F
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 14:40:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706625505; cv=none; b=iSCnkdEkrOPOMSPXB2BOswWVkatiN2ceEHx+3trsdGJfX/tQAui/bPVFEkJgT5IzjsLmvIRGxGyIhJhHmPT9obMZSEZcKQjkbNUM+yTZOYuowZW1JB3naQEcuP38cx/ra2rHcOUV9aRyMwBOHHiH14D8cg8chQTShn1jXOhZZgU=
+	t=1706625634; cv=none; b=aW9+WngSfSWlo8ssgUVya4EpKq5CojJ4AkCuNub/0vnycD7eFI+EH+463hgCKmpoKTZLy6zI52FIIqWbVdl+Axnyo+CyA/dmQ6O/eOvfIOWm4r1f2+m4hkXwx22z3dwVHybKf61/OXd8EX74J9+f3gmRXcUvnF6dKH6h65aikoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706625505; c=relaxed/simple;
-	bh=ROo5bhnpYwp0pttggyRiem9w8sQ3Hui8BZ6JKXA8IGc=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=hXWz4RZCggPq8TpKWojzEY8RYeRBDabI239ZB0Zbcfu+at5Oq13qr7KC1m5U1o5CP6c8GC9/yd14yxCGSrzU4KjE9fdhjQ0/xlHSnDAwBpVA/C9qKX7GqRHchb++XjLG3J4GnviyPpj1NHI5S3xvya81CK++QbDspQaz0Af+dbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-36384ce5760so9706235ab.0
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 06:38:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706625502; x=1707230302;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2R7t2YoaqYAPsCKerlfRFKir1r7n3eDnxsYUSSi2FaE=;
-        b=xSGAVw5xvPcUXN0TQbzlXF6wqJPekvmaPzu6ULMr9umJqLAZtaW79OCewS8DRuxAlD
-         IaNpR5RAJ1q3d0XbyRe1HlmNxlS1E36o652+EjPxfRFKblBMiGH9msydXjdm8ua88HFy
-         VeJzNBuzstlRc7Bs3oBFXepFvXLOg7cvSG+WkoGDknw3ScA6A6X2ARO14FqUYPAAmKuX
-         6oATiSZCsxmiXVuMy/ep04YnceG5VnL3yTHXEAzz8HNrDNJT18z7MaTZDvk4uajq3GOg
-         08EoeZAwE0MakxQ6pvgv4XS1/pPcUb4xTCPrfhpQdLlcG+qDZA0rMjZVFB02Vdqyxp3m
-         faug==
-X-Gm-Message-State: AOJu0YzaU9Fz8cEzJGrG5at9Moo1iBfpRywHNgrc5KXC2M6j1pUr8jTR
-	UJOp/qItEb1aABFpMmX39Ie4yxUbSUTweP1Wi6SUW1vGi+EFIyPlyWONSI0gD6dWtKCigkhobQQ
-	ogy6iLbrb3gDbQUOQm+LYgBegPzXnY1stD6xi15lESsJrqBGC1eELTkg=
-X-Google-Smtp-Source: AGHT+IGP9zFJt9ODdsJJST64s/ApoTT+dlu5lmgfnwM+imtr97ll3bRHIEGPkk+l0Y569vfoQkgmpdh19NV/+hHqEyYfm9fe3EYV
+	s=arc-20240116; t=1706625634; c=relaxed/simple;
+	bh=i4+1Ka55hQ4mmOr5XOnyhyHAsoBzYtZ5wMpGJQ70dgU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NGMGplxv3itlefmPXPn6YhMIBkAu/E9bLcK6wy7jImd3trYAox/7e0s/4AlXAAfi32M0zobH999CMdbQugoVIzOUpC1g/6jfmBMRnpNSKHH+9mGFJ07XsK9D3j2gQiri9MJ7yhcgRFvknattCjI/wQNRb4W8gYxG3OAeXO/Z3kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=F1OWWn+b; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 806941C0004;
+	Tue, 30 Jan 2024 14:40:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1706625629;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=P1l5tDQUKbgnU5aEDhh4VtwiHbVjP5XifbDmxmGNGJ8=;
+	b=F1OWWn+bWfkCvfPbGz/q4Mnx+rUdsZM5BR/ZAUIwALmCeqrQIedzinQjAuyr9SSnq9k+Hh
+	E8p2UWsFP+j7goKN4xgow/JU30i242qqG2GTfKW5e33CqmN2IBL4ZYfBQJ35SDGwcK3Wh7
+	pEWtQ4ycIMssoynSrKuTP2mbdwMpnlVtaiQuolOYPdDxaQmELxD7R3asfbAjfAHRbvPRst
+	13CZbXGuGIkjf8ABGTEdzUhMu99M/mNbD0tc3wxyfz5fxfCHc4vQwDH4O6xnImDCUDgk7q
+	ManXfw9DFT/sld3mUmlQBBrFXgyA7CV6hgYBZNKvmtmzNv9vAgwXGKLeo+dINw==
+Message-ID: <a50ca71f-e0b9-43ad-a08f-b4ee8a349387@arinc9.com>
+Date: Tue, 30 Jan 2024 17:40:26 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:12c1:b0:361:9320:5b3d with SMTP id
- i1-20020a056e0212c100b0036193205b3dmr130264ilm.2.1706625502761; Tue, 30 Jan
- 2024 06:38:22 -0800 (PST)
-Date: Tue, 30 Jan 2024 06:38:22 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000db5af406102ab6e8@google.com>
-Subject: [syzbot] [net?] WARNING in tcp_disconnect (2)
-From: syzbot <syzbot+0f423d4ae07bbb1359ac@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 08/11] net: dsa: realtek: clean user_mii_bus
+ setup
+Content-Language: en-US
+To: Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>,
+ Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
+ andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, ansuelsmth@gmail.com
+References: <20240123215606.26716-1-luizluca@gmail.com>
+ <20240123215606.26716-9-luizluca@gmail.com>
+ <20240125111718.armzsazgcjnicc2h@skbuf>
+ <CAJq09z64o96jURg-2ROgMRjQ9FTnL51kXQQcEpff1=TN11ShKw@mail.gmail.com>
+ <20240129161532.sub4yfbjkpfgqfwh@skbuf>
+ <95752e6d-82da-4cd3-b162-4fb88d7ffd13@gmail.com>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <95752e6d-82da-4cd3-b162-4fb88d7ffd13@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-Hello,
+On 29.01.2024 19:22, Florian Fainelli wrote:
+> 
+> 
+> On 1/29/2024 8:15 AM, Vladimir Oltean wrote:
+>>  From other discussions I've had, there seems to be interest in quite the
+>> opposite thing, in fact. Reboot the SoC running Linux, but do not
+>> disturb traffic flowing through the switch, and somehow pick up the
+>> state from where the previous kernel left it.
+> 
+> Yes this is actually an use case that is very dear to the users of DSA in an airplane. The entertainment system in the seat in front of you typically has a left, CPU/display and right set of switch ports. Across the 300+ units in the plane each entertainment systems runs STP to avoid loops being created when one of the display units goes bad. Occasionally cabin crew members will have to swap those units out since they tend to wear out. When they do, the switch operates in a headless mode and it would be unfortunate that plugging in a display unit into the network again would be disrupting existing traffic. I have seen out of tree patches doing that, but there was not a good way to make them upstream quality.
 
-syzbot found the following issue on:
+This piqued my interest. I'm trying to understand how exactly plugging in a
+display unit into the network would disrupt the traffic flow. Is this about
+all network interfaces attached to the bridge interface being blocked when
+a new link is established to relearn the changed topology?
 
-HEAD commit:    ff63cc2e9506 net: phy: mediatek-ge-soc: sync driver with M..
-git tree:       bpf
-console output: https://syzkaller.appspot.com/x/log.txt?x=133ee64be80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bc36d99546fe9035
-dashboard link: https://syzkaller.appspot.com/bug?extid=0f423d4ae07bbb1359ac
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/09601b75d815/disk-ff63cc2e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/a5549b0aa031/vmlinux-ff63cc2e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f1eb3b2eb752/bzImage-ff63cc2e.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+0f423d4ae07bbb1359ac@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 26544 at net/ipv4/tcp.c:3089 tcp_disconnect+0x1857/0x1df0 net/ipv4/tcp.c:3089
-Modules linked in:
-CPU: 1 PID: 26544 Comm: syz-executor.2 Not tainted 6.8.0-rc1-syzkaller-00182-gff63cc2e9506 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-RIP: 0010:tcp_disconnect+0x1857/0x1df0 net/ipv4/tcp.c:3089
-Code: 00 00 48 89 04 24 e9 24 e9 ff ff e8 13 fb 84 f8 be 07 00 00 00 bf 02 00 00 00 e8 74 f6 84 f8 e9 0b e9 ff ff e8 fa fa 84 f8 90 <0f> 0b 90 e9 21 fa ff ff e8 ec fa 84 f8 4d 8d af 76 08 00 00 4c 89
-RSP: 0018:ffffc9000371f7c0 EFLAGS: 00010246
-RAX: 0000000000040000 RBX: 000000000000d038 RCX: ffffc9000b6ed000
-RDX: 0000000000040000 RSI: ffffffff890328c6 RDI: ffff888043389f18
-RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000000
-R10: 000000000000d038 R11: 0000000000000002 R12: ffff88801c9a0600
-R13: ffff88804338a0f6 R14: ffff888043389a38 R15: ffff888043389880
-FS:  00007fee2d7bc6c0(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f075e6d56c6 CR3: 000000003fa89000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __mptcp_subflow_disconnect net/mptcp/protocol.c:2366 [inline]
- __mptcp_close_ssk+0xb26/0xfd0 net/mptcp/protocol.c:2420
- mptcp_destroy_common+0x168/0x650 net/mptcp/protocol.c:3274
- mptcp_disconnect+0x22c/0x810 net/mptcp/protocol.c:3145
- mptcp_sendmsg_fastopen net/mptcp/protocol.c:1745 [inline]
- mptcp_sendmsg+0x15ec/0x1b20 net/mptcp/protocol.c:1782
- inet_sendmsg+0x9d/0xe0 net/ipv4/af_inet.c:850
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0xd5/0x180 net/socket.c:745
- ____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
- ___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
- __sys_sendmsg+0x117/0x1e0 net/socket.c:2667
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-RIP: 0033:0x7fee2ca7cda9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fee2d7bc0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007fee2cbabf80 RCX: 00007fee2ca7cda9
-RDX: 0000000024000084 RSI: 0000000020000340 RDI: 0000000000000003
-RBP: 00007fee2d7bc120 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 000000000000000b R14: 00007fee2cbabf80 R15: 00007ffd6be957c8
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Arınç
 
