@@ -1,135 +1,123 @@
-Return-Path: <netdev+bounces-67194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D9BF842495
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 13:13:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F209D8424A6
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 13:18:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D86C2B26668
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 12:12:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA112286D71
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 12:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D324B67E60;
-	Tue, 30 Jan 2024 12:12:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABAFB67E74;
+	Tue, 30 Jan 2024 12:18:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="VTUFh7+F"
+	dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b="B/oOkdhx"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D8246775E;
-	Tue, 30 Jan 2024 12:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E6F67E6A
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 12:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706616763; cv=none; b=oBr0r24JzlNqydKpF+2lKM3WcZLGSRHRwxKD9okwu/9m2FNQpKp/zNsFOto6U/KOIK0tQTM887x6z9JfENpVngpyuHsmwCi7NeE72Ej5PYKoSZxgJi5DGZr5PlU6FF68X9cSYIrrI3Eq4UmH1ylNpO4UVjVhBDUGj0g2BvPceUE=
+	t=1706617089; cv=none; b=N0RGG0v4s6FBmV8EaY2iBnhIXDKcZgeqNIRtUU9jcYGKc3dFy7VjceSB24W0v1zbZr8wjtZ/dd9qXgWeZC2b+W4BNi53jxAdJisWMDE8B9m2gMjVTfZbXf+BdlCicLCGjciE6cPjlQmyHnBwsPD6d4/24aJNIr1ejbTD1F/3IQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706616763; c=relaxed/simple;
-	bh=ts6+3cKiUi9J177cwzVgCHsWG2TI3IL/jBqFMX29Dpg=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zpi+xbnV5c1TpIwtePql4bXhFOmPG2iHOe0h7exEZ1a3KytTfdeWFsLWhu/1G2I6ZLQNs96OKkECbpLO4nl3sp+t2QMTSj2RnzRMDq9vI2ec2ae3ze+T+1REN8aEnNx+AtyHJ/8kXU7oyfahwObSKAZoBv0OFu6aWekQK4dlSqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=VTUFh7+F; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1706616761; x=1738152761;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ts6+3cKiUi9J177cwzVgCHsWG2TI3IL/jBqFMX29Dpg=;
-  b=VTUFh7+FYr0Zzk/gUT779ohSTh63PUvwYD7lp08nfsrts9UH6gwnlea5
-   r/XLp5ijX3YgbVAj6bBSZRYGlueV+/4urvbPrtmx+p6p/hOzzQoDFidce
-   SF09U+r64FCvYLIauhdywePchwR/QeWe67cb0QlxL/o5Sfe+RNfcemvoY
-   ZICAZVkkBOrQY2SggEjr6nMBNI/3XU37KEhv/1GMPv5ZNu+ZMXrTzgPVI
-   25MZBSrtKAtNkypTLpVPfw2CarvZOSG2lsamPbE8xNK+ch+vjJ3xPNLAT
-   LmKhwiR4EMfNZcH6+64L27lNPaENe4u3XN8W9CFrEPy7EZgn9nBSQ/X8w
-   A==;
-X-CSE-ConnectionGUID: daF2h1OmQfmAoCYQvT7ARg==
-X-CSE-MsgGUID: SGmXWDjFQGqzfcOyr/9P1g==
-X-IronPort-AV: E=Sophos;i="6.05,707,1701154800"; 
-   d="asc'?scan'208";a="182745230"
-X-Amp-Result: UNKNOWN
-X-Amp-Original-Verdict: FILE UNKNOWN
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 30 Jan 2024 05:12:39 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 30 Jan 2024 05:12:25 -0700
-Received: from wendy (10.10.85.11) by chn-vm-ex03.mchp-main.com (10.10.85.151)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35 via Frontend
- Transport; Tue, 30 Jan 2024 05:12:22 -0700
-Date: Tue, 30 Jan 2024 12:11:44 +0000
-From: Conor Dooley <conor.dooley@microchip.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-CC: Conor Dooley <conor@kernel.org>, <linux-riscv@lists.infradead.org>, "Daire
- McNamara" <daire.mcnamara@microchip.com>, Wolfgang Grandegger
-	<wg@grandegger.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>, Paul Walmsley
-	<paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou
-	<aou@eecs.berkeley.edu>, Michael Turquette <mturquette@baylibre.com>,
-	"Stephen Boyd" <sboyd@kernel.org>, <linux-can@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <linux-clk@vger.kernel.org>
-Subject: Re: [PATCH v2 2/7] dt-bindings: can: mpfs: add missing required clock
-Message-ID: <20240130-narrow-lyricism-8b25baac7bb2@wendy>
-References: <20240122-catty-roast-d3625dbb02fe@spud>
- <20240122-breeder-lying-0d3668d98886@spud>
- <20240122-surely-crimp-ba4a8c55106d-mkl@pengutronix.de>
- <20240122-cruelly-dainty-002081f0beb2@spud>
- <20240122-smokeless-ion-63e4148c22e5-mkl@pengutronix.de>
- <20240122-uncoated-cherub-a29cba1c0035@spud>
- <20240122-pogo-reputable-b1d06ae1f1f1-mkl@pengutronix.de>
+	s=arc-20240116; t=1706617089; c=relaxed/simple;
+	bh=aDZg9Ysv9ypMXY8FZH7IcBkC8f4G67xupV2uxqvZIGk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=My6ECSlpMxjMEXD1q9KHHHeAMD6qaRnnAcmls8nfdANbxpZ9gvHd0dQxHOT6CNVTuDHFdw5uYX9rguruimcj0pPvW1y1kCHdM7Bg03rCR1evNGqTuLtIP3FAFWUkJUh6iiz4TtswDk8HeqFBtBoUKPSRhGP1YCyCUX66gboA0Rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org; spf=pass smtp.mailfrom=ieee.org; dkim=pass (1024-bit key) header.d=ieee.org header.i=@ieee.org header.b=B/oOkdhx; arc=none smtp.client-ip=209.85.166.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ieee.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ieee.org
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-7bff28b2937so73217639f.1
+        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 04:18:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ieee.org; s=google; t=1706617087; x=1707221887; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EVuVKhonMTk5V3LL9uQwVTl3LUQ4N4vNXM25emFwWhY=;
+        b=B/oOkdhxDjrJtU7NY3EMbK1AXNzpVu0d4W2DTes3+OSw9uoGjtq4xiEAoyHA7N1xvj
+         JUW9bCkz32Fg/FeaTgUyntoxl8VRfgarrqJiHXCEfL+ziD9gpMPXioq+DMGQO2kMzKyU
+         Quv0leMON8QXKw7c4MD9wpEvW1mAZ7XcXjusI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706617087; x=1707221887;
+        h=content-transfer-encoding:in-reply-to:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EVuVKhonMTk5V3LL9uQwVTl3LUQ4N4vNXM25emFwWhY=;
+        b=Sn9hrBbOoNrR4no4p4UdUrB+GpsEr8U/PNbR+PXgV2kyLZVxI7eXr77bt2l/RE0RDm
+         NsyPXqdyDjp9x/uNKytG4qjWrq/qF5+MAZ7s31eEaEzjgHL/bX8dcCsK+UlsI6RRKm1V
+         iAZLqfJ5HzvrL1YKb9fyhJTh37bOPOnl42AfNzHnWYO2XymX2YU2je6oVmG90yjankF2
+         jB49N9cbzwb06+gDn0piygE/FOsKq+8T85R70oJpyJI1j5q7siKA0J8J6tVsPk0og5o/
+         hGwOjGH+YhIfKTseImf8V/6XXeOtL4FyyghtC/GDUfSNG2rS4Q7A8gljsU3l321rIaKr
+         ZPVg==
+X-Gm-Message-State: AOJu0Yzqo9mQ6vDNyouIxzZtgVzKVVZvSzQKVM1uSsMkVbfH07u90evS
+	IAepzLm3oP5VxubG98PNk/TAJHJq4apxhg2R4TfebSUfgYwS1TSn2uPsVA27Gg==
+X-Google-Smtp-Source: AGHT+IEH3KOqJ1oHywcrGCu2pHFm7feqj1n5lzJpLDg26IuVpHt7ix13wz4jRmSDBxCcW0ABiiLpww==
+X-Received: by 2002:a05:6602:2d89:b0:7bf:b56c:ac25 with SMTP id k9-20020a0566022d8900b007bfb56cac25mr14110896iow.0.1706617086797;
+        Tue, 30 Jan 2024 04:18:06 -0800 (PST)
+Received: from [172.22.22.28] (c-98-61-227-136.hsd1.mn.comcast.net. [98.61.227.136])
+        by smtp.googlemail.com with ESMTPSA id q18-20020a5ea612000000b007bfea3c536esm1539313ioi.28.2024.01.30.04.18.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jan 2024 04:18:06 -0800 (PST)
+Message-ID: <a03fdf68-efbb-4cc4-aea6-d5f01b0fc604@ieee.org>
+Date: Tue, 30 Jan 2024 06:18:05 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="HOtgW7KLF4e36W+S"
-Content-Disposition: inline
-In-Reply-To: <20240122-pogo-reputable-b1d06ae1f1f1-mkl@pengutronix.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] dt-bindings: net: qcom,ipa: do not override firmware-name
+ $ref
+Content-Language: en-US
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+ Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Alex Elder <elder@kernel.org>,
+ linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240129142121.102450-1-krzysztof.kozlowski@linaro.org>
+From: Alex Elder <elder@ieee.org>
+In-Reply-To: <20240129142121.102450-1-krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---HOtgW7KLF4e36W+S
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On 1/29/24 8:21 AM, Krzysztof Kozlowski wrote:
+> dtschema package defines firmware-name as string-array, so individual
+> bindings should not make it a string but instead just narrow the number
+> of expected firmware file names.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-On Mon, Jan 22, 2024 at 04:31:32PM +0100, Marc Kleine-Budde wrote:
-> On 22.01.2024 14:56:09, Conor Dooley wrote:
+Fine with me.
 
-> > I think we already had this discussion on v1, where I said that the
-> > binding requires the clocks to be in that order, regardless of whether
-> > or not clock-names is provided. You feel more strongly about it than I
-> > do, so I will add them when I get around to sending a v3.
->=20
-> Yes, this discussion sounded very familiar to me, never mind. Keep it as
-> is, and let's get this binding and the CAN driver upstream!
+Acked-by: Alex Elder <elder@linaro.org>
 
-BTW, I didn't see an ack on this nor do I see it in linux-next (yet).
-Are you expecting the patch to go with the rest via the clock tree,
-via the DT tree or will you be taking it with CAN stuff via netdev?
+> ---
+>   Documentation/devicetree/bindings/net/qcom,ipa.yaml | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/qcom,ipa.yaml b/Documentation/devicetree/bindings/net/qcom,ipa.yaml
+> index c30218684cfe..53cae71d9957 100644
+> --- a/Documentation/devicetree/bindings/net/qcom,ipa.yaml
+> +++ b/Documentation/devicetree/bindings/net/qcom,ipa.yaml
+> @@ -159,7 +159,7 @@ properties:
+>         when the AP (not the modem) performs early initialization.
+>   
+>     firmware-name:
+> -    $ref: /schemas/types.yaml#/definitions/string
+> +    maxItems: 1
+>       description:
+>         If present, name (or relative path) of the file within the
+>         firmware search path containing the firmware image used when
 
-I can resend this one patch with a netdev appropriate subject prefix
-if you like.
-
-Thanks,
-Conor.
-
---HOtgW7KLF4e36W+S
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZbjnfwAKCRB4tDGHoIJi
-0td9AP91wL1UJKxv7WEXkQU6wml5iEFKMQpde0b5OMFJLiz7ggD/cJBfDDVA8GxG
-4K79+ItvQhc3pNrmvQLtKEyZc1+fRQ8=
-=AXqd
------END PGP SIGNATURE-----
-
---HOtgW7KLF4e36W+S--
 
