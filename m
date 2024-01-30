@@ -1,137 +1,93 @@
-Return-Path: <netdev+bounces-67212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0EFE8425B0
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:02:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6C6B8425C0
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:06:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F30BA1C28877
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 13:02:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DE958B2C4CB
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 13:00:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DA2D6BB3C;
-	Tue, 30 Jan 2024 13:01:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88C16A03B;
+	Tue, 30 Jan 2024 13:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cy+tidcS"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7563B6A334
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 13:01:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4F084C66
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 13:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706619716; cv=none; b=F2rFZ1A2xHEL87xSSTI64kGbprEiNxAQ2FaCiFyh8cFLT0rjORhfp0ELT7t+rUlYl/4sFxcBfNC0tcbv8Gu0HBE6pTVWt0rDfdcI8LecQZmaBNiLkMowkZqQ2eXfDkXk0rM2nhUAbjqNqhO3ewX8Y+gHzeMhv6063Glrg4lhCyQ=
+	t=1706619627; cv=none; b=btYaJLAefW7WCKdewy5pzQ8TgR1Z2nUSnUGvl+xpTXMGv5uwmg9MXrLmDauGBA+PiNaDGT4yGRUbLX8/38+EukErVTrK1QaE+mCzrzcvAmqNsYgzJ6zZe82iVM3dwPMYhEPuXE4nwUZQxuQHGS5ha64FhNFjSrau2s9sd77VpKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706619716; c=relaxed/simple;
-	bh=A1ipchrz8gQoxwvqpWNrh58UUatxvyP9Y8B8dG0FZR0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LuG0Mb+mvBZoQSE+B/o8oruKMyIQDzR6g3MIw3uh87JEAR5LN1BDj228MZFJL8Uf9MWWSNidOSYEfnK1DuMsSyB+p1qNMepeoiOAI4ZZbBhR/9tsBzzKF/F/qf9J++AqfM2j879PdXxj0q3xs61zGEFgRQAxnVFUDTYakRB/94A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rUnjk-0004RW-00; Tue, 30 Jan 2024 14:01:12 +0100
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rUnji-003Phu-6h; Tue, 30 Jan 2024 14:01:10 +0100
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id B2018281751;
-	Tue, 30 Jan 2024 13:01:09 +0000 (UTC)
-Date: Tue, 30 Jan 2024 14:01:09 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Conor Dooley <conor.dooley@microchip.com>
-Cc: Conor Dooley <conor@kernel.org>, linux-riscv@lists.infradead.org, 
-	Daire McNamara <daire.mcnamara@microchip.com>, Wolfgang Grandegger <wg@grandegger.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
-	Paul Walmsley <paul.walmsley@sifive.com>, Palmer Dabbelt <palmer@dabbelt.com>, 
-	Albert Ou <aou@eecs.berkeley.edu>, Michael Turquette <mturquette@baylibre.com>, 
-	Stephen Boyd <sboyd@kernel.org>, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org
-Subject: Re: [PATCH v2 2/7] dt-bindings: can: mpfs: add missing required clock
-Message-ID: <20240130-fragrance-disinfect-22cc1911bf48-mkl@pengutronix.de>
-References: <20240122-catty-roast-d3625dbb02fe@spud>
- <20240122-breeder-lying-0d3668d98886@spud>
- <20240122-surely-crimp-ba4a8c55106d-mkl@pengutronix.de>
- <20240122-cruelly-dainty-002081f0beb2@spud>
- <20240122-smokeless-ion-63e4148c22e5-mkl@pengutronix.de>
- <20240122-uncoated-cherub-a29cba1c0035@spud>
- <20240122-pogo-reputable-b1d06ae1f1f1-mkl@pengutronix.de>
- <20240130-narrow-lyricism-8b25baac7bb2@wendy>
+	s=arc-20240116; t=1706619627; c=relaxed/simple;
+	bh=ok6OgG3Z+LqAEOxpfLCLaYnPb9PsLqyjjTlcDdVjgzs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=CTRfxBI9oCRhMj3t/f3ws7G7y38WubWXBxNCuvRiM16MqMghZfDzapg733qr2F2ngNZYuQZyhDndLPZvEnxX4MV3DWvkPO49mM7kyh4cj/7tyjwbJ/hOgdkqe7uuxi/nuBYnmQF3feG3fzyLfUudIiVmtVuPlK7/OLMPN734VUk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cy+tidcS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1DB40C43390;
+	Tue, 30 Jan 2024 13:00:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706619627;
+	bh=ok6OgG3Z+LqAEOxpfLCLaYnPb9PsLqyjjTlcDdVjgzs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Cy+tidcS1K5L+3v7JAeajukvUKma3QAdyBaHCRPwyfDA8X1v5sT6PKSjz2Cvcmksr
+	 9n9u9CGW3kqPu/5yVgCwkAqcFUB1HfOT4beLHhZjTRZgBk+geC4LZspWER49ARjcsq
+	 BIckzYGjLILZxC8NcteQsUj8momXzlVqClFUPTTy5SDjoMl6D1SRXNDn4SybUgNCTz
+	 73uImZe1PX5xmy6iKIotjtZH7Gmh146TRVctUUOTvHNfjxqEIQYxmWAjmrdGL1IbwG
+	 FAcAhg55jseAIMT9GndB3By2ugyEgJc/cpeSqtlNqVqCJ7GVc4mwqwtC+aiguEtdek
+	 rNUT1pc+FBoQQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 04270E3237E;
+	Tue, 30 Jan 2024 13:00:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="f4vw5ea6lcxcee4m"
-Content-Disposition: inline
-In-Reply-To: <20240130-narrow-lyricism-8b25baac7bb2@wendy>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] llc: call sock_orphan() at release time
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170661962701.22779.6523636010595073464.git-patchwork-notify@kernel.org>
+Date: Tue, 30 Jan 2024 13:00:27 +0000
+References: <20240126165532.3396702-1-edumazet@google.com>
+In-Reply-To: <20240126165532.3396702-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com,
+ syzbot+32b89eaa102b372ff76d@syzkaller.appspotmail.com, ebiggers@google.com,
+ kuniyu@amazon.com
+
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Fri, 26 Jan 2024 16:55:32 +0000 you wrote:
+> syzbot reported an interesting trace [1] caused by a stale sk->sk_wq
+> pointer in a closed llc socket.
+> 
+> In commit ff7b11aa481f ("net: socket: set sock->sk to NULL after
+> calling proto_ops::release()") Eric Biggers hinted that some protocols
+> are missing a sock_orphan(), we need to perform a full audit.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] llc: call sock_orphan() at release time
+    https://git.kernel.org/netdev/net/c/aa2b2eb39348
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
---f4vw5ea6lcxcee4m
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On 30.01.2024 12:11:44, Conor Dooley wrote:
-> On Mon, Jan 22, 2024 at 04:31:32PM +0100, Marc Kleine-Budde wrote:
-> > On 22.01.2024 14:56:09, Conor Dooley wrote:
->=20
-> > > I think we already had this discussion on v1, where I said that the
-> > > binding requires the clocks to be in that order, regardless of whether
-> > > or not clock-names is provided. You feel more strongly about it than I
-> > > do, so I will add them when I get around to sending a v3.
-> >=20
-> > Yes, this discussion sounded very familiar to me, never mind. Keep it as
-> > is, and let's get this binding and the CAN driver upstream!
->=20
-> BTW, I didn't see an ack on this nor do I see it in linux-next (yet).
-> Are you expecting the patch to go with the rest via the clock tree,
-> via the DT tree or will you be taking it with CAN stuff via netdev?
->=20
-> I can resend this one patch with a netdev appropriate subject prefix
-> if you like.
-
-Feel free to take the whole series via the clock tree.
-
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---f4vw5ea6lcxcee4m
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmW48xIACgkQvlAcSiqK
-BOh05ggAtrkirkvFxfCZmmZ3aogx7JpH2jGUD/uWcu+/to8Esew52WV5+k+a3PFY
-yxF+BD27a4/qjz5d6+KlUy58RrTj18KJIT0PoLwfFTXPUrdqBVD7MYok3u3eWVkR
-Y5CIFBKQTCVBOCsnOPaEjrI6SIqpgJedEJeEhRm8hObb5a9EZR82GkYW2NSojYZj
-8bhFtoSuUlgZ5Qiqo1DIZct1verZ0pTjbFsDTtGzlrOKQ5zxalbZKgr+Qpofpbfz
-aSBQCch6ZW+m3fxuJP4S6V6NQIwI14HQIbR1xysbciRy5hn4I+PczwLPhHx+VgQr
-5nBdDcwbEHBxlsqMSPbp/65xsStnYw==
-=foUg
------END PGP SIGNATURE-----
-
---f4vw5ea6lcxcee4m--
 
