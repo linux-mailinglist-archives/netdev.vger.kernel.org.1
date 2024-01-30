@@ -1,117 +1,85 @@
-Return-Path: <netdev+bounces-67347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8FA1842EB4
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 22:39:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 514E1842EBE
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 22:44:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D8631F248C7
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 21:39:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC3471F24C76
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 21:44:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C0978B53;
-	Tue, 30 Jan 2024 21:39:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5896478B53;
+	Tue, 30 Jan 2024 21:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ax/4Kc9n"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bi62CBMF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7021762C7;
-	Tue, 30 Jan 2024 21:39:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C03878B4C;
+	Tue, 30 Jan 2024 21:44:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706650769; cv=none; b=hIUltUOPEy9lMe0U6JRNteFIVtj+ary4IlG1dA1I42KwOaLRX7XNYUJymZSesuM10q31eC230Dtc3sIOg/Q9v4epx1Jj4I6pCCDAfgAC+hfLUtadz1VKgZPob9d7aU/mRPUKLwx3A9KfF93S8Hpsa19Qrvu9ZT40H/mKgAAPW20=
+	t=1706651055; cv=none; b=rX4MOzbU9qSvoij7W/5oYsafJWq7mMz3kJgGkKY3W4y+/jRuLl25e9nT/oi30nyCicIp1zwXAYK8FHlehuqC434pL80KkW2sViue5oufePvL+/9TuQGbOOlcV3UfrtzOMWuYaANhibdrZDHUzEMr0EOmENo7BRv7BcOr3zBIcOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706650769; c=relaxed/simple;
-	bh=QnJojmWW+VDlaE6OIIGRQSTpYr1wBDNCTR++LHwSjp0=;
+	s=arc-20240116; t=1706651055; c=relaxed/simple;
+	bh=g6hr6LR3xoUAgXzeQqjncFC5OG0aiyGIcL8UiWBwqIo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hQcPNKhYBIp7jeWXauwX1UeSw4AiKgS7AJ44Xxvx9QDXX4BIJnBYhoxlptw44RGLk31W5u2oK05gORumfn9dsu6ArYktvBXbRdYQeGa11SZcClVw4KCSUraSkk/SE8z3Veq9SvOM66FX5NecubTPugtan2DxXZpIL6eDUAQftZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ax/4Kc9n; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D55BC433C7;
-	Tue, 30 Jan 2024 21:39:29 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=rS0JdK2r1DNUCEe1diGOm9s2KWvtQ17TLKovNizgI6tD5WxMKtuzWiT7eYd/YYLJXyHVvFAIA5KllA8T/okPIT7ukzdxBpTyd+0YirNs6vJ1s4swvuM6CLOKPMGaPsSeBEDtzeyQrbMB9NFt7394CBfgRgUkARRcgJCfXkLqPJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bi62CBMF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B42D6C433C7;
+	Tue, 30 Jan 2024 21:44:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706650769;
-	bh=QnJojmWW+VDlaE6OIIGRQSTpYr1wBDNCTR++LHwSjp0=;
+	s=k20201202; t=1706651054;
+	bh=g6hr6LR3xoUAgXzeQqjncFC5OG0aiyGIcL8UiWBwqIo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ax/4Kc9nR6ZDT55/zyLOGSSvM4+kKwvgYoGqxGx9Dq5uvnLcgW2f7q26M7Ad85RJ8
-	 O/HDC4JpsO9p5uB0gSsYk3eS0L5zuYeeiGYfs8Pa23hbNq1lM7hrUnW45/f5JArl+Y
-	 yQg7ur6TRlZLHNThuvaISqKDen/vjZJ6Q3uvxytJg4iuRPCyv6Z5jlTr8pV6AL48qe
-	 8aFsvwhsfvp1zgdwdMrgm1kqmNnDvVqmAMtTRYFbqoQ2s1az9fYFFVh/7lW3cCyxJk
-	 NwnVsr9QeiDAxy78djw3GhB6iE85Dx8VXXcxcUaDkET7zhaJzAXxI/Ew3zF6cWUFzq
-	 EZ7fsI9vdf6qg==
-Date: Tue, 30 Jan 2024 15:39:26 -0600
-From: Rob Herring <robh@kernel.org>
-To: Esben Haabendal <esben@geanix.com>
-Cc: devicetree@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 2/3] dt-bindings: net: snps,dwmac: Add
- time-based-scheduling property
-Message-ID: <20240130213926.GA2342546-robh@kernel.org>
-References: <b365dc6f756a3fad4dfaa2675c98f4078aba8a55.1706105494.git.esben@geanix.com>
- <30ce8f45b8752c603acc861ebb2f18d74d2f8a07.1706105494.git.esben@geanix.com>
+	b=Bi62CBMFV89cP3C48f3mzPsmWlkaFPNdacrfVyxXb9Ms/V80yOaz+L9EeARnrlP7j
+	 7KjTvkeFwcmMua3GoVsLOS3jrXgLichidGrxxCrYdhi1SUWJSGtHc4rweobzSv1Rko
+	 iC1tcV8sdyy6DJCba2dFaeTPJSe/i8RRWh/WzqM8W2mtFdc6A+y4A5MKluLNyirTXo
+	 GFrLmJQrO4EZcFowwj7KGq2Nzqi9NQ9ZmD+5bDotjSWZWkG1Q5ycppCtzi8j77Ge34
+	 Q3Pl1Sk58EYVuo0C/5lfbedKxbIr/MkvTGl9XdPEq+O473BC3GJJQ64pM+6jla9l/9
+	 SzEN/cljxx8OA==
+Date: Tue, 30 Jan 2024 16:44:13 -0500
+From: Sasha Levin <sashal@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	Andy Gospodarek <gospo@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH AUTOSEL 6.7 036/108] bnxt_en: Add 5760X (P7) PCI IDs
+Message-ID: <ZbltrdwtzOsiAumV@sashalap>
+References: <20240116194225.250921-1-sashal@kernel.org>
+ <20240116194225.250921-36-sashal@kernel.org>
+ <CACKFLinMgFcKzKv8=n0MM7XZGhDO1=NFmFAu=pKsj0+BNCqKOQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Disposition: inline
-In-Reply-To: <30ce8f45b8752c603acc861ebb2f18d74d2f8a07.1706105494.git.esben@geanix.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACKFLinMgFcKzKv8=n0MM7XZGhDO1=NFmFAu=pKsj0+BNCqKOQ@mail.gmail.com>
 
-On Wed, Jan 24, 2024 at 03:33:06PM +0100, Esben Haabendal wrote:
-> Time Based Scheduling can be enabled per TX queue, if supported by the
-> controller.
-> 
-> Signed-off-by: Esben Haabendal <esben@geanix.com>
-> ---
->  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 6 ++++++
->  1 file changed, 6 insertions(+)
+On Tue, Jan 16, 2024 at 11:47:59AM -0800, Michael Chan wrote:
+>On Tue, Jan 16, 2024 at 11:44 AM Sasha Levin <sashal@kernel.org> wrote:
+>>
+>> From: Michael Chan <michael.chan@broadcom.com>
+>>
+>> [ Upstream commit 2012a6abc87657c6c8171bb5ff13dd9bafb241bf ]
+>>
+>> Now with basic support for the new chip family, add the PCI IDs of the
+>> new devices.
+>
+>This should not be backported to 6.7.  It won't work without all the
+>driver changes required to support this new chip.
 
-This is not v1 which you are aware. Where's the justification or do I 
-need to ask the same questions again? Here's the last discussion[1].
+I'll drop it, thanks!
 
-I'm still not clear on why this is needed. Seems like the combination of 
-TBS and TSO capabilities provides enough information. If TSO is enabled 
-for a queue, then don't enable TBS.
-
-This binding is already such a mess of properties, I'm inclined to say 
-"what's one more", but it's death by 1000 cuts. Part of the problem is 
-this binding is for not 1 IP block, but something that's evolved over 
-at least 15 years. 
-
-The question on configuration properties really comes down to who would 
-configure things and when. If it's one time for the life of given h/w, 
-then DT makes sense. If every user wants/needs to tweak the setting, 
-then definitely shouldn't be in DT. Somewhere in the middle? Judgement 
-call.
-
-> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> index 5c2769dc689a..301e9150ecc3 100644
-> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> @@ -399,6 +399,12 @@ properties:
->              type: boolean
->              description: TX checksum offload is unsupported by the TX queue.
->  
-> +          snps,time-based-scheduling:
-> +            type: boolean
-> +            description:
-> +              Time Based Scheduling will be enabled for TX queue.
-> +              This is typically not supported for TX queue 0.
-
-Make the property name clear it is an enable, not a capability.
-
-> +
-
-[1] https://lore.kernel.org/all/20230929051758.21492-1-rohan.g.thomas@intel.com/
+-- 
+Thanks,
+Sasha
 
