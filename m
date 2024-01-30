@@ -1,138 +1,155 @@
-Return-Path: <netdev+bounces-67237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DBB38426F7
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:32:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 525D1842707
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 15:38:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD509291D2B
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:32:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFA0D1F273AE
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:38:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1233429CF8;
-	Tue, 30 Jan 2024 14:32:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dVUEc4YW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17BDD7A731;
+	Tue, 30 Jan 2024 14:38:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2AD9846B
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 14:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B19A7A72B
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 14:38:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706625130; cv=none; b=dGgqkTN0R0E+GHgs6P1XOPFfjsM2jYp0c3DwaTNPTT7cJ4AEhkR/p76CWPjDgnA9357rZbiVDw71jQ3cf/SjB0zX5Zks46tklNu86E4EzB8zrZ5E3D2yfx9uxi3BwxZskCQ9GWIgK2FlzAc9Ej61v+p7QRA0ui/4sh7yMYopGXE=
+	t=1706625505; cv=none; b=iSCnkdEkrOPOMSPXB2BOswWVkatiN2ceEHx+3trsdGJfX/tQAui/bPVFEkJgT5IzjsLmvIRGxGyIhJhHmPT9obMZSEZcKQjkbNUM+yTZOYuowZW1JB3naQEcuP38cx/ra2rHcOUV9aRyMwBOHHiH14D8cg8chQTShn1jXOhZZgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706625130; c=relaxed/simple;
-	bh=WUrzSm4gKCsOCglX4nyKiHvqjKuRTU0PNd7T8RnR+iQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=BASrgd2doSzH77C9JOxvP/PURmD0+UW9+mb52+E+2jtH+MKQOs2ttSly/FTgbAOikFyIJVlYxggcm9l6WSiN08L2xZGHhlATRKGPnP3W95Dj5uRoZbgLlki/tDCT2YO8TX72Hi13j+ak821w4Zxv8QYHj41/WMEZ8r7ZXQVbCP0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dVUEc4YW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B75DC433F1;
-	Tue, 30 Jan 2024 14:32:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706625129;
-	bh=WUrzSm4gKCsOCglX4nyKiHvqjKuRTU0PNd7T8RnR+iQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=dVUEc4YW60k5IqhDu7eIsV6JWz+54XO/RTQKp8txHG0lYK8zTAr556kB7EBU6hT8p
-	 7/D5BmkYFKZac3UqzXfGigrk7gTZi+jrhXes/C79UoNUdGd85vhhiohpFwcGHM5uZB
-	 iOsI+nEzJUDUjF4T9E160BXrubvKZoPMEpWLWQrqvUh84k08x+VRwaFOGhxCfvxVo+
-	 +t4z7C/Hbc4xYA/OJ1h3xYcOWMKJ68e3JkFaU9OpDdRoUfUvmxKD2zh5m5y7yC14me
-	 yYFvKdtwyfQWuLI/PlCqeyfow2kqDoZvol8cADqx7OtwPTs38PrF9U3NtlFwGsvqcj
-	 ceu2XlkHWECRQ==
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 94EB8108A226; Tue, 30 Jan 2024 15:32:06 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-To: Pavel Vazharov <pavel@x3me.net>, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Magnus Karlsson <magnus.karlsson@gmail.com>
-Subject: Re: Need of advice for XDP sockets on top of the interfaces behind
- a Linux bonding device
-In-Reply-To: <CAJEV1igHVsqmk0ctxb-9gM2+PLs_gvpE1fyZwoASgv+jYXOcmg@mail.gmail.com>
-References: <CAJEV1ijxNyPTwASJER1bcZzS9nMoZJqfR86nu_3jFFVXzZQ4NA@mail.gmail.com>
- <87y1cb28tg.fsf@toke.dk>
- <CAJEV1igULtS-e0sBd3G=P1AHr8nqTd3kT+0xc8BL2vAfDM_TuA@mail.gmail.com>
- <20240126203916.1e5c2eee@kernel.org>
- <CAJEV1igqV-Yb3YvZEiMOBCGyZXRQ2KTS=yq483+xOVFehvgDAw@mail.gmail.com>
- <CAJEV1ij=K5Xi5LtpH7SHXLxve+JqMWhimdF50Ddy99G0E9dj_Q@mail.gmail.com>
- <CAJEV1igHVsqmk0ctxb-9gM2+PLs_gvpE1fyZwoASgv+jYXOcmg@mail.gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Tue, 30 Jan 2024 15:32:06 +0100
-Message-ID: <87wmrqzyc9.fsf@toke.dk>
+	s=arc-20240116; t=1706625505; c=relaxed/simple;
+	bh=ROo5bhnpYwp0pttggyRiem9w8sQ3Hui8BZ6JKXA8IGc=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=hXWz4RZCggPq8TpKWojzEY8RYeRBDabI239ZB0Zbcfu+at5Oq13qr7KC1m5U1o5CP6c8GC9/yd14yxCGSrzU4KjE9fdhjQ0/xlHSnDAwBpVA/C9qKX7GqRHchb++XjLG3J4GnviyPpj1NHI5S3xvya81CK++QbDspQaz0Af+dbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-36384ce5760so9706235ab.0
+        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 06:38:23 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706625502; x=1707230302;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2R7t2YoaqYAPsCKerlfRFKir1r7n3eDnxsYUSSi2FaE=;
+        b=xSGAVw5xvPcUXN0TQbzlXF6wqJPekvmaPzu6ULMr9umJqLAZtaW79OCewS8DRuxAlD
+         IaNpR5RAJ1q3d0XbyRe1HlmNxlS1E36o652+EjPxfRFKblBMiGH9msydXjdm8ua88HFy
+         VeJzNBuzstlRc7Bs3oBFXepFvXLOg7cvSG+WkoGDknw3ScA6A6X2ARO14FqUYPAAmKuX
+         6oATiSZCsxmiXVuMy/ep04YnceG5VnL3yTHXEAzz8HNrDNJT18z7MaTZDvk4uajq3GOg
+         08EoeZAwE0MakxQ6pvgv4XS1/pPcUb4xTCPrfhpQdLlcG+qDZA0rMjZVFB02Vdqyxp3m
+         faug==
+X-Gm-Message-State: AOJu0YzaU9Fz8cEzJGrG5at9Moo1iBfpRywHNgrc5KXC2M6j1pUr8jTR
+	UJOp/qItEb1aABFpMmX39Ie4yxUbSUTweP1Wi6SUW1vGi+EFIyPlyWONSI0gD6dWtKCigkhobQQ
+	ogy6iLbrb3gDbQUOQm+LYgBegPzXnY1stD6xi15lESsJrqBGC1eELTkg=
+X-Google-Smtp-Source: AGHT+IGP9zFJt9ODdsJJST64s/ApoTT+dlu5lmgfnwM+imtr97ll3bRHIEGPkk+l0Y569vfoQkgmpdh19NV/+hHqEyYfm9fe3EYV
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-Received: by 2002:a05:6e02:12c1:b0:361:9320:5b3d with SMTP id
+ i1-20020a056e0212c100b0036193205b3dmr130264ilm.2.1706625502761; Tue, 30 Jan
+ 2024 06:38:22 -0800 (PST)
+Date: Tue, 30 Jan 2024 06:38:22 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000db5af406102ab6e8@google.com>
+Subject: [syzbot] [net?] WARNING in tcp_disconnect (2)
+From: syzbot <syzbot+0f423d4ae07bbb1359ac@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Pavel Vazharov <pavel@x3me.net> writes:
+Hello,
 
->> On Sat, Jan 27, 2024 at 7:08=E2=80=AFAM Pavel Vazharov <pavel@x3me.net> =
-wrote:
->>>
->>> On Sat, Jan 27, 2024 at 6:39=E2=80=AFAM Jakub Kicinski <kuba@kernel.org=
-> wrote:
->>> >
->>> > On Sat, 27 Jan 2024 05:58:55 +0200 Pavel Vazharov wrote:
->>> > > > Well, it will be up to your application to ensure that it is not.=
- The
->>> > > > XDP program will run before the stack sees the LACP management tr=
-affic,
->>> > > > so you will have to take some measure to ensure that any such man=
-agement
->>> > > > traffic gets routed to the stack instead of to the DPDK applicati=
-on. My
->>> > > > immediate guess would be that this is the cause of those warnings?
->>> > >
->>> > > Thank you for the response.
->>> > > I already checked the XDP program.
->>> > > It redirects particular pools of IPv4 (TCP or UDP) traffic to the a=
-pplication.
->>> > > Everything else is passed to the Linux kernel.
->>> > > However, I'll check it again. Just to be sure.
->>> >
->>> > What device driver are you using, if you don't mind sharing?
->>> > The pass thru code path may be much less well tested in AF_XDP
->>> > drivers.
->>> These are the kernel version and the drivers for the 3 ports in the
->>> above bonding.
->>> ~# uname -a
->>> Linux 6.3.2 #1 SMP Wed May 17 08:17:50 UTC 2023 x86_64 GNU/Linux
->>> ~# lspci -v | grep -A 16 -e 1b:00.0 -e 3b:00.0 -e 5e:00.0
->>> 1b:00.0 Ethernet controller: Intel Corporation 82599ES 10-Gigabit
->>> SFI/SFP+ Network Connection (rev 01)
->>>        ...
->>>         Kernel driver in use: ixgbe
->>> --
->>> 3b:00.0 Ethernet controller: Intel Corporation 82599ES 10-Gigabit
->>> SFI/SFP+ Network Connection (rev 01)
->>>         ...
->>>         Kernel driver in use: ixgbe
->>> --
->>> 5e:00.0 Ethernet controller: Intel Corporation 82599ES 10-Gigabit
->>> SFI/SFP+ Network Connection (rev 01)
->>>         ...
->>>         Kernel driver in use: ixgbe
->>>
->>> I think they should be well supported, right?
->>> So far, it seems that the present usage scenario should work and the
->>> problem is somewhere in my code.
->>> I'll double check it again and try to simplify everything in order to
->>> pinpoint the problem.
-> I've managed to pinpoint that forcing the copying of the packets
-> between the kernel and the user space
-> (XDP_COPY) fixes the issue with the malformed LACPDUs and the not
-> working bonding.
+syzbot found the following issue on:
 
-(+Magnus)
+HEAD commit:    ff63cc2e9506 net: phy: mediatek-ge-soc: sync driver with M..
+git tree:       bpf
+console output: https://syzkaller.appspot.com/x/log.txt?x=133ee64be80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=bc36d99546fe9035
+dashboard link: https://syzkaller.appspot.com/bug?extid=0f423d4ae07bbb1359ac
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
 
-Right, okay, that seems to suggest a bug in the internal kernel copying
-that happens on XDP_PASS in zero-copy mode. Which would be a driver bug;
-any chance you could test with a different driver and see if the same
-issue appears there?
+Unfortunately, I don't have any reproducer for this issue yet.
 
--Toke
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/09601b75d815/disk-ff63cc2e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/a5549b0aa031/vmlinux-ff63cc2e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f1eb3b2eb752/bzImage-ff63cc2e.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+0f423d4ae07bbb1359ac@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 26544 at net/ipv4/tcp.c:3089 tcp_disconnect+0x1857/0x1df0 net/ipv4/tcp.c:3089
+Modules linked in:
+CPU: 1 PID: 26544 Comm: syz-executor.2 Not tainted 6.8.0-rc1-syzkaller-00182-gff63cc2e9506 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+RIP: 0010:tcp_disconnect+0x1857/0x1df0 net/ipv4/tcp.c:3089
+Code: 00 00 48 89 04 24 e9 24 e9 ff ff e8 13 fb 84 f8 be 07 00 00 00 bf 02 00 00 00 e8 74 f6 84 f8 e9 0b e9 ff ff e8 fa fa 84 f8 90 <0f> 0b 90 e9 21 fa ff ff e8 ec fa 84 f8 4d 8d af 76 08 00 00 4c 89
+RSP: 0018:ffffc9000371f7c0 EFLAGS: 00010246
+RAX: 0000000000040000 RBX: 000000000000d038 RCX: ffffc9000b6ed000
+RDX: 0000000000040000 RSI: ffffffff890328c6 RDI: ffff888043389f18
+RBP: 0000000000000000 R08: 0000000000000003 R09: 0000000000000000
+R10: 000000000000d038 R11: 0000000000000002 R12: ffff88801c9a0600
+R13: ffff88804338a0f6 R14: ffff888043389a38 R15: ffff888043389880
+FS:  00007fee2d7bc6c0(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f075e6d56c6 CR3: 000000003fa89000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __mptcp_subflow_disconnect net/mptcp/protocol.c:2366 [inline]
+ __mptcp_close_ssk+0xb26/0xfd0 net/mptcp/protocol.c:2420
+ mptcp_destroy_common+0x168/0x650 net/mptcp/protocol.c:3274
+ mptcp_disconnect+0x22c/0x810 net/mptcp/protocol.c:3145
+ mptcp_sendmsg_fastopen net/mptcp/protocol.c:1745 [inline]
+ mptcp_sendmsg+0x15ec/0x1b20 net/mptcp/protocol.c:1782
+ inet_sendmsg+0x9d/0xe0 net/ipv4/af_inet.c:850
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0xd5/0x180 net/socket.c:745
+ ____sys_sendmsg+0x6ac/0x940 net/socket.c:2584
+ ___sys_sendmsg+0x135/0x1d0 net/socket.c:2638
+ __sys_sendmsg+0x117/0x1e0 net/socket.c:2667
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xd3/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+RIP: 0033:0x7fee2ca7cda9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fee2d7bc0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fee2cbabf80 RCX: 00007fee2ca7cda9
+RDX: 0000000024000084 RSI: 0000000020000340 RDI: 0000000000000003
+RBP: 00007fee2d7bc120 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+R13: 000000000000000b R14: 00007fee2cbabf80 R15: 00007ffd6be957c8
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
