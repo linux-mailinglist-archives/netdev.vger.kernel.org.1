@@ -1,184 +1,132 @@
-Return-Path: <netdev+bounces-67312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 081E7842BB3
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 19:23:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91900842BCB
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 19:30:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 877DB1F2A9E2
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 18:23:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61BADB21D03
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 18:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A604157039;
-	Tue, 30 Jan 2024 18:23:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E453E157E78;
+	Tue, 30 Jan 2024 18:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="iDqkAWHp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EDDC15696D;
-	Tue, 30 Jan 2024 18:22:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24F114E2D3;
+	Tue, 30 Jan 2024 18:30:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706638985; cv=none; b=PxGa2nnejFr9QzTk5ivYAPTzaBtCPlVPiokZvXYhmSuaaJu1LG5H8rCQByCqG7dWEUqc35JOtkRQdljS/Ff/AQr52gwOE+MCZdDLmGhmImBcSNgFxiGQ/oYM1C2UfKVsXidDz7LFWdgYiFgMMXPKWKGu0VbiEz5+o9SMdRUFkWY=
+	t=1706639441; cv=none; b=Q52gbO6jQhmhpJwxRu+tvHe4X5Ja2HrVZLgyb2P+KPCy5kE8i/7wLc2TjQrRj6duyW7Kpiau/dcagjsBLmT/hUgbNgGt3ibfxzyuNfrwBqCTNb7DlFH/xHPXlK5TNZXZHJt0UtAsUZHLn9yYtWMI2aP0DNkr2B1jpzlvDdxxCnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706638985; c=relaxed/simple;
-	bh=7WQHyByr3bWwXliRpuJSVJb6fnBv4p9vOXnA1S0acDg=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Ej6+74BquawyGEahZbz8LkxmjkHLlIyKTdb/4ViEix4sG2WXLhw8bg+17wx2omj2Jx8mokO45CP6R7VZ9XWYdgtJGrJ7ixsOBVU4e4HlncaApJU8R7d7Z/X6bnq9PB9a3zgsqNDVnP1isyeaqRMiBb5Knl0/9r/dXbc58xQuxmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.75.73) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 30 Jan
- 2024 21:22:49 +0300
-Subject: Re: [PATCH net-next v4 07/15] net: ravb: Move reference clock
- enable/disable on runtime PM APIs
-To: claudiu beznea <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
-	<geert+renesas@glider.be>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20240123125829.3970325-1-claudiu.beznea.uj@bp.renesas.com>
- <20240123125829.3970325-8-claudiu.beznea.uj@bp.renesas.com>
- <ec3f5d8a-ac38-1134-93a3-c4ceb8b944e0@omp.ru>
- <6307da2b-aadf-4cd7-85e3-3032153544b5@tuxon.dev>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <9a6b25e5-af9f-2ee9-c587-d67fe49525b1@omp.ru>
-Date: Tue, 30 Jan 2024 21:22:49 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1706639441; c=relaxed/simple;
+	bh=tA4/1H6w8n1bCK32kU8GUndlSG44o2ZLxb5ueu19rFA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=czHl7+dGrG8p6DAcvQn96GtiEgL1rMl1TrxMGiyXNPthj7vfLpNzbdv4M4qvntxao3xdRIngcgkuPAI335W2Fa/hUNU18TUvXXM2i+ei7BR1+pfCqbxHsSJXzMEhGozgUXrgIyHt50Co2LhdwjfjI2F1nVgFjPJ4azi+DbGclT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=iDqkAWHp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF6F0C433C7;
+	Tue, 30 Jan 2024 18:30:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1706639441;
+	bh=tA4/1H6w8n1bCK32kU8GUndlSG44o2ZLxb5ueu19rFA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iDqkAWHpt+bMTji+PSVRO3xNPVEYmK4jZisDaTBLo7yQF43AqYNI3vr6KCaUXhZka
+	 77ntzIA6dKwZ0hrhryhEMoWbroufblQamp6kO3ceTiowU1UK4uFuOtg19Ck6kNk1rG
+	 tbaBDWmc3jREiB0ckBU3/y0FJGV3b55ON1T8VRmk=
+Date: Tue, 30 Jan 2024 10:30:40 -0800
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Leon Romanovsky <leonro@nvidia.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	linux-stable <stable@vger.kernel.org>,
+	Netdev <netdev@vger.kernel.org>, linux-rdma@vger.kernel.org,
+	lkft-triage@lists.linaro.org, Sasha Levin <sashal@kernel.org>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Arnd Bergmann <arnd@arndb.de>
+Subject: Re: stable-rc: 6.1: mlx5: params.c:994:53: error:
+ 'MLX5_IPSEC_CAP_CRYPTO' undeclared (first use in this function)
+Message-ID: <2024013024-overripe-serve-4e45@gregkh>
+References: <CA+G9fYvYQRnBbZhHknSKbwYiCr_3vPwC5zPz2NsV9_1F7=paQQ@mail.gmail.com>
+ <2024012915-enlighten-dreadlock-54e9@gregkh>
+ <CA+G9fYs3_M9E3w+uWky5X1hEgoJU4e92ECqSywerqSkF8KVGvA@mail.gmail.com>
+ <8c178bd1-e0c9-4e29-9b63-dd298298bc7b@gmail.com>
+ <20240130071434.GA7169@unreal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <6307da2b-aadf-4cd7-85e3-3032153544b5@tuxon.dev>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/30/2024 17:18:56
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 183058 [Jan 30 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.75.73 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	git.kernel.org:7.1.1;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.75.73
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 01/30/2024 17:23:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 1/30/2024 2:18:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240130071434.GA7169@unreal>
 
-On 1/29/24 4:53 PM, claudiu beznea wrote:
-
-[...]
-
->>> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>>
->>> Reference clock could be or not part of the power domain. If it is part of
->>
->>    Could be or not be, perhaps?
->>
->>> the power domain, the power domain takes care of propertly setting it. In
->>
->>    Properly. :-)
->>
->>> case it is not part of the power domain and full runtime PM support is
->>> available in driver the clock will not be propertly disabled/enabled at
->>> runtime. For this, keep the prepare/unprepare operations in the driver's
->>> probe()/remove() functions and move the enable/disable in runtime PM
->>> functions.
->>>
->>> Along with it, the other clock request operations were moved close to
->>> reference clock request and prepare to have all the clock requests
->>> specific code grouped together.
->>>
->>> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->> [...]
->>
->>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->>> index 9fc0e39e33c2..4673cc2faec0 100644
->>> --- a/drivers/net/ethernet/renesas/ravb_main.c
->>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->> [...]
->>> @@ -3060,21 +3058,27 @@ static int ravb_resume(struct device *dev)
->>>  	return ret;
->>>  }
->>>  
->>> -static int ravb_runtime_nop(struct device *dev)
->>> +static int ravb_runtime_suspend(struct device *dev)
->>>  {
->>> -	/* Runtime PM callback shared between ->runtime_suspend()
->>> -	 * and ->runtime_resume(). Simply returns success.
->>> -	 *
->>> -	 * This driver re-initializes all registers after
->>> -	 * pm_runtime_get_sync() anyway so there is no need
->>> -	 * to save and restore registers here.
->>> -	 */
->>
->>    I want to pull out the dummy {ravb|sh_eth}_runtime_nop() funcs --
->> they don't seem to be necessary... Then we can implement your clock
-
-   The need to have the dummy RPM suspend/resume methods is gone since:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=63d00be69348fda431ae59aba6af268a5cf5058e
-
->> dance with freshly added ravb_runtime_{suspend|resume}()...
+On Tue, Jan 30, 2024 at 09:14:34AM +0200, Leon Romanovsky wrote:
+> On Mon, Jan 29, 2024 at 08:25:42PM -0800, Florian Fainelli wrote:
+> > 
+> > 
+> > On 1/29/2024 6:52 PM, Naresh Kamboju wrote:
+> > > On Mon, 29 Jan 2024 at 21:58, Greg Kroah-Hartman
+> > > <gregkh@linuxfoundation.org> wrote:
+> > > > 
+> > > > On Mon, Jan 29, 2024 at 09:17:31PM +0530, Naresh Kamboju wrote:
+> > > > > Following build errors noticed on stable-rc linux-6.1.y for arm64.
+> > > > > 
+> > > > > arm64:
+> > > > > --------
+> > > > >    * build/gcc-13-lkftconfig
+> > > > >    * build/gcc-13-lkftconfig-kunit
+> > > > >    * build/clang-nightly-lkftconfig
+> > > > >    * build/clang-17-lkftconfig-no-kselftest-frag
+> > > > >    * build/gcc-13-lkftconfig-devicetree
+> > > > >    * build/clang-lkftconfig
+> > > > >    * build/gcc-13-lkftconfig-perf
+> > > > > 
+> > > > > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> > > > > 
+> > > > > Build errors:
+> > > > > ------
+> > > > > drivers/net/ethernet/mellanox/mlx5/core/en/params.c: In function
+> > > > > 'mlx5e_build_sq_param':
+> > > > > drivers/net/ethernet/mellanox/mlx5/core/en/params.c:994:53: error:
+> > > > > 'MLX5_IPSEC_CAP_CRYPTO' undeclared (first use in this function)
+> > > > >    994 |                     (mlx5_ipsec_device_caps(mdev) &
+> > > > > MLX5_IPSEC_CAP_CRYPTO);
+> > > > >        |
+> > > > > ^~~~~~~~~~~~~~~~~~~~~
+> > > > > 
+> > > > > Suspecting commit:
+> > > > >    net/mlx5e: Allow software parsing when IPsec crypto is enabled
+> > > > >    [ Upstream commit 20f5468a7988dedd94a57ba8acd65ebda6a59723 ]
+> > > > 
+> > > > Something looks very odd here, as the proper .h file is being included,
+> > > > AND this isn't a build failure on x86, so why is this only arm64 having
+> > > > problems?  What's causing this not to show up?
+> > > 
+> > > As per the Daniel report on stable-rc review on 6.1, these build failures also
+> > > reported on System/390.
+> > 
+> > The build failure is legitimate here since
+> > drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.h guards all of the
+> > definitions and enumerations under a CONFIG_MLX5_EN_IPSEC which is not
+> > enabled in the build configuration that failed.
+> > 
+> > This is implicitly fixed upstream with
+> > 8c582ddfbb473c1d799c40b5140aed81278e2837 ("net/mlx5e: Handle hardware IPsec
+> > limits events") which relocates the #ifdef CONFIG_MLX5_EN_IPSEC below and
+> > allows the MLX5_IPSEC_CAP_CRYPTO enum value, amongst others to be visible to
+> > code that is not guarded with CONFIG_MLX5_EN_IPSEC. This specific commit
+> > does not apply cleanly to the stable-6.1 branch, so maybe the best we can
+> > come up with is this targeted change that does the same thing against 6.1:
 > 
-> For this series, does it worth having a patch that removes ravb runtime
-> suspend/resume ops to then add a new patch that add it it again?
+> Thanks for taking look into it. This fix looks as a best solution for me.
 
-    Probably not, indeed... I just wanted to have 2 symmetric patches
-for sh_eth and ravb removing the dummy methods...
-
-> I can do it but it I see no reason in doing it in this series...
-> 
-> The dummy functions were there and the commit description explains the
-> reason they were updated.
-
-   Yet you don't say a word about the big comment in ravb_runtime_nop()
-that you remove. This comment doesn't really make much sense as this
-driver currently has the RPM calls and ndo_{open|stop}() methods decoupled...
-This stuff was copied from sh_eth.c verbatim -- I clearly overlooked it when
-prepping this driver for upstream... :-<
-   You can keep this patch as is (but not its description!) or have a separate
-patch that removes just the big comment not making much sense, both options
-would be fine by me. I will take care of sh_eth.c myself (not really sure
-whether you have targets having this IP)...
-
-> Thank you,
-> Claudiu Beznea
-
-MBR, Sergey
+Thanks, will queue this up now and push out a new -rc
 
