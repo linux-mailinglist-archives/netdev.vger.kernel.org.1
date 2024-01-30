@@ -1,82 +1,103 @@
-Return-Path: <netdev+bounces-67278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0ED28428C0
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 17:05:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 786A98428C3
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 17:06:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 606431F218D5
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 16:05:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D5071F221CC
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 16:06:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87CB586133;
-	Tue, 30 Jan 2024 16:05:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mAylsLi7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FD2E8614C;
+	Tue, 30 Jan 2024 16:06:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE886BB25;
-	Tue, 30 Jan 2024 16:05:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71C76BB25;
+	Tue, 30 Jan 2024 16:06:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706630744; cv=none; b=ANyYmfQZ/1n2R5/0bcaj5HNgI9F/iR+V4WOJ+G662MaP6E1zSh6ijbqRO+PNnnVCxV9xz1WbsDjkq3wDY6NFzyOu4eSTK5ZUXc7I8t9tAzbU8oRHxPlG9sKgJ56xKPKsLqvi7a9yXP0vN2+VyBQIwjj0EWD+1Wf/09dfv2anblY=
+	t=1706630770; cv=none; b=B8tvADWiXKnq7Uz/6kHsP2QpzuLsPwps7me0l5XWgzFjeGkhud3MLss5YgwaOHXJyLuaH/4jSHiK7rAISXDOJNu1M9QomMQMD55ZHRKtQdCz0P2C3lkCMjNuDBTp97B82rbWia4yZP9QrRWX1PU/q6sMlDaDxknKoAyV3RdYCVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706630744; c=relaxed/simple;
-	bh=XNZMtU9+NSZPjnlFT4YalaCcT7iFvu8+aCgq4SJNd0A=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=nSMZ2ucjaHCOh4mpaEd1UqCEpJwaUmip/R7Sz6514qb4z7XjzrWgHAYYuepR+qRa5QLBD3RsX8QH5hZva/V+momc0eeHgsSd7UtImRJG21RUahQ3TPlx6rjNR+jWSjnbkhvLnODT+7zQOeINQ5WvU2BDvEBBQh7w7wm7nkGewFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mAylsLi7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 821A9C433F1;
-	Tue, 30 Jan 2024 16:05:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706630743;
-	bh=XNZMtU9+NSZPjnlFT4YalaCcT7iFvu8+aCgq4SJNd0A=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=mAylsLi7KI3habSsXIBFUxmtVp/tIwg5DU6P0+JwN4GBwB1qLMTbD9X0iFEqUd6fW
-	 GXEt64guYmUQMVMtu416Z8ENRTrqLRbg17l/bVau274uMGtvxxGj2zjpAC+Tsq5dlk
-	 YK+NwQ7ODYLB+SUBWR5rMWpJK1200L9Du5nPMY1OTfBC1r4wLjcy2Zwi3H65kJdnRs
-	 gOsKSwOHm2Moc7LbYuLBJ24Hp/wBI9VtaF5acZtSH0ghnGT8JeMOJnoIYVhKG3WBlX
-	 cr2iuoTxl8ge+X3JSKGrArwa0TxrHYWXe0wYWDKdZrRbzyH25hFY73OSEXcRWBagIz
-	 3KFoPDuALG6vA==
-From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org
-Cc: Song Liu <song@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Yonghong Song <yhs@fb.com>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Luke Nelson
- <luke.r.nels@gmail.com>, Pu Lehui <pulehui@huawei.com>, Pu Lehui
- <pulehui@huaweicloud.com>
-Subject: Re: [PATCH bpf-next v2 3/4] riscv, bpf: Add RV_TAILCALL_OFFSET
- macro to format tailcall offset
-In-Reply-To: <20240130040958.230673-4-pulehui@huaweicloud.com>
-References: <20240130040958.230673-1-pulehui@huaweicloud.com>
- <20240130040958.230673-4-pulehui@huaweicloud.com>
-Date: Tue, 30 Jan 2024 17:05:41 +0100
-Message-ID: <878r46q016.fsf@all.your.base.are.belong.to.us>
+	s=arc-20240116; t=1706630770; c=relaxed/simple;
+	bh=H16eLQlz15glhHn83S28O2LCWxrtu1PELdKLN4q9zoQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qbtyq8Wzrp8zaWIbcLw8PJ4jnS/PTcUzQY/KvgOTEVI9aXFV3ptEoy3lYv9Dh5kzQJref9b5OPj4dHB1AMbq9p98AYOpvfkB0REzkzHUM8Kv9x7QhyiDfoGrAQfppjQrt+4nZOWdA2K8x2Wqu/FcpwfWB0kMvmVvz7R1QEpD0aQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a359e6fde44so298483666b.3;
+        Tue, 30 Jan 2024 08:06:08 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706630767; x=1707235567;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2LbX2mdHtCqh+Dk4WrTnZLdkeXAyj+cWIMg/K56AOg8=;
+        b=jYApe5eAhL4c4TpkrbPHS2UWMI9UOQkglWszV/Da2+HzNtSsNXdwVbW4xyTJgov7iI
+         gaLPvu6g1eI3U/lAcNwvfOblWvZTYl91pl8YzYEHPF9rHfNl0iGa9bIi9nbHvfcStkiP
+         1Fo8hZ2L4CDTSq+gz9hh80JW3+qbIKK8+ytMR4ia+aSXfs49pbUQzlRmaw9Q5aqOb7M4
+         uAy4Jlqwfi+rC3Tx4HwYUXxamXMd77dSDnyb/fTAPvshoDprbJW1SOwUnHeYNewVxfrg
+         vpV73mrQylz2ANCj0l2ZieaDGcmPI632yDzHwZZgBqq8z2KTVFh7hkqFddzj2diNyAVw
+         pH+w==
+X-Gm-Message-State: AOJu0Yza9p4aMHEpohCiC1oFLH4YzuMJOGa0rrai2fEkrRL+P1FTxJRn
+	HJcUlXeZJh6skUScKm0EbJKjBarjoJnmUT5BH65+/yVJIiALCcY2
+X-Google-Smtp-Source: AGHT+IFw9mPfX0TBsU15eBWunTInbBhoRK8tZLLd6sLDnMPemtqwf7MlCh5KbtnhYDfv7AHMVWNzmg==
+X-Received: by 2002:a17:906:298d:b0:a30:69d4:3047 with SMTP id x13-20020a170906298d00b00a3069d43047mr7458405eje.8.1706630766846;
+        Tue, 30 Jan 2024 08:06:06 -0800 (PST)
+Received: from gmail.com (fwdproxy-cln-011.fbsv.net. [2a03:2880:31ff:b::face:b00c])
+        by smtp.gmail.com with ESMTPSA id ps10-20020a170906bf4a00b00a355fbe55d0sm3666832ejb.30.2024.01.30.08.06.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jan 2024 08:06:06 -0800 (PST)
+Date: Tue, 30 Jan 2024 08:06:04 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: Jani Nikula <jani.nikula@linux.intel.com>, kuba@kernel.org,
+	"David S. Miller" <davem@davemloft.net>, linux-doc@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	pabeni@redhat.com, edumazet@google.com
+Subject: Re: [PATCH v3] Documentation: Document each netlink family
+Message-ID: <ZbkebMW+xLqNhsoB@gmail.com>
+References: <20231121114831.3033560-1-leitao@debian.org>
+ <874jevjgvo.fsf@intel.com>
+ <87jznqewa7.fsf@meer.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87jznqewa7.fsf@meer.lwn.net>
 
-Pu Lehui <pulehui@huaweicloud.com> writes:
+On Tue, Jan 30, 2024 at 07:22:08AM -0700, Jonathan Corbet wrote:
+> Jani Nikula <jani.nikula@linux.intel.com> writes:
+> 
+> > On Tue, 21 Nov 2023, Breno Leitao <leitao@debian.org> wrote:
+> >> This is a simple script that parses the Netlink YAML spec files
+> >> (Documentation/netlink/specs/), and generates RST files to be rendered
+> >> in the Network -> Netlink Specification documentation page.
+> >
+> > First of all, my boilerplate complaint: All extra processing for Sphinx
+> > should really be done using Sphinx extensions instead of adding Makefile
+> > hacks. I don't think it's sustainable to keep adding this stuff. We
+> > chose Sphinx because it is extensible, and to avoid the Rube Goldberg
+> > machine that the previous documentation build system was.
+> 
+> So I feel like we've (me included) have kind of sent Breno around in
+> circles on this one.  This *was* implemented as an extension once:
+> 
+>   https://lore.kernel.org/netdev/20231103135622.250314-1-leitao@debian.org/
+> 
+> At that time it seemed too complex, and I thought that an external
+> script would lead to a simpler implementation overall.  Perhaps I was
+> wrong.
 
-> From: Pu Lehui <pulehui@huawei.com>
->
-> Add RV_TAILCALL_OFFSET macro to format tailcall offset, and correct the
-> relevant comments.
->
-> Signed-off-by: Pu Lehui <pulehui@huawei.com>
-
-Acked-by: Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.org>
+I think you are correct. I personally _think_ that the external script
+is better, mainly because it is self contained, thus, easier to
+maintain.
 
