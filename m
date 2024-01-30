@@ -1,140 +1,125 @@
-Return-Path: <netdev+bounces-67094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6E4C842070
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:03:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37E248420DC
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:12:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0150290D1E
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:03:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43C20B2863B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:07:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 764736A025;
-	Tue, 30 Jan 2024 10:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F18F360ED3;
+	Tue, 30 Jan 2024 10:05:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bz6OSzIq"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="OQv7KNAy"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8915C6A01E
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 10:00:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ACFC433BC
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 10:05:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706608802; cv=none; b=tRGyG4Had63yU6QunjlMiw/cz/N61dk2RdpRLzZCxK3pkqUbaypucAEItEWSAD4Jhmj6jVLuO4fqpf3skjdr8eY2t3CVi/eBpKCyfmORRX6z3HdzW3VT0Exz0db9E1e1SzoqcWRCh6v4PrGL4cyIX2KTiMNtYJZHPnwGK38586A=
+	t=1706609136; cv=none; b=YpXPrj2mN/QTlcBoLlgypDYGcHculY8ranNy6OA8IHcQwCNPTFgJ6N/JsweJI6RnCmIXTwNJcfWvEOXKH1Lcs+8DpqcNsXfFVQTrqr6tL845MX2NcaVU/t1b9jiuHoUQi2B1xtMLFQNXM0pk2Qt9lIMJ9479mjfDTLS7sUGN09g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706608802; c=relaxed/simple;
-	bh=mNw5TrQ7ILcQGi5iCrUSeKS8QpvSrMGTQewU6sjZTyw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Um5Ke73jHZMYSDFFfpeBvMjHikYyoJ47rx/81s6iZ2C0Of4w5LtsmTW017tsb9DXV+R3VqAKx+2xK4L+Bk4yk3T+NPMm/37pkGFRgzPMOnQ8DEMeJxOtoj4BILss7Zs/TLK72XlsDmsZSDrWsdWIyzzVQVpvyRE5n19afG6hj38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bz6OSzIq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706608799;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=2t9JICKhM82/154timl/hUWjQtNhaMv+Tcp7bNglvcw=;
-	b=Bz6OSzIq9BY77K0qAVcuIO1sJtaWR5KuiCLo6qHJKMhZ92kkWt27RGh9j7IFw9Mk+yWLGy
-	F+m+2BJQkEMBHRxMFjUNNklXFfk8m7Q9oJlERDQD1l/4kR0yQW5pmw73MyGmPeDl05rFTA
-	1MjTJAP7ueoFD8b7IdlDiVnhTlCMRSI=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-274-UWyEYQ5iPnaIe9TFR40r8A-1; Tue, 30 Jan 2024 04:59:57 -0500
-X-MC-Unique: UWyEYQ5iPnaIe9TFR40r8A-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-51117755c8aso188073e87.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 01:59:57 -0800 (PST)
+	s=arc-20240116; t=1706609136; c=relaxed/simple;
+	bh=DRlRQXLhsU0+cKh3w23bLq1XFJxx5MrK/ImH2gQ3Op4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aTkGA9KHzR3ZD1EyHtmM8ZaTuCjIOfDcIs/GS5cBBwyrda7uHfo/9Art1VkN6zJJ9QHCN69DQShiUfWftJ9YmEuxtVHGqNEi9oDPkEIV06T2LGjn8fvXkaOPeEQXyt9DR9xUnoXQJdxiKKmQUKcwmzZt2AuqyVpIBI00yIqHu4Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=OQv7KNAy; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-55c2cf644f3so3703289a12.1
+        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 02:05:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706609132; x=1707213932; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vNUijCkfAL5sfK5WTVaGUY4h4o2ULqP8+6/IA0phaQk=;
+        b=OQv7KNAysFMWt3Z2bD4a7Dnjr/Z80w7sYgerEm9uhxdgv7J8nQB5MD/Rr8D9ulFRKY
+         TtMO8mK/69gSJLdOy8mtYI0L+t66erGKmw5zuGWcaFmt5ECiN4veuFS93q4cMJzusZQh
+         RL7N8qCNdj8m3517q8RsnE+4VpqkiqoHkEDET3i1QBewsVpS3F1AKeZwyaDmGV8Sm0VN
+         6nmL1MetEGT7NiwwOF1HRMM1unJ74MbRC3oZjgNtRq1oy23DRr3btqm7vNW2l+l5OR4V
+         dD5OsS1UMusbs6kXgHXBIosrW00KLCTdxnvzqXjcjg/uchAaJqJ6jpcbmzH33F2PJjOk
+         imwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706608796; x=1707213596;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2t9JICKhM82/154timl/hUWjQtNhaMv+Tcp7bNglvcw=;
-        b=p9KOR5phYsqtV0aSIiqlxaJYgR0X84BakyqoQQkeTn8yqgG9vNGIJGwDNvMveOnpKr
-         jbq8AG9ryu5TOEAxcFR7JIYLRauQxL1rCXE+DA6E4ZvvN7dPfZRZl/zKfGrN/qQIbdgt
-         s74R/0wGPpHRxzcpsN1q1++Tqb54S5dq0wLwlCnCtQDapU7uIV+LO/PRhCJ07dCTHjW+
-         yhdONqWPse1Xq0YImAa+RHGaLddEA7LTEPbV1K/1JQ2xz+AYxBxYD1TEY2Ghq/46Nkjd
-         fVwmIPGk+i0iLqwDQOYy2Ok83CsAx56+Lyz2B+HFIG4wPhUKvervvvLVcXr77EAAHe1u
-         4ZIA==
-X-Gm-Message-State: AOJu0YxeZMOypVMGQdDF9FBiIfgi3pSCBfI3jug/ANEXEfb+Qkale8BI
-	YBM6PcLO/k8FRTAv0RbFwkSuZHc1cJQhkZJznoTHUM/aI2ktI91HgbwHiroL4V15PIrkfzz0JPi
-	5VDY8xT4BLDtYbK0Fd0PSy3FcFLb9pPlW/XdF44qhr3OFm2hrSr7Uug==
-X-Received: by 2002:a19:4f19:0:b0:510:1bb8:506a with SMTP id d25-20020a194f19000000b005101bb8506amr5255374lfb.5.1706608795914;
-        Tue, 30 Jan 2024 01:59:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGVMkdvwWvmymMw+ffNr7vIpOaBMntnycrvd3Xt/dLrwh9IhFpfE4Q3VDObFj2Y4k7LErqgBg==
-X-Received: by 2002:a19:4f19:0:b0:510:1bb8:506a with SMTP id d25-20020a194f19000000b005101bb8506amr5255354lfb.5.1706608795526;
-        Tue, 30 Jan 2024 01:59:55 -0800 (PST)
-Received: from gerbillo.redhat.com (146-241-232-203.dyn.eolo.it. [146.241.232.203])
-        by smtp.gmail.com with ESMTPSA id gw6-20020a05600c850600b0040e813f1f31sm12625815wmb.25.2024.01.30.01.59.54
+        d=1e100.net; s=20230601; t=1706609132; x=1707213932;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vNUijCkfAL5sfK5WTVaGUY4h4o2ULqP8+6/IA0phaQk=;
+        b=vklurdGpQ5umi80rgttQ0i58mSg7a8iBk4QYhuxn2EwgFXBeq7jEiRFjeOcqFXGVD0
+         If9enR+dYq8UiOhNEIDli78V9xWz0bOc8/6xcvYtVBCKRci1EkHcj9p/mtpOi4CXd4dR
+         a4doUREzHhiEqD7nV1Iz1N2taYqqAuS23uGG8zAhtfTS39TE5vGJOg45Kp6E6jmXG2LQ
+         HLzf7tr/KfsvanhRrB4PYbKBMqLtQpwJ0tN84FQXFBG1FVLXUOtfCYzvutpJFJkUfEH4
+         cO5IKg1HclFfP0AAoVOiiE0dJt+s2jbItDMAS4fr1fcvGtEYqK6fUo9/czeMj4Sro/UR
+         eKZA==
+X-Gm-Message-State: AOJu0Yyao6uclTeRVLce0+lb3Hc1e+zFTM+ypNR8WZVvr0s/skbWaAqK
+	SMX8d/1sE/6i4M20qBcJVybfM32ABLCgpKxUhEpzycf/Fj3yhOdWf5Yx64H4p4o=
+X-Google-Smtp-Source: AGHT+IHuiHgGkkgi9w9V6/5T2cGD46YnixDp6OWJTGuzWpVdpX0pdAoc5abTFOTwONmcrsmDfpovrw==
+X-Received: by 2002:a17:906:140a:b0:a33:b64f:48c1 with SMTP id p10-20020a170906140a00b00a33b64f48c1mr5919446ejc.21.1706609132502;
+        Tue, 30 Jan 2024 02:05:32 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id tl10-20020a170907c30a00b00a3554bb5d22sm3545686ejc.69.2024.01.30.02.05.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 01:59:55 -0800 (PST)
-Message-ID: <0c767128a7ceee72c3cfb4c17498ef3b6fd87a56.camel@redhat.com>
-Subject: Re: [PATCH net-next v6 1/2] net: introduce abstraction for network
- memory
-From: Paolo Abeni <pabeni@redhat.com>
-To: Mina Almasry <almasrymina@google.com>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Jason Gunthorpe
- <jgg@nvidia.com>, Christian =?ISO-8859-1?Q?K=F6nig?=
- <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, Yunsheng
- Lin <linyunsheng@huawei.com>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>
-Date: Tue, 30 Jan 2024 10:59:53 +0100
-In-Reply-To: <20240123221749.793069-2-almasrymina@google.com>
-References: <20240123221749.793069-1-almasrymina@google.com>
-	 <20240123221749.793069-2-almasrymina@google.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+        Tue, 30 Jan 2024 02:05:31 -0800 (PST)
+Date: Tue, 30 Jan 2024 11:05:28 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Kunwu Chan <chentao@kylinos.cn>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: ipv4: Simplify the allocation of slab
+ caches in inet_initpeers
+Message-ID: <ZbjJ6CB5NgMIfBwk@nanopsycho>
+References: <20240130092255.73078-1-chentao@kylinos.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240130092255.73078-1-chentao@kylinos.cn>
 
-On Tue, 2024-01-23 at 14:17 -0800, Mina Almasry wrote:
-> diff --git a/include/net/netmem.h b/include/net/netmem.h
-> new file mode 100644
-> index 000000000000..9f327d964782
-> --- /dev/null
-> +++ b/include/net/netmem.h
-> @@ -0,0 +1,41 @@
-> +/* SPDX-License-Identifier: GPL-2.0
-> + *
-> + *	Network memory
-> + *
-> + *	Author:	Mina Almasry <almasrymina@google.com>
-> + */
-> +
-> +#ifndef _NET_NETMEM_H
-> +#define _NET_NETMEM_H
-> +
-> +/**
-> + * netmem_ref - a nonexistent type marking a reference to generic networ=
-k
+Tue, Jan 30, 2024 at 10:22:55AM CET, chentao@kylinos.cn wrote:
+>commit 0a31bd5f2bbb ("KMEM_CACHE(): simplify slab cache creation")
+>introduces a new macro.
+>Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
+>to simplify the creation of SLAB caches.
+>
+>Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+>---
+> net/ipv4/inetpeer.c | 5 +----
+> 1 file changed, 1 insertion(+), 4 deletions(-)
+>
+>diff --git a/net/ipv4/inetpeer.c b/net/ipv4/inetpeer.c
+>index e9fed83e9b3c..5bd759963451 100644
+>--- a/net/ipv4/inetpeer.c
+>+++ b/net/ipv4/inetpeer.c
+>@@ -81,10 +81,7 @@ void __init inet_initpeers(void)
+> 
+> 	inet_peer_threshold = clamp_val(nr_entries, 4096, 65536 + 128);
+> 
+>-	peer_cachep = kmem_cache_create("inet_peer_cache",
+>-			sizeof(struct inet_peer),
+>-			0, SLAB_HWCACHE_ALIGN | SLAB_PANIC,
+>-			NULL);
+>+	peer_cachep = KMEM_CACHE(inet_peer, SLAB_HWCACHE_ALIGN | SLAB_PANIC);
 
-Minor nit: here you need to prepend 'struct' to avoid a kdoc warning:
+The name is going to be different. Could it be a source of some issue?
+My guess is not, just want to make sure.
 
-include/net/netmem.h:20: warning: cannot understand function prototype: 'ty=
-pedef unsigned long __bitwise netmem_ref; '
 
-Should be:
 
-* struct netmem_ref - a nonexistent type marking a reference to generic net=
-work
-
-Cheers,
-
-Paolo
-
+> }
+> 
+> /* Called with rcu_read_lock() or base->lock held */
+>-- 
+>2.39.2
+>
+>
 
