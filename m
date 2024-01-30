@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-67220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35636842639
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:34:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36FE3842643
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 14:39:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4FC428952E
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 13:34:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CCA3A1F23FF2
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 13:39:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C62736BB57;
-	Tue, 30 Jan 2024 13:34:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C33C26BB3D;
+	Tue, 30 Jan 2024 13:39:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LDp/nUkr"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GWXqCLr5"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD9636BB4A;
-	Tue, 30 Jan 2024 13:34:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D596A320
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 13:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706621653; cv=none; b=PGTCKUQgnPtacDu4zAYjaAkmqWdqHVLJBRgCr+AGH2aoikD2QsmSkI1K6+KOkxfPp6VJHaJuKS2kOf6t4MBcqM+P9TQwe2FUT6QJ9/eWKW493vTiO31xwRIFsH4iCr6+r0NGOSQUcks87pcCL1dnFYKXO4COnsIo3gxerMvMLqw=
+	t=1706621987; cv=none; b=bbuDTGNk8W45Pk1hkof06U5qZhmSTGnREvUKRqUsQIgPY96y4pZmZhvqYYs21Sy6pxCGiZ9iay59azIJ1WLNI8+IZGOtf+Qr8UNU0hsck2uDD0ne1PGLyjQBZkWoN3MKLV8SBqm5o5+ZTtDz+8OwxqrmsAYxiWNFSDb9qngRa8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706621653; c=relaxed/simple;
-	bh=Gn1q7ktiWdbyhy7s2NQWRHwEjdB1UjSxc8vIDzzfCTU=;
+	s=arc-20240116; t=1706621987; c=relaxed/simple;
+	bh=pvLc4iGHB24whDbHaGXJFHP86XTXjnbuyxR+0fdhjNA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Od7tybP7RZ5+aTIIVEjYL8oxkWp+j2WZOE9VoQNjX2AZxVob51skodR6QpKQO6FdTv/tHAwAycnCHpYfHTB33uIUnfb3tfaW9bbKk5TMboHmp/KfHaE2IKfm/Kkrc/7wPMgxNflV0x0AFQgME3XBUPREuxUI88xRi7Z6zgBsldk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LDp/nUkr; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=LYHgbGaGu9ialEw6qwkQhXx9RbTOu++8cDyobiU1xRCTzCitQG8Uow8NHJNGlRwLEsHphSxxeD2FjwlH1NUmeDru76TEFTCzQfgJB/x113el1yU6f4eRO/es2EIusr6adRb7tg89UcQ3NeJRkMds6wI2+jD5KDUJebmGGfzoQTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GWXqCLr5; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,31 +36,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8E4zlUNFez7CfCq5HUwawJjAHyI/J1BFW/vD4LLyEY4=; b=LDp/nUkrRorBTsaU6y3pB7B1c+
-	Prwvnky7EgbzOj3XVCjksKb9bmfeXE2bMpQdotuW5RZnHYBml/AmqhW1PgJoVWf5ajPLva3RvoK1Q
-	Yo8X5aqAEZ8brDT0l+x19kFUy2X8n1Zt4hq8/kzK6EwVRcLj1/uvsKU3XUHD65cKZ8Bk=;
+	bh=5tcIV29zmJ0EwZRiyJlKoaDAak6UxU6mwYCf+BrgywU=; b=GWXqCLr5m6vbVxQ+w3S6HDAqzs
+	wML1JD1Qad//+RuS8gCj2H9BWYUyskE6uHi1O4IN3Th7IH+V76iDK4ubdm+g78sGMQya5dIbrKX56
+	QIU6Mi/ohZwZrwZsjvZ53lI/Nwyps27qg1sX0wU8IlvUEjwxyEBS3LHGymsamRKJefCY=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rUoFU-006Uhd-9M; Tue, 30 Jan 2024 14:34:00 +0100
-Date: Tue, 30 Jan 2024 14:34:00 +0100
+	id 1rUoKs-006Uk9-VU; Tue, 30 Jan 2024 14:39:34 +0100
+Date: Tue, 30 Jan 2024 14:39:34 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Bastien Curutchet <bastien.curutchet@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+To: Alexander Stein <alexander.stein@ew.tq-group.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Herve Codina <herve.codina@bootlin.com>
-Subject: Re: [PATCH 1/2] dt-bindings: net: Add TI DP83640
-Message-ID: <dc81a307-3541-47e2-9c72-d661e76889bf@lunn.ch>
-References: <20240130085935.33722-1-bastien.curutchet@bootlin.com>
- <20240130085935.33722-2-bastien.curutchet@bootlin.com>
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 1/1] net: phy: dp83867: Add support for active-low LEDs
+Message-ID: <f4b075f4-0dd9-45f1-be96-ad7e91936ce6@lunn.ch>
+References: <20240130090043.663865-1-alexander.stein@ew.tq-group.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,57 +62,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240130085935.33722-2-bastien.curutchet@bootlin.com>
+In-Reply-To: <20240130090043.663865-1-alexander.stein@ew.tq-group.com>
 
-> +  ti,led-config:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    enum: [1, 2, 3]
-> +    description: |
-> +      If present, configures the LED Mode (values defined in
-> +      dt-bindings/net/ti-dp83640.h).
-> +      LED configuration can also be strapped. If the strap pin is not set
-> +      correctly or not set at all then this can be used to configure it.
-> +       - 1     = Mode 1
-> +        LED_LINK = ON for Good Link, OFF for No Link
-> +        LED_SPEED = ON in 100 Mb/s, OFF in 10 Mb/s
-> +        LED_ACT = ON for Activity, OFF for No Activity
-> +       - 2     = Mode 2
-> +        LED_LINK = ON for Good Link, BLINK for Activity
-> +        LED_SPEED = ON in 100 Mb/s, OFF in 10 Mb/s
-> +        LED_ACT = ON for Collision, OFF for No Collision
-> +       - 3     = Mode 3
-> +        LED_LINK = ON for Good Link, BLINK for Activity
-> +        LED_SPEED = ON in 100 Mb/s, OFF in 10 Mb/s
-> +        LED_ACT = ON for Full Duplex, OFF for Half Duplex
-> +       - unset = Configured by straps
+On Tue, Jan 30, 2024 at 10:00:43AM +0100, Alexander Stein wrote:
+> Add the led_polarity_set callback for setting LED polarity.
 
-Please look at have the Marvell PHY driver supports LEDs via
-/sys/class/leds. Now we have a generic way to supports LEDs, DT
-properties like this will not be accepted.
+Hi Alexander
 
-> +
-> +  ti,phy-control-frames:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    enum: [0, 1]
-> +    description: |
-> +      If present, enables or disables the PHY control frames.
-> +      PHY Control Frames support can also be strapped. If the strap pin is not
-> +      set correctly or not set at all then this can be used to configure it.
-> +       - 0     = PHY Control Frames disabled
-> +       - 1     = PHY Control Frames enabled
-> +       - unset = Configured by straps
+Please set the Subject to [patch net-next] to indicate which tree this
+is for.
 
-What is a control frame?
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
 
-> +
-> +  ti,energy-detect-en:
-> +    $ref: /schemas/types.yaml#/definitions/flag
-> +    description: |
-> +      If present, Energy Detect Mode is enabled. If not present, Energy Detect
-> +      Mode is disabled. This feature can not be strapped.
+Otherwise this looks good.
 
-Please use the phy tunable ETHTOOL_PHY_EDPD. There are a few examples
-you can copy.
-
-    Andrew
+	  Andrew
 
