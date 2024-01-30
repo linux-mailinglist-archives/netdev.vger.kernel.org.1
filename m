@@ -1,173 +1,119 @@
-Return-Path: <netdev+bounces-66975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 062C8841A68
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 04:21:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64E0D841A6C
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 04:22:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91EC91F291B3
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:21:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20F77283F35
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:22:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A3043771C;
-	Tue, 30 Jan 2024 03:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4487A376FC;
+	Tue, 30 Jan 2024 03:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J5ChalmO"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D589376EE;
-	Tue, 30 Jan 2024 03:19:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0341C374F6
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 03:20:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706584803; cv=none; b=hCYohz45jLMxRwMO/9hWip/Q4z22NryhLsMj4ejxwrd4tbZt6PL6JBZBvBUeIiMNMtgdNPkXXSNrDgrPDP+BCyhmhSaLgUbAVU/j9WbESgMPbSFxcnAnEAbNl5ioUHGH+nTEIsidhAMt+p8oQhG97A3CoJNBDeo1bvS4YYkaF5U=
+	t=1706584827; cv=none; b=cstk7H+HCw1jYiB5OJKnXT5Im78g20hcRE/Waeq23Mwkjijdxz1O1HRMJPENgaUm0zVUDGWeotzAyxhsu10JTxghyA6QAoSS8BCMIt5LVau01LRoMbGs/qxS2ODToILi5Ie1M/LTQ4Ug0j/AW7ghP9+uVSrFFwXJXQtODWEX1GM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706584803; c=relaxed/simple;
-	bh=M6wVVTaY3ttiwNUn+PvJfT1HvQ8W8ZLtrGc85LuVN40=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=ued5xMWboH2ot5Fb7VV3/6d8c93iNl3X0BbEfrvW5PWni6PC11WFGPiuhkmqQqeG+gvfv4SGRRhGCn6h75sNfm5FTohqIUpSFJxiE628SCNF512/gv2IzZFhjh/INade/fKpMuy2iJUek8DXXr18gxQI7FePFOnml8fOezJUCgg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TP9NJ04kZz29krM;
-	Tue, 30 Jan 2024 11:18:08 +0800 (CST)
-Received: from kwepemd100009.china.huawei.com (unknown [7.221.188.135])
-	by mail.maildlp.com (Postfix) with ESMTPS id 486A61A016B;
-	Tue, 30 Jan 2024 11:19:57 +0800 (CST)
-Received: from [10.67.109.184] (10.67.109.184) by
- kwepemd100009.china.huawei.com (7.221.188.135) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.2.1258.28; Tue, 30 Jan 2024 11:19:56 +0800
-Message-ID: <8cc7d3ad-1b34-478d-bfc8-6a2f791aa5d9@huawei.com>
-Date: Tue, 30 Jan 2024 11:19:55 +0800
+	s=arc-20240116; t=1706584827; c=relaxed/simple;
+	bh=d9WP4hd/Fgxj42lnIKM1zOhi36+ZV09aVbpyPYfs59I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qvuT2rnhVcPqe2M4Fq2HIKRrHqS2sKG0qpy94uOtZUvzzCs+c6wdsBNoRtGYnC3TY1xIOQlAM9Q16Z8UZTtj/82sDb5xAl0OrE7OdlXInrFepEP/41WZav4F3oVR2vek943WB4jxya+SoUKc88Fcw1GLUxSeorHY6FpnGmwaSu0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J5ChalmO; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706584824;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=d9WP4hd/Fgxj42lnIKM1zOhi36+ZV09aVbpyPYfs59I=;
+	b=J5ChalmOheO/JWEFdCKNhtk5aQsMsRPGxeL6E5Gfz1lgokBKUAC24/V7F+r5bWoxFJ9CCU
+	s/pbIzhzYR4edV8N0nELTXO2kBFP0sR8qGDx1VDinxFGA9BQerDUzhf/iL47HGWkWG55TB
+	Im+i2pUFDR+vTKxX/btRKLcKSYIWj5Y=
+Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
+ [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-687-MmVMx3W2P4CKzCQ6wIwKbQ-1; Mon, 29 Jan 2024 22:20:22 -0500
+X-MC-Unique: MmVMx3W2P4CKzCQ6wIwKbQ-1
+Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-3bddadbc2bbso5016583b6e.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 19:20:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706584822; x=1707189622;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=d9WP4hd/Fgxj42lnIKM1zOhi36+ZV09aVbpyPYfs59I=;
+        b=KNtCoSaYWFl9A7kSBUdiqBSWyZUKx3ALpjY6u0DZiu8t6p3TzSTl3Y3jPT/3PKDSsJ
+         BwVxKLHdc+IealY8oW6LmVvplEUzalNGr3K6gHSKmperGjRIV3CkwCSwVooFX37M6l+B
+         yYeWHiJnPeuIPRrgk7SvieoReKd4SJc/GWaxQm1fZNm84wfLNwFQxo81HVJpSLayvmNk
+         1fhGFo+3bBALHuWtEbiDxmxvbgZ7PT7fNw7hw4VaaV2LaRIiJx8a8Kxhex4v5+YAu4RX
+         nVLqnqd8XYhco20E/8T/k83ESiQcBBuz401qQ4r4uc8HW4WlOcN+ncsP18pKUzoqsS0t
+         5sLA==
+X-Gm-Message-State: AOJu0YwYATvU2orwmYVY5c+3yAyZsO3DV0PGnjl/sXaD490iW8ccZHVx
+	X9LMXwmIvDsPQjeQJKYPYI98eaUVQZy6hR8M+dY7YngcswGHz1surH5ywWZ2sWLSe7Pdj+3bxY3
+	V7ywh6it1nbP7P57SM9BC4XBL+Y1ESWAOYzDN5wrIhqgmidN382JUhH7v6zS0XC3N2YvTKMMWgk
+	BBFxmqtK+S9aYZsyF54IZOWKNl4cL8
+X-Received: by 2002:a05:6808:1154:b0:3bd:c08d:91f6 with SMTP id u20-20020a056808115400b003bdc08d91f6mr8998035oiu.29.1706584822075;
+        Mon, 29 Jan 2024 19:20:22 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHuZW0m1kap/LxF2wEFM1hvLV2SMn42n3fITC1r2n7f5Wmal4bhgCfEoA8SCfS1utE4NY7HHhgI/uSaJBfNbvo=
+X-Received: by 2002:a05:6808:1154:b0:3bd:c08d:91f6 with SMTP id
+ u20-20020a056808115400b003bdc08d91f6mr8998027oiu.29.1706584821857; Mon, 29
+ Jan 2024 19:20:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next 2/3] bpf: Keep im address consistent between dry
- run and real patching
-Content-Language: en-US
-To: Song Liu <song@kernel.org>, Pu Lehui <pulehui@huaweicloud.com>
-CC: <bpf@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
-	<netdev@vger.kernel.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?=
-	<bjorn@kernel.org>, Puranjay Mohan <puranjay12@gmail.com>, Alexei Starovoitov
-	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
-	<andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Yonghong Song
-	<yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
-	<kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
-	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt
-	<palmer@dabbelt.com>, Luke Nelson <luke.r.nels@gmail.com>
-References: <20240123103241.2282122-1-pulehui@huaweicloud.com>
- <20240123103241.2282122-3-pulehui@huaweicloud.com>
- <CAPhsuW67c8NYxBhwrq8JK8HP95P1Wwq1zHEDqooAOgP+aru13g@mail.gmail.com>
-From: Pu Lehui <pulehui@huawei.com>
-In-Reply-To: <CAPhsuW67c8NYxBhwrq8JK8HP95P1Wwq1zHEDqooAOgP+aru13g@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemd100009.china.huawei.com (7.221.188.135)
+References: <20231226073103.116153-1-xuanzhuo@linux.alibaba.com> <1705384540.169184-2-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <1705384540.169184-2-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 30 Jan 2024 11:20:10 +0800
+Message-ID: <CACGkMEsOs5L6eU==Vym_AkomvhhkHN0O_G9SaPFThAtH9XVyJQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v1 0/6] virtio-net: support device stats
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	virtualization@lists.linux.dev, Zhu Yanjun <yanjun.zhu@linux.dev>, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Jan 16, 2024 at 1:56=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
+>
+> On Tue, 26 Dec 2023 15:30:57 +0800, Xuan Zhuo <xuanzhuo@linux.alibaba.com=
+> wrote:
+> > As the spec:
+> >
+> > https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bb=
+bd243291ab0064f82
+> >
+> > The virtio net supports to get device stats.
+>
+> Hi Jason,
+>
+> Any comments for this?
+>
+> Thanks
+>
 
+I see comments from both Simon and Michael, let's try to address them
+and I will review v2.
 
-On 2024/1/30 1:58, Song Liu wrote:
-> On Tue, Jan 23, 2024 at 2:32 AM Pu Lehui <pulehui@huaweicloud.com> wrote:
->>
->> From: Pu Lehui <pulehui@huawei.com>
->>
->> In __arch_prepare_bpf_trampoline, we emit instructions to store the
->> address of im to register and then pass it to __bpf_tramp_enter and
->> __bpf_tramp_exit functions. Currently we use fake im in
->> arch_bpf_trampoline_size for the dry run, and then allocate new im for
->> the real patching. This is fine for architectures that use fixed
->> instructions to generate addresses. However, for architectures that use
->> dynamic instructions to generate addresses, this may make the front and
->> rear images inconsistent, leading to patching overflow. We can extract
->> the im allocation ahead of the dry run and pass the allocated im to
->> arch_bpf_trampoline_size, so that we can ensure that im is consistent in
->> dry run and real patching.
-> 
-> IIUC, this is required because emit_imm() for riscv may generate variable
-> size instructions (depends on the value of im). I wonder we can fix this by
-> simply set a special value for fake im in arch_bpf_trampoline_size() to
-> so that emit_imm() always gives biggest value for the fake im.
-> 
+Does this sound good to you?
 
-Hi Song,
+Thanks
 
-Thanks for your review. Yes, I had the same idea as you at first, emit 
-biggist count instructions when ctx->insns is NULL, but this may lead to 
-memory waste. So try moving out of IM to get a fixed IM address, maybe 
-other architectures require it too. If you feel it is inappropriate, I 
-will withdraw it.
-
->>
->> Signed-off-by: Pu Lehui <pulehui@huawei.com>
->> ---
-> [...]
->>
->>   static int bpf_trampoline_update(struct bpf_trampoline *tr, bool lock_direct_mutex)
->> @@ -432,23 +425,27 @@ static int bpf_trampoline_update(struct bpf_trampoline *tr, bool lock_direct_mut
->>                  tr->flags |= BPF_TRAMP_F_ORIG_STACK;
->>   #endif
->>
->> -       size = arch_bpf_trampoline_size(&tr->func.model, tr->flags,
->> +       im = kzalloc(sizeof(*im), GFP_KERNEL);
->> +       if (!im) {
->> +               err = -ENOMEM;
->> +               goto out;
->> +       }
->> +
->> +       size = arch_bpf_trampoline_size(im, &tr->func.model, tr->flags,
->>                                          tlinks, tr->func.addr);
->>          if (size < 0) {
->>                  err = size;
->> -               goto out;
->> +               goto out_free_im;
->>          }
->>
->>          if (size > PAGE_SIZE) {
->>                  err = -E2BIG;
->> -               goto out;
->> +               goto out_free_im;
->>          }
->>
->> -       im = bpf_tramp_image_alloc(tr->key, size);
->> -       if (IS_ERR(im)) {
->> -               err = PTR_ERR(im);
->> -               goto out;
->> -       }
->> +       err = bpf_tramp_image_alloc(im, tr->key, size);
->> +       if (err < 0)
->> +               goto out_free_im;
-> 
-> I feel this change just makes bpf_trampoline_update() even
-> more confusing.
-> 
->>
->>          err = arch_prepare_bpf_trampoline(im, im->image, im->image + size,
->>                                            &tr->func.model, tr->flags, tlinks,
->> @@ -496,6 +493,8 @@ static int bpf_trampoline_update(struct bpf_trampoline *tr, bool lock_direct_mut
->>
->>   out_free:
->>          bpf_tramp_image_free(im);
->> +out_free_im:
->> +       kfree_rcu(im, rcu);
-> 
-> If we goto out_free above, we will call kfree_rcu(im, rcu)
-> twice, right? Once in bpf_tramp_image_free(), and again
-> here.
-> 
-
-Oops, sorry, forgot to remove kfree_rcu in bpf_tramp_image_free in this 
-version.
-
-> Thanks,
-> Song
-> 
-> [...]
-> 
 
