@@ -1,250 +1,117 @@
-Return-Path: <netdev+bounces-67374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68D26843102
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 00:17:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D43D84310E
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 00:22:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94BA81C21F4B
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 23:17:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7486C282EA0
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 23:21:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EF0A84A31;
-	Tue, 30 Jan 2024 23:14:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9FB114F78;
+	Tue, 30 Jan 2024 23:21:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hTq83wgH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HhCzzit2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AA9384A29;
-	Tue, 30 Jan 2024 23:14:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EC867EF06
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 23:21:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706656487; cv=none; b=qEU9fhPcL40J82aX2eUxT+vh+11irFf7Kvv5TePbQlHBelvVUauB3JumLqQyh64fgVDqAg7oe+C9NW05wwEnsgUTfsX+R+oEyPrDxEp/N2OVeNLO6m/VmID4gToV9Mv/LlJg2H8ZpoPvsyi96vt4Amko8fVd+I4Opt+d+42BKFo=
+	t=1706656915; cv=none; b=Iyzs/FibuppVeuHY79mfn1R310gu7cqO+2ffDMEdL6wW1yvGAPaEYfT0PyuxYEyP///aQcOKwrzgNSqSgk542dwYycOFae1utnzPRk3JBdcHTmyUB+OZ8XX9Djt/JjBweHicSUUISzemBBCnkScNPO8ydjzUqxD6qpz9eUp4eS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706656487; c=relaxed/simple;
-	bh=BG5ESZ6S3xcp89l1N+mS5Clo2oqsEkk72iSZeToz9kM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Sewm4FsRPmP7i2mxhCNjt85stdigPecgKrFgSkRPrX51wipW1eRMuocflhtQViZdkvXVROVB76SaSdW6TXPXtf1es61pz5lhNhJ9Y3/tl17ekVulKodyP/4a3e6B3Sdd7FV6ptaNm5Nd5p3PVh1f7CqfDnO71FmKpKrq1gFiCKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hTq83wgH; arc=none smtp.client-ip=209.85.214.173
+	s=arc-20240116; t=1706656915; c=relaxed/simple;
+	bh=Ge0Y3b9mg8alEuUZm8pS45nDEZdashCHWIVl60GnCP4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YCilvVh3s0jnP6Ladjv/JFJkRNOkggt9J1PNsrqgxpCaSI7SzNXPmpHsFQb5hjYGfYc1JRuES1zYw5VMd1pZFGNh3vdwrsp8Rx4PRYTcvbRexAAddRzC1QyZtizmHujXxVq5N043yxb077kNERu+Y8iVXFGhRl/otLeWo5srpAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HhCzzit2; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1d731314e67so21933725ad.1;
-        Tue, 30 Jan 2024 15:14:45 -0800 (PST)
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d057b6ddfdso17354991fa.2
+        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 15:21:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706656485; x=1707261285; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Cmf6IXAOX4sOtXhjJ9bPGawS7c4pqgm3fjtDF1AA0Pw=;
-        b=hTq83wgHCQC4CmXVm9hxyZNKqilf49H52VEHD7dQOT5QqZ7oA/mWv2VpUQLZWcS/SM
-         86/2HZbEfwoZUCYCbsBh6+KqWu0w0w9U7wGOmZ8jJVUURRD3P9ZGo2WWY7dV9YUUDcFY
-         k/F1ye6oZ//fB2ux9NhLhH3n095g+u5Q2HgxjRnDKI1WWU1yTQHGbax/susytkxAXgwl
-         S1QO1O/BvDbiTXrl7Xcx5qk/80Wk4ssacUs+EkC5mYpZEkjSNh2UNSUZU+0qeU5LBB12
-         wM0bfdDrMQ8+UC1DNC+XToiPK+54wwDb6bsEq/bB/T/vd18f2dX+lYVtQMSxQHLEBPGy
-         GfHg==
+        d=gmail.com; s=20230601; t=1706656912; x=1707261712; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ge0Y3b9mg8alEuUZm8pS45nDEZdashCHWIVl60GnCP4=;
+        b=HhCzzit2XgL/QVcMGlCo/2WKAOaxVEuZExgeRArKQDrS8On6fqyv4zI3zo97yjb6rs
+         3z2XwyNcwGH/8ElsLTu84Y1FF99KLp43fOBZOEA9ZVUwvB24ieNITWT7rl0WgRwHyh2l
+         MWqr8OQrWlevt3nyxpwp+YBfs/LISPciynDvvJvyxQ9u15MBNpIy95jY8kjUFp+BGbcl
+         R9BhIBSKWZlBYntsfsfD1HCTFmuu/MfqBIW1RHsyH6FK029h42i7gZp5xReftDlIDmDI
+         cZvs9KoF1b7AADxLMXTKToGF9ZPD/E+q1vcsZul1AQ7YcicopZYIQfT604fGeodrgGA3
+         XWmg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706656485; x=1707261285;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Cmf6IXAOX4sOtXhjJ9bPGawS7c4pqgm3fjtDF1AA0Pw=;
-        b=U9Xkswov4NC18cgH718huhNHJ6FBPKS4rvK7sLCX6s+ne5J2izlfTTcHL6h6mLrKOm
-         uV42fqt5504v8NuzWuFyoMFNdhFHRierAs2x5pTtpqb5OMCilruK1VWPkcH5hW5rWjfM
-         wdaPObDTaC6yysR2cM27sbT1rHBuTkCx8kOOvMnQlGFiZ932HZFnKpUNvWZQeZIePGzm
-         A0vgpBk+P3v6lzL7374A9HjTkmyQzoOHwad5bjcsdrVEyBiCgfFaQFPK/SOrkybx0SwL
-         Ns5D+fnjYswTClJu9gpyb80aiGLZgueKC3ypFLZFW70uQCRtU93V3x5WRzVigS9/Ir6F
-         rzFw==
-X-Gm-Message-State: AOJu0YzF02ZU3jDnZIZxZLVlqp+i4eJwo4KD+1XwgoNUpnSCuXSwjLxD
-	9CgkuCVv/Qe/LcXCFWvglOhnBFh/MC9mUvD+91VwuQ17YuZ2xXvo
-X-Google-Smtp-Source: AGHT+IETa/DK+9clg/Rps8jjioDdeA0JzTZORNLfXKPzaPO9J8iEAI/4IP93u05DsELbwccSdN/qhw==
-X-Received: by 2002:a17:903:11cf:b0:1d8:ac08:3cb7 with SMTP id q15-20020a17090311cf00b001d8ac083cb7mr52810plh.33.1706656484948;
-        Tue, 30 Jan 2024 15:14:44 -0800 (PST)
-Received: from tresc054937.tre-sc.gov.br ([2804:c:204:200:2be:43ff:febc:c2fb])
-        by smtp.gmail.com with ESMTPSA id jx2-20020a170903138200b001d8f251c8b2sm3473203plb.221.2024.01.30.15.14.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 15:14:44 -0800 (PST)
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Tue, 30 Jan 2024 20:13:30 -0300
-Subject: [PATCH net-next v5 11/11] net: dsa: realtek: embed dsa_switch into
- realtek_priv
+        d=1e100.net; s=20230601; t=1706656912; x=1707261712;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ge0Y3b9mg8alEuUZm8pS45nDEZdashCHWIVl60GnCP4=;
+        b=Aoh1tvczEU+XqGTNl5W53d8rJxIjKB8qgXrH9dwOaTr46BPZrpfMeM6RpI0Vb+FpHW
+         y7vuKBJwRiRp0N0/0NNexWwKJbKNkCednQ7tM0VNL7Ljv0I81HuyVwKKg8kLIWkiHlnS
+         zCdHhiT6s+W0wpbGfOhxSUelU67wqZuUCJNEOA7ATpuoi1gCgMt6Nz56nHLenvEWU29l
+         HsUez8xGbyIl8PO350laWi9mvUymFF5BraKopFF2o4YMf044BI5h8tQwhpUjBqsPBgRE
+         zSaWxeGDUflaOgJguQ/0rO1iLykl+1+OVcjmpbwCqRMTidStAnAzFB8Z3yYoO0rPgDF+
+         lN6Q==
+X-Gm-Message-State: AOJu0Yx8TTMnDo1SlM9efszWRryrxmmPrSnwOyBZQsGnxL6uOAC/jUKh
+	CK8GYoqlNvl/hqd4/8fZrPEWvgVtK/0sUHfXBZgqFK9TmeF25kzrwQjEXvVczI6tAuiHnmYt1Ix
+	61BAzTmHPk67NVFO1pEaaJAOnrVw=
+X-Google-Smtp-Source: AGHT+IEg+pc6BnWqkZIdmUB8NbCDEMChSVkVjwuzM+9HGMYcKpRiEwCQDt4mF97jbO9M2InxSoINvNC9ZB4I9ePdf4Q=
+X-Received: by 2002:a05:651c:a06:b0:2d0:63b6:e93c with SMTP id
+ k6-20020a05651c0a0600b002d063b6e93cmr555743ljq.20.1706656911938; Tue, 30 Jan
+ 2024 15:21:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20240130-realtek_reverse-v5-11-ecafd9283a07@gmail.com>
-References: <20240130-realtek_reverse-v5-0-ecafd9283a07@gmail.com>
-In-Reply-To: <20240130-realtek_reverse-v5-0-ecafd9283a07@gmail.com>
-To: Linus Walleij <linus.walleij@linaro.org>, 
- =?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Russell King <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Luiz Angelo Daros de Luca <luizluca@gmail.com>
-X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=openpgp-sha256; l=5204; i=luizluca@gmail.com;
- h=from:subject:message-id; bh=BG5ESZ6S3xcp89l1N+mS5Clo2oqsEkk72iSZeToz9kM=;
- b=owEBbQGS/pANAwAIAbsR27rRBztWAcsmYgBluYKxnBF4fse//mhC/q5GitrBp5Vnid95kwo0N
- dDwY2RkwciJATMEAAEIAB0WIQQRByhHhc1bOhL6L/i7Edu60Qc7VgUCZbmCsQAKCRC7Edu60Qc7
- Vi+nB/4zPlKfX2EjMeiuYd9mmY1iicYxLG5bzkJLKDPKw9NyqSnlouwY2KGAUk24+jWjtnT2mvf
- /gO+5+bk0kfBuifuYDXgULj0YiBRp2xAohla4ccECAxrdGrR0qKd/cPyLZtFeY9ULcxcbI6SnTd
- CcavS3u2F3ypfcDzAd27DQqxKtPyPlKVVgeqL7KUGjaZPPsnmeqwGjNVyDv8se5IHKoS8m/IGii
- +KvV8+ld1JAvgApXrlL9G8UU9ohuShnOd7nzDMb2KjCMjYAWKKEZPAlf3bz5bFJcQc7K1UVxH86
- ogcqtJ9MHcOcq6UemIUaCu9JMPUyZi6P1ipJAI759lXe6K3b
-X-Developer-Key: i=luizluca@gmail.com; a=openpgp;
- fpr=1107284785CD5B3A12FA2FF8BB11DBBAD1073B56
+References: <20231223005253.17891-1-luizluca@gmail.com> <20240115215432.o3mfcyyfhooxbvt5@skbuf>
+ <9183aa21-6efb-4e90-96f8-bc1fedf5ceab@arinc9.com> <CACRpkdaXV=P7NZZpS8YC67eQ2BDvR+oMzgJcjJ+GW9vFhy+3iQ@mail.gmail.com>
+ <ccaf46ca-e1a3-4cba-87eb-53bf427b5d68@arinc9.com> <20240129-astute-winged-barnacle-eeffad@lemur>
+In-Reply-To: <20240129-astute-winged-barnacle-eeffad@lemur>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Tue, 30 Jan 2024 20:21:40 -0300
+Message-ID: <CAJq09z4JZGaEBwus=Bmt95TWCtX6Y6EaqRHeo6iHqpD5hiRFbw@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 0/8] net: dsa: realtek: variants to drivers,
+ interfaces to a common module
+To: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+Cc: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org, 
+	alsi@bang-olufsen.dk, andrew@lunn.ch, f.fainelli@gmail.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 
-To eliminate the need for a second memory allocation for dsa_switch, it
-has been embedded within realtek_priv.
+> > I've had trouble with every mail provider's SMTP server that I've ever used
+> > for submitting patches, so the web endpoint is a godsend. It would've been
+> > great if b4 supported openssh keys to submit patches via the web endpoint.
+>
+> The only reason it's not currently supported is because we don't have a recent
+> enough version of openssh on the system where the endpoint is listening. This
+> will change in the near future, at which point using ssh keys will be
+> possible.
+>
+> > Patatt at least supports it to sign patches. I've got a single ed25519
+> > openssh keypair I use across all my devices, now I'll have to backup
+> > another key pair. Or create a new key and authenticate with the web
+> > endpoint on each device.
+> >
+> > Safe to say, I will submit my next patch series using b4. Thanks for
+> > telling me about this tool Linus!
+>
+> \o/
+>
+> Please feel free to provide any feedback you have to the tools@kernel.org
+> list.
+>
+> -K
 
-Suggested-by: Alvin Šipraga <alsi@bang-olufsen.dk>
-Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
----
- drivers/net/dsa/realtek/realtek.h   |  2 +-
- drivers/net/dsa/realtek/rtl8365mb.c | 12 ++++++------
- drivers/net/dsa/realtek/rtl8366rb.c |  2 +-
- drivers/net/dsa/realtek/rtl83xx.c   | 18 +++++++-----------
- 4 files changed, 15 insertions(+), 19 deletions(-)
++1 to b4 users: v5 just sent using b4. Great tool.
 
-diff --git a/drivers/net/dsa/realtek/realtek.h b/drivers/net/dsa/realtek/realtek.h
-index 864bb9a88f14..b80bfde1ad04 100644
---- a/drivers/net/dsa/realtek/realtek.h
-+++ b/drivers/net/dsa/realtek/realtek.h
-@@ -61,7 +61,7 @@ struct realtek_priv {
- 	const struct realtek_variant *variant;
- 
- 	spinlock_t		lock; /* Locks around command writes */
--	struct dsa_switch	*ds;
-+	struct dsa_switch	ds;
- 	struct irq_domain	*irqdomain;
- 	bool			leds_disabled;
- 
-diff --git a/drivers/net/dsa/realtek/rtl8365mb.c b/drivers/net/dsa/realtek/rtl8365mb.c
-index 778a962727ab..9066e34e9ace 100644
---- a/drivers/net/dsa/realtek/rtl8365mb.c
-+++ b/drivers/net/dsa/realtek/rtl8365mb.c
-@@ -880,7 +880,7 @@ static int rtl8365mb_ext_config_rgmii(struct realtek_priv *priv, int port,
- 	if (!extint)
- 		return -ENODEV;
- 
--	dp = dsa_to_port(priv->ds, port);
-+	dp = dsa_to_port(&priv->ds, port);
- 	dn = dp->dn;
- 
- 	/* Set the RGMII TX/RX delay
-@@ -1543,7 +1543,7 @@ static void rtl8365mb_stats_setup(struct realtek_priv *priv)
- 	for (i = 0; i < priv->num_ports; i++) {
- 		struct rtl8365mb_port *p = &mb->ports[i];
- 
--		if (dsa_is_unused_port(priv->ds, i))
-+		if (dsa_is_unused_port(&priv->ds, i))
- 			continue;
- 
- 		/* Per-port spinlock to protect the stats64 data */
-@@ -1564,7 +1564,7 @@ static void rtl8365mb_stats_teardown(struct realtek_priv *priv)
- 	for (i = 0; i < priv->num_ports; i++) {
- 		struct rtl8365mb_port *p = &mb->ports[i];
- 
--		if (dsa_is_unused_port(priv->ds, i))
-+		if (dsa_is_unused_port(&priv->ds, i))
- 			continue;
- 
- 		cancel_delayed_work_sync(&p->mib_work);
-@@ -1963,7 +1963,7 @@ static int rtl8365mb_setup(struct dsa_switch *ds)
- 		dev_info(priv->dev, "no interrupt support\n");
- 
- 	/* Configure CPU tagging */
--	dsa_switch_for_each_cpu_port(cpu_dp, priv->ds) {
-+	dsa_switch_for_each_cpu_port(cpu_dp, &priv->ds) {
- 		cpu->mask |= BIT(cpu_dp->index);
- 
- 		if (cpu->trap_port == RTL8365MB_MAX_NUM_PORTS)
-@@ -1978,7 +1978,7 @@ static int rtl8365mb_setup(struct dsa_switch *ds)
- 	for (i = 0; i < priv->num_ports; i++) {
- 		struct rtl8365mb_port *p = &mb->ports[i];
- 
--		if (dsa_is_unused_port(priv->ds, i))
-+		if (dsa_is_unused_port(&priv->ds, i))
- 			continue;
- 
- 		/* Forward only to the CPU */
-@@ -1995,7 +1995,7 @@ static int rtl8365mb_setup(struct dsa_switch *ds)
- 		 * ports will still forward frames to the CPU despite being
- 		 * administratively down by default.
- 		 */
--		rtl8365mb_port_stp_state_set(priv->ds, i, BR_STATE_DISABLED);
-+		rtl8365mb_port_stp_state_set(&priv->ds, i, BR_STATE_DISABLED);
- 
- 		/* Set up per-port private data */
- 		p->priv = priv;
-diff --git a/drivers/net/dsa/realtek/rtl8366rb.c b/drivers/net/dsa/realtek/rtl8366rb.c
-index 54eff9cd0c03..cdc37be1ed2c 100644
---- a/drivers/net/dsa/realtek/rtl8366rb.c
-+++ b/drivers/net/dsa/realtek/rtl8366rb.c
-@@ -1675,7 +1675,7 @@ static int rtl8366rb_set_mc_index(struct realtek_priv *priv, int port, int index
- 	 * not drop any untagged or C-tagged frames. Make sure to update the
- 	 * filtering setting.
- 	 */
--	if (dsa_port_is_vlan_filtering(dsa_to_port(priv->ds, port)))
-+	if (dsa_port_is_vlan_filtering(dsa_to_port(&priv->ds, port)))
- 		ret = rtl8366rb_drop_untagged(priv, port, !pvid_enabled);
- 
- 	return ret;
-diff --git a/drivers/net/dsa/realtek/rtl83xx.c b/drivers/net/dsa/realtek/rtl83xx.c
-index aa998e15c42b..f65e47339d5b 100644
---- a/drivers/net/dsa/realtek/rtl83xx.c
-+++ b/drivers/net/dsa/realtek/rtl83xx.c
-@@ -226,16 +226,12 @@ int rtl83xx_register_switch(struct realtek_priv *priv)
- 		return ret;
- 	}
- 
--	priv->ds = devm_kzalloc(priv->dev, sizeof(*priv->ds), GFP_KERNEL);
--	if (!priv->ds)
--		return -ENOMEM;
-+	priv->ds.priv = priv;
-+	priv->ds.dev = priv->dev;
-+	priv->ds.ops = priv->variant->ds_ops;
-+	priv->ds.num_ports = priv->num_ports;
- 
--	priv->ds->priv = priv;
--	priv->ds->dev = priv->dev;
--	priv->ds->ops = priv->variant->ds_ops;
--	priv->ds->num_ports = priv->num_ports;
--
--	ret = dsa_register_switch(priv->ds);
-+	ret = dsa_register_switch(&priv->ds);
- 	if (ret) {
- 		dev_err_probe(priv->dev, ret, "unable to register switch\n");
- 		return ret;
-@@ -256,7 +252,7 @@ EXPORT_SYMBOL_NS_GPL(rtl83xx_register_switch, REALTEK_DSA);
-  */
- void rtl83xx_unregister_switch(struct realtek_priv *priv)
- {
--	dsa_unregister_switch(priv->ds);
-+	dsa_unregister_switch(&priv->ds);
- }
- EXPORT_SYMBOL_NS_GPL(rtl83xx_unregister_switch, REALTEK_DSA);
- 
-@@ -273,7 +269,7 @@ EXPORT_SYMBOL_NS_GPL(rtl83xx_unregister_switch, REALTEK_DSA);
-  */
- void rtl83xx_shutdown(struct realtek_priv *priv)
- {
--	dsa_switch_shutdown(priv->ds);
-+	dsa_switch_shutdown(&priv->ds);
- 
- 	dev_set_drvdata(priv->dev, NULL);
- }
+Regards,
 
--- 
-2.43.0
-
+Luiz
 
