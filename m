@@ -1,136 +1,126 @@
-Return-Path: <netdev+bounces-66982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3077841A8D
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 04:32:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE48C841AB3
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 04:52:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5DDF1C230AF
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:32:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D4E81F26287
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:52:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B36E2376F6;
-	Tue, 30 Jan 2024 03:32:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53638376F1;
+	Tue, 30 Jan 2024 03:52:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="PrBSYoKc"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="WMwvuKG7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33AA374CC
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 03:32:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69C35374FB
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 03:52:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706585544; cv=none; b=Buq9V7KTIQtZHtDlAzoa3IE81Gm11hF8Atmj8D7zg4fph+tbqV/Pk5XmQKQPeusZCGiJu97Idgya65Arr2IeTKFetvU6/Eu02jaHf+9Vfc1EfUjO6fWdW4xDfpYZDfyYoAnoz5cZq2KRwis0wSemynav7XgwHWyr0sPwwF9osLo=
+	t=1706586723; cv=none; b=Y/KNVfGJIAS/kUpogH1DZ7KJftCisoQcFuqv4vP27ysAYd3NSZrlZXitgplOr9iI6lnxoyim88s/IwRA7v7p3r+iE/0f/+XYloBdXaePuy7CSKOIURIBfNPIEX32hbY5qUkTMhKSHdYzIMaxWxm1nDvPtV8JucTArJFGorRA3c8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706585544; c=relaxed/simple;
-	bh=ELYmV9fmW0xc+1ZcDD0YMB3ZtknbgobJp7j2bqTa+U4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=URUgD49MiqYW13DO99yRegasICZaEOt8JSyXfVn8uUl4Yg/qtL3sEya6/1nthMNyLENN8fh7jZ/bzrzTzCvqXmbZhgNMRwmCiTZtqeLFGLtVCYTxNRhALcKR5+j0BQJ2BV/u73+EglOoI3MkDJ6v4iK1fK26AeJPVi19KTCoXcs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=PrBSYoKc; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-51030ce36fbso3423648e87.3
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 19:32:22 -0800 (PST)
+	s=arc-20240116; t=1706586723; c=relaxed/simple;
+	bh=mrSUsYr40vZLSd08HCa9ghUj2kZmeOFNxhdsAlHKBFc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RK04/f3pc/+tRN16yoxohk7EVlHPBhXwWy3fgQ+ZDvZTV/r5ViSN+aPsMHnVU31NKnRyD2oWvmWBID0rLKilcY+7cbSChk+wO1J4XO3i7iwMLxTFW4xQkwIgF/9hNedDFub5ykSR6axN66bjUXYkAXyYHLThnfIzPQyCPOk8/Tk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=WMwvuKG7; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-33929364bdaso2440263f8f.2
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 19:52:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1706585541; x=1707190341; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HVSWuVPedMZ0hCiYeV6t6vWEzmV0Yu6IxhjiX+iJPeQ=;
-        b=PrBSYoKcl+2yXGVfHd9QXPj4LHFMHrXqGcqU6sb5a4ihQp+TV2fM+BCIuym/mXjN5B
-         LN6ZnvtahpuPr4J0CqRMglpaMbsZ/bk0ZGCp3IEU2xpJ/hSvjaRdRIN92/ckf6Sp8Mn9
-         L5Y5YXSl6Y/UhaINzAgNvl9NK5iECJjFqS7PA=
+        d=arista.com; s=google; t=1706586719; x=1707191519; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3IAAtpYMk4Ivb7jeyKnDj3sOOnhVdi6sq/asAwlVHv0=;
+        b=WMwvuKG7/TZq0DtcrOUKeNIi/YzL8SAR6/eYBRfInMYk35qTUihSVGabsN2y8Yqw82
+         NdteorllG884xr66l8dkAf7qE/tu/rsBga+UiSlwDNGYQeTXJaPzPaicO1AbdCFu3j/A
+         G5MnoTCR+AlsHVal7nK4jOa46AqfEJNvOc0Zzn1BRPzU96Pxk0DXH+aq7ynH1wbtHqCX
+         VUuRuNyZsp0a23q4hZ9h5NriLK/OTFPo/f936MvWbxZojeTX47Rq3Z3rRDWnEnbdMna3
+         Dvtx+NKuJAed/WsZunwNuZImE6YV9WwU++lhlM+Hn4JOuOqtGfbTThuQr839DC/wHQfi
+         Ohuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706585541; x=1707190341;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HVSWuVPedMZ0hCiYeV6t6vWEzmV0Yu6IxhjiX+iJPeQ=;
-        b=Otp6cxvtAHKLy5Mf+210bqTITohLyO/n5J/rWtJcueInmvknDiXLCxVWk665Gpht2O
-         IE72Qqa3AHzypTMDWjsjz4neiH1BpLqa4hmyH31uf15rcCrQ7P8J4nUBogEY3MXkvMtd
-         q14y1u9XYtGIaz+fAGlZ+JzwKg3htDkohAAmCAVgCpMbJgs46uvOeMw4OC2+NA9rB0nR
-         jFowyuqvIfY9NFyZIcy40isCVWT6XOl1jlL6EQMNLVHcWICnHTwiUiJHeqJ/RPemSYzy
-         bGR/lshyB6IzMyGFohm0VPaWLAtBV21NY50SiAwv3zYTE1CNm/oss1tRDvZt7mvqUqh7
-         12TQ==
-X-Gm-Message-State: AOJu0YwX49IXCu04MBAJXsE+A1XduDiERzx2B6+UyC3Z5pfakuJv4/Le
-	fxn4IhvWPGxh/3qwUlk49H3o/WzBSsb0AaCXEOoQKeqEhLMlBgdQQzfUrYdsqmkRRovUuczLODw
-	NuaLdCxXRcUizQXBw1lDPIqlmOsA8ZSqheqvIrXrTlnDQxGeMpw==
-X-Google-Smtp-Source: AGHT+IHxJ9h0TpEGL+1arI5K15dK7ZMfTGGFT7sxI5crnwlEMm10GtDatZbLxi1ebhRtIB1BUsGi7EDALv4X9Wo6UoA=
-X-Received: by 2002:a2e:8496:0:b0:2cf:34b4:63de with SMTP id
- b22-20020a2e8496000000b002cf34b463demr4704323ljh.35.1706585540108; Mon, 29
- Jan 2024 19:32:20 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706586719; x=1707191519;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3IAAtpYMk4Ivb7jeyKnDj3sOOnhVdi6sq/asAwlVHv0=;
+        b=ElmDLF2wfaqgsM8LkQu0Bn5wJBinat1QVODfNZvmPTKxiM9e6TePvKGEr2tG33XUwu
+         d2LysTzx7UP9qOiu6jndSwE6zJfCNBIc6L300fo6H1gusdd8YNBv9/QvimCDaMpCB/1d
+         YbO5IyUhyN7Kq7bCJbIdNSoPZSbkUTMKrTT0Wn/BevaszCRnIiRbvm2OJN8HiZqMGTzy
+         QieynEBxncgHOwhVUHSV47IOz8haucr3kaDt5ldQ0EXWpEOvrSwofcXgfANtVyumpnGU
+         msxW/9/RmNhD65GnXUEIHSc4bCLjSRsS0tU88pdBHjMk1DjLYwrSYKSDI6MGfEu3Dw+2
+         qMeg==
+X-Gm-Message-State: AOJu0YxLAq5WN4eRL1qAPOAhlKxz1dbVOi6m55rfQpghOtake7Wv0VRc
+	ekQjQj2xAY/PsxOPrI0RzHQ+X/BtnLN5sc3mA01IUhpcch9v/nV9pQ641JrFZg==
+X-Google-Smtp-Source: AGHT+IFgxB0xmRcPBgUyJL72I2YQDnGZRrMzC2LF6+dllvtCE0U8JpF0s4du7/8eXY30bDYq8rdv/A==
+X-Received: by 2002:a05:6000:2c8:b0:33a:f521:7062 with SMTP id o8-20020a05600002c800b0033af5217062mr1762641wry.3.1706586719581;
+        Mon, 29 Jan 2024 19:51:59 -0800 (PST)
+Received: from Mindolluin.ire.aristanetworks.com ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id ay13-20020a5d6f0d000000b00337d6aa3912sm9513207wrb.10.2024.01.29.19.51.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 29 Jan 2024 19:51:58 -0800 (PST)
+From: Dmitry Safonov <dima@arista.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Dmitry Safonov <0x7f454c46@gmail.com>
+Cc: Dmitry Safonov <dima@arista.com>,
+	Mohammad Nassiri <mnassiri@ciena.com>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v2 0/3] selftests/net: A couple of typos fixes in key-management/rst tests
+Date: Tue, 30 Jan 2024 03:51:51 +0000
+Message-ID: <20240130-tcp-ao-test-key-mgmt-v2-0-d190430a6c60@arista.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240126063500.2684087-1-wenst@chromium.org> <20240126063500.2684087-2-wenst@chromium.org>
- <74b9f249-fcb4-4338-bf7b-8477de6c935c@linaro.org> <CAGXv+5Hu+KsTBd1JtnKcaE3qUzPhHbunoVaH2++yfNopHtFf4g@mail.gmail.com>
- <21568334-b21f-429e-81cd-5ce77accaf3c@linaro.org>
-In-Reply-To: <21568334-b21f-429e-81cd-5ce77accaf3c@linaro.org>
-From: Chen-Yu Tsai <wenst@chromium.org>
-Date: Tue, 30 Jan 2024 11:32:09 +0800
-Message-ID: <CAGXv+5HxXzjigN3Bp96vkv71WfTJ1S2b7Wgafc4GxLmhu6+jMg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
- SDIO Bluetooth
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org, 
-	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+X-Mailer: b4 0.13-dev-b6b4b
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1706586711; l=1089; i=dima@arista.com; s=20231212; h=from:subject:message-id; bh=mrSUsYr40vZLSd08HCa9ghUj2kZmeOFNxhdsAlHKBFc=; b=neGs9rbOA+EqGzLfMqyu3VFWcABDrXh0tWgdIRGzuXY3D1GWlihFguJm9kCKBjjMSM9vWnxAZ xt7XFjrr9fKA0St+JyMBuYUlSkQFRgyc0lvx0z3G+8M10EKps+dqft3
+X-Developer-Key: i=dima@arista.com; a=ed25519; pk=hXINUhX25b0D/zWBKvd6zkvH7W2rcwh/CH6cjEa3OTk=
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 29, 2024 at 3:34=E2=80=AFPM Krzysztof Kozlowski
-<krzysztof.kozlowski@linaro.org> wrote:
->
-> On 29/01/2024 04:38, Chen-Yu Tsai wrote:
->
-> >>> +allOf:
-> >>> +  - $ref: bluetooth-controller.yaml#
-> >>> +
-> >>> +properties:
-> >>> +  compatible:
-> >>> +    enum:
-> >>> +      - mediatek,mt7921s-bluetooth
-> >>
-> >> Can it be also WiFi on separate bus? How many device nodes do you need
-> >> for this device?
-> >
-> > For the "S" variant, WiFi is also on SDIO. For the other two variants,
-> > "U" and "E", WiFi goes over USB and PCIe respectively. On both those
-> > variants, Bluetooth can either go over USB or UART. That is what I
-> > gathered from the pinouts. There are a dozen GPIO pins which don't
-> > have detailed descriptions though. If you want a comprehensive
-> > binding of the whole chip and all its variants, I suggest we ask
-> > MediaTek to provide it instead. My goal with the binding is to document
-> > existing usage and allow me to upstream new device trees.
-> >
-> > For now we only need the Bluetooth node. The WiFi part is perfectly
-> > detectable, and the driver doesn't seem to need the WiFi reset pin.
-> > The Bluetooth driver only uses its reset pin to reset a hung controller=
-.
->
-> Then suffix "bluetooth" seems redundant.
+Changes in v2:
+- Dropped "selftests/net: Clean-up double assignment", going to send it
+  to net-next with other changes (Simon)
+- Added a patch to rectify RST selftests.
+- Link to v1: https://lore.kernel.org/r/20240118-tcp-ao-test-key-mgmt-v1-0-3583ca147113@arista.com
 
-I think keeping the suffix makes more sense though. The chip is a two
-function piece, and this only targets one of the functions. Also, the
-compatible string is already used in an existing driver [1] and
-soon-to-be in-tree device tree [2].
+Two typo fixes, noticed by Mohammad's review.
+And a fix for an issue that got uncovered.
 
+Signed-off-by: Dmitry Safonov <dima@arista.com>
+---
+Dmitry Safonov (2):
+      selftests/net: Rectify key counters checks
+      selftests/net: Repair RST passive reset selftest
 
-ChenYu
+Mohammad Nassiri (1):
+      selftests/net: Argument value mismatch when calling verify_counters()
 
-[1] https://elixir.bootlin.com/linux/latest/source/drivers/bluetooth/btmtks=
-dio.c#L1414
-[2] https://elixir.bootlin.com/linux/v6.8-rc1/source/arch/arm64/boot/dts/me=
-diatek/mt8183-kukui-jacuzzi-pico6.dts#L86
+ .../testing/selftests/net/tcp_ao/key-management.c  |  46 ++++---
+ tools/testing/selftests/net/tcp_ao/lib/sock.c      |  12 +-
+ tools/testing/selftests/net/tcp_ao/rst.c           | 138 ++++++++++++++-------
+ 3 files changed, 124 insertions(+), 72 deletions(-)
+---
+base-commit: ecb1b8288dc7ccbdcb3b9df005fa1c0e0c0388a7
+change-id: 20240118-tcp-ao-test-key-mgmt-bb51a5fe15a2
+
+Best regards,
+-- 
+Dmitry Safonov <dima@arista.com>
+
 
