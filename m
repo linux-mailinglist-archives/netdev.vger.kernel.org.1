@@ -1,82 +1,110 @@
-Return-Path: <netdev+bounces-67058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD10D841F52
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:24:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E6CF841FAA
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:36:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D7861F229DF
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:24:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B1A4B2BA7E
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:26:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF4D559169;
-	Tue, 30 Jan 2024 09:23:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BCA96086F;
+	Tue, 30 Jan 2024 09:25:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD1960DDB;
-	Tue, 30 Jan 2024 09:23:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63D4C59165;
+	Tue, 30 Jan 2024 09:25:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706606610; cv=none; b=Tk1fzszdgKYrUVDV3glKNW2AcqOioh8nYelJcUZ5qsvVrGfW0UDY7c34FYJ1V6/NOpn1OKy2VJkAw5fs8EqxPcf5LB1lfi+1Ms0w7ZeY291iZbRbHGWz/Hp3B2LaR9JPjQaQsWsNmyaDKGMfVFkJvFtfE0w8TUfNi6EmB8czHcI=
+	t=1706606758; cv=none; b=qFpWU07/70jXDkdgfRXux9gHgG5PUuH3XApbhn+LsIwVC9GhTDy9as8M4hCwFh5ciiyBMYzL8F8n/zZLzeLNg38/TxYX6qpLQzb1MtrARCaRkRix+ybph6Pn2198umM3HnxFpnrPrbexC0AsXdKWF0cH6Fl/m5YLw358EzdIiI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706606610; c=relaxed/simple;
-	bh=040hBLi3fQefc6K0iLapGpAkzbEy3B35S845VusT4+A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HhKwDPSJ/15aGyhecbJjUfwacCHK9OR4WnZpnGvmpG+DKNMpfTGNivEpr6QZhmfmJt1SN4SRLtLPK8k29KpchkrSTgGq/dYGcj8N5N9Ptzt/D7CD0+2sI1W0Cqri+53eeu6N3rKSlrBZ3dlzzu/UBjLVddxCD8EH92eub3/SG+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a354408e6bfso456341066b.1;
-        Tue, 30 Jan 2024 01:23:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706606607; x=1707211407;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OuijeB7kTKzPg88klh5RjExAWGmk5spjFKXjDZFHLFg=;
-        b=au3MXECgu+yARaByLeIonZbfHR/MruwGzjGiH8QUNKZV4E9nmRd53O7o8FUzCtQBFc
-         XmIygZPJOr9G64yVWtIYp+tg8sXGQqb1AoXu2N2Bx8i0R5DpM2gFesRmgmt/6+qstBI+
-         +JHsOX83vgokWnXt9Mu5ogOQo39AordnVGOTpAzyJXGXlEqdw44ehLa3UEUFsN6BFWE3
-         6AjydEA3iNjczO7NKtE4NZ/z3yqb3A8vP3VxPI7WcQczXPjj86m1pre18MGL0FguekBX
-         i5h/46r4Ck9vHxo3yG7lmRDHmedOBsFtNCK+4ObYxxzFCecAANqDlb/sFihcblBmUI1O
-         uJyA==
-X-Gm-Message-State: AOJu0Yy6rJ9S3inhYRFYyYVTvDyHikwCX9iLjtklfHMxQzKugFlpPXvv
-	2xd91bGrCRyC7ENcMJP2uwjvN+TsS83iLTvURfxx6dxTfR/qFbIj
-X-Google-Smtp-Source: AGHT+IELrXSVw+jDlDFKwJDA0VRFGH1LN4bAe38E5hOcm0xV2g9VuCNZHBnVvD4or/Q3DSewnlwObA==
-X-Received: by 2002:a17:906:1d42:b0:a35:15ea:3cc0 with SMTP id o2-20020a1709061d4200b00a3515ea3cc0mr874790ejh.26.1706606607259;
-        Tue, 30 Jan 2024 01:23:27 -0800 (PST)
-Received: from gmail.com (fwdproxy-cln-016.fbsv.net. [2a03:2880:31ff:10::face:b00c])
-        by smtp.gmail.com with ESMTPSA id ku17-20020a170907789100b00a32fb8e79e1sm4876258ejc.65.2024.01.30.01.23.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 01:23:27 -0800 (PST)
-Date: Tue, 30 Jan 2024 01:23:25 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Matthew Wood <thepacketgeek@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/8] net: netconsole: cleanup formatting lints
-Message-ID: <ZbjADdVvfHH2/yBa@gmail.com>
-References: <20240126231348.281600-1-thepacketgeek@gmail.com>
- <20240126231348.281600-2-thepacketgeek@gmail.com>
+	s=arc-20240116; t=1706606758; c=relaxed/simple;
+	bh=Q1D2Qua3GXjBcUCsDMqOLa6GLF12L1EvbvlN/oSCpQ4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gl9UZ9ByicC0xg9R6UZYUOh/jxSRXDtRjE7wSPBHoJbYs2U1MvKS2Oq2c9dSxO6W122l7Oul6X31eZFmGQbG/d29QXZqdtzc/Er7HDQNGgBavt5xN7Q1VuMFJ3qsnDFlWlhJBpUv5k2i3hW9gSUPF0RWYdmwhX/PLcg63V9zKh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 0bf179d996444cc293d435d5babfbdee-20240130
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.35,REQID:d687b045-17cd-48e7-8110-96ada6d493ec,IP:20,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:5
+X-CID-INFO: VERSION:1.1.35,REQID:d687b045-17cd-48e7-8110-96ada6d493ec,IP:20,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:5
+X-CID-META: VersionHash:5d391d7,CLOUDID:191bea7f-4f93-4875-95e7-8c66ea833d57,B
+	ulkID:240130172548ZPLOI4XG,BulkQuantity:0,Recheck:0,SF:66|38|24|17|19|44|1
+	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
+	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
+X-UUID: 0bf179d996444cc293d435d5babfbdee-20240130
+Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
+	(envelope-from <chentao@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1661973547; Tue, 30 Jan 2024 17:25:47 +0800
+Received: from mail.kylinos.cn (localhost [127.0.0.1])
+	by mail.kylinos.cn (NSMail) with SMTP id F413BE000EB9;
+	Tue, 30 Jan 2024 17:25:46 +0800 (CST)
+X-ns-mid: postfix-65B8C09A-7931421039
+Received: from kernel.. (unknown [172.20.15.213])
+	by mail.kylinos.cn (NSMail) with ESMTPA id 93986E000EB9;
+	Tue, 30 Jan 2024 17:25:43 +0800 (CST)
+From: Kunwu Chan <chentao@kylinos.cn>
+To: roopa@nvidia.com,
+	razor@blackwall.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: bridge@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Kunwu Chan <chentao@kylinos.cn>
+Subject: [PATCH net-next] net: bridge: Use KMEM_CACHE instead of kmem_cache_create
+Date: Tue, 30 Jan 2024 17:25:36 +0800
+Message-Id: <20240130092536.73623-1-chentao@kylinos.cn>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240126231348.281600-2-thepacketgeek@gmail.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 26, 2024 at 03:13:36PM -0800, Matthew Wood wrote:
-> Address checkpatch lint suggestions in preparation for later changes
-> 
-> Signed-off-by: Matthew Wood <thepacketgeek@gmail.com>
+commit 0a31bd5f2bbb ("KMEM_CACHE(): simplify slab cache creation")
+introduces a new macro.
+Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
+to simplify the creation of SLAB caches.
 
-Reviewed-by: Breno Leitao <leitao@debian.org>
+Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+---
+ net/bridge/br_fdb.c | 5 +----
+ 1 file changed, 1 insertion(+), 4 deletions(-)
+
+diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
+index c622de5eccd0..c77591e63841 100644
+--- a/net/bridge/br_fdb.c
++++ b/net/bridge/br_fdb.c
+@@ -35,10 +35,7 @@ static struct kmem_cache *br_fdb_cache __read_mostly;
+=20
+ int __init br_fdb_init(void)
+ {
+-	br_fdb_cache =3D kmem_cache_create("bridge_fdb_cache",
+-					 sizeof(struct net_bridge_fdb_entry),
+-					 0,
+-					 SLAB_HWCACHE_ALIGN, NULL);
++	br_fdb_cache =3D KMEM_CACHE(net_bridge_fdb_entry, SLAB_HWCACHE_ALIGN);
+ 	if (!br_fdb_cache)
+ 		return -ENOMEM;
+=20
+--=20
+2.39.2
+
 
