@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-67081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4517842041
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:58:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26477842046
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:58:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FE282845F0
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:58:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58F701C23B51
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:58:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4966A00B;
-	Tue, 30 Jan 2024 09:54:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA6E6A33D;
+	Tue, 30 Jan 2024 09:54:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="UMq2GsTl"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="fpYTEVlr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5361867E8E
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 09:54:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D15D76A333
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 09:54:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706608456; cv=none; b=Y6LMIAuH7PZFGi5TTmlPXSDoTEeQ1hmLFDmO2P1PhT5Q8GWr4Pa3zbBvwt9fC7WqoaKFYQz/wbB0lillqaM8WXmpSxJ74dBFufoIm8NeivD7OhIoiT7t17l9yrXFiS3Yggaumx3YnnW7ML4WmXv30h6mhsW2Tf0xePim0xKNKRs=
+	t=1706608473; cv=none; b=V7P5+G4MJdblCPvgL07Sj4+BRNTCcMbpFALaoB2mP4K1cXS/hdcgKcdXkXjBIVjjqEIJd7i62+agqSRxDp1BVJcxlXSy8VgeYZVnrdylzQ6TKumJCF0qyiSXmELfueD2w04NVgLEjjPHDhc8XKv69ZxTV1v96UPSDvRPMiBnVKE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706608456; c=relaxed/simple;
-	bh=WbNTg5mIuDPxbwAiWs4O2PNVCMYqhtbc+AFKIbjU9YE=;
+	s=arc-20240116; t=1706608473; c=relaxed/simple;
+	bh=tc884OSP1l5KwudD90FZD+f02qv4O+U7umLknapxXD8=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Sd/5Ex6kE7AcoHM/XJujalXhJMd3DiBmacDqvS4ULLticO7DtX2CMBmcAwsT/PyzTKcyzi4QPsswq+ifz8Qhm0WEn/St5QpGW87V5jsCGukCb9w94xOJL++aGObi34hYOusN5nKlZJBZdTFe4JsRdQO3xpkcEnFjWCygdgLbhLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=UMq2GsTl; arc=none smtp.client-ip=207.171.188.206
+	 MIME-Version:Content-Type; b=eqCT4UijE8Ih1EijAFBqfYoisD6PBQ7pqzhH1vw/2BNhDJkg/fZnEPejrWMlXkZLB+eB44OQ87juaEwFndnMtzmOcmYN+CMRVqX4IrcPeS25U28+JvmaCb/H9646qPrEcqfMCTUtUzAwRoKfY4MtFJWE28WI7RoysISK7PkIzKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=fpYTEVlr; arc=none smtp.client-ip=52.119.213.156
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1706608456; x=1738144456;
+  t=1706608472; x=1738144472;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=AOHM2cJ1bM613iSGC4IQPu8u0ZxSwuCtpMaQ0EYrFYY=;
-  b=UMq2GsTl4NEwLpkgkcR7AbzY0QDONgSfHHWOJNCkjfDI7kh5MWFuzKi6
-   P8kn/MXsVnHRdQMDJuX1Wdpi+xfexCH/pd/CNIBsWa3985J/6VPwarjIM
-   R3ePJzPbL6JC32MvhhYB4q9biJZU7HrlCZJGX1VwL8O/v2lG/4hM6d/0u
-   0=;
+  bh=Oj3xul//fd9knzMKifIN8C8QFDz93xbRDYm88s9cUhM=;
+  b=fpYTEVlrzGx8KG1jULA+vEqC5fBCsN7ULQ77YyzFWqM9jPTKTZlfuxD5
+   v91yUp9R6gRymME+GbN1OPPz0I443sGLOiMwzwJxvk4zl7r9vbABVCrsu
+   xUMokDm2NbN12AD+D3yIhPueiJo4zEmRrRhTj6y0ZIu44fvI8CQgN8hNd
+   4=;
 X-IronPort-AV: E=Sophos;i="6.05,707,1701129600"; 
-   d="scan'208";a="700756132"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-1box-2bm6-32cf6363.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2024 09:54:09 +0000
-Received: from smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan2.pdx.amazon.com [10.39.38.66])
-	by email-inbound-relay-pdx-1box-2bm6-32cf6363.us-west-2.amazon.com (Postfix) with ESMTPS id 764D4803B8;
-	Tue, 30 Jan 2024 09:54:08 +0000 (UTC)
-Received: from EX19MTAUEA002.ant.amazon.com [10.0.29.78:62635]
- by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.46.110:2525] with esmtp (Farcaster)
- id 5ae768a1-cef2-46d4-8ba9-c39c7bf6eef1; Tue, 30 Jan 2024 09:54:07 +0000 (UTC)
-X-Farcaster-Flow-ID: 5ae768a1-cef2-46d4-8ba9-c39c7bf6eef1
-Received: from EX19D008UEC002.ant.amazon.com (10.252.135.242) by
- EX19MTAUEA002.ant.amazon.com (10.252.134.9) with Microsoft SMTP Server
+   d="scan'208";a="630821189"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-fad5e78e.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2024 09:54:29 +0000
+Received: from smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev (pdx2-ws-svc-p26-lb5-vlan3.pdx.amazon.com [10.39.38.70])
+	by email-inbound-relay-pdx-2c-m6i4x-fad5e78e.us-west-2.amazon.com (Postfix) with ESMTPS id 1039FA0466;
+	Tue, 30 Jan 2024 09:54:28 +0000 (UTC)
+Received: from EX19MTAUEB002.ant.amazon.com [10.0.0.204:5415]
+ by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.32.35:2525] with esmtp (Farcaster)
+ id c53ae584-da6b-439e-ade0-b420c1ab517d; Tue, 30 Jan 2024 09:54:27 +0000 (UTC)
+X-Farcaster-Flow-ID: c53ae584-da6b-439e-ade0-b420c1ab517d
+Received: from EX19D008UEA002.ant.amazon.com (10.252.134.125) by
+ EX19MTAUEB002.ant.amazon.com (10.252.135.47) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 30 Jan 2024 09:54:07 +0000
+ 15.2.1118.40; Tue, 30 Jan 2024 09:54:12 +0000
 Received: from EX19MTAUEA001.ant.amazon.com (10.252.134.203) by
- EX19D008UEC002.ant.amazon.com (10.252.135.242) with Microsoft SMTP Server
+ EX19D008UEA002.ant.amazon.com (10.252.134.125) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Tue, 30 Jan 2024 09:54:06 +0000
+ 15.2.1118.40; Tue, 30 Jan 2024 09:54:11 +0000
 Received: from dev-dsk-darinzon-1c-05962a8d.eu-west-1.amazon.com
  (172.19.80.187) by mail-relay.amazon.com (10.252.134.102) with Microsoft SMTP
- Server id 15.2.1118.40 via Frontend Transport; Tue, 30 Jan 2024 09:54:05
+ Server id 15.2.1118.40 via Frontend Transport; Tue, 30 Jan 2024 09:54:09
  +0000
 From: <darinzon@amazon.com>
 To: "Nelson, Shannon" <shannon.nelson@amd.com>, David Miller
@@ -79,9 +79,9 @@ CC: David Arinzon <darinzon@amazon.com>, "Woodhouse, David" <dwmw@amazon.com>,
 	"Abboud, Osama" <osamaabb@amazon.com>, "Ostrovsky, Evgeny"
 	<evostrov@amazon.com>, "Tabachnik, Ofir" <ofirt@amazon.com>, "Koler, Nati"
 	<nkoler@amazon.com>
-Subject: [PATCH v2 net-next 03/11] net: ena: Minor cosmetic changes
-Date: Tue, 30 Jan 2024 09:53:45 +0000
-Message-ID: <20240130095353.2881-4-darinzon@amazon.com>
+Subject: [PATCH v2 net-next 04/11] net: ena: Enable DIM by default
+Date: Tue, 30 Jan 2024 09:53:46 +0000
+Message-ID: <20240130095353.2881-5-darinzon@amazon.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240130095353.2881-1-darinzon@amazon.com>
 References: <20240130095353.2881-1-darinzon@amazon.com>
@@ -97,51 +97,43 @@ Precedence: Bulk
 
 From: David Arinzon <darinzon@amazon.com>
 
-A few changes for better readability and style
+Dynamic Interrupt Moderation (DIM) is a technique
+designed to balance the need for timely data processing
+with the desire to minimize CPU overhead.
+Instead of generating an interrupt for every received
+packet, the system can dynamically adjust the rate at
+which interrupts are generated based on the incoming
+traffic patterns.
 
-1. Adding / Removing newlines
-2. Removing an unnecessary and confusing comment
-3. Using an existing variable rather than re-checking a field
+Enabling DIM by default to improve the user experience.
 
-Signed-off-by: Shay Agroskin <shayagr@amazon.com>
+DIM can be turned on/off through ethtool:
+`ethtool -C <interface> adaptive-rx <on/off>`
+
 Signed-off-by: Arthur Kiyanovski <akiyano@amazon.com>
+Signed-off-by: Osama Abboud <osamaabb@amazon.com>
 Signed-off-by: David Arinzon <darinzon@amazon.com>
 ---
- drivers/net/ethernet/amazon/ena/ena_netdev.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/amazon/ena/ena_netdev.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-index 1c0a782..d68d081 100644
+index d68d081..0b7f94f 100644
 --- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
 +++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-@@ -2197,8 +2197,6 @@ void ena_down(struct ena_adapter *adapter)
- 	/* After this point the napi handler won't enable the tx queue */
- 	ena_napi_disable_in_range(adapter, 0, io_queue_count);
- 
--	/* After destroy the queue there won't be any new interrupts */
--
- 	if (test_bit(ENA_FLAG_TRIGGER_RESET, &adapter->flags)) {
- 		int rc;
- 
-@@ -3226,7 +3224,7 @@ static void ena_destroy_device(struct ena_adapter *adapter, bool graceful)
- 	if (!graceful)
- 		ena_com_set_admin_running_state(ena_dev, false);
- 
--	if (test_bit(ENA_FLAG_DEV_UP, &adapter->flags))
-+	if (dev_up)
- 		ena_down(adapter);
- 
- 	/* Stop the device from sending AENQ events (in case reset flag is set
-@@ -4040,8 +4038,8 @@ static void __ena_shutoff(struct pci_dev *pdev, bool shutdown)
- 		free_irq_cpu_rmap(netdev->rx_cpu_rmap);
- 		netdev->rx_cpu_rmap = NULL;
- 	}
--#endif /* CONFIG_RFS_ACCEL */
- 
-+#endif /* CONFIG_RFS_ACCEL */
- 	/* Make sure timer and reset routine won't be called after
- 	 * freeing device resources.
+@@ -2134,6 +2134,12 @@ int ena_up(struct ena_adapter *adapter)
  	 */
+ 	ena_init_napi_in_range(adapter, 0, io_queue_count);
+ 
++	/* Enabling DIM needs to happen before enabling IRQs since DIM
++	 * is run from napi routine
++	 */
++	if (ena_com_interrupt_moderation_supported(adapter->ena_dev))
++		ena_com_enable_adaptive_moderation(adapter->ena_dev);
++
+ 	rc = ena_request_io_irq(adapter);
+ 	if (rc)
+ 		goto err_req_irq;
 -- 
 2.40.1
 
