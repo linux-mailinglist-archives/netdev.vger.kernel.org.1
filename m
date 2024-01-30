@@ -1,148 +1,79 @@
-Return-Path: <netdev+bounces-67309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFD4B842B4D
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 18:57:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 987CA842B85
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 19:14:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F39E1C2538A
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 17:57:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9C201C21699
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 18:14:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 110DD157052;
-	Tue, 30 Jan 2024 17:56:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17CDA157039;
+	Tue, 30 Jan 2024 18:14:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p8j0BtX5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U5NPn6JQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4306151CC4;
-	Tue, 30 Jan 2024 17:56:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E90BB155301
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 18:14:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706637404; cv=none; b=tBiqcvqNjttQ89WR8+05K3//HciE1F3OISQQuimiQpiP8MUdcyJAHNVgEWe/SFIS7ULMCKazEtSa7dvi3FEXRYWfy3H9KN+7kzcELSHnOlVr5YGs029gKt9F4JzuMU7z+thiSXZ1mX1bd4313L8JEbJTdxNUULNTSDBm0YgfLrs=
+	t=1706638465; cv=none; b=FijpzgflDye2mGI1teVsi0BScDFleLf/0tJjqu9d89LY2/dNj/cBIPPTUwscKd1c+62Fu+Ha/wHU95GT/KG/5xaUZ7Y+hO9JPKs5xXOaQZcYUX+xaI+J9njK0jI32JKQ0tIsYkMKyk+dGjT8BBkQ4EdPQ9s6XW+NLpXGJqEYzV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706637404; c=relaxed/simple;
-	bh=Yb/9/lIzuxOAl9LlxJ374p+pZ3mV2yczBgo+ljHDeKY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SV6joVV8p6ZmKVCgiKzwoUodDrsvC26JyzCHUQFKrdZS4fnfcxKHQk4sWEB99Kbtj9kM9RMGukUvCEt/VLrld8UHlJz4PPPSNEkE/5A6D343m/3TwpMe+rqyO/6XQWC4RYnKm8Taiq0XIIGEja7/sCzPyzCBvInGBlT0/FeZOJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p8j0BtX5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 213FDC433F1;
-	Tue, 30 Jan 2024 17:56:39 +0000 (UTC)
+	s=arc-20240116; t=1706638465; c=relaxed/simple;
+	bh=QmksvwCbuPYPOR50xYuWthfMcn659oC5po7QPV0xwiE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bQxZZ+1VdLdHxacLDm13yLcHDyz5U69io2iOT/7Vr5cWZYglN0wZDGnrCRORL2Pw5g+zabMDR742OTvN1tePv5A3QLqMQo9SG+uvRMUr8b5OLEMUUr4VRI9VGpjd4AfZz4aIba/UpIiazdbs2pv3DJU4miZJSFqb3oRPlZ5uUCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U5NPn6JQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36910C433F1;
+	Tue, 30 Jan 2024 18:14:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706637403;
-	bh=Yb/9/lIzuxOAl9LlxJ374p+pZ3mV2yczBgo+ljHDeKY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=p8j0BtX5Ynuq9zhz1R1Jsk79RG7Ky6/WW0lNaSGJ5412sUUM30tUeQcFaqWTZsvUP
-	 pDUK56hdOmF1huF/uLh4VEn1YdBlLGGsCZMxhjItgfeC9j2Ivt9MSMcEh/wSGlx9mm
-	 AAhFS/PSndmNl2f19w6ZEYwmmbNiRdGHabYj04on/IcUZpidIXeAFLN1pnBLeJTpb8
-	 mCTgDCIktuAXwgI+ZfMFNezKxN8uSqHAnEPmoA35zMvGjgb2d4CcsxiVLEGs8VlWWk
-	 CMG6blBzxWOgVKyJbC8x+2ecvhEqgJXE/YMOmyNUDjEbLmgvYqi+eY32uZ8869uscO
-	 8PtjDa4L4Vuzg==
-Date: Tue, 30 Jan 2024 17:56:37 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Bastien Curutchet <bastien.curutchet@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Herve Codina <herve.codina@bootlin.com>
-Subject: Re: [PATCH 1/2] dt-bindings: net: Add TI DP83640
-Message-ID: <20240130-impulsive-widow-9142a069b7fd@spud>
-References: <20240130085935.33722-1-bastien.curutchet@bootlin.com>
- <20240130085935.33722-2-bastien.curutchet@bootlin.com>
+	s=k20201202; t=1706638464;
+	bh=QmksvwCbuPYPOR50xYuWthfMcn659oC5po7QPV0xwiE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=U5NPn6JQnOe2eXHLwIUJRdJeTGxOtUw/tKl0BZm3RTH4NR0W5/kdZYq5rPL4K7XAz
+	 8RktAo3Aoy+82l0pBzQJ5q6Ia3PqQ440FbWIMdnNsrJQxHJhz5F0wcqlsjPSa46bLV
+	 oYfoj3lhGe9fqayd9aJj5M59pJNAYUs612GOqTNGNBlxjFRUh6lKMnAHuasdzHDaP9
+	 ooonDrRNXtwXZe5urDRKNcaNRImJup4lPhbCyrGDIvvH7alUDBBiGrm3ErQmH5A30j
+	 YC6O/sCWRIm3IfHFtoq3xuq6X4DJBoc30O7iLV5o8tAZjtduzMf0DVqJd9ugkma8ho
+	 Pc2TJDf5pxqfQ==
+Date: Tue, 30 Jan 2024 10:14:23 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Petr Machata <petrm@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, Ido Schimmel
+ <idosch@idosch.org>
+Subject: Re: [PATCH net-next] selftests: forwarding: Add missing config
+ entries
+Message-ID: <20240130101423.45b0e1c1@kernel.org>
+In-Reply-To: <ZbkIFrruZO5DXODm@nanopsycho>
+References: <025abded7ff9cea5874a7fe35dcd3fd41bf5e6ac.1706286755.git.petrm@nvidia.com>
+	<ZbkIFrruZO5DXODm@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Y5GnecSt1OF2hlII"
-Content-Disposition: inline
-In-Reply-To: <20240130085935.33722-2-bastien.curutchet@bootlin.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Tue, 30 Jan 2024 15:30:46 +0100 Jiri Pirko wrote:
+> For me, all tests end up with:
+> SKIP: Cannot create interface. Name not specified
+> 
+> Do I miss some config file? If yes, can't we have some default testing
+> ifnames in case the config is not there?
 
---Y5GnecSt1OF2hlII
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Thanks for bringing this up... I forgot to
 
-Hey,
+  cp forwarding.config.sample forwarding.config
 
-On Tue, Jan 30, 2024 at 09:59:34AM +0100, Bastien Curutchet wrote:
-> +description: |
-> +  The DP83640 Precision PHYTER device delivers the highest level of precision
-
-This is not a marketing document.
-
-> +  clock synchronization for real time industrial connectivity based on the
-> +  IEEE 1588 standard. The DP83640 has deterministic, low latency and allows
-> +  choice of microcontroller with no hardware customization required
-> +
-> +  This device interfaces directly to the MAC layer through the
-> +  IEEE 802.3 Standard Media Independent Interface (MII), or Reduced MII (RMII).
-> +
-> +  Specifications about the Ethernet PHY can be found at:
-> +    https://www.ti.com/lit/gpn/dp83640
-> +
-> +properties:
-> +  reg:
-> +    maxItems: 1
-> +
-> +  ti,clk-output:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    enum: [0, 1]
-> +    description: |
-> +      If present, enables or disables the CLK_OUT pin.
-> +      CLK_OUT pin disabling can also be strapped. If the strap pin is not set
-> +      correctly or not set at all then this can be used to configure it.
-> +       - 0     = CLK_OUT pin disabled
-> +       - 1     = CLK_OUT pin enabled
-> +       - unset = Configured by straps
-
-If you are providing a clock, why is there no clock-controller property
-here? I don't think the 3-way nature of this property is needed, if you
-make this a "real" clock controller.
-
-> +  ti,fiber-mode:
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    enum: [0, 1]
-> +    description: |
-> +      If present, enables or disables the FX Fiber Mode.
-> +      Fiber mode support can also be strapped. If the strap pin is not set
-> +      correctly or not set at all then this can be used to configure it.
-> +       - 0     = FX Fiber Mode disabled
-> +       - 1     = FX Fiber Mode enabled
-> +       - unset = Configured by straps
-
-I don't like these properties that map meanings onto numbers. We can
-have enums of strings in bindings that allow you to use something more
-meaningful than "0" or "1".
-
-Cheers,
-Conor.
-
-
---Y5GnecSt1OF2hlII
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZbk4VQAKCRB4tDGHoIJi
-0sc9AP9/5gdJl8glaf7X/USWmsQy+VhIxi9nZrUhkpklLAx09gEAs00QJHIiHRDu
-j51c3BLSHaUypla7gPW7LWlopEKQeAs=
-=Zij8
------END PGP SIGNATURE-----
-
---Y5GnecSt1OF2hlII--
+an embarrassing number of times. +1 for printing a warning and using
+the sample if forwarding.config does not exist.
 
