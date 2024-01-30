@@ -1,63 +1,57 @@
-Return-Path: <netdev+bounces-67207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51A3A842597
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 13:58:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B9F8784259A
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 13:58:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06D861F2100E
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 12:58:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FCD11F2432A
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 12:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFB4D6A32E;
-	Tue, 30 Jan 2024 12:57:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D22D6BB24;
+	Tue, 30 Jan 2024 12:57:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s7vP0MFo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rDhKELIF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A421F4C66;
-	Tue, 30 Jan 2024 12:57:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 359226A329;
+	Tue, 30 Jan 2024 12:57:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706619437; cv=none; b=IagVBR+kBc5t5rgpWYABnlXRnIojrlZtKEFfkY44VPN4OzsMVe4p9s87DFyAc4u+IE0g4cWxEDplfLwlsJDOX8wSdlQPjY1Dt1cn+k9CkS2LJ0FWNmO6OwYVvRzWUgHu8iXhEC1zfriqbVmpxA+JJ5uYmGHpv8MOueAfevjLPEE=
+	t=1706619459; cv=none; b=pjWAfh+Om0JlemZ26muwgVpD2Ny0DITQM7qjnMhhkvns/jpEKBc0R1jCQtY9kkexmIPJ6RrUM2tG1A+AddJ1CwJcydWndBOKa6Jdl67Unyu4llLL/bwgETWDI3EeUCUzNJhNEmBxKOndi6Cda/QPZimqfBKc/qBhivuVZUuvAZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706619437; c=relaxed/simple;
-	bh=RLq+PicEDTzjiLNQB2XRMMs5TR7fW5zSMDN54swDxCA=;
+	s=arc-20240116; t=1706619459; c=relaxed/simple;
+	bh=0I6bP8y3LQnOILvJKi2xaaxW9feNtDCmHiZomlMRo/Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=poVhUQAlNucJ30Z+dEBdeYXhQPo7hmiobOAnm0tLnqBj0/DOqE/I0Gq+Vz25JAjkbxQ+lFL5FrLvsKApxtRVYfjJZqlp2I4gvwz3ZmKi3KCuORZglGdFI4RXCOhXIXJRR+GVuRseYUbzq91MP3n6IYSGefCD5S/scjUBQnsxDxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s7vP0MFo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB731C433C7;
-	Tue, 30 Jan 2024 12:57:11 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=njLr56+X3l4+SHoktOdC4OwnjS1KIMX7fh2rlLd4UCpClgcE18FRb6Hg341F8P4LsQnmBmCXLaAczSnPkh9DQAan7YumPlXfPeHq/q1JD9oR6sf6bEcGcibRY32hR9Am0ns0t07IOn3hBDnUDchfNL9YER9BDHFo5c7gCOwFL3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rDhKELIF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4DA24C433F1;
+	Tue, 30 Jan 2024 12:57:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706619437;
-	bh=RLq+PicEDTzjiLNQB2XRMMs5TR7fW5zSMDN54swDxCA=;
+	s=k20201202; t=1706619458;
+	bh=0I6bP8y3LQnOILvJKi2xaaxW9feNtDCmHiZomlMRo/Q=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s7vP0MFoPuw4xlo8+GN2ohMGsCvXPn3HC4e1QRIlxPxROwzG3NrQmgHMgUvo+b7xg
-	 7ofb3OWzi7o0p5zrfQghzNNsd8pkonH8yBs8J2DmzMbnxCrLF++D/FijNrqWpI6VMy
-	 t8sifa+UKcdDUBTSg3FojXP8k2jKVC/AjScikAr8GbJa1xQXYiiafTCog6PgczmprS
-	 bMMlt/kCRgWOjdlVeTHCjwRAKwXZDJY19M2tjzOnnKwcC8hNdKyBschxI9nQoSOUb1
-	 uG4NtOdtWCrAAevU5Ab/5SfY4MBK/sdeOYXV8jDgvGsQIBF9KN5wt09hMgT9X6VD3t
-	 nKEDJZVHdmeUA==
-Date: Tue, 30 Jan 2024 12:57:08 +0000
+	b=rDhKELIFiY9SstQVult3F/fZGQh66KAO4a9xDBfX5580dC6kRfPBTPE7D4L/GPwg5
+	 L9blUdhIPsDQ+0PNSrmkee5G02x5I/FDuYA8K4nnIte2XYMlR4Y9CffY4gPGXDCS/0
+	 XhsyCKDxOxaxSK0LCN3iIK2IbR857LTRgbB9MkpMRdxiTkDlrBR0HXclQzybvUUgwT
+	 +CGbrBtGJrYV4Db1j5ddN80FerCL4Me/Ptn9bwmEz4e1PQXN5SKHbP6QkiN59aRgjO
+	 WRlCxLg82VkmUvxUnLo1BqyspMCO2OhFZ8pMv5VHWuxaT+/zklWwR3Uj7O572TNKLG
+	 wdB7RaiZNsGsg==
+Date: Tue, 30 Jan 2024 12:57:32 +0000
 From: Simon Horman <horms@kernel.org>
 To: Breno Leitao <leitao@debian.org>
 Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	edumazet@google.com, Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Ravi Gunasekaran <r-gunasekaran@ti.com>,
-	Roger Quadros <rogerq@kernel.org>, dsahern@kernel.org,
-	weiwan@google.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-	Alex Elder <elder@linaro.org>, Rob Herring <robh@kernel.org>,
-	"open list:TI ETHERNET SWITCH DRIVER (CPSW)" <linux-omap@vger.kernel.org>
-Subject: Re: [PATCH net 06/10] net: fill in MODULE_DESCRIPTION()s for
- cpsw-common
-Message-ID: <20240130125708.GE351311@kernel.org>
+	edumazet@google.com, Dariusz Marcinkiewicz <reksio@newterm.pl>,
+	dsahern@kernel.org, weiwan@google.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 07/10] net: fill in MODULE_DESCRIPTION()s for ec_bhf
+Message-ID: <20240130125732.GF351311@kernel.org>
 References: <20240125193420.533604-1-leitao@debian.org>
- <20240125193420.533604-7-leitao@debian.org>
+ <20240125193420.533604-8-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,14 +60,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240125193420.533604-7-leitao@debian.org>
+In-Reply-To: <20240125193420.533604-8-leitao@debian.org>
 
-On Thu, Jan 25, 2024 at 11:34:16AM -0800, Breno Leitao wrote:
+On Thu, Jan 25, 2024 at 11:34:17AM -0800, Breno Leitao wrote:
 > W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-> Add descriptions to the TI CPSW switch module.
+> Add descriptions to the Beckhoff CX5020 EtherCAT Ethernet driver.
 > 
 > Signed-off-by: Breno Leitao <leitao@debian.org>
-> Reviewed-by: Roger Quadros <rogerq@kernel.org>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
