@@ -1,119 +1,154 @@
-Return-Path: <netdev+bounces-66976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64E0D841A6C
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 04:22:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33035841A73
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 04:22:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20F77283F35
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:22:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 641981C22FA8
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:22:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4487A376FC;
-	Tue, 30 Jan 2024 03:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16727374EE;
+	Tue, 30 Jan 2024 03:22:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="J5ChalmO"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="VlycspZF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0341C374F6
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 03:20:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A05B36AF6
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 03:22:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706584827; cv=none; b=cstk7H+HCw1jYiB5OJKnXT5Im78g20hcRE/Waeq23Mwkjijdxz1O1HRMJPENgaUm0zVUDGWeotzAyxhsu10JTxghyA6QAoSS8BCMIt5LVau01LRoMbGs/qxS2ODToILi5Ie1M/LTQ4Ug0j/AW7ghP9+uVSrFFwXJXQtODWEX1GM=
+	t=1706584933; cv=none; b=Ozmqw6qJAjlLRXrpuVsQdazuCB9k/UW58rcRsTkKYLxCb5JrtrWziR7BtDMSgT/baUBXiobdZc0L5i62/N39I8qGf1zhLI2DiRY2iQlWKiloLNyTLobVj+ZDz1LAXO/RcdIA9BdvDqQ02TxN8CyLp6cqvywipOQX2vGNFJTcMXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706584827; c=relaxed/simple;
-	bh=d9WP4hd/Fgxj42lnIKM1zOhi36+ZV09aVbpyPYfs59I=;
+	s=arc-20240116; t=1706584933; c=relaxed/simple;
+	bh=hTM78LElmEuXY/I156Tkd5M/VZBKoB4TqBIat3HtxZg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qvuT2rnhVcPqe2M4Fq2HIKRrHqS2sKG0qpy94uOtZUvzzCs+c6wdsBNoRtGYnC3TY1xIOQlAM9Q16Z8UZTtj/82sDb5xAl0OrE7OdlXInrFepEP/41WZav4F3oVR2vek943WB4jxya+SoUKc88Fcw1GLUxSeorHY6FpnGmwaSu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=J5ChalmO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706584824;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d9WP4hd/Fgxj42lnIKM1zOhi36+ZV09aVbpyPYfs59I=;
-	b=J5ChalmOheO/JWEFdCKNhtk5aQsMsRPGxeL6E5Gfz1lgokBKUAC24/V7F+r5bWoxFJ9CCU
-	s/pbIzhzYR4edV8N0nELTXO2kBFP0sR8qGDx1VDinxFGA9BQerDUzhf/iL47HGWkWG55TB
-	Im+i2pUFDR+vTKxX/btRKLcKSYIWj5Y=
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
- [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-687-MmVMx3W2P4CKzCQ6wIwKbQ-1; Mon, 29 Jan 2024 22:20:22 -0500
-X-MC-Unique: MmVMx3W2P4CKzCQ6wIwKbQ-1
-Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-3bddadbc2bbso5016583b6e.1
-        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 19:20:22 -0800 (PST)
+	 To:Cc:Content-Type; b=kW+9zmvvy2vF0KNZbbq5PS0+UW/1OHqR1Pim8mg0JLWM9EPGg6xUsAOQAhx4Tmxe/J1P/sTZN1QahPNZS4yJi9aLR56H9YWvM8ML2nexWcLCBu/TeG/aDe9DWGwE2TTAzPvkTyGFPqlEB5LlCkdpWfiFXjcht9f8AnBMyaX8q6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=VlycspZF; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-510221ab3ebso4717158e87.1
+        for <netdev@vger.kernel.org>; Mon, 29 Jan 2024 19:22:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1706584929; x=1707189729; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vFwOvzgohKdirNbIQVbbIr9nG1jrmQvUigB0XE0d7lE=;
+        b=VlycspZF9U+pqCjuAfhZT+VdlYVMohpMPbegNnwRPV7vYzo8qUWE6TOgeziMV3iHlU
+         /KIme31s9sAk1E8/OODSkaWGrS2wSQdADAW3cfPxYNRKp4Xfb2wPgT8lBJ4gqYJgqpS/
+         oSGAR5ppJ2/cm4CCo7t8edCSoK6wJ/bmcRwK0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706584822; x=1707189622;
+        d=1e100.net; s=20230601; t=1706584929; x=1707189729;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=d9WP4hd/Fgxj42lnIKM1zOhi36+ZV09aVbpyPYfs59I=;
-        b=KNtCoSaYWFl9A7kSBUdiqBSWyZUKx3ALpjY6u0DZiu8t6p3TzSTl3Y3jPT/3PKDSsJ
-         BwVxKLHdc+IealY8oW6LmVvplEUzalNGr3K6gHSKmperGjRIV3CkwCSwVooFX37M6l+B
-         yYeWHiJnPeuIPRrgk7SvieoReKd4SJc/GWaxQm1fZNm84wfLNwFQxo81HVJpSLayvmNk
-         1fhGFo+3bBALHuWtEbiDxmxvbgZ7PT7fNw7hw4VaaV2LaRIiJx8a8Kxhex4v5+YAu4RX
-         nVLqnqd8XYhco20E/8T/k83ESiQcBBuz401qQ4r4uc8HW4WlOcN+ncsP18pKUzoqsS0t
-         5sLA==
-X-Gm-Message-State: AOJu0YwYATvU2orwmYVY5c+3yAyZsO3DV0PGnjl/sXaD490iW8ccZHVx
-	X9LMXwmIvDsPQjeQJKYPYI98eaUVQZy6hR8M+dY7YngcswGHz1surH5ywWZ2sWLSe7Pdj+3bxY3
-	V7ywh6it1nbP7P57SM9BC4XBL+Y1ESWAOYzDN5wrIhqgmidN382JUhH7v6zS0XC3N2YvTKMMWgk
-	BBFxmqtK+S9aYZsyF54IZOWKNl4cL8
-X-Received: by 2002:a05:6808:1154:b0:3bd:c08d:91f6 with SMTP id u20-20020a056808115400b003bdc08d91f6mr8998035oiu.29.1706584822075;
-        Mon, 29 Jan 2024 19:20:22 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHuZW0m1kap/LxF2wEFM1hvLV2SMn42n3fITC1r2n7f5Wmal4bhgCfEoA8SCfS1utE4NY7HHhgI/uSaJBfNbvo=
-X-Received: by 2002:a05:6808:1154:b0:3bd:c08d:91f6 with SMTP id
- u20-20020a056808115400b003bdc08d91f6mr8998027oiu.29.1706584821857; Mon, 29
- Jan 2024 19:20:21 -0800 (PST)
+        bh=vFwOvzgohKdirNbIQVbbIr9nG1jrmQvUigB0XE0d7lE=;
+        b=evOdL5i4ePb6L+lFQovJ+CTshg9pgod9fvKuh/6XxFLnqzYtr5G/pWSzy1swnSYcu1
+         k6I4yG1q+tX2DzteogMpwe6oK7P2ca5tmdlqdbAX9EJUdFJst+6TOyd0Vyg4mNaltAtC
+         /RQOyUpM2Vf0pBB2D0Qk8rBNJKBiDyjXgIfyez4s3sZ0v7fQdZ+SrnYTJO0TjwyVaSSY
+         NVZhvqGmqgpH1DQSlAXOPz8YsnsfXka7hfjjP8Mjirm1VwPXIFZCmN/AZIBSCxFFwuIc
+         AtFdN1JT2R+SJDtDbowekIaXuHzMynAiD0YZOeOTR2ku8JPDYo21e1O/wOvW8cI9iQBV
+         jyYw==
+X-Gm-Message-State: AOJu0YzTBn7AMPq7A9JKQQUQqdRm2C7yDMj9jWNT6++8SAgqDsjdwc8P
+	Q73gGjwqL1oMQEafuUBKjojEKwBjsuZNgxWZsIz1ThJTdOxWiFUfLVqKq3U3IDtz7TUX3Gwf3yU
+	ABpQayUlh82x3HlbH7KKAk7PbRnvoHyPqzqW3
+X-Google-Smtp-Source: AGHT+IEL+eB3YpLwGh9C//tICADm74yD1KdefrBuKQSDktUlLhN43MqFdTiiqm0CjqgVnyYHjaOuXC+S0wL0bQ0K82Y=
+X-Received: by 2002:a05:6512:3054:b0:511:150f:6363 with SMTP id
+ b20-20020a056512305400b00511150f6363mr2506060lfb.32.1706584929429; Mon, 29
+ Jan 2024 19:22:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20231226073103.116153-1-xuanzhuo@linux.alibaba.com> <1705384540.169184-2-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1705384540.169184-2-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 30 Jan 2024 11:20:10 +0800
-Message-ID: <CACGkMEsOs5L6eU==Vym_AkomvhhkHN0O_G9SaPFThAtH9XVyJQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 0/6] virtio-net: support device stats
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	virtualization@lists.linux.dev, Zhu Yanjun <yanjun.zhu@linux.dev>, 
-	netdev@vger.kernel.org
+References: <20240126063500.2684087-1-wenst@chromium.org> <20240126063500.2684087-3-wenst@chromium.org>
+ <2c37a716-e4bb-4db3-a95f-a40e05b28cad@molgen.mpg.de>
+In-Reply-To: <2c37a716-e4bb-4db3-a95f-a40e05b28cad@molgen.mpg.de>
+From: Chen-Yu Tsai <wenst@chromium.org>
+Date: Tue, 30 Jan 2024 11:21:58 +0800
+Message-ID: <CAGXv+5H_Rmy1-38xhG48RWW8B9a4K3P0UO=ThUFYjc8T6WT2OA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/2] arm64: dts: mediatek: mt8183-pico6: Fix bluetooth node
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	Angelo Gioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 16, 2024 at 1:56=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
->
-> On Tue, 26 Dec 2023 15:30:57 +0800, Xuan Zhuo <xuanzhuo@linux.alibaba.com=
+On Tue, Jan 30, 2024 at 12:31=E2=80=AFAM Paul Menzel <pmenzel@molgen.mpg.de=
 > wrote:
-> > As the spec:
+>
+> Dear Chen-Yu,
+>
+>
+> Thank you for your patch.
+>
+> Am 26.01.24 um 07:34 schrieb Chen-Yu Tsai:
+> > Bluetooth is not a random device connected to the MMC/SD controller. It
+> > is function 2 of the SDIO device.
 > >
-> > https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bb=
-bd243291ab0064f82
+> > Fix the address of the bluetooth node. Also fix the node name and drop
+> > the label.
+>
+> Excuse my ignorance: Is this a cosmetic fix or does it fix the device
+> somehow?
+
+It's a cosmetic change, since the driver already searches the whole device
+tree for the specific compatible string. However it also fixes the device
+tree description to match the actual hardware.
+
+> > Fixes: 055ef10ccdd4 ("arm64: dts: mt8183: Add jacuzzi pico/pico6 board"=
+)
+> > Signed-off-by: Chen-Yu Tsai <wenst@chromium.org>
+> > Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@coll=
+abora.com>
+> > ---
+> > Changes since v1:
+> > - Collected reviewed-by
 > >
-> > The virtio net supports to get device stats.
+> >   arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts | 3 ++-
+> >   1 file changed, 2 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dt=
+s b/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts
+> > index a2e74b829320..6a7ae616512d 100644
+> > --- a/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts
+> > +++ b/arch/arm64/boot/dts/mediatek/mt8183-kukui-jacuzzi-pico6.dts
+> > @@ -82,7 +82,8 @@ pins-clk {
+> >   };
+> >
+> >   &mmc1 {
+> > -     bt_reset: bt-reset {
+> > +     bluetooth@2 {
+> > +             reg =3D <2>;
 >
-> Hi Jason,
+> To avoid confusion, would it be possible to use sdio as a =E2=80=9Cname=
+=E2=80=9D.
+
+Not sure where the confusion is. Bluetooth is the functionality this
+SDIO function provides.
+
+ChenYu
+
 >
-> Any comments for this?
+> >               compatible =3D "mediatek,mt7921s-bluetooth";
+> >               pinctrl-names =3D "default";
+> >               pinctrl-0 =3D <&bt_pins_reset>;
 >
-> Thanks
 >
-
-I see comments from both Simon and Michael, let's try to address them
-and I will review v2.
-
-Does this sound good to you?
-
-Thanks
-
+> Kind regards,
+>
+> Paul
 
