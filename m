@@ -1,74 +1,89 @@
-Return-Path: <netdev+bounces-67040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70EEB841EC7
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:07:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26295841EF6
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:13:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDAB41F2BDE4
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:07:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D126D289BCC
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:13:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 141D767738;
-	Tue, 30 Jan 2024 09:04:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F28245915B;
+	Tue, 30 Jan 2024 09:13:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="UFdfHjAt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RtE0a1N/"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62EA766B46;
-	Tue, 30 Jan 2024 09:04:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6676059147;
+	Tue, 30 Jan 2024 09:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706605484; cv=none; b=ldUsa0pI4XX7qQEdmijGRvdIuNnJtHfsX0wKYiAn5tRk8WLV41OeoPMP0sYC/IOCDqCeIItAWf6nHKREbHazp52v3gpHf5t5qXHcW2UD+4Yd5NiNcnZHHP70H4NxqfQznQuHp0PXEH1+7tvijXISEXCqzJwVN7iG4Pby4Wx2XJY=
+	t=1706605986; cv=none; b=usI73/VpF7iB/I+nAhco3O7RuHEl25K8AfP46j5Hg3JBXYs8u+HGdrMn6b3/YFmB2XLpkL7iUzcFhciixarJkPhwlSqvUYvJcneMwh+RrUG7qolC/gmdpI33LD13YdUIIwvkEGpMqq+hXEgdvaG2FF9HWgrBACk23evlISPA73U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706605484; c=relaxed/simple;
-	bh=YvFyEfP+dCZA9ZKondkqF7lJWdDHPoc6eQRkDL7dZxI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PkQQJMxWQdd4cCPxZVAq3fNt92uyYhVrZ5Y6vNwEHwtT6VqFQ754orhFUlLzRO8kg54P/CYw6r4K6rA6TydxzmzeNXNSP4XBT2FHwboUGyL4LS0HVz2QE2n+1gDF93He52aYNzoPQzNOO3D/IO7zo6nc8PX/60RMkUy8nGoAd6Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=UFdfHjAt; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPA id 97C4F240002;
-	Tue, 30 Jan 2024 09:04:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1706605479;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l/L6bzf2gaHl/JyjqO/iv8M2x2ZxFgKdEPhznPGhi2w=;
-	b=UFdfHjAtq0cdculhhmemTP/dfOs/LSfzOgZf77WhhPHYDXys8PnSWlhThw2cLFuQCqAk6M
-	SthqX37ODNd/4vbJN1DkmbnvrbpCAZ/ng7pMwbmL7/fVWKNcv+0xu4AqRRKWOduFPG41Ti
-	MRjGX2S/lcFQPd/ajJ80aJk4MynWS7FJ73WhqU+L8FM3Tc46VP83kmbFHod5HabYzz3Zai
-	Nz3spRedOhgVgBoB45D9/5lHouceELLs+aHgaDoNTwwxiHI20AHlxsTR4GkHGk3D2baGng
-	3XVzayg0VCkDgAax7zTeVJf5fsTcO6tuhVxUrEW8ynHgNVppYD+qQgUpDoirkQ==
-From: Bastien Curutchet <bastien.curutchet@bootlin.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Bastien Curutchet <bastien.curutchet@bootlin.com>
-Cc: netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Herve Codina <herve.codina@bootlin.com>
-Subject: [PATCH 2/2] net: phy: Add some configuration from device-tree
-Date: Tue, 30 Jan 2024 09:59:35 +0100
-Message-ID: <20240130085935.33722-3-bastien.curutchet@bootlin.com>
+	s=arc-20240116; t=1706605986; c=relaxed/simple;
+	bh=BQgMw4kft6HibyH5hZoeL9BrKIi7CbOCh2ArBtsepu4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ITriVkw1t4r8/JIorABrVRpqDecz0m6TE/ui/AEucMuJQvencbq18NVzL67Iw8eXlcn64FCtjstmU71siV8MkwHbJFvg5tpvLE/kWHKYjtFPhgLi1WE7yc70XEjy+VdUwwc+aZkKgDLf19RgGq6NejZKSIr+Gc3fkqfJo+2Loa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RtE0a1N/; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-5d7005ea1d0so2355016a12.1;
+        Tue, 30 Jan 2024 01:13:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706605985; x=1707210785; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=2419AmMRLK1a8gM2JjFp9RCfwyGRI0AG4Y0NxPY7Sr8=;
+        b=RtE0a1N/54VEvNzmEZNZLV8yLQlDx1X6FzFS/vp0fxTMT0xNDcwDXwqcfalSXH8DDw
+         n6ERRQVjaro6D/hNYW4Oc/tAzmnAlH4QSNxStRi7xQkIaALoCbX6pjjUzYFI+hj+rfCw
+         3SlqvNXMsYHIfwdWzJwMxySXVdiYmA8T0mDEPsAjFQyhr/cNbD/s+Tq6rg1KAJ5Gi4hT
+         aLtvTfYNxSuWd5WjNNAFPgN65fyvZiKpUwA9DoR7FbuzMJwIVtdglFU1v5bIfp/cZPzj
+         A9EHtphULYREXt0I/w0+mp6bWo0KGzPBm480vnA8rVhrGoIEmKTbbgrnLquy2Y0H6PLo
+         km6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706605985; x=1707210785;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2419AmMRLK1a8gM2JjFp9RCfwyGRI0AG4Y0NxPY7Sr8=;
+        b=FNlp0+SryZbhUeUkWHJaUDzmsy1Bv6C+J9NHCsC14p1l+n9ZlRw4NDKYUtklgdoSwq
+         GW32FPZBeQE0JP8kgAWzZuOPM6ta3oN5PWRelr9BDPV00aCRVoquQtn10XrYtNHCaQLG
+         uxM2ckjFGzQuYPdLQ0lfD20GPZvRn8NX6OuONcnyI5IbJp7bOh18KGxnQepXTF5xMlaT
+         WccSP75Sl8ppwzw/nPxpnjGKkxGRUMAvGuLI/Q0jJ97/dRfI6axrZDsAhHrqNCH3/M8s
+         woFtlSCxOVSs87q2dNrvtyiHudKMagfa7ZGP7cHjmrIaak/unhIWZm+Y8N/1KL0TaOUY
+         2pwQ==
+X-Gm-Message-State: AOJu0YxRNLSfdZWtuRymqW0CCnHFzjOVzKcklAuvXH3zf9kIdFl1w+9h
+	WpT3QgTpY6+a5QVC83+CaFJlorIIEX7v7isrG7g9xV5lrY+AUIt7s/h0SgkL
+X-Google-Smtp-Source: AGHT+IF+ENnioD53E4T34dqSWY4jx2ydBtNwJkgOEgDkPE6BjYRC7VhcjnQWsA29LbzRUKq+5ffnDA==
+X-Received: by 2002:a05:6a21:2d8c:b0:19a:2b15:2a2f with SMTP id ty12-20020a056a212d8c00b0019a2b152a2fmr686345pzb.28.1706605984525;
+        Tue, 30 Jan 2024 01:13:04 -0800 (PST)
+Received: from localhost (dhcp-141-239-144-21.hawaiiantel.net. [141.239.144.21])
+        by smtp.gmail.com with ESMTPSA id gu2-20020a056a004e4200b006dde1781800sm7491336pfb.94.2024.01.30.01.13.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jan 2024 01:13:04 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+From: Tejun Heo <tj@kernel.org>
+To: torvalds@linux-foundation.org,
+	mpatocka@redhat.com
+Cc: linux-kernel@vger.kernel.org,
+	dm-devel@lists.linux.dev,
+	msnitzer@redhat.com,
+	ignat@cloudflare.com,
+	damien.lemoal@wdc.com,
+	bob.liu@oracle.com,
+	houtao1@huawei.com,
+	peterz@infradead.org,
+	mingo@kernel.org,
+	netdev@vger.kernel.org,
+	allen.lkml@gmail.com,
+	kernel-team@meta.com
+Subject: [PATCHSET wq/for-6.9] workqueue: Implement BH workqueue and convert several tasklet users
+Date: Mon, 29 Jan 2024 23:11:47 -1000
+Message-ID: <20240130091300.2968534-1-tj@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240130085935.33722-1-bastien.curutchet@bootlin.com>
-References: <20240130085935.33722-1-bastien.curutchet@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,227 +91,85 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: bastien.curutchet@bootlin.com
 
-Some features can now be enabled or disabled from device tree.
-If attributes are present in device-tree, features are enabled
-or disabled via MDIO registers. Else, hardware configuration is
-left as is.
-These features are : Energy Detect Mode, PHY Control Frames,
-LED configuration and Fiber Mode.
+Hello,
 
-Signed-off-by: Bastien Curutchet <bastien.curutchet@bootlin.com>
----
- drivers/net/phy/dp83640.c     | 131 +++++++++++++++++++++++++++++++++-
- drivers/net/phy/dp83640_reg.h |  21 +++++-
- 2 files changed, 150 insertions(+), 2 deletions(-)
+The only generic interface to execute asynchronously in the BH context is
+tasklet; however, it's marked deprecated and has some design flaws such as
+the execution code accessing the tasklet item after the execution is
+complete which can lead to subtle use-after-free in certain usage scenarios
+and less-developed flush and cancel mechanisms.
 
-diff --git a/drivers/net/phy/dp83640.c b/drivers/net/phy/dp83640.c
-index 5c42c47dc564..f5770002b849 100644
---- a/drivers/net/phy/dp83640.c
-+++ b/drivers/net/phy/dp83640.c
-@@ -7,6 +7,7 @@
- 
- #define pr_fmt(fmt) KBUILD_MODNAME ": " fmt
- 
-+#include <dt-bindings/net/ti-dp83640.h>
- #include <linux/crc32.h>
- #include <linux/ethtool.h>
- #include <linux/kernel.h>
-@@ -16,6 +17,7 @@
- #include <linux/net_tstamp.h>
- #include <linux/netdevice.h>
- #include <linux/if_vlan.h>
-+#include <linux/of.h>
- #include <linux/phy.h>
- #include <linux/ptp_classify.h>
- #include <linux/ptp_clock_kernel.h>
-@@ -1418,15 +1420,142 @@ static int dp83640_ts_info(struct mii_timestamper *mii_ts,
- 	return 0;
- }
- 
-+#ifdef CONFIG_OF_MDIO
-+static int dp83640_of_init(struct phy_device *phydev)
-+{
-+	struct device *dev = &phydev->mdio.dev;
-+	struct device_node *of_node = dev->of_node;
-+	int reg_val;
-+	u32 of_val;
-+	int ret;
-+
-+	if (!of_node)
-+		return 0;
-+
-+	/* All configured features reside in PAGE 0 */
-+	phy_write(phydev, PAGESEL, 0);
-+
-+	/* Energy detect mode */
-+	reg_val = phy_read(phydev, EDCR);
-+	if (of_property_present(of_node, "ti,energy-detect-en"))
-+		reg_val |= ED_EN;
-+	else
-+		reg_val &= ~ED_EN;
-+	phy_write(phydev, EDCR, reg_val);
-+
-+	/* CLK_OUTPUT Pin */
-+	if (of_property_present(of_node, "ti,clk-output")) {
-+		ret = of_property_read_u32(of_node, "ti,clk-output", &of_val);
-+		if (ret)
-+			return ret;
-+
-+		reg_val = phy_read(phydev, PHYCR2);
-+		switch (of_val) {
-+		case 0:
-+			reg_val |= CLK_OUT_DIS;
-+			break;
-+		case 1:
-+			reg_val &= ~CLK_OUT_DIS;
-+			break;
-+		default:
-+			phydev_err(phydev, "Invalid value for ti,clk-output property (%d)"
-+					, of_val);
-+			return -EINVAL;
-+		}
-+		phy_write(phydev, PHYCR2, reg_val);
-+	}
-+
-+	/* LED configuration */
-+	if (of_property_present(of_node, "ti,led-config"))  {
-+		ret = of_property_read_u32(of_node, "ti,led-config", &of_val);
-+		if (ret)
-+			return ret;
-+
-+		reg_val = phy_read(phydev, PHYCR) & ~(LED_CNFG_1 | LED_CNFG_0);
-+		switch (of_val) {
-+		case DP83640_PHYCR_LED_CNFG_MODE_1:
-+			reg_val |= LED_CNFG_0;
-+			break;
-+		case DP83640_PHYCR_LED_CNFG_MODE_2:
-+			/* Keeping LED_CNFG_1 and LED_CNFG_0 unset */
-+			break;
-+		case DP83640_PHYCR_LED_CNFG_MODE_3:
-+			reg_val |= LED_CNFG_1;
-+			break;
-+		default:
-+			phydev_err(phydev, "Invalid value for ti,led-config property (%d)"
-+					, of_val);
-+			return -EINVAL;
-+		}
-+		phy_write(phydev, PHYCR, reg_val);
-+	}
-+	if (of_property_present(of_node, "ti,phy-control-frames")) {
-+		of_property_read_u32(of_node, "ti,phy-control-frames", &of_val);
-+		if (ret)
-+			return ret;
-+
-+		reg_val = phy_read(phydev, PCFCR);
-+		switch (of_val) {
-+		case 0:
-+			reg_val &= ~PCF_EN;
-+			break;
-+		case 1:
-+			reg_val |= PCF_EN;
-+			break;
-+		default:
-+			phydev_err(phydev, "Invalid value for ti,phy-control-frames property (%d)"
-+					, of_val);
-+			return -EINVAL;
-+		}
-+		phy_write(phydev, PCFCR, reg_val);
-+	}
-+	if (of_property_present(of_node, "ti,fiber-mode")) {
-+		ret = of_property_read_u32(of_node, "ti,fiber-mode", &of_val);
-+		if (ret)
-+			return ret;
-+
-+		reg_val = phy_read(phydev, PCSR);
-+		switch (of_val) {
-+		case 0:
-+			reg_val &= ~FX_EN;
-+			break;
-+		case 1:
-+			reg_val |= FX_EN;
-+			break;
-+		default:
-+			phydev_err(phydev, "Invalid value for ti,fiber-mode property (%d)"
-+					, of_val);
-+			return -EINVAL;
-+		}
-+		phy_write(phydev, PCSR, reg_val);
-+		/* Write SOFT_RESET bit to ensure configuration */
-+		reg_val = phy_read(phydev, PHYCR2) | SOFT_RESET;
-+		phy_write(phydev, PHYCR2, reg_val);
-+	}
-+
-+	return 0;
-+}
-+#else
-+static int dp83640_of_init(struct phy_device *phydev)
-+{
-+	return 0;
-+}
-+#endif /* CONFIG_OF_MDIO */
-+
- static int dp83640_probe(struct phy_device *phydev)
- {
- 	struct dp83640_clock *clock;
- 	struct dp83640_private *dp83640;
--	int err = -ENOMEM, i;
-+	int err, i;
- 
- 	if (phydev->mdio.addr == BROADCAST_ADDR)
- 		return 0;
- 
-+	err = dp83640_of_init(phydev);
-+	if (err < 0)
-+		return err;
-+
-+	err = -ENOMEM;
- 	clock = dp83640_clock_get_bus(phydev->mdio.bus);
- 	if (!clock)
- 		goto no_clock;
-diff --git a/drivers/net/phy/dp83640_reg.h b/drivers/net/phy/dp83640_reg.h
-index daae7fa58fb8..8877ba560406 100644
---- a/drivers/net/phy/dp83640_reg.h
-+++ b/drivers/net/phy/dp83640_reg.h
-@@ -6,7 +6,11 @@
- #define HAVE_DP83640_REGISTERS
- 
- /* #define PAGE0                  0x0000 */
-+#define PCSR                      0x0016 /* PCS Configuration and Status Register */
-+#define PHYCR                     0x0019 /* PHY Control Register */
- #define PHYCR2                    0x001c /* PHY Control Register 2 */
-+#define EDCR                      0x001D /* Energy Detect Control Register */
-+#define PCFCR                     0x001F /* PHY Control Frames Control Register */
- 
- #define PAGE4                     0x0004
- #define PTP_CTL                   0x0014 /* PTP Control Register */
-@@ -50,8 +54,23 @@
- #define PTP_GPIOMON               0x001e /* PTP GPIO Monitor Register */
- #define PTP_RXHASH                0x001f /* PTP Receive Hash Register */
- 
-+/* Bit definitions for the PCSR register */
-+#define FX_EN		          BIT(6)  /* Enable FX Fiber Mode */
-+
-+/* Bit definitions for the PHYCR register */
-+#define LED_CNFG_0	          BIT(5)  /* LED configuration, bit 0 */
-+#define LED_CNFG_1	          BIT(6)  /* LED configuration, bit 1 */
-+
- /* Bit definitions for the PHYCR2 register */
--#define BC_WRITE                  (1<<11) /* Broadcast Write Enable */
-+#define CLK_OUT_DIS	          BIT(1)  /* Disable CLK_OUT pin */
-+#define SOFT_RESET		  BIT(9)  /* Soft Reset */
-+#define BC_WRITE                  BIT(11) /* Broadcast Write Enable */
-+
-+/* Bit definitions for the EDCR register */
-+#define ED_EN		          BIT(15) /* Enable Energy Detect Mode */
-+
-+/* Bit definitions for the PCFCR register */
-+#define PCF_EN	                  BIT(0)  /* Enable PHY Control Frames */
- 
- /* Bit definitions for the PTP_CTL register */
- #define TRIG_SEL_SHIFT            (10)    /* PTP Trigger Select */
--- 
-2.43.0
+Mikulas Patocka recently reported that dm-crypt and dm-crypt are affected by
+the access-after-completion issue and suggested adding TASKLET_STATE_ONESHOT
+flag which selectively removes post-completion access while significantly
+limiting how the tasklet can be used in the following thread:
 
+ http://lkml.kernel.org/r/82b964f0-c2c8-a2c6-5b1f-f3145dc2c8e5@redhat.com
+
+Linus didn't like the approach and suggested extending workqueue to support
+execution from atomic context:
+
+ http://lkml.kernel.org/r/CAHk-=wjDW53w4-YcSmgKC5RruiRLHmJ1sXeYdp_ZgVoBw=5byA@mail.gmail.com
+
+As suggested, this patchset implements BH workqueues which are like regular
+workqueues but executes work items in the BH (softirq) context and converts
+several tasklet users.
+
+- The name bh is used instead of the suggested atomic as it's more in line
+  with widely used execution context interface - local_bh_enable/disable()
+  and friends.
+
+- The system default BH workqueues - system_bh_wq and system_bh_highpri_wq -
+  are provided. As queue-wide flushing doesn't exist in tasklet, all
+  existing tasklet users should be able to use the system BH workqueues
+  without creating their own.
+
+- BH workqueues currently use tasklet to run the work items to avoid
+  priority inversions involving tasklet_hi and WQ_BH | WQ_HIGHPRI. Once all
+  tasklet users are converted, tasklet code can be removed and BH workqueues
+  can take over its softirqs.
+
+This patchset is on top of wq/for-6.9 (aae17ebb53c ("workqueue: Avoid using
+isolated cpus' timers on queue_delayed_work")) and contains the following
+eight patches.
+
+ 0001-workqueue-Update-lock-debugging-code.patch
+ 0002-workqueue-Factor-out-init_cpu_worker_pool.patch
+ 0003-workqueue-Implement-BH-workqueues-to-eventually-repl.patch
+ 0004-backtracetest-Convert-from-tasklet-to-BH-workqueue.patch
+ 0005-usb-core-hcd-Convert-from-tasklet-to-BH-workqueue.patch
+ 0006-net-tcp-tsq-Convert-from-tasklet-to-BH-workqueue.patch
+ 0007-dm-crypt-Convert-from-tasklet-to-BH-workqueue.patch
+ 0008-dm-verity-Convert-from-tasklet-to-BH-workqueue.patch
+
+0001-0003 prepare and implement BH workqueues.
+
+0004-0008 convert some tasklet users to BH workqueue. The conversions are
+relatively straightforward but are in descending order of confidence.
+
+The patchset is also available in the following git branch.
+
+ git://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git wq-bh-v1
+
+diffstat follows. Thanks.
+
+ Documentation/core-api/workqueue.rst |   29 ++++-
+ drivers/md/dm-crypt.c                |   36 -------
+ drivers/md/dm-verity-target.c        |    8 -
+ drivers/md/dm-verity.h               |    2
+ drivers/usb/core/hcd.c               |   23 ++--
+ include/linux/usb/hcd.h              |    2
+ include/linux/workqueue.h            |    9 +
+ include/net/tcp.h                    |    2
+ kernel/backtracetest.c               |   18 +--
+ kernel/workqueue.c                   |  312 ++++++++++++++++++++++++++++++++++++++++++++++++--------------
+ kernel/workqueue_internal.h          |    3
+ net/ipv4/tcp.c                       |    2
+ net/ipv4/tcp_output.c                |   36 +++----
+ tools/workqueue/wq_dump.py           |   11 +-
+ 14 files changed, 335 insertions(+), 158 deletions(-)
+
+--
+tejun
 
