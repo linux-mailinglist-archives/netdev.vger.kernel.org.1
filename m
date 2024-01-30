@@ -1,111 +1,150 @@
-Return-Path: <netdev+bounces-67011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D081A841D64
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:16:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DD7E841DA3
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:24:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F6841C2668C
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 08:16:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 279081F28D75
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 08:24:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A86B560894;
-	Tue, 30 Jan 2024 08:14:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E31358208;
+	Tue, 30 Jan 2024 08:20:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5F1605D8;
-	Tue, 30 Jan 2024 08:14:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7C558108;
+	Tue, 30 Jan 2024 08:20:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706602474; cv=none; b=W7q1ijeZQs7R2y4m9m6lHn2FLdDG19nKSTQFJJT3lsSJdXthbGp06wISvjsWRlhzmwCWz+zldvz+Ac2cr2PEL9raqx4+aOvEUVdeCgKLYOzei5LHHydnq5wM/11LxXP2B2nGJinR6RyK7tPRaVNr3KIAI4/r0aYPUrdcDol3uGU=
+	t=1706602841; cv=none; b=qIOfRO6EHzk0nIoUkAfuks8lvr7TGvY55nY4P7gTeeEdwWsQT31DBgoJIQgiGCZtTrTF3SPHqXTvNYj3xDOW4nWz55C2tmTy0pO5t5lqULSQCzR4TycUbZ2xurwGf6lSzKvLM5rZpnJOKhpDAZoSb2H4Zs7DAHS7kw7icRL5yd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706602474; c=relaxed/simple;
-	bh=2X8SIWoitl+VKVgntwPYWRKMalIKKPmqONWJZDOtlBc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WbJPcDi3+Rxogbpg/x45k4W92TFWQzNcN6ynHS6GcUq9D+1/45BN4XAZDvn2+5RDuXyN8EL8zeomHhPcjYhXJvCb+eVgdALMuGRnlfWgL9LslC90IkCr4Ov/mpA9l9UHqgaD5S2sKooqV/oi3dWm4zSwcd660XPxVRwDUou1ekU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 8038e5d20ca848c3927a7be67658d64c-20240130
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:f1c4e82b-a40f-43e6-aa2a-683b630f6be4,IP:10,
-	URL:0,TC:0,Content:-5,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACT
-	ION:release,TS:-10
-X-CID-INFO: VERSION:1.1.35,REQID:f1c4e82b-a40f-43e6-aa2a-683b630f6be4,IP:10,UR
-	L:0,TC:0,Content:-5,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
-	N:release,TS:-10
-X-CID-META: VersionHash:5d391d7,CLOUDID:5f136983-8d4f-477b-89d2-1e3bdbef96d1,B
-	ulkID:240130161419ZQQNJ2TK,BulkQuantity:0,Recheck:0,SF:24|17|19|44|66|38|1
-	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
-	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
-X-UUID: 8038e5d20ca848c3927a7be67658d64c-20240130
-Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 409578972; Tue, 30 Jan 2024 16:14:17 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id 8CD10E000EBB;
-	Tue, 30 Jan 2024 16:14:17 +0800 (CST)
-X-ns-mid: postfix-65B8AFD9-367288681
-Received: from kernel.. (unknown [172.20.15.213])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 1A722E000EB9;
-	Tue, 30 Jan 2024 16:14:13 +0800 (CST)
-From: Kunwu Chan <chentao@kylinos.cn>
-To: steffen.klassert@secunet.com,
-	herbert@gondor.apana.org.au,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kunwu Chan <chentao@kylinos.cn>
-Subject: [PATCH ipsec-next] xfrm: Simplify the allocation of slab caches in xfrm_policy_init
-Date: Tue, 30 Jan 2024 16:14:11 +0800
-Message-Id: <20240130081411.58246-1-chentao@kylinos.cn>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1706602841; c=relaxed/simple;
+	bh=vDR73ReSVHVlsdDGPuhQ6qlDap7CDTu2t9MBqEU5ReM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=QgzgiOLv48i6DBc+h6YyTOoznZ0OR7nfHV2i6MSSpnzV0vngwFhYPzx/qey+GcorIu88Dr5Mox4AM/92CstxjxSKbfvv9ab/m1g8siX65NuXs3cYOoN2TsDDCedncM9CKiI8PF0d+6ZBuhFYzcW7k7OuNmBU8yRdy75o6QEz0Gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4TPJ4n4ThKz1vsn4;
+	Tue, 30 Jan 2024 16:20:09 +0800 (CST)
+Received: from kwepemd100009.china.huawei.com (unknown [7.221.188.135])
+	by mail.maildlp.com (Postfix) with ESMTPS id 3979B1A016B;
+	Tue, 30 Jan 2024 16:20:34 +0800 (CST)
+Received: from [10.67.109.184] (10.67.109.184) by
+ kwepemd100009.china.huawei.com (7.221.188.135) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1258.28; Tue, 30 Jan 2024 16:20:33 +0800
+Message-ID: <b1bf2bc8-870d-40a4-9ad2-2b4ced34c43f@huawei.com>
+Date: Tue, 30 Jan 2024 16:20:32 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND bpf-next v3 4/6] riscv, bpf: Add necessary Zbb
+ instructions
+Content-Language: en-US
+To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Pu Lehui <pulehui@huaweicloud.com>,
+	<bpf@vger.kernel.org>, <linux-riscv@lists.infradead.org>,
+	<netdev@vger.kernel.org>
+CC: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong
+ Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
+	<kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt
+	<palmer@dabbelt.com>, Conor Dooley <conor@kernel.org>, Luke Nelson
+	<luke.r.nels@gmail.com>, Andrew Jones <ajones@ventanamicro.com>
+References: <20240115131235.2914289-1-pulehui@huaweicloud.com>
+ <20240115131235.2914289-5-pulehui@huaweicloud.com>
+ <871qa2zog6.fsf@all.your.base.are.belong.to.us>
+ <03ebc63f-7b96-4a70-ad10-a4ffc1d5b1cc@huawei.com>
+ <0b2bb6aa-e114-157b-94d1-4acb091b48b8@iogearbox.net>
+ <8734ufwdic.fsf@all.your.base.are.belong.to.us>
+From: Pu Lehui <pulehui@huawei.com>
+In-Reply-To: <8734ufwdic.fsf@all.your.base.are.belong.to.us>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemd100009.china.huawei.com (7.221.188.135)
 
-commit 0a31bd5f2bbb ("KMEM_CACHE(): simplify slab cache creation")
-introduces a new macro.
-Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-to simplify the creation of SLAB caches.
 
-Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
----
- net/xfrm/xfrm_policy.c | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
-index 7351f32052dc..6ac97e0b66cb 100644
---- a/net/xfrm/xfrm_policy.c
-+++ b/net/xfrm/xfrm_policy.c
-@@ -4025,10 +4025,7 @@ static int __net_init xfrm_policy_init(struct net =
-*net)
- 	int dir, err;
-=20
- 	if (net_eq(net, &init_net)) {
--		xfrm_dst_cache =3D kmem_cache_create("xfrm_dst_cache",
--					   sizeof(struct xfrm_dst),
--					   0, SLAB_HWCACHE_ALIGN|SLAB_PANIC,
--					   NULL);
-+		xfrm_dst_cache =3D KMEM_CACHE(xfrm_dst, SLAB_HWCACHE_ALIGN | SLAB_PANI=
-C);
- 		err =3D rhashtable_init(&xfrm_policy_inexact_table,
- 				      &xfrm_pol_inexact_params);
- 		BUG_ON(err);
---=20
-2.39.2
+On 2024/1/30 14:18, Björn Töpel wrote:
+> Daniel Borkmann <daniel@iogearbox.net> writes:
+> 
+>> On 1/29/24 10:13 AM, Pu Lehui wrote:
+>>> On 2024/1/28 1:16, Björn Töpel wrote:
+>>>> Pu Lehui <pulehui@huaweicloud.com> writes:
+>>>>
+>>>>> From: Pu Lehui <pulehui@huawei.com>
+>>>>>
+>>>>> Add necessary Zbb instructions introduced by [0] to reduce code size and
+>>>>> improve performance of RV64 JIT. Meanwhile, a runtime deteted helper is
+>>>>> added to check whether the CPU supports Zbb instructions.
+>>>>>
+>>>>> Link: https://github.com/riscv/riscv-bitmanip/releases/download/1.0.0/bitmanip-1.0.0-38-g865e7a7.pdf [0]
+>>>>> Signed-off-by: Pu Lehui <pulehui@huawei.com>
+>>>>> ---
+>>>>>    arch/riscv/net/bpf_jit.h | 32 ++++++++++++++++++++++++++++++++
+>>>>>    1 file changed, 32 insertions(+)
+>>>>>
+>>>>> diff --git a/arch/riscv/net/bpf_jit.h b/arch/riscv/net/bpf_jit.h
+>>>>> index e30501b46f8f..51f6d214086f 100644
+>>>>> --- a/arch/riscv/net/bpf_jit.h
+>>>>> +++ b/arch/riscv/net/bpf_jit.h
+>>>>> @@ -18,6 +18,11 @@ static inline bool rvc_enabled(void)
+>>>>>        return IS_ENABLED(CONFIG_RISCV_ISA_C);
+>>>>>    }
+>>>>> +static inline bool rvzbb_enabled(void)
+>>>>> +{
+>>>>> +    return IS_ENABLED(CONFIG_RISCV_ISA_ZBB) && riscv_has_extension_likely(RISCV_ISA_EXT_ZBB);
+>>>>
+>>>> Hmm, I'm thinking about the IS_ENABLED(CONFIG_RISCV_ISA_ZBB) semantics
+>>>> for a kernel JIT compiler.
+>>>>
+>>>> IS_ENABLED(CONFIG_RISCV_ISA_ZBB) affects the kernel compiler flags.
+>>>> Should it be enough to just have the run-time check? Should a kernel
+>>>> built w/o Zbb be able to emit Zbb from the JIT?
+>>>
+>>> Not enough, because riscv_has_extension_likely(RISCV_ISA_EXT_ZBB) is
+>>> a platform capability check, and the other one is a kernel image
+>>> capability check. We can pass the check
+>>> riscv_has_extension_likely(RISCV_ISA_EXT_ZBB) when
+>>> CONFIG_RISCV_ISA_ZBB=n. And my local test prove it.
+> 
+> What I'm trying to say (and drew as well in the other reply) is that
+> "riscv_has_extension_likely(RISCV_ISA_EXT_ZBB) when
+> CONFIG_RISCV_ISA_ZBB=n" should also make the JIT emit Zbb insns. The
+> platform check should be sufficient.
 
+Ooh, this is really beyond my expectation. The test_progs can pass when 
+with only platform check and it can recognize the zbb instructions. Now 
+I know it. Sorry for misleading.🙁
+
+Curious if CONFIG_RISCV_ISA_ZBB is still necessary?
+
+> 
+>> So if I understand you correctly, only relying on the
+>> riscv_has_extension_likely(RISCV_ISA_EXT_ZBB) part would not work -
+>> iow, the IS_ENABLED(CONFIG_RISCV_ISA_ZBB) is mandatory here?
+>>
+>> Thanks,
+>> Daniel
+>>
+>> P.s.: Given Bjorn's review and tests I took the series into bpf-next
+>> now. Thanks everyone!
+> 
+> Thanks! Yes, this is mainly a semantic discussion, and it can be further
+> relaxed later with a follow up -- if applicable.
+> 
+> 
+> Björn
 
