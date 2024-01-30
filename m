@@ -1,132 +1,131 @@
-Return-Path: <netdev+bounces-67313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91900842BCB
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 19:30:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67D6D842BD5
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 19:33:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61BADB21D03
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 18:30:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B1E81C23B3F
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 18:33:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E453E157E78;
-	Tue, 30 Jan 2024 18:30:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 027B5762CD;
+	Tue, 30 Jan 2024 18:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="iDqkAWHp"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z4kgCRVw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24F114E2D3;
-	Tue, 30 Jan 2024 18:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37A3E762C8
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 18:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706639441; cv=none; b=Q52gbO6jQhmhpJwxRu+tvHe4X5Ja2HrVZLgyb2P+KPCy5kE8i/7wLc2TjQrRj6duyW7Kpiau/dcagjsBLmT/hUgbNgGt3ibfxzyuNfrwBqCTNb7DlFH/xHPXlK5TNZXZHJt0UtAsUZHLn9yYtWMI2aP0DNkr2B1jpzlvDdxxCnk=
+	t=1706639634; cv=none; b=u9VW8HUZsqO3FyeDrkntxHzmwNrO8voxFaODqvY76zDirhex3OHqicONckJyISFQq2Y0Ygy1o03U+hWJKN6dfyCJ/y16qcdyxEO+qVNtmzin4QjA30Ar7TElOb6yau/eOhdVPY0uhOcJCgTXN6nw8jtw50jWXBaiMv6eSiTog6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706639441; c=relaxed/simple;
-	bh=tA4/1H6w8n1bCK32kU8GUndlSG44o2ZLxb5ueu19rFA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=czHl7+dGrG8p6DAcvQn96GtiEgL1rMl1TrxMGiyXNPthj7vfLpNzbdv4M4qvntxao3xdRIngcgkuPAI335W2Fa/hUNU18TUvXXM2i+ei7BR1+pfCqbxHsSJXzMEhGozgUXrgIyHt50Co2LhdwjfjI2F1nVgFjPJ4azi+DbGclT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=iDqkAWHp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF6F0C433C7;
-	Tue, 30 Jan 2024 18:30:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1706639441;
-	bh=tA4/1H6w8n1bCK32kU8GUndlSG44o2ZLxb5ueu19rFA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iDqkAWHpt+bMTji+PSVRO3xNPVEYmK4jZisDaTBLo7yQF43AqYNI3vr6KCaUXhZka
-	 77ntzIA6dKwZ0hrhryhEMoWbroufblQamp6kO3ceTiowU1UK4uFuOtg19Ck6kNk1rG
-	 tbaBDWmc3jREiB0ckBU3/y0FJGV3b55ON1T8VRmk=
-Date: Tue, 30 Jan 2024 10:30:40 -0800
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Leon Romanovsky <leonro@nvidia.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Naresh Kamboju <naresh.kamboju@linaro.org>,
-	linux-stable <stable@vger.kernel.org>,
-	Netdev <netdev@vger.kernel.org>, linux-rdma@vger.kernel.org,
-	lkft-triage@lists.linaro.org, Sasha Levin <sashal@kernel.org>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>
-Subject: Re: stable-rc: 6.1: mlx5: params.c:994:53: error:
- 'MLX5_IPSEC_CAP_CRYPTO' undeclared (first use in this function)
-Message-ID: <2024013024-overripe-serve-4e45@gregkh>
-References: <CA+G9fYvYQRnBbZhHknSKbwYiCr_3vPwC5zPz2NsV9_1F7=paQQ@mail.gmail.com>
- <2024012915-enlighten-dreadlock-54e9@gregkh>
- <CA+G9fYs3_M9E3w+uWky5X1hEgoJU4e92ECqSywerqSkF8KVGvA@mail.gmail.com>
- <8c178bd1-e0c9-4e29-9b63-dd298298bc7b@gmail.com>
- <20240130071434.GA7169@unreal>
+	s=arc-20240116; t=1706639634; c=relaxed/simple;
+	bh=k47AUJB6ROgRfOT0WDPnEsj9abjtahVi1B2DJyIixs0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UEPqubo5dZ+m6Nzc+8F3iWkUtz9ba65YtaV7JVXOlUtETZPYZ9F4Uil+/tIFZnCniuNcU6rxCEVdkYusMtE6g4PsonR3OS0t+SIGaLS82qHQDB/EYaA6TvJMYF6cRW/BlCgzXh6WAdwscnjguBMBjPEHL8pm1xgHi9NkWdePxR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z4kgCRVw; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-55f5d62d024so506a12.1
+        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 10:33:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706639631; x=1707244431; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kdGWsc0oH3bWWgxR/5+ywKCOsUUjq3kFGwbUvLrZ40E=;
+        b=Z4kgCRVwW/yqvzqU1dzZN8rePeH9ZeskmRhgLRkPG9+tug6IlMMU+6ThXb4RO4mt8C
+         F79OVn7aNMInBzhDphe80BoPcczxSeFNmS0vIYECVC54N5IkQDf5+OoMreOf2BIY2lQ6
+         jkc50l6SMbwcjX+Sum6S7PCyJA+09LKTLwOUtPIp/33zMEW6crSYZgLLMa3pGKKIUGRr
+         LsKv9rhoyy31fA9e9/SV+jj/SdZCtshbGoG98+QGirrS01jw7KWvOEhkxKWlC1B1oI/g
+         JcFQYBRTvrP6x5My/V6l9kEm1TMt+3UztLp0IWQhFMy1nqoTThvp62rxn+jDa+selh8S
+         U/6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706639631; x=1707244431;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kdGWsc0oH3bWWgxR/5+ywKCOsUUjq3kFGwbUvLrZ40E=;
+        b=AVsZyiy6mj/x8DnDJUh3Btiw4t9mQuAldyt0+o9BeAswHblFojCKgFgSun3ojq+Env
+         DK07dTg1j/OOpY1EP2mLLdkIJxGhPHbRgVvGvPpiV7BFNFNcQjUznIsWu4e1k7oPCbVP
+         Pc3r05pLFWqt5oUUxyWWMZ1hhSYH5rY0o7RvMcvyM7pRljLguZWmOJc+7GW9QjFnHSDN
+         YjwLAAO8vQddDwW6HwTz+qbVNUbHBgLmT5Vvt/gAw8z1g5EPKUpmzf5RYzX6Fse7ssKF
+         cK79XVyNZHa83Ol5GfSTtqFHXnHT6YTTTGUdOOtwoqPfmO8DKByLT8BSFDu4IfSp9zvQ
+         HBAw==
+X-Gm-Message-State: AOJu0YzEYE9+wgOssIDGcChz1lCz7tdEV6ZrfAlhtdscUYIAPZNgBtKL
+	QoWCabHC2OtmBep9ZsQRIDuVeacjcyqdhKyUMdhS0XmdrtA4LbqrECXdYRvaRHKNvun2diYkwDb
+	N+oMaKyL0ELdOrjDMGr9I4rnzfc/SgTMohZdj
+X-Google-Smtp-Source: AGHT+IH0JnOwUNezNYdu4ljeiaqCHb1sKUhLBrQ2scptHLSnMIcNrZY0sfa0isfpckBxUC/zPaZay20bdb3kAZQTrH0=
+X-Received: by 2002:a05:6402:1d96:b0:55f:5229:5e34 with SMTP id
+ dk22-20020a0564021d9600b0055f52295e34mr124078edb.5.1706639631088; Tue, 30 Jan
+ 2024 10:33:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240130071434.GA7169@unreal>
+References: <20240129190518.585134-1-edumazet@google.com>
+In-Reply-To: <20240129190518.585134-1-edumazet@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 30 Jan 2024 19:33:38 +0100
+Message-ID: <CANn89iL6jEVPf3=zoxZSqME6gqRPttat_bZb7yYnRYYPLUcpQw@mail.gmail.com>
+Subject: Re: [PATCH net] af_unix: fix lockdep positive in sk_diag_dump_icons()
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	syzbot <syzkaller@googlegroups.com>, Kuniyuki Iwashima <kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 30, 2024 at 09:14:34AM +0200, Leon Romanovsky wrote:
-> On Mon, Jan 29, 2024 at 08:25:42PM -0800, Florian Fainelli wrote:
-> > 
-> > 
-> > On 1/29/2024 6:52 PM, Naresh Kamboju wrote:
-> > > On Mon, 29 Jan 2024 at 21:58, Greg Kroah-Hartman
-> > > <gregkh@linuxfoundation.org> wrote:
-> > > > 
-> > > > On Mon, Jan 29, 2024 at 09:17:31PM +0530, Naresh Kamboju wrote:
-> > > > > Following build errors noticed on stable-rc linux-6.1.y for arm64.
-> > > > > 
-> > > > > arm64:
-> > > > > --------
-> > > > >    * build/gcc-13-lkftconfig
-> > > > >    * build/gcc-13-lkftconfig-kunit
-> > > > >    * build/clang-nightly-lkftconfig
-> > > > >    * build/clang-17-lkftconfig-no-kselftest-frag
-> > > > >    * build/gcc-13-lkftconfig-devicetree
-> > > > >    * build/clang-lkftconfig
-> > > > >    * build/gcc-13-lkftconfig-perf
-> > > > > 
-> > > > > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> > > > > 
-> > > > > Build errors:
-> > > > > ------
-> > > > > drivers/net/ethernet/mellanox/mlx5/core/en/params.c: In function
-> > > > > 'mlx5e_build_sq_param':
-> > > > > drivers/net/ethernet/mellanox/mlx5/core/en/params.c:994:53: error:
-> > > > > 'MLX5_IPSEC_CAP_CRYPTO' undeclared (first use in this function)
-> > > > >    994 |                     (mlx5_ipsec_device_caps(mdev) &
-> > > > > MLX5_IPSEC_CAP_CRYPTO);
-> > > > >        |
-> > > > > ^~~~~~~~~~~~~~~~~~~~~
-> > > > > 
-> > > > > Suspecting commit:
-> > > > >    net/mlx5e: Allow software parsing when IPsec crypto is enabled
-> > > > >    [ Upstream commit 20f5468a7988dedd94a57ba8acd65ebda6a59723 ]
-> > > > 
-> > > > Something looks very odd here, as the proper .h file is being included,
-> > > > AND this isn't a build failure on x86, so why is this only arm64 having
-> > > > problems?  What's causing this not to show up?
-> > > 
-> > > As per the Daniel report on stable-rc review on 6.1, these build failures also
-> > > reported on System/390.
-> > 
-> > The build failure is legitimate here since
-> > drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.h guards all of the
-> > definitions and enumerations under a CONFIG_MLX5_EN_IPSEC which is not
-> > enabled in the build configuration that failed.
-> > 
-> > This is implicitly fixed upstream with
-> > 8c582ddfbb473c1d799c40b5140aed81278e2837 ("net/mlx5e: Handle hardware IPsec
-> > limits events") which relocates the #ifdef CONFIG_MLX5_EN_IPSEC below and
-> > allows the MLX5_IPSEC_CAP_CRYPTO enum value, amongst others to be visible to
-> > code that is not guarded with CONFIG_MLX5_EN_IPSEC. This specific commit
-> > does not apply cleanly to the stable-6.1 branch, so maybe the best we can
-> > come up with is this targeted change that does the same thing against 6.1:
-> 
-> Thanks for taking look into it. This fix looks as a best solution for me.
+On Mon, Jan 29, 2024 at 8:05=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> syzbot reported a lockdep splat [1].
+>
+> Blamed commit hinted about the possible lockdep
+> violation, and code used unix_state_lock_nested()
+> in an attempt to silence lockdep.
+>
+> It is not sufficient, because unix_state_lock_nested()
+> is already used from unix_state_double_lock().
+>
+> We need to use a separate subclass.
+>
+> This patch adds a distinct enumeration to make things
+> more explicit.
+>
+> Also use swap() in unix_state_double_lock() as a clean up.
+>
+>
 
-Thanks, will queue this up now and push out a new -rc
+...
+
+> +#define unix_state_lock(s)     spin_lock(&unix_sk(s)->lock)
+> +#define unix_state_unlock(s)   spin_unlock(&unix_sk(s)->lock)
+> +enum unix_socket_lock_class {
+> +       U_LOCK_NORMAL,
+> +       U_LOCK_SECOND,  /* for double locking, see unix_state_double_lock=
+(). */
+> +       U_LOCK_DIAG, /* used while dumping icons, see sk_diag_dump_icons(=
+). */
+> +};
+> +
+> +static void unix_state_lock_nested(struct sock *sk,
+> +                                  enum unix_socket_lock_class subclass)
+
+I will add an inline keyword in v2. Not sure why I did not see the
+compiler warning.
+
+> +{
+> +       spin_lock_nested(&unix_sk(sk)->lock, subclass);
+> +}
+> +
+>  #define peer_wait peer_wq.wait
+>
 
