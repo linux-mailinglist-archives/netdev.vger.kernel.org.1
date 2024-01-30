@@ -1,128 +1,90 @@
-Return-Path: <netdev+bounces-66908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D825084178E
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 01:36:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DBE38417D3
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 01:50:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 76F361F21AA5
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 00:36:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D02F61F250B2
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 00:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A4DA364BA;
-	Tue, 30 Jan 2024 00:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A4C11E52A;
+	Tue, 30 Jan 2024 00:50:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j/Ge8NMV"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Qc984naj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB0DD2EAF7;
-	Tue, 30 Jan 2024 00:36:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 862221E486;
+	Tue, 30 Jan 2024 00:50:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706574968; cv=none; b=Xwps3OCyFt1BxA1TXR5LsI3fl86IUfI68CQ1WRQXVSSDaW8My9MtEp/RP2HihA+tKeNxBIAHOibveU5/7AD1gqPlfu02E0U/mRBS3eLFInwCotiQjs3+HodJGMmbprUWVLnK7aeQ1tTRxk3Px48thtN/39xaKx+NYtysM+oOxOY=
+	t=1706575817; cv=none; b=mDnu31J5IdIu92PI+LFNYgG8+tbAj13mMjrj+1iQ7DQQIIkYpqyL6+RlEh3lTBdETk5sAoEakQ/UulyFfTZaPfXDTJDnmWp422inzEICfpVarRkcgHOkOBLidzCwVGQO2izZsMK/Zt+rPiy6XCOV9zkAYiLsjVrN6jziY7HaDCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706574968; c=relaxed/simple;
-	bh=AOE7n0KnewlaWwxbj8BBqxz1kEl4nUkcJEnkd3Rd1CM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=c0L937mNEwsDNSf6FeWYUfL946dDVlvHch9mV0bNNJ4vp9bXdQWQRFXT9mAQWYbGmo6CI0d0DjCPRiweCUci9saamYEKorFni46fplJRdzV95Xr5oPYgbNjsQOIWPqA/odiwwUVfpZdE5wmChb+2IFm2lqNs7a2kK9Ijht8qHNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j/Ge8NMV; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33926ccbc80so2048066f8f.0;
-        Mon, 29 Jan 2024 16:36:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706574965; x=1707179765; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1Q3Rs7PU6VZ7DHw5oiGFQEWFBt/lSJt0fN7k2NTIpww=;
-        b=j/Ge8NMVfqOkF9L3ThouhsrkEhlfdGjAjq5biANy1aSk/6XzOAaQHnxgm7dXlvMUMs
-         nVx80SpIkemvxiIoqOkS7YHfLcAf4h6dfNi4swY2PeuiheKliWXfD3QAErx751XBS0Vv
-         7Ja/SnQLi0FW9sS4mYeDjmWX1GKdvsLWG3h+wsauI2iyWqJvZohwE9AoYVrT4LSpDUHn
-         56ABsZNngxy63ODFgwFssjtsnu2xzOcYgNX0a9gJRkrpWnEz7mNRresd15AqGmub/VUI
-         DgcAfvAw6Ekr2xv/oSYVul5YAGkXlV8Z1Q84P8/M5CRiuYgHpYm20opo3VAb3/zEFDNB
-         easg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706574965; x=1707179765;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1Q3Rs7PU6VZ7DHw5oiGFQEWFBt/lSJt0fN7k2NTIpww=;
-        b=G8Jh0A1oqycmf2reUM/OBHKtB9/yJffGgjYFsOvFgMlnztplrJa/66VDfseMWJjZau
-         P3TZhkCb1MkV5NhF+NtUbpLoLnU8RQeLVzD45VTGea8sAz+njKZbmYaCiZgDqgoN0IrO
-         5gVZuO9zjxQOUOAAa89KWgOt4A+1mBgyg5F4deHT4BNDdvWHosnJKiR+FNbZn8fbGR+D
-         ae59cl/j2SVwU67q8qtMKNqymA008gXTX80r+HClmE4y4LgbmEJYwWZ1n5rMJfGbBLfX
-         YlYW7pzJpTjMOsiJy+zmDtyr5j8FQPCpuFbio9663Prv1q21H4JOdzlrqXSXv04QCM91
-         gbzg==
-X-Gm-Message-State: AOJu0YyTIKNGNEMm3UUItiRdy69YL4As31XXc7i5IxsW0cWQrw9x3GSz
-	Xq/+7tvJlTkgOnN/kn0pIxtJjS9+84RxLRhZFTPjBViSwWWbnm+p
-X-Google-Smtp-Source: AGHT+IFbkckzAqMPlJhqybLQRcsbZiE3mq3fxUSAmWAwpLn5s5XQHbQ1vg+/EC6MwAlk8uRjqyRSlA==
-X-Received: by 2002:a5d:64ed:0:b0:33a:e39a:1590 with SMTP id g13-20020a5d64ed000000b0033ae39a1590mr6412578wri.53.1706574964763;
-        Mon, 29 Jan 2024 16:36:04 -0800 (PST)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id l10-20020a056000022a00b0033af350fb88sm2542167wrz.25.2024.01.29.16.36.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 29 Jan 2024 16:36:04 -0800 (PST)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
+	s=arc-20240116; t=1706575817; c=relaxed/simple;
+	bh=ThPkbKmqHHdUcXpBDNoCdKALP+40lPN8itv/9IFf1WQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YEGYtTguOsQTgfEwzFU6a8XKMYML3tyHnuZ0CiZkCXqJCIjUtTJ527ZzVQp961lUyYt5AaI0AaQq8XJV0shTS4VoeoeE5PJuZqjqdfWc//zyd+WEPB6yPTyNeWY36NdkG851j+wf3EHNhU+t/Ig6pNwi16z0gVFdhZ53Sw0xrKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Qc984naj; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=UNuOAh732Iz0sCuy9DmPJv186mEKEDafoVURB8T3cQc=; b=Qc984najjcqfo0JWw68P1PLvrp
+	wJ0HiNGM4vaqULIRinZmMfyw3CrZ+1VU4/YqOx4khgKlNePFsLve4IWxr/X6zZWgHtRutlDcZtmpW
+	eGq4IjaHfX5DB21/zERw6d5GF8ZhKXpB/QFBTprZOm+MCRnYYbrfpaTLWE+LSrMPIFjs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rUcK2-006Qn7-78; Tue, 30 Jan 2024 01:49:54 +0100
+Date: Tue, 30 Jan 2024 01:49:54 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
 	Konrad Dybcio <konrad.dybcio@linaro.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Rob Herring <robh+dt@kernel.org>,
 	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
 	Conor Dooley <conor+dt@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>,
 	Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>,
 	Robert Marko <robert.marko@sartura.hr>,
-	linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
 	Jie Luo <quic_luoj@quicinc.com>
-Cc: Christian Marangi <ansuelsmth@gmail.com>
-Subject: [net-next PATCH v2 3/3] arm64: dts: qcom: ipq8074: add clock-frequency to MDIO node
-Date: Tue, 30 Jan 2024 01:35:22 +0100
-Message-ID: <20240130003546.1546-4-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240130003546.1546-1-ansuelsmth@gmail.com>
+Subject: Re: [net-next PATCH v2 1/3] dt-bindings: net: ipq4019-mdio: document
+ now supported clock-frequency
+Message-ID: <200e67aa-85e4-4d9d-85c7-725d3c2d8157@lunn.ch>
 References: <20240130003546.1546-1-ansuelsmth@gmail.com>
+ <20240130003546.1546-2-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240130003546.1546-2-ansuelsmth@gmail.com>
 
-Add clock-frequency to MDIO node to set the MDC rate to 6.25Mhz instead
-of using the default value of 390KHz from MDIO default divider.
+On Tue, Jan 30, 2024 at 01:35:20AM +0100, Christian Marangi wrote:
+> Document support for clock-frequency and add details on why this
+> property is needed and what values are supported.
+> 
+> >From internal documentation, while other values are supported, the
+> correct function of the MDIO bus is not assured hence add only the
+> suggested supported values to the property enum.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- arch/arm64/boot/dts/qcom/ipq8074.dtsi | 2 ++
- 1 file changed, 2 insertions(+)
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-diff --git a/arch/arm64/boot/dts/qcom/ipq8074.dtsi b/arch/arm64/boot/dts/qcom/ipq8074.dtsi
-index 2f275c84e566..08ddfeece043 100644
---- a/arch/arm64/boot/dts/qcom/ipq8074.dtsi
-+++ b/arch/arm64/boot/dts/qcom/ipq8074.dtsi
-@@ -264,6 +264,8 @@ mdio: mdio@90000 {
- 			clocks = <&gcc GCC_MDIO_AHB_CLK>;
- 			clock-names = "gcc_mdio_ahb_clk";
- 
-+			clock-frequency = <6250000>;
-+
- 			status = "disabled";
- 		};
- 
--- 
-2.43.0
-
+    Andrew
 
