@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-66945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-66947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 477DD841968
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:40:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E40784196B
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 03:40:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A58C1C242D7
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 02:40:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0EDDAB250FD
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 02:40:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C2F2E62A;
-	Tue, 30 Jan 2024 02:40:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC68337152;
+	Tue, 30 Jan 2024 02:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I8eY5A1f"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LRs+e7Y4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F785364C6;
-	Tue, 30 Jan 2024 02:40:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A470B36B1C;
+	Tue, 30 Jan 2024 02:40:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706582424; cv=none; b=lLX07U6CFxqyYVfdh2Nt5rWQxF4LEMVQ/jDg8EqKc7M1aJvHZMn5dDoBnyOT1Er9m2jkARuYOPftxF4KqvWyBnrCSsxhEmjRUmLWQRBAHZUIQKmhQ5hLR0EbonELku5nbdhAA0HqOyblVm/vkXbCqaYv3m5377ueWCZ14WIJFV4=
+	t=1706582425; cv=none; b=l65V/dDEn0TAvwqF+74k51zL91VLCWnvU55KXxuGFpSnuoRhZO5svvCixsU+9c4eEQmlNV4mAVqAqNKF06ISUd+umcnd0xl04vW5wdgQ4ZXilgLNzBwLoZpJQZvXuf3sa8+kCCuaNRRFrA6Qj/lhyqETKNA+uV7zrnlCxkG1S+k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706582424; c=relaxed/simple;
-	bh=/+JJ+5Dh8JPDLWVZZFqERw8ATKk3+XmkeQhdjQ1wYW0=;
+	s=arc-20240116; t=1706582425; c=relaxed/simple;
+	bh=dGfWjqEV/3CsfYMoXPfrOB2UNXCZuOUBF/oNPRXQk7g=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=V56nQWZQE2JgbjejCX5q0zl/9IN+TBHsF1bBmSvg8OuafCxn8P1KTYThXLCeCT9eSmER/RDtJLTKSphelKYrLIQxj3IYx9ZxlcWMf7FpZOw48IQhui5/+GH8VKQsRsSjSyX/cUbGPlo2t6zhIOvTL5WXpLYH1yPxeQGVePCBJLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I8eY5A1f; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D5187C433F1;
-	Tue, 30 Jan 2024 02:40:23 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=bpv7TiHt12/NI77qpDCni6VQ8+kRz/MK6fmWdH2YqaMJl/AXLsB1LjiE4s0K9XU1n7N08aV0I4oG7s2lPh7ornavCzHYzY4T4kbZsXwjHMXQ9xCn3WXpQGMXeXHbhBwkpr+83cGkn4XJT/x9zbQ5W8r0ObAt/HbWuKtjHGn8oJU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LRs+e7Y4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 25BEAC433C7;
+	Tue, 30 Jan 2024 02:40:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706582423;
-	bh=/+JJ+5Dh8JPDLWVZZFqERw8ATKk3+XmkeQhdjQ1wYW0=;
+	s=k20201202; t=1706582425;
+	bh=dGfWjqEV/3CsfYMoXPfrOB2UNXCZuOUBF/oNPRXQk7g=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=I8eY5A1f54PN37rmXdRJhto6xA2Jbn8/5k35WaQ72nv9DmrHwmkRWxTJ6qD8MKnYJ
-	 Kn5r4xbI4V2l4qgpgSNbTbqmmoZQzVcCYIWkJA6ujefibnFWDKvUQ8mzroOm492QPE
-	 /2F3LGuTyPsHY8aXuWufH9llKYcZLF00PRRH6P2jBTO/BF2IY5gcPGwEsjJiyVVyuW
-	 j0MciY4VJtpLpjrcqazRsWDrzezYM8h52ntEPIfD59CZ2Z+XK3aSLRBuIoaoRKoQ4L
-	 nw1zcyXrIaXck/nbAVLSZ3o0iULYQMBuytVWtP0QyUHzXw8frlZbhP+1jZYdLfZ3JO
-	 rcxpGaD6cKcfw==
+	b=LRs+e7Y4BLQvSawg7FP9xU0V07xTKEDhcd4u5skI4aRr7h0niuZJDb6Ldzbh5Svsx
+	 FCaI6+uRBpwlgKyxdt/EzvcrbshWy05v44N2jLnAxvesLWKQgaUsgfYWIKRj39oTF5
+	 o3ZdVPApG5dPebLy6jSO9qeMs6d3bu1Go32s97y5UfqbZBwVAAweFNx/n6LrKj2utU
+	 gEfLdSNy+2sqssIZhcMZRr7s6ZAS3p/zhPrhDjkaxEv297RNEOUEpSXnsPZ6TPyBD9
+	 7GP0eLZ2mUG+9zDfqHLGLrGGC0KM3E4tNvI5TBOAMxkaMkP3sS8OcH3/PtWGEdZGm1
+	 hBjxuZDy3KrRA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BDB38C43153;
-	Tue, 30 Jan 2024 02:40:23 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 10FB7C00448;
+	Tue, 30 Jan 2024 02:40:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] selftests: net: add missing config for nftables-backed
- iptables
+Subject: Re: [PATCH net-next v3] net: tcp: accept old ack during closing
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170658242377.31723.2754949438054475014.git-patchwork-notify@kernel.org>
-Date: Tue, 30 Jan 2024 02:40:23 +0000
-References: <20240126201308.2903602-1-kuba@kernel.org>
-In-Reply-To: <20240126201308.2903602-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, shuah@kernel.org, linux-kselftest@vger.kernel.org
+ <170658242406.31723.1004142308570519706.git-patchwork-notify@kernel.org>
+Date: Tue, 30 Jan 2024 02:40:24 +0000
+References: <20240126040519.1846345-1-menglong8.dong@gmail.com>
+In-Reply-To: <20240126040519.1846345-1-menglong8.dong@gmail.com>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 26 Jan 2024 12:13:08 -0800 you wrote:
-> Modern OSes use iptables implementation with nf_tables as a backend,
-> e.g.:
+On Fri, 26 Jan 2024 12:05:19 +0800 you wrote:
+> For now, the packet with an old ack is not accepted if we are in
+> FIN_WAIT1 state, which can cause retransmission. Taking the following
+> case as an example:
 > 
-> $ iptables -V
-> iptables v1.8.8 (nf_tables)
-> 
-> Pablo points out that we need CONFIG_NFT_COMPAT to make that work,
-> otherwise we see a lot of:
+>     Client                               Server
+>       |                                    |
+>   FIN_WAIT1(Send FIN, seq=10)          FIN_WAIT1(Send FIN, seq=20, ack=10)
+>       |                                    |
+>       |                                Send ACK(seq=21, ack=11)
+>    Recv ACK(seq=21, ack=11)
+>       |
+>    Recv FIN(seq=20, ack=10)
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] selftests: net: add missing config for nftables-backed iptables
-    https://git.kernel.org/netdev/net/c/59c93583491a
+  - [net-next,v3] net: tcp: accept old ack during closing
+    https://git.kernel.org/netdev/net-next/c/795a7dfbc3d9
 
 You are awesome, thank you!
 -- 
