@@ -1,132 +1,100 @@
-Return-Path: <netdev+bounces-67107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60DED842126
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:22:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E75DE842141
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 11:29:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66A83B2A9C9
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:22:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77923285DAA
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 10:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87E9660BBB;
-	Tue, 30 Jan 2024 10:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7FBF60DDB;
+	Tue, 30 Jan 2024 10:29:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="CL5yz3La"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="cuwmIq+P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97C6518E25
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 10:22:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1784929D03
+	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 10:29:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706610161; cv=none; b=S1IdiCCM61o2iQxUry6lWeo45czl612rIPirfOWLBd8Y/0qAXj6MmFSOec0NvfggJnOvuqo3fnAclvil+JUGruWV4csO5tfUMjT5+62k2MIqx+5gyJ3gWR0BpdX8HjTHz0SNvg/NC+9xaO8v7skDnRll/gXtqb4/MP6k2I+GZKE=
+	t=1706610548; cv=none; b=dk/eIhBBxJo+lbmg701OHEK7Gz7WyNc8jltAlNhhKxIpwKs+NFjQuLc2Xp7+5K7LPxN2VdX7oRVBiYe+/Bo2qxlTyY67faXKIxu3DJMPXqaCzOsZZDWs+YrElKnv2XmVO9l3MvjsWtxKqSReP6AQr6aV6Gd9U1gn8n7FZrbLsQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706610161; c=relaxed/simple;
-	bh=mdtdqeDO+9gFb4fQkxPp14Sgj8T0EiGaQwIVwtxxhUk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iN+cXko7+oYLSVA+lTkm7GOpBAVClAb6Xfenclx/3GFWuYxwnVEoLqpQ7cXKGGLlstxgIVAEGgEa8L2bsP0gTC65G3cxpJGqYaYjHTJc6sk2MfkQyw6sszNeJ5Y54/53Y4A9TJV2n29ZMY2uSwicpxr9J8qFdfSOsC2HfxZpARk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=CL5yz3La; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-40e7065b7bdso45454495e9.3
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 02:22:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706610158; x=1707214958; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4kClIWEaLDDQHjaE6BzTG46IwU0oZSkUHIGO9qAVt3o=;
-        b=CL5yz3Laplmvo9kbtAAgShDB2VS0ycBqYcSdYpcgTeCBB2KlTbu1PzEueGXYI7ST2/
-         ZAzjknmx6C1QJvIbbEu8A2shdcnAf69CXttnGC5jZ1o1Jevi2vQkU6/aT99A6rhM1u+c
-         fmS4H1x7SBmVBCxf8DErRYcevrIqIAlc4wXgdqLBYog2F0wNs7UMmi7AaV+x6jH8uMRU
-         HQiEQ3iAfIjquhvL/MLKNHcPdK7rTybO/+3WiZyu05vjhxKjZOBYGvlj0/gFNVk71AVw
-         X9rLM0jdW12g9vqMOEQeMH3m51XFa/WtAPtZhLdeotSJ7HGILAX1EWBcJTMT+ZFr92zJ
-         kYKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706610158; x=1707214958;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4kClIWEaLDDQHjaE6BzTG46IwU0oZSkUHIGO9qAVt3o=;
-        b=nCDj5apzdjeDH9hAFBl5Ss6kDO+d6u4ntBHXhAZZU2du3nPF61xjWNV2oU0bbZDeD5
-         qf0lCWULtmzdlREk40fHp+oBKG5fBuk5qwp+9MU2Ww3nXQCpN4DqZXxFozeEWqUwvmVf
-         gRdZPD4uhR45GpmgVKMvs8TakZ7c97eQEtrC0pUOOi8elHK0rs64PhtrtQ/1xGvhF0vs
-         eQ2XrLLRA+SffrW4lq+CsUpOgcvcuPkRX0AFApRWGEV6fZ9Gnt78qO0ZX1XAKQh1P8hm
-         22drAQZWpTgbaFFD+d90QVcgV0QzcXTuMdYbY7S3BDUxR7LdeGv31Sffkc58EsdY9NNU
-         DNXw==
-X-Gm-Message-State: AOJu0YxcIAqrXN9lRDWgz7brtDHf53BOy6XGsIi7TjdLpOCrjuMzvQ+o
-	aIC9hi+05ADmvMX10YfCJgIO7YO2cCk00QvfMvEzuhrYW592the2EM1o3FJyzOo=
-X-Google-Smtp-Source: AGHT+IFaElDChgvIG3OjEHK79JFKlDyINuhOo8aBuUgr0hDZIQuzSz5VPEM9HyUEnuc2nqgv9eI7UA==
-X-Received: by 2002:a7b:ca55:0:b0:40e:df1c:cf0 with SMTP id m21-20020a7bca55000000b0040edf1c0cf0mr6651263wml.33.1706610157706;
-        Tue, 30 Jan 2024 02:22:37 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id co6-20020a0560000a0600b0033af4df8e1esm3173503wrb.47.2024.01.30.02.22.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 02:22:37 -0800 (PST)
-Date: Tue, 30 Jan 2024 11:22:34 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Breno Leitao <leitao@debian.org>,
-	Alessandro Marcolini <alessandromarcolini99@gmail.com>,
-	donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v2 00/13] tools/net/ynl: Add features for tc
- family
-Message-ID: <ZbjN6oRIZi7BfDDZ@nanopsycho>
-References: <20240129223458.52046-1-donald.hunter@gmail.com>
+	s=arc-20240116; t=1706610548; c=relaxed/simple;
+	bh=8K8bhyD6PMNKlGlBWjPd9V+qMPI5kqJnt6RENjDzrrE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KMcXretS7GHDDHsSo60PW0UbQZaqsxPtwyfdwuJGRkrBY73M2G6jfY+WWI45mkkIKkzCW/0/S7fPc7J6Clum66wuRSQYSCy8qb08lr70i8+GC37SndqVUH87lDpmi95xSYLbTvTsPT5onKUS6pgjaFgzbGb16wEhvquxcaqbD7k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=cuwmIq+P; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b213297b-53f6-4c66-8c0b-5b3fbafdbccd@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706610543;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4MDwIsz/51ydoQBF8XYbyl0+NpNiOkbyGxsM19gaKpg=;
+	b=cuwmIq+PxA+EpyjKFG93Gg6Zro1Q2r4AO0Ce4SjmDj0mUSRGrmiKzEMYb0C6E0GsPj89aP
+	7Sjmw9tgLkk+skUD7FiVzekfR3KW8sPBY7PmEzX/2FiUPtrIu3xxTxpaZSXZKxrRlX2A6O
+	EPr9FueR9wJGTEMh7zeq5Nsv7KUA89k=
+Date: Tue, 30 Jan 2024 10:28:56 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240129223458.52046-1-donald.hunter@gmail.com>
+Subject: Re: [patch net-next 0/3] dpll: expose lock status error value to user
+Content-Language: en-US
+To: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org
+Cc: kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, arkadiusz.kubalewski@intel.com, saeedm@nvidia.com,
+ leon@kernel.org, jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+ rrameshbabu@nvidia.com
+References: <20240129145916.244193-1-jiri@resnulli.us>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240129145916.244193-1-jiri@resnulli.us>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Mon, Jan 29, 2024 at 11:34:45PM CET, donald.hunter@gmail.com wrote:
->Add features to ynl for tc and update the tc spec to use them.
->
->Patch 1 adds an option to output json instead of python pretty printing.
->Patch 2, 3 adds support and docs for sub-messages in nested attribute
->spaces that reference keys from a parent space.
->Patches 4 and 7-9 refactor ynl in support of nested struct definitions
->Patch 5 implements sub-message encoding for write ops.
->Patch 6 adds logic to set default zero values for binary blobs
->Patches 10, 11 adds support and docs for nested struct definitions
->Patch 12 updates the ynl doc generator to include type information for
->struct members.
->Patch 13 updates the tc spec - still a work in progress but more complete
->
->v1 -> v2
-> - Use spec-led sub-message selector resolution instead of ChainMap
-> - Add docs for sub-message selector resolution
-> - Remove unused variable declaration in ynl-gen-rst
->
->Donald Hunter (13):
->  tools/net/ynl: Add --output-json arg to ynl cli
->  tools/net/ynl: Support sub-messages in nested attribute spaces
->  doc/netlink: Describe sub-message selector resolution
->  tools/net/ynl: Refactor fixed header encoding into separate method
->  tools/net/ynl: Add support for encoding sub-messages
->  tools/net/ynl: Encode default values for binary blobs
->  tools/net/ynl: Combine struct decoding logic in ynl
->  tools/net/ynl: Rename _fixed_header_size() to _struct_size()
->  tools/net/ynl: Move formatted_string method out of NlAttr
->  tools/net/ynl: Add support for nested structs
->  doc/netlink: Describe nested structs in netlink raw docs
->  tools/net/ynl: Add type info to struct members in generated docs
->  doc/netlink/specs: Update the tc spec
+On 29/01/2024 14:59, Jiri Pirko wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
+> 
+> Allow to expose lock status errort value over new DPLL generic netlink
+> attribute. Extend the lock_status_get() op by new argument to get the
+> value from the driver. Implement this new argument fill-up
+> in mlx5 driver.
 
-Looks good to me in general. I didn't review all the spec changes in
-details though. FWIW:
+The list of errors shows that the focus is on SyncE devices here. What
+do you think about extending it to PPS devices too? Like loss of input
+frequency, or high phase offset?
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+But the series overall looks good,
+
+Acked-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+
+
+> Jiri Pirko (3):
+>    dpll: extend uapi by lock status error attribute
+>    dpll: extend lock_status_get() op by status error and expose to user
+>    net/mlx5: DPLL, Implement lock status error value
+> 
+>   Documentation/netlink/specs/dpll.yaml         | 39 +++++++++++++++++++
+>   drivers/dpll/dpll_netlink.c                   |  9 ++++-
+>   drivers/net/ethernet/intel/ice/ice_dpll.c     |  1 +
+>   .../net/ethernet/mellanox/mlx5/core/dpll.c    | 32 +++++++++++++--
+>   drivers/ptp/ptp_ocp.c                         |  9 +++--
+>   include/linux/dpll.h                          |  1 +
+>   include/linux/mlx5/mlx5_ifc.h                 |  8 ++++
+>   include/uapi/linux/dpll.h                     | 30 ++++++++++++++
+>   8 files changed, 120 insertions(+), 9 deletions(-)
+> 
 
 
