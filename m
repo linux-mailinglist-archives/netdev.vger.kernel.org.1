@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-67031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF364841E50
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:49:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF6C5841E4E
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 09:48:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A4DC283214
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 08:49:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F8B61F21123
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 08:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D58D856745;
-	Tue, 30 Jan 2024 08:48:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 947F756B98;
+	Tue, 30 Jan 2024 08:48:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873BF52F62
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A811E56745
 	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 08:48:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706604519; cv=none; b=dfZoqgdvQd8SftTy1e+gdfabul57kFlq4hTfLReKFQVdbhloZ8ysu1F92bbGlxA2epVEx0bK5+p84i4qpuWZCbOfKcCGNZZBDaglwv9MeQJ0IIZn8sEFsxogHD3y0Ins4zR3lsseHxaSAcopHNEc0W+/znJcABtz/YSQ0fBx3NE=
+	t=1706604518; cv=none; b=MWaVhnz3OMupEubEZfsrO+SwrU4S5J13WKNQtaf5tJbl04rGpUHNLzgBDgM2QpLOY1TMBUMckqeXp7RWo24zmEipHwrCNg+QoKjx8CnJS3SCnWvpe6a7dvr69hXig9BCO/LjHLyVS5SLyla++XJhGEI1b9kVgJeW9pE/5AZUw+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706604519; c=relaxed/simple;
-	bh=Bek/3K/9Us8xj32L6nnIWfajBdqtH3d8wVxLIEnQY5A=;
+	s=arc-20240116; t=1706604518; c=relaxed/simple;
+	bh=f/+sgN/0kWTw/omdssRSkWTxNF/vP3eGAfhujUTKEKY=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AmeHFH9bYkd1xDQJeX7wDYpHu+wFFdAMqpxlD64EQOLnjfaZKYYov71FZi8+bPzd0RjK9QUqNRajO+ACztbDEF5jqt0HkpkqPYtaAWYLNrOUsfNGd5L/pzXocMRcPI++6LwdX7+eyzTnoAp7J5vA2WeZO1D1QWYomeguAxLHL8c=
+	 MIME-Version; b=bOSKsBB3WycPAHPiJ4lObNr1IjPTzNczgbU7+FII12SMgbrLPDFcMNU0gIF2hR9YTb+41brJhJlfsfG/XjWW0Q3HZeFtbhze9egXFW3/SgDAQGoXj/5m4NZ8I8XUqpZ8Jg1Wat4dozb8JWavLTEn5gFln3X61Z35yQt+FLoQ3x0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [112.20.112.150])
-	by gateway (Coremail) with SMTP id _____8AxqvDjt7hlU0UIAA--.25716S3;
+	by gateway (Coremail) with SMTP id _____8BxSOjjt7hlVEUIAA--.6017S3;
 	Tue, 30 Jan 2024 16:48:35 +0800 (CST)
 Received: from localhost.localdomain (unknown [112.20.112.150])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxrhPet7hl0bAnAA--.34545S4;
-	Tue, 30 Jan 2024 16:48:33 +0800 (CST)
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxrhPet7hl0bAnAA--.34545S5;
+	Tue, 30 Jan 2024 16:48:34 +0800 (CST)
 From: Yanteng Si <siyanteng@loongson.cn>
 To: andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -47,9 +47,9 @@ Cc: Yanteng Si <siyanteng@loongson.cn>,
 	guyinggang@loongson.cn,
 	netdev@vger.kernel.org,
 	chris.chenfeiyang@gmail.com
-Subject: [PATCH net-next v8 07/11] net: stmmac: dwmac-loongson: Add multi-channel supports for loongson
-Date: Tue, 30 Jan 2024 16:48:19 +0800
-Message-Id: <bec0d6bf78c0dcf4797a148e3509058e46ccdb13.1706601050.git.siyanteng@loongson.cn>
+Subject: [PATCH net-next v8 08/11] net: stmmac: dwmac-loongson: Fix MAC speed for GNET
+Date: Tue, 30 Jan 2024 16:48:20 +0800
+Message-Id: <e3c83d1e62cd67d5f3b50b30f46c232a307504ab.1706601050.git.siyanteng@loongson.cn>
 X-Mailer: git-send-email 2.31.4
 In-Reply-To: <cover.1706601050.git.siyanteng@loongson.cn>
 References: <cover.1706601050.git.siyanteng@loongson.cn>
@@ -60,138 +60,111 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8CxrhPet7hl0bAnAA--.34545S4
+X-CM-TRANSID:AQAAf8CxrhPet7hl0bAnAA--.34545S5
 X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoWxCr4fGF45JrWfGw4kZry7urX_yoWrJr4fpr
-	43Ca4agrW5tr1fXan8Ja15XFy5Ary3trW7WF4ayw1S9FZFy3sFvFn5Xay0yrWxCrWDAF13
-	Xr4rCF48uF1UAFbCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+X-Coremail-Antispam: 1Uk129KBj93XoWxCr4fGF45JrWfGrW7Zr4UKFX_yoW5ur4rpa
+	17Aa4UuryUtr17Gan5Aw4UZFy5K3y7Krs7Wa9Fyw4a9FZFy3saqryYgFWUAFy7urZ8uFWa
+	qr4qkr1UuFn8C3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUr529EdanIXcx71UUUUU7KY7ZEXa
 	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBvb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	0xBIdaVrnRJUUU9Sb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
 	IYs7xG6rWj6s0DM7CIcVAFz4kK6r4j6s0DM28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
 	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
 	0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAF
-	wI0_Gr1j6F4UJwAaw2AFwI0_JF0_Jw1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
+	wI0_Gr1j6F4UJwAaw2AFwI0_Jrv_JF1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqjxCEc2
 	xF0cIa020Ex4CE44I27wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_
 	Wrv_ZF1lYx0Ex4A2jsIE14v26F4j6r4UJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2
-	Ij64vIr41lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Y
-	z7v_Jr0_Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-	8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE
-	2Ix0cI8IcVAFwI0_Ar0_tr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6x
-	AIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Cr0_Gr1UMIIF0xvEx4A2jsIE
-	c7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf9x07UR7KxUUUUU=
+	Ij64vIr41l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1l4IxYO2xFxVAF
+	wI0_Jrv_JF1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zV
+	AF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Ar0_tr1l
+	IxAIcVC0I7IYx2IY6xkF7I0E14v26F4j6r4UJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF
+	4lIxAIcVC2z280aVAFwI0_Cr0_Gr1UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBI
+	daVFxhVjvjDU0xZFpf9x07URyIUUUUUU=
 
-Request allocation for MSI for specific versions.
-
-Some features of Loongson platforms are bound to the GMAC_VERSION
-register. We have to read its value in order to get the correct channel
-number.
+Current GNET on LS7A only supports ANE when speed is
+set to 1000M.
 
 Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
 Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
 Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
 ---
- .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 57 +++++++++++++++----
- 1 file changed, 46 insertions(+), 11 deletions(-)
+ .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 19 +++++++++++++++++++
+ .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |  6 ++++++
+ include/linux/stmmac.h                        |  1 +
+ 3 files changed, 26 insertions(+)
 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index 584f7322bd3e..60d0a122d7c9 100644
+index 60d0a122d7c9..264c4c198d5a 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -98,10 +98,10 @@ static void dwlgmac_dma_init_channel(struct stmmac_priv *priv,
- 	if (dma_cfg->aal)
- 		value |= DMA_BUS_MODE_AAL;
+@@ -344,6 +344,21 @@ static struct stmmac_pci_info loongson_gmac_pci_info = {
+ 	.config = loongson_gmac_config,
+ };
  
--	writel(value, ioaddr + DMA_BUS_MODE);
-+	writel(value, ioaddr + DMA_CHAN_BUS_MODE(chan));
++static void loongson_gnet_fix_speed(void *priv, unsigned int speed, unsigned int mode)
++{
++	struct loongson_data *ld = (struct loongson_data *)priv;
++	struct net_device *ndev = dev_get_drvdata(ld->dev);
++	struct stmmac_priv *ptr = netdev_priv(ndev);
++
++	/* The controller and PHY don't work well together.
++	 * We need to use the PS bit to check if the controller's status
++	 * is correct and reset PHY if necessary.
++	 */
++	if (speed == SPEED_1000)
++		if (readl(ptr->ioaddr + MAC_CTRL_REG) & (1 << 15) /* PS */)
++			phy_restart_aneg(ndev->phydev);
++}
++
+ static struct mac_device_info *loongson_setup(void *apriv)
+ {
+ 	struct stmmac_priv *priv = apriv;
+@@ -401,6 +416,7 @@ static int loongson_gnet_data(struct pci_dev *pdev,
+ 	plat->phy_interface = PHY_INTERFACE_MODE_INTERNAL;
  
- 	/* Mask interrupts by writing to CSR7 */
--	writel(DMA_INTR_DEFAULT_MASK_LOONGSON, ioaddr + DMA_INTR_ENA);
-+	writel(DMA_INTR_DEFAULT_MASK_LOONGSON, ioaddr + DMA_CHAN_INTR_ENA(chan));
- }
+ 	plat->bsp_priv = &pdev->dev;
++	plat->fix_mac_speed = loongson_gnet_fix_speed;
  
- static int dwlgmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
-@@ -238,6 +238,45 @@ static int loongson_dwmac_config_legacy(struct pci_dev *pdev,
+ 	plat->dma_cfg->pbl = 32;
+ 	plat->dma_cfg->pblx8 = true;
+@@ -416,6 +432,9 @@ static int loongson_gnet_config(struct pci_dev *pdev,
+ 				struct stmmac_resources *res,
+ 				struct device_node *np)
+ {
++	if (pdev->revision == 0x00 || pdev->revision == 0x01)
++		plat->flags |= STMMAC_FLAG_DISABLE_FORCE_1000;
++
  	return 0;
  }
  
-+static int loongson_dwmac_config_multi_msi(struct pci_dev *pdev,
-+					   struct plat_stmmacenet_data *plat,
-+					   struct stmmac_resources *res,
-+					   struct device_node *np,
-+					   int channel_num)
-+{
-+	int i, ret, vecs;
-+
-+	vecs = roundup_pow_of_two(channel_num * 2 + 1);
-+	ret = pci_alloc_irq_vectors(pdev, vecs, vecs, PCI_IRQ_MSI);
-+	if (ret < 0) {
-+		dev_info(&pdev->dev,
-+			 "MSI enable failed, Fallback to legacy interrupt\n");
-+		return loongson_dwmac_config_legacy(pdev, plat, res, np);
-+	}
-+
-+	plat->rx_queues_to_use = channel_num;
-+	plat->tx_queues_to_use = channel_num;
-+
-+	res->irq = pci_irq_vector(pdev, 0);
-+	res->wol_irq = res->irq;
-+
-+	/* INT NAME | MAC | CH7 rx | CH7 tx | ... | CH0 rx | CH0 tx |
-+	 * --------- ----- -------- --------  ...  -------- --------
-+	 * IRQ NUM  |  0  |   1    |   2    | ... |   15   |   16   |
-+	 */
-+	for (i = 0; i < channel_num; i++) {
-+		res->rx_irq[channel_num - 1 - i] =
-+			pci_irq_vector(pdev, 1 + i * 2);
-+		res->tx_irq[channel_num - 1 - i] =
-+			pci_irq_vector(pdev, 2 + i * 2);
-+	}
-+
-+	plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
-+	dev_info(&pdev->dev, "%s: multi MSI enablement successful\n", __func__);
-+
-+	return 0;
-+}
-+
- static void loongson_default_data(struct pci_dev *pdev,
- 				  struct plat_stmmacenet_data *plat)
- {
-@@ -296,11 +335,8 @@ static int loongson_gmac_config(struct pci_dev *pdev,
- 				struct stmmac_resources *res,
- 				struct device_node *np)
- {
--	int ret;
--
--	ret = loongson_dwmac_config_legacy(pdev, plat, res, np);
- 
--	return ret;
-+	return 0;
- }
- 
- static struct stmmac_pci_info loongson_gmac_pci_info = {
-@@ -380,11 +416,7 @@ static int loongson_gnet_config(struct pci_dev *pdev,
- 				struct stmmac_resources *res,
- 				struct device_node *np)
- {
--	int ret;
--
--	ret = loongson_dwmac_config_legacy(pdev, plat, res, np);
--
--	return ret;
-+	return 0;
- }
- 
- static struct stmmac_pci_info loongson_gnet_pci_info = {
-@@ -483,6 +515,9 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
- 		ld->dwlgmac_dma_ops.dma_interrupt = dwlgmac_dma_interrupt;
- 
- 		plat->setup = loongson_setup;
-+		ret = loongson_dwmac_config_multi_msi(pdev, plat, &res, np, 8);
-+	} else {
-+		ret = loongson_dwmac_config_legacy(pdev, plat, &res, np);
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+index 42d27b97dd1d..31068fbc23c9 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+@@ -422,6 +422,12 @@ stmmac_ethtool_set_link_ksettings(struct net_device *dev,
+ 		return 0;
  	}
  
- 	plat->bsp_priv = ld;
++	if (FIELD_GET(STMMAC_FLAG_DISABLE_FORCE_1000, priv->plat->flags)) {
++		if (cmd->base.speed == SPEED_1000 &&
++		    cmd->base.autoneg != AUTONEG_ENABLE)
++			return -EOPNOTSUPP;
++	}
++
+ 	return phylink_ethtool_ksettings_set(priv->phylink, cmd);
+ }
+ 
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index dee5ad6e48c5..2810361e4048 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -221,6 +221,7 @@ struct dwmac4_addrs {
+ #define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI		BIT(10)
+ #define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(11)
+ #define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(12)
++#define STMMAC_FLAG_DISABLE_FORCE_1000	BIT(13)
+ 
+ struct plat_stmmacenet_data {
+ 	int bus_id;
 -- 
 2.31.4
 
