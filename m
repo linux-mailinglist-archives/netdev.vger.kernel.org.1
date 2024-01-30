@@ -1,513 +1,257 @@
-Return-Path: <netdev+bounces-67332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DD5D842D72
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 20:59:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E1F6842D87
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 21:13:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEFCF1F2144F
-	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 19:59:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 057FA289888
+	for <lists+netdev@lfdr.de>; Tue, 30 Jan 2024 20:13:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA0A6F08E;
-	Tue, 30 Jan 2024 19:59:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21F4471B3B;
+	Tue, 30 Jan 2024 20:13:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JxnnXJyH"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="ZuwS+t4W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from SN4PR2101CU001.outbound.protection.outlook.com (mail-southcentralusazon11020003.outbound.protection.outlook.com [40.93.193.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2331769E00
-	for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 19:59:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706644746; cv=none; b=HShAOvpmKtz8EoNR2YL+5lG50TenL/JHS3Lem+bP6fgPoh73Eb7ew1S4/PcdxVJv75LFYYh4EE1DEqhnRglDheMg1BzmSZSFjy/NEmSvUvcbMov5EZswqKWWzu9aVGCppzp7heIYTq2sDNU0rPKseMwssj6d059opauwCnH3GO8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706644746; c=relaxed/simple;
-	bh=sXOZXU7UGKHZyhWcxJnp9OMDlOoRQwxL/o8g45bhcjU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=WSkPwXdERCRtbfhRuG6ONv/aULOoreibUPhJYg+5Imzbvf0/Z4j7EAnjPwCowiywy0Cm9zfcJsqLCzNSLv3972ecVrwhjCCBKfYTlyHD8tkCvV5ZxaoQBnmWpAi3arbxqjZkXl2UW5Pk+8y5t5zqBvIczE7xuJvb1dDWrMaxQGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JxnnXJyH; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a315f43ecc3so449180066b.0
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 11:59:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706644742; x=1707249542; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=iuhDYuylmrjeoeAodDqz9EntK/U4nFv0Igaz+SUwidE=;
-        b=JxnnXJyHPNGC4LTQui73ms6VMgTWwE1VoblL0p/4K0RCtzLJddxmI2iKII70zPmzsj
-         a6oQ4PheeQefv/OQJY7QUvLmiHtLJs7z2LZbPd49gSC4yJMkPR+QH3d2g2AtqSVWAinz
-         KhuHBkHHk1YpwVn38cPvily6NDiyKMRUoEiWj8uEuX2VE8ZEleouwVdr9cBdH2Mle2PV
-         uxfn44ytIHDIjSYjerr7uOOx4tgDg9+oX7yvZNXEmhmDXmBvFLQ9lgEVP8M4BJPQLNhe
-         VPOsfxv1K8EUW1gd2bUDhh5NpK1YweGonVc37kc+TUpi9fb71G3YWIPMUF9YsD0imzuB
-         +mVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706644742; x=1707249542;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=iuhDYuylmrjeoeAodDqz9EntK/U4nFv0Igaz+SUwidE=;
-        b=jE5rdQuJnW9p7YIPABSeagd6+RMp9W+lZtwPPp0qJ/6gmlqbb6uEngFVzd4w8xZT/4
-         0W3MEVd4MFOhkeTj27dyI+OjoyXX9VSo7KOcf1Q6iLmkNHraC4L/0XokhsrJm/h3YQ0r
-         mJvqRcodTJGcEaRfKXPb5OBT/b2hX05QiPpEqF9oS0QUXUxZrDBYMw09ogYh45fyo+sJ
-         nYcxD6bE7DmD7sYiY5M5cvB3Ib8+9+vCfZPcZ6yc5SN5yeNUO52rCDf9bSZKe0hVfAMw
-         7eHRQkTadV06umTeESEczx/FyQ+rAGVUOI7SPJaNY5Y9CVDn2AkngFBcapopIJSD22x4
-         O7vA==
-X-Gm-Message-State: AOJu0YxfTTs1CjieuEO6MBWazLmPDsJBk0yEEGCaTaGJPpy54uIzG19Z
-	gvT6oDvhPPW6j2Q0vhS4p+UGMdCj6wTYjuhAg0K5PrDpDlxlaKua
-X-Google-Smtp-Source: AGHT+IEE1kTHIQC5K3rTo4/ArPyvbf9Fn80p1F4tXKlX3XybEFoEEMlsdFcd3C1rWQInKPFqgPM4ow==
-X-Received: by 2002:a17:906:f8c6:b0:a35:42e0:b96d with SMTP id lh6-20020a170906f8c600b00a3542e0b96dmr7092696ejb.57.1706644741755;
-        Tue, 30 Jan 2024 11:59:01 -0800 (PST)
-Received: from ?IPV6:2a01:c22:7399:9100:1c50:e52f:e8a8:3ab5? (dynamic-2a01-0c22-7399-9100-1c50-e52f-e8a8-3ab5.c22.pool.telefonica.de. [2a01:c22:7399:9100:1c50:e52f:e8a8:3ab5])
-        by smtp.googlemail.com with ESMTPSA id l18-20020a1709067d5200b00a35c5acc51bsm105269ejp.160.2024.01.30.11.59.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Jan 2024 11:59:01 -0800 (PST)
-Message-ID: <208a69de-af5b-4624-85d5-86e87dfe6272@gmail.com>
-Date: Tue, 30 Jan 2024 20:59:00 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E1F71B34;
+	Tue, 30 Jan 2024 20:13:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.193.3
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706645606; cv=fail; b=eSlDjzOp5WFKobrRWmfAIJ2j0Go3q8xvuw6JzOcOU7SGwAxckDlpqItJshFBkCHfMBf2OiAM8IpQ5HF9tA4AmqOfiertTADccbiimvPKPVh1I5CML6MSAV98EOemzYb/H9JZnBufKrKX2a6mqgtAlLREg1sVfkA+YbBcxySK67E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706645606; c=relaxed/simple;
+	bh=AULLZhCRHkkVKrSvDX3AH7+0zbY2g7qyw+zizy/he6k=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=tkNHkLfogQmseEEIeRPySNNkvzlR0vXnR/8dMozjjtB0iVamUegMWrasMsGFsnQlhYTYJ9NUkl5NOiTgrCuCcPzUEkUfxwsiNDoH0/FPqXYKf3uM4Bdw46tjLSnkFaYbUJtnZXkvHp7buJhvAwnx8IuAzweOrwfLyf1YEFZ/Rfo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=ZuwS+t4W; arc=fail smtp.client-ip=40.93.193.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ezMXLheCwbyiCwOTjoAx7L6p0tBgOy2nUIXfkT5d8HhIRGiI7ewdiYyWVSfJwpL4BWVO7aUa5EZe4sgQcl054L+SWhnzcKLDj7gJEpVzF2g4oBHViYLPNqmsLWd3VidTkxteW9mVMdKjKfEwT3vmkscwC0MPxYpQUgv2Guhnj9d3HyiVVVX2hk8BtK61lenME662ACSax6cVQbbj5HCNu2tMwDb5ca2NHNc6fp6OsOaG+Z/twmszVg191vGcDlNhPXe5FKL8RbNjOQcgq1jh7njBcAXODUo/WPP1jGnUB/Fhx77VszeicRNWgdYvjiIrKQLitgBKGQj1Mc1tnDtCKw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sv3/sgFIpLkJFvF9I39vYkQvhh2UyQHO+UI8athqv88=;
+ b=lnjS2wy8AcQzB0Ls3DBr7UlIovbQBAmpiNG7vV8wrF8FfvUr2pa5UtoHoTWU9kisVoQ6X7qFVO8xzlvLhvi701CIe/fcyQHuLv5xaLLw4QNmrOVb+yQATkBOR98PHOUswMDSF0mkKTqcJeh2sWA4KOlzKzO02uKDkL0/Fn5/MpECFWv/venRnGH1PFkdnoOcamn61/rJgWV2zFFluDXPJ4EEo1YDeKP5gSUvn3YRfsrl/YHk3NGi/iOcjZErw7yYsffO9nXsao6zmVQ6qWK/RdzHQsvsMOLPyrM67w9hL2GaXlLVfYJD+nqSaEb5FXaA2e9k0p2IRM6npBlDurC2VA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sv3/sgFIpLkJFvF9I39vYkQvhh2UyQHO+UI8athqv88=;
+ b=ZuwS+t4WfQmeYOehJBNJkZ+VkADtTjhhUkr2dPlFUTJxyNIjAP+urMR+Qakeuo1ndVSl+X68sI/0VHdhYblcWoq+rrpNQifmYDKp6oTVOSdtt9nNQUsfigz1gg2VoBG3kNpEESw3HcIy+qkdx4rcHGhAMe5321MFE+LeBLoZlNo=
+Received: from SA1PR21MB1335.namprd21.prod.outlook.com (2603:10b6:806:1f2::11)
+ by CY8PR21MB4061.namprd21.prod.outlook.com (2603:10b6:930:5d::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.8; Tue, 30 Jan
+ 2024 20:13:21 +0000
+Received: from SA1PR21MB1335.namprd21.prod.outlook.com
+ ([fe80::5d07:5716:225f:f717]) by SA1PR21MB1335.namprd21.prod.outlook.com
+ ([fe80::5d07:5716:225f:f717%4]) with mapi id 15.20.7270.007; Tue, 30 Jan 2024
+ 20:13:21 +0000
+From: Dexuan Cui <decui@microsoft.com>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>, KY Srinivasan
+	<kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu
+	<wei.liu@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Wojciech Drewek <wojciech.drewek@intel.com>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC: Shradha Gupta <shradhagupta@microsoft.com>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>
+Subject: RE: [PATCH] hv_netvsc:Register VF in netvsc_probe if
+ NET_DEVICE_REGISTER missed
+Thread-Topic: [PATCH] hv_netvsc:Register VF in netvsc_probe if
+ NET_DEVICE_REGISTER missed
+Thread-Index: AQHaU0yZPmSUZITQDkq6vegFrHdKtbDyrTeg
+Date: Tue, 30 Jan 2024 20:13:21 +0000
+Message-ID:
+ <SA1PR21MB1335C5554F769454AAEDE1C8BF7D2@SA1PR21MB1335.namprd21.prod.outlook.com>
+References:
+ <1706599135-12651-1-git-send-email-shradhagupta@linux.microsoft.com>
+In-Reply-To:
+ <1706599135-12651-1-git-send-email-shradhagupta@linux.microsoft.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=beac0a21-5dac-4c54-8eec-76ca3372c098;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2024-01-30T18:26:57Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR21MB1335:EE_|CY8PR21MB4061:EE_
+x-ms-office365-filtering-correlation-id: 947d65b7-1a81-41cc-ea7f-08dc21cfe7d5
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ MF1ETwzxTD5oBDh+Gc+Hei0Tus1AiRNKNTpmvsSOYMXv+3mUa0SNksf84yCczuDT1RUWgzvJSkO49f/MpzmEGkPv3KSmeTWIEoFLW8JlsSJliOMxf4e62Rp74sz/HScXmTAg1jAwgaiWPTvHCI6Oo8UwmhkYmI7gyHvsNHi8NtG4LFqgmfidqGiWI9Cd9oUZMfZz9Brh+VOniJyAG+vLKHCS/trKnZJAHlYEB/B0622ESuo3KmEjYDAPLDmrVLJter/bLEjlJKwIjqMT2w91YU+le9u4X2ZjbrcDWEpiZwuPl4eUM/cI61HpIkGfA6mKNL0gGinEkEXOqFP7uB6Z44fi/aSuyy6f++TsyHjORpqDtUxnHRYQE8+olgf9c/jxJj9q0yoL8qg6Lk5ImGXGF+Ys1JBUWWTRxJyUFpkE952SkTzl672ljEQGN9TaVD/mxCeS/9/mxB+7ota/vYK1pp/j08awK8iTUfdaJ/2VGlxGi8aENZ21Tzp1lnroH0uKK9CNfmzNdyAp8Uh4TzyqkCVJBjaimI1BjoU/VLiPmb9j3pegCax7co3oX6PMUrxTBYWcCyFvbu289RZWNcmlPT1y7YBrUygJJubzfo8LIY4DJaXOR3A52nqbpxdyn/XBWKJpOy+XqjR2FHzupEHAdw==
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR21MB1335.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(39860400002)(346002)(366004)(136003)(396003)(376002)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(55016003)(41300700001)(921011)(26005)(38070700009)(7696005)(8990500004)(478600001)(9686003)(10290500003)(6506007)(83380400001)(71200400001)(82950400001)(82960400001)(38100700002)(122000001)(2906002)(86362001)(7416002)(66446008)(5660300002)(64756008)(54906003)(76116006)(66556008)(66946007)(66476007)(316002)(110136005)(8676002)(8936002)(4326008)(52536014)(33656002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?ikVS0r+VYoJH8LLcFlr2OxUYCkYXZkSV7MGnUWqBroXUVrAeAckg9d9YXFFa?=
+ =?us-ascii?Q?EqDmYUv3YuXXn44AQ+/twyDmB5NpKYHCInilceOPj7STcRG3Wrpp5MTmkjGp?=
+ =?us-ascii?Q?QCQLZxpUcfHGal3vkuaIAfWzPaZv05n1D6uR5Kgr1yHvU4BNamFko8SFBlRE?=
+ =?us-ascii?Q?ktbZouOWE4NprGjVJfk1nsXxUhvH8oKoC6o809hYRsmohKMwvdlzqI30bZ8p?=
+ =?us-ascii?Q?aYRXqf0zQooUiw6WWuE411i0JX2p4F8uQei3XsAHfx0VKzNBO56iHgpdwkjY?=
+ =?us-ascii?Q?29ZDtBtrnD25wI0W2ciOS1JXeHn8oMaBZwn19XjrtNy2+zRIWPw3j55eyAcm?=
+ =?us-ascii?Q?Phu9EdmU5aUpp8+WonHR6l7Q1ujYd5yhU2acg4rsiBHprupICYC732YSgehA?=
+ =?us-ascii?Q?5y+TyBJMUc+yypLe5h2obfJ7pBmz/2q71re0vPPQSGKyT9fgkZPlrHd6GrJG?=
+ =?us-ascii?Q?gBtBtIaam0uij3XIgU97xhNqW8/lpis5080GN4M67h/A+69jlHFHHLKAzdnd?=
+ =?us-ascii?Q?9o36epFQqpcf4gAwBkIB8tWf9B8vFR43telTC+KVqh4e+4s/t0hdCEC5CDda?=
+ =?us-ascii?Q?v4lLOpTEOIUCV4RQ9LLu/irF0eKL9ytCuTFacGBq+T+aTfw9ZDCdCEwVMgQZ?=
+ =?us-ascii?Q?JU2Szm7Am/Z8kFqLRCwt0cpS5GMtxry4u31i4h3sV3U66weqahQ4/B5RfV45?=
+ =?us-ascii?Q?LBkpFF6RoRmOWJ5sBjWMHUlZTsXf0ouHQjaxgf9QrE9cn3OvW3TmrsN0TeJo?=
+ =?us-ascii?Q?lQuOiB2WNRXrf+cFHmj5fPLgCcUgEXf/iMD7he+AP9QPzS+88Ax4DkCWLeTX?=
+ =?us-ascii?Q?0HGtYqjsiNGJxRj09BCR+d+suXJWPbOh+ojEZMtLsYRkLiWw5vyBRky7wZ1b?=
+ =?us-ascii?Q?l7LCPfG4dP/NWzTgla6oF2VQMBCpj0pIDcPH2k/EAX0rZZcn3hNRHuwQI4M+?=
+ =?us-ascii?Q?U85ul2gudo4BoAY6N3GrqXo85jARJQ9FuXjeSZ6T4BKdhlfDXMWzS6quZVp0?=
+ =?us-ascii?Q?GHYKdjqki2pl/H/+N1QHawSJ5D/Dz6sfxBVsn8FG+XDz0h5QWyFwK37gICLL?=
+ =?us-ascii?Q?jCbZUwMhCjJtW8Bd2nnTkVIyH8qxqPZ1FcYuaA9Cjl8kyJqP3bqpOYmuDOxy?=
+ =?us-ascii?Q?AXERm78lxVy1nFHutSBDI/D8FtGaP63LaXqmo8DC5iEATreMJ3Bf8SK9Q1B6?=
+ =?us-ascii?Q?BDqUSf+ztloOoSu3VywrWnf9MNlsSA5t6wpytQmKTX07vcPh0TSMZmBqgMrA?=
+ =?us-ascii?Q?VLeL1ndocGYTRHiAm0x5DidCH3yNivNYZkODvgIfqdbt0PBXUjuGxogwnFGE?=
+ =?us-ascii?Q?Joobdm2C7MFoVhK1ixYjtRLxFHetCd+l1CAYvU74gbGJVfMUTKVgytfIOQsl?=
+ =?us-ascii?Q?/W1lszv4HvvAZdoAVunTwU3HkBnkKIzV0WODFQyoEqT2UFUBMP2wXdzF0p08?=
+ =?us-ascii?Q?mb2ni3uXzUMXKwvMa71Gfh5dWWe5BsVwgvoxyhwn8vaFd318dwBS93d7OgCZ?=
+ =?us-ascii?Q?oaqrhS74pHzB9s3Ug3uf8/GJPFXEz6mjQdrSjg/xb/IOppTqWJUq/3sBuKhq?=
+ =?us-ascii?Q?xFqcKc9DBaYruMoVdDA=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Kernel Module r8169 and the Realtek 8126 PCIe 5 G/bps WIRED
- ethernet adapter
-To: Joe Salmeri <jmscdba@gmail.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <edabbc1f-5440-4170-83a4-f436a6d04f76@gmail.com>
- <64b65025-792c-43c9-8ae5-22030264e374@gmail.com>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <64b65025-792c-43c9-8ae5-22030264e374@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR21MB1335.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 947d65b7-1a81-41cc-ea7f-08dc21cfe7d5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jan 2024 20:13:21.0904
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: gqBS1aXbPAH4RuvUP27nZW8lA4qAjwlE4MsrEBnBo/us7aJ5ZoH5r2seQjqHqRhe974PujXhZbtejmsPM81tiA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR21MB4061
 
-On 30.01.2024 17:34, Joe Salmeri wrote:
-> On 1/29/24 17:19, Heiner Kallweit wrote:
->> On 29.01.2024 19:31, Joe Salmeri wrote:
->>> Hi,
->>>
->>> I recently built a new PC using the Asus z790 Maximus Formula motherboard.
->>>
->>> The z790 Formula uses the Realtek 8126 PCIe 5 G/bps WIRED ethernet adapter.
->>>
->>> I am using openSUSE Tumbleweed build 20231228 with kernel 6.6.7-1
->>>
->>> There does not seem to be a driver for the Realtek 8126.
->>>
->>> Here is the device info from "lspci | grep -i net"
->>>
->>>      04:00.0 Network controller: Intel Corporation Device 272b (rev 1a)
->>>      05:00.0 Ethernet controller: Realtek Semiconductor Co., Ltd. Device 8126 (rev 01)
->>>
->>> So it is detects the 8126 just fine it just doesn't have a driver for it.
->>>
->>> I checked realtek.com and found
->>>
->>> https://www.realtek.com/en/component/zoo/category/network-interface-controllers-10-100-1000m-gigabit-ethernet-pci-express-software
->>>
->>> The download link still says 8125 ( and kernel 6.4 ), but I compiled the source and since I have Secure boot enabled, I signed the
->>> resulting module file.
->>>
->>> The driver loads successfully and I now have wired networking and it has worked flawlessly for the last 2 months.
->>>
->>> I submitted a bug in Tumbleweed requesting support for the Realtek 8126 be added and was informed that the r8169 kernel module
->>> is what is used to support the older Realtek 8125 device.
->>>
->>> Since the drivers from Realtek seem to support both the r8125 and my newer r8126, the Tumbleweed support prepared a test
->>> kernel 6.6.7-1 for me where they added the PCI entry for the r8126 and I installed and tested it out.
->>>
->>> Although it does now load the r8169 module with their test kernel, the r8126 device still does not work.
->>>
->>> The only 2 lines that reference the r8169 in the dmesg log are these 2 lines:
->>>
->>> [    3.237151] r8169 0000:05:00.0: enabling device (0000 -> 0003)
->>> [    3.237289] r8169 0000:05:00.0: error -ENODEV: unknown chip XID 649, contact r8169 maintainers (see MAINTAINERS file)
->>>
->>> I reported the results of the test to Tumbleweed support and they said that additional tweaks will be needed for the r8169
->>> module to support the r8126 wired network adapter and thatn I should request to you to add support.
->>>
->>> The details of the openSUSE bug report on the issue can be found here:
->>>
->>>      https://bugzilla.suse.com/show_bug.cgi?id=1217417
->>>
->>> Could we please get support added for the r8126 - Realtek 8126 PCIe 5 G/bps WIRED ethernet adapter added to the kernel ?
->>>
->> Thanks for the report. Actually it's not a bug report but a feature request.
->> Realtek provides no information about new chip versions and no data sheets, therefore the only
->> source of information is the r8125 vendor driver. Each chip requires a lot of version-specific
->> handling, therefore the first steps you described go in the right direction, but are by far not
->> sufficient. Patch below applies on linux-next, please test whether it works for you, and report back.
->>
->> Disclaimer:
->> r8125 references a firmware file that hasn't been provided to linux-firmware by Realtek yet.
->> Typically the firmware files tune PHY parameters to deal with compatibility issues.
->> In addition r8125 includes a lot of PHY tuning for RTL8126A.
->> Depending on cabling, link partner etc. the patch may work for you, or you may experience
->> link instability or worst case no link at all.
->>
->> Maybe RTL8126a also has a new integrated PHY version that isn't supported yet.
->> In this case the driver will complain with the following message and I'd need the PHY ID.
->> "no dedicated PHY driver found for PHY ID xxx"
-> 
-> Thanks very much for your quick response.
-> 
-> I forward your patch to the openSUSE people I have been working and they prepared a new test kernel 6.7.2 with the patches for for me to test.
-> 
-> I just installed the test kernel provided with the patches but just as you expected it complains about no dedicated PHY driver found.
-> 
-> Here is the dmesg | grep 8169 output with the information you requested
-> 
-> [    3.176753] r8169 0000:05:00.0: enabling device (0000 -> 0003)
-> [    3.184887] r8169 0000:05:00.0: no dedicated PHY driver found for PHY ID 0x001cc862, maybe realtek.ko needs to be added to initramfs?
-> [    3.184912] r8169: probe of 0000:05:00.0 failed with error -49
-> 
-> Thank you for your efforts.
-> 
-> Please let me know if you need any further details.
-> 
->> ---
->>   drivers/net/ethernet/realtek/r8169.h          |  1 +
->>   drivers/net/ethernet/realtek/r8169_main.c     | 91 +++++++++++++++----
->>   .../net/ethernet/realtek/r8169_phy_config.c   |  1 +
->>   3 files changed, 77 insertions(+), 16 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/realtek/r8169.h b/drivers/net/ethernet/realtek/r8169.h
->> index 81567fcf3..c921456ed 100644
->> --- a/drivers/net/ethernet/realtek/r8169.h
->> +++ b/drivers/net/ethernet/realtek/r8169.h
->> @@ -68,6 +68,7 @@ enum mac_version {
->>       /* support for RTL_GIGA_MAC_VER_60 has been removed */
->>       RTL_GIGA_MAC_VER_61,
->>       RTL_GIGA_MAC_VER_63,
->> +    RTL_GIGA_MAC_VER_65,
->>       RTL_GIGA_MAC_NONE
->>   };
->>   diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
->> index e0abdbcfa..ebf7a3b13 100644
->> --- a/drivers/net/ethernet/realtek/r8169_main.c
->> +++ b/drivers/net/ethernet/realtek/r8169_main.c
->> @@ -55,6 +55,7 @@
->>   #define FIRMWARE_8107E_2    "rtl_nic/rtl8107e-2.fw"
->>   #define FIRMWARE_8125A_3    "rtl_nic/rtl8125a-3.fw"
->>   #define FIRMWARE_8125B_2    "rtl_nic/rtl8125b-2.fw"
->> +#define FIRMWARE_8126A_2    "rtl_nic/rtl8126a-2.fw"
->>     #define TX_DMA_BURST    7    /* Maximum PCI burst, '7' is unlimited */
->>   #define InterFrameGap    0x03    /* 3 means InterFrameGap = the shortest one */
->> @@ -136,6 +137,7 @@ static const struct {
->>       [RTL_GIGA_MAC_VER_61] = {"RTL8125A",        FIRMWARE_8125A_3},
->>       /* reserve 62 for CFG_METHOD_4 in the vendor driver */
->>       [RTL_GIGA_MAC_VER_63] = {"RTL8125B",        FIRMWARE_8125B_2},
->> +    [RTL_GIGA_MAC_VER_65] = {"RTL8126A",        FIRMWARE_8126A_2},
->>   };
->>     static const struct pci_device_id rtl8169_pci_tbl[] = {
->> @@ -158,6 +160,7 @@ static const struct pci_device_id rtl8169_pci_tbl[] = {
->>       { PCI_VENDOR_ID_LINKSYS, 0x1032, PCI_ANY_ID, 0x0024 },
->>       { 0x0001, 0x8168, PCI_ANY_ID, 0x2410 },
->>       { PCI_VDEVICE(REALTEK,    0x8125) },
->> +    { PCI_VDEVICE(REALTEK,    0x8126) },
->>       { PCI_VDEVICE(REALTEK,    0x3000) },
->>       {}
->>   };
->> @@ -327,8 +330,12 @@ enum rtl8168_registers {
->>   };
->>     enum rtl8125_registers {
->> +    INT_CFG0_8125        = 0x34,
->> +#define INT_CFG0_ENABLE_8125        BIT(0)
->> +#define INT_CFG0_CLKREQEN        BIT(3)
->>       IntrMask_8125        = 0x38,
->>       IntrStatus_8125        = 0x3c,
->> +    INT_CFG1_8125        = 0x7a,
->>       TxPoll_8125        = 0x90,
->>       MAC0_BKP        = 0x19e0,
->>       EEE_TXIDLE_TIMER_8125    = 0x6048,
->> @@ -1139,7 +1146,7 @@ static void rtl_writephy(struct rtl8169_private *tp, int location, int val)
->>       case RTL_GIGA_MAC_VER_31:
->>           r8168dp_2_mdio_write(tp, location, val);
->>           break;
->> -    case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_63:
->> +    case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_65:
->>           r8168g_mdio_write(tp, location, val);
->>           break;
->>       default:
->> @@ -1154,7 +1161,7 @@ static int rtl_readphy(struct rtl8169_private *tp, int location)
->>       case RTL_GIGA_MAC_VER_28:
->>       case RTL_GIGA_MAC_VER_31:
->>           return r8168dp_2_mdio_read(tp, location);
->> -    case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_63:
->> +    case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_65:
->>           return r8168g_mdio_read(tp, location);
->>       default:
->>           return r8169_mdio_read(tp, location);
->> @@ -1507,7 +1514,7 @@ static void __rtl8169_set_wol(struct rtl8169_private *tp, u32 wolopts)
->>           break;
->>       case RTL_GIGA_MAC_VER_34:
->>       case RTL_GIGA_MAC_VER_37:
->> -    case RTL_GIGA_MAC_VER_39 ... RTL_GIGA_MAC_VER_63:
->> +    case RTL_GIGA_MAC_VER_39 ... RTL_GIGA_MAC_VER_65:
->>           if (wolopts)
->>               rtl_mod_config2(tp, 0, PME_SIGNAL);
->>           else
->> @@ -2073,6 +2080,9 @@ static enum mac_version rtl8169_get_mac_version(u16 xid, bool gmii)
->>           u16 val;
->>           enum mac_version ver;
->>       } mac_info[] = {
->> +        /* 8126A family. */
->> +        { 0x7cf, 0x649,    RTL_GIGA_MAC_VER_65 },
->> +
->>           /* 8125B family. */
->>           { 0x7cf, 0x641,    RTL_GIGA_MAC_VER_63 },
->>   @@ -2343,6 +2353,7 @@ static void rtl_init_rxcfg(struct rtl8169_private *tp)
->>           RTL_W32(tp, RxConfig, RX_FETCH_DFLT_8125 | RX_DMA_BURST);
->>           break;
->>       case RTL_GIGA_MAC_VER_63:
->> +    case RTL_GIGA_MAC_VER_65:
->>           RTL_W32(tp, RxConfig, RX_FETCH_DFLT_8125 | RX_DMA_BURST |
->>               RX_PAUSE_SLOT_ON);
->>           break;
->> @@ -2772,7 +2783,7 @@ static void rtl_enable_exit_l1(struct rtl8169_private *tp)
->>       case RTL_GIGA_MAC_VER_37 ... RTL_GIGA_MAC_VER_38:
->>           rtl_eri_set_bits(tp, 0xd4, 0x0c00);
->>           break;
->> -    case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_63:
->> +    case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_65:
->>           r8168_mac_ocp_modify(tp, 0xc0ac, 0, 0x1f80);
->>           break;
->>       default:
->> @@ -2786,7 +2797,7 @@ static void rtl_disable_exit_l1(struct rtl8169_private *tp)
->>       case RTL_GIGA_MAC_VER_34 ... RTL_GIGA_MAC_VER_38:
->>           rtl_eri_clear_bits(tp, 0xd4, 0x1f00);
->>           break;
->> -    case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_63:
->> +    case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_65:
->>           r8168_mac_ocp_modify(tp, 0xc0ac, 0x1f80, 0);
->>           break;
->>       default:
->> @@ -2796,6 +2807,8 @@ static void rtl_disable_exit_l1(struct rtl8169_private *tp)
->>     static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
->>   {
->> +    u8 val8;
->> +
->>       if (tp->mac_version < RTL_GIGA_MAC_VER_32)
->>           return;
->>   @@ -2809,11 +2822,19 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
->>               return;
->>             rtl_mod_config5(tp, 0, ASPM_en);
->> -        rtl_mod_config2(tp, 0, ClkReqEn);
->> +        switch (tp->mac_version) {
->> +        case RTL_GIGA_MAC_VER_65:
->> +            val8 = RTL_R8(tp, INT_CFG0_8125) | INT_CFG0_CLKREQEN;
->> +            RTL_W8(tp, INT_CFG0_8125, val8);
->> +            break;
->> +        default:
->> +            rtl_mod_config2(tp, 0, ClkReqEn);
->> +            break;
->> +        }
->>             switch (tp->mac_version) {
->>           case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
->> -        case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_63:
->> +        case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_65:
->>               /* reset ephy tx/rx disable timer */
->>               r8168_mac_ocp_modify(tp, 0xe094, 0xff00, 0);
->>               /* chip can trigger L1.2 */
->> @@ -2825,14 +2846,22 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
->>       } else {
->>           switch (tp->mac_version) {
->>           case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
->> -        case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_63:
->> +        case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_65:
->>               r8168_mac_ocp_modify(tp, 0xe092, 0x00ff, 0);
->>               break;
->>           default:
->>               break;
->>           }
->>   -        rtl_mod_config2(tp, ClkReqEn, 0);
->> +        switch (tp->mac_version) {
->> +        case RTL_GIGA_MAC_VER_65:
->> +            val8 = RTL_R8(tp, INT_CFG0_8125) & ~INT_CFG0_CLKREQEN;
->> +            RTL_W8(tp, INT_CFG0_8125, val8);
->> +            break;
->> +        default:
->> +            rtl_mod_config2(tp, ClkReqEn, 0);
->> +            break;
->> +        }
->>           rtl_mod_config5(tp, ASPM_en, 0);
->>       }
->>   }
->> @@ -3545,10 +3574,15 @@ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
->>       /* disable new tx descriptor format */
->>       r8168_mac_ocp_modify(tp, 0xeb58, 0x0001, 0x0000);
->>   -    if (tp->mac_version == RTL_GIGA_MAC_VER_63)
->> +    if (tp->mac_version == RTL_GIGA_MAC_VER_65)
->> +        RTL_W8(tp, 0xD8, RTL_R8(tp, 0xD8) & ~0x02);
->> +
->> +    if (tp->mac_version == RTL_GIGA_MAC_VER_65)
->> +        r8168_mac_ocp_modify(tp, 0xe614, 0x0700, 0x0400);
->> +    else if (tp->mac_version == RTL_GIGA_MAC_VER_63)
->>           r8168_mac_ocp_modify(tp, 0xe614, 0x0700, 0x0200);
->>       else
->> -        r8168_mac_ocp_modify(tp, 0xe614, 0x0700, 0x0400);
->> +        r8168_mac_ocp_modify(tp, 0xe614, 0x0700, 0x0300);
->>         if (tp->mac_version == RTL_GIGA_MAC_VER_63)
->>           r8168_mac_ocp_modify(tp, 0xe63e, 0x0c30, 0x0000);
->> @@ -3561,6 +3595,10 @@ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
->>       r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0030);
->>       r8168_mac_ocp_modify(tp, 0xe040, 0x1000, 0x0000);
->>       r8168_mac_ocp_modify(tp, 0xea1c, 0x0003, 0x0001);
->> +    if (tp->mac_version == RTL_GIGA_MAC_VER_65)
->> +        r8168_mac_ocp_modify(tp, 0xea1c, 0x0300, 0x0000);
->> +    else
->> +        r8168_mac_ocp_modify(tp, 0xea1c, 0x0004, 0x0000);
->>       r8168_mac_ocp_modify(tp, 0xe0c0, 0x4f0f, 0x4403);
->>       r8168_mac_ocp_modify(tp, 0xe052, 0x0080, 0x0068);
->>       r8168_mac_ocp_modify(tp, 0xd430, 0x0fff, 0x047f);
->> @@ -3575,10 +3613,10 @@ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
->>         rtl_loop_wait_low(tp, &rtl_mac_ocp_e00e_cond, 1000, 10);
->>   -    if (tp->mac_version == RTL_GIGA_MAC_VER_63)
->> -        rtl8125b_config_eee_mac(tp);
->> -    else
->> +    if (tp->mac_version == RTL_GIGA_MAC_VER_61)
->>           rtl8125a_config_eee_mac(tp);
->> +    else
->> +        rtl8125b_config_eee_mac(tp);
->>         rtl_disable_rxdvgate(tp);
->>   }
->> @@ -3622,6 +3660,12 @@ static void rtl_hw_start_8125b(struct rtl8169_private *tp)
->>       rtl_hw_start_8125_common(tp);
->>   }
->>   +static void rtl_hw_start_8126a(struct rtl8169_private *tp)
->> +{
->> +    rtl_set_def_aspm_entry_latency(tp);
->> +    rtl_hw_start_8125_common(tp);
->> +}
->> +
->>   static void rtl_hw_config(struct rtl8169_private *tp)
->>   {
->>       static const rtl_generic_fct hw_configs[] = {
->> @@ -3664,6 +3708,7 @@ static void rtl_hw_config(struct rtl8169_private *tp)
->>           [RTL_GIGA_MAC_VER_53] = rtl_hw_start_8117,
->>           [RTL_GIGA_MAC_VER_61] = rtl_hw_start_8125a_2,
->>           [RTL_GIGA_MAC_VER_63] = rtl_hw_start_8125b,
->> +        [RTL_GIGA_MAC_VER_65] = rtl_hw_start_8126a,
->>       };
->>         if (hw_configs[tp->mac_version])
->> @@ -3674,9 +3719,23 @@ static void rtl_hw_start_8125(struct rtl8169_private *tp)
->>   {
->>       int i;
->>   +    RTL_W8(tp, INT_CFG0_8125, 0x00);
->> +
->>       /* disable interrupt coalescing */
->> -    for (i = 0xa00; i < 0xb00; i += 4)
->> -        RTL_W32(tp, i, 0);
->> +    switch (tp->mac_version) {
->> +    case RTL_GIGA_MAC_VER_61:
->> +        for (i = 0xa00; i < 0xb00; i += 4)
->> +            RTL_W32(tp, i, 0);
->> +        break;
->> +    case RTL_GIGA_MAC_VER_63:
->> +    case RTL_GIGA_MAC_VER_65:
->> +        for (i = 0xa00; i < 0xa80; i += 4)
->> +            RTL_W32(tp, i, 0);
->> +        RTL_W16(tp, INT_CFG1_8125, 0x0000);
->> +        break;
->> +    default:
->> +        break;
->> +    }
->>         rtl_hw_config(tp);
->>   }
->> diff --git a/drivers/net/ethernet/realtek/r8169_phy_config.c b/drivers/net/ethernet/realtek/r8169_phy_config.c
->> index b50f16786..badf78f81 100644
->> --- a/drivers/net/ethernet/realtek/r8169_phy_config.c
->> +++ b/drivers/net/ethernet/realtek/r8169_phy_config.c
->> @@ -1152,6 +1152,7 @@ void r8169_hw_phy_config(struct rtl8169_private *tp, struct phy_device *phydev,
->>           [RTL_GIGA_MAC_VER_53] = rtl8117_hw_phy_config,
->>           [RTL_GIGA_MAC_VER_61] = rtl8125a_2_hw_phy_config,
->>           [RTL_GIGA_MAC_VER_63] = rtl8125b_hw_phy_config,
->> +        [RTL_GIGA_MAC_VER_65] = NULL,
->>       };
->>         if (phy_configs[ver])
-> 
-> 
+> From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> Sent: Monday, January 29, 2024 11:19 PM
+>  [...]
+> If hv_netvsc driver is removed and reloaded, the NET_DEVICE_REGISTER
 
-The followoing adds support for the integrated PHY.
-Please apply it on-top and re-test.
+s/removed/unloaded/
+unloaded looks more accurate to me :-)
 
----
- drivers/net/phy/realtek.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+> [...]
+> Tested-on: Ubuntu22
+> Testcases: LISA testsuites
+> 	   verify_reload_hyperv_modules, perf_tcp_ntttcp_sriov
+IMO the 3 lines can be removed: this bug is not specific to Ubuntu, and the
+test case names don't provide extra value to help understand the issue
+here and they might cause more questions unnecessarily, e.g. what's LISA,
+what exactly do the test cases do.
 
-diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-index 894172a3e..132784321 100644
---- a/drivers/net/phy/realtek.c
-+++ b/drivers/net/phy/realtek.c
-@@ -1047,6 +1047,16 @@ static struct phy_driver realtek_drvs[] = {
- 		.resume         = rtlgen_resume,
- 		.read_page      = rtl821x_read_page,
- 		.write_page     = rtl821x_write_page,
-+	}, {
-+		PHY_ID_MATCH_EXACT(0x001cc862),
-+		.name           = "RTL8251B 5Gbps PHY",
-+		.get_features   = rtl822x_get_features,
-+		.config_aneg    = rtl822x_config_aneg,
-+		.read_status    = rtl822x_read_status,
-+		.suspend        = genphy_suspend,
-+		.resume         = rtlgen_resume,
-+		.read_page      = rtl821x_read_page,
-+		.write_page     = rtl821x_write_page,
- 	}, {
- 		PHY_ID_MATCH_EXACT(0x001cc961),
- 		.name		= "RTL8366RB Gigabit Ethernet",
--- 
-2.43.0
+> +/* Macros to define the context of vf registration */
+> +#define VF_REG_IN_PROBE		1
+> +#define VF_REG_IN_RECV_CBACK	2
 
+I think VF_REG_IN_NOTIFIER is a better name?
+RECV_CBALL looks inaccurate to me.
+
+> @@ -2205,8 +2209,11 @@ static int netvsc_vf_join(struct net_device
+> *vf_netdev,
+>  			   ndev->name, ret);
+>  		goto upper_link_failed;
+>  	}
+> -
+> -	schedule_delayed_work(&ndev_ctx->vf_takeover,
+> VF_TAKEOVER_INT);
+> +	/* If this registration is called from probe context vf_takeover
+> +	 * is taken care of later in probe itself.
+I suspect "later in probe itself" is not accurate.
+If 'context' is VF_REG_IN_PROBE, I suppose what happens here is:
+after netvsc_probe() finishes, the netvsc interface becomes available,
+so the user space will ifup it, and netvsc_open() will UP the VF interface,
+and netvsc_netdev_event() is called for the VF with event =3D=3D
+NETDEV_POST_INIT (?) and NETDEV_CHANGE, and the data path is
+switched to the VF.
+
+If my understanding is correct, I think in the case of 'context' =3D=3D
+VF_REG_IN_PROBE, I suspect the "Align MTU of VF with master"
+and the "sync address list from ndev to VF" in __netvsc_vf_setup() are
+omitted? If so, should this be fixed? e.g. Not sure if the below is an issu=
+e or not:
+1) a VF is bound to a NetVSC interface, and a user sets the MTUs to 1024.
+2) rmmod hv_netvsc
+3) modprobe hv_netvsc
+4) the netvsc interface uses MTU=3D1500 (the default), and the VF still use=
+s 1024.
+
+> @@ -2597,6 +2604,34 @@ static int netvsc_probe(struct hv_device *dev,
+>  	}
+>=20
+>  	list_add(&net_device_ctx->list, &netvsc_dev_list);
+> +
+> +	/* When the hv_netvsc driver is removed and readded, the
+
+s/removed and readded/unloaded and reloaded/
+
+> +	 * NET_DEVICE_REGISTER for the vf device is replayed before
+> probe
+> +	 * is complete. This is because register_netdevice_notifier() gets
+> +	 * registered before vmbus_driver_register() so that callback func
+> +	 * is set before probe and we don't miss events like
+> NETDEV_POST_INIT
+> +	 * So, in this section we try to register each matching
+
+Looks like there are spaces at the end of the line. We can move up a few wo=
+rds
+from the next line :-)
+
+s/each matching/the matching/
+A NetVSC interface has only 1 matching VF device.
+
+> +	 * vf device that is present as a netdevice, knowing that it's register
+
+s/it's/its/
+
+> +	 * call is not processed in the netvsc_netdev_notifier(as probing is
+> +	 * progress and get_netvsc_byslot fails).
+> +	 */
+> +	for_each_netdev(dev_net(net), vf_netdev) {
+> +		if (vf_netdev->netdev_ops =3D=3D &device_ops)
+> +			continue;
+> +
+> +		if (vf_netdev->type !=3D ARPHRD_ETHER)
+> +			continue;
+> +
+> +		if (is_vlan_dev(vf_netdev))
+> +			continue;
+> +
+> +		if (netif_is_bond_master(vf_netdev))
+> +			continue;
+
+The code above is duplicated from netvsc_netdev_event().
+Can we add a new helper function is_matching_vf() to avoid the duplication?
+
+> +		netvsc_prepare_bonding(vf_netdev);
+> +		netvsc_register_vf(vf_netdev, VF_REG_IN_PROBE);
+> +		__netvsc_vf_setup(net, vf_netdev);
+
+add a "break;' ?
+
+> +	}
+>  	rtnl_unlock();
 
 
