@@ -1,107 +1,254 @@
-Return-Path: <netdev+bounces-67654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB0E1844725
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 19:29:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58ED3844735
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 19:34:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 340F01F2663C
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 18:29:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C227CB2111B
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 18:34:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B525813342C;
-	Wed, 31 Jan 2024 18:29:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF0414A9E;
+	Wed, 31 Jan 2024 18:34:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MgD6dl2u"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WIHFkjTI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB0B12FF7C;
-	Wed, 31 Jan 2024 18:29:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706725777; cv=none; b=IzYczyU6vwIlT6pJqO5mR3FaOIF8FW3tG7dS0wwclSc4LsCt9ifvXyXvXFu3dEzvRGp1Iih0xuOcRaAFoSIaawU8AgWiHqsiGsg00q/Hs1AEuu8JVKnhkHnX0Rmcj2VobIays+gvm23G4IHfUga8D8O89DHeOxuddepwenmqhFo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706725777; c=relaxed/simple;
-	bh=jqQX/UgTogu7KiUnstYHSz/k8BttGHPXLVteXEvXCpE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Yi1kzJtEGBt4icj4BbuoKgPgcrMW0dVxVDZrt/vMXDlchhWs8UjokDvUNUShoHXROFLzo/KN9O3b362QGz2yiTnjoNvaFvT2FC0KGIZyPuL3MCEYPRQzbMkk1ZiqfcIbmFY+pbVTQV2f+2UIah1mi5A7ghdnm7HVtsiaNP7PiVk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MgD6dl2u; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 855A6C433F1;
-	Wed, 31 Jan 2024 18:29:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706725777;
-	bh=jqQX/UgTogu7KiUnstYHSz/k8BttGHPXLVteXEvXCpE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MgD6dl2uqGq65BlRgZgFSuqpk2JkztKm0mJM4rglpfZ7MOhqVd+XOsfv0E9nPoncE
-	 CtsKKCDZxRBF/4LPRq/my45yLNbKjN3zr9g+INaDpxI8zJJsLL53e+F8KTlbobjqPz
-	 hvHrJOh91Osb28tsJzBvybul30x9iA8voCA46FmTZD21vTYE7y0tJ8ATsEy1Nj89gf
-	 Fw+pSHdruNOF5Rf8M/Mqd4FhcTmkzDOGDhgM13LH/ZsPVHOP3tH+L1IFB4GpogXFSC
-	 x9PvUljeKi3nc+K9s6VWK33PAEup6EwOwyzaofQAbunkKaRgyjRppWKNEQkjxApGP+
-	 Nxy3Jn08VJ6vA==
-Date: Wed, 31 Jan 2024 10:29:32 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- linux-kselftest@vger.kernel.org, Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCH net-next] selftests/net: calibrate txtimestamp
-Message-ID: <20240131102932.6caac1e2@kernel.org>
-In-Reply-To: <65ba61ea978b4_1699fd294eb@willemb.c.googlers.com.notmuch>
-References: <20240127023212.3746239-1-willemdebruijn.kernel@gmail.com>
-	<20240130174736.03c79071@kernel.org>
-	<65ba61ea978b4_1699fd294eb@willemb.c.googlers.com.notmuch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26BE618AFB
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 18:34:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706726079; cv=fail; b=DR994BL5G8uwv5OD7OJsa/r+aiBnRKeMmdY1kv9eeCKmRADu8sHDoW5n4SQNrzF+4FXPSmCmQ20gb2RQZvdZ0Q0lj0fVInpzMdvdTL5fYURoyW0ALpG35jcqxbTBvbbXEcltnHwOPhDzX2DasfSH43rOmChzp58nYeVI4wYE/OE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706726079; c=relaxed/simple;
+	bh=jJ7rPVAfgv+yuvgjdWl4i8Cjz90uSDaBorWbccixoOQ=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=p0LHfkeoKuvTuuGn3zCOne9GKPe779cWDJVpX/8hdhzSYcTin53KdzvY8A4C8kyr4G9Y7u+sTZbIJpe53vnT1zg0mENhYth6IlLcLRzHYzJ4KPT0lRu0Ex07k82eSGS0vj/ERHd8WCsoLr2i4ly0tNzFagJOPEnrLFCN51gT0ew=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WIHFkjTI; arc=fail smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706726077; x=1738262077;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=jJ7rPVAfgv+yuvgjdWl4i8Cjz90uSDaBorWbccixoOQ=;
+  b=WIHFkjTIv0N75NibZcpXPvAZkL9qkpVDqa0FUOdA4C+hRd9xaxExAOEl
+   Ln70v2BZ29duauMYBKt03QF+WzFVBkS267XZJ3CrAsH9lCf/fB0yj6YZT
+   +14tnkxeyMDnem2Nmd/P53CJej5Lkrs8fhRxXYNtyvsJ+aUX+LVFWx5PZ
+   AJ0AM2gNzhlbirjhnrnc/nujrU8NJYV8HcMXmQ3lITOyHtVCsildJwXBo
+   ja0dTTFXUK+c1Svz/07kOiJvs2fNzGwhQExN6N6mJF5BV02Lnz8zRuzbn
+   V2i3P+iJx+E1wj0nwi7DT/DSE9JZyLf97qE8dXxyAfmPMhjuN3bkjAJnG
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="10345254"
+X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
+   d="scan'208";a="10345254"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 10:34:28 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
+   d="scan'208";a="4176333"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 31 Jan 2024 10:34:28 -0800
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 31 Jan 2024 10:34:27 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 31 Jan 2024 10:34:27 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.100)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 31 Jan 2024 10:34:27 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=l09gS8H1dSIOO8NdQcSywUkhJaVoUpAZdka8dHGY1Azem372D5FTlNJ8jiq5PhBRd1Cs7VGr2aU2JSQQFLzSGx3VG5x2ha8qB578cYekWUIbv6Wqvh8T1AKTU2/V2p5MoyCcxCJAV1ONQtx9h+TEsUoQLnw33GpNFGbwi1Zzuqv+RXnbtGKUt0Ju2l0eB5EYXghdVxYTYGicGbZoRr/d6RP+N96MM9dOF+TRSSN+EkB3sbLtMlbwSnI2kxkcHErtPBfJPA3AiUuHY3h0U1+MGnLy6ATGBuM2dVGcvy2IYa81Mtb+5AoOWvY7tNn0qx405LO2KiEA2o9+UhNi4y1sFg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ariu+9ekgE96mOkWwDa1yHZziDQMGOMbI7POc5LleDM=;
+ b=IU0kMd8o3o6W2HkBEZD4NaFw686gtuQZHSlDyBEUh/cvjYIIiVtuvm52kVG+pbKs/yqn+hPMJNHAXyPJVXvTZregAu0PDEaon3GyYQY2I2nkO186PJwN4eeUcTO617wcguuEt/kg1BNyuKpeuBi5DLna6iXl979jIRFmsDyvXQEtbQ4rdjRHIM6hpamw2+DHIPFM77DZMpU1+j8FuUEiqOmu/Ji7TtaocwsZIiserOVMixyk5IMKCuMzzhqN4WVp/ooq530Uq1O6MpLKg58aOA9e1bhtmHYsvKs1M5a4uEqEbXecbCkVCFz61Ix+bfMno4vmdCWN8dQaGiHXsWleEQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by CY5PR11MB6439.namprd11.prod.outlook.com (2603:10b6:930:34::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.34; Wed, 31 Jan
+ 2024 18:34:22 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::8760:b5ec:92af:7769]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::8760:b5ec:92af:7769%6]) with mapi id 15.20.7249.017; Wed, 31 Jan 2024
+ 18:34:22 +0000
+Message-ID: <e27bd484-f79b-4bfb-95bd-6f24518d1cbe@intel.com>
+Date: Wed, 31 Jan 2024 19:33:35 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH v3 0/7 iwl-next] idpf: refactor virtchnl
+ messages
+Content-Language: en-US
+To: Alan Brady <alan.brady@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<willemdebruijn.kernel@gmail.com>, <igor.bagnucki@intel.com>,
+	<przemyslaw.kitszel@intel.com>
+References: <20240130005923.983026-1-alan.brady@intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <20240130005923.983026-1-alan.brady@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0218.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:e4::12) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|CY5PR11MB6439:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2cebc62f-8feb-4408-1d96-08dc228b3e58
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: X9U/eJN6Z0uKQy0kEX76WiBpMVDc1IhFA+VForKq/lvjy4OyEEJTxjmohPT3v3z9ONDLuUkzqbWwTz4YEJLE6T3yh5PPbHYjoAqrtl8DaKAnBOnIxbP2goJh7mTArAL2KfMsdMhnbhoiLIWWcQPnjvN6arzY9FSBDR6j0EnsoxIxu23m8eYLMDCwttsF18tLqUT5p4vkjoVf5Y0RHaNskqRm737eiiaUkwmFWiABzOkZrbXKvn0mM7PUSZXyHwKU2meJt5j9jVRLtI4WpxaPA+Bzs0x5r5xdlKfggjew3t58HkHatYXIawcvKvno7BZY3PKCNlGBityu77E9nDS10B6S7kyaj1+cLElsrNM2Cp9X8GpKDgAFiq4rPKXbSNfoTXO4us4Gk+2P6LpWL33UzWlVpZaWIFuORTL3NeYMCHYdeaeATwLCEBa4wH4mWyeZrOpBy/OdVsTVT2ZTTCb1ldFZ+I99llblg/WKCT6GLcANMM1jZhJNOLxJFjAQwjjaktFI02ngMLOPoFnk5VMmzM5ZVc61gygj5mH+GZMnxrIo0ctFhIq6VW4s2Ti03ojKt1Z8mdUtPJKxiGEiHC/4CUOvw8H6IA+r1/WuiK5FVI5sKRH1B5YqqcMmmmvIghqRMY9kyAF0toc4MTU2v/iuHg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(136003)(396003)(376002)(39860400002)(346002)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(31686004)(41300700001)(83380400001)(82960400001)(36756003)(86362001)(31696002)(6512007)(107886003)(26005)(38100700002)(2616005)(6506007)(15650500001)(6486002)(478600001)(2906002)(45080400002)(316002)(37006003)(6666004)(6636002)(66476007)(66946007)(66556008)(6862004)(8676002)(4326008)(8936002)(5660300002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?alBTRTRXTllucjJaYWJLTjY1ZjFEQVZMMXo5YTVhK1JLbTRlKzlLdURNMWhr?=
+ =?utf-8?B?anZCSHNrT1krcVNoWVhYakZJUWswc21pYWpTdlhMK1BLekVjU0xTWGxuQkhY?=
+ =?utf-8?B?THlZYTVmZVpSVzd0Nm1VRys5R1IxUUZZLzc5TzZJUU5EZFI0R0g1K1N3QytE?=
+ =?utf-8?B?M1I0dGJYRmxQRkZZSUxJQjZrQ2F3L29JYlBZcW83NTlwaTluSk1CM3BzTExj?=
+ =?utf-8?B?TU1zbGpiUjBJSmswbm5wLzVBUFdRZkVWMlFmekRrelFaZTdTYmxGUlZqd21Y?=
+ =?utf-8?B?L0V5QnJvSnZNY250dkVqMlkyN0FIb0xGS2h1K05mOGJyZ0JVRzlwdm9kN0dL?=
+ =?utf-8?B?RFRydHlwSVNDMXVNcWRyOWFrTnNudmwzVDdISEVoUGIyeFBIcGg1ZFdzRDVG?=
+ =?utf-8?B?OWRSbGI2QUswL25aOC9BdkZvRGpCZXkyZUhJZXpaSDRqaHk0RHA2UlJyeEFV?=
+ =?utf-8?B?ZU4rUkRoOXVRT1FLdTFReXhSWTFOa05sY1FaQTloYnNGUmlTcHR1TW1vbXc0?=
+ =?utf-8?B?RmxKcGdYb0RNZ1E0STBHWUFFbDRseEZmNEhWd09kNUJPOTMzYmNGV20vUzJv?=
+ =?utf-8?B?WFh0TGN1ajdmYnJ0STdHUENJd3F2UHB2dk5aUC9UUjNhVG4xbUNjNkNxb05i?=
+ =?utf-8?B?M05BVk8rbE90TTJpbUVuaS9RemFBd0M4aVRJaXJ4cU5YNUhQK3ZBazBZd0g2?=
+ =?utf-8?B?VWFFS1NTWVlIazRsVExTUVpYN05WQ2I5anJScE1LaUFXb1dla0VCeW10M216?=
+ =?utf-8?B?ZTM2NlhRdENnRG5ObHF1SWp0TXREZE9YSmdkZHdxTjBNNVNmZjRTampBVmIy?=
+ =?utf-8?B?QjgyM1UyNkY4SjhScENGb0xEZ3VHNnhkcUlyWVozSFhNMVhXd3g2ajBBVmNz?=
+ =?utf-8?B?a1VEcGQ5Tk1Nbkk1YzJ2L0JpejkzVHZwcHZPcTZaL0tUS1VRRG1jVzRYczhD?=
+ =?utf-8?B?NjVyTE9yUkwwMUtCQS9UVWlwb2lWdFVmRkVETExBUVdPV1hSVnpteDFqMGpL?=
+ =?utf-8?B?YjBIVThuem80andxUzBiNHNybG9ZTzJvYU5SMmxIM0d5ZlhhOGhLajNySk9i?=
+ =?utf-8?B?ek9mWHdBS0dmN0RRNXhkOU9mUTFmdUw1SVZ2YXBtcFgyZDFwQUdsZGFuOHBX?=
+ =?utf-8?B?VmVqaFBiaFlETmtjUWdUV0tBTWloQTV2aTVnb0hCUzFRZ21XVTFUUDl3R2RL?=
+ =?utf-8?B?TWxILzFBVVpaMENSUTc4VnZBMmF6YlhHRUZIQjdkQ3ZMenpnV0RycVNYdm15?=
+ =?utf-8?B?V01PMG1vRWZKaUhBeGRsUk5DOWZua0ZLbUZyL01sblpwWE5ISFM1TWVrU3lP?=
+ =?utf-8?B?bFJXbWlqOFJYNkkzSnEvUHcxSHZ3ckR2STFWU0N6Y1E0MExQL1VOUnZFVWVo?=
+ =?utf-8?B?WlJpQzJROHM2ZlpVQjgrZzJWQVlnZk16bWVxa1hKcFA2R3BiYU11V0dCam1j?=
+ =?utf-8?B?SlJjR3lmUzNPWXZyVkZRVHI5eVNQNDRjVEJnSFNqdWczMHlOVVhoVElwTmU2?=
+ =?utf-8?B?NGdKaGhJRW9Scm52T0VzRXpYTXZaSkJSZmVlWVp1OGpQZXhuWTVWWmhJR2c0?=
+ =?utf-8?B?QlE5a2g0ekUyYnhXVFR1ckNFM0puTXJYOVAwVzBWOEFOL1lDOFdDQ1V3Z214?=
+ =?utf-8?B?TDZyMmlQSmZkb3FKZUk5MUVib0RHT1ZZYlpzd0Fsc2cxUDROVldwYlV4c1Br?=
+ =?utf-8?B?bUkvdVN1bzRHNTMwNG4wa0cwRE9WNHBxQmlPT0toVldRQVdJb3o3cVVLUGU3?=
+ =?utf-8?B?TzhGQzVSZldrYlBvcW1OL1hSQXVXenk3SUNGekFkOXZVelZzaG11TlluNGN1?=
+ =?utf-8?B?eWc0Y1RETVZVS3EyRk5yeEhMN0JLUWY5TEJmWTVFdVRnajR5ZnF1WWV0Ym8x?=
+ =?utf-8?B?UFkySTRhTjJ4alhuTk1DTXRWc0grUDltRXRLZFJKZ0xmOE9ad254YUE3TjhL?=
+ =?utf-8?B?TnZENTFJMU9QMTVVNnA3WkxqVmx0aGQ2ZUF6TmgwZ0hSeHNTZE5OZkt2Q1da?=
+ =?utf-8?B?Nmt4UW5iQTZlVy9kRUdjMFZmcmFXNEUra29wOXBIVng1T0RLNTRFTDJsbW5L?=
+ =?utf-8?B?bmEwWXdyM3JCTlI2ZWxXc2p3VzhTaTdHTmtFSU9zWHdYdDNBNnhHSnhSdTQy?=
+ =?utf-8?B?UU5ucUtGekRqQ01YZWJBTm5ZQ0lxKzd6SHpTdXNodi9CM0o0L1ltV0dPRThG?=
+ =?utf-8?B?L2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2cebc62f-8feb-4408-1d96-08dc228b3e58
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jan 2024 18:34:22.3726
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: hMU/R2JXhQY7H681ZdWE5reEGaMeogSH20A3CVoQLtlVj7jAkbYshp2r/ADTC3gizDwK/QsFNC1y+4Mt5mIKdMhR+AfX1FdoDFnEz3BpTDA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6439
+X-OriginatorOrg: intel.com
 
-On Wed, 31 Jan 2024 10:06:18 -0500 Willem de Bruijn wrote:
-> > Willem, do you still want us to apply this as is or should we do 
-> > the 10x only if [ x$KSFT_MACHINE_SLOW != x ] ?  
-> 
-> If the test passes on all platforms with this change, I think that's
-> still preferable.
-> 
-> The only downside is that it will take 10x runtime. But that will
-> continue on debug and virtualized builds anyway.
-> 
-> On the upside, the awesome dash does indicate that it passes as is on
-> non-debug metal instances:
-> 
-> https://netdev.bots.linux.dev/contest.html?test=txtimestamp-sh
-> 
-> Let me know if you want me to use this as a testcase for
-> $KSFT_MACHINE_SLOW.
+From: Alan Brady <alan.brady@intel.com>
+Date: Mon, 29 Jan 2024 16:59:16 -0800
 
-Ah, all good, I thought your increasing the acceptance criteria.
+> The motivation for this series has two primary goals. We want to enable
+> support of multiple simultaneous messages and make the channel more
+> robust. The way it works right now, the driver can only send and receive
+> a single message at a time and if something goes really wrong, it can
+> lead to data corruption and strange bugs.
 
-> Otherwise I'll start with the gro and so-txtime tests. They may not
-> be so easily calibrated. As we cannot control the gro timeout, nor
-> the FQ max horizon.
+Have you tested v3?
+I have this on my system (net-next + your series), no other patches applied:
 
-Paolo also mentioned working on GRO, maybe we need a spreadsheet
-for people to "reserve" broken tests to avoid duplicating work? :S
+> [alobakin@GK3153-KR1-CYP-38282-U39-ETH1 ~]$ sudo modprobe idpf
+> [   89.785966] idpf 0000:83:00.0: Device HW Reset initiated
+> [alobakin@GK3153-KR1-CYP-38282-U39-ETH1 ~]$ [   90.241658] BUG: unable to handle page fault for address: ff8e1df482000000
+> [   90.241704] #PF: supervisor write access in kernel mode
+> [   90.241728] #PF: error_code(0x0002) - not-present page
+> [   90.241751] PGD 107ffc8067 P4D 107ffc7067 PUD 207fdc8067 PMD 0 
+> [   90.241782] Oops: 0002 [#1] PREEMPT SMP NOPTI
+> [   90.241805] CPU: 32 PID: 847 Comm: kworker/32:1 Kdump: loaded Not tainted 6.8.0-rc1-libeth+ #1
+> [   90.241841] Hardware name: Intel Corporation M50CYP2SBSTD/M50CYP2SBSTD, BIOS SE5C620.86B.01.01.0008.2305172341 05/17/2023
+> [   90.241879] Workqueue: idpf-0000:83:00.0-vc_ev idpf_vc_event_task [idpf]
+> [   90.241932] RIP: 0010:__free_pages_ok+0x338/0x4f0
+> [   90.241962] Code: e6 06 45 31 e4 41 bd 40 00 00 00 45 85 ff 74 13 4b 8d 34 28 4c 89 c7 e8 36 97 00 00 8b 74 24 04 41 01 c4 66 90 4c 8b 44 24 08 <43> 81 24 28 00 00 80 c0 49 83 c5 40 4d 39 ee 75 d0 e9 7c fd ff ff
+> [   90.242027] RSP: 0018:ff3f281b098d7b78 EFLAGS: 00010246
+> [   90.242053] RAX: 0000000000100000 RBX: ff8e1df400000000 RCX: 0000000000000034
+> [   90.242084] RDX: 0000000000000d80 RSI: 0000000000000034 RDI: ff8e1df481d980c0
+> [   90.242115] RBP: 0000000000000000 R08: ff8e1df481d980c0 R09: 0000000000000000
+> [   90.242145] R10: ff25062537f9fe00 R11: 0000000000000020 R12: 0000000000000000
+> [   90.242174] R13: 0000000000267f40 R14: 0000000004000000 R15: 0000000000000000
+> [   90.242206] FS:  0000000000000000(0000) GS:ff2506253ec00000(0000) knlGS:0000000000000000
+> [   90.242240] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [   90.242266] CR2: ff8e1df482000000 CR3: 000000207d420006 CR4: 0000000000771ef0
+> [   90.242297] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> [   90.242327] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> [   90.242357] PKRU: 55555554
+> [   90.242378] Call Trace:
+> [   90.242393]  <TASK>
+> [   90.242410]  ? __die_body+0x68/0xb0
+> [   90.242437]  ? page_fault_oops+0x3a6/0x400
+> [   90.242467]  ? exc_page_fault+0xb2/0x1b0
+> [   90.242496]  ? asm_exc_page_fault+0x26/0x30
+> [   90.242527]  ? __free_pages_ok+0x338/0x4f0
+> [   90.242554]  idpf_mb_clean+0xc1/0x110 [idpf]
+> [   90.242600]  idpf_send_mb_msg+0x50/0x1b0 [idpf]
+> [   90.242643]  idpf_vc_xn_exec+0x189/0x350 [idpf]
+> [   90.242688]  idpf_vc_core_init+0x32c/0x6d0 [idpf]
+> [   90.242735]  idpf_vc_event_task+0x2da/0x390 [idpf]
+> [   90.242779]  process_scheduled_works+0x251/0x460
+> [   90.242807]  worker_thread+0x21c/0x2d0
+> [   90.242830]  ? __pfx_worker_thread+0x10/0x10
+> [   90.242855]  kthread+0xe8/0x110
+> [   90.242878]  ? __pfx_kthread+0x10/0x10
+> [   90.242902]  ret_from_fork+0x37/0x50
+> [   90.242925]  ? __pfx_kthread+0x10/0x10
+> [   90.243802]  ret_from_fork_asm+0x1b/0x30
+> [   90.244598]  </TASK>
+> [   90.245361] Modules linked in: idpf libeth rpcrdma rdma_cm ib_cm iw_cm ib_core qrtr rfkill intel_rapl_msr intel_rapl_common intel_uncore_frequency intel_uncore_frequency_common i10nm_edac nfit libnvdimm x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel binfmt_misc vfat fat kvm irqbypass rapl ipmi_ssif iTCO_wdt intel_cstate intel_pmc_bxt iTCO_vendor_support dax_hmem cxl_acpi nfsd ioatdma intel_uncore mei_me isst_if_mmio cxl_core i2c_i801 isst_if_mbox_pci mei acpi_ipmi pcspkr intel_vsec isst_if_common i2c_smbus joydev dca ipmi_si intel_pch_thermal ipmi_devintf auth_rpcgss ipmi_msghandler acpi_power_meter acpi_pad nfs_acl lockd sunrpc loop grace zram xfs crct10dif_pclmul crc32_pclmul crc32c_intel polyval_clmulni polyval_generic ghash_clmulni_intel nvme bnxt_en sha512_ssse3 ast nvme_core sha256_ssse3 sha1_ssse3 i2c_algo_bit wmi scsi_dh_rdac scsi_dh_emc scsi_dh_alua ip6_tables ip_tables dm_multipath fuse
+> [   90.252381] CR2: ff8e1df482000000
+> [   90.253263] ---[ end trace 0000000000000000 ]---
+> [   90.314201] pstore: backend (erst) writing error (-28)
+> [   90.314686] RIP: 0010:__free_pages_ok+0x338/0x4f0
+> [   90.314970] Code: e6 06 45 31 e4 41 bd 40 00 00 00 45 85 ff 74 13 4b 8d 34 28 4c 89 c7 e8 36 97 00 00 8b 74 24 04 41 01 c4 66 90 4c 8b 44 24 08 <43> 81 24 28 00 00 80 c0 49 83 c5 40 4d 39 ee 75 d0 e9 7c fd ff ff
+> [   90.315511] RSP: 0018:ff3f281b098d7b78 EFLAGS: 00010246
+> [   90.315778] RAX: 0000000000100000 RBX: ff8e1df400000000 RCX: 0000000000000034
+> [   90.316043] RDX: 0000000000000d80 RSI: 0000000000000034 RDI: ff8e1df481d980c0
+> [   90.316308] RBP: 0000000000000000 R08: ff8e1df481d980c0 R09: 0000000000000000
+> [   90.316573] R10: ff25062537f9fe00 R11: 0000000000000020 R12: 0000000000000000
+> [   90.316838] R13: 0000000000267f40 R14: 0000000004000000 R15: 0000000000000000
+> [   90.317104] FS:  0000000000000000(0000) GS:ff2506253ec00000(0000) knlGS:0000000000000000
+> [   90.317368] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [   90.317631] CR2: ff8e1df482000000 CR3: 000000207d420006 CR4: 0000000000771ef0
+> [   90.317897] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> [   90.318163] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> [   90.318427] PKRU: 55555554
+> [   90.318687] note: kworker/32:1[847] exited with irqs disabled
+> [   90.319202] BUG: kernel NULL pointer dereference, address: 0000000000000008
 
-> In such cases we can use the environment variable to either skip the
-> test entirely or --my preference-- run it to get code coverage, but
-> suppress a failure if due to timing (only). Sounds good?
+[...]
 
-+1 I also think we should run and ignore failure. I was wondering if we
-can swap FAIL for XFAIL in those cases:
-
-tools/testing/selftests/kselftest.h
-#define KSFT_XFAIL 2
-
-Documentation/dev-tools/ktap.rst
-- "XFAIL", which indicates that a test is expected to fail. This
-  is similar to "TODO", above, and is used by some kselftest tests.
-
-IDK if that's a stretch or not. Or we can just return PASS with 
-a comment?
+Thanks,
+Olek
 
