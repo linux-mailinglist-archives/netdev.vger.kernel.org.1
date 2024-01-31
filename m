@@ -1,136 +1,146 @@
-Return-Path: <netdev+bounces-67424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6425B843447
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 03:57:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09B2C843468
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 04:16:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9C2AB21101
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 02:57:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA5D4282818
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 03:16:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B658CEAEB;
-	Wed, 31 Jan 2024 02:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59BE4FC19;
+	Wed, 31 Jan 2024 03:15:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="dBeaOm4U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YRDBoQmN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f49.google.com (mail-oo1-f49.google.com [209.85.161.49])
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FC18F9CF
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 02:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D5C5FBF5;
+	Wed, 31 Jan 2024 03:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706669831; cv=none; b=oC6r4jXW4ruDfu65+tzUQwx+RmD9jtTfoAc512lRM79MH3dVWEf5xj3U/jLFfhwHCfMe0eOposqsJ082ftRjQnRZtR4bIRlY5rETYCiRVQfaaQCPK/TIdZ+9ketPKN1SpSN4JRgghDG+2bJsT/uKz/zsTEnG23N8bXt8Qxm9+zQ=
+	t=1706670956; cv=none; b=QSZPqMrmcYDspdrxIxHSz6n9Y9PKCHtvA7OkMGn4ZU2vx5sNXgetF1gNK/g0Pe0CLYnJH7qmJsLqwkQ0MIOSYc65XuTWp4KXrwJC0idUFXcM65qaL7aEn6cJNp/mZcKtMFJ4BBpPkzDIwAfLfTBjJ3bTjHYFFdYbqV84y7qWX/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706669831; c=relaxed/simple;
-	bh=VgPYXUVCWMjDrC8yROV4FHibG7ows0RrAJ5ioytMUwg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N+jof9RWzm9NeQipLnSzGjn+ekWbGQBBM0S/zT9T963/rB9LbGkaXtx67HSb+NJNmWjVjfnUs4c8JulCN357qMayIGpH1OQMbuhF97I3QGankYTiaeYebaLKKCPFuI7yJlv+x1A5x9Egp2m7dyrjWrLI4XAe3BPhKr2oRtVB9PE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=dBeaOm4U; arc=none smtp.client-ip=209.85.161.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-5957ede4deaso3014310eaf.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 18:57:09 -0800 (PST)
+	s=arc-20240116; t=1706670956; c=relaxed/simple;
+	bh=xj888ufwZMUj4A2QyuAYOBr+//HBIZGWsKDinV5WyCE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nkKbcl0xc+/4KFtt8oihW1RTjluISDYkgyF6auV4Q9lNAZs70ceTM6RH+93NgNP2pYJoOnMq0x5Q9T8Q7nq1zQ/pz/tJZ42LUW1YjLp2ipciMrBhptOKB3/1eoOB/beIR7e7+oRDIUf78CJbwyZVvTkr6GWOJQ0jjQ22ebE6yAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YRDBoQmN; arc=none smtp.client-ip=209.85.219.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-dc6bad09398so338561276.2;
+        Tue, 30 Jan 2024 19:15:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1706669829; x=1707274629; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=fbQ/cmABBf8PD8bdQqtTiunaVcAC5Mi3yix4/3wHqHA=;
-        b=dBeaOm4UWy5AaxOxacMsxA0KAgPJthBmXUiQR/GIsIp53N5h0Nnwih/qvdVe1/RZBW
-         Og8G41wYDX7tHxC7szLHNZdKKLhxnm50O4/5aqfCazo6d53g0ircgSXtW2eXlcG5lEB8
-         oxmMJBBc/FWV5DfsTOWotrqHSOqd9JJRZtzX3vYwV5ZtN9U9u94VYQ3Oi2HwngqeUCnE
-         rJshlyaygWQIvTrMAs9CkUu4WeKvrRkTt8VtCj7KIIveqt2FLzW6jim0reT2cAElizGG
-         iSPkLhnKm3QgVvspisApU/D8r30j7+aKZJYhWS51wi89eAOzwmMiF2Icv82Qeb/IZzp8
-         5hzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706669829; x=1707274629;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1706670953; x=1707275753; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fbQ/cmABBf8PD8bdQqtTiunaVcAC5Mi3yix4/3wHqHA=;
-        b=BOTkP00aGCaEMOtnndPcbcEMle2eQtkQjqeBiP4JboNFxaLZmiw2XGqd7ig/z8dThT
-         yTTiK403MUIm11fe9loV24NaxSAGuC3kyxCGA40/ZUc3PoH0Gp9VjJjj8z36Or0iCzP8
-         KCUGdZI7zLmhyWUG9/OEV3xQciqjrExRzFeAd/CYeh2GxreHZCF6/3T3bUKRpNoRj8SW
-         e+61mugP0Uc4knwYJ4RaxWpaBnvFYYp/Cj+/sN0uswB9l4L6Ip8yWro18L284gjWYeDN
-         wmBh86TIU8qWLhGDG/IRVj+Qb47wWLoFCB7SaSMtzIsrzJkiSoU8vN7CUGaSZE+cPB7d
-         KOkw==
-X-Gm-Message-State: AOJu0Yx8/WXY1N/FMFd84sUjGeW5RwSpGkkGWEoo2+pxWN8JB5GIJvB1
-	mIAiRuBgzv5+uKYgCiZkIlJmU/ewoOrGZ5j/8mrquZxo8XJRUufzeMDDN4CvcX0=
-X-Google-Smtp-Source: AGHT+IG9K2V19sZuctdZBL4AhF7KafbZpTSmId1sbYMWgHM7klLehsRES8IivEcsfheskPe4H34+3w==
-X-Received: by 2002:a05:6358:7e14:b0:178:618b:89bd with SMTP id o20-20020a0563587e1400b00178618b89bdmr119841rwm.30.1706669829230;
-        Tue, 30 Jan 2024 18:57:09 -0800 (PST)
-Received: from dread.disaster.area (pa49-181-38-249.pa.nsw.optusnet.com.au. [49.181.38.249])
-        by smtp.gmail.com with ESMTPSA id d13-20020a63d70d000000b005cd821a01d4sm9196297pgg.28.2024.01.30.18.57.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 18:57:08 -0800 (PST)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-	(envelope-from <david@fromorbit.com>)
-	id 1rV0mf-00Ha2x-0d;
-	Wed, 31 Jan 2024 13:57:05 +1100
-Date: Wed, 31 Jan 2024 13:57:05 +1100
-From: Dave Chinner <david@fromorbit.com>
-To: Joe Damato <jdamato@fastly.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	chuck.lever@oracle.com, jlayton@kernel.org,
-	linux-api@vger.kernel.org, brauner@kernel.org, edumazet@google.com,
-	davem@davemloft.net, alexander.duyck@gmail.com,
-	sridhar.samudrala@intel.com, kuba@kernel.org,
-	willemdebruijn.kernel@gmail.com, weiwan@google.com,
-	David.Laight@aculab.com, arnd@arndb.de,
-	Jonathan Corbet <corbet@lwn.net>,
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nathan Lynch <nathanl@linux.ibm.com>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Maik Broemme <mbroemme@libmpq.org>,
-	Steve French <stfrench@microsoft.com>,
-	Julien Panis <jpanis@baylibre.com>,
-	Jiri Slaby <jirislaby@kernel.org>, Thomas Huth <thuth@redhat.com>,
-	Andrew Waterman <waterman@eecs.berkeley.edu>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH net-next v4 3/3] eventpoll: Add epoll ioctl for
- epoll_params
-Message-ID: <Zbm3AXgcwL9D6TNM@dread.disaster.area>
-References: <20240131014738.469858-1-jdamato@fastly.com>
- <20240131014738.469858-4-jdamato@fastly.com>
- <2024013001-prison-strum-899d@gregkh>
- <20240131022756.GA4837@fastly.com>
+        bh=M5vfFw+B4qQaAmX0KSnFyPWaYeXXdPCyWr3sYtimr6c=;
+        b=YRDBoQmN1F7zbs4O2XHvlAHhxK6i6iit0rn3OiWPocK3MX9BIosPuxlfeuRwKhl1ff
+         W/L+9P2YG6AIEQV9SwGXZ9DwayKpqi/05RtVgB7Ph3NVZK7IoCrSpNg9JCh5Y2GdWL94
+         zdlN12KimZZm8uSdNwXdXQNCevpF+r4Ahf8QpFbbKSSyBvW0nXyh/4hl+yXH2aKIsjhq
+         eZteTshZirgm7RTQn/KB0qbv6DwU5K3fjGgOM3orqLdGkXHGhznOqGh5Jdq1Mwi0Qarr
+         z6t8uajSnaZXMplvHiaxgai/M4vn0w3/FT8Xs3eS+uIo/9DvmxshH5qBBlMXy5i5hZgc
+         MMqA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706670953; x=1707275753;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M5vfFw+B4qQaAmX0KSnFyPWaYeXXdPCyWr3sYtimr6c=;
+        b=ZgK3j4YXTal/ORG6PjhPJzFR7RPVYno5HfzHqghzbYHgR9D1B1kA3EJ63O7rtjG7iY
+         ywYtJ5VqlFAfUTuySLxFkSL4xIExCn8p9iqPKA+OE4IK7OLpKbWXc5DDiNTwXj0CKmM7
+         6v/Tpn+wJLR0PuVHFCHNuB2wX5ScMFaeqslELWETsTBEoz9WyPXsV6TpT1z0gfK3KeFh
+         SkpX6djCmrwwf/WgnM1ZRIzdfw1IAsJb9Fi1PJcFer/41y6yg3CjkFTvrrSNEoE5YBJJ
+         AjmT1VGtBBaPGbmuZ9pW5gko4Vnv4dWNaxAKdsPFEy9wRKGhNf+tL02iBZ11ElQKe4ZK
+         gBuw==
+X-Gm-Message-State: AOJu0Yye/51n07qyQTRBQPVRhFX9mh2qY8mebQem6IyVgpdhkCd4P+vp
+	IgMdVqEilM5ytbJlzrYxnRTTNYwt4gmaKwdoTRDNMY0RUJoSZrhD0kI3ZYZ0UGrfdowxOVLk+YT
+	A+4z78fEK0eUI+Z7F87BJILC2p6c=
+X-Google-Smtp-Source: AGHT+IEgSI5FvPenJVdi3XSwbwBPCPZgeHMPUFSwjko4DrgrPFSHLEF6/7bMGVVrk7NI2yxvajEREOc/g+s3DqlyrL8=
+X-Received: by 2002:a25:bd92:0:b0:dc6:b945:e58 with SMTP id
+ f18-20020a25bd92000000b00dc6b9450e58mr348589ybh.48.1706670953113; Tue, 30 Jan
+ 2024 19:15:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240131022756.GA4837@fastly.com>
+References: <20240127140747.905552-1-hayatake396@gmail.com>
+ <154f979e-a335-461b-b72e-5e9c54fe940c@linux.intel.com> <CADFiAcJShbgBLXdVgs1vK1jqDFopkRcw-se4b4h0V3Yd60xLVw@mail.gmail.com>
+ <92958c7b-7e5f-4e25-819f-4e52f9ffcf7b@linux.intel.com> <ZbjLWwG8m-FdyxMH@nataraja>
+In-Reply-To: <ZbjLWwG8m-FdyxMH@nataraja>
+From: takeru hayasaka <hayatake396@gmail.com>
+Date: Wed, 31 Jan 2024 12:15:41 +0900
+Message-ID: <CADFiAcLuKXTsHm6FzojKcD_wc8LQz43xt-cN0rHJyA3Va_-EDQ@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH net-next RESENT v3] ethtool: ice:
+ Support for RSS settings to GTP from ethtool
+To: Harald Welte <laforge@gnumonks.org>
+Cc: Marcin Szycik <marcin.szycik@linux.intel.com>, 
+	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	linux-doc@vger.kernel.org, vladimir.oltean@nxp.com, 
+	linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
+	netdev@vger.kernel.org, mailhol.vincent@wanadoo.fr
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 30, 2024 at 06:27:57PM -0800, Joe Damato wrote:
-> On Tue, Jan 30, 2024 at 06:08:36PM -0800, Greg Kroah-Hartman wrote:
-> > On Wed, Jan 31, 2024 at 01:47:33AM +0000, Joe Damato wrote:
-> > > +struct epoll_params {
-> > > +	__aligned_u64 busy_poll_usecs;
-> > > +	__u16 busy_poll_budget;
-> > > +
-> > > +	/* pad the struct to a multiple of 64bits for alignment on all arches */
-> > > +	__u8 __pad[6];
-> > 
-> > You HAVE to check this padding to be sure it is all 0, otherwise it can
-> > never be used in the future for anything.
-> 
-> Is there some preferred mechanism for this in the kernel that I should be
-> using or is this as simple as adding a for loop to check each u8 == 0 ?
+Hi Harald-san
 
-memchr_inv()
+I apologize for the delay in making further progress on this
+patch.(I'm three months late...
 
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+> There are many different GTPv2C messages
+
+Thank you for your assistance in explaining GTPC:)
+
+Thanks,
+Takeru
+
+2024=E5=B9=B41=E6=9C=8830=E6=97=A5(=E7=81=AB) 19:15 Harald Welte <laforge@g=
+numonks.org>:
+>
+> hi Marcin,
+>
+> Disclaimer: I have no understanding of the proposed implementation here, =
+just commenting
+> on this from a 3GPP protocol architecture point of view.
+>
+> On Tue, Jan 30, 2024 at 10:59:40AM +0100, Marcin Szycik wrote:
+> > >> gtpc(4|6) doesn't include TEID, so what is its purpose?
+> > > In GTPC communication, there is no TEID in the CSR (Create Session Re=
+quest).
+> > > Therefore, there are cases of GTPC that do not include TEID.
+> >
+> > The way I understand it now, this patch (and the ethtool one) adds hash=
+ing on
+> > TEID field in GTP* headers. So I wanted to ask why do we have a case (g=
+tpc(4|6))
+> > that doesn't include TEID? Do we hash on other fields in this header?
+>
+> There are many differen GTPv2C messages, most of which contain a TEID.  S=
+o it does
+> in general still make sense to be able to use RSS for all those other mes=
+sages.
+>
+> The CSR (Create Session Request) will not be able to benfit from it, but
+> it's just the first message initiating a dialogue between two elements
+> (think of it like a TCP SYN).  All the follow-up messages in that
+> dialogue contain TEIDs and hence can benefit from RSS.
+>
+> --
+> - Harald Welte <laforge@gnumonks.org>          https://laforge.gnumonks.o=
+rg/
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+> "Privacy in residential applications is a desirable marketing option."
+>                                                   (ETSI EN 300 175-7 Ch. =
+A6)
 
