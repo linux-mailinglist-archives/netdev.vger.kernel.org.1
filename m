@@ -1,181 +1,120 @@
-Return-Path: <netdev+bounces-67560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D73C68440B2
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 14:36:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 454158440D5
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 14:41:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 91BAF282A44
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 13:36:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0117F286A6E
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 13:41:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B44D7F484;
-	Wed, 31 Jan 2024 13:36:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 615457F498;
+	Wed, 31 Jan 2024 13:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D6zMzXSe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HXtYZ0tV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7BC97F47D;
-	Wed, 31 Jan 2024 13:36:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3702D7F491;
+	Wed, 31 Jan 2024 13:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706708177; cv=none; b=kBBfWCOFoavPQM3OBSZeq2egOIvTyTiwlNb/KDX9d7EdPYOXAX7LjhIJ1MskVm6lI7wF6kTMMdP7wZf1mpjoD3tVVpcNFgUbVFZpgabbmkQICKoZf7FKHK46eM4soWmHefiBlCasFTXVyeSVdWcuMfCXeLHQOMOwkdgizHJ6GBw=
+	t=1706708427; cv=none; b=pOAPNdCkWItfEb7Fe3MfUMGsAfNl7Uc0Plpxbx+9+F83ijobYIbj8sE+CeWFjj/hUUiDNdRLtafEqsI1Ckk6nyLBnNv1idfh/UGykaJ3+KkdIbrqEj5yMChaj5mO/4WJP/s6fzgCBYdHhr6FfGtOTJeCjg5B+1AswF8i7kPAkok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706708177; c=relaxed/simple;
-	bh=zPG9Ii5BeC5tacwIgwrm7eTR57WyghjQz9MsJYvoIGc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ozy1AChy0ch2zszr/vQDYx6VAoHeKd0m9rWcxknNA35fT84qhOC/qknAjx+ufu1X4E4qtdhQBet4bXVnCIXImcCQwSgTqq5WKkt51pWIecBpQJ5aBSVujGMJuXECWF2+azA227LYPlvQ9XGR2FMI5cz2I7bdRdhVRfKLhRgWoPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D6zMzXSe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33F57C433C7;
-	Wed, 31 Jan 2024 13:36:17 +0000 (UTC)
+	s=arc-20240116; t=1706708427; c=relaxed/simple;
+	bh=b21SHlwTN9iL2fIw5Q492N87cW6wLJUEi5V8W/Un3ow=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=BkN0nlo4fslMrIqZvp30hkgRQqS1T0VchhmQYA1OEE1psZFpWqSQX9ePzGerepnd3vQ9JKfktVghIaxvgVXy7Ee1MfyRsdVPq7c7XHuOueM34S4tjk67imPMePFuYt07sCtH+8R1AfT+D7ddJwmhnJOtzE7WFlTjqnPmi7EZTpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HXtYZ0tV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 06CB3C43399;
+	Wed, 31 Jan 2024 13:40:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706708177;
-	bh=zPG9Ii5BeC5tacwIgwrm7eTR57WyghjQz9MsJYvoIGc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D6zMzXSe/sCaHsbo3gUSA5qryoI0bBDxVADllwpnUSTYVVkgtdNR3qqHRyrezUjZJ
-	 Puvvo3lABEu3HVNug+kMBuIQ1vRP7FrleYKvKB8b8Xk6c9wQOjV+Uv+KifmKSyKNHv
-	 31QyHzbeuf051JQJS6rVA1ea5ZSseXg8U7UZy5Su6Xa1jCfo8TFwMM/8FG9RLoCMgQ
-	 ZgVlUtdo/qRTrL6fA0dWGAGF9Bj89g7yv2EFtZFPGxWiKCLRCkoZA1hJ+vJ7459ZWO
-	 KL3COeoGXW9qqHyl6p6TmaBLlh32wF6w+w5evXzTa8J4NYwrms6uXWktAV5NX7+XJH
-	 sMUO3ufxsg8jw==
-Date: Wed, 31 Jan 2024 14:36:13 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jesper Dangaard Brouer <hawk@kernel.org>
-Cc: netdev@vger.kernel.org, lorenzo.bianconi@redhat.com,
-	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, bpf@vger.kernel.org, toke@redhat.com,
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	sdf@google.com, ilias.apalodimas@linaro.org
-Subject: Re: [PATCH v6 net-next 1/5] net: add generic per-cpu page_pool
- allocator
-Message-ID: <ZbpMzQeg-UEzGE6V@lore-desk>
-References: <cover.1706451150.git.lorenzo@kernel.org>
- <5b0222d3df382c22fe0fa96154ae7b27189f7ecd.1706451150.git.lorenzo@kernel.org>
- <91cf832e-ad66-47d0-bf2b-a8c9492d16a9@kernel.org>
+	s=k20201202; t=1706708427;
+	bh=b21SHlwTN9iL2fIw5Q492N87cW6wLJUEi5V8W/Un3ow=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=HXtYZ0tV+ZV6O1/b7q52L43SCRRKJnjThVSWuoUHyTEjj2+8vfwgBe1BfcHRWGnSy
+	 i82HSKRdiNNsO1TtT5EE4+c3owyBhbq4pO9KRHlRkXJ0dZexV3de0xjopSAV9S7BLx
+	 9gWmINp4GexV+cgJNrfDWR7HMAmpVtRK48SIkS0L3Nj3zSWPQihP3MGMRZSIllDx3l
+	 klMVn3x9b2he0bs1OJgOqXn1vp6cRnSGvDX8XB3XBTiAhRyC2SM8e3nxGlR++YRKJd
+	 5KUN/lEs8XL87kdM/T/es19zQR1+3Bj6CAMB0FqcT6Q4EMor8biZhURxNQ0QIKq8R9
+	 eE9T0C5/HsDFw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E08EADC99E5;
+	Wed, 31 Jan 2024 13:40:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="A5ZtbKwvnUq5J195"
-Content-Disposition: inline
-In-Reply-To: <91cf832e-ad66-47d0-bf2b-a8c9492d16a9@kernel.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH V4 00/15 net-next] qca_spi: collection of improvements
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170670842691.31681.3525325990073140229.git-patchwork-notify@kernel.org>
+Date: Wed, 31 Jan 2024 13:40:26 +0000
+References: <20240128201059.6259-1-wahrenst@gmx.net>
+In-Reply-To: <20240128201059.6259-1-wahrenst@gmx.net>
+To: Stefan Wahren <wahrenst@gmx.net>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, LinoSanfilippo@gmx.de, f.fainelli@gmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
+Hello:
 
---A5ZtbKwvnUq5J195
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
->=20
->=20
-> On 28/01/2024 15.20, Lorenzo Bianconi wrote:
-> > Introduce generic percpu page_pools allocator.
-> > Moreover add page_pool_create_percpu() and cpuid filed in page_pool str=
-uct
-> > in order to recycle the page in the page_pool "hot" cache if
-> > napi_pp_put_page() is running on the same cpu.
-> > This is a preliminary patch to add xdp multi-buff support for xdp runni=
-ng
-> > in generic mode.
-> >=20
-> > Signed-off-by: Lorenzo Bianconi<lorenzo@kernel.org>
-> > ---
-> >   include/net/page_pool/types.h |  3 +++
-> >   net/core/dev.c                | 40 +++++++++++++++++++++++++++++++++++
-> >   net/core/page_pool.c          | 23 ++++++++++++++++----
-> >   net/core/skbuff.c             |  5 +++--
-> >   4 files changed, 65 insertions(+), 6 deletions(-)
-> >=20
+On Sun, 28 Jan 2024 21:10:44 +0100 you wrote:
+> This series contains a wild collection of improvements for the
+> qca_spi driver. This is a follow-up series to the recent bugfixes [1].
+> 
+> Patch 1, 2 & 3 in this series is the initially intended rework of
+> netdev_open/close. Patch 4 & 10 are minor functional improvements and
+> the rest is clean-up.
+> 
 > [...]
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index cb2dab0feee0..bf9ec740b09a 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> [...]
-> > @@ -11686,6 +11690,27 @@ static void __init net_dev_struct_check(void)
-> >    *
-> >    */
-> > +#define SD_PAGE_POOL_RING_SIZE	256
-> > +static int net_page_pool_alloc(int cpuid)
->=20
-> I don't like the name net_page_pool_alloc().
-> It uses the page_pool_create APIs.
->=20
-> Let us renamed to net_page_pool_create() ?
 
-ack, I will fix it.
+Here is the summary with links:
+  - [V4,01/15,net-next] qca_spi: Add check for kthread_stop
+    (no matching commit)
+  - [V4,02/15,net-next] qca_spi: Improve SPI thread creation
+    (no matching commit)
+  - [V4,03/15,net-next] qca_spi: Improve SPI IRQ handling
+    (no matching commit)
+  - [V4,04/15,net-next] qca_spi: Avoid skb_copy_expand in TX path
+    (no matching commit)
+  - [V4,05/15,net-next] qca_7k_common: Drop unnecessary function description
+    (no matching commit)
+  - [V4,06/15,net-next] qca_7k_common: Drop unused len from qcafrm_handle
+    (no matching commit)
+  - [V4,07/15,net-next] qca_spi: Add QCASPI prefix to ring defines
+    (no matching commit)
+  - [V4,08/15,net-next] qca_spi: Introduce QCASPI_RX_MAX_FRAMES
+    (no matching commit)
+  - [V4,09/15,net-next] qca_spi: Improve calculation of RX buffer size
+    (no matching commit)
+  - [V4,10/15,net-next] qca_spi: Log expected signature in error case
+    (no matching commit)
+  - [V4,11/15,net-next] qca_spi: Adjust log of SPI_REG_RDBUF_BYTE_AVA
+    (no matching commit)
+  - [V4,12/15,net-next] qca_7k: Replace BSD boilerplate with SPDX
+    (no matching commit)
+  - [V4,13/15,net-next] qca_7k: Replace old mail address
+    (no matching commit)
+  - [V4,14/15,net-next] mailmap: add entry for Stefan Wahren
+    https://git.kernel.org/netdev/net-next/c/a47996ebbe40
+  - [V4,15/15,net-next] MAINTAINERS: add entry for qca7k driver(s)
+    (no matching commit)
 
-Regards,
-Lorenzo
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
->=20
->=20
-> > +{
-> > +#if IS_ENABLED(CONFIG_PAGE_POOL)
-> > +	struct page_pool_params page_pool_params =3D {
-> > +		.pool_size =3D SD_PAGE_POOL_RING_SIZE,
-> > +		.nid =3D NUMA_NO_NODE,
-> > +	};
-> > +	struct page_pool *pp_ptr;
-> > +
-> > +	pp_ptr =3D page_pool_create_percpu(&page_pool_params, cpuid);
-> > +	if (IS_ERR(pp_ptr)) {
-> > +		pp_ptr =3D NULL;
-> > +		return -ENOMEM;
-> > +	}
-> > +
-> > +	per_cpu(page_pool, cpuid) =3D pp_ptr;
-> > +#endif
-> > +	return 0;
-> > +}
-> > +
-> >   /*
-> >    *       This is called single threaded during boot, so no need
-> >    *       to take the rtnl semaphore.
-> > @@ -11738,6 +11763,9 @@ static int __init net_dev_init(void)
-> >   		init_gro_hash(&sd->backlog);
-> >   		sd->backlog.poll =3D process_backlog;
-> >   		sd->backlog.weight =3D weight_p;
-> > +
-> > +		if (net_page_pool_alloc(i))
-> > +			goto out;
-> >   	}
-> >   	dev_boot_phase =3D 0;
-> > @@ -11765,6 +11793,18 @@ static int __init net_dev_init(void)
-> >   	WARN_ON(rc < 0);
-> >   	rc =3D 0;
-> >   out:
-> > +	if (rc < 0) {
-> > +		for_each_possible_cpu(i) {
-> > +			struct page_pool *pp_ptr =3D this_cpu_read(page_pool);
-> > +
-> > +			if (!pp_ptr)
-> > +				continue;
-> > +
-> > +			page_pool_destroy(pp_ptr);
-> > +			per_cpu(page_pool, i) =3D NULL;
-> > +		}
-> > +	}
-> > +
-> >   	return rc;
-> >   }
 
---A5ZtbKwvnUq5J195
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZbpMzQAKCRA6cBh0uS2t
-rPAKAPwIep6sdL0hZM9ENHm7rBSb2U8mhOcjEbo9d6U4D/QACQD+PNi5SK+BwU2e
-gDKoFjnUd3694Zb58BJ8QHTLMCT00QM=
-=L38L
------END PGP SIGNATURE-----
-
---A5ZtbKwvnUq5J195--
 
