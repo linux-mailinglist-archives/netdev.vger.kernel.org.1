@@ -1,85 +1,112 @@
-Return-Path: <netdev+bounces-67723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02FF2844B11
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 23:30:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92341844B2C
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 23:41:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B22952951DA
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 22:30:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 313721F2BC7F
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 22:41:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C6A63A292;
-	Wed, 31 Jan 2024 22:30:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E882D39FE0;
+	Wed, 31 Jan 2024 22:41:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="orJpenu5"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5OFYTm68"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5672FE3F
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 22:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E4C4364CA;
+	Wed, 31 Jan 2024 22:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706740213; cv=none; b=ZrU7pUWKsFWiNPU0iROC9X3/43gGZ3010Yeodg0YTOruadnNXutrOZWmnsooxy6HxgXgZO19gE7oYKnOT5WCXmXzDJ8mt3I7jjvh/cRUU8CybF1QLcZfQhDaZfn0XPb2EXrfKCCjZ1dhmMeL+Eiwyltw2Un6pV3xk08XVO6zsAc=
+	t=1706740862; cv=none; b=QKFTz+Av7m3SOZj6uQ7hyRls0oGuTfV5PbgMV5fTN+shvn6/sOiEvVoiQ+FvbdnSznGNPe/vhtzHf4xiJ+2Ue83/kkY4qfyxs30uZ50lPfQXMvlnIrOhmTM8H8VQPXvAeA+SlZYIpRMaQUnPXY7zmS87y/pHH8gu9ec69jD4nu0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706740213; c=relaxed/simple;
-	bh=+k8MNaR/Vc0QQvsIITPij2Um3MBqrEwPE/gFtIResNg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kxGOVAnxYnJMSoY6SSqAmS1+dx83pbsm7htaeAR9UGl+PJtqtzXuO7yj6rx9TesA4p6mtSUK4UIVckkTsgk/CCH313b1IasVXa8gb8CGA1uW7YA2HiPMG/sIPVNtXrYUosjF9vpZgts4HnsomQKNA4nDKpgwTrF8Pui4b7Eqhco=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=orJpenu5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC312C433C7;
-	Wed, 31 Jan 2024 22:30:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706740213;
-	bh=+k8MNaR/Vc0QQvsIITPij2Um3MBqrEwPE/gFtIResNg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=orJpenu5JRyvHb6jr0OwTu1bhGWazNxFNRyI+zj2+4oMHedCutn6WbXNDyEIPOkVp
-	 9p8omdM8TwpdzpHdyA+oyCDJS9hRFq06UU6XgezpZgz36mB+KN70J9soAXTvj8kpTA
-	 Wbga7Vs3xQ9lIqjro5/5mTGyLT5qES+o3ZsBJJrDs0JT/S4FTWw7KB7iqKxv1LxXho
-	 MdV2T+dlT07Jt0lmbK35iLnZbf3tawtt2maDvON3at85tnXLYeUkoeKkOuHuQX66+7
-	 TWxaS2VRb6uRpaFp9Ler2jwEVL+8ZcAalMxcjUx1o8IPQ8rawUOnO0q8rHCHLxMA0N
-	 +faSfthJFkptg==
-Date: Wed, 31 Jan 2024 14:30:09 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: William Tu <witu@nvidia.com>, <bodong@nvidia.com>, <jiri@nvidia.com>,
- <netdev@vger.kernel.org>, <saeedm@nvidia.com>,
- "aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>
-Subject: Re: [RFC PATCH v3 net-next] Documentation: devlink: Add devlink-sd
-Message-ID: <20240131143009.756cc25c@kernel.org>
-In-Reply-To: <777fdb4a-f8f3-4ddb-896a-21b5048c07da@intel.com>
-References: <20240125045624.68689-1-witu@nvidia.com>
-	<20240125223617.7298-1-witu@nvidia.com>
-	<20240130170702.0d80e432@kernel.org>
-	<748d403f-f7ca-4477-82fa-3d0addabab7d@nvidia.com>
-	<20240131110649.100bfe98@kernel.org>
-	<6fd1620d-d665-40f5-b67b-7a5447a71e1b@nvidia.com>
-	<20240131124545.2616bdb6@kernel.org>
-	<2444399e-f25f-4157-b5d0-447450a95ef9@nvidia.com>
-	<777fdb4a-f8f3-4ddb-896a-21b5048c07da@intel.com>
+	s=arc-20240116; t=1706740862; c=relaxed/simple;
+	bh=mTsfTmcgyNMXPcwEfj9zRffg8acVqn20k2Ate8tbaG8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s/k+XIDT5vmp20uHo4j6jJ4C7EKaetFkNQA+n1laUx1ALaW7WH1CyeUkVo6K11Zqhl7wZWjUdzu/adY1KkbS3aNA1bHJxFq2W8vHN6q9xmcpi3R5TqK0RWAHSmYNeJWT/N+qcuwYmVpB+Z9JKNAsSgukVC6INkZf7EMta/VItYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5OFYTm68; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=1FCD7TewqQtQ/+NDwhbXiuyVwjThunikA4QhpumNVSU=; b=5OFYTm68G0r5vPSoHrEi0vd196
+	qULK9+VCXwxp55c7CKayoDKirkf/RjynE6/yXifl8UlN1T4LwuKUxZiy+nI3tLiDk4SPRUIjf7vSn
+	0mYoDqsjzdCImnuJGE0TynQCxs3XcQcig6iyjBh8fzaeDUXHBa6Tp9/fAP2ylvjmHOvE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rVJG9-006cek-Iq; Wed, 31 Jan 2024 23:40:45 +0100
+Date: Wed, 31 Jan 2024 23:40:45 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Conor Dooley <conor@kernel.org>
+Cc: Rob Herring <robh@kernel.org>,
+	Bastien Curutchet <bastien.curutchet@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	Herve Codina <herve.codina@bootlin.com>
+Subject: Re: [PATCH 1/2] dt-bindings: net: Add TI DP83640
+Message-ID: <a1e54836-51d2-4990-9444-56d9414eb28c@lunn.ch>
+References: <20240130085935.33722-1-bastien.curutchet@bootlin.com>
+ <20240130085935.33722-2-bastien.curutchet@bootlin.com>
+ <20240130-impulsive-widow-9142a069b7fd@spud>
+ <20240131210521.GA2289883-robh@kernel.org>
+ <20240131-tummy-imperfect-e6d6f0e245e9@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240131-tummy-imperfect-e6d6f0e245e9@spud>
 
-On Wed, 31 Jan 2024 13:41:07 -0800 Jacob Keller wrote:
-> >> Still, I feel like shared buffer pools / shared queues is how majority
-> >> of drivers implement representors. Did you had a look around?  
-> > 
-> > Yes, I look at Intel ICE driver, which also has representors. (Add to CC)
-> > 
-> > IIUC, it's still dedicated buffer for each reps, so this new API might help.
+On Wed, Jan 31, 2024 at 09:18:39PM +0000, Conor Dooley wrote:
+> On Wed, Jan 31, 2024 at 03:05:21PM -0600, Rob Herring wrote:
+> > On Tue, Jan 30, 2024 at 05:56:37PM +0000, Conor Dooley wrote:
+> > > On Tue, Jan 30, 2024 at 09:59:34AM +0100, Bastien Curutchet wrote:
 > 
-> Yea, I am pretty sure the ice implementation uses dedicated buffers for
-> representors right now.
+> > > > +  ti,fiber-mode:
+> > > > +    $ref: /schemas/types.yaml#/definitions/uint32
+> > > > +    enum: [0, 1]
+> > > > +    description: |
+> > > > +      If present, enables or disables the FX Fiber Mode.
+> > > > +      Fiber mode support can also be strapped. If the strap pin is not set
+> > > > +      correctly or not set at all then this can be used to configure it.
+> > > > +       - 0     = FX Fiber Mode disabled
+> > > > +       - 1     = FX Fiber Mode enabled
+> > > > +       - unset = Configured by straps
+> > > 
+> > > I don't like these properties that map meanings onto numbers. We can
+> > > have enums of strings in bindings that allow you to use something more
+> > > meaningful than "0" or "1".
+> > 
+> > Tristate properties are fairly common pattern where we need 
+> > on/off/default. I've thought about making it a type. I don't think we 
+> > need defines for it.
+> 
+> I think a type would be a good idea. I am not at all a fan of any of the
+> properties people introduce along these lines.
 
-I just did a grep on METADATA_HW_PORT_MUX and assumed bnxt, ice and nfp
-all do buffer sharing. You're saying you mux Tx queues but not Rx
-queues? Or I need to actually read the code instead of grepping? :)
+Before going too far with that, i'm not actually sure it is required
+here. I've not looked at the PHY driver itself, but i expect there is
+some indication somewhere that the network stack expects a fibre link
+is to be used. We probably can determine at runtime if fibre should be
+used.
+
+	Andrew
 
