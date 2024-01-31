@@ -1,133 +1,130 @@
-Return-Path: <netdev+bounces-67656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1655844752
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 19:39:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CB42844757
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 19:39:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83A641F27303
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 18:39:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 347B629124F
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 18:39:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE8B9182DC;
-	Wed, 31 Jan 2024 18:39:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D71B91B268;
+	Wed, 31 Jan 2024 18:39:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ISi55TH+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F047120DE8;
-	Wed, 31 Jan 2024 18:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D71D0210E7
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 18:39:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706726349; cv=none; b=cW9yobSF0Rs+V9NhmZ7uBlthuuuUWhjHkrihLcYQUNZlnPM5uJLPQuNIYtn4AqHkL5VUcD7iKvdsESVL3lm+2hYHwViRiSPmtnS1by1T5C7PEMjJy018OkJWeTGDMzQbplCT/HuQs//GPmr2grZm5jx12zaQ61W02+RNhJ32RVU=
+	t=1706726389; cv=none; b=WubDcoaem8G5LvHFHjPISQ2Zn2yzNWq4iXg+xkxQPZs8Kadg3afc2qjRyjXqQyM2u08Cg0CbeOoS0cNG8y+NlQDsYrFHcKID7f7A4Jy69NNSXWZTh0vkZZmKuw2YpRzXjZwCGs2wNm5JL6nsVP9awj2iYNVksjiEsE55uJzFSmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706726349; c=relaxed/simple;
-	bh=rXcfpzQ9QFkg2aC41Y07F7sa4N5JX3LOM+ObY03VVYY=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=t5AQ7QXiyHOi+JPiCnP7c5u+8/LcE77eThpVK1wY52voybOrjeLtniY5+p8fKWhngf4hZMYrKq2udwcYeaxNF9RewieCSyMX6lIsybTuHj1L5qIKIEr8TCP7x53R7Rq9Reg/Rf8VFfNk7RqyvXS/74I23ROULvfS0FTamla0zic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (31.173.81.146) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 31 Jan
- 2024 21:38:51 +0300
-Subject: Re: [PATCH net-next v5 07/15] net: ravb: Move reference clock
- enable/disable on runtime PM APIs
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<richardcochran@gmail.com>, <p.zabel@pengutronix.de>,
-	<geert+renesas@glider.be>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20240131084133.1671440-1-claudiu.beznea.uj@bp.renesas.com>
- <20240131084133.1671440-8-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <518b6105-b09a-bd07-e6b1-026f73366a35@omp.ru>
-Date: Wed, 31 Jan 2024 21:38:50 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1706726389; c=relaxed/simple;
+	bh=QUzq2Czc4JXRYqcyKeyFT2SLWZTNadaaPT4Rq2b5HPo=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=g1schjxjDINMhT/PhjfqEKKhSHdZ6xDz0L8pSP3A1K5GS5jPQ/0X/QbcE9Wk5p/lQDN6VR2bkHw5d+n24dbu81t10A9FAmnADeY3GGYuatFhCkn2aBkoradshV/5e0Ke+l6U4zKbdoIzZHfwTCSDmpeHonaaNR4drw+ufgP8los=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ISi55TH+; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706726386;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=QUzq2Czc4JXRYqcyKeyFT2SLWZTNadaaPT4Rq2b5HPo=;
+	b=ISi55TH+n9Mt+Rrn9SRFVrs8vxJVceZBiOs0l63FD/VjHdPYz79Z/Hvf1AiKCYqvn42Gm4
+	PpVDFD7ytyv5vIIe/q9SfrplI6VD2yeUXsZhTB5Qxc4O7ChlFWHD4cLos4kTi5HrEDZ70I
+	KO6S5ZYZeUGTtsCP5NhXGq6SLL6HKvU=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-637-FPWc8baaNFCn_R1BwwmDBQ-1; Wed, 31 Jan 2024 13:39:44 -0500
+X-MC-Unique: FPWc8baaNFCn_R1BwwmDBQ-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33ae2dd7d4aso14369f8f.1
+        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 10:39:44 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706726383; x=1707331183;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QUzq2Czc4JXRYqcyKeyFT2SLWZTNadaaPT4Rq2b5HPo=;
+        b=cEuG3fmPVxVm+Q8OSeGKtUZeHem4zHsKVYiOD4r3XNA5OYbXpmNjrcjcnvvSl8iuQi
+         s6EdNHupbZA85eaHoqgdMqnpeaAEVa4K/IdvkBeStyVuoGEljfhGpCQWrN3SR5WoC+f0
+         BXg78Bp/nO9FlaE/LRGp1f+d0yQ0UFXRzWsQI2y+y9k0Nl9x2l/NlWnnYp7gDp/29r0A
+         v+j+LOkBkw4kTYNKuh7X+Bkf1RXpVbPv6lcKrSuTrJWhIhZ2Q44vBYDonpYej0kJUZfu
+         04LobYX2X3xb9MwJGO78XZJuuBIBGDq2mUjfdwGNNLu+CqoRfQc51ZxFgfMNAe8ne2w4
+         dS3A==
+X-Gm-Message-State: AOJu0Yztj5BLgkaSIT3aJnftDdEHmqazTJgPvydOfvYVKcCVHmXzP0MP
+	2li4OooYy8qVSUhNPV3cpZBOw7zEgPVguLNy7pEUPkORyGlMkxOKVt1UA6pFhB+9ZG8fQcOX1ey
+	SljoruEwKsufythOHurYaiMjJJ/2gn9ZdB/sE39RzSoDz4B3sS/XnKw==
+X-Received: by 2002:adf:a11b:0:b0:339:5946:5630 with SMTP id o27-20020adfa11b000000b0033959465630mr1785196wro.5.1706726383409;
+        Wed, 31 Jan 2024 10:39:43 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFnVhUN1vEvyU/fD+U4MQb5QiST2Cr+Zg2aj12cMVIMHUbw+S0cD+PFaoYm1AHpFxnT2LWTPg==
+X-Received: by 2002:adf:a11b:0:b0:339:5946:5630 with SMTP id o27-20020adfa11b000000b0033959465630mr1785189wro.5.1706726383025;
+        Wed, 31 Jan 2024 10:39:43 -0800 (PST)
+Received: from gerbillo.redhat.com (146-241-236-152.dyn.eolo.it. [146.241.236.152])
+        by smtp.gmail.com with ESMTPSA id n4-20020a5d4c44000000b0033aeda49732sm8708037wrt.33.2024.01.31.10.39.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jan 2024 10:39:42 -0800 (PST)
+Message-ID: <b8f675495a2c16cd742d1a95b3421ed15643aad2.camel@redhat.com>
+Subject: Re: [PATCH net-next] selftests/net: calibrate txtimestamp
+From: Paolo Abeni <pabeni@redhat.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jakub Kicinski
+	 <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
+	linux-kselftest@vger.kernel.org, Willem de Bruijn <willemb@google.com>
+Date: Wed, 31 Jan 2024 19:39:41 +0100
+In-Reply-To: <65ba61ea978b4_1699fd294eb@willemb.c.googlers.com.notmuch>
+References: <20240127023212.3746239-1-willemdebruijn.kernel@gmail.com>
+	 <20240130174736.03c79071@kernel.org>
+	 <65ba61ea978b4_1699fd294eb@willemb.c.googlers.com.notmuch>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240131084133.1671440-8-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 01/31/2024 18:18:05
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 183089 [Jan 31 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.81.146 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.81.146
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 01/31/2024 18:23:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 1/31/2024 10:54:00 AM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 1/31/24 11:41 AM, Claudiu wrote:
+On Wed, 2024-01-31 at 10:06 -0500, Willem de Bruijn wrote:
+> Otherwise I'll start with the gro and so-txtime tests. They may not
+> be so easily calibrated. As we cannot control the gro timeout, nor
+> the FQ max horizon.
 
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> 
-> Reference clock could be or not be part of the power domain. If it is part
-> of the power domain, the power domain takes care of properly setting it. In
-> case it is not part of the power domain and full runtime PM support is
-> available in driver the clock will not be propertly disabled/enabled at
-> runtime. For this, keep the prepare/unprepare operations in the driver's
-> probe()/remove() functions and move the enable/disable in runtime PM
-> functions.
-> 
-> By doing this, the previous ravb_runtime_nop() function was renamed
-> ravb_runtime_suspend() and the comment was removed. A proper runtime PM
-> resume function was added (ravb_runtime_resume()). The current driver
-> still don't need to make any register settings on runtime suspend/resume
-> (as expressed in the removed comment) because, currently,
-> pm_runtime_put_sync() is called on the driver remove function. This will be
-> changed in the next commits (that extends the runtime PM support) such
-> that proper register settings (along with runtime resume/suspend) will be
-> done on ravb_open()/ravb_close().
-> 
-> Along with it, the other clock request operations were moved close to
-> reference clock request and prepare to have all the clock requests
-> specific code grouped together.
-> 
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Note that we can control the GRO timeout to some extent, via=20
+gro_flush_timeout, see commit 89abe628375301fedb68770644df845d49018d8b.
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+Unfortunately that is not enough for 'large' gro tests. I think the
+root cause is that the process sending the packets can be de-scheduled
+- even the qemu VM from the hypervisor CPU - causing an extremely large
+gap between consecutive pkts.
 
-[...]
+I guess/hope that replacing multiple sendmsg() with a sendmmsg() could
+improve a bit the scenario, but I fear it will not solve the issue
+completely.
 
-MBR, Sergey
+> In such cases we can use the environment variable to either skip the
+> test entirely or --my preference-- run it to get code coverage, but
+> suppress a failure if due to timing (only). Sounds good?
+
+Sounds good to me! I was wondering about skipping the 'large' test
+only, but suppressing the failure when KSFT_MACHINE_SLOW=3Dyes only for
+such test looks a better option.
+
+Thanks!
+
+Paolo
+
 
