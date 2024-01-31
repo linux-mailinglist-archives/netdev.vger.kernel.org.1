@@ -1,50 +1,72 @@
-Return-Path: <netdev+bounces-67412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 294C384340E
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 03:40:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96B4A843418
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 03:41:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC5F21F27205
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 02:40:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20ADE1F24E90
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 02:41:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DCD6CA7F;
-	Wed, 31 Jan 2024 02:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B26BDDB6;
+	Wed, 31 Jan 2024 02:41:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RZUxGRmf"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="DmspMxIU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC50EE544
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 02:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DAE9DF4F;
+	Wed, 31 Jan 2024 02:41:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706668827; cv=none; b=XDMIyqJzUymb6wzuyun2rweUaetvQ72gAcq/YmDFESrMw+LLnf9oNR3PbMtZQS+o5Pc3jjuZR0j0XObjUImQ/de3zsqp33waWACh/ljQP+uDB+mq1Ir6bIlpVSDwfAL27m0fVYMBCglqRMwgITcZkSrhEtm3CujxQhyHM02Fjtk=
+	t=1706668898; cv=none; b=g/B7YmGc5J9WAiNQ6yYJHXfwiIHNz7GQRugguTrvB1krw4+c7QT/qp/j+sGCK3hAE0+4/8O+Gzk32h8KqfO3xMnzrr2PtuWqPl6LOuNTpNabdQgdpeToZqT7HlezlrqCvTTMpm/+9KVRRP+WMAfbqQkPrtXq+qQ0Fd3zU1ZSsXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706668827; c=relaxed/simple;
-	bh=KPD6mOSeADi78oWV0K/t0GJ9iSIMEPmfbVn4bkkIKhc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=L5EdIh2dfTBRqK7X9jhKaWc46dLh7ZEo8g43gDceRMXLgZpJoX/T1+u0JLf+n5bGPh7wz0Fs8YwMfvcTzKPXilOz99UhG4eBOvFhQwE8fTknuykcD9HDrnx7jFfPxTVvXkbi79n4yYOlscb9YfCm6ragOWeU9ritI7H8zUWr3Us=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RZUxGRmf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 85100C433F1;
-	Wed, 31 Jan 2024 02:40:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706668826;
-	bh=KPD6mOSeADi78oWV0K/t0GJ9iSIMEPmfbVn4bkkIKhc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RZUxGRmf//i5+ovNcSk+9eL4i9Adgrx51isRH/Z8BEg2mG8wXHGUtQ3clWNVnUXxw
-	 Xl3LlAEd5kamOTAWicNzTMYCsiNvTpLePxJPsV+lyWHPGDn0GJHcVtGTokVAYJQAQi
-	 h0B13x1R8tNDJLUFLmcr3BtKw7MXxBP6gNEIKato/TioMqeLJNzAd5Cx2iw/vtLuhL
-	 jf9ez4u6jNAnyw7BbVWlE1lecr8gRBHlQOcAtqkuIWKjtXz6v/Et+4GlSXWmOCr2IB
-	 DVY4Jox9EZFYNfsNR+lva2S4Z2TavkX+2fmTh9+p5luH8YV6vD62veSCyp3CasTHjY
-	 Y9PJda8ylTgFw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6C6DADC99E8;
-	Wed, 31 Jan 2024 02:40:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1706668898; c=relaxed/simple;
+	bh=SpP0n7qUbRbx0Z/5WUWqTEu1Bwjbet1DG+VdV9GFzU0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YSA8jzSdPFg5Ctue3qDVQTVhPhLFEHXB/8Tyly9+RvFO00/GsoIfYLv0GVgaIZTyujSlhTWjqdhW9c4dlGLpj8Occ4kbt+PFeCrND7w9T6dcG8HuiYvKqKwYbJoBcTCDc8Dd/TuUZYFcUyHO+yqKh8Z7sYVEKaD31mztht6sXC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=DmspMxIU; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40UHmG0W011647;
+	Tue, 30 Jan 2024 18:41:27 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=pfpt0220; bh=T/f72Ewe
+	AdptrK0eSwQ0fHYQUvbfFrB/+zpPieRXY40=; b=DmspMxIUbwYJQswKDCnQjXzZ
+	qPPRn7iMgmHQ5MXtXfnPLfGvt0onKQ7uCsQaAlAuefojc5Wg63vQolevkhmQfzvU
+	6LH6cieEHqCIwv30Fg2T64IUaLKiRcRqf+7uBmDOoY5G1/FOrQrGQCDilXz8d/Su
+	6rXOyRGBqecx9Ns8O31Mrs+o+VGjKGNOSk6cIq3yH4UASgGdc4bsyLc6Xl9spKl2
+	0mrzEIE+w+/SFcORmDqLNPFDpHpuLL4LuohEM6zjF/aAJg8tNDFWeCnebNbMY44j
+	UR/paCrGpRxJYyGvl4uoBMwAB08IN35+9WejXI/Khzz1mlpWU9xCTh09VucuZw==
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3vw27nmvbc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Tue, 30 Jan 2024 18:41:26 -0800 (PST)
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 30 Jan
+ 2024 18:41:24 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Tue, 30 Jan 2024 18:41:24 -0800
+Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 92B963F707A;
+	Tue, 30 Jan 2024 18:41:20 -0800 (PST)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <horms@kernel.org>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <bcreeley@amd.com>, <sbhatta@marvell.com>, <gakula@marvell.com>,
+        <hkelam@marvell.com>, <sumang@marvell.com>,
+        Ratheesh Kannoth
+	<rkannoth@marvell.com>
+Subject: [PATCH net v3] octeontx2-af: Initialize maps.
+Date: Wed, 31 Jan 2024 08:11:18 +0530
+Message-ID: <20240131024118.254758-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,44 +74,109 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] devlink: Fix referring to hw_addr attribute during state
- validation
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170666882644.24091.14098617573369079768.git-patchwork-notify@kernel.org>
-Date: Wed, 31 Jan 2024 02:40:26 +0000
-References: <20240129191059.129030-1-parav@nvidia.com>
-In-Reply-To: <20240129191059.129030-1-parav@nvidia.com>
-To: Parav Pandit <parav@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, shayd@nvidia.com, netdev@vger.kernel.org, jiri@nvidia.com
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: _yekNxsZxU1Br4UnRXM_74qZkIY35-l2
+X-Proofpoint-GUID: _yekNxsZxU1Br4UnRXM_74qZkIY35-l2
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-30_14,2024-01-30_01,2023-05-22_02
 
-Hello:
+kmalloc_array() without __GFP_ZERO flag does not initialize
+memory to zero. This causes issues. Use __GFP_ZERO flag for maps and
+bitmap_zalloc() for bimaps.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Fixes: dd7842878633 ("octeontx2-af: Add new devlink param to configure maximum usable NIX block LFs")
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+---
 
-On Mon, 29 Jan 2024 21:10:59 +0200 you wrote:
-> When port function state change is requested, and when the driver
-> does not support it, it refers to the hw address attribute instead
-> of state attribute. Seems like a copy paste error.
-> 
-> Fix it by referring to the port function state attribute.
-> 
-> Fixes: c0bea69d1ca7 ("devlink: Validate port function request")
-> Signed-off-by: Parav Pandit <parav@nvidia.com>
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-> 
-> [...]
+ChangeLogs:
+v2 -> v3: Used GFP_ZERO for normal map arrays
+v1 -> v2: Used bitmap_zalloc() API.
+v0 -> v1: Removed devm_kcalloc()._
+---
+ .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 26 ++++++++++---------
+ 1 file changed, 14 insertions(+), 12 deletions(-)
 
-Here is the summary with links:
-  - [net] devlink: Fix referring to hw_addr attribute during state validation
-    https://git.kernel.org/netdev/net/c/1a89e24f8bfd
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+index 167145bdcb75..6a8f0efd96a5 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
+@@ -1850,8 +1850,8 @@ void npc_mcam_rsrcs_deinit(struct rvu *rvu)
+ {
+ 	struct npc_mcam *mcam = &rvu->hw->mcam;
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+-	kfree(mcam->bmap);
+-	kfree(mcam->bmap_reverse);
++	bitmap_free(mcam->bmap);
++	bitmap_free(mcam->bmap_reverse);
+ 	kfree(mcam->entry2pfvf_map);
+ 	kfree(mcam->cntr2pfvf_map);
+ 	kfree(mcam->entry2cntr_map);
+@@ -1904,13 +1904,11 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+ 	mcam->pf_offset = mcam->nixlf_offset + nixlf_count;
 
+ 	/* Allocate bitmaps for managing MCAM entries */
+-	mcam->bmap = kmalloc_array(BITS_TO_LONGS(mcam->bmap_entries),
+-				   sizeof(long), GFP_KERNEL);
++	mcam->bmap = bitmap_zalloc(mcam->bmap_entries, GFP_KERNEL);
+ 	if (!mcam->bmap)
+ 		return -ENOMEM;
 
+-	mcam->bmap_reverse = kmalloc_array(BITS_TO_LONGS(mcam->bmap_entries),
+-					   sizeof(long), GFP_KERNEL);
++	mcam->bmap_reverse = bitmap_zalloc(mcam->bmap_entries, GFP_KERNEL);
+ 	if (!mcam->bmap_reverse)
+ 		goto free_bmap;
+
+@@ -1918,7 +1916,8 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+
+ 	/* Alloc memory for saving entry to RVU PFFUNC allocation mapping */
+ 	mcam->entry2pfvf_map = kmalloc_array(mcam->bmap_entries,
+-					     sizeof(u16), GFP_KERNEL);
++					     sizeof(u16),
++					     GFP_KERNEL | __GFP_ZERO);
+ 	if (!mcam->entry2pfvf_map)
+ 		goto free_bmap_reverse;
+
+@@ -1942,7 +1941,8 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+ 		goto free_entry_map;
+
+ 	mcam->cntr2pfvf_map = kmalloc_array(mcam->counters.max,
+-					    sizeof(u16), GFP_KERNEL);
++					    sizeof(u16),
++					    GFP_KERNEL | __GFP_ZERO);
+ 	if (!mcam->cntr2pfvf_map)
+ 		goto free_cntr_bmap;
+
+@@ -1950,12 +1950,14 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+ 	 * counter's reference count.
+ 	 */
+ 	mcam->entry2cntr_map = kmalloc_array(mcam->bmap_entries,
+-					     sizeof(u16), GFP_KERNEL);
++					     sizeof(u16),
++					     GFP_KERNEL | __GFP_ZERO);
+ 	if (!mcam->entry2cntr_map)
+ 		goto free_cntr_map;
+
+ 	mcam->cntr_refcnt = kmalloc_array(mcam->counters.max,
+-					  sizeof(u16), GFP_KERNEL);
++					  sizeof(u16),
++					  GFP_KERNEL | __GFP_ZERO);
+ 	if (!mcam->cntr_refcnt)
+ 		goto free_entry_cntr_map;
+
+@@ -1988,9 +1990,9 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
+ free_entry_map:
+ 	kfree(mcam->entry2pfvf_map);
+ free_bmap_reverse:
+-	kfree(mcam->bmap_reverse);
++	bitmap_free(mcam->bmap_reverse);
+ free_bmap:
+-	kfree(mcam->bmap);
++	bitmap_free(mcam->bmap);
+
+ 	return -ENOMEM;
+ }
+--
+2.25.1
 
