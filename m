@@ -1,69 +1,71 @@
-Return-Path: <netdev+bounces-67435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80E5C8436EA
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 07:40:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC1678436EB
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 07:40:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A93B1C22758
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 06:40:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1C4E1C2423C
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 06:40:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C355232186;
-	Wed, 31 Jan 2024 06:40:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E37BE4174A;
+	Wed, 31 Jan 2024 06:40:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B7aJqldO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NEL809fN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f169.google.com (mail-yb1-f169.google.com [209.85.219.169])
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 147FB51011
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 06:40:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C79D51027
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 06:40:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706683247; cv=none; b=BFiL0MStM419ljIfLNsTk42BBM7OF7gydLWn9SR6wtR0fZ9VFn+C10mKN5NaX3wBWAEoGQjD+PrMxG7oliV7QC2gC2MrFKnTZVcQVk6B1MkXTXKci0ECY8C2Q0DpYPiXLC2lZEn70yUoe8auDdRd0Vf3P0OKUBIlQ1dLlZ+gjOM=
+	t=1706683248; cv=none; b=dOLNEYP7d6GgYz01YNb+43S89e8s9KTFzRHinTwMBQxp4njNNZ5yTxd/sHZOBuv60M/R9KeD/RVi9DWp4HaNAag0voSmQWd+RJJpdxLR1Zo343rx3PtqyGMQ1Hu1SWAIZX9M74XOhBGS+ebghi+iuJwRLxCKP8C1J7rZ21GlKZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706683247; c=relaxed/simple;
-	bh=u7tHbYmfgFKPryryDzcWXW7yDRXJXLNX0YONcJ5AW3Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jsDP8uyZcEq6IGT3oeMJeWxnqDwNoARTGJAAyzIMZxbzHAbHJwjNbl7a8vL8uWrgNTG//Azf/vAAboHcL4dUKiCIbxYPZRbpgy1seHKm4atiJuc00dApxO0PP/fSzBFRlRxdX/6e9qbpkxBOjuaWxq6nA5GUypasv/bTzovYtCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B7aJqldO; arc=none smtp.client-ip=209.85.219.169
+	s=arc-20240116; t=1706683248; c=relaxed/simple;
+	bh=9Q7dIWO/up+Z+zGT7zjSYYeM+tBMW5qlYmi941jKS2A=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=BC7sV+djcxs/tXl85jfKtklpI25HzV/0eBuOoe/g91pxG3OQKoE6z/lqzJ22CP5OiM+bJn0usbkXGdCA2oXJGNbAEFe6fb9eYlh/7/1myZ2qzedlk6tC7V/1ynBhXKIad8PTUM0ltIKOOgju+2WmFA/y45lctuoL6v10eylVVPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NEL809fN; arc=none smtp.client-ip=209.85.219.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f169.google.com with SMTP id 3f1490d57ef6-dc236729a2bso4783466276.0
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 22:40:45 -0800 (PST)
+Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-dc23bf7e5aaso5311675276.0
+        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 22:40:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706683245; x=1707288045; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7xii9v6yBDHuufwEqPKjXSveU52i/0nWLFD+8xN0mg4=;
-        b=B7aJqldOw94EHJt50gdbnO9NT1CQw7gg621ZoJbijnqEplKNR5/ypI7gItXZxM4k5N
-         m/l139RI1xptN4PNiuMzyWBEmSciUrA9485xhUerbJizsrhjG4zxGsQ5WqcT7Fhz2GBS
-         Zel5lkC1G54i+Ko1WCkWaRMmYtF1BIBXm/YMhB0o1cfW3HyzKBojgddOZ/um8gNv1YtL
-         tlKYzO7uFbGNvfYa3V5qW+JdpQgWBKvjZItG0J91Jhf75ha+vqW4QpSu05QYyDYaI5uI
-         3CAc+9QgCP44/etIGO8l0ZWVwxSU7PCL8fbhjSpdICX8xnQ2lRoPUiFhow6aK3Mkb3uc
-         Ykiw==
+        d=gmail.com; s=20230601; t=1706683246; x=1707288046; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nPABcs344aIEO6XlzzqYh/8aI4dOCp92Q8NZDEsORFE=;
+        b=NEL809fNKUA3nGZ9w7kTIJq+MtEsshkgDRC+5M03Ekss+KEs3gZ3Ai7sZ7Ym6rPdAC
+         M4GJNyIQEs4wlJ8WpCujvGFCkdtsjflOdk+JWtR+Fbj5O2qg9HDer1VXp+gcDTmZrDHD
+         pG17q1/vlIJeZfinYQqN4H01yViTEJn1WABleMB2SqV0ZQD26PfWXvKCFIeNyOmc/IhP
+         KX02+KhFgI4La6RDKszSiT6E+LvhZwSj9we9eY9T1ECkAQhSt97vHgkt5Zfpi1wUmdPz
+         R4E1G3juZv+BvMaHVlNnhKLq2Ulc2EJJ+Cb0MJO+il63GXCEBI24T5J4NToNc79eS3QB
+         tr1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706683245; x=1707288045;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7xii9v6yBDHuufwEqPKjXSveU52i/0nWLFD+8xN0mg4=;
-        b=LUoWs9QH4SAWbXdq5gM6yWZ8RQvEX2r2Xpvzw0741WTkrY+xxQtBRR3VdF5afnCIM3
-         QoWUehnLSiGlXfjrTuNp5T/KLtvBSlRq4FoEK2YUWW4gmJyQrDIAFY1MGB0GF4OYX3f3
-         jf4t9tPwgwu+U2qM/V/MJzipF4cMEyz4wiSy/5bJwcpueQ+7baphlIUDIvY4xRYBERwz
-         p5fcyIDRiARNqQ0wlETgbeoN3an+oQIJdc0xg/qIyhMDAe/V96N6Ji79YXoOCSubLarf
-         NuYE20GDNgBqlgk0eGktJ/42+bLFHpdvAKQooP+JcuwxOQEtWGGtXIt3u/KxHqiPG9bp
-         bdnw==
-X-Gm-Message-State: AOJu0Yz8scL71/QWg5ca6ubjBsLB/zUx5BNT9HMCbbuvwZce0RMlM6Mf
-	6aPdRd5P+ppnOYXs9ZY6H1GloZ8WTNLmKd9fMTH0nD6h2JbkfnmDOj6VYp3undM=
-X-Google-Smtp-Source: AGHT+IFi46IMmw5ck24T2Yojk7irQNwKziYL0J/yBmFTsDUiVO1QwHuM+/FPtR3um+b2vBgBArLRvQ==
-X-Received: by 2002:a25:b288:0:b0:dc2:1a4f:bc30 with SMTP id k8-20020a25b288000000b00dc21a4fbc30mr734158ybj.26.1706683244576;
-        Tue, 30 Jan 2024 22:40:44 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706683246; x=1707288046;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nPABcs344aIEO6XlzzqYh/8aI4dOCp92Q8NZDEsORFE=;
+        b=MjurDKZNmFQG2gVhls3N6HcSi/3ki2J51+bsSl2TsqnGzimBubADiwgc+b3Y4SEdY9
+         8oXQgoBRhoz0PLVEeGEt9cjp/AktaqHI3qvOez5ykYFRbyKSX4I8d80xjLlnXlNhIvX8
+         eeCmVtfCEjxDu02KbihMfd1ho47KaOfVylh+tQM0iyDAbTkbQMu4xs/NBf0gYZ7lhxb3
+         sLQwMpLe4VmIca8cAgHmtq8jf5HHlGtYa9MqSn1cxShQwU9OmjWV6Stj+krcW6EdqpWu
+         YvSpUgeAKUvyUqputGpoJibxgD3M3jxxaYONn3AS64It1ISN/qUrcXJBRDeOlcrMr8Dc
+         kQsg==
+X-Gm-Message-State: AOJu0YwJbPnTBOAVdB54Ow25Z0oH5/NT4yuPRJ4GyuukPSNBd2lPnQKu
+	i9WummUKUfATSYMpLImR/pqQXG4WFak9lkFJKzJ63v1RNsBI3lQnjau0q5dDJBg=
+X-Google-Smtp-Source: AGHT+IEfQGVFjNCWjSn7MCJIqSM7dqJ+uB8EvLPOQ5efbIzM21xwJAtIMLZY6LgVecF/ZAkZWUg5NA==
+X-Received: by 2002:a25:a40a:0:b0:dc2:644e:fcf9 with SMTP id f10-20020a25a40a000000b00dc2644efcf9mr550038ybi.40.1706683246037;
+        Tue, 30 Jan 2024 22:40:46 -0800 (PST)
 Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:7a8:850:239d:3ddc])
-        by smtp.gmail.com with ESMTPSA id y9-20020a2586c9000000b00dc228b22cd5sm3345683ybm.41.2024.01.30.22.40.42
+        by smtp.gmail.com with ESMTPSA id y9-20020a2586c9000000b00dc228b22cd5sm3345683ybm.41.2024.01.30.22.40.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 22:40:43 -0800 (PST)
+        Tue, 30 Jan 2024 22:40:45 -0800 (PST)
 From: thinker.li@gmail.com
 To: netdev@vger.kernel.org,
 	ast@kernel.org,
@@ -78,10 +80,12 @@ To: netdev@vger.kernel.org,
 Cc: sinquersw@gmail.com,
 	kuifeng@meta.com,
 	Kui-Feng Lee <thinker.li@gmail.com>
-Subject: [PATCH net-next 0/5] Remove expired routes with a separated list of routes.
-Date: Tue, 30 Jan 2024 22:40:36 -0800
-Message-Id: <20240131064041.3445212-1-thinker.li@gmail.com>
+Subject: [PATCH net-next 1/5] net/ipv6: set expires in rt6_add_dflt_router().
+Date: Tue, 30 Jan 2024 22:40:37 -0800
+Message-Id: <20240131064041.3445212-2-thinker.li@gmail.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20240131064041.3445212-1-thinker.li@gmail.com>
+References: <20240131064041.3445212-1-thinker.li@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,131 +96,77 @@ Content-Transfer-Encoding: 8bit
 
 From: Kui-Feng Lee <thinker.li@gmail.com>
 
-This patchset is resent due to previous reverting. [1]
+Pass the duration of a lifetime (in seconds) to the function
+rt6_add_dflt_router() so that it can properly set the expiration time.
 
-FIB6 GC walks trees of fib6_tables to remove expired routes. Walking a tree
-can be expensive if the number of routes in a table is big, even if most of
-them are permanent. Checking routes in a separated list of routes having
-expiration will avoid this potential issue.
+The function ndisc_router_discovery() is the only one that calls
+rt6_add_dflt_router(), and it will later set the expiration time for the
+route created by rt6_add_dflt_router(). However, there is a gap of time
+between calling rt6_add_dflt_router() and setting the expiration time in
+ndisc_router_discovery(). During this period, there is a possibility that a
+new route may be removed from the routing table. By setting the correct
+expiration time in rt6_add_dflt_router(), we can prevent this from
+happening. The reason for setting RTF_EXPIRES in rt6_add_dflt_router() is
+to start the Garbage Collection (GC) timer, as it only activates when a
+route with RTF_EXPIRES is added to a table.
 
-Background
-==========
-
-The size of a Linux IPv6 routing table can become a big problem if not
-managed appropriately.  Now, Linux has a garbage collector to remove
-expired routes periodically.  However, this may lead to a situation in
-which the routing path is blocked for a long period due to an
-excessive number of routes.
-
-For example, years ago, there is a commit c7bb4b89033b ("ipv6: tcp:
-drop silly ICMPv6 packet too big messages").  The root cause is that
-malicious ICMPv6 packets were sent back for every small packet sent to
-them. These packets add routes with an expiration time that prompts
-the GC to periodically check all routes in the tables, including
-permanent ones.
-
-Why Route Expires
-=================
-
-Users can add IPv6 routes with an expiration time manually. However,
-the Neighbor Discovery protocol may also generate routes that can
-expire.  For example, Router Advertisement (RA) messages may create a
-default route with an expiration time. [RFC 4861] For IPv4, it is not
-possible to set an expiration time for a route, and there is no RA, so
-there is no need to worry about such issues.
-
-Create Routes with Expires
-==========================
-
-You can create routes with expires with the  command.
-
-For example,
-
-    ip -6 route add 2001:b000:591::3 via fe80::5054:ff:fe12:3457 \
-        dev enp0s3 expires 30
-
-The route that has been generated will be deleted automatically in 30
-seconds.
-
-GC of FIB6
-==========
-
-The function called fib6_run_gc() is responsible for performing
-garbage collection (GC) for the Linux IPv6 stack. It checks for the
-expiration of every route by traversing the trees of routing
-tables. The time taken to traverse a routing table increases with its
-size. Holding the routing table lock during traversal is particularly
-undesirable. Therefore, it is preferable to keep the lock for the
-shortest possible duration.
-
-Solution
-========
-
-The cause of the issue is keeping the routing table locked during the
-traversal of large trees. To solve this problem, we can create a separate
-list of routes that have expiration. This will prevent GC from checking
-permanent routes.
-
-Result
-======
-
-We conducted a test to measure the execution times of fib6_gc_timer_cb()
-and observed that it enhances the GC of FIB6. During the test, we added
-permanent routes with the following numbers: 1000, 3000, 6000, and
-9000. Additionally, we added a route with an expiration time.
-
-Here are the average execution times for the kernel without the patch.
- - 120020 ns with 1000 permanent routes
- - 308920 ns with 3000 ...
- - 581470 ns with 6000 ...
- - 855310 ns with 9000 ...
-
-The kernel with the patch consistently takes around 14000 ns to execute,
-regardless of the number of permanent routes that are installed.
-
-Major changes from the previous patchset [2]:
-
- - Split helpers.
-
-   - fib6_set_expires() -> fib6_set_expires() and fib6_add_gc_list().
-
-   - fib6_clean_expires() -> fib6_clean_expires() and
-     fib6_remove_gc_list().
-
- - Fix rt6_add_dflt_router() to avoid racing of setting expires.
-
- - Remove unnecessary calling to fib6_clean_expires() in
-   ip6_route_info_create().
-
- - Add test cases of toggling routes between permanent and temporary
-   and handling routes from RA messages.
-
-   - Clean up routes by deleting the existing device and adding a new
-     one.
-
- - Fix a potential issue in modify_prefix_route().
-
+Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
 ---
-[1] https://lore.kernel.org/all/20231219030243.25687-1-dsahern@kernel.org/
-[2] https://lore.kernel.org/all/20230815180706.772638-1-thinker.li@gmail.com/
+ include/net/ip6_route.h | 3 ++-
+ net/ipv6/ndisc.c        | 3 ++-
+ net/ipv6/route.c        | 4 +++-
+ 3 files changed, 7 insertions(+), 3 deletions(-)
 
-Kui-Feng Lee (5):
-  net/ipv6: set expires in rt6_add_dflt_router().
-  net/ipv6: Remove unnecessary clean.
-  net/ipv6: Remove expired routes with a separated list of routes.
-  net/ipv6: set expires in modify_prefix_route() if RTF_EXPIRES is set.
-  selftests/net: Adding test cases of replacing routes and route
-    advertisements.
-
- include/net/ip6_fib.h                    |  36 ++++-
- include/net/ip6_route.h                  |   3 +-
- net/ipv6/addrconf.c                      |  50 ++++++-
- net/ipv6/ip6_fib.c                       |  58 ++++++++-
- net/ipv6/ndisc.c                         |  14 +-
- net/ipv6/route.c                         |  20 ++-
- tools/testing/selftests/net/fib_tests.sh | 159 +++++++++++++++++++++--
- 7 files changed, 308 insertions(+), 32 deletions(-)
-
+diff --git a/include/net/ip6_route.h b/include/net/ip6_route.h
+index 28b065790261..52a51c69aa9d 100644
+--- a/include/net/ip6_route.h
++++ b/include/net/ip6_route.h
+@@ -170,7 +170,8 @@ struct fib6_info *rt6_get_dflt_router(struct net *net,
+ struct fib6_info *rt6_add_dflt_router(struct net *net,
+ 				     const struct in6_addr *gwaddr,
+ 				     struct net_device *dev, unsigned int pref,
+-				     u32 defrtr_usr_metric);
++				     u32 defrtr_usr_metric,
++				     int lifetime);
+ 
+ void rt6_purge_dflt_routers(struct net *net);
+ 
+diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+index a19999b30bc0..a68462668158 100644
+--- a/net/ipv6/ndisc.c
++++ b/net/ipv6/ndisc.c
+@@ -1382,7 +1382,8 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
+ 			neigh_release(neigh);
+ 
+ 		rt = rt6_add_dflt_router(net, &ipv6_hdr(skb)->saddr,
+-					 skb->dev, pref, defrtr_usr_metric);
++					 skb->dev, pref, defrtr_usr_metric,
++					 lifetime);
+ 		if (!rt) {
+ 			ND_PRINTK(0, err,
+ 				  "RA: %s failed to add default route\n",
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index 63b4c6056582..98abba8f15cd 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -4355,7 +4355,8 @@ struct fib6_info *rt6_add_dflt_router(struct net *net,
+ 				     const struct in6_addr *gwaddr,
+ 				     struct net_device *dev,
+ 				     unsigned int pref,
+-				     u32 defrtr_usr_metric)
++				     u32 defrtr_usr_metric,
++				     int lifetime)
+ {
+ 	struct fib6_config cfg = {
+ 		.fc_table	= l3mdev_fib_table(dev) ? : RT6_TABLE_DFLT,
+@@ -4368,6 +4369,7 @@ struct fib6_info *rt6_add_dflt_router(struct net *net,
+ 		.fc_nlinfo.portid = 0,
+ 		.fc_nlinfo.nlh = NULL,
+ 		.fc_nlinfo.nl_net = net,
++		.fc_expires = jiffies_to_clock_t(lifetime * HZ),
+ 	};
+ 
+ 	cfg.fc_gateway = *gwaddr;
 -- 
 2.34.1
 
