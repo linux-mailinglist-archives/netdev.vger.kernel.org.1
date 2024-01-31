@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-67524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DB21843E0C
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 12:14:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D236843E0E
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 12:14:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8677A1F2129B
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 11:14:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C032F28C5D2
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 11:14:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C7D56BB5C;
-	Wed, 31 Jan 2024 11:14:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0F36EB50;
+	Wed, 31 Jan 2024 11:14:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I7Ll3Zhe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jVqxRNiF"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDA3F69DFF
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 11:14:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC436A320
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 11:14:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706699645; cv=none; b=WMTZWEw83Kg/gScl1AGkoFW2WF8HL/bRfoQStLpvrRdtCuCpAFjssK3LaIsGAHjcY1cTrT76ZG1SBk4PASG7QmdvHTYEZzZse+2cEfFoCbJNIuYr9KBgg34GfzPr56AexvUKxFQV3DGSKXqCuQRXSV+T1xur2kjnPdwG4+96KHk=
+	t=1706699646; cv=none; b=fZ/i6+/0eAAI+wso+Fm2QkHfg3oxpgScpCdEqtJE1V67gI5M50FDg/PbY5Bu43fLgKPgFCvHQUCmpy1nmHAZMmVDtjbMsuehb5/0d06P6aAOvZqbkoRKPhCFu4E1fzKWtjgSL79khnplQDzine9MoLpG/+b72GbGx2fc2GbVfM8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706699645; c=relaxed/simple;
-	bh=U8gZiH4dFNnj77QJovPLkgt4kQs8CGvykf2jpEOhbeg=;
+	s=arc-20240116; t=1706699646; c=relaxed/simple;
+	bh=dauvLb8+7cSSPLtnw8Zp9gQ1/HEUQuKf9z7sVWNF1eg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=chzZl+cRl7KCDCOJx4iKG2FFq7qb3PSYyu91GQovtrOTCBuMsLyJ1FVniFpwpKclGHGL4G+C3r85wedGywg/3lszw9w68KKMA2r1Qof2NMU95lOJ8RpGqy5eN5pD06UKQkgYP1vMiowEtNtAU6IL37fONBn6OssU6S6irH3wq6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I7Ll3Zhe; arc=none smtp.client-ip=198.175.65.10
+	 MIME-Version; b=ujnrAurOhHMPUZiZ2DRJQbhP+q/WSPYopXAFRsXBPjFJlCh1+hWCHQg5TxTezo5m41LBRMD+7nx2hzFl5e4Dfm+Dys/2jnCl9vGR8EFEYy/KZhMWOB8beAzyebwLl3SHR+arQkyWrmAp/bgBk+2I8ooyQ8JkurWWNnXlQVf0/Kk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jVqxRNiF; arc=none smtp.client-ip=198.175.65.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,35 +36,36 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1706699644; x=1738235644;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=U8gZiH4dFNnj77QJovPLkgt4kQs8CGvykf2jpEOhbeg=;
-  b=I7Ll3Zhe0j5wgXc/ft2ISiXDfYvxCUdZHN5yW03avsnuighT4vo/Gzam
-   OQOAp+6PrB8hVDN4gUTww63/IvxcACro/2+18sstXwYUp0v7MOzdWjVkH
-   AikOGHDQKpXB7pwSBUqb2OPPwQEFRexryabut1uHt/2jyXQ6QEdcBMme1
-   dHNUbC9LD0v3zDXA5PjIBrjGXuWltHegckYuSH4qJTKsR1ootYO+PE0Vq
-   xiS4CB5sa4JSF/DXkWGNegP0DFbcpMAeXPYgoa04peac1yg7b3sxpZx4t
-   8q6fWSw1137HlU9ixFW8saeunOd5qKOSLixcKG3RZfAgbcyn5nJGsCJT/
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="16949586"
+  bh=dauvLb8+7cSSPLtnw8Zp9gQ1/HEUQuKf9z7sVWNF1eg=;
+  b=jVqxRNiFvcSRITjxysjYLmSSBIXOWobbWkNd6+quwWIYLo8qvDtnqipt
+   KkZRptRyJa3+EWIjEgKOUTTBJUqdJvC29uMKSICjQQiOgJzQ0qkh4qB9/
+   HWZckcS9PRfgevGaSsrDPy4XEBWcJxFlOhDQrVQ5l+JyMICjcHFgsnKNC
+   TpDp+1oKTDdO46T+ju1GrKKE4kuQmObo2GPO64jWXjm9BtLgXgTOEbzG+
+   tHgRPaUTuAbM5otm+5TW2kOemixYGqAAsquQFCSnRduIAYNBrwzu3xp5f
+   MhcV38bc9V9ZiTzrulvKCJzm3YTY/CVCCF5YHuqmSxrcubGFBeN96znnR
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="16949593"
 X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="16949586"
+   d="scan'208";a="16949593"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 03:14:02 -0800
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 03:14:04 -0800
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="878762847"
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="878762850"
 X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="878762847"
+   d="scan'208";a="878762850"
 Received: from os-delivery.igk.intel.com ([10.102.18.218])
-  by FMSMGA003.fm.intel.com with ESMTP; 31 Jan 2024 03:13:59 -0800
+  by FMSMGA003.fm.intel.com with ESMTP; 31 Jan 2024 03:14:01 -0800
 From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: anthony.l.nguyen@intel.com,
 	netdev@vger.kernel.org,
 	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	kernel test robot <lkp@intel.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
 	Simon Horman <horms@kernel.org>
-Subject: [PATCH iwl-next v5 2/3] ixgbe: Rearrange args to fix reverse Christmas tree
-Date: Wed, 31 Jan 2024 12:04:18 +0100
-Message-Id: <20240131110419.29161-2-jedrzej.jagielski@intel.com>
+Subject: [PATCH iwl-next v5 3/3] ixgbe: Clarify the values of the returning status
+Date: Wed, 31 Jan 2024 12:04:19 +0100
+Message-Id: <20240131110419.29161-3-jedrzej.jagielski@intel.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20240131110419.29161-1-jedrzej.jagielski@intel.com>
 References: <20240131110419.29161-1-jedrzej.jagielski@intel.com>
@@ -76,914 +77,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Clean up the code touched during type conversion by the previous patch
-of the series.
+Converting s32 functions to regular int in the previous patch of the series
+caused triggering smatch warnings about missing error code.
 
-Suggested-by: Tony Nguyen <anthony.l.nguyen@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+New smatch warnings:
+drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c:2884 ixgbe_get_lcd_t_x550em() warn: missing error code? 'status'
+drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c:3130 ixgbe_enter_lplu_t_x550em() warn: missing error code? 'status'
+
+Old smatch warnings:
+drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c:2890 ixgbe_get_lcd_t_x550em() warn: missing error code? 'status'
+
+Fix it by clearly stating returning error code as 0.
+
+Reported-by: kernel test robot <lkp@intel.com>
+Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Closes: https://lore.kernel.org/r/202401041701.6QKTsZmx-lkp@intel.com/
 Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
 ---
- .../net/ethernet/intel/ixgbe/ixgbe_82598.c    | 14 ++--
- .../net/ethernet/intel/ixgbe/ixgbe_82599.c    | 41 ++++++------
- .../net/ethernet/intel/ixgbe/ixgbe_common.c   | 66 +++++++++----------
- .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |  2 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  | 54 +++++++--------
- drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c | 12 ++--
- drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c | 50 +++++++-------
- 7 files changed, 120 insertions(+), 119 deletions(-)
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_82598.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_82598.c
-index 51baa176b99f..283a23150a4d 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_82598.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_82598.c
-@@ -97,8 +97,8 @@ static int ixgbe_init_phy_ops_82598(struct ixgbe_hw *hw)
- {
- 	struct ixgbe_mac_info *mac = &hw->mac;
- 	struct ixgbe_phy_info *phy = &hw->phy;
--	int ret_val;
- 	u16 list_offset, data_offset;
-+	int ret_val;
- 
- 	/* Identify the PHY */
- 	phy->ops.identify(hw);
-@@ -414,10 +414,10 @@ static int ixgbe_fc_enable_82598(struct ixgbe_hw *hw)
- static int ixgbe_start_mac_link_82598(struct ixgbe_hw *hw,
- 				      bool autoneg_wait_to_complete)
- {
-+	int status = 0;
- 	u32 autoc_reg;
- 	u32 links_reg;
- 	u32 i;
--	int status = 0;
- 
- 	/* Restart link */
- 	autoc_reg = IXGBE_READ_REG(hw, IXGBE_AUTOC);
-@@ -649,13 +649,13 @@ static int ixgbe_setup_copper_link_82598(struct ixgbe_hw *hw,
-  **/
- static int ixgbe_reset_hw_82598(struct ixgbe_hw *hw)
- {
--	int status;
- 	int phy_status = 0;
--	u32 ctrl;
-+	u8  analog_val;
- 	u32 gheccr;
--	u32 i;
-+	int status;
- 	u32 autoc;
--	u8  analog_val;
-+	u32 ctrl;
-+	u32 i;
- 
- 	/* Call adapter stop to disable tx/rx and clear interrupts */
- 	status = hw->mac.ops.stop_adapter(hw);
-@@ -951,10 +951,10 @@ static int ixgbe_write_analog_reg8_82598(struct ixgbe_hw *hw, u32 reg, u8 val)
- static int ixgbe_read_i2c_phy_82598(struct ixgbe_hw *hw, u8 dev_addr,
- 				    u8 byte_offset, u8 *eeprom_data)
- {
--	int status = 0;
- 	u16 sfp_addr = 0;
- 	u16 sfp_data = 0;
- 	u16 sfp_stat = 0;
-+	int status = 0;
- 	u16 gssr;
- 	u32 i;
- 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
-index 2ae659b123e4..e0c300fe5cee 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_82599.c
-@@ -100,8 +100,8 @@ static void ixgbe_init_mac_link_ops_82599(struct ixgbe_hw *hw)
- 
- static int ixgbe_setup_sfp_modules_82599(struct ixgbe_hw *hw)
- {
--	int ret_val;
- 	u16 list_offset, data_offset, data_value;
-+	int ret_val;
- 
- 	if (hw->phy.sfp_type != ixgbe_sfp_type_unknown) {
- 		ixgbe_init_mac_link_ops_82599(hw);
-@@ -503,11 +503,11 @@ static void ixgbe_stop_mac_link_on_d3_82599(struct ixgbe_hw *hw)
- static int ixgbe_start_mac_link_82599(struct ixgbe_hw *hw,
- 				      bool autoneg_wait_to_complete)
- {
-+	bool got_lock = false;
-+	int status = 0;
- 	u32 autoc_reg;
- 	u32 links_reg;
- 	u32 i;
--	int status = 0;
--	bool got_lock = false;
- 
- 	if (ixgbe_verify_lesm_fw_enabled_82599(hw)) {
- 		status = hw->mac.ops.acquire_swfw_sync(hw,
-@@ -661,11 +661,11 @@ static int ixgbe_setup_mac_link_smartspeed(struct ixgbe_hw *hw,
- 					   ixgbe_link_speed speed,
- 					   bool autoneg_wait_to_complete)
- {
--	int status = 0;
- 	ixgbe_link_speed link_speed = IXGBE_LINK_SPEED_UNKNOWN;
--	s32 i, j;
--	bool link_up = false;
- 	u32 autoc_reg = IXGBE_READ_REG(hw, IXGBE_AUTOC);
-+	bool link_up = false;
-+	int status = 0;
-+	s32 i, j;
- 
- 	 /* Set autoneg_advertised value based on input link speed */
- 	hw->phy.autoneg_advertised = 0;
-@@ -771,12 +771,11 @@ static int ixgbe_setup_mac_link_82599(struct ixgbe_hw *hw,
- 				      ixgbe_link_speed speed,
- 				      bool autoneg_wait_to_complete)
- {
-+	ixgbe_link_speed link_capabilities = IXGBE_LINK_SPEED_UNKNOWN;
-+	u32 pma_pmd_10g_serial, pma_pmd_1g, link_mode, links_reg, i;
-+	u32 autoc2 = IXGBE_READ_REG(hw, IXGBE_AUTOC2);
- 	bool autoneg = false;
- 	int status;
--	u32 pma_pmd_1g, link_mode, links_reg, i;
--	u32 autoc2 = IXGBE_READ_REG(hw, IXGBE_AUTOC2);
--	u32 pma_pmd_10g_serial = autoc2 & IXGBE_AUTOC2_10G_SERIAL_PMA_PMD_MASK;
--	ixgbe_link_speed link_capabilities = IXGBE_LINK_SPEED_UNKNOWN;
- 
- 	/* holds the value of AUTOC register at this current point in time */
- 	u32 current_autoc = IXGBE_READ_REG(hw, IXGBE_AUTOC);
-@@ -785,6 +784,8 @@ static int ixgbe_setup_mac_link_82599(struct ixgbe_hw *hw,
- 	/* temporary variable used for comparison purposes */
- 	u32 autoc = current_autoc;
- 
-+	pma_pmd_10g_serial = autoc2 & IXGBE_AUTOC2_10G_SERIAL_PMA_PMD_MASK;
-+
- 	/* Check to see if speed passed in is supported. */
- 	status = hw->mac.ops.get_link_capabilities(hw, &link_capabilities,
- 						   &autoneg);
-@@ -908,10 +909,10 @@ static int ixgbe_setup_copper_link_82599(struct ixgbe_hw *hw,
- static int ixgbe_reset_hw_82599(struct ixgbe_hw *hw)
- {
- 	ixgbe_link_speed link_speed;
--	int status;
- 	u32 ctrl, i, autoc, autoc2;
--	u32 curr_lms;
- 	bool link_up = false;
-+	u32 curr_lms;
-+	int status;
- 
- 	/* Call adapter stop to disable tx/rx and clear interrupts */
- 	status = hw->mac.ops.stop_adapter(hw);
-@@ -1101,10 +1102,10 @@ static int ixgbe_fdir_check_cmd_complete(struct ixgbe_hw *hw, u32 *fdircmd)
-  **/
- int ixgbe_reinit_fdir_tables_82599(struct ixgbe_hw *hw)
- {
--	int i;
- 	u32 fdirctrl = IXGBE_READ_REG(hw, IXGBE_FDIRCTRL);
- 	u32 fdircmd;
- 	int err;
-+	int i;
- 
- 	fdirctrl &= ~IXGBE_FDIRCTRL_INIT_DONE;
- 
-@@ -1869,8 +1870,8 @@ static int ixgbe_verify_fw_version_82599(struct ixgbe_hw *hw)
- {
- 	u16 fw_offset, fw_ptp_cfg_offset;
- 	int status = -EACCES;
--	u16 offset;
- 	u16 fw_version = 0;
-+	u16 offset;
- 
- 	/* firmware check is only necessary for SFI devices */
- 	if (hw->phy.media_type != ixgbe_media_type_fiber)
-@@ -2008,9 +2009,9 @@ static int ixgbe_read_eeprom_82599(struct ixgbe_hw *hw,
-  **/
- static int ixgbe_reset_pipeline_82599(struct ixgbe_hw *hw)
- {
--	int ret_val;
--	u32 anlp1_reg = 0;
- 	u32 i, autoc_reg, autoc2_reg;
-+	u32 anlp1_reg = 0;
-+	int ret_val;
- 
- 	/* Enable link if disabled in NVM */
- 	autoc2_reg = IXGBE_READ_REG(hw, IXGBE_AUTOC2);
-@@ -2064,9 +2065,9 @@ static int ixgbe_reset_pipeline_82599(struct ixgbe_hw *hw)
- static int ixgbe_read_i2c_byte_82599(struct ixgbe_hw *hw, u8 byte_offset,
- 				     u8 dev_addr, u8 *data)
- {
--	u32 esdp;
--	int status;
- 	s32 timeout = 200;
-+	int status;
-+	u32 esdp;
- 
- 	if (hw->phy.qsfp_shared_i2c_bus == true) {
- 		/* Acquire I2C bus ownership. */
-@@ -2118,9 +2119,9 @@ static int ixgbe_read_i2c_byte_82599(struct ixgbe_hw *hw, u8 byte_offset,
- static int ixgbe_write_i2c_byte_82599(struct ixgbe_hw *hw, u8 byte_offset,
- 				      u8 dev_addr, u8 data)
- {
--	u32 esdp;
--	int status;
- 	s32 timeout = 200;
-+	int status;
-+	u32 esdp;
- 
- 	if (hw->phy.qsfp_shared_i2c_bus == true) {
- 		/* Acquire I2C bus ownership. */
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_common.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_common.c
-index a8fee17cb653..3be1bfb16498 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_common.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_common.c
-@@ -113,10 +113,10 @@ bool ixgbe_device_supports_autoneg_fc(struct ixgbe_hw *hw)
-  **/
- int ixgbe_setup_fc_generic(struct ixgbe_hw *hw)
- {
--	int ret_val = 0;
- 	u32 reg = 0, reg_bp = 0;
--	u16 reg_cu = 0;
- 	bool locked = false;
-+	int ret_val = 0;
-+	u16 reg_cu = 0;
- 
- 	/*
- 	 * Validate the requested mode.  Strict IEEE mode does not allow
-@@ -269,9 +269,9 @@ int ixgbe_setup_fc_generic(struct ixgbe_hw *hw)
-  **/
- int ixgbe_start_hw_generic(struct ixgbe_hw *hw)
- {
--	int ret_val;
--	u32 ctrl_ext;
- 	u16 device_caps;
-+	u32 ctrl_ext;
-+	int ret_val;
- 
- 	/* Set the media type */
- 	hw->phy.media_type = hw->mac.ops.get_media_type(hw);
-@@ -493,10 +493,10 @@ int ixgbe_read_pba_string_generic(struct ixgbe_hw *hw, u8 *pba_num,
- 				  u32 pba_num_size)
- {
- 	int ret_val;
--	u16 data;
- 	u16 pba_ptr;
- 	u16 offset;
- 	u16 length;
-+	u16 data;
- 
- 	if (pba_num == NULL) {
- 		hw_dbg(hw, "PBA string buffer was null\n");
-@@ -898,8 +898,8 @@ int ixgbe_init_eeprom_params_generic(struct ixgbe_hw *hw)
- int ixgbe_write_eeprom_buffer_bit_bang_generic(struct ixgbe_hw *hw, u16 offset,
- 					       u16 words, u16 *data)
- {
--	int status;
- 	u16 i, count;
-+	int status;
- 
- 	hw->eeprom.ops.init_params(hw);
- 
-@@ -945,11 +945,11 @@ int ixgbe_write_eeprom_buffer_bit_bang_generic(struct ixgbe_hw *hw, u16 offset,
- static int ixgbe_write_eeprom_buffer_bit_bang(struct ixgbe_hw *hw, u16 offset,
- 					      u16 words, u16 *data)
- {
-+	u8 write_opcode = IXGBE_EEPROM_WRITE_OPCODE_SPI;
-+	u16 page_size;
- 	int status;
- 	u16 word;
--	u16 page_size;
- 	u16 i;
--	u8 write_opcode = IXGBE_EEPROM_WRITE_OPCODE_SPI;
- 
- 	/* Prepare the EEPROM for writing  */
- 	status = ixgbe_acquire_eeprom(hw);
-@@ -1041,8 +1041,8 @@ int ixgbe_write_eeprom_generic(struct ixgbe_hw *hw, u16 offset, u16 data)
- int ixgbe_read_eeprom_buffer_bit_bang_generic(struct ixgbe_hw *hw, u16 offset,
- 					      u16 words, u16 *data)
- {
--	int status;
- 	u16 i, count;
-+	int status;
- 
- 	hw->eeprom.ops.init_params(hw);
- 
-@@ -1080,9 +1080,9 @@ int ixgbe_read_eeprom_buffer_bit_bang_generic(struct ixgbe_hw *hw, u16 offset,
- static int ixgbe_read_eeprom_buffer_bit_bang(struct ixgbe_hw *hw, u16 offset,
- 					     u16 words, u16 *data)
- {
--	int status;
--	u16 word_in;
- 	u8 read_opcode = IXGBE_EEPROM_READ_OPCODE_SPI;
-+	u16 word_in;
-+	int status;
- 	u16 i;
- 
- 	/* Prepare the EEPROM for reading  */
-@@ -1152,8 +1152,8 @@ int ixgbe_read_eeprom_bit_bang_generic(struct ixgbe_hw *hw, u16 offset,
- int ixgbe_read_eerd_buffer_generic(struct ixgbe_hw *hw, u16 offset,
- 				   u16 words, u16 *data)
- {
--	u32 eerd;
- 	int status;
-+	u32 eerd;
- 	u32 i;
- 
- 	hw->eeprom.ops.init_params(hw);
-@@ -1246,8 +1246,8 @@ int ixgbe_read_eerd_generic(struct ixgbe_hw *hw, u16 offset, u16 *data)
- int ixgbe_write_eewr_buffer_generic(struct ixgbe_hw *hw, u16 offset,
- 				    u16 words, u16 *data)
- {
--	u32 eewr;
- 	int status;
-+	u32 eewr;
- 	u16 i;
- 
- 	hw->eeprom.ops.init_params(hw);
-@@ -1742,9 +1742,9 @@ int ixgbe_calc_eeprom_checksum_generic(struct ixgbe_hw *hw)
- int ixgbe_validate_eeprom_checksum_generic(struct ixgbe_hw *hw,
- 					   u16 *checksum_val)
- {
--	int status;
--	u16 checksum;
- 	u16 read_checksum = 0;
-+	u16 checksum;
-+	int status;
- 
- 	/*
- 	 * Read the first word from the EEPROM. If this times out or fails, do
-@@ -1788,8 +1788,8 @@ int ixgbe_validate_eeprom_checksum_generic(struct ixgbe_hw *hw,
-  **/
- int ixgbe_update_eeprom_checksum_generic(struct ixgbe_hw *hw)
- {
--	int status;
- 	u16 checksum;
-+	int status;
- 
- 	/*
- 	 * Read the first word from the EEPROM. If this times out or fails, do
-@@ -2736,10 +2736,10 @@ int ixgbe_enable_rx_dma_generic(struct ixgbe_hw *hw, u32 regval)
-  **/
- int ixgbe_blink_led_start_generic(struct ixgbe_hw *hw, u32 index)
- {
--	ixgbe_link_speed speed = 0;
--	bool link_up = false;
- 	u32 autoc_reg = IXGBE_READ_REG(hw, IXGBE_AUTOC);
- 	u32 led_reg = IXGBE_READ_REG(hw, IXGBE_LEDCTL);
-+	ixgbe_link_speed speed = 0;
-+	bool link_up = false;
- 	bool locked = false;
- 	int ret_val;
- 
-@@ -2784,9 +2784,9 @@ int ixgbe_blink_led_start_generic(struct ixgbe_hw *hw, u32 index)
-  **/
- int ixgbe_blink_led_stop_generic(struct ixgbe_hw *hw, u32 index)
- {
--	u32 autoc_reg = 0;
- 	u32 led_reg = IXGBE_READ_REG(hw, IXGBE_LEDCTL);
- 	bool locked = false;
-+	u32 autoc_reg = 0;
- 	int ret_val;
- 
- 	if (index > 3)
-@@ -2852,8 +2852,8 @@ static int ixgbe_get_san_mac_addr_offset(struct ixgbe_hw *hw,
- int ixgbe_get_san_mac_addr_generic(struct ixgbe_hw *hw, u8 *san_mac_addr)
- {
- 	u16 san_mac_data, san_mac_offset;
--	u8 i;
- 	int ret_val;
-+	u8 i;
- 
- 	/*
- 	 * First read the EEPROM pointer to see if the MAC addresses are
-@@ -3682,8 +3682,8 @@ int ixgbe_host_interface_command(struct ixgbe_hw *hw, void *buffer,
- {
- 	u32 hdr_size = sizeof(struct ixgbe_hic_hdr);
- 	struct ixgbe_hic_hdr *hdr = buffer;
--	u32 *u32arr = buffer;
- 	u16 buf_len, dword_len;
-+	u32 *u32arr = buffer;
- 	int status;
- 	u32 bi;
- 
-@@ -3758,8 +3758,8 @@ int ixgbe_set_fw_drv_ver_generic(struct ixgbe_hw *hw, u8 maj, u8 min,
- 				 __always_unused const char *driver_ver)
- {
- 	struct ixgbe_hic_drv_info fw_cmd;
--	int i;
- 	int ret_val;
-+	int i;
- 
- 	fw_cmd.hdr.cmd = FW_CEM_CMD_DRIVER_INFO;
- 	fw_cmd.hdr.buf_len = FW_CEM_CMD_DRIVER_INFO_LEN;
-@@ -3905,11 +3905,11 @@ static int ixgbe_get_ets_data(struct ixgbe_hw *hw, u16 *ets_cfg,
-  **/
- int ixgbe_get_thermal_sensor_data_generic(struct ixgbe_hw *hw)
- {
--	int status;
- 	u16 ets_offset;
--	u16 ets_cfg;
- 	u16 ets_sensor;
- 	u8  num_sensors;
-+	u16 ets_cfg;
-+	int status;
- 	u8  i;
- 	struct ixgbe_thermal_sensor_data *data = &hw->mac.thermal_sensor_data;
- 
-@@ -3961,15 +3961,15 @@ int ixgbe_get_thermal_sensor_data_generic(struct ixgbe_hw *hw)
-  **/
- int ixgbe_init_thermal_sensor_thresh_generic(struct ixgbe_hw *hw)
- {
--	int status;
--	u16 ets_offset;
--	u16 ets_cfg;
--	u16 ets_sensor;
-+	struct ixgbe_thermal_sensor_data *data = &hw->mac.thermal_sensor_data;
- 	u8  low_thresh_delta;
- 	u8  num_sensors;
- 	u8  therm_limit;
-+	u16 ets_sensor;
-+	u16 ets_offset;
-+	u16 ets_cfg;
-+	int status;
- 	u8  i;
--	struct ixgbe_thermal_sensor_data *data = &hw->mac.thermal_sensor_data;
- 
- 	memset(data, 0, sizeof(struct ixgbe_thermal_sensor_data));
- 
-@@ -4196,12 +4196,12 @@ int ixgbe_setup_mac_link_multispeed_fiber(struct ixgbe_hw *hw,
- 					  ixgbe_link_speed speed,
- 					  bool autoneg_wait_to_complete)
- {
--	ixgbe_link_speed link_speed = IXGBE_LINK_SPEED_UNKNOWN;
- 	ixgbe_link_speed highest_link_speed = IXGBE_LINK_SPEED_UNKNOWN;
--	int status = 0;
-+	ixgbe_link_speed link_speed = IXGBE_LINK_SPEED_UNKNOWN;
-+	bool autoneg, link_up = false;
- 	u32 speedcnt = 0;
-+	int status = 0;
- 	u32 i = 0;
--	bool autoneg, link_up = false;
- 
- 	/* Mask off requested but non-supported speeds */
- 	status = hw->mac.ops.get_link_capabilities(hw, &link_speed, &autoneg);
-@@ -4340,8 +4340,8 @@ int ixgbe_setup_mac_link_multispeed_fiber(struct ixgbe_hw *hw,
- void ixgbe_set_soft_rate_select_speed(struct ixgbe_hw *hw,
- 				      ixgbe_link_speed speed)
- {
--	int status;
- 	u8 rs, eeprom_data;
-+	int status;
- 
- 	switch (speed) {
- 	case IXGBE_LINK_SPEED_10GB_FULL:
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-index dba2be48805a..98e3f0479fac 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-@@ -3326,9 +3326,9 @@ static int ixgbe_get_module_info(struct net_device *dev,
- {
- 	struct ixgbe_adapter *adapter = netdev_priv(dev);
- 	struct ixgbe_hw *hw = &adapter->hw;
--	int status;
- 	u8 sff8472_rev, addr_mode;
- 	bool page_swap = false;
-+	int status;
- 
- 	if (hw->phy.type == ixgbe_phy_fw)
- 		return -ENXIO;
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-index 471c1446267b..75e9453331ed 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c
-@@ -334,9 +334,9 @@ bool ixgbe_check_reset_blocked(struct ixgbe_hw *hw)
-  **/
- static int ixgbe_get_phy_id(struct ixgbe_hw *hw)
- {
--	int status;
- 	u16 phy_id_high = 0;
- 	u16 phy_id_low = 0;
-+	int status;
- 
- 	status = hw->phy.ops.read_reg(hw, MDIO_DEVID1, MDIO_MMD_PMAPMD,
- 				      &phy_id_high);
-@@ -549,8 +549,8 @@ int ixgbe_read_phy_reg_mdi(struct ixgbe_hw *hw, u32 reg_addr, u32 device_type,
- int ixgbe_read_phy_reg_generic(struct ixgbe_hw *hw, u32 reg_addr,
- 			       u32 device_type, u16 *phy_data)
- {
--	int status;
- 	u32 gssr = hw->phy.phy_semaphore_mask;
-+	int status;
- 
- 	if (hw->mac.ops.acquire_swfw_sync(hw, gssr) == 0) {
- 		status = ixgbe_read_phy_reg_mdi(hw, reg_addr, device_type,
-@@ -647,8 +647,8 @@ int ixgbe_write_phy_reg_mdi(struct ixgbe_hw *hw, u32 reg_addr, u32 device_type,
- int ixgbe_write_phy_reg_generic(struct ixgbe_hw *hw, u32 reg_addr,
- 				u32 device_type, u16 phy_data)
- {
--	int status;
- 	u32 gssr = hw->phy.phy_semaphore_mask;
-+	int status;
- 
- 	if (hw->mac.ops.acquire_swfw_sync(hw, gssr) == 0) {
- 		status = ixgbe_write_phy_reg_mdi(hw, reg_addr, device_type,
-@@ -1097,10 +1097,10 @@ int ixgbe_mii_bus_init(struct ixgbe_hw *hw)
-  **/
- int ixgbe_setup_phy_link_generic(struct ixgbe_hw *hw)
- {
--	int status = 0;
- 	u16 autoneg_reg = IXGBE_MII_AUTONEG_REG;
--	bool autoneg = false;
- 	ixgbe_link_speed speed;
-+	bool autoneg = false;
-+	int status = 0;
- 
- 	ixgbe_get_copper_link_capabilities_generic(hw, &speed, &autoneg);
- 
-@@ -1279,12 +1279,12 @@ int ixgbe_get_copper_link_capabilities_generic(struct ixgbe_hw *hw,
- int ixgbe_check_phy_link_tnx(struct ixgbe_hw *hw, ixgbe_link_speed *speed,
- 			     bool *link_up)
- {
--	int status;
--	u32 time_out;
- 	u32 max_time_out = 10;
--	u16 phy_link = 0;
- 	u16 phy_speed = 0;
-+	u16 phy_link = 0;
- 	u16 phy_data = 0;
-+	u32 time_out;
-+	int status;
- 
- 	/* Initialize speed and link to default case */
- 	*link_up = false;
-@@ -1402,8 +1402,8 @@ int ixgbe_setup_phy_link_tnx(struct ixgbe_hw *hw)
- int ixgbe_reset_phy_nl(struct ixgbe_hw *hw)
- {
- 	u16 phy_offset, control, eword, edata, block_crc;
--	bool end_data = false;
- 	u16 list_offset, data_offset;
-+	bool end_data = false;
- 	u16 phy_data = 0;
- 	int ret_val;
- 	u32 i;
-@@ -1529,17 +1529,17 @@ int ixgbe_identify_module_generic(struct ixgbe_hw *hw)
-  **/
- int ixgbe_identify_sfp_module_generic(struct ixgbe_hw *hw)
- {
-+	enum ixgbe_sfp_type stored_sfp_type = hw->phy.sfp_type;
- 	struct ixgbe_adapter *adapter = hw->back;
--	int status;
-+	u8 oui_bytes[3] = {0, 0, 0};
-+	u8 comp_codes_10g = 0;
-+	u8 comp_codes_1g = 0;
-+	u16 enforce_sfp = 0;
- 	u32 vendor_oui = 0;
--	enum ixgbe_sfp_type stored_sfp_type = hw->phy.sfp_type;
- 	u8 identifier = 0;
--	u8 comp_codes_1g = 0;
--	u8 comp_codes_10g = 0;
--	u8 oui_bytes[3] = {0, 0, 0};
- 	u8 cable_tech = 0;
- 	u8 cable_spec = 0;
--	u16 enforce_sfp = 0;
-+	int status;
- 
- 	if (hw->mac.ops.get_media_type(hw) != ixgbe_media_type_fiber) {
- 		hw->phy.sfp_type = ixgbe_sfp_type_not_present;
-@@ -2134,11 +2134,11 @@ static bool ixgbe_is_sfp_probe(struct ixgbe_hw *hw, u8 offset, u8 addr)
- static int ixgbe_read_i2c_byte_generic_int(struct ixgbe_hw *hw, u8 byte_offset,
- 					   u8 dev_addr, u8 *data, bool lock)
- {
--	int status;
--	u32 max_retry = 10;
--	u32 retry = 0;
- 	u32 swfw_mask = hw->phy.phy_semaphore_mask;
-+	u32 max_retry = 10;
- 	bool nack = true;
-+	u32 retry = 0;
-+	int status;
- 
- 	if (hw->mac.type >= ixgbe_mac_X550)
- 		max_retry = 3;
-@@ -2259,10 +2259,10 @@ int ixgbe_read_i2c_byte_generic_unlocked(struct ixgbe_hw *hw, u8 byte_offset,
- static int ixgbe_write_i2c_byte_generic_int(struct ixgbe_hw *hw, u8 byte_offset,
- 					    u8 dev_addr, u8 data, bool lock)
- {
--	int status;
-+	u32 swfw_mask = hw->phy.phy_semaphore_mask;
- 	u32 max_retry = 1;
- 	u32 retry = 0;
--	u32 swfw_mask = hw->phy.phy_semaphore_mask;
-+	int status;
- 
- 	if (lock && hw->mac.ops.acquire_swfw_sync(hw, swfw_mask))
- 		return -EBUSY;
-@@ -2424,8 +2424,8 @@ static void ixgbe_i2c_stop(struct ixgbe_hw *hw)
-  **/
- static int ixgbe_clock_in_i2c_byte(struct ixgbe_hw *hw, u8 *data)
- {
--	int i;
- 	bool bit = false;
-+	int i;
- 
- 	*data = 0;
- 	for (i = 7; i >= 0; i--) {
-@@ -2445,10 +2445,10 @@ static int ixgbe_clock_in_i2c_byte(struct ixgbe_hw *hw, u8 *data)
-  **/
- static int ixgbe_clock_out_i2c_byte(struct ixgbe_hw *hw, u8 data)
- {
-+	bool bit = false;
- 	int status;
--	int i;
- 	u32 i2cctl;
--	bool bit = false;
-+	int i;
- 
- 	for (i = 7; i >= 0; i--) {
- 		bit = (data >> i) & 0x1;
-@@ -2476,12 +2476,12 @@ static int ixgbe_clock_out_i2c_byte(struct ixgbe_hw *hw, u8 data)
-  **/
- static int ixgbe_get_i2c_ack(struct ixgbe_hw *hw)
- {
--	u32 data_oe_bit = IXGBE_I2C_DATA_OE_N_EN(hw);
--	int status = 0;
--	u32 i = 0;
- 	u32 i2cctl = IXGBE_READ_REG(hw, IXGBE_I2CCTL(hw));
-+	u32 data_oe_bit = IXGBE_I2C_DATA_OE_N_EN(hw);
- 	u32 timeout = 10;
- 	bool ack = true;
-+	int status = 0;
-+	u32 i = 0;
- 
- 	if (data_oe_bit) {
- 		i2cctl |= IXGBE_I2C_DATA_OUT(hw);
-@@ -2561,8 +2561,8 @@ static int ixgbe_clock_in_i2c_bit(struct ixgbe_hw *hw, bool *data)
-  **/
- static int ixgbe_clock_out_i2c_bit(struct ixgbe_hw *hw, bool data)
- {
--	int status;
- 	u32 i2cctl = IXGBE_READ_REG(hw, IXGBE_I2CCTL(hw));
-+	int status;
- 
- 	status = ixgbe_set_i2c_data(hw, &i2cctl, data);
- 	if (status == 0) {
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c
-index 39357af77c64..f1ffa398f6df 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c
-@@ -68,9 +68,9 @@ int ixgbe_setup_mac_link_X540(struct ixgbe_hw *hw, ixgbe_link_speed speed,
-  **/
- int ixgbe_reset_hw_X540(struct ixgbe_hw *hw)
- {
--	int status;
--	u32 ctrl, i;
- 	u32 swfw_mask = hw->phy.phy_semaphore_mask;
-+	u32 ctrl, i;
-+	int status;
- 
- 	/* Call adapter stop to disable tx/rx and clear interrupts */
- 	status = hw->mac.ops.stop_adapter(hw);
-@@ -382,9 +382,9 @@ static int ixgbe_calc_eeprom_checksum_X540(struct ixgbe_hw *hw)
- static int ixgbe_validate_eeprom_checksum_X540(struct ixgbe_hw *hw,
- 					       u16 *checksum_val)
- {
--	int status;
--	u16 checksum;
- 	u16 read_checksum = 0;
-+	u16 checksum;
-+	int status;
- 
- 	/* Read the first word from the EEPROM. If this times out or fails, do
- 	 * not continue or we could be in for a very long wait while every
-@@ -441,8 +441,8 @@ static int ixgbe_validate_eeprom_checksum_X540(struct ixgbe_hw *hw,
-  **/
- static int ixgbe_update_eeprom_checksum_X540(struct ixgbe_hw *hw)
- {
--	int status;
- 	u16 checksum;
-+	int status;
- 
- 	/* Read the first word from the EEPROM. If this times out or fails, do
- 	 * not continue or we could be in for a very long wait while every
-@@ -486,8 +486,8 @@ static int ixgbe_update_eeprom_checksum_X540(struct ixgbe_hw *hw)
-  **/
- static int ixgbe_update_flash_X540(struct ixgbe_hw *hw)
- {
--	u32 flup;
- 	int status;
-+	u32 flup;
- 
- 	status = ixgbe_poll_flash_update_done_X540(hw);
- 	if (status == -EIO) {
 diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-index 70a58bf3d563..efce4b231493 100644
+index efce4b231493..bee1d2f554d3 100644
 --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
 +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
-@@ -926,10 +926,10 @@ static int ixgbe_checksum_ptr_x550(struct ixgbe_hw *hw, u16 ptr,
- 				   u16 size, u16 *csum, u16 *buffer,
- 				   u32 buffer_size)
- {
--	u16 buf[256];
--	int status;
- 	u16 length, bufsz, i, start;
- 	u16 *local_buffer;
-+	u16 buf[256];
-+	int status;
+@@ -2883,17 +2883,17 @@ static int ixgbe_get_lcd_t_x550em(struct ixgbe_hw *hw,
+ 	/* If link partner advertised 1G, return 1G */
+ 	if (an_lp_status & IXGBE_AUTO_NEG_LP_1000BASE_CAP) {
+ 		*lcd_speed = IXGBE_LINK_SPEED_1GB_FULL;
+-		return status;
++		return 0;
+ 	}
  
- 	bufsz = ARRAY_SIZE(buf);
+ 	/* If 10G disabled for LPLU via NVM D10GMP, then return no valid LCD */
+ 	if ((hw->bus.lan_id && (word & NVM_INIT_CTRL_3_D10GMP_PORT1)) ||
+ 	    (word & NVM_INIT_CTRL_3_D10GMP_PORT0))
+-		return status;
++		return 0;
  
-@@ -994,10 +994,10 @@ static int ixgbe_calc_checksum_X550(struct ixgbe_hw *hw, u16 *buffer,
- 				    u32 buffer_size)
- {
- 	u16 eeprom_ptrs[IXGBE_EEPROM_LAST_WORD + 1];
-+	u16 pointer, i, size;
- 	u16 *local_buffer;
--	int status;
- 	u16 checksum = 0;
--	u16 pointer, i, size;
-+	int status;
+ 	/* Link partner not capable of lower speeds, return 10G */
+ 	*lcd_speed = IXGBE_LINK_SPEED_10GB_FULL;
+-	return status;
++	return 0;
+ }
  
- 	hw->eeprom.ops.init_params(hw);
+ /**
+@@ -3129,7 +3129,7 @@ static int ixgbe_enter_lplu_t_x550em(struct ixgbe_hw *hw)
+ 	     (lcd_speed == IXGBE_LINK_SPEED_1GB_FULL)) ||
+ 	    ((speed == IXGBE_MDIO_AUTO_NEG_VENDOR_STATUS_10GB) &&
+ 	     (lcd_speed == IXGBE_LINK_SPEED_10GB_FULL)))
+-		return status;
++		return 0;
  
-@@ -1120,9 +1120,9 @@ static int ixgbe_read_ee_hostif_X550(struct ixgbe_hw *hw, u16 offset, u16 *data)
- static int ixgbe_validate_eeprom_checksum_X550(struct ixgbe_hw *hw,
- 					       u16 *checksum_val)
- {
--	int status;
--	u16 checksum;
- 	u16 read_checksum = 0;
-+	u16 checksum;
-+	int status;
- 
- 	/* Read the first word from the EEPROM. If this times out or fails, do
- 	 * not continue or we could be in for a very long wait while every
-@@ -1170,8 +1170,8 @@ static int ixgbe_validate_eeprom_checksum_X550(struct ixgbe_hw *hw,
- static int ixgbe_write_ee_hostif_data_X550(struct ixgbe_hw *hw, u16 offset,
- 					   u16 data)
- {
--	int status;
- 	struct ixgbe_hic_write_shadow_ram buffer;
-+	int status;
- 
- 	buffer.hdr.req.cmd = FW_WRITE_SHADOW_RAM_CMD;
- 	buffer.hdr.req.buf_lenh = 0;
-@@ -1217,8 +1217,8 @@ static int ixgbe_write_ee_hostif_X550(struct ixgbe_hw *hw, u16 offset, u16 data)
-  **/
- static int ixgbe_update_flash_X550(struct ixgbe_hw *hw)
- {
--	int status = 0;
- 	union ixgbe_hic_hdr2 buffer;
-+	int status = 0;
- 
- 	buffer.req.cmd = FW_SHADOW_RAM_DUMP_CMD;
- 	buffer.req.buf_lenh = 0;
-@@ -1268,9 +1268,9 @@ static bool ixgbe_fw_recovery_mode_X550(struct ixgbe_hw *hw)
-  **/
- static void ixgbe_disable_rx_x550(struct ixgbe_hw *hw)
- {
-+	struct ixgbe_hic_disable_rxen fw_cmd;
- 	u32 rxctrl, pfdtxgswc;
- 	int status;
--	struct ixgbe_hic_disable_rxen fw_cmd;
- 
- 	rxctrl = IXGBE_READ_REG(hw, IXGBE_RXCTRL);
- 	if (rxctrl & IXGBE_RXCTRL_RXEN) {
-@@ -1312,8 +1312,8 @@ static void ixgbe_disable_rx_x550(struct ixgbe_hw *hw)
-  **/
- static int ixgbe_update_eeprom_checksum_X550(struct ixgbe_hw *hw)
- {
--	int status;
- 	u16 checksum = 0;
-+	int status;
- 
- 	/* Read the first word from the EEPROM. If this times out or fails, do
- 	 * not continue or we could be in for a very long wait while every
-@@ -1431,8 +1431,8 @@ static int ixgbe_write_iosf_sb_reg_x550(struct ixgbe_hw *hw, u32 reg_addr,
-  **/
- static int ixgbe_setup_ixfi_x550em_x(struct ixgbe_hw *hw)
- {
--	int status;
- 	u32 reg_val;
-+	int status;
- 
- 	/* Disable training protocol FSM. */
- 	status = ixgbe_read_iosf_sb_reg_x550(hw,
-@@ -1503,8 +1503,8 @@ static int ixgbe_setup_ixfi_x550em_x(struct ixgbe_hw *hw)
-  **/
- static int ixgbe_restart_an_internal_phy_x550em(struct ixgbe_hw *hw)
- {
--	int status;
- 	u32 link_ctrl;
-+	int status;
- 
- 	/* Restart auto-negotiation. */
- 	status = hw->mac.ops.read_iosf_sb_reg(hw,
-@@ -1553,8 +1553,8 @@ static int ixgbe_restart_an_internal_phy_x550em(struct ixgbe_hw *hw)
- static int ixgbe_setup_ixfi_x550em(struct ixgbe_hw *hw, ixgbe_link_speed *speed)
- {
- 	struct ixgbe_mac_info *mac = &hw->mac;
--	int status;
- 	u32 reg_val;
-+	int status;
- 
- 	/* iXFI is only supported with X552 */
- 	if (mac->type != ixgbe_mac_X550EM_x)
-@@ -1649,9 +1649,9 @@ ixgbe_setup_mac_link_sfp_x550em(struct ixgbe_hw *hw,
- 				ixgbe_link_speed speed,
- 				__always_unused bool autoneg_wait_to_complete)
- {
--	int status;
--	u16 reg_slice, reg_val;
- 	bool setup_linear = false;
-+	u16 reg_slice, reg_val;
-+	int status;
- 
- 	/* Check if SFP module is supported and linear */
- 	status = ixgbe_supported_sfp_modules_X550em(hw, &setup_linear);
-@@ -1693,8 +1693,8 @@ ixgbe_setup_mac_link_sfp_x550em(struct ixgbe_hw *hw,
- static int ixgbe_setup_sfi_x550a(struct ixgbe_hw *hw, ixgbe_link_speed *speed)
- {
- 	struct ixgbe_mac_info *mac = &hw->mac;
--	int status;
- 	u32 reg_val;
-+	int status;
- 
- 	/* Disable all AN and force speed to 10G Serial. */
- 	status = mac->ops.read_iosf_sb_reg(hw,
-@@ -1921,8 +1921,8 @@ static int ixgbe_setup_mac_link_t_X550em(struct ixgbe_hw *hw,
- 					 ixgbe_link_speed speed,
- 					 bool autoneg_wait)
- {
--	int status;
- 	ixgbe_link_speed force_speed;
-+	int status;
- 
- 	/* Setup internal/external PHY link speed to iXFI (10G), unless
- 	 * only 1G is auto advertised then setup KX link.
-@@ -2277,8 +2277,8 @@ static void ixgbe_init_mac_link_ops_X550em(struct ixgbe_hw *hw)
-  */
- static int ixgbe_setup_sfp_modules_X550em(struct ixgbe_hw *hw)
- {
--	int status;
- 	bool linear;
-+	int status;
- 
- 	/* Check if SFP module is supported */
- 	status = ixgbe_supported_sfp_modules_X550em(hw, &linear);
-@@ -2581,8 +2581,8 @@ static int ixgbe_handle_lasi_ext_t_x550em(struct ixgbe_hw *hw,
- static int ixgbe_setup_kr_speed_x550em(struct ixgbe_hw *hw,
- 				       ixgbe_link_speed speed)
- {
--	int status;
- 	u32 reg_val;
-+	int status;
- 
- 	status = hw->mac.ops.read_iosf_sb_reg(hw,
- 					IXGBE_KRM_LINK_CTRL_1(hw->bus.lan_id),
-@@ -2868,9 +2868,9 @@ static int ixgbe_set_fw_drv_ver_x550(struct ixgbe_hw *hw, u8 maj, u8 min,
- static int ixgbe_get_lcd_t_x550em(struct ixgbe_hw *hw,
- 				  ixgbe_link_speed *lcd_speed)
- {
-+	u16 word = hw->eeprom.ctrl_word_3;
- 	u16 an_lp_status;
- 	int status;
--	u16 word = hw->eeprom.ctrl_word_3;
- 
- 	*lcd_speed = IXGBE_LINK_SPEED_UNKNOWN;
- 
-@@ -3075,10 +3075,10 @@ static void ixgbe_fc_autoneg_fiber_x550em_a(struct ixgbe_hw *hw)
- static int ixgbe_enter_lplu_t_x550em(struct ixgbe_hw *hw)
- {
- 	u16 an_10g_cntl_reg, autoneg_reg, speed;
--	int status;
- 	ixgbe_link_speed lcd_speed;
- 	u32 save_autoneg;
- 	bool link_up;
-+	int status;
- 
- 	/* If blocked by MNG FW, then don't restart AN */
- 	if (ixgbe_check_reset_blocked(hw))
-@@ -3442,12 +3442,12 @@ static void ixgbe_set_mdio_speed(struct ixgbe_hw *hw)
-  **/
- static int ixgbe_reset_hw_X550em(struct ixgbe_hw *hw)
- {
-+	u32 swfw_mask = hw->phy.phy_semaphore_mask;
- 	ixgbe_link_speed link_speed;
--	int status;
-+	bool link_up = false;
- 	u32 ctrl = 0;
-+	int status;
- 	u32 i;
--	bool link_up = false;
--	u32 swfw_mask = hw->phy.phy_semaphore_mask;
- 
- 	/* Call adapter stop to disable Tx/Rx and clear interrupts */
- 	status = hw->mac.ops.stop_adapter(hw);
-@@ -3610,8 +3610,8 @@ static void ixgbe_set_source_address_pruning_X550(struct ixgbe_hw *hw,
-  **/
- static int ixgbe_setup_fc_backplane_x550em_a(struct ixgbe_hw *hw)
- {
--	int status = 0;
- 	u32 an_cntl = 0;
-+	int status = 0;
- 
- 	/* Validate the requested mode */
- 	if (hw->fc.strict_ieee && hw->fc.requested_mode == ixgbe_fc_rx_pause) {
+ 	/* Clear AN completed indication */
+ 	status = hw->phy.ops.read_reg(hw, IXGBE_MDIO_AUTO_NEG_VENDOR_TX_ALARM,
 -- 
 2.31.1
 
