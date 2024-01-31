@@ -1,195 +1,191 @@
-Return-Path: <netdev+bounces-67718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C78B844A91
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 22:55:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0930C844AA2
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 23:00:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 434D1281ED6
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 21:55:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 286DB1C25F86
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 22:00:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F0BC39FE0;
-	Wed, 31 Jan 2024 21:50:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFBE139AFB;
+	Wed, 31 Jan 2024 21:59:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M9daojn3"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="jX0hpcZN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E21445C14;
-	Wed, 31 Jan 2024 21:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B05739AC8;
+	Wed, 31 Jan 2024 21:59:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706737855; cv=none; b=r7rc6AmH3ibMcWPeD6yLPvzAaf91Oah23SLDNHF4rqZOthVFfLo2bmAT1XAp830il3nvXsRumit4WF3NLZjsU11tdmS+dupWYFYMbA0laIHi4IVtRor09CcPHAywcOzxvcESnNMCNF9Jgm9vxMIUZyHv2xdATbVt6Ia6e6/LYXU=
+	t=1706738398; cv=none; b=QkqCLVcpse9d0/KrrdWhOrsLNUvN8LunyxdoFAj/oVQWO67IvvEGrjDU2/z4HBM7nh8nNO90m/TLWQTiXCvt/6e3F2u+azQpc+cSDVF1swPBXPZhz+sATf8omu4zPr0vgrjY6IacwiQsopUop42eGB91WF7x06bM0Sibkay5WQI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706737855; c=relaxed/simple;
-	bh=dx7wRnDCqrDJsKtDK7xNZDoVY35TSIKa32jxbefvqs8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=rC+MMUVSNmEmmcmB2nTnqp7hY/fNCPtm5mO2ABI3edLAN1N9U1sb7zDrKXp7Fll7R8dNNBTq+5tBxs6Z4UiaBtqPSESlPGh+rl5cbyUhDuFSvfjufBrJp7aHlgeJrF3Jmk0iTXGJfUduTbBgGHJI2VBse5xYLqb/yzS+dzlI8kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M9daojn3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79F93C43142;
-	Wed, 31 Jan 2024 21:50:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706737855;
-	bh=dx7wRnDCqrDJsKtDK7xNZDoVY35TSIKa32jxbefvqs8=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=M9daojn3WbUrsdJtg1dQ9fqgqRcCQUGre2GSemGntl5aSWpQU5Cg6olIjoyK6BM+l
-	 5c165+TnyQslNZaV7+qDdLAmgj2ywWw7UcLy+sOsyOUGY3zq/RUjjP0slIdtkw7VQi
-	 G4tf8pcPIuZhWNfxqF+9RVVtJwqZ5W2WZGaqscjp5I+987xwjPXVUbyFD41ysnxGqw
-	 P1DPLbzEoleACw1NAMJb4hnbfpszLvuS8PKZJGMPJHHROB3QhrXK7ea6Pgx/9OCfD1
-	 UdSYUNHrsFurJIZtai8xrRNA7TsopgEi7VvakM01qEA73vOd0NLDz8uCuBW374Put2
-	 lacjjKtO7sdqQ==
-From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
-Date: Wed, 31 Jan 2024 22:49:54 +0100
-Subject: [PATCH net 9/9] selftests: mptcp: join: stop transfer when check
- is done (part 2)
+	s=arc-20240116; t=1706738398; c=relaxed/simple;
+	bh=QS9kYyTmF0+N4WirBEbQPjUnZA5Cj9CVicXQINR9Pnw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=JWlefwjT9xGuPwM+lUxNoLTQafI02v6+1+XCn2DCxYmTck9EHZCLpzY3M07cNfAqlUq3d4QmB9UhBFcgqcjOtfgVKiVSg83efF/kr3/PuYPDnNy/fbLTUXHJezgI0HnzLp6osEfFiWx32KtxMGnII2KpJIBJs/jGbfK335RGgIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=jX0hpcZN; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 40VKseC0031538;
+	Wed, 31 Jan 2024 21:59:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=6cceawbCFiLT/nNuxjw20HwwZkJ0peSJEK9m+ASYads=; b=jX
+	0hpcZN831ZU0B3HHrEPsdDQ+KmBd1831TuEAvXjnVuOVTFZOzMC2n5w1E4HbRXF2
+	RIXeiAhgQbVMgH/Jd/gohx9kXdiud+DHkBsTFkJSoNbAibxFMoAPgGpQcug7ljre
+	iie+sM1L550U/rgiqg0XLn1iouCbDdv8+uuSUg/dnM1Pin1xdzRMonlF5vq4VIpz
+	kjZwnVrjsaV5n6dHem2VR0Aq7Ppi7b08ALukMHw1Unc6fWU4+QtdE3jkR9IlUk0j
+	uj+HjaomBQrt8Joc6gycVM/2iMlosftnLQAenSfFBTf/W4fp4oQQw1j7xA733uY9
+	ujA3Sw9ofUD9kMPCnlsw==
+Received: from nasanppmta05.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3vyve60auh-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 31 Jan 2024 21:59:23 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 40VLxMCO007973
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 31 Jan 2024 21:59:22 GMT
+Received: from [10.110.127.163] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 31 Jan
+ 2024 13:59:20 -0800
+Message-ID: <5626e874-066c-4bf2-842d-a7f3387b6c1b@quicinc.com>
+Date: Wed, 31 Jan 2024 13:59:20 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/2] net: stmmac: TBS support for platform driver
+To: Esben Haabendal <esben@geanix.com>
+CC: Rohan G Thomas <rohan.g.thomas@intel.com>,
+        "David S . Miller"
+	<davem@davemloft.net>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        "Jose
+ Abreu" <joabreu@synopsys.com>,
+        Eric Dumazet <edumazet@google.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof
+ Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+        "Serge
+ Semin" <fancer.lancer@gmail.com>,
+        Andrew Halaney <ahalaney@redhat.com>, <elder@linaro.org>,
+        <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <quic_bhaviks@quicinc.com>,
+        <kernel.upstream@quicinc.com>
+References: <20230927130919.25683-1-rohan.g.thomas@intel.com>
+ <20230927130919.25683-3-rohan.g.thomas@intel.com>
+ <92892988-bb77-4075-812e-19f6112f436e@quicinc.com>
+ <87r0i44h8v.fsf@geanix.com>
+Content-Language: en-US
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+In-Reply-To: <87r0i44h8v.fsf@geanix.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240131-upstream-net-20240131-mptcp-ci-issues-v1-9-4c1c11e571ff@kernel.org>
-References: <20240131-upstream-net-20240131-mptcp-ci-issues-v1-0-4c1c11e571ff@kernel.org>
-In-Reply-To: <20240131-upstream-net-20240131-mptcp-ci-issues-v1-0-4c1c11e571ff@kernel.org>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- Geliang Tang <geliang.tang@linux.dev>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, stable@vger.kernel.org, 
- Geliang Tang <geliang@kernel.org>
-X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3349; i=matttbe@kernel.org;
- h=from:subject:message-id; bh=dx7wRnDCqrDJsKtDK7xNZDoVY35TSIKa32jxbefvqs8=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBlusCg8SsXtieygSIwUgQbQ/KEVDAVd9jBEbaTy
- 8Ttrh5Cuf6JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZbrAoAAKCRD2t4JPQmmg
- c2qWD/sHFGNL8EnWdDMRDcbajqT+mC1/pA+MR1y08Rcc5IrWGV4a36pl0oPJx5GSSsi7WQVReJc
- PtpFb/fS3hK2n5yE6dFvLPCIrUUeEpSQqxkmk/NDrDLyqA3E2Wrz038AxVMdL/POsunfqWsLu/E
- VBH6Wg1SoQ2IgEpU8vnyvgSeybuCIabbIfE1sVYmcKqXVstCTnbrT3CSH7PM3prdPlmxZzMX/r1
- X2+9purLs4XA7Bovfk1gE5velSO/fYCQ590la+fE0XKZatDojZRTXK7WfAWAieeDy/Fo/JRh1jX
- pSq0aOMBBAK4HRJjc5wFERRj+E0BoRLM/ql+sioT2SJTTjbuUonF/44+rG9yk7MpRRcjIN/PDb5
- xUYndv/WmkSvUph2Cl+8kp2hShWtMkgCe7FVodmz3+ZkZ6EXZiXLM8WffRT2N0gidXRHTBDx9at
- gNi6n1En3iqG4edgR9umbcffTADzZimiGZkSboMm1TVDRnMSTZQpRW0pP/jFNrXCRLblpun8wjQ
- q5LUZaxRYiPFnsZRTjBUD5cBgF0IfjezSEOXzE/gjOUVi4x4isI9GO7sZ5aN/7z/mlvKIqjaH0h
- Rf7j8BmGWMqEbt2Gsittp6wMXyOc42/W30j8UPS/f/5UY9pH35Ue+ONoOas9Jj4w/5EGb6Ew/8p
- vzmCCRJFxSng30g==
-X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: PB0QoEx8sXd23pNThVFyQYoPg1a0htHB
+X-Proofpoint-ORIG-GUID: PB0QoEx8sXd23pNThVFyQYoPg1a0htHB
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-01-31_10,2024-01-31_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 mlxscore=0
+ malwarescore=0 spamscore=0 clxscore=1011 impostorscore=0 bulkscore=0
+ mlxlogscore=999 suspectscore=0 lowpriorityscore=0 priorityscore=1501
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2401190000 definitions=main-2401310170
 
-Since the "Fixes" commits mentioned below, the newly added "userspace
-pm" subtests of mptcp_join selftests are launching the whole transfer in
-the background, do the required checks, then wait for the end of
-transfer.
+Hi Esben,
+	My responses are inline to the queries. I hope i have justified my problem statement.  
 
-There is no need to wait longer, especially because the checks at the
-end of the transfer are ignored (which is fine). This saves quite a few
-seconds on slow environments.
-
-While at it, use 'mptcp_lib_kill_wait()' helper everywhere, instead of
-on a specific one with 'kill_tests_wait()'.
-
-Fixes: b2e2248f365a ("selftests: mptcp: userspace pm create id 0 subflow")
-Fixes: e3b47e460b4b ("selftests: mptcp: userspace pm remove initial subflow")
-Fixes: b9fb176081fb ("selftests: mptcp: userspace pm send RM_ADDR for ID 0")
-Cc: stable@vger.kernel.org
-Reviewed-and-tested-by: Geliang Tang <geliang@kernel.org>
-Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
- tools/testing/selftests/net/mptcp/mptcp_join.sh | 23 +++++++++--------------
- 1 file changed, 9 insertions(+), 14 deletions(-)
-
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index 85bcc95f4ede..c07386e21e0a 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -643,13 +643,6 @@ kill_events_pids()
- 	mptcp_lib_kill_wait $evts_ns2_pid
- }
- 
--kill_tests_wait()
--{
--	#shellcheck disable=SC2046
--	kill -SIGUSR1 $(ip netns pids $ns2) $(ip netns pids $ns1)
--	wait
--}
--
- pm_nl_set_limits()
- {
- 	local ns=$1
-@@ -3494,7 +3487,7 @@ userspace_tests()
- 		chk_mptcp_info subflows 1 subflows 1
- 		chk_subflows_total 2 2
- 		kill_events_pids
--		wait $tests_pid
-+		mptcp_lib_kill_wait $tests_pid
- 	fi
- 
- 	# userspace pm remove initial subflow
-@@ -3518,7 +3511,7 @@ userspace_tests()
- 		chk_mptcp_info subflows 1 subflows 1
- 		chk_subflows_total 1 1
- 		kill_events_pids
--		wait $tests_pid
-+		mptcp_lib_kill_wait $tests_pid
- 	fi
- 
- 	# userspace pm send RM_ADDR for ID 0
-@@ -3544,7 +3537,7 @@ userspace_tests()
- 		chk_mptcp_info subflows 1 subflows 1
- 		chk_subflows_total 1 1
- 		kill_events_pids
--		wait $tests_pid
-+		mptcp_lib_kill_wait $tests_pid
- 	fi
- }
- 
-@@ -3558,7 +3551,8 @@ endpoint_tests()
- 		pm_nl_set_limits $ns2 2 2
- 		pm_nl_add_endpoint $ns1 10.0.2.1 flags signal
- 		speed=slow \
--			run_tests $ns1 $ns2 10.0.1.1 2>/dev/null &
-+			run_tests $ns1 $ns2 10.0.1.1 &
-+		local tests_pid=$!
- 
- 		wait_mpj $ns1
- 		pm_nl_check_endpoint "creation" \
-@@ -3573,7 +3567,7 @@ endpoint_tests()
- 		pm_nl_add_endpoint $ns2 10.0.2.2 flags signal
- 		pm_nl_check_endpoint "modif is allowed" \
- 			$ns2 10.0.2.2 id 1 flags signal
--		kill_tests_wait
-+		mptcp_lib_kill_wait $tests_pid
- 	fi
- 
- 	if reset "delete and re-add" &&
-@@ -3582,7 +3576,8 @@ endpoint_tests()
- 		pm_nl_set_limits $ns2 1 1
- 		pm_nl_add_endpoint $ns2 10.0.2.2 id 2 dev ns2eth2 flags subflow
- 		test_linkfail=4 speed=20 \
--			run_tests $ns1 $ns2 10.0.1.1 2>/dev/null &
-+			run_tests $ns1 $ns2 10.0.1.1 &
-+		local tests_pid=$!
- 
- 		wait_mpj $ns2
- 		chk_subflow_nr "before delete" 2
-@@ -3597,7 +3592,7 @@ endpoint_tests()
- 		wait_mpj $ns2
- 		chk_subflow_nr "after re-add" 2
- 		chk_mptcp_info subflows 1 subflows 1
--		kill_tests_wait
-+		mptcp_lib_kill_wait $tests_pid
- 	fi
- }
- 
-
--- 
-2.43.0
-
+On 1/26/2024 12:43 AM, Esben Haabendal wrote:
+> "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com> writes:
+> 
+>> Qualcomm had similar discussions with respect to enabling of TBS for a
+>> particular queue. We had similar discussion on these terms yesterday
+>> with Redhat. Adding Andrew from Redhat here
+>>
+>> What we discovered as part of the discussions is listed below.
+>>
+>> 1. Today upstream stmmac code is designed in such a way that TBS flag
+>> is put as part of queue configurations(see below snippet) and as well
+>> know that stmmac queue configuration comes from the dtsi file.
+>>
+>> //ndo_open => stmmac_open
+>> int tbs_en = priv->plat->tx_queues_cfg[chan].tbs_en;(comes from tx_queues_cfg)
+>>
+>> /* Setup per-TXQ tbs flag before TX descriptor alloc */
+>> tx_q->tbs |= tbs_en ? STMMAC_TBS_AVAIL : 0;
+>>
+>> 2. There is a no way to do this dynamically from user space because we don't have any 
+>> API exposed which can do it from user space
+> 
+> Not now. But why not extend ethtool API to allow enabling TBS for
+> supported controllers?
+> 
+ethtool API can be implemented but that still doesn't solve the problem of stopping the 
+entire MAC block because of enhanced desc allocation. 
+1. We can either allocate enhanced desc for all channels at bootup and then choose 
+to switch to enable TBS mode at runtime  (Additional memory usage)
+2. Live with the disruption of traffic for a brief duration of time. 
+Which is not a good solution for priority and critical traffic. 
+>> and also TBS rely on special descriptors aka enhanced desc this cannot
+>> be done run time and stmmac has to be aware of it before we do
+>> DMA/MAC/MTL start.
+> 
+> Isn't this somewhat similar to changing the RX/TX ring parameters, which
+> I believe also is quite difficult to do at run time, and ethtool
+> therefore requires the interface to be down in oroer to change them?
+> 
+>> To do this dynamically would only mean stopping DMA/MAC/MTL realloc
+>> resources for enhanced desc and the starting MAC/DMA/MTL. This means
+>> we are disrupting other traffic(By stopping MAC block).
+> 
+> Yes. But you would be disrupting traffic less than by requiring a
+> complete reboot of the target which is needed if the devicetree must be
+> changed.
+> 
+any DTS solution today anyway requires completely loading the boot image 
+and rebooting the device, but once the device is functional,
+End user can activate TBS, as he knows the exact usecase and requirements. 
+I understand the solution is not scalable, but at this point we don't have a solution 
+to activate TBS  at runtime. 
+>> 3. I dont think there is a way we can enable this dynamically today. I
+>> would like upstream community to share your thoughts as well.
+> 
+> Hereby done. Could we investigate the possibility of using ethtool to
+> change TBS enable/disable "run-time"?
+> 
+We can either allocate enhanced desc for all channels at bootup
+and then choose to switch to enable TBS mode at runtime
+>> 4. I agree with Rohan's patch here and want upstream community to
+>> accept it. This will allow use to configure the queues where TBS needs
+>> to be enabled as hardcoding in the code unless upstream has better way
+>> to this using userspace.
+>>
+>> Please let us know if you think otherwise. 
+> 
+> /Esben
+Best Regards
+ABC
 
