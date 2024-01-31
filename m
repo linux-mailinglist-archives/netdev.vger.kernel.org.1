@@ -1,92 +1,183 @@
-Return-Path: <netdev+bounces-67562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D12F8440D6
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 14:41:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 603898440F0
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 14:46:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40EEE1F22733
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 13:41:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82DFD1C221B8
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 13:46:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6555B7FBBC;
-	Wed, 31 Jan 2024 13:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 955677F493;
+	Wed, 31 Jan 2024 13:46:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VeK68afW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LPuGA7Z6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D2417F493;
-	Wed, 31 Jan 2024 13:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD4B7F490;
+	Wed, 31 Jan 2024 13:46:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706708427; cv=none; b=oWYe1RsnOLHqR5cF6/pw09RrLuLDhLTB83aJx0CaROOw0d77HEBZvef84sUnigesY0uceTcCP5J6aMCzArYX5a7GMD7nrV9JLLgZolBx/1IAIGrwZ310E6mMzh9gwswGvaGn6nIZa4Sh2+sCm8gxiuOakVTaUY9CjFLBoKYupCE=
+	t=1706708781; cv=none; b=DUW4fC9Fnl2tld31ZyE8TMIY1UAv+LF7ORzpryQVdII1cCPBKVfKDTLBnCf7tKPWHOvNsLlKm46HDKKCLat6zoHeKlHEEkyLUtiFm3zRt9/A7ua5S0yxREJpYCbI4Kfy8dZ5UOaDdO4JCiG+COqf5PWRFdk+iO2nS75hnl2dLfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706708427; c=relaxed/simple;
-	bh=lWttfl32UtfKQxmCE2Lha+V1wyRrpzCmonLS/CtSrm4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nu9z49wsCZ/IABpvQbO1C4pRu51qMpjN/Zjmd4JipPpI6wO3g2XnJFJEoHlK+gkVgoLvKyQO83LNmZYKf6I9SfOgSk4z276YS6gP+AFJbRwYq1AK+/spC5SDoRuobG6ETWvbkFgH08xvre5wSETSpwfS0INHgNKxVHoJR/HBCCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VeK68afW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 111B9C433B1;
-	Wed, 31 Jan 2024 13:40:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706708427;
-	bh=lWttfl32UtfKQxmCE2Lha+V1wyRrpzCmonLS/CtSrm4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VeK68afWIF1FtCC4TcOQdFncLFI8IFyetcPgjfZNZkdhfsaq0ufM3Z/Rw8rei2GfZ
-	 /303qLegwVOwoxQayD8tll86xcQorruempbTdodfPVZC3GqLh9yfdqAdUaHeswwpk4
-	 4hhso5k3gWJFURFi0ebGOV8H3tZDYSOwI0RTo/G5wg7ZtzpclUKn3oEJRPIEDJj69s
-	 IgTePlUbtJa0BwNzJZBTeMXbX0b+h3q+IJZyNqJIxzMjbKQYlCkD3jARYlSEv3e2eH
-	 s4xBkkYY7GVyMJ8VEpxSXiPMhaR29SWfC/64uO25RYSTVex/us3oRGA2tICmCJCAj9
-	 C5wzuLi1wheIw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E986CE3237F;
-	Wed, 31 Jan 2024 13:40:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1706708781; c=relaxed/simple;
+	bh=ebr3AMTFub7iemMw/BGmsstjBawvqvFelKMLo850JVI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Q2NainEMdcKkFES+OwElLfkEcHDiCmR2SsBOc6vZOSruWhYiUxwUEmSPWf/JU1WOle3wAggfCZ7fPc5/2fnq1+MHjS5/necjtenZt9pG6NK8XuBCkvewcx97TReKD7Hh4JeiXUorrHq8RXfuDgC+JF2AVfmvt2/UUI9Qqbe9yHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LPuGA7Z6; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dc6933a46efso2680403276.0;
+        Wed, 31 Jan 2024 05:46:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706708779; x=1707313579; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V1nzFqWekvSu6tY6ZSGzcooEF5tznBA46cjxleLmSoI=;
+        b=LPuGA7Z6bQ8fJwlX6UVw1J93XtYL4RG0jdwKxYxRpR74wWEiUk93tOK9ryxb4UQf1i
+         tPnvsJY4D494m4AM2V9jGZWDzmn43YorOOyM0fh3etstcP26xLmKAnMiFOTIg5kxMnxb
+         TYmJx4ssArNglJaO3fiJk+CB3csWnLE+wbASRVA+jCGelxFKWkcCD5y39n1PFXiIROIq
+         W/pxB8DXTXH2KBpzJ1oPdUOiPIBvEQ73qdhKx/WW0TPdYyd9V69tj/fQgG8w0PyHogab
+         tuApeXSSOeMNgyQ3HsYz4RwxESUDp45fPm6kqcJ/fdPT9xLsiF/jADQksQ9q2rMecFlJ
+         wCjw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706708779; x=1707313579;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V1nzFqWekvSu6tY6ZSGzcooEF5tznBA46cjxleLmSoI=;
+        b=kRWTur09/8MzbosZ6c5ahMjPW5sM4ep1dOIrBCrrrTtzUjRNYInDkUNeRg7Mmpznga
+         f0hS/B82G9Ah3RL7tZNKrqRFgAw3FlPo6DGV2cyHs639yVyY2DQ0fpLjfmKKRpWYWu9O
+         ZC/LD0EAK653Iuf7rAdhjUnaSXQxwxNlZLC0GpM/cXaEfyRTm7D1fHLDYLLo0jANdoei
+         f8ScKo+xChntZ5/0KB1GKyjhLpyBPAlGVdJkc+8vPjUGZYsidhcJkPMc9LlS7TeLUSA7
+         aYLzX1pPF3i1+hbdShpsfhOIU+5/iof0hrm8TBz3PH4BDdU99fUZTEO6rnSDgxSr3E3p
+         UVqA==
+X-Gm-Message-State: AOJu0YyR8VCNedJvVmcGPDTjOO2iitEDIHxLnsB/PhNvSdRJnCS1FqjC
+	/plz4kvvAGJ4TNjj1cYKouHujMSF5fz6slMNfOvTo6w1qzfHYoeeB5ZsU6b/ojHe1LYIMw+k+Wy
+	rj5ipGkhaG5Ia5gncHijEOCU50RA=
+X-Google-Smtp-Source: AGHT+IEiFoBBXxuV5gR1XwSItKbDrrADzmIWacG63ou2WjTfLO5bCeIPeYOpJr+lhbVeaYbihGwqxx+EMKZNj1aTGQc=
+X-Received: by 2002:a25:e00a:0:b0:dbe:ace1:acf6 with SMTP id
+ x10-20020a25e00a000000b00dbeace1acf6mr1765364ybg.13.1706708778843; Wed, 31
+ Jan 2024 05:46:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: lan966x: debugfs: Fix showing the port keyset
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170670842695.31681.17230280565350658604.git-patchwork-notify@kernel.org>
-Date: Wed, 31 Jan 2024 13:40:26 +0000
-References: <20240128195134.3600629-1-horatiu.vultur@microchip.com>
-In-Reply-To: <20240128195134.3600629-1-horatiu.vultur@microchip.com>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+References: <20240131013705.1002722-1-hayatake396@gmail.com> <0fc3f574-6243-4c85-a6a7-442dc480c9e7@linux.intel.com>
+In-Reply-To: <0fc3f574-6243-4c85-a6a7-442dc480c9e7@linux.intel.com>
+From: takeru hayasaka <hayatake396@gmail.com>
+Date: Wed, 31 Jan 2024 22:46:07 +0900
+Message-ID: <CADFiAc+wymeApwWFAjA_+sYN6_MaMssA3b4bYjeHXxjypjemRg@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH net-next v5] ethtool: ice: Support for
+ RSS settings to GTP from ethtool
+To: Marcin Szycik <marcin.szycik@linux.intel.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	linux-doc@vger.kernel.org, vladimir.oltean@nxp.com, 
+	linux-kernel@vger.kernel.org, laforge@gnumonks.org, 
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	mailhol.vincent@wanadoo.fr
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+Hi Marcin-san
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+> LGTM
 
-On Sun, 28 Jan 2024 20:51:34 +0100 you wrote:
-> On lan966x, it is possible to use debugfs to print different information
-> about the VCAPs. Information like, if it is enabled, how the ports are
-> configured, print the actual rules. The issue is that when printing how
-> the ports are configured for IS1 lookups, it was parsing the wrong
-> register to get this information. The fix consists in reading the
-> correct register that contains this information.
-> 
+Thanks for your review!
+
+> Still removing this line :c
+
+Oh! Sorry for the oversight. I will fix it in the next patch.
+Could you please take another look at the patch?
+
+Thanks
+Takeru
+2024=E5=B9=B41=E6=9C=8831=E6=97=A5(=E6=B0=B4) 20:53 Marcin Szycik <marcin.s=
+zycik@linux.intel.com>:
+
+>
+>
+>
+> On 31.01.2024 02:37, Takeru Hayasaka wrote:
+> > This is a patch that enables RSS functionality for GTP packets using et=
+htool.
+> >
+> > A user can include TEID and make RSS work for GTP-U over IPv4 by doing =
+the
+> > following:`ethtool -N ens3 rx-flow-hash gtpu4 sde`
+> >
+> > In addition to gtpu(4|6), we now support gtpc(4|6),gtpc(4|6)t,gtpu(4|6)=
+e,
+> > gtpu(4|6)u, and gtpu(4|6)d.
+> >
+> > gtpc(4|6): Used for GTP-C in IPv4 and IPv6, where the GTP header format=
+ does
+> > not include a TEID.
+> > gtpc(4|6)t: Used for GTP-C in IPv4 and IPv6, with a GTP header format t=
+hat
+> > includes a TEID.
+> > gtpu(4|6): Used for GTP-U in both IPv4 and IPv6 scenarios.
+> > gtpu(4|6)e: Used for GTP-U with extended headers in both IPv4 and IPv6.
+> > gtpu(4|6)u: Used when the PSC (PDU session container) in the GTP-U exte=
+nded
+> > header includes Uplink, applicable to both IPv4 and IPv6.
+> > gtpu(4|6)d: Used when the PSC in the GTP-U extended header includes Dow=
+nlink,
+> > for both IPv4 and IPv6.
+> >
+> > GTP generates a flow that includes an ID called TEID to identify the tu=
+nnel.
+> > This tunnel is created for each UE (User Equipment).By performing RSS b=
+ased on
+> > this flow, it is possible to apply RSS for each communication unit from=
+ the UE.
+> > Without this, RSS would only be effective within the range of IP addres=
+ses. For
+> > instance, the PGW can only perform RSS within the IP range of the SGW.
+> > Problematic from a load distribution perspective, especially if there's=
+ a bias
+> > in the terminals connected to a particular base station.This case can b=
+e
+> > solved by using this patch.
+>
+> LGTM
+> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+>
+> > Signed-off-by: Takeru Hayasaka <hayatake396@gmail.com>
+> > ---
+> > v2->v3: Based on Harald-san's review, I added documentation and comment=
+s to
+> > ethtool.h and ice.rst.
+> > v3->v4: Based on Marcin-san's review, I added the missing code for GTPC=
+ and
+> > GTPC_TEID, and revised the documentation and comments.
+> > v4->v5: Based on Marcin-san's review, I fixed rename and wrong code reg=
+arding
+> > GTPC
+>
 > [...]
-
-Here is the summary with links:
-  - [net-next] net: lan966x: debugfs: Fix showing the port keyset
-    https://git.kernel.org/netdev/net-next/c/e746094b1bb0
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+>
+> >      f     Hash on bytes 0 and 1 of the Layer 4 header of the Rx packet=
+.
+> >      n     Hash on bytes 2 and 3 of the Layer 4 header of the Rx packet=
+.
+> > -
+>
+> Still removing this line :c
+>
+> > +    e     Hash on GTP Packet on TEID (4bytes) of the Rx packet.
+> >
+> >  Accelerated Receive Flow Steering (aRFS)
+> >  ----------------------------------------
+>
+> ---8<---
 
