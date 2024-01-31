@@ -1,82 +1,62 @@
-Return-Path: <netdev+bounces-67580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8944E844302
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 16:27:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 454AC8442AC
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 16:09:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0C0DB2F33A
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 15:06:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CB8328C4FF
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 15:09:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C0683CC5;
-	Wed, 31 Jan 2024 15:06:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 126B584A3B;
+	Wed, 31 Jan 2024 15:09:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MG7dgYXb"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="q+B6N8P8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30085DF35
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 15:06:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16B4484A2E;
+	Wed, 31 Jan 2024 15:09:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706713608; cv=none; b=iKN5CJLAtPs6ICmXxydqUvgBtfpDm64p75qH2NxKl7jEdew5tfbI08jSLO6eSmBdC7Ywj1jCnUFwqrEUnjG7NOGdMGnBvMExIGUu7CJyPn2wtiwc0YW8BnCT1XZZ5WTj0byfMcQtsdYdm41eUUVTz9Ud7PuR/fv0P/5uQHkP+Os=
+	t=1706713753; cv=none; b=r35lt1fGpk8wf0xehe02NWYtFMFUOS3G9W8G0bDuXQATngKtU56OiY3D9ZhsOpMJJtmNHIbMYdg5bpVb7lHhEmYG9IG295sRpIa4o6ZOzBsucio1fynbG9BRGeXFbK1Tvn+CVEwaSz6PWQ7/1VhnvcRvdvM7gO70pxzLiIr5NOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706713608; c=relaxed/simple;
-	bh=JKswgWfJZBdtmIeko8KWMNuj6Qcy/inlP+BGa8aajbs=;
+	s=arc-20240116; t=1706713753; c=relaxed/simple;
+	bh=XC0EvNphrUcJq0j8q4O4vs/j3i5oUwM7G4PQZOorKIE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JPhyzEPsh9+jmuG1jKN/Ls3EGjFF/kFHn8OjTOhsAibfJXozyDtVOzjZln40eeDteY7ypeeSyobxLNg/Udfgvzo28eOefoyFgkvvQMkMSPsu9Q502HpbgJiEK4EwWc43gygXWnCpc6CMPponUJ1527hpmB2urlbWX7gbqfmxAlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MG7dgYXb; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-40f02b8d176so16223295e9.1
-        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 07:06:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706713605; x=1707318405; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RBVPi7n/ictw/t00XJIGW3x01xrwKWQ4gYT/CyEnd8A=;
-        b=MG7dgYXbEe2Sm6UNe2JstDMeE1ouyDeu9vrNd5hWTbj25rmXikc1eEDtY2NQvnkBR7
-         bLQaE1vyrB2LltOMy0Xb2geIjmYERQ+Bo+hA2nIZYBKMnzKK6q+d0qlkPS1qCZ0Filpp
-         eWD0HDWGfA4lfjt+1x2tzbU+csAc+pdEdeRbyawhYzpaNJyJnUCYYgcoaOtX+w+r64Mv
-         3BrWqJqODs92cYiqjpB+8z8vH/U96xw+6t2Egr9SzWqg/RxLz+n4WvtVyrFMb+/W18hA
-         sA8pXQqkI9KdIPeoYZnMRsf4/biBWfb80SWMkd3+NFEWFZ/Zqnc4W5lw4OZg8xBykhlP
-         DuCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706713605; x=1707318405;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RBVPi7n/ictw/t00XJIGW3x01xrwKWQ4gYT/CyEnd8A=;
-        b=fmkjkbZYrRVIWMU6eManM/oAyC402FZRkn6E7Q3TXskEFaBs8cD9qsO5R6BIQd9p70
-         81omF/LDrTFCIOipqIve4FOdEyRDNz1ohePimkHNAoNPglRsWP6IUy3GzxVn2W6+ppPs
-         U5FOdLSEuLRcVNyZcNKJpqKNIh75QZJ2zvNNBXWeoTRhHxk8N4vjocYIqtbQEmk1vZ0M
-         L9lcNeBlKY442lS0q792hUOA4smwRAOR74yj4xLfE5A/m1y+fYHPXReSzqwvYZAlyf4y
-         L/8s8ANIAFoI80Gnfy8hrtXh0zKUipp1RwjZ+Hh1/nDkhhVOQH/VaSvzBtFKANn2bnvJ
-         o64A==
-X-Gm-Message-State: AOJu0YyaSGOr/BOWCJE9IS0ANzZKYCMlxETCI32vs3sv35iV13z6177W
-	WqzuGwW273znOpc11ajlS0iOiY8AF8kMTg0BM7o2EC5jYbCt0WAU
-X-Google-Smtp-Source: AGHT+IGiPoUnJ8P5vNtErB54OdVWsBM1JqyZNoTTI4pb+oGNQSvMiZkX02utUlDRvS6s0kGjUwFv3w==
-X-Received: by 2002:a05:600c:5109:b0:40f:b45c:85a5 with SMTP id o9-20020a05600c510900b0040fb45c85a5mr1374110wms.22.1706713604721;
-        Wed, 31 Jan 2024 07:06:44 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVbcKo0Qr9DO0LxZunuvEOwIWqWEwOsIBHjNHHasl9y0GDJzI1QkS4wFtT8gBqqvQ15W3cZGytxXNOQU89wvtdcpz0YRlYHafuRF0mSfxf2Xg0mFGuaYT0yQzttWy5Wx2s7LRYjqAtLy7hydQ/pyznFvgURi+2KYExUIpiVP/0ZqiLj52AHAo9HFBtmWMTzqWmdgjcPUCVnNb+cTj/Ti/ycon64wWyiNnsrtBsJZXLB3YdvK+ydRSZbw87H4g==
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id eo9-20020a056000428900b0033ae9e7f6b6sm9541782wrb.111.2024.01.31.07.06.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jan 2024 07:06:44 -0800 (PST)
-Date: Wed, 31 Jan 2024 17:06:42 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, roopa@nvidia.com,
-	razor@blackwall.org, bridge@lists.linux.dev, netdev@vger.kernel.org,
-	jiri@resnulli.us, ivecera@redhat.com
-Subject: Re: [PATCH net 2/2] net: bridge: switchdev: Skip MDB replays of
- pending events
-Message-ID: <20240131150642.mxcssv7l5qfiejkl@skbuf>
-References: <20240131123544.462597-1-tobias@waldekranz.com>
- <20240131123544.462597-3-tobias@waldekranz.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=otxQVKEYF8AFC9lwpzFnVMyPSgXFnuzA0yXnlA0GdtpuD2yphvq/jQQpu/DursTAQAGft5EiNSMdBh4N+a7EDiVV/5Fd2uFlrVRUP0G9rAjosupFg34IqJu5JcVix7vIFnLHfVu6WLJZ7SRfZV1XfESolb8326hn6CrDvOrtS0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=q+B6N8P8; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=5M5xVqM+PiELlH0mfygUqZUpkmPOx2ReByodunoLq8Y=; b=q+B6N8P8Mce5ldTqxt1pFMk4bk
+	ANroDBW2nNEahY5qriecHcAw9WannyiE9aQJeC5q3mJ0zjYgdLT49T++3Fi5ExFegSf6fsR9Itqg5
+	0b0ecnua0hEqOyX9QYmkzDkx/jYdj98d8chpPvoCmqAKuOrMDy/ncsrZpcyu9FtbUEEI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rVCCu-006akv-Iq; Wed, 31 Jan 2024 16:08:56 +0100
+Date: Wed, 31 Jan 2024 16:08:56 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 net-next 05/13] net: phy: marvell-88q2xxx: add driver
+ for the Marvell 88Q2220 PHY
+Message-ID: <c278afc2-49e7-4621-8c5c-31fb8a2766c2@lunn.ch>
+References: <20240122212848.3645785-1-dima.fedrau@gmail.com>
+ <20240122212848.3645785-6-dima.fedrau@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,26 +65,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240131123544.462597-3-tobias@waldekranz.com>
+In-Reply-To: <20240122212848.3645785-6-dima.fedrau@gmail.com>
 
-On Wed, Jan 31, 2024 at 01:35:44PM +0100, Tobias Waldekranz wrote:
->  	list_for_each_entry(obj, &mdb_list, list) {
->  		err = br_switchdev_mdb_replay_one(nb, dev,
-> -- 
-> 2.34.1
+On Mon, Jan 22, 2024 at 10:28:38PM +0100, Dimitri Fedrau wrote:
+> Add a driver for the Marvell 88Q2220. This driver allows to detect the
+> link, switch between 100BASE-T1 and 1000BASE-T1 and switch between
+> master and slave mode. Autonegotiation is supported.
 > 
+> Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
 
-I think there's one more race to deal with.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-If the switchdev driver has signaled SWITCHDEV_BRPORT_UNOFFLOADED,
-it may be that there are still deferred port object deletions.
-If the switchdev port is under a LAG which is under the bridge AND is
-leaving the LAG, those deferred deletions might run too late, aka after
-it will no longer process the deletions, since it has left the bridge
-constellation.
-
-To fix that, we need another switchdev_deferred_process() call, after
-the br_switchdev_mdb_replay_one() calls, while still under rtnl_lock().
-The existing switchdev_deferred_process() call from del_nbp() will not
-help, since the net_bridge_port (the LAG) does _not_ disappear.
+    Andrew
 
