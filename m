@@ -1,119 +1,198 @@
-Return-Path: <netdev+bounces-67456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AB08843913
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 09:29:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C65E4843944
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 09:42:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B9961F21364
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 08:29:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DA65289E66
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 08:42:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDD5458137;
-	Wed, 31 Jan 2024 08:29:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51054605BC;
+	Wed, 31 Jan 2024 08:41:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VOEqZ+SQ"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="rdTH2LtM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896A55DF0F
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 08:29:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11743605D5
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 08:41:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706689767; cv=none; b=N/rHs9uD8p5vIaNgkoiiFkBeCrZBlcDjjtgltcrHbwMTU67VYW2sZ4LkgiZFrUBTuPAstEs4Du1EC2egwsr1wA6KmCznG0mIG+iPyvUtqjBwck+H1xcHlCTpmUS5Ugv24MkHJNhKOBl5ZY5K4Fj8J641UerQ34fs8VlkyivRiq0=
+	t=1706690510; cv=none; b=ClqfsF0tT9PZ+OYgw+wVjYhpVAIOHUHTyvx/J2fAgo/cEeuvNrr94wFPaxwrqKqJ/4FDEK9iwKl5p0e9TcQtCXy2M6YEaotTpz6YePeA8Lxf1OD2eo+H4M1ATRQI6OjzkyACDwz6Ig/bz8ZQIqyfDFQIsOtyH1X+Ojhs7wwD64U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706689767; c=relaxed/simple;
-	bh=qHqlMlQnXte+AmjyNaYMnTz7hhx+M+0ybBYhztyMIBI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bnS0xejMnOtJDZfWqzPxG9NxYTQgcnNrTEOcnqJZx+jl0UqKpcS1eOj8NMlkSM4Z/AULyRFM1ZOpLBy2LZmlXxUvTY3YuC8cGZ9Gs8q+4xAegds2nuvKWvqzFzug2HNzcKRVXBEx5RksVYISYegdUpuqWmG9c1cK9zm0b1aVDjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VOEqZ+SQ; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-5ceb3fe708eso3010196a12.3
-        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 00:29:26 -0800 (PST)
+	s=arc-20240116; t=1706690510; c=relaxed/simple;
+	bh=iKRXLwTfrqU+PVgGgOqGO2T4SSk0VbOyJ7O4Lzl4WVE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=T7wuu3CT50uUF1gnkLA8Vbs3ARf5k54/2DY/SAKWGO59hzXiZIJtWZzvoRBexby8ubwvqb8Zkl8C6HsTAQ9iBAdMR8QJ4imiXKKsmive5P6+8tAogy/Gktd6bcLN9tX7OE3pB1QdmGqokNlXqaVEXEjcYR3MHNHiUXbirk8CzvE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=rdTH2LtM; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-55c33773c0aso5123581a12.1
+        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 00:41:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706689766; x=1707294566; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hee4KxOESGcnFuVhzIUlvEi1hJhpnBFPuBPZHUpVrHI=;
-        b=VOEqZ+SQH+9vVMKvPiNz7O9K7AHWF8cDb3AueghofpPmnp314BmvxOeViBNbAk/j0w
-         kD7Ft6iAMFc+LzXaWSMq0GB535brwkDGHctwsAD8nz29kHFy6jWAMZPgymgEfC4xaXuF
-         7uPVtgxF8UlmDlFa9c89XGGSi+3Z6/sfqRLv5H+4tpf53QAQ8w2nRJOZd0Vy8RXqrUU6
-         9FSX1UazLN36XquCJXn3S3HVdVI+T34GehTBf12lQ+fe1WZiYfEl0kZOW2O+GojQr1FQ
-         GCjzeISLAv2vYmuRd4W5HPSyqmlxpDOWg2v2By1Sn6QCP3Zl/34WLEsLob/xF3VWoWaZ
-         jSwQ==
+        d=tuxon.dev; s=google; t=1706690506; x=1707295306; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1524TzWJOECLHteJDyR9DLp3V3fisC4TKq1DpxaWyKw=;
+        b=rdTH2LtMovlTU2OPE+C9AK1NLSirmXe40R34WpQX+Q5KfhqNXzjpuzq8OzNVPvoFuw
+         dPvevXOxNav9DuSBdc5SufA/gx3FZEtnZRiJIXBoB49T6xCY1YsuMMo1S/zG4YKRqvcS
+         u1vi71Rj9Rb0faAIze08l0RTZqYpJ0zVSWNH7CiGtl80WREwcfcmOZx81sbIC/6Vw+Vg
+         rnqR6X0sC++FHrbokyOOO/Ot7n9hYjCdARj5FJoTW5tBO7iHQ0UVqiUivOcImphzInjN
+         F04ieIOxs8ksl/Oap3+CeecvSA1NHCJKSbDrGBGnrflUShyTghiClMt7XSmno4/wBJ49
+         O40A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706689766; x=1707294566;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=hee4KxOESGcnFuVhzIUlvEi1hJhpnBFPuBPZHUpVrHI=;
-        b=YyVw40kfDKoHa6ktAWUNI89siG1/sWjmZMlkhUE1ZO+QUlLZbhvh8HEIQ393CBZKHS
-         Iq9S1oXt75/S3GfxLzrktUyIcHwPFq34WfYyAholvT4sjNPfEnV0vZbtgRCKT2h3thiS
-         y8KX50wLAe/ml22yprGCisKwaZhY0Q+obfXSNVJu5LFwX4H6f6EqHdG0yAsNhzVTwKhm
-         IEYegykDINjfi/dEq0vNzBuxXeEmHpeAIlM/aa2jSxlEwRVIAqufYhe6ZvUBTtVd41Ls
-         fA+50V2C2w96M6gXByzMM/yOy0d7MDm2ijAEQX/zjUPoDSGO9NZSNbbCEQxU/HFGrx0b
-         nJHQ==
-X-Gm-Message-State: AOJu0Yxlx1C5FaXZKCdKgz+8GR5qkEegV2NNNyNo55WCvxzpj7qPUtYm
-	FGQ0YD0MdBPjkdowLU8w1aSXIu1blxpbYnqScgBz7KG0wWxXSz/X
-X-Google-Smtp-Source: AGHT+IFVHs4uJbqV2iXd1k1rbwUNPHrGUotgbuSMVwg8MrQU4IHzHIXEy8yG/U/vV0m4Uu3QK85Hbg==
-X-Received: by 2002:a17:90a:1289:b0:28e:82c0:db91 with SMTP id g9-20020a17090a128900b0028e82c0db91mr787971pja.43.1706689765608;
-        Wed, 31 Jan 2024 00:29:25 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCW6A1oDChLZ8ph/IRgSFthOsjgJIEcuZne5/kKVN3l5fICKnRR0OVJo7sBPvzdnpjRZypCRN6k/CujAspC7ykc5LNgWM2JbOPeuOXYKjct3qgCYne4Dp2lw3gMbIVFFIFn311uYnRXh8CflN6V+kwla3qIPVknQ8KbrMLQTQAFDLu4SPIGNYu/tcqaMuOPG6RyTNVCGaqr/X4Sa561vKU3o0YvmRj+cuTxpvoYU2a7BvD0ZQtI8EbTxlk2jE6YcPa9OyJ8oVZZNJEluZVAXdVXqzSc1Z+7KA3VTNTaWYYopI+GGTTJIEbmvVzkWRyao2JL37Nc=
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id iq24-20020a17090afb5800b002906e09e1d1sm843605pjb.18.2024.01.31.00.29.21
+        d=1e100.net; s=20230601; t=1706690506; x=1707295306;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1524TzWJOECLHteJDyR9DLp3V3fisC4TKq1DpxaWyKw=;
+        b=Nn05lLkE018g2E1ZYv43XVYnYUmHpjZZt3Cgwbf6AdxqnvLYU0SEzassjKvqydV/sF
+         61jijWj/tvUFX//NHlhPnn9tBisjZ7M9QCAHqh788HA4Dx3rdailh1G3EsQ0Z2xO3IMA
+         un3XiB+Qsd3NDisRHXf9PfDqkKCqnWgi+QmzxSXC9tgBuET+Z66w4wPC6QEQz6Vp8Wxs
+         q2EnaoBKAAHbaXwgLiTDgVuJkGZpAjw7ssuWyPRpOq75OgVmt5lk8wVcbiENSaOKZjPF
+         tRDbG3YSPi4rzhkRukBoXUtZOg8wgpseZodqnRyE0Dki9PJxU9FPwPiIChVZb2vmo9EX
+         /yfw==
+X-Gm-Message-State: AOJu0Yw2LDUKIcweuYBPs2U2Ht/bbjbuMbyZyFEXRpBdM53UXuPcxBsc
+	9AneyspiWHyDIKezEzVYh11Uwep0lds3ZL795moWdMVPuff6sHuYQkZI43wzwIY=
+X-Google-Smtp-Source: AGHT+IEGqc5y9PC/J6J9ErYD3JK8SaZx7UhdE7wuVBjIuEL5mo3X27baMFsbr922gsCpNlpqEnJZow==
+X-Received: by 2002:a05:6402:1c04:b0:55f:86a0:99ba with SMTP id ck4-20020a0564021c0400b0055f86a099bamr626662edb.28.1706690505971;
+        Wed, 31 Jan 2024 00:41:45 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVl5Q/Ei2bvcvv8xNVcQim5Dj02Pl4QjnlUYe+y66df6tf56svSKkWCWd1P/sjdv0gI4LyPVsSopEmlbd13tygZ/mvkuo68KQPQ+8j8kBSDCMF5cUiKMTvYirtlGF0m64iw6+0IGSVGX69xRzlxVO0Be7DrcFDUza9Re4l0fPxIVNgaklWDkagRF+QHIITCEMnuG1eAIhz1ujTNKIrl4ELdFNlN9rTl9asvyXFRxdb/42bD+SjhDyyM7AqP0PVcYaoiQ0c8oTG2o33pVGjiei3JOswrMw8fm8V7pLLefyw63AG29R2I8JAFBfwCcSzzS8OswTrq3h5Hol+JfTB0AeKftpAipGef9/JBUsmSmwPb3YusdXJvaQ7GD8qpgf2l5kAhQnkR51D4g6TA/m6RvAT6y3ZRIk3yzvzhTnqJJkFdBLejai8=
+Received: from claudiu-X670E-Pro-RS.. ([82.78.167.87])
+        by smtp.gmail.com with ESMTPSA id cq16-20020a056402221000b0055f02661ae2sm2863630edb.78.2024.01.31.00.41.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jan 2024 00:29:24 -0800 (PST)
-Date: Wed, 31 Jan 2024 16:29:19 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: thinker.li@gmail.com
-Cc: netdev@vger.kernel.org, ast@kernel.org, martin.lau@linux.dev,
-	kernel-team@meta.com, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	sinquersw@gmail.com, kuifeng@meta.com
-Subject: Re: [PATCH net-next 2/5] net/ipv6: Remove unnecessary clean.
-Message-ID: <ZboE35ahg7t-YSMC@Laptop-X1>
-References: <20240131064041.3445212-1-thinker.li@gmail.com>
- <20240131064041.3445212-3-thinker.li@gmail.com>
+        Wed, 31 Jan 2024 00:41:45 -0800 (PST)
+From: Claudiu <claudiu.beznea@tuxon.dev>
+X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
+To: s.shtylyov@omp.ru,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	richardcochran@gmail.com,
+	p.zabel@pengutronix.de,
+	geert+renesas@glider.be
+Cc: netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	claudiu.beznea@tuxon.dev,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Subject: [PATCH net-next v5 00/15] net: ravb: Prepare for suspend to RAM and runtime PM support (part 1)
+Date: Wed, 31 Jan 2024 10:41:18 +0200
+Message-Id: <20240131084133.1671440-1-claudiu.beznea.uj@bp.renesas.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240131064041.3445212-3-thinker.li@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 30, 2024 at 10:40:38PM -0800, thinker.li@gmail.com wrote:
-> From: Kui-Feng Lee <thinker.li@gmail.com>
-> 
-> The route here is newly created. It is unnecessary to call
-> fib6_clean_expires() on it.
-> 
-> Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
-> ---
->  net/ipv6/route.c | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-> index 98abba8f15cd..dd6ff5b20918 100644
-> --- a/net/ipv6/route.c
-> +++ b/net/ipv6/route.c
-> @@ -3765,8 +3765,6 @@ static struct fib6_info *ip6_route_info_create(struct fib6_config *cfg,
->  	if (cfg->fc_flags & RTF_EXPIRES)
->  		fib6_set_expires(rt, jiffies +
->  				clock_t_to_jiffies(cfg->fc_expires));
-> -	else
-> -		fib6_clean_expires(rt);
->  
->  	if (cfg->fc_protocol == RTPROT_UNSPEC)
->  		cfg->fc_protocol = RTPROT_BOOT;
-> -- 
-> 2.34.1
-> 
+From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+Hi,
+
+This series prepares ravb driver for runtime PM support and adjust the
+already existing suspend to RAM code to work for RZ/G3S (R9A08G045) SoC.
+
+As there are IP versions that switch to module standby when disabling
+the clocks, and because of module standby IP switches to reset and
+the register content is lost, to be able to have runtime PM supported
+for all IP variants, the configuration operations were moved all to
+ravb_open()/ravb_close() letting the ravb_probe() and ravb_remove()
+to deal with resource parsing and allocation/free.
+
+The ethtool and IOCTL APIs that could have been run asyncronously
+were adapted to return if the interface is down. As explained in
+each individual commits description, this should be harmless.
+
+Along with it, the series contains preparatory cleanups.
+
+The series has been tested on the boards with the following device trees:
+- r8a7742-iwg21d-q7.dts
+- r8a774a1-hihope-rzg2m-ex.dts 
+- r9a07g043u11-smarc-rzg2ul.dts
+- r9a07g054l2-smarc-rzv2l.dts
+- r9a07g044l2-smarc-rzg2l.dts
+
+Thank you,
+Claudiu Beznea
+
+Changes in v5:
+- collected tags
+- fixed typos in patches description
+- improved description for patch 07/15
+- collected tags
+
+Changes in v4:
+- changed cover letter title and keep on 15 patches in series to cope
+  with requirement at [1]
+- add dependency on RESET_CONTROLLER in patch "net: ravb: Make reset
+  controller support mandatory"
+- use pm_runtime_active() in patch "net: ravb: Move the IRQs get and
+  request in the probe function"
+- set config more before reading the mac address in patch "net: ravb: Set
+  config mode in ndo_open and reset mode in ndo_close"
+- collected tags
+  
+[1] https://www.kernel.org/doc/html/v6.6/process/maintainer-netdev.html#tl-dr
+
+Changes in v3:
+- collected tags
+- addressed review comments
+- squashed patch 17/21 ("net: ravb: Keep clock request operations grouped
+  together") from v2 in patch 07/19 ("net: ravb: Move reference clock
+  enable/disable on runtime PM APIs") from v3
+- check for ndev->flags & IFF_UP in patch 17/19 and 18/19 instead of
+  checking netif_running()
+- dropped patch 19/21 ("net: ravb: Do not set promiscuous mode if the
+  interface is down") as the changes there are not necessary as
+  ndev->flags & IFF_UP is already checked at the beginning of
+  __dev_set_rx_mode()
+- remove code from ravb_open() introduced by patch 20/21
+  ("net: ravb: Do not apply RX CSUM settings to hardware if the interface
+  is down") from v2 as this is not necessary; driver already takes
+  care of this in ravb_emac_init_rcar()
+
+Changes in v2:
+- rework the driver (mainly, ravb_open() contains now only resource
+  allocation and parsing leaving the settings to ravb_open(); ravb_remove()
+  has been adapted accordingly) to be able to use runtime PM for all
+  IP variants; due to this number of patches increased
+- adjust previous series to review comments
+- collected tags
+- populated driver's own runtime PM ops with enable/disable of reference
+  clock
+
+Claudiu Beznea (15):
+  net: ravb: Let IP-specific receive function to interrogate descriptors
+  net: ravb: Rely on PM domain to enable gptp_clk
+  net: ravb: Make reset controller support mandatory
+  net: ravb: Switch to SYSTEM_SLEEP_PM_OPS()/RUNTIME_PM_OPS() and
+    pm_ptr()
+  net: ravb: Use tabs instead of spaces
+  net: ravb: Assert/de-assert reset on suspend/resume
+  net: ravb: Move reference clock enable/disable on runtime PM APIs
+  net: ravb: Move the IRQs getting/requesting in the probe() method
+  net: ravb: Split GTI computation and set operations
+  net: ravb: Move delay mode set in the driver's ndo_open API
+  net: ravb: Move DBAT configuration to the driver's ndo_open API
+  net: ravb: Move PTP initialization in the driver's ndo_open API for
+    ccc_gac platorms
+  net: ravb: Set config mode in ndo_open and reset mode in ndo_close
+  net: ravb: Simplify ravb_suspend()
+  net: ravb: Simplify ravb_resume()
+
+ drivers/net/ethernet/renesas/Kconfig     |   1 +
+ drivers/net/ethernet/renesas/ravb.h      |   6 +-
+ drivers/net/ethernet/renesas/ravb_main.c | 738 +++++++++++------------
+ 3 files changed, 352 insertions(+), 393 deletions(-)
+
+-- 
+2.39.2
+
 
