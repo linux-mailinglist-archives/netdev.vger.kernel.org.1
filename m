@@ -1,78 +1,93 @@
-Return-Path: <netdev+bounces-67395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A6D5843310
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 02:59:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 718DA843312
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 03:00:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C59E1F278E2
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 01:59:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99C7E1C2143B
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 02:00:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9741A1C2D;
-	Wed, 31 Jan 2024 01:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C42471C2D;
+	Wed, 31 Jan 2024 02:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y6s64S2U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eDXBxBQf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D8C25692;
-	Wed, 31 Jan 2024 01:59:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4045226;
+	Wed, 31 Jan 2024 02:00:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706666383; cv=none; b=s7H5YBW4JT9EKCjSg2ienlPDbjodlq+nH/X4Ie0z2b85iB7MESZaAX3Xegzlk7Gxtv20csVwnmruV6bFAmZ2NzXfSKt9EDko77+4O7r4VQFwDbEpJPLavp2/t4SpuOKWnPu319H7Ed2UptB+R+FUoDAb9WR76LzDBfh10gmVG8w=
+	t=1706666426; cv=none; b=HRk97dumHq6CDjC1m+1ESv2+sW5OeybFZX3j4k/D0+6A0qqPfx2uoOz0hDQDz/K/Ngz7abhDHY6EKjT2nTh73MSGtwzLCrDBWHV+BBGb7AzKLAlrfdEQ7JWAmT7/IRI3jtmXHUlul8wnvrIXJpfRI4Yvd6uno46DOpP3krsu1pQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706666383; c=relaxed/simple;
-	bh=KrZ+qqIPxkijempbl2Yiu2AoQAsBsmHbnTvDKV5iWbU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sy4+25so2JfBb56Z5H+gToiGG/ViYugRGP5vG4VZYE3WTKmtseqA81Npy7jzflFbT3F+Ff0wX1R05B2GWILulbreNOsB/Dx2QgSL5/sVjCAxO29fv4o6YgKdRzlmhc2kZVU5lJZpJICZqUIvRwgTbvSFPA/Kj/b3J4IVZuudfME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y6s64S2U; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5324FC433F1;
-	Wed, 31 Jan 2024 01:59:41 +0000 (UTC)
+	s=arc-20240116; t=1706666426; c=relaxed/simple;
+	bh=K7tOJo64O5pvBYbotIkcoCqboHJHVg54FtiejNKpCYs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=WrEWA7mo7M47/Ndd+EWSTZu2SgFOKRKMRvcpgISoT8avMUKIwA/pMCYoV1MzZGYb/meq561tXRETbcn6QSrEWVti5Ld5WvEpvknWf6Tnzyj1OvnszkgID02aVyFhuJAyZW7wvDef9E74Iokabx+k5YbfMgdMwxJANk4I2djURMk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eDXBxBQf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 41098C433C7;
+	Wed, 31 Jan 2024 02:00:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706666382;
-	bh=KrZ+qqIPxkijempbl2Yiu2AoQAsBsmHbnTvDKV5iWbU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Y6s64S2UHZAZCZB45ZfmJcEYhOd5VbQKgQdB/nqDClzn264I/OIrxy5vZP9skIPyP
-	 tsn+HFstR+fVuwZr41m6K/g0UAC9WEsTDbXZJTo7Tz5H/8t/Jc3xFIMtK6GGAXqc6P
-	 sVKe6MvpumIdenoWGIA6oedGPlkNMv/WbWLLtKa5ydtKNz/4w5pZQ3kUR99RAFK1xg
-	 FHBFaNh/Emq/ijZprjj8toWzQaHBN48HbmuwnnX3IdIG8zBUVLhL31Rs4sAQ14H5wX
-	 gA9w7yazbzHHRseznKd4zNLXHDLNlDgNsGr0If8OdcbDeByXyfD2+gZXyFsruOblui
-	 +mLQnfYao3IOw==
-Date: Tue, 30 Jan 2024 17:59:38 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
- <davem@davemloft.net>, <pabeni@redhat.com>, <edumazet@google.com>,
- <shuah@kernel.org>, <razor@blackwall.org>
-Subject: Re: [PATCH net-next] selftests: net: Add missing matchall
- classifier
-Message-ID: <20240130175938.1d9d50f0@kernel.org>
-In-Reply-To: <20240129123703.1857843-1-idosch@nvidia.com>
-References: <20240129123703.1857843-1-idosch@nvidia.com>
+	s=k20201202; t=1706666426;
+	bh=K7tOJo64O5pvBYbotIkcoCqboHJHVg54FtiejNKpCYs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=eDXBxBQfYShaK3XZUWhY0Y+KCeT0Yohy/OzaY3oH3KVa25qOr7Cdf/kT9uze1bsWk
+	 +Vgh7qwxIr9vVs+dsprsPKhM5kwwYzOoxA3rmihPF3XVYRvxRzcmWRILsEQkuf451f
+	 VDp/h/nQv5l45I2rTndztQqSJjvypD6Njf5MKSwhX3E+hzdkk9f1EqFKHRqiIjHcJs
+	 8+S4+Xf66JFtE7KkOYBQ4VvGHxjau6xu6VCkf6iB6bxZB6EP0CPz8U+XByWkCCkmmW
+	 02cPlqAH2x491QK+FmXjaW0WgFPoCnvkq3OXEwaNnARrZQXa5rOB1vuVFhHOYHNwDZ
+	 XebD+05RCbSHA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 248C0C395FE;
+	Wed, 31 Jan 2024 02:00:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] mlxsw: remove I2C_CLASS_HWMON from drivers w/o
+ detect and address_list
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170666642614.31142.11271705375637726130.git-patchwork-notify@kernel.org>
+Date: Wed, 31 Jan 2024 02:00:26 +0000
+References: <77b5ab8e-20f2-4310-bd89-57db99e2f53b@gmail.com>
+In-Reply-To: <77b5ab8e-20f2-4310-bd89-57db99e2f53b@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: idosch@nvidia.com, petrm@nvidia.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-i2c@vger.kernel.org
 
-On Mon, 29 Jan 2024 14:37:03 +0200 Ido Schimmel wrote:
-> One of the test cases in the test_bridge_backup_port.sh selftest relies
-> on a matchall classifier to drop unrelated traffic so that the Tx drop
-> counter on the VXLAN device will only be incremented as a result of
-> traffic generated by the test.
-> 
-> However, the configuration option for the matchall classifier is
-> missing from the configuration file which might explain the failures we
-> see in the netdev CI [1].
-> 
-> Fix by adding CONFIG_NET_CLS_MATCHALL to the configuration file.
+Hello:
 
-Moved to the larger group of NET_CLS knobs, and applied to net,
-thank you!
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sat, 27 Jan 2024 16:08:18 +0100 you wrote:
+> Class-based I2C probing requires detect() and address_list to be
+> set in the I2C client driver, see checks in i2c_detect().
+> It's misleading to declare I2C_CLASS_HWMON support if this
+> precondition isn't met.
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] mlxsw: remove I2C_CLASS_HWMON from drivers w/o detect and address_list
+    https://git.kernel.org/netdev/net-next/c/ccf1445204a1
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
