@@ -1,136 +1,192 @@
-Return-Path: <netdev+bounces-67554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B2CB84402E
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 14:10:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F262844053
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 14:18:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 07AD1297DC4
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 13:10:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8453E1C264E3
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 13:18:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A89317B3CB;
-	Wed, 31 Jan 2024 13:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A26E7BB05;
+	Wed, 31 Jan 2024 13:17:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iS36poGg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZZ85Z57A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1627AE75
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 13:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E25ED7B3EC
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 13:17:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706706654; cv=none; b=o/CnIsw9RdcZBZtgvQfgjhrTqcJrslEBD8MAwBBtQ3JqEU7nuJzHFC7NHSHpActSn7YGewiJbNvuZuHB6OHKZ8zVZUbEbpii+RfModjP+U9oGhToyOV6vtPDqZw+lXWPhhn9WwN8WYMBNJjf+WxFvQes8F0p6O/ck1uG25iY1mA=
+	t=1706707047; cv=none; b=Y/g5JMNyo76EYrZPLy1SaOyQRX91l5WRaZvhoRi55ToyTEGGl4QYBkyVSb1qR+31CN9gbrL6hCjHsdIAspGkzJZNREoMKVJ0dQrzApYxQ4Hp9R8xwmBxO26ViRn2x4sdBl+FNCiGI+uFfGdKCcc8yXwVUKcO8eSuI89djH7fuQo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706706654; c=relaxed/simple;
-	bh=d9djXh8YHyVzsz+5SiwPrTgVQxpKPQjTgBSMiG9miD8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XEJQTszoyZvbG+x5yMRpFQnuqI+rDs84Uh9iWNG19d85SB9Hvr4rEdzstIn99Bz7Y6bPHPdIpPe03Ir89M+ocACPYrK786sR24jHoTF9FCtDaKtLpR0x+xG9Ik9WqTv6R0Urht4M70FseCWfaMiRQwCfMfCkKIv1gQjgmPRBXWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iS36poGg; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-40fafced243so12060035e9.0
-        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 05:10:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706706651; x=1707311451; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=z63eJUVdfgj6U9DgTOj9Nxua6onnJk5BZ9w81YFRoNU=;
-        b=iS36poGg7SwQFUwA9yBh1EY2Wcm9mlgTaNk5DX+MkH6uxadQofgwWGQnyrVE61VvGr
-         zC7F197xozf3Fm4e9GSBWg0jWXpcf6sXQqSRvUnK2/Jzchl7Z2hLB3h80wwrbuogBOU9
-         tYEkvNzcHTb24KZswQQisXVyqntD6AxO8VJbsrjqBxK6UrPiw+r9Vjj2+4tN0H95arZY
-         KCbhHlaVR57vn+YVan1990kV4AYlXYRJQF4ralRb6/GZtfRqMJyV65RHtJxY+6weKE7/
-         l6PncOb//lRrnAOe9XgY52I+tEzsp5vfunZ/avqnAY/0bIHUi64U6sFDK80dwy7lAWVo
-         CP0w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706706651; x=1707311451;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=z63eJUVdfgj6U9DgTOj9Nxua6onnJk5BZ9w81YFRoNU=;
-        b=aoYlp5zPWU5wzE8wS4HzOpFFoAdI3dZgVC90uAFxREw/C31sbxwPc2I/lnbFzVOcxX
-         Z8FV8Ey9yNecgv0+gOntqNe+HjlKkjgvkHQjhHzOY9myKGX+uYtKO5UKyeE+LomnM9db
-         YM0ENLXLzVAisKby3+AZ0eJbmVQKBe9cMVoUzFeCruVG3jiW2Kux7WvjTfxtn+iFfSce
-         VcR6L3UVwaf9tCYHeCyLleG+pSitjeTW2FX7qp7dfslTvDlDl6H62AZzNtu5uwnaJnkc
-         ZYaQrZCfh/F+0Rv2f0u0iMc9ikFd5VyqFXTZ+gXoxxv/KvMdBbmw9VeZ7ldEdFLLYvDa
-         eK+w==
-X-Gm-Message-State: AOJu0Yzcn66cJvC11QhmME1iW0KqI3X+Fw4Sx7htHVTugISSv087lujk
-	FyXDJuLnpQ13UCzsW/szrcsrsAFEl1ngS1E6EVKoWz6OcFHQc4DC
-X-Google-Smtp-Source: AGHT+IHI5lJ3ZaUC/kHnExkVNW5swAto6oeg7CQXEKlBUyvkob/axCNt5Fm/9ar1Zf0nd11we9OfqA==
-X-Received: by 2002:a05:600c:a384:b0:40e:a479:fed1 with SMTP id hn4-20020a05600ca38400b0040ea479fed1mr1385982wmb.7.1706706650987;
-        Wed, 31 Jan 2024 05:10:50 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUZaxNtDeNFnK21vACUdSHGOsGaKEK7/7wLg+/Hp4wG2i1Wf+pA3lPCCfduA+9ztlJoxwpKXPF0MwsIu9uQqWhyKiaYn9HcarBG3oMt7lwUrE8t4V3PiE1bJlnb6SGJJLK+l8faCjZbFScXlNCa7clCrdB62eNnqiA4kTJLR17rroQcu0TLjWIzhFJ6uiZpsKwwJXc6vh5EOos=
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id t12-20020a05600c450c00b0040d5ae2906esm1590900wmo.30.2024.01.31.05.10.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jan 2024 05:10:50 -0800 (PST)
-Date: Wed, 31 Jan 2024 15:10:48 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: jiri@resnulli.us, ivecera@redhat.com, roopa@nvidia.com,
-	razor@blackwall.org, netdev@vger.kernel.org, bridge@lists.linux.dev
-Subject: Re: net: switchdev: Port-to-Bridge Synchronization
-Message-ID: <20240131130003.bpqd23eepjlt7di7@skbuf>
-References: <87fryl6l2a.fsf@waldekranz.com>
- <20240129121739.3ppum5ewok6atckz@skbuf>
- <87bk927bxl.fsf@waldekranz.com>
+	s=arc-20240116; t=1706707047; c=relaxed/simple;
+	bh=vcKD5as0/agScWGjpQcJGFm+oQZmpJjE2XYTKul8TNo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EDWJPe3nBnneMMsnKSI+jACLmLeRA/VEgPoN+MCfI+NB2TL+YmgVJfM2kTnlLHEK8YwGs7xKCpQSIBPgqtNP8V3im76WQxXsT8CF5Q7ktf1h2E3Bf1ZxfCk/ZeH2qh2Qu7+SjW28j3+w7WhDFJA8g++FSIsGCXRucH/liqWC9s8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZZ85Z57A; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706707044;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=//z4Y/BgNHdCR9hM9Ii+VZgxSjTBvGsBMSlKT9iydbU=;
+	b=ZZ85Z57Abwf9H7iQPzrounpMGGLsmoRj7A32pa3zwzlltG9qK0NrPRwscaYSZ8xeXoZuTI
+	DGgu40T/ef+fqKThmHhev9kXwAyZr9yPOzf+V5/KBAMgxI41u6saHFuh8GJitJUcawCQ4q
+	M2vyqUmB1XBtwTCWpjWQepu+ZFXL8Vo=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-512-99WzZMLDNzuiVzbZ1JrgMA-1; Wed, 31 Jan 2024 08:17:18 -0500
+X-MC-Unique: 99WzZMLDNzuiVzbZ1JrgMA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4A22C835381;
+	Wed, 31 Jan 2024 13:17:17 +0000 (UTC)
+Received: from p1.luc.cera.cz (unknown [10.45.225.38])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3FCF7400DF3E;
+	Wed, 31 Jan 2024 13:17:15 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jeff Kirsher <jeffrey.t.kirsher@intel.com>,
+	Mitch Williams <mitch.a.williams@intel.com>,
+	Sylwester Dziedziuch <sylwesterx.dziedziuch@intel.com>,
+	Mateusz Palczewski <mateusz.palczewski@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net] i40e: Do not allow untrusted VF to remove administratively set MAC
+Date: Wed, 31 Jan 2024 14:17:14 +0100
+Message-ID: <20240131131714.23497-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <87bk927bxl.fsf@waldekranz.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-On Tue, Jan 30, 2024 at 10:23:34PM +0100, Tobias Waldekranz wrote:
-> On mån, jan 29, 2024 at 14:17, Vladimir Oltean <olteanv@gmail.com> wrote:
-> > I'm thinking we could do something like this in br_switchdev_mdb_replay().
-> > We could block concurrent callers to br_switchdev_mdb_notify() by
-> > acquiring br->multicast_lock, so that br->mdb_list stays constant for a
-> > while.
-> >
-> > Then, after constructing the local mdb_list, the problem is that it
-> > still contains some SWITCHDEV_F_DEFER elements which are pending a call
-> > switchdev_deferred_process(). But that can't run currently, so we can
-> > iterate through switchdev's "deferred" list and remove them from the
-> > replay list, if we figure out some sort of reliable switchdev object
-> > comparison function. Then we can safely release br->multicast_lock.
-> 
-> That would _almost_ work, I think. But instead of purging the deferred
-> items, I think we have to skip queuing the replay events in these
-> cases. Otherwise we limit the scope of the notification to the
-> requesting driver, when it ought to reach all registered callbacks on
-> the notifier chain.
-> 
-> This matters if a driver wants to handle foreign group memberships the
-> same way we do with FDB entries, which I want to add to DSA once this
-> race has been taken care of.
+Currently when PF administratively sets VF's MAC address and the VF
+is put down (VF tries to delete all MACs) then the MAC is removed
+from MAC filters and primary VF MAC is zeroed.
 
-Yes, not purging the deferred items (for the reasons you mention), but
-as I said, "remove them from the replay list" (the local mdb_list).
-Similar to what you've done in the series you just posted
-(https://lore.kernel.org/netdev/20240131123544.462597-3-tobias@waldekranz.com/),
-only that instead of removing from the list, what you do is you never
-call list_add_tail().
+Do not allow untrusted VF to remove primary MAC when it was set
+administratively by PF.
 
-> > The big problem I see is that FDB notifications don't work that way.
-> > They are also deferred, but all the deferred processing is on the
-> > switchdev driver side, not on the bridge side. One of the reasons is
-> > that the deferred side should not need rtnl_lock() at all. I don't see
-> > how this model would scale to FDB processing.
-> 
-> Yeah, that's where I threw in the towel as well. That issue will just
-> have to go unsolved for now.
+Reproducer:
+1) Create VF
+2) Set VF interface up
+3) Administratively set the VF's MAC
+4) Put VF interface down
 
-I mean I have some ideas for FDB replays as well, but they all revolve
-around making the interface more similar to how MDBs are handled, while
-also maintaining the rtnl-lockless behavior. It's a lot more rework,
-potentially involves maintaining 2 parallel mechanisms for switchdev FDB
-notifications, and very likely something to handle in net-next.
+[root@host ~]# echo 1 > /sys/class/net/enp2s0f0/device/sriov_numvfs
+[root@host ~]# ip link set enp2s0f0v0 up
+[root@host ~]# ip link set enp2s0f0 vf 0 mac fe:6c:b5:da:c7:7d
+[root@host ~]# ip link show enp2s0f0
+23: enp2s0f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
+    link/ether 3c:ec:ef:b7:dd:04 brd ff:ff:ff:ff:ff:ff
+    vf 0     link/ether fe:6c:b5:da:c7:7d brd ff:ff:ff:ff:ff:ff, spoof checking on, link-state auto, trust off
+[root@host ~]# ip link set enp2s0f0v0 down
+[root@host ~]# ip link show enp2s0f0
+23: enp2s0f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
+    link/ether 3c:ec:ef:b7:dd:04 brd ff:ff:ff:ff:ff:ff
+    vf 0     link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff, spoof checking on, link-state auto, trust off
+
+Fixes: 700bbf6c1f9e ("i40e: allow VF to remove any MAC filter")
+Fixes: ceb29474bbbc ("i40e: Add support for VF to specify its primary MAC address")
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.c    | 38 ++++++++++++++++---
+ 1 file changed, 33 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+index 908cdbd3ec5d..b34c71770887 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+@@ -2848,6 +2848,24 @@ static int i40e_vc_get_stats_msg(struct i40e_vf *vf, u8 *msg)
+ 				      (u8 *)&stats, sizeof(stats));
+ }
+ 
++/**
++ * i40e_can_vf_change_mac
++ * @vf: pointer to the VF info
++ *
++ * Return true if the VF is allowed to change its MAC filters, false otherwise
++ */
++static bool i40e_can_vf_change_mac(struct i40e_vf *vf)
++{
++	/* If the VF MAC address has been set administratively (via the
++	 * ndo_set_vf_mac command), then deny permission to the VF to
++	 * add/delete unicast MAC addresses, unless the VF is trusted
++	 */
++	if (vf->pf_set_mac && !vf->trusted)
++		return false;
++
++	return true;
++}
++
+ #define I40E_MAX_MACVLAN_PER_HW 3072
+ #define I40E_MAX_MACVLAN_PER_PF(num_ports) (I40E_MAX_MACVLAN_PER_HW /	\
+ 	(num_ports))
+@@ -2907,8 +2925,8 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
+ 		 * The VF may request to set the MAC address filter already
+ 		 * assigned to it so do not return an error in that case.
+ 		 */
+-		if (!test_bit(I40E_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps) &&
+-		    !is_multicast_ether_addr(addr) && vf->pf_set_mac &&
++		if (!i40e_can_vf_change_mac(vf) &&
++		    !is_multicast_ether_addr(addr) &&
+ 		    !ether_addr_equal(addr, vf->default_lan_addr.addr)) {
+ 			dev_err(&pf->pdev->dev,
+ 				"VF attempting to override administratively set MAC address, bring down and up the VF interface to resume normal operation\n");
+@@ -3114,19 +3132,29 @@ static int i40e_vc_del_mac_addr_msg(struct i40e_vf *vf, u8 *msg)
+ 			ret = -EINVAL;
+ 			goto error_param;
+ 		}
+-		if (ether_addr_equal(al->list[i].addr, vf->default_lan_addr.addr))
+-			was_unimac_deleted = true;
+ 	}
+ 	vsi = pf->vsi[vf->lan_vsi_idx];
+ 
+ 	spin_lock_bh(&vsi->mac_filter_hash_lock);
+ 	/* delete addresses from the list */
+-	for (i = 0; i < al->num_elements; i++)
++	for (i = 0; i < al->num_elements; i++) {
++		const u8 *addr = al->list[i].addr;
++
++		/* Allow to delete VF primary MAC only if it was not set
++		 * administratively by PF or if VF is trusted.
++		 */
++		if (ether_addr_equal(addr, vf->default_lan_addr.addr) &&
++		    i40e_can_vf_change_mac(vf))
++			was_unimac_deleted = true;
++		else
++			continue;
++
+ 		if (i40e_del_mac_filter(vsi, al->list[i].addr)) {
+ 			ret = -EINVAL;
+ 			spin_unlock_bh(&vsi->mac_filter_hash_lock);
+ 			goto error_param;
+ 		}
++	}
+ 
+ 	spin_unlock_bh(&vsi->mac_filter_hash_lock);
+ 
+-- 
+2.39.3
+
 
