@@ -1,309 +1,219 @@
-Return-Path: <netdev+bounces-67440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2480F8436EF
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 07:41:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B4128437D8
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 08:28:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6005FB23537
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 06:41:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A052D1C26D98
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 07:28:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2E1F51C27;
-	Wed, 31 Jan 2024 06:40:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EC8A56764;
+	Wed, 31 Jan 2024 07:23:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c936dJdS"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="GTYhFukk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2058.outbound.protection.outlook.com [40.107.101.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC7F44F8A8
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 06:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706683254; cv=none; b=B3l+B4kQGneffrACsXbpBGBvsR/KEqBCZFcq35fMQF1XGIrIRhpmx8ssGXUColBWquNb3kv2oDMV129XaqE3VLtqJEfn9jV2G7oDlxgcdj0RZ0z1mULXUbV0uSVHP85jiXdeqSNQts3hcclXAvzbq95MKG0sXFy8z2C91m97SuQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706683254; c=relaxed/simple;
-	bh=Ip3ont9EKGXbKqI4w+atvsRqqkJ8oRnmkodbu6cwvjg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=henMU0p0eDIjquuSbWwJ/Z3Sklk8pKTj0+/kDg16Un3blLw2bqvK13n6ng8Lxb0xSt2jYwSjR1V0I85LBwfCQ4+Ue33qEzQgqy3IAlutux8FV1BkYSt2Xa+w85MlFr3C/1vJyIUGNXl4C267/VUC4kIyiMtHytqw7lyvcK6xzh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c936dJdS; arc=none smtp.client-ip=209.85.219.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-dc6c3902a98so104338276.1
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 22:40:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706683251; x=1707288051; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ho0Ox6SO1ixDdJOhOQI40PynCxm/m/ILX7aiBBia5rQ=;
-        b=c936dJdS+klt0g7Gfqk/Mppy7C2yc9+MUuG+HEpZgCtbA7AxXE7PCak1Qh6QKPXDT8
-         5BhTZN/oSAGMAr2aasFtofZmiCYj1MRwZO1hpYSCEiqLZ8lmhYkCA4llMd0wgUrbB7/1
-         kPjgShdOn+F5AMnkrncIzh8yntMXnHN5RzIQ6gQWbR1MgFEAjoNx5OVAd769Zt0KKSSF
-         utLy5LNS7RmGDLbYDbOt9Mf2pvQqsPEk/eS+SYHgC5iXgLRAb5hJv8DfxI2nXJ8auQpp
-         poWaFBh+N+on1cVG6DR8qDZTOfe/vSumfrxUiTOQLMu6YTdrse5qUh9IOQhqeoG5AGmp
-         1g2w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706683251; x=1707288051;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ho0Ox6SO1ixDdJOhOQI40PynCxm/m/ILX7aiBBia5rQ=;
-        b=TmMzA+W5txANupwRD6AqSWDWc6wz60eQPZYN/3uGJ8TMRpRxLVv7rv5C1kRCqvZJcs
-         RaHIBGiawqKudXGu+KXRzFCLdEzQco3xcZLdcq/RlizT9P8I64Lew2Ynf+zOdBn2gxNe
-         hRNWUNKFaKNw7kCOxNiYqU3vJOiBvQ4SaYKm3qXF4wUgu/u75ScbHPK4l2J5yzfC5EXF
-         icRyxCxzievtnfaTy4VAr5OAJCsGvmj3dnvK190/mcDTMExLBcX6RaYt89QgXX+gkwSa
-         G4Jvkq4ioPFgO8pr74RGy/1g2rIwJ9KrafIUujpQnX4Hwl7HHPnngWBeHIgXaxaH2JGq
-         yTmQ==
-X-Gm-Message-State: AOJu0Yy10JDb+28V+tRG4Y5sA7QOd3IK7wXb8ay/TAMBKfYB9T8ZWaZa
-	NS1lWIU61UcUEQERzxgKgQFuMyYiNXO0BSavsgIXhg+gKmSgH3pp/Gf2wEghLd4=
-X-Google-Smtp-Source: AGHT+IH+3CxGJXsDfO7gX8PlgCIhLIlIelEX0vPevI89GfHGOFpXbJh9/dSAztyQdqKtWxlxRgNOug==
-X-Received: by 2002:a25:2fc1:0:b0:dc6:54c5:2862 with SMTP id v184-20020a252fc1000000b00dc654c52862mr780064ybv.3.1706683251556;
-        Tue, 30 Jan 2024 22:40:51 -0800 (PST)
-Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:7a8:850:239d:3ddc])
-        by smtp.gmail.com with ESMTPSA id y9-20020a2586c9000000b00dc228b22cd5sm3345683ybm.41.2024.01.30.22.40.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 30 Jan 2024 22:40:51 -0800 (PST)
-From: thinker.li@gmail.com
-To: netdev@vger.kernel.org,
-	ast@kernel.org,
-	martin.lau@linux.dev,
-	kernel-team@meta.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	liuhangbin@gmail.com
-Cc: sinquersw@gmail.com,
-	kuifeng@meta.com,
-	Kui-Feng Lee <thinker.li@gmail.com>
-Subject: [PATCH net-next 5/5] selftests/net: Adding test cases of replacing routes and route advertisements.
-Date: Tue, 30 Jan 2024 22:40:41 -0800
-Message-Id: <20240131064041.3445212-6-thinker.li@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240131064041.3445212-1-thinker.li@gmail.com>
-References: <20240131064041.3445212-1-thinker.li@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387CF5DF17;
+	Wed, 31 Jan 2024 07:23:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706685807; cv=fail; b=u8kY6vmziaYxedOHiOWX5s9/kpcS6h7/gDl4AEsMc5qXWvAdbRvrPFPxnALIRHwT84yZ1kx+8liHYdovuFgJfLpzAYt5llZpudSbj3bqOmmR4pBcZzbv0ZRpKXKixhcUvgIcovrsQDfTZ7wkC2C1Fb5zyijwm3627thg1Y7o8ak=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706685807; c=relaxed/simple;
+	bh=ePZYUxhjQwXMSrxI23vOjcoO9konj5cWE98gTj8GB64=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=o5USl7nCNCWBBjgCxRqEmWQ0s/9+QCswyHsDh0lQCzI0rmaUc90BefPR+F2NP4+D4YWIbmT/gBqZrL9TYyao1DIwtQ26nzuVwc/cuXo5Hno50G2BQxzAbB9UbAqhzCpV2T0odwf3dgpGiHmtLUqZbUXD17weva+OROXVnocpXyY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=GTYhFukk; arc=fail smtp.client-ip=40.107.101.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FivzFalnSgJFvddjgu+5SCVXmyYaOxZqtkxFVzsm7XpBu7As2gzPvxplPPXkOQIZoLmtrhN6TIjXwi4SoBqxwqENTL7K99eR0DzUUPTjotgdVVJ2QcrvXC7dNYRtSs9zBHuNnb8/39vtVstROA5Lx9ySSpF/fAPWVmH5rpP2pdHO9o3NpEzn/pB5qWzENLMd+gGIJ4xGZ5soEPqHe7gNP3wCv8uCd95CoJiukGBgbZtuNpHKTkmMxEAcDdalPjOeRyecjXQShvfab4JyE9Z8Qs7DlJjVKjZ1azJ/LC1DwKWW/LQRidRq2dCKwewerS4Jt37Iyw/zzhVIeSlSCR+adw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=j/HGS/ySax6AXEje74So19UMHCH2y6cgVR6IK/9Mxao=;
+ b=oOhfaIt3RpuiwugdTxm/gqmEqLf+8fnGXt36HzgWEK6RwC7Ui0MUWzwyObphpdY8KnH5fFBOqj3nJpKcXV1vvlYRWU8PwdAcwscGqn/N4K6VLpvocLf05qgcinyOh7d+JtDBkRnok+ZMdIEC+3Ml8a0D5hOTpZkaDpGf6WismsX6+gdFDHwpSjxagaOpgz2fNBDppjZG0fKK0GpcsgU4YW0dIWbveQsAq3D6B3vHAlH9ldzeMhzQ2yOx3N4P9Qe8wHu8VuyTdUN1EUOmxswEOfe2vT9/dYRswaaAVwMtwNu2HyFEyP74jEmYACUsrpVrTdxvdBlp2sRn5Mq5my5aGA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=j/HGS/ySax6AXEje74So19UMHCH2y6cgVR6IK/9Mxao=;
+ b=GTYhFukkPu9LOPNrArkqIgV6t77irfl5tkKTWzGRBLKL18DnKLABo1MH4JoSQVB/Hm8v5ISwdydqw7yqRLCqppcADW40yR9uiM9TDIey/FY8sMymcM7Dgx8KkUUROodbjXDZGZ6daF3+jyrKpUWxDKPb/U2xCKNs3iNLGrofTa4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5946.namprd12.prod.outlook.com (2603:10b6:208:399::8)
+ by SJ1PR12MB6097.namprd12.prod.outlook.com (2603:10b6:a03:488::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.24; Wed, 31 Jan
+ 2024 07:23:21 +0000
+Received: from BL1PR12MB5946.namprd12.prod.outlook.com
+ ([fe80::1602:61fd:faf5:d6e2]) by BL1PR12MB5946.namprd12.prod.outlook.com
+ ([fe80::1602:61fd:faf5:d6e2%5]) with mapi id 15.20.7228.029; Wed, 31 Jan 2024
+ 07:23:20 +0000
+Message-ID: <279fc3e5-8470-4c46-ae42-7d345555a209@amd.com>
+Date: Wed, 31 Jan 2024 12:53:11 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/3] dt-bindings: net: cdns,macb: Add
+ wol-arp-packet property
+Content-Language: en-GB
+To: Conor Dooley <conor@kernel.org>
+Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, linux@armlinux.org.uk, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, git@amd.com
+References: <20240130104845.3995341-1-vineeth.karumanchi@amd.com>
+ <20240130104845.3995341-3-vineeth.karumanchi@amd.com>
+ <20240130-smartness-relish-d7f13adcb18d@spud>
+From: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
+In-Reply-To: <20240130-smartness-relish-d7f13adcb18d@spud>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PN2PR01CA0208.INDPRD01.PROD.OUTLOOK.COM
+ (2603:1096:c01:e9::16) To BL1PR12MB5946.namprd12.prod.outlook.com
+ (2603:10b6:208:399::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5946:EE_|SJ1PR12MB6097:EE_
+X-MS-Office365-Filtering-Correlation-Id: b617cdf8-8d16-465e-ba69-08dc222d8089
+X-LD-Processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Cnf/s3AFizDQyS5O2U8MdpDjblpZTjuE2eWpw+Z93vt0I0NdzOqXtANFRFjsUdSEgVCbzNLrbE0zuCQlt/qxc19YwtIt/1LCceyfQXruTygnql80GE83D5d9ZNbTRs0tqY2mruNK01ZMPf2ATB3ZbLcxyHrv3630YcDPIxhE9d/UJRnbf5VTH+jLq8s32Q/CUXK+FxMuvgYSWRtpkm0TBHCiKVdnlyFjrpIOtKfELaaxqrzhDBeFQ+SIu6ayQNSwBCYKcyKJz1dwjnPTix3uTbSoxBjKDjN4iHIo4dORtmfChLle+7xvR7KWkMMYDjGQhNo3khOgaBkEyuko+q1ibRHWqezHV8WZhsCtv1B+L5d/jfSJif5V2B002MuXmNbd9zyIncvBwvDkE+t7DxPb6nzy7gXSffIeSpvn9WuYFnzTuMaWDE0ongthXFwRCdE6Bth5Rzgasio/QrU70oEpNxGbYZG9+wwEk6/tqlC7Wfzcx94VWp5jwlR5YphKt47ROSalIR5aR1lDaUzKav+B49WDLOdnKTb3zI0j35YLSgXbVWeY0nNolupvM/jhVpFxxqGCrC89arA81aAuDq9pF3BAQ+Z/iDlVJx5P9CyPA3eKcHP0fefd6JcMGxXedTjKe7sIuytBvbxSGNzcADwDhw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5946.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(39860400002)(136003)(346002)(366004)(376002)(230922051799003)(64100799003)(186009)(1800799012)(451199024)(41300700001)(66946007)(4326008)(8676002)(8936002)(44832011)(2906002)(7416002)(5660300002)(31696002)(86362001)(66556008)(66476007)(316002)(36756003)(6916009)(38100700002)(53546011)(6506007)(6512007)(478600001)(6486002)(6666004)(83380400001)(26005)(2616005)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TXdqekNPSFNYbUlQZlNXM3ZnQzI1U2NxSkRJcHh0MjU1M1E2ZWowUHphWkJa?=
+ =?utf-8?B?bHhHU3JWVHF3MG9sZ2o3TjJYdHVvdGI2OXhqY29GQnUzZ1VncU56SjhYOEpP?=
+ =?utf-8?B?clIvY0FWSXh1WEJRYnU1cmtRSHM2czI2Q3AzOEZmTkJHbXd5SjFDOG5ja3k3?=
+ =?utf-8?B?VnVhMlVDVkZXOEtnNFRxM3MrdTJXb3BvMUFYSkZTSWlZRmRSSUhaL2hWbmph?=
+ =?utf-8?B?dnlraEMxRHdrVE1SZGRFQnhMYm9Mb0hySm1ZMjN6WldGWmJ0T2ZkMDM2T2Rv?=
+ =?utf-8?B?MzBVLzNpSFZGaWtRbjBqOVE3ZDdxTHBZeTZDMkIzSFpEeHdrdFlhY1F6Um9N?=
+ =?utf-8?B?Q0tON2N5a1pBMzByRVpFWEtmMVBreE5FVDgwT2dwZHp3TXhBTFo1b3BORGov?=
+ =?utf-8?B?b0MrQ2hWNytBcHBIdnB2SVBEM09mZktIbE1URU0zNVhRVUI5RVZpejkxeits?=
+ =?utf-8?B?VTRBRndyNHVNWEJKbUZZS1N1MTNJL0R3QlNNWDJsVWh1QktZM2xoUldlamZO?=
+ =?utf-8?B?V1A2YWl5WEs0UjVJSVdOeUJIS0Y4TEtaQ0tWZEQ1WVVEOThFVVhoNGsrckl3?=
+ =?utf-8?B?MU1ER2ZUNXZKS250cFdka2N5Qkx5QjNmejQ2K1l1bzVJQzJJL0tVekpVZm9h?=
+ =?utf-8?B?MlBOcXNHZW15b1JqWk1IamJWaWplM1Vkb1lybW1GWjBIdFBoNWJaSDdtQnN3?=
+ =?utf-8?B?OVJvMTVxYlVkd1ZMVWFHQ3NZR3RhbFprZE9QbldJVTlMSlQyditoTWh0UldX?=
+ =?utf-8?B?eElFU3BXZlhQSmtOcDJkY0NnRjVaSUdURmMzcGU4bGpvNG94NFJYanY2c3F5?=
+ =?utf-8?B?YUwycTJNMWVrbWhRVWdEaWN2OEY3WXlwN0p3MzQveFErMTREa1N2Z05BR0lh?=
+ =?utf-8?B?NTFNMFAzSkFuYXdsNlVhVVN4NmdHNFJMRnhzUTJWQ2pPUS8yUW1MbDZEZXJz?=
+ =?utf-8?B?Q3ZoRkM1cFc4bnhiOEZ3dEF4clArWUt3Y1RTaWpUK3RCeVMrdElWaXM4dFZk?=
+ =?utf-8?B?TjZ6cHNPbWxFNm1RYVdXWUR5YURQbGxMTVh3ZXR4ZzJXckFFL2l4MHRXMWEv?=
+ =?utf-8?B?OFVDSlQ4NERsUXgzdG9lRHJOaWJLTmxVRzBkeWoweFhDd0MzVDV3UVMyWGdh?=
+ =?utf-8?B?UGlnaUxPQk5PaUZJRjFwVEQ0SFRwbEF2WHdIa1NjWmVERXpieURtYkIrU2JN?=
+ =?utf-8?B?UUZaOW1ZeGd2Yk1sam5mK0k0Sm8xeGpNbkFKcVRQQlF6d09BZ1Q2em1KNjJr?=
+ =?utf-8?B?TnIxNGo1cjhNWXpUK0ZOWkJPdHhqQ1M5NXFqMENOVm9VQVVWTmd6Y2ZQbSs1?=
+ =?utf-8?B?dHJzeGJCMkxmaE1kdGwwbG9vOTZvNVR2T3RIdWU2Rk9hUUhLY1FadGhYTExq?=
+ =?utf-8?B?c0hOTzVlN0RLcUVzbDk1cFVUK3d3SStjak01SFNMT2JDOUJRTUw0RGdVOGdq?=
+ =?utf-8?B?ZzhhT1F1QWZrYndzRFhLelJEV0Z0VUI5UXp6M2ZuYmhiWHFRMWZrV1Z6akFD?=
+ =?utf-8?B?M0h2TWk3QXhPdDRXTkhVR0IwSFFoa2xUa21aRW9veUQ2MlljemNFRSs3c3c1?=
+ =?utf-8?B?TnFMMUxoR05iN1JPUFFLemFKMk1TZ0VLQmxzZm4vS2RuK0tveFYrMklUUzJF?=
+ =?utf-8?B?TnkvNkduK0xvaUtWbjJkcUpYYWx5WUF0RksrbUcrdUw2OStueVNFVHJWRVgw?=
+ =?utf-8?B?RzJ3TDJxT3gwTTRKUzhpbGVIYUdsRVNRaExpbUp2WGFUOHlIcFdOTE9BU0RH?=
+ =?utf-8?B?SkhDdlNWTWF3NlE3bzBValNjVy9BSXAwUTZNNkhkeDBOOGZXc1BoSlhFcVlP?=
+ =?utf-8?B?NytwWkpFMUpmcU1XeVo0VUhJbVpiTE4rVkZYRG1KeG5OVmE2UTd2dzQwYnZ0?=
+ =?utf-8?B?Z2pub3UzTFVBcmFadHRtR0EybHRNVDlUREJIc1E4TWpEbzVIdXdJOW41M1dp?=
+ =?utf-8?B?d1BFcnowdVhKVEtseXAyVXdsK2FMbkc4cXpTclFDN2hKMzN4WVpEOGdYNDhR?=
+ =?utf-8?B?Z2FINS9pWDdSbTNsL294UHdPTnc2Z2F5RWVraFArcEdTbTJtOTdtZ3p4NWtQ?=
+ =?utf-8?B?TDJzMms0aE5la2U0Mm5qV3JmaG1WRFZUSnhLTXRPVVVqZ2duUDNTNkxnZGZo?=
+ =?utf-8?Q?llRkcnx9+ouc3Z/EG4oinOR5l?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b617cdf8-8d16-465e-ba69-08dc222d8089
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5946.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jan 2024 07:23:20.7874
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YOmSF5dRah2ol3x2Pl0ZvyTh8lKQHfLb7hqnXWRHHecpkJviA/kpHbTiWs+viFG/
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6097
 
-From: Kui-Feng Lee <thinker.li@gmail.com>
+Hi Conor,
 
-Add tests of changing permanent routes to temporary routes and the reversed
-case to make sure GC working correctly in these cases.  Add tests for the
-temporary routes from RA.
+On 30/01/24 11:00 pm, Conor Dooley wrote:
+> On Tue, Jan 30, 2024 at 04:18:44PM +0530, Vineeth Karumanchi wrote:
+>> "wol-arp-packet" property enables WOL with ARP packet.
+>> It is an extension to "magic-packet for WOL.
+> 
+> If it is an extension to "magic-packet" why does it not depend on
+> "magic-packet"? Are there systems that would only support the magic arp
+> packet but a regular magic packet?
+> 
 
-The existing device will be deleted between tests to remove all routes
-associated with it, so that the earlier tests don't mess up the later ones.
+The IP version on ZU+ and Versal supports the below combinations for WOL 
+event:
 
-Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
----
- tools/testing/selftests/net/fib_tests.sh | 159 +++++++++++++++++++++--
- 1 file changed, 148 insertions(+), 11 deletions(-)
+1. Magic packet (Wake-on magic packet only)
+2. ARP (Wake-on ARP packet only)
+3. Magic packet or ARP (Wake-on magic or ARP packets)
 
-diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
-index b3ecccbbfcd2..f69b55304ebb 100755
---- a/tools/testing/selftests/net/fib_tests.sh
-+++ b/tools/testing/selftests/net/fib_tests.sh
-@@ -743,6 +743,16 @@ fib_notify_test()
- 	cleanup &> /dev/null
- }
- 
-+# Create a new dummy_10 to remove all associated routes.
-+reset_dummy_10()
-+{
-+	$IP link del dev dummy_10
-+
-+	$IP link add dummy_10 type dummy
-+	$IP link set dev dummy_10 up
-+	$IP -6 address add 2001:10::1/64 dev dummy_10
-+}
-+
- fib6_gc_test()
- {
- 	setup
-@@ -768,15 +778,19 @@ fib6_gc_test()
- 	    $IP -6 route add 2001:20::$i \
- 		via 2001:10::2 dev dummy_10 expires $EXPIRE
- 	done
--	sleep $(($EXPIRE * 2))
--	N_EXP_SLEEP=$($IP -6 route list |grep expires|wc -l)
--	if [ $N_EXP_SLEEP -ne 0 ]; then
--	    echo "FAIL: expected 0 routes with expires, got $N_EXP_SLEEP"
-+	sleep $(($EXPIRE * 2 + 1))
-+	N_EXP=$($IP -6 route list |grep expires|wc -l)
-+	if [ $N_EXP -ne 0 ]; then
-+	    echo "FAIL: expected 0 routes with expires, got $N_EXP"
- 	    ret=1
- 	else
- 	    ret=0
- 	fi
- 
-+	log_test $ret 0 "ipv6 route garbage collection"
-+
-+	reset_dummy_10
-+
- 	# Permanent routes
- 	for i in $(seq 1 5000); do
- 	    $IP -6 route add 2001:30::$i \
-@@ -788,19 +802,142 @@ fib6_gc_test()
- 	    $IP -6 route add 2001:20::$i \
- 		via 2001:10::2 dev dummy_10 expires $EXPIRE
- 	done
--	sleep $(($EXPIRE * 2))
--	N_EXP_SLEEP=$($IP -6 route list |grep expires|wc -l)
--	if [ $N_EXP_SLEEP -ne 0 ]; then
--	    echo "FAIL: expected 0 routes with expires," \
--		 "got $N_EXP_SLEEP (5000 permanent routes)"
-+	sleep $(($EXPIRE * 2 + 1))
-+	N_EXP=$($IP -6 route list |grep expires|wc -l)
-+	if [ $N_EXP -ne 0 ]; then
-+	    echo "FAIL: expected 0 routes with expires, got $N_EXP"
- 	    ret=1
- 	else
- 	    ret=0
- 	fi
- 
--	set +e
-+	log_test $ret 0 "ipv6 route garbage collection (with permanent routes)"
- 
--	log_test $ret 0 "ipv6 route garbage collection"
-+	reset_dummy_10
-+
-+	# Permanent routes
-+	for i in $(seq 1 100); do
-+	    $IP -6 route add 2001:20::$i \
-+		via 2001:10::2 dev dummy_10
-+	done
-+	# Replace with temporary routes
-+	for i in $(seq 1 100); do
-+	    # Expire route after $EXPIRE seconds
-+	    $IP -6 route replace 2001:20::$i \
-+		via 2001:10::2 dev dummy_10 expires $EXPIRE
-+	done
-+	N_EXP=$($IP -6 route list |grep expires|wc -l)
-+	if [ $N_EXP -ne 100 ]; then
-+	    log_test 1 0 "expected 100 routes with expires, got $N_EXP"
-+	    set +e
-+	    cleanup &> /dev/null
-+	    return
-+	fi
-+	# Wait for GC
-+	sleep $(($EXPIRE * 2 + 1))
-+	N_EXP=$($IP -6 route list |grep expires|wc -l)
-+	if [ $N_EXP -ne 0 ]; then
-+	    echo "FAIL: expected 0 routes with expires, got $N_EXP"
-+	    ret=1
-+	else
-+	    ret=0
-+	fi
-+
-+	log_test $ret 0 "ipv6 route garbage collection (replace with expires)"
-+
-+	reset_dummy_10
-+
-+	# Temporary routes
-+	for i in $(seq 1 100); do
-+	    # Expire route after $EXPIRE seconds
-+	    $IP -6 route add 2001:20::$i \
-+		via 2001:10::2 dev dummy_10 expires $EXPIRE
-+	done
-+	# Replace with permanent routes
-+	for i in $(seq 1 100); do
-+	    $IP -6 route replace 2001:20::$i \
-+		via 2001:10::2 dev dummy_10
-+	done
-+	N_EXP=$($IP -6 route list |grep expires|wc -l)
-+	if [ $N_EXP -ne 0 ]; then
-+	    log_test 1 0 "expected 0 routes with expires, got $N_EXP"
-+	    set +e
-+	    cleanup &> /dev/null
-+	    return
-+	fi
-+
-+	# Wait for GC
-+	sleep $(($EXPIRE * 2 + 1))
-+
-+	N_PERM=$($IP -6 route list |grep -v expires|grep 2001:20::|wc -l)
-+	if [ $N_PERM -ne 100 ]; then
-+	    echo "FAIL: expected 100 permanent routes, got $N_PERM"
-+	    ret=1
-+	else
-+	    ret=0
-+	fi
-+
-+	log_test $ret 0 "ipv6 route garbage collection (replace with permanent)"
-+
-+	# ra6 is required for the next test. (ipv6toolkit)
-+	if [ ! -x "$(command -v ra6)" ]; then
-+	    echo "SKIP: ra6 not found."
-+	    set +e
-+	    cleanup &> /dev/null
-+	    return
-+	fi
-+
-+	# Delete dummy_10 and remove all routes
-+	$IP link del dev dummy_10
-+
-+	# Create a pair of veth devices to send a RA message from one
-+	# device to another.
-+	$IP link add veth1 type veth peer name veth2
-+	$IP link set dev veth1 up
-+	$IP link set dev veth2 up
-+	$IP -6 address add 2001:10::1/64 dev veth1 nodad
-+	$IP -6 address add 2001:10::2/64 dev veth2 nodad
-+
-+	# Without stopping these two services, systemd may mess up the test
-+	# by intercepting the RA message and adding routes.
-+	if [ -x "$(command -v systemctl)" ]; then
-+	    systemctl stop systemd-networkd.socket
-+	    systemctl stop systemd-networkd.service
-+	fi
-+	# Make veth1 ready to receive RA messages.
-+	$NS_EXEC sysctl -w net.ipv6.conf.veth1.accept_ra=2 &> /dev/null
-+	$NS_EXEC sysctl -w net.ipv6.conf.veth1.accept_ra_rt_info_max_plen=127 &> /dev/null
-+
-+	# Send a RA message with a route from veth2 to veth1.
-+	$NS_EXEC ra6 -i veth2 -d 2001:10::1 -R "2003:10::/64#1#$EXPIRE" -t $EXPIRE
-+
-+	# Wait for the RA message.
-+	sleep 1
-+
-+	# There are 2 routes with expires. One is a default route and the
-+	# other is the route to 2003:10::/64.
-+	N_EXP=$($IP -6 route list |grep expires|wc -l)
-+	if [ $N_EXP -ne 2 ]; then
-+	    log_test 1 0 "expected 2 routes with expires, got $N_EXP"
-+	    set +e
-+	    cleanup &> /dev/null
-+	    return
-+	fi
-+
-+	# Wait for GC
-+	sleep $(($EXPIRE * 2 + 1))
-+
-+	N_EXP=$($IP -6 route list |grep expires|wc -l)
-+	if [ $N_EXP -ne 0 ]; then
-+	    echo "FAIL: expected 0 routes with expires, got $N_EXP"
-+	    ret=1
-+	else
-+	    ret=0
-+	fi
-+
-+	log_test $ret 0 "ipv6 route garbage collection (RA message)"
-+
-+	set +e
- 
- 	cleanup &> /dev/null
- }
--- 
-2.34.1
+The existing DT binding already has one entry for
+wol via magic packet. We are adding ARP packet support to the existing 
+implementation.
 
+I will change the commit message in v2.
+
+>>
+>> Signed-off-by: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
+>> ---
+>> 7c4a1d0cfdc1 net: macb: make magic-packet property generic
+>> which added magic-property support and wol-arp-packet addition
+>> is similar extension.
+>> ---
+>>   Documentation/devicetree/bindings/net/cdns,macb.yaml | 5 +++++
+>>   1 file changed, 5 insertions(+)
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/cdns,macb.yaml b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+>> index bf8894a0257e..4bea177e85bc 100644
+>> --- a/Documentation/devicetree/bindings/net/cdns,macb.yaml
+>> +++ b/Documentation/devicetree/bindings/net/cdns,macb.yaml
+>> @@ -144,6 +144,11 @@ patternProperties:
+>>           description:
+>>             Indicates that the hardware supports waking up via magic packet.
+>>   
+>> +      wol-arp-packet:
+> 
+> Bikeshedding perhaps, but why not call it "magic-arp-packet" if it has
+> the same function as the other property here?
+> 
+
+Magic packet and ARP packets are two different wol events.
+IP supports configuring in the above-mentioned ways.
+Hence, I think it would be good to not mix with magic packet.
+
+Please let me know your suggestions/comments.
+
+Thanks,
+Vineeth 🙏
+
+> Thanks,
+> Conor.
+> 
+>> +        type: boolean
+>> +        description:
+>> +          Indicates that the hardware supports waking up via ARP packet.
+>> +
+>>       unevaluatedProperties: false
+>>   
+>>   required:
+>> -- 
+>> 2.34.1
+>>
 
