@@ -1,105 +1,126 @@
-Return-Path: <netdev+bounces-67618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 259118445CC
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 18:15:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 284BF84458B
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 18:06:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88C47B24350
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 16:56:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B74AA1F244AF
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 17:06:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1CDF12F591;
-	Wed, 31 Jan 2024 16:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RuKpwUpG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91C2312C52B;
+	Wed, 31 Jan 2024 17:05:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACF9712F58B;
-	Wed, 31 Jan 2024 16:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2B9A84A3C;
+	Wed, 31 Jan 2024 17:05:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706719986; cv=none; b=gisDFqdlll80jUVYA3Vvc/w+BNkwyMgi4P31iCYINn7udbNHw51ywFMLwgZG7AaaYVYDvOIgYDwZEcwOtKH6TlKaYuAlYh1JKFHG38DO9BI6vtvZQINJhcWywD3G2Wd5d+m3JY6BsfPYRUBiJXtjB+IJPz9HO3Ymva/ItkHoRbk=
+	t=1706720755; cv=none; b=rG0FQWF+04idBdJMuR9QKLmraUO+JZ20HI+pXPqhZ0r7VTr7Ag/4XxRWVvXnUxKFF2QmQCXMbp/XrJJIr4EFGoxI9JenxTd+5I45Iix7RZrYAGvgYN/0+7mhMh1P6iWg6Ay8uIprI6TcsqdYHbAcbQmZlEbtxfxmhHykox9RJXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706719986; c=relaxed/simple;
-	bh=zy8loWPlJ2ue1zAlO45Uz6DlMoGbTgu9KTb2TSAx9Dg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DF6cn84P/QV3dxqcSZo/PiVd306DCd8VHrlx3HEyRUXmkxrhOcIGkgEzN1zKls2e5wrMeAUjIzZUDuJ1Uux1k7CfkyNphjFVSqs8rjcfNvoENrZ/vQDgmNcDsoG/r041Yl0YFxduaKvNTVLZ5pyp5sTq9/mVTKY1Oi9w6N6i890=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RuKpwUpG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED486C433C7;
-	Wed, 31 Jan 2024 16:53:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706719986;
-	bh=zy8loWPlJ2ue1zAlO45Uz6DlMoGbTgu9KTb2TSAx9Dg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RuKpwUpGGfnUqH+2fMz5oQqgPYtX3W74FoLl2ZbQGgeOPWmKc9hM3Z+7XWpKqU953
-	 WGLdeII21u1OcZMGbIUUOe/MH0JK87A4waxOJjcitWIjjB+vb/x/Nio1OoVNZEpu1J
-	 zZ2Eac2xjV1toXWsOvl5777MshK/9fK9q40TUyJFolPu3GwsIT+bOpEz2WN5NAtClz
-	 L/BZye/SSIA2i68ZUahanCs14gxwxViXk1X/BOScv2xpJVLazsVIpX18YkJ9n+LLzC
-	 R/2xeZB9IEipsLsJUAe65ZC0JIvJOCTOj4wRIn7UMG5y/3E8owHLKH+xoLOwNA4yOm
-	 xheeuNt3FXQIQ==
-Date: Wed, 31 Jan 2024 17:52:58 +0100
-From: Simon Horman <horms@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1706720755; c=relaxed/simple;
+	bh=uJl5pmP7pzP0qSuDUSpGf4Bz6mdCugoDwzVWMXmOkvQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UaIPMkjVpWRV/RdqmNJvwPAfXVLOEKfeyebFacTGFIlTVK1TO1qiLcW3B2eSnnblpR6Kemdkv/N5NWwvQ6zfgF/Ul0QC7TObEVq2Aj1qxmJDr3fjDcP9VCXICfdzh83L+8BBkJi5z4EMqgpm9Cm8PWk58tfFKK4900dbZcRjX4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-IronPort-AV: E=Sophos;i="6.05,231,1701097200"; 
+   d="scan'208";a="196315512"
+Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
+  by relmlie6.idc.renesas.com with ESMTP; 01 Feb 2024 02:05:46 +0900
+Received: from GBR-5CG2373LKG.adwin.renesas.com (unknown [10.226.92.158])
+	by relmlir6.idc.renesas.com (Postfix) with ESMTP id BE78A40344F5;
+	Thu,  1 Feb 2024 02:05:42 +0900 (JST)
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Christoph Hellwig <hch@lst.de>,
-	Marek Szyprowski <m.szyprowski@samsung.com>,
-	Robin Murphy <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
-	Will Deacon <will@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Alexander Duyck <alexanderduyck@fb.com>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, iommu@lists.linux.dev,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Paul Barker <paul.barker.ct@bp.renesas.com>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	netdev@vger.kernel.org,
+	linux-renesas-soc@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/7] dma: compile-out DMA sync op calls when not
- used
-Message-ID: <20240131165258.GA401365@kernel.org>
-References: <20240126135456.704351-1-aleksander.lobakin@intel.com>
- <20240126135456.704351-2-aleksander.lobakin@intel.com>
+Subject: [PATCH net-next 0/8] Improve GbEth performance on Renesas RZ/G2L and related SoCs
+Date: Wed, 31 Jan 2024 17:05:14 +0000
+Message-Id: <20240131170523.30048-1-paul.barker.ct@bp.renesas.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240126135456.704351-2-aleksander.lobakin@intel.com>
 
-On Fri, Jan 26, 2024 at 02:54:50PM +0100, Alexander Lobakin wrote:
-> Some platforms do have DMA, but DMA there is always direct and coherent.
-> Currently, even on such platforms DMA sync operations are compiled and
-> called.
-> Add a new hidden Kconfig symbol, DMA_NEED_SYNC, and set it only when
-> either sync operations are needed or there is DMA ops or swiotlb
-> enabled. Set dma_need_sync() and dma_skip_sync() (stub for now)
-> depending on this symbol state and don't call sync ops when
-> dma_skip_sync() is true.
-> The change allows for future optimizations of DMA sync calls depending
-> on compile-time or runtime conditions.
-> 
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+This series aims to improve peformance of the GbEth IP in the Renesas
+RZ/G2L SoC family and the RZ/G3S SoC, which use the ravb driver. Along
+the way, we do some refactoring and ensure that napi_complete_done() is
+used in accordance with the NAPI documentation.
 
-Hi Alexander,
+Performance improvment mainly comes from enabling SW IRQ Coalescing for
+all SoCs using the GbEth IP, and NAPI Threaded mode for single core SoCs
+using the GbEth IP. These can be enabled/disabled at runtime via sysfs,
+but our goal is to set sensible defaults which get good performance on
+the affected SoCs.
 
-This seems to cause x86_64 allmodconfig builds to fail:
+Changes are made specific to the GbEth IP, avoiding potential impact on
+the other Renesas R-Car based SoCs which also use the ravb driver. This
+follows the principle of only submitting patches that we can fully test.
 
- ../drivers/media/platform/ti/omap3isp/ispstat.c:82:35: error: ‘dma_sync_single_range_for_device’ undeclared (first use in this function); did you mean ‘dma_sync_sgtable_for_device’?
-    82 |                                   dma_sync_single_range_for_device);
-       |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-       |                                   dma_sync_sgtable_for_device
- ../drivers/media/platform/ti/omap3isp/ispstat.c:82:35: note: each undeclared identifier is reported only once for each function it appears in
- ../drivers/media/platform/ti/omap3isp/ispstat.c: In function ‘isp_stat_buf_sync_magic_for_cpu’:
- ../drivers/media/platform/ti/omap3isp/ispstat.c:94:35: error: ‘dma_sync_single_range_for_cpu’ undeclared (first use in this function); did you mean ‘dma_sync_sgtable_for_cpu’?
-    94 |                                   dma_sync_single_range_for_cpu);
-       |                                   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-       |                                   dma_sync_sgtable_for_cpu
+The performance impact of this series on iperf3 testing is as follows:
+  * RZ/G2L Ethernet throughput is unchanged, but CPU usage drops:
+      * Bidirectional and TCP RX: 6.5% less CPU usage
+      * UDP RX: 10% less CPU usage
+
+  * RZ/G2UL and RZ/G3S Ethernet throughput is increased for all test
+    cases except UDP TX, which suffers a slight loss:
+      * TCP TX: 32% more throughput
+      * TCP RX: 11% more throughput
+      * UDP TX: 10% less throughput
+      * UDP RX: 10183% more throughput - the previous throughput of
+        1.06Mbps is what prompted this work.
+
+  * RZ/G2N CPU usage and Ethernet throughput is unchanged (tested as a
+    representative of the SoCs which use the R-Car based RAVB IP).
+
+This series depends on:
+  * "net: ravb: Let IP-specific receive function to interrogate descriptors" v5
+    https://lore.kernel.org/all/20240131084133.1671440-2-claudiu.beznea.uj@bp.renesas.com/
+
+To get the results shown above, you'll also need:
+  * "topology: Set capacity_freq_ref in all cases"
+    https://lore.kernel.org/all/20240117190545.596057-1-vincent.guittot@linaro.org/
+
+  * "ravb: Add Rx checksum offload support" v2
+    https://lore.kernel.org/all/20240124102115.132154-2-biju.das.jz@bp.renesas.com/
+
+  * "ravb: Add Tx checksum offload support" v2
+    https://lore.kernel.org/all/20240124102115.132154-3-biju.das.jz@bp.renesas.com/
+
+Work in this area will continue, in particular we expect to improve
+TCP/UDP RX performance further with future changes to RX buffer
+handling.
+
+Paul Barker (8):
+  net: ravb: Split R-Car & GbEth poll functions
+  net: ravb: Simplify GbEth poll & receive functions
+  net: ravb: Count packets in GbEth RX (not descriptors)
+  net: ravb: Always process TX descriptor ring in GbEth poll
+  net: ravb: Always update error counters
+  net: ravb: Align GbEth poll function with NAPI docs
+  net: ravb: Enable SW IRQ Coalescing for GbEth
+  net: ravb: Use NAPI threaded mode on 1-core CPUs with GbEth IP
+
+ drivers/net/ethernet/renesas/ravb.h      |   3 +-
+ drivers/net/ethernet/renesas/ravb_main.c | 103 ++++++++++++++++-------
+ 2 files changed, 74 insertions(+), 32 deletions(-)
+
+-- 
+2.39.2
+
 
