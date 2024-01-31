@@ -1,94 +1,77 @@
-Return-Path: <netdev+bounces-67398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3620E84331F
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 03:08:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A5A6843328
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 03:11:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 620EC1C21C41
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 02:08:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD9AF1F26D6C
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 02:11:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A7225240;
-	Wed, 31 Jan 2024 02:08:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC41522A;
+	Wed, 31 Jan 2024 02:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="Cjp1OFPL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hGxaNdjJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D97705223;
-	Wed, 31 Jan 2024 02:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6A35227
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 02:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706666917; cv=none; b=ijfzzVjT6jYgkH34d8UX6TT1iKlht/yyf1p175VjOC6ys0jbVZkNaiuohi4UoFsWIk+QtpKcGEY/dXJV7TX9VcgqnHd+rAfMSidnvy1S8LV14GAS8+Z1e6p07d3tNQ8Pi0xsWRUytXY+G96VHtjgMNN3jKrl6FeJxeuoLdgRe+8=
+	t=1706667061; cv=none; b=WkSavchJP06aaCfrzr8Xt8YCCa0f+IM9Eb4f1xBkJ6wROFQ1zkpc9+Y/vNaZvtGILMWAQU5VB1x58fXjStRKhzdCakx7kROfGb2U6hyOqRRqu4GQPsX69GicJ1utW7ufFcHE31YDmHo8dQtGdPWuEbcGm8Dzx9DxeR3PydpwuFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706666917; c=relaxed/simple;
-	bh=IBH1x5SGT6nGLDE7TxOtnN0YvnQkEver8imdueRKTDE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JSbVoDWdP0zoJoynYtiWJwRbI3KjACyPaBTtKbgIsFOnRTaSbkIMAj6/n18r+sK2SiIGgVQCNmEPshULW/vvRrCzw2/u5W12JFqWiUF9nH0qTqbRYR829Lpp2U3b55A4feH6/ScbfUXPUjtuHd7lv9uLE9NUvjo4dbTp3LPVQDg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=Cjp1OFPL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85027C433F1;
-	Wed, 31 Jan 2024 02:08:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1706666916;
-	bh=IBH1x5SGT6nGLDE7TxOtnN0YvnQkEver8imdueRKTDE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Cjp1OFPLc8a4EwCy4DTj45NxNuKb9gGIovN6fjagz0WBs9Q2oNt4wrBMB2wclD00Z
-	 p0/VDOa22DaYJ4worUHIaKNidJXQoBv/Wc+0N5RxM+/4Z6MpypJG8WdJ/jUL5pMgQp
-	 Gduct+iEoXTiI9szqnyCcweZ0tachHDVKilhKvHU=
-Date: Tue, 30 Jan 2024 18:08:36 -0800
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	chuck.lever@oracle.com, jlayton@kernel.org,
-	linux-api@vger.kernel.org, brauner@kernel.org, edumazet@google.com,
-	davem@davemloft.net, alexander.duyck@gmail.com,
-	sridhar.samudrala@intel.com, kuba@kernel.org,
-	willemdebruijn.kernel@gmail.com, weiwan@google.com,
-	David.Laight@aculab.com, arnd@arndb.de,
-	Jonathan Corbet <corbet@lwn.net>,
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nathan Lynch <nathanl@linux.ibm.com>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Maik Broemme <mbroemme@libmpq.org>,
-	Steve French <stfrench@microsoft.com>,
-	Julien Panis <jpanis@baylibre.com>,
-	Jiri Slaby <jirislaby@kernel.org>, Thomas Huth <thuth@redhat.com>,
-	Andrew Waterman <waterman@eecs.berkeley.edu>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH net-next v4 3/3] eventpoll: Add epoll ioctl for
- epoll_params
-Message-ID: <2024013001-prison-strum-899d@gregkh>
-References: <20240131014738.469858-1-jdamato@fastly.com>
- <20240131014738.469858-4-jdamato@fastly.com>
+	s=arc-20240116; t=1706667061; c=relaxed/simple;
+	bh=vSwmkPa7rc8q00L/39+bR76EUYlaZEGlJFWyizX5a1s=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pNrUB/FCH4K2KhxrWrPDHhwQDJuzBBMgY6/5oAc6TmKi8SUmP+nb0IfkZtKhKY25wxrUjeYg1xgoVTJh5Ctg6J0Xp9JnNdyhaUqtO/gOmQpFgXZ9GQgHNV77qPybJeJZ606kuDxJ6F1Jjtlfe07dwVMj/8cNR6S4AzR86TXjybI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hGxaNdjJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDA35C433F1;
+	Wed, 31 Jan 2024 02:10:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706667061;
+	bh=vSwmkPa7rc8q00L/39+bR76EUYlaZEGlJFWyizX5a1s=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hGxaNdjJNCOeDs6d6AcPykL6qUwC4+TvgIlIODMtj0nGouOwCh7r8LPkOS8dChzVE
+	 DNK2FqVsLxEqY/IyjgQy6rUSyhLxE5C9ypdDZ0pr2zOnQXIQYH/TbhZJKLqS0blHiK
+	 LINDb5EQP2vlHd1+8I5LenTBJeUL12RQgrN1igi4xdYELzmgjByl3bWWP5PgoyAcUz
+	 HDmuDZwHROvep1GFVgBzagyxKE39wNYLgpi8HgjFTdv0F4qJ63Ne+TICfcM0m1nDJo
+	 ox1wXoc8CaVI7ksphI5seMnR0x1AgP2sVnw9p98dcaX0LwbdZG4k/CKchLW64ci6BY
+	 fTHjNXNPDK4Dw==
+Date: Tue, 30 Jan 2024 18:10:56 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ fancer.lancer@gmail.com, Jose.Abreu@synopsys.com, chenhuacai@loongson.cn,
+ linux@armlinux.org.uk, guyinggang@loongson.cn, netdev@vger.kernel.org,
+ chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH net-next v8 00/11] stmmac: Add Loongson platform support
+Message-ID: <20240130181056.42944840@kernel.org>
+In-Reply-To: <cover.1706601050.git.siyanteng@loongson.cn>
+References: <cover.1706601050.git.siyanteng@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240131014738.469858-4-jdamato@fastly.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 31, 2024 at 01:47:33AM +0000, Joe Damato wrote:
-> +struct epoll_params {
-> +	__aligned_u64 busy_poll_usecs;
-> +	__u16 busy_poll_budget;
-> +
-> +	/* pad the struct to a multiple of 64bits for alignment on all arches */
-> +	__u8 __pad[6];
+On Tue, 30 Jan 2024 16:43:20 +0800 Yanteng Si wrote:
+> * The biggest change is according to Serge's comment in the previous
+>   edition:
 
-You HAVE to check this padding to be sure it is all 0, otherwise it can
-never be used in the future for anything.
+Looks like there's a trivial build issue here:
 
-thanks,
+ERROR: modpost: "dwmac1000_dma_ops"
+[drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.ko] undefined!
 
-greg k-h
+Please wait for Serge's review before posting v9.
+-- 
+pw-bot: cr
 
