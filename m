@@ -1,106 +1,156 @@
-Return-Path: <netdev+bounces-67540-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67541-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BC66843F57
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 13:25:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ED35843F68
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 13:28:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3BFAB2376B
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 12:25:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A7D928F65A
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 12:28:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 183A778B45;
-	Wed, 31 Jan 2024 12:25:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDF0378B45;
+	Wed, 31 Jan 2024 12:28:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BKWUsnvX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ry7vCI0k"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E017A7690E;
-	Wed, 31 Jan 2024 12:25:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A22A078695;
+	Wed, 31 Jan 2024 12:28:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706703941; cv=none; b=XcMQ9bPDOlZi+WwHwaKfQDX8w1JQKbnKI14mHecBRs5hf6PFZWfJtvZO3GJQaGkgWXb+tFhN5a53imkD/yJd5a8a5U99BmTBrQ4pJxKaSf3SZ6YAE/5jrkV1YlxYxtCxuxBcO63hXeci5evUxsn96AiRr+dNG+Ru3Fd4UaEwkmo=
+	t=1706704112; cv=none; b=WmtmbMMuIHEish0BHUArRMSBOcb7qWPed/MoFZNGUXNC+8kVYw/lTuUz4+OUheHns5rOwHzkmbi9TtrF5BnCwNu1J/lk8hYMS8IiGG3FyJ1QHOgBKomjQmTLlNMP9fyUeBdpyVzNQQq7+EFvoF96WUXcGsJJWOtaCTWnt/Zfl4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706703941; c=relaxed/simple;
-	bh=pFsCpJSLk0dh72t0fhH3sbqbPwdiOraKzWAQDmmK2Xw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gas2w6z+DyUUPAZhmEqcDDKQ6bTP6JxskTy7KNK30lRgTIEPWoSSoyKHcEQiecrK4UtNl+WZDGCcbivBtq8u9/P4E+YZLfoZXAJDeZ0O65G6030LvHg+YzCdPKMy8bM3p1XtsZ2O+JXQl1h62sz8gaPuOXq/ZgQvj1bOSl7d+po=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BKWUsnvX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3575FC433C7;
-	Wed, 31 Jan 2024 12:25:37 +0000 (UTC)
+	s=arc-20240116; t=1706704112; c=relaxed/simple;
+	bh=7PYbJpYbNE1H2oDbkMpYdoVzL0HGqhKQKxhZsry7l8w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qGHg/ecu11/+dmeio4A1tS/xC6Zwfl5cR3Z9xlQtR9LcEHIkgM2MtK5upP92XHBUBXSfdqwEkRq6hbT42UojDuBcdsm0iEHsmJSAPjvEMiyyiiFxg8Qd2kQvqOmiRGpT3kVyCAQr1y1+qq1H80TG04III+tp96SrO4PugWDO9+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ry7vCI0k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C0A4C433C7;
+	Wed, 31 Jan 2024 12:28:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706703940;
-	bh=pFsCpJSLk0dh72t0fhH3sbqbPwdiOraKzWAQDmmK2Xw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BKWUsnvXlCFIsCKmwvsVgtprb4GpHXt7/kVarXgzN9FU+EqkG3aUPMHTGnwceQR4h
-	 VojfTgj3McCQ1IAayF4Jqy+eO5iQ3ZWjO1WENIP26Cg6lrDn2YvzDBbArS/l2VI+r5
-	 8O1bXx27TXwTLe+c1L94liTE1gO/v/cq1T9IRu7/6d2rbzBE2/D9a/SsgA6uFF8XOq
-	 canyBdS75OzFpREQbXSnVbRHAJHRwKyW32ME+HLt4rLsPuZqaiC5pFzpLDObJHjw3e
-	 mB1b7SthXpeHcdVlZ1XECxatH0arF7IfJiYKCGWghX2/eBwTJM/orChLn6kWL1Y1/P
-	 t3CacpRqXGJZg==
-From: Conor Dooley <conor@kernel.org>
-To: Emil Renner Berthing <kernel@esmil.dk>,
-	Conor Dooley <conor@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Cristian Ciocaltea <cristian.ciocaltea@collabora.com>
-Cc: Conor Dooley <conor.dooley@microchip.com>,
-	linux-riscv@lists.infradead.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	kernel@collabora.com
-Subject: Re: [PATCH v6 0/4] Enable networking support for StarFive JH7100 SoC
-Date: Wed, 31 Jan 2024 12:25:30 +0000
-Message-ID: <20240131-sitter-parabola-8a2e86faa77f@spud>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20231220211743.2490518-1-cristian.ciocaltea@collabora.com>
-References: <20231220211743.2490518-1-cristian.ciocaltea@collabora.com>
+	s=k20201202; t=1706704112;
+	bh=7PYbJpYbNE1H2oDbkMpYdoVzL0HGqhKQKxhZsry7l8w=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ry7vCI0k5FJghlxZwytM/xHFCKymezqDJsGzhO1/jQHt2jWzZQqduQ9GPqMSTzD+I
+	 /Hwm3ETxKLjaPI5a0QFO4Bl/k10PLxdCJj9qHtLqgrhZSQnCP5aQucmTCzTmOchrS4
+	 tMKz3O+zOTbjFpSNroTzYsvlL0L8Czg5RRcP/Eos4ZVsUnaGyJ6ONvMOOCGnbHvdNz
+	 2IZANnCBV2pBImiLCRbjWe1xsdxCSpd7pWwqHGlSG61P96SrlOEJiWEJqG1hYKpTd7
+	 hfazQBt27z9LeWVgqmU6y82T2qPxa8KR6Z+oE8OvvntG3NY/qjdts4Ol/wmUt85qeS
+	 vmKnxwpusS00A==
+Message-ID: <91cf832e-ad66-47d0-bf2b-a8c9492d16a9@kernel.org>
+Date: Wed, 31 Jan 2024 13:28:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1081; i=conor.dooley@microchip.com; h=from:subject:message-id; bh=QpjxKADVuxDHO2HHz1mJLhLzOw0DBvtxFU1iut/HhaM=; b=owGbwMvMwCFWscWwfUFT0iXG02pJDKm7bCyjD5d2OlRF8PLW7+z+duVV4xQZhtszgq8axl4Ib TJrlfnYUcrCIMbBICumyJJ4u69Fav0flx3OPW9h5rAygQxh4OIUgIlcmsrIsHbKbM4q7dOH3UPN g3u+C264YKjs8PpRb9Lv5o67C2V3dTEy7Lv3YLK2exd3R1fLkZe5Lw8fvqb1xjF07uOUS1PsNP6 b8gIA
-X-Developer-Key: i=conor.dooley@microchip.com; a=openpgp; fpr=F9ECA03CF54F12CD01F1655722E2C55B37CF380C
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 net-next 1/5] net: add generic per-cpu page_pool
+ allocator
+Content-Language: en-US
+To: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org
+Cc: lorenzo.bianconi@redhat.com, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, bpf@vger.kernel.org,
+ toke@redhat.com, willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+ sdf@google.com, ilias.apalodimas@linaro.org
+References: <cover.1706451150.git.lorenzo@kernel.org>
+ <5b0222d3df382c22fe0fa96154ae7b27189f7ecd.1706451150.git.lorenzo@kernel.org>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <5b0222d3df382c22fe0fa96154ae7b27189f7ecd.1706451150.git.lorenzo@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Conor Dooley <conor.dooley@microchip.com>
 
-On Wed, 20 Dec 2023 23:17:38 +0200, Cristian Ciocaltea wrote:
-> This patch series adds ethernet support for the StarFive JH7100 SoC and
-> makes it available for the StarFive VisionFive V1 and BeagleV Starlight
-> boards, although I could only validate on the former SBC.  Thank you Emil
-> and Geert for helping with tests on BeagleV!
+
+On 28/01/2024 15.20, Lorenzo Bianconi wrote:
+> Introduce generic percpu page_pools allocator.
+> Moreover add page_pool_create_percpu() and cpuid filed in page_pool struct
+> in order to recycle the page in the page_pool "hot" cache if
+> napi_pp_put_page() is running on the same cpu.
+> This is a preliminary patch to add xdp multi-buff support for xdp running
+> in generic mode.
 > 
-> The work is heavily based on the reference implementation [1] and depends
-> on the SiFive Composable Cache controller and non-coherent DMA support
-> provided by Emil via [2] and [3].
+> Signed-off-by: Lorenzo Bianconi<lorenzo@kernel.org>
+> ---
+>   include/net/page_pool/types.h |  3 +++
+>   net/core/dev.c                | 40 +++++++++++++++++++++++++++++++++++
+>   net/core/page_pool.c          | 23 ++++++++++++++++----
+>   net/core/skbuff.c             |  5 +++--
+>   4 files changed, 65 insertions(+), 6 deletions(-)
 > 
-> [...]
+[...]
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index cb2dab0feee0..bf9ec740b09a 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+[...]
+> @@ -11686,6 +11690,27 @@ static void __init net_dev_struct_check(void)
+>    *
+>    */
+>   
+> +#define SD_PAGE_POOL_RING_SIZE	256
+> +static int net_page_pool_alloc(int cpuid)
 
-Applied to riscv-dt-for-next, thanks!
+I don't like the name net_page_pool_alloc().
+It uses the page_pool_create APIs.
 
-[1/4] riscv: dts: starfive: jh7100: Add sysmain and gmac DT nodes
-      https://git.kernel.org/conor/c/5ca37ca2a483
-[2/4] riscv: dts: starfive: jh7100-common: Setup pinmux and enable gmac
-      https://git.kernel.org/conor/c/6e204aa2116c
-[3/4] riscv: dts: starfive: visionfive-v1: Setup ethernet phy
-      https://git.kernel.org/conor/c/e16d3dc0a2d7
-[4/4] riscv: dts: starfive: beaglev-starlight: Setup phy reset gpio
-      https://git.kernel.org/conor/c/2db68ddbf33a
+Let us renamed to net_page_pool_create() ?
 
-Thanks,
-Conor.
+
+> +{
+> +#if IS_ENABLED(CONFIG_PAGE_POOL)
+> +	struct page_pool_params page_pool_params = {
+> +		.pool_size = SD_PAGE_POOL_RING_SIZE,
+> +		.nid = NUMA_NO_NODE,
+> +	};
+> +	struct page_pool *pp_ptr;
+> +
+> +	pp_ptr = page_pool_create_percpu(&page_pool_params, cpuid);
+> +	if (IS_ERR(pp_ptr)) {
+> +		pp_ptr = NULL;
+> +		return -ENOMEM;
+> +	}
+> +
+> +	per_cpu(page_pool, cpuid) = pp_ptr;
+> +#endif
+> +	return 0;
+> +}
+> +
+>   /*
+>    *       This is called single threaded during boot, so no need
+>    *       to take the rtnl semaphore.
+> @@ -11738,6 +11763,9 @@ static int __init net_dev_init(void)
+>   		init_gro_hash(&sd->backlog);
+>   		sd->backlog.poll = process_backlog;
+>   		sd->backlog.weight = weight_p;
+> +
+> +		if (net_page_pool_alloc(i))
+> +			goto out;
+>   	}
+>   
+>   	dev_boot_phase = 0;
+> @@ -11765,6 +11793,18 @@ static int __init net_dev_init(void)
+>   	WARN_ON(rc < 0);
+>   	rc = 0;
+>   out:
+> +	if (rc < 0) {
+> +		for_each_possible_cpu(i) {
+> +			struct page_pool *pp_ptr = this_cpu_read(page_pool);
+> +
+> +			if (!pp_ptr)
+> +				continue;
+> +
+> +			page_pool_destroy(pp_ptr);
+> +			per_cpu(page_pool, i) = NULL;
+> +		}
+> +	}
+> +
+>   	return rc;
+>   }
+>   
 
