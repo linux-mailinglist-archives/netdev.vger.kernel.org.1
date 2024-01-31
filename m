@@ -1,125 +1,149 @@
-Return-Path: <netdev+bounces-67708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40ED1844A58
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 22:47:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0EF8844A60
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 22:50:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E820F1F21300
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 21:47:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58B93284DE8
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 21:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A941D39AFA;
-	Wed, 31 Jan 2024 21:46:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C0239AEB;
+	Wed, 31 Jan 2024 21:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E8VESlxv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MHFgd8MI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018E539FC6
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 21:46:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E313E39ACA;
+	Wed, 31 Jan 2024 21:50:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706737617; cv=none; b=sleLs/7q7GTMwlc7DqjKD+tF+yNjJbUF5uGuoSb1G1cII7Se9XD8RJK/jD7zQAnsv0w0qE/2cp+BpQB/tspHeU7fl9ccFpKa0cE7DkpB+35VGAuSGr74BBgGPIy5enbwLYNp8WjCaHD95CCq6lx8/obuPr2GoFr1rNj/MM3mLGU=
+	t=1706737828; cv=none; b=dzm3JNdwsElvnW2z+HuYJ/UkT2wNyJNPndb5T79x6kV65RcLHSSWsAPupp6GLP3VfE/q0X0oxBh4HzbfiXeuv9oDOzfIzzXs09JdtilJg5xkYoy1fHn1hs+MpQRQe1HXTu/rAWk0Nwd3ZRZWK3wtZajxkJH6J+IIfwziLAWPhE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706737617; c=relaxed/simple;
-	bh=eFnmC1lbVYN4j4VfW6XU+vAA3X/Ct0usmb10imNRazA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BUdc62Y9zswyTKx6dtrjyzJ4j4wpw75th6+r1WRHySyfWZDwEarkaLFFwY5O0AaJZ7omRxm04J8ivxhHjhtZ/A22eAgofZhutwUQdo+a4kW7nsd3UFIZ+dmORY/aBG1IQ3/KFyYQzzc0cuVmKDzZAAmtLMkyaqTOm5MLySa0q90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E8VESlxv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706737615;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xA0WL8OAWu59QlhnSKj+NZw09nFzDmIW6P1Gg1TTP9c=;
-	b=E8VESlxvWmpYI8CWY1Qsc87rgAMKe42Gai7WDjtpktZ1NCluk8R3jNNKWlCyyljU55WcjO
-	i86vpvDmCUdtrnjndZkYobsScS7lWOSSCfvnoDZPHwCpnapPfq5bp0WTJ9JotVlGpA3nv4
-	kEgBYnkSsNoR/Nycot+FzI7qdz/Xg3U=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-453-POal1p0cMSudJkHhvF7CvQ-1; Wed, 31 Jan 2024 16:46:53 -0500
-X-MC-Unique: POal1p0cMSudJkHhvF7CvQ-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2cf337d68baso2599801fa.3
-        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 13:46:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706737612; x=1707342412;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xA0WL8OAWu59QlhnSKj+NZw09nFzDmIW6P1Gg1TTP9c=;
-        b=LW6RZUvGIb8Nd+EWjKKEj2t4pe1ueemyQYnlQ8kY1GfxNQW8ORJA/LVxnc1jYlkrJZ
-         P7eWR3tVFDSfs4u19/07025j9z7oSi8eXM7vZhnvU2cKatu8B0Yp2LboWiaarZb3vqMu
-         rRuGO5HK/gADzbZl1Ct+8D2ICCtiAuALUiUHG7EB1AfR+9rAzy8ldEYk7u+ByQU6MulQ
-         pj9hAmbVSCVxklKjxJEWAfvwgkPuvcK5XjTAi8xjG4JU7w5YcavEfatrm4qbgTWyE4/3
-         FW2WhJP1IMnZBikm7cnJ3MlCJIksDXhE6LE6SSM2e6sVvc/o1laFZD2i8PblDrSrhv9g
-         3xWQ==
-X-Gm-Message-State: AOJu0Yyjt7dyL8yZB5Ingd0UsK/65DblAHDr/XpLaZ28/ARJ8M2BJr9Z
-	SG0ojBuHnYbw00FPmp4inD5na5pfggVrQbaCKMPWOvvRksiV0J1wYKTai7xNeX8qOoO+0UqxsFi
-	nTmAyvWrxh0BHcE86VSV0YnEW/rlOsA2pnHCIeuDkC2zZabkiGg57MGN4yvIxvwLwsRrfKCwlZH
-	jhUIIqMmfaNe2wg/0Iw8kW4f7EU0lj
-X-Received: by 2002:a2e:9ec3:0:b0:2cf:1288:910 with SMTP id h3-20020a2e9ec3000000b002cf12880910mr1956865ljk.14.1706737611876;
-        Wed, 31 Jan 2024 13:46:51 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE23fLdVgxCbf16DcIFLnyMiHBcJtbPkDANivp0IhWFO/5OXRw56/KeQCVp5xbX9m/eGo6azpw0AIqz+PJ+MPs=
-X-Received: by 2002:a2e:9ec3:0:b0:2cf:1288:910 with SMTP id
- h3-20020a2e9ec3000000b002cf12880910mr1956854ljk.14.1706737611595; Wed, 31 Jan
- 2024 13:46:51 -0800 (PST)
+	s=arc-20240116; t=1706737828; c=relaxed/simple;
+	bh=VA4S5+OXGEre7LcIjG8/DyUIQAvRbZd0CUxocr8qS9s=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=cjrqCcc8qHf/1F9Qu31YLpeUUY9n05PF20VhKRtdQQWP+thlFZyvU6gSzUPJCLprap7CgFIggei3N7XlNhRc3D+r1UJclUcSY8iPlJZN8J8aVjjYKVdxTlIx/pjvbvJe0zmKe7vASyEHCz77Zgo8lsNPHEf1KU5wRie7AIPzNtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MHFgd8MI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D4E0C433F1;
+	Wed, 31 Jan 2024 21:50:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706737827;
+	bh=VA4S5+OXGEre7LcIjG8/DyUIQAvRbZd0CUxocr8qS9s=;
+	h=From:Subject:Date:To:Cc:From;
+	b=MHFgd8MIfCmRKwBb9sVyA6Lp5gZtz2QK8L0SkpzL7DpxVzPPCHqqS60vq5t+4yEjK
+	 q4SxM/xC7O4wI7Atnr76WTxskuUGOWHm1fq/LWIKKjDCc2N9NWjMJreVkJ+ydC1DJX
+	 E/aqVqfJRdCbYRIGdv1m9t1SkVqnZb/r+NKAoem/4EMkCgQoc+wiistnQVdTFN1Fs/
+	 IoMPQBZxYKGIMLkPcGtNcqNAaCRuqM995PyyxI/637DuHgyXSGz/P/UNllsj2kCOkX
+	 wXTCUrnCReR3m/Rir3D1HjKP/VYbNPIMOsrZKeSWsn0GfacejnZO7NpdOOnW7oGX8k
+	 SuWIkM1U+dOrA==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net 0/9] mptcp: fixes for recent issues reported by CI's
+Date: Wed, 31 Jan 2024 22:49:45 +0100
+Message-Id: <20240131-upstream-net-20240131-mptcp-ci-issues-v1-0-4c1c11e571ff@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240131191732.3247996-1-cleech@redhat.com> <20240131191732.3247996-3-cleech@redhat.com>
- <2024013125-unraveled-definite-7fc6@gregkh>
-In-Reply-To: <2024013125-unraveled-definite-7fc6@gregkh>
-From: Chris Leech <cleech@redhat.com>
-Date: Wed, 31 Jan 2024 13:46:40 -0800
-Message-ID: <CAPnfmX+ZXraFC1+2Lu+WdgdUud4ALEcFAcsRQotVjfsGFsqUvw@mail.gmail.com>
-Subject: Re: [PATCH 2/2] cnic,bnx2,bnx2x: use UIO_MEM_DMA_COHERENT
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Nilesh Javali <njavali@marvell.com>, Christoph Hellwig <hch@lst.de>, 
-	John Meneghini <jmeneghi@redhat.com>, Lee Duncan <lduncan@suse.com>, 
-	Mike Christie <michael.christie@oracle.com>, Hannes Reinecke <hare@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	GR-QLogic-Storage-Upstream@marvell.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHnAumUC/z2NywqDMBBFf0Vm3YFErY/+inSh8badhTFkYhHEf
+ zd00eW5cO45SBEFSo/ioIivqKw+g70V5D6jf4NlzkylKWtjK8tb0BQxLuyR+L8uIbnATlhUNyj
+ 3c9NN98ZYtDXlrxDxkv3XGSib9DzPC0Aha6V8AAAA
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang.tang@linux.dev>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, stable@vger.kernel.org, 
+ Geliang Tang <geliang@kernel.org>
+X-Mailer: b4 0.12.4
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3030; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=VA4S5+OXGEre7LcIjG8/DyUIQAvRbZd0CUxocr8qS9s=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBlusCf5pZ5h12sBggnu3rqTutMrwEJMixZM7Mak
+ joQhVGjV0SJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZbrAnwAKCRD2t4JPQmmg
+ c3HQD/9D86lvkLEUa+sCkWAGbpXGChRs4bcLbsOBUCZlo6uhsTraKYGWataaPWcHPothtvFs8Tm
+ jOd+e3oqBPKzN4laDIsjuaQKGyxicLY00zdvBa8rWR74cccSPcjsp4IeRpJkqy0xk/mUItgd2/I
+ Je+zISNODFd6SVb732WQS5/Q+SYgdPY6BypHY9XXV9ZcfExKuj+mo+CSxIWNnR5+gh+aGn8scnr
+ E1278aCvLAVSuxvKOgvA3QKdQVLtM5fLC9ubWp6V1LJ9e+rmjqhktmmTp3JZZghqgyNyZsJVzS4
+ tE7rVNtJoii78/jidC6zPyf2ek3fqhckkYnqiNDdVWwdVyoXpmJ6itD/yDUfESzzerhkw34AgYc
+ x9AfBbheJa+FE6EVfmvnf55Xn+pj4CptiAdBvomTyQGMMvZ4z5McRMbIsycJniMoT4OExODe1f4
+ 8bg6GxiLtCVBSu22r9h+RynGJAziLjGNQFphkGJXdYeLBnmCDH4AZGaLMDFNZ8pvqaFUNV/tXU+
+ RvQBdPRR/v+HDnN/v1+IZmmpbhAtfrumVpkVGoHMDEb2e3dF+8NsNdRuDjjt1cHKTyrDsVUc2dI
+ mcF1gWPokwY5rLbIuTr2w5plZ6IbOQlj7rQbE91Dahe9GXz4FPY0OKmWTZqeQHkinSdlRkK5WQx
+ Q/X/0he1GSWeDMQ==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-On Wed, Jan 31, 2024 at 1:30=E2=80=AFPM Greg Kroah-Hartman
-<gregkh@linuxfoundation.org> wrote:
->
-> On Wed, Jan 31, 2024 at 11:17:32AM -0800, Chris Leech wrote:
-> > Use the UIO_MEM_DMA_COHERENT type to properly handle mmap for
-> > dma_alloc_coherent buffers.
-> >
-> > The cnic l2_ring and l2_buf mmaps have caused page refcount issues as
-> > the dma_alloc_coherent no longer provide __GFP_COMP allocation as per
-> > commit "dma-mapping: reject __GFP_COMP in dma_alloc_attrs".
-> >
-> > Fix this by having the uio device use dma_mmap_coherent.
-> >
-> > The bnx2 and bnx2x status block allocations are also dma_alloc_coherent=
-,
-> > and should use dma_mmap_coherent. They don't allocate multiple pages,
-> > but this interface does not work correctly with an iommu enabled unless
-> > dma_mmap_coherent is used.
-> >
-> > Fixes: bb73955c0b1d ("cnic: don't pass bogus GFP_ flags to dma_alloc_co=
-herent")
->
-> This is really the commit that broke things?  By adding this, are you
-> expecting anyone to backport this change to older kernels?
+This series of 9 patches fixes issues mostly identified by CI's not
+managed by the MPTCP maintainers. Thank you Linero (LKFT) and Netdev
+maintainers (NIPA) for running our kunit and selftests tests!
 
-That's certainly where things stopped working altogether, iommu issues
-go back further.
+For the first patch, it took a bit of time to identify the root cause.
+Some MPTCP Join selftest subtests have been "flaky", mostly in slow
+environments. It appears to be due to the use of a TCP-specific helper
+on an MPTCP socket. A fix for kernels >= v5.15.
 
-- Chris
+Patches 2 to 4 add missing kernel config to support NetFilter tables
+needed for IPTables commands. These kconfigs are usually enabled in
+default configurations, but apparently not for all architectures.
+Patches 2 and 3 can be backported up to v5.11 and the 4th one up to
+v5.19.
+
+Patch 5 increases the time limit for MPTCP selftests. It appears that
+many CI's execute tests in a VM without acceleration supports, e.g. QEmu
+without KVM. As a result, the tests take longer. Plus, there are more
+and more tests. This patch modifies the timeout added in v5.18.
+
+Patch 6 reduces the maximum rate and delay of the different links in
+some Simult Flows selftest subtests. The goal is to let slow VMs reach
+the maximum speed. The original rate was introduced in v5.11.
+
+Patch 7 lets CI changing the prefix of the subtests titles, to be able
+to run the same selftest multiple times with different parameters. With
+different titles, tests will be considered as different and not override
+previous results as it is the case with some CI envs. Subtests have been
+introduced in v6.6.
+
+Patch 8 and 9 make some MPTCP Join selftest subtests quicker by stopping
+the transfer when the expected events have been seen. Patch 8 can be
+backported up to v6.5.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Matthieu Baerts (NGI0) (8):
+      selftests: mptcp: add missing kconfig for NF Filter
+      selftests: mptcp: add missing kconfig for NF Filter in v6
+      selftests: mptcp: add missing kconfig for NF Mangle
+      selftests: mptcp: increase timeout to 30 min
+      selftests: mptcp: decrease BW in simult flows
+      selftests: mptcp: allow changing subtests prefix
+      selftests: mptcp: join: stop transfer when check is done (part 1)
+      selftests: mptcp: join: stop transfer when check is done (part 2)
+
+Paolo Abeni (1):
+      mptcp: fix data re-injection from stale subflow
+
+ net/mptcp/protocol.c                              |  3 ---
+ tools/testing/selftests/net/mptcp/config          |  3 +++
+ tools/testing/selftests/net/mptcp/mptcp_join.sh   | 27 +++++++++--------------
+ tools/testing/selftests/net/mptcp/mptcp_lib.sh    |  2 +-
+ tools/testing/selftests/net/mptcp/settings        |  2 +-
+ tools/testing/selftests/net/mptcp/simult_flows.sh |  8 +++----
+ 6 files changed, 20 insertions(+), 25 deletions(-)
+---
+base-commit: c9ec85153fea6873c52ed4f5055c87263f1b54f9
+change-id: 20240131-upstream-net-20240131-mptcp-ci-issues-9d68b5601e74
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
