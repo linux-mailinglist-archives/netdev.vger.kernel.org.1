@@ -1,202 +1,204 @@
-Return-Path: <netdev+bounces-67427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33878843473
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 04:20:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19AE0843496
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 04:40:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1E6B1F2218B
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 03:20:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6DD63B252A9
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 03:40:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09BCAE576;
-	Wed, 31 Jan 2024 03:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 193361642A;
+	Wed, 31 Jan 2024 03:40:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="i+0AoxKJ"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="jD/IOxQ0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C9617BC8
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 03:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706671207; cv=fail; b=Lvs8ubyq3NZMN0X7zcpb9LfhbdXj0Eycix5dFSaQcDA8tIZEkkHDNbKWhV9oNV9VTnndSP2XiLowgpKySKXU2kHWQ0RBuFT+i3Ncr/HPB6Ri/AyFrDJa6NMdSF5wk+39dGUb7MrtqGObPxIKdAb75L91wJxo0DLnsl869lBu7HE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706671207; c=relaxed/simple;
-	bh=6Cb75a3Tdc36pwe8WQPQGDMeADYixrX3pVTiOSFyLLc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=iLCx4CxFZdVvxQO4hp/50E7uBAEGzhHY7jB/MGYVr5Wxfv2ysOB6h5MQdBA0MkeBEPf5/93VH2q8GipHceEIRuZGqzAdKQY9Gw0wUbLUp41D2OcPx+LlZiN077grKXSHPYGOWv8MKHEyAUIgxvlRo/+/B0i6cyMGHL4EdFa0MG8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=i+0AoxKJ; arc=fail smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706671206; x=1738207206;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=6Cb75a3Tdc36pwe8WQPQGDMeADYixrX3pVTiOSFyLLc=;
-  b=i+0AoxKJfTw5SmMCmXbHmF0tYog70IMlt1hsNSet6rFnIt2Vx+euTn1E
-   1xJtzfYhXpEziAJKp7n4IszUqKcvtXuHTfQS8zzxgtxbcyYlyU3RT+EmH
-   6+EcDKvJMgirs63lq0WfZpLcajCJcsfGqqrS0hUgSvds0BDs6Jfq3a5OA
-   nf7fuuXDT1ztEJUtiFkvWyb5HSFShBWRvw5n75GAMWWIRw+yXI0rASJ5x
-   TIPu/GDDH0mWUafQbb4e7h6CzwGjyve8BQ6pL8zAzeFzR2PMiTTpUlwnF
-   ErKYS5EFZx1wFbvPuXEewVGO7gPmMwJWqOChTNpQRj+QA4evDnhsgNMsG
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="24948956"
-X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="24948956"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2024 19:20:05 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="36719659"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Jan 2024 19:20:05 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 30 Jan 2024 19:20:04 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 30 Jan 2024 19:20:04 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.101)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 30 Jan 2024 19:20:04 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JdCpUxRiv+3XhSzT3we0fG0IETo2JIQJB3gdND/iuihlJN9hSFU/1cZJYLn2TvGt61E/i3bE1ZKT4n9uj7pcvPEPCAWHVK+wkLcIq45FCoNtunZL3F35N7nIZkEGk1IwhaP3x/PvO3ENO5nk2UkBewhnK9+Apfb9jOu7naPu1bU1gHhjU1LTcFIBrlJ0cGvrVnTdxzY3n8vGsD6bgNuGv8DPNrOWg45jltlm0zpvoMgeN6S9bqXlOEf4PHd5RETKfhd5mIEOSLxzHmaSdh4SMHrgXFBlXJUWLJUc3R5EDZ/a+OfxiA98rH+jbkrixqXjAI30+8rCR0Y4p3XJvB5Ytg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=4ZMOi7HG7txbu6z4pKnocyPV1huGMk2VF5sdEWYBqHk=;
- b=YL5kKId1EB9rHlYwJQJG8tItgnJPJ7JNDXh80NGRNetVyp1QpcQL2T+xzJt7w5/f1p/2TFGu+xmtcyMXSSnw6hbKqQH9NbdXSHVCGLklgq1hS4zhPFAh0ZNCZUG2jZkNY7skUmfNlF6XSO5EwAyiNNhgBi24eandAjpxtzQxOiRfoWVK+nWtifz0hA9GSVYgQ/lFA6P4q4fcr829Vvv4KXRVwaf0jOOpiyOb+zrknIn4B6pzpQlMKvZIfgZQcQ9690Pzx/R3HNWhMda4W9c2BD6oWNcrqcryuks926Zcjfn2+FSrKQVU3l5TsNxRwY4cD9BEV2NGtVPuPGVfUf71wg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CH3PR11MB8313.namprd11.prod.outlook.com (2603:10b6:610:17c::15)
- by BN9PR11MB5404.namprd11.prod.outlook.com (2603:10b6:408:11d::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7228.34; Wed, 31 Jan
- 2024 03:19:57 +0000
-Received: from CH3PR11MB8313.namprd11.prod.outlook.com
- ([fe80::42fe:dbf5:e344:f60]) by CH3PR11MB8313.namprd11.prod.outlook.com
- ([fe80::42fe:dbf5:e344:f60%6]) with mapi id 15.20.7228.029; Wed, 31 Jan 2024
- 03:19:57 +0000
-From: "Rout, ChandanX" <chandanx.rout@intel.com>
-To: "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Karlsson, Magnus" <magnus.karlsson@intel.com>,
-	"Kuruvinakunnel, George" <george.kuruvinakunnel@intel.com>, "Pandey, Atul"
-	<atul.pandey@intel.com>, "Nagraj, Shravan" <shravan.nagraj@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next 1/2] ice: make
- ice_vsi_cfg_rxq() static
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next 1/2] ice: make
- ice_vsi_cfg_rxq() static
-Thread-Index: AQHaTfOcKTqwiTvGjkO4qhAvXH8dU7DzTI2w
-Date: Wed, 31 Jan 2024 03:19:57 +0000
-Message-ID: <CH3PR11MB8313C460130BC0CFAB70FED0EA7C2@CH3PR11MB8313.namprd11.prod.outlook.com>
-References: <20240123115846.559559-1-maciej.fijalkowski@intel.com>
- <20240123115846.559559-2-maciej.fijalkowski@intel.com>
-In-Reply-To: <20240123115846.559559-2-maciej.fijalkowski@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CH3PR11MB8313:EE_|BN9PR11MB5404:EE_
-x-ms-office365-filtering-correlation-id: 4243d5a9-c837-4b8c-18ef-08dc220b807a
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 1/Kr/4JuMa9g5yClXiMz45LvcS3odYxTBYd0k9Ovo/SwI6qMKk/xUZHloVmQzitix1Nf2CcTNOtQOX1yFzYMlXUPu6AY3Vk0jtleSUx9clF+MfuJqQ3AbVFWjFRqEtxnA+V3tGEAC6ebjV+PXuN2eycA2a2I4ziS5dZ/odb4+mfRQv7hUePvF651sUSgAGcYAcO1SsZjNJMdt8ommKv6paUhwSe6yksADSxii2pgaF11gyu8Hf6C1Q/JwwuACLyi3SaPvGT1xaOrmJP5ke/qAc+I9l5oTARzsVqeUtpNs+HQDSWf7qCkuQP75m+q/3Ae7lVE4B2zo37CqEEubiBWHUvl+NpVcIrEn07QH1S7/Srp3w84/32FnKG2U8PCLRey84QmYvgxiMVjsVR8f5bq3lVfM6tiV9QvnpyQm+z7AVpwt2meRe4lXiPhg2NLIyb3clZuSBrgo5j648z5mpy9EazjOcIgWhGfwP7aw75fnkJY+ROpojqV3g/NOLc8ZRgYbRzRWPlmDlFXEu/SdNi/KX+ATTUfukynsHdF/knWZ5JUM0hmlSKb9ZUtH2CYphmqkkL9wiUjqsPQtB4oc45HNpBTIIZJdglSXiVmvOO0u8RFUqHbweM5haxb+YzvpRVr
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8313.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(39860400002)(376002)(396003)(346002)(366004)(230922051799003)(64100799003)(451199024)(1800799012)(186009)(7696005)(6506007)(71200400001)(82960400001)(83380400001)(122000001)(38100700002)(55016003)(9686003)(86362001)(33656002)(38070700009)(5660300002)(52536014)(316002)(8676002)(2906002)(4326008)(110136005)(66946007)(66476007)(66446008)(64756008)(54906003)(8936002)(76116006)(66556008)(26005)(107886003)(41300700001)(478600001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?DzuYWPrfcAlPyJzfLyUCxEMsQpmAq5txSS7BfvZEH01Rk1GO8VKruJvLmx+u?=
- =?us-ascii?Q?WF8uZJRaljguC7y5ouT+O5ydr4ax/kpX7jbSx67xC7fia9W+LDBFDdOT9ce+?=
- =?us-ascii?Q?0JA7pFFOUbE94Y31d2cZL8uE39jmQoqQ5fAr/fFU6zD36Rcf2TIJaV8lrm3Q?=
- =?us-ascii?Q?mWGjG6OZ/kf8v5SkyaRYA9KZ3NwQj0M4ccmC67FEunlNLiptEP8gJHO9KHDP?=
- =?us-ascii?Q?DUEDrCH3CsRus1U5SpJ6keeosFbA0nGRxzZw8H1jQawexxh48zknrrhEG1Hz?=
- =?us-ascii?Q?ONiOGBA70cmY8rbcPL3MPpzlyqwHXwKvgs8zm6f48Cg1NpIh8O0ShUqnnlfu?=
- =?us-ascii?Q?+VsyaJ4zISi1GlTCinsiSDCwTT/JBlu91nHx38QwQ/TdZVZNfNaf8fm6uq3B?=
- =?us-ascii?Q?2eNH6vUlB74Xdr5T1tb8Pq3N8x5pOIuF3/tSOL2HYsE6ePMZTDBQ2JaSyfT3?=
- =?us-ascii?Q?M35CYcTAqHiZExex58hW2rWKZXieTTZ0qoNRw0LEJUCz0NVgK5mVwwXcfCQw?=
- =?us-ascii?Q?vQonsqiSpIxNQBrC71ozWrIkEA7Ahs56H1xKnbLs0HmhRl3hhcXgB02RL6Yr?=
- =?us-ascii?Q?a5Uy37wM25VdZ8ihmmT3/lwF2haKkIQ0nokY28shAyPeCRov48Uf/8707lTL?=
- =?us-ascii?Q?gnm9M6+OFAbMxwXi2hMgGjR73vTzqrWPPx3GmZJR6+M6b+12xkUZaHygOT0P?=
- =?us-ascii?Q?apSwoL4A4IC25x4c/ldHJxFe/ZxyPHry/sm5B0YIuyGaapuUOP9xVznUg5Y0?=
- =?us-ascii?Q?kka+ItpgsZJk6RQexyZBxhG25/svhFJb/CdNpMKa2oV4n0XIMZosR+CgOOGN?=
- =?us-ascii?Q?vpdeM+fhZAqgVTzIAKKjD2zM/z1LL7z8JYV1f6/uXHvJ4AY10GEed1YJhbSd?=
- =?us-ascii?Q?zlqNvrxrDdyb1zoKWwhnjCOHf+7iiIrRwVRHnPF5etHpeG0dQ7wQkrHOfTKl?=
- =?us-ascii?Q?eE0hlKWAgrsUZKtd1RfvywtoTs3JD+WtuMgYfdMR8bkttyLzoYJpBDfklFeE?=
- =?us-ascii?Q?c7+DxJOQB13g74lXyh+1l34LpuAxkOAU33+VVG5JnDNwewMW/jtNc33SVtGe?=
- =?us-ascii?Q?1xYO4tgriz39/0xe3p2WLRViCL3vkiF3GE02iq8OnkO/snJaGUi92Rptv+Ua?=
- =?us-ascii?Q?MOkzQ9UhjMR9f3aBKchL5NG6pXcXTS0tPYM4KzHQWPWNzvhE+FWibYU8Rq9N?=
- =?us-ascii?Q?4GXFrrj1tFvyF0mN1vc0Zu5F3pgP7WLhcM7GVv7fdu4sA0qNgIYazLeVw+v7?=
- =?us-ascii?Q?7Sfe59w6I3pbDYl8OHtRqx7pstE4Mj8gfTINltUya2XFWhCYUP+nUPNHQ9Os?=
- =?us-ascii?Q?LNrbTuFua/a+FvHTPqRngOMOQIkUADS0bQG4Ab3ayV71sn3vCkOk089L4aaY?=
- =?us-ascii?Q?VlnLergR3TBa7BjtLJzgBX6TPfN4Dip9CcHxFPfYM8Whp69Q555kS1AdHan+?=
- =?us-ascii?Q?PXSrpx6bSZgv63zhSxdhkPl5wcjWJBF03gX34j8gWy5QUVBNFll4hfSb8AHT?=
- =?us-ascii?Q?3JnCNRKJJTMlJc4lqK6iF088iULlp3z1I7vKu3eEGLKj66ztMdoFGIiUxlzp?=
- =?us-ascii?Q?GdH+WYEOtuHjj4x26TYQRkDejhKQ/kmxTDdwJX+2?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AFC715485
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 03:39:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706672401; cv=none; b=WleRcsa2OqIw5Eo/tpqZVUeDg7exviIqgROhRNFL/FTJZ3zBaoVabAldyBTyoklnu6H7/GngByldIqSllrvb0S8SKLGWQXW24l+1X1BJGe7lUBwDgvFZmlxpy9g6YhfADYYoIybg/XoLe3q1U3hMmhkMjHlK74KKiO5BzgyCZoU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706672401; c=relaxed/simple;
+	bh=WowSxGgZlAt0SjsqlQOh0Xqips85ZOGo0PMJ67xhi14=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QUUZrilyokhdqno2UNrS3vdDAD/FptXupPGC8h/qV8kZx7IjP85q7a1QXHU97XU8x02jthChUAyPcFu4lGGnvrpWLL1/JKd6UtAYy2HMPFBkwTio1Tf7N6UWg2h4WE1EimWxv7hg4x9cqtptz9QAQycK3nPyUotyUF1herB7dh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=jD/IOxQ0; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-51121c08535so960097e87.3
+        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 19:39:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1706672396; x=1707277196; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qpRkgXkbQYXbK1cEg4XXsMfWT44RSVIecn26S5cDrV4=;
+        b=jD/IOxQ0fBTPjZsAKx3JTUo5ygOBAsi6V/aOA7XMNYcNib4z/Cl2XvijLIVhE7rR2m
+         ECF8OhwnjXxpkJf9wnJOLk4B7+6XecT3Lg/FXH1KKvKXNWoyfuJfvK25NJDsdA8rIsdP
+         tGQIVo6YHypobZBohkL2I+mNjUEOJFLMishTc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706672396; x=1707277196;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qpRkgXkbQYXbK1cEg4XXsMfWT44RSVIecn26S5cDrV4=;
+        b=qsQeuNY9K0yiqybud3BrzAx3sf8ggr/bUlerD4fluv7MIGnhb4okaMWgUy1MSvk8+N
+         u7eC54uhdnyhxOPazNPe4Ey2rlJqJqlss04AA0T7e3byku4AJ3oV8eoSLA7gwPcyJusX
+         uPr9DNyV01nJAmgKqco5CRrn20OsNXcTshJnCykAhnfVJ8LKlQ/cmb5NKcC/+pwYiATK
+         41VZKuYtULBW/mH+CdQgG9XL/67a/Vxy36g2iTdUQO03Gc/+FFunBnE/UI9IXdYWFJDQ
+         RCU5d7+/7apl+sD3OUn0VqqNp372rVIrggG8smgVlDMsfkklqcd4Ympl0aBhwKNeLVe0
+         MUCQ==
+X-Gm-Message-State: AOJu0YwJqqH1kZieIODq+wSiGPl1xqMTrRgS3AMcKaCRKW/A8yDY/J9J
+	IVdmi2UFBE9KiFtAioBfPkMMKkeivFJf9sVTiOmL2P2+thp6y/Bsm6kuRkHAfGLA9Ooee+UVFE5
+	hQR2ytu6CpnA0dLu3HNNBR0tbU/NjNHCXKtEZ
+X-Google-Smtp-Source: AGHT+IHsCbNhf/cX1e7S3SrH8YqgH2QhUc3a53hHF1zco0XT9jtlWjG4rpYd5ZxLSwo4KK0lfHA3RvEPSDfNHcGvQqM=
+X-Received: by 2002:ac2:443a:0:b0:50f:18f7:855e with SMTP id
+ w26-20020ac2443a000000b0050f18f7855emr285947lfl.39.1706672396151; Tue, 30 Jan
+ 2024 19:39:56 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8313.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4243d5a9-c837-4b8c-18ef-08dc220b807a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jan 2024 03:19:57.4813
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 4/kpEHFu6BueVOxIO/ZNqeVg1NntTK8UtldiNih9g1U1U8+OzwfkxSMng7rn7yA0l55oeCddZ4tSITHEnzMcxg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5404
-X-OriginatorOrg: intel.com
+References: <20240126063500.2684087-1-wenst@chromium.org> <20240126063500.2684087-2-wenst@chromium.org>
+ <74b9f249-fcb4-4338-bf7b-8477de6c935c@linaro.org> <CAGXv+5Hu+KsTBd1JtnKcaE3qUzPhHbunoVaH2++yfNopHtFf4g@mail.gmail.com>
+ <21568334-b21f-429e-81cd-5ce77accaf3c@linaro.org> <CAGXv+5HxXzjigN3Bp96vkv71WfTJ1S2b7Wgafc4GxLmhu6+jMg@mail.gmail.com>
+ <a4324473-e0c6-4d53-8de0-03b69480e40b@linaro.org> <CAGXv+5HAqmUizXztMH_nY6e+6oQh01hCtxEJXKtCn3_74-sOsQ@mail.gmail.com>
+ <78241d63-3b9d-4c04-9ea5-11b45eac6f00@linaro.org> <20240130223856.GA2538998-robh@kernel.org>
+In-Reply-To: <20240130223856.GA2538998-robh@kernel.org>
+From: Chen-Yu Tsai <wenst@chromium.org>
+Date: Wed, 31 Jan 2024 11:39:43 +0800
+Message-ID: <CAGXv+5FwaNe7oesGwZ=yR0Pg82tEzEF3B0zjoex4qw+6zsSYbQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] dt-bindings: net: bluetooth: Add MediaTek MT7921S
+ SDIO Bluetooth
+To: Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Sean Wang <sean.wang@mediatek.com>, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-mediatek@lists.infradead.org, 
+	devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, Ulf Hansson <ulf.hansson@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+(+CC Ulf Hansson)
+
+On Wed, Jan 31, 2024 at 6:38=E2=80=AFAM Rob Herring <robh@kernel.org> wrote=
+:
+>
+> On Tue, Jan 30, 2024 at 05:25:38PM +0100, Krzysztof Kozlowski wrote:
+> > On 30/01/2024 08:47, Chen-Yu Tsai wrote:
+> > > On Tue, Jan 30, 2024 at 3:37=E2=80=AFPM Krzysztof Kozlowski
+> > > <krzysztof.kozlowski@linaro.org> wrote:
+> > >>
+> > >> On 30/01/2024 04:32, Chen-Yu Tsai wrote:
+> > >>> On Mon, Jan 29, 2024 at 3:34=E2=80=AFPM Krzysztof Kozlowski
+> > >>> <krzysztof.kozlowski@linaro.org> wrote:
+> > >>>>
+> > >>>> On 29/01/2024 04:38, Chen-Yu Tsai wrote:
+> > >>>>
+> > >>>>>>> +allOf:
+> > >>>>>>> +  - $ref: bluetooth-controller.yaml#
+> > >>>>>>> +
+> > >>>>>>> +properties:
+> > >>>>>>> +  compatible:
+> > >>>>>>> +    enum:
+> > >>>>>>> +      - mediatek,mt7921s-bluetooth
+> > >>>>>>
+> > >>>>>> Can it be also WiFi on separate bus? How many device nodes do yo=
+u need
+> > >>>>>> for this device?
+> > >>>>>
+> > >>>>> For the "S" variant, WiFi is also on SDIO. For the other two vari=
+ants,
+> > >>>>> "U" and "E", WiFi goes over USB and PCIe respectively. On both th=
+ose
+> > >>>>> variants, Bluetooth can either go over USB or UART. That is what =
+I
+> > >>>>> gathered from the pinouts. There are a dozen GPIO pins which don'=
+t
+> > >>>>> have detailed descriptions though. If you want a comprehensive
+> > >>>>> binding of the whole chip and all its variants, I suggest we ask
+> > >>>>> MediaTek to provide it instead. My goal with the binding is to do=
+cument
+> > >>>>> existing usage and allow me to upstream new device trees.
+> > >>>>>
+> > >>>>> For now we only need the Bluetooth node. The WiFi part is perfect=
+ly
+> > >>>>> detectable, and the driver doesn't seem to need the WiFi reset pi=
+n.
+> > >>>>> The Bluetooth driver only uses its reset pin to reset a hung cont=
+roller.
+> > >>>>
+> > >>>> Then suffix "bluetooth" seems redundant.
+> > >>>
+> > >>> I think keeping the suffix makes more sense though. The chip is a t=
+wo
+> > >>> function piece, and this only targets one of the functions. Also, t=
+he
+> > >>
+> > >> That's why I asked and you said there is only one interface: SDIO.
+> > >
+> > > There's only one interface, SDIO, but two SDIO functions. The two
+> > > functions, if both were to be described in the device tree, would
+> > > be two separate nodes. We just don't have any use for the WiFi one
+> > > right now. Does that make sense to keep the suffix?
+> >
+> > Number of functions does not really matter. Number of interfaces on the
+> > bus would matter. Why would you have two separate nodes for the same
+> > SDIO interface? Or do you want to say there are two interfaces?
+
+There is only one external interface. I don't know how the functions
+are stitched together internally.
+
+It could be that the separate functions have nothing in common other
+than sharing a standard external SDIO interface. Each function can be
+individually controlled, and operations for different functions are
+directed internally to the corresponding core.
+
+> Right, one device at 2 addresses on a bus should be a node with 2 "reg"
+> entries, not 2 nodes with 1 "reg" address each.
+
+AFAICU that's not what the MMC controller binding, which I quote below,
+says. It implies that each SDIO function shall be a separate node under
+the MMC controller node.
 
 
+patternProperties:
+  "^.*@[0-9]+$":
+    type: object
+    description: |
+      On embedded systems the cards connected to a host may need
+      additional properties. These can be specified in subnodes to the
+      host controller node. The subnodes are identified by the
+      standard \'reg\' property. Which information exactly can be
+      specified depends on the bindings for the SDIO function driver
+      for the subnode, as specified by the compatible string.
 
->-----Original Message-----
->From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
->Fijalkowski, Maciej
->Sent: Tuesday, January 23, 2024 5:29 PM
->To: intel-wired-lan@lists.osuosl.org
->Cc: netdev@vger.kernel.org; Fijalkowski, Maciej
-><maciej.fijalkowski@intel.com>; Nguyen, Anthony L
-><anthony.l.nguyen@intel.com>; Karlsson, Magnus
-><magnus.karlsson@intel.com>
->Subject: [Intel-wired-lan] [PATCH iwl-next 1/2] ice: make ice_vsi_cfg_rxq(=
-) static
->
->Currently, XSK control path in ice driver calls directly
->ice_vsi_cfg_rxq() whereas we have ice_vsi_cfg_single_rxq() for that purpos=
-e.
->Use the latter from XSK side and make ice_vsi_cfg_rxq() static.
->
->ice_vsi_cfg_rxq() resides in ice_base.c and is rather big, so to reduce th=
-e code
->churn let us move two callers of it from ice_lib.c to ice_base.c.
->
->Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
->---
-> drivers/net/ethernet/intel/ice/ice_base.c | 58 ++++++++++++++++++++++-
->drivers/net/ethernet/intel/ice/ice_base.h |  3 +-
->drivers/net/ethernet/intel/ice/ice_lib.c  | 56 ----------------------
->drivers/net/ethernet/intel/ice/ice_lib.h  |  4 --
->drivers/net/ethernet/intel/ice/ice_xsk.c  |  2 +-
-> 5 files changed, 60 insertions(+), 63 deletions(-)
->
+    properties:
+      compatible:
+        description: |
+          Name of SDIO function following generic names recommended
+          practice
 
-Tested-by: Chandan Kumar Rout <chandanx.rout@intel.com> (A Contingent Worke=
-r at Intel)
+      reg:
+        items:
+          - minimum: 0
+            maximum: 7
+            description:
+              Must contain the SDIO function number of the function this
+              subnode describes. A value of 0 denotes the memory SD
+              function, values from 1 to 7 denote the SDIO functions.
+
+
+ChenYu
 
