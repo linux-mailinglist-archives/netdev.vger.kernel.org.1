@@ -1,154 +1,113 @@
-Return-Path: <netdev+bounces-67549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2E24843FB8
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 13:51:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3561D844026
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 14:10:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D83EF1C2788B
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 12:51:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 676C81C22DFB
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 13:10:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 910FD79DCC;
-	Wed, 31 Jan 2024 12:51:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EA787BAF0;
+	Wed, 31 Jan 2024 13:09:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZCGE1xth"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gvDlT928"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A9441E522;
-	Wed, 31 Jan 2024 12:51:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C989E7D403;
+	Wed, 31 Jan 2024 13:09:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706705493; cv=none; b=jcOpArDI7KFgjYsw5wPJ563wXv6DvLH7HKjFVcj1e7PW3U3o32sbzN2UeuM+kmerVmYPM5lvEFl1BTerAc53I1WPCNYJXMfy+Zead9gfKeiWcduyQ8eYTSpYXBaj+YAwu89ZN84iafyZMtOE+xXonpFq++MBAvcSkPccBmpyxzw=
+	t=1706706582; cv=none; b=oVvrn/x00GZ2+akyNgzQioytkN8NVcSCJt2dkmm9W62GdipdoT9D38fM0qoFuMT9+H5odQ0JIO0Ct1tF+lXIrMRmWVoembXN6h6rEohS0r8s8l+4Rmts1vjjj/2DE/mq278NRGAp/uU+YdI1GR4Ykr4vOECVRslQ8GWJlRLNXXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706705493; c=relaxed/simple;
-	bh=zFi4R+3mcquhXVmCyyI6i9sQRxec6JwZEMr5wMdPo3E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DBwuN5tPmR2iJJOIu8WlVniilvUw5PVtVztC/hjdBECLdWbw3H4Tk3f5/KexyYaOcQCPuBCBRdpJJujaouoPFkfuv7qlE0PfNYG/uZUS2EcNdhWvXl3mOb59YcyhvOmoinnMK7U4LJh0aUFVXoPt+mwEtxZ+Y833F25st6zzCd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZCGE1xth; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3FF91C43394;
-	Wed, 31 Jan 2024 12:51:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706705492;
-	bh=zFi4R+3mcquhXVmCyyI6i9sQRxec6JwZEMr5wMdPo3E=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ZCGE1xthknSNmiwOozi5a+jQJ5Io63IXI6wUs0ZYYj5h15i7fhvOHs+iGN1OEwcLV
-	 6iSzek1yRIfpSW2RZbk3KpwXSPmF1Uwn6ddJ6SfXeaMJOyUgS9LhEBw7IQR8f5NshL
-	 +z70ty7IiLzHrYkVVOE/o+B7Y+t6mbvY7vuJM5aqbuBT/n2zrryKJbiHBFInXb+J2H
-	 b5CqjxCKPwx2zZbTZ6aiY+y91J4V6rkUEd2m83dbrDvi8YomKGUmjGM2mfYTPhj2RH
-	 kLnVNihpRH/yfVbjBaVbk+3sCQMP0Suw0ZieaIYWm4lVoiewTiW+PmKZWTfDoA176L
-	 i+PWwyOeFm6yg==
-Message-ID: <32f93a3e-5c4f-4f32-8158-4755f08b5ed4@kernel.org>
-Date: Wed, 31 Jan 2024 13:51:28 +0100
+	s=arc-20240116; t=1706706582; c=relaxed/simple;
+	bh=AtaaNaDVSVp1qgefliVmsQbCeAhN8VRIRGY8S25G6hQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Vppx93kype4PSUXoMuvt7HGymUtHBb1WHQjac6JJXAevuG5GBHwrpoXd1MO7+/f/dLQlYvtvOlPMdsWshcUgUOHEPlrEacc8dGugrjLsYQ/yHdkUC3gFpf7hQ5tqfzT5w8PjJPC+8dEEjVcMc0e6/o7+z2y5RfY7ZTM+2Rd61ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gvDlT928; arc=none smtp.client-ip=192.55.52.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706706580; x=1738242580;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=AtaaNaDVSVp1qgefliVmsQbCeAhN8VRIRGY8S25G6hQ=;
+  b=gvDlT928BgdxntfCyN8F+5vMX0XUYDkG67+biYeQ5p+RJizh7fNtn/Le
+   xHwwe3mbNojMFNDwaM/vuw7jyPf59Ajy29+i0B6y8B+15RMYSbTeAX8Iw
+   wSwPrj2B4rSjz6KvTeZl0TwZHiys+5pP0KioW1isWSSvj1KFwzHSGxtS9
+   VAs++g6RJBMSyTw7Tax3o5DkbF+F2QHhHe4Ci7+C6TsKatYcIjWJI02ah
+   skFqbaSSnp5s46U6V6TX98nvbtNjXaJCDmb4p0doN3Xch9RGuVHS5uouu
+   5wzlj8hGZiOICqOia5QER+uU44yl6IKs6XgBa6gGNemZbtPMSuwJSB8aH
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="400734628"
+X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
+   d="scan'208";a="400734628"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 05:09:39 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="911783179"
+X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
+   d="scan'208";a="911783179"
+Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.43.19])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 05:09:36 -0800
+From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
+To: linux-pm@vger.kernel.org
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+	Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH 0/3] thermal/netlink/intel_hfi: Enable HFI feature only when required
+Date: Wed, 31 Jan 2024 13:05:32 +0100
+Message-Id: <20240131120535.933424-1-stanislaw.gruszka@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 net-next 1/5] net: add generic per-cpu page_pool
- allocator
-Content-Language: en-US
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org,
- davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, bpf@vger.kernel.org, willemdebruijn.kernel@gmail.com,
- jasowang@redhat.com, sdf@google.com, ilias.apalodimas@linaro.org,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-References: <cover.1706451150.git.lorenzo@kernel.org>
- <5b0222d3df382c22fe0fa96154ae7b27189f7ecd.1706451150.git.lorenzo@kernel.org>
- <87jzns1f71.fsf@toke.dk> <ZbefjZvKUMtaCbm1@lore-desk>
- <87bk9416vq.fsf@toke.dk>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <87bk9416vq.fsf@toke.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
+The patchset introduces a netlink notification, which together with
+netlink_has_listners() check, allow drivers to send netlink multicast
+events based on the presence of actual user-space consumers.
+This functionality optimizes resource usage by allowing disabling
+of features when not needed.
 
+Then implement the notification mechanism in the intel_hif driver,
+it is utilized to disable the Hardware Feedback Interface (HFI)
+dynamically. By implementing a netlink notify callback, the driver
+can now enable or disable the HFI based on actual demand, particularly
+when user-space applications like intel-speed-select or Intel Low Power
+daemon utilize events related to performance and energy efficiency
+capabilities.
 
-On 29/01/2024 16.44, Toke Høiland-Jørgensen wrote:
-> Lorenzo Bianconi <lorenzo.bianconi@redhat.com> writes:
-> 
->>> Lorenzo Bianconi <lorenzo@kernel.org> writes:
->>>
->>>> Introduce generic percpu page_pools allocator.
->>>> Moreover add page_pool_create_percpu() and cpuid filed in page_pool struct
->>>> in order to recycle the page in the page_pool "hot" cache if
->>>> napi_pp_put_page() is running on the same cpu.
->>>> This is a preliminary patch to add xdp multi-buff support for xdp running
->>>> in generic mode.
->>>>
->>>> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
->>>> ---
->>>>   include/net/page_pool/types.h |  3 +++
->>>>   net/core/dev.c                | 40 +++++++++++++++++++++++++++++++++++
->>>>   net/core/page_pool.c          | 23 ++++++++++++++++----
->>>>   net/core/skbuff.c             |  5 +++--
->>>>   4 files changed, 65 insertions(+), 6 deletions(-)
->>>>
->>>> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
->>>> index 76481c465375..3828396ae60c 100644
->>>> --- a/include/net/page_pool/types.h
->>>> +++ b/include/net/page_pool/types.h
->>>> @@ -128,6 +128,7 @@ struct page_pool_stats {
->>>>   struct page_pool {
->>>>   	struct page_pool_params_fast p;
->>>>   
->>>> +	int cpuid;
->>>>   	bool has_init_callback;
->>>>   
->>>>   	long frag_users;
->>>> @@ -203,6 +204,8 @@ struct page *page_pool_alloc_pages(struct page_pool *pool, gfp_t gfp);
->>>>   struct page *page_pool_alloc_frag(struct page_pool *pool, unsigned int *offset,
->>>>   				  unsigned int size, gfp_t gfp);
->>>>   struct page_pool *page_pool_create(const struct page_pool_params *params);
->>>> +struct page_pool *page_pool_create_percpu(const struct page_pool_params *params,
->>>> +					  int cpuid);
->>>>   
->>>>   struct xdp_mem_info;
->>>>   
->>>> diff --git a/net/core/dev.c b/net/core/dev.c
->>>> index cb2dab0feee0..bf9ec740b09a 100644
->>>> --- a/net/core/dev.c
->>>> +++ b/net/core/dev.c
->>>> @@ -153,6 +153,8 @@
->>>>   #include <linux/prandom.h>
->>>>   #include <linux/once_lite.h>
->>>>   #include <net/netdev_rx_queue.h>
->>>> +#include <net/page_pool/types.h>
->>>> +#include <net/page_pool/helpers.h>
->>>>   
->>>>   #include "dev.h"
->>>>   #include "net-sysfs.h"
->>>> @@ -442,6 +444,8 @@ static RAW_NOTIFIER_HEAD(netdev_chain);
->>>>   DEFINE_PER_CPU_ALIGNED(struct softnet_data, softnet_data);
->>>>   EXPORT_PER_CPU_SYMBOL(softnet_data);
->>>>   
->>>> +DEFINE_PER_CPU_ALIGNED(struct page_pool *, page_pool);
->>>
->>> I think we should come up with a better name than just "page_pool" for
->>> this global var. In the code below it looks like it's a local variable
->>> that's being referenced. Maybe "global_page_pool" or "system_page_pool"
->>> or something along those lines?
->>
->> ack, I will fix it. system_page_pool seems better, agree?
-> 
-> Yeah, agreed :)
+On machines where Intel HFI is present, but there are no user-space
+components installed, we can save tons of CPU cycles.
 
-Naming it "system_page_pool" is good by me.
+Stanislaw Gruszka (3):
+  netlink: Add notifier when changing netlink socket membership
+  thermal: netlink: Export thermal_group_has_listeners()
+  thermal: intel: hfi: Enable interface only when required
 
-Should we add some comments about concurrency expectations when using this?
-Or is this implied by "PER_CPU" define?
+ drivers/thermal/intel/intel_hfi.c | 82 +++++++++++++++++++++++++++----
+ drivers/thermal/thermal_netlink.c |  7 +--
+ drivers/thermal/thermal_netlink.h | 11 +++++
+ include/linux/notifier.h          |  1 +
+ net/netlink/af_netlink.c          |  6 +++
+ 5 files changed, 92 insertions(+), 15 deletions(-)
 
-PP alloc side have a lockless array/stack, and the per_cpu stuff do
-already imply only one CPU is accessing this, and implicitly (also) we
-cannot handle reentrance cause by preemption.  So, the caller have the
-responsibility to call this from appropriate context.
+-- 
+2.34.1
 
---Jesper
 
