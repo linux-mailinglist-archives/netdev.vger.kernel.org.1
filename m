@@ -1,222 +1,106 @@
-Return-Path: <netdev+bounces-67545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B204843F7F
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 13:36:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29CBA843F8D
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 13:40:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 576BA1F2202F
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 12:36:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8AE92833E0
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 12:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3F347AE5E;
-	Wed, 31 Jan 2024 12:35:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D8DB79938;
+	Wed, 31 Jan 2024 12:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="jc63w5pL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fiU/+/l3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C612D7869F
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 12:35:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292C94F5F9
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 12:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706704559; cv=none; b=CK0LaiYMnOXYAOe9xsqaF2iubR9d433AGecy9Jm83qg4Hy307fxc8o1UMSylbsnzn2m+f4qeiSBr7tfJHh6V/YRZCb4RCDHu4wVHaJFEh8GNbmhr2A/W/ju0B36AyNmIz3Of3GfRPnj3kW7X1PUV16wljETkXdNzgMUGKTu0xYc=
+	t=1706704827; cv=none; b=Kw62D7KzMkGmr73Hj5JoG9xyzsTBF+yesqgmVBP2X6lbjvAG2aEy6m3O6DKnNiCNtG88/nAs1mrdKOjXzKw7n1A7sR4AodUlecQShBjgPw+OsnU8JnfpctYHfCFZwQdvIVdtGTYbmWlnEiy3DgJOnu54RkIK351FBhqPKQFnFbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706704559; c=relaxed/simple;
-	bh=go1CxnwkYrNSMMXZA9us4VqyOB02NCR6uu21U6/jbb8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CPnc2kO7kXpELo6WSk8vtLfDOIw3YHBSTScyJ9i7MVXRMDbivI9inZGqM1QxLrVrPVV0iXgnlkc+ZjboscODIA9bc6RzXt7zb0BG/WTRhtCWNaQAgu51W/9Fy49eZ6JV9iLJDN2e1UjK1UightqfhPAQhNFiaJccgMQ/S/JAFH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=jc63w5pL; arc=none smtp.client-ip=209.85.208.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d04fb2f36bso32039411fa.2
-        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 04:35:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1706704556; x=1707309356; darn=vger.kernel.org;
-        h=content-transfer-encoding:organization:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QEiIF2a77a2NYlBdF0rnvbhZ9XEvtTWVhxdh+i0lTps=;
-        b=jc63w5pLzbv8MdKytEyo19ClyzhASBbNaO88XrZ3vtr+KToUgxyH1KESfjAc2wq8lG
-         GCwwXXOHBDv074hYPyuj+p1lCQWxtw6WJrNOwNCWfik9fYNWidtx9WLDnzwVVnHSquag
-         TCnIU2+dKIz4YNf2eMEhNYF8fqYYJBDUhEzz04NDIZh+iOV+75oUAjKwXJkNRxFoGJtD
-         /FGbyFbTUfxXMSRs7SXW9teRhkmRPu7GJiDU57ZlDFYf8DDHzNvwap5VjkTgFKS+Gjrz
-         g9chvTcXIXqrKL9pfdTk4laF/VaDZ+8+bW0pgXXEA4okapJbZUbdfwOM6sVzdgIqMR/o
-         /j8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706704556; x=1707309356;
-        h=content-transfer-encoding:organization:mime-version:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QEiIF2a77a2NYlBdF0rnvbhZ9XEvtTWVhxdh+i0lTps=;
-        b=Op2JMSha00fqc6jEKBXAyujrHLbtRmAQLTExP1AdWdOamKwcrsfKYaYk39yANg111a
-         3KDut7KwRzsRu87i++My5iHkuiNJOsSrEXVATtAD5lJOdZqz7dDIlzJU5ibr68T5OlRO
-         GzMuKhA7SePmcUqM0QA+IF0yMj/9csWxA6+fLHX4R6vQS4FVjT/ixbrNUehzTyG/PgOo
-         p5PsNH2PFCBPoixIwFc0oTk80ejz73GBsVf+4pVKqq2UwmNRa/A3qZOfr7YznCsKhlvd
-         pImqnzMxC69cg+2ElAribmYrAA8GhktQB8/CxiXAlcUag46Ub1MtMVm7r85rWCKC7/d/
-         ZiLQ==
-X-Gm-Message-State: AOJu0YyFRSjdZDFRVN4dBQYiktSLtkWU+bo56yGcxR7BfJwrbmkK2ode
-	MD+bXlYUcgnKZKFcrs50GakGEA8P/mhc/wk89q/iW6oQRFoMRSlb9qCKvsASA54=
-X-Google-Smtp-Source: AGHT+IF2YwYWLus8PuFNfKLdfhUbeyNe6T0Pteaa0qeEdznNQXcwqXUMLHRIieF9cyqckkxKrvd96g==
-X-Received: by 2002:a2e:7011:0:b0:2cf:2ef2:87f7 with SMTP id l17-20020a2e7011000000b002cf2ef287f7mr942673ljc.53.1706704555700;
-        Wed, 31 Jan 2024 04:35:55 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXKNd1C9bpqVIlZCyele8ttZpf1tBlvnerSbbAefCXaKrZ9qcLUqipgcsFtqQL0JE6dUPwKSW9ycDvkbhYZEyeBGqQQGQRmyNdWBEWtRO7bPAVKVJIH0G7DVWwRtCIWEUVUGEqGdCJCH1JCBL0Cl16qXWE39f+GQj/JSJzGr5GDGD9Yi/+/DLcpeIQk+wgowyHi9OjshEdiR0yVfEQsL1UbmUfHqoDaOW8jXidWxiLeTeVwKbJynh4YWiOYaQ==
-Received: from wkz-x13.addiva.ad (a124.broadband3.quicknet.se. [46.17.184.124])
-        by smtp.gmail.com with ESMTPSA id w21-20020a2e9bd5000000b002cdf4797fb7sm1913517ljj.125.2024.01.31.04.35.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jan 2024 04:35:54 -0800 (PST)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: olteanv@gmail.com,
-	roopa@nvidia.com,
-	razor@blackwall.org,
-	bridge@lists.linux.dev,
-	netdev@vger.kernel.org,
-	jiri@resnulli.us,
-	ivecera@redhat.com
-Subject: [PATCH net 2/2] net: bridge: switchdev: Skip MDB replays of pending events
-Date: Wed, 31 Jan 2024 13:35:44 +0100
-Message-Id: <20240131123544.462597-3-tobias@waldekranz.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240131123544.462597-1-tobias@waldekranz.com>
-References: <20240131123544.462597-1-tobias@waldekranz.com>
+	s=arc-20240116; t=1706704827; c=relaxed/simple;
+	bh=gdIBQPIl9WYJ1By4iZeKGhVgPnsxLwwbFAYBQmodP2s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=onh8yka9NOUOWOFqdlJLIJpu6OSHdIBhfraa2b4KG+WNoZW1gVzxquf7/kvErvWdINJEPjyPSb1rMfe5LGfvthvxXtRhjw7LBl6xhaeah2WUtT2OR56574sGQA/pilDwEw/9cxJVVylhZFPTiH+bPsdsM9DUfeH4oH5+3wRnTqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fiU/+/l3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6FBD3C43394;
+	Wed, 31 Jan 2024 12:40:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706704826;
+	bh=gdIBQPIl9WYJ1By4iZeKGhVgPnsxLwwbFAYBQmodP2s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=fiU/+/l3pRjurIhzTpv6c0utgVk8s+znxNaEoUaOf/dLH+tSS13gdRdOZ8VvESeRH
+	 vPQVV2OdfwaKIzxyBxzU3ATZI33GycPoUX9Qrj2jUEHW3xRMbTcOfHVUgh7N0xDlV7
+	 xVOGLoiyHOLj3LqLdhqiB+M4B++mozkORBMXk59zGf+vjVICVFQpjdDDgan29y8vyP
+	 8cw/sr3zHbI4Lkv02hBooq2sV8ZmCiIsHS6o+0TmJpW/3yjojwGOW+7HDaQBysRGiF
+	 XTLlnZNIrv/g23iLo6dtUhewGRwnC8haiUN1qyCB5oHx9sjUXukDFQfuty13jPhp2z
+	 hzSS3mPWQgv9w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 556C0E3237F;
+	Wed, 31 Jan 2024 12:40:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Organization: Addiva Elektronik
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v4 0/6] ethtool: switch EEE netlink interface to use
+ EEE linkmode bitmaps
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170670482634.28228.8010946543841872656.git-patchwork-notify@kernel.org>
+Date: Wed, 31 Jan 2024 12:40:26 +0000
+References: <7d82de21-9bde-4f66-99ce-f03ff994ef34@gmail.com>
+In-Reply-To: <7d82de21-9bde-4f66-99ce-f03ff994ef34@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: andrew@lunn.ch, linux@armlinux.org.uk, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, davem@davemloft.net,
+ netdev@vger.kernel.org
 
-Generating the list of events MDB to replay races against the IGMP/MLD
-snooping logic, which may concurrently enqueue events to the switchdev
-deferred queue, leading to duplicate events being sent to drivers.
+Hello:
 
-Avoid this by grabbing the write-side lock of the MDB, and make sure
-that a deferred version of a replay event is not already enqueued to
-the switchdev deferred queue before adding it to the replay list.
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-An easy way to reproduce this issue, on an mv88e6xxx system, was to
-create a snooping bridge, and immediately add a port to it:
+On Sat, 27 Jan 2024 14:24:05 +0100 you wrote:
+> So far only 32bit legacy bitmaps are passed to userspace. This makes
+> it impossible to manage EEE linkmodes beyond bit 32, e.g. manage EEE
+> for 2500BaseT and 5000BaseT. This series adds support for passing
+> full linkmode bitmaps between kernel and userspace.
+> 
+> Fortunately the netlink-based part of ethtool is quite smart and no
+> changes are needed in ethtool. However this applies to the netlink
+> interface only, the ioctl interface for now remains restricted to
+> legacy bitmaps.
+> 
+> [...]
 
-    root@infix-06-0b-00:~$ ip link add dev br0 up type bridge mcast_snooping 1 && \
-    > ip link set dev x3 up master br0
-    root@infix-06-0b-00:~$ ip link del dev br0
-    root@infix-06-0b-00:~$ mvls atu
-    ADDRESS             FID  STATE      Q  F  0  1  2  3  4  5  6  7  8  9  a
-    DEV:0 Marvell 88E6393X
-    33:33:00:00:00:6a     1  static     -  -  0  .  .  .  .  .  .  .  .  .  .
-    33:33:ff:87:e4:3f     1  static     -  -  0  .  .  .  .  .  .  .  .  .  .
-    ff:ff:ff:ff:ff:ff     1  static     -  -  0  1  2  3  4  5  6  7  8  9  a
-    root@infix-06-0b-00:~$
+Here is the summary with links:
+  - [net-next,v4,1/6] ethtool: replace struct ethtool_eee with a new struct ethtool_keee on kernel side
+    https://git.kernel.org/netdev/net-next/c/d80a52335374
+  - [net-next,v4,2/6] ethtool: switch back from ethtool_keee to ethtool_eee for ioctl
+    https://git.kernel.org/netdev/net-next/c/0b3100bc8fa7
+  - [net-next,v4,3/6] ethtool: adjust struct ethtool_keee to kernel needs
+    https://git.kernel.org/netdev/net-next/c/285cc15cc555
+  - [net-next,v4,4/6] ethtool: add suffix _u32 to legacy bitmap members of struct ethtool_keee
+    https://git.kernel.org/netdev/net-next/c/1d756ff13da6
+  - [net-next,v4,5/6] ethtool: add linkmode bitmap support to struct ethtool_keee
+    https://git.kernel.org/netdev/net-next/c/1f069de63602
+  - [net-next,v4,6/6] net: phy: c45: change genphy_c45_ethtool_[get|set]_eee to use EEE linkmode bitmaps
+    https://git.kernel.org/netdev/net-next/c/2bb052612959
 
-The two IPv6 groups remain in the hardware database because the
-port (x3) is notified of the host's membership twice: once in the
-original event and once in a replay. Since DSA tracks host addresses
-using reference counters, and only a single delete notification is
-sent, the count remains at 1 when the bridge is destroyed.
-
-Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
----
- net/bridge/br_switchdev.c | 44 ++++++++++++++++++++++++---------------
- 1 file changed, 27 insertions(+), 17 deletions(-)
-
-diff --git a/net/bridge/br_switchdev.c b/net/bridge/br_switchdev.c
-index ee84e783e1df..a3481190d5e6 100644
---- a/net/bridge/br_switchdev.c
-+++ b/net/bridge/br_switchdev.c
-@@ -595,6 +595,8 @@ br_switchdev_mdb_replay_one(struct notifier_block *nb, struct net_device *dev,
- }
- 
- static int br_switchdev_mdb_queue_one(struct list_head *mdb_list,
-+				      struct net_device *dev,
-+				      unsigned long action,
- 				      enum switchdev_obj_id id,
- 				      const struct net_bridge_mdb_entry *mp,
- 				      struct net_device *orig_dev)
-@@ -608,8 +610,17 @@ static int br_switchdev_mdb_queue_one(struct list_head *mdb_list,
- 	mdb->obj.id = id;
- 	mdb->obj.orig_dev = orig_dev;
- 	br_switchdev_mdb_populate(mdb, mp);
--	list_add_tail(&mdb->obj.list, mdb_list);
- 
-+	if (switchdev_port_obj_is_deferred(dev, action, &mdb->obj)) {
-+		/* This event is already in the deferred queue of
-+		 * events, so this replay must be elided, lest the
-+		 * driver receives duplicate events for it.
-+		 */
-+		kfree(mdb);
-+		return 0;
-+	}
-+
-+	list_add_tail(&mdb->obj.list, mdb_list);
- 	return 0;
- }
- 
-@@ -677,22 +688,26 @@ br_switchdev_mdb_replay(struct net_device *br_dev, struct net_device *dev,
- 	if (!br_opt_get(br, BROPT_MULTICAST_ENABLED))
- 		return 0;
- 
--	/* We cannot walk over br->mdb_list protected just by the rtnl_mutex,
--	 * because the write-side protection is br->multicast_lock. But we
--	 * need to emulate the [ blocking ] calling context of a regular
--	 * switchdev event, so since both br->multicast_lock and RCU read side
--	 * critical sections are atomic, we have no choice but to pick the RCU
--	 * read side lock, queue up all our events, leave the critical section
--	 * and notify switchdev from blocking context.
-+	if (adding)
-+		action = SWITCHDEV_PORT_OBJ_ADD;
-+	else
-+		action = SWITCHDEV_PORT_OBJ_DEL;
-+
-+	/* br_switchdev_mdb_queue_one will take care to not queue a
-+	 * replay of an event that is already pending in the switchdev
-+	 * deferred queue. In order to safely determine that, there
-+	 * must be no new deferred MDB notifications enqueued for the
-+	 * duration of the MDB scan. Therefore, grab the write-side
-+	 * lock to avoid racing with any concurrent IGMP/MLD snooping.
- 	 */
--	rcu_read_lock();
-+	spin_lock_bh(&br->multicast_lock);
- 
- 	hlist_for_each_entry_rcu(mp, &br->mdb_list, mdb_node) {
- 		struct net_bridge_port_group __rcu * const *pp;
- 		const struct net_bridge_port_group *p;
- 
- 		if (mp->host_joined) {
--			err = br_switchdev_mdb_queue_one(&mdb_list,
-+			err = br_switchdev_mdb_queue_one(&mdb_list, dev, action,
- 							 SWITCHDEV_OBJ_ID_HOST_MDB,
- 							 mp, br_dev);
- 			if (err) {
-@@ -706,7 +721,7 @@ br_switchdev_mdb_replay(struct net_device *br_dev, struct net_device *dev,
- 			if (p->key.port->dev != dev)
- 				continue;
- 
--			err = br_switchdev_mdb_queue_one(&mdb_list,
-+			err = br_switchdev_mdb_queue_one(&mdb_list, dev, action,
- 							 SWITCHDEV_OBJ_ID_PORT_MDB,
- 							 mp, dev);
- 			if (err) {
-@@ -716,12 +731,7 @@ br_switchdev_mdb_replay(struct net_device *br_dev, struct net_device *dev,
- 		}
- 	}
- 
--	rcu_read_unlock();
--
--	if (adding)
--		action = SWITCHDEV_PORT_OBJ_ADD;
--	else
--		action = SWITCHDEV_PORT_OBJ_DEL;
-+	spin_unlock_bh(&br->multicast_lock);
- 
- 	list_for_each_entry(obj, &mdb_list, list) {
- 		err = br_switchdev_mdb_replay_one(nb, dev,
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
