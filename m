@@ -1,261 +1,161 @@
-Return-Path: <netdev+bounces-67453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D624E84388A
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 09:09:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CADB8843909
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 09:28:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D6E51F293E2
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 08:09:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8232D2845F2
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 08:28:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471C159140;
-	Wed, 31 Jan 2024 08:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A28C61672;
+	Wed, 31 Jan 2024 08:27:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NS/Ixz+G"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hbl8Gmk3"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5179E59B50
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 08:09:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0CDD5FB91
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 08:27:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706688556; cv=none; b=t0VlamT06KR80L2qax8c83fl7292UFDobBjGS+hXGeGyHjz1eFWh4z41hN0Io0+EqjWl67URQ5MuIQhU72c5zeqzCS2P+a1xe2q0zHephd+BU2/hGGEjj7R33/qCLeSBr90vzp/N1ygdfdxdE3nIygQj21TchrAMoAqjhmp8zt8=
+	t=1706689677; cv=none; b=jkLAchQ1EzXuFGuozUWQRrXz9wF4TOOMLcbFMBCjBTZPt4kf0Vi4O1OcA2pKmpkQgKmZWwn0tC5GwouZ38lbLS8I8evTckk1e8q4WGUFmAnlanhoAvsKqSO6hF7I4S9FkiR//GlUvnwB4utbPmFtosmNN9G1wyqJPmxd1Rk9x+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706688556; c=relaxed/simple;
-	bh=R9LlMZ9OVWWJPyIrRhrpFomBiwws4epkFDcHeYI6bsQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VW//NAlFaq/wgq9Oy2ux4tS4/7i3UuRgoHSjn90DGdzzQEMOgCQj9lQ4s4B32GEmwYfWG6ADLq6a+rSV72gpA5DmWOyfGLZJh5I0GUwMCLebmpnOgVxV097pMHngDt+udUZmGaeKmOK+mIMCgUP6cEtisP58H0uVz/7+uxDzryc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NS/Ixz+G; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706688553;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=BVJpQ3A3nkI35HUkwufhzOS8ITMBUW4wMCPcw1yqp/w=;
-	b=NS/Ixz+G2A6WtgyoTzqTUNfUrjMz6d4sq/MQIAi0nPPtp9+sNTi5zFPnBneEylIhRpOHFK
-	4JYvgxl2GUnAgZtGAFzbypD1ARul6aweTtdq0z/ZZHWRBxUr3jXF9cOFuDuE773NrA6/NJ
-	fFgsctCfYC69OLc8Mkdmhw3Ce1fqSVM=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-226-OCFcN1uQN3SCvHaOASgiuQ-1; Wed,
- 31 Jan 2024 03:09:09 -0500
-X-MC-Unique: OCFcN1uQN3SCvHaOASgiuQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 42B3B2825BA5;
-	Wed, 31 Jan 2024 08:09:09 +0000 (UTC)
-Received: from ksundara-mac.redhat.com (unknown [10.74.17.170])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id CC22F1C060AF;
-	Wed, 31 Jan 2024 08:09:03 +0000 (UTC)
-From: karthiksundaravel <ksundara@redhat.com>
-To: jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: rjarry@redhat.com,
-	aharivel@redhat.com,
-	vchundur@redhat.com,
-	ksundara@redhat.com,
-	cfontain@redhat.com
-Subject: [PATCH] ice: Add get/set hw address for VF representor ports
-Date: Wed, 31 Jan 2024 13:38:47 +0530
-Message-Id: <20240131080847.30614-1-ksundara@redhat.com>
+	s=arc-20240116; t=1706689677; c=relaxed/simple;
+	bh=MY2r9mYRhywVE6Zyf3jdHEdPVodHSx4Ti1w826wtNY4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=j/f2pXDv3qzgO+1i6KJuqxoe3S3Mr3E7GzLGIfAD460BRrYAEj/fFjy+pKPSC1ItE+Sy47VVuJlsE8CU4RG6lS8ZSTJTgjXBajpzcqy1E+ImzOtr8Fei5RyZCtAM+sL9/0OeS6chVCGlYz0Bfs1pKLgUQu5e8ueKjYNxxismXo8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hbl8Gmk3; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-55ef0465507so4117008a12.3
+        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 00:27:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1706689673; x=1707294473; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jSyq8T0dgaUi5zrT7v/7kxWNYaOkrtZjbuuR7I5khSc=;
+        b=hbl8Gmk3qMc+AYYVkZrzQ8PzHxin/u9ObcWRCz+Cz6kPsMSntwh5WCUg77IG8S/UmH
+         jrti9tl85wFnxOChMY62kO0zI+B2A+wMGOHgc/mEDtjNp+8eBdqPQ3TjY+lUd0jnZANp
+         /63hUyPbUytKY5d6qO8JQLb/TwsXMYJaOrK8H2ZPDvkLiNZ4kWYz7NhupSlJl7f9OibP
+         dlU3+MJCgzZY7zF+Uvog26drxJIy5i6uoEkEbHQCAuEpYLMjKKhu1QYVSAefKYJZgnuj
+         YRSc3MdnRTm9Cr2FtVnOC1pqS7Bz4o+MKAKCflrGHgQsqsTG6I9dzyqL/OSD55A+TDIR
+         uUAQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706689673; x=1707294473;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jSyq8T0dgaUi5zrT7v/7kxWNYaOkrtZjbuuR7I5khSc=;
+        b=bxiIIGwCCUrtY1AmL4wy/BqPo8Fcw89qPoOxmxfBeG9VzkvBuZS85Sq3QusPsVOXcv
+         4X/dUycTcmFoXA8VuYYsaIuaX470le194NI8x9xkwQhDiUvluS3DMZs1OJanZElSKE86
+         rdmcX6JqE3lWjkNskVXPcrbmhwZy50y9IzVC9tDmOKiCaXzbA6dXqxxrB/beD/m230Rd
+         Gnm+niSwJbNb144AJyVB1X01nmmzfG6yo0kTxRZkCpduVfBdO3EArt2Pt3V0R09IfjSJ
+         2gBu7ltlt/3qnuHNdSV6FwugbLoxA4TGmuvrxi9QEto22uyuZKfWLXiQ2VL0BS5JXfEB
+         FmFA==
+X-Gm-Message-State: AOJu0Yy8OOzOkhtqO5wRm2e1hdr+QNkm1lm0aD0f8ihP3p+OmKsREndp
+	i64oXrJMqUhg2PYXvz7vLmU1Hhj0Uby6SXK5CB4Wm0t5SJVGNnUG3VOK4/Jc6l4=
+X-Google-Smtp-Source: AGHT+IELjYRIc3zYE0j0jPirvie0a03AwJKzNe6ScjTg0S9BDZYPz9H0ESnHsbPbuzr/vd+kofGQbg==
+X-Received: by 2002:aa7:c2cc:0:b0:55f:314:6890 with SMTP id m12-20020aa7c2cc000000b0055f03146890mr580405edp.22.1706689673084;
+        Wed, 31 Jan 2024 00:27:53 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWts5SGByEezZ9xzA8RTu72RZOePLNR39WdTnddJ5XM+N/q+2c5XWBt8goBlk/BLIbgaRudJSYf8AfMLwzgPvaQQ2jI0kyioxLoIp1zqe0HK2zVHEt/4kh+0Mjo1fawrAmwItsvhvf0NB8YS3s4cZU7i6DUqiiRY+FBOFZiN5Qg/Uss7GcpUOFC2qLpRQh3uZQpOcfufsGmSfIWeZJKJ82VeYzX2udbXp+ZegcTGuDE8yFKRzvoRirMm1fnqmp2D3wiKsJ5QH/mFVlN0TZK8pQN8dnaqWIzIoJPxqD9hGGav0wAqnnTtdk3Vui/F1I7oVIxf5HJ06I6hDPFBOMSoS4/ZQW62KZvfIY6UGxKTnCR3Woer5MOE+Qmu1434FI5MqV9Np4agZM2Q64SbuVCn1/my6fsFfnCT1WP06+xvMgv9ApfZFtXbVnKT+EXRooH5tp7IbBWKbWX2tVnyk1CT7BQRPfSin1v2PN0CqO101HSjNot8Gbx0x4tlBaxOAgwHl/XWpOm3TLsa2/ZsA/Li1WeFeHWGZhjBks=
+Received: from [192.168.1.20] ([178.197.222.62])
+        by smtp.gmail.com with ESMTPSA id x6-20020a056402414600b0055d36e6f1a7sm5442819eda.82.2024.01.31.00.27.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 31 Jan 2024 00:27:52 -0800 (PST)
+Message-ID: <f5d3cf5b-9e3b-4904-8edd-fa1e18652990@linaro.org>
+Date: Wed, 31 Jan 2024 09:27:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 1/4] dt-bindings: net: wireless: ath10k: describe
+ firmware-name property
+Content-Language: en-US
+To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+ Kalle Valo <kvalo@kernel.org>, Jeff Johnson <quic_jjohnson@quicinc.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>
+Cc: ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-msm@vger.kernel.org
+References: <20240130-wcn3990-firmware-path-v1-0-826b93202964@linaro.org>
+ <20240130-wcn3990-firmware-path-v1-1-826b93202964@linaro.org>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240130-wcn3990-firmware-path-v1-1-826b93202964@linaro.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Changing the mac address of the VF representor ports are not
-available via devlink. Add the function handlers to set and get
-the HW address for the VF representor ports.
+On 30/01/2024 17:38, Dmitry Baryshkov wrote:
+> For WCN3990 platforms we need to look for the platform / board specific
+> firmware-N.mbn file which corresponds to the wlanmdsp.mbn loaded to the
+> modem DSP via the TQFTPserv. Add firmware-name property describing this
+> classifier.
+> 
+> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+> ---
+>  Documentation/devicetree/bindings/net/wireless/qcom,ath10k.yaml | 6 ++++++
+>  1 file changed, 6 insertions(+)
+> 
 
-Signed-off-by: karthiksundaravel <ksundara@redhat.com>
----
- drivers/net/ethernet/intel/ice/ice_devlink.c | 134 ++++++++++++++++++-
- 1 file changed, 132 insertions(+), 2 deletions(-)
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
-index 80dc5445b50d..56d81836c469 100644
---- a/drivers/net/ethernet/intel/ice/ice_devlink.c
-+++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
-@@ -9,6 +9,8 @@
- #include "ice_eswitch.h"
- #include "ice_fw_update.h"
- #include "ice_dcb_lib.h"
-+#include "ice_fltr.h"
-+#include "ice_tc_lib.h"
- 
- static int ice_active_port_option = -1;
- 
-@@ -1576,6 +1578,134 @@ void ice_devlink_destroy_pf_port(struct ice_pf *pf)
- 	devlink_port_unregister(&pf->devlink_port);
- }
- 
-+/**
-+ * ice_devlink_port_get_vf_mac_address - .port_fn_hw_addr_get devlink handler
-+ * @port: devlink port structure
-+ * @hw_addr: Mac address of the port
-+ * @hw_addr_len: length of mac address
-+ * @extack: extended netdev ack structure
-+ *
-+ * Callback for the devlink .port_fn_hw_addr_get operation
-+ * Return: zero on success or an error code on failure.
-+ */
-+
-+static int ice_devlink_port_get_vf_mac_address(struct devlink_port *port,
-+					       u8 *hw_addr, int *hw_addr_len,
-+					       struct netlink_ext_ack *extack)
-+{
-+	struct net_device *netdev = port->type_eth.netdev;
-+
-+	if (!netdev || !netdev->dev_addr)
-+		return -EADDRNOTAVAIL;
-+
-+	ether_addr_copy(hw_addr, netdev->dev_addr);
-+	*hw_addr_len = ETH_ALEN;
-+	return 0;
-+}
-+
-+/**
-+ * ice_devlink_port_set_vf_mac_address - .port_fn_hw_addr_set devlink handler
-+ * @port: devlink port structure
-+ * @hw_addr: Mac address of the port
-+ * @hw_addr_len: length of mac address
-+ * @extack: extended netdev ack structure
-+ *
-+ * Callback for the devlink .port_fn_hw_addr_set operation
-+ * Return: zero on success or an error code on failure.
-+ */
-+static int ice_devlink_port_set_vf_mac_address(struct devlink_port *port,
-+					       const u8 *hw_addr,
-+					       int hw_addr_len,
-+					       struct netlink_ext_ack *extack)
-+{
-+	struct devlink *devlink = port->devlink;
-+	struct net_device *netdev = port->type_eth.netdev;
-+	struct ice_pf *pf = devlink_priv(devlink);
-+	struct ice_vsi *vsi = *pf->vsi;
-+	struct ice_hw *hw = &pf->hw;
-+	struct device *dev = ice_pf_to_dev(pf);
-+	u8 old_mac[ETH_ALEN];
-+	u8 flags = 0;
-+	const u8 *mac = hw_addr;
-+	int err;
-+
-+	if (!netdev)
-+		return -EADDRNOTAVAIL;
-+
-+	if (!is_valid_ether_addr(mac))
-+		return -EADDRNOTAVAIL;
-+
-+	if (ether_addr_equal(netdev->dev_addr, mac)) {
-+		dev_dbg(dev, "already using mac %pM\n", mac);
-+		return 0;
-+	}
-+
-+	if (test_bit(ICE_DOWN, pf->state) ||
-+	    ice_is_reset_in_progress(pf->state)) {
-+		dev_err(dev, "can't set mac %pM. device not ready\n", mac);
-+		return -EBUSY;
-+	}
-+
-+	if (ice_chnl_dmac_fltr_cnt(pf)) {
-+		dev_err(dev, "can't set mac %pM. Device has tc-flower filters, delete all of them and try again\n",
-+			mac);
-+		return -EAGAIN;
-+	}
-+
-+	netif_addr_lock_bh(netdev);
-+	ether_addr_copy(old_mac, netdev->dev_addr);
-+	/* change the netdev's MAC address */
-+	eth_hw_addr_set(netdev, mac);
-+	netif_addr_unlock_bh(netdev);
-+
-+	/* Clean up old MAC filter. Not an error if old filter doesn't exist */
-+	err = ice_fltr_remove_mac(vsi, old_mac, ICE_FWD_TO_VSI);
-+	if (err && err != -ENOENT) {
-+		err = -EADDRNOTAVAIL;
-+		goto err_update_filters;
-+	}
-+
-+	/* Add filter for new MAC. If filter exists, return success */
-+	err = ice_fltr_add_mac(vsi, mac, ICE_FWD_TO_VSI);
-+	if (err == -EEXIST) {
-+		/* Although this MAC filter is already present in hardware it's
-+		 * possible in some cases (e.g. bonding) that dev_addr was
-+		 * modified outside of the driver and needs to be restored back
-+		 * to this value.
-+		 */
-+		dev_dbg(dev, "filter for MAC %pM already exists\n", mac);
-+		return 0;
-+	} else if (err) {
-+		/* error if the new filter addition failed */
-+		err = -EADDRNOTAVAIL;
-+	}
-+
-+err_update_filters:
-+	if (err) {
-+		dev_err(dev, "can't set MAC %pM. filter update failed\n", mac);
-+		netif_addr_lock_bh(netdev);
-+		eth_hw_addr_set(netdev, old_mac);
-+		netif_addr_unlock_bh(netdev);
-+		return err;
-+	}
-+
-+	dev_dbg(dev, "updated MAC address to %pM\n", netdev->dev_addr);
-+
-+	/* write new MAC address to the firmware */
-+	flags = ICE_AQC_MAN_MAC_UPDATE_LAA_WOL;
-+	err = ice_aq_manage_mac_write(hw, mac, flags, NULL);
-+	if (err) {
-+		dev_err(dev, "can't set MAC %pM. write to firmware failed error %d\n",
-+			mac, err);
-+	}
-+	return 0;
-+}
-+
-+static const struct devlink_port_ops ice_devlink_vf_port_ops = {
-+	.port_fn_hw_addr_get = ice_devlink_port_get_vf_mac_address,
-+	.port_fn_hw_addr_set = ice_devlink_port_set_vf_mac_address,
-+};
-+
- /**
-  * ice_devlink_create_vf_port - Create a devlink port for this VF
-  * @vf: the VF to create a port for
-@@ -1611,7 +1741,8 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
- 	devlink_port_attrs_set(devlink_port, &attrs);
- 	devlink = priv_to_devlink(pf);
- 
--	err = devlink_port_register(devlink, devlink_port, vsi->idx);
-+	err = devlink_port_register_with_ops(devlink, devlink_port,
-+					     vsi->idx, &ice_devlink_vf_port_ops);
- 	if (err) {
- 		dev_err(dev, "Failed to create devlink port for VF %d, error %d\n",
- 			vf->vf_id, err);
-@@ -1620,7 +1751,6 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
- 
- 	return 0;
- }
--
- /**
-  * ice_devlink_destroy_vf_port - Destroy the devlink_port for this VF
-  * @vf: the VF to cleanup
--- 
-2.39.3 (Apple Git-145)
+Best regards,
+Krzysztof
 
 
