@@ -1,168 +1,154 @@
-Return-Path: <netdev+bounces-67679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C108A8448D3
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 21:29:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BFEEA8448DB
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 21:30:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E475288C0B
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 20:29:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71031289EE6
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 20:30:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03F9C405D8;
-	Wed, 31 Jan 2024 20:24:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7035513342C;
+	Wed, 31 Jan 2024 20:27:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lpOpSKFN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CP6k84EO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com [209.85.210.51])
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A1703FE51
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 20:24:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBD33130E3C;
+	Wed, 31 Jan 2024 20:27:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706732673; cv=none; b=I8kTjhZc7Y1i1NsutiSv1/xFyXeKFK8UJgbx51wHShchsGF0Ku++N7aoboazq9ETFOALzq1i2BuyvaSRJafTUi1lQwhgrt4az2gVJ43+aL9hC9723g2HbovZlXPeFYtWs8XcvDUZdjpXBzSnVUwv8GyR9PJOadVPhbEhL6TjFtc=
+	t=1706732857; cv=none; b=uMoY9kZAa0F7f1yp9UHqx7NgG5eIhEhDvk/uVm0VG2G30l4c030h6ySFlYJAUfKQj3of25ze0B7B2axS8tAsw+3htogRie5ez6mkLGXY8g7ePIy1USgk1u6xG4hH1lWSSrmE8pP05cooKMKjCLA4voZvMoSfEJ2xazZj6e3ChGk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706732673; c=relaxed/simple;
-	bh=Uc23yUlCsJLyihvckKDvzcikzc7p3u2f3hupZkGPV88=;
-	h=Message-ID:Date:MIME-Version:Cc:From:Subject:To:Content-Type; b=vE/Row8I8kLjK5Q36HbLhwv32Tkj6cQxU8njqw9XmdcOnsdkq1lV0YuQB2AWsCK3CmKaY4puARFtiuf4Eymi1uyIhsgzEcYTcLFOfid+cJUvUfZ1wTuQVW0Gp5sZhkjtRCsLwONQDQ0JmUacsT6/Ciu8zioAz8qcp4u5mKiG1bY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lpOpSKFN; arc=none smtp.client-ip=209.85.210.51
+	s=arc-20240116; t=1706732857; c=relaxed/simple;
+	bh=WzSzwBPdudJ262CG6Ols7AJ5XlrNJk0qQyTEu0ShNz0=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=mBoahajbVsKcvxuLUwvF5uuY5vPdx8YM+MYXOohHL291JyaxdXUz4hwDS4LW08WqF/pl2aEaB6vIV7g6cugaQ1eCuTC5eVVoKZc72WvrNFj0AUxLI6eFX72XcGJ+yFtkn+ZpOinGGJyune/TBqpC+id3WcsU9ZYh9z9qxg1apNo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CP6k84EO; arc=none smtp.client-ip=209.85.167.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f51.google.com with SMTP id 46e09a7af769-6e12d0af927so143084a34.0
-        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 12:24:32 -0800 (PST)
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3bebc25da94so128581b6e.2;
+        Wed, 31 Jan 2024 12:27:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706732671; x=1707337471; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:autocrypt:subject:from:cc
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=itiX6/DCJ9Z0edipyOtwdoGuHCRWDPaeic1E8yo/EiU=;
-        b=lpOpSKFNaZeMLTP87VWZFb2Hl0BUbKWcqSqMt/plsBpM8EvmkxVG3gSKDuJYHYbD/R
-         +ng8fjjTeASTVZGb/+vEScjGftfNazdykisqErNtmaPqb1ZT4/lDAaV+Yq4ZQ8MNS4Ry
-         sIJTY8q4u20xafIpKCSHctPqL47X2LlqjsEqY7a1WGp+pNxhb2rD0g3EVOcWHwK3jT0p
-         N2I7+u4otXac8VwVTUZCQ05ciF4RSGq8Sd/ssOMpX/0TwciI+ossBa2HNZkayvvr4/+k
-         f65MsZ7TAXpiGmscIF6OzWyVbwyWT3fNfm2dHtn2wJplwiF/+VhXsfPzms7EEyKQgIuP
-         HPdQ==
+        d=gmail.com; s=20230601; t=1706732855; x=1707337655; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aOUcYqy9EC5gFvTqCNhoV5GMF3JPe9eKJnFbf/tP3aY=;
+        b=CP6k84EOIQpkoDU1rOIjh824RDivrBanMM6yR5br3LLpJzQe310zJwWp0JTIoic63t
+         LUF8nsd28edMNItZn8LoSZGzNV8MfZfil/d9MkAXKnOae6rYf8QPD1T84dUWXQm5dnIy
+         fbYnJnRGBmBXdCzReq6ZpRWWN/L8v7KFgtrBBxbKKIUAF3vMUnR8EEdaQizDX1wVYO3u
+         qh1XiZ6hqVotx3IDyY80Ece4b2m3QS1MvXAlMUIYxeZRj17rkmbAccDD1Fv4vTfH/FB3
+         2WMXDm/QRYhSwAvBEtNTmTulT1eISZ8IC9MzFxkTwWk8kQCUdR+saJDKZMcitvmijiW8
+         TiZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706732671; x=1707337471;
-        h=content-transfer-encoding:to:autocrypt:subject:from:cc
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=itiX6/DCJ9Z0edipyOtwdoGuHCRWDPaeic1E8yo/EiU=;
-        b=D0no5AO129ab1ZMDmBOeeg/SgOcZH81dKHWPw/N17bvwBujb12zwX2FcuRcX6Ex03Z
-         GiLmdTfZE7oDyMCJoXKXWDqYuw+xaXG/IlpdkdnYs36yFyrAwn5tSv7b5mHtL8npyoQr
-         ydJ1wliLTVS0rRxJ87XOFQDAte3j8o0voOg9CE1NkiDI0u1+mCjc3dEGlvJZwEmA7AWy
-         wPj0YBLyKBxiWjATlL7QTF3z03itdjTLQL3q35HRwyXH/iJphhY7SDS5JB2wVmwmcTpt
-         kLPgearkbrRLhb7731wIlow/5DK1e0GTnUWQxfyVCLAUlo6inNUNd+tG7C7Spv1gZ5lK
-         mekA==
-X-Gm-Message-State: AOJu0YzjNpcw/oXH6krZ/72FtyaFBscxdy4RHhBn0rtYrC7Y3ReRhlJs
-	Ei34vYsqtPx7aBe9zjIoAdPuk8aD2VnSCu1pydXURwx6Pzd0xslxSPPfMC14
-X-Google-Smtp-Source: AGHT+IEv//Ac0b1G4ZMpOfsnLE/FlB4drCdc4CJd9FM7G5oEy4uZ4J/A8TBKCqYUg+sZghNWw9tPRw==
-X-Received: by 2002:a9d:6285:0:b0:6dc:3c65:2a70 with SMTP id x5-20020a9d6285000000b006dc3c652a70mr2700444otk.65.1706732671105;
-        Wed, 31 Jan 2024 12:24:31 -0800 (PST)
-Received: from ?IPV6:2a01:c23:b988:d300:5963:bb9c:1b6d:3323? (dynamic-2a01-0c23-b988-d300-5963-bb9c-1b6d-3323.c23.pool.telefonica.de. [2a01:c23:b988:d300:5963:bb9c:1b6d:3323])
-        by smtp.googlemail.com with ESMTPSA id s12-20020a9d58cc000000b006e129888566sm1418432oth.17.2024.01.31.12.24.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 Jan 2024 12:24:30 -0800 (PST)
-Message-ID: <0c8e67ea-6505-43d1-bd51-94e7ecd6e222@gmail.com>
-Date: Wed, 31 Jan 2024 21:24:29 +0100
+        d=1e100.net; s=20230601; t=1706732855; x=1707337655;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=aOUcYqy9EC5gFvTqCNhoV5GMF3JPe9eKJnFbf/tP3aY=;
+        b=uWXfSCu11LSr/8I55lmsf28iqRFTE0UTIUKW6xxeeyOJiwyQ1/EzVb/IVVDO3a9+Ea
+         /G5AcNvuDJ++P86FtNzecYhjAphTy3rQEvRW0eG1rfflMnF/Ml635gthkFUH0Nj4qsxb
+         /V5xTbUYtjFMLvrNVi8vPvFf0CoD2S2AKGyczUceqhoVcixQA80uFslbdBJBTK4l38/Z
+         QzqmgUcDuky9jX+03CPujhOoQQUMID/vRPJAz5F+4KjfJxXFYK1VHndR4mwOTBW9DhmZ
+         ImyWTMsXP7aeEb46AFRYSrPrrC+Lmyc1AmI8RQlyK17Vm0naYMUqsH2nqmJDjOb1PNEi
+         9GkQ==
+X-Gm-Message-State: AOJu0YyZatsf0z5uecQ9tnTZ9cYUjWSNxB5bKEmP39+8iXnO3wr7AefP
+	LWMArlcr/elUXQ2iGc2U5jI2MmTSDzkfoqIyMxMiO9CF876T/4Wt
+X-Google-Smtp-Source: AGHT+IEWNwRNc/1r7tpn00tffmMvRJ9Bt9aHwqnL56kiJqeUSPJtZsMGOr0j11FeuUV2XUY70L9P/A==
+X-Received: by 2002:a05:6808:1508:b0:3be:53f8:de8a with SMTP id u8-20020a056808150800b003be53f8de8amr3413588oiw.56.1706732854837;
+        Wed, 31 Jan 2024 12:27:34 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUWORy331POupFh5HmzPQLolP4RHfyrA6zCClriw+PMwRQtGY/WvVVXuNgqUzuHUHFGBUmJBwY7bp81Z47ANJ4Y9ULe+Rp+ufR08PCFFIT7MdizPnzOjTJj+1ZlMG0TQVlu3yE8CwJ0HrAGrZZtZfKn88O01kVyDEVFyVuCOIGMAmhrK4xENhqa0mRmCScCqwgAnAHNxP2mDyVE19jBOmKFe1AK+lcTuqeKb+8Mokpx4ye1K1EF5Nsl4qmX9H9Q8KIr
+Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
+        by smtp.gmail.com with ESMTPSA id fd12-20020a05622a4d0c00b0042aa41424e0sm3496543qtb.83.2024.01.31.12.27.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jan 2024 12:27:34 -0800 (PST)
+Date: Wed, 31 Jan 2024 15:27:34 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ pabeni@redhat.com
+Cc: netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ linux-kselftest@vger.kernel.org, 
+ Willem de Bruijn <willemb@google.com>
+Message-ID: <65baad3627cef_1b52d2294bc@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240131102932.6caac1e2@kernel.org>
+References: <20240127023212.3746239-1-willemdebruijn.kernel@gmail.com>
+ <20240130174736.03c79071@kernel.org>
+ <65ba61ea978b4_1699fd294eb@willemb.c.googlers.com.notmuch>
+ <20240131102932.6caac1e2@kernel.org>
+Subject: Re: [PATCH net-next] selftests/net: calibrate txtimestamp
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Joe Salmeri <jmscdba@gmail.com>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] net: phy: realtek: add support for
- RTL8126A-integrated 5Gbps PHY
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-To: Russell King - ARM Linux <linux@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- David Miller <davem@davemloft.net>
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-A user reported that first consumer mainboards show up with a RTL8126A
-5Gbps MAC/PHY. This adds support for the integrated PHY, which is also
-available stand-alone. From a PHY driver perspective it's treated the
-same as the 2.5Gbps PHY's, we just have to support the new PHY ID.
+Jakub Kicinski wrote:
+> On Wed, 31 Jan 2024 10:06:18 -0500 Willem de Bruijn wrote:
+> > > Willem, do you still want us to apply this as is or should we do 
+> > > the 10x only if [ x$KSFT_MACHINE_SLOW != x ] ?  
+> > 
+> > If the test passes on all platforms with this change, I think that's
+> > still preferable.
+> > 
+> > The only downside is that it will take 10x runtime. But that will
+> > continue on debug and virtualized builds anyway.
+> > 
+> > On the upside, the awesome dash does indicate that it passes as is on
+> > non-debug metal instances:
+> > 
+> > https://netdev.bots.linux.dev/contest.html?test=txtimestamp-sh
+> > 
+> > Let me know if you want me to use this as a testcase for
+> > $KSFT_MACHINE_SLOW.
+> 
+> Ah, all good, I thought your increasing the acceptance criteria.
+> 
+> > Otherwise I'll start with the gro and so-txtime tests. They may not
+> > be so easily calibrated. As we cannot control the gro timeout, nor
+> > the FQ max horizon.
+> 
+> Paolo also mentioned working on GRO, maybe we need a spreadsheet
+> for people to "reserve" broken tests to avoid duplicating work? :S
+> 
+> > In such cases we can use the environment variable to either skip the
+> > test entirely or --my preference-- run it to get code coverage, but
+> > suppress a failure if due to timing (only). Sounds good?
+> 
+> +1 I also think we should run and ignore failure. I was wondering if we
+> can swap FAIL for XFAIL in those cases:
+> 
+> tools/testing/selftests/kselftest.h
+> #define KSFT_XFAIL 2
+> 
+> Documentation/dev-tools/ktap.rst
+> - "XFAIL", which indicates that a test is expected to fail. This
+>   is similar to "TODO", above, and is used by some kselftest tests.
+> 
+> IDK if that's a stretch or not. Or we can just return PASS with 
+> a comment?
 
-Reported-by: Joe Salmeri <jmscdba@gmail.com>
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/phy/realtek.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+Flaky tests will then report both pass and expected fail. That might
+add noise to https://netdev.bots.linux.dev/flakes.html?
 
-diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
-index 894172a3e..132784321 100644
---- a/drivers/net/phy/realtek.c
-+++ b/drivers/net/phy/realtek.c
-@@ -1047,6 +1047,16 @@ static struct phy_driver realtek_drvs[] = {
- 		.resume         = rtlgen_resume,
- 		.read_page      = rtl821x_read_page,
- 		.write_page     = rtl821x_write_page,
-+	}, {
-+		PHY_ID_MATCH_EXACT(0x001cc862),
-+		.name           = "RTL8251B 5Gbps PHY",
-+		.get_features   = rtl822x_get_features,
-+		.config_aneg    = rtl822x_config_aneg,
-+		.read_status    = rtl822x_read_status,
-+		.suspend        = genphy_suspend,
-+		.resume         = rtlgen_resume,
-+		.read_page      = rtl821x_read_page,
-+		.write_page     = rtl821x_write_page,
- 	}, {
- 		PHY_ID_MATCH_EXACT(0x001cc961),
- 		.name		= "RTL8366RB Gigabit Ethernet",
--- 
-2.43.0
+I initially considered returning skipped on timing failure. But that
+has the same issue.
 
+So perhaps just return pass?
+
+
+Especially for flaky tests sometimes returning pass and sometimes
+returning expected to fa red/green
+dash such as 
 
