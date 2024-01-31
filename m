@@ -1,726 +1,143 @@
-Return-Path: <netdev+bounces-67673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD4F1844850
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 20:53:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81219844855
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 20:56:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B0381F221B0
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 19:53:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3773328EFC3
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 19:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECBED3EA9B;
-	Wed, 31 Jan 2024 19:53:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="I45K354d"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 000B83E499;
+	Wed, 31 Jan 2024 19:56:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from cloud48395.mywhc.ca (cloud48395.mywhc.ca [173.209.37.211])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CC573B189
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 19:53:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40603B189;
+	Wed, 31 Jan 2024 19:56:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.209.37.211
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706730801; cv=none; b=rprg1Jn0wyeknZ9oGdW+W3NQNZEegCYKawG02wBptakqovUEgxDP6ecFDaYoMoQtng3eMntE/2qJvoZPnH65QArr+HqwS4tKfL/OVGClejaafohmEp4QwXAOrQU5Ph5JL+n3fkIvYHrLILwuSYC2N0r2r3OjEd6AYtIwWBge3eU=
+	t=1706730971; cv=none; b=d+BzSczmVy1KCFl8UikxgLvjIIpF/1Nc2I+BCCICliWUW6zGl/fLPT8WYD1g/X/92idCOXhuJeHHN852CQtOkMzE6bFZGyTvp2oJy+dYLX0Dk8DvxjKGT0glUDl1Rjm9TIkBEqHn5M3jCN1+AO39P1lfDRPWPQURX27ae+goIaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706730801; c=relaxed/simple;
-	bh=NRMb+2PV8Q9vzRLAYkrArcII/ZX3rb+7RnMXgd8uMWs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=C6iDnhBjnsJpL0d5PkZdHD3rk3cddT8x3tIP0cN1P45S9ujKZdQevjycyTV50pNKDFdg+pru6qzk2Wzi0di+IWoxRHhpJY1ytF6dlXJ1bLTlfwxUhXLbiLvkmHIIobpKAqOFQg+iLEJ8mtfzjy1aHJODKe8zSEKWZW0NNkSgX08=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=I45K354d; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-dc6d5267cceso57761276.1
-        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 11:53:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1706730798; x=1707335598; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KbXeis8CtFXgU6snPwnEN2qvedAhzb+8Us4+2fBZDN8=;
-        b=I45K354dg9A2HvV5hVWN9wZqZgJB42UKPhrLONPfEsdEM0NhKiQc8wsi+RZwOZmzUA
-         +nnrEC9UR7cTASrk2JaNbIs1NYJ01DAXq/d1rgZWyh+Lkx6eWkBVMNyU5xS3RZlLL6EB
-         QZXTnYrtXc1j5q8pSjIZ/xkReSYPGNpa4cW6UWKBt9erEHZWgXQ8LJxJZTZaYp7vNAj0
-         79tGshvh5BQSA6P16FhxG6/s/F2k18Hv0J4haV2UVH3ADOzqWtszvKK70j3CTNZnDEzV
-         u9WBs82UZwYmN+A8tLnmrZt9B6bspsUW6gG2vnmbOfzIpZOA5b9Q5EYgzCsbOQOTIw++
-         OiCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706730798; x=1707335598;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KbXeis8CtFXgU6snPwnEN2qvedAhzb+8Us4+2fBZDN8=;
-        b=tGox7YQWRx15WukpNLzK8srmvE6Fe3bayFEqridMgwNyUHIprPT+WIuZvh66YaRS37
-         ta0800VmP1NsvAGVO+JUQy8jLDM+d325DO5/4JUxbvPb7VFKV+1qVPrNCzszPy4Vd1ZN
-         QISt1xjFbmgm4m9uqElxl1rrOgR8RUmOo1pWNe9hORULv8Xm4Pjr7XHlb2XFS/X+z43B
-         cLLmymR3Qwd1tNEUIy/eLJrGWZd9jnB+VtBsvrbWb2yqxybv2+KWNFGmwOpfDhLcCapX
-         mTltQOEaTegVScgCTKPvInaXHUMl3oTvsNsjthCpkTFkqpLAZ+IEG44LGCFjMCY2pIAH
-         ns9Q==
-X-Gm-Message-State: AOJu0YwV3WH1Hb5mOBUFoRxvLN4jmE/fZC1905rokBa9gGnFdHRJ51Zs
-	CxOOpZMkxjik7KMQ6VFtyx+BCWoLScaf82u28HaY6cg1egvRJy1REAYPZ6CQUTMBOq+QE1wu456
-	/XKyD11v1CpAPXuXMXxHiGMi26RIFDA3Qa2SL
-X-Google-Smtp-Source: AGHT+IHRLyKoCUP7cEiF8nqSwcburomLqObss/hLppMvI7cdN44kACofbcxjst6R3mZVZHM2AHyL3pce6B1hcAiECFo=
-X-Received: by 2002:a25:c702:0:b0:dc2:554f:ef44 with SMTP id
- w2-20020a25c702000000b00dc2554fef44mr2858524ybe.18.1706730797932; Wed, 31 Jan
- 2024 11:53:17 -0800 (PST)
+	s=arc-20240116; t=1706730971; c=relaxed/simple;
+	bh=sQZ7coHBW596Czfzya6483w2cThFXD7vAdHLF1T00gw=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=V/66JaQM12rLVWhjpyj2sHAS649YlfhgMNlSNqx1ZC9/2Yzmc1KLE48hc8vmGjthS7GQjTLWuvA7RCv+pk2+xh2voRyVofZwjYfenudL9QJ+rtz6yP9EDzDZgqm2MxDE5alAx21OjAwkYRKmsW7pYOar/RmAaw28ZGW6T+oO7O0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trillion01.com; spf=pass smtp.mailfrom=trillion01.com; arc=none smtp.client-ip=173.209.37.211
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trillion01.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trillion01.com
+Received: from [45.44.224.220] (port=49530 helo=[192.168.1.177])
+	by cloud48395.mywhc.ca with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <olivier@trillion01.com>)
+	id 1rVGgn-0006ci-2r;
+	Wed, 31 Jan 2024 14:56:05 -0500
+Message-ID: <c28b3f5f40ed028ba9d74e94e3cc826c04f38bf7.camel@trillion01.com>
+Subject: Re: [PATCH v15 0/7] io_uring: add napi busy polling support
+From: Olivier Langlois <olivier@trillion01.com>
+To: Jens Axboe <axboe@kernel.dk>, Stefan Roesch <shr@devkernel.io>, 
+	io-uring@vger.kernel.org, kernel-team@fb.com
+Cc: ammarfaizi2@gnuweeb.org, netdev@vger.kernel.org, kuba@kernel.org
+Date: Wed, 31 Jan 2024 14:56:04 -0500
+In-Reply-To: <34560e193660122ea142daa0fbeb381eb7b0eb6d.camel@trillion01.com>
+References: <20230608163839.2891748-1-shr@devkernel.io>
+	 <58bde897e724efd7771229734d8ad2fb58b3ca48.camel@trillion01.com>
+	 <2b238cec-ab1b-4160-8fb0-ad199e1d0306@kernel.dk>
+	 <45a21ffe4878d77acba01ec43005c80a83f0e31a.camel@trillion01.com>
+	 <b6dc538a-01eb-4f87-a9d4-dea17235ff85@kernel.dk>
+	 <34560e193660122ea142daa0fbeb381eb7b0eb6d.camel@trillion01.com>
+Autocrypt: addr=olivier@trillion01.com; prefer-encrypt=mutual;
+ keydata=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
+Organization: Trillion01 Inc
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240131170019.106122-1-stephen@networkplumber.org>
-In-Reply-To: <20240131170019.106122-1-stephen@networkplumber.org>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 31 Jan 2024 14:53:06 -0500
-Message-ID: <CAM0EoMnrs7h8SZbex27OosxkcrgyhZC1KQK0F=+XfA-ewOGy8g@mail.gmail.com>
-Subject: Re: [PATCH net-next] net/sched: report errors with extack
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)" <bpf@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - cloud48395.mywhc.ca
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - trillion01.com
+X-Get-Message-Sender-Via: cloud48395.mywhc.ca: authenticated_id: olivier@trillion01.com
+X-Authenticated-Sender: cloud48395.mywhc.ca: olivier@trillion01.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-On Wed, Jan 31, 2024 at 12:00=E2=80=AFPM Stephen Hemminger
-<stephen@networkplumber.org> wrote:
->
-> While working a BPF action, found that the error handling was
-> limited. The support of external ack was only added to some
-> but not all actions.
->
-> When an action detects invalid parameters, it should
-> be adding an external ack to netlink so that the user is
-> able to diagnose the issue.
->
-> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
-> ---
->  net/sched/act_bpf.c      | 31 ++++++++++++++++++++++---------
->  net/sched/act_connmark.c |  8 ++++++--
->  net/sched/act_csum.c     |  8 ++++++--
->  net/sched/act_gact.c     | 14 +++++++++++---
->  net/sched/act_gate.c     | 15 +++++++++++----
->  net/sched/act_ife.c      |  8 ++++++--
->  net/sched/act_nat.c      |  9 +++++++--
->  net/sched/act_police.c   | 13 ++++++++++---
->  net/sched/act_sample.c   |  8 ++++++--
->  net/sched/act_simple.c   |  9 +++++++--
->  net/sched/act_skbedit.c  | 13 ++++++++++---
->  net/sched/act_skbmod.c   |  9 +++++++--
->  net/sched/act_vlan.c     |  8 ++++++--
->  13 files changed, 115 insertions(+), 38 deletions(-)
->
-> diff --git a/net/sched/act_bpf.c b/net/sched/act_bpf.c
-> index 6cfee6658103..f8a03d3bbf20 100644
-> --- a/net/sched/act_bpf.c
-> +++ b/net/sched/act_bpf.c
-> @@ -184,7 +184,8 @@ static const struct nla_policy act_bpf_policy[TCA_ACT=
-_BPF_MAX + 1] =3D {
->                                     .len =3D sizeof(struct sock_filter) *=
- BPF_MAXINSNS },
->  };
->
-> -static int tcf_bpf_init_from_ops(struct nlattr **tb, struct tcf_bpf_cfg =
-*cfg)
-> +static int tcf_bpf_init_from_ops(struct nlattr **tb, struct tcf_bpf_cfg =
-*cfg,
-> +                                struct netlink_ext_ack *extack)
->  {
->         struct sock_filter *bpf_ops;
->         struct sock_fprog_kern fprog_tmp;
-> @@ -193,12 +194,16 @@ static int tcf_bpf_init_from_ops(struct nlattr **tb=
-, struct tcf_bpf_cfg *cfg)
->         int ret;
->
->         bpf_num_ops =3D nla_get_u16(tb[TCA_ACT_BPF_OPS_LEN]);
-> -       if (bpf_num_ops > BPF_MAXINSNS || bpf_num_ops =3D=3D 0)
-> +       if (bpf_num_ops > BPF_MAXINSNS || bpf_num_ops =3D=3D 0) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Invalid number of BPF instruc=
-tions");
->                 return -EINVAL;
-> +       }
->
->         bpf_size =3D bpf_num_ops * sizeof(*bpf_ops);
-> -       if (bpf_size !=3D nla_len(tb[TCA_ACT_BPF_OPS]))
-> +       if (bpf_size !=3D nla_len(tb[TCA_ACT_BPF_OPS])) {
-> +               NL_SET_ERR_MSG_MOD(extack, "BPF instruction size");
->                 return -EINVAL;
-> +       }
->
->         bpf_ops =3D kmemdup(nla_data(tb[TCA_ACT_BPF_OPS]), bpf_size, GFP_=
-KERNEL);
->         if (bpf_ops =3D=3D NULL)
-> @@ -221,7 +226,8 @@ static int tcf_bpf_init_from_ops(struct nlattr **tb, =
-struct tcf_bpf_cfg *cfg)
->         return 0;
->  }
->
-> -static int tcf_bpf_init_from_efd(struct nlattr **tb, struct tcf_bpf_cfg =
-*cfg)
-> +static int tcf_bpf_init_from_efd(struct nlattr **tb, struct tcf_bpf_cfg =
-*cfg,
-> +                                struct netlink_ext_ack *extack)
->  {
->         struct bpf_prog *fp;
->         char *name =3D NULL;
-> @@ -230,8 +236,10 @@ static int tcf_bpf_init_from_efd(struct nlattr **tb,=
- struct tcf_bpf_cfg *cfg)
->         bpf_fd =3D nla_get_u32(tb[TCA_ACT_BPF_FD]);
->
->         fp =3D bpf_prog_get_type(bpf_fd, BPF_PROG_TYPE_SCHED_ACT);
-> -       if (IS_ERR(fp))
-> +       if (IS_ERR(fp)) {
-> +               NL_SET_ERR_MSG_MOD(extack, "BPF program type mismatch");
->                 return PTR_ERR(fp);
-> +       }
->
->         if (tb[TCA_ACT_BPF_NAME]) {
->                 name =3D nla_memdup(tb[TCA_ACT_BPF_NAME], GFP_KERNEL);
-> @@ -292,16 +300,20 @@ static int tcf_bpf_init(struct net *net, struct nla=
-ttr *nla,
->         int ret, res =3D 0;
->         u32 index;
->
-> -       if (!nla)
-> +       if (!nla) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Bpf requires attributes to be=
- passed");
->                 return -EINVAL;
-> +       }
->
->         ret =3D nla_parse_nested_deprecated(tb, TCA_ACT_BPF_MAX, nla,
->                                           act_bpf_policy, NULL);
->         if (ret < 0)
->                 return ret;
->
-> -       if (!tb[TCA_ACT_BPF_PARMS])
-> +       if (!tb[TCA_ACT_BPF_PARMS]) {
+On Wed, 2024-01-31 at 12:59 -0500, Olivier Langlois wrote:
+> On Wed, 2024-01-31 at 10:32 -0700, Jens Axboe wrote:
+> >=20
+> > Thanks for testing!
+> >=20
+> > Any chance that you could run some tests with and without NAPI that
+> > help
+> > validate that it actually works? That part is what I'm most
+> > interested
+> > in, not too worried about the stability of it as I have scrutinized
+> > it
+> > pretty close already.
+> >=20
+>=20
+> There is maybe a test that I can perform. The data that I receive is
+> timestamped. I have a small test program that checks the age of the
+> updates on their reception...
+>=20
+> I would expect that it should be possible to perceive the busy
+> polling
+> effect by comparing the average update age with and without the
+> feature
+> enabled...
+>=20
+> A word of warning... The service that my client is connecting to has
+> relocated recently. I used to have an RTT of about 8mSec with it to
+> about 400-500 mSec today...
+>=20
+> because of the huge RTT, I am unsure that the test is going to be
+> conclusive at all...
+>=20
+> However, I am also in the process of relocating my client closer to
+> the
+> service. If you can wait a week or so, I should able to do that test
+> with a RTT < 1 mSec...
+>=20
+> Beside that, I could redo the same test that Stefan did with the ping
+> client/server setup but would that test add any value to the current
+> collective knowledge?
+>=20
+> I'll do the update age test when I restart my client and I'll report
+> back the result but my expectations aren't very high that it is going
+> to be conclusive due to the huge RTT.
+>=20
+>=20
+As I expected, the busy polling difference in the update age test is so
+small compared to the RTT that the result is inconclusive, IMHO...
 
-if (NL_REQ_ATTR_CHECK(extack, NULL, tb, TCA_ACT_BPF_PARMS)  to set the
-other extack fields
+The number of collected updates to build the stats is 500.
 
+System clocks are assumed to be synchronized and the RTT is the
+difference between the local time and the update timestamp.
+Actually, it may be more accurate to say that the displayed RTT values
+are in fact TT...
 
-> +               NL_SET_ERR_MSG_MOD(extack, "Missing required bpf paramete=
-rs");
->                 return -EINVAL;
-> +       }
->
->         parm =3D nla_data(tb[TCA_ACT_BPF_PARMS]);
->         index =3D parm->index;
-> @@ -336,14 +348,15 @@ static int tcf_bpf_init(struct net *net, struct nla=
-ttr *nla,
->         is_ebpf =3D tb[TCA_ACT_BPF_FD];
->
->         if (is_bpf =3D=3D is_ebpf) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Can not specify both BPF fd a=
-nd ops");
->                 ret =3D -EINVAL;
->                 goto put_chain;
->         }
->
->         memset(&cfg, 0, sizeof(cfg));
->
-> -       ret =3D is_bpf ? tcf_bpf_init_from_ops(tb, &cfg) :
-> -                      tcf_bpf_init_from_efd(tb, &cfg);
-> +       ret =3D is_bpf ? tcf_bpf_init_from_ops(tb, &cfg, extack) :
-> +                      tcf_bpf_init_from_efd(tb, &cfg, extack);
->         if (ret < 0)
->                 goto put_chain;
->
-> diff --git a/net/sched/act_connmark.c b/net/sched/act_connmark.c
-> index f8762756657d..0964d10dfc04 100644
-> --- a/net/sched/act_connmark.c
-> +++ b/net/sched/act_connmark.c
-> @@ -110,16 +110,20 @@ static int tcf_connmark_init(struct net *net, struc=
-t nlattr *nla,
->         int ret =3D 0, err;
->         u32 index;
->
-> -       if (!nla)
-> +       if (!nla) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Connmark requires attributes =
-to be passed");
->                 return -EINVAL;
-> +       }
->
->         ret =3D nla_parse_nested_deprecated(tb, TCA_CONNMARK_MAX, nla,
->                                           connmark_policy, NULL);
->         if (ret < 0)
->                 return ret;
->
-> -       if (!tb[TCA_CONNMARK_PARMS])
-> +       if (!tb[TCA_CONNMARK_PARMS]) {
+latency NO napi busy poll:
+[2024-01-31 11:28:34] INFO Main/processCollectedData rtt
+min/avg/max/mdev =3D 74.509/76.752/115.969/3.110 ms
 
-Same thing..
+latency napi busy poll:
+[2024-01-31 11:33:05] INFO Main/processCollectedData rtt
+min/avg/max/mdev =3D 75.347/76.740/134.588/1.648 ms
 
-> +               NL_SET_ERR_MSG(extack, "Missing required connmark paramet=
-ers");
->                 return -EINVAL;
-> +       }
->
->         nparms =3D kzalloc(sizeof(*nparms), GFP_KERNEL);
->         if (!nparms)
-> diff --git a/net/sched/act_csum.c b/net/sched/act_csum.c
-> index 7f8b1f2f2ed9..7c7f74e37528 100644
-> --- a/net/sched/act_csum.c
-> +++ b/net/sched/act_csum.c
-> @@ -55,16 +55,20 @@ static int tcf_csum_init(struct net *net, struct nlat=
-tr *nla,
->         int ret =3D 0, err;
->         u32 index;
->
-> -       if (nla =3D=3D NULL)
-> +       if (!nla) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Checksum requires attributes =
-to be passed");
->                 return -EINVAL;
-> +       }
->
->         err =3D nla_parse_nested_deprecated(tb, TCA_CSUM_MAX, nla, csum_p=
-olicy,
->                                           NULL);
->         if (err < 0)
->                 return err;
->
-> -       if (tb[TCA_CSUM_PARMS] =3D=3D NULL)
-> +       if (!tb[TCA_CSUM_PARMS]) {
+I'll redo the test once my RTT is closer to 1mSec. The relative gain
+should be more impressive...
 
-Same thing...
-
-> +               NL_SET_ERR_MSG(extack, "Missing required checksum paramet=
-ers");
->                 return -EINVAL;
-> +       }
->         parm =3D nla_data(tb[TCA_CSUM_PARMS]);
->         index =3D parm->index;
->         err =3D tcf_idr_check_alloc(tn, &index, a, bind);
-> diff --git a/net/sched/act_gact.c b/net/sched/act_gact.c
-> index 4af3b7ec249f..5d04bcd5115e 100644
-> --- a/net/sched/act_gact.c
-> +++ b/net/sched/act_gact.c
-> @@ -68,16 +68,21 @@ static int tcf_gact_init(struct net *net, struct nlat=
-tr *nla,
->         struct tc_gact_p *p_parm =3D NULL;
->  #endif
->
-> -       if (nla =3D=3D NULL)
-> +       if (!nla) {
-> +               NL_SET_ERR_MSG(extack, "Gact requires attributes to be pa=
-ssed");
->                 return -EINVAL;
-> +       }
->
->         err =3D nla_parse_nested_deprecated(tb, TCA_GACT_MAX, nla, gact_p=
-olicy,
->                                           NULL);
->         if (err < 0)
->                 return err;
->
-> -       if (tb[TCA_GACT_PARMS] =3D=3D NULL)
-> +       if (!tb[TCA_GACT_PARMS]) {
-
-Same..
-
-
-> +               NL_SET_ERR_MSG_MOD(extack, "Missing required gact paramet=
-ers");
->                 return -EINVAL;
-> +       }
-> +
->         parm =3D nla_data(tb[TCA_GACT_PARMS]);
->         index =3D parm->index;
->
-> @@ -87,8 +92,11 @@ static int tcf_gact_init(struct net *net, struct nlatt=
-r *nla,
->  #else
->         if (tb[TCA_GACT_PROB]) {
->                 p_parm =3D nla_data(tb[TCA_GACT_PROB]);
-> -               if (p_parm->ptype >=3D MAX_RAND)
-> +               if (p_parm->ptype >=3D MAX_RAND) {
-> +                       NL_SET_ERR_MSG(extack, "Invalid ptype in gact pro=
-b");
->                         return -EINVAL;
-> +               }
-> +
->                 if (TC_ACT_EXT_CMP(p_parm->paction, TC_ACT_GOTO_CHAIN)) {
->                         NL_SET_ERR_MSG(extack,
->                                        "goto chain not allowed on fallbac=
-k");
-> diff --git a/net/sched/act_gate.c b/net/sched/act_gate.c
-> index c681cd011afd..c9e32822938c 100644
-> --- a/net/sched/act_gate.c
-> +++ b/net/sched/act_gate.c
-> @@ -239,8 +239,10 @@ static int parse_gate_list(struct nlattr *list_attr,
->         int err, rem;
->         int i =3D 0;
->
-> -       if (!list_attr)
-> +       if (!list_attr) {
-> +               NL_SET_ERR_MSG(extack, "Gate missing attributes");
->                 return -EINVAL;
-> +       }
->
->         nla_for_each_nested(n, list_attr, rem) {
->                 if (nla_type(n) !=3D TCA_GATE_ONE_ENTRY) {
-> @@ -317,15 +319,19 @@ static int tcf_gate_init(struct net *net, struct nl=
-attr *nla,
->         ktime_t start;
->         u32 index;
->
-> -       if (!nla)
-> +       if (!nla) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Gate requires attributes to b=
-e passed");
->                 return -EINVAL;
-> +       }
->
->         err =3D nla_parse_nested(tb, TCA_GATE_MAX, nla, gate_policy, exta=
-ck);
->         if (err < 0)
->                 return err;
->
-> -       if (!tb[TCA_GATE_PARMS])
-> +       if (!tb[TCA_GATE_PARMS]) {
-
-Here...
-
-> +               NL_SET_ERR_MSG_MOD(extack, "Missing required gate paramet=
-ers");
->                 return -EINVAL;
-> +       }
->
->         if (tb[TCA_GATE_CLOCKID]) {
->                 clockid =3D nla_get_s32(tb[TCA_GATE_CLOCKID]);
-> @@ -343,7 +349,7 @@ static int tcf_gate_init(struct net *net, struct nlat=
-tr *nla,
->                         tk_offset =3D TK_OFFS_TAI;
->                         break;
->                 default:
-> -                       NL_SET_ERR_MSG(extack, "Invalid 'clockid'");
-> +                       NL_SET_ERR_MSG_MOD(extack, "Invalid 'clockid'");
->                         return -EINVAL;
->                 }
->         }
-> @@ -409,6 +415,7 @@ static int tcf_gate_init(struct net *net, struct nlat=
-tr *nla,
->                         cycle =3D ktime_add_ns(cycle, entry->interval);
->                 cycletime =3D cycle;
->                 if (!cycletime) {
-> +                       NL_SET_ERR_MSG_MOD(extack, "cycle time is zero");
->                         err =3D -EINVAL;
->                         goto chain_put;
->                 }
-> diff --git a/net/sched/act_ife.c b/net/sched/act_ife.c
-> index 0e867d13beb5..85a58cfb23f3 100644
-> --- a/net/sched/act_ife.c
-> +++ b/net/sched/act_ife.c
-> @@ -508,8 +508,10 @@ static int tcf_ife_init(struct net *net, struct nlat=
-tr *nla,
->         if (err < 0)
->                 return err;
->
-> -       if (!tb[TCA_IFE_PARMS])
-> +       if (!tb[TCA_IFE_PARMS]) {
-
-Here...
-Going to stop here - there are more further down. You get the gist..
-
-cheers,
-jamal
-
-> +               NL_SET_ERR_MSG_MOD(extack, "Missing required ife paramete=
-rs");
->                 return -EINVAL;
-> +       }
->
->         parm =3D nla_data(tb[TCA_IFE_PARMS]);
->
-> @@ -517,8 +519,10 @@ static int tcf_ife_init(struct net *net, struct nlat=
-tr *nla,
->          * they cannot run as the same time. Check on all other values wh=
-ich
->          * are not supported right now.
->          */
-> -       if (parm->flags & ~IFE_ENCODE)
-> +       if (parm->flags & ~IFE_ENCODE) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Invalid ife flag parameter");
->                 return -EINVAL;
-> +       }
->
->         p =3D kzalloc(sizeof(*p), GFP_KERNEL);
->         if (!p)
-> diff --git a/net/sched/act_nat.c b/net/sched/act_nat.c
-> index a180e724634e..a990d0c626cd 100644
-> --- a/net/sched/act_nat.c
-> +++ b/net/sched/act_nat.c
-> @@ -46,16 +46,21 @@ static int tcf_nat_init(struct net *net, struct nlatt=
-r *nla, struct nlattr *est,
->         struct tcf_nat *p;
->         u32 index;
->
-> -       if (nla =3D=3D NULL)
-> +       if (!nla) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Nat action requires attribute=
-s");
->                 return -EINVAL;
-> +       }
->
->         err =3D nla_parse_nested_deprecated(tb, TCA_NAT_MAX, nla, nat_pol=
-icy,
->                                           NULL);
->         if (err < 0)
->                 return err;
->
-> -       if (tb[TCA_NAT_PARMS] =3D=3D NULL)
-> +       if (!tb[TCA_NAT_PARMS]) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Nat action parameters missing=
-");
->                 return -EINVAL;
-> +       }
-> +
->         parm =3D nla_data(tb[TCA_NAT_PARMS]);
->         index =3D parm->index;
->         err =3D tcf_idr_check_alloc(tn, &index, a, bind);
-> diff --git a/net/sched/act_police.c b/net/sched/act_police.c
-> index e119b4a3db9f..3eb41233257b 100644
-> --- a/net/sched/act_police.c
-> +++ b/net/sched/act_police.c
-> @@ -56,19 +56,26 @@ static int tcf_police_init(struct net *net, struct nl=
-attr *nla,
->         u64 rate64, prate64;
->         u64 pps, ppsburst;
->
-> -       if (nla =3D=3D NULL)
-> +       if (!nla) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Police requires attributes");
->                 return -EINVAL;
-> +       }
->
->         err =3D nla_parse_nested_deprecated(tb, TCA_POLICE_MAX, nla,
->                                           police_policy, NULL);
->         if (err < 0)
->                 return err;
->
-> -       if (tb[TCA_POLICE_TBF] =3D=3D NULL)
-> +       if (!tb[TCA_POLICE_TBF]) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Missing required police actio=
-n parameters");
->                 return -EINVAL;
-> +       }
-> +
->         size =3D nla_len(tb[TCA_POLICE_TBF]);
-> -       if (size !=3D sizeof(*parm) && size !=3D sizeof(struct tc_police_=
-compat))
-> +       if (size !=3D sizeof(*parm) && size !=3D sizeof(struct tc_police_=
-compat)) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Invalid size for police actio=
-n parameters");
->                 return -EINVAL;
-> +       }
->
->         parm =3D nla_data(tb[TCA_POLICE_TBF]);
->         index =3D parm->index;
-> diff --git a/net/sched/act_sample.c b/net/sched/act_sample.c
-> index c5c61efe6db4..2442e001d92e 100644
-> --- a/net/sched/act_sample.c
-> +++ b/net/sched/act_sample.c
-> @@ -49,15 +49,19 @@ static int tcf_sample_init(struct net *net, struct nl=
-attr *nla,
->         bool exists =3D false;
->         int ret, err;
->
-> -       if (!nla)
-> +       if (!nla) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Sample requires attributes to=
- be passed");
->                 return -EINVAL;
-> +       }
->         ret =3D nla_parse_nested_deprecated(tb, TCA_SAMPLE_MAX, nla,
->                                           sample_policy, NULL);
->         if (ret < 0)
->                 return ret;
->
-> -       if (!tb[TCA_SAMPLE_PARMS])
-> +       if (!tb[TCA_SAMPLE_PARMS]) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Missing required sample actio=
-n parameters");
->                 return -EINVAL;
-> +       }
->
->         parm =3D nla_data(tb[TCA_SAMPLE_PARMS]);
->         index =3D parm->index;
-> diff --git a/net/sched/act_simple.c b/net/sched/act_simple.c
-> index 0a3e92888295..02b8e42c1bdd 100644
-> --- a/net/sched/act_simple.c
-> +++ b/net/sched/act_simple.c
-> @@ -100,16 +100,20 @@ static int tcf_simp_init(struct net *net, struct nl=
-attr *nla,
->         int ret =3D 0, err;
->         u32 index;
->
-> -       if (nla =3D=3D NULL)
-> +       if (!nla) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Sample requires attributes to=
- be passed");
->                 return -EINVAL;
-> +       }
->
->         err =3D nla_parse_nested_deprecated(tb, TCA_DEF_MAX, nla, simple_=
-policy,
->                                           NULL);
->         if (err < 0)
->                 return err;
->
-> -       if (tb[TCA_DEF_PARMS] =3D=3D NULL)
-> +       if (!tb[TCA_DEF_PARMS]) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Missing required sample actio=
-n parameters");
->                 return -EINVAL;
-> +       }
->
->         parm =3D nla_data(tb[TCA_DEF_PARMS]);
->         index =3D parm->index;
-> @@ -121,6 +125,7 @@ static int tcf_simp_init(struct net *net, struct nlat=
-tr *nla,
->                 return ACT_P_BOUND;
->
->         if (tb[TCA_DEF_DATA] =3D=3D NULL) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Missing simple action default=
- data");
->                 if (exists)
->                         tcf_idr_release(*a, bind);
->                 else
-> diff --git a/net/sched/act_skbedit.c b/net/sched/act_skbedit.c
-> index 754f78b35bb8..671ca64a2c33 100644
-> --- a/net/sched/act_skbedit.c
-> +++ b/net/sched/act_skbedit.c
-> @@ -133,16 +133,20 @@ static int tcf_skbedit_init(struct net *net, struct=
- nlattr *nla,
->         int ret =3D 0, err;
->         u32 index;
->
-> -       if (nla =3D=3D NULL)
-> +       if (!nla) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Skbedit requires attributes t=
-o be passed");
->                 return -EINVAL;
-> +       }
->
->         err =3D nla_parse_nested_deprecated(tb, TCA_SKBEDIT_MAX, nla,
->                                           skbedit_policy, NULL);
->         if (err < 0)
->                 return err;
->
-> -       if (tb[TCA_SKBEDIT_PARMS] =3D=3D NULL)
-> +       if (!tb[TCA_SKBEDIT_PARMS]) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Missing required skbedit para=
-meters");
->                 return -EINVAL;
-> +       }
->
->         if (tb[TCA_SKBEDIT_PRIORITY] !=3D NULL) {
->                 flags |=3D SKBEDIT_F_PRIORITY;
-> @@ -161,8 +165,10 @@ static int tcf_skbedit_init(struct net *net, struct =
-nlattr *nla,
->
->         if (tb[TCA_SKBEDIT_PTYPE] !=3D NULL) {
->                 ptype =3D nla_data(tb[TCA_SKBEDIT_PTYPE]);
-> -               if (!skb_pkt_type_ok(*ptype))
-> +               if (!skb_pkt_type_ok(*ptype)) {
-> +                       NL_SET_ERR_MSG_MOD(extack, "ptype is not a valid"=
-);
->                         return -EINVAL;
-> +               }
->                 flags |=3D SKBEDIT_F_PTYPE;
->         }
->
-> @@ -212,6 +218,7 @@ static int tcf_skbedit_init(struct net *net, struct n=
-lattr *nla,
->                 return ACT_P_BOUND;
->
->         if (!flags) {
-> +               NL_SET_ERR_MSG_MOD(extack, "No skbedit action flag");
->                 if (exists)
->                         tcf_idr_release(*a, bind);
->                 else
-> diff --git a/net/sched/act_skbmod.c b/net/sched/act_skbmod.c
-> index bcb673ab0008..c80828cdeb69 100644
-> --- a/net/sched/act_skbmod.c
-> +++ b/net/sched/act_skbmod.c
-> @@ -119,16 +119,20 @@ static int tcf_skbmod_init(struct net *net, struct =
-nlattr *nla,
->         u16 eth_type =3D 0;
->         int ret =3D 0, err;
->
-> -       if (!nla)
-> +       if (!nla) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Skbmod requires attributes to=
- be passed");
->                 return -EINVAL;
-> +       }
->
->         err =3D nla_parse_nested_deprecated(tb, TCA_SKBMOD_MAX, nla,
->                                           skbmod_policy, NULL);
->         if (err < 0)
->                 return err;
->
-> -       if (!tb[TCA_SKBMOD_PARMS])
-> +       if (!tb[TCA_SKBMOD_PARMS]) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Missing required skbmod param=
-eters");
->                 return -EINVAL;
-> +       }
->
->         if (tb[TCA_SKBMOD_DMAC]) {
->                 daddr =3D nla_data(tb[TCA_SKBMOD_DMAC]);
-> @@ -160,6 +164,7 @@ static int tcf_skbmod_init(struct net *net, struct nl=
-attr *nla,
->                 return ACT_P_BOUND;
->
->         if (!lflags) {
-> +               NL_SET_ERR_MSG_MOD(extack, "No skbmod action flag");
->                 if (exists)
->                         tcf_idr_release(*a, bind);
->                 else
-> diff --git a/net/sched/act_vlan.c b/net/sched/act_vlan.c
-> index 836183011a7c..b468a4c8a904 100644
-> --- a/net/sched/act_vlan.c
-> +++ b/net/sched/act_vlan.c
-> @@ -134,16 +134,20 @@ static int tcf_vlan_init(struct net *net, struct nl=
-attr *nla,
->         int ret =3D 0, err;
->         u32 index;
->
-> -       if (!nla)
-> +       if (!nla) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Vlan requires attributes to b=
-e passed");
->                 return -EINVAL;
-> +       }
->
->         err =3D nla_parse_nested_deprecated(tb, TCA_VLAN_MAX, nla, vlan_p=
-olicy,
->                                           NULL);
->         if (err < 0)
->                 return err;
->
-> -       if (!tb[TCA_VLAN_PARMS])
-> +       if (!tb[TCA_VLAN_PARMS]) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Missing required vlan action =
-parameters");
->                 return -EINVAL;
-> +       }
->         parm =3D nla_data(tb[TCA_VLAN_PARMS]);
->         index =3D parm->index;
->         err =3D tcf_idr_check_alloc(tn, &index, a, bind);
-> --
-> 2.43.0
->
 
