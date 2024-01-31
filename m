@@ -1,58 +1,65 @@
-Return-Path: <netdev+bounces-67401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46EE0843330
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 03:13:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 259CC843336
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 03:14:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A9A3FB25DCF
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 02:13:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5865D1C25DE7
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 02:14:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AD9F523B;
-	Wed, 31 Jan 2024 02:13:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE5D15240;
+	Wed, 31 Jan 2024 02:14:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DxTFmKVB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZouvvPjc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CF8BE544;
-	Wed, 31 Jan 2024 02:13:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91CE363B9;
+	Wed, 31 Jan 2024 02:14:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706667194; cv=none; b=S+ebWCaxKIMAbqZe52Rh5vcwWh5fP5H4cikpGouBLvNdUFvyzLFND34ScGk0RPYv084FtvYk8FDPWLVEJkiN3k8BsnkQOq9Z9WIaULy8kntXXboEuRwXWlBip0+OqutBmfnSFLlQYC+7JlNoZNl5IUqCtaZqjEcI1RVq9FaTXRo=
+	t=1706667282; cv=none; b=NoxWp57mQdxr8yoHqtxEmRvAGH951EnSXIb8rz/DH8br4oRpIyeOvER+bNO5j/weMwaebG7OGrcVYzULVbuT7CXCOFTXYNkWN5shnGurYA/IzyMb3K1ON19zp79zRPu3sV1t3gW+q+rpN7DPhwkD9WqfKMsvxjOgkjbOC7pGwpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706667194; c=relaxed/simple;
-	bh=fr8MKqKq5VzL01ZNYfbnakgkkzMKoMPmD0i9DFGHfcY=;
+	s=arc-20240116; t=1706667282; c=relaxed/simple;
+	bh=Q4yhgEhtIEYSfwUmAoh8WuwX6zuMgT7HY8EbWFZ9mL0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=buyHmjyG3IAs3AMr/X+QVcQFA7T+tfhWnTThyTBWbQeMVRJ0JEf/DDdTYHvGVEsa666hm2YOsf6n+ijhilgqQp65k0ykWCAfPVU48m/g7EI2FzxTF8Mjkuf5E+K+fmwUSChh6RiOGDrW8yddrbqhfZi1gm22u5H8KQnW32PmTTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DxTFmKVB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24510C433C7;
-	Wed, 31 Jan 2024 02:13:10 +0000 (UTC)
+	 MIME-Version:Content-Type; b=SdaVpf5BjAMJbVv8h9EMNmuwjmj+8VNDnTnsdEPxHKuYP5uzzP3EDkZ4DEk2oE5REY3P7P8/kpTLlbUDZtlb0lAuo0hHhRXzJ9sJOg3eaPLb2Lmt2eeq+8tq4PUHNUs7lYwQKi/p0JBuLH4za7qyieHluHl7oU7EtqxSIZppDvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZouvvPjc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1D2C0C433F1;
+	Wed, 31 Jan 2024 02:14:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706667193;
-	bh=fr8MKqKq5VzL01ZNYfbnakgkkzMKoMPmD0i9DFGHfcY=;
+	s=k20201202; t=1706667282;
+	bh=Q4yhgEhtIEYSfwUmAoh8WuwX6zuMgT7HY8EbWFZ9mL0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DxTFmKVBeT7KFppHLnfC8CaWPZ2KCRM/1A7b6DHU/6a34j/Ne30UEaTD57dJhA31b
-	 iYi153eWBMjkPov9fXbgW2oLo4EgudGSHZjs9kWoAwkLrn42OnMsoCeWwtXsdZM61H
-	 JL/sMg1ApL7dr1AOUHM3tubG6d2An+6jwkiwg2x/3IwZiMdHjznk7LzE8ZdaIG3vOt
-	 RPuDfG4JFSl8Xs0qrkA1J0D3XICL7LMPGK3mjsXVWt1Of1oI1CnLJ8hkBta1r61CLu
-	 tT9d0a++urhIzDYx+VmNF0Ye4hN3MWzZtIuvqNtnt/0Y7aSZcpbS9li61Ta1IxunMm
-	 fmDnD3q0GQprg==
-Date: Tue, 30 Jan 2024 18:13:08 -0800
+	b=ZouvvPjc55LPYVq7D+8n2VVtEE46cd2K4RLI5fk2oQVuXC7M3Sr4ciVhXfckl+Pdk
+	 9EeqstGFq40zspfS6n8S10oi965QJXs5Yl+5/ZWnqk/6WfJTRE0U6gnjqULVO0FcF3
+	 CDyvKfFjBJyUai090LbPOiR4cnyvFki1yv4FhM5c+x5MtzP/XvT/s5Bme5Wn7d+aqN
+	 tEr386Wfig6WBd0zfjydPUqJ/4hdJkbDyccCoRKYm2RbiSxGYmdbvQBEwd1fdnhet8
+	 5uyKreGGWETzgPzRpnTicqeQ7AwA2kQ8JQP+PvKrSNTCUUSRsQ+p4qJnVXfHIB2p9v
+	 lhGY4sOltTGsQ==
+Date: Tue, 30 Jan 2024 18:14:35 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
-Cc: <nicolas.ferre@microchip.com>, <claudiu.beznea@tuxon.dev>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
- <conor+dt@kernel.org>, <linux@armlinux.org.uk>, <netdev@vger.kernel.org>,
- <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <git@amd.com>
-Subject: Re: [PATCH net-next 0/3] net: macb: WOL enhancements
-Message-ID: <20240130181308.3e5bfa36@kernel.org>
-In-Reply-To: <20240130104845.3995341-1-vineeth.karumanchi@amd.com>
-References: <20240130104845.3995341-1-vineeth.karumanchi@amd.com>
+To: Kalle Valo <kvalo@kernel.org>
+Cc: Breno Leitao <leitao@debian.org>, davem@davemloft.net,
+ pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org,
+ weiwan@google.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ horms@kernel.org, andrew@lunn.ch, leit@fb.com, Uwe =?UTF-8?B?S2xlaW5lLUs=?=
+ =?UTF-8?B?w7ZuaWc=?= <u.kleine-koenig@pengutronix.de>, Kees Cook
+ <keescook@chromium.org>, Johannes Berg <johannes.berg@intel.com>, Emmanuel
+ Grumbach <emmanuel.grumbach@intel.com>, Justin Stitt
+ <justinstitt@google.com>, Li Zetao <lizetao1@huawei.com>, Francois Romieu
+ <romieu@fr.zoreil.com>, Rob Herring <robh@kernel.org>, Marc Kleine-Budde
+ <mkl@pengutronix.de>, Ruan Jinjie <ruanjinjie@huawei.com>,
+ linux-wireless@vger.kernel.org (open list:TI WILINK WIRELESS DRIVERS)
+Subject: Re: [PATCH net 1/9] wifi: fill in MODULE_DESCRIPTION()s for wlcore
+Message-ID: <20240130181435.13f6e2cc@kernel.org>
+In-Reply-To: <170662101207.2289851.7564186430529596261.kvalo@kernel.org>
+References: <20240130104243.3025393-2-leitao@debian.org>
+	<170662101207.2289851.7564186430529596261.kvalo@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,15 +69,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 30 Jan 2024 16:18:42 +0530 Vineeth Karumanchi wrote:
-> - Add provisioning for queue tie-off and queue disable during suspend.
-> - Add ARP packet support to WOL.
+On Tue, 30 Jan 2024 13:23:34 +0000 (UTC) Kalle Valo wrote:
+> > W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> > Add descriptions to the TI WLAN wlcore drivers.
+> > 
+> > Signed-off-by: Breno Leitao <leitao@debian.org>  
+> 
+> These patches go to wireless-next, not net. But no need to resend because of this.
 
-Try to build the driver with sparse enabled:
-
-make C=1 drivers/net/ethernet/cadence/
-
-Looks like you're adding new warnings.
+FWIW I've been taking these thru net (or wireless in your case)
+rather than the -next tree. There's zero chance of regression
+here and the warnings are annoying. But up to you.
 -- 
-pw-bot: cr
+pw-bot: au
 
