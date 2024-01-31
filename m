@@ -1,134 +1,168 @@
-Return-Path: <netdev+bounces-67522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F28CF843DAC
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 12:05:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03153843DBD
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 12:07:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 308CA1C285D6
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 11:05:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96EC61F2AB3D
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 11:07:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7845579DCF;
-	Wed, 31 Jan 2024 11:03:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE7807BAE5;
+	Wed, 31 Jan 2024 11:04:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eM5jKjqd"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="joG4RRyh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99A0279DB5;
-	Wed, 31 Jan 2024 11:03:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB0E07B3E2
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 11:04:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706699001; cv=none; b=JtyT6Ug5sdt+B0i9PrVMEUxZAsj4LQtKsLWcQFG4gIyZ11RVF2GgBHYyUaHa3GADLDFNUivn17EP9l/LO0nYBPLsOZBB97iTjnFb9lBbm041i9QwOXgTyaBR6Y5mBBpfnLjHD7zMYR9TYOcXsuvS+oR0IR+1/hWZsxhSs/oBGAM=
+	t=1706699068; cv=none; b=Mf+rO9lWvWb0YE5rM27ExkMuPiCXP8VTjoI7l6gyoiG8yvXQ1Ka8q1iPS8rPlCVN99YPdQ+c4wFkRQOlTB7hTIw1BE6sSsMkUc+CItcZp+zoHp9fhfsP6sgY+CS9icGK3e+Y4Lx94ziMV8igVsGl7ILCZMeulu/RKkd9XdfUmvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706699001; c=relaxed/simple;
-	bh=w5tD2hF6VL4scoYvTlWDh0fos6f759HiGvpQ7AYLjAI=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=LXB2YG4gtWYrpN5fX2dnPPX3va06A6+fwaiGM1Fo0dt65KmOR/dI8mP/wt/kdwmkWggVvTnsAUVPkc5L3pKBDeh3c0Xs6TN96JVH1vKrtVKhXqbhuFT7IjRXXUk5UKO4aeVKO2YjsHOk42NVCzvtqb5Lq61rZ8fyyimUbwmD9pM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eM5jKjqd; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706699000; x=1738235000;
-  h=from:date:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=w5tD2hF6VL4scoYvTlWDh0fos6f759HiGvpQ7AYLjAI=;
-  b=eM5jKjqdQm8sQ40LKnBKeQGaM5Ae/8GYvptf9z6/jB8xM3mdIlpd3lUr
-   pR+lBo3dnPRjRVNvTRCt5HuT4GTlTlSstMjWxMqaTLwjKTyvL+qNqN8uR
-   k8uvfQczEXlmyigYwLoWDqEkTuJP/LotRaMuWiJOg+jNtmcDGmL1nCVtS
-   FNJ+xQudFGmJCruBAMYBRnBjaGDCcl9PmO1mAZR5qp/zOfaLKZdHqqGXr
-   TviAAz/0wj08411W7IwKN9QyQ3yEGhtC1xO2GTYk/kjyS+IwxGNQPom8W
-   7kaX+pS5O8PLVT17eziH3pGM1G74k59noIa0eobQ9x2onOAVWW7aYHD1J
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="16947160"
-X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="16947160"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 03:03:19 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="30460973"
-Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.246.35.167])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 03:03:08 -0800
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Date: Wed, 31 Jan 2024 13:03:04 +0200 (EET)
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>, 
-    Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
-    Johannes Berg <johannes@sipsolutions.net>, 
-    "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, Hans de Goede <hdegoede@redhat.com>, 
-    =?ISO-8859-15?Q?Ilpo_J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-    Vadim Pasternak <vadimp@nvidia.com>, 
-    Bjorn Andersson <andersson@kernel.org>, 
-    Mathieu Poirier <mathieu.poirier@linaro.org>, 
-    Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>, 
-    Eric Farman <farman@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>, 
-    Vasily Gorbik <gor@linux.ibm.com>, 
-    Alexander Gordeev <agordeev@linux.ibm.com>, 
-    Christian Borntraeger <borntraeger@linux.ibm.com>, 
-    Sven Schnelle <svens@linux.ibm.com>, Alexei Starovoitov <ast@kernel.org>, 
-    Daniel Borkmann <daniel@iogearbox.net>, 
-    Jesper Dangaard Brouer <hawk@kernel.org>, 
-    John Fastabend <john.fastabend@gmail.com>, 
-    Benjamin Berg <benjamin.berg@intel.com>, 
-    Yang Li <yang.lee@linux.alibaba.com>, linux-um@lists.infradead.org, 
-    Netdev <netdev@vger.kernel.org>, platform-driver-x86@vger.kernel.org, 
-    linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org, 
-    kvm@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH vhost 08/17] virtio: vring_new_virtqueue(): pass struct
- instead of multi parameters
-In-Reply-To: <20240130114224.86536-9-xuanzhuo@linux.alibaba.com>
-Message-ID: <bcd0e35e-e9a3-48b5-fc0a-117ba997439a@linux.intel.com>
-References: <20240130114224.86536-1-xuanzhuo@linux.alibaba.com> <20240130114224.86536-9-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1706699068; c=relaxed/simple;
+	bh=o/Kom3bZBaVWt7LhWRqqnq1GfgqDQALX9EwXOIxB6jo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gWcgcQyGUJwEXs+Dok4WB7EVUNOFVF9aVz8viXLRuwEitCR2uXVEVve5obkXcs8stJcHbBowGfQ4UEmpquG2/p1TK7CqsR6UlgocHJS3WQGzrKYePcvz+Ur5gIVDb04t3S9p2hJguRkwusZG53Xc+Jt+fry94wZIgnDF7tAm/bI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=joG4RRyh; arc=none smtp.client-ip=209.85.221.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-4bdd2160a71so407692e0c.1
+        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 03:04:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1706699065; x=1707303865; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o2HD72KRJ6aj0nhRWc+R0OuPJi8YzqJpg5vATYXzxug=;
+        b=joG4RRyhkYtmVlHszov1Xox8vEMUQb8ETUKWjt6HhpjDFqP2olRzg4/hRz8ptLbAqE
+         69eBi3g1/Mub7xPrWsIYHluCI+nkVKTjauRW/UT5YjGl3njyqN/fxeVvm0B5vUPGjGLJ
+         2SD+uu7O3Rb8hX2N+f0WaOhfE0HNR6+9VwGbMfioRNe9JdjDxsL9cT/nW1TQz6W0qggD
+         eJBmVMDat/iQ4SkLtPLjxAXqkZ6rt4YiGWSOhjSw8IlCtaxnV0eWbPXFYefZsqyJrJ1P
+         PhBhfNdhdx5CWzdHAonQu7h/q3dw8IIQqwgZKT0+BnG3oxa37hunJ6QiJCwKah5Yua7R
+         TLtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706699065; x=1707303865;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=o2HD72KRJ6aj0nhRWc+R0OuPJi8YzqJpg5vATYXzxug=;
+        b=YVzkpgoTp6vTkxclmJvm5xcc6ETQOIkdBtNRwtFzvCriCSpwf71bY6d97QY5Fc2JHx
+         zLoG9oWDNXUfURTrpHOOg4NyB7S5YdZFnw8pFH6veC7a5I4aEWl7bN1RYbghDKsPr6WR
+         VNtrW36S8ZqPdPunbBN3fBTY1ZXR5QZTlpZj0vPBzAXihUcg0bD5dPY3o9kqo7KIZKnO
+         lsYG0umS9a+03YV0k1F6ExIGN+u4jQKKM1sh+WSdvFNb8ejl1Tom42hBX4/xui7Nfgjk
+         7BYKVmqCr+/itoGyEYzTtCLAjG0kqwTs3e41opM6ouqHx0p0MSUAcP4Yn+4IdzaWvpx+
+         yF4A==
+X-Gm-Message-State: AOJu0Ywcw0WYsFPdlOzCjl0fvtd+R8j8uv6Ho57cI16MTZ+vxDQEC6Wi
+	nE0Q/pdaNNUgeVCatPj4zn7QBFtiZDneLuZ2MAGEk0AlbtIYLvJvvC3qvrWyh4PxkEhnHHhtLhj
+	vtpBRrWbQbEysGfxRTrQXU1TsZ8TWNPUElsIzWw==
+X-Google-Smtp-Source: AGHT+IEy0t8aQ/0foP3lUPEuTTrCzJxzcZdG9B4tfmtYi+GsJo9plBZulGoXIEHFkjck4RlX43MJn/wu1f8FAMUSvqI=
+X-Received: by 2002:a05:6122:4d1c:b0:4b7:2382:b4 with SMTP id
+ fi28-20020a0561224d1c00b004b7238200b4mr2151457vkb.6.1706699065586; Wed, 31
+ Jan 2024 03:04:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+References: <20240117160748.37682-1-brgl@bgdev.pl> <20240117160748.37682-5-brgl@bgdev.pl>
+ <2024011707-alibi-pregnancy-a64b@gregkh> <CAMRc=Mef7wxRccnfQ=EDLckpb1YN4DNLoC=AYL8v1LLJ=uFH2Q@mail.gmail.com>
+ <2024011836-wok-treadmill-c517@gregkh> <d2he3ufg6m46zos4swww4t3peyq55blxhirsx37ou37rwqxmz2@5khumvic62je>
+In-Reply-To: <d2he3ufg6m46zos4swww4t3peyq55blxhirsx37ou37rwqxmz2@5khumvic62je>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Wed, 31 Jan 2024 12:04:14 +0100
+Message-ID: <CAMRc=MeXJjpJhDjyn_P-SGo4rDnEuT9kGN5jAbRcuM_c7_aDzQ@mail.gmail.com>
+Subject: Re: Re: [PATCH 4/9] PCI: create platform devices for child OF nodes
+ of the port node
+To: Bjorn Andersson <andersson@kernel.org>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Kalle Valo <kvalo@kernel.org>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Chris Morgan <macromorgan@hotmail.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	=?UTF-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4gUHJhZG8=?= <nfraprado@collabora.com>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>, 
+	Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>, 
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>, Terry Bowman <terry.bowman@amd.com>, 
+	Lukas Wunner <lukas@wunner.de>, Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, Abel Vesa <abel.vesa@linaro.org>, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-pci@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 30 Jan 2024, Xuan Zhuo wrote:
+On Tue, Jan 30, 2024 at 10:54=E2=80=AFPM Bjorn Andersson <andersson@kernel.=
+org> wrote:
+>
+> On Thu, Jan 18, 2024 at 12:15:27PM +0100, Greg Kroah-Hartman wrote:
+> > On Thu, Jan 18, 2024 at 11:58:50AM +0100, Bartosz Golaszewski wrote:
+> > > On Wed, Jan 17, 2024 at 5:45=E2=80=AFPM Greg Kroah-Hartman
+> > > <gregkh@linuxfoundation.org> wrote:
+> > > >
+> > > > On Wed, Jan 17, 2024 at 05:07:43PM +0100, Bartosz Golaszewski wrote=
+:
+> > > > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > > > >
+> > > > > In order to introduce PCI power-sequencing, we need to create pla=
+tform
+> > > > > devices for child nodes of the port node.
+> > > >
+> > > > Ick, why a platform device?  What is the parent of this device, a P=
+CI
+> > > > device?  If so, then this can't be a platform device, as that's not=
+ what
+> > > > it is, it's something else so make it a device of that type,.
+> > > >
+> > >
+> > > Greg,
+> > >
+> > > This is literally what we agreed on at LPC. In fact: during one of th=
+e
+> > > hall track discussions I said that you typically NAK any attempts at
+> > > using the platform bus for "fake" devices but you responded that this
+> > > is what the USB on-board HUB does and while it's not pretty, this is
+> > > what we need to do.
+> >
+> > Ah, you need to remind me of these things, this changelog was pretty
+> > sparse :)
+> >
+>
+> I believe I missed this part of the discussion, why does this need to be
+> a platform_device? What does the platform_bus bring that can't be
+> provided by some other bus?
+>
 
-> Just like find_vqs(), it is time to refactor the
-> vring_new_virtqueue(). We pass the similar struct to
-> vring_new_virtqueue.
-> 
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
+Does it need to be a platform_device? No, of course not. Does it make
+sense for it to be one? Yes, for two reasons:
 
-> diff --git a/tools/virtio/vringh_test.c b/tools/virtio/vringh_test.c
-> index 98ff808d6f0c..37f8c5d34285 100644
-> --- a/tools/virtio/vringh_test.c
-> +++ b/tools/virtio/vringh_test.c
+1. The ATH11K WLAN module is represented on the device tree like a
+platform device, we know it's always there and it consumes regulators
+from another platform device. The fact it uses PCIe doesn't change the
+fact that it is logically a platform device.
+2. The platform bus already provides us with the entire infrastructure
+that we'd now need to duplicate (possibly adding bugs) in order to
+introduce a "power sequencing bus".
 
-> @@ -391,7 +391,7 @@ static int parallel_test(u64 features,
->  				/* Swallow all notifies at once. */
->  				if (read(to_guest[0], buf, sizeof(buf)) < 1)
->  					break;
-> -				
-> +
->  				receives++;
->  				virtqueue_disable_cb(vq);
->  				continue;
-> @@ -424,7 +424,7 @@ static int parallel_test(u64 features,
->  				continue;
->  			if (read(to_guest[0], buf, sizeof(buf)) < 1)
->  				break;
-> -				
-> +
+Bart
 
-Two unrelated space changes. Please remove them from this patch.
+> (I'm not questioning the need for having a bus, creating devices, and
+> matching/binding them to a set of drivers)
+>
+> Regards,
+> Bjorn
+>
 
-
--- 
- i.
-
+[snip]
 
