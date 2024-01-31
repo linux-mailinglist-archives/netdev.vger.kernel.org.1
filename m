@@ -1,142 +1,108 @@
-Return-Path: <netdev+bounces-67519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E5CA843D84
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 12:00:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA8C4843D99
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 12:03:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB191295B03
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 11:00:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32C40285050
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 11:03:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9B3179DC5;
-	Wed, 31 Jan 2024 10:58:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 253BC6DD18;
+	Wed, 31 Jan 2024 11:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f1YWadyW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Cijot6a+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 022AF7AE43;
-	Wed, 31 Jan 2024 10:58:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDC0C6BB26;
+	Wed, 31 Jan 2024 11:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706698730; cv=none; b=gr3W30VnrFUkzJkTJzmKD1k/ytUp6nUWHcEzG3oFb9SSR+M3jYNMPNk56wV12NizThXTkkzw0aBPIR1vQUN683UhfwDyT+auK7D/VnqrO9Wi7W8CQ6IO+yxqg0Z7AB/Qe10aPm9aIYnwM/LFWPA//DvrqGJCPgvbY4Wp55d+irQ=
+	t=1706698828; cv=none; b=OjP1AuRAkRnKS5I6jeipHvt/irnjxreomTr/OLHe6ISXMX1RriTP07r7cDIvyo6Lb6qW0eqEjaqPdSe5QRuL4o+tNcmLKGAjv1JufgqMfWT74MMXBQPvG+Fiqwf/BnDBmB3l3HPswii1krVrlXSIEj81ZELeWfinzkIa5jbAzt0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706698730; c=relaxed/simple;
-	bh=miXEls7aCVwLJDABniQxOKAOmoSskv8EQdi+pLuHLaQ=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=QwOWNTDb95YpARaEoxumWZtlXldGKKisUqeHUqJ9kodpaEU6bMNrFR9WYnRbueFgAy/McHkKuftSPlpzDF1/rvj8NbzY1obXxZYYTdsOsxAAT2Le4EColJVFteOMzUpGLH1eJwsInCsctVFD0NgUMohglsi1ASR63eLNVCnyaqU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f1YWadyW; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706698729; x=1738234729;
-  h=from:date:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=miXEls7aCVwLJDABniQxOKAOmoSskv8EQdi+pLuHLaQ=;
-  b=f1YWadyW5wLSEx/hBtT+dc0UJcLQKxv1VhNXglxWmTj1Xghm1e3msDFe
-   eCpuNZiYGc1apXqZjzBPzex1dEpFvb/al24zKwwj9H50bEzELgCuTKat2
-   mNkICMHhz8j+jnVxF+0tT6Qc0w/C7NDIOl6uZs8OgqEv3fPk9lxJDvHCL
-   lu7KLTy+pJtrNC+8HC9J/fMpzXH++DHSlcUdiQejmoz6Ixb5JtBX5QJXH
-   Mjmw7APDBNo9xx6LXFWDisiP2B4dQaFEgT7Wc6IkBbzDUlPHeKoun+mRE
-   5ckjWP/xwom/f/CJMJHDk1IRsRdm9jKEWVmO7Jr5V2GbFVX99/Ciauz1V
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="3407460"
-X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="3407460"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 02:58:48 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="1119583211"
-X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
-   d="scan'208";a="1119583211"
-Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.246.35.167])
-  by fmsmga005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 02:58:37 -0800
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Date: Wed, 31 Jan 2024 12:58:32 +0200 (EET)
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-cc: Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>, 
-    David E Box <david.e.box@linux.intel.com>, 
-    Hans de Goede <hdegoede@redhat.com>, Mark Gross <markgross@kernel.org>, 
-    Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-    Jose Abreu <Jose.Abreu@synopsys.com>, 
-    "David S . Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    Paolo Abeni <pabeni@redhat.com>, 
-    Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-    Richard Cochran <richardcochran@gmail.com>, 
-    Russell King <linux@armlinux.org.uk>, Alexei Starovoitov <ast@kernel.org>, 
-    Daniel Borkmann <daniel@iogearbox.net>, 
-    Jesper Dangaard Brouer <hawk@kernel.org>, 
-    John Fastabend <john.fastabend@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
-    Heiner Kallweit <hkallweit1@gmail.com>, 
-    Philipp Zabel <p.zabel@pengutronix.de>, 
-    Andrew Halaney <ahalaney@redhat.com>, 
-    Simon Horman <simon.horman@corigine.com>, 
-    Serge Semin <fancer.lancer@gmail.com>, Netdev <netdev@vger.kernel.org>, 
-    LKML <linux-kernel@vger.kernel.org>, 
-    linux-stm32@st-md-mailman.stormreply.com, 
-    linux-arm-kernel@lists.infradead.org, platform-driver-x86@vger.kernel.org, 
-    linux-hwmon@vger.kernel.org, bpf@vger.kernel.org, 
-    Voon Wei Feng <weifeng.voon@intel.com>, 
-    Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>, 
-    Lai Peter Jun Ann <jun.ann.lai@intel.com>, 
-    Abdul Rahim Faizal <faizal.abdul.rahim@intel.com>
-Subject: Re: [PATCH net-next v4 08/11] stmmac: intel: configure SerDes
- according to the interface mode
-In-Reply-To: <20240129130253.1400707-9-yong.liang.choong@linux.intel.com>
-Message-ID: <99d78f25-dd2a-4a52-4c2a-b0e29505a776@linux.intel.com>
-References: <20240129130253.1400707-1-yong.liang.choong@linux.intel.com> <20240129130253.1400707-9-yong.liang.choong@linux.intel.com>
+	s=arc-20240116; t=1706698828; c=relaxed/simple;
+	bh=Y5Rf+FC7iGgTxlvyXBhegnW8n75HIKzG+gY7Q2Ogmb8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MXC63KVeoDdqmtXeNxL1SsZoA+uINGUQNgO7sFIRt5fFHSjXpmjDnDm5yCyAuG1kXo1l6w7VAn/fMNbxmIedxdyYtD7b5krzDSxJWVaYBgfQa16kSAZxko6shoEwopu+mBFqT68vMp0xmNGaZQDrzgG4wKvwIickS4tOXWpIILE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Cijot6a+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 83097C433F1;
+	Wed, 31 Jan 2024 11:00:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706698827;
+	bh=Y5Rf+FC7iGgTxlvyXBhegnW8n75HIKzG+gY7Q2Ogmb8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Cijot6a+FLLonzwrLbdJXUAKd3uQlk+gEzp/AQM6tqZ/IoqUypXS8Iu2hj/3u7Un6
+	 dz2MJJa4DelUUtwloHDg3fX9y/lCRb+kBnK3eE4VdEsKiCISBabwJkP2hYScY0xDno
+	 HJT6L03cLPQiqzHG4vthUSBBc01zTGtaBbTJZtVXt3RUoQWbjgtW1p5556Wy3Xfgmp
+	 JAtNdeK9rYIEVd7UJQBlAngH6XXJZOIIswze4MraWbHQ6+NTbbBLGFvzX3XVTPMHcB
+	 qML76DdpCe+aCFUimeo1595dzInZusV41OMDkOHtRFGzR7JBhqlPQ2gq9x7Iw17er9
+	 nZHFZzTVFhMhQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 65684DC99E5;
+	Wed, 31 Jan 2024 11:00:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2 0/6] selftests: Add TEST_INCLUDES directive and
+ adjust tests to use it
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170669882741.1676.14282469125058737908.git-patchwork-notify@kernel.org>
+Date: Wed, 31 Jan 2024 11:00:27 +0000
+References: <20240126232123.769784-1-bpoirier@nvidia.com>
+In-Reply-To: <20240126232123.769784-1-bpoirier@nvidia.com>
+To: Benjamin Poirier <bpoirier@nvidia.com>
+Cc: netdev@vger.kernel.org, shuah@kernel.org, corbet@lwn.net,
+ j.vosburgh@gmail.com, andy@greyhouse.net, andrew@lunn.ch,
+ f.fainelli@gmail.com, olteanv@gmail.com, jiri@resnulli.us,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ petrm@nvidia.com, danieller@nvidia.com, razor@blackwall.org,
+ idosch@nvidia.com, jnixdorf-oss@avm.de, dcaratti@redhat.com,
+ tobias@waldekranz.com, zdoychev@maxlinear.com, liuhangbin@gmail.com,
+ linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org
 
-On Mon, 29 Jan 2024, Choong Yong Liang wrote:
+Hello:
 
-> From: "Tan, Tee Min" <tee.min.tan@linux.intel.com>
-> 
-> Intel platform will configure the SerDes through PMC api based on the
-> provided interface mode.
-> 
-> This patch adds several new functions below:-
-> - intel_tsn_interface_is_available(): This new function reads FIA lane
->   ownership registers and common lane registers through IPC commands
->   to know which lane the mGbE port is assigned to.
-> - intel_config_serdes(): To configure the SerDes based on the assigned
->   lane and latest interface mode, it sends IPC command to the PMC through
->   PMC driver/API. The PMC acts as a proxy for R/W on behalf of the driver.
-> - intel_set_reg_access(): Set the register access to the available TSN
->   interface.
-> 
-> Signed-off-by: Tan, Tee Min <tee.min.tan@linux.intel.com>
-> Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/Kconfig   |   1 +
->  .../net/ethernet/stmicro/stmmac/dwmac-intel.c | 113 +++++++++++++++++-
->  .../net/ethernet/stmicro/stmmac/dwmac-intel.h |  75 ++++++++++++
->  3 files changed, 188 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> index 85dcda51df05..be423fb2b46c 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> +++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-> @@ -273,6 +273,7 @@ config DWMAC_INTEL
->  	default X86
->  	depends on X86 && STMMAC_ETH && PCI
->  	depends on COMMON_CLK
-> +	select INTEL_PMC_IPC
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-INTEL_PMC_IPC has depends on ACPI but selecting INTEL_PMC_IPC won't 
-enforce it AFAIK.
+On Fri, 26 Jan 2024 18:21:17 -0500 you wrote:
+> After commit 25ae948b4478 ("selftests/net: add lib.sh") but before commit
+> 2114e83381d3 ("selftests: forwarding: Avoid failures to source
+> net/lib.sh"), some net selftests encountered errors when they were being
+> exported and run. This was because the new net/lib.sh was not exported
+> along with the tests. The errors were crudely avoided by duplicating some
+> content between net/lib.sh and net/forwarding/lib.sh in 2114e83381d3.
+> 
+> [...]
 
+Here is the summary with links:
+  - [net-next,v2,1/6] selftests: Introduce Makefile variable to list shared bash scripts
+    https://git.kernel.org/netdev/net-next/c/2a0683be5b4c
+  - [net-next,v2,2/6] selftests: bonding: Add net/forwarding/lib.sh to TEST_INCLUDES
+    https://git.kernel.org/netdev/net-next/c/6500780cffa7
+  - [net-next,v2,3/6] selftests: team: Add shared library scripts to TEST_INCLUDES
+    https://git.kernel.org/netdev/net-next/c/975b4a8b68ff
+  - [net-next,v2,4/6] selftests: dsa: Replace test symlinks by wrapper script
+    https://git.kernel.org/netdev/net-next/c/4a24560ad72f
+  - [net-next,v2,5/6] selftests: forwarding: Redefine relative_path variable
+    https://git.kernel.org/netdev/net-next/c/9f2af915916b
+  - [net-next,v2,6/6] selftests: forwarding: Remove duplicated lib.sh content
+    https://git.kernel.org/netdev/net-next/c/521ed1ce94bb
+
+You are awesome, thank you!
 -- 
- i.
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
