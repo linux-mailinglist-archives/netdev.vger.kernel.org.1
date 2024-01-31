@@ -1,98 +1,135 @@
-Return-Path: <netdev+bounces-67578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D2498442E8
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 16:21:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C0DA84429A
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 16:06:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABA59B32BE3
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 15:03:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B200B1F26A1A
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 15:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15A041272B9;
-	Wed, 31 Jan 2024 14:57:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EED238288F;
+	Wed, 31 Jan 2024 15:06:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RmmMSc85"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OMfqgBXb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A2882867;
-	Wed, 31 Jan 2024 14:57:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E6069D00;
+	Wed, 31 Jan 2024 15:06:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706713059; cv=none; b=Bf1OIluT3V6Ku6ePvKVNJVcFMTK9DBd/35GPyi96Jqu90ctHqWlRBH2Gw8F41/vojDosqGCB11sJKXYy2LpDy4NqhCJJtZUnyV6kCJOg6NFyAUPOGuct4iHm7M1qFC7YB4Pry/SKkB5VFDhNAgtZI35ANstdNC5WgmCMmIG5HYE=
+	t=1706713581; cv=none; b=BHrXzpLw/JaprLhzc6YqtxX6KIw4RQs3BA8Dk8qzBmacK4nO3ZazR6UuuqN1KffgFUqBu2tC/gLjqrLXtP13a+iWtBHxfDEwyVM6/mI+Kvn8M4dqxZpc6W10KewPrcn6pQAYC+Sfbdt3KW4LQqz4rtmh6TtpPnCY19Y1EN/thzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706713059; c=relaxed/simple;
-	bh=DSXbRtBgFN5juM7kQqtXWqBYab5ClaoWzkuVt0en0dQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m8tJajBxgpg/bMCUsj4wNwz35VNHa9pBm83/c2KCy1/3A5HcdyKwGfOc07VrwIyCMPvEoFycxL1iFcs5LrX5SaIPbOj2xd3LF8JdjGstM+Wk4EMi3ef3qP/YJ/4NLbLYIsiv6liiuaDe96vuSOD/DCmmtGzMYPAsU481Ct+6f4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RmmMSc85; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 183A2C43390;
-	Wed, 31 Jan 2024 14:57:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706713058;
-	bh=DSXbRtBgFN5juM7kQqtXWqBYab5ClaoWzkuVt0en0dQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RmmMSc85ShOqr63dLFwsLGZY/jvhJfq4jS8LzT4gzw1psoP4jPSLtwmtSciTu/FvS
-	 f14lUbpZuZYBJ61g4R2J+aWSqwzjsuNJBNivXQKqgFtMm4khJK/xPuQqOdJxhjk2Mz
-	 lMlt1RLdi0lH3cxUwU9ElMs3w9Iuyp/PicZZ3NYaFiTLfzSS6RXGLXOHR0bYRirp1q
-	 dPaYl6GAI/d28r7WXs6CEuRiTxW/OHPfX4isHWdZ9fJ7z/37ZKHWF4Gx4ISI+VJK7S
-	 2k1LkXVGAGKZqiURv5NeMcogz+/XPXTfhjNyM5L/kG1Ipzd7Vo3Kh3JcpWvSO9xgsb
-	 83A/AC1N5l51g==
-Date: Wed, 31 Jan 2024 08:57:36 -0600
-From: Rob Herring <robh@kernel.org>
-To: Peng Fan <peng.fan@nxp.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	"Peng Fan (OSS)" <peng.fan@oss.nxp.com>,
-	"wg@grandegger.com" <wg@grandegger.com>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] dt-bindings: can: fsl,flexcan: add i.MX95 compatible
- string
-Message-ID: <20240131145736.GA1262278-robh@kernel.org>
-References: <20240122091738.2078746-1-peng.fan@oss.nxp.com>
- <20240122-skilled-wimp-4bc1769bf235-mkl@pengutronix.de>
- <20240122125631.4c54eba1@kernel.org>
- <DU0PR04MB941750744E86A1656009B7BE88742@DU0PR04MB9417.eurprd04.prod.outlook.com>
+	s=arc-20240116; t=1706713581; c=relaxed/simple;
+	bh=rjL+S8VhYams7cY41B+Sx5INRlbi1v1HLjzV2vQ93yk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=VKQY7s3cOWuVEWPtl3hIRlH5PxZKB18IWkNmyR7hNL1YKrYBu74OwPWr8H+wHXn1CDQt3hB1qPx57TKC+Uk9UJRe3/57U3XoPg8fftpOEko5heWnFCCvovrnHaaHvAdCYc2UvGFaALCkc5f2mFK76rqaMfBTSAvA6x48jpK0C4s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OMfqgBXb; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-42a0ba5098bso34710021cf.0;
+        Wed, 31 Jan 2024 07:06:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706713579; x=1707318379; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/TaPxT+V6eIKAuLdvwPcXj6pCum3OdDHWE8PoctSlZQ=;
+        b=OMfqgBXb1/HKYBGKISpJ1W/gvk1rL2320RIJpF8tgBhu5pJBZjJ4mdWJcJHgZR+NKY
+         Pki6DAeH8CjSNnwu1ZbCRuHshIp7JRG+k5zAI26vukISJ4g0Hnb6PUV0+s/aBZZT/bBz
+         tNyJu4aNJWSN7ingMHplKItfFMBKawFUMqLbuhl+4nSLxQ6hkK8j3jFDS4wyGm9hlvB6
+         5sX3IOU5l2ulGF/cw6I7j58GuL5fZT5tfziRhrbEKnXc4C4DSgeUzCkFnJ80g6BwEQDl
+         bfI7L12Fyyb2wQsth2lkU8S0UuDx1cyB7piRC/zuhAlDcGfUvEQifuWflYF86aYhF+mf
+         bOPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706713579; x=1707318379;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=/TaPxT+V6eIKAuLdvwPcXj6pCum3OdDHWE8PoctSlZQ=;
+        b=nuNwf22naYVTgHHPhISLm/3bE9Xul1ncunYEFC8qNoQkZTSfsQLjzVebgoXArmJcP6
+         d6EGmHlYLoNd89hPceiasOMOTyEXLgrYtLve7XxGZRkDY8CoWk7Ft6PhoqhvpXkSyNSt
+         K4TexukDijvew/mJZB+spgTEEst2j3/Kzntom0ta0lSJafEPs5eYYgQO6VnK5cnODTmk
+         WZNyZIeAIT9maV/XWYql5r5HzMFg0rG9wZvCjyAQY9U0FSUlIdKo2ExdjU0+TSOU+1Fu
+         aWjNmRWsOkpeSzwkHH3WsX1FX2wLySGSDasoJO/bAPe4+xeGp2eYdq8Ayf/x77lZEUBD
+         FxUA==
+X-Gm-Message-State: AOJu0Yw+zQQxBsyQBkAOn7USKxr5uLVUrXLqkh3pr22vR0C78UaC7/n2
+	uMzydco2qOpCpNT3QfwVdYP+IcsUrcXFctaPeSpEYrwlZu9xTT1X
+X-Google-Smtp-Source: AGHT+IE9oLSRxN39V0rks9U2CfUNVGGvbNKU0GBv7t6w5XMk4BKLn+FIGOmmgELtiAQXvimHjDK7Yw==
+X-Received: by 2002:a05:622a:189:b0:42a:b153:2331 with SMTP id s9-20020a05622a018900b0042ab1532331mr2413547qtw.0.1706713579158;
+        Wed, 31 Jan 2024 07:06:19 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXtbBsGAeBzWs6r8c9+61iowfTf6ogo8bO3lHuWiUjAEIDfCpV7GLCrsHkXV7tHd+H38uIncQODYO5YEnIajcmOIHhuQPNdYIEV0BzIEdWYvPudM8pRkPxKUMpPRYVqmF0S9gnYVoq2GIy0HFxLPLw5z9Ow0ML7RspFZ6LUq3TmX7+Eey+oHJ4TIvsS20QoEiyJWxbdZsTmRYO58kXz1LbDupj3TGRbtxB3N4xpHGzE8rUPxmfVf/eDvmKc0+C0pJY3
+Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
+        by smtp.gmail.com with ESMTPSA id ka26-20020a05622a441a00b0042be1188749sm1226683qtb.81.2024.01.31.07.06.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jan 2024 07:06:18 -0800 (PST)
+Date: Wed, 31 Jan 2024 10:06:18 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ linux-kselftest@vger.kernel.org, 
+ Willem de Bruijn <willemb@google.com>
+Message-ID: <65ba61ea978b4_1699fd294eb@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240130174736.03c79071@kernel.org>
+References: <20240127023212.3746239-1-willemdebruijn.kernel@gmail.com>
+ <20240130174736.03c79071@kernel.org>
+Subject: Re: [PATCH net-next] selftests/net: calibrate txtimestamp
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DU0PR04MB941750744E86A1656009B7BE88742@DU0PR04MB9417.eurprd04.prod.outlook.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 23, 2024 at 07:00:27AM +0000, Peng Fan wrote:
-> > Subject: Re: [PATCH] dt-bindings: can: fsl,flexcan: add i.MX95 compatible
-> > string
+Jakub Kicinski wrote:
+> On Fri, 26 Jan 2024 21:31:51 -0500 Willem de Bruijn wrote:
+> > From: Willem de Bruijn <willemb@google.com>
 > > 
-> > On Mon, 22 Jan 2024 11:26:25 +0100 Marc Kleine-Budde wrote:
-> > > > Add i.MX95 flexcan which is compatible i.MX93 flexcan
-> > > >
-> > > > Signed-off-by: Peng Fan <peng.fan@nxp.com>
-> > >
-> > > Acked-by: Marc Kleine-Budde <mkl@pengutronix.de>
+> > The test sends packets and compares enqueue, transmit and Ack
+> > timestamps with expected values. It installs netem delays to increase
+> > latency between these points.
 > > 
-> > Hm, you don't apply CAN DTB patches?
+> > The test proves flaky in virtual environment (vng). Increase the
+> > delays to reduce variance. Scale measurement tolerance accordingly.
+> > 
+> > Time sensitive tests are difficult to calibrate. Increasing delays 10x
+> > also increases runtime 10x, for one. And it may still prove flaky at
+> > some rate.
 > 
-> Nope. I am preparing dt-binding first, then post the i.MX95 SoC
-> dtsi. The CAN will be in the i.MX95 SOC dtsi file, not a
-> single patch only for CAN node.
+> Willem, do you still want us to apply this as is or should we do 
+> the 10x only if [ x$KSFT_MACHINE_SLOW != x ] ?
 
-The question was why isn't Marc, the CAN maintainer, applying this. I 
-have the same question.
+If the test passes on all platforms with this change, I think that's
+still preferable.
 
-Rob
+The only downside is that it will take 10x runtime. But that will
+continue on debug and virtualized builds anyway.
+
+On the upside, the awesome dash does indicate that it passes as is on
+non-debug metal instances:
+
+https://netdev.bots.linux.dev/contest.html?test=txtimestamp-sh
+
+Let me know if you want me to use this as a testcase for
+$KSFT_MACHINE_SLOW.
+
+Otherwise I'll start with the gro and so-txtime tests. They may not
+be so easily calibrated. As we cannot control the gro timeout, nor
+the FQ max horizon.
+
+In such cases we can use the environment variable to either skip the
+test entirely or --my preference-- run it to get code coverage, but
+suppress a failure if due to timing (only). Sounds good?
+
 
