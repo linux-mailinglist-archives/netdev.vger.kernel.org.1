@@ -1,160 +1,95 @@
-Return-Path: <netdev+bounces-67429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D546C8434BD
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 05:09:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C64558435E4
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 06:11:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1CD46B2187C
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 04:09:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 67CE8B27230
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 05:11:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F35714A9E;
-	Wed, 31 Jan 2024 04:09:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 122013D56C;
+	Wed, 31 Jan 2024 05:11:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=faucet.nz header.i=@faucet.nz header.b="Tca/RNfa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gV37/hIF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.forwardemail.net (smtp.forwardemail.net [149.28.215.223])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DAA516416
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 04:09:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.28.215.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D513D550;
+	Wed, 31 Jan 2024 05:11:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706674161; cv=none; b=RUyU1AeCmCnYvVnyrJ873UoeyjVQRIidvNHt5rr2QadZQW7QwJNV+hA7eXE4i49kZUJU9kmI+HEqKaoWZi9av+2yIXRUfY7AIv8O6aMqrN2+F+DZilLF4UFC0cF8A1S0dlZPD75hUFKdmOCZr7VEp8VBfoDGmgiovYiqieO34qo=
+	t=1706677862; cv=none; b=Jitu8CVRFckuDHIW95uERzjdo5Aos5qRWkIShfReFJmU1rBIhauTgpVpb8E6L/QQM35yArY4DHRx0IS5BzKBMSgAJyScJn3kd85jgYO5WpEMGx5dzhyO7T1eU9Uu/up16H+ASd0fugFssQfa1nUB7zlIScmgkgwHpT3pXUAtjro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706674161; c=relaxed/simple;
-	bh=pnxDDAKEBMo7lWFcc3J2ntyngcKsl4r03QwlqkuSvNQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=p8melKzOhs7Yo0id7vOtikaTo8wp4kNG1tu3baJcRnP7oksOFIQxzggFd2eay0QQ5nn9xbA4ZXj8bKfT3T8QDm+KhAhp2PQNrCaFPsbWW4iCLbxe95wcLdqpZzA44oVHLwvfQ7Tvu/nyGPxry9qErrbVYCm+HTLiHXIhUf5Jbxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=faucet.nz; spf=pass smtp.mailfrom=fe-bounces.faucet.nz; dkim=pass (1024-bit key) header.d=faucet.nz header.i=@faucet.nz header.b=Tca/RNfa; arc=none smtp.client-ip=149.28.215.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=faucet.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fe-bounces.faucet.nz
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=faucet.nz;
- h=Content-Transfer-Encoding: MIME-Version: Message-Id: Date: Subject: Cc:
- To: From; q=dns/txt; s=fe-4ed8c67516; t=1706674143;
- bh=WelYVPflxMfIUF+8iQKKCRWtrOjz1iaIT0Kh8otsC8U=;
- b=Tca/RNfafOnsPZrJDhemomfilOp7ml97MkuVeqcs7Ol3RboyaaW6ppfYCN+XTz62wbG/8hLoM
- CwiSDuNbMsxvNKPkHO1RyJ4t4F/IC7JMHVxsEWmnSAhmKdZbG9UoLULV0FZpjqef4VRp/csUtXl
- hSU/whXiviNJZ84Gn7q82JQ=
-From: Brad Cowie <brad@faucet.nz>
-To: netdev@vger.kernel.org
-Cc: pshelar@ovn.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org, dev@openvswitch.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, Brad Cowie
- <brad@faucet.nz>, Aaron Conole <aconole@redhat.com>
-Subject: [PATCH net-next] selftests: openvswitch: Test ICMP related matches work with SNAT
-Date: Wed, 31 Jan 2024 17:08:22 +1300
-Message-Id: <20240131040822.835867-1-brad@faucet.nz>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1706677862; c=relaxed/simple;
+	bh=xrcGrwHhitnih9E8v9UQ+w1w2AvDKYiVY78bIEM1OfU=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=U2LMKTyu0ujFnnLKeo3c7T6Thai9c9PvpPF7gldfHiqj9LL5Kh3gDcXn9qQHmZjY4mtRnID+5c3J5Wyu73NF/mW/mH4RhASv9cPY59GLl9F0v7fPiXCGn160rzk5E+4TLiRhhCXoE9X49tLknfHruO72Wwh1mJUHPvBIBurUBus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gV37/hIF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B728C433F1;
+	Wed, 31 Jan 2024 05:10:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706677861;
+	bh=xrcGrwHhitnih9E8v9UQ+w1w2AvDKYiVY78bIEM1OfU=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=gV37/hIFfWJQ2Y6bf0lACNqLo0bKasPahlBztYPNgvksqUGAX8CgQq99fvvn91Cvw
+	 JYbKYeRH6cuFoeDzc7WhJ2CoCe0rJXAFaDvU2PrLBeAkBDbq02x9yorLAVZXhWC9yA
+	 XfEQWvQTKz0QSHWaQujfvHmytIr9spTbtx1Iif8a1RkhszgeFABGbvUrMa1GD1FtU4
+	 QwyhgLjQmtRSGen9pFqqAvdHtJpAjSQfHaDGRYlUE9cKEDw48GpV5yhTqkBQb12/xR
+	 f/fVcG4h8LJ9EMqdGisIE1qoKJ6uXXoMkxvZFZWNqqUdDpgZzbGeWVzKHZdai80qXg
+	 sy0N9UpvdOlMg==
+From: Kalle Valo <kvalo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Breno Leitao <leitao@debian.org>,  davem@davemloft.net,
+  pabeni@redhat.com,  edumazet@google.com,  dsahern@kernel.org,
+  weiwan@google.com,  netdev@vger.kernel.org,
+  linux-kernel@vger.kernel.org,  horms@kernel.org,  andrew@lunn.ch,
+  leit@fb.com,  Uwe =?utf-8?Q?Kleine-K=C3=B6nig?=
+ <u.kleine-koenig@pengutronix.de>,  Kees
+ Cook <keescook@chromium.org>,  Johannes Berg <johannes.berg@intel.com>,
+  Emmanuel Grumbach <emmanuel.grumbach@intel.com>,  Justin Stitt
+ <justinstitt@google.com>,  Li Zetao <lizetao1@huawei.com>,  Francois
+ Romieu <romieu@fr.zoreil.com>,  Rob Herring <robh@kernel.org>,  Marc
+ Kleine-Budde <mkl@pengutronix.de>,  Ruan Jinjie <ruanjinjie@huawei.com>,
+  linux-wireless@vger.kernel.org (open list:TI WILINK WIRELESS DRIVERS)
+Subject: Re: [PATCH net 1/9] wifi: fill in MODULE_DESCRIPTION()s for wlcore
+References: <20240130104243.3025393-2-leitao@debian.org>
+	<170662101207.2289851.7564186430529596261.kvalo@kernel.org>
+	<20240130181435.13f6e2cc@kernel.org>
+Date: Wed, 31 Jan 2024 07:10:54 +0200
+In-Reply-To: <20240130181435.13f6e2cc@kernel.org> (Jakub Kicinski's message of
+	"Tue, 30 Jan 2024 18:14:35 -0800")
+Message-ID: <87y1c6uly9.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Report-Abuse-To: abuse@forwardemail.net
-X-Report-Abuse: abuse@forwardemail.net
-X-Complaints-To: abuse@forwardemail.net
-X-ForwardEmail-Version: 0.4.40
-X-ForwardEmail-Sender: rfc822; brad@faucet.nz, smtp.forwardemail.net,
- 149.28.215.223
-X-ForwardEmail-ID: 65b9c7de887f9e7cfa92c933
+Content-Type: text/plain
 
-Add a test case for regression in openvswitch nat that was fixed by
-commit e6345d2824a3 ("netfilter: nf_nat: fix action not being set for
-all ct states").
+Jakub Kicinski <kuba@kernel.org> writes:
 
-Link: https://lore.kernel.org/netdev/20231221224311.130319-1-brad@faucet.nz/
-Link: https://mail.openvswitch.org/pipermail/ovs-dev/2024-January/410476.html
-Suggested-by: Aaron Conole <aconole@redhat.com>
-Signed-off-by: Brad Cowie <brad@faucet.nz>
----
- .../selftests/net/openvswitch/openvswitch.sh  | 62 +++++++++++++++++++
- 1 file changed, 62 insertions(+)
+> On Tue, 30 Jan 2024 13:23:34 +0000 (UTC) Kalle Valo wrote:
+>> > W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+>> > Add descriptions to the TI WLAN wlcore drivers.
+>> > 
+>> > Signed-off-by: Breno Leitao <leitao@debian.org>  
+>> 
+>> These patches go to wireless-next, not net. But no need to resend because of this.
+>
+> FWIW I've been taking these thru net (or wireless in your case)
+> rather than the -next tree. There's zero chance of regression
+> here and the warnings are annoying. But up to you.
 
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index f8499d4c87f3..87b80bee6df4 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -17,6 +17,7 @@ tests="
- 	ct_connect_v4				ip4-ct-xon: Basic ipv4 tcp connection using ct
- 	connect_v4				ip4-xon: Basic ipv4 ping between two NS
- 	nat_connect_v4				ip4-nat-xon: Basic ipv4 tcp connection via NAT
-+	nat_related_v4				ip4-nat-related: ICMP related matches work with SNAT
- 	netlink_checks				ovsnl: validate netlink attrs and settings
- 	upcall_interfaces			ovs: test the upcall interfaces
- 	drop_reason				drop: test drop reasons are emitted"
-@@ -473,6 +474,67 @@ test_nat_connect_v4 () {
- 	return 0
- }
- 
-+# nat_related_v4 test
-+#  - client->server ip packets go via SNAT
-+#  - client solicits ICMP destination unreachable packet from server
-+#  - undo NAT for ICMP reply and test dst ip has been updated
-+test_nat_related_v4 () {
-+	which nc >/dev/null 2>/dev/null || return $ksft_skip
-+
-+	sbx_add "test_nat_related_v4" || return $?
-+
-+	ovs_add_dp "test_nat_related_v4" natrelated4 || return 1
-+	info "create namespaces"
-+	for ns in client server; do
-+		ovs_add_netns_and_veths "test_nat_related_v4" "natrelated4" "$ns" \
-+			"${ns:0:1}0" "${ns:0:1}1" || return 1
-+	done
-+
-+	ip netns exec client ip addr add 172.31.110.10/24 dev c1
-+	ip netns exec client ip link set c1 up
-+	ip netns exec server ip addr add 172.31.110.20/24 dev s1
-+	ip netns exec server ip link set s1 up
-+
-+	ip netns exec server ip route add 192.168.0.20/32 via 172.31.110.10
-+
-+	# Allow ARP
-+	ovs_add_flow "test_nat_related_v4" natrelated4 \
-+		"in_port(1),eth(),eth_type(0x0806),arp()" "2" || return 1
-+	ovs_add_flow "test_nat_related_v4" natrelated4 \
-+		"in_port(2),eth(),eth_type(0x0806),arp()" "1" || return 1
-+
-+	# Allow IP traffic from client->server, rewrite source IP with SNAT to 192.168.0.20
-+	ovs_add_flow "test_nat_related_v4" natrelated4 \
-+		"ct_state(-trk),in_port(1),eth(),eth_type(0x0800),ipv4(dst=172.31.110.20)" \
-+		"ct(commit,nat(src=192.168.0.20)),recirc(0x1)" || return 1
-+	ovs_add_flow "test_nat_related_v4" natrelated4 \
-+		"recirc_id(0x1),ct_state(+trk-inv),in_port(1),eth(),eth_type(0x0800),ipv4()" \
-+		"2" || return 1
-+
-+	# Allow related ICMP responses back from server and undo NAT to restore original IP
-+	# Drop any ICMP related packets where dst ip hasn't been restored back to original IP
-+	ovs_add_flow "test_nat_related_v4" natrelated4 \
-+		"ct_state(-trk),in_port(2),eth(),eth_type(0x0800),ipv4()" \
-+		"ct(commit,nat),recirc(0x2)" || return 1
-+	ovs_add_flow "test_nat_related_v4" natrelated4 \
-+		"recirc_id(0x2),ct_state(+rel+trk),in_port(2),eth(),eth_type(0x0800),ipv4(src=172.31.110.20,dst=172.31.110.10,proto=1),icmp()" \
-+		"1" || return 1
-+	ovs_add_flow "test_nat_related_v4" natrelated4 \
-+		"recirc_id(0x2),ct_state(+rel+trk),in_port(2),eth(),eth_type(0x0800),ipv4(dst=192.168.0.20,proto=1),icmp()" \
-+		"drop" || return 1
-+
-+	# Solicit destination unreachable response from server
-+	ovs_sbx "test_nat_related_v4" ip netns exec client \
-+		bash -c "echo a | nc -u -w 1 172.31.110.20 10000"
-+
-+	# Check to make sure no packets matched the drop rule with incorrect dst ip
-+	python3 "$ovs_base/ovs-dpctl.py" dump-flows natrelated4 \
-+		| grep "drop" | grep "packets:0" >/dev/null || return 1
-+
-+	info "done..."
-+	return 0
-+}
-+
- # netlink_validation
- # - Create a dp
- # - check no warning with "old version" simulation
+Good point, I'll take them to wireless. Thanks.
+
 -- 
-2.34.1
+https://patchwork.kernel.org/project/linux-wireless/list/
 
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
