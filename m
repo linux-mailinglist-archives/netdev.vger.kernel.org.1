@@ -1,109 +1,81 @@
-Return-Path: <netdev+bounces-67587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC490844315
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 16:32:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4EF3C8442EA
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 16:21:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4F58B22790
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 15:20:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A79128470B
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 15:21:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1772B128369;
-	Wed, 31 Jan 2024 15:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDF4984A55;
+	Wed, 31 Jan 2024 15:21:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IAKE8oC1"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pU1VFtBq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51F11272C7;
-	Wed, 31 Jan 2024 15:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E80880C07;
+	Wed, 31 Jan 2024 15:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706714427; cv=none; b=LkTFYadnl5w092AQpnbsd7jqbJaOl+AIjEqGqF1RmlXsS+DDpTrWDMQVnR+agELIXxE4NYx8PmM33UA62nfSuuhf4yeWsfeDQQAePOlQCB+qStRr1XPdbHpdmpa2hk/WcEK73Vx51QkNPfUpErfubQbkyCEMmh3ytWFa05C5ppI=
+	t=1706714512; cv=none; b=ZrXdp/Uf9VXQMRJiEZSDlA5DQyBuj69Z/LfW31aiORFOEfOAa6TnE4zzbGB7J+yF2E4PGG4njboorY6BAowko/6nAyxxo63IvUmqf0eKoUgZZqC7nLpa8HWYIwHZkA8gNV/i4ZZocb8Dz3/v/zO2yio2nk1lfxFrw5vTgJD3FJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706714427; c=relaxed/simple;
-	bh=VPQwVKLc1ieUZsLBonDIWiKk0HT4ZtNcfZ3v6pz4USY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=WAc/9ILG9M4V0KCx4FDpDD1E6Vco5F1H0Nd4IXr5g5ixFbRQW4jfiD+xhBPpdQMvKBjwO6lzL9Xz3sB9sBl4lhcCMxgmFfs5KJsBn9IfjUvAuUvmlt6FBpvtvH9e9wXFWM7sA1EDmrNxE1qP0yjbYfb5WrA9H9hjhpE7yI7Aj0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IAKE8oC1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 50992C43143;
-	Wed, 31 Jan 2024 15:20:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706714426;
-	bh=VPQwVKLc1ieUZsLBonDIWiKk0HT4ZtNcfZ3v6pz4USY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IAKE8oC1usrfAH7ThbDhzdg+KjbEs8FAokMm4B821D1pNB+js7EtmAtdJfNXN8WUV
-	 RFl4ZLZI0+7ByyV0FggtOyeq/ausP/PS4KcUvq78gw/Gov0Cnh/BtLuYR2RmvCcum2
-	 EYPTx4Pyyfs/ZH0Fd6JE92N3dYMwm5NrN3wkAiBMu1tWHRL2qpCBft5wreqyRXokSt
-	 clo3V156T237XfbDrI327zR0ioYVDouGcWOcvv+xM6z4io7l++Pr6NoZ7zqfgvZ25G
-	 FOXBGeZfs2pYZBpmLFZ1QyhVj5e8ImE5bc0kcgxYYvDT9qsXCaGGMDhw8epQC5qQiT
-	 LGGwx+Ekxl/OQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3CF8FDC99E6;
-	Wed, 31 Jan 2024 15:20:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1706714512; c=relaxed/simple;
+	bh=q6mhv3JADRxbR9n/Wp1Nh4lEHJY3eahLQ5UjrWSbNB0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gSskZB2Jy55AVuRQ1iKXPZOGRF2mNjd2+AmYRTrQBs3cH9Pj5T3v5Y7wYsfyCiJrzsXT7XhU/0m6pShfhKN8UmHwZ2z75SjDPW3yLVN+RBb5YlXBtL67VZ9qeYUuw2wD+Ru0yzF2QclONB+0zcbQFElQ7FQgrBW/U8m3PLdVKe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pU1VFtBq; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=asPQLrb51OQChEodWg2dePcvhwLYID9ZT09x6YMMitA=; b=pU1VFtBqeOag5WKHQ6MLSSY5p7
+	BVqLmjpSmj8bND/GJiETySDFtpILWTUT3zd1wewjVZTLRYO8/bekP3sDAqzJeKUG6jKYyx0G2ecHS
+	gCSWqWd+PYv4VRHK5RL89uqmqzPs4kjOCAXnCXiaSSPTAFL+s77lIOX4CgbaLvPLJXOw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rVCPI-006aqg-Fa; Wed, 31 Jan 2024 16:21:44 +0100
+Date: Wed, 31 Jan 2024 16:21:44 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 net-next 12/13] net: phy: marvell-88q2xxx: cleanup
+ mv88q2xxx_config_init
+Message-ID: <c2bb9f1b-2003-4c0c-b6c0-1cee6ac6a5b8@lunn.ch>
+References: <20240122212848.3645785-1-dima.fedrau@gmail.com>
+ <20240122212848.3645785-13-dima.fedrau@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH nf-next 1/9] netfilter: uapi: Document NFT_TABLE_F_OWNER flag
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170671442624.26040.11285982214401722283.git-patchwork-notify@kernel.org>
-Date: Wed, 31 Jan 2024 15:20:26 +0000
-References: <20240129145807.8773-2-fw@strlen.de>
-In-Reply-To: <20240129145807.8773-2-fw@strlen.de>
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org,
- phil@nwl.cc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240122212848.3645785-13-dima.fedrau@gmail.com>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Florian Westphal <fw@strlen.de>:
-
-On Mon, 29 Jan 2024 15:57:51 +0100 you wrote:
-> From: Phil Sutter <phil@nwl.cc>
+On Mon, Jan 22, 2024 at 10:28:45PM +0100, Dimitri Fedrau wrote:
+> mv88q2xxx_config_init calls genphy_c45_read_pma which is done by
+> mv88q2xxx_read_status, it calls also mv88q2xxx_config_aneg which is
+> also called by the PHY state machine. Let the PHY state machine handle
+> the phydriver ops in their intendend way.
 > 
-> Add at least this one-liner describing the obvious.
-> 
-> Fixes: 6001a930ce03 ("netfilter: nftables: introduce table ownership")
-> Signed-off-by: Phil Sutter <phil@nwl.cc>
-> Signed-off-by: Florian Westphal <fw@strlen.de>
-> 
-> [...]
+> Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
 
-Here is the summary with links:
-  - [nf-next,1/9] netfilter: uapi: Document NFT_TABLE_F_OWNER flag
-    https://git.kernel.org/netdev/net-next/c/941988af5724
-  - [nf-next,2/9] netfilter: nf_tables: Introduce NFT_TABLE_F_PERSIST
-    https://git.kernel.org/netdev/net-next/c/da5141bbe0c2
-  - [nf-next,3/9] netfilter: nf_tables: Implement table adoption support
-    https://git.kernel.org/netdev/net-next/c/31bf508be656
-  - [nf-next,4/9] netfilter: nf_tables: pass flags to set backend selection routine
-    https://git.kernel.org/netdev/net-next/c/a128885ace60
-  - [nf-next,5/9] netfilter: nf_conncount: Use KMEM_CACHE instead of kmem_cache_create()
-    https://git.kernel.org/netdev/net-next/c/2ae6e9a03dad
-  - [nf-next,6/9] ipvs: Simplify the allocation of ip_vs_conn slab caches
-    https://git.kernel.org/netdev/net-next/c/d5f9142fb96d
-  - [nf-next,7/9] netfilter: arptables: allow xtables-nft only builds
-    https://git.kernel.org/netdev/net-next/c/4654467dc7e1
-  - [nf-next,8/9] netfilter: xtables: allow xtables-nft only builds
-    https://git.kernel.org/netdev/net-next/c/a9525c7f6219
-  - [nf-next,9/9] netfilter: ebtables: allow xtables-nft only builds
-    https://git.kernel.org/netdev/net-next/c/7ad269787b66
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+    Andrew
 
