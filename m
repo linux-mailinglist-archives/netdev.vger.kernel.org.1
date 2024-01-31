@@ -1,99 +1,96 @@
-Return-Path: <netdev+bounces-67406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBB9D8433E2
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 03:28:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 464808433E7
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 03:28:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97B2028BE0A
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 02:28:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01D2E28CD01
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 02:28:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2778063B3;
-	Wed, 31 Jan 2024 02:28:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D535695;
+	Wed, 31 Jan 2024 02:28:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="D45KeAKf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TT+KBo0G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B98F101C5
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 02:28:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118C1566B;
+	Wed, 31 Jan 2024 02:28:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706668084; cv=none; b=NmnjPJ89NC3Ts6fEQ5slsz7o9VB85LuoJxSD4gfhqncGKdRO9eDTSS2FCk9eN+VOQFapOu+tC86ENsf1iyHOurr8zhEv+qtFFx+SmjkAJE1tPcRBVoy3T3/0Bzqi/+VbCS5/kzO6zXmsVsOmIHvplCelCwQL5yALU9Jz0AVLwbQ=
+	t=1706668122; cv=none; b=IRBiNr9YUcx9+R/EpUMrXaAb+9eqhsfdLZ/Jv7fE2IXkwwSCImcGNrJvyisSlWQRz5oviQk+aDCvUkmqmUHSWrFx1HKgsnhU1tOnBxCmt3HpN/ubYZwBopBo4ZoNwKO46JJeOIHiTQ/wWWHgsynbTQ+UmtLGk3i3HCQSPCPo0cg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706668084; c=relaxed/simple;
-	bh=vL9ewJGQjbVzXzeBAWLNtgJlQ6U/GTAb08cdclhSXDM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rpk1n9doEj4xovzPYmp+nzKSEuc9wUlSKKqdmFUUfk9thsXDyfZ/hzPVvDZKn9XbhW1NkZ4eDRjxlvVBoEaDdudI4nLOlwwSuvKX3ducQMJIywVAk8B/tpHGOIe5kXuoTe3ZCOZac1IWcIQML1Y0mOMsrMyF8z9DC0ma1KDdPiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=D45KeAKf; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-5c6bd3100fcso2472106a12.3
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 18:28:02 -0800 (PST)
+	s=arc-20240116; t=1706668122; c=relaxed/simple;
+	bh=n6OVbPXMiuN3Xw32rE6Lv1b8IPhNR6i3ARKs9E3EOo0=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mkfxh7vxPjOGXLsCV9o/PPsPjhC/yV3TOutQRTgHhizfWlck4LzCDWh36lO/JSR7CQajIXLBA1GUEXnImIbVdLtZ1DzrH4pfG9b5wpinmVJqL54ZcQkC9EBOmPtVcfpDfX6RhzwuZe3YvKwGtW8aRq/j1HSsahqYPOjom2LXkFw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TT+KBo0G; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-33ae3be1c37so209994f8f.0;
+        Tue, 30 Jan 2024 18:28:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1706668082; x=1707272882; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9rFuCfrepBWXS1XxHQhjTqPjsgtcav0dkeDXr+bSzRE=;
-        b=D45KeAKfrJ98hS6d6uV3k+WVmM4ZVpQNftMQ8UcepF49jvwH1RWcNkrkF70O4dYahv
-         tiHKD1xXz15tDg/a3/hFJHqZg6fupSdF77ozGdAgg7jyw+4CnnaIwAwhnoKFcJD5lV8s
-         9WYG8Z19Df/P+wgLRJ9f7W9xn5w9GX8A3/UvM=
+        d=gmail.com; s=20230601; t=1706668119; x=1707272919; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=2jLTYVSeYvQnWVKXFzBhZVC+OXb8WPieh64UeYpW5+4=;
+        b=TT+KBo0GdPDVDyFHdTh+Eo5LzDk4P8K9Li8jOALpWN7eXp2qrJ6NWVScX9+30nnQlN
+         K7O85EBVYAda8zVGu6zpM7pAyGwnqOzXcCZ2Q8DZu9MJqYpWnZ7b8/6xtEg/k7A+5uWI
+         AzZsNAdF1Zudmgp3ayAtjMca/emoeB6b1VYqQ4AQyd+BWEvcC7IBUsbkIka+kPMdJqhL
+         4D9kizVKu00dRYhJ799aqsrxiNI0gJpDdTWqw/7LJrxM57trgSt/NDE1TSwnkAmX8rXh
+         5RAAKUoe67KNBz2yFH5mdYkNXI0AqpR7CHhOthgMJpIsqpbiw38sHf10UzVSzse9Qsf/
+         9Uog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706668082; x=1707272882;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9rFuCfrepBWXS1XxHQhjTqPjsgtcav0dkeDXr+bSzRE=;
-        b=POg00x5oDBMEYHGgU8tsYiZfBQGadTi9NfxU3DH1e9A+d9W7b7dkXySFXsEMvBOMuh
-         FrWKtz9fd1vAwK0Mj7mJdSgQjF0K/lHBjclokLuQwbnsy9ypHjEQKuXVEinKdgS09eek
-         HRQ3MVLzDuwQt3++bvxP9bJPvwSS1fbCzMTkwGszumv6HQBYuhK1zXsyhfdn6DBvmUmQ
-         Jkx7nsfOVRjbUXhpHyU6+kw2Wzhz+L1t5r/QRsMbKKi0Oxk/8dagEHT3isDZw0AbpLuk
-         RWq0rot2E/vcj8hngxj5b2ZSsO5I3rigtEzgDFPxm+Fi+ycjwFPbnNy9Xlv1keueV9B5
-         4+Nw==
-X-Gm-Message-State: AOJu0YyBXZiBf9IUfp7G6zuxbnDjwB2yPVsrrlxSJgYKJPaa7T+028ja
-	vZOR2kO9WAQO+BGtq72OJfBHDJgzpMqG5efzvLYLWoEBZa2WJzQnT+FauvxePJcla/aMnOfERTm
-	1Fr0=
-X-Google-Smtp-Source: AGHT+IGjQbidItS+7RU7cPhy+bkQeiwZ/jpP5J+ABb5ADzdlxfdt0avRjFcD6UpscTVrmQlDW7WNQA==
-X-Received: by 2002:a05:6a21:9206:b0:19c:7e70:d32d with SMTP id tl6-20020a056a21920600b0019c7e70d32dmr376162pzb.0.1706668081759;
-        Tue, 30 Jan 2024 18:28:01 -0800 (PST)
-Received: from fastly.com (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id h10-20020a056a00218a00b006dde3053cdasm8574075pfi.133.2024.01.30.18.27.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 30 Jan 2024 18:28:01 -0800 (PST)
-Date: Tue, 30 Jan 2024 18:27:57 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	chuck.lever@oracle.com, jlayton@kernel.org,
-	linux-api@vger.kernel.org, brauner@kernel.org, edumazet@google.com,
-	davem@davemloft.net, alexander.duyck@gmail.com,
-	sridhar.samudrala@intel.com, kuba@kernel.org,
-	willemdebruijn.kernel@gmail.com, weiwan@google.com,
-	David.Laight@aculab.com, arnd@arndb.de,
-	Jonathan Corbet <corbet@lwn.net>,
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nathan Lynch <nathanl@linux.ibm.com>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Maik Broemme <mbroemme@libmpq.org>,
-	Steve French <stfrench@microsoft.com>,
-	Julien Panis <jpanis@baylibre.com>,
-	Jiri Slaby <jirislaby@kernel.org>, Thomas Huth <thuth@redhat.com>,
-	Andrew Waterman <waterman@eecs.berkeley.edu>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH net-next v4 3/3] eventpoll: Add epoll ioctl for
- epoll_params
-Message-ID: <20240131022756.GA4837@fastly.com>
-References: <20240131014738.469858-1-jdamato@fastly.com>
- <20240131014738.469858-4-jdamato@fastly.com>
- <2024013001-prison-strum-899d@gregkh>
+        d=1e100.net; s=20230601; t=1706668119; x=1707272919;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2jLTYVSeYvQnWVKXFzBhZVC+OXb8WPieh64UeYpW5+4=;
+        b=jbnjfLdzGR0QSHxgNN7Hkx29vTPohOQww5qewfqocRLVFHVMB9nqVPYPW59cdVqmQS
+         rDIQrUnerl7LxFK6XSIHJAwDbTDo3JJzGyr9h4MxUThodqSMUbcOPKaoQEukfZp+aGc/
+         4lvebybSV3fdRZ0DOvhorO6vakDjkPFivGWwNENtXMBAoJhDcICNQUcxoQ48NMBsxzDB
+         E3T7MEpy1GavEn8sXtbDmrCQK0xGWa3xjtPrqPXZsCWWL/ye2/TtmHEjKQozTvVUyJES
+         qIy/XJEnJ0p7W13KK1yXru0vf5W030L0Yv4xti8SVccoL449lr2QSAjgqGMs5kQs9Sn4
+         imzg==
+X-Gm-Message-State: AOJu0Ywe28TfKI6laE7i9he1ErcOEPgLIj2EXWJ/HJTK7HDTGlFlZQgE
+	EcqIid68ZSWV9brNpfZF3g/vkgECaUlaRh3qZtBPSC6xypniJEOC
+X-Google-Smtp-Source: AGHT+IFFbw4X4rm7rTmp0mavrk3j/tNSg8iTjVba0Rn2JSBpR5IPAwOams/1ppQI4SW9Waf1Lr8PYA==
+X-Received: by 2002:a5d:4a12:0:b0:33a:f3fc:a7e3 with SMTP id m18-20020a5d4a12000000b0033af3fca7e3mr204208wrq.25.1706668118925;
+        Tue, 30 Jan 2024 18:28:38 -0800 (PST)
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id bu25-20020a056000079900b0033ae4f2edb0sm9747157wrb.37.2024.01.30.18.28.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Jan 2024 18:28:38 -0800 (PST)
+Message-ID: <65b9b056.050a0220.2fde8.9be5@mx.google.com>
+X-Google-Original-Message-ID: <ZbmwUjbYpzFshDiK@Ansuel-xps.>
+Date: Wed, 31 Jan 2024 03:28:34 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Robert Marko <robert.marko@sartura.hr>,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Jie Luo <quic_luoj@quicinc.com>
+Subject: Re: [net-next PATCH v2 3/3] arm64: dts: qcom: ipq8074: add
+ clock-frequency to MDIO node
+References: <20240130003546.1546-1-ansuelsmth@gmail.com>
+ <20240130003546.1546-4-ansuelsmth@gmail.com>
+ <b1ff77bc-0833-493a-b099-884c727f0341@lunn.ch>
+ <65b84983.050a0220.e1700.35fd@mx.google.com>
+ <20240130174041.74341188@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,23 +99,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2024013001-prison-strum-899d@gregkh>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+In-Reply-To: <20240130174041.74341188@kernel.org>
 
-On Tue, Jan 30, 2024 at 06:08:36PM -0800, Greg Kroah-Hartman wrote:
-> On Wed, Jan 31, 2024 at 01:47:33AM +0000, Joe Damato wrote:
-> > +struct epoll_params {
-> > +	__aligned_u64 busy_poll_usecs;
-> > +	__u16 busy_poll_budget;
-> > +
-> > +	/* pad the struct to a multiple of 64bits for alignment on all arches */
-> > +	__u8 __pad[6];
+On Tue, Jan 30, 2024 at 05:40:41PM -0800, Jakub Kicinski wrote:
+> On Tue, 30 Jan 2024 01:57:36 +0100 Christian Marangi wrote:
+> > > If we merge this via netdev, is a merge conflict likely? Any other
+> > > changes expected in this area, given the changes which might happen to
+> > > GCC soon, etc?
+> > > 
+> > > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> > 
+> > Honestly I don't expect much to change here in the mdio node.
+> > 
+> > If it's a problem I can submit in a separate patch in linux-msm.
 > 
-> You HAVE to check this padding to be sure it is all 0, otherwise it can
-> never be used in the future for anything.
+> The arch maintainers usually prefer to take the DTS patches,
+> so if there isn't anything special here we should probably
+> default to that.
 
-Is there some preferred mechanism for this in the kernel that I should be
-using or is this as simple as adding a for loop to check each u8 == 0 ?
+Thanks for the suggestion I sent v3 with the DTS patch dropped and I
+sent that patch separately.
 
-Thanks.
+-- 
+	Ansuel
 
