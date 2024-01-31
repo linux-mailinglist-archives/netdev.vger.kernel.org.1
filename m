@@ -1,87 +1,146 @@
-Return-Path: <netdev+bounces-67443-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 931A68437EA
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 08:32:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9096F8437F7
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 08:36:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3444C1F27004
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 07:32:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E15B3B24C58
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 07:36:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2711D5027C;
-	Wed, 31 Jan 2024 07:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 032A250A66;
+	Wed, 31 Jan 2024 07:36:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="RglxAPrU"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 036A057326
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 07:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 649645677B;
+	Wed, 31 Jan 2024 07:36:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706686297; cv=none; b=deDosJsDVSuqdVDCZ4fKVc8icDCeBGuR6dQCl90bEa5vFyrFGQyDHuTuy5L+QQ8uV7OCbbp4MAh6AuFM/QwKj1Dz3UVyjoylfu//ZOuSW8fJzRpeWwiqYmuNvd+itiS14nq0CdfNwaEFfoymdPUOZSWvlHxr0MBfbjB9is/BY8U=
+	t=1706686584; cv=none; b=GUF//I4gJrHcfiiqUNP52paBVXm/XCqtumN+OQ5/cxUA0zlWgqrOMwLsc3OSbcxs0OIk42/XDE3EXBSYR89DEVZYsHZF7lIBMDM9/fHfb/p2l/2tYLTxsIuDKtrAyTr4aiEOfCLy0NgowJxO6r9y6hkEFBltSSZndU0Bhobcm0M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706686297; c=relaxed/simple;
-	bh=7wT3OQOd5erRl/NCw7clOz7k0MbcO5RwW8IDWyqCu+Q=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=W7xebeyAWsGAZShbuQ30EAwiWNmrI7g3JLujpzPLfri5Y6CyG4WQtPc+BDkc5nv2EBAF0Q8KOfm4NjhhpbBURKAq0aAa9UmIMoJqf2acmV2on130Q3wroHlN973hnEGdibucM3ToZQbXeBZpY9CrV0JeJNMmVzbGbjWyfcdC5Uo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 40V7VTy94702092, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 40V7VTy94702092
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 15:31:29 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.17; Wed, 31 Jan 2024 15:31:30 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 31 Jan 2024 15:31:30 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::c9b7:82a9:7e98:fa7f]) by
- RTEXMBS04.realtek.com.tw ([fe80::c9b7:82a9:7e98:fa7f%7]) with mapi id
- 15.01.2507.035; Wed, 31 Jan 2024 15:31:30 +0800
-From: Justin Lai <justinlai0215@realtek.com>
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Report on abnormal behavior of "page_pool" API
-Thread-Topic: Report on abnormal behavior of "page_pool" API
-Thread-Index: AdpUF0sHyRotE8/qT3KY+LT6QKnbOg==
-Date: Wed, 31 Jan 2024 07:31:30 +0000
-Message-ID: <305a3c3dfc854be6bbd058e2d54c855c@realtek.com>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1706686584; c=relaxed/simple;
+	bh=5bEHW6ksJ3xqW6jJnxsmV+ldSHTTfxdpUCo76HbOvWs=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=n3DFzV8VW0Pq8oFCu4Q5VjxBWOrQoqjj804lcMjtU10e0YWd46uYkMJ5H636b+CYNtrIACRYhm9QM5EqAodnj/ZVFrVfmWd8gpqPMDxx18gRtvJV0+8aokyaWLY+Ysg9wz78kfcR7tXdC9eMPoUlopxUzXzXTDsc/ln+dj384W8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=RglxAPrU; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1099)
+	id 4E89B2057C14; Tue, 30 Jan 2024 23:36:17 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 4E89B2057C14
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1706686577;
+	bh=A9hod7/WJM4EPvXZpXLKwY7FnhxMOn4SZ60i2PuUqsE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=RglxAPrUIN7r8YQ3/2n+WHKSPQEQWtIXbM7C0ahipg7d346Hb5+voReAY38R8Ijby
+	 Hwc9GhT8yNe+b6mzytI2HJwqAyibvevAQ8ng6Kqa7JS6LoL96u5AQ0t4NHP4s7raKM
+	 M6tYRnha0OFzaRpeK8wnrSf4O6n8MnDbWSson16U=
+From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	longli@microsoft.com,
+	yury.norov@gmail.com,
+	leon@kernel.org,
+	cai.huoqing@linux.dev,
+	ssengar@linux.microsoft.com,
+	vkuznets@redhat.com,
+	tglx@linutronix.de,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: schakrabarti@microsoft.com,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	stable@vger.kernel.org
+Subject: [PATCH V2 net] hv_netvsc: Fix race condition between netvsc_probe and netvsc_remove
+Date: Tue, 30 Jan 2024 23:35:51 -0800
+Message-Id: <1706686551-28510-1-git-send-email-schakrabarti@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
 
-To whom it may concern,
+In commit ac5047671758 ("hv_netvsc: Disable NAPI before closing the
+VMBus channel"), napi_disable was getting called for all channels,
+including all subchannels without confirming if they are enabled or not.
 
-I hope this email finds you well. I am writing to report a behavior
-which seems to be abnormal.
+This caused hv_netvsc getting hung at napi_disable, when netvsc_probe()
+has finished running but nvdev->subchan_work has not started yet.
+netvsc_subchan_work() -> rndis_set_subchannel() has not created the
+sub-channels and because of that netvsc_sc_open() is not running.
+netvsc_remove() calls cancel_work_sync(&nvdev->subchan_work), for which
+netvsc_subchan_work did not run.
 
-When I remove the module, I call page_pool_destroy() to release the
-page_pool, but this message appears, page_pool_release_retry() stalled=20
-pool shutdown 1024 inflight 120 sec. Then I tried to return the page to
-page_pool before calling page_pool_destroy(), so I called
-page_pool_put_full_page() first, but after doing so, this message was
-printed, page_pool_empty_ring() page_pool refcnt 0 violation, and the
-computer crashed.
+netif_napi_add() sets the bit NAPI_STATE_SCHED because it ensures NAPI
+cannot be scheduled. Then netvsc_sc_open() -> napi_enable will clear the
+NAPIF_STATE_SCHED bit, so it can be scheduled. napi_disable() does the
+opposite.
 
-I would like to ask what could be causing this and how I should fix it.
+Now during netvsc_device_remove(), when napi_disable is called for those
+subchannels, napi_disable gets stuck on infinite msleep.
 
-The information on my working environment is: Ubuntu23.10,
-linux kernel 6.4, 6.5, 6.6
+This fix addresses this problem by ensuring that napi_disable() is not
+getting called for non-enabled NAPI struct.
+But netif_napi_del() is still necessary for these non-enabled NAPI struct
+for cleanup purpose.
 
-Thank you for your time and efforts, I am looking forward to your reply.
+Call trace:
+[  654.559417] task:modprobe        state:D stack:    0 pid: 2321 ppid:  1091 flags:0x00004002
+[  654.568030] Call Trace:
+[  654.571221]  <TASK>
+[  654.573790]  __schedule+0x2d6/0x960
+[  654.577733]  schedule+0x69/0xf0
+[  654.581214]  schedule_timeout+0x87/0x140
+[  654.585463]  ? __bpf_trace_tick_stop+0x20/0x20
+[  654.590291]  msleep+0x2d/0x40
+[  654.593625]  napi_disable+0x2b/0x80
+[  654.597437]  netvsc_device_remove+0x8a/0x1f0 [hv_netvsc]
+[  654.603935]  rndis_filter_device_remove+0x194/0x1c0 [hv_netvsc]
+[  654.611101]  ? do_wait_intr+0xb0/0xb0
+[  654.615753]  netvsc_remove+0x7c/0x120 [hv_netvsc]
+[  654.621675]  vmbus_remove+0x27/0x40 [hv_vmbus]
 
-Best regards,
-Justin
+Cc: stable@vger.kernel.org
+Fixes: ac5047671758 ("hv_netvsc: Disable NAPI before closing the VMBus channel")
+Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Reviewed-by: Dexuan Cui <decui@microsoft.com>
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+---
+V1 -> V2:
+Changed commit message, added some more details on
+napi NAPIF_STATE_SCHED bit set and reset.
+---
+ drivers/net/hyperv/netvsc.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
+index 1dafa44155d0..a6fcbda64ecc 100644
+--- a/drivers/net/hyperv/netvsc.c
++++ b/drivers/net/hyperv/netvsc.c
+@@ -708,7 +708,10 @@ void netvsc_device_remove(struct hv_device *device)
+ 	/* Disable NAPI and disassociate its context from the device. */
+ 	for (i = 0; i < net_device->num_chn; i++) {
+ 		/* See also vmbus_reset_channel_cb(). */
+-		napi_disable(&net_device->chan_table[i].napi);
++		/* only disable enabled NAPI channel */
++		if (i < ndev->real_num_rx_queues)
++			napi_disable(&net_device->chan_table[i].napi);
++
+ 		netif_napi_del(&net_device->chan_table[i].napi);
+ 	}
+ 
+-- 
+2.34.1
+
 
