@@ -1,117 +1,108 @@
-Return-Path: <netdev+bounces-67557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4899184406E
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 14:24:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6342784409D
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 14:32:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D625C28DD8E
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 13:24:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B0A7281555
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 13:32:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A63B7B3E2;
-	Wed, 31 Jan 2024 13:23:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76E7B7A716;
+	Wed, 31 Jan 2024 13:31:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="eO8HWt8H"
+	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="v20nKiyC"
 X-Original-To: netdev@vger.kernel.org
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF977BAF3;
-	Wed, 31 Jan 2024 13:23:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=66.111.4.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98B0E7D3EE
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 13:31:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706707438; cv=none; b=ahS9MJDTu+3lAQSPNyfTcgIbyWXo3GbqG2w4gL+ydkE3LHRopyU3jM3w4LpJGmWYtgihi2CnYKoUK0l+xHo3eew1I9JoNC5y/Ww+/rAsS3XGHMUKbSlTm7uA2sYZx3gfHR4psmORDY3lL2kXDiLqs4iwsRwtUhls+yIh4AmsrpE=
+	t=1706707916; cv=none; b=n4w84DyLIgyQURn6zzDSyqQUp1RXWqUtp4VunKfAIt00T2eXaAhS07pzY90KO8v+fDaM9+oVMF8BN0l4nH5CDVQLCbPgaK5JYb/2rrZTikzaltbSq4VfoUn/IZ0a62+2dXhlRsrjd3GJGBVGjH9UT5k/hPM0bpNHo9VIBNLrceo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706707438; c=relaxed/simple;
-	bh=IGvMso4zw2819zDPSG7jetJFq4uCWajG6/aSyluyjzs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R/1kuJ0hzh//kVSNuN7O9VlbvKgme6DDbs8hzB7vcF2zvQgQcQoZA/U4Uhqr/g0M/59K7X1yxV412om6WuwCngdzsxV/OBTwQRODwP62ZhTf5Bs7FKHZhwwECyN53G52DM0MBDeQ1RPFWTI08m3QnhLSKLVG6qe0fds79IfVyp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=eO8HWt8H; arc=none smtp.client-ip=66.111.4.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.48])
-	by mailout.nyi.internal (Postfix) with ESMTP id 417615C0158;
-	Wed, 31 Jan 2024 08:23:55 -0500 (EST)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute7.internal (MEProxy); Wed, 31 Jan 2024 08:23:55 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm3; t=1706707435; x=1706793835; bh=OrVXpkh6/GxYIQJfx8cQuBzt1xv7
-	UiE7g8dc4xQBBAQ=; b=eO8HWt8HJ9gNBILmr2JL03l+R0n5GkZCW1EVkb/Tf1Do
-	2Qs+VnrGjA1GFOesoedyucaWNYv/xuhuGp7c/KdjTZZ1oSeq6xVd5cILiWc+pIb9
-	VNZxU2PFaVL6SFY9fh8w8Ep3rVLnbsFiDvHSkuHHChOy6lAscFQ5hiSWs8ngXpTb
-	pNIWwJdYIdgnLoHU/7j8AbKQPcQvZUaA8fWcM1I80BB1QwdBHzzP3HIfnIBP4I9Q
-	9DT+wcssVL6TR8xwdJOur+brMxrILh8EyokG0jBYmb2KedkT6pguZ1MJ2gNdXiG9
-	ELwRSApVyqPbHummQsduDtqybPBN4xnZN6aOmMtXBA==
-X-ME-Sender: <xms:60m6ZXrZcpqtJjvkdKQNy1BvpkrXyt5NC_Lnl5DWylrgD4-zrYu8Vg>
-    <xme:60m6ZRpRuIIh_imJvZIDG441ME0-z7fax0xwkTvLUMDJr5OaDkBACb3kqkwJw-3Qw
-    PqlhDlA4w9Bu3k>
-X-ME-Received: <xmr:60m6ZUM8sIht4FnL5oXpm_oITOXYLkTd9o_qoqUJ1nsSQMnZIIf64BPB4QO->
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvkedrfedtledggeelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucenucfjughrpeffhffvvefukfhfgggtuggjsehttd
-    ertddttddvnecuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihgu
-    ohhstghhrdhorhhgqeenucggtffrrghtthgvrhhnpeeiheffiedvtdehjeejffekffdtie
-    ehueejvefgteeiueegkeelleefgfelteduieenucffohhmrghinheplhhinhhugidruggv
-    vhenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehiug
-    hoshgthhesihguohhstghhrdhorhhg
-X-ME-Proxy: <xmx:60m6Za5G1XW9M0b9xrtQU0xb6hdaPTVx3KfMA6gT4Ygv2gAOOwhFBg>
-    <xmx:60m6ZW4w-xEUTe5rwtPptJak_p3GjMtYpmemGldzn1c19NBsgvariw>
-    <xmx:60m6ZSgPxd_xK1TNElNAqjepSYHB9tdzAur0B8bTh4VF72-ZfHqqIA>
-    <xmx:60m6Zbh-IY_Zvy8WfJ79nrbKnI4E-NritAHvABu9XhkSIFnEU9CqcQ>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 31 Jan 2024 08:23:54 -0500 (EST)
-Date: Wed, 31 Jan 2024 15:23:50 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"netdev-driver-reviewers@vger.kernel.org" <netdev-driver-reviewers@vger.kernel.org>
-Subject: Re: [ANN] net-next is OPEN
-Message-ID: <ZbpJ5s6Lcl5SS3ck@shredder>
-References: <20240122091612.3f1a3e3d@kernel.org>
- <ZbedgjUqh8cGGcs3@shredder>
- <ZbeeKFke4bQ_NCFd@shredder>
- <20240129070057.62d3f18d@kernel.org>
- <ZbfZwZrqdBieYvPi@shredder>
- <20240129091810.0af6b81a@kernel.org>
+	s=arc-20240116; t=1706707916; c=relaxed/simple;
+	bh=B5akkCadRMd6543+II2hS0/0ZN2LSIdXzGcCFDHKGko=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=c+rdOXnCdrn1ujF6rCQ2SHK8DwtawcdEPp5u2648DcemtiPDcy8GomU4U4ID8SZdBy+ltrtZo6SQ0HTR2/eYQIpSoou7Qu2mnB7hCiDENjK4z17PblmEDSZJuMURwfQCeHn0VSbF80aBcX75XSZAnSnSJ3ZvzmdNY7N9RY6j1zM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=v20nKiyC; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5101cd91017so5771062e87.2
+        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 05:31:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1706707912; x=1707312712; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=B5akkCadRMd6543+II2hS0/0ZN2LSIdXzGcCFDHKGko=;
+        b=v20nKiyCvnHSkBeLeLdi1bRRf6oDM0wGKP4XsEGuuYiDfJAaEZpzXnWw/0f2nbaklM
+         g3/EHEPL6yMt/gQcatOVNOs1RV0baCidm4yZKx4WmTu8jy9c9jYwbA/1ZGxKQxoaNM4Q
+         9R9kk+1g+4Y8fKtbpyRwi37Zo/8baj2zc4IqB7GVYPwT9EKmrCZ2IfHc4IAIBt6cDxHv
+         ACYX48oKOGxbo5jyW/CigXVttQC0tmZB9emJZwq11MKYw7MyhXdb7YZDwNR8XISvYDD4
+         5PRTRV5+Rm8NMNeAbtBVb7wWJzYrxvcXFsRnHgETGm8tIa9QWyg+qXSXzkFsVUbEqZIU
+         2TPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706707912; x=1707312712;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B5akkCadRMd6543+II2hS0/0ZN2LSIdXzGcCFDHKGko=;
+        b=sd/nQXqwcI97ZhyewvFlLeb2WbESmDKrQvECgRjBMIR08kVhu6K2ayFCxpzFjoA7k3
+         WuYIbdTz8JXKwyafSYuhF26EmGIoA5fFlh+SHLQwo9ZJkRvbPdIL31xHxyYHGy/2F9D3
+         3E7Uh5BBCdXkKT3OMaPUULsq/Cu3kSHRGgfZEqQudCkeCv95VWorDf/8UuSf2cEbGOmS
+         4N9EKPa6IiQTotJnqjfcbRFwNKAqwX+KuIMgEK2nxhqUub5HMqIS5GJGPVyjccvYM9FP
+         1cXccJI5e4eekNq3Vqkn9AVIk5Fm3cjfbmwKz+Zsp9thwBIAJuQ0nPLpr5BfB8O6dzbG
+         CaRQ==
+X-Gm-Message-State: AOJu0Yzw8U+XE3khDTdo7aCyVsVVH+sJv5WznO7W328Qj8T7DLUPKzIt
+	ekr7acjmhiZ6GOcQaVqrUYsmfCDJpdGefroGN7YWxOYNx6VPjIa9ynKuK72+5HmA0wllH2kBtpc
+	1
+X-Google-Smtp-Source: AGHT+IFXNOVZCBNi80sdmZ1CnXzKfIZR8B6cTDwHE01kPBqY1xwLRfu/6QACKcnImxj8hEM6UNrpeg==
+X-Received: by 2002:a19:7011:0:b0:50e:609c:ab90 with SMTP id h17-20020a197011000000b0050e609cab90mr1152146lfc.32.1706707912421;
+        Wed, 31 Jan 2024 05:31:52 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXCQEZBdGE+kA/EBG6EagF45WN2kE99/U62sVYnOno5Q7EbJGkD++TsrrshIigXpoPecLeshYJ96xqLcqjMnd/YVKqEvUoQ+rvJ3g4WjD46Q2Uy5eUTRvygJY9SQrZtQ4IqVrxKw8LzZ9J2M19EX6fwja4Zf1Ykq346Vaz3/KRVSa2QSsNaKjvup7RkC33tbKRudJG6pcIQNqq2pc0qLILB2XS7vMbXLMOGsEUS1Ct+IE8LF+yAFz4NxhUt48w=
+Received: from wkz-x13 (a124.broadband3.quicknet.se. [46.17.184.124])
+        by smtp.gmail.com with ESMTPSA id w1-20020ac254a1000000b0051129fa324bsm26283lfk.296.2024.01.31.05.31.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jan 2024 05:31:51 -0800 (PST)
+From: Tobias Waldekranz <tobias@waldekranz.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: davem@davemloft.net, kuba@kernel.org, olteanv@gmail.com,
+ roopa@nvidia.com, razor@blackwall.org, bridge@lists.linux.dev,
+ netdev@vger.kernel.org, ivecera@redhat.com
+Subject: Re: [PATCH net 1/2] net: switchdev: Add helper to check if an
+ object event is pending
+In-Reply-To: <ZbpCA3kgoCKsdQ4J@nanopsycho>
+References: <20240131123544.462597-1-tobias@waldekranz.com>
+ <20240131123544.462597-2-tobias@waldekranz.com>
+ <ZbpCA3kgoCKsdQ4J@nanopsycho>
+Date: Wed, 31 Jan 2024 14:31:50 +0100
+Message-ID: <87eddxtyrd.fsf@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240129091810.0af6b81a@kernel.org>
+Content-Type: text/plain
 
-On Mon, Jan 29, 2024 at 09:18:10AM -0800, Jakub Kicinski wrote:
-> On Mon, 29 Jan 2024 19:00:49 +0200 Ido Schimmel wrote:
-> > > Installed both (from source) just in time for the
-> > > net-next-2024-01-29--15-00 run.. let's see.  
-> > 
-> > Thanks!
-> > 
-> > The last two tests look good now, but the first still fails. Can you
-> > share the ndisc6 version information? I tested with [1] from [2].
-> > 
-> > If your copy of ndisc6 indeed works, then I might be missing some
-> > sysctl. I will be AFK tomorrow so I will look into it later this week.
-> 
-> Hm. Looks like our versions match. I put the entire tools root dir up on
-> HTTP now: https://netdev-2.bots.linux.dev/tools/fs/ in case you wanna
-> fetch the exact binary, it only links with libc, it seems.
+On ons, jan 31, 2024 at 13:50, Jiri Pirko <jiri@resnulli.us> wrote:
+> Wed, Jan 31, 2024 at 01:35:43PM CET, tobias@waldekranz.com wrote:
+>>When adding/removing a port to/from a bridge, the port must be brought
+>>up to speed with the current state of the bridge. This is done by
+>>replaying all relevant events, directly to the port in question.
+>
+> Could you please use the imperative mood in your patch descriptions?
+> That way, it is much easier to understand what is the current state of
+> things and what you are actually changing.
+>
+> https://www.kernel.org/doc/html/v6.7/process/submitting-patches.html#describe-your-changes
+>
+> While at it, could you also fix your cover letter so the reader can
+> actually tell what's the current state and what the patchset is doing?
 
-I tried with your binary and on other setups and I'm unable to reproduce
-the failure. From the test output it seems the NS is never sent. If you
-can, attaching the verbose test output might help:
-
-./test_bridge_neigh_suppress.sh -t neigh_suppress_ns -v
-
-Thanks
+Sure thing. Do you feel that this is enough of an issue that it blocks
+you from doing a review of v1, or can I wait for more feedback and bake
+it in with other changes?
 
