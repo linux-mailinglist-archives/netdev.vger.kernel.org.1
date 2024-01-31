@@ -1,100 +1,96 @@
-Return-Path: <netdev+bounces-67611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17E1A844491
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 17:33:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 85248844495
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 17:33:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 952F11F2DA93
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 16:33:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 39F9C1F2E3AE
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 16:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0A7512CDA6;
-	Wed, 31 Jan 2024 16:31:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 568D45FDC5;
+	Wed, 31 Jan 2024 16:33:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="iDNSeBwD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ngSgmMxJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFFF112CDAA;
-	Wed, 31 Jan 2024 16:31:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27C5F12BF28;
+	Wed, 31 Jan 2024 16:33:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706718676; cv=none; b=b/71f2ro/pLF6OhCeD6GpdElsx7euTFbeNEEHnRrMCIgq6qFAd6zoe/4jfCORFIFSXB7uMisY1pHM6otP2Qc0dM2lgVlEXOhFyLiTPx9r7NTM/GsLaeIhiPYafnGRT1YZ3CZfoPm33FBCBlTGks+ZZg9TDPHezCxCdbPvIqCeP0=
+	t=1706718810; cv=none; b=JOb2Ce3vdYOAgwe6A/yXdSV4L7YxCS2lcxUK2jlQdYSEzKJ51Bg7lAJtvF45/fAjw+rR9G8J+VOpMaEFCbcYd58K6H6v1c0Xm1KBGSkRDLNtERyNxwse5aVw62f42Se4ZIoEw1D7wXY2LlemAqCdeFcUEab9uj6PwpbYr6AFH9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706718676; c=relaxed/simple;
-	bh=FQk80lx6LBU/vGzS3KvVOXF8bV761X7qqWnO6O3DsnA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FVLmJiqMPQ2wkMvpUw4fxuMitboyGFYdRpBqV+o0+ZB1Fsr2IeBYTBVpj8H7zm6aq0uYMJOS7SOkrLyivoyImBiKQ/kmneZ0MP8Mvzfpm+2llrK+Joh7IYNqE66rTohQ/AeXSzD/cOAaR/71evKHDaRROOnsQ4Idli/H1juT6WI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iDNSeBwD; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kjk4r4IOpDJAInBw9oQcvbcWlzWkItt0uplMKw74Lkk=; b=iDNSeBwDEwR6AhvBychY0Uo9zA
-	TxBMH/wwrLaFa4WAqlJqrZox7kraISilV/Ol53k3JphW0L+kDp/u8iL+b0WRn0q8eManrxukhJF6j
-	NITQzNf15WeVSKljl8V3bH8TDNe5+1glCwUt77XqK2iowopWnMPQ/FMXUPVOYXjkiovk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rVDU8-006bAp-Tk; Wed, 31 Jan 2024 17:30:48 +0100
-Date: Wed, 31 Jan 2024 17:30:48 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"sdf@google.com" <sdf@google.com>,
-	"kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
-	"maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
-	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
-	"przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
-	"ahmed.zaki@intel.com" <ahmed.zaki@intel.com>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"shayagr@amazon.com" <shayagr@amazon.com>,
-	"paul.greenwalt@intel.com" <paul.greenwalt@intel.com>,
-	"jiri@resnulli.us" <jiri@resnulli.us>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	mlxsw <mlxsw@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	Ido Schimmel <idosch@nvidia.com>
-Subject: Re: [RFC PATCH net-next 9/9] ethtool: Add ability to flash
- transceiver modules' firmware
-Message-ID: <7039bd68-d972-46f6-8d8d-5388d9cff109@lunn.ch>
-References: <20240122084530.32451-1-danieller@nvidia.com>
- <20240122084530.32451-10-danieller@nvidia.com>
- <5bf6b526-02c4-4940-b8ec-bf858f9d4a58@lunn.ch>
- <DM6PR12MB45161C82F43B67AD8EDB950BD87C2@DM6PR12MB4516.namprd12.prod.outlook.com>
- <DM6PR12MB4516BC80DBF383A186707F19D87C2@DM6PR12MB4516.namprd12.prod.outlook.com>
+	s=arc-20240116; t=1706718810; c=relaxed/simple;
+	bh=dT+mfhflriLyZXo/Fge7zTtcbn+ruYw0y1jDB+v52hU=;
+	h=Content-Type:MIME-Version:Subject:From:In-Reply-To:References:To:
+	 Cc:Message-ID:Date; b=gu2S52VFY7CRIdo0llK599m8VpaNOuJsPUWZKVpcXCQU4D64Oot1tUMs6Iaxu077ZFDL/e+aL4v/CimgHsflykmFX9b8R1/emqFPbv3VQFoDEQxEmWdqzp3ZpbqAyMA2KUMT51wO/H8TzpHl3cdFUYFaL7xpfkXJh0PxDmZB6Vs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ngSgmMxJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4899C433C7;
+	Wed, 31 Jan 2024 16:33:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706718809;
+	bh=dT+mfhflriLyZXo/Fge7zTtcbn+ruYw0y1jDB+v52hU=;
+	h=Subject:From:In-Reply-To:References:To:Cc:Date:From;
+	b=ngSgmMxJJn/FMt37UwcrRl0lCvk//DhDoy0iNvodvSaoyTqUi+fepm3L9d0/hHA21
+	 CkbD0zLiteuEIrGqAYMmXaSXMSJRXg+L360aj+ZgzK5Si9EEEQDpg5ndcJedHFFrlY
+	 B5Ld9jwOB/AAApJZCvbLMAhJ2fMAE9X2aU/KDLXI4IjbN8R71bzCPtnsEBEVLfzQp3
+	 Yikq7thw/gZX+5nZa/QM000mBQARdjoT3cRdDBs19CU3sFS8c8ixxBnind8nPuwMrD
+	 5dTz+yCEnJKAWUKBgicNnIOKwVF8Wu2p7uWoUgHEdVc8vA8iFaHEYApJ7oFMMzoT7T
+	 zDHYJMuxSocrQ==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM6PR12MB4516BC80DBF383A186707F19D87C2@DM6PR12MB4516.namprd12.prod.outlook.com>
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH net 1/9] wifi: fill in MODULE_DESCRIPTION()s for wlcore
+From: Kalle Valo <kvalo@kernel.org>
+In-Reply-To: <20240130104243.3025393-2-leitao@debian.org>
+References: <20240130104243.3025393-2-leitao@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, dsahern@kernel.org, weiwan@google.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, horms@kernel.org,
+ andrew@lunn.ch, leit@fb.com,
+ =?utf-8?q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ Kees Cook <keescook@chromium.org>, Johannes Berg <johannes.berg@intel.com>,
+ Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+ Justin Stitt <justinstitt@google.com>, Li Zetao <lizetao1@huawei.com>,
+ Francois Romieu <romieu@fr.zoreil.com>, Rob Herring <robh@kernel.org>,
+ Marc Kleine-Budde <mkl@pengutronix.de>, Ruan Jinjie <ruanjinjie@huawei.com>,
+ linux-wireless@vger.kernel.org (open list:TI WILINK WIRELESS DRIVERS)
+User-Agent: pwcli/0.1.1-git (https://github.com/kvalo/pwcli/) Python/3.11.2
+Message-ID: <170671880271.2431956.66127348872072392.kvalo@kernel.org>
+Date: Wed, 31 Jan 2024 16:33:24 +0000 (UTC)
 
-> > > How big are these firmware blobs?
-> > >
+Breno Leitao <leitao@debian.org> wrote:
+
+> W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add descriptions to the TI WLAN wlcore drivers.
 > 
-> The largest file I came across is 400K.
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-https://hack-gpon.org/ont-fs-com-gpon-onu-stick-with-mac/
+9 patches applied to wireless.git, thanks.
 
-Suggests that some GPON devices have 16MB of flash. Ideally we don't
-want to map a 16MB firmware image into the kernel address space. A
-high end switch could do it, but a typical OpenWRT 'cable modem' is
-likely to have trouble.
+5b778e1c2e97 wifi: fill in MODULE_DESCRIPTION()s for wlcore
+2f2b503ea770 wifi: fill in MODULE_DESCRIPTION()s for wl1251 and wl12xx
+257ca10c7317 wifi: fill in MODULE_DESCRIPTION()s for Broadcom WLAN
+f8782ea450ad wifi: fill in MODULE_DESCRIPTION()s for ar5523
+e063d2a05d71 wifi: fill in MODULE_DESCRIPTION()s for wcn36xx
+714ea2f109d9 wifi: fill in MODULE_DESCRIPTION()s for p54spi
+35337ac47260 wifi: fill in MODULE_DESCRIPTION()s for wl18xx
+c9013880284d wifi: fill in MODULE_DESCRIPTION()s for wilc1000
+f3f8f0503168 wifi: fill in MODULE_DESCRIPTION()s for mt76 drivers
 
-     Andrew
+-- 
+https://patchwork.kernel.org/project/linux-wireless/patch/20240130104243.3025393-2-leitao@debian.org/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+
 
