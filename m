@@ -1,129 +1,211 @@
-Return-Path: <netdev+bounces-67720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13B76844AA6
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 23:03:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3151844AAD
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 23:03:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 415181C20DE0
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 22:03:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53EB81F29481
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 22:03:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEBB639FC7;
-	Wed, 31 Jan 2024 22:02:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D582F39AFB;
+	Wed, 31 Jan 2024 22:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iHKezBPZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GbqfWgSZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3206C39AC8
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 22:02:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706738571; cv=none; b=ZMlfbd+ZtWOBPoznlmPi0KaTy4CdAMp0eJRORdICB2kgzbvL8EqOcL6zxyzqRScBRdpe8XtU1FLzERUbOwpwfZIYqmIOMOeDPuCCAUrlmL74zrAvNVt64XTjZBUbFju5OA7Mltg9yqZptDVRiXS82lU1mhxm9u6/+6XKK1MzDa4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706738571; c=relaxed/simple;
-	bh=zYpL4lqLZcMZwHPGsHutXjfMxMqLdIP4q+lWTgr3/5g=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=cjdC6Ch5u5+rinoM5HrPW6EQspdvKXBgJ7I/IhrEGrba8yPzlk0kM0LeYHXbYH3IvA/Lm5wr1oXmCwmUTYljw+S0Qsd79CNG3a9aWFdV6UEwr4lsciCAFo9Nw02paMFSMqQQIyUirm/s3adeLN0A7R/Qb9KfLwHB6PXAQWt8lhs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iHKezBPZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706738569;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fdbEKrpyLSr/XfltsGu0Y6emup0IET0jljTchC3c+Yk=;
-	b=iHKezBPZinxgysCtAIDondAT+m1XmxRvj9T/zpuMY19zvz+5gzgHLdn/v8gQ8XxyZ3TuYL
-	CebU/bLOFro+103hsG5mmQKJEjkCIjkcRhBMU0eyVhBW+IrVxpEZdEZMuA2mOB+R5luFjN
-	K09GnL68L7WJw2xz0Xd89ykvUaKw65I=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-173-HIqzZnzXPwy0fqocRmRlKw-1; Wed, 31 Jan 2024 17:02:44 -0500
-X-MC-Unique: HIqzZnzXPwy0fqocRmRlKw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E29BD85A58C;
-	Wed, 31 Jan 2024 22:02:43 +0000 (UTC)
-Received: from file1-rdu.file-001.prod.rdu2.dc.redhat.com (unknown [10.11.5.21])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9776F40C1231;
-	Wed, 31 Jan 2024 22:02:43 +0000 (UTC)
-Received: by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix, from userid 12668)
-	id 7F50730C14EB; Wed, 31 Jan 2024 22:02:43 +0000 (UTC)
-Received: from localhost (localhost [127.0.0.1])
-	by file1-rdu.file-001.prod.rdu2.dc.redhat.com (Postfix) with ESMTP id 7CA4A3F7DC;
-	Wed, 31 Jan 2024 23:02:43 +0100 (CET)
-Date: Wed, 31 Jan 2024 23:02:43 +0100 (CET)
-From: Mikulas Patocka <mpatocka@redhat.com>
-To: Tejun Heo <tj@kernel.org>
-cc: torvalds@linux-foundation.org, linux-kernel@vger.kernel.org, 
-    dm-devel@lists.linux.dev, msnitzer@redhat.com, ignat@cloudflare.com, 
-    damien.lemoal@wdc.com, bob.liu@oracle.com, houtao1@huawei.com, 
-    peterz@infradead.org, mingo@kernel.org, netdev@vger.kernel.org, 
-    allen.lkml@gmail.com, kernel-team@meta.com, 
-    Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>
-Subject: Re: [PATCH 8/8] dm-verity: Convert from tasklet to BH workqueue
-In-Reply-To: <Zbq8cE3Y2ZL6dl8r@slm.duckdns.org>
-Message-ID: <f48626b7-d1c-d696-7138-39fbc1c9cebd@redhat.com>
-References: <20240130091300.2968534-1-tj@kernel.org> <20240130091300.2968534-9-tj@kernel.org> <c2539f87-b4fe-ac7d-64d9-cbf8db929c7@redhat.com> <Zbq8cE3Y2ZL6dl8r@slm.duckdns.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3042E374F1
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 22:03:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706738602; cv=fail; b=ikHJhuOBcH7d76m5wnDwM0MiApaITwnBPv1yEhq2XGJOAFVq7DJpwG073BWD/EQqDZVo8lXNw21Z1f4K3XwlTNahhWbUJFQ98cTZvOeLTMcpwYaZUkzkCVl6gT5tbMV9N0M1Muvnau/N58lHVGBvKrTjQ2N7ctsD63aXs8JhnGo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706738602; c=relaxed/simple;
+	bh=5tvjGc0wOjdnUqoUAoF/z2ppMsblrTLCLnrfF1eF7Nc=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=ffmpPbCrAA8SiYpccrvLY84Yix6prvHiNrnLsQdQzsRRXx9JVXfBOAjtZlh8PoUCe3jSpKQrte1ipVupT3g4lYceuE5TWRf1LfefPThSVEw6BzsrbFRRxjTg9pln8kovb5h+QXgPM4TCgOeTceMMICBiF9zm0Y27nF/m4rBEvnc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GbqfWgSZ; arc=fail smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706738601; x=1738274601;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=5tvjGc0wOjdnUqoUAoF/z2ppMsblrTLCLnrfF1eF7Nc=;
+  b=GbqfWgSZJEni1590bZzsjyIVMDkhRxKjiH3IOy4dP4GyZpxyb0tZ6DOJ
+   J2WbUYTzSJboAkReqYl0z97RF40Z2IEunisAFO+7SeVI0fe+eXtHiHt69
+   1yAyNYVL0PyhLtFAAwMqK4dPUutRBx3dUpg3v/zMRXGQ2/G+6RBwcA6cy
+   dv2J1824jRzluEV8dYnCc9LNrVRw9x4MX152D5LGKX/lW7t/QMDackAcf
+   ugA8rSbyYPZBkODXEFnhxLQ8wXFXsGl89WU86uIa1gq6OpCAHPTBRa6NC
+   ND62rWJ372QPFrCppAhE6D3KkWH731nPyIBPJEeJxMrfyTG6waUIxyxUJ
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="10392434"
+X-IronPort-AV: E=Sophos;i="6.05,233,1701158400"; 
+   d="scan'208";a="10392434"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 14:03:20 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="878913560"
+X-IronPort-AV: E=Sophos;i="6.05,233,1701158400"; 
+   d="scan'208";a="878913560"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by FMSMGA003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 31 Jan 2024 14:03:20 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 31 Jan 2024 14:03:19 -0800
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 31 Jan 2024 14:03:18 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 31 Jan 2024 14:03:18 -0800
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.168)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 31 Jan 2024 14:03:18 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Jo5iedvpji/KYOvxAKA8KM6zG7djG9XDoKtZaErdvCQQqrxugk4F30CV3g3dKCyFl0IKX29QurF+K70YHibresr2F6ijHipeGWQyd4pn+iP8T1IXqovlQCug3zmcJHwKnbIsMY0K0pVmAwwXimmQ/s83RT2xhuA778jzV3AW/Bbxq+Tz2A6sPeN39xWkJmwFlbjG4hYG6k8EW6JhLiUOdNmBjbbBhc00286FySQ59hq1U6sbUWb+wLimBgVjFBQavs0zu1vsnhStF6XqgrK22L3DSViUDvuqRO5wAYokY1o98YcO/ozxnjzGYMtqBMtUA9tAwdrdEKXt9zVZPVZzZg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=rPmjxGDedi6EbS0M6UHGuAdtZPueRYPDJA/tojcVSQw=;
+ b=kr2aZ669snrw2M7aql7Cl2K0an0iZhcflVoTr7VAbmrQunn0yUs5xwUSPamtMLeBF7ClJctaBARe7voMKe+GxQzmAEFlIuhJh6bPtnsoKDiP+BjkSiDpVZ+5ndiWawVeX7SnoAe/6tJw7OAlquhGPAzdOGF/fSJwvvmcAlmSVZDZtmUnGHh/2AK7i81sZ6wDHVvnD2ucnfvFWSbBtMS0zGxVPW07LIVjmzU2qbUW5fJUP4Fs2p6LxoC18cYQVYimPMBkM6MSB61YPGvllrV729NdlVLMnt4b4HsjfKT3bSTZo0EUIszIYhK/jMtkVJhHxLYJpigKRgjjH52PVpqIKQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5186.namprd11.prod.outlook.com (2603:10b6:303:9b::24)
+ by PH7PR11MB5983.namprd11.prod.outlook.com (2603:10b6:510:1e2::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.24; Wed, 31 Jan
+ 2024 22:03:16 +0000
+Received: from CO1PR11MB5186.namprd11.prod.outlook.com
+ ([fe80::bf2:91ee:5ddd:6f77]) by CO1PR11MB5186.namprd11.prod.outlook.com
+ ([fe80::bf2:91ee:5ddd:6f77%3]) with mapi id 15.20.7249.024; Wed, 31 Jan 2024
+ 22:03:16 +0000
+Message-ID: <6db9c94a-efd2-446d-a9f0-8cfc7d126f13@intel.com>
+Date: Wed, 31 Jan 2024 14:03:14 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH v3 0/7 iwl-next] idpf: refactor virtchnl
+ messages
+Content-Language: en-US
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<willemdebruijn.kernel@gmail.com>, <igor.bagnucki@intel.com>,
+	<przemyslaw.kitszel@intel.com>
+References: <20240130005923.983026-1-alan.brady@intel.com>
+ <e27bd484-f79b-4bfb-95bd-6f24518d1cbe@intel.com>
+From: Alan Brady <alan.brady@intel.com>
+In-Reply-To: <e27bd484-f79b-4bfb-95bd-6f24518d1cbe@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0177.namprd03.prod.outlook.com
+ (2603:10b6:303:8d::32) To CO1PR11MB5186.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::24)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5186:EE_|PH7PR11MB5983:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6be2f67b-e31e-480f-eb31-08dc22a86d30
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: TprqR6IZ69CTXXD3K2rSAmwM6yHDdw6pi2e+a1UjN8GOGlLQ5atL6OPq4C7o9yLa6JpE9VxDpbtueB/37CNVGnfCsFtMbrLS5EjADYrtd8TQ4bstf8eVLfhUPOOKnX97kMAr5kFgThXZtswOrZ1c34bFSkL7XQ/PdgeTu+keb0tkU8QwMY2ywVI9b7WH1TVJg6lRlevyTw68b/pGyPGT2kyPho/vzfuXqTZjwtABNwmAA2UbdGg2NeNTODsHUfWhGMS2I0aP/mwvutWNLhJwWkd+EiNY6OsWdWF5DXmY6QL3Xhd+lweyzQEtFnPFTVUU5HkRuQP615hE3vYXFLGw1+fOHiPlEY8NlAPjG0rNJclqX1lsqnmzxYF1yaYrEj8pudBZhSct0f5TogUfm+OwJ8mWwP2VZdNxiyCc/wDwR17+foEjNHaKshl7FAIjoDcYYtUie+3bhYBBrgkoI47RJpBj3jxCmLK6pCd9JFg8sEe78hlqLO9zGYufY1lbxKKbsZbSGtmn+oLi0EvDL/PGoe81+56dMyAQXdavFOJh05cLceu9iwIFsAHm5XmTm50Z6femTSMkzEZ6nfcN0KiSNQvaF+HmTfd0+Xd5V63P6qh0JRiIyKpxNhj+0DW9wvBHLoAG1WFYZExEqd75ETzxTA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5186.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(396003)(346002)(39860400002)(136003)(230922051799003)(1800799012)(451199024)(64100799003)(186009)(44832011)(4326008)(8676002)(5660300002)(26005)(107886003)(2616005)(6512007)(6862004)(6506007)(53546011)(83380400001)(2906002)(15650500001)(66556008)(6486002)(66946007)(478600001)(37006003)(316002)(6636002)(8936002)(66476007)(31686004)(82960400001)(41300700001)(86362001)(31696002)(38100700002)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cUpkSGtpUHMwSGFYODdoN0VJUktLV1RvMU91cVBCczhyY29nV2tydSsvZ28v?=
+ =?utf-8?B?MysxcU41clYzRGNzcmJ4bEdxQy9ySjNrN1UzdXllaUVSRk9RcUU1V1YyYU83?=
+ =?utf-8?B?WkVhM2lDUmlTTE91YXlCWGpib1FEVk5JTno1ZTRkUHNJNjZDelhMT0wzcmds?=
+ =?utf-8?B?VWhXRGs4Wk1MdFFQblhKSGdPS0M4NkpLaVFQRnJWdHhkSEErYkpPNnJTTlp3?=
+ =?utf-8?B?b2VGTjMvWFRlNDRlMnFkcC84eUltOFRlQldZSzR2ZWw1SVlzckFLcTBxT1dY?=
+ =?utf-8?B?NC9yTHlLNkpxOUFKVGdwTHMxZ1ljR1VOS1FzcTZsZEtkRFJWdnFWaDNWNzlR?=
+ =?utf-8?B?dGQzeW9aTjU4dkRNc0FkZ2tlWmFmQkZQcmk5OHdiSGtLTmwvM21COFZoaVJw?=
+ =?utf-8?B?SUFyNVlJQ2JaMlJPY2xFQXByeDlEUXFaR1NSSFE0Z2NJZkpFUEZ3aHhrdEJG?=
+ =?utf-8?B?bmpFekIybXhsOUM4Wm1ubE5IZUZNMDhxSTl4Mi9KTFYwZFR5Um5KMU90R3Jr?=
+ =?utf-8?B?eVR0NitVRjJBeUFLWTYraUpuNkx2eFlWSTREaU5GV0pKcC8ycjZYQ2hKbkk1?=
+ =?utf-8?B?UUhObTlCRi9Gekp1aGtzZUFwSE1oTHRqRHd1OG96YjE4MGtWZ3hiQ3dlKzU5?=
+ =?utf-8?B?UWdRM0tGSHlJUU1PTnlRZlNJelN5Y1NsWFkzbytsTUp1U0FpMGNzYzJncjJD?=
+ =?utf-8?B?aTJidkZ2bFgweFluYTBpdlpEWDNVUG1MSjJEbWxsUTVLOFNxeHFyRTVOcXM3?=
+ =?utf-8?B?bjEzUWdHYnd2VVFFaVU4c0RlU3l2UWI1ckZScHNJenZLSWRwZDB2UXBHb2Rv?=
+ =?utf-8?B?VnNCSGc3T2x4Y1JLNkZQWkJDamhZZXdGdkhURmxyS3dIMHNLNldrM2dXMURn?=
+ =?utf-8?B?Ykw3MUFYNlBKdHdPWVBxZWx6UXhsRDd4T3FkNEJFaE82Y0Yrd3dzakJ2cEQ1?=
+ =?utf-8?B?bGZSbzFPN0lEVC9WSzVrdVlHTTJuV1V3K0F3WGVEQUp5RzY4c3JSYzc3dG43?=
+ =?utf-8?B?cUVvUU9iYk5QZ0tnYmFIcVBja3ZGWnVHRm0zUGVMcFNGajAvZFYva3Z3ZGRj?=
+ =?utf-8?B?Zk1jaTNBMThnaUtac2V4eUgwbTZBMFJabUNmZWQ1dStqMUdqNlMvemhSZk1J?=
+ =?utf-8?B?NXpTN0YwRGZ2NXJKRC9MaUJFOXNtMWZNWGY1SkZpeVZoSjBKY3g3eVBjYkdn?=
+ =?utf-8?B?U0JmQkVkY2FNTllvOWxyc0paWngxZWMwVUxPaFZzT280c0M4clQ5aEtmZjht?=
+ =?utf-8?B?ZFBtZVFDeG1xQWQ1MlRPQkMwdDR1TGhkSlM2NS9xaUQzeTZSVlo4a0VEa1dj?=
+ =?utf-8?B?Tm5jVlFuQksyWmdQaGtFZ1FzMXFEaWN2YVF5YzVXd2pIempJYWxoWTdkUXQ0?=
+ =?utf-8?B?NWxqY1ZVdit6aUlLaDRkL240bmZSbzRuV05wYkhxT3krejBxamhlaCt4SEdU?=
+ =?utf-8?B?NVdHSy9QbnoyVndLQ3pJTTJYUk5UN1NUbm13SmlQMkFyL3BtMlYwVHpLVUZB?=
+ =?utf-8?B?VS9uTDNaTjYxVDdkTlJOd3pyNEhNbEdCLy96WUEyeUJTNUVValg1RU1tZkNT?=
+ =?utf-8?B?cFM5cDB5SUJLdGZGYmpCcWJ1b1dneEFKTUV6U0cvZld4SVhsU0hmZUdhMWxO?=
+ =?utf-8?B?K1hoWHhrZzdjY04rR3pPdjFncUpKamU2MVFwSStsYkpIMjAzdVJXWlJqZk1M?=
+ =?utf-8?B?Mng1SkhJbm1xbWRxMWNCR2hpSHhtOUxsMkdDVnBIeDd5RXlkUGl6TDZleko2?=
+ =?utf-8?B?NEc3Wk9aak8yV2s0SXU0QU43TXpqRFRwTE16UzgzQ3I5ajVLblo4OGx5Q1Q4?=
+ =?utf-8?B?R1V0RlZJOW5IYktCTXA4Vm1BcnMwOWY2ZERoSEJ4RW9GWk1uQ2YxM2U1QkxV?=
+ =?utf-8?B?bmdscVdaWVZHNk43OU9kamNxSTVUVkptODQrRGpVNDVCeUJhMVNCbGM5SUkw?=
+ =?utf-8?B?L2lzSWE5UlBzSndIRVc1M1ZrbjQ5R25TTkMwYmJ2b3c2NTBCUVNRU1VBSjJq?=
+ =?utf-8?B?Z3liSkQzUklwbjB6aEZkT2lYblJLQ2JENy9ZcmpIYjUzZEF1bWdRaGZWbEpY?=
+ =?utf-8?B?S0VZVDNwbzhnazJRbXhieURDTXhVT3BHRXgrOFM4cDdSRnNYVXlOdnBRZjVt?=
+ =?utf-8?Q?HsfRt+N0bGvnxG+O3yS0nZCPw?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6be2f67b-e31e-480f-eb31-08dc22a86d30
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5186.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jan 2024 22:03:16.2975
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: t4xCCdTNXg4WLs7qVdYwdtDdUWx2btd6iVzpFRZujOw90yBWYqQrDbsGR4ncuwZVlwoDdPxzAAAVrAM8+6AR8A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5983
+X-OriginatorOrg: intel.com
+
+On 1/31/2024 10:33 AM, Alexander Lobakin wrote:
+> From: Alan Brady <alan.brady@intel.com>
+> Date: Mon, 29 Jan 2024 16:59:16 -0800
+>
+>> The motivation for this series has two primary goals. We want to enable
+>> support of multiple simultaneous messages and make the channel more
+>> robust. The way it works right now, the driver can only send and receive
+>> a single message at a time and if something goes really wrong, it can
+>> lead to data corruption and strange bugs.
+> Have you tested v3?
+> I have this on my system (net-next + your series), no other patches applied:
 
 
+Mea culpa I have made a grave error.
 
-On Wed, 31 Jan 2024, Tejun Heo wrote:
+We did test the vast majority of change and it was all fine. At last 
+minute I noticed it looked like we could clean up idpf_send_mb_msg as 
+well. I had confidence in the other changes weren't a problem so this 
+seemed innocent to me. I was very wrong. There's some complications here 
+with how idpf_mb_clean works that I think need to be worked out 
+separately before we can do this change to idpf_send_mb_msg. I would 
+like to revert the change to idpf_send_mb_msg I did in v3 and instead 
+investigate it further in a follow up series that attempts to address 
+all cases where automatic variables would be a good idea. Apologies and 
+thanks.
 
-> Hello,
-> 
-> On Wed, Jan 31, 2024 at 10:19:07PM +0100, Mikulas Patocka wrote:
-> > > @@ -83,7 +83,7 @@ struct dm_verity_io {
-> > >  	struct bvec_iter iter;
-> > >  
-> > >  	struct work_struct work;
-> > > -	struct tasklet_struct tasklet;
-> > > +	struct work_struct bh_work;
-> > >  
-> > >  	/*
-> > >  	 * Three variably-size fields follow this struct:
-> > 
-> > Do we really need two separate work_structs here? They are never submitted 
-> > concurrently, so I think that one would be enough. Or, am I missing 
-> > something?
-> 
-> I don't know, so just did the dumb thing. If the caller always guarantees
-> that the work items are never queued at the same time, reusing is fine.
-> However, the followings might be useful to keep on mind:
-> 
-> - work_struct is pretty small - 4 pointers.
-> 
-> - INIT_WORK() on a queued work item isn't gonna be pretty.
-> 
-> - Flushing and no-concurrent-execution guarantee are broken on INIT_WORK().
->   e.g. If you queue_work(), INIT_WORK(), flush_work(), the flush isn't
->   actually going to wait for the work item to finish. Also, if you do
->   queue_work(), INIT_WORK(), queue_work(), the two queued work item
->   instances may end up running concurrently.
-> 
-> Muxing a single work item carries more risks of subtle bugs, but in some
-> cases, the way it's used is clear (e.g. sequential chaining) and that's
-> fine.
 
-The code doesn't call INIT_WORK() on a queued work item and it doesn't 
-flush the workqueue (it destroys it only in a situation when there are no 
-work items running) so I think it's safe to use just one work_struct.
+-Alan
 
-Mikulas
 
+> [...]
+>
+> Thanks,
+> Olek
 
