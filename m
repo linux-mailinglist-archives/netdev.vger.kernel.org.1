@@ -1,63 +1,60 @@
-Return-Path: <netdev+bounces-67739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65A7C844D36
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 00:43:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7A1D844D50
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 00:47:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20F652857E9
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 23:43:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05FE21C216D2
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 23:47:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03F4E3A8DB;
-	Wed, 31 Jan 2024 23:41:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20783A8C3;
+	Wed, 31 Jan 2024 23:47:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k9c1ot3i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q6ywVkNp"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5203A8CA;
-	Wed, 31 Jan 2024 23:41:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88E143B282;
+	Wed, 31 Jan 2024 23:47:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706744514; cv=none; b=X25GZeF3EqT3AXn3sudSk9jBiT3cxZArntT3Val7skwAJ5YJEaWDhHfrcuI3ORhD1J0laurKhTVORTSeRJ1LPaIoO03KYY/DTAtFkc6jBTNu1LeDLKOFVQdpJUjuBXC514jYN6JoajD8T14zuxJM8FXQN+I9pv5Lgv+Jsn9wo5c=
+	t=1706744866; cv=none; b=dGOOSevYAld62KJdCKM/HY2KTWDVi4oNQ15QRVm4KeFhXDthFk3fmVKkVhGGfCzxPY69UmhS0nvXTrWDwyi9E/SDTahg6IbDOGVJfkbjUJ6A4f3dHkho+B84Gazc9hZoWWbaygOTdq9Vf3UnIN9b6GfcQO2E+j88qqqC6WjLi8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706744514; c=relaxed/simple;
-	bh=Cxry7gNqW2doRhJEQkZIqtEdzMs9aiFd0Dqs4XIolps=;
+	s=arc-20240116; t=1706744866; c=relaxed/simple;
+	bh=klr52ezqptjRjXQWKQ6Jaw/sO5CEiJK4VNMcJb+fi2k=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GNo9pNiHNV6cFc1RyB5KjQVs/KL7xQB1PGse6Abk/rJ7D66C0s2Q9vZuVTSRW02xwsQsP8orKIe/jP03uNVxop692Bdhip0z+KRlP2jJPFGXeBL7jBTUPNBoqjAk6fnm9UEA+OAN6o8XZXja1fOkfn8v70zWVOmGln6gUSD++i4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k9c1ot3i; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97879C433C7;
-	Wed, 31 Jan 2024 23:41:51 +0000 (UTC)
+	 MIME-Version:Content-Type; b=JahNqWian7nuxleEvJsw1n59iB7pU8or1uMlEQfO6/Bktfv+S0C4fnI38dC6R3qhg0M3vuEDEc+TJwXple9QXy7JKnoPzmBmGY07KCDJGREILJaOvcGGoonjnBAW3EFtYrQ5OrxkJ1+Bxyrry/a49GXsssA/jBuJpOEm6pCENCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q6ywVkNp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F5F2C433F1;
+	Wed, 31 Jan 2024 23:47:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706744514;
-	bh=Cxry7gNqW2doRhJEQkZIqtEdzMs9aiFd0Dqs4XIolps=;
+	s=k20201202; t=1706744865;
+	bh=klr52ezqptjRjXQWKQ6Jaw/sO5CEiJK4VNMcJb+fi2k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=k9c1ot3iIXBALfeUAu3wqIIJ7Ti8ktIInBfVbWNZhd1coiGlvHEg/G7EFO4mB2vR3
-	 tCnJ5dWRDePTI5zb3mVZzlXawgGgnmwTJuV2A04LjKjcictcYm5SXybHee+VtGT/lg
-	 dUax5FimBswXB5IlU2zZlSGiaznW3aCVYxH2mvEqd1CwTHIcVniV/3Cw0xGkP/3ZIH
-	 SgUm/bpRtF6R0dgePswepsAgLm9BLA+S5pu/r82Zqdbms5RmuJXRRMJ61TfPmXqxLW
-	 HgFNjRnXlbkc189WnNNSXT9HavAuiCpcrVvTMjBwdDyCqWDmQl7Qol3VyBhsBxcNyM
-	 7DWjvyFUBV+YA==
-Date: Wed, 31 Jan 2024 15:41:48 -0800
+	b=q6ywVkNp7F89Heuxq/7LOD8ejD3u40gk6zTZUyZ41VmBNfaVhX8yoB37nROjt3Cgw
+	 QjVYg8T4+9VWB6fXyGEL5c/Vcloz35lo+6k44WUHMh5/obC1oO5Vrioo5+PwnKd8WR
+	 mvQmgMwp4Chi5jzMS7aZ5PPP1nsd5S7fpspbYZCEBIoMssJUTKLQFkp1mALWkLpAoS
+	 IaBa1FMeYRvQcwDNd++wWDUEycj+j3GkxySxsi8d4Wvbw2lNGDO5vsEgyaAdjG462l
+	 hvZNiWzmXBwm8YDrWdH0VKRW7pn6dyfGoV+xzIrBBiQCTI7QvjncxKdIZuUs6r84TY
+	 OAWAIVk0YIEhw==
+Date: Wed, 31 Jan 2024 15:47:40 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Halaney <ahalaney@redhat.com>
-Cc: Vinod Koul <vkoul@kernel.org>, bhupesh.linux@gmail.com, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-arm-msm@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH] MAINTAINERS: Drop unreachable reviewer for Qualcomm
- ETHQOS ethernet driver
-Message-ID: <20240131154148.00d9d318@kernel.org>
-In-Reply-To: <ual3c4fuuz5trgn2ekklsfeslwvswfjg5nij5epbnuf5mihfay@pp32fs6btwxk>
-References: <20240129-remove-dwmac-qcom-ethqos-reviewer-v1-1-2645eab61451@redhat.com>
-	<ZbkWwn-oN5wqoPfJ@matsya>
-	<ual3c4fuuz5trgn2ekklsfeslwvswfjg5nij5epbnuf5mihfay@pp32fs6btwxk>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: netdev@vger.kernel.org, lorenzo.bianconi@redhat.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ bpf@vger.kernel.org, toke@redhat.com, willemdebruijn.kernel@gmail.com,
+ jasowang@redhat.com, sdf@google.com, hawk@kernel.org,
+ ilias.apalodimas@linaro.org
+Subject: Re: [PATCH v6 net-next 3/5] xdp: add multi-buff support for xdp
+ running in generic mode
+Message-ID: <20240131154740.615966a9@kernel.org>
+In-Reply-To: <c93dce1f78bd383c117311e4d53e2766264f6759.1706451150.git.lorenzo@kernel.org>
+References: <cover.1706451150.git.lorenzo@kernel.org>
+	<c93dce1f78bd383c117311e4d53e2766264f6759.1706451150.git.lorenzo@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,18 +64,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 30 Jan 2024 09:53:22 -0600 Andrew Halaney wrote:
-> > Looks like Bhupesh sent the patch changing but never followed up with a
-> > v2 for this:
-> > lore.kernel.org/r/20230915191600.3410862-1-bhupesh.linux@gmail.com
-> > 
-> > Would prefer if this is changed to his email (copied him as well)
-> >   
-> 
-> Thanks for finding that! Bhupesh, do you plan on spinning a v2 soon? If
-> so I will not send a v2, otherwise I can respin this with your email and
-> no .mailmap change.
+On Sun, 28 Jan 2024 15:20:39 +0100 Lorenzo Bianconi wrote:
+> +#if IS_ENABLED(CONFIG_PAGE_POOL)
+> +static int
+> +netif_skb_segment_for_xdp(struct page_pool *pool, struct sk_buff **pskb,
+> +			  struct bpf_prog *prog)
 
-The lack of response is not inspiring confidence. We can add Bhupesh
-back if he wants to be active again..
+nit: doesn't look all that related to a netif, I'd put it in skbuff.c
 
