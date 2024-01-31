@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-67414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 468F7843410
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 03:40:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49EA184340F
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 03:40:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A0011C221FC
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 02:40:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06F1F283782
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 02:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 273E2DDB8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EBC7D281;
 	Wed, 31 Jan 2024 02:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="g6iY/pv9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PzJzfwHb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC52FE545;
-	Wed, 31 Jan 2024 02:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC5B3E576
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 02:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706668827; cv=none; b=UBgdt7mxlWMloboedqBbFQTPkHhEzRh3F/3GvQl3I6JuGcNqH2XlqirTh94NPFpKADKk9GA4st8L5nBvuA2atIyenCdmmvFKllMzK9uZ+i/r/WaEZFy3TT9JOLendNRrPvD/c/ivdFehlQ1VRj8NNuhAiil1MIWfiQLZtXP+Aa0=
+	t=1706668827; cv=none; b=KcbX+pzujw8Hai3YVUIdbFouDTxRVzCWReoVAYc/JRXAUHdN2gi8/uACBDz87rznI5GQnHbT5+0Ru8iOf1gmV4+9p41RlY3LNoBisf7R1BrYipcwGAZtDTkTvk3TSmh1bYHRTuA05Evc/bou1iU9eneZf9uLNvibYKJuxkspSbo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706668827; c=relaxed/simple;
-	bh=ri+xtdqHDdAedu6sRg/n0UlatJBbNJKunWM840Atne4=;
+	bh=ou8h9RWtFTwYbrIkq5VinVskN7WC04WhMSdBPie+ZpY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kW2M7u1l7SYNPaPvfT6/8M6cFZCQGP9b+PTY1Sfr+uS5yhuTjwt0b1H1jy3XwzWoCRtlUfIX9cYBGJ7sUudUvNeHQuywHrM6Y306cDA3EGkfRVq0qaDHbKRdxFBR/BwGhyNq0x4Fa3i31GLVgCzSeu/wtNh0Yovi+PPSJM40/gU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=g6iY/pv9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7E99AC43390;
+	 In-Reply-To:To:Cc; b=qwnZMTxkd/MFIrJhHAUVJWM+9HWKlAbSF5eziX5cD6Ct12jbe1T+VaveBAOqYKm/p8g0g0w21v3xO6zfAkMEsFJ/BZDngEB6C8fifeYhpqiYVnF4hPZS4YxO2t4udgEcL4xxkChk/1j7ixd08caxIn9mwL9XMw9AICzH8M0ujXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PzJzfwHb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8D020C43394;
 	Wed, 31 Jan 2024 02:40:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1706668826;
-	bh=ri+xtdqHDdAedu6sRg/n0UlatJBbNJKunWM840Atne4=;
+	bh=ou8h9RWtFTwYbrIkq5VinVskN7WC04WhMSdBPie+ZpY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=g6iY/pv9E9iheFF3QaNJfoym3PlztBxYNWx1crzr5v6vk32yc9KKET2axhPJYpWOP
-	 4h4MYp0FlTHtGsgmkpTbxIYRnoVY+5gJ7kr9gdJoxke1MJdqlw1Roy5ev4ZWCriV3N
-	 P3+okxs7wbEmjbXIalOYHwCjkp3UER+pkll1gkfAsdSW2a0hgxjghlW7nyOzFQjhc2
-	 s/jHOmVaJqFOGdhlTFmxkhsJYHzmMKAZa8/p56Kke1VETRj7C0si6tUNniarNnVrUD
-	 W5p7mQaN96um2NhapXfN0Ki/9RABZuYylgPaOOExfgwMYmGA2NTX5qZN5h8mX6Lu+u
-	 BK4UsBS5WJT6w==
+	b=PzJzfwHb0N1ieciTHBmMNvyCgLjowOP3c8CFK2F1rwSNRIBR+/joj5j6jyQYbhksl
+	 P2POXdV7tt8joLOXdBzxva+Sn3huzwbIo6U0Xo9miTB7VTwc3A0ODqHVSBTf+30WXT
+	 M5wQAePr2JVRWofUhSUc7q919CG3jrFrzIicvZ5FcF6x5Ffk/ZaKxGqk0D3QSZafII
+	 7zsayneITd9x3xP9dUP3dXsMmFC/LNOXuXXKCuqIPEQyiIKlPNtP/e5lGlCMgS22EL
+	 PipnN9tExHOIGw/YELHtFdZH1rj5T+HFyMSOxIW9EzCRYwuFEF2LHg6+hobZ5U1w7D
+	 u3nTlAh2FWSUA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 62EC6E3237E;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 72F6FDC99E7;
 	Wed, 31 Jan 2024 02:40:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] bridge: mcast: fix disabled snooping after long uptime
+Subject: Re: [PATCH net 0/2][pull request] Intel Wired LAN Driver Updates
+ 2024-01-29 (e1000e, ixgbe)
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170666882640.24091.16393026544437992064.git-patchwork-notify@kernel.org>
+ <170666882646.24091.17698785883375480869.git-patchwork-notify@kernel.org>
 Date: Wed, 31 Jan 2024 02:40:26 +0000
-References: <20240127175033.9640-1-linus.luessing@c0d3.blue>
-In-Reply-To: <20240127175033.9640-1-linus.luessing@c0d3.blue>
-To: =?utf-8?q?Linus_L=C3=BCssing_=3Clinus=2Eluessing=40c0d3=2Eblue=3E?=@codeaurora.org
-Cc: netdev@vger.kernel.org, bridge@lists.linux.dev,
- b.a.t.m.a.n@lists.open-mesh.org, linux-kernel@vger.kernel.org,
- roopa@nvidia.com, razor@blackwall.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+References: <20240129185240.787397-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20240129185240.787397-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to netdev/net.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-On Sat, 27 Jan 2024 18:50:32 +0100 you wrote:
-> The original idea of the delay_time check was to not apply multicast
-> snooping too early when an MLD querier appears. And to instead wait at
-> least for MLD reports to arrive before switching from flooding to group
-> based, MLD snooped forwarding, to avoid temporary packet loss.
+On Mon, 29 Jan 2024 10:52:36 -0800 you wrote:
+> This series contains updates to e1000e and ixgbe drivers.
 > 
-> However in a batman-adv mesh network it was noticed that after 248 days of
-> uptime 32bit MIPS based devices would start to signal that they had
-> stopped applying multicast snooping due to missing queriers - even though
-> they were the elected querier and still sending MLD queries themselves.
+> Jake corrects values used for maximum frequency adjustment for e1000e.
+> 
+> Christophe Jaillet adjusts error handling path so that semaphore is
+> released on ixgbe.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] bridge: mcast: fix disabled snooping after long uptime
-    https://git.kernel.org/netdev/net/c/f5c3eb4b7251
+  - [net,1/2] e1000e: correct maximum frequency adjustment values
+    https://git.kernel.org/netdev/net/c/f1f6a6b1830a
+  - [net,2/2] ixgbe: Fix an error handling path in ixgbe_read_iosf_sb_reg_x550()
+    https://git.kernel.org/netdev/net/c/bbc404d20d1b
 
 You are awesome, thank you!
 -- 
