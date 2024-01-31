@@ -1,166 +1,143 @@
-Return-Path: <netdev+bounces-67533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D815D843ED3
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 12:52:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AAAC843EDA
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 12:53:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 840571F2F8B2
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 11:52:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CDDE1C26C00
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 11:53:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA336768FC;
-	Wed, 31 Jan 2024 11:52:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAA0C762E0;
+	Wed, 31 Jan 2024 11:53:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cLPqnYep"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XTWFvOI3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA81476040;
-	Wed, 31 Jan 2024 11:52:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE8969D39;
+	Wed, 31 Jan 2024 11:53:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706701937; cv=none; b=GTlWqDTNe3XTcUfnskhdLIrBNdSIIMABa975En7xvFapSRx4A9a7gQh5nxFL4/Lj0X3yQlW80Php+TmQ2JrgFpy8vIXsoAHRMcf8ncHZe8xJh2mW2mKtrwL9F5lclYP4NII53QwVGdlsmzxa5GBirNMZD4EtA1kstcmDQ/bGxYY=
+	t=1706702013; cv=none; b=nPFE1MGUviOocv8bHW8ye9+zFiMOhj5XXEejR7i07OPkPS70QGBafaqmOBFHoAlPvhqCwwK3H3xvXlAR3+3W3DUlNtcw8wVZE1PGyj+dBXvvfOLqM+N50GK4gOXYPlnh1JN8dRuE1BK/oDVxTALLBnVnPDkana8mNxfsI+o8rU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706701937; c=relaxed/simple;
-	bh=pysEqJSi12OgIxziInUigUCVr98LVwHAqnVaGuYDmmo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a8yU4w0dkwguYN1DPYRews/4uDwvz7TEq+EBeDlpA7YUgdoi+XsUPa/EsY6sdm9p2lWrbl1P7N8pWKHa66Ule9VhZsv3zYZV2FAK3zGurxH2r3GMfKq7/lpFRv1oTzmmspoToQidj6mNA63ObC4LdLZ4HymMao6dqXgw63v8l3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cLPqnYep; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-5102a877d50so5735365e87.0;
-        Wed, 31 Jan 2024 03:52:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706701934; x=1707306734; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SDlah67sh5gJ9ynKDz3ysjr2o7CYUk88hIiX0azAyyc=;
-        b=cLPqnYep/jVY5WhVhBjgRJDbFZuFGyoLkPhP2RlaLMlyHLQKcwxVAU2OvLzT61xobD
-         BggAs2CeXMw+NgiEL2C1ozuROSrjQeTo4O3HyeGqDdJnbMxebusc/bOtkY6zL+aZBQPv
-         3+NXzCIVNuOOC3hAzNey00Y3Vpt9N6yYNJVaOBl7047c80eqaMgfioR7n0bulWF0Q0a5
-         N6PeSzJYW+cW61JlY2XzxBZCfKAHLUW3pqzBpt8US4TqvR5TKpZkESBVuNbJLYeLx2wH
-         z9YAWT0TEb3HQA7U3OMUjZRv6ASviG4ir+rM20jbyqrOnTiRURgXzOKRlHvUY9i34SNf
-         s4nw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706701934; x=1707306734;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SDlah67sh5gJ9ynKDz3ysjr2o7CYUk88hIiX0azAyyc=;
-        b=grla9Ot6qFDmkZKDYLF8G37+8ZuFgQV+ON62Qaf/okJx51KMuQZVDfsObHlDiSA/Dl
-         WDiMzYWHMGC8dgq6dFU78fgdwsoxLXd3+VBuahyApS7qaWEoCKdgWVPvXnf/FfHlkiKc
-         vqOIerF2M4ym+fh8YjM+xacGgeYRmFA+ac+cN642/+taDwcvRW+5gG5a+yI12slLb2Fx
-         AQpqrD8IJxHYeZX//h3xQZsKLGYIPjcs0RWf+V04VbH4Om4TfSUxA8qGtOzPEunh3bK9
-         FcYEFLdoTQHX8FqvlXq8K4qROtsN+hXqYI5FUdyxlQYb0z5U/7foIn8ltqvcgpCPh+YF
-         uQLA==
-X-Gm-Message-State: AOJu0YxOpeLvFU6CS5tBJ0Cunpq4japTqA8ZPxKVCiDFKglu31hS3LzR
-	t+2dqIwRTb7Ml8p8sFJOJR2GbnOZWFi+hUckReMofBfYqzJ7zFCN
-X-Google-Smtp-Source: AGHT+IGT/GhBNY8zNxq8qrY/QrJrCfHAKHa2GeBrruLDDuJpKfIDSnvo8RECdhAB5l3rhzcE/mHJag==
-X-Received: by 2002:a05:6512:1095:b0:50e:a9c0:70a6 with SMTP id j21-20020a056512109500b0050ea9c070a6mr1132993lfg.43.1706701933731;
-        Wed, 31 Jan 2024 03:52:13 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXgxSyJMXOvbCIDB0wzyLHpsYcK4/T9b5Q6W/hyvfAmUa/6cSdxDzdOolPJg5uzFBHRg4i9xC44AzQHm/Qspd2E7peB3o2PhnSnP6vZ776CrE6rJIyj7OmI2t9rAyfGN0BFUAhHXEXj6ujBvSGfMnlwfQOfOnL87du0FxciZU2T3FpJ4TQ74pXT32kWocurP4eH4jBPvr7xzkHzpy4blqOq4wrGKphewAf5X7mxq7P9OtjY9HEXjD027KFbvTWop6vvMwYGFd0nUxqEubJs7EV/P6lQj8WEukj5IDv+2H3TeN3QiDVbTBg7h1kKd7BM0LzYz66Mdg5u6HBIbyYMZIZ5wOlHx8g4vZkseq1faX49F1Zan54fI3sg1J6Tbgz86A==
-Received: from debian ([93.184.186.109])
-        by smtp.gmail.com with ESMTPSA id d15-20020adfa34f000000b0033ae9f1fb82sm8946992wrb.48.2024.01.31.03.52.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jan 2024 03:52:13 -0800 (PST)
-Date: Wed, 31 Jan 2024 12:52:11 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jean Delvare <jdelvare@suse.com>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org
-Subject: Re: [PATCH v5 net-next 08/13] net: phy: marvell-88q2xxx: add support
- for temperature sensor
-Message-ID: <20240131115211.GA111590@debian>
-References: <20240122212848.3645785-1-dima.fedrau@gmail.com>
- <20240122212848.3645785-9-dima.fedrau@gmail.com>
- <Zbi+5ymzbL9sckdi@shell.armlinux.org.uk>
+	s=arc-20240116; t=1706702013; c=relaxed/simple;
+	bh=e6U7IZSvIvmIZ9psc3hSArHZqp0dIjof9nK3JhYKmU4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dehGCwaWcDsuPVdYObxkG2R1uX1Rivmo/M3Jpqi5W8JCnB20VCjRN2X0FTMuqwxRzd0kx8D2lKbPs8uDZJthkeg06cYpnDdZmwCfSbBGSWqRXj3W2MtRWdL7NEYS117ZeXiGo4yofHRWPoJ7oRDAVgx9sANijpegG+mf3/Er5HM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XTWFvOI3; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706702012; x=1738238012;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=e6U7IZSvIvmIZ9psc3hSArHZqp0dIjof9nK3JhYKmU4=;
+  b=XTWFvOI3hC0/8xqrvZR9WW3oDX/h3TKPm4PgF0yYw5nSETGHLu7aGC4K
+   Dl0GceqpOUEM+hV4I/t4xnOaaE2iBoTOzB2GivEtZ4QYA1kZPNVMj87lR
+   MqKtwasTFaDJ1Corr2vAx0sO3ZYolKH3ifrhqS17HiYlqGJANzbUw/5oi
+   04aBfa0UrhWsfjX3cJZQiVc/HZCuDG+cn4Jaz8tmm04zGWY6Izdytnqu4
+   cPH1GxfSrA5OM3kK1OmqyTcfF+spgVdPCSB8gZ6/zL9LEKpbAWsYsvQyJ
+   1jKO8cBFhLu/y87ng90XqVFzzMLhmdOFA8IklxuMnsijBsDZy8JdRzaT7
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="10962417"
+X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
+   d="scan'208";a="10962417"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 03:53:31 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="738071148"
+X-IronPort-AV: E=Sophos;i="6.05,231,1701158400"; 
+   d="scan'208";a="738071148"
+Received: from mszycik-mobl1.ger.corp.intel.com (HELO [10.246.35.198]) ([10.246.35.198])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 03:53:27 -0800
+Message-ID: <0fc3f574-6243-4c85-a6a7-442dc480c9e7@linux.intel.com>
+Date: Wed, 31 Jan 2024 12:53:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zbi+5ymzbL9sckdi@shell.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH net-next v5] ethtool: ice: Support for
+ RSS settings to GTP from ethtool
+Content-Language: en-US
+To: Takeru Hayasaka <hayatake396@gmail.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Jonathan Corbet <corbet@lwn.net>
+Cc: linux-doc@vger.kernel.org, vladimir.oltean@nxp.com,
+ linux-kernel@vger.kernel.org, laforge@gnumonks.org,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ mailhol.vincent@wanadoo.fr
+References: <20240131013705.1002722-1-hayatake396@gmail.com>
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+In-Reply-To: <20240131013705.1002722-1-hayatake396@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Am Tue, Jan 30, 2024 at 09:18:31AM +0000 schrieb Russell King (Oracle):
-> On Mon, Jan 22, 2024 at 10:28:41PM +0100, Dimitri Fedrau wrote:
+
+
+On 31.01.2024 02:37, Takeru Hayasaka wrote:
+> This is a patch that enables RSS functionality for GTP packets using ethtool.
 > 
-> 	int tmp;
+> A user can include TEID and make RSS work for GTP-U over IPv4 by doing the
+> following:`ethtool -N ens3 rx-flow-hash gtpu4 sde`
 > 
-> > +	switch (attr) {
-> > +	case hwmon_temp_input:
-> > +		ret = phy_read_mmd(phydev, MDIO_MMD_PCS,
-> > +				   MDIO_MMD_PCS_MV_TEMP_SENSOR3);
-> > +		if (ret < 0)
-> > +			return ret;
-> > +
-> > +		*val = ((ret & MDIO_MMD_PCS_MV_TEMP_SENSOR3_MASK) - 75) * 1000;
+> In addition to gtpu(4|6), we now support gtpc(4|6),gtpc(4|6)t,gtpu(4|6)e,
+> gtpu(4|6)u, and gtpu(4|6)d.
 > 
-> 		tmp = FIELD_GET(MDIO_MMD_PCS_MV_TEMP_SENSOR3_MASK, ret);
-> 		*val = (tmp - 75) * 1000;
+> gtpc(4|6): Used for GTP-C in IPv4 and IPv6, where the GTP header format does
+> not include a TEID.
+> gtpc(4|6)t: Used for GTP-C in IPv4 and IPv6, with a GTP header format that
+> includes a TEID.
+> gtpu(4|6): Used for GTP-U in both IPv4 and IPv6 scenarios.
+> gtpu(4|6)e: Used for GTP-U with extended headers in both IPv4 and IPv6.
+> gtpu(4|6)u: Used when the PSC (PDU session container) in the GTP-U extended
+> header includes Uplink, applicable to both IPv4 and IPv6.
+> gtpu(4|6)d: Used when the PSC in the GTP-U extended header includes Downlink,
+> for both IPv4 and IPv6.
 > 
-> > +		return 0;
-> > +	case hwmon_temp_max:
-> > +		ret = phy_read_mmd(phydev, MDIO_MMD_PCS,
-> > +				   MDIO_MMD_PCS_MV_TEMP_SENSOR3);
-> > +		if (ret < 0)
-> > +			return ret;
-> > +
-> > +		*val = (((ret & MDIO_MMD_PCS_MV_TEMP_SENSOR3_INT_THRESH_MASK) >>
-> > +			MDIO_MMD_PCS_MV_TEMP_SENSOR3_INT_THRESH_SHIFT) - 75) *
-> > +			1000;
-> 
-> 		tmp = FIELD_GET(MDIO_MMD_PCS_MV_TEMP_SENSOR3_INT_THRESH_MASK,
-> 				ret);
-> 		*val = (tmp - 75) * 1000;
-> 
-> > +		return 0;
-> > +	case hwmon_temp_alarm:
-> > +		ret = phy_read_mmd(phydev, MDIO_MMD_PCS,
-> > +				   MDIO_MMD_PCS_MV_TEMP_SENSOR1);
-> > +		if (ret < 0)
-> > +			return ret;
-> > +
-> > +		*val = !!(ret & MDIO_MMD_PCS_MV_TEMP_SENSOR1_RAW_INT);
-> > +		return 0;
-> > +	default:
-> > +		return -EOPNOTSUPP;
-> > +	}
-> > +}
-> > +
-> > +static int mv88q2xxx_hwmon_write(struct device *dev,
-> > +				 enum hwmon_sensor_types type, u32 attr,
-> > +				 int channel, long val)
-> > +{
-> > +	struct phy_device *phydev = dev_get_drvdata(dev);
-> > +
-> > +	switch (attr) {
-> > +	case hwmon_temp_max:
-> > +		if (val < -75000 || val > 180000)
-> > +			return -EINVAL;
-> > +
-> > +		val = ((val / 1000) + 75) <<
-> > +		       MDIO_MMD_PCS_MV_TEMP_SENSOR3_INT_THRESH_SHIFT;
-> 
-> 		val = (val / 1000) + 75;
-> 		val = FIELD_PREP(MDIO_MMD_PCS_MV_TEMP_SENSOR3_INT_THRESH_MASK,
-> 				 val);
-> 
-> ... and therefore no need for the _SHIFT constants.
->
-Will fix it.
-> -- 
-> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> GTP generates a flow that includes an ID called TEID to identify the tunnel.
+> This tunnel is created for each UE (User Equipment).By performing RSS based on
+> this flow, it is possible to apply RSS for each communication unit from the UE.
+> Without this, RSS would only be effective within the range of IP addresses. For
+> instance, the PGW can only perform RSS within the IP range of the SGW.
+> Problematic from a load distribution perspective, especially if there's a bias
+> in the terminals connected to a particular base station.This case can be
+> solved by using this patch.
+
+LGTM
+Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+
+> Signed-off-by: Takeru Hayasaka <hayatake396@gmail.com>
+> ---
+> v2->v3: Based on Harald-san's review, I added documentation and comments to 
+> ethtool.h and ice.rst.
+> v3->v4: Based on Marcin-san's review, I added the missing code for GTPC and 
+> GTPC_TEID, and revised the documentation and comments.
+> v4->v5: Based on Marcin-san's review, I fixed rename and wrong code regarding
+> GTPC
+
+[...]
+
+>      f     Hash on bytes 0 and 1 of the Layer 4 header of the Rx packet.
+>      n     Hash on bytes 2 and 3 of the Layer 4 header of the Rx packet.
+> -
+
+Still removing this line :c
+
+> +    e     Hash on GTP Packet on TEID (4bytes) of the Rx packet.
+>  
+>  Accelerated Receive Flow Steering (aRFS)
+>  ----------------------------------------
+
+---8<---
 
