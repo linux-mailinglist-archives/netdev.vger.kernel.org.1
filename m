@@ -1,179 +1,166 @@
-Return-Path: <netdev+bounces-67502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B919843B46
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 10:39:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92E6F843B4A
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 10:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0937E1F22277
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 09:39:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B74EC1C21860
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 09:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6A926773D;
-	Wed, 31 Jan 2024 09:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 765EA69944;
+	Wed, 31 Jan 2024 09:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="Soh9i6BX"
+	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="lfjABV3I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2104.outbound.protection.outlook.com [40.107.102.104])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4A4469942
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 09:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706693948; cv=none; b=jtOn+iCOfHa35AEWWrZMTvYl/+mCBCZVeNP1f7+cDmV4aKtpV5vcqmeob7rx56incqXzOORhaXir4NKR/QzLEW4/ymJnumVNapOqy3KkqB3jeFYSOU/xLPOHBBgssCqTgfP7VUxZBkupKqzqcn7mEXTDQ6YlQTF0sMVN8pBi8tc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706693948; c=relaxed/simple;
-	bh=EdvinsgMmsFd9ywhc9GwyJvZ5Z5k3y3pzogjtHpDOjE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=McWPQBVOZWjKUVqzVwNzmyQvKNN4IKd3EEARMd15v/aOT2XFDys0ue3Pn5tRg2WmCC2I6/SepG3oVeD64ixIyGK8WxFPi9U3inKvmS3ZHa2jfOoA7DZxImu3onf/xfgDSI1auAtYNuszexyKOgMRZQBpg9RaPVjYGFv6Z4c8zkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=Soh9i6BX; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-40e5afc18f5so50826445e9.3
-        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 01:39:06 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80A1A168A3
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 09:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.104
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706694031; cv=fail; b=Ac4+wo4Eoxh2lUJgW+Y4B41QAObVJ+Vg8Sd8QPqpSg0dl0kBdPRlkgv1UjYtib2DOrPDpbPXGRxss8LraK2NgfnzPVaw4cMFj872ULi8TiVbcbYqCaAeYAYlZo+t45wS0bDP1nJbT7lOc9aGXGhEjGu8hmb4ifAv59UmOGQLs04=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706694031; c=relaxed/simple;
+	bh=HU/kkqpX4cEqIBA6tqvXu9Yo76PX5jGIHW3cPYVb2qQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=Ct+RIB67chUWaFJk9mZkC+BlrjxDDbxJwt2cbzDhEFN71IQk62aV+AXIL2Fa9W3fh1kUUPny40oJVQG0SLtGGyVByI2Bxt5rO1AEDoazuLTUUincPAQSq+iQhtBtjGfx59TCpjSZ6QOqcDt0k8/+ps+PRzc8kyNYadt3aFM8PDk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com; spf=pass smtp.mailfrom=corigine.com; dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b=lfjABV3I; arc=fail smtp.client-ip=40.107.102.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=corigine.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dX+7u/zrD08XA972bMdBSgiArxrU1aXmAYz9c1vNe1yNBspsavYOO1F8SaP27vJ0GL6OuVTTsP5ywZvAXUWhG/Et0Z7qCzUWNZnxCFNKYK4kT9CYRPCi+sgJdcvUDAiI1KL5xqGoy8GihMwkAgMjoF+dxsvak42JHd8znNA1Y98nIHmubsGIaLnpTryxu4dPLOyHQ9fB5CnWObUDIZ5jANsrRjl9Okr1WgaQKjvigdCYd2v2aoG/cs7rD9/kxyv856L3xm99r5m7A/JZV9cbZm6e869+UVdoBTZCpco+LLyTki9fuV/tPnvg8KKdXvLcla+s2vi1SHiMeHAQI42BgQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kQLR0T0peQm4SlfAczKinYBxbzNjAkY31oiLvSmY5Ew=;
+ b=IlzyVzlPgjNUZTHlTqqpA0GZANqR0hgfMFiF1OBeQjQ0nTXG4IbFo1Zb8nUJZs5oy/mZkwblyxwWYONLOsqrJm70DnH7+MbKTQM/cG7mhb70jTtmwpSflQnnfQKRDzY/bS3aZZ37UZVtuLQ9judbYtG1m4IRfVmEWMsYl3XLSNF/ekQEdDQXsWM6LQEJK7RywDicVDHDIe7TfAgwfTUZdmH5Tb4HHCD2uQviKoYgoiI3lAThH6Yz5zXQfXdhiyer2onzQwyqWgAcqyFARXU4Ia/5bPwtp5r9LvrcoVFTRAHqygkPsCTqArLl5O0gWzdl2nAd5kzh2XfCuQNSiP8MBA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706693945; x=1707298745; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5ZLVmXZ0B3Z3/XsbTVN9T8mNDiHI0n8yXspjnvc/22g=;
-        b=Soh9i6BXfI3TWh4pS0d0Xd0BGLsbz8RhKNNGJA2NwSWS0MhkxNngr9b2QySLYvZPYd
-         7XNA7EUSijgie7LaJo81dUTvOyE4h8kVSsz0K25NOkDyIC0X3LCRhbhAFBePf/fKJ1cl
-         Al0Ucd8l/0Lfsk4H11QsrxSsbsEVEI9elzTSUc+8Pvh4mNdSvI8bLQzJgVWcCayij96M
-         mC64Q0bTzZ4PHcEkY9x2A9kr+0prjQ+73LJAlWxMhdBOXZSXUXCAq7ds2ijLaZKCNMYL
-         V281sUFDM9+EsLE7dIxrNRlnJo151SNeCz4rDnvp+VB53Fem+8tKnMNR6ydEGnnZWhxr
-         x+OQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706693945; x=1707298745;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5ZLVmXZ0B3Z3/XsbTVN9T8mNDiHI0n8yXspjnvc/22g=;
-        b=v0tvOiiwol0IzVBfTYaSb4crIeIZvmEYLF5Lcgnn4H6Yu+oUkbzkzGZ7BVFkFf1MYp
-         HSxKXX6qFKXy7KlEJaTS4rhMMf1lko7eURdKevSr9qqZ6qgtw2HnyLGryuocgGXlmXnw
-         gjx119A766udCaW/wF2Lkge4HHBG7NEh/Zf293mYunDXlrGXfeI9KPfGXQMstBBmRccy
-         LYZsVjichRXXe//TFYhJ1O8ChKGJVDHi1NEbRf7QG36D+kK/uTt9OZxBypI5+MbRlb+S
-         kH4BRIwyG2GWj6DqEXClx7W8muMc8emJA3CUJl1ZwtyFnYBD7rChKlDLUu3VctOV2mgt
-         BArw==
-X-Gm-Message-State: AOJu0YzJLW4v1sNhCIfoM59PlukfFdn6SbfNxgeqYXbtzyeJsVIlLpyG
-	ZtQ6ue9DIingZVBLgGFvns+FFdOLWSjtQpuNrxk/O5j5bruOfGoXcxTle/MHmlA=
-X-Google-Smtp-Source: AGHT+IHZiPIxhl5dhiXrkFKdSLGxPAeui/YC7KY07GMjP/JPbjh+tC78HTNaiTZUIwh9bkctN0kZYw==
-X-Received: by 2002:a05:600c:35cc:b0:40e:e7c6:ddd3 with SMTP id r12-20020a05600c35cc00b0040ee7c6ddd3mr734846wmq.9.1706693944812;
-        Wed, 31 Jan 2024 01:39:04 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVbF+Bdp0xhU87Qu/+uxjPhzjR7hSQAJOHAk1/Acpax4QfxRaS5F43QdUsfJrcs1+xvCuO1vnaauGK7VnxDEKPAAX3oNPrQZPyAZ7j3kRWYo0vF+OQ4ygCTfl73GLXEk3klU5tK3SFVY5BxIk4r34sfFq2qs652mh0H0/3rwNpvn7kVSAEvb+VIsWkfDCmwExhVi07O9zrhtEd5mELt/zhLsalvSmlhI8vsq7ry
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ck14-20020a5d5e8e000000b0033afc81fc00sm3574206wrb.41.2024.01.31.01.39.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jan 2024 01:39:04 -0800 (PST)
-Date: Wed, 31 Jan 2024 10:39:01 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Louis Peens <louis.peens@corigine.com>
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=kQLR0T0peQm4SlfAczKinYBxbzNjAkY31oiLvSmY5Ew=;
+ b=lfjABV3Id3Q8LWeQD5YkOq86tv/hlhDQq8iZYetSc6h5pqnFeBez0sGpV4KdHrrQkoTLsXcHwdIJBQeUWQWZ/BMtiDMU48ygYgkoxhk4C04nY6jl7jyt91cBn5v4CiQzPLRZLl3UXUNb4hxTShXpL4Nw+HvhsJuh+UP/WDdxbq0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
+ by SA1PR13MB4958.namprd13.prod.outlook.com (2603:10b6:806:189::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.24; Wed, 31 Jan
+ 2024 09:40:26 +0000
+Received: from BL0PR13MB4403.namprd13.prod.outlook.com
+ ([fe80::2e1b:fcb6:1e02:4e8a]) by BL0PR13MB4403.namprd13.prod.outlook.com
+ ([fe80::2e1b:fcb6:1e02:4e8a%4]) with mapi id 15.20.7228.029; Wed, 31 Jan 2024
+ 09:40:26 +0000
+Date: Wed, 31 Jan 2024 11:40:16 +0200
+From: Louis Peens <louis.peens@corigine.com>
+To: Jiri Pirko <jiri@resnulli.us>
 Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>, Fei Qin <fei.qin@corigine.com>,
 	netdev@vger.kernel.org, oss-drivers@corigine.com
-Subject: Re: [PATCH net-next 2/2] nfp: customize the dim profiles
-Message-ID: <ZboVNWrlgucuxH9N@nanopsycho>
+Subject: Re: [PATCH net-next 1/2] nfp: update devlink device info output
+Message-ID: <ZboVgL2crEK4StEc@LouisNoVo>
 References: <20240131085426.45374-1-louis.peens@corigine.com>
- <20240131085426.45374-3-louis.peens@corigine.com>
+ <20240131085426.45374-2-louis.peens@corigine.com>
+ <ZboThy4CrJRAITED@nanopsycho>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZboThy4CrJRAITED@nanopsycho>
+X-ClientProxiedBy: JNAP275CA0005.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:4c::10)
+ To BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240131085426.45374-3-louis.peens@corigine.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL0PR13MB4403:EE_|SA1PR13MB4958:EE_
+X-MS-Office365-Filtering-Correlation-Id: 917d402e-2f5c-49d4-bbd9-08dc2240a78b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Yh0QgylvnyX2VU2vsIzGW6+be+LKSCqFMhG5xgJcjiW10g1z8jOhJUVQnLbjvGQkQhis/vhfyEtbAVmjy+1seyAl6dgCKjBYLzrFXovu2KFtBV9CL0v9R6/3i68VfE5y9Z+buctYVMBKxGDkf1owAw3S3UpjUk6yMy6Ool92TJ2v9n8w7rnHWayz2143v4JLL0vzmwC+6Pez3X55goNZoCPkdqqh9E9GI8V7JRzI/32NyTT20/H323inCxJkU/BoWlRmZ+87QWBJOJ3tAe5qIZZfYaXurTUBCLEKpHmBrq+Z1G/2xlIkRlwg9ovkVj8mQ2DD9V1QSih+wxktODqZoiUKfVIPmKYVyOjcqrQjk5EgWFSUxNZcy844GCPfNu+sDGTHQN35zSlSOX9PpY3qYoaI6EKsS7jpsGmgTbRMzQziIfPWo2pllPTJJxUnfd08EsNnrbG/DtCpjYBNd0xMIwznoEhde3ORyVbvIY9EX7MlXMzZhK4I5NKiuRWXBu0uzH7f7ohV5Dtx40yNhDFbqB7JDNdo8iiPaGUWSU3naqxy19ffOHqAHlaanyx/oErS
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR13MB4403.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(39840400004)(136003)(346002)(376002)(396003)(366004)(230922051799003)(1800799012)(451199024)(186009)(64100799003)(2906002)(44832011)(5660300002)(6486002)(38100700002)(86362001)(478600001)(41300700001)(6506007)(107886003)(33716001)(6512007)(9686003)(26005)(6666004)(316002)(8936002)(8676002)(4326008)(66946007)(6916009)(54906003)(66476007)(66556008);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?FRV37W9Y6a1hTA01w0x0cZRh4YA+qpjZeF3KcyVuuzzQRo4PtulHUX0DrFeo?=
+ =?us-ascii?Q?y3bi+eYJ7WL72XsQV6geLc2DWemW2Yy1lx1NI2H7geaAq8waQLY8y1MhgEoA?=
+ =?us-ascii?Q?oup6aVy3/CDIAov8idlFZWTQUKiyHRSV/fqtwoDYVBboCXbZpImL6JpT+ReN?=
+ =?us-ascii?Q?b71UWK6WyKffWCvv9ejdvKjnBCOHe3l+Cr00hUutb8coA6WZNwjNF+W578dS?=
+ =?us-ascii?Q?LRQTf6G9Hchh25t294DlxdgTH87UHVkDuMcHR8xFST1Npy8QWePup3860FwX?=
+ =?us-ascii?Q?/WIpB+FQmcAclut7z1UlIaHjHdh1KBYQ2imgwYTL64tGHWuSU5j59L+9DJ67?=
+ =?us-ascii?Q?O5nuWI+EKw2psySq+BeI+PR/zCKDICCQR7S6B1N8u+7zpr9QvDnpGvPDu5eb?=
+ =?us-ascii?Q?IrEir5zpByyqppd569NGdntTTxZiYQiCe3YgnOiVUzpHfTpNqtWu8iOefK2v?=
+ =?us-ascii?Q?5n0MZGQ+osSb5/VEZ2r2KlBqe4QKHlzil9zsKBVhn8zj4UpeOQcmcpYVT2ch?=
+ =?us-ascii?Q?teDt2eRl8w9KNGUqGgdtWSHjWMvDqIC9OE9/jF/Ehg8m/6FS8r8Zfvd0qYJo?=
+ =?us-ascii?Q?FdZwlV/9H4G5SyYGR0V5aC/LbbotqgzpFlmbP8sqP/zhf56QD2GSOSnJYOBe?=
+ =?us-ascii?Q?3HwwPCnWwvTDTWjUQfT2qAXbKWjq1kW0rZF1q+BZG7eSi91w1rRW+vxLlpSb?=
+ =?us-ascii?Q?rcrFFWgr7hBItIi/MdUkrWrol/5NA3Rk2GG0t9vO+vFPDNy5JGKs0FjFFGE3?=
+ =?us-ascii?Q?iKDPpeE1SGI/dqyzQk1SeiySyKUSxGBVBGXw/eiPkxmYC3DD0ysZgxTxXs1T?=
+ =?us-ascii?Q?//rvhUVPZmclHShIvZCWe+vqFFQ87sJhwtg2+pLArL8WqI1RP3j79birJ5KN?=
+ =?us-ascii?Q?tRBRdDlcYHrQ5OLTLgE1LvH8qDVnVaepGK7fCjNXoQRIHJV6TwHqEYPCUVTx?=
+ =?us-ascii?Q?08o33hppagiQ/g12NVfgEugvec7piCnaeD/kOxU4/Vb+T9nTEiMXx7jUnXsb?=
+ =?us-ascii?Q?0EuePAR15YNxDg8rwtgGflwXvebF5gJiA+UIVXf5SdW4608iVqaGpTGcZIT0?=
+ =?us-ascii?Q?Zoosj/RAONmZkNuz9GzKZH4sR29O9MWDXcUE3mki2KdAMoKuwBz3G5POtx6c?=
+ =?us-ascii?Q?pbGk/3nHwZX6jevJsubHcCVs0TEIljYIL3nsf46GCliYDt4+3l9jxKX6dM8V?=
+ =?us-ascii?Q?XVmmdvnqCvMNsl6af3WdFgiEAf8zLwT+hB7U6fCoZtH0WPS4DYIoEBd/tl6F?=
+ =?us-ascii?Q?MUYaWgdNYrhVlClBpTD/jX2RORy5S7/8inLAf7sAWhs5gSYMw5zb4/BaJjXg?=
+ =?us-ascii?Q?VleqhYUZ6Raw1+0K/mHA9cHoBWWWdhGMQrh8OUVedzy7zenJQxLydamIQGFE?=
+ =?us-ascii?Q?U8PgJLatpeMBeNJQ+92PzJb2VNQH9tPLVLzAEm0jbFMhIh1wRCh2l/1dcWVZ?=
+ =?us-ascii?Q?x3AZUxBF5OjJEJzlAtqv5dplzkInZTiv0axzKwKAIKf2ZKWbB510bnVG6bf0?=
+ =?us-ascii?Q?gd80m8I3ogNUI5/DCEx21gPRubnR+/56jw7huV1TYfhP6zNHMJsun8i6TAxJ?=
+ =?us-ascii?Q?n5EPvAbxiPjsIENXzwmHVhId6EXzIWNp/WrwT3vFnl2gKhaHS9hdIf7BNGr1?=
+ =?us-ascii?Q?VQ=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 917d402e-2f5c-49d4-bbd9-08dc2240a78b
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR13MB4403.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jan 2024 09:40:26.4839
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tyss1T6XG7HzEWhHv4jVdas7ciSXTDAeK0dmAPbrfaK6SAPTtc2bWJPYAN/xAZ6MczqcFXN927du2vitpBLa35Ueh0sad19dy+DTzKpkBqQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR13MB4958
 
-Wed, Jan 31, 2024 at 09:54:26AM CET, louis.peens@corigine.com wrote:
->From: Fei Qin <fei.qin@corigine.com>
->
->The latency with default profiles is not very good when adaptive
->interrupt moderation is enabled. This patch customizes the dim
->profiles to optimize the latency.
->
->Latency comparison between default and customized profiles for 5
->different runs:
->                                     Latency (us)
->Default profiles     |   158.79 158.05 158.46 157.93 157.42
->Customized profiles  |   107.03 106.46 113.01 131.64 107.94
->
->Signed-off-by: Fei Qin <fei.qin@corigine.com>
->Signed-off-by: Louis Peens <louis.peens@corigine.com>
->---
-> .../ethernet/netronome/nfp/nfp_net_common.c   | 27 ++++++++++++++++---
-> 1 file changed, 23 insertions(+), 4 deletions(-)
->
->diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
->index 3b3210d823e8..cfbcec3045bf 100644
->--- a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
->+++ b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
->@@ -1158,16 +1158,28 @@ void nfp_ctrl_close(struct nfp_net *nn)
-> 	rtnl_unlock();
-> }
+On Wed, Jan 31, 2024 at 10:31:51AM +0100, Jiri Pirko wrote:
+> Wed, Jan 31, 2024 at 09:54:25AM CET, louis.peens@corigine.com wrote:
+> >From: Fei Qin <fei.qin@corigine.com>
+> >
+> >Newer NIC will introduce a new part number field, add it to devlink
+> >device info.
+> >
+> >Signed-off-by: Fei Qin <fei.qin@corigine.com>
+> >Signed-off-by: Louis Peens <louis.peens@corigine.com>
+> >---
+> > drivers/net/ethernet/netronome/nfp/nfp_devlink.c | 1 +
+> > 1 file changed, 1 insertion(+)
+> >
+> >diff --git a/drivers/net/ethernet/netronome/nfp/nfp_devlink.c b/drivers/net/ethernet/netronome/nfp/nfp_devlink.c
+> >index 635d33c0d6d3..91563b705639 100644
+> >--- a/drivers/net/ethernet/netronome/nfp/nfp_devlink.c
+> >+++ b/drivers/net/ethernet/netronome/nfp/nfp_devlink.c
+> >@@ -160,6 +160,7 @@ static const struct nfp_devlink_versions_simple {
+> > 	{ DEVLINK_INFO_VERSION_GENERIC_BOARD_REV,	"assembly.revision", },
+> > 	{ DEVLINK_INFO_VERSION_GENERIC_BOARD_MANUFACTURE, "assembly.vendor", },
+> > 	{ "board.model", /* code name */		"assembly.model", },
+> >+	{ "board.pn",					"pn", },
 > 
->+struct nfp_dim {
->+	u16 usec;
->+	u16 pkts;
->+};
->+
-> static void nfp_net_rx_dim_work(struct work_struct *work)
-> {
->+	static const struct nfp_dim rx_profile[] = {
->+		{.usec = 0, .pkts = 1},
->+		{.usec = 4, .pkts = 32},
->+		{.usec = 64, .pkts = 64},
->+		{.usec = 128, .pkts = 256},
->+		{.usec = 256, .pkts = 256},
->+	};
-> 	struct nfp_net_r_vector *r_vec;
-> 	unsigned int factor, value;
->-	struct dim_cq_moder moder;
->+	struct nfp_dim moder;
-> 	struct nfp_net *nn;
-> 	struct dim *dim;
+> This looks quite generic. Could you please introduce:
+> DEVLINK_INFO_VERSION_GENERIC_BOARD_MODEL
+> DEVLINK_INFO_VERSION_GENERIC_BOARD_PN
+> and use those while you are at it?
+We will do so, thanks.
 > 
-> 	dim = container_of(work, struct dim, work);
->-	moder = net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
->+	moder = rx_profile[dim->profile_ix];
-
-It looks incorrect to hardcode it like this. There is a reason this is
-abstracted out in lib/dim/net_dim.c to avoid exactly this. Can't you
-perhaps introduce your modified profile there and keep using
-net_dim_get_[tr]x_moderation() helpers?
-
-
-
-> 	r_vec = container_of(dim, struct nfp_net_r_vector, rx_dim);
-> 	nn = r_vec->nfp_net;
+> Thanks!
 > 
->@@ -1190,14 +1202,21 @@ static void nfp_net_rx_dim_work(struct work_struct *work)
-> 
-> static void nfp_net_tx_dim_work(struct work_struct *work)
-> {
->+	static const struct nfp_dim tx_profile[] = {
->+		{.usec = 0, .pkts = 1},
->+		{.usec = 4, .pkts = 16},
->+		{.usec = 32, .pkts = 64},
->+		{.usec = 64, .pkts = 128},
->+		{.usec = 128, .pkts = 128},
->+	};
-> 	struct nfp_net_r_vector *r_vec;
-> 	unsigned int factor, value;
->-	struct dim_cq_moder moder;
->+	struct nfp_dim moder;
-> 	struct nfp_net *nn;
-> 	struct dim *dim;
-> 
-> 	dim = container_of(work, struct dim, work);
->-	moder = net_dim_get_tx_moderation(dim->mode, dim->profile_ix);
->+	moder = tx_profile[dim->profile_ix];
-> 	r_vec = container_of(dim, struct nfp_net_r_vector, tx_dim);
-> 	nn = r_vec->nfp_net;
-> 
->-- 
->2.34.1
->
->
+> pw-bot: cr
 
