@@ -1,62 +1,58 @@
-Return-Path: <netdev+bounces-67377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F249D84323F
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 01:48:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E6F9843249
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 01:55:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 951CFB226C7
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 00:48:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81B0D1C234CD
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 00:55:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E10634;
-	Wed, 31 Jan 2024 00:47:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A6C136F;
+	Wed, 31 Jan 2024 00:55:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hRcXaOyf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iv1hKx+s"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0809B376;
-	Wed, 31 Jan 2024 00:47:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FE8D363;
+	Wed, 31 Jan 2024 00:55:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706662032; cv=none; b=C4BlXmhEXGcLr8eWO9FfS8az4efmPAy2QRZlxq08T53lhZC0gRfu9bCYZQ+c56h8XVj7KgYDk9dGicC8fyGoKr1y57U/Ujp3F38E4GSDZXmrP37IlTr2Dhbg3CnBXDRUugwxhCJz7eEorbgvR6yozIdtFP+1S1AwAzG4/W1hYEw=
+	t=1706662510; cv=none; b=J7JXEhyfBiV/rDVgpdgV+DRAMQRHqMlZS4cdQtLR1cUvDF911yqpKEcH0Hmg/s+767boRB6KB8gSVP9ZVC/F2ySOXEh9jMZ8hJYsk3K6LR277Fod+3Y7joj8VVDSC6/BPh2nLRDaSlKOJlQu84+9QVgAUl/nBG57x4qtCAsFyZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706662032; c=relaxed/simple;
-	bh=u/n42ehR8Gzk4ARZK1nf/hRQ7/fGOw0OBBHyEqZCDIE=;
+	s=arc-20240116; t=1706662510; c=relaxed/simple;
+	bh=78tiHemZiSA+aMBr76TtZYvrQGw/LWB7nLfaC/AriSM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OZD/h3kF7YEUFJTmSJMAaKjsozbE+fJF0EDcs+wPSQrifgd43nDFpzFWq78T5mqfnJDA/0h0LkU5AZt9lEPSyi0/yppfJ+R3Csdktwa4fpgWw5LpW0trYkPwMag2F6ycO8tz2nF8dVotBYwfTwV6//694DxvGr03f3fAJdCOzCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hRcXaOyf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91184C433C7;
-	Wed, 31 Jan 2024 00:47:09 +0000 (UTC)
+	 MIME-Version:Content-Type; b=QbMrR/je6ecv95fJgW+vMGfuOrZN5nF4Zkyb4cCqBVKwc5lDgVZ+lsyiGOHlwiz65W8FPNfdrvxTtcjOuDRPp4ATEfi0big8tVoisQeioFfVkTxtyyu1dRbnYQ2fOfVQWYOsicRPNIJB+7siU5rJVrm4gUZa2hCfrafNl39Ifdk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iv1hKx+s; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE4D1C433F1;
+	Wed, 31 Jan 2024 00:55:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706662031;
-	bh=u/n42ehR8Gzk4ARZK1nf/hRQ7/fGOw0OBBHyEqZCDIE=;
+	s=k20201202; t=1706662509;
+	bh=78tiHemZiSA+aMBr76TtZYvrQGw/LWB7nLfaC/AriSM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hRcXaOyfnnuCd7YlanR/0JUOOZrbobyeIvl5R6nJrUEm/nqQhfC1lukfYkzEmIyEq
-	 lu+VZx01vyPA5nqirtdFNS/ASTedHt4IvkMWsboWCWINi/wjVQcsMzFsX95Kx/CFuS
-	 V3mAuY5quid6jfiJIfCfQVtbckXWhyrd90UdNopvzdDTwW55ZNAaf29+yL4gW9mjAk
-	 4C/X2bI6eiq9zXWgj09h+yqwOsttq0NjTym+BHI4jNgBh5/VjEQf9/4we8ihCMzkG4
-	 hsCTuWLXy9ayaKYvajpdzRxXp7Xl3oiGVVLOZzWdzwXem8gPvKnZtc/9eY5AdP25sE
-	 KYNs95NHkwmHA==
-Date: Tue, 30 Jan 2024 16:47:06 -0800
+	b=iv1hKx+sqeCBfJJZzCrcsJeCMxaMKP5ymWUDhn9wupVviYotaNb7h+WUromHrzyLH
+	 I+YHypZnI/kg7JcdiIl4fvAhpxNk22HpdEgrn43Vrb3uvODbWZ8h4xuLxiWJ9wopa+
+	 lNVaJk6R5XfecoBKouw8VtotrV+Tm2S0ND7kmiif5yZLAsAnP5Tw5QRmHkl0B5s1UV
+	 AGBT726SaK0tImKfW07zj8RTVZZENf2SdaYr3C7rLy5vslmCK596ip/H6gS4ejXpK7
+	 VTBVp2mnaTz/AohHgQpAFVmB9RpAlDn6BWdIWIbGCSTM0h00M2rTmBhbE+5jWyE/xJ
+	 QzWC76uhedEjA==
+Date: Tue, 30 Jan 2024 16:55:05 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Mina Almasry <almasrymina@google.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jason Gunthorpe <jgg@nvidia.com>, Christian
- =?UTF-8?B?S8O2bmln?= <christian.koenig@amd.com>, Shakeel Butt
- <shakeelb@google.com>, Yunsheng Lin <linyunsheng@huawei.com>, Willem de
- Bruijn <willemdebruijn.kernel@gmail.com>
-Subject: Re: [PATCH net-next v6 1/2] net: introduce abstraction for network
- memory
-Message-ID: <20240130164706.6eb6a9b3@kernel.org>
-In-Reply-To: <0c767128a7ceee72c3cfb4c17498ef3b6fd87a56.camel@redhat.com>
-References: <20240123221749.793069-1-almasrymina@google.com>
-	<20240123221749.793069-2-almasrymina@google.com>
-	<0c767128a7ceee72c3cfb4c17498ef3b6fd87a56.camel@redhat.com>
+To: wangkeqi <wangkeqi_chris@163.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, fw@strlen.de,
+ wangkeqi <wangkeqiwang@didiglobal.com>, kernel test robot
+ <oliver.sang@intel.com>, fengwei.yin@intel.com
+Subject: Re: [PATCH net v3] connector: cn_netlink_has_listeners replaces
+ proc_event_num_listeners
+Message-ID: <20240130165505.446bd37f@kernel.org>
+In-Reply-To: <20240124114437.160930-1-wangkeqi_chris@163.com>
+References: <20240124114437.160930-1-wangkeqi_chris@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,22 +62,9 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 30 Jan 2024 10:59:53 +0100 Paolo Abeni wrote:
-> > + * netmem_ref - a nonexistent type marking a reference to generic network  
-> 
-> Minor nit: here you need to prepend 'struct' to avoid a kdoc warning:
-> 
-> include/net/netmem.h:20: warning: cannot understand function prototype: 'typedef unsigned long __bitwise netmem_ref; '
-> 
-> Should be:
-> 
-> * struct netmem_ref - a nonexistent type marking a reference to generic network
+On Wed, 24 Jan 2024 19:44:37 +0800 wangkeqi wrote:
+> Fixes: c46bfba133 ("connector: Fix proc_event_num_listeners count not cleared")
 
-s/struct/typedef/
-
- /**
-  * typedef netmem_ref - ....
-  */
-
-Somewhat surprisingly kdoc understands the typedef keyword just fine :)
+The fixes tag should have 12 chars of the commit id, could you fix 
+and repost?
 
