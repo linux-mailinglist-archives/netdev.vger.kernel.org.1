@@ -1,195 +1,157 @@
-Return-Path: <netdev+bounces-67432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3491843637
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 06:51:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5722E843668
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 07:04:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AD1E28ADCF
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 05:51:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87DDA1C21730
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 06:04:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F42917BC8;
-	Wed, 31 Jan 2024 05:51:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DAkwwoW7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6577A3E464;
+	Wed, 31 Jan 2024 06:04:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1AF63D993
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 05:51:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A90353F8C7;
+	Wed, 31 Jan 2024 06:03:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706680262; cv=none; b=Vdq1XBOspN5igm0qXAgMa8Lhjx2FP0Hc1iFdiHtTRjPEotii9VPXFbt3Mk7sFcJOeYhmWx2HrI4ZEl6dw+6wihunGoOYqc3bfP12ryyAWKTktoqVkkMHUn2e7gkwnTXIXNn1EstenXYyT/VcW93o27UKHPr26CNjVTidRShHb38=
+	t=1706681041; cv=none; b=F+jloUVdOn17sEjfsiL/Kc3Da33waUwmN94qq92SnekwFS6TmRHFN+9i8i4lHxl5Eq0y8iQ4XAchEgdINqFJDp2RGfeapb0oyFVG2b75OqmybBNnXqo/PxXj+rWNfEQeU3A3xDvjrFAyJOjTc1Be4mPrNS7GttKoESmP/85lAzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706680262; c=relaxed/simple;
-	bh=KCEYRxaW7LgDoVooIEDy4x5qQykkv5+g07a+4kjdiBc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EaLMb8rhcMGWuZdkjAyfmwbgF3Cz09z32FuRfCZ44Icf4xUvMH1DzpW673x/bd724e0ba9cA3qVWiRMCppPnzU9Vzjhm8LNdzvtkvKhSn15uzCSSGdPKB6bLs0fYPgRk/R8bTwCdyIvFNLXmEXQ4gwZr8MsJfanoLceW3kAOiLY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DAkwwoW7; arc=none smtp.client-ip=209.85.219.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1706681041; c=relaxed/simple;
+	bh=RMyiWHBrBchyj1m/GVv0+cXHWz3xTX5F69i+CDc+6Ko=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lhzalFsnIqKrITnBK7W2ioUR7rZxl7VjvnYb/aXoi/n/rnARAn7kVMFGvJfswCdPiE2ptJAyWweH3EeLacDv6VbzYIEvatubLqPzGOre35g1mxMakNcwy9a2rvqCO1YRVM6IobZqb+GbK4JbfPu9ZYZoyX+4BbUrfd01WHe5hRk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-dc6a631a90dso1125923276.2
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 21:51:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706680259; x=1707285059; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2n+tB8ymIuc8RamlUDmXRrewDyPxJulXwL9EERYeP0A=;
-        b=DAkwwoW7JxDiKcp5pN4kVEnSK6py7VqAHdKh3Kvv/clUoABXXyUxi+8bEW7hnxfwGa
-         UUw6WikmDwWom9ICE0STI8LS4cBmTL/bin6sD2HIbElCyNqBt0fuc7iAaLF0FInQjl6D
-         HSryYiu9YD2h5CuInZ5J7jWvwllZ4dkIpoZCkrkZgtUECWXRORlwSZOADRO9Px5n4rjX
-         OcHRWdQT02Y7dxgi3X2rORDN/GGVCk6fwOcKHiydpMtFt7DpStgw4RBPiHUCZtTZJbEV
-         G6g94pql8AW57SsK7q0SivYntmDUD2Ghfi2jufJAp6QedvMHJ/cgrGRU8xJsfPkVfrdR
-         X8ug==
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-51124c0965aso438033e87.0;
+        Tue, 30 Jan 2024 22:03:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706680259; x=1707285059;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2n+tB8ymIuc8RamlUDmXRrewDyPxJulXwL9EERYeP0A=;
-        b=BDQKS5tW8nPWTZWJDjNpimOFtAuC78nuSbSMdCRhS4s9PWx5m6n6ML/pBYKLhI/Uau
-         KW/QsnmJkdWA+ftqz1jKVk4mXtqUhxTjPvdcnOU0DTs8OWJ1OirKdUk173zuiu6KT9D2
-         VHnzWAyCN+4El04yP69/y4JmUDL6H2KfNADtP52XGwOmDHouO9LFlegk3IvjixPkhOFJ
-         Hyym/ZcA3E1CE9qc6GvT4n4cRQd4ZymBbnVnvZMbPAcK4LN68ycg4nxX/O02ai4VnDUM
-         r+VxVJkwG8zZHLLZGgdSOi8MYHxXPHkGKg3ZRLjoT6W1b10/lPYc0nanJDkkpt30fliH
-         Hufg==
-X-Gm-Message-State: AOJu0Yzrk2QrdArrDzxUIgSF0teD7z9aO8+kOSfwmM8rOKtBswLOCdbX
-	rlQ94fwRNy3IqGnA5iNMdjnKhMG0tHSbtjOU3Jhbxn+LRePQdz379VqZ/9I7euzzVVUnx1/jwsi
-	xWVtNqXLGnWSxmPnNxX3/vJlf5SE=
-X-Google-Smtp-Source: AGHT+IFohLYOPObHhK/R+8wgT+d//p0AsSBesf2Wjre9grqlBf3azRjcjSdvhW1eN8S4V4aBKffOpk8Q5qlOd4hg3mc=
-X-Received: by 2002:a25:ad4b:0:b0:dc6:b121:d00c with SMTP id
- l11-20020a25ad4b000000b00dc6b121d00cmr784866ybe.16.1706680259579; Tue, 30 Jan
- 2024 21:50:59 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706681038; x=1707285838;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xdrR+Vdg74mVBKqW0NsH64EGTQpOxZxIT7WHoKcXIB0=;
+        b=QUtz/Z0QtV+nKllBoUfFLRz0KorOpp+tZHfKUI15OuY46lU/Q7X/wD5uUqx9xewtNH
+         notMq2IxsM1Rpt25RI8hpoFljwVrBiFVLnKsV/79vVq0JWXtutnHHdqs5XJyaFMg7nRl
+         ksWa1jHNuZRus+9qygMOw5PFou3iOH9D44b8x0T5Q3rRRVHGJZvbBLTnZGEN/3aX7iW1
+         g8wgK4goEjdg1kSEvjyd0VVQZuq8sF5O56bX89MhO3dnOFg4fmz4qHIHUQz4H8AEP1lQ
+         oSbgUmeZ1oeGsQaZ5D/Bb3/0sCkYZB7gfOmMA7nt3xdSQRMnuqiTFyUCAW88d0WLafDS
+         PuXA==
+X-Gm-Message-State: AOJu0YxEYW3AxnAEzToquVqiNOFDWTMxlD5vlGtYChhZmDOTOUdG4N3B
+	hRehAmOYwwv8mGwdGLj7icenlH+Sy+J2B0zxKMjou0Eij8xWSwf3
+X-Google-Smtp-Source: AGHT+IFTA3lmOTiijHveWydmYBzPzxc3lj7toeZdzaQd7Um1a4zDCJNBfgrd0MLiY3HQ9uZxEOOl7g==
+X-Received: by 2002:a19:6757:0:b0:50e:ca86:658a with SMTP id e23-20020a196757000000b0050eca86658amr619332lfj.45.1706681037411;
+        Tue, 30 Jan 2024 22:03:57 -0800 (PST)
+Received: from ?IPV6:2a0b:e7c0:0:107::aaaa:59? ([2a0b:e7c0:0:107::aaaa:59])
+        by smtp.gmail.com with ESMTPSA id p18-20020adfcc92000000b0033ae5f0f30dsm9761606wrj.2.2024.01.30.22.03.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 30 Jan 2024 22:03:56 -0800 (PST)
+Message-ID: <efee9789-4f05-4202-9a95-21d88f6307b0@kernel.org>
+Date: Wed, 31 Jan 2024 07:03:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240125035710.32118-1-alexhenrie24@gmail.com> <2c2e4c0e5c0413c9697b8924d6ccae8fe357ee74.camel@redhat.com>
-In-Reply-To: <2c2e4c0e5c0413c9697b8924d6ccae8fe357ee74.camel@redhat.com>
-From: Alex Henrie <alexhenrie24@gmail.com>
-Date: Tue, 30 Jan 2024 22:50:00 -0700
-Message-ID: <CAMMLpeT_19VjoUZ=zAogPcXU0-auUOn43YMnN=XCfvHQL60QsA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: ipv6/addrconf: make regen_advance
- independent of retrans time
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, dan@danm.net, bagasdotme@gmail.com, 
-	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, 
-	jikos@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 3/3] eventpoll: Add epoll ioctl for
+ epoll_params
+Content-Language: en-US
+To: Joe Damato <jdamato@fastly.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ chuck.lever@oracle.com, jlayton@kernel.org, linux-api@vger.kernel.org,
+ brauner@kernel.org, edumazet@google.com, davem@davemloft.net,
+ alexander.duyck@gmail.com, sridhar.samudrala@intel.com, kuba@kernel.org,
+ willemdebruijn.kernel@gmail.com, weiwan@google.com, David.Laight@aculab.com,
+ arnd@arndb.de, Jonathan Corbet <corbet@lwn.net>,
+ Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+ Michael Ellerman <mpe@ellerman.id.au>, Nathan Lynch <nathanl@linux.ibm.com>,
+ Thomas Zimmermann <tzimmermann@suse.de>, Maik Broemme <mbroemme@libmpq.org>,
+ Steve French <stfrench@microsoft.com>, Julien Panis <jpanis@baylibre.com>,
+ Thomas Huth <thuth@redhat.com>, Andrew Waterman
+ <waterman@eecs.berkeley.edu>, Albert Ou <aou@eecs.berkeley.edu>,
+ Palmer Dabbelt <palmer@dabbelt.com>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+ "open list:FILESYSTEMS (VFS and infrastructure)"
+ <linux-fsdevel@vger.kernel.org>
+References: <20240131014738.469858-1-jdamato@fastly.com>
+ <20240131014738.469858-4-jdamato@fastly.com>
+ <2024013001-prison-strum-899d@gregkh> <20240131022756.GA4837@fastly.com>
+From: Jiri Slaby <jirislaby@kernel.org>
+Autocrypt: addr=jirislaby@kernel.org; keydata=
+ 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
+In-Reply-To: <20240131022756.GA4837@fastly.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 30, 2024 at 3:46=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On Wed, 2024-01-24 at 20:57 -0700, Alex Henrie wrote:
-> > In RFC 4941, REGEN_ADVANCE is a constant value of 5 seconds, and the RF=
-C
-> > does not permit the creation of temporary addresses with lifetimes
-> > shorter than that:
-> >
-> > > When processing a Router Advertisement with a Prefix
-> > > Information option carrying a global scope prefix for the purposes of
-> > > address autoconfiguration (i.e., the A bit is set), the node MUST
-> > > perform the following steps:
-> >
-> > > 5.  A temporary address is created only if this calculated Preferred
-> > >     Lifetime is greater than REGEN_ADVANCE time units.
-> >
-> > Moreover, using a non-constant regen_advance has undesirable side
-> > effects. If regen_advance swelled above temp_prefered_lft,
-> > ipv6_create_tempaddr would error out without creating any new address.
->
-> RFC 4941 has been obsoleted by RFC 8981, which in turns makes
-> REGEN_ADVANCE non constant:
->
-> 3.8. Defined Protocol Parameters and Configuration Variables
->
-> REGEN_ADVANCE
->    2 + (TEMP_IDGEN_RETRIES * DupAddrDetectTransmits * RetransTimer /
->    1000)
+On 31. 01. 24, 3:27, Joe Damato wrote:
+> On Tue, Jan 30, 2024 at 06:08:36PM -0800, Greg Kroah-Hartman wrote:
+>> On Wed, Jan 31, 2024 at 01:47:33AM +0000, Joe Damato wrote:
+>>> +struct epoll_params {
+>>> +	__aligned_u64 busy_poll_usecs;
+>>> +	__u16 busy_poll_budget;
+>>> +
+>>> +	/* pad the struct to a multiple of 64bits for alignment on all arches */
+>>> +	__u8 __pad[6];
+>>
+>> You HAVE to check this padding to be sure it is all 0, otherwise it can
+>> never be used in the future for anything.
+> 
+> Is there some preferred mechanism for this in the kernel that I should be
+> using or is this as simple as adding a for loop to check each u8 == 0 ?
 
-Ah, so that's where Linux's regen_advance formula came from! Thank you
-very much for pointing me to the updated RFC.
+You are likely looking for memchr_inv().
 
-However, according to the formula defined in RFC 8981, even though
-REGEN_ADVANCE is not a constant, it still must not be less than 2
-seconds. So unfortunately, it still seems that Linux's current
-implementation is technically in violation of the spec because it
-doesn't add the 2.
+-- 
+js
+suse labs
 
-> > On my machine and network, this error happened immediately with the
-> > preferred lifetime set to 1 second, after a few minutes with the
-> > preferred lifetime set to 4 seconds, and not at all with the preferred
-> > lifetime set to 5 seconds. During my investigation, I found a Stack
-> > Exchange post from another person who seems to have had the same
-> > problem: They stopped getting new addresses if they lowered the
-> > preferred lifetime below 3 seconds, and they didn't really know why.
-> >
-> > Some users want to change their IPv6 address as frequently as possible
-> > regardless of the RFC's arbitrary minimum lifetime. For the benefit of
-> > those users, add a regen_advance sysctl parameter that can be set to
-> > below or above 5 seconds.
->
-> I guess we can't accommodate every user desire while speaking the same
-> protocol.
-
-Linux already allows the user to reduce regen_advance to 0 by
-disabling duplicate address detection (setting
-/proc/sys/net/ipv6/conf/*/dad_transmits to 0). Disabling DAD might be
-a protocol violation, and setting regen_advance to 0 probably is too,
-but I didn't want to make it impossible because I can see people
-having good reasons to do both of those things.
-
-The bug I'm trying to fix is a different scenario: It happens when the
-user wants to rotate their IPv6 address as frequently as the protocol
-allows, but not so frequently as to break things like duplicate
-address detection.
-
-> Perhaps emitting a kernel message when user settings do not allow the
-> address regeneration could be a better option?
-
-The fundamental problem with emitting a warning is that when the
-network parameters are set, the kernel might not know that there's
-going to be a problem. The network could work fine for hours or days
-and then have a period of merely a few seconds when regen_advance
-swells above prefered_lft, at which point the kernel just gives up on
-temporary addresses. The kernel could print a warning then, but even
-if the user is knowledgeable enough to look at dmesg and understand
-the problem, unless they disable DAD to make regen_advance zero or set
-prefered_lft to an excessively large value, there's no way for them to
-pick a value for prefered_lft that is guaranteed to always be greater
-than regen_advance.
-
-The fact that regen_advance does not have to be a constant and there
-is no hard minimum means that my original patch that was in 6.7-rc1
-[1] and reverted in 6.7-rc8 [2] was essentially correct, it just needs
-to be fixed to respect the maximums that are checked earlier in the
-function.[3] But if we want to add a 2-second minimum as well, I think
-I need to send three new patches:
-
-1. Move the calculation of regen_advance to a helper function and add
-2 to the calculated value
-
-2. Add a regen_advance sysctl that corresponds to the number 2 in the
-formula, to allow changing it back to 0 or to any other value
-
-3. Clamp preferred_lft to the minimum required as originally intended
-
-Thanks very much for the feedback and please let me know if you have
-any more thoughts before I get cracking.
-
--Alex
-
-[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
-it/?id=3D629df6701c8a9172f4274af6de9dfa99e2c7ac56
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
-it/?id=3D8cdafdd94654ba418648d039c48e7a90508c1982
-[3] https://lore.kernel.org/netdev/20231222234237.44823-2-alexhenrie24@gmai=
-l.com/
 
