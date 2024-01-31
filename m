@@ -1,93 +1,71 @@
-Return-Path: <netdev+bounces-67527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AECE8843E31
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 12:20:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11954843E38
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 12:22:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEBD6298B0A
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 11:20:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9465286B4C
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 11:22:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E32916EB62;
-	Wed, 31 Jan 2024 11:20:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cwk51JMy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BA4471B34;
+	Wed, 31 Jan 2024 11:22:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B79AB69DFD;
-	Wed, 31 Jan 2024 11:20:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50CC69DFD;
+	Wed, 31 Jan 2024 11:22:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706700024; cv=none; b=Ci48uPKTxj/5Vb8niz3mTsWkdDODYvXklc18Cjo1hFFJKcZPans8fbvrgj23YvxQxIGkKFSqdtEDzNjp1pV17Qn/GY5KF7OcnJxFkhT66/zUEmFFyvvDcWBm+jpilH0Q0z0CqAMCLBI+lHc/2EZzEQexjWSGREkl1pqtP9mgAQM=
+	t=1706700168; cv=none; b=kPqyZbldHFGJpRFAK3cyx3+lETt01q/fwc6edaflUJcrJA3ddWCaFrz07Qw0pi8RhpqKbPJqU/u6n8AToINPJ4NSS+XSkb0OmBmcnQZXfjhVTLl8kx+C8mc4gLowuUmXFnw/ism5/Um/DTvkurKbCMnlL98RyY4ZHejvBGhU0ww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706700024; c=relaxed/simple;
-	bh=yhcY0+ogks9SQM6K2SMLIjcNzihlSd+ybaVuvONfrNg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uJ2iSNX5WIsVrxBbx+Yv200str+aTnNrFc5xD1xplZ6SnQkb5Lczkfylv+2xNhjXnYQpmuyFLHlXVjPKSHKCJQfRcCpJZKc5cRseCvxTI45vV4Ws+4sAu7KDE2Dq+275zlwc5mGVQ+E8p2/FunAhKNirPhzNPkJRHknee6t8F7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cwk51JMy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 369B0C43390;
-	Wed, 31 Jan 2024 11:20:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706700024;
-	bh=yhcY0+ogks9SQM6K2SMLIjcNzihlSd+ybaVuvONfrNg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cwk51JMyHHl5C4E8i8HJ6NaAQyK/wV1CtqkJoSfWxl4gztGS50tT6MI4+K0wFiz3T
-	 YPwe74Jw1nygswCSamC0XarwgScQTQ57VPl4FCxIAUUrQSPV/GNQYi5/MK/NgOSvYA
-	 uotR2Rd8KOeJUoH3vJyaY0G86YhyraSzGoEAlFORttjRH2IBbcJ9jO5ZZbdBMELwub
-	 aXb1mznTMq7R074MdNQu979mAd5f04n9pWuCa94qtNSFLcLBVHrvREmSI2VJf5dI1v
-	 guW88ODOQ15vWxJ2nN2K5QC5D24GKTfZkkubPMG+dpYEoDdYsgUB0Ypu/DeApRllKq
-	 3DPRjk58aZ0gA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1AF45DC99E5;
-	Wed, 31 Jan 2024 11:20:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1706700168; c=relaxed/simple;
+	bh=kIcKX12zPKoVcrRmauHy5r15bYlG4J7HoTqZyLhhMws=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KYBO9VJqlI9HttyIyl0w32FY7SvWa3rB7OLiOC4EGOugLcc37EvpqzQc4APrUghU5QNhYYJxAs1ebNLmKNpyxFbHOyb43GnX2XFjhSWELDcfwzsM2mZ5MDC1+Lcc0Z6wbRtRafspNlfNVzs1ph89AUC7bU2R7vBtrVZQTLZCHnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1rV8fl-00010D-Tw; Wed, 31 Jan 2024 12:22:29 +0100
+Date: Wed, 31 Jan 2024 12:22:29 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, netfilter-devel@vger.kernel.org
+Subject: Re: [PATCH nf-next 0/9] netfilter updates for -next
+Message-ID: <20240131112229.GA9524@breakpoint.cc>
+References: <20240129145807.8773-1-fw@strlen.de>
+ <20240130183729.5925c86d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests/net: calibrate fq_band_pktlimit
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170670002410.15698.15810715135280092442.git-patchwork-notify@kernel.org>
-Date: Wed, 31 Jan 2024 11:20:24 +0000
-References: <20240127023309.3746523-1-willemdebruijn.kernel@gmail.com>
-In-Reply-To: <20240127023309.3746523-1-willemdebruijn.kernel@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, linux-kselftest@vger.kernel.org,
- willemb@google.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240130183729.5925c86d@kernel.org>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Fri, 26 Jan 2024 21:33:03 -0500 you wrote:
-> From: Willem de Bruijn <willemb@google.com>
+Jakub Kicinski <kuba@kernel.org> wrote:
+> On Mon, 29 Jan 2024 15:57:50 +0100 Florian Westphal wrote:
+> > Hello,
+> > 
+> > This batch contains updates for your *next* tree.
 > 
-> This test validates per-band packet limits in FQ. Packets are dropped
-> rather than enqueued if the limit for their band is reached.
-> 
-> This test is timing sensitive. It queues packets in FQ with a future
-> delivery time to fill the qdisc.
-> 
-> [...]
+> The nf-next in the subject is a typo, right? It's for net-next?
+> Looks like it but better safe than sorry :)
 
-Here is the summary with links:
-  - [net-next] selftests/net: calibrate fq_band_pktlimit
-    https://git.kernel.org/netdev/net-next/c/57bf3dd2fe91
+Yes, should've been *net-next*,  used to typing 'nf-next'...
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+I've updated local plumbing to refuse sending if cover letter
+is absent or lacks PATCH net(-next) in subject, so this should
+not happen again.
 
