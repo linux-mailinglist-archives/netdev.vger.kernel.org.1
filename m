@@ -1,109 +1,195 @@
-Return-Path: <netdev+bounces-67431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3B1B843615
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 06:30:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3491843637
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 06:51:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6496B1F2473A
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 05:30:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AD1E28ADCF
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 05:51:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 124603D97D;
-	Wed, 31 Jan 2024 05:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F42917BC8;
+	Wed, 31 Jan 2024 05:51:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DAkwwoW7"
 X-Original-To: netdev@vger.kernel.org
-Received: from cloud48395.mywhc.ca (cloud48395.mywhc.ca [173.209.37.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8BED3D982;
-	Wed, 31 Jan 2024 05:30:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.209.37.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1AF63D993
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 05:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706679046; cv=none; b=YksjGU1StC4tmwvhtIUpm6aDDVwsqiVq9RqbCoUO+9LYhDpy4h4hu9wfp5vlzysQzzxSlg1+eYKF0jj9HkhJ3AH8shqV1qOtrw2ulid8WRCszNOSGP6pC1ZLlkde7OFg/XeMd1cGy0vep0uuN9bSssgRdOBa195tFX19N1k9tf4=
+	t=1706680262; cv=none; b=Vdq1XBOspN5igm0qXAgMa8Lhjx2FP0Hc1iFdiHtTRjPEotii9VPXFbt3Mk7sFcJOeYhmWx2HrI4ZEl6dw+6wihunGoOYqc3bfP12ryyAWKTktoqVkkMHUn2e7gkwnTXIXNn1EstenXYyT/VcW93o27UKHPr26CNjVTidRShHb38=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706679046; c=relaxed/simple;
-	bh=WE9M/AjBhAp5GzzofAO+voTpnEMOXjDiOIcooPch55Q=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=rNsVMPNV3Pr/e5xrSvUDCp8aBpnRLIpHrtEDRis+2WwCTKxOpnJ0qOFf1jWK+a/5ZkShLh0J6it2fD0jNG8FgMzwMyHLgXX23NzRgCA9KcgysxM7ir2SeueYN/0xQ0FZQ7iQKh+RnQoBOPTP3jJtDvBJuvli3CjwTPasw8iuu7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trillion01.com; spf=pass smtp.mailfrom=trillion01.com; arc=none smtp.client-ip=173.209.37.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trillion01.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trillion01.com
-Received: from [45.44.224.220] (port=40488 helo=[192.168.1.177])
-	by cloud48395.mywhc.ca with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <olivier@trillion01.com>)
-	id 1rV3BK-0006RL-0A;
-	Wed, 31 Jan 2024 00:30:42 -0500
-Message-ID: <9a8748183fcecbe44406e93e47c47c1639871bfa.camel@trillion01.com>
-Subject: Re: [PATCH v15 0/7] io_uring: add napi busy polling support
-From: Olivier Langlois <olivier@trillion01.com>
-To: Jens Axboe <axboe@kernel.dk>, Stefan Roesch <shr@devkernel.io>, 
-	io-uring@vger.kernel.org, kernel-team@fb.com
-Cc: ammarfaizi2@gnuweeb.org, netdev@vger.kernel.org, kuba@kernel.org
-Date: Wed, 31 Jan 2024 00:30:40 -0500
-In-Reply-To: <2b238cec-ab1b-4160-8fb0-ad199e1d0306@kernel.dk>
-References: <20230608163839.2891748-1-shr@devkernel.io>
-	 <58bde897e724efd7771229734d8ad2fb58b3ca48.camel@trillion01.com>
-	 <2b238cec-ab1b-4160-8fb0-ad199e1d0306@kernel.dk>
-Autocrypt: addr=olivier@trillion01.com; prefer-encrypt=mutual;
- keydata=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
-Organization: Trillion01 Inc
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.2 
+	s=arc-20240116; t=1706680262; c=relaxed/simple;
+	bh=KCEYRxaW7LgDoVooIEDy4x5qQykkv5+g07a+4kjdiBc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EaLMb8rhcMGWuZdkjAyfmwbgF3Cz09z32FuRfCZ44Icf4xUvMH1DzpW673x/bd724e0ba9cA3qVWiRMCppPnzU9Vzjhm8LNdzvtkvKhSn15uzCSSGdPKB6bLs0fYPgRk/R8bTwCdyIvFNLXmEXQ4gwZr8MsJfanoLceW3kAOiLY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DAkwwoW7; arc=none smtp.client-ip=209.85.219.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-dc6a631a90dso1125923276.2
+        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 21:51:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706680259; x=1707285059; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2n+tB8ymIuc8RamlUDmXRrewDyPxJulXwL9EERYeP0A=;
+        b=DAkwwoW7JxDiKcp5pN4kVEnSK6py7VqAHdKh3Kvv/clUoABXXyUxi+8bEW7hnxfwGa
+         UUw6WikmDwWom9ICE0STI8LS4cBmTL/bin6sD2HIbElCyNqBt0fuc7iAaLF0FInQjl6D
+         HSryYiu9YD2h5CuInZ5J7jWvwllZ4dkIpoZCkrkZgtUECWXRORlwSZOADRO9Px5n4rjX
+         OcHRWdQT02Y7dxgi3X2rORDN/GGVCk6fwOcKHiydpMtFt7DpStgw4RBPiHUCZtTZJbEV
+         G6g94pql8AW57SsK7q0SivYntmDUD2Ghfi2jufJAp6QedvMHJ/cgrGRU8xJsfPkVfrdR
+         X8ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706680259; x=1707285059;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2n+tB8ymIuc8RamlUDmXRrewDyPxJulXwL9EERYeP0A=;
+        b=BDQKS5tW8nPWTZWJDjNpimOFtAuC78nuSbSMdCRhS4s9PWx5m6n6ML/pBYKLhI/Uau
+         KW/QsnmJkdWA+ftqz1jKVk4mXtqUhxTjPvdcnOU0DTs8OWJ1OirKdUk173zuiu6KT9D2
+         VHnzWAyCN+4El04yP69/y4JmUDL6H2KfNADtP52XGwOmDHouO9LFlegk3IvjixPkhOFJ
+         Hyym/ZcA3E1CE9qc6GvT4n4cRQd4ZymBbnVnvZMbPAcK4LN68ycg4nxX/O02ai4VnDUM
+         r+VxVJkwG8zZHLLZGgdSOi8MYHxXPHkGKg3ZRLjoT6W1b10/lPYc0nanJDkkpt30fliH
+         Hufg==
+X-Gm-Message-State: AOJu0Yzrk2QrdArrDzxUIgSF0teD7z9aO8+kOSfwmM8rOKtBswLOCdbX
+	rlQ94fwRNy3IqGnA5iNMdjnKhMG0tHSbtjOU3Jhbxn+LRePQdz379VqZ/9I7euzzVVUnx1/jwsi
+	xWVtNqXLGnWSxmPnNxX3/vJlf5SE=
+X-Google-Smtp-Source: AGHT+IFohLYOPObHhK/R+8wgT+d//p0AsSBesf2Wjre9grqlBf3azRjcjSdvhW1eN8S4V4aBKffOpk8Q5qlOd4hg3mc=
+X-Received: by 2002:a25:ad4b:0:b0:dc6:b121:d00c with SMTP id
+ l11-20020a25ad4b000000b00dc6b121d00cmr784866ybe.16.1706680259579; Tue, 30 Jan
+ 2024 21:50:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - cloud48395.mywhc.ca
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - trillion01.com
-X-Get-Message-Sender-Via: cloud48395.mywhc.ca: authenticated_id: olivier@trillion01.com
-X-Authenticated-Sender: cloud48395.mywhc.ca: olivier@trillion01.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+References: <20240125035710.32118-1-alexhenrie24@gmail.com> <2c2e4c0e5c0413c9697b8924d6ccae8fe357ee74.camel@redhat.com>
+In-Reply-To: <2c2e4c0e5c0413c9697b8924d6ccae8fe357ee74.camel@redhat.com>
+From: Alex Henrie <alexhenrie24@gmail.com>
+Date: Tue, 30 Jan 2024 22:50:00 -0700
+Message-ID: <CAMMLpeT_19VjoUZ=zAogPcXU0-auUOn43YMnN=XCfvHQL60QsA@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: ipv6/addrconf: make regen_advance
+ independent of retrans time
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, dan@danm.net, bagasdotme@gmail.com, 
+	davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, 
+	jikos@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 2024-01-30 at 15:59 -0700, Jens Axboe wrote:
-> On 1/30/24 2:20 PM, Olivier Langlois wrote:
-> > Hi,
-> >=20
-> > I was wondering what did happen to this patch submission...
-> >=20
-> > It seems like Stefan did put a lot of effort in addressing every
-> > reported issue for several weeks/months...
-> >=20
-> > and then nothing... as if this patch has never been reviewed by
-> > anyone...
-> >=20
-> > has it been decided to not integrate NAPI busy looping in io_uring
-> > privately finally?
->=20
-> It's really just waiting for testing, I want to ensure it's working
-> as
-> we want it to before committing. But the production bits I wanted to
-> test on have been dragging out, hence I have not made any moves
-> towards
-> merging this for upstream just yet.
->=20
-> FWIW, I have been maintaining the patchset, you can find the current
-> series here:
->=20
-> https://git.kernel.dk/cgit/linux/log/?h=3Dio_uring-napi
->=20
-Hi Jens,
+On Tue, Jan 30, 2024 at 3:46=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On Wed, 2024-01-24 at 20:57 -0700, Alex Henrie wrote:
+> > In RFC 4941, REGEN_ADVANCE is a constant value of 5 seconds, and the RF=
+C
+> > does not permit the creation of temporary addresses with lifetimes
+> > shorter than that:
+> >
+> > > When processing a Router Advertisement with a Prefix
+> > > Information option carrying a global scope prefix for the purposes of
+> > > address autoconfiguration (i.e., the A bit is set), the node MUST
+> > > perform the following steps:
+> >
+> > > 5.  A temporary address is created only if this calculated Preferred
+> > >     Lifetime is greater than REGEN_ADVANCE time units.
+> >
+> > Moreover, using a non-constant regen_advance has undesirable side
+> > effects. If regen_advance swelled above temp_prefered_lft,
+> > ipv6_create_tempaddr would error out without creating any new address.
+>
+> RFC 4941 has been obsoleted by RFC 8981, which in turns makes
+> REGEN_ADVANCE non constant:
+>
+> 3.8. Defined Protocol Parameters and Configuration Variables
+>
+> REGEN_ADVANCE
+>    2 + (TEMP_IDGEN_RETRIES * DupAddrDetectTransmits * RetransTimer /
+>    1000)
 
-ok thx for the update... Since I am a big user of the io_uring napi
-busy polling, testing the official patchset is definitely something
-that I can do to help...
+Ah, so that's where Linux's regen_advance formula came from! Thank you
+very much for pointing me to the updated RFC.
 
-I should be able to report back the result of my testing in few days!
+However, according to the formula defined in RFC 8981, even though
+REGEN_ADVANCE is not a constant, it still must not be less than 2
+seconds. So unfortunately, it still seems that Linux's current
+implementation is technically in violation of the spec because it
+doesn't add the 2.
 
+> > On my machine and network, this error happened immediately with the
+> > preferred lifetime set to 1 second, after a few minutes with the
+> > preferred lifetime set to 4 seconds, and not at all with the preferred
+> > lifetime set to 5 seconds. During my investigation, I found a Stack
+> > Exchange post from another person who seems to have had the same
+> > problem: They stopped getting new addresses if they lowered the
+> > preferred lifetime below 3 seconds, and they didn't really know why.
+> >
+> > Some users want to change their IPv6 address as frequently as possible
+> > regardless of the RFC's arbitrary minimum lifetime. For the benefit of
+> > those users, add a regen_advance sysctl parameter that can be set to
+> > below or above 5 seconds.
+>
+> I guess we can't accommodate every user desire while speaking the same
+> protocol.
+
+Linux already allows the user to reduce regen_advance to 0 by
+disabling duplicate address detection (setting
+/proc/sys/net/ipv6/conf/*/dad_transmits to 0). Disabling DAD might be
+a protocol violation, and setting regen_advance to 0 probably is too,
+but I didn't want to make it impossible because I can see people
+having good reasons to do both of those things.
+
+The bug I'm trying to fix is a different scenario: It happens when the
+user wants to rotate their IPv6 address as frequently as the protocol
+allows, but not so frequently as to break things like duplicate
+address detection.
+
+> Perhaps emitting a kernel message when user settings do not allow the
+> address regeneration could be a better option?
+
+The fundamental problem with emitting a warning is that when the
+network parameters are set, the kernel might not know that there's
+going to be a problem. The network could work fine for hours or days
+and then have a period of merely a few seconds when regen_advance
+swells above prefered_lft, at which point the kernel just gives up on
+temporary addresses. The kernel could print a warning then, but even
+if the user is knowledgeable enough to look at dmesg and understand
+the problem, unless they disable DAD to make regen_advance zero or set
+prefered_lft to an excessively large value, there's no way for them to
+pick a value for prefered_lft that is guaranteed to always be greater
+than regen_advance.
+
+The fact that regen_advance does not have to be a constant and there
+is no hard minimum means that my original patch that was in 6.7-rc1
+[1] and reverted in 6.7-rc8 [2] was essentially correct, it just needs
+to be fixed to respect the maximums that are checked earlier in the
+function.[3] But if we want to add a 2-second minimum as well, I think
+I need to send three new patches:
+
+1. Move the calculation of regen_advance to a helper function and add
+2 to the calculated value
+
+2. Add a regen_advance sysctl that corresponds to the number 2 in the
+formula, to allow changing it back to 0 or to any other value
+
+3. Clamp preferred_lft to the minimum required as originally intended
+
+Thanks very much for the feedback and please let me know if you have
+any more thoughts before I get cracking.
+
+-Alex
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
+it/?id=3D629df6701c8a9172f4274af6de9dfa99e2c7ac56
+[2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/comm=
+it/?id=3D8cdafdd94654ba418648d039c48e7a90508c1982
+[3] https://lore.kernel.org/netdev/20231222234237.44823-2-alexhenrie24@gmai=
+l.com/
 
