@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-67486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0631843AA5
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 10:15:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FFD1843ACA
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 10:17:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55EC328ED2B
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 09:15:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D17ADB29ADF
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 09:16:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4009D6F074;
-	Wed, 31 Jan 2024 09:12:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D90F78689;
+	Wed, 31 Jan 2024 09:12:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AeZbFp3x"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M1nm9uUD"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659DC55E57
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 09:12:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF8FF7866C
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 09:12:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706692360; cv=none; b=a/JUEihp0CtYrdXUjRzZTZMlgOgMXicGLcN80cqQHqmZdNDNHfLp8bOue/5H/nc9cXje6L9TLU0cQrmiVRTa9TuS/qyQufr8CX3RYuuVHqrbsEgjDoxHNUfYf4kRBWWr0kQaJKLZkuTISosdUmP69J2Nby4TxVuFi10FSkqmp0c=
+	t=1706692368; cv=none; b=Rj+9mJt8Dq6m/2ZxHMdZRfHy+Cz4wdxV3N5mJYrjcipxMnWOzXLOi4gLQDXMdU3dYYBkYSgYeU0hq+oc/888buwjjEhXQxUAciZM9WApBmemmk/UNe4nLZFdBFPygERIISG6hCve7Im9wZlAGvLPkx2lALz/1Abef5/YpZgFceI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706692360; c=relaxed/simple;
-	bh=1IbbNg9WzMSGILSE+bt6RMfdtxG4VCDjXqgD72H0ufY=;
+	s=arc-20240116; t=1706692368; c=relaxed/simple;
+	bh=gmMgCA8pbsUZS3rqeteeTCbsa5nilPbRUQKyvYs5+t4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LV73CKAJ0S2bwunRmcGYe8xSqDCKJtc1gQ/zt+LfQ9lWjE82NvsjjdI5Ilhldx+PnE0Y5lR82vwkS0KwAtgjj1bBUUUVV4q2aQbnaMFV+Ou4a5PiJAJITlxFhz+/hSC8VMSf3blXvXM8yQNgwMRV35wLFaRXDaD+UbxCaeHXXo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AeZbFp3x; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=XDOG2N+QcO+rEkBcUj5kzaxLHV4JXKwB/5FIejWtAMtFBGQcHpDOywFGOIF0E69f627bPCmQwXc2TCYoR0Tw+MZOhlRQtScHdpGrBOi7C7yFD5gZaWZMFzDQlPb0QemGw6zY17I1GRwwUR7Me5/R9+jtTfgUSFHU0QvLlR/qUiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M1nm9uUD; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706692357;
+	s=mimecast20190719; t=1706692363;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VJZkeylYKHHxcFFB0bIOJ/hK42jYe/laqdrK+DNO0NQ=;
-	b=AeZbFp3x7aY9FXgjLZBQczg+6y5LIkg1/aI5m7s7annNtHcBGB+Hu17mDBeXbnHYX9OY8g
-	rvWKr0p2ylcX4o56wzLmpiQ4Nh59uqbCmyTwsFVyUez3EG5t8drv3Rv88fCCrJ+Gd9j+2K
-	C8jSvlaVzmTI+ShwctahbQ2BSLeQ/3w=
+	bh=peGGQf3sjuZMqqhDGxYZpBNQpOww05kdciLu+8qQbKs=;
+	b=M1nm9uUDaWycp1wXQsg/8fdhZSJYNQ8Nx8C3YmcmZeslwNV1HGt32i7O9LpCdukK8R9HNv
+	noytlVRdGIZCVYnDiAi1mmqG5YRDjCbW6kEoAer+grQ7BmOnOU7QENURVzxYj9nxcHpSWx
+	HJSB/Gnjo9fYzP7/K3jg7JFwnwMNZro=
 Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
  [209.85.167.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-113-YoUsdhHOPvu0337qvn8Ekg-1; Wed, 31 Jan 2024 04:12:36 -0500
-X-MC-Unique: YoUsdhHOPvu0337qvn8Ekg-1
-Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3bd3af050ddso9816033b6e.2
-        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 01:12:36 -0800 (PST)
+ us-mta-330-ff9U_-H6OfWt_f2Vd3cMeg-1; Wed, 31 Jan 2024 04:12:38 -0500
+X-MC-Unique: ff9U_-H6OfWt_f2Vd3cMeg-1
+Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3bbb6fd2cceso4129500b6e.2
+        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 01:12:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706692355; x=1707297155;
+        d=1e100.net; s=20230601; t=1706692358; x=1707297158;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VJZkeylYKHHxcFFB0bIOJ/hK42jYe/laqdrK+DNO0NQ=;
-        b=UnSyOBD1FO2nNpBnAGbBSywKXqEnTuEmX0Nss/qMcUj8cfYtvhLqxMOuyRl3topI4t
-         UktzdIe4SE/oNGsT6qTk+2A3OPN62gTQISqdKpaNvMBNyNak6nsi2+IfbKBzEXNf7s/T
-         RrXKLlUXiHVv4pgUN1JMXsR0oaB2YiRveuIzcehifVa/TjeHX0fR9f4d6ONjhlBNGqlw
-         2cw5H21ZLtr05SYoJo5puknHovQl1B/fAQ4fn0gVxv8btWuUKuSjgeMdx6Ag77/lFq6O
-         dBV4Idvo/snzrv1Sfzcxh5fjjVBMBVLlWt68lj/glYUGzqEa8i4tCSA89/p6D8Iu4S6p
-         JA/w==
-X-Gm-Message-State: AOJu0YzyormDrtwllxcNokfHfI5rXiir00cbdp4gzbKsmWYgvFdD/Nhs
-	shsgyXJoYvyIXJVByduyqfhnFKu7nzlpMCJPYljiZiWNfczpVaoWrEjFBH/tQ4TJx4z5xY5WQr6
-	aoa+3KCbnev+ssLgkpEGpMretBEfdb7c5fUHuua5Y9V0MPwST/zk7BKiUKe1/QOH2tvn25GTJ7J
-	hR8w3raJYVFgSubehKAZTX/LZ15RcQ
-X-Received: by 2002:a05:6808:10d0:b0:3be:b99e:c4b5 with SMTP id s16-20020a05680810d000b003beb99ec4b5mr1134495ois.49.1706692355405;
-        Wed, 31 Jan 2024 01:12:35 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEqf5XhmMZVc/mvQ+v/Dn0eccGIZhcIm1GbAvr8L9HK2CJQtaTuYKH+cdWn6A0p6FI4Vi12/FhvV3cS9wCPbWU=
-X-Received: by 2002:a05:6808:10d0:b0:3be:b99e:c4b5 with SMTP id
- s16-20020a05680810d000b003beb99ec4b5mr1134482ois.49.1706692355156; Wed, 31
- Jan 2024 01:12:35 -0800 (PST)
+        bh=peGGQf3sjuZMqqhDGxYZpBNQpOww05kdciLu+8qQbKs=;
+        b=vXWBDtW3foKI66lsDJhlmed6Lp76C4Tm+t0ozLTEG97vyGDAYHX2D7FBuVUATvc6mN
+         Tduie45hQfnFlLgnp4C+7GptF8wPf/LQMRfEqeO2lHJ6sjzr6PnACz6eB99a5pZvc/Nf
+         gxaq5sFHOLV4sVF3PlnNUHaW3hvqqw1LAGCm8WEOew3IUK5pkdilojxrFU8n7h7LK0wP
+         eYo/E+publKAV3q6N+0YQhXDCt298hgB1ACyDlgPZf4ww3BS//K1z81j0PMDExjnszr5
+         0v7te9kczZoFISE4XozA6mUxRCZK8JFeR4P6NU4anks24E6Ge0/H7vUBYtpffl6Vmz2P
+         6mIw==
+X-Gm-Message-State: AOJu0YzcHdVCLNTNajxMXNQH7LWbNAhRw3J+zSrOStEe0Ap6eACRJnhN
+	vNcWcVll3m+RrGSzh0iMO7npBxhyW6XHItEJylS89ZYhRl5bfE7Ip+PtCLcsqob28MZbAa2HWxs
+	qUWdoz0hy3kdzA9pVf1Rcr9Tb8E4aKI1IajVTV2lXPR5a2YSiCYsaC42kc9OiBA0wRDR2zsmgGx
+	TaxwU9LGJMRxRwNnI7Djn5d5+5vLOY
+X-Received: by 2002:a05:6358:6e8b:b0:176:4aae:515c with SMTP id q11-20020a0563586e8b00b001764aae515cmr994091rwm.17.1706692357780;
+        Wed, 31 Jan 2024 01:12:37 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG7fIfH41RbzJ4uMQRVZeD0/FtypkpuMBhNalI0GgIXQr8L0GNwGZEMNsexvxgVEoc2spN+yWaoh5j46pvgQwg=
+X-Received: by 2002:a05:6358:6e8b:b0:176:4aae:515c with SMTP id
+ q11-20020a0563586e8b00b001764aae515cmr994071rwm.17.1706692357511; Wed, 31 Jan
+ 2024 01:12:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240130114224.86536-1-xuanzhuo@linux.alibaba.com> <20240130114224.86536-5-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20240130114224.86536-5-xuanzhuo@linux.alibaba.com>
+References: <20240130114224.86536-1-xuanzhuo@linux.alibaba.com> <20240130114224.86536-6-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20240130114224.86536-6-xuanzhuo@linux.alibaba.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 31 Jan 2024 17:12:22 +0800
-Message-ID: <CACGkMEs-wUa_z_tGYEwBf7EVJAtuJdkX4HAdjqMXHEM1ys-gKQ@mail.gmail.com>
-Subject: Re: [PATCH vhost 04/17] virtio_ring: split: remove double check of
- the unmap ops
+Date: Wed, 31 Jan 2024 17:12:25 +0800
+Message-ID: <CACGkMEst-k1uOUA6diC2yB+=9ZYezuz=n3=kAzDFpXLxGE=etQ@mail.gmail.com>
+Subject: Re: [PATCH vhost 05/17] virtio_ring: split: structure the indirect
+ desc table
 To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 Cc: virtualization@lists.linux.dev, Richard Weinberger <richard@nod.at>, 
 	Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg <johannes@sipsolutions.net>, 
@@ -107,182 +107,43 @@ Content-Transfer-Encoding: quoted-printable
 On Tue, Jan 30, 2024 at 7:42=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
 om> wrote:
 >
-> In the functions vring_unmap_one_split and
-> vring_unmap_one_split_indirect,
-> multiple checks are made whether unmap is performed and whether it is
-> INDIRECT.
+> This commit structure the indirect desc table.
+> Then we can get the desc num directly when doing unmap.
 >
-> These two functions are usually called in a loop, and we should put the
-> check outside the loop.
->
-> And we unmap the descs with VRING_DESC_F_INDIRECT on the same path with
-> other descs, that make the thing more complex. If we distinguish the
-> descs with VRING_DESC_F_INDIRECT before unmap, thing will be clearer.
->
-> 1. only one desc of the desc table is used, we do not need the loop
-> 2. the called unmap api is difference from the other desc
-> 3. the vq->premapped is not needed to check
-> 4. the vq->indirect is not needed to check
-> 5. the state->indir_desc must not be null
+> And save the dma info to the struct, then the indirect
+> will not use the dma fields of the desc_extra. The subsequent
+> commits will make the dma fields are optional. But for
+> the indirect case, we must record the dma info.
 >
 > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 > ---
->  drivers/virtio/virtio_ring.c | 80 ++++++++++++++++++------------------
->  1 file changed, 39 insertions(+), 41 deletions(-)
+>  drivers/virtio/virtio_ring.c | 86 ++++++++++++++++++++++--------------
+>  1 file changed, 52 insertions(+), 34 deletions(-)
 >
 > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> index dd03bc5a81fe..2b41fdbce975 100644
+> index 2b41fdbce975..831667a57429 100644
 > --- a/drivers/virtio/virtio_ring.c
 > +++ b/drivers/virtio/virtio_ring.c
-> @@ -452,9 +452,6 @@ static void vring_unmap_one_split_indirect(const stru=
-ct vring_virtqueue *vq,
->  {
->         u16 flags;
->
-> -       if (!vring_need_unmap_buffer(vq))
-> -               return;
+> @@ -67,9 +67,16 @@
+>  #define LAST_ADD_TIME_INVALID(vq)
+>  #endif
+
+[...]
+
+> +               kfree(in_desc);
+>                 vq->split.desc_state[head].indir_desc =3D NULL;
 > -
->         flags =3D virtio16_to_cpu(vq->vq.vdev, desc->flags);
->
->         dma_unmap_page(vring_dma_dev(vq),
-> @@ -472,27 +469,12 @@ static unsigned int vring_unmap_one_split(const str=
-uct vring_virtqueue *vq,
->
->         flags =3D extra[i].flags;
->
-> -       if (flags & VRING_DESC_F_INDIRECT) {
-> -               if (!vq->use_dma_api)
-> -                       goto out;
-> -
-> -               dma_unmap_single(vring_dma_dev(vq),
-> -                                extra[i].addr,
-> -                                extra[i].len,
-> -                                (flags & VRING_DESC_F_WRITE) ?
-> -                                DMA_FROM_DEVICE : DMA_TO_DEVICE);
-> -       } else {
-> -               if (!vring_need_unmap_buffer(vq))
-> -                       goto out;
-> -
-> -               dma_unmap_page(vring_dma_dev(vq),
-> -                              extra[i].addr,
-> -                              extra[i].len,
-> -                              (flags & VRING_DESC_F_WRITE) ?
-> -                              DMA_FROM_DEVICE : DMA_TO_DEVICE);
-> -       }
-> +       dma_unmap_page(vring_dma_dev(vq),
-> +                      extra[i].addr,
-> +                      extra[i].len,
-> +                      (flags & VRING_DESC_F_WRITE) ?
-> +                      DMA_FROM_DEVICE : DMA_TO_DEVICE);
->
-> -out:
->         return extra[i].next;
->  }
->
-> @@ -660,7 +642,7 @@ static inline int virtqueue_add_split(struct virtqueu=
-e *_vq,
->                         vq, desc, total_sg * sizeof(struct vring_desc),
->                         DMA_TO_DEVICE);
->                 if (vring_mapping_error(vq, addr)) {
-> -                       if (vq->premapped)
-> +                       if (!vring_need_unmap_buffer(vq))
->                                 goto free_indirect;
->
->                         goto unmap_release;
-> @@ -713,6 +695,9 @@ static inline int virtqueue_add_split(struct virtqueu=
-e *_vq,
->         return 0;
->
->  unmap_release:
-> +
-> +       WARN_ON(!vring_need_unmap_buffer(vq));
-> +
->         err_idx =3D i;
->
->         if (indirect)
-> @@ -774,34 +759,42 @@ static void detach_buf_split(struct vring_virtqueue=
- *vq, unsigned int head,
->  {
->         unsigned int i, j;
->         __virtio16 nextflag =3D cpu_to_virtio16(vq->vq.vdev, VRING_DESC_F=
-_NEXT);
-> +       u16 flags;
->
->         /* Clear data ptr. */
->         vq->split.desc_state[head].data =3D NULL;
-> +       flags =3D vq->split.desc_extra[head].flags;
->
->         /* Put back on free list: unmap first-level descriptors and find =
-end */
->         i =3D head;
->
-> -       while (vq->split.vring.desc[i].flags & nextflag) {
-> -               vring_unmap_one_split(vq, i);
-> -               i =3D vq->split.desc_extra[i].next;
-> -               vq->vq.num_free++;
-> -       }
-> -
-> -       vring_unmap_one_split(vq, i);
-> -       vq->split.desc_extra[i].next =3D vq->free_head;
-> -       vq->free_head =3D head;
-> +       if (!(flags & VRING_DESC_F_INDIRECT)) {
 
-So during add we do:
-
-        if (!indirect && vring_need_unmap_buffer(vq))
-                vq->split.desc_extra[prev & (vq->split.vring.num - 1)].flag=
-s &=3D
-                        ~VRING_DESC_F_NEXT;
-
-Then using flags here unconditionally seems not reliable.
-
-I post a patch to store flags unconditionally at:
-
-https://lore.kernel.org/all/20220224122655-mutt-send-email-mst@kernel.org/
-
-> +               while (vq->split.vring.desc[i].flags & nextflag) {
-> +                       if (vring_need_unmap_buffer(vq))
-> +                               vring_unmap_one_split(vq, i);
-> +                       i =3D vq->split.desc_extra[i].next;
-> +                       vq->vq.num_free++;
-> +               }
->
-> -       /* Plus final descriptor */
-> -       vq->vq.num_free++;
-> +               if (vring_need_unmap_buffer(vq))
-> +                       vring_unmap_one_split(vq, i);
->
-> -       if (vq->indirect) {
-> +               if (ctx)
-> +                       *ctx =3D vq->split.desc_state[head].indir_desc;
-> +       } else {
->                 struct vring_desc *indir_desc =3D
->                                 vq->split.desc_state[head].indir_desc;
->                 u32 len;
->
-> -               /* Free the indirect table, if any, now that it's unmappe=
-d. */
-> -               if (!indir_desc)
-> -                       return;
-> +               if (vq->use_dma_api) {
-> +                       struct vring_desc_extra *extra =3D vq->split.desc=
-_extra;
-> +
-> +                       dma_unmap_single(vring_dma_dev(vq),
-> +                                        extra[i].addr,
-> +                                        extra[i].len,
-> +                                        (flags & VRING_DESC_F_WRITE) ?
-> +                                        DMA_FROM_DEVICE : DMA_TO_DEVICE)=
-;
-> +               }
-
-Note that there's a following
-
-BUG_ON(!(vq->split.desc_extra[head].flags &
-                                VRING_DESC_F_INDIRECT));
-
-Which I think we can remove.
+Unnecessary changes.
 
 Thanks
+
+
+>         }
+>
+>         vq->split.desc_extra[i].next =3D vq->free_head;
+> --
+> 2.32.0.3.g01195cf9f
+>
 
 
