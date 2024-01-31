@@ -1,143 +1,256 @@
-Return-Path: <netdev+bounces-67674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81219844855
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 20:56:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46D07844862
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 21:05:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3773328EFC3
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 19:56:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C0D271F24848
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 20:05:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 000B83E499;
-	Wed, 31 Jan 2024 19:56:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14A75182DC;
+	Wed, 31 Jan 2024 20:05:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="VnxBfS3w"
 X-Original-To: netdev@vger.kernel.org
-Received: from cloud48395.mywhc.ca (cloud48395.mywhc.ca [173.209.37.211])
+Received: from BN1PR04CU002.outbound.protection.outlook.com (mail-eastus2azon11022011.outbound.protection.outlook.com [52.101.56.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B40603B189;
-	Wed, 31 Jan 2024 19:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.209.37.211
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706730971; cv=none; b=d+BzSczmVy1KCFl8UikxgLvjIIpF/1Nc2I+BCCICliWUW6zGl/fLPT8WYD1g/X/92idCOXhuJeHHN852CQtOkMzE6bFZGyTvp2oJy+dYLX0Dk8DvxjKGT0glUDl1Rjm9TIkBEqHn5M3jCN1+AO39P1lfDRPWPQURX27ae+goIaU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706730971; c=relaxed/simple;
-	bh=sQZ7coHBW596Czfzya6483w2cThFXD7vAdHLF1T00gw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=V/66JaQM12rLVWhjpyj2sHAS649YlfhgMNlSNqx1ZC9/2Yzmc1KLE48hc8vmGjthS7GQjTLWuvA7RCv+pk2+xh2voRyVofZwjYfenudL9QJ+rtz6yP9EDzDZgqm2MxDE5alAx21OjAwkYRKmsW7pYOar/RmAaw28ZGW6T+oO7O0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trillion01.com; spf=pass smtp.mailfrom=trillion01.com; arc=none smtp.client-ip=173.209.37.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trillion01.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trillion01.com
-Received: from [45.44.224.220] (port=49530 helo=[192.168.1.177])
-	by cloud48395.mywhc.ca with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <olivier@trillion01.com>)
-	id 1rVGgn-0006ci-2r;
-	Wed, 31 Jan 2024 14:56:05 -0500
-Message-ID: <c28b3f5f40ed028ba9d74e94e3cc826c04f38bf7.camel@trillion01.com>
-Subject: Re: [PATCH v15 0/7] io_uring: add napi busy polling support
-From: Olivier Langlois <olivier@trillion01.com>
-To: Jens Axboe <axboe@kernel.dk>, Stefan Roesch <shr@devkernel.io>, 
-	io-uring@vger.kernel.org, kernel-team@fb.com
-Cc: ammarfaizi2@gnuweeb.org, netdev@vger.kernel.org, kuba@kernel.org
-Date: Wed, 31 Jan 2024 14:56:04 -0500
-In-Reply-To: <34560e193660122ea142daa0fbeb381eb7b0eb6d.camel@trillion01.com>
-References: <20230608163839.2891748-1-shr@devkernel.io>
-	 <58bde897e724efd7771229734d8ad2fb58b3ca48.camel@trillion01.com>
-	 <2b238cec-ab1b-4160-8fb0-ad199e1d0306@kernel.dk>
-	 <45a21ffe4878d77acba01ec43005c80a83f0e31a.camel@trillion01.com>
-	 <b6dc538a-01eb-4f87-a9d4-dea17235ff85@kernel.dk>
-	 <34560e193660122ea142daa0fbeb381eb7b0eb6d.camel@trillion01.com>
-Autocrypt: addr=olivier@trillion01.com; prefer-encrypt=mutual;
- keydata=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
-Organization: Trillion01 Inc
-Content-Type: text/plain; charset="ISO-8859-1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 069913F8E6;
+	Wed, 31 Jan 2024 20:05:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.56.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706731546; cv=fail; b=ZmRJrTTs099s65D9RJULFDWRpFiuuzHORSZRYzVKc855zW9yduTXhfssAeeOHKXSJQVOpoJqu4LGTVy4FjjD48XmhBVuYwTFxJnPYIEGx177JD33QBIkcPpBi9j9RR3sBjtxoLi3aU86yuFO846U0e1JXdH766aumhgho4m1MrM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706731546; c=relaxed/simple;
+	bh=4l34O8IysWodp8UFmAeNUIwpRNJUMiU7RjZJJ+W3WJU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=XzdytncyggfaVGgFIpxWxwOoNFBCR3OZTNohS5rXDCGy7mZDXgNCBtb17p3yRZmhOn8PtV+Rn1v9XbZCl1gK26T5wZ4C2VkVP5dZ/Bt5TnO+xiy3ouNdeWf+33B2kuSES0sV4LJiu1zWBkcayHTlCieeawgBp1Q8Mo69vlz7CA8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=VnxBfS3w; arc=fail smtp.client-ip=52.101.56.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UWGNIU21AX+E1TdCV9ZErMbHvTatOxfU6NMifoeb6AxSY7i/ZwK6jj4a5GQ0h3tC57uZejuRaDAgEv+y20a1LCBrjda3zWiynwtGoUWqlBsJTGzHXmgHGavx7XgcYyOVgT2T4Ida3MHq6RtM2lbxO+xLcum8tsUmTZXG2z0JppZCJGX+PewH95wMpDaZrk3Gn1VEwwgB/m2hNke5NbgO6WNrEJe+ZVt9omx+Pso+zDAhrhLTilV3PUqUTb1TRqYBZdN140S0RlJ/DPxfVAka5FYi1QS7YVCWf6uofN5J8/F0pDyXZOhHNNn1O0/MSHkWSsMeNHoWcF2iakInlkHqKg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3lAVu4As9hIJmi7PhDqPkXNM1ObofFZnvR2SfR72zZs=;
+ b=Efet5qf2+TiAYqlcwfTrYNsjd7ZiGqA9ngu6URMqJdDhTbIh+v0OdwQyRhdrFAPvdC/3UJDMM8W4bjyqNxVCpdK5U4FElYWdeMXNJDzzL3fGFRSg1P7U9/12O4fRXSCpbGlY9JT6mcm2aAMz7MrrbD+8jf1Fik+guCLAEx1zf8xrIgWAtWuAFQHts5uxeSXMrJOcMId+oSZCwt140ngyXQ3ejcpaTZdt9zqny3gGleZPjS/Kbr6kRtT1750f2gb7oS7mWSKXsL1sLxIWe/Iu5dUtCQYPrRXiwzewt77sSyz96nmWORmn4loVsImm9VwS9qpDhwna7WMqtuyB/5lg6g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3lAVu4As9hIJmi7PhDqPkXNM1ObofFZnvR2SfR72zZs=;
+ b=VnxBfS3wN4quWWxoRv4Y2PDr6mcznf13CjNgXXESjXsiQgPqLciKhlsnC9v3Q0eamfd1O8cShKLXmX/XfTnd9Mu2XgY8h6UNJYvvT5XFXd2MTfW6ySsexvAZg/K+sfEqUnGPwZL5w+fml+PKOMoVL9IRQ/oBswreelrl9BzYDPY=
+Received: from DS1PEPF00012A5F.namprd21.prod.outlook.com
+ (2603:10b6:2c:400:0:3:0:10) by BY5PR21MB1460.namprd21.prod.outlook.com
+ (2603:10b6:a03:21d::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.4; Wed, 31 Jan
+ 2024 20:05:40 +0000
+Received: from DS1PEPF00012A5F.namprd21.prod.outlook.com
+ ([fe80::ff76:81ea:f8d6:45]) by DS1PEPF00012A5F.namprd21.prod.outlook.com
+ ([fe80::ff76:81ea:f8d6:45%8]) with mapi id 15.20.7249.015; Wed, 31 Jan 2024
+ 20:05:39 +0000
+From: Haiyang Zhang <haiyangz@microsoft.com>
+To: Dexuan Cui <decui@microsoft.com>, Shradha Gupta
+	<shradhagupta@linux.microsoft.com>
+CC: KY Srinivasan <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Wojciech Drewek
+	<wojciech.drewek@intel.com>, "linux-hyperv@vger.kernel.org"
+	<linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Shradha Gupta <shradhagupta@microsoft.com>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: RE: [PATCH] hv_netvsc:Register VF in netvsc_probe if
+ NET_DEVICE_REGISTER missed
+Thread-Topic: [PATCH] hv_netvsc:Register VF in netvsc_probe if
+ NET_DEVICE_REGISTER missed
+Thread-Index: AQHaU0yZNOZ7/lEXVUScWvjgIg8G/LDyyvGAgADDxwCAAI9LcIAAFIAAgAAkwVA=
+Date: Wed, 31 Jan 2024 20:05:39 +0000
+Message-ID:
+ <DS1PEPF00012A5F6DC9FADEC65BDB80AA58CA7C2@DS1PEPF00012A5F.namprd21.prod.outlook.com>
+References:
+ <1706599135-12651-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <SA1PR21MB1335C5554F769454AAEDE1C8BF7D2@SA1PR21MB1335.namprd21.prod.outlook.com>
+ <20240131075404.GA18190@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+ <DS1PEPF00012A5FD2F8DBDCA1A0A58C6AC6CA7C2@DS1PEPF00012A5F.namprd21.prod.outlook.com>
+ <SA1PR21MB133546A5D3B1E471E4021A00BF7C2@SA1PR21MB1335.namprd21.prod.outlook.com>
+In-Reply-To:
+ <SA1PR21MB133546A5D3B1E471E4021A00BF7C2@SA1PR21MB1335.namprd21.prod.outlook.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=94a4fd25-9eef-4088-8818-4ef9b583d8ec;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2024-01-31T16:26:55Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DS1PEPF00012A5F:EE_|BY5PR21MB1460:EE_
+x-ms-office365-filtering-correlation-id: 293bdc4d-fccb-4259-302e-08dc2297ff30
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ M6k9MKYOMdQqjo8F+eEsHP3H9XhhyisQai1ySIlccbK8FSG70CAe9MeFAyqPPhuDEdlPGbG4K8LO9LaWLwcdeFs/5LVm1iH8SXIpnRAVYCC8hmZ7rnZuWP2YdA4mrQcjQTYNiLrR7pW5leEeGVOTDUSd5SUWJqk9LvYIn/RXTJOnBC/U8rALD1pGlF99DcMfFYfMlvMCLMwQDWQXSrzCCpkdglqwTXLUXFadmbLr8EdY5AOY0xUUWBDqy3rA6cteuhFrfBLDLiK7yoxoTVWp3/278cOEIyY/lNB3hXHFmdGw3BS1EUzLSfqo19012gLJWaYO1+2rD64HobPuqnrFrXWAB9DyvhijCmoJr0GPaW3gNhLt9Fh7YiLyQ5VmV01EWzfItKAxZYg3S1rtGVQ4gPpzreZo0qJmvMFBcplk1qJwSG2NKqGbgunQE1TQ8tgnbr8y9F3Pp5HXdysZzdroYHEYnjZgYvLrVv6zTl7jTFVF3NOa88P1JINbKCac/nSYlkHaUov71Aw7XuiDTl4wo1j7UzeBf1Lw37go8lIoYZ9yqmPZebnx+k9VHYR1yMAw1G2qmweUtlcukELdHohP50ndfDWQ1tUSyHA5dB+xidrMezfQjTLkcKOq8LaonB+D
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS1PEPF00012A5F.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(366004)(396003)(136003)(39860400002)(346002)(230922051799003)(1800799012)(64100799003)(186009)(451199024)(26005)(41300700001)(55016003)(7696005)(478600001)(82960400001)(71200400001)(10290500003)(38070700009)(83380400001)(6506007)(9686003)(53546011)(316002)(54906003)(82950400001)(38100700002)(122000001)(64756008)(66476007)(2906002)(86362001)(110136005)(76116006)(7416002)(8676002)(33656002)(8936002)(66946007)(52536014)(8990500004)(66446008)(4326008)(66556008)(5660300002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?ZoY9wf5ImRgsM6ZhlAtBGq3n1bM1cZEA5kqWVghSQr/JRO4HNU9XpbEMbPAi?=
+ =?us-ascii?Q?F1YAg+o22LupKvXx0F4fa+3pd7QeQPeW3Wt413a5pLkLXkQKcTV9X/STaUTM?=
+ =?us-ascii?Q?zR4TI+R50HSgi+eU0d+YA5xka8gn9j8tVOl5G8nZ6Gr+1gkGe1MkqS+p0l44?=
+ =?us-ascii?Q?0OikkPXqzoM9yDWXQAPEKgpg4bTOsudcxVMP6s/L7VQc2O/aCmFxXdQ/bt6h?=
+ =?us-ascii?Q?REO94ox7+Q6vLNsLDM0vcxQtY5BzUuKn8LqKFtni2niCnkX0yA3Iib+oVSPI?=
+ =?us-ascii?Q?THqa2RZz3A/3RdCbjr9z6sGLl8vKulAAtFyrBPBWfHd5vzoJqYfk1Cj54oRs?=
+ =?us-ascii?Q?7pjzN0nUwmNdWrJkbzI2zQz/FcoiMwDr90m50Z7FP+iPdVbNBG1XmBTdGchQ?=
+ =?us-ascii?Q?3i+Ul1mIw0W4bGDKVIyhvVfaGP3p5bW6B/4UocxJFkGCo2qc0RQnZunaGFCZ?=
+ =?us-ascii?Q?qBVneD8CGHPZYN8l3tQNasMgXXsP8XactcS/S9yb15yztfPg2Rv++Wv8m3Dp?=
+ =?us-ascii?Q?frdI8+CRmXv9i8e+YMxHvqRSAdXSZcynkOz6cNIIqaThO22uKffE2hSV1Whu?=
+ =?us-ascii?Q?B9KFUOvIn6eqBKpkjdlVNMY9KVhpjxV+t4ItMq4LwWWVomNDHeXhG+rMFqcO?=
+ =?us-ascii?Q?jZg+Eyfgg5yL6LYBNxQXejAH7LXZ6G/0nafDYvm3ZwkD4P8g6BzjkwVYuqSN?=
+ =?us-ascii?Q?ZSA4ysVFf3po5xMjj0NWTuEkhMwOQk24sVHWHHYUB6xvujjLNEHIn8+YKg3b?=
+ =?us-ascii?Q?JHtAKW5lTTXHduGifdGOvHPXys9Wb/bYm2ZLwh7lHejrdN5jJQfJh5CiHpOL?=
+ =?us-ascii?Q?eFO8DM1mGVDaNOBEet/SVISESIs4tEazwDWLlQIUKl7W+Imd4RGvDj8dX1M7?=
+ =?us-ascii?Q?vwcb1/8SsoEJqjV9NC5pBfySmU8xofcNWSUjY7Sg6H6VhLw+pZq+dTnSRpHv?=
+ =?us-ascii?Q?Wbx5jxwv01WwPo9DN3mlPD8IHlQuniX7gbl+nByrfFPsV8RujyG/fZWXZXS/?=
+ =?us-ascii?Q?GAGrtZnmt+9QpgmQdZzox78UGI98hkla7/0J9IqcZMOkgIa3I04iV0UyBDSD?=
+ =?us-ascii?Q?3b8YKg6qavyvVp3sTTPP2bBS8j+3ftOXAJ+/w4sjsNSu33U6PoIspQtVqkqm?=
+ =?us-ascii?Q?tZpXOjpBA41xG08qran1+a9/llLEIHhZ4jDjzJGkMpKYIqNNG0jHVqhyocOi?=
+ =?us-ascii?Q?oPLYwKp6h8pC/hCZhi2CMDWbqdt+61kler+1Sagh4eT/LBfcG2k3GAeFJEnG?=
+ =?us-ascii?Q?4n/8GTWAZ6LTU0rCwONC7Fn+cmkhtUnQ22Pse4hRtQNmIoBIzTQuFxIDiNN/?=
+ =?us-ascii?Q?a9HHRDy5X9eXsRvHgsT5VElbOj7Eb9fQPYYvqRyUCxA7qLiSALJpMeykC5yL?=
+ =?us-ascii?Q?zjdnpyIkhQD9eEGk9YSi7vtOYMJyGNRXatNob1KUixAXDygkJNZj9zdUPqfP?=
+ =?us-ascii?Q?CwZ0k83ZkYfLGvRrdl0ABSuGitAVBl0+6LI7OtpB6XWzUu5s6ydXq9DJJ7Q4?=
+ =?us-ascii?Q?y3lZmlwMZI4dKRvjADidy8oakKUOUvl94u3Mgv+sDIHNIxEjm2/ET6DFJx0T?=
+ =?us-ascii?Q?OqVdgjW02LA15JaethjISMeN8VUMBNWg3g5mdORe?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - cloud48395.mywhc.ca
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - trillion01.com
-X-Get-Message-Sender-Via: cloud48395.mywhc.ca: authenticated_id: olivier@trillion01.com
-X-Authenticated-Sender: cloud48395.mywhc.ca: olivier@trillion01.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DS1PEPF00012A5F.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 293bdc4d-fccb-4259-302e-08dc2297ff30
+X-MS-Exchange-CrossTenant-originalarrivaltime: 31 Jan 2024 20:05:39.6468
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Ti1/JNS3iYAxo67ASNEr6ujuTX8JICb3ki3bHy5yuUTa3k7t3gERaKwol5ZOedEmtJugJ729MLBY+YnfLtqlmg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR21MB1460
 
-On Wed, 2024-01-31 at 12:59 -0500, Olivier Langlois wrote:
-> On Wed, 2024-01-31 at 10:32 -0700, Jens Axboe wrote:
-> >=20
-> > Thanks for testing!
-> >=20
-> > Any chance that you could run some tests with and without NAPI that
-> > help
-> > validate that it actually works? That part is what I'm most
-> > interested
-> > in, not too worried about the stability of it as I have scrutinized
-> > it
-> > pretty close already.
-> >=20
->=20
-> There is maybe a test that I can perform. The data that I receive is
-> timestamped. I have a small test program that checks the age of the
-> updates on their reception...
->=20
-> I would expect that it should be possible to perceive the busy
-> polling
-> effect by comparing the average update age with and without the
-> feature
-> enabled...
->=20
-> A word of warning... The service that my client is connecting to has
-> relocated recently. I used to have an RTT of about 8mSec with it to
-> about 400-500 mSec today...
->=20
-> because of the huge RTT, I am unsure that the test is going to be
-> conclusive at all...
->=20
-> However, I am also in the process of relocating my client closer to
-> the
-> service. If you can wait a week or so, I should able to do that test
-> with a RTT < 1 mSec...
->=20
-> Beside that, I could redo the same test that Stefan did with the ping
-> client/server setup but would that test add any value to the current
-> collective knowledge?
->=20
-> I'll do the update age test when I restart my client and I'll report
-> back the result but my expectations aren't very high that it is going
-> to be conclusive due to the huge RTT.
->=20
->=20
-As I expected, the busy polling difference in the update age test is so
-small compared to the RTT that the result is inconclusive, IMHO...
 
-The number of collected updates to build the stats is 500.
 
-System clocks are assumed to be synchronized and the RTT is the
-difference between the local time and the update timestamp.
-Actually, it may be more accurate to say that the displayed RTT values
-are in fact TT...
+> -----Original Message-----
+> From: Dexuan Cui <decui@microsoft.com>
+> Sent: Wednesday, January 31, 2024 12:40 PM
+> To: Haiyang Zhang <haiyangz@microsoft.com>; Shradha Gupta
+> <shradhagupta@linux.microsoft.com>
+> Cc: KY Srinivasan <kys@microsoft.com>; Wei Liu <wei.liu@kernel.org>;
+> David S. Miller <davem@davemloft.net>; Eric Dumazet
+> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
+> <pabeni@redhat.com>; Wojciech Drewek <wojciech.drewek@intel.com>; linux-
+> hyperv@vger.kernel.org; netdev@vger.kernel.org; linux-
+> kernel@vger.kernel.org; Shradha Gupta <shradhagupta@microsoft.com>;
+> stable@vger.kernel.org
+> Subject: RE: [PATCH] hv_netvsc:Register VF in netvsc_probe if
+> NET_DEVICE_REGISTER missed
+>=20
+> > From: Haiyang Zhang <haiyangz@microsoft.com>
+> > Sent: Wednesday, January 31, 2024 8:46 AM
+> >  [...]
+> > > From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+> > > Sent: Wednesday, January 31, 2024 2:54 AM
+> > > > [...]
+> > > > > +		netvsc_prepare_bonding(vf_netdev);
+> > > > > +		netvsc_register_vf(vf_netdev, VF_REG_IN_PROBE);
+> > > > > +		__netvsc_vf_setup(net, vf_netdev);
+> > > >
+> > > > add a "break;' ?
+> > > With MANA devices and multiport support there, the individual ports
+> are
+> > > also net_devices.
+> > > Wouldn't this be needed for such scenario(where we have multiple mana
+> > > port net devices) to
+> > > register them all?
+> >
+> > Each device has separate probe() call, so only one VF will match in one
+> > netvsc_probe().
+> >
+> > netvsc_prepare_bonding() &  netvsc_register_vf() have
+> > get_netvsc_byslot(vf_netdev), but __netvsc_vf_setup() doesn't have. So,
+> > in case of multi-Vfs, this code will run "this" netvsc NIC with
+> multiple VFs by
+> > __netvsc_vf_setup() which isn't correct.
+> >
+> > You need to add the following lines before
+> > netvsc_prepare_bonding(vf_netdev)
+> > in netvsc_probe() to skip non-matching VFs:
+> >
+> > if (net !=3D get_netvsc_byslot(vf_netdev))
+> > 	continue;
+>=20
+> Haiyang is correct.
+> I think it's still good to add a "break;", e.g. my understanding is
+> something
+> like the below (this is untested):
+>=20
+> +static struct net_device *get_matching_netvsc_dev(net_device
+> *event_ndev)
+> +{
+> +       /* Skip NetVSC interfaces */
+> +       if (event_ndev->netdev_ops =3D=3D &device_ops)
+> +               return NULL;
+> +
+> +       /* Avoid non-Ethernet type devices */
+> +       if (event_ndev->type !=3D ARPHRD_ETHER)
+> +               return NULL;
+> +
+> +       /* Avoid Vlan dev with same MAC registering as VF */
+> +       if (is_vlan_dev(event_ndev))
+> +               return NULL;
+> +
+> +       /* Avoid Bonding master dev with same MAC registering as VF */
+> +       if (netif_is_bond_master(event_ndev))
+> +               return NULL;
+> +
+> +       return get_netvsc_byslot(event_ndev);
+> +}
 
-latency NO napi busy poll:
-[2024-01-31 11:28:34] INFO Main/processCollectedData rtt
-min/avg/max/mdev =3D 74.509/76.752/115.969/3.110 ms
+Looks good.=20
+But, like you said before, the four if's can be moved into a new function,
+and shared by two callers: netvsc_probe() & netvsc_netdev_event().
 
-latency napi busy poll:
-[2024-01-31 11:33:05] INFO Main/processCollectedData rtt
-min/avg/max/mdev =3D 75.347/76.740/134.588/1.648 ms
 
-I'll redo the test once my RTT is closer to 1mSec. The relative gain
-should be more impressive...
+>=20
+> +	for_each_netdev(dev_net(net), vf_netdev) {
+> + 		if (get_matching_netvsc_dev(event_dev) !=3D net)
+> +			continue;
+> +
+> +		netvsc_prepare_bonding(vf_netdev);
+> +		netvsc_register_vf(vf_netdev, VF_REG_IN_PROBE);
+> +		__netvsc_vf_setup(net, vf_netdev);
+> +
+> +		break;
+> +	}
+>=20
+> We can also use get_matching_netvsc_dev() in netvsc_netdev_event().
 
+netvsc_netdev_event() >> netvsc_unregister_vf() uses get_netvsc_byref(vf_ne=
+tdev)
+instead of get_netvsc_byslot().
+So probably just re-factoring the four if's is better.
+
+Thanks,
+-Haiyang
 
