@@ -1,58 +1,60 @@
-Return-Path: <netdev+bounces-67662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11C8A8447E2
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 20:18:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5B948447E4
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 20:18:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 443691C22E7C
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 19:18:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D47928A221
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 19:18:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11C7639AE9;
-	Wed, 31 Jan 2024 19:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC963EA7B;
+	Wed, 31 Jan 2024 19:18:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y+CKMeuT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gnAQ8c7l"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40AFD38DED
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED1C0383B2
 	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 19:17:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706728680; cv=none; b=iqPNcjneQYa/F74lcJ3vB7aFXskVLoHUQV7pKHmvjubU6MT3h4ewshwg1iaeusQhBj9fJNtleft2Paf+tXuGbZE3qBeh3YuNypX8arNByDTR4RVXjfhd/IGHASDR8tSUgOrNlrvQv5TWgcONd8x/aDIHkp8q8WrAI41C4zZtmHc=
+	t=1706728681; cv=none; b=aW+fGhOt+qy9MFqumPgeoI0aHzXvvK6wFTXtpK7OWjlPwFBRplpWKCHEg+wELMloPv9T9VNB4cxmL/wqveRBHRoq9L4NE3q84MYNREYKW6eU3ZBDJBQICn9ZXzyfL3pfHw0aaGEEr8o0iYHKsHI2ZHi+C9BS/VFRA61vzQBqgOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706728680; c=relaxed/simple;
-	bh=MUgnv5FqcUoe5DskRTyALhWieNzpekHbDDqXbALApN8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=S4iFwnlPqkJ1DgJhqRI6vNaEyULdOs8buUkI6WL9FSEE/Am4/f3eeu4nbtobl18YDsjhHGFLjsQt97wik4jld55w/FX0iN8Igm6OME9JqNeQo8f0JFBTfgFvtn8NFsMUyDHgwiunw0ENPEyEwxwLY4swxlqOir0kz8kpNNs/l9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y+CKMeuT; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1706728681; c=relaxed/simple;
+	bh=2DnmIvdGmjURmShJtRCsEJMDdPmjxWUH1IKPlXRajfM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=jwSHWGkGWgkvOUawHlW5GLeTnvFARkE0Qc32RTQbFjQCEFNG3YnRQwuoCMjc4f+jdNXp6d0F1c/ah7xoE0wCmD/gbLi3dXbl95/AmCeN5Uw+cfrVkTSMecTN7ya9TEnH8wKDEoW4Qc9u4G+nPyqo8jXTfVh7xM38Ko2AlhhrQ2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gnAQ8c7l; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	s=mimecast20190719; t=1706728677;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=F2HLLHWA6yNSaZ0qN3yDV0fsRl3D49AgWKDEnKxo7oA=;
-	b=Y+CKMeuTipRp096aSSGw6B7huGuRF8jBIrQakYyVmBLrppFrXpbTwBsSicrXQpZOsCoiN/
-	PyMDrV95Y7AoYt8JbbWZqxTJQTIO4NREayz7tfh6ADHaLVQ5NQAZC3PUIoZktPCYGcBOnU
-	imfMQ3nOsl99PicYVrUKtfaHuRVbkZ4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-215-3Gg7kGmzOlCJNUBUvDyK0w-1; Wed, 31 Jan 2024 14:17:53 -0500
-X-MC-Unique: 3Gg7kGmzOlCJNUBUvDyK0w-1
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lGf8V7YbO8S1JxykOgAqwJn9BdraNH1lFGF1LdAyQdg=;
+	b=gnAQ8c7l1RRHHn8MqZPNnBJLi/XfhK2fLwmhywPLS7gUhKGbFQLJascpSt90vAOAwF4CM5
+	NAujZv9JUZntxswwGFpAHgwq1SjSnhVWCzF4T26fAJU1BhLdZwRz5izHHrpRNy1DmBUJXD
+	p3EoNAtqFHclvgVlhkT8rM9db74LJsM=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-453-RcjBULaaPWGpQPubRupjSg-1; Wed,
+ 31 Jan 2024 14:17:55 -0500
+X-MC-Unique: RcjBULaaPWGpQPubRupjSg-1
 Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0694984FA84;
-	Wed, 31 Jan 2024 19:17:53 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5870329AC03F;
+	Wed, 31 Jan 2024 19:17:54 +0000 (UTC)
 Received: from rhel-developer-toolbox-latest.rmtusor.csb (unknown [10.2.16.182])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 632D340C9444;
-	Wed, 31 Jan 2024 19:17:51 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2C24840CD14B;
+	Wed, 31 Jan 2024 19:17:53 +0000 (UTC)
 From: Chris Leech <cleech@redhat.com>
 To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
 	Nilesh Javali <njavali@marvell.com>
@@ -65,9 +67,11 @@ Cc: Christoph Hellwig <hch@lst.de>,
 	linux-kernel@vger.kernel.org,
 	linux-scsi@vger.kernel.org,
 	GR-QLogic-Storage-Upstream@marvell.com
-Subject: [PATCH 0/2] UIO_MEM_DMA_COHERENT for cnic/bnx2/bnx2x
-Date: Wed, 31 Jan 2024 11:17:30 -0800
-Message-ID: <20240131191732.3247996-1-cleech@redhat.com>
+Subject: [PATCH 1/2] uio: introduce UIO_MEM_DMA_COHERENT type
+Date: Wed, 31 Jan 2024 11:17:31 -0800
+Message-ID: <20240131191732.3247996-2-cleech@redhat.com>
+In-Reply-To: <20240131191732.3247996-1-cleech@redhat.com>
+References: <20240131191732.3247996-1-cleech@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,64 +81,110 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-During bnx2i iSCSI testing we ran into page refcounting issues in the
-uio mmaps exported from cnic to the iscsiuio process, and bisected back
-to the removal of the __GFP_COMP flag from dma_alloc_coherent calls.
+Add a UIO memtype specifically for sharing dma_alloc_coherent
+memory with userspace, backed by dma_mmap_coherent.
 
-The cnic uio interface also has issues running with an iommu enabled,
-which these changes correct.
+This is mainly for the bnx2/bnx2x/bnx2i "cnic" interface, although there
+are a few other uio drivers which map dma_alloc_coherent memory and
+could be converted to use dma_mmap_coherent as well.
 
-In order to fix these drivers to be able to mmap dma coherent memory via
-a uio device, introduce a new uio mmap type backed by dma_mmap_coherent.
+Signed-off-by: Nilesh Javali <njavali@marvell.com>
+Signed-off-by: Chris Leech <cleech@redhat.com>
+---
+ drivers/uio/uio.c          | 40 ++++++++++++++++++++++++++++++++++++++
+ include/linux/uio_driver.h |  3 +++
+ 2 files changed, 43 insertions(+)
 
-While I understand some complaints about how these drivers have been
-structured, I also don't like letting support bitrot when there's a
-reasonable alternative to re-architecting an existing driver. I believe
-this to be the most sane way to restore these drivers to functioning
-properly.
-
-There are two other uio drivers which are mmaping dma_alloc_coherent
-memory as UIO_MEM_PHYS, uio_dmem_genirq and uio_pruss. While a
-conversion to use dma_mmap_coherent might be more correct for these as
-well, I have no way of testing them and assume that this just hasn't
-been an issue for the platforms in question.
-
-v4:
-- re-introduce the dma_device member to uio_map,
-  it needs to be passed to dma_mmap_coherent somehow
-- drop patch 3 to focus only on the uio interface,
-  explicit page alignment isn't needed
-- re-add the v1 mail recipients,
-  this isn't something to be handled through linux-scsi
-v3 (Nilesh Javali <njavali@marvell.com>):
-- fix warnings reported by kernel test robot
-  and added base commit
-v2 (Nilesh Javali <njavali@marvell.com>):
-- expose only the dma_addr within uio and cnic.
-- Cleanup newly added unions comprising virtual_addr
-  and struct device
-
-previous threads:
-v1: https://lore.kernel.org/all/20230929170023.1020032-1-cleech@redhat.com/
-attempt at an alternative change: https://lore.kernel.org/all/20231219055514.12324-1-njavali@marvell.com/
-v2: https://lore.kernel.org/all/20240103091137.27142-1-njavali@marvell.com/
-v3: https://lore.kernel.org/all/20240109121458.26475-1-njavali@marvell.com/
-
-Chris Leech (2):
-  uio: introduce UIO_MEM_DMA_COHERENT type
-  cnic,bnx2,bnx2x: use UIO_MEM_DMA_COHERENT
-
- drivers/net/ethernet/broadcom/bnx2.c          |  1 +
- .../net/ethernet/broadcom/bnx2x/bnx2x_main.c  |  2 +
- drivers/net/ethernet/broadcom/cnic.c          | 15 +++++--
- drivers/net/ethernet/broadcom/cnic.h          |  1 +
- drivers/net/ethernet/broadcom/cnic_if.h       |  1 +
- drivers/uio/uio.c                             | 40 +++++++++++++++++++
- include/linux/uio_driver.h                    |  3 ++
- 7 files changed, 60 insertions(+), 3 deletions(-)
-
-
-base-commit: 861c0981648f5b64c86fd028ee622096eb7af05a
+diff --git a/drivers/uio/uio.c b/drivers/uio/uio.c
+index 2d572f6c8ec83..dde3f49855233 100644
+--- a/drivers/uio/uio.c
++++ b/drivers/uio/uio.c
+@@ -24,6 +24,7 @@
+ #include <linux/kobject.h>
+ #include <linux/cdev.h>
+ #include <linux/uio_driver.h>
++#include <linux/dma-mapping.h>
+ 
+ #define UIO_MAX_DEVICES		(1U << MINORBITS)
+ 
+@@ -759,6 +760,42 @@ static int uio_mmap_physical(struct vm_area_struct *vma)
+ 			       vma->vm_page_prot);
+ }
+ 
++static int uio_mmap_dma_coherent(struct vm_area_struct *vma)
++{
++	struct uio_device *idev = vma->vm_private_data;
++	struct uio_mem *mem;
++	void *addr;
++	int ret = 0;
++	int mi;
++
++	mi = uio_find_mem_index(vma);
++	if (mi < 0)
++		return -EINVAL;
++
++	mem = idev->info->mem + mi;
++
++	if (mem->dma_addr & ~PAGE_MASK)
++		return -ENODEV;
++	if (vma->vm_end - vma->vm_start > mem->size)
++		return -EINVAL;
++
++	/*
++	 * UIO uses offset to index into the maps for a device.
++	 * We need to clear vm_pgoff for dma_mmap_coherent.
++	 */
++	vma->vm_pgoff = 0;
++
++	addr = (void *)mem->addr;
++	ret = dma_mmap_coherent(mem->dma_device,
++				vma,
++				addr,
++				mem->dma_addr,
++				vma->vm_end - vma->vm_start);
++	vma->vm_pgoff = mi;
++
++	return ret;
++}
++
+ static int uio_mmap(struct file *filep, struct vm_area_struct *vma)
+ {
+ 	struct uio_listener *listener = filep->private_data;
+@@ -806,6 +843,9 @@ static int uio_mmap(struct file *filep, struct vm_area_struct *vma)
+ 	case UIO_MEM_VIRTUAL:
+ 		ret = uio_mmap_logical(vma);
+ 		break;
++	case UIO_MEM_DMA_COHERENT:
++		ret = uio_mmap_dma_coherent(vma);
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 	}
+diff --git a/include/linux/uio_driver.h b/include/linux/uio_driver.h
+index 47c5962b876b0..14d9dd2a07e85 100644
+--- a/include/linux/uio_driver.h
++++ b/include/linux/uio_driver.h
+@@ -37,10 +37,12 @@ struct uio_map;
+ struct uio_mem {
+ 	const char		*name;
+ 	phys_addr_t		addr;
++	dma_addr_t		dma_addr;
+ 	unsigned long		offs;
+ 	resource_size_t		size;
+ 	int			memtype;
+ 	void __iomem		*internal_addr;
++	struct device		*dma_device;
+ 	struct uio_map		*map;
+ };
+ 
+@@ -158,6 +160,7 @@ extern int __must_check
+ #define UIO_MEM_LOGICAL	2
+ #define UIO_MEM_VIRTUAL 3
+ #define UIO_MEM_IOVA	4
++#define UIO_MEM_DMA_COHERENT	5
+ 
+ /* defines for uio_port->porttype */
+ #define UIO_PORT_NONE	0
 -- 
 2.43.0
 
