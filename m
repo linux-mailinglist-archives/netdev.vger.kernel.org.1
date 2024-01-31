@@ -1,50 +1,62 @@
-Return-Path: <netdev+bounces-67582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FC778442D3
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 16:17:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 691078442BB
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 16:12:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 159A3B24E7F
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 15:11:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81E1C28343B
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 15:12:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A958186AE7;
-	Wed, 31 Jan 2024 15:11:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 154E284A3D;
+	Wed, 31 Jan 2024 15:12:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="QGgSjckB"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C5E84A44;
-	Wed, 31 Jan 2024 15:11:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4434E62A09;
+	Wed, 31 Jan 2024 15:12:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706713892; cv=none; b=l5YKIaQ/Lg5Rmg10Y+GZaIS4S1u2vasL13a9OSOsr4eOvzSMxnD2FXRkbvbKrmPeciIL9RT2YZLE1b/37N3KZ1bWYj2tgJMSXrMKXdh/EomJ+F4Ma8Fv+zg8b/VJlWP1F1wQY3QXPgWgC8+96Mr6LG2FhxfeNeO753Zc1A3wWWQ=
+	t=1706713939; cv=none; b=W75+mu7NasBzOnO/c3ijXDLSsMLYw2p0U/hhyRFff+kM8KQ1S88Vd9MDvfW6CKlMsPDUEM39I4RmI8l2t0WFrGS6uV+WvLrtNi+4Eymb2QHqMbeuY2gs9oOt+t0PsoHAC66KVdezMr5gaN9zfdkqsiSSVbDRjqG6NgWzBLJP948=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706713892; c=relaxed/simple;
-	bh=VU+M8Ww5lmZFUC/OKedPmORF4YD7skgGYytTSjMIqvg=;
+	s=arc-20240116; t=1706713939; c=relaxed/simple;
+	bh=nbdDlxkkF8cVjN7UUBx3gJB7l95DjikCQYsqd/qj/ZM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qDTdBdi4t3Iv5QbXrXV2bGnQZxfJhbcngUw9nEGsmzz+pJCmI2FQDt5+BLR+FyZzrok3uKK3KC6Pp/kpoYbX0NcBnVSHkd9oweSgXPpLPgwiCmZ2WFQ4WqQcGFyKNe9aIevQupp0/gSKgOvcXUIOdZsJQPFwVLIvUuROqTtnKt0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1rVCFA-0002et-B5; Wed, 31 Jan 2024 16:11:16 +0100
-Date: Wed, 31 Jan 2024 16:11:16 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	Florian Westphal <fw@strlen.de>
-Subject: Re: linux-next: Tree for Jan 30 (netfilter, xtables)
-Message-ID: <20240131151116.GA6403@breakpoint.cc>
-References: <20240130135808.3967a805@canb.auug.org.au>
- <d0dfbaef-046a-4c42-9daa-53636664bf6d@infradead.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pUWXcRfEiVgGEPMGdCZo+3oZJkCnrTutdoGTxQBbLvqlXrPS1/G901N1WlhsshJY0fb23IJjV/a7pR1CWT4TJxaImk+p3j2amOcVjNktY7dn+Kp1jEDB+xLu5KKG1Z3y/DwxncdM4lw9FsPNxCC1ddnT2a7FlMtY3aBecL2Bl0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=QGgSjckB; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=HSa8UkkGFQrhJI5bAmssW8tue1PcMN3B2lq7dqK1nZw=; b=QGgSjckByHHOLBE3n5mZpKVKWf
+	tb0y0/NbhOQJx3qKmQJrkHnKEZ99Jka7EkJ1/tGqNfOQwxRG/uU69bVhRfm1YfoXlTKVl7SkFkhDQ
+	dhzA0Ul8qXgtF4c1Kf4CJlHnBYN7HvraZOACswHkGh/s6CZIXcV3DNX3gekTXhKaTDfw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rVCFz-006amM-Cn; Wed, 31 Jan 2024 16:12:07 +0100
+Date: Wed, 31 Jan 2024 16:12:07 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v5 net-next 06/13] net: phy: marvell-88q2xxx: add
+ interrupt support for link detection
+Message-ID: <b9243c30-1163-4011-ab9f-16d8fa882773@lunn.ch>
+References: <20240122212848.3645785-1-dima.fedrau@gmail.com>
+ <20240122212848.3645785-7-dima.fedrau@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,13 +65,16 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <d0dfbaef-046a-4c42-9daa-53636664bf6d@infradead.org>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20240122212848.3645785-7-dima.fedrau@gmail.com>
 
-Randy Dunlap <rdunlap@infradead.org> wrote:
-> /opt/crosstool/gcc-13.2.0-nolibc/powerpc-linux/bin/powerpc-linux-ld: net/ipv4/netfilter/arp_tables.o: in function `arpt_unregister_table_pre_exit':
-> arp_tables.c:(.text+0x20): undefined reference to `xt_find_table'
+On Mon, Jan 22, 2024 at 10:28:39PM +0100, Dimitri Fedrau wrote:
+> Added .config_intr and .handle_interrupt callbacks. Whenever the link
+> goes up or down an interrupt will be triggered. Interrupts are configured
+> separately for 100/1000BASET1.
+> 
+> Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
 
-Thanks for reporting, original Kconfig had a 'select' for X_TABLES which
-isn't there anymore.  I'll send a followup patch.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
