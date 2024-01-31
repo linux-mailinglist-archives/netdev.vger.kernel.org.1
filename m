@@ -1,137 +1,95 @@
-Return-Path: <netdev+bounces-67670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B685844841
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 20:50:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A424844842
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 20:50:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4BB228BDBC
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 19:50:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2C3E1F2619F
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 19:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B30093AC26;
-	Wed, 31 Jan 2024 19:50:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 904E13E494;
+	Wed, 31 Jan 2024 19:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="cAKdr37o"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MDcRfQCE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C453B189
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 19:50:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9A03AC26
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 19:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706730608; cv=none; b=YJ7P3hYV1myg4W4CV7e/e8L6j5+MGL6WsnSQoM5pI5iPPZlDB2lPTgHQhVoZqXaeE9GOgiyo7sytqmK6/B5DxnB881bzeD8hBvp/krdmbi4jjOsR+ULVPH5EVTw4v9d6gyT9fddRZaORVb5VwuZePyAmoNsyMDjRyzdpa3bgAjI=
+	t=1706730631; cv=none; b=Zrpfj+5AQ7IDlQwYshb9ZnDUme7OJYC5Ze6njRgrFRR1ikY2iBny8gAozZyL4dxQqSnq00SOGkwHXR5rE5jxM85+gPH2OOrpjtSTwfaAbY5PVVm6NabA6kowjYwphcVBZ00mU5KO/nWY6ECnnkV+SA5QiLPwzWh2jalEeeoNQls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706730608; c=relaxed/simple;
-	bh=5rifOvdyD9y2Exp2LqPVvFpk3zEaq3fNuzC4UFn/QYI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t/pLfkH+G0MHkavDmpjg8G3MpQ4FFYBERuGr5td2FpnTjQRccfHD4G7BpRQkvpYMU13tdu8BL8hv5OKVzNfBBhDhZ/7PpZ0MnlKd2n0cuhDMm9CEnBoOZNrfbpYOuknzO6v0oytWeKUpnk49aN1Kscpr+kKXCMTSde//RfovpVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=cAKdr37o; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40fb63c40c0so1688845e9.2
-        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 11:50:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706730605; x=1707335405; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VASVD0MZ27kuNPKaRL04puCP3S6vgLRDMnfORCUnd00=;
-        b=cAKdr37oYpxU/rqaRNgzP9KVpi0uXSGMegneFwj56uRcFtmGAU0zwSBhQGWSSn2RYx
-         mXqUQXx5/tpNyZl8DdBMt1xfMq+jsGfZWm8hbeQsGTJw5BqOR0prIfzHqoaDkxsaJAVq
-         rJAdUjSEIVGxIk+Zq0XDAKtALjm3ytWbmEs4EQF0H5kYPK0MyZqlbRT6G4xlnNyessh3
-         M/zTEOHmNiPld3IFPqMcDp/VWLPLmoY44noM7uQoOMzR8LXFzkVgS2cKXoRliM8odbIa
-         yU62/KxXOSPc0YOTeet2d8SsRbg/y5MllcGl5yXm8ZIDzmqigd0Xz74A01/MkpPeTKNi
-         Rg3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706730605; x=1707335405;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VASVD0MZ27kuNPKaRL04puCP3S6vgLRDMnfORCUnd00=;
-        b=BVHKyM/ioC+89s6JPkid+lvycIuv7hlFnCwnDo2ywV5A/VmKPPlze8ZxJE+3MB86kT
-         EAdBXR0SGWwXwCrRykqQHbjKK/mA3TdMlax2rHV2BVe8CS/K7AWPoCPYp5UXydS9y7/s
-         zalA8hou3RwEeTgFeci8qP5tdGy3XOGcaGYp1/Chi00E2TH4G2S8a27C54YXVvAx/VFy
-         vAnCmvmAIInoOwrgo9UVLgWMs3TWpWSDO58mR+hiHdzCM8mq4qeQ/CfWlGKo7PNALcwt
-         UC4DuvbKEYrGkFGJK1SbCK+X62i5SEvoh3cw3wDrukejKIHXsET3auK4Sd9AEX+IyUCI
-         rDDg==
-X-Gm-Message-State: AOJu0YyB+FmgJ6PTjMBD7e5OKfqm/TwgxQ242/M0rlNtsnn6fQlRd6yz
-	tPftoh8yFhs1v2Xyws6Gr40XMotoNi2lZw6IIsxlRfJ64Th8eDwCP6B0Yr3GcPg=
-X-Google-Smtp-Source: AGHT+IGuDQusJsWajI7v0AaY5F7neNpQ56WLXzlVKUPN5AJGmXVojRjzMHOc041Zm6QA8h7ulWcRyg==
-X-Received: by 2002:a05:600c:54e2:b0:40e:a39e:461f with SMTP id jb2-20020a05600c54e200b0040ea39e461fmr2372349wmb.38.1706730605126;
-        Wed, 31 Jan 2024 11:50:05 -0800 (PST)
-Received: from localhost ([102.140.226.10])
-        by smtp.gmail.com with ESMTPSA id o7-20020a05600c510700b0040e880ac6ecsm2452260wms.35.2024.01.31.11.50.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jan 2024 11:50:04 -0800 (PST)
-Date: Wed, 31 Jan 2024 22:50:01 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Antony Antony <antony@phenome.org>
-Cc: Antony Antony <antony.antony@secunet.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>, devel@linux-ipsec.org,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH ipsec-next 1/2] xfrm: introduce forwarding of ICMP Error
- messages
-Message-ID: <435ce833-c841-46e1-a20f-a067f0e5c8b1@moroto.mountain>
-References: <4b30e07300159db93ec0f6b31778aa0f6a41ef21.1698331320.git.antony.antony@secunet.com>
- <71c2d6bc-ab8d-4fa0-9974-d4ed1f6d8645@moroto.mountain>
- <Zbqhy8U-o2uL2_us@Antony2201.local>
- <c973a8fc-2baa-49e8-9c8f-fd63ef348f92@moroto.mountain>
+	s=arc-20240116; t=1706730631; c=relaxed/simple;
+	bh=vm1VvPWS8u/0sVVO0sq2qAm/X+8Dw5pmdJyX/qXhvX8=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=fE3OiYzCQ5FUQ1cjkaJxnoknMtNDMQiMidiws7iLMQFJ8Fd+kKlL3N5OwI3VyqOYWd+LdTfr23ZS+KvoQfDiJRIgFdPARiKSYCqN07SPV1I6DdsKZUBE+K/CC7MGAMXkMva8zd10axuL97DegiE7d7YOVC7Ckxon4BK+jklb/KY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MDcRfQCE; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706730628;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rF0QFeVS0b/AoQ7bIaAq+Ck/8ND4nETi8q3EifYpCJ4=;
+	b=MDcRfQCEkiOCgU+sS6H86duTIktXp1sgHF8qBybZvN8YbkAMzswL7Nl57AH2mhYC9X22gK
+	cAUBys2ml8Y+sSNulPF0ui8SV2j4wQcOTuCTf2qK38tE6K3WxQeKwR31VoyTufK2OS68NR
+	rDEo6iw6TQjmAdgPqF/hcDWxHgbGfHs=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-601-7D72DHpwNK2O5iHGjDusPg-1; Wed, 31 Jan 2024 14:50:26 -0500
+X-MC-Unique: 7D72DHpwNK2O5iHGjDusPg-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 048FD84A291;
+	Wed, 31 Jan 2024 19:50:26 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.245])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 56130C259DD;
+	Wed, 31 Jan 2024 19:50:25 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20240131155220.82641-1-bevan@bi-co.net>
+References: <20240131155220.82641-1-bevan@bi-co.net>
+To: Michael Lass <bevan@bi-co.net>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org,
+    regressions@lists.linux.dev
+Subject: Re: [PATCH] net: Fix from address in memcpy_to_iter_csum()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c973a8fc-2baa-49e8-9c8f-fd63ef348f92@moroto.mountain>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2259906.1706730624.1@warthog.procyon.org.uk>
+Date: Wed, 31 Jan 2024 19:50:24 +0000
+Message-ID: <2259907.1706730624@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.8
 
-On Wed, Jan 31, 2024 at 10:48:02PM +0300, Dan Carpenter wrote:
-> On Wed, Jan 31, 2024 at 08:38:51PM +0100, Antony Antony wrote:
-> > HI Dan,
-> > 
-> > Thanks for reporting the warning.
-> > 
-> > On Tue, Jan 30, 2024 at 01:36:28PM +0300, Dan Carpenter wrote:
-> > > 
-> > > Hello Antony Antony,
-> > > 
-> > > The patch 63b21caba17e: "xfrm: introduce forwarding of ICMP Error
-> > > messages" from Jan 19, 2024 (linux-next), leads to the following
-> > > Smatch static checker warning:
-> > > 
-> > > 	net/xfrm/xfrm_policy.c:3708 __xfrm_policy_check()
-> > > 	error: testing array offset 'dir' after use.
-> > 
-> > > 
-> > > net/xfrm/xfrm_policy.c
-> > >   3689  
-> > >   3690          pol = NULL;
-> > >   3691          sk = sk_to_full_sk(sk);
-> > >   3692          if (sk && sk->sk_policy[dir]) {
-> > >                             ^^^^^^^^^^^^^^^^
-> > > If dir is XFRM_POLICY_FWD (2) then it is one element beyond the end of
-> > > the ->sk_policy[] array.
-> > 
-> > Yes, that's correct. However, for this patch, it's necessary that sk != NULL 
-> > at the same time. As far as I know, there isn't any code that would call dir 
-> > = XFRM_POLICY_FWD with sk != NULL. What am I missing? Did Smatch give any 
-> > hints for such a code path?
-> > 
+Michael Lass <bevan@bi-co.net> wrote:
+
+> While inlining csum_and_memcpy() into memcpy_to_iter_csum(), the from
+> address passed to csum_partial_copy_nocheck() was accidentally changed.
+> This causes a regression in applications using UDP, as for example
+> OpenAFS, causing loss of datagrams.
 > 
-> I wondered if that might be the case.  The truth is that this sort of
-> dependency is too compicated for any static analysis tools that
-> currently exist.  Smatch tries to track the relationship between
-> "dir" and "sk" as they are passed in, but it will look the relationship
-> information when we re-assign sk.  "sk = sk_to_full_sk(sk);".
+> Fixes: dc32bff195b4 ("iov_iter, net: Fold in csum_and_memcpy()")
+> Cc: David Howells <dhowells@redhat.com>
+> Cc: stable@vger.kernel.org
+> Cc: regressions@lists.linux.dev
+> Signed-off-by: Michael Lass <bevan@bi-co.net>
 
-s/look/lose/.  I'm tired.  I should go to bed.
-
-regards,
-dan carpenter
+Acked-by: David Howells <dhowells@redhat.com>
 
 
