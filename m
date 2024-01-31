@@ -1,81 +1,107 @@
-Return-Path: <netdev+bounces-67653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 390DE844716
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 19:27:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB0E1844725
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 19:29:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BA1C1C21DB6
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 18:27:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 340F01F2663C
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 18:29:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2643A12FF78;
-	Wed, 31 Jan 2024 18:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B525813342C;
+	Wed, 31 Jan 2024 18:29:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zr0I78bw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MgD6dl2u"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 649E4131750;
-	Wed, 31 Jan 2024 18:27:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AB0B12FF7C;
+	Wed, 31 Jan 2024 18:29:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706725628; cv=none; b=UQb+xgSuWtx95kYcW58ag+3Hb/aSQnmPrfMKqweNQrwVQzXbxmhBNtXzJv9Uts862fDBJJrfbV9WMu2x2BI5qzs74t9ODt971Gd1u8v4JLsBAIS1Bso0QGC1bGOIRsms92AYUQEOo3cGWvVNm3y/b7TGmOykDotXbfILqgm81Gk=
+	t=1706725777; cv=none; b=IzYczyU6vwIlT6pJqO5mR3FaOIF8FW3tG7dS0wwclSc4LsCt9ifvXyXvXFu3dEzvRGp1Iih0xuOcRaAFoSIaawU8AgWiHqsiGsg00q/Hs1AEuu8JVKnhkHnX0Rmcj2VobIays+gvm23G4IHfUga8D8O89DHeOxuddepwenmqhFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706725628; c=relaxed/simple;
-	bh=yG5pKXzI2U9TEh+X2crF1nYSTpS7SIx9dKJxseUsNn4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y7xviBmGCI3Vev/5JIXRJRdHNAS9iSz2/yCnqXbinbHrcFs64Z7hwvEZNZWp2QHjnDrEUNVRdM+iJDEXPlHs7tCuZ7DfPyQZZ4sQg6w/UlH+ng4pkyLFlqVc/AUpoJRA1tPPTSZbt0gBiKh0CU1Fo4zuukzaf+OzRPPqjqUew9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zr0I78bw; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=hg9/xopq1B8VMQX5winCbXo7MK2kcXX1CEYYe/IOgTw=; b=zr0I78bwzf/kHL9GgaOT8aPq0V
-	AOfR+UzbbbpIqbLyGVcv+3rSQvj4d47+7QwE1iELR1HWRC3VaC13bQ9rg8cihasNKHAOry6OkWvWx
-	2qyZLxoxrVtMEU+W85giReSnveU4jQ8EP6d0uOtdUmOFn5Q+jZeADlsriC+URF1kwUVA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rVFIO-006bdb-Q5; Wed, 31 Jan 2024 19:26:48 +0100
-Date: Wed, 31 Jan 2024 19:26:48 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 0/8] Improve GbEth performance on Renesas RZ/G2L
- and related SoCs
-Message-ID: <953f6b82-c4b1-43f7-af68-e504d663f070@lunn.ch>
-References: <20240131170523.30048-1-paul.barker.ct@bp.renesas.com>
+	s=arc-20240116; t=1706725777; c=relaxed/simple;
+	bh=jqQX/UgTogu7KiUnstYHSz/k8BttGHPXLVteXEvXCpE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Yi1kzJtEGBt4icj4BbuoKgPgcrMW0dVxVDZrt/vMXDlchhWs8UjokDvUNUShoHXROFLzo/KN9O3b362QGz2yiTnjoNvaFvT2FC0KGIZyPuL3MCEYPRQzbMkk1ZiqfcIbmFY+pbVTQV2f+2UIah1mi5A7ghdnm7HVtsiaNP7PiVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MgD6dl2u; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 855A6C433F1;
+	Wed, 31 Jan 2024 18:29:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706725777;
+	bh=jqQX/UgTogu7KiUnstYHSz/k8BttGHPXLVteXEvXCpE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=MgD6dl2uqGq65BlRgZgFSuqpk2JkztKm0mJM4rglpfZ7MOhqVd+XOsfv0E9nPoncE
+	 CtsKKCDZxRBF/4LPRq/my45yLNbKjN3zr9g+INaDpxI8zJJsLL53e+F8KTlbobjqPz
+	 hvHrJOh91Osb28tsJzBvybul30x9iA8voCA46FmTZD21vTYE7y0tJ8ATsEy1Nj89gf
+	 Fw+pSHdruNOF5Rf8M/Mqd4FhcTmkzDOGDhgM13LH/ZsPVHOP3tH+L1IFB4GpogXFSC
+	 x9PvUljeKi3nc+K9s6VWK33PAEup6EwOwyzaofQAbunkKaRgyjRppWKNEQkjxApGP+
+	 Nxy3Jn08VJ6vA==
+Date: Wed, 31 Jan 2024 10:29:32 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ linux-kselftest@vger.kernel.org, Willem de Bruijn <willemb@google.com>
+Subject: Re: [PATCH net-next] selftests/net: calibrate txtimestamp
+Message-ID: <20240131102932.6caac1e2@kernel.org>
+In-Reply-To: <65ba61ea978b4_1699fd294eb@willemb.c.googlers.com.notmuch>
+References: <20240127023212.3746239-1-willemdebruijn.kernel@gmail.com>
+	<20240130174736.03c79071@kernel.org>
+	<65ba61ea978b4_1699fd294eb@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240131170523.30048-1-paul.barker.ct@bp.renesas.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> Changes are made specific to the GbEth IP, avoiding potential impact on
-> the other Renesas R-Car based SoCs which also use the ravb driver. This
-> follows the principle of only submitting patches that we can fully test.
- 
-Are you saying that Renesas does not have access to all Renesas RDKs?
+On Wed, 31 Jan 2024 10:06:18 -0500 Willem de Bruijn wrote:
+> > Willem, do you still want us to apply this as is or should we do 
+> > the 10x only if [ x$KSFT_MACHINE_SLOW != x ] ?  
+> 
+> If the test passes on all platforms with this change, I think that's
+> still preferable.
+> 
+> The only downside is that it will take 10x runtime. But that will
+> continue on debug and virtualized builds anyway.
+> 
+> On the upside, the awesome dash does indicate that it passes as is on
+> non-debug metal instances:
+> 
+> https://netdev.bots.linux.dev/contest.html?test=txtimestamp-sh
+> 
+> Let me know if you want me to use this as a testcase for
+> $KSFT_MACHINE_SLOW.
 
-I don't particularly like the way your first patch makes a copy of
-shared functions. Is it not likely that R-Car would also benefit from
-this?
+Ah, all good, I thought your increasing the acceptance criteria.
 
-	Andrew
+> Otherwise I'll start with the gro and so-txtime tests. They may not
+> be so easily calibrated. As we cannot control the gro timeout, nor
+> the FQ max horizon.
+
+Paolo also mentioned working on GRO, maybe we need a spreadsheet
+for people to "reserve" broken tests to avoid duplicating work? :S
+
+> In such cases we can use the environment variable to either skip the
+> test entirely or --my preference-- run it to get code coverage, but
+> suppress a failure if due to timing (only). Sounds good?
+
++1 I also think we should run and ignore failure. I was wondering if we
+can swap FAIL for XFAIL in those cases:
+
+tools/testing/selftests/kselftest.h
+#define KSFT_XFAIL 2
+
+Documentation/dev-tools/ktap.rst
+- "XFAIL", which indicates that a test is expected to fail. This
+  is similar to "TODO", above, and is used by some kselftest tests.
+
+IDK if that's a stretch or not. Or we can just return PASS with 
+a comment?
 
