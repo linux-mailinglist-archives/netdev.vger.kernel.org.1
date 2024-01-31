@@ -1,166 +1,151 @@
-Return-Path: <netdev+bounces-67446-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67447-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12AA8843833
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 08:46:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E46384384C
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 08:51:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 382D01C209C9
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 07:46:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C07201F26EC2
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 07:51:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F36554F9C;
-	Wed, 31 Jan 2024 07:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB4355C2D;
+	Wed, 31 Jan 2024 07:51:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="jJplRV2g"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="RvrQ/caU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38BDC58135
-	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 07:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A28D5DF35
+	for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 07:50:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706687156; cv=none; b=OhquNA3pA772Xh1XxalUkz409krrEw164wIPB8LmlislWXXiGguF9jn/jkCqFDknzdB4qaynAiotdrUD+avsH/6O4RcWJxu34ILl/8d9Q8dF6n1l63RpoZb0+5aMYQh3z4JRki+3ub4+jgvCBRSuvyHMhkMpBq+mclWwHjqes2o=
+	t=1706687460; cv=none; b=T078Pi2vpxieEIYYIuxHBxo5rPPRf9fEKdjvj1hjOIIgpKqork5f7uogCYoT1K43KVDNsAAVNvjIk4FpUwYV56jAm0VSvalJ0/mN55LPrbglK/iYzT38KBEQh31XFTZXgXuQuWoqIzOzZwUHmQ9Tt8pFDrGPClXSKbZshfYzO7U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706687156; c=relaxed/simple;
-	bh=oXO0S8EkQBuqNAP1QcV7YXuCyhbIOsW0r8fEkR0rwqs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HrmlDCoDTTv6VBNzUq7tySVnHlw2R+7ZLsHKZvJJ90XqGqb1DqEDjVPlmh7s5+WgX+zJFPM3KckpQBeXce7/9H+MVBx0my1YDGdnns6X2RKPsWLf9ynLNsUCxrPHB0mo/fIuqWYC6cCMZllaaHI4R8vFd4Kwhhp6lUBYcAJuysk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=jJplRV2g; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a26f73732c5so599936266b.3
-        for <netdev@vger.kernel.org>; Tue, 30 Jan 2024 23:45:54 -0800 (PST)
+	s=arc-20240116; t=1706687460; c=relaxed/simple;
+	bh=Wc0xOVIWckfRHHIOn/q+oHdUUmf63oj788j1ZPHCFSY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gWYhCH740zKTPd8vDxOBuyNuyzOaSxhi30y+iVRxLUqLOKj79KDulzGoae4EwmQhdPawIvOQ5sL5RtXnKZR+Xz8GedOO9q/WBzVW2M7yliYhX4DKVXmAGrG/Pz40nL1d9/fGdCZUQni4hdyoBtYpM+217ZSSpMiZQcmy5IxVQS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=RvrQ/caU; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706687153; x=1707291953; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GlX3/XcJ4q7qlkl7qz5VNzVWUimap3oMgXG/HE+rFCQ=;
-        b=jJplRV2gzWQUlCVBCV3VhqDp6jasH7lQr8AdmrTe3R+NZMeXF/tGJMHjUa0mhjGc6N
-         oIS05w3QoAYvR/RM15KhwniMyE2jmbJcQL2GooMURKrEnoLcDgCSGVdc4ms/RCY1HNxO
-         LfUWTlg3kkF/35Bk9hSXgsFddAv9wqXl035671spssWckpLH90t2WGKR3oalNd5nYxBd
-         mrtsi5o18RJLx5h9I0Tpj20ijtlXLJuK8oWr8p7bHJ9zgRfc3AWPHsTkqOqTEgbqeaEz
-         ZwptHzL5o21kl0PBHT4YttcMYIJDSLSV/RHFlEOwanFNUZxp+EFODLawrXdLYIF5yq9Z
-         bXpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706687153; x=1707291953;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GlX3/XcJ4q7qlkl7qz5VNzVWUimap3oMgXG/HE+rFCQ=;
-        b=WhLcYYuJlS4Jfm1l5aPc0a2XrCBNCse1HJE2u2HZHDT+dO9C7b8PO/Zhbrz+ARK+km
-         w0Ubu1f6dYI102rTTiSQggnAFe3VWqPg3wFzv5JZbKNp7FY53pUb0+Fwe2SxG37YIphp
-         KjLwFyfsly/hQ7s0BOoINZv+XDc+SHAyx+I/zevI566red86TkMHzLzqqaWAgz+EBnaN
-         G1ocqgEYY+aC/UY7Ul0yCIHqr4vHef+rVw+SDIr+/y8qXlSWfuIvmP4GA0+WfvuKGMJq
-         lXJowP8gt9efek3tqnLpl3b9ekVZDmSrzIV+Mh1bs4HZnxiAPBIFEJLrCGcjdidc96Kl
-         mgag==
-X-Gm-Message-State: AOJu0Yz7+0j/icqtA3yKqbrUml2Au03tJRiRIpkyzoelmV4lksw9GXTQ
-	w78aWw7e37vMGq4iGS6Op7PPokSUL0Q8H3n8FP399PTJgTOLxsJPWsvTNaNWHq8=
-X-Google-Smtp-Source: AGHT+IFdt9UmrYZi1LDJaUZN6v4OsBwX0Wx45/vHyal7niLOuagGLOWO4SXaO/A1B2GY2WReWwPAPA==
-X-Received: by 2002:a17:906:234e:b0:a36:2dc:1903 with SMTP id m14-20020a170906234e00b00a3602dc1903mr494495eja.68.1706687153351;
-        Tue, 30 Jan 2024 23:45:53 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWsega7ZdA6a/BqxICUW4OxzCdFaE0moY3j8YVcxaOlRVZhqUSqLh3uwJ6d030OhbTppkjffadP3AiTtuXNpXPQTpMDPeh3ZnETrX72AyaWeCVL7sAltxVTJSVcbT1z88FjbLt96vM13+kwvUInZavDGXLBFJPFWLRtyURoI+Y13a0Lf3fLV8n+gfpK1RURRhYyHiWtMx8Eci4LAkGHBbUO/LwKX0sg4Ec2Yac3anBtBAbSoPV8LmWTTChxGTGXg5GjU9Y5IBCvTXgH4pH2FqGaYkX3Fto49XCVALQiymP6VvKKyMz1a5vdgdzyZNHbGkpz8SAab/PvxOHUVxUyYn3/V/8x6LUO2Um+d9RZwVvGvixxNGWPCKw2HBItGqNA3NUqvEyrAGhT3gjYHzdvtPsjVWaGFl3GfBH7ns+Tztks2OJ0skbQxqag6lKVZqtssAsRYPyx8aAYNrmwZv+mmj49zs98zv7Iin8=
-Received: from [192.168.1.20] ([178.197.222.62])
-        by smtp.gmail.com with ESMTPSA id d11-20020a170907272b00b00a360fe9a7b0sm1738640ejl.23.2024.01.30.23.45.50
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 30 Jan 2024 23:45:52 -0800 (PST)
-Message-ID: <b48fa0bd-18e1-4268-9e7a-8199f5d180e8@linaro.org>
-Date: Wed, 31 Jan 2024 08:45:49 +0100
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1706687456; x=1738223456;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=KX4ONkvDBzPCJ/JU8NWuUGEp9jRU1yWD5msoD5yYawA=;
+  b=RvrQ/caUMyhzSTuiyVAvwShp0Aq/r2ROdJirDuk6itUKVRPzVJbd6tfB
+   fxBWOLpCsAAsh4auylTCrntZnU1mBHLnxNHB93Eau6A98Zq2tl1rF3eKq
+   tGA59oIICHSha5yaAB4mRETSFKeHqrnwi5XNXX2whDVFJg2McdyopuQnm
+   3d2a0CuUde/kbuePoNxXjkRBg6X8XwTA87WGTGTy7aIeKvMieelzAJJAW
+   A5lukBCprbmfJlBL4nC8+dMSckTbJEPE+fD+OwKqpfAWUXvMYEMpqud6r
+   xovbklOj5+WeLQtFaNxHeHlzNNbTbJpnxRQavKvsqzkDZpSU9Nm19Wav+
+   Q==;
+X-IronPort-AV: E=Sophos;i="6.05,231,1701126000"; 
+   d="scan'208";a="35162019"
+Received: from vtuxmail01.tq-net.de ([10.115.0.20])
+  by mx1.tq-group.com with ESMTP; 31 Jan 2024 08:50:52 +0100
+Received: from steina-w.tq-net.de (steina-w.tq-net.de [10.123.53.25])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by vtuxmail01.tq-net.de (Postfix) with ESMTPSA id 1718B280075;
+	Wed, 31 Jan 2024 08:50:52 +0100 (CET)
+From: Alexander Stein <alexander.stein@ew.tq-group.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Stein <alexander.stein@ew.tq-group.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next RESEND 1/1] net: phy: dp83867: Add support for active-low LEDs
+Date: Wed, 31 Jan 2024 08:50:48 +0100
+Message-Id: <20240131075048.1092551-1-alexander.stein@ew.tq-group.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/3] dt-bindings: net: cdns,macb: Add
- wol-arp-packet property
-Content-Language: en-US
-To: Vineeth Karumanchi <vineeth.karumanchi@amd.com>,
- Andrew Lunn <andrew@lunn.ch>
-Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
- conor+dt@kernel.org, linux@armlinux.org.uk, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, git@amd.com
-References: <20240130104845.3995341-1-vineeth.karumanchi@amd.com>
- <20240130104845.3995341-3-vineeth.karumanchi@amd.com>
- <824aad4d-6b05-4641-b75d-ceaa08b0a4e8@lunn.ch>
- <09ce2e81-01cc-431f-8acb-076a54e5a7e6@amd.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <09ce2e81-01cc-431f-8acb-076a54e5a7e6@amd.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 31/01/2024 08:39, Vineeth Karumanchi wrote:
-> Hi Andrew,
-> 
-> 
-> On 31/01/24 6:56 am, Andrew Lunn wrote:
->> On Tue, Jan 30, 2024 at 04:18:44PM +0530, Vineeth Karumanchi wrote:
->>> "wol-arp-packet" property enables WOL with ARP packet.
->>> It is an extension to "magic-packet for WOL.
->>
->> It not clear why this is needed. Is this not a standard feature of the
->> IP? Is there no hardware bit indicating the capability?
->>
-> 
-> WOL via both ARP and Magic packet is supported by the IP version on ZU+ 
-> and Versal. However, user can choose which type of packet to recognize 
-> as a WOL event - magic packet or ARP. The existing DT binding already 
-> describes one entry for wol via magic packet. Hence, adding a new packet 
-> type using the same methodology.
+Add the led_polarity_set callback for setting LED polarity.
 
-And why would this be board-level configuration? This looks like OS policy.
+Signed-off-by: Alexander Stein <alexander.stein@ew.tq-group.com>
+---
+With the addition of LED polarity modes, PHY LEDs attached to this PHY can
+be configured as active-low.
 
-Best regards,
-Krzysztof
+Note1: This callback is only called if at least once bit of 'enum phy_led_modes'
+  is set. This works only because active-high is default on this hardware.
+
+Note2: DP83867_SW_RESET in dp83867_phy_reset clears any previously set config.
+  This needs to be addressed as well. Same for interface down/up cycle which
+  might include a hardware reset as well. So LED config needs to be cached.
+
+But that's independent from this change.
+
+This is just a resend with target tree named in subject
+
+[1] https://lore.kernel.org/all/20240125203702.4552-4-ansuelsmth@gmail.com/
+
+ drivers/net/phy/dp83867.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/drivers/net/phy/dp83867.c b/drivers/net/phy/dp83867.c
+index 5f08f9d38bd7a..4120385c5a79d 100644
+--- a/drivers/net/phy/dp83867.c
++++ b/drivers/net/phy/dp83867.c
+@@ -158,6 +158,7 @@
+ /* LED_DRV bits */
+ #define DP83867_LED_DRV_EN(x)	BIT((x) * 4)
+ #define DP83867_LED_DRV_VAL(x)	BIT((x) * 4 + 1)
++#define DP83867_LED_POLARITY(x)	BIT((x) * 4 + 2)
+ 
+ #define DP83867_LED_FN(idx, val)	(((val) & 0xf) << ((idx) * 4))
+ #define DP83867_LED_FN_MASK(idx)	(0xf << ((idx) * 4))
+@@ -1152,6 +1153,26 @@ static int dp83867_led_hw_control_get(struct phy_device *phydev, u8 index,
+ 	return 0;
+ }
+ 
++static int dp83867_led_polarity_set(struct phy_device *phydev, int index,
++				    unsigned long modes)
++{
++	/* Default active high */
++	u16 polarity = DP83867_LED_POLARITY(index);
++	u32 mode;
++
++	for_each_set_bit(mode, &modes, __PHY_LED_MODES_NUM) {
++		switch (mode) {
++		case PHY_LED_ACTIVE_LOW:
++			polarity = 0;
++			break;
++		default:
++			return -EINVAL;
++		}
++	}
++	return phy_modify(phydev, DP83867_LEDCR2,
++			  DP83867_LED_POLARITY(index), polarity);
++}
++
+ static struct phy_driver dp83867_driver[] = {
+ 	{
+ 		.phy_id		= DP83867_PHY_ID,
+@@ -1184,6 +1205,7 @@ static struct phy_driver dp83867_driver[] = {
+ 		.led_hw_is_supported = dp83867_led_hw_is_supported,
+ 		.led_hw_control_set = dp83867_led_hw_control_set,
+ 		.led_hw_control_get = dp83867_led_hw_control_get,
++		.led_polarity_set = dp83867_led_polarity_set,
+ 	},
+ };
+ module_phy_driver(dp83867_driver);
+-- 
+2.34.1
 
 
