@@ -1,93 +1,78 @@
-Return-Path: <netdev+bounces-67383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F4658432A9
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 02:20:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 113A28432B3
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 02:26:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 239C1B237B1
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 01:20:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4424E1C21010
+	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 01:26:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86B037FA;
-	Wed, 31 Jan 2024 01:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 421AEA2A;
+	Wed, 31 Jan 2024 01:26:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kg/tKFk3"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cAnxPAOd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59AF84C65;
-	Wed, 31 Jan 2024 01:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CC161366;
+	Wed, 31 Jan 2024 01:26:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706664026; cv=none; b=cX8JQjVIgnAgsBboesIyACAODpT2r6vAmDbNVu9Rt2py3X4ktT8Czz3nZgYi4PKz4QHKmLLejO5JbdTQHNYmB0B4YA9aOOqsSUmBriZYBTrIYtTz43eDNPElsGJXOuIbVRxnRpfnsCQiXL31HlP4jIcf3J4y14+NQ/xTqwq55mw=
+	t=1706664402; cv=none; b=AKusg0fRPyv6xdz2rzhDlAoAhLDrUHMcI9d4OUKxboQrhq92bwtW/fu60tHpFiO+oQBLqkvQfKe0mYECG8xyQ/GnmGmt2OsN0h8D8q8KdfJlJmjzmb4T8VnZ8QwnLj65l0W5qDN5jk1iXmbLW/aTARHGg1znbbKXRfukBKwjCE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706664026; c=relaxed/simple;
-	bh=uDA455Pv69DDJHi8Ti0vcIAvDtygawzLM08+OuqQ/cw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ceVOHUWBzZU2RHwvPm3pFCed0ho8r3lWnsv7eWRhGDMvYnCuSymhENrXtfFBePshexUbKBCX//Q82E/KYu28d+T9PIPyB54NsN6wCe7UwRgQ3wo/gfK9rYsSlUBzLzyn3uUqkelZ0JK+MIn3c85hquhteN3P8GbIEuj85AmP0RM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kg/tKFk3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CFE88C43390;
-	Wed, 31 Jan 2024 01:20:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706664025;
-	bh=uDA455Pv69DDJHi8Ti0vcIAvDtygawzLM08+OuqQ/cw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Kg/tKFk32q01ka/Zw9x8SpNQx9EEXFf956jBIJmXfLV2onqGxMPA0JhwzPVPDucFT
-	 noBO9hysv4tDOo7L+kc7Lx8ZUugiGyHNub9FutJMLLsz9KWXd3ZJhH41mi8IyIk23/
-	 YtTl0P9cXiNQA6ertvC5bzOYQG5H7FY7qaqeB7Ro6Lgnrf9UgbaNLLmG87iHp+LlLk
-	 Ay0oJBDQZyeFaA7C81FMB8im+pWU9Q8Kt94qCBWQZA+9RWD0F36h2xyEc3oyl2gkq3
-	 tOHM1IWAo2KvqlYuFWRc3I+8Op7YKhQm1zZKuWlMrbswM3ef77hQQg9czJ59QUxIXb
-	 YJ9qWHk7uL8fg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B7025C4166F;
-	Wed, 31 Jan 2024 01:20:25 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1706664402; c=relaxed/simple;
+	bh=y/w2o0K99J5lhMm3nbPifN6jz4SsD7/L8rq9AFM/jXg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sylkvNmmhbTnFZEuuonycNIG19tAa6SDlAoZNO+0A/ycGvhZ6ikDruKXPX0xnJRtl+zSvKiX+rJT7uJXQN79sPHJHQqtzYIm1VMba8pcKTboF2n1+Szo7b66XFhf3esXXAIAzARijT7fcnEC9A5IehlBoy1Ag0gRrTxfB7ivl1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cAnxPAOd; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=64H+AS77GSweExe9sdGygbTFKGZ9x1KjAbkYtG8yLv0=; b=cAnxPAOdsYELZmcpp19XvdrmD2
+	8w8xq5uq1IVwgd4wEATNllDFMYlMsFedZF8z/MqLg6lYdsFy3CRyS3wSEolqn9ijNbqMMRHFNyXXu
+	qZsMYVffFIewzuxe2RusJfbt6vVR9v4dpEckBsPVmKYknpPzhvEzjX6rj6NsSLkB7PuE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rUzMl-006XdP-6w; Wed, 31 Jan 2024 02:26:15 +0100
+Date: Wed, 31 Jan 2024 02:26:15 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
+Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	linux@armlinux.org.uk, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	git@amd.com
+Subject: Re: [PATCH net-next 2/3] dt-bindings: net: cdns,macb: Add
+ wol-arp-packet property
+Message-ID: <824aad4d-6b05-4641-b75d-ceaa08b0a4e8@lunn.ch>
+References: <20240130104845.3995341-1-vineeth.karumanchi@amd.com>
+ <20240130104845.3995341-3-vineeth.karumanchi@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: rds: Simplify the allocation of slab caches in
- rds_conn_init
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170666402574.11970.2150907643973879045.git-patchwork-notify@kernel.org>
-Date: Wed, 31 Jan 2024 01:20:25 +0000
-References: <20240124075801.471330-1-chentao@kylinos.cn>
-In-Reply-To: <20240124075801.471330-1-chentao@kylinos.cn>
-To: Kunwu Chan <chentao@kylinos.cn>
-Cc: santosh.shilimkar@oracle.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org, rds-devel@oss.oracle.com,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240130104845.3995341-3-vineeth.karumanchi@amd.com>
 
-Hello:
+On Tue, Jan 30, 2024 at 04:18:44PM +0530, Vineeth Karumanchi wrote:
+> "wol-arp-packet" property enables WOL with ARP packet.
+> It is an extension to "magic-packet for WOL.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+It not clear why this is needed. Is this not a standard feature of the
+IP? Is there no hardware bit indicating the capability?
 
-On Wed, 24 Jan 2024 15:58:01 +0800 you wrote:
-> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-> to simplify the creation of SLAB caches.
-> 
-> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
-> ---
->  net/rds/connection.c | 4 +---
->  1 file changed, 1 insertion(+), 3 deletions(-)
-
-Here is the summary with links:
-  - net: rds: Simplify the allocation of slab caches in rds_conn_init
-    https://git.kernel.org/netdev/net-next/c/047a7d261be6
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+    Andrew
 
