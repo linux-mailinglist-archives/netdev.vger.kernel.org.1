@@ -1,141 +1,168 @@
-Return-Path: <netdev+bounces-68137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C6A7845E38
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:12:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B52BE845E46
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:14:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B258BB28450
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:11:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7A5D1C228EF
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:14:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B8C2161B5B;
-	Thu,  1 Feb 2024 17:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FC4160888;
+	Thu,  1 Feb 2024 17:14:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="O350cbXh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yi6vpXtg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF4B1161B63
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 17:10:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E25116087F
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 17:14:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706807404; cv=none; b=iX4b85ZBcGiBUAYEqzqy+QBdqayJUxxbtR9nS1EECVUH+/30zHAkN4ewsKZL0dU1Ue0LVDFdOf39D22C4LZBqfCcr0WimSsbAzbClJVO+2C4KBX1i45bfM41KOeTmRBXjutjXN7cy47DZYFhqOeJopTMEbbLfaJR2ZPWl6X4Q3Y=
+	t=1706807662; cv=none; b=QuvStXPs1q3M2+ht9S63dxwz0MCudoGc8hJ6KikHHviMO62fPKDzo9hd+4LlecLPNgo+QT6dyM71BF68yS7coevy60iLeW4LrVBx1sEPpQNp4BezgKQjxTa/A0bzgmlkKV8nyXIAMqPflb3gsI9Z8meg6aUIo4JoLtpFaH6F+x0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706807404; c=relaxed/simple;
-	bh=tIuUHEiTAyNoogXhr1fPfKvWp3GOsNFmlGQo6c4DLcA=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=B8Y2GQcm7S4qZ0+vaQXAqTTIQLyE6uX1qfEI8R6I/PsL1KICA9ttUcxeJKiz12Zlo75koBfsfwcWRtiyoA8XA5XSfhFRFVWNHqH5I6Bo+WdpBUyC2wHh1tGsfK3hJAKRPKwLRBX6+Moj3bgX9Uv/uH+siTcrmcmKcN3Jl0HJ79s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=O350cbXh; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6ba5fdf1aso1580441276.1
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 09:10:02 -0800 (PST)
+	s=arc-20240116; t=1706807662; c=relaxed/simple;
+	bh=gU8thq7J5TCYF34U/LU+7wEBu8KKfhhL845/dKJ4GxI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VdlNAeIxRv06FPqp31ejueTlIR6qnCesCaZj2KNPzHEgndL8nXKuL8YuEIAdinfQPYEAibof19Kk+WZ8tcYUSN6f/+xAdZvFqq+QLlrQn+Vp/HHrRhc3k43nAERs6C3c/Hk1Ve4mgujHdCZiJpfil5dWXQZdA7iIbTUPOy3ww6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yi6vpXtg; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-604123a7499so12334457b3.3
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 09:14:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706807402; x=1707412202; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sYHPXhTKrhLq5KSpWdX/0gb12Fsu7f5tuc69AnEURmI=;
-        b=O350cbXh56CFPUaGVHyMNc3pj2S15o+bMuyWJytz6Ku9qkLFs7Hh6tBFqvzTJ4xip6
-         szBPVN0OrZkgih3OCuQrctsLWbyryU93ybBLuvaRfBaws3JxWgeShFZa8OemCh64pazC
-         hRNZJxDhlLShhLCjEcneQX9pVDw69UY4PfYqEEEvAn6HpzImwKT1QI1JxSxi/c8mkF6V
-         tJFA51jEeECo8X2CvemLtcd1uieUGpcSVgCXpaDPZ2vQTEicB2Wam7yTY82cFqI1Gr0u
-         k3muDLmFhoGbEIWHA56kLeAHMTwB+Pj/b+ENyzDVPOZXRWLGZTIi3wdAA2GmzBmX7733
-         Pt/w==
+        d=gmail.com; s=20230601; t=1706807659; x=1707412459; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=BODdxd4JD+654DTMxsqMEdGHW0fURTYjfBFForLZ/KI=;
+        b=Yi6vpXtgnOKQASMBaJP0lQUl2jPQQP0su/iYzn78zk8Bmtp+q6rCJKrC/tJ63WpfFP
+         gXRreOVUPH4Q8UM56yrbkna/ZnjXD0jaIwxqe3+psu9mZBfPRJEWvTOxcJPsyZbl5koA
+         KToBN6IEi3EpyHl1KsCsea2WfR7nYEEYVqVKHjjnEoOcLDcBuR5TTTWaPvJ/hEfjFil5
+         wtQ6FxJMx5xRBXjVI52NSuFocCBcKOs79ZKAZXNpCQw1YMmyfmK2bkYnFOyVvca3dO7j
+         lIROhC5F99gMIpYFoL4sgWnAwrPb3oYmhcHn3+b094Dv46S772YvXorllEJb2Ee/+guG
+         fqcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706807402; x=1707412202;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=sYHPXhTKrhLq5KSpWdX/0gb12Fsu7f5tuc69AnEURmI=;
-        b=FBjzA61xyTXsavj4A2IlGzVNXY9iCWHjtX3m/s32MTNDYXVJfTgu7IBJwZa4YL+I0e
-         NeenhRrlzF12P5O+LYr/i7pptWX9ZkQM0BW2Wuh3o4amWJ+1BfScveFf6jPeGh9THm4s
-         k8aynSfio2MTFxms7eaQP1Vo9tz/sm8XsZYHdB9u4TUmUBWeqH3bj8f8WONbGt0rbicx
-         NKRVc1mjmyupcU3xE+V8JLf89hU8QjwPlxEHM6ADHPUXqAXZVTnmeLnUsmcwPyPjC8fI
-         kqiXReD7KONqrHlf19OdF4sYMVxuHx3NlpV5iAOdk5dW0kiM3GQwDHejODfnYxwPeFHO
-         mkgQ==
-X-Gm-Message-State: AOJu0YxtyJNaaDlIRd2TecAq0NcdhGPNrwNGuobYMrM73xE1eV2JMn5L
-	vEGXbTBSDwWDSy9sx3ocVq9yHIZkQ3EwR1BRPfZJDlpX5eLHXQubR/OARDVC9532QNKYHtX9KAG
-	YxrlnX2jVdQ==
-X-Google-Smtp-Source: AGHT+IHIzKVQkUClFuD/rDCLjIQW8AK3j+JeSkzVkeoNikvjRS/4fto9Kkhf10IutEsEK4a/ZULGUBNCFCHhLg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:2602:b0:dc2:3426:c9ee with SMTP
- id dw2-20020a056902260200b00dc23426c9eemr192334ybb.11.1706807401889; Thu, 01
- Feb 2024 09:10:01 -0800 (PST)
-Date: Thu,  1 Feb 2024 17:09:37 +0000
-In-Reply-To: <20240201170937.3549878-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1706807659; x=1707412459;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=BODdxd4JD+654DTMxsqMEdGHW0fURTYjfBFForLZ/KI=;
+        b=OJXE19CDEq8ybyws/YBEidfH0YPgtOy15rdtwM1T6cRvT93SOjJ1MvktRwQ16/bHYw
+         5OZLbLpHZx9KHWlq2AxTEXOagH9xgG4aR5KT6mNLgfAPx1VZ9l3VgmLpwrZ9x/xIPJxU
+         w1Y5sKs7+W2TTaW5zkxnBGjiUvV87uKv87PXdbngNanuJ7Rb0mazCN+IWBlXYuulog9S
+         vdEdmY6SMPCZOMZQyed2Is/zSIONZMRiglGQ1St6qFtw6NUZh/1L7CdjkXbD1EK6JlVA
+         lwC/JCXfWBw/SJCMMIWOfiZtMbIS9O7utlrcBk4k3L3XD+elzJlNU++qolprcTo6k3Wx
+         rwpw==
+X-Gm-Message-State: AOJu0YxcG4W/Lir5DRdZ1GotkXRW3wJgWRjyte/BbadUvKRPnaNAXfly
+	KKLS/WbkSTsPAkf3ZkE473Yqup92SWQS429rB1x/LE8c2jdxizUu8mg673Hp
+X-Google-Smtp-Source: AGHT+IGfuT4IiPO0+Fww2hxl8xPzUw5v8ANjG/0TuIeqlF71izScDxK1mvftSKZTevxec8QTx21/7A==
+X-Received: by 2002:a0d:d901:0:b0:5ff:58f1:9944 with SMTP id b1-20020a0dd901000000b005ff58f19944mr5305828ywe.30.1706807659453;
+        Thu, 01 Feb 2024 09:14:19 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUKVetHWLgS8L6a9vrcAsBCcio3w8xBYqT8Q74pQoOTRIQ6o0iFEd/4lH1Jlhxp2mF6SN/Hof6OEkO/tHQEjbYeREXLgdq4+MhNFQZT76S360o9BVAHHE17t1bKwwRp4ElS0U1x5Yy+pZ2kWM3ScCnWcSd/eNShWlNLA0ZTBv/DjbexFy+xYIAJXKs1zLVbJsA/qWdqhVcW66NxsRaj+R/PHiJp+yQAVSDj28GzLkLW+ZHGPywBnNYnWbWs3wqJB5iFBOJu0DkO/F44DwQK8OHJ8RP//KbvB8lT9YqmbluSiE+apv/pPxU1G03qnLL4ALBGsK1H
+Received: from ?IPV6:2600:1700:6cf8:1240:16d4:21fd:67de:3e7? ([2600:1700:6cf8:1240:16d4:21fd:67de:3e7])
+        by smtp.gmail.com with ESMTPSA id cp33-20020a05690c0e2100b005effa4feef0sm4406784ywb.58.2024.02.01.09.14.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Feb 2024 09:14:19 -0800 (PST)
+Message-ID: <22cc962a-c300-49ee-95ee-76d9f794e23a@gmail.com>
+Date: Thu, 1 Feb 2024 09:14:17 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240201170937.3549878-1-edumazet@google.com>
-X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-Message-ID: <20240201170937.3549878-17-edumazet@google.com>
-Subject: [PATCH net-next 16/16] xfrm: interface: use exit_batch_rtnl() method
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 5/5] selftests/net: Adding test cases of
+ replacing routes and route advertisements.
+Content-Language: en-US
+To: Hangbin Liu <liuhangbin@gmail.com>, thinker.li@gmail.com
+Cc: netdev@vger.kernel.org, ast@kernel.org, martin.lau@linux.dev,
+ kernel-team@meta.com, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, kuifeng@meta.com
+References: <20240131064041.3445212-1-thinker.li@gmail.com>
+ <20240131064041.3445212-6-thinker.li@gmail.com> <ZbtabpEr7I6Gy5vE@Laptop-X1>
+From: Kui-Feng Lee <sinquersw@gmail.com>
+In-Reply-To: <ZbtabpEr7I6Gy5vE@Laptop-X1>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-exit_batch_rtnl() is called while RTNL is held,
-and devices to be unregistered can be queued in the dev_kill_list.
 
-This saves one rtnl_lock()/rtnl_unlock() pair per netns
-and one unregister_netdevice_many() call.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/xfrm/xfrm_interface_core.c | 14 ++++++--------
- 1 file changed, 6 insertions(+), 8 deletions(-)
+On 2/1/24 00:46, Hangbin Liu wrote:
+> Hi,
+> 
+> On Tue, Jan 30, 2024 at 10:40:41PM -0800, thinker.li@gmail.com wrote:
+>> +# Create a new dummy_10 to remove all associated routes.
+>> +reset_dummy_10()
+>> +{
+>> +	$IP link del dev dummy_10
+>> +
+>> +	$IP link add dummy_10 type dummy
+>> +	$IP link set dev dummy_10 up
+>> +	$IP -6 address add 2001:10::1/64 dev dummy_10
+>> +}
+>> +
+>>   fib6_gc_test()
+>>   {
+>>   	setup
+>> @@ -768,15 +778,19 @@ fib6_gc_test()
+>>   	    $IP -6 route add 2001:20::$i \
+>>   		via 2001:10::2 dev dummy_10 expires $EXPIRE
+>>   	done
+>> -	sleep $(($EXPIRE * 2))
+>> -	N_EXP_SLEEP=$($IP -6 route list |grep expires|wc -l)
+>> -	if [ $N_EXP_SLEEP -ne 0 ]; then
+>> -	    echo "FAIL: expected 0 routes with expires, got $N_EXP_SLEEP"
+>> +	sleep $(($EXPIRE * 2 + 1))
+>> +	N_EXP=$($IP -6 route list |grep expires|wc -l)
+>> +	if [ $N_EXP -ne 0 ]; then
+>> +	    echo "FAIL: expected 0 routes with expires, got $N_EXP"
+>>   	    ret=1
+>>   	else
+>>   	    ret=0
+>>   	fi
+>>   
+>> +	log_test $ret 0 "ipv6 route garbage collection"
+>> +
+>> +	reset_dummy_10
+> 
+> Since you reset the dummy device and will not affect the later tests. Maybe
+> you can log the test directly, e.g.
+> 
+> 	if [ "$($IP -6 route list |grep expires|wc -l)" -ne 0 ]; then
+> 		log_test $ret 0 "ipv6 route garbage collection"
+> 	fi
+> 
+> Or, if you want to keep ret and also report passed log, you can wrapper the
+> number checking like
+> 
+> check_exp_number()
+> {
+> 	local exp=$1
+> 	local n_exp=$($IP -6 route list |grep expires|wc -l)
+> 	if [ "$n_exp" -ne "$exp" ]; then
+> 		echo "FAIL: expected $exp routes with expires, got $n_exp"
+> 		ret=1
+> 	else
+> 		ret=0
+> 	fi
+> }
+> 
+> Then we can call it without repeating the if/else lines
+> 
+> 	check_exp_number 0
+> 	log_test $ret 0 "ipv6 route garbage collection"
 
-diff --git a/net/xfrm/xfrm_interface_core.c b/net/xfrm/xfrm_interface_core.c
-index 21d50d75c26088063538d9b9da5cba93db181a1f..dafefef3cf51a79fd6701a8b78c3f8fcfd10615d 100644
---- a/net/xfrm/xfrm_interface_core.c
-+++ b/net/xfrm/xfrm_interface_core.c
-@@ -957,12 +957,12 @@ static struct rtnl_link_ops xfrmi_link_ops __read_mostly = {
- 	.get_link_net	= xfrmi_get_link_net,
- };
- 
--static void __net_exit xfrmi_exit_batch_net(struct list_head *net_exit_list)
-+static void __net_exit xfrmi_exit_batch_rtnl(struct list_head *net_exit_list,
-+					     struct list_head *dev_to_kill)
- {
- 	struct net *net;
--	LIST_HEAD(list);
- 
--	rtnl_lock();
-+	ASSERT_RTNL();
- 	list_for_each_entry(net, net_exit_list, exit_list) {
- 		struct xfrmi_net *xfrmn = net_generic(net, xfrmi_net_id);
- 		struct xfrm_if __rcu **xip;
-@@ -973,18 +973,16 @@ static void __net_exit xfrmi_exit_batch_net(struct list_head *net_exit_list)
- 			for (xip = &xfrmn->xfrmi[i];
- 			     (xi = rtnl_dereference(*xip)) != NULL;
- 			     xip = &xi->next)
--				unregister_netdevice_queue(xi->dev, &list);
-+				unregister_netdevice_queue(xi->dev, dev_to_kill);
- 		}
- 		xi = rtnl_dereference(xfrmn->collect_md_xfrmi);
- 		if (xi)
--			unregister_netdevice_queue(xi->dev, &list);
-+			unregister_netdevice_queue(xi->dev, dev_to_kill);
- 	}
--	unregister_netdevice_many(&list);
--	rtnl_unlock();
- }
- 
- static struct pernet_operations xfrmi_net_ops = {
--	.exit_batch = xfrmi_exit_batch_net,
-+	.exit_batch_rtnl = xfrmi_exit_batch_rtnl,
- 	.id   = &xfrmi_net_id,
- 	.size = sizeof(struct xfrmi_net),
- };
--- 
-2.43.0.429.g432eaa2c6b-goog
+If I read it correctly, the point here is too many boilerplate checks,
+and you prefer to reduce them. Right?
+No problem! I will do it.
 
+
+> 
+> Thanks
+> Hangbin
 
