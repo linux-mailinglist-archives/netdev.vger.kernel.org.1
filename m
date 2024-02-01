@@ -1,73 +1,50 @@
-Return-Path: <netdev+bounces-67901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74632845484
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 10:48:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C3A484548A
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 10:50:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A0A21C24D74
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 09:48:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EF041C24447
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 09:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 969354DA15;
-	Thu,  1 Feb 2024 09:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55BE04DA15;
+	Thu,  1 Feb 2024 09:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E62Ygaq8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rgKKp9Fb"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F304DA07
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 09:48:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF3C4D9E8;
+	Thu,  1 Feb 2024 09:50:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706780886; cv=none; b=lRqK8KUWLyrd3X7qSUn0nHpss9S1Ai4DebcNrY/uEbQBUzaNPcJ9/dIz5iQIY/TU/x2i6M5goiu4c34oeo/Nh9lpNHakU8Nd+xT++i08oL5nl2HjWkslzJHT0SBfYePnCS4Jadk4zrxTEmYUykBqQOtPJs7haTwH5dX62Hp9xxI=
+	t=1706781026; cv=none; b=TjHuVtOsJOdCV2AO6oZfK2MeznItZ1tfkdNuae69TvohgAPB6/tlzDHUZWkukAHZGFeX7Qf1KcGVBbpEyMgPpH7jSqBEopClrT0kjYY4vp63NunPxXel1BVtpf3D7ZPlbvtmOq73sSKXqsZGdWQ88Df04HVDINo560iJHaim9go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706780886; c=relaxed/simple;
-	bh=W8ueSTQV9H7E/wwgKuME47isVu3e6OuRVGwZ2kTJe4g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CWgXqqPdelVEl8ndTS1LykcphqQvwf6BeChJpOc6tbP/+NEY5Y2FIu1PX0Xr5Tjx+ZrREYSh05Vjy/zTlnPh+BzrUpBbmATLlu9jk1xXFoYIGUtlF328kJ8/lWYSUSmi7NDxh5TFwkY1Q4AIowbfVqnrhal7+TqHRucMTm6CLIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E62Ygaq8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706780883;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=FJgqeoCkyruSUGWxSYUKZ7d4Y/5G+4ikFi2lBwdoA7E=;
-	b=E62Ygaq8v3Jxb5hhzEAozH387dmsWmkMGuvgp7E3dI9JV3yarvrSFjoFi6JeA4a2jX14YA
-	SB+njV0mp4ivASS5zbZHWkwCsrUR0zST/eWOdnvu2KoD0YpMffcNO3q56Kggr7qRANmWTX
-	/jjvTHgLpdeiwygX5081sCArr5svKZE=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-298-s17VHR53PCmLTjArLwOQjw-1; Thu, 01 Feb 2024 04:47:59 -0500
-X-MC-Unique: s17VHR53PCmLTjArLwOQjw-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F1238881C81;
-	Thu,  1 Feb 2024 09:47:58 +0000 (UTC)
-Received: from p1.luc.cera.cz (unknown [10.45.225.38])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 4B1451C060AF;
-	Thu,  1 Feb 2024 09:47:57 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Egor Pomozov <epomozov@marvell.com>,
-	Igor Russkikh <irusskikh@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Dmitry Bezrukov <dmitry.bezrukov@aquantia.com>,
-	Sergey Samoilenko <sergey.samoilenko@aquantia.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net] net: atlantic: Fix DMA mapping for PTP hwts ring
-Date: Thu,  1 Feb 2024 10:47:51 +0100
-Message-ID: <20240201094752.883026-1-ivecera@redhat.com>
+	s=arc-20240116; t=1706781026; c=relaxed/simple;
+	bh=heLY3xnN70UESqZim9udaT6wWjubP3iz/pVeh/8OHPU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=BfvQAeFN7sf3hdWEiMXLcJYERgkQLuKYfnbnEP1tq+bK6T5DEDF3P6m+bsb/BNG99CS6pmdHPgrwQpE0TOzkFootgaKMiz8xIJtH21B2g9YKvlmnSGviBkCtMhpvC50L2hkFdNT4gWSOCmmGZnN1PRG5kwbcfYzRMWPjtLLkhqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rgKKp9Fb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8F589C43390;
+	Thu,  1 Feb 2024 09:50:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706781025;
+	bh=heLY3xnN70UESqZim9udaT6wWjubP3iz/pVeh/8OHPU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=rgKKp9FbcwRq7eKMdfalaqj6Y8h8fvF2beSM+I8W6k8QC2MXe8b9mzLL1cKvYwNeV
+	 uYzKcPMG5J7KjaLA3L+AV+exroAYZg6LBMU//VkEOt3mK9/ua+nttRjDjIUfLryoDg
+	 ZX7UTbfli7eWtjl0Al9lh6JMxofINjyeTDuQ4MAamMcaZCCPYbnQHJr4bpdHuJngHw
+	 AUUEUb5igSoX7q9T/rRw0li3C4SyvyMlDcP6xZiGIm1gBKbP99Yv/PHwMkhBiJr4l7
+	 GLpDkuRsFpOFHC0t87EIzSFx8h5vXC2sGL3rHlUH3Z16LCRw3/nsR7qEfhy4iIb/cH
+	 3ocqvumSGmzDw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 75392DC99E5;
+	Thu,  1 Feb 2024 09:50:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,115 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+Subject: Re: [PATCH] dt-bindings: net: qcom,ipa: do not override firmware-name
+ $ref
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170678102547.16078.6373938266088244682.git-patchwork-notify@kernel.org>
+Date: Thu, 01 Feb 2024 09:50:25 +0000
+References: <20240129142121.102450-1-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20240129142121.102450-1-krzysztof.kozlowski@linaro.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: andersson@kernel.org, konrad.dybcio@linaro.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+ krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, elder@kernel.org,
+ linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Function aq_ring_hwts_rx_alloc() maps extra AQ_CFG_RXDS_DEF bytes
-for PTP HWTS ring but then generic aq_ring_free() does not take this
-into account.
-Create and use a specific function to free HWTS ring to fix this
-issue.
+Hello:
 
-Trace:
-[  215.351607] ------------[ cut here ]------------
-[  215.351612] DMA-API: atlantic 0000:4b:00.0: device driver frees DMA memory with different size [device address=0x00000000fbdd0000] [map size=34816 bytes] [unmap size=32768 bytes]
-[  215.351635] WARNING: CPU: 33 PID: 10759 at kernel/dma/debug.c:988 check_unmap+0xa6f/0x2360
-...
-[  215.581176] Call Trace:
-[  215.583632]  <TASK>
-[  215.585745]  ? show_trace_log_lvl+0x1c4/0x2df
-[  215.590114]  ? show_trace_log_lvl+0x1c4/0x2df
-[  215.594497]  ? debug_dma_free_coherent+0x196/0x210
-[  215.599305]  ? check_unmap+0xa6f/0x2360
-[  215.603147]  ? __warn+0xca/0x1d0
-[  215.606391]  ? check_unmap+0xa6f/0x2360
-[  215.610237]  ? report_bug+0x1ef/0x370
-[  215.613921]  ? handle_bug+0x3c/0x70
-[  215.617423]  ? exc_invalid_op+0x14/0x50
-[  215.621269]  ? asm_exc_invalid_op+0x16/0x20
-[  215.625480]  ? check_unmap+0xa6f/0x2360
-[  215.629331]  ? mark_lock.part.0+0xca/0xa40
-[  215.633445]  debug_dma_free_coherent+0x196/0x210
-[  215.638079]  ? __pfx_debug_dma_free_coherent+0x10/0x10
-[  215.643242]  ? slab_free_freelist_hook+0x11d/0x1d0
-[  215.648060]  dma_free_attrs+0x6d/0x130
-[  215.651834]  aq_ring_free+0x193/0x290 [atlantic]
-[  215.656487]  aq_ptp_ring_free+0x67/0x110 [atlantic]
-...
-[  216.127540] ---[ end trace 6467e5964dd2640b ]---
-[  216.132160] DMA-API: Mapped at:
-[  216.132162]  debug_dma_alloc_coherent+0x66/0x2f0
-[  216.132165]  dma_alloc_attrs+0xf5/0x1b0
-[  216.132168]  aq_ring_hwts_rx_alloc+0x150/0x1f0 [atlantic]
-[  216.132193]  aq_ptp_ring_alloc+0x1bb/0x540 [atlantic]
-[  216.132213]  aq_nic_init+0x4a1/0x760 [atlantic]
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Fixes: 94ad94558b0f ("net: aquantia: add PTP rings infrastructure")
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/net/ethernet/aquantia/atlantic/aq_ptp.c  |  4 ++--
- drivers/net/ethernet/aquantia/atlantic/aq_ring.c | 13 +++++++++++++
- drivers/net/ethernet/aquantia/atlantic/aq_ring.h |  1 +
- 3 files changed, 16 insertions(+), 2 deletions(-)
+On Mon, 29 Jan 2024 15:21:21 +0100 you wrote:
+> dtschema package defines firmware-name as string-array, so individual
+> bindings should not make it a string but instead just narrow the number
+> of expected firmware file names.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+>  Documentation/devicetree/bindings/net/qcom,ipa.yaml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ptp.c b/drivers/net/ethernet/aquantia/atlantic/aq_ptp.c
-index abd4832e4ed2..5acb3e16b567 100644
---- a/drivers/net/ethernet/aquantia/atlantic/aq_ptp.c
-+++ b/drivers/net/ethernet/aquantia/atlantic/aq_ptp.c
-@@ -993,7 +993,7 @@ int aq_ptp_ring_alloc(struct aq_nic_s *aq_nic)
- 	return 0;
- 
- err_exit_hwts_rx:
--	aq_ring_free(&aq_ptp->hwts_rx);
-+	aq_ring_hwts_rx_free(&aq_ptp->hwts_rx);
- err_exit_ptp_rx:
- 	aq_ring_free(&aq_ptp->ptp_rx);
- err_exit_ptp_tx:
-@@ -1011,7 +1011,7 @@ void aq_ptp_ring_free(struct aq_nic_s *aq_nic)
- 
- 	aq_ring_free(&aq_ptp->ptp_tx);
- 	aq_ring_free(&aq_ptp->ptp_rx);
--	aq_ring_free(&aq_ptp->hwts_rx);
-+	aq_ring_hwts_rx_free(&aq_ptp->hwts_rx);
- 
- 	aq_ptp_skb_ring_release(&aq_ptp->skb_ring);
- }
-diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ring.c b/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
-index cda8597b4e14..f7433abd6591 100644
---- a/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
-+++ b/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
-@@ -919,6 +919,19 @@ void aq_ring_free(struct aq_ring_s *self)
- 	}
- }
- 
-+void aq_ring_hwts_rx_free(struct aq_ring_s *self)
-+{
-+	if (!self)
-+		return;
-+
-+	if (self->dx_ring) {
-+		dma_free_coherent(aq_nic_get_dev(self->aq_nic),
-+				  self->size * self->dx_size + AQ_CFG_RXDS_DEF,
-+				  self->dx_ring, self->dx_ring_pa);
-+		self->dx_ring = NULL;
-+	}
-+}
-+
- unsigned int aq_ring_fill_stats_data(struct aq_ring_s *self, u64 *data)
- {
- 	unsigned int count;
-diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ring.h b/drivers/net/ethernet/aquantia/atlantic/aq_ring.h
-index 52847310740a..d627ace850ff 100644
---- a/drivers/net/ethernet/aquantia/atlantic/aq_ring.h
-+++ b/drivers/net/ethernet/aquantia/atlantic/aq_ring.h
-@@ -210,6 +210,7 @@ int aq_ring_rx_fill(struct aq_ring_s *self);
- int aq_ring_hwts_rx_alloc(struct aq_ring_s *self,
- 			  struct aq_nic_s *aq_nic, unsigned int idx,
- 			  unsigned int size, unsigned int dx_size);
-+void aq_ring_hwts_rx_free(struct aq_ring_s *self);
- void aq_ring_hwts_rx_clean(struct aq_ring_s *self, struct aq_nic_s *aq_nic);
- 
- unsigned int aq_ring_fill_stats_data(struct aq_ring_s *self, u64 *data);
+Here is the summary with links:
+  - dt-bindings: net: qcom,ipa: do not override firmware-name $ref
+    https://git.kernel.org/netdev/net-next/c/b2005bb756e1
+
+You are awesome, thank you!
 -- 
-2.41.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
