@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-68188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E9EC846094
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:03:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE2498460A1
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:07:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37C8628B4C0
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 19:03:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D76628491D
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 19:07:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7623685264;
-	Thu,  1 Feb 2024 19:03:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE7585264;
+	Thu,  1 Feb 2024 19:07:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RSE/Tr62"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hgTKd26j"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED8FA84FD3
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 19:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0890E84FD3
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 19:07:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706814181; cv=none; b=r/Zm5JFAHryy+b69az2qbupuHiFzvFrPIlFvHDVWvgOZMarwYLyGW1nWDRbZc4BcR1qrD0B3WEa0inVoVWEtiyZ9VrlAuq19CitmBxd6nSQZChphO0z0jb0Arc2RP+y8imH1jlsEpsg8QqQBmW1Qq86La49qFO4NsV/tdF3m1AI=
+	t=1706814447; cv=none; b=MDgDnhK9/C7GlVwzhRTNWM3q5fOE+tEyYiqHe6XIQxj8eNoFJeYjn2hmxjYHL8zr8McfhdfDhHjycYE32V2tO/cvus3myLfzNW/v/nZgbImGGJHSwZDqAubeb9Sg8WpOLDbJd7z/IkqCbJQrRDXYyEQxDDpaQ/BSWTCitSfaidw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706814181; c=relaxed/simple;
-	bh=Acifw2aO4y44QZkkG4j8Gu47MIJAm3ELhRCF0CUk7Ec=;
+	s=arc-20240116; t=1706814447; c=relaxed/simple;
+	bh=nd1xNacpJ7edmbB4vw12t/6SqODjNijtIQ+qQJkAn2I=;
 	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g4Gr7W0ETgtgSvcd71tKm8cp2iFX+XB5drmUdEfb+xDF3AJzPkN458lg/jcM+J8LnR57WMmDjaSIukHDk05+5tQpLa5POPRwgF0LZ10tyJL0cLjw6lEoF1RqZesME7VYDjzQLmuap+B61kQKNlSym7J12tdpGMejyNE4fOmEOM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RSE/Tr62; arc=none smtp.client-ip=170.10.129.124
+	 To:Cc:Content-Type; b=s8gFaE7o6z33C3k3CE7dnDl7ZEZ2KuZ9HR6WUaNsC7EqpTT6r4UpCu9Yxq1uHpvCBD1MoIxKjxNOENGPMcdqObg1F2LndCmapOfB2IH4GyrKmWZABp47jDFYYrkFBeYstoPXxaPwqjgvGaGtqROmf08ygIDNujM/WzzSNcDQuoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hgTKd26j; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706814179;
+	s=mimecast20190719; t=1706814445;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Acifw2aO4y44QZkkG4j8Gu47MIJAm3ELhRCF0CUk7Ec=;
-	b=RSE/Tr626ri4Cf7nvPi4YjkGK/eJM2qXVOhAO9ezVEoolDpmHOELArt3NwuxyoaUCTJFKr
-	PkQK8mvFSd6TikHjo+P2qOnWINyPyVnaMJbxn9FKmJW/R94DluQJ9/Kfn3EDZ8mv0HCuCa
-	LdZAgwctrubRnAC4QFZkTWtPKudUr8k=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=Cx+1abgolFRi+4nasT0owtFSb2ulTA5ZS8PvE2Kg9TU=;
+	b=hgTKd26jS62eIgX5Lxx4SraivxvpuWv+XOZBay2b4mwdcsPgKPGoOQE27KhbcYslPExEwx
+	67sXqH9zeHkT5ExFggGoIX63C8h8TzTf3ljBGHcTZHxFsmyS3+EqiAnXlHR7btC6mDGagG
+	qCAmCV4vlNErliFag2wCu0KjhAF10b0=
+Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com
+ [209.85.208.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-475-72RzohBJPWely82u7GG0dQ-1; Thu, 01 Feb 2024 14:02:57 -0500
-X-MC-Unique: 72RzohBJPWely82u7GG0dQ-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2d081966c58so2144811fa.2
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 11:02:57 -0800 (PST)
+ us-mta-138-octvpEWGMV20YnaP9dBeyA-1; Thu, 01 Feb 2024 14:07:23 -0500
+X-MC-Unique: octvpEWGMV20YnaP9dBeyA-1
+Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-55d71ec6ef3so786315a12.0
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 11:07:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706814176; x=1707418976;
+        d=1e100.net; s=20230601; t=1706814442; x=1707419242;
         h=cc:to:subject:message-id:date:in-reply-to:mime-version:references
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Acifw2aO4y44QZkkG4j8Gu47MIJAm3ELhRCF0CUk7Ec=;
-        b=ubVcOVRIbRyyzZ20lv0bBC67P73sPsLDiqnFUQ1ElsKllts26cqv5gZEoCerQNPeJK
-         DYyFbKmMqFOBXiUJwIOxeoH64a+owDAfg45JY1vmWA/nNKWVdRltZfanaJIO0ABIZMJa
-         65gegCFrvEVc20sERIkakY+fGjvFb918nJYhfTl9erV6HptaOXeVZa0CkfLKcNE6+l3u
-         HSDzrgnL1Yau+EhRNuIVrlWdzgYLdoyLe40kurWVwD+/JcTs3NWDQy8WEcg9ZCh4YGp7
-         v3SBZVAhUv0pi7n3fSlgZW4O5arihMlqc9OP/KL0l9n2bAQ/6Isw/ZCUgi6SnW6f+Or8
-         cktQ==
-X-Gm-Message-State: AOJu0Ywe0aCpBNP2wqOc3q1B7Kt52H3611WHjUXfymRxoZhni4OovrQS
-	6x60HovaAum3ra5Ve/rg/saAOmHO/4Tyr9KrZQ/BF/QbfPZSDg2oMA+HuP7a17Fc3tucW/dkOaA
-	0k3719nGlul36UhFdBbKa5IAlsvuC41zyDADrpOOv+Do8pc384lMg4DoXjO0txo2Vj750smocHY
-	ArPgURUvdp1+dDL6HEdED+SEmivIfO
-X-Received: by 2002:a05:651c:311:b0:2cf:276f:83e3 with SMTP id a17-20020a05651c031100b002cf276f83e3mr1803374ljp.28.1706814176014;
-        Thu, 01 Feb 2024 11:02:56 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEy4lBH4E+hDaZ+LWF/+yr0kHTmJHCD3X/mQ+0iuenxVQPxxPHjUJJGsksFSXcvp8DiwsHDdMKJYLId4rRMLNU=
-X-Received: by 2002:a05:651c:311:b0:2cf:276f:83e3 with SMTP id
- a17-20020a05651c031100b002cf276f83e3mr1803348ljp.28.1706814175691; Thu, 01
- Feb 2024 11:02:55 -0800 (PST)
+        bh=Cx+1abgolFRi+4nasT0owtFSb2ulTA5ZS8PvE2Kg9TU=;
+        b=VaYTLqhuQUT8D2dBJXn+jXWYRlxiYih+yT+F7WlArZFfRVmYETwHxqzVvbgnshOklL
+         UC5gywGv2L+XlVU7hKyIzuFDKDzL1zfKSd0IKj7zpFpj2VrnAT5c5OmX68i0dPuTD0Nf
+         hk8oCmwTNNeQSIz5QVDVeNJF3+oUt402F8j/+9qDrFURxA2U4j9UGawddYVE7kBK+NSV
+         IX1J8AYQOhsUCpaUlMn9ttPJeH3QnC02BN8w6Ir3I7hHXq5ewaErQeoq+tOXKdbeSG3Q
+         yEWkx6AmJzcZlRW7NsW4apEWvAWpcmaoyZ0jPnb+jL0vVh3F0V70zZBQmppXcQxG1Z9E
+         VmHw==
+X-Gm-Message-State: AOJu0YxzxO+nXNI/YDGWcmCZCY0OHRBLANdVVRlOgqtLJyjRANjiH2yo
+	c5byRdCNenhtZa+W1P7qbRAIWI+kdPksz8peowc6MzZ1AvCtVIhqc5tqn1j36EBVvEDtUcczPFp
+	jnI/NEn0urTskjGeU4+qvbcTyCU9vPunYiIkgM9r5AR6fyIQLBmbF5nis5WioG07Ftp4hprb5ET
+	Kft0YrF7jpKeJvgic0wPUAKXszLw/7
+X-Received: by 2002:a05:6402:3402:b0:55e:ef54:a4dc with SMTP id k2-20020a056402340200b0055eef54a4dcmr4269494edc.23.1706814442621;
+        Thu, 01 Feb 2024 11:07:22 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGZ8wz1J4znsp54tQfcT1PW1YBWiXRCYfSoLa5g1fFEFNKhu84EYm4M0xhWlmFnpH5WWH25rUVHhle4WSqoF7E=
+X-Received: by 2002:a05:6402:3402:b0:55e:ef54:a4dc with SMTP id
+ k2-20020a056402340200b0055eef54a4dcmr4269471edc.23.1706814442328; Thu, 01 Feb
+ 2024 11:07:22 -0800 (PST)
 Received: from 753933720722 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 1 Feb 2024 11:02:54 -0800
+ HTTPREST; Thu, 1 Feb 2024 11:07:21 -0800
 From: Marcelo Ricardo Leitner <mleitner@redhat.com>
-References: <20240122194801.152658-1-jhs@mojatatu.com> <20240122194801.152658-5-jhs@mojatatu.com>
+References: <20240122194801.152658-1-jhs@mojatatu.com> <20240122194801.152658-6-jhs@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240122194801.152658-5-jhs@mojatatu.com>
-Date: Thu, 1 Feb 2024 11:02:54 -0800
-Message-ID: <CALnP8ZaqDp1e5qRQ6o3cs6bSt1zJ+m6u3CpVoWsN-nLbAb76sg@mail.gmail.com>
-Subject: Re: [PATCH v10 net-next 04/15] net/sched: act_api: add struct
- p4tc_action_ops as a parameter to lookup callback
+In-Reply-To: <20240122194801.152658-6-jhs@mojatatu.com>
+Date: Thu, 1 Feb 2024 11:07:21 -0800
+Message-ID: <CALnP8ZYtVXHbnvESkZpcVwpJAVJWe9NP1EtPQOzTKD3WUnqO3g@mail.gmail.com>
+Subject: Re: [PATCH v10 net-next 05/15] net: sched: act_api: Add support for
+ preallocated P4 action instances
 To: Jamal Hadi Salim <jhs@mojatatu.com>
 Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
 	namrata.limaye@intel.com, tom@sipanda.io, Mahesh.Shirshyad@amd.com, 
@@ -92,16 +92,19 @@ Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com,
 	mattyk@nvidia.com, daniel@iogearbox.net, bpf@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Jan 22, 2024 at 02:47:50PM -0500, Jamal Hadi Salim wrote:
-> For P4 actions, we require information from struct tc_action_ops,
-> specifically the action kind, to find and locate the P4 action information
-> for the lookup operation.
+On Mon, Jan 22, 2024 at 02:47:51PM -0500, Jamal Hadi Salim wrote:
+> $ tc -j actions ls action myprog/send_nh | jq .
 >
-> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> Reviewed-by: Vlad Buslov <vladbu@nvidia.com>
+> [
+>   {
+>     "total acts": 1
+...
+>         "not_in_hw": true
 
-Reviewed-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+For a moment I was like "hmm, this is going to get tricky. Some times
+space, sometimes _", but this is not introduced by this patch.
+
+
+Reviewd-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
 
 
