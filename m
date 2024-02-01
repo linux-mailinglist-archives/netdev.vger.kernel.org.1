@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-68124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29D13845E27
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:10:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43DD3845E29
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:10:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D07121F278AF
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:10:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D54DB1F24BAE
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1222315DBCF;
-	Thu,  1 Feb 2024 17:09:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5697315DBDC;
+	Thu,  1 Feb 2024 17:09:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="v7Ra3Uhk"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rth1MPtp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723BA1292C4
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 17:09:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C208415DBCD
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 17:09:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706807386; cv=none; b=rkS+cExyoaE7g8MvUj9w1QjiWVbPHFWfYhe3hHxyvvO3hTlDwazo4WoPzk5JXloX4u792eiT9xTwLW5ltWKZtEslW9uai4TsFWsIO82wmLCifL79PCCWuwjpgCiEedTg7NIEzKzPKl6TutJ/DBJx9wR3EYqCDMb4u0xalldXdNI=
+	t=1706807387; cv=none; b=A9Kw4VjWJL53KbQqbRdWFhtRmoenqknXOxQaafT8HgjXW0x30l8PhTapG9cYRkMqZO0QOq73kg7mvBhy+gHarNvXMTjUTrXyphxxj7WJIHDMxZYEqa1zA19fQyB4pMCDMVpgLHS2Rf2bzLUd69rqbBU/IRFm9l5D5WWwH+Lx9rQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706807386; c=relaxed/simple;
-	bh=T+99pQGkXBrKdiTr1khPrGndHdX5hT0wcxaOc5AKFNQ=;
+	s=arc-20240116; t=1706807387; c=relaxed/simple;
+	bh=UyNXHL0AAbquyRryjTWHlEfC9CbwVr85rRbcyASMaUU=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WNdD31StbVxTxGBa1bDCkdEYPkUPDcmdJTI+v6DQVhQscxXce2Mu/PTNxsTSYskZQC+NehELAPaqaAbd4EYaav+ZCJdeII0P2yTEGfLT0ZKpS4ci5Hq1E4Qw10B4I20UMR3Lmg9jJaNK5aC1gTZJa6USLnfA+uMC4UBPqc3I4oU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=v7Ra3Uhk; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=j+/UzdSP63hn/5NJ3Xkyts1Qy9OKAMuNZ0XvJNDX1ZWtws2laSXfmW08CShIAGRpdl7fCuRmYQWptLbvBhJSOXl586OxhtfXYg5ZHa8tY7ReZO81hBsBOOS5QtxsWf6QsWs6CNAgG8RYHZ681nxCNmVO8QsPEW/MF7NkGDakBoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rth1MPtp; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6ceade361so1849586276.0
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 09:09:44 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dbf618042daso1680641276.0
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 09:09:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706807383; x=1707412183; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1706807384; x=1707412184; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y2D5E9Gu3MpPPnV5CXWo8iDsBmuAoodNd9wVAuyaVMs=;
-        b=v7Ra3UhkWP9Ynhzu34YnehVmKJlY0y+muVg+QGWxy57ESFb0eku/+d23M/4wfX4m/6
-         DtZzbX+u5FsvKOHmHEKAvCEUDasbZ/BNBBpNFj26MpaurdPJGjVx+mlS84tJzS4NDRGg
-         wSYs0fDyCSZfC4htehnIashZ5zoklNJvuW3mG/KmSveBEiwVnw4cV6yb1BclRPHzG5TU
-         1PQTx/NNMQkQSSPW6Ohw7E3mPDIaCCgussgEqnuJ8UBkv/7ZPcnL1MYzF5lx89/rQEvO
-         uVZYiY+kxevCtM5pU2LC/FFmPGQUaNe1APe7mMhzq5kt+It7TXYMtRz4DtjXNAdcG74p
-         dHGA==
+        bh=/ZHMaqb9bXqw89uowGjnODMeAm3e3dYrZmUj9VUKXTM=;
+        b=rth1MPtprZoXUKcvHNoMQjMuY1JfPBkOldrVSohb8fDpC9GutOb0NDdBt6XsvOY/oo
+         5UcXIfdkhM7QXep9aJBgc5pFb95M/FErYkvNW4NcRn7DVtEcikfCDGbQukD5TrShJlID
+         c3vKGd0i/AnwiJ368lL7lcgeRm967XDKiZOYmFegB7nFWejnS7t35d9URELrcoTgn5Me
+         wUx7qGLWWj8Wlzv5L9dfw8iH8CzsirNdYW2OGLKsuck5bblGwEfuQOVnfUT/jtUN3bot
+         EU6CZPLR+kRB99ocoMglghTe6sFLBtY8SjfdabkaGM0MNjwJI2tE6hrlpkJRSaOBeVV4
+         LvtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706807383; x=1707412183;
+        d=1e100.net; s=20230601; t=1706807384; x=1707412184;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y2D5E9Gu3MpPPnV5CXWo8iDsBmuAoodNd9wVAuyaVMs=;
-        b=ECA3Eh/N7SUQJOfhEWoi01iAp+Co/hPn8sbx1wV+tlN4QFzxjvulXzsfMumnDxM1kj
-         jpxWonz85fzAVqscQE+UgHbRBSK+1bRkChAHBxFxZsVmROcvJkHPhKYtO/0TTgWQrLxB
-         KVd+Ypbvvw3yrScrl0guyLtv2JexLc6tZkSax90+9Ky9IRjT2uxLB4K7nbzGFrUKHGc/
-         xqsd8bWNFeWqhWb5+zHIrtSf6pSz8XmK1C9e9FZ+3qu6VbGoQ9QxA+zZiNcbNiz8m5/N
-         MTnrRZVg4MnboXkCr0HLW7770iaLnjwhJowyPpF36tadUF1yeUV9VoxUzhfCtwx/7Yku
-         MBzg==
-X-Gm-Message-State: AOJu0Yy99LGsA2OkkeGR175jZ0fLBBz8crpybsIrAR/pR2dXYYG+b0jZ
-	SVVvQfosl/5mzOh0LuKzjDRSmaeIGu9nSXBOFj24iMneui4bxVOHzZH4ZZz3WMKqH1Mk8bqCHS4
-	/cK5BdtJFFA==
-X-Google-Smtp-Source: AGHT+IGgmi6ajeLoG0v9xgL8hWEyB7pET/NlKiHziS/ygcFE7H9bkiWxJ9drA3vaPn3bHDNIkBWAGKf8q7QBZw==
+        bh=/ZHMaqb9bXqw89uowGjnODMeAm3e3dYrZmUj9VUKXTM=;
+        b=eVcaS3xNL683hjrOKb2D2GlUCBxFlbWJeIPynMph4IakYQGfkPIuqWAJhm+0Ir3Y4J
+         JWgREOrjeyFTxbnv/2GJ7V8sFO5qtsgYWPtgXWkV9F5hgk3unsXrCM8rEgcLAIAN6GqU
+         /yMN7oV9eUrN0M4sL2xlrKg2xo9NjCPqHv3ATS4hzd+hVXkhhyRKjyNYEW+PiuWBX3j3
+         0cvZon7NDubTqZUCQIFCZaGr65kBqpURmmHKmi9vYdBVQw2xyw3GzwOAPYWhXfYxgOpe
+         XX65zLAIvQjOqCgshj6YiMmDW4bBs62xjpVXzBnp82nh8WlpTFGTNeCmiV6Lm1F9cIvf
+         UHmQ==
+X-Gm-Message-State: AOJu0Yze7xNtKJimploDgOF5qSykkDddfQZCKsQ/dtt1aUSXsSLaowdW
+	mBIokfvxqSgZbgMdKrc1eaANeoBeVAsnVLKp/w7ZcwKMp4mJgqg7J95Qm3Pw5cgi3Db4xxCmXDk
+	US4lt+TKTSw==
+X-Google-Smtp-Source: AGHT+IFp2xuPnvmXpomNvkJyYxjGOcXlzNthWRSYoO4U8MQ3r8/BleNS9iPC1R1yDdMSOMKoMkjPKABzoGwezA==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:11c3:b0:dc2:398d:a671 with SMTP
- id n3-20020a05690211c300b00dc2398da671mr1393727ybu.10.1706807383425; Thu, 01
- Feb 2024 09:09:43 -0800 (PST)
-Date: Thu,  1 Feb 2024 17:09:24 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1691:b0:dc2:23db:1bc8 with SMTP
+ id bx17-20020a056902169100b00dc223db1bc8mr95715ybb.3.1706807384698; Thu, 01
+ Feb 2024 09:09:44 -0800 (PST)
+Date: Thu,  1 Feb 2024 17:09:25 +0000
 In-Reply-To: <20240201170937.3549878-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,9 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240201170937.3549878-1-edumazet@google.com>
 X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
-Message-ID: <20240201170937.3549878-4-edumazet@google.com>
-Subject: [PATCH net-next 03/16] net: convert default_device_exit_batch() to
- exit_batch_rtnl method
+Message-ID: <20240201170937.3549878-5-edumazet@google.com>
+Subject: [PATCH net-next 04/16] bareudp: use exit_batch_rtnl() method
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -91,54 +90,41 @@ and one unregister_netdevice_many() call.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/core/dev.c | 13 +++++--------
- 1 file changed, 5 insertions(+), 8 deletions(-)
+ drivers/net/bareudp.c | 13 ++++---------
+ 1 file changed, 4 insertions(+), 9 deletions(-)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index b53b9c94de4008aa7e808d58618675425aff0f4c..86107a9c9dd09d5590578923018be56065fbd58c 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11596,7 +11596,8 @@ static void __net_exit default_device_exit_net(struct net *net)
- 	}
+diff --git a/drivers/net/bareudp.c b/drivers/net/bareudp.c
+index 31377bb1cc97cba08e02dc7d48761068627af3fb..4db6122c9b43032a36b98916bb4390e3d6f08f68 100644
+--- a/drivers/net/bareudp.c
++++ b/drivers/net/bareudp.c
+@@ -760,23 +760,18 @@ static void bareudp_destroy_tunnels(struct net *net, struct list_head *head)
+ 		unregister_netdevice_queue(bareudp->dev, head);
  }
  
--static void __net_exit default_device_exit_batch(struct list_head *net_list)
-+static void __net_exit default_device_exit_batch_rtnl(struct list_head *net_list,
-+						      struct list_head *dev_kill_list)
+-static void __net_exit bareudp_exit_batch_net(struct list_head *net_list)
++static void __net_exit bareudp_exit_batch_rtnl(struct list_head *net_list,
++					       struct list_head *dev_kill_list)
  {
- 	/* At exit all network devices most be removed from a network
- 	 * namespace.  Do this in the reverse order of registration.
-@@ -11605,9 +11606,7 @@ static void __net_exit default_device_exit_batch(struct list_head *net_list)
- 	 */
- 	struct net_device *dev;
  	struct net *net;
--	LIST_HEAD(dev_kill_list);
+-	LIST_HEAD(list);
  
 -	rtnl_lock();
- 	list_for_each_entry(net, net_list, exit_list) {
- 		default_device_exit_net(net);
- 		cond_resched();
-@@ -11616,17 +11615,15 @@ static void __net_exit default_device_exit_batch(struct list_head *net_list)
- 	list_for_each_entry(net, net_list, exit_list) {
- 		for_each_netdev_reverse(net, dev) {
- 			if (dev->rtnl_link_ops && dev->rtnl_link_ops->dellink)
--				dev->rtnl_link_ops->dellink(dev, &dev_kill_list);
-+				dev->rtnl_link_ops->dellink(dev, dev_kill_list);
- 			else
--				unregister_netdevice_queue(dev, &dev_kill_list);
-+				unregister_netdevice_queue(dev, dev_kill_list);
- 		}
- 	}
--	unregister_netdevice_many(&dev_kill_list);
+ 	list_for_each_entry(net, net_list, exit_list)
+-		bareudp_destroy_tunnels(net, &list);
+-
+-	/* unregister the devices gathered above */
+-	unregister_netdevice_many(&list);
 -	rtnl_unlock();
++		bareudp_destroy_tunnels(net, dev_kill_list);
  }
  
- static struct pernet_operations __net_initdata default_device_ops = {
--	.exit_batch = default_device_exit_batch,
-+	.exit_batch_rtnl = default_device_exit_batch_rtnl,
+ static struct pernet_operations bareudp_net_ops = {
+ 	.init = bareudp_init_net,
+-	.exit_batch = bareudp_exit_batch_net,
++	.exit_batch_rtnl = bareudp_exit_batch_rtnl,
+ 	.id   = &bareudp_net_id,
+ 	.size = sizeof(struct bareudp_net),
  };
- 
- static void __init net_dev_struct_check(void)
 -- 
 2.43.0.429.g432eaa2c6b-goog
 
