@@ -1,96 +1,94 @@
-Return-Path: <netdev+bounces-67782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B7EA844E84
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 02:15:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8A98844E8D
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 02:16:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE8DE1C2AA72
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:14:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69509296CDA
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:16:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F67A2116;
-	Thu,  1 Feb 2024 01:12:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B46110A;
+	Thu,  1 Feb 2024 01:15:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hgD7kbsa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U7zJf6cd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E383BB20;
-	Thu,  1 Feb 2024 01:12:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E0913FDB;
+	Thu,  1 Feb 2024 01:15:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706749968; cv=none; b=p4UzOYPFV2AUksDn2l2lXtR9JKOHOxzHVKmpfkceeuqPMXvANCcflSy8fd4SpK9rsTKvJRfiwiuh2ps1+eg6y7ev+8M7K0fiPC1w8fi2xDHAGUDZlAeh4+M+I9rl/XQRtce9tiKobPBmslHaVjN38QxNdo6Gfnbolxf6SOphDeU=
+	t=1706750120; cv=none; b=XbTzkIz5BV5Hm/aj/B4OBpN8CB8N/J+yrWPPKvnBQOwKCASP8TNLphHK6eFL61cB2jy913BzdfYB3/sYLSZ6BZvtyzWI5wTPqgIQixuHJfmD/gFUUgsvitU9ZQv+sbJg2x9JNzjvxKhSfBFdPhk3NpxQR5osF+SAKfmDLKlt618=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706749968; c=relaxed/simple;
-	bh=K7m8gtHLg+fdcwXXrK8dXPdrMnYZvsrGEiWz2SbekN0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oZMGtD8DjdzDCtIssrpx0bVLCDRnH0ahXc15SOcmGeZtHFTBnUKP3MpC94SX2F8URaC+Q33vzgykQEOg5Rl2pu/dIAeqdznS0npS2tzpIXNkREIYuRTHHgn5clQD5gC5t1UHQMqPPMcJft4o5kIdXRrVe3xBny6NNQUEwb2vhh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hgD7kbsa; arc=none smtp.client-ip=209.85.166.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3639124ef52so1596245ab.3;
-        Wed, 31 Jan 2024 17:12:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706749965; x=1707354765; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K7m8gtHLg+fdcwXXrK8dXPdrMnYZvsrGEiWz2SbekN0=;
-        b=hgD7kbsa0q4GHDEcWAZc3DpVyDBQvBTgrbIAiiu3wLM5SkUF+jk/G+AdqGVe1qX/6u
-         Ws98wj4ttcuxlhBjPAiiglNv+INZ2eejVtpqvOrQGO+BnyWRvYR1Rh5vAHGwmQqjOOCa
-         g3kWSY4ixMqbqfG6rG3FsZAYDAaA5EegmMH2FdqT5ki78FwuWKBxp9e1Z+AWES6S5U+4
-         LK2k/Qyi5aLMoLgQycNDUR9A8swik1q7jHn8WgFNHe7tq04lxk0Ush8bhMCcyi+Ts45Q
-         lcMQyInWea4XwMHO9bU/uJYejsfbMQLev5EkXqqdeuNhqmPe6ySLtU7DW83ag7XA7G7q
-         qqlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706749965; x=1707354765;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=K7m8gtHLg+fdcwXXrK8dXPdrMnYZvsrGEiWz2SbekN0=;
-        b=D1ADboZFXelb0Tbeiz+hRTNcgWW6K+HX2sp2Er1NYqZV2m28I3/98MXn3tmRT7Bhr+
-         zsk1B6UKW2uY71bX3EXciRiYDF43QmZ3sV85RCuyJGzOsTd09Yj8RJr/w6bf/s4Dq3u/
-         u8Zi1kmpLReHZ0PbFNJ0b4ClN1wwWkTaMw/a5Ogut5rXafgXNESdz9oeFZm8iB40apf8
-         exg5kTiHBXo21ehT+G8/mUPw8WrT4QvTYzKswrabaMnlCY9giiKLhqsarkmAWGuuDuK5
-         iTzA+toM0CXg++EJIzBMuRQ59n6dZs78QRSqgd4u9rli83ryY5dQ9PMrakh1sviY1ky3
-         YkiA==
-X-Gm-Message-State: AOJu0Yw7SSOLQkAzHB6XY5dW4KZJJByRbO8ZUQ+lKVmasxf6j2OhwsjS
-	B3nSXOsUM3EO2vIxAWeHJNJ2Qk+eDbxoPMzSL4qfiJjqSIzlrAKvKPGKq/kPNXJbE63/VPkAtS9
-	WQ/yVEZc6zWqp4Sp2tZN9dYQSqvw=
-X-Google-Smtp-Source: AGHT+IEh0+jQ75LnEjqODofvT0NWp1gE8wEHS1esNqSY/7DD+N4jBt8M2Eb3cH395TwbO60rTYWKynysoJh3mylrNDw=
-X-Received: by 2002:a92:d307:0:b0:363:920c:9bd7 with SMTP id
- x7-20020a92d307000000b00363920c9bd7mr3313192ila.9.1706749965596; Wed, 31 Jan
- 2024 17:12:45 -0800 (PST)
+	s=arc-20240116; t=1706750120; c=relaxed/simple;
+	bh=xI9kxDTnO40mhXx+1mT9ERBGq3fM7AsdzehbVDIP/uI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZvumC+gokb5lhQPC4MYBHX4+QlVsTntW2tHR/GAmf19aXQ3Z8ckhdcFqLSKHi19Oc0XFF2/BGbAA6rH/05yj+Va5LqGDSKQDWwR3do5gV1flndRU08Aph4d/QjzkzIOu+w+j7w9qEF2+x7odhKJ3ZJB+UImHHvI9XFSI6JxmD18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U7zJf6cd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5B79C433C7;
+	Thu,  1 Feb 2024 01:15:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706750119;
+	bh=xI9kxDTnO40mhXx+1mT9ERBGq3fM7AsdzehbVDIP/uI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=U7zJf6cd+wica2bEqKoH0TFGobs0dKW7A7Wv+wLFq+NhcwNC/dluLJnix36GUb/M6
+	 cMN5D94ajyFboFQkJN9c6y6YtWSMjDXwOHXE3Ny7R0oM/ExqoDmR19Xk2htrpIPpRD
+	 FmKsuQTKxk2cuZ4F9pdKmHtwm+wGRbYmrCsot2/NhDGnMzqZ37R3TpPNwxX6NF/S6I
+	 kMPPOo1QCbrfXF/t/oTVN+xjNZNRhSXigAommv1h6jJObE/EYys5KMVZwlqR3mo88c
+	 DV5HUKNrUOktCk8d+3dkrw2U0VMkEgY/+ihwJMmTxqTaqwHHkjrXQuC93isYVnadx1
+	 XMPtlynVojOQQ==
+Date: Wed, 31 Jan 2024 17:15:13 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Benjamin Poirier <bpoirier@nvidia.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>, Andy
+ Gospodarek <andy@greyhouse.net>, Shuah Khan <shuah@kernel.org>, Jiri Pirko
+ <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Petr Machata
+ <petrm@nvidia.com>, Danielle Ratson <danieller@nvidia.com>, Ido Schimmel
+ <idosch@nvidia.com>, Johannes Nixdorf <jnixdorf-oss@avm.de>, Davide Caratti
+ <dcaratti@redhat.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Tobias
+ Waldekranz <tobias@waldekranz.com>, Coco Li <lixiaoyan@google.com>, Willem
+ de Bruijn <willemb@google.com>, Lucas Karpinski <lkarpins@redhat.com>,
+ Anders Roxell <anders.roxell@linaro.org>, Hangbin Liu
+ <liuhangbin@gmail.com>, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net 0/5] selftests: net: More small fixes
+Message-ID: <20240131171513.20eece61@kernel.org>
+In-Reply-To: <20240131140848.360618-1-bpoirier@nvidia.com>
+References: <20240131140848.360618-1-bpoirier@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240131084549.142595-1-chentao@kylinos.cn>
-In-Reply-To: <20240131084549.142595-1-chentao@kylinos.cn>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Wed, 31 Jan 2024 20:12:34 -0500
-Message-ID: <CADvbK_ewbc2dnFLArRdj9APhMVUiBJg9GwvjxJ+2wdiK6Pp-tw@mail.gmail.com>
-Subject: Re: [PATCH net-next] sctp: Simplify the allocation of slab caches
-To: Kunwu Chan <chentao@kylinos.cn>
-Cc: marcelo.leitner@gmail.com, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, linux-sctp@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 31, 2024 at 3:46=E2=80=AFAM Kunwu Chan <chentao@kylinos.cn> wro=
-te:
->
-> commit 0a31bd5f2bbb ("KMEM_CACHE(): simplify slab cache creation")
-> introduces a new macro.
-> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-> to simplify the creation of SLAB caches.
->
-> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
-Acked-by: Xin Long <lucien.xin@gmail.com>
+On Wed, 31 Jan 2024 09:08:43 -0500 Benjamin Poirier wrote:
+> Some small fixes for net selftests which follow from these recent commits:
+> dd2d40acdbb2 ("selftests: bonding: Add more missing config options")
+> 49078c1b80b6 ("selftests: forwarding: Remove executable bits from lib.sh")
+
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+
+Not so great that the team test was passing even tho it lacks 
+so many configs...
+
+TAP version 13
+1..1
+# timeout set to 45
+# selftests: drivers/net/team: dev_addr_lists.sh
+# Error: Unknown device type.
+# Error: Unknown device type.
+# This program is not intended to be run as root.
+[   17.601119] team0: Mode changed to "loadbalance"
+# RTNETLINK answers: Operation not supported
+# TEST: team cleanup mode lacp                                        [ OK ]
+ok 1 selftests: drivers/net/team: dev_addr_lists.sh
+
+:(
 
