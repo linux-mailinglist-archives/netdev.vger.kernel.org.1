@@ -1,127 +1,150 @@
-Return-Path: <netdev+bounces-68237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCCFF846464
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 00:26:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 445CA84647A
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 00:34:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7712628BF3B
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 23:26:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F84328A0A7
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 23:34:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5061347F41;
-	Thu,  1 Feb 2024 23:26:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5171D47F5A;
+	Thu,  1 Feb 2024 23:34:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="buJUkL4I"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Adu1wQi1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8876E3D566;
-	Thu,  1 Feb 2024 23:26:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E31847F4A
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 23:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706829986; cv=none; b=GNDZbsZySjcSZSGV7DyXBKSM7xMEAY/F3LJgFsrlLZ/drRe9w+w4XumXO8yj1lqiGhpKOjFv+QmevmpEo/565C5TmvWdPRXXIUJQODJoW+Ul+UpOGRjElAAJgxiYIFb84zPSgVqfqGycOvwTrOu3I+3W8gvXhWiDwUNFHXeRMYo=
+	t=1706830463; cv=none; b=Mh7E3qSYAw890VOE8biHB5nYwnLqiEujNBUonwL/7ugctei5IM+DZcESTa9DvZoALpi5XQ1Q8zDvkBU5wDcCn5cAlqK3BohOQeIg8APBzvtgzf3FyCVPiBaMUicmX9ppOp0iRG348zNpmb/yL82lni4PbtSZDnqjM8+zr2BB48E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706829986; c=relaxed/simple;
-	bh=t0P9U/fdDr35SHvrZhkQig6KKzFDue8UOlQKPLPl61E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=U8CE380B39iB+DRobitjvh62WkrPGcPMuTO8r1349BIJo3ZzPmUZTUrrxPCffomNcF4BzV6iWfDhaNCF1zQqOhEw7Mt8DIYfc8KSgtvl5xb8kwAMb+071BdCWA0MkvIkEcVV9qTBfOorPbbz+PCqRXT4jndagnF/9EEtNy4u4fI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=buJUkL4I; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a2d7e2e7fe0so40600166b.1;
-        Thu, 01 Feb 2024 15:26:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706829983; x=1707434783; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=uqOCCFMzBcZ2VL5Z1Pts5v3IryEZHh1IG9XimJuKSKk=;
-        b=buJUkL4It/LjQ1N0TYe30v712v+x8Rhx4RCCxF8pyzUy3AVzVjr2Ad2Vs5pRN5UyC4
-         knZhRfkJvxWC7t5foXN+eLXm/IY3N9t++TY1wvQ8jHl89nrtMGkiJHJKzDCFLpucJZ2T
-         aiic7USNeJof9jrrHeYcSBRD++KiAxX/GQ1IcHwTTpBqFWXHdJjKboQfatsLLtv06s1m
-         gD8/86lFzbZeknB0m+bXtz/Ot8LGMZ0KLU6rzyOgFrbXBgL6r7SH4NOMAiWKIp/966ok
-         bhgL/jp8WLBl5lUDmwCGz9d5aGvtjkIz/kUuvI5jH5uO0qsVO5LPPBS4H4ZGEaafWBo+
-         h8wA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706829983; x=1707434783;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uqOCCFMzBcZ2VL5Z1Pts5v3IryEZHh1IG9XimJuKSKk=;
-        b=FMbYJe3KGp5tskkTnnlokHUxQOlvUBnf3PxufyU9jgCzYA1rH41bcEYTC9gqcyFqyC
-         I1oJkSXwd26ovxjKcf77iq+i5w0+ZVqRbHs3+c2YdniAoO1+m/4gUWsXWW4qixDC+Yow
-         aPKhArb7FtK3ToQMdjlQUKcoOFDcnUTjJ8RUyq1iyKV1mNXBYOaHToQVLe3lcewlEa+7
-         kXf+gq9zfx//7yiJwUac9sEo/fnfzIqiPO4ui4qfQcuOGDS0yiCiyId2aBL5XiUeEXYv
-         3ryu2UkHEauPUTMcc6ONe5yLg9K/zbX8djfSUn3PhiBsbUN2lRc/H0qEkNuKT+NE+KhP
-         H1FQ==
-X-Gm-Message-State: AOJu0YwToM8hIoPlcfpMRfy4paml5SugbDO3m658tJGOWoEYNzVroiqs
-	AmzmClxG9o71T89poRvXFkExnM2kim816U5M6B3nAwEQmkz2G2Hx
-X-Google-Smtp-Source: AGHT+IFlrCxvvGTG0ycgv+W52pIwYEVlf4h1Tfg/JJ6vHxl/5vIGyFMylIp7dWVzsKX6fEKWC/DX5Q==
-X-Received: by 2002:a17:906:553:b0:a36:f672:5dab with SMTP id k19-20020a170906055300b00a36f6725dabmr386277eja.16.1706829982626;
-        Thu, 01 Feb 2024 15:26:22 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWf9289hy9yd1LiVZoV/ca+hZT4+cy+waP8Oy6do+fAz/MsGVbV6hbPTCBaKrvJGoSy+zYREmdkv+XfqXuB85+aaU+n8WHC2ieU/OdQ98Xr8/e1lXR4BgwBcO/biw67hjdzzzbRmcSh4GAnJ7uFmd/jSBe0XHg+neiXfNF2v/VunmEkb6CTDrW7FG9upTbyxLo9qnbt/wTDRYEDx99huRNMIQO3SkEX6092jqyOPcNYaC0sPOyUF0H4d3/zrxfSGOG96nMQc6zrnX+z7n/fbprIqM1sDp9i2UT6xnnr8MSZAeeEQfot4lx5J01me2Pm26lgyBuxCDKBveGhy7JIVo2qb3ESGE7HzCpFaf72OAH4CqasqkviUFaiHqkuF45mje0O51iouslEwIo4eDqIKKn3y0aFkq+ewLDxr8TbBJVR/XikgvclpPoZswh8B2CC/Pt9acUKY8owqJQeHsdr2PU5xOFlIueZaQ1Aqd5vQhC6BTP3gy0n+3a17UPlshj3v5o58Ca9lJQaRCsH1JWyOrGwuJR93mQSDU5wToSMBkgke57yaVQ2ppru1pR/27j0EgjhI+MD3v6VjsmHtUPCOaaNkPbn9b1Oo4XHf57wQgRojIlIqGczt8e3n/DWEMfiVqs/fUzuj3M1OEIn0m2uNNzyTIGRCWj+HXApPUIJNo3oPdtlY8qAy1O5t5vhsK3W
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id vi4-20020a170907d40400b00a3702ab71f6sm56765ejc.206.2024.02.01.15.26.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 15:26:22 -0800 (PST)
-Date: Fri, 2 Feb 2024 01:26:19 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: arinc.unal@arinc9.com
-Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net RFC] net: dsa: mt7530: fix link-local frames that
- ingress vlan filtering ports
-Message-ID: <20240201232619.nsmm7lvafuem2gou@skbuf>
-References: <65bbf40d.170a0220.a87f4.becdSMTPIN_ADDED_BROKEN@mx.google.com>
- <65bbf40d.170a0220.a87f4.becdSMTPIN_ADDED_BROKEN@mx.google.com>
+	s=arc-20240116; t=1706830463; c=relaxed/simple;
+	bh=kw+ki3WM3q8qc2SsVqZ3aaq+zpP97OZDm6P5TkPPdhM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dl5a5nsiKRDyCGwKSN3emJCpl1K+YyZ9NEPAfZsDFkKT2X8zjU/4l+8IaWDqsOuLx9+B7ai3tlZvUpdKxyeyRRRyYZStF+ilO7z2rmMFjbH5TVF8wtwE7nd3Q28GYPmsN1OSOPTm0bSp2c70BUI1kvRgNgZ4gXOV4FyiKQ7xoUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Adu1wQi1; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706830460;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=+KNKvB+sVb0oHCzlVCeXjS4dy7AjP6uKhJvKZaZyiAA=;
+	b=Adu1wQi1CioNWw6FdoKvDmcbWlXfdjUhWN9mghTOBPDFw8akKQfqgjCmdTbnrC4ZdEUx9v
+	sUaZStJTlzc1hjnOS7Nfm7g5gdrpFN6likLEvEgsuVP8g1dsku961TttHhD8bRN46ZTd3o
+	uEMLFBhcY9fIQ3psmsidCpmr3BkdOjs=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-391-_2dxdNjMMFuAFSX8uqEhdw-1; Thu,
+ 01 Feb 2024 18:34:17 -0500
+X-MC-Unique: _2dxdNjMMFuAFSX8uqEhdw-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id DD9C428C976B;
+	Thu,  1 Feb 2024 23:34:16 +0000 (UTC)
+Received: from rhel-developer-toolbox-latest.rmtusor.csb (unknown [10.2.16.182])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 741AC1BDB1;
+	Thu,  1 Feb 2024 23:34:15 +0000 (UTC)
+From: Chris Leech <cleech@redhat.com>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nilesh Javali <njavali@marvell.com>
+Cc: Christoph Hellwig <hch@lst.de>,
+	John Meneghini <jmeneghi@redhat.com>,
+	Lee Duncan <lduncan@suse.com>,
+	Mike Christie <michael.christie@oracle.com>,
+	Hannes Reinecke <hare@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	GR-QLogic-Storage-Upstream@marvell.com
+Subject: [PATCH v5 0/4] UIO_MEM_DMA_COHERENT for cnic/bnx2/bnx2x
+Date: Thu,  1 Feb 2024 15:33:56 -0800
+Message-ID: <20240201233400.3394996-1-cleech@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <65bbf40d.170a0220.a87f4.becdSMTPIN_ADDED_BROKEN@mx.google.com>
- <65bbf40d.170a0220.a87f4.becdSMTPIN_ADDED_BROKEN@mx.google.com>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-On Thu, Feb 01, 2024 at 10:13:39PM +0300, Arınç ÜNAL via B4 Relay wrote:
-> One remaining limitation is that the ingress port must have a PVID assigned
-> to it for the frame to be trapped to the CPU port. A PVID is set by default
-> on vlan aware and vlan unaware ports. However, when the network interface
-> that pertains to the ingress port is attached to a vlan_filtering enabled
-> bridge, the user can remove the PVID assignment from it which would prevent
-> the link-local frames from being trapped to the CPU port.
-> 
-> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> ---
-> I couldn't figure out a way to bypass VLAN table lookup for link-local
-> frames to directly trap them to the CPU port. The CPU port is hardcoded for
-> MT7530. For MT7531 and the switch on the MT7988 SoC, it depends on the port
-> matrix to choose the CPU port to trap the frames to. Port matrix and VLAN
-> table seem to go hand in hand so I don't know if this would even be
-> possible.
-> 
-> If possible to implement, link-local frames must not be influenced by the
-> VLAN table. They must always be trapped to the CPU port, and trapped
-> untagged.
+During bnx2i iSCSI testing we ran into page refcounting issues in the
+uio mmaps exported from cnic to the iscsiuio process, and bisected back
+to the removal of the __GFP_COMP flag from dma_alloc_coherent calls.
 
-Isn't this, in effect, what the "Leaky VLAN Enable" bit does?
+The cnic uio interface also has issues running with an iommu enabled,
+which these changes correct.
+
+In order to fix these drivers to be able to mmap dma coherent memory via
+a uio device, introduce a new uio mmap type backed by dma_mmap_coherent.
+
+While I understand some complaints about how these drivers have been
+structured, I also don't like letting support bitrot when there's a
+reasonable alternative to re-architecting an existing driver. I believe
+this to be the most sane way to restore these drivers to functioning
+properly.
+
+There are two other uio drivers which are mmaping dma_alloc_coherent
+memory as UIO_MEM_PHYS, uio_dmem_genirq and uio_pruss.
+These drivers are converted in the later patches of this series.
+
+v5:
+- convert uio_pruss and uio_dmem_genirq
+- added dev_warn and comment about not adding more users
+- put some PAGE_ALIGNs back in cnic to keep checks in
+  uio_mmap_dma_coherent matched with uio_mmap_physical.
+- dropped the Fixes trailer
+v4:
+- re-introduce the dma_device member to uio_map,
+  it needs to be passed to dma_mmap_coherent somehow
+- drop patch 3 to focus only on the uio interface,
+  explicit page alignment isn't needed
+- re-add the v1 mail recipients,
+  this isn't something to be handled through linux-scsi
+v3 (Nilesh Javali <njavali@marvell.com>):
+- fix warnings reported by kernel test robot
+  and added base commit
+v2 (Nilesh Javali <njavali@marvell.com>):
+- expose only the dma_addr within uio and cnic.
+- Cleanup newly added unions comprising virtual_addr
+  and struct device
+
+previous threads:
+v1: https://lore.kernel.org/all/20230929170023.1020032-1-cleech@redhat.com/
+attempt at an alternative change: https://lore.kernel.org/all/20231219055514.12324-1-njavali@marvell.com/
+v2: https://lore.kernel.org/all/20240103091137.27142-1-njavali@marvell.com/
+v3: https://lore.kernel.org/all/20240109121458.26475-1-njavali@marvell.com/
+v4: https://lore.kernel.org/all/20240131191732.3247996-1-cleech@redhat.com/
+
+Chris Leech (4):
+  uio: introduce UIO_MEM_DMA_COHERENT type
+  cnic,bnx2,bnx2x: use UIO_MEM_DMA_COHERENT
+  uio_pruss: UIO_MEM_DMA_COHERENT conversion
+  uio_dmem_genirq: UIO_MEM_DMA_COHERENT conversion
+
+ drivers/net/ethernet/broadcom/bnx2.c          |  1 +
+ .../net/ethernet/broadcom/bnx2x/bnx2x_main.c  |  2 +
+ drivers/net/ethernet/broadcom/cnic.c          | 25 ++++++----
+ drivers/net/ethernet/broadcom/cnic.h          |  1 +
+ drivers/net/ethernet/broadcom/cnic_if.h       |  1 +
+ drivers/uio/uio.c                             | 47 +++++++++++++++++++
+ drivers/uio/uio_dmem_genirq.c                 | 22 ++++-----
+ drivers/uio/uio_pruss.c                       |  6 ++-
+ include/linux/uio_driver.h                    |  8 ++++
+ 9 files changed, 89 insertions(+), 24 deletions(-)
+
+
+base-commit: 861c0981648f5b64c86fd028ee622096eb7af05a
+-- 
+2.43.0
+
 
