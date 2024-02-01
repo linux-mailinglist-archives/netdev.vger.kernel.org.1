@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-67909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E028845557
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 11:30:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 086488455A1
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 11:40:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B6A228956D
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 10:30:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7BD3282973
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 10:40:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9BB15B98B;
-	Thu,  1 Feb 2024 10:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBD6D5B1E7;
+	Thu,  1 Feb 2024 10:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yoj5HyDo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ue+SoNsP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FF2D6DD0B;
-	Thu,  1 Feb 2024 10:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2DC0185E;
+	Thu,  1 Feb 2024 10:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706783425; cv=none; b=dwxjdh70iORGG+0lagH+fCMoLgrmF040h4NoR6PIp+Y6XmwAYfHs4ZIv5BxwmATUWiAS8ppy44h8KBleS1An0G/WxJC41EtQRpvYF1jfdA3z2miOUkHPXb8H9FXoLKuxLYp/LdX/k+MavPcwpwVMO20CNRRC909oxtYYm3DRUfs=
+	t=1706784027; cv=none; b=eyENHMNdrKdPazrlPrI1k8bLmximwdtsGBFMU3P2eQ4EAiExH7wxgWk8NG560JB3ljh2Zo++84DHsDM5jTQyHxPqS7eiMw5NKS+TDYGSdlya561+PurIMXGZ+Hbc/QJEln7K3yU5ECpQO+ILs3sykjDlUMhCE0zz0db0s8giLCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706783425; c=relaxed/simple;
-	bh=kpRSNOV1qvBd7nRyNi+FOZQA1dXy0tQBvFmMZT/3dJE=;
+	s=arc-20240116; t=1706784027; c=relaxed/simple;
+	bh=XaG0HTa5bdiZUGiMcDQ0KA5J9y1Mt48AeFOL+u1Drd0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rBJP/Fojle1w1qFKuRHuH039MoZ3tGA+TqAHqSeRseDlrbKEqKUWizIxZFqUwckvy1jj0YcLUZhxrlndNDie01c66LhH8f1Ax8u52Gah4Y9aikv3dbKSwisFsZUz0hpQEhqBrjwFex4toe7VuJZnRrv7U/fL+FrrGFekXk5CHX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yoj5HyDo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 90F5EC43143;
-	Thu,  1 Feb 2024 10:30:24 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=OSv7MfRMyYYyrK9nhbtlg5fL4peSFLgyf1p0E94rk4ZqRXhyGRQRfmJkdj7AGEiBMcTPEarxCrDi3R0bnTGyKNpH+yL2DrOgqrU/AtrmoFgi6gcxEM5sgAN9r+ixyc4erZS4TeGppbTuiksjzLOglZsnYIpbC/rd60OumWhezYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ue+SoNsP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 42FCBC43399;
+	Thu,  1 Feb 2024 10:40:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706783424;
-	bh=kpRSNOV1qvBd7nRyNi+FOZQA1dXy0tQBvFmMZT/3dJE=;
+	s=k20201202; t=1706784027;
+	bh=XaG0HTa5bdiZUGiMcDQ0KA5J9y1Mt48AeFOL+u1Drd0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Yoj5HyDox8bS3+CO489Mt5T+WHuJCTWSj6FmgvNsZ7jD0JfQuR0eLAsSG+n9TYFKL
-	 9Q1JuZnw2DR6m5lDixJHbywvuUKA54Zdzkf2Ir36rex4Hla91aPP+25LGr+xT9JbQR
-	 WJhcrd5f9x2fT6NMPkz+vKtGVL/Mo9mnfKDYFvEmgCzLLNGot76oqoHWyKqdPBv4ZD
-	 fdj3ZSh/vCxaH+5NkMYsZ8qPUZ/rMzV6+8dYpp8t0MgPx4Ti0LqwvgHIpFFKKkAK99
-	 oIkg7bIAjaiYM/WCh3sbByeVX6ZCgnxyiqBGt2Bd8lP+uQozS3cl2gJXfEodXC/6H7
-	 lk2E6459/aH5g==
+	b=ue+SoNsPgTZAimqUVy5rIYex/14lNlZMmPq+EV8Qua2OfHWthNQ2wQQjer3Jo/mK7
+	 RKdKkIUaar3lHB45M9WYYfITZwnwBGU3NSWzvVz3PBWSP8yOUBh9oTL1MneiMvtgVq
+	 kK5LbaGZ86DA6xBNYxuhUoNrgp4r7kNE6/9oCdV3E7fX3hRuNzHBX5YHTNq8BOqjhW
+	 6NhU9iIyUttXlY4zOLuhcQ9RNghUwttSFTYqG1kyJvwAd7hBlBwmnsjc89SJGoizWH
+	 JAQUHqZwMS1JOCYQt0yO3pLmwheTsqU592r9bE/bc+nK8OT+y74P7/tzrS5XYaN0SZ
+	 AuEyFhr2P/FFg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7A7D7E3237E;
-	Thu,  1 Feb 2024 10:30:24 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2E98DC1614E;
+	Thu,  1 Feb 2024 10:40:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 1/2] dt-bindings: net: dsa: Add KSZ8567 switch
- support
+Subject: Re: [PATCH bpf-next 0/2] Enable inline bpf_kptr_xchg() for RV64
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170678342449.6867.9597352434665263927.git-patchwork-notify@kernel.org>
-Date: Thu, 01 Feb 2024 10:30:24 +0000
-References: <20240130083419.135763-1-dev@pschenker.ch>
-In-Reply-To: <20240130083419.135763-1-dev@pschenker.ch>
-To: Philippe Schenker <dev@pschenker.ch>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
- marex@denx.de, olteanv@gmail.com, woojung.huh@microchip.com,
- robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- andrew@lunn.ch, UNGLinuxDriver@microchip.com, devicetree@vger.kernel.org,
- davem@davemloft.net, f.fainelli@gmail.com, stefan.portmann@impulsing.ch,
- edumazet@google.com, kuba@kernel.org, philippe.schenker@impulsing.ch,
- conor.dooley@microchip.com
+ <170678402718.13930.11085578984728371793.git-patchwork-notify@kernel.org>
+Date: Thu, 01 Feb 2024 10:40:27 +0000
+References: <20240130124659.670321-1-pulehui@huaweicloud.com>
+In-Reply-To: <20240130124659.670321-1-pulehui@huaweicloud.com>
+To: Pu Lehui <pulehui@huaweicloud.com>
+Cc: bpf@vger.kernel.org, linux-riscv@lists.infradead.org,
+ netdev@vger.kernel.org, bjorn@kernel.org, houtao1@huawei.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+ eddyz87@gmail.com, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com,
+ kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+ palmer@dabbelt.com, luke.r.nels@gmail.com, pulehui@huawei.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+This series was applied to bpf/bpf-next.git (master)
+by Daniel Borkmann <daniel@iogearbox.net>:
 
-On Tue, 30 Jan 2024 09:34:18 +0100 you wrote:
-> From: Philippe Schenker <philippe.schenker@impulsing.ch>
+On Tue, 30 Jan 2024 12:46:57 +0000 you wrote:
+> This patch is the RV64 implementation of inline bpf_kptr_xchg()[0]. RV64
+> JIT supports 64-bit BPF_XCHG atomic instructions. At the same time, the
+> underlying implementation of xchg() and atomic64_xchg() in RV64 both are
+> raw_xchg() that supported 64-bit. Therefore inline bpf_kptr_xchg() will
+> have equivalent semantics. Let's inline it for better performance.
 > 
-> This commit adds the dt-binding for KSZ8567, a robust 7-port
-> Ethernet switch. The KSZ8567 features two RGMII/MII/RMII interfaces,
-> each capable of gigabit speeds, complemented by five 10/100 Mbps
-> MAC/PHYs.
+> link: https://lore.kernel.org/bpf/20240105104819.3916743-1-houtao@huaweicloud.com [0]
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3,1/2] dt-bindings: net: dsa: Add KSZ8567 switch support
-    https://git.kernel.org/netdev/net-next/c/5f8066d45782
-  - [net-next,v3,2/2] net: dsa: Add KSZ8567 switch support
-    https://git.kernel.org/netdev/net-next/c/3723b56d6f73
+  - [bpf-next,1/2] riscv, bpf: Enable inline bpf_kptr_xchg() for RV64
+    https://git.kernel.org/bpf/bpf-next/c/69065aa11ca6
+  - [bpf-next,2/2] selftests/bpf: Enable inline bpf_kptr_xchg() test for RV64
+    https://git.kernel.org/bpf/bpf-next/c/994ff2f79739
 
 You are awesome, thank you!
 -- 
