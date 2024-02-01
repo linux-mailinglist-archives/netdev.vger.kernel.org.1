@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-68155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECBF7845F7B
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 19:10:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AC64845F96
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 19:13:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 893F51F2BF6D
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:10:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7F45B2FBD6
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:11:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4949712FB04;
-	Thu,  1 Feb 2024 18:07:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C43784FCF;
+	Thu,  1 Feb 2024 18:07:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.someserver.de (mail.someserver.de [116.202.193.223])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D46912FB00;
-	Thu,  1 Feb 2024 18:07:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8050884FC5;
+	Thu,  1 Feb 2024 18:07:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.202.193.223
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706810836; cv=none; b=GfGJR0SVnMIRHOBHljEuY/0e/FH3cfcqsqHDgho4yK8ufc3vP/2gWEdsMz+Zg6OHpggLlfNCaEv4cTRzvnAOeix7E9Sb6OO/5s/BoMeI3i6ZD7/6XdFblSnbISD6u8xZvoyRqFfuVceg97nIQd0rnYhFmw6kKXL0FyyDcXGDfFo=
+	t=1706810839; cv=none; b=lhmOxoCR6j9xG30P71NDE43OYBogv2Sahw1MOflrNVBGKJdHjP9u/7HaCQB40l1wMp4f/eEel5S2anzX3vgJJlwUwB8HnJh0nRBNUOsU7Soun0NS2sO2N5JALXZEdz8gayxJEcsFv9QZ+tQAjVF6aHOGJ/vYimuKbflChKlQsqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706810836; c=relaxed/simple;
-	bh=jWA5iTRD69ucDNwkpZwR5jCH+P2otKImG+J2kWpMQs8=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ckf0wEhSkc25Chs4CfzO8gMYwLo3J0H0Rtc59yMtST9u95saXZdYCCSzEFMirLk/m9dWD2ekBvNspWAg+WT+ZrnGmtuqbA+DV6WvC4+HGT2xlO+/DJm0cy6vXvrexD8jYvmmaCTgqkSqS0fPmJLuQAggdwhRxulk+AlenrDd50A=
+	s=arc-20240116; t=1706810839; c=relaxed/simple;
+	bh=I9yo8gFF9g6Nktp5khK01f/99bXfCpCeui/xCrTFEX0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=jaeqw0/DX8LyMACjAD6mrdbcIz4pYRKBWCFCG3ZBMpXtzxZ9FtnUyN2ofn6v7Q3NXiKnBrpozmsSo97HYZF5ECKasOAPURAIUCzpbLqGmW400oBpq8qj55DrKRWncVNAg6px67UKO37LRd50tBJQ/Lw6C6KzLMagDv0SnbtIRkw=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=christina-quast.de; spf=pass smtp.mailfrom=christina-quast.de; arc=none smtp.client-ip=116.202.193.223
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=christina-quast.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=christina-quast.de
 Received: from localhost (unknown [195.162.191.218])
-	by mail.someserver.de (Postfix) with ESMTPSA id 80FA2A211E;
-	Thu,  1 Feb 2024 19:07:10 +0100 (CET)
+	by mail.someserver.de (Postfix) with ESMTPSA id 2965DA21AE;
+	Thu,  1 Feb 2024 19:07:13 +0100 (CET)
 From: Christina Quast <contact@christina-quast.de>
-Subject: [PATCH v2 0/3] Add Rust Rockchip PHY driver
-Date: Thu, 01 Feb 2024 19:06:57 +0100
-Message-Id: <20240201-rockchip-rust-phy_depend-v2-0-c5fa4faab924@christina-quast.de>
+Date: Thu, 01 Feb 2024 19:06:58 +0100
+Subject: [PATCH v2 1/3] DONOTMERGE: rust: prelude: add bit function
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -43,10 +43,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAMHdu2UC/0XMQQ7CIBCF4asY1o4BWtvqynsYYyhMZWKkONBG0
- /TuEl34dt/i/YtIyIRJHDeLYJwp0RgK9HYjrDfhhkCuWGipa6mlAh7t3XqKwFPKEP376jBicNB
- 0yvV1K9syUe6RcaDXN32+FA88PiB7RvMPqkr+Oj1lmBUoQKfRNVV3MPvuZD1TyhQMPCeT8s6hW
- NcPdt7myrMAAAA=
+Message-Id: <20240201-rockchip-rust-phy_depend-v2-1-c5fa4faab924@christina-quast.de>
+References: <20240201-rockchip-rust-phy_depend-v2-0-c5fa4faab924@christina-quast.de>
+In-Reply-To: <20240201-rockchip-rust-phy_depend-v2-0-c5fa4faab924@christina-quast.de>
 To: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
  Wedson Almeida Filho <wedsonaf@gmail.com>, 
  Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
@@ -66,43 +65,54 @@ Cc: rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-rockchip@lists.infradead.org, 
  Christina Quast <contact@christina-quast.de>
 X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1706810819; l=1206;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1706810819; l=1166;
  i=contact@christina-quast.de; s=20240130; h=from:subject:message-id;
- bh=jWA5iTRD69ucDNwkpZwR5jCH+P2otKImG+J2kWpMQs8=;
- b=x2+WW6v6zLMM6XjRuSZYbZ89dx3Cl5LmXdahaHthccc/4Gh8+ZzNrEDkpGaplAm9LUlUMptAJ
- DRo0OfTS6bQB4JaHE1iLovyZ7EjwiZi42bBiADhExh0vY5oYleM7WbV
+ bh=I9yo8gFF9g6Nktp5khK01f/99bXfCpCeui/xCrTFEX0=;
+ b=PD/auZkWvS/a6RAELm9LZMt+cqhgGaqOca8QQUD5tdAWmf0dbh8OFZXYaJmqZgB58v2xzsXPY
+ 6aq5k52d6jBD1X+2SRUI45jUSSAeNaaKZovXt/2kXeZa7O2MuqHekKw
 X-Developer-Key: i=contact@christina-quast.de; a=ed25519;
  pk=aoQfinjbnr265vCkIZdYteLDcmIqLBhY1m74WfFUU9E=
 
-Based on the example shown in drivers/net/phy/ax88796b_rust.rs, I ported
-the rockchip phy driver to Rust. The code in drivers/net/phy/rockchip.c
-was basically rewritten in Rust.  The patchset includes changes to
-phy.rs, adding more struct driver functions for the abstraction with
-Rust.
+In order to create masks easily, the define BIT() is used in C code.
+This commit adds the same functionality to the rust kernel.
 
-The driver was not tested on real hardware, because I do not have a
-board with this phy, and I would appreciate it if somebody could try
-out the driver on their board.
+Do not merge this commit, because rust/kernel/types.rs in Rust-for-Linux
+already contains this functionality and will be merged into next-net
+soon.
+But this driver does not compile without this commit, so I am adding it
+to the patchset to get more feedback on the actual driver.
 
 Signed-off-by: Christina Quast <contact@christina-quast.de>
 ---
-Christina Quast (3):
-      DONOTMERGE: rust: prelude: add bit function
-      rust: phy: add some phy_driver and genphy_ functions
-      net: phy: add Rust Rockchip PHY driver
+ rust/kernel/prelude.rs | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
- drivers/net/phy/Kconfig          |   8 +++
- drivers/net/phy/Makefile         |   4 ++
- drivers/net/phy/rockchip_rust.rs | 131 +++++++++++++++++++++++++++++++++++++++
- rust/kernel/net/phy.rs           |  31 +++++++++
- rust/kernel/prelude.rs           |  16 +++++
- 5 files changed, 190 insertions(+)
----
-base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
-change-id: 20240201-rockchip-rust-phy_depend-681db4707777
+diff --git a/rust/kernel/prelude.rs b/rust/kernel/prelude.rs
+index ae21600970b3..16e483de2f27 100644
+--- a/rust/kernel/prelude.rs
++++ b/rust/kernel/prelude.rs
+@@ -38,3 +38,19 @@
+ pub use super::init::{InPlaceInit, Init, PinInit};
+ 
+ pub use super::current;
++
++/// Returns a `u32` number that has only the `n`th bit set.
++///
++/// # Arguments
++///
++/// * `n` - A `u32` that specifies the bit position (zero-based index)
++///
++/// # Example
++///
++/// ```
++/// let b = bit(2);
++/// assert_eq!(b, 4);
++#[inline]
++pub const fn bit(n: u32) -> u32 {
++    1 << n
++}
 
-Best regards,
 -- 
-Christina Quast <contact@christina-quast.de>
+2.43.0
 
 
