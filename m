@@ -1,119 +1,134 @@
-Return-Path: <netdev+bounces-68007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4162845953
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 14:52:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23CDE84595C
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 14:53:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C637B21B1E
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:52:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D012028E7F7
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:53:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3914B5CDD9;
-	Thu,  1 Feb 2024 13:52:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE1455CDF9;
+	Thu,  1 Feb 2024 13:52:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ueiC7CfB"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="dlhPWdiC";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="vKmhuTm8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BF8F8663B;
-	Thu,  1 Feb 2024 13:52:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A67162142
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 13:52:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706795554; cv=none; b=uSSY17aZYFRLI2tzFxWUqUYOWUe8XmwKfdFlHusTOL237kEDUyic09d8ccZiAIEYRb2Z83H9E5j4txFdRLuinimZ9X3iGeWQnYV0DrU5IT4yuUvG7Arjd5OCh88BVAqdsf4eurF5EBVcDS42UA7idBIFiMbyeFpmOPvDXUXDNV0=
+	t=1706795566; cv=none; b=J8V+ZhPq+thGtMofPDuycvipjPIRb/WnQtP3H5/lyZgrWiRfNZYac28K85oBouJjS46Y0kkCtH/q5Hp1rEmqH9fWIiv47sI631asDJYL1afnlKK4gvj4qIw1KRixPWNiXgZAyhKVwqdfFE+f0bY856PW5HuPiqjBCwjpG6z3soQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706795554; c=relaxed/simple;
-	bh=hU+ObxdoMg2MlAgcOXqMatFJ02oxVhmfiG3OEicRvus=;
-	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cLCupQ7rHJVreglaT93Yqc5dtL77zMULFrEBD8wxNJKW1f7t1acGDTqNdVKpewkA0R/HkxOqHo54djkaMQqqWoYdpn3cx1kndziMpZ5qoFKwGEAt+s5hNgFz21KDcF/YfHIvPQVslsm7EjG1yETYwHf4Sx90C7tjIogZKe8i+w8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ueiC7CfB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65C90C433C7;
-	Thu,  1 Feb 2024 13:52:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706795553;
-	bh=hU+ObxdoMg2MlAgcOXqMatFJ02oxVhmfiG3OEicRvus=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ueiC7CfBdVH8cLEkErjSzc5fwcnpU9NQYkgJAZKkZdye5Ve0ZZKpNZkx3AVRwFN75
-	 KWfgD/PQh0yb1xyYnWyQvuITxKNcSfvokL/qgPm60I6VUngyErYQtVbkmm1HxINcWy
-	 n25D8upedMPS0wwORv12rv5WLwDH8rBYraNM1Y7jw90bRRBqH1TqBkIoZ12b47Q4S5
-	 bEmHqC008jveWDP4yVx3r2spzj2wAyJRWlp1SH0MdHpKOkZvtZFnwQ9upnvCRmf22x
-	 zVTDquAJf3Foz2m00hXuZMXU0GIh/8UrrPALF8N2+BjvcH4xIUHomOf1jE4UFs2Asy
-	 Y9zyJjvGVo+VQ==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=goblin-girl.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1rVXUU-00GwZa-OY;
-	Thu, 01 Feb 2024 13:52:30 +0000
-Date: Thu, 01 Feb 2024 13:52:29 +0000
-Message-ID: <86jzno70ma.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Peter Hilber <peter.hilber@opensynergy.com>
-Cc: linux-kernel@vger.kernel.org,
-	"D, Lakshmi Sowjanya" <lakshmi.sowjanya.d@intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	jstultz@google.com,
-	giometti@enneenne.com,
-	corbet@lwn.net,
-	"Dong, Eddie" <eddie.dong@intel.com>,
-	"Hall, Christopher S" <christopher.s.hall@intel.com>,
-	Simon Horman <horms@kernel.org>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	linux-arm-kernel@lists.infradead.org,
-	Sean Christopherson <seanjc@google.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Ingo Molnar <mingo@redhat.com>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Wanpeng Li <wanpengli@tencent.com>,
-	Vitaly Kuznetsov <vkuznets@redhat.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	kvm@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v3 5/8] ptp/kvm, arm_arch_timer: Set system_counterval_t.cs_id to constant
-In-Reply-To: <20240201010453.2212371-6-peter.hilber@opensynergy.com>
-References: <20240201010453.2212371-1-peter.hilber@opensynergy.com>
-	<20240201010453.2212371-6-peter.hilber@opensynergy.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/29.1
- (aarch64-unknown-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	s=arc-20240116; t=1706795566; c=relaxed/simple;
+	bh=ZO/j1j+9+A7qCam99/oB4Ql7Kg/x1VdfoAEYRYpx2Jk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=fPNKs/7fg0sIhO5EhgAxe0hTFJi2gqiMq5kSfiVKDV+boJzp6KrIRykpYGb4p2yGf9FzGsQQNmXX4UfPRoiPn/RQ59eBCxRkplbnzjv9YKAnlAKgvf8CpiPgMRPeXDd2px+rviRHXsEUuLBVOnvNGSlApDrlupOTNUgMtK+uV6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=dlhPWdiC; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=vKmhuTm8; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1706795563;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OogcyfdpfTs2059FyNWKDfxdIMwy/Wf0EdjSpwPuYeE=;
+	b=dlhPWdiCX0eaW2qNQyddeSpThyxY92nMpXXL/5IKXzLU3RFYpG7gCCumDyqE3HeT1unFKn
+	oqBh57oY+KsFVd1TsLlBp+k14+L5qaeSCt5TRyy/AtiamWMP7N0SEkmCsz7mGSsbii19hH
+	FUvOvfj4mCooZ+fcoGDjMpge1wR02I9eXF09cFWFhN/lz6SlCectKN06JdeCDED/7+2B0K
+	IjLiXeqvG7+uXYg+QwiYH+9UsRNiWRHIJNhYtDNu9YJRXa36+hKnL8uFU76Em4kS1tIptw
+	Vng+XGCLGA8g1Hq9rwNK1BT/DHroWg5DLKBJzuvcAjqgn+twT5S64MaPuNdKMQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1706795563;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OogcyfdpfTs2059FyNWKDfxdIMwy/Wf0EdjSpwPuYeE=;
+	b=vKmhuTm8LPRD4Pbbmw+xL2YJER7/u+Fy4uX1bbib+SSz36wARLM0OhQy8PeF46EpD+3lAG
+	Qr/7R7IQ9Gz/aTCQ==
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Vinicius Costa Gomes
+ <vinicius.gomes@intel.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: Re: [PATCH iwl-next v2] igc: Add support for LEDs on i225/i226
+In-Reply-To: <3629e504-4c22-4222-b218-32c9945ff77e@lunn.ch>
+References: <20240201125946.44431-1-kurt@linutronix.de>
+ <3629e504-4c22-4222-b218-32c9945ff77e@lunn.ch>
+Date: Thu, 01 Feb 2024 14:52:41 +0100
+Message-ID: <87wmro70ly.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: peter.hilber@opensynergy.com, linux-kernel@vger.kernel.org, lakshmi.sowjanya.d@intel.com, tglx@linutronix.de, jstultz@google.com, giometti@enneenne.com, corbet@lwn.net, eddie.dong@intel.com, christopher.s.hall@intel.com, horms@kernel.org, andriy.shevchenko@linux.intel.com, linux-arm-kernel@lists.infradead.org, seanjc@google.com, pbonzini@redhat.com, mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com, wanpengli@tencent.com, vkuznets@redhat.com, mark.rutland@arm.com, daniel.lezcano@linaro.org, richardcochran@gmail.com, kvm@vger.kernel.org, netdev@vger.kernel.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-On Thu, 01 Feb 2024 01:04:50 +0000,
-Peter Hilber <peter.hilber@opensynergy.com> wrote:
-> 
-> Identify the clocksources used by ptp_kvm by setting clocksource ID enum
-> constants. This avoids dereferencing struct clocksource. Once the
-> system_counterval_t.cs member will be removed, this will also avoid the
-> need to obtain clocksource pointers from kvm_arch_ptp_get_crosststamp().
-> 
-> The clocksource IDs are associated to timestamps requested from the KVM
-> hypervisor, so the proper clocksource ID is known at the ptp_kvm request
-> site.
-> 
-> While at it, also rectify the ptp_kvm_get_time_fn() ret type.
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-Not sure what is wrong with that return type, but this patch doesn't
-seem to affect it.
+On Thu Feb 01 2024, Andrew Lunn wrote:
+> On Thu, Feb 01, 2024 at 01:59:46PM +0100, Kurt Kanzenbach wrote:
+>> Add support for LEDs on i225/i226. The LEDs can be controlled via sysfs
+>> from user space using the netdev trigger. The LEDs are named as
+>> igc-<bus><device>-<led> to be easily identified.
+>>=20
+>> Offloading link speed is supported. Other modes are simulated in software
+>> by using on/off. Tested on Intel i225.
+>>=20
+>> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+>> ---
+>>=20
+>> Changes since v1:
+>>=20
+>>  * Add brightness_set() to allow software control (Andrew)
+>>  * Remove offloading of activity, because the software control is more f=
+lexible
+>
+> Please could you expand on that. Activity is quite expensive in
+> software, since it needs to get the statistics every 50ms and then
+> control the LED. So if activity can be offloaded, it should
+> be. Sometimes the hardware can only offload a subset of activity
+> indications, which is fine. It should implement those it can, and
+> leave the rest to software.
 
-	M.
+Activity can be offloaded to HW only with Tx and Rx combined. Individual
+Rx or Tx activity is not supported. But sure, when a user selects Rx and
+Tx it can be offloaded, if it's too expensive doing it in software.
 
--- 
-Without deviation from the norm, progress is not possible.
+Thanks,
+Kurt
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmW7oikTHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgo05EACnxY2U5Iw6L1XYr4uU+ERxEyZ6f582
+8Ro2QsR+RDgq0R4mEXRM2t1bb/665o6yEqCuk/rLVK6bIigowuUtyznqkZ/bXUtr
+a09pa2o8gB5skWueeTVZh2HwWrEIFuHAa2gs5kR+dokEAO4rDupGZjrX52l46I8F
+6A/w51tbM5vrGqdOwsKcw+nk1BPyhd+zNHSHIJaQICx6fSQ5BwMEcijcbKa8xlyV
+RhFSkFlyoESrk9oghfZUiwRHokFwmM7Z+F9GvbRzj5htCEyxZC7PhPu1Hhte3iE7
+Efk4fa8lYsvrctwO+3h7CsigY7qidjO9W5tRtkUBfLA4Qy8uTk7+5YAvhGhnZOpE
+d0wM7nLSjjK09DS7BVPQfQsAbGJQy/HBNt1xx3MqFFA/tnZ78pM0h9YGjw8euJxO
+R1p2Cp4P8bNklmnFpAErI9hU32mGDN+7cL6/IOBvuZeXL4UX4gpuUtyoT7rmx4Fo
+8pkCuIyeEM1DvrLDqfsPZOkPF/PHhieOmMwrqAVJXejdjk+YBDdSpZzfrUE6DwZs
+Kd86lO/8WY4ja2PjZpuZvZDapufU/QQhLy9i6fHo/wtBhVknlV4fRa7rXp7GtvS1
+huNrznEGYYFeMC6p8rbrm5sPmYjQq7KoopfA6mDWvCAS57mbx+F9fMCjvxSY+CTv
+ThPsezdBBIWvrg==
+=ZhtF
+-----END PGP SIGNATURE-----
+--=-=-=--
 
