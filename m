@@ -1,90 +1,90 @@
-Return-Path: <netdev+bounces-68097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E556845D47
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:30:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84F26845D2F
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:26:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E04DC299C47
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:30:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 906FB1C243FD
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:26:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A9A15E201;
-	Thu,  1 Feb 2024 16:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 686475A4C9;
+	Thu,  1 Feb 2024 16:23:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="i575lqAk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V4mw59lV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f66.google.com (mail-lf1-f66.google.com [209.85.167.66])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 529A65A4FF
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 16:29:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99087E11A;
+	Thu,  1 Feb 2024 16:23:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706804955; cv=none; b=BmCQz/ul02YwHRIr9SjzsC8p7x+wZvmqrUPyNZXLsqH7y2UYXmJByOAB0EOtGMgpnr/O3/M5PPX9q7B9N4UKTF1j/jSJC6P3nDDkRmjRm7AO+BCi4x9cgeE90eANg7cyVdxyyWHGN48HF476x4H2tydmSPX2uyv/xgMEABn3uck=
+	t=1706804635; cv=none; b=ma2w6JyQg1A+sQoOjqNKeZ8ZBnUMRDYVk0G4IzXAz5yerM/imjOL7bM2vxCp9KTfg3aX1X1q+4DRk0Sy4PDilS18+9lG1vhDpoxAM24BwqCf+CrWfjVT9rFFwj154xQOVQYml9k4h7GcMe1Fm0foNkJoLjkAgrwpweYbhLmh/7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706804955; c=relaxed/simple;
-	bh=S3AjnrNIx5BKudNt+FuYiHFiKF3Aoog4fHYyZ72OBkA=;
+	s=arc-20240116; t=1706804635; c=relaxed/simple;
+	bh=Lc6vsJuq2InNpQ6ROo4kJykXV1gLlEdgQidNBeqY9d4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fU5Sw+RJ29qjM9AI3rysaChrnEIn0XuwmqZO1vixG43qkgWNtoswE2J3BuV3UKR7V6jSBMh2RRDpaCyl17GQbNYJOS7r7/sVUKdd2rydfa9JWys4Mbf3yuHx/O+F7crQdW3lyP4oFknAvhrma8iCcqH8S5kTLw7AVAtDXhE/fvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=i575lqAk; arc=none smtp.client-ip=209.85.167.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lf1-f66.google.com with SMTP id 2adb3069b0e04-51124db6cf0so1184584e87.0
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 08:29:13 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=NDklixJFpOe6ohN1X6+HHLsI+kjxjYFZcWCyMdmTwo8ZoBFbxPU/Aiu7pv3VQODOCFPyB5d9bysfm9v1beOqMgnlAEn5uuA2oMtvoEoctE6yIAXiv2Un7e0N5K7ecSyRmtCiFLvz7VGwvznBe/z945fDaU39RIRZlC3/VBtxVic=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V4mw59lV; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-33adec41b55so731670f8f.0;
+        Thu, 01 Feb 2024 08:23:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706804951; x=1707409751; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706804632; x=1707409432; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=iNllvtHZDHAWtrtv2nUVEGYjjg2CQe0uH6p+qaHk/zI=;
-        b=i575lqAk5QpDzdnJ0aDRfnljghLoEZOwTIjOuhc6P8MNrZAvfZWbJDEpYAlPSo+e9e
-         +FaH7abrJYJiWt9t9Iw6SrvnGCW11PwLuo5/exDBphoBu2XJwBtqH6lHXAMMaHRAp2uV
-         SC8Vf7TfZdimenF1RDv6q9TX+vCuWP7aPhyRe3PUmUKuaOuU3DswUUf/omnYoiUT+BsW
-         OkeUut4u44o5HrpbEuEpC83sqn0471KFa+y6DzBGdxTHwTSgn2E3hVJO06YOz8sPd2TZ
-         S5HZ2kuKy4UqvcWrLz7quOrTaEqgeJYwd029VAblQca5YLKyk8viYx6Ro9DyDpHWuyic
-         vr3A==
+        bh=KWMLBwwrq98cpw9j+C9MMkDHh6iPJbtOGOBB2hDS5dA=;
+        b=V4mw59lVpZYGYdGbE+8tEKpxZIiNzmiazR8veF5o+ZwoNAAQEvCwNmT7zohyqg4d9Y
+         1Q7odb8Lsxxvv0iDHLH9QpnSx2RaZnuEgJbx5YTXJkg6dUKen3EUR/QK1eSrrfZ0gxte
+         /ENQX/0XkdFXCejct2Hv+yefS/yYnwTef4j+HHzaGePr38thbxf54nt6QmslkRtcKmI0
+         D0TFCKKyPyFOcx7lz6OZEWtj8VKVhx7RmDSRozB3UcF15P+gnDDUiSbspTrJoL9qAcgw
+         lluvUtvwwAUPTNFgCQIzEHv10BXKT+UnJHnB4Ot4ka9RhkxLLbk5QtjPC8A5SIyFWsRG
+         UrjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706804951; x=1707409751;
+        d=1e100.net; s=20230601; t=1706804632; x=1707409432;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=iNllvtHZDHAWtrtv2nUVEGYjjg2CQe0uH6p+qaHk/zI=;
-        b=Sv7m7isE5g0iM5aXG6ZskL1Xyzm3AJhN4E/whYzfFb+nvXN2YGXphG6JNl5sMbTH40
-         vMddRLuvB0KBWp5KPK2fqOEfnFFT22qRrukQHblUzLLRhvLecJW8iq6EToBKoqutxlGH
-         bS1nW54lBlqUe0TSSezCYB+/DRq+w9Dv/iR/9k7wh9uqGYptPmy/7rexJ6N3mjf6krsB
-         iRkJX7S9tVEFwLn151nKVdVeeKTirtCfJyXLv6MEu9P/XjOPTVRp/cHRURMaXP32RdgP
-         R12+y0aHBXerhNQP6cDkdBPkvG3o52dWzvzktg3MikMhMjFPhpie2d77lhQfuEURnkDb
-         DLBw==
-X-Gm-Message-State: AOJu0Yyl8Lai/5Npfcv61C7ACHI7rRZTKAl64GLCNGagYStc4VRYaDTm
-	l8cSFlR1DDcm2+brHchGfifBfAnzbLMDa9dfBc/WflbZtgMIx86E3fu9WXDZTGM=
-X-Google-Smtp-Source: AGHT+IFpHJ9fDp3l9urMIz13d5uHrF2tLGi6nIvV59bVO5ddL+GvcU3faJHjeQ/t/EVxkT02aIk5Hw==
-X-Received: by 2002:a05:600c:3151:b0:40f:aabd:b83 with SMTP id h17-20020a05600c315100b0040faabd0b83mr4429255wmo.13.1706804501869;
-        Thu, 01 Feb 2024 08:21:41 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCU5l2dL8cK1cAB4grrA4V4D/XQXZKGpCwYEEgqMb5x2x4dcX8OR4UqDUNJHrfM/Iutif0muo/x0eAIkmpruVJZnVcs/yVyLqxI39v/alBmjYu2llkaZleZKNi4BNcDVCYzYsTDzuhgU/2EuwOjDZRJgMh8qO/us6VAOPZmnRo6b+n8aBxRVekETd5nBmkVhPgTvzDNc+cgtUoS4hGm3ef41cvU0uknmWbOvNYRMhr90Tw+0z6qHoGbYHnGj0JxhGFn5LnFDw2US/FhLgUITymjqLP1zAZuOLkSzweUB4SQworFLPUb64QcjksWzyPVI+hDEEDCXhPjUkJklVZ18BlRXw+iiv+Kyx0YTRI6g0oRH9nWI1SmaWKiC+OEZYhN2jkPtrvHzuuwxD3EzfixyEg8RJdwl/k034Il6jb83p5xV6j8keHt/nFByX83dtqLhVMqzG27njGZHXKGkc+YvoLDGVl0=
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id f6-20020a05600c154600b0040fa661ee82sm4903623wmg.44.2024.02.01.08.21.40
+        bh=KWMLBwwrq98cpw9j+C9MMkDHh6iPJbtOGOBB2hDS5dA=;
+        b=RbRDbg/KQ/ukId4kgoCmUT5BoKz+sZJoq52SKUMdKzkM/Y2f33gAptLWZP1350KN4P
+         iIYKdHdP7932dOp0e6lGcd3KWXrglRHA0NHP83NQMUeMi+u8Fppq7G63y4HFq4OzYmOK
+         G+2XYmV6c06hdVtRlvuuLXymgAwmEMtyTPzxH9ng1vFLIPED5PHoXbv17pf6bthAbbNj
+         AeXMUqA7FlwmunSheCPCBWQBiPkwcrDjfZd5gVc/SPJVO1FDZdP9/n4zLtNEa8ZHC5pU
+         8By3bhwZdw1TwiXsafZwk8jAPEyLnSVyKeZrxXqQijKWTSI8lIDHiHlKYfxKcG7rJOyn
+         klaA==
+X-Gm-Message-State: AOJu0Yx+JYSUPZyZxHKDZbIe6Ob8jWGRkXDu63MYxScVKtYYXnehb0qv
+	TRLOpxYGNF0oaFvweZhY12J3qwRwn66Aka1isN28ND+pv+XtlJLu
+X-Google-Smtp-Source: AGHT+IHUrVZJvvXQO/F46SGvBHmFou+tBmeLgmTv2/pnii7M0QlMF4iDYFSM3/RgIsONEWdeHYZ0vw==
+X-Received: by 2002:adf:db4b:0:b0:337:6bc5:8c8 with SMTP id f11-20020adfdb4b000000b003376bc508c8mr2158116wrj.68.1706804631659;
+        Thu, 01 Feb 2024 08:23:51 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCU5GpK2fzf9u83rld5cXo1En8vk92nshy0BA1uku4maQvP1GT71F+EOXlw7kWnJA7Cu38Ch1f8tAay1ILKEyzceIUxFjihKsJ8gVU4L/EuiOSAqa4fQwOeRu2z/7MSVluE8GXHMy+jfP4AcXamts5SmRejcWXNC3tHuVTv7XmJktEDtHpbnnBwUdHCy5n7F9wsNSnXcZRUkkCme+4SqRWhHMhhA8YuJyBBpbKALk4P0E++5KwLI4qjpiq6EaQsfT9IstaWoZybGOBbBoAP7xbf2Q82Hc6RZChngNU6XIBTgA7I2EAYxbyUlYLyhnc3EXKPbOAVBvQgZxkGjKgPRMOwYwP5a7352Oitve7+NY5f5z2RR7UDTMHFnUSr1ZkSroPastA==
+Received: from debian ([93.184.186.109])
+        by smtp.gmail.com with ESMTPSA id cc9-20020a5d5c09000000b0033afb963d0dsm7482152wrb.101.2024.02.01.08.23.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 08:21:41 -0800 (PST)
-Date: Thu, 1 Feb 2024 17:21:38 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Aahil Awatramani <aahila@google.com>
-Cc: David Dillow <dave@thedillows.org>,
-	Mahesh Bandewar <maheshb@google.com>,
-	Jay Vosburgh <j.vosburgh@gmail.com>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Andy Gospodarek <andy@greyhouse.net>,
-	"David S . Miller" <davem@davemloft.net>,
+        Thu, 01 Feb 2024 08:23:51 -0800 (PST)
+Date: Thu, 1 Feb 2024 17:23:49 +0100
+From: Dimitri Fedrau <dima.fedrau@gmail.com>
+To: Guenter Roeck <linux@roeck-us.net>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Martin KaFai Lau <martin.lau@kernel.org>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v6] bonding: Add independent control state
- machine
-Message-ID: <ZbvFEtQskK3xzi6y@nanopsycho>
-References: <20240129202741.3424902-1-aahila@google.com>
+	Jean Delvare <jdelvare@suse.com>,
+	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org
+Subject: Re: [PATCH v5 net-next 08/13] net: phy: marvell-88q2xxx: add support
+ for temperature sensor
+Message-ID: <20240201162349.GC48964@debian>
+References: <20240122212848.3645785-1-dima.fedrau@gmail.com>
+ <20240122212848.3645785-9-dima.fedrau@gmail.com>
+ <88a60be9-083b-4618-845c-6983bcad3540@roeck-us.net>
+ <c9866a56-d82e-4a3d-b335-db22c0413416@lunn.ch>
+ <a02c7451-8515-45d4-ae7b-9e64b03b5b38@roeck-us.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,31 +93,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240129202741.3424902-1-aahila@google.com>
+In-Reply-To: <a02c7451-8515-45d4-ae7b-9e64b03b5b38@roeck-us.net>
 
-Mon, Jan 29, 2024 at 09:27:41PM CET, aahila@google.com wrote:
+Am Thu, Feb 01, 2024 at 05:39:25AM -0800 schrieb Guenter Roeck:
+> On 2/1/24 05:27, Andrew Lunn wrote:
+> > > > +#ifdef CONFIG_HWMON
+> > > 
+> > > HWMON is tristate, so this may be problematic if the driver is built
+> > > into the kernel and hwmon is built as module.
+> > 
+> > There should be Kconfig in addition to this, e.g.
+> > 
+> > config MAXLINEAR_GPHY
+> >          tristate "Maxlinear Ethernet PHYs"
+> >          select POLYNOMIAL if HWMON
+> >          depends on HWMON || HWMON=n
+> >          help
+> >            Support for the Maxlinear GPY115, GPY211, GPY212, GPY215,
+> >            GPY241, GPY245 PHYs.
+> > 
+> > So its forced to being built in, or not built at all.
+> > 
+> 
+> Even then it should be "#if IS_ENABLED(HWMON)" in the code.
+> 
+>
+If using "#if IS_ENABLED(HWMON)" do I have to add the dependency in
+the KConfig file ? When looking at other PHY drivers, they do.
 
-[...]
-
-
->diff --git a/drivers/net/bonding/bond_procfs.c b/drivers/net/bonding/bond_procfs.c
->index 43be458422b3..95d88df94756 100644
->--- a/drivers/net/bonding/bond_procfs.c
->+++ b/drivers/net/bonding/bond_procfs.c
->@@ -154,6 +154,8 @@ static void bond_info_show_master(struct seq_file *seq)
-> 			   (bond->params.lacp_active) ? "on" : "off");
-> 		seq_printf(seq, "LACP rate: %s\n",
-> 			   (bond->params.lacp_fast) ? "fast" : "slow");
->+		seq_printf(seq, "LACP coupled_control: %s\n",
->+			   (bond->params.coupled_control) ? "on" : "off");
-
-Hmm, I wonder how it makes sense to add new features here. This should
-rot.
-
-
-> 		seq_printf(seq, "Min links: %d\n", bond->params.min_links);
-> 		optval = bond_opt_get_val(BOND_OPT_AD_SELECT,
-> 					  bond->params.ad_select);
-
-[...]
+Dimitri
 
