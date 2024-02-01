@@ -1,291 +1,234 @@
-Return-Path: <netdev+bounces-67867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36F6184524B
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 09:01:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B347845257
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 09:06:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C78F1C221B1
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:01:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEFFE1F2B295
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:06:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E86F1586F5;
-	Thu,  1 Feb 2024 08:01:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB80A158D84;
+	Thu,  1 Feb 2024 08:06:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tgz4Ea3Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2062.outbound.protection.outlook.com [40.107.212.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D8C3B182;
-	Thu,  1 Feb 2024 08:01:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706774466; cv=none; b=VmnJKoZqolUKZsQUyz3KWXUzr+Bw7p1MB24qnErQ+UMxAHhpFNQ9G7J/824S6Seqx0m7pbcCGVO3G2Ieu2TAzE6p9EZj+5Gs1Qi/IBULX/wSKHUc2Sk/VSKWXdTVpnb+M38/Sc4Y8fsau/Rd50AYiXvGMoRw8drWKVCzSlKL+AQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706774466; c=relaxed/simple;
-	bh=kS9DYB4BEmc66Mc51nkbeAZk5TYUzacr2iWVxMq1DIk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KtVRDBSVk3pnK84KKiylh57BQ/WETBnvO5zCe3z0SYKM6oq7NMjiEr3svBc9ioQVFKlStU0UJwNOpKvwon15ruzPJQRRQEU8OVyY4AwyS1hEcqlxAz2ZY7bkNP5nqhMaH4jtZXv3SjKfphVotbOHsVRP22MTr9rUP2GItBrUVFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.6] (ip5f5af685.dynamic.kabel-deutschland.de [95.90.246.133])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 371B861E5FE01;
-	Thu,  1 Feb 2024 09:00:15 +0100 (CET)
-Message-ID: <943270a2-3125-4767-b4e7-2852b0f8ea94@molgen.mpg.de>
-Date: Thu, 1 Feb 2024 09:00:14 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49F1158D74;
+	Thu,  1 Feb 2024 08:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.62
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706774777; cv=fail; b=BhBs/zsVgNomiOXMQ7UfI5LIDGXPotBzCgWSGcRBrQoMev2zUbfhTps266ujZkghp4b5ck8ZJkH6nzUypxkS5mqYxwKRGd+2AfBoDIQaOPGwtOlpGawATRfGPqL3Mk4wZh9E1qrUTgxo4b58JqKrPt7pxqdgr5HS0GFf7hMHrvw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706774777; c=relaxed/simple;
+	bh=VN0+4Zgf7jyoWqgMA9jM/xjheZzHQOVyXv4LJt8+1W8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OxaD/x09642D98Up8j8HKPdKzUXotfEaouY+dxJydv1xWe8Ma0oJy31/X3MBg+l/4x5VweW/06QJOaaxBAl9ju9c6JHhFfPVkn1q1jvjdde0LdHrwP0sb4JHNOP9J82s56XQmOW1Kd7RjdKrbWUDZe4Fipj6g7V4YytRsYpXumo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=tgz4Ea3Z; arc=fail smtp.client-ip=40.107.212.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Gb27yrz4Ti/oWgALlMc2A4murT73QFyx06GP6Y6LdogslpZXpK0Iqcvz9JbRwKWwdOoXfUY0kfths82VjNO7hlJrZswIWf2pwBdcrjOfFEQN42+6fvhNdur+F9p3H4QJRqDc5OeXdY7eQTqhalP9d/i2P3+ZVnvjWoU1yAv+8gQHIgudKvJtCRqMxwtdP2MsUWOdLdbXPsCG/Litp0GXAQpUG+eIq/xCxqLZGcH7ok2s+v0DaLV4aX+XzGf7kbkeJ8DdrFaD44qWGgdktS8GxdDKAZMoZXZ7Nj7IObEV6an1FSBGcbPuVNZwmWfKZgCIZFNFwd1tWr2kJNLMFVARww==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZTNnGGeR7u10jrzxZge+9+6sDDntXVkb5X30h5D0rHo=;
+ b=IrCW/icsV7c/MdrJmvvWcq7P3WAi0T4Invet4H81LcWqT67nxVrnIhn8aIo3c3XIV7GlR0+fbfa1O8YaP9C67U3O/gDNJcHjrceDT+orgVjg4pxckeaM5rD9W/aoaeWj92nNZ0ZuLrQt2/WPM+Mcj5xFkgS2vvVeZydJKeXMDhycRr2iN8jLfbvlA8Gx6gMcPelZj22Lwx1zx1rugH6sieXMK/iq+Rzxh8PT2IcYZsRMtZXeUuFeuTE8vlWL1K0l5ukPgE+Jjx/u34avHsYHBZWq/IRRhFTF8luRkLFKQxQY7d1HlL0Maf+AJ+OyTyuroDEA8hewSV1WVcTh2xRkPA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZTNnGGeR7u10jrzxZge+9+6sDDntXVkb5X30h5D0rHo=;
+ b=tgz4Ea3ZAOfoEfyntaJTbNC8DHdb9fFYodSoQ/5Ohkhg17sIAYSeyJOdD1gUvtVhWjDfmZ4IEAa+Hqshcg03HzgyAROP6TW3rn2QRrX5N2j628KzXae5WfwFJHHYT/a9Ba1s4Uj0ILtSvR9FelD+rRAgEFh4flAbiGSgUdbrXS1Y0kGrfDqZt3aTskiwwFHVyqaqRkfWPk+hXKNmy1PzPoJDFjpZwCyXAMZGYVew0V6tLmAmJ1aOqhz6Cl8VR5g4sl47WrlfimjXjhbFOfeqOj/s5ekSFfnnIpQVgsiwCVkhwA6CZGHxS9gUQOP6y8m1AvF9cnSh++GijhkWQ7sptg==
+Received: from SN6PR16CA0046.namprd16.prod.outlook.com (2603:10b6:805:ca::23)
+ by PH7PR12MB7257.namprd12.prod.outlook.com (2603:10b6:510:205::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.22; Thu, 1 Feb
+ 2024 08:06:09 +0000
+Received: from SA2PEPF000015C6.namprd03.prod.outlook.com
+ (2603:10b6:805:ca:cafe::d) by SN6PR16CA0046.outlook.office365.com
+ (2603:10b6:805:ca::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.26 via Frontend
+ Transport; Thu, 1 Feb 2024 08:06:09 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SA2PEPF000015C6.mail.protection.outlook.com (10.167.241.196) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7249.19 via Frontend Transport; Thu, 1 Feb 2024 08:06:09 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 1 Feb 2024
+ 00:05:50 -0800
+Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.231.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.41; Thu, 1 Feb 2024 00:05:47 -0800
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <shuah@kernel.org>, <razor@blackwall.org>, "Ido
+ Schimmel" <idosch@nvidia.com>
+Subject: [PATCH net-next] selftests: net: Fix bridge backup port test flakiness
+Date: Thu, 1 Feb 2024 10:05:16 +0200
+Message-ID: <20240201080516.3585867-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH] ice: Add get/set hw address for VF
- representor ports
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: ksundara@redhat.com, jesse.brandeburg@intel.com,
- anthony.l.nguyen@intel.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, rjarry@redhat.com,
- aharivel@redhat.com, cfontain@redhat.com, vchundur@redhat.com
-References: <20240131080847.30614-1-ksundara@redhat.com>
- <64c36525-9177-48b1-abbb-c69dbdeb6d79@molgen.mpg.de>
- <ZbtK6PwsYLosTem8@nanopsycho>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <ZbtK6PwsYLosTem8@nanopsycho>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA2PEPF000015C6:EE_|PH7PR12MB7257:EE_
+X-MS-Office365-Filtering-Correlation-Id: b0de4fe8-b433-4248-4cf3-08dc22fca64b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	YWhoMYRNDc61+YHDnLiqH8SqB4mI+L23M4/NfKyQd5g9Ma9Ra9n4uvg35GftaKoJmmgm0cJYfeWy55SDdsbcbXOWwThyn8Ki1m04HPlY2HB6zoXHsmU8KAaIYzBgvK4agPDLxa+hcs+2bBCOsWlySu96gil+wU1r1pF1NginRD7U8NKQx+PK9dMnym2vWlbh+tMBm+N1iRSs4pBss2RDO86W5e33g+ZY1yw5EOKq1iXcjJmcp/7LheDg6QvA0LLPhcbIO1D32b3V1P7mAE78G9Eenfg0UlKNVgDv0JPRIq5cFTMEa+PtYeupMsNVZltVQHpfln/EoTzHrqmF8jaSC0n5JWHlvBDJU6+CQmRCuW7rgD9pFIZe1OyqPUys9IBq2uQYxUlYFfLc9tqUURDqTMS437Q1woG+4jrmlscz9elNKrIe3LYLm8nfzuGkgkVrJ9QDuWEpzAPf8q1y5VXw2BIF7PjOlFbTMwKDCWwpl6JgK1L/J/AHFMKPooh19wAeJM2Ny05tuPNa0d1xN13gkMOnMIjswpfUaHVpG2hJb0SS4ejZViHvTet6V0k9WjO8C/yLye0tFww9xeuHDcKUjQAQVWPT7cIKx44rMYayax3fCNLIrC4RqVL+URRyccyuTsCMKTt9jmzN2xirWJD/0Q+egZm2SpWlPKlOEJrT7YYLfsK8GRW8y2qhlk2hKd7xwKoq538YK8E8QsEI7GVmLupLjeojBJSgtJPeL8iNPZs=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(136003)(346002)(396003)(376002)(230922051799003)(186009)(82310400011)(64100799003)(1800799012)(451199024)(40470700004)(36840700001)(46966006)(40480700001)(40460700003)(41300700001)(83380400001)(107886003)(36756003)(82740400003)(70206006)(86362001)(7636003)(36860700001)(1076003)(356005)(2616005)(26005)(47076005)(16526019)(336012)(426003)(54906003)(2906002)(70586007)(6666004)(316002)(110136005)(4326008)(5660300002)(8676002)(478600001)(8936002);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Feb 2024 08:06:09.5261
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: b0de4fe8-b433-4248-4cf3-08dc22fca64b
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SA2PEPF000015C6.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7257
 
-Dear Jiri,
+The test toggles the carrier of a bridge port in order to test the
+bridge backup port feature.
 
+Due to the linkwatch delayed work the carrier change is not always
+reflected fast enough to the bridge driver and packets are not forwarded
+as the test expects, resulting in failures [1].
 
-Am 01.02.24 um 08:40 schrieb Jiri Pirko:
-> Wed, Jan 31, 2024 at 05:15:46PM CET, pmenzel@molgen.mpg.de wrote:
+Fix by adding a one second delay after a carrier change in places where
+a packet is sent immediately after the carrier change.
 
-[…]
+[1]
+ # Backup port
+ # -----------
+ [...]
+ # TEST: swp1 carrier off                                              [ OK ]
+ # TEST: No forwarding out of swp1                                     [FAIL]
+ [  641.995910] br0: port 1(swp1) entered disabled state
+ # TEST: No forwarding out of vx0                                      [ OK ]
 
->> Am 31.01.24 um 09:08 schrieb karthiksundaravel:
->>> Changing the mac address of the VF representor ports are not
->>
->> Do you mean “is not possible”?
->>
->>> available via devlink. Add the function handlers to set and get
->>> the HW address for the VF representor ports.
->>
->> How did you test this? It’d be great if you documented it.
->>
->>> Signed-off-by: karthiksundaravel <ksundara@redhat.com>
->>
->> Is “karthiksundaravel” the official spelling of your name. If not, you can
->> change it with
->>
->>     git config --global user.name "Your Name"
->>     git commit -s --amend --author="Your Name <ksundara@redhat.com>"
->>
->>> ---
->>>    drivers/net/ethernet/intel/ice/ice_devlink.c | 134 ++++++++++++++++++-
->>>    1 file changed, 132 insertions(+), 2 deletions(-)
->>>
->>> diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
->>> index 80dc5445b50d..56d81836c469 100644
->>> --- a/drivers/net/ethernet/intel/ice/ice_devlink.c
->>> +++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
->>> @@ -9,6 +9,8 @@
->>>    #include "ice_eswitch.h"
->>>    #include "ice_fw_update.h"
->>>    #include "ice_dcb_lib.h"
->>> +#include "ice_fltr.h"
->>> +#include "ice_tc_lib.h"
->>>    static int ice_active_port_option = -1;
->>> @@ -1576,6 +1578,134 @@ void ice_devlink_destroy_pf_port(struct ice_pf *pf)
->>>    	devlink_port_unregister(&pf->devlink_port);
->>>    }
->>> +/**
->>> + * ice_devlink_port_get_vf_mac_address - .port_fn_hw_addr_get devlink handler
->>> + * @port: devlink port structure
->>> + * @hw_addr: Mac address of the port
->>> + * @hw_addr_len: length of mac address
->>
->> Mac/mac is spelled differently. (Also below.)
->>
->>> + * @extack: extended netdev ack structure
->>> + *
->>> + * Callback for the devlink .port_fn_hw_addr_get operation
->>> + * Return: zero on success or an error code on failure.
->>> + */
->>> +
->>> +static int ice_devlink_port_get_vf_mac_address(struct devlink_port *port,
->>> +					       u8 *hw_addr, int *hw_addr_len,
->>> +					       struct netlink_ext_ack *extack)
->>> +{
->>> +	struct net_device *netdev = port->type_eth.netdev;
->>> +
->>> +	if (!netdev || !netdev->dev_addr)
->>> +		return -EADDRNOTAVAIL;
->>> +
->>> +	ether_addr_copy(hw_addr, netdev->dev_addr);
->>> +	*hw_addr_len = ETH_ALEN;
->>> +	return 0;
->>> +}
->>> +
->>> +/**
->>> + * ice_devlink_port_set_vf_mac_address - .port_fn_hw_addr_set devlink handler
->>> + * @port: devlink port structure
->>> + * @hw_addr: Mac address of the port
->>> + * @hw_addr_len: length of mac address
->>> + * @extack: extended netdev ack structure
->>> + *
->>> + * Callback for the devlink .port_fn_hw_addr_set operation
->>> + * Return: zero on success or an error code on failure.
->>> + */
->>> +static int ice_devlink_port_set_vf_mac_address(struct devlink_port *port,
->>> +					       const u8 *hw_addr,
->>> +					       int hw_addr_len,
->>> +					       struct netlink_ext_ack *extack)
->>> +{
->>> +	struct devlink *devlink = port->devlink;
->>> +	struct net_device *netdev = port->type_eth.netdev;
->>> +	struct ice_pf *pf = devlink_priv(devlink);
->>> +	struct ice_vsi *vsi = *pf->vsi;
->>> +	struct ice_hw *hw = &pf->hw;
->>> +	struct device *dev = ice_pf_to_dev(pf);
->>> +	u8 old_mac[ETH_ALEN];
->>> +	u8 flags = 0;
->>> +	const u8 *mac = hw_addr;
->>> +	int err;
->>> +
->>> +	if (!netdev)
->>> +		return -EADDRNOTAVAIL;
->>> +
->>> +	if (!is_valid_ether_addr(mac))
->>> +		return -EADDRNOTAVAIL;
->>> +
->>> +	if (ether_addr_equal(netdev->dev_addr, mac)) {
->>> +		dev_dbg(dev, "already using mac %pM\n", mac);
->>> +		return 0;
->>> +	}
->>> +
->>> +	if (test_bit(ICE_DOWN, pf->state) ||
->>> +	    ice_is_reset_in_progress(pf->state)) {
->>> +		dev_err(dev, "can't set mac %pM. device not ready\n", mac);
->>> +		return -EBUSY;
->>> +	}
->>> +
->>> +	if (ice_chnl_dmac_fltr_cnt(pf)) {
->>> +		dev_err(dev, "can't set mac %pM. Device has tc-flower filters, delete all of them and try again\n",
->>> +			mac);
->>> +		return -EAGAIN;
->>> +	}
->>> +
->>> +	netif_addr_lock_bh(netdev);
->>> +	ether_addr_copy(old_mac, netdev->dev_addr);
->>> +	/* change the netdev's MAC address */
->>
->> The comment seems redundant.
->>
->>> +	eth_hw_addr_set(netdev, mac);
->>> +	netif_addr_unlock_bh(netdev);
->>> +
->>> +	/* Clean up old MAC filter. Not an error if old filter doesn't exist */
->>> +	err = ice_fltr_remove_mac(vsi, old_mac, ICE_FWD_TO_VSI);
->>> +	if (err && err != -ENOENT) {
->>> +		err = -EADDRNOTAVAIL;
->>> +		goto err_update_filters;
->>> +	}
->>> +
->>> +	/* Add filter for new MAC. If filter exists, return success */
->>> +	err = ice_fltr_add_mac(vsi, mac, ICE_FWD_TO_VSI);
->>> +	if (err == -EEXIST) {
->>> +		/* Although this MAC filter is already present in hardware it's
->>> +		 * possible in some cases (e.g. bonding) that dev_addr was
->>> +		 * modified outside of the driver and needs to be restored back
->>> +		 * to this value.
->>> +		 */
->>> +		dev_dbg(dev, "filter for MAC %pM already exists\n", mac);
->>> +		return 0;
->>> +	} else if (err) {
->>> +		/* error if the new filter addition failed */
->>
->> The comment seems redundant.
->>
->>> +		err = -EADDRNOTAVAIL;
->>> +	}
->>> +
->>> +err_update_filters:
->>> +	if (err) {
->>> +		dev_err(dev, "can't set MAC %pM. filter update failed\n", mac);
->>> +		netif_addr_lock_bh(netdev);
->>> +		eth_hw_addr_set(netdev, old_mac);
->>> +		netif_addr_unlock_bh(netdev);
->>> +		return err;
->>> +	}
->>> +
->>> +	dev_dbg(dev, "updated MAC address to %pM\n", netdev->dev_addr);
->>
->> Should it be level info?
->>
->>> +
->>> +	/* write new MAC address to the firmware */
->>> +	flags = ICE_AQC_MAN_MAC_UPDATE_LAA_WOL;
->>> +	err = ice_aq_manage_mac_write(hw, mac, flags, NULL);
->>> +	if (err) {
->>> +		dev_err(dev, "can't set MAC %pM. write to firmware failed error %d\n",
->>> +			mac, err);
->>> +	}
->>> +	return 0;
->>> +}
->>> +
->>> +static const struct devlink_port_ops ice_devlink_vf_port_ops = {
->>> +	.port_fn_hw_addr_get = ice_devlink_port_get_vf_mac_address,
->>> +	.port_fn_hw_addr_set = ice_devlink_port_set_vf_mac_address,
->>> +};
->>> +
->>>    /**
->>>     * ice_devlink_create_vf_port - Create a devlink port for this VF
->>>     * @vf: the VF to create a port for
->>> @@ -1611,7 +1741,8 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
->>>    	devlink_port_attrs_set(devlink_port, &attrs);
->>>    	devlink = priv_to_devlink(pf);
->>> -	err = devlink_port_register(devlink, devlink_port, vsi->idx);
->>> +	err = devlink_port_register_with_ops(devlink, devlink_port,
->>> +					     vsi->idx, &ice_devlink_vf_port_ops);
->>>    	if (err) {
->>>    		dev_err(dev, "Failed to create devlink port for VF %d, error %d\n",
->>>    			vf->vf_id, err);
->>> @@ -1620,7 +1751,6 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
->>>    	return 0;
->>>    }
->>> -
->>
->> Unrelated whitespace change.
->>
->>>    /**
->>>     * ice_devlink_destroy_vf_port - Destroy the devlink_port for this VF
->>>     * @vf: the VF to cleanup
->>
->> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-> 
-> Paul. It looks a bit weird you put in multiple comments that require
-> changes and then the Reviewed-by tag. Usually, you put the tag only if
-> you are 100% happy with the patch as it is.
+Fixes: b408453053fb ("selftests: net: Add bridge backup port and backup nexthop ID test")
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+---
+Jakub, targeting at net-next to see if it helps the CI, but can be
+applied to net. I'm unable to reproduce the failure locally.
+---
+ tools/testing/selftests/net/test_bridge_backup_port.sh | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Sorry about that. I will keep this in mind.
+diff --git a/tools/testing/selftests/net/test_bridge_backup_port.sh b/tools/testing/selftests/net/test_bridge_backup_port.sh
+index 70a7d87ba2d2..92078b56ae0a 100755
+--- a/tools/testing/selftests/net/test_bridge_backup_port.sh
++++ b/tools/testing/selftests/net/test_bridge_backup_port.sh
+@@ -260,6 +260,7 @@ backup_port()
+ 
+ 	run_cmd "ip -n $sw1 link set dev swp1 carrier off"
+ 	log_test $? 0 "swp1 carrier off"
++	sleep 1
+ 
+ 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
+ 	tc_check_packets $sw1 "dev swp1 egress" 101 1
+@@ -285,6 +286,7 @@ backup_port()
+ 
+ 	run_cmd "ip -n $sw1 link set dev swp1 carrier off"
+ 	log_test $? 0 "swp1 carrier off"
++	sleep 1
+ 
+ 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
+ 	tc_check_packets $sw1 "dev swp1 egress" 101 2
+@@ -294,6 +296,7 @@ backup_port()
+ 
+ 	run_cmd "ip -n $sw1 link set dev swp1 carrier on"
+ 	log_test $? 0 "swp1 carrier on"
++	sleep 1
+ 
+ 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
+ 	tc_check_packets $sw1 "dev swp1 egress" 101 3
+@@ -315,6 +318,7 @@ backup_port()
+ 
+ 	run_cmd "ip -n $sw1 link set dev swp1 carrier off"
+ 	log_test $? 0 "swp1 carrier off"
++	sleep 1
+ 
+ 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
+ 	tc_check_packets $sw1 "dev swp1 egress" 101 4
+@@ -370,6 +374,7 @@ backup_nhid()
+ 
+ 	run_cmd "ip -n $sw1 link set dev swp1 carrier off"
+ 	log_test $? 0 "swp1 carrier off"
++	sleep 1
+ 
+ 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
+ 	tc_check_packets $sw1 "dev swp1 egress" 101 1
+@@ -399,6 +404,7 @@ backup_nhid()
+ 
+ 	run_cmd "ip -n $sw1 link set dev swp1 carrier off"
+ 	log_test $? 0 "swp1 carrier off"
++	sleep 1
+ 
+ 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
+ 	tc_check_packets $sw1 "dev swp1 egress" 101 2
+@@ -412,6 +418,7 @@ backup_nhid()
+ 
+ 	run_cmd "ip -n $sw1 link set dev swp1 carrier on"
+ 	log_test $? 0 "swp1 carrier on"
++	sleep 1
+ 
+ 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
+ 	tc_check_packets $sw1 "dev swp1 egress" 101 3
+@@ -442,6 +449,7 @@ backup_nhid()
+ 
+ 	run_cmd "ip -n $sw1 link set dev swp1 carrier off"
+ 	log_test $? 0 "swp1 carrier off"
++	sleep 1
+ 
+ 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
+ 	tc_check_packets $sw1 "dev swp1 egress" 101 4
+@@ -498,6 +506,7 @@ backup_nhid_invalid()
+ 
+ 	run_cmd "ip -n $sw1 link set dev swp1 carrier off"
+ 	log_test $? 0 "swp1 carrier off"
++	sleep 1
+ 
+ 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
+ 	tc_check_packets $sw1 "dev swp1 egress" 101 0
+@@ -605,6 +614,7 @@ backup_nhid_ping()
+ 
+ 	run_cmd "ip -n $sw1 link set dev swp1 carrier off"
+ 	run_cmd "ip -n $sw2 link set dev swp1 carrier off"
++	sleep 1
+ 
+ 	run_cmd "ip netns exec $sw1 ping -i 0.1 -c 10 -w $PING_TIMEOUT 192.0.2.66"
+ 	log_test $? 0 "Ping with backup nexthop ID"
+-- 
+2.43.0
 
-> It is also weird you put in a tag in this case when the patch
-> is completely wrong, as I pointed out in my first reply. Did you miss
-> it?
-
-Yes, I missed it. (I disabled threading in Mozilla Thunderbird. I am 
-going to change that again. Sorry about that.)
-
-
-Kind regards,
-
-Paul
 
