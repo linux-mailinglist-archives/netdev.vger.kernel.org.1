@@ -1,59 +1,57 @@
-Return-Path: <netdev+bounces-68193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98A76846123
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:41:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53A3E846137
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:43:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB2B01C244FF
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 19:41:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CE12291BFA
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 19:43:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E289A8527B;
-	Thu,  1 Feb 2024 19:41:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 485308527C;
+	Thu,  1 Feb 2024 19:43:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IbTcrcsZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fOSadR/a"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC807C6C1;
-	Thu,  1 Feb 2024 19:41:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 202DA127B47;
+	Thu,  1 Feb 2024 19:43:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706816464; cv=none; b=oi+BjICPfTE1I6yon9Q2hqTUjn9Y31JLY30G5pI8ckgzXLzjLls9B7nslBVrlkFjKz6D47Kp8W9iza7rQx5aH8imLicoO8j3Ac73UURcmretgeO7ZiJWnTB7MSi4fB2XA6Gxh9pNzZYbd0SjNpNw0ms9ypi890MBeoPQtwc1NyI=
+	t=1706816602; cv=none; b=Xvl9tnSIixqW/3HcPzjULS6UHp99IddQNTtUlwJVqkT+uM0iddyjwLUhiXSYHuBHQrYckT/cGosX13FJF7vdtDSIVf4VCcVqc8Wzw/uWf3Q2Wx2lBgTlmRsac8vDbRl3WEFB9onyMZtQlOZsB30yLIIJ0VB9Iwx9733vf91Fk+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706816464; c=relaxed/simple;
-	bh=mw8IruWtLhnVBZG2bw57KfvNyrKA6nWlauPlAegiYXo=;
+	s=arc-20240116; t=1706816602; c=relaxed/simple;
+	bh=R4rK6MPXPx93cZ0GZWk0zlDLWoZA1p29HyxEOOWznxc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CDboBe0om26ZBO/wwfNELDeuXzu2DzVwY3VrkZMi1XyAs0cVaGrQYG/hB0F54aDTc1Vrne5GUM98RMKwg1Qkx9yH6ZwF64sWnb2fQXnypQ366FXr7tXmDyhkKPfhl3iBdjqfBXvqrStCh+cER/83VS0n/Wlq8autMCb/VBeTz2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IbTcrcsZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2756FC433F1;
-	Thu,  1 Feb 2024 19:41:02 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Pi+FIbqb3ndSjVSUMmkogjayCTU2GwpNWtN8nd+tEN7z2gZQunoOstzSKZou3p6Uj80bsOHcIugkhGQoDwat8FZkpEUronYOUS5/KfP2oOrB4Y0v+XImTovR1RlfbiEn5vfU2AkWp1ihGtTp3ItUpGx0T2n5AS5cNTcJWoGap70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOSadR/a; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5BD1EC433C7;
+	Thu,  1 Feb 2024 19:43:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706816464;
-	bh=mw8IruWtLhnVBZG2bw57KfvNyrKA6nWlauPlAegiYXo=;
+	s=k20201202; t=1706816601;
+	bh=R4rK6MPXPx93cZ0GZWk0zlDLWoZA1p29HyxEOOWznxc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IbTcrcsZUbMN85dPQYaJ8qHiKYG7r4m4/vfEYOZMt/h+f2q/V3Jc7gXKXWs+YfMTO
-	 1elg+W0ORBzckh9fcP7CfBW054G/WcsrDwYiK1BmG1m+vN3a9npeL92wIDqwJ/pZeF
-	 Hb3Taetog6bGz8vOrfoiDKy01/JZWQfY1NbNmaBTSPTzP7T588bLgP13/Ms1XeVOtQ
-	 C0Pdm48g9a65sdi/W9/Hgb31NeKqeoO1TJjndCf7weVP8XYSwz6WpI5uB0uWySEXqj
-	 fUvChv/wDo2t0g5vYPMnLoQKDWFl/E3Rtf203kURT5zR3FQPUTLAR4c5NhPWD8xQqd
-	 bWhF7rbv7o7Xg==
-Date: Thu, 1 Feb 2024 11:40:59 -0800
+	b=fOSadR/a/KN2UhE9P8pfXfAyXB/48blVSXd9TT6IB9BGZBMccTh5gsa4BMTvAg9aC
+	 HRbB9bav3P2ZMHHMZW/bAkMqkfskZgPyAR8SZxBUafssKVhMrWQINCussyUC9ISiRk
+	 0zdNgbV+TMNc8LC1BzGtoitTFQTepSNj21EThRebSHzChs6IZDdB0VyWHyi2PrY7RL
+	 Y801DoBQH86Ov3GxkTT0bI4gbv1un7ANCCF9GTWffiV8WqiS8zZ8HcwGApzyjLyhes
+	 Qztw06uECzZsU2/SU76BKBl0xkZOUOrpfxLkM0r1r+8EY/jcbmEUmAGEIeTSEdwKWe
+	 JrSb/El2YNO4g==
+Date: Thu, 1 Feb 2024 11:43:18 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Breno Leitao <leitao@debian.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, Andrew
- Morton <akpm@linux-foundation.org>, Mahesh Bandewar <maheshb@google.com>,
- weiwan@google.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- horms@kernel.org, andrew@lunn.ch, leit@fb.com
-Subject: Re: [PATCH] blackhole_dev: Fix buil warning
-Message-ID: <20240201114059.50b1051c@kernel.org>
-In-Reply-To: <Zbvm8HhzdHGXzlus@gmail.com>
-References: <20240201133238.3089363-1-leitao@debian.org>
-	<20240201085509.40a0bb76@kernel.org>
-	<Zbvm8HhzdHGXzlus@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v2 0/2] net: dqs: NIC stall detector
+Message-ID: <20240201114318.72eb52e1@kernel.org>
+In-Reply-To: <ZbvnTNT28EpoGSdU@gmail.com>
+References: <20240131102150.728960-1-leitao@debian.org>
+	<20240201081432.3fa70c6c@kernel.org>
+	<ZbvnTNT28EpoGSdU@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,20 +61,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 1 Feb 2024 10:46:08 -0800 Breno Leitao wrote:
-> > Since Jiri suggested a title fix I reckon we should be a bit more
-> > specific, still. Imagine this title ending up in a quote or a Fixes
-> > tag, could be many things.. How about:
-> > 
-> >   net: blackhole_dev: fix build warning for ethh set but not used  
+On Thu, 1 Feb 2024 10:47:40 -0800 Breno Leitao wrote:
+> > Let me take this on in, but the other one is not a fix,
+> > so it has to go to net-next.  
 > 
-> Sure, let me resend it.
-> 
-> I suppose I should recent to `net` given it is a building warning,
-> right?
+> Sure. I didn't know how to split the dependencies. Maybe I should have
+> sent both of them to net-next, and you would cherry-pick the fix to net?
+> Is this a better approach for next time?
 
-Not necessarily, net-next is good enough for W=1 warnings in general.
-Compiler warnings only show up if the file in question or some header
-it includes was modified. The linker warnings are a bit special.
-If you touch any file in any module you'll see all linker warnings.
+You gotta send the net part and then wait until Thu afternoon Pacific
+time when Linus pulls from us. We then pull net (and Linus's tree into
+net-next).
 
