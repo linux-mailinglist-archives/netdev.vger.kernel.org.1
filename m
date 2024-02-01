@@ -1,215 +1,218 @@
-Return-Path: <netdev+bounces-68209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CD35846219
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:46:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3351084622C
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:53:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40B901C20DD0
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:46:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03F1AB296D7
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:53:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B0A13CF4B;
-	Thu,  1 Feb 2024 20:45:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F871E481;
+	Thu,  1 Feb 2024 20:53:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rj5oBC8C"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LRAVZ2xv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2813F3CF73
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 20:45:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706820355; cv=none; b=YRW4h/Rt2e1t619FVfq4SPCWc1r55rLBA8ioaHiHXKe111cN4bO/MXYom0rJHaPPcRV/4BX0WZ57t4gM/fP/tt8scnBlnYzWhpQf3Q8CBjeI2KdG6qwAHskq47zN3Ys4JTWN9i5UZb8qY9HOfZtKi+k2AUbGcUtHafNMlzifITM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706820355; c=relaxed/simple;
-	bh=Dgw6KwuT5iOSIOfdXghS0A8NOeSxhwpnWQcPHTaILOw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=owCopdqCZsps5qEbo8yGCELjvsJXFQ3zGpJsAXfqLrqXiEJXsmBUQaR7O9LCfsZi2SEXRNH/YYzq/SwjY5MViGfpUSjVJWvfDUDs+gx/kxPJY0pfNhSBYbqkDgHaN9ueVbkJkSylVVTJAr7MWOSb0VRD7/xVZM/h8oy2VKN+2ag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rj5oBC8C; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a34c5ca2537so201360966b.0
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 12:45:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706820351; x=1707425151; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2nVZO6y8TcIQYcaKwHAm6Bz36UagPk36lmeIjL1j0eQ=;
-        b=rj5oBC8C7/ctfHD7gaN0OpOE9NLag6pQNHUV4LFFXvTm3rWKSe++BmiruwSOkFHXYI
-         CGX2AcnkSeszcUx4PO3yPMoqdMfaTSC8IbjKoK4yqlm0iZ3gEYi2SXMuR6xxAfktXrSz
-         SFTBPqk4iSe8LNyCHSRxNwGxHKtq/aMoVOsL0tyHPpWanclL3JTxAj6xbFBc3sIuo2+V
-         T9PtmGkZGsJajodx2sE4E3gGyEx1Xa4MSZSkAJZuLjJue9c97xyHpu1ItlwImJ/6MSFG
-         OSs8b+LGR+A2CoUnB0we0Tz3gh8TMdt/cfXNh2490NiChuYgdQkJceqB3l0jCyRc6blw
-         lvMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706820351; x=1707425151;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2nVZO6y8TcIQYcaKwHAm6Bz36UagPk36lmeIjL1j0eQ=;
-        b=Gau7edkHE2f07wQyIHKmUSagWhmEC7GOLrmlavJN5YGzt79GqZcHcYUO+NntW+KMDV
-         X8pZThyAVCFtgjSR1bf7ENI3cIt/6Hotta3yjpQn7JMYt/jHEi4maNN25JW9Vp5ZUkq+
-         1m6pgMpz3wnixOqKvMRjKd7CXXegxo6buEI2KDpqStq769ldKgXUEjMtOLx17lZI64uM
-         yz2E68Jzap8TxB9XP4Xg0zjfMY1k00gxFy7M8qPTjbv2WdgOt0sB71XgpH0hDqKgEIsX
-         C4MUdsbJYhx5oxzqfRomIuRBgrZbV0Gbh0MOdz5vg5WotQDV9Qtfoekv+c/TAvnURvho
-         ekmw==
-X-Gm-Message-State: AOJu0YxaE3eqGVkdMLkVla5xRUAJEbAjeljVyH54AJc43HyfxHKisTUV
-	dfDUhdDp0ygxgX5VJJNbNXJI2aj3d5UsLFZrU9mUzWgu2uYcYxto+aNo5jMOSz+ygUdESakeGcU
-	vn2/Le5sUyp/OpmGMlsl7hrYG/deX7zphlrAE
-X-Google-Smtp-Source: AGHT+IG/DL6INtFHc9j0F77V2IEAikGcResQBCFRtVCsiZS9TEJ+CqZIrzxtUr08GJ7e33dJapOrJizJUMeB5E/tYFo=
-X-Received: by 2002:a17:907:c82:b0:a36:c353:952e with SMTP id
- gi2-20020a1709070c8200b00a36c353952emr143080ejc.41.1706820351053; Thu, 01 Feb
- 2024 12:45:51 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2953D0A3;
+	Thu,  1 Feb 2024 20:53:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=134.134.136.65
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706820797; cv=fail; b=YEx/jLamFJuIfoVq0cjH6YwtXhriWVSByKHoBXXyAPss42S9U4jYAlc25ofpZ580Vui3p6H2SDAu3OyPVEodOaM6uBQI4vA5a8HXpIaolPVA4bPBQcBj7dWssLjt7tKRorOqblq4W1GI8Ifw4XHTWzhV/JnnwzF5pyAnCLRAZTc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706820797; c=relaxed/simple;
+	bh=mqmhDJPq0iRJFnxENdhfqE99Dyo9dV3HmgIM8YJDDPA=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=JuE6NS3v63yRvTKCYLZzK7zpwzMy+dOcTwIVOecnMIXY72HqfElX4tdcyDYvWcvFfKEITPGuphooDv4T16W3PsYSsv+j14dYF5xibyxYQimFDNEybYFNY3yYEX7SYFgrf6UDbWCo2SKnsUMcAdiYVn3G+7MEZ0cWlBarOo/PQ/E=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LRAVZ2xv; arc=fail smtp.client-ip=134.134.136.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706820795; x=1738356795;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=mqmhDJPq0iRJFnxENdhfqE99Dyo9dV3HmgIM8YJDDPA=;
+  b=LRAVZ2xv4chXNKxD4RhYAM/4c2yQPxv2hNDhSzSSzVNZ1Fc9hUS/tOQw
+   ElATLMgKaUJDK7DDG06sBoVN5crSKjnbu3KljaG77132wjK6bqkA3bSKa
+   ssu8fv9AVQvyN2J4rtZLfLsOcQIXR/F3iJnlXKNUy6JQckhdRkx+7K/VD
+   ahlFGVrYvtWDKXEo9W2WVuoaqP45uj1WcphsdCPVkrkjh73ft8LK5sdYb
+   3WnqWpMIWezjL6xEkTzlMn+Xsf6Lkh24YsmcBEJwawqPNRl1dPVz0kF3N
+   JHYWBaw6gyc8cezknnNws0nCrJqMV4aG/U4jkx1keNnim9o6f7zfQYGLz
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="407718436"
+X-IronPort-AV: E=Sophos;i="6.05,236,1701158400"; 
+   d="scan'208";a="407718436"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 12:53:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,236,1701158400"; 
+   d="scan'208";a="23198525"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Feb 2024 12:53:14 -0800
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 1 Feb 2024 12:53:14 -0800
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 1 Feb 2024 12:53:13 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 1 Feb 2024 12:53:13 -0800
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.41) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 1 Feb 2024 12:53:13 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=X+C6XbIy+7zXKjhfgbwBiZHIeKwVmVBa7Qhm3fTOUZyv/nezOy4RaBugnV3+lLlu+VV6H/9YLSNOG2BWY9Ub4cw+KpYhTFcsB+cTjQrfOzMhVF55tPb+kUhrCPfS5zXlLFlAAKvKznUEkjjyHDUCRfteRQU6cztor/3JrprdlgLtaRpKOQ1koshDoicCr8fqHPcozGQlhfHyaXrX0rG3qOp6rfj09Wmeinq5F8EqrQZKM5cGNXDTZXHpSyEacgg7OHOgEqkjDstaSdcPSf+2GK5hKA7MFNfEVr+EDPr/Jt0jFLtuwyI5ST14vFfjHFAH+Vsh5v0LI40pUp0wL/YgcA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pbUIhfblf24tuQg7l7H7aOKP/SKSlwehx7jAx6ixbUg=;
+ b=e+c5PbntuhoSaxGEFTKMvSCYKpNTz8if3CWtPsglVSmHLCJMO2M9ANBcZggcS70DkjIZUJO3NlE+BrLgMBeQTNpu4s9t7LsOgX5I/IimRzc1Vm1FLZ9/DgX5eVLEwvf9x4fbsjWrnFouCnKih3HfNIACGJlUPtpJ2is2z/CfzsUPojkfbXs6fFy0tWiYrhF1FRUJqhoCZLZir1qvxAg+7bELBTN9XQ9yoPKoox0hx736PQap596wMsxrglawZNdfGdT1EUClbDFPdFEc25DxQYBeExrzPQRBky3G4IE14/ShSnWMqLDqlMvPKQephwFKshGvpWqaBbRmVc7WOi6Nsw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by DS0PR11MB7960.namprd11.prod.outlook.com (2603:10b6:8:fe::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.29; Thu, 1 Feb
+ 2024 20:53:11 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::4069:eb50:16b6:a80d]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::4069:eb50:16b6:a80d%4]) with mapi id 15.20.7249.027; Thu, 1 Feb 2024
+ 20:53:11 +0000
+Message-ID: <029065d6-faaf-4e58-ac06-4e11c2ded02c@intel.com>
+Date: Thu, 1 Feb 2024 12:53:08 -0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v1 02/12] tools/net/ynl: Support sub-messages in
+ nested attribute spaces
+To: Jakub Kicinski <kuba@kernel.org>, Donald Hunter <donald.hunter@gmail.com>
+CC: <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Jonathan
+ Corbet" <corbet@lwn.net>, <linux-doc@vger.kernel.org>, Breno Leitao
+	<leitao@debian.org>, Jiri Pirko <jiri@resnulli.us>, Alessandro Marcolini
+	<alessandromarcolini99@gmail.com>, <donald.hunter@redhat.com>
+References: <20240123160538.172-1-donald.hunter@gmail.com>
+ <20240123160538.172-3-donald.hunter@gmail.com>
+ <20240123161804.3573953d@kernel.org> <m2ede7xeas.fsf@gmail.com>
+ <20240124073228.0e939e5c@kernel.org> <m2ttn0w9fa.fsf@gmail.com>
+ <20240126105055.2200dc36@kernel.org> <m2jznuwv7g.fsf@gmail.com>
+ <20240129174220.65ac1755@kernel.org>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <20240129174220.65ac1755@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR03CA0262.namprd03.prod.outlook.com
+ (2603:10b6:303:b4::27) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240123221749.793069-1-almasrymina@google.com>
- <20240123221749.793069-3-almasrymina@google.com> <cff078e234e94593fb3fcfce9732d7988ead42d3.camel@redhat.com>
-In-Reply-To: <cff078e234e94593fb3fcfce9732d7988ead42d3.camel@redhat.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 1 Feb 2024 12:45:37 -0800
-Message-ID: <CAHS8izMHciG28ZdiRmvxpoKcffS7uXEHNTC+EfDgtd96btx7tw@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 2/2] net: add netmem to skb_frag_t
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>, 
-	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Shakeel Butt <shakeelb@google.com>, Yunsheng Lin <linyunsheng@huawei.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DS0PR11MB7960:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0cb7c9b8-37f7-419c-a373-08dc2367cd28
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: VBjJoNwxkGbJC05Ue50+sgF3/8XvGMHsgPpZ/BQCqY43qtoLgQqMs4VYvzQWoNf6wiPj2ygFGeqyujv6z/8XTNwvId4Tamt3TeiEkmhJM4ZFrZk32gCKZnB1fq6AMGzjQSd8pPilpXJPHeTeF2ZRIL7fCaRgId2C4EUBYz3Wo3IEhQzobvMK0mGozx3zmil/qUTVok5gTd+fr6aO8rz9bB6dPFW6gBLY81yIkoQAOF89YzkqIGq1Bzgctos+d4a5ofUOzvAcZUMsl3x77qqiy63avvS8FEfTYPYuy4X/nxrTzopCgkY9ad+UxRxS+JYJ76aGX5YZOCecHAWxSmr2Pt0e0eU7jM0bNfWh7OGNNR9iudfcWt2Xp6+i7KpGW+vvaWhRUt2ShRc/MAcuFuXqZZ0dl+UFT4v17f2IPes8pbWQIzpYzBlN1jQDpbxgWITjWA7CpZr8VKKG25/KT/6dXEFKqJC4uqESdEekuXm3jFnjaFCxb0AujegMyP8lYtGhT1L6YdErA2i4i0VoRows8tuE+BmDoTRYCIYrdt+eAnD/NbOoRnlAO6dTWJ687wU3T0eFWURDJbwT5Oisvkq2qRbCeWJHtvLehZW+J8oiI4dBfvrH52oPEvn1dD11qgApasz6dQMBFfRHdw7IVP6uWA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(136003)(346002)(376002)(39860400002)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(31686004)(83380400001)(36756003)(41300700001)(86362001)(31696002)(82960400001)(110136005)(6512007)(38100700002)(2616005)(26005)(2906002)(6506007)(66946007)(478600001)(66476007)(66556008)(316002)(6666004)(6486002)(53546011)(54906003)(4326008)(7416002)(5660300002)(15650500001)(8676002)(8936002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UkxrYW9LY1RmY28yTmxWYTZZZmpJM2gzNE5KQnRrZHQ0N2Z3UUZrd0I0TktF?=
+ =?utf-8?B?OCtROCs1QmFieDJSME8wMFNNekdRVTRLWXV6eVF3SVE0ci9UY1NBQnAvNVFj?=
+ =?utf-8?B?K01FWEkrbC9CL25wQ1JGdUllRzlNOEx1a2ZxalRaZGNsRUNOTXhFU0lsSkd3?=
+ =?utf-8?B?TFJVUWU3L3BocEdKckVSTFF5QVRHZXNoVkhlV1VMVEVSVnpDelUwK1REZlFZ?=
+ =?utf-8?B?YS9Md2JPWUZQS3F3YVZFRFllUEJpb25VMFBNYUR0TFROeTd6UFQrNDdsU1Rl?=
+ =?utf-8?B?ekhOSDc4V1NCQlpCNENIdE1QdTdmK3RuUmtUenFXejA2V3Jwb2tvSXZ0YnR4?=
+ =?utf-8?B?dkdpS1MrVUoyQzVCbWdMVERtd0d4ZjdaeG1OWEpwc3ZBakpwd3N3dllhOXIx?=
+ =?utf-8?B?NFdZYXBIN1RJRXlCZ1lVOVVPUlFRWnFsSG1OUkRVMHhiNzNlTDdlWk9tbVox?=
+ =?utf-8?B?N3dyV1VwN3BPeG52QW84UEg3TVR6djFxZ3BuUm5uOThOVjJsYWc1RDV1TTg0?=
+ =?utf-8?B?d0Uxd1lRQ2FyeGR6elhhQUdrVWl1STNxSjcrME55bkJPWFJDd1FTNkJEdU5Z?=
+ =?utf-8?B?Qm5nbndMbVhZdm5icVRNWGRzamtjRjk3aW00R1V2a3NiSnZIc0k5VkRmYmdY?=
+ =?utf-8?B?cXlzVmozcWxDbnlhK3VZWU1tbnlPS3QrUWw5TjA2M3RRTVAxc1JCckpuRW5R?=
+ =?utf-8?B?VTR3SzA5ZlVJSTVTYmdPQklVc2xBVld4K2NQVTBXNGRNOU1BVDdEUlJ4T0Zp?=
+ =?utf-8?B?WFdTeUtQZ2xaWmMyMldRb1daZkV0OERSK3lRR3pmUUQ3d1lPOXpJbjJnb29H?=
+ =?utf-8?B?bVNTb2FJN3pmeGJSaUhPZ0pWSDY0R1hlMWJmTnBJTUkxbDBzTHd5T01mVlJ3?=
+ =?utf-8?B?NE1Xc1RnLzNsVVBXTTM1SnRwelcxbnFpaGozY29iZzF0L0paV3BLRGZDZjQr?=
+ =?utf-8?B?MUJoang0b2dWV2lITWFhbnhHL091am5SQWNsOXpSQUphZTh0b1FKZXFpS2da?=
+ =?utf-8?B?dkVycjhJOVVnYnM5UWlJdFJ2WmdxcHVSY1FGK0dDekJSMzhVd25IeXNVMG10?=
+ =?utf-8?B?L0hOaisweTgzSlgzR0IwWXBUQzhtampqeks2N29RS2hGTDBzR0M1K3JZSUtx?=
+ =?utf-8?B?YklNK0NodjFYdkw4SDFvWml5b09zaXBCdG1MQUNLUGRHc3MveWtwUnlzbUZt?=
+ =?utf-8?B?bTdyU0tmMXBmNU1mZ2hSZnJaRDlIZS9Lamo1VE0yQTdKY0FscU4zOVZGMWI5?=
+ =?utf-8?B?RlpnbEduRnViaXZNVkUva1dxa1N0dUd3NTR5WHJuaXMxRTdudFBnRjl0YWpV?=
+ =?utf-8?B?czJDTSs3SUU5L3BzSUpYeXVkQlFwWWc5YStVaTZ6eWRZaUFXWGM3eDZET0Zq?=
+ =?utf-8?B?TWZ1VDlMUjVDS09GeUhDOTR1VUowVFVOT1BUYlZpQU1xekt5UXlLdU45T2lM?=
+ =?utf-8?B?bU55RUFKRUhxMjAxVVR0aTBOTG0rZWsveFZvODQzREQwNXRzejdudldLK25r?=
+ =?utf-8?B?a0pKM2ExaGdzZktaRlNnZlg4OTY0TytCSUcra0FiMkxDMVF2VjV3OGZ6Rklv?=
+ =?utf-8?B?RUNSUTNLTGRid3NDYVdKOHcxM3VuOXVURFdZM1NvdEVOdWVET09kRmw5YXNG?=
+ =?utf-8?B?dkVEMXVZQzliSUh3VHJUMjhuWEpzTVU5L1ZZcW9xRkdIRExCSEM3WVVtd05r?=
+ =?utf-8?B?MnVMTXJvUnBuNllXSHhTQzhVMG5HNUF5anpVd2dhVDZsNVoxa3NjeVAzeklW?=
+ =?utf-8?B?SHJ1MjdhQXFPVEdBbWo1TXhKcnIweVpJZlpVNkFkazBrbHA0U3VUMXN2cm0w?=
+ =?utf-8?B?aXdJeUpEajloS1RWYmF5aWR0b0FKNUZ3ZXE3SUNzSUgzSEg2cEFYWmhxKy9S?=
+ =?utf-8?B?SXhrRTBGVE1xUlVkYjJPdklia3hBTFdaV3puT0Z1TmY4bnhoZytTVGFOVTVr?=
+ =?utf-8?B?dW9Gb1NxVTdGcHZ0bHFQSFUzYnBOS2lvMisxdTJKSEgrZkJUUGNiNGRmZ0RD?=
+ =?utf-8?B?V3lQYVd0V0l0TzVBSG4rY3prVjFpRm9ScG5HMFBRcndIdnhZKzVJYWwrdUw1?=
+ =?utf-8?B?cUwxZ2RoczVoNFJUNkloV3dIYlVxa2cxUi9RcU1zZzdKb05oRUpiZUM1S1pE?=
+ =?utf-8?B?V2hzbHVDVWNLMmpIVXlGK2Y1dXptWmxyczRrUWNTN2hhOVhOdFB4eHlRdW1y?=
+ =?utf-8?B?Q3c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0cb7c9b8-37f7-419c-a373-08dc2367cd28
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Feb 2024 20:53:11.1571
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7Yr2HVVtUUhUYo2BN/udoUygjZb+ASAC1UOvx9ouBPBeZqJlCV+xbbQnBPy2P4JH8hNhSVx8n7m+aeS+3mg1OfRdHZypHIiNacsjVvkd7Kk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7960
+X-OriginatorOrg: intel.com
 
-On Tue, Jan 30, 2024 at 1:34=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> Hi,
->
-> I'm sorry for the late feedback.
->
 
-Thanks for looking.
 
-> On Tue, 2024-01-23 at 14:17 -0800, Mina Almasry wrote:
-> > @@ -845,16 +863,24 @@ struct sk_buff *__napi_alloc_skb(struct napi_stru=
-ct *napi, unsigned int len,
-> >  }
-> >  EXPORT_SYMBOL(__napi_alloc_skb);
-> >
-> > -void skb_add_rx_frag(struct sk_buff *skb, int i, struct page *page, in=
-t off,
-> > -                  int size, unsigned int truesize)
-> > +void skb_add_rx_frag_netmem(struct sk_buff *skb, int i, netmem_ref net=
-mem,
-> > +                         int off, int size, unsigned int truesize)
-> >  {
-> >       DEBUG_NET_WARN_ON_ONCE(size > truesize);
-> >
-> > -     skb_fill_page_desc(skb, i, page, off, size);
-> > +     skb_fill_netmem_desc(skb, i, netmem, off, size);
-> >       skb->len +=3D size;
-> >       skb->data_len +=3D size;
-> >       skb->truesize +=3D truesize;
-> >  }
-> > +EXPORT_SYMBOL(skb_add_rx_frag_netmem);
-> > +
-> > +void skb_add_rx_frag(struct sk_buff *skb, int i, struct page *page, in=
-t off,
-> > +                  int size, unsigned int truesize)
-> > +{
-> > +     skb_add_rx_frag_netmem(skb, i, page_to_netmem(page), off, size,
-> > +                            truesize);
-> > +}
-> >  EXPORT_SYMBOL(skb_add_rx_frag);
->
-> Out of sheer ignorance, I'm unsure if the compiler will always inline
-> the above skb_add_rx_frag_netmem() call. What about moving this helper
-> to the header file?
->
+On 1/29/2024 5:42 PM, Jakub Kicinski wrote:
+> Whether YNL specs should replace policy dumps completely (by building
+> the YAML into the kernel, and exposing via sysfs like kheaders or btf)
+>  - I'm not sure. I think I used policy dumps twice in my life. They
+> are not all that useful, IMVHO...
 
-Will do.
+Many older genetlink/netlink families don't have a super robust or
+specific policy. For example, devlink has a single enum for all
+attributes, and the policy is not specified per command. The policy
+simply accepts all attributes for every command. This means that you
+can't rely on policy to decide whether an attribute has meaning for a
+given command.
 
-> > diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
-> > index 1184d40167b8..145ef22b2b35 100644
-> > --- a/net/kcm/kcmsock.c
-> > +++ b/net/kcm/kcmsock.c
-> > @@ -636,9 +636,14 @@ static int kcm_write_msgs(struct kcm_sock *kcm)
-> >               for (i =3D 0; i < skb_shinfo(skb)->nr_frags; i++)
-> >                       msize +=3D skb_frag_size(&skb_shinfo(skb)->frags[=
-i]);
-> >
-> > +             if (WARN_ON_ONCE(!skb_frag_page(&skb_shinfo(skb)->frags[0=
-]))) {
-> > +                     ret =3D -EINVAL;
-> > +                     goto out;
-> > +             }
->
-> I feel like the following has been already discussed, but I could not
-> find the relevant reference... Are all frags constrained to carry the
-> same memref type? If not it would be better to move this check inside
-> the previous loop, it's already traversing all the skb frags, it should
-> not add measurable overhead.
->
+Unfortunately, we can't really change this because it ultimately counts
+as uAPI and we require that existing working functionality continues
+working in the future. I personally find this too stringent as sending
+such junk attributes requires someone going out of their way to write
+the messages and add extra attributes. In most cases I think sane
+users/software would rather be informed that they are sending data which
+is not relevant.
 
-Yes, this was discussed before. I believe the agreement is that, yes,
-all the frags in a single skb will be constrained to a single type. It
-was discussed on one of the many RFCs I believe.
+However, I can understand the point that the userspace software
+"worked", and we don't want to break existing applications just because
+of a kernel upgrade.
 
-Supporting skbs with mixed netmem types is certainly possible, but
-requires per-frag checking and per-frag handling. Constraining all
-skbs to the same netmem type just simplifies things greatly because
-frag0 can be checked to determine the type of all the frags in the
-skb, and all the frags in the skb can be processed the same as they're
-the same type. There are no interesting use cases I can think of right
-now that require mixed types, and the code can always be extended to
-that if someone has a use case in the future.
+The YNL spec does this by telling you at every layer of nesting which
+set of attributes are allowed and with what values. Even if we can't
+enforce this for older families its still useful information to report
+in some manner.
 
-I plan to add a WARN_ON_ONCE or DEBUG_NET_WARN_ON_ONCE in
-skb_add_frag_rx_netmem that detects if the driver is trying to mix
-types in the devmem series which adds non-page netmem.
-
-If OK with you, I'll keep the check for only frag 0, but combine it
-with the nr_frags check above like this:
-
-diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
-index 145ef22b2b35..73c200c5c8e4 100644
---- a/net/kcm/kcmsock.c
-+++ b/net/kcm/kcmsock.c
-@@ -627,7 +627,8 @@ static int kcm_write_msgs(struct kcm_sock *kcm)
-                        skb =3D txm->frag_skb;
-                }
-
--               if (WARN_ON(!skb_shinfo(skb)->nr_frags)) {
-+               if (WARN_ON(!skb_shinfo(skb)->nr_frags) ||
-+                   WARN_ON_ONCE(!skb_frag_page(&skb_shinfo(skb)->frags[0])=
-)) {
-                        ret =3D -EINVAL;
-                        goto out;
-                }
-@@ -636,11 +637,6 @@ static int kcm_write_msgs(struct kcm_sock *kcm)
-                for (i =3D 0; i < skb_shinfo(skb)->nr_frags; i++)
-                        msize +=3D skb_frag_size(&skb_shinfo(skb)->frags[i]=
-);
-
--               if (WARN_ON_ONCE(!skb_frag_page(&skb_shinfo(skb)->frags[0])=
-)) {
--                       ret =3D -EINVAL;
--                       goto out;
--               }
--
-
-But I'm happy implementing the check exactly as you described if you
-strongly prefer that instead, I don't think it's a big deal from my
-end either way. Thanks!
-
---=20
-Thanks,
-Mina
+In addition, the YNL spec is more readable than the policy dumps which
+essentially require a separate tool to parse out everything and convert
+to something useful.
 
