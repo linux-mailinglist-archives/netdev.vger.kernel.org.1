@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-67761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3534A844E29
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:50:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31F08844E2A
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:50:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7A7F1F22472
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 00:50:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A643F1F2255A
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 00:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C925920E4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB8B92107;
 	Thu,  1 Feb 2024 00:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tpD1jZdl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V3LlxWj1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A04191FDA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A04561FDB;
 	Thu,  1 Feb 2024 00:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706748627; cv=none; b=O7MxkoDWOxO+1qAUcO72BKc0fhUjrBb/UqmmwqC1z3iIMZMxj2w1m1fDhGR4smJJJLz6dBWTID8Ao8OMlTyJi3/bnVOytb2AzeVn88HpZ/21glYIKeKqTlIYpNxNXyuHYE0LWNs001Rj+9gOG+ThEUZ4FxUfNtx38qBzA6tmz1s=
+	t=1706748627; cv=none; b=AQT2wlJ2hm23xIrcu40PHq5XlcZTA9hL6IdxzNL52DxmF7iySkEQKn8L21BrYkggmbUCfO3oCuVNcGsHCxsdL3FVYgjbdIdDpqBFDzSUBUebOkn+blP6ihEzQw/jCz0o95RiClVK7gMDEgatTySzfhDMNiFRy6RLLT+e8lHxTKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706748627; c=relaxed/simple;
-	bh=8Yn7WZuUu+7N5PkWWTp/ZUOVig7abrr1Tg2VivYAKi8=;
+	bh=Z8/BUyh1zO7VkK/Z95QEQWiI4CaCboUScz5qDKCf52w=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Xgcyx2CY+bY3PbpU4AvBAKsmSgBav4y5YN9C+/Ota5VpOjWItCKYMJVoVak/LW115w/KRpDztDapkfGHi+YZ4kmZm8dCfTEvqxWOMqiERANdiy/8gGnIUdJX4t6dtOKrBeHMO+HILxeOgwb5othJhgBXKxzIl++QhB3oM1HT/xc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tpD1jZdl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2F976C433F1;
+	 In-Reply-To:To:Cc; b=tyXz23hujpvbopAl24uaponAseteiSTfJGbEiwxpz66o6AAH09gWVolhXoYgxWDlRptv2bltGd4HxCzxWEnL+fNI5CL06vqBg4iehtEM8qyjU4CDwRaJpcN/j73Xfu68PjszNZs6ebF9v9jd8nnO85FBXDyJ9RDmt2XoSmHAQ3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V3LlxWj1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 36213C43394;
 	Thu,  1 Feb 2024 00:50:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1706748627;
-	bh=8Yn7WZuUu+7N5PkWWTp/ZUOVig7abrr1Tg2VivYAKi8=;
+	bh=Z8/BUyh1zO7VkK/Z95QEQWiI4CaCboUScz5qDKCf52w=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tpD1jZdlJOCSbQjrtrLGr/hMr10uIywTyHgmSLZy7WvOCciOq/60PefDfkAIPc4w4
-	 hcDHYbxp6JI/0cM3MhzGTCLVPWauspzVKCavbdUSMNZvcl8YCr9jVX9vPliEgMj1Ql
-	 uaiVvsZetdarxleGT2VhwWGSmkiVcudpNKq+ZQ8pl0J4KuMjv1qMSf7yRqOPwL2FzI
-	 bodwKNi+unOUv877jWxr4OSCxhiMxoJbHrB0p8uENbre6tamUBGg8y1wkrO2rX0GUg
-	 aEo23zj3C2cB+1ATfJg7FPzjBwudfJ9fL7MbaHLtAKL0rvqLPFdN6s0eXtYM28zzPE
-	 dVVnmvhrhnsEg==
+	b=V3LlxWj1BtfdnbpotfYIP/AOJVD0kYrHuO4ila2uOh6DXOYcsCi5Eq3+JVUhl7bfX
+	 O4+dzUQA7x4YaiOttpE8ANWhH7zd/4weXRPNKA/P+6MfeXvdsYNLSIDLlq9Qd2dI2F
+	 0QUYzCFn/UXF/9H9GiiwDIEICGcz9fhvlY1uEVe8NycNPIEYT9fSYQrezI2XJUy1SJ
+	 njwYbufd5cOV8NEglSUMHKXCitwYy+aGH7EhMc8aAaOh6NHtNmji6Ozr6oi/Zeuym6
+	 8BT2UyI+l8R+07JZzJbFGXlIZNGy/8Q+58HYzOzy9LPcsmtz8DZ+dwv2KUH6DNWDHB
+	 Qhya5+FfdNdJg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 14718DC99E6;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1CCECD8C96C;
 	Thu,  1 Feb 2024 00:50:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,25 +52,25 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: ipv4: Simplify the allocation of slab caches in
- inet_initpeers
+Subject: Re: [PATCH net-next] net: bridge: Use KMEM_CACHE instead of
+ kmem_cache_create
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170674862708.27305.5476784873293252924.git-patchwork-notify@kernel.org>
+ <170674862711.27305.15780784019014646394.git-patchwork-notify@kernel.org>
 Date: Thu, 01 Feb 2024 00:50:27 +0000
-References: <20240130092255.73078-1-chentao@kylinos.cn>
-In-Reply-To: <20240130092255.73078-1-chentao@kylinos.cn>
+References: <20240130092536.73623-1-chentao@kylinos.cn>
+In-Reply-To: <20240130092536.73623-1-chentao@kylinos.cn>
 To: Kunwu Chan <chentao@kylinos.cn>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Cc: roopa@nvidia.com, razor@blackwall.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ bridge@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 30 Jan 2024 17:22:55 +0800 you wrote:
+On Tue, 30 Jan 2024 17:25:36 +0800 you wrote:
 > commit 0a31bd5f2bbb ("KMEM_CACHE(): simplify slab cache creation")
 > introduces a new macro.
 > Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
@@ -81,8 +81,8 @@ On Tue, 30 Jan 2024 17:22:55 +0800 you wrote:
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: ipv4: Simplify the allocation of slab caches in inet_initpeers
-    https://git.kernel.org/netdev/net-next/c/57f2c6350f2d
+  - [net-next] net: bridge: Use KMEM_CACHE instead of kmem_cache_create
+    https://git.kernel.org/netdev/net-next/c/2dc23b6f852b
 
 You are awesome, thank you!
 -- 
