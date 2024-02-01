@@ -1,168 +1,175 @@
-Return-Path: <netdev+bounces-68138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B52BE845E46
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:14:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA2C0845E58
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:20:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7A5D1C228EF
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:14:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65ACC1F25A01
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FC4160888;
-	Thu,  1 Feb 2024 17:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4719F1649AD;
+	Thu,  1 Feb 2024 17:20:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yi6vpXtg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ddc1zRwV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E25116087F
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 17:14:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE601649A1;
+	Thu,  1 Feb 2024 17:20:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706807662; cv=none; b=QuvStXPs1q3M2+ht9S63dxwz0MCudoGc8hJ6KikHHviMO62fPKDzo9hd+4LlecLPNgo+QT6dyM71BF68yS7coevy60iLeW4LrVBx1sEPpQNp4BezgKQjxTa/A0bzgmlkKV8nyXIAMqPflb3gsI9Z8meg6aUIo4JoLtpFaH6F+x0=
+	t=1706808018; cv=none; b=R9rzeVvflmfI+9chjOJKU2/S/cvSeRjfbRIwA4YCe7FUxpDPR33j+8C2f/YEX+fknia0AMWM6aVlPoX/ykUNW3q1wQPMBrb/6JnvfkI9/NdhDpB1QL7ezHzAQe4mz0egPRkuF5hrWIMQClkZApj1eNa5QXo7Fygv16OysJ4vzPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706807662; c=relaxed/simple;
-	bh=gU8thq7J5TCYF34U/LU+7wEBu8KKfhhL845/dKJ4GxI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VdlNAeIxRv06FPqp31ejueTlIR6qnCesCaZj2KNPzHEgndL8nXKuL8YuEIAdinfQPYEAibof19Kk+WZ8tcYUSN6f/+xAdZvFqq+QLlrQn+Vp/HHrRhc3k43nAERs6C3c/Hk1Ve4mgujHdCZiJpfil5dWXQZdA7iIbTUPOy3ww6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yi6vpXtg; arc=none smtp.client-ip=209.85.128.179
+	s=arc-20240116; t=1706808018; c=relaxed/simple;
+	bh=LH/WmLmxZ5NddiycIskFKogm1M0vOHxW+Kgj+afN768=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BVsDEYrxSoHcqXIO+u+WZR8UOJnaYsWGTboO34UCjdDR+IJfExvtIuJyHaQP75TE3+b0OUJil2F1oT/jKiaaY92Re3ga3jnw+VHExcAd9+8QzkF3cjhq54j9jXY5c0hqVDB+QUuACcOfN5Pzt1jYC/Hi/1SF0ZMMZ8yECoRAStk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ddc1zRwV; arc=none smtp.client-ip=209.85.221.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-604123a7499so12334457b3.3
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 09:14:20 -0800 (PST)
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-33b17fd046fso476322f8f.1;
+        Thu, 01 Feb 2024 09:20:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706807659; x=1707412459; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BODdxd4JD+654DTMxsqMEdGHW0fURTYjfBFForLZ/KI=;
-        b=Yi6vpXtgnOKQASMBaJP0lQUl2jPQQP0su/iYzn78zk8Bmtp+q6rCJKrC/tJ63WpfFP
-         gXRreOVUPH4Q8UM56yrbkna/ZnjXD0jaIwxqe3+psu9mZBfPRJEWvTOxcJPsyZbl5koA
-         KToBN6IEi3EpyHl1KsCsea2WfR7nYEEYVqVKHjjnEoOcLDcBuR5TTTWaPvJ/hEfjFil5
-         wtQ6FxJMx5xRBXjVI52NSuFocCBcKOs79ZKAZXNpCQw1YMmyfmK2bkYnFOyVvca3dO7j
-         lIROhC5F99gMIpYFoL4sgWnAwrPb3oYmhcHn3+b094Dv46S772YvXorllEJb2Ee/+guG
-         fqcg==
+        d=gmail.com; s=20230601; t=1706808014; x=1707412814; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=0AZcHUGcaVEghSUh9pVwwvnRjfi5Kbw3FRUGFJNp33k=;
+        b=Ddc1zRwVkPrFKw7piHv22PMo9/bCXLZtMQiJnsERU5NFE6M/DOiMugbbAjc5VenWUQ
+         fSBS8uWmZDKfx+cNSfOAeVOsqFJaoCF4x7m0G8vLc1K9N6DPI1qOd6qx2yIXtYZ9mASW
+         wwn6AnkIu2nWohjPs+yam9a3MKjcOakT/i9vyqaGuEUbXr5us9t3wIDGk6GfIHwdlp7Q
+         vexxqohOFlL6Oj2NBAVSxJzg6WmFrsQT+HMGZyX0W0g3NvWxzUVbgiweaO9pCspShNAy
+         /ppXxvg96S7ZgLsRVFK3P2ip4aHoC6CwSWPNuJY6PG4Aea4Gp5NeBhm+JfJnB43l0qFD
+         T2aQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706807659; x=1707412459;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BODdxd4JD+654DTMxsqMEdGHW0fURTYjfBFForLZ/KI=;
-        b=OJXE19CDEq8ybyws/YBEidfH0YPgtOy15rdtwM1T6cRvT93SOjJ1MvktRwQ16/bHYw
-         5OZLbLpHZx9KHWlq2AxTEXOagH9xgG4aR5KT6mNLgfAPx1VZ9l3VgmLpwrZ9x/xIPJxU
-         w1Y5sKs7+W2TTaW5zkxnBGjiUvV87uKv87PXdbngNanuJ7Rb0mazCN+IWBlXYuulog9S
-         vdEdmY6SMPCZOMZQyed2Is/zSIONZMRiglGQ1St6qFtw6NUZh/1L7CdjkXbD1EK6JlVA
-         lwC/JCXfWBw/SJCMMIWOfiZtMbIS9O7utlrcBk4k3L3XD+elzJlNU++qolprcTo6k3Wx
-         rwpw==
-X-Gm-Message-State: AOJu0YxcG4W/Lir5DRdZ1GotkXRW3wJgWRjyte/BbadUvKRPnaNAXfly
-	KKLS/WbkSTsPAkf3ZkE473Yqup92SWQS429rB1x/LE8c2jdxizUu8mg673Hp
-X-Google-Smtp-Source: AGHT+IGfuT4IiPO0+Fww2hxl8xPzUw5v8ANjG/0TuIeqlF71izScDxK1mvftSKZTevxec8QTx21/7A==
-X-Received: by 2002:a0d:d901:0:b0:5ff:58f1:9944 with SMTP id b1-20020a0dd901000000b005ff58f19944mr5305828ywe.30.1706807659453;
-        Thu, 01 Feb 2024 09:14:19 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUKVetHWLgS8L6a9vrcAsBCcio3w8xBYqT8Q74pQoOTRIQ6o0iFEd/4lH1Jlhxp2mF6SN/Hof6OEkO/tHQEjbYeREXLgdq4+MhNFQZT76S360o9BVAHHE17t1bKwwRp4ElS0U1x5Yy+pZ2kWM3ScCnWcSd/eNShWlNLA0ZTBv/DjbexFy+xYIAJXKs1zLVbJsA/qWdqhVcW66NxsRaj+R/PHiJp+yQAVSDj28GzLkLW+ZHGPywBnNYnWbWs3wqJB5iFBOJu0DkO/F44DwQK8OHJ8RP//KbvB8lT9YqmbluSiE+apv/pPxU1G03qnLL4ALBGsK1H
-Received: from ?IPV6:2600:1700:6cf8:1240:16d4:21fd:67de:3e7? ([2600:1700:6cf8:1240:16d4:21fd:67de:3e7])
-        by smtp.gmail.com with ESMTPSA id cp33-20020a05690c0e2100b005effa4feef0sm4406784ywb.58.2024.02.01.09.14.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Feb 2024 09:14:19 -0800 (PST)
-Message-ID: <22cc962a-c300-49ee-95ee-76d9f794e23a@gmail.com>
-Date: Thu, 1 Feb 2024 09:14:17 -0800
+        d=1e100.net; s=20230601; t=1706808014; x=1707412814;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0AZcHUGcaVEghSUh9pVwwvnRjfi5Kbw3FRUGFJNp33k=;
+        b=aNPnGGXvOiJB9Ft50Bz+OizQhGmjxojHhJOYranZD9VctdFQuLIRmXfOHJMY64E7sW
+         /aq96OQid6qpUqbSMsdwL4hLU78KTEMrY5muXrJHAR0msMQlD2xmgBaUoxw7V6o6V4qu
+         xYRInWscgBfqw8NLv7ExSqz/PeYJLlzUWI2yY2yReZEAWnuDhgJy8WWI0M/k/vejGWYC
+         SiOzipPXnikdP9fpp1WsTGGNQ3v8sOiuzkcDd/6XUTPANro+Lg3Z2kabGbiqPnTHkmA8
+         kpqPq2C210Cn1MX1otQMJTRzCN4Ve8rwWfxamxPmplvzOO6azwxxuQbUYzMT1pz/2iOn
+         8Yng==
+X-Gm-Message-State: AOJu0YxebYH/Td5bWt4Qoz9YEpjUZWlbP+prUbqvNPpC8fGs27xm/exW
+	nuS+YIbx20cHgW+1/4iRAZUHIiHndQMbCEX+bizK36lpTO8qwStn
+X-Google-Smtp-Source: AGHT+IFN1KFpDh1vr3wtQw4Rq4JRxS6JjigiP3HSep4uIBf6R15MxBW8NBhFRaWoh+4CexLAnmTucA==
+X-Received: by 2002:a5d:58ee:0:b0:33b:1d07:e5d with SMTP id f14-20020a5d58ee000000b0033b1d070e5dmr67618wrd.13.1706808014309;
+        Thu, 01 Feb 2024 09:20:14 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXiMptxujpw0Uavr69kijioTH/QpH4oeYK5ZXjekdKcnmWbK224KFYbhKIOukjBf2usPaSBCPAXm7B34kxcBsO3gJdqgHF1RBs+mcvhrZNItaP7n9zf4KzdtiNjZ+CN4IQ/Q0O3jfPxHn8pF7748J6n4uHzLpHg9mAMN73EyNUwEAFiHB2mS5FYfW/BhxywyCEhB648dcAZmyvgeW2gzLB2iiXHkHm9HgppgHuYn7S+ZSTargk9uSr/AsZQzqyR164bla+fXOsH1QVI9aMdEeymDDCsEl+qztlYabRJLUoQRJB+fGyQfw2/f1RjuGMpUAwfgU2+3dKK9LYEF8VURqTGQSkF6czZei5W5N/zDX7ibwg2y7QvP0qCIYu5/SneZqnqUVdzpfSGSy5YF9Bc4zkojdAIUYxRrMp1YbwBtnCmsmu9SrQi2etiZaNT6LSHm78CiMTc5RX2gl9A8HKeQvYvCtTR7AHKbz/aGo9wjMdp9GBP4I+sQcZPo1wm7sXTAzwh+Sp2E3NiTzXdJ6jrVO7c2iGbPHtZu5CXB1CWvv9tJk/nxSrGZpDwNOIlbv9/xJVwA7yEfMOkAPdHcYVeRY1aV+jQ7aaABg==
+Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
+        by smtp.gmail.com with ESMTPSA id bu16-20020a056000079000b0033b0797cc14sm4263915wrb.51.2024.02.01.09.20.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Feb 2024 09:20:14 -0800 (PST)
+Message-ID: <65bbd2ce.050a0220.5ff09.69d5@mx.google.com>
+X-Google-Original-Message-ID: <ZbvSyo_-1iTc4pD1@Ansuel-xps.>
+Date: Thu, 1 Feb 2024 18:20:10 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Antoine Tenart <atenart@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Bjorn Andersson <andersson@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Frank Rowand <frowand.list@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+	Robert Marko <robert.marko@sartura.hr>,
+	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [net-next PATCH v5 2/9] net: phy: add support for scanning PHY
+ in PHY packages nodes
+References: <20240201151747.7524-1-ansuelsmth@gmail.com>
+ <20240201151747.7524-3-ansuelsmth@gmail.com>
+ <170680473689.4979.1991415008659281513@kwain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 5/5] selftests/net: Adding test cases of
- replacing routes and route advertisements.
-Content-Language: en-US
-To: Hangbin Liu <liuhangbin@gmail.com>, thinker.li@gmail.com
-Cc: netdev@vger.kernel.org, ast@kernel.org, martin.lau@linux.dev,
- kernel-team@meta.com, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, kuifeng@meta.com
-References: <20240131064041.3445212-1-thinker.li@gmail.com>
- <20240131064041.3445212-6-thinker.li@gmail.com> <ZbtabpEr7I6Gy5vE@Laptop-X1>
-From: Kui-Feng Lee <sinquersw@gmail.com>
-In-Reply-To: <ZbtabpEr7I6Gy5vE@Laptop-X1>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <170680473689.4979.1991415008659281513@kwain>
 
+On Thu, Feb 01, 2024 at 05:25:36PM +0100, Antoine Tenart wrote:
+> Quoting Christian Marangi (2024-02-01 16:17:28)
+> > 
+> > +static int __of_mdiobus_parse_phys(struct mii_bus *mdio, struct device_node *np,
+> > +                                  int base_addr, bool *scanphys)
+> > +{
+> > +       struct device_node *child;
+> > +       int addr, rc = 0;
+> > +
+> > +       /* Loop over the child nodes and register a phy_device for each phy */
+> > +       for_each_available_child_of_node(np, child) {
+> > +               if (of_node_name_eq(child, "ethernet-phy-package")) {
+> > +                       rc = of_property_read_u32(child, "reg", &addr);
+> > +                       if (rc)
+> > +                               goto exit;
+> 
+> This means a PHY package node w/o a reg property will prevent all other
+> PHYs in the same parent node to be found?
+>
 
+Since this is something new, would it be a problem to make it mandatory
+to define a reg? (And return error if we find something? Or print a
+warn?)
 
-On 2/1/24 00:46, Hangbin Liu wrote:
-> Hi,
+> > +
+> > +                       rc = __of_mdiobus_parse_phys(mdio, child, addr, scanphys);
 > 
-> On Tue, Jan 30, 2024 at 10:40:41PM -0800, thinker.li@gmail.com wrote:
->> +# Create a new dummy_10 to remove all associated routes.
->> +reset_dummy_10()
->> +{
->> +	$IP link del dev dummy_10
->> +
->> +	$IP link add dummy_10 type dummy
->> +	$IP link set dev dummy_10 up
->> +	$IP -6 address add 2001:10::1/64 dev dummy_10
->> +}
->> +
->>   fib6_gc_test()
->>   {
->>   	setup
->> @@ -768,15 +778,19 @@ fib6_gc_test()
->>   	    $IP -6 route add 2001:20::$i \
->>   		via 2001:10::2 dev dummy_10 expires $EXPIRE
->>   	done
->> -	sleep $(($EXPIRE * 2))
->> -	N_EXP_SLEEP=$($IP -6 route list |grep expires|wc -l)
->> -	if [ $N_EXP_SLEEP -ne 0 ]; then
->> -	    echo "FAIL: expected 0 routes with expires, got $N_EXP_SLEEP"
->> +	sleep $(($EXPIRE * 2 + 1))
->> +	N_EXP=$($IP -6 route list |grep expires|wc -l)
->> +	if [ $N_EXP -ne 0 ]; then
->> +	    echo "FAIL: expected 0 routes with expires, got $N_EXP"
->>   	    ret=1
->>   	else
->>   	    ret=0
->>   	fi
->>   
->> +	log_test $ret 0 "ipv6 route garbage collection"
->> +
->> +	reset_dummy_10
+> You might want to save passing scanphys down, PHYs w/o a reg property in
+> a PHY package won't be "auto scanned" later.
 > 
-> Since you reset the dummy device and will not affect the later tests. Maybe
-> you can log the test directly, e.g.
-> 
-> 	if [ "$($IP -6 route list |grep expires|wc -l)" -ne 0 ]; then
-> 		log_test $ret 0 "ipv6 route garbage collection"
-> 	fi
-> 
-> Or, if you want to keep ret and also report passed log, you can wrapper the
-> number checking like
-> 
-> check_exp_number()
-> {
-> 	local exp=$1
-> 	local n_exp=$($IP -6 route list |grep expires|wc -l)
-> 	if [ "$n_exp" -ne "$exp" ]; then
-> 		echo "FAIL: expected $exp routes with expires, got $n_exp"
-> 		ret=1
-> 	else
-> 		ret=0
-> 	fi
-> }
-> 
-> Then we can call it without repeating the if/else lines
-> 
-> 	check_exp_number 0
-> 	log_test $ret 0 "ipv6 route garbage collection"
 
-If I read it correctly, the point here is too many boilerplate checks,
-and you prefer to reduce them. Right?
-No problem! I will do it.
+I might be confused by this, but isn't this already done? (passing
+scanphys in each recursive call so we can set it to true if needed?)
 
+Also I think the scanphys should be skipped for the PHY package
+(assuming we make reg mandatory, it would be an error condition and
+should not be handled?)
 
+> > diff --git a/drivers/net/phy/mdio_bus.c b/drivers/net/phy/mdio_bus.c
+> > index afbad1ad8683..7737d0101d7b 100644
+> > --- a/drivers/net/phy/mdio_bus.c
+> > +++ b/drivers/net/phy/mdio_bus.c
+> > @@ -459,20 +459,33 @@ EXPORT_SYMBOL(of_mdio_find_bus);
+> >   * found, set the of_node pointer for the mdio device. This allows
+> >   * auto-probed phy devices to be supplied with information passed in
+> >   * via DT.
+> > + * If a PHY package is found, PHY is searched also there.
+> >   */
+> > -static void of_mdiobus_link_mdiodev(struct mii_bus *bus,
+> > -                                   struct mdio_device *mdiodev)
+> > +static int of_mdiobus_find_phy(struct device *dev, struct mdio_device *mdiodev,
+> > +                              struct device_node *np, int base_addr)
+> >  {
+> > -       struct device *dev = &mdiodev->dev;
+> >         struct device_node *child;
+> >  
+> > -       if (dev->of_node || !bus->dev.of_node)
+> > -               return;
+> > +       for_each_available_child_of_node(np, child) {
+> > +               int addr, ret;
+> >  
+> > -       for_each_available_child_of_node(bus->dev.of_node, child) {
+> > -               int addr;
+> > +               if (of_node_name_eq(child, "ethernet-phy-package")) {
+> > +                       ret = of_property_read_u32(child, "reg", &addr);
+> > +                       if (ret)
+> > +                               return ret;
 > 
-> Thanks
-> Hangbin
+> of_node_put
+
+-- 
+	Ansuel
 
