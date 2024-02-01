@@ -1,303 +1,244 @@
-Return-Path: <netdev+bounces-68213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30267846270
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 22:09:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B60B084627C
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 22:14:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54DEE1C24A79
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:09:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B5E428CE1E
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:14:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A080A3CF7F;
-	Thu,  1 Feb 2024 21:07:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 591582FC29;
+	Thu,  1 Feb 2024 21:14:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="GNaUeSe7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zs9qgkCR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D12EF3CF71
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 21:06:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CEEC7472;
+	Thu,  1 Feb 2024 21:14:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706821622; cv=none; b=LzHY3q4dSrb9cqv0M8POgL4WW/lUCoWFZEu2qRtcY8JskFiV6ro6t1qe21r94zy8uYxxl2+qbWkot5AfKugGrprxK7wVKdvXHqLLe1Avthnaj8BEXjNtdNi2ITJDSEDs+LtXnV1HpLtgybc/8zv67zb8yiudoAuKe1Z0giXX0Ew=
+	t=1706822049; cv=none; b=YvmMCZzqZmsBuevtFoquPNGRAQuP3gblS09hyz/YqfmeqBRwu+wVhJp/0UXtW9UH45b22ipnll+IXA+bYjKYulAJyhO03emwQze4Qw4c75bEOqlXdolHsqp5ejoqfKF05mIa9f67zd7yeTS8xQ6DZFN5a/PxlHCu4C7wZfSD15o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706821622; c=relaxed/simple;
-	bh=oPJOZv03hwxbqkYwudlxIPTDiQRZpFGwDc+SB/ATHDM=;
+	s=arc-20240116; t=1706822049; c=relaxed/simple;
+	bh=YFgnfBLucu85ptKP2p7HpNLLQpCoH2a8SI4kbIvbpRk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I2UCeOJwGcSQqv7xSp+YqS7m2ujZtGsWNo6G5Ha0VdeIeu55v0VXX7TJ8/ka1XZOXwp4o1brqyYaRgerZ0qp1Nq5mzwf2007PHrO4rl5AYHjPVNLQ3CgDmmwehY69SSqt9hq7zbt4u9RYxaiQvU+gyiTXT77ey8T6+c9JZWWx5U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=GNaUeSe7; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=umich.edu
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-5ffdf06e009so14460267b3.3
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 13:06:59 -0800 (PST)
+	 To:Cc:Content-Type; b=qS5EUPdbT02LF5UnheIWubMtGhg5uUQ/ldpBq/Xtf8d2c+VVfr7PJqqE0kgv2HP30e4pDkWTXMLJAOLPqsY2OC8vDem9GeyT+CN4EpB9VZ9QXE7reXWPs2XyO92MnP6LWpQ+xawbp6ztHbUEFgH+VDk+GEyjOflKwKvQS0FGu0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zs9qgkCR; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-55fc9a581f8so1107061a12.2;
+        Thu, 01 Feb 2024 13:14:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=umich.edu; s=google-2016-06-03; t=1706821619; x=1707426419; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706822045; x=1707426845; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Yt7e5kW67jPJRZM8ErOQj6BquenTsqSTjJPhbNcD7fw=;
-        b=GNaUeSe7A3mHBwARmu5PgQQlF34wzp2roJJMQ7FBpM4dmXq1y9eWsulUwONYwZU2Kr
-         Z/KmrVBxiM4Z28O8v/6lDo8JySTh0XUAUh3zvteIUhw1MyA8Vy77y1T33EqdbxX8SLjg
-         Cs+7yenilbNn4n90l71QyQqV2c32lBgr3Z1qJfhPRX8DHdIy/pf62utIN7sW4bvpgZKY
-         rG9D8s/0S+8AYeo7USUHQqcWuO+xlhqvN+7dxKP0M9KAXoJhvhODld7HGJtziUgO0HoW
-         H4f/ZcB3X653UyUjEUWsF/GIhQfYl+3c+JJiBMz7Vz3/JRqH2wdxB+EivncC7mimpqRX
-         TdSQ==
+        bh=ftVgWUeYL2XoK4+UC76bqY+RetEWYpldhnbErfDuhfw=;
+        b=Zs9qgkCRcZv3ZSNY7yrIM3Fnsolfy/HgeiZKH+QWPsJo03hIRFJz+qM9Sobyi4K951
+         2bz4XZ9pOy6ZkCHMXU1u+rVmbJulSB5tMjRXVhKN7mV6M/Airs2mvaZRGoJkmBBf9kbE
+         KYLbZDHCXo+itWUeitznos9/VPzV7UR7KAkVQdL6U2ODULlIaE2SmB4+vfa02/J1qXTE
+         pnsbaIONnEiqLFipEJqrvjgKmJwniuhRjgC8IEdbGBwzSVw8wtHy7AcQ2SipcB3Xrdjf
+         9BZc3xT7rJ5NZul2rD8/k8Gn1tUBg0GiiuRw27AnkOxPLHG5xDs9OwzWMFu/k/REp9hI
+         MUvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706821619; x=1707426419;
+        d=1e100.net; s=20230601; t=1706822045; x=1707426845;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Yt7e5kW67jPJRZM8ErOQj6BquenTsqSTjJPhbNcD7fw=;
-        b=QGwhQc4z0jr3GfQlyKSSr7s42vPhcpOiDCOAFlapDIpGkFaH8XoHuwAzapDg51Fsq1
-         VZd5xhnV1t+AO85MrsuXz3i05aa0c/Bgpmaa/85E0BynPhST+OndwaBF84zlepmBbfH4
-         1jU1F5UIxl5qru79bp9OIOzyoB1hqqSwSjKYqAa1Goc4tuSR466G5hCNCCwpJAFNoI2j
-         HnDZwo9IRWZGkckIPWaShHMzgEzBzQn8dbfoGvahINRA7Dysl/+XTLj2lk9J/wl/fa4v
-         Cpm4SNzzXCbfWqvr2XWrzBK0zs5xAo3Pt8mnu5zddFkMfT3YxUTIqDJC0pfJS7g2IAtr
-         ssmw==
-X-Gm-Message-State: AOJu0YyJQq1ZIknIxrVXOVvbBPxefIO9vl7xQa72a21VA32qOgldIlxE
-	9ud8oSmXieiC1aLKg/82LV7dviiambC9nrK72kcGihPSjiUWvpJShqhE/xXefJh+7jyU/+gOHU2
-	D8G64EwuxLfwQKE+aNLSCgMZS7nJMfMR9iFZfvg==
-X-Google-Smtp-Source: AGHT+IGEUKSA0ksa3LSL8TqJTFxwolHbJCZbeQLC+r6L2WGPwgMdAzKp16oStnHvrtxqabrcInoFkHb1EhGBbU2VoDs=
-X-Received: by 2002:a81:4813:0:b0:602:9f2e:c513 with SMTP id
- v19-20020a814813000000b006029f2ec513mr3819062ywa.4.1706821618780; Thu, 01 Feb
- 2024 13:06:58 -0800 (PST)
+        bh=ftVgWUeYL2XoK4+UC76bqY+RetEWYpldhnbErfDuhfw=;
+        b=pBDqHvKAnQ6IfZWMas33ySOoZ9+u3NKM8Nn5VTHtORtGgqNWbAZ4PCuex1ypDNca1W
+         A1+Sct2tqZHauoTrOEDAh6EZl4VGuPHGEtcrLLf7MOeN7H4gf9DOJfvtN1ySNftxTRg4
+         LVKVoxWREepiaARDZhlJo2BuMLHAt/PLvH8UTREeHn3qp+BSKiORYLGKZIBTVbSIyUYl
+         BPZUqs7AN1PW/i+xkMRmDtCIEkkGIDRZIuPerkeEszthvav5jMP13x7gGmjqpbDyUkb8
+         SkGkaQDle2XHEoVRUbMMuW8g/USw1H+jnNpR7jq8o86A1VMBnjgrZO2qANIxFEhxb3Oy
+         8igg==
+X-Gm-Message-State: AOJu0YxRHJ8ufoffaktgXl/JCEDLKVEzg4PPlNxNA+qFqmgfUImZ0z9g
+	qjGn9Myly9/QFBNsB+tKuhw3WXjMiLVgw1o/ZmK8E1WR0v27qElQIkzWBo1M213Hrrdv5Q18SAr
+	3+piCHSznbOuY0DY5Qom8nSFvHek=
+X-Google-Smtp-Source: AGHT+IFUb9VpSM3tlJelkffQ1mXaVP5k5IDoF1WvoVK3mShxW7a5CP04A811/hfKTaMGDbgzbSWJrJJaWp8Ftah8PI8=
+X-Received: by 2002:aa7:d615:0:b0:55f:cab9:5f9c with SMTP id
+ c21-20020aa7d615000000b0055fcab95f9cmr18020edr.0.1706822045281; Thu, 01 Feb
+ 2024 13:14:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240201-rockchip-rust-phy_depend-v2-0-c5fa4faab924@christina-quast.de>
- <20240201-rockchip-rust-phy_depend-v2-3-c5fa4faab924@christina-quast.de>
-In-Reply-To: <20240201-rockchip-rust-phy_depend-v2-3-c5fa4faab924@christina-quast.de>
-From: Trevor Gross <tmgross@umich.edu>
-Date: Thu, 1 Feb 2024 15:06:47 -0600
-Message-ID: <CALNs47tnwCgyvM2jBo=bTt1=2AJFt3b6W+JsTHM3Np2tbNJYCA@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] net: phy: add Rust Rockchip PHY driver
-To: Christina Quast <contact@christina-quast.de>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, 
-	Alice Ryhl <aliceryhl@google.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
+References: <20240201194521.139472-1-biju.das.jz@bp.renesas.com>
+ <20240201194521.139472-3-biju.das.jz@bp.renesas.com> <d3a6657d-0a67-a826-24b1-17ec8f43ee81@omp.ru>
+In-Reply-To: <d3a6657d-0a67-a826-24b1-17ec8f43ee81@omp.ru>
+From: Biju Das <biju.das.au@gmail.com>
+Date: Thu, 1 Feb 2024 21:13:54 +0000
+Message-ID: <CADT+UeAeT0dC2AV1RP8H10V7LY2WLeET=6C-U_cXEDW95eYgYg@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next 2/2] ravb: Add Tx checksum offload support for GbEth
+To: Sergey Shtylyov <s.shtylyov@omp.ru>
+Cc: Biju Das <biju.das.jz@bp.renesas.com>, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Heiko Stuebner <heiko@sntech.de>, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, 
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, 
+	Wolfram Sang <wsa+renesas@sang-engineering.com>, 
+	Nikita Yushchenko <nikita.yoush@cogentembedded.com>, netdev@vger.kernel.org, 
+	linux-renesas-soc@vger.kernel.org, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 1, 2024 at 12:07=E2=80=AFPM Christina Quast
-<contact@christina-quast.de> wrote:
-> +++ b/drivers/net/phy/rockchip_rust.rs
-> @@ -0,0 +1,131 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +// Copyright (C) 2024 Christina Quast <contact@christina-quast.de>
-> +
-> +//! Rust Rockchip PHY driver
-> +//!
-> +//! C version of this driver: [`drivers/net/phy/rockchip.c`](./rockchip.=
-c)
-> +use kernel::{
-> +    c_str,
-> +    net::phy::{self, DeviceId, Driver},
-> +    prelude::*,
-> +    uapi,
-> +};
-> +
-> +kernel::module_phy_driver! {
-> +    drivers: [PhyRockchip],
-> +    device_table: [
-> +        DeviceId::new_with_driver::<PhyRockchip>(),
-> +    ],
-> +    name: "rust_asix_phy",
-> +    author: "FUJITA Tomonori <fujita.tomonori@gmail.com>",
+Hi Sergey,
 
-Tomo wrote this? :)
-
-> +    description: "Rust Asix PHYs driver",
-> +    license: "GPL",
-> +}
-> +
-> +
-> +const MII_INTERNAL_CTRL_STATUS: u16 =3D 17;
-> +const SMI_ADDR_TSTCNTL: u16 =3D 20;
-> +const SMI_ADDR_TSTWRITE: u16 =3D 23;
-> +
-> +const MII_AUTO_MDIX_EN: u16 =3D bit(7);
-> +const MII_MDIX_EN: u16 =3D bit(6);
-> +
-> +const TSTCNTL_WR: u16 =3D bit(14) | bit(10);
-> +
-> +const TSTMODE_ENABLE: u16 =3D 0x400;
-> +const TSTMODE_DISABLE: u16 =3D 0x0;
-> +
-> +const WR_ADDR_A7CFG: u16 =3D 0x18;
-
-Most of these are clear enough, but could you add comments about what
-the more ambiguous constants are for? (e.g. A7CFG).
-
-> +struct PhyRockchip;
-> +
-> +impl PhyRockchip {
-
-Remove the `helper_` prefix for these functions, and change the docs.
-Their use as helpers is obvious enough based on where they are called,
-better to say what they actually accomplish.
-
-Since they don't take `self`, these could also just be standalone
-functions rather than in an `impl PhyRockchip` block. This makes
-calling them a bit cleaner since you don't need the `PhyRockchip::`
-prefix.
-
-> +   /// Helper function for helper_integrated_phy_analog_init
-> +    fn helper_init_tstmode(dev: &mut phy::Device) -> Result {
-> +        // Enable access to Analog and DSP register banks
-> +        dev.write(SMI_ADDR_TSTCNTL, TSTMODE_ENABLE)?;
-> +        dev.write(SMI_ADDR_TSTCNTL, TSTMODE_DISABLE)?;
-> +        dev.write(SMI_ADDR_TSTCNTL, TSTMODE_ENABLE)
-> +    }
-
-For consistency, just make the last write also end with `?;` and add a
-`Ok(())` line.
-
-> +
-> +    /// Helper function for helper_integrated_phy_analog_init
-> +    fn helper_close_tstmode(dev: &mut phy::Device) -> Result {
-> +        dev.write(SMI_ADDR_TSTCNTL, TSTMODE_DISABLE)
-> +    }
-> +
-> +    /// Helper function for rockchip_config_init
-> +    fn helper_integrated_phy_analog_init(dev: &mut phy::Device) -> Resul=
-t {
-> +        Self::helper_init_tstmode(dev)?;
-> +        dev.write(SMI_ADDR_TSTWRITE, 0xB)?;
-> +        dev.write(SMI_ADDR_TSTCNTL, TSTCNTL_WR | WR_ADDR_A7CFG)?;
-> +        Self::helper_close_tstmode(dev)
-> +    }
-> +
-> +    /// Helper function for config_init
-> +    fn helper_config_init(dev: &mut phy::Device) -> Result {
-> +        let val =3D !MII_AUTO_MDIX_EN & dev.read(MII_INTERNAL_CTRL_STATU=
-S)?;
-> +        dev.write(MII_INTERNAL_CTRL_STATUS, val)?;
-> +        Self::helper_integrated_phy_analog_init(dev)
-> +    }
-> +
-> +    fn helper_set_polarity(dev: &mut phy::Device, polarity: u8) -> Resul=
-t {
-> +        let reg =3D !MII_AUTO_MDIX_EN & dev.read(MII_INTERNAL_CTRL_STATU=
-S)?;
-> +        let val =3D match polarity as u32 {
-> +            // status: MDI; control: force MDI
-> +            uapi::ETH_TP_MDI =3D> Some(reg & !MII_MDIX_EN),
-> +            // status: MDI-X; control: force MDI-X
-> +            uapi::ETH_TP_MDI_X =3D> Some(reg | MII_MDIX_EN),
-> +            // uapi::ETH_TP_MDI_AUTO =3D> control: auto-select
-> +            // uapi::ETH_TP_MDI_INVALID =3D> status: unknown; control: u=
-nsupported
-> +            _ =3D> None,
-
-Is receiving an invalid value not an error? I.e.
-
-    uapi::ETH_TP_MDI_AUTO | uapi::ETH_TP_MDI_INVALID =3D> None,
-    _ =3D> return Err(...)
-
-I know the current implementation came from the C version, just
-wondering about correctness here.
-
-> +        };
-> +        if let Some(v) =3D val {
-> +            if v !=3D reg {
-> +                return dev.write(MII_INTERNAL_CTRL_STATUS, v);
-> +            }
-> +        }
-
-In the match statement above - I think you can replace `=3D> None` with
-`=3D> return Ok(())` and drop the `Some(...)` wrappers. Then you don't
-need to destructure val here.
-
-> +        Ok(())
-> +
-> +    }
-> +}
-> +
-> +#[vtable]
-> +impl Driver for PhyRockchip {
-> +    const FLAGS: u32 =3D 0;
-> +    const NAME: &'static CStr =3D c_str!("Rockchip integrated EPHY");
-> +    const PHY_DEVICE_ID: DeviceId =3D DeviceId::new_with_custom_mask(0x1=
-234d400, 0xfffffff0);
-> +
-> +    fn link_change_notify(dev: &mut phy::Device) {
-> +    // If mode switch happens from 10BT to 100BT, all DSP/AFE
-> +    // registers are set to default values. So any AFE/DSP
-> +    // registers have to be re-initialized in this case.
-
-Comment indent
-
-> +        if dev.state() =3D=3D phy::DeviceState::Running && dev.speed() =
-=3D=3D uapi::SPEED_100 {
-> +            if let Err(e) =3D Self::helper_integrated_phy_analog_init(de=
-v) {
-> +                pr_err!("rockchip: integrated_phy_analog_init err: {:?}"=
-, e);
-> +            }
-> +        }
-> +    }
-> +
-> +    fn soft_reset(dev: &mut phy::Device) -> Result {
-> +        dev.genphy_soft_reset()
-> +    }
-> +
-> +    fn config_init(dev: &mut phy::Device) -> Result {
-> +        PhyRockchip::helper_config_init(dev)
-> +    }
-> +
-> +    fn config_aneg(dev: &mut phy::Device) -> Result {
-> +        PhyRockchip::helper_set_polarity(dev, dev.mdix())?;
-> +        dev.genphy_config_aneg()
-> +    }
-> +
-> +    fn suspend(dev: &mut phy::Device) -> Result {
-> +        dev.genphy_suspend()
-> +    }
-> +
-> +    fn resume(dev: &mut phy::Device) -> Result {
-> +        let _ =3D dev.genphy_resume();
-
-Why not `?` the possible error?
-
-> +
-> +        PhyRockchip::helper_config_init(dev)
-> +    }
-> +}
+On Thu, Feb 1, 2024 at 8:56=E2=80=AFPM Sergey Shtylyov <s.shtylyov@omp.ru> =
+wrote:
 >
-> --
-> 2.43.0
+> On 2/1/24 10:45 PM, Biju Das wrote:
 >
+> > TOE has hardware support for calculating IP header and TCP/UDP/ICMP
+> > checksum for both IPv4 and IPv6.
+> >
+> > Add Tx checksum offload supported by TOE for IPv4 and TCP/UDP.
+> >
+> > For Tx, the result of checksum calculation is set to the checksum field=
+ of
+> > each IPv4 Header/TCP/UDP/ICMP of ethernet frames. For the unsupported
+> > frames, those fields are not changed. If a transmission frame is an UDP=
+v4
+> > frame and its checksum value in the UDP header field is 0x0000, TOE doe=
+s
+> > not calculate checksum for UDP part of this frame as it is optional
+> > function as per standards.
+> >
+> > We can test this functionality by the below commands
+> >
+> > ethtool -K eth0 tx on --> to turn on Tx checksum offload
+> > ethtool -K eth0 tx off --> to turn off Tx checksum offload
+> >
+> > Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
+> > ---
+> > v2->v3:
+> >  * Updated commit header and description as suggested by Sergey.
+> >  * Replaced NETIF_F_IP_CSUM->NETIF_F_HW_CSUM as we are supporting only =
+IPv4.
+>
+>    You do vice versa, NETIF_F_HW_CSUM->NETIF_F_IP_CSUM. :-)
+>    However, I'm now seeing this comment under CHECKSM_PATIAL:
+>
+>  *   %NETIF_F_IP_CSUM and %NETIF_F_IPV6_CSUM are being deprecated in favo=
+r of
+>  *   %NETIF_F_HW_CSUM. New devices should use %NETIF_F_HW_CSUM to indicat=
+e
+>  *   checksum offload capability.
+>
+>    So probably we should've kept NETIF_F_HW_CSUM? :-/
 
-As Greg and Dragan mentioned, duplicate drivers are generally not
-accepted in-tree to avoid double maintenance and confusing config. Is
-there a specific goal?
+Ok, Will do in the next version.
+>
+> >  * Updated the comment related to UDP header field.
+> >  * Renamed ravb_is_tx_checksum_offload_gbeth_possible()->ravb_is_tx_csu=
+m_gbeth().
+> > v1->v2:
+> >  * No change.
+> [...]
+>
+> > diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/eth=
+ernet/renesas/ravb_main.c
+> > index c4dc6ec54287..042dc565d1a5 100644
+> > --- a/drivers/net/ethernet/renesas/ravb_main.c
+> > +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> [...]
+> > @@ -524,15 +525,27 @@ static int ravb_ring_init(struct net_device *ndev=
+, int q)
+> >
+> >  static void ravb_csum_init_gbeth(struct net_device *ndev)
+> >  {
+> > -     if (!(ndev->features & NETIF_F_RXCSUM))
+> > +     bool tx_enable =3D ndev->features & NETIF_F_IP_CSUM;
+> > +     bool rx_enable =3D ndev->features & NETIF_F_RXCSUM;
+> > +
+> > +     if (!(tx_enable || rx_enable))
+> >               goto done;
+> >
+> >       ravb_write(ndev, 0, CSR0);
+> > -     if (ravb_wait(ndev, CSR0, CSR0_RPE, 0)) {
+> > +     if (ravb_wait(ndev, CSR0, CSR0_TPE | CSR0_RPE, 0)) {
+> >               netdev_err(ndev, "Timeout enabling hardware checksum\n");
+> > -             ndev->features &=3D ~NETIF_F_RXCSUM;
+> > +
+> > +             if (tx_enable)
+> > +                     ndev->features &=3D ~NETIF_F_IP_CSUM;
+> > +
+> > +             if (rx_enable)
+> > +                     ndev->features &=3D ~NETIF_F_RXCSUM;
+> >       } else {
+> > -             ravb_write(ndev, CSR2_ALL, CSR2);
+> > +             if (tx_enable)
+> > +                     ravb_write(ndev, CSR1_ALL, CSR1);
+> > +
+> > +             if (rx_enable)
+> > +                     ravb_write(ndev, CSR2_ALL, CSR2);
+> >       }
+> >
+> >  done:
+> > @@ -1986,6 +1999,35 @@ static void ravb_tx_timeout_work(struct work_str=
+uct *work)
+> >       rtnl_unlock();
+> >  }
+> >
+> > +static bool ravb_is_tx_csum_gbeth(struct sk_buff *skb)
+>
+>    Hm, this new name doesn't parse well for me... :-(
+>    Maybe ravb_can_tx_csum_gbeth() or ravb_tx_csum_possible_gbeth()?
 
-It is quite alright to request feedback on Rust drivers (and I have
-provided some) or even ask if anyone is willing to help test it out,
-but please use RFC PATCH and make it clear that this is for
-experimentation rather than upstreaming.
+OK, ravb_can_tx_csum_gbeth() as it is shorter.
 
-Netdev has seemed relatively open to adding Rust drivers for new phys
-that don't have a C implementation, but these phys are of course
-tougher to find.
+>
+> > +{
+> > +     struct iphdr *ip =3D ip_hdr(skb);
+> > +
+> > +     /* TODO: Need to add support for VLAN tag 802.1Q */
+> > +     if (skb_vlan_tag_present(skb))
+> > +             return false;
+> > +
+> > +     switch (ip->protocol) {
+> > +     case IPPROTO_TCP:
+> > +             break;
+> > +     case IPPROTO_UDP:
+> > +             /* If the checksum value in the UDP header field is 0, TO=
+E does
+> > +              * not calculate checksum for UDP part of this frame as i=
+t is
+> > +              * optional function as per standards.
+> > +              */
+> > +             if (udp_hdr(skb)->check =3D=3D 0)
+> > +                     return false;
+> > +             break;
+> > +     /* TODO: Need to add HW checksum for ICMP */
+>
+>    s/HW/hardware/?
 
-Also for future reference, changes intended for the net tree should be
-labeled [PATCH v? net-next].
+OK.
+>
+> > +     case IPPROTO_ICMP:
+> > +             fallthrough;
+>
+>    You don't even need fallthrough, actually...
 
-Best regards,
-Trevor
+Clang Compiler will complain.
+
+[1] https://patchwork.kernel.org/project/xfs/patch/20210420230652.GA70650@e=
+mbeddedor/#24129659
+
+https://patches.linaro.org/project/netdev/patch/20210305094850.GA141221@emb=
+eddedor/#617482
+
+>    But why do you return false for ICMP? Isn't it supported by TOE?
+
+It is supported by the hardware, but not the network subsystem.
+
+Cheers,
+Biju
 
