@@ -1,97 +1,130 @@
-Return-Path: <netdev+bounces-68235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA919846445
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 00:05:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CDF2846452
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 00:12:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7BD01C233ED
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 23:05:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F20B9B21F43
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 23:12:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61E103D960;
-	Thu,  1 Feb 2024 23:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 698C747A7D;
+	Thu,  1 Feb 2024 23:12:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nYBfaUfh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BCdyF+GC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5AE747F5C
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 23:05:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFA933FB37;
+	Thu,  1 Feb 2024 23:12:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706828717; cv=none; b=BeNUBamdy97R4mO/F/aeXC/LpAWcG9DNH39W+ecvLHBfXW1V/TF1XQTfRygBuQrj9iuW/fGqqYQ6KFQ7LLfDDJ2UYIj+L5ErmXBo/C8SUl4HmwpUyXsn2cHjXMOBjjC/TLmjTLuw6pdlhdA2SUtHecT9Wa4d161ESIOiDGSAJI8=
+	t=1706829139; cv=none; b=V85TlwWY20g6OjCWN0nNIeLpd6St9lzYPKHtkEIIhn3PjfN2fyQqdmiQeRNghGQdisRei0JkoiSxfTmnlAiYDTO3gtiyu90pxRCXyzx2TEQBMXABiArobW3OJPqCDnDNfWCYUoO8klkPbW0QoTdI4TXZ4KanitQ7D156wESLvXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706828717; c=relaxed/simple;
-	bh=jZKZvywDdddnNc4X6eFsCo4m8AqAV5RIFRVFMF99TIA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hIQ/GBaDbOrAomeN7U+14X4IHMvrPEaH4Bw7Mk8bqaWTDs5iGuRO/dC6dqhhEn/Acrod1lkwExWxc803XI0pzYw+dQ2gGXrQ+DNGOARHrfUCkHFqBCTXRwMlGcNyZOWkEYNTHxivhAvkrxqsiyVk56Jh5yXM4uALkK24oMgndF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nYBfaUfh; arc=none smtp.client-ip=209.85.167.44
+	s=arc-20240116; t=1706829139; c=relaxed/simple;
+	bh=+PN1aVVdJv7dQ6u3SE9gXNMJ5i8PkALkHFjLI1LOmKY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b2XNJAK5f1fjpgdVy3IvlapXL1+t1zM/wluKYdc121a79qd31T9Y4EiJniH5+5fKMjaxkJeuYheg+vCgdmA41B86XsN9fmjqgdSmC9CpRm/MZANJCTer2m8ziwLNo7jUhpY6oXpdaukI/wnmQXAjjr3AAOL05Xp8X1PUerHGX/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BCdyF+GC; arc=none smtp.client-ip=209.85.128.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-51124d43943so2319177e87.2
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 15:05:15 -0800 (PST)
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-60412f65124so15178117b3.3;
+        Thu, 01 Feb 2024 15:12:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706828714; x=1707433514; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jZKZvywDdddnNc4X6eFsCo4m8AqAV5RIFRVFMF99TIA=;
-        b=nYBfaUfhStJWW6taTdnkREIAfp82cb3pQGGm6hpwv0hI694Vbfpp4pV5Lhu4zB+5G+
-         cFPp92ltZe/18oyrHcJ/u2+Jl+Xx8cUh+5XwMJL001SByLT0XIfVSzSziqVd7e2M2NmZ
-         txDNFW2YOmJMDYIW9N6HlsfXa+318o1D+8FlBqoh4PuuCwcWho1Zz0ZQk+v9bBslPbZX
-         9HnPqRhIL3OkcM0qsKnyQtw3jU++61pbskYCMNfG3ywaz3K4uObg8VK2Duo01I3o/F55
-         XzKduHQ9jdaYOtFC/21uSVnN07j78p7mAi0n6PkoeIHv+moZr/oEc97jpyKshf49ei5p
-         V6Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706828714; x=1707433514;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1706829137; x=1707433937; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jZKZvywDdddnNc4X6eFsCo4m8AqAV5RIFRVFMF99TIA=;
-        b=YIIDRQIehK6R+oGV58Tb/Qg70hkyF4ze/WEZsjZcVDe+3KuCfZ2Xz0PxkiHl+GLbkz
-         341YQE+5+UP5ecSTZ8ZQtx1/hhU/tFRGWjwOR1Mq6ibw9UlXUkyGkl8+r6AKm9RVO5OT
-         NwcQPpiRLNiCgv207f0J4YX8VkvuxrUVMxcQ4tambNQ4KYD9QerIjXW/mCoQWc5lpIt9
-         RYVfsKW+6CMBfGkD0afKHAxBV0i55/Yzpw7SBO+uaZIgV7cd8zcp4y/Ztj7XgKF0yTQc
-         wJGBurkkMn7ZMTp9cpI73jJrN0zFQyB1cn5PZEgbCfqC3EBe9afIMADm76bUms2oVjnX
-         2NjQ==
-X-Gm-Message-State: AOJu0Yy8Rk94mY2+TEYcLuldYuiv1n79g4/YGn426MpkaH81SeQL7X53
-	DBa5iBSteRPinPu0qqr3JH6Anz94/1veWoos3q9I72fXIKzx//EG
-X-Google-Smtp-Source: AGHT+IHj8ayAivmzIWhPgLKluZGh0MAju091b00svwcv2bw87f3M8xRCUg1w2etV7RUgmLJcJ4ENWg==
-X-Received: by 2002:a05:6512:32a4:b0:511:31fa:cb17 with SMTP id q4-20020a05651232a400b0051131facb17mr238175lfe.27.1706828713583;
-        Thu, 01 Feb 2024 15:05:13 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXPNzPR8alnWCjwsvxmGFPvK+sif6SYCCRH2kIiCxjLVW4VqRvoTSXpBmiQJmTPw/iL6qH702eppOH07iHqo6nnsAfPVbtljNCrNjGF1QVVvFvMrkRQZ5bhgtD6R1mqLga3yLZGBbOPEKSFNn3NVDT/iX9xTMBBVO3BJXs/OYpbt+2U8KKbn2frXb7dhrZSNX/xwq1AG4eKCTlYuYquNG+THJOO7Yqm3ZkzjiM6EW2ZJyVwfrd+bhLJhvaL/dgHtw0IxhBUWdd9hjjOYLE1uyzbxPQKl8yiEHMVuDORC6pXUcA0RpdklaYMr0yvzkuqHHqOooWJPaSfnQVC47v2zK4=
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id hu21-20020a170907a09500b00a34b15c5cedsm244261ejc.170.2024.02.01.15.05.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 15:05:13 -0800 (PST)
-Date: Fri, 2 Feb 2024 01:05:11 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, alsi@bang-olufsen.dk,
-	andrew@lunn.ch, f.fainelli@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	arinc.unal@arinc9.com, ansuelsmth@gmail.com
-Subject: Re: [PATCH 11/11] net: dsa: realtek: embed dsa_switch into
- realtek_priv
-Message-ID: <20240201230511.iznisjslqbcnohsc@skbuf>
-References: <20240123214420.25716-1-luizluca@gmail.com>
- <20240123214420.25716-12-luizluca@gmail.com>
+        bh=+PN1aVVdJv7dQ6u3SE9gXNMJ5i8PkALkHFjLI1LOmKY=;
+        b=BCdyF+GCqK8XLGf5CxqL+kvzbQlcwsWAODILEHQfRrU6Z3qVUwS4xL2aVaRkZ/vY37
+         L/zv+0QDa7jPjNo2M8qtqk37aOQtr6xPrALOW6SrEpmEwjSi977uzkJM4gYR6rTtiHg5
+         QVYbMY1XxByuZhab7VZLtcDtYq5NzGQJBmYyU/CJRG55D1lie8Jn9ZlJG/lER44If11K
+         uzjvWloMvfyVHv4n2AQMSx71ce0PENYnK3z00G/3VdcZtnlQbiFB+FegDcQMRidpgUYI
+         W2BIGwVLXuCiFc3REWU8aAoNSDqZrdEBK7VTo14zXY8tBqm9r/gmg/COrStx8wF70NdR
+         Ow/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706829137; x=1707433937;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+PN1aVVdJv7dQ6u3SE9gXNMJ5i8PkALkHFjLI1LOmKY=;
+        b=RwO8r/GHMjufytvtJJ+6rX7m6ZOYatl9d2CWJxJ9IkL5HG/x5RPcp9t7R4ex8qn7L1
+         5snrf3WDVpNItr1qRoMYDjkuJWnBgsGZdCyxMuEEoqFWRNaONFYevHQzXPTw4vrr9y0q
+         WcDgU2U0adw1al4JDvjyY64lgVEvsERIQMGGN+0YBfl5FIMsRP0O6gBuN+vasUqnpbCi
+         ZBVc7fMIh0b1NrEPANyUzqDY3XwMXC/Cna8FHHVGJvzoJ6jjSLAx6ZagqxWlTOpD/V55
+         zoqg6N9O7oroa2cEa3ipwEYT3D2eRysYZ4sDAieLWXkTul+rhuuQLNLWH0YWNLg3Gk6T
+         Fkaw==
+X-Gm-Message-State: AOJu0YyDIps9Rwlis6xqKGAeHLBB7xPpIp9mXN5j8+MGFovqm+H1TAYO
+	kLnaYCalIsq8jUhUIRIXLE9DbloZWlCU1gPaX11zG1Tm2Ne1GJCFIXFcUVkZ2LPxkedtEZhbR5K
+	Ed4Laa8ITp+tqdEYvmu2QHlmvNxg=
+X-Google-Smtp-Source: AGHT+IFznqZD386j38NqZlpMPZjSrbX0IVvxdtH06xaGlCHWUb0CmZLJnLZmRce7XPhhGHqaSHLrFy/x9r3vOSy+mk0=
+X-Received: by 2002:a0d:cbc9:0:b0:5ff:81fa:16e6 with SMTP id
+ n192-20020a0dcbc9000000b005ff81fa16e6mr622138ywd.38.1706829136716; Thu, 01
+ Feb 2024 15:12:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240123214420.25716-12-luizluca@gmail.com>
+References: <20240201-rockchip-rust-phy_depend-v2-0-c5fa4faab924@christina-quast.de>
+ <20240201-rockchip-rust-phy_depend-v2-3-c5fa4faab924@christina-quast.de>
+ <2024020105-bankroll-opium-a6e5@gregkh> <6725eeac-45ee-4f3f-a612-0ef5725b9fd9@lunn.ch>
+In-Reply-To: <6725eeac-45ee-4f3f-a612-0ef5725b9fd9@lunn.ch>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Fri, 2 Feb 2024 00:12:05 +0100
+Message-ID: <CANiq72nnHj2PnsM-=RREOcq1wsyydFZQ67-DewDa18=tAHe4NA@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] net: phy: add Rust Rockchip PHY driver
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Greg KH <gregkh@linuxfoundation.org>, 
+	Christina Quast <contact@christina-quast.de>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, 
+	Alice Ryhl <aliceryhl@google.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Trevor Gross <tmgross@umich.edu>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Heiko Stuebner <heiko@sntech.de>, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jan 23, 2024 at 06:44:19PM -0300, Luiz Angelo Daros de Luca wrote:
-> To eliminate the need for a second memory allocation for dsa_switch, it
-> has been embedded within realtek_priv.
+On Thu, Feb 1, 2024 at 10:30=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> As one of the PHY Maintainers, i would say no.
+>
+> Now we have an example, i think we should be a lot more strict about
+> what we actually merge. It should be a driver for hardware which does
+> not have a C driver.
 
-Ah, I forgot. Be consistent in the use of the imperative mood for
-describing the change throughout the patchset.
+Yeah, a single "Rust reference driver" is likely enough to give a good
+example of how things would look.
+
+I guess more than one could be justified if there are significant
+differences, e.g. if the maintainers want to cover more of the
+abstractions API for some reason.
+
+> We cannot drop C drivers since Rust at the moment does not support all
+> architectures GCC/Clang does. PHY drivers are architecture
+> independent, and in real life used on multiple architectures. When
+> Rust eventually catches up, we could consider dropping C drivers when
+> there is an equivalent Rust driver, but from what i hear, that is a
+> few years away. I don't want to be supporting a C and Rust driver for
+> the same hardware.
+
+The `rustc_codegen_gcc` backend can already build the kernel without
+changes, so hopefully we will see some results sooner than that. If we
+are talking multiple years, GCC Rust likely enters the equation too.
+
+But, indeed, there is a lot of work to do until we can drop C code in gener=
+al.
+
+Cheers,
+Miguel
 
