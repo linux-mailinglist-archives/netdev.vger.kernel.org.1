@@ -1,146 +1,132 @@
-Return-Path: <netdev+bounces-68159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CA7B845F9F
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 19:14:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E602D845FBE
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 19:23:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A84F1C26A3A
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:14:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8045B27641
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:23:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AA99127B4A;
-	Thu,  1 Feb 2024 18:11:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D063A82C60;
+	Thu,  1 Feb 2024 18:22:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TLSlsr4o"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ODIz70cQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA60127B48;
-	Thu,  1 Feb 2024 18:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24550779F8;
+	Thu,  1 Feb 2024 18:22:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706811117; cv=none; b=kIfaNAiiuqSrcmKCoTXD+pwJfvLR95AspR8PdVpXxGPSsSgJOibjERrahaM7dVgjTtTtgTdrF8MhMBmdVTjaOdFQtORGpgW1MAQs0jy4FoWc4mC+vWe0HNh22+13Bz8e+6l+I0aqLRqsN6WD9eI9juxl2ssG1ptWeyd7el4LqHc=
+	t=1706811762; cv=none; b=dBVN1r3NI1NX9jbEQnj60oZhlf3Wsg+XQE8L2fKMXjCL+4tGAtYK+oOqx5P2+cWV4liuJ8tCN9IC47gr/cpL0I1K08gpWDrfW7lwvUdSlN7dgCW1mA5OBZ0qRHNotnT/CuJWn2Bk9aUq6dXOeSEIXDZpbe+TfQJ3UQuYYTR3Z90=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706811117; c=relaxed/simple;
-	bh=86vTRfPucmb5AYxZwhb9dFpu1vfbO62Ulmjm8wLUwNc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=gsSvT4OzpiPI0QHg9n4Lc1dUZ0Gcec3lhPm72fAVePAPoZfZhH37Y7H1/ITXyKSTCxdv/K3tiPAreYFZMFgeWsoFrT50+kkr0IG4qlGGyZzgIJ/kTkJIfzWf6dq0uX0xL7+QQ5UJV5gsJ5z6XSZ/fHnSEWqV4+pXYQ7+7KT78ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TLSlsr4o; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706811116; x=1738347116;
-  h=message-id:subject:from:reply-to:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=86vTRfPucmb5AYxZwhb9dFpu1vfbO62Ulmjm8wLUwNc=;
-  b=TLSlsr4omsO4YapeGczyqpdnDwqMIJA6KVfbcobXYnMgmZjUOcbL8HGX
-   Y0yvwv75hnza4eDs6OKIDeP16+slHUO0tjafaTZ9zZjyWs4MMv0b9m5OK
-   LWomMK38vRXb9vJUkldD5T1rr1YJhSmYqjG9W26Her9nzaRCizLmrKw1T
-   BTxSrXahTj9OjW+tysDD0MGk78fK1roaFJvl9uCy7h7fqZMLPbmrfoxMS
-   xnZx3mIi15EfqhFO37vA4ea1t/726TxZeRcr2tpBHxcEudNVXi5sBI04y
-   6EIAdTqFJzb4JL++pT0GPRQbZcs7ejqjRLuZMZOmLo3dnjZWB7+TSQSDf
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="2894281"
-X-IronPort-AV: E=Sophos;i="6.05,235,1701158400"; 
-   d="scan'208";a="2894281"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 10:11:55 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,235,1701158400"; 
-   d="scan'208";a="4482906"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 10:11:54 -0800
-Received: from ssigler-mobl.amr.corp.intel.com (unknown [10.209.41.165])
-	by linux.intel.com (Postfix) with ESMTP id 5C0BA580DD4;
-	Thu,  1 Feb 2024 10:11:54 -0800 (PST)
-Message-ID: <47df451d2494243d73e9065202e50e022ae2792b.camel@linux.intel.com>
-Subject: Re: [PATCH 2/8] platform/x86/intel/sdsi: Combine read and write
- mailbox flows
-From: "David E. Box" <david.e.box@linux.intel.com>
-Reply-To: david.e.box@linux.intel.com
-To: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>,
-  netdev@vger.kernel.org, ilpo.jarvinen@linux.intel.com
-Cc: linux-kernel@vger.kernel.org, platform-driver-x86@vger.kernel.org
-Date: Thu, 01 Feb 2024 10:11:54 -0800
-In-Reply-To: <6ee06c50-3782-4d50-9a01-f332d181d3fc@linux.intel.com>
-References: <20240201010747.471141-1-david.e.box@linux.intel.com>
-	 <20240201010747.471141-3-david.e.box@linux.intel.com>
-	 <6ee06c50-3782-4d50-9a01-f332d181d3fc@linux.intel.com>
-Organization: David E. Box
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: base64
-User-Agent: Evolution 3.44.4-0ubuntu2 
+	s=arc-20240116; t=1706811762; c=relaxed/simple;
+	bh=cLSkI5IBu1sLgJ+AB7I0pNKDEEb48J57fLxzeatJ6vQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=caCcSGmc5c0h2vA+8f0ZxyB+zpUVxB1xbln5BbI2bBTYj0EtjB1Tig2k8pRnWfKQ3XHa1Qi30roqU9nBdFNLKsamEhQSpwNCfKB7YotD4HNFvpu+FC4Y+5koLUpC3/wHN+lNeMStECvD/948x4ki88DaqxqRZXJJq7q/3LJiSek=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ODIz70cQ; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1d751bc0c15so10861095ad.2;
+        Thu, 01 Feb 2024 10:22:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706811760; x=1707416560; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jPhuLzzBaanFkbxZrNOz+54SWmvRq/NmuPTyh/Ud9JY=;
+        b=ODIz70cQ096sIrka3M4CHxlkABBV8lMVO5rq3WEo+LZiAEI86BR9hjp6vYL3FVVj+U
+         5YJ+OhjAbe1t1fgGkZ69XQybk4e/jlZ1wQqjVutagtfEfhMGpEc2qUz8SXhZhTGRiMcA
+         C2p5sJOxSEO7cmFFiDTFXucF1AKVBLKhSTbS9U1iMYq3LZDUaiJwgsBVNoxoBzANjtyn
+         x40O1LEBblkPszZMLIlj+WRC5it7LzfOtInLv3mr9102YGKgkvbjQS8EsxabvKIEc60L
+         yPHL0EPd950Kvg04qyvJVEv7V1lfsb7vAvSDW+vr15cOmVqAb2Mhy2hiUY2lw7hs3AZ2
+         UoUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706811760; x=1707416560;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jPhuLzzBaanFkbxZrNOz+54SWmvRq/NmuPTyh/Ud9JY=;
+        b=we4pxHlyxXak7sxOSY6jIPWlY/dj9ugdyYBsLLHkf3rJZmhTU7wUKDctEQ4VHbkcNY
+         ryeoRv7O18d2ODzCSDOypp6JggcgYBmNqZA5tJnGqDlpaNJ+IQfv54ZmJs2uBO9TdHEG
+         nXmZ5RyMKCg/gdHvBv33WGMtqhszlrMug5EjhkoYSHt1Q2YzFpUrnK2hGluzkAHyHk7+
+         rOAmQyVLsZwPGXRISenPC+s6oTXhSboEDkUVaxV1H2VgEBdVaokC2vkVNCWMyKx9d6tl
+         lCDKPcbmke59n5Bixj9dD7DcrxXsZL4DO0aRZefuI/KouCi6zfvH047/eepJCghsZ09+
+         hqyw==
+X-Gm-Message-State: AOJu0Yxd+ANMISnXXitKZ6yoKAxC3gBAOShPiqtTtfWxc4j0Rhk4eshp
+	r/DdKf9Qxl8jSkHd3SZV5rcAp7HbpjrHD5tvTMqna7VUsGETIZoD
+X-Google-Smtp-Source: AGHT+IFeGzxHfBcXGwVjYK3ufH+44i8PF4Dp/jrC0oCoLEVT8MX9e2dDuxRGLPIbO4ofMRVQ0mtNCA==
+X-Received: by 2002:a17:902:dac4:b0:1d9:5b4d:7004 with SMTP id q4-20020a170902dac400b001d95b4d7004mr1846907plx.29.1706811760258;
+        Thu, 01 Feb 2024 10:22:40 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCU+IBY81Kz6rLwPzYCi1ipUBA536vINVT5q/KW0MHqg7zcBHVGVA+ThOaFFkztfMB8Xg44Iy2yxYQrJdpDIZkjAq8ABIQ9UdLHH4eGgRkDigdc6q7HitD8R25haOs9WJW4CmJf7iIp4Cxv4DM0k/eRDpGghZTrEDPjJZiPUfE7vKP6N/dgySzuvyvL49ugAHjywb3w01X2X1UsST/RtcetsXkAoK3f0qfhzoQVIo9JmOEmYIqSM0TKX5JR/fjlQ9sI9G6BvrR/yjnvbY+WHiyz9Cdvp5+BbH8blpqkeHmBZ06ztuMYKCvd59lDeivoGDsuKnLvq1s5Rc9ccbE6u1kR8KxnHPanfUfOVGaldB6c0KEWhaMWOirxov2cnk2acj5idvw==
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id f7-20020a170902ce8700b001d91849f274sm111308plg.134.2024.02.01.10.22.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Feb 2024 10:22:39 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Thu, 1 Feb 2024 10:22:38 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+To: Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jean Delvare <jdelvare@suse.com>,
+	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org
+Subject: Re: [PATCH v5 net-next 08/13] net: phy: marvell-88q2xxx: add support
+ for temperature sensor
+Message-ID: <5fdc3741-c169-4457-bffa-dab3d2ee42fe@roeck-us.net>
+References: <20240122212848.3645785-1-dima.fedrau@gmail.com>
+ <20240122212848.3645785-9-dima.fedrau@gmail.com>
+ <88a60be9-083b-4618-845c-6983bcad3540@roeck-us.net>
+ <c9866a56-d82e-4a3d-b335-db22c0413416@lunn.ch>
+ <a02c7451-8515-45d4-ae7b-9e64b03b5b38@roeck-us.net>
+ <20240201162349.GC48964@debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240201162349.GC48964@debian>
 
-SGkgU2F0aHlhLAoKT24gVGh1LCAyMDI0LTAyLTAxIGF0IDA5OjMxIC0wODAwLCBLdXBwdXN3YW15
-IFNhdGh5YW5hcmF5YW5hbiB3cm90ZToKPiAKPiBPbiAxLzMxLzI0IDU6MDcgUE0sIERhdmlkIEUu
-IEJveCB3cm90ZToKPiA+IFRoZSBjdXJyZW50IG1haWxib3ggY29tbWFuZHMgYXJlIGVpdGhlciBy
-ZWFkLW9ubHkgb3Igd3JpdGUtb25seSBhbmQgdGhlCj4gPiBmbG93IGlzIGRpZmZlcmVudCBmb3Ig
-ZWFjaC4gTmV3IGNvbW1hbmRzIHdpbGwgbmVlZCB0byBzZW5kIGFuZCByZWNlaXZlCj4gPiBkYXRh
-LiBJbiBwcmVwYXJhdGlvbiBmb3IgdGhlc2UgY29tbWFuZHMsIGNyZWF0ZSBhIGNvbW1vbiBwb2xs
-aW5nIGZ1bmN0aW9uCj4gPiB0byBoYW5kbGUgc2VuZGluZyBkYXRhIGFuZCByZWNlaXZpbmcgaW4g
-dGhlIHNhbWUgdHJhbnNhY3Rpb24uCj4gPiAKPiA+IFNpZ25lZC1vZmYtYnk6IERhdmlkIEUuIEJv
-eCA8ZGF2aWQuZS5ib3hAbGludXguaW50ZWwuY29tPgo+ID4gLS0tCj4gPiDCoGRyaXZlcnMvcGxh
-dGZvcm0veDg2L2ludGVsL3Nkc2kuYyB8IDc5ICsrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0t
-LS0KPiA+IMKgMSBmaWxlIGNoYW5nZWQsIDQ0IGluc2VydGlvbnMoKyksIDM1IGRlbGV0aW9ucygt
-KQo+ID4gCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9wbGF0Zm9ybS94ODYvaW50ZWwvc2RzaS5j
-Cj4gPiBiL2RyaXZlcnMvcGxhdGZvcm0veDg2L2ludGVsL3Nkc2kuYwo+ID4gaW5kZXggYTcwYzA3
-MWRlNmUyLi4wNWEzNWYyZjg1YjYgMTAwNjQ0Cj4gPiAtLS0gYS9kcml2ZXJzL3BsYXRmb3JtL3g4
-Ni9pbnRlbC9zZHNpLmMKPiA+ICsrKyBiL2RyaXZlcnMvcGxhdGZvcm0veDg2L2ludGVsL3Nkc2ku
-Ywo+ID4gQEAgLTE1LDYgKzE1LDcgQEAKPiA+IMKgI2luY2x1ZGUgPGxpbnV4L2lvcG9sbC5oPgo+
-ID4gwqAjaW5jbHVkZSA8bGludXgva2VybmVsLmg+Cj4gPiDCoCNpbmNsdWRlIDxsaW51eC9tb2R1
-bGUuaD4KPiA+ICsjaW5jbHVkZSA8bGludXgvb3ZlcmZsb3cuaD4KPiA+IMKgI2luY2x1ZGUgPGxp
-bnV4L3BjaS5oPgo+ID4gwqAjaW5jbHVkZSA8bGludXgvc2xhYi5oPgo+ID4gwqAjaW5jbHVkZSA8
-bGludXgvc3lzZnMuaD4KPiA+IEBAIC0xNTYsOCArMTU3LDggQEAgc3RhdGljIGludCBzZHNpX3N0
-YXR1c190b19lcnJubyh1MzIgc3RhdHVzKQo+ID4gwqDCoMKgwqDCoMKgwqDCoH0KPiA+IMKgfQo+
-ID4gwqAKPiA+IC1zdGF0aWMgaW50IHNkc2lfbWJveF9jbWRfcmVhZChzdHJ1Y3Qgc2RzaV9wcml2
-ICpwcml2LCBzdHJ1Y3Qgc2RzaV9tYm94X2luZm8KPiA+ICppbmZvLAo+ID4gLcKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHNpemVfdCAqZGF0
-YV9zaXplKQo+ID4gK3N0YXRpYyBpbnQgc2RzaV9tYm94X3BvbGwoc3RydWN0IHNkc2lfcHJpdiAq
-cHJpdiwgc3RydWN0IHNkc2lfbWJveF9pbmZvCj4gPiAqaW5mbywKPiA+ICvCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc2l6ZV90ICpkYXRhX3NpemUpCj4g
-PiDCoHsKPiA+IMKgwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgZGV2aWNlICpkZXYgPSBwcml2LT5kZXY7
-Cj4gPiDCoMKgwqDCoMKgwqDCoMKgdTMyIHRvdGFsLCBsb29wLCBlb20sIHN0YXR1cywgbWVzc2Fn
-ZV9zaXplOwo+ID4gQEAgLTE2NiwxOCArMTY3LDEwIEBAIHN0YXRpYyBpbnQgc2RzaV9tYm94X2Nt
-ZF9yZWFkKHN0cnVjdCBzZHNpX3ByaXYgKnByaXYsCj4gPiBzdHJ1Y3Qgc2RzaV9tYm94X2luZm8g
-KmluZgo+ID4gwqAKPiA+IMKgwqDCoMKgwqDCoMKgwqBsb2NrZGVwX2Fzc2VydF9oZWxkKCZwcml2
-LT5tYl9sb2NrKTsKPiA+IMKgCj4gPiAtwqDCoMKgwqDCoMKgwqAvKiBGb3JtYXQgYW5kIHNlbmQg
-dGhlIHJlYWQgY29tbWFuZCAqLwo+ID4gLcKgwqDCoMKgwqDCoMKgY29udHJvbCA9IEZJRUxEX1BS
-RVAoQ1RSTF9FT00sIDEpIHwKPiA+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBG
-SUVMRF9QUkVQKENUUkxfU09NLCAxKSB8Cj4gPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oMKgwqAgRklFTERfUFJFUChDVFJMX1JVTl9CVVNZLCAxKSB8Cj4gPiAtwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoMKgwqAgRklFTERfUFJFUChDVFJMX1BBQ0tFVF9TSVpFLCBpbmZvLT5zaXpl
-KTsKPiA+IC3CoMKgwqDCoMKgwqDCoHdyaXRlcShjb250cm9sLCBwcml2LT5jb250cm9sX2FkZHIp
-Owo+ID4gLQo+ID4gwqDCoMKgwqDCoMKgwqDCoC8qIEZvciByZWFkcywgZGF0YSBzaXplcyB0aGF0
-IGFyZSBsYXJnZXIgdGhhbiB0aGUgbWFpbGJveCBzaXplIGFyZQo+ID4gcmVhZCBpbiBwYWNrZXRz
-LiAqLwo+ID4gwqDCoMKgwqDCoMKgwqDCoHRvdGFsID0gMDsKPiA+IMKgwqDCoMKgwqDCoMKgwqBs
-b29wID0gMDsKPiA+IMKgwqDCoMKgwqDCoMKgwqBkbyB7Cj4gPiAtwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgdm9pZCAqYnVmID0gaW5mby0+YnVmZmVyICsgKFNEU0lfU0laRV9NQUlMQk9Y
-ICogbG9vcCk7Cj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHUzMiBwYWNrZXRf
-c2l6ZTsKPiA+IMKgCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoC8qIFBvbGwg
-b24gcmVhZHkgYml0ICovCj4gPiBAQCAtMTk1LDYgKzE4OCwxMSBAQCBzdGF0aWMgaW50IHNkc2lf
-bWJveF9jbWRfcmVhZChzdHJ1Y3Qgc2RzaV9wcml2ICpwcml2LAo+ID4gc3RydWN0IHNkc2lfbWJv
-eF9pbmZvICppbmYKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKHJldCkK
-PiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGJyZWFr
-Owo+ID4gwqAKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAoIXBhY2tldF9z
-aXplKSB7Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oHNkc2lfY29tcGxldGVfdHJhbnNhY3Rpb24ocHJpdik7Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGJyZWFrOwo+ID4gK8KgwqDCoMKgwqDCoMKgwqDC
-oMKgwqDCoMKgwqDCoH0KPiA+ICsKPiAKPiBJdCBzZWVtcyB0byBiZSBhIGdlbmVyaWMgY2hlY2su
-IElzIHRoaXMgcmVsYXRlZCB0byBjb252ZXJ0aW5nIHRvIGEgcmVhZC93cml0ZQo+IGZ1bmN0aW9u
-IG9yCj4gYSBjb21tb24gZml4IHlvdSBhZGRlZCB0b2dldGhlciBpbiB0aGlzIHBhdGNoLgoKWWVz
-LCBpdCdzIHJlbGF0ZWQuIFRoZSBjb2RlIHRoYXQgZm9sbG93cyB0aGlzIG9ubHkgYXBwbGllcyB0
-byByZWFkcy4gVGhpcyBjaGVjawp3b3VsZCBiZSB0cnVlIG9ubHkgZm9yIHdyaXRlcyB3aGljaCBv
-bmx5IG5lZWQgdG8gcG9sbCBvbmNlIHRvIGNvbmZpcm0gdGhlIHdyaXRlCndhcyBzdWNjZXNzZnVs
-LiBJJ2xsIGFkZCBhIGNvbW1lbnQgdG8gbWFrZSBpdCBjbGVhci4K
+On Thu, Feb 01, 2024 at 05:23:49PM +0100, Dimitri Fedrau wrote:
+> Am Thu, Feb 01, 2024 at 05:39:25AM -0800 schrieb Guenter Roeck:
+> > On 2/1/24 05:27, Andrew Lunn wrote:
+> > > > > +#ifdef CONFIG_HWMON
+> > > > 
+> > > > HWMON is tristate, so this may be problematic if the driver is built
+> > > > into the kernel and hwmon is built as module.
+> > > 
+> > > There should be Kconfig in addition to this, e.g.
+> > > 
+> > > config MAXLINEAR_GPHY
+> > >          tristate "Maxlinear Ethernet PHYs"
+> > >          select POLYNOMIAL if HWMON
+> > >          depends on HWMON || HWMON=n
+> > >          help
+> > >            Support for the Maxlinear GPY115, GPY211, GPY212, GPY215,
+> > >            GPY241, GPY245 PHYs.
+> > > 
+> > > So its forced to being built in, or not built at all.
+> > > 
+> > 
+> > Even then it should be "#if IS_ENABLED(HWMON)" in the code.
+> > 
+> >
+> If using "#if IS_ENABLED(HWMON)" do I have to add the dependency in
+> the KConfig file ? When looking at other PHY drivers, they do.
 
+Yes, to handle CONFIG_HWMON=m. Note that it is "IS_ENABLED(CONFIG_HWMON)"
+      				                           ^^^^^^^
+
+Guenter
 
