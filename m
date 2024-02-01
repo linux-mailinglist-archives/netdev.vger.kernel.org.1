@@ -1,216 +1,118 @@
-Return-Path: <netdev+bounces-68116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1A2A845E05
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:02:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8E65845DC0
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:52:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C155EB36EF3
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:54:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0AC51C2992C
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:52:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27231525B;
-	Thu,  1 Feb 2024 16:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39DCB4A2A;
+	Thu,  1 Feb 2024 16:52:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A49GhWC0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Hq16+ADG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BE8D2C682
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 16:53:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 845306FB3;
+	Thu,  1 Feb 2024 16:52:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706806438; cv=none; b=euGcNSKkN8j0EVz3JlFQJ/AtYzFMnReD7UmaaLG6hg+8g3JgH3bE9hxKKrt0sXyBpI+9fAHaLV9v1lmxEUxVFtLRTNU8olTme8e/muZfCU9a9kz0fis8+COyHpMw6Df4rqxZ8I14B1uRKM2rrE6hjP5dSiT9pANDDlGUipEnxVY=
+	t=1706806347; cv=none; b=EgzK7/gt5rRYYLkvGMx8kQHbfl01fZHAjKXfHLrNii2TEJFxTxUwZ4tf5Np0lLBuR6o5j6wcUoZvguUnvelCAJBzbwiZEwp6upvpK79acOyVyjVPPQIU5TtsCquUTRpc6BgxSREIkgXOGxVhLymVdwfb5tQ4whiY6n/VdpAgj64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706806438; c=relaxed/simple;
-	bh=bSlFyFBtX1ZUQ9mEtGa9D7NEp3g56ZuLMBCPZXWszzo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ic4+ICSabhLG44Q4WuOYk/ElP4QctZ4UPd5zHMczv9kQjWR0vWAbnNVicefiRfksFuCe8FhU1GKcUNkpQgq4GQbqdr/JAxA3x1fnpfOAceNP3jlhNNzZVBc0ZIa22RsmvV5aR6j8SFgmvItQVuSu5v2NruPzhTye2us2hW5h+gU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A49GhWC0; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706806435;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GhloFOaRG7JAVrALPv9JoqGpGTdloX9rIvcfDTbl+Ks=;
-	b=A49GhWC03OjoiGmaQEGRh48B3zDEzQylJNGTN5iRTenG6nruv+j5mxP7/IdtdqjZSjvL0e
-	7gYRHZoS3NSvVkp6EYpfkVWgIHUYg/wa/bqHRf+5VrssVdo1y+L2NctU9hcq5v00BHpVKz
-	lHHEP+SXsjTvBksDUgpLwNdLbSdlbew=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-163-g9252Q68O7qs8oPiAKN8_Q-1; Thu, 01 Feb 2024 11:53:50 -0500
-X-MC-Unique: g9252Q68O7qs8oPiAKN8_Q-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 531A585A58E;
-	Thu,  1 Feb 2024 16:53:49 +0000 (UTC)
-Received: from dcaratti.users.ipa.redhat.com (unknown [10.45.226.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 6FAA8492BE4;
-	Thu,  1 Feb 2024 16:53:47 +0000 (UTC)
-From: Davide Caratti <dcaratti@redhat.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
+	s=arc-20240116; t=1706806347; c=relaxed/simple;
+	bh=vz6LudJL4eKqv3CjXYHs2B5Tec5lKHc2ygrfhj4xYF0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pmrfRB/s0BEQ3ASpGf18BrjiZddaBOqFTLfaHrCvsRc4llwYRPMoyANg2AVq8dQxR/+oVrUGpekDcmoGdHO+COGAhzJicjg3+RiylOtBSYQd+oiA1WynI1js+3kvy3nCzy0sYVaCLCZWLEMT7t8iknE6S99gwyfwqzaxAeFeups=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Hq16+ADG; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-40fc22e53f1so4755485e9.2;
+        Thu, 01 Feb 2024 08:52:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706806344; x=1707411144; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=36YMN2QmFQFae2ekkCq5RQmRrLMnTH3/M270MHoKBFo=;
+        b=Hq16+ADGJeV7plohduFbAFAcY21rUaCR4aGpsIjbuBY/CG9iX4r/U+8AVNIT9yZcFx
+         73jmsKzTRIzA/N/8eeJmbR10TrmcHw+lO3e7qRr5VitEOSn3kp4sNIRD+kf+2hkOLGQC
+         KLge0cu5lujkqWHlm/VyGUk17udhIyfIWQg4vTl19z3CbLVtoD+W3G6ombK7eivDK8uF
+         ubpj0gWqFtt9EBbuD5E9yZ0HaqvLcYcawG95oPtdbsruLzv+ELqRdEf0fRR8esbozPVY
+         09VDsNnrC1H73rFeQeXRuQ6vAzy4Kycj5JriBk+b0UXvqEUUOsYdDqx86viaVbM/zV/4
+         82kA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706806344; x=1707411144;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=36YMN2QmFQFae2ekkCq5RQmRrLMnTH3/M270MHoKBFo=;
+        b=KtZDs8Uj+Cl/lXT8pitO0Nrb7LCf/pEjXrp3PdOYiD3/WtU50HXmlQlpEqfnN49p7w
+         E30VhQisZNQ5JQ4a26FBQ4TBrtfwP4Ps4VgtiUYfua8t6kJ27brwWCyWBYTHUbGpZIc5
+         Ezd+m9ePj3ZVeWjdtuhnb0GGyId04XvlHXU1rHYIqccLXDjOk9hfzInIXXDC3mXisItI
+         FUMCmPPKDqU2UA33Z1an9cDKrozZgrz9A2E1uD4oG0nqflJTeTQwotJ+m/yP1BAunmtX
+         fEHGw6zc18ISvVKKhet2FJXzZhsbqpyzZzR1fYAWBidbff8vdf3YEbJgmd+OPfn2mODH
+         HP4A==
+X-Gm-Message-State: AOJu0YzJXBfkbvJ7IBYl1P6Odk1UYk52BgRKtp6Ccd8kLE+E2Vb6mWt7
+	HBjeLif+pWlaPhipRHFBl7SnqvWO3tfoehhuy+ms6xa56rE7HQJF
+X-Google-Smtp-Source: AGHT+IG6yuiQUuYWLdX4eGgPosOUbrfcFbE8B2VVupH1TRMhah/T+64W/jSfdtRkeHK3qCQhtdCP3Q==
+X-Received: by 2002:a05:600c:3510:b0:40f:b03d:86b8 with SMTP id h16-20020a05600c351000b0040fb03d86b8mr3730677wmq.28.1706806343568;
+        Thu, 01 Feb 2024 08:52:23 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVFQ81UwtOJOLZF1rbu9HOtiRi+P6+IFJ3wq3EdVDScvs8o9ZTWl8xgfnGgKbXPYyXsg3Nx3kMYwyEAJS7Rw4Fc4nP/w2b+PQNMByDje51OAvNSabwjGUh+N1C/SmJLq32vAL9kG05OJmSEZEj+DBpdyizcxeofgdQaGbBKzFAhvxxcWPvy9aHmiThDH4cVKlvoPsiYgKD/1fONJi///sS4KP1/qOe06RfdAzAX8Ta1NjVloXiZslBE6z3/RX7SQq3Egzb8hqDr6wkTmdY4p1CexESQ6zCImpQzrsqjv3POOXhBEh+G8RePxwwz30wDDvQpoZHmHDlnioa+DzJocUr1Sdmxv37e6sgffJoW6bmQCGD9LdPKwfrthFGNOFfoHog=
+Received: from debian ([93.184.186.109])
+        by smtp.gmail.com with ESMTPSA id p15-20020a05600c358f00b0040fafc8bb3asm135112wmq.9.2024.02.01.08.52.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Feb 2024 08:52:23 -0800 (PST)
+Date: Thu, 1 Feb 2024 17:52:21 +0100
+From: Dimitri Fedrau <dima.fedrau@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	Ilya Maximets <i.maximets@ovn.org>
-Subject: [PATCH net-next v2 2/2] net/sched: cls_flower: add support for matching tunnel control flags
-Date: Thu,  1 Feb 2024 17:51:44 +0100
-Message-ID: <e58d5b6d8a091bb4f3beb4ffd43583d37ead4cfa.1706805548.git.dcaratti@redhat.com>
-In-Reply-To: <cover.1706805548.git.dcaratti@redhat.com>
-References: <cover.1706805548.git.dcaratti@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jean Delvare <jdelvare@suse.com>,
+	Guenter Roeck <linux@roeck-us.net>,
+	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org
+Subject: Re: [PATCH v5 net-next 08/13] net: phy: marvell-88q2xxx: add support
+ for temperature sensor
+Message-ID: <20240201165221.GD48964@debian>
+References: <20240122212848.3645785-1-dima.fedrau@gmail.com>
+ <20240122212848.3645785-9-dima.fedrau@gmail.com>
+ <65071184-428b-4850-9e0c-baaa73513c6d@lunn.ch>
+ <20240201071137.GA41347@debian>
+ <a8d7125d-156c-4c7e-a49d-d246719dcfe2@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a8d7125d-156c-4c7e-a49d-d246719dcfe2@lunn.ch>
 
-extend cls_flower to match flags belonging to 'TUNNEL_FLAGS_PRESENT' mask
-inside skb tunnel metadata.
-
-Suggested-by: Ilya Maximets <i.maximets@ovn.org>
-Signed-off-by: Davide Caratti <dcaratti@redhat.com>
----
- include/uapi/linux/pkt_cls.h |  3 +++
- net/sched/cls_flower.c       | 50 +++++++++++++++++++++++++++++++++++-
- 2 files changed, 52 insertions(+), 1 deletion(-)
-
-diff --git a/include/uapi/linux/pkt_cls.h b/include/uapi/linux/pkt_cls.h
-index ea277039f89d..e3394f9d06b7 100644
---- a/include/uapi/linux/pkt_cls.h
-+++ b/include/uapi/linux/pkt_cls.h
-@@ -554,6 +554,9 @@ enum {
- 	TCA_FLOWER_KEY_SPI,		/* be32 */
- 	TCA_FLOWER_KEY_SPI_MASK,	/* be32 */
- 
-+	TCA_FLOWER_KEY_ENC_FLAGS,	/* be16 */
-+	TCA_FLOWER_KEY_ENC_FLAGS_MASK,	/* be16 */
-+
- 	__TCA_FLOWER_MAX,
- };
- 
-diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
-index efb9d2811b73..8da12256568f 100644
---- a/net/sched/cls_flower.c
-+++ b/net/sched/cls_flower.c
-@@ -74,6 +74,7 @@ struct fl_flow_key {
- 	struct flow_dissector_key_l2tpv3 l2tpv3;
- 	struct flow_dissector_key_ipsec ipsec;
- 	struct flow_dissector_key_cfm cfm;
-+	struct flow_dissector_key_enc_flags enc_flags;
- } __aligned(BITS_PER_LONG / 8); /* Ensure that we can do comparisons as longs. */
- 
- struct fl_flow_mask_range {
-@@ -731,6 +732,10 @@ static const struct nla_policy fl_policy[TCA_FLOWER_MAX + 1] = {
- 	[TCA_FLOWER_KEY_SPI_MASK]	= { .type = NLA_U32 },
- 	[TCA_FLOWER_L2_MISS]		= NLA_POLICY_MAX(NLA_U8, 1),
- 	[TCA_FLOWER_KEY_CFM]		= { .type = NLA_NESTED },
-+	[TCA_FLOWER_KEY_ENC_FLAGS]	= NLA_POLICY_MASK(NLA_BE16,
-+							  TUNNEL_FLAGS_PRESENT),
-+	[TCA_FLOWER_KEY_ENC_FLAGS_MASK]	= NLA_POLICY_MASK(NLA_BE16,
-+							  TUNNEL_FLAGS_PRESENT),
- };
- 
- static const struct nla_policy
-@@ -1748,6 +1753,21 @@ static int fl_set_key_cfm(struct nlattr **tb,
- 	return 0;
- }
- 
-+static int fl_set_key_enc_flags(struct nlattr **tb, __be16 *flags_key,
-+				__be16 *flags_mask, struct netlink_ext_ack *extack)
-+{
-+	/* mask is mandatory for flags */
-+	if (NL_REQ_ATTR_CHECK(extack, NULL, tb, TCA_FLOWER_KEY_ENC_FLAGS_MASK)) {
-+		NL_SET_ERR_MSG(extack, "missing enc_flags mask");
-+		return -EINVAL;
-+	}
-+
-+	*flags_key = nla_get_be16(tb[TCA_FLOWER_KEY_ENC_FLAGS]);
-+	*flags_mask = nla_get_be16(tb[TCA_FLOWER_KEY_ENC_FLAGS_MASK]);
-+
-+	return 0;
-+}
-+
- static int fl_set_key(struct net *net, struct nlattr **tb,
- 		      struct fl_flow_key *key, struct fl_flow_key *mask,
- 		      struct netlink_ext_ack *extack)
-@@ -1982,9 +2002,16 @@ static int fl_set_key(struct net *net, struct nlattr **tb,
- 	if (ret)
- 		return ret;
- 
--	if (tb[TCA_FLOWER_KEY_FLAGS])
-+	if (tb[TCA_FLOWER_KEY_FLAGS]) {
- 		ret = fl_set_key_flags(tb, &key->control.flags,
- 				       &mask->control.flags, extack);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	if (tb[TCA_FLOWER_KEY_ENC_FLAGS])
-+		ret = fl_set_key_enc_flags(tb, &key->enc_flags.flags,
-+					   &mask->enc_flags.flags, extack);
- 
- 	return ret;
- }
-@@ -2098,6 +2125,8 @@ static void fl_init_dissector(struct flow_dissector *dissector,
- 			     FLOW_DISSECTOR_KEY_IPSEC, ipsec);
- 	FL_KEY_SET_IF_MASKED(mask, keys, cnt,
- 			     FLOW_DISSECTOR_KEY_CFM, cfm);
-+	FL_KEY_SET_IF_MASKED(mask, keys, cnt,
-+			     FLOW_DISSECTOR_KEY_ENC_FLAGS, enc_flags);
- 
- 	skb_flow_dissector_init(dissector, keys, cnt);
- }
-@@ -3185,6 +3214,22 @@ static int fl_dump_key_cfm(struct sk_buff *skb,
- 	return err;
- }
- 
-+static int fl_dump_key_enc_flags(struct sk_buff *skb,
-+				 struct flow_dissector_key_enc_flags *key,
-+				 struct flow_dissector_key_enc_flags *mask)
-+{
-+	if (!memchr_inv(mask, 0, sizeof(*mask)))
-+		return 0;
-+
-+	if (nla_put_be16(skb, TCA_FLOWER_KEY_ENC_FLAGS, key->flags))
-+		return -EMSGSIZE;
-+
-+	if (nla_put_be16(skb, TCA_FLOWER_KEY_ENC_FLAGS_MASK, mask->flags))
-+		return -EMSGSIZE;
-+
-+	return 0;
-+}
-+
- static int fl_dump_key_options(struct sk_buff *skb, int enc_opt_type,
- 			       struct flow_dissector_key_enc_opts *enc_opts)
- {
-@@ -3481,6 +3526,9 @@ static int fl_dump_key(struct sk_buff *skb, struct net *net,
- 	if (fl_dump_key_cfm(skb, &key->cfm, &mask->cfm))
- 		goto nla_put_failure;
- 
-+	if (fl_dump_key_enc_flags(skb, &key->enc_flags, &mask->enc_flags))
-+		goto nla_put_failure;
-+
- 	return 0;
- 
- nla_put_failure:
--- 
-2.43.0
-
+Am Thu, Feb 01, 2024 at 02:23:15PM +0100 schrieb Andrew Lunn:
+> > Anyway it's wrong. I couldn't find a good solution to use the temperature
+> > interrupt. Will have a look into this, and probably figuring out how to
+> > do so. But it won't be part of this patch series.
+> 
+> I don't know of any PHY driver you can follow, those that do have a
+> temperature sensor just report the temperature and don't do anything
+> in addition.
+> 
+> You might need to look at thermal zones, and indicate there has been a
+> thermal trip point. That could then be used by the thermal subsystem
+> to increase cooling via a fan, etc. In theory, you could also make the
+> PHY active to thermal pressure, by forcing the link to renegotiate to
+> a lower link speed. If you decide to go this route, please try to make
+> is generic to any PHY. But its going to be quite a disruptive thing,
+> the link will be lost of a little over a second...
+> 
+Making the PHY active to thermal pressure sounds interesting. Will look
+into this.
 
