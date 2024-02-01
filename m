@@ -1,189 +1,318 @@
-Return-Path: <netdev+bounces-67862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B20C284521B
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:39:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29A28845224
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:40:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72562B29D13
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 07:39:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5A7828DA25
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 07:40:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A63421586D5;
-	Thu,  1 Feb 2024 07:39:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28F131586E2;
+	Thu,  1 Feb 2024 07:40:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="cIkXFR+n"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="TFgc6iJB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f194.google.com (mail-lj1-f194.google.com [209.85.208.194])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 993A6208DD;
-	Thu,  1 Feb 2024 07:39:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907ED15703D
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 07:40:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706773146; cv=none; b=esFXr8JAJVCC6bJ3KxT/aXO2ksb34kAu0sBgJSaTk/eXd/ykx5qqNCfE2o1B8QkJvbsYgPa3QM2tHmKG+GVOPn/cympoV+4c1ZGHE75dUTrc7tssU41cV8kYym5TCsLLVBMuZoa5r3j0UWS7yAgzRzeAr+13egfl7t0uabme9j0=
+	t=1706773234; cv=none; b=J+uJX38aPCxxbFD9LvlrAPhQatU83AShDEdlQ8uoPcx8AZipx6OqjEAFUAq3Cs5OOqa86wzw3nqgL1/7/zMPMzEAsfMojyj/WOdDajnuU2ihvKlHsTzvDn5XZpMjYJAVmrp4wLKBpKWYiO2rFJ9hlc7W/AlsQOL3gOJTI6R/d18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706773146; c=relaxed/simple;
-	bh=Vy3QAsyp6Zh8+Hcn9aLRVk8VwYfa3R24xQXNfWAKT4M=;
+	s=arc-20240116; t=1706773234; c=relaxed/simple;
+	bh=Jz5zT0EJWFPNzRd0qEdL7OJFDc1gsg6xawO/pb8lUeQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JAKSUxILUQY7Ruo7iOx6NcfGS3CtyyTTNtbH8ryxpg/3gKLeNnyg/jaQCHYA/Pk6TLe9MEaNyMchyWSjGTdNXeV39in9uYYuGSJxs99bo9khpNoZ8okk+z9btIkL4BACZXlBktK8SFBkXGnzyN3PfPS7wJX1kjQVZWJEmi/E0mo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=cIkXFR+n; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 41167OjR023207;
-	Thu, 1 Feb 2024 07:38:49 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=pp1; bh=O5xbgGIVQTFeQwn1snTqVjPyk1UJqDq7NObWf8KUYvU=;
- b=cIkXFR+n/pu1/YCFuL3LWp5TOK+UO2VLs5whWub60JTQvqf7suBBLJs13FHLYc9zWQ1W
- d7JcT8/RNZwbGn/W9zSt3rfaBTNLYdDeyuE6YMcoH5fmZYF7NFUYjlyREmOtGMtMfskT
- HRY/TVn8v2Tf/srs8UsUY3sS7ni6PvYdHi7HiI6iDLVTD1FyPMl8WE5q4/nXQOoznlw7
- aAKl/QCb1GgQdQQdknUYQD49mCWo5/n6UIFW66TcWc0JZVK6DW0fKJF9D86ubAiq+4tT
- amyz0z2suBSkX+5Rf/t3P598z4ONL5iKeResvWudmHo76N13suWP/lxmy8dM7gGYnTIm gA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w05re1wty-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 07:38:49 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 4117TlOG016946;
-	Thu, 1 Feb 2024 07:38:48 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w05re1wtf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 07:38:48 +0000
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 4116sqx1008242;
-	Thu, 1 Feb 2024 07:38:47 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3vwdnmajk0-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 07:38:47 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4117cj8X39518878
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 1 Feb 2024 07:38:45 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1431920043;
-	Thu,  1 Feb 2024 07:38:45 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DA4DE20040;
-	Thu,  1 Feb 2024 07:38:44 +0000 (GMT)
-Received: from DESKTOP-2CCOB1S. (unknown [9.171.218.73])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Thu,  1 Feb 2024 07:38:44 +0000 (GMT)
-Date: Thu, 1 Feb 2024 08:38:43 +0100
-From: Tobias Huschle <huschle@linux.ibm.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, Abel Wu <wuyun.abel@bytedance.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
-        virtualization@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
- sched/fair: Add lag based placement)
-Message-ID: <ZbtKg6815Uwg3HPw@DESKTOP-2CCOB1S.>
-References: <20231211115329-mutt-send-email-mst@kernel.org>
- <CACGkMEudZnF7hUajgt0wtNPCxH8j6A3L1DgJj2ayJWhv9Bh1WA@mail.gmail.com>
- <20231212111433-mutt-send-email-mst@kernel.org>
- <42870.123121305373200110@us-mta-641.us.mimecast.lan>
- <20231213061719-mutt-send-email-mst@kernel.org>
- <25485.123121307454100283@us-mta-18.us.mimecast.lan>
- <20231213094854-mutt-send-email-mst@kernel.org>
- <20231214021328-mutt-send-email-mst@kernel.org>
- <92916.124010808133201076@us-mta-622.us.mimecast.lan>
- <20240121134311-mutt-send-email-mst@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HlXeIntQxvfjijvgMd6lmS2iyRVHc9s3lqyyTvbtYUZp1hpRh8r7sLXiATPNNlLRMpZNiW8yQnVNHC7wg02upGL2QEsE4mjFoOmIq2t2aHEV+fUYEK+b+ijMiX1poaSiy782Z3ylkfKACIEe8554oXNnFL46ZhEaEID88j8hls4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=TFgc6iJB; arc=none smtp.client-ip=209.85.208.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lj1-f194.google.com with SMTP id 38308e7fff4ca-2cf2fdd518bso8509861fa.1
+        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 23:40:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706773228; x=1707378028; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=8+2hWgqEGa1ik5p7kIXAag508wrtryRn7JUB1Ap3pFg=;
+        b=TFgc6iJB4E5Kdp1aZWjF+hoEd5v+5PClpflAjJojtodbhussQBf9Z5B8tyPxG4pNvp
+         Zz3BqBBQPwi0J6e7E6xqDk5J2QgrOadOLprhPs/iwfPnZWe2Q5k2/CQnp7G3tZvF0yWA
+         6ZxZOx3L/B4B637jSGbnMxGCKgrnys1yqSWxpQwdnpWMkwjXoTTmYvxlRKa+ZnO1gG5G
+         VROXHBCISw26qv/BuJ4+O4CTYYR/1P0VOgBONp7/vyuPpQkbGeVO8w/4hOlSXZzD7G11
+         eiL70bVWBzv+E5qAIzk46psInir3/30e0HrcE0MtehY//d2SKkNKcz6x1tLo82PLueCk
+         bvGA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706773228; x=1707378028;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8+2hWgqEGa1ik5p7kIXAag508wrtryRn7JUB1Ap3pFg=;
+        b=kpO1t3n0xKMLljZAxdIi4SuwNMczemurHP0W9f++TRGLq5QfwAPwdqpWqEhFWuwxEh
+         eos+yA48nqsNNeAw+FqPURyh0lglb8mtgo1rX4jHUgTldoIoEL/VQeB4XHue8p2Vx0eK
+         mNlNF5f7eICQ4vFJgiI+waoi+uv9xSAHfu8jb94dCSHn5nUYCeCKY65JqntU+BwxQkd7
+         Wm2mfdJGRM1JbzqwDbVAqaBiR5caAovx5f/cABxiQ+aevnxkrY9oMTpeLTsqRLZb6/20
+         5V2SEgRNScKIDoNWU+nRzNmolDHrnQouNu/hEYzKmFcrsCy2/cnbRGUAO5j00U51QWEk
+         aBtQ==
+X-Gm-Message-State: AOJu0YyCFS9Uf72lJ8u1Lpnu3ztMszKHVsltVO4BtxIJwNNOU/l0nxkw
+	rF57/dINgvi7D9MCYn9qMkq9hr9cOCx1oIHbs4Y4EWuDhgDf+XhU7cqe8PFoZv0=
+X-Google-Smtp-Source: AGHT+IFoNPg5KzMKro6fCiGuoPk0P1yrwaX8gjGPGV6/S5rk+mRzPU+3mFhHYYcGLWJ85O8Kw9Ddkw==
+X-Received: by 2002:a2e:8847:0:b0:2cd:cd28:beea with SMTP id z7-20020a2e8847000000b002cdcd28beeamr818829ljj.35.1706773228316;
+        Wed, 31 Jan 2024 23:40:28 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUeu0JlMUgDbweYXKiU8+IJF44zqT5tVI1dbOYAdWYgDhhINQeXlZxKfEiQfJv+owTP6v3QMPs5Sn6n9oUf8969yJ5dRfVBC+eaTqfYx5+ayw0cka+E4WMX3DGeKXpbhtWszDtcVndmJ6LKaeGhvbxc83mvlaXhHdKRlkXlsRL2HUGKVsTmQ7HjHBkBU5oi2OrjBY79W+5exkcHUoFA2VYQcjWROlhp2k/X59rm7Etqckb2kAB4TJkCcYHS0R1g4F6iDW4J6HjDaC+qN9HuIpQb6jFgXi5wP43WOLjqIb9odVX18UiFChTfSsPEXtHT/Gg5J7KB9CbwZV9mDUrx911sjfwyKvdUC552SSdse3Zsnvm5zDwcD1xDAQbyM2CDviVZ8HLvSJcdmuMbNtZfJRy2tQpLUdw3Sc3sqws9PQAbswW1EFI3+Bq6RNxfzuVvcbdZGDVL6uIMRxWLJFh71gowMZwU/DSSC6biBoiuqgvBww==
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id z11-20020a5d440b000000b0033b17e18df8sm410990wrq.12.2024.01.31.23.40.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jan 2024 23:40:27 -0800 (PST)
+Date: Thu, 1 Feb 2024 08:40:24 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: karthiksundaravel <ksundara@redhat.com>, jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, rjarry@redhat.com,
+	aharivel@redhat.com, cfontain@redhat.com, vchundur@redhat.com
+Subject: Re: [Intel-wired-lan] [PATCH] ice: Add get/set hw address for VF
+ representor ports
+Message-ID: <ZbtK6PwsYLosTem8@nanopsycho>
+References: <20240131080847.30614-1-ksundara@redhat.com>
+ <64c36525-9177-48b1-abbb-c69dbdeb6d79@molgen.mpg.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240121134311-mutt-send-email-mst@kernel.org>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: dszN-J_Pt26RmI-Q8iq1vbjEbXr0EEWP
-X-Proofpoint-ORIG-GUID: TIVluWx1UphXsst12-HPeQ90EczE4qo0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-01-31_10,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
- spamscore=0 lowpriorityscore=0 suspectscore=0 adultscore=0 malwarescore=0
- mlxlogscore=686 bulkscore=0 phishscore=0 priorityscore=1501 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2402010060
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <64c36525-9177-48b1-abbb-c69dbdeb6d79@molgen.mpg.de>
 
-On Sun, Jan 21, 2024 at 01:44:32PM -0500, Michael S. Tsirkin wrote:
-> On Mon, Jan 08, 2024 at 02:13:25PM +0100, Tobias Huschle wrote:
-> > On Thu, Dec 14, 2023 at 02:14:59AM -0500, Michael S. Tsirkin wrote:
-> > - Along with the wakeup of the kworker, need_resched needs to
-> >   be set, such that cond_resched() triggers a reschedule.
-> 
-> Let's try this? Does not look like discussing vhost itself will
-> draw attention from scheduler guys but posting a scheduling
-> patch probably will? Can you post a patch?
+Wed, Jan 31, 2024 at 05:15:46PM CET, pmenzel@molgen.mpg.de wrote:
+>Dear karthiksundaravel,
+>
+>
+>Thank you for your patch.
+>
+>
+>Am 31.01.24 um 09:08 schrieb karthiksundaravel:
+>> Changing the mac address of the VF representor ports are not
+>
+>Do you mean “is not possible”?
+>
+>> available via devlink. Add the function handlers to set and get
+>> the HW address for the VF representor ports.
+>
+>How did you test this? It’d be great if you documented it.
+>
+>> Signed-off-by: karthiksundaravel <ksundara@redhat.com>
+>
+>Is “karthiksundaravel” the official spelling of your name. If not, you can
+>change it with
+>
+>    git config --global user.name "Your Name"
+>    git commit -s --amend --author="Your Name <ksundara@redhat.com>"
+>
+>> ---
+>>   drivers/net/ethernet/intel/ice/ice_devlink.c | 134 ++++++++++++++++++-
+>>   1 file changed, 132 insertions(+), 2 deletions(-)
+>> 
+>> diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
+>> index 80dc5445b50d..56d81836c469 100644
+>> --- a/drivers/net/ethernet/intel/ice/ice_devlink.c
+>> +++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
+>> @@ -9,6 +9,8 @@
+>>   #include "ice_eswitch.h"
+>>   #include "ice_fw_update.h"
+>>   #include "ice_dcb_lib.h"
+>> +#include "ice_fltr.h"
+>> +#include "ice_tc_lib.h"
+>>   static int ice_active_port_option = -1;
+>> @@ -1576,6 +1578,134 @@ void ice_devlink_destroy_pf_port(struct ice_pf *pf)
+>>   	devlink_port_unregister(&pf->devlink_port);
+>>   }
+>> +/**
+>> + * ice_devlink_port_get_vf_mac_address - .port_fn_hw_addr_get devlink handler
+>> + * @port: devlink port structure
+>> + * @hw_addr: Mac address of the port
+>> + * @hw_addr_len: length of mac address
+>
+>Mac/mac is spelled differently. (Also below.)
+>
+>> + * @extack: extended netdev ack structure
+>> + *
+>> + * Callback for the devlink .port_fn_hw_addr_get operation
+>> + * Return: zero on success or an error code on failure.
+>> + */
+>> +
+>> +static int ice_devlink_port_get_vf_mac_address(struct devlink_port *port,
+>> +					       u8 *hw_addr, int *hw_addr_len,
+>> +					       struct netlink_ext_ack *extack)
+>> +{
+>> +	struct net_device *netdev = port->type_eth.netdev;
+>> +
+>> +	if (!netdev || !netdev->dev_addr)
+>> +		return -EADDRNOTAVAIL;
+>> +
+>> +	ether_addr_copy(hw_addr, netdev->dev_addr);
+>> +	*hw_addr_len = ETH_ALEN;
+>> +	return 0;
+>> +}
+>> +
+>> +/**
+>> + * ice_devlink_port_set_vf_mac_address - .port_fn_hw_addr_set devlink handler
+>> + * @port: devlink port structure
+>> + * @hw_addr: Mac address of the port
+>> + * @hw_addr_len: length of mac address
+>> + * @extack: extended netdev ack structure
+>> + *
+>> + * Callback for the devlink .port_fn_hw_addr_set operation
+>> + * Return: zero on success or an error code on failure.
+>> + */
+>> +static int ice_devlink_port_set_vf_mac_address(struct devlink_port *port,
+>> +					       const u8 *hw_addr,
+>> +					       int hw_addr_len,
+>> +					       struct netlink_ext_ack *extack)
+>> +{
+>> +	struct devlink *devlink = port->devlink;
+>> +	struct net_device *netdev = port->type_eth.netdev;
+>> +	struct ice_pf *pf = devlink_priv(devlink);
+>> +	struct ice_vsi *vsi = *pf->vsi;
+>> +	struct ice_hw *hw = &pf->hw;
+>> +	struct device *dev = ice_pf_to_dev(pf);
+>> +	u8 old_mac[ETH_ALEN];
+>> +	u8 flags = 0;
+>> +	const u8 *mac = hw_addr;
+>> +	int err;
+>> +
+>> +	if (!netdev)
+>> +		return -EADDRNOTAVAIL;
+>> +
+>> +	if (!is_valid_ether_addr(mac))
+>> +		return -EADDRNOTAVAIL;
+>> +
+>> +	if (ether_addr_equal(netdev->dev_addr, mac)) {
+>> +		dev_dbg(dev, "already using mac %pM\n", mac);
+>> +		return 0;
+>> +	}
+>> +
+>> +	if (test_bit(ICE_DOWN, pf->state) ||
+>> +	    ice_is_reset_in_progress(pf->state)) {
+>> +		dev_err(dev, "can't set mac %pM. device not ready\n", mac);
+>> +		return -EBUSY;
+>> +	}
+>> +
+>> +	if (ice_chnl_dmac_fltr_cnt(pf)) {
+>> +		dev_err(dev, "can't set mac %pM. Device has tc-flower filters, delete all of them and try again\n",
+>> +			mac);
+>> +		return -EAGAIN;
+>> +	}
+>> +
+>> +	netif_addr_lock_bh(netdev);
+>> +	ether_addr_copy(old_mac, netdev->dev_addr);
+>> +	/* change the netdev's MAC address */
+>
+>The comment seems redundant.
+>
+>> +	eth_hw_addr_set(netdev, mac);
+>> +	netif_addr_unlock_bh(netdev);
+>> +
+>> +	/* Clean up old MAC filter. Not an error if old filter doesn't exist */
+>> +	err = ice_fltr_remove_mac(vsi, old_mac, ICE_FWD_TO_VSI);
+>> +	if (err && err != -ENOENT) {
+>> +		err = -EADDRNOTAVAIL;
+>> +		goto err_update_filters;
+>> +	}
+>> +
+>> +	/* Add filter for new MAC. If filter exists, return success */
+>> +	err = ice_fltr_add_mac(vsi, mac, ICE_FWD_TO_VSI);
+>> +	if (err == -EEXIST) {
+>> +		/* Although this MAC filter is already present in hardware it's
+>> +		 * possible in some cases (e.g. bonding) that dev_addr was
+>> +		 * modified outside of the driver and needs to be restored back
+>> +		 * to this value.
+>> +		 */
+>> +		dev_dbg(dev, "filter for MAC %pM already exists\n", mac);
+>> +		return 0;
+>> +	} else if (err) {
+>> +		/* error if the new filter addition failed */
+>
+>The comment seems redundant.
+>
+>> +		err = -EADDRNOTAVAIL;
+>> +	}
+>> +
+>> +err_update_filters:
+>> +	if (err) {
+>> +		dev_err(dev, "can't set MAC %pM. filter update failed\n", mac);
+>> +		netif_addr_lock_bh(netdev);
+>> +		eth_hw_addr_set(netdev, old_mac);
+>> +		netif_addr_unlock_bh(netdev);
+>> +		return err;
+>> +	}
+>> +
+>> +	dev_dbg(dev, "updated MAC address to %pM\n", netdev->dev_addr);
+>
+>Should it be level info?
+>
+>> +
+>> +	/* write new MAC address to the firmware */
+>> +	flags = ICE_AQC_MAN_MAC_UPDATE_LAA_WOL;
+>> +	err = ice_aq_manage_mac_write(hw, mac, flags, NULL);
+>> +	if (err) {
+>> +		dev_err(dev, "can't set MAC %pM. write to firmware failed error %d\n",
+>> +			mac, err);
+>> +	}
+>> +	return 0;
+>> +}
+>> +
+>> +static const struct devlink_port_ops ice_devlink_vf_port_ops = {
+>> +	.port_fn_hw_addr_get = ice_devlink_port_get_vf_mac_address,
+>> +	.port_fn_hw_addr_set = ice_devlink_port_set_vf_mac_address,
+>> +};
+>> +
+>>   /**
+>>    * ice_devlink_create_vf_port - Create a devlink port for this VF
+>>    * @vf: the VF to create a port for
+>> @@ -1611,7 +1741,8 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
+>>   	devlink_port_attrs_set(devlink_port, &attrs);
+>>   	devlink = priv_to_devlink(pf);
+>> -	err = devlink_port_register(devlink, devlink_port, vsi->idx);
+>> +	err = devlink_port_register_with_ops(devlink, devlink_port,
+>> +					     vsi->idx, &ice_devlink_vf_port_ops);
+>>   	if (err) {
+>>   		dev_err(dev, "Failed to create devlink port for VF %d, error %d\n",
+>>   			vf->vf_id, err);
+>> @@ -1620,7 +1751,6 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
+>>   	return 0;
+>>   }
+>> -
+>
+>Unrelated whitespace change.
+>
+>>   /**
+>>    * ice_devlink_destroy_vf_port - Destroy the devlink_port for this VF
+>>    * @vf: the VF to cleanup
+>
+>Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
 
-As a baseline, I verified that the following two options fix
-the regression:
+Paul. It looks a bit weird you put in multiple comments that require
+changes and then the Reviewed-by tag. Usually, you put the tag only if
+you are 100% happy with the patch as it is.
 
-- replacing the cond_resched in the vhost_worker function with a hard
-  schedule 
-- setting the need_resched flag using set_tsk_need_resched(current)
-  right before calling cond_resched
-
-I then tried to find a better spot to put the set_tsk_need_resched
-call. 
-
-One approach I found to be working is setting the need_resched flag 
-at the end of handle_tx and hande_rx.
-This would be after data has been actually passed to the socket, so 
-the originally blocked kworker has something to do and will profit
-from the reschedule. 
-It might be possible to go deeper and place the set_tsk_need_resched
-call to the location right after actually passing the data, but this
-might leave us with sprinkling that call in multiple places and
-might be too intrusive.
-Furthermore, it might be possible to check if an error occured when
-preparing the transmission and then skip the setting of the flag.
-
-This would require a conceptual decision on the vhost side.
-This solution would not touch the scheduler, only incentivise it to
-do the right thing for this particular regression.
-
-Another idea could be to find the counterpart that initiates the
-actual data transfer, which I assume wakes up the kworker. From
-what I gather it seems to be an eventfd notification that ends up
-somewhere in the qemu code. Not sure if that context would allow
-to set the need_resched flag, nor whether this would be a good idea.
-
-> 
-> > - On cond_resched(), verify if the consumed runtime of the caller
-> >   is outweighing the negative lag of another process (e.g. the 
-> >   kworker) and schedule the other process. Introduces overhead
-> >   to cond_resched.
-> 
-> Or this last one.
-
-On cond_resched itself, this will probably only be possible in a very 
-very hacky way. That is because currently, there is no immidiate access
-to the necessary data available, which would make it necessary to 
-bloat up the cond_resched function quite a bit, with a probably 
-non-negligible amount of overhead.
-
-Changing other aspects in the scheduler might get us in trouble as
-they all would probably resolve back to the question "What is the magic
-value that determines whether a small task not being scheduled justifies
-setting the need_resched flag for a currently running task or adjusting 
-its lag?". As this would then also have to work for all non-vhost related
-cases, this looks like a dangerous path to me on second thought.
+It is also weird you put in a tag in this case when the patch
+is completely wrong, as I pointed out in my first reply. Did you miss
+it?
 
 
--------- Summary --------
-
-In my (non-vhost experience) opinion the way to go would be either
-replacing the cond_resched with a hard schedule or setting the
-need_resched flag within vhost if the a data transfer was successfully
-initiated. It will be necessary to check if this causes problems with
-other workloads/benchmarks.
+>
+>
+>Kind regards,
+>
+>Paul
+>
 
