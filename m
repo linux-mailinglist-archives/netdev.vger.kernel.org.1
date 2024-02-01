@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-67846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2DFB8451F3
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:32:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E9668451F4
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:32:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A8341F25FD4
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 07:32:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFDE81F25E30
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 07:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91455158D75;
-	Thu,  1 Feb 2024 07:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5FF4158D7E;
+	Thu,  1 Feb 2024 07:32:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JwW71SAY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BK1sbWJz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628031586EC
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 07:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 924C8158D7B
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 07:32:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706772730; cv=none; b=V7qgEREDakaX+Vp3rGXCAcfuVDAQYYtmtFtW+MgpzjAJ6Q4XXB2ABWYIfeZskbGO/d8KiWS4JXlgXvhs59XAfvGj7pic6jG/JTlSU3ggudpLqVOmriLWJ9Er585fzz2cy9hOmOb0WVzyUsXWPmos4YBn3IBWJU/xTDfrhkHgyiY=
+	t=1706772731; cv=none; b=rH6ri5t1ZAQh/Ku0VNCg2GGZj/kpIm4PAbSdeXVp8FfV7fWU8usmYsakFHjJ8GYeVXgwpVqiFkcM5/oCsyuSLm8P+bo0WeXXFtoFkLxxiEkwnecy6SOiw1G/jLIHEa+AThjDcF6tvUXKuX3cM4nqDxGaZXJb6CuV4px5/3f1cxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706772730; c=relaxed/simple;
-	bh=PGVjMBiqAlBk2bCHv2UWG4LFSmBzXpqPGGnGzqaEGFM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KWsQoyAdoKWynmd2XHoIGwhDXQ1pRhBoDpOmYEJV2PPPgAgXj9Qi5nyb9T9vSXxWD4fiQ4f4EqsNMfB/ygJ9ynbFaisd5kHFxDWrvXNxpmshKeJ/Kq2epzQq4S7vhZdJMoxOypIP07wWDvyfLKp0Pv4nfbL4PWBokRdvdavU5v8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JwW71SAY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C979C433C7;
-	Thu,  1 Feb 2024 07:32:09 +0000 (UTC)
+	s=arc-20240116; t=1706772731; c=relaxed/simple;
+	bh=7oAESdKlteanAg5NbdTtvIPa6oUhHUeW59gnNsifAi0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=m1d+IVmVD34DsCgnSUwfV47BsEvzJvjtaOI+OpLdxy9K61gIsyC4x3biz7176ABsnHkoIe9fhRiMf3G6NeTJ3ZUw/wgKd3o8DLnKnpOQPONRASouJiw5tk9t9R3EJ0XVcpV+Db6bSvWYDIPXQJTA8xm5yNytApeFH1jkmDcVYPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BK1sbWJz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42571C43399;
+	Thu,  1 Feb 2024 07:32:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706772729;
-	bh=PGVjMBiqAlBk2bCHv2UWG4LFSmBzXpqPGGnGzqaEGFM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=JwW71SAYazrM4JoMdAA7rZPN81amQ6YCZbzMeS8PbqbhNFaP93oTTW2MyAOtMa3rc
-	 qGNmqJtZ6jFLWm5QFCvCESlC9A2NGp6jAKKNoH4dr8ANOyWQ/ZVINVHg2RZ/fZrYAZ
-	 pjKWLzO64/fLiZR2xgwGLWqvcI8ILCgtpCu3Zfes2nxnY8u8yDni4fgw7iweq54rg1
-	 Xc21DXmerRMQR0ZKkutGrax7IcDNKunuoRGlRbfZLS1ZvLx7TZKJsHpFxPSpUvCxvb
-	 MnhuGb8zi2HSHNt+pWMBwAov5az3EJ6KEw7cP2lrBeoKJ+HXIAFaskQgdm2OcrjXQ5
-	 G2QptC4DRaveQ==
+	s=k20201202; t=1706772731;
+	bh=7oAESdKlteanAg5NbdTtvIPa6oUhHUeW59gnNsifAi0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=BK1sbWJzhZa5k+bypDNOBi1f54i9DclbTYGwZce0d6toN0curRJErG0w1ixQ10WHo
+	 JNP8rZ+JdMDw5TjcMJVpBc+KYBIg+Qvcr0oYK97u9A116C/J5RUy8TOiP3DYqLQBxI
+	 NjEfNX3z97ld+X8kYWra1ov6uSGIAS8TSsNPi7gFmiEwLmI0Kkg92hfLZP0VL7qYxP
+	 mg3ddEH058FUouaWbwV6hmmzFrUesXRwz9LgAxJM5tC9fm09HfNDAnknRaF5/NF9F0
+	 GjKtQL/rp7TuDc/fzy/L2YVlpFc0gjvXWQlQ+7fNcaOT5tkiFa0iNgDcflMQYPplDj
+	 +YJP+HuJZZAdw==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -49,11 +50,14 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>
-Subject: [pull request][net-next V2 00/15] mlx5 updates 2024-01-26
-Date: Wed, 31 Jan 2024 23:31:43 -0800
-Message-ID: <20240201073158.22103-1-saeed@kernel.org>
+	Leon Romanovsky <leonro@nvidia.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>
+Subject: [net-next V2 01/15] xfrm: generalize xdo_dev_state_update_curlft to allow statistics update
+Date: Wed, 31 Jan 2024 23:31:44 -0800
+Message-ID: <20240201073158.22103-2-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240201073158.22103-1-saeed@kernel.org>
+References: <20240201073158.22103-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,90 +66,157 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+From: Leon Romanovsky <leonro@nvidia.com>
 
-v1->v2:
- - Fix large stack buffer usage in patch #13
+In order to allow drivers to fill all statistics, change the name
+of xdo_dev_state_update_curlft to be xdo_dev_state_update_stats.
 
-This series provides misc updates to mlx5 and xfrm,
-the two xfrm patches are already acked by Steffen Klassert in the
-previous release cycle.
+Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ Documentation/networking/xfrm_device.rst              |  4 ++--
+ .../net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c  |  7 ++++---
+ include/linux/netdevice.h                             |  2 +-
+ include/net/xfrm.h                                    | 11 ++++-------
+ net/xfrm/xfrm_state.c                                 |  4 ++--
+ net/xfrm/xfrm_user.c                                  |  2 +-
+ 6 files changed, 14 insertions(+), 16 deletions(-)
 
-For more information please see tag log below.
-Please pull and let me know if there is any problem.
+diff --git a/Documentation/networking/xfrm_device.rst b/Documentation/networking/xfrm_device.rst
+index 535077cbeb07..bfea9d8579ed 100644
+--- a/Documentation/networking/xfrm_device.rst
++++ b/Documentation/networking/xfrm_device.rst
+@@ -71,9 +71,9 @@ Callbacks to implement
+ 	bool	(*xdo_dev_offload_ok) (struct sk_buff *skb,
+ 				       struct xfrm_state *x);
+ 	void    (*xdo_dev_state_advance_esn) (struct xfrm_state *x);
++	void    (*xdo_dev_state_update_stats) (struct xfrm_state *x);
+ 
+         /* Solely packet offload callbacks */
+-	void    (*xdo_dev_state_update_curlft) (struct xfrm_state *x);
+ 	int	(*xdo_dev_policy_add) (struct xfrm_policy *x, struct netlink_ext_ack *extack);
+ 	void	(*xdo_dev_policy_delete) (struct xfrm_policy *x);
+ 	void	(*xdo_dev_policy_free) (struct xfrm_policy *x);
+@@ -191,6 +191,6 @@ xdo_dev_policy_free() on any remaining offloaded states.
+ 
+ Outcome of HW handling packets, the XFRM core can't count hard, soft limits.
+ The HW/driver are responsible to perform it and provide accurate data when
+-xdo_dev_state_update_curlft() is called. In case of one of these limits
++xdo_dev_state_update_stats() is called. In case of one of these limits
+ occuried, the driver needs to call to xfrm_state_check_expire() to make sure
+ that XFRM performs rekeying sequence.
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+index 05612d9c6080..f160522fbe75 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c
+@@ -984,7 +984,7 @@ static void mlx5e_xfrm_advance_esn_state(struct xfrm_state *x)
+ 	queue_work(sa_entry->ipsec->wq, &work->work);
+ }
+ 
+-static void mlx5e_xfrm_update_curlft(struct xfrm_state *x)
++static void mlx5e_xfrm_update_stats(struct xfrm_state *x)
+ {
+ 	struct mlx5e_ipsec_sa_entry *sa_entry = to_ipsec_sa_entry(x);
+ 	struct mlx5e_ipsec_rule *ipsec_rule = &sa_entry->ipsec_rule;
+@@ -993,7 +993,8 @@ static void mlx5e_xfrm_update_curlft(struct xfrm_state *x)
+ 	lockdep_assert(lockdep_is_held(&x->lock) ||
+ 		       lockdep_is_held(&dev_net(x->xso.real_dev)->xfrm.xfrm_cfg_mutex));
+ 
+-	if (x->xso.flags & XFRM_DEV_OFFLOAD_FLAG_ACQ)
++	if (x->xso.flags & XFRM_DEV_OFFLOAD_FLAG_ACQ ||
++	    x->xso.type != XFRM_DEV_OFFLOAD_PACKET)
+ 		return;
+ 
+ 	mlx5_fc_query_cached(ipsec_rule->fc, &bytes, &packets, &lastuse);
+@@ -1156,7 +1157,7 @@ static const struct xfrmdev_ops mlx5e_ipsec_xfrmdev_ops = {
+ 	.xdo_dev_offload_ok	= mlx5e_ipsec_offload_ok,
+ 	.xdo_dev_state_advance_esn = mlx5e_xfrm_advance_esn_state,
+ 
+-	.xdo_dev_state_update_curlft = mlx5e_xfrm_update_curlft,
++	.xdo_dev_state_update_stats = mlx5e_xfrm_update_stats,
+ 	.xdo_dev_policy_add = mlx5e_xfrm_add_policy,
+ 	.xdo_dev_policy_delete = mlx5e_xfrm_del_policy,
+ 	.xdo_dev_policy_free = mlx5e_xfrm_free_policy,
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 118c40258d07..9538576dbebc 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -1062,7 +1062,7 @@ struct xfrmdev_ops {
+ 	bool	(*xdo_dev_offload_ok) (struct sk_buff *skb,
+ 				       struct xfrm_state *x);
+ 	void	(*xdo_dev_state_advance_esn) (struct xfrm_state *x);
+-	void	(*xdo_dev_state_update_curlft) (struct xfrm_state *x);
++	void	(*xdo_dev_state_update_stats) (struct xfrm_state *x);
+ 	int	(*xdo_dev_policy_add) (struct xfrm_policy *x, struct netlink_ext_ack *extack);
+ 	void	(*xdo_dev_policy_delete) (struct xfrm_policy *x);
+ 	void	(*xdo_dev_policy_free) (struct xfrm_policy *x);
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index 1d107241b901..4ca2f3205190 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -1578,21 +1578,18 @@ struct xfrm_state *xfrm_state_lookup_byspi(struct net *net, __be32 spi,
+ 					      unsigned short family);
+ int xfrm_state_check_expire(struct xfrm_state *x);
+ #ifdef CONFIG_XFRM_OFFLOAD
+-static inline void xfrm_dev_state_update_curlft(struct xfrm_state *x)
++static inline void xfrm_dev_state_update_stats(struct xfrm_state *x)
+ {
+ 	struct xfrm_dev_offload *xdo = &x->xso;
+ 	struct net_device *dev = xdo->dev;
+ 
+-	if (x->xso.type != XFRM_DEV_OFFLOAD_PACKET)
+-		return;
+-
+ 	if (dev && dev->xfrmdev_ops &&
+-	    dev->xfrmdev_ops->xdo_dev_state_update_curlft)
+-		dev->xfrmdev_ops->xdo_dev_state_update_curlft(x);
++	    dev->xfrmdev_ops->xdo_dev_state_update_stats)
++		dev->xfrmdev_ops->xdo_dev_state_update_stats(x);
+ 
+ }
+ #else
+-static inline void xfrm_dev_state_update_curlft(struct xfrm_state *x) {}
++static inline void xfrm_dev_state_update_stats(struct xfrm_state *x) {}
+ #endif
+ void xfrm_state_insert(struct xfrm_state *x);
+ int xfrm_state_add(struct xfrm_state *x);
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index bda5327bf34d..d8701b2d0d57 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -570,7 +570,7 @@ static enum hrtimer_restart xfrm_timer_handler(struct hrtimer *me)
+ 	int err = 0;
+ 
+ 	spin_lock(&x->lock);
+-	xfrm_dev_state_update_curlft(x);
++	xfrm_dev_state_update_stats(x);
+ 
+ 	if (x->km.state == XFRM_STATE_DEAD)
+ 		goto out;
+@@ -1935,7 +1935,7 @@ EXPORT_SYMBOL(xfrm_state_update);
+ 
+ int xfrm_state_check_expire(struct xfrm_state *x)
+ {
+-	xfrm_dev_state_update_curlft(x);
++	xfrm_dev_state_update_stats(x);
+ 
+ 	if (!READ_ONCE(x->curlft.use_time))
+ 		WRITE_ONCE(x->curlft.use_time, ktime_get_real_seconds());
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index ad01997c3aa9..dc4f9b8d7cb0 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -902,7 +902,7 @@ static void copy_to_user_state(struct xfrm_state *x, struct xfrm_usersa_info *p)
+ 	memcpy(&p->sel, &x->sel, sizeof(p->sel));
+ 	memcpy(&p->lft, &x->lft, sizeof(p->lft));
+ 	if (x->xso.dev)
+-		xfrm_dev_state_update_curlft(x);
++		xfrm_dev_state_update_stats(x);
+ 	memcpy(&p->curlft, &x->curlft, sizeof(p->curlft));
+ 	put_unaligned(x->stats.replay_window, &p->stats.replay_window);
+ 	put_unaligned(x->stats.replay, &p->stats.replay);
+-- 
+2.43.0
 
-Thanks,
-Saeed.
-
-
-The following changes since commit 1701940b1a02addc8fe445538442112e84270b02:
-
-  Merge branch 'tools-net-ynl-add-features-for-tc-family' (2024-01-31 21:19:22 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-updates-2024-01-26
-
-for you to fetch changes up to 62a2a0c4633c2e50da40fd1795fe28692b3a6444:
-
-  net/mlx5e: XDP, Exclude headroom and tailroom from memory calculations (2024-01-31 23:30:22 -0800)
-
-----------------------------------------------------------------
-mlx5-updates-2024-01-26
-
-1) IPSec global stats for xfrm and mlx5
-2) XSK memory improvements for non-linear SKBs
-3) Software steering debug dump to use seq_file ops
-4) Various code clean-ups
-
-----------------------------------------------------------------
-Carolina Jubran (2):
-      net/mlx5e: XSK, Exclude tailroom from non-linear SKBs memory calculations
-      net/mlx5e: XDP, Exclude headroom and tailroom from memory calculations
-
-Gal Pressman (2):
-      net/mlx5: Remove initial segmentation duplicate definitions
-      net/mlx5: Change missing SyncE capability print to debug
-
-Hamdan Igbaria (1):
-      net/mlx5: DR, Change SWS usage to debug fs seq_file interface
-
-Leon Romanovsky (4):
-      xfrm: generalize xdo_dev_state_update_curlft to allow statistics update
-      xfrm: get global statistics from the offloaded device
-      net/mlx5e: Connect mlx5 IPsec statistics with XFRM core
-      net/mlx5e: Delete obsolete IPsec code
-
-Moshe Shemesh (6):
-      Documentation: Fix counter name of mlx5 vnic reporter
-      net/mlx5: Rename mlx5_sf_dev_remove
-      net/mlx5: remove fw_fatal reporter dump option for non PF
-      net/mlx5: remove fw reporter dump option for non PF
-      net/mlx5: SF, Stop waiting for FW as teardown was called
-      net/mlx5: Return specific error code for timeout on wait_fw_init
-
- Documentation/networking/devlink/mlx5.rst          |   5 +-
- Documentation/networking/xfrm_device.rst           |   4 +-
- drivers/net/ethernet/mellanox/mlx5/core/dev.c      |   2 +-
- .../net/ethernet/mellanox/mlx5/core/en/params.c    |  24 +-
- .../ethernet/mellanox/mlx5/core/en_accel/ipsec.c   |  26 +-
- .../ethernet/mellanox/mlx5/core/en_accel/ipsec.h   |   1 -
- .../mellanox/mlx5/core/en_accel/ipsec_rxtx.c       |  25 +-
- .../mellanox/mlx5/core/en_accel/ipsec_rxtx.h       |   1 -
- .../mellanox/mlx5/core/en_accel/ipsec_stats.c      |   1 -
- drivers/net/ethernet/mellanox/mlx5/core/fw.c       |   6 +-
- drivers/net/ethernet/mellanox/mlx5/core/health.c   |  45 +-
- drivers/net/ethernet/mellanox/mlx5/core/main.c     |  38 +-
- .../net/ethernet/mellanox/mlx5/core/mlx5_core.h    |   7 -
- .../net/ethernet/mellanox/mlx5/core/sf/dev/dev.c   |   9 +-
- .../ethernet/mellanox/mlx5/core/sf/dev/driver.c    |  21 +-
- .../ethernet/mellanox/mlx5/core/steering/dr_dbg.c  | 726 +++++++++++++++++----
- .../ethernet/mellanox/mlx5/core/steering/dr_dbg.h  |  20 +
- include/linux/mlx5/mlx5_ifc.h                      |   1 +
- include/linux/netdevice.h                          |   2 +-
- include/net/xfrm.h                                 |  14 +-
- net/xfrm/xfrm_proc.c                               |   1 +
- net/xfrm/xfrm_state.c                              |  17 +-
- net/xfrm/xfrm_user.c                               |   2 +-
- 23 files changed, 761 insertions(+), 237 deletions(-)
 
