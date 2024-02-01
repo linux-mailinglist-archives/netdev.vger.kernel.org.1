@@ -1,347 +1,138 @@
-Return-Path: <netdev+bounces-68226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0D378462DA
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 22:48:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 853D38462CF
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 22:47:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10D8F1C23142
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:48:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB193B21CA5
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:47:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 248C64174F;
-	Thu,  1 Feb 2024 21:47:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4632D3F8D4;
+	Thu,  1 Feb 2024 21:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="S8tmqHIC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KYhAJw//"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0D043EA89
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 21:47:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B0F39AE1;
+	Thu,  1 Feb 2024 21:47:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706824066; cv=none; b=msbnSyVLJlrzPUF+t4pj+k/hJC6ErVUiRgEVER/p9AfA1d6jyr8EEhNBE8VPNW0FcHbXKDh4Vj7Y8oOCYAz7PO8rt85x94v73TuWAPubI+3CDUzg9Fs1ei8q11rPUccHRvwQG24mkrs2dsVjv/zzsJ1unEYaadJxiJ90unz30tU=
+	t=1706824053; cv=none; b=Uak3q6fovuTrGQ6irIPfGICYVR6/6afdPLjz5lGScydMdAvIKR/Ha7ZIPGsrj8heY0Ul5oFuu9USIkaIAmsbS2Wh/ipeb4gjhrXDLzP7rEYiWVRvrELSdlwX1XSIfR1w2P79RKfrvzAbn89EXGPA6OMhjEYh+YXMgar4h6gDgzs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706824066; c=relaxed/simple;
-	bh=6GU8hHP9jGTgDMpfzVPAVkfsiOjGsOZZFoe0Xxt2Myc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tmmZnGU9Bmt95nNSs8pTLlz4wPXK2KX4ReOZXPpCecYeCk81FknRoKfcafYaaF4PHT4sGD9T00jXtyUBS/0G9o2BpquGUrJ5YWQuebKzL0fd6KiLYkGJ6jxGX2eAac+TCtNl2wmusaiDOxuPUlzhqGPh8FY9zXVIMhGRCTBydKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=S8tmqHIC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706824062;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Nd6pZFAe36Ph7pnbqd5xnWNHxoCQ+A2+nfOfl6OaIEI=;
-	b=S8tmqHICEtw6Sn8FyaIcwm34PpN7yYm8blrjGtX7/ZkG8bzsHqca2pXqJS1XT9naISB/7Z
-	c1ULv2DWtXuU5Ega47q0PEFogFcuLvvmz/rj4MMPpKIAg5f3x6K/Sy2/B6m11HkHwtJQaI
-	JcRAMqj1zVPzlH1cc1vwyf0+SIdnyRo=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-515-E3MMc370P1qdtJ6j6Wjxzw-1; Thu, 01 Feb 2024 16:47:39 -0500
-X-MC-Unique: E3MMc370P1qdtJ6j6Wjxzw-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-5113583c567so29156e87.0
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 13:47:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706824058; x=1707428858;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Nd6pZFAe36Ph7pnbqd5xnWNHxoCQ+A2+nfOfl6OaIEI=;
-        b=BgCFe+jf1/nLlsfXeJKgE5Q9+B+O9DNrT1WE0XPRM6c+7YqxX/plc/Kl9O+0MsjsxK
-         D2gza4JRNRHfGVcrQC5YRvWANdeTk97Pexma8eA/UzZm0UTTa/EVXkDHsGuDoKrT/Unb
-         alBVE8fBx3DdxyZ9oxIDAcm1IRkfsOt0bqaSpPINLMlpq0nKgYLKL8pUWYoX1r/r9Ro0
-         2mfWm/Mv95dPzJNmnzHaodp8nXjq3yOKO0txFNJlesCFCyt8a73bVI/rOf8S+O82IuLs
-         z36TRGi20BxA63gXXhR+2go8ifNjDlDuOU0zPSOdxMnXha9TORDqpzDJ5WqjzzM8HJXU
-         VipQ==
-X-Gm-Message-State: AOJu0YzMp6t6JSlseEVWn9LtnEUJGAqE5dZjEv871UZoHa/vbBHFVzvF
-	Lw0Q6zhv7Ioz9vRq5K36ZHchadMlZHvtrp3WgfaEsAUA91v65ve9iP0hflMRNKQtOR/SDOdg+Yt
-	fjfDMwRsOCeFA/ociptGBU5Mzn+uueTmv1dr9ZE3zLoftpCrc7sNDlA==
-X-Received: by 2002:a19:9119:0:b0:511:8ae:a3ce with SMTP id t25-20020a199119000000b0051108aea3cemr116855lfd.64.1706824057813;
-        Thu, 01 Feb 2024 13:47:37 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IERJumn4jmPk94XsbThRiH1oxprtpORD7De9/dN3geKxTHsNjDzRADdHkn5t7WjQ4g0GDsdUA==
-X-Received: by 2002:a19:9119:0:b0:511:8ae:a3ce with SMTP id t25-20020a199119000000b0051108aea3cemr116842lfd.64.1706824057340;
-        Thu, 01 Feb 2024 13:47:37 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXcvt6FzFuEt6+5/FgCEnaeIsP+2gRzanG2HXw5U5uuFjH/j+AC6IjrJiPlmYkoGgRIPugIzQ7pu2L2q31k0eO8y6aFrzplOW+qIcHDvtvWGoOq4rHl7h4PiaA0kEuXo7WLWwBb8kpU1wzm7W7EfsJfycjCterjwdWyyPFc1tKH0jm3oVWchX55IepzQhP4AIVzZbckIPj3P+fIgLhskYdTkRcVEg==
-Received: from maya.cloud.tilaa.com (maya.cloud.tilaa.com. [164.138.29.33])
-        by smtp.gmail.com with ESMTPSA id ps6-20020a170906bf4600b00a28fa7838a1sm192163ejb.172.2024.02.01.13.47.36
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 01 Feb 2024 13:47:36 -0800 (PST)
-Date: Thu, 1 Feb 2024 22:47:00 +0100
-From: Stefano Brivio <sbrivio@redhat.com>
-To: jmaloy@redhat.com
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- passt-dev@passt.top, lvivier@redhat.com, dgibson@redhat.com, Paolo Abeni
- <pabeni@redhat.com>
-Subject: Re: [RFC net-next] tcp: add support for SO_PEEK_OFF
-Message-ID: <20240201224700.5b32b913@elisabeth>
-In-Reply-To: <20240201213201.1228681-1-jmaloy@redhat.com>
-References: <20240201213201.1228681-1-jmaloy@redhat.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.36; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1706824053; c=relaxed/simple;
+	bh=ONdXqAS27cKeOgWX4XGTKCxg4rE0mzWElHVnnYMMb0Y=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=khxhwSxLDnLzjIdYRf0JZGlz3N+SgDTU1UeUf+6SBoSQeUBK47wAcA3uuk18bvU3k9yTfrG83HMqz2/VEq/jaA28iuim+dgoqHSgNBcucMECnn/FwC7u904JZr5lKQUlIl0uxu6CALvToLATsy7OmaqQxjriTPztTHU9S2cVVvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KYhAJw//; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EEEB5C433C7;
+	Thu,  1 Feb 2024 21:47:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706824052;
+	bh=ONdXqAS27cKeOgWX4XGTKCxg4rE0mzWElHVnnYMMb0Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KYhAJw//yARcM3TA6pVCkI4LUiBLE5XWbQdyIJ2IOE9XeeW9PXuRT0u1fpPxxrkwp
+	 Hurjt/dBf8xwi23T1FksMdv9e36XHyjvhrDNFhBSr1xRnTYLMYbJE3ILCL/Xokm/MD
+	 5zQO0eFXQidwjXeacacwmmo5pMdGivYcXVl5OsSlyzb4uDD6zF3QHkW/ipNCSyCrkX
+	 ruFySuh4tDJV4Rf4YFiYpBgTsdWdhvZKAcl5M+3wneiWVFJ2zo1QtBfWDecyRoxa73
+	 fETXEmGDyXWVSu/j1Xloaznpi7OcrAoyx70CgInqn+hTw2H52XDK3rA5SorsXzUwVT
+	 KByKrTZWMbAOA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Thu, 01 Feb 2024 23:47:13 +0200
+Message-Id: <CYU2MG4IOJ0Q.2UJOTK999FCCC@suppilovahvero>
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Mark Brown" <broonie@kernel.org>, "Greg Kroah-Hartman"
+ <gregkh@linuxfoundation.org>
+Cc: =?utf-8?q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+ <kernel@pengutronix.de>, "Moritz Fischer" <mdf@kernel.org>, "Wu Hao"
+ <hao.wu@intel.com>, "Xu Yilun" <yilun.xu@intel.com>, "Tom Rix"
+ <trix@redhat.com>, <linux-fpga@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, "Alexander Aring" <alex.aring@gmail.com>,
+ "Stefan Schmidt" <stefan@datenfreihafen.org>, "Miquel Raynal"
+ <miquel.raynal@bootlin.com>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, <linux-wpan@vger.kernel.org>,
+ <netdev@vger.kernel.org>, "Lars-Peter Clausen" <lars@metafoo.de>, "Michael
+ Hennerich" <Michael.Hennerich@analog.com>, "Jonathan Cameron"
+ <jic23@kernel.org>, <linux-iio@vger.kernel.org>, "Dmitry Torokhov"
+ <dmitry.torokhov@gmail.com>, <linux-input@vger.kernel.org>, "Ulf Hansson"
+ <ulf.hansson@linaro.org>, "Rayyan Ansari" <rayyan@ansari.sh>, "Andy
+ Shevchenko" <andriy.shevchenko@linux.intel.com>, "Jonathan Cameron"
+ <Jonathan.Cameron@huawei.com>, "Martin Tuma"
+ <martin.tuma@digiteqautomotive.com>, "Mauro Carvalho Chehab"
+ <mchehab@kernel.org>, <linux-media@vger.kernel.org>, "Sergey Kozlov"
+ <serjk@netup.ru>, "Arnd Bergmann" <arnd@arndb.de>, "Yang Yingliang"
+ <yangyingliang@huawei.com>, <linux-mmc@vger.kernel.org>, "Richard
+ Weinberger" <richard@nod.at>, "Vignesh Raghavendra" <vigneshr@ti.com>, "Rob
+ Herring" <robh@kernel.org>, "Heiko Stuebner" <heiko@sntech.de>, "Michal
+ Simek" <michal.simek@amd.com>, "Amit Kumar Mahapatra via Alsa-devel"
+ <alsa-devel@alsa-project.org>, <linux-mtd@lists.infradead.org>, "Martin
+ Blumenstingl" <martin.blumenstingl@googlemail.com>, "Geert Uytterhoeven"
+ <geert+renesas@glider.be>, =?utf-8?q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+ "Simon Horman" <horms@kernel.org>, "Ronald Wahl" <ronald.wahl@raritan.com>,
+ "Benson Leung" <bleung@chromium.org>, "Tzung-Bi Shih" <tzungbi@kernel.org>,
+ "Guenter Roeck" <groeck@chromium.org>, <chrome-platform@lists.linux.dev>,
+ "Max Filippov" <jcmvbkbc@gmail.com>, <linux-spi@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, "Bjorn Andersson"
+ <andersson@kernel.org>, "Konrad Dybcio" <konrad.dybcio@linaro.org>,
+ <linux-arm-msm@vger.kernel.org>, "Matthias Brugger"
+ <matthias.bgg@gmail.com>, "AngeloGioacchino Del Regno"
+ <angelogioacchino.delregno@collabora.com>,
+ <linux-mediatek@lists.infradead.org>, "Thomas Zimmermann"
+ <tzimmermann@suse.de>, "Javier Martinez Canillas" <javierm@redhat.com>,
+ "Amit Kumar Mahapatra" <amit.kumar-mahapatra@amd.com>,
+ <dri-devel@lists.freedesktop.org>, <linux-fbdev@vger.kernel.org>,
+ <linux-staging@lists.linux.dev>, "Viresh Kumar" <vireshk@kernel.org>, "Rui
+ Miguel Silva" <rmfrfs@gmail.com>, "Johan Hovold" <johan@kernel.org>, "Alex
+ Elder" <elder@kernel.org>, <greybus-dev@lists.linaro.org>, "Peter Huewe"
+ <peterhuewe@gmx.de>, "Jason Gunthorpe" <jgg@ziepe.ca>,
+ <linux-integrity@vger.kernel.org>, "Herve Codina"
+ <herve.codina@bootlin.com>, "Alan Stern" <stern@rowland.harvard.edu>, "Aaro
+ Koskinen" <aaro.koskinen@iki.fi>, "Krzysztof Kozlowski"
+ <krzysztof.kozlowski@linaro.org>, <linux-usb@vger.kernel.org>, "Helge
+ Deller" <deller@gmx.de>, "Dario Binacchi"
+ <dario.binacchi@amarulasolutions.com>, "Kalle Valo" <kvalo@kernel.org>,
+ "Dmitry Antipov" <dmantipov@yandex.ru>, <libertas-dev@lists.infradead.org>,
+ <linux-wireless@vger.kernel.org>, "Jonathan Corbet" <corbet@lwn.net>,
+ "James Clark" <james.clark@arm.com>, "Bjorn Helgaas" <bhelgaas@google.com>,
+ <linux-doc@vger.kernel.org>
+Subject: Re: [PATCH v2 00/33] spi: get rid of some legacy macros
+X-Mailer: aerc 0.15.2
+References: <cover.1705944943.git.u.kleine-koenig@pengutronix.de>
+ <2024012417-prissy-sworn-bc55@gregkh>
+ <c1e38a30-5075-4d01-af24-ac684e77cf29@sirena.org.uk>
+In-Reply-To: <c1e38a30-5075-4d01-af24-ac684e77cf29@sirena.org.uk>
 
-On Thu,  1 Feb 2024 16:32:01 -0500
-jmaloy@redhat.com wrote:
+On Wed Jan 24, 2024 at 7:22 PM EET, Mark Brown wrote:
+> On Wed, Jan 24, 2024 at 09:13:49AM -0800, Greg Kroah-Hartman wrote:
+> > On Mon, Jan 22, 2024 at 07:06:55PM +0100, Uwe Kleine-K=C3=B6nig wrote:
+>
+> > > Note that Jonathan Cameron has already applied patch 3 to his tree, i=
+t
+> > > didn't appear in a public tree though yet. I still included it here t=
+o
+> > > make the kernel build bots happy.
+>
+> > Are we supposed to take the individual changes in our different
+> > subsystem trees, or do you want them all to go through the spi tree?
+>
+> Given that the final patch removes the legacy interfaces I'm expecting
+> to take them via SPI.
 
-> From: Jon Maloy <jmaloy@redhat.com>
-> 
-> When reading received messages from a socket with MSG_PEEK, we may want
-> to read the contents with an offset, like we can do with pread/preadv()
-> when reading files. Currently, it is not possible to do that.
-> 
-> In this commit, we add support for the SO_PEEK_OFF socket option for TCP,
-> in a similar way it is done for Unix Domain sockets.
-> 
-> In the iperf3 log examples shown below, we can observe a throughput
-> improvement of 15-20 % in the direction host->namespace when using the
-> protocol splicer 'pasta' (https://passt.top).
-> This is a consistent result.
-> 
-> pasta(1) and passt(1) implement user-mode networking for network
-> namespaces (containers) and virtual machines by means of a translation
-> layer between Layer-2 network interface and native Layer-4 sockets
-> (TCP, UDP, ICMP/ICMPv6 echo).
-> 
-> Received, pending TCP data to the container/guest is kept in kernel
-> buffers until acknowledged, so the tool routinely needs to fetch new
-> data from socket, skipping data that was already sent.
-> 
-> At the moment this is implemented using a dummy buffer passed to
-> recvmsg(). With this change, we don't need a dummy buffer and the
-> related buffer copy (copy_to_user()) anymore.
-> 
-> passt and pasta are supported in KubeVirt and libvirt/qemu.
-> 
-> jmaloy@freyr:~/passt$ perf record -g ./pasta --config-net -f
-> SO_PEEK_OFF not supported by kernel.
-> 
-> jmaloy@freyr:~/passt# iperf3 -s
-> -----------------------------------------------------------
-> Server listening on 5201 (test #1)
-> -----------------------------------------------------------
-> Accepted connection from 192.168.122.1, port 44822
-> [  5] local 192.168.122.180 port 5201 connected to 192.168.122.1 port 44832
-> [ ID] Interval           Transfer     Bitrate
-> [  5]   0.00-1.00   sec  1.02 GBytes  8.78 Gbits/sec
-> [  5]   1.00-2.00   sec  1.06 GBytes  9.08 Gbits/sec
-> [  5]   2.00-3.00   sec  1.07 GBytes  9.15 Gbits/sec
-> [  5]   3.00-4.00   sec  1.10 GBytes  9.46 Gbits/sec
-> [  5]   4.00-5.00   sec  1.03 GBytes  8.85 Gbits/sec
-> [  5]   5.00-6.00   sec  1.10 GBytes  9.44 Gbits/sec
-> [  5]   6.00-7.00   sec  1.11 GBytes  9.56 Gbits/sec
-> [  5]   7.00-8.00   sec  1.07 GBytes  9.20 Gbits/sec
-> [  5]   8.00-9.00   sec   667 MBytes  5.59 Gbits/sec
-> [  5]   9.00-10.00  sec  1.03 GBytes  8.83 Gbits/sec
-> [  5]  10.00-10.04  sec  30.1 MBytes  6.36 Gbits/sec
-> - - - - - - - - - - - - - - - - - - - - - - - - -
-> [ ID] Interval           Transfer     Bitrate
-> [  5]   0.00-10.04  sec  10.3 GBytes  8.78 Gbits/sec   receiver
-> -----------------------------------------------------------
-> Server listening on 5201 (test #2)
-> -----------------------------------------------------------
-> ^Ciperf3: interrupt - the server has terminated
-> jmaloy@freyr:~/passt#
-> logout
-> [ perf record: Woken up 23 times to write data ]
-> [ perf record: Captured and wrote 5.696 MB perf.data (35580 samples) ]
-> jmaloy@freyr:~/passt$
-> 
-> jmaloy@freyr:~/passt$ perf record -g ./pasta --config-net -f
-> SO_PEEK_OFF supported by kernel.
-> 
-> jmaloy@freyr:~/passt# iperf3 -s
-> -----------------------------------------------------------
-> Server listening on 5201 (test #1)
-> -----------------------------------------------------------
-> Accepted connection from 192.168.122.1, port 52084
-> [  5] local 192.168.122.180 port 5201 connected to 192.168.122.1 port 52098
-> [ ID] Interval           Transfer     Bitrate
-> [  5]   0.00-1.00   sec  1.32 GBytes  11.3 Gbits/sec
-> [  5]   1.00-2.00   sec  1.19 GBytes  10.2 Gbits/sec
-> [  5]   2.00-3.00   sec  1.26 GBytes  10.8 Gbits/sec
-> [  5]   3.00-4.00   sec  1.36 GBytes  11.7 Gbits/sec
-> [  5]   4.00-5.00   sec  1.33 GBytes  11.4 Gbits/sec
-> [  5]   5.00-6.00   sec  1.21 GBytes  10.4 Gbits/sec
-> [  5]   6.00-7.00   sec  1.31 GBytes  11.2 Gbits/sec
-> [  5]   7.00-8.00   sec  1.25 GBytes  10.7 Gbits/sec
-> [  5]   8.00-9.00   sec  1.33 GBytes  11.5 Gbits/sec
-> [  5]   9.00-10.00  sec  1.24 GBytes  10.7 Gbits/sec
-> [  5]  10.00-10.04  sec  56.0 MBytes  12.1 Gbits/sec
-> - - - - - - - - - - - - - - - - - - - - - - - - -
-> [ ID] Interval           Transfer     Bitrate
-> [  5]   0.00-10.04  sec  12.9 GBytes  11.0 Gbits/sec                  receiver
-> -----------------------------------------------------------
-> Server listening on 5201 (test #2)
-> -----------------------------------------------------------
-> ^Ciperf3: interrupt - the server has terminated
-> logout
-> [ perf record: Woken up 20 times to write data ]
-> [ perf record: Captured and wrote 5.040 MB perf.data (33411 samples) ]
-> jmaloy@freyr:~/passt$
-> 
-> The perf record confirms this result. Below, we can observe that the
-> CPU spends significantly less time in the function ____sys_recvmsg()
-> when we have offset support.
-> 
-> Without offset support:
-> ----------------------
-> jmaloy@freyr:~/passt$ perf report -q --symbol-filter=do_syscall_64 -p ____sys_recvmsg -x --stdio -i  perf.data | head -1
->     46.32%     0.00%  passt.avx2  [kernel.vmlinux]  [k] do_syscall_64  ____sys_recvmsg
-> 
-> With offset support:
-> ----------------------
-> jmaloy@freyr:~/passt$ perf report -q --symbol-filter=do_syscall_64 -p ____sys_recvmsg -x --stdio -i  perf.data | head -1
->    28.12%     0.00%  passt.avx2  [kernel.vmlinux]  [k] do_syscall_64  ____sys_recvmsg
-> 
-> Signed-off-by: Jon Maloy <jmaloy@redhat.com>
++1
 
-I guess this was Suggested-by: Paolo Abeni <pabeni@redhat.com> ? :)
+least fuss approach
 
-> ---
->  include/net/tcp.h  |  1 +
->  net/ipv4/af_inet.c |  1 +
->  net/ipv4/tcp.c     | 25 +++++++++++++++++++------
->  3 files changed, 21 insertions(+), 6 deletions(-)
-> 
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index 87f0e6c2e1f2..7eca7f2ac102 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -357,6 +357,7 @@ void tcp_twsk_purge(struct list_head *net_exit_list, int family);
->  ssize_t tcp_splice_read(struct socket *sk, loff_t *ppos,
->  			struct pipe_inode_info *pipe, size_t len,
->  			unsigned int flags);
-> +int tcp_set_peek_offset(struct sock *sk, int val);
->  struct sk_buff *tcp_stream_alloc_skb(struct sock *sk, gfp_t gfp,
->  				     bool force_schedule);
->  
-> diff --git a/net/ipv4/af_inet.c b/net/ipv4/af_inet.c
-> index fb81de10d332..7a8b3a91257f 100644
-> --- a/net/ipv4/af_inet.c
-> +++ b/net/ipv4/af_inet.c
-> @@ -1068,6 +1068,7 @@ const struct proto_ops inet_stream_ops = {
->  #endif
->  	.splice_eof	   = inet_splice_eof,
->  	.splice_read	   = tcp_splice_read,
-> +	.set_peek_off      = tcp_set_peek_offset,
->  	.read_sock	   = tcp_read_sock,
->  	.read_skb	   = tcp_read_skb,
->  	.sendmsg_locked    = tcp_sendmsg_locked,
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index fce5668a6a3d..33ade88633de 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -863,6 +863,14 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *ppos,
->  }
->  EXPORT_SYMBOL(tcp_splice_read);
->  
-> +int tcp_set_peek_offset(struct sock *sk, int val)
-> +{
-> +	WRITE_ONCE(sk->sk_peek_off, val);
-> +
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL(tcp_set_peek_offset);
-> +
->  struct sk_buff *tcp_stream_alloc_skb(struct sock *sk, gfp_t gfp,
->  				     bool force_schedule)
->  {
-> @@ -2302,7 +2310,6 @@ static int tcp_inq_hint(struct sock *sk)
->   *	tricks with *seq access order and skb->users are not required.
->   *	Probably, code can be easily improved even more.
->   */
-> -
-
-Stray change.
-
->  static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
->  			      int flags, struct scm_timestamping_internal *tss,
->  			      int *cmsg_flags)
-> @@ -2317,6 +2324,7 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
->  	long timeo;
->  	struct sk_buff *skb, *last;
->  	u32 urg_hole = 0;
-> +	u32 peek_offset = 0;
->  
->  	err = -ENOTCONN;
->  	if (sk->sk_state == TCP_LISTEN)
-> @@ -2349,7 +2357,8 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
->  
->  	seq = &tp->copied_seq;
->  	if (flags & MSG_PEEK) {
-> -		peek_seq = tp->copied_seq;
-> +		peek_offset = max(sk_peek_offset(sk, flags), 0);
-> +		peek_seq = tp->copied_seq + peek_offset;
->  		seq = &peek_seq;
->  	}
->  
-
-And with this, explicit support in tcp_peek_sndq() is not actually
-needed, but this comment in that function:
-
-        /* XXX -- need to support SO_PEEK_OFF */
-
-should be removed now I guess.
-
-> @@ -2452,11 +2461,11 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
->  		}
->  
->  		if ((flags & MSG_PEEK) &&
-> -		    (peek_seq - copied - urg_hole != tp->copied_seq)) {
-> +		    (peek_seq - peek_offset - copied - urg_hole != tp->copied_seq)) {
->  			net_dbg_ratelimited("TCP(%s:%d): Application bug, race in MSG_PEEK\n",
->  					    current->comm,
->  					    task_pid_nr(current));
-> -			peek_seq = tp->copied_seq;
-> +			peek_seq = tp->copied_seq + peek_offset;
->  		}
->  		continue;
->  
-> @@ -2497,7 +2506,10 @@ static int tcp_recvmsg_locked(struct sock *sk, struct msghdr *msg, size_t len,
->  		WRITE_ONCE(*seq, *seq + used);
->  		copied += used;
->  		len -= used;
-> -
-> +		if (flags & MSG_PEEK)
-> +			sk_peek_offset_fwd(sk, used);
-> +		else
-> +			sk_peek_offset_bwd(sk, used);
->  		tcp_rcv_space_adjust(sk);
->  
->  skip_copy:
-> @@ -2774,6 +2786,7 @@ void __tcp_close(struct sock *sk, long timeout)
->  		data_was_unread += len;
->  		__kfree_skb(skb);
->  	}
-> +	sk_set_peek_off(sk, -1);
->  
->  	/* If socket has been already reset (e.g. in tcp_reset()) - kill it. */
->  	if (sk->sk_state == TCP_CLOSE)
-> @@ -4492,7 +4505,7 @@ void tcp_done(struct sock *sk)
->  		reqsk_fastopen_remove(sk, req, false);
->  
->  	WRITE_ONCE(sk->sk_shutdown, SHUTDOWN_MASK);
-> -
-> +	sk_set_peek_off(sk, -1);
->  	if (!sock_flag(sk, SOCK_DEAD))
->  		sk->sk_state_change(sk);
->  	else
-
--- 
-Stefano
-
+BR, Jarkko
 
