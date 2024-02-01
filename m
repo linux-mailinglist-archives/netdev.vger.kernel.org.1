@@ -1,141 +1,85 @@
-Return-Path: <netdev+bounces-68079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61166845C70
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:03:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8509845C83
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:09:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9390A1C285B8
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:03:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 959F029B549
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:09:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5CE177A19;
-	Thu,  1 Feb 2024 16:02:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 224C8626B6;
+	Thu,  1 Feb 2024 16:09:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="iEdHyO8D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oMzdWVFd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E87D77A09
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 16:02:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E17A4626AC;
+	Thu,  1 Feb 2024 16:09:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706803345; cv=none; b=OegRQkDR4ILdG8m5UlsK4Je9rzclKYRP+RV41tkshw5wCrSl3mOeohCQdX9nOJUlztG/ovguN6EHq2/T3JEUwlafBr2qx5fpD7CCeS4CcFU5Y+zKHuUzaN0u/+F3qEC396e88gCNl9yQr10ok37AuyiIqra18xB6Hy6WaH/9DLE=
+	t=1706803775; cv=none; b=o5wXCbHIVXAJbFLwrNBtl2Aei0PFOrFYMBxmxUJXcpjFk6O5jQmSEfT3dHoMb8JWByy2as7Wk/KbKd+dvBLju/fULATftkuTkZfNbYTK9n0N5DCDefDKWGVU6vl878E7gv4VYaJPZbyxZQ4tU1oW4MFcFBMfQGWCTdMiicUsErs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706803345; c=relaxed/simple;
-	bh=U24fXnRqD3dOh5+P6dppxxAVP72lv89006UrPUI/kuc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cnNVKFenDRBKzlZpShSVrCWOdRrXaAaU6JkRy5QKR9tJdh9imzX1nK28kc2Rf1K8Y76C280MriOD8n3S0kx9kaToBoUlfwSLz+/PkUybgfiT/Evga29+EKFjN9mXS4UuXyDuj55MKRMcq1Krr32VQJ8nhfLI1ZMaqPMR3shXUmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=iEdHyO8D; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3394bec856fso1443406f8f.0
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 08:02:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706803342; x=1707408142; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HOnhFau+Mczj5sTvCdYfAZH4E5T76nRZ5OXsZ+LtuLo=;
-        b=iEdHyO8DvStN1nUNrAXFbkzwD6UcZxqect9x1/R5GqJUnmCRe9N+iCKRhyc8iY5RT4
-         yvoBhM2nZbNCk/b29bjNjQilU/ifvkeJI7G14XxQtZqQ5TPv6tbRlG6Rr/14a9J4NnXS
-         7GS+GSMFSQTemix2+SUSiHf0f4vVIfduGaQlkaYpwYSu5J0SgpKSE02uy61hkM0EJ+6+
-         oulBPRfTdNhyGTBXRZyzlX3CL8XvjgUKRkY0XNuGLU330kxNhQ+c4Uts26OFrujuZsjA
-         jJDYIVWt0Ed14YWaC6VOimymt+iVyqZLAdYVECX5Cre5+N2l5VcqIafR7cr6LDJJYEP7
-         6QrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706803342; x=1707408142;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HOnhFau+Mczj5sTvCdYfAZH4E5T76nRZ5OXsZ+LtuLo=;
-        b=AjuGLd0HlSDY1Y/sVXQq5nrbtvcnP+Dw8pKjTjzqTo/T4Igw8TyIq13DJYZlJyPxCu
-         EblfOPC2+Gg8Mac0/XOqEJ1ndU81H0TxJu3Bd2o1Mr9BRT8Cmi3DIrrq15/+oFWJdfTK
-         WqzWOoQ6PSgiskvfL5Q5MpVl113EXei2XPMeQj+HhDNQqG0razhABwaOaOm4i6qCzF54
-         R+sRMr6ZzF+aG2CWwt8cYfMkWSU9miSdOibIMN06zHodYSTUXWy2+JuneV+wBopG5ETF
-         P8Nc63EYRYPfAfGcxT0pSn6onL0Eo4VBFeP/53nm+lJUI8h/uUGbVBTMxpdvqsTskLH9
-         XvYA==
-X-Gm-Message-State: AOJu0Yxdln1yKnbpmd3SdSoFFN00cwprUsYO+/KUz2qv9DcHEVElwEL2
-	jJs6dPEDhk2MFawYsg7OWyD0TUkFI1K2vET/wd42w3R1i9V+dEXe7qzoM0CBfR8=
-X-Google-Smtp-Source: AGHT+IEhPCyMcjo+bIKLNhPT2rEIpC1fE3T0Xn3OKMkuAbGB4/W1gfryxjECtWwFqOrjrczet4m2Xw==
-X-Received: by 2002:adf:e8c2:0:b0:33a:f277:8f6 with SMTP id k2-20020adfe8c2000000b0033af27708f6mr7541335wrn.14.1706803342109;
-        Thu, 01 Feb 2024 08:02:22 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUso9ydzZ8gdGjO73/U9lNujpuXhy9lYTJ0tvKFLzKScdRJ59qLqPz3BRG1QmpivZubMtbuPqGiOV9GCr9PP0keXKnO2a/r0iuHtRDzfDLZ4jVd2FD3yqiWJu0gB06CrB70Aei8IR2WWs3mmLqhZMT+jRL4md5AXF9I0pfW2xBLrXfnJbzGwKaSCPJhTFb6arOtbn51Qm/zwtEb8B2jnppE8Jy4YAQmloiRO0/7weh8dIl0KcuNu7VUweWKFHhKlfGTF0K5LWFMPnWQT9jC8axiDhhFu2oxfssczbuCVL2D9CveZotUpLdhktQkCKb4Smt7bzCYSnjeYb11Jfn8Go04xYi9t+syVd+NSFx4Y+8zirJZkv7hPZqvHMJbl6OUfg0osFtV
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id cx16-20020a056000093000b00337d5cd0d8asm16469273wrb.90.2024.02.01.08.02.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 08:02:21 -0800 (PST)
-Date: Thu, 1 Feb 2024 17:02:18 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	edumazet@google.com, Andrew Morton <akpm@linux-foundation.org>,
-	Mahesh Bandewar <maheshb@google.com>, weiwan@google.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	horms@kernel.org, andrew@lunn.ch, leit@fb.com
-Subject: Re: [PATCH] blackhole_dev: Fix buil warning
-Message-ID: <ZbvAigcKvxTLjHrr@nanopsycho>
-References: <20240201133238.3089363-1-leitao@debian.org>
+	s=arc-20240116; t=1706803775; c=relaxed/simple;
+	bh=rcvgKkAFbDGfteuQyxWJp9KmDKoTlFpiaCcJiMj3tbQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ehw4DxitkYPjYByWgbxKDmLvvwrEwE5zuIn7gNaNaeMDjqLCrjH45F/OkVbCSrF0+sK8w5/Ao2Y1xNpNOTyK9G6xX2XUrBhnL7BPesTrbJ7RJMR30k1ojhrxw+fb2wuyjFJWXQ4sxP9HJtMFH2rWa8+hA2yovTiecP0R5mGzJcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oMzdWVFd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6839C433C7;
+	Thu,  1 Feb 2024 16:09:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706803774;
+	bh=rcvgKkAFbDGfteuQyxWJp9KmDKoTlFpiaCcJiMj3tbQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oMzdWVFd3DHFOz89NxSPixk3igdlaO10a3igYdL+ylfv9rXVzJdFelsiH19E4s7YQ
+	 Wytkz+teLY+NmyHcjO8k1CmVMAPcxq8bcHoI6azBQBY4G+y7sV0kt3Wj4YvFNhyIBt
+	 WcGtNdrSaUGLnRb0FIfxQbWv/2lO0rqWNkIvEsgbtZ13eYDwv6ipXNUO1pII/uIUcn
+	 aT0U6CHajoTFr3tXeE1/nHF7q4lDdIpeZ9puU8RH8WRJ7pFSKWBnPsbpNHMss3iT6n
+	 iBgBC6CxwH+7NUKiSuQwNjqs1AjJmx7hm/gXhWcRHjA2ZRsIrxH7LJTB1wcvQxiCId
+	 K2oLsZWXvJz7g==
+Date: Thu, 1 Feb 2024 08:09:32 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: John Garry <john.g.garry@oracle.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, mcgrof@kernel.org, russ.weight@linux.dev,
+ gregkh@linuxfoundation.org, rafael@kernel.org, rostedt@goodmis.org,
+ mhiramat@kernel.org, mathieu.desnoyers@efficios.com, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, keescook@chromium.org,
+ masahiroy@kernel.org, nathan@kernel.org, nicolas@fjasle.eu,
+ linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH RFC 3/4] net: ethtool: Use uts_release
+Message-ID: <20240201080932.4f8bb9fc@kernel.org>
+In-Reply-To: <Zbual3uIsjXENw0c@nanopsycho>
+References: <20240131104851.2311358-1-john.g.garry@oracle.com>
+	<20240131104851.2311358-4-john.g.garry@oracle.com>
+	<20240131112432.5133bcaa@kernel.org>
+	<fa2636b8-de7c-494a-bb9c-d1a8cc97f6c8@oracle.com>
+	<Zbual3uIsjXENw0c@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240201133238.3089363-1-leitao@debian.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-s/buil/build/ in the subject.
+On Thu, 1 Feb 2024 14:20:23 +0100 Jiri Pirko wrote:
+> >BTW, I assume that changes like this are also ok:
+> >
+> >--------8<---------
+> >
+> >   net: team: Don't bother filling in ethtool driver version
 
-Also, indicate which tree are you targetting. In this case, should be:
-[patch net-next] xxx
+Yup, just to be clear - you can send this independently from the series,
+tag is as 
 
+ [PATCH net-next]
 
-Thu, Feb 01, 2024 at 02:32:37PM CET, leitao@debian.org wrote:
->lib/test_blackhole_dev.c sets a variable that is never read, causing
->this following building warning:
->
->	lib/test_blackhole_dev.c:32:17: warning: variable 'ethh' set but not used [-Wunused-but-set-variable]
->
->Remove the variable struct ethhdr *ethh, which is unused.
->
->Fixes: 509e56b37cc3 ("blackhole_dev: add a selftest")
->Signed-off-by: Breno Leitao <leitao@debian.org>
-
-The patch itself looks good. Feel free to attach
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-with the v2 with fixed subject. Thanks!
-
-
->---
-> lib/test_blackhole_dev.c | 3 +--
-> 1 file changed, 1 insertion(+), 2 deletions(-)
->
->diff --git a/lib/test_blackhole_dev.c b/lib/test_blackhole_dev.c
->index 4c40580a99a3..f247089d63c0 100644
->--- a/lib/test_blackhole_dev.c
->+++ b/lib/test_blackhole_dev.c
->@@ -29,7 +29,6 @@ static int __init test_blackholedev_init(void)
-> {
-> 	struct ipv6hdr *ip6h;
-> 	struct sk_buff *skb;
->-	struct ethhdr *ethh;
-> 	struct udphdr *uh;
-> 	int data_len;
-> 	int ret;
->@@ -61,7 +60,7 @@ static int __init test_blackholedev_init(void)
-> 	ip6h->saddr = in6addr_loopback;
-> 	ip6h->daddr = in6addr_loopback;
-> 	/* Ether */
->-	ethh = (struct ethhdr *)skb_push(skb, sizeof(struct ethhdr));
->+	skb_push(skb, sizeof(struct ethhdr));
-> 	skb_set_mac_header(skb, 0);
-> 
-> 	skb->protocol = htons(ETH_P_IPV6);
->-- 
->2.39.3
->
->
+we'll take it via the networking tree. I'm not sure which tree the other
+patches will go thru..
 
