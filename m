@@ -1,263 +1,146 @@
-Return-Path: <netdev+bounces-68158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BD7D845F8A
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 19:12:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CA7B845F9F
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 19:14:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A6161F21DEB
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:12:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A84F1C26A3A
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:14:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E0EA12EBCF;
-	Thu,  1 Feb 2024 18:07:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AA99127B4A;
+	Thu,  1 Feb 2024 18:11:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TLSlsr4o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.someserver.de (mail.someserver.de [116.202.193.223])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A8512E1CC;
-	Thu,  1 Feb 2024 18:07:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.202.193.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA60127B48;
+	Thu,  1 Feb 2024 18:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706810842; cv=none; b=SnqKSweXWaUWi2iiuuJfo1gn0qh1drJ799Y9Fiiur22RLC7LNamnrEzQYLCcZIM2e9gGzaONzmScH0rS0j/iIjcajmaLIvcRZDrZFTxNJlkKtx0qp51Uw0huATIU6OAqbrdiIWwYYgVY4oPS0oR6pQm5bdOo74w697/rTtuIRbA=
+	t=1706811117; cv=none; b=kIfaNAiiuqSrcmKCoTXD+pwJfvLR95AspR8PdVpXxGPSsSgJOibjERrahaM7dVgjTtTtgTdrF8MhMBmdVTjaOdFQtORGpgW1MAQs0jy4FoWc4mC+vWe0HNh22+13Bz8e+6l+I0aqLRqsN6WD9eI9juxl2ssG1ptWeyd7el4LqHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706810842; c=relaxed/simple;
-	bh=TIHsrpiXhvakc3QpotZKPzxEDzOuO24UX7NpNCsypps=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Ny9nyHI3Ou9wgX9nys79M/sOep77TZ2j9nCOlS1oLotC70thNXlp1togM6kc58pkEKa2Cdu5leWQh+BX61qzB0L42WqOrRreYnA2T8bZkzqPGQk5Qn2vE2k0BiS/SGngyYUEkl7K2qOIFeYHxRShXFZ4jWSY/hgWyqCY5qmsSnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=christina-quast.de; spf=pass smtp.mailfrom=christina-quast.de; arc=none smtp.client-ip=116.202.193.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=christina-quast.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=christina-quast.de
-Received: from localhost (unknown [195.162.191.218])
-	by mail.someserver.de (Postfix) with ESMTPSA id F41BCA2267;
-	Thu,  1 Feb 2024 19:07:17 +0100 (CET)
-From: Christina Quast <contact@christina-quast.de>
-Date: Thu, 01 Feb 2024 19:07:00 +0100
-Subject: [PATCH v2 3/3] net: phy: add Rust Rockchip PHY driver
+	s=arc-20240116; t=1706811117; c=relaxed/simple;
+	bh=86vTRfPucmb5AYxZwhb9dFpu1vfbO62Ulmjm8wLUwNc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=gsSvT4OzpiPI0QHg9n4Lc1dUZ0Gcec3lhPm72fAVePAPoZfZhH37Y7H1/ITXyKSTCxdv/K3tiPAreYFZMFgeWsoFrT50+kkr0IG4qlGGyZzgIJ/kTkJIfzWf6dq0uX0xL7+QQ5UJV5gsJ5z6XSZ/fHnSEWqV4+pXYQ7+7KT78ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TLSlsr4o; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706811116; x=1738347116;
+  h=message-id:subject:from:reply-to:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=86vTRfPucmb5AYxZwhb9dFpu1vfbO62Ulmjm8wLUwNc=;
+  b=TLSlsr4omsO4YapeGczyqpdnDwqMIJA6KVfbcobXYnMgmZjUOcbL8HGX
+   Y0yvwv75hnza4eDs6OKIDeP16+slHUO0tjafaTZ9zZjyWs4MMv0b9m5OK
+   LWomMK38vRXb9vJUkldD5T1rr1YJhSmYqjG9W26Her9nzaRCizLmrKw1T
+   BTxSrXahTj9OjW+tysDD0MGk78fK1roaFJvl9uCy7h7fqZMLPbmrfoxMS
+   xnZx3mIi15EfqhFO37vA4ea1t/726TxZeRcr2tpBHxcEudNVXi5sBI04y
+   6EIAdTqFJzb4JL++pT0GPRQbZcs7ejqjRLuZMZOmLo3dnjZWB7+TSQSDf
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="2894281"
+X-IronPort-AV: E=Sophos;i="6.05,235,1701158400"; 
+   d="scan'208";a="2894281"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 10:11:55 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,235,1701158400"; 
+   d="scan'208";a="4482906"
+Received: from linux.intel.com ([10.54.29.200])
+  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 10:11:54 -0800
+Received: from ssigler-mobl.amr.corp.intel.com (unknown [10.209.41.165])
+	by linux.intel.com (Postfix) with ESMTP id 5C0BA580DD4;
+	Thu,  1 Feb 2024 10:11:54 -0800 (PST)
+Message-ID: <47df451d2494243d73e9065202e50e022ae2792b.camel@linux.intel.com>
+Subject: Re: [PATCH 2/8] platform/x86/intel/sdsi: Combine read and write
+ mailbox flows
+From: "David E. Box" <david.e.box@linux.intel.com>
+Reply-To: david.e.box@linux.intel.com
+To: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>,
+  netdev@vger.kernel.org, ilpo.jarvinen@linux.intel.com
+Cc: linux-kernel@vger.kernel.org, platform-driver-x86@vger.kernel.org
+Date: Thu, 01 Feb 2024 10:11:54 -0800
+In-Reply-To: <6ee06c50-3782-4d50-9a01-f332d181d3fc@linux.intel.com>
+References: <20240201010747.471141-1-david.e.box@linux.intel.com>
+	 <20240201010747.471141-3-david.e.box@linux.intel.com>
+	 <6ee06c50-3782-4d50-9a01-f332d181d3fc@linux.intel.com>
+Organization: David E. Box
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: base64
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240201-rockchip-rust-phy_depend-v2-3-c5fa4faab924@christina-quast.de>
-References: <20240201-rockchip-rust-phy_depend-v2-0-c5fa4faab924@christina-quast.de>
-In-Reply-To: <20240201-rockchip-rust-phy_depend-v2-0-c5fa4faab924@christina-quast.de>
-To: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
- Wedson Almeida Filho <wedsonaf@gmail.com>, 
- Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
- =?utf-8?q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
- Benno Lossin <benno.lossin@proton.me>, 
- Andreas Hindborg <a.hindborg@samsung.com>, 
- Alice Ryhl <aliceryhl@google.com>, 
- FUJITA Tomonori <fujita.tomonori@gmail.com>, 
- Trevor Gross <tmgross@umich.edu>, Andrew Lunn <andrew@lunn.ch>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- Russell King <linux@armlinux.org.uk>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Heiko Stuebner <heiko@sntech.de>
-Cc: rust-for-linux@vger.kernel.org, linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-rockchip@lists.infradead.org, 
- Christina Quast <contact@christina-quast.de>
-X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1706810819; l=6330;
- i=contact@christina-quast.de; s=20240130; h=from:subject:message-id;
- bh=TIHsrpiXhvakc3QpotZKPzxEDzOuO24UX7NpNCsypps=;
- b=8X+Cl8CgP8FACgRIhTspxgnky8uPVFD6oK9+YPkEb03a9uYnKVWs2Fjil6lGl/w6frseON75r
- cp6NdHHykN+DubHZ8prPcfHHGD5OQHP108x7AX4hJtENdpJQ/MTXYUM
-X-Developer-Key: i=contact@christina-quast.de; a=ed25519;
- pk=aoQfinjbnr265vCkIZdYteLDcmIqLBhY1m74WfFUU9E=
 
-This is the Rust implementation of drivers/net/phy/rockchip.c. The
-features are equivalent. You can choose C or Rust version kernel
-configuration.
-
-Signed-off-by: Christina Quast <contact@christina-quast.de>
----
- drivers/net/phy/Kconfig          |   8 +++
- drivers/net/phy/Makefile         |   4 ++
- drivers/net/phy/rockchip_rust.rs | 131 +++++++++++++++++++++++++++++++++++++++
- 3 files changed, 143 insertions(+)
-
-diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
-index 9e2672800f0b..8b73edb7e836 100644
---- a/drivers/net/phy/Kconfig
-+++ b/drivers/net/phy/Kconfig
-@@ -362,6 +362,14 @@ config ROCKCHIP_PHY
- 	help
- 	  Currently supports the integrated Ethernet PHY.
- 
-+config ROCKCHIP_RUST_PHY
-+	bool "Rust driver for Rockchip Ethernet PHYs"
-+	depends on RUST_PHYLIB_ABSTRACTIONS && ROCKCHIP_PHY
-+	help
-+	  Uses the Rust reference driver for Rockchip PHYs (rockchip_rust.ko).
-+	  The features are equivalent. It supports the integrated Ethernet PHY.
-+
-+
- config SMSC_PHY
- 	tristate "SMSC PHYs"
- 	select CRC16
-diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-index 6097afd44392..045d2913bf2e 100644
---- a/drivers/net/phy/Makefile
-+++ b/drivers/net/phy/Makefile
-@@ -94,7 +94,11 @@ obj-$(CONFIG_NXP_TJA11XX_PHY)	+= nxp-tja11xx.o
- obj-$(CONFIG_QSEMI_PHY)		+= qsemi.o
- obj-$(CONFIG_REALTEK_PHY)	+= realtek.o
- obj-$(CONFIG_RENESAS_PHY)	+= uPD60620.o
-+ifdef CONFIG_ROCKCHIP_RUST_PHY
-+obj-$(CONFIG_ROCKCHIP_PHY)	+= rockchip_rust.o
-+else
- obj-$(CONFIG_ROCKCHIP_PHY)	+= rockchip.o
-+endif
- obj-$(CONFIG_SMSC_PHY)		+= smsc.o
- obj-$(CONFIG_STE10XP)		+= ste10Xp.o
- obj-$(CONFIG_TERANETICS_PHY)	+= teranetics.o
-diff --git a/drivers/net/phy/rockchip_rust.rs b/drivers/net/phy/rockchip_rust.rs
-new file mode 100644
-index 000000000000..17a1f94da8c1
---- /dev/null
-+++ b/drivers/net/phy/rockchip_rust.rs
-@@ -0,0 +1,131 @@
-+// SPDX-License-Identifier: GPL-2.0
-+// Copyright (C) 2024 Christina Quast <contact@christina-quast.de>
-+
-+//! Rust Rockchip PHY driver
-+//!
-+//! C version of this driver: [`drivers/net/phy/rockchip.c`](./rockchip.c)
-+use kernel::{
-+    c_str,
-+    net::phy::{self, DeviceId, Driver},
-+    prelude::*,
-+    uapi,
-+};
-+
-+kernel::module_phy_driver! {
-+    drivers: [PhyRockchip],
-+    device_table: [
-+        DeviceId::new_with_driver::<PhyRockchip>(),
-+    ],
-+    name: "rust_asix_phy",
-+    author: "FUJITA Tomonori <fujita.tomonori@gmail.com>",
-+    description: "Rust Asix PHYs driver",
-+    license: "GPL",
-+}
-+
-+
-+const MII_INTERNAL_CTRL_STATUS: u16 = 17;
-+const SMI_ADDR_TSTCNTL: u16 = 20;
-+const SMI_ADDR_TSTWRITE: u16 = 23;
-+
-+const MII_AUTO_MDIX_EN: u16 = bit(7);
-+const MII_MDIX_EN: u16 = bit(6);
-+
-+const TSTCNTL_WR: u16 = bit(14) | bit(10);
-+
-+const TSTMODE_ENABLE: u16 = 0x400;
-+const TSTMODE_DISABLE: u16 = 0x0;
-+
-+const WR_ADDR_A7CFG: u16 = 0x18;
-+
-+struct PhyRockchip;
-+
-+impl PhyRockchip {
-+   /// Helper function for helper_integrated_phy_analog_init
-+    fn helper_init_tstmode(dev: &mut phy::Device) -> Result {
-+        // Enable access to Analog and DSP register banks
-+        dev.write(SMI_ADDR_TSTCNTL, TSTMODE_ENABLE)?;
-+        dev.write(SMI_ADDR_TSTCNTL, TSTMODE_DISABLE)?;
-+        dev.write(SMI_ADDR_TSTCNTL, TSTMODE_ENABLE)
-+    }
-+
-+    /// Helper function for helper_integrated_phy_analog_init
-+    fn helper_close_tstmode(dev: &mut phy::Device) -> Result {
-+        dev.write(SMI_ADDR_TSTCNTL, TSTMODE_DISABLE)
-+    }
-+
-+    /// Helper function for rockchip_config_init
-+    fn helper_integrated_phy_analog_init(dev: &mut phy::Device) -> Result {
-+        Self::helper_init_tstmode(dev)?;
-+        dev.write(SMI_ADDR_TSTWRITE, 0xB)?;
-+        dev.write(SMI_ADDR_TSTCNTL, TSTCNTL_WR | WR_ADDR_A7CFG)?;
-+        Self::helper_close_tstmode(dev)
-+    }
-+
-+    /// Helper function for config_init
-+    fn helper_config_init(dev: &mut phy::Device) -> Result {
-+        let val = !MII_AUTO_MDIX_EN & dev.read(MII_INTERNAL_CTRL_STATUS)?;
-+        dev.write(MII_INTERNAL_CTRL_STATUS, val)?;
-+        Self::helper_integrated_phy_analog_init(dev)
-+    }
-+
-+    fn helper_set_polarity(dev: &mut phy::Device, polarity: u8) -> Result {
-+        let reg = !MII_AUTO_MDIX_EN & dev.read(MII_INTERNAL_CTRL_STATUS)?;
-+        let val = match polarity as u32 {
-+            // status: MDI; control: force MDI
-+            uapi::ETH_TP_MDI => Some(reg & !MII_MDIX_EN),
-+            // status: MDI-X; control: force MDI-X
-+            uapi::ETH_TP_MDI_X => Some(reg | MII_MDIX_EN),
-+            // uapi::ETH_TP_MDI_AUTO => control: auto-select
-+            // uapi::ETH_TP_MDI_INVALID => status: unknown; control: unsupported
-+            _ => None,
-+        };
-+        if let Some(v) = val {
-+            if v != reg {
-+                return dev.write(MII_INTERNAL_CTRL_STATUS, v);
-+            }
-+        }
-+        Ok(())
-+
-+    }
-+}
-+
-+#[vtable]
-+impl Driver for PhyRockchip {
-+    const FLAGS: u32 = 0;
-+    const NAME: &'static CStr = c_str!("Rockchip integrated EPHY");
-+    const PHY_DEVICE_ID: DeviceId = DeviceId::new_with_custom_mask(0x1234d400, 0xfffffff0);
-+
-+    fn link_change_notify(dev: &mut phy::Device) {
-+    // If mode switch happens from 10BT to 100BT, all DSP/AFE
-+    // registers are set to default values. So any AFE/DSP
-+    // registers have to be re-initialized in this case.
-+        if dev.state() == phy::DeviceState::Running && dev.speed() == uapi::SPEED_100 {
-+            if let Err(e) = Self::helper_integrated_phy_analog_init(dev) {
-+                pr_err!("rockchip: integrated_phy_analog_init err: {:?}", e);
-+            }
-+        }
-+    }
-+
-+    fn soft_reset(dev: &mut phy::Device) -> Result {
-+        dev.genphy_soft_reset()
-+    }
-+
-+    fn config_init(dev: &mut phy::Device) -> Result {
-+        PhyRockchip::helper_config_init(dev)
-+    }
-+
-+    fn config_aneg(dev: &mut phy::Device) -> Result {
-+        PhyRockchip::helper_set_polarity(dev, dev.mdix())?;
-+        dev.genphy_config_aneg()
-+    }
-+
-+    fn suspend(dev: &mut phy::Device) -> Result {
-+        dev.genphy_suspend()
-+    }
-+
-+    fn resume(dev: &mut phy::Device) -> Result {
-+        let _ = dev.genphy_resume();
-+
-+        PhyRockchip::helper_config_init(dev)
-+    }
-+}
-
--- 
-2.43.0
+SGkgU2F0aHlhLAoKT24gVGh1LCAyMDI0LTAyLTAxIGF0IDA5OjMxIC0wODAwLCBLdXBwdXN3YW15
+IFNhdGh5YW5hcmF5YW5hbiB3cm90ZToKPiAKPiBPbiAxLzMxLzI0IDU6MDcgUE0sIERhdmlkIEUu
+IEJveCB3cm90ZToKPiA+IFRoZSBjdXJyZW50IG1haWxib3ggY29tbWFuZHMgYXJlIGVpdGhlciBy
+ZWFkLW9ubHkgb3Igd3JpdGUtb25seSBhbmQgdGhlCj4gPiBmbG93IGlzIGRpZmZlcmVudCBmb3Ig
+ZWFjaC4gTmV3IGNvbW1hbmRzIHdpbGwgbmVlZCB0byBzZW5kIGFuZCByZWNlaXZlCj4gPiBkYXRh
+LiBJbiBwcmVwYXJhdGlvbiBmb3IgdGhlc2UgY29tbWFuZHMsIGNyZWF0ZSBhIGNvbW1vbiBwb2xs
+aW5nIGZ1bmN0aW9uCj4gPiB0byBoYW5kbGUgc2VuZGluZyBkYXRhIGFuZCByZWNlaXZpbmcgaW4g
+dGhlIHNhbWUgdHJhbnNhY3Rpb24uCj4gPiAKPiA+IFNpZ25lZC1vZmYtYnk6IERhdmlkIEUuIEJv
+eCA8ZGF2aWQuZS5ib3hAbGludXguaW50ZWwuY29tPgo+ID4gLS0tCj4gPiDCoGRyaXZlcnMvcGxh
+dGZvcm0veDg2L2ludGVsL3Nkc2kuYyB8IDc5ICsrKysrKysrKysrKysrKysrLS0tLS0tLS0tLS0t
+LS0KPiA+IMKgMSBmaWxlIGNoYW5nZWQsIDQ0IGluc2VydGlvbnMoKyksIDM1IGRlbGV0aW9ucygt
+KQo+ID4gCj4gPiBkaWZmIC0tZ2l0IGEvZHJpdmVycy9wbGF0Zm9ybS94ODYvaW50ZWwvc2RzaS5j
+Cj4gPiBiL2RyaXZlcnMvcGxhdGZvcm0veDg2L2ludGVsL3Nkc2kuYwo+ID4gaW5kZXggYTcwYzA3
+MWRlNmUyLi4wNWEzNWYyZjg1YjYgMTAwNjQ0Cj4gPiAtLS0gYS9kcml2ZXJzL3BsYXRmb3JtL3g4
+Ni9pbnRlbC9zZHNpLmMKPiA+ICsrKyBiL2RyaXZlcnMvcGxhdGZvcm0veDg2L2ludGVsL3Nkc2ku
+Ywo+ID4gQEAgLTE1LDYgKzE1LDcgQEAKPiA+IMKgI2luY2x1ZGUgPGxpbnV4L2lvcG9sbC5oPgo+
+ID4gwqAjaW5jbHVkZSA8bGludXgva2VybmVsLmg+Cj4gPiDCoCNpbmNsdWRlIDxsaW51eC9tb2R1
+bGUuaD4KPiA+ICsjaW5jbHVkZSA8bGludXgvb3ZlcmZsb3cuaD4KPiA+IMKgI2luY2x1ZGUgPGxp
+bnV4L3BjaS5oPgo+ID4gwqAjaW5jbHVkZSA8bGludXgvc2xhYi5oPgo+ID4gwqAjaW5jbHVkZSA8
+bGludXgvc3lzZnMuaD4KPiA+IEBAIC0xNTYsOCArMTU3LDggQEAgc3RhdGljIGludCBzZHNpX3N0
+YXR1c190b19lcnJubyh1MzIgc3RhdHVzKQo+ID4gwqDCoMKgwqDCoMKgwqDCoH0KPiA+IMKgfQo+
+ID4gwqAKPiA+IC1zdGF0aWMgaW50IHNkc2lfbWJveF9jbWRfcmVhZChzdHJ1Y3Qgc2RzaV9wcml2
+ICpwcml2LCBzdHJ1Y3Qgc2RzaV9tYm94X2luZm8KPiA+ICppbmZvLAo+ID4gLcKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgIHNpemVfdCAqZGF0
+YV9zaXplKQo+ID4gK3N0YXRpYyBpbnQgc2RzaV9tYm94X3BvbGwoc3RydWN0IHNkc2lfcHJpdiAq
+cHJpdiwgc3RydWN0IHNkc2lfbWJveF9pbmZvCj4gPiAqaW5mbywKPiA+ICvCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgc2l6ZV90ICpkYXRhX3NpemUpCj4g
+PiDCoHsKPiA+IMKgwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgZGV2aWNlICpkZXYgPSBwcml2LT5kZXY7
+Cj4gPiDCoMKgwqDCoMKgwqDCoMKgdTMyIHRvdGFsLCBsb29wLCBlb20sIHN0YXR1cywgbWVzc2Fn
+ZV9zaXplOwo+ID4gQEAgLTE2NiwxOCArMTY3LDEwIEBAIHN0YXRpYyBpbnQgc2RzaV9tYm94X2Nt
+ZF9yZWFkKHN0cnVjdCBzZHNpX3ByaXYgKnByaXYsCj4gPiBzdHJ1Y3Qgc2RzaV9tYm94X2luZm8g
+KmluZgo+ID4gwqAKPiA+IMKgwqDCoMKgwqDCoMKgwqBsb2NrZGVwX2Fzc2VydF9oZWxkKCZwcml2
+LT5tYl9sb2NrKTsKPiA+IMKgCj4gPiAtwqDCoMKgwqDCoMKgwqAvKiBGb3JtYXQgYW5kIHNlbmQg
+dGhlIHJlYWQgY29tbWFuZCAqLwo+ID4gLcKgwqDCoMKgwqDCoMKgY29udHJvbCA9IEZJRUxEX1BS
+RVAoQ1RSTF9FT00sIDEpIHwKPiA+IC3CoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCBG
+SUVMRF9QUkVQKENUUkxfU09NLCAxKSB8Cj4gPiAtwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oMKgwqAgRklFTERfUFJFUChDVFJMX1JVTl9CVVNZLCAxKSB8Cj4gPiAtwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoMKgwqAgRklFTERfUFJFUChDVFJMX1BBQ0tFVF9TSVpFLCBpbmZvLT5zaXpl
+KTsKPiA+IC3CoMKgwqDCoMKgwqDCoHdyaXRlcShjb250cm9sLCBwcml2LT5jb250cm9sX2FkZHIp
+Owo+ID4gLQo+ID4gwqDCoMKgwqDCoMKgwqDCoC8qIEZvciByZWFkcywgZGF0YSBzaXplcyB0aGF0
+IGFyZSBsYXJnZXIgdGhhbiB0aGUgbWFpbGJveCBzaXplIGFyZQo+ID4gcmVhZCBpbiBwYWNrZXRz
+LiAqLwo+ID4gwqDCoMKgwqDCoMKgwqDCoHRvdGFsID0gMDsKPiA+IMKgwqDCoMKgwqDCoMKgwqBs
+b29wID0gMDsKPiA+IMKgwqDCoMKgwqDCoMKgwqBkbyB7Cj4gPiAtwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgdm9pZCAqYnVmID0gaW5mby0+YnVmZmVyICsgKFNEU0lfU0laRV9NQUlMQk9Y
+ICogbG9vcCk7Cj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoHUzMiBwYWNrZXRf
+c2l6ZTsKPiA+IMKgCj4gPiDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoC8qIFBvbGwg
+b24gcmVhZHkgYml0ICovCj4gPiBAQCAtMTk1LDYgKzE4OCwxMSBAQCBzdGF0aWMgaW50IHNkc2lf
+bWJveF9jbWRfcmVhZChzdHJ1Y3Qgc2RzaV9wcml2ICpwcml2LAo+ID4gc3RydWN0IHNkc2lfbWJv
+eF9pbmZvICppbmYKPiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgaWYgKHJldCkK
+PiA+IMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGJyZWFr
+Owo+ID4gwqAKPiA+ICvCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqBpZiAoIXBhY2tldF9z
+aXplKSB7Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oHNkc2lfY29tcGxldGVfdHJhbnNhY3Rpb24ocHJpdik7Cj4gPiArwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoGJyZWFrOwo+ID4gK8KgwqDCoMKgwqDCoMKgwqDC
+oMKgwqDCoMKgwqDCoH0KPiA+ICsKPiAKPiBJdCBzZWVtcyB0byBiZSBhIGdlbmVyaWMgY2hlY2su
+IElzIHRoaXMgcmVsYXRlZCB0byBjb252ZXJ0aW5nIHRvIGEgcmVhZC93cml0ZQo+IGZ1bmN0aW9u
+IG9yCj4gYSBjb21tb24gZml4IHlvdSBhZGRlZCB0b2dldGhlciBpbiB0aGlzIHBhdGNoLgoKWWVz
+LCBpdCdzIHJlbGF0ZWQuIFRoZSBjb2RlIHRoYXQgZm9sbG93cyB0aGlzIG9ubHkgYXBwbGllcyB0
+byByZWFkcy4gVGhpcyBjaGVjawp3b3VsZCBiZSB0cnVlIG9ubHkgZm9yIHdyaXRlcyB3aGljaCBv
+bmx5IG5lZWQgdG8gcG9sbCBvbmNlIHRvIGNvbmZpcm0gdGhlIHdyaXRlCndhcyBzdWNjZXNzZnVs
+LiBJJ2xsIGFkZCBhIGNvbW1lbnQgdG8gbWFrZSBpdCBjbGVhci4K
 
 
