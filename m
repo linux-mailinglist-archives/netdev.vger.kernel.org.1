@@ -1,118 +1,166 @@
-Return-Path: <netdev+bounces-67864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC5F184522A
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:43:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBECC84522C
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:44:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE4081C2526F
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 07:43:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 836BD28F1B8
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 07:44:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECCF2157E8A;
-	Thu,  1 Feb 2024 07:43:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D0A158D66;
+	Thu,  1 Feb 2024 07:44:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="KVHRufhb"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BTi5Srt3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3915285C7D
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 07:43:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63AA61586F9
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 07:44:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706773383; cv=none; b=C37Rw1/a3g1kn68Gl0iT06jlLIyfg05lCp1RtgZ4NKYQpDBe7VUNY+IOehiUGAnPmw2uuuy6JkmCNCg3DDDpzQYKDRZMJURDa1+RRGxZ2tSBOmRkaGvPnCGI7lSNTRwWvL1jQD5XAoc8bbM4VjoSdlIYPPmvM5n1WpwgGhjZSl8=
+	t=1706773454; cv=none; b=q5UCP7mn40PG1z4fEMxmmLbXzjkcd7rFikZWFqVbW+e5/AGKspLeWAyQS9ugUBWWRfzp5+Ux63Q92O10cOvwiKg0XG/8sgevMyDoGlzhGtzs6cP4LR3OMo2g+AvHVoi49m3B+uA4TbZPCnoGFJJInD2wcHdrUxQaR5T0HTjwvVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706773383; c=relaxed/simple;
-	bh=e94shsC29e1VNGM8RduCeTaJZI1jor9ldW8up3OpF9s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mGhvoc4xObQCfvHq/M9WQM4ZColi+qPcFaMzYXhyIivp9+jtqeFAmskIBmS9gE2kGXO70/kIv6fP22/FETJY067QcKWXIvbMQLCMVNEnlaA1E82fPpsr20Ou5/PiD/mBMgtB0aXPM2IIlukfeVcrIqGedtGJ5HIy7NUSFFRq4H0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=KVHRufhb; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-40e5afc18f5so5122615e9.3
-        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 23:43:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706773380; x=1707378180; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bIwiY3/0OXRMRHobEctVMsrv6IfpcW17O/58yrPU7rU=;
-        b=KVHRufhbd8sbfEwljCoL9CNjw5QzzPh9pamr9LaDEIiyX9/YZRhURr3EHHu5uaoP5E
-         AwNSQndQw2muaj89iZuDejwaPIGVuzL9/aUfaJJUVhyjWKtu04/D0wtX94/0DjVJ1jP7
-         frzUjkEFhR6FpqKGrC7OjCJvSco1eIWH314zSseC4NSNfVVRBsiwWl8HjbNZUjcxVBVE
-         T+XUusxlzEmfm9vIfmP1I/qvzMvpXy4l0ZRKd8LT/jj5PG0TcIsFl6MXs/Z16iNw+6o0
-         5Xu/rRhNptnTGHeuBK/L2QQtNpgFMXmCg4co0ZyxV4JitDJcsFNDo5Q3p9tpKNTH/FcA
-         fjww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706773380; x=1707378180;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bIwiY3/0OXRMRHobEctVMsrv6IfpcW17O/58yrPU7rU=;
-        b=fpTjfLJg2wjW+Xxh7Pt7d4g2e7pzZNuT51N+MkKap+16RCxgfohr0S3AmYIhd4DW1z
-         0htq1AWK0zFdz9GJwYtttG/tLf2A/UDSsHRbl17K+J2SgQHpUKQLQiqY9S8qJ3Ave3tu
-         3DlA3Sv8SChrq24FbFeXy1vy2OLL0aiTPVvfFLw7/lSm8KDRmOzQ9H14ZPgCrcRZGoW4
-         +dQHGnFSnwkEFI7Kr4h5DhudadicwXyjKTnwgKpWqgQAWn+HsjQSz3LKLQR7vcc1Peol
-         rW5Z1PEt1gLebRTr0L72SVKneMCe5x8XjFJ65UlgIJVzf/x/n82I4iMqg41KqZlF8Yj3
-         kk7A==
-X-Gm-Message-State: AOJu0YwtpE7rCb8rizGjgzhkCTMiAXhDzwJn5SewaOap7UcdlehSo2fe
-	lG47JQg6KqHDWtIWpUCCQltUpj9rivuUYsz3i7tpSFuo4Yc92HrRTFeHzOl+et4=
-X-Google-Smtp-Source: AGHT+IFM72i3dfmjauq0Nzivx1xbBtSwerH0NtLifNq17YVO5AxkrzxocbmJ/9hhLYlbbwRqJqylmw==
-X-Received: by 2002:a5d:638b:0:b0:33a:eda5:acde with SMTP id p11-20020a5d638b000000b0033aeda5acdemr1033119wru.11.1706773380237;
-        Wed, 31 Jan 2024 23:43:00 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWP6SrkJipsQwN1Gc0er7jisj0oQ2cSf4pFlGtqFLgpDH7MXHrISwKk3zouvNIrrX77RC132a1Eqg/8vih4iVQStzYawWmV6hxLkmyZfkhxoX62rgb6EyIkyAjbAh1IW8gYsE6n1kxvGAhP0oaOGObE+NdjAptTvQ8E6msqrh9saahhy9uAlet6nfdCKVGGVAScj3Zd9g2xigJeY0dwF2QO8qay4mCHko9bUeHtkz4P7yPvqXJ9Jh8tVtm/a2Qi8nYadg==
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id bp20-20020a5d5a94000000b0033af280ec84sm9236283wrb.26.2024.01.31.23.42.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jan 2024 23:42:59 -0800 (PST)
-Date: Thu, 1 Feb 2024 08:42:57 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Yinjun Zhang <yinjun.zhang@corigine.com>
-Cc: Louis Peens <louis.peens@corigine.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Fei Qin <fei.qin@nephogine.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	oss-drivers <oss-drivers@corigine.com>
-Subject: Re: [PATCH net-next 2/2] nfp: customize the dim profiles
-Message-ID: <ZbtLgcBcd5B2ZkPC@nanopsycho>
-References: <20240131085426.45374-1-louis.peens@corigine.com>
- <20240131085426.45374-3-louis.peens@corigine.com>
- <ZboVNWrlgucuxH9N@nanopsycho>
- <DM6PR13MB37051F13B28B53F2CE135CE0FC432@DM6PR13MB3705.namprd13.prod.outlook.com>
+	s=arc-20240116; t=1706773454; c=relaxed/simple;
+	bh=VUxkMaWDzVG8ks5grBa6GIO8EpjRdlccwEaXcMtktI4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DZYJfhdYQYdZ1XUimJfJMqBEm1Vso1EskWlS5/tW3FkotH1R6rWnPc2nprGY6yW26gJSh2pD16MZOsR5xG9dUXZHtMNQivWTRDVLhm1QMVLTP6pbbs/S9uDpr5L8lJ3V/GaEDDM+qAZkkPdkhzIoseiRlHyIZXVDTOSETGFIDoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BTi5Srt3; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <fdc2da16-5680-44cf-bc18-b3e8c0f565fa@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706773449;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=W+Ldjee8H+rdTycXwv7iNM7fs8dOnUOKfLYDOYFBKVs=;
+	b=BTi5Srt3XKJ6GI3RHRfeEo1l/LIcvsed3vksfXGfzoNkv2bVp9RgtmgnorM1PflB601mio
+	ZFYZWsWXuDV9CHI2hA0a6mHsCy0fjvtfbHXRWJUGYQG/TN+xsopEpfQy0//LmahUgBBaBR
+	ctnB69aOTsyBQtqsU/VGoDWvQfeYCms=
+Date: Thu, 1 Feb 2024 15:43:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM6PR13MB37051F13B28B53F2CE135CE0FC432@DM6PR13MB3705.namprd13.prod.outlook.com>
+Subject: Re: [PATCH vhost 00/17] virtio: drivers maintain dma info for
+ premapped vq
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, virtualization@lists.linux.dev
+Cc: Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+ Johannes Berg <johannes@sipsolutions.net>,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Hans de Goede <hdegoede@redhat.com>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Vadim Pasternak <vadimp@nvidia.com>, Bjorn Andersson <andersson@kernel.org>,
+ Mathieu Poirier <mathieu.poirier@linaro.org>,
+ Cornelia Huck <cohuck@redhat.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Eric Farman <farman@linux.ibm.com>, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Benjamin Berg <benjamin.berg@intel.com>, Yang Li
+ <yang.lee@linux.alibaba.com>, linux-um@lists.infradead.org,
+ netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org,
+ linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org,
+ kvm@vger.kernel.org, bpf@vger.kernel.org
+References: <20240130114224.86536-1-xuanzhuo@linux.alibaba.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20240130114224.86536-1-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Thu, Feb 01, 2024 at 03:16:50AM CET, yinjun.zhang@corigine.com wrote:
->On Wednesday, January 31, 2024 5:39 PM, Jiri Pirko wrote:
-><...>
->> It looks incorrect to hardcode it like this. There is a reason this is
->> abstracted out in lib/dim/net_dim.c to avoid exactly this. Can't you
->> perhaps introduce your modified profile there and keep using
->> net_dim_get_[tr]x_moderation() helpers?
->> 
->
->We don't know if this introduced profile is adaptable to other NICs/vendors,
->it's generated based on NFP's performance. Do you really think it's
->appropriate to move it to the net_dim.c as a new common profile like:
->enum dim_cq_period_mode {
->        DIM_CQ_PERIOD_MODE_START_FROM_EQE = 0x0,
->        DIM_CQ_PERIOD_MODE_START_FROM_CQE = 0x1,
->+       DIM_CQ_PERIOD_MODE_SPECIFIC_0 = 0x2,
+在 2024/1/30 19:42, Xuan Zhuo 写道:
+> As discussed:
+> http://lore.kernel.org/all/CACGkMEvq0No8QGC46U4mGsMtuD44fD_cfLcPaVmJ3rHYqRZxYg@mail.gmail.com
+> 
+> If the virtio is premapped mode, the driver should manage the dma info by self.
+> So the virtio core should not store the dma info.
+> So we can release the memory used to store the dma info.
+> 
+> But if the desc_extra has not dma info, we face a new question,
+> it is hard to get the dma info of the desc with indirect flag.
+> For split mode, that is easy from desc, but for the packed mode,
+> it is hard to get the dma info from the desc. And for hardening
+> the dma unmap is saft, we should store the dma info of indirect
+> descs.
+> 
+> So I introduce the "structure the indirect desc table" to
+> allocate space to store dma info with the desc table.
+> 
+> On the other side, we mix the descs with indirect flag
+> with other descs together to share the unmap api. That
+> is complex. I found if we we distinguish the descs with
+> VRING_DESC_F_INDIRECT before unmap, thing will be clearer.
+> 
+> Because of the dma array is allocated in the find_vqs(),
+> so I introduce a new parameter to find_vqs().
+> 
+> Please review.
+> 
+> Thanks
+> 
+> Xuan Zhuo (17):
+>    virtio_ring: introduce vring_need_unmap_buffer
+>    virtio_ring: packed: remove double check of the unmap ops
+>    virtio_ring: packed: structure the indirect desc table
+>    virtio_ring: split: remove double check of the unmap ops
+>    virtio_ring: split: structure the indirect desc table
+>    virtio_ring: no store dma info when unmap is not needed
+>    virtio: find_vqs: pass struct instead of multi parameters
+>    virtio: vring_new_virtqueue(): pass struct instead of multi parameters
+>    virtio_ring: reuse the parameter struct of find_vqs()
+>    virtio: find_vqs: add new parameter premapped
+>    virtio_ring: export premapped to driver by struct virtqueue
+>    virtio_net: set premapped mode by find_vqs()
+>    virtio_ring: remove api of setting vq premapped
+>    virtio_ring: introduce dma map api for page
+>    virtio_net: unify the code for recycling the xmit ptr
+>    virtio_net: rename free_old_xmit_skbs to free_old_xmit
+>    virtio_net: sq support premapped mode
 
-Maybe. Can't think of anything better atm. Maybe others would have some
-ideas.
+The above can not be cleanly merged into kernel 6.8-rc2.
 
->        DIM_CQ_PERIOD_NUM_MODES
-> };
->
->
+Perhaps a base-commit is needed. About base-commit, please see the link
+https://people.kernel.org/monsieuricon/all-patches-must-include-base-commit-info
+
+Zhu Yanjun
+
+> 
+>   arch/um/drivers/virtio_uml.c             |  29 +-
+>   drivers/net/virtio_net.c                 | 298 +++++++---
+>   drivers/platform/mellanox/mlxbf-tmfifo.c |  24 +-
+>   drivers/remoteproc/remoteproc_virtio.c   |  31 +-
+>   drivers/s390/virtio/virtio_ccw.c         |  33 +-
+>   drivers/virtio/virtio_mmio.c             |  30 +-
+>   drivers/virtio/virtio_pci_common.c       |  59 +-
+>   drivers/virtio/virtio_pci_common.h       |   9 +-
+>   drivers/virtio/virtio_pci_legacy.c       |  16 +-
+>   drivers/virtio/virtio_pci_modern.c       |  24 +-
+>   drivers/virtio/virtio_ring.c             | 660 ++++++++++++-----------
+>   drivers/virtio/virtio_vdpa.c             |  33 +-
+>   include/linux/virtio.h                   |  10 +-
+>   include/linux/virtio_config.h            |  48 +-
+>   include/linux/virtio_ring.h              |  82 +--
+>   tools/virtio/virtio_test.c               |   4 +-
+>   tools/virtio/vringh_test.c               |  32 +-
+>   17 files changed, 812 insertions(+), 610 deletions(-)
+> 
+> --
+> 2.32.0.3.g01195cf9f
+> 
+
 
