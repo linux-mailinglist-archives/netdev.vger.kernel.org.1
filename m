@@ -1,143 +1,105 @@
-Return-Path: <netdev+bounces-68067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F33BA845BAE
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:36:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FCDA845BBE
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:40:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF4852942BC
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 15:36:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CFEF28E385
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 15:40:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7838E62141;
-	Thu,  1 Feb 2024 15:36:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33CD56215A;
+	Thu,  1 Feb 2024 15:40:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="FeAHbqf3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE0D5F494
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 15:36:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
+Received: from mout.web.de (mout.web.de [212.227.15.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DC195F489;
+	Thu,  1 Feb 2024 15:40:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706801804; cv=none; b=bO7w+UDdk7V3QqEjd1ENgyEQf2SNzG8t3zxMGxKcBQtyT19IVgJuG1Mj9nTwIav5YL99LPLAEC5mIa3ZcDS0HhxfCW1CkwuuhPSbqXPmL26ZnrUpNpAJVHLEE2LvUk7L6Q3Oqg54yEK4JUr1A5tYI2SKD2uzpZn+sTRLOjNfGOk=
+	t=1706802008; cv=none; b=QX855JXK5TxnX9JuRB55coZlPY6qFIvzBEi3GN7/4e9yo+zespzuByYOlsaGegiOzYbi0mR6aN4cSjiXfDjsn8cN3rrMtboKTYpPnLNxJa9RvxbVKI85/c5zuvUrE4mhbBsdSSoem1umJp365rsrue8gmgrL/6J7V30aHGksQNM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706801804; c=relaxed/simple;
-	bh=E2Ur7TnblgfF+O/priD3//nvSlv/KH2Klfy3FtlFVAo=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=hGAYgK8n1kinrIggn7kU+h67Fe1LSa67omXSXoZOeMlF5ZKHzAPq6dtRfKSOtG/BzfsJeam5wUZFg0MXlVfbnZQS3dJIH9zWwu31PwyeDWj0BFz+XhfQSIVJnxSvZ3EeuYPflgP4dIHI/SczcuI05l2uu3H0KghZrrPx0UFi0Y4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from ja.int.chopps.org.chopps.org (172-222-091-149.res.spectrum.com [172.222.91.149])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id 847FF7D05A;
-	Thu,  1 Feb 2024 15:36:41 +0000 (UTC)
-References: <20231113035219.920136-1-chopps@chopps.org>
- <20231113035219.920136-7-chopps@chopps.org> <ZWirsc6i-8n4qSAo@hog>
-User-agent: mu4e 1.8.14; emacs 28.2
-From: Christian Hopps <chopps@chopps.org>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org, Steffen
- Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org, Christian
- Hopps <chopps@labn.net>
-Subject: Re: [RFC ipsec-next v2 6/8] iptfs: xfrm: Add mode_cbs module
- functionality
-Date: Thu, 01 Feb 2024 10:34:49 -0500
-In-reply-to: <ZWirsc6i-8n4qSAo@hog>
-Message-ID: <m28r446vsn.fsf@ja.int.chopps.org>
+	s=arc-20240116; t=1706802008; c=relaxed/simple;
+	bh=2qcjkYA/09qzTjU0YMvalmbOHyCge4tVY/zh9Oyji4s=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=bperc9YpdpYkay2mvcFCLIzkUBQzJ0161S070DPLZdFlFCJV3Hel/+NyhUJTNjQzacT/ukDQ5G/mEu/ZIVoJmbMknwSVovTBgAUw6EiNkipthZlX1Zch+aPsF0dEgzokpaAKoiVrHZE9u/Rs2HfPkwA3betM/bHCsODWFZq9htg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=FeAHbqf3; arc=none smtp.client-ip=212.227.15.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1706801929; x=1707406729; i=markus.elfring@web.de;
+	bh=2qcjkYA/09qzTjU0YMvalmbOHyCge4tVY/zh9Oyji4s=;
+	h=X-UI-Sender-Class:Date:To:Cc:References:Subject:From:
+	 In-Reply-To;
+	b=FeAHbqf3ogXWj44u0MXNmHNOOmA3iAt4a5Qh0dmKmISUfboxx++coKrQuTkg962S
+	 PKhyKmQeQb8RBGHwXH8c08RImpHz47ZXUyZYn60xkKIt48ShQ4Nu6oJykjCSiekpp
+	 N3mc483lRibHiEvwHsPcetqNTiyxrEiFIQtu6S9vyZN/KelFwCthgRSbNm7LrkF9F
+	 lAbGZNzx7AjT1Q6R7iEZDqtaaBYQJzPxZ8ctH4fYoPBfgJ3EyImdDSwumpFcDCaEk
+	 DASud8pm3Tph05qfmlmAkutav9Y3iBK5OHensfHpI99Ne2j+UaBThDjmWa8dVmJdd
+	 lofuQo5llUOHXVHZLQ==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.81.95]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mo6Jz-1qfwax3asl-00pZSG; Thu, 01
+ Feb 2024 16:38:48 +0100
+Message-ID: <078e0e4b-688e-4f98-aab1-ddd387f7db0a@web.de>
+Date: Thu, 1 Feb 2024 16:38:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+User-Agent: Mozilla Thunderbird
+To: Kunwu Chan <chentao@kylinos.cn>, linux-afs@lists.infradead.org,
+ netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>, David Howells <dhowells@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Marc Dionne <marc.dionne@auristor.com>,
+ Paolo Abeni <pabeni@redhat.com>
+References: <20240201100924.210298-1-chentao@kylinos.cn>
+Subject: Re: [net-next] rxrpc: Simplify the allocation of slab caches
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20240201100924.210298-1-chentao@kylinos.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:VCDUuQeQNKj5tUf0gdRVcgdhX57d47HiTV7SNmo7l5VI23hoGOS
+ XiwQQFS70ixo2jFLBXrcv2xt9Jf6Ywjs4Dy8jHU8YOC1DWsjxd8YPR23Dv8Fk4EoEsVDGnt
+ WIEEu9ZhtGn+yle4rWPNC1td6Sx887gYj58uGLJx+IFaXRmvQJef7lSBxAJ72GrQLdI2bY+
+ mIEB7F561+4ryJaEgdNFA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:R7D/xcBganQ=;+WUL+cplBtvdlYhCP8x/4mZxQ+G
+ YtR5DFgB3+/lGSU0SvO6hbdDSeUSGEtfixllX5Wy6YtJlY0Z2FQaQVj4xHcdf4JvphoFaQ5+y
+ 3xo33OjUBKdzSLYGGa3KrBCBrWII15NsjC+AtjS5/8xf1DFOdUOxLHZGhuIxdId2opmVKe0tr
+ 3gVyLF23IZ+WDWJ2pEGpw7RhM4pArWW5KeROC5ZBougDA5x6Nqtj6r4UdDXRQUH1kuRn9fIXW
+ G27w96XF202T4cwn0o6ZRsHm4BOHxeotoFFhOVp0g2JmY5TyWQx56XZyyoeNrmMstdda2pwdk
+ aACIW+B1oIJ39plELSCM7f5nGY5gUqiQgDQi3gZ27FhFYZUnrDIA7S464IzTgAqC+riOAczTo
+ tpqWVjNihG6ssR0nEZZpf2nhOToB3dChRfkcCg6amZFxv9LE2NKgS7FtNXBLMpBPh7S1RfDYN
+ JWr8DXAhpOwO0tOn2G7blfUcVuiN8Vvp+zX1sZNh19CSo0PLMf19d88Bpp8D4ZEEr6FG5XLxm
+ Vwrkde1lpWSFVrOb3wFxvBUiE99gy8WtYpD0FXmL6gNWDhMK464D4j6gvHWQATYRKnrqhddXe
+ I0FZePNAcaJtehknDB2Od5EYhMx3+YfPaCxIsgCSo9BsdGO/x0TCiwQeCM+vDEpXtkycr+lV9
+ N6b0T7SWWs2y7yOb9ln/PrDrUEsfoujpJD1WiY++XBHku89/46d4tC3BOOUE2eHANaXNuusJt
+ EwK/Qmce+vzsoDDoU0bWKUEIZqzSOSh30wUQpadKlVOeDvVvu0aFdoE/fbBBmNu1EAHTg8ocr
+ 2wAFt6/nvbQASoLh22uBbFuP/3yfJWbtgJYyOizL7cd1s=
 
---=-=-=
-Content-Type: text/plain; format=flowed
+> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
+> to simplify the creation of SLAB caches.
+
+* Please replace the word =E2=80=9Cnew=E2=80=9D by a reference to the comm=
+it 0a31bd5f2bbb6473ef9d24f0063ca91cfa678b64
+  ("KMEM_CACHE(): simplify slab cache creation").
+
+  See also related background information from 2007-05-06.
+
+* Would you like to take another look at possibilities to group
+  similar source code transformations into patch series?
 
 
-Sabrina Dubroca <sd@queasysnail.net> writes:
-
-> 2023-11-12, 22:52:17 -0500, Christian Hopps wrote:
->> From: Christian Hopps <chopps@labn.net>
->>
->> Add a set of callbacks xfrm_mode_cbs to xfrm_state. These callbacks
->> enable the addition of new xfrm modes, such as IP-TFS to be defined
->> in modules.
->
-> Not a big fan of bringing back modes in modules :(
-> Florian's work made the code a lot more readable.
->
->> diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
->> index 662c83beb345..4390c111410d 100644
->> --- a/net/xfrm/xfrm_output.c
->> +++ b/net/xfrm/xfrm_output.c
->> @@ -280,7 +280,9 @@ static int xfrm4_tunnel_encap_add(struct xfrm_state *x, struct sk_buff *skb)
->>  	skb_set_inner_network_header(skb, skb_network_offset(skb));
->>  	skb_set_inner_transport_header(skb, skb_transport_offset(skb));
->>
->> -	skb_set_network_header(skb, -x->props.header_len);
->> +	/* backup to add space for the outer encap */
->> +	skb_set_network_header(skb,
->> +			       -x->props.header_len + x->props.enc_hdr_len);
->
-> Since this only gets called for XFRM_MODE_TUNNEL, and only iptfs sets
-> enc_hdr_len, do we need this change? (and same for xfrm6_tunnel_encap_add)
-
-You're right, removed. This particular code actually predated the callbacks.
-
->>  	skb->mac_header = skb->network_header +
->>  			  offsetof(struct iphdr, protocol);
->>  	skb->transport_header = skb->network_header + sizeof(*top_iph);
->> @@ -325,7 +327,8 @@ static int xfrm6_tunnel_encap_add(struct xfrm_state *x, struct sk_buff *skb)
->>  	skb_set_inner_network_header(skb, skb_network_offset(skb));
->>  	skb_set_inner_transport_header(skb, skb_transport_offset(skb));
->>
->> -	skb_set_network_header(skb, -x->props.header_len);
->> +	skb_set_network_header(skb,
->> +			       -x->props.header_len + x->props.enc_hdr_len);
->>  	skb->mac_header = skb->network_header +
->>  			  offsetof(struct ipv6hdr, nexthdr);
->>  	skb->transport_header = skb->network_header + sizeof(*top_iph);
->> @@ -472,6 +475,8 @@ static int xfrm_outer_mode_output(struct xfrm_state *x, struct sk_buff *skb)
->>  		WARN_ON_ONCE(1);
->>  		break;
->>  	default:
->> +		if (x->mode_cbs->prepare_output)
->
-> Can x->mode_cbs be NULL here? Every other use of mode_cbs does
->     if (x->mode_cbs && x->mode_cbs->FOO)
->
-> (I think not at the moment since only IPTFS (and IN_TRIGGER) can reach
-> this, but this inconsistency with the rest of the series struck me)
-
-Still worth putting the guard in, fixed.
-
-Thanks,
-Chris.
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmW7uogSHGNob3Bwc0Bj
-aG9wcHMub3JnAAoJEC4dgw7XuDAln/0P/RSJMgZzsAa9crpj/uzKOQYAnes9+SQy
-qJHMvhlJh3C9b2UNpeFygwZ11E5EEJEiYg3RoNXPSbCJPomRIy28QbwA2H+M5ap1
-UelnrCnI5F+nLcjyZrpyIMhOgzWo7fBF9GZ9mTgcFhUHVNaGC+lk+YcquFqX04P4
-pmaTZCgThO8RjBN3cKU8hb1c6uhZCp4ZvNRK0hUblDfL4cxGENeqNgIq8ju0it7Y
-0bbCBuE2E7K9KoCoEmVxyCDvdTeDc2eUn2VuSlnP8zGUUWmYYXq/88d0zbw9/4+x
-ccYM6mDd7jI88+W6ElDkaHfptjChyxEryyfkrU1ggKQ7vUAgZjxMnkpuG1Vva9ik
-D80OA0PEzv9+quMmtCm5pLmbcS1Xk+Uee14prvibaUrL1kmrlWJ+vXIA4AepohgQ
-rQPxbm+2VR1Ekjpdq3irlaT1E1V3cb8w7Si/S0N7C4C1LlXTomIrqmqNbB0timqn
-fqXKmevNTFuWFepL/rtwyJYZX+FnczzfRzkF8XtnfMAX+89XwmtdC2oZsgUuhCYw
-4U7xBXfywwEVdm7aDSswRYv6XM4n0Ganf7DYP2DQO5eKBMMJ1dwc45vJV8+ElXyQ
-Wu7zsJaq1QljSpHTG1B0vfIU1p8dxCnq2LMfwytR+euKNUzp1Afdj8OmmT6fSnID
-FchZsSnYBwlP
-=YktJ
------END PGP SIGNATURE-----
---=-=-=--
+Regards,
+Markus
 
