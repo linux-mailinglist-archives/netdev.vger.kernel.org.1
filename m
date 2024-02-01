@@ -1,69 +1,93 @@
-Return-Path: <netdev+bounces-67760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB268844E27
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:48:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3534A844E29
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:50:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB3E5B215A6
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 00:46:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7A7F1F22472
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 00:50:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 334F61FB5;
-	Thu,  1 Feb 2024 00:45:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C925920E4;
+	Thu,  1 Feb 2024 00:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TRZEcMRF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tpD1jZdl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D986FBFA
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 00:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A04191FDA;
+	Thu,  1 Feb 2024 00:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706748304; cv=none; b=HWq7HFIvcVDkEY0u46tcdXfGlhhofkObNUrDRmh4jvwdt5pKVS1e9URwyibxfPVlQhQFQAQrLD/k1GTRxXJbKFALN/jGqFgvQr5C2jEhEhS1n6ZvzaSaL2FfxaBt4VatUs60iguy4UFSLTbZu3UAgdlx8dopNI1B9wo5l7XqwRw=
+	t=1706748627; cv=none; b=O7MxkoDWOxO+1qAUcO72BKc0fhUjrBb/UqmmwqC1z3iIMZMxj2w1m1fDhGR4smJJJLz6dBWTID8Ao8OMlTyJi3/bnVOytb2AzeVn88HpZ/21glYIKeKqTlIYpNxNXyuHYE0LWNs001Rj+9gOG+ThEUZ4FxUfNtx38qBzA6tmz1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706748304; c=relaxed/simple;
-	bh=MKxbIlbE/ItrBHLkTVW7xv3F9cS80aX1XEtWBTfyMO0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UMPkJZZzl2GCfqvPC8fM9sb44r2hlrcwnSDbTcIqUuqweHHT9z71v3YOk+2MPH2cT5WFNn+HRXSV8ZgUDTTJ8biXsHY9iNs48QitvoDHcbqhMa9tRmiKSKO/iQaKNRBzItN03vaO4K//2w+Aml6sdItwdZRRDXjtBEmy3m+6xlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TRZEcMRF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7F7AC433C7;
-	Thu,  1 Feb 2024 00:45:01 +0000 (UTC)
+	s=arc-20240116; t=1706748627; c=relaxed/simple;
+	bh=8Yn7WZuUu+7N5PkWWTp/ZUOVig7abrr1Tg2VivYAKi8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Xgcyx2CY+bY3PbpU4AvBAKsmSgBav4y5YN9C+/Ota5VpOjWItCKYMJVoVak/LW115w/KRpDztDapkfGHi+YZ4kmZm8dCfTEvqxWOMqiERANdiy/8gGnIUdJX4t6dtOKrBeHMO+HILxeOgwb5othJhgBXKxzIl++QhB3oM1HT/xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tpD1jZdl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2F976C433F1;
+	Thu,  1 Feb 2024 00:50:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706748303;
-	bh=MKxbIlbE/ItrBHLkTVW7xv3F9cS80aX1XEtWBTfyMO0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TRZEcMRFKRMO0VyE2F9XCfHwUAIUIH1/A6R51IekxK77dovOerkBi/3DnT57/bSAK
-	 /9kR97XvdBYz6VMhhcH7+oF+oKHFsFUrEtHrrCVEZBxQ4xprPa5GreiilYwfLEbqCf
-	 tjC5XBrsMERbjtXKLn3LHMO++Xt4Ni5zOrPX1Nr91TMV/fACdTDS69Ph/FLjYKZmYp
-	 AhkjEt63LU2mvdpbfA0KVZ2Bqg6Ag+lMRI1NFgmwGsYoGgr/571+gS8/yfOk67L2Az
-	 MMFiWLOwlSZN/Z+p832b16avWsuQXZo2I7U6RkhzjmkgFWLg2/qcJbJxrd4r/WQ1mm
-	 2ANBrHy2PeVuw==
-Date: Wed, 31 Jan 2024 16:44:59 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: Jiri Pirko <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>,
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v8 0/5] netdevsim: link and forward skbs
- between ports
-Message-ID: <20240131164459.314a809b@kernel.org>
-In-Reply-To: <20240130214620.3722189-1-dw@davidwei.uk>
-References: <20240130214620.3722189-1-dw@davidwei.uk>
+	s=k20201202; t=1706748627;
+	bh=8Yn7WZuUu+7N5PkWWTp/ZUOVig7abrr1Tg2VivYAKi8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=tpD1jZdlJOCSbQjrtrLGr/hMr10uIywTyHgmSLZy7WvOCciOq/60PefDfkAIPc4w4
+	 hcDHYbxp6JI/0cM3MhzGTCLVPWauspzVKCavbdUSMNZvcl8YCr9jVX9vPliEgMj1Ql
+	 uaiVvsZetdarxleGT2VhwWGSmkiVcudpNKq+ZQ8pl0J4KuMjv1qMSf7yRqOPwL2FzI
+	 bodwKNi+unOUv877jWxr4OSCxhiMxoJbHrB0p8uENbre6tamUBGg8y1wkrO2rX0GUg
+	 aEo23zj3C2cB+1ATfJg7FPzjBwudfJ9fL7MbaHLtAKL0rvqLPFdN6s0eXtYM28zzPE
+	 dVVnmvhrhnsEg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 14718DC99E6;
+	Thu,  1 Feb 2024 00:50:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: ipv4: Simplify the allocation of slab caches in
+ inet_initpeers
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170674862708.27305.5476784873293252924.git-patchwork-notify@kernel.org>
+Date: Thu, 01 Feb 2024 00:50:27 +0000
+References: <20240130092255.73078-1-chentao@kylinos.cn>
+In-Reply-To: <20240130092255.73078-1-chentao@kylinos.cn>
+To: Kunwu Chan <chentao@kylinos.cn>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On Tue, 30 Jan 2024 13:46:16 -0800 David Wei wrote:
-> [PATCH net-next v8 0/5] netdevsim: link and forward skbs between ports
+Hello:
 
-There's only 4 patches here, you'll need to repost because you promised
-patchwork 5 by saying 0/5 :(
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 30 Jan 2024 17:22:55 +0800 you wrote:
+> commit 0a31bd5f2bbb ("KMEM_CACHE(): simplify slab cache creation")
+> introduces a new macro.
+> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
+> to simplify the creation of SLAB caches.
+> 
+> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next] net: ipv4: Simplify the allocation of slab caches in inet_initpeers
+    https://git.kernel.org/netdev/net-next/c/57f2c6350f2d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
