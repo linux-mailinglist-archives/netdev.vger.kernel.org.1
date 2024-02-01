@@ -1,234 +1,207 @@
-Return-Path: <netdev+bounces-67868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B347845257
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 09:06:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78C9984526A
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 09:09:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEFFE1F2B295
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:06:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DA0F1C25E73
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:09:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB80A158D84;
-	Thu,  1 Feb 2024 08:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EABA6158D8B;
+	Thu,  1 Feb 2024 08:08:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="tgz4Ea3Z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KUf9fVqL"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2062.outbound.protection.outlook.com [40.107.212.62])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E49F1158D74;
-	Thu,  1 Feb 2024 08:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706774777; cv=fail; b=BhBs/zsVgNomiOXMQ7UfI5LIDGXPotBzCgWSGcRBrQoMev2zUbfhTps266ujZkghp4b5ck8ZJkH6nzUypxkS5mqYxwKRGd+2AfBoDIQaOPGwtOlpGawATRfGPqL3Mk4wZh9E1qrUTgxo4b58JqKrPt7pxqdgr5HS0GFf7hMHrvw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706774777; c=relaxed/simple;
-	bh=VN0+4Zgf7jyoWqgMA9jM/xjheZzHQOVyXv4LJt8+1W8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=OxaD/x09642D98Up8j8HKPdKzUXotfEaouY+dxJydv1xWe8Ma0oJy31/X3MBg+l/4x5VweW/06QJOaaxBAl9ju9c6JHhFfPVkn1q1jvjdde0LdHrwP0sb4JHNOP9J82s56XQmOW1Kd7RjdKrbWUDZe4Fipj6g7V4YytRsYpXumo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=tgz4Ea3Z; arc=fail smtp.client-ip=40.107.212.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Gb27yrz4Ti/oWgALlMc2A4murT73QFyx06GP6Y6LdogslpZXpK0Iqcvz9JbRwKWwdOoXfUY0kfths82VjNO7hlJrZswIWf2pwBdcrjOfFEQN42+6fvhNdur+F9p3H4QJRqDc5OeXdY7eQTqhalP9d/i2P3+ZVnvjWoU1yAv+8gQHIgudKvJtCRqMxwtdP2MsUWOdLdbXPsCG/Litp0GXAQpUG+eIq/xCxqLZGcH7ok2s+v0DaLV4aX+XzGf7kbkeJ8DdrFaD44qWGgdktS8GxdDKAZMoZXZ7Nj7IObEV6an1FSBGcbPuVNZwmWfKZgCIZFNFwd1tWr2kJNLMFVARww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZTNnGGeR7u10jrzxZge+9+6sDDntXVkb5X30h5D0rHo=;
- b=IrCW/icsV7c/MdrJmvvWcq7P3WAi0T4Invet4H81LcWqT67nxVrnIhn8aIo3c3XIV7GlR0+fbfa1O8YaP9C67U3O/gDNJcHjrceDT+orgVjg4pxckeaM5rD9W/aoaeWj92nNZ0ZuLrQt2/WPM+Mcj5xFkgS2vvVeZydJKeXMDhycRr2iN8jLfbvlA8Gx6gMcPelZj22Lwx1zx1rugH6sieXMK/iq+Rzxh8PT2IcYZsRMtZXeUuFeuTE8vlWL1K0l5ukPgE+Jjx/u34avHsYHBZWq/IRRhFTF8luRkLFKQxQY7d1HlL0Maf+AJ+OyTyuroDEA8hewSV1WVcTh2xRkPA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZTNnGGeR7u10jrzxZge+9+6sDDntXVkb5X30h5D0rHo=;
- b=tgz4Ea3ZAOfoEfyntaJTbNC8DHdb9fFYodSoQ/5Ohkhg17sIAYSeyJOdD1gUvtVhWjDfmZ4IEAa+Hqshcg03HzgyAROP6TW3rn2QRrX5N2j628KzXae5WfwFJHHYT/a9Ba1s4Uj0ILtSvR9FelD+rRAgEFh4flAbiGSgUdbrXS1Y0kGrfDqZt3aTskiwwFHVyqaqRkfWPk+hXKNmy1PzPoJDFjpZwCyXAMZGYVew0V6tLmAmJ1aOqhz6Cl8VR5g4sl47WrlfimjXjhbFOfeqOj/s5ekSFfnnIpQVgsiwCVkhwA6CZGHxS9gUQOP6y8m1AvF9cnSh++GijhkWQ7sptg==
-Received: from SN6PR16CA0046.namprd16.prod.outlook.com (2603:10b6:805:ca::23)
- by PH7PR12MB7257.namprd12.prod.outlook.com (2603:10b6:510:205::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.22; Thu, 1 Feb
- 2024 08:06:09 +0000
-Received: from SA2PEPF000015C6.namprd03.prod.outlook.com
- (2603:10b6:805:ca:cafe::d) by SN6PR16CA0046.outlook.office365.com
- (2603:10b6:805:ca::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.26 via Frontend
- Transport; Thu, 1 Feb 2024 08:06:09 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SA2PEPF000015C6.mail.protection.outlook.com (10.167.241.196) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7249.19 via Frontend Transport; Thu, 1 Feb 2024 08:06:09 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 1 Feb 2024
- 00:05:50 -0800
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.231.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.41; Thu, 1 Feb 2024 00:05:47 -0800
-From: Ido Schimmel <idosch@nvidia.com>
-To: <netdev@vger.kernel.org>, <linux-kselftest@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <shuah@kernel.org>, <razor@blackwall.org>, "Ido
- Schimmel" <idosch@nvidia.com>
-Subject: [PATCH net-next] selftests: net: Fix bridge backup port test flakiness
-Date: Thu, 1 Feb 2024 10:05:16 +0200
-Message-ID: <20240201080516.3585867-1-idosch@nvidia.com>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3461615A4A2
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 08:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706774905; cv=none; b=ILTrcuzxBq6SzeZlM69zQzgfIYrcBAnn3ErjObiOLCoCK8SpzSmRDGvHKDOC86m6OtyoCIqbQQAkGGHjUyjkVq5nAVT5kuaSxONSFvdsxUqyStgnK2x6Sm5O+dOc8mp6wuZeYiK4fjAFte7akv31s0mfmUg3d37PYKbUP8uQFUQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706774905; c=relaxed/simple;
+	bh=yRW+zk6ipQx+/UeKBycRl86N7OpB8VApca3JZVyt31I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R7lt8NOAD2BFTW75CGCQjIRZYMoEYgy4QtI3vNpix4aikalAVQuM4SlMOSTQlA1ob1aBL/0/+UpFSqosQQzFVhlHzyFGgSxwVg8cv+ttiUX99nYUOF6kzUgGud1TfMF8RM37rwL8wkmdSb7HwqZMcf9UEJuHdmGL8C4PVt7YuCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KUf9fVqL; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706774896;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=iy0to9gJNsnChVp/GnNaL86E7YakxrA6m3SgledDRmM=;
+	b=KUf9fVqL2VNKyOK/W4u2vJjGcoR0ZzK0JfOARQOruN+EmAIoApqVfkDNm5N83wlLezXF8z
+	hgy9yuQeD7uiATwZR6OojRBpzEExLxt2NxnP/Hjq5LVtdSxNveoDBgC4d7FB3DdrFTiUB9
+	v5cQ0Y3GDeZx20dShwcSQBJ6rjWjrcY=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-324-uJSvMOIiOEeod-F3XRSakg-1; Thu, 01 Feb 2024 03:08:15 -0500
+X-MC-Unique: uJSvMOIiOEeod-F3XRSakg-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a2fba67ec20so38712566b.3
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 00:08:14 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706774894; x=1707379694;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iy0to9gJNsnChVp/GnNaL86E7YakxrA6m3SgledDRmM=;
+        b=v9Sz2MILbKH1BR9zP99W4HuVuvgYxLYJp1x34m10exVvmyfgnp25py9Gkwpoj8ayKz
+         Pvrs705ESNEg8bozNfZfZYuZWGYLh01pzB0/HLah/D1S2/OPq+JLuDuD5x6DoTAsylem
+         1fnDiVZi6n6BZrErWrPVG0jZQjc1CL/5vZVpTx9NbMWwP9me8nIvnGxqCmC8Si1C0Zty
+         5qmknk19EEGZwx35BoBZpLkrx/VIK5Jn2SKhNWGt3Y6wc6Z5MGcAWkoHWBNYKDQ+Xqg9
+         3nnmN7bWBzLR7GMoc8ABtxpUvafBSYBR0CfHCpx55jgX37Jwy67bBYsTfpCcebzo2ICc
+         TCVA==
+X-Gm-Message-State: AOJu0YxEz1c3CRDldWiX9X+i4WaqTQvZanJWZJRUpF0oo1hCSJSNF+g/
+	aHycBuoooDWGebkCKblb005Ucv7kSOIYc0GmjZ7DamEszB4ndzpY8IS9EnObWXhWiCAprEyPKZH
+	zrnjm49H2RzdUWyqck+jiIXQDXS72Wabh7VizeGg0be+nkDqUnIKC8g==
+X-Received: by 2002:a17:907:994a:b0:a36:6198:3505 with SMTP id kl10-20020a170907994a00b00a3661983505mr2891733ejc.25.1706774893759;
+        Thu, 01 Feb 2024 00:08:13 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGR6sQz2gxBGtwqzlmOhuYoQMalz//Dwvh7p+uyOALTuWEkXwrce4iZxrh7C6Z3DpndGvJclg==
+X-Received: by 2002:a17:907:994a:b0:a36:6198:3505 with SMTP id kl10-20020a170907994a00b00a3661983505mr2891712ejc.25.1706774893374;
+        Thu, 01 Feb 2024 00:08:13 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUPikGwlmK61HBD824LPki9FCPfzBqA8DOG1qFKTu86qM6TT3O5V9/CvItrJ98+QzfcVoEyp+96Zr1Nn2L+BvS4DqHAaoL3vKwZ6lp6Isco+Twi35RKwnoZUuMkraXf3k7IhNqwNPtWxXU0q5hpZ3dtYMws/l0G/WLT2JxU+Az61Ph3wfFwo0rWQrE9KpQ7vopZeP4GRY7hV6XC5TPZ8jR/tHxE8mlGsfTD2vqlwVDFVHk3t88eeqmNpQtAeXcq4Z1TDE9naso78eI=
+Received: from redhat.com ([2a02:14f:179:3a6d:f252:c632:3893:a2ef])
+        by smtp.gmail.com with ESMTPSA id m1-20020a1709062b8100b00a363e8be473sm2143643ejg.143.2024.02.01.00.08.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Feb 2024 00:08:12 -0800 (PST)
+Date: Thu, 1 Feb 2024 03:08:07 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Tobias Huschle <huschle@linux.ibm.com>
+Cc: Jason Wang <jasowang@redhat.com>, Abel Wu <wuyun.abel@bytedance.com>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Linux Kernel <linux-kernel@vger.kernel.org>, kvm@vger.kernel.org,
+	virtualization@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: Re: Re: EEVDF/vhost regression (bisected to 86bfbb7ce4f6
+ sched/fair: Add lag based placement)
+Message-ID: <20240201030341-mutt-send-email-mst@kernel.org>
+References: <CACGkMEudZnF7hUajgt0wtNPCxH8j6A3L1DgJj2ayJWhv9Bh1WA@mail.gmail.com>
+ <20231212111433-mutt-send-email-mst@kernel.org>
+ <42870.123121305373200110@us-mta-641.us.mimecast.lan>
+ <20231213061719-mutt-send-email-mst@kernel.org>
+ <25485.123121307454100283@us-mta-18.us.mimecast.lan>
+ <20231213094854-mutt-send-email-mst@kernel.org>
+ <20231214021328-mutt-send-email-mst@kernel.org>
+ <92916.124010808133201076@us-mta-622.us.mimecast.lan>
+ <20240121134311-mutt-send-email-mst@kernel.org>
+ <07974.124020102385100135@us-mta-501.us.mimecast.lan>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF000015C6:EE_|PH7PR12MB7257:EE_
-X-MS-Office365-Filtering-Correlation-Id: b0de4fe8-b433-4248-4cf3-08dc22fca64b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	YWhoMYRNDc61+YHDnLiqH8SqB4mI+L23M4/NfKyQd5g9Ma9Ra9n4uvg35GftaKoJmmgm0cJYfeWy55SDdsbcbXOWwThyn8Ki1m04HPlY2HB6zoXHsmU8KAaIYzBgvK4agPDLxa+hcs+2bBCOsWlySu96gil+wU1r1pF1NginRD7U8NKQx+PK9dMnym2vWlbh+tMBm+N1iRSs4pBss2RDO86W5e33g+ZY1yw5EOKq1iXcjJmcp/7LheDg6QvA0LLPhcbIO1D32b3V1P7mAE78G9Eenfg0UlKNVgDv0JPRIq5cFTMEa+PtYeupMsNVZltVQHpfln/EoTzHrqmF8jaSC0n5JWHlvBDJU6+CQmRCuW7rgD9pFIZe1OyqPUys9IBq2uQYxUlYFfLc9tqUURDqTMS437Q1woG+4jrmlscz9elNKrIe3LYLm8nfzuGkgkVrJ9QDuWEpzAPf8q1y5VXw2BIF7PjOlFbTMwKDCWwpl6JgK1L/J/AHFMKPooh19wAeJM2Ny05tuPNa0d1xN13gkMOnMIjswpfUaHVpG2hJb0SS4ejZViHvTet6V0k9WjO8C/yLye0tFww9xeuHDcKUjQAQVWPT7cIKx44rMYayax3fCNLIrC4RqVL+URRyccyuTsCMKTt9jmzN2xirWJD/0Q+egZm2SpWlPKlOEJrT7YYLfsK8GRW8y2qhlk2hKd7xwKoq538YK8E8QsEI7GVmLupLjeojBJSgtJPeL8iNPZs=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(39860400002)(136003)(346002)(396003)(376002)(230922051799003)(186009)(82310400011)(64100799003)(1800799012)(451199024)(40470700004)(36840700001)(46966006)(40480700001)(40460700003)(41300700001)(83380400001)(107886003)(36756003)(82740400003)(70206006)(86362001)(7636003)(36860700001)(1076003)(356005)(2616005)(26005)(47076005)(16526019)(336012)(426003)(54906003)(2906002)(70586007)(6666004)(316002)(110136005)(4326008)(5660300002)(8676002)(478600001)(8936002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Feb 2024 08:06:09.5261
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: b0de4fe8-b433-4248-4cf3-08dc22fca64b
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF000015C6.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7257
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <07974.124020102385100135@us-mta-501.us.mimecast.lan>
 
-The test toggles the carrier of a bridge port in order to test the
-bridge backup port feature.
+On Thu, Feb 01, 2024 at 08:38:43AM +0100, Tobias Huschle wrote:
+> On Sun, Jan 21, 2024 at 01:44:32PM -0500, Michael S. Tsirkin wrote:
+> > On Mon, Jan 08, 2024 at 02:13:25PM +0100, Tobias Huschle wrote:
+> > > On Thu, Dec 14, 2023 at 02:14:59AM -0500, Michael S. Tsirkin wrote:
+> > > - Along with the wakeup of the kworker, need_resched needs to
+> > >   be set, such that cond_resched() triggers a reschedule.
+> > 
+> > Let's try this? Does not look like discussing vhost itself will
+> > draw attention from scheduler guys but posting a scheduling
+> > patch probably will? Can you post a patch?
+> 
+> As a baseline, I verified that the following two options fix
+> the regression:
+> 
+> - replacing the cond_resched in the vhost_worker function with a hard
+>   schedule 
+> - setting the need_resched flag using set_tsk_need_resched(current)
+>   right before calling cond_resched
+> 
+> I then tried to find a better spot to put the set_tsk_need_resched
+> call. 
+> 
+> One approach I found to be working is setting the need_resched flag 
+> at the end of handle_tx and hande_rx.
+> This would be after data has been actually passed to the socket, so 
+> the originally blocked kworker has something to do and will profit
+> from the reschedule. 
+> It might be possible to go deeper and place the set_tsk_need_resched
+> call to the location right after actually passing the data, but this
+> might leave us with sprinkling that call in multiple places and
+> might be too intrusive.
+> Furthermore, it might be possible to check if an error occured when
+> preparing the transmission and then skip the setting of the flag.
+> 
+> This would require a conceptual decision on the vhost side.
+> This solution would not touch the scheduler, only incentivise it to
+> do the right thing for this particular regression.
+> 
+> Another idea could be to find the counterpart that initiates the
+> actual data transfer, which I assume wakes up the kworker. From
+> what I gather it seems to be an eventfd notification that ends up
+> somewhere in the qemu code. Not sure if that context would allow
+> to set the need_resched flag, nor whether this would be a good idea.
+> 
+> > 
+> > > - On cond_resched(), verify if the consumed runtime of the caller
+> > >   is outweighing the negative lag of another process (e.g. the 
+> > >   kworker) and schedule the other process. Introduces overhead
+> > >   to cond_resched.
+> > 
+> > Or this last one.
+> 
+> On cond_resched itself, this will probably only be possible in a very 
+> very hacky way. That is because currently, there is no immidiate access
+> to the necessary data available, which would make it necessary to 
+> bloat up the cond_resched function quite a bit, with a probably 
+> non-negligible amount of overhead.
+> 
+> Changing other aspects in the scheduler might get us in trouble as
+> they all would probably resolve back to the question "What is the magic
+> value that determines whether a small task not being scheduled justifies
+> setting the need_resched flag for a currently running task or adjusting 
+> its lag?". As this would then also have to work for all non-vhost related
+> cases, this looks like a dangerous path to me on second thought.
+> 
+> 
+> -------- Summary --------
+> 
+> In my (non-vhost experience) opinion the way to go would be either
+> replacing the cond_resched with a hard schedule or setting the
+> need_resched flag within vhost if the a data transfer was successfully
+> initiated. It will be necessary to check if this causes problems with
+> other workloads/benchmarks.
 
-Due to the linkwatch delayed work the carrier change is not always
-reflected fast enough to the bridge driver and packets are not forwarded
-as the test expects, resulting in failures [1].
+Yes but conceptually I am still in the dark on whether the fact that
+periodically invoking cond_resched is no longer sufficient to be nice to
+others is a bug, or intentional.  So you feel it is intentional?
+I propose a two patch series then:
 
-Fix by adding a one second delay after a carrier change in places where
-a packet is sent immediately after the carrier change.
+patch 1: in this text in Documentation/kernel-hacking/hacking.rst
 
-[1]
- # Backup port
- # -----------
- [...]
- # TEST: swp1 carrier off                                              [ OK ]
- # TEST: No forwarding out of swp1                                     [FAIL]
- [  641.995910] br0: port 1(swp1) entered disabled state
- # TEST: No forwarding out of vx0                                      [ OK ]
+If you're doing longer computations: first think userspace. If you
+**really** want to do it in kernel you should regularly check if you need
+to give up the CPU (remember there is cooperative multitasking per CPU).
+Idiom::
 
-Fixes: b408453053fb ("selftests: net: Add bridge backup port and backup nexthop ID test")
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
----
-Jakub, targeting at net-next to see if it helps the CI, but can be
-applied to net. I'm unable to reproduce the failure locally.
----
- tools/testing/selftests/net/test_bridge_backup_port.sh | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+    cond_resched(); /* Will sleep */
 
-diff --git a/tools/testing/selftests/net/test_bridge_backup_port.sh b/tools/testing/selftests/net/test_bridge_backup_port.sh
-index 70a7d87ba2d2..92078b56ae0a 100755
---- a/tools/testing/selftests/net/test_bridge_backup_port.sh
-+++ b/tools/testing/selftests/net/test_bridge_backup_port.sh
-@@ -260,6 +260,7 @@ backup_port()
- 
- 	run_cmd "ip -n $sw1 link set dev swp1 carrier off"
- 	log_test $? 0 "swp1 carrier off"
-+	sleep 1
- 
- 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
- 	tc_check_packets $sw1 "dev swp1 egress" 101 1
-@@ -285,6 +286,7 @@ backup_port()
- 
- 	run_cmd "ip -n $sw1 link set dev swp1 carrier off"
- 	log_test $? 0 "swp1 carrier off"
-+	sleep 1
- 
- 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
- 	tc_check_packets $sw1 "dev swp1 egress" 101 2
-@@ -294,6 +296,7 @@ backup_port()
- 
- 	run_cmd "ip -n $sw1 link set dev swp1 carrier on"
- 	log_test $? 0 "swp1 carrier on"
-+	sleep 1
- 
- 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
- 	tc_check_packets $sw1 "dev swp1 egress" 101 3
-@@ -315,6 +318,7 @@ backup_port()
- 
- 	run_cmd "ip -n $sw1 link set dev swp1 carrier off"
- 	log_test $? 0 "swp1 carrier off"
-+	sleep 1
- 
- 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
- 	tc_check_packets $sw1 "dev swp1 egress" 101 4
-@@ -370,6 +374,7 @@ backup_nhid()
- 
- 	run_cmd "ip -n $sw1 link set dev swp1 carrier off"
- 	log_test $? 0 "swp1 carrier off"
-+	sleep 1
- 
- 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
- 	tc_check_packets $sw1 "dev swp1 egress" 101 1
-@@ -399,6 +404,7 @@ backup_nhid()
- 
- 	run_cmd "ip -n $sw1 link set dev swp1 carrier off"
- 	log_test $? 0 "swp1 carrier off"
-+	sleep 1
- 
- 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
- 	tc_check_packets $sw1 "dev swp1 egress" 101 2
-@@ -412,6 +418,7 @@ backup_nhid()
- 
- 	run_cmd "ip -n $sw1 link set dev swp1 carrier on"
- 	log_test $? 0 "swp1 carrier on"
-+	sleep 1
- 
- 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
- 	tc_check_packets $sw1 "dev swp1 egress" 101 3
-@@ -442,6 +449,7 @@ backup_nhid()
- 
- 	run_cmd "ip -n $sw1 link set dev swp1 carrier off"
- 	log_test $? 0 "swp1 carrier off"
-+	sleep 1
- 
- 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
- 	tc_check_packets $sw1 "dev swp1 egress" 101 4
-@@ -498,6 +506,7 @@ backup_nhid_invalid()
- 
- 	run_cmd "ip -n $sw1 link set dev swp1 carrier off"
- 	log_test $? 0 "swp1 carrier off"
-+	sleep 1
- 
- 	run_cmd "ip netns exec $sw1 mausezahn br0.10 -a $smac -b $dmac -A 198.51.100.1 -B 198.51.100.2 -t ip -p 100 -q -c 1"
- 	tc_check_packets $sw1 "dev swp1 egress" 101 0
-@@ -605,6 +614,7 @@ backup_nhid_ping()
- 
- 	run_cmd "ip -n $sw1 link set dev swp1 carrier off"
- 	run_cmd "ip -n $sw2 link set dev swp1 carrier off"
-+	sleep 1
- 
- 	run_cmd "ip netns exec $sw1 ping -i 0.1 -c 10 -w $PING_TIMEOUT 192.0.2.66"
- 	log_test $? 0 "Ping with backup nexthop ID"
+
+replace cond_resched -> schedule
+
+
+Since apparently cond_resched is no longer sufficient to
+make the scheduler check whether you need to give up the CPU.
+
+patch 2: make this change for vhost.
+
+WDYT?
+
 -- 
-2.43.0
+MST
 
 
