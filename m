@@ -1,133 +1,131 @@
-Return-Path: <netdev+bounces-68119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2A42845E06
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:02:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9C9B845E11
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:03:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD30BB30806
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:56:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BEED0B220AD
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54EC9566F;
-	Thu,  1 Feb 2024 16:56:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03CF55B665;
+	Thu,  1 Feb 2024 17:00:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="memqZ//+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V77pz3KO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72271468C;
-	Thu,  1 Feb 2024 16:56:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D31635A4F1
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 17:00:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706806575; cv=none; b=DkDtSzLCyJrO+De1cpWOhwW7fKiDZ7l6b3vQ28PXvuf9SY3Umc5+C/WqAGwmXVhs/ZJhjfZdq/ClSPRbDp/ewJg+IxMnl4gnYDASqTZhHihyXClAYFXIoOmjnoWNPvX3BUYc0vTmGP9qCKIFDnltKOXcjxgj3fDDCRTaugETpRg=
+	t=1706806847; cv=none; b=Hg5giN+DeAVVnO++i6dWEIJ09uiVrxymIbVY14+4b9L/HH2ZpqValiotbpMPJuMWcG4dRsw2kKn+hPzSbrE/GM37PAX01BvpMU68zgVe6YarYhLLg/+fo6rMElRXrPvMnS6WgHqZtYIkvbdLeaAjVL2kXcJ0x1EwIpo8tP8cd4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706806575; c=relaxed/simple;
-	bh=z3Remv4QfHt/lpAm+q6drL+AsGVbzUcUothMsaLNhTM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C3gadKLrRiw0yQXgt0m4m1iVFdrfXtxwvf8/KEwVFkdKkGGZF0vvDjPFU7igDXTEVx8FSMuPhGal1f6cFKRpKXp+B0ATRKdqgMfdmCmcjxpNSFlbQYmvSwRu2DD+TwpcJBdmzm1vbG3iDIAF4LvIpWiwiRxgG3MTtPG6DMHh2qw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=memqZ//+; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33b0e5d1e89so811062f8f.0;
-        Thu, 01 Feb 2024 08:56:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706806571; x=1707411371; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WRONz3zs2Ye8kp8mlNb2mkGa+oDmC9gtz59sMXR+/Aw=;
-        b=memqZ//+/GIPJydCbOq8OdYi+Lksvq5kWAaDqpiCbeLyvFCd86JcoawneAxshEg3Y4
-         XPJW44tqBm3ILm4Vp6s2lkGyIv9bkS9LvleXTbE+rlPB7CPZARYcYPKHJXiFKKzWSvBZ
-         BAcbj1DkAcoyrUozri9BcKmcNnzG9XZoCHTfHHhswaVr2fF2ss38oCiO8OvN+HBoj8JA
-         buoxLhakKMP6z8bD84J/qoHEDYTc6zjU5pUW0V7e05ZDZvIqnAyvcyBxTutjZpjyl4jr
-         s8g6M6w2eOLyeB3PU5LSAKNoh/KVdLgZvhR66sYJkknNBrvcxFqekbY4fgzRbEhcfaUm
-         6Xug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706806571; x=1707411371;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WRONz3zs2Ye8kp8mlNb2mkGa+oDmC9gtz59sMXR+/Aw=;
-        b=lXxPj+RRrZqfCNnxqgdjJH18AMjEuirlH+jgEUVENYCvi6Gd+LZrSk0q6iTJWxwkz0
-         IcRBe/v/w7miCEzARvyPQDfJalSBEOikvPz55LwQZ6mSDE4/niECLxfJQAA2lMPPzS8f
-         WzxaBp/nt85zJXxFHwkWxhs/1E+/1fQ/cz9bnWtcIdQzEkgtAUJr7v07bGUdQnIScUjb
-         lP12HWba02yLrZeA+Q9/fCoQaLhE2ktqVUwY1V/inT11UqLiqaM2ekoyyeMlmXXPcugP
-         Cw+jZu+WIE+sxt5HYcXLUSS58TOqNW98HBueL8API9THli0ZlfA8u+eE161xMffiBVVd
-         94HQ==
-X-Gm-Message-State: AOJu0YxnGTKuz32+QmuSKk5OHETQVqRrmukEHlyfiw9J4m0t3JIR4W5e
-	Ieq+AjPxDQdfvW+ZesPJGjwT/DAoVA0bD2piKNyZjXu1F+kHpQvY
-X-Google-Smtp-Source: AGHT+IEN7piBAHgnsH6iF/KjuouX1TsTmXKCFnH6zypAeAmK3ksCuMdXsSBTTbmVGDAgLcth2+4FKg==
-X-Received: by 2002:a5d:64e2:0:b0:33b:17c5:f25a with SMTP id g2-20020a5d64e2000000b0033b17c5f25amr1723832wri.64.1706806571598;
-        Thu, 01 Feb 2024 08:56:11 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVeIhYc1bdHcoOq49k918ll9ufcHPwUS1uMRPCBVPg6NM0QHqmbl/8a0+Kc5D+nxToRxKb/os+NbNRaE3FUHYWb/AeDqmke6MYZm6AArQbY7vrqUj7uLw3vNSWx6DFnLUgeNkGzW2Ao9uLsQnWudVBvld+j30BEGZ2MuXDbFtxUTqRjKHi9RC704VM2/KdUOy3ZupHBL3YzIwvpQgO1f13eeixA8M0n3RAPQuyEqNV93YVjbDzeGvziclROkPQIo5M09LswlYi3yzOJnQ6sFvZYxGjG9mRMaJyNVS4S2wxF2fYiz521256/m6G9gEcqYIpHPBF3IFZbGsNq99Lz0nVA2S+xk7zuOjBL6gmHAglKGZ15hyiFj3FAJm9i9nQrXIlz2g==
-Received: from debian ([93.184.186.109])
-        by smtp.gmail.com with ESMTPSA id ba15-20020a0560001c0f00b0033ae54cdd97sm14380311wrb.100.2024.02.01.08.56.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 08:56:11 -0800 (PST)
-Date: Thu, 1 Feb 2024 17:56:09 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Guenter Roeck <linux@roeck-us.net>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jean Delvare <jdelvare@suse.com>,
-	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org
-Subject: Re: [PATCH v5 net-next 08/13] net: phy: marvell-88q2xxx: add support
- for temperature sensor
-Message-ID: <20240201165609.GE48964@debian>
-References: <20240122212848.3645785-1-dima.fedrau@gmail.com>
- <20240122212848.3645785-9-dima.fedrau@gmail.com>
- <88a60be9-083b-4618-845c-6983bcad3540@roeck-us.net>
- <c9866a56-d82e-4a3d-b335-db22c0413416@lunn.ch>
- <a02c7451-8515-45d4-ae7b-9e64b03b5b38@roeck-us.net>
- <20240201162349.GC48964@debian>
- <b4fc0bc4-1585-4ae0-a980-10814e6d9ff6@lunn.ch>
+	s=arc-20240116; t=1706806847; c=relaxed/simple;
+	bh=PLSLp9bcVf2PuZymtCHZC6iHxikonaFGkl0Ncm0Ee6E=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=atD6WzJ0brGtVaNkKgesk8bcoNVCPNxKvK89k1b++L1/AhNshBkTwJnEjs1yI1U5Z7A1gFltXEyBDfKPHi/PJ/DYOq86iLjLYeHWGGAcXogEGdHh9LE4R5RRSKOOWiH9tGDBtkGmjbiFkve2QZT5s3w5Pi4cbQB/YqqTYQpPO08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V77pz3KO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79CEFC43390;
+	Thu,  1 Feb 2024 17:00:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706806847;
+	bh=PLSLp9bcVf2PuZymtCHZC6iHxikonaFGkl0Ncm0Ee6E=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=V77pz3KOgsBGt7WynUmINWIFon4yaxXBKJ39dqcHvFtcYWkT7LtBJbI40HhotJgbU
+	 2v8/+jiQUFEsOUjgD0JPoR2KVjzeFLI7xouEFYIS/P6FCbQEm0tiDgPaen9iutm5CL
+	 /1CDA1xn+UBh72zrM82SeWBfmfjDWgJtdwF7mTu815/EHf4840gVFf21d46ChJoVBi
+	 1YaKkyCELxKeOmF+AOHMht3bbWaA2Szxh5pgz5rwXvEnSdD/LLITgmJoCWE55gQbwS
+	 c4bWusvlkGYnIe2oD3PXfgNFJmUyZznjR9S89RFB4ydKi0xeoC6NcUbptkap/6ANYL
+	 shWMQgAtY7riA==
+Date: Thu, 1 Feb 2024 09:00:46 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/3] net/sched: netem: use extack
+Message-ID: <20240201090046.1b93bcbd@kernel.org>
+In-Reply-To: <Zbtks__SZIgoDTaj@nanopsycho>
+References: <20240201034653.450138-1-stephen@networkplumber.org>
+	<20240201034653.450138-2-stephen@networkplumber.org>
+	<Zbtks__SZIgoDTaj@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b4fc0bc4-1585-4ae0-a980-10814e6d9ff6@lunn.ch>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Am Thu, Feb 01, 2024 at 05:47:21PM +0100 schrieb Andrew Lunn:
-> On Thu, Feb 01, 2024 at 05:23:49PM +0100, Dimitri Fedrau wrote:
-> > Am Thu, Feb 01, 2024 at 05:39:25AM -0800 schrieb Guenter Roeck:
-> > > On 2/1/24 05:27, Andrew Lunn wrote:
-> > > > > > +#ifdef CONFIG_HWMON
-> > > > > 
-> > > > > HWMON is tristate, so this may be problematic if the driver is built
-> > > > > into the kernel and hwmon is built as module.
-> > > > 
-> > > > There should be Kconfig in addition to this, e.g.
-> > > > 
-> > > > config MAXLINEAR_GPHY
-> > > >          tristate "Maxlinear Ethernet PHYs"
-> > > >          select POLYNOMIAL if HWMON
-> > > >          depends on HWMON || HWMON=n
-> > > >          help
-> > > >            Support for the Maxlinear GPY115, GPY211, GPY212, GPY215,
-> > > >            GPY241, GPY245 PHYs.
-> > > > 
-> > > > So its forced to being built in, or not built at all.
-> > > > 
-> > > 
-> > > Even then it should be "#if IS_ENABLED(HWMON)" in the code.
-> > > 
-> > >
-> > If using "#if IS_ENABLED(HWMON)" do I have to add the dependency in
-> > the KConfig file ? When looking at other PHY drivers, they do.
+On Thu, 1 Feb 2024 10:30:27 +0100 Jiri Pirko wrote:
+> Thu, Feb 01, 2024 at 04:45:58AM CET, stephen@networkplumber.org wrote:
+> >-	if (!opt)
+> >+	if (!opt) {
+> >+		NL_SET_ERR_MSG_MOD(extack, "Netem missing required parameters");  
 > 
-> Please follow what other drivers do. Its easy to break the build,
-> resulting is undefined symbols. What we have now works.
+> Drop "Netem " here.
+> 
+> Otherwise, this looks fine.
 
-Sure.
+Looks like most sch's require opt. Would it be a bad idea to pull 
+the check out to the caller? Minor simplification, plus the caller
+has the outer message so they can use NL_SET_ERR_ATTR_MISS() and
+friends.
+
+
+$ git grep -A1 'if (!opt)' -- net/sched/
+net/sched/cls_fw.c:     if (!opt)
+net/sched/cls_fw.c-             return handle ? -EINVAL : 0; /* Succeed if it is old method. */
+--
+net/sched/cls_u32.c:    if (!opt) {
+net/sched/cls_u32.c-            if (handle) {
+--
+net/sched/sch_cbs.c:    if (!opt) {
+net/sched/sch_cbs.c-            NL_SET_ERR_MSG(extack, "Missing CBS qdisc options  which are mandatory");
+--
+net/sched/sch_drr.c:    if (!opt) {
+net/sched/sch_drr.c-            NL_SET_ERR_MSG(extack, "DRR options are required for this operation");
+--
+net/sched/sch_etf.c:    if (!opt) {
+net/sched/sch_etf.c-            NL_SET_ERR_MSG(extack,
+--
+net/sched/sch_ets.c:    if (!opt) {
+net/sched/sch_ets.c-            NL_SET_ERR_MSG(extack, "ETS options are required for this operation");
+--
+net/sched/sch_ets.c:    if (!opt)
+net/sched/sch_ets.c-            return -EINVAL;
+--
+net/sched/sch_gred.c:   if (!opt)
+net/sched/sch_gred.c-           return -EINVAL;
+--
+net/sched/sch_htb.c:    if (!opt)
+net/sched/sch_htb.c-            return -EINVAL;
+--
+net/sched/sch_htb.c:    if (!opt)
+net/sched/sch_htb.c-            goto failure;
+--
+net/sched/sch_multiq.c: if (!opt)
+net/sched/sch_multiq.c-         return -EINVAL;
+--
+net/sched/sch_netem.c:  if (!opt)
+net/sched/sch_netem.c-          return -EINVAL;
+--
+net/sched/sch_prio.c:   if (!opt)
+net/sched/sch_prio.c-           return -EINVAL;
+--
+net/sched/sch_red.c:    if (!opt)
+net/sched/sch_red.c-            return -EINVAL;
+--
+net/sched/sch_skbprio.c:        if (!opt)
+net/sched/sch_skbprio.c-                return 0;
+--
+net/sched/sch_taprio.c: if (!opt)
+net/sched/sch_taprio.c-         return -EINVAL;
+--
+net/sched/sch_tbf.c:    if (!opt)
+net/sched/sch_tbf.c-            return -EINVAL;
+
 
