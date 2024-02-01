@@ -1,79 +1,303 @@
-Return-Path: <netdev+bounces-68212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD19C846241
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 22:03:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30267846270
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 22:09:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 971F2282D7D
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:03:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54DEE1C24A79
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:09:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72B82405D4;
-	Thu,  1 Feb 2024 21:02:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A080A3CF7F;
+	Thu,  1 Feb 2024 21:07:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DM3JLCxv"
+	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="GNaUeSe7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5733CF79;
-	Thu,  1 Feb 2024 21:02:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D12EF3CF71
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 21:06:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706821352; cv=none; b=pJ3ZZAmmBENYgQTLuyMQMMIvBTDMm1eTH6M79Djkng5aMFbCRgSYw/7LQvQY2URZNlnmbQktrSRMTN9FULUR6WtBQXiskEB16H0x4r9RQ6G4Ye/bko41fHJPQ1FcapN3x2nmKkPXpKa1xQjbtbZVy0KXX9ttrPLsFFla6md4yyA=
+	t=1706821622; cv=none; b=LzHY3q4dSrb9cqv0M8POgL4WW/lUCoWFZEu2qRtcY8JskFiV6ro6t1qe21r94zy8uYxxl2+qbWkot5AfKugGrprxK7wVKdvXHqLLe1Avthnaj8BEXjNtdNi2ITJDSEDs+LtXnV1HpLtgybc/8zv67zb8yiudoAuKe1Z0giXX0Ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706821352; c=relaxed/simple;
-	bh=l3/oCKlxxHFyMLP1M3auM39noF5+GDiT9+aZvX/miAo=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=QfvdbQTatQiV6TiJf8imPMvLXZ9fE+hIOpRDIpcDpUir700eoZ7X9AGIv6liiCgrcw2TqZliXf9zqAEO1o7FQ1NMpYm06B7tWUnBMFWYkbScyZ4TqJnqD5+3+7Clb0b9DuG966dxR3ziEio3cq0JqLAFoKXqPmPjP09ADJDKG8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DM3JLCxv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 24450C43394;
-	Thu,  1 Feb 2024 21:02:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706821352;
-	bh=l3/oCKlxxHFyMLP1M3auM39noF5+GDiT9+aZvX/miAo=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=DM3JLCxvz5s2aIEBYeB/979MeP9w9dWV6DyfQ9BU7z1jo8wZ/wn92b6ZkskH5/TGH
-	 F/GHG5GFv+iWG9nwakLArHTvhYjBGdcgo6AQul47CmjP9yOWiSxUFjP1oZf62Bjqqs
-	 Mgw6bKnHedh2w4uPGdUN5870S1pBmn3VTlmlzXv8SdQDCAE4hcEZ/txr6Rv5CAXRv8
-	 WWbGW2sjqj7EWL/gYDTyc7JZCIeZpr7V6b2Cb++ro56mGW4/kZHoxRKnRY/BjPNy9Q
-	 WntlOpyQe39+hxMIJX+Jyx3qiZVpt4WMG6fF1yzABs6yzszzDWb7DvRROAftoUCIcu
-	 CjXlIT59GznXQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1225FC0C40E;
-	Thu,  1 Feb 2024 21:02:32 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.8-rc3
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20240201183046.3491512-1-kuba@kernel.org>
-References: <20240201183046.3491512-1-kuba@kernel.org>
-X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20240201183046.3491512-1-kuba@kernel.org>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.8-rc3
-X-PR-Tracked-Commit-Id: 4e192be1a225b7b1c4e315a44754312347628859
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 41b9fb381a486360b2daaec0c7480f8e3ff72bc7
-Message-Id: <170682135206.25707.7004428323547963175.pr-tracker-bot@kernel.org>
-Date: Thu, 01 Feb 2024 21:02:32 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
+	s=arc-20240116; t=1706821622; c=relaxed/simple;
+	bh=oPJOZv03hwxbqkYwudlxIPTDiQRZpFGwDc+SB/ATHDM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=I2UCeOJwGcSQqv7xSp+YqS7m2ujZtGsWNo6G5Ha0VdeIeu55v0VXX7TJ8/ka1XZOXwp4o1brqyYaRgerZ0qp1Nq5mzwf2007PHrO4rl5AYHjPVNLQ3CgDmmwehY69SSqt9hq7zbt4u9RYxaiQvU+gyiTXT77ey8T6+c9JZWWx5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=GNaUeSe7; arc=none smtp.client-ip=209.85.128.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=umich.edu
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-5ffdf06e009so14460267b3.3
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 13:06:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=umich.edu; s=google-2016-06-03; t=1706821619; x=1707426419; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Yt7e5kW67jPJRZM8ErOQj6BquenTsqSTjJPhbNcD7fw=;
+        b=GNaUeSe7A3mHBwARmu5PgQQlF34wzp2roJJMQ7FBpM4dmXq1y9eWsulUwONYwZU2Kr
+         Z/KmrVBxiM4Z28O8v/6lDo8JySTh0XUAUh3zvteIUhw1MyA8Vy77y1T33EqdbxX8SLjg
+         Cs+7yenilbNn4n90l71QyQqV2c32lBgr3Z1qJfhPRX8DHdIy/pf62utIN7sW4bvpgZKY
+         rG9D8s/0S+8AYeo7USUHQqcWuO+xlhqvN+7dxKP0M9KAXoJhvhODld7HGJtziUgO0HoW
+         H4f/ZcB3X653UyUjEUWsF/GIhQfYl+3c+JJiBMz7Vz3/JRqH2wdxB+EivncC7mimpqRX
+         TdSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706821619; x=1707426419;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Yt7e5kW67jPJRZM8ErOQj6BquenTsqSTjJPhbNcD7fw=;
+        b=QGwhQc4z0jr3GfQlyKSSr7s42vPhcpOiDCOAFlapDIpGkFaH8XoHuwAzapDg51Fsq1
+         VZd5xhnV1t+AO85MrsuXz3i05aa0c/Bgpmaa/85E0BynPhST+OndwaBF84zlepmBbfH4
+         1jU1F5UIxl5qru79bp9OIOzyoB1hqqSwSjKYqAa1Goc4tuSR466G5hCNCCwpJAFNoI2j
+         HnDZwo9IRWZGkckIPWaShHMzgEzBzQn8dbfoGvahINRA7Dysl/+XTLj2lk9J/wl/fa4v
+         Cpm4SNzzXCbfWqvr2XWrzBK0zs5xAo3Pt8mnu5zddFkMfT3YxUTIqDJC0pfJS7g2IAtr
+         ssmw==
+X-Gm-Message-State: AOJu0YyJQq1ZIknIxrVXOVvbBPxefIO9vl7xQa72a21VA32qOgldIlxE
+	9ud8oSmXieiC1aLKg/82LV7dviiambC9nrK72kcGihPSjiUWvpJShqhE/xXefJh+7jyU/+gOHU2
+	D8G64EwuxLfwQKE+aNLSCgMZS7nJMfMR9iFZfvg==
+X-Google-Smtp-Source: AGHT+IGEUKSA0ksa3LSL8TqJTFxwolHbJCZbeQLC+r6L2WGPwgMdAzKp16oStnHvrtxqabrcInoFkHb1EhGBbU2VoDs=
+X-Received: by 2002:a81:4813:0:b0:602:9f2e:c513 with SMTP id
+ v19-20020a814813000000b006029f2ec513mr3819062ywa.4.1706821618780; Thu, 01 Feb
+ 2024 13:06:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20240201-rockchip-rust-phy_depend-v2-0-c5fa4faab924@christina-quast.de>
+ <20240201-rockchip-rust-phy_depend-v2-3-c5fa4faab924@christina-quast.de>
+In-Reply-To: <20240201-rockchip-rust-phy_depend-v2-3-c5fa4faab924@christina-quast.de>
+From: Trevor Gross <tmgross@umich.edu>
+Date: Thu, 1 Feb 2024 15:06:47 -0600
+Message-ID: <CALNs47tnwCgyvM2jBo=bTt1=2AJFt3b6W+JsTHM3Np2tbNJYCA@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] net: phy: add Rust Rockchip PHY driver
+To: Christina Quast <contact@christina-quast.de>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
+	Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, 
+	Alice Ryhl <aliceryhl@google.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Heiko Stuebner <heiko@sntech.de>, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The pull request you sent on Thu,  1 Feb 2024 10:30:46 -0800:
+On Thu, Feb 1, 2024 at 12:07=E2=80=AFPM Christina Quast
+<contact@christina-quast.de> wrote:
+> +++ b/drivers/net/phy/rockchip_rust.rs
+> @@ -0,0 +1,131 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +// Copyright (C) 2024 Christina Quast <contact@christina-quast.de>
+> +
+> +//! Rust Rockchip PHY driver
+> +//!
+> +//! C version of this driver: [`drivers/net/phy/rockchip.c`](./rockchip.=
+c)
+> +use kernel::{
+> +    c_str,
+> +    net::phy::{self, DeviceId, Driver},
+> +    prelude::*,
+> +    uapi,
+> +};
+> +
+> +kernel::module_phy_driver! {
+> +    drivers: [PhyRockchip],
+> +    device_table: [
+> +        DeviceId::new_with_driver::<PhyRockchip>(),
+> +    ],
+> +    name: "rust_asix_phy",
+> +    author: "FUJITA Tomonori <fujita.tomonori@gmail.com>",
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.8-rc3
+Tomo wrote this? :)
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/41b9fb381a486360b2daaec0c7480f8e3ff72bc7
+> +    description: "Rust Asix PHYs driver",
+> +    license: "GPL",
+> +}
+> +
+> +
+> +const MII_INTERNAL_CTRL_STATUS: u16 =3D 17;
+> +const SMI_ADDR_TSTCNTL: u16 =3D 20;
+> +const SMI_ADDR_TSTWRITE: u16 =3D 23;
+> +
+> +const MII_AUTO_MDIX_EN: u16 =3D bit(7);
+> +const MII_MDIX_EN: u16 =3D bit(6);
+> +
+> +const TSTCNTL_WR: u16 =3D bit(14) | bit(10);
+> +
+> +const TSTMODE_ENABLE: u16 =3D 0x400;
+> +const TSTMODE_DISABLE: u16 =3D 0x0;
+> +
+> +const WR_ADDR_A7CFG: u16 =3D 0x18;
 
-Thank you!
+Most of these are clear enough, but could you add comments about what
+the more ambiguous constants are for? (e.g. A7CFG).
 
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+> +struct PhyRockchip;
+> +
+> +impl PhyRockchip {
+
+Remove the `helper_` prefix for these functions, and change the docs.
+Their use as helpers is obvious enough based on where they are called,
+better to say what they actually accomplish.
+
+Since they don't take `self`, these could also just be standalone
+functions rather than in an `impl PhyRockchip` block. This makes
+calling them a bit cleaner since you don't need the `PhyRockchip::`
+prefix.
+
+> +   /// Helper function for helper_integrated_phy_analog_init
+> +    fn helper_init_tstmode(dev: &mut phy::Device) -> Result {
+> +        // Enable access to Analog and DSP register banks
+> +        dev.write(SMI_ADDR_TSTCNTL, TSTMODE_ENABLE)?;
+> +        dev.write(SMI_ADDR_TSTCNTL, TSTMODE_DISABLE)?;
+> +        dev.write(SMI_ADDR_TSTCNTL, TSTMODE_ENABLE)
+> +    }
+
+For consistency, just make the last write also end with `?;` and add a
+`Ok(())` line.
+
+> +
+> +    /// Helper function for helper_integrated_phy_analog_init
+> +    fn helper_close_tstmode(dev: &mut phy::Device) -> Result {
+> +        dev.write(SMI_ADDR_TSTCNTL, TSTMODE_DISABLE)
+> +    }
+> +
+> +    /// Helper function for rockchip_config_init
+> +    fn helper_integrated_phy_analog_init(dev: &mut phy::Device) -> Resul=
+t {
+> +        Self::helper_init_tstmode(dev)?;
+> +        dev.write(SMI_ADDR_TSTWRITE, 0xB)?;
+> +        dev.write(SMI_ADDR_TSTCNTL, TSTCNTL_WR | WR_ADDR_A7CFG)?;
+> +        Self::helper_close_tstmode(dev)
+> +    }
+> +
+> +    /// Helper function for config_init
+> +    fn helper_config_init(dev: &mut phy::Device) -> Result {
+> +        let val =3D !MII_AUTO_MDIX_EN & dev.read(MII_INTERNAL_CTRL_STATU=
+S)?;
+> +        dev.write(MII_INTERNAL_CTRL_STATUS, val)?;
+> +        Self::helper_integrated_phy_analog_init(dev)
+> +    }
+> +
+> +    fn helper_set_polarity(dev: &mut phy::Device, polarity: u8) -> Resul=
+t {
+> +        let reg =3D !MII_AUTO_MDIX_EN & dev.read(MII_INTERNAL_CTRL_STATU=
+S)?;
+> +        let val =3D match polarity as u32 {
+> +            // status: MDI; control: force MDI
+> +            uapi::ETH_TP_MDI =3D> Some(reg & !MII_MDIX_EN),
+> +            // status: MDI-X; control: force MDI-X
+> +            uapi::ETH_TP_MDI_X =3D> Some(reg | MII_MDIX_EN),
+> +            // uapi::ETH_TP_MDI_AUTO =3D> control: auto-select
+> +            // uapi::ETH_TP_MDI_INVALID =3D> status: unknown; control: u=
+nsupported
+> +            _ =3D> None,
+
+Is receiving an invalid value not an error? I.e.
+
+    uapi::ETH_TP_MDI_AUTO | uapi::ETH_TP_MDI_INVALID =3D> None,
+    _ =3D> return Err(...)
+
+I know the current implementation came from the C version, just
+wondering about correctness here.
+
+> +        };
+> +        if let Some(v) =3D val {
+> +            if v !=3D reg {
+> +                return dev.write(MII_INTERNAL_CTRL_STATUS, v);
+> +            }
+> +        }
+
+In the match statement above - I think you can replace `=3D> None` with
+`=3D> return Ok(())` and drop the `Some(...)` wrappers. Then you don't
+need to destructure val here.
+
+> +        Ok(())
+> +
+> +    }
+> +}
+> +
+> +#[vtable]
+> +impl Driver for PhyRockchip {
+> +    const FLAGS: u32 =3D 0;
+> +    const NAME: &'static CStr =3D c_str!("Rockchip integrated EPHY");
+> +    const PHY_DEVICE_ID: DeviceId =3D DeviceId::new_with_custom_mask(0x1=
+234d400, 0xfffffff0);
+> +
+> +    fn link_change_notify(dev: &mut phy::Device) {
+> +    // If mode switch happens from 10BT to 100BT, all DSP/AFE
+> +    // registers are set to default values. So any AFE/DSP
+> +    // registers have to be re-initialized in this case.
+
+Comment indent
+
+> +        if dev.state() =3D=3D phy::DeviceState::Running && dev.speed() =
+=3D=3D uapi::SPEED_100 {
+> +            if let Err(e) =3D Self::helper_integrated_phy_analog_init(de=
+v) {
+> +                pr_err!("rockchip: integrated_phy_analog_init err: {:?}"=
+, e);
+> +            }
+> +        }
+> +    }
+> +
+> +    fn soft_reset(dev: &mut phy::Device) -> Result {
+> +        dev.genphy_soft_reset()
+> +    }
+> +
+> +    fn config_init(dev: &mut phy::Device) -> Result {
+> +        PhyRockchip::helper_config_init(dev)
+> +    }
+> +
+> +    fn config_aneg(dev: &mut phy::Device) -> Result {
+> +        PhyRockchip::helper_set_polarity(dev, dev.mdix())?;
+> +        dev.genphy_config_aneg()
+> +    }
+> +
+> +    fn suspend(dev: &mut phy::Device) -> Result {
+> +        dev.genphy_suspend()
+> +    }
+> +
+> +    fn resume(dev: &mut phy::Device) -> Result {
+> +        let _ =3D dev.genphy_resume();
+
+Why not `?` the possible error?
+
+> +
+> +        PhyRockchip::helper_config_init(dev)
+> +    }
+> +}
+>
+> --
+> 2.43.0
+>
+
+As Greg and Dragan mentioned, duplicate drivers are generally not
+accepted in-tree to avoid double maintenance and confusing config. Is
+there a specific goal?
+
+It is quite alright to request feedback on Rust drivers (and I have
+provided some) or even ask if anyone is willing to help test it out,
+but please use RFC PATCH and make it clear that this is for
+experimentation rather than upstreaming.
+
+Netdev has seemed relatively open to adding Rust drivers for new phys
+that don't have a C implementation, but these phys are of course
+tougher to find.
+
+Also for future reference, changes intended for the net tree should be
+labeled [PATCH v? net-next].
+
+Best regards,
+Trevor
 
