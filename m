@@ -1,121 +1,100 @@
-Return-Path: <netdev+bounces-67748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 726E5844DBD
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:19:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92DF6844DC0
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:20:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91FB21C25C4C
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 00:19:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4372EB22C71
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 00:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F5C2184;
-	Thu,  1 Feb 2024 00:19:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 507C7386;
+	Thu,  1 Feb 2024 00:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TQGgOwQa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9AE3386
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 00:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28428374;
+	Thu,  1 Feb 2024 00:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706746761; cv=none; b=LuwhoLKEoVxBhY6ytcNP4Dc2Y7K7aI4CSo26SDYrOel6u2AEquQQW3kxAcNmrPgFCMukZMSb1bQd4taicF0zRn15YLYW7eVMK7V7eiuq3KA1gad7yl6RnbDgsmfCfj3W+GUcrphksaLvyoYqkrUdUkF1Lgqecdmt1D6UgrkGH0I=
+	t=1706746829; cv=none; b=I0BhytaiRuAnJfvjKHos1AmEZ4xUSdqUiqt7AbCBQ6ywd/I23VAPuppLlvtITxBsm4wVUIF25LUtMShQiOizfQ3s00zH7lUNMbR+6BU0CvRsHi15csMnzA5/5bdEJ6fK1D/2w2RE88cAkkKG9sXXikWpVQ30UgDgG8IqX/fyY5s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706746761; c=relaxed/simple;
-	bh=SXoSUb25N4SIhzDyHycEEGGNHFWUa2jrgC425uOAoDk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S6tF0T5uPzjAcl+eDTinMpYSRCQkYQ6dvRwAb1MCxNmMHki6S/iNPoVu4mnpG7NJpBsv0dVxqLD9Wg3zZn18d+F6dRKpAF0zaDm41/NtHk2eatnQC3Iqk9Zb8+tEXIFX+F/z4wDXeB3dh5qbxUXmN9XSfMTC0a5CXtwAKmYW9RM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-68c794970d5so1746066d6.0
-        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 16:19:19 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706746758; x=1707351558;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JOGWXS4vIGOtPO57OizB9tZVNU4X/XL4dLBYqD+darE=;
-        b=DHuBT64leFU0rmBjxr24xdHeEPu1ccXX923eqlHi6EGH9t4JVwYYDFSOfyK9uPmyey
-         KvFMTtEzuz50QXtgCUt0Xzajul9Fg7zKXPHB9vD4OLzHD8HgHdyQZ+5JHElJhPR9WWu1
-         BVvkyE/1mn4/PRsL61N+TwW5wT11WJm7IkUnjJvWAhKnmjLTTQZnZI4Qcd8ofFNdp9nN
-         eRcHYV2gYXxc2+XYI9Umh2n+CPUrdrRFupKXIK95sSZ9A9lnnhYyMJtbHY+BRKAOpOcg
-         00/DwuyvoxX3oLExPzddlduq4CuBFytZEqB9LohU6Q5DRmR2b4uxWKvuyae93t7sRGvt
-         SC2w==
-X-Gm-Message-State: AOJu0YwfWjr5nA5r2n8xftffSVQlDahSdN1UaB+MIi4/A+wKnf3ArmHD
-	EjPlHjLMoLCh9rTzP9nKGxXeeq2OmghlBLgGCVtX6c6T6vp+D6VjK6PzIqZKjw==
-X-Google-Smtp-Source: AGHT+IFz2ZMJEVVJyslGbL2NC9jJRXeluErPH4TTAKBoKq5hLhQo2sNCISfpNnDx3bysA3PSYCdTaw==
-X-Received: by 2002:a0c:f3cb:0:b0:68c:5a3b:330f with SMTP id f11-20020a0cf3cb000000b0068c5a3b330fmr6629455qvm.0.1706746758679;
-        Wed, 31 Jan 2024 16:19:18 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUM/cFc6R6aZLbDsLKxeq42vMwKC0o7KnnDGJCJ3KsJJPmIYoFQ5SBpKU2Sbat2qv3A8jiuYLvVic3C0NCl1MXyn/r5kUL7DbN38/3NkhYv0d4+gLEnl4NOyrdW/+90eMg+x7A+3tggeoxVSZ+9uPhUgg5e5CyuytXUVms9rKmtsaUnU8BcLNdHQnBFzzNODgVRhhp/S/vyHVAV+7chsE/dfcMwc20O9d15aMpf/MxT3YTk7Lq0dcajFy1MACFnKiVvs3EYVwV4+LtZm4pDknbu6VEUi6lhMXIekjCHOsd09JGgB/spEReR/fyS3EwQg2DiX5GFfHJ/3ktzCsFxtInPQs/lb6FH6Y3NRWPS0B0uKaQUT+vxXTHq2hSbFJsNFoyVUA1zmPMVpviNmFcMXU42RrqO9WWuGy9q+3AXX3abD0/BV0Cxx7/hTd5+QwsvMeFF23vzfmX8TIHJ4ntDHNK6Dw==
-Received: from localhost (pool-68-160-141-91.bstnma.fios.verizon.net. [68.160.141.91])
-        by smtp.gmail.com with ESMTPSA id ob9-20020a0562142f8900b0068c56e0f8aesm2864309qvb.138.2024.01.31.16.19.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jan 2024 16:19:18 -0800 (PST)
-Date: Wed, 31 Jan 2024 19:19:16 -0500
-From: Mike Snitzer <snitzer@kernel.org>
-To: Tejun Heo <tj@kernel.org>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>,
-	Mikulas Patocka <mpatocka@redhat.com>, linux-kernel@vger.kernel.org,
-	dm-devel@lists.linux.dev, msnitzer@redhat.com, ignat@cloudflare.com,
-	damien.lemoal@wdc.com, bob.liu@oracle.com, houtao1@huawei.com,
-	peterz@infradead.org, mingo@kernel.org, netdev@vger.kernel.org,
-	allen.lkml@gmail.com, kernel-team@meta.com,
-	Alasdair Kergon <agk@redhat.com>
-Subject: Re: [PATCH 8/8] dm-verity: Convert from tasklet to BH workqueue
-Message-ID: <ZbrjhJFMttj8lh3X@redhat.com>
-References: <20240130091300.2968534-1-tj@kernel.org>
- <20240130091300.2968534-9-tj@kernel.org>
- <c2539f87-b4fe-ac7d-64d9-cbf8db929c7@redhat.com>
- <Zbq8cE3Y2ZL6dl8r@slm.duckdns.org>
- <CAHk-=wjMz_1mb+WJsPhfp5VBNrM=o8f-x2=6UW2eK5n4DHff9g@mail.gmail.com>
- <ZbrgCPEolPJNfg1x@slm.duckdns.org>
+	s=arc-20240116; t=1706746829; c=relaxed/simple;
+	bh=/VxkoqMjoE7DN9wE2kVN+Q8l8JnStP2ePctt+C58hR8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=jdECWYcYrnE3wjgqGlnxwPZYa2I/CoGoFNQDqHUT6XSWBCRZE8/84DMdwEoM6r9dnm8P4uhgs78sKRT57rcs8gO5H9Kt9UKzf5+R6pNlNFOft1Wqj2WC+JNRI2J7zz7zf/uT+eAqx01LM82bUCEm9HqX/aWx9rKin40ibAqytok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TQGgOwQa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8BB30C43390;
+	Thu,  1 Feb 2024 00:20:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706746828;
+	bh=/VxkoqMjoE7DN9wE2kVN+Q8l8JnStP2ePctt+C58hR8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TQGgOwQa1HrFRfb0GCdlXjNRLwUXX2nxq1RmI0+RAdkhkHWUgZaRNWAwb0Jw2GH9T
+	 U8nChjyD7uioUW6+aeLJsKbvvW3HiFTqYvZNIE1TsYjJZV2OC3m6TXQE2v5u7sR0+u
+	 g1rU/oBOxm2CZu5SwaC9gDdkMMU9H6gsITZjHTL1sIgYlIsQRym8KF4GlpY++TNLBs
+	 noNUyVD6GF22GY9kmXXRkK2UBm8zmNIP4c/1AEmh3U3TstXcYGfzg04Q/liINj5qXj
+	 SOVkjQxK8fSNTAGHtZmeQ3l1LEH6nLIwGG3SlrOns575RhuMME0iOANKPKV6SlZlQs
+	 KBfIc2vQ8tr2w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6D8CCDC99E6;
+	Thu,  1 Feb 2024 00:20:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZbrgCPEolPJNfg1x@slm.duckdns.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] net: dsa: mv88e6xxx: Fix failed probe due to
+ unsupported C45 reads
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170674682844.10400.9428070571469992334.git-patchwork-notify@kernel.org>
+Date: Thu, 01 Feb 2024 00:20:28 +0000
+References: <20240129224948.1531452-1-andrew@lunn.ch>
+In-Reply-To: <20240129224948.1531452-1-andrew@lunn.ch>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ davem@davemloft.net, vladimir.oltean@nxp.com, netdev@vger.kernel.org,
+ stable@vger.kernel.org, tmenninger@purestorage.com
 
-On Wed, Jan 31 2024 at  7:04P -0500,
-Tejun Heo <tj@kernel.org> wrote:
+Hello:
 
-> Hello, Linus.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 29 Jan 2024 23:49:48 +0100 you wrote:
+> Not all mv88e6xxx device support C45 read/write operations. Those
+> which do not return -EOPNOTSUPP. However, when phylib scans the bus,
+> it considers this fatal, and the probe of the MDIO bus fails, which in
+> term causes the mv88e6xxx probe as a whole to fail.
 > 
-> On Wed, Jan 31, 2024 at 03:19:01PM -0800, Linus Torvalds wrote:
-> > On Wed, 31 Jan 2024 at 13:32, Tejun Heo <tj@kernel.org> wrote:
-> > >
-> > > I don't know, so just did the dumb thing. If the caller always guarantees
-> > > that the work items are never queued at the same time, reusing is fine.
-> > 
-> > So the reason I thought it would be a good cleanup to introduce that
-> > "atomic" workqueue thing (now "bh") was that this case literally has a
-> > switch between "use tasklets' or "use workqueues".
-> > 
-> > So it's not even about "reusing" the workqueue, it's literally a
-> > matter of making it always just use workqueues, and the switch then
-> > becomes just *which* workqueue to use - system or bh.
+> When there is no device on the bus for a given address, the pull up
+> resistor on the data line results in the read returning 0xffff. The
+> phylib core code understands this when scanning for devices on the
+> bus. C45 allows multiple devices to be supported at one address, so
+> phylib will perform a few reads at each address, so although thought
+> not the most efficient solution, it is a way to avoid fatal
+> errors. Make use of this as a minimal fix for stable to fix the
+> probing problems.
 > 
-> Yeah, that's how the dm-crypt got converted. The patch just before this one.
-> This one probably can be converted the same way. I don't see the work item
-> being re-initialized. It probably is better to initialize the work item
-> together with the enclosing struct and then just queue it when needed.
+> [...]
 
-Sounds good.
- 
-> Mikulas, I couldn't decide what to do with the "try_verify_in_tasklet"
-> option and just decided to do the minimal thing hoping that someone more
-> familiar with the code can take over the actual conversion. How much of user
-> interface commitment is that? Should it be renamed or would it be better to
-> leave it be?
+Here is the summary with links:
+  - [net,v2] net: dsa: mv88e6xxx: Fix failed probe due to unsupported C45 reads
+    https://git.kernel.org/netdev/net/c/585b40e25dc9
 
-cryptsetup did add support for it, so I think it worthwhile to
-preserve the option; but it'd be fine to have it just be a backward
-compatible alias for a more appropriately named option?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Mike
+
 
