@@ -1,158 +1,140 @@
-Return-Path: <netdev+bounces-68018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CB738459CB
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 15:16:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6486D845A2C
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 15:24:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EE281C2230E
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 14:16:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 213B5293960
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 14:24:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 948CB5D48B;
-	Thu,  1 Feb 2024 14:15:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="oaocL2L0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DE235F480;
+	Thu,  1 Feb 2024 14:23:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95A835D47F;
-	Thu,  1 Feb 2024 14:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45CD4626A6
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 14:23:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706796959; cv=none; b=uxopQT7dE7KHITw8TwkHpUHeUNVrZaMmkb23G1rxFhac3nKKQe3dQsM37gzZndZGZDTGNR8v0aaYJ49IGpmiQ26qJicXly1edoxNofJRtVgX1ImhfZoFSMaZ1avOHRF2awWjYlt2eHsojwLUVkTwaFWULBDs9NoP8Ij2Ad2szU8=
+	t=1706797404; cv=none; b=vAe6MqpfTZ9DVuVNZnofKa3uoB6Dqc1kJW3e2ZycaIvB5WYxd8xtveyjc+Xl8SNOObq7vbFBbt44fkzHu/oeHY5kOHlFityM1saG9o+e2BsGc1jN1iPeCw/5o5G5i2iYgkDKwzOsJELKFnqMXN3pIj6ZgHcFtdMFjZKI6sOs0DE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706796959; c=relaxed/simple;
-	bh=IBgH0tB27y4jumRoQMdXPm5HdwQXC8IYWeN1SNZ9N8U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=RWhoxQG3Zkb21K4XSWlK3m+01+w64zQy8aHalLlhp6f0M35Y37Yi44eNMJEUzHe+NoD8LDlMgvjYUXksOMUBjg72VTs+ltY8rkT9Vi8p5Ih+1AcBuwibuxIdgCSqtDDLaOdN7KFD/7/OLDiI00BjqtQX8ZctR3Yf2aTD8n7dd58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=oaocL2L0; arc=none smtp.client-ip=198.47.23.248
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 411EFfZa122499;
-	Thu, 1 Feb 2024 08:15:41 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1706796941;
-	bh=J6flvXpOkXawJWzN/G+NmhHzqrhF472sihVACRH/ksM=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=oaocL2L0YFB2E/M/Mx3/J+AVekeYV3/SxFQxmP03dI+IyFr1AHCTLo7qmpgXN4a4i
-	 en3Xrd/L0oem5F1g3NVcsfl/EmRXe/XQdl4DPO/Y5bMeJPle4Qyp8VYbMLoe9S1WR2
-	 QS0OFNUhIcWkKPkw4B5vnKx04f/8Uk/UcwAT24Fw=
-Received: from DFLE103.ent.ti.com (dfle103.ent.ti.com [10.64.6.24])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 411EFfv3014842
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 1 Feb 2024 08:15:41 -0600
-Received: from DFLE105.ent.ti.com (10.64.6.26) by DFLE103.ent.ti.com
- (10.64.6.24) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 1
- Feb 2024 08:15:41 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE105.ent.ti.com
- (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 1 Feb 2024 08:15:41 -0600
-Received: from [10.249.129.226] ([10.249.129.226])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 411EFAoe050156;
-	Thu, 1 Feb 2024 08:15:18 -0600
-Message-ID: <0ff9f349-25f1-408c-b7f8-ffad035f427e@ti.com>
-Date: Thu, 1 Feb 2024 19:45:05 +0530
+	s=arc-20240116; t=1706797404; c=relaxed/simple;
+	bh=xzPlYSRThIaDCVbPeVhSq7kA3ynCPvfnGtpkJPCJyR8=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=WShfAOpNMneoYrLSD8HLX5i6pjDu7fq0qArsdzGZWz8f87K4CEtgKw7ivFpJEfHBgZTjl50BnFiNyWOwU+fNoaoFldHGV8A//26AZ1vDvJDva0TbOLlG0X3RcnouShRXcP7UNQ66O9+70SuUoO46V0UcWoIanMXm00N4WMWOhvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from ja.int.chopps.org.chopps.org (172-222-091-149.res.spectrum.com [172.222.91.149])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id 07B4A7D05A;
+	Thu,  1 Feb 2024 14:18:00 +0000 (UTC)
+References: <20231113035219.920136-1-chopps@chopps.org>
+ <20231113035219.920136-3-chopps@chopps.org> <ZVt7Nud5U5FbUJ3f@hog>
+User-agent: mu4e 1.8.14; emacs 28.2
+From: Christian Hopps <chopps@chopps.org>
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org, Steffen
+ Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org, Christian
+ Hopps <chopps@labn.net>
+Subject: Re: [RFC ipsec-next v2 2/8] iptfs: uapi: ip: add ip_tfs_*_hdr
+ packet formats
+Date: Thu, 01 Feb 2024 09:15:33 -0500
+In-reply-to: <ZVt7Nud5U5FbUJ3f@hog>
+Message-ID: <m2cytg6zfr.fsf@ja.int.chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next 1/2] net: ethernet: ti: Introduce
- inter-core-virt-eth as RPMsg driver
-To: Simon Horman <horms@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <andrew@lunn.ch>, <rogerq@kernel.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <s-vadapalli@ti.com>, <srk@ti.com>,
-        Ravi Gunasekaran <r-gunasekaran@ti.com>
-References: <20240130110944.26771-1-r-gunasekaran@ti.com>
- <20240130110944.26771-2-r-gunasekaran@ti.com>
- <20240201133001.GC530335@kernel.org>
-Content-Language: en-US
-From: Ravi Gunasekaran <r-gunasekaran@ti.com>
-In-Reply-To: <20240201133001.GC530335@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-Simon,
+--=-=-=
+Content-Type: text/plain; format=flowed
 
-On 2/1/2024 7:00 PM, Simon Horman wrote:
-> On Tue, Jan 30, 2024 at 04:39:43PM +0530, Ravi Gunasekaran wrote:
->> TI's K3 SoCs comprises heterogeneous processors (Cortex A, Cortex R).
->> When the ethernet controller is completely managed by a core (Cortex R)
->> running a flavor of RTOS, in a non virtualized environment, network traffic
->> tunnelling between heterogeneous processors can be realized by means of
->> RPMsg based shared memory ethernet driver. With the shared memory used
->> for the data plane and the RPMsg end point channel used for control plane.
+
+Sabrina Dubroca <sd@queasysnail.net> writes:
+
+> 2023-11-12, 22:52:13 -0500, Christian Hopps wrote:
+>> From: Christian Hopps <chopps@labn.net>
 >>
->> inter-core-virt-eth driver is modelled as a RPMsg based shared
->> memory ethernet driver for such an use case.
+>> Add the on-wire basic and congestion-control IP-TFS packet headers.
 >>
->> As a first step, register the inter-core-virt-eth as a RPMsg driver.
->> And introduce basic control messages for querying and responding.
->>
->> Signed-off-by: Siddharth Vadapalli <s-vadapalli@ti.com>
->> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
+>> Signed-off-by: Christian Hopps <chopps@labn.net>
 >> ---
->>  drivers/net/ethernet/ti/inter-core-virt-eth.c | 139 ++++++++++++++++++
->>  drivers/net/ethernet/ti/inter-core-virt-eth.h |  89 +++++++++++
->>  2 files changed, 228 insertions(+)
->>  create mode 100644 drivers/net/ethernet/ti/inter-core-virt-eth.c
->>  create mode 100644 drivers/net/ethernet/ti/inter-core-virt-eth.h
+>>  include/uapi/linux/ip.h | 17 +++++++++++++++++
+>>  1 file changed, 17 insertions(+)
 >>
->> diff --git a/drivers/net/ethernet/ti/inter-core-virt-eth.c b/drivers/net/ethernet/ti/inter-core-virt-eth.c
->> new file mode 100644
->> index 000000000000..d3b689eab1c0
->> --- /dev/null
->> +++ b/drivers/net/ethernet/ti/inter-core-virt-eth.c
->> @@ -0,0 +1,139 @@
->> +/* SPDX-License-Identifier: GPL-2.0 */
-> Hi Ravi and Siddharth,
->
-> The correct style for SPDX headers in .c files is a '//' comment:
->
-> // SPDX-License-Identifier: GPL-2.0
-
-I will fix this.
-
->> +/* Texas Instruments K3 Inter Core Virtual Ethernet Driver
->> + *
->> + * Copyright (C) 2024 Texas Instruments Incorporated - https://www.ti.com/
->> + */
-> ...
->
->> diff --git a/drivers/net/ethernet/ti/inter-core-virt-eth.h b/drivers/net/ethernet/ti/inter-core-virt-eth.h
-> ...
->
->> +struct icve_common {
->> +	struct rpmsg_device *rpdev;
->> +	spinlock_t send_msg_lock;
->> +	spinlock_t recv_msg_lock;
-> Spinlocks ought to come with an comment regarding what they lock.
-
-I will add the comments as reported by checkpatch.
-
->
->> +	struct message send_msg;
->> +	struct message recv_msg;
->> +	struct icve_port *port;
->> +	struct device *dev;
->> +} __packed;
+>> diff --git a/include/uapi/linux/ip.h b/include/uapi/linux/ip.h
+>> index 283dec7e3645..cc83878ecf08 100644
+>> --- a/include/uapi/linux/ip.h
+>> +++ b/include/uapi/linux/ip.h
+>> @@ -137,6 +137,23 @@ struct ip_beet_phdr {
+>>  	__u8 reserved;
+>>  };
+>>
+>> +struct ip_iptfs_hdr {
+>> +	__u8 subtype;		/* 0*: basic, 1: CC */
+>> +	__u8 flags;
+>> +	__be16 block_offset;
+>> +};
 >> +
->> +#endif /* __INTER_CORE_VIRT_ETH_H__ */
->> -- 
->> 2.17.1
->>
->>
+>> +struct ip_iptfs_cc_hdr {
+>> +	__u8 subtype;		/* 0: basic, 1*: CC */
+>> +	__u8 flags;
+>> +	__be16 block_offset;
+>> +	__be32 loss_rate;
+>> +	__u8 rtt_and_adelay1[4];
+>> +	__u8 adelay2_and_xdelay[4];
+>
+> Given how the fields are split, wouldn't it be more convenient to have
+> a single __be64, rather than reading some bits from multiple __u8?
 
-Ravi
+Changed this to __be64.
+
+
+>> +	__be32 tval;
+>> +	__be32 techo;
+>> +};
+>
+> I don't think these need to be part of uapi. Can we move them to
+> include/net/iptfs.h (or possibly net/xfrm/xfrm_iptfs.c)? It would also
+> make more sense to have them near the definitions for
+> IPTFS_SUBTYPE_*. And it would be easier to change how we split and
+> name fields for kernel consumption if we're not stuck with whatever we
+> put in uapi.
+
+I saw this also as the place documenting the packet format. Userland can have raw packets delivered to them... Mostly though I was following the pattern that existed already.
+
+Thanks,
+Chris.
+
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmW7qBgSHGNob3Bwc0Bj
+aG9wcHMub3JnAAoJEC4dgw7XuDAlrssP/jzGlqlXyw3goL7c111yUl5+zYdBREs0
+puBZPuQBRyZp6r7y2r5+fmIRXdOsVXUKYiZOeinJfRyR2x6bRu2GeJAsDOC8QE0o
+N4vmhJkWMKlEz9na0kT0dUA+6/fot6F+GBgyQSAQsA6pvhC3TduSWQzIXxJz3bc0
+yYCQTjX52eFLUlGb3w5kEbhwk1iIA4PSFLnYsgzVFSl6fTngNIsj2rMRXogxewUV
+MG/ipFvXwckRGM3R4BXI4bWXG5AeIagMmpdklAe/TFyklaaI+amTl9ucZ89bb9bt
+zOiORxM2KVEi0xSSNZnMFf4i3Er5/c2IcHQVGjP6m9OMiiNWz2gAGR5K3ouS+gbr
+GYoQwx3mQm9GfmnuXXH0ieYDRhbiJnR/mFMH6/Fw5fQhN2RKrVfhal/8xdFhpU2E
+EDOjacgNLquE8dV8EB9cdHTC2oDzto8ZmnNpOOb4iq3KWBrp2Iby+fyIGLPpLKuY
+xlUVhHHdh2ZFpPBru+6Rlw05Lv+zRjcfOuRx4zwxy2chAoj3RsdWnBmQnjtJJzm+
+pFYSwc0jiLGoXJRk7iJjA4kq2y3N1TApWJZZXW2WvlEH/u0i2SShhY5o7p1Z0PHg
+d5Du3KHx9yd5xtt3Grzy94Z+WBGp1sdohyaZfPGmp/tSyO2fZsPqVdivDrKclRfp
+6OnrS723g9eN
+=UGt1
+-----END PGP SIGNATURE-----
+--=-=-=--
 
