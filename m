@@ -1,134 +1,139 @@
-Return-Path: <netdev+bounces-68008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23CDE84595C
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 14:53:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03EC684595D
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 14:53:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D012028E7F7
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:53:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88C93B28A09
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:53:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE1455CDF9;
-	Thu,  1 Feb 2024 13:52:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D195D46B;
+	Thu,  1 Feb 2024 13:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="dlhPWdiC";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="vKmhuTm8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RULfAaSW"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A67162142
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 13:52:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E358F5336B
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 13:53:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706795566; cv=none; b=J8V+ZhPq+thGtMofPDuycvipjPIRb/WnQtP3H5/lyZgrWiRfNZYac28K85oBouJjS46Y0kkCtH/q5Hp1rEmqH9fWIiv47sI631asDJYL1afnlKK4gvj4qIw1KRixPWNiXgZAyhKVwqdfFE+f0bY856PW5HuPiqjBCwjpG6z3soQ=
+	t=1706795598; cv=none; b=hHgarWKQwPwR6KWiJWdj7FXD83p2l6w7ralF5XXutvJb4Mq9ulIAbwfWAy2ykiiVaT5RQtyYQSL/HoB26+KMtjI8TSSl8K37xMYq6axdQnjOO5Y2eYfYYw8JuUPETFjVW07CHTItq4jaSLL21iLBuf5TdPwn2cqRnSbvOXWp6+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706795566; c=relaxed/simple;
-	bh=ZO/j1j+9+A7qCam99/oB4Ql7Kg/x1VdfoAEYRYpx2Jk=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=fPNKs/7fg0sIhO5EhgAxe0hTFJi2gqiMq5kSfiVKDV+boJzp6KrIRykpYGb4p2yGf9FzGsQQNmXX4UfPRoiPn/RQ59eBCxRkplbnzjv9YKAnlAKgvf8CpiPgMRPeXDd2px+rviRHXsEUuLBVOnvNGSlApDrlupOTNUgMtK+uV6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=dlhPWdiC; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=vKmhuTm8; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1706795563;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OogcyfdpfTs2059FyNWKDfxdIMwy/Wf0EdjSpwPuYeE=;
-	b=dlhPWdiCX0eaW2qNQyddeSpThyxY92nMpXXL/5IKXzLU3RFYpG7gCCumDyqE3HeT1unFKn
-	oqBh57oY+KsFVd1TsLlBp+k14+L5qaeSCt5TRyy/AtiamWMP7N0SEkmCsz7mGSsbii19hH
-	FUvOvfj4mCooZ+fcoGDjMpge1wR02I9eXF09cFWFhN/lz6SlCectKN06JdeCDED/7+2B0K
-	IjLiXeqvG7+uXYg+QwiYH+9UsRNiWRHIJNhYtDNu9YJRXa36+hKnL8uFU76Em4kS1tIptw
-	Vng+XGCLGA8g1Hq9rwNK1BT/DHroWg5DLKBJzuvcAjqgn+twT5S64MaPuNdKMQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1706795563;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OogcyfdpfTs2059FyNWKDfxdIMwy/Wf0EdjSpwPuYeE=;
-	b=vKmhuTm8LPRD4Pbbmw+xL2YJER7/u+Fy4uX1bbib+SSz36wARLM0OhQy8PeF46EpD+3lAG
-	Qr/7R7IQ9Gz/aTCQ==
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Vinicius Costa Gomes
- <vinicius.gomes@intel.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: Re: [PATCH iwl-next v2] igc: Add support for LEDs on i225/i226
-In-Reply-To: <3629e504-4c22-4222-b218-32c9945ff77e@lunn.ch>
-References: <20240201125946.44431-1-kurt@linutronix.de>
- <3629e504-4c22-4222-b218-32c9945ff77e@lunn.ch>
-Date: Thu, 01 Feb 2024 14:52:41 +0100
-Message-ID: <87wmro70ly.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1706795598; c=relaxed/simple;
+	bh=sq1cWvyVkdX2fs4Z/aiPzFVgCCfswu7HDAiJGcCDW+M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ATm84iTOz15IhioxssgHh7g6p0aZkiwGhJqaPKZSRt25c2erQOb3thPJTm7uXmc5ZXRGPXKMO0YyZV2q0tK0I5xqX2huZTh2x6WsPuzsIN7RRoSbdXhrUyjcP6+oowq3RE5mglqk/YardvXePg3a4rSbdfFeZcfXogEdH8fB0HA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RULfAaSW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41027C433C7;
+	Thu,  1 Feb 2024 13:53:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706795597;
+	bh=sq1cWvyVkdX2fs4Z/aiPzFVgCCfswu7HDAiJGcCDW+M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RULfAaSW0cBus6P0eYfypAFaGeMTtqv6IhRSWWUSYZ2g7CHObq96HIcTIWIz4stsB
+	 1R8LpvDOabl+TO3Ei/1QTk25OPe6A6A6catrjsz+PpS70b9ibg1gXBsOG5iEfinF27
+	 Y3gdoQsd8XJKIHXlAU4xCHwUBdmc9TSRYyxMVRrxe8taojdla1yFe/If1IpIJBC9Rp
+	 KY3n6G7EMkUZqFhMnIoBYosG6fcZ77XDZrTN/GLMLj8MTwQQBG2WYiDkjjRzKlt3RA
+	 S6XgOxMRYIfL4SU9+fRrtErrE2CkJnAPnWOx8XD+3iHkRxONSSpQX9vNiqTOMyexRq
+	 xXyz9jfzhUfyQ==
+Date: Thu, 1 Feb 2024 14:53:11 +0100
+From: Simon Horman <horms@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, edumazet@google.com, vadim.fedorenko@linux.dev,
+	arkadiusz.kubalewski@intel.com, saeedm@nvidia.com, leon@kernel.org,
+	jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+	rrameshbabu@nvidia.com
+Subject: Re: [patch net-next v2 1/3] dpll: extend uapi by lock status error
+ attribute
+Message-ID: <20240201135311.GE530335@kernel.org>
+References: <20240130120831.261085-1-jiri@resnulli.us>
+ <20240130120831.261085-2-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240130120831.261085-2-jiri@resnulli.us>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+On Tue, Jan 30, 2024 at 01:08:29PM +0100, Jiri Pirko wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
+> 
+> If the dpll devices goes to state "unlocked" or "holdover", it may be
+> caused by an error. In that case, allow user to see what the error was.
+> Introduce a new attribute and values it can carry.
+> 
+> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+> Acked-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
-On Thu Feb 01 2024, Andrew Lunn wrote:
-> On Thu, Feb 01, 2024 at 01:59:46PM +0100, Kurt Kanzenbach wrote:
->> Add support for LEDs on i225/i226. The LEDs can be controlled via sysfs
->> from user space using the netdev trigger. The LEDs are named as
->> igc-<bus><device>-<led> to be easily identified.
->>=20
->> Offloading link speed is supported. Other modes are simulated in software
->> by using on/off. Tested on Intel i225.
->>=20
->> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
->> ---
->>=20
->> Changes since v1:
->>=20
->>  * Add brightness_set() to allow software control (Andrew)
->>  * Remove offloading of activity, because the software control is more f=
-lexible
->
-> Please could you expand on that. Activity is quite expensive in
-> software, since it needs to get the statistics every 50ms and then
-> control the LED. So if activity can be offloaded, it should
-> be. Sometimes the hardware can only offload a subset of activity
-> indications, which is fine. It should implement those it can, and
-> leave the rest to software.
+The nit below notwithstanding, this looks good to me.
 
-Activity can be offloaded to HW only with Tx and Rx combined. Individual
-Rx or Tx activity is not supported. But sure, when a user selects Rx and
-Tx it can be offloaded, if it's too expensive doing it in software.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Thanks,
-Kurt
+...
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
+> diff --git a/include/uapi/linux/dpll.h b/include/uapi/linux/dpll.h
+> index b4e947f9bfbc..0c13d7f1a1bc 100644
+> --- a/include/uapi/linux/dpll.h
+> +++ b/include/uapi/linux/dpll.h
+> @@ -50,6 +50,35 @@ enum dpll_lock_status {
+>  	DPLL_LOCK_STATUS_MAX = (__DPLL_LOCK_STATUS_MAX - 1)
+>  };
+>  
+> +/**
+> + * enum dpll_lock_status_error - if previous status change was done due to a
+> + *   failure, this provides information of dpll device lock status error. Valid
+> + *   values for DPLL_A_LOCK_STATUS_ERROR attribute
+> + * @DPLL_LOCK_STATUS_ERROR_NONE: dpll device lock status was changed without
+> + *   any error
+> + * @DPLL_LOCK_STATUS_ERROR_UNDEFINED: dpll device lock status was changed due
+> + *   to undefined error. Driver fills this value up in case it is not able to
+> + *   obtain suitable exact error type.
+> + * @DPLL_LOCK_STATUS_ERROR_MEDIA_DOWN: dpll device lock status was changed
+> + *   because of associated media got down. This may happen for example if dpll
+> + *   device was previously locked on an input pin of type
+> + *   PIN_TYPE_SYNCE_ETH_PORT.
+> + * @DPLL_LOCK_STATUS_ERROR_FRACTIONAL_FREQUENCY_OFFSET_TOO_HIGH: the FFO
+> + *   (Fractional Frequency Offset) between the RX and TX symbol rate on the
+> + *   media got too high. This may happen for example if dpll device was
+> + *   previously locked on an input pin of type PIN_TYPE_SYNCE_ETH_PORT.
+> + */
+> +enum dpll_lock_status_error {
+> +	DPLL_LOCK_STATUS_ERROR_NONE = 1,
+> +	DPLL_LOCK_STATUS_ERROR_UNDEFINED,
+> +	DPLL_LOCK_STATUS_ERROR_MEDIA_DOWN,
+> +	DPLL_LOCK_STATUS_ERROR_FRACTIONAL_FREQUENCY_OFFSET_TOO_HIGH,
 
------BEGIN PGP SIGNATURE-----
+nit: I'm all for descriptive names,
+     but this one is rather long to say the least.
 
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmW7oikTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgo05EACnxY2U5Iw6L1XYr4uU+ERxEyZ6f582
-8Ro2QsR+RDgq0R4mEXRM2t1bb/665o6yEqCuk/rLVK6bIigowuUtyznqkZ/bXUtr
-a09pa2o8gB5skWueeTVZh2HwWrEIFuHAa2gs5kR+dokEAO4rDupGZjrX52l46I8F
-6A/w51tbM5vrGqdOwsKcw+nk1BPyhd+zNHSHIJaQICx6fSQ5BwMEcijcbKa8xlyV
-RhFSkFlyoESrk9oghfZUiwRHokFwmM7Z+F9GvbRzj5htCEyxZC7PhPu1Hhte3iE7
-Efk4fa8lYsvrctwO+3h7CsigY7qidjO9W5tRtkUBfLA4Qy8uTk7+5YAvhGhnZOpE
-d0wM7nLSjjK09DS7BVPQfQsAbGJQy/HBNt1xx3MqFFA/tnZ78pM0h9YGjw8euJxO
-R1p2Cp4P8bNklmnFpAErI9hU32mGDN+7cL6/IOBvuZeXL4UX4gpuUtyoT7rmx4Fo
-8pkCuIyeEM1DvrLDqfsPZOkPF/PHhieOmMwrqAVJXejdjk+YBDdSpZzfrUE6DwZs
-Kd86lO/8WY4ja2PjZpuZvZDapufU/QQhLy9i6fHo/wtBhVknlV4fRa7rXp7GtvS1
-huNrznEGYYFeMC6p8rbrm5sPmYjQq7KoopfA6mDWvCAS57mbx+F9fMCjvxSY+CTv
-ThPsezdBBIWvrg==
-=ZhtF
------END PGP SIGNATURE-----
---=-=-=--
+> +
+> +	/* private: */
+> +	__DPLL_LOCK_STATUS_ERROR_MAX,
+> +	DPLL_LOCK_STATUS_ERROR_MAX = (__DPLL_LOCK_STATUS_ERROR_MAX - 1)
+> +};
+> +
+>  #define DPLL_TEMP_DIVIDER	1000
+>  
+>  /**
+> @@ -150,6 +179,7 @@ enum dpll_a {
+>  	DPLL_A_LOCK_STATUS,
+>  	DPLL_A_TEMP,
+>  	DPLL_A_TYPE,
+> +	DPLL_A_LOCK_STATUS_ERROR,
+>  
+>  	__DPLL_A_MAX,
+>  	DPLL_A_MAX = (__DPLL_A_MAX - 1)
+> -- 
+> 2.43.0
+> 
+> 
 
