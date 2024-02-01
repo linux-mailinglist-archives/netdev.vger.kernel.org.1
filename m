@@ -1,84 +1,82 @@
-Return-Path: <netdev+bounces-68078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82490845CD2
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:16:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61166845C70
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:03:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB508B315B9
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:01:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9390A1C285B8
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:03:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D638B626BA;
-	Thu,  1 Feb 2024 15:58:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5CE177A19;
+	Thu,  1 Feb 2024 16:02:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="VbdGFprx"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="iEdHyO8D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E065F47B
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 15:58:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E87D77A09
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 16:02:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706803099; cv=none; b=htwYVBfpcAzSPXcUJ68KC+zxV83qUmVFY/nvisNUafRM6jD2NpxkZ4BjyhLsWZIOw+tbW52xjZfBqumKKHXWbwXxKwPLFVL1qnh2Awox+EU4wuMqIA18pL7U+rq10MskGlHO0EsN8tgs6zxYc7ncpS04ReU3VYWei4lSlNBj3+8=
+	t=1706803345; cv=none; b=OegRQkDR4ILdG8m5UlsK4Je9rzclKYRP+RV41tkshw5wCrSl3mOeohCQdX9nOJUlztG/ovguN6EHq2/T3JEUwlafBr2qx5fpD7CCeS4CcFU5Y+zKHuUzaN0u/+F3qEC396e88gCNl9yQr10ok37AuyiIqra18xB6Hy6WaH/9DLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706803099; c=relaxed/simple;
-	bh=ozXxsLBjFZrfleXBGW9rOCSjqD+GK7DvzmkvFe3txRE=;
+	s=arc-20240116; t=1706803345; c=relaxed/simple;
+	bh=U24fXnRqD3dOh5+P6dppxxAVP72lv89006UrPUI/kuc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BMUNwweTh4E/ZOsDpgWNoBx61GZkQlAgMDxseR72JyJVSiplKCuyaU3QfnyLGQynjnAflvpTFqZaFDYPFhptuY5uOUr6jW52+OXzCq6Cd1bePFRlnLpHjSIl4DjfoT8m6ZqllaRzvPR3rrQgPhuxASaNSw9X3AvSaHZYlawRNP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=VbdGFprx; arc=none smtp.client-ip=209.85.128.67
+	 Content-Type:Content-Disposition:In-Reply-To; b=cnNVKFenDRBKzlZpShSVrCWOdRrXaAaU6JkRy5QKR9tJdh9imzX1nK28kc2Rf1K8Y76C280MriOD8n3S0kx9kaToBoUlfwSLz+/PkUybgfiT/Evga29+EKFjN9mXS4UuXyDuj55MKRMcq1Krr32VQJ8nhfLI1ZMaqPMR3shXUmA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=iEdHyO8D; arc=none smtp.client-ip=209.85.221.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-40fc352d2e2so1668655e9.2
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 07:58:16 -0800 (PST)
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3394bec856fso1443406f8f.0
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 08:02:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706803095; x=1707407895; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706803342; x=1707408142; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zb2N1SjFXrCezi0DdrzWDAreAVNvluHnD5YFqaNLg/Y=;
-        b=VbdGFprxgQA2cTKQj+yVOqrzSxPmSL5Ot5ynbQs//Wmylf5fJhnqWPPsR3KTvWibPs
-         Zq/M5GfEM+zu6LGz80kGYp1rY5AoN3QSP4Ep0oOUDe4xSHXqi1+WOrMrs6MTURAwcJzm
-         p/9d3I9Ymx8erp208FUw+0pE2lwTJVu+AZuu8krybUktGsUUnbcqkIYznPXoUPxEE6Yt
-         vhnTCF+PC10J16Q6llp022ltBv545u6H2St0kZpNvk4qMrJEMvO1/4yk0+sMVlMOtWc6
-         jAv2vOvCGkzj0xo8ciBdSV11AtAP1+eWXWaibrUhYhT8fvpO8GuulYJY+L3lm2q1Ycsm
-         uPEA==
+        bh=HOnhFau+Mczj5sTvCdYfAZH4E5T76nRZ5OXsZ+LtuLo=;
+        b=iEdHyO8DvStN1nUNrAXFbkzwD6UcZxqect9x1/R5GqJUnmCRe9N+iCKRhyc8iY5RT4
+         yvoBhM2nZbNCk/b29bjNjQilU/ifvkeJI7G14XxQtZqQ5TPv6tbRlG6Rr/14a9J4NnXS
+         7GS+GSMFSQTemix2+SUSiHf0f4vVIfduGaQlkaYpwYSu5J0SgpKSE02uy61hkM0EJ+6+
+         oulBPRfTdNhyGTBXRZyzlX3CL8XvjgUKRkY0XNuGLU330kxNhQ+c4Uts26OFrujuZsjA
+         jJDYIVWt0Ed14YWaC6VOimymt+iVyqZLAdYVECX5Cre5+N2l5VcqIafR7cr6LDJJYEP7
+         6QrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706803095; x=1707407895;
+        d=1e100.net; s=20230601; t=1706803342; x=1707408142;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=zb2N1SjFXrCezi0DdrzWDAreAVNvluHnD5YFqaNLg/Y=;
-        b=wPf2vGC/b4J7i8lQFhHb/7Ukf+4LKtA88rSCzPDeZCGw+xNDAAhIex94nJ9qWoQmpM
-         BVvvCrJNwh+vpiHvTpeqqp/DcmcOuCEVd8QkEsv1ewYGZjWY40HWtKgEoPgdGQ+LDvpe
-         9AahCztey0ysY/sVCNwZo7m2woHGa09NcU4zYEhaj509M0b/xgUC1uo8a7f55omKvMRo
-         o/e1lRhgQWzQs7/qBWannVJn6jvc0B7ptwZ7DzUgL6Q3ICOUWq+5kDR95ZUEXIEk9uV/
-         cryCxVXwL5unmngMtSMnLVkJlMAqXBglVt89t+Wku8u1pUYyqlsd8iRDcBH2wa7xvMOp
-         nvhg==
-X-Gm-Message-State: AOJu0YzdmX3vVBPqtIHbThVHTZEw6rjQgJ4bkFg4hd6fy+oVaaVHHfq3
-	qKjEcn3d5x7mjqmUm56jt1/9GVEmQqOhIV7q0E/mp+L6l6d7Q9PbxGi6YpJZseIHBgC+szczEaO
-	lSp7ObQ==
-X-Google-Smtp-Source: AGHT+IFHyevawAIt4/49GDyezXA9WB+8DVF5/C/y1gWx5XY8NHEi0DDUf5DUfrgDT3T8+Vb2xqs2VQ==
-X-Received: by 2002:a05:600c:a384:b0:40f:bc67:49ec with SMTP id hn4-20020a05600ca38400b0040fbc6749ecmr1417680wmb.40.1706803095384;
-        Thu, 01 Feb 2024 07:58:15 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVZE3CmS3I509/B+4D1+SyEV9MQ8wzMOeJgw+9jwr4NcwqTvYe4NELBai7km6wiv2eS9ZL/xzCUotLn5uj1Hn5tzLmKGGXIKKYSSmLHcO2QJZ2taHj3WNBJOIll3SbqGezG4sr9D6zSW//jDPmeJTky8Y6iQsH9RTPJ2TL09YoCT4/vMVP7iVEyOVSGqJXpf4f2Ebguu9raToFCQsIkYIZYUGXYUptCrFH7eNf30pfI81N5he23yKQNPKBEznMloI2e29/h4XazUkOVFtCbfAR/zy5whRzrBuEAOzdbvhRG66Zi1sq9ZISL01yn69N0gZ99l3iocsRDKH5op7SFUyHiTe7vNF9IsfA=
+        bh=HOnhFau+Mczj5sTvCdYfAZH4E5T76nRZ5OXsZ+LtuLo=;
+        b=AjuGLd0HlSDY1Y/sVXQq5nrbtvcnP+Dw8pKjTjzqTo/T4Igw8TyIq13DJYZlJyPxCu
+         EblfOPC2+Gg8Mac0/XOqEJ1ndU81H0TxJu3Bd2o1Mr9BRT8Cmi3DIrrq15/+oFWJdfTK
+         WqzWOoQ6PSgiskvfL5Q5MpVl113EXei2XPMeQj+HhDNQqG0razhABwaOaOm4i6qCzF54
+         R+sRMr6ZzF+aG2CWwt8cYfMkWSU9miSdOibIMN06zHodYSTUXWy2+JuneV+wBopG5ETF
+         P8Nc63EYRYPfAfGcxT0pSn6onL0Eo4VBFeP/53nm+lJUI8h/uUGbVBTMxpdvqsTskLH9
+         XvYA==
+X-Gm-Message-State: AOJu0Yxdln1yKnbpmd3SdSoFFN00cwprUsYO+/KUz2qv9DcHEVElwEL2
+	jJs6dPEDhk2MFawYsg7OWyD0TUkFI1K2vET/wd42w3R1i9V+dEXe7qzoM0CBfR8=
+X-Google-Smtp-Source: AGHT+IEhPCyMcjo+bIKLNhPT2rEIpC1fE3T0Xn3OKMkuAbGB4/W1gfryxjECtWwFqOrjrczet4m2Xw==
+X-Received: by 2002:adf:e8c2:0:b0:33a:f277:8f6 with SMTP id k2-20020adfe8c2000000b0033af27708f6mr7541335wrn.14.1706803342109;
+        Thu, 01 Feb 2024 08:02:22 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUso9ydzZ8gdGjO73/U9lNujpuXhy9lYTJ0tvKFLzKScdRJ59qLqPz3BRG1QmpivZubMtbuPqGiOV9GCr9PP0keXKnO2a/r0iuHtRDzfDLZ4jVd2FD3yqiWJu0gB06CrB70Aei8IR2WWs3mmLqhZMT+jRL4md5AXF9I0pfW2xBLrXfnJbzGwKaSCPJhTFb6arOtbn51Qm/zwtEb8B2jnppE8Jy4YAQmloiRO0/7weh8dIl0KcuNu7VUweWKFHhKlfGTF0K5LWFMPnWQT9jC8axiDhhFu2oxfssczbuCVL2D9CveZotUpLdhktQkCKb4Smt7bzCYSnjeYb11Jfn8Go04xYi9t+syVd+NSFx4Y+8zirJZkv7hPZqvHMJbl6OUfg0osFtV
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id w13-20020a05600c474d00b0040ec66021a7sm15206wmo.1.2024.02.01.07.58.14
+        by smtp.gmail.com with ESMTPSA id cx16-20020a056000093000b00337d5cd0d8asm16469273wrb.90.2024.02.01.08.02.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 07:58:14 -0800 (PST)
-Date: Thu, 1 Feb 2024 16:58:12 +0100
+        Thu, 01 Feb 2024 08:02:21 -0800 (PST)
+Date: Thu, 1 Feb 2024 17:02:18 +0100
 From: Jiri Pirko <jiri@resnulli.us>
-To: wangkeqi <wangkeqi_chris@163.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, fw@strlen.de,
-	wangkeqi <wangkeqiwang@didiglobal.com>,
-	kernel test robot <oliver.sang@intel.com>, fengwei.yin@intel.com
-Subject: Re: [PATCH net v4] connector: cn_netlink_has_listeners replaces
- proc_event_num_listeners
-Message-ID: <Zbu_lBFkeb8NUIek@nanopsycho>
-References: <20240131014459.411158-1-wangkeqi_chris@163.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+	edumazet@google.com, Andrew Morton <akpm@linux-foundation.org>,
+	Mahesh Bandewar <maheshb@google.com>, weiwan@google.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	horms@kernel.org, andrew@lunn.ch, leit@fb.com
+Subject: Re: [PATCH] blackhole_dev: Fix buil warning
+Message-ID: <ZbvAigcKvxTLjHrr@nanopsycho>
+References: <20240201133238.3089363-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,212 +85,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240131014459.411158-1-wangkeqi_chris@163.com>
+In-Reply-To: <20240201133238.3089363-1-leitao@debian.org>
 
-Wed, Jan 31, 2024 at 02:44:59AM CET, wangkeqi_chris@163.com wrote:
->From: wangkeqi <wangkeqiwang@didiglobal.com>
+s/buil/build/ in the subject.
 
-Care to fix your name please?
+Also, indicate which tree are you targetting. In this case, should be:
+[patch net-next] xxx
 
 
+Thu, Feb 01, 2024 at 02:32:37PM CET, leitao@debian.org wrote:
+>lib/test_blackhole_dev.c sets a variable that is never read, causing
+>this following building warning:
 >
->It is inaccurate to judge whether proc_event_num_listeners is
->cleared by cn_netlink_send_mult returning -ESRCH.
->In the case of stress-ng netlink-proc, -ESRCH will always be returned,
->because netlink_broadcast_filtered will return -ESRCH,
->which may cause stress-ng netlink-proc performance degradation.
->If the judgment condition is modified to whether there is a listener.
-
-This sentence does not sound complete.
-
-
->proc_event_num_listeners will still be wrong due to concurrency.
->So replace the counter with cn_netlink_has_listeners
-
-I'm reading the whole patch description for 5th time, I still don't
-understand it :(
-
-
+>	lib/test_blackhole_dev.c:32:17: warning: variable 'ethh' set but not used [-Wunused-but-set-variable]
 >
->Reported-by: kernel test robot <oliver.sang@intel.com>
->Closes: https://lore.kernel.org/oe-lkp/202401112259.b23a1567-oliver.sang@intel.com
->Fixes: c46bfba1337d ("connector: Fix proc_event_num_listeners count not cleared")
->Signed-off-by: wangkeqi <wangkeqiwang@didiglobal.com>
+>Remove the variable struct ethhdr *ethh, which is unused.
+>
+>Fixes: 509e56b37cc3 ("blackhole_dev: add a selftest")
+>Signed-off-by: Breno Leitao <leitao@debian.org>
 
-Same here.
+The patch itself looks good. Feel free to attach
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+with the v2 with fixed subject. Thanks!
 
 
->Cc: fengwei.yin@intel.com
->Cc: fw@strlen.de
 >---
-> drivers/connector/cn_proc.c   | 33 +++++++++++++++++++++------------
-> drivers/connector/connector.c |  9 +++++++++
-> include/linux/connector.h     |  1 +
-> 3 files changed, 31 insertions(+), 12 deletions(-)
+> lib/test_blackhole_dev.c | 3 +--
+> 1 file changed, 1 insertion(+), 2 deletions(-)
 >
->diff --git a/drivers/connector/cn_proc.c b/drivers/connector/cn_proc.c
->index 3d5e6d705..4898e974c 100644
->--- a/drivers/connector/cn_proc.c
->+++ b/drivers/connector/cn_proc.c
->@@ -85,6 +85,16 @@ static int cn_filter(struct sock *dsk, struct sk_buff *skb, void *data)
-> 	return 1;
-> }
-> 
->+static int cn_netlink_has_listeners(void)
->+{
->+	struct sock *sk = get_cdev_nls();
->+
->+	if (sk)
->+		return netlink_has_listeners(sk, CN_IDX_PROC);
->+	else
->+		return 0;
->+}
->+
-> static inline void send_msg(struct cn_msg *msg)
+>diff --git a/lib/test_blackhole_dev.c b/lib/test_blackhole_dev.c
+>index 4c40580a99a3..f247089d63c0 100644
+>--- a/lib/test_blackhole_dev.c
+>+++ b/lib/test_blackhole_dev.c
+>@@ -29,7 +29,6 @@ static int __init test_blackholedev_init(void)
 > {
-> 	__u32 filter_data[2];
->@@ -108,9 +118,8 @@ static inline void send_msg(struct cn_msg *msg)
-> 		filter_data[1] = 0;
-> 	}
+> 	struct ipv6hdr *ip6h;
+> 	struct sk_buff *skb;
+>-	struct ethhdr *ethh;
+> 	struct udphdr *uh;
+> 	int data_len;
+> 	int ret;
+>@@ -61,7 +60,7 @@ static int __init test_blackholedev_init(void)
+> 	ip6h->saddr = in6addr_loopback;
+> 	ip6h->daddr = in6addr_loopback;
+> 	/* Ether */
+>-	ethh = (struct ethhdr *)skb_push(skb, sizeof(struct ethhdr));
+>+	skb_push(skb, sizeof(struct ethhdr));
+> 	skb_set_mac_header(skb, 0);
 > 
->-	if (cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
->-			     cn_filter, (void *)filter_data) == -ESRCH)
->-		atomic_set(&proc_event_num_listeners, 0);
->+	cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
->+			     cn_filter, (void *)filter_data);
-> 
-> 	local_unlock(&local_event.lock);
-> }
->@@ -122,7 +131,7 @@ void proc_fork_connector(struct task_struct *task)
-> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
-> 	struct task_struct *parent;
-> 
->-	if (atomic_read(&proc_event_num_listeners) < 1)
->+	if (!cn_netlink_has_listeners())
-> 		return;
-> 
-> 	msg = buffer_to_cn_msg(buffer);
->@@ -151,7 +160,7 @@ void proc_exec_connector(struct task_struct *task)
-> 	struct proc_event *ev;
-> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
-> 
->-	if (atomic_read(&proc_event_num_listeners) < 1)
->+	if (!cn_netlink_has_listeners())
-> 		return;
-> 
-> 	msg = buffer_to_cn_msg(buffer);
->@@ -176,7 +185,7 @@ void proc_id_connector(struct task_struct *task, int which_id)
-> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
-> 	const struct cred *cred;
-> 
->-	if (atomic_read(&proc_event_num_listeners) < 1)
->+	if (!cn_netlink_has_listeners())
-> 		return;
-> 
-> 	msg = buffer_to_cn_msg(buffer);
->@@ -213,7 +222,7 @@ void proc_sid_connector(struct task_struct *task)
-> 	struct proc_event *ev;
-> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
-> 
->-	if (atomic_read(&proc_event_num_listeners) < 1)
->+	if (!cn_netlink_has_listeners())
-> 		return;
-> 
-> 	msg = buffer_to_cn_msg(buffer);
->@@ -237,7 +246,7 @@ void proc_ptrace_connector(struct task_struct *task, int ptrace_id)
-> 	struct proc_event *ev;
-> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
-> 
->-	if (atomic_read(&proc_event_num_listeners) < 1)
->+	if (!cn_netlink_has_listeners())
-> 		return;
-> 
-> 	msg = buffer_to_cn_msg(buffer);
->@@ -269,7 +278,7 @@ void proc_comm_connector(struct task_struct *task)
-> 	struct proc_event *ev;
-> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
-> 
->-	if (atomic_read(&proc_event_num_listeners) < 1)
->+	if (!cn_netlink_has_listeners())
-> 		return;
-> 
-> 	msg = buffer_to_cn_msg(buffer);
->@@ -295,7 +304,7 @@ void proc_coredump_connector(struct task_struct *task)
-> 	struct task_struct *parent;
-> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
-> 
->-	if (atomic_read(&proc_event_num_listeners) < 1)
->+	if (!cn_netlink_has_listeners())
-> 		return;
-> 
-> 	msg = buffer_to_cn_msg(buffer);
->@@ -328,7 +337,7 @@ void proc_exit_connector(struct task_struct *task)
-> 	struct task_struct *parent;
-> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
-> 
->-	if (atomic_read(&proc_event_num_listeners) < 1)
->+	if (!cn_netlink_has_listeners())
-> 		return;
-> 
-> 	msg = buffer_to_cn_msg(buffer);
->@@ -370,7 +379,7 @@ static void cn_proc_ack(int err, int rcvd_seq, int rcvd_ack)
-> 	struct proc_event *ev;
-> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
-> 
->-	if (atomic_read(&proc_event_num_listeners) < 1)
->+	if (!cn_netlink_has_listeners())
-> 		return;
-
-
-Are you still using &proc_event_num_listeners for anything? If not, why
-don't you remove it entirely?
-
-
-> 
-> 	msg = buffer_to_cn_msg(buffer);
->diff --git a/drivers/connector/connector.c b/drivers/connector/connector.c
->index 7f7b94f61..42bcb39ba 100644
->--- a/drivers/connector/connector.c
->+++ b/drivers/connector/connector.c
->@@ -129,6 +129,15 @@ int cn_netlink_send(struct cn_msg *msg, u32 portid, u32 __group,
-> }
-> EXPORT_SYMBOL_GPL(cn_netlink_send);
-> 
->+struct sock *get_cdev_nls(void)
-
-Perhaps name it cn_cdev_nls_get() to be aligned with the rest?
-
-
-
->+{
->+	if (cn_already_initialized == 1)
->+		return cdev.nls;
->+	else
->+		return NULL;
->+}
->+EXPORT_SYMBOL_GPL(get_cdev_nls);
->+
-> /*
->  * Callback helper - queues work and setup destructor for given data.
->  */
->diff --git a/include/linux/connector.h b/include/linux/connector.h
->index cec2d99ae..255466aea 100644
->--- a/include/linux/connector.h
->+++ b/include/linux/connector.h
->@@ -127,6 +127,7 @@ int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid,
->  */
-> int cn_netlink_send(struct cn_msg *msg, u32 portid, u32 group, gfp_t gfp_mask);
-> 
->+struct sock *get_cdev_nls(void);
-
-Add empty line.
-
-
-> int cn_queue_add_callback(struct cn_queue_dev *dev, const char *name,
-> 			  const struct cb_id *id,
-> 			  void (*callback)(struct cn_msg *, struct netlink_skb_parms *));
+> 	skb->protocol = htons(ETH_P_IPV6);
 >-- 
->2.27.0
+>2.39.3
 >
 >
 
