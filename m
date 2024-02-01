@@ -1,119 +1,130 @@
-Return-Path: <netdev+bounces-68105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50D40845D74
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:40:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5697845D79
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:41:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCB3B1F26AEC
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:40:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49DC21F29B0B
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0D5D381A5;
-	Thu,  1 Feb 2024 16:40:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC2D77E0EC;
+	Thu,  1 Feb 2024 16:41:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NmDmAyJI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pfb6dsY3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AC602C1B0;
-	Thu,  1 Feb 2024 16:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B85468C;
+	Thu,  1 Feb 2024 16:41:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706805632; cv=none; b=Lrd/tqcl1YU6YSi8XmcZayBaT/jd2R5JAnNAsaOr3gfv6kGvJANd1YVigxXj32TIuQsUPgQNMRW7ljWDfw1AoQ9Z+91P7S/HXfBGVvhdgx8bBV+GxGLZzD/Z9n7O9ZdnzjCw/1j8oJ9XHrIwgC9jLqka3y7QyIOE9XE78UQQgTQ=
+	t=1706805673; cv=none; b=aDBAaAFuFcJRv+QLhxB9AW6yxSz4vxUke+aYIbanqj4AYBgxLlY057+MaegOBR8J4bDFiu6bZEgaMKu5a3MDQVPpPG/T58ozBOZ1IE3XYcAf9vLm/M5Q7zSMxglY4jv/wFerennSH/4DDqKvNokYvwV1ddS0K4T9OiLFeNUvlJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706805632; c=relaxed/simple;
-	bh=1uDUyfxjxc7ZnmKbXWn7c4080mDYIoyCn8OIHNE86Do=;
-	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:To:
-	 Date:Message-ID; b=FEqCGEJvNSw0NNGlMeIcdXzPLOB/maz88Ek1WNy0epXkjPT377ow4E+ZZQmasS4FecuY7pxy8CZMKO7gHvL85MCWx0RqUGhE1TYWy3qEsUXLbFsX7rfviqaE1Dvoj4xZe4I/4emXFEMR938oOoyn1gaXCuqA/+ggR1Eh3qgwlbQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NmDmAyJI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED34AC433F1;
-	Thu,  1 Feb 2024 16:40:30 +0000 (UTC)
+	s=arc-20240116; t=1706805673; c=relaxed/simple;
+	bh=C5qACvJe4fco+aV4C5Cr3NGN+Os63Z8yz1zzXlaXL0w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nlkdzs4itg9sAzxURwereSBfR9v49WAhPWdBcZgWGtxKw9CADd097O9YIr6//XcOM1mIeoxyIaoNbFloK9JNH9UraPbQvhLCY0968yt+3IZJDnstgmeIalHu6Tz1yEoNtoO0rhVEf0LWwDtcyWd8EKIoi6plp/6V5EjAyT6FpIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pfb6dsY3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E139FC433F1;
+	Thu,  1 Feb 2024 16:41:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706805631;
-	bh=1uDUyfxjxc7ZnmKbXWn7c4080mDYIoyCn8OIHNE86Do=;
-	h=In-Reply-To:References:Subject:From:To:Date:From;
-	b=NmDmAyJI7oXl7gcgFhi3lr6+03TWmLAbJZU+wUiXVk4W1c71yCNK9V/PbFOCkhEYu
-	 WzgxZwkrQkpyZzkyOewO7UnApEN2OsJCki760LTK1zhDCoW0vWtzkvcKaoQBEbLi3R
-	 5Q+XvnIpY3EibKFsBlqxXAXLdi7UDkPsh+Zzw2W7pO/cRKDBeQvw5jJ5P+Unjdej6a
-	 XgMLVAqcVTD699HdwsVBim0W9vLZMDGo55Gmwv65lXGsUWhIRFqdJlxoFfifGkGWiP
-	 gHiSosa7R+ENx6DDudg6ECj4B75PMg5UTC8VGAsH7GARMh0TBejZdT532Gw+PxVmTl
-	 hjwN0vK7sytDA==
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1706805673;
+	bh=C5qACvJe4fco+aV4C5Cr3NGN+Os63Z8yz1zzXlaXL0w=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pfb6dsY3vtKeeT9ssgHQFDkW7nhyCtSHlIS+KFNcFWWfF2Idcv/tp2O8xVuVNNAy+
+	 AMf0SH08itOSEYRCoVAMT6l4CZeTQEJ2qSKIfm7H0QlhTgICs8UJ3say4XVSDDAEGG
+	 zpG3tzZM9xvAzwoh8gyaav6LOqJrFI9sBWuixreV/U/E60RJ+NbOGHU3h/LuV8uyMU
+	 gbSlqwbMXgo+fOj7q6XsUKLqnRiNJbobhg0fLkB524fxFh/dP4feFX/ja5rIGigLbS
+	 ZEEGqGJGA1XFmi/xRn12+CBuIPGR3xN1W6Wjp/1kYCva2EAEetSrg9t3+SFKvdYsVm
+	 +gos90HrwjgvQ==
+Date: Thu, 1 Feb 2024 17:41:09 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, lorenzo.bianconi@redhat.com,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	bpf@vger.kernel.org, toke@redhat.com,
+	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	sdf@google.com, hawk@kernel.org, ilias.apalodimas@linaro.org
+Subject: Re: [PATCH v6 net-next 3/5] xdp: add multi-buff support for xdp
+ running in generic mode
+Message-ID: <ZbvJpQfyz-QG8EdQ@lore-desk>
+References: <cover.1706451150.git.lorenzo@kernel.org>
+ <c93dce1f78bd383c117311e4d53e2766264f6759.1706451150.git.lorenzo@kernel.org>
+ <20240131154740.615966a9@kernel.org>
+ <ZbuBwvCa4diMHNhk@lore-desk>
+ <20240201071512.0fb7c5ee@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="RMohjYX9M5WO5zrC"
+Content-Disposition: inline
+In-Reply-To: <20240201071512.0fb7c5ee@kernel.org>
+
+
+--RMohjYX9M5WO5zrC
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20240201151747.7524-4-ansuelsmth@gmail.com>
-References: <20240201151747.7524-1-ansuelsmth@gmail.com> <20240201151747.7524-4-ansuelsmth@gmail.com>
-Subject: Re: [net-next PATCH v5 3/9] net: phy: add devm/of_phy_package_join helper
-From: Antoine Tenart <atenart@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>, Bjorn Andersson <andersson@kernel.org>, Christian Marangi <ansuelsmth@gmail.com>, Conor Dooley <conor+dt@kernel.org>, David S. Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Frank Rowand <frowand.list@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Robert Marko <robert.marko@sartura.hr>, Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Date: Thu, 01 Feb 2024 17:40:28 +0100
-Message-ID: <170680562826.4979.15332968112575820833@kwain>
 
-Quoting Christian Marangi (2024-02-01 16:17:29)
-> +/**
-> + * of_phy_package_join - join a common PHY group in PHY package
-> + * @phydev: target phy_device struct
-> + * @priv_size: if non-zero allocate this amount of bytes for private data
-> + *
-> + * This is a variant of phy_package_join for PHY package defined in DT.
-> + *
-> + * The parent node of the @phydev is checked as a valid PHY package node
-> + * structure (by matching the node name "ethernet-phy-package") and the
-> + * base_addr for the PHY package is passed to phy_package_join.
-> + *
-> + * With this configuration the shared struct will also have the np value
-> + * filled to use additional DT defined properties in PHY specific
-> + * probe_once and config_init_once PHY package OPs.
-> + *
-> + * Returns < 1 on error, 0 on success. Esp. calling phy_package_join()
+> On Thu, 1 Feb 2024 12:34:26 +0100 Lorenzo Bianconi wrote:
+> > > nit: doesn't look all that related to a netif, I'd put it in skbuff.c=
+ =20
+> >=20
+> > ack, fine. skb_segment_for_xdp() in this case?
+>=20
+> I think the closest thing we have now is skb_cow_data(),
+> so how about skb_cow_data_pp() or skb_cow_fragged() or
+> skb_cow_something? :)
 
-So, < 0 on error ?
+I like skb_cow_something :)
 
-> +int of_phy_package_join(struct phy_device *phydev, size_t priv_size)
-> +{
-> +       struct device_node *node =3D phydev->mdio.dev.of_node;
-> +       struct device_node *package_node;
-> +       u32 base_addr;
-> +       int ret;
-> +
-> +       if (!node)
-> +               return -EINVAL;
-> +
-> +       package_node =3D of_get_parent(node);
+>=20
+> I'm on the fence whether we should split the XDP-ness out.
+> I mean the only two xdp-related things are the headroom and
+> check for xdp_has_frags, so we could also:
+>=20
+> skb_cow_data_pp(struct page_pool *pool, struct sk_buff **pskb,
+> 		unsigned int headroom)
+> {
+> 	...
+> }
+>=20
+> skb_cow_data_xdp(struct page_pool *pool, struct sk_buff **pskb,
+> 		 struct bpf_prog *prog)
+> {
+> 	if (!prog->aux->xdp_has_frags)
+> 		return -EINVAL;
+>=20
+> 	return skb_cow_data_pp(pool, pskb, XDP_PACKET_HEADROOM);
+> }
+>=20
+>=20
+> I think it'd increase the chances of reuse. But that's speculative=20
+> so I'll let you decide if you prefer that or to keep it simple.
 
-Is the node put on package leave?
+ack, I agree. I will fix it in v7.
 
-> +       if (!package_node)
-> +               return -EINVAL;
-> +
-> +       if (!of_node_name_eq(package_node, "ethernet-phy-package")
+Regards,
+Lorenzo
 
-of_put_node? + below.
+--RMohjYX9M5WO5zrC
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> +               return -EINVAL;
-> +
-> +       if (of_property_read_u32(package_node, "reg", &base_addr))
-> +               return -EINVAL;
-> +
-> +       ret =3D phy_package_join(phydev, base_addr, priv_size);
-> +       if (ret)
-> +               return ret;
-> +
-> +       phydev->shared->np =3D package_node;
+-----BEGIN PGP SIGNATURE-----
 
-Just looked quickly, looks like ->np is uninitialized in the !of join
-case.
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZbvJpQAKCRA6cBh0uS2t
+rBQeAQDjWxYXA4LO9NpbdMFqQxHAoE9xCllfwg+tem94ByDntgD/SW9IojM4gQtJ
++FhLDKxDQnSEbDtMvTUK368/jepCQwQ=
+=qvpZ
+-----END PGP SIGNATURE-----
 
-> +
-> +       return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(of_phy_package_join);
+--RMohjYX9M5WO5zrC--
 
