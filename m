@@ -1,118 +1,151 @@
-Return-Path: <netdev+bounces-67845-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67846-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F1D38451DF
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:25:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2DFB8451F3
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:32:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5DCF1F23865
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 07:25:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A8341F25FD4
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 07:32:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC5E71586D2;
-	Thu,  1 Feb 2024 07:24:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91455158D75;
+	Thu,  1 Feb 2024 07:32:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="qqhhIi+H"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JwW71SAY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AD893FE0
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 07:24:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 628031586EC
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 07:32:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706772297; cv=none; b=hOOc/Sw9dswrr5ZQE5IofPCcodqI3Ao+iIpu9kbMPDim0XkNa3qmNRK7nnbX8m76/VyQoHCU8EzoqZDfZaGzEueGbmmdanxSEqI64pMyoFf/uACbg4nqN5rCxzMB6ZCuBr2eD+GuHg/9Y83VmcDErdFu63xRXj22BF8G1FBCgCM=
+	t=1706772730; cv=none; b=V7qgEREDakaX+Vp3rGXCAcfuVDAQYYtmtFtW+MgpzjAJ6Q4XXB2ABWYIfeZskbGO/d8KiWS4JXlgXvhs59XAfvGj7pic6jG/JTlSU3ggudpLqVOmriLWJ9Er585fzz2cy9hOmOb0WVzyUsXWPmos4YBn3IBWJU/xTDfrhkHgyiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706772297; c=relaxed/simple;
-	bh=rt3xdToS1edrEqLARcHH3D4D0bQAx1em8WkrQGW9AHw=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=scVYHmHSuQx7bkpKi3CGIO/Db2FXgWmZPUofejDRfKU8e5uzwx5m81xSHvOyjmO4BK09GfhjjqIX3qOhkF/EsOYUzJ/4r/Vlj6uAFI32XMVtmloXH+09arUF56yFNOf7//fb9WDvaTjbhka7KbE9KMp87sXDlknVjH+a9a8FiuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=qqhhIi+H; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1706772296; x=1738308296;
-  h=from:to:cc:subject:date:message-id:
-   content-transfer-encoding:mime-version;
-  bh=D6B6nIUhDm9/HFTW0ViOh2I+6P+OSFveiy5CYzSjRWY=;
-  b=qqhhIi+HYkEL82FPTRATFtWl1AVBWR+u/p7MuFAXwQ8cSQja/hvvGPum
-   WBwl5TRxnC7aH3PEsNG0oJCAu/40pv7Dsr2oyt4RwfVcb1lirW/rVjjrB
-   N2DyhoFrnwkXw/8oxdWjXNfjL4ktfakmhROwEPJO/sIRFoWY36J5ePxhA
-   o=;
-X-IronPort-AV: E=Sophos;i="6.05,234,1701129600"; 
-   d="scan'208";a="631270136"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 07:24:53 +0000
-Received: from EX19MTAEUB002.ant.amazon.com [10.0.43.254:9420]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.14.233:2525] with esmtp (Farcaster)
- id fba90ec5-3aa3-4313-b7ad-83557396f1db; Thu, 1 Feb 2024 07:24:52 +0000 (UTC)
-X-Farcaster-Flow-ID: fba90ec5-3aa3-4313-b7ad-83557396f1db
-Received: from EX19D028EUC004.ant.amazon.com (10.252.61.145) by
- EX19MTAEUB002.ant.amazon.com (10.252.51.59) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 1 Feb 2024 07:24:51 +0000
-Received: from EX19D037EUC001.ant.amazon.com (10.252.61.220) by
- EX19D028EUC004.ant.amazon.com (10.252.61.145) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 1 Feb 2024 07:24:51 +0000
-Received: from EX19D037EUC001.ant.amazon.com ([fe80::d0f1:b6b6:e660:ae67]) by
- EX19D037EUC001.ant.amazon.com ([fe80::d0f1:b6b6:e660:ae67%3]) with mapi id
- 15.02.1118.040; Thu, 1 Feb 2024 07:24:51 +0000
-From: "Bernstein, Amit" <amitbern@amazon.com>
-To: "tglx@linutronix.de" <tglx@linutronix.de>, "richardcochran@gmail.com"
-	<richardcochran@gmail.com>
-CC: "kuba@kernel.org" <kuba@kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Dagan, Noam" <ndagan@amazon.com>, "Arinzon, David"
-	<darinzon@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>
-Subject: Add PHC support with error bound value for ENA driver
-Thread-Topic: Add PHC support with error bound value for ENA driver
-Thread-Index: AdpU32temyuKTDgWRNqtQlnNzjS4cQ==
-Date: Thu, 1 Feb 2024 07:24:51 +0000
-Message-ID: <8803342f01f54ca38296cedafea10bde@amazon.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1706772730; c=relaxed/simple;
+	bh=PGVjMBiqAlBk2bCHv2UWG4LFSmBzXpqPGGnGzqaEGFM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KWsQoyAdoKWynmd2XHoIGwhDXQ1pRhBoDpOmYEJV2PPPgAgXj9Qi5nyb9T9vSXxWD4fiQ4f4EqsNMfB/ygJ9ynbFaisd5kHFxDWrvXNxpmshKeJ/Kq2epzQq4S7vhZdJMoxOypIP07wWDvyfLKp0Pv4nfbL4PWBokRdvdavU5v8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JwW71SAY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9C979C433C7;
+	Thu,  1 Feb 2024 07:32:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706772729;
+	bh=PGVjMBiqAlBk2bCHv2UWG4LFSmBzXpqPGGnGzqaEGFM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=JwW71SAYazrM4JoMdAA7rZPN81amQ6YCZbzMeS8PbqbhNFaP93oTTW2MyAOtMa3rc
+	 qGNmqJtZ6jFLWm5QFCvCESlC9A2NGp6jAKKNoH4dr8ANOyWQ/ZVINVHg2RZ/fZrYAZ
+	 pjKWLzO64/fLiZR2xgwGLWqvcI8ILCgtpCu3Zfes2nxnY8u8yDni4fgw7iweq54rg1
+	 Xc21DXmerRMQR0ZKkutGrax7IcDNKunuoRGlRbfZLS1ZvLx7TZKJsHpFxPSpUvCxvb
+	 MnhuGb8zi2HSHNt+pWMBwAov5az3EJ6KEw7cP2lrBeoKJ+HXIAFaskQgdm2OcrjXQ5
+	 G2QptC4DRaveQ==
+From: Saeed Mahameed <saeed@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: [pull request][net-next V2 00/15] mlx5 updates 2024-01-26
+Date: Wed, 31 Jan 2024 23:31:43 -0800
+Message-ID: <20240201073158.22103-1-saeed@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi Thomas, Richard and all,
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-In one of the upcoming releases, we're planning to add PHC support to the E=
-NA driver (/drivers/net/ethernet/amazon/ena/)
-To provide the best experience for service customers, the ENA driver will e=
-xpose an error_bound parameter (expressed in nanoseconds),=20
-which will represent the maximal clock error on each given PHC timestamp.
-The error bound is calculated by the device,  taking into account the accur=
-acy and delays of all the device's PHC components.
+v1->v2:
+ - Fix large stack buffer usage in patch #13
 
-Based on our search, there is no similar functionality in other drivers, me=
-aning there is no user interface to expose it.
-We're currently exploring the best method of exposing this capability to th=
-e user.
-Our debate is between:
-- Extending the gettimex64 API in ptp_clock_info
-- Introducing a new devlink entry
-- Updating the time-related ethtool option (-T flag).
+This series provides misc updates to mlx5 and xfrm,
+the two xfrm patches are already acked by Steffen Klassert in the
+previous release cycle.
 
-As our device sends each PHC timestamp with an error_bound value together, =
-gettimex64 is the reasonable option for us and our recommended solution.
-We would like to ask for your recommendation.
-
-We have already consulted with Jakub, who recommended that we consult with =
-all of you.
-
-For more information, you may visit: https://aws.amazon.com/blogs/compute/i=
-ts-about-time-microsecond-accurate-clocks-on-amazon-ec2-instances/
+For more information please see tag log below.
+Please pull and let me know if there is any problem.
 
 Thanks,
-Amit
+Saeed.
 
+
+The following changes since commit 1701940b1a02addc8fe445538442112e84270b02:
+
+  Merge branch 'tools-net-ynl-add-features-for-tc-family' (2024-01-31 21:19:22 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-updates-2024-01-26
+
+for you to fetch changes up to 62a2a0c4633c2e50da40fd1795fe28692b3a6444:
+
+  net/mlx5e: XDP, Exclude headroom and tailroom from memory calculations (2024-01-31 23:30:22 -0800)
+
+----------------------------------------------------------------
+mlx5-updates-2024-01-26
+
+1) IPSec global stats for xfrm and mlx5
+2) XSK memory improvements for non-linear SKBs
+3) Software steering debug dump to use seq_file ops
+4) Various code clean-ups
+
+----------------------------------------------------------------
+Carolina Jubran (2):
+      net/mlx5e: XSK, Exclude tailroom from non-linear SKBs memory calculations
+      net/mlx5e: XDP, Exclude headroom and tailroom from memory calculations
+
+Gal Pressman (2):
+      net/mlx5: Remove initial segmentation duplicate definitions
+      net/mlx5: Change missing SyncE capability print to debug
+
+Hamdan Igbaria (1):
+      net/mlx5: DR, Change SWS usage to debug fs seq_file interface
+
+Leon Romanovsky (4):
+      xfrm: generalize xdo_dev_state_update_curlft to allow statistics update
+      xfrm: get global statistics from the offloaded device
+      net/mlx5e: Connect mlx5 IPsec statistics with XFRM core
+      net/mlx5e: Delete obsolete IPsec code
+
+Moshe Shemesh (6):
+      Documentation: Fix counter name of mlx5 vnic reporter
+      net/mlx5: Rename mlx5_sf_dev_remove
+      net/mlx5: remove fw_fatal reporter dump option for non PF
+      net/mlx5: remove fw reporter dump option for non PF
+      net/mlx5: SF, Stop waiting for FW as teardown was called
+      net/mlx5: Return specific error code for timeout on wait_fw_init
+
+ Documentation/networking/devlink/mlx5.rst          |   5 +-
+ Documentation/networking/xfrm_device.rst           |   4 +-
+ drivers/net/ethernet/mellanox/mlx5/core/dev.c      |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/en/params.c    |  24 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ipsec.c   |  26 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ipsec.h   |   1 -
+ .../mellanox/mlx5/core/en_accel/ipsec_rxtx.c       |  25 +-
+ .../mellanox/mlx5/core/en_accel/ipsec_rxtx.h       |   1 -
+ .../mellanox/mlx5/core/en_accel/ipsec_stats.c      |   1 -
+ drivers/net/ethernet/mellanox/mlx5/core/fw.c       |   6 +-
+ drivers/net/ethernet/mellanox/mlx5/core/health.c   |  45 +-
+ drivers/net/ethernet/mellanox/mlx5/core/main.c     |  38 +-
+ .../net/ethernet/mellanox/mlx5/core/mlx5_core.h    |   7 -
+ .../net/ethernet/mellanox/mlx5/core/sf/dev/dev.c   |   9 +-
+ .../ethernet/mellanox/mlx5/core/sf/dev/driver.c    |  21 +-
+ .../ethernet/mellanox/mlx5/core/steering/dr_dbg.c  | 726 +++++++++++++++++----
+ .../ethernet/mellanox/mlx5/core/steering/dr_dbg.h  |  20 +
+ include/linux/mlx5/mlx5_ifc.h                      |   1 +
+ include/linux/netdevice.h                          |   2 +-
+ include/net/xfrm.h                                 |  14 +-
+ net/xfrm/xfrm_proc.c                               |   1 +
+ net/xfrm/xfrm_state.c                              |  17 +-
+ net/xfrm/xfrm_user.c                               |   2 +-
+ 23 files changed, 761 insertions(+), 237 deletions(-)
 
