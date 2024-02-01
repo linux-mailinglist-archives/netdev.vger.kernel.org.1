@@ -1,118 +1,96 @@
-Return-Path: <netdev+bounces-68199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68200-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C7558461CB
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:11:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D28B8461D6
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:17:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E42C1C22587
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:11:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EBD528266C
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:17:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0D985627;
-	Thu,  1 Feb 2024 20:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62E2F8529D;
+	Thu,  1 Feb 2024 20:17:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="22ukRdaz"
+	dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b="uEX/QmMf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail.manjaro.org (mail.manjaro.org [116.203.91.91])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123A18528B
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 20:11:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5869D8528E;
+	Thu,  1 Feb 2024 20:17:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.91.91
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706818262; cv=none; b=jjbErhOe1rdjON/TiM8efs9a4Cn/n1xy5N3M5GMy1KCsr9aSSg/ZPJxJ8XZ6/IkxKkfNPJ8y0KT3gpAEH4djsfavdXDiByuRKq0YzKu85uWdeAm4Z+tZZdwg4a+I4fn1MEMCwuRXo+F3LIJY8vMeJmWqegbM5xMzJGv+LZ8LtlI=
+	t=1706818635; cv=none; b=OnYRM92WKuPiKKrimngS1q9eBQmTH1x/X6yy6Hik6JtICsi5GMPyoaZcyYycq8rclDQUwl72ASTYQNf6kRgx0bb4WbSP0bB86gj94k8aC0Z7qVqfudlEk87/hehEgnlyh8xasekeX3RxmImV/2SWSLvHLKYzh65DQRpw8rbM9lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706818262; c=relaxed/simple;
-	bh=p+cFD0VWHPwsCLWu7k74qwLoPELrk6sXEkr7D0IEpZw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lPOvGegltF2a2fpHcGsvKkhG8OZS3buzDqNadL4YGql7qZLVOc4qweDkL9+eDLEgBdVgksuFH2eCrIZcdVJGVoSYDnE5AOIEDkLFCkFqvgPR+b9jXm/hXUoJu7sMzibMTApBXnXYrqfDmjghBXE9T3Fid6ol4dZ45+Sj9SeG5nU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=22ukRdaz; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-55f63fd3dd8so2344a12.0
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 12:11:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706818259; x=1707423059; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3HUJ91Kg1r9ZFRIyQrQf1AnCt8Vh5OB+DO7n+ndiBvI=;
-        b=22ukRdaz3qzrzZopZn75tQZ3UnJ7uTG56vidKyf4W+fGlsynNwhUba1ENozlu5UUG8
-         zEHdkVovIgcbefkSDb2Z3VfHRnwna71Y4iwqWaoh02IbQO0odRzF97eRW71U2AHhCMbk
-         e/5ZLEUY9Tgo0212OFZ87DBKjmKdA+SuWUD2iJiAMOZBNGeu5/9+c59TpSqqJXgeSZos
-         Qo6ynypzEm/Cw5IIfQAyhaN55YAYf4Q2aEZwwvfzfDrSYWvXEjQRMKfN312TjAH6Q/eg
-         j/QHqKRxexjDYQ8ydRtPAEc9NH5AkilDUOBwxzbtaXT3pENt4jJ6yYVjEo9Vsm/JOM3K
-         XdcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706818259; x=1707423059;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3HUJ91Kg1r9ZFRIyQrQf1AnCt8Vh5OB+DO7n+ndiBvI=;
-        b=VmSjZEj1T3EagocC5MbLEzerPH1KLMTD92Yytbu2CgHrPOP0EQ/PRDX7JkeG91L/2a
-         qdCSoS2XW6W9kPJN5rIvZwhAW3GzRN3WsRK8Lfhf8+CYwK/koQtpe4g+/3ENVvVYyY87
-         7HJq1t3nAdjrPHSZVq4d73sdLFAG0/kkD3BwwEagM30bjwPTBB0W1c7d8e/CI0fl3R9n
-         rLLGRP7msynZYq0CeZ0v4HK34NWW+m1SPPuovfQT4m2Igr0gePVql083YQvLXpRa936W
-         lnoM5iS9/LABGQT2cxYHrEfQYunZOy0cA1rYcksDcNlJ2GwpG1KCgixYv9OZuO0UOAeo
-         JATA==
-X-Gm-Message-State: AOJu0YyIqKYx8OBTK8uff7UbprfFhhYjyPmeQIrpsUzOHl3lbwuzFajN
-	MSfKg7WZvdMD9jqRbiv6wpvlrSly6PWLZWwK1VK7IXfrW+E62EQ/P8XRoXWgYKPWtUs96b+Vnz5
-	ebkJW6d/329JXLSb0CRV8RvRQH4y6Z/tXPEpmeQAAhklLcEwmUIMR
-X-Google-Smtp-Source: AGHT+IEN0t4/mPKYbcBDp05j0wQtiit60NotPmlcWlN6xcItSGXXXc0Gf6Vz8fkxYCFxOLQvZ1XV7WjqCVfkJP7q+bQ=
-X-Received: by 2002:a50:c34a:0:b0:55f:cdc8:b43 with SMTP id
- q10-20020a50c34a000000b0055fcdc80b43mr15747edb.2.1706818258802; Thu, 01 Feb
- 2024 12:10:58 -0800 (PST)
+	s=arc-20240116; t=1706818635; c=relaxed/simple;
+	bh=kUJ0d3O/c0wajgWfESE7EH663Rzvk91KqBPyZn/q+LA=;
+	h=MIME-Version:Date:From:To:Cc:Subject:In-Reply-To:References:
+	 Message-ID:Content-Type; b=WQizPctuMtrkeEyeWgc2+AfpzpK8rra7J8ky3GsG6iWMY0Arly1UYGypwtJV+kr3FHMeRFzLUSSYQmSl/l+tTvI/5WF7OrZeFU2EDgli+3keisqXPMOFEnNOWnvmHqsLMgm2erSb2nE0EXYNOFj4Lu6j2QPjrWlm+1wZ6K6Mm3w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org; spf=pass smtp.mailfrom=manjaro.org; dkim=pass (2048-bit key) header.d=manjaro.org header.i=@manjaro.org header.b=uEX/QmMf; arc=none smtp.client-ip=116.203.91.91
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=manjaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=manjaro.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240201175324.3752746-1-edumazet@google.com> <9259d368c091b071d16bd1969240f4e9dffe92fb.camel@redhat.com>
-In-Reply-To: <9259d368c091b071d16bd1969240f4e9dffe92fb.camel@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 1 Feb 2024 21:10:46 +0100
-Message-ID: <CANn89i+MLtYa9kxc4r_etSrz87hoMF8L_HHbJXtaNEU7C22-Ng@mail.gmail.com>
-Subject: Re: [PATCH net] netdevsim: avoid potential loop in nsim_dev_trap_report_work()
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, syzbot <syzkaller@googlegroups.com>, 
-	Jiri Pirko <jiri@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=manjaro.org; s=2021;
+	t=1706818630;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mQ4LObGFJg/ha8hZmJ9oAUbu9DDaZFLu+D2ZoTVr7XY=;
+	b=uEX/QmMf0zExWZ912UGlq+tML5qMj/92LtN25+1uudl4cc01SleXspXqRqXKJ9nRv0a0fw
+	x/N8E64ubnnVJXrJGSBPjwTq4cqHHWivYYPi3YJ46kdkqf4tts136hK74q6NFcqYqaRRt0
+	0TjwNrvwt03lKnfYr8u4qpPG3RjdV52YPdcsImOLpCoehjSC94Y/dvvd0bpJUGSrr5Ut3A
+	As2O6AzDzQH9Ph60tLDy4f2BURXvfKS0ajp4++ghPJyo3Gv/R9WIb3TVoOkM1cysWAL/+O
+	kVd4uhg44YlhOx/8v3j8Z8lodhWBNK/WvNJImFdynAZSkAPcfjEOlTSYPhZnnw==
+Date: Thu, 01 Feb 2024 21:17:08 +0100
+From: Dragan Simic <dsimic@manjaro.org>
+To: Greg KH <gregkh@linuxfoundation.org>, Christina Quast
+ <contact@christina-quast.de>
+Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>,
+ Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng
+ <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, =?UTF-8?Q?Bj?=
+ =?UTF-8?Q?=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, Benno Lossin
+ <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, Alice
+ Ryhl <aliceryhl@google.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>,
+ Trevor Gross <tmgross@umich.edu>, Andrew Lunn <andrew@lunn.ch>, Heiner
+ Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Heiko
+ Stuebner <heiko@sntech.de>, rust-for-linux@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org
+Subject: Re: [PATCH v2 3/3] net: phy: add Rust Rockchip PHY driver
+In-Reply-To: <2024020105-bankroll-opium-a6e5@gregkh>
+References: <20240201-rockchip-rust-phy_depend-v2-0-c5fa4faab924@christina-quast.de>
+ <20240201-rockchip-rust-phy_depend-v2-3-c5fa4faab924@christina-quast.de>
+ <2024020105-bankroll-opium-a6e5@gregkh>
+Message-ID: <cabb91e97a5e563cccbffd56f331a477@manjaro.org>
+X-Sender: dsimic@manjaro.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Authentication-Results: ORIGINATING;
+	auth=pass smtp.auth=dsimic@manjaro.org smtp.mailfrom=dsimic@manjaro.org
 
-On Thu, Feb 1, 2024 at 7:49=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
+On 2024-02-01 19:23, Greg KH wrote:
+> On Thu, Feb 01, 2024 at 07:07:00PM +0100, Christina Quast wrote:
+>> This is the Rust implementation of drivers/net/phy/rockchip.c. The
+>> features are equivalent. You can choose C or Rust version kernel
+>> configuration.
+>> 
+>> Signed-off-by: Christina Quast <contact@christina-quast.de>
+> 
+> Cool, but why?  Is this going to happen for all phy drivers going
+> forward?  What's the end-game here, dropping all .c phy drivers that
+> are in rust?  Or having duplicates for all of them?
 
-> The patch LGTM, thanks!
->
-> I'm wondering if we have a similar problem in
-> devlink_rel_nested_in_notify_work():
->
->         if (!devl_trylock(devlink)) {
->                 devlink_put(devlink);
->                 goto reschedule_work;
->         }
->
->         //...
-> reschedule_work:
->         schedule_work(&rel->nested_in.notify_work);
->
-
-> And possibly adding 1ms delay there could be problematic?
-
-A conversion to schedule_delayed_work() would be needed I think.
-
-I looked at all syzbot reports and did not find
-devlink_rel_nested_in_notify_work() in them,
-I guess we were lucky all this time :)
-
->
-> Cheers,
->
-> Paolo
->
+I'd also like to know what's the intended purpose of rewriting a mature
+existing PHY driver in Rust?
 
