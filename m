@@ -1,159 +1,94 @@
-Return-Path: <netdev+bounces-67787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F643844ED1
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 02:47:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA94D844EEF
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 03:00:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74BFCB26609
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:47:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67F3228EFB0
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 02:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68A9C5242;
-	Thu,  1 Feb 2024 01:46:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A28CEAE3;
+	Thu,  1 Feb 2024 02:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PRTMmJnH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JRPNNQdE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B847746B3;
-	Thu,  1 Feb 2024 01:46:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F57EAEF
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 02:00:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706752009; cv=none; b=OUcXZqSW8f4Ihtg0FLwlJi4VL8MXFrDG3lobWPzu3h+Z3tcdqMaH+IjE0JCpcZ6+ILX+0icltgjQtOtQXit/jskaP/TNgzu+Y+teSuTpDbswHIA/wDPgOisa/eB21AdIpTiSBNq+Uyiel36aBNj7jyFiU9FCDxBtPl0LB72kr8w=
+	t=1706752825; cv=none; b=D/X/1TlhWdJUaP3Hnw3xIR//Oj22nHAbnMd3wGst9PJzBwRQTBcv2S1BkmrwKkMJy3DxLL411XJjYcZ4qZEO2O4xu7UAteax3ZZ2n1ITRnhrAxER987uOe3uLwu8wmgHtyRKU2jZ0BTPQDeJwWphqdjjrLbd2QYh3DDTdohUeE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706752009; c=relaxed/simple;
-	bh=FJzDsG9kSU8DbmUxMS4dfZM8sMHzJMKPGsS3zV9z0zM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zr1fNgSKmEwiNwUWwrMIpoOjmYfP9uMLL4o+STWm4OIevA0e48GXOgQ6yMfgOH0NeFF6BL3AwDG9mj1ylwjSuCkxzevyzqPLKizaHVyl3TArdaT1uFovhO+9bRKVn9wrSyVlvv4KFsY1EuiZ+9rWofy+fc9ehnfgCX2g/E8ljS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PRTMmJnH; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706752008; x=1738288008;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=FJzDsG9kSU8DbmUxMS4dfZM8sMHzJMKPGsS3zV9z0zM=;
-  b=PRTMmJnHF77frm5YgJ24N6WGEQNUN7xzVpe7wPbNm5UaY2wXwuDINS/g
-   oL6OhPKjj4LKwHCVEPE5ygtJeUt7rxt93F1m3MmrhDzPIHIyw0moq7kdW
-   aYa4tZCVxxqSPRKXun3XW68jT+lET8AU8T19g1blbnDc/6AvrVtvOqVAD
-   fUmr3lMNyzCQTX2Q7GEW8erXrLXhAE7qOrD5jI1c5djLdYFPMRxCJOwE3
-   JJm2nS9eZIR5MNbExooawRcbgHNDlW02fSYYg3LRQyaOXM8QizC/CSteV
-   va6UQN23GVU904T3La6FCKFX6ZDQ0a2OXIOSO9D/ZwBn6CTQoZc91W0LR
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="17166280"
-X-IronPort-AV: E=Sophos;i="6.05,233,1701158400"; 
-   d="scan'208";a="17166280"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 17:46:47 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,233,1701158400"; 
-   d="scan'208";a="4243771"
-Received: from ranerica-svr.sc.intel.com ([172.25.110.23])
-  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 17:46:46 -0800
-Date: Wed, 31 Jan 2024 17:48:08 -0800
-From: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>
-To: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
-Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 3/3] thermal: intel: hfi: Enable interface only when
- required
-Message-ID: <20240201014808.GF18560@ranerica-svr.sc.intel.com>
-References: <20240131120535.933424-1-stanislaw.gruszka@linux.intel.com>
- <20240131120535.933424-4-stanislaw.gruszka@linux.intel.com>
+	s=arc-20240116; t=1706752825; c=relaxed/simple;
+	bh=EzHkq80lP+j3FuY1z1BTtnNQiwlqaBJWtcFD3rUhcUY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=nqiSVowhVeNC+VQRxLjsTut4VhW2noH/2emwxtjqe1hSqJxre7jQycyS4ARSMw6jYvDPI4ex0sKxgGugS6kCspTAXgVen+FoL/6R6T7GvISRf73lVUEoskN0k2eIwWV9yIstRI1aARljVS27U0ZfaAYT0DdgYAlXP5hR/8YQ09E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JRPNNQdE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CE925C433C7;
+	Thu,  1 Feb 2024 02:00:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706752824;
+	bh=EzHkq80lP+j3FuY1z1BTtnNQiwlqaBJWtcFD3rUhcUY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=JRPNNQdEIFKthRHhXyM9KHGe8XBCt/4fNptHZg9bMDXmA0tv9HmqKfHnp5EwXq6YE
+	 QZSFW8mAwbbDkAMEvVwyM5FfBZBbFS2aInLmGwEsFw5pPXFYbaVJgjagIzsrV4NW1K
+	 bsIg9xEbxYgSHTypd++5ByJ1V3T8BtA1mMYDhMz2Ny21AtMTDMQaOszC5DxkQ/1IEa
+	 RyjpMpJzaS3Jq38oPy2RH3pwQPmYiqoBUMEV01Zcg3KNWL9CW+lF0giTFHJP5Mpeig
+	 i3/qIbedYMPYQohjtu8jk6OMznCgyxFtiKFw9UroNuJeXqHMMVvdpShFRLAvSuc08h
+	 3kwIWh0dHiB9w==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B26B5C4166F;
+	Thu,  1 Feb 2024 02:00:24 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240131120535.933424-4-stanislaw.gruszka@linux.intel.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Subject: Re: [PATCH v2 net] af_unix: fix lockdep positive in sk_diag_dump_icons()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170675282472.29157.2470860661306193938.git-patchwork-notify@kernel.org>
+Date: Thu, 01 Feb 2024 02:00:24 +0000
+References: <20240130184235.1620738-1-edumazet@google.com>
+In-Reply-To: <20240130184235.1620738-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, syzkaller@googlegroups.com,
+ kuniyu@amazon.com
 
-On Wed, Jan 31, 2024 at 01:05:35PM +0100, Stanislaw Gruszka wrote:
-> Enable and disable hardware feedback interface (HFI) when user space
-> handler is present. For example, enable HFI, when intel-speed-select or
-> Intel Low Power daemon is running and subscribing to thermal netlink
-> events,. When user space handlers exit or remove subscription for
-> thermal netlink events, disable HFI.
+Hello:
 
-I'd rephrase as:
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Enable and disable HFI when a user space handler is running and listening
-to thermal netlink events (e.g., intel-speed-select, Intel Low Power
-daemon). When the user space handlers exit or remove subscription, disable
-HFI.
-
+On Tue, 30 Jan 2024 18:42:35 +0000 you wrote:
+> syzbot reported a lockdep splat [1].
 > 
-> Summary of changes:
+> Blamed commit hinted about the possible lockdep
+> violation, and code used unix_state_lock_nested()
+> in an attempt to silence lockdep.
 > 
-> - When CPU is online, instead of blindly enabling HFI by calling
-> hfi_enable(), check if the thermal netlink group has any listener.
-> This will make sure that HFI is not enabled by default during boot
-> time.
-
-s/by calling hfi_enable()//
-
+> It is not sufficient, because unix_state_lock_nested()
+> is already used from unix_state_double_lock().
 > 
-> - Register a netlink notifier.
-> 
-> - In the notifier process reason code NETLINK_CHANGE and
+> [...]
 
-s/notifier/notifier,/
+Here is the summary with links:
+  - [v2,net] af_unix: fix lockdep positive in sk_diag_dump_icons()
+    https://git.kernel.org/netdev/net/c/4d322dce82a1
 
-> NETLINK_URELEASE. If thermal netlink group has any listener enable
-> HFI on all packages. If there are no listener disable HFI on all
-> packages.
-> 
-> - Actual processing to enable/disable matches what is done in
-> suspend/resume callbacks. So, create two functions hfi_do_enable()
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-s/So,//
 
-> and hfi_do_disable(), which can be called from  the netlink notifier
-> callback and suspend/resume callbacks.
-> 
-> Signed-off-by: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
-> ---
->  drivers/thermal/intel/intel_hfi.c | 82 +++++++++++++++++++++++++++----
->  1 file changed, 73 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/thermal/intel/intel_hfi.c b/drivers/thermal/intel/intel_hfi.c
-> index 3b04c6ec4fca..50601f75f6dc 100644
-> --- a/drivers/thermal/intel/intel_hfi.c
-> +++ b/drivers/thermal/intel/intel_hfi.c
-> @@ -30,6 +30,7 @@
->  #include <linux/kernel.h>
->  #include <linux/math.h>
->  #include <linux/mutex.h>
-> +#include <linux/netlink.h>
->  #include <linux/percpu-defs.h>
->  #include <linux/printk.h>
->  #include <linux/processor.h>
-> @@ -480,7 +481,8 @@ void intel_hfi_online(unsigned int cpu)
->  	/* Enable this HFI instance if this is its first online CPU. */
->  	if (cpumask_weight(hfi_instance->cpus) == 1) {
->  		hfi_set_hw_table(hfi_instance);
-> -		hfi_enable();
-> +		if (thermal_group_has_listeners(THERMAL_GENL_EVENT_GROUP))
-> +			hfi_enable();
-
-You could avoid the extra level of indentation if you did:
-	if (cpumask_weight() == 1 && has_listeners())
-
-You would need to also update the comment.
-
-My two cents.
- 
 
