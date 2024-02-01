@@ -1,644 +1,206 @@
-Return-Path: <netdev+bounces-67798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CE12844F9D
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 04:24:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB7A3844FBC
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 04:28:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B72392959D4
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 03:24:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D6311C2522C
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 03:28:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D64403A8C2;
-	Thu,  1 Feb 2024 03:23:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 817663A8C2;
+	Thu,  1 Feb 2024 03:28:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="BuN93lZN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mBELPiiX"
 X-Original-To: netdev@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f171.google.com (mail-pg1-f171.google.com [209.85.215.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 464C11DFF3;
-	Thu,  1 Feb 2024 03:23:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C58A63B786;
+	Thu,  1 Feb 2024 03:28:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706757838; cv=none; b=qPWTrworjfG1x3uaP4SepJ9EpfVDNH49FELaDe0MP8ZAbBwQZ/8ybiZoUkKhQ/2bLXYyKJeCEKxsmxkcuxpY1A+0QItEVw1tdFGOQ3aAUTM9coPUmKzT5ScgoJpcOyal11fuiKYrNs5/AGmaglmizkInj6IN0BFbamtaXEiCmR0=
+	t=1706758118; cv=none; b=kfK636/H5OfLyBA/VXVKYpQOHXGU/ibW6qmdxqyFInRnSWHUYSzCbaQsTcLeqXtPbTUkcvTl9OQv+3nItF06lINRIQaQ9Km4h9Gxsd6aaDa2UxN4Wj8Db6Au7dN2QEALBXbd0vX6nd93OWdyLHz0vIIB+auD/iI9KjdiUoEGWT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706757838; c=relaxed/simple;
-	bh=MtSAE4kQ0ro4PqZ8a9LgEQXVgqNRTt8P4g84Pfbty5U=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Xo3tHxiWFQYp3tTIJWajGjF1j8xqkuUKfFyHrzjIJZC6dZINi/79JbXq5kurpgYzSwgdyihWJptgpSxNnLwKuzp5usjevi2yBUdfABEFzzaTBdN1KUTEqradawCRsd/YEWR6HsTuwbfHQvIVjP/JqTQRTnqcIs1GJvtHjYv6J3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=BuN93lZN; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1706757830;
-	bh=N8a0aY25rkscSNwTfJr7k+5fNe2/G4vUIB9/0tfmbHk=;
-	h=Date:From:To:Cc:Subject:From;
-	b=BuN93lZNU+/EeDebh/JRE2PHFxSu7jMoMrSuWAiNlH37AK93hxJ7PEpcKhc17KVnJ
-	 aKBbxDT8P/tu92Z6XuozE64c7OyUc7rD1sLnxm0PjCAJOSvqEAD6zkvCae0OMwSi5f
-	 wrp/9/a4xRSnQ1dncjUeB1ZvOGLZJZ2kICCxnAjpKviblW/b8eeiLYm/+tqe5PazP5
-	 oo4NQWk8UlYIW7wMEVkFt916peNTburvFFIAym35gSSWa9emaMWUKGHUIBMrJiwYIG
-	 hwUh8j/tveLZDbtQl+kxkjONpFsAlwmvHay6irrnZ9JFPhyPo9i5uso1bihEnB4lk4
-	 5TGkBWZQ49uBw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4TQPPy1F91z4wd4;
-	Thu,  1 Feb 2024 14:23:49 +1100 (AEDT)
-Date: Thu, 1 Feb 2024 14:23:48 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
- <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, bpf
- <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>
-Cc: Daniel Xu <dxu@dxuuu.xyz>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: runtime warnings after merge of the bpf-next tree
-Message-ID: <20240201142348.38ac52d5@canb.auug.org.au>
+	s=arc-20240116; t=1706758118; c=relaxed/simple;
+	bh=emwqzbfyj2CjwDXfFxr2yguXLoC7xr2j8vCVmi+56Ms=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=S+EQAzKLm3NvcysdiisNkIE5pSXSh8hpUl/dJ4NcEQZu9nSRmQf1KrLZJpygTY1fJtHkW9SxOvt1pQRLYYwv0b8r4w80I/ROkfA1tVOBa+5BCn+v2oBY0o5rXHZO7V95yaruf78oNqv/M1YygTxTS2o4gRG0x6H65ThQY6yb0KY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mBELPiiX; arc=none smtp.client-ip=209.85.215.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f171.google.com with SMTP id 41be03b00d2f7-5c6bd3100fcso367161a12.3;
+        Wed, 31 Jan 2024 19:28:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706758116; x=1707362916; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=4Ho6tWOUJQG5jwgdiQ+YC/nc1aAPjOngvOC35lqmr7A=;
+        b=mBELPiiXKuLics7srQM2DZE4cUcti2pBcBrZ+AVMhMpaEnv8eB6VvqeyR/yarNDKaR
+         oaQVDmobaB24PBRSKzIWokVYF5YpVCxe99ey/94qJ+N1KHCJGcz/mbgl3Q267Nj3g7H8
+         ODTS2EqcqRLe0Lz/V59cXFHc3kDRXEKzX7ZS6CEDdKVBToqWVFHK0wv82+IZ4zmt4IJN
+         g5ip44mZNYpmNMjpxeFI0iRxFrthIUL+sQxoS9vbeMtkLluahFKsxCZO9KkDOKpVb1e1
+         VVfYAwS/pEJvNmOl9Bxp2EsUr+VX79PTHC5rw14dAP2pRSzLC+XTU0J0TePwdAsXOxTd
+         eB/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706758116; x=1707362916;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4Ho6tWOUJQG5jwgdiQ+YC/nc1aAPjOngvOC35lqmr7A=;
+        b=MfAN+5jde1l/bDDF1C/0ebLqXHfhlUsIlsTVrzaCBkHiT7mRRnx122mWmledjBcqAk
+         HTtQFHZwsQufiE46wIkevjXa00K8G93rLZReSmOTWWfLLmtxW2wAxybEKwbOTuVzR1yU
+         5Q1nItGv/l7weNlkRmJXM87sNKbX5cvDKeWCFEuEpso4auC57Res2pMG/ONRPESaZapr
+         58EyGzwoZYw/C3QVU0ulvWhjSV7Kky4ann1koR2U/4GhjJhonV/KdfvBoJRxTWEEBC8z
+         FSJvNK96OFJHxPPGNP5lxp/2WG3IYk1NL5qI5ZJ3dz06zfrIDi652J76/7DkUqCR7f9y
+         4vHQ==
+X-Gm-Message-State: AOJu0YwMafAa9iB6L1zcA/py4nEsCf1Ooze/GFjLQluQw0ycUQV6S7ip
+	ccq0vU1sTGf/UylH4gjJZzZO/icbsffu9pUbHgn82EVpvE+A8eRF
+X-Google-Smtp-Source: AGHT+IEg4yxMdZKR72aUWYqIJObTXDnPnApeUkWrbWcBkPgWJ9jQiF6bv9EpHP9LqAQfMdqtWN+v9Q==
+X-Received: by 2002:a05:6a20:d485:b0:19c:881d:78e6 with SMTP id im5-20020a056a20d48500b0019c881d78e6mr3543871pzb.42.1706758115776;
+        Wed, 31 Jan 2024 19:28:35 -0800 (PST)
+Received: from ocxma-dut.. ([153.126.233.62])
+        by smtp.gmail.com with ESMTPSA id im23-20020a170902bb1700b001d8c8c903c0sm347852plb.149.2024.01.31.19.28.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jan 2024 19:28:35 -0800 (PST)
+From: Takeru Hayasaka <hayatake396@gmail.com>
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	mailhol.vincent@wanadoo.fr,
+	vladimir.oltean@nxp.com,
+	laforge@gnumonks.org,
+	Takeru Hayasaka <hayatake396@gmail.com>
+Subject: [PATCH net-next v6 1/2] ethtool: Add GTP RSS hash options to ethtool.h
+Date: Thu,  1 Feb 2024 03:27:49 +0000
+Message-Id: <20240201032748.1027121-1-hayatake396@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/IdzMCA.1BtKvMaBdA9eqQJZ";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
 
---Sig_/IdzMCA.1BtKvMaBdA9eqQJZ
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+This is a patch that enables RSS functionality for GTP packets using ethtool.
 
-Hi all,
+A user can include TEID and make RSS work for GTP-U over IPv4 by doing the
+following:`ethtool -N ens3 rx-flow-hash gtpu4 sde`
 
-After merging the bpf-next tree, today's linux-next build (powerpc
-pseries_le_defconfig) produced these runtime warnings in my qemu boot
-tests:
+In addition to gtpu(4|6), we now support gtpc(4|6),gtpc(4|6)t,gtpu(4|6)e,
+gtpu(4|6)u, and gtpu(4|6)d.
 
-  ipip: IPv4 and MPLS over IPv4 tunneling driver
-  ------------[ cut here ]------------
-  WARNING: CPU: 0 PID: 1 at kernel/bpf/btf.c:8131 register_btf_kfunc_id_set=
-+0x68/0x74
-  Modules linked in:
-  CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.8.0-rc2-03380-gd0c0d80c1162 #2
-  Hardware name: IBM pSeries (emulated by qemu) POWER8 (raw) 0x4d0200 0xf00=
-0004 of:SLOF,HEAD pSeries
-  NIP:  c0000000003bfbfc LR: c00000000209ba3c CTR: c00000000209b9a4
-  REGS: c0000000049bf960 TRAP: 0700   Not tainted  (6.8.0-rc2-03380-gd0c0d8=
-0c1162)
-  MSR:  8000000002029033 <SF,VEC,EE,ME,IR,DR,RI,LE>  CR: 24000482  XER: 000=
-00000
-  CFAR: c0000000003bfbb0 IRQMASK: 0=20
-  GPR00: c00000000209ba3c c0000000049bfc00 c0000000015c9900 000000000000001=
-b=20
-  GPR04: c0000000012bc980 000000000000019a 000000000000019a 000000000000013=
-3=20
-  GPR08: c000000002969900 0000000000000001 c000000002969900 c00000000296990=
-0=20
-  GPR12: c00000000209b9a4 c000000002b60000 c0000000000110cc 000000000000000=
-0=20
-  GPR16: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0=20
-  GPR20: 0000000000000000 0000000000000000 0000000000000000 c0000000014cd25=
-0=20
-  GPR24: c000000002003e6c c000000001582c78 000000000000018b c0000000020c106=
-0=20
-  GPR28: 0000000000000000 0000000000000007 c0000000020c10a8 c000000002968f8=
-0=20
-  NIP [c0000000003bfbfc] register_btf_kfunc_id_set+0x68/0x74
-  LR [c00000000209ba3c] cubictcp_register+0x98/0xc8
-  Call Trace:
-  [c0000000049bfc30] [c000000000010d58] do_one_initcall+0x80/0x2f8
-  [c0000000049bfd00] [c000000002005aec] kernel_init_freeable+0x32c/0x520
-  [c0000000049bfde0] [c0000000000110f8] kernel_init+0x34/0x25c
-  [c0000000049bfe50] [c00000000000debc] ret_from_kernel_user_thread+0x14/0x=
-1c
-  --- interrupt: 0 at 0x0
-  Code: 60420000 3d22ffc6 39290708 7d291a14 89290270 7d290774 79230020 4bff=
-f8c0 60420000 e9240000 7d290074 7929d182 <0b090000> 3860ffea 4e800020 3c4c0=
-121=20
-  ---[ end trace 0000000000000000 ]---
-  NET: Registered PF_INET6 protocol family
-	.
-	.
-	.
-  Running code patching self-tests ...
-  ------------[ cut here ]------------
-  WARNING: CPU: 0 PID: 1 at kernel/bpf/btf.c:8131 register_btf_kfunc_id_set=
-+0x68/0x74
-  Modules linked in:
-  CPU: 0 PID: 1 Comm: swapper/0 Tainted: G        W          6.8.0-rc2-0338=
-0-gd0c0d80c1162 #2
-  Hardware name: IBM pSeries (emulated by qemu) POWER8 (raw) 0x4d0200 0xf00=
-0004 of:SLOF,HEAD pSeries
-  NIP:  c0000000003bfbfc LR: c00000000204900c CTR: c000000002048fe0
-  REGS: c0000000049bf970 TRAP: 0700   Tainted: G        W           (6.8.0-=
-rc2-03380-gd0c0d80c1162)
-  MSR:  8000000002029033 <SF,VEC,EE,ME,IR,DR,RI,LE>  CR: 24000482  XER: 200=
-00000
-  CFAR: c0000000003bfbb0 IRQMASK: 0=20
-  GPR00: c00000000204900c c0000000049bfc10 c0000000015c9900 000000000000001=
-a=20
-  GPR04: c000000001218fb0 0000000000000002 c0000000049bfc02 0000000035b5793=
-c=20
-  GPR08: 0000000000000000 0000000000000001 0000000000000000 000000009e3fcb9=
-9=20
-  GPR12: c000000002048fe0 c000000002b60000 c0000000000110cc 000000000000000=
-0=20
-  GPR16: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0=20
-  GPR20: 0000000000000000 0000000000000000 0000000000000000 c0000000014cd25=
-0=20
-  GPR24: c000000002003e6c c000000001582c78 000000000000018b c0000000020c106=
-8=20
-  GPR28: 0000000000000000 0000000000000008 c0000000020c10b0 c000000002048fe=
-0=20
-  NIP [c0000000003bfbfc] register_btf_kfunc_id_set+0x68/0x74
-  LR [c00000000204900c] bpf_rstat_kfunc_init+0x2c/0x40
-  Call Trace:
-  [c0000000049bfc10] [c0000000020c10b0] 0xc0000000020c10b0 (unreliable)
-  [c0000000049bfc30] [c000000000010d58] do_one_initcall+0x80/0x2f8
-  [c0000000049bfd00] [c000000002005aec] kernel_init_freeable+0x32c/0x520
-  [c0000000049bfde0] [c0000000000110f8] kernel_init+0x34/0x25c
-  [c0000000049bfe50] [c00000000000debc] ret_from_kernel_user_thread+0x14/0x=
-1c
-  --- interrupt: 0 at 0x0
-  Code: 60420000 3d22ffc6 39290708 7d291a14 89290270 7d290774 79230020 4bff=
-f8c0 60420000 e9240000 7d290074 7929d182 <0b090000> 3860ffea 4e800020 3c4c0=
-121=20
-  ---[ end trace 0000000000000000 ]---
-  registered taskstats version 1
-  ------------[ cut here ]------------
-  WARNING: CPU: 0 PID: 1 at kernel/bpf/btf.c:8131 register_btf_kfunc_id_set=
-+0x68/0x74
-  Modules linked in:
-  CPU: 0 PID: 1 Comm: swapper/0 Tainted: G        W          6.8.0-rc2-0338=
-0-gd0c0d80c1162 #2
-  Hardware name: IBM pSeries (emulated by qemu) POWER8 (raw) 0x4d0200 0xf00=
-0004 of:SLOF,HEAD pSeries
-  NIP:  c0000000003bfbfc LR: c000000002050fdc CTR: c000000002050fb8
-  REGS: c0000000049bf970 TRAP: 0700   Tainted: G        W           (6.8.0-=
-rc2-03380-gd0c0d80c1162)
-  MSR:  8000000002029033 <SF,VEC,EE,ME,IR,DR,RI,LE>  CR: 24000482  XER: 200=
-00000
-  CFAR: c0000000003bfbb0 IRQMASK: 0=20
-  GPR00: c000000002050fdc c0000000049bfc10 c0000000015c9900 000000000000001=
-d=20
-  GPR04: c000000001223600 0000000000000002 c0000000049bfc02 fffffffffffe000=
-0=20
-  GPR08: 0000000000000000 0000000000000001 0000000000000000 000000002400024=
-2=20
-  GPR12: c000000002050fb8 c000000002b60000 c0000000000110cc 000000000000000=
-0=20
-  GPR16: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0=20
-  GPR20: 0000000000000000 0000000000000000 0000000000000000 c0000000014cd25=
-0=20
-  GPR24: c000000002003e6c c000000001582c78 000000000000018b c0000000020c106=
-8=20
-  GPR28: 0000000000000000 0000000000000008 c0000000020c10b0 c000000002050fb=
-8=20
-  NIP [c0000000003bfbfc] register_btf_kfunc_id_set+0x68/0x74
-  LR [c000000002050fdc] bpf_fs_kfuncs_init+0x24/0x38
-  Call Trace:
-  [c0000000049bfc10] [c0000000020c10b0] 0xc0000000020c10b0 (unreliable)
-  [c0000000049bfc30] [c000000000010d58] do_one_initcall+0x80/0x2f8
-  [c0000000049bfd00] [c000000002005aec] kernel_init_freeable+0x32c/0x520
-  [c0000000049bfde0] [c0000000000110f8] kernel_init+0x34/0x25c
-  [c0000000049bfe50] [c00000000000debc] ret_from_kernel_user_thread+0x14/0x=
-1c
-  --- interrupt: 0 at 0x0
-  Code: 60420000 3d22ffc6 39290708 7d291a14 89290270 7d290774 79230020 4bff=
-f8c0 60420000 e9240000 7d290074 7929d182 <0b090000> 3860ffea 4e800020 3c4c0=
-121=20
-  ---[ end trace 0000000000000000 ]---
-  ------------[ cut here ]------------
-  WARNING: CPU: 0 PID: 1 at kernel/bpf/btf.c:8131 register_btf_kfunc_id_set=
-+0x68/0x74
-  Modules linked in:
-  CPU: 0 PID: 1 Comm: swapper/0 Tainted: G        W          6.8.0-rc2-0338=
-0-gd0c0d80c1162 #2
-  Hardware name: IBM pSeries (emulated by qemu) POWER8 (raw) 0x4d0200 0xf00=
-0004 of:SLOF,HEAD pSeries
-  NIP:  c0000000003bfbfc LR: c000000002050fa4 CTR: c000000002050f80
-  REGS: c0000000049bf970 TRAP: 0700   Tainted: G        W           (6.8.0-=
-rc2-03380-gd0c0d80c1162)
-  MSR:  8000000002029033 <SF,VEC,EE,ME,IR,DR,RI,LE>  CR: 24000482  XER: 200=
-00000
-  CFAR: c0000000003bfbb0 IRQMASK: 0=20
-  GPR00: c000000002050fa4 c0000000049bfc10 c0000000015c9900 000000000000001=
-a=20
-  GPR04: c0000000012235e8 0000000000000002 c0000000049bfc02 fffffffffffe000=
-0=20
-  GPR08: 0000000000000000 0000000000000001 0000000000000000 000000002400024=
-2=20
-  GPR12: c000000002050f80 c000000002b60000 c0000000000110cc 000000000000000=
-0=20
-  GPR16: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0=20
-  GPR20: 0000000000000000 0000000000000000 0000000000000000 c0000000014cd25=
-0=20
-  GPR24: c000000002003e6c c000000001582c78 000000000000018b c0000000020c106=
-8=20
-  GPR28: 0000000000000000 0000000000000008 c0000000020c10b0 c000000002050f8=
-0=20
-  NIP [c0000000003bfbfc] register_btf_kfunc_id_set+0x68/0x74
-  LR [c000000002050fa4] bpf_key_sig_kfuncs_init+0x24/0x38
-  Call Trace:
-  [c0000000049bfc10] [c0000000020c10b0] 0xc0000000020c10b0 (unreliable)
-  [c0000000049bfc30] [c000000000010d58] do_one_initcall+0x80/0x2f8
-  [c0000000049bfd00] [c000000002005aec] kernel_init_freeable+0x32c/0x520
-  [c0000000049bfde0] [c0000000000110f8] kernel_init+0x34/0x25c
-  [c0000000049bfe50] [c00000000000debc] ret_from_kernel_user_thread+0x14/0x=
-1c
-  --- interrupt: 0 at 0x0
-  Code: 60420000 3d22ffc6 39290708 7d291a14 89290270 7d290774 79230020 4bff=
-f8c0 60420000 e9240000 7d290074 7929d182 <0b090000> 3860ffea 4e800020 3c4c0=
-121=20
-  ---[ end trace 0000000000000000 ]---
-  ------------[ cut here ]------------
-  WARNING: CPU: 0 PID: 1 at kernel/bpf/btf.c:8131 register_btf_kfunc_id_set=
-+0x68/0x74
-  Modules linked in:
-  CPU: 0 PID: 1 Comm: swapper/0 Tainted: G        W          6.8.0-rc2-0338=
-0-gd0c0d80c1162 #2
-  Hardware name: IBM pSeries (emulated by qemu) POWER8 (raw) 0x4d0200 0xf00=
-0004 of:SLOF,HEAD pSeries
-  NIP:  c0000000003bfbfc LR: c0000000020517dc CTR: c000000002051790
-  REGS: c0000000049bf940 TRAP: 0700   Tainted: G        W           (6.8.0-=
-rc2-03380-gd0c0d80c1162)
-  MSR:  8000000002029033 <SF,VEC,EE,ME,IR,DR,RI,LE>  CR: 24000422  XER: 200=
-00000
-  CFAR: c0000000003bfbb0 IRQMASK: 0=20
-  GPR00: c0000000020517dc c0000000049bfbe0 c0000000015c9900 000000000000001=
-a=20
-  GPR04: c000000001227670 0000000000000002 c0000000049bfc02 fffffffffffe000=
-0=20
-  GPR08: 0000000000000000 0000000000000001 0000000000000000 000000002400028=
-2=20
-  GPR12: c000000002051790 c000000002b60000 c0000000000110cc 000000000000000=
-0=20
-  GPR16: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0=20
-  GPR20: 0000000000000000 0000000000000000 0000000000000000 c0000000014cd25=
-0=20
-  GPR24: c000000002003e6c c000000001582c78 000000000000018b c0000000020c106=
-8=20
-  GPR28: 0000000000000000 0000000000000008 c0000000020c10b0 c00000000122767=
-0=20
-  NIP [c0000000003bfbfc] register_btf_kfunc_id_set+0x68/0x74
-  LR [c0000000020517dc] kfunc_init+0x4c/0x110
-  Call Trace:
-  [c0000000049bfc30] [c000000000010d58] do_one_initcall+0x80/0x2f8
-  [c0000000049bfd00] [c000000002005aec] kernel_init_freeable+0x32c/0x520
-  [c0000000049bfde0] [c0000000000110f8] kernel_init+0x34/0x25c
-  [c0000000049bfe50] [c00000000000debc] ret_from_kernel_user_thread+0x14/0x=
-1c
-  --- interrupt: 0 at 0x0
-  Code: 60420000 3d22ffc6 39290708 7d291a14 89290270 7d290774 79230020 4bff=
-f8c0 60420000 e9240000 7d290074 7929d182 <0b090000> 3860ffea 4e800020 3c4c0=
-121=20
-  ---[ end trace 0000000000000000 ]---
-  ------------[ cut here ]------------
-  WARNING: CPU: 0 PID: 1 at kernel/bpf/btf.c:8131 register_btf_kfunc_id_set=
-+0x68/0x74
-  Modules linked in:
-  CPU: 0 PID: 1 Comm: swapper/0 Tainted: G        W          6.8.0-rc2-0338=
-0-gd0c0d80c1162 #2
-  Hardware name: IBM pSeries (emulated by qemu) POWER8 (raw) 0x4d0200 0xf00=
-0004 of:SLOF,HEAD pSeries
-  NIP:  c0000000003bfbfc LR: c0000000003976c8 CTR: c00000000039769c
-  REGS: c0000000049bf970 TRAP: 0700   Tainted: G        W           (6.8.0-=
-rc2-03380-gd0c0d80c1162)
-  MSR:  8000000002029033 <SF,VEC,EE,ME,IR,DR,RI,LE>  CR: 24000422  XER: 200=
-00000
-  CFAR: c0000000003bfbb0 IRQMASK: 0=20
-  GPR00: c0000000003976c8 c0000000049bfc10 c0000000015c9900 000000000000000=
-0=20
-  GPR04: c000000001228d70 0000000000000002 c0000000049bfc02 fffffffffffe000=
-0=20
-  GPR08: 0000000000000000 0000000000000001 0000000000000000 000000002400028=
-2=20
-  GPR12: c00000000039769c c000000002b60000 c0000000000110cc 000000000000000=
-0=20
-  GPR16: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0=20
-  GPR20: 0000000000000000 0000000000000000 0000000000000000 c0000000014cd25=
-0=20
-  GPR24: c000000002003e6c c000000001582c78 000000000000018b c0000000020c106=
-8=20
-  GPR28: 0000000000000000 0000000000000008 c0000000020c10b0 c00000000039769=
-c=20
-  NIP [c0000000003bfbfc] register_btf_kfunc_id_set+0x68/0x74
-  LR [c0000000003976c8] init_subsystem+0x2c/0x40
-  Call Trace:
-  [c0000000049bfc10] [c0000000020c10b0] 0xc0000000020c10b0 (unreliable)
-  [c0000000049bfc30] [c000000000010d58] do_one_initcall+0x80/0x2f8
-  [c0000000049bfd00] [c000000002005aec] kernel_init_freeable+0x32c/0x520
-  [c0000000049bfde0] [c0000000000110f8] kernel_init+0x34/0x25c
-  [c0000000049bfe50] [c00000000000debc] ret_from_kernel_user_thread+0x14/0x=
-1c
-  --- interrupt: 0 at 0x0
-  Code: 60420000 3d22ffc6 39290708 7d291a14 89290270 7d290774 79230020 4bff=
-f8c0 60420000 e9240000 7d290074 7929d182 <0b090000> 3860ffea 4e800020 3c4c0=
-121=20
-  ---[ end trace 0000000000000000 ]---
-  ------------[ cut here ]------------
-  WARNING: CPU: 0 PID: 1 at kernel/bpf/btf.c:8131 register_btf_kfunc_id_set=
-+0x68/0x74
-  Modules linked in:
-  CPU: 0 PID: 1 Comm: swapper/0 Tainted: G        W          6.8.0-rc2-0338=
-0-gd0c0d80c1162 #2
-  Hardware name: IBM pSeries (emulated by qemu) POWER8 (raw) 0x4d0200 0xf00=
-0004 of:SLOF,HEAD pSeries
-  NIP:  c0000000003bfbfc LR: c000000002051ed8 CTR: 0000000000000000
-  REGS: c0000000049bf950 TRAP: 0700   Tainted: G        W           (6.8.0-=
-rc2-03380-gd0c0d80c1162)
-  MSR:  8000000002029033 <SF,VEC,EE,ME,IR,DR,RI,LE>  CR: 24000220  XER: 200=
-00000
-  CFAR: c0000000003bfbb0 IRQMASK: 0=20
-  GPR00: c000000002051ed8 c0000000049bfbf0 c0000000015c9900 000000000000001=
-a=20
-  GPR04: c00000000122ad08 0000000000000001 c000000004810c00 c00000007fc92c3=
-0=20
-  GPR08: 0000000000000017 0000000000000001 0000000000000008 000000002400022=
-2=20
-  GPR12: 0000000000000034 c000000002b60000 c0000000000110cc 000000000000000=
-0=20
-  GPR16: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0=20
-  GPR20: 0000000000000000 0000000000000000 0000000000000000 c0000000014cd25=
-0=20
-  GPR24: c000000002003e6c c000000001582c78 000000000000018b c0000000020c106=
-8=20
-  GPR28: 0000000000000000 0000000000000008 c0000000020c10b0 c00000000122ad0=
-8=20
-  NIP [c0000000003bfbfc] register_btf_kfunc_id_set+0x68/0x74
-  LR [c000000002051ed8] cpumask_kfunc_init+0x98/0xf0
-  Call Trace:
-  [c0000000049bfbf0] [c000000002051e84] cpumask_kfunc_init+0x44/0xf0 (unrel=
-iable)
-  [c0000000049bfc30] [c000000000010d58] do_one_initcall+0x80/0x2f8
-  [c0000000049bfd00] [c000000002005aec] kernel_init_freeable+0x32c/0x520
-  [c0000000049bfde0] [c0000000000110f8] kernel_init+0x34/0x25c
-  [c0000000049bfe50] [c00000000000debc] ret_from_kernel_user_thread+0x14/0x=
-1c
-  --- interrupt: 0 at 0x0
-  Code: 60420000 3d22ffc6 39290708 7d291a14 89290270 7d290774 79230020 4bff=
-f8c0 60420000 e9240000 7d290074 7929d182 <0b090000> 3860ffea 4e800020 3c4c0=
-121=20
-  ---[ end trace 0000000000000000 ]---
-  Loading compiled-in X.509 certificates
-	.
-	.
-	.
-  netconsole: network logging started
-  ------------[ cut here ]------------
-  WARNING: CPU: 0 PID: 1 at kernel/bpf/btf.c:8131 register_btf_kfunc_id_set=
-+0x68/0x74
-  Modules linked in:
-  CPU: 0 PID: 1 Comm: swapper/0 Tainted: G        W          6.8.0-rc2-0338=
-0-gd0c0d80c1162 #2
-  Hardware name: IBM pSeries (emulated by qemu) POWER8 (raw) 0x4d0200 0xf00=
-0004 of:SLOF,HEAD pSeries
-  NIP:  c0000000003bfbfc LR: c000000000f0099c CTR: c000000000f00970
-  REGS: c0000000049bf970 TRAP: 0700   Tainted: G        W           (6.8.0-=
-rc2-03380-gd0c0d80c1162)
-  MSR:  8000000002029033 <SF,VEC,EE,ME,IR,DR,RI,LE>  CR: 24000282  XER: 200=
-00000
-  CFAR: c0000000003bfbb0 IRQMASK: 0=20
-  GPR00: c000000000f0099c c0000000049bfc10 c0000000015c9900 000000000000001=
-a=20
-  GPR04: c0000000012b12c0 0000000000000002 c0000000049bfc02 fffffffffffe000=
-0=20
-  GPR08: 0000000000000000 0000000000000001 0000000000000000 000000000000000=
-0=20
-  GPR12: c000000000f00970 c000000002b60000 c0000000000110cc 000000000000000=
-0=20
-  GPR16: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0=20
-  GPR20: 0000000000000000 0000000000000000 0000000000000000 c0000000014cd25=
-0=20
-  GPR24: c000000002003e6c c000000001582c78 000000000000018b c0000000020c106=
-8=20
-  GPR28: 0000000000000000 0000000000000008 c0000000020c10b0 c000000000f0097=
-0=20
-  NIP [c0000000003bfbfc] register_btf_kfunc_id_set+0x68/0x74
-  LR [c000000000f0099c] init_subsystem+0x2c/0x40
-  Call Trace:
-  [c0000000049bfc10] [c0000000020c10b0] 0xc0000000020c10b0 (unreliable)
-  [c0000000049bfc30] [c000000000010d58] do_one_initcall+0x80/0x2f8
-  [c0000000049bfd00] [c000000002005aec] kernel_init_freeable+0x32c/0x520
-  [c0000000049bfde0] [c0000000000110f8] kernel_init+0x34/0x25c
-  [c0000000049bfe50] [c00000000000debc] ret_from_kernel_user_thread+0x14/0x=
-1c
-  --- interrupt: 0 at 0x0
-  Code: 60420000 3d22ffc6 39290708 7d291a14 89290270 7d290774 79230020 4bff=
-f8c0 60420000 e9240000 7d290074 7929d182 <0b090000> 3860ffea 4e800020 3c4c0=
-121=20
-  ---[ end trace 0000000000000000 ]---
-  ------------[ cut here ]------------
-  WARNING: CPU: 0 PID: 1 at kernel/bpf/btf.c:8131 register_btf_kfunc_id_set=
-+0x68/0x74
-  Modules linked in:
-  CPU: 0 PID: 1 Comm: swapper/0 Tainted: G        W          6.8.0-rc2-0338=
-0-gd0c0d80c1162 #2
-  Hardware name: IBM pSeries (emulated by qemu) POWER8 (raw) 0x4d0200 0xf00=
-0004 of:SLOF,HEAD pSeries
-  NIP:  c0000000003bfbfc LR: c000000002094ab0 CTR: c000000002094a70
-  REGS: c0000000049bf960 TRAP: 0700   Tainted: G        W           (6.8.0-=
-rc2-03380-gd0c0d80c1162)
-  MSR:  8000000002029033 <SF,VEC,EE,ME,IR,DR,RI,LE>  CR: 24000282  XER: 200=
-00000
-  CFAR: c0000000003bfbb0 IRQMASK: 0=20
-  GPR00: c000000002094ab0 c0000000049bfc00 c0000000015c9900 000000000000000=
-3=20
-  GPR04: c0000000012b1260 0000000000000002 c0000000049bfc02 fffffffffffe000=
-0=20
-  GPR08: 0000000000000000 0000000000000001 0000000000000000 000000000000000=
-0=20
-  GPR12: c000000002094a70 c000000002b60000 c0000000000110cc 000000000000000=
-0=20
-  GPR16: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0=20
-  GPR20: 0000000000000000 0000000000000000 0000000000000000 c0000000014cd25=
-0=20
-  GPR24: c000000002003e6c c000000001582c78 000000000000018b c0000000020c106=
-8=20
-  GPR28: 0000000000000000 0000000000000008 c0000000012aef20 c0000000012b126=
-0=20
-  NIP [c0000000003bfbfc] register_btf_kfunc_id_set+0x68/0x74
-  LR [c000000002094ab0] bpf_kfunc_init+0x40/0x18c
-  Call Trace:
-  [c0000000049bfc30] [c000000000010d58] do_one_initcall+0x80/0x2f8
-  [c0000000049bfd00] [c000000002005aec] kernel_init_freeable+0x32c/0x520
-  [c0000000049bfde0] [c0000000000110f8] kernel_init+0x34/0x25c
-  [c0000000049bfe50] [c00000000000debc] ret_from_kernel_user_thread+0x14/0x=
-1c
-  --- interrupt: 0 at 0x0
-  Code: 60420000 3d22ffc6 39290708 7d291a14 89290270 7d290774 79230020 4bff=
-f8c0 60420000 e9240000 7d290074 7929d182 <0b090000> 3860ffea 4e800020 3c4c0=
-121=20
-  ---[ end trace 0000000000000000 ]---
-  ------------[ cut here ]------------
-  WARNING: CPU: 0 PID: 1 at kernel/bpf/btf.c:8131 register_btf_kfunc_id_set=
-+0x68/0x74
-  Modules linked in:
-  CPU: 0 PID: 1 Comm: swapper/0 Tainted: G        W          6.8.0-rc2-0338=
-0-gd0c0d80c1162 #2
-  Hardware name: IBM pSeries (emulated by qemu) POWER8 (raw) 0x4d0200 0xf00=
-0004 of:SLOF,HEAD pSeries
-  NIP:  c0000000003bfbfc LR: c000000002094ccc CTR: c000000002094ca0
-  REGS: c0000000049bf970 TRAP: 0700   Tainted: G        W           (6.8.0-=
-rc2-03380-gd0c0d80c1162)
-  MSR:  8000000002029033 <SF,VEC,EE,ME,IR,DR,RI,LE>  CR: 24000282  XER: 200=
-00000
-  CFAR: c0000000003bfbb0 IRQMASK: 0=20
-  GPR00: c000000002094ccc c0000000049bfc10 c0000000015c9900 000000000000000=
-6=20
-  GPR04: c0000000012b25e0 0000000000000002 c0000000049bfc02 fffffffffffe000=
-0=20
-  GPR08: 0000000000000000 0000000000000001 0000000000000000 000000000000000=
-0=20
-  GPR12: c000000002094ca0 c000000002b60000 c0000000000110cc 000000000000000=
-0=20
-  GPR16: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0=20
-  GPR20: 0000000000000000 0000000000000000 0000000000000000 c0000000014cd25=
-0=20
-  GPR24: c000000002003e6c c000000001582c78 000000000000018b c0000000020c106=
-8=20
-  GPR28: 0000000000000000 0000000000000008 c0000000020c10b0 c000000002094ca=
-0=20
-  NIP [c0000000003bfbfc] register_btf_kfunc_id_set+0x68/0x74
-  LR [c000000002094ccc] xdp_metadata_init+0x2c/0x40
-  Call Trace:
-  [c0000000049bfc10] [c0000000020c10b0] 0xc0000000020c10b0 (unreliable)
-  [c0000000049bfc30] [c000000000010d58] do_one_initcall+0x80/0x2f8
-  [c0000000049bfd00] [c000000002005aec] kernel_init_freeable+0x32c/0x520
-  [c0000000049bfde0] [c0000000000110f8] kernel_init+0x34/0x25c
-  [c0000000049bfe50] [c00000000000debc] ret_from_kernel_user_thread+0x14/0x=
-1c
-  --- interrupt: 0 at 0x0
-  Code: 60420000 3d22ffc6 39290708 7d291a14 89290270 7d290774 79230020 4bff=
-f8c0 60420000 e9240000 7d290074 7929d182 <0b090000> 3860ffea 4e800020 3c4c0=
-121=20
-  ---[ end trace 0000000000000000 ]---
-  ------------[ cut here ]------------
-  WARNING: CPU: 0 PID: 1 at kernel/bpf/btf.c:8131 register_btf_kfunc_id_set=
-+0x68/0x74
-  Modules linked in:
-  CPU: 0 PID: 1 Comm: swapper/0 Tainted: G        W          6.8.0-rc2-0338=
-0-gd0c0d80c1162 #2
-  Hardware name: IBM pSeries (emulated by qemu) POWER8 (raw) 0x4d0200 0xf00=
-0004 of:SLOF,HEAD pSeries
-  NIP:  c0000000003bfbfc LR: c000000002095890 CTR: c000000002095800
-  REGS: c0000000049bf940 TRAP: 0700   Tainted: G        W           (6.8.0-=
-rc2-03380-gd0c0d80c1162)
-  MSR:  8000000002029033 <SF,VEC,EE,ME,IR,DR,RI,LE>  CR: 24000282  XER: 200=
-00000
-  CFAR: c0000000003bfbb0 IRQMASK: 0=20
-  GPR00: c000000002095890 c0000000049bfbe0 c0000000015c9900 000000000000000=
-3=20
-  GPR04: c0000000012b5938 0000000000000002 c0000000049bfc02 fffffffffffe000=
-0=20
-  GPR08: 0000000000000000 0000000000000001 0000000000000000 000000000000000=
-0=20
-  GPR12: c000000002095800 c000000002b60000 c0000000000110cc 000000000000000=
-0=20
-  GPR16: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0=20
-  GPR20: 0000000000000000 0000000000000000 0000000000000000 c0000000014cd25=
-0=20
-  GPR24: c000000002003e6c c000000001582c78 000000000000018b c0000000020c106=
-8=20
-  GPR28: 0000000000000000 0000000000000008 c0000000020c10b0 c0000000012b593=
-8=20
-  NIP [c0000000003bfbfc] register_btf_kfunc_id_set+0x68/0x74
-  LR [c000000002095890] bpf_prog_test_run_init+0x90/0xec
-  Call Trace:
-  [c0000000049bfbe0] [c000000002095848] bpf_prog_test_run_init+0x48/0xec (u=
-nreliable)
-  [c0000000049bfc30] [c000000000010d58] do_one_initcall+0x80/0x2f8
-  [c0000000049bfd00] [c000000002005aec] kernel_init_freeable+0x32c/0x520
-  [c0000000049bfde0] [c0000000000110f8] kernel_init+0x34/0x25c
-  [c0000000049bfe50] [c00000000000debc] ret_from_kernel_user_thread+0x14/0x=
-1c
-  --- interrupt: 0 at 0x0
-  Code: 60420000 3d22ffc6 39290708 7d291a14 89290270 7d290774 79230020 4bff=
-f8c0 60420000 e9240000 7d290074 7929d182 <0b090000> 3860ffea 4e800020 3c4c0=
-121=20
-  ---[ end trace 0000000000000000 ]---
-  modprobe (54) used greatest stack depth: 28336 bytes left
-  ------------[ cut here ]------------
-  WARNING: CPU: 0 PID: 1 at kernel/bpf/btf.c:8131 register_btf_kfunc_id_set=
-+0x68/0x74
-  Modules linked in:
-  CPU: 0 PID: 1 Comm: swapper/0 Tainted: G        W          6.8.0-rc2-0338=
-0-gd0c0d80c1162 #2
-  Hardware name: IBM pSeries (emulated by qemu) POWER8 (raw) 0x4d0200 0xf00=
-0004 of:SLOF,HEAD pSeries
-  NIP:  c0000000003bfbfc LR: c00000000209bd0c CTR: c00000000209bce0
-  REGS: c0000000049bf970 TRAP: 0700   Tainted: G        W           (6.8.0-=
-rc2-03380-gd0c0d80c1162)
-  MSR:  800000000282b033 <SF,VEC,VSX,EE,FP,ME,IR,DR,RI,LE>  CR: 24000242  X=
-ER: 20000000
-  CFAR: c0000000003bfbb0 IRQMASK: 0=20
-  GPR00: c00000000209bd0c c0000000049bfc10 c0000000015c9900 000000000000001=
-b=20
-  GPR04: c0000000012bcb28 0000000000000002 c0000000049bfc02 fffffffffffe000=
-0=20
-  GPR08: 0000000000000000 0000000000000001 0000000000000000 c00000000291fb9=
-0=20
-  GPR12: c00000000209bce0 c000000002b60000 c0000000000110cc 000000000000000=
-0=20
-  GPR16: 0000000000000000 0000000000000000 0000000000000000 000000000000000=
-0=20
-  GPR20: 0000000000000000 0000000000000000 0000000000000000 c0000000014cd25=
-0=20
-  GPR24: c000000002003e6c c000000001582c78 000000000000018b c0000000020c106=
-8=20
-  GPR28: 0000000000000000 0000000000000008 c0000000020c10b0 c00000000209bce=
-0=20
-  NIP [c0000000003bfbfc] register_btf_kfunc_id_set+0x68/0x74
-  LR [c00000000209bd0c] bpf_tcp_ca_kfunc_init+0x2c/0x74
-  Call Trace:
-  [c0000000049bfc10] [c0000000020c10b0] 0xc0000000020c10b0 (unreliable)
-  [c0000000049bfc30] [c000000000010d58] do_one_initcall+0x80/0x2f8
-  [c0000000049bfd00] [c000000002005aec] kernel_init_freeable+0x32c/0x520
-  [c0000000049bfde0] [c0000000000110f8] kernel_init+0x34/0x25c
-  [c0000000049bfe50] [c00000000000debc] ret_from_kernel_user_thread+0x14/0x=
-1c
-  --- interrupt: 0 at 0x0
-  Code: 60420000 3d22ffc6 39290708 7d291a14 89290270 7d290774 79230020 4bff=
-f8c0 60420000 e9240000 7d290074 7929d182 <0b090000> 3860ffea 4e800020 3c4c0=
-121=20
-  ---[ end trace 0000000000000000 ]---
-  Freeing unused kernel image (initmem) memory: 6464K
+gtpc(4|6): Used for GTP-C in IPv4 and IPv6, where the GTP header format does
+not include a TEID.
+gtpc(4|6)t: Used for GTP-C in IPv4 and IPv6, with a GTP header format that
+includes a TEID.
+gtpu(4|6): Used for GTP-U in both IPv4 and IPv6 scenarios.
+gtpu(4|6)e: Used for GTP-U with extended headers in both IPv4 and IPv6.
+gtpu(4|6)u: Used when the PSC (PDU session container) in the GTP-U extended
+header includes Uplink, applicable to both IPv4 and IPv6.
+gtpu(4|6)d: Used when the PSC in the GTP-U extended header includes Downlink,
+for both IPv4 and IPv6.
 
-Exposed (and maybe caused) by commit
+GTP generates a flow that includes an ID called TEID to identify the tunnel.
+This tunnel is created for each UE (User Equipment).By performing RSS based on
+this flow, it is possible to apply RSS for each communication unit from the UE.
+Without this, RSS would only be effective within the range of IP addresses. For
+instance, the PGW can only perform RSS within the IP range of the SGW.
+Problematic from a load distribution perspective, especially if there's a bias
+in the terminals connected to a particular base station.This case can be
+solved by using this patch.
 
-  6e7769e6419f ("bpf: treewide: Annotate BPF kfuncs in BTF")
+Signed-off-by: Takeru Hayasaka <hayatake396@gmail.com>
+---
+v2->v3: Based on Harald-san's review, I added documentation and comments to 
+ethtool.h and ice.rst.
+v3->v4: Based on Marcin-san's review, I added the missing code for GTPC and 
+GTPC_TEID, and revised the documentation and comments.
+v4->v5: Based on Marcin-san's review, I fixed rename and wrong code regarding
+GTPC
+v5->v6: Based on Marcin-san's review, Undoing the addition of unnecessary
+blank lines.Minor fixes.
+v6->v7 Based on Jakub-san's review, Split the patch.
+ include/uapi/linux/ethtool.h | 48 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
---=20
-Cheers,
-Stephen Rothwell
+diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+index 06ef6b78b7de..11fc18988bc2 100644
+--- a/include/uapi/linux/ethtool.h
++++ b/include/uapi/linux/ethtool.h
+@@ -2023,6 +2023,53 @@ static inline int ethtool_validate_duplex(__u8 duplex)
+ #define	IPV4_FLOW	0x10	/* hash only */
+ #define	IPV6_FLOW	0x11	/* hash only */
+ #define	ETHER_FLOW	0x12	/* spec only (ether_spec) */
++
++/* Used for GTP-U IPv4 and IPv6.
++ * The format of GTP packets only includes
++ * elements such as TEID and GTP version.
++ * It is primarily intended for data communication of the UE.
++ */
++#define GTPU_V4_FLOW 0x13	/* hash only */
++#define GTPU_V6_FLOW 0x14	/* hash only */
++
++/* Use for GTP-C IPv4 and v6.
++ * The format of these GTP packets does not include TEID.
++ * Primarily expected to be used for communication
++ * to create sessions for UE data communication,
++ * commonly referred to as CSR (Create Session Request).
++ */
++#define GTPC_V4_FLOW 0x15	/* hash only */
++#define GTPC_V6_FLOW 0x16	/* hash only */
++
++/* Use for GTP-C IPv4 and v6.
++ * Unlike GTPC_V4_FLOW, the format of these GTP packets includes TEID.
++ * After session creation, it becomes this packet.
++ * This is mainly used for requests to realize UE handover.
++ */
++#define GTPC_TEID_V4_FLOW 0x17	/* hash only */
++#define GTPC_TEID_V6_FLOW 0x18	/* hash only */
++
++/* Use for GTP-U and extended headers for the PSC (PDU Session Container).
++ * The format of these GTP packets includes TEID and QFI.
++ * In 5G communication using UPF (User Plane Function),
++ * data communication with this extended header is performed.
++ */
++#define GTPU_EH_V4_FLOW 0x19	/* hash only */
++#define GTPU_EH_V6_FLOW 0x1a	/* hash only */
++
++/* Use for GTP-U IPv4 and v6 PSC (PDU Session Container) extended headers.
++ * This differs from GTPU_EH_V(4|6)_FLOW in that it is distinguished by
++ * UL/DL included in the PSC.
++ * There are differences in the data included based on Downlink/Uplink,
++ * and can be used to distinguish packets.
++ * The functions described so far are useful when you want to
++ * handle communication from the mobile network in UPF, PGW, etc.
++ */
++#define GTPU_UL_V4_FLOW 0x1b	/* hash only */
++#define GTPU_UL_V6_FLOW 0x1c	/* hash only */
++#define GTPU_DL_V4_FLOW 0x1d	/* hash only */
++#define GTPU_DL_V6_FLOW 0x1e	/* hash only */
++
+ /* Flag to enable additional fields in struct ethtool_rx_flow_spec */
+ #define	FLOW_EXT	0x80000000
+ #define	FLOW_MAC_EXT	0x40000000
+@@ -2037,6 +2084,7 @@ static inline int ethtool_validate_duplex(__u8 duplex)
+ #define	RXH_IP_DST	(1 << 5)
+ #define	RXH_L4_B_0_1	(1 << 6) /* src port in case of TCP/UDP/SCTP */
+ #define	RXH_L4_B_2_3	(1 << 7) /* dst port in case of TCP/UDP/SCTP */
++#define	RXH_GTP_TEID	(1 << 8) /* teid in case of GTP */
+ #define	RXH_DISCARD	(1 << 31)
+ 
+ #define	RX_CLS_FLOW_DISC	0xffffffffffffffffULL
+-- 
+2.34.1
 
---Sig_/IdzMCA.1BtKvMaBdA9eqQJZ
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmW7DsQACgkQAVBC80lX
-0GwK6wf5AaWtLw0kNLRUntfY2QZiLPlox2O5XTHOu5dOt4ovN6i9r8FXKPb93J4x
-XkMQHTy40vJBCKjNIRzr2g+usTiXA32y7+KILBTDUqmFnqyOnpGZHv3uqgobmmuy
-ypTHmmsk0hxY8lHF9iWuk7Kj3lA/Jx1Q3dbCVUY82/quoqwX9uQogpSBnt50ILw4
-jNfiT/saxIWuL9ln5BUuPyHi+Ib0tDi7wPnwZ+znRM+oGZs7hw3SgOOGkj8JU+b6
-q7bcmoNBWTx/aNQ6oCitIsZQMtKjCFVW14OG+js7dqdeovv69VrmLCTVDwF4Wr8T
-nTTmK50gHwrOWZrYDD+KQBcylXubow==
-=R6IK
------END PGP SIGNATURE-----
-
---Sig_/IdzMCA.1BtKvMaBdA9eqQJZ--
 
