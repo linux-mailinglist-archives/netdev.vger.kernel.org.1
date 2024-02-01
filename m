@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-67821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BC248450A6
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 06:20:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C06088450A8
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 06:20:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C47AA1F29758
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 05:20:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7705528F181
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 05:20:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 124733C488;
-	Thu,  1 Feb 2024 05:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCA0E3CF44;
+	Thu,  1 Feb 2024 05:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OImwbE51"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WgAWwoQW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7DE3C478;
-	Thu,  1 Feb 2024 05:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9565B3B19E;
+	Thu,  1 Feb 2024 05:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706764826; cv=none; b=Rt5ecl4es8gZF8OwWIlT9Mb+qX3AkKx4uCSoIrHu+VV4rDVJfGAWTzRrRI9ycRnBp5dyY9uRZE6H+RRHKtWn6359sfGc1b66sryOkZ2fyoWYcPQJ8oW4dCMfVt3PX+9dBn/c0J6paoQJRv5QbLLJNzYs/seR3YSLD5Z9PFlmjNU=
+	t=1706764828; cv=none; b=tCfiuAILKAFs04W5OgSxAbsPv1fPt292Xovtp4q6++yvqnBuanhr6zW+GX3535R7VxgRB3AqhtP6Ae5mL9Tppf20mHzTNs52kSiZCsuud106ATlSPl4/B8coNK/GPjJ/QvvBBHVNTJBjaolrxu2FgL7loCWyO9A4AO3GNqeSeFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706764826; c=relaxed/simple;
-	bh=Xrl1S/KSzdhstY3QZ086GSIfQy2B8O1HOVrY5nbEFUM=;
+	s=arc-20240116; t=1706764828; c=relaxed/simple;
+	bh=NzVEEPfDKZXrlbClAX/5PpcAND3mvnrMb8EUSMT+Mdo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LsnZWwQ4syOpJWb7sRtPK3sBFhO90VN46FupD3I5VPymODocLg9VaKepYi9bei0tQP+nCxM3BNNjxDISwvnKbg8f/Q1aT8zNs1MuY1oDa7RfqJbsA63YXCuxFXdITaQ6Dgvb0wgv7VbISckbvs2S5OCa2NQO/UalCgTMzv1tv9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OImwbE51; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 59DD1C43390;
-	Thu,  1 Feb 2024 05:20:25 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=rCfeN6403Go1lgzNYyDicPFV265PMdh2KJ3CTWkZ7b/56pbXu3k7yvryfXqNPcg2Myf2PfUQT7a9vuqHEX9CEXFdQPT6y8+McEv6ZLCH7ejsrYZfBbN3dMAsV6l3fChIHQH8Sn3NkDplAMd90Ked78xwMnWm2YAquXR4iEm618M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WgAWwoQW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1B37AC43390;
+	Thu,  1 Feb 2024 05:20:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706764825;
-	bh=Xrl1S/KSzdhstY3QZ086GSIfQy2B8O1HOVrY5nbEFUM=;
+	s=k20201202; t=1706764828;
+	bh=NzVEEPfDKZXrlbClAX/5PpcAND3mvnrMb8EUSMT+Mdo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OImwbE51iPhWYXkBQveZKo9t6PTimzG4k6mz4P3BYeb7Saar5X0bnvXB/haN4iH7n
-	 l9rjnDeAgEejjocfeao1mK/30tZ6uSlebaW1+2S+gLHub6a/XTNXT4sumVD4lYD3Z4
-	 0nzNypgHAbvkLeuomXGiu3f94jETjgt1xnwwRQCKhPSnk12BCZ2CZVA3udwaLXOdt3
-	 fxfc8vkSieZqm/99hKOy70nWj0pHijHTm7PnRxQSuqpGwH9BssN7WsTvtRJnm7uQdF
-	 BZrjNVn4W3UVnvy+vjyQkqxaSkQJIosIxrMuv/QViEXocxXZhuQ0hRo86BKvJ7/gk8
-	 5HI4S1P02Svyg==
+	b=WgAWwoQWQnNO/6VrNpyKPtXUQ9MebifHXs244+oys/F6LEZOvzCew8zfZSAaRPnTJ
+	 BNUq0FHwfvUjKOKVsrOoDFhPWnX3TgjSwGFdHtK3zwMWGuR0x6o1Mqds4qvX1DlVm4
+	 29Q8Ej46635Cmqc3UC47KdpSnRjifznTuHL+kJi4sa8oSpSBnCqNbOC/Kt0dGRTBNf
+	 g76qdvoAYkGTNhrCLo3gHlAYHUjQc32OaaKDxFyGcdsHAuSkgut+Gt+bOOzozqD6W6
+	 8Xbx6I19E7BCqQK6qzlKvVC40S34VWnIBNVavgrC/p4pzbmrxuG5RnKk32EQW3k1Dv
+	 ztV1NHIw5BO3w==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3ECFFDC99E5;
-	Thu,  1 Feb 2024 05:20:25 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 06998DC99E5;
+	Thu,  1 Feb 2024 05:20:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,45 +52,67 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] selftests: net: a few pmtu.sh fixes
+Subject: Re: [PATCH net-next v2 00/13] tools/net/ynl: Add features for tc family
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170676482525.24744.1244628672807352889.git-patchwork-notify@kernel.org>
-Date: Thu, 01 Feb 2024 05:20:25 +0000
-References: <cover.1706635101.git.pabeni@redhat.com>
-In-Reply-To: <cover.1706635101.git.pabeni@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, shuah@kernel.org, dsahern@kernel.org, gnault@redhat.com,
- vadim.fedorenko@linux.dev, fw@strlen.de, linux-kselftest@vger.kernel.org
+ <170676482802.24744.7890909749893938993.git-patchwork-notify@kernel.org>
+Date: Thu, 01 Feb 2024 05:20:28 +0000
+References: <20240129223458.52046-1-donald.hunter@gmail.com>
+In-Reply-To: <20240129223458.52046-1-donald.hunter@gmail.com>
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, corbet@lwn.net,
+ linux-doc@vger.kernel.org, jacob.e.keller@intel.com, leitao@debian.org,
+ jiri@resnulli.us, alessandromarcolini99@gmail.com, donald.hunter@redhat.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 30 Jan 2024 18:47:15 +0100 you wrote:
-> This series try to address CI failures for the pmtu.sh tests. It
-> does _not_ attempt to enable all the currently skipped cases, to
-> avoid adding more entropy.
+On Mon, 29 Jan 2024 22:34:45 +0000 you wrote:
+> Add features to ynl for tc and update the tc spec to use them.
 > 
-> Tested with:
-> 
-> make -C tools/testing/selftests/ TARGETS=net install
-> vng --build  --config tools/testing/selftests/net/config
-> vng --run . --user root -- \
-> 	./tools/testing/selftests/kselftest_install/run_kselftest.sh \
-> 	-t net:pmtu.sh
+> Patch 1 adds an option to output json instead of python pretty printing.
+> Patch 2, 3 adds support and docs for sub-messages in nested attribute
+> spaces that reference keys from a parent space.
+> Patches 4 and 7-9 refactor ynl in support of nested struct definitions
+> Patch 5 implements sub-message encoding for write ops.
+> Patch 6 adds logic to set default zero values for binary blobs
+> Patches 10, 11 adds support and docs for nested struct definitions
+> Patch 12 updates the ynl doc generator to include type information for
+> struct members.
+> Patch 13 updates the tc spec - still a work in progress but more complete
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] selftests: net: add missing config for pmtu.sh tests
-    https://git.kernel.org/netdev/net/c/f7c25d8e17dd
-  - [net,2/3] selftests: net: fix available tunnels detection
-    https://git.kernel.org/netdev/net/c/e4e4b6d568d2
-  - [net,3/3] selftests: net: don't access /dev/stdout in pmtu.sh
-    https://git.kernel.org/netdev/net/c/bc0970d5ac1d
+  - [net-next,v2,01/13] tools/net/ynl: Add --output-json arg to ynl cli
+    https://git.kernel.org/netdev/net-next/c/e2ece0bc5ab1
+  - [net-next,v2,02/13] tools/net/ynl: Support sub-messages in nested attribute spaces
+    https://git.kernel.org/netdev/net-next/c/bf8b832374fb
+  - [net-next,v2,03/13] doc/netlink: Describe sub-message selector resolution
+    https://git.kernel.org/netdev/net-next/c/78d234169795
+  - [net-next,v2,04/13] tools/net/ynl: Refactor fixed header encoding into separate method
+    https://git.kernel.org/netdev/net-next/c/5f2823c48ad6
+  - [net-next,v2,05/13] tools/net/ynl: Add support for encoding sub-messages
+    https://git.kernel.org/netdev/net-next/c/ab463c4342d1
+  - [net-next,v2,06/13] tools/net/ynl: Encode default values for binary blobs
+    https://git.kernel.org/netdev/net-next/c/a387a921139e
+  - [net-next,v2,07/13] tools/net/ynl: Combine struct decoding logic in ynl
+    https://git.kernel.org/netdev/net-next/c/e45fee0f49fc
+  - [net-next,v2,08/13] tools/net/ynl: Rename _fixed_header_size() to _struct_size()
+    https://git.kernel.org/netdev/net-next/c/886365cf40b2
+  - [net-next,v2,09/13] tools/net/ynl: Move formatted_string method out of NlAttr
+    https://git.kernel.org/netdev/net-next/c/971c3eeaf668
+  - [net-next,v2,10/13] tools/net/ynl: Add support for nested structs
+    https://git.kernel.org/netdev/net-next/c/bf08f32c8ced
+  - [net-next,v2,11/13] doc/netlink: Describe nested structs in netlink raw docs
+    https://git.kernel.org/netdev/net-next/c/9d6429c33976
+  - [net-next,v2,12/13] tools/net/ynl: Add type info to struct members in generated docs
+    https://git.kernel.org/netdev/net-next/c/fe09ae5fb93b
+  - [net-next,v2,13/13] doc/netlink/specs: Update the tc spec
+    https://git.kernel.org/netdev/net-next/c/2267672a6190
 
 You are awesome, thank you!
 -- 
