@@ -1,178 +1,118 @@
-Return-Path: <netdev+bounces-68198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AB4B8461BA
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:02:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C7558461CB
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:11:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 111E9283991
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:02:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E42C1C22587
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:11:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C118185626;
-	Thu,  1 Feb 2024 20:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0D985627;
+	Thu,  1 Feb 2024 20:11:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="SdhvkOni"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="22ukRdaz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 831738528E
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 20:02:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123A18528B
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 20:11:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706817737; cv=none; b=Wqfoc1m+ClP3RakZ1bTrncUvzh9KLSWjlldbpybOv9jx7YPrwuzf9szdz30IvBr4Ph6XHrAFQ493nRy4QwjVBa3CwaQj4/JUnj51VALmXKUlx/FKMtcDrUS87H7IAgZPdOBHSUlWA1tXFwGmh2aShcwShkD71XUKsF7Oa+zoA+k=
+	t=1706818262; cv=none; b=jjbErhOe1rdjON/TiM8efs9a4Cn/n1xy5N3M5GMy1KCsr9aSSg/ZPJxJ8XZ6/IkxKkfNPJ8y0KT3gpAEH4djsfavdXDiByuRKq0YzKu85uWdeAm4Z+tZZdwg4a+I4fn1MEMCwuRXo+F3LIJY8vMeJmWqegbM5xMzJGv+LZ8LtlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706817737; c=relaxed/simple;
-	bh=tvy6mSud+tO0FW2Ix++bq0Yqn3nq8l29ZBq1/shnleU=;
+	s=arc-20240116; t=1706818262; c=relaxed/simple;
+	bh=p+cFD0VWHPwsCLWu7k74qwLoPELrk6sXEkr7D0IEpZw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SGP/c448mGEKWEFHWic+5CgcRU85d9ChvXYU/uEvkNrsVoD9c7UJNk8htK7Nbdu1LjQKL+hNYc6PSASv+5s0sSmRdDc7nOnRZMbKZOs2iWFpekB/rT4ucvLY4n0oyB/1RqEyINgs+SRjuLFphdRtQupxtTHRPYE+ZQoRdr544as=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=SdhvkOni; arc=none smtp.client-ip=209.85.167.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=umich.edu
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3be6b977516so913908b6e.2
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 12:02:15 -0800 (PST)
+	 To:Cc:Content-Type; b=lPOvGegltF2a2fpHcGsvKkhG8OZS3buzDqNadL4YGql7qZLVOc4qweDkL9+eDLEgBdVgksuFH2eCrIZcdVJGVoSYDnE5AOIEDkLFCkFqvgPR+b9jXm/hXUoJu7sMzibMTApBXnXYrqfDmjghBXE9T3Fid6ol4dZ45+Sj9SeG5nU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=22ukRdaz; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-55f63fd3dd8so2344a12.0
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 12:11:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=umich.edu; s=google-2016-06-03; t=1706817734; x=1707422534; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1706818259; x=1707423059; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=oKtKU9ec/rsz7HBSzIU5uqFOSZbUdu+2rlARf46Czpw=;
-        b=SdhvkOnie1LRW6jS1+B8/uSuT6goBwPJ5Ysv4a0WhSxROFWET7z6lXc6zDSsNw3lfT
-         l4pUCQ13wLkl+D0Rkxcb7xsaI3ncktvMANX2AqlxF6jM/6uRS31Wvn62Pw/u0AXPEU3C
-         lUD20nZY+iDBO5RWhY3sLWc1PkOtFQMIaBHGO6wuzhuZL8XK3WwNEvRzKLJPXv4eVnYN
-         CH+7SkmGsNySP4rt8hM3f8M14PaRW78PVEpA/s+kEawiyY8uD7kznYhDlQ5IwBSpWWI2
-         Uxkac9x/ZCcnpWh3ZwwJyfMhYqJ/Xsmv8hYUFMqecMSIheVkdkBpPUSt1YT8bM2p1NY/
-         L6hw==
+        bh=3HUJ91Kg1r9ZFRIyQrQf1AnCt8Vh5OB+DO7n+ndiBvI=;
+        b=22ukRdaz3qzrzZopZn75tQZ3UnJ7uTG56vidKyf4W+fGlsynNwhUba1ENozlu5UUG8
+         zEHdkVovIgcbefkSDb2Z3VfHRnwna71Y4iwqWaoh02IbQO0odRzF97eRW71U2AHhCMbk
+         e/5ZLEUY9Tgo0212OFZ87DBKjmKdA+SuWUD2iJiAMOZBNGeu5/9+c59TpSqqJXgeSZos
+         Qo6ynypzEm/Cw5IIfQAyhaN55YAYf4Q2aEZwwvfzfDrSYWvXEjQRMKfN312TjAH6Q/eg
+         j/QHqKRxexjDYQ8ydRtPAEc9NH5AkilDUOBwxzbtaXT3pENt4jJ6yYVjEo9Vsm/JOM3K
+         XdcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706817734; x=1707422534;
+        d=1e100.net; s=20230601; t=1706818259; x=1707423059;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oKtKU9ec/rsz7HBSzIU5uqFOSZbUdu+2rlARf46Czpw=;
-        b=K5X6byvTj7AnYEFefHEF0yIiaDLPMHi+shb3qUZN3TpM0gH39gokVHSbEO/pV5GI3r
-         1+gJuklb/urzjT9PhNiBIFv1+RAlzwlf2zgHgQifaM+YUGoRm+s9QohRuK45Ck00QlPj
-         U6uTs6kO85sbuDN2SyoXmJXOfmlYTAV7vXKfKUDgWQor5xsRgxnzA8EcXE0ENWE0pIw7
-         KYtsNH06mPucXwbVyyvmaOS8tGMJ+A3n8HcAMu9SU6DdqMZIxh2I+bh0ktgoMPU7AjVv
-         xHmFwhFlOBTLoB6Cs4sO7cIFaS2r5cT7D880ozmdJ870o1PRZU8GTqZifyreOMOdOipg
-         KxNA==
-X-Gm-Message-State: AOJu0YwxCb7Ri0PieUYzB0H2riVpIZNdMX2Eg48VVRt5X/d1oB0GSlET
-	pSRTHBNSQpKkwZ0f/y3blioe8X8aaxTtlFnZXaThAGvM+tpjPlWb7gGje3Tz4mo+4YkrFosDvOf
-	qTNpwXmfvweCYkCCZimj7+O78lhI/7+COKTnyOg==
-X-Google-Smtp-Source: AGHT+IGkopw9KI9BmtHxGeMn+uc0bvHsWIA3VKpCBS/bF9G1Oq6uAmfg6Qe9qX+sxvKiL3uBS6W453i2/9uWDYwy3Dw=
-X-Received: by 2002:a05:6808:640e:b0:3be:aafd:cc6 with SMTP id
- fg14-20020a056808640e00b003beaafd0cc6mr3387394oib.17.1706817734567; Thu, 01
- Feb 2024 12:02:14 -0800 (PST)
+        bh=3HUJ91Kg1r9ZFRIyQrQf1AnCt8Vh5OB+DO7n+ndiBvI=;
+        b=VmSjZEj1T3EagocC5MbLEzerPH1KLMTD92Yytbu2CgHrPOP0EQ/PRDX7JkeG91L/2a
+         qdCSoS2XW6W9kPJN5rIvZwhAW3GzRN3WsRK8Lfhf8+CYwK/koQtpe4g+/3ENVvVYyY87
+         7HJq1t3nAdjrPHSZVq4d73sdLFAG0/kkD3BwwEagM30bjwPTBB0W1c7d8e/CI0fl3R9n
+         rLLGRP7msynZYq0CeZ0v4HK34NWW+m1SPPuovfQT4m2Igr0gePVql083YQvLXpRa936W
+         lnoM5iS9/LABGQT2cxYHrEfQYunZOy0cA1rYcksDcNlJ2GwpG1KCgixYv9OZuO0UOAeo
+         JATA==
+X-Gm-Message-State: AOJu0YyIqKYx8OBTK8uff7UbprfFhhYjyPmeQIrpsUzOHl3lbwuzFajN
+	MSfKg7WZvdMD9jqRbiv6wpvlrSly6PWLZWwK1VK7IXfrW+E62EQ/P8XRoXWgYKPWtUs96b+Vnz5
+	ebkJW6d/329JXLSb0CRV8RvRQH4y6Z/tXPEpmeQAAhklLcEwmUIMR
+X-Google-Smtp-Source: AGHT+IEN0t4/mPKYbcBDp05j0wQtiit60NotPmlcWlN6xcItSGXXXc0Gf6Vz8fkxYCFxOLQvZ1XV7WjqCVfkJP7q+bQ=
+X-Received: by 2002:a50:c34a:0:b0:55f:cdc8:b43 with SMTP id
+ q10-20020a50c34a000000b0055fcdc80b43mr15747edb.2.1706818258802; Thu, 01 Feb
+ 2024 12:10:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240201-rockchip-rust-phy_depend-v2-0-c5fa4faab924@christina-quast.de>
- <20240201-rockchip-rust-phy_depend-v2-2-c5fa4faab924@christina-quast.de>
-In-Reply-To: <20240201-rockchip-rust-phy_depend-v2-2-c5fa4faab924@christina-quast.de>
-From: Trevor Gross <tmgross@umich.edu>
-Date: Thu, 1 Feb 2024 14:02:03 -0600
-Message-ID: <CALNs47tWNNi2GXHAwwT=A1LP=xWwXvrPy4xVapqMQOeyeN0+9Q@mail.gmail.com>
-Subject: Re: [PATCH v2 2/3] rust: phy: add some phy_driver and genphy_ functions
-To: Christina Quast <contact@christina-quast.de>
-Cc: Miguel Ojeda <ojeda@kernel.org>, Alex Gaynor <alex.gaynor@gmail.com>, 
-	Wedson Almeida Filho <wedsonaf@gmail.com>, Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, 
-	Alice Ryhl <aliceryhl@google.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Heiko Stuebner <heiko@sntech.de>, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org
+References: <20240201175324.3752746-1-edumazet@google.com> <9259d368c091b071d16bd1969240f4e9dffe92fb.camel@redhat.com>
+In-Reply-To: <9259d368c091b071d16bd1969240f4e9dffe92fb.camel@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 1 Feb 2024 21:10:46 +0100
+Message-ID: <CANn89i+MLtYa9kxc4r_etSrz87hoMF8L_HHbJXtaNEU7C22-Ng@mail.gmail.com>
+Subject: Re: [PATCH net] netdevsim: avoid potential loop in nsim_dev_trap_report_work()
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com, syzbot <syzkaller@googlegroups.com>, 
+	Jiri Pirko <jiri@nvidia.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 1, 2024 at 12:07=E2=80=AFPM Christina Quast
-<contact@christina-quast.de> wrote:
-> diff --git a/rust/kernel/net/phy.rs b/rust/kernel/net/phy.rs
-> index e457b3c7cb2f..373a4d358e9f 100644
-> --- a/rust/kernel/net/phy.rs
-> +++ b/rust/kernel/net/phy.rs
-> @@ -95,6 +95,22 @@ pub fn phy_id(&self) -> u32 {
->          unsafe { (*phydev).phy_id }
->      }
->
-> +    /// Gets the current crossover of the PHY.
-> +    pub fn mdix(&self) -> u8 {
-
-Are possible values for mdix always ETH_TP_MDI{,_INVALID,_X,_AUTO}? If
-so, this would be better as an enum.
-
-> +        let phydev =3D self.0.get();
-> +        // SAFETY: The struct invariant ensures that we may access
-> +        // this field without additional synchronization.
-> +        unsafe { (*phydev).mdix }
-> +    }
-
-> +
->      /// Gets the state of PHY state machine states.
->      pub fn state(&self) -> DeviceState {
->          let phydev =3D self.0.get();
-> @@ -300,6 +316,15 @@ pub fn genphy_read_abilities(&mut self) -> Result {
->          // So it's just an FFI call.
->          to_result(unsafe { bindings::genphy_read_abilities(phydev) })
->      }
-> +
-> +    /// Writes BMCR
-> +    pub fn genphy_config_aneg(&mut self) -> Result {
-
-The docs need an update here
-
-> +        let phydev =3D self.0.get();
-> +        // SAFETY: `phydev` is pointing to a valid object by the type in=
-variant of `Self`.
-> +        // So it's just an FFI call.
-> +        // second param =3D false =3D> autoneg not requested
-> +        to_result(unsafe { bindings::__genphy_config_aneg(phydev, false)=
- })
-
-I assume you did this since the non-dunder `genphy_config_aneg` is
-inline. I think that is ok since the implementation is so minimal, but
-you could also add a binding helper and call that (rust/helpers.c).
-
-> +    }
->  }
->
->  /// Defines certain other features this PHY supports (like interrupts).
-> @@ -583,6 +608,12 @@ fn soft_reset(_dev: &mut Device) -> Result {
->          Err(code::ENOTSUPP)
->      }
->
-> +    /// Called to initialize the PHY,
-> +    /// including after a reset
-
-Docs wrapping
-
-> +    fn config_init(_dev: &mut Device) -> Result {
-> +        Err(code::ENOTSUPP)
-> +    }
-
-These have been changed to raise a build error rather than ENOTSUPP in
-recent , see [1]. That patch is in net-next so you should see it next
-time you rebase.
-
-Also - these functions are meant for the vtable and don't do anything
-if they are not wired up. See the create_phy_driver function, you will
-need to add the field.
-
->      /// Probes the hardware to determine what abilities it has.
->      fn get_features(_dev: &mut Device) -> Result {
->          Err(code::ENOTSUPP)
->
-> --
-> 2.43.0
+On Thu, Feb 1, 2024 at 7:49=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
 >
 
-[1]: https://lore.kernel.org/rust-for-linux/20240125014502.3527275-2-fujita=
-.tomonori@gmail.com/
+> The patch LGTM, thanks!
+>
+> I'm wondering if we have a similar problem in
+> devlink_rel_nested_in_notify_work():
+>
+>         if (!devl_trylock(devlink)) {
+>                 devlink_put(devlink);
+>                 goto reschedule_work;
+>         }
+>
+>         //...
+> reschedule_work:
+>         schedule_work(&rel->nested_in.notify_work);
+>
+
+> And possibly adding 1ms delay there could be problematic?
+
+A conversion to schedule_delayed_work() would be needed I think.
+
+I looked at all syzbot reports and did not find
+devlink_rel_nested_in_notify_work() in them,
+I guess we were lucky all this time :)
+
+>
+> Cheers,
+>
+> Paolo
+>
 
