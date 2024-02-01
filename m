@@ -1,245 +1,174 @@
-Return-Path: <netdev+bounces-68152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A86B3845EE3
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:49:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4874F845EF3
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:53:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DB851F2DDC5
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:49:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27EA3B2BCDC
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:53:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D7297C6D4;
-	Thu,  1 Feb 2024 17:49:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 038457C6E2;
+	Thu,  1 Feb 2024 17:53:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="nMrmJ6e9"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="J4LJ2awR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2DF7C6D9
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 17:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FAED7C6D7
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 17:53:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706809763; cv=none; b=SutGtOF+w0JqDV+QdyKBd7KwqVj26eaJwOIZ+YkCxgw09KnvWdy2RXHB3w2T4tZbhFoPffSLAKwZCdCp2MIRUbzuUjrnJqf7BUxmmIQXMQIxfNon0pw8nd+xucP3qTrcMqDGqqaZTe20izS/JNzMDJjWmAx+GfKejduF/ctKfR8=
+	t=1706810008; cv=none; b=X3ghwtJxYeCkRxCoD4WC2GmvAaj+mQPg/5qeVLr8zcgZatFTVEGFXczGpmZ6h3OR8kuJaDgtE/9scNAluAIb41+AomM2n75P/oLBosriOHGT1BkHDPN7MJeqfIqgEYD+BWBX6y1ffIJhifJFfGYP2JcYvAULGdpaYTi8+yUunk0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706809763; c=relaxed/simple;
-	bh=9XFsZwOD3LHEK3a0qDgxtBUhSexmKK4nwTIs6niVY14=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=chzmNeZiB+vOegXgDu0LV5cO7A/N8NQi4HcDMBPoTmHb33RD54l4XpgZaBwWEVTlIhbxKcAKpAgeYzsKROhmeliI7wTQppeIAvRYEKA6cL4Bi8gfk7fyn1hg9hqsnApasZxYEaHA0xv7rNlrk+wo9OvG5dF9pIleoZqwCIS8lrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=nMrmJ6e9; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
-Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 411HavJQ025723;
-	Thu, 1 Feb 2024 17:49:14 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding; s=pp1;
- bh=tvIon4durGBvjsrMVCRtCf+31D8bLbhX6K64OfKeZuo=;
- b=nMrmJ6e93yvzFPuzCOVcCwAkcro7FovWoTpxliXmw77XM6B/LT024civbWimj2Rg63rT
- 3FZADLkP5pXkKbPgwqPj9Si8Ddh83JMgXEyjmHSMqRSk+RNkyZBtQ3FfT1z8KCHL93QN
- 63YSNgPjf5aw28jVEvtohmGWPWYpJunAcniuiovjgjM9mdfOrEKSeYolR5MpSkm9pTOU
- cZ0ziAFX6vlEYyEtnRHXyBKG0DVCS7AJzD+xIIKoQrRqV93phTwsncYkTuW7M4+rGlYU
- 9bngq+q/fTsuMAJaWvV/qo9PxpF92/eihMqSza0FDV3LJu7tfhsr3D7akUB8kQmqnysk +A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w0e093trp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 17:49:14 +0000
-Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 411HbEU5028573;
-	Thu, 1 Feb 2024 17:49:13 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w0e093trc-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 17:49:13 +0000
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 411Gje1a007196;
-	Thu, 1 Feb 2024 17:49:12 GMT
-Received: from smtprelay05.wdc07v.mail.ibm.com ([172.16.1.72])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 3vwev2njgs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 01 Feb 2024 17:49:12 +0000
-Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay05.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 411HnARC12583486
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 1 Feb 2024 17:49:10 GMT
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id F0B6858056;
-	Thu,  1 Feb 2024 17:49:09 +0000 (GMT)
-Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id BEC125805A;
-	Thu,  1 Feb 2024 17:49:09 +0000 (GMT)
-Received: from linux.vnet.ibm.com (unknown [9.41.99.4])
-	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  1 Feb 2024 17:49:09 +0000 (GMT)
-From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
-To: kuba@kernel.org
-Cc: netdev@vger.kernel.org, aelior@marvell.com, davem@davemloft.net,
-        manishc@marvell.com, pabeni@redhat.com, skalluru@marvell.com,
-        simon.horman@corigine.com, edumazet@google.com,
-        VENKATA.SAI.DUGGI@ibm.com, drc@linux.vnet.ibm.com, abdhalee@in.ibm.com,
-        thinhtr@linux.vnet.ibm.com
-Subject: [PATCH v7 2/2] net/bnx2x: refactor common code to bnx2x_stop_nic()
-Date: Thu,  1 Feb 2024 11:48:22 -0600
-Message-Id: <1149c0efc9b000bf6c28807b3f1d173079e807bd.1706804455.git.thinhtr@linux.vnet.ibm.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <cover.1706804455.git.thinhtr@linux.vnet.ibm.com>
-References: <cover.1706804455.git.thinhtr@linux.vnet.ibm.com>
+	s=arc-20240116; t=1706810008; c=relaxed/simple;
+	bh=Zk2ov1opgNHmx4vLZRgOl+nHfy0HQweiyoOa7ZkDcTM=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=lLbjAOM1Ux+8CB5eWDDM/ZjWAABBty9nKjNvDXQfa2jmj/3GciTHn/92w8sCoOpEJpVtAX//SXjxmwJamYlCsUkhrl04nUGizLUAgj4FbATw8GspKyvsYaYg6PpbRPBwBW7WfofjszjN+ijRj3VRp/tesZINwmb10Al31ZoewGk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=J4LJ2awR; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b2681571so1871480276.2
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 09:53:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706810006; x=1707414806; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=hWruSwlom3lXdmwH02laiU8RsFEbcXFelwURYIcXPD8=;
+        b=J4LJ2awRdIlzo4eF9vTqEUYGxuH3mVu180VFANJeynhw9ta2gP8stkfP9WaNkvlHm9
+         naIQmbRl0jq2mKFQDsWg1VGswT3uL/QLUbKVdUZvXV5U5l+A0i9VUyez7vm+weyz1qfP
+         +l49w3iCrE6eCZBd/NgZpNBXtvIaO2w0uvJMGpE1SKCEFK/0lRou96vbYulgajFNaA+L
+         SGTDCuBJ/MzGiBLkm0jLImm2wdJb8O+EF3q69RwjnkJEPPnw1JrAHoOfnxsJL+ZsmpGD
+         ofIxAGi2g582s+HdxRa16NoZBwL/jckYozXdF5UYo9vmoV3W/HXUcA4V2Hnw1wtb/Cx1
+         yFTQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706810006; x=1707414806;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hWruSwlom3lXdmwH02laiU8RsFEbcXFelwURYIcXPD8=;
+        b=WV6FZegbxIm/DygeDTM5tNDqhqh/IKPAaZt9SiWpgQb5wbnLTNGiMFJRVOjMX4Ah/3
+         86Relf0AbHP3khGcSi0uV0AdiFUucKzto4prWEE+faL0LliitTTCYoJjWWAXmpFfQFQd
+         yQdxdfD1afOmxKHEF5BksJvIRMs4wQADO/JnzIExl/w1lldCeaWZrCRvaaQ0vzaruxGQ
+         ZYjSq0ak954eZdRAjetMkKHu0J6bTwCLqzmD6T5CabznwQNpM1S473GH4abXTnTvh1nY
+         fB4xxPwaPFMHTeSctpCiwRe+sDaL5rS6wh4DYy93jVrD+3hVIugFr3xKQs/kgRwNXPdz
+         y1Qg==
+X-Gm-Message-State: AOJu0YxCtB6iABhy/KnLZ29ie9YNqNZgLgZWTfI6ch+nSKaDeyrsUq9M
+	g9duYiMXJWohHeEgX5pksQxN5d/dfVab57iSyyKU+QqciBtZzlW+I6GAkP9sz7F8eKn2pee2gf/
+	3KfGPnhShHQ==
+X-Google-Smtp-Source: AGHT+IFxWgWYXAB/QRHek7Sdh2QC3KTM0gL9tsTQGMM0Fd3YkzkHuobjSIhG1SYOBOEDQyzIw+NbNKhwnLvqQQ==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:2384:b0:dc6:9f32:59ae with SMTP
+ id dp4-20020a056902238400b00dc69f3259aemr103018ybb.12.1706810006339; Thu, 01
+ Feb 2024 09:53:26 -0800 (PST)
+Date: Thu,  1 Feb 2024 17:53:24 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: kwxe5kgGE7rCRz_6V6bpmNKzrgHrwwFN
-X-Proofpoint-ORIG-GUID: EODeH6t7w9EhA-P0wqh6yPTauYMsBO_K
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-01_04,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
- mlxlogscore=927 priorityscore=1501 bulkscore=0 phishscore=0 malwarescore=0
- spamscore=0 clxscore=1015 suspectscore=0 lowpriorityscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2402010138
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.429.g432eaa2c6b-goog
+Message-ID: <20240201175324.3752746-1-edumazet@google.com>
+Subject: [PATCH net] netdevsim: avoid potential loop in nsim_dev_trap_report_work()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
+	Jiri Pirko <jiri@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Refactor common code which disables and releases HW interrupts, deletes
-NAPI objects, into a new bnx2x_stop_nic() function.
+Many syzbot reports include the following trace [1]
 
-Signed-off-by: Thinh Tran <thinhtr@linux.vnet.ibm.com>
+If nsim_dev_trap_report_work() can not grab the mutex,
+it should rearm itself at least one jiffie later.
+
+[1]
+Sending NMI from CPU 1 to CPUs 0:
+NMI backtrace for cpu 0
+CPU: 0 PID: 32383 Comm: kworker/0:2 Not tainted 6.8.0-rc2-syzkaller-00031-g861c0981648f #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+Workqueue: events nsim_dev_trap_report_work
+ RIP: 0010:bytes_is_nonzero mm/kasan/generic.c:89 [inline]
+ RIP: 0010:memory_is_nonzero mm/kasan/generic.c:104 [inline]
+ RIP: 0010:memory_is_poisoned_n mm/kasan/generic.c:129 [inline]
+ RIP: 0010:memory_is_poisoned mm/kasan/generic.c:161 [inline]
+ RIP: 0010:check_region_inline mm/kasan/generic.c:180 [inline]
+ RIP: 0010:kasan_check_range+0x101/0x190 mm/kasan/generic.c:189
+Code: 07 49 39 d1 75 0a 45 3a 11 b8 01 00 00 00 7c 0b 44 89 c2 e8 21 ed ff ff 83 f0 01 5b 5d 41 5c c3 48 85 d2 74 4f 48 01 ea eb 09 <48> 83 c0 01 48 39 d0 74 41 80 38 00 74 f2 eb b6 41 bc 08 00 00 00
+RSP: 0018:ffffc90012dcf998 EFLAGS: 00000046
+RAX: fffffbfff258af1e RBX: fffffbfff258af1f RCX: ffffffff8168eda3
+RDX: fffffbfff258af1f RSI: 0000000000000004 RDI: ffffffff92c578f0
+RBP: fffffbfff258af1e R08: 0000000000000000 R09: fffffbfff258af1e
+R10: ffffffff92c578f3 R11: ffffffff8acbcbc0 R12: 0000000000000002
+R13: ffff88806db38400 R14: 1ffff920025b9f42 R15: ffffffff92c578e8
+FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000c00994e078 CR3: 000000002c250000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <NMI>
+ </NMI>
+ <TASK>
+  instrument_atomic_read include/linux/instrumented.h:68 [inline]
+  atomic_read include/linux/atomic/atomic-instrumented.h:32 [inline]
+  queued_spin_is_locked include/asm-generic/qspinlock.h:57 [inline]
+  debug_spin_unlock kernel/locking/spinlock_debug.c:101 [inline]
+  do_raw_spin_unlock+0x53/0x230 kernel/locking/spinlock_debug.c:141
+  __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:150 [inline]
+  _raw_spin_unlock_irqrestore+0x22/0x70 kernel/locking/spinlock.c:194
+  debug_object_activate+0x349/0x540 lib/debugobjects.c:726
+  debug_work_activate kernel/workqueue.c:578 [inline]
+  insert_work+0x30/0x230 kernel/workqueue.c:1650
+  __queue_work+0x62e/0x11d0 kernel/workqueue.c:1802
+  __queue_delayed_work+0x1bf/0x270 kernel/workqueue.c:1953
+  queue_delayed_work_on+0x106/0x130 kernel/workqueue.c:1989
+  queue_delayed_work include/linux/workqueue.h:563 [inline]
+  schedule_delayed_work include/linux/workqueue.h:677 [inline]
+  nsim_dev_trap_report_work+0x9c0/0xc80 drivers/net/netdevsim/dev.c:842
+  process_one_work+0x886/0x15d0 kernel/workqueue.c:2633
+  process_scheduled_works kernel/workqueue.c:2706 [inline]
+  worker_thread+0x8b9/0x1290 kernel/workqueue.c:2787
+  kthread+0x2c6/0x3a0 kernel/kthread.c:388
+  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+ </TASK>
+
+Fixes: 012ec02ae441 ("netdevsim: convert driver to use unlocked devlink API during init/fini")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Jiri Pirko <jiri@nvidia.com>
 ---
- .../net/ethernet/broadcom/bnx2x/bnx2x_cmn.c   | 28 +++++++++++--------
- .../net/ethernet/broadcom/bnx2x/bnx2x_cmn.h   |  1 +
- .../net/ethernet/broadcom/bnx2x/bnx2x_main.c  | 25 +++--------------
- .../net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c  | 12 ++------
- 4 files changed, 24 insertions(+), 42 deletions(-)
+ drivers/net/netdevsim/dev.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
-index e9c1e1bb5580..e34aff5fb782 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
-@@ -3097,17 +3097,8 @@ int bnx2x_nic_unload(struct bnx2x *bp, int unload_mode, bool keep_link)
- 		if (!CHIP_IS_E1x(bp))
- 			bnx2x_pf_disable(bp);
+diff --git a/drivers/net/netdevsim/dev.c b/drivers/net/netdevsim/dev.c
+index b4d3b9cde8bd685202f135cf9c845d1be76ef428..92a7a36b93ac0cc1b02a551b974fb390254ac484 100644
+--- a/drivers/net/netdevsim/dev.c
++++ b/drivers/net/netdevsim/dev.c
+@@ -835,14 +835,14 @@ static void nsim_dev_trap_report_work(struct work_struct *work)
+ 				      trap_report_dw.work);
+ 	nsim_dev = nsim_trap_data->nsim_dev;
  
--		if (!bp->nic_stopped) {
--			/* Disable HW interrupts, NAPI */
--			bnx2x_netif_stop(bp, 1);
--			/* Delete all NAPI objects */
--			bnx2x_del_all_napi(bp);
--			if (CNIC_LOADED(bp))
--				bnx2x_del_all_napi_cnic(bp);
--			/* Release IRQs */
--			bnx2x_free_irq(bp);
--			bp->nic_stopped = true;
--		}
-+		/* Disable HW interrupts, delete NAPIs, Release IRQs */
-+		bnx2x_stop_nic(bp, 1);
- 
- 		/* Report UNLOAD_DONE to MCP */
- 		bnx2x_send_unload_done(bp, false);
-@@ -5139,3 +5130,18 @@ void bnx2x_schedule_sp_rtnl(struct bnx2x *bp, enum sp_rtnl_flag flag,
- 	   flag);
- 	schedule_delayed_work(&bp->sp_rtnl_task, 0);
- }
-+
-+void bnx2x_stop_nic(struct bnx2x *bp, int disable_hw)
-+{
-+	if (!bp->nic_stopped) {
-+		/* Disable HW interrupts, NAPI */
-+		bnx2x_netif_stop(bp, disable_hw);
-+		/* Delete all NAPI objects */
-+		bnx2x_del_all_napi(bp);
-+		if (CNIC_LOADED(bp))
-+			bnx2x_del_all_napi_cnic(bp);
-+		/* Release IRQs */
-+		bnx2x_free_irq(bp);
-+		bp->nic_stopped = true;
-+	}
-+}
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
-index 0bc1367fd649..a35a02299b33 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
-@@ -553,6 +553,7 @@ void bnx2x_free_skbs(struct bnx2x *bp);
- void bnx2x_netif_stop(struct bnx2x *bp, int disable_hw);
- void bnx2x_netif_start(struct bnx2x *bp);
- int bnx2x_load_cnic(struct bnx2x *bp);
-+void bnx2x_stop_nic(struct bnx2x *bp, int disable_hw);
- 
- /**
-  * bnx2x_enable_msix - set msix configuration.
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-index 0d8e61c63c7c..ff75c883cffe 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-@@ -9474,18 +9474,8 @@ void bnx2x_chip_cleanup(struct bnx2x *bp, int unload_mode, bool keep_link)
- 		}
+-	/* For each running port and enabled packet trap, generate a UDP
+-	 * packet with a random 5-tuple and report it.
+-	 */
+ 	if (!devl_trylock(priv_to_devlink(nsim_dev))) {
+-		schedule_delayed_work(&nsim_dev->trap_data->trap_report_dw, 0);
++		schedule_delayed_work(&nsim_dev->trap_data->trap_report_dw, 1);
+ 		return;
  	}
  
--	if (!bp->nic_stopped) {
--		/* Disable HW interrupts, NAPI */
--		bnx2x_netif_stop(bp, 1);
--		/* Delete all NAPI objects */
--		bnx2x_del_all_napi(bp);
--		if (CNIC_LOADED(bp))
--			bnx2x_del_all_napi_cnic(bp);
--
--		/* Release IRQs */
--		bnx2x_free_irq(bp);
--		bp->nic_stopped = true;
--	}
-+	/* Disable HW interrupts, delete NAPIs, Release IRQs */
-+	bnx2x_stop_nic(bp, 1);
- 
- 	/* Reset the chip, unless PCI function is offline. If we reach this
- 	 * point following a PCI error handling, it means device is really
-@@ -14241,16 +14231,9 @@ static pci_ers_result_t bnx2x_io_slot_reset(struct pci_dev *pdev)
- 		}
- 		bnx2x_drain_tx_queues(bp);
- 		bnx2x_send_unload_req(bp, UNLOAD_RECOVERY);
--		if (!bp->nic_stopped) {
--			bnx2x_netif_stop(bp, 1);
--			bnx2x_del_all_napi(bp);
- 
--			if (CNIC_LOADED(bp))
--				bnx2x_del_all_napi_cnic(bp);
--
--			bnx2x_free_irq(bp);
--			bp->nic_stopped = true;
--		}
-+		/* Disable HW interrupts, delete NAPIs, Release IRQs */
-+		bnx2x_stop_nic(bp, 1);
- 
- 		/* Report UNLOAD_DONE to MCP */
- 		bnx2x_send_unload_done(bp, true);
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c
-index 8946a931e87e..e92e82423096 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c
-@@ -529,16 +529,8 @@ void bnx2x_vfpf_close_vf(struct bnx2x *bp)
- 	bnx2x_vfpf_finalize(bp, &req->first_tlv);
- 
- free_irq:
--	if (!bp->nic_stopped) {
--		/* Disable HW interrupts, NAPI */
--		bnx2x_netif_stop(bp, 0);
--		/* Delete all NAPI objects */
--		bnx2x_del_all_napi(bp);
--
--		/* Release IRQs */
--		bnx2x_free_irq(bp);
--		bp->nic_stopped = true;
--	}
-+	/* Disable HW interrupts, delete NAPIs, Release IRQs */
-+	bnx2x_stop_nic(bp, 0);
- }
- 
- static void bnx2x_leading_vfq_init(struct bnx2x *bp, struct bnx2x_virtf *vf,
++	/* For each running port and enabled packet trap, generate a UDP
++	 * packet with a random 5-tuple and report it.
++	 */
+ 	list_for_each_entry(nsim_dev_port, &nsim_dev->port_list, list) {
+ 		if (!netif_running(nsim_dev_port->ns->netdev))
+ 			continue;
 -- 
-2.25.1
+2.43.0.429.g432eaa2c6b-goog
 
 
