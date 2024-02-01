@@ -1,93 +1,127 @@
-Return-Path: <netdev+bounces-67742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06AAA844D86
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:00:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB833844D92
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:04:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7B602824BB
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 00:00:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80B6C1F244E7
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 00:04:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 173922CA6;
-	Thu,  1 Feb 2024 00:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C885A184;
+	Thu,  1 Feb 2024 00:04:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oK4Cj8Dq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h9TQrAbV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B8128FA;
-	Thu,  1 Feb 2024 00:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E62337C;
+	Thu,  1 Feb 2024 00:04:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706745630; cv=none; b=pGro8wNlS1Wht4luJsp5QxufAGJh+1fUSx2PitIUC0+VysxLfXrdfJWBFaLAAy9iFF3nNUVTfkt1zNFccMQSzII+ynLyXClrHCA/mCujmYe7d426hXuWMWYbQ/8+xhcD3IEkyP3iW54TDMf5b9Kz2qQiOmnc+v9/saNJsEEAv64=
+	t=1706745868; cv=none; b=gD4NcGoqqYIfKF/rJ8jpHInkpuJcmts7H1BCKrD+I9jIEL8TQ3KnPePoobofh/1RrpIZB6YCuuxa+dfOweyNVjFB3cc6GVzl+b3xMm+6NhiMtYP24dBKlMohRc2zt0Hu+MqilXyHk556l0zTK2wMMB4rRdVXThWdHTB/QfMQ/Lc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706745630; c=relaxed/simple;
-	bh=zREvaHdfm6Af6CZ/mjkHydTi1oz70Sam0xHkCUDkCfI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EW2mZ95DYg8w2nAzCaSupbYr9Gnn5JBsa/DenBWKTyD7lFGVEhJcjqDTxWPssYw8HDighzvfB/k3qq0Amj/kzxcmcZ1CY+QyGr18ULlYOKLt9LKExlKi5Z9+lXZFzprckIeEC4t33m2GKJTr89jVaKQQafR6YrKWnUQfSAiy3hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oK4Cj8Dq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6E342C433F1;
-	Thu,  1 Feb 2024 00:00:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706745629;
-	bh=zREvaHdfm6Af6CZ/mjkHydTi1oz70Sam0xHkCUDkCfI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=oK4Cj8Dqw6Mshr7jru5Tt6t+tgJDqFFEKMaNCdLLeLBBBT/V2E1TKQb9EP4aurbGl
-	 Qj6aWb903Kfv75zsQkMAsS5ylx+Ve/oQ7PP+RqaBetPDmMqgXay+8vzuzVLs3+JKHD
-	 omYDqYnqlIOHytvTRyMZUrK0EATocVC3OYcZEQPB1BWHC2wlCDzQpPs+RHsCjYPn3U
-	 mEQ4Hwz/vuGfqf8L9wEsabVLYUNpM0o2mg4fjWGPWb0f2YHaMq/Jypi3QXcplmQ8ln
-	 Mn4AGboJe8Rq+xpMLVBfP8RtOjan6O8BxsB+Ml8ETQ50m+qBYdWFxSLGujk/NrXtEh
-	 RNVAkSlLxGoEQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 51D1CE3237F;
-	Thu,  1 Feb 2024 00:00:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1706745868; c=relaxed/simple;
+	bh=ocp7AlYTWdpktj/bKSgADTaYJuvdE/zKdxZf6Npx1Kg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D3pz66sVxfJGOyHgLplQIUWhAoXU6oibiUriLQLp7dITL+wc1mrHYj7HGQPdU90dTzje7f9vLPQY6ncob/lBYkm+48+PitWPzh0EV7c65uw2KLSMMMEu++glPrNinnxp4Y0mLcZtr83g8nRRwgUT5Mek0UJ5cm6JKbVixElK4x0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h9TQrAbV; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6ddb129350cso227815b3a.3;
+        Wed, 31 Jan 2024 16:04:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706745866; x=1707350666; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QWmJW1ioE6shF94cLYg8UXpbXdCkseBL4kZBLYoeBuI=;
+        b=h9TQrAbVdqErNQWKOE2o55fn2ZaOQbFr4FxM2aEUYvaAQ38nZllnVy3ZU4RVmC2E9U
+         I+kPu7BlXSu+hcCkuXx96kyBqxlyFVt+5YA7GFmlT6EbDRVsdZEO7tH6dPbhVJ/aNykH
+         H5fyVLERaCVQGeQaybF4SSmO6o40eVxbToEIeSNzherMCG2GE3u2v606M71PE3blkad+
+         1Eslf3KcjHWYqu0vC6uoTFcXjCwNWivuCq27ZOrxzZ4ZRW5aEgjH73BuhdLHQ9Tq4x8s
+         rB8wfrydKDQNegS4ErRgFplngPbvsEZauAXdbLqFjtaLOwq5y7uJbRakJD2o6ilLfd4U
+         YGmA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706745866; x=1707350666;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QWmJW1ioE6shF94cLYg8UXpbXdCkseBL4kZBLYoeBuI=;
+        b=VkdkvcD610i90dvrbVV0gDCTwsdSUonIN9hdbFldWCgpFnRUTKVQqZRxhiINRcj5Qx
+         hks3oNLQ93I72czpT9MxxJAg/GuURuf/ujqhgjjcbDMBRmhTqNfPOz/fIDty1dXkMcZX
+         AdbukNPqJ6A1Xo3/7pLQbV8rvX75h3iEp051/Cw5ymVk/qKv9loZgwiCgqRqEAk49CIk
+         K8LHo3WktDZgR1hMSiHnkEcMjm0qcDS13mO7lagkoS/b7MDuo3FQZKjyODhQ8HFeY7uw
+         j080gUQjZMtorXi5Tg2JW0vZoPVWf+g/o4danyz15syvxrKY3P28SZsFjmMJEJPOG3eA
+         tlNA==
+X-Gm-Message-State: AOJu0YyuVF61qtYbiIW5isDMFxTdFzVjxj8Xa4BOdvOa7aR3Hvqa7dZj
+	s9ZITcsawNmZlMIFTtsdOsapgHIS2dYZAy+agPCyKdwN+VYyW9Sg
+X-Google-Smtp-Source: AGHT+IGBKobfIm1xyfYyTe1hLyDXEz+BO2PI+5A5iytez90gtfBGuKYEcrsACR6tlmTY3B1KQ7lVsg==
+X-Received: by 2002:a05:6a00:1c91:b0:6d9:ac1f:421e with SMTP id y17-20020a056a001c9100b006d9ac1f421emr3881511pfw.26.1706745866320;
+        Wed, 31 Jan 2024 16:04:26 -0800 (PST)
+Received: from localhost (dhcp-141-239-144-21.hawaiiantel.net. [141.239.144.21])
+        by smtp.gmail.com with ESMTPSA id jw3-20020a056a00928300b006dbd2231184sm10443282pfb.70.2024.01.31.16.04.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jan 2024 16:04:26 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Wed, 31 Jan 2024 14:04:24 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Mikulas Patocka <mpatocka@redhat.com>, linux-kernel@vger.kernel.org,
+	dm-devel@lists.linux.dev, msnitzer@redhat.com, ignat@cloudflare.com,
+	damien.lemoal@wdc.com, bob.liu@oracle.com, houtao1@huawei.com,
+	peterz@infradead.org, mingo@kernel.org, netdev@vger.kernel.org,
+	allen.lkml@gmail.com, kernel-team@meta.com,
+	Alasdair Kergon <agk@redhat.com>, Mike Snitzer <snitzer@kernel.org>
+Subject: Re: [PATCH 8/8] dm-verity: Convert from tasklet to BH workqueue
+Message-ID: <ZbrgCPEolPJNfg1x@slm.duckdns.org>
+References: <20240130091300.2968534-1-tj@kernel.org>
+ <20240130091300.2968534-9-tj@kernel.org>
+ <c2539f87-b4fe-ac7d-64d9-cbf8db929c7@redhat.com>
+ <Zbq8cE3Y2ZL6dl8r@slm.duckdns.org>
+ <CAHk-=wjMz_1mb+WJsPhfp5VBNrM=o8f-x2=6UW2eK5n4DHff9g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] [v2] net: ipv4: fix a memleak in ip_setup_cork
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170674562932.31899.696796459152019489.git-patchwork-notify@kernel.org>
-Date: Thu, 01 Feb 2024 00:00:29 +0000
-References: <20240129091017.2938835-1-alexious@zju.edu.cn>
-In-Reply-To: <20240129091017.2938835-1-alexious@zju.edu.cn>
-To: Zhipeng Lu <alexious@zju.edu.cn>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHk-=wjMz_1mb+WJsPhfp5VBNrM=o8f-x2=6UW2eK5n4DHff9g@mail.gmail.com>
 
-Hello:
+Hello, Linus.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 29 Jan 2024 17:10:17 +0800 you wrote:
-> When inetdev_valid_mtu fails, cork->opt should be freed if it is
-> allocated in ip_setup_cork. Otherwise there could be a memleak.
+On Wed, Jan 31, 2024 at 03:19:01PM -0800, Linus Torvalds wrote:
+> On Wed, 31 Jan 2024 at 13:32, Tejun Heo <tj@kernel.org> wrote:
+> >
+> > I don't know, so just did the dumb thing. If the caller always guarantees
+> > that the work items are never queued at the same time, reusing is fine.
 > 
-> Fixes: 501a90c94510 ("inet: protect against too small mtu values.")
-> Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
-> ---
-> Changelog:
+> So the reason I thought it would be a good cleanup to introduce that
+> "atomic" workqueue thing (now "bh") was that this case literally has a
+> switch between "use tasklets' or "use workqueues".
 > 
-> [...]
+> So it's not even about "reusing" the workqueue, it's literally a
+> matter of making it always just use workqueues, and the switch then
+> becomes just *which* workqueue to use - system or bh.
 
-Here is the summary with links:
-  - [v2] net: ipv4: fix a memleak in ip_setup_cork
-    https://git.kernel.org/netdev/net/c/5dee6d692345
+Yeah, that's how the dm-crypt got converted. The patch just before this one.
+This one probably can be converted the same way. I don't see the work item
+being re-initialized. It probably is better to initialize the work item
+together with the enclosing struct and then just queue it when needed.
 
-You are awesome, thank you!
+Mikulas, I couldn't decide what to do with the "try_verify_in_tasklet"
+option and just decided to do the minimal thing hoping that someone more
+familiar with the code can take over the actual conversion. How much of user
+interface commitment is that? Should it be renamed or would it be better to
+leave it be?
+
+Thanks.
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+tejun
 
