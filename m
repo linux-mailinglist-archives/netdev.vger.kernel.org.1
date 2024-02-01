@@ -1,483 +1,489 @@
-Return-Path: <netdev+bounces-68221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47D578462AE
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 22:35:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51AAB8462B0
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 22:38:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C8D01F2425A
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:35:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74E45B21C25
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:38:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDB903FE48;
-	Thu,  1 Feb 2024 21:34:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 154FD3CF60;
+	Thu,  1 Feb 2024 21:38:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="108sp8ca"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vyx2i16/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D968D3FB15
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 21:34:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E714B38DCD
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 21:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706823280; cv=none; b=RsRXFO+VqeNDxLWVwmA3bIeW/5AKFs61Qzy1aH+qyQDc66TCs2nPloiVXpfPv6iPwm/UkeiIdzKdKwoeqbsRI3V+QEYBRz/7tK+a7Tsnhoz4UKy+pVjgud6SxeEaM6KlR5io0Xjf5xjX+NvtRlParIUT4Su6F9roFZre0d/D0YY=
+	t=1706823486; cv=none; b=UZvX0t8tuX0gxh/Fl4htF4hzhXjajqa9u82V1COp8l25zbaxz5UP7jXCjBuwNzcSwZXXtxXoMo1qa01VJVtJddkz+3TKjYgRy+fnr0TmFKpXD1xs9WbGZY77nHvHM8ZuQOH5V9vyf/zXGOzvWE5pc4p0cv/BU3BYHUBM0zKqPLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706823280; c=relaxed/simple;
-	bh=XsTm4G/QN8bn2Q4iit9UfUbT2i7xvQSURHOPoEOGK4o=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=tBMSXiwjb96cfslXxAXl8chVbmhjOalvOo+MLHOVwLJp1gqJr6GSaZoePihmnTF6049dqeBVZYXPij92Tn6Jj2x/pLA7n0ipo0ikOXwdYKfSGRyiv1bzer37NeCW7FPtv6J+CFcu+bYY9plMy2K5Y8oBmSca7E5BIr0P36UM0No=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=108sp8ca; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6041c633cfaso19236687b3.1
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 13:34:38 -0800 (PST)
+	s=arc-20240116; t=1706823486; c=relaxed/simple;
+	bh=ui2MX2/w1VBVPu3vgRnhL5bF9/yLr2ycZmn0Lhv9sro=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=nqIV0fBWZ6cowINyuq03sY3V/BvuQRzHXYSFTNJbFGWbZDFOHPvGEFolvn9YDP1XCM52pnfRBhF5c9E0z2v5tWA0lZ0D0HbHMJwGNjFeNVt9UKDd0tKmdY/ly/j6ZTXxnqAfh6ystXnaEDPETqSs18IgEQWSJkxojPssjjOwSKc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vyx2i16/; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a26f73732c5so219199666b.3
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 13:38:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706823278; x=1707428078; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=BWLmWK2Td4HLWqajG1M4UvIFhKc5O1hv4SsJBoHY8ds=;
-        b=108sp8caluXK1k2HF/SM/b9ID5VS1URZzVQTMf1bVer4n5ZAVUsZ16nKU/YCYsohfL
-         bDDlic5US5Or+Z+2zDonSPRw4P8iw+WFmTLI3Y11NFmRSPVJo68iJ0v51gX8B7XhiHXG
-         tLHwuFxLI/+qidkqRKP6+GGG0SpvJeZxOwJpN8BlwO+iefaohQPhUt7PZ6lKEC551BPF
-         91FlI8N9C5D2KHCThulMgulo0TH2qTWJ9D6cJHKKuxaONkleFrGmMDmUATbcPBGcrEa3
-         bQJTZ7u7oDNAs0BLtLIPvydZ+A+H36RF4ix0xQiYfF7H7cIBm+IHX8L9Aa25jkIlUg1q
-         5mRA==
+        d=gmail.com; s=20230601; t=1706823482; x=1707428282; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mPLTaNIOFbAesnh9I7RvdD0gHY5yyIyg+iUrOEJAqUU=;
+        b=Vyx2i16/X3/vRF4nkD3cEdzZfyC7/22BsMDWFDx6MRG3CIZeSwOM4Bx0IgSnvL5guN
+         khH7JsQZulOTk0gAWIb7afhV6emfVy7imRPXnlBw6MFOtMYCp74gIOU3EACAxcsfjhkG
+         sX7/4AaDO3bS9NZThdtvUaRVQPOugnBAYHIR1idEtFUiXVID/6qLCfnQ9V7kgRCXYadA
+         Q7UbyIwS9y4FKJDuMsq7eag/6wwc729BPvqfQNX7wgs25IXUbxy0apfwEkxl369Bw8kv
+         gTUHno3FEjSapt9el6dl/tAAFuhxN3VBXu6k5MFOWbgB9TqlzYZ4tH5ThfSvQZDi3TOJ
+         HoNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706823278; x=1707428078;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BWLmWK2Td4HLWqajG1M4UvIFhKc5O1hv4SsJBoHY8ds=;
-        b=qi/26a3WD/EsSxgyR5tpUXlKdHo4jYBLybCeYa0N6QOmlr0ItQ4IwOfVlRX9z9FddW
-         7S1qQ0wWpAgK6hGIGqo8DJS5R7+wpWdngHNguvfVCSpgK6i2YTgUu/afWY8u6Ec1vgya
-         0VhQkWdc31BjOe/HRv76cZNCnKkzZpBixgqpp8g3cDEWVqWH4yxaEGNjqpThZ1J/M3X0
-         ACCRqj0ZekS5X+cNMWL6SpHK4Cax8zzcFaBQ+2+HV7/9E/avRhHVSx5tTSl1/MJgrFMf
-         jvU0VWTyTt5VDziTddhio36ZoaZ1zjFS4S5nqh4vDySSn8v9TYTUg5qy6qhjbMQQJER7
-         85sQ==
-X-Gm-Message-State: AOJu0YzSUUyfoQcmCBaquv+2VZqHAQgLy5fvnwPfs6Q2yRwgHgbEbke3
-	KZg0dUWO1s2bBFk3ZGFm2KgNPvpIaF+nFoWgw1ysBnBiGIa1vZQKO9h18Yk7BIAMbxFENZGMGwa
-	HEPTXRTyXMWN5PZwSaei9sg==
-X-Google-Smtp-Source: AGHT+IEwJ2Kan4/GnAs9norXw/yNyP8fObBapRZe9Ima87FfnxbJZmEt+aavamGVn/9S3rAetMFvRfpDYxVby1ivyg==
-X-Received: from almasrymina.svl.corp.google.com ([2620:15c:2c4:200:4c26:ae83:34fc:80a5])
- (user=almasrymina job=sendgmr) by 2002:a05:690c:f8d:b0:604:1eea:a39e with
- SMTP id df13-20020a05690c0f8d00b006041eeaa39emr443690ywb.3.1706823277800;
- Thu, 01 Feb 2024 13:34:37 -0800 (PST)
-Date: Thu,  1 Feb 2024 13:34:26 -0800
-In-Reply-To: <20240201213429.4120839-1-almasrymina@google.com>
+        d=1e100.net; s=20230601; t=1706823482; x=1707428282;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mPLTaNIOFbAesnh9I7RvdD0gHY5yyIyg+iUrOEJAqUU=;
+        b=CdVeW4fF5EwWxxA/BoC2bwJlOoTdFXUkX8DWspgPKBQg6I+dcC9ib5udTPxULPqNIi
+         nLT+x7KL0cAWrrn8tl1bvhs5mux5WHn/4ooNRCIpN7aumnO3ZAe2JCN1Rnci+Bb88VTv
+         WGlC+IF/LQsnoRiDdvLKAT25IIEi+wokOanWXsxNUCqS/3WqRg/lX4RRLM/4vr1n8TLf
+         h1PaY2O1GbQ3xIkVfQev8ZlFPf/TvdOp7vBE1xMvZ6rj0t9mT8sZg4mzWVLdT8lSYVfo
+         3PRQCl1kr/itodyYgHySTqy52R3H5YFSohDsAhcA/TeH8ZNXobSQQYXLr7Tr7GV+BrsK
+         PmwQ==
+X-Gm-Message-State: AOJu0Yw0OpC/8lQ7UlnoszpGqQA7XS9yj9qTRtJr/AN+I+ATQXt42E0Y
+	BBN3PbK2fjTSKSVp0IUTAAGkzMCf7548KZewDFsX0TkYROHw1uce82EjLdxf
+X-Google-Smtp-Source: AGHT+IEMghz2BrOd1gzMRNJeFU8jsBSBrJzLMm3cWGxv2GNFKH6ohE5lDfrdBJ45zrl3Yb8rDKJjfQ==
+X-Received: by 2002:a17:906:e81:b0:a36:47fa:4b8c with SMTP id p1-20020a1709060e8100b00a3647fa4b8cmr2507926ejf.9.1706823481660;
+        Thu, 01 Feb 2024 13:38:01 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVuYMDGk6DMXR/z9zwf1gM1ulo2geGP99lXZ72HqwMpiRzTz05N6vqKmD5AEJOqXCYcc6h/V8FGaHANuftOaYXKyN0opZtntc6G8kitP1Nb4o8KYcPMnT70j11ilrUQVMAa5SHTuIZgEyaQJWWtcAkwfYr6cE3djTBaw6Xj
+Received: from ?IPV6:2a01:c23:bcb7:3100:59fd:7b30:8e23:b0ac? (dynamic-2a01-0c23-bcb7-3100-59fd-7b30-8e23-b0ac.c23.pool.telefonica.de. [2a01:c23:bcb7:3100:59fd:7b30:8e23:b0ac])
+        by smtp.googlemail.com with ESMTPSA id n13-20020a1709061d0d00b00a3527dba974sm188711ejh.35.2024.02.01.13.38.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Feb 2024 13:38:00 -0800 (PST)
+Message-ID: <c2eaaf79-600a-4162-b439-8dbd7e7033fd@gmail.com>
+Date: Thu, 1 Feb 2024 22:38:01 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240201213429.4120839-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
-Message-ID: <20240201213429.4120839-3-almasrymina@google.com>
-Subject: [PATCH net-next v7 2/2] net: add netmem to skb_frag_t
-From: Mina Almasry <almasrymina@google.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: Mina Almasry <almasrymina@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jason Gunthorpe <jgg@nvidia.com>, 
-	"=?UTF-8?q?Christian=20K=C3=B6nig?=" <christian.koenig@amd.com>, Shakeel Butt <shakeelb@google.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] r8169: add support for RTL8126A
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Use struct netmem* instead of page in skb_frag_t. Currently struct
-netmem* is always a struct page underneath, but the abstraction
-allows efforts to add support for skb frags not backed by pages.
+This adds support for the RTL8126A found on Asus z790 Maximus Formula.
+It was successfully tested w/o the firmware at 1000Mbps. Firmware file
+has been provided by Realtek and submitted to linux-firmware.
+2.5G and 5G modes are untested.
 
-There is unfortunately 1 instance where the skb_frag_t is assumed to be
-a exactly a bio_vec in kcm. For this case, WARN_ON_ONCE and return error
-before doing a cast.
-
-Add skb[_frag]_fill_netmem_*() and skb_add_rx_frag_netmem() helpers so
-that the API can be used to create netmem skbs.
-
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
+ drivers/net/ethernet/realtek/r8169.h          |   1 +
+ drivers/net/ethernet/realtek/r8169_main.c     | 105 ++++++++++++++----
+ .../net/ethernet/realtek/r8169_phy_config.c   |   7 ++
+ 3 files changed, 89 insertions(+), 24 deletions(-)
 
-v7:
-- Move skb_rx_add_frag to header file (Paolo).
-- Move combine kcm skb_frag_page() check with nr_frags check.
-
-v6:
-- Add static_asserts to validate skb_frag_t to bio_vec cast in
-  kcm_write_msg (Yunsheng)
-
-v4:
-- Handle error in kcm_write_msgs() instead of only warning (Willem)
-
-v3:
-- Renamed the fields in skb_frag_t.
-
-v2:
-- Add skb frag filling helpers.
-
----
- include/linux/skbuff.h | 109 ++++++++++++++++++++++++++++++-----------
- net/core/skbuff.c      |  38 ++++++++------
- net/kcm/kcmsock.c      |   7 +--
- 3 files changed, 107 insertions(+), 47 deletions(-)
-
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 2dde34c29203..7d1c03e59017 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -37,6 +37,7 @@
- #endif
- #include <net/net_debug.h>
- #include <net/dropreason-core.h>
-+#include <net/netmem.h>
+diff --git a/drivers/net/ethernet/realtek/r8169.h b/drivers/net/ethernet/realtek/r8169.h
+index 81567fcf3..c921456ed 100644
+--- a/drivers/net/ethernet/realtek/r8169.h
++++ b/drivers/net/ethernet/realtek/r8169.h
+@@ -68,6 +68,7 @@ enum mac_version {
+ 	/* support for RTL_GIGA_MAC_VER_60 has been removed */
+ 	RTL_GIGA_MAC_VER_61,
+ 	RTL_GIGA_MAC_VER_63,
++	RTL_GIGA_MAC_VER_65,
+ 	RTL_GIGA_MAC_NONE
+ };
  
- /**
-  * DOC: skb checksums
-@@ -359,7 +360,11 @@ extern int sysctl_max_skb_frags;
-  */
- #define GSO_BY_FRAGS	0xFFFF
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 3d30d4499..e0c2e050b 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -55,6 +55,7 @@
+ #define FIRMWARE_8107E_2	"rtl_nic/rtl8107e-2.fw"
+ #define FIRMWARE_8125A_3	"rtl_nic/rtl8125a-3.fw"
+ #define FIRMWARE_8125B_2	"rtl_nic/rtl8125b-2.fw"
++#define FIRMWARE_8126A_2	"rtl_nic/rtl8126a-2.fw"
  
--typedef struct bio_vec skb_frag_t;
-+typedef struct skb_frag {
-+	netmem_ref netmem;
-+	unsigned int len;
-+	unsigned int offset;
-+} skb_frag_t;
+ #define TX_DMA_BURST	7	/* Maximum PCI burst, '7' is unlimited */
+ #define InterFrameGap	0x03	/* 3 means InterFrameGap = the shortest one */
+@@ -136,6 +137,7 @@ static const struct {
+ 	[RTL_GIGA_MAC_VER_61] = {"RTL8125A",		FIRMWARE_8125A_3},
+ 	/* reserve 62 for CFG_METHOD_4 in the vendor driver */
+ 	[RTL_GIGA_MAC_VER_63] = {"RTL8125B",		FIRMWARE_8125B_2},
++	[RTL_GIGA_MAC_VER_65] = {"RTL8126A",		FIRMWARE_8126A_2},
+ };
  
- /**
-  * skb_frag_size() - Returns the size of a skb fragment
-@@ -367,7 +372,7 @@ typedef struct bio_vec skb_frag_t;
-  */
- static inline unsigned int skb_frag_size(const skb_frag_t *frag)
- {
--	return frag->bv_len;
-+	return frag->len;
- }
+ static const struct pci_device_id rtl8169_pci_tbl[] = {
+@@ -158,6 +160,7 @@ static const struct pci_device_id rtl8169_pci_tbl[] = {
+ 	{ PCI_VENDOR_ID_LINKSYS, 0x1032, PCI_ANY_ID, 0x0024 },
+ 	{ 0x0001, 0x8168, PCI_ANY_ID, 0x2410 },
+ 	{ PCI_VDEVICE(REALTEK,	0x8125) },
++	{ PCI_VDEVICE(REALTEK,	0x8126) },
+ 	{ PCI_VDEVICE(REALTEK,	0x3000) },
+ 	{}
+ };
+@@ -327,8 +330,12 @@ enum rtl8168_registers {
+ };
  
- /**
-@@ -377,7 +382,7 @@ static inline unsigned int skb_frag_size(const skb_frag_t *frag)
-  */
- static inline void skb_frag_size_set(skb_frag_t *frag, unsigned int size)
- {
--	frag->bv_len = size;
-+	frag->len = size;
- }
- 
- /**
-@@ -387,7 +392,7 @@ static inline void skb_frag_size_set(skb_frag_t *frag, unsigned int size)
-  */
- static inline void skb_frag_size_add(skb_frag_t *frag, int delta)
- {
--	frag->bv_len += delta;
-+	frag->len += delta;
- }
- 
- /**
-@@ -397,7 +402,7 @@ static inline void skb_frag_size_add(skb_frag_t *frag, int delta)
-  */
- static inline void skb_frag_size_sub(skb_frag_t *frag, int delta)
- {
--	frag->bv_len -= delta;
-+	frag->len -= delta;
- }
- 
- /**
-@@ -417,7 +422,7 @@ static inline bool skb_frag_must_loop(struct page *p)
-  *	skb_frag_foreach_page - loop over pages in a fragment
-  *
-  *	@f:		skb frag to operate on
-- *	@f_off:		offset from start of f->bv_page
-+ *	@f_off:		offset from start of f->netmem
-  *	@f_len:		length from f_off to loop over
-  *	@p:		(temp var) current page
-  *	@p_off:		(temp var) offset from start of current page,
-@@ -2429,22 +2434,37 @@ static inline unsigned int skb_pagelen(const struct sk_buff *skb)
- 	return skb_headlen(skb) + __skb_pagelen(skb);
- }
- 
-+static inline void skb_frag_fill_netmem_desc(skb_frag_t *frag,
-+					     netmem_ref netmem, int off,
-+					     int size)
-+{
-+	frag->netmem = netmem;
-+	frag->offset = off;
-+	skb_frag_size_set(frag, size);
-+}
+ enum rtl8125_registers {
++	INT_CFG0_8125		= 0x34,
++#define INT_CFG0_ENABLE_8125		BIT(0)
++#define INT_CFG0_CLKREQEN		BIT(3)
+ 	IntrMask_8125		= 0x38,
+ 	IntrStatus_8125		= 0x3c,
++	INT_CFG1_8125		= 0x7a,
+ 	TxPoll_8125		= 0x90,
+ 	MAC0_BKP		= 0x19e0,
+ 	EEE_TXIDLE_TIMER_8125	= 0x6048,
+@@ -1140,7 +1147,7 @@ static void rtl_writephy(struct rtl8169_private *tp, int location, int val)
+ 	case RTL_GIGA_MAC_VER_31:
+ 		r8168dp_2_mdio_write(tp, location, val);
+ 		break;
+-	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_63:
++	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_65:
+ 		r8168g_mdio_write(tp, location, val);
+ 		break;
+ 	default:
+@@ -1155,7 +1162,7 @@ static int rtl_readphy(struct rtl8169_private *tp, int location)
+ 	case RTL_GIGA_MAC_VER_28:
+ 	case RTL_GIGA_MAC_VER_31:
+ 		return r8168dp_2_mdio_read(tp, location);
+-	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_63:
++	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_65:
+ 		return r8168g_mdio_read(tp, location);
+ 	default:
+ 		return r8169_mdio_read(tp, location);
+@@ -1341,7 +1348,7 @@ static void rtl_set_d3_pll_down(struct rtl8169_private *tp, bool enable)
+ 	case RTL_GIGA_MAC_VER_25 ... RTL_GIGA_MAC_VER_26:
+ 	case RTL_GIGA_MAC_VER_29 ... RTL_GIGA_MAC_VER_30:
+ 	case RTL_GIGA_MAC_VER_32 ... RTL_GIGA_MAC_VER_37:
+-	case RTL_GIGA_MAC_VER_39 ... RTL_GIGA_MAC_VER_63:
++	case RTL_GIGA_MAC_VER_39 ... RTL_GIGA_MAC_VER_65:
+ 		if (enable)
+ 			RTL_W8(tp, PMCH, RTL_R8(tp, PMCH) & ~D3_NO_PLL_DOWN);
+ 		else
+@@ -1508,7 +1515,7 @@ static void __rtl8169_set_wol(struct rtl8169_private *tp, u32 wolopts)
+ 		break;
+ 	case RTL_GIGA_MAC_VER_34:
+ 	case RTL_GIGA_MAC_VER_37:
+-	case RTL_GIGA_MAC_VER_39 ... RTL_GIGA_MAC_VER_63:
++	case RTL_GIGA_MAC_VER_39 ... RTL_GIGA_MAC_VER_65:
+ 		if (wolopts)
+ 			rtl_mod_config2(tp, 0, PME_SIGNAL);
+ 		else
+@@ -2095,6 +2102,9 @@ static enum mac_version rtl8169_get_mac_version(u16 xid, bool gmii)
+ 		u16 val;
+ 		enum mac_version ver;
+ 	} mac_info[] = {
++		/* 8126A family. */
++		{ 0x7cf, 0x649,	RTL_GIGA_MAC_VER_65 },
 +
- static inline void skb_frag_fill_page_desc(skb_frag_t *frag,
- 					   struct page *page,
- 					   int off, int size)
+ 		/* 8125B family. */
+ 		{ 0x7cf, 0x641,	RTL_GIGA_MAC_VER_63 },
+ 
+@@ -2368,6 +2378,7 @@ static void rtl_init_rxcfg(struct rtl8169_private *tp)
+ 		RTL_W32(tp, RxConfig, RX_FETCH_DFLT_8125 | RX_DMA_BURST);
+ 		break;
+ 	case RTL_GIGA_MAC_VER_63:
++	case RTL_GIGA_MAC_VER_65:
+ 		RTL_W32(tp, RxConfig, RX_FETCH_DFLT_8125 | RX_DMA_BURST |
+ 			RX_PAUSE_SLOT_ON);
+ 		break;
+@@ -2554,7 +2565,7 @@ static void rtl_wait_txrx_fifo_empty(struct rtl8169_private *tp)
+ 	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_61:
+ 		rtl_loop_wait_high(tp, &rtl_rxtx_empty_cond, 100, 42);
+ 		break;
+-	case RTL_GIGA_MAC_VER_63:
++	case RTL_GIGA_MAC_VER_63 ... RTL_GIGA_MAC_VER_65:
+ 		RTL_W8(tp, ChipCmd, RTL_R8(tp, ChipCmd) | StopReq);
+ 		rtl_loop_wait_high(tp, &rtl_rxtx_empty_cond, 100, 42);
+ 		rtl_loop_wait_high(tp, &rtl_rxtx_empty_cond_2, 100, 42);
+@@ -2797,7 +2808,7 @@ static void rtl_enable_exit_l1(struct rtl8169_private *tp)
+ 	case RTL_GIGA_MAC_VER_37 ... RTL_GIGA_MAC_VER_38:
+ 		rtl_eri_set_bits(tp, 0xd4, 0x0c00);
+ 		break;
+-	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_63:
++	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_65:
+ 		r8168_mac_ocp_modify(tp, 0xc0ac, 0, 0x1f80);
+ 		break;
+ 	default:
+@@ -2811,7 +2822,7 @@ static void rtl_disable_exit_l1(struct rtl8169_private *tp)
+ 	case RTL_GIGA_MAC_VER_34 ... RTL_GIGA_MAC_VER_38:
+ 		rtl_eri_clear_bits(tp, 0xd4, 0x1f00);
+ 		break;
+-	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_63:
++	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_65:
+ 		r8168_mac_ocp_modify(tp, 0xc0ac, 0x1f80, 0);
+ 		break;
+ 	default:
+@@ -2821,6 +2832,8 @@ static void rtl_disable_exit_l1(struct rtl8169_private *tp)
+ 
+ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
  {
--	frag->bv_page = page;
--	frag->bv_offset = off;
--	skb_frag_size_set(frag, size);
-+	skb_frag_fill_netmem_desc(frag, page_to_netmem(page), off, size);
-+}
++	u8 val8;
 +
-+static inline void __skb_fill_netmem_desc_noacc(struct skb_shared_info *shinfo,
-+						int i, netmem_ref netmem,
-+						int off, int size)
-+{
-+	skb_frag_t *frag = &shinfo->frags[i];
-+
-+	skb_frag_fill_netmem_desc(frag, netmem, off, size);
- }
+ 	if (tp->mac_version < RTL_GIGA_MAC_VER_32)
+ 		return;
  
- static inline void __skb_fill_page_desc_noacc(struct skb_shared_info *shinfo,
- 					      int i, struct page *page,
- 					      int off, int size)
- {
--	skb_frag_t *frag = &shinfo->frags[i];
--
--	skb_frag_fill_page_desc(frag, page, off, size);
-+	__skb_fill_netmem_desc_noacc(shinfo, i, page_to_netmem(page), off,
-+				     size);
- }
+@@ -2834,11 +2847,19 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
+ 			return;
  
- /**
-@@ -2460,10 +2480,10 @@ static inline void skb_len_add(struct sk_buff *skb, int delta)
- }
+ 		rtl_mod_config5(tp, 0, ASPM_en);
+-		rtl_mod_config2(tp, 0, ClkReqEn);
++		switch (tp->mac_version) {
++		case RTL_GIGA_MAC_VER_65:
++			val8 = RTL_R8(tp, INT_CFG0_8125) | INT_CFG0_CLKREQEN;
++			RTL_W8(tp, INT_CFG0_8125, val8);
++			break;
++		default:
++			rtl_mod_config2(tp, 0, ClkReqEn);
++			break;
++		}
  
- /**
-- * __skb_fill_page_desc - initialise a paged fragment in an skb
-+ * __skb_fill_netmem_desc - initialise a fragment in an skb
-  * @skb: buffer containing fragment to be initialised
-- * @i: paged fragment index to initialise
-- * @page: the page to use for this fragment
-+ * @i: fragment index to initialise
-+ * @netmem: the netmem to use for this fragment
-  * @off: the offset to the data with @page
-  * @size: the length of the data
-  *
-@@ -2472,10 +2492,12 @@ static inline void skb_len_add(struct sk_buff *skb, int delta)
-  *
-  * Does not take any additional reference on the fragment.
-  */
--static inline void __skb_fill_page_desc(struct sk_buff *skb, int i,
--					struct page *page, int off, int size)
-+static inline void __skb_fill_netmem_desc(struct sk_buff *skb, int i,
-+					  netmem_ref netmem, int off, int size)
- {
--	__skb_fill_page_desc_noacc(skb_shinfo(skb), i, page, off, size);
-+	struct page *page = netmem_to_page(netmem);
-+
-+	__skb_fill_netmem_desc_noacc(skb_shinfo(skb), i, netmem, off, size);
+ 		switch (tp->mac_version) {
+ 		case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
+-		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_63:
++		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_65:
+ 			/* reset ephy tx/rx disable timer */
+ 			r8168_mac_ocp_modify(tp, 0xe094, 0xff00, 0);
+ 			/* chip can trigger L1.2 */
+@@ -2850,14 +2871,22 @@ static void rtl_hw_aspm_clkreq_enable(struct rtl8169_private *tp, bool enable)
+ 	} else {
+ 		switch (tp->mac_version) {
+ 		case RTL_GIGA_MAC_VER_46 ... RTL_GIGA_MAC_VER_48:
+-		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_63:
++		case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_65:
+ 			r8168_mac_ocp_modify(tp, 0xe092, 0x00ff, 0);
+ 			break;
+ 		default:
+ 			break;
+ 		}
  
- 	/* Propagate page pfmemalloc to the skb if we can. The problem is
- 	 * that not all callers have unique ownership of the page but rely
-@@ -2483,7 +2505,20 @@ static inline void __skb_fill_page_desc(struct sk_buff *skb, int i,
- 	 */
- 	page = compound_head(page);
- 	if (page_is_pfmemalloc(page))
--		skb->pfmemalloc	= true;
-+		skb->pfmemalloc = true;
-+}
-+
-+static inline void __skb_fill_page_desc(struct sk_buff *skb, int i,
-+					struct page *page, int off, int size)
-+{
-+	__skb_fill_netmem_desc(skb, i, page_to_netmem(page), off, size);
-+}
-+
-+static inline void skb_fill_netmem_desc(struct sk_buff *skb, int i,
-+					netmem_ref netmem, int off, int size)
-+{
-+	__skb_fill_netmem_desc(skb, i, netmem, off, size);
-+	skb_shinfo(skb)->nr_frags = i + 1;
- }
- 
- /**
-@@ -2503,8 +2538,7 @@ static inline void __skb_fill_page_desc(struct sk_buff *skb, int i,
- static inline void skb_fill_page_desc(struct sk_buff *skb, int i,
- 				      struct page *page, int off, int size)
- {
--	__skb_fill_page_desc(skb, i, page, off, size);
--	skb_shinfo(skb)->nr_frags = i + 1;
-+	skb_fill_netmem_desc(skb, i, page_to_netmem(page), off, size);
- }
- 
- /**
-@@ -2528,8 +2562,25 @@ static inline void skb_fill_page_desc_noacc(struct sk_buff *skb, int i,
- 	shinfo->nr_frags = i + 1;
- }
- 
--void skb_add_rx_frag(struct sk_buff *skb, int i, struct page *page, int off,
--		     int size, unsigned int truesize);
-+static inline void skb_add_rx_frag_netmem(struct sk_buff *skb, int i,
-+					  netmem_ref netmem, int off, int size,
-+					  unsigned int truesize)
-+{
-+	DEBUG_NET_WARN_ON_ONCE(size > truesize);
-+
-+	skb_fill_netmem_desc(skb, i, netmem, off, size);
-+	skb->len += size;
-+	skb->data_len += size;
-+	skb->truesize += truesize;
-+}
-+
-+static inline void skb_add_rx_frag(struct sk_buff *skb, int i,
-+				   struct page *page, int off, int size,
-+				   unsigned int truesize)
-+{
-+	skb_add_rx_frag_netmem(skb, i, page_to_netmem(page), off, size,
-+			       truesize);
-+}
- 
- void skb_coalesce_rx_frag(struct sk_buff *skb, int i, int size,
- 			  unsigned int truesize);
-@@ -3378,7 +3429,7 @@ static inline void skb_propagate_pfmemalloc(const struct page *page,
-  */
- static inline unsigned int skb_frag_off(const skb_frag_t *frag)
- {
--	return frag->bv_offset;
-+	return frag->offset;
- }
- 
- /**
-@@ -3388,7 +3439,7 @@ static inline unsigned int skb_frag_off(const skb_frag_t *frag)
-  */
- static inline void skb_frag_off_add(skb_frag_t *frag, int delta)
- {
--	frag->bv_offset += delta;
-+	frag->offset += delta;
- }
- 
- /**
-@@ -3398,7 +3449,7 @@ static inline void skb_frag_off_add(skb_frag_t *frag, int delta)
-  */
- static inline void skb_frag_off_set(skb_frag_t *frag, unsigned int offset)
- {
--	frag->bv_offset = offset;
-+	frag->offset = offset;
- }
- 
- /**
-@@ -3409,7 +3460,7 @@ static inline void skb_frag_off_set(skb_frag_t *frag, unsigned int offset)
- static inline void skb_frag_off_copy(skb_frag_t *fragto,
- 				     const skb_frag_t *fragfrom)
- {
--	fragto->bv_offset = fragfrom->bv_offset;
-+	fragto->offset = fragfrom->offset;
- }
- 
- /**
-@@ -3420,7 +3471,7 @@ static inline void skb_frag_off_copy(skb_frag_t *fragto,
-  */
- static inline struct page *skb_frag_page(const skb_frag_t *frag)
- {
--	return frag->bv_page;
-+	return netmem_to_page(frag->netmem);
- }
- 
- /**
-@@ -3524,7 +3575,7 @@ static inline void *skb_frag_address_safe(const skb_frag_t *frag)
- static inline void skb_frag_page_copy(skb_frag_t *fragto,
- 				      const skb_frag_t *fragfrom)
- {
--	fragto->bv_page = fragfrom->bv_page;
-+	fragto->netmem = fragfrom->netmem;
- }
- 
- bool skb_page_frag_refill(unsigned int sz, struct page_frag *pfrag, gfp_t prio);
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index edbbef563d4d..a754978cbed8 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -115,6 +115,24 @@ static struct kmem_cache *skb_small_head_cache __ro_after_init;
- int sysctl_max_skb_frags __read_mostly = MAX_SKB_FRAGS;
- EXPORT_SYMBOL(sysctl_max_skb_frags);
- 
-+/* kcm_write_msgs() relies on casting paged frags to bio_vec to use
-+ * iov_iter_bvec(). These static asserts ensure the cast is valid is long as the
-+ * netmem is a page.
-+ */
-+static_assert(offsetof(struct bio_vec, bv_page) ==
-+	      offsetof(skb_frag_t, netmem));
-+static_assert(sizeof_field(struct bio_vec, bv_page) ==
-+	      sizeof_field(skb_frag_t, netmem));
-+
-+static_assert(offsetof(struct bio_vec, bv_len) == offsetof(skb_frag_t, len));
-+static_assert(sizeof_field(struct bio_vec, bv_len) ==
-+	      sizeof_field(skb_frag_t, len));
-+
-+static_assert(offsetof(struct bio_vec, bv_offset) ==
-+	      offsetof(skb_frag_t, offset));
-+static_assert(sizeof_field(struct bio_vec, bv_offset) ==
-+	      sizeof_field(skb_frag_t, offset));
-+
- #undef FN
- #define FN(reason) [SKB_DROP_REASON_##reason] = #reason,
- static const char * const drop_reasons[] = {
-@@ -845,18 +863,6 @@ struct sk_buff *__napi_alloc_skb(struct napi_struct *napi, unsigned int len,
- }
- EXPORT_SYMBOL(__napi_alloc_skb);
- 
--void skb_add_rx_frag(struct sk_buff *skb, int i, struct page *page, int off,
--		     int size, unsigned int truesize)
--{
--	DEBUG_NET_WARN_ON_ONCE(size > truesize);
--
--	skb_fill_page_desc(skb, i, page, off, size);
--	skb->len += size;
--	skb->data_len += size;
--	skb->truesize += truesize;
--}
--EXPORT_SYMBOL(skb_add_rx_frag);
--
- void skb_coalesce_rx_frag(struct sk_buff *skb, int i, int size,
- 			  unsigned int truesize)
- {
-@@ -1906,10 +1912,11 @@ int skb_copy_ubufs(struct sk_buff *skb, gfp_t gfp_mask)
- 
- 	/* skb frags point to kernel buffers */
- 	for (i = 0; i < new_frags - 1; i++) {
--		__skb_fill_page_desc(skb, i, head, 0, psize);
-+		__skb_fill_netmem_desc(skb, i, page_to_netmem(head), 0, psize);
- 		head = (struct page *)page_private(head);
+-		rtl_mod_config2(tp, ClkReqEn, 0);
++		switch (tp->mac_version) {
++		case RTL_GIGA_MAC_VER_65:
++			val8 = RTL_R8(tp, INT_CFG0_8125) & ~INT_CFG0_CLKREQEN;
++			RTL_W8(tp, INT_CFG0_8125, val8);
++			break;
++		default:
++			rtl_mod_config2(tp, ClkReqEn, 0);
++			break;
++		}
+ 		rtl_mod_config5(tp, ASPM_en, 0);
  	}
--	__skb_fill_page_desc(skb, new_frags - 1, head, 0, d_off);
-+	__skb_fill_netmem_desc(skb, new_frags - 1, page_to_netmem(head), 0,
-+			       d_off);
- 	skb_shinfo(skb)->nr_frags = new_frags;
+ }
+@@ -3570,10 +3599,15 @@ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
+ 	/* disable new tx descriptor format */
+ 	r8168_mac_ocp_modify(tp, 0xeb58, 0x0001, 0x0000);
  
- release:
-@@ -3647,7 +3654,8 @@ skb_zerocopy(struct sk_buff *to, struct sk_buff *from, int len, int hlen)
- 		if (plen) {
- 			page = virt_to_head_page(from->head);
- 			offset = from->data - (unsigned char *)page_address(page);
--			__skb_fill_page_desc(to, 0, page, offset, plen);
-+			__skb_fill_netmem_desc(to, 0, page_to_netmem(page),
-+					       offset, plen);
- 			get_page(page);
- 			j = 1;
- 			len -= plen;
-diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
-index 1184d40167b8..73c200c5c8e4 100644
---- a/net/kcm/kcmsock.c
-+++ b/net/kcm/kcmsock.c
-@@ -627,7 +627,8 @@ static int kcm_write_msgs(struct kcm_sock *kcm)
- 			skb = txm->frag_skb;
- 		}
+-	if (tp->mac_version == RTL_GIGA_MAC_VER_63)
++	if (tp->mac_version == RTL_GIGA_MAC_VER_65)
++		RTL_W8(tp, 0xD8, RTL_R8(tp, 0xD8) & ~0x02);
++
++	if (tp->mac_version == RTL_GIGA_MAC_VER_65)
++		r8168_mac_ocp_modify(tp, 0xe614, 0x0700, 0x0400);
++	else if (tp->mac_version == RTL_GIGA_MAC_VER_63)
+ 		r8168_mac_ocp_modify(tp, 0xe614, 0x0700, 0x0200);
+ 	else
+-		r8168_mac_ocp_modify(tp, 0xe614, 0x0700, 0x0400);
++		r8168_mac_ocp_modify(tp, 0xe614, 0x0700, 0x0300);
  
--		if (WARN_ON(!skb_shinfo(skb)->nr_frags)) {
-+		if (WARN_ON(!skb_shinfo(skb)->nr_frags) ||
-+		    WARN_ON_ONCE(!skb_frag_page(&skb_shinfo(skb)->frags[0]))) {
- 			ret = -EINVAL;
- 			goto out;
- 		}
-@@ -637,8 +638,8 @@ static int kcm_write_msgs(struct kcm_sock *kcm)
- 			msize += skb_frag_size(&skb_shinfo(skb)->frags[i]);
+ 	if (tp->mac_version == RTL_GIGA_MAC_VER_63)
+ 		r8168_mac_ocp_modify(tp, 0xe63e, 0x0c30, 0x0000);
+@@ -3586,6 +3620,10 @@ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
+ 	r8168_mac_ocp_modify(tp, 0xe056, 0x00f0, 0x0030);
+ 	r8168_mac_ocp_modify(tp, 0xe040, 0x1000, 0x0000);
+ 	r8168_mac_ocp_modify(tp, 0xea1c, 0x0003, 0x0001);
++	if (tp->mac_version == RTL_GIGA_MAC_VER_65)
++		r8168_mac_ocp_modify(tp, 0xea1c, 0x0300, 0x0000);
++	else
++		r8168_mac_ocp_modify(tp, 0xea1c, 0x0004, 0x0000);
+ 	r8168_mac_ocp_modify(tp, 0xe0c0, 0x4f0f, 0x4403);
+ 	r8168_mac_ocp_modify(tp, 0xe052, 0x0080, 0x0068);
+ 	r8168_mac_ocp_modify(tp, 0xd430, 0x0fff, 0x047f);
+@@ -3600,10 +3638,10 @@ static void rtl_hw_start_8125_common(struct rtl8169_private *tp)
  
- 		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE,
--			      skb_shinfo(skb)->frags, skb_shinfo(skb)->nr_frags,
--			      msize);
-+			      (const struct bio_vec *)skb_shinfo(skb)->frags,
-+			      skb_shinfo(skb)->nr_frags, msize);
- 		iov_iter_advance(&msg.msg_iter, txm->frag_offset);
+ 	rtl_loop_wait_low(tp, &rtl_mac_ocp_e00e_cond, 1000, 10);
  
- 		do {
+-	if (tp->mac_version == RTL_GIGA_MAC_VER_63)
+-		rtl8125b_config_eee_mac(tp);
+-	else
++	if (tp->mac_version == RTL_GIGA_MAC_VER_61)
+ 		rtl8125a_config_eee_mac(tp);
++	else
++		rtl8125b_config_eee_mac(tp);
+ 
+ 	rtl_disable_rxdvgate(tp);
+ }
+@@ -3647,6 +3685,12 @@ static void rtl_hw_start_8125b(struct rtl8169_private *tp)
+ 	rtl_hw_start_8125_common(tp);
+ }
+ 
++static void rtl_hw_start_8126a(struct rtl8169_private *tp)
++{
++	rtl_set_def_aspm_entry_latency(tp);
++	rtl_hw_start_8125_common(tp);
++}
++
+ static void rtl_hw_config(struct rtl8169_private *tp)
+ {
+ 	static const rtl_generic_fct hw_configs[] = {
+@@ -3689,6 +3733,7 @@ static void rtl_hw_config(struct rtl8169_private *tp)
+ 		[RTL_GIGA_MAC_VER_53] = rtl_hw_start_8117,
+ 		[RTL_GIGA_MAC_VER_61] = rtl_hw_start_8125a_2,
+ 		[RTL_GIGA_MAC_VER_63] = rtl_hw_start_8125b,
++		[RTL_GIGA_MAC_VER_65] = rtl_hw_start_8126a,
+ 	};
+ 
+ 	if (hw_configs[tp->mac_version])
+@@ -3699,9 +3744,23 @@ static void rtl_hw_start_8125(struct rtl8169_private *tp)
+ {
+ 	int i;
+ 
++	RTL_W8(tp, INT_CFG0_8125, 0x00);
++
+ 	/* disable interrupt coalescing */
+-	for (i = 0xa00; i < 0xb00; i += 4)
+-		RTL_W32(tp, i, 0);
++	switch (tp->mac_version) {
++	case RTL_GIGA_MAC_VER_61:
++		for (i = 0xa00; i < 0xb00; i += 4)
++			RTL_W32(tp, i, 0);
++		break;
++	case RTL_GIGA_MAC_VER_63:
++	case RTL_GIGA_MAC_VER_65:
++		for (i = 0xa00; i < 0xa80; i += 4)
++			RTL_W32(tp, i, 0);
++		RTL_W16(tp, INT_CFG1_8125, 0x0000);
++		break;
++	default:
++		break;
++	}
+ 
+ 	rtl_hw_config(tp);
+ }
+@@ -3779,8 +3838,7 @@ static int rtl8169_change_mtu(struct net_device *dev, int new_mtu)
+ 	rtl_jumbo_config(tp);
+ 
+ 	switch (tp->mac_version) {
+-	case RTL_GIGA_MAC_VER_61:
+-	case RTL_GIGA_MAC_VER_63:
++	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_65:
+ 		rtl8125_set_eee_txidle_timer(tp);
+ 		break;
+ 	default:
+@@ -3929,7 +3987,7 @@ static void rtl8169_cleanup(struct rtl8169_private *tp)
+ 		RTL_W8(tp, ChipCmd, RTL_R8(tp, ChipCmd) | StopReq);
+ 		rtl_loop_wait_high(tp, &rtl_txcfg_empty_cond, 100, 666);
+ 		break;
+-	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_63:
++	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_65:
+ 		rtl_enable_rxdvgate(tp);
+ 		fsleep(2000);
+ 		break;
+@@ -4080,8 +4138,7 @@ static unsigned int rtl_quirk_packet_padto(struct rtl8169_private *tp,
+ 
+ 	switch (tp->mac_version) {
+ 	case RTL_GIGA_MAC_VER_34:
+-	case RTL_GIGA_MAC_VER_61:
+-	case RTL_GIGA_MAC_VER_63:
++	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_65:
+ 		padto = max_t(unsigned int, padto, ETH_ZLEN);
+ 		break;
+ 	default:
+@@ -5108,7 +5165,7 @@ static void rtl_hw_initialize(struct rtl8169_private *tp)
+ 	case RTL_GIGA_MAC_VER_40 ... RTL_GIGA_MAC_VER_48:
+ 		rtl_hw_init_8168g(tp);
+ 		break;
+-	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_63:
++	case RTL_GIGA_MAC_VER_61 ... RTL_GIGA_MAC_VER_65:
+ 		rtl_hw_init_8125(tp);
+ 		break;
+ 	default:
+diff --git a/drivers/net/ethernet/realtek/r8169_phy_config.c b/drivers/net/ethernet/realtek/r8169_phy_config.c
+index b50f16786..1f74317be 100644
+--- a/drivers/net/ethernet/realtek/r8169_phy_config.c
++++ b/drivers/net/ethernet/realtek/r8169_phy_config.c
+@@ -1102,6 +1102,12 @@ static void rtl8125b_hw_phy_config(struct rtl8169_private *tp,
+ 	rtl8125b_config_eee_phy(phydev);
+ }
+ 
++static void rtl8126a_hw_phy_config(struct rtl8169_private *tp,
++				   struct phy_device *phydev)
++{
++	r8169_apply_firmware(tp);
++}
++
+ void r8169_hw_phy_config(struct rtl8169_private *tp, struct phy_device *phydev,
+ 			 enum mac_version ver)
+ {
+@@ -1152,6 +1158,7 @@ void r8169_hw_phy_config(struct rtl8169_private *tp, struct phy_device *phydev,
+ 		[RTL_GIGA_MAC_VER_53] = rtl8117_hw_phy_config,
+ 		[RTL_GIGA_MAC_VER_61] = rtl8125a_2_hw_phy_config,
+ 		[RTL_GIGA_MAC_VER_63] = rtl8125b_hw_phy_config,
++		[RTL_GIGA_MAC_VER_65] = rtl8126a_hw_phy_config,
+ 	};
+ 
+ 	if (phy_configs[ver])
 -- 
-2.43.0.594.gd9cf4e227d-goog
+2.43.0
 
 
