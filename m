@@ -1,100 +1,99 @@
-Return-Path: <netdev+bounces-67741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CFE7844D62
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 00:53:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B20C6844D95
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:05:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFEE61C22C13
-	for <lists+netdev@lfdr.de>; Wed, 31 Jan 2024 23:53:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D39F7B229AB
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 00:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C2E23A8DA;
-	Wed, 31 Jan 2024 23:52:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BCE01110;
+	Thu,  1 Feb 2024 00:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HD+WJNkH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N8/pQahr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1251F3A8D2;
-	Wed, 31 Jan 2024 23:52:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0B5A259C;
+	Thu,  1 Feb 2024 00:00:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706745177; cv=none; b=p1XMdlQZy6GRDz0/s8EQksGfCOkjqNP6tc2Mjsit0zLL7F94T7UJ4JwW34hxw4KAXfjA8yLtIwARE5pemKN7ehVshECUpEdYCV0SY2PpRKAGMiyfbgf9YqT68Z9z02i+dDF05KPbmQcXKSQbjBSkJE7y++aea+I+NqedUjE+Fko=
+	t=1706745630; cv=none; b=GOz1MUDdeXQ67A876PGfQ53AJWlTexBUvwXxQGFOdOpxbjpNTOI0UWGsuJd+F4j8pypcmIu4+79RkWIjDgsnqS60vd1eApgjGQlE7c5tEOU4NDRV7Sabkc+v5h33UZVa+StPV29AdPwmTnFcILuub2aguMuzjrnmcaPD+o3hTqE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706745177; c=relaxed/simple;
-	bh=aq/tIq5REOIbug/MsfZrhDQM9zZce6YgRuZXTIMdeCQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M0iVzp4cQcETSodlknTRJZ7EkL8qnWBGHMtZgQd3RS1oMZ0ornE1cvTdhcvWCxqQo/0UTaaQPWgsE5ZX4KihUSg5UXtpd5S1Y/C+NgelD/kJ8ZHl6xBpO51hUy81mEiMyJ2U5fo8o+9HWtNqaSZqii3TIPxXutURuiPpYY8elnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HD+WJNkH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3D1F5C433C7;
-	Wed, 31 Jan 2024 23:52:54 +0000 (UTC)
+	s=arc-20240116; t=1706745630; c=relaxed/simple;
+	bh=VQ1dvamFDSryW11vpmGv5L78MWAe9bKmnX4ruK5uSbs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ovB4JaHcby+n93uLLY4WIfmfhrQHfp+SPZBoyq139eU3IIzIsTS8AYrq2A99Jh9CEMkfzkNWKrApWy41HHEnbEplnWoDRoOsetnpoyHU1QkY7nIdKNuUYGNIeJQ/Cn4e9Xkh7MJXB/NDcloz1E/UP7zvJ4Jlj9j3JuRaOTjJW0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N8/pQahr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7A141C43394;
+	Thu,  1 Feb 2024 00:00:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706745176;
-	bh=aq/tIq5REOIbug/MsfZrhDQM9zZce6YgRuZXTIMdeCQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=HD+WJNkHRfk9ENiP8dDzfv6lD33dxf18Hu22SV0XeSlGhJsCappav4iW9yF42IXlu
-	 ugZmBH+2geZiw+E0aLRPf4mFAq11DMv4NNCq2JeBy6KxC4LBnsrwJVQdU3GUgVR+fV
-	 +9bgc/u8EUQa7U87G0eoO+TvErhxnWDdzn0Nc1maSdqIJgddFimfqgb/bzegflkKV9
-	 jTwKes+DT7BzN5DOZ0H8vrOHgMzmho+AMt68BgZaSy6RL9ZShBilhnhEu0mMjYXjOL
-	 i4sFnyV8o5Y4xgmtPpcO6xdTPx8tfSY5+tPEANwQgjogVQmuPFfz91MwwV251qQA6K
-	 cHgtetzbvUlZQ==
-Date: Wed, 31 Jan 2024 15:52:51 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>
-Cc: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Yunsheng Lin <linyunsheng@huawei.com>, Lorenzo Bianconi
- <lorenzo@kernel.org>, netdev@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, bpf@vger.kernel.org,
- willemdebruijn.kernel@gmail.com, jasowang@redhat.com, sdf@google.com,
- ilias.apalodimas@linaro.org
-Subject: Re: [PATCH v6 net-next 4/5] net: page_pool: make stats available
- just for global pools
-Message-ID: <20240131155251.5d22477f@kernel.org>
-In-Reply-To: <877cjpzfgv.fsf@toke.dk>
-References: <cover.1706451150.git.lorenzo@kernel.org>
-	<9f0a571c1f322ff6c4e6facfd7d6d508e73a8f2f.1706451150.git.lorenzo@kernel.org>
-	<bc5dc202-de63-4dee-5eb4-efd63dcb162b@huawei.com>
-	<ZbejGhc8K4J4dLbL@lore-desk>
-	<ef59f9ac-b622-315a-4892-6c7723a2986a@huawei.com>
-	<Zbj_Cb9oHRseTa3u@lore-desk>
-	<fcf8678b-b373-49a8-8268-0a8b1a49f739@kernel.org>
-	<ZbkdblTwF19lBYbf@lore-desk>
-	<877cjpzfgv.fsf@toke.dk>
+	s=k20201202; t=1706745629;
+	bh=VQ1dvamFDSryW11vpmGv5L78MWAe9bKmnX4ruK5uSbs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=N8/pQahrcMr8fQlcWeBYDBb/MeX8DcaueRP9x84V8xYsa4Kg1hRbTkfwdrT9Ohw8f
+	 YFlREoniVhxmlc7JjhGtiKMa9R/I8VTOyn4uHzx3MfR4avlQjXH0P5E7HYzeQoSlG1
+	 n1W9ay7LPAIch4Ia3ZjcBHapWrB41hLPF87pWWMx79/gnUSHeCG1KYTM9HnDMcr+7U
+	 g5vYZXb2hSCTULnqdtNAZdlJmTh/cm78zqRr8s/HFx5rQQRyYB+pGyneevU4LSnF6X
+	 3pHfPTFCSXiwWJDKdW+ecg6CDN9gIo4AcMWV0msXAAnV4Va5wp7tndoOcjCFUUJYXf
+	 QtC2xi+vokbmQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5D1D2DC99E8;
+	Thu,  1 Feb 2024 00:00:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] MAINTAINERS: Drop unreachable reviewer for Qualcomm ETHQOS
+ ethernet driver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170674562937.31899.1767619419103104462.git-patchwork-notify@kernel.org>
+Date: Thu, 01 Feb 2024 00:00:29 +0000
+References: <20240129-remove-dwmac-qcom-ethqos-reviewer-v1-1-2645eab61451@redhat.com>
+In-Reply-To: <20240129-remove-dwmac-qcom-ethqos-reviewer-v1-1-2645eab61451@redhat.com>
+To: Andrew Halaney <ahalaney@redhat.com>
+Cc: vkoul@kernel.org, alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
 
-On Wed, 31 Jan 2024 16:32:00 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> > ack from my side if you have some use-cases in mind.
-> > Some questions below:
-> > - can we assume ethtool will be used to report stats just for 'global'
-> >   page_pool (not per-cpu page_pool)?
-> > - can we assume netlink/yaml will be used to report per-cpu page_pool s=
-tats?
-> >
-> > I think in the current series we can fix the accounting part (in partic=
-ular
-> > avoiding memory wasting) and then we will figure out how to report perc=
-pu
-> > page_pool stats through netlink/yaml. Agree? =20
->=20
-> Deferring the export API to a separate series after this is merged is
-> fine with me.
+Hello:
 
-+1
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> In which case the *gathering* of statistics could also be
-> deferred (it's not really useful if it can't be exported).
+On Mon, 29 Jan 2024 11:12:11 -0600 you wrote:
+> Bhupesh's email responds indicating they've changed employers and with
+> no new contact information. Let's drop the line from MAINTAINERS to
+> avoid getting the same response over and over.
+> 
+> Signed-off-by: Andrew Halaney <ahalaney@redhat.com>
+> ---
+> If anyone knows how to contact Bhupesh / if they're willing to continue
+> being a reviewer feel free to suggest an alternative, but for the moment
+> this is better than nothing.
+> 
+> [...]
 
-What do you mean by "gather" here? If we plan to expose them later on=20
-I reckon there's no point having this patch which actively optimizes
-them away, no? IOW we should just drop this patch from v7?
+Here is the summary with links:
+  - MAINTAINERS: Drop unreachable reviewer for Qualcomm ETHQOS ethernet driver
+    https://git.kernel.org/netdev/net/c/e028243003ad
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
