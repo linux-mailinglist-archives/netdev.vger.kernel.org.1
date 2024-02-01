@@ -1,319 +1,381 @@
-Return-Path: <netdev+bounces-68081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1432E845C88
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:10:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A89B5845C8D
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:11:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34CAB1C27FFD
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:10:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBB731C2CC9C
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:11:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A849626AB;
-	Thu,  1 Feb 2024 16:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F21D1626BD;
+	Thu,  1 Feb 2024 16:10:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TJyxzSaB"
+	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="bxMzRBQk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600A4626B2
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 16:10:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96214626AB
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 16:10:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706803827; cv=none; b=eLwGLiYHBCkjsTFfrsJl9cazlmogasi7xHAIrcoA2+vFszzY/DG1u+VPj9ZH1De+FMTB5im6GZSVDqft9eNKND0gCAbF5yCjy1VJwG+IunhQ+RABE6Q4dBVWGldvHYM4GJ3tiep8hzhr4Chhuk6lbh9fUThLkv4fu53NJyKodZc=
+	t=1706803858; cv=none; b=VL4lpl4C1q2lC2/37admsynWknbNd+Xlc4p0tznlDFy++Gj/hJhVU8xEB41JDNqeLAI1IGpCbEwhEsxSVTAw+qgvPn57iv1QXg7jjwUi9b+ru+TYJ8lGGMqaYEBIla22GAHcmpJbmw+qJ5JnpzAlNKMrTnl7uU08HpZUgSMxGUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706803827; c=relaxed/simple;
-	bh=DU1a/4wI2tBiXWAbhp2DqcMq9FqoI26hIFGdMHkXqno=;
-	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
-	 In-Reply-To:Content-Type; b=JTEhiu8CI0pVYbwC7Aiirb2bkvINUP4gtR3h+tsD5XeEZ8H2XJW6i0q+9AVaAXf/YYOXmXkuBo8UIj7p05jX2ExllAdGYUO8w8toQZhw0+OG9QF08MbdV4aYb/2KvFiHiRHYkquK0YefOa5JlacyhLPilRyRfIu3Km0S+VyCIbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TJyxzSaB; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-40fb63c40c0so9873285e9.2
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 08:10:25 -0800 (PST)
+	s=arc-20240116; t=1706803858; c=relaxed/simple;
+	bh=7cgT8swYUHF5iJkB8D8jTLHsvEi1ThHpXgJDwGV1tMg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aeVO+iCsWTciTHt5T8ILKFrAE8UbjHCMxocZ107x84G/x0Bc2R5vHTHGpVU7NPvWnAwIOpn7Cov3Cz6rXjj/hioUUWQpR1kDrAGHybqVGAG9qZIL2ZLag9UaKMbWQAeTIGB9Z5d4Srw/gjpKKD3iOz2Fo0DkaQMHmlJTme3LKiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=bxMzRBQk; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2cf591d22dfso12840751fa.0
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 08:10:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706803823; x=1707408623; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=yvgKt6vyIvLQ9cao7dV112oZw/spOoZQuBNAwiuVdb8=;
-        b=TJyxzSaB5IMZuu78PilpQMU+Is9lb9XFoe13eWkTkrd71vRMnzEJYUKXCScn6KUpJA
-         ra8rx1s3pEHue1ddsChrHX7hbq2wnGakjtF4B9EZs6MdPmmNP4dOXsKWoIbQCLhdnQgD
-         eq3lKaqs9nfb0lBUFX5SPObXdTC04S0ALZYCYd245b9l+iXYh+G0UUs0A/MxI93rsmNh
-         N7k8JjgmDOl71RAFv45tvydSGeQseedAvTa0f5zlphxp/AErTNjbfeavt8Ql4eaIh3SX
-         QwFo2HHIKTOEiRza+Qdyedjc4YmYwFNVsk33SlXMZxinUDd6BqhBUR9l/SUbCkxgqAF1
-         90Zw==
+        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1706803854; x=1707408654; darn=vger.kernel.org;
+        h=content-transfer-encoding:organization:mime-version:message-id:date
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QUVoc0E/OYa+AToYGz8Q4BBQZXgHdlFQ4US1MgCl+mc=;
+        b=bxMzRBQkdf2hRXMLSHUgNQwcxMxme4H45VFNvWBaCOa5TF3LNERmMXfnTpZJv3S6JH
+         lmh1mDgAsOwu5Yw2ZkPEEubKt9moJW2GJ++u7rbKLcUNIclaW5behPM+zNcSSiXZo263
+         iHeWZDHcT1TuYLg2aFCMNlxctdeWHfxGYKLftSyaxEHMMypzg9qkDdTMZ1aGlSe395wD
+         sMQmAmUnSj7lAOyW7vFMaEvmvgVX4cEVkP7JD0KPnz+YRiahsK5BMchAYqvFUgDB1mJE
+         xYJa5pML1eioRqZKDrU45Hoc5Km5NqCYh9bMBg38HdtU1q1rK+UeVPtrfjAlplxcLEzW
+         yQRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706803823; x=1707408623;
-        h=content-transfer-encoding:in-reply-to:organization:references:cc:to
-         :content-language:subject:reply-to:user-agent:mime-version:date
-         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1706803854; x=1707408654;
+        h=content-transfer-encoding:organization:mime-version:message-id:date
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yvgKt6vyIvLQ9cao7dV112oZw/spOoZQuBNAwiuVdb8=;
-        b=M8qHbZrgjxAQ0FUoBVfKxGfhebQcVZmbZBim8JmwVCuAxQSHH9S/knMya9BE43lerb
-         lhNPKQ8qduCgwyMKKoKuxIBiyAVI7tMQILuVM6nYEBi5tGQhsjEYE+bKfKiRjMFnY/ZU
-         i6k2h5WTcbxNQe/tXJq8uTzZjMwmJeGJat/ey+zO7AkbCEXIi1SwRR25c4G/qElgVVcr
-         S5K1p9ZXs0+H0ZTgtLEYyDAr4JL1vizXJgyR7iqhkd7McrntQFft0P7ETRCmN1sjnUdg
-         tsb8Eq3TQWp2Wb+wCFQI4Lw5v0TcXvWXUIVUJKLf/4Nh7DQXNyDhB7QFz3O7JBXJ91Xu
-         Nzfw==
-X-Gm-Message-State: AOJu0YzrUt1xknKMboFhFF/kcidjLYPIE4Y/eMNzpK420qLNfKXu9R3p
-	qj/sho9sQG39YGoRaxLSmilE6rsy0hhnTiIjFWiaVpjYNy0TEmuIIJs6hqCNhe8=
-X-Google-Smtp-Source: AGHT+IEJ1m79KnyLHr6GvYPcIVi1Yn5A5Nr4MDBCO78RLOXhhcFiwoz/B1H/xeAutDcnO1f9DXmivw==
-X-Received: by 2002:a5d:6b81:0:b0:33a:fec8:e46a with SMTP id n1-20020a5d6b81000000b0033afec8e46amr4267477wrx.11.1706803823477;
-        Thu, 01 Feb 2024 08:10:23 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCViOqOOszIhKkGMgLBmqB92mrQNRdR7OnPceOL0Z9LSVRHf4dJA9gJwG7JBTlRP94BQ48gsy/QsdPjZgPY6BhSE176aU/sPB+whQerq9g1p2xjSj4t+4gumT/sTyp1gCIf9yoShBiM=
-Received: from [10.95.167.50] (54-240-197-233.amazon.com. [54.240.197.233])
-        by smtp.gmail.com with ESMTPSA id a15-20020a056000100f00b0033aee3bfac5sm10679554wrx.16.2024.02.01.08.10.21
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Feb 2024 08:10:21 -0800 (PST)
-From: Paul Durrant <xadimgnik@gmail.com>
-X-Google-Original-From: Paul Durrant <paul@xen.org>
-Message-ID: <383c1d4a-175f-4e23-b884-b9d9c1dce4da@xen.org>
-Date: Thu, 1 Feb 2024 16:10:19 +0000
+        bh=QUVoc0E/OYa+AToYGz8Q4BBQZXgHdlFQ4US1MgCl+mc=;
+        b=ie3PzI7pDo2JYOT+odT7YELYjQHILEkkqPoA+dr6Vv2zNPH3ddpxuVnscfWRl4bRDB
+         iLO8sy0FPvclP8DCYfA8JT2HkUMyJ5H4LIOVYfSJlrarHMX7rfWzTGKZD9OGTGtelXee
+         r8gh0E1szIkHSs3IH5ih/Cl8A9lQU1ZctD5DMA2W1a07LMfCDA2Pvith0V7/oXvcggMH
+         b1U7H0r/y5YYHxCsuvC1sxqKTXm6HtOWIAzSUUoTD4de/ZOM7hWokWjfqWjNwK5cfHav
+         b0gSdxqNEc7gmjpZscbsGra6eHy7mdbD/REe4PAjEeowzS8pU28oBxsP/riRMzt086fm
+         EkXw==
+X-Gm-Message-State: AOJu0Yy5j0plZgiAPYf+ZN2xseUg2yCStLiDwDjo9RS+D+FjcvQyFj0h
+	JNFEQcsasmyWIznKGD4Bz/X+ChL7uAxVp6ju+m5L1pBafJRmtTSOKLH8aox/en5hdUQzFCudquB
+	b
+X-Google-Smtp-Source: AGHT+IEdykIuN7/o5lMWik40LVDQK7zQYhARMjAg93ApuRHTe0/QCoSK6b2B/arIFRjh+NgB82J8WQ==
+X-Received: by 2002:a2e:6e0b:0:b0:2cf:1535:9307 with SMTP id j11-20020a2e6e0b000000b002cf15359307mr3628705ljc.52.1706803854453;
+        Thu, 01 Feb 2024 08:10:54 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXGBcHjBKKa9Hp1Frq6z0IhePrlvdjjS5lMePe36KtqClUHsi+17zOCRo3fL/61kEee3EP22cbvJHlAJAOv1ZRrajV5LxO4jM8tr8svg78hkH1YJ18mrFkVwvjaT8j5ZPyo8ATuuaDkTwwQw54g6QhIbtk8LYOgI7emnOjzRFRa63HvcxYuA2woYcbhtHKRGty6n1+y1kIcSSmxEiy1JblXIq32EJ9JIuK0NcJufeKRkyGSi68W+o8EAEL0iZZxf3Ag5MveLRHRqF0zMESj02fb
+Received: from wkz-x13.addiva.ad (a124.broadband3.quicknet.se. [46.17.184.124])
+        by smtp.gmail.com with ESMTPSA id y1-20020a2e95c1000000b002cd7a4a2611sm2427088ljh.35.2024.02.01.08.10.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Feb 2024 08:10:53 -0800 (PST)
+From: Tobias Waldekranz <tobias@waldekranz.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: olteanv@gmail.com,
+	atenart@kernel.org,
+	roopa@nvidia.com,
+	razor@blackwall.org,
+	bridge@lists.linux.dev,
+	netdev@vger.kernel.org,
+	jiri@resnulli.us,
+	ivecera@redhat.com
+Subject: [PATCH v3 net] net: bridge: switchdev: Skip MDB replays of pending events
+Date: Thu,  1 Feb 2024 17:10:45 +0100
+Message-Id: <20240201161045.1956074-1-tobias@waldekranz.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Reply-To: paul@xen.org
-Subject: Re: [PATCH net] xen-netback: properly sync TX responses
-Content-Language: en-US
-To: Jan Beulich <jbeulich@suse.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: Wei Liu <wl@xen.org>,
- "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
-References: <980c6c3d-e10e-4459-8565-e8fbde122f00@suse.com>
-Organization: Xen Project
-In-Reply-To: <980c6c3d-e10e-4459-8565-e8fbde122f00@suse.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Organization: Addiva Elektronik
+Content-Transfer-Encoding: 8bit
 
-On 29/01/2024 13:03, Jan Beulich wrote:
-> Invoking the make_tx_response() / push_tx_responses() pair with no lock
-> held would be acceptable only if all such invocations happened from the
-> same context (NAPI instance or dealloc thread). Since this isn't the
-> case, and since the interface "spec" also doesn't demand that multicast
-> operations may only be performed with no in-flight transmits,
-> MCAST_{ADD,DEL} processing also needs to acquire the response lock
-> around the invocations.
-> 
-> To prevent similar mistakes going forward, "downgrade" the present
-> functions to private helpers of just the two remaining ones using them
-> directly, with no forward declarations anymore. This involves renaming
-> what so far was make_tx_response(), for the new function of that name
-> to serve the new (wrapper) purpose.
-> 
-> While there,
-> - constify the txp parameters,
-> - correct xenvif_idx_release()'s status parameter's type,
-> - rename {,_}make_tx_response()'s status parameters for consistency with
->    xenvif_idx_release()'s.
-> 
-> Fixes: 210c34dcd8d9 ("xen-netback: add support for multicast control")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Jan Beulich <jbeulich@suse.com>
-> ---
-> Of course this could be split into two or even more separate changes,
-> but I think these transformations are best done all in one go.
-> 
-> It remains questionable whether push_tx_responses() really needs
-> invoking after every single _make_tx_response().
-> 
-> MCAST_{ADD,DEL} are odd also from another perspective: They're supposed
-> to come with "dummy requests", with the comment in the public header
-> leaving open what that means.
+Before this change, generation of the list of events MDB to replay
+would race against the IGMP/MLD snooping logic, which could concurrently
+enqueue events to the switchdev deferred queue, leading to duplicate
+events being sent to drivers. As a consequence of this, drivers which
+reference count memberships (at least DSA), would be left with orphan
+groups in their hardware database when the bridge was destroyed.
 
-IIRC the only reference I had at the time was Solaris code... I don't 
-really there being any documentation of the feature. I think that 
-https://github.com/illumos/illumos-gate/blob/master/usr/src/uts/common/xen/io/xnb.c 
-is probably similar to the code I looked at to determine what the 
-Solaris frontend expected. So I think 'dummy' means 'ignored'.
+Avoid this by grabbing the write-side lock of the MDB while generating
+the replay list, making sure that no deferred version of a replay
+event is already enqueued to the switchdev deferred queue, before
+adding it to the replay list.
 
-> Netback doesn't check dummy-ness (e.g.
-> size being zero). Furthermore the description in the public header
-> doesn't really make clear that there's a restriction of one such "extra"
-> per dummy request. Yet the way xenvif_get_extras() works precludes
-> multiple ADDs or multiple DELs in a single dummy request (only the last
-> one would be honored afaict). While the way xenvif_tx_build_gops() works
-> precludes an ADD and a DEL coming together in a single dummy request
-> (the DEL would be ignored).
+An easy way to reproduce this issue, on an mv88e6xxx system, was to
+create a snooping bridge, and immediately add a port to it:
 
-It appears the Solaris backend never coped with multiple extra_info so 
-what the 'correct' semantic would be is unclear.
+    root@infix-06-0b-00:~$ ip link add dev br0 up type bridge mcast_snooping 1 && \
+    > ip link set dev x3 up master br0
+    root@infix-06-0b-00:~$ ip link del dev br0
+    root@infix-06-0b-00:~$ mvls atu
+    ADDRESS             FID  STATE      Q  F  0  1  2  3  4  5  6  7  8  9  a
+    DEV:0 Marvell 88E6393X
+    33:33:00:00:00:6a     1  static     -  -  0  .  .  .  .  .  .  .  .  .  .
+    33:33:ff:87:e4:3f     1  static     -  -  0  .  .  .  .  .  .  .  .  .  .
+    ff:ff:ff:ff:ff:ff     1  static     -  -  0  1  2  3  4  5  6  7  8  9  a
+    root@infix-06-0b-00:~$
 
-Anyway...
+The two IPv6 groups remain in the hardware database because the
+port (x3) is notified of the host's membership twice: once via the
+original event and once via a replay. Since only a single delete
+notification is sent, the count remains at 1 when the bridge is
+destroyed.
 
-Reviewed-by: Paul Durrant <paul@xen.org>
+Fixes: 4f2673b3a2b6 ("net: bridge: add helper to replay port and host-joined mdb entries")
+Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
+---
 
-> 
-> --- a/drivers/net/xen-netback/netback.c
-> +++ b/drivers/net/xen-netback/netback.c
-> @@ -104,13 +104,12 @@ bool provides_xdp_headroom = true;
->   module_param(provides_xdp_headroom, bool, 0644);
->   
->   static void xenvif_idx_release(struct xenvif_queue *queue, u16 pending_idx,
-> -			       u8 status);
-> +			       s8 status);
->   
->   static void make_tx_response(struct xenvif_queue *queue,
-> -			     struct xen_netif_tx_request *txp,
-> +			     const struct xen_netif_tx_request *txp,
->   			     unsigned int extra_count,
-> -			     s8       st);
-> -static void push_tx_responses(struct xenvif_queue *queue);
-> +			     s8 status);
->   
->   static void xenvif_idx_unmap(struct xenvif_queue *queue, u16 pending_idx);
->   
-> @@ -208,13 +207,9 @@ static void xenvif_tx_err(struct xenvif_
->   			  unsigned int extra_count, RING_IDX end)
->   {
->   	RING_IDX cons = queue->tx.req_cons;
-> -	unsigned long flags;
->   
->   	do {
-> -		spin_lock_irqsave(&queue->response_lock, flags);
->   		make_tx_response(queue, txp, extra_count, XEN_NETIF_RSP_ERROR);
-> -		push_tx_responses(queue);
-> -		spin_unlock_irqrestore(&queue->response_lock, flags);
->   		if (cons == end)
->   			break;
->   		RING_COPY_REQUEST(&queue->tx, cons++, txp);
-> @@ -465,12 +460,7 @@ static void xenvif_get_requests(struct x
->   	for (shinfo->nr_frags = 0; nr_slots > 0 && shinfo->nr_frags < MAX_SKB_FRAGS;
->   	     nr_slots--) {
->   		if (unlikely(!txp->size)) {
-> -			unsigned long flags;
-> -
-> -			spin_lock_irqsave(&queue->response_lock, flags);
->   			make_tx_response(queue, txp, 0, XEN_NETIF_RSP_OKAY);
-> -			push_tx_responses(queue);
-> -			spin_unlock_irqrestore(&queue->response_lock, flags);
->   			++txp;
->   			continue;
->   		}
-> @@ -496,14 +486,8 @@ static void xenvif_get_requests(struct x
->   
->   		for (shinfo->nr_frags = 0; shinfo->nr_frags < nr_slots; ++txp) {
->   			if (unlikely(!txp->size)) {
-> -				unsigned long flags;
-> -
-> -				spin_lock_irqsave(&queue->response_lock, flags);
->   				make_tx_response(queue, txp, 0,
->   						 XEN_NETIF_RSP_OKAY);
-> -				push_tx_responses(queue);
-> -				spin_unlock_irqrestore(&queue->response_lock,
-> -						       flags);
->   				continue;
->   			}
->   
-> @@ -995,7 +979,6 @@ static void xenvif_tx_build_gops(struct
->   					 (ret == 0) ?
->   					 XEN_NETIF_RSP_OKAY :
->   					 XEN_NETIF_RSP_ERROR);
-> -			push_tx_responses(queue);
->   			continue;
->   		}
->   
-> @@ -1007,7 +990,6 @@ static void xenvif_tx_build_gops(struct
->   
->   			make_tx_response(queue, &txreq, extra_count,
->   					 XEN_NETIF_RSP_OKAY);
-> -			push_tx_responses(queue);
->   			continue;
->   		}
->   
-> @@ -1433,8 +1415,35 @@ int xenvif_tx_action(struct xenvif_queue
->   	return work_done;
->   }
->   
-> +static void _make_tx_response(struct xenvif_queue *queue,
-> +			     const struct xen_netif_tx_request *txp,
-> +			     unsigned int extra_count,
-> +			     s8 status)
-> +{
-> +	RING_IDX i = queue->tx.rsp_prod_pvt;
-> +	struct xen_netif_tx_response *resp;
-> +
-> +	resp = RING_GET_RESPONSE(&queue->tx, i);
-> +	resp->id     = txp->id;
-> +	resp->status = status;
-> +
-> +	while (extra_count-- != 0)
-> +		RING_GET_RESPONSE(&queue->tx, ++i)->status = XEN_NETIF_RSP_NULL;
-> +
-> +	queue->tx.rsp_prod_pvt = ++i;
-> +}
-> +
-> +static void push_tx_responses(struct xenvif_queue *queue)
-> +{
-> +	int notify;
-> +
-> +	RING_PUSH_RESPONSES_AND_CHECK_NOTIFY(&queue->tx, notify);
-> +	if (notify)
-> +		notify_remote_via_irq(queue->tx_irq);
-> +}
-> +
->   static void xenvif_idx_release(struct xenvif_queue *queue, u16 pending_idx,
-> -			       u8 status)
-> +			       s8 status)
->   {
->   	struct pending_tx_info *pending_tx_info;
->   	pending_ring_idx_t index;
-> @@ -1444,8 +1453,8 @@ static void xenvif_idx_release(struct xe
->   
->   	spin_lock_irqsave(&queue->response_lock, flags);
->   
-> -	make_tx_response(queue, &pending_tx_info->req,
-> -			 pending_tx_info->extra_count, status);
-> +	_make_tx_response(queue, &pending_tx_info->req,
-> +			  pending_tx_info->extra_count, status);
->   
->   	/* Release the pending index before pusing the Tx response so
->   	 * its available before a new Tx request is pushed by the
-> @@ -1459,32 +1468,19 @@ static void xenvif_idx_release(struct xe
->   	spin_unlock_irqrestore(&queue->response_lock, flags);
->   }
->   
-> -
->   static void make_tx_response(struct xenvif_queue *queue,
-> -			     struct xen_netif_tx_request *txp,
-> +			     const struct xen_netif_tx_request *txp,
->   			     unsigned int extra_count,
-> -			     s8       st)
-> +			     s8 status)
->   {
-> -	RING_IDX i = queue->tx.rsp_prod_pvt;
-> -	struct xen_netif_tx_response *resp;
-> -
-> -	resp = RING_GET_RESPONSE(&queue->tx, i);
-> -	resp->id     = txp->id;
-> -	resp->status = st;
-> -
-> -	while (extra_count-- != 0)
-> -		RING_GET_RESPONSE(&queue->tx, ++i)->status = XEN_NETIF_RSP_NULL;
-> +	unsigned long flags;
->   
-> -	queue->tx.rsp_prod_pvt = ++i;
-> -}
-> +	spin_lock_irqsave(&queue->response_lock, flags);
->   
-> -static void push_tx_responses(struct xenvif_queue *queue)
-> -{
-> -	int notify;
-> +	_make_tx_response(queue, txp, extra_count, status);
-> +	push_tx_responses(queue);
->   
-> -	RING_PUSH_RESPONSES_AND_CHECK_NOTIFY(&queue->tx, notify);
-> -	if (notify)
-> -		notify_remote_via_irq(queue->tx_irq);
-> +	spin_unlock_irqrestore(&queue->response_lock, flags);
->   }
->   
->   static void xenvif_idx_unmap(struct xenvif_queue *queue, u16 pending_idx)
+Notes:
+    v1 -> v2:
+    
+    - Squash the previously separate addition of
+      switchdev_port_obj_act_is_deferred into this patch.
+    - Use ether_addr_equal to compare MAC addresses.
+    - Document switchdev_port_obj_act_is_deferred (renamed from
+      switchdev_port_obj_is_deferred in v1, to indicate that we also match
+      on the action).
+    - Delay allocations of MDB objects until we know they're needed.
+    - Use non-RCU version of the hash list iterator, now that the MDB is
+      not scanned while holding the RCU read lock.
+    - Add Fixes tag to commit message
+    
+    v2 -> v3:
+    
+    - Fix unlocking in error paths
+    - Access RCU protected port list via mlock_dereference, since MDB is
+      guaranteed to remain constant for the duration of the scan.
+
+ include/net/switchdev.h   |  3 ++
+ net/bridge/br_switchdev.c | 69 +++++++++++++++++++++---------------
+ net/switchdev/switchdev.c | 73 +++++++++++++++++++++++++++++++++++++++
+ 3 files changed, 117 insertions(+), 28 deletions(-)
+
+diff --git a/include/net/switchdev.h b/include/net/switchdev.h
+index a43062d4c734..8346b0d29542 100644
+--- a/include/net/switchdev.h
++++ b/include/net/switchdev.h
+@@ -308,6 +308,9 @@ void switchdev_deferred_process(void);
+ int switchdev_port_attr_set(struct net_device *dev,
+ 			    const struct switchdev_attr *attr,
+ 			    struct netlink_ext_ack *extack);
++bool switchdev_port_obj_act_is_deferred(struct net_device *dev,
++					enum switchdev_notifier_type nt,
++					const struct switchdev_obj *obj);
+ int switchdev_port_obj_add(struct net_device *dev,
+ 			   const struct switchdev_obj *obj,
+ 			   struct netlink_ext_ack *extack);
+diff --git a/net/bridge/br_switchdev.c b/net/bridge/br_switchdev.c
+index ee84e783e1df..6d3fb4292071 100644
+--- a/net/bridge/br_switchdev.c
++++ b/net/bridge/br_switchdev.c
+@@ -595,21 +595,35 @@ br_switchdev_mdb_replay_one(struct notifier_block *nb, struct net_device *dev,
+ }
+ 
+ static int br_switchdev_mdb_queue_one(struct list_head *mdb_list,
++				      struct net_device *dev,
++				      unsigned long action,
+ 				      enum switchdev_obj_id id,
+ 				      const struct net_bridge_mdb_entry *mp,
+ 				      struct net_device *orig_dev)
+ {
+-	struct switchdev_obj_port_mdb *mdb;
++	struct switchdev_obj_port_mdb mdb = {
++		.obj = {
++			.id = id,
++			.orig_dev = orig_dev,
++		},
++	};
++	struct switchdev_obj_port_mdb *pmdb;
+ 
+-	mdb = kzalloc(sizeof(*mdb), GFP_ATOMIC);
+-	if (!mdb)
+-		return -ENOMEM;
++	br_switchdev_mdb_populate(&mdb, mp);
+ 
+-	mdb->obj.id = id;
+-	mdb->obj.orig_dev = orig_dev;
+-	br_switchdev_mdb_populate(mdb, mp);
+-	list_add_tail(&mdb->obj.list, mdb_list);
++	if (switchdev_port_obj_act_is_deferred(dev, action, &mdb.obj)) {
++		/* This event is already in the deferred queue of
++		 * events, so this replay must be elided, lest the
++		 * driver receives duplicate events for it.
++		 */
++		return 0;
++	}
++
++	pmdb = kmemdup(&mdb, sizeof(mdb), GFP_ATOMIC);
++	if (!pmdb)
++		return -ENOMEM;
+ 
++	list_add_tail(&pmdb->obj.list, mdb_list);
+ 	return 0;
+ }
+ 
+@@ -677,51 +691,50 @@ br_switchdev_mdb_replay(struct net_device *br_dev, struct net_device *dev,
+ 	if (!br_opt_get(br, BROPT_MULTICAST_ENABLED))
+ 		return 0;
+ 
+-	/* We cannot walk over br->mdb_list protected just by the rtnl_mutex,
+-	 * because the write-side protection is br->multicast_lock. But we
+-	 * need to emulate the [ blocking ] calling context of a regular
+-	 * switchdev event, so since both br->multicast_lock and RCU read side
+-	 * critical sections are atomic, we have no choice but to pick the RCU
+-	 * read side lock, queue up all our events, leave the critical section
+-	 * and notify switchdev from blocking context.
++	if (adding)
++		action = SWITCHDEV_PORT_OBJ_ADD;
++	else
++		action = SWITCHDEV_PORT_OBJ_DEL;
++
++	/* br_switchdev_mdb_queue_one() will take care to not queue a
++	 * replay of an event that is already pending in the switchdev
++	 * deferred queue. In order to safely determine that, there
++	 * must be no new deferred MDB notifications enqueued for the
++	 * duration of the MDB scan. Therefore, grab the write-side
++	 * lock to avoid racing with any concurrent IGMP/MLD snooping.
+ 	 */
+-	rcu_read_lock();
++	spin_lock_bh(&br->multicast_lock);
+ 
+-	hlist_for_each_entry_rcu(mp, &br->mdb_list, mdb_node) {
++	hlist_for_each_entry(mp, &br->mdb_list, mdb_node) {
+ 		struct net_bridge_port_group __rcu * const *pp;
+ 		const struct net_bridge_port_group *p;
+ 
+ 		if (mp->host_joined) {
+-			err = br_switchdev_mdb_queue_one(&mdb_list,
++			err = br_switchdev_mdb_queue_one(&mdb_list, dev, action,
+ 							 SWITCHDEV_OBJ_ID_HOST_MDB,
+ 							 mp, br_dev);
+ 			if (err) {
+-				rcu_read_unlock();
++				spin_unlock_bh(&br->multicast_lock);
+ 				goto out_free_mdb;
+ 			}
+ 		}
+ 
+-		for (pp = &mp->ports; (p = rcu_dereference(*pp)) != NULL;
++		for (pp = &mp->ports; (p = mlock_dereference(*pp, br)) != NULL;
+ 		     pp = &p->next) {
+ 			if (p->key.port->dev != dev)
+ 				continue;
+ 
+-			err = br_switchdev_mdb_queue_one(&mdb_list,
++			err = br_switchdev_mdb_queue_one(&mdb_list, dev, action,
+ 							 SWITCHDEV_OBJ_ID_PORT_MDB,
+ 							 mp, dev);
+ 			if (err) {
+-				rcu_read_unlock();
++				spin_unlock_bh(&br->multicast_lock);
+ 				goto out_free_mdb;
+ 			}
+ 		}
+ 	}
+ 
+-	rcu_read_unlock();
+-
+-	if (adding)
+-		action = SWITCHDEV_PORT_OBJ_ADD;
+-	else
+-		action = SWITCHDEV_PORT_OBJ_DEL;
++	spin_unlock_bh(&br->multicast_lock);
+ 
+ 	list_for_each_entry(obj, &mdb_list, list) {
+ 		err = br_switchdev_mdb_replay_one(nb, dev,
+diff --git a/net/switchdev/switchdev.c b/net/switchdev/switchdev.c
+index 5b045284849e..7d11f31820df 100644
+--- a/net/switchdev/switchdev.c
++++ b/net/switchdev/switchdev.c
+@@ -19,6 +19,35 @@
+ #include <linux/rtnetlink.h>
+ #include <net/switchdev.h>
+ 
++static bool switchdev_obj_eq(const struct switchdev_obj *a,
++			     const struct switchdev_obj *b)
++{
++	const struct switchdev_obj_port_vlan *va, *vb;
++	const struct switchdev_obj_port_mdb *ma, *mb;
++
++	if (a->id != b->id || a->orig_dev != b->orig_dev)
++		return false;
++
++	switch (a->id) {
++	case SWITCHDEV_OBJ_ID_PORT_VLAN:
++		va = SWITCHDEV_OBJ_PORT_VLAN(a);
++		vb = SWITCHDEV_OBJ_PORT_VLAN(b);
++		return va->flags == vb->flags &&
++			va->vid == vb->vid &&
++			va->changed == vb->changed;
++	case SWITCHDEV_OBJ_ID_PORT_MDB:
++	case SWITCHDEV_OBJ_ID_HOST_MDB:
++		ma = SWITCHDEV_OBJ_PORT_MDB(a);
++		mb = SWITCHDEV_OBJ_PORT_MDB(b);
++		return ma->vid == mb->vid &&
++			ether_addr_equal(ma->addr, mb->addr);
++	default:
++		break;
++	}
++
++	BUG();
++}
++
+ static LIST_HEAD(deferred);
+ static DEFINE_SPINLOCK(deferred_lock);
+ 
+@@ -307,6 +336,50 @@ int switchdev_port_obj_del(struct net_device *dev,
+ }
+ EXPORT_SYMBOL_GPL(switchdev_port_obj_del);
+ 
++/**
++ *	switchdev_port_obj_act_is_deferred - Is object action pending?
++ *
++ *	@dev: port device
++ *	@nt: type of action; add or delete
++ *	@obj: object to test
++ *
++ *	Returns true if a deferred item is exists, which is equivalent
++ *	to the action @nt of an object @obj.
++ *
++ *	rtnl_lock must be held.
++ */
++bool switchdev_port_obj_act_is_deferred(struct net_device *dev,
++					enum switchdev_notifier_type nt,
++					const struct switchdev_obj *obj)
++{
++	struct switchdev_deferred_item *dfitem;
++	bool found = false;
++
++	ASSERT_RTNL();
++
++	spin_lock_bh(&deferred_lock);
++
++	list_for_each_entry(dfitem, &deferred, list) {
++		if (dfitem->dev != dev)
++			continue;
++
++		if ((dfitem->func == switchdev_port_obj_add_deferred &&
++		     nt == SWITCHDEV_PORT_OBJ_ADD) ||
++		    (dfitem->func == switchdev_port_obj_del_deferred &&
++		     nt == SWITCHDEV_PORT_OBJ_DEL)) {
++			if (switchdev_obj_eq((const void *)dfitem->data, obj)) {
++				found = true;
++				break;
++			}
++		}
++	}
++
++	spin_unlock_bh(&deferred_lock);
++
++	return found;
++}
++EXPORT_SYMBOL_GPL(switchdev_port_obj_act_is_deferred);
++
+ static ATOMIC_NOTIFIER_HEAD(switchdev_notif_chain);
+ static BLOCKING_NOTIFIER_HEAD(switchdev_blocking_notif_chain);
+ 
+-- 
+2.34.1
 
 
