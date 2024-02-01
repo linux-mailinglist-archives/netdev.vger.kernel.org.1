@@ -1,62 +1,84 @@
-Return-Path: <netdev+bounces-68076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EF8D845C1D
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:50:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82490845CD2
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:16:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ACC37B29137
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 15:49:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB508B315B9
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 716CD626B1;
-	Thu,  1 Feb 2024 15:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D638B626BA;
+	Thu,  1 Feb 2024 15:58:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D5R878vL"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="VbdGFprx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f67.google.com (mail-wm1-f67.google.com [209.85.128.67])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5E762179;
-	Thu,  1 Feb 2024 15:49:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57E065F47B
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 15:58:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.67
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706802593; cv=none; b=S3bviHYw9djl7w+eUzo/njOaiqlQpszHzSdE9H/gabzsqil21ZbOhdAg/cug3fU4oMxOjPFIM+PuqxCImNXQ4//Lkp5I4XQu3UHA7Zqxrs8KhmHQ7WlDCQLnNV+zo2o4SDRQQBooVCLSfZ5kErGkmqy+TKGmRmSY+AG0/9B0C68=
+	t=1706803099; cv=none; b=htwYVBfpcAzSPXcUJ68KC+zxV83qUmVFY/nvisNUafRM6jD2NpxkZ4BjyhLsWZIOw+tbW52xjZfBqumKKHXWbwXxKwPLFVL1qnh2Awox+EU4wuMqIA18pL7U+rq10MskGlHO0EsN8tgs6zxYc7ncpS04ReU3VYWei4lSlNBj3+8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706802593; c=relaxed/simple;
-	bh=yyG+tXwMfUAMz3ARIk0tUpjcZeb5q7dyZl3guKF9XEI=;
+	s=arc-20240116; t=1706803099; c=relaxed/simple;
+	bh=ozXxsLBjFZrfleXBGW9rOCSjqD+GK7DvzmkvFe3txRE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KgqkK9iJ1q0u9l4EEUFePCRy4x/k9HZOspVlZV1zmykWabBWvm3Jo579rP5LQRH7oUnASR9d5TFYuFHNnjVyintuTnFPhX2srRMsCvRPPutU1lwGzUOKaNMOvrlS86SrwVVkHqgRKrB4z5j9qUHzxtGYhq65WiUGza0xn+q0rZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D5R878vL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4578CC433F1;
-	Thu,  1 Feb 2024 15:49:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706802593;
-	bh=yyG+tXwMfUAMz3ARIk0tUpjcZeb5q7dyZl3guKF9XEI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=D5R878vLpp+NEpb12DzhTaXiVuha7CUkYaNGVUv4HFeSDPDHQwIZJPMu6bS+/ov/u
-	 W0I3xHDNHJ1I7+jUfB0OPmO80Km5O8eRExbsn/LLkytdUHQY0SxKimRQYvxrHiIksl
-	 9l/KCxMV06+LvGm/VEVnI1vCOipD8duidStMHMTculmhtdoPDYgBUCN22PDZMQSvQ4
-	 ZK38poOGk2Anq8mZ4w+g7d8xLK//MOvO7OAgpUKuHmnBkqwLuf617V1jTVNjpv3coj
-	 dXd454290CsnfBqsmdVRHewoj3XSx4nFQvHCMLvsoqIfUdqZHHzwBAa+DuZbiTYGpJ
-	 vtS2mBiIppf4w==
-Date: Thu, 1 Feb 2024 16:49:45 +0100
-From: Simon Horman <horms@kernel.org>
-To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
-	yury.norov@gmail.com, leon@kernel.org, cai.huoqing@linux.dev,
-	ssengar@linux.microsoft.com, vkuznets@redhat.com,
-	tglx@linutronix.de, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, schakrabarti@microsoft.com,
-	stable@vger.kernel.org
-Subject: Re: [PATCH V2 net] hv_netvsc: Fix race condition between
- netvsc_probe and netvsc_remove
-Message-ID: <20240201154945.GH530335@kernel.org>
-References: <1706686551-28510-1-git-send-email-schakrabarti@linux.microsoft.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=BMUNwweTh4E/ZOsDpgWNoBx61GZkQlAgMDxseR72JyJVSiplKCuyaU3QfnyLGQynjnAflvpTFqZaFDYPFhptuY5uOUr6jW52+OXzCq6Cd1bePFRlnLpHjSIl4DjfoT8m6ZqllaRzvPR3rrQgPhuxASaNSw9X3AvSaHZYlawRNP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=VbdGFprx; arc=none smtp.client-ip=209.85.128.67
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f67.google.com with SMTP id 5b1f17b1804b1-40fc352d2e2so1668655e9.2
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 07:58:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706803095; x=1707407895; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zb2N1SjFXrCezi0DdrzWDAreAVNvluHnD5YFqaNLg/Y=;
+        b=VbdGFprxgQA2cTKQj+yVOqrzSxPmSL5Ot5ynbQs//Wmylf5fJhnqWPPsR3KTvWibPs
+         Zq/M5GfEM+zu6LGz80kGYp1rY5AoN3QSP4Ep0oOUDe4xSHXqi1+WOrMrs6MTURAwcJzm
+         p/9d3I9Ymx8erp208FUw+0pE2lwTJVu+AZuu8krybUktGsUUnbcqkIYznPXoUPxEE6Yt
+         vhnTCF+PC10J16Q6llp022ltBv545u6H2St0kZpNvk4qMrJEMvO1/4yk0+sMVlMOtWc6
+         jAv2vOvCGkzj0xo8ciBdSV11AtAP1+eWXWaibrUhYhT8fvpO8GuulYJY+L3lm2q1Ycsm
+         uPEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706803095; x=1707407895;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zb2N1SjFXrCezi0DdrzWDAreAVNvluHnD5YFqaNLg/Y=;
+        b=wPf2vGC/b4J7i8lQFhHb/7Ukf+4LKtA88rSCzPDeZCGw+xNDAAhIex94nJ9qWoQmpM
+         BVvvCrJNwh+vpiHvTpeqqp/DcmcOuCEVd8QkEsv1ewYGZjWY40HWtKgEoPgdGQ+LDvpe
+         9AahCztey0ysY/sVCNwZo7m2woHGa09NcU4zYEhaj509M0b/xgUC1uo8a7f55omKvMRo
+         o/e1lRhgQWzQs7/qBWannVJn6jvc0B7ptwZ7DzUgL6Q3ICOUWq+5kDR95ZUEXIEk9uV/
+         cryCxVXwL5unmngMtSMnLVkJlMAqXBglVt89t+Wku8u1pUYyqlsd8iRDcBH2wa7xvMOp
+         nvhg==
+X-Gm-Message-State: AOJu0YzdmX3vVBPqtIHbThVHTZEw6rjQgJ4bkFg4hd6fy+oVaaVHHfq3
+	qKjEcn3d5x7mjqmUm56jt1/9GVEmQqOhIV7q0E/mp+L6l6d7Q9PbxGi6YpJZseIHBgC+szczEaO
+	lSp7ObQ==
+X-Google-Smtp-Source: AGHT+IFHyevawAIt4/49GDyezXA9WB+8DVF5/C/y1gWx5XY8NHEi0DDUf5DUfrgDT3T8+Vb2xqs2VQ==
+X-Received: by 2002:a05:600c:a384:b0:40f:bc67:49ec with SMTP id hn4-20020a05600ca38400b0040fbc6749ecmr1417680wmb.40.1706803095384;
+        Thu, 01 Feb 2024 07:58:15 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVZE3CmS3I509/B+4D1+SyEV9MQ8wzMOeJgw+9jwr4NcwqTvYe4NELBai7km6wiv2eS9ZL/xzCUotLn5uj1Hn5tzLmKGGXIKKYSSmLHcO2QJZ2taHj3WNBJOIll3SbqGezG4sr9D6zSW//jDPmeJTky8Y6iQsH9RTPJ2TL09YoCT4/vMVP7iVEyOVSGqJXpf4f2Ebguu9raToFCQsIkYIZYUGXYUptCrFH7eNf30pfI81N5he23yKQNPKBEznMloI2e29/h4XazUkOVFtCbfAR/zy5whRzrBuEAOzdbvhRG66Zi1sq9ZISL01yn69N0gZ99l3iocsRDKH5op7SFUyHiTe7vNF9IsfA=
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id w13-20020a05600c474d00b0040ec66021a7sm15206wmo.1.2024.02.01.07.58.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Feb 2024 07:58:14 -0800 (PST)
+Date: Thu, 1 Feb 2024 16:58:12 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: wangkeqi <wangkeqi_chris@163.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, fw@strlen.de,
+	wangkeqi <wangkeqiwang@didiglobal.com>,
+	kernel test robot <oliver.sang@intel.com>, fengwei.yin@intel.com
+Subject: Re: [PATCH net v4] connector: cn_netlink_has_listeners replaces
+ proc_event_num_listeners
+Message-ID: <Zbu_lBFkeb8NUIek@nanopsycho>
+References: <20240131014459.411158-1-wangkeqi_chris@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,54 +87,212 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1706686551-28510-1-git-send-email-schakrabarti@linux.microsoft.com>
+In-Reply-To: <20240131014459.411158-1-wangkeqi_chris@163.com>
 
-On Tue, Jan 30, 2024 at 11:35:51PM -0800, Souradeep Chakrabarti wrote:
-> In commit ac5047671758 ("hv_netvsc: Disable NAPI before closing the
-> VMBus channel"), napi_disable was getting called for all channels,
-> including all subchannels without confirming if they are enabled or not.
-> 
-> This caused hv_netvsc getting hung at napi_disable, when netvsc_probe()
-> has finished running but nvdev->subchan_work has not started yet.
-> netvsc_subchan_work() -> rndis_set_subchannel() has not created the
-> sub-channels and because of that netvsc_sc_open() is not running.
-> netvsc_remove() calls cancel_work_sync(&nvdev->subchan_work), for which
-> netvsc_subchan_work did not run.
-> 
-> netif_napi_add() sets the bit NAPI_STATE_SCHED because it ensures NAPI
-> cannot be scheduled. Then netvsc_sc_open() -> napi_enable will clear the
-> NAPIF_STATE_SCHED bit, so it can be scheduled. napi_disable() does the
-> opposite.
-> 
-> Now during netvsc_device_remove(), when napi_disable is called for those
-> subchannels, napi_disable gets stuck on infinite msleep.
-> 
-> This fix addresses this problem by ensuring that napi_disable() is not
-> getting called for non-enabled NAPI struct.
-> But netif_napi_del() is still necessary for these non-enabled NAPI struct
-> for cleanup purpose.
-> 
-> Call trace:
-> [  654.559417] task:modprobe        state:D stack:    0 pid: 2321 ppid:  1091 flags:0x00004002
-> [  654.568030] Call Trace:
-> [  654.571221]  <TASK>
-> [  654.573790]  __schedule+0x2d6/0x960
-> [  654.577733]  schedule+0x69/0xf0
-> [  654.581214]  schedule_timeout+0x87/0x140
-> [  654.585463]  ? __bpf_trace_tick_stop+0x20/0x20
-> [  654.590291]  msleep+0x2d/0x40
-> [  654.593625]  napi_disable+0x2b/0x80
-> [  654.597437]  netvsc_device_remove+0x8a/0x1f0 [hv_netvsc]
-> [  654.603935]  rndis_filter_device_remove+0x194/0x1c0 [hv_netvsc]
-> [  654.611101]  ? do_wait_intr+0xb0/0xb0
-> [  654.615753]  netvsc_remove+0x7c/0x120 [hv_netvsc]
-> [  654.621675]  vmbus_remove+0x27/0x40 [hv_vmbus]
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: ac5047671758 ("hv_netvsc: Disable NAPI before closing the VMBus channel")
-> Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-> Reviewed-by: Dexuan Cui <decui@microsoft.com>
-> Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Wed, Jan 31, 2024 at 02:44:59AM CET, wangkeqi_chris@163.com wrote:
+>From: wangkeqi <wangkeqiwang@didiglobal.com>
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Care to fix your name please?
+
+
+>
+>It is inaccurate to judge whether proc_event_num_listeners is
+>cleared by cn_netlink_send_mult returning -ESRCH.
+>In the case of stress-ng netlink-proc, -ESRCH will always be returned,
+>because netlink_broadcast_filtered will return -ESRCH,
+>which may cause stress-ng netlink-proc performance degradation.
+>If the judgment condition is modified to whether there is a listener.
+
+This sentence does not sound complete.
+
+
+>proc_event_num_listeners will still be wrong due to concurrency.
+>So replace the counter with cn_netlink_has_listeners
+
+I'm reading the whole patch description for 5th time, I still don't
+understand it :(
+
+
+>
+>Reported-by: kernel test robot <oliver.sang@intel.com>
+>Closes: https://lore.kernel.org/oe-lkp/202401112259.b23a1567-oliver.sang@intel.com
+>Fixes: c46bfba1337d ("connector: Fix proc_event_num_listeners count not cleared")
+>Signed-off-by: wangkeqi <wangkeqiwang@didiglobal.com>
+
+Same here.
+
+
+>Cc: fengwei.yin@intel.com
+>Cc: fw@strlen.de
+>---
+> drivers/connector/cn_proc.c   | 33 +++++++++++++++++++++------------
+> drivers/connector/connector.c |  9 +++++++++
+> include/linux/connector.h     |  1 +
+> 3 files changed, 31 insertions(+), 12 deletions(-)
+>
+>diff --git a/drivers/connector/cn_proc.c b/drivers/connector/cn_proc.c
+>index 3d5e6d705..4898e974c 100644
+>--- a/drivers/connector/cn_proc.c
+>+++ b/drivers/connector/cn_proc.c
+>@@ -85,6 +85,16 @@ static int cn_filter(struct sock *dsk, struct sk_buff *skb, void *data)
+> 	return 1;
+> }
+> 
+>+static int cn_netlink_has_listeners(void)
+>+{
+>+	struct sock *sk = get_cdev_nls();
+>+
+>+	if (sk)
+>+		return netlink_has_listeners(sk, CN_IDX_PROC);
+>+	else
+>+		return 0;
+>+}
+>+
+> static inline void send_msg(struct cn_msg *msg)
+> {
+> 	__u32 filter_data[2];
+>@@ -108,9 +118,8 @@ static inline void send_msg(struct cn_msg *msg)
+> 		filter_data[1] = 0;
+> 	}
+> 
+>-	if (cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
+>-			     cn_filter, (void *)filter_data) == -ESRCH)
+>-		atomic_set(&proc_event_num_listeners, 0);
+>+	cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
+>+			     cn_filter, (void *)filter_data);
+> 
+> 	local_unlock(&local_event.lock);
+> }
+>@@ -122,7 +131,7 @@ void proc_fork_connector(struct task_struct *task)
+> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
+> 	struct task_struct *parent;
+> 
+>-	if (atomic_read(&proc_event_num_listeners) < 1)
+>+	if (!cn_netlink_has_listeners())
+> 		return;
+> 
+> 	msg = buffer_to_cn_msg(buffer);
+>@@ -151,7 +160,7 @@ void proc_exec_connector(struct task_struct *task)
+> 	struct proc_event *ev;
+> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
+> 
+>-	if (atomic_read(&proc_event_num_listeners) < 1)
+>+	if (!cn_netlink_has_listeners())
+> 		return;
+> 
+> 	msg = buffer_to_cn_msg(buffer);
+>@@ -176,7 +185,7 @@ void proc_id_connector(struct task_struct *task, int which_id)
+> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
+> 	const struct cred *cred;
+> 
+>-	if (atomic_read(&proc_event_num_listeners) < 1)
+>+	if (!cn_netlink_has_listeners())
+> 		return;
+> 
+> 	msg = buffer_to_cn_msg(buffer);
+>@@ -213,7 +222,7 @@ void proc_sid_connector(struct task_struct *task)
+> 	struct proc_event *ev;
+> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
+> 
+>-	if (atomic_read(&proc_event_num_listeners) < 1)
+>+	if (!cn_netlink_has_listeners())
+> 		return;
+> 
+> 	msg = buffer_to_cn_msg(buffer);
+>@@ -237,7 +246,7 @@ void proc_ptrace_connector(struct task_struct *task, int ptrace_id)
+> 	struct proc_event *ev;
+> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
+> 
+>-	if (atomic_read(&proc_event_num_listeners) < 1)
+>+	if (!cn_netlink_has_listeners())
+> 		return;
+> 
+> 	msg = buffer_to_cn_msg(buffer);
+>@@ -269,7 +278,7 @@ void proc_comm_connector(struct task_struct *task)
+> 	struct proc_event *ev;
+> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
+> 
+>-	if (atomic_read(&proc_event_num_listeners) < 1)
+>+	if (!cn_netlink_has_listeners())
+> 		return;
+> 
+> 	msg = buffer_to_cn_msg(buffer);
+>@@ -295,7 +304,7 @@ void proc_coredump_connector(struct task_struct *task)
+> 	struct task_struct *parent;
+> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
+> 
+>-	if (atomic_read(&proc_event_num_listeners) < 1)
+>+	if (!cn_netlink_has_listeners())
+> 		return;
+> 
+> 	msg = buffer_to_cn_msg(buffer);
+>@@ -328,7 +337,7 @@ void proc_exit_connector(struct task_struct *task)
+> 	struct task_struct *parent;
+> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
+> 
+>-	if (atomic_read(&proc_event_num_listeners) < 1)
+>+	if (!cn_netlink_has_listeners())
+> 		return;
+> 
+> 	msg = buffer_to_cn_msg(buffer);
+>@@ -370,7 +379,7 @@ static void cn_proc_ack(int err, int rcvd_seq, int rcvd_ack)
+> 	struct proc_event *ev;
+> 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
+> 
+>-	if (atomic_read(&proc_event_num_listeners) < 1)
+>+	if (!cn_netlink_has_listeners())
+> 		return;
+
+
+Are you still using &proc_event_num_listeners for anything? If not, why
+don't you remove it entirely?
+
+
+> 
+> 	msg = buffer_to_cn_msg(buffer);
+>diff --git a/drivers/connector/connector.c b/drivers/connector/connector.c
+>index 7f7b94f61..42bcb39ba 100644
+>--- a/drivers/connector/connector.c
+>+++ b/drivers/connector/connector.c
+>@@ -129,6 +129,15 @@ int cn_netlink_send(struct cn_msg *msg, u32 portid, u32 __group,
+> }
+> EXPORT_SYMBOL_GPL(cn_netlink_send);
+> 
+>+struct sock *get_cdev_nls(void)
+
+Perhaps name it cn_cdev_nls_get() to be aligned with the rest?
+
+
+
+>+{
+>+	if (cn_already_initialized == 1)
+>+		return cdev.nls;
+>+	else
+>+		return NULL;
+>+}
+>+EXPORT_SYMBOL_GPL(get_cdev_nls);
+>+
+> /*
+>  * Callback helper - queues work and setup destructor for given data.
+>  */
+>diff --git a/include/linux/connector.h b/include/linux/connector.h
+>index cec2d99ae..255466aea 100644
+>--- a/include/linux/connector.h
+>+++ b/include/linux/connector.h
+>@@ -127,6 +127,7 @@ int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid,
+>  */
+> int cn_netlink_send(struct cn_msg *msg, u32 portid, u32 group, gfp_t gfp_mask);
+> 
+>+struct sock *get_cdev_nls(void);
+
+Add empty line.
+
+
+> int cn_queue_add_callback(struct cn_queue_dev *dev, const char *name,
+> 			  const struct cb_id *id,
+> 			  void (*callback)(struct cn_msg *, struct netlink_skb_parms *));
+>-- 
+>2.27.0
+>
+>
 
