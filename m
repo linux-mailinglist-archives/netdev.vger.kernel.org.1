@@ -1,377 +1,189 @@
-Return-Path: <netdev+bounces-67899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 572C7845475
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 10:45:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 74632845484
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 10:48:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BBA61C27D6C
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 09:45:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A0A21C24D74
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 09:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A67B15CD75;
-	Thu,  1 Feb 2024 09:44:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 969354DA15;
+	Thu,  1 Feb 2024 09:48:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="aiMu/SrP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="E62Ygaq8"
 X-Original-To: netdev@vger.kernel.org
-Received: from madrid.collaboradmins.com (madrid.collaboradmins.com [46.235.227.194])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 921BE15B995;
-	Thu,  1 Feb 2024 09:44:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F304DA07
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 09:48:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706780657; cv=none; b=H0bWg3qIDKWuUd+u/WbDuumdZ6eE+YlDiyc1PXMDWeXwwMhuPXeAicRuvQu5MpW36oKA5BeYT6Th051oOuRXxogdZLWzfMRdQo0MzAc5KEtcVliq9nw+wNaSoxQ4KNSNay3d1TzStVbYhGey2jeVBFIYRmEIaJuRW8N4d2GJzjA=
+	t=1706780886; cv=none; b=lRqK8KUWLyrd3X7qSUn0nHpss9S1Ai4DebcNrY/uEbQBUzaNPcJ9/dIz5iQIY/TU/x2i6M5goiu4c34oeo/Nh9lpNHakU8Nd+xT++i08oL5nl2HjWkslzJHT0SBfYePnCS4Jadk4zrxTEmYUykBqQOtPJs7haTwH5dX62Hp9xxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706780657; c=relaxed/simple;
-	bh=C8AitdaoBIcKR44uJyMOG7G5OG2flvelnSS+vt/CmMQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=A+wEbLC8VYqIchatTIt2ZckDs72zB27CmlM/vJZ5jKaFuVl2WfWpDGkvuMBbhCygl9asqMbyL67GzFcnX3cbSr2FD0EhAEvp5HQmjYJBOiCAn5fMQAWIhNGMhurSj4KqJ6vvelWUelNqJvMol6xkeWob0KSiha9modTf2dyIbKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=aiMu/SrP; arc=none smtp.client-ip=46.235.227.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1706780654;
-	bh=C8AitdaoBIcKR44uJyMOG7G5OG2flvelnSS+vt/CmMQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=aiMu/SrPTKm2kxhZRA6E9jWpsDX3XVEtQszdCaYdOt1e3PgBMcz7W2LBKZWW2NKsY
-	 fbBEFwmakwX8tJagXc/r9eVw3mFrJmTo97T5CYuZ2dPl7Jbvwy4yUe1BPeLP4+JmgQ
-	 PRHs+PkZo1yA6arQHYef+CWIOGnZDCsRSNIAj69ZReCmZuefM8r3RT7MN2kmx4NMKI
-	 2EhLS9kEP6W+Tv9KuyVugrQSZMqz4UbHV6o3dBVIFdrWQx1QoRFVTEewpTdUqzUwxW
-	 g2HA4IQX+CqOTgVqzB0LT1ARlRuWF2X+WLIvdzr6KmoCEonSQ/epZip6NaJu0/1qJF
-	 iT8/DaHH8/Buw==
-Received: from [100.113.186.2] (cola.collaboradmins.com [195.201.22.229])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	s=arc-20240116; t=1706780886; c=relaxed/simple;
+	bh=W8ueSTQV9H7E/wwgKuME47isVu3e6OuRVGwZ2kTJe4g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CWgXqqPdelVEl8ndTS1LykcphqQvwf6BeChJpOc6tbP/+NEY5Y2FIu1PX0Xr5Tjx+ZrREYSh05Vjy/zTlnPh+BzrUpBbmATLlu9jk1xXFoYIGUtlF328kJ8/lWYSUSmi7NDxh5TFwkY1Q4AIowbfVqnrhal7+TqHRucMTm6CLIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=E62Ygaq8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706780883;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FJgqeoCkyruSUGWxSYUKZ7d4Y/5G+4ikFi2lBwdoA7E=;
+	b=E62Ygaq8v3Jxb5hhzEAozH387dmsWmkMGuvgp7E3dI9JV3yarvrSFjoFi6JeA4a2jX14YA
+	SB+njV0mp4ivASS5zbZHWkwCsrUR0zST/eWOdnvu2KoD0YpMffcNO3q56Kggr7qRANmWTX
+	/jjvTHgLpdeiwygX5081sCArr5svKZE=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-298-s17VHR53PCmLTjArLwOQjw-1; Thu, 01 Feb 2024 04:47:59 -0500
+X-MC-Unique: s17VHR53PCmLTjArLwOQjw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by madrid.collaboradmins.com (Postfix) with ESMTPSA id 7C092378208F;
-	Thu,  1 Feb 2024 09:44:12 +0000 (UTC)
-Message-ID: <e43a6f6e-6e95-4cbd-9e73-49c129d5724e@collabora.com>
-Date: Thu, 1 Feb 2024 10:44:12 +0100
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F1238881C81;
+	Thu,  1 Feb 2024 09:47:58 +0000 (UTC)
+Received: from p1.luc.cera.cz (unknown [10.45.225.38])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4B1451C060AF;
+	Thu,  1 Feb 2024 09:47:57 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Egor Pomozov <epomozov@marvell.com>,
+	Igor Russkikh <irusskikh@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Dmitry Bezrukov <dmitry.bezrukov@aquantia.com>,
+	Sergey Samoilenko <sergey.samoilenko@aquantia.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net] net: atlantic: Fix DMA mapping for PTP hwts ring
+Date: Thu,  1 Feb 2024 10:47:51 +0100
+Message-ID: <20240201094752.883026-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 06/21] virt: geniezone: Add set_user_memory_region for
- vm
-Content-Language: en-US
-To: Yi-De Wu <yi-de.wu@mediatek.com>,
- Yingshiuan Pan <yingshiuan.pan@mediatek.com>,
- Ze-Yu Wang <ze-yu.wang@mediatek.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
- Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>,
- Matthias Brugger <matthias.bgg@gmail.com>
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- netdev@vger.kernel.org, linux-mediatek@lists.infradead.org,
- David Bradil <dbrazdil@google.com>, Trilok Soni <quic_tsoni@quicinc.com>,
- My Chuang <my.chuang@mediatek.com>, Shawn Hsiao <shawn.hsiao@mediatek.com>,
- PeiLun Suei <peilun.suei@mediatek.com>,
- Liju Chen <liju-clr.chen@mediatek.com>,
- Willix Yeh <chi-shen.yeh@mediatek.com>,
- Kevenny Hsieh <kevenny.hsieh@mediatek.com>
-References: <20240129083302.26044-1-yi-de.wu@mediatek.com>
- <20240129083302.26044-7-yi-de.wu@mediatek.com>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-In-Reply-To: <20240129083302.26044-7-yi-de.wu@mediatek.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-Il 29/01/24 09:32, Yi-De Wu ha scritto:
-> From: "Yingshiuan Pan" <yingshiuan.pan@mediatek.com>
-> 
-> Direct use of physical memory from VMs is forbidden and designed to be
-> dictated to the privilege models managed by GenieZone hypervisor for
-> security reason. With the help of gzvm-ko, the hypervisor would be able
-> to manipulate memory as objects. And the memory management is highly
-> integrated with ARM 2-stage translation tables to convert VA to IPA to
-> PA under proper security measures required by protected VMs.
-> 
-> Signed-off-by: Yingshiuan Pan <yingshiuan.pan@mediatek.com>
-> Signed-off-by: Jerry Wang <ze-yu.wang@mediatek.com>
-> Signed-off-by: Liju Chen <liju-clr.chen@mediatek.com>
-> Signed-off-by: Yi-De Wu <yi-de.wu@mediatek.com>
-> ---
->   arch/arm64/geniezone/gzvm_arch_common.h |   2 +
->   arch/arm64/geniezone/vm.c               |   9 ++
->   drivers/virt/geniezone/Makefile         |   1 -
->   drivers/virt/geniezone/gzvm_vm.c        | 110 ++++++++++++++++++++++++
->   include/linux/gzvm_drv.h                |  40 +++++++++
->   include/uapi/linux/gzvm.h               |  26 ++++++
->   6 files changed, 187 insertions(+), 1 deletion(-)
-> 
-> diff --git a/arch/arm64/geniezone/gzvm_arch_common.h b/arch/arm64/geniezone/gzvm_arch_common.h
-> index fdaa7849353d..2f66e496dfae 100644
-> --- a/arch/arm64/geniezone/gzvm_arch_common.h
-> +++ b/arch/arm64/geniezone/gzvm_arch_common.h
-> @@ -11,6 +11,7 @@
->   enum {
->   	GZVM_FUNC_CREATE_VM = 0,
->   	GZVM_FUNC_DESTROY_VM = 1,
-> +	GZVM_FUNC_SET_MEMREGION = 4,
->   	GZVM_FUNC_PROBE = 12,
->   	NR_GZVM_FUNC,
->   };
-> @@ -23,6 +24,7 @@ enum {
->   
->   #define MT_HVC_GZVM_CREATE_VM		GZVM_HCALL_ID(GZVM_FUNC_CREATE_VM)
->   #define MT_HVC_GZVM_DESTROY_VM		GZVM_HCALL_ID(GZVM_FUNC_DESTROY_VM)
-> +#define MT_HVC_GZVM_SET_MEMREGION	GZVM_HCALL_ID(GZVM_FUNC_SET_MEMREGION)
->   #define MT_HVC_GZVM_PROBE		GZVM_HCALL_ID(GZVM_FUNC_PROBE)
->   
->   /**
-> diff --git a/arch/arm64/geniezone/vm.c b/arch/arm64/geniezone/vm.c
-> index a15bad13c2ee..998d6498ac5e 100644
-> --- a/arch/arm64/geniezone/vm.c
-> +++ b/arch/arm64/geniezone/vm.c
-> @@ -49,6 +49,15 @@ int gzvm_arch_probe(void)
->   	return 0;
->   }
->   
-> +int gzvm_arch_set_memregion(u16 vm_id, size_t buf_size,
-> +			    phys_addr_t region)
-> +{
-> +	struct arm_smccc_res res;
-> +
-> +	return gzvm_hypcall_wrapper(MT_HVC_GZVM_SET_MEMREGION, vm_id,
-> +				    buf_size, region, 0, 0, 0, 0, &res);
-> +}
-> +
->   /**
->    * gzvm_arch_create_vm() - create vm
->    * @vm_type: VM type. Only supports Linux VM now.
-> diff --git a/drivers/virt/geniezone/Makefile b/drivers/virt/geniezone/Makefile
-> index 066efddc0b9c..25614ea3dea2 100644
-> --- a/drivers/virt/geniezone/Makefile
-> +++ b/drivers/virt/geniezone/Makefile
-> @@ -7,4 +7,3 @@
->   GZVM_DIR ?= ../../../drivers/virt/geniezone
->   
->   gzvm-y := $(GZVM_DIR)/gzvm_main.o $(GZVM_DIR)/gzvm_vm.o
-> -
-
-Don't remove this line here - actually, don't introduce it in the first place...
-
-> diff --git a/drivers/virt/geniezone/gzvm_vm.c b/drivers/virt/geniezone/gzvm_vm.c
-> index d5e850af924a..326cc9e93d92 100644
-> --- a/drivers/virt/geniezone/gzvm_vm.c
-> +++ b/drivers/virt/geniezone/gzvm_vm.c
-> @@ -15,6 +15,115 @@
->   static DEFINE_MUTEX(gzvm_list_lock);
->   static LIST_HEAD(gzvm_list);
->   
-> +u64 gzvm_gfn_to_hva_memslot(struct gzvm_memslot *memslot, u64 gfn)
-> +{
-> +	u64 offset = gfn - memslot->base_gfn;
-
-I'd check if `gfn` is less than `memslot->base_gfn` - that's a potential security
+Function aq_ring_hwts_rx_alloc() maps extra AQ_CFG_RXDS_DEF bytes
+for PTP HWTS ring but then generic aq_ring_free() does not take this
+into account.
+Create and use a specific function to free HWTS ring to fix this
 issue.
 
-This means that this function should be
+Trace:
+[  215.351607] ------------[ cut here ]------------
+[  215.351612] DMA-API: atlantic 0000:4b:00.0: device driver frees DMA memory with different size [device address=0x00000000fbdd0000] [map size=34816 bytes] [unmap size=32768 bytes]
+[  215.351635] WARNING: CPU: 33 PID: 10759 at kernel/dma/debug.c:988 check_unmap+0xa6f/0x2360
+...
+[  215.581176] Call Trace:
+[  215.583632]  <TASK>
+[  215.585745]  ? show_trace_log_lvl+0x1c4/0x2df
+[  215.590114]  ? show_trace_log_lvl+0x1c4/0x2df
+[  215.594497]  ? debug_dma_free_coherent+0x196/0x210
+[  215.599305]  ? check_unmap+0xa6f/0x2360
+[  215.603147]  ? __warn+0xca/0x1d0
+[  215.606391]  ? check_unmap+0xa6f/0x2360
+[  215.610237]  ? report_bug+0x1ef/0x370
+[  215.613921]  ? handle_bug+0x3c/0x70
+[  215.617423]  ? exc_invalid_op+0x14/0x50
+[  215.621269]  ? asm_exc_invalid_op+0x16/0x20
+[  215.625480]  ? check_unmap+0xa6f/0x2360
+[  215.629331]  ? mark_lock.part.0+0xca/0xa40
+[  215.633445]  debug_dma_free_coherent+0x196/0x210
+[  215.638079]  ? __pfx_debug_dma_free_coherent+0x10/0x10
+[  215.643242]  ? slab_free_freelist_hook+0x11d/0x1d0
+[  215.648060]  dma_free_attrs+0x6d/0x130
+[  215.651834]  aq_ring_free+0x193/0x290 [atlantic]
+[  215.656487]  aq_ptp_ring_free+0x67/0x110 [atlantic]
+...
+[  216.127540] ---[ end trace 6467e5964dd2640b ]---
+[  216.132160] DMA-API: Mapped at:
+[  216.132162]  debug_dma_alloc_coherent+0x66/0x2f0
+[  216.132165]  dma_alloc_attrs+0xf5/0x1b0
+[  216.132168]  aq_ring_hwts_rx_alloc+0x150/0x1f0 [atlantic]
+[  216.132193]  aq_ptp_ring_alloc+0x1bb/0x540 [atlantic]
+[  216.132213]  aq_nic_init+0x4a1/0x760 [atlantic]
 
-int gzvm_gfn_to_hva_memslot(struct gzvm_memslot *memslot, u64 gfn, u64 *hva_memslot)
+Fixes: 94ad94558b0f ("net: aquantia: add PTP rings infrastructure")
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+---
+ drivers/net/ethernet/aquantia/atlantic/aq_ptp.c  |  4 ++--
+ drivers/net/ethernet/aquantia/atlantic/aq_ring.c | 13 +++++++++++++
+ drivers/net/ethernet/aquantia/atlantic/aq_ring.h |  1 +
+ 3 files changed, 16 insertions(+), 2 deletions(-)
 
-if (gfn < memslot->base_gfn)
-	return -EINVAL
-
-offset = gfn - memslot->base_gfn;
-*hva_memslot = memslot->userspace_addr + offset * PAGE_SIZE:
-
-return 0;
-
-> +
-> +	return memslot->userspace_addr + offset * PAGE_SIZE;
-> +}
-> +
-> +/**
-> + * register_memslot_addr_range() - Register memory region to GenieZone
-> + * @gzvm: Pointer to struct gzvm
-> + * @memslot: Pointer to struct gzvm_memslot
-> + *
-> + * Return: 0 for success, negative number for error
-> + */
-> +static int
-> +register_memslot_addr_range(struct gzvm *gzvm, struct gzvm_memslot *memslot)
-> +{
-> +	struct gzvm_memory_region_ranges *region;
-> +	u32 buf_size = PAGE_SIZE * 2;
-> +	u64 gfn;
-> +
-> +	region = alloc_pages_exact(buf_size, GFP_KERNEL);
-> +	if (!region)
-> +		return -ENOMEM;
-> +
-> +	region->slot = memslot->slot_id;
-> +	region->total_pages = memslot->npages;
-> +	gfn = memslot->base_gfn;
-> +	region->gpa = PFN_PHYS(gfn);
-> +
-> +	if (gzvm_arch_set_memregion(gzvm->vm_id, buf_size,
-> +				    virt_to_phys(region))) {
-> +		pr_err("Failed to register memregion to hypervisor\n");
-> +		free_pages_exact(region, buf_size);
-> +		return -EFAULT;
-> +	}
-> +
-> +	free_pages_exact(region, buf_size);
-> +	return 0;
-> +}
-> +
-> +/**
-> + * gzvm_vm_ioctl_set_memory_region() - Set memory region of guest
-> + * @gzvm: Pointer to struct gzvm.
-> + * @mem: Input memory region from user.
-> + *
-> + * Return: 0 for success, negative number for error
-> + *
-> + * -EXIO		- The memslot is out-of-range
-> + * -EFAULT		- Cannot find corresponding vma
-> + * -EINVAL		- Region size and VMA size mismatch
-> + */
-> +static int
-> +gzvm_vm_ioctl_set_memory_region(struct gzvm *gzvm,
-> +				struct gzvm_userspace_memory_region *mem)
-> +{
-> +	struct vm_area_struct *vma;
-> +	struct gzvm_memslot *memslot;
-> +	unsigned long size;
-> +	__u32 slot;
-> +
-
-Remove __u32 slot.....
-
-	if (mem->slot >= GZVM_MAX_MEM_REGION)
-		return -ENXIO;
-
-	memslot = &gzvm->memslot[mem->slot];
-
-> +	slot = mem->slot;
-> +	if (slot >= GZVM_MAX_MEM_REGION)
-> +		return -ENXIO;
-> +	memslot = &gzvm->memslot[slot];
-> + > +	vma = vma_lookup(gzvm->mm, mem->userspace_addr);
-> +	if (!vma)
-> +		return -EFAULT;
-> +
-> +	size = vma->vm_end - vma->vm_start;
-> +	if (size != mem->memory_size)
-> +		return -EINVAL;
-> +
-> +	memslot->base_gfn = __phys_to_pfn(mem->guest_phys_addr);
-> +	memslot->npages = size >> PAGE_SHIFT;
-> +	memslot->userspace_addr = mem->userspace_addr;
-> +	memslot->vma = vma;
-> +	memslot->flags = mem->flags;
-> +	memslot->slot_id = mem->slot;
-> +	return register_memslot_addr_range(gzvm, memslot);
-> +}
-> +
-> +/* gzvm_vm_ioctl() - Ioctl handler of VM FD */
-> +static long gzvm_vm_ioctl(struct file *filp, unsigned int ioctl,
-> +			  unsigned long arg)
-> +{
-> +	long ret;
-> +	void __user *argp = (void __user *)arg;
-> +	struct gzvm *gzvm = filp->private_data;
-> +
-> +	switch (ioctl) {
-> +	case GZVM_SET_USER_MEMORY_REGION: {
-> +		struct gzvm_userspace_memory_region userspace_mem;
-> +
-> +		if (copy_from_user(&userspace_mem, argp, sizeof(userspace_mem))) {
-
-			return -EFAULT;
-
-> +			ret = -EFAULT;
-> +			goto out;
-> +		}
-> +		ret = gzvm_vm_ioctl_set_memory_region(gzvm, &userspace_mem);
-> +		break;
-> +	}
-> +	default:
-> +		ret = -ENOTTY;
-> +	}
-> +out:
-> +	return ret;
-> +}
-> +
->   static void gzvm_destroy_vm(struct gzvm *gzvm)
->   {
->   	pr_debug("VM-%u is going to be destroyed\n", gzvm->vm_id);
-> @@ -42,6 +151,7 @@ static int gzvm_vm_release(struct inode *inode, struct file *filp)
->   
->   static const struct file_operations gzvm_vm_fops = {
->   	.release        = gzvm_vm_release,
-> +	.unlocked_ioctl = gzvm_vm_ioctl,
->   	.llseek		= noop_llseek,
->   };
->   
-> diff --git a/include/linux/gzvm_drv.h b/include/linux/gzvm_drv.h
-> index f1dce23838e4..81696b7b67cc 100644
-> --- a/include/linux/gzvm_drv.h
-> +++ b/include/linux/gzvm_drv.h
-> @@ -7,9 +7,16 @@
->   #define __GZVM_DRV_H__
->   
->   #include <linux/list.h>
-> +#include <linux/mm.h>
->   #include <linux/mutex.h>
->   #include <linux/gzvm.h>
->   
-> +/*
-> + * For the normal physical address, the highest 12 bits should be zero, so we
-> + * can mask bit 62 ~ bit 52 to indicate the error physical address
-> + */
-> +#define GZVM_PA_ERR_BAD (0x7ffULL << 52)
-> +
->   #define INVALID_VM_ID   0xffff
->   
->   /*
-> @@ -27,10 +34,39 @@
->    * The following data structures are for data transferring between driver and
->    * hypervisor, and they're aligned with hypervisor definitions
->    */
-> +#define GZVM_MAX_MEM_REGION	10
-> +
-> +/* struct mem_region_addr_range - Identical to ffa memory constituent */
-> +struct mem_region_addr_range {
-> +	/* the base IPA of the constituent memory region, aligned to 4 kiB */
-> +	__u64 address;
-> +	/* the number of 4 kiB pages in the constituent memory region. */
-> +	__u32 pg_cnt;
-> +	__u32 reserved;
-> +};
-> +
-> +struct gzvm_memory_region_ranges {
-> +	__u32 slot;
-> +	__u32 constituent_cnt;
-> +	__u64 total_pages;
-> +	__u64 gpa;
-> +	struct mem_region_addr_range constituents[];
-> +};
-> +
-> +/* struct gzvm_memslot - VM's memory slot descriptor */
-> +struct gzvm_memslot {
-> +	u64 base_gfn;			/* begin of guest page frame */
-> +	unsigned long npages;		/* number of pages this slot covers */
-> +	unsigned long userspace_addr;	/* corresponding userspace va */
-> +	struct vm_area_struct *vma;	/* vma related to this userspace addr */
-
-kerneldoc please
-
-> +	u32 flags;
-> +	u32 slot_id;
-> +};
->   
-
-Regards,
-Angelo
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ptp.c b/drivers/net/ethernet/aquantia/atlantic/aq_ptp.c
+index abd4832e4ed2..5acb3e16b567 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_ptp.c
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_ptp.c
+@@ -993,7 +993,7 @@ int aq_ptp_ring_alloc(struct aq_nic_s *aq_nic)
+ 	return 0;
+ 
+ err_exit_hwts_rx:
+-	aq_ring_free(&aq_ptp->hwts_rx);
++	aq_ring_hwts_rx_free(&aq_ptp->hwts_rx);
+ err_exit_ptp_rx:
+ 	aq_ring_free(&aq_ptp->ptp_rx);
+ err_exit_ptp_tx:
+@@ -1011,7 +1011,7 @@ void aq_ptp_ring_free(struct aq_nic_s *aq_nic)
+ 
+ 	aq_ring_free(&aq_ptp->ptp_tx);
+ 	aq_ring_free(&aq_ptp->ptp_rx);
+-	aq_ring_free(&aq_ptp->hwts_rx);
++	aq_ring_hwts_rx_free(&aq_ptp->hwts_rx);
+ 
+ 	aq_ptp_skb_ring_release(&aq_ptp->skb_ring);
+ }
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ring.c b/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
+index cda8597b4e14..f7433abd6591 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_ring.c
+@@ -919,6 +919,19 @@ void aq_ring_free(struct aq_ring_s *self)
+ 	}
+ }
+ 
++void aq_ring_hwts_rx_free(struct aq_ring_s *self)
++{
++	if (!self)
++		return;
++
++	if (self->dx_ring) {
++		dma_free_coherent(aq_nic_get_dev(self->aq_nic),
++				  self->size * self->dx_size + AQ_CFG_RXDS_DEF,
++				  self->dx_ring, self->dx_ring_pa);
++		self->dx_ring = NULL;
++	}
++}
++
+ unsigned int aq_ring_fill_stats_data(struct aq_ring_s *self, u64 *data)
+ {
+ 	unsigned int count;
+diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_ring.h b/drivers/net/ethernet/aquantia/atlantic/aq_ring.h
+index 52847310740a..d627ace850ff 100644
+--- a/drivers/net/ethernet/aquantia/atlantic/aq_ring.h
++++ b/drivers/net/ethernet/aquantia/atlantic/aq_ring.h
+@@ -210,6 +210,7 @@ int aq_ring_rx_fill(struct aq_ring_s *self);
+ int aq_ring_hwts_rx_alloc(struct aq_ring_s *self,
+ 			  struct aq_nic_s *aq_nic, unsigned int idx,
+ 			  unsigned int size, unsigned int dx_size);
++void aq_ring_hwts_rx_free(struct aq_ring_s *self);
+ void aq_ring_hwts_rx_clean(struct aq_ring_s *self, struct aq_nic_s *aq_nic);
+ 
+ unsigned int aq_ring_fill_stats_data(struct aq_ring_s *self, u64 *data);
+-- 
+2.41.0
 
 
