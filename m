@@ -1,30 +1,31 @@
-Return-Path: <netdev+bounces-67922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D24A84560B
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 12:10:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F0D9845608
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 12:10:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EFC54B213A4
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 11:10:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B705A1F2B708
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 11:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF36D15D5BE;
-	Thu,  1 Feb 2024 11:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3924915CD76;
+	Thu,  1 Feb 2024 11:10:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.simonwunderlich.de (mail.simonwunderlich.de [23.88.38.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1E1B15CD4F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97C1515CD40
 	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 11:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.88.38.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706785828; cv=none; b=gOSXkT/AvBkomwV9B+rEYyYeIXlmtWgF+p9YN+n+TNnucAvzPoNg6W3d/40Qr+n5VFGjzbfeITtLsJ3QSQBLaNZqmk/rDdxCLKNlsVkKw7R/tMOx1Io2gJb+cFzt3ov3d5q6FWMQwD1O9z7+jAetOmDPJKvq2/qVxl4m8KawZlY=
+	t=1706785827; cv=none; b=UXio9JTgv/kb5rljjAS8TxSZQdladvXJQZjCNU81lu+f2Je2ChSAKBlzKq+KyQjXTEhpst1qJwcu4O5WJO+VLTPISk7glSnCtrg067LJYQbn0IiL7lWgZGeH5rkAzs8Smh8sCQq2xnU/17em2J8osmYSwkDlUNE8N56i8UpCbWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706785828; c=relaxed/simple;
-	bh=TdvRguEtsJmq0YYY7WJKxmSPI/K3KqQyHKzfYsmYynM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=V3LqZL7aY/vAP7kYjoEqnsOZ04TEbQewSgtOcaZrpfyNIgEXZjcrZe9KAeZZ+Dpf4VCaHH7xQI/DoLE1UXN3UwvJMkYwb3TTBvUWcvWjtjgyPL1OwT/1WNh8/qYy3ZzjPPMyMPdX49cm6oXDCqRaaPTt8RTSq8BeR0XHK6KfQdE=
+	s=arc-20240116; t=1706785827; c=relaxed/simple;
+	bh=kFbi/GNT4AXtAgyd5PpS3csqGmzO3Bcwr3VIUhQvKm4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CHk7tnT6j2UfYgjs7qmeCZyPyCKWx2STsF0kLr6cdA5d+bAa0Vv828D8Mvbg8k0ihXUlCUeQXYq6Gmv5l5WraVad+VZfKSQ0h3eC7cO9v7INDNj+zQBKF/huO759xmCBJGNMseG88G25lvjWf2YUdAp20RU8a5WZA2Dgc9EtfMs=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de; spf=pass smtp.mailfrom=simonwunderlich.de; arc=none smtp.client-ip=23.88.38.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simonwunderlich.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simonwunderlich.de
@@ -32,18 +33,22 @@ Received: from kero.packetmixer.de (p200300c59712C7d8D89318FB9D63B559.dip0.t-ipc
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mail.simonwunderlich.de (Postfix) with ESMTPSA id 1B9D7FA2D7;
+	by mail.simonwunderlich.de (Postfix) with ESMTPSA id 7A811FA9A1;
 	Thu,  1 Feb 2024 12:01:15 +0100 (CET)
 From: Simon Wunderlich <sw@simonwunderlich.de>
 To: davem@davemloft.net,
 	kuba@kernel.org
 Cc: netdev@vger.kernel.org,
 	b.a.t.m.a.n@lists.open-mesh.org,
+	=?UTF-8?q?Linus=20L=C3=BCssing?= <linus.luessing@c0d3.blue>,
+	Sven Eckelmann <sven@narfation.org>,
 	Simon Wunderlich <sw@simonwunderlich.de>
-Subject: [PATCH 0/2] pull request for net: batman-adv 2024-02-01
-Date: Thu,  1 Feb 2024 12:01:08 +0100
-Message-Id: <20240201110110.29129-1-sw@simonwunderlich.de>
+Subject: [PATCH 1/2] batman-adv: mcast: fix mcast packet type counter on timeouted nodes
+Date: Thu,  1 Feb 2024 12:01:09 +0100
+Message-Id: <20240201110110.29129-2-sw@simonwunderlich.de>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20240201110110.29129-1-sw@simonwunderlich.de>
+References: <20240201110110.29129-1-sw@simonwunderlich.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,38 +58,37 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Hi David, hi Jakub,
+From: Linus Lüssing <linus.luessing@c0d3.blue>
 
-here are two bugfixes for batman-adv which we would like to have integrated into net.
+When a node which does not have the new batman-adv multicast packet type
+capability vanishes then the according, global counter erroneously would
+not be reduced in response on other nodes. Which in turn leads to the mesh
+never switching back to sending with the new multicast packet type.
 
-Please pull or let me know of any problem!
+Fix this by reducing the according counter when such a node times out.
 
-Thank you,
-      Simon
+Fixes: 90039133221e ("batman-adv: mcast: implement multicast packet generation")
+Signed-off-by: Linus Lüssing <linus.luessing@c0d3.blue>
+Signed-off-by: Sven Eckelmann <sven@narfation.org>
+Signed-off-by: Simon Wunderlich <sw@simonwunderlich.de>
+---
+ net/batman-adv/multicast.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-The following changes since commit 6613476e225e090cc9aad49be7fa504e290dd33d:
+diff --git a/net/batman-adv/multicast.c b/net/batman-adv/multicast.c
+index d982daea8329..b4f8b4af1722 100644
+--- a/net/batman-adv/multicast.c
++++ b/net/batman-adv/multicast.c
+@@ -2198,6 +2198,8 @@ void batadv_mcast_purge_orig(struct batadv_orig_node *orig)
+ 				      BATADV_MCAST_WANT_NO_RTR4);
+ 	batadv_mcast_want_rtr6_update(bat_priv, orig,
+ 				      BATADV_MCAST_WANT_NO_RTR6);
++	batadv_mcast_have_mc_ptype_update(bat_priv, orig,
++					  BATADV_MCAST_HAVE_MC_PTYPE_CAPA);
+ 
+ 	spin_unlock_bh(&orig->mcast_handler_lock);
+ }
+-- 
+2.39.2
 
-  Linux 6.8-rc1 (2024-01-21 14:11:32 -0800)
-
-are available in the Git repository at:
-
-  git://git.open-mesh.org/linux-merge.git tags/batadv-net-pullrequest-20240201
-
-for you to fetch changes up to 0a186b49bba596b81de5a686ce5bfc9cd48ab3ef:
-
-  batman-adv: mcast: fix memory leak on deleting a batman-adv interface (2024-01-27 09:13:39 +0100)
-
-----------------------------------------------------------------
-Here are some batman-adv bugfixes:
-
- - fix a timeout issue and a memory leak in batman-adv multicast,
-   by Linus Lüssing (2 patches)
-
-----------------------------------------------------------------
-Linus Lüssing (2):
-      batman-adv: mcast: fix mcast packet type counter on timeouted nodes
-      batman-adv: mcast: fix memory leak on deleting a batman-adv interface
-
- net/batman-adv/multicast.c | 3 +++
- 1 file changed, 3 insertions(+)
 
