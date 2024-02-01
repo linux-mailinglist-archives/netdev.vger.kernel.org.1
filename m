@@ -1,90 +1,93 @@
-Return-Path: <netdev+bounces-68162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35B43845FCC
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 19:24:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D46E845FDD
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 19:26:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E082A298D83
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:24:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B6861C262A9
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:26:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F1682C9C;
-	Thu,  1 Feb 2024 18:23:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C52B12FB38;
+	Thu,  1 Feb 2024 18:26:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UY9Bq9v6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eBNc7Fuw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC5C684FC0;
-	Thu,  1 Feb 2024 18:23:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC5D612FB0E;
+	Thu,  1 Feb 2024 18:26:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706811794; cv=none; b=lU/buG8nHssoPHk65g6aKJ/kzy8QOxeWLcsjYoBe+bApPBlo2nqvUb2UK0xYozoic0M0kOKn6PZqIZ9uFe2/xwCAI/HSuHwlAKOH2cvfl7w3jg5SSvENuTOD3PA3T1MfuNk0xcL4RyAYdtGKiqdsmJeLaXT3rVCBhumezhivmVs=
+	t=1706811987; cv=none; b=mGG1kUDM2GIxQKHP2k2DWvGEuGjZBRYNkGUWfSBthZSRxbg57oQjWCVKaP1/eQmDLVjBKE2TgWcjBoYRZ86jUgysSaVltc5jm3q1/zNWhvYgsOXKv1xqrwt4fNCPV8wT9sOmQozue/QlQYmtJ+MEeHaaeJihHYUqp2Hxbx6m668=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706811794; c=relaxed/simple;
-	bh=ogV7GvdZt6YyCj/tWdJxbt2NIxMLRcjU/P0OzTk7O5c=;
+	s=arc-20240116; t=1706811987; c=relaxed/simple;
+	bh=FVTBCN2du4zlWLyaWqxrGSTkTvzubs6Y4PI45j7s9XM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vCaBtX+SMC+T/uXHlnJd9eTDYY3IhwFfAvvT7wWSdV0Lb4BpEGmh48vpArLnX9cVzKTgGnvZCjFlCK1OVCH1Lf75zzwYqfXVf5pIgI7iWnCB9RHckHeki4HZUidlgYZBrnUsgNeTtHFC46R7e562N7e1FIyHfltBJf/tKC2aFyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UY9Bq9v6; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	 Content-Type:Content-Disposition:In-Reply-To; b=exVOkgK8RGKz2NkfUKd7ZMAGfYgscvSG8AT27+5xf74MKMMUJAwnLnBmOpd5J4rty+2ksbKulBVtqWbUIGpJqox8DdAJdxf/+41zu56sl4uJAk9mzNCkNAd7i1UL8tMN8AowHfTskUDZXKP0crLjAn7oB2uHz0O/CicpQtZEj2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eBNc7Fuw; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a359e6fde44so132131466b.3;
-        Thu, 01 Feb 2024 10:23:12 -0800 (PST)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d72f71f222so10799675ad.1;
+        Thu, 01 Feb 2024 10:26:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706811791; x=1707416591; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706811985; x=1707416785; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WDk4/I3bKMa0G5KpJtieeLmumvANCayNAEiZNJHgZu4=;
-        b=UY9Bq9v6FGouacypOWxFoQejqz4UGxEHTHtchf39PqNQ8bsGrmODBqcO26khTB9CzL
-         7msIPlV4bYnkWaywMhLCiDWxLve1cTIy3ekT72z9fYNsm8K8z+DZOiSLYEfMDCXGkrr1
-         xRZXFp+X4uasMePa3f/yQ1tAqaKGTu2Hy3xrrbdf1mOUtWSJ5ZNHou7mLL2BuJY/zFP6
-         x8moJnXCt95ZWm+bPSoqx8ovQQ58RfvvAy6mrTgvSsFodb+0a0P5wEyUtFm6eFYwXBXt
-         1OydySNwbTRQnsN+dkfBCRj4ycCOLXuPs4I9t9KpOFH9C+qYO1CMZhzYiQ05KdRwvHda
-         GvUA==
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hwmvsN2Ntz2KqUUIBBoM0a9JofCC8LHROVWl1waNCjg=;
+        b=eBNc7FuwzMrOkLT0kaiJQQLPA0qSIbhbk+EIRbfP0OpKGkVR5Wfgz/RD7Rp0/WPrSm
+         5Qq1zAqDgVtmOXgFuP0t6sMN7Q/rC6D2t4OJCbciRH7bhgBlYfThUjuKKVSizGqjTiHg
+         wSe+Ssnu6F/+fnxaynFVuxh9sP+L5nJQe22c04gZDqh7+MvMAHS3Q6zi/96DqfGDNthO
+         BJ7tQLG+H2J9fPh10wbYbEOEsHkAjkC4xW8z6gJbA+lYOKAjV8S/qUUl+acP442N98bB
+         EtNS70JzdMS0MwrBGS5PRlHmX04Sgz927fhlfFrl2Chnrwf84Uo9unBAoAOj5JkI6PH5
+         ZUrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706811791; x=1707416591;
+        d=1e100.net; s=20230601; t=1706811985; x=1707416785;
         h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WDk4/I3bKMa0G5KpJtieeLmumvANCayNAEiZNJHgZu4=;
-        b=MW8hzZfuaedDUCwACsTTfOgD/bmsxbJ3mhC4N8PmqGMfXVbyhYI6N1X2G09k3+Hpwf
-         6z8IRdqetnOYDGAI/VkaBBO6Moev59xZkQPsbqq6sbz9en0AegV3KlJbCcccbHpAjjDg
-         r/EedCyHHPCzqGlhy9rMg5F15OgYTmNXcdTT4eer0+5re6I8cPTXV+v15F/FLs2CYmq9
-         n1CI1dRmTTKyG4A2PagEp1xkCd9TWOMqgo/0Q5xx6c9/gzy4J/BrjGiFN7W6RVbpPmQc
-         LV26uPmG/uNXdL+ovtEC+cOZ3przsiwqh2tGAUk/P9e98z6tmcp7fz9qJiyWySROZrGa
-         X31A==
-X-Gm-Message-State: AOJu0YyeCg7MWgdRaOljz8HycKYChiwi1gOs3TxHgolYnRh+MHw0MdMf
-	4boKBlH9lwXDKSrT7TYRjLUjJriQ4beCUFkpKUKyYAa03E3a/+nLKQ6UUO/nyn5pVQ==
-X-Google-Smtp-Source: AGHT+IG5CPplvGLonZc8xM+jICyAuaMr9N5QG0wHARTP+/UokArb/SWT9izO2KFBKh8clvIlQZJ7Lw==
-X-Received: by 2002:a17:907:171b:b0:a31:3162:4a6f with SMTP id le27-20020a170907171b00b00a3131624a6fmr4596587ejc.59.1706811790140;
-        Thu, 01 Feb 2024 10:23:10 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVD7zXyRp3Oy4jXfzIceCAO8UeOWkswxmRwVK35mnbXpuez92+IhD0r2UOrNHb+NlO35PJ2MJjWYv5NZFu/Sw7sD/e+EqbZvBXYjhpTp8ec5W2GctUGxg69xeJp0LLvDbC1nzpbanLi+IrbE2HYf7MHcBeBMdXYdNCpixYqjhiHavUVl/CS9nc1WYaJ0rzq3Mvnf21cG1lUgyNQQyaMKT5eWnG69+BJSxERaWEKcO803zBTl+xVwN9ggaz8R8Da6QkRNCJ/Zs3hTphYDgCgs9fte2HhlcO6ry/zghvNkMcnscF4wrJ01iVPkAzZ8uESuk0N/3m2NQAvKQCTMNfI8Uug56Dxyho=
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id v12-20020a1709063bcc00b00a36c2ab1b14sm38736ejf.139.2024.02.01.10.23.09
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hwmvsN2Ntz2KqUUIBBoM0a9JofCC8LHROVWl1waNCjg=;
+        b=i2opzZT+M++WtoD6wOWm1X+rn6ttJenjhMExbDg4U2qrO6frMoQaLJ5xN6+2dRmmy0
+         sEN6TO0DVX9yLtmmixVljZ+Am69ixpz5EE1djkqHp869cbASjpb6fcMTwHR/XSGMywFt
+         AySfKzwwbHbv8GEN86ZYCgTmcva3pjml1vg0FlashQMarCks3kie74oGgx5JxFqZBKCo
+         o6UMlmlMaNtE/cZn42+6ztFB08ArIHz4zGk834jzMByYHyLz3oAZURwbqU1TcpmCcRzi
+         RWRO4uvC0fuxdaROrL56qpmRYact6xdvXSiddmXthb9szQIRKxXR1OyybC2PaV5W1Hih
+         1ztA==
+X-Gm-Message-State: AOJu0YzKbITNLWvJ1twFc/WVYJBosqtrKwEHgEnyspiWRpQ7CYcOUtaj
+	SODoFtI5fR5wnjV6YbRSrFSXhzdPgzQGNDMCZBtO2RR5mByX+Xr7
+X-Google-Smtp-Source: AGHT+IGfYDlPKiO2kGlPRvllIPOYXbZB9hN5jH+VTZP2buW4S8Q56DzaxHeeECZd9Qet1OzG4IecuA==
+X-Received: by 2002:a17:902:d590:b0:1d9:427a:99b with SMTP id k16-20020a170902d59000b001d9427a099bmr5910320plh.32.1706811984997;
+        Thu, 01 Feb 2024 10:26:24 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXJt9er2Oe/D78iSMdGinSF1rdGyGo50IHP1ZZ2fCvGk6/+VT7Znkbx2lE5lFgA6SaiprC5NEbqgW9kMhJyeKZIbyakvpqM/J0TJMFhkyrfVyeB+DeUz1mRJnnBL7daAee+zjmaLrfsmJ3BA9mk2va/eC9atWlLef9U9aizsP3x0bq4LoqUEwcgmblnSe4nzbdV2tb759DWzAjY+lKVdKj3qFjPEc73FH5fgfZe+tvkcfD61q8gMM6xZJbv19aJuQYrDsBmUJQ3nQIvmnKvoUHrAmQYw0+rZXh0Fn/6qyvEjOnDACZHK61xGWxrVsPoBgYXCFvJXZnt/yBItHWainrXh1t0aJYs5L1xQHlAnSNNP6DoDmZy8460xtWScYQh9tF95A==
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id v11-20020a170902d08b00b001d7134d149dsm112730plv.256.2024.02.01.10.26.24
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 10:23:09 -0800 (PST)
-Date: Thu, 1 Feb 2024 20:23:07 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
+        Thu, 01 Feb 2024 10:26:24 -0800 (PST)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Thu, 1 Feb 2024 10:26:23 -0800
+From: Guenter Roeck <linux@roeck-us.net>
+To: Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 05/11] net: dsa: realtek: common rtl83xx
- module
-Message-ID: <20240201182307.mls7qnrpu2zhh5xk@skbuf>
-References: <20240130-realtek_reverse-v5-0-ecafd9283a07@gmail.com>
- <20240130-realtek_reverse-v5-0-ecafd9283a07@gmail.com>
- <20240130-realtek_reverse-v5-5-ecafd9283a07@gmail.com>
- <20240130-realtek_reverse-v5-5-ecafd9283a07@gmail.com>
+	Jean Delvare <jdelvare@suse.com>,
+	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org
+Subject: Re: [PATCH v5 net-next 08/13] net: phy: marvell-88q2xxx: add support
+ for temperature sensor
+Message-ID: <0f9c8083-7287-40af-a084-98c692166b40@roeck-us.net>
+References: <20240122212848.3645785-1-dima.fedrau@gmail.com>
+ <20240122212848.3645785-9-dima.fedrau@gmail.com>
+ <65071184-428b-4850-9e0c-baaa73513c6d@lunn.ch>
+ <20240201071137.GA41347@debian>
+ <5dc7d495-dd41-4b1f-b0e0-1fe512f1687c@roeck-us.net>
+ <20240201161435.GA48964@debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,138 +96,53 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240130-realtek_reverse-v5-5-ecafd9283a07@gmail.com>
- <20240130-realtek_reverse-v5-5-ecafd9283a07@gmail.com>
+In-Reply-To: <20240201161435.GA48964@debian>
 
-On Tue, Jan 30, 2024 at 08:13:24PM -0300, Luiz Angelo Daros de Luca wrote:
->  /**
->   * realtek_smi_probe() - Probe a platform device for an SMI-connected switch
->   * @pdev: platform_device to probe on.
->   *
-> - * This function should be used as the .probe in a platform_driver. It
-> - * initializes realtek_priv and read data from the device-tree node. The switch
-> - * is hard resetted if a method is provided. It checks the switch chip ID and,
-> - * finally, a DSA switch is registered.
-> + * This function should be used as the .probe in a platform_driver. After
-> + * calling the common probe function for both interfaces, it initializes the
-> + * values specific for SMI-connected devices. Finally, it calls a common
-> + * function to register the DSA switch.
->   *
->   * Context: Can sleep. Takes and releases priv->map_lock.
->   * Return: Returns 0 on success, a negative error on failure.
->   */
->  int realtek_smi_probe(struct platform_device *pdev)
->  {
-> -	const struct realtek_variant *var;
->  	struct device *dev = &pdev->dev;
->  	struct realtek_priv *priv;
-> -	struct regmap_config rc;
-> -	struct device_node *np;
->  	int ret;
->  
-> -	var = of_device_get_match_data(dev);
-> -	np = dev->of_node;
-> -
-> -	priv = devm_kzalloc(dev, sizeof(*priv) + var->chip_data_sz, GFP_KERNEL);
-> -	if (!priv)
-> -		return -ENOMEM;
-> -	priv->chip_data = (void *)priv + sizeof(*priv);
-> -
-> -	mutex_init(&priv->map_lock);
-> -
-> -	rc = realtek_smi_regmap_config;
-> -	rc.lock_arg = priv;
-> -	priv->map = devm_regmap_init(dev, NULL, priv, &rc);
-> -	if (IS_ERR(priv->map)) {
-> -		ret = PTR_ERR(priv->map);
-> -		dev_err(dev, "regmap init failed: %d\n", ret);
-> -		return ret;
-> -	}
-> -
-> -	rc = realtek_smi_nolock_regmap_config;
-> -	priv->map_nolock = devm_regmap_init(dev, NULL, priv, &rc);
-> -	if (IS_ERR(priv->map_nolock)) {
-> -		ret = PTR_ERR(priv->map_nolock);
-> -		dev_err(dev, "regmap init failed: %d\n", ret);
-> -		return ret;
-> -	}
-> -
-> -	/* Link forward and backward */
-> -	priv->dev = dev;
-> -	priv->variant = var;
-> -	priv->ops = var->ops;
-> -
-> -	priv->setup_interface = realtek_smi_setup_mdio;
-> -	priv->write_reg_noack = realtek_smi_write_reg_noack;
-> -
-> -	dev_set_drvdata(dev, priv);
-> -	spin_lock_init(&priv->lock);
-> -
-> -	/* TODO: if power is software controlled, set up any regulators here */
-> -
-> -	priv->reset = devm_gpiod_get_optional(dev, "reset", GPIOD_OUT_LOW);
-> -	if (IS_ERR(priv->reset)) {
-> -		dev_err(dev, "failed to get RESET GPIO\n");
-> -		return PTR_ERR(priv->reset);
-> -	}
-> -	if (priv->reset) {
-> -		gpiod_set_value(priv->reset, 1);
-> -		dev_dbg(dev, "asserted RESET\n");
-> -		msleep(REALTEK_HW_STOP_DELAY);
-> -		gpiod_set_value(priv->reset, 0);
-> -		msleep(REALTEK_HW_START_DELAY);
-> -		dev_dbg(dev, "deasserted RESET\n");
-> -	}
-> +	priv = rtl83xx_probe(dev, &realtek_smi_info);
-> +	if (IS_ERR(priv))
-> +		return PTR_ERR(priv);
->  
->  	/* Fetch MDIO pins */
->  	priv->mdc = devm_gpiod_get_optional(dev, "mdc", GPIOD_OUT_LOW);
->  	if (IS_ERR(priv->mdc))
->  		return PTR_ERR(priv->mdc);
+On Thu, Feb 01, 2024 at 05:14:35PM +0100, Dimitri Fedrau wrote:
+> Am Thu, Feb 01, 2024 at 05:34:05AM -0800 schrieb Guenter Roeck:
+> > On 1/31/24 23:11, Dimitri Fedrau wrote:
+> > > Am Wed, Jan 31, 2024 at 04:17:06PM +0100 schrieb Andrew Lunn:
+> > > > > +static int mv88q2xxx_hwmon_probe(struct phy_device *phydev)
+> > > > > +{
+> > > > > +	struct device *dev = &phydev->mdio.dev;
+> > > > > +	struct device *hwmon;
+> > > > > +	char *hwmon_name;
+> > > > > +	int ret;
+> > > > > +
+> > > > > +	/* Enable temperature sensor interrupt */
+> > > > > +	ret = phy_set_bits_mmd(phydev, MDIO_MMD_PCS,
+> > > > > +			       MDIO_MMD_PCS_MV_TEMP_SENSOR1,
+> > > > > +			       MDIO_MMD_PCS_MV_TEMP_SENSOR1_INT_EN);
+> > > > 
+> > > > You enable an interrupt, but i don't see any changes to the interrupt
+> > > > handler to handle any interrupts which are generated?
+> > > > 
+> > > Hi Andrew,
+> > > 
+> > > you are right. Have to remove these lines. Besides enabling the interrupt
+> > > in MDIO_MMD_PCS_MV_TEMP_SENSOR1, there are two further register writes
+> > > necessary to make the interrupt propagate. I didn't want it to propagate.
+> > > Anyway it's wrong. I couldn't find a good solution to use the temperature
+> > > interrupt. Will have a look into this, and probably figuring out how to
+> > > do so. But it won't be part of this patch series.
+> > > 
+> > 
+> > From hwmon perspective, the expected use of such an interrupt would be
+> > to call hwmon_notify_event() with the affected limit attribute as argument.
+> > This would notify the thermal subsystem if the sensor is registered with it
+> > (your patch doesn't set the necessary flag when registering the driver,
+> > so this would not happen), it will send a notification to the sysfs
+> > attribute, and generate a udev event.
+> >
+> Thanks, noted it down. Didn't know about the notification to the thermal
+> subsystem and the generated udev event. :)
+> 
 
-Be consistent in the usage of the API you create. Every time rtl83xx_probe()
-succeeds and something else down the line fails, you must call
-rtl83xx_remove(). Otherwise, it is a shaky base to build upon.
+Note that you'd have to add something like
 
-The rtl83xx_remove() function can even be left empty if you feel that
-the existing hard reset is of no value (which I would agree with) - see
-mv88e6xxx_hwtstamp_free() as an example.
+	HWMON_CHANNEL_INFO(chip, HWMON_C_REGISTER_TZ),
 
-> +
->  	priv->mdio = devm_gpiod_get_optional(dev, "mdio", GPIOD_OUT_LOW);
->  	if (IS_ERR(priv->mdio))
->  		return PTR_ERR(priv->mdio);
->  
-> -	priv->leds_disabled = of_property_read_bool(np, "realtek,disable-leds");
-> +	priv->write_reg_noack = realtek_smi_write_reg_noack;
-> +	priv->setup_interface = realtek_smi_setup_mdio;
-> +	priv->ds_ops = priv->variant->ds_ops_smi;
->  
-> -	ret = priv->ops->detect(priv);
-> -	if (ret) {
-> -		dev_err(dev, "unable to detect switch\n");
-> +	ret = rtl83xx_register_switch(priv);
-> +	if (ret)
->  		return ret;
-> -	}
-> -
-> -	priv->ds = devm_kzalloc(dev, sizeof(*priv->ds), GFP_KERNEL);
-> -	if (!priv->ds)
-> -		return -ENOMEM;
->  
-> -	priv->ds->dev = dev;
-> -	priv->ds->num_ports = priv->num_ports;
-> -	priv->ds->priv = priv;
-> -
-> -	priv->ds->ops = var->ds_ops_smi;
-> -	ret = dsa_register_switch(priv->ds);
-> -	if (ret) {
-> -		dev_err_probe(dev, ret, "unable to register switch\n");
-> -		return ret;
-> -	}
->  	return 0;
->  }
->  EXPORT_SYMBOL_NS_GPL(realtek_smi_probe, REALTEK_DSA);
+to the code to register the sensor as thermal zone.
+
+Guenter
 
