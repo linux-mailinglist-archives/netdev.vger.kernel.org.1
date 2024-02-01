@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-68102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF101845D6B
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:40:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C36FD845D6E
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8849C28FD52
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:40:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AE0B2901B6
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BAEB7E107;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA475399;
 	Thu,  1 Feb 2024 16:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VfJZ0QH3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="legpP2Iy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A564C79
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 16:40:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65E855220;
+	Thu,  1 Feb 2024 16:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706805627; cv=none; b=nWT697Z9+ta4oEMQ24EzkQZIKvwe2QsRgqCwL0MBfFGCqfog1jH0JNyTQIdRwa6YKLPWlOK2Ennbjac+uuUIfS4s9GgwXTEOTUKjDf4I92uh+DRdW0KAXkp0oo+F8a8kFJ8vABg12lkNdpNxuL8n05S7BNMDN8nvkGXm5iPAo/o=
+	t=1706805627; cv=none; b=Mn3baYHBvsQCbPsSFzQ6/hu2l0Z6O+RtCfIIb6OCv8KNkW35Bv0eN2LrUKiAmooWQr1wc9v5/xDSPlNl3L163COXX1dKdXITkI8U3coH0nHdTmdWFNJyaNGrFDeLRpSQDvUsVIEQMR3iHAVybyk0aD/eHUaNpZ9aYb65meHhc5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706805627; c=relaxed/simple;
-	bh=tUGHjQXZc4kPtsp3kBrK8stZgKY4d0Sjj2hXbau2+tw=;
+	bh=cEeiNYKArm+VYNgUm6O2A02TGK3a297C60jApYVOn98=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RWxl6EYWgkqr5Hb32n9AEZ/tDY8mCnjpA7I7UuUCORXH60TZf0AzwJka2+LBizDkj5NckDy/4/0UtMhvOiOeAT1kTlQF9yc3Uu0LHqdb+vvlvEoyaR3ZtzeA/PKr3Wa9uJoEGlPnfHQ7HxOW+d3ps4qZuwk8ZHi+sgymqjVi70o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VfJZ0QH3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ED7CAC43399;
+	 In-Reply-To:To:Cc; b=Kstfxy1wkE4wktLTvtPk9KNwUeSZkd+aNfaCe7N0KDcyjsHgDu4ix7uu7Wsk4ijqnk43yW/9Hg6H8RL57yO+qLpY7TZ01j5d+kDAkwGSvlV7KSN1LuFBiaROFXjpmN9RKJkzVxRH/WQgKAdZpVgdjDLn7eV5+3lOZaKDEkensik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=legpP2Iy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E5EA0C43394;
 	Thu,  1 Feb 2024 16:40:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1706805627;
-	bh=tUGHjQXZc4kPtsp3kBrK8stZgKY4d0Sjj2hXbau2+tw=;
+	bh=cEeiNYKArm+VYNgUm6O2A02TGK3a297C60jApYVOn98=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VfJZ0QH3JSTZZIgOoOIZVp+7MvzJdERSMVdJrd7Nz3wf6BV+idXCMDx4tOcaTmvat
-	 fxmPMtckf+EgnLTFPSQgP+8PFLohotnQa8Y73hUITcqIffQ818riTNTFzmzMBDfb+x
-	 lqRcmaJib3eQlM6Bs/nkFhdsotdm+9+pU5XwzS5R1XNhZejmtoY2KQX1zi5IBVNhjs
-	 frvKdkUdX+klk0Nz3k+cWF4y52HNIuv9tO2vavaZpWzr9Fi04wQMA4jDiQ8OSgFZwz
-	 fxk1x53xSh9Yg8N0jUCPDUPEC3/Gx+Hxv1sJYy5QKNuCs+V3fQxgU4dnlaTpml7b4V
-	 4VibnUIC34LDg==
+	b=legpP2Iyco/ENQwWpCazE2ZQ7lro7yMbH+fUnmbTsUZ93ltNeCemnU/i2OAR8ktO1
+	 z6Tal1lytqo0gU8XTTfEsQ3gynyVQ8hp42TWd+js388O5xMIndV2+3fnB7nK3RqOdL
+	 JfMTP02HqekWuLtUshOiJmkO+FqcUzulC5CmbrUFC/AnTxQE+k3UogvpMsz8RXRmJ/
+	 XwAfRzK2jkrx3IpuaEyMAjhvabz2oKjBGUvGr+dVA2h24Dilw+VuMr3VcMSmQ/RprM
+	 EML0Ef6fhbcOyAo25B36NcTO4SKr688xvJG/YrvCNgJeBG/g6oAqP0nHNmVcwlB8Uf
+	 k+hA+LwKiq+CQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D639DD8C97B;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CC251D8C9A3;
 	Thu,  1 Feb 2024 16:40:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,36 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] xen-netback: properly sync TX responses
+Subject: Re: [PATCH V2 net] hv_netvsc: Fix race condition between netvsc_probe and
+ netvsc_remove
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170680562687.32005.2375881723958020276.git-patchwork-notify@kernel.org>
+ <170680562683.32005.9726914174097287156.git-patchwork-notify@kernel.org>
 Date: Thu, 01 Feb 2024 16:40:26 +0000
-References: <980c6c3d-e10e-4459-8565-e8fbde122f00@suse.com>
-In-Reply-To: <980c6c3d-e10e-4459-8565-e8fbde122f00@suse.com>
-To: Jan Beulich <JBeulich@suse.com>
-Cc: netdev@vger.kernel.org, wl@xen.org, paul@xen.org,
- xen-devel@lists.xenproject.org
+References: <1706686551-28510-1-git-send-email-schakrabarti@linux.microsoft.com>
+In-Reply-To: <1706686551-28510-1-git-send-email-schakrabarti@linux.microsoft.com>
+To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+ decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
+ yury.norov@gmail.com, leon@kernel.org, cai.huoqing@linux.dev,
+ ssengar@linux.microsoft.com, vkuznets@redhat.com, tglx@linutronix.de,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+ schakrabarti@microsoft.com, stable@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 29 Jan 2024 14:03:08 +0100 you wrote:
-> Invoking the make_tx_response() / push_tx_responses() pair with no lock
-> held would be acceptable only if all such invocations happened from the
-> same context (NAPI instance or dealloc thread). Since this isn't the
-> case, and since the interface "spec" also doesn't demand that multicast
-> operations may only be performed with no in-flight transmits,
-> MCAST_{ADD,DEL} processing also needs to acquire the response lock
-> around the invocations.
+On Tue, 30 Jan 2024 23:35:51 -0800 you wrote:
+> In commit ac5047671758 ("hv_netvsc: Disable NAPI before closing the
+> VMBus channel"), napi_disable was getting called for all channels,
+> including all subchannels without confirming if they are enabled or not.
+> 
+> This caused hv_netvsc getting hung at napi_disable, when netvsc_probe()
+> has finished running but nvdev->subchan_work has not started yet.
+> netvsc_subchan_work() -> rndis_set_subchannel() has not created the
+> sub-channels and because of that netvsc_sc_open() is not running.
+> netvsc_remove() calls cancel_work_sync(&nvdev->subchan_work), for which
+> netvsc_subchan_work did not run.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] xen-netback: properly sync TX responses
-    https://git.kernel.org/netdev/net/c/7b55984c96ff
+  - [V2,net] hv_netvsc: Fix race condition between netvsc_probe and netvsc_remove
+    https://git.kernel.org/netdev/net/c/e0526ec5360a
 
 You are awesome, thank you!
 -- 
