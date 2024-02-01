@@ -1,132 +1,117 @@
-Return-Path: <netdev+bounces-67994-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67995-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65FCD8458E7
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 14:30:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EBE58458F1
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 14:32:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04E161F257C9
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:30:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7125F1C21FAC
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:32:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 878BC5339B;
-	Thu,  1 Feb 2024 13:30:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DEXUWemM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61A6B5337F;
+	Thu,  1 Feb 2024 13:32:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600E653377;
-	Thu,  1 Feb 2024 13:30:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620465336C;
+	Thu,  1 Feb 2024 13:32:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706794207; cv=none; b=JPHq2JjVuQycUFcgAKNbLEJLXZTVg/hXag24DtrvoiLtyaoy9G/Kmr5+YY5j9hIr8zjEZfELvnygVyWo1vQae1l6X1YWUfIng/cTc3QGNG5ymXz3lRiCFVrBof/+Ha2hDFLSAOg4icAd2DMrmT5jO1Sf8PrpjjucNWeHK99J4jM=
+	t=1706794365; cv=none; b=AAqDFENJNRwgRP7ZZCtf8sd9lZbTEUZzHwRFluhGrI49wgw16vUnCC13lq6gM7P+mCrGbBoOPyg+TB4D7u5vVKg9bSpz4vE3JZ+xkr0NwAqMMH2uhQUNOSSSTB0L8s+jT02iS1hknQPjB1juLEVplK5ORhpkjF2L2r02nzgI6G8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706794207; c=relaxed/simple;
-	bh=4swrM4alFmGHIV9rLYolfhNl1z4eenjzX5UGMuP51e4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fhF68CewDSf1BHW2wfPqVtL5uAQ69xoi1udGjgukw6tSmD61AgLmO/F253gVOTHRpJBZZabvrjcChEfMmBS6G06aYYZpNW4uTVTkDFg2WDtQw9FmVUKZKGjP4CNkn9fnnP/f2m7deAQ8/jiQdltJI22KA5mHLioqbXLBr8uUYwc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DEXUWemM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B116C433C7;
-	Thu,  1 Feb 2024 13:30:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706794206;
-	bh=4swrM4alFmGHIV9rLYolfhNl1z4eenjzX5UGMuP51e4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=DEXUWemMB88V51rl7TUk+J2QCqlF4Wq5rjg3xkr0QM+eund5jsdf995s5EiPgUC4F
-	 R0wXxRt9n+wuxTzIPAEbqYDpz8JjqVdhA/OTicluDgNOiTYIqiv8tiTigNYrsKSb73
-	 N2LbZVMIeCGQpTWLZmE7HT5JPPrpKz94rrzn6mHxbNSuJxoXdq19PBNoRBNuUH6RmQ
-	 hTSKry8JNkfog8weOGQdO0ntwFLUgvXZddYL3CpLAdZ+Or2+C51d39GZ2BVA6oLllz
-	 cm567Npkg8E1bmG9AEDcJBqC/5LrvL25xn2xQiEfMnn4vG+b2a6DB2iymKkWiN9MxG
-	 DOJP2aWwf8C+w==
-Date: Thu, 1 Feb 2024 14:30:01 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ravi Gunasekaran <r-gunasekaran@ti.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew@lunn.ch, rogerq@kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	s-vadapalli@ti.com, srk@ti.com
-Subject: Re: [RFC PATCH net-next 1/2] net: ethernet: ti: Introduce
- inter-core-virt-eth as RPMsg driver
-Message-ID: <20240201133001.GC530335@kernel.org>
-References: <20240130110944.26771-1-r-gunasekaran@ti.com>
- <20240130110944.26771-2-r-gunasekaran@ti.com>
+	s=arc-20240116; t=1706794365; c=relaxed/simple;
+	bh=L9ncuNlPiuhV+Tgp8aiHz1A9CHSswt3CwCdzJSUYnwg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fauhy/asduVuvb58vmRBLff1vlW9Y3ymPmqCVh65HzTgKAgKFSssHxC32vJ5wUnCAsLHJ8+cg2pSKBJ9X7DAxmLeqMzbIOR9xLqbbNw4o5KN6iiuJ6kkCRe3KupCvGdhpvDD1+rDoS8dtKsXiF9cwP7PcGu9LJIBD1NSSj3MWZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a26fa294e56so127092466b.0;
+        Thu, 01 Feb 2024 05:32:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706794361; x=1707399161;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DPawFIAhtjEptx34yN1DVcCgpO4g27vMV7ZWuCSE18o=;
+        b=UsA98u0BkPo6EiFB1Scle1NOjTIXCjWvMoe+9lN8Q9C6WdHGrfciKI+tWOLWg9zMtO
+         EmKmZ+/l9Xu06JE7fjuMawVK8gzLQ+N10zZ67OQVrE9xTjzD+xCFYM4BBUL0SjF+pEsd
+         bNAOgzpl9UB60FME4XSI3AHBRuYsyaln7IoocOT3qy5IB6NIJzPpOp1E47jruMw+1Sb6
+         p7QH8DIYT3kHm6xrbCAXX7njUbNmztXQxf0s169jF/OzO0T3nciSYsFKo50AbtSBlqHO
+         Ik0S9osIpXK8ck9xec3kMlVz5zdqvOsnNyl13g3xZtMaV4k+Ga9K1sLXjX1+yGVPZUaH
+         Pa0A==
+X-Gm-Message-State: AOJu0YxPCXiE9ADlN4e7I6a7qHO4q5EyQ4nkUFwFEhg1WqFQTEiSrXiB
+	xwz2Zcu2NUS99tUEw/80GNNJ2zhqWXsS2KvnbMlX7aQB9Uh+JUBy
+X-Google-Smtp-Source: AGHT+IE2dqeAMP8WIUzJIlbbIjKkCCC+rcdNuODnsW0z5TlRFolwBryDbWLYHthiNGKd+lFKmkWA8Q==
+X-Received: by 2002:a17:906:5053:b0:a35:32ae:e0c0 with SMTP id e19-20020a170906505300b00a3532aee0c0mr3578892ejk.3.1706794361382;
+        Thu, 01 Feb 2024 05:32:41 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVVG+qynyiJ0xto/6fL4lOt2J9jSM0ooLDXIVE1W5u7WlW6jISxS3h/er5GCZ4hVxQh2lgMpZv+7KFUy6/DnIMFRSS+qg/Tw8Pw5gojN/cI9zssWtqsnkFS8xxRinjAsk4zcVpDdzAq3Q6FO6meBdMaV/jVLgrHcpWit4+yeGSTK4Y2hqj9TCVaaqo8Z0WBmSsFQ4aZ+/O5dLR8Qg833nBbX6WOi2vzSqH2/1kyXrlLdNDA3bMAAQFSgMswy27dH4k6etXdWRcTBnRQn0xaPzWiqFN25BP5mOyjZ3uoxrml704sPBlIQzDe5iJFmumFXak0iuPIpH3BgsWyeFISbW4=
+Received: from localhost (fwdproxy-lla-004.fbsv.net. [2a03:2880:30ff:4::face:b00c])
+        by smtp.gmail.com with ESMTPSA id f14-20020a170906494e00b00a3681468567sm1474795ejt.81.2024.02.01.05.32.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Feb 2024 05:32:41 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Mahesh Bandewar <maheshb@google.com>
+Cc: weiwan@google.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	horms@kernel.org,
+	andrew@lunn.ch,
+	leit@fb.com
+Subject: [PATCH] blackhole_dev: Fix buil warning
+Date: Thu,  1 Feb 2024 05:32:37 -0800
+Message-Id: <20240201133238.3089363-1-leitao@debian.org>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240130110944.26771-2-r-gunasekaran@ti.com>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Jan 30, 2024 at 04:39:43PM +0530, Ravi Gunasekaran wrote:
-> TI's K3 SoCs comprises heterogeneous processors (Cortex A, Cortex R).
-> When the ethernet controller is completely managed by a core (Cortex R)
-> running a flavor of RTOS, in a non virtualized environment, network traffic
-> tunnelling between heterogeneous processors can be realized by means of
-> RPMsg based shared memory ethernet driver. With the shared memory used
-> for the data plane and the RPMsg end point channel used for control plane.
-> 
-> inter-core-virt-eth driver is modelled as a RPMsg based shared
-> memory ethernet driver for such an use case.
-> 
-> As a first step, register the inter-core-virt-eth as a RPMsg driver.
-> And introduce basic control messages for querying and responding.
-> 
-> Signed-off-by: Siddharth Vadapalli <s-vadapalli@ti.com>
-> Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
-> ---
->  drivers/net/ethernet/ti/inter-core-virt-eth.c | 139 ++++++++++++++++++
->  drivers/net/ethernet/ti/inter-core-virt-eth.h |  89 +++++++++++
->  2 files changed, 228 insertions(+)
->  create mode 100644 drivers/net/ethernet/ti/inter-core-virt-eth.c
->  create mode 100644 drivers/net/ethernet/ti/inter-core-virt-eth.h
-> 
-> diff --git a/drivers/net/ethernet/ti/inter-core-virt-eth.c b/drivers/net/ethernet/ti/inter-core-virt-eth.c
-> new file mode 100644
-> index 000000000000..d3b689eab1c0
-> --- /dev/null
-> +++ b/drivers/net/ethernet/ti/inter-core-virt-eth.c
-> @@ -0,0 +1,139 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
+lib/test_blackhole_dev.c sets a variable that is never read, causing
+this following building warning:
 
-Hi Ravi and Siddharth,
+	lib/test_blackhole_dev.c:32:17: warning: variable 'ethh' set but not used [-Wunused-but-set-variable]
 
-The correct style for SPDX headers in .c files is a '//' comment:
+Remove the variable struct ethhdr *ethh, which is unused.
 
-// SPDX-License-Identifier: GPL-2.0
+Fixes: 509e56b37cc3 ("blackhole_dev: add a selftest")
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ lib/test_blackhole_dev.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-> +/* Texas Instruments K3 Inter Core Virtual Ethernet Driver
-> + *
-> + * Copyright (C) 2024 Texas Instruments Incorporated - https://www.ti.com/
-> + */
+diff --git a/lib/test_blackhole_dev.c b/lib/test_blackhole_dev.c
+index 4c40580a99a3..f247089d63c0 100644
+--- a/lib/test_blackhole_dev.c
++++ b/lib/test_blackhole_dev.c
+@@ -29,7 +29,6 @@ static int __init test_blackholedev_init(void)
+ {
+ 	struct ipv6hdr *ip6h;
+ 	struct sk_buff *skb;
+-	struct ethhdr *ethh;
+ 	struct udphdr *uh;
+ 	int data_len;
+ 	int ret;
+@@ -61,7 +60,7 @@ static int __init test_blackholedev_init(void)
+ 	ip6h->saddr = in6addr_loopback;
+ 	ip6h->daddr = in6addr_loopback;
+ 	/* Ether */
+-	ethh = (struct ethhdr *)skb_push(skb, sizeof(struct ethhdr));
++	skb_push(skb, sizeof(struct ethhdr));
+ 	skb_set_mac_header(skb, 0);
+ 
+ 	skb->protocol = htons(ETH_P_IPV6);
+-- 
+2.39.3
 
-...
-
-> diff --git a/drivers/net/ethernet/ti/inter-core-virt-eth.h b/drivers/net/ethernet/ti/inter-core-virt-eth.h
-
-...
-
-> +struct icve_common {
-> +	struct rpmsg_device *rpdev;
-> +	spinlock_t send_msg_lock;
-> +	spinlock_t recv_msg_lock;
-
-Spinlocks ought to come with an comment regarding what they lock.
-
-> +	struct message send_msg;
-> +	struct message recv_msg;
-> +	struct icve_port *port;
-> +	struct device *dev;
-> +} __packed;
-> +
-> +#endif /* __INTER_CORE_VIRT_ETH_H__ */
-> -- 
-> 2.17.1
-> 
-> 
 
