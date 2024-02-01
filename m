@@ -1,119 +1,115 @@
-Return-Path: <netdev+bounces-68088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2324845D1A
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:23:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D878845D21
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:23:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 71F4C1F27387
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:23:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0D661F21EB0
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:23:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9362515F337;
-	Thu,  1 Feb 2024 16:17:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C05EE5A4EA;
+	Thu,  1 Feb 2024 16:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iQf1BBrm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EGyFFnI4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-lj1-f172.google.com (mail-lj1-f172.google.com [209.85.208.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECCD3626BE;
-	Thu,  1 Feb 2024 16:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063EA5A4E8;
+	Thu,  1 Feb 2024 16:20:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706804275; cv=none; b=DfR99a2HHHi/usBAWBcLV0OmrHkRsjlK8CRJqv66csydikVXjyho28t3v7dq6tTn0cB35qx80zTYYDpJs4iIwqRGgKndMirhI1vxtD1bgJt8CvMiCe7XXzeZgX8NlisuYcIQnYTtuIXSNoLTMsI9xu7s6bFNsXsaVwJSr9VwWg0=
+	t=1706804402; cv=none; b=E4Ehm6nHtbZ7ATeSDI+lDDeKWMcUYznfp0wIijkObrpbfEQvEYJF+L5JwPkE931a5Zm24Y/eiX3TEszavIztgwioObaWIemOk1YxWv7HavQYEncs0oNj9h6howeMcWA1p18XLyDbEi7qQimGeNeW5qe7KYfhuCyHhbpiunACKFM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706804275; c=relaxed/simple;
-	bh=jVgPnk47a0kmMu1SnTVlETox5FpEracdHmxLPBBbb0Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rTuv//Ga7CACy722Qzi/8kRXUMJdK6Z9hj+GTMhTEiZARTX70jR2dPYeFHElhD6OBEK4lFPhMxb4fMgoTIWVfPObHF6oN6Rmjn5ICHz09x5MfR9P0XQkQ38kebPtxbgfGew5iHsT4ZDVuhSk90y2cONJiGP1Y5KNK2GNaKL6ZC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iQf1BBrm; arc=none smtp.client-ip=209.85.128.49
+	s=arc-20240116; t=1706804402; c=relaxed/simple;
+	bh=ygH1ANBFQzdbWHqig1KvXevLJTUpUKVJInoERj5H7V4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=OgTfEU6MLJvA2jYC/479AsWeNZzW2FEAYoOj4G9CDq39qASfBdbY5E00OaUOab3hqL/ZEeyHe7psYjygwrwSodmxeEG72WAwFlA3qdcakQA1q7az8kFybCr3UF7ib7vxqjm7ko9aCgB6+NT2zNHaRcfanoKDpbUHiNFVIpBsshA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EGyFFnI4; arc=none smtp.client-ip=209.85.208.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40e72a567eeso10125725e9.0;
-        Thu, 01 Feb 2024 08:17:53 -0800 (PST)
+Received: by mail-lj1-f172.google.com with SMTP id 38308e7fff4ca-2cf588c4dbcso14617111fa.1;
+        Thu, 01 Feb 2024 08:20:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706804272; x=1707409072; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2bm7C4zBaRxEHtHnijKpshODpaBuCUwJZ3uIJhW1Zwk=;
-        b=iQf1BBrmfdqvtScJCM+3XPt85nxA8yryNFY3y+M0Wt7NnAuCfFk2L3PyB0XyT58S/i
-         H/oMtneaE3lqB5o8LEiaajb6EkE9Nt5AzlKqWEYA2wueCMf+m1zNBPizOKP//OmsQss9
-         4EJkQ2lGKstyg+cBqeAOmA6PRI2ZRW7CGSuDKgPUZPz7URIvdp/dKVYtEwtp8Sk6oBk9
-         2i1w6hJZS/MYqpVhHFzfUQvyfcW06vVtYvGWBbTcyYjB2hDgfKXNN5GzcoDRHfKJDhE9
-         FFpigdvmS8ixqjvw4Zpdx+gxqgioAAEy7X8eCE0/wIdY5AN/y+KasZ1rHpJpLNfOd8NB
-         SMdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706804272; x=1707409072;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1706804399; x=1707409199; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2bm7C4zBaRxEHtHnijKpshODpaBuCUwJZ3uIJhW1Zwk=;
-        b=oBwnRCK+us97KG/VdKE88O/FxNG5U4+0nZ4wASVS0Jr+Smc/1zhvScSP0TdD45q+mc
-         AuQ9LfH1EBIJ1lmohb6+R9M6gRiokZlgyGByRhnLWVkohbk1mkDAFJk4M3wgkto+zO4j
-         elQRP4TRZ1srisxlnWX5nmIV/uRm7oM2vewx2fAUEvvUsnMcY2rjtSRKOfWxfKJSY0t1
-         Nn16CIOV+SRxVZbfnWpcuHof59AtVx7e/9orkidmmpwZQxngY9jDCuOVrovecJlb3ciC
-         afBJZGcC/IGMJ2MF1eGTd6ogfvYlTU4DCw+nJB6y2Ki/A71HHpcIM0Ry2Ho7BRmbAU6C
-         MvKQ==
-X-Gm-Message-State: AOJu0YzRxqq3auGKoZjh2yH6T0ZlLjUY9dBOKh0yX5SBQLFBKxPpdoIE
-	Bu/OO4XK7O7PQ1tqP+T2thMq0Dn8duLHukJFw78VsiFywUuw4OsO
-X-Google-Smtp-Source: AGHT+IE5JBsOUNO+M24oDIwSLbHf3lrV+nWcnPe3JATfJ8sR9G8Ui48KTiv0utw5fmmtYSapTfuRjA==
-X-Received: by 2002:a05:600c:190b:b0:40f:bef8:2c87 with SMTP id j11-20020a05600c190b00b0040fbef82c87mr1447351wmq.39.1706804271957;
-        Thu, 01 Feb 2024 08:17:51 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXKr4L2sAmDkLE2iJ0MDwJlxLRc/8Q5Nz7mXGkv6l4wWI20MmjGuAZTPPz4K2T3EnY2zttITtp4Jr+1lkaQxhPvZSVgzJOFCDug/Tk6JxUfX40t2Iyjr5AiFK5cw8WV5Ds4uZH+3N7bKs9tHIAJNpaRZBu6udF+RWUNwm84kHc3LpALPUPw7f98MpBeM+xPDbrXmbcoRzpFNslE0S+xm5Me6TRunYhPOH6UfKpCN3WbTC7sK6sVnfYcHmsye81G9+DFQ+GWZrIuXymsl9UUmlUyit7m4dOcjfS+M2DwJ9JObuYiGyiWRjmog0SwrHnAwaMD2buzMDOgSUz1pKsCU7gO8fI3AeLeTfZ+5Pzx9on/Jw8CQgh38O7K2IJprIMqZYqyNg==
-Received: from debian ([93.184.186.109])
-        by smtp.gmail.com with ESMTPSA id eo9-20020a056000428900b0033ae9e7f6b6sm12463234wrb.111.2024.02.01.08.17.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 08:17:51 -0800 (PST)
-Date: Thu, 1 Feb 2024 17:17:49 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jean Delvare <jdelvare@suse.com>,
-	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org
-Subject: Re: [PATCH v5 net-next 08/13] net: phy: marvell-88q2xxx: add support
- for temperature sensor
-Message-ID: <20240201161749.GB48964@debian>
-References: <20240122212848.3645785-1-dima.fedrau@gmail.com>
- <20240122212848.3645785-9-dima.fedrau@gmail.com>
- <88a60be9-083b-4618-845c-6983bcad3540@roeck-us.net>
+        bh=ygH1ANBFQzdbWHqig1KvXevLJTUpUKVJInoERj5H7V4=;
+        b=EGyFFnI4dm5FcPTEnEsfNc4DFItUBEyfHodEoS70PIGAR9Zr0bC8SGXLshGY2hMI4D
+         VTVLMt2KTQzsZrS9k0c1DzTw8dG1bGH0TBsJ6xNIlwgrfWvOkRNHfz4zbT/lXB0moHmv
+         AY7ShLG296fXWnILPNN+8c5w8Xy6EdNp12KrgBjB2dzaaZfCTScfaCSpkGVzgmZ30/bI
+         MdeDOOFb2ZR7/4fIfF8lzHlodkRJkz1JpkomW3KwvUBBfCq0T5bR9iqPNEm9N+o0O92C
+         TDGCBBAIscLEb4LI+tuMZdjVOIs5pGpIUtDQKtnl+47KYArqcD0FiSlp7OA6d6eWLpWx
+         thgg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706804399; x=1707409199;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ygH1ANBFQzdbWHqig1KvXevLJTUpUKVJInoERj5H7V4=;
+        b=jVYx/jyTX8luIS2CR2nuD7qehq0X5HOsoPPoUTKnmTVpHnCgmn/8ZTFToHg5tiTqd3
+         xo6HZYHY+Ltw+FgcCTuc9585/zF/J4Eo2kJQT4OCqZ1qXNLyJxOLo+ae0qK+GRTegPhh
+         hL/stqIzuEeCVkscFFBgXUiznsq6y2cREqnR71HVGaU5fKOL+gBsaopv5V4xtjh6Db5+
+         uPG8NfnsFJ2ZWUNicX2KzyUjTFUVkgtEF8Wqd0qSmF3awJRkJEPTv9xDO4iFlovJTYAU
+         9ZR4OOMkRHlEFEDnXcsuV/lzEvmDKiGVPqIw2KIDBUyCiZl69RsAcxVSeI8oElqEg7Rw
+         PaAQ==
+X-Gm-Message-State: AOJu0YyHzKm/7xRAjiQHvFwUx2v79xU7464KJ22Sg3/ciEPofycZFlPA
+	+cZZpVj+yqcdLKJ8bGN7QACFyQqAEHxreLJ2Hej8DUo5Cw7JJEYYQGCaduw63x71Akk6KEPfs3/
+	1YKQbmImOZPw2g9v/4cIB3nLJyDM=
+X-Google-Smtp-Source: AGHT+IEboM9BU1D2N1zSAOvc+WKlkpgFNHKYIUTTDXV+yPQMssdBnKXS+jMSgdgp9NElwX1iLJcp9P1fdOcXCG6REiQ=
+X-Received: by 2002:a2e:9c8d:0:b0:2cd:50a7:12d0 with SMTP id
+ x13-20020a2e9c8d000000b002cd50a712d0mr3708974lji.38.1706804398627; Thu, 01
+ Feb 2024 08:19:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <88a60be9-083b-4618-845c-6983bcad3540@roeck-us.net>
+References: <20240201083351.943121-1-pulehui@huaweicloud.com> <1e7181e4-c4c5-d307-2c5c-5bf15016aa8a@iogearbox.net>
+In-Reply-To: <1e7181e4-c4c5-d307-2c5c-5bf15016aa8a@iogearbox.net>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Thu, 1 Feb 2024 08:19:47 -0800
+Message-ID: <CAADnVQ+rLneO4t=YYmLYtc945Fz0=ucNTWZBxgvs8toFY-onRg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 0/4] Mixing bpf2bpf and tailcalls for RV64
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Pu Lehui <pulehui@huaweicloud.com>, bpf <bpf@vger.kernel.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>, 
+	Network Development <netdev@vger.kernel.org>, =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Luke Nelson <luke.r.nels@gmail.com>, 
+	Pu Lehui <pulehui@huawei.com>, Leon Hwang <hffilwlqm@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Am Thu, Feb 01, 2024 at 05:18:23AM -0800 schrieb Guenter Roeck:
-[...]
-> > +
-> > +static int mv88q2xxx_hwmon_write(struct device *dev,
-> > +				 enum hwmon_sensor_types type, u32 attr,
-> > +				 int channel, long val)
-> > +{
-> > +	struct phy_device *phydev = dev_get_drvdata(dev);
-> > +
-> > +	switch (attr) {
-> > +	case hwmon_temp_max:
-> > +		if (val < -75000 || val > 180000)
-> > +			return -EINVAL;
-> > +
-> 
-> Not that it matters much, but we typically use clamp_val() to limit
-> the range of temperature limits because the valid range differs for
-> each chip and is otherwise difficult to determine for the user.
+On Thu, Feb 1, 2024 at 2:56=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.ne=
+t> wrote:
 >
+> > will be destroyed. So we implemented mixing bpf2bpf and tailcalls
+> > similar to x86_64, i.e. using a non-callee saved register to transfer
+...
+> Iiuc, this still needs a respin as per the ongoing discussions. Also,
+> if you have worked on BPF selftests which exercise the corner case
+> around a6, please include them in the series as well for coverage.
 
-Will fix it.
+Hold on, folks.
+I'm not sure it's such a code idea to support tailcalls from subprogs
+in risc-v.
+They're broken on x86-64 and so far several attempts to fix them
+were not successful.
+If we don't have a fix soon we will disable this feature completely
+in the verifier.
+In general tailcalling from subprogs is a niche use case.
+If there are users they should transition to tail call from main prog only.
 
-Dimitri
+See
+https://lore.kernel.org/bpf/CAADnVQJ1szry9P00wweVDu4d0AQoM_49qT-_ueirvggAiC=
+Zrpw@mail.gmail.com/
 
