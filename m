@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-68230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98870846376
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 23:33:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBC88846398
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 23:45:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0652C283328
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 22:33:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EA1C28D956
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 22:45:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345EE3D960;
-	Thu,  1 Feb 2024 22:33:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE6B440C0E;
+	Thu,  1 Feb 2024 22:45:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GlC3sZBI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UfVCH8Ee"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C21836134;
-	Thu,  1 Feb 2024 22:33:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F3A841208;
+	Thu,  1 Feb 2024 22:45:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706826800; cv=none; b=NdbwvVWm7vZr7Zl9uToTMUwPIQocH6ojQ6ZtxOl4K9BNRiE7ieASs3Vpi5M+Aw5EyII3ajGSApUru7s2LUXevtDtU/zJSPWimyWfvGnHwi+evfPFiXN5e4zei/VeGKLNRxYLMVsOSIzeS960KlPU5NCsunwHu0wCPno6GRze2mg=
+	t=1706827522; cv=none; b=PQ1edMt3HLvTasSLD4t9F25mqGtEDnqQFRRh8Ndp4J9lMa5DZG9/ZPUeI/1bcCS/k3kEexaS+KiW4Yz4DXquvLQSDz38kKEtqMVDKfbPsFqHVhouf2QD2dJQ8RggQNP3Y9QkKklcfcI312iGQ8YsXfi3ZkcVJcvoXus8kxgR0KQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706826800; c=relaxed/simple;
-	bh=UIZFij3vX2Sso0FDouOwGC3iXhnc2OgUMZXke142ft4=;
+	s=arc-20240116; t=1706827522; c=relaxed/simple;
+	bh=MTnSrMq8i1x++ESn+SIH1QLN42cjYh/PlfT7IxAwwC0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mpT7MWyiOX2XPms6RPFjIYDRJQsxVTmTKjmZ+q7iV+vAwicvEemeBvMlElGVNnCFXiGIboGbVjJ3MoYbK1Tv7sqKL3ZYQ18CzV+1U+pv9JDvoIPXu3EpAyEt1pgRbhjk3KFE4z4y/X2peyak4jDSOtzkj9ua6Cl7Qw4Imrn3TA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GlC3sZBI; arc=none smtp.client-ip=209.85.167.50
+	 Content-Type:Content-Disposition:In-Reply-To; b=oABoTQQ90as1xFJ/oVdR4Q9F+aFCL0j2SlAXTp6BNd/GJYfZfeKSzSQ0yuvA7DqAyKcO71M2M3gKMHlbSe2dPichUcK4h2eZbg/RLM/uY+wykO78tXBNOene8g4n9VtU84dEzXQ5hmYguV16vBh3SpFSVIhEebrdlw8F5yaUAGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UfVCH8Ee; arc=none smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-51134755d9cso271323e87.0;
-        Thu, 01 Feb 2024 14:33:18 -0800 (PST)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-55c2cf644f3so1891660a12.1;
+        Thu, 01 Feb 2024 14:45:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706826796; x=1707431596; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706827519; x=1707432319; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=aOoVJvNlIyAZpSKQW2nK0aJiflX1kuB/bEqUHjK+UFc=;
-        b=GlC3sZBIkTxI3T0f05RnM9zjR7JSEqtkxR0qok1Zg9hrpveDTH0mJ7OPlpQFoRevS5
-         JgT9lov37e1wO1je1nZDznRWieX9NlXf8wXzR684AQJTnIzwEGbtuvEY1lFUq8Uq2Rk9
-         NfeiT1NIMDSWTjC41wVBOkq5/sL75/3hnRLlgw+wOPYiLHeFap5C2ZWSPK8Vy3b5UzvW
-         +Be6uM4foIKIQTHO6LDqSc53hXajjBLarXprLreZMN0ROMPHITUyEx2Zz5v+MNqWPTqW
-         0Sfjv1PFU1+3vkVM8/+NSjXuMis+2ATfb641CYWbUDeW2rOfptN1YGEy0TzxYN5XYjNG
-         mA2Q==
+        bh=5fGYdKfwHRpUOUYn273X9Mhr4fH/tkJBZxTmCbsLDgg=;
+        b=UfVCH8EeIEhkrpMfeTfeTqpdHlxzSp7CUXq6Vo34t9osNcRUFiid6axY00xrCmrAD+
+         XaVLb/XKtsxeJ61dqrw2aM4em3qlqFpOxn9yZ0XdAPIB9kQT4sCcCPp1D4Ts0XuRlA1L
+         q3TrKr6WxSCp6vTg3j6sK436xcboF6ClygXe6O8rYd+GI/T8/AsCf+E70cKmJL3ONyAQ
+         ISbGeeDbxznaVWxpo4Pztf+lQTztNkgMuBCN1MPS91dprsm9p6lQQ9JJqqu8tNueeJSr
+         n+GIrydYcRK8LabUVEgDg7wNKqErQg/QvB0aa27NfK3SBmnEAQ7QxB/YaCdfv1Uc2XZC
+         wXaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706826796; x=1707431596;
+        d=1e100.net; s=20230601; t=1706827519; x=1707432319;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aOoVJvNlIyAZpSKQW2nK0aJiflX1kuB/bEqUHjK+UFc=;
-        b=mHotg2xHQA5mEnmz4dVvYywPA7cHB6aTIwuoGcvVLvO3UqqugTnxM3tvaPvDYTJ3D6
-         mQQmKjHMw1TUj6LMt7YcS57USedMgry1CBFlmzYMUX6Dnh4rYUg44iZ13XxEQQ0uUNkX
-         jYxsKFGBlk9CX2TrFrH62j/8B1P/6MLzQwO1x7S3GYPPl2vEdI7LYcmyiCFOiS7BLi4v
-         rMYJ62Ys3wCGOunQ8vDoBnxqeY8IcZMM2XYz8rpMDJsLTC1OXoWbPlYrT/xd2m1ZEK/1
-         +ftsQzYkqQ0J/1ezSH+NOUgKRwS07R9NzO3C4jFmx9ZbUDEzj+0+5IoC5TedwwBu32L9
-         ibUA==
-X-Gm-Message-State: AOJu0YwS/+RCoKD9LyoALAPcNfOvdP/9olBH3p5kFx8KAzERArwceQJe
-	u4sX+kCBAHzgjax+uuSDXD+F8CqvvzcqaBPv/+AhBpM/+la/G836wuqs0QThb0SpPA==
-X-Google-Smtp-Source: AGHT+IHsZNYZRvF+ZTQViUHg7CwLt4tXgfEKgX0bWoH7t0K5CTTzwt6LAuBX7Ups5F1iz9FstX9LlA==
-X-Received: by 2002:ac2:430d:0:b0:511:351d:6acc with SMTP id l13-20020ac2430d000000b00511351d6accmr185356lfh.15.1706826796151;
-        Thu, 01 Feb 2024 14:33:16 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUdUJyzuPJo0Xs64tfoHzHILjdDsgoPZ+i791+q/qxxpm0ZBcGxWDv384AIbMKsd+5bPvLIQvbalXcUlmIws4jipCbm23IVIAtlnkIeZxcQw67jgvFUSO0vwl6GQ2b2WvopIDROIIxp6kY3Yl/9+TfD74QdjLGxlNPbu47jxKs/cvtqAw7P4X227wXPoFnuCDvxwE0L+IMpPw30ejEJlWVpAKJrRuOYCc92Yudz9m4KCNfOHK9CCuOmd9O8PDldWCc6P0FLNY1UTK8+1tyycvbmUhV7/IYi+FN86iHCrTrQNfrAR9oEdVH/ddf1YTmX8saHBCspqSxdNsjTJNXFOuY8JTpWTCo=
+        bh=5fGYdKfwHRpUOUYn273X9Mhr4fH/tkJBZxTmCbsLDgg=;
+        b=agB0g32ei63XodOZpoRLgemElaUm+Ww1r7Uic4iFzD6ffZ/TytNYePlJylav2SK5cc
+         bbYXyd9kXFEHZ/wwJTgJYYXNKblz1nKFDXhVoilsBO7bxqLxDo/B0+ltNsyzD7LPpzIq
+         bjLCPKwkZW0dNXCj15haKolLCaVRHLBN6PfuC4WBRCOc+ua+GBNw3ydbGMnjuPlRAwt9
+         IcBhhaA8o93MfUDwi2YIgnJFcur7RDEVAeXpZI9QqxbSmZ9IihPm0RgqQHCTfD3Ua70t
+         aYoupzmIB6fTvwntpKRQba5zeiywYj9MwGxLGWFXmlJCB/VBr3JbEzi8xUo+H4YUq07R
+         9Udg==
+X-Gm-Message-State: AOJu0YyQxcm1QcTLuQI6UkXfplYRwMXd0F+Nh5JApIDsPL4pkPSg06wU
+	9khutpUwnjHUHCJqc7ew/MtyQMWfdSgT/vQyWCc/YY0MD8e39vYZ
+X-Google-Smtp-Source: AGHT+IHrRG6KdcJoOWJ0ti2YqgpNxWeeibbNcSidMyvWTpFC/vNgQCl+H7ng+V7cQGc6eT8gxBX8Sw==
+X-Received: by 2002:a05:6402:160c:b0:55f:d80a:d641 with SMTP id f12-20020a056402160c00b0055fd80ad641mr1032641edv.9.1706827519072;
+        Thu, 01 Feb 2024 14:45:19 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWGsDSrtt8pCql64mwXFDMszUWKQdycnC6Oy2HR18d0q9+zQrrd8ZhC8Gt35m3zcdraLS5ZNNE9HD5oVwtmEcGG/I3bbOO4qBBeEuHwh4BAhsfharD0holKKSm2i3FWREjVc9LSs7jzno409WhAZ2dYpvljPiqkWjUuvIaNcr9rIf7r5auQ2nTQU7WBNRrOt/n6kGDG55468oc4Qa7uYH5Ag+KMR78xYjZDYVt1b7Yn0xHLmzMB6cqRvo6qKiobUECllz2Q3vkzRXc+VjnzAtwrjXfDe/tjXU2yrltKqwfT204kkhzW3j3jgYoCVfwR5enL6Ixmv0qLaGhV9K91oswn8uh9PA4=
 Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id hd34-20020a17090796a200b00a36f314daa6sm224233ejc.46.2024.02.01.14.33.15
+        by smtp.gmail.com with ESMTPSA id cn21-20020a0564020cb500b0055f98c703easm247632edb.6.2024.02.01.14.45.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 14:33:15 -0800 (PST)
-Date: Fri, 2 Feb 2024 00:33:13 +0200
+        Thu, 01 Feb 2024 14:45:18 -0800 (PST)
+Date: Fri, 2 Feb 2024 00:45:16 +0200
 From: Vladimir Oltean <olteanv@gmail.com>
 To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 Cc: Linus Walleij <linus.walleij@linaro.org>,
@@ -78,13 +78,13 @@ Cc: Linus Walleij <linus.walleij@linaro.org>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 08/11] net: dsa: realtek: clean user_mii_bus
- setup
-Message-ID: <20240201223313.6inu6l6cwg4krapz@skbuf>
+Subject: Re: [PATCH net-next v5 09/11] net: dsa: realtek: migrate
+ user_mii_bus setup to realtek-dsa
+Message-ID: <20240201224516.pujapjenqtyejihg@skbuf>
 References: <20240130-realtek_reverse-v5-0-ecafd9283a07@gmail.com>
  <20240130-realtek_reverse-v5-0-ecafd9283a07@gmail.com>
- <20240130-realtek_reverse-v5-8-ecafd9283a07@gmail.com>
- <20240130-realtek_reverse-v5-8-ecafd9283a07@gmail.com>
+ <20240130-realtek_reverse-v5-9-ecafd9283a07@gmail.com>
+ <20240130-realtek_reverse-v5-9-ecafd9283a07@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,25 +93,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240130-realtek_reverse-v5-8-ecafd9283a07@gmail.com>
- <20240130-realtek_reverse-v5-8-ecafd9283a07@gmail.com>
+In-Reply-To: <20240130-realtek_reverse-v5-9-ecafd9283a07@gmail.com>
+ <20240130-realtek_reverse-v5-9-ecafd9283a07@gmail.com>
 
-On Tue, Jan 30, 2024 at 08:13:27PM -0300, Luiz Angelo Daros de Luca wrote:
-> Remove the line assigning dev.of_node in mdio_bus as subsequent
-> of_mdiobus_register will always overwrite it.
-> 
-> As discussed in [1], allow the DSA core to be simplified, by not
-> assigning ds->user_mii_bus when the MDIO bus is described in OF, as it
-> is unnecessary.
-> 
-> Since commit 3b73a7b8ec38 ("net: mdio_bus: add refcounting for fwnodes
-> to mdiobus"), we can put the "mdio" node just after the MDIO bus
-> registration.
-> 
-> [1] https://lkml.kernel.org/netdev/20231213120656.x46fyad6ls7sqyzv@skbuf/T/#u
-> 
-> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-> ---
+On Tue, Jan 30, 2024 at 08:13:28PM -0300, Luiz Angelo Daros de Luca wrote:
+> +/**
+> + * rtl83xx_setup_user_mdio() - register the user mii bus driver
+> + * @ds: DSA switch associated with this user_mii_bus
+> + *
+> + * This function first gets and mdio node under the dev OF node, aborting
+> + * if missing. That mdio node describing an mdio bus is used to register a
+> + * new mdio bus.
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+The description has the overall feel of "Family Guy - Peter narrates his life"
+(https://www.youtube.com/watch?v=zw8zUMjEW0I).
+
+You could be a bit more succinct and say something like "Registers the
+MDIO bus for built-in Ethernet PHYs, and associates it with the
+mandatory 'mdio' child OF node of the switch".
+
+> + *
+> + * Context: Can sleep.
+> + * Return: 0 on success, negative value for failure.
+> + */
+> +int rtl83xx_setup_user_mdio(struct dsa_switch *ds)
+> +{
+> +	struct realtek_priv *priv = ds->priv;
+> +	struct device_node *mdio_np;
+> +	struct mii_bus *bus;
+> +	int ret = 0;
+> +
+> +	mdio_np = of_get_child_by_name(priv->dev->of_node, "mdio");
+> +	if (!mdio_np) {
+> +		dev_err(priv->dev, "no MDIO bus node\n");
+> +		return -ENODEV;
+> +	}
+> +
+> +	bus = devm_mdiobus_alloc(priv->dev);
+> +	if (!bus) {
+> +		ret = -ENOMEM;
+> +		goto err_put_node;
+> +	}
+> +
+> +	bus->priv = priv;
+> +	bus->name = "Realtek user MII";
+> +	bus->read = rtl83xx_user_mdio_read;
+> +	bus->write = rtl83xx_user_mdio_write;
+> +	snprintf(bus->id, MII_BUS_ID_SIZE, "%s:user_mii", dev_name(priv->dev));
+> +	bus->parent = priv->dev;
+> +
+> +	ret = devm_of_mdiobus_register(priv->dev, bus, mdio_np);
+> +	if (ret) {
+> +		dev_err(priv->dev, "unable to register MDIO bus %s\n",
+> +			bus->id);
+> +		goto err_put_node;
+> +	}
+> +
+> +	priv->user_mii_bus = bus;
+> +
+> +err_put_node:
+> +	of_node_put(mdio_np);
+> +
+> +	return ret;
+> +}
+> +EXPORT_SYMBOL_NS_GPL(rtl83xx_setup_user_mdio, REALTEK_DSA);
 
