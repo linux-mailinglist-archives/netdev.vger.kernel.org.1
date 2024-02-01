@@ -1,107 +1,77 @@
-Return-Path: <netdev+bounces-68109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAD4D845DA0
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:47:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 175B9845D9F
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:47:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B9D928A377
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:47:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74E94289E0E
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:47:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E24D97E10B;
-	Thu,  1 Feb 2024 16:47:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7307E0F5;
+	Thu,  1 Feb 2024 16:47:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XfPMOc1V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tn9ZQX3M"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B06A2D281;
-	Thu,  1 Feb 2024 16:47:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2566163AF;
+	Thu,  1 Feb 2024 16:47:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706806063; cv=none; b=rueT7QtDwOgs6QIHbTMj1W1XaEDc6jHAzNxjw1CD0cloUfbWB+GRArIsni3OY25kT1RSLFvdiFtcM0ZQy0cVRqtrLk6stjYU2OFWS/qE8WfrGWauxVzmbOG7nzHWdwcn96q3wZ4iRwjqPA4h1BkrkIix7sn2H0R7dpJdyWqU8qQ=
+	t=1706806056; cv=none; b=WRiKx0TvozDDD02mNv2kdDzrEVM25ZHXSdgD7KWiDgLIc/2zBu0ntdp/fkCT+DDweKepiMsXdRVxO01EkkUBaX5mrfhjCgp94QACkBlLS7NxMhlR2kl2vZ2BMfLVlmcpXKkT+/Hrz9tR2wrPt9Fg/4dCb0NRZ0aWD95m93njkJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706806063; c=relaxed/simple;
-	bh=+K0T97CVgMNpfRwZlO4eKu8a/DzZVeS+5rFivyPss+w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W+kq0HwV8lWIJKmjErXyL2mnFFlIsbhPkf/MsdobuFzdP510Q3JGaQ1MLn+JnZt/er7Szm5DG2aFcYkqHtvX75N0FBzY1Qg7UajfpQYWe5q2qpu2CmuMIAmEd+LjBsXwr+7zkgo0WonrVyuZYIjuJoAn1nZ7VC/oHCd6E3kkJW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XfPMOc1V; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=bUN7yMh6xy2hWhvAEG7t+zJP6Ap6R4V2I56VA8W+GD8=; b=XfPMOc1Vq3U3HOb18Bz8QczK3k
-	g+LxL9dyOB95t/oGQzYWYyETjRxfv+GLcPmPfUfCFqCmGzlIEgl5v8EMON+nLJH+kRh9CMc2LknpE
-	M4fDU8lpc+Chg/33DQ935/cp4zaBrwvfIfoFPOsEDSTPmULjLXy99RDT4X2KWxL7ASpY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rVaDh-006hIq-0x; Thu, 01 Feb 2024 17:47:21 +0100
-Date: Thu, 1 Feb 2024 17:47:21 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Dimitri Fedrau <dima.fedrau@gmail.com>
-Cc: Guenter Roeck <linux@roeck-us.net>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jean Delvare <jdelvare@suse.com>,
-	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org
-Subject: Re: [PATCH v5 net-next 08/13] net: phy: marvell-88q2xxx: add support
- for temperature sensor
-Message-ID: <b4fc0bc4-1585-4ae0-a980-10814e6d9ff6@lunn.ch>
-References: <20240122212848.3645785-1-dima.fedrau@gmail.com>
- <20240122212848.3645785-9-dima.fedrau@gmail.com>
- <88a60be9-083b-4618-845c-6983bcad3540@roeck-us.net>
- <c9866a56-d82e-4a3d-b335-db22c0413416@lunn.ch>
- <a02c7451-8515-45d4-ae7b-9e64b03b5b38@roeck-us.net>
- <20240201162349.GC48964@debian>
+	s=arc-20240116; t=1706806056; c=relaxed/simple;
+	bh=/Cpko5bgqtkY/APFe0XRYiD2zhK2pxQ8UE5K7+s5InY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=k7gfEv8AZbQ4dqWYrVHt0h/FmWcglvV+0QTziiFQ40MQ31oYG9HBuWNve+y5I8g/p0Wi5Q9j/InJPhBojSpd9+kJBE5MENq/2U3bdaVx7zTZ+Y3QMCp5SrVTNNYLIvAfLOi079PcDv9QqAwNTtQAi4hLMGnlL82Phuaq7hS0PLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tn9ZQX3M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A16BC433F1;
+	Thu,  1 Feb 2024 16:47:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706806055;
+	bh=/Cpko5bgqtkY/APFe0XRYiD2zhK2pxQ8UE5K7+s5InY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tn9ZQX3Ml+wdbppqkFNiVxhS3dIm/Y9ANv3FnATgHy5Nufkd468WOSF06Tq0WNmXa
+	 UljAghw6pGSIOGV343sa6tZ2L6lo8mYuDlOVvd3rmWKQKOm9vhLmF5kMH2x2ASCMrG
+	 cnj506kMkSaQCtk8EbHUOxJ1F9/lGyspU+F4E4qWI3J024IsM7CD1P6I6TCzBaK9R1
+	 63bOpY1Uw1alPq4TZgB30W1n6tLIWBPmvZgPef8ebZ5nqflPi4BRZCJYzosFmAju74
+	 wFHSEu3sCdoBHNqGrLz9TmF7dE7YvqhiAT4bt9lWKVEqT8767wkZXaDh1JLfG2OD0V
+	 y3IV+Z9yfIQEw==
+Date: Thu, 1 Feb 2024 08:47:34 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>, Willem de
+ Bruijn <willemb@google.com>, Shannon Nelson <shannon.nelson@amd.com>,
+ Steffen Klassert <steffen.klassert@secunet.com>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net 0/3] selftests: net: more fixes
+Message-ID: <20240201084734.1cec7c63@kernel.org>
+In-Reply-To: <cover.1706723341.git.pabeni@redhat.com>
+References: <cover.1706723341.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240201162349.GC48964@debian>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 01, 2024 at 05:23:49PM +0100, Dimitri Fedrau wrote:
-> Am Thu, Feb 01, 2024 at 05:39:25AM -0800 schrieb Guenter Roeck:
-> > On 2/1/24 05:27, Andrew Lunn wrote:
-> > > > > +#ifdef CONFIG_HWMON
-> > > > 
-> > > > HWMON is tristate, so this may be problematic if the driver is built
-> > > > into the kernel and hwmon is built as module.
-> > > 
-> > > There should be Kconfig in addition to this, e.g.
-> > > 
-> > > config MAXLINEAR_GPHY
-> > >          tristate "Maxlinear Ethernet PHYs"
-> > >          select POLYNOMIAL if HWMON
-> > >          depends on HWMON || HWMON=n
-> > >          help
-> > >            Support for the Maxlinear GPY115, GPY211, GPY212, GPY215,
-> > >            GPY241, GPY245 PHYs.
-> > > 
-> > > So its forced to being built in, or not built at all.
-> > > 
-> > 
-> > Even then it should be "#if IS_ENABLED(HWMON)" in the code.
-> > 
-> >
-> If using "#if IS_ENABLED(HWMON)" do I have to add the dependency in
-> the KConfig file ? When looking at other PHY drivers, they do.
+On Wed, 31 Jan 2024 18:52:26 +0100 Paolo Abeni wrote:
+> Another small bunch of fixes, addressing issues outlined by the
+> netdev CI.
+> 
+> Paolo Abeni (3):
+>   selftests: net: cut more slack for gro fwd tests.
+>   selftests: net: fix setup_ns usage in rtnetlink.sh
+>   selftests: net: enable some more knobs
 
-Please follow what other drivers do. Its easy to break the build,
-resulting is undefined symbols. What we have now works.
-
-	Andrew	  
+Let me apply the last patch since it's equivalent to what we had
+locally in the CI bot for a week. (The rest needs a repost since
+they didn't apply at the time of posting.)
 
