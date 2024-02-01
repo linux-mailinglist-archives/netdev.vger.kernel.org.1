@@ -1,57 +1,80 @@
-Return-Path: <netdev+bounces-67888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCEA3845411
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 10:35:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31D53845415
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 10:35:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F4ED283430
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 09:35:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E24FA28332F
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 09:35:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C367B4D9EF;
-	Thu,  1 Feb 2024 09:31:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0B84D9F4;
+	Thu,  1 Feb 2024 09:31:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P4OMQogt"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="OXGUfRX7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B1C04D9F4;
-	Thu,  1 Feb 2024 09:31:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBACF4D9F3
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 09:31:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706779886; cv=none; b=joXsrvqQf+bPzp/AL/bHIhSBVE/FoU794xZuCNC4Q62HcONvt0BfT03dHO5jqObUCFeogKxvK6kshYbHmS9aWqbVAbl/DjYOqVaV0/M4LACXvaoE6XwsUj7mmhBtVFpUCONJFci3FbwYeBfRpfaWh9UpD3xudjr8qH0dJm/8h2o=
+	t=1706779913; cv=none; b=t9OeRjlp06Ht68GrcpK7LstKpkrrr6AXB6g27nxgl7Hnbr55ljvNjH5wLJvgQzasJ8Dn1eGi29CjVfnH/mpEJheWeUDaFcRhilhWOdEX7jtak20ov/LOd46Bv7x/rYJ+YZ82Ox/rvDIkt+E1bbaaip5nBZCeKctwuCHqF8IAnv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706779886; c=relaxed/simple;
-	bh=NCINvj4Y1T2SJFg7Qok5Q80wpETFi8oJObXS6KhNNjI=;
+	s=arc-20240116; t=1706779913; c=relaxed/simple;
+	bh=E9niEGVgZhUdPgPTb7GMxl8Ccwm+G7/hGenwW522N9M=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AV3IyNqI1xN1OFq95l8ngZRg4vRvAIqfDHqlBwaPQGaHmR64SFhg4bIf5DCar/TLJwdqPYPT2Cafd0KZASaibpyCBU3ZGEFxlYEpAo8boEqGDCE6tPMe0vykMOXcf1xc2unYq3tfjegR0SLBWuL20jVbbRepygHKTQWhRVVFJWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P4OMQogt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B9DDC433F1;
-	Thu,  1 Feb 2024 09:31:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706779885;
-	bh=NCINvj4Y1T2SJFg7Qok5Q80wpETFi8oJObXS6KhNNjI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=P4OMQogtkyu0vL8S5TV2Q593vFtymlGsJaf1sxbSKdsN17VUmTdK/ga9qYaQrV9Wb
-	 928Hwt1LqE9cnMePmG6qZlixdgRKiEpiWv32XqzsbZs9YplBy5QNMcqzNkS2c/+xKV
-	 9ozWzTpqV85BAqIShl3kQd7lQCiBYyXZGDAXNKZ+rD9qaHKDHDWz2wkpdpZVK1mp3g
-	 b+/+AQ3XNf0psoILlvoCH6iMSmm93D+mnfa82U3la5hCa0kNweSGGQChH114mx8OuE
-	 Ge5hfnXCRxm2Eai7n53R/ndt956xR2sqwLra3OWTg1hz7iaXEdbM2PAtFhVdsw2a1j
-	 WYscoU2nXOTVw==
-Date: Thu, 1 Feb 2024 10:31:19 +0100
-From: Simon Horman <horms@kernel.org>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, bcreeley@amd.com,
-	sbhatta@marvell.com, gakula@marvell.com, hkelam@marvell.com,
-	sumang@marvell.com
-Subject: Re: [PATCH net v3] octeontx2-af: Initialize maps.
-Message-ID: <20240201093119.GB514352@kernel.org>
-References: <20240131024118.254758-1-rkannoth@marvell.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=M8INALzj3W4LztXv8zGEiKzaUDng/7sLZ88GcSZ2CTUlRaRh/15kjbNpNyVaX+18TOtdjWSA2yMcflBsheJ3hU/MrsrYpURdR9DrRUEmMJRdCbIiBCCU2lSuuJdNsyQMBgph+gZbGOeXtB1Lt5SkpPKG5XSe7QaGqeaXHkDtqJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=OXGUfRX7; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-510322d5363so1025983e87.1
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 01:31:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706779910; x=1707384710; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RAv92q1PnnVq+dxV1mTCP+RfAFuWPr3Wk7OmWYlbPfI=;
+        b=OXGUfRX7pCwMKH+jfB37hKuUOZudWYtrnO1LXGwgQgZvnRT2GF8P8TCXomdL3HkmBC
+         A2+jbkQ3GYh3IfDG4BlCSxpnOnN/9feHBaEr7x8C86C0zAaI/75SSXwdIBshYTYymFV8
+         mPkP/3CGo87dDonIXe3Xemxfug3Sx2p207KQntaJNhnviE9OOCaecmFegI+ZkUPAU0+N
+         PIFe6wmYAvt/VyufrPP/t7KLQyhDqWayO3Pmbr9dnCOkYONLujSOHB65TXdX9g9UHay6
+         B/YiyluS3wvQw1WMpgbrBSwR8KFQdGMluGxRcOt0I8KeKIs5dQP6V3pttem+zY5kghRS
+         OdhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706779910; x=1707384710;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RAv92q1PnnVq+dxV1mTCP+RfAFuWPr3Wk7OmWYlbPfI=;
+        b=XtUUcas588uHIYj/AsS3uhVBJQBO2EQD6w6dJd4GCIW/V04buspaG6Y8AdQpxZ7V/S
+         9P3p9xHatHUCC9/psbzgmFi5vJyM2c1GifsB3QQ4wIoAaTL92EeSwEC0hMqlbjCPhWvP
+         L/zu4FRXunR94OryZQVWzyg2Tg93gcA12K1jsG7skN9OkC1R4Hkw2gSVKIrm4kSoKpeA
+         hoxPuCsMs3fNTH01z3ma1J2hVU4wjmH5apZVvxGSM335OIgIpk5T+deIBtKSdd6NOX5l
+         K5lI7VmM2Uqkx17XoLfiY26qoQS3Wie6/SBoD1fRJhZoYmnBu9qbERzSJmWPQ19U4B5C
+         zi6A==
+X-Gm-Message-State: AOJu0YydDyTAo3ApsJBY2p4qgqS9y5HVvxhzVQ9hm/qgjqQdDRoRD/iZ
+	LNWAudxnu8COi7yU+PUCvXiy0+gskBV9kan9RZ9aECpIbl3LREBwC98CqSD5S/U=
+X-Google-Smtp-Source: AGHT+IEe0Gs4UjFC1yYOp4EHmipjAJpEnViYrLrcMQHXETpNl0XbVpLlMYurAjYB3pY5xuIhL1kP1g==
+X-Received: by 2002:a05:6512:748:b0:50e:a219:e05d with SMTP id c8-20020a056512074800b0050ea219e05dmr1541060lfs.12.1706779909758;
+        Thu, 01 Feb 2024 01:31:49 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCV2VBfNg+hcJUA9n9GQQU7ItsWT5ZYOsaRaWYvRf5sW2nUHLX8KFNTv3+qwkfKIDLjNwCiNi7DvfPl1u6XhuCTD
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id p23-20020a05600c1d9700b0040e9d507424sm3954296wms.5.2024.02.01.01.31.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Feb 2024 01:31:49 -0800 (PST)
+Date: Thu, 1 Feb 2024 10:31:46 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH 2/3] net/sched: netem: get rid of unnecesary version
+ message
+Message-ID: <ZbtlAi0WU2sZPEHP@nanopsycho>
+References: <20240201034653.450138-1-stephen@networkplumber.org>
+ <20240201034653.450138-3-stephen@networkplumber.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,116 +83,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240131024118.254758-1-rkannoth@marvell.com>
+In-Reply-To: <20240201034653.450138-3-stephen@networkplumber.org>
 
-On Wed, Jan 31, 2024 at 08:11:18AM +0530, Ratheesh Kannoth wrote:
-> kmalloc_array() without __GFP_ZERO flag does not initialize
-> memory to zero. This causes issues. Use __GFP_ZERO flag for maps and
-> bitmap_zalloc() for bimaps.
+Thu, Feb 01, 2024 at 04:45:59AM CET, stephen@networkplumber.org wrote:
+>The version of netem module is irrelevant and was never useful.
+>Remove it.
+>
+>Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+>---
+> net/sched/sch_netem.c | 5 ++---
+> 1 file changed, 2 insertions(+), 3 deletions(-)
+>
+>diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
+>index 7c37a69aba0e..f712d03ad854 100644
+>--- a/net/sched/sch_netem.c
+>+++ b/net/sched/sch_netem.c
+>@@ -26,8 +26,6 @@
+> #include <net/pkt_sched.h>
+> #include <net/inet_ecn.h>
 > 
-> Fixes: dd7842878633 ("octeontx2-af: Add new devlink param to configure maximum usable NIX block LFs")
-> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
-> ---
+>-#define VERSION "1.3"
+>-
+> /*	Network Emulation Queuing algorithm.
+> 	====================================
 > 
-> ChangeLogs:
-> v2 -> v3: Used GFP_ZERO for normal map arrays
-> v1 -> v2: Used bitmap_zalloc() API.
-> v0 -> v1: Removed devm_kcalloc()._
-> ---
->  .../ethernet/marvell/octeontx2/af/rvu_npc.c   | 26 ++++++++++---------
->  1 file changed, 14 insertions(+), 12 deletions(-)
+>@@ -1300,13 +1298,14 @@ static struct Qdisc_ops netem_qdisc_ops __read_mostly = {
 > 
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-> index 167145bdcb75..6a8f0efd96a5 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-> @@ -1850,8 +1850,8 @@ void npc_mcam_rsrcs_deinit(struct rvu *rvu)
->  {
->  	struct npc_mcam *mcam = &rvu->hw->mcam;
-> 
-> -	kfree(mcam->bmap);
-> -	kfree(mcam->bmap_reverse);
-> +	bitmap_free(mcam->bmap);
-> +	bitmap_free(mcam->bmap_reverse);
->  	kfree(mcam->entry2pfvf_map);
->  	kfree(mcam->cntr2pfvf_map);
->  	kfree(mcam->entry2cntr_map);
-> @@ -1904,13 +1904,11 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
->  	mcam->pf_offset = mcam->nixlf_offset + nixlf_count;
-> 
->  	/* Allocate bitmaps for managing MCAM entries */
-> -	mcam->bmap = kmalloc_array(BITS_TO_LONGS(mcam->bmap_entries),
-> -				   sizeof(long), GFP_KERNEL);
-> +	mcam->bmap = bitmap_zalloc(mcam->bmap_entries, GFP_KERNEL);
->  	if (!mcam->bmap)
->  		return -ENOMEM;
-> 
-> -	mcam->bmap_reverse = kmalloc_array(BITS_TO_LONGS(mcam->bmap_entries),
-> -					   sizeof(long), GFP_KERNEL);
-> +	mcam->bmap_reverse = bitmap_zalloc(mcam->bmap_entries, GFP_KERNEL);
->  	if (!mcam->bmap_reverse)
->  		goto free_bmap;
-> 
-> @@ -1918,7 +1916,8 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
-> 
->  	/* Alloc memory for saving entry to RVU PFFUNC allocation mapping */
->  	mcam->entry2pfvf_map = kmalloc_array(mcam->bmap_entries,
-> -					     sizeof(u16), GFP_KERNEL);
-> +					     sizeof(u16),
-> +					     GFP_KERNEL | __GFP_ZERO);
+> static int __init netem_module_init(void)
+> {
+>-	pr_info("netem: version " VERSION "\n");
+> 	return register_qdisc(&netem_qdisc_ops);
+> }
+>+
+> static void __exit netem_module_exit(void)
+> {
+> 	unregister_qdisc(&netem_qdisc_ops);
+> }
+>+
 
-Hi Ratheesh,
+These whitespace changes look unrelated to the patch. Anyway:
 
-The use of bitmap_zalloc()/bitmap_free() looks good to me.
-But for the kmalloc_array(..., GFP_KERNEL | __GFP_ZERO) cases
-I think kcalloc() is the way to go.
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
->  	if (!mcam->entry2pfvf_map)
->  		goto free_bmap_reverse;
-> 
-> @@ -1942,7 +1941,8 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
->  		goto free_entry_map;
-> 
->  	mcam->cntr2pfvf_map = kmalloc_array(mcam->counters.max,
-> -					    sizeof(u16), GFP_KERNEL);
-> +					    sizeof(u16),
-> +					    GFP_KERNEL | __GFP_ZERO);
->  	if (!mcam->cntr2pfvf_map)
->  		goto free_cntr_bmap;
-> 
-> @@ -1950,12 +1950,14 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
->  	 * counter's reference count.
->  	 */
->  	mcam->entry2cntr_map = kmalloc_array(mcam->bmap_entries,
-> -					     sizeof(u16), GFP_KERNEL);
-> +					     sizeof(u16),
-> +					     GFP_KERNEL | __GFP_ZERO);
->  	if (!mcam->entry2cntr_map)
->  		goto free_cntr_map;
-> 
->  	mcam->cntr_refcnt = kmalloc_array(mcam->counters.max,
-> -					  sizeof(u16), GFP_KERNEL);
-> +					  sizeof(u16),
-> +					  GFP_KERNEL | __GFP_ZERO);
->  	if (!mcam->cntr_refcnt)
->  		goto free_entry_cntr_map;
-> 
-> @@ -1988,9 +1990,9 @@ int npc_mcam_rsrcs_init(struct rvu *rvu, int blkaddr)
->  free_entry_map:
->  	kfree(mcam->entry2pfvf_map);
->  free_bmap_reverse:
-> -	kfree(mcam->bmap_reverse);
-> +	bitmap_free(mcam->bmap_reverse);
->  free_bmap:
-> -	kfree(mcam->bmap);
-> +	bitmap_free(mcam->bmap);
-> 
->  	return -ENOMEM;
->  }
-> --
-> 2.25.1
-> 
 
--- 
-pw-bot: changes-requested
+> module_init(netem_module_init)
+> module_exit(netem_module_exit)
+> MODULE_LICENSE("GPL");
+>-- 
+>2.43.0
+>
+>
 
