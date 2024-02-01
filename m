@@ -1,90 +1,155 @@
-Return-Path: <netdev+bounces-67746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67747-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65637844D9D
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:10:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB6B5844DA9
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:14:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2064A28F093
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 00:10:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77C00289941
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 00:14:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E66372;
-	Thu,  1 Feb 2024 00:10:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48282374;
+	Thu,  1 Feb 2024 00:14:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f7f0vBpP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tbrgd0qG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FD90184
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 00:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E35A37C;
+	Thu,  1 Feb 2024 00:14:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706746225; cv=none; b=PfKxtgYieu4eqDwIcAbUft98geaqYaYVqpeiX8cq7fVnYs4o8Q6r1duryQacySXk4PQCq76tJF9enVufb+OUgyUmMUV+gPuRg86y2MHhWOTepaDZBcgX55nUTwF2iV/iFfIEvooFYB6lBCTfzaqqEIf1FZmOfjY///a9uDK7PnQ=
+	t=1706746454; cv=none; b=kzdJMc3A/yZnIzPyqi+O2QQIm+5zhXGLUuR1LVlm9Ma+LTSXOumHlMLOJonJrcQIygBvEVG2lsP/BzRKVVcvEFMKzp9DTPTZ7+e7ct0gN9toShPERcNOu9qV3fnqceFMQFoEyjAfmKoZlMS2O0N9NN4XB1C0h0S28QDkRYM3+I8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706746225; c=relaxed/simple;
-	bh=oUwgQllIveGvw3jSh50dqKHf2YsQ2L46fCnnRBo7RfI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pUXd6naF+csaYWBN1wK1bPFrm7opcJoE7cJ0oEaGrsHQV5oMz/l30z5DDVaDgE7RpgjC/E9Kbl2YbbH86udN2someTk7cmFtdbdnfxGtG+XsSlJ7swQsQHlScql8FTZTMBdzNBav5pCdFfR/5JI+yiIwDNPOSXGW7xRpr34Eo98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f7f0vBpP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7BA93C43390;
-	Thu,  1 Feb 2024 00:10:24 +0000 (UTC)
+	s=arc-20240116; t=1706746454; c=relaxed/simple;
+	bh=UYG+bMN6gA1Ij16eOnxlASAzV3Xla9f4HQGKMwAR6is=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=eZ7PZY6/CT6ghbtpJaosZNSurINjBLW6jMW2sh7zNqY14pIUrKf6SvZWplcAbuZlbWCODgpP0zfHlf2apF78RxcR7OEyT+9aBYrVwAffaPrteHwjbiFYrIWgh7wScGXGgFPM11YIpA3phkyMqfpPfWvpbVn/GOam/CSHFwwCBOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tbrgd0qG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2406AC433F1;
+	Thu,  1 Feb 2024 00:14:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706746224;
-	bh=oUwgQllIveGvw3jSh50dqKHf2YsQ2L46fCnnRBo7RfI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=f7f0vBpPl+eefrUVNy604JK6ip8o6RijBUhBZlWKG0ORXf804KvpIOEoxNtchEbOz
-	 v7U1Q6DGkRZeFFQCkFIIaTObYcqaV7/tkjV2s3FRAo659zO5JpYXv8huBvY1AjeGvs
-	 THJsRbSbiWyM85k6dSGa75CdhV6yFX8XAtYGWp3xpTIVALorcG+qtfruv0wldb7CnM
-	 QiO7K0/FajK07OSfC2qq21mRgkz1bleHORyX1qg1iFxoPaxkhWUQl/V2SVQ/Wm+c/3
-	 pgAB2UQwyOLygabxSD91E9fudACSO0Bf6yqogjrvOKIWelX7/dtOmM0mVyyeqJOIfe
-	 4sDKl35HmzsGA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 580ABC4166F;
-	Thu,  1 Feb 2024 00:10:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1706746453;
+	bh=UYG+bMN6gA1Ij16eOnxlASAzV3Xla9f4HQGKMwAR6is=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Tbrgd0qGQ82NEm2jHe0rpSSX9NBFwIaCQfe/P3IwOZW8ZYq4NJHN/ZRFwRQIvr7+I
+	 sGdzVJdFfG7QiCH21lugyVCDqzf7SonMXoQsi3jq61YyWbd9RWweUHG1ssg0QnUAvC
+	 peoIS3A1Y56J8pmHdCZnlmy9AvGQmG/Myq1oGnlNplYV7M4YnzGkXN1KpfDip8BZBZ
+	 BK2ixEdJEgCvMylk8Ef9xHjnU0bKfsc1Vu5n/Ak7vavEDqfJkFZiKnnKJIZ2YwPs1m
+	 amTu1JuwIl+M1pWqGBNGqKEOD++2B5x/KdCu3eS8xwtSxL4olZnLlYgWgIVR0Cc+fz
+	 k/UPLUzb6ez+g==
+Date: Wed, 31 Jan 2024 16:14:06 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <hgani@marvell.com>, <vimleshk@marvell.com>, <sedara@marvell.com>,
+ <egallen@redhat.com>, <mschmidt@redhat.com>, <pabeni@redhat.com>,
+ <horms@kernel.org>, <wizhao@redhat.com>, <kheib@redhat.com>,
+ <konguyen@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, "Jonathan Corbet" <corbet@lwn.net>,
+ Veerasenareddy Burru <vburru@marvell.com>, "Satananda Burla"
+ <sburla@marvell.com>, Shannon Nelson <shannon.nelson@amd.com>, "Tony
+ Nguyen" <anthony.l.nguyen@intel.com>, Joshua Hay <joshua.a.hay@intel.com>,
+ Rahul Rameshbabu <rrameshbabu@nvidia.com>, Brett Creeley
+ <brett.creeley@amd.com>, Andrew Lunn <andrew@lunn.ch>, Jacob Keller
+ <jacob.e.keller@intel.com>
+Subject: Re: [PATCH net-next v5 1/8] octeon_ep_vf: Add driver framework and
+ device initialization
+Message-ID: <20240131161406.22a9e330@kernel.org>
+In-Reply-To: <20240129050254.3047778-2-srasheed@marvell.com>
+References: <20240129050254.3047778-1-srasheed@marvell.com>
+	<20240129050254.3047778-2-srasheed@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] ip: remove non-existent amt subcommand from usage
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170674622435.5414.5096091905930057925.git-patchwork-notify@kernel.org>
-Date: Thu, 01 Feb 2024 00:10:24 +0000
-References: <20240127164508.14394-1-yedaya.ka@gmail.com>
-In-Reply-To: <20240127164508.14394-1-yedaya.ka@gmail.com>
-To: Yedaya Katsman <yedaya.ka@gmail.com>
-Cc: netdev@vger.kernel.org, ap420073@gmail.com, dsahern@gmail.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Sun, 28 Jan 2024 21:02:47 -0800 Shinas Rasheed wrote:
+> +static int octep_vf_stop(struct net_device *netdev)
+> +{
+> +	struct octep_vf_device *oct = netdev_priv(netdev);
+> +
+> +	netdev_info(netdev, "Stopping the device ...\n");
+> +
+> +	/* Stop Tx from stack */
+> +	netif_tx_stop_all_queues(netdev);
 
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+netif_tx_disable() stops queues, IIRC. You seem to stop them twice.
 
-On Sat, 27 Jan 2024 18:45:08 +0200 you wrote:
-> Commit 6e15d27aae94 ("ip: add AMT support") added "amt" to the list
-> of "first level" commands list, which isn't correct, as it isn't present
-> in the cmds list. remove it from the usage help.
-> 
-> Fixes: 6e15d27aae94 ("ip: add AMT support")
-> Signed-off-by: Yedaya Katsman <yedaya.ka@gmail.com>
-> 
-> [...]
+> +	netif_carrier_off(netdev);
+> +	netif_tx_disable(netdev);
 
-Here is the summary with links:
-  - ip: remove non-existent amt subcommand from usage
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=327741c6e8ed
+You haven't masked any IRQ or disabled NAPI. What prevents the queues
+from getting restarted right after this call?
 
-You are awesome, thank you!
+> +static void octep_vf_tx_timeout(struct net_device *netdev, unsigned int txqueue)
+> +{
+> +	struct octep_vf_device *oct = netdev_priv(netdev);
+> +
+> +	queue_work(octep_vf_wq, &oct->tx_timeout_task);
+> +}
+
+I don't see you canceling this work. What if someone unregistered
+the device before it runs? You gotta netdev_hold() a reference.
+
+> +err_register_dev:
+> +err_mbox_version:
+> +	octep_vf_delete_mbox(octep_vf_dev);
+> +err_setup_mbox:
+> +	octep_vf_device_cleanup(octep_vf_dev);
+> +err_octep_vf_config:
+> +	free_netdev(netdev);
+> +err_alloc_netdev:
+> +	pci_release_mem_regions(pdev);
+> +err_pci_regions:
+> +err_dma_mask:
+> +	pci_disable_device(pdev);
+> +	dev_err(&pdev->dev, "Device probe failed\n");
+> +	return err;
+> +}
+
+Name the labels after what you're jumping to, please.
+It's so much easier to make sure the code is correct that way.
+
+> +static int __init octep_vf_init_module(void)
+> +{
+> +	int ret;
+> +
+> +	pr_info("%s: Loading %s ...\n", OCTEP_VF_DRV_NAME, OCTEP_VF_DRV_STRING);
+> +
+> +	/* work queue for all deferred tasks */
+> +	octep_vf_wq = create_singlethread_workqueue(OCTEP_VF_DRV_NAME);
+
+Is there a reason this wq has to be single threaded and different than
+system queue? All you schedule on it in this series is the reset task.
+
+> +	if (!octep_vf_wq) {
+> +		pr_err("%s: Failed to create common workqueue\n",
+> +		       OCTEP_VF_DRV_NAME);
+> +		return -ENOMEM;
+> +	}
+> +
+> +	ret = pci_register_driver(&octep_vf_driver);
+> +	if (ret < 0) {
+> +		pr_err("%s: Failed to register PCI driver; err=%d\n",
+> +		       OCTEP_VF_DRV_NAME, ret);
+> +		return ret;
+> +	}
+> +
+> +	pr_info("%s: Loaded successfully !\n", OCTEP_VF_DRV_NAME);
+
+One message when driver is loaded is probably fine, but two is really
+pushing it. Please don't spam the logs.
+
+> +	return ret;
+> +}
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
