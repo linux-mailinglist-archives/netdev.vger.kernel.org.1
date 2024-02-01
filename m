@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-68073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0149F845BED
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:44:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8536845BFD
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:46:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 93AB11F245B9
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 15:44:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2FD25B2E371
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 15:45:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8636D779FA;
-	Thu,  1 Feb 2024 15:43:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B61066217F;
+	Thu,  1 Feb 2024 15:45:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bsTa/PUR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gMzApyKU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f46.google.com (mail-qv1-f46.google.com [209.85.219.46])
+Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC704626C3;
-	Thu,  1 Feb 2024 15:43:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B5F062179;
+	Thu,  1 Feb 2024 15:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706802208; cv=none; b=F7FECmIv3aqBdzdAqcQWj5i1Ge1gNQTbRelBP5j/XKR7c7GKbbjWqq/Sd+hXkEw32Y7G0yDEKKyGYTB3VtSIN+wFqAA5VENGAWbiVLnpjPg76r/tVQcJE0+CgK50FSL+esCrRO7vZQLm9jj3ESt2IJiYtjhN/h2fqqEkOvACEd4=
+	t=1706802330; cv=none; b=Ej2r6KQRRhfDrlLyqEnitfiqEvGpqedG0MhStST7w8EjiWKs6xjtUKLo+q6hVZMnSKE8DY3JZgIS1TyqJc7vGAtE1GURInFdyyvAqo98m4iFBov9GOP1Uc5gPvipq7o23M8rTD4fklUoorjA9Jvdmz+Nqpf1Gd2FTx5KWEnudDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706802208; c=relaxed/simple;
-	bh=j99reKCwRyXseO7+0KwcycRiHYsC+7kzPqhM+tn/SsI=;
+	s=arc-20240116; t=1706802330; c=relaxed/simple;
+	bh=Z7grpuTnkWfFVJfpJEHnYuRJbJeM6STBD+XYX9rbdGE=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Wml5oZAVg/rihl62Oid34+FYuwNTxi5bVhZTD0JWBtX68k1NWsDT4TOFkDZf73/6ZgJuY3NFrQmtE16hYaR/+SKU6m19q2mNu+hub/vRuTxqWKn4Tv0gW66sVZfX/DPsZFMIu6t0250waVQlVikBHNabpevujaLNcibDsIAf6+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bsTa/PUR; arc=none smtp.client-ip=209.85.219.46
+	 Mime-Version:Content-Type; b=aszV/d3tqhAtP+qduQ6JVPmBQg5ivfjZ4MjGr/8Ht0k9YlF7/8Ant69Qf9NOHK9wmMkROj6PmIru/QMbBihxh2ZGUU6jqMZ/Ey3RmY++jNcEgeuzuqo2oSCWkurVKNjB1/ggjt/n7KeJebEiSi6HaTKekMLy0dZ4TeO8B/JaESg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gMzApyKU; arc=none smtp.client-ip=209.85.222.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f46.google.com with SMTP id 6a1803df08f44-686a92a8661so5982226d6.0;
-        Thu, 01 Feb 2024 07:43:26 -0800 (PST)
+Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-78541a1c5b0so94944885a.1;
+        Thu, 01 Feb 2024 07:45:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706802206; x=1707407006; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706802328; x=1707407128; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IGJSIkR2dvNRRMJHxM9e8OJOgNv6ZtO/1x+1Cqwz0po=;
-        b=bsTa/PUR/Vjt8qCkZsCxNAJuWj+WrC594N735O4EVYbTTlrxqbFNEB6E/v1gs0vZMN
-         vALI9RWBdqh2oSNfZJ3gsxgpMnOSQdarPfXhFank0sFeJIJVZ4MOn+DSzcEsa/zopgFi
-         22XdsNoOLrcBISUkrzOAgpOJ/xfMB5WJFVxvqaVskmac2IzWN85nUw6WabQiz9a72H20
-         zw2fvj8Z08Y0PB3QfyG7KUgonMYaioDAuH3sUUhXAnzeS94GPAbeGFHzvkh4vFooFcYt
-         BqZEnsubqkIA9mulJAcqUtVmkFD+WlSmmrYqPN2wiPdKo+AVGHccwl5aRbMSzajaYwV5
-         NE6w==
+        bh=TRYameA8P9vTXgG9HemCHAMfbe9mX6cBUyZCuN/wnZQ=;
+        b=gMzApyKU2xkVdmW1dm0Fw/YOXxYJcvNqBHg8GkgT0/wFi/MLj7rj+If0hYA6/h+UUE
+         eF8GaLgu0E64aV5pKRErkGa4QdoYneOAkFoH/+9ypKaEplvyCGOu6s9qRKk+7Cc+rZZS
+         bajJws02yCcy9M5UrCwgnvWAnEsZIYRrAUleyYWyOl321izT3wqMWl7hGsQeUdiHutv/
+         D8VYti/vbatHAkOQh/vmd3/fS5UHC0rrPZDk2PQuI+bZTDVuj15nYenqGsUhxj4egB2/
+         m5WJ1p93D33vjNu9CwOobLWeD3Ct5sjiVG/QCim6IfvFi7SriEV1+AIstxQ/wO3filbP
+         7ayg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706802206; x=1707407006;
+        d=1e100.net; s=20230601; t=1706802328; x=1707407128;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=IGJSIkR2dvNRRMJHxM9e8OJOgNv6ZtO/1x+1Cqwz0po=;
-        b=RLqZzdVMa/hV9RSWI0UqHqYlyRiRqi90jEt6vIyP5E9AawvM8j7BtBjXAevO7EgcJL
-         Lrp7iBy9lBs4O4TwocilKMDxyZfDakfKORkyXkGmRXGL//ygsx8aZ3rY0iAC7ZfthqKM
-         nhsMkbluoTc4n2h0F0YzKDON6Fd1dKk5KWn52T9I2lKrJwdpNhjmn279DdpiD0FjP9yY
-         tuOnGvBDSuDD8bFA1kEIFdu5W5Yb5ddWcKGK62YpFYWgtHuPluoBUFynuzHmEEbBWa3H
-         rz8UKfTTGGmtv2i6To/A21v+Xp1txQdlOvIOQSXV7TWnOdA+9geSt68lufDNvu4TmEgZ
-         0lHw==
-X-Gm-Message-State: AOJu0Yxaa/dT15IkS48Gzw31G6QTqHWzyJ+fLBTZnPV4YoTSnuJx/eGu
-	5w3V08KUXj+xylUKOXxj3Alp/fVbzaUVWCfTDco20ZY4sj6NypRE
-X-Google-Smtp-Source: AGHT+IGzJaJU+bUSPwjIjMdQGwyFoZWguU4RABNcHeN6pre9iCalIHrbytMdU30/1BTKsgnrY0Scaw==
-X-Received: by 2002:ad4:5968:0:b0:680:f683:c7c3 with SMTP id eq8-20020ad45968000000b00680f683c7c3mr6250336qvb.26.1706802205710;
-        Thu, 01 Feb 2024 07:43:25 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVBsfF7vDPMQjUv6D8D1TCxE6vkP/Lt0CkL78PzD5ichT2AGaHdohDRv1TFPMivvr67dM1LYuz3N8oAoGuJZOE4sG6OZhwm9rVrZrKF4Fzv9zLdhKQALuUdpJlrZwl8HlqLoqmxLgOKWxnWeEGe+l1I+NP49TEZ0zor5OGkGqwZXFz6Lzce5TBOQTLejeKMZI47R6hAkfToRRFZGJOhGgu7qYoPR8oJZtTyMtHa7arSspnRBDMAvb5CPpE1DdU=
+        bh=TRYameA8P9vTXgG9HemCHAMfbe9mX6cBUyZCuN/wnZQ=;
+        b=KWeXB1b2G2LN+MSIZDWcz+KZAD3kPCQZV82Sig4d4MUGvL46TQVwpew+h5fZbkgvuP
+         LwhPxoLe5xcvGbSjH3h3vK/Z3uC++su0IBe7saYpWEYPSN8+bV5rETj4xpawnolJqPFw
+         9enRVsPAGiCrknBqq+8TFsGcX7FZ/k0sbbWAnV0hnnKoeP4ATAQIIGzDXBeGgNI4iooy
+         k4dPM6t66ZZWbCyq8lDM8EX3FbPTjYXW3nqbxc4PL0+31fezpRDeesJqk0myYPybaqHN
+         6RHagl84F3Szgy/OiSA0PL0W/RLhDCsOFbLFSPevMffeYqkDxMp9pS3dOYDHyYU9hHcH
+         pa3w==
+X-Gm-Message-State: AOJu0YytG8oNeF6b3eQ3KJ7N2NbhNR4uk45SGXVjebzh9rN+PlrH04EN
+	wz9UBnQH6zGdO9qvBLQoC64QzOy4uvhqWeQSLmK5FXcOOSybH9Gv
+X-Google-Smtp-Source: AGHT+IHCapveW9Z+WVICc3gK1566k5UpTCufzT41ynBu6bgBVsin3omVtIFzcRED7quhZ6zn0UN0OQ==
+X-Received: by 2002:a05:6214:ca9:b0:68c:444e:2bea with SMTP id s9-20020a0562140ca900b0068c444e2beamr10980669qvs.6.1706802327993;
+        Thu, 01 Feb 2024 07:45:27 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVzP82+zqH4asKF1TXjBCPmdvUPfZGCQZdxMx7IrOgib7g8sWGEqLpHs1tq0wDY/DK/k60zGnZr6PCpwXaWWbl08pRvEXdW3+SM5yCM8VF6BQd3GJHzwwmCggCc75efyqn3+4QjAULRgXjCrd48PFB4kiCfVx6s2A5IhXDn6La9gHGE3fpAstCwuTD4ovCaUy8nZGTHRJDFwIZIi0HOnIQh4OT5woUBTfIQnbFuqZRnOIy4fTIY1iioMn8cyow=
 Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
-        by smtp.gmail.com with ESMTPSA id b27-20020a05620a119b00b00783dc450d84sm5359896qkk.12.2024.02.01.07.43.25
+        by smtp.gmail.com with ESMTPSA id mc8-20020a056214554800b0067f2559fd5esm6641056qvb.34.2024.02.01.07.45.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 07:43:25 -0800 (PST)
-Date: Thu, 01 Feb 2024 10:43:25 -0500
+        Thu, 01 Feb 2024 07:45:27 -0800 (PST)
+Date: Thu, 01 Feb 2024 10:45:27 -0500
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 To: Yunjian Wang <wangyunjian@huawei.com>, 
  willemdebruijn.kernel@gmail.com, 
@@ -78,10 +78,10 @@ Cc: netdev@vger.kernel.org,
  linux-kernel@vger.kernel.org, 
  xudingke@huawei.com, 
  Yunjian Wang <wangyunjian@huawei.com>
-Message-ID: <65bbbc1d2e236_222699294f4@willemb.c.googlers.com.notmuch>
-In-Reply-To: <1706789109-36556-1-git-send-email-wangyunjian@huawei.com>
-References: <1706789109-36556-1-git-send-email-wangyunjian@huawei.com>
-Subject: Re: [PATCH net-next] tun: Implement ethtool's get_channels() callback
+Message-ID: <65bbbc9776ea4_2226992949c@willemb.c.googlers.com.notmuch>
+In-Reply-To: <1706793792-20928-1-git-send-email-wangyunjian@huawei.com>
+References: <1706793792-20928-1-git-send-email-wangyunjian@huawei.com>
+Subject: Re: [PATCH net-next] tun: Fix code style issues in <linux/if_vlan.h>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,47 +93,15 @@ Content-Type: text/plain;
 Content-Transfer-Encoding: 7bit
 
 Yunjian Wang wrote:
-> Implement the tun .get_channels functionality. This feature is necessary
-> for some tools, such as libxdp, which need to retrieve the queue count.
+> This fixes the following code style problem:
+> - WARNING: please, no spaces at the start of a line
+> - CHECK: Please use a blank line after
+>          function/struct/union/enum declarations
 > 
 > Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
 > ---
->  drivers/net/tun.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index afa5497f7c35..7cf448ff93ee 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -3638,12 +3638,22 @@ static int tun_set_coalesce(struct net_device *dev,
->  	return 0;
->  }
->  
-> +static void tun_get_channels(struct net_device *dev,
-> +			     struct ethtool_channels *channels)
-> +{
-> +	struct tun_struct *tun = netdev_priv(dev);
-> +
-> +	channels->combined_count = tun->numqueues;
-> +	channels->max_combined = MAX_TAP_QUEUES;
+>  include/linux/if_tun.h | 16 +++++++++++++---
 
-Conditional on IFF_MULTI_QUEUE?
-
-> +}
-> +
->  static const struct ethtool_ops tun_ethtool_ops = {
->  	.supported_coalesce_params = ETHTOOL_COALESCE_RX_MAX_FRAMES,
->  	.get_drvinfo	= tun_get_drvinfo,
->  	.get_msglevel	= tun_get_msglevel,
->  	.set_msglevel	= tun_set_msglevel,
->  	.get_link	= ethtool_op_get_link,
-> +	.get_channels   = tun_get_channels,
->  	.get_ts_info	= ethtool_op_get_ts_info,
->  	.get_coalesce   = tun_get_coalesce,
->  	.set_coalesce   = tun_set_coalesce,
-> -- 
-> 2.33.0
-> 
-
+Subject: s/if_vlan/if_tun/
 
 
