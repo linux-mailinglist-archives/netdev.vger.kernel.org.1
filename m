@@ -1,114 +1,109 @@
-Return-Path: <netdev+bounces-68111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 059FB845DAE
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:49:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5957845DFE
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:01:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B639328E130
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:49:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B1F1B3231A
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:53:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9913E1FDB;
-	Thu,  1 Feb 2024 16:49:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A9153AE;
+	Thu,  1 Feb 2024 16:53:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="g6dK53CM"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EmLlI3ii"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B13AD4C6C;
-	Thu,  1 Feb 2024 16:49:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 967047E0FD
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 16:53:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706806166; cv=none; b=MwXePXUTOkhgIhIXO3LJPxhgUYFT7DdHGMsE6j/+d9gtGg5WkQ/eInO655af5NF0YGfBEf6cV+KmyGV0aKAEpHm8f6sBAYw5H8Kq3ZhRuMcU3Qs3yrRWm6hzQKcZICAEO4uv312ugGa9zi/fUokFR59lIf5Pi2fwmnj3PeBQ/NY=
+	t=1706806422; cv=none; b=SHzb/PmGob3N02ZMfSmbp8kUsTDmUyRUf+llJb9R+WsjJOyEz773qY//K5OCZYs63ayuhGAiPeHJLqntHe54JAoNeQtzNd+xbd2u/27C0EcB1AeSU2cDMrIX3+HV4YY+Kjzf3G22gZsydwssDRHGp9osWvPMb0GpUIv82x3V1G8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706806166; c=relaxed/simple;
-	bh=iNwIgCxueiSubhh6aaDWCe0zkEEitgzyfnX3oZSXMHw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RhguefMTYe2JI42QoUQNvIanIvS/BUIUMiZItb3vnUBBxI7JzXEJA9Mo1qpyGUHINhsyEBB2FK1h8XDFVm+xq7+Z/qBJOqkLwS4qf0o2Bh9GWVA6if7laLwr3RtyyxVl0SSkzr+fqQDskrrPc/nKpmF2JOrYC1PN3Te1b8e6LRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=g6dK53CM; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706806165; x=1738342165;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=iNwIgCxueiSubhh6aaDWCe0zkEEitgzyfnX3oZSXMHw=;
-  b=g6dK53CMcXhX7r7qO7MfyIcn9hjpP7fOoPtpyqySO20TeZ6kIqpVK3Y8
-   unYTnGjf6271OrzHcTVaWvxahqAOLYaWLkVxaGcYc2mAthjcfHD9Phnvy
-   Y2bDN9Dfv7cfe6zpPwRbrkHCJoFfRA2wlpyn/jOGxxckCjl7xQYwEBesM
-   ThjlYqwPSTLpnHkwxAvmc4DNNWQIDfURw9oMhkW+6CeOKx6XwB4LKFdYc
-   W2LZFotA3fpxKb6+vknNtP2A8dh7GsDbmhbb+gcI2XXjA9KS0JQo1wNDf
-   NihB8k+NUTf3F/w8q+YOodjDUTbbpgbAIDZ+aq/Z07pW3lsuvyCN19Exg
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="11041377"
-X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
-   d="scan'208";a="11041377"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 08:49:24 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="822962532"
-X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
-   d="scan'208";a="822962532"
-Received: from cacasing-mobl1.amr.corp.intel.com (HELO [10.209.102.228]) ([10.209.102.228])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 08:49:23 -0800
-Message-ID: <468e87a2-c50f-4146-8519-16b4317313e6@linux.intel.com>
-Date: Thu, 1 Feb 2024 08:49:23 -0800
+	s=arc-20240116; t=1706806422; c=relaxed/simple;
+	bh=Z0EiL8rTbtpj+Srs33vaEyBR/q+0IWvfO3k0kCgLqCM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tz7yjF+1RZ0kss3fEshyI+txrmp7CWY7+nL4mB/Xd6ya5kjKzYpsaYjVZWb+R/bentk+6swZh78f+Rb+tUN1cZUbPmWI6MurThsLHlkZOVLQQ0gxhv55MJIjLb6zm/yqa5eBTpxFak08XReYF+OAKw4az+rZ5fi5dq35pAscAq0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EmLlI3ii; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706806419;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=3IvH3mK50SvQqfHcbj4T812S5eHoNhmat3eDxm2vKfw=;
+	b=EmLlI3iiYcCKstIgXJipi9lnxNokedYoA5krD3tTOqgKvu5+BTGvxAwLDXVepaxmaPx2f8
+	Zc0nI1gezJZ8Dh2Vtfn7d7PDe+7xCs0AlwGlPUtxGqOlHwtRHr9bNZo/Di/r+PFiJYTWJf
+	Y9VDAFtfdOGtj9+jbmjEyuOsnzbQkl8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-657-D2CzUNRPNDimzwqdOyeF8g-1; Thu, 01 Feb 2024 11:53:34 -0500
+X-MC-Unique: D2CzUNRPNDimzwqdOyeF8g-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8D512835381;
+	Thu,  1 Feb 2024 16:53:33 +0000 (UTC)
+Received: from dcaratti.users.ipa.redhat.com (unknown [10.45.226.26])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D43B3492BE7;
+	Thu,  1 Feb 2024 16:53:30 +0000 (UTC)
+From: Davide Caratti <dcaratti@redhat.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	Ilya Maximets <i.maximets@ovn.org>
+Subject: [PATCH net-next v2 0/2] net: allow dissecting/matching tunnel control flags  
+Date: Thu,  1 Feb 2024 17:51:42 +0100
+Message-ID: <cover.1706805548.git.dcaratti@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/8] platform/x86/intel/sdsi: Set message size during
- writes
-Content-Language: en-US
-To: "David E. Box" <david.e.box@linux.intel.com>, netdev@vger.kernel.org,
- ilpo.jarvinen@linux.intel.com
-Cc: linux-kernel@vger.kernel.org, platform-driver-x86@vger.kernel.org
-References: <20240201010747.471141-1-david.e.box@linux.intel.com>
- <20240201010747.471141-2-david.e.box@linux.intel.com>
-From: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>
-In-Reply-To: <20240201010747.471141-2-david.e.box@linux.intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
+Ilya says: "for correct matching on decapsulated packets, we should match
+on not only tunnel id and headers, but also on tunnel configuration flags
+like TUNNEL_NO_CSUM and TUNNEL_DONT_FRAGMENT. This is done to distinguish
+similar tunnels with slightly different configs. And it is important since
+tunnel configuration is flow based, i.e. can be different for every packet,
+even though the main tunnel port is the same."
 
-On 1/31/24 5:07 PM, David E. Box wrote:
-> New mailbox commands will support sending multi packet writes and updated
-> firmware now requires that the message size be written for all commands
+ - patch 1 extends the kernel's flow dissector to extract these flags
+   from the packet's tunnel metadata.
+ - patch 2 extends TC flower to match on any combination of TUNNEL_NO_CSUM,
+   TUNNEL_OAM and TUNNEL_DONT_FRAGMENT.
 
-Can you include some spec reference to new mailbox commands?
+v2:
+ - use NL_REQ_ATTR_CHECK() where possible (thanks Jamal)
+ - don't overwrite 'ret' in the error path of fl_set_key_flags()
 
-What about updated firmware mean? Like a particular version?
+Davide Caratti (2):
+  flow_dissector: add support for tunnel control flags
+  net/sched: cls_flower: add support for matching tunnel control flags
 
-> along with the packet size. Since the driver doesn't perform writes larger
-> than the packet size, set the message size to the same value.
->
-> Signed-off-by: David E. Box <david.e.box@linux.intel.com>
-> ---
->  drivers/platform/x86/intel/sdsi.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/drivers/platform/x86/intel/sdsi.c b/drivers/platform/x86/intel/sdsi.c
-> index 556e7c6dbb05..a70c071de6e2 100644
-> --- a/drivers/platform/x86/intel/sdsi.c
-> +++ b/drivers/platform/x86/intel/sdsi.c
-> @@ -252,6 +252,7 @@ static int sdsi_mbox_cmd_write(struct sdsi_priv *priv, struct sdsi_mbox_info *in
->  		  FIELD_PREP(CTRL_SOM, 1) |
->  		  FIELD_PREP(CTRL_RUN_BUSY, 1) |
->  		  FIELD_PREP(CTRL_READ_WRITE, 1) |
-> +		  FIELD_PREP(CTRL_MSG_SIZE, info->size) |
->  		  FIELD_PREP(CTRL_PACKET_SIZE, info->size);
->  	writeq(control, priv->control_addr);
->  
+ include/net/flow_dissector.h | 11 ++++++++
+ include/uapi/linux/pkt_cls.h |  3 +++
+ net/core/flow_dissector.c    | 13 +++++++++-
+ net/sched/cls_flower.c       | 50 +++++++++++++++++++++++++++++++++++-
+ 4 files changed, 75 insertions(+), 2 deletions(-)
 
 -- 
-Sathyanarayanan Kuppuswamy
-Linux Kernel Developer
+2.43.0
 
 
