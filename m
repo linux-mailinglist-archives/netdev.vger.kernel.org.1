@@ -1,151 +1,104 @@
-Return-Path: <netdev+bounces-67884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCDD68452DF
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 09:38:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ADD58452DC
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 09:38:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BE541C21246
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:38:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2DE73B22A0A
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:38:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C864915A498;
-	Thu,  1 Feb 2024 08:38:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A4F15A48D;
+	Thu,  1 Feb 2024 08:38:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="vUOaJTXw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cupDJHKg"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05B7158D8B;
-	Thu,  1 Feb 2024 08:38:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C10615957F
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 08:38:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706776719; cv=none; b=jtzKHNT5wO4yn/JZMOLmm55CHhqq3VcS4ljdlKtrWLDrzuryPnzVkEDnPTZ1WyOCX6hZhOvdbHqe8VdxZNOU8pHUvlVseg8S7dcjiysTy7vPbapXKyUnEC2uuXk2arMw3lBQTZ4lyWw8L+Ah8gNYM2VdGtRi//dcatd/CPVjHsM=
+	t=1706776701; cv=none; b=VCoQh4+Sgn59nwolTFfJax3uJNaZlSSEreFdi0t8RNl36IFyvZXr/XduH8NmUSXWZZZXbWsYDtBP5GF78yI1NDS47SRy6YH2PUWAJrWhzVC8hhN075wphXfBjhv5hL0nPAn6hQEeEg6txU2Qh9RvQjzkvSABztCVBlYwwrNl+6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706776719; c=relaxed/simple;
-	bh=vKbbomgjgBcY5l3J5iDAD1fwuBRayq3H73ZqACqcsOA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JHj1RG1clOWttvAAglkQk8jOB+DJjM3G2LEXJKVrcR6ry8L8eGmL9Q5bLzmIVnCewbjmz0rKt4pUBbSLvsc9Bk+zPnBtHCXEEN9lNppLse9fil4tcmEAKqQnPY3+osfWGOd0PXLZpD21KdP78RCIrY1NAXtSF9XFnjAIwiCdBS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=vUOaJTXw; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rrEM/L5CNb2Siaw0EtzA1uq6MEwvjM+ooAg4sDv+6Ys=; b=vUOaJTXwWrDwPbjOYcQMYs5ISg
-	vTGHLnDbiExdxCQU4+KTNPIU0vo8RUyQ92hzTz7icFpYBaS+dkVlGJPjkk0EWKQ3HSrTFCJB++nR2
-	7Aqg2M5Ejz5EUOn9yVorOeWvzHkLg8tTSHtgvny4nV3L4Zu1aEsQsALg3kraGBvpB07iF0i2h9Ho2
-	BjBcJ9Nr6VKJvSqEu4SvgsXcX67dpfHtE1vY56zz+LBPek48+qvQ38c/NqAo26nxZczitbF9m84Tv
-	I9o63J9fpzCon81R3y7mgJvCKpSoiJ9Pqv+yR74mPmdZjG2ujzxls78qpTyAvI1sYV7rCA2INc7Tk
-	9YtOja1g==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35708)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rVSaG-0004IS-19;
-	Thu, 01 Feb 2024 08:38:08 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rVSa9-0007FA-KA; Thu, 01 Feb 2024 08:38:01 +0000
-Date: Thu, 1 Feb 2024 08:38:01 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Cc: Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
-	David E Box <david.e.box@linux.intel.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Mark Gross <markgross@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	Serge Semin <fancer.lancer@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	platform-driver-x86@vger.kernel.org, linux-hwmon@vger.kernel.org,
-	bpf@vger.kernel.org, Voon Wei Feng <weifeng.voon@intel.com>,
-	Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
-	Lai Peter Jun Ann <jun.ann.lai@intel.com>,
-	Abdul Rahim Faizal <faizal.abdul.rahim@intel.com>
-Subject: Re: [PATCH net-next v4 06/11] net: stmmac: resetup XPCS according to
- the new interface mode
-Message-ID: <ZbtYaXkNf2ZF1prE@shell.armlinux.org.uk>
-References: <20240129130253.1400707-1-yong.liang.choong@linux.intel.com>
- <20240129130253.1400707-7-yong.liang.choong@linux.intel.com>
- <ZbjNn+C/VHegH2t7@shell.armlinux.org.uk>
- <9e23671e-788c-4191-bdb4-94915ff7da5a@linux.intel.com>
+	s=arc-20240116; t=1706776701; c=relaxed/simple;
+	bh=UeDEbBS4ZCI5n4U/aoXtMkSEMN9vEAaDGmiMdoWBGEw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ThqkIIOsQFkNLMiIVTCS4pbGbFtrlu/Dw+GAPCCrX5xsRBHM0OftL3CrkgzwDY+jI8NIWTK1Vrqyf/zO9BU9f2vsRALwpajEy6wkN6j+CEenHjJtokU70Fnuw79H7VWclBlOl7P0dvulmKQuU0UfWTFvcgAjPQk9TDKSGuzJbMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cupDJHKg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E884C433F1;
+	Thu,  1 Feb 2024 08:38:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706776700;
+	bh=UeDEbBS4ZCI5n4U/aoXtMkSEMN9vEAaDGmiMdoWBGEw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=cupDJHKgjzXOxEfkzQBOgEf5QZWbZOC7nIDPf2U4oAuu9pvwdHKv9AVuegv+fUaZ0
+	 Yj+qDbeSsgChuwxJ2/MipiEteowsTFCh7FsLiV1+elgjANNP5c256QiW/rQ+MNxeFE
+	 Bo+vpjBkbjqNQpNnd2Xq0NULGa7U5HfOIwIoC0h+Hx8eyK8eo2Oa4pC5oFDpQ1BM/Q
+	 jpmKCZ8XU+uEDSz7NDSxPFi1JjCSLvwsSv+59ENK8bA+U+VPneTQ8dV3rQHkSPMT//
+	 QZnD2V3PV+RaNphgl1xrD/LDa3Z4KHcQHtHVOrHRI6ra7/qpsxfq6zzP29gJZurDi3
+	 XsJxF/E4aW/mg==
+From: Antoine Tenart <atenart@kernel.org>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com
+Cc: Antoine Tenart <atenart@kernel.org>,
+	netdev@vger.kernel.org
+Subject: [PATCH net] tunnels: fix out of bounds access when building IPv6 PMTU error
+Date: Thu,  1 Feb 2024 09:38:15 +0100
+Message-ID: <20240201083817.12774-1-atenart@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9e23671e-788c-4191-bdb4-94915ff7da5a@linux.intel.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 01, 2024 at 01:10:05PM +0800, Choong Yong Liang wrote:
-> 
-> 
-> On 30/1/2024 6:21 pm, Russell King (Oracle) wrote:
-> > NAK. Absolutely not. You haven't read the phylink documentation, nor
-> > understood how phylink works.
-> > 
-> > Since you haven't read the phylink documentation, I'm not going to
-> > waste any more time reviewing this series since you haven't done your
-> > side of the bargin here.
-> > 
-> Hi Russell,
-> 
-> Sorry that previously I only studied the phylink based on the `phylink.h`
-> itself.
+If the ICMPv6 error is built from a non-linear skb we get the following
+splat,
 
-From phylink.h:
+  BUG: KASAN: slab-out-of-bounds in do_csum+0x220/0x240
+  Read of size 4 at addr ffff88811d402c80 by task netperf/820
+  CPU: 0 PID: 820 Comm: netperf Not tainted 6.8.0-rc1+ #543
+  ...
+   kasan_report+0xd8/0x110
+   do_csum+0x220/0x240
+   csum_partial+0xc/0x20
+   skb_tunnel_check_pmtu+0xeb9/0x3280
+   vxlan_xmit_one+0x14c2/0x4080
+   vxlan_xmit+0xf61/0x5c00
+   dev_hard_start_xmit+0xfb/0x510
+   __dev_queue_xmit+0x7cd/0x32a0
+   br_dev_queue_push_xmit+0x39d/0x6a0
 
-/**
- * mac_select_pcs: Select a PCS for the interface mode.
- * @config: a pointer to a &struct phylink_config.
- * @interface: PHY interface mode for PCS
- *
- * Return the &struct phylink_pcs for the specified interface mode, or
- * NULL if none is required, or an error pointer on error.
- *
- * This must not modify any state. It is used to query which PCS should
- * be used. Phylink will use this during validation to ensure that the
- * configuration is valid, and when setting a configuration to internally
- * set the PCS that will be used.
- */
+Use skb_checksum instead of csum_partial who cannot deal with non-linear
+SKBs.
 
-Note the "This must not modify any state." statement. By reinitialising
-the PCS in this method, you are violating that statement.
+Fixes: 4cb47a8644cc ("tunnels: PMTU discovery support for directly bridged IP packets")
+Signed-off-by: Antoine Tenart <atenart@kernel.org>
+---
+ net/ipv4/ip_tunnel_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-This requirement is because this method will be called by
-phylink_validate_mac_and_pcs() at various times, potentially for each
-and every interface that stmmac supports, which will lead to you
-reinitialising the PCS, killing the link, each time we ask the MAC for
-a PCS, whether we are going to make use of it in that mode or not.
-
-You can not do this. Sorry. Hard NAK for this approach.
-
+diff --git a/net/ipv4/ip_tunnel_core.c b/net/ipv4/ip_tunnel_core.c
+index 586b1b3e35b8..80ccd6661aa3 100644
+--- a/net/ipv4/ip_tunnel_core.c
++++ b/net/ipv4/ip_tunnel_core.c
+@@ -332,7 +332,7 @@ static int iptunnel_pmtud_build_icmpv6(struct sk_buff *skb, int mtu)
+ 	};
+ 	skb_reset_network_header(skb);
+ 
+-	csum = csum_partial(icmp6h, len, 0);
++	csum = skb_checksum(skb, skb_transport_offset(skb), len, 0);
+ 	icmp6h->icmp6_cksum = csum_ipv6_magic(&nip6h->saddr, &nip6h->daddr, len,
+ 					      IPPROTO_ICMPV6, csum);
+ 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.0
+
 
