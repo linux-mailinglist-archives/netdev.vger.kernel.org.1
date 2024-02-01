@@ -1,400 +1,242 @@
-Return-Path: <netdev+bounces-68184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EA6C846088
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:01:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79BEC84608A
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:01:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B502BB2832A
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 19:00:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03A691F2419F
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 19:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31F2984FD8;
-	Thu,  1 Feb 2024 19:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4FA884FD3;
+	Thu,  1 Feb 2024 19:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LL1VmD2v"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="PtRqufRB"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57CB584FD6
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 19:00:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C781684FBF;
+	Thu,  1 Feb 2024 19:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706814037; cv=none; b=rSssFryilu8cYMtU7hegPmlE1fZdBJ0jvKLy0AWbqQi0twLmzkZX5/70xQ59x/eoKBBLI1I3/oRiMe8dWCwD1ajgi1N6REas6ZQLVcOOgz4g7IqhD6Ak9O3Z5Qwanabxl522qAaq+d7RH7WEehHhBkRd/jBFXaWrj4/WGgH2uWc=
+	t=1706814097; cv=none; b=gDfGdcgPSLKx7EUCTj07q9ZVDhmVjZHl/cDaTLbSVUmEmXGp1TnaBWNija8X6IhZ8T/iubaOj5i5JAIip4t/ms3flUaGaUCOnDJItf81HCjAXOwPz78uSLi1NZe9FQbbD9lspttbKUyVlfPzjs8Gd9IKEjFt7fQIU6GYtnEJark=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706814037; c=relaxed/simple;
-	bh=r9GAjnTvy1SIRls04p7XYXp+mU/J+UYn1yR6k3M3/7I=;
-	h=From:References:MIME-Version:In-Reply-To:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Pmhzs6l3YhG6KLejsATdZ1fOZvVk18IrwIQukHrMtX+Y5iQfXQnMdb1WX6vFh2n1R418tonYsfP97ZIYs3lA9/klApUdHpa/T6tVmoGgzKSY6LJrJ6ivqEYNVTYvqz6syM2xcNmMqIeu0VXpn8gzwWzqzA7PWrR418szoNdzk+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LL1VmD2v; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706814019;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=BRKR1h0PZnSsIUaQCl19SM8Yn3K4k9ZBF+b53dwy1ek=;
-	b=LL1VmD2vyaTtayvWS3AR4XTlvGUME3oyS1FqsO0fjvaLpZ3FinsOii3DY/p99QM0m1XYu4
-	YAXnONN7nPLAk1dBvtOM0KqEGUlhqpzY78vZaT7RSNvNqtbExrT3gUTQuw6byjU0Gmk3+P
-	nnTRCgOAfLrduHoOzbsUA0USQAMxhGw=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-528-TFEDcFY1NpOY5wSS2KATDA-1; Thu, 01 Feb 2024 14:00:17 -0500
-X-MC-Unique: TFEDcFY1NpOY5wSS2KATDA-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-558aafe9bf2so1120921a12.1
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 11:00:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706814016; x=1707418816;
-        h=cc:to:subject:message-id:date:in-reply-to:mime-version:references
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BRKR1h0PZnSsIUaQCl19SM8Yn3K4k9ZBF+b53dwy1ek=;
-        b=f0cu6Qoz/JG5wjRbSP7AS6Nl2a7SrJrgwCRQI1qoOVIeR7FVTwVMsFMWQzs75g+I/Z
-         RoZiJr+F2gTzuWx//hWGz1S8XqWrnYrstr6R6hC/O96JCypGDtNnQvAIB97k1+iPxqDO
-         V3FWND59Jo1+cOO75JLpBdqhiyFUIbgR7XTj8pk+tV2Scvnaj0PUOu921DV6h+gWrTGi
-         JXN7zHabO+heIIngzjm3yFCgcDfHKnRMZlF4bcbabcTQ+Db711kc4YWbGIHDb13Kjz3f
-         2VkPMSaX9/ae+25GO6Sc9KRDHECPYzui31I3eDgWlq4R/Ap4ToSH9i3U8h01WRyTgM92
-         JewA==
-X-Gm-Message-State: AOJu0YzhBfMUvDqoFEJsw6ehkq2ss4wICGQRYDzhNDelegssn4SnCWw6
-	24T8f2r5fJ4stNVikBEjMLFggwUWuvnuoWpKMuWZ/uACNfBlPwM0sNp2/PfR4yxUPpRXv9W2aqQ
-	GUhWN194kZ/wr5eBOdFxKgpgkmB2XUolrwFYaOpf0tcAiZmj/qemZCRYGS43+qeP2hv0GOi5ptk
-	eyF69yW8wIjEGch9UlBky8ZXj1S/hI
-X-Received: by 2002:aa7:c1d9:0:b0:55f:1ef6:48d6 with SMTP id d25-20020aa7c1d9000000b0055f1ef648d6mr2324286edp.35.1706814016535;
-        Thu, 01 Feb 2024 11:00:16 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH5aIySRM7JKihk1YL+nfmrN0MInvb99Qlsm5Rsn1wixR+fYu5keNYInj+igejLtF/08KX6OWrwyeCtoBBPiek=
-X-Received: by 2002:aa7:c1d9:0:b0:55f:1ef6:48d6 with SMTP id
- d25-20020aa7c1d9000000b0055f1ef648d6mr2324266edp.35.1706814016179; Thu, 01
- Feb 2024 11:00:16 -0800 (PST)
-Received: from 753933720722 named unknown by gmailapi.google.com with
- HTTPREST; Thu, 1 Feb 2024 11:00:15 -0800
-From: Marcelo Ricardo Leitner <mleitner@redhat.com>
-References: <20240122194801.152658-1-jhs@mojatatu.com> <20240122194801.152658-2-jhs@mojatatu.com>
+	s=arc-20240116; t=1706814097; c=relaxed/simple;
+	bh=Jfb2ag/RVb7aLbbTFIRRajXzhYFdXWB21U1ECTT7m+w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=S/iVpT40oKYqP1qIpPmb2uaAGHKuJxHfPzPpXTbHVm4k2pxe8ywlllyL8KPDWUV4hPf/ML1cO9fwrILOqsFNgBSYDtTyshKBufBDr/+KwpxmsE8PUX3/OdfdJ/Qp7EDFizwb+GyOKOkWbaLct9wEV7sKzKr3iFgY6t7dV8Nn88s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=PtRqufRB; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 411GEMZa004256;
+	Thu, 1 Feb 2024 19:00:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=CEPvhuqBAzR9JTprWZWY6mkiYQwJNcN/+j7I9096g80=; b=Pt
+	RqufRBRL2/tQACYvHUmx8rVAPoE9dnhRRNoNy2BpxO3u/d0GaRd/AplxNJflzGmu
+	f1qvIpWAQQ4zzrEwLu5SsUDqYSpTd6rdKOGk0D4JQr/HSnKrTD+6ECyXmCdC+Cs5
+	b/qPW3RJ9aOIO+JmtUg4HDoSdLRzdpaekZ3fPiV5o9lgZwAvBBqtBu90p2ItS0bc
+	naC/otOgipTlgz185sZj2IhBFYRAofIj8u5OBQ+N4VkRZR10Au/8402eZ/V3REzf
+	n2Q8fE1JpOTl+rk6QWNNEZR1jqJWxo4JSAZxSuEentL/BkJJe8PwQVByKFMhPNi1
+	846KKKu32Kk6TKIdqJWA==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3w06mnsu2q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 01 Feb 2024 19:00:57 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 411J0t6H004090
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 1 Feb 2024 19:00:55 GMT
+Received: from [10.110.99.223] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 1 Feb
+ 2024 11:00:52 -0800
+Message-ID: <c2497eef-1041-4cd0-8220-42622c8902f4@quicinc.com>
+Date: Thu, 1 Feb 2024 11:00:52 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240122194801.152658-2-jhs@mojatatu.com>
-Date: Thu, 1 Feb 2024 11:00:15 -0800
-Message-ID: <CALnP8ZbTPN2nGVTF12ONZQxvmRR_wT4kch2z1TP_u-BJf730Kg@mail.gmail.com>
-Subject: Re: [PATCH v10 net-next 01/15] net: sched: act_api: Introduce P4
- actions list
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, deb.chatterjee@intel.com, anjali.singhai@intel.com, 
-	namrata.limaye@intel.com, tom@sipanda.io, Mahesh.Shirshyad@amd.com, 
-	tomasz.osinski@intel.com, jiri@resnulli.us, xiyou.wangcong@gmail.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	vladbu@nvidia.com, horms@kernel.org, khalidm@nvidia.com, toke@redhat.com, 
-	mattyk@nvidia.com, daniel@iogearbox.net, bpf@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/2] net: stmmac: TBS support for platform driver
+Content-Language: en-US
+To: Esben Haabendal <esben@geanix.com>
+CC: Rohan G Thomas <rohan.g.thomas@intel.com>,
+        "David S . Miller"
+	<davem@davemloft.net>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        "Jose
+ Abreu" <joabreu@synopsys.com>,
+        Eric Dumazet <edumazet@google.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Maxime Coquelin
+	<mcoquelin.stm32@gmail.com>,
+        Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof
+ Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+        "Serge
+ Semin" <fancer.lancer@gmail.com>,
+        Andrew Halaney <ahalaney@redhat.com>, <elder@linaro.org>,
+        <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <quic_bhaviks@quicinc.com>,
+        <kernel.upstream@quicinc.com>
+References: <20230927130919.25683-1-rohan.g.thomas@intel.com>
+ <20230927130919.25683-3-rohan.g.thomas@intel.com>
+ <92892988-bb77-4075-812e-19f6112f436e@quicinc.com>
+ <87r0i44h8v.fsf@geanix.com>
+ <5626e874-066c-4bf2-842d-a7f3387b6c1b@quicinc.com>
+ <87a5okvbdt.fsf@geanix.com>
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+In-Reply-To: <87a5okvbdt.fsf@geanix.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: 598Pt-pLYSSFWLEVg2mMTCAOFDnOomF_
+X-Proofpoint-ORIG-GUID: 598Pt-pLYSSFWLEVg2mMTCAOFDnOomF_
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-01_05,2024-01-31_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
+ impostorscore=0 phishscore=0 suspectscore=0 adultscore=0
+ lowpriorityscore=0 mlxlogscore=999 clxscore=1015 malwarescore=0
+ spamscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2401190000 definitions=main-2402010146
 
-On Mon, Jan 22, 2024 at 02:47:47PM -0500, Jamal Hadi Salim wrote:
-> In P4 we require to generate new actions "on the fly" based on the
-> specified P4 action definition. P4 action kinds, like the pipeline
-> they are attached to, must be per net namespace, as opposed to native
-> action kinds which are global. For that reason, we chose to create a
-> separate structure to store P4 actions.
->
-> Co-developed-by: Victor Nogueira <victor@mojatatu.com>
-> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-> Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
-> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> Reviewed-by: Vlad Buslov <vladbu@nvidia.com>
 
-Reviewed-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
 
-> ---
->  include/net/act_api.h |   8 ++-
->  net/sched/act_api.c   | 123 +++++++++++++++++++++++++++++++++++++-----
->  net/sched/cls_api.c   |   2 +-
->  3 files changed, 116 insertions(+), 17 deletions(-)
->
-> diff --git a/include/net/act_api.h b/include/net/act_api.h
-> index e1e5e72b9..ab28c2254 100644
-> --- a/include/net/act_api.h
-> +++ b/include/net/act_api.h
-> @@ -105,6 +105,7 @@ typedef void (*tc_action_priv_destructor)(void *priv);
->
->  struct tc_action_ops {
->  	struct list_head head;
-> +	struct list_head p4_head;
->  	char    kind[IFNAMSIZ];
->  	enum tca_id  id; /* identifier should match kind */
->  	unsigned int	net_id;
-> @@ -199,8 +200,10 @@ int tcf_idr_check_alloc(struct tc_action_net *tn, u32 *index,
->  int tcf_idr_release(struct tc_action *a, bool bind);
->
->  int tcf_register_action(struct tc_action_ops *a, struct pernet_operations *ops);
-> +int tcf_register_p4_action(struct net *net, struct tc_action_ops *act);
->  int tcf_unregister_action(struct tc_action_ops *a,
->  			  struct pernet_operations *ops);
-> +void tcf_unregister_p4_action(struct net *net, struct tc_action_ops *act);
->  int tcf_action_destroy(struct tc_action *actions[], int bind);
->  int tcf_action_exec(struct sk_buff *skb, struct tc_action **actions,
->  		    int nr_actions, struct tcf_result *res);
-> @@ -208,8 +211,9 @@ int tcf_action_init(struct net *net, struct tcf_proto *tp, struct nlattr *nla,
->  		    struct nlattr *est,
->  		    struct tc_action *actions[], int init_res[], size_t *attr_size,
->  		    u32 flags, u32 fl_flags, struct netlink_ext_ack *extack);
-> -struct tc_action_ops *tc_action_load_ops(struct nlattr *nla, u32 flags,
-> -					 struct netlink_ext_ack *extack);
-> +struct tc_action_ops *
-> +tc_action_load_ops(struct net *net, struct nlattr *nla,
-> +		   u32 flags, struct netlink_ext_ack *extack);
->  struct tc_action *tcf_action_init_1(struct net *net, struct tcf_proto *tp,
->  				    struct nlattr *nla, struct nlattr *est,
->  				    struct tc_action_ops *a_o, int *init_res,
-> diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-> index 3e30d7260..e4a1b8f5a 100644
-> --- a/net/sched/act_api.c
-> +++ b/net/sched/act_api.c
-> @@ -57,6 +57,40 @@ static void tcf_free_cookie_rcu(struct rcu_head *p)
->  	kfree(cookie);
->  }
->
-> +static unsigned int p4_act_net_id;
-> +
-> +struct tcf_p4_act_net {
-> +	struct list_head act_base;
-> +	rwlock_t act_mod_lock;
-> +};
-> +
-> +static __net_init int tcf_p4_act_base_init_net(struct net *net)
-> +{
-> +	struct tcf_p4_act_net *p4_base_net = net_generic(net, p4_act_net_id);
-> +
-> +	INIT_LIST_HEAD(&p4_base_net->act_base);
-> +	rwlock_init(&p4_base_net->act_mod_lock);
-> +
-> +	return 0;
-> +}
-> +
-> +static void __net_exit tcf_p4_act_base_exit_net(struct net *net)
-> +{
-> +	struct tcf_p4_act_net *p4_base_net = net_generic(net, p4_act_net_id);
-> +	struct tc_action_ops *ops, *tmp;
-> +
-> +	list_for_each_entry_safe(ops, tmp, &p4_base_net->act_base, p4_head) {
-> +		list_del(&ops->p4_head);
-> +	}
-> +}
-> +
-> +static struct pernet_operations tcf_p4_act_base_net_ops = {
-> +	.init = tcf_p4_act_base_init_net,
-> +	.exit = tcf_p4_act_base_exit_net,
-> +	.id = &p4_act_net_id,
-> +	.size = sizeof(struct tc_action_ops),
-> +};
-> +
->  static void tcf_set_action_cookie(struct tc_cookie __rcu **old_cookie,
->  				  struct tc_cookie *new_cookie)
->  {
-> @@ -962,6 +996,48 @@ static void tcf_pernet_del_id_list(unsigned int id)
->  	mutex_unlock(&act_id_mutex);
->  }
->
-> +static struct tc_action_ops *tc_lookup_p4_action(struct net *net, char *kind)
-> +{
-> +	struct tcf_p4_act_net *p4_base_net = net_generic(net, p4_act_net_id);
-> +	struct tc_action_ops *a, *res = NULL;
-> +
-> +	read_lock(&p4_base_net->act_mod_lock);
-> +	list_for_each_entry(a, &p4_base_net->act_base, p4_head) {
-> +		if (strcmp(kind, a->kind) == 0) {
-> +			if (try_module_get(a->owner))
-> +				res = a;
-> +			break;
-> +		}
-> +	}
-> +	read_unlock(&p4_base_net->act_mod_lock);
-> +
-> +	return res;
-> +}
-> +
-> +void tcf_unregister_p4_action(struct net *net, struct tc_action_ops *act)
-> +{
-> +	struct tcf_p4_act_net *p4_base_net = net_generic(net, p4_act_net_id);
-> +
-> +	write_lock(&p4_base_net->act_mod_lock);
-> +	list_del(&act->p4_head);
-> +	write_unlock(&p4_base_net->act_mod_lock);
-> +}
-> +EXPORT_SYMBOL(tcf_unregister_p4_action);
-> +
-> +int tcf_register_p4_action(struct net *net, struct tc_action_ops *act)
-> +{
-> +	struct tcf_p4_act_net *p4_base_net = net_generic(net, p4_act_net_id);
-> +
-> +	if (tc_lookup_p4_action(net, act->kind))
-> +		return -EEXIST;
-> +
-> +	write_lock(&p4_base_net->act_mod_lock);
-> +	list_add(&act->p4_head, &p4_base_net->act_base);
-> +	write_unlock(&p4_base_net->act_mod_lock);
-> +
-> +	return 0;
-> +}
-> +
->  int tcf_register_action(struct tc_action_ops *act,
->  			struct pernet_operations *ops)
->  {
-> @@ -1032,7 +1108,7 @@ int tcf_unregister_action(struct tc_action_ops *act,
->  EXPORT_SYMBOL(tcf_unregister_action);
->
->  /* lookup by name */
-> -static struct tc_action_ops *tc_lookup_action_n(char *kind)
-> +static struct tc_action_ops *tc_lookup_action_n(struct net *net, char *kind)
->  {
->  	struct tc_action_ops *a, *res = NULL;
->
-> @@ -1040,31 +1116,48 @@ static struct tc_action_ops *tc_lookup_action_n(char *kind)
->  		read_lock(&act_mod_lock);
->  		list_for_each_entry(a, &act_base, head) {
->  			if (strcmp(kind, a->kind) == 0) {
-> -				if (try_module_get(a->owner))
-> -					res = a;
-> -				break;
-> +				if (try_module_get(a->owner)) {
-> +					read_unlock(&act_mod_lock);
-> +					return a;
-> +				}
->  			}
->  		}
->  		read_unlock(&act_mod_lock);
-> +
-> +		return tc_lookup_p4_action(net, kind);
->  	}
-> +
->  	return res;
->  }
->
->  /* lookup by nlattr */
-> -static struct tc_action_ops *tc_lookup_action(struct nlattr *kind)
-> +static struct tc_action_ops *tc_lookup_action(struct net *net,
-> +					      struct nlattr *kind)
->  {
-> +	struct tcf_p4_act_net *p4_base_net = net_generic(net, p4_act_net_id);
->  	struct tc_action_ops *a, *res = NULL;
->
->  	if (kind) {
->  		read_lock(&act_mod_lock);
->  		list_for_each_entry(a, &act_base, head) {
-> +			if (nla_strcmp(kind, a->kind) == 0) {
-> +				if (try_module_get(a->owner)) {
-> +					read_unlock(&act_mod_lock);
-> +					return a;
-> +				}
-> +			}
-> +		}
-> +		read_unlock(&act_mod_lock);
-> +
-> +		read_lock(&p4_base_net->act_mod_lock);
-> +		list_for_each_entry(a, &p4_base_net->act_base, p4_head) {
->  			if (nla_strcmp(kind, a->kind) == 0) {
->  				if (try_module_get(a->owner))
->  					res = a;
->  				break;
->  			}
->  		}
-> -		read_unlock(&act_mod_lock);
-> +		read_unlock(&p4_base_net->act_mod_lock);
->  	}
->  	return res;
->  }
-> @@ -1324,8 +1417,9 @@ void tcf_idr_insert_many(struct tc_action *actions[], int init_res[])
->  	}
->  }
->
-> -struct tc_action_ops *tc_action_load_ops(struct nlattr *nla, u32 flags,
-> -					 struct netlink_ext_ack *extack)
-> +struct tc_action_ops *
-> +tc_action_load_ops(struct net *net, struct nlattr *nla,
-> +		   u32 flags, struct netlink_ext_ack *extack)
->  {
->  	bool police = flags & TCA_ACT_FLAGS_POLICE;
->  	struct nlattr *tb[TCA_ACT_MAX + 1];
-> @@ -1356,7 +1450,7 @@ struct tc_action_ops *tc_action_load_ops(struct nlattr *nla, u32 flags,
->  		}
->  	}
->
-> -	a_o = tc_lookup_action_n(act_name);
-> +	a_o = tc_lookup_action_n(net, act_name);
->  	if (a_o == NULL) {
->  #ifdef CONFIG_MODULES
->  		bool rtnl_held = !(flags & TCA_ACT_FLAGS_NO_RTNL);
-> @@ -1367,7 +1461,7 @@ struct tc_action_ops *tc_action_load_ops(struct nlattr *nla, u32 flags,
->  		if (rtnl_held)
->  			rtnl_lock();
->
-> -		a_o = tc_lookup_action_n(act_name);
-> +		a_o = tc_lookup_action_n(net, act_name);
->
->  		/* We dropped the RTNL semaphore in order to
->  		 * perform the module load.  So, even if we
-> @@ -1477,7 +1571,7 @@ int tcf_action_init(struct net *net, struct tcf_proto *tp, struct nlattr *nla,
->  	for (i = 1; i <= TCA_ACT_MAX_PRIO && tb[i]; i++) {
->  		struct tc_action_ops *a_o;
->
-> -		a_o = tc_action_load_ops(tb[i], flags, extack);
-> +		a_o = tc_action_load_ops(net, tb[i], flags, extack);
->  		if (IS_ERR(a_o)) {
->  			err = PTR_ERR(a_o);
->  			goto err_mod;
-> @@ -1683,7 +1777,7 @@ static struct tc_action *tcf_action_get_1(struct net *net, struct nlattr *nla,
->  	index = nla_get_u32(tb[TCA_ACT_INDEX]);
->
->  	err = -EINVAL;
-> -	ops = tc_lookup_action(tb[TCA_ACT_KIND]);
-> +	ops = tc_lookup_action(net, tb[TCA_ACT_KIND]);
->  	if (!ops) { /* could happen in batch of actions */
->  		NL_SET_ERR_MSG(extack, "Specified TC action kind not found");
->  		goto err_out;
-> @@ -1731,7 +1825,7 @@ static int tca_action_flush(struct net *net, struct nlattr *nla,
->
->  	err = -EINVAL;
->  	kind = tb[TCA_ACT_KIND];
-> -	ops = tc_lookup_action(kind);
-> +	ops = tc_lookup_action(net, kind);
->  	if (!ops) { /*some idjot trying to flush unknown action */
->  		NL_SET_ERR_MSG(extack, "Cannot flush unknown TC action");
->  		goto err_out;
-> @@ -2184,7 +2278,7 @@ static int tc_dump_action(struct sk_buff *skb, struct netlink_callback *cb)
->  		return 0;
->  	}
->
-> -	a_o = tc_lookup_action(kind);
-> +	a_o = tc_lookup_action(net, kind);
->  	if (a_o == NULL)
->  		return 0;
->
-> @@ -2251,6 +2345,7 @@ static int __init tc_action_init(void)
->  	rtnl_register(PF_UNSPEC, RTM_GETACTION, tc_ctl_action, tc_dump_action,
->  		      0);
->
-> +	register_pernet_subsys(&tcf_p4_act_base_net_ops);
->  	return 0;
->  }
->
-> diff --git a/net/sched/cls_api.c b/net/sched/cls_api.c
-> index 92a12e3d0..2fec3f80b 100644
-> --- a/net/sched/cls_api.c
-> +++ b/net/sched/cls_api.c
-> @@ -3323,7 +3323,7 @@ int tcf_exts_validate_ex(struct net *net, struct tcf_proto *tp, struct nlattr **
->  			struct tc_action_ops *a_o;
->
->  			flags |= TCA_ACT_FLAGS_POLICE | TCA_ACT_FLAGS_BIND;
-> -			a_o = tc_action_load_ops(tb[exts->police], flags,
-> +			a_o = tc_action_load_ops(net, tb[exts->police], flags,
->  						 extack);
->  			if (IS_ERR(a_o))
->  				return PTR_ERR(a_o);
-> --
-> 2.34.1
->
+On 2/1/2024 12:26 AM, Esben Haabendal wrote:
+> "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com> writes:
+>> On 1/26/2024 12:43 AM, Esben Haabendal wrote:
+>>> "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com> writes:
+>>>
+>>>> Qualcomm had similar discussions with respect to enabling of TBS for a
+>>>> particular queue. We had similar discussion on these terms yesterday
+>>>> with Redhat. Adding Andrew from Redhat here
+>>>>
+>>>> What we discovered as part of the discussions is listed below.
+>>>>
+>>>> 1. Today upstream stmmac code is designed in such a way that TBS flag
+>>>> is put as part of queue configurations(see below snippet) and as well
+>>>> know that stmmac queue configuration comes from the dtsi file.
+>>>>
+>>>> //ndo_open => stmmac_open
+>>>> int tbs_en = priv->plat->tx_queues_cfg[chan].tbs_en;(comes from tx_queues_cfg)
+>>>>
+>>>> /* Setup per-TXQ tbs flag before TX descriptor alloc */
+>>>> tx_q->tbs |= tbs_en ? STMMAC_TBS_AVAIL : 0;
+>>>>
+>>>> 2. There is a no way to do this dynamically from user space because
+>>>> we don't have any API exposed which can do it from user space
+>>>
+>>> Not now. But why not extend ethtool API to allow enabling TBS for
+>>> supported controllers?
+>>
+>> ethtool API can be implemented but that still doesn't solve the
+>> problem of stopping the entire MAC block because of enhanced desc
+>> allocation.
+> 
+> I am not sure what you exact point is here.
+> 
+> If you look at the implementation of ethtool API for changing ring
+> parameters, you have stmmac_set_ringparam() which calls
+> stmmac_reinit_ringparam(), which again calls stmmac_release() if the
+> interface is up (stopping the entire MAC), and then stmmac_open() which
+> reinitializes everything.
+> 
+> The same pattern could be applied to changes to enable enhanced
+> descriptor allocation.
+> 
+> I don't see why that will not be acceptable. Why would anyone have to do
+> that while critical traffic is flowing? In your system you should be
+> able to know which queues needs enhanced descriptors before starting
+> communication.
+> 
+>> 1. We can either allocate enhanced desc for all channels at bootup and
+>> then choose to switch to enable TBS mode at runtime (Additional memory
+>> usage)
+> 
+> A good default would IMHO be to enable enhanced descriptors for all but
+> TX queue 0. This will allow use of TBS without needing to change
+> anything. If the rather minimal extra memory usage is disturbing anyone,
+> then they can tune it at boot time before bringing the interface up.
+> 
+>> 2. Live with the disruption of traffic for a brief duration of time.
+>> Which is not a good solution for priority and critical traffic.
+> 
+> As mentioned above, I don't see why anyone would need to modify the
+> descriptor allocation while critical traffic is flowing.
+> 
+> If you are able put this information in your device tree, you definitely
+> will be able to put it in an boot script in some form.
+> 
+>>>> and also TBS rely on special descriptors aka enhanced desc this
+>>>> cannot be done run time and stmmac has to be aware of it before we
+>>>> do DMA/MAC/MTL start.
+>>>
+>>> Isn't this somewhat similar to changing the RX/TX ring parameters,
+>>> which I believe also is quite difficult to do at run time, and
+>>> ethtool therefore requires the interface to be down in oroer to
+>>> change them?
+>>>
+>>>> To do this dynamically would only mean stopping DMA/MAC/MTL realloc
+>>>> resources for enhanced desc and the starting MAC/DMA/MTL. This means
+>>>> we are disrupting other traffic(By stopping MAC block).
+>>>
+>>> Yes. But you would be disrupting traffic less than by requiring a
+>>> complete reboot of the target which is needed if the devicetree must be
+>>> changed.
+>>>
+>> any DTS solution today anyway requires completely loading the boot
+>> image and rebooting the device, but once the device is functional, End
+>> user can activate TBS, as he knows the exact usecase and requirements.
+>> I understand the solution is not scalable, but at this point we don't
+>> have a solution to activate TBS at runtime.
+> 
+> Exactly. We are discussing a solution to activate enhanced descriptors
+> at "runtime". But I propose to do it in a similar way as changing ring
+> parameters, so it is in runtime seen from a CPU perspective, but the
+> interface will be shortly brought down when changing it.
+> 
+>>>> 3. I dont think there is a way we can enable this dynamically today. I
+>>>> would like upstream community to share your thoughts as well.
+>>>
+>>> Hereby done. Could we investigate the possibility of using ethtool to
+>>> change TBS enable/disable "run-time"?
+>>>
+>> We can either allocate enhanced desc for all channels at bootup
+>> and then choose to switch to enable TBS mode at runtime.
+> 
+> I think we should do something like this:
+> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=3b12ec8f618e
+> 
+> for all glue drivers, so a sane default is established that allows using
+> TBS from boot up.
+> 
+> But in addition to that, I think it would make sense to create an
+> ethtool API to change it from that default. And it will bring down the
+> interface while applying the change.
+> 
 
+Agreed. Okay, We can go with this approach. I will evaluate the changes from ethtool perspective.
+ethtool approach will be favorable to everyone as most of the users rely on ethtool to configure 
+the NIC parameters. 
+
+For now glue drivers can exclude queue0 for tbs and have all other queues to have tbs enabled.  
+
+> /Esben
 
