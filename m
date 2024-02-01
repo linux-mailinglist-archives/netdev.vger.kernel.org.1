@@ -1,58 +1,60 @@
-Return-Path: <netdev+bounces-68114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5957845DFE
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 18:01:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57460845DCA
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:54:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B1F1B3231A
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:53:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AD8B1F2D519
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:54:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A9153AE;
-	Thu,  1 Feb 2024 16:53:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DA5F5242;
+	Thu,  1 Feb 2024 16:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EmLlI3ii"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IZ/WbuoL"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 967047E0FD
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 16:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B191D4C6C
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 16:53:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706806422; cv=none; b=SHzb/PmGob3N02ZMfSmbp8kUsTDmUyRUf+llJb9R+WsjJOyEz773qY//K5OCZYs63ayuhGAiPeHJLqntHe54JAoNeQtzNd+xbd2u/27C0EcB1AeSU2cDMrIX3+HV4YY+Kjzf3G22gZsydwssDRHGp9osWvPMb0GpUIv82x3V1G8=
+	t=1706806428; cv=none; b=U+NyXy8WdwLmpwgkvfm7zowbNrL6L9hACRTz4TQIeWhMaHPvrtnRTxSHKa5O/DBIh8U8XH/o8lfkU+L2otSxGsAkryUkuKJHCdFi4FpvoHINFTRt7rWM/F7iux95ltFsU8laWBIoZfHs2s2fvlqvnY6tbs+IH0wVtlzbEppUFoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706806422; c=relaxed/simple;
-	bh=Z0EiL8rTbtpj+Srs33vaEyBR/q+0IWvfO3k0kCgLqCM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tz7yjF+1RZ0kss3fEshyI+txrmp7CWY7+nL4mB/Xd6ya5kjKzYpsaYjVZWb+R/bentk+6swZh78f+Rb+tUN1cZUbPmWI6MurThsLHlkZOVLQQ0gxhv55MJIjLb6zm/yqa5eBTpxFak08XReYF+OAKw4az+rZ5fi5dq35pAscAq0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EmLlI3ii; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1706806428; c=relaxed/simple;
+	bh=S+LAOBzBbsGLce3YEcEbKpLkY+B1uuYInBC/zcdcJCA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=PNHkbQvi5Pw3EOPG11VVY/wrb88GItSNNi7IJx2hIoHOuXGMuBqGP+8Pf5GAA5kzg1pAFu7nERb8vYXxouXhy8nqoCWmLeZwP+M+RNx6iOfEesC7zQ0zXcBlohWdT8Y1RmVXOWLn9uJI/2FowWNtUHSM/BWhUhVNL7H39h8BjNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IZ/WbuoL; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706806419;
+	s=mimecast20190719; t=1706806425;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=3IvH3mK50SvQqfHcbj4T812S5eHoNhmat3eDxm2vKfw=;
-	b=EmLlI3iiYcCKstIgXJipi9lnxNokedYoA5krD3tTOqgKvu5+BTGvxAwLDXVepaxmaPx2f8
-	Zc0nI1gezJZ8Dh2Vtfn7d7PDe+7xCs0AlwGlPUtxGqOlHwtRHr9bNZo/Di/r+PFiJYTWJf
-	Y9VDAFtfdOGtj9+jbmjEyuOsnzbQkl8=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-657-D2CzUNRPNDimzwqdOyeF8g-1; Thu, 01 Feb 2024 11:53:34 -0500
-X-MC-Unique: D2CzUNRPNDimzwqdOyeF8g-1
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eaoaPqae0QGkUTYmUGfhPd0Bl0iReDOAQW04C8x8OtM=;
+	b=IZ/WbuoL1pRqWPbQ9QK1Gn1H5RGWKyQPoyCz+45/5YNoaESZx+8d3LeFa0AmMMRUjdaKWQ
+	YkcpRkY4wrynItEdePnJi7WiGfhCZW0nNigbAU6AZaROldDsW1iRbQKI0wCiSFrhBjZnm4
+	M3FFpneNa3aVuzEgf5deVHOsaBdZAFM=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-670-AjPdK2IhNqKAPdSbboP8Ng-1; Thu,
+ 01 Feb 2024 11:53:41 -0500
+X-MC-Unique: AjPdK2IhNqKAPdSbboP8Ng-1
 Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8D512835381;
-	Thu,  1 Feb 2024 16:53:33 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8D54B1C0F474;
+	Thu,  1 Feb 2024 16:53:40 +0000 (UTC)
 Received: from dcaratti.users.ipa.redhat.com (unknown [10.45.226.26])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id D43B3492BE7;
-	Thu,  1 Feb 2024 16:53:30 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 72D7E492BE4;
+	Thu,  1 Feb 2024 16:53:38 +0000 (UTC)
 From: Davide Caratti <dcaratti@redhat.com>
 To: Jamal Hadi Salim <jhs@mojatatu.com>,
 	Cong Wang <xiyou.wangcong@gmail.com>,
@@ -65,9 +67,11 @@ To: Jamal Hadi Salim <jhs@mojatatu.com>,
 Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
 	Xin Long <lucien.xin@gmail.com>,
 	Ilya Maximets <i.maximets@ovn.org>
-Subject: [PATCH net-next v2 0/2] net: allow dissecting/matching tunnel control flags  
-Date: Thu,  1 Feb 2024 17:51:42 +0100
-Message-ID: <cover.1706805548.git.dcaratti@redhat.com>
+Subject: [PATCH net-next v2 1/2] flow_dissector: add support for tunnel control flags
+Date: Thu,  1 Feb 2024 17:51:43 +0100
+Message-ID: <1e7f0f6ddf38d85d3b0eecdb0dc3389c27ea7d2a.1706805548.git.dcaratti@redhat.com>
+In-Reply-To: <cover.1706805548.git.dcaratti@redhat.com>
+References: <cover.1706805548.git.dcaratti@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,32 +81,76 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.10
 
-Ilya says: "for correct matching on decapsulated packets, we should match
-on not only tunnel id and headers, but also on tunnel configuration flags
-like TUNNEL_NO_CSUM and TUNNEL_DONT_FRAGMENT. This is done to distinguish
-similar tunnels with slightly different configs. And it is important since
-tunnel configuration is flow based, i.e. can be different for every packet,
-even though the main tunnel port is the same."
+dissect [no]csum, [no]dontfrag, [no]oam flags on 'external' tunnels. This
+is a prerequisite for matching these control flags using TC flower.
 
- - patch 1 extends the kernel's flow dissector to extract these flags
-   from the packet's tunnel metadata.
- - patch 2 extends TC flower to match on any combination of TUNNEL_NO_CSUM,
-   TUNNEL_OAM and TUNNEL_DONT_FRAGMENT.
+Suggested-by: Ilya Maximets <i.maximets@ovn.org>
+Signed-off-by: Davide Caratti <dcaratti@redhat.com>
+---
+ include/net/flow_dissector.h | 11 +++++++++++
+ net/core/flow_dissector.c    | 13 ++++++++++++-
+ 2 files changed, 23 insertions(+), 1 deletion(-)
 
-v2:
- - use NL_REQ_ATTR_CHECK() where possible (thanks Jamal)
- - don't overwrite 'ret' in the error path of fl_set_key_flags()
-
-Davide Caratti (2):
-  flow_dissector: add support for tunnel control flags
-  net/sched: cls_flower: add support for matching tunnel control flags
-
- include/net/flow_dissector.h | 11 ++++++++
- include/uapi/linux/pkt_cls.h |  3 +++
- net/core/flow_dissector.c    | 13 +++++++++-
- net/sched/cls_flower.c       | 50 +++++++++++++++++++++++++++++++++++-
- 4 files changed, 75 insertions(+), 2 deletions(-)
-
+diff --git a/include/net/flow_dissector.h b/include/net/flow_dissector.h
+index 1a7131d6cb0e..98a0050d5cc3 100644
+--- a/include/net/flow_dissector.h
++++ b/include/net/flow_dissector.h
+@@ -329,6 +329,16 @@ struct flow_dissector_key_cfm {
+ #define FLOW_DIS_CFM_MDL_MASK GENMASK(7, 5)
+ #define FLOW_DIS_CFM_MDL_MAX 7
+ 
++/**
++ * struct flow_dissector_key_enc_flags
++ * @flags: tunnel control flags
++ */
++struct flow_dissector_key_enc_flags {
++	__be16 flags;
++};
++
++#define TUNNEL_FLAGS_PRESENT (TUNNEL_CSUM | TUNNEL_DONT_FRAGMENT | TUNNEL_OAM)
++
+ enum flow_dissector_key_id {
+ 	FLOW_DISSECTOR_KEY_CONTROL, /* struct flow_dissector_key_control */
+ 	FLOW_DISSECTOR_KEY_BASIC, /* struct flow_dissector_key_basic */
+@@ -363,6 +373,7 @@ enum flow_dissector_key_id {
+ 	FLOW_DISSECTOR_KEY_L2TPV3, /* struct flow_dissector_key_l2tpv3 */
+ 	FLOW_DISSECTOR_KEY_CFM, /* struct flow_dissector_key_cfm */
+ 	FLOW_DISSECTOR_KEY_IPSEC, /* struct flow_dissector_key_ipsec */
++	FLOW_DISSECTOR_KEY_ENC_FLAGS, /* struct flow_dissector_key_enc_flags */
+ 
+ 	FLOW_DISSECTOR_KEY_MAX,
+ };
+diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
+index 272f09251343..9099a5524d7c 100644
+--- a/net/core/flow_dissector.c
++++ b/net/core/flow_dissector.c
+@@ -382,7 +382,9 @@ skb_flow_dissect_tunnel_info(const struct sk_buff *skb,
+ 	    !dissector_uses_key(flow_dissector,
+ 				FLOW_DISSECTOR_KEY_ENC_IP) &&
+ 	    !dissector_uses_key(flow_dissector,
+-				FLOW_DISSECTOR_KEY_ENC_OPTS))
++				FLOW_DISSECTOR_KEY_ENC_OPTS) &&
++	    !dissector_uses_key(flow_dissector,
++				FLOW_DISSECTOR_KEY_ENC_FLAGS))
+ 		return;
+ 
+ 	info = skb_tunnel_info(skb);
+@@ -467,6 +469,15 @@ skb_flow_dissect_tunnel_info(const struct sk_buff *skb,
+ 						TUNNEL_OPTIONS_PRESENT;
+ 		}
+ 	}
++
++	if (dissector_uses_key(flow_dissector, FLOW_DISSECTOR_KEY_ENC_FLAGS)) {
++		struct flow_dissector_key_enc_flags *enc_flags;
++
++		enc_flags = skb_flow_dissector_target(flow_dissector,
++						      FLOW_DISSECTOR_KEY_ENC_FLAGS,
++						      target_container);
++		enc_flags->flags = info->key.tun_flags & TUNNEL_FLAGS_PRESENT;
++	}
+ }
+ EXPORT_SYMBOL(skb_flow_dissect_tunnel_info);
+ 
 -- 
 2.43.0
 
