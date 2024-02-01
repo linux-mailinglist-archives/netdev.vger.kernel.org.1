@@ -1,180 +1,82 @@
-Return-Path: <netdev+bounces-68192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E00C58460DA
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:23:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98A76846123
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:41:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 239241F2C104
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 19:23:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB2B01C244FF
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 19:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 331CB85264;
-	Thu,  1 Feb 2024 19:23:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E289A8527B;
+	Thu,  1 Feb 2024 19:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IbTcrcsZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CE2012FB11;
-	Thu,  1 Feb 2024 19:22:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC807C6C1;
+	Thu,  1 Feb 2024 19:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706815380; cv=none; b=ZUA12az45n8DIKEDRraoUFUaL2mYwvjw2ELe/wLrGk0Gcq4Sog089OuXKn/dYuRDrikzFLn4gUUVrKtgirB78qRitHksj0ul6rsKA5Whkm7qcl6qKObrx37bIirPDUmRHoUVCoySTYiCkRBYgGS644HnQsvvaVTAM+GQKIYv6C0=
+	t=1706816464; cv=none; b=oi+BjICPfTE1I6yon9Q2hqTUjn9Y31JLY30G5pI8ckgzXLzjLls9B7nslBVrlkFjKz6D47Kp8W9iza7rQx5aH8imLicoO8j3Ac73UURcmretgeO7ZiJWnTB7MSi4fB2XA6Gxh9pNzZYbd0SjNpNw0ms9ypi890MBeoPQtwc1NyI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706815380; c=relaxed/simple;
-	bh=NokxQZ6kiNXIYprq8Mysenzkd0RWRCEMpBAfJ30F1Cw=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=uNdjcuiGtviwz/l6VmIfI9LHXXnYYTWpx2qHXa3j6PHQKFQJ4b0Vq/Pyhupc1asQJqjcCzuyUPjVfW4DvtrQUhG8z1uOZ032AMDDF7IdcMALOpM21uj+opnAdAYw5EyST4eRGv/dgiy6QylPz7xElCWWbM9aFjpeCeLzijMBvp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (31.173.82.6) by msexch01.omp.ru (10.188.4.12)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 1 Feb
- 2024 22:22:39 +0300
-Subject: Re: [PATCH net-next 0/8] Improve GbEth performance on Renesas RZ/G2L
- and related SoCs
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
-	<wsa+renesas@sang-engineering.com>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240131170523.30048-1-paul.barker.ct@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <a428e75e-32b7-e94e-24c3-f87097951470@omp.ru>
-Date: Thu, 1 Feb 2024 22:22:39 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1706816464; c=relaxed/simple;
+	bh=mw8IruWtLhnVBZG2bw57KfvNyrKA6nWlauPlAegiYXo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CDboBe0om26ZBO/wwfNELDeuXzu2DzVwY3VrkZMi1XyAs0cVaGrQYG/hB0F54aDTc1Vrne5GUM98RMKwg1Qkx9yH6ZwF64sWnb2fQXnypQ366FXr7tXmDyhkKPfhl3iBdjqfBXvqrStCh+cER/83VS0n/Wlq8autMCb/VBeTz2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IbTcrcsZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2756FC433F1;
+	Thu,  1 Feb 2024 19:41:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706816464;
+	bh=mw8IruWtLhnVBZG2bw57KfvNyrKA6nWlauPlAegiYXo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IbTcrcsZUbMN85dPQYaJ8qHiKYG7r4m4/vfEYOZMt/h+f2q/V3Jc7gXKXWs+YfMTO
+	 1elg+W0ORBzckh9fcP7CfBW054G/WcsrDwYiK1BmG1m+vN3a9npeL92wIDqwJ/pZeF
+	 Hb3Taetog6bGz8vOrfoiDKy01/JZWQfY1NbNmaBTSPTzP7T588bLgP13/Ms1XeVOtQ
+	 C0Pdm48g9a65sdi/W9/Hgb31NeKqeoO1TJjndCf7weVP8XYSwz6WpI5uB0uWySEXqj
+	 fUvChv/wDo2t0g5vYPMnLoQKDWFl/E3Rtf203kURT5zR3FQPUTLAR4c5NhPWD8xQqd
+	 bWhF7rbv7o7Xg==
+Date: Thu, 1 Feb 2024 11:40:59 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, Andrew
+ Morton <akpm@linux-foundation.org>, Mahesh Bandewar <maheshb@google.com>,
+ weiwan@google.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ horms@kernel.org, andrew@lunn.ch, leit@fb.com
+Subject: Re: [PATCH] blackhole_dev: Fix buil warning
+Message-ID: <20240201114059.50b1051c@kernel.org>
+In-Reply-To: <Zbvm8HhzdHGXzlus@gmail.com>
+References: <20240201133238.3089363-1-leitao@debian.org>
+	<20240201085509.40a0bb76@kernel.org>
+	<Zbvm8HhzdHGXzlus@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240131170523.30048-1-paul.barker.ct@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/01/2024 19:05:26
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 183133 [Feb 01 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.6 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.6 in (user) dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;lore.kernel.org:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.82.6
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/01/2024 19:10:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/1/2024 5:08:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 1/31/24 8:05 PM, Paul Barker wrote:
-
-> This series aims to improve peformance of the GbEth IP in the Renesas
-
-   Performance.
-
-> RZ/G2L SoC family and the RZ/G3S SoC, which use the ravb driver. Along
-> the way, we do some refactoring and ensure that napi_complete_done() is
-> used in accordance with the NAPI documentation.
+On Thu, 1 Feb 2024 10:46:08 -0800 Breno Leitao wrote:
+> > Since Jiri suggested a title fix I reckon we should be a bit more
+> > specific, still. Imagine this title ending up in a quote or a Fixes
+> > tag, could be many things.. How about:
+> > 
+> >   net: blackhole_dev: fix build warning for ethh set but not used  
 > 
-> Performance improvment mainly comes from enabling SW IRQ Coalescing for
-
-   Improvement.
-
-> all SoCs using the GbEth IP, and NAPI Threaded mode for single core SoCs
-> using the GbEth IP. These can be enabled/disabled at runtime via sysfs,
-> but our goal is to set sensible defaults which get good performance on
-> the affected SoCs.
+> Sure, let me resend it.
 > 
-> Changes are made specific to the GbEth IP, avoiding potential impact on
-> the other Renesas R-Car based SoCs which also use the ravb driver. This
-> follows the principle of only submitting patches that we can fully test.
-> 
-> The performance impact of this series on iperf3 testing is as follows:
->   * RZ/G2L Ethernet throughput is unchanged, but CPU usage drops:
->       * Bidirectional and TCP RX: 6.5% less CPU usage
->       * UDP RX: 10% less CPU usage
-> 
->   * RZ/G2UL and RZ/G3S Ethernet throughput is increased for all test
->     cases except UDP TX, which suffers a slight loss:
->       * TCP TX: 32% more throughput
->       * TCP RX: 11% more throughput
->       * UDP TX: 10% less throughput
->       * UDP RX: 10183% more throughput - the previous throughput of
+> I suppose I should recent to `net` given it is a building warning,
+> right?
 
-   10183%, really? 8-)
-
->         1.06Mbps is what prompted this work.
-> 
->   * RZ/G2N CPU usage and Ethernet throughput is unchanged (tested as a
->     representative of the SoCs which use the R-Car based RAVB IP).
-> 
-> This series depends on:
->   * "net: ravb: Let IP-specific receive function to interrogate descriptors" v5
->     https://lore.kernel.org/all/20240131084133.1671440-2-claudiu.beznea.uj@bp.renesas.com/
-
-   So this is based on yet unmerged patch?
-   Dave, Jakub, et al., the series should be considered RFC then.
-
-> To get the results shown above, you'll also need:
->   * "topology: Set capacity_freq_ref in all cases"
->     https://lore.kernel.org/all/20240117190545.596057-1-vincent.guittot@linaro.org/
-> 
->   * "ravb: Add Rx checksum offload support" v2
->     https://lore.kernel.org/all/20240124102115.132154-2-biju.das.jz@bp.renesas.com/
-> 
->   * "ravb: Add Tx checksum offload support" v2
->     https://lore.kernel.org/all/20240124102115.132154-3-biju.das.jz@bp.renesas.com/
-
-   Those 2 are not finalized yet...
-
-> Work in this area will continue, in particular we expect to improve
-> TCP/UDP RX performance further with future changes to RX buffer
-> handling.
-> 
-> Paul Barker (8):
->   net: ravb: Split R-Car & GbEth poll functions
->   net: ravb: Simplify GbEth poll & receive functions
->   net: ravb: Count packets in GbEth RX (not descriptors)
->   net: ravb: Always process TX descriptor ring in GbEth poll
->   net: ravb: Always update error counters
->   net: ravb: Align GbEth poll function with NAPI docs
->   net: ravb: Enable SW IRQ Coalescing for GbEth
->   net: ravb: Use NAPI threaded mode on 1-core CPUs with GbEth IP
-> 
->  drivers/net/ethernet/renesas/ravb.h      |   3 +-
->  drivers/net/ethernet/renesas/ravb_main.c | 103 ++++++++++++++++-------
->  2 files changed, 74 insertions(+), 32 deletions(-)
-
-MBR, Sergey
+Not necessarily, net-next is good enough for W=1 warnings in general.
+Compiler warnings only show up if the file in question or some header
+it includes was modified. The linker warnings are a bit special.
+If you touch any file in any module you'll see all linker warnings.
 
