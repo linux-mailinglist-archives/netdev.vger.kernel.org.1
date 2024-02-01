@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-67854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 922C3845202
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:33:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A83F6845203
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:33:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F369E28CF0F
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 07:33:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB38B1C241E0
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 07:33:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C971A15959F;
-	Thu,  1 Feb 2024 07:32:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45612158D75;
+	Thu,  1 Feb 2024 07:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F2HM/eQb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Egbquufm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97DE9158D70
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 07:32:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 217E7158D6F
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 07:32:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706772742; cv=none; b=kipHvBp6d1UwIBjT3bnEb3H24byKIhBC/dRuM3FaprSVc+K+SzxJl+rvDNq2rTE7GoxlGKp8d5e4XIxQfXnbpwsiokDJN34p2y710Ptf8S0NsoAxOOLHH6oAyY2khOqz3cUX5lqGCEiw7LWHosHw5CpsR7w9zpiYLWiBIIWyob0=
+	t=1706772744; cv=none; b=imfljbMUJxwscMi7v+eGgyrierbO7QG6gS0Ki5GEnRnOCytA3WqH+JIacmAqQxPvKtPgtojwJizKa4pNFVfVtAXDh8SFGBTvFZQGsNKX4bN0bTWhvtJz8Kh9ZwQyen766PjqRt0wp7UxpP6onrRfdDEHw6Rg/JUQs9mDxyujLeo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706772742; c=relaxed/simple;
-	bh=tJ0z98HCrsNG7SNSA0d/1Zfmz/iBx99+ymhi3CD6Md4=;
+	s=arc-20240116; t=1706772744; c=relaxed/simple;
+	bh=6G3rLaio//bwVROcPEZtoatiQXH7RJSuVehvjzcAqdk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WNHU4dJQh9YZCDKHViqwVhgPtsKWdPEn5Svta6saaEXkjE8/qw+6ozZSeUDBj8mcKpfZYRDaF2Y568gOkNdBBNtAEg4FL3W+3bzMFc1sIsdn/ixLFZ2oxSZaf46/Ob2tPO2m3mDCpzk48XiySZWvEojtJ5856QAodtI8BANo+3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F2HM/eQb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4985AC433C7;
-	Thu,  1 Feb 2024 07:32:22 +0000 (UTC)
+	 MIME-Version; b=GSM5dB6de1ba+IhDfQTuAGOMfxY2Bz9ZAf+8LDinXvUPIhzy/DUgqiSUqirN6Zk6ig3elo1mPGvK2l79qONNA90Oe8/681hYx6sdV/jjxMqLLXlttvkiaHhXme/04SicEXkRhv97TFVybPTtz8sXAwKcu/FUUtvnXoCzmHbqJHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Egbquufm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5358C43601;
+	Thu,  1 Feb 2024 07:32:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706772742;
-	bh=tJ0z98HCrsNG7SNSA0d/1Zfmz/iBx99+ymhi3CD6Md4=;
+	s=k20201202; t=1706772744;
+	bh=6G3rLaio//bwVROcPEZtoatiQXH7RJSuVehvjzcAqdk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=F2HM/eQbuSG1htRNqH/1VonUxs29/So9yWVRpIiTC9rWnoJX1sOnv6SBKV2+w+xI/
-	 cbXlc3CHKLpW+STOXGUKzzU5/1ryOF8iAPUyGPlMPEu6eT7vSH1t8DBy/BBHALaWM1
-	 9NcOdXxfUET8hNjkyPqC5llR3mfulFmVz8dtavwsl0PBiJ2TKEW0MnrYutlKD9bs9W
-	 DyqmTmkFyG/LgXajQ2fFAmHLVt6kZ4ovvHs8qIrbaFoaQaxLxRKn2f8e7bvBQSaYuP
-	 +WjhwWjx1q1B8v3nM8QxdWgG38VJ9hZp1tp2Fs7vNRaDwpd2DaGM/YKq0nt6qSPxcn
-	 spaDYfIWqtAcA==
+	b=Egbquufm6Dh5LNFbUlD10FPwavm2GWAWxSi4gS+16D8Pcbyl8Y8yzSbOXqJkS4I9v
+	 KMFYQ7/jxg0fB5s2bobkzs/0pxlPLLo62cR131dlPU5TclI3+sXr0kzHijjLoSpaSO
+	 KuVB2z+I4SqSfYIMUnMzO9gvqyBWz9tHTXRAkpAfu6+clyl7YMMITCd7Nttc5GsL15
+	 zj1xMy/HPTE3F5+YjAnMwI8InQusahWtgGObB2lFDTxB537Xlhe7n6my+AzlwtNmrQ
+	 xIKAFiC02m63RkSfmRBG4bOucdxVpqx23NYbbUYjYHDS63ruOaKsqUcMPcvz2PtDrW
+	 pLLVbv7XFOPdQ==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -53,9 +53,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
 	Moshe Shemesh <moshe@nvidia.com>,
 	Aya Levin <ayal@nvidia.com>
-Subject: [net-next V2 08/15] net/mlx5: remove fw reporter dump option for non PF
-Date: Wed, 31 Jan 2024 23:31:51 -0800
-Message-ID: <20240201073158.22103-9-saeed@kernel.org>
+Subject: [net-next V2 09/15] net/mlx5: SF, Stop waiting for FW as teardown was called
+Date: Wed, 31 Jan 2024 23:31:52 -0800
+Message-ID: <20240201073158.22103-10-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240201073158.22103-1-saeed@kernel.org>
 References: <20240201073158.22103-1-saeed@kernel.org>
@@ -69,68 +69,61 @@ Content-Transfer-Encoding: 8bit
 
 From: Moshe Shemesh <moshe@nvidia.com>
 
-In case function is not a Physical Function it is not allowed to get FW
-core dump, so if tried it will fail the fw health reporter dump option.
-Instead of failing, remove the option of fw_fatal health reporter dump
-for such function.
+When PF/VF teardown is called the driver sets the flag
+MLX5_BREAK_FW_WAIT to stop waiting for FW loading and initializing. Same
+should be applied to SF driver teardown to cut waiting time. On
+mlx5_sf_dev_remove() set the flag before draining health WQ as recovery
+flow may also wait for FW reloading while it is not relevant anymore.
 
 Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
 Reviewed-by: Aya Levin <ayal@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/health.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+ .../mellanox/mlx5/core/sf/dev/driver.c        | 21 ++++++++++++-------
+ 1 file changed, 13 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/health.c b/drivers/net/ethernet/mellanox/mlx5/core/health.c
-index 721e343388df..5c2ac2d9dbd9 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/health.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/health.c
-@@ -555,12 +555,17 @@ static void mlx5_fw_reporter_err_work(struct work_struct *work)
- 				      &fw_reporter_ctx);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c b/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c
+index 169c2c68ed5c..bc863e1f062e 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c
+@@ -95,24 +95,29 @@ static int mlx5_sf_dev_probe(struct auxiliary_device *adev, const struct auxilia
+ static void mlx5_sf_dev_remove(struct auxiliary_device *adev)
+ {
+ 	struct mlx5_sf_dev *sf_dev = container_of(adev, struct mlx5_sf_dev, adev);
+-	struct devlink *devlink = priv_to_devlink(sf_dev->mdev);
++	struct mlx5_core_dev *mdev = sf_dev->mdev;
++	struct devlink *devlink;
+ 
+-	mlx5_drain_health_wq(sf_dev->mdev);
++	devlink = priv_to_devlink(mdev);
++	set_bit(MLX5_BREAK_FW_WAIT, &mdev->intf_state);
++	mlx5_drain_health_wq(mdev);
+ 	devlink_unregister(devlink);
+-	if (mlx5_dev_is_lightweight(sf_dev->mdev))
+-		mlx5_uninit_one_light(sf_dev->mdev);
++	if (mlx5_dev_is_lightweight(mdev))
++		mlx5_uninit_one_light(mdev);
+ 	else
+-		mlx5_uninit_one(sf_dev->mdev);
+-	iounmap(sf_dev->mdev->iseg);
+-	mlx5_mdev_uninit(sf_dev->mdev);
++		mlx5_uninit_one(mdev);
++	iounmap(mdev->iseg);
++	mlx5_mdev_uninit(mdev);
+ 	mlx5_devlink_free(devlink);
  }
  
--static const struct devlink_health_reporter_ops mlx5_fw_reporter_ops = {
-+static const struct devlink_health_reporter_ops mlx5_fw_reporter_pf_ops = {
- 		.name = "fw",
- 		.diagnose = mlx5_fw_reporter_diagnose,
- 		.dump = mlx5_fw_reporter_dump,
- };
- 
-+static const struct devlink_health_reporter_ops mlx5_fw_reporter_ops = {
-+		.name = "fw",
-+		.diagnose = mlx5_fw_reporter_diagnose,
-+};
-+
- static int
- mlx5_fw_fatal_reporter_recover(struct devlink_health_reporter *reporter,
- 			       void *priv_ctx,
-@@ -666,10 +671,12 @@ void mlx5_fw_reporters_create(struct mlx5_core_dev *dev)
+ static void mlx5_sf_dev_shutdown(struct auxiliary_device *adev)
  {
- 	const struct devlink_health_reporter_ops *fw_fatal_ops;
- 	struct mlx5_core_health *health = &dev->priv.health;
-+	const struct devlink_health_reporter_ops *fw_ops;
- 	struct devlink *devlink = priv_to_devlink(dev);
- 	u64 grace_period;
+ 	struct mlx5_sf_dev *sf_dev = container_of(adev, struct mlx5_sf_dev, adev);
++	struct mlx5_core_dev *mdev = sf_dev->mdev;
  
- 	fw_fatal_ops = &mlx5_fw_fatal_reporter_pf_ops;
-+	fw_ops = &mlx5_fw_reporter_pf_ops;
- 	if (mlx5_core_is_ecpf(dev)) {
- 		grace_period = MLX5_FW_REPORTER_ECPF_GRACEFUL_PERIOD;
- 	} else if (mlx5_core_is_pf(dev)) {
-@@ -678,11 +685,11 @@ void mlx5_fw_reporters_create(struct mlx5_core_dev *dev)
- 		/* VF or SF */
- 		grace_period = MLX5_FW_REPORTER_DEFAULT_GRACEFUL_PERIOD;
- 		fw_fatal_ops = &mlx5_fw_fatal_reporter_ops;
-+		fw_ops = &mlx5_fw_reporter_ops;
- 	}
+-	mlx5_unload_one(sf_dev->mdev, false);
++	set_bit(MLX5_BREAK_FW_WAIT, &mdev->intf_state);
++	mlx5_unload_one(mdev, false);
+ }
  
- 	health->fw_reporter =
--		devl_health_reporter_create(devlink, &mlx5_fw_reporter_ops,
--					    0, dev);
-+		devl_health_reporter_create(devlink, fw_ops, 0, dev);
- 	if (IS_ERR(health->fw_reporter))
- 		mlx5_core_warn(dev, "Failed to create fw reporter, err = %ld\n",
- 			       PTR_ERR(health->fw_reporter));
+ static const struct auxiliary_device_id mlx5_sf_dev_id_table[] = {
 -- 
 2.43.0
 
