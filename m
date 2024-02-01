@@ -1,218 +1,231 @@
-Return-Path: <netdev+bounces-68210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3351084622C
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:53:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5CE584622F
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:56:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03F1AB296D7
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:53:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2BA291F2639A
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:56:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F871E481;
-	Thu,  1 Feb 2024 20:53:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LRAVZ2xv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E5BC3CF5B;
+	Thu,  1 Feb 2024 20:56:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D2953D0A3;
-	Thu,  1 Feb 2024 20:53:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=134.134.136.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706820797; cv=fail; b=YEx/jLamFJuIfoVq0cjH6YwtXhriWVSByKHoBXXyAPss42S9U4jYAlc25ofpZ580Vui3p6H2SDAu3OyPVEodOaM6uBQI4vA5a8HXpIaolPVA4bPBQcBj7dWssLjt7tKRorOqblq4W1GI8Ifw4XHTWzhV/JnnwzF5pyAnCLRAZTc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706820797; c=relaxed/simple;
-	bh=mqmhDJPq0iRJFnxENdhfqE99Dyo9dV3HmgIM8YJDDPA=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=JuE6NS3v63yRvTKCYLZzK7zpwzMy+dOcTwIVOecnMIXY72HqfElX4tdcyDYvWcvFfKEITPGuphooDv4T16W3PsYSsv+j14dYF5xibyxYQimFDNEybYFNY3yYEX7SYFgrf6UDbWCo2SKnsUMcAdiYVn3G+7MEZ0cWlBarOo/PQ/E=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LRAVZ2xv; arc=fail smtp.client-ip=134.134.136.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706820795; x=1738356795;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=mqmhDJPq0iRJFnxENdhfqE99Dyo9dV3HmgIM8YJDDPA=;
-  b=LRAVZ2xv4chXNKxD4RhYAM/4c2yQPxv2hNDhSzSSzVNZ1Fc9hUS/tOQw
-   ElATLMgKaUJDK7DDG06sBoVN5crSKjnbu3KljaG77132wjK6bqkA3bSKa
-   ssu8fv9AVQvyN2J4rtZLfLsOcQIXR/F3iJnlXKNUy6JQckhdRkx+7K/VD
-   ahlFGVrYvtWDKXEo9W2WVuoaqP45uj1WcphsdCPVkrkjh73ft8LK5sdYb
-   3WnqWpMIWezjL6xEkTzlMn+Xsf6Lkh24YsmcBEJwawqPNRl1dPVz0kF3N
-   JHYWBaw6gyc8cezknnNws0nCrJqMV4aG/U4jkx1keNnim9o6f7zfQYGLz
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="407718436"
-X-IronPort-AV: E=Sophos;i="6.05,236,1701158400"; 
-   d="scan'208";a="407718436"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 12:53:14 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,236,1701158400"; 
-   d="scan'208";a="23198525"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Feb 2024 12:53:14 -0800
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 1 Feb 2024 12:53:14 -0800
-Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 1 Feb 2024 12:53:13 -0800
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 1 Feb 2024 12:53:13 -0800
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.41) by
- edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 1 Feb 2024 12:53:13 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=X+C6XbIy+7zXKjhfgbwBiZHIeKwVmVBa7Qhm3fTOUZyv/nezOy4RaBugnV3+lLlu+VV6H/9YLSNOG2BWY9Ub4cw+KpYhTFcsB+cTjQrfOzMhVF55tPb+kUhrCPfS5zXlLFlAAKvKznUEkjjyHDUCRfteRQU6cztor/3JrprdlgLtaRpKOQ1koshDoicCr8fqHPcozGQlhfHyaXrX0rG3qOp6rfj09Wmeinq5F8EqrQZKM5cGNXDTZXHpSyEacgg7OHOgEqkjDstaSdcPSf+2GK5hKA7MFNfEVr+EDPr/Jt0jFLtuwyI5ST14vFfjHFAH+Vsh5v0LI40pUp0wL/YgcA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pbUIhfblf24tuQg7l7H7aOKP/SKSlwehx7jAx6ixbUg=;
- b=e+c5PbntuhoSaxGEFTKMvSCYKpNTz8if3CWtPsglVSmHLCJMO2M9ANBcZggcS70DkjIZUJO3NlE+BrLgMBeQTNpu4s9t7LsOgX5I/IimRzc1Vm1FLZ9/DgX5eVLEwvf9x4fbsjWrnFouCnKih3HfNIACGJlUPtpJ2is2z/CfzsUPojkfbXs6fFy0tWiYrhF1FRUJqhoCZLZir1qvxAg+7bELBTN9XQ9yoPKoox0hx736PQap596wMsxrglawZNdfGdT1EUClbDFPdFEc25DxQYBeExrzPQRBky3G4IE14/ShSnWMqLDqlMvPKQephwFKshGvpWqaBbRmVc7WOi6Nsw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by DS0PR11MB7960.namprd11.prod.outlook.com (2603:10b6:8:fe::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.29; Thu, 1 Feb
- 2024 20:53:11 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::4069:eb50:16b6:a80d]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::4069:eb50:16b6:a80d%4]) with mapi id 15.20.7249.027; Thu, 1 Feb 2024
- 20:53:11 +0000
-Message-ID: <029065d6-faaf-4e58-ac06-4e11c2ded02c@intel.com>
-Date: Thu, 1 Feb 2024 12:53:08 -0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1 02/12] tools/net/ynl: Support sub-messages in
- nested attribute spaces
-To: Jakub Kicinski <kuba@kernel.org>, Donald Hunter <donald.hunter@gmail.com>
-CC: <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Jonathan
- Corbet" <corbet@lwn.net>, <linux-doc@vger.kernel.org>, Breno Leitao
-	<leitao@debian.org>, Jiri Pirko <jiri@resnulli.us>, Alessandro Marcolini
-	<alessandromarcolini99@gmail.com>, <donald.hunter@redhat.com>
-References: <20240123160538.172-1-donald.hunter@gmail.com>
- <20240123160538.172-3-donald.hunter@gmail.com>
- <20240123161804.3573953d@kernel.org> <m2ede7xeas.fsf@gmail.com>
- <20240124073228.0e939e5c@kernel.org> <m2ttn0w9fa.fsf@gmail.com>
- <20240126105055.2200dc36@kernel.org> <m2jznuwv7g.fsf@gmail.com>
- <20240129174220.65ac1755@kernel.org>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20240129174220.65ac1755@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0262.namprd03.prod.outlook.com
- (2603:10b6:303:b4::27) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7120029403;
+	Thu,  1 Feb 2024 20:56:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706820971; cv=none; b=AYwcY1gICv9w00NLlb/Hxw74BwCHsVVsLFc1hoMdpA/g36JvwBScSx/Uzdw2B6DDCrC5XdjoUwb840mZy0HhBFO5D5ph8xqwyf8WRYp1daN4qSqlsUKrxsKgZmyk65r2TVfknTMd0trw2wGNSzAgFmN8MiXPOQicz0O8eQkgiIk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706820971; c=relaxed/simple;
+	bh=Bv9jOktnPbtdFkXhdqLZdhGAbc1vG2EGLSIiPMVmd0g=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=F3PaZWPVHtallRNQ9bI2x11qvHI1ksiMRrpUxwEn9RlKwFjL6bWc8L/LG5Bh5SHtvN2zcEvq2o741qxsH88UA+VSfiso6+I4ruu4K6DYSAtZoMm0XjwAlAY5tIXbpXKuUjmS791f2SGJ+9ZsK2MubMaOWcEHFSZZpCQFSyBMuNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (31.173.82.6) by msexch01.omp.ru (10.188.4.12)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 1 Feb
+ 2024 23:55:58 +0300
+Subject: Re: [PATCH v3 net-next 2/2] ravb: Add Tx checksum offload support for
+ GbEth
+To: Biju Das <biju.das.jz@bp.renesas.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
+	<yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
+	<wsa+renesas@sang-engineering.com>, Nikita Yushchenko
+	<nikita.yoush@cogentembedded.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, Geert Uytterhoeven
+	<geert+renesas@glider.be>, Prabhakar Mahadev Lad
+	<prabhakar.mahadev-lad.rj@bp.renesas.com>, Biju Das <biju.das.au@gmail.com>
+References: <20240201194521.139472-1-biju.das.jz@bp.renesas.com>
+ <20240201194521.139472-3-biju.das.jz@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <d3a6657d-0a67-a826-24b1-17ec8f43ee81@omp.ru>
+Date: Thu, 1 Feb 2024 23:55:57 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|DS0PR11MB7960:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0cb7c9b8-37f7-419c-a373-08dc2367cd28
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: VBjJoNwxkGbJC05Ue50+sgF3/8XvGMHsgPpZ/BQCqY43qtoLgQqMs4VYvzQWoNf6wiPj2ygFGeqyujv6z/8XTNwvId4Tamt3TeiEkmhJM4ZFrZk32gCKZnB1fq6AMGzjQSd8pPilpXJPHeTeF2ZRIL7fCaRgId2C4EUBYz3Wo3IEhQzobvMK0mGozx3zmil/qUTVok5gTd+fr6aO8rz9bB6dPFW6gBLY81yIkoQAOF89YzkqIGq1Bzgctos+d4a5ofUOzvAcZUMsl3x77qqiy63avvS8FEfTYPYuy4X/nxrTzopCgkY9ad+UxRxS+JYJ76aGX5YZOCecHAWxSmr2Pt0e0eU7jM0bNfWh7OGNNR9iudfcWt2Xp6+i7KpGW+vvaWhRUt2ShRc/MAcuFuXqZZ0dl+UFT4v17f2IPes8pbWQIzpYzBlN1jQDpbxgWITjWA7CpZr8VKKG25/KT/6dXEFKqJC4uqESdEekuXm3jFnjaFCxb0AujegMyP8lYtGhT1L6YdErA2i4i0VoRows8tuE+BmDoTRYCIYrdt+eAnD/NbOoRnlAO6dTWJ687wU3T0eFWURDJbwT5Oisvkq2qRbCeWJHtvLehZW+J8oiI4dBfvrH52oPEvn1dD11qgApasz6dQMBFfRHdw7IVP6uWA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(396003)(366004)(136003)(346002)(376002)(39860400002)(230922051799003)(186009)(64100799003)(451199024)(1800799012)(31686004)(83380400001)(36756003)(41300700001)(86362001)(31696002)(82960400001)(110136005)(6512007)(38100700002)(2616005)(26005)(2906002)(6506007)(66946007)(478600001)(66476007)(66556008)(316002)(6666004)(6486002)(53546011)(54906003)(4326008)(7416002)(5660300002)(15650500001)(8676002)(8936002)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UkxrYW9LY1RmY28yTmxWYTZZZmpJM2gzNE5KQnRrZHQ0N2Z3UUZrd0I0TktF?=
- =?utf-8?B?OCtROCs1QmFieDJSME8wMFNNekdRVTRLWXV6eVF3SVE0ci9UY1NBQnAvNVFj?=
- =?utf-8?B?K01FWEkrbC9CL25wQ1JGdUllRzlNOEx1a2ZxalRaZGNsRUNOTXhFU0lsSkd3?=
- =?utf-8?B?TFJVUWU3L3BocEdKckVSTFF5QVRHZXNoVkhlV1VMVEVSVnpDelUwK1REZlFZ?=
- =?utf-8?B?YS9Md2JPWUZQS3F3YVZFRFllUEJpb25VMFBNYUR0TFROeTd6UFQrNDdsU1Rl?=
- =?utf-8?B?ekhOSDc4V1NCQlpCNENIdE1QdTdmK3RuUmtUenFXejA2V3Jwb2tvSXZ0YnR4?=
- =?utf-8?B?dkdpS1MrVUoyQzVCbWdMVERtd0d4ZjdaeG1OWEpwc3ZBakpwd3N3dllhOXIx?=
- =?utf-8?B?NFdZYXBIN1RJRXlCZ1lVOVVPUlFRWnFsSG1OUkRVMHhiNzNlTDdlWk9tbVox?=
- =?utf-8?B?N3dyV1VwN3BPeG52QW84UEg3TVR6djFxZ3BuUm5uOThOVjJsYWc1RDV1TTg0?=
- =?utf-8?B?d0Uxd1lRQ2FyeGR6elhhQUdrVWl1STNxSjcrME55bkJPWFJDd1FTNkJEdU5Z?=
- =?utf-8?B?Qm5nbndMbVhZdm5icVRNWGRzamtjRjk3aW00R1V2a3NiSnZIc0k5VkRmYmdY?=
- =?utf-8?B?cXlzVmozcWxDbnlhK3VZWU1tbnlPS3QrUWw5TjA2M3RRTVAxc1JCckpuRW5R?=
- =?utf-8?B?VTR3SzA5ZlVJSTVTYmdPQklVc2xBVld4K2NQVTBXNGRNOU1BVDdEUlJ4T0Zp?=
- =?utf-8?B?WFdTeUtQZ2xaWmMyMldRb1daZkV0OERSK3lRR3pmUUQ3d1lPOXpJbjJnb29H?=
- =?utf-8?B?bVNTb2FJN3pmeGJSaUhPZ0pWSDY0R1hlMWJmTnBJTUkxbDBzTHd5T01mVlJ3?=
- =?utf-8?B?NE1Xc1RnLzNsVVBXTTM1SnRwelcxbnFpaGozY29iZzF0L0paV3BLRGZDZjQr?=
- =?utf-8?B?MUJoang0b2dWV2lITWFhbnhHL091am5SQWNsOXpSQUphZTh0b1FKZXFpS2da?=
- =?utf-8?B?dkVycjhJOVVnYnM5UWlJdFJ2WmdxcHVSY1FGK0dDekJSMzhVd25IeXNVMG10?=
- =?utf-8?B?L0hOaisweTgzSlgzR0IwWXBUQzhtampqeks2N29RS2hGTDBzR0M1K3JZSUtx?=
- =?utf-8?B?YklNK0NodjFYdkw4SDFvWml5b09zaXBCdG1MQUNLUGRHc3MveWtwUnlzbUZt?=
- =?utf-8?B?bTdyU0tmMXBmNU1mZ2hSZnJaRDlIZS9Lamo1VE0yQTdKY0FscU4zOVZGMWI5?=
- =?utf-8?B?RlpnbEduRnViaXZNVkUva1dxa1N0dUd3NTR5WHJuaXMxRTdudFBnRjl0YWpV?=
- =?utf-8?B?czJDTSs3SUU5L3BzSUpYeXVkQlFwWWc5YStVaTZ6eWRZaUFXWGM3eDZET0Zq?=
- =?utf-8?B?TWZ1VDlMUjVDS09GeUhDOTR1VUowVFVOT1BUYlZpQU1xekt5UXlLdU45T2lM?=
- =?utf-8?B?bU55RUFKRUhxMjAxVVR0aTBOTG0rZWsveFZvODQzREQwNXRzejdudldLK25r?=
- =?utf-8?B?a0pKM2ExaGdzZktaRlNnZlg4OTY0TytCSUcra0FiMkxDMVF2VjV3OGZ6Rklv?=
- =?utf-8?B?RUNSUTNLTGRid3NDYVdKOHcxM3VuOXVURFdZM1NvdEVOdWVET09kRmw5YXNG?=
- =?utf-8?B?dkVEMXVZQzliSUh3VHJUMjhuWEpzTVU5L1ZZcW9xRkdIRExCSEM3WVVtd05r?=
- =?utf-8?B?MnVMTXJvUnBuNllXSHhTQzhVMG5HNUF5anpVd2dhVDZsNVoxa3NjeVAzeklW?=
- =?utf-8?B?SHJ1MjdhQXFPVEdBbWo1TXhKcnIweVpJZlpVNkFkazBrbHA0U3VUMXN2cm0w?=
- =?utf-8?B?aXdJeUpEajloS1RWYmF5aWR0b0FKNUZ3ZXE3SUNzSUgzSEg2cEFYWmhxKy9S?=
- =?utf-8?B?SXhrRTBGVE1xUlVkYjJPdklia3hBTFdaV3puT0Z1TmY4bnhoZytTVGFOVTVr?=
- =?utf-8?B?dW9Gb1NxVTdGcHZ0bHFQSFUzYnBOS2lvMisxdTJKSEgrZkJUUGNiNGRmZ0RD?=
- =?utf-8?B?V3lQYVd0V0l0TzVBSG4rY3prVjFpRm9ScG5HMFBRcndIdnhZKzVJYWwrdUw1?=
- =?utf-8?B?cUwxZ2RoczVoNFJUNkloV3dIYlVxa2cxUi9RcU1zZzdKb05oRUpiZUM1S1pE?=
- =?utf-8?B?V2hzbHVDVWNLMmpIVXlGK2Y1dXptWmxyczRrUWNTN2hhOVhOdFB4eHlRdW1y?=
- =?utf-8?B?Q3c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0cb7c9b8-37f7-419c-a373-08dc2367cd28
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Feb 2024 20:53:11.1571
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 7Yr2HVVtUUhUYo2BN/udoUygjZb+ASAC1UOvx9ouBPBeZqJlCV+xbbQnBPy2P4JH8hNhSVx8n7m+aeS+3mg1OfRdHZypHIiNacsjVvkd7Kk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7960
-X-OriginatorOrg: intel.com
+In-Reply-To: <20240201194521.139472-3-biju.das.jz@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/01/2024 20:39:37
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 183136 [Feb 01 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.6 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.82.6 in (user) dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.82.6
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 02/01/2024 20:44:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 2/1/2024 7:00:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
+On 2/1/24 10:45 PM, Biju Das wrote:
 
+> TOE has hardware support for calculating IP header and TCP/UDP/ICMP
+> checksum for both IPv4 and IPv6.
+> 
+> Add Tx checksum offload supported by TOE for IPv4 and TCP/UDP.
+> 
+> For Tx, the result of checksum calculation is set to the checksum field of
+> each IPv4 Header/TCP/UDP/ICMP of ethernet frames. For the unsupported
+> frames, those fields are not changed. If a transmission frame is an UDPv4
+> frame and its checksum value in the UDP header field is 0x0000, TOE does
+> not calculate checksum for UDP part of this frame as it is optional
+> function as per standards.
+> 
+> We can test this functionality by the below commands
+> 
+> ethtool -K eth0 tx on --> to turn on Tx checksum offload
+> ethtool -K eth0 tx off --> to turn off Tx checksum offload
+> 
+> Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
+> ---
+> v2->v3:
+>  * Updated commit header and description as suggested by Sergey.
+>  * Replaced NETIF_F_IP_CSUM->NETIF_F_HW_CSUM as we are supporting only IPv4.
 
-On 1/29/2024 5:42 PM, Jakub Kicinski wrote:
-> Whether YNL specs should replace policy dumps completely (by building
-> the YAML into the kernel, and exposing via sysfs like kheaders or btf)
->  - I'm not sure. I think I used policy dumps twice in my life. They
-> are not all that useful, IMVHO...
+   You do vice versa, NETIF_F_HW_CSUM->NETIF_F_IP_CSUM. :-)
+   However, I'm now seeing this comment under CHECKSM_PATIAL:
 
-Many older genetlink/netlink families don't have a super robust or
-specific policy. For example, devlink has a single enum for all
-attributes, and the policy is not specified per command. The policy
-simply accepts all attributes for every command. This means that you
-can't rely on policy to decide whether an attribute has meaning for a
-given command.
+ *   %NETIF_F_IP_CSUM and %NETIF_F_IPV6_CSUM are being deprecated in favor of
+ *   %NETIF_F_HW_CSUM. New devices should use %NETIF_F_HW_CSUM to indicate
+ *   checksum offload capability.
 
-Unfortunately, we can't really change this because it ultimately counts
-as uAPI and we require that existing working functionality continues
-working in the future. I personally find this too stringent as sending
-such junk attributes requires someone going out of their way to write
-the messages and add extra attributes. In most cases I think sane
-users/software would rather be informed that they are sending data which
-is not relevant.
+   So probably we should've kept NETIF_F_HW_CSUM? :-/
+ 
+>  * Updated the comment related to UDP header field.
+>  * Renamed ravb_is_tx_checksum_offload_gbeth_possible()->ravb_is_tx_csum_gbeth().
+> v1->v2:
+>  * No change.
+[...]
 
-However, I can understand the point that the userspace software
-"worked", and we don't want to break existing applications just because
-of a kernel upgrade.
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index c4dc6ec54287..042dc565d1a5 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+[...]
+> @@ -524,15 +525,27 @@ static int ravb_ring_init(struct net_device *ndev, int q)
+>  
+>  static void ravb_csum_init_gbeth(struct net_device *ndev)
+>  {
+> -	if (!(ndev->features & NETIF_F_RXCSUM))
+> +	bool tx_enable = ndev->features & NETIF_F_IP_CSUM;
+> +	bool rx_enable = ndev->features & NETIF_F_RXCSUM;
+> +
+> +	if (!(tx_enable || rx_enable))
+>  		goto done;
+>  
+>  	ravb_write(ndev, 0, CSR0);
+> -	if (ravb_wait(ndev, CSR0, CSR0_RPE, 0)) {
+> +	if (ravb_wait(ndev, CSR0, CSR0_TPE | CSR0_RPE, 0)) {
+>  		netdev_err(ndev, "Timeout enabling hardware checksum\n");
+> -		ndev->features &= ~NETIF_F_RXCSUM;
+> +
+> +		if (tx_enable)
+> +			ndev->features &= ~NETIF_F_IP_CSUM;
+> +
+> +		if (rx_enable)
+> +			ndev->features &= ~NETIF_F_RXCSUM;
+>  	} else {
+> -		ravb_write(ndev, CSR2_ALL, CSR2);
+> +		if (tx_enable)
+> +			ravb_write(ndev, CSR1_ALL, CSR1);
+> +
+> +		if (rx_enable)
+> +			ravb_write(ndev, CSR2_ALL, CSR2);
+>  	}
+>  
+>  done:
+> @@ -1986,6 +1999,35 @@ static void ravb_tx_timeout_work(struct work_struct *work)
+>  	rtnl_unlock();
+>  }
+>  
+> +static bool ravb_is_tx_csum_gbeth(struct sk_buff *skb)
 
-The YNL spec does this by telling you at every layer of nesting which
-set of attributes are allowed and with what values. Even if we can't
-enforce this for older families its still useful information to report
-in some manner.
+   Hm, this new name doesn't parse well for me... :-(
+   Maybe ravb_can_tx_csum_gbeth() or ravb_tx_csum_possible_gbeth()?
 
-In addition, the YNL spec is more readable than the policy dumps which
-essentially require a separate tool to parse out everything and convert
-to something useful.
+> +{
+> +	struct iphdr *ip = ip_hdr(skb);
+> +
+> +	/* TODO: Need to add support for VLAN tag 802.1Q */
+> +	if (skb_vlan_tag_present(skb))
+> +		return false;
+> +
+> +	switch (ip->protocol) {
+> +	case IPPROTO_TCP:
+> +		break;
+> +	case IPPROTO_UDP:
+> +		/* If the checksum value in the UDP header field is 0, TOE does
+> +		 * not calculate checksum for UDP part of this frame as it is
+> +		 * optional function as per standards.
+> +		 */
+> +		if (udp_hdr(skb)->check == 0)
+> +			return false;
+> +		break;
+> +	/* TODO: Need to add HW checksum for ICMP */
+
+   s/HW/hardware/?
+
+> +	case IPPROTO_ICMP:
+> +		fallthrough;
+
+   You don't even need fallthrough, actually...
+   But why do you return false for ICMP? Isn't it supported by TOE?
+
+> +	default:
+> +		return false;
+> +	}
+> +
+> +	return true;
+> +}
+> +
+>  /* Packet transmit function for Ethernet AVB */
+>  static netdev_tx_t ravb_start_xmit(struct sk_buff *skb, struct net_device *ndev)
+>  {
+[...]
+
+MBR, Sergey
 
