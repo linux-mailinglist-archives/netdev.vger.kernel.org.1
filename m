@@ -1,137 +1,134 @@
-Return-Path: <netdev+bounces-67791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCE1B844F1F
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 03:24:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD4D9844F24
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 03:25:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EA601F2AA8D
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 02:24:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF9E51C2328D
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 02:25:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989221AABD;
-	Thu,  1 Feb 2024 02:24:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2AAF5234;
+	Thu,  1 Feb 2024 02:25:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="xzMyHymm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NrXZKQrP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5168617554;
-	Thu,  1 Feb 2024 02:24:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8661A27A
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 02:25:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706754287; cv=none; b=VXX5Or6XmoeHCwcxzFxl9U6+TWoOKuBwoNYnwjPqQ8rQhuL+EBVT/ATH6tC5odcxOuQ5VmsLqnLrL0Hwt7+yHocEb2ze/4oV72NTGWMUbwUB28GkBG6EpjyH5PVbYT1g1uaZ+CL+15BVdzbiSeb0wwVTM2Y+u6UGr6Zh/H3Ings=
+	t=1706754309; cv=none; b=uFC58yz8+y24mW9LYdMDYaAWlbwAShIsw4R59CgSVPpGekp2BYK8AQC8TLiMttJzPcVd6LchjzhiZNbg4juqSNNsnaCgJt8pzFbRTrgGX8DLafgDWWq/6KoToKAsm1qAMMgTAiMQQ7OB+BhyCoOeLfyXBDMt6GziMX1SGm5ZqJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706754287; c=relaxed/simple;
-	bh=JRicf2YLFT9kvYkR1O+/05/ONpzCairi+jAAGATbK2A=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=nsf7rrYKKm8UhaibWH06wwzxO3aBXfPgTXVviSC0pPXxn1a1+bpHoYJ+kHvzkWo6EH8G9tYRKRedcEC2N8d6ynhYrQzt/BhA18gLip+fBVoeR4LmeYiNPABVrHGgxZ3YE7a1yDvtMZb2pYttT6xs4H0jqmfEiWjBgA80XTEw5AY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=xzMyHymm; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1706754282; h=Message-ID:Subject:Date:From:To;
-	bh=lp6gnz0UerLEf+61GoJAoC7KepGxnJDRWTzE7Fmg8w8=;
-	b=xzMyHymmEOi178o4u16V0ldnZrIgb2AOsKvx+wOvAzmQp3tByVaA5TP6YS7KRDIsGO8nXMuWTSTmUjZbAfcHjDXvLAYu/wAgi7tc76O0T0rDqUGykPqeCo65k39dXs5OtxzA1kr383BplRSYfTyimv39C8/PxbFCjahm3bu7n6g=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=36;SR=0;TI=SMTPD_---0W.lS.oy_1706754279;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W.lS.oy_1706754279)
-          by smtp.aliyun-inc.com;
-          Thu, 01 Feb 2024 10:24:40 +0800
-Message-ID: <1706754257.289654-2-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost 08/17] virtio: vring_new_virtqueue(): pass struct instead of multi parameters
-Date: Thu, 1 Feb 2024 10:24:17 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Cc: virtualization@lists.linux.dev,
- Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- "Michael S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Hans de Goede <hdegoede@redhat.com>,
- =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
- Vadim Pasternak <vadimp@nvidia.com>,
- Bjorn Andersson <andersson@kernel.org>,
- Mathieu Poirier <mathieu.poirier@linaro.org>,
- Cornelia Huck <cohuck@redhat.com>,
- Halil Pasic <pasic@linux.ibm.com>,
- Eric Farman <farman@linux.ibm.com>,
- Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Benjamin Berg <benjamin.berg@intel.com>,
- Yang Li <yang.lee@linux.alibaba.com>,
- linux-um@lists.infradead.org,
- Netdev <netdev@vger.kernel.org>,
- platform-driver-x86@vger.kernel.org,
- linux-remoteproc@vger.kernel.org,
- linux-s390@vger.kernel.org,
- kvm@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20240130114224.86536-1-xuanzhuo@linux.alibaba.com>
- <20240130114224.86536-9-xuanzhuo@linux.alibaba.com>
- <bcd0e35e-e9a3-48b5-fc0a-117ba997439a@linux.intel.com>
-In-Reply-To: <bcd0e35e-e9a3-48b5-fc0a-117ba997439a@linux.intel.com>
+	s=arc-20240116; t=1706754309; c=relaxed/simple;
+	bh=2pr+9lz0MqI25T5Y8iroeGJE/d8GEZI70Ln+WQXTu5w=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Jgkb10jDr4mAPUf8sC1BowcQrPlpF+tohpesf7vEZ6WuQNRIwhtOOAASb+v+S1p5V68GkdG7Nsa9Y/LrrGzgKgjo2EvEPpnliaJWwLASlcTOprhhw6wWrG7OcPGVhIl51S0knFJ9Y4asAa8HOAZXYZNaPNPi2YAoCJU8pctm8YI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NrXZKQrP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2237C433F1;
+	Thu,  1 Feb 2024 02:25:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706754309;
+	bh=2pr+9lz0MqI25T5Y8iroeGJE/d8GEZI70Ln+WQXTu5w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=NrXZKQrP+AutcpM/YiC0PqJSAFEJRP61BwYGEtszJgDaTY+AWTJ+m2QV/Rwc/YxKB
+	 BlDbYLra6xiWUZUS9ip/DrPSy4jzIvXpGIpREBFJMn6E1U1ewZelJMCOvSlIeAH3+Z
+	 6v6mPbYUQWzY5m+ynMVa6bMRvMshGEVEDkW+tB5jll7wqdXtvJ+5Tnp94yJOVBwBbL
+	 DGhBfriTu8C88BRCUvBjPVzvgK936zT5T939kxQeUcWOi6Pk2Vb5d6cjBklBv3uCIe
+	 h6jW+LPejxpwBSc0P+bEDnh0O2XHweji/NDlHQKib04pwu+cZqa2rJWx/Jt8bP2Ck2
+	 dh2BL1rk91TVA==
+Date: Wed, 31 Jan 2024 18:25:05 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <brett.creeley@amd.com>, <drivers@pensando.io>
+Subject: Re: [PATCH net-next 6/9] ionic: Add XDP_TX support
+Message-ID: <20240131182505.67eeedd9@kernel.org>
+In-Reply-To: <20240130013042.11586-7-shannon.nelson@amd.com>
+References: <20240130013042.11586-1-shannon.nelson@amd.com>
+	<20240130013042.11586-7-shannon.nelson@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, 31 Jan 2024 13:03:04 +0200 (EET), =?utf-8?q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com> wrote:
-> On Tue, 30 Jan 2024, Xuan Zhuo wrote:
->
-> > Just like find_vqs(), it is time to refactor the
-> > vring_new_virtqueue(). We pass the similar struct to
-> > vring_new_virtqueue.
-> >
-> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > ---
->
-> > diff --git a/tools/virtio/vringh_test.c b/tools/virtio/vringh_test.c
-> > index 98ff808d6f0c..37f8c5d34285 100644
-> > --- a/tools/virtio/vringh_test.c
-> > +++ b/tools/virtio/vringh_test.c
->
-> > @@ -391,7 +391,7 @@ static int parallel_test(u64 features,
-> >  				/* Swallow all notifies at once. */
-> >  				if (read(to_guest[0], buf, sizeof(buf)) < 1)
-> >  					break;
-> > -
-> > +
-> >  				receives++;
-> >  				virtqueue_disable_cb(vq);
-> >  				continue;
-> > @@ -424,7 +424,7 @@ static int parallel_test(u64 features,
-> >  				continue;
-> >  			if (read(to_guest[0], buf, sizeof(buf)) < 1)
-> >  				break;
-> > -
-> > +
->
-> Two unrelated space changes. Please remove them from this patch.
+On Mon, 29 Jan 2024 17:30:39 -0800 Shannon Nelson wrote:
+>  	case XDP_TX:
+> +		xdpf = xdp_convert_buff_to_frame(&xdp_buf);
+> +		if (!xdpf)
+> +			goto out_xdp_abort;
+> +
+> +		txq = rxq->partner;
+> +		nq = netdev_get_tx_queue(netdev, txq->index);
+> +		__netif_tx_lock(nq, smp_processor_id());
+> +
+> +		if (netif_tx_queue_stopped(nq) ||
+> +		    unlikely(ionic_maybe_stop_tx(txq, 1))) {
+> +			__netif_tx_unlock(nq);
+> +			goto out_xdp_abort;
+> +		}
+> +
+> +		dma_unmap_page(rxq->dev, buf_info->dma_addr,
+> +			       IONIC_PAGE_SIZE, DMA_FROM_DEVICE);
+> +
+> +		err = ionic_xdp_post_frame(netdev, txq, xdpf, XDP_TX,
+> +					   buf_info->page,
+> +					   buf_info->page_offset,
+> +					   true);
 
+I think that you need txq_trans_cond_update() somewhere, otherwise 
+if XDP starves stack Tx the stack will think the queue is stalled.
 
-Will fix in next version.
+> +		__netif_tx_unlock(nq);
+> +		if (err) {
+> +			netdev_dbg(netdev, "tx ionic_xdp_post_frame err %d\n", err);
+> +			goto out_xdp_abort;
+> +		}
+> +		stats->xdp_tx++;
+> +
+> +		/* the Tx completion will free the buffers */
+> +		break;
+> +
+>  	case XDP_ABORTED:
+>  	default:
+> -		trace_xdp_exception(netdev, xdp_prog, xdp_action);
+> -		ionic_rx_page_free(rxq, buf_info);
+> -		stats->xdp_aborted++;
+> +		goto out_xdp_abort;
+>  	}
+>  
+> +	return true;
+> +
+> +out_xdp_abort:
+> +	trace_xdp_exception(netdev, xdp_prog, xdp_action);
+> +	ionic_rx_page_free(rxq, buf_info);
+> +	stats->xdp_aborted++;
+> +
+>  	return true;
+>  }
+>  
+> @@ -880,6 +1001,16 @@ static void ionic_tx_clean(struct ionic_queue *q,
+>  	struct sk_buff *skb = cb_arg;
+>  	u16 qi;
+>  
+> +	if (desc_info->xdpf) {
+> +		ionic_xdp_tx_desc_clean(q->partner, desc_info);
+> +		stats->clean++;
+> +
+> +		if (unlikely(__netif_subqueue_stopped(q->lif->netdev, q->index)))
+> +			netif_wake_subqueue(q->lif->netdev, q->index);
+> +
+> +		return;
+> +	}
 
-Thanks.
-
-
->
->
-> --
->  i.
->
+You can't complete XDP if NAPI budget is 0, you may be in hard IRQ
+context if its netpoll calling :(
 
