@@ -1,131 +1,101 @@
-Return-Path: <netdev+bounces-67820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 428FF84509A
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 06:10:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BC248450A6
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 06:20:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3111C1C220A6
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 05:10:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C47AA1F29758
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 05:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBEAC3C08D;
-	Thu,  1 Feb 2024 05:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 124733C488;
+	Thu,  1 Feb 2024 05:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Hfo0TwT4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OImwbE51"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2EA8366;
-	Thu,  1 Feb 2024 05:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7DE3C478;
+	Thu,  1 Feb 2024 05:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706764228; cv=none; b=bZ4UJngXxpOhvRMhE5iWWv8G5sqr6q9PdSkpAXz1huhJ97/0pOaDfrm2MKaykOGXQQPuY5Hr1wSgI5XdoFzqBms8Dzq1HTLuMlT4g2J8EO8xZge4aOOWtwKuF6rtDBDYi797IbD4pluxb2E2KkW/nT3+pMn5A0m5UlhdaDSsT3M=
+	t=1706764826; cv=none; b=Rt5ecl4es8gZF8OwWIlT9Mb+qX3AkKx4uCSoIrHu+VV4rDVJfGAWTzRrRI9ycRnBp5dyY9uRZE6H+RRHKtWn6359sfGc1b66sryOkZ2fyoWYcPQJ8oW4dCMfVt3PX+9dBn/c0J6paoQJRv5QbLLJNzYs/seR3YSLD5Z9PFlmjNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706764228; c=relaxed/simple;
-	bh=TZ4WdxaS6sBzLI6TTeW0UbEUGPpFWeuJx+KfLwa7rnQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MI9bBqsKEvkLDG+GW3ovpSt8G/XeQgoRPFsogwqojEb8QnhVLNwmqvfc6xYd2iesnF++yM6JjRH3/r4TKNizLwGDzQTTMly4TVfXCL5J/NdzS/pMRLRF82aU18EG97Agq3s43aYBq32LKlcTNbznB5RdJKI/VqjQzOODR2Iopmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Hfo0TwT4; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706764227; x=1738300227;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=TZ4WdxaS6sBzLI6TTeW0UbEUGPpFWeuJx+KfLwa7rnQ=;
-  b=Hfo0TwT4iF7pfEchdTAN09ZkgQgq0lmNmD9iBurnBCxQJ/WmXe6Oa8nB
-   b6mSUwR7Xc536bN8XV2dv2X9pUKiB6VCREYzQyD4QKHnJOtowTrx999CS
-   +Gj5K7wDVYIHSTwq74lacgxH/ZN25tjr4IVPyE3FlBCgo0QfE/E1uoxHv
-   +mKaUwrWCcIVXnQrPuOxCplwVUaZCpzgF/vnAmzNp0Z2grKFoTXzwU81W
-   Vhq9H+F+hS7a+87OUUnNqUu2tRawMh6/Bsk9USdsCdaGv4soBarPIR0fr
-   DaIDfY3wjxNouCqyFe4OKICNYGaz+/SL9sECV65IfCwINYT+dI10nK6iY
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="17196091"
-X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
-   d="scan'208";a="17196091"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 21:10:26 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="908132348"
-X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
-   d="scan'208";a="908132348"
-Received: from choongyo-mobl.gar.corp.intel.com (HELO [10.247.5.230]) ([10.247.5.230])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 21:10:17 -0800
-Message-ID: <9e23671e-788c-4191-bdb4-94915ff7da5a@linux.intel.com>
-Date: Thu, 1 Feb 2024 13:10:05 +0800
+	s=arc-20240116; t=1706764826; c=relaxed/simple;
+	bh=Xrl1S/KSzdhstY3QZ086GSIfQy2B8O1HOVrY5nbEFUM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=LsnZWwQ4syOpJWb7sRtPK3sBFhO90VN46FupD3I5VPymODocLg9VaKepYi9bei0tQP+nCxM3BNNjxDISwvnKbg8f/Q1aT8zNs1MuY1oDa7RfqJbsA63YXCuxFXdITaQ6Dgvb0wgv7VbISckbvs2S5OCa2NQO/UalCgTMzv1tv9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OImwbE51; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 59DD1C43390;
+	Thu,  1 Feb 2024 05:20:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706764825;
+	bh=Xrl1S/KSzdhstY3QZ086GSIfQy2B8O1HOVrY5nbEFUM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=OImwbE51iPhWYXkBQveZKo9t6PTimzG4k6mz4P3BYeb7Saar5X0bnvXB/haN4iH7n
+	 l9rjnDeAgEejjocfeao1mK/30tZ6uSlebaW1+2S+gLHub6a/XTNXT4sumVD4lYD3Z4
+	 0nzNypgHAbvkLeuomXGiu3f94jETjgt1xnwwRQCKhPSnk12BCZ2CZVA3udwaLXOdt3
+	 fxfc8vkSieZqm/99hKOy70nWj0pHijHTm7PnRxQSuqpGwH9BssN7WsTvtRJnm7uQdF
+	 BZrjNVn4W3UVnvy+vjyQkqxaSkQJIosIxrMuv/QViEXocxXZhuQ0hRo86BKvJ7/gk8
+	 5HI4S1P02Svyg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3ECFFDC99E5;
+	Thu,  1 Feb 2024 05:20:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 06/11] net: stmmac: resetup XPCS according to
- the new interface mode
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
- David E Box <david.e.box@linux.intel.com>,
- Hans de Goede <hdegoede@redhat.com>, Mark Gross <markgross@kernel.org>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <Jose.Abreu@synopsys.com>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Philipp Zabel <p.zabel@pengutronix.de>, Andrew Halaney
- <ahalaney@redhat.com>, Simon Horman <simon.horman@corigine.com>,
- Serge Semin <fancer.lancer@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, platform-driver-x86@vger.kernel.org,
- linux-hwmon@vger.kernel.org, bpf@vger.kernel.org,
- Voon Wei Feng <weifeng.voon@intel.com>,
- Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
- Lai Peter Jun Ann <jun.ann.lai@intel.com>,
- Abdul Rahim Faizal <faizal.abdul.rahim@intel.com>
-References: <20240129130253.1400707-1-yong.liang.choong@linux.intel.com>
- <20240129130253.1400707-7-yong.liang.choong@linux.intel.com>
- <ZbjNn+C/VHegH2t7@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-In-Reply-To: <ZbjNn+C/VHegH2t7@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/3] selftests: net: a few pmtu.sh fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170676482525.24744.1244628672807352889.git-patchwork-notify@kernel.org>
+Date: Thu, 01 Feb 2024 05:20:25 +0000
+References: <cover.1706635101.git.pabeni@redhat.com>
+In-Reply-To: <cover.1706635101.git.pabeni@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, shuah@kernel.org, dsahern@kernel.org, gnault@redhat.com,
+ vadim.fedorenko@linux.dev, fw@strlen.de, linux-kselftest@vger.kernel.org
 
+Hello:
 
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On 30/1/2024 6:21 pm, Russell King (Oracle) wrote:
-> NAK. Absolutely not. You haven't read the phylink documentation, nor
-> understood how phylink works.
+On Tue, 30 Jan 2024 18:47:15 +0100 you wrote:
+> This series try to address CI failures for the pmtu.sh tests. It
+> does _not_ attempt to enable all the currently skipped cases, to
+> avoid adding more entropy.
 > 
-> Since you haven't read the phylink documentation, I'm not going to
-> waste any more time reviewing this series since you haven't done your
-> side of the bargin here.
+> Tested with:
 > 
-Hi Russell,
+> make -C tools/testing/selftests/ TARGETS=net install
+> vng --build  --config tools/testing/selftests/net/config
+> vng --run . --user root -- \
+> 	./tools/testing/selftests/kselftest_install/run_kselftest.sh \
+> 	-t net:pmtu.sh
+> 
+> [...]
 
-Sorry that previously I only studied the phylink based on the `phylink.h` 
-itself. I think it might not be sufficient. I did search through the 
-internet and found the phylink document from kernel.org 
-(https://docs.kernel.org/networking/sfp-phylink.html). Kindly let me know 
-if there are any other phylink documents I might have overlooked.
+Here is the summary with links:
+  - [net,1/3] selftests: net: add missing config for pmtu.sh tests
+    https://git.kernel.org/netdev/net/c/f7c25d8e17dd
+  - [net,2/3] selftests: net: fix available tunnels detection
+    https://git.kernel.org/netdev/net/c/e4e4b6d568d2
+  - [net,3/3] selftests: net: don't access /dev/stdout in pmtu.sh
+    https://git.kernel.org/netdev/net/c/bc0970d5ac1d
 
-According to the phylink document from kernel.org, it does mention that 
-"phylink is a mechanism to support hot-pluggable networking modules 
-directly connected to a MAC without needing to re-initialise the adapter on 
-hot-plug events." I realize I should not destroy and reinitialize the PCS.
-Instead, I plan to follow the implementation in "net: macb: use 
-.mac_select_pcs() interface" 
-(https://lore.kernel.org/netdev/E1n568J-002SZX-Gr@rmk-PC.armlinux.org.uk/T/). 
-This involves initializing the required PCS during the MAC probe and 
-querying the PCS based on the interface.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Kindly let me know if I've overlooked anything in this proposed solution.
+
 
