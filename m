@@ -1,130 +1,129 @@
-Return-Path: <netdev+bounces-68106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5697845D79
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:41:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31571845D80
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 17:42:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49DC21F29B0B
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:41:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5F8E1F2333D
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 16:42:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC2D77E0EC;
-	Thu,  1 Feb 2024 16:41:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A31A67E0F3;
+	Thu,  1 Feb 2024 16:42:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pfb6dsY3"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZVIcQ1j4"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B85468C;
-	Thu,  1 Feb 2024 16:41:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D85F13FFE;
+	Thu,  1 Feb 2024 16:42:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706805673; cv=none; b=aDBAaAFuFcJRv+QLhxB9AW6yxSz4vxUke+aYIbanqj4AYBgxLlY057+MaegOBR8J4bDFiu6bZEgaMKu5a3MDQVPpPG/T58ozBOZ1IE3XYcAf9vLm/M5Q7zSMxglY4jv/wFerennSH/4DDqKvNokYvwV1ddS0K4T9OiLFeNUvlJ0=
+	t=1706805757; cv=none; b=agQRx+aIJdg+uxHIF/WW/ePtdE4JvZdAm5L2z2nQzy5Lm5JE1OkLiKZYWceW/Qtj/Tn1JcNQuP53vl0NR/c/owXqLMCukKHYRIAYOESIR3VV6UdUSdOkqf1AOBVmq/1jvfywBR41Lakxhn2CYYGAdd+/1BgnT8V6XYbFNr/DM7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706805673; c=relaxed/simple;
-	bh=C5qACvJe4fco+aV4C5Cr3NGN+Os63Z8yz1zzXlaXL0w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nlkdzs4itg9sAzxURwereSBfR9v49WAhPWdBcZgWGtxKw9CADd097O9YIr6//XcOM1mIeoxyIaoNbFloK9JNH9UraPbQvhLCY0968yt+3IZJDnstgmeIalHu6Tz1yEoNtoO0rhVEf0LWwDtcyWd8EKIoi6plp/6V5EjAyT6FpIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pfb6dsY3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E139FC433F1;
-	Thu,  1 Feb 2024 16:41:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706805673;
-	bh=C5qACvJe4fco+aV4C5Cr3NGN+Os63Z8yz1zzXlaXL0w=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pfb6dsY3vtKeeT9ssgHQFDkW7nhyCtSHlIS+KFNcFWWfF2Idcv/tp2O8xVuVNNAy+
-	 AMf0SH08itOSEYRCoVAMT6l4CZeTQEJ2qSKIfm7H0QlhTgICs8UJ3say4XVSDDAEGG
-	 zpG3tzZM9xvAzwoh8gyaav6LOqJrFI9sBWuixreV/U/E60RJ+NbOGHU3h/LuV8uyMU
-	 gbSlqwbMXgo+fOj7q6XsUKLqnRiNJbobhg0fLkB524fxFh/dP4feFX/ja5rIGigLbS
-	 ZEEGqGJGA1XFmi/xRn12+CBuIPGR3xN1W6Wjp/1kYCva2EAEetSrg9t3+SFKvdYsVm
-	 +gos90HrwjgvQ==
-Date: Thu, 1 Feb 2024 17:41:09 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, lorenzo.bianconi@redhat.com,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	bpf@vger.kernel.org, toke@redhat.com,
-	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
-	sdf@google.com, hawk@kernel.org, ilias.apalodimas@linaro.org
-Subject: Re: [PATCH v6 net-next 3/5] xdp: add multi-buff support for xdp
- running in generic mode
-Message-ID: <ZbvJpQfyz-QG8EdQ@lore-desk>
-References: <cover.1706451150.git.lorenzo@kernel.org>
- <c93dce1f78bd383c117311e4d53e2766264f6759.1706451150.git.lorenzo@kernel.org>
- <20240131154740.615966a9@kernel.org>
- <ZbuBwvCa4diMHNhk@lore-desk>
- <20240201071512.0fb7c5ee@kernel.org>
+	s=arc-20240116; t=1706805757; c=relaxed/simple;
+	bh=Crd3dJgXe4fYUS6yZk7Jg/OJoQ9gKfrffjshj7lAM8A=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=NMHyyZkZO7CDB6dFLXEC7mqlExncos/maMKcQMu9X4D+6UWML7uB1cTRNcs/0V4/6I/PveIctTO8cIQQYyhsuYoNdVdV1HhaK9bEADbS3kGRUXlT6TL+ln54l2LwTFeKIyqDM0aMwjRmQa+lHSjKhRMF5wtho2jaT0Ww2Sgkv5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZVIcQ1j4; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706805756; x=1738341756;
+  h=message-id:subject:from:reply-to:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=Crd3dJgXe4fYUS6yZk7Jg/OJoQ9gKfrffjshj7lAM8A=;
+  b=ZVIcQ1j4wLvA1kpqAyDL2PaYQFti0RlU5QiS7hxb7wmv1ProZb/MKQ/e
+   8WcfUPGX2U2na3Bq5l0+8n1Be8IGVfqKZmB87MnVNG1bgp1ePZzxW+dHL
+   a0C9SIliP/ZFEK3zUIPHNV3fPxjJsbYAfyHs3XnzFx4Of1eNE3IL6AUKN
+   pcMPcvQ6xiQwE2f9BdzzspVtPbpcEnm19Je9Men60pK/quY6/4ggIgHFv
+   IXV8NbdmlHs6DOpjKOmwYi4dnJo2jsSqEEXFRA3nc0HCGey2kXrk1qX/5
+   maDE1rTQQatYSS1QCSuONyYRd3i4+GkiKQENQg7d/QKY2kyItQyqFvhNY
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="10688931"
+X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
+   d="scan'208";a="10688931"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 08:42:34 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
+   d="scan'208";a="4437860"
+Received: from linux.intel.com ([10.54.29.200])
+  by fmviesa005.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 08:42:34 -0800
+Received: from ssigler-mobl.amr.corp.intel.com (unknown [10.209.41.165])
+	by linux.intel.com (Postfix) with ESMTP id 16F6F580D28;
+	Thu,  1 Feb 2024 08:42:34 -0800 (PST)
+Message-ID: <94a61858ac82ceaac1ef8ae41067ae7356512d7d.camel@linux.intel.com>
+Subject: Re: [PATCH 4/8] platform/x86/intel/sdsi: Add netlink SPDM transport
+From: "David E. Box" <david.e.box@linux.intel.com>
+Reply-To: david.e.box@linux.intel.com
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, ilpo.jarvinen@linux.intel.com, 
+	sathyanarayanan.kuppuswamy@linux.intel.com, linux-kernel@vger.kernel.org, 
+	platform-driver-x86@vger.kernel.org
+Date: Thu, 01 Feb 2024 08:42:33 -0800
+In-Reply-To: <ZbtjyOBHzVKXu_4H@nanopsycho>
+References: <20240201010747.471141-1-david.e.box@linux.intel.com>
+	 <20240201010747.471141-5-david.e.box@linux.intel.com>
+	 <ZbtjyOBHzVKXu_4H@nanopsycho>
+Organization: David E. Box
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.44.4-0ubuntu2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="RMohjYX9M5WO5zrC"
-Content-Disposition: inline
-In-Reply-To: <20240201071512.0fb7c5ee@kernel.org>
 
+Hi Jiro,
 
---RMohjYX9M5WO5zrC
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Thanks for your comments.
 
-> On Thu, 1 Feb 2024 12:34:26 +0100 Lorenzo Bianconi wrote:
-> > > nit: doesn't look all that related to a netif, I'd put it in skbuff.c=
- =20
-> >=20
-> > ack, fine. skb_segment_for_xdp() in this case?
+On Thu, 2024-02-01 at 10:26 +0100, Jiri Pirko wrote:
+> Thu, Feb 01, 2024 at 02:07:43AM CET, david.e.box@linux.intel.com=C2=A0wro=
+te:
 >=20
-> I think the closest thing we have now is skb_cow_data(),
-> so how about skb_cow_data_pp() or skb_cow_fragged() or
-> skb_cow_something? :)
-
-I like skb_cow_something :)
-
->=20
-> I'm on the fence whether we should split the XDP-ness out.
-> I mean the only two xdp-related things are the headroom and
-> check for xdp_has_frags, so we could also:
->=20
-> skb_cow_data_pp(struct page_pool *pool, struct sk_buff **pskb,
-> 		unsigned int headroom)
-> {
-> 	...
-> }
->=20
-> skb_cow_data_xdp(struct page_pool *pool, struct sk_buff **pskb,
-> 		 struct bpf_prog *prog)
-> {
-> 	if (!prog->aux->xdp_has_frags)
-> 		return -EINVAL;
->=20
-> 	return skb_cow_data_pp(pool, pskb, XDP_PACKET_HEADROOM);
-> }
+> [...]
 >=20
 >=20
-> I think it'd increase the chances of reuse. But that's speculative=20
-> so I'll let you decide if you prefer that or to keep it simple.
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: spdm-req
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 type: binary
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 name: spdm-rsp
+> > +=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 type: binary
+>=20
+> I don't understand the need to use netlink for this. Basically what you
+> do is you just use it to pass binary blobs to and from FW.
+> Advantages, like well-defined attributes, notifications etc, for which
+> it makes sense to use Netlink are not utilized at all.
 
-ack, I agree. I will fix it in v7.
+SPDM supports the setup of a secure channel between the responder and reque=
+stor
+using TLS based encryption algorthms. While this is just a transport for th=
+ose
+blobs, netlink seemed an appropriate interface for this type of communicati=
+on.
+The binary blobs can instead be broken out into the SPDM protocol messages,
+right out of the spec. But for our needs this would still just define the
+protocol. The algorithms themselves are not handled by the driver.
 
-Regards,
-Lorenzo
+> Also, I don't thing it is good idea to have hw-driver-specific genl
+> family. I'm not aware of anything like that so far. Leave netlink
+> for use of generic and abstracted APIs.
 
---RMohjYX9M5WO5zrC
-Content-Type: application/pgp-signature; name="signature.asc"
+Sounds like an implied rule. If so should it be documented somewhere?
 
------BEGIN PGP SIGNATURE-----
+>=20
+> Can't you just have a simple misc device for this?
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZbvJpQAKCRA6cBh0uS2t
-rBQeAQDjWxYXA4LO9NpbdMFqQxHAoE9xCllfwg+tem94ByDntgD/SW9IojM4gQtJ
-+FhLDKxDQnSEbDtMvTUK368/jepCQwQ=
-=qvpZ
------END PGP SIGNATURE-----
+It wouldn't be too much work to convert it.
 
---RMohjYX9M5WO5zrC--
+David
 
