@@ -1,100 +1,88 @@
-Return-Path: <netdev+bounces-67749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92DF6844DC0
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:20:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93E82844DC6
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:23:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4372EB22C71
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 00:20:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C70D81C25D22
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 00:23:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 507C7386;
-	Thu,  1 Feb 2024 00:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E61184;
+	Thu,  1 Feb 2024 00:23:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TQGgOwQa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lk+5raA/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28428374;
-	Thu,  1 Feb 2024 00:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4D9380
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 00:23:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706746829; cv=none; b=I0BhytaiRuAnJfvjKHos1AmEZ4xUSdqUiqt7AbCBQ6ywd/I23VAPuppLlvtITxBsm4wVUIF25LUtMShQiOizfQ3s00zH7lUNMbR+6BU0CvRsHi15csMnzA5/5bdEJ6fK1D/2w2RE88cAkkKG9sXXikWpVQ30UgDgG8IqX/fyY5s=
+	t=1706747021; cv=none; b=Ore/zRZ1YrCOSZdOyxtzg43HR3kvy1s9+Nf3lQEEfBSPw3UgZWppIbmnRqh7a6c7gbSsSRtyu350P3l3BOpSFCyNKzYx1PaVMnBmsDqInYTrRS+8PF999L5af7P+BIcESOOP6RrM6NaDpGIxplL2wDosuMarAv1Q4RhctfF7UmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706746829; c=relaxed/simple;
-	bh=/VxkoqMjoE7DN9wE2kVN+Q8l8JnStP2ePctt+C58hR8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jdECWYcYrnE3wjgqGlnxwPZYa2I/CoGoFNQDqHUT6XSWBCRZE8/84DMdwEoM6r9dnm8P4uhgs78sKRT57rcs8gO5H9Kt9UKzf5+R6pNlNFOft1Wqj2WC+JNRI2J7zz7zf/uT+eAqx01LM82bUCEm9HqX/aWx9rKin40ibAqytok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TQGgOwQa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8BB30C43390;
-	Thu,  1 Feb 2024 00:20:28 +0000 (UTC)
+	s=arc-20240116; t=1706747021; c=relaxed/simple;
+	bh=7gsKG6V5s1dopCQuysbsTz34HGC4+l+xc5j4okSwkgM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZhOT9WJ5LoXx7Igq4t1XAHQosCHvD5uZdKKo6DLrhcF1QfRwOOTYnneTyXRXsYL+uGb3/dFxHxFeHlO3ay1LB2MToNFFcn1uyI2SAzG06q8GVrGVItYOaYKIHn+VKw1m56N5a1nF7LOAWaTBQFXyuLFYlHqf6FhQ6FDiBlC1x8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lk+5raA/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 646C0C433F1;
+	Thu,  1 Feb 2024 00:23:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706746828;
-	bh=/VxkoqMjoE7DN9wE2kVN+Q8l8JnStP2ePctt+C58hR8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TQGgOwQa1HrFRfb0GCdlXjNRLwUXX2nxq1RmI0+RAdkhkHWUgZaRNWAwb0Jw2GH9T
-	 U8nChjyD7uioUW6+aeLJsKbvvW3HiFTqYvZNIE1TsYjJZV2OC3m6TXQE2v5u7sR0+u
-	 g1rU/oBOxm2CZu5SwaC9gDdkMMU9H6gsITZjHTL1sIgYlIsQRym8KF4GlpY++TNLBs
-	 noNUyVD6GF22GY9kmXXRkK2UBm8zmNIP4c/1AEmh3U3TstXcYGfzg04Q/liINj5qXj
-	 SOVkjQxK8fSNTAGHtZmeQ3l1LEH6nLIwGG3SlrOns575RhuMME0iOANKPKV6SlZlQs
-	 KBfIc2vQ8tr2w==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6D8CCDC99E6;
-	Thu,  1 Feb 2024 00:20:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1706747020;
+	bh=7gsKG6V5s1dopCQuysbsTz34HGC4+l+xc5j4okSwkgM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lk+5raA/Cc61dnv9T5cuz4gmbXaTbEiX742QUf0zqnvIfq3Fj3SYKTN/uoi3yP+g/
+	 pLoelw6V1AJdY5MbbIOAYtjq2qesUk/3GIwLzdEFsN3PUAnwi+SxWwW3Lk9cgZsGoS
+	 qlbBbWMb45LrvVgTPSl5JJf+j443ewZ3jZ6m6+9GWMGFXHWIqsoJk6VP5mL+8net8k
+	 d2kwVXZdx5SbZTOwXM3ZVtzXTiOiHudjReNRanO2NxpAYRWNjdzws2AHMiA+mEOmcg
+	 c0zNjS8GO0+Zn4sPw2NrOEAj6LZ6IyjsmFrxzylSiyQWii7Fsps6xQ8mJ7fjWr3eN7
+	 6nJN7zWOFch0g==
+Date: Wed, 31 Jan 2024 16:23:36 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paul Durrant <paul@xen.org>
+Cc: Jan Beulich <jbeulich@suse.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, Wei Liu <wl@xen.org>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+Subject: Re: [PATCH net] xen-netback: properly sync TX responses
+Message-ID: <20240131162336.7d3ba09e@kernel.org>
+In-Reply-To: <980c6c3d-e10e-4459-8565-e8fbde122f00@suse.com>
+References: <980c6c3d-e10e-4459-8565-e8fbde122f00@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] net: dsa: mv88e6xxx: Fix failed probe due to
- unsupported C45 reads
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170674682844.10400.9428070571469992334.git-patchwork-notify@kernel.org>
-Date: Thu, 01 Feb 2024 00:20:28 +0000
-References: <20240129224948.1531452-1-andrew@lunn.ch>
-In-Reply-To: <20240129224948.1531452-1-andrew@lunn.ch>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- davem@davemloft.net, vladimir.oltean@nxp.com, netdev@vger.kernel.org,
- stable@vger.kernel.org, tmenninger@purestorage.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 29 Jan 2024 23:49:48 +0100 you wrote:
-> Not all mv88e6xxx device support C45 read/write operations. Those
-> which do not return -EOPNOTSUPP. However, when phylib scans the bus,
-> it considers this fatal, and the probe of the MDIO bus fails, which in
-> term causes the mv88e6xxx probe as a whole to fail.
+On Mon, 29 Jan 2024 14:03:08 +0100 Jan Beulich wrote:
+> Invoking the make_tx_response() / push_tx_responses() pair with no lock
+> held would be acceptable only if all such invocations happened from the
+> same context (NAPI instance or dealloc thread). Since this isn't the
+> case, and since the interface "spec" also doesn't demand that multicast
+> operations may only be performed with no in-flight transmits,
+> MCAST_{ADD,DEL} processing also needs to acquire the response lock
+> around the invocations.
 > 
-> When there is no device on the bus for a given address, the pull up
-> resistor on the data line results in the read returning 0xffff. The
-> phylib core code understands this when scanning for devices on the
-> bus. C45 allows multiple devices to be supported at one address, so
-> phylib will perform a few reads at each address, so although thought
-> not the most efficient solution, it is a way to avoid fatal
-> errors. Make use of this as a minimal fix for stable to fix the
-> probing problems.
+> To prevent similar mistakes going forward, "downgrade" the present
+> functions to private helpers of just the two remaining ones using them
+> directly, with no forward declarations anymore. This involves renaming
+> what so far was make_tx_response(), for the new function of that name
+> to serve the new (wrapper) purpose.
 > 
-> [...]
+> While there,
+> - constify the txp parameters,
+> - correct xenvif_idx_release()'s status parameter's type,
+> - rename {,_}make_tx_response()'s status parameters for consistency with
+>   xenvif_idx_release()'s.
 
-Here is the summary with links:
-  - [net,v2] net: dsa: mv88e6xxx: Fix failed probe due to unsupported C45 reads
-    https://git.kernel.org/netdev/net/c/585b40e25dc9
-
-You are awesome, thank you!
+Hi Paul, is this one on your TODO list to review or should 
+we do our best? :)
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: needs-ack
 
