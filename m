@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-68009-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03EC684595D
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 14:53:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95C6D84595E
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 14:53:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 88C93B28A09
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:53:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C82EF1C27E38
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:53:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D195D46B;
-	Thu,  1 Feb 2024 13:53:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CE345CDE4;
+	Thu,  1 Feb 2024 13:53:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RULfAaSW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="neo4lntG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E358F5336B
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 13:53:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDCF85B669
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 13:53:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706795598; cv=none; b=hHgarWKQwPwR6KWiJWdj7FXD83p2l6w7ralF5XXutvJb4Mq9ulIAbwfWAy2ykiiVaT5RQtyYQSL/HoB26+KMtjI8TSSl8K37xMYq6axdQnjOO5Y2eYfYYw8JuUPETFjVW07CHTItq4jaSLL21iLBuf5TdPwn2cqRnSbvOXWp6+U=
+	t=1706795619; cv=none; b=tSd86+dBBvOB2vqRcst+PFOCCggO4U7cv+3aPE4kQiYT1tA8uM39mfiGxaT9+HvtjjOMdf9RGYaDnQJnrAjS+/f8Qu3fmRzX+XZPN82hr8jGsSIxpU76T/m8mzM47BEkNKiNYKsET7LLWFS1E8cZslIWaJcO1sqPgaE7wERLLpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706795598; c=relaxed/simple;
-	bh=sq1cWvyVkdX2fs4Z/aiPzFVgCCfswu7HDAiJGcCDW+M=;
+	s=arc-20240116; t=1706795619; c=relaxed/simple;
+	bh=hRf6knhptwKVRnr0kxJwmE3JRsjwA6Rl3X4xJJiymys=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ATm84iTOz15IhioxssgHh7g6p0aZkiwGhJqaPKZSRt25c2erQOb3thPJTm7uXmc5ZXRGPXKMO0YyZV2q0tK0I5xqX2huZTh2x6WsPuzsIN7RRoSbdXhrUyjcP6+oowq3RE5mglqk/YardvXePg3a4rSbdfFeZcfXogEdH8fB0HA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RULfAaSW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41027C433C7;
-	Thu,  1 Feb 2024 13:53:14 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=HHAKkXG2IlgbvJTe1rV3JmTsb1AojnhxvhX9izov9TTkhW4jDxu+uQMVBqQPDGmv5t1I4hML9zJ+Zj2yieuMqVS5xpl7wqMN4taDS0VZXrHKNxgMeYa8UBD+psJcVnBVZKLvOFLJc9+WWxLkc+kYdV1x2ZgetukEKoxoU7pguvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=neo4lntG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 77119C433C7;
+	Thu,  1 Feb 2024 13:53:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706795597;
-	bh=sq1cWvyVkdX2fs4Z/aiPzFVgCCfswu7HDAiJGcCDW+M=;
+	s=k20201202; t=1706795619;
+	bh=hRf6knhptwKVRnr0kxJwmE3JRsjwA6Rl3X4xJJiymys=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=RULfAaSW0cBus6P0eYfypAFaGeMTtqv6IhRSWWUSYZ2g7CHObq96HIcTIWIz4stsB
-	 1R8LpvDOabl+TO3Ei/1QTk25OPe6A6A6catrjsz+PpS70b9ibg1gXBsOG5iEfinF27
-	 Y3gdoQsd8XJKIHXlAU4xCHwUBdmc9TSRYyxMVRrxe8taojdla1yFe/If1IpIJBC9Rp
-	 KY3n6G7EMkUZqFhMnIoBYosG6fcZ77XDZrTN/GLMLj8MTwQQBG2WYiDkjjRzKlt3RA
-	 S6XgOxMRYIfL4SU9+fRrtErrE2CkJnAPnWOx8XD+3iHkRxONSSpQX9vNiqTOMyexRq
-	 xXyz9jfzhUfyQ==
-Date: Thu, 1 Feb 2024 14:53:11 +0100
+	b=neo4lntGqIxyky2sTSVaI5zzJClozUPOjHE+lreq65bpEnGqCWbRhamk7K5OrE+YI
+	 FN7tMyn1cYj12olZUWaXIOFd1zm3QQeE/WteimZA/SfR7wEWEorTvEHeDrgjp8iWHk
+	 FiG3Wktv7sQEtUFXTPbFJBmANN5XkUjYep2qIJA6RxZcKbeHeoVDtMVYFgjqiIrOlY
+	 XdJ8MY0wPz9qhKVJ0biefU18mBknoJiMVbkSwDTN9xWbMXoE+aw2AwThUT+pQEczFj
+	 hNQnLVZTSZ65Ani08FF3fpfeKoGs0Ix4LZxdah4c2ZwW0i7OLhN8OpYXGBe/RhOgNZ
+	 zayWCUkJXr6NA==
+Date: Thu, 1 Feb 2024 14:53:34 +0100
 From: Simon Horman <horms@kernel.org>
 To: Jiri Pirko <jiri@resnulli.us>
 Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
@@ -49,11 +49,11 @@ Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
 	arkadiusz.kubalewski@intel.com, saeedm@nvidia.com, leon@kernel.org,
 	jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
 	rrameshbabu@nvidia.com
-Subject: Re: [patch net-next v2 1/3] dpll: extend uapi by lock status error
- attribute
-Message-ID: <20240201135311.GE530335@kernel.org>
+Subject: Re: [patch net-next v2 2/3] dpll: extend lock_status_get() op by
+ status error and expose to user
+Message-ID: <20240201135334.GF530335@kernel.org>
 References: <20240130120831.261085-1-jiri@resnulli.us>
- <20240130120831.261085-2-jiri@resnulli.us>
+ <20240130120831.261085-3-jiri@resnulli.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,78 +62,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240130120831.261085-2-jiri@resnulli.us>
+In-Reply-To: <20240130120831.261085-3-jiri@resnulli.us>
 
-On Tue, Jan 30, 2024 at 01:08:29PM +0100, Jiri Pirko wrote:
+On Tue, Jan 30, 2024 at 01:08:30PM +0100, Jiri Pirko wrote:
 > From: Jiri Pirko <jiri@nvidia.com>
 > 
-> If the dpll devices goes to state "unlocked" or "holdover", it may be
-> caused by an error. In that case, allow user to see what the error was.
-> Introduce a new attribute and values it can carry.
+> Pass additional argunent status_error over lock_status_get()
+> so drivers can fill it up. In case they do, expose the value over
+> previously introduced attribute to user. Do it only in case the
+> current lock_status is either "unlocked" or "holdover".
 > 
 > Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 > Acked-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
-The nit below notwithstanding, this looks good to me.
-
 Reviewed-by: Simon Horman <horms@kernel.org>
 
-...
 
-> diff --git a/include/uapi/linux/dpll.h b/include/uapi/linux/dpll.h
-> index b4e947f9bfbc..0c13d7f1a1bc 100644
-> --- a/include/uapi/linux/dpll.h
-> +++ b/include/uapi/linux/dpll.h
-> @@ -50,6 +50,35 @@ enum dpll_lock_status {
->  	DPLL_LOCK_STATUS_MAX = (__DPLL_LOCK_STATUS_MAX - 1)
->  };
->  
-> +/**
-> + * enum dpll_lock_status_error - if previous status change was done due to a
-> + *   failure, this provides information of dpll device lock status error. Valid
-> + *   values for DPLL_A_LOCK_STATUS_ERROR attribute
-> + * @DPLL_LOCK_STATUS_ERROR_NONE: dpll device lock status was changed without
-> + *   any error
-> + * @DPLL_LOCK_STATUS_ERROR_UNDEFINED: dpll device lock status was changed due
-> + *   to undefined error. Driver fills this value up in case it is not able to
-> + *   obtain suitable exact error type.
-> + * @DPLL_LOCK_STATUS_ERROR_MEDIA_DOWN: dpll device lock status was changed
-> + *   because of associated media got down. This may happen for example if dpll
-> + *   device was previously locked on an input pin of type
-> + *   PIN_TYPE_SYNCE_ETH_PORT.
-> + * @DPLL_LOCK_STATUS_ERROR_FRACTIONAL_FREQUENCY_OFFSET_TOO_HIGH: the FFO
-> + *   (Fractional Frequency Offset) between the RX and TX symbol rate on the
-> + *   media got too high. This may happen for example if dpll device was
-> + *   previously locked on an input pin of type PIN_TYPE_SYNCE_ETH_PORT.
-> + */
-> +enum dpll_lock_status_error {
-> +	DPLL_LOCK_STATUS_ERROR_NONE = 1,
-> +	DPLL_LOCK_STATUS_ERROR_UNDEFINED,
-> +	DPLL_LOCK_STATUS_ERROR_MEDIA_DOWN,
-> +	DPLL_LOCK_STATUS_ERROR_FRACTIONAL_FREQUENCY_OFFSET_TOO_HIGH,
 
-nit: I'm all for descriptive names,
-     but this one is rather long to say the least.
-
-> +
-> +	/* private: */
-> +	__DPLL_LOCK_STATUS_ERROR_MAX,
-> +	DPLL_LOCK_STATUS_ERROR_MAX = (__DPLL_LOCK_STATUS_ERROR_MAX - 1)
-> +};
-> +
->  #define DPLL_TEMP_DIVIDER	1000
->  
->  /**
-> @@ -150,6 +179,7 @@ enum dpll_a {
->  	DPLL_A_LOCK_STATUS,
->  	DPLL_A_TEMP,
->  	DPLL_A_TYPE,
-> +	DPLL_A_LOCK_STATUS_ERROR,
->  
->  	__DPLL_A_MAX,
->  	DPLL_A_MAX = (__DPLL_A_MAX - 1)
-> -- 
-> 2.43.0
-> 
-> 
 
