@@ -1,173 +1,116 @@
-Return-Path: <netdev+bounces-67961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4796D8457D7
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:33:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B3F28457DC
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:33:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EB55B2B503
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 12:33:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 070681F22E82
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 12:33:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11A0B53368;
-	Thu,  1 Feb 2024 12:27:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6340F5CDDC;
+	Thu,  1 Feb 2024 12:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="iZBOwbyC"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TX4qmDrM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8F553365
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 12:27:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 408AB5CDC4
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 12:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706790434; cv=none; b=mWwkQeMXppUgOWArsQgJ5550et/SJI2RufzqebGekZ1nZFPR+OMYBSdZoU1XcF57knLa0jJ0YGKwIAqDMe9ieXWdhAAREOATAxKclgUpC5SngzI3RMbQzMvzmWlI2Zm/1Vt50gzUE4tPoh7fiyRopBngrBK020mGv91VERIRXjw=
+	t=1706790628; cv=none; b=d5IVOwKlpDlBeDBgtOfKsIBCz9RWF4+31XFfvaqw7aQZxeGehHL/IRNnZLkt8ycpwyOEdzmhfg+n4awQuI4ND5a9xovPQ94G9G363zIjwF2Dj1l2kD/9aSnYgP4VXxK//KMqm9Int44WU0fg1S9+gVj68MDmDbG3zDh49WT/WNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706790434; c=relaxed/simple;
-	bh=bqMA8kpz+ZEy0Nhr/thcrdvZ8GQ3Mj53b4sx5dLp2Ec=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fYbmKX36hNr5ltbn0vMxAuW+oxjTbLa+YBVGCNBCEnoqsouFlJTaH0fB/Nd4d4JgglEGvBXspNdeex9HiuNSTaV1/wM/TPZ2dnM8muoBsHHF2IemOsY/q60YwW92QY/NQp9/HO9fJ41HDUNoGG4dJ/4A27gi+tfIWrWJzulX2Lk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=iZBOwbyC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 635B5C433C7;
-	Thu,  1 Feb 2024 12:27:08 +0000 (UTC)
+	s=arc-20240116; t=1706790628; c=relaxed/simple;
+	bh=DBvgQXkRvLI9oy5I3Bs1HzaZ+aJXSMBrlrz9UE+HB3w=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=kljx68RiJP/6v7TWHV1VgsDSwRAT7WBDkxM6id5lVqV6Nk6LwFe5ZBfFykXn9qVtNUzGaoHCyK2cT9zJp33a2ho037HcgHXyD/O/4VB+aK0LDZCPlJ3qK0VbWLBEYZ1L2Ex04uGR7Nc91oXCIHiq1tGIuuW7qXClpp1uyG/dT6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TX4qmDrM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C3D59C433C7;
+	Thu,  1 Feb 2024 12:30:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706790433;
-	bh=bqMA8kpz+ZEy0Nhr/thcrdvZ8GQ3Mj53b4sx5dLp2Ec=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=iZBOwbyCFSQAz6Yd61eutqrrJd5/vrPxNV4qSd+hK9v3QdcmMYxySgVQS66RKTRa0
-	 Cd4qYmk9RwBvCOc/Jig3NagPx4jVtb+kgOSuQPm3exRn/SUsZnp5DxV+cUHid7Bn+d
-	 fHnO7OBIrZzurRWPhy41RZDJ0PQIQuQIowvEMtS6/hds/UsKuIYCFeTO26iRVIQfMD
-	 wOR32G1evyKqqeOezvr6zRy4VPR1CHQYDkwAHvzxM3sfSFOCCN8ltj+9Ajy09KQGL0
-	 D0dI16C7RJEXddx4gUT33ORDz0mgbAhgQ4DQY7stJkRnLkCdxVZPg4ngjONKJZPlQ6
-	 /ZmHMMV2pnjdQ==
-Date: Thu, 1 Feb 2024 13:27:05 +0100
-From: Simon Horman <horms@kernel.org>
-To: darinzon@amazon.com
-Cc: "Nelson, Shannon" <shannon.nelson@amd.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	"Woodhouse, David" <dwmw@amazon.com>,
-	"Machulsky, Zorik" <zorik@amazon.com>,
-	"Matushevsky, Alexander" <matua@amazon.com>,
-	Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
-	"Liguori, Anthony" <aliguori@amazon.com>,
-	"Bshara, Nafea" <nafea@amazon.com>,
-	"Belgazal, Netanel" <netanel@amazon.com>,
-	"Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>,
-	"Kiyanovski, Arthur" <akiyano@amazon.com>,
-	"Dagan, Noam" <ndagan@amazon.com>,
-	"Agroskin, Shay" <shayagr@amazon.com>,
-	"Itzko, Shahar" <itzko@amazon.com>,
-	"Abboud, Osama" <osamaabb@amazon.com>,
-	"Ostrovsky, Evgeny" <evostrov@amazon.com>,
-	"Tabachnik, Ofir" <ofirt@amazon.com>,
-	"Koler, Nati" <nkoler@amazon.com>
-Subject: Re: [PATCH v2 net-next 07/11] net: ena: Add more information on TX
- timeouts
-Message-ID: <20240201122705.GA530335@kernel.org>
-References: <20240130095353.2881-1-darinzon@amazon.com>
- <20240130095353.2881-8-darinzon@amazon.com>
+	s=k20201202; t=1706790627;
+	bh=DBvgQXkRvLI9oy5I3Bs1HzaZ+aJXSMBrlrz9UE+HB3w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TX4qmDrM97LGPMjRUbFzyCMnPhNiXn58q6TqpcMxKv54AdCoPi6ZFPLSdZFqC9bOh
+	 GDeciYBENLMDeOWOPVpqOLqB9yzSgOYB+Pg75wMtNiQj2y3LCCx9E8zubfGipJsOdm
+	 dUFiBOlm5U6qL4BnZqFoVDo8e/ZAly+tmyMnykd9fw3vSJg1dNO9L34nDGIBLfSD9g
+	 QLiyynb5fkmOKx3B49715ZnYRWJTAER7PTTSzP8dcjNK/I4bUou18eL4FBH5QnAp1Z
+	 WzhNQ5X7dy9zCIeQIWsJKtS23qUGyA4yCcKy0hFJLKdYBVkimpPhtalqIFZKYlRBxY
+	 S7WeC1Gy3hRKg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A6D83DC99ED;
+	Thu,  1 Feb 2024 12:30:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240130095353.2881-8-darinzon@amazon.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net-next 00/11] ENA driver changes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170679062767.10307.17987301987672256826.git-patchwork-notify@kernel.org>
+Date: Thu, 01 Feb 2024 12:30:27 +0000
+References: <20240130095353.2881-1-darinzon@amazon.com>
+In-Reply-To: <20240130095353.2881-1-darinzon@amazon.com>
+To: Arinzon@codeaurora.org, David <darinzon@amazon.com>
+Cc: shannon.nelson@amd.com, davem@davemloft.net, kuba@kernel.org,
+ netdev@vger.kernel.org, dwmw@amazon.com, zorik@amazon.com, matua@amazon.com,
+ saeedb@amazon.com, msw@amazon.com, aliguori@amazon.com, nafea@amazon.com,
+ netanel@amazon.com, alisaidi@amazon.com, benh@amazon.com, akiyano@amazon.com,
+ ndagan@amazon.com, shayagr@amazon.com, itzko@amazon.com, osamaabb@amazon.com,
+ evostrov@amazon.com, ofirt@amazon.com, nkoler@amazon.com
 
-On Tue, Jan 30, 2024 at 09:53:49AM +0000, darinzon@amazon.com wrote:
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue, 30 Jan 2024 09:53:42 +0000 you wrote:
 > From: David Arinzon <darinzon@amazon.com>
 > 
-> The function responsible for polling TX completions might not receive
-> the CPU resources it needs due to higher priority tasks running on the
-> requested core.
+> This patchset contains a set of minor and cosmetic
+> changes to the ENA driver.
 > 
-> The driver might not be able to recognize such cases, but it can use its
-> state to suspect that they happened. If both conditions are met:
+> Changes from v1:
+> - Address comments from Shannon Nelson
 > 
-> - napi hasn't been executed more than the TX completion timeout value
-> - napi is scheduled (meaning that we've received an interrupt)
-> 
-> Then it's more likely that the napi handler isn't scheduled because of
-> an overloaded CPU.
-> It was decided that for this case, the driver would wait twice as long
-> as the regular timeout before scheduling a reset.
-> The driver uses ENA_REGS_RESET_SUSPECTED_POLL_STARVATION reset reason to
-> indicate this case to the device.
-> 
-> This patch also adds more information to the ena_tx_timeout() callback.
-> This function is called by the kernel when it detects that a specific TX
-> queue has been closed for too long.
-> 
-> Signed-off-by: Shay Agroskin <shayagr@amazon.com>
-> Signed-off-by: David Arinzon <darinzon@amazon.com>
-> ---
->  drivers/net/ethernet/amazon/ena/ena_netdev.c  | 77 +++++++++++++++----
->  .../net/ethernet/amazon/ena/ena_regs_defs.h   |  1 +
->  2 files changed, 64 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> index 18acb76..ae9291b 100644
-> --- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> +++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-> @@ -47,19 +47,44 @@ static int ena_restore_device(struct ena_adapter *adapter);
->  
->  static void ena_tx_timeout(struct net_device *dev, unsigned int txqueue)
->  {
-> +	enum ena_regs_reset_reason_types reset_reason = ENA_REGS_RESET_OS_NETDEV_WD;
->  	struct ena_adapter *adapter = netdev_priv(dev);
-> +	unsigned int time_since_last_napi, threshold;
-> +	struct ena_ring *tx_ring;
-> +	int napi_scheduled;
-> +
-> +	if (txqueue >= adapter->num_io_queues) {
-> +		netdev_err(dev, "TX timeout on invalid queue %u\n", txqueue);
-> +		goto schedule_reset;
-> +	}
-> +
-> +	threshold = jiffies_to_usecs(dev->watchdog_timeo);
-> +	tx_ring = &adapter->tx_ring[txqueue];
-> +
-> +	time_since_last_napi = jiffies_to_usecs(jiffies - tx_ring->tx_stats.last_napi_jiffies);
-> +	napi_scheduled = !!(tx_ring->napi->state & NAPIF_STATE_SCHED);
->  
-> +	netdev_err(dev,
-> +		   "TX q %d is paused for too long (threshold %u). Time since last napi %u usec. napi scheduled: %d\n",
-> +		   txqueue,
-> +		   threshold,
-> +		   time_since_last_napi,
-> +		   napi_scheduled);
-> +
-> +	if (threshold < time_since_last_napi && napi_scheduled) {
-> +		netdev_err(dev,
-> +			   "napi handler hasn't been called for a long time but is scheduled\n");
-> +			   reset_reason = ENA_REGS_RESET_SUSPECTED_POLL_STARVATION;
+> [...]
 
-Hi David,
+Here is the summary with links:
+  - [v2,net-next,01/11] net: ena: Remove an unused field
+    https://git.kernel.org/netdev/net-next/c/0def8a15dae7
+  - [v2,net-next,02/11] net: ena: Add more documentation for RX copybreak
+    https://git.kernel.org/netdev/net-next/c/bd765cc91012
+  - [v2,net-next,03/11] net: ena: Minor cosmetic changes
+    https://git.kernel.org/netdev/net-next/c/243f36eef5c7
+  - [v2,net-next,04/11] net: ena: Enable DIM by default
+    https://git.kernel.org/netdev/net-next/c/50d7a2660579
+  - [v2,net-next,05/11] net: ena: Remove CQ tail pointer update
+    https://git.kernel.org/netdev/net-next/c/06a96fe6f9f0
+  - [v2,net-next,06/11] net: ena: Change error print during ena_device_init()
+    https://git.kernel.org/netdev/net-next/c/ae8220929329
+  - [v2,net-next,07/11] net: ena: Add more information on TX timeouts
+    https://git.kernel.org/netdev/net-next/c/071271f39ce8
+  - [v2,net-next,08/11] net: ena: Relocate skb_tx_timestamp() to improve time stamping accuracy
+    https://git.kernel.org/netdev/net-next/c/70c9360390ea
+  - [v2,net-next,09/11] net: ena: Change default print level for netif_ prints
+    https://git.kernel.org/netdev/net-next/c/716bdaeceaee
+  - [v2,net-next,10/11] net: ena: handle ena_calc_io_queue_size() possible errors
+    https://git.kernel.org/netdev/net-next/c/4b4012da28cf
+  - [v2,net-next,11/11] net: ena: Reduce lines with longer column width boundary
+    https://git.kernel.org/netdev/net-next/c/50613650c3d6
 
-a nit from my side: the line above is indented one tab-stop too many.
-No need to respin just for this AFAIC.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> +	}
-> +schedule_reset:
->  	/* Change the state of the device to trigger reset
->  	 * Check that we are not in the middle or a trigger already
->  	 */
-> -
->  	if (test_and_set_bit(ENA_FLAG_TRIGGER_RESET, &adapter->flags))
->  		return;
->  
-> -	ena_reset_device(adapter, ENA_REGS_RESET_OS_NETDEV_WD);
-> +	ena_reset_device(adapter, reset_reason);
->  	ena_increase_stat(&adapter->dev_stats.tx_timeout, 1, &adapter->syncp);
-> -
-> -	netif_err(adapter, tx_err, dev, "Transmit time out\n");
->  }
->  
 
-...
 
