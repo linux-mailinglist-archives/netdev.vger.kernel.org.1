@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-67874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3102F845296
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 09:20:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C558F845297
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 09:21:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C28001F26D8F
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:20:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4A989B240C3
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DB2515A49C;
-	Thu,  1 Feb 2024 08:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45CBA15A499;
+	Thu,  1 Feb 2024 08:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dPEUrYcP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gy90SB+e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD3D915A48D
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 08:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7729A15A4A0
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 08:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706775635; cv=none; b=YEai3kVrMPx0WFHq66SwiQES3bHb8JNUsyYAcIv1cnDnadHADIgOiliNFp53PMkaa3fxzr61reK1rFc5LVB3XJyHc2k7k6d0cQ0zKHth7bR6xTXcp7kJGD6fm+auJgYrvR2Q8zetXMMaWha/e21dE0BsAt8voUpTRZj3iBf6bAs=
+	t=1706775637; cv=none; b=u1TH5iIw3GKYzDqAogjHy6Zc9+f9FHtNIhWxWrGMi4CD10e2PS8OtmJB+EcA5cDu4kjpgUJBSSo10BDTmhovTTeAAg8JSMarcggAZf4lZsM/JBAL18rJoi8Wz4rJl66shpIoGN8gl3Fj00prwsq95JGGbze0JJiQ//qAGHszkY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706775635; c=relaxed/simple;
-	bh=HRqkCqxtBKrUms3XCHQMXqP+vqbRKLRoHOHl89isBsQ=;
+	s=arc-20240116; t=1706775637; c=relaxed/simple;
+	bh=eISr1nSYpLUgO7TGB1jTeA78zrVUXIYlnFhUksdAN78=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gMR59Y1fVPmgJCfTpri+Q+v4jOpqjg4F54Kdy77qfOXrryq87sAsZfSRwR8YxI863Jq5LfF9nzDoZWY/LK6ma0ItrF6KyLpwLOEzuFQ9y/C9vwyIJNy/Ybw7N1L3LDwpP9w42CoRJp0CXLn7G04EH1Q0OVxLFgRKviocJvD75Do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dPEUrYcP; arc=none smtp.client-ip=209.85.128.173
+	 MIME-Version; b=Gm+/UpcJKyZTViI1iDgtTzIb85Q/317Y8zWeN6N1bti79Mnm/wNRpiABWEfrzXV7QAtJcGbIZnBZvuDAponYYvu2IjABS9eMk/lg47l418cE2gqrxf42rSrCnruZq5NDOG3bJ4DTuDzp2tg4k4Wep8V1CJiTTBJwFn+GITvEcww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gy90SB+e; arc=none smtp.client-ip=209.85.128.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-60406dba03cso7739997b3.0
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 00:20:33 -0800 (PST)
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-60406da718aso7006487b3.1
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 00:20:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706775632; x=1707380432; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706775634; x=1707380434; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5h17ojUPSOJID+Qge95Q9ZnvyDNG+2fV6vU1bRnAO9Q=;
-        b=dPEUrYcPgr2EFc4qMT//Z4iW7dG+286m6mSVztwnmF7J19M77gVLchAp/FiCqC62gY
-         ipnkgrBFOrUV4qNwEVn2LM4cw0qmtoc/U3RqVJgi0pP0dydUNoOl2aJNFwkTqDl6raRj
-         Uqkd2pBO/wITXhD75dOh2ZqtdjLoe8x4iYn45l2Oh3TtW7CAx7AmA9+2iKBuBBEd6Ou5
-         7Qjb2nVp9vKccacAMFtY1ySpCIAKnFYcQeOGZvnu5LaBRoUlTLDv/ro3BCI97X9wQsEV
-         4eJVH2ro21zkbzf8VXEtS1jqqsWrdavfrF5tHF84fEqKUuG7No3bxQgtweYA63P8Sk3e
-         O+lA==
+        bh=PtwHtCS36bNnk1CUbV/iOwOunx5AKCLAnCCDe8pyxjA=;
+        b=gy90SB+eImH3ok/FWqzZXtwAZCdEhgE/D1l229XgZXEcrtXHENSm8Wiz9Xy6v7agqU
+         GAEOrmQvPwC/Tmv9giRjbz+aLaUh1HC1vyAe4Bro4jltf7hnrkCBEpKWfN38u336y0tT
+         0Ajssggeqm3iUYnnrTkLeiklbDbQu+sSqy7JVJEiEH6+K1Egf7ZSbH+uxLPTSEz6O1gm
+         kTgZEj9jGwvxn0ANSGc2fEklUC0puUWR348SJEBjQSI+PBE9BDSjt2h2rXP99Hzz+Q9n
+         T0H3RQt4AYqmKcdwYUu4NfEJ1fpkayUMvfLQ75y4j2ITltaTUM8gT8yZPlHkLrRnmOrw
+         2P2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706775632; x=1707380432;
+        d=1e100.net; s=20230601; t=1706775634; x=1707380434;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=5h17ojUPSOJID+Qge95Q9ZnvyDNG+2fV6vU1bRnAO9Q=;
-        b=qGPdZsduxld5SAzZ5raMm9Bq750yu17fpBK67lVm4fmV90nfjwLzFwRxbW12tW/jrc
-         CHWFZ9X3meEadmQJZtcIdYpAGMBZCDztcG5wt1RTfpC0v+Ji+zXw95P9LXMyJA3GK5L1
-         MDsY+Df3N1T9WoH7x/aaMrUlrLwRpZnd1sU6WWKROShwtSaixrZcxCqWILXwo9VkGnYx
-         ExVz4Gdz6dnjERrX4lANDJQY8aW4MH+QhBUt+TF33WQPgCY0ukdDLDGJynph5bz3UrKC
-         eDNKfqVfdRGNErq3mXHScP+ZAMrCiRpHsfeK0BFRiapA/95H8prKKXq+CNmrOKUrR5pf
-         7Mvw==
-X-Gm-Message-State: AOJu0Yzrr/JIuIcOkJExpdta9xdhnO2Es0yx6aGP4td0hHgFKBxMDeOy
-	xS1AQy7mIuCkuSLgI6a4e4BT90KGD8itRJ8rpFyBLwymJgJ5IMcCkbJo6fXarCs=
-X-Google-Smtp-Source: AGHT+IE9YnN4udsJRE7wQHvp0I+sdxDGGtiE1jhrK23rnqqeXfrSediHN3iuE87RTA1ACCaZnQ+Mrw==
-X-Received: by 2002:a0d:d903:0:b0:604:a75:4274 with SMTP id b3-20020a0dd903000000b006040a754274mr1410440ywe.51.1706775632489;
-        Thu, 01 Feb 2024 00:20:32 -0800 (PST)
+        bh=PtwHtCS36bNnk1CUbV/iOwOunx5AKCLAnCCDe8pyxjA=;
+        b=qe+3C8vmGXfvzzA4rA8mE2vZSTMjTgrMpiE+0jm97Ug/CY4XmGSizHh+iwq7Hj7AKM
+         FchiUw7EK5sNAaXv2sRdZjU8ivTKOtwq9nHkrm8XQ3q8XIUD7BAY8LJCkaaXmuCJT7nZ
+         Fxf8cFKqRuuzo/XAK5yko72/aEQgL9HKrMvJ3k1RjgcnXNkp7gnAhR/N31oOjB2qTJhn
+         k0O0W1iy3T2m/ndrtF6OGgDLL+CSBNM66DxPVkrB5xVe5gYtAjhbgZUxH4Ss3YgOmbVZ
+         1C0Tbo98NOTjgVEAbuFfqORwBeyXmL8/NGadF/8iaADrV93ks9nT8qQdv6WmGs08LK6v
+         fU/A==
+X-Gm-Message-State: AOJu0YyVA7MW1xtqXgfG7VzJzlFhw/UXAIU7vsJl5P9GXuDJG2VXtYWj
+	LNrZJZryNjuIjutwyTk04zV4MV7OKko3eP9Y9xQo67iUOryrpCbbQbCd9Y5qoBM=
+X-Google-Smtp-Source: AGHT+IFAuoF8mfrhzhQ/gACBtsOQR1n0C0e6JUhS9+Byck0VQQo+B5VojS7ZCzN+hFLOJ9nHdXG5eg==
+X-Received: by 2002:a0d:ea52:0:b0:5e2:2bfc:c6dd with SMTP id t79-20020a0dea52000000b005e22bfcc6ddmr3933164ywe.23.1706775633967;
+        Thu, 01 Feb 2024 00:20:33 -0800 (PST)
 Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:b616:d09e:9171:5ef4])
-        by smtp.gmail.com with ESMTPSA id w186-20020a0dd4c3000000b006041ca620f4sm209090ywd.81.2024.02.01.00.20.31
+        by smtp.gmail.com with ESMTPSA id w186-20020a0dd4c3000000b006041ca620f4sm209090ywd.81.2024.02.01.00.20.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 00:20:32 -0800 (PST)
+        Thu, 01 Feb 2024 00:20:33 -0800 (PST)
 From: thinker.li@gmail.com
 To: netdev@vger.kernel.org,
 	ast@kernel.org,
@@ -80,9 +80,9 @@ To: netdev@vger.kernel.org,
 Cc: sinquersw@gmail.com,
 	kuifeng@meta.com,
 	Kui-Feng Lee <thinker.li@gmail.com>
-Subject: [PATCH net-next v2 4/5] net/ipv6: set expires in modify_prefix_route() if RTF_EXPIRES is set.
-Date: Thu,  1 Feb 2024 00:20:23 -0800
-Message-Id: <20240201082024.1018011-5-thinker.li@gmail.com>
+Subject: [PATCH net-next v2 5/5] selftests/net: Adding test cases of replacing routes and route advertisements.
+Date: Thu,  1 Feb 2024 00:20:24 -0800
+Message-Id: <20240201082024.1018011-6-thinker.li@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240201082024.1018011-1-thinker.li@gmail.com>
 References: <20240201082024.1018011-1-thinker.li@gmail.com>
@@ -96,39 +96,228 @@ Content-Transfer-Encoding: 8bit
 
 From: Kui-Feng Lee <thinker.li@gmail.com>
 
-Make the decision to set or clean the expires of a route based on the
-RTF_EXPIRES flag, rather than the value of the "expires" argument.
+Add tests of changing permanent routes to temporary routes and the reversed
+case to make sure GC working correctly in these cases.  Add tests for the
+temporary routes from RA.
 
-The function inet6_addr_modify() is the only caller of
-modify_prefix_route(), and it passes the RTF_EXPIRES flag and an expiration
-value. The RTF_EXPIRES flag is turned on or off based on the value of
-valid_lft. The RTF_EXPIRES flag is turned on if valid_lft is a finite value
-(not infinite, not 0xffffffff). Even if valid_lft is 0, the RTF_EXPIRES
-flag remains on. The expiration value being passed is equal to the
-valid_lft value if the flag is on. However, if the valid_lft value is
-infinite, the expiration value becomes 0 and the RTF_EXPIRES flag is turned
-off. Despite this, modify_prefix_route() decides to set the expiration
-value if the received expiration value is not zero. This mixing of infinite
-and zero cases creates an inconsistency.
+The existing device will be deleted between tests to remove all routes
+associated with it, so that the earlier tests don't mess up the later ones.
 
 Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
 ---
- net/ipv6/addrconf.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ tools/testing/selftests/net/fib_tests.sh | 161 ++++++++++++++++++++---
+ 1 file changed, 146 insertions(+), 15 deletions(-)
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 36bfa987c314..2f6cf6314646 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -4788,7 +4788,7 @@ static int modify_prefix_route(struct inet6_ifaddr *ifp,
- 	} else {
- 		table = f6i->fib6_table;
- 		spin_lock_bh(&table->tb6_lock);
--		if (!expires) {
-+		if (!(flags & RTF_EXPIRES)) {
- 			fib6_clean_expires(f6i);
- 			fib6_remove_gc_list(f6i);
- 		} else {
+diff --git a/tools/testing/selftests/net/fib_tests.sh b/tools/testing/selftests/net/fib_tests.sh
+index b3ecccbbfcd2..38e786aad678 100755
+--- a/tools/testing/selftests/net/fib_tests.sh
++++ b/tools/testing/selftests/net/fib_tests.sh
+@@ -743,6 +743,16 @@ fib_notify_test()
+ 	cleanup &> /dev/null
+ }
+ 
++# Create a new dummy_10 to remove all associated routes.
++reset_dummy_10()
++{
++	$IP link del dev dummy_10
++
++	$IP link add dummy_10 type dummy
++	$IP link set dev dummy_10 up
++	$IP -6 address add 2001:10::1/64 dev dummy_10
++}
++
+ fib6_gc_test()
+ {
+ 	setup
+@@ -751,7 +761,7 @@ fib6_gc_test()
+ 	echo "Fib6 garbage collection test"
+ 	set -e
+ 
+-	EXPIRE=3
++	EXPIRE=5
+ 
+ 	# Check expiration of routes every $EXPIRE seconds (GC)
+ 	$NS_EXEC sysctl -wq net.ipv6.route.gc_interval=$EXPIRE
+@@ -763,44 +773,165 @@ fib6_gc_test()
+ 	$NS_EXEC sysctl -wq net.ipv6.route.flush=1
+ 
+ 	# Temporary routes
+-	for i in $(seq 1 1000); do
++	for i in $(seq 1 5); do
+ 	    # Expire route after $EXPIRE seconds
+ 	    $IP -6 route add 2001:20::$i \
+ 		via 2001:10::2 dev dummy_10 expires $EXPIRE
+ 	done
+-	sleep $(($EXPIRE * 2))
+-	N_EXP_SLEEP=$($IP -6 route list |grep expires|wc -l)
+-	if [ $N_EXP_SLEEP -ne 0 ]; then
+-	    echo "FAIL: expected 0 routes with expires, got $N_EXP_SLEEP"
++	sleep $(($EXPIRE * 2 + 1))
++	N_EXP=$($IP -6 route list |grep expires|wc -l)
++	if [ $N_EXP -ne 0 ]; then
++	    echo "FAIL: expected 0 routes with expires, got $N_EXP"
+ 	    ret=1
+ 	else
+ 	    ret=0
+ 	fi
+ 
++	log_test $ret 0 "ipv6 route garbage collection"
++
++	reset_dummy_10
++
+ 	# Permanent routes
+-	for i in $(seq 1 5000); do
++	for i in $(seq 1 5); do
+ 	    $IP -6 route add 2001:30::$i \
+ 		via 2001:10::2 dev dummy_10
+ 	done
+ 	# Temporary routes
+-	for i in $(seq 1 1000); do
++	for i in $(seq 1 5); do
+ 	    # Expire route after $EXPIRE seconds
+ 	    $IP -6 route add 2001:20::$i \
+ 		via 2001:10::2 dev dummy_10 expires $EXPIRE
+ 	done
+-	sleep $(($EXPIRE * 2))
+-	N_EXP_SLEEP=$($IP -6 route list |grep expires|wc -l)
+-	if [ $N_EXP_SLEEP -ne 0 ]; then
+-	    echo "FAIL: expected 0 routes with expires," \
+-		 "got $N_EXP_SLEEP (5000 permanent routes)"
++	sleep $(($EXPIRE * 2 + 1))
++	N_EXP=$($IP -6 route list |grep expires|wc -l)
++	if [ $N_EXP -ne 0 ]; then
++	    echo "FAIL: expected 0 routes with expires, got $N_EXP"
+ 	    ret=1
+ 	else
+ 	    ret=0
+ 	fi
+ 
+-	set +e
++	log_test $ret 0 "ipv6 route garbage collection (with permanent routes)"
+ 
+-	log_test $ret 0 "ipv6 route garbage collection"
++	reset_dummy_10
++
++	# Permanent routes
++	for i in $(seq 1 5); do
++	    $IP -6 route add 2001:20::$i \
++		via 2001:10::2 dev dummy_10
++	done
++	# Replace with temporary routes
++	for i in $(seq 1 5); do
++	    # Expire route after $EXPIRE seconds
++	    $IP -6 route replace 2001:20::$i \
++		via 2001:10::2 dev dummy_10 expires $EXPIRE
++	done
++	N_EXP=$($IP -6 route list |grep expires|wc -l)
++	if [ $N_EXP -ne 5 ]; then
++	    log_test 1 0 "expected 5 routes with expires, got $N_EXP"
++	    set +e
++	    cleanup &> /dev/null
++	    return
++	fi
++	# Wait for GC
++	sleep $(($EXPIRE * 2 + 1))
++	N_EXP=$($IP -6 route list |grep expires|wc -l)
++	if [ $N_EXP -ne 0 ]; then
++	    echo "FAIL: expected 0 routes with expires, got $N_EXP"
++	    ret=1
++	else
++	    ret=0
++	fi
++
++	log_test $ret 0 "ipv6 route garbage collection (replace with expires)"
++
++	reset_dummy_10
++
++	# Temporary routes
++	for i in $(seq 1 5); do
++	    # Expire route after $EXPIRE seconds
++	    $IP -6 route add 2001:20::$i \
++		via 2001:10::2 dev dummy_10 expires $EXPIRE
++	done
++	# Replace with permanent routes
++	for i in $(seq 1 5); do
++	    $IP -6 route replace 2001:20::$i \
++		via 2001:10::2 dev dummy_10
++	done
++	N_EXP=$($IP -6 route list |grep expires|wc -l)
++	if [ $N_EXP -ne 0 ]; then
++	    log_test 1 0 "expected 0 routes with expires, got $N_EXP"
++	    set +e
++	    cleanup &> /dev/null
++	    return
++	fi
++
++	# Wait for GC
++	sleep $(($EXPIRE * 2 + 1))
++
++	N_PERM=$($IP -6 route list |grep -v expires|grep 2001:20::|wc -l)
++	if [ $N_PERM -ne 5 ]; then
++	    echo "FAIL: expected 5 permanent routes, got $N_PERM"
++	    ret=1
++	else
++	    ret=0
++	fi
++
++	log_test $ret 0 "ipv6 route garbage collection (replace with permanent)"
++
++	# ra6 is required for the next test. (ipv6toolkit)
++	if [ ! -x "$(command -v ra6)" ]; then
++	    echo "SKIP: ra6 not found."
++	    set +e
++	    cleanup &> /dev/null
++	    return
++	fi
++
++	# Delete dummy_10 and remove all routes
++	$IP link del dev dummy_10
++
++	# Create a pair of veth devices to send a RA message from one
++	# device to another.
++	$IP link add veth1 type veth peer name veth2
++	$IP link set dev veth1 up
++	$IP link set dev veth2 up
++	$IP -6 address add 2001:10::1/64 dev veth1 nodad
++	$IP -6 address add 2001:10::2/64 dev veth2 nodad
++
++	# Make veth1 ready to receive RA messages.
++	$NS_EXEC sysctl -wq net.ipv6.conf.veth1.accept_ra=2
++
++	# Send a RA message with a route from veth2 to veth1.
++	$NS_EXEC ra6 -i veth2 -d 2001:10::1 -t $EXPIRE
++
++	# Wait for the RA message.
++	sleep 1
++
++	N_EXP=$($IP -6 route list|grep expires|wc -l)
++	if [ $N_EXP -ne 1 ]; then
++	    # systemd may mess up the test.  Make sure that
++	    # systemd-networkd.service and systemd-networkd.socket are
++	    # stopped.
++	    log_test 1 0 "expected 1 routes with expires, got $N_EXP"
++	    set +e
++	    cleanup &> /dev/null
++	    return
++	fi
++
++	# Wait for GC
++	sleep $(($EXPIRE * 2 + 1))
++
++	N_EXP=$($IP -6 route list |grep expires|wc -l)
++	if [ $N_EXP -ne 0 ]; then
++	    echo "FAIL: expected 0 routes with expires, got $N_EXP"
++	    ret=1
++	else
++	    ret=0
++	fi
++
++	log_test $ret 0 "ipv6 route garbage collection (RA message)"
++
++	set +e
+ 
+ 	cleanup &> /dev/null
+ }
 -- 
 2.34.1
 
