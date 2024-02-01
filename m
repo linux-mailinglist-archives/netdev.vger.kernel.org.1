@@ -1,175 +1,118 @@
-Return-Path: <netdev+bounces-67979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1285D845885
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 14:10:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C80384588F
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 14:12:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1B5728033B
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:10:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19A0D2888A8
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 260D05CDC4;
-	Thu,  1 Feb 2024 13:09:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CC325CDC7;
+	Thu,  1 Feb 2024 13:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="UijMuGJp";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="UijMuGJp"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S10ePGPs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7F553366;
-	Thu,  1 Feb 2024 13:09:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E435338C;
+	Thu,  1 Feb 2024 13:11:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.134.136.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706792991; cv=none; b=QtLvZBOtXMaOA2Nni5YvJTDL3NVWgWVijj6FlTNHvo0qDB9FpXl/0jiBiF+tfGjjRyqoBgTHQ5BCYHL5By8nnKZgfOT1rcHIFcC/QrTwSNOgvRYj/cAZ8D4dVB0d4GTuR9yREyx8707Qv+nE+bSO0CQcLC9//9u1G+SUPBRVkwE=
+	t=1706793068; cv=none; b=Oz7kHlnOwnG6dacmC2tvXFPBuFpGqZ4qfYCHajCHWR4aJ4iMal20+t8Amhtq6TrQdDMy3aNULmTv8otzKFMpRIolZjgwaN6IQStv/UoLNNJnsSjnL4Is7yrUum7xDXfrAIZgST3J4qAV5CTeSE1aUFn2i8ouNtBnsUr6FOQHzkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706792991; c=relaxed/simple;
-	bh=pISfP3Hzv5P7bazKFw8x24gFRtSxfRqfs11zSQ5Dbys=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=QwtqHdyl0rftnpE3LY+M/lzS5p/vzu86qzmxXW+pynJRFi/TwNSNrRjClIQ36Xc8VuOYtTckF3M3uBsNhgz5FTO/Jd58L0/zSSQkMDCE78SyUZVGEoSscQUKl84Y38TWUK84cC7T3AV+GoEpNEKytgfsgRHHquPG2++CRISMa50=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=UijMuGJp; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=UijMuGJp; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:98])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 1711722147;
-	Thu,  1 Feb 2024 13:09:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1706792986; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IUKCAfTVoUrxB4zijGrDV9tJzwRsfCTR6KHiqfmXiK8=;
-	b=UijMuGJpe3SfxW+1Pa+kKELvVKpcKljLUpGWkDPuIdt2hhb8Afa0MOKc6+aRoPYgiXmE+w
-	QZ19FIitBTazsJrm0EudoeUJnyouGtG98vHV8Vb9Xdh8tWq4zURVKEM3a4RQeM0nsSGXzi
-	OqCTVdI248guWFEpigsz/SDL0N3sJC0=
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1706792986; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=IUKCAfTVoUrxB4zijGrDV9tJzwRsfCTR6KHiqfmXiK8=;
-	b=UijMuGJpe3SfxW+1Pa+kKELvVKpcKljLUpGWkDPuIdt2hhb8Afa0MOKc6+aRoPYgiXmE+w
-	QZ19FIitBTazsJrm0EudoeUJnyouGtG98vHV8Vb9Xdh8tWq4zURVKEM3a4RQeM0nsSGXzi
-	OqCTVdI248guWFEpigsz/SDL0N3sJC0=
-Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id E4EBF13A04;
-	Thu,  1 Feb 2024 13:09:45 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap2.dmz-prg2.suse.org with ESMTPSA
-	id GOnBNxmYu2VafgAAn2gu4w
-	(envelope-from <mkoutny@suse.com>); Thu, 01 Feb 2024 13:09:45 +0000
-From: =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	cake@lists.bufferbloat.net
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@toke.dk>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Simon Horman <horms@kernel.org>,
-	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH v5 4/4] net/sched: Remove alias of sch_clsact
-Date: Thu,  1 Feb 2024 14:09:43 +0100
-Message-ID: <20240201130943.19536-5-mkoutny@suse.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240201130943.19536-1-mkoutny@suse.com>
-References: <20240201130943.19536-1-mkoutny@suse.com>
+	s=arc-20240116; t=1706793068; c=relaxed/simple;
+	bh=ls+9RFNzMOW0liv757p99+kmzNTODKha4qA4iMAm7yQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E+0w9oVSe5b5hyAEBC1dABvQ3Bxqvc7I8OF2KUsxwl7xj2hMLKsYoBlBgVTaF8dr5KGeN6APW0ap6lHmHuZ5NtA1S9EDf8ejyg96nzYXIE22QJwC6ZXzfWyAp7sB+CZo395YyD57yNVv+snL//d6zMs/2HADd0RI+U1pf+fAhlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S10ePGPs; arc=none smtp.client-ip=134.134.136.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706793063; x=1738329063;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ls+9RFNzMOW0liv757p99+kmzNTODKha4qA4iMAm7yQ=;
+  b=S10ePGPs7WXKAMIuSq/8DAPdnLCvZlm5XxI61/HXgF3g8xhYMu5sz/4s
+   72u7lpWmRtwmcoBHEU5BtNGBibkKbXAgVB3Ie41SXa8I+Fp4BwrpK1DqH
+   p+IMrs6shAYN9XgNO1r3lAXxV4i1TYkiScYpNP95FfCxJoxYakv63Kr81
+   agfa09o7tdd6Lw5pJEJkTHvTXu9EO3WioC7yvFmbraiD7Hg1oRRR8ABCJ
+   eYka1cauoikkZoYezY1XwYO6Op24q3QImP5OPehwOMpd3HdXXMkXIE+SC
+   8NlmCC4bv1kHvotyKfhA5Ws/h0/KbTpG+PR5zwnh8edPWHxyhC/GWPBOC
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="468123506"
+X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
+   d="scan'208";a="468123506"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 05:11:02 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
+   d="scan'208";a="30587141"
+Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.41.120])
+  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 05:10:59 -0800
+Date: Thu, 1 Feb 2024 14:10:56 +0100
+From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+	Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 1/3] netlink: Add notifier when changing netlink socket
+ membership
+Message-ID: <ZbuYYMvihYxEbQ/p@linux.intel.com>
+References: <20240131120535.933424-1-stanislaw.gruszka@linux.intel.com>
+ <20240131120535.933424-2-stanislaw.gruszka@linux.intel.com>
+ <20240131174056.23b43f12@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-X-Spamd-Bar: /
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.com header.s=susede1 header.b=UijMuGJp
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-0.58 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.com:s=susede1];
-	 BAYES_HAM(-1.57)[92.20%];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 TAGGED_RCPT(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 R_RATELIMIT(0.00)[to_ip_from(RLogq4uai3psdy7gygdsfysmzr)];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	 DKIM_TRACE(0.00)[suse.com:+];
-	 MX_GOOD(-0.01)[];
-	 RCPT_COUNT_TWELVE(0.00)[28];
-	 MID_CONTAINS_FROM(1.00)[];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 FREEMAIL_CC(0.00)[davemloft.net,google.com,kernel.org,redhat.com,mojatatu.com,gmail.com,resnulli.us,iogearbox.net,linux.dev,toke.dk,intel.com,networkplumber.org];
-	 RCVD_TLS_ALL(0.00)[];
-	 SUSPICIOUS_RECIPS(1.50)[]
-X-Spam-Score: -0.58
-X-Rspamd-Queue-Id: 1711722147
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240131174056.23b43f12@kernel.org>
 
-The module sch_ingress stands out among net/sched modules
-because it provides multiple act/sch functionalities in a single .ko.
-They have aliases to make autoloading work for any of the provided
-functionalities.
+On Wed, Jan 31, 2024 at 05:40:56PM -0800, Jakub Kicinski wrote:
+> On Wed, 31 Jan 2024 13:05:33 +0100 Stanislaw Gruszka wrote:
+> > Add notification when adding/removing multicast group to/from
+> > client socket via setsockopt() syscall.
+> > 
+> > It can be used with conjunction with netlink_has_listeners() to check
+> > if consumers of netlink multicast messages emerge or disappear.
+> > 
+> > A client can call netlink_register_notifier() to register a callback.
+> > In the callback check for state NETLINK_CHANGE and NETLINK_URELEASE to
+> > get notification for change in the netlink socket membership.
+> > 
+> > Thus, a client can now send events only when there are active consumers,
+> > preventing unnecessary work when none exist.
+> 
+> Can we plumb thru the existing netlink_bind / netlink_unbind callbacks?
+>
+> Add similar callbacks to the genl family struct to plumb it thru to
+> thermal. Then thermal can do what it wants with it (also add driver
+> callbacks or notifiers).
 
-Since the autoloading was changed to uniformly request any functionality
-under its alias, the non-systemic aliases can be removed now (i.e.
-assuming the alias were only used to ensure autoloading).
+Yes, sure, can be done this way and make sense. Going to do this.
 
-Signed-off-by: Michal Koutný <mkoutny@suse.com>
----
- net/sched/sch_ingress.c | 1 -
- 1 file changed, 1 deletion(-)
+> Having a driver listen to a core AF_NETLINK notifier to learn about
+> changes to a genl family it registers with skips too many layers to
+> easily reason about. At least for my taste.
+> 
+> When you repost please CC Florian W, Johannes B and Jiri P, off the top
+> of my head. Folks who most often work on netlink internals..
 
-diff --git a/net/sched/sch_ingress.c b/net/sched/sch_ingress.c
-index 48a800131e99..c2ef9dcf91d2 100644
---- a/net/sched/sch_ingress.c
-+++ b/net/sched/sch_ingress.c
-@@ -370,6 +370,5 @@ static void __exit ingress_module_exit(void)
- module_init(ingress_module_init);
- module_exit(ingress_module_exit);
- 
--MODULE_ALIAS("sch_clsact");
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Ingress and clsact based ingress and egress qdiscs");
--- 
-2.43.0
+Ok.
 
+Regards
+Stanislaw
+> 
 
