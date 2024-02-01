@@ -1,213 +1,96 @@
-Return-Path: <netdev+bounces-67778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAA87844E65
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 02:10:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B7EA844E84
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 02:15:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD5F01C20DC6
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:10:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE8DE1C2AA72
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 01:14:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C90DE3B293;
-	Thu,  1 Feb 2024 01:07:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F67A2116;
+	Thu,  1 Feb 2024 01:12:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LTnaoViN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hgD7kbsa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC341A27C;
-	Thu,  1 Feb 2024 01:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E383BB20;
+	Thu,  1 Feb 2024 01:12:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706749674; cv=none; b=Cpi2uoHiHI62yLGAqLIwuUnaoy40fl26DbGzsvCbAPtDSgEgLQSTJ5qIjlwspMLz6kau1v5J8hG2zBwE1AoXvtZ3qN+zlZAfM8d2hpm2K734YMScw8DnXkiLg6gePKb2SE6WhtoudXQ0hIPkPMLjA8FD5ogyajr9hB+JNFST8WQ=
+	t=1706749968; cv=none; b=p4UzOYPFV2AUksDn2l2lXtR9JKOHOxzHVKmpfkceeuqPMXvANCcflSy8fd4SpK9rsTKvJRfiwiuh2ps1+eg6y7ev+8M7K0fiPC1w8fi2xDHAGUDZlAeh4+M+I9rl/XQRtce9tiKobPBmslHaVjN38QxNdo6Gfnbolxf6SOphDeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706749674; c=relaxed/simple;
-	bh=4WsWv00onasp48d72sbpBjqQmJ37YOowYHi4hbk2FQg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=lw2/+/imtUYNYsK40hv8IZUsm/ruRAKxDyY+gKE+o45ZROcCiCrxtSlEhVCaEpyUBiGjRlwSTh8aLgbjze0AsDiyzeHpKSDhooalLUNecLBJ3tf5gq2k7xdgcrngl1P1oRoawqs6EFiJLpmtlEIaPsp36lNyCzL2gNwWP/YMc3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LTnaoViN; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706749673; x=1738285673;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=4WsWv00onasp48d72sbpBjqQmJ37YOowYHi4hbk2FQg=;
-  b=LTnaoViNbPtUE6o6pHTOyj5Oe3N52/I/rvVudQkO0hkyJB1Pe6L+2VUd
-   ktExJfxO9kxxAOoEMn2lrDAQP6OJPXIp14ZSkMlu8zWlfqNJmFZXlvdH6
-   Iain2QAJqJkzd74TeaSBdNZfBND5yjNTVHhJhtje/3ITDfTVKpPkWWxwc
-   ByfKa7TTCAYhXq1tqgdOV109cX/tPQEKNKbYcSAz2XuKqNveuZOauioNk
-   OHYvcmCMyHRi99eiV9dszi12lr/ugxZFTKMH8Qu9Jw2iVxlMHYvjmZgYE
-   Xh6KJtHHeTn/Hrd2JLN7CRS0Po+W9sp6wlqdqhAlGrBmXHDJnhvzkP+32
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="10533017"
-X-IronPort-AV: E=Sophos;i="6.05,233,1701158400"; 
-   d="scan'208";a="10533017"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 17:07:50 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,233,1701158400"; 
-   d="scan'208";a="4265165"
-Received: from linux.intel.com ([10.54.29.200])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2024 17:07:50 -0800
-Received: from debox1-desk4.lan (unknown [10.212.205.115])
-	by linux.intel.com (Postfix) with ESMTP id B3099580201;
-	Wed, 31 Jan 2024 17:07:49 -0800 (PST)
-From: "David E. Box" <david.e.box@linux.intel.com>
-To: netdev@vger.kernel.org,
-	ilpo.jarvinen@linux.intel.com,
-	david.e.box@linux.intel.com,
-	sathyanarayanan.kuppuswamy@linux.intel.com
-Cc: linux-kernel@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org
-Subject: [PATCH 8/8] tools: intel_sdsi: Add current meter support
-Date: Wed, 31 Jan 2024 17:07:47 -0800
-Message-Id: <20240201010747.471141-9-david.e.box@linux.intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240201010747.471141-1-david.e.box@linux.intel.com>
-References: <20240201010747.471141-1-david.e.box@linux.intel.com>
+	s=arc-20240116; t=1706749968; c=relaxed/simple;
+	bh=K7m8gtHLg+fdcwXXrK8dXPdrMnYZvsrGEiWz2SbekN0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oZMGtD8DjdzDCtIssrpx0bVLCDRnH0ahXc15SOcmGeZtHFTBnUKP3MpC94SX2F8URaC+Q33vzgykQEOg5Rl2pu/dIAeqdznS0npS2tzpIXNkREIYuRTHHgn5clQD5gC5t1UHQMqPPMcJft4o5kIdXRrVe3xBny6NNQUEwb2vhh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hgD7kbsa; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3639124ef52so1596245ab.3;
+        Wed, 31 Jan 2024 17:12:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706749965; x=1707354765; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K7m8gtHLg+fdcwXXrK8dXPdrMnYZvsrGEiWz2SbekN0=;
+        b=hgD7kbsa0q4GHDEcWAZc3DpVyDBQvBTgrbIAiiu3wLM5SkUF+jk/G+AdqGVe1qX/6u
+         Ws98wj4ttcuxlhBjPAiiglNv+INZ2eejVtpqvOrQGO+BnyWRvYR1Rh5vAHGwmQqjOOCa
+         g3kWSY4ixMqbqfG6rG3FsZAYDAaA5EegmMH2FdqT5ki78FwuWKBxp9e1Z+AWES6S5U+4
+         LK2k/Qyi5aLMoLgQycNDUR9A8swik1q7jHn8WgFNHe7tq04lxk0Ush8bhMCcyi+Ts45Q
+         lcMQyInWea4XwMHO9bU/uJYejsfbMQLev5EkXqqdeuNhqmPe6ySLtU7DW83ag7XA7G7q
+         qqlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706749965; x=1707354765;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=K7m8gtHLg+fdcwXXrK8dXPdrMnYZvsrGEiWz2SbekN0=;
+        b=D1ADboZFXelb0Tbeiz+hRTNcgWW6K+HX2sp2Er1NYqZV2m28I3/98MXn3tmRT7Bhr+
+         zsk1B6UKW2uY71bX3EXciRiYDF43QmZ3sV85RCuyJGzOsTd09Yj8RJr/w6bf/s4Dq3u/
+         u8Zi1kmpLReHZ0PbFNJ0b4ClN1wwWkTaMw/a5Ogut5rXafgXNESdz9oeFZm8iB40apf8
+         exg5kTiHBXo21ehT+G8/mUPw8WrT4QvTYzKswrabaMnlCY9giiKLhqsarkmAWGuuDuK5
+         iTzA+toM0CXg++EJIzBMuRQ59n6dZs78QRSqgd4u9rli83ryY5dQ9PMrakh1sviY1ky3
+         YkiA==
+X-Gm-Message-State: AOJu0Yw7SSOLQkAzHB6XY5dW4KZJJByRbO8ZUQ+lKVmasxf6j2OhwsjS
+	B3nSXOsUM3EO2vIxAWeHJNJ2Qk+eDbxoPMzSL4qfiJjqSIzlrAKvKPGKq/kPNXJbE63/VPkAtS9
+	WQ/yVEZc6zWqp4Sp2tZN9dYQSqvw=
+X-Google-Smtp-Source: AGHT+IEh0+jQ75LnEjqODofvT0NWp1gE8wEHS1esNqSY/7DD+N4jBt8M2Eb3cH395TwbO60rTYWKynysoJh3mylrNDw=
+X-Received: by 2002:a92:d307:0:b0:363:920c:9bd7 with SMTP id
+ x7-20020a92d307000000b00363920c9bd7mr3313192ila.9.1706749965596; Wed, 31 Jan
+ 2024 17:12:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240131084549.142595-1-chentao@kylinos.cn>
+In-Reply-To: <20240131084549.142595-1-chentao@kylinos.cn>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Wed, 31 Jan 2024 20:12:34 -0500
+Message-ID: <CADvbK_ewbc2dnFLArRdj9APhMVUiBJg9GwvjxJ+2wdiK6Pp-tw@mail.gmail.com>
+Subject: Re: [PATCH net-next] sctp: Simplify the allocation of slab caches
+To: Kunwu Chan <chentao@kylinos.cn>
+Cc: marcelo.leitner@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, linux-sctp@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add support to read the 'meter_current' file. The display is the same as
-the 'meter_certificate', but will show the current snapshot of the
-counters.
-
-Signed-off-by: David E. Box <david.e.box@linux.intel.com>
----
- tools/arch/x86/intel_sdsi/intel_sdsi.c | 48 +++++++++++++++++---------
- 1 file changed, 31 insertions(+), 17 deletions(-)
-
-diff --git a/tools/arch/x86/intel_sdsi/intel_sdsi.c b/tools/arch/x86/intel_sdsi/intel_sdsi.c
-index a8fb6d17405f..c9b3e457885d 100644
---- a/tools/arch/x86/intel_sdsi/intel_sdsi.c
-+++ b/tools/arch/x86/intel_sdsi/intel_sdsi.c
-@@ -182,6 +182,7 @@ struct sdsi_dev {
- enum command {
- 	CMD_SOCKET_INFO,
- 	CMD_METER_CERT,
-+	CMD_METER_CURRENT_CERT,
- 	CMD_STATE_CERT,
- 	CMD_PROV_AKC,
- 	CMD_PROV_CAP,
-@@ -329,7 +330,7 @@ static void get_feature(uint32_t encoding, char *feature)
- 	feature[0] = name[3];
- }
- 
--static int sdsi_meter_cert_show(struct sdsi_dev *s)
-+static int sdsi_meter_cert_show(struct sdsi_dev *s, bool show_current)
- {
- 	char buf[METER_CERT_MAX_SIZE] = {0};
- 	struct bundle_encoding_counter *bec;
-@@ -360,7 +361,11 @@ static int sdsi_meter_cert_show(struct sdsi_dev *s)
- 		return ret;
- 	}
- 
--	cert_ptr = fopen("meter_certificate", "r");
-+	if (!show_current)
-+		cert_ptr = fopen("meter_certificate", "r");
-+	else
-+		cert_ptr = fopen("meter_current", "r");
-+
- 	if (!cert_ptr) {
- 		perror("Could not open 'meter_certificate' file");
- 		return -1;
-@@ -368,7 +373,8 @@ static int sdsi_meter_cert_show(struct sdsi_dev *s)
- 
- 	size = fread(buf, 1, sizeof(buf), cert_ptr);
- 	if (!size) {
--		fprintf(stderr, "Could not read 'meter_certificate' file\n");
-+		fprintf(stderr, "Could not read '%s' file\n",
-+			show_current ? "meter_current" : "meter_certificate");
- 		fclose(cert_ptr);
- 		return -1;
- 	}
-@@ -734,7 +740,7 @@ static void sdsi_free_dev(struct sdsi_dev *s)
- 
- static void usage(char *prog)
- {
--	printf("Usage: %s [-l] [-d DEVNO [-i] [-s] [-m] [-a FILE] [-c FILE]]\n", prog);
-+	printf("Usage: %s [-l] [-d DEVNO [-i] [-s] [-m | -C] [-a FILE] [-c FILE]\n", prog);
- }
- 
- static void show_help(void)
-@@ -743,8 +749,9 @@ static void show_help(void)
- 	printf("  %-18s\t%s\n", "-l, --list",           "list available On Demand devices");
- 	printf("  %-18s\t%s\n", "-d, --devno DEVNO",    "On Demand device number");
- 	printf("  %-18s\t%s\n", "-i, --info",           "show socket information");
--	printf("  %-18s\t%s\n", "-s, --state",          "show state certificate");
--	printf("  %-18s\t%s\n", "-m, --meter",          "show meter certificate");
-+	printf("  %-18s\t%s\n", "-s, --state",          "show state certificate data");
-+	printf("  %-18s\t%s\n", "-m, --meter",          "show meter certificate data");
-+	printf("  %-18s\t%s\n", "-C, --meter_current",  "show live unattested meter data");
- 	printf("  %-18s\t%s\n", "-a, --akc FILE",       "provision socket with AKC FILE");
- 	printf("  %-18s\t%s\n", "-c, --cap FILE>",      "provision socket with CAP FILE");
- }
-@@ -760,21 +767,22 @@ int main(int argc, char *argv[])
- 	int option_index = 0;
- 
- 	static struct option long_options[] = {
--		{"akc",		required_argument,	0, 'a'},
--		{"cap",		required_argument,	0, 'c'},
--		{"devno",	required_argument,	0, 'd'},
--		{"help",	no_argument,		0, 'h'},
--		{"info",	no_argument,		0, 'i'},
--		{"list",	no_argument,		0, 'l'},
--		{"meter",	no_argument,		0, 'm'},
--		{"state",	no_argument,		0, 's'},
--		{0,		0,			0, 0 }
-+		{"akc",			required_argument,	0, 'a'},
-+		{"cap",			required_argument,	0, 'c'},
-+		{"devno",		required_argument,	0, 'd'},
-+		{"help",		no_argument,		0, 'h'},
-+		{"info",		no_argument,		0, 'i'},
-+		{"list",		no_argument,		0, 'l'},
-+		{"meter",		no_argument,		0, 'm'},
-+		{"meter_current",	no_argument,		0, 'C'},
-+		{"state",		no_argument,		0, 's'},
-+		{0,			0,			0, 0 }
- 	};
- 
- 
- 	progname = argv[0];
- 
--	while ((opt = getopt_long_only(argc, argv, "+a:c:d:hilms", long_options,
-+	while ((opt = getopt_long_only(argc, argv, "+a:c:d:hilmCs", long_options,
- 			&option_index)) != -1) {
- 		switch (opt) {
- 		case 'd':
-@@ -790,6 +798,9 @@ int main(int argc, char *argv[])
- 		case 'm':
- 			command = CMD_METER_CERT;
- 			break;
-+		case 'C':
-+			command = CMD_METER_CURRENT_CERT;
-+			break;
- 		case 's':
- 			command = CMD_STATE_CERT;
- 			break;
-@@ -828,7 +839,10 @@ int main(int argc, char *argv[])
- 			ret = sdsi_read_reg(s);
- 			break;
- 		case CMD_METER_CERT:
--			ret = sdsi_meter_cert_show(s);
-+			ret = sdsi_meter_cert_show(s, false);
-+			break;
-+		case CMD_METER_CURRENT_CERT:
-+			ret = sdsi_meter_cert_show(s, true);
- 			break;
- 		case CMD_STATE_CERT:
- 			ret = sdsi_state_cert_show(s);
--- 
-2.34.1
-
+On Wed, Jan 31, 2024 at 3:46=E2=80=AFAM Kunwu Chan <chentao@kylinos.cn> wro=
+te:
+>
+> commit 0a31bd5f2bbb ("KMEM_CACHE(): simplify slab cache creation")
+> introduces a new macro.
+> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
+> to simplify the creation of SLAB caches.
+>
+> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+Acked-by: Xin Long <lucien.xin@gmail.com>
 
