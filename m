@@ -1,149 +1,139 @@
-Return-Path: <netdev+bounces-67963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 211858457E0
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:34:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67F6B8457ED
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:39:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C92AD2921CE
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 12:34:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95B0C1C22574
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 12:39:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C25B5D475;
-	Thu,  1 Feb 2024 12:31:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758408663E;
+	Thu,  1 Feb 2024 12:39:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="X6s5EdgK"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="XOq/miWO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E045CDFF
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 12:31:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F407E86634
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 12:39:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706790717; cv=none; b=fFIUSjKWNqq4/KLFRijpBItrEuSYovojzBFELLagvQlJ/S66QaSAlZDYvHxlTz0G000PSpSPa2UIMPxzsJzmlQdKI3eZINA4LAobBfrMY1s9YJvA2asLBs8KYaV8w85zqHVOoDfCEPMSK+ANCcAHwX4gvE72/NNeFuWISKdM7Do=
+	t=1706791153; cv=none; b=pxgsx/WlqIwfV3DSV7jInWoFveFu4fPP2g3GY16yJJUTylnfT29vUpjZTC5MMYqkBe74TOnzvRMq1Xo8aHVu3aK+Avfi0Ml//V5nIjGmdakN7a0/UKXc/0dpO7/SdR2/s+vqejjKanuZ3mKaBmG+tGWDpwJvWoebge16X4B+YHs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706790717; c=relaxed/simple;
-	bh=vFuz6GjziEsF8tIFPzKP71+n4ONaqUX+bFUX3vwueo8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=f/2NZr+8Sqck12Jno/VaE2wULUT/+fE5o+5sbPhQBJjb1C4GJusnZMRp08cpkWK8hQSABceFcQNV9EHS/3YCULSdCrsEMaJjRK9IuvfD1t3NvqOCcZ29J9//C+L/aix7LeueNYThNbq9L+HjnSuCOJumv9kMRD22CUxQV2Thc0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=X6s5EdgK; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706790714;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=bTUZkGIAnQ4UIrmyCuy0FjocNAqGSflk8m8tXe4IgM8=;
-	b=X6s5EdgKUea4B8laAGRc3FKvCGlbf1HsKPZPXSweIXwuycPVcT+Y9Jf8J/3n9oCosZ0+HX
-	AC13mgNFSoFP0Wd/6AHVyzHo/NHLh8elnY590doSP8NyOINr6z3Rsb/BUEsJKFSxDMhUq9
-	jCfXF1y7Zbvs8Gnl2rMuu+vWh6oVaIQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-161-0_w6et4sNFmRMxplL7wW8Q-1; Thu, 01 Feb 2024 07:31:52 -0500
-X-MC-Unique: 0_w6et4sNFmRMxplL7wW8Q-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40efaee41dbso736315e9.1
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 04:31:52 -0800 (PST)
+	s=arc-20240116; t=1706791153; c=relaxed/simple;
+	bh=vcSXNWqKLKnr/XxvBuwOVYodoel7yAEy8t0XbIE1FLs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FHF2D0hYtUXNgdBPgAJ3JHp9+Yaos+SIu2XXZayaKDSsv/xPRxF8CqKdxMSrcGWR1AOFOCulu9YlQSBS2/M3fdBQ52w2+DLMrJpemXwdoHzS7fZT22YXKOPhz78AtrfKpx50vi+U79mbMhFsy7OFHqIurpkvR5jynrNCN5Gb6Ik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=XOq/miWO; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-40f033c2e30so8062975e9.0
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 04:39:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706791149; x=1707395949; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=G+R0ydXD/di7fbrB8jfxyy8IuF2nnjQdgLn7lXVeRMY=;
+        b=XOq/miWO4R0d2xCY51lqcQahKzflxe3aYtUvTcGhWZ3j4iJFgnVuoW7o07IN5WTQoQ
+         ZEFM4mrriuxeABIOaOt3+mKgWh2XgE6HWW7jWUUGQky1m+aN9zrL3vYAmwa3B1anrziE
+         gO5zPP0ZQ1JOk4n3hRr9V9DcMUs6olnCQe4V/z0hUh6PNQxSiEGtW0paau/bCi3MYUKN
+         75PkMf2HTjj28n6Z3bhW1zP34GTbD1kvJNY9UTZBqGOzNwSbcMng0rf3jjxrlRgR9ix0
+         0MiTZorFYpXHjNvptUgd9FosxOhoEBpNBM1D/oE3Nq6htbMBJ9YVEpZfJJEEX1Z26/Fg
+         piAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706790712; x=1707395512;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bTUZkGIAnQ4UIrmyCuy0FjocNAqGSflk8m8tXe4IgM8=;
-        b=c/kddj8FDh0brYA1fj0ROsZDnz+Ddz6AaXzyZVGdWYjjRgtUMXuN8MgBupE2tpXwAh
-         40LnNN9T7r+/otIgXvHxH0bo5aZzrTk7b3QQ7UcllWwJQYYFemeP/3e4Q35V9SRVKr2X
-         9ZDDc1wmHdsIVJyahqnp37Zo4Pwdq7jt7bh/QXtELvT9VDEdXvCGfvzy8ZkjAckCLQXX
-         m9G5f5JnoPQsZnnLFH+L+bkgqz3XnY4ThVcxmSHY2Em3DtKitD9Td5GLxsO6hN9WnIiI
-         wGCmJoWwaawvQBYdKWJFK0fI9u5VhSTw+Spcb+JPPI0LQP2YEdM7LcNxwSxJ0y5jyLT2
-         6Nog==
-X-Gm-Message-State: AOJu0Yx0B3w2KeyanmRb1PY/l4q2CzkU9iRWzAR/Um1tgbxz2etbiF8T
-	ehaD5dOsth/jvUtQeaiFu0FEACoPHtS0DgnbG3e4KDsKR6LIBV90Cr2XDu0nV3mseSyE2MIbcgZ
-	FpfqE6mrJbnfn3aG9PTkBfm34CE55xTUi37TGD9SF8I8JbuhhWFuOMg==
-X-Received: by 2002:a5d:4f89:0:b0:337:c6ee:3d7a with SMTP id d9-20020a5d4f89000000b00337c6ee3d7amr1619994wru.5.1706790711877;
-        Thu, 01 Feb 2024 04:31:51 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFU5FE1/QQHBxbfXTeTRxXPq7220Whd+L/Z8t9G34xGeWinx+1tt/R9oJL4aaDO/hpOptf3Yw==
-X-Received: by 2002:a5d:4f89:0:b0:337:c6ee:3d7a with SMTP id d9-20020a5d4f89000000b00337c6ee3d7amr1619983wru.5.1706790711529;
-        Thu, 01 Feb 2024 04:31:51 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXOJpaMuiyq6dZ8ZMz+gaEM5j1Uo44Y5Qb4Fxj/RX3hxQtPPjCB27S1OXm5w/H5F3B8mhvjXCIR/UnLLOW2fXIXH8VZaxtcwR//GRPCjcMuwTtxrEQRT57Vehv3v70XB9QURK+SBY0flHxXxzhfoqpRg0cIkIrTNwN0X/b9EzHO000SYzvXFTzxh4J0WL/onXh2eoAxg48Qj34J8PWmpVCc51cy1kyd1LxUFZ/rVFa7tz0=
-Received: from gerbillo.redhat.com (146-241-238-90.dyn.eolo.it. [146.241.238.90])
-        by smtp.gmail.com with ESMTPSA id bj26-20020a0560001e1a00b0033ae6530969sm13415277wrb.85.2024.02.01.04.31.50
+        d=1e100.net; s=20230601; t=1706791149; x=1707395949;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G+R0ydXD/di7fbrB8jfxyy8IuF2nnjQdgLn7lXVeRMY=;
+        b=NR0z9A3b9Gepxhvsq0PmHsxvBl7Bqq7ewuKlfBGF7vqhsuSyN8Vq9j5FbjOj18cvV8
+         SPU7G/Qetjs4EpJWlYbgI2AyoNB2zuqlLqR0QaYBOyNd+E4rvmfsS6FyBe9RnPqCEP0E
+         0vQxzkNlLiW+lF1fSTnJOrHRi2lRaCbTPPUVxwBucWspZVrazRJQZUluesdfm24B/Lnn
+         USnmCbJayCiQKfUGBFyI2Wux9Qnfwuk/6cDPA+DIW52eopDU4mHrBenX1vdgN23uC+2e
+         hmjUuLyx1JTBWeI9IVM0Rb53vZfAJqt7MlR1vsQvhJM+RzPtTKpqzpDAkX7E1mKtV0yj
+         HK5Q==
+X-Gm-Message-State: AOJu0Yysq2Hz4Xoi7Ro23BzHApmHH5DeEhQ0bk4NvmvY52m9O63An6Oe
+	uubVlHCukhkcktsiABDapZt9CbmWYcpoqxKc8EklSEc94jsg8fUyyc88+8jcOMs=
+X-Google-Smtp-Source: AGHT+IEu0L318kNsyVOJlQFrGCea8JQ3yLCrd9+VDQ6+MeMgB75U7I6tgx2Oef+Ldiu1FpmF1HB+HA==
+X-Received: by 2002:a05:600c:1705:b0:40e:4f81:3f68 with SMTP id c5-20020a05600c170500b0040e4f813f68mr4280509wmn.16.1706791146931;
+        Thu, 01 Feb 2024 04:39:06 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCV1oNiYoCy1UgJxP9Ql5prbzFAsWudfeZsVk2LzshOEsDr8SMvy53OEcb+atyC7KHyYzHIGu88E2LDymf/j6i843WMGxBgn65w3khjqo79UvJk1T7xTg4l6YjzMFF2iL18IW6JXRceG/UQPsK3eW2Pc3ITiXy+aghMOW3n+G21OYK6X3BWO5Xi+g292zTJ+fgyRT5aLAfwo6FBMDKRx6lHOHYgmevL9cvNC7PrfgviypD/uBvs8pWJWN/9BXN8zEAP+zMwNnIQCjpe0uYo5sx/o7E1lWWEgHwhclEsj7fOkuFNEFy+qCwKXyHhXuyig178PyOLeoDhUY6g/GOXxjwly8wbaE5NTe0OrBqvKbabAplT9I7OeP7D8BQN5+2HvEDqISfhbqKk2k1pp667cxaF6Iw==
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id p14-20020a05600c468e00b0040fbad272f6sm1785216wmo.46.2024.02.01.04.39.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 04:31:51 -0800 (PST)
-Message-ID: <5dfcfc03f62f80a498b9281e31f9e40ae1e35a34.camel@redhat.com>
-Subject: Re: [PATCH net-next] selftests: net: Fix bridge backup port test
- flakiness
-From: Paolo Abeni <pabeni@redhat.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- shuah@kernel.org,  razor@blackwall.org
-Date: Thu, 01 Feb 2024 13:31:49 +0100
-In-Reply-To: <Zbt9dxyJHszL4Aoy@shredder>
-References: <20240201080516.3585867-1-idosch@nvidia.com>
-	 <4cca1f0d3c015a6ab9e371b1639f6c3c29b33024.camel@redhat.com>
-	 <Zbt9dxyJHszL4Aoy@shredder>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+        Thu, 01 Feb 2024 04:39:06 -0800 (PST)
+Date: Thu, 1 Feb 2024 13:39:03 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Egor Pomozov <epomozov@marvell.com>,
+	Igor Russkikh <irusskikh@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Dmitry Bezrukov <dmitry.bezrukov@aquantia.com>,
+	Sergey Samoilenko <sergey.samoilenko@aquantia.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] net: atlantic: Fix DMA mapping for PTP hwts ring
+Message-ID: <ZbuQ58l4DoWU70Bp@nanopsycho>
+References: <20240201094752.883026-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240201094752.883026-1-ivecera@redhat.com>
 
-On Thu, 2024-02-01 at 13:16 +0200, Ido Schimmel wrote:
-> On Thu, Feb 01, 2024 at 10:34:52AM +0100, Paolo Abeni wrote:
-> > What about adding an helper alike wait_local_port_listen(), checking
-> > for bridge link status in short intervals, to likely reduce the overall
-> > wait time?
->=20
-> What about the below?
->=20
-> diff --git a/tools/testing/selftests/net/test_bridge_backup_port.sh b/too=
-ls/testing/selftests/net/test_bridge_backup_port.sh
-> index 70a7d87ba2d2..1b3f89e2b86e 100755
-> --- a/tools/testing/selftests/net/test_bridge_backup_port.sh
-> +++ b/tools/testing/selftests/net/test_bridge_backup_port.sh
-> @@ -124,6 +124,16 @@ tc_check_packets()
->  	[[ $pkts =3D=3D $count ]]
->  }
-> =20
-> +bridge_link_check()
-> +{
-> +	local ns=3D$1; shift
-> +	local dev=3D$1; shift
-> +	local state=3D$1; shift
-> +
-> +	bridge -n $ns -d -j link show dev $dev | \
-> +		jq -e ".[][\"state\"] =3D=3D \"$state\"" &> /dev/null
-> +}
+Thu, Feb 01, 2024 at 10:47:51AM CET, ivecera@redhat.com wrote:
+>Function aq_ring_hwts_rx_alloc() maps extra AQ_CFG_RXDS_DEF bytes
+>for PTP HWTS ring but then generic aq_ring_free() does not take this
+>into account.
+>Create and use a specific function to free HWTS ring to fix this
+>issue.
+>
+>Trace:
+>[  215.351607] ------------[ cut here ]------------
+>[  215.351612] DMA-API: atlantic 0000:4b:00.0: device driver frees DMA memory with different size [device address=0x00000000fbdd0000] [map size=34816 bytes] [unmap size=32768 bytes]
+>[  215.351635] WARNING: CPU: 33 PID: 10759 at kernel/dma/debug.c:988 check_unmap+0xa6f/0x2360
+>...
+>[  215.581176] Call Trace:
+>[  215.583632]  <TASK>
+>[  215.585745]  ? show_trace_log_lvl+0x1c4/0x2df
+>[  215.590114]  ? show_trace_log_lvl+0x1c4/0x2df
+>[  215.594497]  ? debug_dma_free_coherent+0x196/0x210
+>[  215.599305]  ? check_unmap+0xa6f/0x2360
+>[  215.603147]  ? __warn+0xca/0x1d0
+>[  215.606391]  ? check_unmap+0xa6f/0x2360
+>[  215.610237]  ? report_bug+0x1ef/0x370
+>[  215.613921]  ? handle_bug+0x3c/0x70
+>[  215.617423]  ? exc_invalid_op+0x14/0x50
+>[  215.621269]  ? asm_exc_invalid_op+0x16/0x20
+>[  215.625480]  ? check_unmap+0xa6f/0x2360
+>[  215.629331]  ? mark_lock.part.0+0xca/0xa40
+>[  215.633445]  debug_dma_free_coherent+0x196/0x210
+>[  215.638079]  ? __pfx_debug_dma_free_coherent+0x10/0x10
+>[  215.643242]  ? slab_free_freelist_hook+0x11d/0x1d0
+>[  215.648060]  dma_free_attrs+0x6d/0x130
+>[  215.651834]  aq_ring_free+0x193/0x290 [atlantic]
+>[  215.656487]  aq_ptp_ring_free+0x67/0x110 [atlantic]
+>...
+>[  216.127540] ---[ end trace 6467e5964dd2640b ]---
+>[  216.132160] DMA-API: Mapped at:
+>[  216.132162]  debug_dma_alloc_coherent+0x66/0x2f0
+>[  216.132165]  dma_alloc_attrs+0xf5/0x1b0
+>[  216.132168]  aq_ring_hwts_rx_alloc+0x150/0x1f0 [atlantic]
+>[  216.132193]  aq_ptp_ring_alloc+0x1bb/0x540 [atlantic]
+>[  216.132213]  aq_nic_init+0x4a1/0x760 [atlantic]
+>
+>Fixes: 94ad94558b0f ("net: aquantia: add PTP rings infrastructure")
+>Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 
-I was wondering more about a sleeping loop, something alike:
-
-wait_bridge_link()
-{=09
-	for i in $(seq 10); do
-		if bridge_link_check $1 $2 $3; then
-			break
-		fi
-		sleep 0.1
-	done
-}
-
-but no strong preference
-
-
-Cheers,
-
-Paolo
-
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
