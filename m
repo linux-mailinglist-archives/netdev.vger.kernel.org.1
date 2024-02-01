@@ -1,121 +1,215 @@
-Return-Path: <netdev+bounces-68208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29E2F846206
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:42:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CD35846219
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 21:46:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DADC9283507
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:42:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40B901C20DD0
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 20:46:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAB8B2C1BF;
-	Thu,  1 Feb 2024 20:42:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B0A13CF4B;
+	Thu,  1 Feb 2024 20:45:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="P5AynUl/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rj5oBC8C"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF0981E48B;
-	Thu,  1 Feb 2024 20:42:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2813F3CF73
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 20:45:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706820149; cv=none; b=QJELNiKHPWELBqzKtXgoG38hK5NMoLym4YAPrNbA0lpB3Ifh6aR4aCokeTmqBtENhkIaFP0jXWZeF0YBboLvMiIkuwEwhJfpnVmIDEUShCi4+LE6VgT7UEtAQs/+m+JoHE5dAl9nlDn6xV9vdNGROmPjmbrScn0NI5n3jp0d/90=
+	t=1706820355; cv=none; b=YRW4h/Rt2e1t619FVfq4SPCWc1r55rLBA8ioaHiHXKe111cN4bO/MXYom0rJHaPPcRV/4BX0WZ57t4gM/fP/tt8scnBlnYzWhpQf3Q8CBjeI2KdG6qwAHskq47zN3Ys4JTWN9i5UZb8qY9HOfZtKi+k2AUbGcUtHafNMlzifITM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706820149; c=relaxed/simple;
-	bh=bFJvUoef9xdUvduLzwvR1dgdMRczwphCznQNMwnf6as=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DaGJLwpRYDh2cUHrrcGJsJWJSl1VyP9+ec+7JjfoZSR5HJt+5Dq/KheX7Fhhr5+apJ1okX5Qt88sCcOuL4o2FKsHmZ3r8DkjM383/C9/EUHbWaYE9lmo0LeE0lEEPvckeN6jts/4y4Q4ShJYJC20M7NW6NuBwbIpo63gnFZKoyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=P5AynUl/; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1706820147; x=1738356147;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=bFJvUoef9xdUvduLzwvR1dgdMRczwphCznQNMwnf6as=;
-  b=P5AynUl/xCoDXl90jEZtNSoFTwGKmYMIBJajTrYhHJfzPlvEhzxKsMDp
-   ZO31YnvQe12llWVyCIF/PuRIIUc01+d8t0tjtmj1NduHvhOPaEToYlWok
-   rS2V3JfCtLQKNKXZANqS7pQHmRs3wHBtOEPVdfq+vrxjH6FSrLu+PTGuO
-   LqsR4AMbKqfLnD2GB77vOdeRiltmBIQMpgtaIHa1XQXt1JF2dCXqZRHuM
-   KelcuQLFcYU+ougq27u1u/NRJcFlXTQM6ocgGkYREis90BJcyTbLcdouC
-   Ao+PXudajMCSROVeUXFI/Tc/iMD8GHI/JRGpMPvov8fA7b2CNCMGrLPLG
-   w==;
-X-CSE-ConnectionGUID: Q09uTIAUTuimtNqrhQiWBQ==
-X-CSE-MsgGUID: 3RcJp7R+TUm53xfjLnWyyw==
-X-IronPort-AV: E=Sophos;i="6.05,236,1701154800"; 
-   d="scan'208";a="15646434"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa4.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Feb 2024 13:42:26 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 1 Feb 2024 13:42:19 -0700
-Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Thu, 1 Feb 2024 13:42:16 -0700
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<UNGLinuxDriver@microchip.com>, Horatiu Vultur <horatiu.vultur@microchip.com>
-Subject: [PATCH net-next] net: micrel: Fix the frequency adjustments
-Date: Thu, 1 Feb 2024 21:42:03 +0100
-Message-ID: <20240201204203.2691424-1-horatiu.vultur@microchip.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1706820355; c=relaxed/simple;
+	bh=Dgw6KwuT5iOSIOfdXghS0A8NOeSxhwpnWQcPHTaILOw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=owCopdqCZsps5qEbo8yGCELjvsJXFQ3zGpJsAXfqLrqXiEJXsmBUQaR7O9LCfsZi2SEXRNH/YYzq/SwjY5MViGfpUSjVJWvfDUDs+gx/kxPJY0pfNhSBYbqkDgHaN9ueVbkJkSylVVTJAr7MWOSb0VRD7/xVZM/h8oy2VKN+2ag=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rj5oBC8C; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a34c5ca2537so201360966b.0
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 12:45:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706820351; x=1707425151; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2nVZO6y8TcIQYcaKwHAm6Bz36UagPk36lmeIjL1j0eQ=;
+        b=rj5oBC8C7/ctfHD7gaN0OpOE9NLag6pQNHUV4LFFXvTm3rWKSe++BmiruwSOkFHXYI
+         CGX2AcnkSeszcUx4PO3yPMoqdMfaTSC8IbjKoK4yqlm0iZ3gEYi2SXMuR6xxAfktXrSz
+         SFTBPqk4iSe8LNyCHSRxNwGxHKtq/aMoVOsL0tyHPpWanclL3JTxAj6xbFBc3sIuo2+V
+         T9PtmGkZGsJajodx2sE4E3gGyEx1Xa4MSZSkAJZuLjJue9c97xyHpu1ItlwImJ/6MSFG
+         OSs8b+LGR+A2CoUnB0we0Tz3gh8TMdt/cfXNh2490NiChuYgdQkJceqB3l0jCyRc6blw
+         lvMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706820351; x=1707425151;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2nVZO6y8TcIQYcaKwHAm6Bz36UagPk36lmeIjL1j0eQ=;
+        b=Gau7edkHE2f07wQyIHKmUSagWhmEC7GOLrmlavJN5YGzt79GqZcHcYUO+NntW+KMDV
+         X8pZThyAVCFtgjSR1bf7ENI3cIt/6Hotta3yjpQn7JMYt/jHEi4maNN25JW9Vp5ZUkq+
+         1m6pgMpz3wnixOqKvMRjKd7CXXegxo6buEI2KDpqStq769ldKgXUEjMtOLx17lZI64uM
+         yz2E68Jzap8TxB9XP4Xg0zjfMY1k00gxFy7M8qPTjbv2WdgOt0sB71XgpH0hDqKgEIsX
+         C4MUdsbJYhx5oxzqfRomIuRBgrZbV0Gbh0MOdz5vg5WotQDV9Qtfoekv+c/TAvnURvho
+         ekmw==
+X-Gm-Message-State: AOJu0YxaE3eqGVkdMLkVla5xRUAJEbAjeljVyH54AJc43HyfxHKisTUV
+	dfDUhdDp0ygxgX5VJJNbNXJI2aj3d5UsLFZrU9mUzWgu2uYcYxto+aNo5jMOSz+ygUdESakeGcU
+	vn2/Le5sUyp/OpmGMlsl7hrYG/deX7zphlrAE
+X-Google-Smtp-Source: AGHT+IG/DL6INtFHc9j0F77V2IEAikGcResQBCFRtVCsiZS9TEJ+CqZIrzxtUr08GJ7e33dJapOrJizJUMeB5E/tYFo=
+X-Received: by 2002:a17:907:c82:b0:a36:c353:952e with SMTP id
+ gi2-20020a1709070c8200b00a36c353952emr143080ejc.41.1706820351053; Thu, 01 Feb
+ 2024 12:45:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+References: <20240123221749.793069-1-almasrymina@google.com>
+ <20240123221749.793069-3-almasrymina@google.com> <cff078e234e94593fb3fcfce9732d7988ead42d3.camel@redhat.com>
+In-Reply-To: <cff078e234e94593fb3fcfce9732d7988ead42d3.camel@redhat.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 1 Feb 2024 12:45:37 -0800
+Message-ID: <CAHS8izMHciG28ZdiRmvxpoKcffS7uXEHNTC+EfDgtd96btx7tw@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 2/2] net: add netmem to skb_frag_t
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Jason Gunthorpe <jgg@nvidia.com>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	Shakeel Butt <shakeelb@google.com>, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-By default lan8841's 1588 clock frequency is 125MHz. But when adjusting
-the frequency, it is using the 1PPM format of the lan8814. Which is the
-wrong format as lan8814 has a 1588 clock frequency of 250MHz. So then
-for each 1PPM adjustment would adjust less than expected.
-Therefore fix this by using the correct 1PPM format for lan8841.
+On Tue, Jan 30, 2024 at 1:34=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> Hi,
+>
+> I'm sorry for the late feedback.
+>
 
-Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
----
- drivers/net/phy/micrel.c | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Thanks for looking.
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 40bea9293ddd7..9b69735819896 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -120,6 +120,12 @@
-  */
- #define LAN8814_1PPM_FORMAT			17179
- 
-+/* Represents 1ppm adjustment in 2^32 format with
-+ * each nsec contains 8 clock cycles.
-+ * The value is calculated as following: (1/1000000)/((2^-32)/8)
-+ */
-+#define LAN8841_1PPM_FORMAT			34360
-+
- #define PTP_RX_VERSION				0x0248
- #define PTP_TX_VERSION				0x0288
- #define PTP_MAX_VERSION(x)			(((x) & GENMASK(7, 0)) << 8)
-@@ -4115,8 +4121,8 @@ static int lan8841_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
- 		faster = false;
- 	}
- 
--	rate = LAN8814_1PPM_FORMAT * (upper_16_bits(scaled_ppm));
--	rate += (LAN8814_1PPM_FORMAT * (lower_16_bits(scaled_ppm))) >> 16;
-+	rate = LAN8841_1PPM_FORMAT * (upper_16_bits(scaled_ppm));
-+	rate += (LAN8841_1PPM_FORMAT * (lower_16_bits(scaled_ppm))) >> 16;
- 
- 	mutex_lock(&ptp_priv->ptp_lock);
- 	phy_write_mmd(phydev, 2, LAN8841_PTP_LTC_RATE_ADJ_HI,
--- 
-2.34.1
+> On Tue, 2024-01-23 at 14:17 -0800, Mina Almasry wrote:
+> > @@ -845,16 +863,24 @@ struct sk_buff *__napi_alloc_skb(struct napi_stru=
+ct *napi, unsigned int len,
+> >  }
+> >  EXPORT_SYMBOL(__napi_alloc_skb);
+> >
+> > -void skb_add_rx_frag(struct sk_buff *skb, int i, struct page *page, in=
+t off,
+> > -                  int size, unsigned int truesize)
+> > +void skb_add_rx_frag_netmem(struct sk_buff *skb, int i, netmem_ref net=
+mem,
+> > +                         int off, int size, unsigned int truesize)
+> >  {
+> >       DEBUG_NET_WARN_ON_ONCE(size > truesize);
+> >
+> > -     skb_fill_page_desc(skb, i, page, off, size);
+> > +     skb_fill_netmem_desc(skb, i, netmem, off, size);
+> >       skb->len +=3D size;
+> >       skb->data_len +=3D size;
+> >       skb->truesize +=3D truesize;
+> >  }
+> > +EXPORT_SYMBOL(skb_add_rx_frag_netmem);
+> > +
+> > +void skb_add_rx_frag(struct sk_buff *skb, int i, struct page *page, in=
+t off,
+> > +                  int size, unsigned int truesize)
+> > +{
+> > +     skb_add_rx_frag_netmem(skb, i, page_to_netmem(page), off, size,
+> > +                            truesize);
+> > +}
+> >  EXPORT_SYMBOL(skb_add_rx_frag);
+>
+> Out of sheer ignorance, I'm unsure if the compiler will always inline
+> the above skb_add_rx_frag_netmem() call. What about moving this helper
+> to the header file?
+>
 
+Will do.
+
+> > diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
+> > index 1184d40167b8..145ef22b2b35 100644
+> > --- a/net/kcm/kcmsock.c
+> > +++ b/net/kcm/kcmsock.c
+> > @@ -636,9 +636,14 @@ static int kcm_write_msgs(struct kcm_sock *kcm)
+> >               for (i =3D 0; i < skb_shinfo(skb)->nr_frags; i++)
+> >                       msize +=3D skb_frag_size(&skb_shinfo(skb)->frags[=
+i]);
+> >
+> > +             if (WARN_ON_ONCE(!skb_frag_page(&skb_shinfo(skb)->frags[0=
+]))) {
+> > +                     ret =3D -EINVAL;
+> > +                     goto out;
+> > +             }
+>
+> I feel like the following has been already discussed, but I could not
+> find the relevant reference... Are all frags constrained to carry the
+> same memref type? If not it would be better to move this check inside
+> the previous loop, it's already traversing all the skb frags, it should
+> not add measurable overhead.
+>
+
+Yes, this was discussed before. I believe the agreement is that, yes,
+all the frags in a single skb will be constrained to a single type. It
+was discussed on one of the many RFCs I believe.
+
+Supporting skbs with mixed netmem types is certainly possible, but
+requires per-frag checking and per-frag handling. Constraining all
+skbs to the same netmem type just simplifies things greatly because
+frag0 can be checked to determine the type of all the frags in the
+skb, and all the frags in the skb can be processed the same as they're
+the same type. There are no interesting use cases I can think of right
+now that require mixed types, and the code can always be extended to
+that if someone has a use case in the future.
+
+I plan to add a WARN_ON_ONCE or DEBUG_NET_WARN_ON_ONCE in
+skb_add_frag_rx_netmem that detects if the driver is trying to mix
+types in the devmem series which adds non-page netmem.
+
+If OK with you, I'll keep the check for only frag 0, but combine it
+with the nr_frags check above like this:
+
+diff --git a/net/kcm/kcmsock.c b/net/kcm/kcmsock.c
+index 145ef22b2b35..73c200c5c8e4 100644
+--- a/net/kcm/kcmsock.c
++++ b/net/kcm/kcmsock.c
+@@ -627,7 +627,8 @@ static int kcm_write_msgs(struct kcm_sock *kcm)
+                        skb =3D txm->frag_skb;
+                }
+
+-               if (WARN_ON(!skb_shinfo(skb)->nr_frags)) {
++               if (WARN_ON(!skb_shinfo(skb)->nr_frags) ||
++                   WARN_ON_ONCE(!skb_frag_page(&skb_shinfo(skb)->frags[0])=
+)) {
+                        ret =3D -EINVAL;
+                        goto out;
+                }
+@@ -636,11 +637,6 @@ static int kcm_write_msgs(struct kcm_sock *kcm)
+                for (i =3D 0; i < skb_shinfo(skb)->nr_frags; i++)
+                        msize +=3D skb_frag_size(&skb_shinfo(skb)->frags[i]=
+);
+
+-               if (WARN_ON_ONCE(!skb_frag_page(&skb_shinfo(skb)->frags[0])=
+)) {
+-                       ret =3D -EINVAL;
+-                       goto out;
+-               }
+-
+
+But I'm happy implementing the check exactly as you described if you
+strongly prefer that instead, I don't think it's a big deal from my
+end either way. Thanks!
+
+--=20
+Thanks,
+Mina
 
