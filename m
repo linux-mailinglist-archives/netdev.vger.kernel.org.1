@@ -1,123 +1,162 @@
-Return-Path: <netdev+bounces-67843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C07078451C5
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:11:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 358278451D8
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:19:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CCF7EB24A8B
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 07:11:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D53BFB22DA7
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 07:19:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B92BB1586CA;
-	Thu,  1 Feb 2024 07:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E47C21552E8;
+	Thu,  1 Feb 2024 07:19:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YS4H9asG"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="bo+OXXKp";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="kcxyNRo6";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="bo+OXXKp";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="kcxyNRo6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7ED157E90;
-	Thu,  1 Feb 2024 07:11:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 190071586D2
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 07:19:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706771503; cv=none; b=hy9OkWYaZ9M5pyqsJep6SYNfmlZu/hOWx9tyU6/anwt9L0BxY6eSnTVwfeziDn91mI5tANPvB6VrTa71izKwfL/dfV+SQiC4VQJePadPGDcD6X7NGHKJBdCs/BbPGwPvgLdFCDrQ70k5SNMQgoedNNZXhrhzhKFUJc6YvzlhD1c=
+	t=1706771992; cv=none; b=RGFV8AiJAKbA5Ny4tgI5o+VW+l8GlYZlwwWYSXBp7dyVgf7QG3T1KVOfjQ8Oqydu/o3IQyKUGoLhN6BJerxTFua4CUsQdihtWHNi5uflZ4Ps3NkUWbn6Y7hBqeEAs+M4h2RwqPMS7QkHOFT5XNgtqmg6wrZUs5dAMvE2GQz+JJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706771503; c=relaxed/simple;
-	bh=IDC7ymgQeSHuFr0rjM4UAqt05pUsygpnpWG3puJorBY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dxAkdvBOBNKBNhjqjpZ7zDIXqO5h/tI1N1+GQEhdsiWuqRxjDkM36kqE9Vm+xB/KTgB8rtGfIZdQjGpSswLVUKnxyrObtJ6vppEVcs3h582cC640UtwoNPkzfJURH0/dkSAPdMPv/VI//SQfQGIqWgLLlhDT8/hITEZb6K+PyHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YS4H9asG; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-40ef3f351d2so9561455e9.1;
-        Wed, 31 Jan 2024 23:11:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706771500; x=1707376300; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=4MTyarJbOldtNhuHu6n9oQqi/8jRbXK/pPJRsFzR35U=;
-        b=YS4H9asGSf7bAi4V76u5mO90qP8uOdP/mF/EAHaAIt2vSHXfzmd8W8G24aWdTbfPnE
-         HhJaqcEikoCPpNO/Z3UFxKzo+dqg1FsKwoLLKpi5znQEGqNoRFw2RkN1A0C/Q3nsKA0J
-         MzxEpebZQXk99Upo1oOJBbHvBpo3H+WfKEwgYgBh5gj+aG/VA3+B7lxjcIB4957y+Abc
-         8vsRV30Q7K+cjGw6h1PeauwyX4Zv/RoOPLJZXRrfwZoPDUuvJDH4sgohvvjCFYXd5/ep
-         PmKk3pSBQR8OUT1peWCA+lpPYK/ORZPjNS20TBPAYB56UhdS8mbF7UAXIUpSNRgBaJxV
-         XMkQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706771500; x=1707376300;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4MTyarJbOldtNhuHu6n9oQqi/8jRbXK/pPJRsFzR35U=;
-        b=h8wou5gt+z/3FrMbYPTqHvdMYrK7X2/Mvr/yGmHE2PbO+mU2B36/gjNlMPSCFWpbBP
-         AFXKmZNR/uZr+UEIWTmfTVdCYdy4Lq4Im1vnt6IpAMLi+CXGHqUk9ra7hye0IyMxMaOM
-         D6zrN4PxT9BH7BksKIuSuTNNQrx5rlGfS8aYeqiuaRA9gRIcaG2fPS24ZxphdqjGSt5e
-         vPIKvi/P4uqysKl90+KZGY20aSFeP/wRLB1J0xblBuZR3L0LaSoiWM/1rbcCJ8liePeR
-         n1eouvNQr2YJzW1Y3r9BQenaKhpmY0sjPFVlyDqz1UBcs5WNJH13k6+fErOf7A2J4KsV
-         DsPA==
-X-Gm-Message-State: AOJu0Ywza+ciI7SSbhByvgVCruTWw7KMOAHB1iTVb7gVu2BgwECBrAm8
-	0ZBPDraN4KHt83ym09gcVVhL6hZ2J3HfkB6lJc3mGCrJJOEhrlE+
-X-Google-Smtp-Source: AGHT+IFhZNCP7pLIRaQX31qub5NUXs5YtlIDtuXNLxD7QXJ+jJ0TNtbNMHi4DTXv1oZX+7u7E8L0AQ==
-X-Received: by 2002:a05:600c:1d22:b0:40e:9fd3:6b75 with SMTP id l34-20020a05600c1d2200b0040e9fd36b75mr3490821wms.2.1706771500051;
-        Wed, 31 Jan 2024 23:11:40 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWZbPbEgyT54/x6K2CkuFor5xDD4w48ZY+aXRc6lotr2YXNh/x2FhappvkkZwiCsEX08OoinX8Rz13BAhMHHLq5S306Vu1mJ0UmxQ9U7ujOZUErQHRjvzQt4Z5sq+qfypV4Ekzp4bS25lBLwLd2l1vrfKLzmgQrJRqKvnoNONYdLgG8S3/8cImKaRg6fzTRy/vzFK8SFnmnOZC4kWV6aeERa1h9wv4aEMoH8qU542ujxvZ8LgsFp1CwLIghGMi6KuNzDNlMZyTUg/eswacp92gAMv/a23kAXkcNevTThGH9TORq2XWPRAGlaOt0yxdIu4cVPU0UiFDCyqTW3g8sTANARo3+m/7Ni8MQwDXmvDUHiYuAD68crmPV19iDMZ0qW/M=
-Received: from debian ([93.184.186.109])
-        by smtp.gmail.com with ESMTPSA id t8-20020adfe108000000b0033921c383b2sm15263806wrz.67.2024.01.31.23.11.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jan 2024 23:11:39 -0800 (PST)
-Date: Thu, 1 Feb 2024 08:11:37 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jean Delvare <jdelvare@suse.com>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hwmon@vger.kernel.org
-Subject: Re: [PATCH v5 net-next 08/13] net: phy: marvell-88q2xxx: add support
- for temperature sensor
-Message-ID: <20240201071137.GA41347@debian>
-References: <20240122212848.3645785-1-dima.fedrau@gmail.com>
- <20240122212848.3645785-9-dima.fedrau@gmail.com>
- <65071184-428b-4850-9e0c-baaa73513c6d@lunn.ch>
+	s=arc-20240116; t=1706771992; c=relaxed/simple;
+	bh=+91a28CLUGMyXMzV68n0pHKrGbRfAn+jHF8/dS6BdQ0=;
+	h=Date:Message-ID:From:To:Cc:Subject:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=adD5r6wu3SD7tRW0ILkoJinedYDAkOLUWMlAw2bBM9l7jKxeHipbizxhJM5zoLGEnubiGmJt6qx47BfystpVw3yFek2tOawi9+e0qYGNbnr8nZrrZVkAlsOwEG0D/vqsg8/MzTxfbSFkiQz+TS2SbQPEcGlC4pYM7K4/Rg6+RCU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=bo+OXXKp; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=kcxyNRo6; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=bo+OXXKp; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=kcxyNRo6; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 458201FB8D;
+	Thu,  1 Feb 2024 07:19:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1706771989; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tU3HZ8TRhIa1ljHB/7xlkHMq8P+0Mu3fKjcUBBNSlKo=;
+	b=bo+OXXKpp4nRZ3h3zNsPWUxWTEH7D601LlHYTJIi0Oz55ovDbdrFzRWxXGzMQfmPMCu/8m
+	8Em2iz0jxz4ZtcSOhFYYDSPBy+mack9VoZdILHWIC2E5jTZt7Prnys/AQ4zcNZyQIhZCKX
+	k06LFdvpUAfV5U8A/ogM3HSNGhjfD2Y=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1706771989;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tU3HZ8TRhIa1ljHB/7xlkHMq8P+0Mu3fKjcUBBNSlKo=;
+	b=kcxyNRo600jiD7pMAO7DsTnwOyA6wp9u/mS4SwEd7Nxjh6o6V0pLzxxWSpf4hoUtPHOnFO
+	Om9tqMpQ5EQYXPAQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1706771989; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tU3HZ8TRhIa1ljHB/7xlkHMq8P+0Mu3fKjcUBBNSlKo=;
+	b=bo+OXXKpp4nRZ3h3zNsPWUxWTEH7D601LlHYTJIi0Oz55ovDbdrFzRWxXGzMQfmPMCu/8m
+	8Em2iz0jxz4ZtcSOhFYYDSPBy+mack9VoZdILHWIC2E5jTZt7Prnys/AQ4zcNZyQIhZCKX
+	k06LFdvpUAfV5U8A/ogM3HSNGhjfD2Y=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1706771989;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=tU3HZ8TRhIa1ljHB/7xlkHMq8P+0Mu3fKjcUBBNSlKo=;
+	b=kcxyNRo600jiD7pMAO7DsTnwOyA6wp9u/mS4SwEd7Nxjh6o6V0pLzxxWSpf4hoUtPHOnFO
+	Om9tqMpQ5EQYXPAQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 180CD139B1;
+	Thu,  1 Feb 2024 07:19:49 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id rQ+3AxVGu2UnXgAAD6G6ig
+	(envelope-from <tiwai@suse.de>); Thu, 01 Feb 2024 07:19:49 +0000
+Date: Thu, 01 Feb 2024 08:19:48 +0100
+Message-ID: <87cytg1wiz.wl-tiwai@suse.de>
+From: Takashi Iwai <tiwai@suse.de>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Joe Salmeri <jmscdba@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	tiwai@suse.com
+Subject: Re: Kernel Module r8169 and the Realtek 8126 PCIe 5 G/bps WIRED ethernet adapter
+In-Reply-To: <e7092019-dfe0-4d6c-96f2-2a1b909dc130@gmail.com>
+References: <edabbc1f-5440-4170-83a4-f436a6d04f76@gmail.com>
+	<64b65025-792c-43c9-8ae5-22030264e374@gmail.com>
+	<208a69de-af5b-4624-85d5-86e87dfe6272@gmail.com>
+	<55163a6d-b40a-472d-bacb-bb252bc85007@gmail.com>
+	<f344abc6-f164-46d9-b9d1-405709b77bba@gmail.com>
+	<7ee3893f-8303-46a1-a303-7a009031ca4e@gmail.com>
+	<e7092019-dfe0-4d6c-96f2-2a1b909dc130@gmail.com>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) Emacs/27.2 Mule/6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65071184-428b-4850-9e0c-baaa73513c6d@lunn.ch>
+MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
+Content-Type: text/plain; charset=ISO-8859-1
+Content-Transfer-Encoding: 8bit
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: -2.45
+X-Spamd-Result: default: False [-2.45 / 50.00];
+	 ARC_NA(0.00)[];
+	 TO_DN_EQ_ADDR_SOME(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 RCPT_COUNT_THREE(0.00)[4];
+	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 TO_DN_SOME(0.00)[];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 MID_CONTAINS_FROM(1.00)[];
+	 FREEMAIL_TO(0.00)[gmail.com];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 FREEMAIL_CC(0.00)[gmail.com,vger.kernel.org,suse.com];
+	 RCVD_TLS_ALL(0.00)[];
+	 BAYES_HAM(-2.15)[95.94%]
+X-Spam-Flag: NO
 
-Am Wed, Jan 31, 2024 at 04:17:06PM +0100 schrieb Andrew Lunn:
-> > +static int mv88q2xxx_hwmon_probe(struct phy_device *phydev)
-> > +{
-> > +	struct device *dev = &phydev->mdio.dev;
-> > +	struct device *hwmon;
-> > +	char *hwmon_name;
-> > +	int ret;
-> > +
-> > +	/* Enable temperature sensor interrupt */
-> > +	ret = phy_set_bits_mmd(phydev, MDIO_MMD_PCS,
-> > +			       MDIO_MMD_PCS_MV_TEMP_SENSOR1,
-> > +			       MDIO_MMD_PCS_MV_TEMP_SENSOR1_INT_EN);
+On Thu, 01 Feb 2024 08:09:21 +0100,
+Heiner Kallweit wrote:
 > 
-> You enable an interrupt, but i don't see any changes to the interrupt
-> handler to handle any interrupts which are generated?
->
-Hi Andrew,
+> On 01.02.2024 00:36, Joe Salmeri wrote:
+> > You mentioned support showing up in the 6.9 kernel.   Was that correct or did you mean 6.8 which comes out in March ?
+> > 
+> 6.8 is already in rc phase and closed for new features.
 
-you are right. Have to remove these lines. Besides enabling the interrupt
-in MDIO_MMD_PCS_MV_TEMP_SENSOR1, there are two further register writes
-necessary to make the interrupt propagate. I didn't want it to propagate.
-Anyway it's wrong. I couldn't find a good solution to use the temperature
-interrupt. Will have a look into this, and probably figuring out how to
-do so. But it won't be part of this patch series.
+As those are rather trivial changes, I can backport the stuff to
+openSUSE Tumbleweed kernel if the changes are accepted by the
+subsystem.
 
-Dimitri
+Heiner, did you already submit the patch for r8169, too?
+I couldn't find it, only I saw a realtek phy patch in
+  https://lore.kernel.org/netdev/0c8e67ea-6505-43d1-bd51-94e7ecd6e222@gmail.com
+
+
+thanks,
+
+Takashi
 
