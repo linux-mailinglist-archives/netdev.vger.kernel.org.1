@@ -1,148 +1,149 @@
-Return-Path: <netdev+bounces-67906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D56BB8454EC
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 11:12:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE97B8454F7
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 11:14:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 149681C23DE6
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 10:12:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BD3828F3E4
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 10:14:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55FE15B0FE;
-	Thu,  1 Feb 2024 10:12:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC0034DA06;
+	Thu,  1 Feb 2024 10:14:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="trlXLoeg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B09815AABD
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 10:12:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9164A15B11B
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 10:14:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706782347; cv=none; b=nBIWzCWvMkeGkbfnMzKu6la3l6m2g0va5UCnC68lljCXF7HbtQx/rJiPb2OBOl6hr/FAG1BnhJ2W4z62wit5cypN94yXDN3v9gTApRHGItvPwD28pHOXtYxBdgrzdN4SwqJd5/INr9e8b4KSuUO+gD7AjAKsfAC3Tv7477r+/CI=
+	t=1706782445; cv=none; b=K2TXmzyNZ/wHliT9XypQHo/TQvr6I4jaSzx889E7AJXAsJz2zD3yk5mNsprDWwYXdhw70AIVScLQELlL97tlDrv0sUaoRo2wYk2rdI4rf8NQylB/ZCBZGjHu08SgdAOrvSF9Q8dSrShAt0TD8Kkt5r8U11xohXMn4qj2Uz/D8jo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706782347; c=relaxed/simple;
-	bh=0hkGTq+IfUCvwYmNvyoNZ0aTtPEQahj/pe57w9qIgMk=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=cUiypNH9sR1e0HJhACbSjmmiO936zMPFUey3mlR9Q2JJJfsh9lAzHaNbHe5/kly50ojcquTJP9QTBbFmsqNDbA8QLB9h/dbGmusgocNhLSSA5jT1IcoY5bt00KhUziLe1lX//1731j7R2Rz+vPbNkVN2vXXHw1jHd8KMGFlcbRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7bfffd9b47fso55617339f.1
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 02:12:25 -0800 (PST)
+	s=arc-20240116; t=1706782445; c=relaxed/simple;
+	bh=ZI5RtE8zkA8WP2I8EFMXwgAhBsml9b7wPVyfiO5m79Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gWIMh4zlPIE8vypoFAgS+KpLljUCzXyjaCQnKNsAHbwQa6N68rQP8Tr7hqApI8ApLc5JA6x7NWiCRR0gK/1lD+DS3shMChusxpWu/R3/FyGphw6tMNwUvo6ciR2qi7FqcUJKS4WUK/a9P1NtKgP8fnQoPZuU3CmAzOzUMdfKZEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=trlXLoeg; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-33ae4205ad8so487734f8f.2
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 02:14:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706782441; x=1707387241; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1/e8HqGTBoNdiXvpZKyoPnEwDs0/fPJqWhKv8bb/8xc=;
+        b=trlXLoegtcC/CkHT5KGqreesF3ZcRu7OEsT383AGqRQOLwRYgIXoj2XQMtbmjKcQ4G
+         9blXK/2ObWhAYzlohB1vzo/Myil1ghZEGi9/D8zEwcJQ+rml8hH1tLwcNX7WSgatxvwc
+         gm56vONmCx/aqt7zD/dVcE+a5qUI9zYNWuXY+XvARmGb0olafIgkUl1YGdcOU3nT5nR8
+         oF0WRqE5MjT48uPeu/zS2WpEWyO0jISHuqIBxkJhzClwol5EkIwYQlPLTd/R3DojgT0I
+         sQbNLy8u5yzLbTUY+W3c1mAHx1sytYZU1JHlLRemDJsP0UA4HaIHghv3FDYaTyxbim3e
+         JqDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706782345; x=1707387145;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Asvm9Ng9v04fcnG9TARg/mgu5KJMM7tuU6wye4lAsNY=;
-        b=ir1uTi0xpciN5LMYBeQNwna8+XvciWotDCAxa8vvxnZEYwuUqwxeIO5vtDeXc3vleB
-         GwrnicpMkJidqfSex0zKsBQHLIobIjZPf6UKrFIaaUu+3eHIf173jHi3soGqqruU1F/T
-         E5kQ7HJZdVGMBDfHIrc4FyBnYhnBldYyuRLwllFDZtlszOI/BKSg2F2pTJ90mqlIRwYY
-         cFAwUPt6xJKUE4WrxKAV63/eyGMaU0GTI88NZnPHetb5Ir0kQw1cKbshDkHtSQtBlfNO
-         zByp1bHgurep1t7ruQZsJmTTk9MhWYge1jkn2Kt7xqQfMixR6+4RKHUMwcK+PEfeqRKP
-         cBtA==
-X-Gm-Message-State: AOJu0Yx5eeadP6v2ceV+m7PobRuCSJ4/pFwutNC2cbcg1PyWqNLYJkU6
-	mswvwCSglxw7+agSQSaKxEnA2nQZAXzTOBp/l3aac8PMxcnV5R6hUaexRpoMF/gMkopq8gL3+Ey
-	5DpYit1IA5eaSxdvP/HiXX9Q4ajZo6C334fd9+TPewXeej8v2l/fs7zU=
-X-Google-Smtp-Source: AGHT+IHPOwfpLUsGJ/kYBOjvVxEPaanltLISeaZxKkJShYH6tg0o8LqNJReL0ZqbXA22eXjJF9PUJevPkLA+oEfj6Q05uMppTIZz
+        d=1e100.net; s=20230601; t=1706782441; x=1707387241;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1/e8HqGTBoNdiXvpZKyoPnEwDs0/fPJqWhKv8bb/8xc=;
+        b=bzji5430jSZz+eD8l8CDrmGqfeV7KE3AGGZfcu6cq6r40+r0wSjYNFFLKAx6Fu4wsq
+         U+rQezeToJT1j4K51Vg7s1noCENFmZEqlBRt3h6Sti3Tpq20KTDqxsL1EsE0CucdHOX3
+         zfGRAiiP96vGhG1PojZWZTksMurMxBpY0DYsgHjTd5Tz/DAPbc+05kXj4SXMtEJKud8K
+         jmBUkun32bi0qA23UHDxwM8waoQ5DDayqEx7Hi1GMUc/AM4ebGlkyk782nC5siLJwtGY
+         0cf1VEtMHB0Ywvvp3DjaeHXV+3AvG3ua7Ysh6n+bP0bcZalSD6cjypTF0njvcW1VdKML
+         Yo4A==
+X-Gm-Message-State: AOJu0YzQmRmDcgOL5Tj2BYzjFZacfG4uwFDOXuAE7AWhggY4UG+bIk3T
+	45AbDzg0L10jnYsUSr2sCwOPpeM6sWb9eXbafFTcBMbjjRengdlidNAYJyCFl9Q=
+X-Google-Smtp-Source: AGHT+IEK93z1E6or0sJbGnRUDd6jiXvN13hhMUqfzejOcW2igcwCjOxIMzIUlVCxGM4BG33e4giODw==
+X-Received: by 2002:a5d:544a:0:b0:33a:f0a4:eb07 with SMTP id w10-20020a5d544a000000b0033af0a4eb07mr2964962wrv.54.1706782440709;
+        Thu, 01 Feb 2024 02:14:00 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUalGmA1msgn1XM4nLoqZ3P83NGz4JHVfbuoAGEW/sk3lOdYY9HcgYAcSkIWYcOjMalvYafr9V5gDBZ6T/hCvFVfI8usx0A3B6VFAahSQXQ7YJ0EZmDHR6ywxaPZ9l070nrvLQACFM/7MuKHguS+a1gDXLEiPi7Tk929yYK5Jvper8As9PeZj7N/XML2N9WXHHL6iC0pA9VQb/XpxttQKR21TtqXghjqQPgo8ITf9aemTMGbMAydUGMBeFEPA4k/m8rf5+l30iI
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id y7-20020a5d6147000000b0033b0d2ba3a1sm2446353wrt.63.2024.02.01.02.13.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Feb 2024 02:14:00 -0800 (PST)
+Date: Thu, 1 Feb 2024 11:13:57 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: William Tu <witu@nvidia.com>, Jacob Keller <jacob.e.keller@intel.com>,
+	bodong@nvidia.com, jiri@nvidia.com, netdev@vger.kernel.org,
+	saeedm@nvidia.com,
+	"aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>
+Subject: Re: [RFC PATCH v3 net-next] Documentation: devlink: Add devlink-sd
+Message-ID: <Zbtu5alCZ-Exr2WU@nanopsycho>
+References: <20240130170702.0d80e432@kernel.org>
+ <748d403f-f7ca-4477-82fa-3d0addabab7d@nvidia.com>
+ <20240131110649.100bfe98@kernel.org>
+ <6fd1620d-d665-40f5-b67b-7a5447a71e1b@nvidia.com>
+ <20240131124545.2616bdb6@kernel.org>
+ <2444399e-f25f-4157-b5d0-447450a95ef9@nvidia.com>
+ <777fdb4a-f8f3-4ddb-896a-21b5048c07da@intel.com>
+ <20240131143009.756cc25c@kernel.org>
+ <dc9f44a8-857b-498a-8b8c-3445e4749366@nvidia.com>
+ <20240131151726.1ddb9bc9@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1b0c:b0:363:9211:a723 with SMTP id
- i12-20020a056e021b0c00b003639211a723mr377330ilv.2.1706782345179; Thu, 01 Feb
- 2024 02:12:25 -0800 (PST)
-Date: Thu, 01 Feb 2024 02:12:25 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000064b78606104f3b91@google.com>
-Subject: [syzbot] [net?] [s390?] KCSAN: data-race in __sys_connect / smc_switch_to_fallback
-From: syzbot <syzbot+ab2213db98841b6ead07@syzkaller.appspotmail.com>
-To: agordeev@linux.ibm.com, alibuda@linux.alibaba.com, davem@davemloft.net, 
-	edumazet@google.com, guwen@linux.alibaba.com, jaka@linux.ibm.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	tonylu@linux.alibaba.com, wenjia@linux.ibm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240131151726.1ddb9bc9@kernel.org>
 
-Hello,
+Thu, Feb 01, 2024 at 12:17:26AM CET, kuba@kernel.org wrote:
+>On Wed, 31 Jan 2024 15:02:58 -0800 William Tu wrote:
+>> > I just did a grep on METADATA_HW_PORT_MUX and assumed bnxt, ice and nfp
+>> > all do buffer sharing. You're saying you mux Tx queues but not Rx
+>> > queues? Or I need to actually read the code instead of grepping? :)
+>> 
+>> I guess bnxt, ice, nfp are doing tx buffer sharing?
+>
+>I'm not familiar with ice. I'm 90% sure bnxt shares both Rx and Tx.
+>I'm 99.9% sure nfp does.
 
-syzbot found the following issue on:
+Wait a sec. You refer to using the lower device (like PF) to actually
+send and receive trafic of representors. That means, you share the
+entire queues. Or maybe better term is not "share" but "use PF queues".
 
-HEAD commit:    4854cf9c61d0 Merge tag 'mips-fixes_6.8_1' of git://git.ker..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=149d01efe80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e1bd33f45956bbc2
-dashboard link: https://syzkaller.appspot.com/bug?extid=ab2213db98841b6ead07
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+The infra William is proposing is about something else. In that
+scenario, each representor has a separate independent set of queues,
+as well as the PF has. Currently in mlx5, all representor queues have
+descriptors only used for the individual representor. So there is
+a huge waste of memory for that, as often there is only very low traffic
+there and probability of hitting trafic burst on many representors at
+the same time is very low.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Say you have 1 queue for a rep. 1 queue has 1k descriptors. For 1k
+representors you end up with:
+1k x 1k = 1m descriptors
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/e44f160651d1/disk-4854cf9c.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f6a2062d07e6/vmlinux-4854cf9c.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/3d179908ef3c/bzImage-4854cf9c.xz
+With this API, user can configure sharing of the descriptors.
+So there would be a pool (or multiple pools) of descriptors and the
+descriptors could be used by many queues/representors.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ab2213db98841b6ead07@syzkaller.appspotmail.com
+So in the example above, for 1k representors you have only 1k
+descriptors.
 
-==================================================================
-BUG: KCSAN: data-race in __sys_connect / smc_switch_to_fallback
-
-write to 0xffff88812a230bc8 of 8 bytes by task 1831 on cpu 1:
- smc_switch_to_fallback+0x453/0x740 net/smc/af_smc.c:924
- smc_sendmsg+0xd6/0x330 net/smc/af_smc.c:2772
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x37c/0x4d0 net/socket.c:2584
- ___sys_sendmsg net/socket.c:2638 [inline]
- __sys_sendmsg+0x1e9/0x270 net/socket.c:2667
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x46/0x50 net/socket.c:2674
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x59/0x120 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-read to 0xffff88812a230bc8 of 8 bytes by task 1833 on cpu 0:
- sock_from_file net/socket.c:514 [inline]
- __sys_connect_file net/socket.c:2037 [inline]
- __sys_connect+0x11d/0x1b0 net/socket.c:2065
- __do_sys_connect net/socket.c:2075 [inline]
- __se_sys_connect net/socket.c:2072 [inline]
- __x64_sys_connect+0x41/0x50 net/socket.c:2072
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x59/0x120 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-value changed: 0xffff8881293bc000 -> 0xffff8881293bf400
-
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 0 PID: 1833 Comm: syz-executor.0 Not tainted 6.8.0-rc1-syzkaller-00385-g4854cf9c61d0 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-==================================================================
+The infra allows great flexibility in terms of configuring multiple
+pools of different sizes and assigning queues from representors to
+different pools. So you can have multiple "classes" of representors.
+For example the ones you expect heavy trafic could have a separate pool,
+the rest can share another pool together, etc.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+>
+>It'd be great if you could do the due diligence rather than guessing
+>given that you're proposing uAPI extension :(
+>
+>> This devlink sd is for RX queues not TX queues.
+>> 
+>> And devlink-sd creates a pool of shared descriptors only for RX queue.
+>> 
+>> The TX queues/ TX path remain unchanged.
+>
 
