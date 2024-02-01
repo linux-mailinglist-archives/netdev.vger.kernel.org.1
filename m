@@ -1,107 +1,102 @@
-Return-Path: <netdev+bounces-67904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37F028454E1
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 11:09:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E4798454E6
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 11:11:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AC391C215E4
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 10:09:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26A9828443E
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 10:11:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 670CB15B11A;
-	Thu,  1 Feb 2024 10:09:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 289AC15B96D;
+	Thu,  1 Feb 2024 10:11:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HUZcF9T2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C134DA1D;
-	Thu,  1 Feb 2024 10:09:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7CD15AABD;
+	Thu,  1 Feb 2024 10:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706782179; cv=none; b=ApgvLUXrYObTFZDRNHSazrVQZ0szK65JDJigmlMveBcSCkq7IZee0/URFDOJ3Wcf8z0friFY22ZQKK3ycjdUZGCY1klmqbPL01pEdF6iiZ3qH5WKMrXaNUOddSmvfTWX/8n+EHVf5j69MDnVv4HQOtOiPCiffvRtE9SFM5y0Xb4=
+	t=1706782259; cv=none; b=So3qvzi0itre2hUQxPEB+pY1Izz3GSXl2UKiNKVBTN9bllPKn9vOLwcMfzxf0ITSV1oLHThp9uLpRxe9Fq0gnaz6/s6wDcPN4mATqJl53CT4u16a6jm8J3mYH7Id68Mj+SEwVsPDbR5DwJ9pVMLetKJbNKlcwQYO0bzEAoQyaMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706782179; c=relaxed/simple;
-	bh=sUELeIL8A4dMOkQ6Uu6mJ6Gg/l8qd0uKqcRrayxEFTw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YWYokFJ2SOSxzvR0GOUxz3JgDFv1LXYk8xPUm4ClEf03vCZwNoJq/RJR6XtzI8QEkeSWHQQtBfuGALxKLnxFsKCN6w++4j0SjWhlHYCQM6PwmTwmMVftfvn+uCGbNvyIMUaHOPlPZXRXrpxTH6DKN+uRRfF/YiybcwmpOfWJe3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 8e60355f3f044216afb21e30a2e3a3e9-20240201
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:5a88fb0a-d436-49d2-8459-4aef407d2d46,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:-5
-X-CID-INFO: VERSION:1.1.35,REQID:5a88fb0a-d436-49d2-8459-4aef407d2d46,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:5d391d7,CLOUDID:80c80180-4f93-4875-95e7-8c66ea833d57,B
-	ulkID:240201180932CHGT3RUC,BulkQuantity:0,Recheck:0,SF:38|24|17|19|44|66|1
-	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
-	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_SNR
-X-UUID: 8e60355f3f044216afb21e30a2e3a3e9-20240201
-Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 1476708960; Thu, 01 Feb 2024 18:09:29 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id A812AE000EB9;
-	Thu,  1 Feb 2024 18:09:29 +0800 (CST)
-X-ns-mid: postfix-65BB6DD9-4795091386
-Received: from kernel.. (unknown [172.20.15.254])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 1FB48E000EB9;
-	Thu,  1 Feb 2024 18:09:25 +0800 (CST)
-From: Kunwu Chan <chentao@kylinos.cn>
-To: dhowells@redhat.com,
-	marc.dionne@auristor.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-afs@lists.infradead.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Kunwu Chan <chentao@kylinos.cn>
-Subject: [PATCH net-next] rxrpc: Simplify the allocation of slab caches
-Date: Thu,  1 Feb 2024 18:09:24 +0800
-Message-Id: <20240201100924.210298-1-chentao@kylinos.cn>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1706782259; c=relaxed/simple;
+	bh=kNpL087SdTjcpHpZyVDVxwYbgFh8TGavz5zFaqFwx9I=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ijcOxoFYDji4h1CQY8v6nJArupCWFfo+ww+hFMzQpSrj3lZ4OQr4WNz7g5YWfFxjRU9ACOKAE+/GgIBlt926ax2Tg0ogyAzXefwo6lC/3QPbwdC9xazFno6acJqRadlb0n99H1bUyfEhoKbgDBpBCBqJz4rtGPVkbKtO2Qr018s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HUZcF9T2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1183C43390;
+	Thu,  1 Feb 2024 10:10:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706782258;
+	bh=kNpL087SdTjcpHpZyVDVxwYbgFh8TGavz5zFaqFwx9I=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=HUZcF9T20LH5e967YRRqhKtkEzGG4/wImL8agSCSMROtzuPTo5wxkrHi8X2bPfk43
+	 GCIHf0ozPYQ/ZxXgsbkEuvC6hEal/smcL0umPsIak4Qfgcp/Jm9XOgd7Gd3luyibVc
+	 JhXeNbVaYqFdQyQHbop8xfeg4NU8vog1t7OMJh++kPawtlRmpsDla6p7QUvsCYUMd2
+	 Zsb+Pibhxk6hsD80w1VLYcVx2Bxdk8dWKK6p0ViXP/YSkIh7xYe+6h+3ubHCPf8c+G
+	 UP/swblYGgpBa49CYmBU2FKpCbCGXRRSawTajia0vXJljo0fZlKnbB6cbgVhunLSXp
+	 IcAy6LT3+IdJA==
+From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
+ linux-riscv@lists.infradead.org, netdev@vger.kernel.org
+Cc: Song Liu <song@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Yonghong Song <yhs@fb.com>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Luke Nelson
+ <luke.r.nels@gmail.com>, Pu Lehui <pulehui@huawei.com>
+Subject: Re: [PATCH bpf-next v2 4/4] riscv, bpf: Mixing bpf2bpf and tailcalls
+In-Reply-To: <fab22b9e-7b56-4fef-ba92-bf62ec43007d@huaweicloud.com>
+References: <20240130040958.230673-1-pulehui@huaweicloud.com>
+ <20240130040958.230673-5-pulehui@huaweicloud.com>
+ <87sf2eohj2.fsf@all.your.base.are.belong.to.us>
+ <fab22b9e-7b56-4fef-ba92-bf62ec43007d@huaweicloud.com>
+Date: Thu, 01 Feb 2024 11:10:55 +0100
+Message-ID: <878r44mr4g.fsf@all.your.base.are.belong.to.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-to simplify the creation of SLAB caches.
+Pu Lehui <pulehui@huaweicloud.com> writes:
 
-Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
----
- net/rxrpc/af_rxrpc.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+>>> @@ -252,10 +220,7 @@ static void __build_epilogue(bool is_tail_call, st=
+ruct rv_jit_context *ctx)
+>>>   		emit_ld(RV_REG_S5, store_offset, RV_REG_SP, ctx);
+>>>   		store_offset -=3D 8;
+>>>   	}
+>>> -	if (seen_reg(RV_REG_S6, ctx)) {
+>>> -		emit_ld(RV_REG_S6, store_offset, RV_REG_SP, ctx);
+>>> -		store_offset -=3D 8;
+>>> -	}
+>>> +	emit_ld(RV_REG_TCC, store_offset, RV_REG_SP, ctx);
+>>=20
+>> Why do you need to restore RV_REG_TCC? We're passing RV_REG_TCC (a6) as
+>> an argument at all call-sites, and for tailcalls we're loading from the
+>> stack.
+>>=20
+>> Is this to fake the a6 argument for the tail-call? If so, it's better to
+>> move it to emit_bpf_tail_call(), instead of letting all programs pay for
+>> it.
+>
+> Yes, we can remove this duplicate load. will do that at next version.
 
-diff --git a/net/rxrpc/af_rxrpc.c b/net/rxrpc/af_rxrpc.c
-index 465bfe5eb061..1326a1bff2d7 100644
---- a/net/rxrpc/af_rxrpc.c
-+++ b/net/rxrpc/af_rxrpc.c
-@@ -1026,9 +1026,7 @@ static int __init af_rxrpc_init(void)
-=20
- 	ret =3D -ENOMEM;
- 	rxrpc_gen_version_string();
--	rxrpc_call_jar =3D kmem_cache_create(
--		"rxrpc_call_jar", sizeof(struct rxrpc_call), 0,
--		SLAB_HWCACHE_ALIGN, NULL);
-+	rxrpc_call_jar =3D KMEM_CACHE(rxrpc_call,	SLAB_HWCACHE_ALIGN);
- 	if (!rxrpc_call_jar) {
- 		pr_notice("Failed to allocate call jar\n");
- 		goto error_call_jar;
---=20
-2.39.2
+Hmm, no remove, but *move* right? Otherwise a6 can contain gargabe on
+entering the tailcall?
 
+Move it before __emit_epilogue() in the tailcall, no?
+
+
+Bj=C3=B6rn
 
