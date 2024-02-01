@@ -1,173 +1,98 @@
-Return-Path: <netdev+bounces-67932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 329BC8456B9
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:02:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F3588456E9
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:07:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97BDE1F23D2A
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 12:02:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B233A1C23846
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 12:07:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFA6215D5B4;
-	Thu,  1 Feb 2024 12:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pg2S9/45"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6812615DBBC;
+	Thu,  1 Feb 2024 12:05:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C864D9E7
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 12:01:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8356F15DBA2;
+	Thu,  1 Feb 2024 12:05:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706788919; cv=none; b=IJruReh43ZGHabCQiExAagRWQnLXqFSS6K1A39k1GTEh8qUTZT0eSQ9uLHzmRl2XcYTIyKVuwZioZv8Bf8Eebfp1+GqjZsTEksSaVztPSFQMpTln3ObC/VKZ0gQAgCKG0A/i5087yRjxOWmjYXjHyxf1vRigD8PE5kHaElfBt2A=
+	t=1706789135; cv=none; b=nydZYFVhKTpqoc/T0JhgtZtWzoKK6GfZRM0MM1l5VCGugfx08JRBSQn/r6g5jLEj0WmxcQvwKoZLbpSrrdtynP7k1GICNARJoE9j2TMvVekv9P52mtkJnmKNnPCBaXFobaN1XdWdjMeijhdYZCTLN2+bUk9lmtOfu7De0+txx4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706788919; c=relaxed/simple;
-	bh=DsE+tvWItQ1J13vN0xMITMFdI6X97MiXwib79KoM0gw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=jBKB24rlybjeiVZ+sX8ti3+jjqOGjlsPgl4XKaCQfFvowcOSDul6yXB4MrUA+pYt6fAp2gEMi7y/4os3JMl8NIFd+2MzH0bP7vbhiZluVcE1FjDpezIMuwLlENjhUyRlGoGHv6oIxWtl6qIrE61goAETj8+ufSA9Zz+YtBm1bQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pg2S9/45; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706788917;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=mcEUKdi4uiysteQLExSEli88YMa6cGV3bas2H1wcmjE=;
-	b=Pg2S9/45c0R2QJ+VcUoudu9M0PXTbwCUdPxiQSr7KpRPuVQ/ctsso7Eh+L6B0D79baqFO0
-	ljkfe3et3JQ5GfTctrjYjV0JSTeoFHGXqlHJ2gLReab2ebxho3vunOegyeEW2LyL2sKQJm
-	pz5Yp569oVcrMQMB/FGOJYXoN6b1r1M=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-587-LA_wacglPHCcA0p9pEmOmg-1; Thu, 01 Feb 2024 07:01:55 -0500
-X-MC-Unique: LA_wacglPHCcA0p9pEmOmg-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40ef6441d1aso917995e9.0
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 04:01:54 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706788914; x=1707393714;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mcEUKdi4uiysteQLExSEli88YMa6cGV3bas2H1wcmjE=;
-        b=VPZqZaw+v+a8tFLftf3eAJ4ghkuL88UwANeJhpdr9+6UQD/XYnnm7C4xQE6JOiqHmS
-         RI16biQyIX3WsoZySwZNRIymij/WUg1LVNPe20jyk6yc7fHW0X8JFLckzef4+TWEa8Ci
-         4bzlQCxNWTV/8XS3KRIM5EhpK908+uAINWhNXxWEO8SAFZl8SenQojguqj/3XuSCsn9U
-         CEXHVdLkstmAyN46jRpcx+kuASZbUcGT828b2uTjnKJy0X34hWBMH5w4KtdTE4Y/vjro
-         KABKnyA3RUuvG+AP2CVbszEAEsmVQI6sS85R0/rZz/IOtJaji49EKu47WCU3/31kZD80
-         au5g==
-X-Forwarded-Encrypted: i=0; AJvYcCXmPd3PoSxxxdSo4pv+6hcnh9CwIMR0r6ySDub4rb+8G7fo3Wsl4IBS+PESJ0yY/ckx/w6BFL3p3RflZeyxuSekyrz5snNF
-X-Gm-Message-State: AOJu0YwcRcM2ks/jQFZergX7Im1HbH9NH7Mvcp+um5EqsXg+EcXl45h1
-	YOJXlIcCqtyQejwe+6WOBvoMJ1n4M56TJgO/9AiMKkJSF7DB3moBD55bsM88vjmTfmyEHsYQGct
-	2ddeVBPKay+qERD3Zl4DOMiToZH9tYTC5dpe4KmNV74Zo4UgzkBeNPA==
-X-Received: by 2002:a5d:43ce:0:b0:33b:1a51:733c with SMTP id v14-20020a5d43ce000000b0033b1a51733cmr520672wrr.6.1706788913783;
-        Thu, 01 Feb 2024 04:01:53 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFSzFdSnCWWh8DuX2kOUaKPmifpX1BGRedx6WDhyPSJ5Aa+E7ADsiOr/z2Uydt9bsS+//LAHQ==
-X-Received: by 2002:a5d:43ce:0:b0:33b:1a51:733c with SMTP id v14-20020a5d43ce000000b0033b1a51733cmr520651wrr.6.1706788913413;
-        Thu, 01 Feb 2024 04:01:53 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCW/u2BuRjHWFot74Lj/r29L7EOgPRqNFE85eGX5C7PoWgKVQlIrBa3Va6N4OMLsqKyR0BgziOAv4N6/mLX5HXTlBR58ZXYn51MY/GFcp7f9uJQgwtYQ8xWmRXYNlBRlPR0hlrEtko2qybOvs7TeFt6zejyNgaDWUx/rZidOu9kVjsVaJvPwKawz/1LaGmp0exN97A5NYcsDCxa8BHmJwUY34bffEpQ46sOVhRLa+07YcQ8MNpUCVdA39W1YgjQbUvEbIdX0obteS9Jiu40aF56QW2Ji4OJGElU9jGzcwIyGKMS/Nt3JFbvf/T0z0Xn7O9RQdrQpjZAVeJ91Lmk4UWwwUC21gfvFJvK91ND+cC9cLmPEWBSUvKKE548=
-Received: from gerbillo.redhat.com (146-241-238-90.dyn.eolo.it. [146.241.238.90])
-        by smtp.gmail.com with ESMTPSA id e13-20020a5d4e8d000000b0033b08b9cd9dsm3083916wru.79.2024.02.01.04.01.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 04:01:52 -0800 (PST)
-Message-ID: <a8845eca2d9bab5d7805c19a16811820671c41f2.camel@redhat.com>
-Subject: Re: [PATCH v2 5/6] net: wan: fsl_qmc_hdlc: Add runtime timeslots
- changes support
-From: Paolo Abeni <pabeni@redhat.com>
-To: Herve Codina <herve.codina@bootlin.com>, Vadim Fedorenko
-	 <vadim.fedorenko@linux.dev>, "David S. Miller" <davem@davemloft.net>, Eric
-	Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>, Mark Brown
- <broonie@kernel.org>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Date: Thu, 01 Feb 2024 13:01:51 +0100
-In-Reply-To: <20240130084035.115086-6-herve.codina@bootlin.com>
-References: <20240130084035.115086-1-herve.codina@bootlin.com>
-	 <20240130084035.115086-6-herve.codina@bootlin.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1706789135; c=relaxed/simple;
+	bh=4b6J3WQy1ZuklldGS5umROhnm/eI6zxFrBGfBb5XyAs=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=p/Za/jpuuKj6IlMBct/n+a4+W0K1CV+KS7B1WAZ+JpWhw9NHaV7WXEGzcwF2fkc8GUG5bQD/zkV0uF0YMuLq3y5Z8LgbNZo1b16/eSEOjUQbaR0rWVZiE2fMzGaNPKJbbWI+Gs5ymfkhdWF4KNy/u0UTLDFipz54GXpdzaiYKHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TQctg25F5z1FK5w;
+	Thu,  1 Feb 2024 20:00:59 +0800 (CST)
+Received: from dggpemm500008.china.huawei.com (unknown [7.185.36.136])
+	by mail.maildlp.com (Postfix) with ESMTPS id BAE4C1A016B;
+	Thu,  1 Feb 2024 20:05:25 +0800 (CST)
+Received: from localhost (10.174.242.157) by dggpemm500008.china.huawei.com
+ (7.185.36.136) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 1 Feb
+ 2024 20:05:25 +0800
+From: Yunjian Wang <wangyunjian@huawei.com>
+To: <willemdebruijn.kernel@gmail.com>, <jasowang@redhat.com>,
+	<kuba@kernel.org>, <davem@davemloft.net>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<xudingke@huawei.com>, Yunjian Wang <wangyunjian@huawei.com>
+Subject: [PATCH net-next] tun: Implement ethtool's get_channels() callback
+Date: Thu, 1 Feb 2024 20:05:09 +0800
+Message-ID: <1706789109-36556-1-git-send-email-wangyunjian@huawei.com>
+X-Mailer: git-send-email 1.9.5.msysgit.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500008.china.huawei.com (7.185.36.136)
 
-On Tue, 2024-01-30 at 09:40 +0100, Herve Codina wrote:
-> QMC channels support runtime timeslots changes but nothing is done at
-> the QMC HDLC driver to handle these changes.
->=20
-> Use existing IFACE ioctl in order to configure the timeslots to use.
->=20
-> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-> Acked-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  drivers/net/wan/fsl_qmc_hdlc.c | 155 ++++++++++++++++++++++++++++++++-
->  1 file changed, 154 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/wan/fsl_qmc_hdlc.c b/drivers/net/wan/fsl_qmc_hdl=
-c.c
-> index e7b2b72a6050..8316f2984864 100644
-> --- a/drivers/net/wan/fsl_qmc_hdlc.c
-> +++ b/drivers/net/wan/fsl_qmc_hdlc.c
-> @@ -7,6 +7,7 @@
->   * Author: Herve Codina <herve.codina@bootlin.com>
->   */
-> =20
-> +#include <linux/bitmap.h>
->  #include <linux/dma-mapping.h>
->  #include <linux/hdlc.h>
->  #include <linux/module.h>
-> @@ -32,6 +33,7 @@ struct qmc_hdlc {
->  	struct qmc_hdlc_desc tx_descs[8];
->  	unsigned int tx_out;
->  	struct qmc_hdlc_desc rx_descs[4];
-> +	u32 slot_map;
->  };
-> =20
->  static inline struct qmc_hdlc *netdev_to_qmc_hdlc(struct net_device *net=
-dev)
-> @@ -202,6 +204,147 @@ static netdev_tx_t qmc_hdlc_xmit(struct sk_buff *sk=
-b, struct net_device *netdev)
->  	return NETDEV_TX_OK;
->  }
-> =20
-> +static int qmc_hdlc_xlate_slot_map(struct qmc_hdlc *qmc_hdlc,
-> +				   u32 slot_map, struct qmc_chan_ts_info *ts_info)
-> +{
-> +	DECLARE_BITMAP(ts_mask_avail, 64);
-> +	DECLARE_BITMAP(ts_mask, 64);
-> +	DECLARE_BITMAP(map, 64);
-> +	u32 array32[2];
-> +
-> +	/* Tx and Rx available masks must be identical */
-> +	if (ts_info->rx_ts_mask_avail !=3D ts_info->tx_ts_mask_avail) {
-> +		dev_err(qmc_hdlc->dev, "tx and rx available timeslots mismatch (0x%llx=
-, 0x%llx)\n",
-> +			ts_info->rx_ts_mask_avail, ts_info->tx_ts_mask_avail);
-> +		return -EINVAL;
-> +	}
-> +
-> +	bitmap_from_arr64(ts_mask_avail, &ts_info->rx_ts_mask_avail, 64);
-> +	array32[0] =3D slot_map;
-> +	array32[1] =3D 0;
-> +	bitmap_from_arr32(map, array32, 64);
+Implement the tun .get_channels functionality. This feature is necessary
+for some tools, such as libxdp, which need to retrieve the queue count.
 
-What about using bitmap_from_u64 everywhere ?
+Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
+---
+ drivers/net/tun.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-Cheers,
-
-Paolo
+diff --git a/drivers/net/tun.c b/drivers/net/tun.c
+index afa5497f7c35..7cf448ff93ee 100644
+--- a/drivers/net/tun.c
++++ b/drivers/net/tun.c
+@@ -3638,12 +3638,22 @@ static int tun_set_coalesce(struct net_device *dev,
+ 	return 0;
+ }
+ 
++static void tun_get_channels(struct net_device *dev,
++			     struct ethtool_channels *channels)
++{
++	struct tun_struct *tun = netdev_priv(dev);
++
++	channels->combined_count = tun->numqueues;
++	channels->max_combined = MAX_TAP_QUEUES;
++}
++
+ static const struct ethtool_ops tun_ethtool_ops = {
+ 	.supported_coalesce_params = ETHTOOL_COALESCE_RX_MAX_FRAMES,
+ 	.get_drvinfo	= tun_get_drvinfo,
+ 	.get_msglevel	= tun_get_msglevel,
+ 	.set_msglevel	= tun_set_msglevel,
+ 	.get_link	= ethtool_op_get_link,
++	.get_channels   = tun_get_channels,
+ 	.get_ts_info	= ethtool_op_get_ts_info,
+ 	.get_coalesce   = tun_get_coalesce,
+ 	.set_coalesce   = tun_set_coalesce,
+-- 
+2.33.0
 
 
