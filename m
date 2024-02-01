@@ -1,109 +1,291 @@
-Return-Path: <netdev+bounces-67866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B35CC845234
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:45:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36F6184524B
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 09:01:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 528A51F29D9C
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 07:45:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C78F1C221B1
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 08:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB40C1586FA;
-	Thu,  1 Feb 2024 07:45:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="a1mCszzK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E86F1586F5;
+	Thu,  1 Feb 2024 08:01:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B4EE1586EF
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 07:45:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D8C3B182;
+	Thu,  1 Feb 2024 08:01:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706773527; cv=none; b=bE9Qb9aJuVQCU+bt8Qd/DFNMyEysSUWqYzORZOnydW4tiiDggraC81xbLfKqBZg+yYe2l/jEmU7yVW4t/g2fCWk8w/tP7GUF4+sVi+++4kXud0W4wgYd8Ln5DINOFB7BNk3CHM8YipDqtJRjmEE4HXgJ9K92Ni38Uuczx4vRCC0=
+	t=1706774466; cv=none; b=VmnJKoZqolUKZsQUyz3KWXUzr+Bw7p1MB24qnErQ+UMxAHhpFNQ9G7J/824S6Seqx0m7pbcCGVO3G2Ieu2TAzE6p9EZj+5Gs1Qi/IBULX/wSKHUc2Sk/VSKWXdTVpnb+M38/Sc4Y8fsau/Rd50AYiXvGMoRw8drWKVCzSlKL+AQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706773527; c=relaxed/simple;
-	bh=3doOOfTwch96we44aEoN/N+kUin3abrCSam0C+Uo5og=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XeCbjRNMkAZGVb6SrtamFcEmQ6Kvf3TiGnZqwXFG7aNKUcREeEIQwBdRguP02U/dalGFiBpE4fuBG/Gzd6+tIByCdE40XFEKhwdpJXmTxqtOg1g+Z4lrp9AwFUv+HDI1OLLpQa8HsJPcn+Ayybl1Ad/8Xw+xfjMqWH8+1rplveo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=a1mCszzK; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-33ae7ae1c32so367842f8f.3
-        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 23:45:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706773524; x=1707378324; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZEB1jKMD6m3vF3/N1fu5eKuMmW/5Mh94YFllnsy6bK8=;
-        b=a1mCszzK2XrgfPHR4r9mR8f5Tl+NKoqPa415aAJVrGFy25n1f4gV7899hmCDRbsoOP
-         wwGcRG6mvLd7mHWVOOpDsxYgB+X6RBqQwTurVnV0FLmYaJMM/E1GxhkTPAn+iWdsiGLy
-         JE9UK5dZLyz/EmvbwppSslJeyYivZhHBewsYdrRMgvXMOvdcaH0TowoYg/uBdNMNrskW
-         N6qppGaAhHSLWy69a61rg42KNfy+N4vSeyYIm6YVlWowv6tFA8gkPnLkqcbVa/7OsbUg
-         gAqeIT3mWQioPHH9/0hesRqn4umLQcj4DiseIk3B8ha6DHvHRyKrK9NgHCLuOu1+jGax
-         M3xA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706773524; x=1707378324;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZEB1jKMD6m3vF3/N1fu5eKuMmW/5Mh94YFllnsy6bK8=;
-        b=S80XJ3bXIY1Rh6nayIuHz3brHbuZBdBuTAGLMdkOT4T8Ou5RTO88NcRFYuNyYRQKja
-         BvG+9Df+QC39EUy68HBlVNH9Mw9Mp93boQtdoLCe3TtJVYJWWDfzl2+zUflXLJwT4ulw
-         dCcBbX4OycKVdH4Wgnw2i0Oxki4zb57N6larZNT89qOijSxcPJFEpPAy7j4DC6WNOyj4
-         Ct9sSws7ABIaEGId7UxqaVUZkGBjRjw01u2IZcfCY0sASdOEQ7U10aWv5s870PojBNph
-         PzY57z9ac+QfqSG6r/tM59dh5ntFJYaqOLjIdxDIU/x7mITWc8lRadIofR7J9F4iCyzs
-         Z0IA==
-X-Gm-Message-State: AOJu0YxYF4d1NJqbNefuPlhDTQUBTWJ0MCRZztpgb7VGU8pCnU3z54x/
-	cgGUzb+c6DoQ4HEGgE3zIUbELPcaaXi4Eoj8kAHssZ57kA7Z9tyi3wUfr7vMeno=
-X-Google-Smtp-Source: AGHT+IEzXnY5g65s5rzpDxqKCORq4oPArdoL9BA0PmQpvUy42l2ZaFRV3D+lBBfzvNNAIB6uL0eSHQ==
-X-Received: by 2002:a5d:4809:0:b0:33b:1131:ebfd with SMTP id l9-20020a5d4809000000b0033b1131ebfdmr951503wrq.49.1706773524311;
-        Wed, 31 Jan 2024 23:45:24 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCX/NS4sV9Pkx7LYKa6plBta44EGH7iuV15vC3shcj20wTgNgQFW4+vq0Ga5NuTOuhLoxWf5htnOXGQErwCWP7RKlNZnZ26TzBnLTpyvnchwPPyIMjlC/u2EzVdjHzeBsOFJhVsOZzlQcL4J2WSo+9A0/R8RB3cTnVFRrWvflWyld5SmQ350D+GGQRNmeE4C7TXerowGoWnIDei6nufn6wkuqTe/PZ5O+KkSezx2frLGdenNXe1qH04hEOBBKcTTpK06eJHZ37Z6/5bZoafBd85hYg==
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id t18-20020adfe112000000b0033ade19da41sm14625593wrz.76.2024.01.31.23.45.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 31 Jan 2024 23:45:23 -0800 (PST)
-Date: Thu, 1 Feb 2024 08:45:20 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Tobias Waldekranz <tobias@waldekranz.com>, davem@davemloft.net,
-	kuba@kernel.org, roopa@nvidia.com, razor@blackwall.org,
-	bridge@lists.linux.dev, netdev@vger.kernel.org, ivecera@redhat.com
-Subject: Re: [PATCH net 1/2] net: switchdev: Add helper to check if an object
- event is pending
-Message-ID: <ZbtMEOIDA_6CgRVp@nanopsycho>
-References: <20240131123544.462597-1-tobias@waldekranz.com>
- <20240131123544.462597-2-tobias@waldekranz.com>
- <ZbpCA3kgoCKsdQ4J@nanopsycho>
- <20240201003305.thoj2y3bjyxq2hlj@skbuf>
+	s=arc-20240116; t=1706774466; c=relaxed/simple;
+	bh=kS9DYB4BEmc66Mc51nkbeAZk5TYUzacr2iWVxMq1DIk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KtVRDBSVk3pnK84KKiylh57BQ/WETBnvO5zCe3z0SYKM6oq7NMjiEr3svBc9ioQVFKlStU0UJwNOpKvwon15ruzPJQRRQEU8OVyY4AwyS1hEcqlxAz2ZY7bkNP5nqhMaH4jtZXv3SjKfphVotbOHsVRP22MTr9rUP2GItBrUVFY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.0.6] (ip5f5af685.dynamic.kabel-deutschland.de [95.90.246.133])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 371B861E5FE01;
+	Thu,  1 Feb 2024 09:00:15 +0100 (CET)
+Message-ID: <943270a2-3125-4767-b4e7-2852b0f8ea94@molgen.mpg.de>
+Date: Thu, 1 Feb 2024 09:00:14 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240201003305.thoj2y3bjyxq2hlj@skbuf>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH] ice: Add get/set hw address for VF
+ representor ports
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: ksundara@redhat.com, jesse.brandeburg@intel.com,
+ anthony.l.nguyen@intel.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, rjarry@redhat.com,
+ aharivel@redhat.com, cfontain@redhat.com, vchundur@redhat.com
+References: <20240131080847.30614-1-ksundara@redhat.com>
+ <64c36525-9177-48b1-abbb-c69dbdeb6d79@molgen.mpg.de>
+ <ZbtK6PwsYLosTem8@nanopsycho>
+Content-Language: en-US
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <ZbtK6PwsYLosTem8@nanopsycho>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Thu, Feb 01, 2024 at 01:33:05AM CET, olteanv@gmail.com wrote:
->On Wed, Jan 31, 2024 at 01:50:11PM +0100, Jiri Pirko wrote:
->> Wed, Jan 31, 2024 at 01:35:43PM CET, tobias@waldekranz.com wrote:
->> >When adding/removing a port to/from a bridge, the port must be brought
->> >up to speed with the current state of the bridge. This is done by
->> >replaying all relevant events, directly to the port in question.
->> 
->> Could you please use the imperative mood in your patch descriptions?
->> That way, it is much easier to understand what is the current state of
->> things and what you are actually changing.
->
->FWIW, the paragraph you've concentrated upon does describe the current
->state of things, not what the patch does; thus it does not need to be in
->the imperative mood.
+Dear Jiri,
 
-Well, there is no imperative mood in the next paragraph either :)
-Therefore from the patch desctiption pow now clue what the patch is doing.
+
+Am 01.02.24 um 08:40 schrieb Jiri Pirko:
+> Wed, Jan 31, 2024 at 05:15:46PM CET, pmenzel@molgen.mpg.de wrote:
+
+[…]
+
+>> Am 31.01.24 um 09:08 schrieb karthiksundaravel:
+>>> Changing the mac address of the VF representor ports are not
+>>
+>> Do you mean “is not possible”?
+>>
+>>> available via devlink. Add the function handlers to set and get
+>>> the HW address for the VF representor ports.
+>>
+>> How did you test this? It’d be great if you documented it.
+>>
+>>> Signed-off-by: karthiksundaravel <ksundara@redhat.com>
+>>
+>> Is “karthiksundaravel” the official spelling of your name. If not, you can
+>> change it with
+>>
+>>     git config --global user.name "Your Name"
+>>     git commit -s --amend --author="Your Name <ksundara@redhat.com>"
+>>
+>>> ---
+>>>    drivers/net/ethernet/intel/ice/ice_devlink.c | 134 ++++++++++++++++++-
+>>>    1 file changed, 132 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
+>>> index 80dc5445b50d..56d81836c469 100644
+>>> --- a/drivers/net/ethernet/intel/ice/ice_devlink.c
+>>> +++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
+>>> @@ -9,6 +9,8 @@
+>>>    #include "ice_eswitch.h"
+>>>    #include "ice_fw_update.h"
+>>>    #include "ice_dcb_lib.h"
+>>> +#include "ice_fltr.h"
+>>> +#include "ice_tc_lib.h"
+>>>    static int ice_active_port_option = -1;
+>>> @@ -1576,6 +1578,134 @@ void ice_devlink_destroy_pf_port(struct ice_pf *pf)
+>>>    	devlink_port_unregister(&pf->devlink_port);
+>>>    }
+>>> +/**
+>>> + * ice_devlink_port_get_vf_mac_address - .port_fn_hw_addr_get devlink handler
+>>> + * @port: devlink port structure
+>>> + * @hw_addr: Mac address of the port
+>>> + * @hw_addr_len: length of mac address
+>>
+>> Mac/mac is spelled differently. (Also below.)
+>>
+>>> + * @extack: extended netdev ack structure
+>>> + *
+>>> + * Callback for the devlink .port_fn_hw_addr_get operation
+>>> + * Return: zero on success or an error code on failure.
+>>> + */
+>>> +
+>>> +static int ice_devlink_port_get_vf_mac_address(struct devlink_port *port,
+>>> +					       u8 *hw_addr, int *hw_addr_len,
+>>> +					       struct netlink_ext_ack *extack)
+>>> +{
+>>> +	struct net_device *netdev = port->type_eth.netdev;
+>>> +
+>>> +	if (!netdev || !netdev->dev_addr)
+>>> +		return -EADDRNOTAVAIL;
+>>> +
+>>> +	ether_addr_copy(hw_addr, netdev->dev_addr);
+>>> +	*hw_addr_len = ETH_ALEN;
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +/**
+>>> + * ice_devlink_port_set_vf_mac_address - .port_fn_hw_addr_set devlink handler
+>>> + * @port: devlink port structure
+>>> + * @hw_addr: Mac address of the port
+>>> + * @hw_addr_len: length of mac address
+>>> + * @extack: extended netdev ack structure
+>>> + *
+>>> + * Callback for the devlink .port_fn_hw_addr_set operation
+>>> + * Return: zero on success or an error code on failure.
+>>> + */
+>>> +static int ice_devlink_port_set_vf_mac_address(struct devlink_port *port,
+>>> +					       const u8 *hw_addr,
+>>> +					       int hw_addr_len,
+>>> +					       struct netlink_ext_ack *extack)
+>>> +{
+>>> +	struct devlink *devlink = port->devlink;
+>>> +	struct net_device *netdev = port->type_eth.netdev;
+>>> +	struct ice_pf *pf = devlink_priv(devlink);
+>>> +	struct ice_vsi *vsi = *pf->vsi;
+>>> +	struct ice_hw *hw = &pf->hw;
+>>> +	struct device *dev = ice_pf_to_dev(pf);
+>>> +	u8 old_mac[ETH_ALEN];
+>>> +	u8 flags = 0;
+>>> +	const u8 *mac = hw_addr;
+>>> +	int err;
+>>> +
+>>> +	if (!netdev)
+>>> +		return -EADDRNOTAVAIL;
+>>> +
+>>> +	if (!is_valid_ether_addr(mac))
+>>> +		return -EADDRNOTAVAIL;
+>>> +
+>>> +	if (ether_addr_equal(netdev->dev_addr, mac)) {
+>>> +		dev_dbg(dev, "already using mac %pM\n", mac);
+>>> +		return 0;
+>>> +	}
+>>> +
+>>> +	if (test_bit(ICE_DOWN, pf->state) ||
+>>> +	    ice_is_reset_in_progress(pf->state)) {
+>>> +		dev_err(dev, "can't set mac %pM. device not ready\n", mac);
+>>> +		return -EBUSY;
+>>> +	}
+>>> +
+>>> +	if (ice_chnl_dmac_fltr_cnt(pf)) {
+>>> +		dev_err(dev, "can't set mac %pM. Device has tc-flower filters, delete all of them and try again\n",
+>>> +			mac);
+>>> +		return -EAGAIN;
+>>> +	}
+>>> +
+>>> +	netif_addr_lock_bh(netdev);
+>>> +	ether_addr_copy(old_mac, netdev->dev_addr);
+>>> +	/* change the netdev's MAC address */
+>>
+>> The comment seems redundant.
+>>
+>>> +	eth_hw_addr_set(netdev, mac);
+>>> +	netif_addr_unlock_bh(netdev);
+>>> +
+>>> +	/* Clean up old MAC filter. Not an error if old filter doesn't exist */
+>>> +	err = ice_fltr_remove_mac(vsi, old_mac, ICE_FWD_TO_VSI);
+>>> +	if (err && err != -ENOENT) {
+>>> +		err = -EADDRNOTAVAIL;
+>>> +		goto err_update_filters;
+>>> +	}
+>>> +
+>>> +	/* Add filter for new MAC. If filter exists, return success */
+>>> +	err = ice_fltr_add_mac(vsi, mac, ICE_FWD_TO_VSI);
+>>> +	if (err == -EEXIST) {
+>>> +		/* Although this MAC filter is already present in hardware it's
+>>> +		 * possible in some cases (e.g. bonding) that dev_addr was
+>>> +		 * modified outside of the driver and needs to be restored back
+>>> +		 * to this value.
+>>> +		 */
+>>> +		dev_dbg(dev, "filter for MAC %pM already exists\n", mac);
+>>> +		return 0;
+>>> +	} else if (err) {
+>>> +		/* error if the new filter addition failed */
+>>
+>> The comment seems redundant.
+>>
+>>> +		err = -EADDRNOTAVAIL;
+>>> +	}
+>>> +
+>>> +err_update_filters:
+>>> +	if (err) {
+>>> +		dev_err(dev, "can't set MAC %pM. filter update failed\n", mac);
+>>> +		netif_addr_lock_bh(netdev);
+>>> +		eth_hw_addr_set(netdev, old_mac);
+>>> +		netif_addr_unlock_bh(netdev);
+>>> +		return err;
+>>> +	}
+>>> +
+>>> +	dev_dbg(dev, "updated MAC address to %pM\n", netdev->dev_addr);
+>>
+>> Should it be level info?
+>>
+>>> +
+>>> +	/* write new MAC address to the firmware */
+>>> +	flags = ICE_AQC_MAN_MAC_UPDATE_LAA_WOL;
+>>> +	err = ice_aq_manage_mac_write(hw, mac, flags, NULL);
+>>> +	if (err) {
+>>> +		dev_err(dev, "can't set MAC %pM. write to firmware failed error %d\n",
+>>> +			mac, err);
+>>> +	}
+>>> +	return 0;
+>>> +}
+>>> +
+>>> +static const struct devlink_port_ops ice_devlink_vf_port_ops = {
+>>> +	.port_fn_hw_addr_get = ice_devlink_port_get_vf_mac_address,
+>>> +	.port_fn_hw_addr_set = ice_devlink_port_set_vf_mac_address,
+>>> +};
+>>> +
+>>>    /**
+>>>     * ice_devlink_create_vf_port - Create a devlink port for this VF
+>>>     * @vf: the VF to create a port for
+>>> @@ -1611,7 +1741,8 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
+>>>    	devlink_port_attrs_set(devlink_port, &attrs);
+>>>    	devlink = priv_to_devlink(pf);
+>>> -	err = devlink_port_register(devlink, devlink_port, vsi->idx);
+>>> +	err = devlink_port_register_with_ops(devlink, devlink_port,
+>>> +					     vsi->idx, &ice_devlink_vf_port_ops);
+>>>    	if (err) {
+>>>    		dev_err(dev, "Failed to create devlink port for VF %d, error %d\n",
+>>>    			vf->vf_id, err);
+>>> @@ -1620,7 +1751,6 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
+>>>    	return 0;
+>>>    }
+>>> -
+>>
+>> Unrelated whitespace change.
+>>
+>>>    /**
+>>>     * ice_devlink_destroy_vf_port - Destroy the devlink_port for this VF
+>>>     * @vf: the VF to cleanup
+>>
+>> Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> 
+> Paul. It looks a bit weird you put in multiple comments that require
+> changes and then the Reviewed-by tag. Usually, you put the tag only if
+> you are 100% happy with the patch as it is.
+
+Sorry about that. I will keep this in mind.
+
+> It is also weird you put in a tag in this case when the patch
+> is completely wrong, as I pointed out in my first reply. Did you miss
+> it?
+
+Yes, I missed it. (I disabled threading in Mozilla Thunderbird. I am 
+going to change that again. Sorry about that.)
+
+
+Kind regards,
+
+Paul
 
