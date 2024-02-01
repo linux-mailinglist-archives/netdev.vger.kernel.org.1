@@ -1,292 +1,207 @@
-Return-Path: <netdev+bounces-67836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F79B845164
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 07:31:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4841845190
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 07:42:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C912728FFC1
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 06:31:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9DD41C23AAA
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 06:42:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCBDB137C58;
-	Thu,  1 Feb 2024 06:31:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F40159568;
+	Thu,  1 Feb 2024 06:41:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="pjhXywCe"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="OybueztM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2054.outbound.protection.outlook.com [40.107.94.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 386151339B4
-	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 06:31:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706769098; cv=none; b=J68nCl1tH8EkDpltEUkTZSc9VKuYqao9hAel9QNa9Wq1452xw78J8ydsnEUe2wWkWEgpdgiwbqeqhBEAez3XLrBe/4OGiFy2iORsbixWVcQ4OsYLDocJjtrNOki1FKk1dNegl17zlCHfYc1f3lhoAvaLkjM0ZrE5knPCQamGcLE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706769098; c=relaxed/simple;
-	bh=rhkKqXYx2bfqJ3XZQo1ZFPXeQt4Ok4Ahotcdhk9yTjc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Mx7fHoGjadlbpPRdno0vZthw0USUpxYDHAVxBSXMVIbhfCHhofySMCnWMSnvIeCyHwT8it3oyMhzzqYEVICkhcXQ0NNQRMRkaHI0+C16CcI/IGjyEKObH5+MB8NCY99ih2Pw7L4u4X65MWSq870gvThas6iwjskiv1WFFMZDhdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=pjhXywCe; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-55a9008c185so885122a12.1
-        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 22:31:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1706769094; x=1707373894; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3ILH3iVCOAXF1BayqkdoSoFZAWJWdaJcxQN309+oN/4=;
-        b=pjhXywCezFnTggORZ+MdQ5ZyxrYhnPfmBxEWd4S02cFLxmg9lthti1xGMzQr9mvvMC
-         SJS6xUj7d9p7FN/q/uwfs2CqnBxrVLbEzOHseAo1NGu2n8FSJSIqlWgiJqfnxHezE0ie
-         r0vs98mlA0Z+DU18ZXQIKngQ9LnnJFh9raEO+fvjmo4rT9bO61IbZL3XDp2wPgQGw5EO
-         H9p/zntYIfM+qPBzGX3eJYAInuqsPOs2KRMhZFrSzz9j/A2FXOxeJB7nGt7DEidRab1a
-         iFqwKCVfQ+70qrBahdGOe2RDwG6uiL38Yc8W8dUUTldem8sJcv24fpNIgI/PhJWJjdtb
-         8OIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706769094; x=1707373894;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3ILH3iVCOAXF1BayqkdoSoFZAWJWdaJcxQN309+oN/4=;
-        b=TXtvjriIdIwKA8aDejbUHo/xGo2LX5Mj4XpDho8PGmo10epRmBFFfGksFP8aRzuO6H
-         OFiiWXc2ulEiqH6V4EMsIM5dqMSRAMltvs0Bofko07d6a1YdSHwtKKUA6gOX+xdCEQD6
-         sKP8F+boZ9+L7VYbZXu/67g2wrfzASzTrVBCs1p7V/tmnXUiv1UQs50psUeexllI0Aja
-         y/GslsClWYK69gjDaeejJ0n03IFpw5OQA5aB0OVKi27Om/OgkjK8JvvdHSCK6cOBkxGp
-         G14y7UqJaVN1KnAaiz9IWBhBedphr/gNLBWY7jqg1OCbT8MbAStWMmLYo7iuk7EWMlK8
-         E6BQ==
-X-Gm-Message-State: AOJu0YxoWuXM2czdnY4AyeMgGpb9vEmY+/92B3RD1AhstXjBRrR1wj5E
-	hbrXs+5sw5UtPPEwB2QnWevgywyhjMzSLneAT7UVq0jBXu4VomXj/IW9Nq5nINs=
-X-Google-Smtp-Source: AGHT+IFJuMt/iAwHv85KWXo5SEc8zjmjsTXgILaTRKPTGHLtJ10gxSybs1Zm87LeDlgqRJYYa0918w==
-X-Received: by 2002:a50:fa93:0:b0:55f:b5a5:9f6c with SMTP id w19-20020a50fa93000000b0055fb5a59f6cmr633497edr.4.1706769094226;
-        Wed, 31 Jan 2024 22:31:34 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCX0SQhONyb9M3xPhhEr8ZR2V2hwQXJE5ofoOfBa77A0czh8LozpdpefPWdxHGioIGOVwJvrfwd9ZPR2K1cEYHt2TJ588lUoerWDaMNpnWZJ16PEP+jeSiVmMotdJ75Xy8AixWp/1W2ID6MIjkdcvFazy+Dkh4fQGWptDY/CCqZDygxY3sYfiWYZ/AHwo8faWH/6k44kBh4BSsdzj2cRSik0PNolL4YywDb7ESMa+Or48u6rhoCJekqmAPZRtG2ZTC4uB3+HIDRCnPb8sMl1A6xtqNzhV9qOHfsoml5+lFGjN/rmVgSfRyD/sLiiMXfiWiaQhO5Ndo2pzbZZPcHzobqTNun7mELQdPm2CuW2wkgKvEJytvs8k9Y725OTkrI6Gs5FgusODpJlkhDhgw8phVhgNfujg0YScjijdbdmezMNdeobWC4=
-Received: from [192.168.50.4] ([82.78.167.87])
-        by smtp.gmail.com with ESMTPSA id p14-20020a056402500e00b0055c67e6454asm6573565eda.70.2024.01.31.22.31.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 31 Jan 2024 22:31:33 -0800 (PST)
-Message-ID: <9321b515-b4da-4d18-9d87-3470caf28b6d@tuxon.dev>
-Date: Thu, 1 Feb 2024 08:31:32 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1541586DE;
+	Thu,  1 Feb 2024 06:41:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706769688; cv=fail; b=dWC1+nKNyuYtWUCwcS8WoQ6NiPtXwEcS1ws2lBh3nk+6SOxZtHdfIAdw1eQ9isgUg++Pd2NdzRKymK6pu1x5CG7iAp2X/KvpMKq4eIf5m/t//wrA1pXbOHtd4iuICY84m0FP1f1MB41p+CF4WA70yFM2HU9thvQvfZ7ETyFI92U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706769688; c=relaxed/simple;
+	bh=IBjN2CHT5/O1ppY4iEeqA5CVoxIVBSFpK+imrH/IZ80=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=WbZuhc8QWjUT7zm70VUBd8mem6nDQX89cyK5U6gXWrx+ZE3zofUD1H+lVZz5uS4tFpH4afJ4PwQ5qRiLXIOcyi9srZ3dODtx/44uXRxMzSttocg7DV1xfIYcSgYNksd1AvAjC7Vik5WLLtciexbzHgW8Vqy1pKijhE8JAMbhNpg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=OybueztM; arc=fail smtp.client-ip=40.107.94.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T1ZAloIQgvSIfDVlVBBzwbuHQUIvIYTpYy0RGmnnGFilbPO8VaYz5oXPmLqN3138xBalobDU6Gh+7jUrMoRN+e573rMvFG3z9MEQrumZx0bYZ88ZlR0GXOmdhMEwySZJhmO/FuBBf2R6+9Hb385DISSgg2Q/0puL64gXa3hzWZSVa6KFr9mqgcEqiagRNi7wErxKwzYZHxTd/CwhO/hDCJVwjC0NedJX0UhZv613vo81YFlvErhnkfCJGbmKtIfHVmILeVR4xPxO5EP5uEG3iSfcv2hcuLYXNVq1KO4S2hIjAu9ojrnzJh0dDcgynccqmY4mZuZisUjoLwSF4vO91w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=CVz4ssz0UzueaQc/yHXGq3apYsucao+eay39ooiqJdc=;
+ b=OA9qu8sq8eNKy5+NAC1TsH5uRf6jzEx1I4ALADMZOs9rNqyH3pexAJkFr6BDv4aUajFwdpdfdg3HkYyBygk1XalnY1Pd+iDJMKsjY4bHsZ/R5TuyLJqt2LDuq697evlCugz1t/sKYCCBnwmWK+gFe33wnrkDbkE4PJjPu2o0cHPPBvSuvA4weOifj8pQmFwdzoKdZCNsFcSkN+RbwQy63mnWRbEu+fum9iZcfLjNMhlfC7KcQ7T5UGq/cCmZd8mctUKuQ4PmKQPB3hZQxn08Cph5/+vytmRi/oas3RKMan5F5ByZP5CPCRA+Ft+jsQ4NZ/J0XOf6Pc0KAhDNzGjA7Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=CVz4ssz0UzueaQc/yHXGq3apYsucao+eay39ooiqJdc=;
+ b=OybueztMHcj8TLzcmW8hCPvVIwbybBgOmD4feIJ5s7UZboEhBCjdPIRkXsxmkJZRXRvv3cQ+ndHFKnCvDeT/odGp2BwmNW6WfPRtzwxXao6ie2wcPvKcsMzWUWGv+QNTK1/N+3gKb/72U+SWE/hCe8NAfyLwERlycfzk1zHhUew=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from BL1PR12MB5946.namprd12.prod.outlook.com (2603:10b6:208:399::8)
+ by SJ0PR12MB8139.namprd12.prod.outlook.com (2603:10b6:a03:4e8::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.22; Thu, 1 Feb
+ 2024 06:41:23 +0000
+Received: from BL1PR12MB5946.namprd12.prod.outlook.com
+ ([fe80::1602:61fd:faf5:d6e2]) by BL1PR12MB5946.namprd12.prod.outlook.com
+ ([fe80::1602:61fd:faf5:d6e2%5]) with mapi id 15.20.7228.029; Thu, 1 Feb 2024
+ 06:41:23 +0000
+Message-ID: <7a063832-e1b5-42df-92cf-66486d4feecb@amd.com>
+Date: Thu, 1 Feb 2024 12:11:15 +0530
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/3] dt-bindings: net: cdns,macb: Add
+ wol-arp-packet property
+To: Andrew Lunn <andrew@lunn.ch>, krzysztof.kozlowski+dt@linaro.org
+Cc: nicolas.ferre@microchip.com, claudiu.beznea@tuxon.dev,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, linux@armlinux.org.uk, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, git@amd.com
+References: <20240130104845.3995341-1-vineeth.karumanchi@amd.com>
+ <20240130104845.3995341-3-vineeth.karumanchi@amd.com>
+ <824aad4d-6b05-4641-b75d-ceaa08b0a4e8@lunn.ch>
+ <09ce2e81-01cc-431f-8acb-076a54e5a7e6@amd.com>
+ <9b4a2c23-5a96-45eb-9bdf-cefc99f25fec@lunn.ch>
+Content-Language: en-GB
+From: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
+In-Reply-To: <9b4a2c23-5a96-45eb-9bdf-cefc99f25fec@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PN2P287CA0014.INDP287.PROD.OUTLOOK.COM
+ (2603:1096:c01:21b::8) To BL1PR12MB5946.namprd12.prod.outlook.com
+ (2603:10b6:208:399::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 08/15] net: ravb: Move the IRQs
- getting/requesting in the probe() method
-Content-Language: en-US
-To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, p.zabel@pengutronix.de, geert+renesas@glider.be
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-References: <20240131084133.1671440-1-claudiu.beznea.uj@bp.renesas.com>
- <20240131084133.1671440-9-claudiu.beznea.uj@bp.renesas.com>
- <5536e607-e03b-f38e-2909-a6f6a126ff0d@omp.ru>
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-In-Reply-To: <5536e607-e03b-f38e-2909-a6f6a126ff0d@omp.ru>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR12MB5946:EE_|SJ0PR12MB8139:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0ddadc05-1f7c-4c77-23ac-08dc22f0ce66
+X-LD-Processed: 3dd8961f-e488-4e60-8e11-a82d994e183d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	FCJa6Dazbm3bdRsfLI1rWnzAW9DSXyE+tfK02GwHa8qkfxMYdCZXWEY2OAHM6sDg48SFwRTw3ZRUBZ0xCSxfejKQLr+ReuE3eX/yu3NqhGbWGVYtPhIgsaDmRw4x6G4vYQoWp/VL7g1o9/9ICru9+hz228klnoIpN8yFsYesT6pNeJNRDbnH60Lc8RwD8VkytdkVXAZAFLU0UUli1c9owjQZ0xnKJTdyWEZRlvE1N/KzifpMBn5Fowd0j7Mxj8vUhNe0TqP6s2nkKpeSHEkHph2AgDPkQUbViuvALGhEpnq8qT5/rqIDEhekTIFy9iGuZlMGGar0Ml2WYUe5Hi5dk9hao68RJ+omNpQg4w0wi4ngHTpu6alHw3YlO0CUDLYmiw/i5kqp9bGHkZQ8+VxKBON8HOJYLd+aV2awNLEYchoTl65ezG/Ivg8d6Qjv9cSGpZLpJWRECEtNufoMx+ovJiLmfnWpNlF5PqtFp9V3GsNMewb1sNTk4qEyG9Pl0H/ZK5C53P2lVg6Yegkv58AmH0AQ7RRWm8Gt5Jf69M36HVlRxV6heKMFvfUohBZtZ/GwCDXi3wEMeSwa+bZNVXDEwjchduwzV2zCzv23f5sZQhEdUPqnjtPsEs+RZK6t5V/yxQFfhtOqXVZzB91Rq2HJMg==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5946.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(136003)(396003)(366004)(39860400002)(346002)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(41300700001)(8936002)(66946007)(8676002)(4326008)(44832011)(86362001)(5660300002)(31696002)(2906002)(7416002)(36756003)(478600001)(38100700002)(66556008)(316002)(66476007)(6486002)(6506007)(53546011)(83380400001)(6512007)(6666004)(26005)(2616005)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?aXo4cEovNWs4NS9DQUUvTnBTSU9IODNmNUtRWmk2ZnpKM3VOZS9KVGFIRzZQ?=
+ =?utf-8?B?VjhtQ3Y3bU16ZVVFWlFVWm42NnNkK2NuRlp1Yko4NUVVYTZmYVEyRXNUcXlX?=
+ =?utf-8?B?VHRleUFZNmNzMmdzRkFaWEpCSXBaMkpuNVRyeWl3SDI4M2hzWHBUMnFLaU1q?=
+ =?utf-8?B?MHpnZWFSSTdPd1VIV0ZVU3BYVnJ2cDZraHFaakluSDlkeG9SOHNLY2dBaVBl?=
+ =?utf-8?B?WTJYQ0taU21CaTdlcFVkVkFtd1YyYmVIUGwwWWVSYTNDQjVaSzhqazRYdjRO?=
+ =?utf-8?B?Mm9yMndDUzBwWVhHRlo3OHNKVjA1SnMyMDJ6UjIrL1VQQlBrdDVoQmVnZVFR?=
+ =?utf-8?B?b3R3bW9VdWNBWlovSVc3aG00NUdraHVwc1ZMRHJ4MVJiMXdkYjU4czdlRTRa?=
+ =?utf-8?B?SkRCWnBCaWhUM1JqTU5iRWNWOUhuYXh2VHlkODJWRTF5Y0VKSWtobGh5djk3?=
+ =?utf-8?B?ejdQNXB3V0NHRjM5SEpEY1VhazgwS25JTFh3OWxhWFhseVZMeTUvaVlWMk5J?=
+ =?utf-8?B?aW9kQ243WjBpKzVrNkt1Q0ozUGlidXB1MDhYZXdhd2wzQTJtTE5jVzgrL0VN?=
+ =?utf-8?B?WjZuQzRLN28xSFB0dzVsYWhiUzNGa0xkTnVrelVJOFBBTnlVY0tVQWRoS28w?=
+ =?utf-8?B?YnYwNDRFRzZTbnlUbEVNbVBTSXp2RmNsaU5nK25IaWNIeEFXd2ZibkVscDJ4?=
+ =?utf-8?B?dW94YkwvWlkxOG85R3BhNGIxSEdpbytRTitkZHVISkFNd2RPblovL3FsaXRO?=
+ =?utf-8?B?ZWpEaFJEMUdtN1Jva05IbURsZmVFYjZQcVgxMHFxTTlDTGFueGg1cDBqZ2M4?=
+ =?utf-8?B?ZDJLMUhwT1VMc0ZSc0Y4RHY5d2RNK0N5TzlwWkN0NmsvY2R6N2w2STdoSjhF?=
+ =?utf-8?B?MGl4alFOTHFBbUMwcm1hMnZ3Q1JNazl0aEVYSkVNNW1raFRmQWh2aWd5aTZs?=
+ =?utf-8?B?bTR0QzFYNWl2SEJsNHAyTGZPVjNGQXBzTWFSK0lsUzNPYWJmOUI4RjhIbHdj?=
+ =?utf-8?B?YUVTMFNNQXc1Y1g2Qyt6NU5XcG4vWlhldVI2S056ZEVOSTd6aVdZZkQwS0hU?=
+ =?utf-8?B?VnJUN0I4bGkrQ1ZPQVc2TXVhRWFtTWRaalZUeVFGOU55TDZrUUFUSE5MdFpP?=
+ =?utf-8?B?NFhIZE5tem5WYlY5d0xzQTZZUkNMVnNCR3FvYU9haVVxOWZaOURJYysrOWg5?=
+ =?utf-8?B?eklETGhlUjJaYW9EaG55NkpwS2Q0cVdwaTRiQVJPSFlwY2tOZjlJa2xlMVYr?=
+ =?utf-8?B?NnpwRFNLbVI5NGJFVGlSeVY0aGN6N0ZDandXalkxTjk4R015TjZJRGFqTkhh?=
+ =?utf-8?B?aW9TME5UaEt4YVEzcWVadTlDbWplSFJtRTcyNmxDT1dHVmxQbjBxdlNFa2xO?=
+ =?utf-8?B?SXZyc2g3VGxGekhkblpJajNVUDR6Q3ZramoyaGE2VkFMejlGZENnaG5jTVY3?=
+ =?utf-8?B?VlZES0tlUlFIQ2tiT25BNHBmVnJ0bndKNVlsNVhXRm9ZN1R2RFF4Z3d6WjBD?=
+ =?utf-8?B?RkdRZy9vZUpaTUJzejdyTDUrcVZIV1RJRTgvbFU1VDdPSVBZcXFDR1NyUUhN?=
+ =?utf-8?B?cXZYNlh4NkZLekoxUndYQlJwWTNIZkZQaldPL1lncTVlMllVbFNsc1I3ODRj?=
+ =?utf-8?B?ZVJWS1ZaMTI5SWYyNWh1YnFxN25pQ0U2RmtDSHlqMjNWNGxLemdhUFpDWURI?=
+ =?utf-8?B?Qnp6MkV4enFleDJ2M0I0Skd3Mlc1T2ZkK0FTUitaSjhHVVpjRnFCWU1yanZx?=
+ =?utf-8?B?ZnNGaUFxdW1EdXp6Qk52MUVKUFc1a2dSRUdPdWozeUN2cVRJek90OTdCdUM2?=
+ =?utf-8?B?a3ZEdjk0WWxhbXJMZDJlcFQ2MmdmNlNMQ1pSOWtLcGIrbVV5NEU5N1FWQ3Bp?=
+ =?utf-8?B?SmFhRVRRbEJ4V2VEZ2xmcE8rSkliYk5Fc1JlZE92b3hVWXZ4RjFTWFYrU2Y0?=
+ =?utf-8?B?endqRC9wajcxUGpVWHdpYXE4aVpObTY1UGJYV0NuT2hrOEFabG5aTW9HRlZM?=
+ =?utf-8?B?OU8zOTlSOG5tbFJNRDZVQTJ3K0VSK1AyV09KOGdNRGREY0k3ZFVZNjl1eUNw?=
+ =?utf-8?B?MmNsVXkwUmFqUjhBdzBoZ2srNWtmWFBxRG5vSlVFamNaeE92WW1HNkxBSXZX?=
+ =?utf-8?Q?DvQ3hStlZg528/YEvHIPFHRKm?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0ddadc05-1f7c-4c77-23ac-08dc22f0ce66
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5946.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Feb 2024 06:41:23.2836
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: XY0z4H4dwfHN/PMgx7nDf/PSxEs5maom2UYWocSIQ8mvQ9cyPLVRSde0uI2mWo/s
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB8139
+
+Hi Andrew, Krzysztof,
 
 
 
-On 31.01.2024 21:51, Sergey Shtylyov wrote:
->    I said the subject needs to be changed to "net: ravb: Move getting/requesting IRQs in
-> the probe() method", not "net: ravb: Move IRQs getting/requesting in the probe() method".
-> That's not very proper English, AFAIK! =)
-
-It seems I messed this up.
-
-> 
-> On 1/31/24 11:41 AM, Claudiu wrote:
-> 
->> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+On 31/01/24 6:48 pm, Andrew Lunn wrote:
+> On Wed, Jan 31, 2024 at 01:09:19PM +0530, Vineeth Karumanchi wrote:
+>> Hi Andrew,
 >>
->> The runtime PM implementation will disable clocks at the end of
->> ravb_probe(). As some IP variants switch to reset mode as a result of
->> setting module standby through clock disable APIs, to implement runtime PM
->> the resource parsing and requesting are moved in the probe function and IP
->> settings are moved in the open function. This is done because at the end of
->> the probe some IP variants will switch anyway to reset mode and the
->> registers content is lost. Also keeping only register settings operations
->> in the ravb_open()/ravb_close() functions will make them faster.
 >>
->> Commit moves IRQ requests to ravb_probe() to have all the IRQs ready when
->> the interface is open. As now IRQs getting/requesting are in a single place
-> 
->    Again, "getting/requesting IRQs is done"...
-> 
->> there is no need to keep intermediary data (like ravb_rx_irqs[] and
->> ravb_tx_irqs[] arrays or IRQs in struct ravb_private).
+>> On 31/01/24 6:56 am, Andrew Lunn wrote:
+>>> On Tue, Jan 30, 2024 at 04:18:44PM +0530, Vineeth Karumanchi wrote:
+>>>> "wol-arp-packet" property enables WOL with ARP packet.
+>>>> It is an extension to "magic-packet for WOL.
+>>>
+>>> It not clear why this is needed. Is this not a standard feature of the
+>>> IP? Is there no hardware bit indicating the capability?
+>>>
 >>
->> In order to avoid accessing the IP registers while the IP is runtime
->> suspended (e.g. in the timeframe b/w the probe requests shared IRQs and
->> IP clocks are enabled) in the interrupt handlers were introduced
+>> WOL via both ARP and Magic packet is supported by the IP version on ZU+ and
+>> Versal. However, user can choose which type of packet to recognize as a WOL
+>> event - magic packet or ARP.
 > 
->    But can't we just request our IRQs after we call pm_runtime_resume_and_get()?
-> We proaobly can... but then again, we call pm_runtime_put_sync() in the remove()
-> method before the IRQs are freed...  So, it still seems OK that we're adding
-> pm_runtime_active() calls to the IRQ handlers in this very patch, not when we'll
-> start calling the RPM APIs in the ndo_{open|close}() methods, correct? :-)
+> ethtool says:
+> 
+>             wol p|u|m|b|a|g|s|f|d...
+>                    Sets Wake-on-LAN options.  Not all devices support this.  The argument to this  option  is  a
+>                    string of characters specifying which options to enable.
+>                    p   Wake on PHY activity
+>                    u   Wake on unicast messages
+>                    m   Wake on multicast messages
+>                    b   Wake on broadcast messages
+>                    a   Wake on ARP
+>                    g   Wake on MagicPacket™
+>                    s   Enable SecureOn™ password for MagicPacket™
+>                    f   Wake on filter(s)
+>                    d   Disable  (wake  on  nothing).  This option
+>                        clears all previous options.
+> 
+> So why do we need a DT property?
+> 
 
-Yes, it should be safe.
+The earlier implementation of WOL (magic-packet) was using DT property.
+We added one more packet type using DT property to be in-line with the 
+earlier implementation.
 
-> 
->> pm_runtime_active() checks. The device runtime PM usage counter has been
->> incremented to avoid disabling the device's clocks while the check is in
->> progress (if any).
->>
->> This is a preparatory change to add runtime PM support for all IP variants.
->>
->> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
->> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> [...]
-> 
->> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->> index e70c930840ce..f9297224e527 100644
->> --- a/drivers/net/ethernet/renesas/ravb_main.c
->> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> [...]
->> @@ -1092,11 +1082,23 @@ static irqreturn_t ravb_emac_interrupt(int irq, void *dev_id)
->>  {
->>  	struct net_device *ndev = dev_id;
->>  	struct ravb_private *priv = netdev_priv(ndev);
->> +	struct device *dev = &priv->pdev->dev;
->> +	irqreturn_t result = IRQ_HANDLED;
->> +
->> +	pm_runtime_get_noresume(dev);
->> +
-> 
->    Not sure we need en empty line here...
+However, I echo with you that this feature should be in driver (CAPS).
+We will re-work the implementation with the below flow:
 
-That's a personal taste... more like to emphasize that this is PM runtime
-"protected"... Same for the rest of occurrences you signaled below.
+- Add MACB_CAPS_WOL capability to the supported platforms
+- Advertise supported WOL packet types based on the CAPS in ethtool.
+- Users can set packet type using ethtool.
 
-> 
->> +	if (unlikely(!pm_runtime_active(dev))) {
->> +		result = IRQ_NONE;
->> +		goto out_rpm_put;
->> +	}
->>  
->>  	spin_lock(&priv->lock);
->>  	ravb_emac_interrupt_unlocked(ndev);
->>  	spin_unlock(&priv->lock);
->> -	return IRQ_HANDLED;
->> +
->> +out_rpm_put:
->> +	pm_runtime_put_noidle(dev);
->> +	return result;
->>  }
->>  
->>  /* Error interrupt handler */
->> @@ -1176,9 +1178,15 @@ static irqreturn_t ravb_interrupt(int irq, void *dev_id)
->>  	struct net_device *ndev = dev_id;
->>  	struct ravb_private *priv = netdev_priv(ndev);
->>  	const struct ravb_hw_info *info = priv->info;
->> +	struct device *dev = &priv->pdev->dev;
->>  	irqreturn_t result = IRQ_NONE;
->>  	u32 iss;
->>  
->> +	pm_runtime_get_noresume(dev);
->> +
-> 
->    And here...
-> 
->> +	if (unlikely(!pm_runtime_active(dev)))
->> +		goto out_rpm_put;
->> +
->>  	spin_lock(&priv->lock);
->>  	/* Get interrupt status */
->>  	iss = ravb_read(ndev, ISS);
-> [...]
->> @@ -1230,9 +1241,15 @@ static irqreturn_t ravb_multi_interrupt(int irq, void *dev_id)
->>  {
->>  	struct net_device *ndev = dev_id;
->>  	struct ravb_private *priv = netdev_priv(ndev);
->> +	struct device *dev = &priv->pdev->dev;
->>  	irqreturn_t result = IRQ_NONE;
->>  	u32 iss;
->>  
->> +	pm_runtime_get_noresume(dev);
->> +
-> 
->    Here too...
-> 
->> +	if (unlikely(!pm_runtime_active(dev)))
->> +		goto out_rpm_put;
->> +
->>  	spin_lock(&priv->lock);
->>  	/* Get interrupt status */
->>  	iss = ravb_read(ndev, ISS);
-> [...]
->> @@ -1261,8 +1281,14 @@ static irqreturn_t ravb_dma_interrupt(int irq, void *dev_id, int q)
->>  {
->>  	struct net_device *ndev = dev_id;
->>  	struct ravb_private *priv = netdev_priv(ndev);
->> +	struct device *dev = &priv->pdev->dev;
->>  	irqreturn_t result = IRQ_NONE;
->>  
->> +	pm_runtime_get_noresume(dev);
->> +
-> 
->    Here as well...
-> 
->> +	if (unlikely(!pm_runtime_active(dev)))
->> +		goto out_rpm_put;
->> +
->>  	spin_lock(&priv->lock);
->>  
->>  	/* Network control/Best effort queue RX/TX */
-> [...]
->> @@ -2616,6 +2548,90 @@ static void ravb_parse_delay_mode(struct device_node *np, struct net_device *nde
->>  	}
->>  }
->>  
->> +static int ravb_setup_irq(struct ravb_private *priv, const char *irq_name,
->> +			  const char *ch, int *irq, irq_handler_t handler)
->> +{
->> +	struct platform_device *pdev = priv->pdev;
->> +	struct net_device *ndev = priv->ndev;
->> +	struct device *dev = &pdev->dev;
->> +	const char *dev_name;
->> +	unsigned long flags;
->> +	int error;
->> +
->> +	if (irq_name) {
->> +		dev_name = devm_kasprintf(dev, GFP_KERNEL, "%s:%s", ndev->name, ch);
->> +		if (!dev_name)
->> +			return -ENOMEM;
->> +
->> +		*irq = platform_get_irq_byname(pdev, irq_name);
->> +		flags = 0;
->> +	} else {
->> +		dev_name = ndev->name;
->> +		*irq = platform_get_irq(pdev, 0);
->> +		flags = IRQF_SHARED;
-> 
->    Perhaps it's worth passing flags as a parameter here instead?
+Please let me know your thoughts/suggestions.
 
-I don't see it like this. We need this flag for a single call of
-ravb_setup_irq(), we can determine for which call we need to set this flag
-so I think it is redundant to have an extra argument for it.
+🙏 vineeth
 
-> 
->> +	}
->> +	if (*irq < 0)
->> +		return *irq;
->> +
->> +	error = devm_request_irq(dev, *irq, handler, flags, dev_name, ndev);
->> +	if (error)
->> +		netdev_err(ndev, "cannot request IRQ %s\n", dev_name);
->> +
->> +	return error;
->> +}
-> [...]
-> 
-> MBR, Sergey
+> 	Andrew
 
