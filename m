@@ -1,185 +1,133 @@
-Return-Path: <netdev+bounces-67830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F03AE84514D
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 07:17:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D64884515F
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 07:30:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6FA72842D4
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 06:17:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 90536B238B1
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 06:30:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C086F62A00;
-	Thu,  1 Feb 2024 06:17:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0701285C5A;
+	Thu,  1 Feb 2024 06:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="RCt+umGI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PKvJzMkI"
 X-Original-To: netdev@vger.kernel.org
-Received: from SINPR02CU002.outbound.protection.outlook.com (mail-southeastasiaazon11021006.outbound.protection.outlook.com [52.101.133.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01ED35FB9C;
-	Thu,  1 Feb 2024 06:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.133.6
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706768264; cv=fail; b=ZCPY9DPONDIa/BSdSks5Kz+zyfA8V0JaOgEoBQaqHl8ch8GFVQHyuqt2SaxR3PE+hq7ua/7KZBVey7tG5PECogynZ9629LPSy6te4/aVpxtlIlzBeOjHTNfHwdYVU32iMQufdFDhwuCRd/lg+4ov32NCJTNfHvuUfSTHPY21nIc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706768264; c=relaxed/simple;
-	bh=+VHP6lqWU0kAm4W+2l+fwCD039kTHr9WCOlyqL0lqq8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Qia9ed861LTxVU+MMiPK+jwyxb24mYGn1iAVaXRfJ4b6Wl/SqDs2R9KL8weSTpzUXPNdvDPdlvawths8T2s0wlwXXMDed5lSTkOxaEfVMjAX7fQl4I3cWyWBro64Z2mKpWki+fv4h3crpES9ANXA5LVS4+wKGb03QfvhkstaK5Y=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=RCt+umGI; arc=fail smtp.client-ip=52.101.133.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=j/emlYBiCQ0y/JVSad4Yon0fB+kZcMkPLAoYOEuU+0j3uG4SQLjKoX+3tQjIlqkGL1RcJJoV2SgAziV1sjwRTHm2nrSqTsu1jfR8K7dF56b9TuqtBceEGNuxjlM4zyzBQ9E46zB/JHmThd47fh/VD1BnqFMyPgBZtnz+1iW/lYyRL9sztXj0dSzPbucKXXtLhpnZtyHYWuxDXPGkqDq1lT2yECSmAiy9wqJGGdKES8XhnHa9f7CdxOZohi98uSpdy1YQ1ucaaDRtY3pBRIq6bObZSlk9OLO0f6XRYZk+o6RYDfv4s1uClw/Euq0bMHkk8o/7PGtMg5YtuquVA10+Sw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+VHP6lqWU0kAm4W+2l+fwCD039kTHr9WCOlyqL0lqq8=;
- b=RDFxlQhDXmafW6MiMwj7XVEIFnYCHGg926lzR2nB5DkVAK+pYwZBTguImEbpMEtMkK51JqG3kjzIAk6F211WbmJtDupUwMVT9EWJhz0x55824DnmV6/Y7Epi3bFz2LYxeIwVzN490PY/5/xJhv/2/w71GCx1a1Jq54UgtRx5prcrCmbRKYIx0B+1fRLoK9BULBWWgnC3a5ujcsBilS4PcEpoB7LyIyPZP9Myvyguf5+yomKgc6QVfTdxOHAYcDMBbufa8WZqo62Te/u3+WO6PFb99+GL6pOjbNkCFT+MpAwzxhaMC1LhGlQuTT5FxsMgmPzZxD5MQ0Z7Ngd1OAcsJw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+VHP6lqWU0kAm4W+2l+fwCD039kTHr9WCOlyqL0lqq8=;
- b=RCt+umGIu1Cg0gSIq2nFi3o5s+n6tcTPn5V61cP52KC3FnMqdsuKpiD7g/kIQ0yFiBo7rACj860R8ZCBWUrDWsoZVPf4Hua2kB8dJ/XdnT3NyNnL8mXG2DDUvDa6DL2/P8u/2YenXSLOHQH4VwQtGJq1NqR2scWNnm85cJEOkHc=
-Received: from KL1P15301MB0799.APCP153.PROD.OUTLOOK.COM (2603:1096:820:b1::7)
- by PUZP153MB0634.APCP153.PROD.OUTLOOK.COM (2603:1096:301:e7::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.11; Thu, 1 Feb
- 2024 06:17:37 +0000
-Received: from KL1P15301MB0799.APCP153.PROD.OUTLOOK.COM
- ([fe80::3afb:679f:e653:5c2b]) by KL1P15301MB0799.APCP153.PROD.OUTLOOK.COM
- ([fe80::3afb:679f:e653:5c2b%5]) with mapi id 15.20.7249.016; Thu, 1 Feb 2024
- 06:17:37 +0000
-From: Shradha Gupta <shradhagupta@microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>, Shradha Gupta
-	<shradhagupta@linux.microsoft.com>
-CC: KY Srinivasan <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Wojciech Drewek <wojciech.drewek@intel.com>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>
-Subject: RE: [EXTERNAL] Re: [PATCH] hv_netvsc:Register VF in netvsc_probe if
- NET_DEVICE_REGISTER missed
-Thread-Topic: [EXTERNAL] Re: [PATCH] hv_netvsc:Register VF in netvsc_probe if
- NET_DEVICE_REGISTER missed
-Thread-Index: AQHaVAwjmntiXunnhEuM1B/1uGjqrrD0o7UAgABgxOA=
-Date: Thu, 1 Feb 2024 06:17:36 +0000
-Message-ID:
- <KL1P15301MB079998B4D03095FB6DCCBC59D3432@KL1P15301MB0799.APCP153.PROD.OUTLOOK.COM>
-References:
- <1706599135-12651-1-git-send-email-shradhagupta@linux.microsoft.com>
-	<20240130182914.25df5128@kernel.org>
-	<20240131060957.GA15733@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <20240131163048.574707f2@kernel.org>
-In-Reply-To: <20240131163048.574707f2@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=7eab432d-8886-41f0-8b44-2e0393cb46ec;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2024-02-01T06:17:08Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: KL1P15301MB0799:EE_|PUZP153MB0634:EE_
-x-ms-office365-filtering-correlation-id: f6dc6aae-00e3-4e34-1a99-08dc22ed7c09
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- U7L5JeVgk1ts7jC9sZyamKgCCK08l+KXNM0tspMZznbT0JEEEygX4Ep7hHAUvbBsOQ+iMCn4PAHWwEuPPFDjm/D1KDeXBXbJmJpW7Enor1cUC8NbBWVQovEd9JDE7W1I6lcfRZNIMXKTqUVB7gA0Pxl82bbRzkUy8mp4yQgTRvXYBLIPCsztzihMkf5l6bQTpVEgzftd4XQsb1Fyrj0KIgm6VBs67+lJqCw6BZGsRXSg4B3KjWwn8BZXxwZa0PL9GD7xGMDhBKuOJqHOCoCig3Cv76Y3ZxPoOFIsNCIWJ/gLmpbtq4BX3yKxzsRKMG7xiBsUroEQtZkSKj3AkBKbupMlN5ZAYsff71vQu+kBeZTQ8bPTGdrvJtGq9lRSjSQ/1f+DL4PSb88WZ1R2XbgEWQzpu5ZuWxsflWFtBKf6DW7VBFbjj19EYfema42HxSw2e1+DqJacr2GOrYssJqqYKkr+n9PO0b+75Zk1rWD3RqXaMi3K4+H2usIHxr0NjXkiblCHdS3hbdy1XdVnVLIP6AmS1vmPAxMlDsuwkqqghCUgcIC2o2pGVYbtRpuyCBid3rj/8wn9oLGcOeXxzhid5dD0v0NCfCCANGySAs04E6eNWDkVnqveU5bdrbX6Rwpl39LXXrVQ3k+PxoDXSVSwvKbXWr/MWCPwc3/LpaZHh0Q=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:KL1P15301MB0799.APCP153.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(366004)(346002)(136003)(376002)(39860400002)(396003)(230273577357003)(230922051799003)(230173577357003)(64100799003)(451199024)(186009)(1800799012)(83380400001)(41300700001)(9686003)(38100700002)(122000001)(8676002)(52536014)(8936002)(5660300002)(4326008)(8990500004)(7416002)(53546011)(2906002)(10290500003)(478600001)(6506007)(7696005)(54906003)(64756008)(66446008)(66476007)(66556008)(71200400001)(66946007)(76116006)(316002)(110136005)(38070700009)(82960400001)(86362001)(33656002)(82950400001)(55016003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?yYZtXsHu8q+QXvea+8u4IaUDS/yWena2W0zqeFy/O3QyFVq0xp5u4vqUEVOr?=
- =?us-ascii?Q?rgcaY4trYvI7k9HXioyrPc1s5pW3Q/EvMosRj8LCyuwkV8M+InYjjj0s87Go?=
- =?us-ascii?Q?lzVQ43SdhCssOQkTMqMz0gdPkkDzt0JsA7JhNZnZeSAXO8Dvbg89BrV6zXYq?=
- =?us-ascii?Q?DJ74UE/cNVdJX1Y5aww0wuhWGsfvve+edtI3JufDCuAVpf51Wx+SdE2EAlQ6?=
- =?us-ascii?Q?DEiEc8A+l67CTy70RIHGSRQG3uWYl4EhQ00xCpJExfqNxF99E0r2NEHaC+pM?=
- =?us-ascii?Q?S/act4mk5pK0BqLv+jj7W5M4EOe3SCk9w1EPL2WK+NKRkXQuTVIGHo0seMcv?=
- =?us-ascii?Q?czmVC0bVqLYePpoQW56MchI19XAl544FCg3gChGCMvdtEPYVILaGn9gdpb76?=
- =?us-ascii?Q?QwgLFFVYU2rX7OLV+IgW8xtK/WAsS/uaLpNVdU9JauNlniZBeLS7Vm+2GxpW?=
- =?us-ascii?Q?YZNLMdUrBFkQvQfb0PS1Sx3zAZeFrXe/OeA1efYcncJmDxhkt515kJHutcoR?=
- =?us-ascii?Q?bBATyH8NBzfBGm1pg0oN0iJ3l12ddod/g1MbLhYMhTgJy4vNmjgp7RqoqTxD?=
- =?us-ascii?Q?UTV8J/UUdICKjxTCjhftWBbkGX0sy3RCHtjqc4g5RMF4z70FhJ+Mtfi3hfrH?=
- =?us-ascii?Q?Q8oQj12eGBhVilvI+o7yWcCPMaYwWE1/vpkmzqCfDSRskz0n8PNxzafZHw+a?=
- =?us-ascii?Q?b0arGRB3SwCUBJhm3qS8+RSeCC3sFYbF/beMZwFPJJrcc9ZcPvbc/IDdJWJL?=
- =?us-ascii?Q?o/mm/jimvQ9FrP9hXkYbKXng1GutLmGhtm4t7g//717XDepk36y516bUvMPK?=
- =?us-ascii?Q?peMP45BbbVJCl0YQylvS2cSgEkT5Mfhe3oSy2CUctScq3yPvO1A50rsYplmE?=
- =?us-ascii?Q?T1s724/UzCr/63ZTt7Q2dlqzAf7f/yZNVkUQZvEgNVbLjcgw1gF/+8qrCIz/?=
- =?us-ascii?Q?tZlE9zrvsLni72VWYdYp0bd1X+qpStjsHwGiXXBpvxQAiv3fgeb6JaMH1EqF?=
- =?us-ascii?Q?CgTUN3sdFpnLRE8rU4SLD4TR26OUt0s837pFy5EDQd9VuD2yokzR3GL8y6tN?=
- =?us-ascii?Q?6Hppgq8FwVl+WfFov66tQdiKNmR+khtvEcJ53JXBQz8ItQiSKssWyt+IWEBl?=
- =?us-ascii?Q?KmwnR/KsortWF9WgaFbyTcc2d6aYbqU5JNaPSLaInuUYvx2eTrk5FibXKGgB?=
- =?us-ascii?Q?Fkbe3HMREj4cn+KNEb/RGSI9ABzSxO6qYXiAqSZDNMD5YED150NOca8TulwQ?=
- =?us-ascii?Q?1mivwaUEzTXtwJ6cW/GxIjI0HHZo2EnwZmVpc8ulFeGQy4RsPSIBTOCxAO/q?=
- =?us-ascii?Q?IaIFzhvtZEttUED5wLI3HLBhJ8vf7mpMzimUtDAqNpoysOVxo9I1ad7u+zBG?=
- =?us-ascii?Q?PxDgOetMztVJcNTmK3yhpxN6biOBnGd51Sf/lGAFp/5FIqf/O7MKbjVfW3yB?=
- =?us-ascii?Q?fWDFmKhOIP3COwdYu/C9dIXY2mhbYxQO4PIis1hTvG1L8TXij+l8EcoihVR4?=
- =?us-ascii?Q?YGHmXiBWk8xBPnMsHwkbCeadGprnZTWhzncLQGBcJffjfMupMlGqad9NtGEE?=
- =?us-ascii?Q?dMFVQWkqVmXHeuk4DUJblvclcZXKvPMUXjKBgH5h?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EC6D85C43
+	for <netdev@vger.kernel.org>; Thu,  1 Feb 2024 06:30:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706769004; cv=none; b=diW4KOh6A5iW5crAtnzKIrjNzXOwXopY8KvBRREaroAj3N9hcEzDWkMcwcVT8PVgsTxNIdJKwZ2Sw2ISQxuy/7TjMElWpuRV6ji7DRhk3xUwtLaymTTLNjaqlnGe2O4fF+o1Gc0c5gKia5Qni3bHqG5Yrwn4VwNdX6UFsmWvcUI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706769004; c=relaxed/simple;
+	bh=I2yRvRwoJe8NYhNMjDLJQUNmI0hI7Hs/5kgtIZg24No=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BnDqKTKzdPyhqyDO+TbWWNNhQmgFMZ1487M3uXJsAR2EPGbdUVKKkqKDZ/9G6Jj+bHq9ZpjJWE+ont3wmlT03I1RZnRKwSUmfgiMCodN3fcpaUYyR0R/td7oxLsTC+VCgavcxxrtGFgF9rWTaBba14clBzKFEyL3raRci66jmGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PKvJzMkI; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-290a55f3feaso411762a91.2
+        for <netdev@vger.kernel.org>; Wed, 31 Jan 2024 22:30:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706769002; x=1707373802; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DZrL2VpEJa7UqL8kWj7kSRmwBGmurcLyNVJ3Z3snrz0=;
+        b=PKvJzMkI3EM81Tlmns+wAiF3X3CbY/5orBt55SeDSsadq/9+46EweHSw5s7gdIQiax
+         tlTlbv1+ba9Nui36uvwoWISvibgDVjg2kpntGiqwrPCgYcLzyzY5bBO0nFzUx6JiDyYq
+         Xxp+HeMmW1V2t1EtnxKxyVGZnwnBvrHjSkc/aFI2DT+7ntECT6mkc07vRxZ38zsL0SvQ
+         MtUuYUe34D7BR1Cp9cKIOzlxkVLomdIFPg6NF0312Kws7aREaMA7eCx2wmvI1IkEgA1f
+         5eCiwgCi6aAHV0cOlNnt2+caMx/7F/6iNg35WrMxvxOPAXTWVtlxzp7Tg54b4W61qOQD
+         ib5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706769002; x=1707373802;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DZrL2VpEJa7UqL8kWj7kSRmwBGmurcLyNVJ3Z3snrz0=;
+        b=E5o2oMLD1JWfhefHNLwfXum0cW14A/DMONGiczVgI7bPAeyMvz5+rJ0HQkmhVJimzo
+         MZLWo5OR7ApKfU7jIUwX2KbQ7P82roHUpgdLdy0undUoImwtnCxXb4ZLP2sXNPHhTaJH
+         b2Ish9ugepZkdyX0Xe5RORfdeRdG0x76M+flG00pjuDwkmUGvSwCI65mekKL+GsVmOfj
+         TlId4qs0gK6prsqNbl+HITMluFsiQVg9WBAKl4/42wJzfE6Fy4Poij+z4rJ76zgcFVS8
+         RBW2tmm4VWcrCkBesSWzgxccf5Vk9KWt5Ep4DiW1oy+rzOVJsBb6lZDSmA5OOYThz5i0
+         wJTg==
+X-Gm-Message-State: AOJu0YzBV400boXFRZx2yt6fWQosCXhUNW6WyQO305yF5fi3c23cNCuE
+	hfJ3pdaIqQGAoe39wz/1l9JST8yhH0T+wKD5HeIHAiwrxhVofemZWC6vPY447XMWaOx5
+X-Google-Smtp-Source: AGHT+IEJFVL+SBeIPFuVeCjIgluczCSuwHrmjZ6fE/oWI2JzkP6p3gQhiIXX8vUtTeEUO3xLuIVaJg==
+X-Received: by 2002:a17:90b:3555:b0:295:fe86:ad1f with SMTP id lt21-20020a17090b355500b00295fe86ad1fmr2791031pjb.46.1706769002062;
+        Wed, 31 Jan 2024 22:30:02 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXBHbijGK5tkTdZVyXUwxeuJ8wfJCzMGhof1bRlQxpDHu49mBYal/xM2xM2hyjEXGe3p9n/onwWIxOpzF7f7LE9iVTpHZ1M6bUVhZH395KsAGdgz1ZVzNyzOqDRJ8GBZdiJ2YXochB2V2xHVjrCw1XAFpGfJ+l62J7j5n1T7/kihpSoZz1aLbqgSV66JihoEBikT6aaK1QEKpiFCRzi7dqv2wVcz22EQIBvIoA0MuGiNaXa+RS+jwFNeUZIkn7O0Sk8rQ==
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id pm12-20020a17090b3c4c00b0029618dbe87dsm515895pjb.3.2024.01.31.22.29.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 31 Jan 2024 22:30:01 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Liang Li <liali@redhat.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv2 net-next 0/4] selftests: bonding: use slowwait when waiting
+Date: Thu,  1 Feb 2024 14:29:50 +0800
+Message-ID: <20240201062954.421145-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: KL1P15301MB0799.APCP153.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: f6dc6aae-00e3-4e34-1a99-08dc22ed7c09
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Feb 2024 06:17:36.3052
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: kFGMtiLOhC+lTVOhMZNP7Uej/veUxI9s+mO49Bt/77SgZN9422RjlzY8QH4u7B0lC80vPLC2MpcBBd4rG1gjBHRKlzFgqyceqVbuTyGP/NU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PUZP153MB0634
+Content-Transfer-Encoding: 8bit
 
-I'll fix this and resend. Thanks
+There are a lot waitings in bonding tests use sleep. Let's replace them with
+slowwait(added in the first patch). This could save much test time. e.g.
 
-Regards,
-Shradha
+bond-break-lacpdu-tx.sh
+  before: 0m16.346s
+  after: 0m2.824s
 
------Original Message-----
-From: Jakub Kicinski <kuba@kernel.org>=20
-Sent: Thursday, February 1, 2024 6:01 AM
-To: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Cc: KY Srinivasan <kys@microsoft.com>; Haiyang Zhang <haiyangz@microsoft.co=
-m>; Wei Liu <wei.liu@kernel.org>; Dexuan Cui <decui@microsoft.com>; David S=
-. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Paolo A=
-beni <pabeni@redhat.com>; Wojciech Drewek <wojciech.drewek@intel.com>; linu=
-x-hyperv@vger.kernel.org; netdev@vger.kernel.org; linux-kernel@vger.kernel.=
-org; Shradha Gupta <shradhagupta@microsoft.com>; stable@vger.kernel.org
-Subject: [EXTERNAL] Re: [PATCH] hv_netvsc:Register VF in netvsc_probe if NE=
-T_DEVICE_REGISTER missed
+bond_options.sh
+  before: 9m25.299s
+  after: 6m14.439s
 
-On Tue, 30 Jan 2024 22:09:57 -0800 Shradha Gupta wrote:
-> This patch applies to net, which is missed in the subject. I will fix=20
-> this in the new version of the patch. Thanks
+bond-lladdr-target.sh
+  before: 0m7.090s
+  after: 0m6.148s
 
+bond_macvlan.sh
+  before: 0m44.999s
+  after: 0m26.468s
 
-$ git checkout net/main
-[...]
-$ git am raw
-Applying: hv_netvsc:Register VF in netvsc_probe if NET_DEVICE_REGISTER miss=
-ed
-error: patch failed: drivers/net/hyperv/netvsc_drv.c:42
-error: drivers/net/hyperv/netvsc_drv.c: patch does not apply Patch failed a=
-t 0001 hv_netvsc:Register VF in netvsc_probe if NET_DEVICE_REGISTER missed
-hint: Use 'git am --show-current-patch=3Ddiff' to see the failed patch When=
- you have resolved this problem, run "git am --continue".
-If you prefer to skip this patch, run "git am --skip" instead.
-To restore the original branch and stop patching, run "git am --abort".
+In total, we could save about 200 seconds.
+
+v2: Reduce slowwait sleep time to 0.1 (Paolo Abeni)
+    Reduce num_grat_arp() miimon time (Paolo Abeni)
+    Use slowwait for ping result in lag_lib.sh
+
+Hangbin Liu (4):
+  selftests/net/forwarding: add slowwait functions
+  selftests: bonding: use tc filter to check if LACP was sent
+  selftests: bonding: reduce garp_test/arp_validate test time
+  selftests: bonding: use slowwait instead of hard code sleep
+
+ .../net/bonding/bond-break-lacpdu-tx.sh       | 19 +++++-----
+ .../drivers/net/bonding/bond-lladdr-target.sh | 21 ++++++++--
+ .../drivers/net/bonding/bond_macvlan.sh       |  5 +--
+ .../drivers/net/bonding/bond_options.sh       | 38 ++++++++++++++-----
+ .../drivers/net/bonding/bond_topo_2d1c.sh     |  6 +--
+ .../selftests/drivers/net/bonding/lag_lib.sh  |  7 ++--
+ tools/testing/selftests/net/forwarding/lib.sh | 36 ++++++++++++++++++
+ 7 files changed, 100 insertions(+), 32 deletions(-)
+
+-- 
+2.43.0
+
 
