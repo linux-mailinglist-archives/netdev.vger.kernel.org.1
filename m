@@ -1,118 +1,138 @@
-Return-Path: <netdev+bounces-67980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-67981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C80384588F
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 14:12:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 571D1845899
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 14:13:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19A0D2888A8
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:12:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EDBDEB23E2B
+	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 13:13:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CC325CDC7;
-	Thu,  1 Feb 2024 13:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52C045D47D;
+	Thu,  1 Feb 2024 13:12:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="S10ePGPs"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BOlPkzmo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E435338C;
-	Thu,  1 Feb 2024 13:11:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.134.136.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF0875D46A;
+	Thu,  1 Feb 2024 13:12:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706793068; cv=none; b=Oz7kHlnOwnG6dacmC2tvXFPBuFpGqZ4qfYCHajCHWR4aJ4iMal20+t8Amhtq6TrQdDMy3aNULmTv8otzKFMpRIolZjgwaN6IQStv/UoLNNJnsSjnL4Is7yrUum7xDXfrAIZgST3J4qAV5CTeSE1aUFn2i8ouNtBnsUr6FOQHzkQ=
+	t=1706793152; cv=none; b=uIH1Bx5DjrZ6pNitypEge1phvBiDfIwcDZmvZAaxJDx9KGJUgV1YdzEQAN8JmiLCOS2Ngp+eJ87A2ldwhy5c/NoZyD9z/tOjUJ1jxZ9ZM9XiyJIm3rElrW87zaePIDKQZkhF68V62qztENQmQPJnUk7wnnmUiwMd3buHal30GEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706793068; c=relaxed/simple;
-	bh=ls+9RFNzMOW0liv757p99+kmzNTODKha4qA4iMAm7yQ=;
+	s=arc-20240116; t=1706793152; c=relaxed/simple;
+	bh=/I3LOE7Iy4GWVmhyKaKeXXQqboCCKJZr0DzFVtVFQ18=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E+0w9oVSe5b5hyAEBC1dABvQ3Bxqvc7I8OF2KUsxwl7xj2hMLKsYoBlBgVTaF8dr5KGeN6APW0ap6lHmHuZ5NtA1S9EDf8ejyg96nzYXIE22QJwC6ZXzfWyAp7sB+CZo395YyD57yNVv+snL//d6zMs/2HADd0RI+U1pf+fAhlQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=S10ePGPs; arc=none smtp.client-ip=134.134.136.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706793063; x=1738329063;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=ls+9RFNzMOW0liv757p99+kmzNTODKha4qA4iMAm7yQ=;
-  b=S10ePGPs7WXKAMIuSq/8DAPdnLCvZlm5XxI61/HXgF3g8xhYMu5sz/4s
-   72u7lpWmRtwmcoBHEU5BtNGBibkKbXAgVB3Ie41SXa8I+Fp4BwrpK1DqH
-   p+IMrs6shAYN9XgNO1r3lAXxV4i1TYkiScYpNP95FfCxJoxYakv63Kr81
-   agfa09o7tdd6Lw5pJEJkTHvTXu9EO3WioC7yvFmbraiD7Hg1oRRR8ABCJ
-   eYka1cauoikkZoYezY1XwYO6Op24q3QImP5OPehwOMpd3HdXXMkXIE+SC
-   8NlmCC4bv1kHvotyKfhA5Ws/h0/KbTpG+PR5zwnh8edPWHxyhC/GWPBOC
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10969"; a="468123506"
-X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
-   d="scan'208";a="468123506"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 05:11:02 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,234,1701158400"; 
-   d="scan'208";a="30587141"
-Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.41.120])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 05:10:59 -0800
-Date: Thu, 1 Feb 2024 14:10:56 +0100
-From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-	Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 1/3] netlink: Add notifier when changing netlink socket
- membership
-Message-ID: <ZbuYYMvihYxEbQ/p@linux.intel.com>
-References: <20240131120535.933424-1-stanislaw.gruszka@linux.intel.com>
- <20240131120535.933424-2-stanislaw.gruszka@linux.intel.com>
- <20240131174056.23b43f12@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=GkobEfbp95DZECJy0cfUhsDFML3bAQ696BQ8znyF4iQ1JBJnYyuD3NvMYD2iui9gFWPYsTV/AMNy6Pbh9zX0MF7oOQ5y3MhV0WF/iZrthQw4Os8ZaH6dnEutRSt647SFCdUaBUrMmoUU6ve2xo3IiyAJ4xl4rBRZL21tewyPCro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BOlPkzmo; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=ourWqt0U9KzwsZ13Pf+R3eqNLW9t0wZoaANlJWDjL/4=; b=BO
+	lPkzmoaz/mHfd0lTIMD5LjQQgNNUR2u1V5xfpsGvCHutTAqG1dc5H98ZLd8WIOQaMznZP2bcASWuq
+	r2Kp34QdGhzoMvAxrbMYGPaQ21eCZbJfzD6XsJl4pYZSK3rKRpLAz5gNUSRDmpsT1a3/VKLUNueSc
+	1EDowPp1gKvBpTg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rVWrO-006fvY-KU; Thu, 01 Feb 2024 14:12:06 +0100
+Date: Thu, 1 Feb 2024 14:12:06 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vineeth Karumanchi <vineeth.karumanchi@amd.com>
+Cc: krzysztof.kozlowski+dt@linaro.org, nicolas.ferre@microchip.com,
+	claudiu.beznea@tuxon.dev, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, robh+dt@kernel.org,
+	conor+dt@kernel.org, linux@armlinux.org.uk, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	git@amd.com
+Subject: Re: [PATCH net-next 2/3] dt-bindings: net: cdns,macb: Add
+ wol-arp-packet property
+Message-ID: <fb8f56b1-c961-478d-ac3a-8136408771d3@lunn.ch>
+References: <20240130104845.3995341-1-vineeth.karumanchi@amd.com>
+ <20240130104845.3995341-3-vineeth.karumanchi@amd.com>
+ <824aad4d-6b05-4641-b75d-ceaa08b0a4e8@lunn.ch>
+ <09ce2e81-01cc-431f-8acb-076a54e5a7e6@amd.com>
+ <9b4a2c23-5a96-45eb-9bdf-cefc99f25fec@lunn.ch>
+ <7a063832-e1b5-42df-92cf-66486d4feecb@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240131174056.23b43f12@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7a063832-e1b5-42df-92cf-66486d4feecb@amd.com>
 
-On Wed, Jan 31, 2024 at 05:40:56PM -0800, Jakub Kicinski wrote:
-> On Wed, 31 Jan 2024 13:05:33 +0100 Stanislaw Gruszka wrote:
-> > Add notification when adding/removing multicast group to/from
-> > client socket via setsockopt() syscall.
-> > 
-> > It can be used with conjunction with netlink_has_listeners() to check
-> > if consumers of netlink multicast messages emerge or disappear.
-> > 
-> > A client can call netlink_register_notifier() to register a callback.
-> > In the callback check for state NETLINK_CHANGE and NETLINK_URELEASE to
-> > get notification for change in the netlink socket membership.
-> > 
-> > Thus, a client can now send events only when there are active consumers,
-> > preventing unnecessary work when none exist.
+On Thu, Feb 01, 2024 at 12:11:15PM +0530, Vineeth Karumanchi wrote:
+> Hi Andrew, Krzysztof,
 > 
-> Can we plumb thru the existing netlink_bind / netlink_unbind callbacks?
->
-> Add similar callbacks to the genl family struct to plumb it thru to
-> thermal. Then thermal can do what it wants with it (also add driver
-> callbacks or notifiers).
-
-Yes, sure, can be done this way and make sense. Going to do this.
-
-> Having a driver listen to a core AF_NETLINK notifier to learn about
-> changes to a genl family it registers with skips too many layers to
-> easily reason about. At least for my taste.
 > 
-> When you repost please CC Florian W, Johannes B and Jiri P, off the top
-> of my head. Folks who most often work on netlink internals..
-
-Ok.
-
-Regards
-Stanislaw
 > 
+> On 31/01/24 6:48 pm, Andrew Lunn wrote:
+> > On Wed, Jan 31, 2024 at 01:09:19PM +0530, Vineeth Karumanchi wrote:
+> > > Hi Andrew,
+> > > 
+> > > 
+> > > On 31/01/24 6:56 am, Andrew Lunn wrote:
+> > > > On Tue, Jan 30, 2024 at 04:18:44PM +0530, Vineeth Karumanchi wrote:
+> > > > > "wol-arp-packet" property enables WOL with ARP packet.
+> > > > > It is an extension to "magic-packet for WOL.
+> > > > 
+> > > > It not clear why this is needed. Is this not a standard feature of the
+> > > > IP? Is there no hardware bit indicating the capability?
+> > > > 
+> > > 
+> > > WOL via both ARP and Magic packet is supported by the IP version on ZU+ and
+> > > Versal. However, user can choose which type of packet to recognize as a WOL
+> > > event - magic packet or ARP.
+> > 
+> > ethtool says:
+> > 
+> >             wol p|u|m|b|a|g|s|f|d...
+> >                    Sets Wake-on-LAN options.  Not all devices support this.  The argument to this  option  is  a
+> >                    string of characters specifying which options to enable.
+> >                    p   Wake on PHY activity
+> >                    u   Wake on unicast messages
+> >                    m   Wake on multicast messages
+> >                    b   Wake on broadcast messages
+> >                    a   Wake on ARP
+> >                    g   Wake on MagicPacket™
+> >                    s   Enable SecureOn™ password for MagicPacket™
+> >                    f   Wake on filter(s)
+> >                    d   Disable  (wake  on  nothing).  This option
+> >                        clears all previous options.
+> > 
+> > So why do we need a DT property?
+> > 
+> 
+> The earlier implementation of WOL (magic-packet) was using DT property.
+> We added one more packet type using DT property to be in-line with the
+> earlier implementation.
+
+I can understand that. It also suggests we did a bad job reviewing
+that patch, and should of rejected it. But it was added a long time
+ago, and we were less strict back then.
+
+> 
+> However, I echo with you that this feature should be in driver (CAPS).
+> We will re-work the implementation with the below flow:
+> 
+> - Add MACB_CAPS_WOL capability to the supported platforms
+> - Advertise supported WOL packet types based on the CAPS in ethtool.
+> - Users can set packet type using ethtool.
+
+Yes, this sounds good. Maybe add to that, mark magic-packet
+deprecated, and a comment that ethtool should be used instead.
+
+Thanks
+	Andrew
 
