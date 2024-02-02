@@ -1,128 +1,114 @@
-Return-Path: <netdev+bounces-68437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6026C846F0C
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:37:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13C7E846F24
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:40:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B44A61F27F9B
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:37:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E23BFB29862
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:39:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50A6960DF2;
-	Fri,  2 Feb 2024 11:37:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9337C13EFE1;
+	Fri,  2 Feb 2024 11:38:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eY/NHH/S"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cua/KP5x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01BA4BAB5
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 11:37:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F28DE13E23B
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 11:38:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706873842; cv=none; b=l8s+DYxOej9dVQsGzdqn8dP3jZuuzTwFik9uOHJyXBb1duZxNQaQ42WnYpmoWaNqMwtIwyTC9AE9QcnfP4JkrEyLP+fDivwgU4Wx0rInRHo12MdhlMAgQoi+9SlJV4JU7amm0+6FUBdsRAgnkJ+5zGgz6OpuCuaNQuAIE3shtmU=
+	t=1706873936; cv=none; b=fEOixKVtMdYgmV9H42TVMV+BigujHdqvq9+jmpWlZvwAFQMDFhlFT9S1aORsGy84Ladslu6t2e5YGb2czefmOh3mtnM5i2SloDwGpNUsfYAeffp5L0RUNyBnEPo0OsN5IxG3T1LgEe3hvTZyBqaiKONpTKMiJ9K9Ht5IrfNy3U0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706873842; c=relaxed/simple;
-	bh=5ITX4M7NNZhMdZOhdloezK66zkwOnZYHAPoJGwc6d04=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rMJFAI52v2u5VmxqcXPsPhNa8vPDzZHc2zYCEUPp5ahNbcCAe4qC5SIZiXtb+/e7+onHJg51jhHSV8PyZAmeD+iFM6aqdtIWzyxt04xEnPaPgyOKQpkyIsrxpFBqFpE55g2/aCZAmM8R6akPbaU+vkvKQ2Le3EPD2a6T/5vHp0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eY/NHH/S; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-40e7065b7bdso16431305e9.3
-        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 03:37:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706873839; x=1707478639; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=CUXRx/CtdVJ7bTO6O0nWj1rsj5lqnWx/R9lyMFBiJU8=;
-        b=eY/NHH/SjojFPhqEGwfxTI7SOaSsOsX3x01qR8niLzaAJA1yiwz2uNciEqpgU9F98q
-         Ejn0cF+5hUwyJGye7KflOy/uvA1ki9HaEpVrnlwnyfbolYV+55kr/Tz5rzh+g9oETkxD
-         Xcobvy2bHt45ENSjlBnlsyeKXTzyzDtTyo/agSIbngOhj05HGhkjs89QdRyUdJHPznAS
-         bROS1PjDBkGhdBnJDFGddJMC9Pe2/Zl6ZfMJbHWqnbKCtk6xjbqzx/omxB7zsHxhyuqA
-         7vsxy3PcCP2kLBLFdRfmYsnDV2iJ/f2VBqvYZsn7gRDGWsm3QD1rk5wuFAHJyNYEwnzi
-         lZcA==
+	s=arc-20240116; t=1706873936; c=relaxed/simple;
+	bh=4hlLoxgVRubmdsXA/JOtymfDpB123MgdtvEfROpDl+0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Y3XII/ojoQQNTJSl0VuHh5C++TC94/SQ6H4XR2D4e4onYjKiKae+U5aubCgcvmGP0Ch/DTBGcwYq6G6yMGhUtBSFk5qzwPmEQZRCPE3p7Q6lbqDFdjK5CvFyTOkbPsOo1CR4aq8X+fIRnplG+36m5LqID7n9xtNtr3rJXZ4lQqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cua/KP5x; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706873932;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4hlLoxgVRubmdsXA/JOtymfDpB123MgdtvEfROpDl+0=;
+	b=cua/KP5x8g2GZSLNqyXeP5OBBj2V+w008X4v1c1ZDuVO6rTwcv9hHsUvYBAqIzVxNd87A+
+	eXOSbe8yyWNVxYnXixFWgedtghxSaQBI2WoLkXlQTl7HE4S4IuhYyl6gzAYVUihxP/Y/ce
+	WyG7hujBE3KxsOCv/qGMFKERLfoU+wI=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-618-jX945PpkMX6fwMiKUYgymA-1; Fri, 02 Feb 2024 06:38:51 -0500
+X-MC-Unique: jX945PpkMX6fwMiKUYgymA-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-a358c652e42so118875966b.3
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 03:38:51 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706873839; x=1707478639;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CUXRx/CtdVJ7bTO6O0nWj1rsj5lqnWx/R9lyMFBiJU8=;
-        b=Rc+AbML3nsj2csimYiFQX0ku2puVmvhu+Yb6KAhuu3guy2jVy7Z/FvbLnId7muVuUR
-         u8SHLDWKB8c8YxuujydzZBo2ddmgs0aJlbFt/gKuuCgGNotFCkfPLRjhXfL8C10StNkM
-         7bZg6tOWw5ra8K5d/z3Mh8/uRBAcdrPvxkqLA3zSUsqrzoanliiKFArIfoYTznYdXkyW
-         x+97gkI1t2lNnF9o2OEYfEIwUGslZDKtnfkb57GRTWpLYmM8CsllcvkslFeMGZVjQd8m
-         FiEpmdvv4q9VUAy3Gbwe46mJTD6rCWVYfBZFGTpJEa3QtbtwcHzYBeP66sRsDuFCn/S2
-         za7Q==
-X-Gm-Message-State: AOJu0YzeD4kqPlRK02CFAzxu81lLB47hX13sX9gzQSy/Khx00nS8vt0D
-	8xBoQ5uCJ8ixjdLO6+PEmo2nhCtPMh3aSZTkR0KVAU6WAq7TnokG
-X-Google-Smtp-Source: AGHT+IFXOaX9hS5UhHFYRl4fooKM4y65Auo0ymzOHSlZKHqD2ha3wa7P75W8fiw17AHpd706oxrNkg==
-X-Received: by 2002:a05:600c:1d19:b0:40f:afc8:ac6b with SMTP id l25-20020a05600c1d1900b0040fafc8ac6bmr3594910wms.6.1706873838627;
-        Fri, 02 Feb 2024 03:37:18 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXraUY2iH95X+Vbx4mlcLHS3HBR73qkXHXcrmPUUv9r5Sl1Rt0Ag67TTUXpNfijmGEbMop8WixqO4a1qBq7vcoeG/q0gYnSmpx2pyyIR8p8OuFeV7dfGJXBZVix8QVQteZ7eskKqYVpH2fgKYAgOsft8h1usAYj3xEeRVi5nM3sB8gnvy/FeqK7KaIzKmcKfVskNd3SPjlgCMxu7CIBqJ45BoRwbdvPzJ7K2Zob63XVagsinlv+4AgE34YH/xTw1cp5dXhDJMEXQ/mvdOhcbFtZPZxTcRrSUaUwvEXsyZPiA1+aaoUNNKnDTKBMgxfzgQ==
-Received: from ?IPV6:2001:b07:646f:4a4d:e17a:bd08:d035:d8c2? ([2001:b07:646f:4a4d:e17a:bd08:d035:d8c2])
-        by smtp.gmail.com with ESMTPSA id u13-20020a05600c00cd00b0040f02114906sm7069152wmm.16.2024.02.02.03.37.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Feb 2024 03:37:18 -0800 (PST)
-Message-ID: <2b3ec0f1-303d-4e0c-92de-5d0430470c33@gmail.com>
-Date: Fri, 2 Feb 2024 12:38:11 +0100
+        d=1e100.net; s=20230601; t=1706873930; x=1707478730;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4hlLoxgVRubmdsXA/JOtymfDpB123MgdtvEfROpDl+0=;
+        b=M4UyIiV1bmpgmzFFhlWSmX6cB1nOKcAy/TJa+YihDMuJTkHg2nOY02ac4bSGp/tAJV
+         tsyU9JMSEWCaMAi7KwyyUaR5Zg/kOdm23Yy6zAQpWdKWKGjBQO72nGOTol/cW62cCbru
+         0uO2pvOl1UmDWHnskv2zon6dkbx/JJWjyvgvLytzO1QRYRsxb4ghR2W3xNLBhHvmzl51
+         M6E3Ua3/nejvz1VhWX4f+hP7v820If/TytMnYhMXaOdDQwz4UYF54RWTbE7iY6O7XQPa
+         B+Nn6SsYQmJM0YRsSS6tf/QsctsrBO1wDxtPM9G5TmMspw+UUtjToEdbwTuo/VWyEtxh
+         Feuw==
+X-Gm-Message-State: AOJu0YxQyWIvYJEclT4WmAsVnLovYPdjA/gaI+sHJKrDyIFB3HP1BMy9
+	Fr8fLN3cOt7JlypDcDtmbWZEv8nsuPIQktV59ula+UA/OCbxrBUhsAIyw19u0UhQ/PnMcndPiuw
+	VB0HzklpoWOBv317GNgk2ewbXMXiXI51KMgU2BNB3XMT4Mp75JJaP1g==
+X-Received: by 2002:a17:906:15d8:b0:a31:f7e:8a53 with SMTP id l24-20020a17090615d800b00a310f7e8a53mr1343355ejd.26.1706873930320;
+        Fri, 02 Feb 2024 03:38:50 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGxEAJunAEUW/L3MFJKR31vN1MxxW5woPZmhc5v2fwcaBQ9f38xfilE5aVLH0gmvNqQ5Q13ng==
+X-Received: by 2002:a17:906:15d8:b0:a31:f7e:8a53 with SMTP id l24-20020a17090615d800b00a310f7e8a53mr1343337ejd.26.1706873929992;
+        Fri, 02 Feb 2024 03:38:49 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCX4/KG5Hy4D3W6/JBc0krwsLJY4D1i5j/cUA45VUdQFA8tENeMlpGHHU4/BGh8Doavma3fd6YuLy5krCvfSam1MQ6ieOolQu31kz+w9bOzMqgjjnOlS0WV98FTdIi7yI8uWyKkMfjmvKvhQcHI/ZvK86lCXe8ysA3qsQ+lJzdfh2CqUqUMaEdsKpEohirM+xL1Jru5nbR6kqL74hPuFynzdwyWuG8ySqcZbd14/2hfZUQRv71G34cZYhzRn2AQbUKx+2/Fld43qEetm7suF6p19LacOzQIMf+TsvrxrAGb3K513ShimALlA1LNZW/P3WYRqW+FbmC3Zi1gijZ5O6l/8BlI1GzBr5kUZMyzPxX6x1ZjB6fOdMscxhRRksaZ+fU/p1hgRxa12b802vyYGGkg8unF7ahM=
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id p4-20020a17090628c400b00a360239f006sm792261ejd.37.2024.02.02.03.38.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Feb 2024 03:38:49 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id CD464108A835; Fri,  2 Feb 2024 12:38:48 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org
+Cc: lorenzo.bianconi@redhat.com, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, bpf@vger.kernel.org,
+ willemdebruijn.kernel@gmail.com, jasowang@redhat.com, sdf@google.com,
+ hawk@kernel.org, ilias.apalodimas@linaro.org, linyunsheng@huawei.com
+Subject: Re: [PATCH v7 net-next 1/4] net: add generic percpu page_pool
+ allocator
+In-Reply-To: <1d34b717f8f842b9c3e9f70f0e8ffd245a5d2460.1706861261.git.lorenzo@kernel.org>
+References: <cover.1706861261.git.lorenzo@kernel.org>
+ <1d34b717f8f842b9c3e9f70f0e8ffd245a5d2460.1706861261.git.lorenzo@kernel.org>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Fri, 02 Feb 2024 12:38:48 +0100
+Message-ID: <87v877xfhz.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net-next 3/3] tools: ynl: add support for encoding
- multi-attr
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- donald.hunter@gmail.com, sdf@google.com, chuck.lever@oracle.com,
- lorenzo@kernel.org, jacob.e.keller@intel.com, jiri@resnulli.us,
- netdev@vger.kernel.org
-References: <cover.1706800192.git.alessandromarcolini99@gmail.com>
- <9644d866cbc6449525144fb3c679e877c427afce.1706800192.git.alessandromarcolini99@gmail.com>
- <20240201172431.2f68dacb@kernel.org>
-Content-Language: en-US
-From: Alessandro Marcolini <alessandromarcolini99@gmail.com>
-In-Reply-To: <20240201172431.2f68dacb@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On 2/2/24 02:24, Jakub Kicinski wrote:
-> I think you're trying to handle this at the wrong level. The main
-> message can also contain multi-attr, so looping inside nests won't
-> cut it.
+Lorenzo Bianconi <lorenzo@kernel.org> writes:
+
+> Introduce generic percpu page_pools allocator.
+> Moreover add page_pool_create_percpu() and cpuid filed in page_pool struct
+> in order to recycle the page in the page_pool "hot" cache if
+> napi_pp_put_page() is running on the same cpu.
+> This is a preliminary patch to add xdp multi-buff support for xdp running
+> in generic mode.
 >
-> Early in the function check if attr.is_multi and isinstance(value,
-> list), and if so do:
->
-> 	attr_payload = b''
-> 	for subvalue in value:
-> 		attr_payload += self._add_attr(space, name, subvalue,
-> 					       search_attrs) 
-> 	return attr_payload
->
-> IOW all you need to do is recursively call _add_attr() with the
-> subvalues stripped. You don't have to descend into a nest.
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-I (wrongly) supposed that multi-attr attributes were always inside a nest (that's because I've only experimented with the tc spec). That's also because I (mistakenly, again) thought that the syntax for specifying a multi-attr would be:
-"parent-attr":[{multi-attr:{values}}, {multi-attr: {values}}, ... ]
-Instead of:
-"optional-parent-attr": {"multi-attr": [{values in multi-attr}, ...]}
-
-By reading the docs [1]:
-"multi-attr (arrays)
-Boolean property signifying that the attribute may be present multiple times. Allowing an attribute to repeat is the recommended way of implementing arrays (no extra nesting)."
-
-I understood that the syntax should be the former (I was thinking of an array containing all the multi-attr attributes, and not only their values), albeit really verbose and not that readable.
-
-I've now made the changes as you suggested and tested it, it works as expected!
-I'll post a v3 soon, thanks for your review :)
-
-[1] https://docs.kernel.org/userspace-api/netlink/specs.html#multi-attr-arrays
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
 
