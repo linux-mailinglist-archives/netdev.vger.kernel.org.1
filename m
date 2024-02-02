@@ -1,141 +1,106 @@
-Return-Path: <netdev+bounces-68509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 746CB8470CD
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 14:04:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D64B08470E1
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 14:13:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F8EF2869E2
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:04:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 143261C245FD
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:13:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C01433D8F;
-	Fri,  2 Feb 2024 13:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17271755A;
+	Fri,  2 Feb 2024 13:13:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GWov61Xa"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Q1e9qHZ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9900A40BF2;
-	Fri,  2 Feb 2024 13:04:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A8D4C6A
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 13:12:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706879047; cv=none; b=POTBHa2z0IFeluRkbG73Eq9JV2NMfdkcnG/FL9FW59WiXA6xSFdeDrNMm2A8SHt3e3o6Dxz+SGrAX73CuMi5KRyco5cOPAlbOtbY5A/eMQl6q07SzLq4KNS+GTB3Q1v2k36mSkJ299SFqr8De2OrVVuTrjzH/xGWGgJ2qZADzH4=
+	t=1706879580; cv=none; b=E8TLh+FCXNj7EUpa0yIaxUC0UGw+BxgFn5fVfUZ95SxYl/oZAOzoGSoDKVSZb7/TVfocpcdyEgCc+vkBmD/1ClBKfOA/sKPfIlMA6kyWpCtWDGymx9t+4ITYVX31chETqphj3jr4aNjDcNAoTU/9UvhK/ZlEMvxlLAnZIX8akTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706879047; c=relaxed/simple;
-	bh=sJfAEWjsAZta/5Hz8HZlZF6BluB71hiZTGWU2kv4FZ4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Xblp8mpV11LkRpN+jixoxyiOP9JD7eL+JuL7V1n75jJ3GdvxolNL/BxCLhd+6lgJp/2VyRP3BO6BnQOuyI/WgPuvQxFdgiMcNXXBW//XH9g4dhCeuCBUMKfMJNRuqAe1Hwm3o5jJZBrKRrvF3OtGfsTdNo1VqP9djf13kfGwhc4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GWov61Xa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85733C433F1;
-	Fri,  2 Feb 2024 13:04:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706879047;
-	bh=sJfAEWjsAZta/5Hz8HZlZF6BluB71hiZTGWU2kv4FZ4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=GWov61XaezU5B5NhZDeqObu4dQW+TYXv1GWbezkW4ht3a1uRQNnsaMzXqEbXpqFnX
-	 5q2PIKOGqiKTAO2uZFcen2/jaGc+Ranl8uZYNGOs6+U40APcnxtR04Z9U0FSNITy1/
-	 EUXGDgwjwPKBXXx3rGWYfdiIg2LI1sFt9jJiAtSY1jayFExR7OCboy8dlMcMhsl9It
-	 WfEsRIROz5vNouOVje6g5aYMU93tH0pl1zq8tEZZmAhokow3RwBqJxmEph41aRy1G/
-	 nQrpVpP4CaxD11x9+kCtE1grJ6HX3m42lbdjUL7nFsRSk6g7WN09VrGZM0sc0DzaO9
-	 pN8duy7KEryyw==
-From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
- linux-riscv@lists.infradead.org, netdev@vger.kernel.org
-Cc: Song Liu <song@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Yonghong Song <yhs@fb.com>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Luke Nelson
- <luke.r.nels@gmail.com>, Pu Lehui <pulehui@huawei.com>
-Subject: Re: [PATCH bpf-next v2 4/4] riscv, bpf: Mixing bpf2bpf and tailcalls
-In-Reply-To: <160aaa6f-7efb-4a29-ab6f-dcf938d3419f@huaweicloud.com>
-References: <20240130040958.230673-1-pulehui@huaweicloud.com>
- <20240130040958.230673-5-pulehui@huaweicloud.com>
- <87sf2eohj2.fsf@all.your.base.are.belong.to.us>
- <fab22b9e-7b56-4fef-ba92-bf62ec43007d@huaweicloud.com>
- <878r44mr4g.fsf@all.your.base.are.belong.to.us>
- <93209b12-9117-484a-908a-5b138fa2ffb0@huaweicloud.com>
- <87jznowbmf.fsf@all.your.base.are.belong.to.us>
- <160aaa6f-7efb-4a29-ab6f-dcf938d3419f@huaweicloud.com>
-Date: Fri, 02 Feb 2024 14:04:04 +0100
-Message-ID: <87wmrnhvaz.fsf@all.your.base.are.belong.to.us>
+	s=arc-20240116; t=1706879580; c=relaxed/simple;
+	bh=io0NICBVfwnZnXbztPakR2EeUsIODAVoIUHlXCkSjCA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=moY7mFpMZTlTZez8iKR5I7b+2it2neODjSdw7VVXb8XLtQ8+Je/Zp6yPZfI0+rJFPPdZJLNR+pXnAaI4TScHmMkZ5ZuGOKxd1dHdOlHCJT67NBWTg/MPfEdJZOGGB3mEXDvH89+M5QYPU1gz2H3rSk97im4EfJhKKVQXgO0BIYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Q1e9qHZ1; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=s3zsPgcNqiCwE5EkeatYq7+XQt9oayC0AQ4nOZKOK00=; b=Q1e9qHZ1KpjjOn9Pjqa+r0Uc7H
+	NNmKHk2cZgswflZDRbGazZl70B2kCAqU16W/rtyqTELhAIOBIgb9wj7IGjaHzuPDwlx4C6/d0Yx99
+	BwNgxJF7MuojqNpWumtgZNx09pXRAxm+lX5VU52mflbGsIgap1Fm1vo6NoHGNr1xS5iE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rVtLR-006mey-Fg; Fri, 02 Feb 2024 14:12:37 +0100
+Date: Fri, 2 Feb 2024 14:12:37 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH RESUBMIT net-next] r8169: simplify EEE handling
+Message-ID: <219c3309-e676-48e0-9a24-e03332b7b7b4@lunn.ch>
+References: <27c336a8-ea47-483d-815b-02c45ae41da2@gmail.com>
+ <d5d18109-e882-43cd-b0e5-a91ffffa7fed@lunn.ch>
+ <be436811-af21-4c8e-9298-69706e6895df@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <be436811-af21-4c8e-9298-69706e6895df@gmail.com>
 
-Pu Lehui <pulehui@huaweicloud.com> writes:
+On Fri, Feb 02, 2024 at 07:55:38AM +0100, Heiner Kallweit wrote:
+> On 02.02.2024 01:16, Andrew Lunn wrote:
+> >> @@ -5058,7 +5033,9 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
+> >>  	}
+> >>  
+> >>  	tp->phydev->mac_managed_pm = true;
+> >> -
+> >> +	if (rtl_supports_eee(tp))
+> >> +		linkmode_copy(tp->phydev->advertising_eee,
+> >> +			      tp->phydev->supported_eee);
+> > 
+> > This looks odd. Does it mean something is missing on phylib?
+> > 
+> Reason is that we treat "normal" advertising and EEE advertising differently
+> in phylib. See this code snippet from phy_probe().
+> 
+>         phy_advertise_supported(phydev);
+>         /* Get PHY default EEE advertising modes and handle them as potentially
+>          * safe initial configuration.
+>          */
+>         err = genphy_c45_read_eee_adv(phydev, phydev->advertising_eee);
+> 
+> For EEE we don't change the initial advertising to what's supported,
+> but preserve the EEE advertising at the time of phy probing.
+> So if I want to mimic the behavior of phy_advertise_supported() for EEE,
+> I have to populate advertising_eee in the driver.
 
-> On 2024/2/1 21:35, Bj=C3=B6rn T=C3=B6pel wrote:
->> Pu Lehui <pulehui@huaweicloud.com> writes:
->>=20
->>> On 2024/2/1 18:10, Bj=C3=B6rn T=C3=B6pel wrote:
->>>> Pu Lehui <pulehui@huaweicloud.com> writes:
->>>>
->>>>>>> @@ -252,10 +220,7 @@ static void __build_epilogue(bool is_tail_call=
-, struct rv_jit_context *ctx)
->>>>>>>     		emit_ld(RV_REG_S5, store_offset, RV_REG_SP, ctx);
->>>>>>>     		store_offset -=3D 8;
->>>>>>>     	}
->>>>>>> -	if (seen_reg(RV_REG_S6, ctx)) {
->>>>>>> -		emit_ld(RV_REG_S6, store_offset, RV_REG_SP, ctx);
->>>>>>> -		store_offset -=3D 8;
->>>>>>> -	}
->>>>>>> +	emit_ld(RV_REG_TCC, store_offset, RV_REG_SP, ctx);
->>>>>>
->>>>>> Why do you need to restore RV_REG_TCC? We're passing RV_REG_TCC (a6)=
- as
->>>>>> an argument at all call-sites, and for tailcalls we're loading from =
-the
->>>>>> stack.
->>>>>>
->>>>>> Is this to fake the a6 argument for the tail-call? If so, it's bette=
-r to
->>>>>> move it to emit_bpf_tail_call(), instead of letting all programs pay=
- for
->>>>>> it.
->>>>>
->>>>> Yes, we can remove this duplicate load. will do that at next version.
->>>>
->>>> Hmm, no remove, but *move* right? Otherwise a6 can contain gargabe on
->>>> entering the tailcall?
->>>>
->>>> Move it before __emit_epilogue() in the tailcall, no?
->>>>
->>>
->>> IIUC, we don't need to load it again. In emit_bpf_tail_call function, we
->>> load TCC from stack to A6, A6--, then store A6 back to stack. Then
->>> unwind the current stack and jump to target bpf prog, during this
->>> period, we did not touch the A6 register, do we still need to load it a=
-gain?
->>=20
->> a6 has to be populated prior each call -- including tailcalls. An
->> example, how it can break:
->>=20
->> main_prog() -> prologue (a6 :=3D 0; push a6) -> bpf_helper() (random
->> kernel path that clobbers a6) -> tailcall(foo()) (unwinds stack, enters
->
-> It's OK to clobbers A6 reg for helper/kfunc call, because we will load=20
-> TCC from stack to A6 reg before jump to tailcall target prog. In=20
-> addition, I found that we can remove the store A6 back to stack command=20
-> from the tailcall process. I try to describe the process involved:
+So the device you are using is advertising less than what it supports?
 
-Indeed! tailcall *is* already populating a6, and yes, the store can be
-omitted. Nice!
+> Alternative would be to change phy_advertise_supported(), but this may
+> impact systems with PHY's with EEE flaws.
 
-Now, we still have the bug Alexei described, so until there's a
-fix/workaround, this series can't be merged.
+If i remember correctly, there was some worry enabling EEE by default
+could upset some low latency use cases, PTP accuracy etc. So lets
+leave it as it is. Maybe a helper would be useful
+phy_advertise_eee_all() with a comment about why it could be used.
 
-
-Cheers,
-Bj=C3=B6rn
+	Andrew
 
