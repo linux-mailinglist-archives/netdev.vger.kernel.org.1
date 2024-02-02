@@ -1,105 +1,193 @@
-Return-Path: <netdev+bounces-68520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35FD484711F
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 14:27:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E648847126
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 14:28:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E413628B754
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:27:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B26AE28E202
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:28:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A8B45C07;
-	Fri,  2 Feb 2024 13:27:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3736E4644E;
+	Fri,  2 Feb 2024 13:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="YdXu3aCa"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XFSArmQm";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="+KZX5wHl";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XFSArmQm";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="+KZX5wHl"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05A58442E
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 13:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EAF345C07
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 13:28:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706880467; cv=none; b=H0eXv9czZ3LrNg3emj58S/8LtEt80ysYdYe6pdjU5h2TPi0uNwhzc4pOL/FJ1TrvBS8T/cGRv+t42c3ugRYugoz6FRAxGFV5k1hW8C6EJY7oWd2QSbQq41poXMdbMYczdkBGN9aYp7ZjFwJKQ8SQp4+ktcBgRcFJLMFKiNcoMsU=
+	t=1706880533; cv=none; b=mGdnakdrjYZy7a58H+hIPGg7/uP9U/t3857bfWUWo9uHQNdWwzjAqgfEkzKAZr1aZ13tx2susjG0pjc9KLrr8pxPxqRTqXBTK27s2GyWvKFgZHjRuSeF7xy6KXjopQJYZHYfC56WU3CQjeAMXtB4GV5wNZj8SolOEW2f5hSkBCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706880467; c=relaxed/simple;
-	bh=TEEsuWm23/DxzqCBNhOeZsY5ROgu/GXMI2ypw8OGtO0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dTpEHdUxf0wPrHPnYoCUVbSgIzoIyK0qo47wFXKmtQ1+tfVo2UcdZUj301J8VVWihtg6taBJDgELUtLo6Suspf/JDD5KC8bFQTmXBHkayUwvDGNwunN0KHdsE3cUCoePLOmHpeh6rw4/Mp4wMaZQImcKz3qtiFXpAj4hnq/i6hg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=YdXu3aCa; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=CZ96REXPzgbv1rKB/gQ+nMDSX6HLKmttay56kD5KHLc=; b=YdXu3aCa2E9/AFs1Pll0plKcki
-	vnG615A/ug4wDtAwALJaiOKdgjIz8XnVrQ4avj0Mr5vBuU2Uatp3u2nM8jiWH2Oy+xYgmt8/TC/pQ
-	fYn5U02d8aSAmKeSpYvqwT3IqpyHVpruZotKmU0qN9S31fvyLzdn5S9dBdPBru9e2yLQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rVtZv-006moX-7z; Fri, 02 Feb 2024 14:27:35 +0100
-Date: Fri, 2 Feb 2024 14:27:35 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	bcm-kernel-feedback-list@broadcom.com,
-	Byungho An <bh74.an@samsung.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Doug Berger <opendmb@gmail.com>, Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	Justin Chen <justin.chen@broadcom.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	NXP Linux Team <linux-imx@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Vladimir Oltean <olteanv@gmail.com>, Wei Fang <wei.fang@nxp.com>
-Subject: Re: [PATCH net-next 6/6] net: dsa: b53: remove
- eee_enabled/eee_active in b53_get_mac_eee()
-Message-ID: <d989588f-d92a-45aa-baec-a9d616ddd11a@lunn.ch>
-References: <Zby24IKSgzpvRDNF@shell.armlinux.org.uk>
- <E1rVpw2-002PeJ-Bh@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1706880533; c=relaxed/simple;
+	bh=xjDHb/nl37vfEOTHGO2vmnqCzsnrEDBY/Rf1/nL4rog=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qPhz1l3pKLmUquXSHi8xdGij7nyoIFU/jYUv9ABSFTaSe1XG1MlVJEcRp6/qGPRf3EmX5BhqDy/DCwdalToWA4gyA1lT3HX3aXGIkIXGMDfa9KDFx3Uwe1kNgCQ/BIkTld1yELq/VKN+KuZOdmKmAk/4t5jDZJ48HchiVs8ryzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XFSArmQm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=+KZX5wHl; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XFSArmQm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=+KZX5wHl; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id B37671F78A;
+	Fri,  2 Feb 2024 13:28:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1706880529; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=i9/C1p7haXcEz+iJb96LprsTgumnZH4E464AtrJ4rLw=;
+	b=XFSArmQmU3ICb8xXeEgX8mjxlq4wsNbEZSZnrw7DtcqVxah/NSdYHQww3bekCULxeNWqiC
+	bCuYz4cm7wii04yVZWs/VJj7rmFQ1n6L5Sdn7l631alcEalpeTEwzMVx+gIpg/+OtRY1bI
+	6nw44TsYXIg9B9dE4rvA5bDYIg7dzOQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1706880529;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=i9/C1p7haXcEz+iJb96LprsTgumnZH4E464AtrJ4rLw=;
+	b=+KZX5wHlw+JI0TPkauJ/ycNZp9Q50mwEZpJI+itSVsu6BhcaJuQqyXqnrVR9jRvU+kOHGD
+	R46Da5eGMd3+EADw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1706880529; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=i9/C1p7haXcEz+iJb96LprsTgumnZH4E464AtrJ4rLw=;
+	b=XFSArmQmU3ICb8xXeEgX8mjxlq4wsNbEZSZnrw7DtcqVxah/NSdYHQww3bekCULxeNWqiC
+	bCuYz4cm7wii04yVZWs/VJj7rmFQ1n6L5Sdn7l631alcEalpeTEwzMVx+gIpg/+OtRY1bI
+	6nw44TsYXIg9B9dE4rvA5bDYIg7dzOQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1706880529;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=i9/C1p7haXcEz+iJb96LprsTgumnZH4E464AtrJ4rLw=;
+	b=+KZX5wHlw+JI0TPkauJ/ycNZp9Q50mwEZpJI+itSVsu6BhcaJuQqyXqnrVR9jRvU+kOHGD
+	R46Da5eGMd3+EADw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6ACEE139AB;
+	Fri,  2 Feb 2024 13:28:49 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 68X2FhHuvGUFEQAAD6G6ig
+	(envelope-from <dkirjanov@suse.de>); Fri, 02 Feb 2024 13:28:49 +0000
+Message-ID: <631a90a4-24fb-48a5-b533-131042751821@suse.de>
+Date: Fri, 2 Feb 2024 16:28:48 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1rVpw2-002PeJ-Bh@rmk-PC.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2] ifstat: convert sprintf to snprintf
+Content-Language: en-US
+To: David Laight <David.Laight@ACULAB.COM>,
+ 'Stephen Hemminger' <stephen@networkplumber.org>,
+ Denis Kirjanov <kirjanov@gmail.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20240131124107.1428-1-dkirjanov@suse.de>
+ <20240131081418.72770d85@hermes.local>
+ <913e0c6bb6114fdfaa74073fc8b6c2ee@AcuMS.aculab.com>
+ <5fa65887-1f56-4470-bc99-383fe7e3f47b@suse.de>
+ <d2e9ab2c4df04f0e8f12b623366123eb@AcuMS.aculab.com>
+From: Denis Kirjanov <dkirjanov@suse.de>
+In-Reply-To: <d2e9ab2c4df04f0e8f12b623366123eb@AcuMS.aculab.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=XFSArmQm;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=+KZX5wHl
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-3.60 / 50.00];
+	 TO_DN_EQ_ADDR_SOME(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	 TO_DN_SOME(0.00)[];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_TRACE(0.00)[suse.de:+];
+	 MX_GOOD(-0.01)[];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 FREEMAIL_TO(0.00)[ACULAB.COM,networkplumber.org,gmail.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 BAYES_HAM(-0.10)[65.36%];
+	 MID_RHS_MATCH_FROM(0.00)[];
+	 ARC_NA(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 FROM_HAS_DN(0.00)[];
+	 RCPT_COUNT_THREE(0.00)[4];
+	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 DWL_DNSWL_MED(-2.00)[suse.de:dkim];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 RCVD_TLS_ALL(0.00)[]
+X-Spam-Score: -3.60
+X-Rspamd-Queue-Id: B37671F78A
+X-Spam-Flag: NO
 
-On Fri, Feb 02, 2024 at 09:34:10AM +0000, Russell King (Oracle) wrote:
-> b53_get_mac_eee() sets both eee_enabled and eee_active, and then
-> returns zero.
-> 
-> dsa_slave_get_eee(), which calls this function, will then continue to
-> call phylink_ethtool_get_eee(), which will return -EOPNOTSUPP if there
-> is no PHY present, otherwise calling phy_ethtool_get_eee() which in
-> turn will call genphy_c45_ethtool_get_eee().
-> 
-> genphy_c45_ethtool_get_eee() will overwrite eee_enabled and eee_active
-> with its own interpretation from the PHYs settings and negotiation
-> result.
-> 
-> Thus, when there is no PHY, dsa_slave_get_eee() will fail with
-> -EOPNOTSUPP, meaning eee_enabled and eee_active will not be returned to
-> userspace. When there is a PHY, eee_enabled and eee_active will be
-> overwritten by phylib, making the setting of these members in
-> b53_get_mac_eee() entirely unnecessary.
-> 
-> Remove this code, thus simplifying b53_get_mac_eee().
-> 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-    Andrew
+On 2/2/24 16:02, David Laight wrote:
+> From: Denis Kirjanov
+>> Sent: 02 February 2024 12:24
+>>
+>> On 2/2/24 14:32, David Laight wrote:
+>>> From: Stephen Hemminger
+>>>> Sent: 31 January 2024 16:14
+>>>
+>>>>
+>>>> On Wed, 31 Jan 2024 07:41:07 -0500
+>>>> Denis Kirjanov <kirjanov@gmail.com> wrote:
+>>>>
+>>>>> @@ -893,7 +893,7 @@ int main(int argc, char *argv[])
+>>>>>
+>>>>>  	sun.sun_family = AF_UNIX;
+>>>>>  	sun.sun_path[0] = 0;
+>>>>> -	sprintf(sun.sun_path+1, "ifstat%d", getuid());
+>>>>> +	snprintf(sun.sun_path+1, sizeof(sun.sun_path), "ifstat%d", getuid());
+>>>>
+>>>> If you are changing the line, please add spaces around plus sign
+>>>
+>>> Isn't the size also wrong - needs a matching '- 1'.
+>>
+>> I don't think it's wrong, it's just the size of the target buffer which is
+>> UNIX_PATH_MAX bytes.
+> 
+> But you are starting one byte in.
+> So, if the size were 8 the '\0' would be written after the end.
+yep, you're right
+> 
+> Also, to avoid the next patch in a few weeks it should be
+> calling scnprintf().
+I'll post the next version
+
+
+> 
+> 	David
+> 
+> -
+> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+> Registration No: 1397386 (Wales)
 
