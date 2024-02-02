@@ -1,120 +1,167 @@
-Return-Path: <netdev+bounces-68367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E60B846B9F
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 10:12:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38156846BB3
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 10:19:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62A1728499A
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:12:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 679D21C2569B
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56F2E7763A;
-	Fri,  2 Feb 2024 09:12:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC1F77641;
+	Fri,  2 Feb 2024 09:19:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="TxRDHImx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ARsrl0lh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mslow1.mail.gandi.net (mslow1.mail.gandi.net [217.70.178.240])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED661768E6;
-	Fri,  2 Feb 2024 09:12:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.240
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22A8C604DD;
+	Fri,  2 Feb 2024 09:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706865141; cv=none; b=NG49GrUUca0qrYEG9e00DsHuCIgmN9FJijnmUSEJNskw0tjnd+BiZ4zfWGrO3Oc5zfMKAmAboFxKpRYnx+0tC1Y8QXYClGh5Se1IC1PDQIzm99tuUgd4HOzLapHFDpWm6ZXoIZWOH8yOp9Qn79ZjkLYBdGkIrTovhc2zhM6SmVk=
+	t=1706865573; cv=none; b=NCvlA0Yj64xLTExZ0Eb342FEA72N+dCh755PDQIW0Qf6uoRMU5BdablEvqxw9XOMvpd9n6vyG8wPXGJ3QbCmKfLcTkKBVhX6Y0k1WmiGUQyaaPKfvQVLyGtVUKP6g9rnTx9uVAdUzvZjGuGYaf2BMWovS3hdM3sNqMZ1sTM/SzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706865141; c=relaxed/simple;
-	bh=mKbj4nrp4DysHu5ieaVdYJT9MXIIya9/e61lxx3xm20=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q3NqJO03e17sOCxNl8AIWGknb9Vq2gcH2HTjRsxQ2Bqib+BwRAOya03Fd4T2bw3L50YIU9I3GDcoCbT9rfRGGZjs8JZvHmxqW6j2wJ/z2FE4OIEaouBy5+Vtbmn0Tzd1w5vkIIhlxnI3n+Z9dA291rTQz0gQ/rw8FrmhsZsFa9M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=TxRDHImx; arc=none smtp.client-ip=217.70.178.240
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: from relay7-d.mail.gandi.net (unknown [IPv6:2001:4b98:dc4:8::227])
-	by mslow1.mail.gandi.net (Postfix) with ESMTP id 7CCF6C4EBC;
-	Fri,  2 Feb 2024 09:11:47 +0000 (UTC)
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6671420011;
-	Fri,  2 Feb 2024 09:11:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1706865105;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Y1NoW9zhjmqcQuUi6KkawAZpHX7sdUmwFKBiyO/7PKA=;
-	b=TxRDHImxBW1jNI5WVNtiHiElYu6N+plp8XivTZ6hMBaX315Na0NYYCaDzb66WoE7Cllpb4
-	ru8QC2pbYn+6vFyUANVu4eby5xhX3DrlOAzs3PJQy66gwpVnCp8pqMtI5RCYO83Bl9CPHM
-	7DlGNwhhEwwi5oBsuaGeqAtiAq0yPmOfeug6FBlujbTRFrzrs6j50z5TNOmVmdUH+BNATZ
-	DR6FygpLkPFRWJGxxLg0sTl2eJ4zUBjADblDxwLXOT4FR6bv+eR6P5Xt/ouJbQ5RmbKoez
-	/0K0bQ/uTyBgEZN/MO8qc4GnT6J+xg6AYPPOmr3HEMzU+rVvcSskEvG/+h/JXA==
-Message-ID: <1f0e67ba-edd7-4998-bc20-1de86bd53a68@arinc9.com>
-Date: Fri, 2 Feb 2024 12:11:37 +0300
+	s=arc-20240116; t=1706865573; c=relaxed/simple;
+	bh=xE7EaY+SaLysKQoYh+sK179THKxjITu9cCGTNetAMsE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=sInQt5gHYmV+gh2B1k+kzoESYSdLPS5QtqEOI5RnCfwYTlKkZAp4EaZtbP1NsKvz9WKZ+DHMPGTtwZBXUXAqHyF9mkcxTSPBsraYRwW3jlXlU7zDeVKsXlBkaBN508vJG/vxx4v0/cy5uSM6yP22U1+si7WYmHSpEazmtceiSHY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ARsrl0lh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 93445C433F1;
+	Fri,  2 Feb 2024 09:19:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706865572;
+	bh=xE7EaY+SaLysKQoYh+sK179THKxjITu9cCGTNetAMsE=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=ARsrl0lhmfMY8srMfY2Apt7F5gCb6COauZuUOzfIT7dM37Kwz6IpUpqltZ8gzHeov
+	 wcaI4lKjsglpPmmGoDUuK3BkHJcMlxGokJB9Km9jYEpJowY2pIaGmNgz+GDf9d1h8K
+	 hpnbY864aSunSY+LGEjeHm63Ju8NvyxBUpqY3Wk4NhOHb/J7pGLvpNwWmAcl3siI95
+	 v7lEfaQgAcKdb59XBmyVI7rrczIHON2B6FesHo6fTbQTXxIRkIrGDkRkjdjbVt7ZkD
+	 Q+IT67nSHDi/YIDxmNtdgIovEBpf0xp6/XIjaKsOO5sGCZ+YcP2Z6vUdk5sWiCsi4v
+	 Q3cEHg9LTy8PQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DDEEC47258;
+	Fri,  2 Feb 2024 09:19:32 +0000 (UTC)
+From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= via B4 Relay
+ <devnull+arinc.unal.arinc9.com@kernel.org>
+Subject: [PATCH net-next v3 0/7] MT7530 DSA Subdriver Improvements Act II
+Date: Fri, 02 Feb 2024 12:19:06 +0300
+Message-Id:
+ <20240202-for-netnext-mt7530-improvements-2-v3-0-63d5adae99ca@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net RFC] net: dsa: mt7530: fix link-local frames that
- ingress vlan filtering ports
-To: Vladimir Oltean <olteanv@gmail.com>,
- Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- =?UTF-8?Q?Alvin_=C5=A0ipraga?= <ALSI@bang-olufsen.dk>,
- Frank Wunderlich <frank-w@public-files.de>,
- Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, tools@kernel.org
-References: <65bbf40d.170a0220.a87f4.becdSMTPIN_ADDED_BROKEN@mx.google.com>
- <20240201225943.abphuuavp7bkbrt6@skbuf>
-Content-Language: en-US
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <20240201225943.abphuuavp7bkbrt6@skbuf>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+X-B4-Tracking: v=1; b=H4sIAIqzvGUC/4WOyw6CMBREf8V07SV9UB6u/A/josBFmkhL2tpgC
+ P9urRtduZvJ5MzMRjw6jZ6cDhtxGLXX1iQjjgfST8rcEPSQPOGUl5RxBqN1YDAYXAPMoZaCgp4
+ XZyPOaIIHDl05lqKqWFc2kqSexeGo17xxIQmFN0uuKZm0D9Y983hkOf/sMMEol7wtGipqBgyU0
+ 6YvHkbdz1m2RW/n3BH5F5fO/P8XOVDoFK1GOQwtdvSnct/3F0YuEvsVAQAA
+To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: mithat.guner@xeront.com, erkin.bozoglu@xeront.com, 
+ Bartel Eerdekens <bartel.eerdekens@constell8.be>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, 
+ =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
+X-Mailer: b4 0.12.4
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1706865569; l=2936;
+ i=arinc.unal@arinc9.com; s=arinc9-patatt; h=from:subject:message-id;
+ bh=xE7EaY+SaLysKQoYh+sK179THKxjITu9cCGTNetAMsE=;
+ b=JV8ZrWmbGIpnTvgNTtvg3p3kzLL5SUHQd8O9lRAeQNyXPg1sWhIXmlYwg3DSLhfVQKD8OIosM
+ kHj7L+uTIWyCUcg4d29vb3TG9fjjdE4Vnuhr117r0dDfRVfS/kNcv72
+X-Developer-Key: i=arinc.unal@arinc9.com; a=ed25519;
+ pk=VmvgMWwm73yVIrlyJYvGtnXkQJy9CvbaeEqPQO9Z4kA=
+X-Endpoint-Received:
+ by B4 Relay for arinc.unal@arinc9.com/arinc9-patatt with auth_id=115
+X-Original-From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Reply-To: <arinc.unal@arinc9.com>
 
-On 2.02.2024 01:59, Vladimir Oltean wrote:
-> On Thu, Feb 01, 2024 at 10:13:39PM +0300, Arınç ÜNAL via B4 Relay wrote:
->> base-commit: 4e192be1a225b7b1c4e315a44754312347628859
->> change-id: 20240201-b4-for-net-mt7530-fix-link-local-that-ingress-vlan-filtering-ports-6a2099e7ffb3
->>
->> Best regards,
->> -- 
->> Arınç ÜNAL <arinc.unal@arinc9.com>
-> 
-> You sent this patch 3 times. What happened, b4 didn't work so well?
+Hello!
 
-Odd, I've received only a single email of this patch.
+This is the second patch series with the goal of simplifying the MT7530 DSA
+subdriver and improving support for MT7530, MT7531, and the switch on the
+MT7988 SoC.
 
-Looking at lore.kernel.org, it looks like the b4 web endpoint properly
-submitted the patch to the b4-sent mailing list but for some reason changed
-the Message-Id before submitting it to the netdev mailing list.
+I have done a simple ping test to confirm basic communication on all switch
+ports on MCM and standalone MT7530, and MT7531 switch with this patch
+series applied.
 
-This is the email with what the Message-Id should be, which only exists on
-the b4-sent mailing list:
+MT7621 Unielec, MCM MT7530:
 
-https://lore.kernel.org/all/20240201-b4-for-net-mt7530-fix-link-local-that-ingress-vlan-filtering-ports-v1-1-881c1c96b27f@arinc9.com/
+rgmii-only-gmac0-mt7621-unielec-u7621-06-16m.dtb
+gmac0-and-gmac1-mt7621-unielec-u7621-06-16m.dtb
 
-This is the email with changed Message-Id that was submitted to the netdev
-mailing list:
+tftpboot 0x80008000 mips-uzImage.bin; tftpboot 0x83000000 mips-rootfs.cpio.uboot; tftpboot 0x83f00000 $dtb; bootm 0x80008000 0x83000000 0x83f00000
 
-https://lore.kernel.org/all/=%3Futf-8%3Fq%3F=3C20240201-b4-for-net-mt7530-fix-link-local-that-ingr%3F=%20=%3Futf-8%3Fq%3Fess-vlan-filtering-ports-v1-1-881c1c96b27f=40arinc9=2Ecom=3E%3F=/
+MT7622 Bananapi, MT7531:
 
-There're no brackets enclosing the Message-Id. That must be why Gmail
-modified it with the SMTPIN_ADDED_BROKEN disclaimer added for you. I can't
-come up with a theory as to why you've received it thrice though.
+gmac0-and-gmac1-mt7622-bananapi-bpi-r64.dtb
 
-Konstantin, could you take a look at what happened here?
+tftpboot 0x40000000 arm64-Image; tftpboot 0x45000000 arm64-rootfs.cpio.uboot; tftpboot 0x4a000000 $dtb; booti 0x40000000 0x45000000 0x4a000000
 
-Arınç
+MT7623 Bananapi, standalone MT7530:
+
+rgmii-only-gmac0-mt7623n-bananapi-bpi-r2.dtb
+gmac0-and-gmac1-mt7623n-bananapi-bpi-r2.dtb
+
+tftpboot 0x80008000 arm-zImage; tftpboot 0x83000000 arm-rootfs.cpio.uboot; tftpboot 0x83f00000 $dtb; bootz 0x80008000 0x83000000 0x83f00000
+
+This patch series is the continuation of the patch series linked below.
+
+https://lore.kernel.org/r/20230522121532.86610-1-arinc.unal@arinc9.com
+
+Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+---
+Changes in v3:
+- Update the patches with the latest received trailers.
+- Patch 5
+  - Disable TRGMII clocks for all cases.
+- Link to v2: https://lore.kernel.org/r/20240130-for-netnext-mt7530-improvements-2-v2-0-ba06f5dd9eb0@arinc9.com
+
+Changes in v2:
+- Update the patches with the latest received trailers.
+- Remove 'net: dsa: mt7530: move enabling port 6 to mt7530_setup_port6()'
+  which was patch 5. I will bring a more appropriate change with a later
+  patch series.
+- Patch 5
+  - Set P6_INTF_MODE(0) and explain why on the patch log.
+- Patch 6
+  - Mention the MT7988 document and explain more on the patch log.
+- Patch 7
+  - Explain more on the patch log.
+- Link to v1: https://lore.kernel.org/r/20240113102529.80371-1-arinc.unal@arinc9.com
+
+---
+Arınç ÜNAL (7):
+      net: dsa: mt7530: empty default case on mt7530_setup_port5()
+      net: dsa: mt7530: call port 6 setup from mt7530_mac_config()
+      net: dsa: mt7530: remove pad_setup function pointer
+      net: dsa: mt7530: move XTAL check to mt7530_setup()
+      net: dsa: mt7530: simplify mt7530_setup_port6() and change to void
+      net: dsa: mt7530: correct port capabilities of MT7988
+      net: dsa: mt7530: do not clear config->supported_interfaces
+
+ drivers/net/dsa/mt7530.c | 152 +++++++++++++++++------------------------------
+ drivers/net/dsa/mt7530.h |   3 -
+ 2 files changed, 53 insertions(+), 102 deletions(-)
+---
+base-commit: 4acf4e62cd572b0c806035046b3698f5585ab821
+change-id: 20240121-for-netnext-mt7530-improvements-2-b4f43661b485
+
+Best regards,
+-- 
+Arınç ÜNAL <arinc.unal@arinc9.com>
+
 
