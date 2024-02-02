@@ -1,119 +1,94 @@
-Return-Path: <netdev+bounces-68489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1048884703F
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:26:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBF8A847052
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:30:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 965E9B28527
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:26:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87CFD2944AD
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74C4C1420A1;
-	Fri,  2 Feb 2024 12:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46D5A145B1E;
+	Fri,  2 Feb 2024 12:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nHc5UpRM"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89076145332;
-	Fri,  2 Feb 2024 12:26:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E782F14461A;
+	Fri,  2 Feb 2024 12:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706876790; cv=none; b=KfqnUXZRkZ4Ql5lZVicWpaart1NQHOZ3sNM43+yLOYB/F36DbgZeRFueB/g4HhFJLYET4BrArKAYB8Xvi+JlQTxiTYROaBzzO14PZUZ18ayydYVKcTHvkh8v2tdzbUkRU9KSP1xza8J7wnIrESi3BC03U9H/FAQNH82JG/CmcHI=
+	t=1706877028; cv=none; b=NaOaucKwYVPCpnqyVh2E0+pElLDJU5WdyOx45jJUYajOuKDdWbi7AHX+j/7tFxRsZWa3rhZjpOB5XPA8CNH5OI8LsZvrkFWcn/4jvMNtfSp9tfdNl9Pt0VGRsnR7zECuSl85FYAjTkwm1nVxHbRb3+IGncEEww1u5JXlQPvSdH8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706876790; c=relaxed/simple;
-	bh=zTYvDrC3AI1BUd+WmQeEVA4jrbzOrc/cESq1tDOC62Q=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=n5RrVGdDRibJavPVz8mLOmpCaQsbuhwvrrkx97gU7qoTGLY0L1zM//wiEh9oDXKZk2bh5qeSVrEwcaC38WGn0o+XkwgAmJkubONrvY1OIL/RdoBwW/BmnvJyg9WaOszyoqOTXt/hgWmew4KdM93ZQTMkA8pEzaq1LxhyEu+Uw/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4TRFMH5sspz1Q8XD;
-	Fri,  2 Feb 2024 20:24:27 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 69B37140384;
-	Fri,  2 Feb 2024 20:26:20 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 2 Feb
- 2024 20:26:20 +0800
-Subject: Re: [PATCH net-next v4 2/5] page_frag: unify gfp bits for order 3
- page allocation
-To: Paolo Abeni <pabeni@redhat.com>, <davem@davemloft.net>, <kuba@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Alexander Duyck
-	<alexanderduyck@fb.com>, Alexander Duyck <alexander.duyck@gmail.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet
-	<edumazet@google.com>, <kvm@vger.kernel.org>,
-	<virtualization@lists.linux.dev>, <linux-mm@kvack.org>
-References: <20240130113710.34511-1-linyunsheng@huawei.com>
- <20240130113710.34511-3-linyunsheng@huawei.com>
- <81c37127dda0f2f69a019d67d4420f62c995ee7f.camel@redhat.com>
- <2e8606b1-81c2-6f3f-622c-607db5e90253@huawei.com>
- <868b806f0d6b365334ac79a11a3a1a8a1588cbdf.camel@redhat.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <540b1cbf-da9e-eb9e-08ce-39b7f053652c@huawei.com>
-Date: Fri, 2 Feb 2024 20:26:19 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	s=arc-20240116; t=1706877028; c=relaxed/simple;
+	bh=plRVnWo3cLidU9FUKqA9yG6+oyyfjWE049KtPhHgMTQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qsr7oIZgq94xWLCBoKAd1BEcBs1A9syCo9NwZSH+uKFOWA8mtIlLny7esEXqtc7fy4pBdNC14rfSyCuwAHVvmmGobFUTNz/iSwdmus7n0hGocD8y9+9xVDHUZUcQGQRtA8nxdFiyKof8wgXPtb3WFxBSB8b0PtfAgozK91M8G0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nHc5UpRM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C56C8C433B1;
+	Fri,  2 Feb 2024 12:30:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706877025;
+	bh=plRVnWo3cLidU9FUKqA9yG6+oyyfjWE049KtPhHgMTQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=nHc5UpRMP4Cq6w5REz4SkG8TpD1WuQ5Mo3ISEtPyU+FCah3X28UJrKzySXKsbQ4Ht
+	 ILjZaA+mbzAZMYoo6STEeKstfqhyKFQGDUh2sYpQWqpGnE8jJOlUt5chShxFZgVgHR
+	 tgZqZSK1TrW41JW1USOzlarPCYzAAEXov7GqL0NUFVmFQuI7TcDcGO4D6JQHmDY2it
+	 BmgxCTfH0tH2Y6U1qP4YhKIrUCfgZKzOnJtQswwLprAabdbVjqTxoOQUk9xyMITMAx
+	 ubq4moxVmO+TEpJd0hRWSvoLyG6F1dBwHGW8miCtOOvbCeAnJxhhVW4wR3JsofILc0
+	 ZceOGTz09Hb/A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A76B8C04E32;
+	Fri,  2 Feb 2024 12:30:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <868b806f0d6b365334ac79a11a3a1a8a1588cbdf.camel@redhat.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: Fix from address in memcpy_to_iter_csum()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170687702567.1471.17975786299632818065.git-patchwork-notify@kernel.org>
+Date: Fri, 02 Feb 2024 12:30:25 +0000
+References: <20240131155220.82641-1-bevan@bi-co.net>
+In-Reply-To: <20240131155220.82641-1-bevan@bi-co.net>
+To: Michael Lass <bevan@bi-co.net>
+Cc: netdev@vger.kernel.org, dhowells@redhat.com, regressions@lists.linux.dev
 
-On 2024/2/2 16:36, Paolo Abeni wrote:
-> On Fri, 2024-02-02 at 10:10 +0800, Yunsheng Lin wrote:
->> On 2024/2/1 21:16, Paolo Abeni wrote:
->>
->>> from the __page_frag_cache_refill() allocator - which never accesses
->>> the memory reserves.
->>
->> I am not really sure I understand the above commemt.
->> The semantic is the same as skb_page_frag_refill() as explained above
->> as my understanding. Note that __page_frag_cache_refill() use 'gfp_mask'
->> for allocating order 3 pages and use the original 'gfp' for allocating
->> order 0 pages.
-> 
-> You are right! I got fooled misreading 'gfp' as 'gfp_mask' in there.
-> 
->>> I'm unsure we want to propagate the __page_frag_cache_refill behavior
->>> here, the current behavior could be required by some systems.
->>>
->>> It looks like this series still leave the skb_page_frag_refill()
->>> allocator alone, what about dropping this chunk, too? 
->>
->> As explained above, I would prefer to keep it as it is as it seems
->> to be quite obvious that we can avoid possible pressure for mm by
->> not using memory reserve for order 3 pages as we have the fallback
->> for order 0 pages.
->>
->> Please let me know if there is anything obvious I missed.
->>
-> 
-> I still think/fear that behaviours changes here could have
-> subtle/negative side effects - even if I agree the change looks safe.
-> 
-> I think the series without this patch would still achieve its goals and
-> would be much more uncontroversial. What about move this patch as a
-> standalone follow-up?
+Hello:
 
-Fair enough, will remove that for now.
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
+On Wed, 31 Jan 2024 16:52:20 +0100 you wrote:
+> While inlining csum_and_memcpy() into memcpy_to_iter_csum(), the from
+> address passed to csum_partial_copy_nocheck() was accidentally changed.
+> This causes a regression in applications using UDP, as for example
+> OpenAFS, causing loss of datagrams.
 > 
-> Thanks!
+> Fixes: dc32bff195b4 ("iov_iter, net: Fold in csum_and_memcpy()")
+> Cc: David Howells <dhowells@redhat.com>
+> Cc: stable@vger.kernel.org
+> Cc: regressions@lists.linux.dev
+> Signed-off-by: Michael Lass <bevan@bi-co.net>
 > 
-> Paolo
-> 
-> .
-> 
+> [...]
+
+Here is the summary with links:
+  - net: Fix from address in memcpy_to_iter_csum()
+    https://git.kernel.org/netdev/net/c/fe92f874f091
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
