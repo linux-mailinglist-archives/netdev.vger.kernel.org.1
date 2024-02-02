@@ -1,74 +1,48 @@
-Return-Path: <netdev+bounces-68272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB1118465BD
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 03:21:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0078C8465BF
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 03:22:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7406D1F273F2
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:21:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A80A11F2746D
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:22:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6663C882F;
-	Fri,  2 Feb 2024 02:21:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A195D8839;
+	Fri,  2 Feb 2024 02:22:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bUpbzJ21"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WEEaGbmu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC6BEBA24;
-	Fri,  2 Feb 2024 02:21:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 797B28BE1
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 02:22:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706840484; cv=none; b=SlzkFnNUmK8OaQ+qMAiKpwVHJpmtMTgU+/ElosTF2GTIk15pHT2lYsXK0dSpyQ0dg+bceujvwdQnSVWMOhYoAVZG01hM9cvnHoyTF9tsuFIjk23eV5MjVk1yXJrGaUmFp9NkaNsDEMw1Sccd9/NnYB9GrbdszDhFnj2m4Q+eqVU=
+	t=1706840521; cv=none; b=taWDzEquJdBdGLCMKkPu2bj734GB23lbZ7+MFoGkUq9UCF14bHxVy+NnOJ9HJFbvukCMFto2AXYaS3zYT6X7Nw6n54LvMvWECVHKP4/EL3Q517Tu6Up6ffvzlRoqKZ4a2mnbfb8r+fgSLI0Dv5YDwzGw0+bB2TD/YmYAzdg4juw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706840484; c=relaxed/simple;
-	bh=DdoXRzk+lKR3FazbKRtaW/yjrgzce0EILdYm+2tlAR8=;
+	s=arc-20240116; t=1706840521; c=relaxed/simple;
+	bh=QVJtjMaNqC/ca8Mc941TRApky1Y+uxkV9DGdID/R0Po=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=W0qgMgrJvK23ompWlAM8Le4U25Gq3JrL5kTmuJejycrSUmOUZlaKfD3baoLL+0V61V7UKF6DpqqPWw6RdOqk58/231pJJQtGFMOuyQs4Ov7izx07o5mKwMq2JStZIHlcBW2FGaAjskufMfAhjkPF16NN1x0MJx4xAfj4P+o6qSE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bUpbzJ21; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-7beda2e6794so12224339f.1;
-        Thu, 01 Feb 2024 18:21:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706840482; x=1707445282; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=mCF/rEIk8KrA7PI0LjZREJr/uXjAEXA/eqE8UNUtZHQ=;
-        b=bUpbzJ214W1tJiZ+5tIFVatE/EFBlu3b6zDLr0DR//OKq+vQ2Wwrb3klYwLwrx06LU
-         2NyqVTK4raG8uSwIdVGyIr6dCbG3kIjjGZ8q9m6ymn7+Iz8QeeQT0E2Vlbcj+KBqI136
-         aISxDOtksMSFfMV+f3F/BZFwf3jKuL4l84Pw6mGrkaFv6Xixzopb1aGiFIcMiAqwdmnm
-         Cy8QVUAPcBJX4luGi2o9TxTFfXUa4uMeD8qs4r2aG+EPHZTAK0VOTnSwgyLjzfpttl9O
-         3ptoopURnHSSEwv623L23k0w62CbHby+sO2VetgipynAF3+4MVoSSCTn8cCjC358jIcP
-         dxtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706840482; x=1707445282;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mCF/rEIk8KrA7PI0LjZREJr/uXjAEXA/eqE8UNUtZHQ=;
-        b=J7Yw7uEb9U9s9dnHz6qwH2/OFgEb37UVHhelh4yTSE7hgfZO8GHJA/WuwBDgJrG4Xo
-         TRfq4p9a8neaSEgV2G7Qp/+hUU6/E3r/dc1jWw4u4P4L+Q+HCyei9HkDQI290Apty8CE
-         eG3jwAFcMAEEAfVlxsrQQCrOP7dCYr8Ph6eqPiFprLVMHVHmHV1m5WUV71RdDpon5wEE
-         uIs/aoeZdvV2KxQzLz2brx+kCdBiIUI+4nJDD6ep6O84cis8YSVdZXrgFWN4wlV8ldcJ
-         8Mr4noVye+xfqUkQWkRVrQWHWKHRWj0NC9aJtOGw94jXzCFd2KdgW6xkE7JQ3aroXi02
-         uxVw==
-X-Gm-Message-State: AOJu0YwS7drp0UtKA2UH15IhTftY7SIPwWmldzkMPQGxNWtO7zbFXa7g
-	++Fdjca91+huWlJlkFpxO9GvkvMJodgrNkPGP4e0La5O0qfNlHAM
-X-Google-Smtp-Source: AGHT+IHEmAORMd6S6PZh9WzCAsfNYaDaqJGdy0b1gumH93sXlykxSlBsSgetstaQxphrN1IzEibGwQ==
-X-Received: by 2002:a5e:df47:0:b0:7bf:9e23:99a3 with SMTP id g7-20020a5edf47000000b007bf9e2399a3mr685000ioq.2.1706840481849;
-        Thu, 01 Feb 2024 18:21:21 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUjJjJeDecBv9ijEaATRrQYjUJGvfUqn78QhfOMy/FFHOLBsSLJcpvFs2H3ldDffa2EWA1N/PwN41IM9fswaandc0TIGkAEmC49lEkvHD4VYz0UwcwFCu9gFXgtavxw2JO46Hr/43UIxa9DXpg4Hi7RRrn0Rusog1TRY0uu/1btV4NFLh/dnvEn+tLyvigsHoNN4Z/IPOe7TYbQXFVOcOkjOA6lqLJcvRTY3OFILJPDept+aGURNCjrTAcKFK7bmOQB
-Received: from ?IPV6:2601:282:1e82:2350:245c:6a9e:25c1:5469? ([2601:282:1e82:2350:245c:6a9e:25c1:5469])
-        by smtp.googlemail.com with ESMTPSA id l22-20020a5e8816000000b007baf1948186sm227403ioj.42.2024.02.01.18.21.20
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Feb 2024 18:21:21 -0800 (PST)
-Message-ID: <5e6edac1-1f52-4978-b483-974c3958daa0@gmail.com>
-Date: Thu, 1 Feb 2024 19:21:20 -0700
+	 In-Reply-To:Content-Type; b=YXsYqZJO+R5W/Weh4xhgekm7EIXyUq0WW1TVQvR1pLL+8zTQeYoxlMZDP70r0evnX1s0TuwsMCQatDZxQ2LFiyRt+XRyE9xCF29sdchOz4aCEYeFRj5DFraw7Pu4Oq7aGv6zAyi+y3eUBSHWbZylfODZ9PhmAni83H0/7cXPGVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WEEaGbmu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99EE6C433F1;
+	Fri,  2 Feb 2024 02:22:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706840521;
+	bh=QVJtjMaNqC/ca8Mc941TRApky1Y+uxkV9DGdID/R0Po=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=WEEaGbmu1K//Uzrg5jeAf1uMMnfsyiQyImaB3k9MYTayh/qLkjsKyG1zFYYlnStMM
+	 vj/Pfd/zTcgSpTdkZcxdPbb8jFH4rUQJd5XB2vqlpEFbITagVHpHkVpingg5oK322G
+	 R6hxZ+qQN6nfFPZLxFl2PwbcXujWsYZIhA4vHjSYvV9vPBphMrChcHRMRLBPGrvozs
+	 YwogTZ+UaJ+UFRsk6YB0yCJ4X3QZMd7EYn+TLOxiabXWct4Mn6Ec0ZZ2+POtdWOFJk
+	 DAMgg27Z0zdujDDD2rAghzynmyv5LYrHu7GOQjjuUSCDFLSA/6gNrMZm5phYBltXSW
+	 jh4UpUD6OCqcQ==
+Message-ID: <5ec6cc3d-a31e-4391-a8ee-31666650ea23@kernel.org>
+Date: Thu, 1 Feb 2024 19:21:59 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,43 +50,29 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net 0/4] selftests: net: more fixes
+Subject: Re: [PATCH net-next] ipv6: make addrconf_wq single threaded
 Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Shuah Khan <shuah@kernel.org>, Willem de Bruijn <willemb@google.com>,
- Florian Westphal <fw@strlen.de>, linux-kselftest@vger.kernel.org
-References: <cover.1706812005.git.pabeni@redhat.com>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <cover.1706812005.git.pabeni@redhat.com>
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20240201173031.3654257-1-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240201173031.3654257-1-edumazet@google.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2/1/24 11:42 AM, Paolo Abeni wrote:
-> Another small bunch of fixes, addressing issues outlined by the
-> netdev CI.
+On 2/1/24 10:30 AM, Eric Dumazet wrote:
+> Both addrconf_verify_work() and addrconf_dad_work() acquire rtnl,
+> there is no point trying to have one thread per cpu.
 > 
-> The first 2 patches are just rebased.
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> ---
+>  net/ipv6/addrconf.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> The following 2 are new fixes, for even more problems that surfaced
-> meanwhile.
-> 
-> Paolo Abeni (4):
->   selftests: net: cut more slack for gro fwd tests.
->   selftests: net: fix setup_ns usage in rtnetlink.sh
->   selftests: net: fix tcp listener handling in pmtu.sh
->   selftests: net: avoid just another constant wait
-> 
->  tools/testing/selftests/net/pmtu.sh           | 23 ++++++++++++++-----
->  tools/testing/selftests/net/rtnetlink.sh      |  6 ++---
->  tools/testing/selftests/net/udpgro_fwd.sh     | 14 +++++++++--
->  tools/testing/selftests/net/udpgso_bench_rx.c |  2 +-
->  4 files changed, 32 insertions(+), 13 deletions(-)
-> 
-
-For the set:
 
 Reviewed-by: David Ahern <dsahern@kernel.org>
+
 
 
