@@ -1,160 +1,236 @@
-Return-Path: <netdev+bounces-68716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D081E847A88
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 21:36:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B757B847A91
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 21:39:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F3433B2234C
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:36:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4074A28520A
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:39:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2136C18050;
-	Fri,  2 Feb 2024 20:36:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF5D5182AE;
+	Fri,  2 Feb 2024 20:39:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fs8tR0sm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mWdL9qfG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A8018021
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 20:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CABF7A705;
+	Fri,  2 Feb 2024 20:39:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706906191; cv=none; b=HPY/UYLtX+2vZfBFI+v2YxOaqN5pQ+bp/0CGinEpWJt3qvqiLw0CUPOgfx6XuSd+jAyMxsFFygY5YeZktGpKeBskkbbKcdoSsyrUGZaVO7b21DRszIL/PTlX7o8uTEkMjkusUxdDPrWEj2/JbOOIqMLJkeNJcSW0KkDPEzhvLfE=
+	t=1706906357; cv=none; b=VosYsLecc9Faqgr0U9NhHYUcXQFaAC5r6BOB1ktjl47QFVAazXX2l7N40w4lo2FrKMK1NzJLC9XV+Qp8CE8alXXFp45/Ug4hDbi8itAlHpCtN+b868L1c8rRh6znCbR0mk5hO4lQi0sjiCLH1ucDUyVfrS2Pt/zkIlGimkiZJpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706906191; c=relaxed/simple;
-	bh=rL1lW4km98gq7/oS28Zo1duG7JsTMe58RiLskUB9Pa4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g5FxA4Hv25UpkFXwyW7+6YKabJBsDVPapvtysXSXK6j7GD7rMNa9qgduT8OpxcquZZYQCJziF9r12BulH/DZq3OScJbZmONh9WghtrWlco6+sA/JMNi0WY+uQVuaXY3RKMB9rwWo5iO6w0hHwXtWIjcE14yvgnUp78v28Na3CmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fs8tR0sm; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-55ff4dbe6a8so1378232a12.2
-        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 12:36:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706906188; x=1707510988; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=2py5wM6kwhov6R9mcaN5/uUzV3lruDwhhxoZ88sAVk8=;
-        b=Fs8tR0smH+yGEEItI9DmBrgsOR2kQEL4vgkf0mr0ZZ/Kr/WeYXzof12krOsTuUKSmY
-         EK1/Esy83uAUCfJlVxzhHhEw0NmdnSkm6jsjTU5Y/nTUHnmo4T3YVlKU7rMWvcTvTheo
-         RYGVBQ4KnBV2k9DVOHvtG6ZUa5Q835W1UeCNmlSKZgwp4ALQh6jai9XLt037KRRYMV5F
-         acjg5avXkrpV7fmLeFBWixvPIhFuduMnmjDa2UbORDf7duFuaHZQLych2uxj0TiWKtNM
-         murZR6SuA3rx1+yq5KIZ23ohYiFif+Ak03iHqRj0crqHLCJVVNEL7ovzwMMPG0MiQRDJ
-         jwpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706906188; x=1707510988;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2py5wM6kwhov6R9mcaN5/uUzV3lruDwhhxoZ88sAVk8=;
-        b=iwcF1CObvrI9nhPmoPJ++4E5BEvW49nXNvNxdtozpTzN01eXo6tVII1tfLIYjPsUtY
-         SAasib5a2Y5EkA+wItB/C3Qo1ydub1CVIrfA4Z8mP8HU+lslmYfy3qW+qVay/gYunHEM
-         JbJ9iDhJLwsJhpZEbN+uVBOb4bzN3Dvukp5OQO5/7D4r3Lrkkzt0ON1GAV0Vf0fxb9XR
-         lk1hv27sq7Xv1YuOWyX1Q4i8ni/JXHK9OGBhtVKM8tdMsMo74GWpdmW3Zjha1Xs+4EEv
-         9OPAoh0/GPiQO66tJB4K6VVVMekmvFRJ9tNxW5F9bP4hn2067qd5LRLI+r05J/zvIyVa
-         m/iw==
-X-Forwarded-Encrypted: i=0; AJvYcCX6SLkJWZcIXGjZ8P8dp+QpMDblHEYXkcqja2YTXh9//dAn1DNJ7OVbHP9Stju3pr60gJo2Ps8YVEKP/L9JhSYRQmZfrHlT
-X-Gm-Message-State: AOJu0YxVZLYVROxiCtKBGtXvPzZjFruNI+wDi3El4I/uJuHQhDc77kMp
-	gjnu6xW/N00OTCUEiDhiVbFZMt4k80b/N4GKIu1lZoDHW4bqf9xb
-X-Google-Smtp-Source: AGHT+IFqmIKhO5ihTlUrf8OfxxByY5UlYrHar9c1cGaomRFVd1s7+EOI5BmJp7cjq4SWRQJuIWS+YQ==
-X-Received: by 2002:a50:ed97:0:b0:55e:aca4:aab2 with SMTP id h23-20020a50ed97000000b0055eaca4aab2mr503197edr.19.1706906187422;
-        Fri, 02 Feb 2024 12:36:27 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCV3MN6SFpyegKdxX9zBNddpyYu5NF1tDo+xPRn7Qgp8ai4z7orAkPyeqLJgTK2JcXRkfy+VLS6Piy6sTPYqF527xiQlDaXyA29pPnvwt5vA7dUtI0D60pUEK0eSoXuaTh7McOIrRTCX/BTKQDGMd7V7m43p3eRW/dStlAeFzw7v6NmMNcuHA74v7ki+Bq+0uPkuQ6cG6PWzrqc=
-Received: from ?IPV6:2a01:c22:7392:d000:2834:713e:737c:78c3? (dynamic-2a01-0c22-7392-d000-2834-713e-737c-78c3.c22.pool.telefonica.de. [2a01:c22:7392:d000:2834:713e:737c:78c3])
-        by smtp.googlemail.com with ESMTPSA id cq21-20020a056402221500b0056011a877dasm154178edb.29.2024.02.02.12.36.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Feb 2024 12:36:27 -0800 (PST)
-Message-ID: <6b89ec8a-230b-43f2-a7d4-d9f4fd4520de@gmail.com>
-Date: Fri, 2 Feb 2024 21:36:26 +0100
+	s=arc-20240116; t=1706906357; c=relaxed/simple;
+	bh=lUiZwAyJaZQ+4+AMBX9/v5QxyV7H20zeM9q/qx9XCac=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CDDnzmHkFapCJkoa7sBg3NawFgR1z6Hh6i8YpMQZPFjlbG/PfZp2HjByQXomkFp9XnGqw65s6M9DwdRvV/Yz0NxDQiNWRswYOsr/Lp6sYJQFIJ+pns0FMFXRAQsPxWXJLiTaAJuXoJf0P6e/anB84f9EOmRdwVhblQ4pqFSLfl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mWdL9qfG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37F31C433F1;
+	Fri,  2 Feb 2024 20:39:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706906357;
+	bh=lUiZwAyJaZQ+4+AMBX9/v5QxyV7H20zeM9q/qx9XCac=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mWdL9qfGg9+QYiLHGqKxy5w13NQS3jS8kuZiGZQpV1EHP0DDuiG50vo53jUAMg7el
+	 9Eg5SKbj+hgnPOOHe/DnUhehIBbvGqKvBPa2H6jt3Jd8CZrSKgmatkyFNVrwvVF/Mv
+	 y/RM/pYp9W8S76hE1ryic+RHRHTv5/tY1d1yYFSMa12Da5W4RzYZpTIbiclMaGBNWk
+	 BcaESKdR34K7KngBrj/kZNHznnAspo0bqYaVvQSbtfPUOqlb6XVN1I3bFuNZdZP14d
+	 rLAQKz1fy1fH5ITZ0/9cE94sQkhjd8gRI//CQPBLvQ6EAtI52h/5BTcTfyREgrQj0o
+	 8iSEimIbIsGRA==
+Date: Fri, 2 Feb 2024 14:39:15 -0600
+From: Rob Herring <robh@kernel.org>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Frank Rowand <frowand.list@gmail.com>,
+	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [net-next PATCH v5 6/9] dt-bindings: net: Document Qcom QCA807x
+ PHY package
+Message-ID: <20240202203915.GA1075521-robh@kernel.org>
+References: <20240201151747.7524-1-ansuelsmth@gmail.com>
+ <20240201151747.7524-7-ansuelsmth@gmail.com>
+ <94dfc4c4-5fe6-438d-bcda-4f818eafd2f0@linaro.org>
+ <65bd0678.050a0220.bf9e4.9bd2@mx.google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RESUBMIT net-next] r8169: simplify EEE handling
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>,
- David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <27c336a8-ea47-483d-815b-02c45ae41da2@gmail.com>
- <d5d18109-e882-43cd-b0e5-a91ffffa7fed@lunn.ch>
- <be436811-af21-4c8e-9298-69706e6895df@gmail.com>
- <219c3309-e676-48e0-9a24-e03332b7b7b4@lunn.ch>
- <7122d90b-cdfe-4733-bfad-45ce63f75536@gmail.com>
- <20240202081511.3d4374f4@kernel.org>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <20240202081511.3d4374f4@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <65bd0678.050a0220.bf9e4.9bd2@mx.google.com>
 
-On 02.02.2024 17:15, Jakub Kicinski wrote:
-> On Fri, 2 Feb 2024 17:06:10 +0100 Heiner Kallweit wrote:
->>>> Alternative would be to change phy_advertise_supported(), but this may
->>>> impact systems with PHY's with EEE flaws.  
->>>
->>> If i remember correctly, there was some worry enabling EEE by default
->>> could upset some low latency use cases, PTP accuracy etc. So lets
->>> leave it as it is. Maybe a helper would be useful
->>> phy_advertise_eee_all() with a comment about why it could be used.
->>>   
->> Yes, I think that's the way to go.
->> To minimize efforts I'd like to keep this patch here as it is, then I'll
->> add the helper and change this place in r8169 to use the new helper.
+On Fri, Feb 02, 2024 at 04:12:53PM +0100, Christian Marangi wrote:
+> On Fri, Feb 02, 2024 at 08:45:52AM +0100, Krzysztof Kozlowski wrote:
+> > On 01/02/2024 16:17, Christian Marangi wrote:
+> > > Document Qcom QCA807x PHY package.
+> > > 
+> > > Qualcomm QCA807X Ethernet PHY is PHY package of 2 or 5
+> > > IEEE 802.3 clause 22 compliant 10BASE-Te, 100BASE-TX and
+> > > 1000BASE-T PHY-s.
+> > > 
+> > > Document the required property to make the PHY package correctly
+> > > configure and work.
+> > > 
+> > > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > > ---
+> > >  .../devicetree/bindings/net/qcom,qca807x.yaml | 142 ++++++++++++++++++
+> > 
+> > Your bindings header must be squashed here. Headers are not separate
+> > thing from the bindings.
+> > 
+> > >  1 file changed, 142 insertions(+)
+> > >  create mode 100644 Documentation/devicetree/bindings/net/qcom,qca807x.yaml
+> > > 
+> > > diff --git a/Documentation/devicetree/bindings/net/qcom,qca807x.yaml b/Documentation/devicetree/bindings/net/qcom,qca807x.yaml
+> > > new file mode 100644
+> > > index 000000000000..1c3692897b02
+> > > --- /dev/null
+> > > +++ b/Documentation/devicetree/bindings/net/qcom,qca807x.yaml
+> > > @@ -0,0 +1,142 @@
+> > > +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> > > +%YAML 1.2
+> > > +---
+> > > +$id: http://devicetree.org/schemas/net/qcom,qca807x.yaml#
+> > > +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> > > +
+> > > +title: Qualcomm QCA807X Ethernet PHY
+> > 
+> > What is "X"? Wildcards are usually not expected.
+> >
 > 
-> Sorry for being slow - on top or as v2? :)
+> It's to identify the Ethrnet PHY family. Looks wrong to declare qca8072
+> or qca8074 since they would refer to a more generic Family of devices.
 
-I'll do it on top.
+Declare them all or provide some justification such as the exact model 
+is discoverable (and better be sure power on is the same in order to do 
+discovery).
+
+> What would be the correct way? We have many other case on net with
+> schema called qca8k that refer to the family of Ethernet Switch but in
+> it refer to qca8327 qca8337 qca8334...
+> 
+> > > +
+> > > +maintainers:
+> > > +  - Christian Marangi <ansuelsmth@gmail.com>
+> > > +  - Robert Marko <robert.marko@sartura.hr>
+> > > +
+> > > +description: |
+> > > +  Qualcomm QCA807X Ethernet PHY is PHY package of 2 or 5
+> > > +  IEEE 802.3 clause 22 compliant 10BASE-Te, 100BASE-TX and
+> > > +  1000BASE-T PHY-s.
+> > > +
+> > > +  They feature 2 SerDes, one for PSGMII or QSGMII connection with
+> > > +  MAC, while second one is SGMII for connection to MAC or fiber.
+> > > +
+> > > +  Both models have a combo port that supports 1000BASE-X and
+> > > +  100BASE-FX fiber.
+> > > +
+> > > +  Each PHY inside of QCA807x series has 4 digitally controlled
+> > > +  output only pins that natively drive LED-s for up to 2 attached
+> > > +  LEDs. Some vendor also use these 4 output for GPIO usage without
+> > > +  attaching LEDs.
+> > > +
+> > > +  Note that output pins can be set to drive LEDs OR GPIO, mixed
+> > > +  definition are not accepted.
+> > > +
+> > > +  PHY package can be configured in 3 mode following this table:
+> > > +
+> > > +                First Serdes mode       Second Serdes mode
+> > > +  Option 1      PSGMII for copper       Disabled
+> > > +                ports 0-4
+> > > +  Option 2      PSGMII for copper       1000BASE-X / 100BASE-FX
+> > > +                ports 0-4
+> > > +  Option 3      QSGMII for copper       SGMII for
+> > > +                ports 0-3               copper port 4
+> > > +
+> > > +$ref: ethernet-phy-package.yaml#
+> > > +
+> > > +properties:
+> > > +  compatible:
+> > > +    const: qcom,qca807x-package
+> > > +
+> > > +  qcom,package-mode:
+> > 
+> > Where is definition of this property with type and description?
+> > 
+> > > +    enum:
+> > > +      - qsgmii
+> > > +      - psgmii
+> > > +
+> > > +  qcom,tx-driver-strength:
+> > 
+> > Use proper unit suffix.
+> > 
+> > https://github.com/devicetree-org/dt-schema/blob/main/dtschema/schemas/property-units.yaml
+> > 
+> > > +    description: set the TX Amplifier value in mv.
+> > > +      If not defined, 600mw is set by default.
+> > > +    $ref: /schemas/types.yaml#/definitions/uint32
+> > > +    enum: [140, 160, 180, 200, 220,
+> > > +           240, 260, 280, 300, 320,
+> > > +           400, 500, 600]
+> > > +
+> > > +patternProperties:
+> > > +  ^ethernet-phy(@[a-f0-9]+)?$:
+> > > +    $ref: ethernet-phy.yaml#
+> > > +
+> > > +    properties:
+> > > +      gpio-controller:
+> > > +        description: set the output lines as GPIO instead of LEDs
+> > > +        type: boolean
+
+You only need 'gpio-controller: true'. The core already defines the 
+type.
+
+> > > +
+> > > +      '#gpio-cells':
+> > > +        description: number of GPIO cells for the PHY
+
+Not a useful description. Normally, you'd describe what's in the cells, 
+but GPIO is standardized so no need (unless you are deviating from the 
+norm).
+
+> > > +        const: 2
+> > > +
+> > > +    dependencies:
+> > > +      gpio-controller: ['#gpio-cells']
+> > 
+> > Why do you need it? None of gpio-controllers do it, I think.
+> > 
+> 
+> Well gpio-controller property is optional and having that declared and
+> #gpio-cells skipped will result in an error on probe. I think it should
+> be the opposite with other schema having to declare this.
+
+If you think everything else is wrong, then please fix them. :)
+
+> 
+> In usual way for gpio-controller both property are defined as required
+> but you can see some (to-be-converted) txt files whith comments where
+> they say:
+> 
+> ./mux/adi,adgs1408.txt:10:- gpio-controller : if present, #gpio-cells is required.
+> 
+> Should I instead add this condition in the if right below?
+
+The core schema enforces this dependency, so you don't need to.
+
+Rob
 
