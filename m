@@ -1,100 +1,87 @@
-Return-Path: <netdev+bounces-68324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CB3B8469D3
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:53:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EB928469DB
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:56:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E301EB24F43
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 07:53:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C5B0E1F26C53
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 07:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBBB717BA4;
-	Fri,  2 Feb 2024 07:53:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C7BF17BC4;
+	Fri,  2 Feb 2024 07:55:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="nYYKAISt"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A8C17C64;
-	Fri,  2 Feb 2024 07:53:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7A8E17BA4;
+	Fri,  2 Feb 2024 07:55:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706860430; cv=none; b=T6NiBtqTbNo67yEsJQPLqKQlVvjBFcOSQnYAiVjY1SY9hf7VU8zV3eISNF5b+peJO21XT8B6Y2qeFWJMQBNKrMVr0tPRFXNA2mhfmvYWOKYQsQeolhtdZT/7hUVnFQ7+KKQGd9DL6DiuYq8GdRyO3hdkDHdb1tarnOYI2RnlUXA=
+	t=1706860555; cv=none; b=Pe/v7OCl4RS/uuTDq4yKjWOSn58t2yMFmlyRzgfTfHCnMCxPbxq15wQWj3Ruf3Xp/AZ67yL2LfY6Vlyds2evLa3a0wt/uG4Ztn58AFpDH4Lb1KHZygfC0zMn8R9OUGqYw0E5JSHle+cgbDMd4vWv85dCQVjVnluzP7wLFx1qj6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706860430; c=relaxed/simple;
-	bh=udxviX13manDkpnOlukyrX/hjFf+xqpC/T6OYP3DU6A=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Y5NlCiu5DyJAJmPdw1RG0Ee1q12WLZ4KhP7Eie+oXotKd+K6hh9n4nscB9Mv2Yu6Y4kobQ577lbwaHkPJ8mTsPR+1/ae0fJ1Janydz0nULE5lUQcG5eWZSSQUmGlTIZd8LYbKtuFzaQWa04hTOgDqG3SQgr1BDl9G7NfFwlmZY8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.234])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TR7Fh6QPvz1FKDX;
-	Fri,  2 Feb 2024 15:49:12 +0800 (CST)
-Received: from dggpemm500008.china.huawei.com (unknown [7.185.36.136])
-	by mail.maildlp.com (Postfix) with ESMTPS id 056571400CC;
-	Fri,  2 Feb 2024 15:53:44 +0800 (CST)
-Received: from localhost (10.174.242.157) by dggpemm500008.china.huawei.com
- (7.185.36.136) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 2 Feb
- 2024 15:53:43 +0800
-From: Yunjian Wang <wangyunjian@huawei.com>
-To: <willemdebruijn.kernel@gmail.com>, <jasowang@redhat.com>,
-	<kuba@kernel.org>, <davem@davemloft.net>, <jiri@resnulli.us>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<xudingke@huawei.com>, Yunjian Wang <wangyunjian@huawei.com>
-Subject: [PATCH net-next v2] tun: Implement ethtool's get_channels() callback
-Date: Fri, 2 Feb 2024 15:53:20 +0800
-Message-ID: <1706860400-61484-1-git-send-email-wangyunjian@huawei.com>
-X-Mailer: git-send-email 1.9.5.msysgit.1
+	s=arc-20240116; t=1706860555; c=relaxed/simple;
+	bh=68hL+FZLLcrrCGOYzkanDw/JbY5cOul8cp+uyDfPMTY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QLS1WlDXJbdSKXIEJ0VBriMJkf5+xPZk4Bc/iW/LJkPs+JTpGFInQE+gs62EtYDV0PCiM1iFopDG2MDCp2NThm/ShesBTl7hrJDzO1gr5+8X8mMwqeJjTUpkK90QouA0r7rhlUUaRKFkSs4Pt9K3q8HzDZFng/9XseQnUriRHjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=nYYKAISt; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E5CDD1C0007;
+	Fri,  2 Feb 2024 07:55:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1706860549;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=68hL+FZLLcrrCGOYzkanDw/JbY5cOul8cp+uyDfPMTY=;
+	b=nYYKAIStwHLyok/90gVQUFipyrI5YTOPkDuMKsKZ6iZU4RCiPkvWu2iiOmX9O+5I1v1zss
+	tbBKziub+xr6Xg6lIMCdA330UzueJNF2KyZfD1DNKcyh3N9SkN+KesMvgETxfb0m5Fdhr2
+	Q4ZSRQ/LvGHV6fs4wiNe5HtG6OzJVAKVm2hYcabkrIAd8jTzWdCtclIzjqHcEAOEUn3EYV
+	Mtdmr0Gfe9Nb1YdP2ZZW9Vk6BoL5mQExjs0m1n5UKNwqGil2nussRjtsJudP7ekEQgSkwA
+	9ICpSqtpNWUUUzgpLyObGH93FcSHrWV4Kuo7mEKiZ2SgMtUk30wxome9qPJedQ==
+Date: Fri, 2 Feb 2024 08:55:47 +0100
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Bo Liu <liubo03@inspur.com>
+Cc: <alex.aring@gmail.com>, <stefan@datenfreihafen.org>,
+ <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+ <pabeni@redhat.com>, <linux-wpan@vger.kernel.org>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] net: ieee802154: at86rf230: convert to use maple tree
+ register cache
+Message-ID: <20240202085547.46c81c96@xps-13>
+In-Reply-To: <20240202064512.39259-1-liubo03@inspur.com>
+References: <20240202064512.39259-1-liubo03@inspur.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemm500008.china.huawei.com (7.185.36.136)
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-Implement the tun .get_channels functionality. This feature is necessary
-for some tools, such as libxdp, which need to retrieve the queue count.
+Hi Bo,
 
-Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
----
-  v2: add conditional on IFF_MULTI_QUEUE
----
- drivers/net/tun.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
+liubo03@inspur.com wrote on Fri, 2 Feb 2024 01:45:12 -0500:
 
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index afa5497f7c35..0b6d25ede7fc 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -3638,12 +3638,22 @@ static int tun_set_coalesce(struct net_device *dev,
- 	return 0;
- }
- 
-+static void tun_get_channels(struct net_device *dev,
-+			     struct ethtool_channels *channels)
-+{
-+	struct tun_struct *tun = netdev_priv(dev);
-+
-+	channels->combined_count = tun->numqueues;
-+	channels->max_combined = tun->flags & IFF_MULTI_QUEUE ? MAX_TAP_QUEUES : 1;
-+}
-+
- static const struct ethtool_ops tun_ethtool_ops = {
- 	.supported_coalesce_params = ETHTOOL_COALESCE_RX_MAX_FRAMES,
- 	.get_drvinfo	= tun_get_drvinfo,
- 	.get_msglevel	= tun_get_msglevel,
- 	.set_msglevel	= tun_set_msglevel,
- 	.get_link	= ethtool_op_get_link,
-+	.get_channels   = tun_get_channels,
- 	.get_ts_info	= ethtool_op_get_ts_info,
- 	.get_coalesce   = tun_get_coalesce,
- 	.set_coalesce   = tun_set_coalesce,
--- 
-2.33.0
+> The maple tree register cache is based on a much more modern data structu=
+re
+> than the rbtree cache and makes optimisation choices which are probably
+> more appropriate for modern systems than those made by the rbtree cache.
 
+What are the real intended benefits? Shall we expect any drawbacks?
+
+> Signed-off-by: Bo Liu <liubo03@inspur.com>
+
+Thanks,
+Miqu=C3=A8l
 
