@@ -1,167 +1,94 @@
-Return-Path: <netdev+bounces-68245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C1768464C0
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:03:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE9A78464C8
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:04:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24A51B22C52
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 00:03:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1CD01C236ED
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 00:04:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3119E17F3;
-	Fri,  2 Feb 2024 00:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46E9C469F;
+	Fri,  2 Feb 2024 00:04:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o1O0LXPh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C+KGT/67"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E56BA4C71;
-	Fri,  2 Feb 2024 00:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C6A84694;
+	Fri,  2 Feb 2024 00:04:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706832198; cv=none; b=ZvLvFtPL76f50iY77iGChNyC9cKG45fNQwXHxLxcWlsj6EOOgB94RfBl8mWN4hT78f3ag10v5y0cKGil4zS6KAbqap3VUTB1pT8aafExvAqFNt+5RAvJE0h2PUDAEIA+ETz1pCu80QSp9lIEq1Mi/GLTWedUv6bbafd5d6xeStc=
+	t=1706832262; cv=none; b=f3J+4FNzjMAFq7YA61veOk6Gno4BVKbHRWui+LTWLqEnxl8h7o5a9uSqeaJeewYyo7dG7n93OEgDf5RRDNMBdSVnU15ctvo2cDnYqF86sNoA+qheln3E+qhTUJVk28O8yMWWRYGbxXS8cY7MJMVuVdFVBS6GQTayMK29Z+ngvOs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706832198; c=relaxed/simple;
-	bh=S77eR3+aBnUK3p2BE5Am64ezv1OvD+YOIoEHYe29IuI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fRVTNj4KTS3xbmMJH1e9f2z8BKzdN8lEulStru61NTFKWNs53piWBTQo0K+kOlRT4ygVFLr3kLh4E72UQ4UKOjN0H+HdsTHDfvVec+NDnVaOcOK3FmMuoaVWVdoM2gKIhXues1JmogqOQPJkfLvmv8yshpaSAG7qpZixOupOF6g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o1O0LXPh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F322C433F1;
-	Fri,  2 Feb 2024 00:03:14 +0000 (UTC)
+	s=arc-20240116; t=1706832262; c=relaxed/simple;
+	bh=pNTP5KAhWQVKoi5tIE6ZiagSXkkKSX/ysVVnKPKlVr4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AAQI/xrGxT8AhOMQAnCbklVzo4iE0rv9rNNbZwwZIjn/9wbz4N1g8ER2MP6khAx+IVTcZ8BNO9OCfSnhP3U3u21ToZ+SNb33EXq5c7HozmhO3Q9h8dIll/CL4Jj1pqY0EgtXnAPKRcKm9bEGmTTm029qZbmScWOwJKPHeJ9+jfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C+KGT/67; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 572BBC433F1;
+	Fri,  2 Feb 2024 00:04:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706832197;
-	bh=S77eR3+aBnUK3p2BE5Am64ezv1OvD+YOIoEHYe29IuI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=o1O0LXPhHzpi1Rs6bzSdUB3LcjO1MINeMXN+1VP+sLsOBbB1lmcWYZuIO4+mnQAL7
-	 MpNreOS7S3fgAQVhYTOwYixsFgyWORbDq1gNT16Srdh7+9QduAlF2WLSh7ATYq9A/m
-	 Y0Lm0CB7nQpLHDTRuIF6IujMeKqllKNE//q8Nn3cMmddLrW3fdHEFrHNrIdxf9+VMQ
-	 1T/iRH19Hl/og9XJiEqS8kUbH26YuegOXXgC2QmD8Clxt3tze7TsIaPCE17/GfHVgz
-	 xNSreoCPH085OxjKknjT/WMdY6EMheAbPZNwG25VNnB9eCHX5WAsJbaqJNBaD471hM
-	 CnqXZHJo7xVJg==
-Date: Thu, 1 Feb 2024 18:03:12 -0600
-From: Bjorn Andersson <andersson@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Konrad Dybcio <konrad.dybcio@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
-	Heiko Stuebner <heiko@sntech.de>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
-	Chris Morgan <macromorgan@hotmail.com>, Linus Walleij <linus.walleij@linaro.org>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, 
-	=?utf-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4=?= Prado <nfraprado@collabora.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
-	Peng Fan <peng.fan@nxp.com>, Robert Richter <rrichter@amd.com>, 
-	Dan Williams <dan.j.williams@intel.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
-	Terry Bowman <terry.bowman@amd.com>, Lukas Wunner <lukas@wunner.de>, 
-	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
-	Srini Kandagatla <srinivas.kandagatla@linaro.org>, Abel Vesa <abel.vesa@linaro.org>, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: Re: Re: [PATCH 4/9] PCI: create platform devices for child OF
- nodes of the port node
-Message-ID: <oiwvcvu6wdmpvhss3t7uaqkl5q73mki5pz6liuv66bap4dr2mp@jtjjwzlvt6za>
-References: <20240117160748.37682-1-brgl@bgdev.pl>
- <20240117160748.37682-5-brgl@bgdev.pl>
- <2024011707-alibi-pregnancy-a64b@gregkh>
- <CAMRc=Mef7wxRccnfQ=EDLckpb1YN4DNLoC=AYL8v1LLJ=uFH2Q@mail.gmail.com>
- <2024011836-wok-treadmill-c517@gregkh>
- <d2he3ufg6m46zos4swww4t3peyq55blxhirsx37ou37rwqxmz2@5khumvic62je>
- <CAMRc=MeXJjpJhDjyn_P-SGo4rDnEuT9kGN5jAbRcuM_c7_aDzQ@mail.gmail.com>
+	s=k20201202; t=1706832261;
+	bh=pNTP5KAhWQVKoi5tIE6ZiagSXkkKSX/ysVVnKPKlVr4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=C+KGT/67532lFzqQWf2qp3tEQorF868vzJZSYmvHQItVKOld9voLEOnX1YQRZ1bpV
+	 uSH1edCyj/dVEW4eAAELqpFN1q4r+oRhMt6WU1ibyhSPxcyznwDUmVrsgxLXEclXU3
+	 BtHKdPgfJVJBqGnBYEzRcMpIfkqpur6x6SVlGdkkLcNXj629OvnzBgSVHpla/mhQhO
+	 CPP1ffEZGugqzf1Rl65diOQ0BEJHt4DE8abW73qbN71EIStTVUfCISOy/NX2AjG49h
+	 f85TnUcQ4PBt2QC3KYFKw2wDdMPySEHwxBXLAhDvkLCgOoiuQI0czdC+ClRwVNCDZ7
+	 9tF5c0XkBmPzQ==
+Date: Thu, 1 Feb 2024 16:04:16 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Donald Hunter <donald.hunter@gmail.com>, <netdev@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, "Eric Dumazet"
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Jonathan Corbet"
+ <corbet@lwn.net>, <linux-doc@vger.kernel.org>, Breno Leitao
+ <leitao@debian.org>, Jiri Pirko <jiri@resnulli.us>, Alessandro Marcolini
+ <alessandromarcolini99@gmail.com>, <donald.hunter@redhat.com>
+Subject: Re: [PATCH net-next v1 02/12] tools/net/ynl: Support sub-messages
+ in nested attribute spaces
+Message-ID: <20240201160416.0da06952@kernel.org>
+In-Reply-To: <029065d6-faaf-4e58-ac06-4e11c2ded02c@intel.com>
+References: <20240123160538.172-1-donald.hunter@gmail.com>
+	<20240123160538.172-3-donald.hunter@gmail.com>
+	<20240123161804.3573953d@kernel.org>
+	<m2ede7xeas.fsf@gmail.com>
+	<20240124073228.0e939e5c@kernel.org>
+	<m2ttn0w9fa.fsf@gmail.com>
+	<20240126105055.2200dc36@kernel.org>
+	<m2jznuwv7g.fsf@gmail.com>
+	<20240129174220.65ac1755@kernel.org>
+	<029065d6-faaf-4e58-ac06-4e11c2ded02c@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMRc=MeXJjpJhDjyn_P-SGo4rDnEuT9kGN5jAbRcuM_c7_aDzQ@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 31, 2024 at 12:04:14PM +0100, Bartosz Golaszewski wrote:
-> On Tue, Jan 30, 2024 at 10:54 PM Bjorn Andersson <andersson@kernel.org> wrote:
-> >
-> > On Thu, Jan 18, 2024 at 12:15:27PM +0100, Greg Kroah-Hartman wrote:
-> > > On Thu, Jan 18, 2024 at 11:58:50AM +0100, Bartosz Golaszewski wrote:
-> > > > On Wed, Jan 17, 2024 at 5:45 PM Greg Kroah-Hartman
-> > > > <gregkh@linuxfoundation.org> wrote:
-> > > > >
-> > > > > On Wed, Jan 17, 2024 at 05:07:43PM +0100, Bartosz Golaszewski wrote:
-> > > > > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-> > > > > >
-> > > > > > In order to introduce PCI power-sequencing, we need to create platform
-> > > > > > devices for child nodes of the port node.
-> > > > >
-> > > > > Ick, why a platform device?  What is the parent of this device, a PCI
-> > > > > device?  If so, then this can't be a platform device, as that's not what
-> > > > > it is, it's something else so make it a device of that type,.
-> > > > >
-> > > >
-> > > > Greg,
-> > > >
-> > > > This is literally what we agreed on at LPC. In fact: during one of the
-> > > > hall track discussions I said that you typically NAK any attempts at
-> > > > using the platform bus for "fake" devices but you responded that this
-> > > > is what the USB on-board HUB does and while it's not pretty, this is
-> > > > what we need to do.
-> > >
-> > > Ah, you need to remind me of these things, this changelog was pretty
-> > > sparse :)
-> > >
-> >
-> > I believe I missed this part of the discussion, why does this need to be
-> > a platform_device? What does the platform_bus bring that can't be
-> > provided by some other bus?
-> >
+On Thu, 1 Feb 2024 12:53:08 -0800 Jacob Keller wrote:
+> On 1/29/2024 5:42 PM, Jakub Kicinski wrote:
+> > Whether YNL specs should replace policy dumps completely (by building
+> > the YAML into the kernel, and exposing via sysfs like kheaders or btf)
+> >  - I'm not sure. I think I used policy dumps twice in my life. They
+> > are not all that useful, IMVHO...  
 > 
-> Does it need to be a platform_device? No, of course not. Does it make
-> sense for it to be one? Yes, for two reasons:
-> 
-> 1. The ATH11K WLAN module is represented on the device tree like a
-> platform device, we know it's always there and it consumes regulators
-> from another platform device. The fact it uses PCIe doesn't change the
-> fact that it is logically a platform device.
+> Many older genetlink/netlink families don't have a super robust or
+> specific policy. For example, devlink has a single enum for all
+> attributes, and the policy is not specified per command. The policy
+> simply accepts all attributes for every command. This means that you
+> can't rely on policy to decide whether an attribute has meaning for a
+> given command.
 
-Are you referring to the ath11k SNOC (firmware running on co-processor
-in the SoC) variant?
+FWIW Jiri converted devlink to use ynl policy generation. AFAIU it now
+only accepts what's used and nobody complained, yet, knock wood.
 
-Afaict the PCIe-attached ath11k is not represented as a platform_device
-in DeviceTree.
-
-Said platform_device is also not a child under the PCIe bus, so this
-would be a different platform_device...
-
-> 2. The platform bus already provides us with the entire infrastructure
-> that we'd now need to duplicate (possibly adding bugs) in order to
-> introduce a "power sequencing bus".
-> 
-
-This is a perfectly reasonable desire. Look at our PMICs, they are full
-of platform_devices. But through the years it's been said many times,
-that this is not a valid or good reason for using platform_devices, and
-as a result we have e.g. auxiliary bus.
-
-Anyway, (please) don't claim that "we need to", when it actually is "we
-want to use platform_device because that's more convenient"!
-
-Regards,
-Bjorn
-
-> Bart
-> 
-> > (I'm not questioning the need for having a bus, creating devices, and
-> > matching/binding them to a set of drivers)
-> >
-> > Regards,
-> > Bjorn
-> >
-> 
-> [snip]
+Agreed on other points :)
 
