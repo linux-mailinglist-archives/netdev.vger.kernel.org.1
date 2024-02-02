@@ -1,151 +1,110 @@
-Return-Path: <netdev+bounces-68727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A2D2847B78
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 22:24:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E6D9847B83
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 22:30:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0A6D1F26ACA
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 21:24:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 806351C2334B
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 21:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 736968174B;
-	Fri,  2 Feb 2024 21:24:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F98982C60;
+	Fri,  2 Feb 2024 21:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="teO9xkwH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AwAyS874"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 478C081723;
-	Fri,  2 Feb 2024 21:24:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5F57C0B9;
+	Fri,  2 Feb 2024 21:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706909063; cv=none; b=Xl/H97OixZJI+XjGBdIDj/1rYQNf4KvKLOZY0BZoAvcXfOalCbqb6Jd9kUQhSAbvfSofpJOFQ5sy/+0p0//zGgXADcSUrlqTBtejHCP7tqzXGAFmQ+66oTfVfM9Kp8UY3c+DkTSU4NUd05dL6fejfqnt7JVxfs88mJv7czkjJxE=
+	t=1706909429; cv=none; b=qPih27I7JBt9U+j4d++yVAJQWy1lJUjbCmusFuh84qC4St7Uj8fvcg0zeOkYwRsC09aSfwJZvHMBgR2RakGaFNbyRbkWxdn5CFGrWZTGF+XbEr33qGHR27KQJHvQQeZi9UrsHJ3uwgVSjEQV1wNb+ALhoGYdvpVuujgViQP4f5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706909063; c=relaxed/simple;
-	bh=UZ+yJRgsFPGKwSTDFBg0r03EZWgLZlspYa2WkFy5MiA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=goq9bPtHpSphbJUcmyaffnWXk3ljf+3AEMMY5yS/NFlZTLq3rgkR1gY8IF6P8tmM/qKrM8b7ByynHMQxfWyBvUiHA6zcK/U3634HngYj1x3DEakuaNTWAImWW1HHLeIjYd7JiV4V5klkCJvv/oH3qFghWHC/QD9NAdRRkPG+UHg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=teO9xkwH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72D71C433C7;
-	Fri,  2 Feb 2024 21:24:22 +0000 (UTC)
+	s=arc-20240116; t=1706909429; c=relaxed/simple;
+	bh=v56A7tIQPuHlG+irb7rZnIZfGnhBn+AGY94HikYcQ2o=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=I9M/z9cPyWQdwBWZ/r0ZljTSJz7drPPhDRaXLA6/q6j6DBJaTQvuMeB+HzJhSf1eMK/3UJfaAQfbBVwGE5LRAiRi46I1v9CeTI9gzTIOkDD/2ULAQd9kKWAz7tTh3iVozgaaNMn5e35M890thjLdU1gQ9MyR32HfBpWgRDX3IC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AwAyS874; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 29586C43390;
+	Fri,  2 Feb 2024 21:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706909062;
-	bh=UZ+yJRgsFPGKwSTDFBg0r03EZWgLZlspYa2WkFy5MiA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=teO9xkwHltv0T0lPtU2+7uxbSRQZXu6/REzvx0bSQvNw23ajHvQTtRrzcbKgqgcto
-	 Qz5I/ZL8Yae+1FbTMmiWOORN+yWt+6zMVotV2Omv2qFLh02dsTev+gZjT+02Xoj1Pa
-	 55RKD0O1gA/FcygEaO3shOHwz1wmfjact06vT2h7azz/dnW0UEq87+/ijVeqPz8sWU
-	 J1hcDtKIs0hN1bamIt4it/ivIsZN6b5KRfDv4eSuL89IMxiDOg45sxDHcZP8OyQG7M
-	 VB6q6WyV8NOavbjqr1LVh4oqfoz3W5hMd8t5KwIAtsdrnAhkvrW5+H4RC+e+uSeed+
-	 jX/JQcBYko2Xg==
-Date: Fri, 2 Feb 2024 15:24:20 -0600
-From: Rob Herring <robh@kernel.org>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Bc-bocun Chen <bc-bocun.chen@mediatek.com>,
-	Steven Liu <steven.liu@mediatek.com>,
-	John Crispin <john@phrozen.org>,
-	Chunfeng Yun <chunfeng.yun@mediatek.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 1/2] dt-bindings: phy: mediatek,xfi-tphy: add new bindings
-Message-ID: <20240202212420.GA1561174-robh@kernel.org>
-References: <702afb0c1246d95c90b22e57105304028bdd3083.1706823233.git.daniel@makrotopia.org>
+	s=k20201202; t=1706909429;
+	bh=v56A7tIQPuHlG+irb7rZnIZfGnhBn+AGY94HikYcQ2o=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AwAyS874oIHV5p30xFYq1JV07Z6ZPK5FBkU0ZQtKFL0XmagipQokhxrw1/uWJqHRO
+	 UZB9sxaIdMotx8nyZBuazWpxb5O3H75fv41LAxN2PjMshs/FaMxX4UkiXwMvUjXedZ
+	 ANvwiSqyLrALh6eYQ6cQ9G5LjlV3nN/MLD2Fg/pKutU02QcQJsFZ1RjQ8cV1HxFspg
+	 0VyPGFS5HlnPHwPWohwABxOSksqrgGuQxaAHpLh8/1wdSNXJyMrirwVaZkhOQ+mYzY
+	 yGdSX/hD/0Fm3CC2nglrnEdFiLmH8ie1v7v1s/ymgObJNHfIfIegr3gciP+nP6px7h
+	 6b6z/kghHMl+A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0BDACC04E32;
+	Fri,  2 Feb 2024 21:30:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <702afb0c1246d95c90b22e57105304028bdd3083.1706823233.git.daniel@makrotopia.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v3 0/6] Improvements for tracking scalars in the BPF
+ verifier
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170690942904.20598.1069790224577035855.git-patchwork-notify@kernel.org>
+Date: Fri, 02 Feb 2024 21:30:29 +0000
+References: <20240127175237.526726-1-maxtram95@gmail.com>
+In-Reply-To: <20240127175237.526726-1-maxtram95@gmail.com>
+To: Maxim Mikityanskiy <maxtram95@gmail.com>
+Cc: eddyz87@gmail.com, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, shung-hsi.yu@suse.com, john.fastabend@gmail.com,
+ martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev,
+ kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+ mykolal@fb.com, shuah@kernel.org, davem@davemloft.net, kuba@kernel.org,
+ hawk@kernel.org, bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org, maxim@isovalent.com
 
-On Thu, Feb 01, 2024 at 09:52:20PM +0000, Daniel Golle wrote:
-> Add bindings for the MediaTek XFI T-PHY Ethernet SerDes PHY found in the
-> MediaTek MT7988 SoC which can operate at various interfaces modes:
+Hello:
 
-This is v4 unless I'm confused[1]. Where's the revision history?
+This series was applied to bpf/bpf-next.git (master)
+by Andrii Nakryiko <andrii@kernel.org>:
 
-Rob
-
-[1] https://lore.kernel.org/all/b875f693f6d4367a610a12ef324584f3bf3a1c1c.1702352117.git.daniel@makrotopia.org/
-
+On Sat, 27 Jan 2024 19:52:31 +0200 you wrote:
+> From: Maxim Mikityanskiy <maxim@isovalent.com>
 > 
-> via USXGMII PCS:
->  * USXGMII
->  * 10GBase-R
->  * 5GBase-R
+> The goal of this series is to extend the verifier's capabilities of
+> tracking scalars when they are spilled to stack, especially when the
+> spill or fill is narrowing. It also contains a fix by Eduard for
+> infinite loop detection and a state pruning optimization by Eduard that
+> compensates for a verification complexity regression introduced by
+> tracking unbounded scalars. These improvements reduce the surface of
+> false rejections that I saw while working on Cilium codebase.
 > 
-> via LynxI SGMII PCS:
->  * 2500Base-X
->  * 1000Base-X
->  * Cisco SGMII (MAC side)
-> 
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> ---
->  .../bindings/phy/mediatek,xfi-tphy.yaml       | 80 +++++++++++++++++++
->  1 file changed, 80 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/phy/mediatek,xfi-tphy.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/phy/mediatek,xfi-tphy.yaml b/Documentation/devicetree/bindings/phy/mediatek,xfi-tphy.yaml
-> new file mode 100644
-> index 0000000000000..e897118dcf7e6
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/phy/mediatek,xfi-tphy.yaml
-> @@ -0,0 +1,80 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/phy/mediatek,xfi-tphy.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: MediaTek XFI T-PHY
-> +
-> +maintainers:
-> +  - Daniel Golle <daniel@makrotopia.org>
-> +
-> +description:
-> +  The MediaTek XFI SerDes T-PHY provides the physical SerDes lanes
-> +  used by the (10G/5G) USXGMII PCS and (1G/2.5G) LynxI PCS found in
-> +  MediaTek's 10G-capabale SoCs.
-> +
-> +properties:
-> +  $nodename:
-> +    pattern: "^phy@[0-9a-f]+$"
-> +
-> +  compatible:
-> +    const: mediatek,mt7988-xfi-tphy
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  clocks:
-> +    items:
-> +      - description: XFI PHY clock
-> +      - description: XFI register clock
-> +
-> +  clock-names:
-> +    items:
-> +      - const: xfipll
-> +      - const: topxtal
-> +
-> +  resets:
-> +    items:
-> +      - description: PEXTP reset
+> [...]
 
-What is PEXTP?
+Here is the summary with links:
+  - [bpf-next,v3,1/6] bpf: Track spilled unbounded scalars
+    https://git.kernel.org/bpf/bpf-next/c/e67ddd9b1cff
+  - [bpf-next,v3,2/6] selftests/bpf: Test tracking spilled unbounded scalars
+    https://git.kernel.org/bpf/bpf-next/c/6be503cec6c9
+  - [bpf-next,v3,3/6] bpf: Preserve boundaries and track scalars on narrowing fill
+    https://git.kernel.org/bpf/bpf-next/c/c1e6148cb4f8
+  - [bpf-next,v3,4/6] selftests/bpf: Add test cases for narrowing fill
+    https://git.kernel.org/bpf/bpf-next/c/067313a85c6f
+  - [bpf-next,v3,5/6] bpf: handle scalar spill vs all MISC in stacksafe()
+    https://git.kernel.org/bpf/bpf-next/c/6efbde200bf3
+  - [bpf-next,v3,6/6] selftests/bpf: states pruning checks for scalar vs STACK_MISC
+    https://git.kernel.org/bpf/bpf-next/c/73a28d9d000e
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
