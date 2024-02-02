@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-68482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37D5D84701D
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:20:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5A7A84701F
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:20:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B4381C24DC0
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:20:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5FFB32914DE
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BF7214198A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91EDC14198E;
 	Fri,  2 Feb 2024 12:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YEpqDYqi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LBI1ElvJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6686014079D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 667FF14079C;
 	Fri,  2 Feb 2024 12:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706876430; cv=none; b=P/qxJT1E37w+jbwjsUVZJ8JPFp85ui5q+sxyUimEEU38Zw3iYsNEqNi9cwLcLB8Q3nCC+YKVu3Nrg1RZyduoof63gAuxJoLiT4Y8cexIFVLHaAiuuRXL7SS48Lsv/gh9JcLN1+iruREhhOmY0ZYyQhkyU7N5amhnwbpiazuQ9xM=
+	t=1706876430; cv=none; b=i2HanE1zm1YPZ0VCQ9UJAiZwP3wgszqVr5pEgBtn14OON8LvrVxrvr3OLR9PR2gAN79A3HNGmmgwvrVPJ9Cn5H/7GVFotewX8QYBmRauyJrqiYbblRUMoiuiNrg0lpwkF8ySe1VFwYwKpubkHUHFeEDYZEazEa9/QOZGOBFBK80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706876430; c=relaxed/simple;
-	bh=kn7u04wfy8ymvQ6lKtK29MV+2GMKXsSRwya72f7h1v8=;
+	bh=FV0ha3qJz0mYOJpLNPsy90g8FeOobYwSB7UjsP+sQ20=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uqmDOcJNLPLsMSCWQTkRlPEQUxt7yJf/xlEKZVsRCM6eh2DWUyNs3D1bxyPBvMmW+6rvfd8cgd6glEn33BuwLM1pI28RfiSus3q05g2zQmxQ9igJXnQ5MyMMCKA4ChAwohgmKap2f32n2llLUR6Dgps1ToTTgdnLDDip4aYkXEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YEpqDYqi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EFF1FC433C7;
-	Fri,  2 Feb 2024 12:20:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=hJnd5riFZug5OZg+isXV7fvm1PnhOIO/2ANL3CZhNmJszQZtymeksTHxph8gF4452o4rKXKF5x5gpF/ik0lsSXHNFqO34I/hzyhGvJTrVyzMLMz2kYPSJpsH2xGH5sdctcGmXbfyEoKNimCNJBTTxrYUozD6xT9KGczMDtL462Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LBI1ElvJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0869CC43399;
+	Fri,  2 Feb 2024 12:20:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1706876430;
-	bh=kn7u04wfy8ymvQ6lKtK29MV+2GMKXsSRwya72f7h1v8=;
+	bh=FV0ha3qJz0mYOJpLNPsy90g8FeOobYwSB7UjsP+sQ20=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YEpqDYqiVUb1Nmy16MTlbFn+z8d3nwqXFoMw6ej53mkG/4Y7oiE7CVyMrCsxhkXqs
-	 choNCgGdKGEQosyZ7TAD7ADWBJCghfxzjF2szs8a8+KWr/7e5KyXCXf1iUdsGgvV4S
-	 1Y0gtMIu/av+R/QRymJfxUppKKjF2YvbwditNNlDZjFow04zyGE95dbY4v4NUOuKCC
-	 vZK4d2VNc+ZlMpmfdohRQYhDuDKsDblZZFb/TbOTiLijkplI5RucWqETVcpiigDxiL
-	 M0luGzRmP3zIsKUGTdfBoPQPROPjDQ1e9uWT5WBlbygjkU8EjwhV5WYPNeel6Wn+tJ
-	 E5Mu3EQGInYiQ==
+	b=LBI1ElvJpI6BA+juTCP3EffNxoLiuAdevcyYndlcAIQw0cKOIh9FCZ2xH/4HE9ry7
+	 Cv20J+U57gF/kRbGmV9uSXzZi2enp2h22B5S0Bggfj0U9ULFSF9qhKZllfIJ4Wacar
+	 bAPZXsMZU4gf3RADXVUTLnvIJVqgAgpNtc5X8opTQZoL3bsVNpcQqIZkuUOmeljFUy
+	 I5MLxd1K43D5xZ24wJaEjASyU04HHr+FsLXtmlI+v1dQzv+pvzH8wcKFRte4CjSKFd
+	 CHyNM2rFuOB++WKUh3v7edmuK8c7gPWFrJHSrRqpsH9RGH+mhx45Oby236kY5bTZfA
+	 CdonEVvb+HCJw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D6A70C04E27;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DFB3DDC99E7;
 	Fri,  2 Feb 2024 12:20:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 0/2] Dynamically allocate BPIDs for LBK
+Subject: Re: [PATCH net-next] net: dccp: Simplify the allocation of slab caches in
+ dccp_ackvec_init
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170687642987.27809.15518970048126764791.git-patchwork-notify@kernel.org>
+ <170687642991.27809.3782875181223836265.git-patchwork-notify@kernel.org>
 Date: Fri, 02 Feb 2024 12:20:29 +0000
-References: <20240131075441.17227-1-gakula@marvell.com>
-In-Reply-To: <20240131075441.17227-1-gakula@marvell.com>
-To: Geetha sowjanya <gakula@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org,
- davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- sgoutham@marvell.com, sbhatta@marvell.com, hkelam@marvell.com
+References: <20240131090851.144229-1-chentao@kylinos.cn>
+In-Reply-To: <20240131090851.144229-1-chentao@kylinos.cn>
+To: Kunwu Chan <chentao@kylinos.cn>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dccp@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Wed, 31 Jan 2024 13:24:39 +0530 you wrote:
-> In current driver 64 BPIDs are reserved for LBK interfaces.
-> These bpids are 1-to-1 mapped to LBK interface channel numbers.
-> In some usecases one LBK interface required more than one bpids
-> and in some case they may not require at all. These usescas
-> can't be address with the current implementation as it always
-> reserves only one bpid per LBK channel.
+On Wed, 31 Jan 2024 17:08:51 +0800 you wrote:
+> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
+> to simplify the creation of SLAB caches.
 > 
-> [...]
+> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+> ---
+>  net/dccp/ackvec.c | 8 ++------
+>  1 file changed, 2 insertions(+), 6 deletions(-)
 
 Here is the summary with links:
-  - [net-next,v2,1/2] octeontx2-af: Create BPIDs free pool
-    https://git.kernel.org/netdev/net-next/c/d6212d2e41a0
-  - [net-next,v2,2/2] octeontx2-af: Cleanup loopback device checks
-    https://git.kernel.org/netdev/net-next/c/ae703539f49d
+  - [net-next] net: dccp: Simplify the allocation of slab caches in dccp_ackvec_init
+    https://git.kernel.org/netdev/net-next/c/20ea9327c2fd
 
 You are awesome, thank you!
 -- 
