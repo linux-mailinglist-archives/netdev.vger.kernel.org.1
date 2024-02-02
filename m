@@ -1,108 +1,102 @@
-Return-Path: <netdev+bounces-68651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1399847734
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:16:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2540E847750
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:24:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70CBB1F22826
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:16:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B87B81F273EA
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:24:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3504914AD10;
-	Fri,  2 Feb 2024 18:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E82DB14E2C1;
+	Fri,  2 Feb 2024 18:22:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="KSYCbLwL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I1TvU+Lj"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 477CA14A4DB;
-	Fri,  2 Feb 2024 18:16:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B890F152DEF;
+	Fri,  2 Feb 2024 18:22:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706897774; cv=none; b=QBOR8+w2MynFKnY/FIY1R0exq6EK5DI9hy6t3uZiRIdrOggQytVnCBw8GlUPO23yEaPKLdwsAKpNi5ZZzaRVaXtEJyVUtBVjS5yw2AwpOVUzmaE4n6xiiEI4svKJ8Y2w6aOQlopDQ2Kpm1Moq5io/Ztc9J1vYAmQnXwaQ5h65fo=
+	t=1706898161; cv=none; b=M0gZ4babYzxRRI/SmSfVTIlWbNun2kQRmbLLXoG79yM/PkrczJ09WG+Xot9BUEWi5eJ44nAr0sa7bC9FEJkFnqHanECv+j1lYQJFBkUPaZC+44GQdtfxa4IjjWbFKuYsQWFY/cWS4zf+QU16iis/Pv62xg84u5O8xVBL8RCV4yY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706897774; c=relaxed/simple;
-	bh=NjO4eKATb1ZVzlEJYvDOvITgk+VfeuI9bh96oQ6EXhw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=QInhMb6M08AoeMg3bFrhmKsTso+jjaBVNsITDIcg7QynErh6Htu3HveTDeBS+2afk/R2ZcWIBeo8bpwMMllXZ5+ebsWOXPBs/WQ+2VXxeeRMyy1cQnedeDoQEZRh3mycnKusqYGbUEo2uAlRmgFCQ43SUr0+6XzO4Uzrxz/Rmz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=KSYCbLwL; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 9A90240006;
-	Fri,  2 Feb 2024 18:16:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1706897769;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wtiYOXFMPoLKKMTHGF2JB2BrNN/qXiq/VP/qdA5HoGY=;
-	b=KSYCbLwLFuzIuoUaJtpjQGUzO1il4uWXGQ0IExPOpAKFe7gDSiBo3Zdbi+kNccBwAl2Yec
-	RB4VAVK7NrOrl2YBoFuidSJZRkL57a+WmQ7lxqCmdkMTKSimnimlSsAPH7WhtbnHjbmMcf
-	Brarti0Ozcpa7hCbnOYI4yB13yrzhLSjSpAK46Pa9PfMOyQvZ6mFY4LCTUz7gg2v+t58AH
-	FQ/pnWSOQKp8/Tk0nqzBxPiQrbKbulmAa9H0zHfhFbRZcJpiGj9EBCWqfWD83X5GtIW303
-	dVMZ7x0vg+AKUWJCm1WjaDAps1zeUQIli0oh+MpNDLKQ9OWItA/vUi6aa1Nujw==
-Message-ID: <5b744f7f-2f63-4219-a0e9-8f08267b1fdd@arinc9.com>
-Date: Fri, 2 Feb 2024 21:16:02 +0300
+	s=arc-20240116; t=1706898161; c=relaxed/simple;
+	bh=svlvAKv5Rsvu79CaMk7L2BcATKO9LgP+bcm0qXURTwE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kXT40s587iTqiLmrwCm3PglsnqX26GDXanspLQaEos6Q+x3gVLuUDWztlw0tlH4BmToxViyX52enzsEYPm1+fYGpciU6ZikEW7QcjRi7FK07cirEy1VQID4FCJAbjdr6+n7BgIlh1EWje8T5FFa7CMu0FPsPGjSEYNQhUGXqPOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I1TvU+Lj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9F75C433F1;
+	Fri,  2 Feb 2024 18:22:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706898161;
+	bh=svlvAKv5Rsvu79CaMk7L2BcATKO9LgP+bcm0qXURTwE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=I1TvU+LjPjr5qbLEIXhr7/DRLc7UIpceNQ5kWHZnw0xpTGQ94/KFqA+FR7dw+gIe9
+	 TAQY0kW36tFvSPdxJIwk/qePlR6anGBbBhKCAnuXDVvwO+u3737/q1pGdLwlnQORkO
+	 xSF61brZecFv2S2/NxndiIyhyEPiX6cS7v/2dSJOVKqTX0Aqfb3DGpLcjPUUf9ChVL
+	 wFwZeRnYRq/xjtfK8nVM+KWFYAstoemWARClHatdXrrEJP5i1KSnptzOc273mnBYOD
+	 4UDD4jrAbn8EpOUc62qfT90JE1ISVJtRHOoi4/JbYdDbpMYbe1ySHALb0wbjzs5ree
+	 q6FH+Kfhb/GWQ==
+Date: Fri, 2 Feb 2024 10:22:39 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Eric Dumazet
+ <edumazet@google.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <chuck.lever@oracle.com>,
+ <jlayton@kernel.org>, <linux-api@vger.kernel.org>, <brauner@kernel.org>,
+ <davem@davemloft.net>, <alexander.duyck@gmail.com>, "Wei Wang"
+ <weiwan@google.com>, Amritha Nambiar <amritha.nambiar@intel.com>
+Subject: Re: [net-next 0/3] Per epoll context busy poll support
+Message-ID: <20240202102239.274ca9bb@kernel.org>
+In-Reply-To: <f0b4d813-d7cb-428b-9c41-a2d86684f3f1@intel.com>
+References: <20240124025359.11419-1-jdamato@fastly.com>
+	<CANn89i+YKwrgpt8VnHrw4eeVpqRamLkTSr4u+g1mRDMZa6b+7Q@mail.gmail.com>
+	<5faf88de-5063-421f-ad78-ad24d931fd17@intel.com>
+	<20240202032806.GA8708@fastly.com>
+	<f0b4d813-d7cb-428b-9c41-a2d86684f3f1@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 4/7] net: dsa: mt7530: move XTAL check to
- mt7530_setup()
-Content-Language: en-US
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
- Bartel Eerdekens <bartel.eerdekens@constell8.be>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20240202-for-netnext-mt7530-improvements-2-v3-0-63d5adae99ca@arinc9.com>
- <20240202-for-netnext-mt7530-improvements-2-v3-4-63d5adae99ca@arinc9.com>
- <ZbzWpmZrukknMsYf@shell.armlinux.org.uk>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <ZbzWpmZrukknMsYf@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 2.02.2024 14:48, Russell King (Oracle) wrote:
-> On Fri, Feb 02, 2024 at 12:19:10PM +0300, Arınç ÜNAL via B4 Relay wrote:
->> From: Arınç ÜNAL <arinc.unal@arinc9.com>
->>
->> The crystal frequency concerns the switch core. The frequency should be
->> checked when the switch is being set up so the driver can reject the
->> unsupported hardware earlier and without requiring port 6 to be used.
->>
->> Move it to mt7530_setup(). Drop the unnecessary function printing.
->>
->> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
->> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
->> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+On Fri, 2 Feb 2024 11:23:28 -0600 Samudrala, Sridhar wrote:
+> > I know I am replying to a stale thread on the patches I've submit (there is
+> > a v5 now [1]), but I just looked at your message - sorry I didn't reply
+> > sooner.
+> > 
+> > The per-queue and per-napi netlink APIs look extremely useful, thanks for
+> > pointing this out.
+> > 
+> > In my development tree, I had added SIOCGIFNAME_BY_NAPI_ID which works
+> > similar to SIOCGIFNAME: it takes a NAPI ID and returns the IF name. This is
+> > useful on machines with multiple NICs where each NIC could be located in
+> > one of many different NUMA zones.
+> > 
+> > The idea was that apps would use SO_INCOMING_NAPI_ID, distribute the NAPI
+> > ID to a worker thread which could then use SIOCGIFNAME_BY_NAPI_ID to
+> > compute which NIC the connection came in on. The app would then (via
+> > configuration) know where to pin that worker thread; ideally somewhere NUMA
+> > local to the NIC.
+> > 
+> > I had assumed that such a change would be rejected, but I figured I'd send
+> > an RFC for it after the per epoll context stuff was done and see if anyone
+> > thought SIOCGIFNAME_BY_NAPI_ID would be useful for them, as well.  
 > 
-> I would prefer this to be earlier in the series, before patch 2 which
-> moves mt7530_setup_port6() to be called from mac_config(). mac_config()
-> is supposed to be configuration error-free - in other words, all state
-> should have been checked before hand.
+> I think you should be able to get this functionality via the netdev-genl 
+> API to get napi parameters. It returns ifindex as one of the parameters 
+> and you should able to get the name from ifindex.
+> 
+> $ ./cli.py --spec netdev.yaml --do napi-get --json='{"id": 593}'
+> {'id': 593, 'ifindex': 12, 'irq': 291, 'pid': 3727}
 
-I agree but mt7530_mac_config() is not a void function yet. The
-mac_port_config member of the mt753x_info structure points to this
-function. My next patch series gets rid of all useless error returns on the
-phylink path and change mac_port_config to void. So I don't think working
-on this patch series further will worth the effort. I'd rather have this
-version applied as is.
-
-Arınç
+FWIW we also have a C library to access those. Out of curiosity what's
+the programming language you'd use in user space, Joe?
 
