@@ -1,202 +1,142 @@
-Return-Path: <netdev+bounces-68703-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD1C3847A07
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:58:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B0A4847A2C
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 21:02:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 381A21F232BC
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:58:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5C375B29D4E
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:02:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB05B8062B;
-	Fri,  2 Feb 2024 19:58:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BFA912F366;
+	Fri,  2 Feb 2024 19:59:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yp8fxriP"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="tvRbhxEd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2042.outbound.protection.outlook.com [40.107.102.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEAB015E5CF;
-	Fri,  2 Feb 2024 19:58:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706903910; cv=none; b=Ckd+P8VQGKDnl9N5DEasicPTsK012Emzr5jJDInOPbCQv/M51T5SM563YsSYnrU86EPq5yt5YpWmT1eB89kZtAtu0HlVcZAl/wo4rU6TIi2s4BeQ3tlRizXEP8NtWSRIwHVYv1Jxn/ABTr7e4KCMsx47xSRPhjRWn69KHqh+NlE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706903910; c=relaxed/simple;
-	bh=QXqBLZTBwDvHVnz+ZkulQjlUzUelopqjAIOf9+JsdIU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a72p801rX2ckYr12gW6rxDMyTiLCUqtYY0T1vYogSVOTssOKB4fxLGp4oYKvGtjHIL3W7t8YlkzaIDRBjmZ8rJ//SzOo5680fb0HZuJBQZEo6Aj6TPsrzycvnmcdyArEMMvXBkpDzNAZcn31Oz5931mTJD9pbVqZ3dqvzgastxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yp8fxriP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B860CC433C7;
-	Fri,  2 Feb 2024 19:58:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706903910;
-	bh=QXqBLZTBwDvHVnz+ZkulQjlUzUelopqjAIOf9+JsdIU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Yp8fxriPipHveAtkSZWGL4RYByuF3BQFT06IyAs7nyBIsT8OdaQrFq+owBOAvMbD2
-	 XIvpHdlWNA3Ym1PoHP61IYhLoQ8C/LUruHXsVxUs4Aiy3SAT2JZrD5he6+jm9kOohn
-	 lP5JId8vOiM8t7jyTVu3Y82p57PSejAqER8KXv13ZAbEtsBL079++hZzlgBD3Z0oXN
-	 xSSVf5jES+8T8/6vtwZLjp4lm5F9SErYxI6J64XiLhqXoEq0WYZe4T9TA5jAH1PpN/
-	 am9dygBObjWHmlAK3fbUKAYnxPFk9Hj5P7a1U9Ju9ifbH0pkX7eNpx9jjckeXefCSa
-	 l9/uCK76NGK7A==
-Date: Fri, 2 Feb 2024 11:58:28 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Eric Dumazet
- <edumazet@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, chuck.lever@oracle.com, jlayton@kernel.org,
- linux-api@vger.kernel.org, brauner@kernel.org, davem@davemloft.net,
- alexander.duyck@gmail.com, Wei Wang <weiwan@google.com>, Amritha Nambiar
- <amritha.nambiar@intel.com>
-Subject: Re: [net-next 0/3] Per epoll context busy poll support
-Message-ID: <20240202115828.6fd125bf@kernel.org>
-In-Reply-To: <20240202193332.GA8932@fastly.com>
-References: <20240124025359.11419-1-jdamato@fastly.com>
-	<CANn89i+YKwrgpt8VnHrw4eeVpqRamLkTSr4u+g1mRDMZa6b+7Q@mail.gmail.com>
-	<5faf88de-5063-421f-ad78-ad24d931fd17@intel.com>
-	<20240202032806.GA8708@fastly.com>
-	<f0b4d813-d7cb-428b-9c41-a2d86684f3f1@intel.com>
-	<20240202102239.274ca9bb@kernel.org>
-	<20240202193332.GA8932@fastly.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D819412C7E3;
+	Fri,  2 Feb 2024 19:59:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706903976; cv=fail; b=U6I9FgF3uAbs+CU/BTVdnqb62w5lGLaRh9Pv2Z5smyJxiE2aurF8Atln+noT/WkOJCj6cWKUzToIwXs5BMzzehKCl68DDTnURSeHBSunNE8KNO2FJnKTwDWS9ZZjeJEZA8RRkjLbh5RDE1r45yDbnD9CL3C2RCI1QGiDUs0+bmY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706903976; c=relaxed/simple;
+	bh=IWctnh+920BaO1LbGwY1uSCT2fwlAHqK/tF6oQllz9U=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gqqCFtpgttw2v9yxFdCeIKaMKzwIipExZLG+bCwW67rza65ORDSrVan/ekhi06pi4caNJGVb5A7f8KEnhiuPjVIkCL5xOoaGx00A/fbi/4wqZgsy4qrcXeBSM52mVRnL1eve+8okAJkXiRcgB/hxSYLq6IMSOpQepGlB8TseL8w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=tvRbhxEd; arc=fail smtp.client-ip=40.107.102.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Yqo36TxNfr3gCr7lbb0FBZQ9yQFHdN6OtkUKVAycWt8NwVrguibYxcGU7V9UEoM1a7yinCqFs4YKWyPv/VPIhX+j1mjZF4pS/Tp4KmIrz6wF98RMdMwwmwgcDtz43fQFrIhIhsKMEPCRmRy8nOYsPwAlA3Su2LfN/x39j6Jy3T3xJSmG9ui0LWskVodj0crbfr1RTBtQwiFGUlI68iI1WLglbxBjHAAU96JTQMIt6FxP69quwmMuVgxt7hvuwgo0bcKXvbBPKBIelEDlZ8g88nMjKRyld1VlCWWaovs8VxxbWLpyaHQ5RclU2NKPmgay7yDi18ZfsyLmtSg6sy/+Kg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tIzADFhpfbbIY+S0rgIxieFinh+y0xyYR/20NUIZ4EM=;
+ b=E8eswuSCkm0nPW8zFEqsPkAiJX3S5W3eIL4toZlOWtm/lrXnd0SkYLLhgD1wJru7gFDm0+cxLZtcx4Qy7BOMuvFfE3Hmrzd6jyj/JETvJh3i1XqENIYiuuor1V9hxcPrUcdBrCjgnU9WGLzZipNlbjL0qVyRbuPUw2XqjRNLqIebAJdhaEk1330Ivg38GPTFzoEWErijhT1E2Cx9P/zDvG28O5kgx3BlBs06JQeK81lHo/oocYPk54bRoHfrwb1TpOxobw2uWyTSBE2Km8bmU/QUcMaL704CJzk7lDjcyU35ScOrwx7BrYNlCbiX+cxT40ss+wiUTWXZcMWYNA1chw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tIzADFhpfbbIY+S0rgIxieFinh+y0xyYR/20NUIZ4EM=;
+ b=tvRbhxEdVQnWwHsVeM93hdIGpg48dPMgE81dNSDmKBOOtQ//ToqzL2YwyH8AnQCRby/H5hEARD2lRY366sW+qdtjTdh2B8Ufd8Y3uUuYKFNk2m+aVOQ0EBXBXeGP90lizgRVvOQn5ly9ScZ2nGvhDaN2S8xhbtfZltVCEET85kI=
+Received: from BYAPR04CA0021.namprd04.prod.outlook.com (2603:10b6:a03:40::34)
+ by PH7PR12MB9175.namprd12.prod.outlook.com (2603:10b6:510:2e6::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.29; Fri, 2 Feb
+ 2024 19:59:24 +0000
+Received: from SJ5PEPF000001D3.namprd05.prod.outlook.com
+ (2603:10b6:a03:40:cafe::a7) by BYAPR04CA0021.outlook.office365.com
+ (2603:10b6:a03:40::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.24 via Frontend
+ Transport; Fri, 2 Feb 2024 19:59:24 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ SJ5PEPF000001D3.mail.protection.outlook.com (10.167.242.55) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7202.16 via Frontend Transport; Fri, 2 Feb 2024 19:59:24 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Fri, 2 Feb
+ 2024 13:59:22 -0600
+From: Brett Creeley <brett.creeley@amd.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <shannon.nelson@amd.com>, <brett.creeley@amd.com>
+Subject: [PATCH net-next 0/4] pds_core: Various improvements/cleanups
+Date: Fri, 2 Feb 2024 11:59:07 -0800
+Message-ID: <20240202195911.65338-1-brett.creeley@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001D3:EE_|PH7PR12MB9175:EE_
+X-MS-Office365-Filtering-Correlation-Id: eb981190-181f-4575-3011-08dc2429744f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	TQct+wwoc0J+2HffLHMSMLvbQDEWQKNAdt07w/yaCObJ8SA0iVdw5c2yyUuidGQZsabxN8RXb6KhOkL60XDid8nxJ5SLX/UdDwqibqryLi3dHw3/pWFcXhpXc6B0gLA+vdhoa1UAD/7eLr3FE56gfnjGd7NQZ3KK4B9Hs8PAkFVuXvpWleioFUXlIw0CRWNNRdWC1A6ufJ4zdjgT3w1wRZ32nNuvKyl7BbrA8QWroxPL8mPyAinxXcE6LSY+sP5YFRcFIzW7+J98nUAFJc3zEQVDzvgPEdQu7V2KniZkayE/moClnma8/+CAqsUIHUzQBbsZMMgZt3GhZMk6Uomj9XmMp/VI36UC2InsvcmZKDLn5ymkiGUu5f3Jvqjxlb9G7YfGoUBb8g3ratv7Izwl6quGC1A8RO1FMVaXn9SWzqPnG3KzfNym7R/xjTTGTo6gTQSUA7zLVGxxFelR8z0H00he9PLQ5VpkTEc9ya/txb40Z3+xRHu7ZJLg6TrRBC8y0AZpZe1PDgfDqBaAGUBnfVEFsV2LhGM8c6OZP15b1SaKvJRfV2ncDlDtlL9eH40MEtCFOG4JPADTINyntNbh1zABGLYF7dBNOCUdFP5g0SdjBvi9zfO0UaLo/kfbA36jRd1fNoYvdfPE374InFDpJHgNDL04WqV25mJbfZGFjhS04K55AJeWrxlWlMbm+7rseFqDzrGacLErZZ6nMYO3WmJPiWQpczIYxu/4ezaSoAmxtMdyUm5UAXHDHrhzF5vGcSkdZbtRTkYIEJtlffLNo4oaKsX7bOAAWOltYiSZGjk=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(376002)(346002)(396003)(39860400002)(136003)(230922051799003)(1800799012)(82310400011)(64100799003)(186009)(451199024)(46966006)(40470700004)(36840700001)(2906002)(82740400003)(36756003)(356005)(110136005)(86362001)(36860700001)(5660300002)(41300700001)(44832011)(47076005)(81166007)(4326008)(8936002)(83380400001)(8676002)(40480700001)(40460700003)(336012)(26005)(426003)(16526019)(1076003)(316002)(2616005)(70206006)(54906003)(70586007)(478600001)(6666004)(966005)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2024 19:59:24.1654
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: eb981190-181f-4575-3011-08dc2429744f
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001D3.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9175
 
-On Fri, 2 Feb 2024 11:33:33 -0800 Joe Damato wrote:
-> On Fri, Feb 02, 2024 at 10:22:39AM -0800, Jakub Kicinski wrote:
-> > On Fri, 2 Feb 2024 11:23:28 -0600 Samudrala, Sridhar wrote:  
-> > > I think you should be able to get this functionality via the netdev-genl 
-> > > API to get napi parameters. It returns ifindex as one of the parameters 
-> > > and you should able to get the name from ifindex.
-> > > 
-> > > $ ./cli.py --spec netdev.yaml --do napi-get --json='{"id": 593}'
-> > > {'id': 593, 'ifindex': 12, 'irq': 291, 'pid': 3727}  
-> > 
-> > FWIW we also have a C library to access those. Out of curiosity what's
-> > the programming language you'd use in user space, Joe?  
-> 
-> I am using C from user space. 
+This series contains various improvements and cleanups for the
+pds_core driver. These patches were originally part of the following
+net-next series:
 
-Ah, great! Here comes the advert.. :)
+https://lore.kernel.org/netdev/20240126174255.17052-1-brett.creeley@amd.com/
 
-  make -C tools/net/ynl/
+However, some of the patches from the above series were actually fixes,
+so they were pushed and accepted to net. That series can be found here:
 
-will generate the C lib for you. tools/net/ynl/generated/netdev-user.h
-will have the full API. There are some samples in
-tools/net/ynl/samples/. And basic info also here:
-https://docs.kernel.org/next/userspace-api/netlink/intro-specs.html#ynl-lib
+https://lore.kernel.org/netdev/20240129234035.69802-1-brett.creeley@amd.com/
 
-You should be able to convert Sridhar's cli.py into an equivalent 
-in C in ~10 LoC.
+Also, the Reviewed-by tags were left in place from the original net-next
+reviews as the patches didn't change.
 
-> Curious what you think about
-> SIOCGIFNAME_BY_NAPI_ID, Jakub? I think it would be very useful, but not
-> sure if such an extension would be accepted. I can send an RFC, if you'd
-> like to take a look and consider it. I know you are busy and I don't want
-> to add too much noise to the list if I can help it :)
+Brett Creeley (4):
+  pds_core: Don't assign interrupt index/bound_intr to notifyq
+  pds_core: Unmask adminq interrupt in work thread
+  pds_core: Fix up some minor issues
+  pds_core: Clean up init/uninit flows to be more readable
 
-Nothing wrong with it in particular, but we went with the netlink API
-because all the objects are related. There are interrupts, NAPI
-instances, queues, page pools etc. and we need to show all sort of
-attributes, capabilities, stats as well as the linking. So getsockopts
-may not scale, or we'd need to create a monster mux getsockopt?
-Plus with some luck the netlink API will send you notifications of
-things changing.
+ drivers/net/ethernet/amd/pds_core/adminq.c  | 10 +--
+ drivers/net/ethernet/amd/pds_core/core.c    | 92 ++++++++++-----------
+ drivers/net/ethernet/amd/pds_core/core.h    |  1 +
+ drivers/net/ethernet/amd/pds_core/debugfs.c |  8 +-
+ drivers/net/ethernet/amd/pds_core/dev.c     | 22 ++++-
+ 5 files changed, 71 insertions(+), 62 deletions(-)
 
-> Here's a brief description of what I'm doing, which others might find
-> helpful:
-> 
-> 1. Machine has multiple NICs. Each NIC has 1 queue per busy poll app
-> thread, plus a few extra queues for other non busy poll usage.
-> 
-> 2. A custom RSS context is created to distribute flows to the busy poll
-> queues. This context is created for each NIC. The default context directs
-> flows to the non-busy poll queues.
-> 
-> 3. Each NIC has n-tuple filters inserted to direct incoming connections
-> with certain destination ports (e.g. 80, 443) to the custom RSS context.
-> All other incoming connections will land in the default context and go to
-> the other queues.
-> 
-> 4. IRQs for the busy poll queues are pinned to specific CPUs which are NUMA
-> local to the NIC.
-> 
-> 5. IRQ coalescing values are setup with busy poll in mind, so IRQs are
-> deferred as much as possible with the assumption userland will drive NAPI
-> via epoll_wait. This is done per queue (using ethtool --per-queue and a
-> queue mask). This is where napi_defer_hard_irqs and gro_flush_timeout
-> could help even more. IRQ deferral is only needed for the busy poll queues.
+-- 
+2.17.1
 
-Did you see SO_PREFER_BUSY_POLL by any chance? (In combination with
-gro_flush_timeout IIRC). We added it a while back with Bjorn, it seems
-like a great idea to me at the time but I'm unclear if anyone uses it 
-in production..
-
-> 6. userspace app config has NICs with their NUMA local CPUs listed, for
-> example like this:
-> 
->    - eth0: 0,1,2,3
->    - eth1: 4,5,6,7
-> 
-> The app reads that configuration in when it starts. Ideally, these are the
-> same CPUs the IRQs are pinned to in step 4, but hopefully the coalesce
-> settings let IRQs be deferred quite a bit so busy poll can take over.
-
-FWIW if the driver you're using annotates things right you'll also get
-the NAPI <> IRQ mapping via the netdev netlink. Hopefully that
-simplifies the pinning setup.
-
-> 7. App threads are created and sockets are opened with REUSEPORT. Notably:
-> when the sockets are created, SO_BINDTODEVICE is used* (see below for
-> longer explanation about this).
-> 
-> 8. cbpf reusport program inserted to distribute incoming connections to
-> threads based on skb->queue_mapping. skb->queue_mapping values are not
-> unique (e.g. each NIC will have queue_mapping==0), this is why BINDTODEVICE
-> is needed. Again, see below.
-> 
-> 9. worker thread epoll contexts are set to busy poll by the ioctl I've
-> submit in my patches.
-> 
-> The first time a worker thread receives a connection, it:
-> 
-> 1. calls SO_INCOMING_NAPI_ID to get the NAPI ID associated with the
-> connection it received.
-> 
-> 2. Takes that NAPI ID and calls SIOCGIFNAME_BY_NAPI_ID to figure out which
-> NIC the connection came in on.
-> 
-> 3. Looks for an un-unsed CPU from the list it read in at configuration time
-> that is associated with that NIC and then pins itself to that CPU. That CPU
-> is removed from the list so other threads can't take it.
-> 
-> All future incoming connections with the same NAPI ID will be distributed
-> to app threads which are pinned in the appropriate place and are doing busy
-> polling.
-> 
-> So, as you can see, SIOCGIFNAME_BY_NAPI_ID makes this implementation very
-> simple.
-> 
-> I plan to eventually add some information to the kernel networking
-> documentation to capture some more details of the above, which I think
-> might be helpful for others.
-
-Sounds very sensible & neat indeed. And makes sense to describe this 
-in the docs, that should hopefully put more people on the right path :)
-
-> Another potential solution to avoid the above might be use an eBPF program
-> and to build a hash that maps NAPI IDs to thread IDs and write a more
-> complicated eBPF program to distribute connections that way. This seemed
-> cool, but involved a lot more work so I went with the SO_BINDTODEVICE +
-> SIOCGIFNAME_BY_NAPI_ID method instead which was pretty simple (C code wise)
-> and easy to implement.
-
-Interesting!
 
