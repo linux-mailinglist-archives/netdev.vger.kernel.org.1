@@ -1,170 +1,111 @@
-Return-Path: <netdev+bounces-68460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EF6A846F76
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:52:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE7B4846F77
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:52:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE844293E9D
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:52:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9640A29715C
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:52:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF1851386C4;
-	Fri,  2 Feb 2024 11:52:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5664913E214;
+	Fri,  2 Feb 2024 11:52:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KUBZEB3g"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="aj0xf2f5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A81137C41
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 11:52:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4DC113D4F7;
+	Fri,  2 Feb 2024 11:52:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706874739; cv=none; b=EdWGrRVGZvmAF/FSc5kWTS6pl4IO/LLDCXITT83eZHvbQPqzVCKBXzuDAuWjJVJzL6HsvVeWM7PlPYY0U9QbCExSZjpqTK+JdGh501uhwfFRTEE4u/V6dKL9PVKANPLTk79tY6l/d2+9e0EDE8pIb9Fkook3d74cKcjme3SZBGo=
+	t=1706874744; cv=none; b=Y4wIAfRpFoGjzybxKWhssmDN19kwji4V3dM8G8mMuS0RgIrGy03lus/8KC9nSoTUMUB0tqC2LznZXaiA4IX7gYYqijfSol1iwN5o+XMQ5iCdHCJXWcQVKeBNupKRPVHgEzghvWqK5abawmtyKiPc01gtS+z6V8TQX9nxgKzCJVA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706874739; c=relaxed/simple;
-	bh=5wnwSiLLu0b6qjxFN8dviNlFoEwroi5Al15bdFtZJsY=;
+	s=arc-20240116; t=1706874744; c=relaxed/simple;
+	bh=WWpj7IIOmpVjFPX3K3o71FGW0pD4t4+22/QypjCBsEM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ShNnvzsjZCX6yp98KuyvPmkJN6zOzXzDRL7SWXatZDkTcXFVOMb5uqjyD9HW0P5wMk1sgZQxPp+RECV3HP8kvFG6zIkYE2a8sUyJtOy3rkK1LIo7gV/PNOGkeN4Qip7p1SCti/6VJmIDkgZ2yPPbHVy8SIl5p6B3QkZL+grKTWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KUBZEB3g; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-5d81b08d6f2so1687357a12.0
-        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 03:52:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706874737; x=1707479537; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ITvVa55mQEnNJu8CgrUE3gCVzEHWWZsHqL/+c7zzmq0=;
-        b=KUBZEB3gqbmt0YuYKqUsA7YMx+/orhPrqhavXYOV0JdXQa27RhFYR1CgOePvnCFj2E
-         PZ5N5NEHhIbsh+47e5FuQxkVPLL9JOazKZjTfNWlAEvk2/TjjZ9IaKgnc9iNAb7yXcko
-         8azvLXul/H/6AI1wbfDdVyU+cBOfJkOe0Of/UB/yjJMfq56XjWvdE0ZbHdf6k2iiyhuv
-         LcEytrlH2N6/DznXtsb4Y+6zqcWar/pB+tg1dq1x299Qop22uYfZ7SM2yZBlcF2AjnHp
-         D+2QMzCAUxMKcMzMUqhCYUof4g/4KXF2OmplzakU+JPimnGpmItqfO8Xqz+25EthsTsJ
-         8gAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706874737; x=1707479537;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ITvVa55mQEnNJu8CgrUE3gCVzEHWWZsHqL/+c7zzmq0=;
-        b=Lt6FlGJ8iCCLgtJMTT5YjytjarZ8bEVYLP3kaHa5SrQBAMaLMpkxnRvCPF4Co0APIC
-         DiN3oE1ZYk4sLfgF/g0Du5t7hB/Rdvpx+IJ8Tb6X9+s3+YeXuLSweUiNomolIpd69kXh
-         j7YeR5YAKsoUk1iR4RGb5UbeI78A5L2zHVbws+jGAk5x1sVnNQJc3wJl0R8YJ6WFcMsB
-         RmYT+AojlvdcRibKvPf4N57pvVOhCsegUUs5kjFZoVjsABNgOt0Xn3aAmiQId2VFYs9q
-         4PyyR4LKBR7xep98bWkeWbwqEiAoEwPPyXCDXfPg4HO+rdWVlgj+LTXtzU7+6sXri1Kp
-         I/vQ==
-X-Gm-Message-State: AOJu0YzOsjwjH8mdCLb09RU5Kzqur6NcgZ0CVuTTGH/fqRyx9yC/mZ3B
-	s6lqGXY7sqBjZX3iWOdgCGhTrx/iDhIjYWibnXIvON5lADUTN9NH
-X-Google-Smtp-Source: AGHT+IHlMNo6fUMh25e9Y8Vvzt7iY5hoFBCaUc1nka2NnAUc3ndqbmi2NJWgMWU6+QH5k/LFzD4k+g==
-X-Received: by 2002:a05:6a20:c526:b0:19c:74d1:b314 with SMTP id gm38-20020a056a20c52600b0019c74d1b314mr4224154pzb.17.1706874737541;
-        Fri, 02 Feb 2024 03:52:17 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUY6fznHSruX7Oj6EeMC1LSZhc5cifz8Ao4O69AB+WH2zQ/Ww/TJTG6KD9v5VJpGvqlCaxljHOWX9pscNvkqCzFSeVZ53EM/T+0CYOu7k28vwYCSP5OIb6a9LZYZ7w9f+CABb9YCSh6cTNBNdYVvPyt0i7jwnDZAbqdbl7lii2N6QaWoU3j5IcTh/Tw1N84WuECiZD2KBoT7X2kPoOMJ59d+SaZD5W+yA6ZjNslgcU46w8+ERpTj6YGtZJomPsSy7vWLsEvgJAcaOYn0qoq59so3novG9rSRZ10U37Arheqx+Fyl2EoitrcowQ25Zz29qAxgfw=
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 20-20020a631554000000b005d8be4c125csm1399474pgv.80.2024.02.02.03.52.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Feb 2024 03:52:16 -0800 (PST)
-Date: Fri, 2 Feb 2024 19:52:11 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: thinker.li@gmail.com
-Cc: netdev@vger.kernel.org, ast@kernel.org, martin.lau@linux.dev,
-	kernel-team@meta.com, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	sinquersw@gmail.com, kuifeng@meta.com
-Subject: Re: [PATCH net-next v3 1/5] net/ipv6: set expires in
- rt6_add_dflt_router().
-Message-ID: <ZbzXa3ECxEBdjOJu@Laptop-X1>
-References: <20240202082200.227031-1-thinker.li@gmail.com>
- <20240202082200.227031-2-thinker.li@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=W1cT47qZDd2NSSvkDarK4mLCnpspKXCVsttG/l8rS3JpK0zGzGeCAxC57WnHJ2nERqzH/R+2lMZwc+fRRl94OtfJdJGXnsRA4/SlLqYR85p7r34SzFARRi/q5iuNuQtFpFbPha46c0gE2rSyTSfLGlFig+pDnuW6Lql07uQ57cQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=aj0xf2f5; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=bdMRNfuOlYWXCZSbX3qtLpZ6mLae9pQYUL0x6nsWQvA=; b=aj0xf2f5Jf2gkGwMowWngx4HiC
+	veb5AYlQO/gjHSyzr2p8XpEQgkWsB0lsh3TM5rAP/Mpdht38o6EWIGmXnsUz/PqYitIR5wzPJAEbC
+	toUWEczWTq0ZuJqe2A7aqJ3i16YHPbXjue1LuKpi5i+F4ob58eYNaoO1QzEsmJuFHu46xx3BVAHv6
+	DmF9DdS6Pa26OxbI131SJYNL0nCcWks/SWrdJv4J5wFc3jtLYlk6bdwiR3LtHvG0gc8MiNaorp+n7
+	/ehLDkav139ssUKFj79VIyRJwYmGjvVrVHM5mdAPsc4R7e6t9dMKIJU4m5Y2LKkJMHzL1E8GfQYET
+	JG72R3CQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34052)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rVs5d-0005vu-2u;
+	Fri, 02 Feb 2024 11:52:13 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rVs5b-0008IR-Tm; Fri, 02 Feb 2024 11:52:11 +0000
+Date: Fri, 2 Feb 2024 11:52:11 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: arinc.unal@arinc9.com
+Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v3 7/7] net: dsa: mt7530: do not clear
+ config->supported_interfaces
+Message-ID: <ZbzXayWoRv37zFvp@shell.armlinux.org.uk>
+References: <20240202-for-netnext-mt7530-improvements-2-v3-0-63d5adae99ca@arinc9.com>
+ <20240202-for-netnext-mt7530-improvements-2-v3-7-63d5adae99ca@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240202082200.227031-2-thinker.li@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240202-for-netnext-mt7530-improvements-2-v3-7-63d5adae99ca@arinc9.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, Feb 02, 2024 at 12:21:56AM -0800, thinker.li@gmail.com wrote:
-> From: Kui-Feng Lee <thinker.li@gmail.com>
+On Fri, Feb 02, 2024 at 12:19:13PM +0300, Arınç ÜNAL via B4 Relay wrote:
+> From: Arınç ÜNAL <arinc.unal@arinc9.com>
 > 
-> Pass the duration of a lifetime (in seconds) to the function
-> rt6_add_dflt_router() so that it can properly set the expiration time.
+> There's no need to clear the config->supported_interfaces bitmap before
+> reporting the supported interfaces as all bits in the bitmap will already
+> be initialized to zero when the phylink_config structure is allocated. The
+> "config" pointer points to &dp->phylink_config, and "dp" is allocated by
+> dsa_port_touch() with kzalloc(), so all its fields are filled with zeroes.
 > 
-> The function ndisc_router_discovery() is the only one that calls
-> rt6_add_dflt_router(), and it will later set the expiration time for the
-> route created by rt6_add_dflt_router(). However, there is a gap of time
-> between calling rt6_add_dflt_router() and setting the expiration time in
-> ndisc_router_discovery(). During this period, there is a possibility that a
-> new route may be removed from the routing table. By setting the correct
-> expiration time in rt6_add_dflt_router(), we can prevent this from
-> happening. The reason for setting RTF_EXPIRES in rt6_add_dflt_router() is
-> to start the Garbage Collection (GC) timer, as it only activates when a
-> route with RTF_EXPIRES is added to a table.
+> There's no code that would change the bitmap beforehand. Remove it.
 > 
-> Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
-> ---
->  include/net/ip6_route.h | 3 ++-
->  net/ipv6/ndisc.c        | 3 ++-
->  net/ipv6/route.c        | 4 +++-
->  3 files changed, 7 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/net/ip6_route.h b/include/net/ip6_route.h
-> index 28b065790261..52a51c69aa9d 100644
-> --- a/include/net/ip6_route.h
-> +++ b/include/net/ip6_route.h
-> @@ -170,7 +170,8 @@ struct fib6_info *rt6_get_dflt_router(struct net *net,
->  struct fib6_info *rt6_add_dflt_router(struct net *net,
->  				     const struct in6_addr *gwaddr,
->  				     struct net_device *dev, unsigned int pref,
-> -				     u32 defrtr_usr_metric);
-> +				     u32 defrtr_usr_metric,
-> +				     int lifetime);
->  
->  void rt6_purge_dflt_routers(struct net *net);
->  
-> diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-> index a19999b30bc0..a68462668158 100644
-> --- a/net/ipv6/ndisc.c
-> +++ b/net/ipv6/ndisc.c
-> @@ -1382,7 +1382,8 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
->  			neigh_release(neigh);
->  
->  		rt = rt6_add_dflt_router(net, &ipv6_hdr(skb)->saddr,
-> -					 skb->dev, pref, defrtr_usr_metric);
-> +					 skb->dev, pref, defrtr_usr_metric,
-> +					 lifetime);
->  		if (!rt) {
->  			ND_PRINTK(0, err,
->  				  "RA: %s failed to add default route\n",
-> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-> index 63b4c6056582..98abba8f15cd 100644
-> --- a/net/ipv6/route.c
-> +++ b/net/ipv6/route.c
-> @@ -4355,7 +4355,8 @@ struct fib6_info *rt6_add_dflt_router(struct net *net,
->  				     const struct in6_addr *gwaddr,
->  				     struct net_device *dev,
->  				     unsigned int pref,
-> -				     u32 defrtr_usr_metric)
-> +				     u32 defrtr_usr_metric,
-> +				     int lifetime)
->  {
->  	struct fib6_config cfg = {
->  		.fc_table	= l3mdev_fib_table(dev) ? : RT6_TABLE_DFLT,
-> @@ -4368,6 +4369,7 @@ struct fib6_info *rt6_add_dflt_router(struct net *net,
->  		.fc_nlinfo.portid = 0,
->  		.fc_nlinfo.nlh = NULL,
->  		.fc_nlinfo.nl_net = net,
-> +		.fc_expires = jiffies_to_clock_t(lifetime * HZ),
->  	};
->  
->  	cfg.fc_gateway = *gwaddr;
-> -- 
-> 2.34.1
-> 
+> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> Acked-by: Daniel Golle <daniel@makrotopia.org>
+> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+
+Thanks!
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
