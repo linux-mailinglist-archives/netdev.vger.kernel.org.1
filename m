@@ -1,196 +1,126 @@
-Return-Path: <netdev+bounces-68634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AEA4847682
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:46:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C4DF847688
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:47:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A46841F29BD6
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:46:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDB061F2177C
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:47:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A353314C59B;
-	Fri,  2 Feb 2024 17:44:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD84014C5BB;
+	Fri,  2 Feb 2024 17:44:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="gMnuts5L"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03olkn2077.outbound.protection.outlook.com [40.92.59.77])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7F6114C597;
-	Fri,  2 Feb 2024 17:44:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.59.77
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706895878; cv=fail; b=L4Q1yK8xDfuZ6f1MwKqagjnhjgedlhRPpbldrLyavSTV64fCjxOqFO8aL82BVIoQPABuCXl9kxUjJwx9IsANTfc9kBUfeT5FSNeF/sVqyZTF0J7dCr3thp+9HDlowcUF0rTliAntn4zjPszNCyRemr5En616V8GNix/LpUBC/Go=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706895878; c=relaxed/simple;
-	bh=ixO0lXTMeNq9WTz5v3bNcLRDvxoeRpA6R1rrYbeed0w=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=b2yqRNEFRsAL7JO0R3lZE1YQQSUacYEch03PQc9yZM7FITr5LxIUIhBtdLjr51a0APfNW5MDmIzYXr/HZbhXImIYmXnFBSM5H/AJAIqGVNXlndDxqTBxgAeBUkeRtqYaQkgPqvyxLBajjnRy6Z1Nxf6Y74R4qRPk/SB8XyWchl4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.it; spf=pass smtp.mailfrom=outlook.it; arc=fail smtp.client-ip=40.92.59.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.it
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fIhpEyES0vDLKJ8Dc0vdC/4lyOMv1u5NFTLikjewOa6PBK/21mNTk30v8h47FHnGku8Sm5eeEy34hbSJt9556V1/+m61mj+lhB3gvmygAHt3EMj1n/bPWgl+lbXyD3siB/FHNZkP/PJvGzy5AROz+rfr25UaGEZpqTZCnr7zMstWKtahmKwBtAi5H2PFhS57joNff3zC1sMxi57AzqHaWrC4ssM/vPzqolNsxffFT1MQBPQTGg4Rs7hqrNiSgsbnvqqSh2ewAturk6cPwZiHVZI7kR8cUSb0EQ6MzdMVGITOhCfV1YJa2HkQ/bauJzleARa7B/InO9Ke1mokRCCVTg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pNSFEQa1H+YfdQEuqBo95HXizm3wV1tG069CdPsQkdQ=;
- b=KIzxfg4CjKfa6uGwKwY3n8w0J92nWjX4gWhrEgZo3z018F6iRkVKmEuwvb+USpWPHxq/OzTMs6HC1fLB4mW4Sue6113dU7fow4FBeSryQ6/kJA8NCM17a8ctCizuIoV+o0fj+06cXoPM8jttGVmpA29/VXIzFCmaeSexZC5iqCsOW0gCH61LTaIGCdi1JkKmzCy3Hov/G+EihQaNNM3RHiX7O2EYux069touhlwFLSFvO0fW2ea30FHIrixLcsKu8Ek79zWwFaNRdszJF8/ajpv9MkxPqEocXNO0GPHflYUMFLPUnUQN0s0XAlIJlB/PCbvwxHAF8bujzRdAO/RXXg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-Received: from AS1PR03MB8189.eurprd03.prod.outlook.com (2603:10a6:20b:47d::10)
- by AM9PR03MB7979.eurprd03.prod.outlook.com (2603:10a6:20b:43c::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.30; Fri, 2 Feb
- 2024 17:44:34 +0000
-Received: from AS1PR03MB8189.eurprd03.prod.outlook.com
- ([fe80::ffb3:3ff8:6ea9:52b5]) by AS1PR03MB8189.eurprd03.prod.outlook.com
- ([fe80::ffb3:3ff8:6ea9:52b5%5]) with mapi id 15.20.7202.035; Fri, 2 Feb 2024
- 17:44:34 +0000
-Message-ID:
- <AS1PR03MB818918BC313CC8A59E288FF082422@AS1PR03MB8189.eurprd03.prod.outlook.com>
-Date: Fri, 2 Feb 2024 18:44:32 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: sfp: add quirk for ODI DFP-34X-2C2 GPON ONU
- SFP
-Content-Language: it
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <AS1PR03MB81893D69344708C98EE2B470827F2@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <ZbZoDIPR3O/iei5z@shell.armlinux.org.uk>
-From: Sergio Palumbo <palumbo.ser@outlook.it>
-In-Reply-To: <ZbZoDIPR3O/iei5z@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TMN: [z+bFD4lJNIJux6EJR3FM1WLx2UQwwZ7aP+WFBD4AlBbUAPwEXVU4FMe5NIlOF/WT]
-X-ClientProxiedBy: MR1P264CA0004.FRAP264.PROD.OUTLOOK.COM
- (2603:10a6:501:2e::9) To AS1PR03MB8189.eurprd03.prod.outlook.com
- (2603:10a6:20b:47d::10)
-X-Microsoft-Original-Message-ID:
- <7ce1a7df-9685-4f89-b439-3399d8068788@outlook.it>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C861214C5A5;
+	Fri,  2 Feb 2024 17:44:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706895896; cv=none; b=rYxcmJpllmh5I3Bs/9pvUjiTUyA8b+TrL/FwPDLkJyDOTDwELdEFs2niV8h6CVGKnO2yUXSyV7t+oJKGfJ6LDFqKlsUlQoqG4O5I98+yrxlQo3Bcar/1BaSnqe70EnWwlyo/mX5b4cTm5hPfxLHQIgLiLGCEPXSB98XXUbvLhU8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706895896; c=relaxed/simple;
+	bh=uw5lYvRz7me5BtWDmKAyakAi0GQyrUa1obli20c2iTQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cuWGaHsS+Gdg7elijYjWz22NVI86XR1p6OYyOr/3vNI+urvC4OleYgfffb+6U90fui8g8KzTiVehXdPevYnFjCtXJ+YVHgkJDENeiFbMqiQjoC62yHGPK+iGSrYKb3tZcJRWUth5CQd5gtjzvEOEPrQYOPTm8toVSxishbf/D5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=gMnuts5L; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 07E1E1C0003;
+	Fri,  2 Feb 2024 17:44:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1706895886;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C4uIPG7Nra39EUwOvsm4b3NYu2+PD/eNW8/4vOlSOB4=;
+	b=gMnuts5Lxz0WzF6krO3ay2/xk9bENZ0R9500jzKTl6II5Pl1QNZQkV5+pvJEGddg0ljX4u
+	nj5dYRWbMH/9KzOS7AeqcnQa7NuWabvlvrXgDHlsbcC25TI/r3OoxKStXMrc/M/YKNzF7e
+	PC5M3035FEr3TMV/4SEkNirvrkfDpeWMskWmCei9MQiuMjpHR3Hhgu+ga8cfrXMNa2xHpF
+	BuJfp6HqnLXt5fqP0KbeyaTnAVhwYGBfuX8xIqDpdiY0hrZVsaeRKTcKxoLcogNhQ6oDrA
+	R4hfkShWlwy/zj1dyErgAi4P8/UGMGQOQ+GO6ki0xDDGtpnrwh6fFrAOW4xkig==
+Message-ID: <e3b4add6-425c-46ca-9da5-8713055fc422@arinc9.com>
+Date: Fri, 2 Feb 2024 20:44:39 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS1PR03MB8189:EE_|AM9PR03MB7979:EE_
-X-MS-Office365-Filtering-Correlation-Id: 564eb9d8-4984-4eb7-1427-08dc24169e26
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	fmfYJLqkCXG8F00uOmPfdi8DlUVLW0MVQ2k8wZ0W+VBEbtiGqHWTdXxPKELtcUUxn8RG17vz3LIvQjOk2cIwlAi0V5FsM+rFCuMYLLBdZrb1UyBOptRrY/0ZFTo9AOXmc0IbYtjN0dnNVZjLRzH/NflXnBS89GXDtaGoHRNarLRdtDt+Ev8cKSjxfF+KPvQ2IVys42q4U/NqYG+uKvxZBFVp0xTBa/96fHgytjAVXJRpS1B+1eAivwpRC4bi12gLDUs9W1aQ9X2AYu7zL4DN6Cyg5yaKfrZctdoi8V9Iy5qrhUmOIU1MZT8+m9IYFwSEA7j4VjM4Lm/Eee/ISegqZEKR50j/RGfhYz3oDQOGOZVcuh2SuWsO6z+1f42ZMkvG59EmCbIxB7vCrCod42PB0EeJcxyVBieT4PqUedrQaJogaP1CUVolomwOxIatncCleD3ZHtQpnoL3YJo0oks9y7Bvpo/TZXErRsoChvSanijtLQ/0n0h15hUbKIAVcJLCiJeXDOj3+C/HCHXFL/pavtYS/p1HeOu/G3dE3gLO14wci3CXJcq4Ek68gZOAv8yUEZHNrnZVVNLznRba23iLjjXX5FaWBosgsnd4SGS27Ko=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bkNtZ1M3d1FudFpZYnBqL290UTdDR3ZCYUFHbnlvNk5nSDFSSEpTaWdUT2sw?=
- =?utf-8?B?bmdRZDFBWmcxMlV6ekFuOEo5MElPR0xlOVdmRURzUE9OdDQwbDZ0eVRyODhL?=
- =?utf-8?B?aHBFU09CekZHZUMyQ3ZKVndMTW1QeGdLeDlCQVBuUW9qbXZJVDdKcnJsSDV6?=
- =?utf-8?B?RmF4R052a2ZVODFHUS9MUWNnN2xHVm9TNDZPM1A1Uk1MQVBBcUg0U3dPUUhI?=
- =?utf-8?B?S29EajJSOFgycmd4MnBXc2RDMVNTOUNDRHZVcVE4ZjQ4QkI3ekNwS3RPb1gx?=
- =?utf-8?B?amJXRlVsTlhYSXdRTUovMnFyQVc1Umg4RFFMVkVqSldVNGJxMFRoNGtTR1RE?=
- =?utf-8?B?VkVUSmZpaFphRWhkSVdieHRGUjlnTDRqcytMWmpxRzIzbEw4dTlOQTRYb0xu?=
- =?utf-8?B?dTVvNWJubVp4Nk9JU2Y0bHhmVlNGTEQ5NGxRMzdxNU5XcXkrWTJFWVc3ZmVN?=
- =?utf-8?B?d1o3SW4wL1FjSk1KWHZ4LzB2b3BVeSsrQTFLNVp5QnZTdGQ2WUhrK0EvY1RT?=
- =?utf-8?B?OUlpK2h3eDloY1h3TEV5T080MWJLa1BWTWVKVUJnb2ZQWFlXWHpGWjhBRWda?=
- =?utf-8?B?RGpaak9ualJhcGY5WG94S1UxTW5iTS9jNW9ETHBwZFVBaktzV2lLbnV1bXVx?=
- =?utf-8?B?UWhOYmk2bnJrYndWM1ozV2NzYmtla2xwNXRrRmord21oRUxmMWNYcVk0eDVq?=
- =?utf-8?B?T28wRWpwNUZKaEsvLzc2Ym1vc0Vzb0hnckhYTlFqakR3Mjlib0I3N1U2bENN?=
- =?utf-8?B?RzF1RlN6Y3NZemlpd2RKRlFPQWowVlFTaVMxbXp4a1dGL0ZmMUxNdFU2eXhp?=
- =?utf-8?B?MzE5YWlvaEx0bi9MTk1yanhmQjRaaktyREdlaXp6UDRHanc4N3BobFZPMmN0?=
- =?utf-8?B?RFVjNTFmTy96U0xzbE5uWmJZSWFzMEdRaVFUcGtzR2REMzVSN0lSVUxJZy9H?=
- =?utf-8?B?TC9aK2dDaEVFcUtPMWxlVW5DNXhvLzQvYmEzMGJaZGRVMnF5SzhqbXBUQjJZ?=
- =?utf-8?B?Y095R3I2eUxsMklFd3lobDVuelYyMW9FWjBTQ2pGc3VsR2ZHUXBCbk1ZNVFR?=
- =?utf-8?B?RDFFeis2cFA4SCs4UGlaUHkzNE1lSDB6VHo2SlpXNEFSNEo5UUIvOXlzdWRv?=
- =?utf-8?B?U2VzSHVab2U1c2k4dHBpM3RHYlE3dExGTFZCZ3JaUmxCejZ1Tk1QNzd6WWk1?=
- =?utf-8?B?WVdCeU9YdlJvK3FpVlRITTZWcmxZSnpWQjVrNXoyZHpiM0FPZy9DemVoQnV1?=
- =?utf-8?B?Nm4zcVVPYWtjbHAva1BGZWFBTnhiTzRxdHN1ek4wQXdqOFVjQnMrbzZieFpN?=
- =?utf-8?B?blpkb25oellxNUIvczhSQlZUbVptUkdWTHltRnljQnRYSURlcTM3VTBlaVl3?=
- =?utf-8?B?VDgvancyVzg2VkJPdU54MlBQSFRMbmZBa0pIYVdQcENNTWppYWppb1NpVWY0?=
- =?utf-8?B?UlZnL1hVamN2V0xFQjlHa0x0dVFqRytmcHMzUldkVE9WaGlnUXFrZVlHeHZy?=
- =?utf-8?B?T0JOMVhXWUEwczA1bWhnTy9pNmRLbWVHSW5mZmR2K1lFclJiK3pPMEtwNFZY?=
- =?utf-8?B?REl1Q3pQVGovdmNMQktRN1VkZDVUeVhQZzAyMjQ3QStCWk5paHVxVmdwNWtU?=
- =?utf-8?B?dFR2RzhHaG5XRVhzTjI5ZnhnemVHQlI3RVVuT1JBbWppZ0FtWlNHZXp1MkFS?=
- =?utf-8?B?N3lmOFMyVnlXOVFLUFNnWmxFK3pUTDgvNCtQM1lxRGw0R1FOQ200ZTUwcEZJ?=
- =?utf-8?Q?FK91VAph2h/6s0550I=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-10f0b.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 564eb9d8-4984-4eb7-1427-08dc24169e26
-X-MS-Exchange-CrossTenant-AuthSource: AS1PR03MB8189.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2024 17:44:34.2659
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR03MB7979
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/7] net: dsa: mt7530: empty default case on
+ mt7530_setup_port5()
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+ Bartel Eerdekens <bartel.eerdekens@constell8.be>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20240202-for-netnext-mt7530-improvements-2-v3-0-63d5adae99ca@arinc9.com>
+ <20240202-for-netnext-mt7530-improvements-2-v3-1-63d5adae99ca@arinc9.com>
+ <ZbzUotyQm/FyKK7G@shell.armlinux.org.uk>
+Content-Language: en-US
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <ZbzUotyQm/FyKK7G@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: arinc.unal@arinc9.com
 
-Hello Russell,
-this is the pach for the vendor "ODI".
-Same hardware but different vendor.
-I explained it in the description.
-Hope this clarifies.
+On 2.02.2024 14:40, Russell King (Oracle) wrote:
+> While reviewing this change, but not related to it, I notice that this
+> function sets the TX delay based on the RGMII interface mode. This isn't
+> correct. I've explained why this is this many times in the past, but
+> essentially it comes down to the model:
+> 
+> 
+> phy-mode in NIC node	Network driver	PCB		PHY
+> rgmii			no delays	delays		no delays
+> rgmii-id		no delays	no delays	tx/rx delays
+> rgmii-txid		no delays	no delays	tx delays
+> rgmii-rxid		no delays	no delays	rx delays
+> 
+> Then we have rx-internal-delay-ps and tx-internal-delay-ps in the NIC
+> node which define the RGMII delays at the local end and similar
+> properties for the PHY node.
+> 
+> 
+> So, if we take the view that, when a switch is connected to a NIC in
+> RGMII mode, then the phy-mode specified delays still should not impact
+> the local NIC.
+> 
+> Now, for the switch, we specify the phy-mode in the port node as well.
+> Consider the case of a switch port connected to a RGMII PHY. This has
+> to operate in exactly the same way as a normal NIC - that is, the
+> RGMII delays at the port should be ignored as it's the responsibility
+> of a PHY.
+> 
+> The final scenario to examine is the case of a RGMII switch port
+> connected to a NIC. The NIC's phy-mode has no way to be communicated
+> to DSA or vice versa, so neither phy-mode can impact the other side
+> of the RGMII link, but should only place the link into RGMII mode.
+> Given everything I've said above, the only way to configure RGMII
+> delays is via the rx-internal-delay-ps and tx-internal-delay-ps
+> properties. So, DSA drivers should _not_ be configuring their ports
+> with RGMII delays based on the RGMII phy interface mode.
+> 
+> The above is my purely logically reasoned point of view on this
+> subject. Others may have other (to me completely illogical)
+> interpretations that can only lead to interoperability issues.
 
-Thanks and regards
+I will address this with the next patch series. Thank you for explaining it
+in detail.
 
-Sergio Palumbo
-
-Il 28/01/2024 15:43, Russell King (Oracle) ha scritto:
-> Oh, a second repost. What's different from the first repost?
->
-> On Sun, Jan 28, 2024 at 03:23:06PM +0100, Sergio Palumbo wrote:
->>       DFP-34X-2C2 is a GPON spf module working at both 1000baseX
->>       and 2500baseX.
->>       Setting the module to LAN_SDS_MODE=6 the module is working
->>       at 2500baseX with auto negotiation see at
->>       https://hack-gpon.org/ont-odi-realtek-dfp-34x-2c2/
->>       Unfortunatly the module's PHY is accessible at 1000baseX only.
->>       ethtool returning:
->>       Supported ports: [ Fibre ]
->>       Supported link modes: 1000baseX/Full
->>
->>       After applying the quirk:
->>       Supported ports: [ Fibre ]
->>       Supported link modes: 1000baseX/Full
->>                             2500baseX/Full
->>       Tested on BANANA PI R3 in OpenWRT v 23.05.2 Kernel 5.15.137
->>       Tested on sfp to ethernet Media Converter.
->>       Autonegotiating 1000baseX or 2500baseX according to the
->>       connected host speed.
->>
->>       This module is existing in 2 versions:
->>       Vendor = "ODI"
->>       Vendor = "OEM"
->>       This is the patch for vendor "ODI"
->>
->>       Patch has been inserted keeping the list in alphabetical order
->>       first by vendor first and then by part string.
->>
->> Signed-off-by: Sergio Palumbo <palumbo.ser@outlook.it>
->> ---
->>   drivers/net/phy/sfp.c | 3 +++
->>   1 file changed, 3 insertions(+)
->>
->> diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
->> index 3c0028a4af92..410375bc6b94 100644
->> --- a/drivers/net/phy/sfp.c
->> +++ b/drivers/net/phy/sfp.c
->> @@ -495,6 +495,9 @@ static const struct sfp_quirk sfp_quirks[] = {
->>   	// 2500MBd NRZ in their EEPROM
->>   	SFP_QUIRK_M("Lantech", "8330-262D-E", sfp_quirk_2500basex),
->>   
->> +	// ODI DFP-34X-2C2 GPON ONU support 2500base-X
->> +	SFP_QUIRK_M("ODI", "DFP-34X-2C2", sfp_quirk_2500basex),
->> +
->>   	SFP_QUIRK_M("UBNT", "UF-INSTANT", sfp_quirk_ubnt_uf_instant),
->>   
->>   	// Walsun HXSX-ATR[CI]-1 don't identify as copper, and use the
->> -- 
->> 2.34.1
->>
->>
-
+Arınç
 
