@@ -1,109 +1,90 @@
-Return-Path: <netdev+bounces-68257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC4BE846537
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:03:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB120846547
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:09:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FA2C1F25D84
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:03:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECE801C22579
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:09:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D8C353BA;
-	Fri,  2 Feb 2024 01:02:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dGjiB7bY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D3CD53A1;
+	Fri,  2 Feb 2024 01:09:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6397EAD4F;
-	Fri,  2 Feb 2024 01:02:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8FFE5678;
+	Fri,  2 Feb 2024 01:09:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706835775; cv=none; b=JVO2MNZxPPiXCDSAJzdN3CQQwP81sI1mBwsT6BJe/uvnypom6zZuxWYdDF78VD6T3skHu8oAr0wumz7H+/IKXxXbTdGOOstwuwIOenu9VSgIsgY1Zyxv+OvsHMUsZ+ScnBgOQUz6A/9kZ1Tf6tBAsnZWHOjf/p96Ihkq7VnhyZs=
+	t=1706836157; cv=none; b=HOYZxRvzLY4w1G3UgRg0oO/8jMo5QKravOzSCWhJ19QUIDII1Tvu6CTx73XritMii77J1/EB7YChftPgBGKpbORUfFuwRfKq3Kj/quigrkNdeUe5HV0GP8w4NRfkUAe52dYTy79Jw7iYNQP9s15ulUJH93INjvyDp2U2MhRCN8g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706835775; c=relaxed/simple;
-	bh=t7fqNukb58DPR2uH9r6sePm8zu2FpuOah650ZPEwo7c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a6AOXqrfYgTt/L4T4xlopJ9sJVNdaTGHo2hb6IpdoF6cFuGRp+C2n8bAf+mXkzj5G1jm2yhvysWCC1FJuCpfxDU4c+PVzLuxCYvl5l8I/Nir1Z780DXqlh8tEwWJXHnf6z96gez0b9j5HaKjo/56N5DGCZL+Yf5CuXViVQPzxXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dGjiB7bY; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=SRwLFjr2kgHxYJ1y6JChlTLnAQdKVct1/aWOL5U9V1E=; b=dGjiB7bYGz73GOemZdRIpMdldZ
-	fjwWY0MERslapOKspJ8e7S3E+cKy0xPZ8YR5/KAbl+E3TlvK80b9Oy5wiGXajZDDh7tY6U8mnzJGO
-	QtpI7PeFasregV25OhbVn5v29t2nA8HqVbCHXusiGm201hkk/yRBTAzs6Pw170EHBSmE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rVhx3-006jdz-Ce; Fri, 02 Feb 2024 02:02:41 +0100
-Date: Fri, 2 Feb 2024 02:02:41 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Antoine Tenart <atenart@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Frank Rowand <frowand.list@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
-	Robert Marko <robert.marko@sartura.hr>,
-	Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [net-next PATCH v5 2/9] net: phy: add support for scanning PHY
- in PHY packages nodes
-Message-ID: <2bba44dc-b5df-46ef-b5f3-eabbd34aa7db@lunn.ch>
-References: <20240201151747.7524-1-ansuelsmth@gmail.com>
- <20240201151747.7524-3-ansuelsmth@gmail.com>
- <170680473689.4979.1991415008659281513@kwain>
- <65bbd2ce.050a0220.5ff09.69d5@mx.google.com>
+	s=arc-20240116; t=1706836157; c=relaxed/simple;
+	bh=2MMnCP8CJCwqGCW+J2bQ7c7qs3ug+y2ozOiY5gstMog=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=mF6E8AVmYYqIDwNMIISB2O3KjX5dvaahHus+6fDz2tKea7F5olO4DPWMJsbce564LWEyvHozSj4+xRdjnlQdlgcsIyVMOGn2DZVSw1r6vmdD3+edBMYSOjEgxoa1Y5FbWgEiBuM9rN+G4unzTS1IKEjkka7KUFE0fwUsRwAZTcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4TQyMd1N0vz1vt2J;
+	Fri,  2 Feb 2024 09:08:45 +0800 (CST)
+Received: from kwepemd200003.china.huawei.com (unknown [7.221.188.150])
+	by mail.maildlp.com (Postfix) with ESMTPS id ED3901A016B;
+	Fri,  2 Feb 2024 09:09:10 +0800 (CST)
+Received: from dggpemm500008.china.huawei.com (7.185.36.136) by
+ kwepemd200003.china.huawei.com (7.221.188.150) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1258.28; Fri, 2 Feb 2024 09:09:10 +0800
+Received: from dggpemm500008.china.huawei.com ([7.185.36.136]) by
+ dggpemm500008.china.huawei.com ([7.185.36.136]) with mapi id 15.01.2507.035;
+ Fri, 2 Feb 2024 09:09:10 +0800
+From: wangyunjian <wangyunjian@huawei.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "jasowang@redhat.com"
+	<jasowang@redhat.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, xudingke
+	<xudingke@huawei.com>
+Subject: RE: [PATCH net-next] tun: Fix code style issues in <linux/if_vlan.h>
+Thread-Topic: [PATCH net-next] tun: Fix code style issues in <linux/if_vlan.h>
+Thread-Index: AQHaVRHPhW+sBdmp20ehAKJLTO4e/LD1GxqAgAEjetA=
+Date: Fri, 2 Feb 2024 01:09:10 +0000
+Message-ID: <e59177fbc48944479f0ea4c17fd1c532@huawei.com>
+References: <1706793792-20928-1-git-send-email-wangyunjian@huawei.com>
+ <65bbbc9776ea4_2226992949c@willemb.c.googlers.com.notmuch>
+In-Reply-To: <65bbbc9776ea4_2226992949c@willemb.c.googlers.com.notmuch>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <65bbd2ce.050a0220.5ff09.69d5@mx.google.com>
 
-On Thu, Feb 01, 2024 at 06:20:10PM +0100, Christian Marangi wrote:
-> On Thu, Feb 01, 2024 at 05:25:36PM +0100, Antoine Tenart wrote:
-> > Quoting Christian Marangi (2024-02-01 16:17:28)
-> > > 
-> > > +static int __of_mdiobus_parse_phys(struct mii_bus *mdio, struct device_node *np,
-> > > +                                  int base_addr, bool *scanphys)
-> > > +{
-> > > +       struct device_node *child;
-> > > +       int addr, rc = 0;
-> > > +
-> > > +       /* Loop over the child nodes and register a phy_device for each phy */
-> > > +       for_each_available_child_of_node(np, child) {
-> > > +               if (of_node_name_eq(child, "ethernet-phy-package")) {
-> > > +                       rc = of_property_read_u32(child, "reg", &addr);
-> > > +                       if (rc)
-> > > +                               goto exit;
-> > 
-> > This means a PHY package node w/o a reg property will prevent all other
-> > PHYs in the same parent node to be found?
-> >
-> 
-> Since this is something new, would it be a problem to make it mandatory
-> to define a reg? (And return error if we find something? Or print a
-> warn?)
-
-Making reg mandatory within a package is reasonable. Please indicate
-this in the DT schema.
-
-     Andrew
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBXaWxsZW0gZGUgQnJ1aWpuIFtt
+YWlsdG86d2lsbGVtZGVicnVpam4ua2VybmVsQGdtYWlsLmNvbV0NCj4gU2VudDogVGh1cnNkYXks
+IEZlYnJ1YXJ5IDEsIDIwMjQgMTE6NDUgUE0NCj4gVG86IHdhbmd5dW5qaWFuIDx3YW5neXVuamlh
+bkBodWF3ZWkuY29tPjsNCj4gd2lsbGVtZGVicnVpam4ua2VybmVsQGdtYWlsLmNvbTsgamFzb3dh
+bmdAcmVkaGF0LmNvbTsga3ViYUBrZXJuZWwub3JnOw0KPiBkYXZlbUBkYXZlbWxvZnQubmV0DQo+
+IENjOiBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3Jn
+OyB4dWRpbmdrZQ0KPiA8eHVkaW5na2VAaHVhd2VpLmNvbT47IHdhbmd5dW5qaWFuIDx3YW5neXVu
+amlhbkBodWF3ZWkuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIG5ldC1uZXh0XSB0dW46IEZp
+eCBjb2RlIHN0eWxlIGlzc3VlcyBpbiA8bGludXgvaWZfdmxhbi5oPg0KPiANCj4gWXVuamlhbiBX
+YW5nIHdyb3RlOg0KPiA+IFRoaXMgZml4ZXMgdGhlIGZvbGxvd2luZyBjb2RlIHN0eWxlIHByb2Js
+ZW06DQo+ID4gLSBXQVJOSU5HOiBwbGVhc2UsIG5vIHNwYWNlcyBhdCB0aGUgc3RhcnQgb2YgYSBs
+aW5lDQo+ID4gLSBDSEVDSzogUGxlYXNlIHVzZSBhIGJsYW5rIGxpbmUgYWZ0ZXINCj4gPiAgICAg
+ICAgICBmdW5jdGlvbi9zdHJ1Y3QvdW5pb24vZW51bSBkZWNsYXJhdGlvbnMNCj4gPg0KPiA+IFNp
+Z25lZC1vZmYtYnk6IFl1bmppYW4gV2FuZyA8d2FuZ3l1bmppYW5AaHVhd2VpLmNvbT4NCj4gPiAt
+LS0NCj4gPiAgaW5jbHVkZS9saW51eC9pZl90dW4uaCB8IDE2ICsrKysrKysrKysrKystLS0NCj4g
+DQo+IFN1YmplY3Q6IHMvaWZfdmxhbi9pZl90dW4vDQpZZXAsIG15IGJhZCwgd2lsbCBzZW5kIHYy
+IHdpdGggY29ycmVjdGlvbi4NClRoYW5rcw0K
 
