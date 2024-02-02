@@ -1,116 +1,130 @@
-Return-Path: <netdev+bounces-68576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B57B84744C
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:12:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8239984746D
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:15:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CAE71C253D0
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:12:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20FE81F2F2B9
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:15:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 309D214A0B6;
-	Fri,  2 Feb 2024 16:09:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E67D14690E;
+	Fri,  2 Feb 2024 16:14:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P4aG5jaD"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ew+4bmOU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BB281474A0;
-	Fri,  2 Feb 2024 16:09:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3082146916
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 16:14:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706890142; cv=none; b=smyy5SyUPmls1IIplr5ikKksAZ0scmx7pc1CJ4sr2VjoODOc1UCOs4oRsdE997MPu921b6gcXBRoPfCtdD28v2fSLaKBg1lZSbPOG0jtsKAD4k/8T11MpxvQTbFvrJz5moTQr8YBdAojHQMMjOEtpniGxo5jftMXIGDzU/HXDEw=
+	t=1706890457; cv=none; b=ZsANDoMihCQuW/Fpk/9K4uDcxxY/ZEPf4pHjg/xknebX2Yu/f+0BQ+nE4FFa89Zt7wyqQC37DkVaINMeTa17ILFx9TVU21CBTZOLh0SpsYHK+tP72ecBbGnLFGmeqjakgsuIAlcnO5xkXRLPXtDgLhFJWnaewP9QFNp++qqcY4k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706890142; c=relaxed/simple;
-	bh=ObobwIusGY63NE/2MOWR+NbMWvgKu/d9ZjBL9g2lKRM=;
+	s=arc-20240116; t=1706890457; c=relaxed/simple;
+	bh=Ri3/hQOGxa7fvdX6zXfOFaMYOWypSsO0kQTSZQ0812I=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EOpYeOqPh6GQVZ3zgCPgFQwWaqB5Rtj39VqE78tyv4nsq9z8fJ6KfGPuezpDdCB/Pmy8LKKhcBoeK6kYFiFn0NgobP9njxaa+xcfaQIMnYx0d+SXbJCYR/11ACLJ2NY/dwkeuJjzExu3FQXK9y7u/HSU0Jycx7HFl9nJHV80lRQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P4aG5jaD; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-6041779e75eso24009227b3.3;
-        Fri, 02 Feb 2024 08:09:00 -0800 (PST)
+	 To:Cc:Content-Type; b=nCVq5Pz+d0uH1kwsZGd3Rdnp7e2TVcU5SsOEzB1ihr3bjeX53exgWZPnO3xBRLWJXQKK3B4Nudo7y6eKUfOkL8+UP9vnEepAI+Fa5s18p47mCFByTmPmRhpC/QzQXTKHY46sLzBg4rnRHJonm8aJvVRH67iQz7+hoVS/9mQb6ZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ew+4bmOU; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-55fff7a874fso7979a12.1
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 08:14:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706890139; x=1707494939; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1706890454; x=1707495254; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ObobwIusGY63NE/2MOWR+NbMWvgKu/d9ZjBL9g2lKRM=;
-        b=P4aG5jaDyDYRpT+eVdAhqKTboEYgxtCcSFqFddMsR/tA4OfDmGLY5vqhusq0s5DLC9
-         Cg+jgJKUN25AAgBN9xRQp7uvSQiPR4dj1RGfaxL5Qybhh9g9+VEHl8E/9ZijgqZ60wF5
-         I+kWnwOqW9S3X62MeKqXQgJkY25bnnDCTfPUAYT0W/JFkZ1RDLUuq2UZWGtLckdZIT9a
-         gwB+ps0VwjoclkuWq6lGjjH0ghpUsNG9EGQ8YPFVIfk89OzuX1QnFWcUJkHYCVE6+RGU
-         FmdUggw8Ygjmdij6T/amKgnTpH+uoBGKKw2Usx05xbOhEgXHgG1kJZuojuNKtI86i7mU
-         1W3g==
+        bh=Y6KbT4kBuivO+GxSvi+LQfZT8tk8UxIY20bJMtmOgR8=;
+        b=Ew+4bmOU0+dtkH6cavqekcnL5mcUzN1QIhwR9IAlwk55q2CHxzSL6gOjv5nh66uHmc
+         ZQ+/8wqs03GqR+M7oD3PZNrhrLsYOOJjkt+QLmf4dNimEVTFtYI0Am/dRa5Y6rGrQ9KS
+         1R4soacIaWpiVk+AG4W3fX4YoK7Pc/Snd0puHKE4W878PF6mFz+gBUqz5gu5r8X0JhRY
+         +5Y5GJV/0bqu/JGmgqSNPfuYXAQcyqWyoq9uPqPUOX9y1xpbMpkagIbCYTtu3+J+VXzb
+         X1PJQC72DW+OGAJeCHV+b5RZXx2/vvbIhu4V3Rz9ZcYesaQBXJ9nWzv8Wr4jaAx0n3Z3
+         vjjQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706890139; x=1707494939;
+        d=1e100.net; s=20230601; t=1706890454; x=1707495254;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ObobwIusGY63NE/2MOWR+NbMWvgKu/d9ZjBL9g2lKRM=;
-        b=qbD9G/Gt6DkkCUln5hyv8yKoKL++fXlOOf/djTNWE6YBWO+myS2Go1VoSLWhmC0Xm4
-         ZQbHxHm7mKk0E58FGrfPpkPJaaCj1z2FzxClNFc2G0uFhI6fy011GE1nXmCrQO0i0ONr
-         3TSCKjtQmX69r9GxQ/kvFkhUSvVPGXxhWlrK9Otyg/JMefzdy/yssnvYEAeb5R3QpOQz
-         L2oCBsmylfFtzA5hkv7iOMcEFqUpodvUCuHwMUzCWWTL9jVlRLXGF62R5aUlzK3BEoEY
-         JMucZ2SD73t43dhC0sgmC5j1dPZ2i9cfq6mevdCG6VIfs6ujIJWSyo/IXq61bLTbmY9W
-         T5OA==
-X-Gm-Message-State: AOJu0Yw7nq4Lbg++wqBtxDKPgsQDyU6QGLU+7LmL7WEiiyKK2ehtIMjj
-	Ibd4NOKJCXWOcNbkyVaKw4y5bAhEmlToN/2eeSkO3K/zAKKZvgSEsXWmvDFfBbOT6Lk6EFFmU1A
-	1ggu1a3P23H/fYtclu/VkU+8YtRc=
-X-Google-Smtp-Source: AGHT+IGMWWJJIsEQaIGhd3HotQ+QkJuC6kkshmtHK3UG+EVQsNgMHpDuOqo3DccHZuJCzl1gJq/ilLs/vZ/Z4MzkmfU=
-X-Received: by 2002:a81:441c:0:b0:5e8:92f9:46e8 with SMTP id
- r28-20020a81441c000000b005e892f946e8mr2730296ywa.30.1706890139331; Fri, 02
- Feb 2024 08:08:59 -0800 (PST)
+        bh=Y6KbT4kBuivO+GxSvi+LQfZT8tk8UxIY20bJMtmOgR8=;
+        b=fy8zm3o98UvpCCOE5W8bre3RsqVNgcAtAEbsRxO+fD5b+fAu/M2y5ibR3xCyd8NZzu
+         SAOSU59aUkUSdrUyeTLNjAhcyUULnJSINbPMpnLYbOrJRGY0ivEVwqkfhekkECot03M6
+         Rlk0hCZsaHbh9ohaALtq1B2buFwNISQBSQrpcBpq2h6H6uUW+NZQvRDhBTo9+DHCXqLE
+         4X6dXReeOIHHwlSU+AZaUjrFE7t7PU1y+wypNYoLPMlLYi1U9QS/LT6oySx/DHUkLGOZ
+         RkBHxAbM9Hv1tl4WxNycXNiTo1O9TfwuVoLY88eLAP5bUAtl8yD0BfBTH9PFlv879STa
+         f84A==
+X-Gm-Message-State: AOJu0YyIt4WzO0aFREqegDq8+P8CEhsyCnzAMkVt3bNxCmHXQTeT1Edn
+	4llamBxroSaI4P/VtcLvixgt/S4AfNURXQZCxDt/DFVnSHU/hG7tfB4p2GmSNabt9/SnT7B3a2b
+	Jn21qWSf6wsEeEFVh3/q3pn8u/NxsVEddpXDN
+X-Google-Smtp-Source: AGHT+IGoWJsfhic7qRq3Vkd/uQY7ncJaEl4oQRFpZ6VVQ+6xH8r5zNwrHxEHwrY4VVtCqnRYr0wWw05OQfRx3tGtzzg=
+X-Received: by 2002:a50:ccda:0:b0:55f:98d7:877c with SMTP id
+ b26-20020a50ccda000000b0055f98d7877cmr30140edj.5.1706890452766; Fri, 02 Feb
+ 2024 08:14:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240202101311.it.893-kees@kernel.org> <20240202101642.156588-2-keescook@chromium.org>
- <CANpmjNPPbTNPJfM5MNE6tW-jCse+u_RB8bqGLT3cTxgCsL+x-A@mail.gmail.com> <202402020405.7E0B5B3784@keescook>
-In-Reply-To: <202402020405.7E0B5B3784@keescook>
-From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Date: Fri, 2 Feb 2024 17:08:48 +0100
-Message-ID: <CANiq72ku9wsHtnPAh5G71Y_pbsftrPPyV5wmDCcZRM+WB6KVjA@mail.gmail.com>
-Subject: Re: [PATCH v2 2/6] ubsan: Reintroduce signed and unsigned overflow sanitizers
-To: Kees Cook <keescook@chromium.org>
-Cc: Marco Elver <elver@google.com>, linux-hardening@vger.kernel.org, 
-	Justin Stitt <justinstitt@google.com>, Miguel Ojeda <ojeda@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Hao Luo <haoluo@google.com>, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Fangrui Song <maskray@google.com>, 
-	Masahiro Yamada <masahiroy@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, 
-	Bill Wendling <morbo@google.com>, Andrey Konovalov <andreyknvl@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, x86@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev, linux-doc@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	kasan-dev@googlegroups.com, linux-acpi@vger.kernel.org
+References: <f011968fee563eeaaa82bf94e760e9f612eee356.1706889875.git.pabeni@redhat.com>
+In-Reply-To: <f011968fee563eeaaa82bf94e760e9f612eee356.1706889875.git.pabeni@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 2 Feb 2024 17:13:59 +0100
+Message-ID: <CANn89iJ8b-vXhH0Rc5isVTaxgSQ871mud+ttQnLOLtuCu14UXg@mail.gmail.com>
+Subject: Re: [PATCH net] selftests: net: let big_tcp test cope with slow env
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>, Xin Long <lucien.xin@gmail.com>, 
+	linux-kselftest@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 2, 2024 at 1:17=E2=80=AFPM Kees Cook <keescook@chromium.org> wr=
-ote:
+On Fri, Feb 2, 2024 at 5:07=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
 >
-> Perhaps I should hold off on bringing the unsigned sanitizer back? I was
-> hoping to work in parallel with the signed sanitizer, but maybe this
-> isn't the right approach?
+> In very slow environments, most big TCP cases including
+> segmentation and reassembly of big TCP packets have a good
+> chance to fail: by default the TCP client uses write size
+> well below 64K. If the host is low enough autocorking is
+> unable to build real big TCP packets.
+>
+> Address the issue using much larger write operations.
+>
+> Note that is hard to observe the issue without an extremely
+> slow and/or overloaded environment; reduce the TCP transfer
+> time to allow for much easier/faster reproducibility.
+>
+> Fixes: 6bb382bcf742 ("selftests: add a selftest for big tcp")
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ---
+>  tools/testing/selftests/net/big_tcp.sh | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>
+> diff --git a/tools/testing/selftests/net/big_tcp.sh b/tools/testing/selft=
+ests/net/big_tcp.sh
+> index cde9a91c4797..2db9d15cd45f 100755
+> --- a/tools/testing/selftests/net/big_tcp.sh
+> +++ b/tools/testing/selftests/net/big_tcp.sh
+> @@ -122,7 +122,9 @@ do_netperf() {
+>         local netns=3D$1
+>
+>         [ "$NF" =3D "6" ] && serip=3D$SERVER_IP6
+> -       ip net exec $netns netperf -$NF -t TCP_STREAM -H $serip 2>&1 >/de=
+v/null
+> +
+> +       # use large write to be sure to generate big tcp packets
+> +       ip net exec $netns netperf -$NF -t TCP_STREAM -l 1 -H $serip -- -=
+m 262144 2>&1 >/dev/null
+>  }
 
-If you can do anything to keep it in-tree, I think it would be nice so
-that others can easily use it to test the tooling and to start to
-clean up cases. A per-subsystem opt-in like Marco says could be a way,
-and you could perhaps do one very small subsystem or similar to see
-how it would look like.
+Interesting.
 
-Something that could also help would be to split the cases even
-further (say, only overflows and not underflows), but is that a
-possibility with the current tooling?
+I think we set tcp_wmem[1] to 262144 in our hosts. I think netperf
+default depends on tcp_wmem[1]
 
-Thanks for working on this, Kees!
-
-Cheers,
-Miguel
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
