@@ -1,63 +1,61 @@
-Return-Path: <netdev+bounces-68652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2540E847750
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:24:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8CE0847774
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:29:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B87B81F273EA
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:24:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6DCF1C241F3
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:29:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E82DB14E2C1;
-	Fri,  2 Feb 2024 18:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78DC314A4DC;
+	Fri,  2 Feb 2024 18:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I1TvU+Lj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i2BjsCRO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B890F152DEF;
-	Fri,  2 Feb 2024 18:22:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 465CF149012;
+	Fri,  2 Feb 2024 18:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706898161; cv=none; b=M0gZ4babYzxRRI/SmSfVTIlWbNun2kQRmbLLXoG79yM/PkrczJ09WG+Xot9BUEWi5eJ44nAr0sa7bC9FEJkFnqHanECv+j1lYQJFBkUPaZC+44GQdtfxa4IjjWbFKuYsQWFY/cWS4zf+QU16iis/Pv62xg84u5O8xVBL8RCV4yY=
+	t=1706898588; cv=none; b=O3heavjn9hbrBGZw5J84Wndwxj1flDAFe3Hyxon8lZ4AWmPcselLv1JcLoDlQZDUOW6ZR0bRJaTcQl3lWydfSsElQtR0c+JJyM8iXSJV1cy4RinVP7xB7WLOo1L9wAJ2rBtawPF3jKRGs8PuIG4NgtZUrfmc96PS2acxfUshLAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706898161; c=relaxed/simple;
-	bh=svlvAKv5Rsvu79CaMk7L2BcATKO9LgP+bcm0qXURTwE=;
+	s=arc-20240116; t=1706898588; c=relaxed/simple;
+	bh=tUCobfJJYi8OieBavxShsPnIA/+6GAcMJyEFD3AP3Kw=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kXT40s587iTqiLmrwCm3PglsnqX26GDXanspLQaEos6Q+x3gVLuUDWztlw0tlH4BmToxViyX52enzsEYPm1+fYGpciU6ZikEW7QcjRi7FK07cirEy1VQID4FCJAbjdr6+n7BgIlh1EWje8T5FFa7CMu0FPsPGjSEYNQhUGXqPOk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I1TvU+Lj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9F75C433F1;
-	Fri,  2 Feb 2024 18:22:40 +0000 (UTC)
+	 MIME-Version:Content-Type; b=BxyOAb/0Sb2EaSP8Sr8jTgYnCv9dhbO441D8a+WZRZRYnU6zxi4LYLEtu7ojlzShpumAuPLxmbS+RMKYaiaChLQkMj+5B5ragKyj7OepA5+uiJ/7KPPJeYfVRspAsFOV50jFrTisCJZyoTyGcoJV4d4WBU2nDzZPoR9BjgLj64Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i2BjsCRO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B3FBC433C7;
+	Fri,  2 Feb 2024 18:29:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706898161;
-	bh=svlvAKv5Rsvu79CaMk7L2BcATKO9LgP+bcm0qXURTwE=;
+	s=k20201202; t=1706898587;
+	bh=tUCobfJJYi8OieBavxShsPnIA/+6GAcMJyEFD3AP3Kw=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I1TvU+LjPjr5qbLEIXhr7/DRLc7UIpceNQ5kWHZnw0xpTGQ94/KFqA+FR7dw+gIe9
-	 TAQY0kW36tFvSPdxJIwk/qePlR6anGBbBhKCAnuXDVvwO+u3737/q1pGdLwlnQORkO
-	 xSF61brZecFv2S2/NxndiIyhyEPiX6cS7v/2dSJOVKqTX0Aqfb3DGpLcjPUUf9ChVL
-	 wFwZeRnYRq/xjtfK8nVM+KWFYAstoemWARClHatdXrrEJP5i1KSnptzOc273mnBYOD
-	 4UDD4jrAbn8EpOUc62qfT90JE1ISVJtRHOoi4/JbYdDbpMYbe1ySHALb0wbjzs5ree
-	 q6FH+Kfhb/GWQ==
-Date: Fri, 2 Feb 2024 10:22:39 -0800
+	b=i2BjsCROBtsIRrs/j6Ug/MslyOhwVvq1VpFPKQptSb7ysOwj/HgcprrwcNbhppf4g
+	 oC2BWiyJxBTjrnxtQOtWaGS/c2ft89VzbIZtcmy3VhBf7rWg85Mo8/7G6i+8Mz4Fu3
+	 KbNNmzWSLH/0pzKJeahqIZfEmhT7pBAS8iQI2hdNV/zypXUoq+r8rRyYw6Uz8zLBNi
+	 Pyo31JrWMN8Rbq3cNQECPNmsnVDELINMVW85DqzqZ8gPo7pvazR0nxLlySaRAQavqr
+	 hvPniZdiFJm2AhHrYhEIVPw5z4CByWWhC/72mDSO7Nhxun843WRu4vzV3/Rh7RO6nE
+	 2ch7u7WSZMPPA==
+Date: Fri, 2 Feb 2024 10:29:46 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Eric Dumazet
- <edumazet@google.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <chuck.lever@oracle.com>,
- <jlayton@kernel.org>, <linux-api@vger.kernel.org>, <brauner@kernel.org>,
- <davem@davemloft.net>, <alexander.duyck@gmail.com>, "Wei Wang"
- <weiwan@google.com>, Amritha Nambiar <amritha.nambiar@intel.com>
-Subject: Re: [net-next 0/3] Per epoll context busy poll support
-Message-ID: <20240202102239.274ca9bb@kernel.org>
-In-Reply-To: <f0b4d813-d7cb-428b-9c41-a2d86684f3f1@intel.com>
-References: <20240124025359.11419-1-jdamato@fastly.com>
-	<CANn89i+YKwrgpt8VnHrw4eeVpqRamLkTSr4u+g1mRDMZa6b+7Q@mail.gmail.com>
-	<5faf88de-5063-421f-ad78-ad24d931fd17@intel.com>
-	<20240202032806.GA8708@fastly.com>
-	<f0b4d813-d7cb-428b-9c41-a2d86684f3f1@intel.com>
+To: Masahiro Yamada <masahiroy@kernel.org>
+Cc: John Garry <john.g.garry@oracle.com>, mcgrof@kernel.org,
+ russ.weight@linux.dev, gregkh@linuxfoundation.org, rafael@kernel.org,
+ rostedt@goodmis.org, mhiramat@kernel.org, mathieu.desnoyers@efficios.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ keescook@chromium.org, nathan@kernel.org, nicolas@fjasle.eu,
+ linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kbuild@vger.kernel.org
+Subject: Re: [PATCH RFC 0/4] Introduce uts_release
+Message-ID: <20240202102946.56215f4e@kernel.org>
+In-Reply-To: <CAK7LNATDMjzmgpBHZFTOJCkTCqpLPq8jEjdrwzEZ3uu7WMG7jg@mail.gmail.com>
+References: <20240131104851.2311358-1-john.g.garry@oracle.com>
+	<CAK7LNATDMjzmgpBHZFTOJCkTCqpLPq8jEjdrwzEZ3uu7WMG7jg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,36 +65,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 2 Feb 2024 11:23:28 -0600 Samudrala, Sridhar wrote:
-> > I know I am replying to a stale thread on the patches I've submit (there is
-> > a v5 now [1]), but I just looked at your message - sorry I didn't reply
-> > sooner.
-> > 
-> > The per-queue and per-napi netlink APIs look extremely useful, thanks for
-> > pointing this out.
-> > 
-> > In my development tree, I had added SIOCGIFNAME_BY_NAPI_ID which works
-> > similar to SIOCGIFNAME: it takes a NAPI ID and returns the IF name. This is
-> > useful on machines with multiple NICs where each NIC could be located in
-> > one of many different NUMA zones.
-> > 
-> > The idea was that apps would use SO_INCOMING_NAPI_ID, distribute the NAPI
-> > ID to a worker thread which could then use SIOCGIFNAME_BY_NAPI_ID to
-> > compute which NIC the connection came in on. The app would then (via
-> > configuration) know where to pin that worker thread; ideally somewhere NUMA
-> > local to the NIC.
-> > 
-> > I had assumed that such a change would be rejected, but I figured I'd send
-> > an RFC for it after the per epoll context stuff was done and see if anyone
-> > thought SIOCGIFNAME_BY_NAPI_ID would be useful for them, as well.  
-> 
-> I think you should be able to get this functionality via the netdev-genl 
-> API to get napi parameters. It returns ifindex as one of the parameters 
-> and you should able to get the name from ifindex.
-> 
-> $ ./cli.py --spec netdev.yaml --do napi-get --json='{"id": 593}'
-> {'id': 593, 'ifindex': 12, 'irq': 291, 'pid': 3727}
+On Sat, 3 Feb 2024 00:01:26 +0900 Masahiro Yamada wrote:
+> I do not see why it is useful.
+> As you discussed in 3/4, if UTS_RELEASE is unneeded,
+> it is better to get rid of it.
 
-FWIW we also have a C library to access those. Out of curiosity what's
-the programming language you'd use in user space, Joe?
+To be clear - the discussion on 3/4 was about the fact that netdev
+already prints UTS_RELEASE into the version member of driver info
+struct, as a default. So the drivers no longer have to. But there's 
+no user-observable change there.
 
