@@ -1,78 +1,84 @@
-Return-Path: <netdev+bounces-68251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A0968464F7
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:16:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE77C846523
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:49:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8006B1C22A3B
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 00:16:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55C4A1F26089
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 00:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A26AA179;
-	Fri,  2 Feb 2024 00:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029505380;
+	Fri,  2 Feb 2024 00:49:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="yPRfnFY0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UPjuBb6x"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE97C28E7
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 00:16:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFBFB53A1
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 00:49:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706833005; cv=none; b=EizIbgyU+IHuM96b6NHHuYtU8YRW+1drIK87sqThdDSBZoOqQuabu3/ML6Zn3hQTffBBBovym31/qVeF6ihF0w4W6f4TzP4DCx6tRmBD1qDits3uoLIyib9hb5SU8PQIaA7G2KeyiK6584ct2rERGx9ubeVbTgPhNJtsDxd+4XI=
+	t=1706834981; cv=none; b=cShybdKmyIpv1yRUcAQTyS9oBO9F/OO5HGXeSiMUw+6v6gJJYwrM5fLKpSiewNvNwG94zDoKyvTolhjkACDlgf8bjLdDOBjJhcg8rtcry5KfvUN/s342nkRCYZF1hYafTtrZNaRctRPOek9qSMHeZ4sXw7fNx9QxQACZuicbYzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706833005; c=relaxed/simple;
-	bh=EDN3BfRv1w1pPwAiNA+iUu5GTyIkfOxd66/MZOM6us0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lKogYoMHBAP4rU34QdEBRDVa7rL/rY5TBRmvFDn/PZLewL6oss7RBG9eyCv3ng8Qdi91GB4XGMirO0Jhq8Z3TKpFRIvqeGvqL4kCcFpm77nLugwiWtV9dbSHQSNORUW9KFF6t+XsNMcSdiFOVyUpzeDwe2b6bd/H7ZHDkBVRbGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=yPRfnFY0; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=zdm007S7lyUpdZhrFArK1IUdu4h6iTcrLOUKfuRw6T4=; b=yPRfnFY0N2SEtd1dWrm5V+Op4E
-	GCVRB8WmYdTzyRyzhL2l8fVHwVaPBzHgqLc0wY/f3iHEpLlWGNMSFwbpq9bDBJw3mXSzXYOk4DQfi
-	YYEgf27AkNmSnkQHg0vop3G1wHhlyzagyKvTpucS4nlllXFShdnDP9h7tE6Sm7v7NxZA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rVhEQ-006jY2-E8; Fri, 02 Feb 2024 01:16:34 +0100
-Date: Fri, 2 Feb 2024 01:16:34 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH RESUBMIT net-next] r8169: simplify EEE handling
-Message-ID: <d5d18109-e882-43cd-b0e5-a91ffffa7fed@lunn.ch>
-References: <27c336a8-ea47-483d-815b-02c45ae41da2@gmail.com>
+	s=arc-20240116; t=1706834981; c=relaxed/simple;
+	bh=Oii5TWp0RAUAIw3QoHqC8rj0+bXQ/bLjUqAvwTe9Dxg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a/6D1KZrK1sk+saJ4oxyUyDLJEOujt6jamVF6JdOsrjmq2LVlr4dv/JW6kJi5TuoXIJCxYx13tG8Jn9LPLgZ3p8V7Ox6+t1+pnv8ki7uicAKoE6EdiV88Bsxrz9vpp/+pcTrD5SMVJpKUNlhknzvBP5LG4UFO+QbW2DhgN5kyRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UPjuBb6x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA796C433C7;
+	Fri,  2 Feb 2024 00:49:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706834981;
+	bh=Oii5TWp0RAUAIw3QoHqC8rj0+bXQ/bLjUqAvwTe9Dxg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=UPjuBb6xhfkWZ43wgP1SvA+lwM3lZkxa7vmBZ/zsH/oXs+cTEO6tY4rX7qUOAPYE1
+	 s4cjrGuam8XlQDghvfOv0904OK0x1TlIoInY5gc3K1vnWxXyXk//9wA32VtQQYb+i/
+	 XOrnvOY3hcL2VOH+x/pBuES2TpMwHVCgIgGD4bdmK3eqzYagOnIO8MBknutfCr4Qkj
+	 xPVB6m9/i08NCQJdzH9+2huVhw3dYWhXcmVNY1vTocFlLMxdfi0movcUlfAEtxUcWX
+	 HmsZBaujcmn0XsFZfbQV1j2F9EbEv29PMzYPfssI++D6Sty7roK06j94quX5OVTATj
+	 IXa4w0VMlGR+w==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	jiri@resnulli.us,
+	donald.hunter@gmail.com,
+	sdf@google.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 0/3] tools: ynl: auto-gen for all genetlink families
+Date: Thu,  1 Feb 2024 16:49:23 -0800
+Message-ID: <20240202004926.447803-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <27c336a8-ea47-483d-815b-02c45ae41da2@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-> @@ -5058,7 +5033,9 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
->  	}
->  
->  	tp->phydev->mac_managed_pm = true;
-> -
-> +	if (rtl_supports_eee(tp))
-> +		linkmode_copy(tp->phydev->advertising_eee,
-> +			      tp->phydev->supported_eee);
+The code gen has caught up with all features required in genetlink
+families in Linux 6.8 already. We have also stopped committing auto-
+-generated user space code to the tree. Instead of listing all the
+families in the Makefile search the spec directory, and generate
+code for everything that's not legacy netlink.
 
-This looks odd. Does it mean something is missing on phylib?
+Jakub Kicinski (3):
+  tools: ynl: include dpll and mptcp_pm in C codegen
+  tools: ynl: generate code for ovs families
+  tools: ynl: auto-gen for all genetlink families
 
-	Andrew
+ tools/net/ynl/Makefile.deps      |  2 ++
+ tools/net/ynl/generated/Makefile |  5 ++-
+ tools/net/ynl/samples/ovs.c      | 60 ++++++++++++++++++++++++++++++++
+ 3 files changed, 66 insertions(+), 1 deletion(-)
+ create mode 100644 tools/net/ynl/samples/ovs.c
+
+-- 
+2.43.0
+
 
