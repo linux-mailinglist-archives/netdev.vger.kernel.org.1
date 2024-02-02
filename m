@@ -1,178 +1,93 @@
-Return-Path: <netdev+bounces-68306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F9E7846850
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 07:46:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B130846874
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 07:48:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9238B1C23576
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 06:46:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1078B248E2
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 06:48:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63D7B17BA2;
-	Fri,  2 Feb 2024 06:42:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="DkxNFSg0"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5146F171DC;
+	Fri,  2 Feb 2024 06:44:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ssh247.corpemail.net (ssh247.corpemail.net [210.51.61.247])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E1B317995
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 06:42:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6E2487A3;
+	Fri,  2 Feb 2024 06:44:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.51.61.247
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706856125; cv=none; b=CHquULQ30aaOO+WjpPBbgLRYKbsUcPJKfPJzjsRatMiPysvpWiaOTrqqtwB0tkxt1CXMG3aaARabZa5oGRgEHfWmezf6+K0YGP0yrBbf+ml/MSTOH4YfhCmXlPw8YgWGnELI8I1F6EmFJvQoFRPbkHClQeBcGQcjZMiqV1gKpD4=
+	t=1706856297; cv=none; b=dnEPuHVyByrnE5t56+I3JUjcqEp7ZlpwsZxrQsbV+txtxR8825GgKCCkiMYMKXlydzS+ySpEByjDpUMpAA6lRtzSMkpq8d+6PyEBJ4mJLxeOKl4CnaWLzmituWXsG2rBCspuCHMdPa8/RkqhiBwNcuWFPvHmSuL1MrQjdED6ghI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706856125; c=relaxed/simple;
-	bh=EyPJ1v8uJ1verWOqJzXdRF7tA+iZhYTVX3CQiV6Wfbk=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=DjkyJrSjDTQT5Zn/E1HzRN5QGVRmdP/oKF5l6uuTC7q6Pe/SjyWS2zlg2khZZsHIf5cJ+bUYzjgAb1pWSRuJhdl8+zHgiqrLv3ICpLsnlIsU8AxbrZvodFnIvb3BrmH/QtXzoZH9i0QFcDwwL8ba4HDwMlq9IUf/65C559Ap0DQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=DkxNFSg0; arc=none smtp.client-ip=209.85.215.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-5ce942efda5so1523720a12.2
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 22:42:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1706856121; x=1707460921; darn=vger.kernel.org;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xeB3e/KJ2ArkcAJ7cDxBQCA+oTgv/CnKDnVoit5SrNw=;
-        b=DkxNFSg0UZjhOYNO9QomilU3VFGX9Oa0ddKOOE/qq8NOKjEi5oeh6AXR47Qq81lm77
-         PSb7glH0eOIC/NhkSo8hmsT+/B+e3bdBCJavw0o6imYrLYjLeAdT9NUmO9RY8HdYVIZm
-         XNXZ84WHDAQBSEkEufFjL8S1BwX5AuuUlSWHo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706856121; x=1707460921;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xeB3e/KJ2ArkcAJ7cDxBQCA+oTgv/CnKDnVoit5SrNw=;
-        b=DjY5Sqhjq9+ma8HXc0UENEP+ylXowlD3VkDSrYof/6MLQU93ew0b9sp7b5uJH7UREM
-         BPa3UuwOAnR7WabuSImWOTnSqqbtopS3WQ5FFJDhKlFohAy1NJ343zlzTjOBv8OxlS0n
-         pEUYo8YWqGpQyq0Egv2meDK7FW/Kzh/EZ6YJgtIx1zHngK6BNlwpRydx8b1N9Pbg6lyY
-         9br+YNlnzN7IcWh/JVFp7MZKjvXRL7KRfjFjFhQPrLedA5YBdSFfbbmUqSztEtYhxQDN
-         KqtckwMQxieT+Su0VB0t8xB5wzWm9ubYmu1D47P/k9j4DzzJlkLzLBLhBRFzZ6SGaCpk
-         aSHA==
-X-Gm-Message-State: AOJu0Yx6ZpZkFg19NWns4oj5SDB6c9YDVwTuYD9wP3S96vqHiqqP9QXp
-	HpIibrzkbru5cliakQiYBU6x3YNDBuqwbkgDyH7kk+pghbj8F993i7OriYa90g==
-X-Google-Smtp-Source: AGHT+IGkxoHrn5M23ZvqLsrcgWb9Dxe4chh56p5rjnQf81e2tLgOZlZAD6cC22pLx6DS6kx/4ch7Rg==
-X-Received: by 2002:a05:6a20:9326:b0:19e:399f:7bed with SMTP id r38-20020a056a20932600b0019e399f7bedmr4407693pzh.35.1706856121632;
-        Thu, 01 Feb 2024 22:42:01 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUSv8KyeVxLzlGyhyhJ6/k5Q8l3rOmZnebm5Ftte6euQTEIyGzkjD1oV8Cyqg6y2bKRShGnz/qsu+E5D9h1OLSVVnu84HPXx7PLd5AgFJfvfginU3vSbn1Jyi7RnXvVdEq+bFkO47Zwrq/rLX7o756g05VcM3Kko6+PIh5jDoU0gQgNF3OHccJnR0hZpbe1Y06qv4h8qSFrnEhsGOLrTQoKnGpXivVi4shl/FNK4m1L3o8+vSZqqsv0S3wMcmdERd8EJhTOaZ0PH7W2w6p1bfCEQaLzN/0/w6QZGBwzpqlN4EQOPhwQGxkfy8HJhsbkyUxzRysBfA1uG4CXq1egORvciiFbGJkVKpTYr2N2BpYLQdBSHlgHNrlyBIdB0O+Aoxt7l11Wa7GVWyoTdjg/cOmdceBMrnJ1QDGZsjz0Lz9u+bmbEWiRefNwhkPQQicN/vAkTnHZ8DuoIswbpmksZRumsxfA5YJcJRepZCixavqoYSVuYWECbbW/FXKzEYJZGmL3knKe6cS5u4qkdeaAO/uzJQR5HAA=
-Received: from akaher-virtual-machine.eng.vmware.com ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id kc12-20020a17090333cc00b001d94a245f3fsm880583plb.16.2024.02.01.22.41.59
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 01 Feb 2024 22:42:00 -0800 (PST)
-From: Ajay Kaher <ajay.kaher@broadcom.com>
-To: stable@vger.kernel.org,
-	gregkh@linuxfoundation.org
-Cc: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	fw@strlen.de,
-	davem@davemloft.net,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	alexey.makhalov@broadcom.com,
-	florian.fainelli@broadcom.com,
-	vasavi.sirnapalli@broadcom.com,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Sasha Levin <sashal@kernel.org>,
-	Ajay Kaher <ajay.kaher@broadcom.com>
-Subject: [PATCH v5.10.y] netfilter: nf_tables: fix pointer math issue in nft_byteorder_eval()
-Date: Fri,  2 Feb 2024 12:11:21 +0530
-Message-Id: <1706856081-37418-1-git-send-email-ajay.kaher@broadcom.com>
-X-Mailer: git-send-email 2.7.4
+	s=arc-20240116; t=1706856297; c=relaxed/simple;
+	bh=TdFGU89xpk1hjNXN+ZsruSkJjk4d0NqyQ9VSJozPCjM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=hFEhJ64n8JjqINELULhOdUAiBMSNXKB6/Bzh1jc+JAGMwdGkfKmadwbs+O562nrxg7rgeefnvUaRzkdyQHMGD2cp4Wp+yHti1dy3cdzWPserHVapItGg50sZnlX0TTAo5WF+HFaVv64SqowdUSYnMPNmQcg8ZymwC3e5tD9e/Wg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com; spf=pass smtp.mailfrom=inspur.com; arc=none smtp.client-ip=210.51.61.247
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=inspur.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inspur.com
+Received: from ssh247.corpemail.net
+        by ssh247.corpemail.net ((D)) with ASMTP (SSL) id YYT00038;
+        Fri, 02 Feb 2024 14:43:38 +0800
+Received: from localhost.localdomain.com (10.73.45.222) by
+ jtjnmail201605.home.langchao.com (10.100.2.5) with Microsoft SMTP Server id
+ 15.1.2507.34; Fri, 2 Feb 2024 14:43:37 +0800
+From: Bo Liu <liubo03@inspur.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Bo Liu
+	<liubo03@inspur.com>
+Subject: [PATCH] net: encx24j600: convert to use maple tree register cache
+Date: Fri, 2 Feb 2024 01:43:36 -0500
+Message-ID: <20240202064336.39138-1-liubo03@inspur.com>
+X-Mailer: git-send-email 2.18.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain
+tUid: 2024202144338eccbe320a9b895256bb1bc63e56e9fe0
+X-Abuse-Reports-To: service@corp-email.com
+Abuse-Reports-To: service@corp-email.com
+X-Complaints-To: service@corp-email.com
+X-Report-Abuse-To: service@corp-email.com
 
-From: Dan Carpenter <dan.carpenter@linaro.org>
+The maple tree register cache is based on a much more modern data structure
+than the rbtree cache and makes optimisation choices which are probably
+more appropriate for modern systems than those made by the rbtree cache.
 
-commit c301f0981fdd3fd1ffac6836b423c4d7a8e0eb63 upstream.
-
-The problem is in nft_byteorder_eval() where we are iterating through a
-loop and writing to dst[0], dst[1], dst[2] and so on...  On each
-iteration we are writing 8 bytes.  But dst[] is an array of u32 so each
-element only has space for 4 bytes.  That means that every iteration
-overwrites part of the previous element.
-
-I spotted this bug while reviewing commit caf3ef7468f7 ("netfilter:
-nf_tables: prevent OOB access in nft_byteorder_eval") which is a related
-issue.  I think that the reason we have not detected this bug in testing
-is that most of time we only write one element.
-
-Fixes: ce1e7989d989 ("netfilter: nft_byteorder: provide 64bit le/be conversion")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-[Ajay: Modified to apply on v5.10.y]
-Signed-off-by: Ajay Kaher <ajay.kaher@broadcom.com>
+Signed-off-by: Bo Liu <liubo03@inspur.com>
 ---
- include/net/netfilter/nf_tables.h | 4 ++--
- net/netfilter/nft_byteorder.c     | 5 +++--
- net/netfilter/nft_meta.c          | 2 +-
- 3 files changed, 6 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/microchip/encx24j600-regmap.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_tables.h
-index 2237657..2da11d8 100644
---- a/include/net/netfilter/nf_tables.h
-+++ b/include/net/netfilter/nf_tables.h
-@@ -142,9 +142,9 @@ static inline u16 nft_reg_load16(const u32 *sreg)
- 	return *(u16 *)sreg;
- }
- 
--static inline void nft_reg_store64(u32 *dreg, u64 val)
-+static inline void nft_reg_store64(u64 *dreg, u64 val)
- {
--	put_unaligned(val, (u64 *)dreg);
-+	put_unaligned(val, dreg);
- }
- 
- static inline u64 nft_reg_load64(const u32 *sreg)
-diff --git a/net/netfilter/nft_byteorder.c b/net/netfilter/nft_byteorder.c
-index 7b0b8fe..9d250bd 100644
---- a/net/netfilter/nft_byteorder.c
-+++ b/net/netfilter/nft_byteorder.c
-@@ -38,20 +38,21 @@ void nft_byteorder_eval(const struct nft_expr *expr,
- 
- 	switch (priv->size) {
- 	case 8: {
-+		u64 *dst64 = (void *)dst;
- 		u64 src64;
- 
- 		switch (priv->op) {
- 		case NFT_BYTEORDER_NTOH:
- 			for (i = 0; i < priv->len / 8; i++) {
- 				src64 = nft_reg_load64(&src[i]);
--				nft_reg_store64(&dst[i], be64_to_cpu(src64));
-+				nft_reg_store64(&dst64[i], be64_to_cpu(src64));
- 			}
- 			break;
- 		case NFT_BYTEORDER_HTON:
- 			for (i = 0; i < priv->len / 8; i++) {
- 				src64 = (__force __u64)
- 					cpu_to_be64(nft_reg_load64(&src[i]));
--				nft_reg_store64(&dst[i], src64);
-+				nft_reg_store64(&dst64[i], src64);
- 			}
- 			break;
- 		}
-diff --git a/net/netfilter/nft_meta.c b/net/netfilter/nft_meta.c
-index 44d9b38..cb5bb0e 100644
---- a/net/netfilter/nft_meta.c
-+++ b/net/netfilter/nft_meta.c
-@@ -63,7 +63,7 @@ nft_meta_get_eval_time(enum nft_meta_keys key,
- {
- 	switch (key) {
- 	case NFT_META_TIME_NS:
--		nft_reg_store64(dest, ktime_get_real_ns());
-+		nft_reg_store64((u64 *)dest, ktime_get_real_ns());
- 		break;
- 	case NFT_META_TIME_DAY:
- 		nft_reg_store8(dest, nft_meta_weekday());
+diff --git a/drivers/net/ethernet/microchip/encx24j600-regmap.c b/drivers/net/ethernet/microchip/encx24j600-regmap.c
+index 2e0fe16a4082..443128adbcb6 100644
+--- a/drivers/net/ethernet/microchip/encx24j600-regmap.c
++++ b/drivers/net/ethernet/microchip/encx24j600-regmap.c
+@@ -464,7 +464,7 @@ static struct regmap_config regcfg = {
+ 	.val_bits = 16,
+ 	.max_register = 0xee,
+ 	.reg_stride = 2,
+-	.cache_type = REGCACHE_RBTREE,
++	.cache_type = REGCACHE_MAPLE,
+ 	.val_format_endian = REGMAP_ENDIAN_LITTLE,
+ 	.readable_reg = encx24j600_regmap_readable,
+ 	.writeable_reg = encx24j600_regmap_writeable,
+@@ -485,7 +485,7 @@ static struct regmap_config phycfg = {
+ 	.reg_bits = 8,
+ 	.val_bits = 16,
+ 	.max_register = 0x1f,
+-	.cache_type = REGCACHE_RBTREE,
++	.cache_type = REGCACHE_MAPLE,
+ 	.val_format_endian = REGMAP_ENDIAN_LITTLE,
+ 	.readable_reg = encx24j600_phymap_readable,
+ 	.writeable_reg = encx24j600_phymap_writeable,
 -- 
-2.7.4
+2.31.1
 
 
