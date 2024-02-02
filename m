@@ -1,173 +1,105 @@
-Return-Path: <netdev+bounces-68571-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68572-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23F32847429
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:08:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F73884742B
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:08:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E3C4B299DB
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:08:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 390C91F22A91
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F4714A09F;
-	Fri,  2 Feb 2024 16:05:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kfMwjSao"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF2B314A4D0;
+	Fri,  2 Feb 2024 16:05:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE2E14A096;
-	Fri,  2 Feb 2024 16:05:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 366351474A6;
+	Fri,  2 Feb 2024 16:05:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706889922; cv=none; b=fgQ7LgeJAVYKVX+/udC7eChjh7HkJPiZm0qye+UFvJNlMQLIMHoEvQgurq8K83rpCv75qVUrhgaf23MV1Tsf1c4GWhcBl4tFIQalb+IkC4QjHdx5NKloGDu3u9xH5de6s6RpsEOyKcem5VRH08LUve+yjlRmPTlG3eTNDH4/lXM=
+	t=1706889955; cv=none; b=EMWvAOnmLeZeitLE72gfL2acReTM6+bjxN2QPxnKjZpsXerizN2gTgeH+cxFlu2DPA09GdzE8Pt804zmtsnbLirBz/P/aUJvN6Bj0pLWfXto/qNcQlWbmJApBBaseP1NvUwvQeCYI9IT42alOeZlqciHiIN9AKzH3lRgGq4DfUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706889922; c=relaxed/simple;
-	bh=jX74YmxcgCmEmELepiQIjYfkj4EhbJwtDcV1u+qSGXo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QyvyWA8Bg6utS/h9jhduD8bAD6watlIc69b1IkAV+ZA2JORy6QRRS43/P7ljT7D/p+niUmOUlpixKm6fAOnDpR+rpgdJ7lyVpD3XyK4ZtBVSPC2QGbD71fL88YIfAvwAEtXdyGN7mmpLr0W55sxeVA66Jc8Y5gD05bCrP0tjzQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kfMwjSao; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1706889955; c=relaxed/simple;
+	bh=huJ/Rfg6KdXJHB+0Z8ECd2LJxmRDfJZTc2ymEesl2vg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DKqK+dluZKPCp8hlgM1MrWeCDAXSdUECfAVsW1wAJC3elSADxaZfxw3UjyyUwEs8X/rA3S82XQUltXTjn6LJ/oquTZPio1hHSkES2RtosO3cDctSgj2lKbfRxV13EuwIFdAlWCQlzyUvvCKGINEgH6rptjapM5NmL9TTnsRoTYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-55a9008c185so1770522a12.1;
-        Fri, 02 Feb 2024 08:05:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706889919; x=1707494719; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FLlRPXBIEL3X1bT9VeDZff9MrnDp+zQ7VNRcupI/Wt4=;
-        b=kfMwjSaoXYublwapY5si4blLRG6ens1ESSv5kMLR1VOGZC/53/U9tcS2Mh7OITYxYn
-         4OC9pJ8YdNLzUkJAkecN1uHBDg1IOiFr/gdmlqxqTz3fML9GxkIrTLdHFzBbr+UKOkuy
-         SdcYmic67OPpmcb8iCvug0Whp5Trx+Fbju2OJi6D0OkmIzk3IUj9kbwBpAKmPAb/fE5B
-         HNrOBDZKebZvquZGhdcOLk9vrl62CGLFISLqqG8QAwYiXxuGtZUeJYQ32J4SYy48bQRL
-         CNIpW9UIyPkIzWMCKsr099614FthHYJWy/oSYuNHb2X2/I9AA+HoUR17BrMdFSVtTHCT
-         bQ4g==
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a370315191dso106742966b.2;
+        Fri, 02 Feb 2024 08:05:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706889919; x=1707494719;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FLlRPXBIEL3X1bT9VeDZff9MrnDp+zQ7VNRcupI/Wt4=;
-        b=ownZHHSIArlcqIQTdQIhaTj6Nesb4WYyBoPLSef2uXsz8+5gyjstJ214szKW4Hp7b1
-         muxxJasTEF3dRg5n+jbcADjdQU2VAMO5qeWwbWm9I4QUsYCMhPh/vZhze4xXCvRUxER9
-         SgCp71/+lVFxIMp8UsAwM2Cz+NwA/JaRqlSFBx3mWMz1hJRCu/2Y4Y9vrv0B93payGGD
-         sTlraM2rhJurLs/SKRKqpY1mQOHotsW1fNHUSHGcbSMS3TGAIv9XCbGW7E6h08ICxqoO
-         vv2ovPXMz9p3mBUALJQc6ePNWpylK03gAA3/S/9rotgL0ovH0r5V8pRN3ZG2la6eYOvT
-         7a2w==
-X-Gm-Message-State: AOJu0YxmQ0MH1nP+9oJNny+w426B4Z/YSpcXOjwknER3C4jfw3KD31UM
-	Qwp1ZOwefczS7Ffhzx0XIzIxnVcRWNFtyty3Oh5lYnlqdFcWqUtmZuuRXf7DfZtu300YckNEshQ
-	02SmXTRpVehNGOFJAoQq+2MEJPFU=
-X-Google-Smtp-Source: AGHT+IF2slK9fXYPzwfDD2e5yHoShmAfdPNFPYP1AwFwnfIvZq1ro3WVBw4BwoJUCQXQSeCzb/p18f/Aik+8HMPoGHg=
-X-Received: by 2002:aa7:c88d:0:b0:55f:f301:35d4 with SMTP id
- p13-20020aa7c88d000000b0055ff30135d4mr34904eds.12.1706889918650; Fri, 02 Feb
- 2024 08:05:18 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706889952; x=1707494752;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=pu462frfQANGewhiNlgpx6hR3E2pyTy5PdFJlf3HJog=;
+        b=mwt/WQujM8/KlETmRg6Hm+Nsf7lFeRBn4yu62GaKogu0mwgscw3qw1AHD/fBiCX2Kg
+         I+GKUz9imiyDk/Qtmj+zlnmHRmuMWUrtRW061W5hwGt3hmaBnvQ8fF4+8rzng/GmeU+/
+         ckuSMwTwzvO0VGqrQw4kZBhkoLGiaYW52lMJdXXJfJexDblkVLu6ay5OazzIWY4PuM5J
+         nZ/KRQ7WHT5u1u26f3/SsZvw852ZNiNum6AID0dVrgeZzXvulnpnvlyqDeI9oxGTvldx
+         gPusfAHbt7duUbmrHafKfAEyLelb+PG9EFBJCQ95WWWjZrSc7XoEMk+KecCJhxIjJnCG
+         G09w==
+X-Gm-Message-State: AOJu0YxmbWsdws2KZURUgiiLe9AoQQ3IMcgynD7ElDoI7Fy7I6s1Qg2n
+	V5wX/PBsvrXkoL9Z5luyw8Ws1+NPYhF8lwV7JSClh0qAMxfK/miP
+X-Google-Smtp-Source: AGHT+IHVsW+CVEna2Q6TLns6X2lxQWbiX8YRFHFnm22qfOt0MmouTGxujVLOCmOB7iHlQ++dXPwOiA==
+X-Received: by 2002:a17:906:195a:b0:a36:884b:ed4f with SMTP id b26-20020a170906195a00b00a36884bed4fmr4133864eje.38.1706889951973;
+        Fri, 02 Feb 2024 08:05:51 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWbvj5lc3FPaz1DivsiiiE4R60Vw7/9HBDomMBOyD54TGT2wpPpWQXfIkXqJLw1+VXNIDN4MWlEPBSMuzQhbMSt3igODgdQ8n8p4UI2qHxN6Wa70TpeARohpYRP008vq8ZeBr/DXY7eSYBZQI+xq6juhhXGdpzDSQ5zZEsGVnbPJTDXp5eOCqppUPZD1sOApq7wkUvxzRdik3SuVIuDAFeflmuF59GYn2npXFIj3Fhj8CXveWidqDpxTtTL18KeT1h9OKTuGxDJ/mCQCaHU1AKtBo0tTimTf2/L6w/vjwLM/oql/P8UWgOl25H76Y1PS/4MIFzd/RL+h8VcORBwab6mAiET5yLmu1UEat5Rw518myw=
+Received: from localhost (fwdproxy-cln-010.fbsv.net. [2a03:2880:31ff:a::face:b00c])
+        by smtp.gmail.com with ESMTPSA id vh11-20020a170907d38b00b00a36fdfd5f52sm877495ejc.204.2024.02.02.08.05.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Feb 2024 08:05:51 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com,
+	Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: ocelot: update the MODULE_DESCRIPTION()
+Date: Fri,  2 Feb 2024 08:05:37 -0800
+Message-Id: <20240202160538.2139629-1-leitao@debian.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240126231348.281600-1-thepacketgeek@gmail.com>
- <20240126231348.281600-6-thepacketgeek@gmail.com> <20240202115151.GL530335@kernel.org>
-In-Reply-To: <20240202115151.GL530335@kernel.org>
-From: Matthew Wood <thepacketgeek@gmail.com>
-Date: Fri, 2 Feb 2024 08:05:07 -0800
-Message-ID: <CADvopvb1phuPW+M3L2BQ576vJgWx2zeFN943OxcVq+iTL8_3qA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 5/8] net: netconsole: add a userdata
- config_group member to netconsole_target
-To: Simon Horman <horms@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, leitao@debian.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 2, 2024 at 3:52=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
-e:
->
-> On Fri, Jan 26, 2024 at 03:13:40PM -0800, Matthew Wood wrote:
-> > Create configfs machinery for netconsole userdata appending, which depe=
-nds
-> > on CONFIG_NETCONSOLE_DYNAMIC (for configfs interface). Add a userdata
-> > config_group to netconsole_target for managing userdata entries as a tr=
-ee
-> > under the netconsole configfs subsystem. Directory names created under =
-the
-> > userdata directory become userdatum keys; the userdatum value is the
-> > content of the value file.
-> >
-> > Include the minimum-viable-changes for userdata configfs config_group.
-> > init_target_config_group() ties in the complete configfs machinery to
-> > avoid unused func/variable errors during build. Initializing the
-> > netconsole_target->group is moved to init_target_config_group, which
-> > will also init and add the userdata config_group.
-> >
-> > Each userdatum entry has a limit of 256 bytes (54 for
-> > the key/directory, 200 for the value, and 2 for '=3D' and '\n'
-> > characters), which is enforced by the configfs functions for updating
-> > the userdata config_group.
-> >
-> > When a new netconsole_target is created, initialize the userdata
-> > config_group and add it as a default group for netconsole_target
-> > config_group, allowing the userdata configfs sub-tree to be presented
-> > in the netconsole configfs tree under the userdata directory.
-> >
-> > Co-developed-by: Breno Leitao <leitao@debian.org>
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > Signed-off-by: Matthew Wood <thepacketgeek@gmail.com>
->
-> Hi Matthew,
->
-> some minor feedback from my side, as it looks like there will be another
-> revision of this patchset anyway.
->
-> > ---
-> >  drivers/net/netconsole.c | 143 +++++++++++++++++++++++++++++++++++++--
-> >  1 file changed, 139 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
->
-> ...
->
-> > @@ -596,6 +606,123 @@ static ssize_t remote_mac_store(struct config_ite=
-m *item, const char *buf,
-> >       return -EINVAL;
-> >  }
-> >
-> > +struct userdatum {
-> > +     struct config_item item;
-> > +     char value[MAX_USERDATA_VALUE_LENGTH];
-> > +};
-> > +
-> > +static inline struct userdatum *to_userdatum(struct config_item *item)
-> > +{
-> > +     return container_of(item, struct userdatum, item);
-> > +}
->
-> Please don't use the inline keyword in C files,
-> unless there is a demonstrable reason to do so.
-> Rather, please let the compiler inline code as is sees fit.
->
-> ...
->
-> > @@ -640,6 +767,14 @@ static const struct config_item_type netconsole_ta=
-rget_type =3D {
-> >       .ct_owner               =3D THIS_MODULE,
-> >  };
-> >
-> > +static void init_target_config_group(struct netconsole_target *nt, con=
-st char *name)
->
-> nit: Networking still prefers code to be 80 columns wide or less.
->
-> ...
+commit 1c870c63d7d2 ("net: fill in MODULE_DESCRIPTION()s for ocelot")
+got a suggestion from Vladimir Oltean after it had landed in net-next.
 
-Hi Simon,
+Rewrite the module description according to Vladimir's suggestion.
 
-I appreciate the review, thank you for the feedback. I've addressed
-the comments here and in the other patches too. I'll be posting a v3
-soon with the changes.
+Fixes: 1c870c63d7d2 ("net: fill in MODULE_DESCRIPTION()s for ocelot")
+Suggested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ drivers/net/ethernet/mscc/ocelot.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/mscc/ocelot.c b/drivers/net/ethernet/mscc/ocelot.c
+index 2194f2a7ab27..ed2fb44500b0 100644
+--- a/drivers/net/ethernet/mscc/ocelot.c
++++ b/drivers/net/ethernet/mscc/ocelot.c
+@@ -3078,5 +3078,5 @@ void ocelot_deinit_port(struct ocelot *ocelot, int port)
+ }
+ EXPORT_SYMBOL(ocelot_deinit_port);
+ 
+-MODULE_DESCRIPTION("Microsemi Ocelot (VSC7514) Switch driver");
++MODULE_DESCRIPTION("Microsemi Ocelot switch family library");
+ MODULE_LICENSE("Dual MIT/GPL");
+-- 
+2.34.1
+
 
