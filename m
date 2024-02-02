@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-68378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68379-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D626846C29
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 10:36:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 023D8846C2C
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 10:36:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28E1A28427C
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:36:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 684541F27FC9
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04B1B78B66;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0BE27CF27;
 	Fri,  2 Feb 2024 09:34:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="EAa2XEyZ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tp+k/0ig"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BEDE5B020
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 09:34:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CFB57869A
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 09:34:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706866464; cv=none; b=drS6kIUi3CTQRScaC8xgBpQbCpw+WuhXFvRYrMuR5lV7JGZipSXhqyFHzhisa6f68zAHxwIoDpLrUnWk119Ty/NZgVwy5/bP93xpqBYGLnOeYoIQ0hd4kEfjZ5T6SWC9eSfyFk0n+qKXah8FTNdWLj+EEH2yePvGEF7qpLVfHqU=
+	t=1706866465; cv=none; b=dGQx1abIrWvZBsT/LfM7SPkNhCl1LZBunm9pDuAMuNbaYugFuKqStMdxu2ebMu5pkSitihxWzrBHStoYs+HWz8egJgZCYliwq++rQUtj7WQUu3H7UKZnrtyDbvfVDB8IhHpzgI+PkC79hkBIU0aTnERfPky5BXbO0AjJ9sNtE9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706866464; c=relaxed/simple;
-	bh=mi8Qpq2AcOUwPg+2eQUjSMBtjoezBuLq7bTxFTqR/XY=;
+	s=arc-20240116; t=1706866465; c=relaxed/simple;
+	bh=vHubZa8qymzdl18u3WJkx8jDGv54QU47mdTZxtb5O9k=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=ZW6Ws+69NQloOw8cziMwSvoPCL8BJy64z20t6JnbB+SMw1sCR1d8Cp99VkO28wi75YI5olbl5GHN+qwO5lRKsuzsTblnqhhmFJhHYDGoHP7bp1ct5x4fCaPjgl5WBkb0QXOSpvxRwSgIFm2QcEGkzUj3X/p/vAfdf+5tv7XrdSU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=EAa2XEyZ; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=SCW03PfgD2FPXwZTwld6cZ2WqgN39uJ6IC/y17Xg0+LEHMp8fAcm95uWDR0H//jSuCxu2pmWAI9eQaY1j7MVushLq12fwzUofaNVdXhUdkRAOvsKNJlnY9ttH+ZPdEPLJfng5nC2lG09FYbNz3AvXYCR0/tVP+leORgE/o5a0hM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=tp+k/0ig; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=LAIXrcGLIz+mYluAnrDraCyjl4jRrDiCTuZzIy+Ppxk=; b=EAa2XEyZYQoZVTBu9npDD+xIUz
-	QDggunk8rs8ihOSXhWjfHl+PbZMX6kA4cUQqNIvULz2DWnuSTMbEQlp5VLCJHbtQ/oPxWs1p61Ns9
-	xbZpv3oS5r0og9VSVeNbobqT69IEy51wH6aD4zQsfdKTd8PXx1bo2ZvYEJVKigAHBsK2HUikx+M4d
-	XVSM1cbuj06I9+zHxXg2aEZZymiWgKuNF4mQcxKzpx/JcigBSQTetKpO/PRahTI8WnaFOZ6QDKrL7
-	x6MAwXAmQFq00jPhqa919W5+RTzBQI8tm2/0UFenHeFGr3evsoJmeRavhAr3NJxXNF00K1N5GBydp
-	ywEbSFGQ==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:54174 helo=rmk-PC.armlinux.org.uk)
+	bh=RYigqvKp+xajIPmg+6RK+NoYme7EmhQ5CBgPRCDS1Po=; b=tp+k/0igR/CtGrHFnPuhenukta
+	3JwYDgctuTSy+Y4WfYNxeQN9xgsNDd2unYkHiR+jvxGLnYpYZ/zz4pFWrx/z2ycQjq4xgkgKPBUZO
+	j5fIpL0/URZHermmyuREWU8/brcSdrOuMHZtxleb8eDxQ0tj77tyFMMP0KIU+Lw8nwRysbyoi64Tr
+	yK7IOSz3pjaQszcGygOsl7BBQMj527XYKlmaAzYjf26GLZ+DevIFU2rqw58B07E91tk/mzRAx3UYa
+	D1R4ultGUc6wcm8PFZCoD6FZqnxzGKgPJBmzVUV05kFDOWP+C1yw2bX371ibxw0AZFKSURcb+2RT3
+	OaesoQzw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:54184 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1rVpvm-0005j1-0i;
-	Fri, 02 Feb 2024 09:33:55 +0000
+	id 1rVpvs-0005jA-2T;
+	Fri, 02 Feb 2024 09:34:00 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1rVpvh-002Pdv-Ol; Fri, 02 Feb 2024 09:33:49 +0000
+	id 1rVpvm-002Pe0-TV; Fri, 02 Feb 2024 09:33:54 +0000
 In-Reply-To: <Zby24IKSgzpvRDNF@shell.armlinux.org.uk>
 References: <Zby24IKSgzpvRDNF@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -78,8 +78,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Shenwei Wang <shenwei.wang@nxp.com>,
 	Vladimir Oltean <olteanv@gmail.com>,
 	Wei Fang <wei.fang@nxp.com>
-Subject: [PATCH net-next 2/6] net: sxgbe: remove eee_enabled/eee_active in
- sxgbe_get_eee()
+Subject: [PATCH net-next 3/6] net: fec: remove eee_enabled/eee_active in
+ fec_enet_get_eee()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,66 +89,48 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1rVpvh-002Pdv-Ol@rmk-PC.armlinux.org.uk>
+Message-Id: <E1rVpvm-002Pe0-TV@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 02 Feb 2024 09:33:49 +0000
+Date: Fri, 02 Feb 2024 09:33:54 +0000
 
-sxgbe_get_eee() sets edata->eee_active and edata->eee_enabled from its
-own copy, and then calls phy_ethtool_get_eee() which in turn will call
-genphy_c45_ethtool_get_eee().
+fec_enet_get_eee() sets edata->eee_active and edata->eee_enabled from
+its own copy, and then calls phy_ethtool_get_eee() which in turn will
+call genphy_c45_ethtool_get_eee().
 
 genphy_c45_ethtool_get_eee() will overwrite eee_enabled and eee_active
 with its own interpretation from the PHYs settings and negotiation
 result.
 
-Therefore, setting these members in sxgbe_get_eee() is redundant.
-Remove this, and remove the priv->eee_active member which then becomes
-a write-only variable.
+Therefore, setting these members in fec_enet_get_eee() is redundant.
+Remove this, and remove the setting of fep->eee.eee_active member which
+becomes a write-only variable.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/samsung/sxgbe/sxgbe_common.h  | 1 -
- drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c | 2 --
- drivers/net/ethernet/samsung/sxgbe/sxgbe_main.c    | 1 -
- 3 files changed, 4 deletions(-)
+ drivers/net/ethernet/freescale/fec_main.c | 3 ---
+ 1 file changed, 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/samsung/sxgbe/sxgbe_common.h b/drivers/net/ethernet/samsung/sxgbe/sxgbe_common.h
-index d14e0cfc3a6b..1458939c3bf5 100644
---- a/drivers/net/ethernet/samsung/sxgbe/sxgbe_common.h
-+++ b/drivers/net/ethernet/samsung/sxgbe/sxgbe_common.h
-@@ -503,7 +503,6 @@ struct sxgbe_priv_data {
- 	bool tx_path_in_lpi_mode;
- 	int lpi_irq;
- 	int eee_enabled;
--	int eee_active;
- 	int tx_lpi_timer;
- };
+diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+index 63707e065141..38dcf0989e3f 100644
+--- a/drivers/net/ethernet/freescale/fec_main.c
++++ b/drivers/net/ethernet/freescale/fec_main.c
+@@ -3140,7 +3140,6 @@ static int fec_enet_eee_mode_set(struct net_device *ndev, bool enable)
  
-diff --git a/drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c b/drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c
-index d93b628b7046..4a439b34114d 100644
---- a/drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c
-+++ b/drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c
-@@ -140,8 +140,6 @@ static int sxgbe_get_eee(struct net_device *dev,
- 	if (!priv->hw_cap.eee)
- 		return -EOPNOTSUPP;
+ 	p->tx_lpi_enabled = enable;
+ 	p->eee_enabled = enable;
+-	p->eee_active = enable;
  
--	edata->eee_enabled = priv->eee_enabled;
--	edata->eee_active = priv->eee_active;
- 	edata->tx_lpi_timer = priv->tx_lpi_timer;
+ 	writel(sleep_cycle, fep->hwp + FEC_LPI_SLEEP);
+ 	writel(wake_cycle, fep->hwp + FEC_LPI_WAKE);
+@@ -3160,8 +3159,6 @@ fec_enet_get_eee(struct net_device *ndev, struct ethtool_keee *edata)
+ 	if (!netif_running(ndev))
+ 		return -ENETDOWN;
  
- 	return phy_ethtool_get_eee(dev->phydev, edata);
-diff --git a/drivers/net/ethernet/samsung/sxgbe/sxgbe_main.c b/drivers/net/ethernet/samsung/sxgbe/sxgbe_main.c
-index 71439825ea4e..ecbe3994f2b1 100644
---- a/drivers/net/ethernet/samsung/sxgbe/sxgbe_main.c
-+++ b/drivers/net/ethernet/samsung/sxgbe/sxgbe_main.c
-@@ -130,7 +130,6 @@ bool sxgbe_eee_init(struct sxgbe_priv_data * const priv)
- 		if (phy_init_eee(ndev->phydev, true))
- 			return false;
+-	edata->eee_enabled = p->eee_enabled;
+-	edata->eee_active = p->eee_active;
+ 	edata->tx_lpi_timer = p->tx_lpi_timer;
+ 	edata->tx_lpi_enabled = p->tx_lpi_enabled;
  
--		priv->eee_active = 1;
- 		timer_setup(&priv->eee_ctrl_timer, sxgbe_eee_ctrl_timer, 0);
- 		priv->eee_ctrl_timer.expires = SXGBE_LPI_TIMER(eee_timer);
- 		add_timer(&priv->eee_ctrl_timer);
 -- 
 2.30.2
 
