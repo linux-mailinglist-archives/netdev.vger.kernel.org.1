@@ -1,137 +1,85 @@
-Return-Path: <netdev+bounces-68671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12D2E847941
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:12:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E6E6847935
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:11:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24C3DB2E984
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:02:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2720F1F2708E
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:11:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70EDE15B4DD;
-	Fri,  2 Feb 2024 18:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C4315E5C1;
+	Fri,  2 Feb 2024 19:05:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Na8nKRuN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mRMhjrr6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 461061308D2;
-	Fri,  2 Feb 2024 18:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E0E15E5BC;
+	Fri,  2 Feb 2024 19:05:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706899352; cv=none; b=ECeLdW15H/O+02LAOvtTojyoioG8c8yzYfpHWht0SCWm/Ip19AjOMZmJxgcW7lW4tlCwvwHiqFv0G8b/0KDCS3zbMaZobRKCEq0bA1dHD2OK0kZykkD8giIkmFtmBKuX2MYnz0DzdV8v/Pbsc6LtxasEDd1ki1bi+kM9lYqVhgg=
+	t=1706900714; cv=none; b=WWcyWtxf/6edcyGwURs2akDCVblxf6fJ1OcU3eYkiPXHqgFzdTd1N2yOMh1nUioKN1XFAtYFiW6NjIBrohN4Nil4yris79/cPouYXu8FusSOeRYtKHs+U8QJZBRYH6SGePNo+qiosW+4ncHse6xNZeI1iVhHT2MkrWXaaRZdrls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706899352; c=relaxed/simple;
-	bh=9XSoArqLiKz3yhFYVD04GEitqqJghk8hzezLmEgg/OQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FMPE7Cm5Gbx6bxyK8vsYNV2c5xtrPo+9V0EC4wOnXbdbR7VVTxDmn0996w77P0vpRjOhUDI4Zk5cRKq8n47yQQpMKQXFy/w5g58w4kPDQklP0ypmQvR960CMNVqivOesINKPy3eDRucL/YAwMq3prz9X8YQqjvuoj3oBI7TXrno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Na8nKRuN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91125C433F1;
-	Fri,  2 Feb 2024 18:42:30 +0000 (UTC)
+	s=arc-20240116; t=1706900714; c=relaxed/simple;
+	bh=PbcZ6/Uc6nEWpeypOwRFRtOhlGrseI91iIhICRGZBak=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jJR0Y+5z+2jKXv8LfhUSYK/J0/y64Xq6BhPjbuN4tof1E6uO9YilyhZhBucfhmLo2l1qajqTAKuADLx5HGrrEdBGQ27rNIOuby0uc34IZVlfCfRlkssMntdGBuf0fyzmTQbPXNIKpWGNpZfGjNcMZ4zdW0/zKFV1mTECuQ3F53g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mRMhjrr6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A54A4C433F1;
+	Fri,  2 Feb 2024 19:05:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706899351;
-	bh=9XSoArqLiKz3yhFYVD04GEitqqJghk8hzezLmEgg/OQ=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Na8nKRuNtWQWlmi/jhS7Y5lCkf4GWoWVVAo/mW0Pd5Omh1P0K7T8sI0ROnczh4lNR
-	 sgOyQOuq1QqHj4Fkt90GxaDXixG+uJebulWSHUuf2mmbAnd0WeTgNK6sg3D8ibVrlA
-	 CPgJhLo/Kwv7HFmkm8HLL0wXxbwYQ512dHxxPTWb9HGQT2AwS08DlKdXNpqEkZ/s8O
-	 hnj6YGE8nd2WSDCpDt+97tU0BPU8WOD2jo69OXWTcchl8MBOCkpLwN5aVGD3FrB4H5
-	 ifW8xur48Je6QsdgkvrqrfqV+vDSpfemuImKYJnJcHBr+TbMNdM5G84rXI4i98RlGp
-	 2lNv/N+qbjbGA==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Michal Kazior <michal@plume.com>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 1/5] wifi: cfg80211: fix missing interfaces when dumping
-Date: Fri,  2 Feb 2024 13:42:22 -0500
-Message-ID: <20240202184229.542298-1-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
+	s=k20201202; t=1706900713;
+	bh=PbcZ6/Uc6nEWpeypOwRFRtOhlGrseI91iIhICRGZBak=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mRMhjrr6RV1qjDeZR87YJLcjcavrxpWwnfciJGxNbphzpqEBEavTsIE2QBYvax3os
+	 SmnPa3J35rc6mLeAHQN6BWSaJWj/Wfi9O9sona9JIZCXIkLhz53oGEdUTxjyNL3AjM
+	 hpgM3OMpgaVHazqEn+8Ce8hg/BmQniFXHAA3Tgambv61pO9rzcITnIjiiW+auyypCA
+	 OTDO1SEB+mia/A8rC1AwhOXvsBFXJeldtzQrxVA7+5PJ0h6/7IiiKwZOChosOsc44k
+	 mvXdDkoM/OBfXFc1W/ZK7l8cQKXrMlzjFvJgG1JmbAwEP4MBq7R4Dna0vmErgFyPyz
+	 /hF+mTF+B0v8g==
+Date: Fri, 2 Feb 2024 11:05:11 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Frank Li <Frank.Li@nxp.com>
+Cc: Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
+ <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
+ <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>, Wei
+ Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
+ <xiaoning.wang@nxp.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, imx@lists.linux.dev
+Subject: Re: [PATCH v2 0/4] Add 8qm SMMU information
+Message-ID: <20240202110511.135d26b7@kernel.org>
+In-Reply-To: <20240201-8qm_smmu-v2-0-3d12a80201a3@nxp.com>
+References: <20240201-8qm_smmu-v2-0-3d12a80201a3@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.19.306
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Michal Kazior <michal@plume.com>
+On Thu, 01 Feb 2024 15:22:40 -0500 Frank Li wrote:
+>       dt-bindings: mmc: fsl-imx-esdhc: add iommus property
+>       dt-bindings: net: fec: add iommus property
+>       arm64: dts: imx8qm: add smmu node
+>       arm64: dts: imx8qm: add smmu stream id information
+> 
+>  .../devicetree/bindings/mmc/fsl-imx-esdhc.yaml     |  3 ++
+>  Documentation/devicetree/bindings/net/fsl,fec.yaml |  3 ++
+>  arch/arm64/boot/dts/freescale/imx8qm-ss-conn.dtsi  |  6 ++++
+>  arch/arm64/boot/dts/freescale/imx8qm.dtsi          | 41 ++++++++++++++++++++++
 
-[ Upstream commit a6e4f85d3820d00694ed10f581f4c650445dbcda ]
-
-The nl80211_dump_interface() supports resumption
-in case nl80211_send_iface() doesn't have the
-resources to complete its work.
-
-The logic would store the progress as iteration
-offsets for rdev and wdev loops.
-
-However the logic did not properly handle
-resumption for non-last rdev. Assuming a system
-with 2 rdevs, with 2 wdevs each, this could
-happen:
-
- dump(cb=[0, 0]):
-  if_start=cb[1] (=0)
-  send rdev0.wdev0 -> ok
-  send rdev0.wdev1 -> yield
-  cb[1] = 1
-
- dump(cb=[0, 1]):
-  if_start=cb[1] (=1)
-  send rdev0.wdev1 -> ok
-  // since if_start=1 the rdev0.wdev0 got skipped
-  // through if_idx < if_start
-  send rdev1.wdev1 -> ok
-
-The if_start needs to be reset back to 0 upon wdev
-loop end.
-
-The problem is actually hard to hit on a desktop,
-and even on most routers. The prerequisites for
-this manifesting was:
- - more than 1 wiphy
- - a few handful of interfaces
- - dump without rdev or wdev filter
-
-I was seeing this with 4 wiphys 9 interfaces each.
-It'd miss 6 interfaces from the last wiphy
-reported to userspace.
-
-Signed-off-by: Michal Kazior <michal@plume.com>
-Link: https://msgid.link/20240116142340.89678-1-kazikcz@gmail.com
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/wireless/nl80211.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/net/wireless/nl80211.c b/net/wireless/nl80211.c
-index e33c1175b158..f79700e5d801 100644
---- a/net/wireless/nl80211.c
-+++ b/net/wireless/nl80211.c
-@@ -2994,6 +2994,7 @@ static int nl80211_dump_interface(struct sk_buff *skb, struct netlink_callback *
- 			if_idx++;
- 		}
- 
-+		if_start = 0;
- 		wp_idx++;
- 	}
-  out:
--- 
-2.43.0
-
+Any preference on whether all these go via a platform tree,
+or should we pick up the net patch to netdev? I guess taking
+the DTB via netdev would be the usual way to handle this?
 
