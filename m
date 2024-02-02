@@ -1,93 +1,136 @@
-Return-Path: <netdev+bounces-68507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 597468470CA
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 14:03:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5164F84712B
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 14:30:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6195B2A386
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:03:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E427E1F220B6
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:30:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5271E20F4;
-	Fri,  2 Feb 2024 13:02:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9194643A;
+	Fri,  2 Feb 2024 13:30:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UNwaRQEp"
 X-Original-To: netdev@vger.kernel.org
-Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 261671872
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 13:02:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A875F47772;
+	Fri,  2 Feb 2024 13:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706878979; cv=none; b=sAk4u+xzU7iRFhwSNIwFM6+lDk3ZbSkOCRj4Sg4KL8chRKv2dSmCLE38YrDxcdSATUS6JIua/yrBGoR3sDv4p/V83ThZPGzA99gD+i4eRppFbdiG8AH7kOIG255vhdnqyW308vl2kLiDxxK+tlML8pB/ZlLJTKdwRUrCaBg4DwA=
+	t=1706880610; cv=none; b=nGVsZeWLmx5EDloBOoCBfcxhoo6bYT2lo3RIEVnuCj0fzK5gpEyePWG8Hl3hZHtHcoDquOqLVzqHmVGfrY4xxaryY3t4+iCAFXuzWitXK82JfQsc/3jRugY1E0UGXrdrT9NVJwOrEQDi5zp834yIf+VZTaz52sQ2hnZh3N8cIdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706878979; c=relaxed/simple;
-	bh=zEo6ZjhQQ89W/HijwzXz240ibMlpI+EvKMp0QLbWbng=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 MIME-Version:Content-Type; b=KdpsYhZ1qWvxTx+oDpAVJNJ8EfySusJOBK9rJkSmhDo9rvf7QStZtx03fEdOyIeDZa/hAMIBMAlm66IuTtVuYGfrJOJbyKzMy1c8tz2AOz38d7Xtgj1A3QPoR+CFEXZfZJ/bPiQowbaJVfeTqAuLO+NT2kOUyn1eFhfhZueRGPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
-Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
- relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- uk-mta-256-uvtxM6aSP9uhVnrgjo1V0Q-1; Fri, 02 Feb 2024 13:02:52 +0000
-X-MC-Unique: uvtxM6aSP9uhVnrgjo1V0Q-1
-Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
- (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 2 Feb
- 2024 13:02:32 +0000
-Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
- id 15.00.1497.048; Fri, 2 Feb 2024 13:02:32 +0000
-From: David Laight <David.Laight@ACULAB.COM>
-To: 'Denis Kirjanov' <dkirjanov@suse.de>, 'Stephen Hemminger'
-	<stephen@networkplumber.org>, Denis Kirjanov <kirjanov@gmail.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [PATCH iproute2] ifstat: convert sprintf to snprintf
-Thread-Topic: [PATCH iproute2] ifstat: convert sprintf to snprintf
-Thread-Index: AQHaVGCdMUuLtnf3K0G1n1AQJlh+tLD27kCAgAAOVwCAAAoxQA==
-Date: Fri, 2 Feb 2024 13:02:32 +0000
-Message-ID: <d2e9ab2c4df04f0e8f12b623366123eb@AcuMS.aculab.com>
-References: <20240131124107.1428-1-dkirjanov@suse.de>
- <20240131081418.72770d85@hermes.local>
- <913e0c6bb6114fdfaa74073fc8b6c2ee@AcuMS.aculab.com>
- <5fa65887-1f56-4470-bc99-383fe7e3f47b@suse.de>
-In-Reply-To: <5fa65887-1f56-4470-bc99-383fe7e3f47b@suse.de>
-Accept-Language: en-GB, en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-transport-fromentityheader: Hosted
+	s=arc-20240116; t=1706880610; c=relaxed/simple;
+	bh=dakj+8/YDKrgFqMkE8JqXt+7c3Xphn1UZs2Lv3Mv6RI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aIzOmpC8WbJqoUtwKLw9OdoRuDl3ZixZM2eYy15YIGQvk//2ZDlW2fV2aJZeyj1mprD241quhkIaFZ/5rpR6oKjFZTMctGtlHZ+5Rs8JSF0JP6WJG9qVZUQ7yf2o3f01HpMXI9VO8bbccf3ZfpgaGpf+b7Ft5kntca0Qo8H+EaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UNwaRQEp; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706880608; x=1738416608;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=dakj+8/YDKrgFqMkE8JqXt+7c3Xphn1UZs2Lv3Mv6RI=;
+  b=UNwaRQEp7JzUXzhNrQY5YSHA8R4hY0OZE20aF35fe+lqbP5wBiU9ulfI
+   Y4YqGZZ3xZ91tl5IXdjkZDei8Sqm8bmvIIoIPRT9j6yk7vpWs5YhCl8x0
+   wKaggY8HVdyMzQcxgyXxAJr133etuglqjC4KZZGiM02G0CDHN6ZCF2Pz5
+   wzTAaCrZWIyO4oDTfGP3ys/RfdZZUGHswSpP92lrUljvha7t741wDkJPv
+   UHDZc/3beuhnQ1dHYdZH7+sZE9MulS6e4lqd4lEIxA7K9Vs3iVGAb4hDf
+   KEzRUPYmgdxZwE8gZLXjgBQ3i9hWxy+YJvTyh7K7gE0PKOJLeqo7AnhYm
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="66956"
+X-IronPort-AV: E=Sophos;i="6.05,238,1701158400"; 
+   d="scan'208";a="66956"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 05:30:07 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,238,1701158400"; 
+   d="scan'208";a="4824879"
+Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.59.157])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 05:30:05 -0800
+Date: Fri, 2 Feb 2024 14:00:46 +0100
+From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+	Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 3/3] thermal: intel: hfi: Enable interface only when
+ required
+Message-ID: <Zbznft0x7DRWjUTQ@linux.intel.com>
+References: <20240131120535.933424-1-stanislaw.gruszka@linux.intel.com>
+ <20240131120535.933424-4-stanislaw.gruszka@linux.intel.com>
+ <ZbzhuXbuejM1VLE3@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: aculab.com
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZbzhuXbuejM1VLE3@nanopsycho>
 
-RnJvbTogRGVuaXMgS2lyamFub3YNCj4gU2VudDogMDIgRmVicnVhcnkgMjAyNCAxMjoyNA0KPiAN
-Cj4gT24gMi8yLzI0IDE0OjMyLCBEYXZpZCBMYWlnaHQgd3JvdGU6DQo+ID4gRnJvbTogU3RlcGhl
-biBIZW1taW5nZXINCj4gPj4gU2VudDogMzEgSmFudWFyeSAyMDI0IDE2OjE0DQo+ID4NCj4gPj4N
-Cj4gPj4gT24gV2VkLCAzMSBKYW4gMjAyNCAwNzo0MTowNyAtMDUwMA0KPiA+PiBEZW5pcyBLaXJq
-YW5vdiA8a2lyamFub3ZAZ21haWwuY29tPiB3cm90ZToNCj4gPj4NCj4gPj4+IEBAIC04OTMsNyAr
-ODkzLDcgQEAgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkNCj4gPj4+DQo+ID4+PiAg
-CXN1bi5zdW5fZmFtaWx5ID0gQUZfVU5JWDsNCj4gPj4+ICAJc3VuLnN1bl9wYXRoWzBdID0gMDsN
-Cj4gPj4+IC0Jc3ByaW50ZihzdW4uc3VuX3BhdGgrMSwgImlmc3RhdCVkIiwgZ2V0dWlkKCkpOw0K
-PiA+Pj4gKwlzbnByaW50ZihzdW4uc3VuX3BhdGgrMSwgc2l6ZW9mKHN1bi5zdW5fcGF0aCksICJp
-ZnN0YXQlZCIsIGdldHVpZCgpKTsNCj4gPj4NCj4gPj4gSWYgeW91IGFyZSBjaGFuZ2luZyB0aGUg
-bGluZSwgcGxlYXNlIGFkZCBzcGFjZXMgYXJvdW5kIHBsdXMgc2lnbg0KPiA+DQo+ID4gSXNuJ3Qg
-dGhlIHNpemUgYWxzbyB3cm9uZyAtIG5lZWRzIGEgbWF0Y2hpbmcgJy0gMScuDQo+IA0KPiBJIGRv
-bid0IHRoaW5rIGl0J3Mgd3JvbmcsIGl0J3MganVzdCB0aGUgc2l6ZSBvZiB0aGUgdGFyZ2V0IGJ1
-ZmZlciB3aGljaCBpcw0KPiBVTklYX1BBVEhfTUFYIGJ5dGVzLg0KDQpCdXQgeW91IGFyZSBzdGFy
-dGluZyBvbmUgYnl0ZSBpbi4NClNvLCBpZiB0aGUgc2l6ZSB3ZXJlIDggdGhlICdcMCcgd291bGQg
-YmUgd3JpdHRlbiBhZnRlciB0aGUgZW5kLg0KDQpBbHNvLCB0byBhdm9pZCB0aGUgbmV4dCBwYXRj
-aCBpbiBhIGZldyB3ZWVrcyBpdCBzaG91bGQgYmUNCmNhbGxpbmcgc2NucHJpbnRmKCkuDQoNCglE
-YXZpZA0KDQotDQpSZWdpc3RlcmVkIEFkZHJlc3MgTGFrZXNpZGUsIEJyYW1sZXkgUm9hZCwgTW91
-bnQgRmFybSwgTWlsdG9uIEtleW5lcywgTUsxIDFQVCwgVUsNClJlZ2lzdHJhdGlvbiBObzogMTM5
-NzM4NiAoV2FsZXMpDQo=
+On Fri, Feb 02, 2024 at 01:36:09PM +0100, Jiri Pirko wrote:
+> Wed, Jan 31, 2024 at 01:05:35PM CET, stanislaw.gruszka@linux.intel.com wrote:
+> 
+> [...]
+> 
+> 
+> >+static int hfi_netlink_notify(struct notifier_block *nb, unsigned long state,
+> >+			      void *_notify)
+> >+{
+> >+	struct netlink_notify *notify = _notify;
+> >+	struct hfi_instance *hfi_instance;
+> >+	smp_call_func_t func;
+> >+	unsigned int cpu;
+> >+	int i;
+> >+
+> >+	if (notify->protocol != NETLINK_GENERIC)
+> >+		return NOTIFY_DONE;
+> >+
+> >+	switch (state) {
+> >+	case NETLINK_CHANGE:
+> >+	case NETLINK_URELEASE:
+> >+		mutex_lock(&hfi_instance_lock);
+> >+
+> 
+> What's stopping other thread from mangling the listeners here?
 
+Nothing. But if the listeners will be changed, we will get next notify.
+Serialization by the mutex is needed to assure that the last setting will win,
+so we do not end with HFI disabled when there are listeners or vice versa.
+
+> >+		if (thermal_group_has_listeners(THERMAL_GENL_EVENT_GROUP))
+> >+			func = hfi_do_enable;
+> >+		else
+> >+			func = hfi_do_disable;
+> >+
+> >+		for (i = 0; i < max_hfi_instances; i++) {
+> >+			hfi_instance = &hfi_instances[i];
+> >+			if (cpumask_empty(hfi_instance->cpus))
+> >+				continue;
+> >+
+> >+			cpu = cpumask_any(hfi_instance->cpus);
+> >+			smp_call_function_single(cpu, func, hfi_instance, true);
+> >+		}
+> >+
+> >+		mutex_unlock(&hfi_instance_lock);
+> >+		return NOTIFY_OK;
+> >+	}
+> >+
+> >+	return NOTIFY_DONE;
+> >+}
+> 
+> [...]
 
