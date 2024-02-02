@@ -1,150 +1,143 @@
-Return-Path: <netdev+bounces-68647-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E24048476FC
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:03:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1FD284770C
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:06:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DDB11F261D2
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:03:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AEB58285B79
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:06:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01BF614AD35;
-	Fri,  2 Feb 2024 18:03:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 918A514C590;
+	Fri,  2 Feb 2024 18:06:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jqGmbV+Q"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ObLXNAjP"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF7D1474C5;
-	Fri,  2 Feb 2024 18:03:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE5014C583;
+	Fri,  2 Feb 2024 18:06:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706897005; cv=none; b=PQSN7WMG6AaK9HsamtQf++mHCqjFL1z/3qfRuOiaufMQ5fZfTCX4OtvjUyfaVKqYZ3yX0FZ1D3bmU5YMunLPdjK7akOQjCZxMfB6XgocABlAxVM/vswozT9f+4iAzX+ZxK/RpdtaSWY4oGik8I/vgD6HMM8OXln963I0ss/LVAo=
+	t=1706897164; cv=none; b=hNeKMDcs8m0I5YvlWD3R/FZmIPcbVJ1U7intaFYXt8Q09RdgcDg5WnI0gviODlthEON8dHmOdTQ9R6toKnM06dduzT8tLo7+gsgu8LBevXgyvlon3Tb30faTHWbFXgCwjddm/UdmvQfIXn9fTIRH2FBa6YOpt+RWveKiqLW1rlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706897005; c=relaxed/simple;
-	bh=Uup5FZMCcfCZOBIUv6G2Fi/wsqkNSTdL09LNTQwRP+o=;
+	s=arc-20240116; t=1706897164; c=relaxed/simple;
+	bh=0+zBy9BxMtmgrUapuuE00XzrLUjsL9pi4V6VkVRtgQc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p9jueDsoKwZAEE+j4Xt65rR5gEv6Mbrpp1XD2O3qoKQd3UU+0Ogb0Ojs8LUwd4ja/eBWK6I5TDbjNEketBmiAjkMXyvyjfzga1tSrUCYqZSR8FrbbU8aOFctI1fYdHmlHg4XCVDzFj/8hkJQGHZpRfL3o14cf+UmOcsJOVejr7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jqGmbV+Q; arc=none smtp.client-ip=78.32.30.218
+	 Content-Type:Content-Disposition:In-Reply-To; b=PXaG4UKtNVueO/ezoYbf9TniHFspnIhvoQInFK0mlQBtUkzMveXJnqoNFe8L9tl88KUMDyJNYvTh89a6VwzbRbqbUud4QVA1+0b1z/6ZbZL1snuPHwLFag0/TWMA/pBd7R8W0LQQvU9WrCylT0NK6ABRyrDsRxbNUyEjy4X5Qmg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ObLXNAjP; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=qW6erQdXZh/wex5Ipty9iKt5f/CAhi5xgAqgpkUZTXE=; b=jqGmbV+Q1QaVQdi2aLgWcgAdoB
-	aSdWAty4d+FolwETOQNX57ObHIwrXEVvpY7/ORK8jpChvDNRv+Cc4SLhJqw7g1IzilwXF9S1WJWiF
-	agLfa4ntaPuZdC9+NJl9JPwTTLJFwABGpyG6Fl40FdRfkxbzezkornZ9aubEFUnHZWc1VhEoOBIHz
-	AOHTY4cg+kXDUth76QIHTUSN90EtNCU8ej7CsZ50Lid51NlTyWHfUIwFzBWGaFNvCRS+2qqG5rEAu
-	CC6kKNcawpRX3WnKxgNcsKsR0tY0tkx97z4KFlyzthfOEqMxWooyHOrgQN/js7g9TTLAfuG7dcyza
-	cm7uPp7w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:42210)
+	bh=h2ATmObSzV4eeYzY6CoQyZq/5jRI5DOKZsLmwWQtw3M=; b=ObLXNAjPuveYNFk2FxXGhxn30h
+	0eMSF4JCx6nTaY5ps/qixLTdCG9nttzdB4vmXGfi1dhc0Lm+mlwVLIWjISDlCqhO22LkaLGM8bRh/
+	ZgYJoAqIqdCU+b140Zls+zIInP9AYeteqn0e438kukRymDf+y9BygXSO56Ns6K0YplJGZTdhFXtIC
+	BS/gtnnwuIyYzoiBscjrIpTLWBj2/+4QkfR240j+qXMWhfZQ70gc8xr6EOfY1JO9UwgV5e8J0pJSu
+	2qjd4ciq2AFp+ipZLyExm5XZlqn4LncSrUUE+8wnVh/el1JEDBepA1dxdRX4ycLyI1kQ/W8q0qDBu
+	MhuO8W/A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59614)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1rVxsj-0006KR-1y;
-	Fri, 02 Feb 2024 18:03:17 +0000
+	id 1rVxv3-0006Kg-2u;
+	Fri, 02 Feb 2024 18:05:42 +0000
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rVxsh-0008VD-Sk; Fri, 02 Feb 2024 18:03:15 +0000
-Date: Fri, 2 Feb 2024 18:03:15 +0000
+	id 1rVxuy-0008VK-P4; Fri, 02 Feb 2024 18:05:36 +0000
+Date: Fri, 2 Feb 2024 18:05:36 +0000
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Sergio Palumbo <palumbo.ser@outlook.it>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: sfp: add quirk for ODI DFP-34X-2C2 GPON
- ONU SFP
-Message-ID: <Zb0uYyxaKIMHQbQW@shell.armlinux.org.uk>
-References: <AS1PR03MB81893D69344708C98EE2B470827F2@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <ZbZoDIPR3O/iei5z@shell.armlinux.org.uk>
- <AS1PR03MB818918BC313CC8A59E288FF082422@AS1PR03MB8189.eurprd03.prod.outlook.com>
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v3 1/7] net: dsa: mt7530: empty default case on
+ mt7530_setup_port5()
+Message-ID: <Zb0u8NY0q6ay17j5@shell.armlinux.org.uk>
+References: <20240202-for-netnext-mt7530-improvements-2-v3-0-63d5adae99ca@arinc9.com>
+ <20240202-for-netnext-mt7530-improvements-2-v3-1-63d5adae99ca@arinc9.com>
+ <ZbzUotyQm/FyKK7G@shell.armlinux.org.uk>
+ <e3b4add6-425c-46ca-9da5-8713055fc422@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <AS1PR03MB818918BC313CC8A59E288FF082422@AS1PR03MB8189.eurprd03.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e3b4add6-425c-46ca-9da5-8713055fc422@arinc9.com>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-All the concerns with the OEM version of this patch apply to this one
-as well.
-
-On Fri, Feb 02, 2024 at 06:44:32PM +0100, Sergio Palumbo wrote:
-> Hello Russell,
-> this is the pach for the vendor "ODI".
-> Same hardware but different vendor.
-> I explained it in the description.
-> Hope this clarifies.
-> 
-> Thanks and regards
-> 
-> Sergio Palumbo
-> 
-> Il 28/01/2024 15:43, Russell King (Oracle) ha scritto:
-> > Oh, a second repost. What's different from the first repost?
+On Fri, Feb 02, 2024 at 08:44:39PM +0300, Arınç ÜNAL wrote:
+> On 2.02.2024 14:40, Russell King (Oracle) wrote:
+> > While reviewing this change, but not related to it, I notice that this
+> > function sets the TX delay based on the RGMII interface mode. This isn't
+> > correct. I've explained why this is this many times in the past, but
+> > essentially it comes down to the model:
 > > 
-> > On Sun, Jan 28, 2024 at 03:23:06PM +0100, Sergio Palumbo wrote:
-> > >       DFP-34X-2C2 is a GPON spf module working at both 1000baseX
-> > >       and 2500baseX.
-> > >       Setting the module to LAN_SDS_MODE=6 the module is working
-> > >       at 2500baseX with auto negotiation see at
-> > >       https://hack-gpon.org/ont-odi-realtek-dfp-34x-2c2/
-> > >       Unfortunatly the module's PHY is accessible at 1000baseX only.
-> > >       ethtool returning:
-> > >       Supported ports: [ Fibre ]
-> > >       Supported link modes: 1000baseX/Full
-> > > 
-> > >       After applying the quirk:
-> > >       Supported ports: [ Fibre ]
-> > >       Supported link modes: 1000baseX/Full
-> > >                             2500baseX/Full
-> > >       Tested on BANANA PI R3 in OpenWRT v 23.05.2 Kernel 5.15.137
-> > >       Tested on sfp to ethernet Media Converter.
-> > >       Autonegotiating 1000baseX or 2500baseX according to the
-> > >       connected host speed.
-> > > 
-> > >       This module is existing in 2 versions:
-> > >       Vendor = "ODI"
-> > >       Vendor = "OEM"
-> > >       This is the patch for vendor "ODI"
-> > > 
-> > >       Patch has been inserted keeping the list in alphabetical order
-> > >       first by vendor first and then by part string.
-> > > 
-> > > Signed-off-by: Sergio Palumbo <palumbo.ser@outlook.it>
-> > > ---
-> > >   drivers/net/phy/sfp.c | 3 +++
-> > >   1 file changed, 3 insertions(+)
-> > > 
-> > > diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-> > > index 3c0028a4af92..410375bc6b94 100644
-> > > --- a/drivers/net/phy/sfp.c
-> > > +++ b/drivers/net/phy/sfp.c
-> > > @@ -495,6 +495,9 @@ static const struct sfp_quirk sfp_quirks[] = {
-> > >   	// 2500MBd NRZ in their EEPROM
-> > >   	SFP_QUIRK_M("Lantech", "8330-262D-E", sfp_quirk_2500basex),
-> > > +	// ODI DFP-34X-2C2 GPON ONU support 2500base-X
-> > > +	SFP_QUIRK_M("ODI", "DFP-34X-2C2", sfp_quirk_2500basex),
-> > > +
-> > >   	SFP_QUIRK_M("UBNT", "UF-INSTANT", sfp_quirk_ubnt_uf_instant),
-> > >   	// Walsun HXSX-ATR[CI]-1 don't identify as copper, and use the
-> > > -- 
-> > > 2.34.1
-> > > 
-> > > 
+> > 
+> > phy-mode in NIC node	Network driver	PCB		PHY
+> > rgmii			no delays	delays		no delays
+> > rgmii-id		no delays	no delays	tx/rx delays
+> > rgmii-txid		no delays	no delays	tx delays
+> > rgmii-rxid		no delays	no delays	rx delays
+> > 
+> > Then we have rx-internal-delay-ps and tx-internal-delay-ps in the NIC
+> > node which define the RGMII delays at the local end and similar
+> > properties for the PHY node.
+> > 
+> > 
+> > So, if we take the view that, when a switch is connected to a NIC in
+> > RGMII mode, then the phy-mode specified delays still should not impact
+> > the local NIC.
+> > 
+> > Now, for the switch, we specify the phy-mode in the port node as well.
+> > Consider the case of a switch port connected to a RGMII PHY. This has
+> > to operate in exactly the same way as a normal NIC - that is, the
+> > RGMII delays at the port should be ignored as it's the responsibility
+> > of a PHY.
+> > 
+> > The final scenario to examine is the case of a RGMII switch port
+> > connected to a NIC. The NIC's phy-mode has no way to be communicated
+> > to DSA or vice versa, so neither phy-mode can impact the other side
+> > of the RGMII link, but should only place the link into RGMII mode.
+> > Given everything I've said above, the only way to configure RGMII
+> > delays is via the rx-internal-delay-ps and tx-internal-delay-ps
+> > properties. So, DSA drivers should _not_ be configuring their ports
+> > with RGMII delays based on the RGMII phy interface mode.
+> > 
+> > The above is my purely logically reasoned point of view on this
+> > subject. Others may have other (to me completely illogical)
+> > interpretations that can only lead to interoperability issues.
 > 
-> 
+> I will address this with the next patch series. Thank you for explaining it
+> in detail.
+
+This is a good time to point out not to rush with the next patch
+series, as my email will _likely_ provoke some additional discussion
+from Andrew and/or Vladimir. So please give it a few days (maybe
+around the middle of next week) to give them time to consider my
+email and respond.
 
 -- 
 RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
