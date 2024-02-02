@@ -1,183 +1,111 @@
-Return-Path: <netdev+bounces-68266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 008AF846587
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:47:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CE2584659B
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 03:03:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8E731F22D51
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:47:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 060A3B22026
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:03:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19A6C63A8;
-	Fri,  2 Feb 2024 01:47:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hoxIVJGa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A50D63CB;
+	Fri,  2 Feb 2024 02:03:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCBCA8BE1
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 01:47:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E658BE1;
+	Fri,  2 Feb 2024 02:03:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706838474; cv=none; b=J4QrRjemBVlKTrDTyBa4DKieZ8y9LMOqt/wXbRUpjo4nsG8jsAk3j+WdQF2ODaSBvNpTpLWjwwIVT/k5uUCvkznwDa2rkirUuoloCJyPFa9EdDscg05NTRBTFxB32vL5d+NLqSIXlouO7eW6SNBpYUIMBNPFUaZz7vncTXuFoZA=
+	t=1706839399; cv=none; b=etbZL//NVoBePHmcOKpP1I5UoeVDRTApiMznHC0yDblf1o0rsxdPfYSz+fOwYsD6Wwk3vIy2yztKspuLRAYTTEfRiA83A/6KQ73/WZE45ZoqTYq3hoSeRhFfTlCq2+S0nciDa1Bm5JaZ5UNOxr8wkQPWaacRYme65RTrbpeXhfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706838474; c=relaxed/simple;
-	bh=sELDC7Dq7jbJKZ94quhQrSYWfsMEiyh8Vu4uAAvvxiE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JPFLoFMuGu+S0cyQ0u0DIQ6faZL8OaA5ht3glltTqgmmIRdTHCUy7rYeO8wIHoVrn99M805D2L0QvYoRQPkb0D46tYWPmX08zwlX0a73xxwy5kAvo7HUfHBSFbW9Mw2sn05KB0MO3WxZnhOR6zJHw5yKgk+5pwqFGLWiS1IifcQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hoxIVJGa; arc=none smtp.client-ip=95.215.58.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8a2e9cf6-ef36-4ba8-bb95-fb592bdce5db@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706838469;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dqWkAdcNsywcgiK3l1QK5Act/UKUr9ykoatsuW2y9jY=;
-	b=hoxIVJGaQd1Ldgldl9yOqOd/fs1wJO5yxMhDEcC5ja2omj2KpQNvfHNG9Nky7jC5ft/9V7
-	wF7RPCGmAzIfzGKYU6Fwx/jCpMIpqrzEmHnVyGcFfPv2L9PhRs05cBeIX+mU+CqFTC4gNN
-	Zn2NjMbDlXjjIrBfC6kEPkz9Fh1Wfe0=
-Date: Thu, 1 Feb 2024 17:47:44 -0800
+	s=arc-20240116; t=1706839399; c=relaxed/simple;
+	bh=ItYWq6QxmvvUtDMVmlQ0TWqNO6QqpjeFMchh79E+LbU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=bcNWy9RO9klbXadkuHBQJG8tXUiv4zYxdIzdk6DvqWZpYjQoINDM0BZBsMjQEYL1b9hymp/w5FdTPncDS+yHYT5DJ5JG9X9dD72rMhXtq5o0zWMS/4La9MiGRwXpyfrCG9Jn7kewRmeudrmMk/CraJQNADUOHTUmbH7zIDbbzyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4TQzY93CxMzNlgQ;
+	Fri,  2 Feb 2024 10:02:05 +0800 (CST)
+Received: from kwepemd500002.china.huawei.com (unknown [7.221.188.104])
+	by mail.maildlp.com (Postfix) with ESMTPS id 965D7140499;
+	Fri,  2 Feb 2024 10:03:07 +0800 (CST)
+Received: from dggpemm500008.china.huawei.com (7.185.36.136) by
+ kwepemd500002.china.huawei.com (7.221.188.104) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.2.1258.28; Fri, 2 Feb 2024 10:03:07 +0800
+Received: from dggpemm500008.china.huawei.com ([7.185.36.136]) by
+ dggpemm500008.china.huawei.com ([7.185.36.136]) with mapi id 15.01.2507.035;
+ Fri, 2 Feb 2024 10:03:06 +0800
+From: wangyunjian <wangyunjian@huawei.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "jasowang@redhat.com"
+	<jasowang@redhat.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, xudingke
+	<xudingke@huawei.com>
+Subject: RE: [PATCH net-next] tun: Implement ethtool's get_channels() callback
+Thread-Topic: [PATCH net-next] tun: Implement ethtool's get_channels()
+ callback
+Thread-Index: AQHaVQbwnpDx30SF00Gz0GBhWRLXerD1Gp6AgAEizYA=
+Date: Fri, 2 Feb 2024 02:03:06 +0000
+Message-ID: <e8c1b2ab2dd346d2886eb5b010313974@huawei.com>
+References: <1706789109-36556-1-git-send-email-wangyunjian@huawei.com>
+ <65bbbc1d2e236_222699294f4@willemb.c.googlers.com.notmuch>
+In-Reply-To: <65bbbc1d2e236_222699294f4@willemb.c.googlers.com.notmuch>
+Accept-Language: zh-CN, en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH v7 1/8] net_sched: Introduce eBPF based Qdisc
-Content-Language: en-US
-To: Amery Hung <ameryhung@gmail.com>
-Cc: bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, toke@redhat.com,
- jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com,
- xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com, netdev@vger.kernel.org,
- Kui-Feng Lee <thinker.li@gmail.com>
-References: <cover.1705432850.git.amery.hung@bytedance.com>
- <232881645a5c4c05a35df4ff1f08a19ef9a02662.1705432850.git.amery.hung@bytedance.com>
- <0484f7f7-715f-4084-b42d-6d43ebb5180f@linux.dev>
- <CAMB2axM1TVw05jZsFe7TsKKRN8jw=YOwu-+rA9bOAkOiCPyFqQ@mail.gmail.com>
- <01fdb720-c0dc-495d-a42d-756aa2bf4455@linux.dev>
- <CAMB2axOZqwgksukO5d4OiXeEgo2jFrgnzO5PQwABi_WxYFycGg@mail.gmail.com>
- <8c00bd63-2d00-401e-af6d-1b6aebac4701@linux.dev>
- <CAMB2axOdeE5dPeFGvgM5QVd9a47srtvDFZd1VUYjSarNJC=T_w@mail.gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAMB2axOdeE5dPeFGvgM5QVd9a47srtvDFZd1VUYjSarNJC=T_w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 1/31/24 8:23 AM, Amery Hung wrote:
->>> 1. Passing a referenced kptr into a bpf program, which will also need
->>> to be released, or exchanged into maps or allocated objects.
->> "enqueue" should be the one considering here:
->>
->> struct Qdisc_ops {
->>          /* ... */
->>          int                     (*enqueue)(struct sk_buff *skb,
->>                                             struct Qdisc *sch,
->>                                             struct sk_buff **to_free);
->>
->> };
->>
->> The verifier only marks the skb as a trusted kptr but does not mark its
->> reg->ref_obj_id. Take a look at btf_ctx_access(). In particular:
->>
->>          if (prog_args_trusted(prog))
->>                  info->reg_type |= PTR_TRUSTED;
->>
->> The verifier does not know the skb ownership is passed into the ".enqueue" ops
->> and does not know the bpf prog needs to release it or store it in a map.
->>
->> The verifier tracks the reference state when a KF_ACQUIRE kfunc is called (just
->> an example, not saying we need to use KF_ACQUIRE kfunc). Take a look at
->> acquire_reference_state() which is the useful one here.
->>
->> Whenever the verifier is loading the ".enqueue" bpf_prog, the verifier can
->> always acquire_reference_state() for the "struct sk_buff *skb" argument.
->>
->> Take a look at a recent RFC:
->> https://lore.kernel.org/bpf/20240122212217.1391878-1-thinker.li@gmail.com/
->> which is tagging the argument of an ops (e.g. ".enqueue" here). That RFC patch
->> is tagging the argument could be NULL by appending "__nullable" to the argument
->> name. The verifier will enforce that the bpf prog must check for NULL first.
->>
->> The similar idea can be used here but with a different tagging (for example,
->> "__must_release", admittedly not a good name). While the RFC patch is
->> in-progress, for now, may be hardcode for the ".enqueue" ops in
->> check_struct_ops_btf_id() and always acquire_reference_state() for the skb. This
->> part can be adjusted later once the RFC patch will be in shape.
->>
-> Make sense. One more thing to consider here is that .enqueue is
-> actually a reference acquiring and releasing function at the same
-> time. Assuming ctx written to by a struct_ops program can be seen by
-> the kernel, another new tag for the "to_free" argument will still be
-> needed so that the verifier can recognize when writing skb to
-> "to_free".
-
-I don't think "to_free" needs special tagging. I was thinking the 
-"bpf_qdisc_drop" kfunc could be a KF_RELEASE. Ideally, it should be like
-
-__bpf_kfunc int bpf_qdisc_drop(struct sk_buff *skb, struct Qdisc *sch,
-	                       struct sk_buff **to_free)
-{
-	return qdisc_drop(skb, sch, to_free);
-}
-
-However, I don't think the verifier supports pointer to pointer now. Meaning
-"struct sk_buff **to_free" does not work.
-
-If the ptr indirection spinning in my head is sound, one possible solution to 
-unblock the qdisc work is to introduce:
-
-struct bpf_sk_buff_ptr {
-	struct sk_buff *skb;
-};
-
-and the bpf_qdisc_drop kfunc:
-
-__bpf_kfunc int bpf_qdisc_drop(struct sk_buff *skb, struct Qdisc *sch,
-                                struct bpf_sk_buff_ptr *to_free_list)
-
-and the enqueue prog:
-
-SEC("struct_ops/enqueue")
-int BPF_PROG(test_enqueue, struct sk_buff *skb,
-              struct Qdisc *sch,
-              struct bpf_sk_buff_ptr *to_free_list)
-{
-	return bpf_qdisc_drop(skb, sch, to_free_list);
-}
-
-and the ".is_valid_access" needs to change the btf_type from "struct sk_buff **" 
-to "struct bpf_sk_buff_ptr *" which is sort of similar to the bpf_tcp_ca.c that 
-is changing the "struct sock *" type to the "struct tcp_sock *" type.
-
-I have the compiler-tested idea here: 
-https://git.kernel.org/pub/scm/linux/kernel/git/martin.lau/bpf-next.git/log/?h=qdisc-ideas
-
-
-> 
->> Then one more thing is to track when the struct_ops bpf prog is actually reading
->> the value of the skb pointer. One thing is worth to mention here, e.g. a
->> struct_ops prog for enqueue:
->>
->> SEC("struct_ops")
->> int BPF_PROG(bpf_dropall_enqueue, struct sk_buff *skb, struct Qdisc *sch,
->>               struct sk_buff **to_free)
->> {
->>          return bpf_qdisc_drop(skb, sch, to_free);
->> }
->>
->> Take a look at the BPF_PROG macro, the bpf prog is getting a pointer to an array
->> of __u64 as the only argument. The skb is actually in ctx[0], sch is in
->> ctx[1]...etc. When ctx[0] is read to get the skb pointer (e.g. r1 = ctx[0]),
->> btf_ctx_access() marks the reg_type to PTR_TRUSTED. It needs to also initialize
->> the reg->ref_obj_id by the id obtained earlier from acquire_reference_state()
->> during check_struct_ops_btf_id() somehow.
-
+PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBXaWxsZW0gZGUgQnJ1aWpuIFtt
+YWlsdG86d2lsbGVtZGVicnVpam4ua2VybmVsQGdtYWlsLmNvbV0NCj4gU2VudDogVGh1cnNkYXks
+IEZlYnJ1YXJ5IDEsIDIwMjQgMTE6NDMgUE0NCj4gVG86IHdhbmd5dW5qaWFuIDx3YW5neXVuamlh
+bkBodWF3ZWkuY29tPjsNCj4gd2lsbGVtZGVicnVpam4ua2VybmVsQGdtYWlsLmNvbTsgamFzb3dh
+bmdAcmVkaGF0LmNvbTsga3ViYUBrZXJuZWwub3JnOw0KPiBkYXZlbUBkYXZlbWxvZnQubmV0DQo+
+IENjOiBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3Jn
+OyB4dWRpbmdrZQ0KPiA8eHVkaW5na2VAaHVhd2VpLmNvbT47IHdhbmd5dW5qaWFuIDx3YW5neXVu
+amlhbkBodWF3ZWkuY29tPg0KPiBTdWJqZWN0OiBSZTogW1BBVENIIG5ldC1uZXh0XSB0dW46IElt
+cGxlbWVudCBldGh0b29sJ3MgZ2V0X2NoYW5uZWxzKCkgY2FsbGJhY2sNCj4gDQo+IFl1bmppYW4g
+V2FuZyB3cm90ZToNCj4gPiBJbXBsZW1lbnQgdGhlIHR1biAuZ2V0X2NoYW5uZWxzIGZ1bmN0aW9u
+YWxpdHkuIFRoaXMgZmVhdHVyZSBpcw0KPiA+IG5lY2Vzc2FyeSBmb3Igc29tZSB0b29scywgc3Vj
+aCBhcyBsaWJ4ZHAsIHdoaWNoIG5lZWQgdG8gcmV0cmlldmUgdGhlIHF1ZXVlDQo+IGNvdW50Lg0K
+PiA+DQo+ID4gU2lnbmVkLW9mZi1ieTogWXVuamlhbiBXYW5nIDx3YW5neXVuamlhbkBodWF3ZWku
+Y29tPg0KPiA+IC0tLQ0KPiA+ICBkcml2ZXJzL25ldC90dW4uYyB8IDEwICsrKysrKysrKysNCj4g
+PiAgMSBmaWxlIGNoYW5nZWQsIDEwIGluc2VydGlvbnMoKykNCj4gPg0KPiA+IGRpZmYgLS1naXQg
+YS9kcml2ZXJzL25ldC90dW4uYyBiL2RyaXZlcnMvbmV0L3R1bi5jIGluZGV4DQo+ID4gYWZhNTQ5
+N2Y3YzM1Li43Y2Y0NDhmZjkzZWUgMTAwNjQ0DQo+ID4gLS0tIGEvZHJpdmVycy9uZXQvdHVuLmMN
+Cj4gPiArKysgYi9kcml2ZXJzL25ldC90dW4uYw0KPiA+IEBAIC0zNjM4LDEyICszNjM4LDIyIEBA
+IHN0YXRpYyBpbnQgdHVuX3NldF9jb2FsZXNjZShzdHJ1Y3QgbmV0X2RldmljZQ0KPiAqZGV2LA0K
+PiA+ICAJcmV0dXJuIDA7DQo+ID4gIH0NCj4gPg0KPiA+ICtzdGF0aWMgdm9pZCB0dW5fZ2V0X2No
+YW5uZWxzKHN0cnVjdCBuZXRfZGV2aWNlICpkZXYsDQo+ID4gKwkJCSAgICAgc3RydWN0IGV0aHRv
+b2xfY2hhbm5lbHMgKmNoYW5uZWxzKSB7DQo+ID4gKwlzdHJ1Y3QgdHVuX3N0cnVjdCAqdHVuID0g
+bmV0ZGV2X3ByaXYoZGV2KTsNCj4gPiArDQo+ID4gKwljaGFubmVscy0+Y29tYmluZWRfY291bnQg
+PSB0dW4tPm51bXF1ZXVlczsNCj4gPiArCWNoYW5uZWxzLT5tYXhfY29tYmluZWQgPSBNQVhfVEFQ
+X1FVRVVFUzsNCj4gDQo+IENvbmRpdGlvbmFsIG9uIElGRl9NVUxUSV9RVUVVRT8NCg0KT0ssIGxp
+a2UgdGhpcz8NCiAgIGNoYW5uZWxzLT5jb21iaW5lZF9jb3VudCA9IHR1bi0+bnVtcXVldWVzOw0K
+ICAgY2hhbm5lbHMtPm1heF9jb21iaW5lZCA9IHR1bi0+ZmxhZ3MgJiBJRkZfTVVMVElfUVVFVUUg
+PyBNQVhfVEFQX1FVRVVFUyA6IDE7DQoNClRoYW5rcw0KDQo+IA0KPiA+ICt9DQo+ID4gKw0KPiA+
+ICBzdGF0aWMgY29uc3Qgc3RydWN0IGV0aHRvb2xfb3BzIHR1bl9ldGh0b29sX29wcyA9IHsNCj4g
+PiAgCS5zdXBwb3J0ZWRfY29hbGVzY2VfcGFyYW1zID0gRVRIVE9PTF9DT0FMRVNDRV9SWF9NQVhf
+RlJBTUVTLA0KPiA+ICAJLmdldF9kcnZpbmZvCT0gdHVuX2dldF9kcnZpbmZvLA0KPiA+ICAJLmdl
+dF9tc2dsZXZlbAk9IHR1bl9nZXRfbXNnbGV2ZWwsDQo+ID4gIAkuc2V0X21zZ2xldmVsCT0gdHVu
+X3NldF9tc2dsZXZlbCwNCj4gPiAgCS5nZXRfbGluawk9IGV0aHRvb2xfb3BfZ2V0X2xpbmssDQo+
+ID4gKwkuZ2V0X2NoYW5uZWxzICAgPSB0dW5fZ2V0X2NoYW5uZWxzLA0KPiA+ICAJLmdldF90c19p
+bmZvCT0gZXRodG9vbF9vcF9nZXRfdHNfaW5mbywNCj4gPiAgCS5nZXRfY29hbGVzY2UgICA9IHR1
+bl9nZXRfY29hbGVzY2UsDQo+ID4gIAkuc2V0X2NvYWxlc2NlICAgPSB0dW5fc2V0X2NvYWxlc2Nl
+LA0KPiA+IC0tDQo+ID4gMi4zMy4wDQo+ID4NCj4gDQoNCg==
 
