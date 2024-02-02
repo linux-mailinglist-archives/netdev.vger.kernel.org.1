@@ -1,276 +1,152 @@
-Return-Path: <netdev+bounces-68714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 117A8847A78
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 21:25:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26752847A81
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 21:26:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB636284912
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:25:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB0C1B27EE4
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:26:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA5F8062D;
-	Fri,  2 Feb 2024 20:25:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E89881733;
+	Fri,  2 Feb 2024 20:26:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N+Y9F7P4"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AGmPciXs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344028062A
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 20:25:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE3D580601;
+	Fri,  2 Feb 2024 20:26:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706905535; cv=none; b=qtgTRbhuGFC6mZQ/K/cDUtoSCh1KB5K3v0DfVnoXrBrjVdaGgV0x/ecEAKRowplysJXA1p17fqzzx/EsbpLdJdKcELjB64bC5XCc/iZM86l9uoGKOH3iZnJ+Y8JsFkHwg0PJpyH/VxUQV0SgTrYr+CU3b7waHX/Az6u2UsxxODs=
+	t=1706905582; cv=none; b=EyAEe4CEt/02Sn+7YsSztl2yimH5tiIVjVZp0CtS2+zhTfKGl6GJjwWqT1YJRHPRO0AwqFXk1q0KwZWbA5sgKEcpKFWK4LCIQ2njV7spIgARR+htUmErLfQIdfjuQLlm5yDSYbAvOg7v+uWVyfVLdHrZ8tX4KHMDL0L6qEpS5yA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706905535; c=relaxed/simple;
-	bh=VeuU1gtpMHD6R4y3QskCdXixRRQG76sqQMFIwVjNW8o=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ueDe7gZyGin6GwUSf0DWB5gzmg9/HJl6l9tuMs3e6/dhEJZSXeLOuD/RwOkhNwWn/Lq5MwaLvgE0jCrD9eVq80UxLKpDPaDMEaz6pePVuNmyds9uh1drWlDmby6be7O7dkSmhO8od1HS3tcquoLa0MruSeDhPpTWQbtAdw+s3GQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N+Y9F7P4; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706905533; x=1738441533;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=VeuU1gtpMHD6R4y3QskCdXixRRQG76sqQMFIwVjNW8o=;
-  b=N+Y9F7P4X5vN0yMsUJUBXbOaZboVinGE8tstRUzH5LIKlDV58RNXcvPo
-   N204bI7E5beaJii1v+qP8a1LF/54cAGCFq+jrwwGzepwbv5nGqbVSG0IG
-   cHHca2KxEiQbKtT+T1kE8mRD0G9NuRu0UoUQFGmeeivZHaiCZxmUmzitL
-   tBhHNzmcooIuQRA8zr+xjaH97fPpFmTe+jQpGm/y1WoMSkCicvAKny6ex
-   wzroaHp8qM5+rb5+ovB5nqb+iaMhLpPEidmGoO0OJyeIlKag3FpmScVqD
-   zjUEl2SwZLQ+85MfQyuZc9YmCq+KWScY3k+BY/Gh6WeFB+91GXpj1GL8n
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="10885086"
-X-IronPort-AV: E=Sophos;i="6.05,238,1701158400"; 
-   d="scan'208";a="10885086"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 12:25:32 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,238,1701158400"; 
-   d="scan'208";a="489194"
-Received: from apalla-mobl2.ger.corp.intel.com (HELO azaki-desk1.intel.com) ([10.249.41.168])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 12:25:27 -0800
-From: Ahmed Zaki <ahmed.zaki@intel.com>
-To: netdev@vger.kernel.org
-Cc: mkubecek@suse.cz,
-	alexander.duyck@gmail.com,
-	kuba@kernel.org,
-	willemdebruijn.kernel@gmail.com,
-	gal@nvidia.com,
-	jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	pabeni@redhat.com,
-	andrew@lunn.ch,
-	Ahmed Zaki <ahmed.zaki@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: [PATCH ethtool v2] ethtool: add support for RSS input transformation
-Date: Fri,  2 Feb 2024 13:25:20 -0700
-Message-Id: <20240202202520.70162-1-ahmed.zaki@intel.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1706905582; c=relaxed/simple;
+	bh=VcZTs2Gq08PlBskokPhLEf4TRhE+oKA4D1KkVs9TtsE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kqdMzA1UAW4kBnG5rrj/zJrhizFy1YfXF5ZLj9oWRfOh18olrF3wnTAcMrk27Fmmz9VgX4GKrPZDT9GR5eJDQvUJnxdXc+d9nFBXeULYNMXhqB+gT5J5irfj7VamDGpxVCKev3kctLUB6w+lDBgeuLnX/sjNyqYyXTKlBTNp/tE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AGmPciXs; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=WGnc/m8wZ5VekXMjEDlGv2LgOYZxP0Ar/ku6T9fE9Us=; b=AG
+	mPciXsoxeRmPl2pgCQEew0vyueQo9nP5a9cQdrR+vatsm8Rr4aFOl3MqKSocFSSE/Orl8uXD6DN+s
+	tZ17BYJL9sHXLLpXE/s7ECOaxX/7daK9ZtTjQDXczWjFuEWK588nEvNGnj111BYTG/AaTEMBvnC6b
+	+BzMRtZQ4btiEDE=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rW06l-006qZX-8r; Fri, 02 Feb 2024 21:25:55 +0100
+Date: Fri, 2 Feb 2024 21:25:55 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v3 1/7] net: dsa: mt7530: empty default case on
+ mt7530_setup_port5()
+Message-ID: <59e88b15-da57-4cff-83b3-91e38a185461@lunn.ch>
+References: <20240202-for-netnext-mt7530-improvements-2-v3-0-63d5adae99ca@arinc9.com>
+ <20240202-for-netnext-mt7530-improvements-2-v3-1-63d5adae99ca@arinc9.com>
+ <ZbzUotyQm/FyKK7G@shell.armlinux.org.uk>
+ <e3b4add6-425c-46ca-9da5-8713055fc422@arinc9.com>
+ <Zb0u8NY0q6ay17j5@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zb0u8NY0q6ay17j5@shell.armlinux.org.uk>
 
-Add support for RSS input transformation [1]. Currently, only symmetric-xor
-is supported. The user can set the RSS input transformation via:
+On Fri, Feb 02, 2024 at 06:05:36PM +0000, Russell King (Oracle) wrote:
+> On Fri, Feb 02, 2024 at 08:44:39PM +0300, Arınç ÜNAL wrote:
+> > On 2.02.2024 14:40, Russell King (Oracle) wrote:
+> > > While reviewing this change, but not related to it, I notice that this
+> > > function sets the TX delay based on the RGMII interface mode. This isn't
+> > > correct. I've explained why this is this many times in the past, but
+> > > essentially it comes down to the model:
+> > > 
+> > > 
+> > > phy-mode in NIC node	Network driver	PCB		PHY
+> > > rgmii			no delays	delays		no delays
+> > > rgmii-id		no delays	no delays	tx/rx delays
+> > > rgmii-txid		no delays	no delays	tx delays
+> > > rgmii-rxid		no delays	no delays	rx delays
+> > > 
+> > > Then we have rx-internal-delay-ps and tx-internal-delay-ps in the NIC
+> > > node which define the RGMII delays at the local end and similar
+> > > properties for the PHY node.
+> > > 
+> > > 
+> > > So, if we take the view that, when a switch is connected to a NIC in
+> > > RGMII mode, then the phy-mode specified delays still should not impact
+> > > the local NIC.
+> > > 
+> > > Now, for the switch, we specify the phy-mode in the port node as well.
+> > > Consider the case of a switch port connected to a RGMII PHY. This has
+> > > to operate in exactly the same way as a normal NIC - that is, the
+> > > RGMII delays at the port should be ignored as it's the responsibility
+> > > of a PHY.
 
-    # ethtool -X <dev> xfrm symmetric-xor
+Not quite. It is unusual, but there are a few MAC drivers which do act
+on phy-mode, to configure MAC delays. However, if they do this, they
+then mask the value of phy-mode passed to the PHY in order to avoid
+double delays. Its not something i recommend, we prefer the PHYs do
+the delays. And it something i strongly suggest we avoid in DSA.
 
-and sets it off (default) by:
+> > > The final scenario to examine is the case of a RGMII switch port
+> > > connected to a NIC.
 
-    # ethtool -X <dev> xfrm none
+This should also extend to a port connected to a port of another
+switch. For Marvell switches, these are so called DSA ports.
 
-The status of the transformation is reported by a new section at the end
-of "ethtool -x":
+> > > The NIC's phy-mode has no way to be communicated
+> > > to DSA or vice versa, so neither phy-mode can impact the other side
+> > > of the RGMII link, but should only place the link into RGMII mode.
+> > > Given everything I've said above, the only way to configure RGMII
+> > > delays is via the rx-internal-delay-ps and tx-internal-delay-ps
+> > > properties. So, DSA drivers should _not_ be configuring their ports
+> > > with RGMII delays based on the RGMII phy interface mode.
 
-    # ethtool -x <dev>
-      .
-      .
-      .
-      .
-      RSS hash function:
-          toeplitz: on
-          xor: off
-          crc32: off
-      RSS input transformation:
-          symmetric-xor: on
+Marvell goes against this. rx-internal-delay-ps and
+tx-internal-delay-ps are pretty new, when compared to the age of
+mv88e6xxx. I had the problem of a FEC connected to an mv88e6xxx using
+RGMII and i needed to somehow configure RGMII delays, or packets did
+not get through. So mv88e6xxx will apply phy-mode to ports being used
+in CPU or DSA mode. So in the case of the FEC->switch, rgmii-id is
+used by the switch. For DSA->DSA, there are DT blobs with rgmii-txid
+on both ends of the link, which results in the needed delays.
 
-Link: https://lore.kernel.org/netdev/20231213003321.605376-1-ahmed.zaki@intel.com/
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
----
-v2: add a note in the man page on the loss of entropy due to XORing.
+> > > The above is my purely logically reasoned point of view on this
+> > > subject. Others may have other (to me completely illogical)
+> > > interpretations that can only lead to interoperability issues.
 
- ethtool.8.in  | 14 ++++++++++++++
- ethtool.c     | 16 ++++++++++++++++
- netlink/rss.c | 19 +++++++++++++++++--
- 3 files changed, 47 insertions(+), 2 deletions(-)
+Now that rx-internal-delay-ps and tx-internal-delay-ps actually exist,
+these are the best ways to handle such delays, for new drivers. But we
+cannot change old drivers without causing regressions.
 
-diff --git a/ethtool.8.in b/ethtool.8.in
-index 7a3080f..5924b8d 100644
---- a/ethtool.8.in
-+++ b/ethtool.8.in
-@@ -351,6 +351,7 @@ ethtool \- query or control network driver and hardware settings
- .RB ...\ | \ default \ ]
- .RB [ hfunc
- .IR FUNC ]
-+.B2 xfrm symmetric-xor none
- .RB [ context
- .I CTX
- .RB |\  new ]
-@@ -1201,6 +1202,19 @@ even if a nibble is zero.
- Sets RSS hash function of the specified network device.
- List of RSS hash functions which kernel supports is shown as a part of the --show-rxfh command output.
- .TP
-+.BI xfrm
-+Sets the RSS input transformation. Currently, only the
-+.B symmetric-xor
-+transformation is supported where the NIC XORs the L3 and/or L4 source and
-+destination fields (as selected by
-+.B --config-nfc rx-flow-hash
-+) before passing them to the hash algorithm. The RSS hash function will
-+then yield the same hash for the other flow direction where the source and
-+destination fields are swapped (i.e. Symmetric RSS). Note that XORing the
-+input parameters reduces the entropy of the input set and the hash algorithm
-+could potentially be exploited. Switch off (default) by
-+.B xfrm none.
-+.TP
- .BI start\  N
- For the \fBequal\fR and \fBweight\fR options, sets the starting receive queue
- for spreading flows to \fIN\fR.
-diff --git a/ethtool.c b/ethtool.c
-index 3ac15a7..82919f8 100644
---- a/ethtool.c
-+++ b/ethtool.c
-@@ -4029,6 +4029,10 @@ static int do_grxfh(struct cmd_context *ctx)
- 		       (const char *)hfuncs->data + i * ETH_GSTRING_LEN,
- 		       (rss->hfunc & (1 << i)) ? "on" : "off");
- 
-+	printf("RSS input transformation:\n");
-+	printf("    symmetric-xor: %s\n",
-+	       (rss->input_xfrm & RXH_XFRM_SYM_XOR) ? "on" : "off");
-+
- out:
- 	free(hfuncs);
- 	free(rss);
-@@ -4146,6 +4150,7 @@ static int do_srxfh(struct cmd_context *ctx)
- 	u32 arg_num = 0, indir_bytes = 0;
- 	u32 req_hfunc = 0;
- 	u32 entry_size = sizeof(rss_head.rss_config[0]);
-+	u32 req_input_xfrm = 0xff;
- 	u32 num_weights = 0;
- 	u32 rss_context = 0;
- 	int delete = 0;
-@@ -4189,6 +4194,15 @@ static int do_srxfh(struct cmd_context *ctx)
- 			if (!req_hfunc_name)
- 				exit_bad_args();
- 			++arg_num;
-+		} else if (!strcmp(ctx->argp[arg_num], "xfrm")) {
-+			++arg_num;
-+			if (!strcmp(ctx->argp[arg_num], "symmetric-xor"))
-+				req_input_xfrm = RXH_XFRM_SYM_XOR;
-+			else if (!strcmp(ctx->argp[arg_num], "none"))
-+				req_input_xfrm = 0;
-+			else
-+				exit_bad_args();
-+			++arg_num;
- 		} else if (!strcmp(ctx->argp[arg_num], "context")) {
- 			++arg_num;
- 			if(!strcmp(ctx->argp[arg_num], "new"))
-@@ -4333,6 +4347,7 @@ static int do_srxfh(struct cmd_context *ctx)
- 	rss->cmd = ETHTOOL_SRSSH;
- 	rss->rss_context = rss_context;
- 	rss->hfunc = req_hfunc;
-+	rss->input_xfrm = req_input_xfrm;
- 	if (delete) {
- 		rss->indir_size = rss->key_size = 0;
- 	} else {
-@@ -5887,6 +5902,7 @@ static const struct option args[] = {
- 			  "		[ equal N | weight W0 W1 ... | default ]\n"
- 			  "		[ hkey %x:%x:%x:%x:%x:.... ]\n"
- 			  "		[ hfunc FUNC ]\n"
-+			  "		[ xfrm symmetric-xor|none ]\n"
- 			  "		[ delete ]\n"
- 	},
- 	{
-diff --git a/netlink/rss.c b/netlink/rss.c
-index 4ad6065..dc28698 100644
---- a/netlink/rss.c
-+++ b/netlink/rss.c
-@@ -21,7 +21,8 @@ struct cb_args {
- 
- void dump_json_rss_info(struct cmd_context *ctx, u32 *indir_table,
- 			u32 indir_size, u8 *hkey, u32 hkey_size,
--			const struct stringset *hash_funcs, u8 hfunc)
-+			const struct stringset *hash_funcs, u8 hfunc,
-+			u32 input_xfrm)
- {
- 	unsigned int i;
- 
-@@ -46,6 +47,12 @@ void dump_json_rss_info(struct cmd_context *ctx, u32 *indir_table,
- 			if (hfunc & (1 << i)) {
- 				print_string(PRINT_JSON, "rss-hash-function",
- 					     NULL, get_string(hash_funcs, i));
-+				open_json_object("rss-input-transformation");
-+				print_bool(PRINT_JSON, "symmetric-xor", NULL,
-+					   (input_xfrm & RXH_XFRM_SYM_XOR) ?
-+					   true : false);
-+
-+				close_json_object();
- 				break;
- 			}
- 		}
-@@ -89,6 +96,7 @@ int rss_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 	const struct stringset *hash_funcs;
- 	u32 rss_hfunc = 0, indir_size;
- 	u32 *indir_table = NULL;
-+	u32 input_xfrm = 0;
- 	u8 *hkey = NULL;
- 	bool silent;
- 	int err_ret;
-@@ -118,6 +126,9 @@ int rss_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 		hkey = mnl_attr_get_payload(tb[ETHTOOL_A_RSS_HKEY]);
- 	}
- 
-+	if (tb[ETHTOOL_A_RSS_INPUT_XFRM])
-+		input_xfrm = mnl_attr_get_u32(tb[ETHTOOL_A_RSS_INPUT_XFRM]);
-+
- 	/* Fetch RSS hash functions and their status and print */
- 	if (!nlctx->is_monitor) {
- 		ret = netlink_init_ethnl2_socket(nlctx);
-@@ -153,7 +164,8 @@ int rss_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 	indir_size = indir_bytes / sizeof(u32);
- 	if (is_json_context()) {
- 		dump_json_rss_info(nlctx->ctx, (u32 *)indir_table, indir_size,
--				   hkey, hkey_bytes, hash_funcs, rss_hfunc);
-+				   hkey, hkey_bytes, hash_funcs, rss_hfunc,
-+				   input_xfrm);
- 	} else {
- 		print_indir_table(nlctx->ctx, args->num_rings,
- 				  indir_size, (u32 *)indir_table);
-@@ -167,6 +179,9 @@ int rss_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 			printf("    %s: %s\n", get_string(hash_funcs, i),
- 			       (rss_hfunc & (1 << i)) ? "on" : "off");
- 		}
-+		printf("RSS input transformation:\n");
-+		printf("    symmetric-xor: %s\n",
-+		       (input_xfrm & RXH_XFRM_SYM_XOR) ? "on" : "off");
- 	}
- 
- 	return MNL_CB_OK;
--- 
-2.34.1
-
+       Andrew
 
