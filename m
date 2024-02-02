@@ -1,79 +1,94 @@
-Return-Path: <netdev+bounces-68452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6360846F46
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:44:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F432846F56
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:46:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C2B11F292AD
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:44:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7ADCFB2CBB0
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:45:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3223113E207;
-	Fri,  2 Feb 2024 11:40:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A86A013E223;
+	Fri,  2 Feb 2024 11:42:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jGp8goMJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jQ+Bsfub"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 694A01468FA;
-	Fri,  2 Feb 2024 11:40:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1ECD01946F
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 11:42:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706874045; cv=none; b=FBtODa/GTKOMqOdfT6UBWKOxDBcOWyOJDNBZ/tIpXnSEibdSTRak6+Q2ThWmcUGwCmlhskBQ5nw3xlSIM2phAacNsc6bLRrqSg5A+evFSgaqYNm2dAt6oBsOsD3RuCRBzxRrfTedymVU5JdmaNuGOoLHMbbrLhMs5pkYQ//3AYs=
+	t=1706874142; cv=none; b=P7gInFRcF098mAapT9eUHy0we7dawsxEx+KIbktbWHxl7dR87iawavZt8T5FdV23BW5iwYijTg62dpNA0J8cZTGAm7NKEXtdMl2kz5sBvSEK8k4mxwadMgKeKgh+Smt/zSHrT7qWUUGtXeFFfkRyRC+Wq3U0Gau+KCp1ko+nD6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706874045; c=relaxed/simple;
-	bh=THNcitwNvcPDGnnPmti91/QSPozPaK3v1G+mw5I964g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=O2H5RJ1SjgrqfcY2vp0Nf0Fh5YUNsQqVAqQRXUD2c2flezWtZvJqkX6vgivTJ4ch7ttEVxzQyKuctYplo+cjCfDQJDhWCBHXGfVYazC8B540OUNRH0mEgjfBcd7sgaadX79lqjvq6xs5uw2eeGEgnD+cuLIEsQBkoapN6HKnUZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jGp8goMJ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=UslJPsc9OxqAKRDemcvqM9t/waIR2GXs7pcOUZ0/ORQ=; b=jGp8goMJO/MxQ0XCJBfcTUrVlZ
-	xZigOzTQl82Q8t4B92czFeAdsOazhcWc0byV/RMFxvtxNPdRsd3Pd/98g/123aQIqSzg4BJd0zKA7
-	6b9U2pyFIZBoaXbM0oZtq2p/jhjv81jjqAZsffVCIDl4f+Sy9SaVHMznBIgycpw28JXHyheJskcv2
-	qTf7ClI1YPceYNXMX9UidY/M0X7H0n314C0JuZeE3P17Q47bP5/hXk2TB+Gw/GeVKdjTU3PhlOX1x
-	E8Ttl6pFzqH+aFIBCh8R+VXlHO6FuMM7EuhKoVzYtIGVkrGrjIm3aPaWBTEwf2ZDGCO6265lnP52l
-	6Qlaix/Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46710)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rVruE-0005tL-1l;
-	Fri, 02 Feb 2024 11:40:26 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rVru6-0008Hm-Un; Fri, 02 Feb 2024 11:40:18 +0000
-Date: Fri, 2 Feb 2024 11:40:18 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: arinc.unal@arinc9.com
-Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v3 1/7] net: dsa: mt7530: empty default case on
- mt7530_setup_port5()
-Message-ID: <ZbzUotyQm/FyKK7G@shell.armlinux.org.uk>
-References: <20240202-for-netnext-mt7530-improvements-2-v3-0-63d5adae99ca@arinc9.com>
- <20240202-for-netnext-mt7530-improvements-2-v3-1-63d5adae99ca@arinc9.com>
+	s=arc-20240116; t=1706874142; c=relaxed/simple;
+	bh=0Uz+i8MjJSenirZh0mUrgqQNJWmb68i5QhXBdv2XStY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=K/Vw2UzFekVQyNei6Yq4SJ28xDGpUiBcZWXXume6bsi5Urip0VRw7/HC6prOu85OvV05F1QYr/AR4tPtkP7oBSpyX9S34ETzu1vknk7pu+sv9QgKTaSPawRKmkX7ix4BKC6hgMwuy/A9tELcl/owStvuthr6PF4XZQNUCHiloJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jQ+Bsfub; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706874140;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0Uz+i8MjJSenirZh0mUrgqQNJWmb68i5QhXBdv2XStY=;
+	b=jQ+BsfubP0ep4trMVUfL/KnumfGOkkfmDIREu2uFuwBzxl2FC2/2xLzQaA42uWO3tGXdqc
+	YJB/c+7F0ZfqcV+Nf1noXJT0MghP9ZxvrC6hj2vMPL8l5ITAG8PjaSyghQGpHXpHDGKvCD
+	kLMHfYf2QjGwQx9NK19UVDhTRg5Q+Bk=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-625-bRc-0n-DMkyPuzG0vzf14w-1; Fri, 02 Feb 2024 06:42:16 -0500
+X-MC-Unique: bRc-0n-DMkyPuzG0vzf14w-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a2c4e9cb449so139386966b.1
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 03:42:16 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706874135; x=1707478935;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0Uz+i8MjJSenirZh0mUrgqQNJWmb68i5QhXBdv2XStY=;
+        b=bDKPlWZEXcCGyh4nDpEBNmfItgUI3ymR5835AGAVWLIyR+GM2t5+gSpICLKUbNDDmO
+         KqvlHi1NCdwbfUUoSSj41vqp8P3s50QknGb6MJbEfSN5c3cVKSgDB1keewv2uIh2WUt2
+         WX0A0tcGBNiS9L9xCyRBPYDKaXSY4L1gYVHUuirOHZhtiKzgOKvXCt1QVo8TUkRVLDaP
+         6kVrpvsZwaFZLVcGwEUAgTmiG4iJ1CtoFqPi2ow1y5VSJPk5y7Iv8t6b3rrKD2o4PIoK
+         CWuRIan/zLEV2/SZ2YW3PPeQmXgMYO8/H0OktfhiyMJFhIDKdooyvMaRXeuQ+wvvTECZ
+         nB6g==
+X-Gm-Message-State: AOJu0Ywwa3coaD5VhbrjnH2yG5En8IHIptLHhrD0mMGtDUaPgOAh7Cqc
+	QJhfmxgHCVSGsi5ugdHl7LqJbi9uW0C5bdPkhllA/lzUzyq5dhmqQpEXdJxW2Uf8+6/SjqGnAjZ
+	6jIWmlHS73ZTaUBjh0+opzqOOljOYdx7OSnCyvox+2KSnuCFtIJzLHA==
+X-Received: by 2002:a17:906:2e87:b0:a34:adce:b5be with SMTP id o7-20020a1709062e8700b00a34adceb5bemr6466433eji.1.1706874135630;
+        Fri, 02 Feb 2024 03:42:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEE0Q9OhxrbEM9zN9VXsMVO/3rEJNZuM7N92oHBfjcS4SBq2/nYTkciBJ+OdsCi6sR/PYcpaQ==
+X-Received: by 2002:a17:906:2e87:b0:a34:adce:b5be with SMTP id o7-20020a1709062e8700b00a34adceb5bemr6466382eji.1.1706874134305;
+        Fri, 02 Feb 2024 03:42:14 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWgUQiW0qmIr+l4Jg9ciixIdW/YmYCKOhjgS3IH3EzAuLSRKebUrBBhFWPpGuLvnehbdToaj/HGLwWybsB27JZNTmrBqVAY4EU11wL4+wEoH3+4Lzp7Ku3Ol5jJRTq3ogo6tWH/p+oz5SaklMvHG/J4cZz7dFsPDOsoisrh5GbweO1+YF0+ZL7ZU4RIEZFQ5R9suQ4vBXTuJM/VXlv6N1qTGA0MeViXTSqI4xpy02YI32F/gGhsch868eu4XBJp71HYWW5+CYFjSdRptV2i2xEwKNWW59cJSHOSvF55C8GWh0sd4L3NgXaGDaDKB73tlbNPXK5zDkgIbQoJAfzQ0iqe5YhPHGIJZlG7er252Gj+/ZSv20Y3UfJv6PVjES6wr0Qacy4cJCiPtnWLm6L9Zpo1ktCFPjc=
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id di10-20020a170906730a00b00a34ae71e58dsm798363ejc.147.2024.02.02.03.42.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Feb 2024 03:42:14 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id A0116108A839; Fri,  2 Feb 2024 12:42:13 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org
+Cc: lorenzo.bianconi@redhat.com, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, bpf@vger.kernel.org,
+ willemdebruijn.kernel@gmail.com, jasowang@redhat.com, sdf@google.com,
+ hawk@kernel.org, ilias.apalodimas@linaro.org, linyunsheng@huawei.com
+Subject: Re: [PATCH v7 net-next 3/4] xdp: add multi-buff support for xdp
+ running in generic mode
+In-Reply-To: <35486ef21c3a74931e81b5e9c604734781ca1213.1706861261.git.lorenzo@kernel.org>
+References: <cover.1706861261.git.lorenzo@kernel.org>
+ <35486ef21c3a74931e81b5e9c604734781ca1213.1706861261.git.lorenzo@kernel.org>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Fri, 02 Feb 2024 12:42:13 +0100
+Message-ID: <87plxfxfca.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,81 +96,17 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240202-for-netnext-mt7530-improvements-2-v3-1-63d5adae99ca@arinc9.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 02, 2024 at 12:19:07PM +0300, Arınç ÜNAL via B4 Relay wrote:
-> From: Arınç ÜNAL <arinc.unal@arinc9.com>
-> 
-> There're two code paths for setting up port 5:
-> 
-> mt7530_setup()
-> -> mt7530_setup_port5()
-> 
-> mt753x_phylink_mac_config()
-> -> mt753x_mac_config()
->    -> mt7530_mac_config()
->       -> mt7530_setup_port5()
-> 
-> On the first code path, priv->p5_intf_sel is either set to
-> P5_INTF_SEL_PHY_P0 or P5_INTF_SEL_PHY_P4 when mt7530_setup_port5() is run.
-> 
-> On the second code path, priv->p5_intf_sel is set to P5_INTF_SEL_GMAC5 when
-> mt7530_setup_port5() is run.
-> 
-> Empty the default case which will never run but is needed nonetheless to
-> handle all the remaining enumeration values.
-> 
-> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Lorenzo Bianconi <lorenzo@kernel.org> writes:
 
-Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Similar to native xdp, do not always linearize the skb in
+> netif_receive_generic_xdp routine but create a non-linear xdp_buff to be
+> processed by the eBPF program. This allow to add multi-buffer support
+> for xdp running in generic mode.
+>
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 
-Thanks!
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
 
-While reviewing this change, but not related to it, I notice that this
-function sets the TX delay based on the RGMII interface mode. This isn't
-correct. I've explained why this is this many times in the past, but
-essentially it comes down to the model:
-
-
-phy-mode in NIC node	Network driver	PCB		PHY
-rgmii			no delays	delays		no delays
-rgmii-id		no delays	no delays	tx/rx delays
-rgmii-txid		no delays	no delays	tx delays
-rgmii-rxid		no delays	no delays	rx delays
-
-Then we have rx-internal-delay-ps and tx-internal-delay-ps in the NIC
-node which define the RGMII delays at the local end and similar
-properties for the PHY node.
-
-
-So, if we take the view that, when a switch is connected to a NIC in
-RGMII mode, then the phy-mode specified delays still should not impact
-the local NIC.
-
-Now, for the switch, we specify the phy-mode in the port node as well.
-Consider the case of a switch port connected to a RGMII PHY. This has
-to operate in exactly the same way as a normal NIC - that is, the
-RGMII delays at the port should be ignored as it's the responsibility
-of a PHY.
-
-The final scenario to examine is the case of a RGMII switch port
-connected to a NIC. The NIC's phy-mode has no way to be communicated
-to DSA or vice versa, so neither phy-mode can impact the other side
-of the RGMII link, but should only place the link into RGMII mode.
-Given everything I've said above, the only way to configure RGMII
-delays is via the rx-internal-delay-ps and tx-internal-delay-ps
-properties. So, DSA drivers should _not_ be configuring their ports
-with RGMII delays based on the RGMII phy interface mode.
-
-The above is my purely logically reasoned point of view on this
-subject. Others may have other (to me completely illogical)
-interpretations that can only lead to interoperability issues.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
