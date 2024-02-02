@@ -1,156 +1,144 @@
-Return-Path: <netdev+bounces-68362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BD88846B2D
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:49:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 870E9846B3F
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:51:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F3B51C269AC
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:49:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1858CB22054
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:51:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA4D05FF10;
-	Fri,  2 Feb 2024 08:48:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43668604D2;
+	Fri,  2 Feb 2024 08:51:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DI5RaeN8"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="GcEW7nTo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2E65FF0C
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 08:48:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E650D604C1;
+	Fri,  2 Feb 2024 08:51:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706863708; cv=none; b=eMhbAK8eILF93CJUZp6TgpeCsB914N8wmxHSzTC3OpYtQRq4LPXuS+XvHgvhIYzMo1XW0VSzem0HQEizE1PixyJLFdMtNeaJoTE4UQPB7h5IlTsXVTeKnNssvR63r68pTDeE1nax8UPjKxNOPNPpV6UQcV70JV8Gvr8KaAcZWjc=
+	t=1706863874; cv=none; b=hxOOagSH9RAwi933Wq5dQ282JH91OhMs9qyzEvKuFbx85x5w2ERBw7pyS4tvMr4nepqUNOtRwC4VxznVPZHOsy5Ql2RH/EArzjiSX0Pr48gw2UJSb0ZDuW6T3VFpj5jFSvHlbJHDC0HVRZy5XXTsEhEN1eUu3Q0JIxkDs5s0q5M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706863708; c=relaxed/simple;
-	bh=giPRyOV5I52f7S0E9p8//2PldUVaMgBAQHbHgx/8CUk=;
+	s=arc-20240116; t=1706863874; c=relaxed/simple;
+	bh=rPghlH4fKzDrgFUA2AU5udG4v87gHBMz2GHmtLMD1sY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CaZrlPjLJq5EVeZZlSlij0OZE5L9Ty+gZNBooJdOc7Cl4sKlunMBCKRz1O7hg55O4Hvzbl0baOx5xQUJBWVu0ZrSNl6+GuBOYP2VxDqTa1TUdrfiFknXv3+rYrwRVQxUYQ0O0huCtB/weKDIEIufzqmv+5PscQGX979bw7qP5Ok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DI5RaeN8; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706863707; x=1738399707;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=giPRyOV5I52f7S0E9p8//2PldUVaMgBAQHbHgx/8CUk=;
-  b=DI5RaeN8nwoEvVK9cFqSfdK2Jh8p02ybDXaFU93LxmqVvI+R1eKtrM69
-   j7uojQNFSq30sNHuZJ2DPu7QG9yFg0hfjJ181iN9Nkbsx9oo2nV5HXA1Y
-   qfuNik7aEM9io4OIQlnGrEZROZ+Y6vsRVtfz69DpsvR+51hGz3mOymLDt
-   jrwBl2cLWkq+zuifvVKBvDOUtHQUkYFe2+QHP6ETfLzKHSgHbopnQlN2O
-   QDP9poc9cPuTWRemISHcPLuhaTxt2uFc8so48XdfGnHHch8BLRQAI/nr9
-   rIVW/fWcWFlYe2Myti5BsVxOs1SGp4nqdkutNMFLpW9DRV+1HkwukKHMi
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="25565046"
-X-IronPort-AV: E=Sophos;i="6.05,237,1701158400"; 
-   d="scan'208";a="25565046"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 00:48:27 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,237,1701158400"; 
-   d="scan'208";a="30843608"
-Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by orviesa002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 00:48:25 -0800
-Date: Fri, 2 Feb 2024 09:48:13 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: William Tu <witu@nvidia.com>
-Cc: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>, bodong@nvidia.com,
-	jiri@nvidia.com, netdev@vger.kernel.org, saeedm@nvidia.com,
-	"aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>
-Subject: Re: [RFC PATCH v3 net-next] Documentation: devlink: Add devlink-sd
-Message-ID: <ZbysTRVYtih/1fOc@mev-dev>
-References: <20240131110649.100bfe98@kernel.org>
- <6fd1620d-d665-40f5-b67b-7a5447a71e1b@nvidia.com>
- <20240131124545.2616bdb6@kernel.org>
- <2444399e-f25f-4157-b5d0-447450a95ef9@nvidia.com>
- <777fdb4a-f8f3-4ddb-896a-21b5048c07da@intel.com>
- <20240131143009.756cc25c@kernel.org>
- <dc9f44a8-857b-498a-8b8c-3445e4749366@nvidia.com>
- <20240131151726.1ddb9bc9@kernel.org>
- <6bea046d-326e-4f32-b6cb-dd92811b5fcb@intel.com>
- <82c97129-5d87-435e-b0f0-863733e16633@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=uMnnW1XJ4FAnZkgHCCu7AmxtXch9Hww6k3kX97zrbXZnjBqJdyYPFgqI2aI4bpNEa4Juji/F3MJY5EK+kb+49oZ4chZWhYgHCGGHJT/I6oWM0VdSsWbX4QyOKEQNmfeQkvIFhBBkLIamfNTDzMmhfjm8OBVvU7gGUtXHjvCsc/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=GcEW7nTo; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=zgcj+wX/L6IDdldqgziNCDsIyAb6c+kW8GcYNwM7sts=; b=GcEW7nToPq2txWV+ViSERXcFwc
+	rIIQ4n6+rou3/R+i4yGctXiLFzZv29zF/60F+jjXeE+KHkkI+HTQgFIorTtxr6i5Za45zbgiGpucj
+	p8gdiQ/Qz6wt/2SM4aIkw4zlWDE+fNPHZ2ovt3wAkQpvzQJanqF0SAHiMGwRu0K61OLmBUFMvdnzG
+	4NT4zFRK50O0q8jV7zYb1G+Dvhf+oOw/OamJj2xAG9XEZD52Lj7vD6df8J9yUZUZ/ULdzDWo6Nirg
+	26NrmJqI7PQdR8VJ1T9wQDKxln+BeKE210XOxjyZftyAu6H1aS4itKKLrMYDKPb1xVrgslxsJGmE1
+	J7sImYnQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:49854)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rVpFx-0005e9-2k;
+	Fri, 02 Feb 2024 08:50:41 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rVpFq-0008Bx-Er; Fri, 02 Feb 2024 08:50:34 +0000
+Date: Fri, 2 Feb 2024 08:50:34 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+Cc: Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
+	David E Box <david.e.box@linux.intel.com>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Mark Gross <markgross@kernel.org>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Simon Horman <simon.horman@corigine.com>,
+	Serge Semin <fancer.lancer@gmail.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	platform-driver-x86@vger.kernel.org, linux-hwmon@vger.kernel.org,
+	bpf@vger.kernel.org, Voon Wei Feng <weifeng.voon@intel.com>,
+	Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
+	Lai Peter Jun Ann <jun.ann.lai@intel.com>,
+	Abdul Rahim Faizal <faizal.abdul.rahim@intel.com>
+Subject: Re: [PATCH net-next v4 06/11] net: stmmac: resetup XPCS according to
+ the new interface mode
+Message-ID: <Zbys2orOUikYxeOm@shell.armlinux.org.uk>
+References: <20240129130253.1400707-1-yong.liang.choong@linux.intel.com>
+ <20240129130253.1400707-7-yong.liang.choong@linux.intel.com>
+ <ZbjNn+C/VHegH2t7@shell.armlinux.org.uk>
+ <9e23671e-788c-4191-bdb4-94915ff7da5a@linux.intel.com>
+ <ZbtYaXkNf2ZF1prE@shell.armlinux.org.uk>
+ <2ad1f55c-f361-4439-9174-6af1bb429d55@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <82c97129-5d87-435e-b0f0-863733e16633@nvidia.com>
+In-Reply-To: <2ad1f55c-f361-4439-9174-6af1bb429d55@linux.intel.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Feb 01, 2024 at 06:00:54AM -0800, William Tu wrote:
+On Fri, Feb 02, 2024 at 11:00:58AM +0800, Choong Yong Liang wrote:
 > 
-> On 1/31/24 6:23 PM, Samudrala, Sridhar wrote:
-> > External email: Use caution opening links or attachments
+> 
+> On 1/2/2024 4:38 pm, Russell King (Oracle) wrote:
+> > Note the "This must not modify any state." statement. By reinitialising
+> > the PCS in this method, you are violating that statement.
 > > 
+> > This requirement is because this method will be called by
+> > phylink_validate_mac_and_pcs() at various times, potentially for each
+> > and every interface that stmmac supports, which will lead to you
+> > reinitialising the PCS, killing the link, each time we ask the MAC for
+> > a PCS, whether we are going to make use of it in that mode or not.
 > > 
-> > On 1/31/2024 5:17 PM, Jakub Kicinski wrote:
-> > > On Wed, 31 Jan 2024 15:02:58 -0800 William Tu wrote:
-> > > > > I just did a grep on METADATA_HW_PORT_MUX and assumed bnxt,
-> > > > > ice and nfp
-> > > > > all do buffer sharing. You're saying you mux Tx queues but not Rx
-> > > > > queues? Or I need to actually read the code instead of grepping? :)
-> > > > 
-> > > > I guess bnxt, ice, nfp are doing tx buffer sharing?
-> > > 
-> > > I'm not familiar with ice. I'm 90% sure bnxt shares both Rx and Tx.
-> > > I'm 99.9% sure nfp does.
+> > You can not do this. Sorry. Hard NAK for this approach.
 > > 
-> > In ice, all the VF representor netdevs share a VSI(TX/RX queues). UL/PF
-> > netdev has its own VSI and TX/RX queues. But there is patch from Michal
-> > under review that is going to simplify the design with a single VSI and
-> > all the VF representor netdevs and UL/PF netdev will be sharing the
-> > TX/RX queues in switchdev mode.
-> > 
-> Thank you!
+> Thank you for taking the time to review, got your concerns, and I'll address
+> the following concerns before submitting a new patch series:
 > 
-> Reading the ice code, ice_eswitch_remap_rings_to_vectors(), it is setting up
-> tx/rx rings for each reps.
-> 
-> "Each port representor will have dedicated 1 Tx/Rx ring pair, so number of
-> rings pair is equal to
->  number of VFs."
-> 
-> So after Michal's patch, representors will share TX/RX queues of uplink-pf?
-> 
-> 
+> 1. Remove allow_switch_interface and have the PHY driver fill in
+> phydev->possible_interfaces.
 
-Yeah, right, we though about solution like in mlx5, but we can easily
-get queues shortage in ice. We need to allow representor to share the
-queues. The easiest solution was to move to sharing queues with PF like
-(I think so) nfp and few other vendors do.
+Yes please.
 
-> > Does mlx5 has separate TX/RX queues for each of its representor netdevs?
-> > 
-> Yes, in mlx5e_rep_open calls mlx5e_open_locked, which will create TX/RX
-> queues like typical mlx5 device.
-> 
-> Each representor can set it TX/RX queues by using ethtool -L
->
+> 2. Rework on the PCS to have similar implementation with the following patch
+> "net: macb: use .mac_select_pcs() interface"
+> (https://lore.kernel.org/netdev/E1n568J-002SZX-Gr@rmk-PC.armlinux.org.uk/T/).
 
-I am a little out of context here. Do you allow also sharing queues
-between representors? API for sharing descriptors sounds great, but in
-ice we also have queues shortage, because of that we want to use PF
-queues instead.
+mac_select_pcs() is about returning to phylink the PCS that the MAC
+needs to use for the specified interface mode, or NULL if no PCS is
+required, nothing more, nothing less.
 
-> > > It'd be great if you could do the due diligence rather than guessing
-> > > given that you're proposing uAPI extension :(
-> > > 
-> Working on it!
-> 
-> Thanks
-> 
-> William
-> 
->
+Plase do not copy that mac_select_pcs() implementation - changing the
+"ops" underneath phylink is no longer permitted.
 
-Thaks,
-Michal
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
