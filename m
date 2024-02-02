@@ -1,112 +1,116 @@
-Return-Path: <netdev+bounces-68575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66CEA84743C
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:10:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B57B84744C
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:12:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95B4C1C230ED
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:10:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CAE71C253D0
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB0EA1474CB;
-	Fri,  2 Feb 2024 16:07:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 309D214A0B6;
+	Fri,  2 Feb 2024 16:09:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UwuTtjLU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P4aG5jaD"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44D6148301
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 16:07:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BB281474A0;
+	Fri,  2 Feb 2024 16:09:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706890038; cv=none; b=flRya0V97Vwzr9So2mTHepk54OJxgPHs8ZIyLg/6mHoquF1Q+FazeTJYjy2e1/pmxfERgDB/BG+4OfTZr+0B5tqqkbNR5vEJDsHPyTvVGqgQVTUZ2dMB+Tp4H3A2OIz+BuoVhGiALZuoSBhwcT8bVqRW/VQ7OEIyECAhNhZMGHI=
+	t=1706890142; cv=none; b=smyy5SyUPmls1IIplr5ikKksAZ0scmx7pc1CJ4sr2VjoODOc1UCOs4oRsdE997MPu921b6gcXBRoPfCtdD28v2fSLaKBg1lZSbPOG0jtsKAD4k/8T11MpxvQTbFvrJz5moTQr8YBdAojHQMMjOEtpniGxo5jftMXIGDzU/HXDEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706890038; c=relaxed/simple;
-	bh=dWqDluAGebC9iUHazZC6G1amxNpPOt/EUwg+LbLuE9U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gfdbTJqn0wSvNUQEZXieaZsn5akZNMoiOLbbbkwLI7pvfrrhEyNM7Q8K6z3CTmEM2mCPKr1VXuXD3Si2eijIqVQtrlUSI0RALJ2YnIOlYz7UTqt3ah7RHWPPXhm8u1iNgpC2mEBB7/MLjYlweDykyMUo2ZxQ3CKiRBICr9xvsys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UwuTtjLU; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706890035;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=TeQN/mgjI+NOMRyCt7BGpixz6liM9dhqEGJXdte70KM=;
-	b=UwuTtjLUmjFzColfSd9+ZY4ps8C53bLKERd+wQJiEMuFtjTMpdpYxSTj2GSVt0Ud2UI6HX
-	qbqSWGO3Huxf8iKB5SRTN2Jnw68BNEO5NgBlLzUVkhqz84DKYX30o42khe0FO0tm/Q95z6
-	zfLkdg/Yod4v+8v8XuIOiaHP78x/BUo=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-237-y4sGsZFIMTuYSlqJTZ9amQ-1; Fri,
- 02 Feb 2024 11:07:14 -0500
-X-MC-Unique: y4sGsZFIMTuYSlqJTZ9amQ-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8D2893C23FC3;
-	Fri,  2 Feb 2024 16:07:13 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.224.216])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id EBA7F492BC6;
-	Fri,  2 Feb 2024 16:07:11 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Xin Long <lucien.xin@gmail.com>,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net] selftests: net: let big_tcp test cope with slow env
-Date: Fri,  2 Feb 2024 17:06:59 +0100
-Message-ID: <f011968fee563eeaaa82bf94e760e9f612eee356.1706889875.git.pabeni@redhat.com>
+	s=arc-20240116; t=1706890142; c=relaxed/simple;
+	bh=ObobwIusGY63NE/2MOWR+NbMWvgKu/d9ZjBL9g2lKRM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EOpYeOqPh6GQVZ3zgCPgFQwWaqB5Rtj39VqE78tyv4nsq9z8fJ6KfGPuezpDdCB/Pmy8LKKhcBoeK6kYFiFn0NgobP9njxaa+xcfaQIMnYx0d+SXbJCYR/11ACLJ2NY/dwkeuJjzExu3FQXK9y7u/HSU0Jycx7HFl9nJHV80lRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P4aG5jaD; arc=none smtp.client-ip=209.85.128.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-6041779e75eso24009227b3.3;
+        Fri, 02 Feb 2024 08:09:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706890139; x=1707494939; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ObobwIusGY63NE/2MOWR+NbMWvgKu/d9ZjBL9g2lKRM=;
+        b=P4aG5jaDyDYRpT+eVdAhqKTboEYgxtCcSFqFddMsR/tA4OfDmGLY5vqhusq0s5DLC9
+         Cg+jgJKUN25AAgBN9xRQp7uvSQiPR4dj1RGfaxL5Qybhh9g9+VEHl8E/9ZijgqZ60wF5
+         I+kWnwOqW9S3X62MeKqXQgJkY25bnnDCTfPUAYT0W/JFkZ1RDLUuq2UZWGtLckdZIT9a
+         gwB+ps0VwjoclkuWq6lGjjH0ghpUsNG9EGQ8YPFVIfk89OzuX1QnFWcUJkHYCVE6+RGU
+         FmdUggw8Ygjmdij6T/amKgnTpH+uoBGKKw2Usx05xbOhEgXHgG1kJZuojuNKtI86i7mU
+         1W3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706890139; x=1707494939;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ObobwIusGY63NE/2MOWR+NbMWvgKu/d9ZjBL9g2lKRM=;
+        b=qbD9G/Gt6DkkCUln5hyv8yKoKL++fXlOOf/djTNWE6YBWO+myS2Go1VoSLWhmC0Xm4
+         ZQbHxHm7mKk0E58FGrfPpkPJaaCj1z2FzxClNFc2G0uFhI6fy011GE1nXmCrQO0i0ONr
+         3TSCKjtQmX69r9GxQ/kvFkhUSvVPGXxhWlrK9Otyg/JMefzdy/yssnvYEAeb5R3QpOQz
+         L2oCBsmylfFtzA5hkv7iOMcEFqUpodvUCuHwMUzCWWTL9jVlRLXGF62R5aUlzK3BEoEY
+         JMucZ2SD73t43dhC0sgmC5j1dPZ2i9cfq6mevdCG6VIfs6ujIJWSyo/IXq61bLTbmY9W
+         T5OA==
+X-Gm-Message-State: AOJu0Yw7nq4Lbg++wqBtxDKPgsQDyU6QGLU+7LmL7WEiiyKK2ehtIMjj
+	Ibd4NOKJCXWOcNbkyVaKw4y5bAhEmlToN/2eeSkO3K/zAKKZvgSEsXWmvDFfBbOT6Lk6EFFmU1A
+	1ggu1a3P23H/fYtclu/VkU+8YtRc=
+X-Google-Smtp-Source: AGHT+IGMWWJJIsEQaIGhd3HotQ+QkJuC6kkshmtHK3UG+EVQsNgMHpDuOqo3DccHZuJCzl1gJq/ilLs/vZ/Z4MzkmfU=
+X-Received: by 2002:a81:441c:0:b0:5e8:92f9:46e8 with SMTP id
+ r28-20020a81441c000000b005e892f946e8mr2730296ywa.30.1706890139331; Fri, 02
+ Feb 2024 08:08:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+References: <20240202101311.it.893-kees@kernel.org> <20240202101642.156588-2-keescook@chromium.org>
+ <CANpmjNPPbTNPJfM5MNE6tW-jCse+u_RB8bqGLT3cTxgCsL+x-A@mail.gmail.com> <202402020405.7E0B5B3784@keescook>
+In-Reply-To: <202402020405.7E0B5B3784@keescook>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Fri, 2 Feb 2024 17:08:48 +0100
+Message-ID: <CANiq72ku9wsHtnPAh5G71Y_pbsftrPPyV5wmDCcZRM+WB6KVjA@mail.gmail.com>
+Subject: Re: [PATCH v2 2/6] ubsan: Reintroduce signed and unsigned overflow sanitizers
+To: Kees Cook <keescook@chromium.org>
+Cc: Marco Elver <elver@google.com>, linux-hardening@vger.kernel.org, 
+	Justin Stitt <justinstitt@google.com>, Miguel Ojeda <ojeda@kernel.org>, 
+	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Hao Luo <haoluo@google.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Fangrui Song <maskray@google.com>, 
+	Masahiro Yamada <masahiroy@kernel.org>, Nicolas Schier <nicolas@fjasle.eu>, 
+	Bill Wendling <morbo@google.com>, Andrey Konovalov <andreyknvl@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, x86@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org, llvm@lists.linux.dev, linux-doc@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	kasan-dev@googlegroups.com, linux-acpi@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In very slow environments, most big TCP cases including
-segmentation and reassembly of big TCP packets have a good
-chance to fail: by default the TCP client uses write size
-well below 64K. If the host is low enough autocorking is
-unable to build real big TCP packets.
+On Fri, Feb 2, 2024 at 1:17=E2=80=AFPM Kees Cook <keescook@chromium.org> wr=
+ote:
+>
+> Perhaps I should hold off on bringing the unsigned sanitizer back? I was
+> hoping to work in parallel with the signed sanitizer, but maybe this
+> isn't the right approach?
 
-Address the issue using much larger write operations.
+If you can do anything to keep it in-tree, I think it would be nice so
+that others can easily use it to test the tooling and to start to
+clean up cases. A per-subsystem opt-in like Marco says could be a way,
+and you could perhaps do one very small subsystem or similar to see
+how it would look like.
 
-Note that is hard to observe the issue without an extremely
-slow and/or overloaded environment; reduce the TCP transfer
-time to allow for much easier/faster reproducibility.
+Something that could also help would be to split the cases even
+further (say, only overflows and not underflows), but is that a
+possibility with the current tooling?
 
-Fixes: 6bb382bcf742 ("selftests: add a selftest for big tcp")
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
- tools/testing/selftests/net/big_tcp.sh | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+Thanks for working on this, Kees!
 
-diff --git a/tools/testing/selftests/net/big_tcp.sh b/tools/testing/selftests/net/big_tcp.sh
-index cde9a91c4797..2db9d15cd45f 100755
---- a/tools/testing/selftests/net/big_tcp.sh
-+++ b/tools/testing/selftests/net/big_tcp.sh
-@@ -122,7 +122,9 @@ do_netperf() {
- 	local netns=$1
- 
- 	[ "$NF" = "6" ] && serip=$SERVER_IP6
--	ip net exec $netns netperf -$NF -t TCP_STREAM -H $serip 2>&1 >/dev/null
-+
-+	# use large write to be sure to generate big tcp packets
-+	ip net exec $netns netperf -$NF -t TCP_STREAM -l 1 -H $serip -- -m 262144 2>&1 >/dev/null
- }
- 
- do_test() {
--- 
-2.43.0
-
+Cheers,
+Miguel
 
