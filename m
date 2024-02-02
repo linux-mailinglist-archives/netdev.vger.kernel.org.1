@@ -1,104 +1,75 @@
-Return-Path: <netdev+bounces-68582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 014EB8474A3
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:25:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CE9C8474B5
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:29:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFF09292977
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:25:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF6BE1C260EB
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:29:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9E11474C3;
-	Fri,  2 Feb 2024 16:25:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09C8D1474D4;
+	Fri,  2 Feb 2024 16:29:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yqe8jl7E"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dMzpstna"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D2571468FF;
-	Fri,  2 Feb 2024 16:25:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32B421487CC
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 16:29:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706891124; cv=none; b=j5W7SvUi479Xt4MM92Hkg5aU+oLmMRxSG61FGRi4O3dR8rLUV1j0A2yhDtzvJoSJFa1lLgK/+uavEr14RuBEOLXug6xPtY+Jy5TeWdUU/72wV/teF2GPyD1dTYGKlUK7ym0QaCsEbPFH4j4gRbitnSCsSYz+tC2LZDS7lcz3Qj4=
+	t=1706891384; cv=none; b=lLJtbsLaNjk/+iiRcy16D6174mORRsPYjxZkW1+V7KOIk//3+gHfJRzZiADJZmgw1NH+PIvBjNHSUNDXBd9KiyxQc/81Zdd5gnfDqIqWuSBkZrAZTqh3HqvvjSnQYorC0Bbu0vnVGhHOIqlILhIrHVLy0C6LLyr0GTmyGUnOG2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706891124; c=relaxed/simple;
-	bh=5k8mKkVdz5DWjDbMmA5DXVLJ+PTi+mk9o+WFQB+6iB8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j6VGVmxdB/TOC8M/dzlKyn7n+UzDxQfo5L2JxR355yYs+bouWCrLPQRRRIRtXH7DHSy/BXK8EQR4mdFr/KM1GNV7D+Tae7TFf7FtK/fHdKRo0TC9FLWlmQhh/3haL/3m/HwuJeDROHshrysxlxBB/N6lVJtKarfoK8yXMwCD/gY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yqe8jl7E; arc=none smtp.client-ip=209.85.166.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-7ba9f1cfe94so102439739f.1;
-        Fri, 02 Feb 2024 08:25:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706891122; x=1707495922; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5k8mKkVdz5DWjDbMmA5DXVLJ+PTi+mk9o+WFQB+6iB8=;
-        b=Yqe8jl7EUQwTGVqNY1Y30jS7YpVyAZUjPztIoE5/fUn9Fmk7gZ37WPC9XZD98YL5wL
-         ygSo5IuY5SnVmttl3+hnuF/7WZShqK3PQWO6kt/kjhD8IdLMt9NgzplKPb41IOP8atdn
-         LQ7T9rOTfMS6xJsSsivQk/usGRE9P9pd4nKiNZx9vuApSqDONI8kmcaPpcc9t5o55NyB
-         4lGSj9KjGNoSdpayvGI7XBo8jjS5kfyUMP+4IR3r48cZsAQlIIPwIcwBr7WKuOPwOQWX
-         Tk6zbDJ3z0Mcgd4EpE7e8Qixdzxi00wRZXPQrwyHZ9oLeMVEPa6664C1xiqmwhrbxgfF
-         7WEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706891122; x=1707495922;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5k8mKkVdz5DWjDbMmA5DXVLJ+PTi+mk9o+WFQB+6iB8=;
-        b=DE/jUwgv0W3lfH096jcyOFMdlGMLRQehIenRT9eQo+PAsHitGVJOHZllPNiunXEwJC
-         e/ORZ4aN5jwodg/YzR3viXLKta1/MLXpnTOdgpyPUeTuzyT+H0kcjDraEsUZowfRoQOP
-         FB2W+zU6HJcB7Rs0MbiDKn8JN/X3Ce4POpAkiEgMYxvfMHoURHlqSQNlRWfn+tGMuot1
-         XelUV6TK3rhP6RcNAbW6m/E90nKEQ4d8Vus4Jl6aD+E+kXEGtNL76mfcd3UE9yhQucj+
-         LYCCgVYRvWiLdOdiYbgimjwf8s3q4WGaQ9zCu7lqoCsVMQ2FZhAnrcZffJcLi6HNls74
-         hgCw==
-X-Gm-Message-State: AOJu0YywPw+OKNnnBon9amRyC/OOt/VKz0HaPcWvRSCuhzSdrs3A5m6W
-	e0NRKhWWPcrbc2LeA0KdkWuPHh54C8W04CYWnyuIReeFTdvfZNgVPNePByzX+97ysIo2Qgj7Pgk
-	eWnI71kci2Himgtg++4AMBO8KUW8=
-X-Google-Smtp-Source: AGHT+IGODY0ZLWoVirFF+z0KGkDtRIBITBqgb9qbMw2pbSlc+t5obb4QxW83V0s+9ue5Wua2TMbj3bITgfy8p5FtWA8=
-X-Received: by 2002:a05:6e02:1a2f:b0:363:9f5e:c449 with SMTP id
- g15-20020a056e021a2f00b003639f5ec449mr2292546ile.1.1706891122103; Fri, 02 Feb
- 2024 08:25:22 -0800 (PST)
+	s=arc-20240116; t=1706891384; c=relaxed/simple;
+	bh=McgEpCiFTpylFCpGen6Xfmt1DMBsDcHEmnCVtUO5fVs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EcT6LMZXQanIt7h9zGsnCYLNjXYfAPiP14wyj552LgclSsNem5r7GBTk1Ud/ccEHpd5/MxjCBWl5dSW4YCZqhuyXu1VluwLLjZpvM4p03IO5HNfP9JIoHzrOf+z7dmJiZxSsBb4nkWkqANxMKByAY9GCWsP3MHKIq8+4Wyh4uq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dMzpstna; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=2QtvlCQUTzGp99EIP/bc5eVXD45PDHLpjOvv370HWtk=; b=dMzpstnaTu0Q2jAuj/SE7au+YD
+	RsfLMRrnb8yOSyed/jIltx6mb+VV+Qt1Wbth6h/p+B1AJ7xM79OVRsaiVKzKbwECSfRM+mdF7kayC
+	dc4ojJe6MFWYvJrGjKCg+w+tyhq8Kg2VoiR2+NFZQu59n2cLzTomn9TiYCSTDVkW66Ho=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rVwQ7-006pDw-K0; Fri, 02 Feb 2024 17:29:39 +0100
+Date: Fri, 2 Feb 2024 17:29:39 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Florian Fainelli <f.fainelli@gmail.com>
+Subject: Re: [PATCH net-next] net: dsa: reindent arguments of
+ dsa_user_vlan_for_each()
+Message-ID: <b9b90933-d3d2-4231-ba65-2d0e8d556312@lunn.ch>
+References: <20240202162041.2313212-1-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <f011968fee563eeaaa82bf94e760e9f612eee356.1706889875.git.pabeni@redhat.com>
-In-Reply-To: <f011968fee563eeaaa82bf94e760e9f612eee356.1706889875.git.pabeni@redhat.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Fri, 2 Feb 2024 11:25:11 -0500
-Message-ID: <CADvbK_cWU8-Ydo6rcOPm9MOJVhTPYyYSGX3ZTNUvJVR9ZkstKQ@mail.gmail.com>
-Subject: Re: [PATCH net] selftests: net: let big_tcp test cope with slow env
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240202162041.2313212-1-vladimir.oltean@nxp.com>
 
-On Fri, Feb 2, 2024 at 11:07=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> In very slow environments, most big TCP cases including
-> segmentation and reassembly of big TCP packets have a good
-> chance to fail: by default the TCP client uses write size
-> well below 64K. If the host is low enough autocorking is
-> unable to build real big TCP packets.
->
-> Address the issue using much larger write operations.
->
-> Note that is hard to observe the issue without an extremely
-> slow and/or overloaded environment; reduce the TCP transfer
-> time to allow for much easier/faster reproducibility.
->
-> Fixes: 6bb382bcf742 ("selftests: add a selftest for big tcp")
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Acked-by: Xin Long <lucien.xin@gmail.com>
+On Fri, Feb 02, 2024 at 06:20:41PM +0200, Vladimir Oltean wrote:
+> These got misaligned after commit 6ca80638b90c ("net: dsa: Use conduit
+> and user terms").
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
