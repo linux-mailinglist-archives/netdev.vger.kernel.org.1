@@ -1,296 +1,246 @@
-Return-Path: <netdev+bounces-68735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85FFD847CEA
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 00:09:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 517C0847D19
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 00:18:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB1FF1C22553
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 23:09:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B59CA1F28085
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 23:18:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93E7112C7F1;
-	Fri,  2 Feb 2024 23:09:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oti5Grmb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 000BA12C7E6;
+	Fri,  2 Feb 2024 23:18:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05olkn2031.outbound.protection.outlook.com [40.92.91.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1D1126F2E;
-	Fri,  2 Feb 2024 23:09:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706915351; cv=none; b=RY/cVo60Sf2Y2iHg0xmQHW/6f4QxcvXdC7JlWs2htcRikVL4Y1mU2j3jP95bnPBjDi3P2Ru1yW6nIvpzX0/mpsXJ8KFUfc3bVHdPtxOrppLSCDYtUjtzQ1RfSb8qBfOiciJ/+BJdrCC38pI2PmyEYkt3W4LNQ88WZj2ZYaVKKpA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706915351; c=relaxed/simple;
-	bh=Wo7+jDfk5sZHf8MlrGXUXrmEpHHugcRqmAit0yROqao=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SAk5EXHev6d39bB0XVN6DpaLApfwzIgpZk4fKpGuQhiAWLmGQqgNCUlr0MlKDKv9/AZaZPwvIo8/S1/2u3aq+QKykL91aZAiWKe3X7EeRvJj3KX8PLzJSIUOHKwzt6EfJwZdRPyulMbiLx8WqUN9gvXgWwAmxnx7w4VhAq6YOtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Oti5Grmb; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1d73066880eso22707665ad.3;
-        Fri, 02 Feb 2024 15:09:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706915349; x=1707520149; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ns/bvPkKWqK4cT5hwWAJS7KQis8SRbW6Visd6BLTiUI=;
-        b=Oti5Grmb+FX3pffdtZQhqx/Tdi7NzpBBggod79wgb9rLNDFh/ZhoWUKAX6bKD/InbI
-         VtrsuECkASUfC7nwkKwB6DTR5f2CKqYw3iN44mSfTjY8UYOX3lXqtRY/ZQw2yoSC4CzH
-         znsNzQC+unksr8nEFMtHPGAbOAcU/ogQ3eE8OupkZn3f8VIU1HlX5UjsM1akkKVyUCF9
-         M2HpPPq0LYRwRXQ/7MrX812nQkLH6moptx+83fn8OGnaSuM4eSprJsKhXkFvWKyVdkU8
-         xG14TBQah2G/jpSTx2whi0E/qrWb9hChs09fE8RxEdtm1UxtoPa144Ur9RnGqe0RJpa3
-         UdzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706915349; x=1707520149;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ns/bvPkKWqK4cT5hwWAJS7KQis8SRbW6Visd6BLTiUI=;
-        b=IIyZAwUD6hrnLwWowj7TCQj3ka+HjAeIK1BCcIjbDWYspeqktsVDEAFXmDtKa5uFJC
-         BfCMMUNp9HdM4McEsB5CkNelkz/C89/ev3psbiNZmjBmVON8cgKZvxT4Gg0GPoLkXpu4
-         q3fdlkZ33B9IXd/joT4SWZ42hihXJfwmgpODzps5KIKgy4JkCeHxtcZrGbmdm716A5G3
-         4/T13wrMQOdlnV7BkQmiaegKNCZysGdtw+OQCa5PozphDv1jivUj4LibfsV5I7A5BLDG
-         lCx9KmjTT0Zr5MdSNYA2FTWE2cfb9FgLMDZTw/tcpt+0IFmhosbklTJfIlV0edZ7ra6L
-         c71g==
-X-Gm-Message-State: AOJu0YyzvhhN1H8eWGv1JoHVz9PSFJXNLlGu0t8lOJJgLWVS1nIwJi+E
-	3QncgSz2tyI8x2uCv2P+Wah4qxyUHacPmBwCxwTFws+SznUIcKbC
-X-Google-Smtp-Source: AGHT+IFxxTOrsdYhKRWr9e6jHbv8TCklGcEQIE8BSnW/BV4FuD23/hWYjE901pv5pKGyJLGFlLZjBQ==
-X-Received: by 2002:a17:902:b194:b0:1d5:c08e:52eb with SMTP id s20-20020a170902b19400b001d5c08e52ebmr8168069plr.65.1706915348583;
-        Fri, 02 Feb 2024 15:09:08 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXh8AopKfi/YqWmfKiAwlQ/PCijITod0oFhPh7EZgbe4IqqVCTYplEzVZLk725jsEN7/jjrF3+q6jwqjZIAWgtFJwhn9qmdKmzSh1WTQWyzKIR3Vu1RR9VOQ/mVdMEOrdQtYnhjryw1mdCQexA9JgKi6G6x/jm8n0qLhDny1Uyh9vw8IV8OyRb46UVpGGduitQ9ram54QIx/Q4+QDflTEF+IDMbGP6LDutZoBqdGyGeIDaHWDuGJjeQGgpi3kWxY6Mxokz3ztlOAqOGqeQDd+PFxUQapdW8eUtWM9krlaYdDID3UIGv6Ao+xrLQWDCxkdxkdWrDdbxlfq5IiqlrLk7HA0UnJpJ4jkFfgWd75iHDEi8ZdxAD0XE06DRBlvejpEon3X1Owg03SqEYrAL6rJdyOqiuNnhveN6rok4raRhfJSFqktdoCqF5aru6yMErGbiCNxd0+0aDnqt1T1XYbEGqcirlu5DKCtQ6o6ulW7Vylya1gXBRqZMMo8UuNV9ealWnc8Uf9Vfw1XOhHZ4j41gYSibJO6X/qQ9m3wUuH/DVujlBkGxKAkVqWMc+Wc4KsIxm/EtloqOHI0LTPMMffFTsW5xMa5t9igm/5IU1NvJ0UaL1KXIbvnzxQdLod4WO3cP7eM+SLAzmpsRCYZ37BA3OS0HH2DSw/vYCAqccICCfyklhIqIq0wBZrEXbqubqWvBOtecAaQ==
-Received: from surya ([70.134.61.176])
-        by smtp.gmail.com with ESMTPSA id c9-20020a170902d48900b001d9557f6c04sm2086428plg.267.2024.02.02.15.09.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Feb 2024 15:09:08 -0800 (PST)
-Date: Fri, 2 Feb 2024 15:09:05 -0800
-From: Manu Bretelle <chantr4@gmail.com>
-To: Daniel Xu <dxu@dxuuu.xyz>
-Cc: linux-trace-kernel@vger.kernel.org, coreteam@netfilter.org,
-	bpf@vger.kernel.org, linux-input@vger.kernel.org,
-	cgroups@vger.kernel.org, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
-	fsverity@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	netfilter-devel@vger.kernel.org, alexei.starovoitov@gmail.com,
-	olsajiri@gmail.com, quentin@isovalent.com, alan.maguire@oracle.com,
-	memxor@gmail.com, vmalik@redhat.com
-Subject: Re: [PATCH bpf-next v4 0/3] Annotate kfuncs in .BTF_ids section
-Message-ID: <Zb12EZt0BAKOPBk/@surya>
-References: <cover.1706491398.git.dxu@dxuuu.xyz>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEAE41EEE7;
+	Fri,  2 Feb 2024 23:18:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.91.31
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706915902; cv=fail; b=rKk4KqEHJiw2Lk/AYaGdXpbzeru3aJucakwSZ33o+Bf5/ay5UR7JYK9Qn6RzVRA7hqpHr9q+g72ymPfUaObLxSTM2VJk4fL3sMXvpjN40M4DYpvfYX8kXLNOoZ052A6I6NNaM/v5J/km7UMiNEn6PIOcCze9Ee0dWnXgU5FchUs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706915902; c=relaxed/simple;
+	bh=IyXJvgNuIwsdXWlqvyjeSsFUL34V47fn6nw4rmsV9jA=;
+	h=Message-ID:Date:From:Subject:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=YdY1cN2CgoQQ5UxfglKSLC92oa5LAO/lNs4Cbwjx0Dhx8S1gwYK4jEHfb3xA76SNR77qQ6CcDDBNewD3+UmSEyse6oKoCStkrer/eGLatKKpDu3Rve1JJFE7jds1EkHJPzCP8/CnL633W1cq6RgeliqR92In/Iz0mztKfsF7X8o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.it; spf=pass smtp.mailfrom=outlook.it; arc=fail smtp.client-ip=40.92.91.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.it
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MuF1p+SAlAGZc4U9TXZLSVR1CBagMKYykciXhgNzfPYhOOJdS9EebUMhkNQ3/11wmQFvOL/9+IeeJPhxZYnbzwY7TAGsu0IpQoWy9R5sHXvP7yvPKFo/qmBgW+3gwk6JIeh7moQdgwOO3+pQ+zV0FGICtqEtTll9Go+uQX33268/ghvCFHvmVuXOJejAr9waXldwct4Srpx0RzwVN+jRwpaM0CIrPAD5tYVTdPVyPPSfvR7k+5kxpgkV9L2pA30aYDYMa6Rv2bCp7Dt0D1VQHU4F+TKiahrLorS1D4FtC73xEWEdnHEtn/rR0oMokL6dPpgm4q1XpH1hIOGmmTplIA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+UckP0dmTkqRTCU1OYbtyYJ1mg4WuQhLwmHmqYOoZZw=;
+ b=OJrQCueJg3uJEf320rB24d4rcaa6U3FKlI4tOZ2yx4I5RjsbOnusZCgmK6N9F3Rw7/WwVbJaU7h7g7lgx0171ODhZlJrspjpBKZx9cmTbj5ir16t3ClkNl44bFxyW7Lvmv0duPUMy2XOuXamajnWCjfATISo2tVOAexZutwnwqmT+2iCr1WxGL3RYuI+GSET4uBaNWu18Fsd0X3NOZ1cYKjt91A/Z4++ZM0Ps778crg2D0io15ypjzWyN6QHfJxUk56jcFmvqH+qGg/cYja6i0QCXLN8vOyMCIsC2GPRgcfRu2zhg6v9Iigw90DmYWJUCbAkRYokK9Rea6eJCdO0fQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+Received: from AS1PR03MB8189.eurprd03.prod.outlook.com (2603:10a6:20b:47d::10)
+ by AS8PR03MB7239.eurprd03.prod.outlook.com (2603:10a6:20b:2eb::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.31; Fri, 2 Feb
+ 2024 23:18:16 +0000
+Received: from AS1PR03MB8189.eurprd03.prod.outlook.com
+ ([fe80::ffb3:3ff8:6ea9:52b5]) by AS1PR03MB8189.eurprd03.prod.outlook.com
+ ([fe80::ffb3:3ff8:6ea9:52b5%5]) with mapi id 15.20.7202.035; Fri, 2 Feb 2024
+ 23:18:16 +0000
+Message-ID:
+ <AS1PR03MB8189D48114A559B080AF5BEA82422@AS1PR03MB8189.eurprd03.prod.outlook.com>
+Date: Sat, 3 Feb 2024 00:18:13 +0100
+User-Agent: Mozilla Thunderbird
+From: Sergio Palumbo <palumbo.ser@outlook.it>
+Subject: Re: [PATCH net-next] net: sfp: add quirk for OEM DFP-34X-2C2 GPON ONU
+ SFP
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <AS1PR03MB8189AD85CEB6E139F27307D3827F2@AS1PR03MB8189.eurprd03.prod.outlook.com>
+ <ZbZn8oCiyc1aNPuW@shell.armlinux.org.uk>
+ <AS1PR03MB8189B99C360FB403B8A0DD6882422@AS1PR03MB8189.eurprd03.prod.outlook.com>
+ <Zb0t+zKHx+0wTXH5@shell.armlinux.org.uk>
+Content-Language: it
+In-Reply-To: <Zb0t+zKHx+0wTXH5@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TMN: [ndP3sb6i8tlPcCS47fFEJhc8VYazFblxJxunVHwgQQGBdczloJ6YbeTbv0Y2W28F]
+X-ClientProxiedBy: MI0P293CA0014.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:44::14) To AS1PR03MB8189.eurprd03.prod.outlook.com
+ (2603:10a6:20b:47d::10)
+X-Microsoft-Original-Message-ID:
+ <d28a1b4b-4809-483c-ba32-1eaef4421122@outlook.it>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <cover.1706491398.git.dxu@dxuuu.xyz>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS1PR03MB8189:EE_|AS8PR03MB7239:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4ce0a2a5-ff5a-4e8d-d2e2-08dc24453c40
+X-MS-Exchange-SLBlob-MailProps:
+	AlkLxVwsndnKCvQ/MAtVGZuRYfxhVfNmT+28bNf9n2b2i8hcFKXFyisW1vO/MASiwLp9KRyyjqn5Vo0S6JN/w6nxexuls0ZkYxsHcfJA6Lwqy5h7j9Jb/J7PIlDQhRR0p8YyZel341FVEzLbtxjcJC2au2XQeJ8JlN1Zh2B6vV0XVUsL9M8hjkiKrs58/nKzznjUSnbGpLwVx3zYiC/p2S+whblePZPCOGaVXIBg+NM7huwdcJJ0LU66V4+7qd7ck4Zs2tMCyFEOdF2rLknEEFjqQGb5SZ7lS+ZxcDT+8Jdb4ir2CCMowX5Ee9KYoJfjukmYP9yl8R3XtN8anra9LBYqFN3EJ94AymcJK3D6MSQs6EGP4I+KHwKR3cLlJH3Yhwj/Z1rgckH+18ARABtG1eGETTL0vXA8VLW57d7yrCXsHRqnpUtO2H35st88ltBQIAq2e5ni3gajoFuDVReynWJf8IwduFZJyyAAqw5OEXSOjJz+ycfOdy0jesfEywzhMxV01KhN1vQ4m8M9sltz6BkZgQurs7kVgDsyxn2idI5mfFEjY+rPb4s06qOMBXPiA4Agj+roe6Whu9cP6cmnZ0AyAAHRQGbc9Vvu3KeMvn19kIx6p5C5VqcdrcveUfYXGXgwVAu34MM9gssBEjTCDG3tq7sRrvUkWh+2cxhhKx9i/SHBqMNNfSugSLLEnwPsFKn1zUyCy/uwSNawuwKdbo6amPmW+meNdcdh7vzZaOnhqWBWERzV3Zz+ELUmopfhKHocUnpJyo/W1GUa3ybPbfbuVV9/5I+3
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	7iS6l6aqRq+6EuXAxTLfdOZwJD2scjPmZorSo7YKROEfMB3iTtcpfURfm8Z9wIXCg7XeztYIvFw0nPQBaKGIiBHVYthG3paVZITpLFBjFhvrV65ZDqpJwlsWul1IuQ0fH9PfM+a2+ZcqdGVFzovPQ+E/IPPo3all9Q5ys2zSMGBg3Z5i6gu4E7NPZOa7KivQjy+x+GDrzQL1w4M9iPxiAQ6ZMQDdKtOD02nZLul0UxSFLBgW7GG7IEA/uyjLzacf1o3LrAi46TkqfxF6XrYvk8Mj4J929dZiYCZdNJmMHLGzfusW67qq2ge+aZFWpZFtDqo5fVAU4KKCq/Xmn7Nv0tHXb+mY8ZVttg9vx4gpjnQAnuYCOyxWYE9nJ+gOZ13fVTq26T3hU21ZO9CuMxDW9cfUeSY6s7Te4Itx+6mWas22s8jqkMBsF5lAYoX7XGyh7v3J4FrX1fDEXQeVaoXOFnFLy3qtpvA1jKBvJ+Kl57ClZgPPRpGgdmMwCcGzjU4HtE3bSZQqcmEvD5nyrh+aZb5WEfDMO88fHmnS1pM8FEM8u0XkwMKTv8HVOJQlQ0yk
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Tjg4bEhKTHBjeWRWZmFCSWU0WFJJUU5oQThSdWZETzc5cXN0eE1hTE1WbVkx?=
+ =?utf-8?B?THZPak9jYU1WWTNtTzVTUFBLMUM4b3dmVzJnWldIYXMzZXZGUXhZZ2pDU3ho?=
+ =?utf-8?B?VmpOUXI5SmIxYklqQ1haRHptUFNxV29rMHdOZ05nOGMzMHU0RWVMSDNTbzc4?=
+ =?utf-8?B?dEswd2kwVFpjVmZoYmFtTFVGNWd2ZmlGR1JMMUdoYTk2cHdzdWh2RkVUc2Fz?=
+ =?utf-8?B?VWZUNWxJT0twUzJNdDhySG9nVkJHenR5M3ExMlNTYW1peXRHZDdHK3dGSDNt?=
+ =?utf-8?B?SmhVMGdLVDd6a2tiRG84RFY2MW55RjNvd213V1BZVnZhbEdSQzFWS3VuUnEy?=
+ =?utf-8?B?SjR3Z1g5ejRQSEtDTWx5NG1hbHNYRjI3eFhOS0lNeEh6enVYWHhIOTJ2dHlw?=
+ =?utf-8?B?T080NzNndGZLSmFOOW1nMWZURmh4R2VnQ0wrbi81a3RaSmRjRk5WTTVzSEsz?=
+ =?utf-8?B?WkpacjRyUGdmb0ZJdDdTdE0yZEZSM0xVVFYvWVg2UVhEcjlhYkVlTG1ZandM?=
+ =?utf-8?B?bHMrbVpPSHNvMWg3aE93OHNRMkFNL0Y5NFQxdGpaVDhNaUlJTFI3bU16Yk13?=
+ =?utf-8?B?bzBCVi9uTkdoMGpNSkt2aVZqamJ1c1daWWdaZzJ1NWV2MnZ1ZjBhSFVvVmhR?=
+ =?utf-8?B?YXc3NTJFUllmWWpXVG9Xclc4U2hqbzJZdXFlV1VJajN1REV2TStJMlFXaWFa?=
+ =?utf-8?B?VkRSakwvdzhnSFdncEJ3blgrMEwrWjM0b0NUWERqeDUvUFNLeTBVeTZ1aFFy?=
+ =?utf-8?B?TFFDNjZCMCswaUQrYUlRMEl2RDduMWlOTVdVRXVMdU5jNE90aDJwQmdiT0Jo?=
+ =?utf-8?B?SE9MUzUyY05sUStiVVY0NDg2TU5TdlFWRVpWREpMRTA4bUpVVy9KUzFVMXox?=
+ =?utf-8?B?OWJ5QTdoU0ZsR0JveXN1NDFYOWdSWlZwZGQ1MEp5ODE0c0o4ODhxRTllaWo1?=
+ =?utf-8?B?cXIvQkJyT0RpQUhTQkxpSTlGcnZVZEIvTkJqYkJwSU1kSm5oZ0xjNCtWa2tN?=
+ =?utf-8?B?cVBMVHFjbVZzeHJGejV3Y0NHZDBEUmFXT3VEN3lQRXpJQmNnaURsZXhIamNs?=
+ =?utf-8?B?WHFQakJLa1JHNDlxbVlsQVRVbW9XU1RIT0FOTTFRTnZzNk1uZjBWMU5tb3Ar?=
+ =?utf-8?B?MXBBT0VDdDJhUGRqaHcxRWF2OTFxRWhoWUU4U3N2cGM5MFRYK0cyQ0YrRFNz?=
+ =?utf-8?B?dnlHR1JYUCt3YUhoakNReUFacFBaUzdKdUlsdWZ2dHRZSDVWdE5BMEVaRms1?=
+ =?utf-8?B?QXBKYWdrTG1IMTRaRkVMOUlsS05VWFZGQ0NkT2s3Z3oxZXFTY3lOWUIrR0Qx?=
+ =?utf-8?B?ZnVWQXAxc2pYQUU1QWxpOEU2dW16WG10R1FwNjhVQlVDREZyM2MrQm5JZVB2?=
+ =?utf-8?B?ak9LMnhmM0xxSno4TzB5ZVdseURqa1ZMRFBQaGdaZk5MZXp5WE9ubmk0UFJD?=
+ =?utf-8?B?d0xvamRCcSsrKy8rTVlRWi8wM1BlSFhVSExzMnVnaUN4U0V3QVpJRjFCeUgy?=
+ =?utf-8?B?WFpUTFlURDdQS1IyZ0lMNmNhdkF6SEYwK3lpRm1qQUQ0M1FEY1VPeUtkMzV0?=
+ =?utf-8?B?aVZyUnFnMHNQVXYrTlZJODlqdm5iRFc4TUxiRzJYclpSd0dCamswazZpLzdB?=
+ =?utf-8?B?TE00SGJSZnpJOE8rSnlqMDFyb2lVT3Jqb0JWU1MxbnRvR01WNjVVMHJabEtR?=
+ =?utf-8?B?YUZzdXVXSkZtbTFoVnMrc1dsNjMrMHRIMko1cWpuNmhxNmJlenNZc1IzdWJQ?=
+ =?utf-8?Q?S4GmRw6kl0nUNl68vI=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-10f0b.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4ce0a2a5-ff5a-4e8d-d2e2-08dc24453c40
+X-MS-Exchange-CrossTenant-AuthSource: AS1PR03MB8189.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2024 23:18:16.6147
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR03MB7239
 
-On Sun, Jan 28, 2024 at 06:24:05PM -0700, Daniel Xu wrote:
-> === Description ===
-> 
-> This is a bpf-treewide change that annotates all kfuncs as such inside
-> .BTF_ids. This annotation eventually allows us to automatically generate
-> kfunc prototypes from bpftool.
-> 
-> We store this metadata inside a yet-unused flags field inside struct
-> btf_id_set8 (thanks Kumar!). pahole will be taught where to look.
-> 
-> More details about the full chain of events are available in commit 3's
-> description.
-> 
-> The accompanying pahole and bpftool changes can be viewed
-> here on these "frozen" branches [0][1].
-> 
-> [0]: https://github.com/danobi/pahole/tree/kfunc_btf-v3-mailed
-> [1]: https://github.com/danobi/linux/tree/kfunc_bpftool-mailed
+Hello Russell,
+thanks for your  explanation. I have to say that:
+Module default is LAN_SDS_MODE=1
+Host banana PI R3 supporting 1000base-X + 2500base-X
+I would update the table as follows:
 
+The current situation:
+Host supports		Module		Mode		Functional
+1000base-X		LAN_SDS_MODE=1	1000base-X	Not tested, but expect to work as 1000base-X + 2500base-X
+1000base-X		LAN_SDS_MODE=6	1000base-X	Not tested, but expect to work as 1000base-X + 2500base-X
+1000base-X + 2500base-X	LAN_SDS_MODE=1	1000base-X	Yes
+1000base-X + 2500base-X	LAN_SDS_MODE=6	1000base-X	Yes (host forcing module at 1000base-X)
 
-I hit a similar issue to [0] on master
-943b043aeecc ("selftests/bpf: Fix bench runner SIGSEGV")
- when cross-compiling on x86_64 (LE) to s390x (BE).
-I do have CONFIG_DEBUG_INFO_BTF enable and the issue would not trigger if
-I disabled CONFIG_DEBUG_INFO_BTF (and with the fix mentioned in [0]).
-
-What seems to happen is that `tools/resolve_btfids` is ran in the context of the
-host endianess and if I printk before the WARN_ON:
-diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-index ef380e546952..a9ed7a1a4936 100644
-  --- a/kernel/bpf/btf.c
-  +++ b/kernel/bpf/btf.c
-  @@ -8128,6 +8128,7 @@ int register_btf_kfunc_id_set(enum bpf_prog_type prog_type,
-           * WARN() for initcall registrations that do not check errors.
-           */
-          if (!(kset->set->flags & BTF_SET8_KFUNCS)) {
-  +        printk("Flag 0x%08X, expected 0x%08X\n", kset->set->flags, BTF_SET8_KFUNCS);
-                  WARN_ON(!kset->owner);
-                  return -EINVAL;
-          }
-
-the boot logs would show:
-  Flag 0x01000000, expected 0x00000001
-
-The issue did not happen prior to
-6f3189f38a3e ("bpf: treewide: Annotate BPF kfuncs in BTF")
-has only 0 was written before.
-
-It seems [1] will be addressing cross-compilation, but it did not fix it as is
-by just applying on top of master, so probably some of the changes will also need
-to be ported to `tools/include/linux/btf_ids.h`?
-
-A hacky workaround to cross-compilation I have is to apply:
-
-  diff --git a/tools/bpf/resolve_btfids/Makefile b/tools/bpf/resolve_btfids/Makefile
-  index 4b8079f294f6..b706e7ab066f 100644
-  --- a/tools/bpf/resolve_btfids/Makefile
-  +++ b/tools/bpf/resolve_btfids/Makefile
-  @@ -22,10 +22,10 @@ HOST_OVERRIDES := AR="$(HOSTAR)" CC="$(HOSTCC)" LD="$(HOSTLD)" ARCH="$(HOSTARCH)
-                    CROSS_COMPILE="" EXTRA_CFLAGS="$(HOSTCFLAGS)"
-   RM      ?= rm
-  -HOSTCC  ?= gcc
-  -HOSTLD  ?= ld
-  -HOSTAR  ?= ar
-  -CROSS_COMPILE =
-  +HOSTCC  = $(CC)
-  +HOSTLD  = $(LD)
-  +HOSTAR  = $(AR)
-  +#CROSS_COMPILE =
-   OUTPUT ?= $(srctree)/tools/bpf/resolve_btfids/
-  @@ -56,16 +56,16 @@ $(OUTPUT) $(OUTPUT)/libsubcmd $(LIBBPF_OUT):
-   $(SUBCMDOBJ): fixdep FORCE | $(OUTPUT)/libsubcmd
-          $(Q)$(MAKE) -C $(SUBCMD_SRC) OUTPUT=$(SUBCMD_OUT) \
-  -                   DESTDIR=$(SUBCMD_DESTDIR) $(HOST_OVERRIDES) prefix= subdir= \
-  +                   DESTDIR=$(SUBCMD_DESTDIR) prefix= subdir= \
-                      $(abspath $@) install_headers
-   $(BPFOBJ): $(wildcard $(LIBBPF_SRC)/*.[ch] $(LIBBPF_SRC)/Makefile) | $(LIBBPF_OUT)
-          $(Q)$(MAKE) $(submake_extras) -C $(LIBBPF_SRC) OUTPUT=$(LIBBPF_OUT)    \
-  -                   DESTDIR=$(LIBBPF_DESTDIR) $(HOST_OVERRIDES) prefix= subdir= \
-  +                   DESTDIR=$(LIBBPF_DESTDIR) prefix= subdir= \
-                      $(abspath $@) install_headers
-  -LIBELF_FLAGS := $(shell $(HOSTPKG_CONFIG) libelf --cflags 2>/dev/null)
-  -LIBELF_LIBS  := $(shell $(HOSTPKG_CONFIG) libelf --libs 2>/dev/null || echo -lelf)
-  +LIBELF_FLAGS := $(shell $(PKG_CONFIG) libelf --cflags 2>/dev/null)
-  +LIBELF_LIBS  := $(shell $(PKG_CONFIG) libelf --libs 2>/dev/null || echo -lelf)
-   HOSTCFLAGS_resolve_btfids += -g \
-             -I$(srctree)/tools/include \
-  @@ -84,7 +84,7 @@ $(BINARY_IN): fixdep FORCE prepare | $(OUTPUT)
-   $(BINARY): $(BPFOBJ) $(SUBCMDOBJ) $(BINARY_IN)
-          $(call msg,LINK,$@)
-  -       $(Q)$(HOSTCC) $(BINARY_IN) $(KBUILD_HOSTLDFLAGS) -o $@ $(BPFOBJ) $(SUBCMDOBJ) $(LIBS)
-  +       $(Q)$(CC) $(BINARY_IN) $(KBUILD_HOSTLDFLAGS) -o $@ $(BPFOBJ) $(SUBCMDOBJ) $(LIBS)
-   clean_objects := $(wildcard $(OUTPUT)/*.o                \
-                               $(OUTPUT)/.*.o.cmd           \
-  diff --git a/tools/testing/selftests/bpf/Makefile b/tools/testing/selftests/bpf/Makefile
-  index a38a3001527c..5cd193c04448 100644
-  --- a/tools/testing/selftests/bpf/Makefile
-  +++ b/tools/testing/selftests/bpf/Makefile
-  @@ -171,7 +171,7 @@ INCLUDE_DIR := $(SCRATCH_DIR)/include
-   BPFOBJ := $(BUILD_DIR)/libbpf/libbpf.a
-   ifneq ($(CROSS_COMPILE),)
-   HOST_BUILD_DIR         := $(BUILD_DIR)/host
-  -HOST_SCRATCH_DIR       := $(OUTPUT)/host-tools
-  +HOST_SCRATCH_DIR       := $(SCRATCH_DIR)
-   HOST_INCLUDE_DIR       := $(HOST_SCRATCH_DIR)/include
-   else
-   HOST_BUILD_DIR         := $(BUILD_DIR)
-
-This causes `resolve_btfids` to be compiled in the target endianess and gets
-magically run provided that the hosts has `qemu-s390x-static` and a functional
-binfmt_misc [2] on the host, but having this using host architecture per [1]
-is likely better.
-
-Here are steps to reproduce the issue on Ubuntu 23.10 and assuming
-danobi/vmtest [3] is installed:
-
-  XPLATFORM="s390x"
-  XARCH="s390"
-  # Set up repo for s390x
-  cat <<EOF >> /etc/apt/sources.list.d/s390x.list
-  deb [arch=s390x] http://ports.ubuntu.com/ubuntu-ports  mantic main restricted
-  deb [arch=s390x] http://ports.ubuntu.com/ubuntu-ports  mantic-updates main restricted
-  EOF
-  sudo dpkg --add-architecture s390x
-  
-  apt install qemu-system-s390x qemu-user-static g{cc,++}-"${XARCH}-linux-gnu" {libelf-dev,libssl-dev,pkgconf}:s390x
-  
-  KBUILD_OUTPUT_DIR="/tmp/kbuild-${XPLATFORM}"
-  mkdir "${KBUILD_OUTPUT_DIR}"
-  cat tools/testing/selftests/bpf/config{,.vm,.${XPLATFORM}} > ${KBUILD_OUTPUT_DIR}/.config
-  
-  make ARCH="${XARCH}" CROSS_COMPILE="${XPLATFORM}-linux-gnu-" O="${KBUILD_OUTPUT_DIR}"  -j$((4 * $(nproc))) olddefconfig
-  make ARCH="${XARCH}" CROSS_COMPILE="${XPLATFORM}-linux-gnu-" O="${KBUILD_OUTPUT_DIR}"  -j$((4 * $(nproc))) all
-  
-  # No need for a s390x ubuntu 23.10 rootfs, we only care about booting the kernel
-  vmtest -k "${KBUILD_OUTPUT_DIR}/arch/s390/boot/bzImage" -a s390x "uname -m" | cat
+I suppose that Banana PI R3 host is forced by linux drivers
+at 1000base-X so first two cases should be same as second two cases.
 
 
-For the chroot route, see [4].
+With the quirk:
+Host supports		Module		Mode		Functional
+1000base-X		LAN_SDS_MODE=1	1000base-X	Not tested, but expect to work as 1000base-X + 2500base-X host
+1000base-X		LAN_SDS_MODE=6	1000base-X	Not tested, but expect to work as 1000base-X + 2500base-X host
+1000base-X + 2500base-X	LAN_SDS_MODE=1	1000base-X	Yes (module forcing host at 1000base-X)
+1000base-X + 2500base-X	LAN_SDS_MODE=6	2500base-X	Yes
 
-[0] https://lore.kernel.org/linux-kernel/20240201155339.2b5936be@canb.auug.org.au/T/
-[1] https://lore.kernel.org/bpf/cover.1706717857.git.vmalik@redhat.com/
-[2] https://en.wikipedia.org/wiki/Binfmt_misc
-[3] https://github.com/danobi/vmtest
-[4] https://chantra.github.io/bpfcitools/bpf-cross-compile.html
 
-Manu
+I suppose Banana PI R3 forcing Linux drivers at 1000-X when
+module in LAN_SDS_MODE=1 and expect it should work alpso with
+hosts at 1000base-X only in LAN_SDS_MODE=1 and LAN_SDS_MODE=6
 
-> 
-> === Changelog ===
-> 
-> Changes from v3:
-> * Rebase to bpf-next and add missing annotation on new kfunc
-> 
-> Changes from v2:
-> * Only WARN() for vmlinux kfuncs
-> 
-> Changes from v1:
-> * Move WARN_ON() up a call level
-> * Also return error when kfunc set is not properly tagged
-> * Use BTF_KFUNCS_START/END instead of flags
-> * Rename BTF_SET8_KFUNC to BTF_SET8_KFUNCS
-> 
-> Daniel Xu (3):
->   bpf: btf: Support flags for BTF_SET8 sets
->   bpf: btf: Add BTF_KFUNCS_START/END macro pair
->   bpf: treewide: Annotate BPF kfuncs in BTF
-> 
->  Documentation/bpf/kfuncs.rst                  |  8 +++----
->  drivers/hid/bpf/hid_bpf_dispatch.c            |  8 +++----
->  fs/verity/measure.c                           |  4 ++--
->  include/linux/btf_ids.h                       | 21 +++++++++++++++----
->  kernel/bpf/btf.c                              |  8 +++++++
->  kernel/bpf/cpumask.c                          |  4 ++--
->  kernel/bpf/helpers.c                          |  8 +++----
->  kernel/bpf/map_iter.c                         |  4 ++--
->  kernel/cgroup/rstat.c                         |  4 ++--
->  kernel/trace/bpf_trace.c                      |  8 +++----
->  net/bpf/test_run.c                            |  8 +++----
->  net/core/filter.c                             | 20 +++++++++---------
->  net/core/xdp.c                                |  4 ++--
->  net/ipv4/bpf_tcp_ca.c                         |  4 ++--
->  net/ipv4/fou_bpf.c                            |  4 ++--
->  net/ipv4/tcp_bbr.c                            |  4 ++--
->  net/ipv4/tcp_cubic.c                          |  4 ++--
->  net/ipv4/tcp_dctcp.c                          |  4 ++--
->  net/netfilter/nf_conntrack_bpf.c              |  4 ++--
->  net/netfilter/nf_nat_bpf.c                    |  4 ++--
->  net/xfrm/xfrm_interface_bpf.c                 |  4 ++--
->  net/xfrm/xfrm_state_bpf.c                     |  4 ++--
->  .../selftests/bpf/bpf_testmod/bpf_testmod.c   |  8 +++----
->  23 files changed, 87 insertions(+), 66 deletions(-)
-> 
-> -- 
-> 2.42.1
-> 
-> 
-> _______________________________________________
-> linux-arm-kernel mailing list
-> linux-arm-kernel@lists.infradead.org
-> http://lists.infradead.org/mailman/listinfo/linux-arm-kernel
+
+
+I also  tested them a Linux PC with ethernet at 1GB (Host) attached to
+a media converter ethertnet <-> sfp 2.5G module working at 1000base-X
+(speed of the host ehternet) with module set at both LAN_SDS_MODE=1 and
+LAN_SDS_MODE=6
+
+Do you think this could be enough?
+
+Waitng your comments.
+
+Best regards
+
+Sergio Palumbo
+
+
+Il 02/02/2024 19:01, Russell King (Oracle) ha scritto:
+> On Fri, Feb 02, 2024 at 06:41:51PM +0100, Sergio Palumbo wrote:
+>> Dear Russell,
+>> sorry for the indenting. I will no longer use indenting in future postings.
+>> As explained in the description setting up the module via telnet with
+>> LAN_SDS_MODE=6 puts the module in 2500X autonegotiating mode.
+> Okay, so this requires manual configuration to switch the module into
+> 2500base-X.
+>
+>> Without applying the patch the module shows up to linux at 1000X
+>> because the EEPROM is not correctly reporting the 2500X speeds.
+> Okay, so in its default as-new state without reconfiguring the module,
+> it reports 1000base-X and Linux drives it as such. This sounds fine.
+>
+>> Ethtool lines in the description repporting only 1000X and host
+>> connecting only at 1000X.
+> That would be expected.
+>
+>> After the quirk as you can see from the ethtool lines I put in the
+>> description the module shows up to linux with both speeds 1000X and 2500X.
+> Yes, adding the quirk will have that effect, but it will also have the
+> effect that we will choose 2500base-X for host interfaces that support
+> it, whether or not the module has been reconfigured to operate at
+> 2500base-X. This will result in a mismatch between the module and the
+> host, and the link will not come up.
+>
+>> According to the above if the host has the ability to connect at 2500X
+>> the module is connecting at 2500X, if the host has the ability to connect
+>> at 1000X only it will connect at 1000X.
+> The current situation:
+>
+> Host supports		Module		Mode		Functional
+> 1000base-X		default		1000base-X	Yes
+> 1000base-X		LAN_SDS_MODE=6	1000base-X	No
+> 1000base-X + 2500base-X	default		1000base-X	Yes	***
+> 1000base-X + 2500base-X	LAN_SDS_MODE=6	1000base-X	No
+>
+> With the quirk:
+> Host supports		Module		Mode		Functional
+> 1000base-X		default		1000base-X	Yes
+> 1000base-X		LAN_SDS_MODE=6	1000base-X	No
+> 1000base-X + 2500base-X	default		2500base-X	No	***
+> 1000base-X + 2500base-X	LAN_SDS_MODE=6	2500base-X	Yes
+>
+> The lines marked "***" are what I'm concerned about - by adding this
+> quirk, it has the effect of trading one working configuration (the
+> one where the module is in its default factory configuration) for one
+> which requires special configuration of the module _and_ which breaks
+> the factory configuration.
+>
+> On the plus side, ethtool _can_ be used to switch the interface mode
+> back to 1000base-X, but given that this was working it seems backwards
+> to need manual intervention.
+>
+>> On the other side after the quirk and the module set to LAN_SDS_MODE=1
+>> 1000X mode. Linux host is connecting at 1000X only.
+> No it won't. The module will still be detected, the quirk will be used,
+> which will indicate to the kernel that the module supports both
+> 1000base-X and 2500base-X. With a host interface that supports both,
+> the kernel will choose 2500base-X, but the module will be using
+> 1000base-X - and the link will not come up.
+>
+> At the very least, this needs to be mentioned in the commit message,
+> so that the implications of this can be properly considered.
+>
+
 
