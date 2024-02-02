@@ -1,147 +1,113 @@
-Return-Path: <netdev+bounces-68343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73673846ACE
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:37:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56D47846ADF
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:39:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 984381C29D9A
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:37:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EDF27B23536
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:39:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0118618C28;
-	Fri,  2 Feb 2024 08:36:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 458CE5FB8A;
+	Fri,  2 Feb 2024 08:39:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MfR2fiOg"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="M4U6/ncJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f179.google.com (mail-lj1-f179.google.com [209.85.208.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11EB318641
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 08:36:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C4115FDA3
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 08:39:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706863006; cv=none; b=sYS7d+Pq7XmKhyMuDVl4zVCuYfm9MRqw6R1CMBo3n1c4sbW8rb9Ijf2tQxLOkkCZTCVN9KSzXllSqd9YCnmL7KuqcnUTQyR7nVWXS8U51JPJ6RiW+ubyHlpQ+23yYVP8tZGaCyrkojR+o2Ff+oXEsJ2P9tda0I5//x1Ucjf82ms=
+	t=1706863170; cv=none; b=hAxGcVKFjkz7l0TqXgPYIVMFNNhSr2ptym0lsVNZGqlYuJacBgGPaomfEHbS0WJE24y5WZ6vU3Khz6EGKLIDb31HKHhUoB1H+7cBmIzMvQdEMmIwdVL3SEawSPz5S2Ixhs1iAHuMOnPKdaHyAhl+qwqZJzOta92AAsO6acTdUy8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706863006; c=relaxed/simple;
-	bh=kLSRj3dY7enfEXLlfpsKMblPexWph2+9JD5884nsQPw=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hmd3B5mMFtebcwfzXNVPy/odteFuiaqUj1jveiV1fuYg9k8duwR/b7bh+nCri79W4uD8xLmtNOivcNbDwhKPHOvQ+m6Ma/+s5UyvbCLtAs0PsZr3DTxS/9q08+1uOshz3CSacHj5ngv5sUemNsOa96TMsMvvi5fdlIYkOnADas0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MfR2fiOg; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706863004;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=kLSRj3dY7enfEXLlfpsKMblPexWph2+9JD5884nsQPw=;
-	b=MfR2fiOg8kgZDS5g3c2lpuWAph2yrOsvp7gzP8h6W7vuDxs2apmsKjurpDzBQjlRJVpZsR
-	E+VAz9/LuQvdRUvZGhSVjRN+5zmc9oDoSD5ZFNcWmnidRpKfAosl5MIBImHsbOG+letIsL
-	OyUUfSpguuMp/mVbYqOMeFiXHJcLpM8=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-428-IAYBvK2jOWKRWCKT5ehAfw-1; Fri, 02 Feb 2024 03:36:42 -0500
-X-MC-Unique: IAYBvK2jOWKRWCKT5ehAfw-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40e354aaf56so3613615e9.1
-        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 00:36:42 -0800 (PST)
+	s=arc-20240116; t=1706863170; c=relaxed/simple;
+	bh=JLkPFQpIy1oLwpzzhEnpjuaJWvmZz3fTSqray4LYca0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=by0xPAQsLORbeDHNbmoFF9XtC8SJXh9T1YdjSHYUMV36RH0R7TSSf9OVllG6OOxauuNS64ioKNhh8IpUvizacLqEy5U0YHG1jlOaDxjaEEx6CkfjubVkMO0exAFLIThBxunBrHPkKm/8x5m1PVMWixYn+Qm1OU1Pn8yTd2U0YWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=M4U6/ncJ; arc=none smtp.client-ip=209.85.208.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lj1-f179.google.com with SMTP id 38308e7fff4ca-2d07d74be60so15220411fa.3
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 00:39:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706863165; x=1707467965; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/dQeLZalH/sXacUPHud9aP5O4P0g3K5C3fjfkdt4C9M=;
+        b=M4U6/ncJcQd4rOnrewI2LiiHKGliH6NiThgX9VS9ZNiG6pRg9VtV0XBPWoJNcqX0B7
+         fKxhf+Rafipgvk30ulJAcE07TqBpTjKrSN8aQ4ItFJdAq9TTbmfHnFEeGqmHKJgXdysx
+         usQ0D38NQyxBtp7RjaHCVERoRVm1mLtfN0jKVAENwwlDkWNu4ccn/X8jH33YL8xgRO4t
+         Cm+aiGhiPf5o2AiZ4ffrq9I6qQAQsQmhsjCIiCNgMpszowB2Y5V0vxFWJ9gs3yLXY+U9
+         TwswVtpp/hAg4ZfJZx3WtuUUL2P5epzNXKiGsY6s1U/hI6QE4e6VniXMkqh5kqRZSVBb
+         QRUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706863001; x=1707467801;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kLSRj3dY7enfEXLlfpsKMblPexWph2+9JD5884nsQPw=;
-        b=t2iHHccuqJQ71FuFfwlu3rI5SZ3ktM9B+dQlQui9WaLDfS1BJEN12xXrn6q1QrML8T
-         sUeSzwyyUlKtnVcX2Fb6jYXUDkwQxas3EEhwijSWH1o3c1KWd5q7VCts7a+96cBz4dAB
-         fW4CSqT6swZRNau93005Z/uC5tqBJTaLqq1h7qDvn/SjzoqtMpnBXlKeyQSxah2gRwRH
-         EV4448FnuTDL9cXKaKFCY+ztS5qZMVrM9QWh0xJDFXBEtKQDzQyjQ/LLRubmzE2tESWY
-         TWn3ZjzSEP2gE59gLNu0PvsC1b7XTeF+nS647d2/8QfahlgFahsjYcmW5jOOB6c3wTyS
-         IYnw==
-X-Gm-Message-State: AOJu0Yw/rntzsZPGS1Fmjeea2rmTT0tDKhV4M2UTrgywmKINT9+1h/Xy
-	5jhILm9ORSGoOTGiWtpyy6fjY46NlNfoGXrUDLWeE/qbehmFBodfDYyovIfwHaW+ni2VxcQ3bzY
-	dK+nPJsiQaIVauPD9RzbkhORxmrw/oGP2YyE1LyosePLsH9ye24oI9w==
-X-Received: by 2002:a5d:69c1:0:b0:33b:1126:7326 with SMTP id s1-20020a5d69c1000000b0033b11267326mr3810483wrw.4.1706863001438;
-        Fri, 02 Feb 2024 00:36:41 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFY1S6pSccvpGarJL0l/Y2hkINSCPC2MzAQVlVlHMLvWXGRgWSZ6IQXHgMREO1GczDqwvTavA==
-X-Received: by 2002:a5d:69c1:0:b0:33b:1126:7326 with SMTP id s1-20020a5d69c1000000b0033b11267326mr3810470wrw.4.1706863001080;
-        Fri, 02 Feb 2024 00:36:41 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUig5eBFQa0SYflL1GBVpgYTsv01x7Rn6WIi+HrXPFMHdiRBX65TZHjuYpHgGvOF/fsZgEptPJx17+lb618UIuhu9o3vM8DXNtD6YV0+03tk7NMhfvkrtJmS4x7013euvor26JR+nTJdnHYfbj78/pMFgls9VOpEg06OUXj1OjNGX+5pQtBadcPxX4bpuoWRSK1mVaiO6Y5I+f6hABsYNl4oUU8r+sUe0pwAuv3R350KvcE0STy5x+RpNcfGVKdcgEXJM+sAqxBxlTl3e9cNCXlbR/7dS5SzuGWAnhUvMlJsdzpN5Uoy/xtj9S8LJz+q28iON25uYBQR0eZK4JnuaTsEtZy1rrR4mhFT0deEdNW+Cab4Ehsp29E9y0IlZFnk8c0D8tJvcZa7x257sIvOPmNKq9ApCoBg6uSuuwQJfZy4B+7
-Received: from gerbillo.redhat.com (146-241-232-21.dyn.eolo.it. [146.241.232.21])
-        by smtp.gmail.com with ESMTPSA id b11-20020a5d45cb000000b0033afd49cac7sm1404811wrs.43.2024.02.02.00.36.39
+        d=1e100.net; s=20230601; t=1706863165; x=1707467965;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/dQeLZalH/sXacUPHud9aP5O4P0g3K5C3fjfkdt4C9M=;
+        b=BETS0OyfTDN9DM2uMrmwyM0ZxoWIJAtmopTzxaZWV7tQh6zXY1WcKLLsCknkOpOdJ5
+         J8Y93gUyTRrYxUsu7Yh7dTJQQWAeyVuXkbVimyTjZvZKlvICmzTiUiQTkn3N+eSwiMHM
+         AkjFRD2DGlTIitswDN7KlUnGv7N7F+O9KayoOqTqpuDlYDup1KXydzYO60IecMXzFd2Q
+         phvXmZ4SwKgijIqJwgfVwyD2sBJjy/Qt49x2POnFq0sYlk7B7IJXAiuUhvXJNAGnmKfw
+         UdOhnjNZ7n1XCW2Isk1bhpJbSzFzY34izEyxLcz0NHlWiN7aeSwMQ98WuMsKEeWdXSh1
+         29yA==
+X-Gm-Message-State: AOJu0YznZ77URaIpIoiGsAFIDY/h4voO26aizsYXRz/W9Ib88qYeaUws
+	NY4v2LGIfLF5Kuygz6HhmxHHnGDucUtp1eP1uVHwM6XCOQ+GTWv8wEgxuy4nUlQ=
+X-Google-Smtp-Source: AGHT+IEb9GLrdlS5HkGPdk2Td6uv5TgAI406llDlpH1+HxuyW7Jfvm7h7qMnDd1l+U3gYWiyYMLi/g==
+X-Received: by 2002:a2e:9a94:0:b0:2cf:33a3:42fd with SMTP id p20-20020a2e9a94000000b002cf33a342fdmr760950lji.2.1706863164811;
+        Fri, 02 Feb 2024 00:39:24 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVRBI4BB+kLCHGl8CenUURewYXN4VkdRv363xDfA8QomFdlU4a9KfScWPxS9HxtXLN05VJoG3j6yGUP7g/smzjd0vGoepbPebNh5+pLvmTzXboDznzR2Tz+oJvPnLOmfeDJ1WPlPIXvTBJ2fOLXfVunfQa8CoK8k6QvjE0AMNMocSHtsVxzWKvv0kyDeLgSbfligWXWysEKCtINY+FXkX2OyAljVSAengq48qrXVzuWY1HaKnAPffd7ue8m62dDttRX7JzScQ==
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id s12-20020a05600c45cc00b0040e813f1f31sm1941120wmo.25.2024.02.02.00.39.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Feb 2024 00:36:40 -0800 (PST)
-Message-ID: <868b806f0d6b365334ac79a11a3a1a8a1588cbdf.camel@redhat.com>
-Subject: Re: [PATCH net-next v4 2/5] page_frag: unify gfp bits for order 3
- page allocation
-From: Paolo Abeni <pabeni@redhat.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Alexander Duyck
-	 <alexanderduyck@fb.com>, Alexander Duyck <alexander.duyck@gmail.com>, 
-	"Michael S. Tsirkin"
-	 <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Andrew Morton
-	 <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, 
-	kvm@vger.kernel.org, virtualization@lists.linux.dev, linux-mm@kvack.org
-Date: Fri, 02 Feb 2024 09:36:38 +0100
-In-Reply-To: <2e8606b1-81c2-6f3f-622c-607db5e90253@huawei.com>
-References: <20240130113710.34511-1-linyunsheng@huawei.com>
-	 <20240130113710.34511-3-linyunsheng@huawei.com>
-	 <81c37127dda0f2f69a019d67d4420f62c995ee7f.camel@redhat.com>
-	 <2e8606b1-81c2-6f3f-622c-607db5e90253@huawei.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+        Fri, 02 Feb 2024 00:39:24 -0800 (PST)
+Date: Fri, 2 Feb 2024 09:39:21 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	"David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
+	eric.dumazet@gmail.com, syzbot <syzkaller@googlegroups.com>,
+	Jiri Pirko <jiri@nvidia.com>
+Subject: Re: [PATCH net] netdevsim: avoid potential loop in
+ nsim_dev_trap_report_work()
+Message-ID: <ZbyqOdvIMijpIwkm@nanopsycho>
+References: <20240201175324.3752746-1-edumazet@google.com>
+ <9259d368c091b071d16bd1969240f4e9dffe92fb.camel@redhat.com>
+ <CANn89i+MLtYa9kxc4r_etSrz87hoMF8L_HHbJXtaNEU7C22-Ng@mail.gmail.com>
+ <20240201134108.195cf302@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240201134108.195cf302@kernel.org>
 
-On Fri, 2024-02-02 at 10:10 +0800, Yunsheng Lin wrote:
-> On 2024/2/1 21:16, Paolo Abeni wrote:
->=20
-> > from the __page_frag_cache_refill() allocator - which never accesses
-> > the memory reserves.
->=20
-> I am not really sure I understand the above commemt.
-> The semantic is the same as skb_page_frag_refill() as explained above
-> as my understanding. Note that __page_frag_cache_refill() use 'gfp_mask'
-> for allocating order 3 pages and use the original 'gfp' for allocating
-> order 0 pages.
+Thu, Feb 01, 2024 at 10:41:08PM CET, kuba@kernel.org wrote:
+>On Thu, 1 Feb 2024 21:10:46 +0100 Eric Dumazet wrote:
+>> > And possibly adding 1ms delay there could be problematic?  
+>> 
+>> A conversion to schedule_delayed_work() would be needed I think.
+>> 
+>> I looked at all syzbot reports and did not find
+>> devlink_rel_nested_in_notify_work() in them,
+>> I guess we were lucky all this time :)
+>
+>FWIW the devlink_rel_* stuff is for linecards and SIOV sub function
+>instances, netdevsim can't fake those so syzbot probably never
+>exercises that code :(
+>
+>Jiri is on CC, so we can consider him notified about the problem
+>and leave it to him? :)
 
-You are right! I got fooled misreading 'gfp' as 'gfp_mask' in there.
+Will take care of that.
 
-> > I'm unsure we want to propagate the __page_frag_cache_refill behavior
-> > here, the current behavior could be required by some systems.
-> >=20
-> > It looks like this series still leave the skb_page_frag_refill()
-> > allocator alone, what about dropping this chunk, too?=20
->=20
-> As explained above, I would prefer to keep it as it is as it seems
-> to be quite obvious that we can avoid possible pressure for mm by
-> not using memory reserve for order 3 pages as we have the fallback
-> for order 0 pages.
->=20
-> Please let me know if there is anything obvious I missed.
->=20
-
-I still think/fear=C2=A0that behaviours changes here could have
-subtle/negative side effects - even if I agree the change looks safe.
-
-I think the series without this patch would still achieve its goals and
-would be much more uncontroversial. What about move this patch as a
-standalone follow-up?
-
-Thanks!
-
-Paolo
-
+>
 
