@@ -1,139 +1,107 @@
-Return-Path: <netdev+bounces-68316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35E1284692C
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:21:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD166846932
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:23:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6979C1C25E91
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 07:21:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 719EC1F234E6
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 07:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A27C17999;
-	Fri,  2 Feb 2024 07:21:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBADB17994;
+	Fri,  2 Feb 2024 07:23:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="oM6poxbp"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="uW0kwOv9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40BED17998
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 07:21:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA67517C62
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 07:23:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706858468; cv=none; b=m7+VzxCT4dQDcFAIR/odjYmSDj0dhpj8jUzAeSMWV6dMyQZJVuU79UQ0dSWeIrQk7Nkd7deci3g0np6RUQxiBASN4ExMBRA/7ukJ1R7e9k3LsNGsd4n3ogA52kmzGGIU4fxN6eWG7TUqQjEoHM4QShWc8hwfNfQMkAWH2+hDp1Q=
+	t=1706858613; cv=none; b=k6oHcLIEvz0Trkjp16o3ElNZr55Ko+6j8oBi80IQ55rP+ZmkW6v66ULMpZTzjhDa2rNUiLeZyjVYj1fAhkNfs/GZFCgtr4LMMaoMZZLIn0pSxPI1lUtrOrxTPko4qSaTe+y+d0smIMVgGltDdWs9U2sARS83g29zmps2UI0k900=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706858468; c=relaxed/simple;
-	bh=pk77FvIoJFqOe3hjIxvi07qZKYT8KOekiGIY+FDjot4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=lFDQTiFuJmCQfS2bqkAKpw9MnX4ghNKxIgeCodI2HwWB/7G/KGbZ6ltWZsRzTvdmOwqAfByAqVrO5PqE1Iv81R/2KXudGtsNMpEE4SFG6wNd9B/LYYRG7sBy4PK0929gKQpIntUc0/hzmWRaZ2r/zQeoECBoCewP3WgvCqE+Y60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=oM6poxbp; arc=none smtp.client-ip=209.85.167.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-51117bfd452so2998719e87.3
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 23:21:05 -0800 (PST)
+	s=arc-20240116; t=1706858613; c=relaxed/simple;
+	bh=FKYeyb5r+mQMu/bTvkzq/zXSluKwypESmMB0zIXlNXs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q9abWle2rvjMueMDVwB22zZUKPWPN7Ih99cJv4Ws+x3iTCvltOz74PN482auEHKO468FGy96gZgBiDIcT7t86sFOlkkBb3vP2wwS7jPmWKHidkLd6LicekIsQ6pex7s6ymK0W78MjoxWNWGHr65Tu0VSNb+3RZT6Pp/yOa3LPN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=uW0kwOv9; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-51120e285f6so2161360e87.2
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 23:23:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1706858464; x=1707463264; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=KwbUUQIVXVTz0VccesbEfswR5fbWTE4n9Q0ACHmmb3o=;
-        b=oM6poxbpA4yW9dTejFrJFyJ8qo6lWEENgqfg3aCG7f2rAVcS6lvcJBr6cIhNwkGQUz
-         IU+4Bgl30thRltxkz3L0LFqyKSP0mWmZTutBdw21+SnfAtb5oodChbBGER0nEae6lujC
-         IKFZflJkmzQAJ2zJ7TB+w5PRJNF6hKfz1pwkQHWI1TMhhVxjIqT4sQ+WNhh/ffAl5PrC
-         SbcYpkQOpwSK618/l1XosYxE9WJq3WdyguTagvlEBbN8yWqmU67Dti8umQoK8CID2qgT
-         OQ77Fdwh3WgI+JtrjYPoR1mXXeKasDEm4jsvcHGk1LG3Io67vFIlrcbmbyMj6LlSaJBL
-         09JQ==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706858610; x=1707463410; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FKYeyb5r+mQMu/bTvkzq/zXSluKwypESmMB0zIXlNXs=;
+        b=uW0kwOv9S7f06LK0YRMnfDnwMtUdFneXYFXpBtBPgDIyCJ8Pxx9FDCHFpJjuQPeX4e
+         5rvxFMvQE9NZhl46MSkNxmT0SGnMjDXhPrqlCJMbGM2ceLT2ALFqcRLb2zGZu2PxxbyX
+         H/rbuB12y2PZkoCtvklV0ArBzwlNmQAlghnSsWtKeM44WmqIkgqhmG684yBbSRU12J9n
+         5bUuKj91pf4eVd/w0rCPaVuPHEpeUgT9eZJUNdneuGjstaH02SCpyLKJmR9wOYQWzPBr
+         hJ7ocIp5c4NLAakjYSRk/IUwUlROq6x9QQ8ycJetKnxfa5PGQdLj7W4hzZXk1hhIhFKb
+         EshA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706858464; x=1707463264;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KwbUUQIVXVTz0VccesbEfswR5fbWTE4n9Q0ACHmmb3o=;
-        b=J2i5YSvoi0EplcYIz7NvIPTGGt0vKZ9plChdVjssVB1c9Ydesvs6vOLsmJLyp1/59H
-         +GYzRjuqqnkcXj+jpBgqhsmzh1nmG3H7DZAVeaVVtWTZiJ0Sb4vCt2+aQF/d3wamNZro
-         fW7g+UCNXdGoql1Sd20H/Z/ZkO/zv74WnfFi4cr08SQ/D85sYabwP2O1uydeizKmdSBK
-         jv9XnzotPponIlOgJyejXjDwP/M5gP73GN28p1491GFFOZB1QbbOZ66fq92Q23wfvV1P
-         m5FQ9pXnfKll/afu3ZsTGKC/CWzHOr7Zi7FkbkzCNFWDe3F1ixv13L4mo4cTflla0AvP
-         mYpg==
-X-Gm-Message-State: AOJu0YwjZJ2NFlVwCt1ZPeMlXUj5GEc5vkcW8BVEmFSg64UU+013qUEe
-	fybAeoJnsw/Oyed+R+oB30NMC6yqZcMqa66AcjYj5bZ1O26wUP6bN9Fmmp4zdPM=
-X-Google-Smtp-Source: AGHT+IGZd22/TiTxCGbUUTtD8AI3EPo3xd9ZDSbi1WavZgWzxDLXkVe3FH1D+WHjWkFCgjA3uP+ipA==
-X-Received: by 2002:a05:6512:374a:b0:510:c73:631b with SMTP id a10-20020a056512374a00b005100c73631bmr3133365lfs.19.1706858464152;
-        Thu, 01 Feb 2024 23:21:04 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXDttNK642bVGNWWIPtCuzxOk0LEdcayDqFGQzkpaO9ZT33Ak4k0SgSLF8HR5O+K2BS6CdYB8hNQiijdiS1nscvv5n9F8lV19mhhr35hhyvJ1gWyuoliZNSy/PMHjJfAbsUvIodlknGmPkoTlvI+I1QqCrMtEmGU0siBea5LHAL0vcjEYB7EP1wEvNNaobBPzf63EQDB/SHL4D6L2E7+/1qJhYhMKH/y27KBsEve2Cxcs8ODiiQEOBKPB8QmflEEnfis+immUGyFkaVXPlga5cC/CF85chOqTIBBptTJuEff5H5bYKDbEwF6eZgxZKwZWMH1gnhCHCORD4=
-Received: from wkz-x13 (a124.broadband3.quicknet.se. [46.17.184.124])
-        by smtp.gmail.com with ESMTPSA id z10-20020a19650a000000b0051129fa324bsm212280lfb.296.2024.02.01.23.21.03
+        d=1e100.net; s=20230601; t=1706858610; x=1707463410;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FKYeyb5r+mQMu/bTvkzq/zXSluKwypESmMB0zIXlNXs=;
+        b=MPbAKipkY1l2iOC/MCSYWmai4vcSCQTRdebjQgPJ8IfSvMpZVdR7nojtEkmroysOiB
+         VjzO5FVIMzd6hj3248E9dZf9U808L3AdO+mS9fz4+EXNW6NJh8dNHRR/VeQQT3k0wdQS
+         gHOU0X9CW/pT9kzDwCJXoLFYxmXFd5dr0Ux3yxCXAUcbZX3QfK2S0uwsUEQ40rOJzSTW
+         INeWTXsmc3L/nvsfVIYdtQfMyQbgqZY/BLyhPl4jjumMK4Tb0XkCMVzOcNfB+u6jz55y
+         jx4MZk6AltNV0cXlD7J5ETWT4Y7y0QNwGvFbagsNTf1GnQUnR51RDlB63JrELHHcSeZw
+         /1Qw==
+X-Gm-Message-State: AOJu0YyJ46TToDk2hkG+BToVh5ancfj6++3oWCdRw8+Gz+nZlhNlm5Dy
+	KFoQDjBt5E+jSlWWKt5ViFufgJwvoxor07EOfCEyQ3WGTiR5rCJUHr1I4+rO9Lg=
+X-Google-Smtp-Source: AGHT+IFjz8mAdecH3QpcLaRDEYDQ6LYhmaHa5wbSffnEPR+knURnCIOe1byh2RJzy/Eb5bo9JQigbQ==
+X-Received: by 2002:ac2:4563:0:b0:511:3299:1475 with SMTP id k3-20020ac24563000000b0051132991475mr1593360lfm.51.1706858609797;
+        Thu, 01 Feb 2024 23:23:29 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWlWUcaXlM/rDQQLZt8vC+9Xd6MKg3XIIC5SEbV5XoagsuTXdxmGOG3Hjq6wmsVlBgTk/4sxqjnlal9LwsUM/bwSJypos+ScpNHdEC9jviu+lGFtmBhdTRUpNtmCCf+BTH4muPp3W9Z5dD+WPF8XJCYoC7sX7opCLthkMUU+RcAILMMoXjfPJxS1WyqXuO1yAfBp7k0Ke8OvrVo+2FaYLXPbWfQZSiBprF7ps+JbIieZwvqN7lZQNZZI9RBVB9mgg69ydfde6hrQo7BUNCVwFzSZej36tn16hxSrbklvwJzDOTk88wVDUODANUKQ5aHu4k+tmMnu57clhdpp+MHwxNaBeDfEqRyaRHEemb91iDo8n5ZiFgo4MG6bLS709nNX/WJSk+nkaBoo0okIvLk9vbV065XeXQ/F9lKipUViJQAqrDCdgHpFHYVe/mcxYnMr/o6IVzkBuo0DYAOsqJpm9oBvCrTucYGqMxqKsKvrSM6qW2vb7qAmpOhbSw06+SeDXDJolQuRnbp1eB6TVb/PXA6UUOSmR3wHoVvKa5mVgQCVbzV7nCIVW8RdmWI11PbI1b5oPLhKVFs35JBu41H3jIl5eewLziNqX6ikls0mjvgVm/1Od8/Y8GYzF7+Lj0eB9uMQfeBSErsPTaYER1o0XrtcLaRNN1SWa4hKfE3+BmcM4QX9SNbDH1D/Mm5sTNCCzg95As0TovFpDwg1M3+tk5+JJQyIibLyTNFx8BgIgD5FqdaeFPGDsKZCkNSA0pYKizLUy+XqMKDK/CoveudYha6VB8hvnRPcxHjNe3LfNI7ZABWMWAjvcipj+SaRV6g/LR67b29Y+3G+sYEewxkC9zFVCMFicS7J6pglBhHUs1v4xmT7RaB5xUl/Eks5zOS5zsfGAXVw6NcdZiQeQRZd5bokMd86DMtTFLnB9k7R/iA3B70
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id u12-20020a05600c138c00b0040fb989f4bdsm1756338wmf.23.2024.02.01.23.23.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 23:21:03 -0800 (PST)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, jiri@resnulli.us, ivecera@redhat.com,
- netdev@vger.kernel.org, roopa@nvidia.com, razor@blackwall.org,
- bridge@lists.linux.dev, rostedt@goodmis.org, mhiramat@kernel.org,
- linux-trace-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 0/5] net: switchdev: Tracepoints
-In-Reply-To: <20240201204459.60fea698@kernel.org>
-References: <20240130201937.1897766-1-tobias@waldekranz.com>
- <20240201204459.60fea698@kernel.org>
-Date: Fri, 02 Feb 2024 08:21:01 +0100
-Message-ID: <8734ubtjqa.fsf@waldekranz.com>
+        Thu, 01 Feb 2024 23:23:29 -0800 (PST)
+Date: Fri, 2 Feb 2024 08:23:26 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jinjian Song <songjinjian@hotmail.com>
+Cc: alan.zhang1@fibocom.com, angel.huang@fibocom.com,
+	chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com, danielwinkler@google.com,
+	davem@davemloft.net, edumazet@google.com, felix.yan@fibocom.com,
+	freddy.lin@fibocom.com, haijun.liu@mediatek.com,
+	jinjian.song@fibocom.com, joey.zhao@fibocom.com,
+	johannes@sipsolutions.net, kuba@kernel.org, letitia.tsai@hp.com,
+	linux-kernel@vger.kernel.com, liuqf@fibocom.com,
+	loic.poulain@linaro.org, m.chetan.kumar@linux.intel.com,
+	netdev@vger.kernel.org, nmarupaka@google.com, pabeni@redhat.com,
+	pin-hao.huang@hp.com, ricardo.martinez@linux.intel.com,
+	ryazanov.s.a@gmail.com, vsankar@lenovo.com, zhangrc@fibocom.com
+Subject: Re: [net-next v7 2/4] net: wwan: t7xx: Add sysfs attribute for
+ device state machine
+Message-ID: <ZbyYbul92taHMPgq@nanopsycho>
+References: <20240201151340.4963-1-songjinjian@hotmail.com>
+ <MEYP282MB26974374FE2D87ED62E14549BB432@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
+ <MEYP282MB2697CBD4E366DBE80DA59216BB422@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MEYP282MB2697CBD4E366DBE80DA59216BB422@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
 
-On tor, feb 01, 2024 at 20:44, Jakub Kicinski <kuba@kernel.org> wrote:
-> On Tue, 30 Jan 2024 21:19:32 +0100 Tobias Waldekranz wrote:
->> This series starts off (1-2/5) by creating stringifiers for common
->> switchdev objects. This will primarily be used by the tracepoints for
->> decoding switchdev notifications, but drivers could also make use of
->> them to provide richer debug/error messages.
->> 
->> Then follows two refactoring commits (3-4/5), with no (intended)
->> functional changes:
->> 
->> - 3/5: Wrap all replay callbacks in br_switchdev.c in a switchdev
->>        function to make it easy to trace all of these.
->> 
->> - 4/5: Instead of using a different format for deferred items, reuse
->>        the existing notification structures when enqueuing. This lets
->>        us share a bit more code, and it unifies the data presented by
->>        the tracepoints.
->> 
->> Finally, add the tracepoints.
->
-> Is there any risk with conflicting with the fixes which are getting
-> worked on in parallel? Sorry for not investigating myself, ENOTIME.
+Fri, Feb 02, 2024 at 03:16:12AM CET, songjinjian@hotmail.com wrote:
+>>Thu, Feb 01, 2024 at 04:13:38PM CET, songjinjian@hotmail.com wrote:
+>>>From: Jinjian Song <jinjian.song@fibocom.com>
 
-They will unfortunately conflict with this series, yes. My journey was:
+Could you please fix your email client? You clearly reply to my email,
+yet the threading is wrong. Thanks!
 
-1. There's a problem with the MDB
-2. I need tracepoints to figure this out
-3. Having a light down here is pretty nice, I should upstream this
-4. Find/understand/fix (1)
-5. (4) probably should go into net
-
-In hindsight, I should probably have anticipated this situation and done
-away with (5) before proceeding with (3).
-
-My idea now is to get the fix accepted, wait for the next merge of net
-back to net-next, then fixup this series so that it does not reintroduce
-the MDB sync issue. I already have a version of the fix that applies on
-top of this series, so I'll just work it in to the switchdev refactor
-steps in the next version.
-
-Is there a better way to go about this?
-
->> v1 -> v2:
->> 
->> - Fixup kernel-doc comment for switchdev_call_replay
->> 
->> I know that there are still some warnings issued by checkpatch, but
->> I'm not sure how to work around them, given the nature of the mapper
->> macros. Please advise.
->
-> It's a known problem, don't worry about those.
 
