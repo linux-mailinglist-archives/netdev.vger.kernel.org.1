@@ -1,122 +1,102 @@
-Return-Path: <netdev+bounces-68649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14B71847726
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:12:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98F34847733
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:16:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4705B1C2208B
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:12:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB7461C22789
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:16:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E26A614C5B0;
-	Fri,  2 Feb 2024 18:11:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 176BA14D44C;
+	Fri,  2 Feb 2024 18:15:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hY/ca1PQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OMXFTwpi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53664171A5;
-	Fri,  2 Feb 2024 18:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F44914D43C
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 18:15:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706897516; cv=none; b=YfHbtVlRSEtmrWcTZxdULvaLPKADJi9PC9JiKWpdeQUD5ZW3PeGAO4tGbMp5GxcpRJvvdXXmqiUCpeBO0N/wZHR9D3ov4CW891Ai6+PO6C25ibvs/Bvk01GukE6RZE2K63+ON6dJ8q1HaSPtoPVIlFQOMwBr6XipqrpAqfz2/9s=
+	t=1706897753; cv=none; b=oNb833fPKyzzTPt++7QPLS+/fM5bKFzjdMorrp8vrEr2rN9e9iIG00vnFwvj2iZlAD3UsD0+vCDhot9WbaQorZrVbZHew5XaG/xjz1lxBk6IISR9gQ8cOftMGDWjLYg4irXwElixSTTm3cRRIx3WNQF41lqh+VNgZrYxxs+xPsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706897516; c=relaxed/simple;
-	bh=DOQo6PG8tdHWNw9j/HZXDNtATHbN0Fw0rHO+quU72Ec=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dWxkMguCj7dnCYZSWR0e44CnKAPxc1nyBia1pQdl4s/yGt8xxpukJXkJ10/xqDjosm1ULl04ORCD1wuLCMVbON7BgCQ68MSLjTAiUS25nVAH+T7giNqSWU11FvEPfmyF3yAbtJdvSDUYGVqGPLZhnqIOAvxWX0kBm7+SUyvLWOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hY/ca1PQ; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 412Hntcq009634;
-	Fri, 2 Feb 2024 18:11:44 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=qcppdkim1; bh=cqOAfti
-	ykg7lWOyB0qfM6AnnhzSlRRQXEIGuedibGKo=; b=hY/ca1PQ6DtRcovSEm7P7l2
-	m+M34pQi2NC0ci8HLeGM1U1GwRRU+ihuGZtrBulOXIAbo+ibTmmwzxRXd1YbxPyg
-	3jl7mLAqqz8qBJSDxNB5Q4AAsh4F1ZJGOj7LJUpVzqxBZ4eNK+zGEbV2E8TXwUQg
-	xWj+Wwwrxue/ygAz7zX+Hr8xrQZTFEXx3PnP3sAPBKnb/SIZRmHnFowb3B5hJ6Al
-	6DoKkqmvvt08+Hy0Y+Iw3f8zYuubgHWMgOC/VfHXrMYAU9C93E5G8Mim5Ok5fqZ8
-	HeZ7aDJZJt92yBnSTeLWeZJArikviaVf5njL2URzgxtprCbQzhbOFoQ9sC7A4EQ=
-	=
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3w154w81dn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 02 Feb 2024 18:11:44 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 412IBhCK027527
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 2 Feb 2024 18:11:43 GMT
-Received: from jhugo-lnx.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 2 Feb 2024 10:11:42 -0800
-From: Jeffrey Hugo <quic_jhugo@quicinc.com>
-To: <quic_bjorande@quicinc.com>, <marcel@holtmann.org>, <luiz.dentz@gmail.com>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <robh@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <quic_bgodavar@quicinc.com>, <quic_rjliao@quicinc.com>
-CC: <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Jeffrey Hugo <quic_jhugo@quicinc.com>
-Subject: [PATCH] dt-bindings: net: bluetooth: qualcomm: Fix bouncing @codeaurora
-Date: Fri, 2 Feb 2024 11:11:22 -0700
-Message-ID: <20240202181122.4118105-1-quic_jhugo@quicinc.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1706897753; c=relaxed/simple;
+	bh=DasRXTIQ0LLPsovHP8wdNBQ5VdDQmoBI6wY8nKq8mck=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=j0VR3bkFh0PkZgH83vI8eod7pqJgjTrQhZE8mPK1NDovTv+YwqZuzVsD5ThBZTp1buO68cUR6eTdYsrYBtKnP7/oepwpeI5GB6lnU7H0KdQ1D6eEvadxe/NsFKkG2EuwHxE1rlSVqhkj3nQMpQDeh8+KlkgF/bDZyOuTpv7ZAOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OMXFTwpi; arc=none smtp.client-ip=209.85.219.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-68c887ef17eso3593836d6.2
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 10:15:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706897750; x=1707502550; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Q3dX0UPb1hlx0pQ17vHKfS4yqCWpAh4i4+SS0RVd7kM=;
+        b=OMXFTwpiaxlhtQcpR/I9wZ3e6972EsmP0k2gSI4vA+UXnd9lYMowx27tFuGcFLPY/i
+         MkKXDuUfUiS02Seji4x0JXDFoOIG/j0n444nbmbBGLEvs5j8/7SnyCoHTVGj7xImhXTB
+         aPyUlc7JFC3pbtu/CsfwECH9vnclg6sDnt3ozL735Zb8UH/jSE7qk3vRDEt6SpZNVEeu
+         CVh54p0RmmmClxBINtA2oKvMjPP3kzxy7bJ5tsoyqwhGqESzK1KfoPGCxrT1gGxB8l8M
+         65QCZ0ggmU9ipAiDnpssXPH6/+DguZ03u+YUF1WFLdsve42HToChI5qsy0vqV/9Amlj5
+         lG1g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706897750; x=1707502550;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q3dX0UPb1hlx0pQ17vHKfS4yqCWpAh4i4+SS0RVd7kM=;
+        b=u8ZSoI7mpquAZMvgS/tC1xfPspvkHKZbKDNZWukGgGvxlz/R3ccABTYRG+q0ZdwNqV
+         NEcgVk1ha6u8C/K/te4/Vp+AvcJKcIVpi+bR1zFqZ4R57WyaqsLfPXipwUZFEXCXQnkX
+         zMCyQOECPPjjs6NQiVDghfVNPFFU1ur+JB83cAml9VacNr/eu6k1ek+KW3PI5k7aqHCj
+         iVy+AYn9BWTY/bIp9gZOJqI7eVJml22k8bXYaUIr4PYGaXOEKiGw80a6T6Wj+BFmUq0S
+         EvC+fXnVuaX3AydXzADaHdCzMSiBPBPSFrAHS36P2HgSZeWB+aqJcwvAhOJNRpgSk+Yb
+         rCMw==
+X-Gm-Message-State: AOJu0YyDqWf4MNqdtqYjCOeCjN+9/nRid9szipDUa6L8IgVNQUbpVMey
+	EbFni2dOvHhappLDN1+kM2v54LoFZiM09VOdUrnHP1+J+LPKi361
+X-Google-Smtp-Source: AGHT+IF/jUtMSxohSPo+OBG28fBFBpR7i6ZfsGe75lhIzXk+ihi65yddYUiPzQttd4BFcbW50X3ybw==
+X-Received: by 2002:a05:6214:f63:b0:686:97da:8fd0 with SMTP id iy3-20020a0562140f6300b0068697da8fd0mr3771778qvb.21.1706897750224;
+        Fri, 02 Feb 2024 10:15:50 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWQJeEYha8iekqtNLWYaaACOJ9qFsEoRMtso19ExCL58xzoDyRaIgHTBYZjturu7z0zPmIzpTwCqQYlkb7CO2hketBPZmQ4xf/Pap3Ko6qAf4CeAjn6lp2zV0AnWhmRpECgjv4gD+cx4lxuFdAyLNgBC1WX84sWpjOXIUPJDtUEEBUMjXnDF9oX4mU3kdD8YA==
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id mk17-20020a056214581100b0068c7c91b04bsm1004591qvb.104.2024.02.02.10.15.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Feb 2024 10:15:49 -0800 (PST)
+Message-ID: <7de9a94a-2ed0-4da3-b7d7-8c7faaa8e22b@gmail.com>
+Date: Fri, 2 Feb 2024 10:15:47 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: y5vSqHzEUAJyL94BjJMxtxKqTy1X5dpy
-X-Proofpoint-ORIG-GUID: y5vSqHzEUAJyL94BjJMxtxKqTy1X5dpy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-02_12,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 bulkscore=0
- impostorscore=0 priorityscore=1501 lowpriorityscore=0 suspectscore=0
- mlxlogscore=692 malwarescore=0 phishscore=0 mlxscore=0 spamscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2401310000 definitions=main-2402020131
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: dsa: reindent arguments of
+ dsa_user_vlan_for_each()
+Content-Language: en-US
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>
+References: <20240202162041.2313212-1-vladimir.oltean@nxp.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20240202162041.2313212-1-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-The servers for the @codeaurora domain are long retired and any messages
-sent there will bounce.  Update the maintainer addresses for this
-binding to match the entries in .mailmap so that anyone looking in the
-file for a contact will see a correct address.
+On 2/2/24 08:20, Vladimir Oltean wrote:
+> These got misaligned after commit 6ca80638b90c ("net: dsa: Use conduit
+> and user terms").
 
-Signed-off-by: Jeffrey Hugo <quic_jhugo@quicinc.com>
----
- .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Doh!
 
-diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-index eba2f3026ab0..528ef3572b62 100644
---- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-+++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-@@ -7,8 +7,8 @@ $schema: http://devicetree.org/meta-schemas/core.yaml#
- title: Qualcomm Bluetooth Chips
- 
- maintainers:
--  - Balakrishna Godavarthi <bgodavar@codeaurora.org>
--  - Rocky Liao <rjliao@codeaurora.org>
-+  - Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
-+  - Rocky Liao <quic_rjliao@quicinc.com>
- 
- description:
-   This binding describes Qualcomm UART-attached bluetooth chips.
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
-2.34.1
+Florian
 
 
