@@ -1,459 +1,415 @@
-Return-Path: <netdev+bounces-68486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F075847033
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:24:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FD1584703B
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:26:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C44C3B211E1
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:24:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32F7C28ABAC
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:26:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A468D1419A4;
-	Fri,  2 Feb 2024 12:24:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A16D1420A1;
+	Fri,  2 Feb 2024 12:26:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dtRcN/hJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4999914198A;
-	Fri,  2 Feb 2024 12:24:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2837140783;
+	Fri,  2 Feb 2024 12:25:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706876660; cv=none; b=ZEyARc5/s1SuFf1V5/bhsD7b1G0rU1u4ZLsbTglQEXbCBF03ZRDSwGibsHRiFddFdxF+QFRCwy+ZSF6Vw2sCIfHaU+bTgku2lXrryXDtSy2DaKwCz1I1/6IPl18ve22T9sZVekqv5pzdOKzCMNGovAiJjWPyizkoEbU+PelCw6Q=
+	t=1706876762; cv=none; b=s1rUeTICRP8ImmH4/alAZ4hXgoKQtMTbXPDAFxsLzne+lb/SbpSbE6CiS8A0ht9scqQy7S1UIwYlbpF2a4HNPOEZ0VVcBSx71Cd+a3Cs0KrwLRM26SqBSWTazxUgQcTvhuhizr7jDY8QdcCu7F06ZcjqTg5a4/ptNaulPVyJBss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706876660; c=relaxed/simple;
-	bh=2slv0zHi3v9XTecM8qQvxL7ef967yjxlXQ7dAoIhKrw=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=YXfNjxzwVk0R+bMZkY/cJKTTwXNLx+SwY7nu35BLe/GwYKuZBv0tYyED6b74aSy9+fyYVwp7G6WUjZRWY7jGfFvoZwKhIGnC74vEoCvP3iVmfOsYKXA/ja7SsMKvoXi16D7yJqnO8kgDR1N3vPNSAS7qpllK+o4AfzRrHXZZVUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TRFFn6jbvz1FK8D;
-	Fri,  2 Feb 2024 20:19:41 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3F532140384;
-	Fri,  2 Feb 2024 20:24:13 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 2 Feb
- 2024 20:24:12 +0800
-Subject: Re: [PATCH net-next v4 5/5] tools: virtio: introduce vhost_net_test
-To: Jason Wang <jasowang@redhat.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Michael S.
- Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	<virtualization@lists.linux.dev>
-References: <20240130113710.34511-1-linyunsheng@huawei.com>
- <20240130113710.34511-6-linyunsheng@huawei.com>
- <CACGkMEsJq1Fg6T+9YLPzE16027sBHRZodk2+b1ySa9MeMcGjMA@mail.gmail.com>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <dfc3dcb0-511c-945b-6099-c4d7ccbf3253@huawei.com>
-Date: Fri, 2 Feb 2024 20:24:12 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	s=arc-20240116; t=1706876762; c=relaxed/simple;
+	bh=Tw35jGRqwEaaFrKm56paYJvFfUTFwDuU/Oivtu/pSc0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=o+R2A0P7sBVRtVWxuI77N12me0hwkqhhqwLoK/IMbeWsRb1BaEftQ1nrQZJFPLot0DYmX/1q6FkiGq6BGzzOmfioMQ6Q9t0J8SzFYRkLOEiGmaHPeoInDHt9QDSal4Ejjb7Pp42MJeDMh/0AnY63uOL7VXa8wwG5V/rvX7qGUh0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dtRcN/hJ; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-511206d1c89so2742907e87.1;
+        Fri, 02 Feb 2024 04:25:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706876758; x=1707481558; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :reply-to:in-reply-to:references:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cMvb8VA96y3MEO7FFtiqwg3FWVeCN/rGYUEn/narly4=;
+        b=dtRcN/hJojhltJAY3D/Fg95PrGNJhQXMkRr9ZPwuB9rsOIe4B8AzreJoNRUuv01y9g
+         FViEMRakV9bq8QMGqK53VsFUGV0+tOxG7vgikiw1lWlx5eybDKcECq6Lm74qCfPNgl9V
+         KEri8j+m5xm0E/Eax06nT9R1hZoe58n09DxPCfYSF9cQbhPdnbVlC1uL86O2Vl3/gbC6
+         PVXgWbcQnUaKf9t3K4K4MbybQDOyVRN4fIM2l49P2OP4/HfMFG6ENG/KlYlWtgWAjVDw
+         0tYdFNNt33eRyrGmbh/r2DWGMZ8TYX1R07N53gJ3ILOSGNnyLE34a7LafQbFQpTzTB49
+         6VIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706876758; x=1707481558;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :reply-to:in-reply-to:references:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cMvb8VA96y3MEO7FFtiqwg3FWVeCN/rGYUEn/narly4=;
+        b=HstPAXk3k0Fqn0IqjdNmuI0ouqqFgP2IsgjaEqua8z0m9DDPGKE4K8rfiUzEUc0FnV
+         o+uQM+CTRBoWEyHwJBOeBLfcJ32jIHE5phzfUJeCSGU2QIQEieNTVr+yxrftJI9E5qZu
+         iiVHMCi5VplVbfL4e2h9G8pUEnESH+PuR53QVFMQxHKUpDupvT4SU6YrU9pSnytHcYxu
+         aAFwmZx9Lvotq2vtvycc+7+6Wn/JzfldmOV2X49NkTNS0CX19ymyze3Kwxq9B8Mprd0u
+         3kViukYvP1fr9fwduAzBJ6WYj5ebuWC3kaS8PvY5v7lXVtlNPzqbgnxvtMnRDbskH9ti
+         MTJg==
+X-Gm-Message-State: AOJu0YysLD/kzeWnAWTUTZoq8isguU5Kf0p4bP+gfjO9G7lA5677JyVV
+	ceEidB0hdWffTKNx9fEyR82X6Xm3zMso9v8wfrHbk9fXmRGozQdNyxvFNvo9u6I8kCQdtnKo156
+	PQ4odxwht8nIA1LQ4KojWA4Jkt7M=
+X-Google-Smtp-Source: AGHT+IH3MpyDQsZKQdTX5F5C/FwhEAW32gPBprX2q8BPQcrXLC5Pa8gkQ+GIBf7MGEctDL8si7Whpq0UZ/8EgPnPqMo=
+X-Received: by 2002:a19:644a:0:b0:50e:95cf:e7b1 with SMTP id
+ b10-20020a19644a000000b0050e95cfe7b1mr1416305lfj.9.1706876757502; Fri, 02 Feb
+ 2024 04:25:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CACGkMEsJq1Fg6T+9YLPzE16027sBHRZodk2+b1ySa9MeMcGjMA@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+References: <20240127020833.487907-1-kent.overstreet@linux.dev>
+ <20240127020833.487907-2-kent.overstreet@linux.dev> <20240202120357.tfjdri5rfd2onajl@quack3>
+In-Reply-To: <20240202120357.tfjdri5rfd2onajl@quack3>
+Reply-To: sedat.dilek@gmail.com
+From: Sedat Dilek <sedat.dilek@gmail.com>
+Date: Fri, 2 Feb 2024 13:25:20 +0100
+Message-ID: <CA+icZUWdUUhWg_-0NvF+6L=EUhj7amv_7HRKHDPvrEBspwHC2Q@mail.gmail.com>
+Subject: Re: [PATCH 1/4] fs/pipe: Convert to lockdep_cmp_fn
+To: Jan Kara <jack@suse.cz>
+Cc: Kent Overstreet <kent.overstreet@linux.dev>, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org, peterz@infradead.org, 
+	boqun.feng@gmail.com, Alexander Viro <viro@zeniv.linux.org.uk>, 
+	Christian Brauner <brauner@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024/2/2 12:05, Jason Wang wrote:
-> On Tue, Jan 30, 2024 at 7:38 PM Yunsheng Lin <linyunsheng@huawei.com> wrote:
->>
->> introduce vhost_net_test basing on virtio_test to test
->> vhost_net changing in the kernel.
-> 
-> Let's describe what kind of test is being done and how it is done here.
+On Fri, Feb 2, 2024 at 1:12=E2=80=AFPM Jan Kara <jack@suse.cz> wrote:
+>
+> On Fri 26-01-24 21:08:28, Kent Overstreet wrote:
+> > *_lock_nested() is fundamentally broken; lockdep needs to check lock
+> > ordering, but we cannot device a total ordering on an unbounded number
+> > of elements with only a few subclasses.
+> >
+> > the replacement is to define lock ordering with a proper comparison
+> > function.
+> >
+> > fs/pipe.c was already doing everything correctly otherwise, nothing
+> > much changes here.
+> >
+> > Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+> > Cc: Christian Brauner <brauner@kernel.org>
+> > Cc: Jan Kara <jack@suse.cz>
+> > Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
+>
+> I had to digest for a while what this new lockdep lock ordering feature i=
+s
+> about. I have one pending question - what is the motivation of this
+> conversion of pipe code? AFAIU we don't have any problems with lockdep
+> annotations on pipe->mutex because there are always only two subclasses?
+>
+>                                                                 Honza
 
-How about something like below:
+Hi,
 
-This patch introduces testing for both vhost_net tx and rx.
-Steps for vhost_net tx testing:
-1. Prepare a out buf
-2. Kick the vhost_net to do tx processing
-3. Do the receiving in the tun side
-4. verify the data received by tun is correct
+"Numbers talk - Bullshit walks." (Linus Torvalds)
 
-Steps for vhost_net rx testing::
-1. Prepare a in buf
-2. Do the sending in the tun side
-3. Kick the vhost_net to do rx processing
-4. verify the data received by vhost_net is correct
+In things of pipes - I normally benchmark like this (example):
 
+root# cat /dev/sdc | pipebench > /dev/null
 
->> +
->> +static int tun_alloc(struct vdev_info *dev)
->> +{
->> +       struct ifreq ifr;
->> +       int len = HDR_LEN;
-> 
-> Any reason you can't just use the virtio_net uapi?
+Do you have numbers for your patch-series?
 
-I didn't find a macro for that in include/uapi/linux/virtio_net.h.
+Thanks.
 
-Did you mean using something like below?
-sizeof(struct virtio_net_hdr_mrg_rxbuf)
+BG,
+-Sedat-
 
-> 
->> +       int fd, e;
->> +
->> +       fd = open("/dev/net/tun", O_RDWR);
->> +       if (fd < 0) {
->> +               perror("Cannot open /dev/net/tun");
->> +               return fd;
->> +       }
->> +
->> +       memset(&ifr, 0, sizeof(ifr));
->> +
->> +       ifr.ifr_flags = IFF_TAP | IFF_NO_PI | IFF_VNET_HDR;
->> +       snprintf(ifr.ifr_name, IFNAMSIZ, "tun_%d", getpid());
->> +
->> +       e = ioctl(fd, TUNSETIFF, &ifr);
->> +       if (e < 0) {
->> +               perror("ioctl[TUNSETIFF]");
->> +               close(fd);
->> +               return e;
->> +       }
->> +
->> +       e = ioctl(fd, TUNSETVNETHDRSZ, &len);
->> +       if (e < 0) {
->> +               perror("ioctl[TUNSETVNETHDRSZ]");
->> +               close(fd);
->> +               return e;
->> +       }
->> +
->> +       e = ioctl(fd, SIOCGIFHWADDR, &ifr);
->> +       if (e < 0) {
->> +               perror("ioctl[SIOCGIFHWADDR]");
->> +               close(fd);
->> +               return e;
->> +       }
->> +
->> +       memcpy(dev->mac, &ifr.ifr_hwaddr.sa_data, ETHER_ADDR_LEN);
->> +       return fd;
->> +}
->> +
->> +static void vdev_create_socket(struct vdev_info *dev)
->> +{
->> +       struct ifreq ifr;
->> +
->> +       dev->sock = socket(AF_PACKET, SOCK_RAW, htons(TEST_PTYPE));
->> +       assert(dev->sock != -1);
->> +
->> +       snprintf(ifr.ifr_name, IFNAMSIZ, "tun_%d", getpid());
-> 
-> Nit: it might be better to accept the device name instead of repeating
-> the snprintf trick here, this would facilitate the future changes.
+[1] https://packages.debian.org/pipebench
 
-I am not sure I understand what did you mean by "accept the device name"
-here.
-
-The above is used to get ifindex of the tun netdevice created in
-tun_alloc(), so that we can use it in vdev_send_packet() to send
-a packet using the tun netdevice created in tun_alloc(). Is there
-anything obvious I missed here?
-
-> 
->> +       assert(ioctl(dev->sock, SIOCGIFINDEX, &ifr) >= 0);
->> +
->> +       dev->ifindex = ifr.ifr_ifindex;
->> +
->> +       /* Set the flags that bring the device up */
->> +       assert(ioctl(dev->sock, SIOCGIFFLAGS, &ifr) >= 0);
->> +       ifr.ifr_flags |= (IFF_UP | IFF_RUNNING);
->> +       assert(ioctl(dev->sock, SIOCSIFFLAGS, &ifr) >= 0);
->> +}
->> +
->> +static void vdev_send_packet(struct vdev_info *dev)
->> +{
->> +       char *sendbuf = dev->test_buf + HDR_LEN;
->> +       struct sockaddr_ll saddrll = {0};
->> +       int sockfd = dev->sock;
->> +       int ret;
->> +
->> +       saddrll.sll_family = PF_PACKET;
->> +       saddrll.sll_ifindex = dev->ifindex;
->> +       saddrll.sll_halen = ETH_ALEN;
->> +       saddrll.sll_protocol = htons(TEST_PTYPE);
->> +
->> +       ret = sendto(sockfd, sendbuf, TEST_BUF_LEN, 0,
->> +                    (struct sockaddr *)&saddrll,
->> +                    sizeof(struct sockaddr_ll));
->> +       assert(ret >= 0);
->> +}
->> +
-
-...
-
->> +
->> +static void vq_info_add(struct vdev_info *dev, int idx, int num, int fd)
->> +{
->> +       struct vhost_vring_file backend = { .index = idx, .fd = fd };
->> +       struct vq_info *info = &dev->vqs[idx];
->> +       int r;
->> +
->> +       info->idx = idx;
->> +       info->kick = eventfd(0, EFD_NONBLOCK);
->> +       info->call = eventfd(0, EFD_NONBLOCK);
-> 
-> If we don't care about the callback, let's just avoid to set the call here?
-> 
-> (As I see vq_callback is a NULL)
-
-Sure, will remove the vq_callback related code.
-
-> 
->> +       r = posix_memalign(&info->ring, 4096, vring_size(num, 4096));
->> +       assert(r >= 0);
->> +       vq_reset(info, num, &dev->vdev);
->> +       vhost_vq_setup(dev, info);
->> +       info->fds.fd = info->call;
->> +       info->fds.events = POLLIN;
->> +
->> +       r = ioctl(dev->control, VHOST_NET_SET_BACKEND, &backend);
->> +       assert(!r);
->> +}
->> +
->> +static void vdev_info_init(struct vdev_info *dev, unsigned long long features)
->> +{
->> +       struct ether_header *eh;
->> +       int i, r;
->> +
->> +       dev->vdev.features = features;
->> +       INIT_LIST_HEAD(&dev->vdev.vqs);
->> +       spin_lock_init(&dev->vdev.vqs_list_lock);
->> +
->> +       dev->buf_size = (HDR_LEN + TEST_BUF_LEN) * 2;
->> +       dev->buf = malloc(dev->buf_size);
->> +       assert(dev->buf);
->> +       dev->test_buf = dev->buf;
->> +       dev->res_buf = dev->test_buf + HDR_LEN + TEST_BUF_LEN;
->> +
->> +       memset(dev->test_buf, 0, HDR_LEN + TEST_BUF_LEN);
->> +       eh = (struct ether_header *)(dev->test_buf + HDR_LEN);
->> +       eh->ether_type = htons(TEST_PTYPE);
->> +       memcpy(eh->ether_dhost, dev->mac, ETHER_ADDR_LEN);
->> +       memcpy(eh->ether_shost, dev->mac, ETHER_ADDR_LEN);
->> +
->> +       for (i = sizeof(*eh); i < TEST_BUF_LEN; i++)
->> +               dev->test_buf[i + HDR_LEN] = (char)i;
->> +
->> +       dev->control = open("/dev/vhost-net", O_RDWR);
->> +       assert(dev->control >= 0);
->> +
->> +       r = ioctl(dev->control, VHOST_SET_OWNER, NULL);
->> +       assert(r >= 0);
->> +
->> +       dev->mem = malloc(offsetof(struct vhost_memory, regions) +
->> +                         sizeof(dev->mem->regions[0]));
->> +       assert(dev->mem);
->> +       memset(dev->mem, 0, offsetof(struct vhost_memory, regions) +
->> +              sizeof(dev->mem->regions[0]));
->> +       dev->mem->nregions = 1;
->> +       dev->mem->regions[0].guest_phys_addr = (long)dev->buf;
->> +       dev->mem->regions[0].userspace_addr = (long)dev->buf;
->> +       dev->mem->regions[0].memory_size = dev->buf_size;
->> +
->> +       r = ioctl(dev->control, VHOST_SET_MEM_TABLE, dev->mem);
->> +       assert(r >= 0);
->> +
->> +       r = ioctl(dev->control, VHOST_SET_FEATURES, &features);
->> +       assert(r >= 0);
->> +
->> +       dev->nvqs = 2;
->> +}
->> +
->> +static void wait_for_interrupt(struct vq_info *vq)
->> +{
->> +       unsigned long long val;
->> +
->> +       poll(&vq->fds, 1, -1);
->> +
->> +       if (vq->fds.revents & POLLIN)
->> +               read(vq->fds.fd, &val, sizeof(val));
->> +}
->> +
->> +static void verify_res_buf(char *res_buf)
->> +{
->> +       int i;
->> +
->> +       for (i = ETHER_HDR_LEN; i < TEST_BUF_LEN; i++)
->> +               assert(res_buf[i] == (char)i);
->> +}
->> +
->> +static void run_tx_test(struct vdev_info *dev, struct vq_info *vq,
->> +                       bool delayed, int batch, int bufs)
-> 
-> It might be better to describe the test design briefly above as a
-> comment. Or we can start from simple test logic and add sophisticated
-> ones on top.
-
-Does something described in the comment log as suggested by you make
-sense to you?
-Steps for vhost_net tx testing:
-1. Prepare a out buf
-2. Kick the vhost_net to do tx processing
-3. Do the receiving in the tun side
-4. verify the data received by tun is correct
-
-> 
->> +{
->> +       const bool random_batch = batch == RANDOM_BATCH;
->> +       long long spurious = 0;
->> +       struct scatterlist sl;
->> +       unsigned int len;
->> +       int r;
->> +
->> +       for (;;) {
->> +               long started_before = vq->started;
->> +               long completed_before = vq->completed;
->> +
->> +               virtqueue_disable_cb(vq->vq);
->> +               do {
->> +                       if (random_batch)
->> +                               batch = (random() % vq->vring.num) + 1;
->> +
->> +                       while (vq->started < bufs &&
->> +                              (vq->started - vq->completed) < batch) {
->> +                               sg_init_one(&sl, dev->test_buf, HDR_LEN + TEST_BUF_LEN);
->> +                               r = virtqueue_add_outbuf(vq->vq, &sl, 1,
->> +                                                        dev->test_buf + vq->started,
->> +                                                        GFP_ATOMIC);
->> +                               if (unlikely(r != 0)) {
->> +                                       if (r == -ENOSPC &&
->> +                                           vq->started > started_before)
->> +                                               r = 0;
->> +                                       else
->> +                                               r = -1;
->> +                                       break;
->> +                               }
->> +
->> +                               ++vq->started;
->> +
->> +                               if (unlikely(!virtqueue_kick(vq->vq))) {
->> +                                       r = -1;
->> +                                       break;
->> +                               }
->> +                       }
->> +
->> +                       if (vq->started >= bufs)
->> +                               r = -1;
->> +
->> +                       /* Flush out completed bufs if any */
->> +                       while (virtqueue_get_buf(vq->vq, &len)) {
->> +                               int n;
->> +
->> +                               n = recvfrom(dev->sock, dev->res_buf, TEST_BUF_LEN, 0, NULL, NULL);
->> +                               assert(n == TEST_BUF_LEN);
->> +                               verify_res_buf(dev->res_buf);
->> +
->> +                               ++vq->completed;
->> +                               r = 0;
->> +                       }
->> +               } while (r == 0);
->> +
->> +               if (vq->completed == completed_before && vq->started == started_before)
->> +                       ++spurious;
->> +
->> +               assert(vq->completed <= bufs);
->> +               assert(vq->started <= bufs);
->> +               if (vq->completed == bufs)
->> +                       break;
->> +
->> +               if (delayed) {
->> +                       if (virtqueue_enable_cb_delayed(vq->vq))
->> +                               wait_for_interrupt(vq);
->> +               } else {
->> +                       if (virtqueue_enable_cb(vq->vq))
->> +                               wait_for_interrupt(vq);
->> +               }
->> +       }
->> +       printf("TX spurious wakeups: 0x%llx started=0x%lx completed=0x%lx\n",
->> +              spurious, vq->started, vq->completed);
->> +}
->> +
->> +static void run_rx_test(struct vdev_info *dev, struct vq_info *vq,
->> +                       bool delayed, int batch, int bufs)
->> +{
->> +       const bool random_batch = batch == RANDOM_BATCH;
->> +       long long spurious = 0;
->> +       struct scatterlist sl;
->> +       unsigned int len;
->> +       int r;
->> +
->> +       for (;;) {
->> +               long started_before = vq->started;
->> +               long completed_before = vq->completed;
->> +
->> +               do {
->> +                       if (random_batch)
->> +                               batch = (random() % vq->vring.num) + 1;
->> +
->> +                       while (vq->started < bufs &&
->> +                              (vq->started - vq->completed) < batch) {
->> +                               sg_init_one(&sl, dev->res_buf, HDR_LEN + TEST_BUF_LEN);
->> +
->> +                               r = virtqueue_add_inbuf(vq->vq, &sl, 1,
->> +                                                       dev->res_buf + vq->started,
->> +                                                       GFP_ATOMIC);
->> +                               if (unlikely(r != 0)) {
->> +                                       if (r == -ENOSPC &&
-> 
-> Drivers usually maintain a #free_slots, this can help to avoid the
-> trick for checking ENOSPC?
-
-The above "(vq->started - vq->completed) < batch" seems to ensure that
-the 'r' can't be '-ENOSPC'? We just need to ensure the batch <= desc_num,
-and the 'r == -ENOSPC' checking seems to be unnecessary.
-
-> 
->> +                                           vq->started > started_before)
->> +                                               r = 0;
->> +                                       else
->> +                                               r = -1;
->> +                                       break;
->> +                               }
->> +
->> +                               ++vq->started;
->> +
->> +                               vdev_send_packet(dev);
->> +
->> +                               if (unlikely(!virtqueue_kick(vq->vq))) {
->> +                                       r = -1;
->> +                                       break;
->> +                               }
->> +                       }
->> +
->> +                       if (vq->started >= bufs)
->> +                               r = -1;
->> +
->> +                       /* Flush out completed bufs if any */
->> +                       while (virtqueue_get_buf(vq->vq, &len)) {
->> +                               struct ether_header *eh;
->> +
->> +                               eh = (struct ether_header *)(dev->res_buf + HDR_LEN);
->> +
->> +                               /* tun netdev is up and running, ignore the
->> +                                * non-TEST_PTYPE packet.
->> +                                */
-> 
-> I wonder if it's better to set up some kind of qdisc to avoid the
-> unexpected packet here, or is it too complicated?
-
-Yes, at least I don't know to do that yet.
-
-> 
-> Thanks
-> 
-> .
-> 
+>
+> > ---
+> >  fs/pipe.c | 81 +++++++++++++++++++++++++------------------------------
+> >  1 file changed, 36 insertions(+), 45 deletions(-)
+> >
+> > diff --git a/fs/pipe.c b/fs/pipe.c
+> > index f1adbfe743d4..50c8a8596b52 100644
+> > --- a/fs/pipe.c
+> > +++ b/fs/pipe.c
+> > @@ -76,18 +76,20 @@ static unsigned long pipe_user_pages_soft =3D PIPE_=
+DEF_BUFFERS * INR_OPEN_CUR;
+> >   * -- Manfred Spraul <manfred@colorfullife.com> 2002-05-09
+> >   */
+> >
+> > -static void pipe_lock_nested(struct pipe_inode_info *pipe, int subclas=
+s)
+> > +#define cmp_int(l, r)                ((l > r) - (l < r))
+> > +
+> > +#ifdef CONFIG_PROVE_LOCKING
+> > +static int pipe_lock_cmp_fn(const struct lockdep_map *a,
+> > +                         const struct lockdep_map *b)
+> >  {
+> > -     if (pipe->files)
+> > -             mutex_lock_nested(&pipe->mutex, subclass);
+> > +     return cmp_int((unsigned long) a, (unsigned long) b);
+> >  }
+> > +#endif
+> >
+> >  void pipe_lock(struct pipe_inode_info *pipe)
+> >  {
+> > -     /*
+> > -      * pipe_lock() nests non-pipe inode locks (for writing to a file)
+> > -      */
+> > -     pipe_lock_nested(pipe, I_MUTEX_PARENT);
+> > +     if (pipe->files)
+> > +             mutex_lock(&pipe->mutex);
+> >  }
+> >  EXPORT_SYMBOL(pipe_lock);
+> >
+> > @@ -98,28 +100,16 @@ void pipe_unlock(struct pipe_inode_info *pipe)
+> >  }
+> >  EXPORT_SYMBOL(pipe_unlock);
+> >
+> > -static inline void __pipe_lock(struct pipe_inode_info *pipe)
+> > -{
+> > -     mutex_lock_nested(&pipe->mutex, I_MUTEX_PARENT);
+> > -}
+> > -
+> > -static inline void __pipe_unlock(struct pipe_inode_info *pipe)
+> > -{
+> > -     mutex_unlock(&pipe->mutex);
+> > -}
+> > -
+> >  void pipe_double_lock(struct pipe_inode_info *pipe1,
+> >                     struct pipe_inode_info *pipe2)
+> >  {
+> >       BUG_ON(pipe1 =3D=3D pipe2);
+> >
+> > -     if (pipe1 < pipe2) {
+> > -             pipe_lock_nested(pipe1, I_MUTEX_PARENT);
+> > -             pipe_lock_nested(pipe2, I_MUTEX_CHILD);
+> > -     } else {
+> > -             pipe_lock_nested(pipe2, I_MUTEX_PARENT);
+> > -             pipe_lock_nested(pipe1, I_MUTEX_CHILD);
+> > -     }
+> > +     if (pipe1 > pipe2)
+> > +             swap(pipe1, pipe2);
+> > +
+> > +     pipe_lock(pipe1);
+> > +     pipe_lock(pipe2);
+> >  }
+> >
+> >  static void anon_pipe_buf_release(struct pipe_inode_info *pipe,
+> > @@ -271,7 +261,7 @@ pipe_read(struct kiocb *iocb, struct iov_iter *to)
+> >               return 0;
+> >
+> >       ret =3D 0;
+> > -     __pipe_lock(pipe);
+> > +     mutex_lock(&pipe->mutex);
+> >
+> >       /*
+> >        * We only wake up writers if the pipe was full when we started
+> > @@ -368,7 +358,7 @@ pipe_read(struct kiocb *iocb, struct iov_iter *to)
+> >                       ret =3D -EAGAIN;
+> >                       break;
+> >               }
+> > -             __pipe_unlock(pipe);
+> > +             mutex_unlock(&pipe->mutex);
+> >
+> >               /*
+> >                * We only get here if we didn't actually read anything.
+> > @@ -400,13 +390,13 @@ pipe_read(struct kiocb *iocb, struct iov_iter *to=
+)
+> >               if (wait_event_interruptible_exclusive(pipe->rd_wait, pip=
+e_readable(pipe)) < 0)
+> >                       return -ERESTARTSYS;
+> >
+> > -             __pipe_lock(pipe);
+> > +             mutex_lock(&pipe->mutex);
+> >               was_full =3D pipe_full(pipe->head, pipe->tail, pipe->max_=
+usage);
+> >               wake_next_reader =3D true;
+> >       }
+> >       if (pipe_empty(pipe->head, pipe->tail))
+> >               wake_next_reader =3D false;
+> > -     __pipe_unlock(pipe);
+> > +     mutex_unlock(&pipe->mutex);
+> >
+> >       if (was_full)
+> >               wake_up_interruptible_sync_poll(&pipe->wr_wait, EPOLLOUT =
+| EPOLLWRNORM);
+> > @@ -462,7 +452,7 @@ pipe_write(struct kiocb *iocb, struct iov_iter *fro=
+m)
+> >       if (unlikely(total_len =3D=3D 0))
+> >               return 0;
+> >
+> > -     __pipe_lock(pipe);
+> > +     mutex_lock(&pipe->mutex);
+> >
+> >       if (!pipe->readers) {
+> >               send_sig(SIGPIPE, current, 0);
+> > @@ -582,19 +572,19 @@ pipe_write(struct kiocb *iocb, struct iov_iter *f=
+rom)
+> >                * after waiting we need to re-check whether the pipe
+> >                * become empty while we dropped the lock.
+> >                */
+> > -             __pipe_unlock(pipe);
+> > +             mutex_unlock(&pipe->mutex);
+> >               if (was_empty)
+> >                       wake_up_interruptible_sync_poll(&pipe->rd_wait, E=
+POLLIN | EPOLLRDNORM);
+> >               kill_fasync(&pipe->fasync_readers, SIGIO, POLL_IN);
+> >               wait_event_interruptible_exclusive(pipe->wr_wait, pipe_wr=
+itable(pipe));
+> > -             __pipe_lock(pipe);
+> > +             mutex_lock(&pipe->mutex);
+> >               was_empty =3D pipe_empty(pipe->head, pipe->tail);
+> >               wake_next_writer =3D true;
+> >       }
+> >  out:
+> >       if (pipe_full(pipe->head, pipe->tail, pipe->max_usage))
+> >               wake_next_writer =3D false;
+> > -     __pipe_unlock(pipe);
+> > +     mutex_unlock(&pipe->mutex);
+> >
+> >       /*
+> >        * If we do do a wakeup event, we do a 'sync' wakeup, because we
+> > @@ -629,7 +619,7 @@ static long pipe_ioctl(struct file *filp, unsigned =
+int cmd, unsigned long arg)
+> >
+> >       switch (cmd) {
+> >       case FIONREAD:
+> > -             __pipe_lock(pipe);
+> > +             mutex_lock(&pipe->mutex);
+> >               count =3D 0;
+> >               head =3D pipe->head;
+> >               tail =3D pipe->tail;
+> > @@ -639,16 +629,16 @@ static long pipe_ioctl(struct file *filp, unsigne=
+d int cmd, unsigned long arg)
+> >                       count +=3D pipe->bufs[tail & mask].len;
+> >                       tail++;
+> >               }
+> > -             __pipe_unlock(pipe);
+> > +             mutex_unlock(&pipe->mutex);
+> >
+> >               return put_user(count, (int __user *)arg);
+> >
+> >  #ifdef CONFIG_WATCH_QUEUE
+> >       case IOC_WATCH_QUEUE_SET_SIZE: {
+> >               int ret;
+> > -             __pipe_lock(pipe);
+> > +             mutex_lock(&pipe->mutex);
+> >               ret =3D watch_queue_set_size(pipe, arg);
+> > -             __pipe_unlock(pipe);
+> > +             mutex_unlock(&pipe->mutex);
+> >               return ret;
+> >       }
+> >
+> > @@ -734,7 +724,7 @@ pipe_release(struct inode *inode, struct file *file=
+)
+> >  {
+> >       struct pipe_inode_info *pipe =3D file->private_data;
+> >
+> > -     __pipe_lock(pipe);
+> > +     mutex_lock(&pipe->mutex);
+> >       if (file->f_mode & FMODE_READ)
+> >               pipe->readers--;
+> >       if (file->f_mode & FMODE_WRITE)
+> > @@ -747,7 +737,7 @@ pipe_release(struct inode *inode, struct file *file=
+)
+> >               kill_fasync(&pipe->fasync_readers, SIGIO, POLL_IN);
+> >               kill_fasync(&pipe->fasync_writers, SIGIO, POLL_OUT);
+> >       }
+> > -     __pipe_unlock(pipe);
+> > +     mutex_unlock(&pipe->mutex);
+> >
+> >       put_pipe_info(inode, pipe);
+> >       return 0;
+> > @@ -759,7 +749,7 @@ pipe_fasync(int fd, struct file *filp, int on)
+> >       struct pipe_inode_info *pipe =3D filp->private_data;
+> >       int retval =3D 0;
+> >
+> > -     __pipe_lock(pipe);
+> > +     mutex_lock(&pipe->mutex);
+> >       if (filp->f_mode & FMODE_READ)
+> >               retval =3D fasync_helper(fd, filp, on, &pipe->fasync_read=
+ers);
+> >       if ((filp->f_mode & FMODE_WRITE) && retval >=3D 0) {
+> > @@ -768,7 +758,7 @@ pipe_fasync(int fd, struct file *filp, int on)
+> >                       /* this can happen only if on =3D=3D T */
+> >                       fasync_helper(-1, filp, 0, &pipe->fasync_readers)=
+;
+> >       }
+> > -     __pipe_unlock(pipe);
+> > +     mutex_unlock(&pipe->mutex);
+> >       return retval;
+> >  }
+> >
+> > @@ -834,6 +824,7 @@ struct pipe_inode_info *alloc_pipe_info(void)
+> >               pipe->nr_accounted =3D pipe_bufs;
+> >               pipe->user =3D user;
+> >               mutex_init(&pipe->mutex);
+> > +             lock_set_cmp_fn(&pipe->mutex, pipe_lock_cmp_fn, NULL);
+> >               return pipe;
+> >       }
+> >
+> > @@ -1144,7 +1135,7 @@ static int fifo_open(struct inode *inode, struct =
+file *filp)
+> >       filp->private_data =3D pipe;
+> >       /* OK, we have a pipe and it's pinned down */
+> >
+> > -     __pipe_lock(pipe);
+> > +     mutex_lock(&pipe->mutex);
+> >
+> >       /* We can only do regular read/write on fifos */
+> >       stream_open(inode, filp);
+> > @@ -1214,7 +1205,7 @@ static int fifo_open(struct inode *inode, struct =
+file *filp)
+> >       }
+> >
+> >       /* Ok! */
+> > -     __pipe_unlock(pipe);
+> > +     mutex_unlock(&pipe->mutex);
+> >       return 0;
+> >
+> >  err_rd:
+> > @@ -1230,7 +1221,7 @@ static int fifo_open(struct inode *inode, struct =
+file *filp)
+> >       goto err;
+> >
+> >  err:
+> > -     __pipe_unlock(pipe);
+> > +     mutex_unlock(&pipe->mutex);
+> >
+> >       put_pipe_info(inode, pipe);
+> >       return ret;
+> > @@ -1411,7 +1402,7 @@ long pipe_fcntl(struct file *file, unsigned int c=
+md, unsigned int arg)
+> >       if (!pipe)
+> >               return -EBADF;
+> >
+> > -     __pipe_lock(pipe);
+> > +     mutex_lock(&pipe->mutex);
+> >
+> >       switch (cmd) {
+> >       case F_SETPIPE_SZ:
+> > @@ -1425,7 +1416,7 @@ long pipe_fcntl(struct file *file, unsigned int c=
+md, unsigned int arg)
+> >               break;
+> >       }
+> >
+> > -     __pipe_unlock(pipe);
+> > +     mutex_unlock(&pipe->mutex);
+> >       return ret;
+> >  }
+> >
+> > --
+> > 2.43.0
+> >
+> --
+> Jan Kara <jack@suse.com>
+> SUSE Labs, CR
+>
 
