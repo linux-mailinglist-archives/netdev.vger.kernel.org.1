@@ -1,106 +1,104 @@
-Return-Path: <netdev+bounces-68581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 721E384749C
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:24:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 014EB8474A3
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:25:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E33B2916C4
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:24:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFF09292977
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:25:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873CE145B07;
-	Fri,  2 Feb 2024 16:24:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9E11474C3;
+	Fri,  2 Feb 2024 16:25:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WEfSM85R"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Yqe8jl7E"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F5D1474C1
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 16:24:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D2571468FF;
+	Fri,  2 Feb 2024 16:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706891040; cv=none; b=aL1aMmyb5zEFs67SMOy2hBNxmJZOWco0X+Ls50+Bta3wo1RS8DKpreyG/4Wf4B44FWou1DMs9+6HGoxJLnlW9xovp4Y21JB23JH2wRsLvHtvJcUnKlww9gr4O5i7nhrcvEIMKwyGcV9VY3gyU2jJeMq/2ZQQYQiFK0k7Vy9FfKQ=
+	t=1706891124; cv=none; b=j5W7SvUi479Xt4MM92Hkg5aU+oLmMRxSG61FGRi4O3dR8rLUV1j0A2yhDtzvJoSJFa1lLgK/+uavEr14RuBEOLXug6xPtY+Jy5TeWdUU/72wV/teF2GPyD1dTYGKlUK7ym0QaCsEbPFH4j4gRbitnSCsSYz+tC2LZDS7lcz3Qj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706891040; c=relaxed/simple;
-	bh=A4cjklZ1Oqe0cilrN2NQCkymwAfXc1h9dP9hoDDFxnc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=mESLnR8S54ikA9TnGtQLdUC4dpybjKBsVyWQpCnNjjUAkEGjCvvFsrChpRc9RZWUTMF35azfLZu5JLk0EHVIlbVSbKHskvvEvKm4YMJxQHR+T9Ckb0rwhGnIvfSGxfsuKg925RngXYvlR9sL4riqzaYSqxn5fYY0Y0Tql408uWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WEfSM85R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ADBFBC433F1;
-	Fri,  2 Feb 2024 16:23:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706891039;
-	bh=A4cjklZ1Oqe0cilrN2NQCkymwAfXc1h9dP9hoDDFxnc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WEfSM85R+d7xZ5riYUuVyXqMI65LXEM6M7JRgPyYDX29lEKv4RWYS+JZb86O1LULH
-	 /GJtdH7NcFvj08hVrmwO2q4dbaZSpdYLDMrjiP3RpCd5VKziKgyHqDaHzR95cmJHH6
-	 hprHYV2z0VimLWvUG1VsAFyHg50c7XmG75g1g+kZ8ce8SEnUhTOuaAOk1eHJmbI0D2
-	 slUYhFYRP3LBS01J98LwSZZZuI10JwWv3PTVRneKmf4mwV1PbaBpTkdKo8To6VlVNk
-	 8FYq73HS+zzkJYUXKty3YxKZv9MepgtwIqpiAhBOkMJUKqQ9jCRI3AY2+srN8N9f5L
-	 qOAUYOAJkybOA==
-Date: Fri, 2 Feb 2024 08:23:58 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: Jiri Pirko <jiri@resnulli.us>, Stephen Hemminger
- <stephen@networkplumber.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH 1/3] net/sched: netem: use extack
-Message-ID: <20240202082358.1f2fd8ec@kernel.org>
-In-Reply-To: <m2bk8zulpb.fsf@gmail.com>
-References: <20240201034653.450138-1-stephen@networkplumber.org>
-	<20240201034653.450138-2-stephen@networkplumber.org>
-	<Zbtks__SZIgoDTaj@nanopsycho>
-	<20240201090046.1b93bcbd@kernel.org>
-	<m2bk8zulpb.fsf@gmail.com>
+	s=arc-20240116; t=1706891124; c=relaxed/simple;
+	bh=5k8mKkVdz5DWjDbMmA5DXVLJ+PTi+mk9o+WFQB+6iB8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=j6VGVmxdB/TOC8M/dzlKyn7n+UzDxQfo5L2JxR355yYs+bouWCrLPQRRRIRtXH7DHSy/BXK8EQR4mdFr/KM1GNV7D+Tae7TFf7FtK/fHdKRo0TC9FLWlmQhh/3haL/3m/HwuJeDROHshrysxlxBB/N6lVJtKarfoK8yXMwCD/gY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Yqe8jl7E; arc=none smtp.client-ip=209.85.166.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-7ba9f1cfe94so102439739f.1;
+        Fri, 02 Feb 2024 08:25:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706891122; x=1707495922; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5k8mKkVdz5DWjDbMmA5DXVLJ+PTi+mk9o+WFQB+6iB8=;
+        b=Yqe8jl7EUQwTGVqNY1Y30jS7YpVyAZUjPztIoE5/fUn9Fmk7gZ37WPC9XZD98YL5wL
+         ygSo5IuY5SnVmttl3+hnuF/7WZShqK3PQWO6kt/kjhD8IdLMt9NgzplKPb41IOP8atdn
+         LQ7T9rOTfMS6xJsSsivQk/usGRE9P9pd4nKiNZx9vuApSqDONI8kmcaPpcc9t5o55NyB
+         4lGSj9KjGNoSdpayvGI7XBo8jjS5kfyUMP+4IR3r48cZsAQlIIPwIcwBr7WKuOPwOQWX
+         Tk6zbDJ3z0Mcgd4EpE7e8Qixdzxi00wRZXPQrwyHZ9oLeMVEPa6664C1xiqmwhrbxgfF
+         7WEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706891122; x=1707495922;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5k8mKkVdz5DWjDbMmA5DXVLJ+PTi+mk9o+WFQB+6iB8=;
+        b=DE/jUwgv0W3lfH096jcyOFMdlGMLRQehIenRT9eQo+PAsHitGVJOHZllPNiunXEwJC
+         e/ORZ4aN5jwodg/YzR3viXLKta1/MLXpnTOdgpyPUeTuzyT+H0kcjDraEsUZowfRoQOP
+         FB2W+zU6HJcB7Rs0MbiDKn8JN/X3Ce4POpAkiEgMYxvfMHoURHlqSQNlRWfn+tGMuot1
+         XelUV6TK3rhP6RcNAbW6m/E90nKEQ4d8Vus4Jl6aD+E+kXEGtNL76mfcd3UE9yhQucj+
+         LYCCgVYRvWiLdOdiYbgimjwf8s3q4WGaQ9zCu7lqoCsVMQ2FZhAnrcZffJcLi6HNls74
+         hgCw==
+X-Gm-Message-State: AOJu0YywPw+OKNnnBon9amRyC/OOt/VKz0HaPcWvRSCuhzSdrs3A5m6W
+	e0NRKhWWPcrbc2LeA0KdkWuPHh54C8W04CYWnyuIReeFTdvfZNgVPNePByzX+97ysIo2Qgj7Pgk
+	eWnI71kci2Himgtg++4AMBO8KUW8=
+X-Google-Smtp-Source: AGHT+IGODY0ZLWoVirFF+z0KGkDtRIBITBqgb9qbMw2pbSlc+t5obb4QxW83V0s+9ue5Wua2TMbj3bITgfy8p5FtWA8=
+X-Received: by 2002:a05:6e02:1a2f:b0:363:9f5e:c449 with SMTP id
+ g15-20020a056e021a2f00b003639f5ec449mr2292546ile.1.1706891122103; Fri, 02 Feb
+ 2024 08:25:22 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <f011968fee563eeaaa82bf94e760e9f612eee356.1706889875.git.pabeni@redhat.com>
+In-Reply-To: <f011968fee563eeaaa82bf94e760e9f612eee356.1706889875.git.pabeni@redhat.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Fri, 2 Feb 2024 11:25:11 -0500
+Message-ID: <CADvbK_cWU8-Ydo6rcOPm9MOJVhTPYyYSGX3ZTNUvJVR9ZkstKQ@mail.gmail.com>
+Subject: Re: [PATCH net] selftests: net: let big_tcp test cope with slow env
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+	linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 02 Feb 2024 11:53:04 +0000 Donald Hunter wrote:
-> > Looks like most sch's require opt. Would it be a bad idea to pull 
-> > the check out to the caller? Minor simplification, plus the caller
-> > has the outer message so they can use NL_SET_ERR_ATTR_MISS() and
-> > friends.  
-> 
-> There's also these which maybe complicates things:
-> 
-> $ git grep -A1 'if (opt == NULL)' -- net/sched/
-> net/sched/cls_flow.c:   if (opt == NULL)
-> net/sched/cls_flow.c-           return -EINVAL;
-> --
-> net/sched/sch_choke.c:  if (opt == NULL)
-> net/sched/sch_choke.c-          return -EINVAL;
-> --
-> net/sched/sch_fifo.c:   if (opt == NULL) {
-> net/sched/sch_fifo.c-           u32 limit = qdisc_dev(sch)->tx_queue_len;
-> --
-> net/sched/sch_hfsc.c:   if (opt == NULL)
-> net/sched/sch_hfsc.c-           return -EINVAL;
-> --
-> net/sched/sch_plug.c:   if (opt == NULL) {
-> net/sched/sch_plug.c-           q->limit = qdisc_dev(sch)->tx_queue_len
-
-That's fine, I was thinking opt-in. Add a bit to ops that says
-"init_requires_opts" or whatnot. 
-
-> I'm in favour of qdisc specific extack messages.
-
-Most of them just say "$name requires options" in a more or less concise
-and more or less well spelled form :( Even if we don't want to depend
-purely on ATTR_MISS - extack messages support printf now, and we have
-the qdisc name in the ops (ops->id), so we can printf the same string 
-in the core.
-
-Just an idea, if you all prefer to keep things as they are, that's fine.
-But we've been sprinkling the damn string messages throughout TC for
-years now, and still they keep coming and still if you step one foot
-away from the most actively developed actions and classifiers, you're
-back in the 90s :( 
+On Fri, Feb 2, 2024 at 11:07=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> In very slow environments, most big TCP cases including
+> segmentation and reassembly of big TCP packets have a good
+> chance to fail: by default the TCP client uses write size
+> well below 64K. If the host is low enough autocorking is
+> unable to build real big TCP packets.
+>
+> Address the issue using much larger write operations.
+>
+> Note that is hard to observe the issue without an extremely
+> slow and/or overloaded environment; reduce the TCP transfer
+> time to allow for much easier/faster reproducibility.
+>
+> Fixes: 6bb382bcf742 ("selftests: add a selftest for big tcp")
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Acked-by: Xin Long <lucien.xin@gmail.com>
 
