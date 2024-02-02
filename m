@@ -1,160 +1,128 @@
-Return-Path: <netdev+bounces-68730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F7D2847BB7
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 22:38:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD010847BCC
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 22:50:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5BDF1F282EF
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 21:38:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63AF1287DFE
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 21:50:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3212F839E5;
-	Fri,  2 Feb 2024 21:38:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B175483A03;
+	Fri,  2 Feb 2024 21:50:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E0wRh0ez"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bTySsv6t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BCF9839EE;
-	Fri,  2 Feb 2024 21:38:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D117D8060D;
+	Fri,  2 Feb 2024 21:50:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706909931; cv=none; b=Sx+jFbKskB48E8+RXVrXE8CC91ZsLPBO7KhdvUImx92dLEGyu2FhPTkBy3jMBnxDfF8Ih/u85VrOaz++W5PRmen8ZaTIljIYoBkTS9nO+g71jszmR6K6zE6eTIWZmvVWSf7JlMMhZ4wU33ohdJGk7jaWmBF/I/Br9+95eWR4j08=
+	t=1706910649; cv=none; b=uDcQQrT/XhQI6NcwPyUOiVEICiMoFxLGLtp5fcWY7URVZ8DrUAXDpaX9wVLtLrJIKjuDZFvQwxxWxviWOg7y+5gbu+lMfiduIyfqXeYlCNw3onvxXXRb9aWiTmmz2vTNs3CKARNw4oqL4E7I4teFJ9t6QKcbDt6F4ucx8fj9JAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706909931; c=relaxed/simple;
-	bh=F6VquZN2wtXDcdORlyKdNN7aLm3JSWls/Qx7ZNJpgk0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bCLCwvhKl9ZPbPI/4rL5SBXX98v1VWdYiCincd0kCaHQXfuMIwuCIvJVnkQ5KBp3NcgC+lIDa1RwKib6VzxRRbsxMt+bzkND9DSVvrvgVtrVc5nBs7r18HO48JJ22GB0xpv3aWacCP1RUNsLpkGQi6O6haA7VuzkT8TlyA//jUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E0wRh0ez; arc=none smtp.client-ip=209.85.219.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-dc6c0dc50dcso2197579276.2;
-        Fri, 02 Feb 2024 13:38:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706909928; x=1707514728; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gsmzFnQIcz/cfdKoMIxMibTLWaipEjSMwVTmlwFeBfY=;
-        b=E0wRh0ezVmEKg0O51crq4+Z5uvhBFLLDfwLCQ1MbTQk6NzqVQXMjErfj5lOTs6o/yM
-         KXlJBCDxUGNfbE+t/zz6//51m81gqDzTBG0WCRigC5F6JUiuXDYbzbxfEEP23Bu1AX9Y
-         KjBSJGC8zhkGqaODDAExJT9aNwF49KQDWLmkiNktmsNEnIMek3djleJBM4TA0/rzbaTB
-         LS+dOCMz6Nr/tPr0Uask5DcfpvlpE1qpgb7NQUmkwuhDbHxUEOSIFmFW1jwiKqiG8p1U
-         WPqnRk7ZtzoxJDXHY5iUqTzUZpvMyGXDddIZbYz7MxnFiOkWF5cPRb9igiFvcm28zL7Z
-         z1SQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706909928; x=1707514728;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gsmzFnQIcz/cfdKoMIxMibTLWaipEjSMwVTmlwFeBfY=;
-        b=s8+e8veYBgANgmlGsUZcz1+Quv+2yTTh7y6D6BSgF0335O/9lUQ45ITKy9c1jIb7g+
-         ZyLG9fmhbM96iCd42sE62tFIRtyNVIO9F6NgxhKzELqig3RZcszMX0NBCe+c2FJGdORl
-         xS4zEU/5Tb9XrQ1zIMhRF4H+6585FTd3euVUF4GiE0XKMQVDInFN++xdD0/IQoxvfLVZ
-         gkFdhlRqRI33R1a2mNZDXrFaQag79iCSPUJ6mWSRqcJN9wktqlDCsTSg9AoNyuziG7pz
-         Sb2EtpwhSe18BTbEGdncD5W0InB8tLzSmqEsIG4CmOxYOqnsD1B44qv/ggiFNiuiZsaQ
-         3WMw==
-X-Gm-Message-State: AOJu0Yy6e62SCaLCqvSLSSfIxHsXWgrCGwjQnXVgIcb0BNc6CXOIEVmi
-	iH1PLl4Jv9+jdaA3r5uKkSil9NtN9owRnVNy27PNUY7fcMzePezhUw8+uYZM
-X-Google-Smtp-Source: AGHT+IGYOWp42Mtocorzjb0cxbAYRMA2vVWpDYIkLbO4o9w9ExzIiJfKpJ5weBm3niBtrlOEcbzm3g==
-X-Received: by 2002:a25:6d46:0:b0:dc2:234d:214d with SMTP id i67-20020a256d46000000b00dc2234d214dmr9479422ybc.40.1706909928231;
-        Fri, 02 Feb 2024 13:38:48 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWChupyp0Mz+dMNPd4Y8znsIZpNFhcPVRIRQm6YdOde7BY6Jilnu9sSnU9gwSZuDhSXAoJvuY6HDZa5BaUxEuDcp+S7Qve1n+iMakN+XBQkp0wUeBJ+KsQ=
-Received: from lvondent-mobl4.. (071-047-239-151.res.spectrum.com. [71.47.239.151])
-        by smtp.gmail.com with ESMTPSA id t2-20020a259082000000b00dc22fa579c5sm605591ybl.45.2024.02.02.13.38.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Feb 2024 13:38:47 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2024-02-02
-Date: Fri,  2 Feb 2024 16:38:43 -0500
-Message-ID: <20240202213846.1775983-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1706910649; c=relaxed/simple;
+	bh=O2Lsa5KL5GxKg5QnRfDjyLpIoTIAQCOszwP8LJlqAuo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZdBTb7pNAdYN+DyevOmnU585XBVZmbEXvnevtnIEkEByPA4Anf74lMeV2u0v/nvRnW1Rgr/BEnbVT+GzPWRaSEmoywxHD61vxnF8vojRzCJ4kgEKVS4xgUkoNNXcZyoFhAdJd9GP9iELAnh9JZqdUWMqgjBy7nRyqJ+ipuJ0NIQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bTySsv6t; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=NcIRGxju6SMTFH2+BO670Y4r/6YmRM2psDzw/RSO4YY=; b=bTySsv6tAo2nG6vDjflCwLCzzg
+	yyvGGwyvsWA1nZv7jr0L+Z5cxITNBEfZnfIvqV2Nr4YrI6qzGDTXw0/NMRruC5rMV+GrriWFcPjRZ
+	KlpeVRrQnE08zfUuj/mM+SBMTrT0CAiFfRwbXZNACfPssDVvML9oPinHV4a8Gt9TSbJ8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rW1Qh-006qsK-Dp; Fri, 02 Feb 2024 22:50:35 +0100
+Date: Fri, 2 Feb 2024 22:50:35 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Rob Herring <robh@kernel.org>
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Frank Rowand <frowand.list@gmail.com>,
+	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [net-next PATCH v5 6/9] dt-bindings: net: Document Qcom QCA807x
+ PHY package
+Message-ID: <9e6298ad-a0c9-4c3e-b94b-13dec8c253c6@lunn.ch>
+References: <20240201151747.7524-1-ansuelsmth@gmail.com>
+ <20240201151747.7524-7-ansuelsmth@gmail.com>
+ <20240202204536.GB1075521-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240202204536.GB1075521-robh@kernel.org>
 
-The following changes since commit ba5e1272142d051dcc57ca1d3225ad8a089f9858:
+> > +patternProperties:
+> > +  ^ethernet-phy(@[a-f0-9]+)?$:
+> 
+> I don't get how an address is optional.
 
-  netdevsim: avoid potential loop in nsim_dev_trap_report_work() (2024-02-02 11:00:38 -0800)
+Its pretty unusual, but for example:
 
-are available in the Git repository at:
+arch/arm/boot/dts/nxp/imx/imx6q-novena.dts
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-02-02
+&fec {
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_enet_novena>;
+        phy-mode = "rgmii";
+        phy-handle = <&ethphy>;
+        phy-reset-gpios = <&gpio3 23 GPIO_ACTIVE_LOW>;
+        status = "okay";
 
-for you to fetch changes up to 96d874780bf5b6352e45b4c07c247e37d50263c3:
+        mdio {
+                #address-cells = <1>;
+                #size-cells = <0>;
 
-  Bluetooth: qca: Fix triggering coredump implementation (2024-02-02 16:13:56 -0500)
+                ethphy: ethernet-phy {
+                        compatible = "ethernet-phy-ieee802.3-c22";
+                        rxc-skew-ps = <3000>;
+                        rxdv-skew-ps = <0>;
+                        txc-skew-ps = <3000>;
+                        txen-skew-ps = <0>;
+                        rxd0-skew-ps = <0>;
+                        rxd1-skew-ps = <0>;
+                        rxd2-skew-ps = <0>;
+                        rxd3-skew-ps = <0>;
+                        txd0-skew-ps = <3000>;
+                        txd1-skew-ps = <3000>;
+                        txd2-skew-ps = <3000>;
+                        txd3-skew-ps = <3000>;
+                };
+        };
+};
 
-----------------------------------------------------------------
-bluetooth pull request for net:
+There is no reg property, because its optional. If there is no reg,
+there is no address.
 
- - btintel: Fix null ptr deref in btintel_read_version
- - mgmt: Fix limited discoverable off timeout
- - hci_qca: Set BDA quirk bit if fwnode exists in DT
- - hci_bcm4377: do not mark valid bd_addr as invalid
- - hci_sync: Check the correct flag before starting a scan
- - Enforce validation on max value of connection interval
- - hci_sync: Fix accept_list when attempting to suspend
- - hci_event: Fix handling of HCI_EV_IO_CAPA_REQUEST
- - Avoid potential use-after-free in hci_error_reset
- - rfcomm: Fix null-ptr-deref in rfcomm_check_security
- - hci_event: Fix wrongly recorded wakeup BD_ADDR
- - qca: Fix wrong event type for patch config command
- - qca: Fix triggering coredump implementation
+When phylib finds a DT blob like this, it enumerates the bus, and then
+assigns the nodes to the devices it finds in the order it finds them.
 
-----------------------------------------------------------------
-Edward Adam Davis (1):
-      Bluetooth: btintel: Fix null ptr deref in btintel_read_version
+Its old behaviour, from before the times of yaml validation, and
+current best practices, etc. But because it works, it still used in
+new bindings.
 
-Frédéric Danis (1):
-      Bluetooth: mgmt: Fix limited discoverable off timeout
-
-Janaki Ramaiah Thota (1):
-      Bluetooth: hci_qca: Set BDA quirk bit if fwnode exists in DT
-
-Johan Hovold (1):
-      Bluetooth: hci_bcm4377: do not mark valid bd_addr as invalid
-
-Jonas Dreßler (1):
-      Bluetooth: hci_sync: Check the correct flag before starting a scan
-
-Kai-Heng Feng (1):
-      Bluetooth: Enforce validation on max value of connection interval
-
-Luiz Augusto von Dentz (2):
-      Bluetooth: hci_sync: Fix accept_list when attempting to suspend
-      Bluetooth: hci_event: Fix handling of HCI_EV_IO_CAPA_REQUEST
-
-Ying Hsu (1):
-      Bluetooth: Avoid potential use-after-free in hci_error_reset
-
-Yuxuan Hu (1):
-      Bluetooth: rfcomm: Fix null-ptr-deref in rfcomm_check_security
-
-Zijun Hu (3):
-      Bluetooth: hci_event: Fix wrongly recorded wakeup BD_ADDR
-      Bluetooth: qca: Fix wrong event type for patch config command
-      Bluetooth: qca: Fix triggering coredump implementation
-
- drivers/bluetooth/btintel.c     |  2 +-
- drivers/bluetooth/btqca.c       |  2 +-
- drivers/bluetooth/hci_bcm4377.c |  3 +--
- drivers/bluetooth/hci_qca.c     | 22 ++++++++++++++++------
- net/bluetooth/hci_core.c        |  7 ++++---
- net/bluetooth/hci_event.c       | 13 ++++++++++---
- net/bluetooth/hci_sync.c        |  7 +++++--
- net/bluetooth/l2cap_core.c      |  8 +++++++-
- net/bluetooth/mgmt.c            |  4 +++-
- net/bluetooth/rfcomm/core.c     |  2 +-
- 10 files changed, 49 insertions(+), 21 deletions(-)
+    Andrew
 
