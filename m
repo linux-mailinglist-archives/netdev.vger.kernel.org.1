@@ -1,62 +1,59 @@
-Return-Path: <netdev+bounces-68658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A9068477C2
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:39:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CB318477D3
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:40:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21BCC1F236E4
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:39:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F98C1C2661D
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72244151CC9;
-	Fri,  2 Feb 2024 18:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94004154453;
+	Fri,  2 Feb 2024 18:39:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dwJYjqbX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QYRvzNcd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 415DA15147F;
-	Fri,  2 Feb 2024 18:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D3F15444D;
+	Fri,  2 Feb 2024 18:39:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706899171; cv=none; b=nWrEzWqZ3JS7j766Z/DwpCgw4w7BWnY5U9BbdtjxNs5p0wi2RDe7AUsoI2oVF7VUBgqUvFhScCUEYzyj2DMBaa/kUfJJ6Y/F+1aT7P4O0VxnMOmJzr+UndeGhkeogXttTcwyeWoX2lUp14P/3vAxbJSAJGyfgsl+op5FoN7+dm8=
+	t=1706899176; cv=none; b=bMa89eyiEfdeqWbQZaqkOdjvQdisJBu9sgt29IZ7Ed+h7EQcibOF4pUXVnXaOGVCPQEoWXvBZ6nykpqEVjnfCTi0YQcTckhiuMac5gC7B78MiVE6m8m0/xjT4G245HPOKxNJOvnzPoqmHonJU1QJCbbjhn56u8BhkhLs9l6P5XY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706899171; c=relaxed/simple;
-	bh=rTiMzZumFkAMwgLLb/3XmyG868+z7oI8xdqdDsyYiqI=;
+	s=arc-20240116; t=1706899176; c=relaxed/simple;
+	bh=N+iMXqBMlZrQ+J+4xgN6PKCTFmhrm6XrOnA1jsh8+Ps=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=p5XPxmMpdtZD2zEuSiicVx73jHTNZ90AUwZ9hyqscor4DrGjJJmaftreYyzxFDQHt9DVZdX6iSjQgRUOM7IbwwkT9rwMeAgl9S5abHOT02XzdH7waRNY8Sfad6nl6qdE/OKqZfMIHMruGqvGIoQk6cIoFIb7wpauB3VgnQN5x5s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dwJYjqbX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC1BCC43390;
-	Fri,  2 Feb 2024 18:39:29 +0000 (UTC)
+	 MIME-Version; b=WYDiMM7EAagmy0tbjsRmUgocUofosWo7M3GKGmv0LjMJM3FUGWrX5zx4EFhdUv7lzQGivk009nSqhKBoLjNkgTbL5VCLlOUXA/mlKEoKhWWSVbCjARBOw+9P9QHEKMTuO9Z36L1StBnSUn6xTvfXxJq/eEP4asLS/JXT1PJxaRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QYRvzNcd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7CBAC43390;
+	Fri,  2 Feb 2024 18:39:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706899171;
-	bh=rTiMzZumFkAMwgLLb/3XmyG868+z7oI8xdqdDsyYiqI=;
+	s=k20201202; t=1706899175;
+	bh=N+iMXqBMlZrQ+J+4xgN6PKCTFmhrm6XrOnA1jsh8+Ps=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dwJYjqbXF/ym1WXtUmtQT9U6yUqHq0mEcL403Qk7zCuK602cDkfM004TFQAAfIL5S
-	 ZG84rhzE0cRo8t+lEZNvgatpmW+b3NCorr23nlOMbWmejkK72J38yPhTJDaedrta6N
-	 HC09L4rn074eCxzU5YVHXdrvmq2YopyxqB0YDgHqnyxSJloajH/Wp2RscYi2ZvPkKo
-	 lW4zGDFsaLws/ymifjHPOy24ZXrZ2B4mM7Ef47Jk69ENcJeGktuSOSuZ5g+w5EtUvk
-	 TMu4CG4YW45pjuu3jAGl0OHbucIDthruJnnhy3LBG5QInr+tC4nm5ZQlZlDvKYw/Cw
-	 x0RiGO/HIaCFg==
+	b=QYRvzNcdr8hc30kvL/TpCjshNW84mUGmJpkYjLxxswUiovN0VS6nwmeSL4nnHB42d
+	 ERNLZMtHwzNByg5IPwTajGRZ5Yqd/gvsiXNirsMQFiEEZHr3DVD2ar5oKuAdpxWmd8
+	 gvzLQ5X7HePL1Oki23rvnGXL29+HnhdqQHoxKDuhyQ5pUZK4KjPjK0wWb+XtqaL2yk
+	 5IkcAuwwRF4/hapUTS6FXXvPQY9NhOdd3kqWiOj0wUNKomBSW483H+MTc5i9JBRxAI
+	 sNhPJQ07ebA/kH/6PYeHsyFIYreMi4IeeTFVqUmdJPc7zbNVXDyBrTaT6T/uWafaUV
+	 tSMHmS8zb4ljg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Felix Fietkau <nbd@nbd.name>,
-	Johannes Berg <johannes.berg@intel.com>,
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Jiri Pirko <jiri@nvidia.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
+	vadim.fedorenko@linux.dev,
+	jiri@resnulli.us,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.7 02/23] wifi: mac80211: fix race condition on enabling fast-xmit
-Date: Fri,  2 Feb 2024 13:38:58 -0500
-Message-ID: <20240202183926.540467-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.7 05/23] dpll: fix broken error path in dpll_pin_alloc(..)
+Date: Fri,  2 Feb 2024 13:39:01 -0500
+Message-ID: <20240202183926.540467-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240202183926.540467-1-sashal@kernel.org>
 References: <20240202183926.540467-1-sashal@kernel.org>
@@ -71,51 +68,51 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.7.3
 Content-Transfer-Encoding: 8bit
 
-From: Felix Fietkau <nbd@nbd.name>
+From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 
-[ Upstream commit bcbc84af1183c8cf3d1ca9b78540c2185cd85e7f ]
+[ Upstream commit b6a11a7fc4d6337f7ea720b9287d1b9749c4eae0 ]
 
-fast-xmit must only be enabled after the sta has been uploaded to the driver,
-otherwise it could end up passing the not-yet-uploaded sta via drv_tx calls
-to the driver, leading to potential crashes because of uninitialized drv_priv
-data.
-Add a missing sta->uploaded check and re-check fast xmit after inserting a sta.
+If pin type is not expected, or pin properities failed to allocate
+memory, the unwind error path shall not destroy pin's xarrays, which
+were not yet initialized.
+Add new goto label and use it to fix broken error path.
 
-Signed-off-by: Felix Fietkau <nbd@nbd.name>
-Link: https://msgid.link/20240104181059.84032-1-nbd@nbd.name
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/mac80211/sta_info.c | 2 ++
- net/mac80211/tx.c       | 2 +-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ drivers/dpll/dpll_core.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/net/mac80211/sta_info.c b/net/mac80211/sta_info.c
-index 0ba613dd1cc4..b62b21749f52 100644
---- a/net/mac80211/sta_info.c
-+++ b/net/mac80211/sta_info.c
-@@ -910,6 +910,8 @@ static int sta_info_insert_finish(struct sta_info *sta) __acquires(RCU)
- 	if (ieee80211_vif_is_mesh(&sdata->vif))
- 		mesh_accept_plinks_update(sdata);
- 
-+	ieee80211_check_fast_xmit(sta);
-+
- 	return 0;
-  out_remove:
- 	if (sta->sta.valid_links)
-diff --git a/net/mac80211/tx.c b/net/mac80211/tx.c
-index ed4fdf655343..4b2823e36a37 100644
---- a/net/mac80211/tx.c
-+++ b/net/mac80211/tx.c
-@@ -3048,7 +3048,7 @@ void ieee80211_check_fast_xmit(struct sta_info *sta)
- 	    sdata->vif.type == NL80211_IFTYPE_STATION)
- 		goto out;
- 
--	if (!test_sta_flag(sta, WLAN_STA_AUTHORIZED))
-+	if (!test_sta_flag(sta, WLAN_STA_AUTHORIZED) || !sta->uploaded)
- 		goto out;
- 
- 	if (test_sta_flag(sta, WLAN_STA_PS_STA) ||
+diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
+index 3568149b9562..36f5c0eaf604 100644
+--- a/drivers/dpll/dpll_core.c
++++ b/drivers/dpll/dpll_core.c
+@@ -440,7 +440,7 @@ dpll_pin_alloc(u64 clock_id, u32 pin_idx, struct module *module,
+ 	if (WARN_ON(prop->type < DPLL_PIN_TYPE_MUX ||
+ 		    prop->type > DPLL_PIN_TYPE_MAX)) {
+ 		ret = -EINVAL;
+-		goto err;
++		goto err_pin_prop;
+ 	}
+ 	pin->prop = prop;
+ 	refcount_set(&pin->refcount, 1);
+@@ -448,11 +448,12 @@ dpll_pin_alloc(u64 clock_id, u32 pin_idx, struct module *module,
+ 	xa_init_flags(&pin->parent_refs, XA_FLAGS_ALLOC);
+ 	ret = xa_alloc(&dpll_pin_xa, &pin->id, pin, xa_limit_16b, GFP_KERNEL);
+ 	if (ret)
+-		goto err;
++		goto err_xa_alloc;
+ 	return pin;
+-err:
++err_xa_alloc:
+ 	xa_destroy(&pin->dpll_refs);
+ 	xa_destroy(&pin->parent_refs);
++err_pin_prop:
+ 	kfree(pin);
+ 	return ERR_PTR(ret);
+ }
 -- 
 2.43.0
 
