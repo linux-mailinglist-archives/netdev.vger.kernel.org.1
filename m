@@ -1,194 +1,112 @@
-Return-Path: <netdev+bounces-68525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75277847154
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 14:45:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C2B584715B
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 14:46:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B7E628F20D
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:45:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDEF81C226A6
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:46:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23A9F47774;
-	Fri,  2 Feb 2024 13:45:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4F7A1FCA;
+	Fri,  2 Feb 2024 13:46:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ciLtjmQe"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ml2LZsqY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F4374654F
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 13:45:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEF6446B9B
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 13:46:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706881507; cv=none; b=kFQdJObQnxyO1LMvnfOKc2ODdUR36b9sHKA5uXw3+7vZ0z2qVKOM9AkAeUcn1Hh1RFOtoTjrv+XVeSKUOJquo5OWyrxP7RJ6G5ZGmSrHfpMcUWh74pj7qeMNsxfTDsfDl0ZO6lg22wmWy9hVJjsvVUOcQ1pVy+bjjtKm530NlSg=
+	t=1706881568; cv=none; b=EFksiXp4BHD0HtSONCaJzlQ8MBcRcJZNRvUEcdD5vJ/UCwtPH31xDaCrwx1RUhbPigtW+6Kz6jD/YlPOoS0hZ6x0ZmxYwdBS7WvgSLdGSM46RhGM/G8iUfV9guQ2y+mGHd0hfE+y031TbvroMVoJKbdk0LgBcPSpiNTf5q+hedw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706881507; c=relaxed/simple;
-	bh=PKzcI1q48e2Z9AZgmA1h8iLqG3H0FbHpPV+nCkPjFVo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oAgy3YWjCIq2CYnqCPPByJ8TUKSr3xAtiIlBOTrIjug3S9UvuLVOUqYRgydtnpa9qqCy5EnXv62JedFUZ9LEcV6mM91PB6pnvVJ46H3pEeJxmmRX/cgCMC2C3ydZw8HfeuOVXa3N+yiWB734PczKrO9d5vYohsADDfjbiAremC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ciLtjmQe; arc=none smtp.client-ip=209.85.221.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-4b7fc7642fcso947466e0c.0
-        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 05:45:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706881504; x=1707486304; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=IIzUaTAWY721VAmsfjicI7pRblrKzWu2/3eiQAJEETw=;
-        b=ciLtjmQe/0vRcQ3JQLVTYPqCoOMXdITAKbYTfWsB+fpRqSM8y404m8HozoFm5QYZsL
-         hFVfXSOloLdjHecWKFMM8jdutG0nvWpKrQtzxZo7VpdpsY5FH7fHh9BR6g0EGI8yTVqL
-         X2XFDObPrxafA/1Sb4+6fkZuqIpPeMelkv2aWExfqoPn7KK9tQZeXG9t/AtPel9FGaH7
-         3D6N/jyiXnluyTCTST9wICuZosRMjt6x7r2WaOnXojP+XdYv5tffqk+WBcrAJVqpgHB0
-         mPBL6rpGZIAnxdCjkOS5UtTwYUk7va1agy48bAvxlJJIq+FtWNph+TEW7FIGMQjeVOYY
-         27KA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706881504; x=1707486304;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IIzUaTAWY721VAmsfjicI7pRblrKzWu2/3eiQAJEETw=;
-        b=GTRAMmThwUMkkdsIMmY7zx11reF63B7qDF53Q3un01Lqc291E4EjuetZPy0MZ98euD
-         /kubC2sDbC2uIl9k8dKaJGqmoR7lourfPoy1BhGurIYkOiej8kIh2gyMc2tHrlLbGhlY
-         +wfknJKkaeNRAsTaBOPSvuWHeK5E5X4aS3Ei2mrh/Nno2u7KlI7uZ0Mda7/rmH2rTJxx
-         sXeQmTI2KuriEk8QAIAKn+fhoo9KzoI1n5hHtU5KeFs0C4zW4q8UKEmJojb4iqViSTaV
-         rA1j26nDaCVRgdqxI+poTdhoGOFgNHA1NkQjF2TARC7AdNNKhubNu2Cxjcb8kI3bSPMQ
-         Y04A==
-X-Gm-Message-State: AOJu0YzT8AIeDMvdjOG64CYhQLdCxJ/F4JXvEMNcSuKpjOIPMgv2fCPe
-	gThf/OJlDLEyTgs38Ffq5T5K9SjSzJofzCNxMVKbXGxfUok1LyNXX9eJZOVhvryC8R5zG74EYsN
-	dC0Z58mL3IW0b2zvY4SgRJbKv4AdCGBWW4oA5
-X-Google-Smtp-Source: AGHT+IHcugcAY0onJJ9YbOTRMsO8AuL33RLMvypF1xfaELG25ml3lxK0pklBkcHRLPdq/bsUZds6rXkq0SmKDaybI0c=
-X-Received: by 2002:a1f:f4c9:0:b0:4b6:bdba:8460 with SMTP id
- s192-20020a1ff4c9000000b004b6bdba8460mr1847799vkh.9.1706881503872; Fri, 02
- Feb 2024 05:45:03 -0800 (PST)
+	s=arc-20240116; t=1706881568; c=relaxed/simple;
+	bh=QAYb6vsRnOnThDVh38Ak4sBRMhLsPFggVSP2wvyWDho=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q+5F9m1a3db8mEBfJrvIHD1WYvduDZP7sHyPsDDCk5BFVQjAtRT8GItAq/b86ovrefJkDJfqKXeGHpjN0Eqcth9GndF/R2UCl6EzKbSl8oK7hcyoXWYhlxoeFpw8GlVVQh5yAOZNJbddvkuL1cc8+UybZMa2Dk0bvE9Fe+ajyk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ml2LZsqY; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=7hFvlERHieFAUVwlSVD673jXkZUakpcgcmrI0kwzE+Q=; b=ml2LZsqYjytchOT37m3ldtskih
+	8BlyHKRB07xDljmVdrFSERYHH1plpteURpODM5Vq/d+IPZO+LHZlRaRUVf67OJmbhjdIiE37e+vva
+	37DG9vtOcfZBmVswhST+mNnSSti+wB6eTDKAfzSbfXC7cMnpgvHtwxjCSBiGt1pk4+yc/W3JZMB4t
+	TwaNeLJgUyssyER2l37LnXGrSydladNs3goAm41WVV2d50ZUmscFAzZFxE7Gq6nQFct3FRJNYIjRx
+	3OxUAy2ECxEmaq1Xh3FTZI6YBJoVPUuD2b34+q4Vcsy/FYrL7N98JiP5neHHFcKpJDBcGY6Y37G50
+	swML5u6g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59704)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rVtrW-00063T-0c;
+	Fri, 02 Feb 2024 13:45:46 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rVtrP-0008Mp-Lz; Fri, 02 Feb 2024 13:45:39 +0000
+Date: Fri, 2 Feb 2024 13:45:39 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: g@lunn.ch, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	bcm-kernel-feedback-list@broadcom.com,
+	Byungho An <bh74.an@samsung.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Doug Berger <opendmb@gmail.com>, Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	Justin Chen <justin.chen@broadcom.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	NXP Linux Team <linux-imx@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Vladimir Oltean <olteanv@gmail.com>, Wei Fang <wei.fang@nxp.com>
+Subject: Re: [PATCH net-next 3/6] net: fec: remove eee_enabled/eee_active in
+ fec_enet_get_eee()
+Message-ID: <ZbzyAy7Nc7vf+BD9@shell.armlinux.org.uk>
+References: <Zby24IKSgzpvRDNF@shell.armlinux.org.uk>
+ <E1rVpvm-002Pe0-TV@rmk-PC.armlinux.org.uk>
+ <011cb523-0561-436a-9f64-4479648b4770@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240202101311.it.893-kees@kernel.org> <20240202101642.156588-2-keescook@chromium.org>
- <CANpmjNPPbTNPJfM5MNE6tW-jCse+u_RB8bqGLT3cTxgCsL+x-A@mail.gmail.com> <202402020405.7E0B5B3784@keescook>
-In-Reply-To: <202402020405.7E0B5B3784@keescook>
-From: Marco Elver <elver@google.com>
-Date: Fri, 2 Feb 2024 14:44:25 +0100
-Message-ID: <CANpmjNO-4A4LMK8kbWiiODB-vOZqc5gZndWtnYDc5RCGDBcoSQ@mail.gmail.com>
-Subject: Re: [PATCH v2 2/6] ubsan: Reintroduce signed and unsigned overflow sanitizers
-To: Kees Cook <keescook@chromium.org>
-Cc: linux-hardening@vger.kernel.org, Justin Stitt <justinstitt@google.com>, 
-	Miguel Ojeda <ojeda@kernel.org>, Nathan Chancellor <nathan@kernel.org>, 
-	Nick Desaulniers <ndesaulniers@google.com>, Peter Zijlstra <peterz@infradead.org>, 
-	Hao Luo <haoluo@google.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
-	Fangrui Song <maskray@google.com>, Masahiro Yamada <masahiroy@kernel.org>, 
-	Nicolas Schier <nicolas@fjasle.eu>, Bill Wendling <morbo@google.com>, 
-	Andrey Konovalov <andreyknvl@gmail.com>, Jonathan Corbet <corbet@lwn.net>, x86@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org, 
-	llvm@lists.linux.dev, linux-doc@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, kasan-dev@googlegroups.com, 
-	linux-acpi@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <011cb523-0561-436a-9f64-4479648b4770@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, 2 Feb 2024 at 13:17, Kees Cook <keescook@chromium.org> wrote:
->
-> On Fri, Feb 02, 2024 at 12:01:55PM +0100, Marco Elver wrote:
-> > On Fri, 2 Feb 2024 at 11:16, Kees Cook <keescook@chromium.org> wrote:
-> > > [...]
-> > > +config UBSAN_UNSIGNED_WRAP
-> > > +       bool "Perform checking for unsigned arithmetic wrap-around"
-> > > +       depends on $(cc-option,-fsanitize=unsigned-integer-overflow)
-> > > +       depends on !X86_32 # avoid excessive stack usage on x86-32/clang
-> > > +       depends on !COMPILE_TEST
-> > > +       help
-> > > +         This option enables -fsanitize=unsigned-integer-overflow which checks
-> > > +         for wrap-around of any arithmetic operations with unsigned integers. This
-> > > +         currently causes x86 to fail to boot.
-> >
-> > My hypothesis is that these options will quickly be enabled by various
-> > test and fuzzing setups, to the detriment of kernel developers. While
-> > the commit message states that these are for experimentation, I do not
-> > think it is at all clear from the Kconfig options.
->
-> I can certainly rephrase it more strongly. I would hope that anyone
-> enabling the unsigned sanitizer would quickly realize how extremely
-> noisy it is.
->
-> > Unsigned integer wrap-around is relatively common (it is _not_ UB
-> > after all). While I can appreciate that in some cases wrap around is a
-> > genuine semantic bug, and that's what we want to find with these
-> > changes, ultimately marking all semantically valid wrap arounds to
-> > catch the unmarked ones. Given these patterns are so common, and C
-> > programmers are used to them, it will take a lot of effort to mark all
-> > the intentional cases. But I fear that even if we get to that place,
-> > _unmarked_  but semantically valid unsigned wrap around will keep
-> > popping up again and again.
->
-> I agree -- it's going to be quite a challenge. My short-term goal is to
-> see how far the sanitizer itself can get with identifying intentional
-> uses. For example, I found two more extremely common code patterns that
-> trip it now:
->
->         unsigned int i = ...;
->         ...
->         while (i--) { ... }
->
-> This trips the sanitizer at loop exit. :P It seems like churn to
-> refactor all of these into "for (; i; i--)". The compiler should be able
-> to identify this by looking for later uses of "i", etc.
->
-> The other is negative constants: -1UL, -3ULL, etc. These are all over
-> the place and very very obviously intentional and should be ignored by
-> the compiler.
+On Fri, Feb 02, 2024 at 02:22:02PM +0100, Andrew Lunn wrote:
+> On Fri, Feb 02, 2024 at 09:33:54AM +0000, Russell King (Oracle) wrote:
+> > fec_enet_get_eee() sets edata->eee_active and edata->eee_enabled from
+> > its own copy, and then calls phy_ethtool_get_eee() which in turn will
+> > call genphy_c45_ethtool_get_eee().
+> > 
+> > genphy_c45_ethtool_get_eee() will overwrite eee_enabled and eee_active
+> > with its own interpretation from the PHYs settings and negotiation
+> > result.
+> > 
+> > Therefore, setting these members in fec_enet_get_eee() is redundant.
+> > Remove this, and remove the setting of fep->eee.eee_active member which
+> > becomes a write-only variable.
+> 
+> I _think_ p->eee_enabled becomes write only as well?
 
-Yeah, banning technically valid code like this is going to be a very hard sell.
+Thanks for spotting, I'll remove it in v2!
 
-> > What is the long-term vision to minimize the additional churn this may
-> > introduce?
->
-> My hope is that we can evolve the coverage over time. Solving it all at
-> once won't be possible, but I think we can get pretty far with the
-> signed overflow sanitizer, which runs relatively cleanly already.
->
-> If we can't make meaningful progress in unsigned annotations, I think
-> we'll have to work on gaining type-based operator overloading so we can
-> grow type-aware arithmetic. That will serve as a much cleaner
-> annotation. E.g. introduce jiffie_t, which wraps.
->
-> > I think the problem reminds me a little of the data race problem,
-> > although I suspect unsigned integer wraparound is much more common
-> > than data races (which unlike unsigned wrap around is actually UB) -
-> > so chasing all intentional unsigned integer wrap arounds and marking
-> > will take even more effort than marking all intentional data races
-> > (which we're still slowly, but steadily, making progress towards).
-> >
-> > At the very least, these options should 'depends on EXPERT' or even
-> > 'depends on BROKEN' while the story is still being worked out.
->
-> Perhaps I should hold off on bringing the unsigned sanitizer back? I was
-> hoping to work in parallel with the signed sanitizer, but maybe this
-> isn't the right approach?
-
-I leave that to you - to me any of these options would be ok:
-
-1. Remove completely for now.
-
-2. Make it 'depends on BROKEN' (because I think even 'depends on
-EXPERT' won't help avoid the inevitable spam from test robots).
-
-3. Make it a purely opt-in sanitizer: rather than having subsystems
-opt out with UBSAN_WRAP_UNSIGNED:=n, do the opposite and say that for
-subsystems that want to opt in, they have to specify
-UBSAN_WRAP_UNSIGNED:=y to explicitly opt in.
-
-I can see there being value in explicitly marking semantically
-intended unsigned integer wrap, and catch unintended cases, so option
-#3 seems appealing. At least that way, if a maintainer chooses to opt
-in, they are committed to sorting out their code. Hypothetically, if I
-was the maintainer of some smaller subsystem and have had wrap around
-bugs in the past, I would certainly consider opting in. It feels a lot
-nicer than having it forced upon me.
-
-Thanks,
--- Marco
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
