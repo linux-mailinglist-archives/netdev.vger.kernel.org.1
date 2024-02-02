@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-68280-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68281-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD2668465F1
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 03:38:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C2568465F2
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 03:38:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 510EA1F24BCD
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:38:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D238A1F25024
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADB9AAD57;
-	Fri,  2 Feb 2024 02:38:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9B51B66D;
+	Fri,  2 Feb 2024 02:38:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JUMuC/2P"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S6pxuRMZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0A0C8DB
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 02:38:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AF15C8EA
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 02:38:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706841496; cv=none; b=bknJIub9F8bYtjoUWV0FHLYaZ6QNrU60Bgp8FNPf2qOmXi2SISS3XVSv+3ihldVk15YSsXhAv0wCCDfPi7y70lGTZhrdz1doXPWnKkPYZXLDtX1qtHw6r1vFGYzsfxfnMsYAcr+izXGsfTOxvaWBQIHUUljjLAfqRy8t8/yrTW8=
+	t=1706841500; cv=none; b=KKpiWtLLlv7ZT33tO6QDOcun/V1s3L8Rb2/tW6k2GsP/JcuVplY8rtY2Wr8JqiR/1uLJkoJxJcxmemUk+hAWhCC3o5LWprU09xXjdS/K3aUoUSkzQTk5q+5vAnfdna8N5hKDM+7IesYODXy1yUn8OSqpdH23MENvHlNTqXquNDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706841496; c=relaxed/simple;
-	bh=G/Ux3LgDRNAQg7rjHZrbyybShnGgVnE/dh5wJIEOlQI=;
+	s=arc-20240116; t=1706841500; c=relaxed/simple;
+	bh=zJdidQYa9AADNngsqGQ0JLKnlpMwCBGS7dyutvjzjvw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NlRkw8KkvUGAP+ZPoTHh8QGp/97fnK0cGnHV+LTLKiyuuWIBdnIHlXFRNkidxDBOmADm667LfSexfCDB74NvT7HR9eZrWt6UJW8UtbrAIuyKJ/djhalBQsjQVGYD7Le/Xr2jaMD7yJ9Jy/kwbDJq0rY8I+ciHHlQ1Yb9wb5ZlMU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JUMuC/2P; arc=none smtp.client-ip=209.85.214.176
+	 MIME-Version; b=C3GyrIS4HrUa9psnau4xCVTyuEr7TsefQI5DF7DQ2+GH56pIlfNxgf1buCpk5EZhjjHW0XnbdNEfiEIiEhhE86kwDBmUMyY3cHJTETWSqqpd7lQV0m1bcsl0+NaESa2Nj5+YMvgi3MKs9G9OVohsaZJpn5eXc4MFfdU9qhpzayE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S6pxuRMZ; arc=none smtp.client-ip=209.85.215.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1d70b0e521eso11825135ad.1
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 18:38:14 -0800 (PST)
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-5ca29c131ebso1443854a12.0
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 18:38:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706841494; x=1707446294; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706841497; x=1707446297; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=1N5DayUxd7++DZoXwdreOmT1QtfwA5myExd/7/w8Yzc=;
-        b=JUMuC/2PZ5yf0w21dfTtvPJuThbkjARmcF4XCJbDFqG5GUfXxrM17tNJe6HiH1amkY
-         eqXxfzqWzXcmKy4VR3DjZAgzSqdb+kn8XIIcW+u6sM6zcJEtSlfufEDIZTh8Fkp8py97
-         9IugEJ7Zh3chR2qeZl6IZi1XzQW2GCr1MRpmjewlsT5mc1kU94DEXe3afuyRfBMS0si4
-         7O5KIoDGpnEoTHD9+2UPPgcjU844sy2lP8ie5RhPxgCqAI+ukP/AXcq3KCmXPGGZ0QcN
-         qPMCYNjDjiRZI5VO5YOCOIAXCRwe4z30a0qaPfujSp8N6eu3oG9UwS7rn/O6q/mW83ar
-         Lnrg==
+        bh=ROyTVP+CZ1AMHXlRGWi4pRwAXiD8TK9McQ610tQyilc=;
+        b=S6pxuRMZ5IDX4rAo0Ilffdql228PwCI9Ns/q80M/TiiI9n8yRoUN7VcWw/TJ+xzOz9
+         2nkuOBnUpzn+bgchoFNVhatBgvTWwQ+aL6tX6+8ogYiYf4OMXd8oYx0kzFzCNHZESeuy
+         EKhp7sHJlHnqEfaVxZNl7TtXNaomMAr1CAK9FkyY4PLYBVwFwSXvAY9ifriZ2PLKnv+f
+         nunPS6a3nugEgTqAakq1dzkLpBKhbfi60ODlt8/enqQU81cleNh3Jtrlk0P2efA5OxsJ
+         khO1UXcSMif+HV0x/rnhAqlVsIBLQ/vqlf/HbfwIpy5ilC8KGFe5c9wEQMol5hQTuTzt
+         6hUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706841494; x=1707446294;
+        d=1e100.net; s=20230601; t=1706841497; x=1707446297;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=1N5DayUxd7++DZoXwdreOmT1QtfwA5myExd/7/w8Yzc=;
-        b=uewYcFSe0xpKEE+Ovg/M0bF8HLHzgXD5FY6GpjtWGUXYe+bIESaxkNsD7FF7Ee0CPb
-         dEYNtbdgrT7JOxVD2HG9ctwbrglED4M0FoSZc67AluvrKkIIo6nB+dpkfdUqxyx0w9RE
-         7HM/Vp5GBYE7N1KstQZcadvVWMO5/bLKDCOTUETg3tnVomjdexvceWtHWOYHs2kbddsg
-         9pbWJb0/Pq+kO/wx220r+xEAi5ofwGf54MZLYjBj01ThYg0k9vxeM8y7FWWOyOdyWe1i
-         6OvTzPjSpvTsWu4df1JehqQQUG4jHcT+tVFuDWI/pGM3oVjV+YI8YKnHA8WAyKWQePKr
-         DpeQ==
-X-Gm-Message-State: AOJu0Yy+yokXzrWTMtiouu2jlB2K7PzK1AqHuX9vzl/6zDa7MHhhCrMe
-	4McbAuWzBn2gcd08Pds1CN3C7Ul5UStQc3ct8TCn+l1s7DC3nZ2oskEmtUI3L8nmGHiK
-X-Google-Smtp-Source: AGHT+IHYxYeHkGbsaMmubGxfoBe7dFJ8wpd6/3BK8jrWNYu1pUquYS0ENT1Cz2FhgFlJTMmFv6qXhg==
-X-Received: by 2002:a17:902:c64a:b0:1d7:719a:41a0 with SMTP id s10-20020a170902c64a00b001d7719a41a0mr851872pls.56.1706841493953;
-        Thu, 01 Feb 2024 18:38:13 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXYJj1iI533R35PO7eC2QImFQfDviFDOy4e6BCTrj8Io3S+s2Ow8EJHAWxp7i2n29ELbxQoDij6OIR5V76xX91CrMdSLqv6d8oPFt9XPOC6yWE9S/fXrGJo1/aP+EQ3G1geru48A7c1GsJx6wWTM3npxWNEOATmJD7DirTWP8xKmwMmjtTtaMTUw5C9lDm4eSuL+3C9WTE8A4xN2uoeQA8uZ5n+GFQmSQk9anIfxPRZO24w1byQb6OiYRrGm7ocG8zYUw==
+        bh=ROyTVP+CZ1AMHXlRGWi4pRwAXiD8TK9McQ610tQyilc=;
+        b=wu0KYFi8wjsCcxLfZRqnodA5gfQ66fXsXrJzIXT1Nxbl0nvRXuA2ifTNwtRTMDAtt5
+         QbLovLdNv0sTXxLpx6/d89n6TciH5w5bnkyJAS8uIgLSMdNPf9f+3ANNozc8eSFLoDEW
+         +/rjbRVG5Pm1NULHK9tQSG72P4NdsrDlGt3+6iz9wh3OF4EdOULI7GyNUZe0YfQ7JjCl
+         d0MG5QetcaHglCVPWQb5hHa1sDY+w850LDS2/4AmHtGCadu0kGhVC9J+zksuISopla0j
+         GPLIDu97f6kIMsArFXNYqshFEGXpfnAEdoGLvD6V4qvc+Anu6FPuea++PoD1vODKhu5F
+         mhRg==
+X-Gm-Message-State: AOJu0Yw6Uv+Uc0eNOtzC7WQJdfVbLsKO2/Q0AOrNcdjXmBGi6UzpUoga
+	P8eLJTDcFKr+6ZiF9/VFr8nk893RRK+/zPJt2uTwY7QxZI+sO8A878ky6tBVy7hgU0Qs
+X-Google-Smtp-Source: AGHT+IHkQftHAKYoArCyRZg2tukcE6eb0938Dqw9g8iKnvd0U8lpvp9PIzrCGcMebzk5AuEDUS5T4g==
+X-Received: by 2002:a05:6a21:629:b0:19c:1881:b4fa with SMTP id ll41-20020a056a21062900b0019c1881b4famr641835pzb.33.1706841497492;
+        Thu, 01 Feb 2024 18:38:17 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVLD8LCviu/8y9F6jMb2hhVA2ZquDwZTo8ZPx9oM7vyccxnqzmTrZwgwgmY8omnebUKqyrh9WXnc6JJFEdfv+VPaBVjKR1uRmPrgOjbO7snLZ6p50x9cOKciUOWLaRkNmdXRHKtOZXaCMHhij8+pR13oWpVKzWSscQi0ddCc1lcvXjpiK/dOxPfT1rxSGuM+A165eWL5kLn+WzuYD0kUt4r9Sq+dCHG2w+5R880iGcdxaW9Z1ZKb3UuZWi0AbeXO382xg==
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id ji19-20020a170903325300b001d944b3c5f1sm493256plb.178.2024.02.01.18.38.10
+        by smtp.gmail.com with ESMTPSA id ji19-20020a170903325300b001d944b3c5f1sm493256plb.178.2024.02.01.18.38.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 18:38:13 -0800 (PST)
+        Thu, 01 Feb 2024 18:38:16 -0800 (PST)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
@@ -77,9 +77,9 @@ Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
 	Liang Li <liali@redhat.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv3 net-next 3/4] selftests: bonding: reduce garp_test/arp_validate test time
-Date: Fri,  2 Feb 2024 10:37:53 +0800
-Message-ID: <20240202023754.932930-4-liuhangbin@gmail.com>
+Subject: [PATCHv3 net-next 4/4] selftests: bonding: use slowwait instead of hard code sleep
+Date: Fri,  2 Feb 2024 10:37:54 +0800
+Message-ID: <20240202023754.932930-5-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240202023754.932930-1-liuhangbin@gmail.com>
 References: <20240202023754.932930-1-liuhangbin@gmail.com>
@@ -91,139 +91,168 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The purpose of grat_arp is testing commit 9949e2efb54e ("bonding: fix
-send_peer_notif overflow"). As the send_peer_notif was defined to u8,
-to overflow it, we need to
+Use slowwait instead of hard code sleep for bonding tests.
 
-send_peer_notif = num_peer_notif * peer_notif_delay = num_grat_arp * peer_notify_delay / miimon > 255
-  (kernel)           (kernel parameter)                   (user parameter)
+In function setup_prepare(), the client_create() will be called after
+server_create(). So I think there is no need to sleep in server_create()
+and remove it.
 
-e.g. 30 (num_grat_arp) * 1000 (peer_notify_delay) / 100 (miimon) > 255.
+For lab_lib.sh, remove bonding module may affect other running bonding tests.
+And some test env may buildin bond which can't be removed. The bonding
+link should be removed by lag_reset_network() or netns delete.
 
-Which need 30s to complete sending garp messages. To save the testing time,
-the only way is reduce the miimon number. Something like
-30 (num_grat_arp) * 100 (peer_notify_delay) / 10 (miimon) > 255.
-
-To save more time, the 50 num_grat_arp testing could be removed.
-
-The arp_validate_test also need to check the mii_status, which sleep
-too long. Use slowwait to save some time.
-
-For other connection checkings, make sure active slave changed first.
-
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- .../drivers/net/bonding/bond_options.sh       | 38 ++++++++++++++-----
- 1 file changed, 29 insertions(+), 9 deletions(-)
+ .../drivers/net/bonding/bond-lladdr-target.sh | 21 ++++++++++++++++---
+ .../drivers/net/bonding/bond_macvlan.sh       |  5 ++---
+ .../drivers/net/bonding/bond_topo_2d1c.sh     |  6 +++---
+ .../selftests/drivers/net/bonding/lag_lib.sh  |  7 +++----
+ 4 files changed, 26 insertions(+), 13 deletions(-)
 
-diff --git a/tools/testing/selftests/drivers/net/bonding/bond_options.sh b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-index d508486cc0bd..6fd0cff3e1e9 100755
---- a/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-+++ b/tools/testing/selftests/drivers/net/bonding/bond_options.sh
-@@ -45,15 +45,23 @@ skip_ns()
+diff --git a/tools/testing/selftests/drivers/net/bonding/bond-lladdr-target.sh b/tools/testing/selftests/drivers/net/bonding/bond-lladdr-target.sh
+index 89af402fabbe..78d3e0fe6604 100755
+--- a/tools/testing/selftests/drivers/net/bonding/bond-lladdr-target.sh
++++ b/tools/testing/selftests/drivers/net/bonding/bond-lladdr-target.sh
+@@ -17,6 +17,11 @@
+ #  +----------------+
+ #
+ # We use veths instead of physical interfaces
++REQUIRE_MZ=no
++NUM_NETIFS=0
++lib_dir=$(dirname "$0")
++source "$lib_dir"/../../../net/forwarding/lib.sh
++
+ sw="sw-$(mktemp -u XXXXXX)"
+ host="ns-$(mktemp -u XXXXXX)"
+ 
+@@ -26,6 +31,16 @@ cleanup()
+ 	ip netns del $host
  }
  
- active_slave=""
-+active_slave_changed()
++wait_lladdr_dad()
 +{
-+	local old_active_slave=$1
-+	local new_active_slave=$(cmd_jq "ip -n ${s_ns} -d -j link show bond0" \
-+				".[].linkinfo.info_data.active_slave")
-+	test "$old_active_slave" != "$new_active_slave"
++	$@ | grep fe80 | grep -qv tentative
 +}
 +
- check_active_slave()
- {
- 	local target_active_slave=$1
-+	slowwait 2 active_slave_changed $active_slave
- 	active_slave=$(cmd_jq "ip -n ${s_ns} -d -j link show bond0" ".[].linkinfo.info_data.active_slave")
- 	test "$active_slave" = "$target_active_slave"
- 	check_err $? "Current active slave is $active_slave but not $target_active_slave"
- }
++wait_bond_up()
++{
++	$@ | grep -q 'state UP'
++}
++
+ trap cleanup 0 1 2
+ 
+ ip netns add $sw
+@@ -37,8 +52,8 @@ ip -n $host link add veth1 type veth peer name veth1 netns $sw
+ ip -n $sw link add br0 type bridge
+ ip -n $sw link set br0 up
+ sw_lladdr=$(ip -n $sw addr show br0 | awk '/fe80/{print $2}' | cut -d'/' -f1)
+-# sleep some time to make sure bridge lladdr pass DAD
+-sleep 2
++# wait some time to make sure bridge lladdr pass DAD
++slowwait 2 wait_lladdr_dad ip -n $sw addr show br0
+ 
+ ip -n $host link add bond0 type bond mode 1 ns_ip6_target ${sw_lladdr} \
+ 	arp_validate 3 arp_interval 1000
+@@ -53,7 +68,7 @@ ip -n $sw link set veth1 master br0
+ ip -n $sw link set veth0 up
+ ip -n $sw link set veth1 up
+ 
+-sleep 5
++slowwait 5 wait_bond_up ip -n $host link show bond0
+ 
+ rc=0
+ if ip -n $host link show bond0 | grep -q LOWER_UP; then
+diff --git a/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh b/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
+index b609fb6231f4..acd3ebed3e20 100755
+--- a/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
++++ b/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
+@@ -58,7 +58,7 @@ macvlan_over_bond()
+ 	ip -n ${m2_ns} addr add ${m2_ip4}/24 dev macv0
+ 	ip -n ${m2_ns} addr add ${m2_ip6}/24 dev macv0
+ 
+-	sleep 2
++	slowwait 2 ip netns exec ${c_ns} ping ${s_ip4} -c 1 -W 0.1 &> /dev/null
+ 
+ 	check_connection "${c_ns}" "${s_ip4}" "IPv4: client->server"
+ 	check_connection "${c_ns}" "${s_ip6}" "IPv6: client->server"
+@@ -69,8 +69,7 @@ macvlan_over_bond()
+ 	check_connection "${m1_ns}" "${m2_ip4}" "IPv4: macvlan_1->macvlan_2"
+ 	check_connection "${m1_ns}" "${m2_ip6}" "IPv6: macvlan_1->macvlan_2"
  
 -
- # Test bonding prio option
- prio_test()
- {
-@@ -84,13 +92,13 @@ prio_test()
- 
- 	# active slave should be the higher prio slave
- 	ip -n ${s_ns} link set $active_slave down
--	bond_check_connection "fail over"
- 	check_active_slave eth2
-+	bond_check_connection "fail over"
- 
- 	# when only 1 slave is up
- 	ip -n ${s_ns} link set $active_slave down
--	bond_check_connection "only 1 slave up"
- 	check_active_slave eth0
-+	bond_check_connection "only 1 slave up"
- 
- 	# when a higher prio slave change to up
- 	ip -n ${s_ns} link set eth2 up
-@@ -140,8 +148,8 @@ prio_test()
- 		check_active_slave "eth1"
- 
- 		ip -n ${s_ns} link set $active_slave down
--		bond_check_connection "change slave prio"
- 		check_active_slave "eth0"
-+		bond_check_connection "change slave prio"
- 	fi
- }
- 
-@@ -199,6 +207,15 @@ prio()
- 	prio_ns "active-backup"
- }
- 
-+wait_mii_up()
-+{
-+	for i in $(seq 0 2); do
-+		mii_status=$(cmd_jq "ip -n ${s_ns} -j -d link show eth$i" ".[].linkinfo.info_slave_data.mii_status")
-+		[ ${mii_status} != "UP" ] && return 1
-+	done
-+	return 0
-+}
-+
- arp_validate_test()
- {
- 	local param="$1"
-@@ -211,7 +228,7 @@ arp_validate_test()
- 	[ $RET -ne 0 ] && log_test "arp_validate" "$retmsg"
- 
- 	# wait for a while to make sure the mii status stable
 -	sleep 5
-+	slowwait 5 wait_mii_up
- 	for i in $(seq 0 2); do
- 		mii_status=$(cmd_jq "ip -n ${s_ns} -j -d link show eth$i" ".[].linkinfo.info_slave_data.mii_status")
- 		if [ ${mii_status} != "UP" ]; then
-@@ -276,10 +293,13 @@ garp_test()
- 	active_slave=$(cmd_jq "ip -n ${s_ns} -d -j link show bond0" ".[].linkinfo.info_data.active_slave")
- 	ip -n ${s_ns} link set ${active_slave} down
++	slowwait 5 ip netns exec ${s_ns} ping ${c_ip4} -c 1 -W 0.1 &> /dev/null
  
--	exp_num=$(echo "${param}" | cut -f6 -d ' ')
--	sleep $((exp_num + 2))
-+	# wait for active link change
-+	slowwait 2 active_slave_changed $active_slave
- 
-+	exp_num=$(echo "${param}" | cut -f6 -d ' ')
- 	active_slave=$(cmd_jq "ip -n ${s_ns} -d -j link show bond0" ".[].linkinfo.info_data.active_slave")
-+	slowwait_for_counter $((exp_num + 5)) $exp_num \
-+		tc_rule_handle_stats_get "dev s${active_slave#eth} ingress" 101 ".packets" "-n ${g_ns}"
- 
- 	# check result
- 	real_num=$(tc_rule_handle_stats_get "dev s${active_slave#eth} ingress" 101 ".packets" "-n ${g_ns}")
-@@ -296,8 +316,8 @@ garp_test()
- num_grat_arp()
- {
- 	local val
--	for val in 10 20 30 50; do
--		garp_test "mode active-backup miimon 100 num_grat_arp $val peer_notify_delay 1000"
-+	for val in 10 20 30; do
-+		garp_test "mode active-backup miimon 10 num_grat_arp $val peer_notify_delay 100"
- 		log_test "num_grat_arp" "active-backup miimon num_grat_arp $val"
- 	done
+ 	check_connection "${s_ns}" "${c_ip4}" "IPv4: server->client"
+ 	check_connection "${s_ns}" "${c_ip6}" "IPv6: server->client"
+diff --git a/tools/testing/selftests/drivers/net/bonding/bond_topo_2d1c.sh b/tools/testing/selftests/drivers/net/bonding/bond_topo_2d1c.sh
+index 0eb7edfb584c..195ef83cfbf1 100644
+--- a/tools/testing/selftests/drivers/net/bonding/bond_topo_2d1c.sh
++++ b/tools/testing/selftests/drivers/net/bonding/bond_topo_2d1c.sh
+@@ -73,7 +73,6 @@ server_create()
+ 	ip -n ${s_ns} link set bond0 up
+ 	ip -n ${s_ns} addr add ${s_ip4}/24 dev bond0
+ 	ip -n ${s_ns} addr add ${s_ip6}/24 dev bond0
+-	sleep 2
  }
+ 
+ # Reset bond with new mode and options
+@@ -96,7 +95,8 @@ bond_reset()
+ 	ip -n ${s_ns} link set bond0 up
+ 	ip -n ${s_ns} addr add ${s_ip4}/24 dev bond0
+ 	ip -n ${s_ns} addr add ${s_ip6}/24 dev bond0
+-	sleep 2
++	# Wait for IPv6 address ready as it needs DAD
++	slowwait 2 ip netns exec ${s_ns} ping6 ${c_ip6} -c 1 -W 0.1 &> /dev/null
+ }
+ 
+ server_destroy()
+@@ -150,7 +150,7 @@ bond_check_connection()
+ {
+ 	local msg=${1:-"check connection"}
+ 
+-	sleep 2
++	slowwait 2 ip netns exec ${s_ns} ping ${c_ip4} -c 1 -W 0.1 &> /dev/null
+ 	ip netns exec ${s_ns} ping ${c_ip4} -c5 -i 0.1 &>/dev/null
+ 	check_err $? "${msg}: ping failed"
+ 	ip netns exec ${s_ns} ping6 ${c_ip6} -c5 -i 0.1 &>/dev/null
+diff --git a/tools/testing/selftests/drivers/net/bonding/lag_lib.sh b/tools/testing/selftests/drivers/net/bonding/lag_lib.sh
+index dbdd736a41d3..bf9bcd1b5ec0 100644
+--- a/tools/testing/selftests/drivers/net/bonding/lag_lib.sh
++++ b/tools/testing/selftests/drivers/net/bonding/lag_lib.sh
+@@ -107,13 +107,12 @@ lag_setup2x2()
+ 	NAMESPACES="${namespaces}"
+ }
+ 
+-# cleanup all lag related namespaces and remove the bonding module
++# cleanup all lag related namespaces
+ lag_cleanup()
+ {
+ 	for n in ${NAMESPACES}; do
+ 		ip netns delete ${n} >/dev/null 2>&1 || true
+ 	done
+-	modprobe -r bonding
+ }
+ 
+ SWITCH="lag_node1"
+@@ -159,7 +158,7 @@ test_bond_recovery()
+ 	create_bond $@
+ 
+ 	# verify connectivity
+-	ip netns exec ${CLIENT} ping ${SWITCHIP} -c 2 >/dev/null 2>&1
++	slowwait 2 ip netns exec ${CLIENT} ping ${SWITCHIP} -c 2 -W 0.1 &> /dev/null
+ 	check_err $? "No connectivity"
+ 
+ 	# force the links of the bond down
+@@ -169,7 +168,7 @@ test_bond_recovery()
+ 	ip netns exec ${SWITCH} ip link set eth1 down
+ 
+ 	# re-verify connectivity
+-	ip netns exec ${CLIENT} ping ${SWITCHIP} -c 2 >/dev/null 2>&1
++	slowwait 2 ip netns exec ${CLIENT} ping ${SWITCHIP} -c 2 -W 0.1 &> /dev/null
+ 
+ 	local rc=$?
+ 	check_err $rc "Bond failed to recover"
 -- 
 2.43.0
 
