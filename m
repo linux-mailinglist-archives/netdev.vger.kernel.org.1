@@ -1,91 +1,183 @@
-Return-Path: <netdev+bounces-68265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64D54846583
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:43:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 008AF846587
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:47:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92CB41C24EFB
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:43:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8E731F22D51
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:47:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD70A63CB;
-	Fri,  2 Feb 2024 01:43:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19A6C63A8;
+	Fri,  2 Feb 2024 01:47:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1meNNi5A"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hoxIVJGa"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from out-171.mta1.migadu.com (out-171.mta1.migadu.com [95.215.58.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B3E8824;
-	Fri,  2 Feb 2024 01:43:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCBCA8BE1
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 01:47:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706838229; cv=none; b=LqBsEl5RemRfySKDswLVF2kFhxUvnwnUKLJ28hyhTRMR4ny7AUB4KYA5sUdFPmel/m76KYhPyJzBkDPyIEA/ikIAzNrGfyEa0nO9jAL2+y/ETkSQoZLC9c8iFMlLagTnB16s2qQX5FU0KgYVeMeNqNJbSSlJ/WCn3TtNo8bEIAY=
+	t=1706838474; cv=none; b=J4QrRjemBVlKTrDTyBa4DKieZ8y9LMOqt/wXbRUpjo4nsG8jsAk3j+WdQF2ODaSBvNpTpLWjwwIVT/k5uUCvkznwDa2rkirUuoloCJyPFa9EdDscg05NTRBTFxB32vL5d+NLqSIXlouO7eW6SNBpYUIMBNPFUaZz7vncTXuFoZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706838229; c=relaxed/simple;
-	bh=jF7cqlsOLjqdYzWUfrDIRz33gJa1OHskriEj+F8t68s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VK2wUXyvCFW4OtOfuceerGaREafzfqF3YZ3//mlq6KEMLv1wqRmZtlQjtbrP4/qIMXnSWbVSxSmh0d1sDWz8AuJh16hB6omUCa9BZzKqNkxlujxxEy125yT4wzSRwjjw+dd/2tQv8mTdRMI/w5lS0uH5PfYDrN1XhLG64gIGKs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1meNNi5A; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=bUBDi/m6vanSfN7M1l7jMTNcJUjKwJryfyB1BXudoSg=; b=1meNNi5AWyupGCEBpPG/qvE0jH
-	qHT2flxVKXduJRVNGc1gJPVEMWbHDwndfrIv0O1PeGOqnnlYHAPZvjLWHN+041RvQJD61XXP2H4ob
-	z0KuDS3B5b0uBdNL4Caud36vx4KSxonWgw4GwgG0ciql4H59CS3VGJ10jEwgCgA4o5KY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rViaf-006jmC-Ku; Fri, 02 Feb 2024 02:43:37 +0100
-Date: Fri, 2 Feb 2024 02:43:37 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Frank Rowand <frowand.list@gmail.com>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [net-next PATCH v5 9/9] net: phy: qca807x: add support for
- configurable LED
-Message-ID: <46085abf-8e82-4fd9-95b8-95cbfde6e5c2@lunn.ch>
-References: <20240201151747.7524-1-ansuelsmth@gmail.com>
- <20240201151747.7524-10-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1706838474; c=relaxed/simple;
+	bh=sELDC7Dq7jbJKZ94quhQrSYWfsMEiyh8Vu4uAAvvxiE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JPFLoFMuGu+S0cyQ0u0DIQ6faZL8OaA5ht3glltTqgmmIRdTHCUy7rYeO8wIHoVrn99M805D2L0QvYoRQPkb0D46tYWPmX08zwlX0a73xxwy5kAvo7HUfHBSFbW9Mw2sn05KB0MO3WxZnhOR6zJHw5yKgk+5pwqFGLWiS1IifcQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hoxIVJGa; arc=none smtp.client-ip=95.215.58.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8a2e9cf6-ef36-4ba8-bb95-fb592bdce5db@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706838469;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=dqWkAdcNsywcgiK3l1QK5Act/UKUr9ykoatsuW2y9jY=;
+	b=hoxIVJGaQd1Ldgldl9yOqOd/fs1wJO5yxMhDEcC5ja2omj2KpQNvfHNG9Nky7jC5ft/9V7
+	wF7RPCGmAzIfzGKYU6Fwx/jCpMIpqrzEmHnVyGcFfPv2L9PhRs05cBeIX+mU+CqFTC4gNN
+	Zn2NjMbDlXjjIrBfC6kEPkz9Fh1Wfe0=
+Date: Thu, 1 Feb 2024 17:47:44 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240201151747.7524-10-ansuelsmth@gmail.com>
+Subject: Re: [RFC PATCH v7 1/8] net_sched: Introduce eBPF based Qdisc
+Content-Language: en-US
+To: Amery Hung <ameryhung@gmail.com>
+Cc: bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, toke@redhat.com,
+ jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com,
+ xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com, netdev@vger.kernel.org,
+ Kui-Feng Lee <thinker.li@gmail.com>
+References: <cover.1705432850.git.amery.hung@bytedance.com>
+ <232881645a5c4c05a35df4ff1f08a19ef9a02662.1705432850.git.amery.hung@bytedance.com>
+ <0484f7f7-715f-4084-b42d-6d43ebb5180f@linux.dev>
+ <CAMB2axM1TVw05jZsFe7TsKKRN8jw=YOwu-+rA9bOAkOiCPyFqQ@mail.gmail.com>
+ <01fdb720-c0dc-495d-a42d-756aa2bf4455@linux.dev>
+ <CAMB2axOZqwgksukO5d4OiXeEgo2jFrgnzO5PQwABi_WxYFycGg@mail.gmail.com>
+ <8c00bd63-2d00-401e-af6d-1b6aebac4701@linux.dev>
+ <CAMB2axOdeE5dPeFGvgM5QVd9a47srtvDFZd1VUYjSarNJC=T_w@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAMB2axOdeE5dPeFGvgM5QVd9a47srtvDFZd1VUYjSarNJC=T_w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-> +
-> +			phydev->drv->led_brightness_set = NULL;
-> +			phydev->drv->led_blink_set = NULL;
-> +			phydev->drv->led_hw_is_supported = NULL;
-> +			phydev->drv->led_hw_control_set = NULL;
-> +			phydev->drv->led_hw_control_get = NULL;
+On 1/31/24 8:23 AM, Amery Hung wrote:
+>>> 1. Passing a referenced kptr into a bpf program, which will also need
+>>> to be released, or exchanged into maps or allocated objects.
+>> "enqueue" should be the one considering here:
+>>
+>> struct Qdisc_ops {
+>>          /* ... */
+>>          int                     (*enqueue)(struct sk_buff *skb,
+>>                                             struct Qdisc *sch,
+>>                                             struct sk_buff **to_free);
+>>
+>> };
+>>
+>> The verifier only marks the skb as a trusted kptr but does not mark its
+>> reg->ref_obj_id. Take a look at btf_ctx_access(). In particular:
+>>
+>>          if (prog_args_trusted(prog))
+>>                  info->reg_type |= PTR_TRUSTED;
+>>
+>> The verifier does not know the skb ownership is passed into the ".enqueue" ops
+>> and does not know the bpf prog needs to release it or store it in a map.
+>>
+>> The verifier tracks the reference state when a KF_ACQUIRE kfunc is called (just
+>> an example, not saying we need to use KF_ACQUIRE kfunc). Take a look at
+>> acquire_reference_state() which is the useful one here.
+>>
+>> Whenever the verifier is loading the ".enqueue" bpf_prog, the verifier can
+>> always acquire_reference_state() for the "struct sk_buff *skb" argument.
+>>
+>> Take a look at a recent RFC:
+>> https://lore.kernel.org/bpf/20240122212217.1391878-1-thinker.li@gmail.com/
+>> which is tagging the argument of an ops (e.g. ".enqueue" here). That RFC patch
+>> is tagging the argument could be NULL by appending "__nullable" to the argument
+>> name. The verifier will enforce that the bpf prog must check for NULL first.
+>>
+>> The similar idea can be used here but with a different tagging (for example,
+>> "__must_release", admittedly not a good name). While the RFC patch is
+>> in-progress, for now, may be hardcode for the ".enqueue" ops in
+>> check_struct_ops_btf_id() and always acquire_reference_state() for the skb. This
+>> part can be adjusted later once the RFC patch will be in shape.
+>>
+> Make sense. One more thing to consider here is that .enqueue is
+> actually a reference acquiring and releasing function at the same
+> time. Assuming ctx written to by a struct_ops program can be seen by
+> the kernel, another new tag for the "to_free" argument will still be
+> needed so that the verifier can recognize when writing skb to
+> "to_free".
 
-I don't see how that works. You have multiple PHYs using this
-driver. Some might have LEDs, some might have GPOs. But if you modify
-the driver structure like this, you prevent all PHYs from having LEDs,
-and maybe cause a Opps if a PHY device has already registered its
-LEDs?
+I don't think "to_free" needs special tagging. I was thinking the 
+"bpf_qdisc_drop" kfunc could be a KF_RELEASE. Ideally, it should be like
 
-	Andrew
+__bpf_kfunc int bpf_qdisc_drop(struct sk_buff *skb, struct Qdisc *sch,
+	                       struct sk_buff **to_free)
+{
+	return qdisc_drop(skb, sch, to_free);
+}
+
+However, I don't think the verifier supports pointer to pointer now. Meaning
+"struct sk_buff **to_free" does not work.
+
+If the ptr indirection spinning in my head is sound, one possible solution to 
+unblock the qdisc work is to introduce:
+
+struct bpf_sk_buff_ptr {
+	struct sk_buff *skb;
+};
+
+and the bpf_qdisc_drop kfunc:
+
+__bpf_kfunc int bpf_qdisc_drop(struct sk_buff *skb, struct Qdisc *sch,
+                                struct bpf_sk_buff_ptr *to_free_list)
+
+and the enqueue prog:
+
+SEC("struct_ops/enqueue")
+int BPF_PROG(test_enqueue, struct sk_buff *skb,
+              struct Qdisc *sch,
+              struct bpf_sk_buff_ptr *to_free_list)
+{
+	return bpf_qdisc_drop(skb, sch, to_free_list);
+}
+
+and the ".is_valid_access" needs to change the btf_type from "struct sk_buff **" 
+to "struct bpf_sk_buff_ptr *" which is sort of similar to the bpf_tcp_ca.c that 
+is changing the "struct sock *" type to the "struct tcp_sock *" type.
+
+I have the compiler-tested idea here: 
+https://git.kernel.org/pub/scm/linux/kernel/git/martin.lau/bpf-next.git/log/?h=qdisc-ideas
+
+
+> 
+>> Then one more thing is to track when the struct_ops bpf prog is actually reading
+>> the value of the skb pointer. One thing is worth to mention here, e.g. a
+>> struct_ops prog for enqueue:
+>>
+>> SEC("struct_ops")
+>> int BPF_PROG(bpf_dropall_enqueue, struct sk_buff *skb, struct Qdisc *sch,
+>>               struct sk_buff **to_free)
+>> {
+>>          return bpf_qdisc_drop(skb, sch, to_free);
+>> }
+>>
+>> Take a look at the BPF_PROG macro, the bpf prog is getting a pointer to an array
+>> of __u64 as the only argument. The skb is actually in ctx[0], sch is in
+>> ctx[1]...etc. When ctx[0] is read to get the skb pointer (e.g. r1 = ctx[0]),
+>> btf_ctx_access() marks the reg_type to PTR_TRUSTED. It needs to also initialize
+>> the reg->ref_obj_id by the id obtained earlier from acquire_reference_state()
+>> during check_struct_ops_btf_id() somehow.
+
 
