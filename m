@@ -1,100 +1,142 @@
-Return-Path: <netdev+bounces-68467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 401EC846F92
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:55:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70D47846F99
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:56:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 350E6B26A2A
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:55:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28BED29B227
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:56:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E5A13EFE3;
-	Fri,  2 Feb 2024 11:55:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD1DE13D51E;
+	Fri,  2 Feb 2024 11:56:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ih4UzVvz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MnZw4JfQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE4C13E233;
-	Fri,  2 Feb 2024 11:55:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25591101CA;
+	Fri,  2 Feb 2024 11:56:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706874904; cv=none; b=uH2eZMbjXEYOaZMjN/bWWJhDDG8g18fCO19fZ5dvawGzWvefUfC8XnvHECUd9xN6r2UCQjkET8jk3rw5d9HyS3rt/rW5+j4LhCEvHBvUQGO8FPxbUu07Oh2WsOR3/Dg0mJ0mPTdCv2E8vS7+/gLx8kRc42ol4GIQ5JmsCTKfd4U=
+	t=1706875007; cv=none; b=p7ZhpyJJFYufX8VerWv5nTBfuhhmnXT0GEhbfrvuy7qh3WwlfqbcwWR2X37TRgQ5/LUA5Wr/cdiCCQUYCdyf16jFOxbaV4n1Lzap9/UK18vTfbmpS7A0MK7ZvcGJqWQqu/OnnNmeVnnkF6/oqgYfeJMbh2Lo8b5bK4mQ5Qzmp6A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706874904; c=relaxed/simple;
-	bh=0rsf8rEwPN7l+sZRb7Vel03fado/1fE6W/Zbap4tgdg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RpQMTL+7RDi4qzKcujzBC8GZBAD5oht9eHhotDZciFHv75MwHdAhtSFowXqoquCht9feRYRpVQIXzpJW84+h23ZjZDAwCuNRP7mP8cIOMN7xLwS1i/4plvrIYB20vJ6JJYBSDR43UszXWil6Jy2uTFSAzFLd++g1cNvkm3GgGeU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ih4UzVvz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3EE7CC433C7;
-	Fri,  2 Feb 2024 11:55:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706874903;
-	bh=0rsf8rEwPN7l+sZRb7Vel03fado/1fE6W/Zbap4tgdg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Ih4UzVvzD71Vh4DujrIrHPHocAEX28dkzpBbE55Jn/vEmPTHm+GmCNcn6/sC0NNO6
-	 fZ+kgq1R7Lf1X5JuZ0fnGdjtG9tzlZ19d40HJOweaaOI1MKFr3pwMFD586uu5RWJJR
-	 DI06gNkL8FfJcVU+Jluj5v2p1sJJiRpaSy/VRJtozmClMJfO5ohd7zGcJv6+FsCSxO
-	 b0uwsR5GxPIPLmEaJRpWQlCeTpXfr7DEU2LGNnISwTxmuFK2Ils7do3zgGvq7OtFnZ
-	 wXiVzvmUF+LWwiw/AqiAi57xAYE5lpmMaUbvwd4UZlmZ5fVW3od6AmDi60LpyenYU1
-	 bLJU7O0BitVNA==
-Date: Fri, 2 Feb 2024 12:54:50 +0100
-From: Simon Horman <horms@kernel.org>
-To: Matthew Wood <thepacketgeek@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	leitao@debian.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/8] net: netconsole: move netconsole_target
- config_item to config_group
-Message-ID: <20240202115450.GN530335@kernel.org>
-References: <20240126231348.281600-1-thepacketgeek@gmail.com>
- <20240126231348.281600-3-thepacketgeek@gmail.com>
+	s=arc-20240116; t=1706875007; c=relaxed/simple;
+	bh=HPpXztDKtPpvbFK4baO9rz9dfeoqWBJWdIhwAkDd88c=;
+	h=Content-Type:Mime-Version:Date:Message-Id:To:Cc:Subject:From:
+	 References:In-Reply-To; b=iFdrFxQfWbNFwtd5oScnzy+Bw+wgaCM7gTxaiUP7BIk/l+mLvVrinjOs96X8TCulyTnC5xCf00gdtRAWV8OiDOTj8agG/YGJaSGwR00GZaPAYwgsiC5YHzxF5/JNIsX6Y0FsjLmxvkBcK7jCIe6oSeIMXTEy8MOs3ccDeetaQt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MnZw4JfQ; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-55fbbfbc0f5so2796913a12.0;
+        Fri, 02 Feb 2024 03:56:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706875004; x=1707479804; darn=vger.kernel.org;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=GG+S5GHLjupx6ER5keZYLTe4IHoqCrNyuoTCVzg0jo0=;
+        b=MnZw4JfQWV7R3btwobtAUZmJL1huPWqDHRrinoLjL5qxn4HAgX7rvQtR2il4HfiFyH
+         +fkSxzKZT+Fx8cmrksT493Jk73L8JD4mN3zQDEAH7HSG0oVi31hGOkqDM97eR9Vjs5Wy
+         ki9xo36PDhEK9uQYnKyG+0zYvOuHyV+WXOVM4x7dxrTASZxmTFjBkaHpaPSmuXzDusI/
+         zCsZiXc8iAYPPJEPoAhxkzeCPRN2AuGI6sTSOx5rrJdgO0EFjN8FQpnsZntcnqFUkx26
+         MptqPsoelNiy1l4LSg4k1KD5qKhVyZJ3pS450NOKFiDVW2/HREwueFsgKl5OcGPS4NmI
+         s+SA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706875004; x=1707479804;
+        h=in-reply-to:references:from:subject:cc:to:message-id:date
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=GG+S5GHLjupx6ER5keZYLTe4IHoqCrNyuoTCVzg0jo0=;
+        b=QGz8c19k9+Q0DYCRXYtxGQ7JL3yes1lAop8vRnWec84JrDAJrY8bgv00QINqEYgVub
+         VSjVeuvWsl3yZSGLXMffzqfZwzGWIAALDwn4hG0FfVVEO00zQP52AWiXWj9rqdu9Wjlc
+         Mkj5hMfjR4Z5W5DbtI5uC4EjZxF4KPctOlp4vOIIyLwpRZB2w/3lRSVByfTnfY1zRL9M
+         aZLw2kyIhTge62TmaSgi/WsiHsTxcpU4vlgsOFygGVY14xLX4rqKLjnL8qj9CXM0vxx6
+         wOmgKe4MbcKM9RqbTPMKd//UKD+WYsQ3YEN9tc1h1o5V0zNdLdvx3d4gF53Wqkek1Vw6
+         1QMQ==
+X-Gm-Message-State: AOJu0YybQkHhTkW/M0nchEtOBfRqSuhmB3Khp/RT0SGC9tksuC5oksqS
+	59d36w4nUgpwXNehKX/zAKsVu4I3K3X3NuMIli6t2/9JB7ScxLoH1L1a3cYh
+X-Google-Smtp-Source: AGHT+IFVhaTCP6oR6YqmOW2BRG8uTZ9wmXSTxUarlqKneiLmehcQMO5JzmUscfkCox5rMbEmuO50EA==
+X-Received: by 2002:a17:906:5789:b0:a36:6c98:a506 with SMTP id k9-20020a170906578900b00a366c98a506mr1625202ejq.18.1706875003912;
+        Fri, 02 Feb 2024 03:56:43 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCW5dI5nuJyVEmffMPO+6v4Jj4YjyRyStV61K5coisKkUpFZwVttW+iKe9Vpaqf6dAA3OP3sKD55cFsjMNfame5Bt1LkIO29kFRRRDzowvWVJEQtFBNiCN43aQr4xkLtBSQGH58iei2pLm3Tt28mnhp7PIjLtPfG5oJjyHoME4QuWDCU7y0y6t9bm7jown07s8XNBc7zz0yuCCEbkFY3S23TcPwjIFP0TX0JBanMMkObXjRUqNw5vc0B38HhFyt04RlKtrFBYV8n4B6/VdJq4aZYFE4Vn8fq3D47UtJwUaZlq3Wf/nV3Zw055a7eyNclkKp8uZxOHc8vTVEtO5mzGhs43e6Dli7LdJZMJahSQ742V23J4V5s1rIMphueZTDty+1Y7ytB1S44anJY8ufcvcOGg7JcU2zzogWS9PASM2BcJiPd8DkvCYojLhsJVGZ67w==
+Received: from localhost (p200300e41f147f00f22f74fffe1f3a53.dip0.t-ipconnect.de. [2003:e4:1f14:7f00:f22f:74ff:fe1f:3a53])
+        by smtp.gmail.com with ESMTPSA id o8-20020a17090611c800b00a36efbc8a0csm810284eja.142.2024.02.02.03.56.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Feb 2024 03:56:43 -0800 (PST)
+Content-Type: multipart/signed;
+ boundary=e24b41a4f26a8b9a10d9406ab403ef394b90d058a9a15d50ac8b9824a485;
+ micalg=pgp-sha256; protocol="application/pgp-signature"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240126231348.281600-3-thepacketgeek@gmail.com>
+Mime-Version: 1.0
+Date: Fri, 02 Feb 2024 12:56:42 +0100
+Message-Id: <CYUKOVAO5YVL.3TA1O4LH0488B@gmail.com>
+To: "Thierry Reding" <thierry.reding@gmail.com>, "Alexandre Torgue"
+ <alexandre.torgue@foss.st.com>, "Jose Abreu" <joabreu@synopsys.com>, "David
+ S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
+ "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>
+Cc: <netdev@vger.kernel.org>, <linux-stm32@st-md-mailman.stormreply.com>,
+ <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+ <linux-tegra@vger.kernel.org>, "Thierry Reding" <treding@nvidia.com>
+Subject: Re: [PATCH net-next 1/3] net: stmmac: Pass resources to DT parsing
+ code
+From: "Thierry Reding" <thierry.reding@gmail.com>
+X-Mailer: aerc 0.16.0-1-0-g560d6168f0ed-dirty
+References: <20240201-stmmac-axi-config-v1-0-822e97b2d26e@nvidia.com>
+ <20240201-stmmac-axi-config-v1-1-822e97b2d26e@nvidia.com>
+In-Reply-To: <20240201-stmmac-axi-config-v1-1-822e97b2d26e@nvidia.com>
 
-On Fri, Jan 26, 2024 at 03:13:37PM -0800, Matthew Wood wrote:
-> In order to support a nested userdata config_group in later patches,
-> use a config_group for netconsole_target instead of a
-> config_item. It's a no-op functionality-wise, since
-> config_group maintains all features of a config_item via the cg_item
-> member.
-> 
-> Signed-off-by: Matthew Wood <thepacketgeek@gmail.com>
-> ---
->  drivers/net/netconsole.c | 61 ++++++++++++++++++++++------------------
->  1 file changed, 33 insertions(+), 28 deletions(-)
-> 
-> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+--e24b41a4f26a8b9a10d9406ab403ef394b90d058a9a15d50ac8b9824a485
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
 
-...
+On Thu Feb 1, 2024 at 7:49 PM CET, Thierry Reding wrote:
+[...]
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/driv=
+ers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+[...]
+> @@ -605,7 +606,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, =
+u8 *mac)
+> =20
+>  	of_property_read_u32(np, "snps,ps-speed", &plat->mac_port_sel_speed);
+> =20
+> -	plat->axi =3D stmmac_axi_setup(pdev);
+> +	plat->axi =3D stmmac_axi_setup(pdev, res);
 
-> @@ -665,8 +669,9 @@ static struct config_item *make_netconsole_target(struct config_group *group,
->  	if (!strncmp(name, NETCONSOLE_PARAM_TARGET_PREFIX,
->  		     strlen(NETCONSOLE_PARAM_TARGET_PREFIX))) {
->  		nt = find_cmdline_target(name);
-> -		if (nt)
-> -			return &nt->item;
-> +		if (nt) {
-> +			return &nt->group;
-> +		}
+Looks like I messed up splitting these changes, so this will actually
+fail to build before patch 2. I've sent out an updated v2 that I've
+explicitly tested for bisectability.
 
-nit: no need for {} here.
+Sorry for not catching this earlier.
 
->  	}
->  
->  	nt = alloc_and_init();
+Thierry
 
-...
+--e24b41a4f26a8b9a10d9406ab403ef394b90d058a9a15d50ac8b9824a485
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAmW82HsACgkQ3SOs138+
+s6HByA//T7KnD4H8sVbYiDUKxEteI4BxxUWpTFvQCch43SAhItvc5yB+OqDK13y9
+ZlxwjJOht8LZZPUHMNP3u0sZSP8A+SzkOdMaFayTTWi0rep+SxwroYkbftIyXc+1
++h7nUVp6YitkAFl7wYWpx4G9aDawDc5+qH0WPgxA+g877bE5iyY8RdssTVqj+2BK
+OSomWN5F6tjK7ZzEVPa1d7otssjzmrsRWOq+e0EAkFShWELfPnbFaDpUtwNPfrmM
+tRLzbuuvqxVDhUvS+ciFYFEq11mG7fp3FiiNFgFKlr2S4Iup5Tv+fyETk9W+rJ7T
+7diy09G2yzxDFYbFdlA+2gUYZONuK+S1G1qbEHefgT5ea2iBUnSxk+xeiEkawQU6
+1hetSvJYKgPZcS7H9ulZi1igX9+3gGSg/O6OnIq19Ka02/dOHbu6/XVHMQ4jftmK
+f4TSeZJOEQ+X2MWRMyXz2jbdNIrC4l/21A+J/7uetVbEc+PC2LyAbuAzNIvwsmt0
+wG+FFS4KyN6vNvsOsIy0si/e7WVgxdEughzkerOgXk83ha0XYC5/J41nN02qGxg6
+//P16mJOVi/LBpwFiSEkndRJxw+YsTgl32NRCAdoSv49IB6aWlz3FPHENKBx8fBc
+3govTWDRwfkaF14qTuzuCpNZzyRomHDie1T7Uc4g0AsbxYXjLRY=
+=pstN
+-----END PGP SIGNATURE-----
+
+--e24b41a4f26a8b9a10d9406ab403ef394b90d058a9a15d50ac8b9824a485--
 
