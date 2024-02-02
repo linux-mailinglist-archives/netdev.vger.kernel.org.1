@@ -1,55 +1,60 @@
-Return-Path: <netdev+bounces-68697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5290D847993
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:22:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD6AA8479B6
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:33:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06A581F2C8D0
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:22:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8650528CCC2
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:33:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A95515E5B7;
-	Fri,  2 Feb 2024 19:22:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1F9315E5D6;
+	Fri,  2 Feb 2024 19:33:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ocLy2aZi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fSwZfUaY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42B3C15E5AF;
-	Fri,  2 Feb 2024 19:22:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76F953D3BC;
+	Fri,  2 Feb 2024 19:33:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706901770; cv=none; b=d9bpVKdqzXixyJGu8Mkf/dg7MdTP6dXzXiqTA0ah48Yw3THHdBrDi7E7EnPvh8J9ctJvyyul5laT0yO+w4LRm5uLFgwB6wTTWqAWokOZejbW0hu0hu/j8cejq+cTPTVzE1SqPWpwI6teqEV9GQMIreVA1H32ZvubqQ92raO0b+M=
+	t=1706902395; cv=none; b=hizcPO5sD2eBk3D/49qq5xhZiwCUNipnMOeEXVtNo53IsZ1ekhMVFLP6gYCuEb4yQfCWPCBrVdoKvKJTAibMwlA8tHXz+1DGf6bQ1bQW8FuTcRtQBroHQWbLv2SIiiHZiRu37o+qHph3plnvQVb2/l0xZWDhXWkVpBeu9+q0oGE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706901770; c=relaxed/simple;
-	bh=V3kaQg+NArWG0vA3dsZqjgsHs9QDv1kjIrU7FQWv/vM=;
+	s=arc-20240116; t=1706902395; c=relaxed/simple;
+	bh=5fX28k3jBg8AF6wuBErGgmwNBI5qB8oapTjKGw2klLY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jkA5v2IvTmYeYuRWfiYlnda12xwHhsMH4AzLDLk114Y5nnVj7RTNvvNtodknIjcSc7LkBzixAlv3svFBcpGXnEXschwNiTo4jwUtjDHyT+EbXA4Nb9Dd6SLttmZNWtpFEiuSBteo/AJ8tpEaxwRZAlmaZr9SReBVM/KeEMGzu4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ocLy2aZi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C208C433F1;
-	Fri,  2 Feb 2024 19:22:49 +0000 (UTC)
+	 MIME-Version:Content-Type; b=XZMh5TLxEWKiFFpfRqkgiCO75larLY7F9DT4zj52/8MfDjZaKyvGYA/sjd63UsEP2hyj14eTfpYSjdYgBfgVjDEHYvxeoxpkslx3H4faxa2GZHYi2rYT4Spfj8IjGz/7bCLQy2g2+e2pCstHqIpnirTxDCNYLVnECrgYftw0RIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fSwZfUaY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F3FE8C433C7;
+	Fri,  2 Feb 2024 19:33:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706901769;
-	bh=V3kaQg+NArWG0vA3dsZqjgsHs9QDv1kjIrU7FQWv/vM=;
+	s=k20201202; t=1706902395;
+	bh=5fX28k3jBg8AF6wuBErGgmwNBI5qB8oapTjKGw2klLY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ocLy2aZizLLxiVJxS+kDMWHuplT5mq6wVwwMoDmh/IKAks7y/pzwMX0av/n1X/NlO
-	 QVNuA4LmdcjRL7rQ6zn+x3hyV4OC1udHZxVSlxhS54v/+x7p2zL3BMUKqp0BO41IZo
-	 +ckB/6bQgfDzCo3iivWsouB4kGfJAaRozqulGo4JuHTP/QC5hPF2x2OFl65EZAjCMl
-	 anFczYaqr7qnFWtjyrFrzIkffi7zYE4dD2GSpYhN3WNqoMQCsjSsWx75/vruWG6IAS
-	 Dum4Hq9JNUQqRqYUrhJXAVDSdyrJT1TdM7/TvLnbayW0XftoVkXunhVPgSJU3WLcXo
-	 1m/JlXZEleJIA==
-Date: Fri, 2 Feb 2024 11:22:48 -0800
+	b=fSwZfUaYriZSw2g/i0aVBoJi+X28rETNBt7iN9Qv/JADxiikJNxTzbFABqcklfsJe
+	 Q1+tSI7YPPGRAUPS3xrzIrQPpoknlXh93bFiFP8YtfCvALE8k9gtvAE6ZInmvoYFEG
+	 BMOSXx2/isYuYYTySvQXnEs6aznflCfMOMTvlCKrUNLmqIY72xxgeoR6SXtdDtMcpK
+	 UeqsgzPKpUdiIYgFzJefEBWW6j1KaNtbXjjAZSFC2g0kN8AX+1BFEqkUpXDYCIhDxV
+	 vvKi1HXBB9mbkKn1poycMz4ZLp2rRGSr9W+g7mpwRMzfAR4BPmEZ+wfEfyBJvFAACP
+	 mHuArwCM2/F0A==
+Date: Fri, 2 Feb 2024 11:33:14 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: Chuck Lever <chuck.lever@oracle.com>,
- kernel-tls-handshake@lists.linux.dev, netdev@vger.kernel.org
-Subject: Re: Persistent problem with handshake unit tests
-Message-ID: <20240202112248.7df97993@kernel.org>
-In-Reply-To: <b22d1b62-a6b1-4dd6-9ccb-827442846f3c@roeck-us.net>
-References: <b22d1b62-a6b1-4dd6-9ccb-827442846f3c@roeck-us.net>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH RESEND] nfc: hci: Save a few bytes of memory when
+ registering a 'nfc_llc' engine
+Message-ID: <20240202113314.4c5f09ce@kernel.org>
+In-Reply-To: <30e5c9c2-b13a-4b7e-a266-1e03e654f1d3@wanadoo.fr>
+References: <6d2b8c390907dcac2e4dc6e71f1b2db2ef8abef1.1705744530.git.christophe.jaillet@wanadoo.fr>
+	<20240131150803.2fec5a5c@kernel.org>
+	<30e5c9c2-b13a-4b7e-a266-1e03e654f1d3@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,14 +64,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 2 Feb 2024 09:21:22 -0800 Guenter Roeck wrote:
-> when running handshake kunit tests in qemu, I always get the following
-> failure.
+On Fri, 2 Feb 2024 20:11:56 +0100 Christophe JAILLET wrote:
+> It would be slower, but it would reduce code duplication as well.
+> This is just an _exit() function, so it shouldn't be called that often 
+> anyway, if called at all.
+> 
+> Or, add another function with the list_del()+kfree_const()+kfree(), that 
+> would be called from nfc_llc_exit() and nfc_llc_unregister(), to have 
+> the best of the 2 worlds?
 
-Sorry for sidetracking - how do you run kunit to get all the tests?
-We run:
-
-	./tools/testing/kunit/kunit.py run --alltests
-
-but more and more I feel like the --alltests is a cruel joke.
+My vote is the latter - factor out the 3 calls into a new helper, call
+it where appropriate.
 
