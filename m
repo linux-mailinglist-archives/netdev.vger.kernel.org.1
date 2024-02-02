@@ -1,91 +1,79 @@
-Return-Path: <netdev+bounces-68263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0102F846578
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:38:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E00284657E
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:42:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CDA41F268D5
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:38:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C049328A13F
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:42:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8B2A6130;
-	Fri,  2 Feb 2024 01:38:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8851610E;
+	Fri,  2 Feb 2024 01:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="BfcRPwjK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fP8eCE0K"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3C1C53B9;
-	Fri,  2 Feb 2024 01:38:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6BE6AAB;
+	Fri,  2 Feb 2024 01:42:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706837908; cv=none; b=rNS5iiUVf8AFtdG+uuuG+1vcVy6C+xKT48r5A1Haoqr7EHp9OvE1bH+QJNjHdiewAbq4Gr+KVkJ6n1xzMN01A2RkH2lW/O8URQFOr20D5ryqQ14zvitoNFMtd7Ntu5wJIPKXB3ub9JTz0cPeQlDVBrlNib0pTxMX9TyiIlkLmlQ=
+	t=1706838173; cv=none; b=EhnUHUwcGo3ThG88gTS7q5lF3xgLevmFlwUOWG8tps1K2Q42EAbeYmscRecEEY5de6vjGVG0I1W6tvlzw9oH5eUoIJO46oJHxWPxsPHdeAkVT+WYlOi8htZ2d4I56gUMmys+0BR26IyGOu62oFIpiap1aLGc7//Nk3pZxoHslAg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706837908; c=relaxed/simple;
-	bh=YcpLpVCdlye1BoPJKLYYkusS/fcIkeSV6M2HV65jNfo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BLOD90AIk7qyu+wDMsuIHp/cEkIn0CWj6fwThHdV8Hkpd9gwwDx08qVMuEH8fZ3C5SItX7QrcOZCTNBXXRP/0fu94FUtglY/UJ4HuuBdJTCtyF3Liw7Y8rk48rEQXT2/G8z2h9M+kzbov52wWeW2/VEitzqQzsEAjYPjzCLSbaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=BfcRPwjK; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=wV4rR0AKtPj1WIddqkyqKOAXUe6Ps5Ee+7NgRDAA0Yg=; b=BfcRPwjK3LbmSGRbFxgpQfDM41
-	jC7xyB9dbGsDvwdeHchIuQGXduQbs3cYwJ9GgrdepNy0Z+d1O6989t5t90dJOxOV9Hk2O3sMWYDd0
-	y6RzlqDkxjODnqGP0GyH3SHCzT6iXhfrZ+11uZ4jAc4xtn2wSfKMBUg6unvMINOCm+wo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rViVW-006jkd-BL; Fri, 02 Feb 2024 02:38:18 +0100
-Date: Fri, 2 Feb 2024 02:38:18 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Frank Rowand <frowand.list@gmail.com>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [net-next PATCH v5 8/9] net: phy: qcom: generalize some qca808x
- LED functions
-Message-ID: <56fb487f-4358-4c1f-9c8c-c6d75991972d@lunn.ch>
-References: <20240201151747.7524-1-ansuelsmth@gmail.com>
- <20240201151747.7524-9-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1706838173; c=relaxed/simple;
+	bh=xknzaMag2fCqoNkrvN7IIBRCKRuhmXWZUa22lppRh8w=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KPA2BSG5xNii6gaojjQXw/oa0eOm0RIrh1TVShd+rxkbSiDzsURXRrN49SBbKjUWPy49Y1XhAU1zPO6MSxmOo4lOqoueum5n7qsSVCqPInT77aayNkYOT0ZwfRfADosPo35drtv9Z81yDo/4TPJK2qvkxLaJ6y0ra0XzA1nZTT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fP8eCE0K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D34D4C433C7;
+	Fri,  2 Feb 2024 01:42:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706838173;
+	bh=xknzaMag2fCqoNkrvN7IIBRCKRuhmXWZUa22lppRh8w=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fP8eCE0KOmsWSUtVp2DEVsfAkBCmpGQni85nCkRU56qov54y+lKxDuFbX7MijgbXO
+	 W2esKeSse4JScex9hMR6HC0TxQkgTjN6HKkNSvVIICJ570ggv5JLEKpo9e7qnfVp8f
+	 200UMHfG7rW0uvrVLKPtFMLcQTKGGkN0jDESneHKr7yB6jgKckPCgyA3H9keinVn08
+	 /TOm47Zvf+WWcZzuZCKIuhXmnL9Hfzg/ghOgPyCfyN+rfHFURXDUZ+VUKgxbUORF6d
+	 kOqNk6QcLY+8CJJarZbCuCh3U2Bt924gu0+9uGXCTYU7dEC8YmcDlN3EqNSw7RuVbO
+	 pQD9jUebKHgNA==
+Date: Thu, 1 Feb 2024 17:42:49 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: "David E. Box" <david.e.box@linux.intel.com>
+Cc: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>,
+ netdev@vger.kernel.org, ilpo.jarvinen@linux.intel.com,
+ linux-kernel@vger.kernel.org, platform-driver-x86@vger.kernel.org
+Subject: Re: [PATCH 0/8] Intel On Demand: Add netlink interface for SPDM
+ attestation
+Message-ID: <20240201174249.5d55324c@kernel.org>
+In-Reply-To: <ea0ae8ac-41bc-4aaa-87b6-af31002e6ce0@linux.intel.com>
+References: <20240201010747.471141-1-david.e.box@linux.intel.com>
+	<ea0ae8ac-41bc-4aaa-87b6-af31002e6ce0@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240201151747.7524-9-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 01, 2024 at 04:17:34PM +0100, Christian Marangi wrote:
-> Generalize some qca808x LED functions in preparation for qca807x LED
-> support.
+On Thu, 1 Feb 2024 08:53:37 -0800 Kuppuswamy Sathyanarayanan wrote:
+> On 1/31/24 5:07 PM, David E. Box wrote:
+> > This patch series primarily adds support for a new netlink ABI in the
+> > Intel On Demand driver for performing attestation of the hardware state.  
 > 
-> The LED implementation of qca808x and qca807x is the same but qca807x
-> supports also Fiber port and have different hw control bits for Fiber
-> port. To limit code duplication introduce micro functions that takes reg
-> instead of LED index to tweak all the supported LED modes.
+> Try to add some info about why you need new netlink ABI?
 
-Please could you split this up. Do the move first, no changes. Then
-add the macros and other refactoring. That will make this easier to
-review.
+Since netdev is copied it'd also be useful to give us a high level
+intro into what pieces are involved. Assume we have heard about
+SPDM/attestation in context of NIC FW but have little understanding of
+x86 platform stuff. 
 
-	Andrew
+grep -i sdsi Documentation doesn't say much, the first Google result
+for Intel On Demand reads like marketing fluff :(
 
