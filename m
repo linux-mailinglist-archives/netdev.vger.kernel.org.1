@@ -1,101 +1,136 @@
-Return-Path: <netdev+bounces-68291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2193684668E
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 04:31:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2816B846697
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 04:45:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54ECD1C224DA
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 03:31:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C0B428D494
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 03:45:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D333AC8C3;
-	Fri,  2 Feb 2024 03:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A1FBDDCE;
+	Fri,  2 Feb 2024 03:45:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RQEknTRO"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wkJwZkbb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-179.mta0.migadu.com (out-179.mta0.migadu.com [91.218.175.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1663EAFB
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 03:30:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B6A9DF41
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 03:45:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706844655; cv=none; b=PElM0FFP1N78ogsUoIIU1QbB2DoyzCc7+0MCADSusOw/AIsIuCrmOUPIdDJbpdFHx4kiIDhmfl2pkSBl9SBuYreucQK+nq4t4WIZxvk19lCsIlry+VSDkaFnUk1X8uVhYyLvvlBoQnye1+0VzlM9Nx//StDKyoALzwKTFlAI1fA=
+	t=1706845523; cv=none; b=sP9743QLVKSaGVpNAh3m6YlfnBg/jbpOHdKeqIkkJvYjVrfnSlXp9Qa/fQXpYOJKYj5BTVkc5/nRTXcfb6dsIx1sAUT4bUvAsKaCqTwn3K4H00CZzpsihc20yvoLi02mSaRus1zB8LH4J068cpa5hlyvkzxPdI032exDtTclOaM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706844655; c=relaxed/simple;
-	bh=YB58uL0vd9C7zXR3MUALx3Xy9Es4q5H9cUmii8RuLcs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ByRbHrIhvJTdaZUNu1nsvyF6XybAmxRLYtIV7Z8NF2klazwweMTXh3EmAVEBpN0GnYCViqJIV9dki+zvrdgcnMoEwiTb/1As6tqpttepU4Xv21rhn6T+ti/Atc3twoqUlMwcf6ZFbX7SQFDBGhZNJ9y3Vq7VgXmMyABMpadlzAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RQEknTRO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44962C43394;
-	Fri,  2 Feb 2024 03:30:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706844655;
-	bh=YB58uL0vd9C7zXR3MUALx3Xy9Es4q5H9cUmii8RuLcs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RQEknTRObrQCJsvICpSrNk7f1/RYknmSlo1R9rCKPYoFRazqdjCDDtP3a789TShEl
-	 v5ohIEAyS/vxwz9MbYCBvuJEnXyIsIC/uyU/uRhFEkdKf+j7gLkkqq6gKjhy8sI6Kt
-	 5hPeLciRgcDHETPtrdNTnbS8ly1Zr/rXg8KCUyhkevs1vrk0iq6fi4q59857tMdGtm
-	 995exWrOwUqLB1QNz65ViNqradAId3Uwy6atJuHlVGzBAERXIMlCbmUFO7N2bpnNU1
-	 m62Th0bXUA2L4neMFhB52Dana9R2af/06tIAmll1k/PAhQzzLAWHLwpaSvVWCYW+ql
-	 sQR88oA6CqGAw==
-Date: Thu, 1 Feb 2024 19:30:50 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: William Tu <witu@nvidia.com>
-Cc: Jacob Keller <jacob.e.keller@intel.com>, bodong@nvidia.com,
- jiri@nvidia.com, netdev@vger.kernel.org, saeedm@nvidia.com,
- "aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>,
- ecree.xilinx@gmail.com, Yossi Kuperman <yossiku@nvidia.com>, William Tu
- <u9012063@gmail.com>
-Subject: Re: [RFC PATCH v3 net-next] Documentation: devlink: Add devlink-sd
-Message-ID: <20240201193050.3b19111b@kernel.org>
-In-Reply-To: <39dbf7f6-76e0-4319-97d8-24b54e788435@nvidia.com>
-References: <20240125045624.68689-1-witu@nvidia.com>
-	<20240125223617.7298-1-witu@nvidia.com>
-	<20240130170702.0d80e432@kernel.org>
-	<748d403f-f7ca-4477-82fa-3d0addabab7d@nvidia.com>
-	<20240131110649.100bfe98@kernel.org>
-	<6fd1620d-d665-40f5-b67b-7a5447a71e1b@nvidia.com>
-	<20240131124545.2616bdb6@kernel.org>
-	<2444399e-f25f-4157-b5d0-447450a95ef9@nvidia.com>
-	<777fdb4a-f8f3-4ddb-896a-21b5048c07da@intel.com>
-	<20240131143009.756cc25c@kernel.org>
-	<dc9f44a8-857b-498a-8b8c-3445e4749366@nvidia.com>
-	<20240131151726.1ddb9bc9@kernel.org>
-	<39dbf7f6-76e0-4319-97d8-24b54e788435@nvidia.com>
+	s=arc-20240116; t=1706845523; c=relaxed/simple;
+	bh=+sLC3/sMdldqreq8t261If0XmChHH3bybwx3J4jsT04=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=oaTklmiGYNv7j82Q6ylzATWDMG3EhioSc53fe/rNE/TtNIzlbDcFsO+zRyRWqbs4Gp23iYohUQ7KGX7E/n1vcd6d27hvZ8EqCFUqXbreE1ctTIbzYZgiltTGrrCKkCJgIySrIQt4fdVyZZLgscMBwk34U/rFN98AgBt/9uAoFao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wkJwZkbb; arc=none smtp.client-ip=91.218.175.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1706845516;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=FhDGektx+3oTkSzeRUpmjCM+yvBN/m1UWuemA9fuCj0=;
+	b=wkJwZkbb8FTbQTYUmMCc+6wPEba6MbtYyoGnztwdtyD8u/BcuMHY2UAmU4/DrWiR/yr6Ik
+	SJLMf1jvr6mRpoFs2k8hZtGv2LX/KGDpgHacW78RxbLQRk1H2juR0LGq5v83zJAEyQrS/M
+	6LiXrWwld7xmuiMo19amcNbhO01whQo=
+From: George Guo <dongtai.guo@linux.dev>
+To: Paul Moore <paul@paul-moore.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: George Guo <guodongtai@kylinos.cn>,
+	netdev@vger.kernel.org,
+	linux-security-module@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/1] Modify macro NETLBL_CATMAP_MAPTYPE to define a type using typedef
+Date: Fri,  2 Feb 2024 11:44:48 +0800
+Message-Id: <20240202034448.717589-1-dongtai.guo@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 1 Feb 2024 11:16:22 -0800 William Tu wrote:
-> >> I guess bnxt, ice, nfp are doing tx buffer sharing?  
-> > I'm not familiar with ice. I'm 90% sure bnxt shares both Rx and Tx.
-> > I'm 99.9% sure nfp does.
-> >
-> > It'd be great if you could do the due diligence rather than guessing
-> > given that you're proposing uAPI extension :(
-> >  
-> *
-> 
-> (sorry again, html is detected in previous email)
-> 
-> due diligence here:
+From: George Guo <guodongtai@kylinos.cn>
 
-Thanks for collecting the deets!
+Modify NETLBL_CATMAP_MAPTYPE to netlbl_catmap_map_t, which is more 
+readable.
 
-If I'm reading this right we have 3 drivers which straight up share
-queues. I don't remember anyone complaining about the queue sharing
-in my time at Netro. Meaning we can probably find reasonable defaults
-and not start with the full API? Just have the
+Signed-off-by: George Guo <guodongtai@kylinos.cn>
+---
+ include/net/netlabel.h       | 8 ++++----
+ net/netlabel/netlabel_kapi.c | 8 ++++----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-  devlink dev eswitch set DEV mode switchdev shared-descs enable
+diff --git a/include/net/netlabel.h b/include/net/netlabel.h
+index 43ae50337685..9f8387fc7e27 100644
+--- a/include/net/netlabel.h
++++ b/include/net/netlabel.h
+@@ -145,15 +145,15 @@ struct netlbl_lsm_cache {
+  * processing.
+  *
+  */
+-#define NETLBL_CATMAP_MAPTYPE           u64
++typedef u64 netlbl_catmap_map_t;
+ #define NETLBL_CATMAP_MAPCNT            4
+-#define NETLBL_CATMAP_MAPSIZE           (sizeof(NETLBL_CATMAP_MAPTYPE) * 8)
++#define NETLBL_CATMAP_MAPSIZE           (sizeof(netlbl_catmap_map_t) * 8)
+ #define NETLBL_CATMAP_SIZE              (NETLBL_CATMAP_MAPSIZE * \
+ 					 NETLBL_CATMAP_MAPCNT)
+-#define NETLBL_CATMAP_BIT               (NETLBL_CATMAP_MAPTYPE)0x01
++#define NETLBL_CATMAP_BIT               ((netlbl_catmap_map_t)0x01)
+ struct netlbl_lsm_catmap {
+ 	u32 startbit;
+-	NETLBL_CATMAP_MAPTYPE bitmap[NETLBL_CATMAP_MAPCNT];
++	netlbl_catmap_map_t bitmap[NETLBL_CATMAP_MAPCNT];
+ 	struct netlbl_lsm_catmap *next;
+ };
+ 
+diff --git a/net/netlabel/netlabel_kapi.c b/net/netlabel/netlabel_kapi.c
+index 27511c90a26f..a8fa336be1cd 100644
+--- a/net/netlabel/netlabel_kapi.c
++++ b/net/netlabel/netlabel_kapi.c
+@@ -610,7 +610,7 @@ int netlbl_catmap_walk(struct netlbl_lsm_catmap *catmap, u32 offset)
+ 	struct netlbl_lsm_catmap *iter;
+ 	u32 idx;
+ 	u32 bit;
+-	NETLBL_CATMAP_MAPTYPE bitmap;
++	netlbl_catmap_map_t bitmap;
+ 
+ 	iter = _netlbl_catmap_getnode(&catmap, offset, _CM_F_WALK, 0);
+ 	if (iter == NULL)
+@@ -666,8 +666,8 @@ int netlbl_catmap_walkrng(struct netlbl_lsm_catmap *catmap, u32 offset)
+ 	struct netlbl_lsm_catmap *prev = NULL;
+ 	u32 idx;
+ 	u32 bit;
+-	NETLBL_CATMAP_MAPTYPE bitmask;
+-	NETLBL_CATMAP_MAPTYPE bitmap;
++	netlbl_catmap_map_t bitmask;
++	netlbl_catmap_map_t bitmap;
+ 
+ 	iter = _netlbl_catmap_getnode(&catmap, offset, _CM_F_WALK, 0);
+ 	if (iter == NULL)
+@@ -857,7 +857,7 @@ int netlbl_catmap_setlong(struct netlbl_lsm_catmap **catmap,
+ 
+ 	offset -= iter->startbit;
+ 	idx = offset / NETLBL_CATMAP_MAPSIZE;
+-	iter->bitmap[idx] |= (NETLBL_CATMAP_MAPTYPE)bitmap
++	iter->bitmap[idx] |= (netlbl_catmap_map_t)bitmap
+ 			     << (offset % NETLBL_CATMAP_MAPSIZE);
+ 
+ 	return 0;
+-- 
+2.34.1
 
-extension to begin with?
 
