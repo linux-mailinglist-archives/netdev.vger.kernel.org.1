@@ -1,97 +1,59 @@
-Return-Path: <netdev+bounces-68603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C63B18475E1
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:13:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 343118475F2
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:18:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 780C928C5F6
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:13:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCEE91F261BF
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:18:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3A814A4F0;
-	Fri,  2 Feb 2024 17:13:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FCAB148FEC;
+	Fri,  2 Feb 2024 17:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GpidqCUY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ofEWPwwt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A6F214A4E9;
-	Fri,  2 Feb 2024 17:13:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C31C45BF3
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 17:18:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706894000; cv=none; b=PB8TwYQp8mG9/tio9Wnfg0TVZ6CfW4YyuoWcLUb7j0MQwcfrlLoU22WBnAmiAFJCB+e0ZuZb7Chlnj1koQ+4qwnez/qdwICC/tZrRrgWPipnkidbQ4LmA+45994GQxfNm75pD9c/SIMqPUyIlzny60GeP/sRwVqkN5CZEEa62RE=
+	t=1706894292; cv=none; b=qWD6isLypOH8+IZ1UCMHhMosaGIO9OSCJK4yYL9x9KUWkB7rdxnl3FyU4uFAOoYajdaPZY7JUUi3fxTVaMzRWgBkIJS3ehD1/ndOZZujBs8VWazp1OTik6WmvpCmb1Hhuk/+7obRektAl/yfcDGjz6lMa5UHcL8wYMKWF4JHn9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706894000; c=relaxed/simple;
-	bh=8c6EpFuSL/RCfyj8FhDfnXzj0voM3VashKovRfGqikU=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gSezZnbFI43qGWMS1hX3ZdcpccBT6xMkfVVzis00QT2bp5fABZxUCRN1yvgUFygaNl/T1g62fgttyHendJVXLweKUPV94wy0RsiwXitFNXyJrs9EzWakAWLbu7LpIxt10ExVO2CbqkdxrlFSA/SHUcuLujRQFxhhZ9gERe8whZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GpidqCUY; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-40fcb6ebe24so3690035e9.0;
-        Fri, 02 Feb 2024 09:13:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706893992; x=1707498792; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=w5nhOibo/PIgA624XGefYyKKp7xyU3/pWyQClEA0ccA=;
-        b=GpidqCUYALDEN4LVVBTG9vR5Afbom1eQSOGAxL08yH6fqlwtg2bA6d/mF+MkyLw9FW
-         Th1cfvx//ixw6rZlpv8TTbml/Gc0lneXMM0e2wUzg4ESd3R9zVHJ6rMal/E5iqauwSeI
-         NP/9GsQAlAc1ZNuRh/nJjX9KPvZcbb83CrlXcCw22vBM2JI9XQa1u/evVDOVu9PwsxTs
-         PJthdxqpjEucVqlLZ1+92o3oPGIad962mdxUCy18GjSRmKVfQ6P+tWuMkC1Lg+rIft4M
-         mzpfzYtekuVyeh+3GsSRptaiHf5T1GcgsIq/DkM1Ica4c3RVSE38hgkLgMk7dK3uiLFc
-         2YIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706893992; x=1707498792;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=w5nhOibo/PIgA624XGefYyKKp7xyU3/pWyQClEA0ccA=;
-        b=EXe3xh3yl8XJULr2/yeEi4S18IATiFFZo6brRaK7gH/5QN+kmPmFZfgxzD1OmOAN+A
-         tckJHXTfyYjtgUHp1sWRgrv80BC+0/hE+I/QnXaTgMkk0+fGAXS9DgLL3O6gWF8LVKyd
-         5TSuHL7ORvA0cuIsBb2Gd8Qd8KzqlsOAcSzt8zV5zGje9bA9qAhHqW4B4xW7bafbKEeI
-         h/YFHgjFpOeJWcRNd8J0mGXG7tJiXro+TYUrcfQ6+dS1bhMpXDf0wNkHYyAa0BeGX6Vf
-         6lI0fLv+Ymc5iZ8urasmI4J0+Mx9DQ/wgHwUxyKnOLKYW6EuvXVnUvEeldHUvGeEAOvl
-         BKuw==
-X-Gm-Message-State: AOJu0YwJnZDXvjj1+JG5YwDum1/rwk4iVFsVxs1osthwCI5YqxF8uxj+
-	zLjl0nxSpavvodaJac6FQ9MwGFdJsAapHcQGSBtot8NpbzkX05FA
-X-Google-Smtp-Source: AGHT+IENpzsVWWWp51ExAgYEKKZAwBks2nkSTfruZeJSPkfyAxKIpKRuxHSRbEhcU/GRyf/mNdiStg==
-X-Received: by 2002:a05:600c:3110:b0:40f:b772:c37c with SMTP id g16-20020a05600c311000b0040fb772c37cmr5118335wmo.31.1706893992093;
-        Fri, 02 Feb 2024 09:13:12 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXqTf4U+29R5VScw69iqcfqY4TUSJsaI6YeRW+S4WWB61TsvPJW4hEk3WZd0rgYA/KDdl3JgIqSZGY9ttMdMftyxVJhrZLj+aHAr9quiIUQgFHuTleOpASwXOWRGxBXiZ22WCwf71DN3rbV5jzJxk84eylvtK3JH1AkNrwd5PeMGS9iZnu7rVmhVtk2gVDKzfbmXlUFQ4Xag27VYP6OMhsQ9TFE6FyG0SgMXysclky1/RAEZjFAL0m2jPLzHxYobqiMiRBQeAR0hy6Sks4TLG7QOBuTJyB1Z9fJyRYpWyceAeA3FScCCKs3NVYF88sy0RhVixZ0spGfHSmjz8CxNDGaaYShgt1dF+UmDOeJ3LYIU/pXvkdewehXV7e6xxpzxuNEWjnuoi8cIoHV2bUopLttCVvwryja566ozmylAKnzuPIyVVfwpOjvUP3YQcBWR5VrT5gFTY0nNJ+IwjCrqNdcwEO7/NYd442br3Z+L8jPPpUB92RGoZwMB9NEu4jq21q9G+9FIwNZEOMbfDHxbquzDC6Ux0FkgOyHAieyttI4KZdc46FYngv5xpo5zHgEnV2FBg==
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id r2-20020a05600c35c200b0040efbdd2376sm441610wmq.41.2024.02.02.09.13.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Feb 2024 09:13:11 -0800 (PST)
-Message-ID: <65bd22a7.050a0220.39d07.2fd4@mx.google.com>
-X-Google-Original-Message-ID: <Zb0ipFb8y6gzMH1A@Ansuel-xps.>
-Date: Fri, 2 Feb 2024 18:13:08 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Frank Rowand <frowand.list@gmail.com>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [net-next PATCH v5 9/9] net: phy: qca807x: add support for
- configurable LED
-References: <20240201151747.7524-1-ansuelsmth@gmail.com>
- <20240201151747.7524-10-ansuelsmth@gmail.com>
- <46085abf-8e82-4fd9-95b8-95cbfde6e5c2@lunn.ch>
- <65bd1af9.df0a0220.c0618.9f8d@mx.google.com>
- <8bbff46a-f316-49b7-82f8-44dbdd452b0d@lunn.ch>
+	s=arc-20240116; t=1706894292; c=relaxed/simple;
+	bh=mTQpAVj7Ewz7qRcOhpB8XMamGD5kDsPz+5ZWXExfk9k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YF4MUY7sL4qX7aO26OlaXCX+1Ac944bALWesMhXQJbR/bQd6UinMZ44sY0HjzxnhuVY8RhW2/d1Lac6vI7wdL+UrgWzCUx/rGCBCLC64Ll2T+PkvaYLqS7KUwLig5PDLg3pqS0hyowZOM7tEK1Tv4FE3oXnJO9huCmYJ/sdNYHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ofEWPwwt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4AAEC433F1;
+	Fri,  2 Feb 2024 17:18:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706894291;
+	bh=mTQpAVj7Ewz7qRcOhpB8XMamGD5kDsPz+5ZWXExfk9k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ofEWPwwtqDkSqZIOv2vLm45rJ/UEXBWf2MUUNgpMkSPDt8EakRtXkBob4QnyVg6gq
+	 cYPZHriD97iFyR1hvqV4BI23G382E8+YOnrHptmNz1BURXZcwmYo2hnj9p36hfHX9i
+	 k2MYM2fkLAu5QmHMCdYVynjO6TqVD/6qqnQDs460lkfL0Df0tXyJ9P4KIa9PXgq8m4
+	 SgtgAc5GrWD4O9PMqX97LeS74LEFrS/yVNNlcgnfKjxt/ChgBmh0ue+t8jTP7SHljZ
+	 et0oqbXD+Uyy3JJGHB1NOBrFUr+gi6z/eIU089C2C58e1cXrTHgMyXb0DAECssXPhj
+	 +a0xg3MJ0bL4A==
+Date: Fri, 2 Feb 2024 18:18:05 +0100
+From: Simon Horman <horms@kernel.org>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	marcin.szycik@intel.com, wojciech.drewek@intel.com,
+	sridhar.samudrala@intel.com, przemyslaw.kitszel@intel.com,
+	Marcin Szycik <marcin.szycik@linux.intel.com>
+Subject: Re: [iwl-next v1 4/8] ice: control default Tx rule in lag
+Message-ID: <20240202171805.GS530335@kernel.org>
+References: <20240125125314.852914-1-michal.swiatkowski@linux.intel.com>
+ <20240125125314.852914-5-michal.swiatkowski@linux.intel.com>
+ <20240129105541.GH401354@kernel.org>
+ <ZbtCom/grznFpesc@mev-dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,40 +62,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8bbff46a-f316-49b7-82f8-44dbdd452b0d@lunn.ch>
+In-Reply-To: <ZbtCom/grznFpesc@mev-dev>
 
-On Fri, Feb 02, 2024 at 06:08:33PM +0100, Andrew Lunn wrote:
-> On Fri, Feb 02, 2024 at 05:40:21PM +0100, Christian Marangi wrote:
-> > On Fri, Feb 02, 2024 at 02:43:37AM +0100, Andrew Lunn wrote:
-> > > > +
-> > > > +			phydev->drv->led_brightness_set = NULL;
-> > > > +			phydev->drv->led_blink_set = NULL;
-> > > > +			phydev->drv->led_hw_is_supported = NULL;
-> > > > +			phydev->drv->led_hw_control_set = NULL;
-> > > > +			phydev->drv->led_hw_control_get = NULL;
+On Thu, Feb 01, 2024 at 08:05:06AM +0100, Michal Swiatkowski wrote:
+> On Mon, Jan 29, 2024 at 10:55:41AM +0000, Simon Horman wrote:
+> > On Thu, Jan 25, 2024 at 01:53:10PM +0100, Michal Swiatkowski wrote:
+> > > Tx rule in switchdev was changed to use PF instead of additional control
+> > > plane VSI. Because of that during lag we should control it. Control
+> > > means to add and remove the default Tx rule during lag active/inactive
+> > > switching.
 > > > 
-> > > I don't see how that works. You have multiple PHYs using this
-> > > driver. Some might have LEDs, some might have GPOs. But if you modify
-> > > the driver structure like this, you prevent all PHYs from having LEDs,
-> > > and maybe cause a Opps if a PHY device has already registered its
-> > > LEDs?
-> > >
+> > > It can be done the same way as default Rx rule.
 > > 
-> > God you are right! Off-topic but given the effects this may cause, why
-> > the thing is not const?
+> > Hi Michal,
+> > 
+> > Can I confirm that LAG TX/RX works both before and after this patch?
+> > 
 > 
-> I would like it to be, but its not easy. There are fields in the
-> driver structure that phylib needs to modify. e.g. mdiodrv.driver gets
-> passed to the driver core when registering the driver, and it modifies
-> it. mdiodrv.flags is also manipulated. So we cannot make the whole
-> structure const.
->
+> Hi Simon,
+> 
+> This part of LAG code is related to the LAG + switchdev feature (it
+> isn't chaning LAG core code). Hope that normal LAG also works well. This
+> is the scenario when you have PF in switchdev, bond created of two PFs
+> connected to the bridge with representors. Switching between interfaces
+> from bond needs to add default Rx rule, and after my changes also
+> default Tx rule.
+> 
+> Do you think I should add this description to commit message?
 
-Maybe the ops part can be detached and just that made const? (and
-introduce something like struct phy_driver_ops)
-It would require a big conversion but assuming nobody adds OPs in probe
-function everything should be static and easy to convert.
+Thanks Michal,
 
--- 
-	Ansuel
+I think that might be a good idea.
+
+But my question was a bit different: I'm asking if this patch addresses
+a regression introduced earlier in the series. Sorry for not being clearer
+the first time around.
 
