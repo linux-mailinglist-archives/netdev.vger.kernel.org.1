@@ -1,126 +1,172 @@
-Return-Path: <netdev+bounces-68485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 036BD847030
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:24:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8633284703A
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:25:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7D8ECB27648
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:24:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B86D71C241AF
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:25:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C725913F01A;
-	Fri,  2 Feb 2024 12:24:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51C16140783;
+	Fri,  2 Feb 2024 12:25:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qWcjWi3A";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sa9oFaAB";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="qWcjWi3A";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="sa9oFaAB"
 X-Original-To: netdev@vger.kernel.org
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.128.96.19
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8633614077A
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 12:25:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706876651; cv=none; b=Y17LKBAM0Feokj9RhxoPkpKPlJH7om2hy16pBHjq8u/RDM4hr6Zn81qXbmgTNt8XSkaMtjK/h0XNlMi72fkJz7bq308/W6GN05OhkROpFTuoyndMU/DvZdnY0mFGLKJ6TYsRyvhns9ZessLLs4hz0nQfwVVhQgD2fTv08IXoNqA=
+	t=1706876728; cv=none; b=TIzXEohbEdAJNoKH5JO9J/dkV35h3QK4aiieFq3v02AsFzqelp/yyDu8htwJIgFKqL5qQRbUmTGJ+CrjCzaaHzWIW2U8ewDGghhsht6xtnYLA/1k2DyI/zCt8y2smSbwnrPxsfD+eknbC96x2SRMT80898u/8KTnmaJWOK8C+kQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706876651; c=relaxed/simple;
-	bh=m8mtqnWI7hjKWBDfyKsbopyfLerJiS3T9hkaNbjWoX8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=coYabtE/ct7GKowzm5coJ1YpnzTBbffXLX9+KJvFpV67MH+1uQvKaujwjUJRz/hQZnoZcZbzbPqwLWrEBGg1MyCs3uW77tWVLRBTVwjujyIEO9l8mxIpoNA3qFHT0PPvrRhDcaVzHAHYoouT6SFZAySe1+/DslsadYNpg+/w3ZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=23.128.96.19
-X-Greylist: delayed 64 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 02 Feb 2024 04:24:03 PST
-Received: from mail22.mail.schwarz (mail22.mail.schwarz [185.124.192.54])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EC5E97;
-	Fri,  2 Feb 2024 04:24:03 -0800 (PST)
-X-SCHWARZ-TO: coreteam@netfilter.org, linux-kernel@vger.kernel.org, pabeni@redhat.com,
- i.maximets@ovn.org, kadlec@netfilter.org, davem@davemloft.net,
- netfilter-devel@vger.kernel.org, fw@strlen.de, netdev@vger.kernel.org,
- edumazet@google.com, pablo@netfilter.org, linux-kselftest@vger.kernel.org,
- horms@ovn.org, shuah@kernel.org
-X-SCHWARZ-ENVELOPEFROM: felix.huettner@mail.schwarz
-Received: from felix.runs.onstackit.cloud ([45.129.43.133])
-  by mail22.mail.schwarz with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 12:22:56 +0000
-Date: Fri, 2 Feb 2024 12:22:55 +0000
-From: Felix Huettner <felix.huettner@mail.schwarz>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Ilya Maximets <i.maximets@ovn.org>, linux-kernel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kadlec@netfilter.org, fw@strlen.de, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, shuah@kernel.org,
-	luca.czesla@mail.schwarz, max.lamprecht@mail.schwarz,
-	Simon Horman <horms@ovn.org>
-Subject: Re: [PATCH net-next v2] net: ctnetlink: support filtering by zone
-Message-ID: <Zbzen36ahZaiR+qp@felix.runs.onstackit.cloud>
-References: <ZWSCPKtDuYRG1XWt@kernel-bug-kernel-bug>
- <ZYV6hgP35k6Bwk+H@calendula>
- <2032238f-31ac-4106-8f22-522e76df5a12@ovn.org>
- <ZbzOA1D1IGYX2oxS@calendula>
+	s=arc-20240116; t=1706876728; c=relaxed/simple;
+	bh=e3ZnNNIWuBU/EFI+HVMYi9/5id2kl2QSlW2J4FvWeO0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IxEz/6adoRtergKjSRMR4Tph1sknxYvg1ZJftKSI9HTpjo1s6WDkKqX9oZpJtFjWZsyVNauHD+6udFGb5n7yArvSw7a9MbdSqUwo2SAo9DzYnnwTW3nRQsiXXUHlfgl95JLWwlIYU9dfSRuIToyRYvVefx4gx9ZVg2Lo3rT64Aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qWcjWi3A; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sa9oFaAB; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=qWcjWi3A; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=sa9oFaAB; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id AEF891F786;
+	Fri,  2 Feb 2024 12:25:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1706876724; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oVr9kcBdxoRJnBBzvIZPReDAQxlpaCyjtd2pjoG/VDY=;
+	b=qWcjWi3AfhhHFdSAXkxKZd7wW32IiWniA7EW9nDbxJ4+oNGb7ixHL5DobJX3J81qPyPz7X
+	9roO3PXbMUfuorHBWogP9W7tewWmOHvQjysGQrk3XZH+w4fji/5tlpq+2ZF4ZYUul1j3dF
+	BzhDJwInT3mBRLhDXEb3LWuIre2WRxc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1706876724;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oVr9kcBdxoRJnBBzvIZPReDAQxlpaCyjtd2pjoG/VDY=;
+	b=sa9oFaABoBMQJUyxc7C3UyeoupN1N/M3+fsMMvJUiO2pOix7SXld+gP4/J1vy1W6U41ZgU
+	+qPSM/cNUm9oXlDw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1706876724; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oVr9kcBdxoRJnBBzvIZPReDAQxlpaCyjtd2pjoG/VDY=;
+	b=qWcjWi3AfhhHFdSAXkxKZd7wW32IiWniA7EW9nDbxJ4+oNGb7ixHL5DobJX3J81qPyPz7X
+	9roO3PXbMUfuorHBWogP9W7tewWmOHvQjysGQrk3XZH+w4fji/5tlpq+2ZF4ZYUul1j3dF
+	BzhDJwInT3mBRLhDXEb3LWuIre2WRxc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1706876724;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oVr9kcBdxoRJnBBzvIZPReDAQxlpaCyjtd2pjoG/VDY=;
+	b=sa9oFaABoBMQJUyxc7C3UyeoupN1N/M3+fsMMvJUiO2pOix7SXld+gP4/J1vy1W6U41ZgU
+	+qPSM/cNUm9oXlDw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 62F4413A58;
+	Fri,  2 Feb 2024 12:25:24 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id d2O7FDTfvGUyfwAAD6G6ig
+	(envelope-from <dkirjanov@suse.de>); Fri, 02 Feb 2024 12:25:24 +0000
+Message-ID: <5fa65887-1f56-4470-bc99-383fe7e3f47b@suse.de>
+Date: Fri, 2 Feb 2024 15:23:48 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZbzOA1D1IGYX2oxS@calendula>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2] ifstat: convert sprintf to snprintf
+Content-Language: en-US
+To: David Laight <David.Laight@ACULAB.COM>,
+ 'Stephen Hemminger' <stephen@networkplumber.org>,
+ Denis Kirjanov <kirjanov@gmail.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <20240131124107.1428-1-dkirjanov@suse.de>
+ <20240131081418.72770d85@hermes.local>
+ <913e0c6bb6114fdfaa74073fc8b6c2ee@AcuMS.aculab.com>
+From: Denis Kirjanov <dkirjanov@suse.de>
+In-Reply-To: <913e0c6bb6114fdfaa74073fc8b6c2ee@AcuMS.aculab.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: -1.38
+X-Spamd-Result: default: False [-1.38 / 50.00];
+	 ARC_NA(0.00)[];
+	 TO_DN_EQ_ADDR_SOME(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 RCPT_COUNT_THREE(0.00)[4];
+	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 BAYES_HAM(-0.09)[64.45%];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 FREEMAIL_TO(0.00)[ACULAB.COM,networkplumber.org,gmail.com];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+X-Spam-Flag: NO
 
-On Fri, Feb 02, 2024 at 12:12:03PM +0100, Pablo Neira Ayuso wrote:
-> On Fri, Feb 02, 2024 at 12:04:35PM +0100, Ilya Maximets wrote:
-> > On 12/22/23 13:01, Pablo Neira Ayuso wrote:
-> > > On Mon, Nov 27, 2023 at 11:49:16AM +0000, Felix Huettner wrote:
-> > >> conntrack zones are heavily used by tools like openvswitch to run
-> > >> multiple virtual "routers" on a single machine. In this context each
-> > >> conntrack zone matches to a single router, thereby preventing
-> > >> overlapping IPs from becoming issues.
-> > >> In these systems it is common to operate on all conntrack entries of a
-> > >> given zone, e.g. to delete them when a router is deleted. Previously this
-> > >> required these tools to dump the full conntrack table and filter out the
-> > >> relevant entries in userspace potentially causing performance issues.
-> > >>
-> > >> To do this we reuse the existing CTA_ZONE attribute. This was previous
-> > >> parsed but not used during dump and flush requests. Now if CTA_ZONE is
-> > >> set we filter these operations based on the provided zone.
-> > >> However this means that users that previously passed CTA_ZONE will
-> > >> experience a difference in functionality.
-> > >>
-> > >> Alternatively CTA_FILTER could have been used for the same
-> > >> functionality. However it is not yet supported during flush requests and
-> > >> is only available when using AF_INET or AF_INET6.
-> > > 
-> > > For the record, this is applied to nf-next.
-> > 
-> > Hi, Felix and Pablo.
-> > 
-> > I was looking through the code and the following part is bothering me:
-> > 
-> >  diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conntrack_netlink.c
-> >  index fb0ae15e96df..4e9133f61251 100644
-> >  --- a/net/netfilter/nf_conntrack_netlink.c
-> >  +++ b/net/netfilter/nf_conntrack_netlink.c
-> >  @@ -1148,6 +1149,10 @@ static int ctnetlink_filter_match(struct nf_conn *ct, void *data)
-> >          if (filter->family && nf_ct_l3num(ct) != filter->family)
-> >                  goto ignore_entry;
-> >  
-> >  +       if (filter->zone.id != NF_CT_DEFAULT_ZONE_ID &&
-> >  +           !nf_ct_zone_equal_any(ct, &filter->zone))
-> >  +               goto ignore_entry;
-> >  +
-> >          if (filter->orig_flags) {
-> >                  tuple = nf_ct_tuple(ct, IP_CT_DIR_ORIGINAL);
-> >                  if (!ctnetlink_filter_match_tuple(&filter->orig, tuple,
-> > 
-> > If I'm reading that right, the default zone is always flushed, even if the
-> > user requested to flush a different zone.  I.e. the entry is never ignored
-> > for a default zone.  Is that correct or am I reading that wrong?
-> > 
-> > If my observation is correct, then I don't think this functionality can
-> > actually be used by applications as it does something unexpected.
+
+
+On 2/2/24 14:32, David Laight wrote:
+> From: Stephen Hemminger
+>> Sent: 31 January 2024 16:14
 > 
-> This needs a fix, the NF_CT_DEFAULT_ZONE_ID is used as a marker to
-> indicate if the filtering by zone needs to happen or not.
+>>
+>> On Wed, 31 Jan 2024 07:41:07 -0500
+>> Denis Kirjanov <kirjanov@gmail.com> wrote:
+>>
+>>> @@ -893,7 +893,7 @@ int main(int argc, char *argv[])
+>>>
+>>>  	sun.sun_family = AF_UNIX;
+>>>  	sun.sun_path[0] = 0;
+>>> -	sprintf(sun.sun_path+1, "ifstat%d", getuid());
+>>> +	snprintf(sun.sun_path+1, sizeof(sun.sun_path), "ifstat%d", getuid());
+>>
+>> If you are changing the line, please add spaces around plus sign
 > 
-> I'd suggest to add a boolean flag that specifies that zone filtering
-> is set on.
+> Isn't the size also wrong - needs a matching '- 1'.
 
-Hi Pablo and Ilya,
+I don't think it's wrong, it's just the size of the target buffer which is
+UNIX_PATH_MAX bytes.
 
-thanks for finding that.
-i will build a fix for that.
 
+> 
+> 	David
+> 
+> -
+> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
+> Registration No: 1397386 (Wales)
+> 
+> 
 
