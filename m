@@ -1,516 +1,182 @@
-Return-Path: <netdev+bounces-68268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 349118465A2
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 03:07:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 838F68465A5
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 03:10:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A5681C217EC
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:07:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D4C81F25242
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:10:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B4836AAB;
-	Fri,  2 Feb 2024 02:07:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Ab2NncDN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A8EC8466;
+	Fri,  2 Feb 2024 02:10:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEB67B67C
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 02:07:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2881EBE55;
+	Fri,  2 Feb 2024 02:10:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706839667; cv=none; b=kDWOas2UMMKZqlJo/Ya5BvOXnkKA6J/U1e1pp1yBLeZUnRFJU94seQDIrniLvqUqGcDIJ1hr2sPi1NCdYwXXGRZVh1mxUGJqzqIcRsmOJjDcrKPpiYmCe97h302HzKzKB9GbCaST8t0rFZyxokIk4VjihX7SfJN8V5YynJLQ9uA=
+	t=1706839814; cv=none; b=POEC7NIP6jDK5EDB5/dJjURccWEeuSCkss4/7AvACzd8gmI8vsvi+9pFTvsCsT2jifn1qB3rCyg6vNWzTeg7E3bilcW6OpfIDc4gZ5pVDT1RGLhUKkvzgZvGfG13qvTRqgiDuykXGL9IfqZNVLg7T2UEQ4Gb7/gXQDfH24AOn9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706839667; c=relaxed/simple;
-	bh=hEz10lfWeKbzbqehHpw1NYF9alhMYNGRZ4sAYik+l4c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UsZcdGvNW3PwQxoov6U4gIMpOdbnz+nwWv/Zt+zVTlLIKjnWmRflJfaL0zTWiy7S3ZWbHYa8qXm2H+AzL53haNe90lSNK4xaIzyXRgPFtlkzhAC/Lp5CL4DlZ5zhRW7AqbXLMDC+IcMyHZZyDAy/Aic2T8zD6SrELrFGeU9vTlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=Ab2NncDN; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d780a392fdso13684365ad.3
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 18:07:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1706839664; x=1707444464; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PxiFKl6taBsIGrO9TTbZUygHy8dPKLBS1ElW7zjOSa0=;
-        b=Ab2NncDNN/SVZT9ube3AfKX1/kvSDwdnx3dYUIehgOshtjUI5W+Mbpw7s3mGr7V0VC
-         VqM1Z9NoN7zAXfJcsoW2CMCs6oFbDKUe4rJR27KYFSwEE+WJd1dzyYbwpZYZv5s+8GJP
-         tYKT/7q/u6uEvjug76TjZyjSI9SwptnilAIm0Aatun6nyjgGHIcmzspiMlvRJaRpQcZv
-         HqNbseavyTAu4lVuTwHCCr599CX7pUWwB1GQUG/1LWIF1efsEaozlnQW9pDsgGWp0pph
-         YwtTQAsmuDBe+/kgYYi0OOp9hM4aTfXZGyZW+74WF+/aGRQLoRumPOm8ggVr5QgqQpZ4
-         2GYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706839664; x=1707444464;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PxiFKl6taBsIGrO9TTbZUygHy8dPKLBS1ElW7zjOSa0=;
-        b=u79o6+dqReSAqHVnob3NRpPYv3mmOjKgpt1iRd7Uia51LlAc0TKsZzvQH1z6ucFs93
-         tFT1zAQMk+yO97v47DnFUsPZ5TSnT1x1/G5aRPfoxvJXcMWT9o4jQD2aB7b49/P2Y47K
-         d4UzOPGnQDoEmMUp5e1Y7XC2fPUzxZeAH99SRreCo2MBsnOp2UvrsAN5NxSgCWINTRuV
-         m3y4bObGPAt/w596Rov2PYhKukTMnMVczw5hRiB4aVLpcHqbsi+ZnWgSykoUar7dn+Q2
-         3YIQ6kNewkjOj/1MUuR7TE4T+lyYQ3u90hvZ3Iz7E4QNMBVM4OBSyC9plAHTFxUgpPd0
-         xJRQ==
-X-Gm-Message-State: AOJu0YwpRcwyhyJzyNeecBt7ofeZTkZEqdrn8+sLSdMY+ryZ3o8kUun5
-	isNaIrEkhQxk/OoHLJwwTa6Er9jcXnXSR7vYjZXmQ3j+2LQNcPIGq4oPbzOuOA==
-X-Google-Smtp-Source: AGHT+IEIS2BycnI6QDfnmu+I9A3B4NFttZklLUx4ZMEh/nbc5BGYEDvS/8Xbr/+uGgoDBBl6fMC9gg==
-X-Received: by 2002:a17:902:a981:b0:1d7:310e:1e0d with SMTP id bh1-20020a170902a98100b001d7310e1e0dmr3808079plb.32.1706839664113;
-        Thu, 01 Feb 2024 18:07:44 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUm1IhpQcGWpGU4fkiddZpTqlKOuqvTGaHRuPvBZ4+B3ynOhQdeY7fZJeM8qdT8+5CDohHd4ruoki4KtRC1MecaU73UEp5nuGVrKG2hM9H3HUTiFparrEMavRUkHrNkVyMpd3MT5QLAxfA1ch21Jfa94aIUYIkKeSrztRlBikgcmZlTfZvTpfH2op7VS3SdHEPgq5x0s4WtBDnVM3V8CDzNb8czKNq2twgbR7zxg9MVqx77SUQ+IEPleePAfTiSssRguW40Hi4=
-Received: from exu-caveira.tail33bf8.ts.net ([2804:7f1:e2c1:815f:8b02:176b:bed6:69ec])
-        by smtp.gmail.com with ESMTPSA id kc12-20020a17090333cc00b001d94a245f3fsm495688plb.16.2024.02.01.18.07.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 18:07:43 -0800 (PST)
-From: Victor Nogueira <victor@mojatatu.com>
-To: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Cc: kernel@mojatatu.com,
-	pctammela@mojatatu.com
-Subject: [PATCH net-next] selftests: tc-testing: add mirred to block tdc tests
-Date: Thu,  1 Feb 2024 23:07:26 -0300
-Message-ID: <20240202020726.529170-1-victor@mojatatu.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1706839814; c=relaxed/simple;
+	bh=S1wJ8O2c3yy8xDXZK3UXs+325LgwXfZxjnn5v0hTV8w=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Ji95BbYBQiYG/bxFPkHu5yoLoCIKG1Ai4zDJJcS8b7g69tSZKLDBOmjdD/DbYP06Uu5KIGmrLdcaG4ktbyX/46Fn6pc4UwNiyFjNAydeQPPr1wXDowxdYY9ArHj635I33frxQOVLQTzLHkzRQqU/xE+0fhlCkEV/rlxviJhe3lQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4TQzhj4yq1zXgvp;
+	Fri,  2 Feb 2024 10:08:37 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 0296B18007A;
+	Fri,  2 Feb 2024 10:10:03 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Fri, 2 Feb
+ 2024 10:10:02 +0800
+Subject: Re: [PATCH net-next v4 2/5] page_frag: unify gfp bits for order 3
+ page allocation
+To: Paolo Abeni <pabeni@redhat.com>, <davem@davemloft.net>, <kuba@kernel.org>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Alexander Duyck
+	<alexanderduyck@fb.com>, Alexander Duyck <alexander.duyck@gmail.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+	Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet
+	<edumazet@google.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux.dev>, <linux-mm@kvack.org>
+References: <20240130113710.34511-1-linyunsheng@huawei.com>
+ <20240130113710.34511-3-linyunsheng@huawei.com>
+ <81c37127dda0f2f69a019d67d4420f62c995ee7f.camel@redhat.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <2e8606b1-81c2-6f3f-622c-607db5e90253@huawei.com>
+Date: Fri, 2 Feb 2024 10:10:02 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <81c37127dda0f2f69a019d67d4420f62c995ee7f.camel@redhat.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-Add 8 new mirred tdc tests that target mirred to block:
+On 2024/2/1 21:16, Paolo Abeni wrote:
+> On Tue, 2024-01-30 at 19:37 +0800, Yunsheng Lin wrote:
+>> Currently there seems to be three page frag implementions
+>> which all try to allocate order 3 page, if that fails, it
+>> then fail back to allocate order 0 page, and each of them
+>> all allow order 3 page allocation to fail under certain
+>> condition by using specific gfp bits.
+>>
+>> The gfp bits for order 3 page allocation are different
+>> between different implementation, __GFP_NOMEMALLOC is
+>> or'd to forbid access to emergency reserves memory for
+>> __page_frag_cache_refill(), but it is not or'd in other
+>> implementions, __GFP_DIRECT_RECLAIM is masked off to avoid
+>> direct reclaim in skb_page_frag_refill(), but it is not
+>> masked off in __page_frag_cache_refill().
+>>
+>> This patch unifies the gfp bits used between different
+>> implementions by or'ing __GFP_NOMEMALLOC and masking off
+>> __GFP_DIRECT_RECLAIM for order 3 page allocation to avoid
+>> possible pressure for mm.
+>>
+>> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+>> Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
+>> CC: Alexander Duyck <alexander.duyck@gmail.com>
+>> ---
+>>  drivers/vhost/net.c | 2 +-
+>>  mm/page_alloc.c     | 4 ++--
+>>  net/core/sock.c     | 2 +-
+>>  3 files changed, 4 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+>> index f2ed7167c848..e574e21cc0ca 100644
+>> --- a/drivers/vhost/net.c
+>> +++ b/drivers/vhost/net.c
+>> @@ -670,7 +670,7 @@ static bool vhost_net_page_frag_refill(struct vhost_net *net, unsigned int sz,
+>>  		/* Avoid direct reclaim but allow kswapd to wake */
+>>  		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
+>>  					  __GFP_COMP | __GFP_NOWARN |
+>> -					  __GFP_NORETRY,
+>> +					  __GFP_NORETRY | __GFP_NOMEMALLOC,
+>>  					  SKB_FRAG_PAGE_ORDER);
+> 
+>>  		if (likely(pfrag->page)) {
+>>  			pfrag->size = PAGE_SIZE << SKB_FRAG_PAGE_ORDER;
+>> diff --git a/mm/page_alloc.c b/mm/page_alloc.c
+>> index c0f7e67c4250..636145c29f70 100644
+>> --- a/mm/page_alloc.c
+>> +++ b/mm/page_alloc.c
+>> @@ -4685,8 +4685,8 @@ static struct page *__page_frag_cache_refill(struct page_frag_cache *nc,
+>>  	gfp_t gfp = gfp_mask;
+>>  
+>>  #if (PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE)
+>> -	gfp_mask |= __GFP_COMP | __GFP_NOWARN | __GFP_NORETRY |
+>> -		    __GFP_NOMEMALLOC;
+>> +	gfp_mask = (gfp_mask & ~__GFP_DIRECT_RECLAIM) |  __GFP_COMP |
+>> +		   __GFP_NOWARN | __GFP_NORETRY | __GFP_NOMEMALLOC;
+>>  	page = alloc_pages_node(NUMA_NO_NODE, gfp_mask,
+>>  				PAGE_FRAG_CACHE_MAX_ORDER);
+>>  	nc->size = page ? PAGE_FRAG_CACHE_MAX_SIZE : PAGE_SIZE;
+>> diff --git a/net/core/sock.c b/net/core/sock.c
+>> index 88bf810394a5..8289a3d8c375 100644
+>> --- a/net/core/sock.c
+>> +++ b/net/core/sock.c
+>> @@ -2919,7 +2919,7 @@ bool skb_page_frag_refill(unsigned int sz, struct page_frag *pfrag, gfp_t gfp)
+>>  		/* Avoid direct reclaim but allow kswapd to wake */
+>>  		pfrag->page = alloc_pages((gfp & ~__GFP_DIRECT_RECLAIM) |
+>>  					  __GFP_COMP | __GFP_NOWARN |
+>> -					  __GFP_NORETRY,
+>> +					  __GFP_NORETRY | __GFP_NOMEMALLOC,
+>>  					  SKB_FRAG_PAGE_ORDER);
+> 
+> This will prevent memory reserve usage when allocating order 3 pages,
+> but not when allocating a single page as a fallback. Still different
 
-- Add mirred mirror to egress block action
-- Add mirred mirror to ingress block action
-- Add mirred redirect to egress block action
-- Add mirred redirect to ingress block action
-- Try to add mirred action with both dev and block
-- Try to add mirred action without specifying neither dev nor block
-- Replace mirred redirect to dev action with redirect to block
-- Replace mirred redirect to block action with mirror to dev
+More accurately, the above ensures memory reserve is always not used
+for order 3 pages, whether memory reserve is used for order 0 pages
+depending on original 'gfp' flags, if 'gfp' does not have __GFP_NOMEMALLOC
+bit set, memory reserve may still be used  for order 0 pages.
 
-Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
----
- .../tc-testing/tc-tests/actions/mirred.json   | 396 ++++++++++++++++++
- 1 file changed, 396 insertions(+)
+> from the __page_frag_cache_refill() allocator - which never accesses
+> the memory reserves.
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json b/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
-index b53d12909962..795cf1ce8af0 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
-@@ -649,5 +649,401 @@
-         "teardown": [
-             "$TC actions flush action mirred"
-         ]
-+    },
-+    {
-+        "id": "456d",
-+        "name": "Add mirred mirror to egress block action",
-+        "category": [
-+            "actions",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            [
-+                "$TC actions flush action mirred",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC qdisc add dev $DEV1 egress_block 21 clsact",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC actions add action mirred egress mirror index 1 blockid 21",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "mirror",
-+                        "direction": "egress",
-+                        "to_blockid": 21,
-+                        "control_action": {
-+                            "type": "pipe"
-+                        },
-+                        "index": 1,
-+                        "ref": 1,
-+                        "bind": 0,
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 egress_block 21 clsact",
-+            "$TC actions flush action mirred"
-+        ]
-+    },
-+    {
-+        "id": "2358",
-+        "name": "Add mirred mirror to ingress block action",
-+        "category": [
-+            "actions",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            [
-+                "$TC actions flush action mirred",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC qdisc add dev $DEV1 ingress_block 21 clsact",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC actions add action mirred ingress mirror index 1 blockid 21",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "mirror",
-+                        "direction": "ingress",
-+                        "to_blockid": 21,
-+                        "control_action": {
-+                            "type": "pipe"
-+                        },
-+                        "index": 1,
-+                        "ref": 1,
-+                        "bind": 0,
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 ingress_block 21 clsact",
-+            "$TC actions flush action mirred"
-+        ]
-+    },
-+    {
-+        "id": "fdb1",
-+        "name": "Add mirred redirect to egress block action",
-+        "category": [
-+            "actions",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            [
-+                "$TC actions flush action mirred",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC qdisc add dev $DEV1 ingress_block 21 clsact",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC actions add action mirred egress redirect index 1 blockid 21",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "redirect",
-+                        "direction": "egress",
-+                        "to_blockid": 21,
-+                        "control_action": {
-+                            "type": "stolen"
-+                        },
-+                        "index": 1,
-+                        "ref": 1,
-+                        "bind": 0,
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 ingress_block 21 clsact",
-+            "$TC actions flush action mirred"
-+        ]
-+    },
-+    {
-+        "id": "20cc",
-+        "name": "Add mirred redirect to ingress block action",
-+        "category": [
-+            "actions",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            [
-+                "$TC actions flush action mirred",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC qdisc add dev $DEV1 ingress_block 21 clsact",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC actions add action mirred ingress redirect index 1 blockid 21",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "redirect",
-+                        "direction": "ingress",
-+                        "to_blockid": 21,
-+                        "control_action": {
-+                            "type": "stolen"
-+                        },
-+                        "index": 1,
-+                        "ref": 1,
-+                        "bind": 0,
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 ingress_block 21 clsact",
-+            "$TC actions flush action mirred"
-+        ]
-+    },
-+    {
-+        "id": "e739",
-+        "name": "Try to add mirred action with both dev and block",
-+        "category": [
-+            "actions",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            [
-+                "$TC actions flush action mirred",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC qdisc add dev $DEV1 ingress_block 21 clsact",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC actions add action mirred ingress redirect index 1 blockid 21 dev $DEV1",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j actions list action mirred",
-+        "matchJSON": [],
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 ingress_block 21 clsact",
-+            "$TC actions flush action mirred"
-+        ]
-+    },
-+    {
-+        "id": "2f47",
-+        "name": "Try to add mirred action without specifying neither dev nor block",
-+        "category": [
-+            "actions",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            [
-+                "$TC actions flush action mirred",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC qdisc add dev $DEV1 ingress_block 21 clsact",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC actions add action mirred ingress redirect index 1",
-+        "expExitCode": "255",
-+        "verifyCmd": "$TC -j actions list action mirred",
-+        "matchJSON": [],
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 ingress_block 21 clsact",
-+            "$TC actions flush action mirred"
-+        ]
-+    },
-+    {
-+        "id": "3188",
-+        "name": "Replace mirred redirect to dev action with redirect to block",
-+        "category": [
-+            "actions",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            [
-+                "$TC actions flush action mirred",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC qdisc add dev $DEV1 ingress_block 21 clsact",
-+                0
-+            ],
-+            [
-+                "$TC actions add action mirred ingress redirect index 1 dev $DEV1",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC actions replace action mirred egress redirect index 1 blockid 21",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "redirect",
-+                        "direction": "egress",
-+                        "to_blockid": 21,
-+                        "control_action": {
-+                            "type": "stolen"
-+                        },
-+                        "index": 1,
-+                        "ref": 1,
-+                        "bind": 0,
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 ingress_block 21 clsact",
-+            "$TC actions flush action mirred"
-+        ]
-+    },
-+    {
-+        "id": "83cc",
-+        "name": "Replace mirred redirect to block action with mirror to dev",
-+        "category": [
-+            "actions",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            [
-+                "$TC actions flush action mirred",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC qdisc add dev $DEV1 ingress_block 21 clsact",
-+                0
-+            ],
-+            [
-+                "$TC actions add action mirred egress redirect index 1 blockid 21",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC actions replace action mirred ingress mirror index 1 dev lo",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC -j actions get action mirred index 1",
-+        "matchJSON": [
-+            {
-+                "total acts": 0
-+            },
-+            {
-+                "actions": [
-+                    {
-+                        "order": 1,
-+                        "kind": "mirred",
-+                        "mirred_action": "mirror",
-+                        "direction": "ingress",
-+                        "to_dev": "lo",
-+                        "control_action": {
-+                            "type": "pipe"
-+                        },
-+                        "index": 1,
-+                        "ref": 1,
-+                        "bind": 0,
-+                        "not_in_hw": true
-+                    }
-+                ]
-+            }
-+        ],
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 ingress_block 21 clsact",
-+            "$TC actions flush action mirred"
-+        ]
-     }
- ]
--- 
-2.25.1
+I am not really sure I understand the above commemt.
+The semantic is the same as skb_page_frag_refill() as explained above
+as my understanding. Note that __page_frag_cache_refill() use 'gfp_mask'
+for allocating order 3 pages and use the original 'gfp' for allocating
+order 0 pages.
 
+> 
+> I'm unsure we want to propagate the __page_frag_cache_refill behavior
+> here, the current behavior could be required by some systems.
+> 
+> It looks like this series still leave the skb_page_frag_refill()
+> allocator alone, what about dropping this chunk, too? 
+
+As explained above, I would prefer to keep it as it is as it seems
+to be quite obvious that we can avoid possible pressure for mm by
+not using memory reserve for order 3 pages as we have the fallback
+for order 0 pages.
+
+Please let me know if there is anything obvious I missed.
+
+> 
+> Thanks!
+> 
+> Paolo
+> 
+> 
+> .
+> 
 
