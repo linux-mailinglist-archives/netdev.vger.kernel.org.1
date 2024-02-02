@@ -1,93 +1,97 @@
-Return-Path: <netdev+bounces-68500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0657084709F
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:48:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C77468470A5
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:50:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 394C81C23617
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:47:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66C3A1F2790A
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:50:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3FF71874;
-	Fri,  2 Feb 2024 12:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8434F185B;
+	Fri,  2 Feb 2024 12:50:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fM4KnXiH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b9qM9A9B"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-175.mta0.migadu.com (out-175.mta0.migadu.com [91.218.175.175])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01E9A1872
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 12:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C7646A1
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 12:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706878077; cv=none; b=T7FENgT00I4JLzmnH6VUXWSM8oCub1X4lhjQLNQWFkf10TaaLQKp9xSKQEvRqh8BKunbM9GpoAMfoP49ANN2kR29YnJZalZ2ysC2dsJ2Z+VSemsywiQRW4YkB8XKas7y9YMh0rHRd92Mxa21AoC8Vis1ds+Muq8Jlw2FJACSEvc=
+	t=1706878231; cv=none; b=lA9Qpv/w+Nb0SlcRYHfP9AXgo0RLEVRipC+P329RLwkwcMq8DuDVW4qIXlSO4StdSWwGTxBhAf972y77Tt8eaJXzIU9cffYHFdhr8z+tp8WAjtABToN3QZgsbxdSj2Rs/MqWdkbG/Jvoji1zWtnLk3KA/g09fWuVN40+vmQ5vnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706878077; c=relaxed/simple;
-	bh=RdTmza3iZdCn9aokmFdZsGKf1WkeNmgHQkyy7tSm8lw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KIXp6p5wijg+EQZhZkT59gloMmWpJtbMuv7yhCvTn6kNFikv+twgTsMrwsVro7EKPKGWOAerMUBO9tfk+xCC/aKlmaZ+wDP7nZxZSGVvaMGBHBixHlroOPrUmYU0BgxIJuRNOOnq3KwK1oHNb+BBs1MhQHx3e/dulToHI2trgyY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fM4KnXiH; arc=none smtp.client-ip=91.218.175.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Date: Fri, 2 Feb 2024 07:47:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1706878073;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xb97amKiVjHfa56AqmJwWt5AiBv9K/QA/PEcc/1iKAU=;
-	b=fM4KnXiHEeMdAKYtzIZQSnI4BYWCbgXBoXDNmFxQt6LB3ps+0jhsSPrdCEBvRner8OmAxX
-	ZxpFZp9CwTdDbNAh/e0+RTQfz9C63GdnrEQJ8RqGEqkW9jlMqrx4FrVPefi3CtwtKTO3Ym
-	HyzeF71W3DAuKwjIBvV7QhPGHa63+sA=
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Kent Overstreet <kent.overstreet@linux.dev>
-To: Jan Kara <jack@suse.cz>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, peterz@infradead.org, boqun.feng@gmail.com, 
-	Alexander Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH 1/4] fs/pipe: Convert to lockdep_cmp_fn
-Message-ID: <3nakly5rpn4eomhlxlzutvrisasm6yzqaccrfpnpw2lenxzfmy@vpft5f4osnye>
-References: <20240127020833.487907-1-kent.overstreet@linux.dev>
- <20240127020833.487907-2-kent.overstreet@linux.dev>
- <20240202120357.tfjdri5rfd2onajl@quack3>
+	s=arc-20240116; t=1706878231; c=relaxed/simple;
+	bh=u7RiM0Pypl3EzOdBZ9FDy9MqeXVePrrJicNCJaQwZQk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=aFjJbWwX2mMs4a6E52whyd9U0wiYUvpQ9z9kjo8QPZNUrrdpW3FuwUDAEJVfp+VBMfm8ohWnvN2X9rny8V1ASL3IyTAZEBjiHnU46lQcaMRtmkpE5mRB6aNLewZMyWgmhGC4TWLeBG+iW9UNofgOREv04S9KLaEvdTBiV4FXGB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b9qM9A9B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8F2DAC43390;
+	Fri,  2 Feb 2024 12:50:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706878230;
+	bh=u7RiM0Pypl3EzOdBZ9FDy9MqeXVePrrJicNCJaQwZQk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=b9qM9A9B2633n+z/MewQtlUyxEvEOFb8gGRGCNYGPRmrrO2vK2WJJD4ZaTmjFp3kD
+	 bbfgeta/3menT2K0HkH8/IX+jAykOeMWzDqaJnh1w16IjIBK2Dfmqr01n7CWHfD1p/
+	 QSqhgtm0pyS4AnFDCOaQSD+ruykx9U+7K9wewRoUzvnBKGUCDqugqibpCR7lxfG53V
+	 kwc9GzklH5gRdHpYlMMdI+Ig3w2vduO62XsNechgrPhd0UNp4LHTfspdviAux5Fl7N
+	 5vnNvssdXAHyEEYCegVoSf02IHLHwnOszy5c0PeLR10H4ThRVE0OI+oaqC95mHNZQM
+	 yk+hUeGem70xg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7AADEC04E27;
+	Fri,  2 Feb 2024 12:50:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240202120357.tfjdri5rfd2onajl@quack3>
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 1/4] batman-adv: Start new development cycle
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170687823049.13015.12274931129811487024.git-patchwork-notify@kernel.org>
+Date: Fri, 02 Feb 2024 12:50:30 +0000
+References: <20240201110756.29728-2-sw@simonwunderlich.de>
+In-Reply-To: <20240201110756.29728-2-sw@simonwunderlich.de>
+To: Simon Wunderlich <sw@simonwunderlich.de>
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ b.a.t.m.a.n@lists.open-mesh.org
 
-On Fri, Feb 02, 2024 at 01:03:57PM +0100, Jan Kara wrote:
-> On Fri 26-01-24 21:08:28, Kent Overstreet wrote:
-> > *_lock_nested() is fundamentally broken; lockdep needs to check lock
-> > ordering, but we cannot device a total ordering on an unbounded number
-> > of elements with only a few subclasses.
-> > 
-> > the replacement is to define lock ordering with a proper comparison
-> > function.
-> > 
-> > fs/pipe.c was already doing everything correctly otherwise, nothing
-> > much changes here.
-> > 
-> > Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-> > Cc: Christian Brauner <brauner@kernel.org>
-> > Cc: Jan Kara <jack@suse.cz>
-> > Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Simon Wunderlich <sw@simonwunderlich.de>:
+
+On Thu,  1 Feb 2024 12:07:53 +0100 you wrote:
+> This version will contain all the (major or even only minor) changes for
+> Linux 6.9.
 > 
-> I had to digest for a while what this new lockdep lock ordering feature is
-> about. I have one pending question - what is the motivation of this
-> conversion of pipe code? AFAIU we don't have any problems with lockdep
-> annotations on pipe->mutex because there are always only two subclasses?
+> The version number isn't a semantic version number with major and minor
+> information. It is just encoding the year of the expected publishing as
+> Linux -rc1 and the number of published versions this year (starting at 0).
+> 
+> [...]
 
-It's one of the easier conversions to do, and ideally /all/ users of
-subclasses would go away.
+Here is the summary with links:
+  - [1/4] batman-adv: Start new development cycle
+    https://git.kernel.org/netdev/net-next/c/df3fc228dead
+  - [2/4] batman-adv: Return directly after a failed batadv_dat_select_candidates() in batadv_dat_forward_data()
+    https://git.kernel.org/netdev/net-next/c/ffc15626c861
+  - [3/4] batman-adv: Improve exception handling in batadv_throw_uevent()
+    https://git.kernel.org/netdev/net-next/c/5593e9abf1cf
+  - [4/4] batman-adv: Drop usage of export.h
+    https://git.kernel.org/netdev/net-next/c/db60ad8b21ce
 
-Start with the easier ones, figure out those patterns, then the
-harder...
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
