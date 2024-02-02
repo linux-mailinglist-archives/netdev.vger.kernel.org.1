@@ -1,149 +1,202 @@
-Return-Path: <netdev+bounces-68702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80D0B8479E3
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:47:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD1C3847A07
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:58:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03C48283AFF
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:47:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 381A21F232BC
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:58:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7A7780608;
-	Fri,  2 Feb 2024 19:47:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB05B8062B;
+	Fri,  2 Feb 2024 19:58:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yp8fxriP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0CC80603;
-	Fri,  2 Feb 2024 19:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEAB015E5CF;
+	Fri,  2 Feb 2024 19:58:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706903248; cv=none; b=u3W0zzB/hKm7t20Xgei7whnlKE1bzXh2Jfw4BBY7jYT4fq7zo7REtnDELqx8TKpUEozj+cqd5Pe7KoYGRmlQLOFMfc8ZUj+Kicwh+mVQscsFDL6ZnwsjHI/cIDktxkQNOKg0KQh6+4dbvCeW7jTmcoQDlbxzy+0XQExN9DOn934=
+	t=1706903910; cv=none; b=Ckd+P8VQGKDnl9N5DEasicPTsK012Emzr5jJDInOPbCQv/M51T5SM563YsSYnrU86EPq5yt5YpWmT1eB89kZtAtu0HlVcZAl/wo4rU6TIi2s4BeQ3tlRizXEP8NtWSRIwHVYv1Jxn/ABTr7e4KCMsx47xSRPhjRWn69KHqh+NlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706903248; c=relaxed/simple;
-	bh=g8WdEUjO3MhOqX7G8qPPne2dului+4Z2R4meol+a1Zc=;
-	h=Subject:From:To:CC:References:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=o3muhc7mfIrRvsC64L2GpeUZ+XIFve15dQKJSY0bOrmT6pHNxQB8oBn5f2JjP+bmhFl13xbCghq6rD4rgFq5/t8drzQw+H1YXhuiYUpnK8kZEOp6cGyVS544qBlcCBAKORbwx6d+NxmkzIpJH2+A7nPvqx2yJKYJPqknt7s5E5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.78.128) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 2 Feb
- 2024 22:47:10 +0300
-Subject: Re: [PATCH v3 net-next 1/2] ravb: Add Rx checksum offload support for
- GbEth
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-To: Biju Das <biju.das.jz@bp.renesas.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
-	<yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
-	<wsa+renesas@sang-engineering.com>, Nikita Yushchenko
-	<nikita.yoush@cogentembedded.com>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, Geert Uytterhoeven
-	<geert+renesas@glider.be>, Prabhakar Mahadev Lad
-	<prabhakar.mahadev-lad.rj@bp.renesas.com>, Biju Das <biju.das.au@gmail.com>
-References: <20240201194521.139472-1-biju.das.jz@bp.renesas.com>
- <20240201194521.139472-2-biju.das.jz@bp.renesas.com>
- <422974a5-cbce-50ad-5a8c-7588d5eeebc2@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <20d6e13e-bfe6-6209-3a81-a9c1e32ce195@omp.ru>
-Date: Fri, 2 Feb 2024 22:47:09 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1706903910; c=relaxed/simple;
+	bh=QXqBLZTBwDvHVnz+ZkulQjlUzUelopqjAIOf9+JsdIU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=a72p801rX2ckYr12gW6rxDMyTiLCUqtYY0T1vYogSVOTssOKB4fxLGp4oYKvGtjHIL3W7t8YlkzaIDRBjmZ8rJ//SzOo5680fb0HZuJBQZEo6Aj6TPsrzycvnmcdyArEMMvXBkpDzNAZcn31Oz5931mTJD9pbVqZ3dqvzgastxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yp8fxriP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B860CC433C7;
+	Fri,  2 Feb 2024 19:58:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706903910;
+	bh=QXqBLZTBwDvHVnz+ZkulQjlUzUelopqjAIOf9+JsdIU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Yp8fxriPipHveAtkSZWGL4RYByuF3BQFT06IyAs7nyBIsT8OdaQrFq+owBOAvMbD2
+	 XIvpHdlWNA3Ym1PoHP61IYhLoQ8C/LUruHXsVxUs4Aiy3SAT2JZrD5he6+jm9kOohn
+	 lP5JId8vOiM8t7jyTVu3Y82p57PSejAqER8KXv13ZAbEtsBL079++hZzlgBD3Z0oXN
+	 xSSVf5jES+8T8/6vtwZLjp4lm5F9SErYxI6J64XiLhqXoEq0WYZe4T9TA5jAH1PpN/
+	 am9dygBObjWHmlAK3fbUKAYnxPFk9Hj5P7a1U9Ju9ifbH0pkX7eNpx9jjckeXefCSa
+	 l9/uCK76NGK7A==
+Date: Fri, 2 Feb 2024 11:58:28 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>, Eric Dumazet
+ <edumazet@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, chuck.lever@oracle.com, jlayton@kernel.org,
+ linux-api@vger.kernel.org, brauner@kernel.org, davem@davemloft.net,
+ alexander.duyck@gmail.com, Wei Wang <weiwan@google.com>, Amritha Nambiar
+ <amritha.nambiar@intel.com>
+Subject: Re: [net-next 0/3] Per epoll context busy poll support
+Message-ID: <20240202115828.6fd125bf@kernel.org>
+In-Reply-To: <20240202193332.GA8932@fastly.com>
+References: <20240124025359.11419-1-jdamato@fastly.com>
+	<CANn89i+YKwrgpt8VnHrw4eeVpqRamLkTSr4u+g1mRDMZa6b+7Q@mail.gmail.com>
+	<5faf88de-5063-421f-ad78-ad24d931fd17@intel.com>
+	<20240202032806.GA8708@fastly.com>
+	<f0b4d813-d7cb-428b-9c41-a2d86684f3f1@intel.com>
+	<20240202102239.274ca9bb@kernel.org>
+	<20240202193332.GA8932@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <422974a5-cbce-50ad-5a8c-7588d5eeebc2@omp.ru>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/02/2024 19:34:28
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 183168 [Feb 02 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.78.128 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.78.128 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.78.128
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/02/2024 19:38:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/2/2024 4:50:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 2/2/24 10:12 PM, Sergey Shtylyov wrote:
-
->> TOE has hardware support for calculating IP header and TCP/UDP/ICMP
->> checksum for both IPv4 and IPv6.
->>
->> Add Rx checksum offload supported by TOE for IPv4 and TCP/UDP protocols.
->>
->> For Rx, the 4-byte result of checksum calculation is attached to the
->> Ethernet frames.First 2-bytes is result of IPv4 header checksum and next
->> 2-bytes is TCP/UDP/ICMP checksum.
->>
->> If a frame does not have checksum error, 0x0000 is attached as checksum
->> calculation result. For unsupported frames 0xFFFF is attached as checksum
->> calculation result. In case of an IPv6 packet, IPv4 checksum is always set
->> to 0xFFFF.
->>
->> We can test this functionality by the below commands
->>
->> ethtool -K eth0 rx on --> to turn on Rx checksum offload
->> ethtool -K eth0 rx off --> to turn off Rx checksum offload
->>
->> Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
-[...]
->> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->> index 0e3731f50fc2..c4dc6ec54287 100644
->> --- a/drivers/net/ethernet/renesas/ravb_main.c
->> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-[...]
->> @@ -2334,11 +2381,49 @@ static void ravb_set_rx_csum(struct net_device *ndev, bool enable)
->>  	spin_unlock_irqrestore(&priv->lock, flags);
->>  }
->>  
->> +static int ravb_endisable_csum_gbeth(struct net_device *ndev, enum ravb_reg reg,
->> +				     u32 val, u32 mask)
+On Fri, 2 Feb 2024 11:33:33 -0800 Joe Damato wrote:
+> On Fri, Feb 02, 2024 at 10:22:39AM -0800, Jakub Kicinski wrote:
+> > On Fri, 2 Feb 2024 11:23:28 -0600 Samudrala, Sridhar wrote:  
+> > > I think you should be able to get this functionality via the netdev-genl 
+> > > API to get napi parameters. It returns ifindex as one of the parameters 
+> > > and you should able to get the name from ifindex.
+> > > 
+> > > $ ./cli.py --spec netdev.yaml --do napi-get --json='{"id": 593}'
+> > > {'id': 593, 'ifindex': 12, 'irq': 291, 'pid': 3727}  
+> > 
+> > FWIW we also have a C library to access those. Out of curiosity what's
+> > the programming language you'd use in user space, Joe?  
 > 
->    I'd suggest to mimic ravb_wait() with the the mask param followed by
-> the val[ue] param...
+> I am using C from user space. 
 
-   Nevermind, I see now they are for different registers...
+Ah, great! Here comes the advert.. :)
 
-[...]
+  make -C tools/net/ynl/
 
-MBR, Sergey
+will generate the C lib for you. tools/net/ynl/generated/netdev-user.h
+will have the full API. There are some samples in
+tools/net/ynl/samples/. And basic info also here:
+https://docs.kernel.org/next/userspace-api/netlink/intro-specs.html#ynl-lib
+
+You should be able to convert Sridhar's cli.py into an equivalent 
+in C in ~10 LoC.
+
+> Curious what you think about
+> SIOCGIFNAME_BY_NAPI_ID, Jakub? I think it would be very useful, but not
+> sure if such an extension would be accepted. I can send an RFC, if you'd
+> like to take a look and consider it. I know you are busy and I don't want
+> to add too much noise to the list if I can help it :)
+
+Nothing wrong with it in particular, but we went with the netlink API
+because all the objects are related. There are interrupts, NAPI
+instances, queues, page pools etc. and we need to show all sort of
+attributes, capabilities, stats as well as the linking. So getsockopts
+may not scale, or we'd need to create a monster mux getsockopt?
+Plus with some luck the netlink API will send you notifications of
+things changing.
+
+> Here's a brief description of what I'm doing, which others might find
+> helpful:
+> 
+> 1. Machine has multiple NICs. Each NIC has 1 queue per busy poll app
+> thread, plus a few extra queues for other non busy poll usage.
+> 
+> 2. A custom RSS context is created to distribute flows to the busy poll
+> queues. This context is created for each NIC. The default context directs
+> flows to the non-busy poll queues.
+> 
+> 3. Each NIC has n-tuple filters inserted to direct incoming connections
+> with certain destination ports (e.g. 80, 443) to the custom RSS context.
+> All other incoming connections will land in the default context and go to
+> the other queues.
+> 
+> 4. IRQs for the busy poll queues are pinned to specific CPUs which are NUMA
+> local to the NIC.
+> 
+> 5. IRQ coalescing values are setup with busy poll in mind, so IRQs are
+> deferred as much as possible with the assumption userland will drive NAPI
+> via epoll_wait. This is done per queue (using ethtool --per-queue and a
+> queue mask). This is where napi_defer_hard_irqs and gro_flush_timeout
+> could help even more. IRQ deferral is only needed for the busy poll queues.
+
+Did you see SO_PREFER_BUSY_POLL by any chance? (In combination with
+gro_flush_timeout IIRC). We added it a while back with Bjorn, it seems
+like a great idea to me at the time but I'm unclear if anyone uses it 
+in production..
+
+> 6. userspace app config has NICs with their NUMA local CPUs listed, for
+> example like this:
+> 
+>    - eth0: 0,1,2,3
+>    - eth1: 4,5,6,7
+> 
+> The app reads that configuration in when it starts. Ideally, these are the
+> same CPUs the IRQs are pinned to in step 4, but hopefully the coalesce
+> settings let IRQs be deferred quite a bit so busy poll can take over.
+
+FWIW if the driver you're using annotates things right you'll also get
+the NAPI <> IRQ mapping via the netdev netlink. Hopefully that
+simplifies the pinning setup.
+
+> 7. App threads are created and sockets are opened with REUSEPORT. Notably:
+> when the sockets are created, SO_BINDTODEVICE is used* (see below for
+> longer explanation about this).
+> 
+> 8. cbpf reusport program inserted to distribute incoming connections to
+> threads based on skb->queue_mapping. skb->queue_mapping values are not
+> unique (e.g. each NIC will have queue_mapping==0), this is why BINDTODEVICE
+> is needed. Again, see below.
+> 
+> 9. worker thread epoll contexts are set to busy poll by the ioctl I've
+> submit in my patches.
+> 
+> The first time a worker thread receives a connection, it:
+> 
+> 1. calls SO_INCOMING_NAPI_ID to get the NAPI ID associated with the
+> connection it received.
+> 
+> 2. Takes that NAPI ID and calls SIOCGIFNAME_BY_NAPI_ID to figure out which
+> NIC the connection came in on.
+> 
+> 3. Looks for an un-unsed CPU from the list it read in at configuration time
+> that is associated with that NIC and then pins itself to that CPU. That CPU
+> is removed from the list so other threads can't take it.
+> 
+> All future incoming connections with the same NAPI ID will be distributed
+> to app threads which are pinned in the appropriate place and are doing busy
+> polling.
+> 
+> So, as you can see, SIOCGIFNAME_BY_NAPI_ID makes this implementation very
+> simple.
+> 
+> I plan to eventually add some information to the kernel networking
+> documentation to capture some more details of the above, which I think
+> might be helpful for others.
+
+Sounds very sensible & neat indeed. And makes sense to describe this 
+in the docs, that should hopefully put more people on the right path :)
+
+> Another potential solution to avoid the above might be use an eBPF program
+> and to build a hash that maps NAPI IDs to thread IDs and write a more
+> complicated eBPF program to distribute connections that way. This seemed
+> cool, but involved a lot more work so I went with the SO_BINDTODEVICE +
+> SIOCGIFNAME_BY_NAPI_ID method instead which was pretty simple (C code wise)
+> and easy to implement.
+
+Interesting!
 
