@@ -1,110 +1,126 @@
-Return-Path: <netdev+bounces-68260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38EED846556
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:17:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96E9F846562
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:24:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE78C1F260BC
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:17:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D20231C245A1
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:24:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31C135690;
-	Fri,  2 Feb 2024 01:16:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC07BE59;
+	Fri,  2 Feb 2024 01:24:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="sy8L5oZZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mle8mWI0"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C4D353A2;
-	Fri,  2 Feb 2024 01:16:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E49BE55
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 01:24:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706836614; cv=none; b=pbofN7sIKfXS3bAQKHhgLTYDUhSma9Hy20BOV3qGlZj7AOWCqUMKpRNvkoA5SN7GuI4ISQo2vVc26VMw2iGxFx+LYDcMV4EymOKluxtdei1gz8oNrEpOU32hNP5rQVCNJ7FrtoIGnEjG7VvpULZ7hQFcMQK/o6XKbEpOoN2+DQc=
+	t=1706837077; cv=none; b=u7mdJDDpg6LywYcaTAaI1WVpy5e3mnBX/oBaMSw2/nu0oboGIEARg6NHS0YOc6kI2SmS3hrzjvYh06Nh8qwd5vIV7Ii81uPzxZU1wKF/snZwJjAnqk5mgcPV6KlRLngeLGaAi2BKm1sxFBpPY4COFfhy6gnjYnAd5G01kMeL0U0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706836614; c=relaxed/simple;
-	bh=yW5AGAGXClWKsZDkZkhBCsAVxDNe52eYj+53BwmQDfw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HaUV6fg6OohbgtGSfzJ7WyrxalCZzFOvM945QLs7EDAmmWQG2DkM+av9sQEVRHTSmKyIzSMk0mxkqlxKidUC3j3v+yHHfYfVDHWCtefcboWESJX2F6buqYW8Pj9lxRJqR5yELSQxatKbhYglLUDbB2JRq1NrJVepl8vXOQCKYvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=sy8L5oZZ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ve/7LM8S/UJI1k9A6JeJcpf47mw9cyjHBuN+rVj0Xw4=; b=sy8L5oZZCzX6PHTspscT1E0mJI
-	cpSQgyHpRSqvG8i9XJ0uamEVcZpSe2roUWTUcNv2XvXUVYe+kyl7EQcOH5jg9JhuRvJZrT50siQ1x
-	Kb7OFvG2nFo5O8q+uXIk8w5Adq0Xgpakg4N3dXtsKH0+s4wTcxQ15j9PF1wbg1K3tpcU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rViAa-006jga-Fk; Fri, 02 Feb 2024 02:16:40 +0100
-Date: Fri, 2 Feb 2024 02:16:40 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Frank Rowand <frowand.list@gmail.com>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [net-next PATCH v5 6/9] dt-bindings: net: Document Qcom QCA807x
- PHY package
-Message-ID: <2cd72962-2fca-4436-91e7-e1695525bab5@lunn.ch>
-References: <20240201151747.7524-1-ansuelsmth@gmail.com>
- <20240201151747.7524-7-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1706837077; c=relaxed/simple;
+	bh=ZMFg9aMmYEcvittqxuoJAHUrrVGw5BpEBs3Oavdepd8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Gbjl4gOuosyun+//129KHM2UoHTHq4o1qYJvStFWAaRva9l24bsfAvtDSdBOPZLaRQ/1a1b2J0MFa0HxVD8YDEXAHwP8HJ7r21M/FbG9uwySNkqGn8fQwFlooNKi1vNY9zczgwxn/m4Y3pqMJHOg3XeBL5nUKtPOKVdxz6C2WSo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mle8mWI0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F9C1C433C7;
+	Fri,  2 Feb 2024 01:24:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706837076;
+	bh=ZMFg9aMmYEcvittqxuoJAHUrrVGw5BpEBs3Oavdepd8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mle8mWI0z/plQAkqRgEiHpQuaoPiIDRzdKpD/9ALeEMcgKqcnIwho856pc+USwNkW
+	 jEaC48wPVEorNiJsI6T8l5EE8IjJcFQ9bAyf9ZhlHN74YVbkmzwopxa8JbPFpf5nJb
+	 B7dQM39F/SIp+DHrJhWC/txfQceABpaU8pmx0G/hluOJkhZW67bnY1tqbGxV3Pzp8y
+	 6vsKlc4seQELzsLkVP8NtD6/p7AAW5TnJ98I6uGYFIt3LIMiJ+AHKRAGSOyGnl+cxa
+	 BDlu4QeX8XWdhb1L0PkYUhEk6GyVaYQVShjxqMu0HwxQjeOsTIWtfgItuzWlBKCyvE
+	 zP532XtixFYgQ==
+Date: Thu, 1 Feb 2024 17:24:31 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alessandro Marcolini <alessandromarcolini99@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ donald.hunter@gmail.com, sdf@google.com, chuck.lever@oracle.com,
+ lorenzo@kernel.org, jacob.e.keller@intel.com, jiri@resnulli.us,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 3/3] tools: ynl: add support for encoding
+ multi-attr
+Message-ID: <20240201172431.2f68dacb@kernel.org>
+In-Reply-To: <9644d866cbc6449525144fb3c679e877c427afce.1706800192.git.alessandromarcolini99@gmail.com>
+References: <cover.1706800192.git.alessandromarcolini99@gmail.com>
+	<9644d866cbc6449525144fb3c679e877c427afce.1706800192.git.alessandromarcolini99@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240201151747.7524-7-ansuelsmth@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> +  PHY package can be configured in 3 mode following this table:
+On Thu,  1 Feb 2024 16:12:51 +0100 Alessandro Marcolini wrote:
+> Multi-attr elements could not be encoded because of missing logic in the
+> ynl code. Enable encoding of these attributes by checking if the nest
+> attribute in the spec contains multi-attr attributes and if the value to
+> be processed is a list.
+> 
+> This has been tested both with the taprio and ets qdisc which contain
+> this kind of attributes.
+> 
+> Signed-off-by: Alessandro Marcolini <alessandromarcolini99@gmail.com>
+> ---
+>  tools/net/ynl/lib/ynl.py | 17 +++++++++++++----
+>  1 file changed, 13 insertions(+), 4 deletions(-)
+> 
+> diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+> index 0f4193cc2e3b..e4e6a3fe0f23 100644
+> --- a/tools/net/ynl/lib/ynl.py
+> +++ b/tools/net/ynl/lib/ynl.py
+> @@ -447,10 +447,19 @@ class YnlFamily(SpecFamily):
+>          if attr["type"] == 'nest':
+>              nl_type |= Netlink.NLA_F_NESTED
+>              attr_payload = b''
+> -            sub_attrs = SpaceAttrs(self.attr_sets[space], value, search_attrs)
+> -            for subname, subvalue in value.items():
+> -                attr_payload += self._add_attr(attr['nested-attributes'],
+> -                                               subname, subvalue, sub_attrs)
+> +            nested_attrs = self.attr_sets[attr["nested-attributes"]]
 > +
-> +                First Serdes mode       Second Serdes mode
-> +  Option 1      PSGMII for copper       Disabled
-> +                ports 0-4
-> +  Option 2      PSGMII for copper       1000BASE-X / 100BASE-FX
-> +                ports 0-4
-> +  Option 3      QSGMII for copper       SGMII for
-> +                ports 0-3               copper port 4
-> +
-> +$ref: ethernet-phy-package.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    const: qcom,qca807x-package
-> +
-> +  qcom,package-mode:
-> +    enum:
-> +      - qsgmii
-> +      - psgmii
+> +            if any(v.is_multi for _,v in nested_attrs.items()) and isinstance(value, list):
 
-There are three modes listed above, yet only two values here? Please
-describe how they related.
+I think you're trying to handle this at the wrong level. The main
+message can also contain multi-attr, so looping inside nests won't
+cut it.
 
-> +
-> +  qcom,tx-driver-strength:
-> +    description: set the TX Amplifier value in mv.
-> +      If not defined, 600mw is set by default.
+Early in the function check if attr.is_multi and isinstance(value,
+list), and if so do:
 
-Looking at other bindings, it seems pretty normal to include the units
-in the property name: qcom,tx-driver-strength-milliwatts.
+	attr_payload = b''
+	for subvalue in value:
+		attr_payload += self._add_attr(space, name, subvalue,
+					       search_attrs) 
+	return attr_payload
 
-   Andrew
+IOW all you need to do is recursively call _add_attr() with the
+subvalues stripped. You don't have to descend into a nest.
+
+> +                for item in value:
+> +                    sub_attrs = SpaceAttrs(self.attr_sets[space], item, search_attrs)
+> +                    for subname, subvalue in item.items():
+> +                        attr_payload += self._add_attr(attr['nested-attributes'],
+> +                                                       subname, subvalue, sub_attrs)
+> +            else:
+> +                sub_attrs = SpaceAttrs(self.attr_sets[space], value, search_attrs)
+> +                for subname, subvalue in value.items():
+> +                    attr_payload += self._add_attr(attr['nested-attributes'],
+> +                                                   subname, subvalue, sub_attrs)
+>          elif attr["type"] == 'flag':
+>              attr_payload = b''
+>          elif attr["type"] == 'string':
+
 
