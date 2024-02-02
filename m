@@ -1,127 +1,113 @@
-Return-Path: <netdev+bounces-68374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF76C846BBF
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 10:20:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60DAC846C13
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 10:34:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76C8428E8F8
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:20:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 859CA1C234B4
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63B579DB8;
-	Fri,  2 Feb 2024 09:19:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D606A7A709;
+	Fri,  2 Feb 2024 09:33:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JNTwGHPX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="o9aTOCOt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7E07764F;
-	Fri,  2 Feb 2024 09:19:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C08779F1
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 09:33:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706865573; cv=none; b=jfGb2bHvNgc10nwlhb3z2OLBPJgyFotat3LZ2TnRgk3LJVeJnjgGg8GefBDGscz/bBwMExp6J4o+2BWdm2q7m3OBG4RytERghVrm5Sy8A7HHSKQh2ZFD5g1Ghqg6fjsVUxnagl6YEWiWII6hQ/AOehUN2jKVl5RBjYliqLHGwIw=
+	t=1706866427; cv=none; b=sGdniWNSNRSfztWshOcziYyjpph6paV3W32pys9IJo0ZebQ1D4fKDl/T1yaAjl4338axkV8Nj4S37NTHBeS6ZXbSXK6gkI/IwpYK3R2OXmGvduVlU1I1iYdv4fSj4Fej57Q+MWXwE6XPWhzkdhn4DNxRmb/ED7R6wwgIyZaQhoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706865573; c=relaxed/simple;
-	bh=xbOYQ6vgMY8Ad9HjvLOG9yt3xcYe8E0VH499yRcv+v0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=CloleMDuPrPLPY2ux4EeoLOU23If1jpop+Yj9NjrYjO2UMtfCKXxHFaE9828X7AYyMl8vjGvJLxMucWgzCeebrPLBMAdtB4vAnpkKIe/X5qf8/LRLYLlo+NVcW2S25segNu9V3o2R72CISTax7P/SmaytHmNMovg5a3NG1+/lMk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JNTwGHPX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 19BA5C43141;
-	Fri,  2 Feb 2024 09:19:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706865573;
-	bh=xbOYQ6vgMY8Ad9HjvLOG9yt3xcYe8E0VH499yRcv+v0=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=JNTwGHPXph1fz5NcoNtbJiYcwjaWlRnjcKrrkAKxHjIWV0QPv5ZrcTP45MFBLvp3h
-	 JCcGh+G7mSWIZuq4Po2NDT2+qvFaK51tesT1HkQMpQX8UCkoLKwafMkeb5vuKIGcdG
-	 kttWDL8MvuvD6pl7muicRUZ6Lb9wcFV51fNLJyIgS+9HcYTXlbe06n2bNcXDXj1fkr
-	 Pm0WGCw+skIDHFg4y6oUCohoUfZbyDHOtq7UmqJIAAoqNBMPvNjWdU9kia3nZZA72k
-	 6o3roNZSaH7Ya393azKT1q9ce7jgiLz/LWQ5sPm7Vc2q6tzdv4KwDpok4SsPESjCN3
-	 U4Ect4Dgs+MMg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 03A41C48292;
-	Fri,  2 Feb 2024 09:19:33 +0000 (UTC)
-From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= via B4 Relay
- <devnull+arinc.unal.arinc9.com@kernel.org>
-Date: Fri, 02 Feb 2024 12:19:13 +0300
-Subject: [PATCH net-next v3 7/7] net: dsa: mt7530: do not clear
- config->supported_interfaces
+	s=arc-20240116; t=1706866427; c=relaxed/simple;
+	bh=iAEV6/CWfMPXtFsFV0NrWYl5Je7Z7IiH9PymvfyunMI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=lh9W/4b7qK5cdJ4pKHayc52+7kW8EyoC8cSlmOPycyyMS0lJrcy+H5nHfYHlZu2ZwbnJDzT9ia4YIydhGue9v9x2BnezHt7An5cBWEktWxPG6Uv4gaU50ojAsANnRUIhKs6u5A/wkvyGo/VYIjSyZ5d90y72FM8WQyVhy2JS558=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=o9aTOCOt; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=H88J5TUA4kjzKrM8edavWO7CzzGR5hnVTyCFR8jMm6M=; b=o9aTOCOtnDglVLzDJl90mCnXEN
+	icDDEyJnZAKHU6F6Z0n7hw86O6lijLfhhn0Der1BSHRrKuL1iag/1Rcvb2iAelSvuSy18iq4wysbt
+	7J2+B1pjzUtSvlAU9LFrLIGCyiA7GNdpAQylKRxYWzx5iiYeXxBSvYx8rwbyMnS3A5GgBrT+6APE7
+	u0uXNPrqs4RmJGLmUp4Zdfkgjz4Ln8JZTMVsZvWlwL8pRAvd8l/lmITm4OT09Eyf6UmhIoXSRp7m9
+	VF7nPSWlXvhS/SllW+bgXY4iiOuuUda6p40zpe0PMdeu75LPf8SWwvUs9mZbOQDyvRGx17oap5uXR
+	pMHpZEAg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37008)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rVpvN-0005hy-1I;
+	Fri, 02 Feb 2024 09:33:29 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rVpvE-0008D5-T5; Fri, 02 Feb 2024 09:33:20 +0000
+Date: Fri, 2 Feb 2024 09:33:20 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	bcm-kernel-feedback-list@broadcom.com,
+	Byungho An <bh74.an@samsung.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Doug Berger <opendmb@gmail.com>, Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	Justin Chen <justin.chen@broadcom.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	NXP Linux Team <linux-imx@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Vladimir Oltean <olteanv@gmail.com>, Wei Fang <wei.fang@nxp.com>
+Subject: [PATCH net-next 0/6] net: eee network driver cleanups
+Message-ID: <Zby24IKSgzpvRDNF@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id:
- <20240202-for-netnext-mt7530-improvements-2-v3-7-63d5adae99ca@arinc9.com>
-References:
- <20240202-for-netnext-mt7530-improvements-2-v3-0-63d5adae99ca@arinc9.com>
-In-Reply-To:
- <20240202-for-netnext-mt7530-improvements-2-v3-0-63d5adae99ca@arinc9.com>
-To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
- Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Russell King <linux@armlinux.org.uk>
-Cc: mithat.guner@xeront.com, erkin.bozoglu@xeront.com, 
- Bartel Eerdekens <bartel.eerdekens@constell8.be>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, 
- =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
-X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1706865569; l=1237;
- i=arinc.unal@arinc9.com; s=arinc9-patatt; h=from:subject:message-id;
- bh=O2Jc3kMGKF7p2IMR4BSUcjDORbDflRydvglEQ/7DqIY=;
- b=oz1Jb+hTkQBq+zHBfH5lPDglY2+5P/R0xXWcb/3ehsxh63f1fIu/v/CVfc5jNziMq+IR/xQEe
- TAGfppGixF8A3Xdq7Zr8sCu9n7Yz5Rgl2SRFrlH3BIAVgvJgGlv3qtv
-X-Developer-Key: i=arinc.unal@arinc9.com; a=ed25519;
- pk=VmvgMWwm73yVIrlyJYvGtnXkQJy9CvbaeEqPQO9Z4kA=
-X-Endpoint-Received:
- by B4 Relay for arinc.unal@arinc9.com/arinc9-patatt with auth_id=115
-X-Original-From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Reply-To: <arinc.unal@arinc9.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Arınç ÜNAL <arinc.unal@arinc9.com>
+Hi,
 
-There's no need to clear the config->supported_interfaces bitmap before
-reporting the supported interfaces as all bits in the bitmap will already
-be initialized to zero when the phylink_config structure is allocated. The
-"config" pointer points to &dp->phylink_config, and "dp" is allocated by
-dsa_port_touch() with kzalloc(), so all its fields are filled with zeroes.
+Since commit d1420bb99515 ("net: phy: improve generic EEE ethtool
+functions") changed phylib to set eee->eee_active and eee->eee_enabled,
+overriding anything that drivers have set these to prior to calling
+phy_ethtool_get_eee().
 
-There's no code that would change the bitmap beforehand. Remove it.
+Therefore, drivers setting these members becomes redundant, since
+phylib overwrites the values they set. This series finishes off
+Heiner's work in the referenced commit by removing these redundant
+writes in various drivers and any associated code or structure members
+that become unnecessary.
 
-Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-Acked-by: Daniel Golle <daniel@makrotopia.org>
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
----
- drivers/net/dsa/mt7530.c | 2 --
- 1 file changed, 2 deletions(-)
-
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 4ca7ba94788e..aed1ea6815ee 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -2573,8 +2573,6 @@ static void mt7531_mac_port_get_caps(struct dsa_switch *ds, int port,
- static void mt7988_mac_port_get_caps(struct dsa_switch *ds, int port,
- 				     struct phylink_config *config)
- {
--	phy_interface_zero(config->supported_interfaces);
--
- 	switch (port) {
- 	/* Ports which are connected to switch PHYs. There is no MII pinout. */
- 	case 0 ... 3:
+ drivers/net/dsa/b53/b53_common.c                     | 6 ------
+ drivers/net/ethernet/broadcom/asp2/bcmasp_ethtool.c  | 4 ----
+ drivers/net/ethernet/broadcom/asp2/bcmasp_intf.c     | 5 +++--
+ drivers/net/ethernet/broadcom/genet/bcmgenet.c       | 8 +++-----
+ drivers/net/ethernet/broadcom/genet/bcmmii.c         | 5 +++--
+ drivers/net/ethernet/freescale/fec_main.c            | 3 ---
+ drivers/net/ethernet/samsung/sxgbe/sxgbe_common.h    | 1 -
+ drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c   | 2 --
+ drivers/net/ethernet/samsung/sxgbe/sxgbe_main.c      | 1 -
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c | 2 --
+ 10 files changed, 9 insertions(+), 28 deletions(-)
 
 -- 
-2.40.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
