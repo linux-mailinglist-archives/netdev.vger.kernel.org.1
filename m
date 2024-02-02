@@ -1,53 +1,74 @@
-Return-Path: <netdev+bounces-68333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 517AC846A8F
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:22:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D509A846A9E
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:24:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D86D9B24523
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:22:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 042F31C26189
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:24:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8E7D18AF6;
-	Fri,  2 Feb 2024 08:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77F1039AD5;
+	Fri,  2 Feb 2024 08:21:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="UtfEJPkm"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="QG1qv+vA"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward205b.mail.yandex.net (forward205b.mail.yandex.net [178.154.239.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43AAD18628;
-	Fri,  2 Feb 2024 08:16:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70AB02C683
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 08:21:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706861810; cv=none; b=KlPpvfjVxv6QR/Bd6VSOMoElo79s7Fu5ieA28WB87BKvJhUyNNkCZe5jVTQPl+0vNctDkWUDyJiLszx8R8FkHUWeY70NQPgtIF2p5z9Nh0y3pi9xckffrxrNbPiNNSalBHGWeu4cFBSeWV0nQ6PvQbtAsoBhPCEOrqsp9MFuREI=
+	t=1706862106; cv=none; b=rfaE0297J66e6rel2Fns1I6HhWna7uuzuoRr5+5ZeBOIG/6YQZq2uy33lYH43YWsVwxHKWLsva34pdsgvNZidfb6hSgMYS7L0JXTFp5JUa8UT878WeyMsyPdCio+iwlRu0xCpTBENGoTRBk/O55IBqPmorxSGfRAHvzPL6HKF6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706861810; c=relaxed/simple;
-	bh=dyFkP540k5uwUKmQOZqkqe8E/2c94F4Jpy3jS5oNZ2o=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=TOUoT911w76/wDk5zgw1FzPsHDOGwb6IDOp9lJwbvvH8WCnDoLbTG3zMFz8NImslDOxnkw22HDRhYHaCl/VfpR5Cuq7XMjadnHFE7hddfpzORZm2j8+UxZv1Q+8nLXU6MQ4cdkxl7Wx6ravDqf/ItUk2tTini3uqbshfHgW65DU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=UtfEJPkm; arc=none smtp.client-ip=178.154.239.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from forward103c.mail.yandex.net (forward103c.mail.yandex.net [IPv6:2a02:6b8:c03:500:1:45:d181:d103])
-	by forward205b.mail.yandex.net (Yandex) with ESMTPS id DFF15626BD;
-	Fri,  2 Feb 2024 11:16:43 +0300 (MSK)
-Received: from mail-nwsmtp-smtp-production-main-59.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-59.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:5e15:0:640:5b6e:0])
-	by forward103c.mail.yandex.net (Yandex) with ESMTPS id 5023360909;
-	Fri,  2 Feb 2024 11:16:36 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-59.iva.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id ZGXh9s7uIqM0-ip65dgjD;
-	Fri, 02 Feb 2024 11:16:35 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1706861796; bh=tkXPLrm90NHw9N1zThe4QotB7/Rv/sUgKnlCs7whDfo=;
-	h=To:Cc:From:Subject:Date:Message-ID;
-	b=UtfEJPkm00lFY6obWr0KzLRis4rCTd/hxDs/qy2LeL92C+TP4X6Wx/L6rRbU2SJBb
-	 3D25r5w91tFzxhdZi1XpOad70Ms8bCp71f91SXdJ1fzIJkfYgTSTyY4omBJJJ2x92f
-	 ZvOsvco7jKjx4J2Xxa9nYvyAqgXLHRSv5RTx9xMw=
-Authentication-Results: mail-nwsmtp-smtp-production-main-59.iva.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <8121e1f3-0c82-4764-85ff-b8e0b696adc8@yandex.ru>
-Date: Fri, 2 Feb 2024 11:16:35 +0300
+	s=arc-20240116; t=1706862106; c=relaxed/simple;
+	bh=EDdO5VlAqnIMMHb63CojoKqFHiAFk2Z90LhVtRkssyQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=aLb+ZYknk+lHE9NJy2K1naxlXRw8mrlT+uijwyeYAxmZTby+VvkSpDSn8NIODHPL0XEcfYO9Chv0GPG2f++bFi+TNXEGJHK084L8vPBuB2FHcA2x3CD9DYFaTggdxuwAZtVDlRGyOl/xGdxqRBX9MdFXuro5IAZnyn1xgQw8z+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=QG1qv+vA; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-33b14a64416so901168f8f.3
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 00:21:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1706862102; x=1707466902; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vX5pK42z/aqE6DXjCqNO3Rh9dRIj2CnXkXYCoafVHxw=;
+        b=QG1qv+vA4EwWpk0bgtF5rq1Al9q+BfZ6Y04dkTXp0w+bWhk2E6vxgl77fWQZuNlqRN
+         1WFbhod51SGJeC0abC9l8Vl7ssWhCHclDYmfu1czwg4OjLfIq2O5Qs+hrVA3iT3a974f
+         dhzfGskxWIZT3HIEp/m6CKlPptz1pbtkGVInXHQA/VnWGwA6CinFFzWSXS+liFmWShWf
+         zXlMHrCsTeW7tpH7pMBeMeZJlAf+94GXT/bhCXFe5VSnRaVNLJE13NdeLJke4uCVcXae
+         ijh7fRG7+1be+Mpcy2M95FRb0OZ5u7LJj+o5ra3PagHEngmlH2dKnC39CMQbBT1j6yZm
+         Y3ng==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706862102; x=1707466902;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vX5pK42z/aqE6DXjCqNO3Rh9dRIj2CnXkXYCoafVHxw=;
+        b=gK9GxEFm9rY0bsfaOPuBUyfY/ZMSfZn4U2Aei/KwJZi/4XWpun2YPYkSjrJH8a1kHt
+         S7kt8/oG5WQIY7irYL2jqDPvuK+ECycWwAdb7LO33breDrnOKU/oMmaFlXgv2UPz5oF2
+         T1FGttM+KT1ZdUmcs/GBopgLenvgiUEPT4vhXeulwAv3E8EvcQpZCEaJTIVaWGFf8nZP
+         4UFoDvzJSP757Oia1d2paaB65pSyij649/2ySUcvwigRfFcwkHLkIiNOcrATwyPIqyAE
+         qPwLRVdKc2qkRzhVje04oxae5MYTfE0WIk6mZ9aiFBDdJ/z2PUmDYiDDdxoFZICu0+va
+         znEQ==
+X-Gm-Message-State: AOJu0YyDCS1SRii/hpaWuMGlolQ5xXDeCFscCAamz7NqGEHskS/B05aq
+	a9llsoIZr4+9ImhOnDkfwn3/64EHA0NveLLrJRSaf/pkSfvkUtwf0bIsUYXZ0A0=
+X-Google-Smtp-Source: AGHT+IFHpmKaTfIaU7hxAjZaxJrl8urFm4mSJmDqUJIVZFVPCayD7HPdw5kKzsoxaT005jX2TQkPnA==
+X-Received: by 2002:adf:a45d:0:b0:33a:e6f0:ee05 with SMTP id e29-20020adfa45d000000b0033ae6f0ee05mr2743494wra.45.1706862101672;
+        Fri, 02 Feb 2024 00:21:41 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVmbVyJeEEren4Lwmo3gre/jH5x6+HaLtaLv+s+LWjJ9Noyq0L60yvHmqm5GnOa1PJs0b9b+qAH+eujbCNxX3g32UJP0RfIG20ifL0B+vyThyQoMchFau9Z9jcBec0Z/DlvGoFkWx78ZOVTlO3Rg4lsoGlkQ2LFbvFOiu0PD4UJeeGF2Hma6PX4zQqQXpvNDX89Fx/i+Vvx8RZgO78qUCsOtOupoXQpMdhLPFDPxbV5Sm7QuFGCUxqvq6TDK6ZHaX39wxY8cxbaH33QxL8wCE7g9Ce3Q5/Y+KB0y233Gt9aZyDjnyubPGeG3cUqYWw3D1L7V27VrJoV8hRoXm+7OxE+EVDKuyFCBXxDDJQ3bUMV44MnIMdJ7QIQ/3iZY5Zd9RxqhIuW2HexzZb23JdpcAgRqQEnwB0PmWAyHt9k3xIka8rYLb29pLldAbHhdpHr8h9yBB2IjQyRwPm/Osfm24L8LJV6WH9Au8Tl0ZF66CiQknxWvATZqSzhfmAaBII5Nh5rH7CFVt4/Nuo5wNz7xkM5T9kBy/3i4KTuP2zzrZn+tnZuccBBD9GV2lzHDPgiP7DpCuS7ML8vNEMoNQJ9v98esHylO0Jf+dAKYb8G7xxSDL5nw+owcWXT+wzVIYnpsRLmL3BmEHnGo0eaMZKwHK+R/MqzryTztMg7hTNQ2ZAn7EnWMMKH7VS6RED22l7Y4hO7L5+8UAK3XLI+1CACcr02UWkRbabWOOd/qpRHY7bb55iI/GOGTorN+VOz6x7RubE=
+Received: from [192.168.1.20] ([178.197.222.62])
+        by smtp.gmail.com with ESMTPSA id r18-20020a056000015200b0033aedfc5581sm1378023wrx.32.2024.02.02.00.21.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Feb 2024 00:21:41 -0800 (PST)
+Message-ID: <adf20671-2f1d-43ea-8584-df0c0b095865@linaro.org>
+Date: Fri, 2 Feb 2024 09:21:38 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,51 +76,170 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-To: netdev@vger.kernel.org
+Subject: Re: [PATCH 1/2] dt-bindings: phy: mediatek,xfi-tphy: add new bindings
 Content-Language: en-US
-Cc: linux-sctp@vger.kernel.org
-From: Dmitry Antipov <dmantipov@yandex.ru>
-Autocrypt: addr=dmantipov@yandex.ru; keydata=
- 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
- tx98MCutXbJWn55RtnVKbpIiMfBrcB8=
-Subject: Using skb_clone() after __skb_header_release()
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Daniel Golle <daniel@makrotopia.org>,
+ Bc-bocun Chen <bc-bocun.chen@mediatek.com>,
+ Steven Liu <steven.liu@mediatek.com>, John Crispin <john@phrozen.org>,
+ Chunfeng Yun <chunfeng.yun@mediatek.com>, Vinod Koul <vkoul@kernel.org>,
+ Kishon Vijay Abraham I <kishon@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Qingfang Deng <dqfext@gmail.com>,
+ SkyLake Huang <SkyLake.Huang@mediatek.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Philipp Zabel <p.zabel@pengutronix.de>,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ linux-phy@lists.infradead.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <702afb0c1246d95c90b22e57105304028bdd3083.1706823233.git.daniel@makrotopia.org>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <702afb0c1246d95c90b22e57105304028bdd3083.1706823233.git.daniel@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Is it legal to do Y = skb_clone(X) _after_ doing  __skb_header_release(X)?
-(This seems happens in SCTP, and I'm interesting whether it might cause
-https://syzkaller.appspot.com/bug?id=0d8351bbe54fd04a492c2daab0164138db008042).
+On 01/02/2024 22:52, Daniel Golle wrote:
+> Add bindings for the MediaTek XFI T-PHY Ethernet SerDes PHY found in the
+> MediaTek MT7988 SoC which can operate at various interfaces modes:
+> 
+> via USXGMII PCS:
+>  * USXGMII
+>  * 10GBase-R
+>  * 5GBase-R
+> 
+> via LynxI SGMII PCS:
+>  * 2500Base-X
+>  * 1000Base-X
+>  * Cisco SGMII (MAC side)
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>  .../bindings/phy/mediatek,xfi-tphy.yaml       | 80 +++++++++++++++++++
+>  1 file changed, 80 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/phy/mediatek,xfi-tphy.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/phy/mediatek,xfi-tphy.yaml b/Documentation/devicetree/bindings/phy/mediatek,xfi-tphy.yaml
+> new file mode 100644
+> index 0000000000000..e897118dcf7e6
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/phy/mediatek,xfi-tphy.yaml
+> @@ -0,0 +1,80 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/phy/mediatek,xfi-tphy.yaml#
 
-Dmitry
+Please use compatible as filename. Your binding says only one is
+possible (const, not enum), so there is no reasoning for different filename.
+
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: MediaTek XFI T-PHY
+> +
+> +maintainers:
+> +  - Daniel Golle <daniel@makrotopia.org>
+> +
+> +description:
+> +  The MediaTek XFI SerDes T-PHY provides the physical SerDes lanes
+> +  used by the (10G/5G) USXGMII PCS and (1G/2.5G) LynxI PCS found in
+> +  MediaTek's 10G-capabale SoCs.
+> +
+> +properties:
+> +  $nodename:
+> +    pattern: "^phy@[0-9a-f]+$"
+
+No need for nodename in individual bindings file.
+
+> +
+> +  compatible:
+> +    const: mediatek,mt7988-xfi-tphy
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    items:
+> +      - description: XFI PHY clock
+> +      - description: XFI register clock
+> +
+> +  clock-names:
+> +    items:
+> +      - const: xfipll
+> +      - const: topxtal
+> +
+> +  resets:
+> +    items:
+> +      - description: PEXTP reset
+> +
+> +  mediatek,usxgmii-performance-errata:
+> +    $ref: /schemas/types.yaml#/definitions/flag
+> +    description:
+> +      One instance of the T-PHY on MT7988 suffers from a performance
+> +      problem in 10GBase-R mode which needs a work-around in the driver.
+
+Can you explain what is this issue and errata about (except performance)?
+
+> +      The work-around is enabled using this flag.
+> +
+> +  "#phy-cells":
+> +    const: 0
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - clocks
+> +  - clock-names
+> +  - resets
+> +  - "#phy-cells"
+> +
+> +additionalProperties: false
+
+
+Best regards,
+Krzysztof
+
 
