@@ -1,279 +1,184 @@
-Return-Path: <netdev+bounces-68321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52F8C8469BC
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:46:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 207DC8469C0
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:47:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 090FF281DF2
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 07:46:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 449871C20398
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 07:47:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98A1D17BB6;
-	Fri,  2 Feb 2024 07:45:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 424381775E;
+	Fri,  2 Feb 2024 07:47:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="wBqMaEym"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="BkG/wLDN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-lj1-f193.google.com (mail-lj1-f193.google.com [209.85.208.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E18E17BB5
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 07:45:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34EEE17BAC
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 07:47:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706859959; cv=none; b=bgOH+Ry8jdQDWW3xHntSxefeQUIptlhklEhPwTS4L/AmJoIMer3mrPskI7E7OXU8cLI1fzbDtQXQeGGFqbLq7P2Ku7j0PYV1W5WeyowQbGKze126RQ4dtxlfXKfRpXnJrKyoG8zsr20YhwaWhy/wu42dBMO7GnsgMcnOk12zUPA=
+	t=1706860024; cv=none; b=ZoM1LC9uYttZfkRix2l/87r7bwtesl8gO3RaZL3oS/ljFE98PrPmjR1jGL4bQyK5mez0qYFJIL8ORitG87+MPQH8BLi2cquON8oinwlhq+MyaMHhjceFtH0LC/w4qzNNoJwzZgQoI1pBYlxOKVqPdxlnjTjYGRBfUnyyCRi6wRE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706859959; c=relaxed/simple;
-	bh=NAsooKUMZ6cRT7XPqJjE+9VvMXnUOT5yUMaTp3y7h0Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=WYnt53eizEyKZc5is9GISiIlhqPGDlkG+obnqLD68tE7KnG2tyFt4ulZs1gI27Y1KVWVxia0PFDglcJGYLjy7c7EI9oX5Qx7FXp9irPInVf2MkvN1v1DyD/7/MfNLW2BnZh4wBQClfhyrMdwf4ZuTS5jjdQk96dfBe2JI5bGpG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=wBqMaEym; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-55f03ede12cso2358428a12.0
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 23:45:57 -0800 (PST)
+	s=arc-20240116; t=1706860024; c=relaxed/simple;
+	bh=zTpmsjzrinvpuVifqqyj9McJ5sPZ4iquKbn34GykddI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EaLUfQx14R16PZ5DBgjjjrDosXqBV9umBrqQdnMBKzLGG/hNLGNjxnbFvKpC72DKoENkBsTiftiuqePlajNsKQcRhoxmDkbBHkbDtqUglEa0TbPdy+SIARppJ+xEBfgcvSd5/LSIRTh2/9yufyFiZ5G+HmEGO2hfZvkMkAiVTPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=BkG/wLDN; arc=none smtp.client-ip=209.85.208.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lj1-f193.google.com with SMTP id 38308e7fff4ca-2d043160cd1so20891611fa.1
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 23:47:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1706859956; x=1707464756; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FMbsAERs2rab2klKMjzdXggrU7C85LLi4M4OtVPYEoc=;
-        b=wBqMaEymCuq14vkLy9pVFSW5741xC1OFFcBnDdc1JFdcz7+jQ8i38GmVqGYJ9cC1jj
-         qvjFsK5LiiWKv4x2Ss/BU+ZBQtTR0HEUE6ZtOPj3VqiddMlOt8o+m9gEbC0U6CSnha7U
-         ddt1ens8ZPzq94UjHy6GEKBt7OdhQI6iyT97tAmwFZR8azVw45ZauyglrPuSLcP4L/r4
-         lDiU1wjaypGz2YvSlh7RC73S6hjgnYRzI6RIOFfOpK/opB54eEhDrO+RzwsTef6S1Vn+
-         U70tzI/Aa6j043plCRW50gsoj/vzyWDd+Aj6vSjexYpTUvofJesBcEYT5Ja01cf3yJLm
-         LfaA==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706860020; x=1707464820; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=umVLAUVuC8fGiqJOrcxqcnirOPPoxmUT+3/smehpeQY=;
+        b=BkG/wLDNKm1Pg6tTUt8pL2735lMh/vpDLO93ZIVDDfIxLtBvlqjT/TykjTEZAWetO9
+         UYTLtOaR7wJKgWOBLEKdIvzt5byfgZ995Xdz9tBNOpaIBU1J+S4CsDp7RRuvRpdQ/GAE
+         XEPFEDiWQuhBkVJW4u+WwlkurRFpf0xgvvBJBcqvBFuOyP1SuOhuzE8yxmdAeFAwARxF
+         iCGyFV937cjwT31NkecSqbUvf6qLpUAdaLGX6njAdGPDJ/eG5fkKuZJUM80KhnQoJXkR
+         NAknSA1cevAzSGrGYeXz3b9N8VSI3Tr8RJhbkWFGi4klvJGRAaVE/SLUR5H9o+QdVkF5
+         cQow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706859956; x=1707464756;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FMbsAERs2rab2klKMjzdXggrU7C85LLi4M4OtVPYEoc=;
-        b=WYEF++bQleAm0kobQlfmVkp7y0GIG20CVWeIVTBOu1Fb05Ne8w13Scdj6QERVKwnMg
-         OHNmMpwVHgvVEOTtFoZs/Nd9AdU9hpXQDLai/tPuAcFl65fa7Aio1WbKzD41q5XTrU/y
-         lhqI7rXdJYRM+h/I23OuHrNWLJHoueX8rBgqHVdBzIKWnkij4f7XlVX65rXpxQ8lGVRe
-         2erpml2pP3xOUE0Jv9a80jeruP/5vZirPSb0fRX1a0oTk5/6x1yZoUR8W2tW32Ys0O0g
-         rtX2rVy2IBu/6Rue6r24SYDqUsGT2BZbY8rC0gt4epSelOg7kDm294pGJnl/PjRYJo49
-         e13w==
-X-Gm-Message-State: AOJu0Yxn25VEEv9OcQDixmLK45jAiLhquXdsaIJHu7liIF23PTZG3ItQ
-	pZ3eastZqLpLPPrY53Q6uIGND1pBG6R/GF3OTmH1eyEvRuVOuj4gWy0oiJS53Ok=
-X-Google-Smtp-Source: AGHT+IEyxsNxiMuwL3uzYLii1hFVrh4VLP2keiW3l91Jpx0fb4fpxbnrR6I2DVY4suvdJnUcE6REyg==
-X-Received: by 2002:aa7:c718:0:b0:55f:f13b:9b62 with SMTP id i24-20020aa7c718000000b0055ff13b9b62mr478863edq.2.1706859955785;
-        Thu, 01 Feb 2024 23:45:55 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUIx0O0cGAowPI4Y3BYEppq2FCSzTCYiWkE8WqTLqEDCitiWXX5mJI2bWpgSGFHOYydG2t0lNYefEteGMj4P0mKNSfl+3UB0hwI/5rSOixC2mQDtYh6tBJDcnunVp9s7ilX3xniZ2EYeCjDCLLNzaiaUaJfyJON0t3kuYRxOATcg5NuF5ZejjiYkdBSwhYUZBCcYYCcylI7zjSU/rQVRkiE2vU6f2JSARD/FrmnPfjhhleA0FeQwyK5TcKItl8biOsKvZUjP/IVtGf9vrofKtwN1uk+6NZ34DB71Uac3sa2AUiTOZqhVXFTcYUAhLzndLXHMBk/dnl7eOt9Fr9XM37nuMfy5jrC3n8xyEYCmun4QdGwSHF4PH3nHSAmIjXmYTuANz+LRntqyRFEQONC9oNw+0XEf5tX5u3rhi7THno04HqEDFIBLlRkTK8rk1+AOFVP3ER5yZlrrS0y5TC2HXBf7JBrHRKNAau2IfnjWVdr1897ZqCfs89ZmXq1SLMs1p1gHP+CFPoGwfe5hv5DJHcgosKUPI/8Hz4U1hIWIu5+do3/D1IOFOtRfH8QRPUo/Kt6OLLLILakX640kYQC2VVj5lPw0b1ptTNRKloT1J2LAx2Z19EaytE=
-Received: from [192.168.1.20] ([178.197.222.62])
-        by smtp.gmail.com with ESMTPSA id x2-20020aa7dac2000000b0055f129cea52sm71587eds.49.2024.02.01.23.45.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 01 Feb 2024 23:45:55 -0800 (PST)
-Message-ID: <94dfc4c4-5fe6-438d-bcda-4f818eafd2f0@linaro.org>
-Date: Fri, 2 Feb 2024 08:45:52 +0100
+        d=1e100.net; s=20230601; t=1706860020; x=1707464820;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=umVLAUVuC8fGiqJOrcxqcnirOPPoxmUT+3/smehpeQY=;
+        b=TH4/jtIKK0BOb3K4LC7WELyuTBEwan95VWVZA2slAKCx+tggB0HlJbP9+VsfKcKnxa
+         HbHuLZjBp0cDvObp0U2K69pGMFU87NR+Q6cr+D3H+1okr+BNI6evInkII7I3XKsex/Mc
+         sZ84YynGDLuXtoTDos2k5wXAUIKpmMjfzert6uVhDSFQsCWflKQkiCVyYsB97ElogRby
+         FM8UolDG9bMY+zsyYHKZ7dOGYsDLHByBH7EjPqXm3dsX4BMi1SUHjkeTwpBaP7VfS3L5
+         auLDE9om7OXduKe6EB5CLkc2O2nBXgRBEyy2ZAAsgYlb8wMG9mp3jM7UX2+XS9NKSog2
+         0NHQ==
+X-Gm-Message-State: AOJu0YwJ5lk8+hOFhsRWiIDd43/b1fhG0Iu/rUQlR2xccc6rxV0JUp8m
+	SZ2j2lwSN9fjyvXVwDS1h0e4sJjTKJvCs+g9drHLIMRWQXIvBAwMa2xbDLS8Kl4=
+X-Google-Smtp-Source: AGHT+IEgi7x+cmDlc7XAhdfSEcLla3jqLoFo2CdTI40RjEi1//diYQhE2M/bj/rDnidZp9NVEn3/Wg==
+X-Received: by 2002:a2e:8e8a:0:b0:2d0:7c54:1c13 with SMTP id z10-20020a2e8e8a000000b002d07c541c13mr649023ljk.47.1706860019984;
+        Thu, 01 Feb 2024 23:46:59 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCW162CGAoKHb5hyvcPiFYV8SQj997zBlDMlSFmGNEAAoqs2XKZEKYO80t31GcvqRDjlSFLVplizsE1BLCdSf9t9kZA5VG69+l+WgQQ5oXG5BsdM4bblDjgv4L96E7U4eSvO6zryjIOXbfZ33JW3KE3E9qs6OSVbSBG/IOa7x17rPtz2H72GbjAY9DR5TzDlKZji0IHGWYK5Ozu2nsqdrNgx+oWWBRoy1GbS++qFy4wpy8qKVE1txmtC4zTGY0Jwo+bM9H+EkNHj
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id e21-20020adfa455000000b003392b1ebf5csm1319038wra.59.2024.02.01.23.46.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 01 Feb 2024 23:46:59 -0800 (PST)
+Date: Fri, 2 Feb 2024 08:46:56 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: William Tu <witu@nvidia.com>, Jacob Keller <jacob.e.keller@intel.com>,
+	bodong@nvidia.com, jiri@nvidia.com, netdev@vger.kernel.org,
+	saeedm@nvidia.com,
+	"aleksander.lobakin@intel.com" <aleksander.lobakin@intel.com>
+Subject: Re: [RFC PATCH v3 net-next] Documentation: devlink: Add devlink-sd
+Message-ID: <Zbyd8Fbj8_WHP4WI@nanopsycho>
+References: <20240131110649.100bfe98@kernel.org>
+ <6fd1620d-d665-40f5-b67b-7a5447a71e1b@nvidia.com>
+ <20240131124545.2616bdb6@kernel.org>
+ <2444399e-f25f-4157-b5d0-447450a95ef9@nvidia.com>
+ <777fdb4a-f8f3-4ddb-896a-21b5048c07da@intel.com>
+ <20240131143009.756cc25c@kernel.org>
+ <dc9f44a8-857b-498a-8b8c-3445e4749366@nvidia.com>
+ <20240131151726.1ddb9bc9@kernel.org>
+ <Zbtu5alCZ-Exr2WU@nanopsycho>
+ <20240201200041.241fd4c1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH v5 6/9] dt-bindings: net: Document Qcom QCA807x
- PHY package
-Content-Language: en-US
-To: Christian Marangi <ansuelsmth@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
- Konrad Dybcio <konrad.dybcio@linaro.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Frank Rowand <frowand.list@gmail.com>,
- Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-msm@vger.kernel.org
-References: <20240201151747.7524-1-ansuelsmth@gmail.com>
- <20240201151747.7524-7-ansuelsmth@gmail.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240201151747.7524-7-ansuelsmth@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240201200041.241fd4c1@kernel.org>
 
-On 01/02/2024 16:17, Christian Marangi wrote:
-> Document Qcom QCA807x PHY package.
-> 
-> Qualcomm QCA807X Ethernet PHY is PHY package of 2 or 5
-> IEEE 802.3 clause 22 compliant 10BASE-Te, 100BASE-TX and
-> 1000BASE-T PHY-s.
-> 
-> Document the required property to make the PHY package correctly
-> configure and work.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
->  .../devicetree/bindings/net/qcom,qca807x.yaml | 142 ++++++++++++++++++
+Fri, Feb 02, 2024 at 05:00:41AM CET, kuba@kernel.org wrote:
+>On Thu, 1 Feb 2024 11:13:57 +0100 Jiri Pirko wrote:
+>> Thu, Feb 01, 2024 at 12:17:26AM CET, kuba@kernel.org wrote:
+>> >> I guess bnxt, ice, nfp are doing tx buffer sharing?  
+>> >
+>> >I'm not familiar with ice. I'm 90% sure bnxt shares both Rx and Tx.
+>> >I'm 99.9% sure nfp does.  
+>> 
+>> Wait a sec.
+>
+>No, you wait a sec ;) Why do you think this belongs to devlink?
+>Two months ago you were complaining bitterly when people were
+>considering using devlink rate to control per-queue shapers.
+>And now it's fine to add queues as a concept to devlink?
 
-Your bindings header must be squashed here. Headers are not separate
-thing from the bindings.
-
->  1 file changed, 142 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/qcom,qca807x.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/qcom,qca807x.yaml b/Documentation/devicetree/bindings/net/qcom,qca807x.yaml
-> new file mode 100644
-> index 000000000000..1c3692897b02
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/qcom,qca807x.yaml
-> @@ -0,0 +1,142 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/qcom,qca807x.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Qualcomm QCA807X Ethernet PHY
-
-What is "X"? Wildcards are usually not expected.
-
-> +
-> +maintainers:
-> +  - Christian Marangi <ansuelsmth@gmail.com>
-> +  - Robert Marko <robert.marko@sartura.hr>
-> +
-> +description: |
-> +  Qualcomm QCA807X Ethernet PHY is PHY package of 2 or 5
-> +  IEEE 802.3 clause 22 compliant 10BASE-Te, 100BASE-TX and
-> +  1000BASE-T PHY-s.
-> +
-> +  They feature 2 SerDes, one for PSGMII or QSGMII connection with
-> +  MAC, while second one is SGMII for connection to MAC or fiber.
-> +
-> +  Both models have a combo port that supports 1000BASE-X and
-> +  100BASE-FX fiber.
-> +
-> +  Each PHY inside of QCA807x series has 4 digitally controlled
-> +  output only pins that natively drive LED-s for up to 2 attached
-> +  LEDs. Some vendor also use these 4 output for GPIO usage without
-> +  attaching LEDs.
-> +
-> +  Note that output pins can be set to drive LEDs OR GPIO, mixed
-> +  definition are not accepted.
-> +
-> +  PHY package can be configured in 3 mode following this table:
-> +
-> +                First Serdes mode       Second Serdes mode
-> +  Option 1      PSGMII for copper       Disabled
-> +                ports 0-4
-> +  Option 2      PSGMII for copper       1000BASE-X / 100BASE-FX
-> +                ports 0-4
-> +  Option 3      QSGMII for copper       SGMII for
-> +                ports 0-3               copper port 4
-> +
-> +$ref: ethernet-phy-package.yaml#
-> +
-> +properties:
-> +  compatible:
-> +    const: qcom,qca807x-package
-> +
-> +  qcom,package-mode:
-
-Where is definition of this property with type and description?
-
-> +    enum:
-> +      - qsgmii
-> +      - psgmii
-> +
-> +  qcom,tx-driver-strength:
-
-Use proper unit suffix.
-
-https://github.com/devicetree-org/dt-schema/blob/main/dtschema/schemas/property-units.yaml
-
-> +    description: set the TX Amplifier value in mv.
-> +      If not defined, 600mw is set by default.
-> +    $ref: /schemas/types.yaml#/definitions/uint32
-> +    enum: [140, 160, 180, 200, 220,
-> +           240, 260, 280, 300, 320,
-> +           400, 500, 600]
-> +
-> +patternProperties:
-> +  ^ethernet-phy(@[a-f0-9]+)?$:
-> +    $ref: ethernet-phy.yaml#
-> +
-> +    properties:
-> +      gpio-controller:
-> +        description: set the output lines as GPIO instead of LEDs
-> +        type: boolean
-> +
-> +      '#gpio-cells':
-> +        description: number of GPIO cells for the PHY
-> +        const: 2
-> +
-> +    dependencies:
-> +      gpio-controller: ['#gpio-cells']
-
-Why do you need it? None of gpio-controllers do it, I think.
-
-> +
-> +    if:
-> +      required:
-> +        - gpio-controller
-> +    then:
-> +      properties:
-> +        leds: false
-> +
-> +    unevaluatedProperties: false
-> +
-> +required:
-> +  - compatible
-> +
-> +unevaluatedProperties: false
+Do you have a better suggestion how to model common pool object for
+multiple netdevices? This is the reason why devlink was introduced to
+provide a platform for common/shared things for a device that contains
+multiple netdevs/ports/whatever. But I may be missing something here,
+for sure.
 
 
-Best regards,
-Krzysztof
+>
+>> You refer to using the lower device (like PF) to actually
+>> send and receive trafic of representors. That means, you share the
+>> entire queues. Or maybe better term is not "share" but "use PF queues".
+>> 
+>> The infra William is proposing is about something else. In that
+>> scenario, each representor has a separate independent set of queues,
+>> as well as the PF has. Currently in mlx5, all representor queues have
+>> descriptors only used for the individual representor. So there is
+>> a huge waste of memory for that, as often there is only very low traffic
+>> there and probability of hitting trafic burst on many representors at
+>> the same time is very low.
+>> 
+>> Say you have 1 queue for a rep. 1 queue has 1k descriptors. For 1k
+>> representors you end up with:
+>> 1k x 1k = 1m descriptors
+>
+>I understand the memory waste problem:
+>https://people.kernel.org/kuba/nic-memory-reserve
+>
+>> With this API, user can configure sharing of the descriptors.
+>> So there would be a pool (or multiple pools) of descriptors and the
+>> descriptors could be used by many queues/representors.
+>> 
+>> So in the example above, for 1k representors you have only 1k
+>> descriptors.
+>> 
+>> The infra allows great flexibility in terms of configuring multiple
+>> pools of different sizes and assigning queues from representors to
+>> different pools. So you can have multiple "classes" of representors.
+>> For example the ones you expect heavy trafic could have a separate pool,
+>> the rest can share another pool together, etc.
+>
+>Well, it does not extend naturally to the design described in that blog
+>post. There I only care about a netdev level pool, but every queue can
+>bind multiple pools.
+>
+>It also does not cater naturally to a very interesting application
+>of such tech to lightweight container interfaces, macvlan-offload style.
+>As I said at the beginning, why is the pool a devlink thing if the only
+>objects that connect to it are netdevs?
 
+Okay. Let's model it differently, no problem. I find devlink device
+as a good fit for object to contain shared things like pools.
+But perhaps there could be something else. Something new?
+
+
+>
+>Another netdev thing where this will be awkward is page pool
+>integration. It lives in netdev genl, are we going to add devlink pool
+>reference to indicate which pool a pp is feeding?
+
+Page pool is per-netdev, isn't it? It could be extended to be bound per
+devlink-pool as you suggest. It is a bit awkward, I agree.
+
+So instead of devlink, should be add the descriptor-pool object into
+netdev genl and make possible for multiple netdevs to use it there?
+I would still miss the namespace of the pool, as it naturally aligns
+with devlink device. IDK :/
+
+
+>
+>When memory providers finally materialize that will be another
+>netdev thing that needs to somehow connect here.
 
