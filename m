@@ -1,136 +1,141 @@
-Return-Path: <netdev+bounces-68522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5164F84712B
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 14:30:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 746CB8470CD
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 14:04:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E427E1F220B6
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:30:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F8EF2869E2
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9194643A;
-	Fri,  2 Feb 2024 13:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C01433D8F;
+	Fri,  2 Feb 2024 13:04:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UNwaRQEp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GWov61Xa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A875F47772;
-	Fri,  2 Feb 2024 13:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9900A40BF2;
+	Fri,  2 Feb 2024 13:04:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706880610; cv=none; b=nGVsZeWLmx5EDloBOoCBfcxhoo6bYT2lo3RIEVnuCj0fzK5gpEyePWG8Hl3hZHtHcoDquOqLVzqHmVGfrY4xxaryY3t4+iCAFXuzWitXK82JfQsc/3jRugY1E0UGXrdrT9NVJwOrEQDi5zp834yIf+VZTaz52sQ2hnZh3N8cIdM=
+	t=1706879047; cv=none; b=POTBHa2z0IFeluRkbG73Eq9JV2NMfdkcnG/FL9FW59WiXA6xSFdeDrNMm2A8SHt3e3o6Dxz+SGrAX73CuMi5KRyco5cOPAlbOtbY5A/eMQl6q07SzLq4KNS+GTB3Q1v2k36mSkJ299SFqr8De2OrVVuTrjzH/xGWGgJ2qZADzH4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706880610; c=relaxed/simple;
-	bh=dakj+8/YDKrgFqMkE8JqXt+7c3Xphn1UZs2Lv3Mv6RI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aIzOmpC8WbJqoUtwKLw9OdoRuDl3ZixZM2eYy15YIGQvk//2ZDlW2fV2aJZeyj1mprD241quhkIaFZ/5rpR6oKjFZTMctGtlHZ+5Rs8JSF0JP6WJG9qVZUQ7yf2o3f01HpMXI9VO8bbccf3ZfpgaGpf+b7Ft5kntca0Qo8H+EaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UNwaRQEp; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706880608; x=1738416608;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=dakj+8/YDKrgFqMkE8JqXt+7c3Xphn1UZs2Lv3Mv6RI=;
-  b=UNwaRQEp7JzUXzhNrQY5YSHA8R4hY0OZE20aF35fe+lqbP5wBiU9ulfI
-   Y4YqGZZ3xZ91tl5IXdjkZDei8Sqm8bmvIIoIPRT9j6yk7vpWs5YhCl8x0
-   wKaggY8HVdyMzQcxgyXxAJr133etuglqjC4KZZGiM02G0CDHN6ZCF2Pz5
-   wzTAaCrZWIyO4oDTfGP3ys/RfdZZUGHswSpP92lrUljvha7t741wDkJPv
-   UHDZc/3beuhnQ1dHYdZH7+sZE9MulS6e4lqd4lEIxA7K9Vs3iVGAb4hDf
-   KEzRUPYmgdxZwE8gZLXjgBQ3i9hWxy+YJvTyh7K7gE0PKOJLeqo7AnhYm
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="66956"
-X-IronPort-AV: E=Sophos;i="6.05,238,1701158400"; 
-   d="scan'208";a="66956"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 05:30:07 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,238,1701158400"; 
-   d="scan'208";a="4824879"
-Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.59.157])
-  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 05:30:05 -0800
-Date: Fri, 2 Feb 2024 14:00:46 +0100
-From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-	Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 3/3] thermal: intel: hfi: Enable interface only when
- required
-Message-ID: <Zbznft0x7DRWjUTQ@linux.intel.com>
-References: <20240131120535.933424-1-stanislaw.gruszka@linux.intel.com>
- <20240131120535.933424-4-stanislaw.gruszka@linux.intel.com>
- <ZbzhuXbuejM1VLE3@nanopsycho>
+	s=arc-20240116; t=1706879047; c=relaxed/simple;
+	bh=sJfAEWjsAZta/5Hz8HZlZF6BluB71hiZTGWU2kv4FZ4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Xblp8mpV11LkRpN+jixoxyiOP9JD7eL+JuL7V1n75jJ3GdvxolNL/BxCLhd+6lgJp/2VyRP3BO6BnQOuyI/WgPuvQxFdgiMcNXXBW//XH9g4dhCeuCBUMKfMJNRuqAe1Hwm3o5jJZBrKRrvF3OtGfsTdNo1VqP9djf13kfGwhc4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GWov61Xa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85733C433F1;
+	Fri,  2 Feb 2024 13:04:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706879047;
+	bh=sJfAEWjsAZta/5Hz8HZlZF6BluB71hiZTGWU2kv4FZ4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=GWov61XaezU5B5NhZDeqObu4dQW+TYXv1GWbezkW4ht3a1uRQNnsaMzXqEbXpqFnX
+	 5q2PIKOGqiKTAO2uZFcen2/jaGc+Ranl8uZYNGOs6+U40APcnxtR04Z9U0FSNITy1/
+	 EUXGDgwjwPKBXXx3rGWYfdiIg2LI1sFt9jJiAtSY1jayFExR7OCboy8dlMcMhsl9It
+	 WfEsRIROz5vNouOVje6g5aYMU93tH0pl1zq8tEZZmAhokow3RwBqJxmEph41aRy1G/
+	 nQrpVpP4CaxD11x9+kCtE1grJ6HX3m42lbdjUL7nFsRSk6g7WN09VrGZM0sc0DzaO9
+	 pN8duy7KEryyw==
+From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
+To: Pu Lehui <pulehui@huaweicloud.com>, bpf@vger.kernel.org,
+ linux-riscv@lists.infradead.org, netdev@vger.kernel.org
+Cc: Song Liu <song@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Yonghong Song <yhs@fb.com>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>, Luke Nelson
+ <luke.r.nels@gmail.com>, Pu Lehui <pulehui@huawei.com>
+Subject: Re: [PATCH bpf-next v2 4/4] riscv, bpf: Mixing bpf2bpf and tailcalls
+In-Reply-To: <160aaa6f-7efb-4a29-ab6f-dcf938d3419f@huaweicloud.com>
+References: <20240130040958.230673-1-pulehui@huaweicloud.com>
+ <20240130040958.230673-5-pulehui@huaweicloud.com>
+ <87sf2eohj2.fsf@all.your.base.are.belong.to.us>
+ <fab22b9e-7b56-4fef-ba92-bf62ec43007d@huaweicloud.com>
+ <878r44mr4g.fsf@all.your.base.are.belong.to.us>
+ <93209b12-9117-484a-908a-5b138fa2ffb0@huaweicloud.com>
+ <87jznowbmf.fsf@all.your.base.are.belong.to.us>
+ <160aaa6f-7efb-4a29-ab6f-dcf938d3419f@huaweicloud.com>
+Date: Fri, 02 Feb 2024 14:04:04 +0100
+Message-ID: <87wmrnhvaz.fsf@all.your.base.are.belong.to.us>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZbzhuXbuejM1VLE3@nanopsycho>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 02, 2024 at 01:36:09PM +0100, Jiri Pirko wrote:
-> Wed, Jan 31, 2024 at 01:05:35PM CET, stanislaw.gruszka@linux.intel.com wrote:
-> 
-> [...]
-> 
-> 
-> >+static int hfi_netlink_notify(struct notifier_block *nb, unsigned long state,
-> >+			      void *_notify)
-> >+{
-> >+	struct netlink_notify *notify = _notify;
-> >+	struct hfi_instance *hfi_instance;
-> >+	smp_call_func_t func;
-> >+	unsigned int cpu;
-> >+	int i;
-> >+
-> >+	if (notify->protocol != NETLINK_GENERIC)
-> >+		return NOTIFY_DONE;
-> >+
-> >+	switch (state) {
-> >+	case NETLINK_CHANGE:
-> >+	case NETLINK_URELEASE:
-> >+		mutex_lock(&hfi_instance_lock);
-> >+
-> 
-> What's stopping other thread from mangling the listeners here?
+Pu Lehui <pulehui@huaweicloud.com> writes:
 
-Nothing. But if the listeners will be changed, we will get next notify.
-Serialization by the mutex is needed to assure that the last setting will win,
-so we do not end with HFI disabled when there are listeners or vice versa.
+> On 2024/2/1 21:35, Bj=C3=B6rn T=C3=B6pel wrote:
+>> Pu Lehui <pulehui@huaweicloud.com> writes:
+>>=20
+>>> On 2024/2/1 18:10, Bj=C3=B6rn T=C3=B6pel wrote:
+>>>> Pu Lehui <pulehui@huaweicloud.com> writes:
+>>>>
+>>>>>>> @@ -252,10 +220,7 @@ static void __build_epilogue(bool is_tail_call=
+, struct rv_jit_context *ctx)
+>>>>>>>     		emit_ld(RV_REG_S5, store_offset, RV_REG_SP, ctx);
+>>>>>>>     		store_offset -=3D 8;
+>>>>>>>     	}
+>>>>>>> -	if (seen_reg(RV_REG_S6, ctx)) {
+>>>>>>> -		emit_ld(RV_REG_S6, store_offset, RV_REG_SP, ctx);
+>>>>>>> -		store_offset -=3D 8;
+>>>>>>> -	}
+>>>>>>> +	emit_ld(RV_REG_TCC, store_offset, RV_REG_SP, ctx);
+>>>>>>
+>>>>>> Why do you need to restore RV_REG_TCC? We're passing RV_REG_TCC (a6)=
+ as
+>>>>>> an argument at all call-sites, and for tailcalls we're loading from =
+the
+>>>>>> stack.
+>>>>>>
+>>>>>> Is this to fake the a6 argument for the tail-call? If so, it's bette=
+r to
+>>>>>> move it to emit_bpf_tail_call(), instead of letting all programs pay=
+ for
+>>>>>> it.
+>>>>>
+>>>>> Yes, we can remove this duplicate load. will do that at next version.
+>>>>
+>>>> Hmm, no remove, but *move* right? Otherwise a6 can contain gargabe on
+>>>> entering the tailcall?
+>>>>
+>>>> Move it before __emit_epilogue() in the tailcall, no?
+>>>>
+>>>
+>>> IIUC, we don't need to load it again. In emit_bpf_tail_call function, we
+>>> load TCC from stack to A6, A6--, then store A6 back to stack. Then
+>>> unwind the current stack and jump to target bpf prog, during this
+>>> period, we did not touch the A6 register, do we still need to load it a=
+gain?
+>>=20
+>> a6 has to be populated prior each call -- including tailcalls. An
+>> example, how it can break:
+>>=20
+>> main_prog() -> prologue (a6 :=3D 0; push a6) -> bpf_helper() (random
+>> kernel path that clobbers a6) -> tailcall(foo()) (unwinds stack, enters
+>
+> It's OK to clobbers A6 reg for helper/kfunc call, because we will load=20
+> TCC from stack to A6 reg before jump to tailcall target prog. In=20
+> addition, I found that we can remove the store A6 back to stack command=20
+> from the tailcall process. I try to describe the process involved:
 
-> >+		if (thermal_group_has_listeners(THERMAL_GENL_EVENT_GROUP))
-> >+			func = hfi_do_enable;
-> >+		else
-> >+			func = hfi_do_disable;
-> >+
-> >+		for (i = 0; i < max_hfi_instances; i++) {
-> >+			hfi_instance = &hfi_instances[i];
-> >+			if (cpumask_empty(hfi_instance->cpus))
-> >+				continue;
-> >+
-> >+			cpu = cpumask_any(hfi_instance->cpus);
-> >+			smp_call_function_single(cpu, func, hfi_instance, true);
-> >+		}
-> >+
-> >+		mutex_unlock(&hfi_instance_lock);
-> >+		return NOTIFY_OK;
-> >+	}
-> >+
-> >+	return NOTIFY_DONE;
-> >+}
-> 
-> [...]
+Indeed! tailcall *is* already populating a6, and yes, the store can be
+omitted. Nice!
+
+Now, we still have the bug Alexei described, so until there's a
+fix/workaround, this series can't be merged.
+
+
+Cheers,
+Bj=C3=B6rn
 
