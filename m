@@ -1,131 +1,143 @@
-Return-Path: <netdev+bounces-68314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DA5E846906
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:09:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEB30846921
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:18:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0F741C25D42
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 07:09:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A8EAB20FBD
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 07:18:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B1851757D;
-	Fri,  2 Feb 2024 07:09:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9131775E;
+	Fri,  2 Feb 2024 07:18:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b="OSWel9zs"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="rmVTRZ+8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+Received: from mail-wr1-f66.google.com (mail-wr1-f66.google.com [209.85.221.66])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 696D1175AC
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 07:09:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ECE217C62
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 07:18:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706857793; cv=none; b=uZyDzZOp1M2+3ijZLQ+ZFe/8ASbrgAZch2ws+bxgasFeyoq67pSUzIjrWhqopxg0Z7ZaQyv9Kln7T7lAI9OwNUaBNZWlDQGkz2o+0Tp12i04gV8ONSP2j4u5iq9f10Q7Fq2L4aCDXCGadu4aAsiW0SDzcQMbwvTTQZXETb/4Apw=
+	t=1706858286; cv=none; b=FgpZwTutTxTA9i5GyA9Le2mDXok0dMDUB5/BNtN0nvz3N8+z+OOzxjSkP3ryf3zWBP6mJXlth9eOwmGIC7GxJt2JktqOeMYQcjZDAc8vuzZUkV2ukqSaEbj6EzkAYtXfx/gSBymhvgQRdexN7Xbs3s4I6KOMtYC06R4hlWzJH2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706857793; c=relaxed/simple;
-	bh=aM0I27fSxG9ncsoOwq8+RLtJ8Akzqu2IpCqFvquszZ0=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=qYrtxH5ND1Iaw8NKO4kccogJXFhPfSo6wXs8988zsAc6gECeIH2z+Q07hFZNL9IZQhU2J/KBlF7k2MNRjW7vJoz8ZwqX4xq3fBMapYvrV+CWp/YtWlD3CN3wc6nNMBSJCfqJgJTXUqR/ZLtLTjqPpOHIzwA8vX7oqmge6/nCw1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com; spf=pass smtp.mailfrom=waldekranz.com; dkim=pass (2048-bit key) header.d=waldekranz-com.20230601.gappssmtp.com header.i=@waldekranz-com.20230601.gappssmtp.com header.b=OSWel9zs; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=waldekranz.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=waldekranz.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-50eac018059so2193272e87.0
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 23:09:51 -0800 (PST)
+	s=arc-20240116; t=1706858286; c=relaxed/simple;
+	bh=nm4ZQS/VjFA0/33oXv/rZ2TvSf0VJ3+fW6AC5T+GWFY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=izjYFHjGDABiZhAU7XDaXwvhU2PgEIdLDdD7ts4/9pckkjLnCir93kLkDAIbeVUbHsKJUjOTpLH//j77LY+RLIuMeGMfKlcJJklpqZ+0j8p7DOY8s8hX2UgZWmIIAnM+AZlTv6eWmQHdem/pY9Jiq73+81MDQz0IAxjFGYCuJ+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=rmVTRZ+8; arc=none smtp.client-ip=209.85.221.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f66.google.com with SMTP id ffacd0b85a97d-3394ca0c874so1242613f8f.2
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 23:18:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=waldekranz-com.20230601.gappssmtp.com; s=20230601; t=1706857789; x=1707462589; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=o0xl4+XqIugVEwtcY8bcqC8nTrvfpuE9sxWYNsaFq/A=;
-        b=OSWel9zs9kVAlt+7C0FdZDtdoI7EQD9xLjLvmrhErHPDJNVN3GZ935btnY2K8wjl8U
-         lRYGrqN1L8/R0uG4xATcrzJDGvnqCcW0eGwp7ly+Aba40mbfWpFRmG7yuKz0gKr+xwCV
-         Yk3SXPlQXROdNAmyB8mnMdjzHhO//u1YC7lNSYfCoEAnK5Ss4fQO6KWElQDWZrTH81NN
-         qlO85lbpfnerrU+nOQQYuyJ59Ggc0hsXtaSzhP8WW7kXl4kgZQS1KVcHZh5C9NdPsR/O
-         D5nPuurrOZ07lfnMedipNySBvAxQJ2Az5RSb0dRtI/ub29PbcdVwMOy8fyDlou6HNpDw
-         yZgQ==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706858282; x=1707463082; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=aAUjuRqQR3EqFDoyAUglRvCh4JpyuuFKVUjgTVN2xyU=;
+        b=rmVTRZ+8PCWvNWzs0+MdhQgerkdXtWbyRkWOV0mzLY5Z8xFf7B83aJd0Jk9bdt1Zlw
+         D39tNrxTXQu3XD+OS+sipJIoD47PQhgBVaRuEuLTMYNXjP9hyRgYcZM2NxFs5w4rJs7T
+         Wi4/ctnnkarBrN9eTbqTsg37b+IwNaH23n48kTRjvrP6h+xPQlWwaNOSoVsliq/xQD2Z
+         88L9wKkNxr+ijOmBbVb460xY8UtNNm0Il+91Mx+oaau1LwVGO9pzR3UrxFZbka5ZK7Op
+         uTZkqjKZNlgPnny3oVUOtlzg7D+c1w2iljYUhp8goN828ucqInNK/k1QLPd0BSqrqVLv
+         FiKw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706857789; x=1707462589;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=o0xl4+XqIugVEwtcY8bcqC8nTrvfpuE9sxWYNsaFq/A=;
-        b=nbKCgFEQ8/tcb545CY2E5o4y2AVkvqpSYTCa7FGUTeY/S4rcISb4gbrqLisa3kgywx
-         XWzBf5rjRuf4kaBS8xASfZw2RkaQDqqISctA/sLU/DdabK1rqs8JtRbkKkmYjIvj5VKa
-         XFDW6p85hVjwHmRXVnwVQqnkZOHeHHLT/Rc8shKQWTYvofMkO7+S4Krb3iyfpa1OUIZp
-         sihpjKlfw3vVJji8BhRmjAv6qo6VrZ/rQnxAa/kJJNu+WQJZvMdnuc5Qf8fT0jceJ2XK
-         JW1B8GIWBcp7fmRjYrz/cBp4pGZIJzp6CgFaLt5l0sBZ8EDYJfOjyF7DUil6zXqS4PNs
-         zKCw==
-X-Gm-Message-State: AOJu0YxoDC7wPRDG1I7FJJqphjVLvtNnnqlQUgulhEYkVGcBr4Ilm178
-	ginafLHTGTNcuCnhhWBGGl+mXAOLSAVYEoE0Q3LFcEVvYbXOcROM5FbOJ9LYie8=
-X-Google-Smtp-Source: AGHT+IHBrRXbjJRB+j0ms4uycbW4rA/CKq+L9eqPj4WvKyB6UQPVnsq0i+wC8O2Sd5Jl/r8nXNQglg==
-X-Received: by 2002:ac2:4542:0:b0:50e:1870:1ef4 with SMTP id j2-20020ac24542000000b0050e18701ef4mr601401lfm.48.1706857789212;
-        Thu, 01 Feb 2024 23:09:49 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWfU6Hxs3SQwI/O6LS5fYegHC2xgnfAhMJL5Wg7Fel7Xbx1AvMT0xyuyGIeUTttCKZzUJwavB8Ph4IZs8DwJGqHg1V+iJprkUz/jjMXOxYAtJQ7ABPtOBDS+IWALSIgL0x/kRPPYBp9qRyAeLqGvPyMNhZKQp0kCk7gjF34S4nqkI3y9rn509f3bLjc/4dmMYxqMLcgYNk/jVNRKMLspbIn3vnudhsOY53WhkxwWzZOhRrdFT8huEZlvkg2x3GkO2Y0h7BXhnpvLjsmnZj+FYQXGA==
-Received: from wkz-x13 (a124.broadband3.quicknet.se. [46.17.184.124])
-        by smtp.gmail.com with ESMTPSA id u18-20020ac243d2000000b005101b937bedsm209068lfl.5.2024.02.01.23.09.47
+        d=1e100.net; s=20230601; t=1706858282; x=1707463082;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aAUjuRqQR3EqFDoyAUglRvCh4JpyuuFKVUjgTVN2xyU=;
+        b=BUCXYGAF3Kk/lzslPjZBRvPiVgHs27BuBptNstGpj1d3pHmOacDhOVAK3g3dmfms1i
+         c5X9vtfPACSGbvS9XKuO4jkPjLUGyu2XZxLD7qOdw77x6wvztgNldsNGiFDObE7BdxN0
+         6TB4bsF8MaryEbaePTguhE1Pc/5e/1sIBjKj6DHhc7dLpWWaT6Qq5/GbAQ7/iLXH9+Ay
+         KkY0VaeTWnw5wVW3DTj36GBuqd2JXa2GoxCE3x/zkJfjzJ7miOdAa72ui//w+/B6T6lx
+         b9BmMHzME4FASUP3zl0QMPVZK3Z/8S2e9m2bWTNu2I1t/nrS1Kp4e/TzUmnvUpakPg8G
+         Jf2w==
+X-Gm-Message-State: AOJu0YxOB29LL+qtn3/2CTycf5HY1GraR8/NKzWxMP2GwKmfk3G9fehr
+	jLvkWn1y6E3HrZCAPX+kf1Q9noWSFSdlcyVMs1lc/K9LGktBzHcrerbJhwRv0Ss=
+X-Google-Smtp-Source: AGHT+IG2x8GDdFF8OLIvYlGbLM6O8MjsOOzCIZrIporr34iTNIHJYlQ0U7dsMCWY0nH0mKqaxkdoow==
+X-Received: by 2002:a5d:62c6:0:b0:33a:febd:f1bb with SMTP id o6-20020a5d62c6000000b0033afebdf1bbmr659915wrv.33.1706858282218;
+        Thu, 01 Feb 2024 23:18:02 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVX9Y+zLh8jP+uos0qelWWa7RYcG+vufyZ8JE1v5YdeSbhliA/oBkPpOd7x1g+fDkhcJgFYKoz9pi02ivCUjXoVOey32Sfu8zvAMQaE9bAmlMYKfUu2IatqZgj931a/6SRDOAdf90pbUvUDB/TaRzGcd1itGi8Pf0jsyAaFNdY55TN2F6wU0sBo6xf3lPhBypzoBnLU3F/6nIHLQs2BkWTOBCqkTuYcm7aH/Vcx5wGNR2wKkzbuPhdT/enpapPso90uQDqwYlq0ZekAvkd5uM8Ky7NfbMyxwlxH9AhpRhSYp4kBdCRhCtEiG9YAOyl7feFMxw6KfwoAQo84agcsNSVnxzfl7sw1QbEAa+nhpDnlBbrKAVWyEU9/IxiwBtk+FhBbnF218OzVJ5ff8liJSYGPF2J+ms2N2z6UjcL6OQya5iTYuKMkTLab0s9+tY1jhL8PTiyZ4ZnO6Bp+PJyEJ3jJQx8=
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id d22-20020adfa356000000b0033af51eafc6sm1244237wrb.104.2024.02.01.23.18.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 23:09:48 -0800 (PST)
-From: Tobias Waldekranz <tobias@waldekranz.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: davem@davemloft.net, kuba@kernel.org, olteanv@gmail.com,
- atenart@kernel.org, roopa@nvidia.com, razor@blackwall.org,
- bridge@lists.linux.dev, netdev@vger.kernel.org, ivecera@redhat.com
-Subject: Re: [PATCH v3 net] net: bridge: switchdev: Skip MDB replays of
- pending events
-In-Reply-To: <ZbvFwVSQI1M_2WZo@nanopsycho>
-References: <20240201161045.1956074-1-tobias@waldekranz.com>
- <ZbvFwVSQI1M_2WZo@nanopsycho>
-Date: Fri, 02 Feb 2024 08:09:46 +0100
-Message-ID: <875xz7tk91.fsf@waldekranz.com>
+        Thu, 01 Feb 2024 23:18:01 -0800 (PST)
+Date: Fri, 2 Feb 2024 08:17:58 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Aahil Awatramani <aahila@google.com>
+Cc: David Dillow <dave@thedillows.org>,
+	Mahesh Bandewar <maheshb@google.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Hangbin Liu <liuhangbin@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v6] bonding: Add independent control state
+ machine
+Message-ID: <ZbyXJu0ZO4sZfrV2@nanopsycho>
+References: <20240129202741.3424902-1-aahila@google.com>
+ <ZbvFEtQskK3xzi6y@nanopsycho>
+ <CAGfWUPzeWeF-XPGem=VqxG=DaOEMRWnjCcueD+ODsEKLczDEMA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGfWUPzeWeF-XPGem=VqxG=DaOEMRWnjCcueD+ODsEKLczDEMA@mail.gmail.com>
 
-On tor, feb 01, 2024 at 17:24, Jiri Pirko <jiri@resnulli.us> wrote:
-> Thu, Feb 01, 2024 at 05:10:45PM CET, tobias@waldekranz.com wrote:
->>Before this change, generation of the list of events MDB to replay
->>would race against the IGMP/MLD snooping logic, which could concurrently
->>enqueue events to the switchdev deferred queue, leading to duplicate
->>events being sent to drivers. As a consequence of this, drivers which
->>reference count memberships (at least DSA), would be left with orphan
->>groups in their hardware database when the bridge was destroyed.
->>
->>Avoid this by grabbing the write-side lock of the MDB while generating
->>the replay list, making sure that no deferred version of a replay
->>event is already enqueued to the switchdev deferred queue, before
->>adding it to the replay list.
->>
->>An easy way to reproduce this issue, on an mv88e6xxx system, was to
->>create a snooping bridge, and immediately add a port to it:
->>
->>    root@infix-06-0b-00:~$ ip link add dev br0 up type bridge mcast_snooping 1 && \
->>    > ip link set dev x3 up master br0
->>    root@infix-06-0b-00:~$ ip link del dev br0
->>    root@infix-06-0b-00:~$ mvls atu
->>    ADDRESS             FID  STATE      Q  F  0  1  2  3  4  5  6  7  8  9  a
->>    DEV:0 Marvell 88E6393X
->>    33:33:00:00:00:6a     1  static     -  -  0  .  .  .  .  .  .  .  .  .  .
->>    33:33:ff:87:e4:3f     1  static     -  -  0  .  .  .  .  .  .  .  .  .  .
->>    ff:ff:ff:ff:ff:ff     1  static     -  -  0  1  2  3  4  5  6  7  8  9  a
->>    root@infix-06-0b-00:~$
->>
->>The two IPv6 groups remain in the hardware database because the
->>port (x3) is notified of the host's membership twice: once via the
->>original event and once via a replay. Since only a single delete
->>notification is sent, the count remains at 1 when the bridge is
->>destroyed.
->>
->>Fixes: 4f2673b3a2b6 ("net: bridge: add helper to replay port and host-joined mdb entries")
->>Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
+Thu, Feb 01, 2024 at 07:45:23PM CET, aahila@google.com wrote:
+>> Any chance we can have some coverage via self-tests?
 >
-> Could you please maintain 24 hours period between sending another patch
-> version?
+>I plan to work on these self-tests decoupled from the current patch.
 >
-> https://www.kernel.org/doc/html/v6.7/process/maintainer-netdev.html#tl-dr
+>> Hmm, I wonder how it makes sense to add new features here. This should
+>> rot.
+>
+>Could you clarify what you are suggesting here?
 
-Sorry, I will avoid that going forward.
+Don't touch procfs here.
+
+>
+>
+>On Thu, Feb 1, 2024 at 8:28 AM Jiri Pirko <jiri@resnulli.us> wrote:
+>>
+>> Mon, Jan 29, 2024 at 09:27:41PM CET, aahila@google.com wrote:
+>>
+>> [...]
+>>
+>>
+>> >diff --git a/drivers/net/bonding/bond_procfs.c b/drivers/net/bonding/bond_procfs.c
+>> >index 43be458422b3..95d88df94756 100644
+>> >--- a/drivers/net/bonding/bond_procfs.c
+>> >+++ b/drivers/net/bonding/bond_procfs.c
+>> >@@ -154,6 +154,8 @@ static void bond_info_show_master(struct seq_file *seq)
+>> >                          (bond->params.lacp_active) ? "on" : "off");
+>> >               seq_printf(seq, "LACP rate: %s\n",
+>> >                          (bond->params.lacp_fast) ? "fast" : "slow");
+>> >+              seq_printf(seq, "LACP coupled_control: %s\n",
+>> >+                         (bond->params.coupled_control) ? "on" : "off");
+>>
+>> Hmm, I wonder how it makes sense to add new features here. This should
+>> rot.
+>>
+>>
+>> >               seq_printf(seq, "Min links: %d\n", bond->params.min_links);
+>> >               optval = bond_opt_get_val(BOND_OPT_AD_SELECT,
+>> >                                         bond->params.ad_select);
+>>
+>> [...]
 
