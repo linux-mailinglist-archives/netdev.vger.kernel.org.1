@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-68672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A4778478E8
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:02:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D09368478FF
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:05:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D354628BF2E
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:02:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64826B2A400
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:00:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0DF315CB7A;
-	Fri,  2 Feb 2024 18:42:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A16159C8B;
+	Fri,  2 Feb 2024 18:42:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IaNETuLQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F1/pHSuS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5DE315CB74;
-	Fri,  2 Feb 2024 18:42:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0850E159C88;
+	Fri,  2 Feb 2024 18:42:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706899353; cv=none; b=jvlQRk/gN6dUwOTTdCho3pDK2am4GbAeiMjmP+gm/J3TucARolmXRXGVoYWvDCTUCbsPo96HvZEBHLwrbbjov9q5AP4zflSys3EZqxicLa+iwnKqcndW6bzP4yV22bQ7CVlEKMAn86dkuq0jwgP3CwrQsrGWVlAA7Tq5F/RczJQ=
+	t=1706899340; cv=none; b=crzgGx6ULJ2A0u2URuqgAhOa31xzIZgz2tKFIknvGeSjAhOXQPRi2KYxyYNvHU3acIwaLoS+1IpaS0oYK2me2xz1c+a6XmKCmqe3kt+LOmp8sxyvIwnoYr7hQmQTibaimLGdUlSvYfPWzkIEWYSKEQUcaSasacZl1Oapqq0lCx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706899353; c=relaxed/simple;
-	bh=jEiw8BhY0l8FEObtYsQOR2XZcG4iTyOyOqSzcE2pnBI=;
+	s=arc-20240116; t=1706899340; c=relaxed/simple;
+	bh=Gdc2I7i5JEkHocibM+yybNafm4ZVrKVYQ/o4/jaK2q8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LEdUY+pVnqyHjjEXqOu749I1tOmCck9C6I7OMYZbn8pALezPoOYbubSlyE1KfGcg9RbUincEPGbsGZpSijDhHvHcfRr/pS+M6/7wsQXQUF7rjglhTDILh0tiJ5pVbUuhPOGyAM7ywyZiUBwddl22GfwvcC+A/+05MJF2lT7km6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IaNETuLQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 59F1DC433C7;
-	Fri,  2 Feb 2024 18:42:32 +0000 (UTC)
+	 MIME-Version; b=oRN2yRWaiVRZBPC6rlFz2RJ+EDQdYpthxzfK6cDlY0KbarnBO7ovS5q7Wyoz3rfShM0n0p/aFCjv4p364y1Fa7AOYdBf+nn1SzWRd25VjJaIrk26wDpLH0kgzKVZK+frIWaXUsYE83MpQy4wmzHPle+3PCYaVIEGBrCq5zYO5yI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F1/pHSuS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BB75C433F1;
+	Fri,  2 Feb 2024 18:42:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706899353;
-	bh=jEiw8BhY0l8FEObtYsQOR2XZcG4iTyOyOqSzcE2pnBI=;
+	s=k20201202; t=1706899339;
+	bh=Gdc2I7i5JEkHocibM+yybNafm4ZVrKVYQ/o4/jaK2q8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=IaNETuLQu0bRt4kkcw4ArSvMoe5jK/wGInlrzP74hvYlueqO8Wj1JvuLF9l9Rze2b
-	 KxzuOZ9jrTEJnCE1j0bhNt+G3lVkFFRHZ6xWPT/Z9KCfM9XVxDCy7Mw9Z53GrDe15P
-	 USBtw9ucHKQAAUoDn2P8oiSgy4xPT8fMH7is6AGoxruZ0gL2wKXe/Fykhb9snU06+e
-	 O8/f/PVEA8ER+LjZWOAHVoMevWQ74webQm5A5iOPDURprOsD0GUWZk9Q4qOnDq/Iyc
-	 Sdkg2R6RzFC3G1PEBFAc85hyHkQ+BYbXtJtF2SQK/Gx0WRw4gwZTmGCjezVy1TsXrS
-	 bLDqH/LJz4nWw==
+	b=F1/pHSuSbp2+2a/rTtmywEGB+mAd9gIr+k9m/QBVjRDlFXUNFWFFJAqfjc1lGmtD5
+	 Pqe3BqRst9tvY3amSYFhgYXA9n+NpOKJzNkFaNyBnf4BsEc8pI+/zqWc38Wtz8aGdn
+	 A33e2D62C1cTRyMPsU3FKE30jTIlPcn9120LGD71pUMnLTJVBqRUVdMvVcaK1SaeQf
+	 BpVVRw0hvmZ7OYx3dGkv1KwQUOSA0jX5LJ+CyCJVD0SsuoNT63dhOVjWZOWbijhBim
+	 Yqv+G0TrEaasDCnx4MPVO4fhXerlqrAndLaPh5uj2KZPzRbO0+bfTjzMiM5C3PSpqB
+	 bfIM24DDxGYZg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
@@ -54,12 +54,12 @@ Cc: Felix Fietkau <nbd@nbd.name>,
 	pabeni@redhat.com,
 	linux-wireless@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 2/5] wifi: mac80211: fix race condition on enabling fast-xmit
-Date: Fri,  2 Feb 2024 13:42:23 -0500
-Message-ID: <20240202184229.542298-2-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 2/6] wifi: mac80211: fix race condition on enabling fast-xmit
+Date: Fri,  2 Feb 2024 13:42:08 -0500
+Message-ID: <20240202184215.542162-2-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240202184229.542298-1-sashal@kernel.org>
-References: <20240202184229.542298-1-sashal@kernel.org>
+In-Reply-To: <20240202184215.542162-1-sashal@kernel.org>
+References: <20240202184215.542162-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,7 +68,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
-X-stable-base: Linux 4.19.306
+X-stable-base: Linux 5.4.268
 Content-Transfer-Encoding: 8bit
 
 From: Felix Fietkau <nbd@nbd.name>
@@ -91,10 +91,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  2 files changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/net/mac80211/sta_info.c b/net/mac80211/sta_info.c
-index 5c209f72de70..714d0b01ea62 100644
+index 0f97c6fcec17..e330036e02ea 100644
 --- a/net/mac80211/sta_info.c
 +++ b/net/mac80211/sta_info.c
-@@ -629,6 +629,8 @@ static int sta_info_insert_finish(struct sta_info *sta) __acquires(RCU)
+@@ -683,6 +683,8 @@ static int sta_info_insert_finish(struct sta_info *sta) __acquires(RCU)
  	if (ieee80211_vif_is_mesh(&sdata->vif))
  		mesh_accept_plinks_update(sdata);
  
@@ -104,10 +104,10 @@ index 5c209f72de70..714d0b01ea62 100644
   out_remove:
  	sta_info_hash_del(local, sta);
 diff --git a/net/mac80211/tx.c b/net/mac80211/tx.c
-index 3a0aadf881fc..89500b1fe301 100644
+index 8bd01dfa75cb..5fd9a6f752a1 100644
 --- a/net/mac80211/tx.c
 +++ b/net/mac80211/tx.c
-@@ -2868,7 +2868,7 @@ void ieee80211_check_fast_xmit(struct sta_info *sta)
+@@ -2919,7 +2919,7 @@ void ieee80211_check_fast_xmit(struct sta_info *sta)
  	    sdata->vif.type == NL80211_IFTYPE_STATION)
  		goto out;
  
