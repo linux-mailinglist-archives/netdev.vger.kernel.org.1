@@ -1,213 +1,184 @@
-Return-Path: <netdev+bounces-68534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABE29847237
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 15:52:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A108E84723A
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 15:53:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 245ABB25BCF
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 14:52:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57B8C28AC5B
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 14:53:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADED82B9A1;
-	Fri,  2 Feb 2024 14:52:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E07FA46B9A;
+	Fri,  2 Feb 2024 14:53:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="06dpG3rx"
+	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="e7aMmCAb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2182.outbound.protection.outlook.com [40.92.62.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D245B7F7D3
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 14:51:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706885521; cv=none; b=h4WGDqSqppFlFp/2Acg7CqVZx4gFk6zr6zjElL0w5vlsa8BfQTQH2QRg3Ywr18eqXHRyZ9sshAQdmPaLXf0Gy88FxuInrmW7cSNd5I5vwq8eXRhuuPcIOsk/KpQ3UHW5MFFHymr21KJ8PWsuAS+6oy9/EGdc3Ygpb8QMBVXBfjQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706885521; c=relaxed/simple;
-	bh=70P5vrTsGzNAKrq3wBE/YqB4BwTzcc1xvVpm51oliks=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kknm3D6a7Px/0QsICqijo+vYEmzpMx6GSU6vqslJMTB1dcjr1wEcE3vvFEQfEukJx6n1t0xF8y9gOIVhWf3YeMcYFcsedUqExhu3RVXdQBiIaPXAfE/qK4KiXcmufnOPTYHpNvQwUX/m0wsrJxrUB1BWU8cwE/wA0aJ+HTXHHtY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=06dpG3rx; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-55fff7a874fso6257a12.1
-        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 06:51:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706885518; x=1707490318; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=C8SUGcuT5iqtitOI1qPRqeM3GypUyzBfV2zoJ/JlD3o=;
-        b=06dpG3rxB084v2ekVYvOmfMucwfTgmjsVraPyu8As98BJ4wg0eB6Jac7ZD70yMfd/R
-         mSKc7HIzFDdOUSYWeh9FbTNbpjNjDUoajXOGN5WzGjtLqoO6LlDaz5N2sd6h1V4/Aekh
-         wDoaKb2QAY31LzbcLhkV0HrSCf2YHXApG+xo6LK8uaxkUjF+icHhLKO5kjBL93WDg59/
-         5y6AsqeSSUJ4Tj7ICGU1q5NnD8cs1K/JnwR+Vx2GnbpfoBEJxqbIjufO7VZA/5N9ySgb
-         yzAcNDGrjfymSl36l+wPr125Vt0DU8q8C3v+dLvRi61XOTL6fRyG/aj32vpOZoLQxC74
-         Friw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706885518; x=1707490318;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=C8SUGcuT5iqtitOI1qPRqeM3GypUyzBfV2zoJ/JlD3o=;
-        b=WZpyoqzu1dgYtbVzA+xJkvytHQTOXUwZoAE3Gp7XmgAD/NfkjeeLP+FKe7nhoOPNqM
-         awB/Tfl7LVXcYzRFa19hQqITG4XP+IcRlO+gaeQBZaEyyppcup/LnuCqjaX/vsw75U67
-         dlsIhtn0iIeYfd76QQ+kEpez5GSHypstUpNlM9HEO7pGRugNcKoEnpVSuoI/rx8RCZYi
-         MGRSRCAkMDj3ZE5BhKDnK/soVy3bdMw5KSIoRZtVakaB/93zN02F9GeX4SNuLGjxBpvH
-         q5JP+CKNZ0ky2UmFZPboZhFOHuoA1H08AhwjiwOrtPQnd9MIH5L5DXxbqpGOSGPel1C6
-         E8Wg==
-X-Gm-Message-State: AOJu0YzpQKQA/+NjWOw7cG5yllBplbkINjRzv6nsAIlbcJyP/qzvwfA+
-	x/1atnOE2Ip1ncSpXs3yOz6D5ShpwGCrPD9nl2Wjfw7cNE0It4w164UiM91wIgOHoiZAI4kLBi6
-	hyERybm2tt4ficPOpdDf43MENiJkKV+ZqL/cE
-X-Google-Smtp-Source: AGHT+IG6MptKIwPmQqM71pnnii9o3hteYZdAqf0Wq+SBzCe+wKTcwAJw4N1SebmD3RmRMWC+rcWJpyUyO4Rrtc6LEgQ=
-X-Received: by 2002:a50:c318:0:b0:55f:a1af:bade with SMTP id
- a24-20020a50c318000000b0055fa1afbademr15416edb.4.1706885517772; Fri, 02 Feb
- 2024 06:51:57 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB90814532C
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 14:53:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.62.182
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706885608; cv=fail; b=kua43Q6Is+dGYNlCjiAUgwzMhR1wDO6AKf1moAGcoGRQh8I7bDAELNOXMQw7IjEO5O/ttfr45+I9M7p9KXdDz0+NBisWVZonOZk3514MNkzvwq5u79H3RA/67e5GAYterLtRgQEQUCEOnoA0W5KLp1BLkzbIuirzNV9en4NmxzY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706885608; c=relaxed/simple;
+	bh=tha8v26+Y4/T46gw1httTeCY9sZVACyTYufjXEaeRFc=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=NyfcJetcLc3r1deJT+ztG0RFJ160WI/mlwQ+L4NEc13kH6UNMN4x+Qn70utYFwhxvoT6iiGhsUqfJGODL1iOuTHiAeVyKQmq4QUhnQNbL+8raGjGeT/axKAdhuk28XVTUZqFCVM/000pK6nGEp86MNfPd51AsJwx+An5JJk6BtI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=hotmail.com; dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b=e7aMmCAb; arc=fail smtp.client-ip=40.92.62.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZxPYveLDc7ZV13YpDSqhLU54kR61XUKOHHoBgGcGVNM131W06ZTg8PFlcZaj51it66IhcAT/O4YrJQCFpxs2+FtywIqSUOhqBGYXmmCrSzfPbfG2h3aFr5KY7Jp1oCqjxVNR9l2yriyPyUdEX6n6oGrytwWtUbV5SYBbOFxyLk2/dVoeDITFfxH9LJQI8oiC9dZ9A8ivkEt3sI6oMwJl3M/4wwPc6gd/0TJQ5xSy4GMZlXQIEZuHb+vXz8upqNuauemZh3OvGCjv4fobTcSBXiZ5t87VZ7w71oVmxilkIaKOCbRvjrPKVP9+kZHXgE3A6lUP1+dUdko6gdagVDt0kw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FHfTN0v2eELrtwwj+VJsPwAySZAJWB2mB5d+5UMqnes=;
+ b=C7N3QIFWgzSkDkXtlxyFs+hxWfWGy3nIzPf1DPdejeFiB/MaZJqyjc9GDEG2X2TlftEUSiUOKLEECHASOeK9kU/Lme0HsbnAwQy6h18Y3TcMRepPQoTElS4BRT9kCoiZqEWKvHX4Ppsfzg49FXFtWsj8EC20YOa2FFYWeB+wZJ4PsHSaVslAE5tT6QiKHpRMEHB3H2bpir8w/8SSA9SSjJKHB9aGtKQ3eyhajwK8Zk9yVO8+ZrN/nM3uawO+pNgH8QXEfV11yo0YkaLR6v4xpFhZaigj1wv6jk8vCRfW3oy4lsa+bTorOJ8BVEKZaMwNqZ4+PfhEZ/rQIZvFh6XYbg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FHfTN0v2eELrtwwj+VJsPwAySZAJWB2mB5d+5UMqnes=;
+ b=e7aMmCAbJF+6WjSlD8uRekooEfXfxh9r83NtjXqkHKexYR/SJrUVesfYXyKLenJK3PjJcnjVlQB0pSKX1A8JfbW+yBUkJv4HgD3ihJbzfYtYV3VmBUkzaHPesHhFNqKWvQpN8IspRb2UWHyArE/OQs6opSMHX2oItSDKTn/DCJHxCbQel3C4CXvaAPha4/L1DrgmEfRA6gZAFRhsUWIz1x72H01vlySdcm6KBHuFA9V6tV779d5mPReFwSsNPsDLvrVmEehSy8xrTZqxh1ZxTYk2w+ILuDLE594coRM3xMd4AaFtCSSVN5zsLk3woUx8CGp3Rz4U2BiuhOFh4vOa4g==
+Received: from MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:14c::12)
+ by ME3P282MB3821.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:1bb::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.30; Fri, 2 Feb
+ 2024 14:53:19 +0000
+Received: from MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::4b5:c5db:e39a:e48f]) by MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
+ ([fe80::4b5:c5db:e39a:e48f%4]) with mapi id 15.20.7249.025; Fri, 2 Feb 2024
+ 14:53:19 +0000
+From: Jinjian Song <songjinjian@hotmail.com>
+To: netdev@vger.kernel.org
+Cc: chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com,
+	haijun.liu@mediatek.com,
+	m.chetan.kumar@linux.intel.com,
+	ricardo.martinez@linux.intel.com,
+	loic.poulain@linaro.org,
+	ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.com,
+	vsankar@lenovo.com,
+	letitia.tsai@hp.com,
+	pin-hao.huang@hp.com,
+	danielwinkler@google.com,
+	nmarupaka@google.com,
+	joey.zhao@fibocom.com,
+	liuqf@fibocom.com,
+	felix.yan@fibocom.com,
+	angel.huang@fibocom.com,
+	freddy.lin@fibocom.com,
+	alan.zhang1@fibocom.com,
+	zhangrc@fibocom.com,
+	Jinjian Song <jinjian.song@fibocom.com>
+Subject: [net-next v8 0/4] net: wwan: t7xx: Add fastboot interface 
+Date: Fri,  2 Feb 2024 22:52:45 +0800
+Message-ID:
+ <MEYP282MB2697B2E0997F8A7455C0E031BB422@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-TMN: [YIV+pm+ePvRhmZFfJ8Fy047wj+Ul9159]
+X-ClientProxiedBy: SG2PR02CA0026.apcprd02.prod.outlook.com
+ (2603:1096:3:18::14) To MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
+ (2603:10c6:220:14c::12)
+X-Microsoft-Original-Message-ID:
+ <20240202145249.5238-1-songjinjian@hotmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240201170937.3549878-1-edumazet@google.com> <20240201170937.3549878-6-edumazet@google.com>
- <170688415193.5216.10499830272732622816@kwain>
-In-Reply-To: <170688415193.5216.10499830272732622816@kwain>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 2 Feb 2024 15:51:43 +0100
-Message-ID: <CANn89i+300-irMM8gZwbq6+xn7Mxc7mdr_wKhoRoyxYstV8kvQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 05/16] bonding: use exit_batch_rtnl() method
-To: Antoine Tenart <atenart@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MEYP282MB2697:EE_|ME3P282MB3821:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5d5c03a5-b45e-4ad0-bf3a-08dc23feb14e
+X-MS-Exchange-SLBlob-MailProps:
+	dx7TrgQSB6fTa61voF783eI3ZA+3oOgpLovzPC7TXiQ0x34jT6PBdAyQexuhz7kQPujx9C1jm1vXsmuATK2HBV4EdTNSd9iMUyJ9k7JuaquAHU7BLUSrN+mYe0cn0KJ8EMBoWOkH1gC6Nt8bLBfMYO2jCbxLW3x7wFgytRRRjKnPeZ4LB2Lyp8HSezF9GFJ2bpqv8T4e3bPmgopcqBmynZoxj67rLx9UbihiMtJqrLxy1R63zfhu1QQ4BCm9mJQPxJzYkciGFYG8KS0Cku8u+osXQfQHkgQtgrKLB6FY+MQHY68TJCHFXlic+Qy2l35tRp59XXQOwJU3Y/81lnQudO3ij+iL2jjGhbmTzSYceAuNrMnpMRcDMj3NBae/bM+Y2y8rVo+3bqzauz+l0m+JzJw4+MXLmeGPBq574GWIuCByyLXVuulwl0ANFirfVhnBuQOy3CS5EishJd/uuzZfEdWg4W98oruSl1j++xyCnNpkN2ZsrMCg6EmIwj5Zm1h5Jhh0YXf0ipfLtesBU/krMwS9p6oeOjY93+wZkfiqq9hwZa2ke8loHy8gjbNMBVtsuOo5BJKY6z8xo6fE8m+MfT5bUorcwJVs7RJxzrbmq6I7Fx1edRjtMOM8IpC+paSALvUS6zIJpvpSOZYfAN6zmc3ikzwGsEdQTWu2iPS7O4bnyW5wH62UDkZK2fJRm3E2CzyQ/5FlhOSCK+uAedAkFEJfBSGBR9MN1+WrkazOlQg/LvVSZxyVbuAEFa+6AJRWIay7KNhx9BM=
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	yh9IinX3gU/RFunQNuk15m0op7QejZq7L9azGr1srEWVOL25ujM++tJGNz81ZvqCR3tSy+0JzycrZ1AhugS0FEzwnXA0dyL2OW80gItzGW2r31MZDYvBAPIlVTJVJYntC6mk1Jb6pAmos9AOVJNEhnhix4PIhLllO/r0au1VqNEt2vPfirCIdfwQgnecUkPTPiG2LUqv4/WBjZedXB4zt6JDkGOJaH2FdLDRpcK5DGcZcU8wElgFT3yAuvFYKRzreyJ6kefTVoYDbtNEctLaMu79l/fJsrY7tXXJiKl0RXs2wd0wMMklfNSVb37Ym6snNdYcPQ4/K7z5JQTUmM8Fm07jesne8SzE5sJh5c0yt2F5B/bbX5IgSpzaxuIJs6xlKDcjXMCbFjn8pyOoibzFYC+BNvm9usAa6Ho2yk+BSk2RBIPxnA4KWVjKKS2Uf5njgKGYszs6R+rSOmeG3/IHAXqoU7dFNChg9DqfLwcU8UdgY/SmB2i84XD0nm9OFZk8AsqqZiIFPrWnWYXjsRBU46FzKEIyDFqSnH7XKk/kEeS3z16ip2piOz4zRZflK1+K
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?b60cMhy5HYE5yO97LY+21//euyk8u60x9H4sCohj57JdidHl8Q8rZK9wZAu0?=
+ =?us-ascii?Q?1TusS107yAS3tom9xtoIU2jz2EVUTvE4eEZpwVxfEATF7ZKHKyqHPgMlXovb?=
+ =?us-ascii?Q?JsVG5QZx5ydlajJ5Sxh5/gZ+u8HkH+7OnD2tVVDIa7VeB8MvaxdcfhN9L5Xf?=
+ =?us-ascii?Q?4qyBSRqdnno4abHOXShFPDIo2b/DGrglNJOBHpff241Bpci2+rswaYHtSRZl?=
+ =?us-ascii?Q?mwLR7ZGG6Lve9bO7mEhvO6QpTgeu9kXiEkjCz/A68Ckpvo0bGxgv6zNb6UoJ?=
+ =?us-ascii?Q?ioTTeIpWfbQwzx0BspBF5C7osG6n3qlDnYWo0vmyx0mbipdcztXnWSf0u7Mq?=
+ =?us-ascii?Q?9dmLaajvKRhAr5sVlHP+SdhT2vLqX27ON8OY6K74i9y05gwpxsQP4uoxZJnT?=
+ =?us-ascii?Q?KAWrD1lqWJIy9lYa/J8PdiBK+EnyRgo1pTRgyU0T9WLoKA7vB/CcB7NgKr+s?=
+ =?us-ascii?Q?0ogp+YS9ADK7FNXRQTc1M2jLBwqe99z7zmsz9dBDZKbBSVTDnwSM1RCYz1Ak?=
+ =?us-ascii?Q?oamNvsQ1A/XrV3L7kxH9b0xlPTJMUjyqJwHlDiKdRtwTKtmzJndI+ci40jrS?=
+ =?us-ascii?Q?mTur/ryAJrRqubsSEo9juQirNMq8pVwGMwlfWOQxrnTTetF9Vj2cw6MV4yoX?=
+ =?us-ascii?Q?rZtQ+gg+StoKrZ1xCvliwuM9ipkLAAkgTp6ps/TF4lEwC/qefwZ8Ao5tgmr+?=
+ =?us-ascii?Q?o6PzRsN/b4x3guxlv+Q2iOrl1TbV6M8iPjjzGf0mGc7ZjgBRGEXFOi2ImLWF?=
+ =?us-ascii?Q?YNGKuvd7qv/D/a10mvNCqC27x55Z6CiCBPkfOtARLFWUSuq4F42/z1wNjO/F?=
+ =?us-ascii?Q?jam7bnWunxc/Mi7I/9tpH996s1rega5nsOBpkkoWB9SjYeVbnxQmFhVMMPgx?=
+ =?us-ascii?Q?sraY7SQn6+ml48tMKONLuLrFE9NpCvKGDh/bUBzvggyfbDrDE5s0j1wMN4xx?=
+ =?us-ascii?Q?RET+mAkM5hrowYEwBi3mTr/eI+a5GdV/zPxRghF9pVFZuvY0uNAngdtXEpvY?=
+ =?us-ascii?Q?C6Kf9xhEr18ZqgLEorHc872csrX9uZ+Qj7i+JFvLv3B1+Ih52BGwnMBkEip2?=
+ =?us-ascii?Q?EinuaFKGewphC6KiyLLJLJbYDTldbAOQguG/nSaZzrFrgqivAzzBo+fatTFx?=
+ =?us-ascii?Q?pPHvs2pPaigWiJ3dLw2/r/dl2iQJ0z0XVgzmGNO7mvSt9O0DbthksRScKXzb?=
+ =?us-ascii?Q?btWrLsPt8oJFS4nrTvC5aRicUkwIxmgHQBpP78RdzmOOrpBlIhXBLnkzDoE?=
+ =?us-ascii?Q?=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-746f3.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d5c03a5-b45e-4ad0-bf3a-08dc23feb14e
+X-MS-Exchange-CrossTenant-AuthSource: MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2024 14:53:18.8880
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: ME3P282MB3821
 
-On Fri, Feb 2, 2024 at 3:29=E2=80=AFPM Antoine Tenart <atenart@kernel.org> =
-wrote:
->
-> Hello,
->
-> Quoting Eric Dumazet (2024-02-01 18:09:26)
-> > diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond=
-_main.c
-> > index 4e0600c7b050f21c82a8862e224bb055e95d5039..181da7ea389312d7c851ca5=
-1c35b871c07144b6b 100644
-> > --- a/drivers/net/bonding/bond_main.c
-> > +++ b/drivers/net/bonding/bond_main.c
-> > @@ -6419,34 +6419,34 @@ static void __net_exit bond_net_exit_batch(stru=
-ct list_head *net_list)
-> >  {
-> >         struct bond_net *bn;
-> >         struct net *net;
-> > -       LIST_HEAD(list);
-> >
-> >         list_for_each_entry(net, net_list, exit_list) {
-> >                 bn =3D net_generic(net, bond_net_id);
-> >                 bond_destroy_sysfs(bn);
-> > +               bond_destroy_proc_dir(bn);
-> >         }
-> > +}
-> > +
-> > +static void __net_exit bond_net_exit_batch_rtnl(struct list_head *net_=
-list,
-> > +                                               struct list_head *dev_k=
-ill_list)
-> > +{
-> > +       struct bond_net *bn;
-> > +       struct net *net;
-> >
-> >         /* Kill off any bonds created after unregistering bond rtnl ops=
- */
-> > -       rtnl_lock();
-> >         list_for_each_entry(net, net_list, exit_list) {
-> >                 struct bonding *bond, *tmp_bond;
-> >
-> >                 bn =3D net_generic(net, bond_net_id);
-> >                 list_for_each_entry_safe(bond, tmp_bond, &bn->dev_list,=
- bond_list)
-> > -                       unregister_netdevice_queue(bond->dev, &list);
-> > -       }
-> > -       unregister_netdevice_many(&list);
-> > -       rtnl_unlock();
-> > -
-> > -       list_for_each_entry(net, net_list, exit_list) {
-> > -               bn =3D net_generic(net, bond_net_id);
-> > -               bond_destroy_proc_dir(bn);
-> > +                       unregister_netdevice_queue(bond->dev, dev_kill_=
-list);
-> >         }
-> >  }
->
-> This changes the logic of how bond net & devices are destroyed. Before
-> this patch the logic was:
->
-> 1. bond_destroy_sysfs; called first so no new bond devices can be
->    registered later.
-> 2. unregister_netdevice; cleans up any new bond device added before 1.
->
-> This now is:
-> 1. unregister_netdevice
-> // Here new bond devices can still be registered.
-> 2. bond_destroy_sysfs
->
-> Looking briefly at the history, the above is done on purpose to avoid
-> issues when unloading the bonding module. See 23fa5c2caae0 and
-> especially 69b0216ac255.
+From: Jinjian Song <jinjian.song@fibocom.com>
 
-Nice catch, thanks.
+Add support for t7xx WWAN device firmware flashing & coredump collection
+using fastboot interface.
 
-Hmmm, it seems we should perform the  bond_destroy_sysfs(bn) call earlier t=
-hen,
-from the pre_exit() method...
+Using fastboot protocol command through /dev/wwan0fastboot0 WWAN port to
+support firmware flashing and coredump collection, userspace get device
+mode from /sys/bus/pci/devices/${bdf}/t7xx_mode.
 
-Order of calls is :
-1) pre_exit()
-2) exit_batch_rtnl()
-3) exit(), exit_batch()
+Jinjian Song (4):
+  wwan: core: Add WWAN fastboot port type
+  net: wwan: t7xx: Add sysfs attribute for device state machine
+  net: wwan: t7xx: Infrastructure for early port configuration
+  net: wwan: t7xx: Add fastboot WWAN port
 
-Something like the following (that I would squash on the current patch)
+ .../networking/device_drivers/wwan/t7xx.rst   |  46 ++++++
+ drivers/net/wwan/t7xx/t7xx_hif_cldma.c        |  47 ++++--
+ drivers/net/wwan/t7xx/t7xx_hif_cldma.h        |  18 ++-
+ drivers/net/wwan/t7xx/t7xx_modem_ops.c        |  10 +-
+ drivers/net/wwan/t7xx/t7xx_modem_ops.h        |   1 +
+ drivers/net/wwan/t7xx/t7xx_pci.c              | 103 ++++++++++++-
+ drivers/net/wwan/t7xx/t7xx_pci.h              |  14 +-
+ drivers/net/wwan/t7xx/t7xx_port.h             |   4 +
+ drivers/net/wwan/t7xx/t7xx_port_proxy.c       | 108 ++++++++++++--
+ drivers/net/wwan/t7xx/t7xx_port_proxy.h       |  10 ++
+ drivers/net/wwan/t7xx/t7xx_port_wwan.c        | 115 +++++++++++----
+ drivers/net/wwan/t7xx/t7xx_reg.h              |  24 +++-
+ drivers/net/wwan/t7xx/t7xx_state_monitor.c    | 136 +++++++++++++++---
+ drivers/net/wwan/t7xx/t7xx_state_monitor.h    |   1 +
+ drivers/net/wwan/wwan_core.c                  |   4 +
+ include/linux/wwan.h                          |   2 +
+ 16 files changed, 553 insertions(+), 90 deletions(-)
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_mai=
-n.c
-index 181da7ea389312d7c851ca51c35b871c07144b6b..7edd3daa7e6d977e6b0220226b3=
-cd4f8f67a7952
-100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -6415,6 +6415,13 @@ static int __net_init bond_net_init(struct net *net)
-        return 0;
- }
+-- 
+2.34.1
 
-+static void __net_exit bond_net_pre_exit(struct net *net)
-+{
-+       struct bond_net *bn =3D net_generic(net, bond_net_id);
-+
-+       bond_destroy_sysfs(bn);
-+}
-+
- static void __net_exit bond_net_exit_batch(struct list_head *net_list)
- {
-        struct bond_net *bn;
-@@ -6422,7 +6429,6 @@ static void __net_exit
-bond_net_exit_batch(struct list_head *net_list)
-
-        list_for_each_entry(net, net_list, exit_list) {
-                bn =3D net_generic(net, bond_net_id);
--               bond_destroy_sysfs(bn);
-                bond_destroy_proc_dir(bn);
-        }
- }
-@@ -6445,8 +6451,9 @@ static void __net_exit
-bond_net_exit_batch_rtnl(struct list_head *net_list,
-
- static struct pernet_operations bond_net_ops =3D {
-        .init =3D bond_net_init,
--       .exit_batch =3D bond_net_exit_batch,
-+       .pre_exit =3D bond_net_pre_exit,
-        .exit_batch_rtnl =3D bond_net_exit_batch_rtnl,
-+       .exit_batch =3D bond_net_exit_batch,
-        .id   =3D &bond_net_id,
-        .size =3D sizeof(struct bond_net),
- };
 
