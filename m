@@ -1,98 +1,90 @@
-Return-Path: <netdev+bounces-68289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 023B8846675
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 04:17:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D8C584666A
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 04:13:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F75F1C23673
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 03:17:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E15C41F274D6
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 03:13:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A9C4BE69;
-	Fri,  2 Feb 2024 03:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C0CC2C7;
+	Fri,  2 Feb 2024 03:13:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V4j78Mpg"
 X-Original-To: netdev@vger.kernel.org
-Received: from anchovy3.45ru.net.au (anchovy3.45ru.net.au [203.30.46.155])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F24F4E0
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 03:17:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.30.46.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB97C2CF;
+	Fri,  2 Feb 2024 03:13:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706843847; cv=none; b=sjqt2nMm5STNI6q7MXLYTlejABDu+FQQFE/1QrwQB6jVFDpKE/QgLxKibhJBGAe4Lyc3rBFP8cBv6gEDVC8ULxphsUFkJ4NS349eu05NwyC7sthBi1QoojyONYjta+g0NQ6X+t6/K4Azi9JB3MiHHvaTL9ldWFZ+He+FYCsJVY0=
+	t=1706843625; cv=none; b=sUCvQNBAcW/T8ll1tPY553PUgrWAuCNEHh3U2T5dE6pHQiYVPVouKndDKjHSl4ANvG3FqRqrLUCg1PdLEAJxm+4rbzPDH3qAFljLzImfgmcg32qW9HfwCp6OoI4spfsHoEiN8kyOg/85J5RdmmT4wta8QJWCg4+06fBucaKxHGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706843847; c=relaxed/simple;
-	bh=5BqSEZGI5oRLouBUdH2wy4cRQMfnUEg237kfHxqOI+Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LHFTVfLOIzNgP58WzRCJeCXHgkrBULezp+zy4lvDGO+vhUXjGx+EiwsKN1qLJcHsKah7j5XnYt1lDxgeSjTxn4fsf5qS2ZS7g1F86jHH4/KyU3jA9mKnyS1UQsgwYAl12HCKPjYnWcDxXD1inrg9MgSy+RL85BKO5zkESt3rRtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=electromag.com.au; spf=pass smtp.mailfrom=electromag.com.au; arc=none smtp.client-ip=203.30.46.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=electromag.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=electromag.com.au
-Received: (qmail 16395 invoked by uid 5089); 2 Feb 2024 03:10:39 -0000
-Received: by simscan 1.2.0 ppid: 16271, pid: 16272, t: 0.4128s
-         scanners: regex: 1.2.0 attach: 1.2.0 clamav: 0.88.3/m:40/d:1950 spam: 3.1.4
-X-Spam-Level: 
-Received: from unknown (HELO ?192.168.2.4?) (rtresidd@electromag.com.au@203.59.235.95)
-  by anchovy2.45ru.net.au with ESMTPA; 2 Feb 2024 03:10:38 -0000
-Message-ID: <6e6adda6-26bd-45f6-a63d-8fc73a95373c@electromag.com.au>
-Date: Fri, 2 Feb 2024 11:10:32 +0800
+	s=arc-20240116; t=1706843625; c=relaxed/simple;
+	bh=tp1bXQDlXuxDkK/j6AFJ58xOLtftbewwvftDcqvNO1c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=vF6Lqe4CZjfsBjWyrHYXBgzq6Ey0zxA6szaAYh4SgqQPdxJbjwuGiDFkLYeNFkdDACWT20s5C1ktXobQEP5HiYwwIhf7pC6a0hOBwUU4ZNG0EyIbkUH1UeyuF07nJJIwoG4BbSXH2pKQABoHFabwqm0Enq3X4X+4/tDYaVIyDe0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V4j78Mpg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B2674C433C7;
+	Fri,  2 Feb 2024 03:13:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706843624;
+	bh=tp1bXQDlXuxDkK/j6AFJ58xOLtftbewwvftDcqvNO1c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=V4j78MpgPT5lnOix7DebWLKx57Op3v4BVMbMVyanlF4UvXJaRWChFjWJwISuI6k9c
+	 kKy0OmsEcWf2sebntticALA9zodlUi+moP8VpnNWVs7M4O7Rgw/z/lej9TFLZUxC/x
+	 6geZ6csuoOUoCYw4Va3/hW3TOyQsit4uXqp+hiU9QtPwd8x5RvfJ7UwNYhdbLUAzM1
+	 r3odYWGv9hvPXNprXozMpzt6c2ShZDNdqI1JW2uEWOl14W3yRZumEibjx8vFAqE3Wo
+	 tJntmmTZ5BTiqGDHQPfY6fXW+Pe2Zdlp9GK0Ek/0m6+6tQZKrlzVbE4ma5sUmxbTom
+	 hrAGyYjvZnphg==
+Date: Thu, 1 Feb 2024 19:13:40 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dmitry Safonov <dima@arista.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
+ <shuah@kernel.org>, Dmitry Safonov <0x7f454c46@gmail.com>, Mohammad Nassiri
+ <mnassiri@ciena.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 0/3] selftests/net: A couple of typos fixes in
+ key-management/rst tests
+Message-ID: <20240201191340.0d952a3f@kernel.org>
+In-Reply-To: <6104436c-4c71-4427-a569-cf98174d0c20@arista.com>
+References: <20240130-tcp-ao-test-key-mgmt-v2-0-d190430a6c60@arista.com>
+	<20240131163630.31309ee0@kernel.org>
+	<e88d5133-94a9-42e7-af7f-3086a6a3da7c@arista.com>
+	<20240201132153.4d68f45e@kernel.org>
+	<44d893b4-10b0-4876-bbf7-f6a81940b300@arista.com>
+	<a1ac7a6e-4447-4476-8fb7-fb5f0d7ec979@arista.com>
+	<6104436c-4c71-4427-a569-cf98174d0c20@arista.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v6] net: stmmac: Prevent DSA tags from breaking COE
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Romain Gantois <romain.gantois@bootlin.com>,
-  Alexandre Torgue <alexandre.torgue@foss.st.com>,
-  Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
-  Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-  netdev@vger.kernel.org, "G Thomas, Rohan" <rohan.g.thomas@intel.com>
-References: <20240116-prevent_dsa_tags-v6-1-ec44ed59744b@bootlin.com>
- <b757b71b-2460-48fe-a163-f7ddfb982725@electromag.com.au>
- <20240201070551.7147faee@kernel.org>
-Content-Language: en-US
-From: Richard Tresidder <rtresidd@electromag.com.au>
-In-Reply-To: <20240201070551.7147faee@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Fri, 2 Feb 2024 02:30:52 +0000 Dmitry Safonov wrote:
+> > Actually, I think there may be an easier fix:
+> > 
+> > 4. Make sure that client close()s TCP-AO first, making it twsk.
+> >    And also make sure that net-ns counters read post server's close().
+> > 
+> > Will do this, let's see if this fixes the flakiness on the netdev bot :)  
+> 
+> FWIW, I ended up with this:
+> https://lore.kernel.org/all/20240202-unsigned-md5-netns-counters-v1-1-8b90c37c0566@arista.com/
+> 
+> I reproduced the issue once, running unsigned-md5* in a loop, while in
+> another terminal building linux-next with all cores.
+> With the patch above, it survived 77 iterations of both ipv4/ipv6 tests
+> so far. So, there is a chance it fixes the issue :)
 
-
-
-
-Richard Tresidder
-
-
-
-On 1/02/2024 11:05 pm, Jakub Kicinski wrote:
-
-> On Thu, 1 Feb 2024 17:38:07 +0800 Richard Tresidder wrote:
->>       Thanks for your work on this patch.
->> I was wondering if this would make it's way onto the lts kernel branch at some point?
->> I think this patch relies on at least a few others that don't appear to have been ported across either.
->> eg: at least 2023-09-18 	Rohan G Thomas net: stmmac: Tx coe sw fallback
->>
->> Just looking at having to abandon the 6.6 lts kernel I'm basing things on as we require this patchset to get our network system working.
->> Again much appreciated!
-> Hm, it may have gotten missed because of the double space in:
-> Cc:  <stable@vger.kernel.org>
-> double check if it's present in the stable tree and if not please
-> request the backport, the info you need to provide is somewhere
-> in kernel doc's process section.
->
-Hi Jakub
-    Thanks for the hint.
-I just found these patches noted in the stable mailing list on the 29th of Jan as part of the [PATCH 6.6] series
-So yep my bad I was looking in the wrong spot.
-
-[PATCH 6.6 008/331] net: stmmac: Tx coe sw fallback
-[PATCH 6.6 009/331] net: stmmac: Prevent DSA tags from breaking COE
-
-Cheers
-    Richard Tresidder
-
+That was quick! Fingers crossed :)
 
