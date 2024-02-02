@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-68685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94341847963
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:14:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20682847986
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:17:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D36228240A
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:14:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A61A3B315D8
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:14:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B256712D74D;
-	Fri,  2 Feb 2024 19:09:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F339F12D75A;
+	Fri,  2 Feb 2024 19:09:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lkNhDtwB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K9FCJlqN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F58012D749
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 19:09:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFBBD12D757
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 19:09:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706900950; cv=none; b=h8FVfL/KhjatZ+Q+btx9oncveMVF30lyf+t7JksboTdLpSTG2eIEF+3wASZEzvhCZI+v9e5M/Zak8hUJiGOnuP5ZubNR2+KJRSCJhVxOMIhB/+lUvZjO4YOzotegLOhfjoU8KMf02VyLtL/4q4VeiLrAiNeoNhxhUOIlJMxs4nc=
+	t=1706900951; cv=none; b=Ytp+x3hn5AcuhlQR7HDjg5wgSjXIVQUyhqjzxA1OVMHd+HZC5DzPCuaRcGU6KBnac4yHesFaphDAclJeul3N+i7uO+8wUIne+UzxYiDl78MSoiYPg0PpDljlqDnrJCWLByYd1oDhId6Gs+w/SJhH/ou/Qv6U9Ar5VwlcUNpE8Es=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706900950; c=relaxed/simple;
-	bh=6G3rLaio//bwVROcPEZtoatiQXH7RJSuVehvjzcAqdk=;
+	s=arc-20240116; t=1706900951; c=relaxed/simple;
+	bh=qLPTj/GITcn9YU5JJjUQObLYqhNens9zBvUAEM3bAUg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CwL+cYmw8fj1NuBPPqUDAQYF5qB34Fj7ClBcrB36UUBwJJA7n2xGagm0+K1NJ3lHFWqS6o6skJuiDPMFiyjScRREQoA7Zc4zUALBq3MK36um6rEeZiosQ5vBROLNwcnhtGcBQIQLC3Gh4jdUljNZMD3G1xCanJ9SlOoFgW6t5M8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lkNhDtwB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08123C43390;
-	Fri,  2 Feb 2024 19:09:09 +0000 (UTC)
+	 MIME-Version; b=gDXv+WVrcw21LSwkwPxoCzM5GavSCXVEKHZAS8/fpEd45fKEDGJN2psi4Ytv5ux1+QB8mIomaJK7yCcd+YrkaReN50WFtIH8BXBUoN17mdfunSEocfQPWXlEPKTpLxAN3JyIou7ZRTs3lqBav1UL3jFEWVaVnlJdl1BnIAlNj+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K9FCJlqN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C2B2C433C7;
+	Fri,  2 Feb 2024 19:09:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706900950;
-	bh=6G3rLaio//bwVROcPEZtoatiQXH7RJSuVehvjzcAqdk=;
+	s=k20201202; t=1706900951;
+	bh=qLPTj/GITcn9YU5JJjUQObLYqhNens9zBvUAEM3bAUg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lkNhDtwBjtNzVriDffW3I7Xtcw9BG4uDRRNbTqO14XO+GImfQyQ/KH6ktAOv0PPCn
-	 ADy0pqdzji6zKF7jSrbI5ADNskcjHOPdpMLfmIOdLfAPIjq4s29syGKFOhHsLIJ4z9
-	 /lZ4TxoXkQ6bOqY/gDvm8rYgcO6zYa7mjgIZPyUwX2P1+AblOYyouHcbaeJmiVTUfv
-	 pCh3QlPPWLGI907Ty4ov2m5pyoev70371F1BQT/RCwF761DMTP3i3mPbT+jxfb8JQ+
-	 li38D4l+DwGzZt/FkymSSxGPc4oiZbDAD7b/UOi5Ybs+P5rWQydY1xgVGds1mAMouD
-	 fX0ejQQ2eyeWg==
+	b=K9FCJlqNB9yv6NyPqhl0EEBDiATZCuLHoKsPhs1Du4CmVaae/e708O8AEYIHO8K0o
+	 KvYHjtprrgNQqYlOqlKunsTZpG+QeClFyFV6fJ5CO112RjburJspxuqA+vXgpo6SJP
+	 m0Syo0O//cigZzflfWPXlWAruKCnluu07hJ4DN/Qq+av133LpLRI3ehwq+VNqTIVDg
+	 o4fLzrMudDvhOk4WjUbvzW7sQ55gdJeVZ+yHDsX92lJHzbGYn34Ij6jUq1qNOnqvVZ
+	 /GD7vlmHrX/UakYUQgsox959Fc7EqoXxRI85+KcvB85vyfIoDP3HSS/+fjWjAsdfYi
+	 7D1fItl8u8JKA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -51,11 +51,10 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>,
-	Aya Levin <ayal@nvidia.com>
-Subject: [net-next V3 09/15] net/mlx5: SF, Stop waiting for FW as teardown was called
-Date: Fri,  2 Feb 2024 11:08:48 -0800
-Message-ID: <20240202190854.1308089-10-saeed@kernel.org>
+	Moshe Shemesh <moshe@nvidia.com>
+Subject: [net-next V3 10/15] net/mlx5: Return specific error code for timeout on wait_fw_init
+Date: Fri,  2 Feb 2024 11:08:49 -0800
+Message-ID: <20240202190854.1308089-11-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240202190854.1308089-1-saeed@kernel.org>
 References: <20240202190854.1308089-1-saeed@kernel.org>
@@ -69,61 +68,100 @@ Content-Transfer-Encoding: 8bit
 
 From: Moshe Shemesh <moshe@nvidia.com>
 
-When PF/VF teardown is called the driver sets the flag
-MLX5_BREAK_FW_WAIT to stop waiting for FW loading and initializing. Same
-should be applied to SF driver teardown to cut waiting time. On
-mlx5_sf_dev_remove() set the flag before draining health WQ as recovery
-flow may also wait for FW reloading while it is not relevant anymore.
+The function wait_fw_init() returns same error code either if it breaks
+waiting due to timeout or other reason. Thus, the function callers print
+error message on timeout without checking error type.
+
+Return different error code for different failure reason and print error
+message accordingly on wait_fw_init().
 
 Signed-off-by: Moshe Shemesh <moshe@nvidia.com>
-Reviewed-by: Aya Levin <ayal@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../mellanox/mlx5/core/sf/dev/driver.c        | 21 ++++++++++++-------
- 1 file changed, 13 insertions(+), 8 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/main.c    | 38 +++++++++----------
+ 1 file changed, 19 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c b/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c
-index 169c2c68ed5c..bc863e1f062e 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c
-@@ -95,24 +95,29 @@ static int mlx5_sf_dev_probe(struct auxiliary_device *adev, const struct auxilia
- static void mlx5_sf_dev_remove(struct auxiliary_device *adev)
- {
- 	struct mlx5_sf_dev *sf_dev = container_of(adev, struct mlx5_sf_dev, adev);
--	struct devlink *devlink = priv_to_devlink(sf_dev->mdev);
-+	struct mlx5_core_dev *mdev = sf_dev->mdev;
-+	struct devlink *devlink;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
+index bccf6e53556c..c2593625c09a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
+@@ -187,31 +187,36 @@ static struct mlx5_profile profile[] = {
+ };
  
--	mlx5_drain_health_wq(sf_dev->mdev);
-+	devlink = priv_to_devlink(mdev);
-+	set_bit(MLX5_BREAK_FW_WAIT, &mdev->intf_state);
-+	mlx5_drain_health_wq(mdev);
- 	devlink_unregister(devlink);
--	if (mlx5_dev_is_lightweight(sf_dev->mdev))
--		mlx5_uninit_one_light(sf_dev->mdev);
-+	if (mlx5_dev_is_lightweight(mdev))
-+		mlx5_uninit_one_light(mdev);
- 	else
--		mlx5_uninit_one(sf_dev->mdev);
--	iounmap(sf_dev->mdev->iseg);
--	mlx5_mdev_uninit(sf_dev->mdev);
-+		mlx5_uninit_one(mdev);
-+	iounmap(mdev->iseg);
-+	mlx5_mdev_uninit(mdev);
- 	mlx5_devlink_free(devlink);
+ static int wait_fw_init(struct mlx5_core_dev *dev, u32 max_wait_mili,
+-			u32 warn_time_mili)
++			u32 warn_time_mili, const char *init_state)
+ {
+ 	unsigned long warn = jiffies + msecs_to_jiffies(warn_time_mili);
+ 	unsigned long end = jiffies + msecs_to_jiffies(max_wait_mili);
+ 	u32 fw_initializing;
+-	int err = 0;
+ 
+ 	do {
+ 		fw_initializing = ioread32be(&dev->iseg->initializing);
+ 		if (!(fw_initializing >> 31))
+ 			break;
+-		if (time_after(jiffies, end) ||
+-		    test_bit(MLX5_BREAK_FW_WAIT, &dev->intf_state)) {
+-			err = -EBUSY;
+-			break;
++		if (time_after(jiffies, end)) {
++			mlx5_core_err(dev, "Firmware over %u MS in %s state, aborting\n",
++				      max_wait_mili, init_state);
++			return -ETIMEDOUT;
++		}
++		if (test_bit(MLX5_BREAK_FW_WAIT, &dev->intf_state)) {
++			mlx5_core_warn(dev, "device is being removed, stop waiting for FW %s\n",
++				       init_state);
++			return -ENODEV;
+ 		}
+ 		if (warn_time_mili && time_after(jiffies, warn)) {
+-			mlx5_core_warn(dev, "Waiting for FW initialization, timeout abort in %ds (0x%x)\n",
+-				       jiffies_to_msecs(end - warn) / 1000, fw_initializing);
++			mlx5_core_warn(dev, "Waiting for FW %s, timeout abort in %ds (0x%x)\n",
++				       init_state, jiffies_to_msecs(end - warn) / 1000,
++				       fw_initializing);
+ 			warn = jiffies + msecs_to_jiffies(warn_time_mili);
+ 		}
+ 		msleep(mlx5_tout_ms(dev, FW_PRE_INIT_WAIT));
+ 	} while (true);
+ 
+-	return err;
++	return 0;
  }
  
- static void mlx5_sf_dev_shutdown(struct auxiliary_device *adev)
- {
- 	struct mlx5_sf_dev *sf_dev = container_of(adev, struct mlx5_sf_dev, adev);
-+	struct mlx5_core_dev *mdev = sf_dev->mdev;
+ static void mlx5_set_driver_version(struct mlx5_core_dev *dev)
+@@ -1151,12 +1156,10 @@ static int mlx5_function_enable(struct mlx5_core_dev *dev, bool boot, u64 timeou
+ 	/* wait for firmware to accept initialization segments configurations
+ 	 */
+ 	err = wait_fw_init(dev, timeout,
+-			   mlx5_tout_ms(dev, FW_PRE_INIT_WARN_MESSAGE_INTERVAL));
+-	if (err) {
+-		mlx5_core_err(dev, "Firmware over %llu MS in pre-initializing state, aborting\n",
+-			      timeout);
++			   mlx5_tout_ms(dev, FW_PRE_INIT_WARN_MESSAGE_INTERVAL),
++			   "pre-initializing");
++	if (err)
+ 		return err;
+-	}
  
--	mlx5_unload_one(sf_dev->mdev, false);
-+	set_bit(MLX5_BREAK_FW_WAIT, &mdev->intf_state);
-+	mlx5_unload_one(mdev, false);
- }
+ 	err = mlx5_cmd_enable(dev);
+ 	if (err) {
+@@ -1166,12 +1169,9 @@ static int mlx5_function_enable(struct mlx5_core_dev *dev, bool boot, u64 timeou
  
- static const struct auxiliary_device_id mlx5_sf_dev_id_table[] = {
+ 	mlx5_tout_query_iseg(dev);
+ 
+-	err = wait_fw_init(dev, mlx5_tout_ms(dev, FW_INIT), 0);
+-	if (err) {
+-		mlx5_core_err(dev, "Firmware over %llu MS in initializing state, aborting\n",
+-			      mlx5_tout_ms(dev, FW_INIT));
++	err = wait_fw_init(dev, mlx5_tout_ms(dev, FW_INIT), 0, "initializing");
++	if (err)
+ 		goto err_cmd_cleanup;
+-	}
+ 
+ 	dev->caps.embedded_cpu = mlx5_read_embedded_cpu(dev);
+ 	mlx5_cmd_set_state(dev, MLX5_CMDIF_STATE_UP);
 -- 
 2.43.0
 
