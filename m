@@ -1,64 +1,61 @@
-Return-Path: <netdev+bounces-68673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E6E6847935
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:11:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E62F84793F
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:12:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2720F1F2708E
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:11:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F1471C203DE
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C4315E5C1;
-	Fri,  2 Feb 2024 19:05:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA11981744;
+	Fri,  2 Feb 2024 19:06:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mRMhjrr6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tdDTzvoc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5E0E15E5BC;
-	Fri,  2 Feb 2024 19:05:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8504F81750
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 19:06:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706900714; cv=none; b=WWcyWtxf/6edcyGwURs2akDCVblxf6fJ1OcU3eYkiPXHqgFzdTd1N2yOMh1nUioKN1XFAtYFiW6NjIBrohN4Nil4yris79/cPouYXu8FusSOeRYtKHs+U8QJZBRYH6SGePNo+qiosW+4ncHse6xNZeI1iVhHT2MkrWXaaRZdrls=
+	t=1706900776; cv=none; b=PTbN6AS2FmoChbQK4EHTbvQzKHFaUfMo4Nk34hfxsfa6OCy8Ax583wknAqck4HTDeC1g1z3JSKXhVOr9q0sQex+0DGUgFQuQ08la/vYpLspgiNavjQJ4dklf0rwnqpOWsDvIEjAIWhZIrhEy6FjBLqOBB5H68GnIVzpLaKNlWDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706900714; c=relaxed/simple;
-	bh=PbcZ6/Uc6nEWpeypOwRFRtOhlGrseI91iIhICRGZBak=;
+	s=arc-20240116; t=1706900776; c=relaxed/simple;
+	bh=tlOjrnKvgC2LOEqUt6RzgKeYWW3vfMz1hs2u+Hqkp6Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jJR0Y+5z+2jKXv8LfhUSYK/J0/y64Xq6BhPjbuN4tof1E6uO9YilyhZhBucfhmLo2l1qajqTAKuADLx5HGrrEdBGQ27rNIOuby0uc34IZVlfCfRlkssMntdGBuf0fyzmTQbPXNIKpWGNpZfGjNcMZ4zdW0/zKFV1mTECuQ3F53g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mRMhjrr6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A54A4C433F1;
-	Fri,  2 Feb 2024 19:05:12 +0000 (UTC)
+	 MIME-Version:Content-Type; b=TrEo3wNq9fiiaFSgGgk0BzKeuGfjxEByU1ZmwEElCumI9+m741Tcu/pz+dcjIugB9ZjrsFF0HaMWVNzKIly2W+XmPaEIEX+DTjhLDVEATI5xk8wVVBBJkkEK96ueA0bw0jClxyUdyAXOMPHgqohmmNBj2EAmbg3yzMtIMqGXE8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tdDTzvoc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F981C433C7;
+	Fri,  2 Feb 2024 19:06:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706900713;
-	bh=PbcZ6/Uc6nEWpeypOwRFRtOhlGrseI91iIhICRGZBak=;
+	s=k20201202; t=1706900776;
+	bh=tlOjrnKvgC2LOEqUt6RzgKeYWW3vfMz1hs2u+Hqkp6Y=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mRMhjrr6RV1qjDeZR87YJLcjcavrxpWwnfciJGxNbphzpqEBEavTsIE2QBYvax3os
-	 SmnPa3J35rc6mLeAHQN6BWSaJWj/Wfi9O9sona9JIZCXIkLhz53oGEdUTxjyNL3AjM
-	 hpgM3OMpgaVHazqEn+8Ce8hg/BmQniFXHAA3Tgambv61pO9rzcITnIjiiW+auyypCA
-	 OTDO1SEB+mia/A8rC1AwhOXvsBFXJeldtzQrxVA7+5PJ0h6/7IiiKwZOChosOsc44k
-	 mvXdDkoM/OBfXFc1W/ZK7l8cQKXrMlzjFvJgG1JmbAwEP4MBq7R4Dna0vmErgFyPyz
-	 /hF+mTF+B0v8g==
-Date: Fri, 2 Feb 2024 11:05:11 -0800
+	b=tdDTzvocGW7B4avcdrx1Vg4UU0Llm4x5GqZR3bI5HHcqfUNIQWqJQ6CvH0HTtUUEW
+	 a3R0G6jrvYrUo60LN8lPxcpBsdzC7nVKdFoVwqQpHHSbKQNVl8CI/LlCRVuORnKQBz
+	 DGc8YN0aGiprFdnuhFHVhPoTU9PmlMb7+HuSglcHZG+snw3ZmGrZeBDS8Ol9/0wli/
+	 GBhlMLGVyMP15/SUCogBz8ACTclFv6I1B8IhKUSK8hiSr6hK3Qs8PKGffodWnDLWjS
+	 7+Rz/QHs8z2uKVtkgV5S1KlaTDZrnWJ3NKl3bGrxYkTIoLQVOzsYOTmNbgd0tng33M
+	 rdWC3/LYhRd6w==
+Date: Fri, 2 Feb 2024 11:06:14 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Frank Li <Frank.Li@nxp.com>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley
- <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>, Sascha Hauer
- <s.hauer@pengutronix.de>, Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>, Wei
- Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
- <xiaoning.wang@nxp.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, imx@lists.linux.dev
-Subject: Re: [PATCH v2 0/4] Add 8qm SMMU information
-Message-ID: <20240202110511.135d26b7@kernel.org>
-In-Reply-To: <20240201-8qm_smmu-v2-0-3d12a80201a3@nxp.com>
-References: <20240201-8qm_smmu-v2-0-3d12a80201a3@nxp.com>
+To: Ahmed Zaki <ahmed.zaki@intel.com>
+Cc: netdev@vger.kernel.org, mkubecek@suse.cz, alexander.duyck@gmail.com,
+ willemdebruijn.kernel@gmail.com, gal@nvidia.com,
+ jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+ davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+ pabeni@redhat.com, andrew@lunn.ch, Aleksandr Loktionov
+ <aleksandr.loktionov@intel.com>, Michal Swiatkowski
+ <michal.swiatkowski@linux.intel.com>
+Subject: Re: [PATCH ethtool] ethtool: add support for RSS input
+ transformation
+Message-ID: <20240202110614.18a0770e@kernel.org>
+In-Reply-To: <20240201204104.40931-1-ahmed.zaki@intel.com>
+References: <20240201204104.40931-1-ahmed.zaki@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,18 +65,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 01 Feb 2024 15:22:40 -0500 Frank Li wrote:
->       dt-bindings: mmc: fsl-imx-esdhc: add iommus property
->       dt-bindings: net: fec: add iommus property
->       arm64: dts: imx8qm: add smmu node
->       arm64: dts: imx8qm: add smmu stream id information
-> 
->  .../devicetree/bindings/mmc/fsl-imx-esdhc.yaml     |  3 ++
->  Documentation/devicetree/bindings/net/fsl,fec.yaml |  3 ++
->  arch/arm64/boot/dts/freescale/imx8qm-ss-conn.dtsi  |  6 ++++
->  arch/arm64/boot/dts/freescale/imx8qm.dtsi          | 41 ++++++++++++++++++++++
+On Thu,  1 Feb 2024 13:41:04 -0700 Ahmed Zaki wrote:
+> +Sets the RSS input transformation. Currently, only the
+> +.B symmetric-xor
+> +transformation is supported where the NIC XORs the L3 and/or L4 source and
+> +destination fields (as selected by
+> +.B --config-nfc rx-flow-hash
+> +) before passing them to the hash algorithm. The RSS hash function will
+> +then yield the same hash for the other flow direction where the source and
+> +destination fields are swapped (i.e. Symmetric RSS). Switch off (default) by
+> +.B xfrm none.
 
-Any preference on whether all these go via a platform tree,
-or should we pick up the net patch to netdev? I guess taking
-the DTB via netdev would be the usual way to handle this?
+Wasn't there supposed to be a warning somewhere saying that it loses
+entropy?
 
