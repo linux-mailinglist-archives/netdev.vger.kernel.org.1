@@ -1,58 +1,60 @@
-Return-Path: <netdev+bounces-68562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EF998472F7
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:19:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC8038472FE
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:20:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 339572892B0
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 15:19:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F18501C216B2
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 15:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C362F145B04;
-	Fri,  2 Feb 2024 15:19:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90C12146912;
+	Fri,  2 Feb 2024 15:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Q2tDq2Gt"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DmsRkhHM"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E15F3146903
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 15:19:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CC9A1468ED
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 15:20:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706887174; cv=none; b=jOh1X7RHx0BIKjIcC2tlL8CnnlxK1BHp8bhXxy9vknWUasuoLkAVG4YKFdVRt8e4jIhvh0d5t3WRCCxTzGHZKp6JWL5RJdFdguZws6sDxo1u7+8tHoLtrCe/8s4dDxQxfyg4k+Ku6eIPER4cMgwP6vyZi/faqOgy8o2aum6KfM4=
+	t=1706887203; cv=none; b=O6g8hkYwI1T9HW+QJ46U7r7b6HFYzoX/zifj1rAKGLb8JKgdZ+y78AjL3GbfS5uCqE1n9IiZ0QY/kO7dd3zr9JIJd1MvjW+QDlQbTPHD87RmviFT7F5Dgt6QnbcsgyyDBm0q4//fXL1r1Q3dwK3SHWbq2X35mfSgrQtXUYFJTNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706887174; c=relaxed/simple;
-	bh=2Dbxz5xYJkxF7TJ2GJxLcMWWwSL1lpUM3YqACQhdtpI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KXG1n18QDBDRjzGRnEZCeGoTG226Gtk2SQniFhYVdBVEankv7Bd+MhbZ7Ue/7OvR5Yco7yzl+DHGTKZWLQdWcqXOFuPsGhvUWfb0kW3b1d4leHp2KPJBOiNUl1g41WubhnXNUrkoudXGHmcu/V6TkfsQ06ghhsLyOhaNy2vS42A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Q2tDq2Gt; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1706887203; c=relaxed/simple;
+	bh=1E+6w2N5wsmKVyiiiDYhEZBNbV8HFqMK2hFS1Um4w2k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=E9WOLOlbuau+fRPnVp76BpkQnbPDQq537vz2THF3xW6U7yG2i/hyJKpN2oBL2mP8Ie+rkzIXbC9PRuDE8lbGd3ZWT9aXpMmaVb2W7Am3i2Z/vqLBvN9tHtVorF6eKzoQZLU1h+2UkzmnChISjjrg1lFesFxVI3R0qpI0o5CU0qw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DmsRkhHM; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706887171;
+	s=mimecast20190719; t=1706887200;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=odElO08YnTHudO0RnXkSSEFFNVCU35WEEp/Vx52s7/Y=;
-	b=Q2tDq2Gtiex0vEfgVZHYP1vIgSRkmohOFE23AXmtM9kFYqPykBdHioIzOcFNk408jL5Q33
-	VzTyFy5U+Eo2ncAo94giGnqRoS6TuQ/B672nJgU8dlESIAyAg/fGYLWCdr7aKHzxpLxN0s
-	LBKT3XoKCYb5zE5kNItCdZN1lXKZ/r0=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RcOk0tCCziI3vJhbOH1NSk8vxoJI3+Ui+TVJi/wrzSA=;
+	b=DmsRkhHMKEJ0TFgOqzyyZWvzhC3ZkelttKcXgGg5KswdQBhVvb5iHMF6UDeiNMEXel35u2
+	2MRqVkHdr7qqhOQSNoBME5yWIHOA/Af43SrnB5Gi1QTRhhXL6o6m8rlP3o2f9HFnDFv4BU
+	TCEd3jJ0e9YB7tZvMUg6D/Pbu4VUs7I=
 Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
  by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-75-QE6NjE1MPzSH2RcgRceGjQ-1; Fri,
- 02 Feb 2024 10:19:27 -0500
-X-MC-Unique: QE6NjE1MPzSH2RcgRceGjQ-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-517-N2QewX3ENtyKSqmZSJpK1A-1; Fri,
+ 02 Feb 2024 10:19:54 -0500
+X-MC-Unique: N2QewX3ENtyKSqmZSJpK1A-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 67EC33C000BD;
-	Fri,  2 Feb 2024 15:19:27 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 798363C0BE55;
+	Fri,  2 Feb 2024 15:19:54 +0000 (UTC)
 Received: from warthog.procyon.org.com (unknown [10.42.28.245])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1733A2026D66;
-	Fri,  2 Feb 2024 15:19:25 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 590AD40C9444;
+	Fri,  2 Feb 2024 15:19:53 +0000 (UTC)
 From: David Howells <dhowells@redhat.com>
 To: netdev@vger.kernel.org
 Cc: David Howells <dhowells@redhat.com>,
@@ -63,9 +65,11 @@ Cc: David Howells <dhowells@redhat.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-afs@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net 0/4] rxrpc: Miscellaneous fixes
-Date: Fri,  2 Feb 2024 15:19:12 +0000
-Message-ID: <20240202151920.2760446-1-dhowells@redhat.com>
+Subject: [PATCH net 1/4] rxrpc: Fix generation of serial numbers to skip zero
+Date: Fri,  2 Feb 2024 15:19:13 +0000
+Message-ID: <20240202151920.2760446-2-dhowells@redhat.com>
+In-Reply-To: <20240202151920.2760446-1-dhowells@redhat.com>
+References: <20240202151920.2760446-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,48 +77,162 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
 
-Here some miscellaneous fixes for AF_RXRPC:
+In the Rx protocol, every packet generated is marked with a per-connection
+monotonically increasing serial number.  This number can be referenced in
+an ACK packet generated in response to an incoming packet - thereby
+allowing the sender to use this for RTT determination, amongst other
+things.
 
- (1) The zero serial number has a special meaning in an ACK packet serial
-     reference, so skip it when assigning serial numbers to transmitted
-     packets.
+However, if the reference field in the ACK is zero, it doesn't refer to any
+incoming packet (it could be a ping to find out if a packet got lost, for
+example) - so we shouldn't generate zero serial numbers.
 
- (2) Don't set the reference serial number in a delayed ACK as the ACK
-     cannot be used for RTT calculation.
+Fix the generation of serial numbers to retry if it comes up with a zero.
 
- (3) Don't emit a DUP ACK response to a PING RESPONSE ACK coming back to a
-     call that completed in the meantime.
+Furthermore, since the serial numbers are only ever allocated within the
+I/O thread this connection is bound to, there's no need for atomics so
+remove that too.
 
- (4) Fix the counting of acks and nacks in ACK packet to better drive
-     congestion management.  We want to know if there have been new
-     acks/nacks since the last ACK packet, not that there are still
-     acks/nacks.  This is more complicated as we have to save the old SACK
-     table and compare it.
-
-David
-
+Fixes: 17926a79320a ("[AF_RXRPC]: Provide secure RxRPC sockets for use by userspace and kernel both")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: linux-afs@lists.infradead.org
+cc: netdev@vger.kernel.org
 ---
-The patches can be found here also:
+ net/rxrpc/ar-internal.h | 16 +++++++++++++++-
+ net/rxrpc/conn_event.c  |  2 +-
+ net/rxrpc/output.c      |  8 ++++----
+ net/rxrpc/proc.c        |  2 +-
+ net/rxrpc/rxkad.c       |  4 ++--
+ 5 files changed, 23 insertions(+), 9 deletions(-)
 
-	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=rxrpc-fixes
-
-David Howells (4):
-  rxrpc: Fix generation of serial numbers to skip zero
-  rxrpc: Fix delayed ACKs to not set the reference serial number
-  rxrpc: Fix response to PING RESPONSE ACKs to a dead call
-  rxrpc: Fix counting of new acks and nacks
-
- include/trace/events/rxrpc.h |   8 ++-
- net/rxrpc/ar-internal.h      |  37 ++++++++---
- net/rxrpc/call_event.c       |  12 ++--
- net/rxrpc/call_object.c      |   1 +
- net/rxrpc/conn_event.c       |  10 ++-
- net/rxrpc/input.c            | 115 +++++++++++++++++++++++++++++------
- net/rxrpc/output.c           |   8 +--
- net/rxrpc/proc.c             |   2 +-
- net/rxrpc/rxkad.c            |   4 +-
- 9 files changed, 154 insertions(+), 43 deletions(-)
+diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
+index dbeb75c29857..31b0dd8c9b2d 100644
+--- a/net/rxrpc/ar-internal.h
++++ b/net/rxrpc/ar-internal.h
+@@ -510,7 +510,7 @@ struct rxrpc_connection {
+ 	enum rxrpc_call_completion completion;	/* Completion condition */
+ 	s32			abort_code;	/* Abort code of connection abort */
+ 	int			debug_id;	/* debug ID for printks */
+-	atomic_t		serial;		/* packet serial number counter */
++	rxrpc_serial_t		tx_serial;	/* Outgoing packet serial number counter */
+ 	unsigned int		hi_serial;	/* highest serial number received */
+ 	u32			service_id;	/* Service ID, possibly upgraded */
+ 	u32			security_level;	/* Security level selected */
+@@ -822,6 +822,20 @@ static inline bool rxrpc_sending_to_client(const struct rxrpc_txbuf *txb)
+ 
+ #include <trace/events/rxrpc.h>
+ 
++/*
++ * Allocate the next serial number on a connection.  0 must be skipped.
++ */
++static inline rxrpc_serial_t rxrpc_get_next_serial(struct rxrpc_connection *conn)
++{
++	rxrpc_serial_t serial;
++
++	serial = conn->tx_serial;
++	if (serial == 0)
++		serial = 1;
++	conn->tx_serial = serial + 1;
++	return serial;
++}
++
+ /*
+  * af_rxrpc.c
+  */
+diff --git a/net/rxrpc/conn_event.c b/net/rxrpc/conn_event.c
+index 95f4bc206b3d..ec5eae60ab0c 100644
+--- a/net/rxrpc/conn_event.c
++++ b/net/rxrpc/conn_event.c
+@@ -117,7 +117,7 @@ void rxrpc_conn_retransmit_call(struct rxrpc_connection *conn,
+ 	iov[2].iov_base	= &ack_info;
+ 	iov[2].iov_len	= sizeof(ack_info);
+ 
+-	serial = atomic_inc_return(&conn->serial);
++	serial = rxrpc_get_next_serial(conn);
+ 
+ 	pkt.whdr.epoch		= htonl(conn->proto.epoch);
+ 	pkt.whdr.cid		= htonl(conn->proto.cid | channel);
+diff --git a/net/rxrpc/output.c b/net/rxrpc/output.c
+index a0906145e829..4a292f860ae3 100644
+--- a/net/rxrpc/output.c
++++ b/net/rxrpc/output.c
+@@ -216,7 +216,7 @@ int rxrpc_send_ack_packet(struct rxrpc_call *call, struct rxrpc_txbuf *txb)
+ 	iov[0].iov_len	= sizeof(txb->wire) + sizeof(txb->ack) + n;
+ 	len = iov[0].iov_len;
+ 
+-	serial = atomic_inc_return(&conn->serial);
++	serial = rxrpc_get_next_serial(conn);
+ 	txb->wire.serial = htonl(serial);
+ 	trace_rxrpc_tx_ack(call->debug_id, serial,
+ 			   ntohl(txb->ack.firstPacket),
+@@ -302,7 +302,7 @@ int rxrpc_send_abort_packet(struct rxrpc_call *call)
+ 	iov[0].iov_base	= &pkt;
+ 	iov[0].iov_len	= sizeof(pkt);
+ 
+-	serial = atomic_inc_return(&conn->serial);
++	serial = rxrpc_get_next_serial(conn);
+ 	pkt.whdr.serial = htonl(serial);
+ 
+ 	iov_iter_kvec(&msg.msg_iter, WRITE, iov, 1, sizeof(pkt));
+@@ -334,7 +334,7 @@ int rxrpc_send_data_packet(struct rxrpc_call *call, struct rxrpc_txbuf *txb)
+ 	_enter("%x,{%d}", txb->seq, txb->len);
+ 
+ 	/* Each transmission of a Tx packet needs a new serial number */
+-	serial = atomic_inc_return(&conn->serial);
++	serial = rxrpc_get_next_serial(conn);
+ 	txb->wire.serial = htonl(serial);
+ 
+ 	if (test_bit(RXRPC_CONN_PROBING_FOR_UPGRADE, &conn->flags) &&
+@@ -558,7 +558,7 @@ void rxrpc_send_conn_abort(struct rxrpc_connection *conn)
+ 
+ 	len = iov[0].iov_len + iov[1].iov_len;
+ 
+-	serial = atomic_inc_return(&conn->serial);
++	serial = rxrpc_get_next_serial(conn);
+ 	whdr.serial = htonl(serial);
+ 
+ 	iov_iter_kvec(&msg.msg_iter, WRITE, iov, 2, len);
+diff --git a/net/rxrpc/proc.c b/net/rxrpc/proc.c
+index 6c86cbb98d1d..26dc2f26d92d 100644
+--- a/net/rxrpc/proc.c
++++ b/net/rxrpc/proc.c
+@@ -181,7 +181,7 @@ static int rxrpc_connection_seq_show(struct seq_file *seq, void *v)
+ 		   atomic_read(&conn->active),
+ 		   state,
+ 		   key_serial(conn->key),
+-		   atomic_read(&conn->serial),
++		   conn->tx_serial,
+ 		   conn->hi_serial,
+ 		   conn->channels[0].call_id,
+ 		   conn->channels[1].call_id,
+diff --git a/net/rxrpc/rxkad.c b/net/rxrpc/rxkad.c
+index b52dedcebce0..6b32d61d4cdc 100644
+--- a/net/rxrpc/rxkad.c
++++ b/net/rxrpc/rxkad.c
+@@ -664,7 +664,7 @@ static int rxkad_issue_challenge(struct rxrpc_connection *conn)
+ 
+ 	len = iov[0].iov_len + iov[1].iov_len;
+ 
+-	serial = atomic_inc_return(&conn->serial);
++	serial = rxrpc_get_next_serial(conn);
+ 	whdr.serial = htonl(serial);
+ 
+ 	ret = kernel_sendmsg(conn->local->socket, &msg, iov, 2, len);
+@@ -721,7 +721,7 @@ static int rxkad_send_response(struct rxrpc_connection *conn,
+ 
+ 	len = iov[0].iov_len + iov[1].iov_len + iov[2].iov_len;
+ 
+-	serial = atomic_inc_return(&conn->serial);
++	serial = rxrpc_get_next_serial(conn);
+ 	whdr.serial = htonl(serial);
+ 
+ 	rxrpc_local_dont_fragment(conn->local, false);
 
 
