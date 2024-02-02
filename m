@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-68639-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57D038476CC
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:57:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F9678476D1
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:58:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EC7C28ABEE
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:57:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A228D1C2621E
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:58:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CD0A15144D;
-	Fri,  2 Feb 2024 17:56:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 036C8151460;
+	Fri,  2 Feb 2024 17:56:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jCWw29YS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Q30E9HkS"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 369A71509AF;
-	Fri,  2 Feb 2024 17:56:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E70151451
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 17:56:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706896584; cv=none; b=tQSq5G5vDiUYt4JLuTQTJfjSazvnufHXs3SCNuntdMx+D++tum4uw72pAwljAM/yUzgySwDC/EKFKxqcD+p2Uc8SVUj1j+8QeRGSU7bbnaOjgHQzeRwTVlzulGCVQWsyvArNOskDg06jXzzj/qxJgO+myJC4H1OVqBEAyYkUTuE=
+	t=1706896585; cv=none; b=NFrOIcIKyh92eVC3bRg2Y4fFD4zlxkUpP+fLBSviF9Q+Q3Fj1SDXcqT85y8ofl60CV5ixVC9KlGAu9Ywk0DP5qI7XSorsDu1oo9DBngjthM5qJxm4gl8OQOEX5AN/SMvu0z7ONl7CzIZBh6DzGBslPhXKjyceY25VJG8NIbSm8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706896584; c=relaxed/simple;
-	bh=NsXxokl/vQR4r6JF4L/WEZodHBGta13WP5nk1U7r/Vc=;
+	s=arc-20240116; t=1706896585; c=relaxed/simple;
+	bh=ed1pa01NpylKbuGOAgxUxNyRjyMaR0ZklViikUWd0sw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z1vktoJGiBinG1sEa4iDoX+kbFNPjhQsGc2/De6Wa8tb6PGs6mNUhtK+/QcOiChdMW8BxC7fQCFwy8LJhEV2XBiW6RGcEP0mv3jV9LNT90c77xt2D42FBUr/sXuc39T4E0xjS9Yf3wZdcpEL6UXsyrXCPMFQhBhThl1bdAvBCgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jCWw29YS; arc=none smtp.client-ip=192.55.52.88
+	 MIME-Version; b=idFFYsmXC/ENbe0bC6fsgeRZDImH89amEKw7MftPXGaSkbkfDLywQB0RN4fSoXnA2XofQ6+C3x3+W2pO8b8jAjSiqtOaWWRna52vikJlz0+8n1U2iEtzEu+BTSyJqn+LDR8WV/BIDM5TpwWrHejrOb8+hyp1TQXSLRaRerxFJdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Q30E9HkS; arc=none smtp.client-ip=192.55.52.88
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706896582; x=1738432582;
+  t=1706896584; x=1738432584;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=NsXxokl/vQR4r6JF4L/WEZodHBGta13WP5nk1U7r/Vc=;
-  b=jCWw29YSApE8ihsRlZSSNemoxdB8RFEMFfz48Br7RzTB0rATp22f9K7Z
-   8dZAOXomx2LEcR7smGizc+5iT04fCyyYv5FnDoVPd8kQNMAtTCT9l2oyD
-   /U+Oxn541MUHHL/eigcggAxsZYXwHUvRpfwjWo1eCUjJZKe4aT5gXSSdQ
-   UU9PWteWEKSBlAywq8x3V60YJOF1FLOAXOVoiJO6mXL45wcNqgCkyQXXC
-   L705Rt7WsdV/Jx4LjkpxyFK/j5HKYHZtcGkNcR5LfMbS79UtsRWnsDCQj
-   x7KVn5KMzOs3gMtht/S9VlcQm5OHYFUSkOpbJoadoND3nRxW5BxzVGJD8
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="435347618"
+  bh=ed1pa01NpylKbuGOAgxUxNyRjyMaR0ZklViikUWd0sw=;
+  b=Q30E9HkS6wxY2tCkRp7H3EM784PWtIzGG1ihyijHAphxstrcwBpctRt9
+   iH5+NQppR0aUncvb8SlcvxMqlRy6HX1XPgAa+JZbYNLZbe9PM3g1SgitA
+   e+wbDxy0BMiIeOI/TT28N91yG+lkzO4VMkc9Gao1asG5wsk4CyeOdVOn+
+   igEmMOGZJdxnR2FBuUTieAhPyX0EEL2wpfQ+9DJe7i+BPIrJPqUl1VJ6o
+   8Lyh21AO3E98vZCaZiIbpdpdDhHe20Uhm4d8WQoPfOF8wOg4LwqKXH26q
+   Ctsy3DUA0bOPyio7PnLSA8Rb1TeQSZdAi18svU9Sq/OdYXkzWwEmYEZ5u
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="435347627"
 X-IronPort-AV: E=Sophos;i="6.05,238,1701158400"; 
-   d="scan'208";a="435347618"
+   d="scan'208";a="435347627"
 Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 09:56:18 -0800
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 09:56:19 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,238,1701158400"; 
-   d="scan'208";a="137836"
+   d="scan'208";a="137839"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa010.jf.intel.com with ESMTP; 02 Feb 2024 09:56:18 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -60,19 +60,16 @@ To: davem@davemloft.net,
 	pabeni@redhat.com,
 	edumazet@google.com,
 	netdev@vger.kernel.org
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+Cc: Aniruddha Paul <aniruddha.paul@intel.com>,
 	anthony.l.nguyen@intel.com,
-	magnus.karlsson@intel.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	bpf@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jan Glaza <jan.glaza@intel.com>,
+	Jan Sokolowski <jan.sokolowski@intel.com>,
 	Simon Horman <horms@kernel.org>,
-	Chandan Kumar Rout <chandanx.rout@intel.com>
-Subject: [PATCH net-next 2/4] ice: make ice_vsi_cfg_txq() static
-Date: Fri,  2 Feb 2024 09:56:10 -0800
-Message-ID: <20240202175613.3470818-3-anthony.l.nguyen@intel.com>
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Subject: [PATCH net-next 3/4] ice: Add a new counter for Rx EIPE errors
+Date: Fri,  2 Feb 2024 09:56:11 -0800
+Message-ID: <20240202175613.3470818-4-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20240202175613.3470818-1-anthony.l.nguyen@intel.com>
 References: <20240202175613.3470818-1-anthony.l.nguyen@intel.com>
@@ -84,304 +81,77 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+From: Aniruddha Paul <aniruddha.paul@intel.com>
 
-Currently, XSK control path in ice driver calls directly
-ice_vsi_cfg_txq() whereas we have ice_vsi_cfg_single_txq() for that
-purpose. Use the latter from XSK side and make ice_vsi_cfg_txq() static.
+HW incorrectly reports EIPE errors on encapsulated packets
+with L2 padding inside inner packet. HW shows outer UDP/IPV4
+packet checksum errors as part of the EIPE flags of the
+Rx descriptor. These are reported only if checksum offload
+is enabled and L3/L4 parsed flag is valid in Rx descriptor.
 
-ice_vsi_cfg_txq() resides in ice_base.c and is rather big, so to reduce
-the code churn let us move the callers of it from ice_lib.c to
-ice_base.c.
+When that error is reported by HW, we don't act on it
+instead of incrementing main Rx errors statistic as it
+would normally happen.
 
-This change puts ice_qp_ena() on nice diet due to the checks and
-operations that ice_vsi_cfg_single_{r,t}xq() do internally.
+Add a new statistic to count these errors since we still want
+to print them.
 
-add/remove: 0/0 grow/shrink: 0/1 up/down: 0/-182 (-182)
-Function                                     old     new   delta
-ice_xsk_pool_setup                          2165    1983    -182
-Total: Before=472597, After=472415, chg -0.04%
-
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
+Signed-off-by: Aniruddha Paul <aniruddha.paul@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Jan Glaza <jan.glaza@intel.com>
+Signed-off-by: Jan Sokolowski <jan.sokolowski@intel.com>
 Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Chandan Kumar Rout <chandanx.rout@intel.com> (A Contingent Worker at Intel)
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_base.c | 76 ++++++++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_base.h |  7 ++-
- drivers/net/ethernet/intel/ice/ice_lib.c  | 73 ----------------------
- drivers/net/ethernet/intel/ice/ice_lib.h  |  6 --
- drivers/net/ethernet/intel/ice/ice_xsk.c  | 20 +-----
- 5 files changed, 82 insertions(+), 100 deletions(-)
+ drivers/net/ethernet/intel/ice/ice.h          | 1 +
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  | 1 +
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 8 ++++++--
+ 3 files changed, 8 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
-index f49cf6a26753..ad953208f582 100644
---- a/drivers/net/ethernet/intel/ice/ice_base.c
-+++ b/drivers/net/ethernet/intel/ice/ice_base.c
-@@ -884,7 +884,7 @@ void ice_vsi_free_q_vectors(struct ice_vsi *vsi)
-  * @ring: Tx ring to be configured
-  * @qg_buf: queue group buffer
-  */
--int
-+static int
- ice_vsi_cfg_txq(struct ice_vsi *vsi, struct ice_tx_ring *ring,
- 		struct ice_aqc_add_tx_qgrp *qg_buf)
- {
-@@ -955,6 +955,80 @@ ice_vsi_cfg_txq(struct ice_vsi *vsi, struct ice_tx_ring *ring,
- 	return 0;
- }
+diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+index 97c2a5fb5dbf..a4ba60e17d0b 100644
+--- a/drivers/net/ethernet/intel/ice/ice.h
++++ b/drivers/net/ethernet/intel/ice/ice.h
+@@ -605,6 +605,7 @@ struct ice_pf {
+ 	wait_queue_head_t reset_wait_queue;
  
-+int ice_vsi_cfg_single_txq(struct ice_vsi *vsi, struct ice_tx_ring **tx_rings,
-+			   u16 q_idx)
-+{
-+	DEFINE_FLEX(struct ice_aqc_add_tx_qgrp, qg_buf, txqs, 1);
-+
-+	if (q_idx >= vsi->alloc_txq || !tx_rings || !tx_rings[q_idx])
-+		return -EINVAL;
-+
-+	qg_buf->num_txqs = 1;
-+
-+	return ice_vsi_cfg_txq(vsi, tx_rings[q_idx], qg_buf);
-+}
-+
-+/**
-+ * ice_vsi_cfg_txqs - Configure the VSI for Tx
-+ * @vsi: the VSI being configured
-+ * @rings: Tx ring array to be configured
-+ * @count: number of Tx ring array elements
-+ *
-+ * Return 0 on success and a negative value on error
-+ * Configure the Tx VSI for operation.
-+ */
-+static int
-+ice_vsi_cfg_txqs(struct ice_vsi *vsi, struct ice_tx_ring **rings, u16 count)
-+{
-+	DEFINE_FLEX(struct ice_aqc_add_tx_qgrp, qg_buf, txqs, 1);
-+	int err = 0;
-+	u16 q_idx;
-+
-+	qg_buf->num_txqs = 1;
-+
-+	for (q_idx = 0; q_idx < count; q_idx++) {
-+		err = ice_vsi_cfg_txq(vsi, rings[q_idx], qg_buf);
-+		if (err)
-+			break;
+ 	u32 hw_csum_rx_error;
++	u32 hw_rx_eipe_error;
+ 	u32 oicr_err_reg;
+ 	struct msi_map oicr_irq;	/* Other interrupt cause MSIX vector */
+ 	struct msi_map ll_ts_irq;	/* LL_TS interrupt MSIX vector */
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index 55fcf17d503e..3cc364a4d682 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -129,6 +129,7 @@ static const struct ice_stats ice_gstrings_pf_stats[] = {
+ 	ICE_PF_STAT("rx_oversize.nic", stats.rx_oversize),
+ 	ICE_PF_STAT("rx_jabber.nic", stats.rx_jabber),
+ 	ICE_PF_STAT("rx_csum_bad.nic", hw_csum_rx_error),
++	ICE_PF_STAT("rx_eipe_error.nic", hw_rx_eipe_error),
+ 	ICE_PF_STAT("rx_dropped.nic", stats.eth.rx_discards),
+ 	ICE_PF_STAT("rx_crc_errors.nic", stats.crc_errors),
+ 	ICE_PF_STAT("illegal_bytes.nic", stats.illegal_bytes),
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+index 839e5da24ad5..f8f1d2bdc1be 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+@@ -143,8 +143,12 @@ ice_rx_csum(struct ice_rx_ring *ring, struct sk_buff *skb,
+ 	ipv6 = (decoded.outer_ip == ICE_RX_PTYPE_OUTER_IP) &&
+ 	       (decoded.outer_ip_ver == ICE_RX_PTYPE_OUTER_IPV6);
+ 
+-	if (ipv4 && (rx_status0 & (BIT(ICE_RX_FLEX_DESC_STATUS0_XSUM_IPE_S) |
+-				   BIT(ICE_RX_FLEX_DESC_STATUS0_XSUM_EIPE_S))))
++	if (ipv4 && (rx_status0 & (BIT(ICE_RX_FLEX_DESC_STATUS0_XSUM_EIPE_S)))) {
++		ring->vsi->back->hw_rx_eipe_error++;
++		return;
 +	}
 +
-+	return err;
-+}
-+
-+/**
-+ * ice_vsi_cfg_lan_txqs - Configure the VSI for Tx
-+ * @vsi: the VSI being configured
-+ *
-+ * Return 0 on success and a negative value on error
-+ * Configure the Tx VSI for operation.
-+ */
-+int ice_vsi_cfg_lan_txqs(struct ice_vsi *vsi)
-+{
-+	return ice_vsi_cfg_txqs(vsi, vsi->tx_rings, vsi->num_txq);
-+}
-+
-+/**
-+ * ice_vsi_cfg_xdp_txqs - Configure Tx queues dedicated for XDP in given VSI
-+ * @vsi: the VSI being configured
-+ *
-+ * Return 0 on success and a negative value on error
-+ * Configure the Tx queues dedicated for XDP in given VSI for operation.
-+ */
-+int ice_vsi_cfg_xdp_txqs(struct ice_vsi *vsi)
-+{
-+	int ret;
-+	int i;
-+
-+	ret = ice_vsi_cfg_txqs(vsi, vsi->xdp_rings, vsi->num_xdp_txq);
-+	if (ret)
-+		return ret;
-+
-+	ice_for_each_rxq(vsi, i)
-+		ice_tx_xsk_pool(vsi, i);
-+
-+	return 0;
-+}
-+
- /**
-  * ice_cfg_itr - configure the initial interrupt throttle values
-  * @hw: pointer to the HW structure
-diff --git a/drivers/net/ethernet/intel/ice/ice_base.h b/drivers/net/ethernet/intel/ice/ice_base.h
-index 85e607644560..b711bc921928 100644
---- a/drivers/net/ethernet/intel/ice/ice_base.h
-+++ b/drivers/net/ethernet/intel/ice/ice_base.h
-@@ -15,9 +15,10 @@ int ice_vsi_wait_one_rx_ring(struct ice_vsi *vsi, bool ena, u16 rxq_idx);
- int ice_vsi_alloc_q_vectors(struct ice_vsi *vsi);
- void ice_vsi_map_rings_to_vectors(struct ice_vsi *vsi);
- void ice_vsi_free_q_vectors(struct ice_vsi *vsi);
--int
--ice_vsi_cfg_txq(struct ice_vsi *vsi, struct ice_tx_ring *ring,
--		struct ice_aqc_add_tx_qgrp *qg_buf);
-+int ice_vsi_cfg_single_txq(struct ice_vsi *vsi, struct ice_tx_ring **tx_rings,
-+			   u16 q_idx);
-+int ice_vsi_cfg_lan_txqs(struct ice_vsi *vsi);
-+int ice_vsi_cfg_xdp_txqs(struct ice_vsi *vsi);
- void ice_cfg_itr(struct ice_hw *hw, struct ice_q_vector *q_vector);
- void
- ice_cfg_txq_interrupt(struct ice_vsi *vsi, u16 txq, u16 msix_idx, u16 itr_idx);
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
-index a2d3e5e9fed8..60e0d824195e 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-@@ -1774,79 +1774,6 @@ ice_write_qrxflxp_cntxt(struct ice_hw *hw, u16 pf_q, u32 rxdid, u32 prio,
- 	wr32(hw, QRXFLXP_CNTXT(pf_q), regval);
- }
++	if (ipv4 && (rx_status0 & (BIT(ICE_RX_FLEX_DESC_STATUS0_XSUM_IPE_S))))
+ 		goto checksum_fail;
  
--int ice_vsi_cfg_single_txq(struct ice_vsi *vsi, struct ice_tx_ring **tx_rings, u16 q_idx)
--{
--	DEFINE_FLEX(struct ice_aqc_add_tx_qgrp, qg_buf, txqs, 1);
--
--	if (q_idx >= vsi->alloc_txq || !tx_rings || !tx_rings[q_idx])
--		return -EINVAL;
--
--	qg_buf->num_txqs = 1;
--
--	return ice_vsi_cfg_txq(vsi, tx_rings[q_idx], qg_buf);
--}
--
--/**
-- * ice_vsi_cfg_txqs - Configure the VSI for Tx
-- * @vsi: the VSI being configured
-- * @rings: Tx ring array to be configured
-- * @count: number of Tx ring array elements
-- *
-- * Return 0 on success and a negative value on error
-- * Configure the Tx VSI for operation.
-- */
--static int
--ice_vsi_cfg_txqs(struct ice_vsi *vsi, struct ice_tx_ring **rings, u16 count)
--{
--	DEFINE_FLEX(struct ice_aqc_add_tx_qgrp, qg_buf, txqs, 1);
--	int err = 0;
--	u16 q_idx;
--
--	qg_buf->num_txqs = 1;
--
--	for (q_idx = 0; q_idx < count; q_idx++) {
--		err = ice_vsi_cfg_txq(vsi, rings[q_idx], qg_buf);
--		if (err)
--			break;
--	}
--
--	return err;
--}
--
--/**
-- * ice_vsi_cfg_lan_txqs - Configure the VSI for Tx
-- * @vsi: the VSI being configured
-- *
-- * Return 0 on success and a negative value on error
-- * Configure the Tx VSI for operation.
-- */
--int ice_vsi_cfg_lan_txqs(struct ice_vsi *vsi)
--{
--	return ice_vsi_cfg_txqs(vsi, vsi->tx_rings, vsi->num_txq);
--}
--
--/**
-- * ice_vsi_cfg_xdp_txqs - Configure Tx queues dedicated for XDP in given VSI
-- * @vsi: the VSI being configured
-- *
-- * Return 0 on success and a negative value on error
-- * Configure the Tx queues dedicated for XDP in given VSI for operation.
-- */
--int ice_vsi_cfg_xdp_txqs(struct ice_vsi *vsi)
--{
--	int ret;
--	int i;
--
--	ret = ice_vsi_cfg_txqs(vsi, vsi->xdp_rings, vsi->num_xdp_txq);
--	if (ret)
--		return ret;
--
--	ice_for_each_rxq(vsi, i)
--		ice_tx_xsk_pool(vsi, i);
--
--	return 0;
--}
--
- /**
-  * ice_intrl_usec_to_reg - convert interrupt rate limit to register value
-  * @intrl: interrupt rate limit in usecs
-diff --git a/drivers/net/ethernet/intel/ice/ice_lib.h b/drivers/net/ethernet/intel/ice/ice_lib.h
-index 6ffe4b0603bd..0c77d581416a 100644
---- a/drivers/net/ethernet/intel/ice/ice_lib.h
-+++ b/drivers/net/ethernet/intel/ice/ice_lib.h
-@@ -54,10 +54,6 @@ bool ice_pf_state_is_nominal(struct ice_pf *pf);
- 
- void ice_update_eth_stats(struct ice_vsi *vsi);
- 
--int ice_vsi_cfg_single_txq(struct ice_vsi *vsi, struct ice_tx_ring **tx_rings, u16 q_idx);
--
--int ice_vsi_cfg_lan_txqs(struct ice_vsi *vsi);
--
- void ice_vsi_cfg_msix(struct ice_vsi *vsi);
- 
- int ice_vsi_start_all_rx_rings(struct ice_vsi *vsi);
-@@ -68,8 +64,6 @@ int
- ice_vsi_stop_lan_tx_rings(struct ice_vsi *vsi, enum ice_disq_rst_src rst_src,
- 			  u16 rel_vmvf_num);
- 
--int ice_vsi_cfg_xdp_txqs(struct ice_vsi *vsi);
--
- int ice_vsi_stop_xdp_tx_rings(struct ice_vsi *vsi);
- 
- void ice_cfg_sw_lldp(struct ice_vsi *vsi, bool tx, bool create);
-diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
-index 617e4d14d46e..8a051420fa19 100644
---- a/drivers/net/ethernet/intel/ice/ice_xsk.c
-+++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
-@@ -217,32 +217,17 @@ static int ice_qp_dis(struct ice_vsi *vsi, u16 q_idx)
-  */
- static int ice_qp_ena(struct ice_vsi *vsi, u16 q_idx)
- {
--	DEFINE_FLEX(struct ice_aqc_add_tx_qgrp, qg_buf, txqs, 1);
--	u16 size = __struct_size(qg_buf);
- 	struct ice_q_vector *q_vector;
--	struct ice_tx_ring *tx_ring;
--	struct ice_rx_ring *rx_ring;
- 	int err;
- 
--	if (q_idx >= vsi->num_rxq || q_idx >= vsi->num_txq)
--		return -EINVAL;
--
--	qg_buf->num_txqs = 1;
--
--	tx_ring = vsi->tx_rings[q_idx];
--	rx_ring = vsi->rx_rings[q_idx];
--	q_vector = rx_ring->q_vector;
--
--	err = ice_vsi_cfg_txq(vsi, tx_ring, qg_buf);
-+	err = ice_vsi_cfg_single_txq(vsi, vsi->tx_rings, q_idx);
- 	if (err)
- 		return err;
- 
- 	if (ice_is_xdp_ena_vsi(vsi)) {
- 		struct ice_tx_ring *xdp_ring = vsi->xdp_rings[q_idx];
- 
--		memset(qg_buf, 0, size);
--		qg_buf->num_txqs = 1;
--		err = ice_vsi_cfg_txq(vsi, xdp_ring, qg_buf);
-+		err = ice_vsi_cfg_single_txq(vsi, vsi->xdp_rings, q_idx);
- 		if (err)
- 			return err;
- 		ice_set_ring_xdp(xdp_ring);
-@@ -253,6 +238,7 @@ static int ice_qp_ena(struct ice_vsi *vsi, u16 q_idx)
- 	if (err)
- 		return err;
- 
-+	q_vector = vsi->rx_rings[q_idx]->q_vector;
- 	ice_qvec_cfg_msix(vsi, q_vector);
- 
- 	err = ice_vsi_ctrl_one_rx_ring(vsi, true, q_idx, true);
+ 	if (ipv6 && (rx_status0 & (BIT(ICE_RX_FLEX_DESC_STATUS0_IPV6EXADD_S))))
 -- 
 2.41.0
 
