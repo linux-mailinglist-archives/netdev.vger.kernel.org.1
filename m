@@ -1,119 +1,106 @@
-Return-Path: <netdev+bounces-68659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CB318477D3
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:40:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 468AF8477EE
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:42:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F98C1C2661D
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:40:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 796C71C2401B
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:42:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94004154453;
-	Fri,  2 Feb 2024 18:39:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QYRvzNcd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5479780618;
+	Fri,  2 Feb 2024 18:39:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D3F15444D;
-	Fri,  2 Feb 2024 18:39:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E34315D5CD;
+	Fri,  2 Feb 2024 18:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706899176; cv=none; b=bMa89eyiEfdeqWbQZaqkOdjvQdisJBu9sgt29IZ7Ed+h7EQcibOF4pUXVnXaOGVCPQEoWXvBZ6nykpqEVjnfCTi0YQcTckhiuMac5gC7B78MiVE6m8m0/xjT4G245HPOKxNJOvnzPoqmHonJU1QJCbbjhn56u8BhkhLs9l6P5XY=
+	t=1706899184; cv=none; b=r/yNrOBKJD2sFEapMgyEFH0whbZMTxeBqwFEENgYTso/h+N3jWSa/mlaBXyd6CRaEV9igWN5CXjkAGV29Ho9Ev5pRRHNTcH4HibKkRE5FxAb/NBPW2ygeIDPwLoawcLLIwfcXpaGafzfE9i4zNHR4BcgpwuqRcN9OFMGGBmw8AA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706899176; c=relaxed/simple;
-	bh=N+iMXqBMlZrQ+J+4xgN6PKCTFmhrm6XrOnA1jsh8+Ps=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WYDiMM7EAagmy0tbjsRmUgocUofosWo7M3GKGmv0LjMJM3FUGWrX5zx4EFhdUv7lzQGivk009nSqhKBoLjNkgTbL5VCLlOUXA/mlKEoKhWWSVbCjARBOw+9P9QHEKMTuO9Z36L1StBnSUn6xTvfXxJq/eEP4asLS/JXT1PJxaRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QYRvzNcd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7CBAC43390;
-	Fri,  2 Feb 2024 18:39:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706899175;
-	bh=N+iMXqBMlZrQ+J+4xgN6PKCTFmhrm6XrOnA1jsh8+Ps=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=QYRvzNcdr8hc30kvL/TpCjshNW84mUGmJpkYjLxxswUiovN0VS6nwmeSL4nnHB42d
-	 ERNLZMtHwzNByg5IPwTajGRZ5Yqd/gvsiXNirsMQFiEEZHr3DVD2ar5oKuAdpxWmd8
-	 gvzLQ5X7HePL1Oki23rvnGXL29+HnhdqQHoxKDuhyQ5pUZK4KjPjK0wWb+XtqaL2yk
-	 5IkcAuwwRF4/hapUTS6FXXvPQY9NhOdd3kqWiOj0wUNKomBSW483H+MTc5i9JBRxAI
-	 sNhPJQ07ebA/kH/6PYeHsyFIYreMi4IeeTFVqUmdJPc7zbNVXDyBrTaT6T/uWafaUV
-	 tSMHmS8zb4ljg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Jiri Pirko <jiri@nvidia.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Sasha Levin <sashal@kernel.org>,
-	vadim.fedorenko@linux.dev,
-	jiri@resnulli.us,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.7 05/23] dpll: fix broken error path in dpll_pin_alloc(..)
-Date: Fri,  2 Feb 2024 13:39:01 -0500
-Message-ID: <20240202183926.540467-5-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240202183926.540467-1-sashal@kernel.org>
-References: <20240202183926.540467-1-sashal@kernel.org>
+	s=arc-20240116; t=1706899184; c=relaxed/simple;
+	bh=9f6vU82EFNxs5qQJiBXinPYuAuGon2VB1Gw/+HpYECs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YVcwJP4K2fx0qHAJk58OBfaPEp/i8P8ggqb3YA8siPC8BhCjwHKVvMJJvbQDnHiIBEPFo4cCdjw9KUlTEGdvUmJIoNJ3K5j55YOG6SemSjjEfTNFEtLlo73cOJBnUKr3/QM2e2YcstBGHf5A5eL8FpOfYUivPgDqmmuJoM9iSCI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1rVyRe-0002Ew-3A;
+	Fri, 02 Feb 2024 18:39:23 +0000
+Date: Fri, 2 Feb 2024 18:39:18 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v3 4/7] net: dsa: mt7530: move XTAL check to
+ mt7530_setup()
+Message-ID: <Zb021ozEQSbU-gPd@makrotopia.org>
+References: <20240202-for-netnext-mt7530-improvements-2-v3-0-63d5adae99ca@arinc9.com>
+ <20240202-for-netnext-mt7530-improvements-2-v3-4-63d5adae99ca@arinc9.com>
+ <ZbzWpmZrukknMsYf@shell.armlinux.org.uk>
+ <5b744f7f-2f63-4219-a0e9-8f08267b1fdd@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.7.3
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <5b744f7f-2f63-4219-a0e9-8f08267b1fdd@arinc9.com>
 
-From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+On Fri, Feb 02, 2024 at 09:16:02PM +0300, Arınç ÜNAL wrote:
+> On 2.02.2024 14:48, Russell King (Oracle) wrote:
+> > On Fri, Feb 02, 2024 at 12:19:10PM +0300, Arınç ÜNAL via B4 Relay wrote:
+> > > From: Arınç ÜNAL <arinc.unal@arinc9.com>
+> > > 
+> > > The crystal frequency concerns the switch core. The frequency should be
+> > > checked when the switch is being set up so the driver can reject the
+> > > unsupported hardware earlier and without requiring port 6 to be used.
+> > > 
+> > > Move it to mt7530_setup(). Drop the unnecessary function printing.
+> > > 
+> > > Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> > > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> > > Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+> > 
+> > I would prefer this to be earlier in the series, before patch 2 which
+> > moves mt7530_setup_port6() to be called from mac_config(). mac_config()
+> > is supposed to be configuration error-free - in other words, all state
+> > should have been checked before hand.
+> 
+> I agree but mt7530_mac_config() is not a void function yet. The
+> mac_port_config member of the mt753x_info structure points to this
+> function. My next patch series gets rid of all useless error returns on the
+> phylink path and change mac_port_config to void. So I don't think working
+> on this patch series further will worth the effort. I'd rather have this
+> version applied as is.
 
-[ Upstream commit b6a11a7fc4d6337f7ea720b9287d1b9749c4eae0 ]
-
-If pin type is not expected, or pin properities failed to allocate
-memory, the unwind error path shall not destroy pin's xarrays, which
-were not yet initialized.
-Add new goto label and use it to fix broken error path.
-
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/dpll/dpll_core.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/dpll/dpll_core.c b/drivers/dpll/dpll_core.c
-index 3568149b9562..36f5c0eaf604 100644
---- a/drivers/dpll/dpll_core.c
-+++ b/drivers/dpll/dpll_core.c
-@@ -440,7 +440,7 @@ dpll_pin_alloc(u64 clock_id, u32 pin_idx, struct module *module,
- 	if (WARN_ON(prop->type < DPLL_PIN_TYPE_MUX ||
- 		    prop->type > DPLL_PIN_TYPE_MAX)) {
- 		ret = -EINVAL;
--		goto err;
-+		goto err_pin_prop;
- 	}
- 	pin->prop = prop;
- 	refcount_set(&pin->refcount, 1);
-@@ -448,11 +448,12 @@ dpll_pin_alloc(u64 clock_id, u32 pin_idx, struct module *module,
- 	xa_init_flags(&pin->parent_refs, XA_FLAGS_ALLOC);
- 	ret = xa_alloc(&dpll_pin_xa, &pin->id, pin, xa_limit_16b, GFP_KERNEL);
- 	if (ret)
--		goto err;
-+		goto err_xa_alloc;
- 	return pin;
--err:
-+err_xa_alloc:
- 	xa_destroy(&pin->dpll_refs);
- 	xa_destroy(&pin->parent_refs);
-+err_pin_prop:
- 	kfree(pin);
- 	return ERR_PTR(ret);
- }
--- 
-2.43.0
-
+I agree regarding not changing the patch itself, but I also agree
+with Russell regarding the patch ordering. I know it's a 10-minute
+git headache to rebase the patches on top of each other in a different
+order, but you can easily compare the end result being identical to
+what you had before and hence don't need to retest.
 
