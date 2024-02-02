@@ -1,130 +1,82 @@
-Return-Path: <netdev+bounces-68577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8239984746D
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:15:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D44D184746F
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:15:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20FE81F2F2B9
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:15:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 886A51F2F187
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:15:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E67D14690E;
-	Fri,  2 Feb 2024 16:14:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AE7D145B13;
+	Fri,  2 Feb 2024 16:15:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ew+4bmOU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jT10U7PS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3082146916
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 16:14:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0755114198F
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 16:15:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706890457; cv=none; b=ZsANDoMihCQuW/Fpk/9K4uDcxxY/ZEPf4pHjg/xknebX2Yu/f+0BQ+nE4FFa89Zt7wyqQC37DkVaINMeTa17ILFx9TVU21CBTZOLh0SpsYHK+tP72ecBbGnLFGmeqjakgsuIAlcnO5xkXRLPXtDgLhFJWnaewP9QFNp++qqcY4k=
+	t=1706890513; cv=none; b=gWuE867WP7gR8a6aHcQiC8sOZNtTteBI2cyvLIPWmTFt+Fo1SJ4Oyi4CNb6eGqIuahy8rqjdi+K5p7KZTzw34zvvpxFyFcyzpVJQ+WAeXVOgAe9iR8tWYv2h2DWMiHN3xc4vtU+SjElWGbpRyV02JPuLCMkpEwcqTtPv0oPjvSg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706890457; c=relaxed/simple;
-	bh=Ri3/hQOGxa7fvdX6zXfOFaMYOWypSsO0kQTSZQ0812I=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nCVq5Pz+d0uH1kwsZGd3Rdnp7e2TVcU5SsOEzB1ihr3bjeX53exgWZPnO3xBRLWJXQKK3B4Nudo7y6eKUfOkL8+UP9vnEepAI+Fa5s18p47mCFByTmPmRhpC/QzQXTKHY46sLzBg4rnRHJonm8aJvVRH67iQz7+hoVS/9mQb6ZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ew+4bmOU; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-55fff7a874fso7979a12.1
-        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 08:14:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706890454; x=1707495254; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y6KbT4kBuivO+GxSvi+LQfZT8tk8UxIY20bJMtmOgR8=;
-        b=Ew+4bmOU0+dtkH6cavqekcnL5mcUzN1QIhwR9IAlwk55q2CHxzSL6gOjv5nh66uHmc
-         ZQ+/8wqs03GqR+M7oD3PZNrhrLsYOOJjkt+QLmf4dNimEVTFtYI0Am/dRa5Y6rGrQ9KS
-         1R4soacIaWpiVk+AG4W3fX4YoK7Pc/Snd0puHKE4W878PF6mFz+gBUqz5gu5r8X0JhRY
-         +5Y5GJV/0bqu/JGmgqSNPfuYXAQcyqWyoq9uPqPUOX9y1xpbMpkagIbCYTtu3+J+VXzb
-         X1PJQC72DW+OGAJeCHV+b5RZXx2/vvbIhu4V3Rz9ZcYesaQBXJ9nWzv8Wr4jaAx0n3Z3
-         vjjQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706890454; x=1707495254;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y6KbT4kBuivO+GxSvi+LQfZT8tk8UxIY20bJMtmOgR8=;
-        b=fy8zm3o98UvpCCOE5W8bre3RsqVNgcAtAEbsRxO+fD5b+fAu/M2y5ibR3xCyd8NZzu
-         SAOSU59aUkUSdrUyeTLNjAhcyUULnJSINbPMpnLYbOrJRGY0ivEVwqkfhekkECot03M6
-         Rlk0hCZsaHbh9ohaALtq1B2buFwNISQBSQrpcBpq2h6H6uUW+NZQvRDhBTo9+DHCXqLE
-         4X6dXReeOIHHwlSU+AZaUjrFE7t7PU1y+wypNYoLPMlLYi1U9QS/LT6oySx/DHUkLGOZ
-         RkBHxAbM9Hv1tl4WxNycXNiTo1O9TfwuVoLY88eLAP5bUAtl8yD0BfBTH9PFlv879STa
-         f84A==
-X-Gm-Message-State: AOJu0YyIt4WzO0aFREqegDq8+P8CEhsyCnzAMkVt3bNxCmHXQTeT1Edn
-	4llamBxroSaI4P/VtcLvixgt/S4AfNURXQZCxDt/DFVnSHU/hG7tfB4p2GmSNabt9/SnT7B3a2b
-	Jn21qWSf6wsEeEFVh3/q3pn8u/NxsVEddpXDN
-X-Google-Smtp-Source: AGHT+IGoWJsfhic7qRq3Vkd/uQY7ncJaEl4oQRFpZ6VVQ+6xH8r5zNwrHxEHwrY4VVtCqnRYr0wWw05OQfRx3tGtzzg=
-X-Received: by 2002:a50:ccda:0:b0:55f:98d7:877c with SMTP id
- b26-20020a50ccda000000b0055f98d7877cmr30140edj.5.1706890452766; Fri, 02 Feb
- 2024 08:14:12 -0800 (PST)
+	s=arc-20240116; t=1706890513; c=relaxed/simple;
+	bh=bXhDZcD0YYOvVaCv5v5BI2OisTBd/lQs5mOu6uLdWRE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=tDUsutQ1FxPaAokxatlOLqWf1Bz68VY/1QgS0iaYzN3GxzUb0tbZyRAMUGhCOovekn1vV6LdtTQOxtisJUl5GmJ2eYP9u/mchtR7ScRl0QvxQePX/ADW56Dk+GQsUFPVLAvG0fXSTWZakhHoJb0TSfrA4RPwGB9e68ZFw+dxgUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jT10U7PS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E2F6C433C7;
+	Fri,  2 Feb 2024 16:15:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706890512;
+	bh=bXhDZcD0YYOvVaCv5v5BI2OisTBd/lQs5mOu6uLdWRE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jT10U7PSiKq+sZ72cwPOLQe7cEU4dWH2m8i+KvkNhTBQuqgG6hdrd117Fdci5tuQX
+	 jn2umvYUQiVCt3xtre6pNdmhe2Tt/pwnHd7z6hGF7aL5eb4hWgfDao57QDyc1Al+S8
+	 R8E0za4ea0Lfj9SitBwU+K796XIH8Mk0kgSiZvj41YAvw8GAkp8rs1drCDTi9weiql
+	 2DdwNUwc9xXixa4kZ28bd4lcR55iDythiD/igXx+4CivSeyEcwKshR2oeA6H55ieaM
+	 /yMcTQMgSc1luLRQA7D8qKoQqPSLYUE5Myzs3R5MtheY80fNqnDDStOpFM+h4hbd61
+	 u/MpwH46edxiA==
+Date: Fri, 2 Feb 2024 08:15:11 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Realtek linux nic maintainers
+ <nic_swsd@realtek.com>, David Miller <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH RESUBMIT net-next] r8169: simplify EEE handling
+Message-ID: <20240202081511.3d4374f4@kernel.org>
+In-Reply-To: <7122d90b-cdfe-4733-bfad-45ce63f75536@gmail.com>
+References: <27c336a8-ea47-483d-815b-02c45ae41da2@gmail.com>
+	<d5d18109-e882-43cd-b0e5-a91ffffa7fed@lunn.ch>
+	<be436811-af21-4c8e-9298-69706e6895df@gmail.com>
+	<219c3309-e676-48e0-9a24-e03332b7b7b4@lunn.ch>
+	<7122d90b-cdfe-4733-bfad-45ce63f75536@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <f011968fee563eeaaa82bf94e760e9f612eee356.1706889875.git.pabeni@redhat.com>
-In-Reply-To: <f011968fee563eeaaa82bf94e760e9f612eee356.1706889875.git.pabeni@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 2 Feb 2024 17:13:59 +0100
-Message-ID: <CANn89iJ8b-vXhH0Rc5isVTaxgSQ871mud+ttQnLOLtuCu14UXg@mail.gmail.com>
-Subject: Re: [PATCH net] selftests: net: let big_tcp test cope with slow env
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>, Xin Long <lucien.xin@gmail.com>, 
-	linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 2, 2024 at 5:07=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> In very slow environments, most big TCP cases including
-> segmentation and reassembly of big TCP packets have a good
-> chance to fail: by default the TCP client uses write size
-> well below 64K. If the host is low enough autocorking is
-> unable to build real big TCP packets.
->
-> Address the issue using much larger write operations.
->
-> Note that is hard to observe the issue without an extremely
-> slow and/or overloaded environment; reduce the TCP transfer
-> time to allow for much easier/faster reproducibility.
->
-> Fixes: 6bb382bcf742 ("selftests: add a selftest for big tcp")
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
->  tools/testing/selftests/net/big_tcp.sh | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
->
-> diff --git a/tools/testing/selftests/net/big_tcp.sh b/tools/testing/selft=
-ests/net/big_tcp.sh
-> index cde9a91c4797..2db9d15cd45f 100755
-> --- a/tools/testing/selftests/net/big_tcp.sh
-> +++ b/tools/testing/selftests/net/big_tcp.sh
-> @@ -122,7 +122,9 @@ do_netperf() {
->         local netns=3D$1
->
->         [ "$NF" =3D "6" ] && serip=3D$SERVER_IP6
-> -       ip net exec $netns netperf -$NF -t TCP_STREAM -H $serip 2>&1 >/de=
-v/null
-> +
-> +       # use large write to be sure to generate big tcp packets
-> +       ip net exec $netns netperf -$NF -t TCP_STREAM -l 1 -H $serip -- -=
-m 262144 2>&1 >/dev/null
->  }
+On Fri, 2 Feb 2024 17:06:10 +0100 Heiner Kallweit wrote:
+> >> Alternative would be to change phy_advertise_supported(), but this may
+> >> impact systems with PHY's with EEE flaws.  
+> > 
+> > If i remember correctly, there was some worry enabling EEE by default
+> > could upset some low latency use cases, PTP accuracy etc. So lets
+> > leave it as it is. Maybe a helper would be useful
+> > phy_advertise_eee_all() with a comment about why it could be used.
+> >   
+> Yes, I think that's the way to go.
+> To minimize efforts I'd like to keep this patch here as it is, then I'll
+> add the helper and change this place in r8169 to use the new helper.
 
-Interesting.
-
-I think we set tcp_wmem[1] to 262144 in our hosts. I think netperf
-default depends on tcp_wmem[1]
-
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Sorry for being slow - on top or as v2? :)
 
