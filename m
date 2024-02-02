@@ -1,101 +1,80 @@
-Return-Path: <netdev+bounces-68654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03F1184777A
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:30:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 332FC84777F
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:32:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57DBBB25841
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:30:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65B971C24C9E
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 18:32:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3672D14E2F9;
-	Fri,  2 Feb 2024 18:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE80B14E2C1;
+	Fri,  2 Feb 2024 18:32:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dh/lLRrp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qbr10d3m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7277D26ADB;
-	Fri,  2 Feb 2024 18:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE3114D443;
+	Fri,  2 Feb 2024 18:32:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706898636; cv=none; b=d98NZcNAygJAf1/TGHUUzN2iubzWDbUfxuMwb/r82WzZK+ZAIp6Hl/smIDU4W0m9GmOr8RO8Qzi3OxV0rvOmjLukvrBzIAhWcfd4zaqILEdELLUESTxXlRfI7hIxW3sr0Qjocvq8bV6/yJtp/NWwyy4yhBeZ2iC8UjFOJIdUpx4=
+	t=1706898761; cv=none; b=ZbToZplM9PofaUuZEzS2ahLsiSbHvDY3cqhjEnqQnmUsgtvd/kTjb0cYes4XfsTSs7b++iw9IZZXePX6DRGTbnh4R6TzV5BT179hfrcG2htjx++kyWzg/PQz7itasC/T0rJCxiTdUw5fm0O55SESsnt3Ag19U5fCUEuRZZ0XaZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706898636; c=relaxed/simple;
-	bh=7+ZNXe8RQ6WizeFSYfqEWIhFGaKx/uASmD7TBJc1N1U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ryo5gu+f82JMt9kihvx51GXpMods9b5WnHlYd0mINP9gJGkUqE2RnoHXGbXmBNffl/umyn4+7OXZhQ4Mow94hx7JWRE1ydch+O6gPGscral1DosuZT6fJX/WiFb7Zmjikl8QIXzGlI33hk2oHFkBRoAoGPPRmtGopbv6zacL0wE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dh/lLRrp; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2d07d74be60so21146531fa.3;
-        Fri, 02 Feb 2024 10:30:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706898632; x=1707503432; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7+ZNXe8RQ6WizeFSYfqEWIhFGaKx/uASmD7TBJc1N1U=;
-        b=Dh/lLRrpUN0q6k8yNu0J0kyB6oupbsBan23vE+VjwBPsqs75dtQ53+3N+rQb5eg+fr
-         2JKU6EsBUBWCQw/inxUmdukkXj+QAehOQp/p//6GzbLK0gUfh+ZMN/d7zvST5XHCIpK5
-         md8YE+/pO8sUHQfzxSPX4eq37IQxREEdSpcTpEgCELadQQDIs/yfAB2H68eZG+wG9oQ6
-         Akd/ysEgdyHrXf2L7p3aWxOjfeA65KtdlrkD0LSqco39s0HXR4gnuOMbl3l+74ezU8kn
-         Zu7Q3nwTt4pALcG8XTXw2hKillRXrK9rKGMy0xkfil0QDEHZBWeMzSi8awI1YwCJd8ad
-         bq7A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706898632; x=1707503432;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7+ZNXe8RQ6WizeFSYfqEWIhFGaKx/uASmD7TBJc1N1U=;
-        b=X8DVMzofIoEdGqbPBGAplrvUA1CZJYlt50xv9m02kW9LA9barINRRafpGZJ5B12eGe
-         YjNgQB8bZKm6kXcrIouPaPm8LZp3bcvGi4qFD+CsR2682vECpmzGgqJ7lCthQ0izfS5p
-         Y9eyeC0REKZZP7zv0AqBAQZsQZrNFsQpSg1uqQpHPGe7js43c22IMmqhhe08wg4VD9A8
-         DXGzHFQUWDJodIfB3kdbwuHKj/LqHEFpBaRMR6T65zIjXYQqjxuGXswEvLQDzSS3laRS
-         +SE0AguBkHwRFhN7DdnD5tg5zxGFNO5ucEvVkesP1C726jL5kA3NpLiuLWJ3E7Tvc+Ej
-         MbJQ==
-X-Gm-Message-State: AOJu0YyG+bl1jOOwhB6rtMW+FMaOo0T6JWW9Rk2+3VyXBbhiwaxiKvjt
-	QqM7xWSWzjeXcEIA6PsL9RmxYz5JWfjQFZ+dMteiG8GhTlGdl0LE
-X-Google-Smtp-Source: AGHT+IG7ezzuPRxz5SVex2fFfr2/a66lZzV0Rrx/3HqeYAfchXqybAbCKp6y4o59FQqdgN7NyQnVVA==
-X-Received: by 2002:a05:651c:220f:b0:2d0:97e9:99c with SMTP id y15-20020a05651c220f00b002d097e9099cmr205872ljq.19.1706898632403;
-        Fri, 02 Feb 2024 10:30:32 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCU4ZOzHlOWJQAWr1fWkzCjy59iCNCMAl7Ra78JQSvdffgM6v+DxCAQMDzmV/gZeP1Kyvsaan1JbZc7bWaxkLVEAt0Id0EkOV2pvGgpIux9l1/Pb/O9Hh3pDoo0mMoR7I570cRKvQthAjkSd5AgRiIApdFwYWax+s+RXuCHKpYEV78wGbzHG1rDtqNCXiEDAa/ef4tLWIgumBjaNTzFWHLWZ8PwSBBdnQs6y1p+Bpw/1DdfKwCmqMBlFTHobyrDpDHgiB+WpWIMYCfUPqZFDCgEmqH8BMOwYucL1j6s8GkzVuKk=
-Received: from debian ([93.184.186.109])
-        by smtp.gmail.com with ESMTPSA id eo15-20020a056402530f00b0055eeb5f0efcsm1027391edb.58.2024.02.02.10.30.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Feb 2024 10:30:31 -0800 (PST)
-Date: Fri, 2 Feb 2024 19:30:29 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 net-next 00/13] net: phy: marvell-88q2xxx: add driver
- for the Marvell 88Q2220 PHY
-Message-ID: <20240202183029.GA16692@debian>
-References: <20240122212848.3645785-1-dima.fedrau@gmail.com>
- <20240129180959.582dbc88@kernel.org>
+	s=arc-20240116; t=1706898761; c=relaxed/simple;
+	bh=LXnUA9uLDfsc51JXxSgjMp6dsTQZv+8fYhk4eTTjY8M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WKaiUj4tnDm65a0ZMFjHY90iDG7kghCgQehWXctXRW44DShwRadtTwRuVFc73aBmse7Y8R6EiP5qhDkhT7k2U41GcvrSTTcHjMHykioEsD2G2AunzWLIyfT7M0gbGZp8SYWINldtdyzS07Qy8tBSgRMSqZWKqr7j13dsRRRsXHE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qbr10d3m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4321C433C7;
+	Fri,  2 Feb 2024 18:32:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706898761;
+	bh=LXnUA9uLDfsc51JXxSgjMp6dsTQZv+8fYhk4eTTjY8M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qbr10d3mY2jGaUrsflP5eunrMqgkEefU3XzrTPLE6FaUw3DSk75plfuPm4qnvPkjJ
+	 ogZ7YvZaoOkrrI+zsMpfNLazFVwAyAPWzHdq6yEblCy3Yt8IG0WjYFBBZKryCO0Iuv
+	 yNWqlZ5KRaxmuOkGTjDPQVaTaVzRsdLIyia3TIOpVr3l+hWrgSaYgaeO+do6kncBHf
+	 CDVRL0jQ/uxlnZ6vey5fQPvYgaQoGdoXmuRW89I0e4l4wNw+PCeM5p6Y8vdt2V9evu
+	 l/Cg+zSm8gdRzq2j1Wu481ixBqDQ7G7mc+Q+/S7ThcNKf98TkEcmSe+6mpeMjUiglx
+	 QoZkCcgzLBF3g==
+Date: Fri, 2 Feb 2024 10:32:39 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tobias Waldekranz <tobias@waldekranz.com>
+Cc: davem@davemloft.net, jiri@resnulli.us, ivecera@redhat.com,
+ netdev@vger.kernel.org, roopa@nvidia.com, razor@blackwall.org,
+ bridge@lists.linux.dev, rostedt@goodmis.org, mhiramat@kernel.org,
+ linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 0/5] net: switchdev: Tracepoints
+Message-ID: <20240202103239.05f224c1@kernel.org>
+In-Reply-To: <8734ubtjqa.fsf@waldekranz.com>
+References: <20240130201937.1897766-1-tobias@waldekranz.com>
+	<20240201204459.60fea698@kernel.org>
+	<8734ubtjqa.fsf@waldekranz.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240129180959.582dbc88@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-[...]
+On Fri, 02 Feb 2024 08:21:01 +0100 Tobias Waldekranz wrote:
+> My idea now is to get the fix accepted, wait for the next merge of net
+> back to net-next, then fixup this series so that it does not reintroduce
+> the MDB sync issue. I already have a version of the fix that applies on
+> top of this series, so I'll just work it in to the switchdev refactor
+> steps in the next version.
+> 
+> Is there a better way to go about this?
 
-Probably late, but there are parts of the code which are based on the
-sample code provided by Marvell. The sample code is licensed under BSD
-2 Clause. Should I change the license in the driver to dual license ?
-
-Best regards,
-Dimitri
+No no, that's perfect! This set was still active in patchwork
+yesterday, tho, so we could have applied it by mistake..
+If you realize there's a conflict it's worth sending a comment 
+to the already-posted net-next series notifying maintainers of
+the situation.
 
