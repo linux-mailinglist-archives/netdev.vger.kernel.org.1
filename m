@@ -1,46 +1,49 @@
-Return-Path: <netdev+bounces-68411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33F75846D56
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:07:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF6CF846D63
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:10:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E7E64B226AC
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 10:06:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F0231C21A56
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 10:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAFDF77652;
-	Fri,  2 Feb 2024 10:06:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0B4E78B6B;
+	Fri,  2 Feb 2024 10:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Dzo8R8xe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="StfPeYjR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A6013FE2;
-	Fri,  2 Feb 2024 10:06:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D40077652;
+	Fri,  2 Feb 2024 10:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706868363; cv=none; b=NqiQUH4tRM1ekFo/YfQ5dzBRmExw1RwDDA8PAuUx+WikF4+BW9ffsOVEcAXkkcoYIdj0Awq36MtIKM6wP3dAHnBaL1U7uSGYv7GJu/y+ljumLMHCPeHGV8JWrmmgGLBbSI9DVHrxP4afPltO9QRp0DiGHjV5RjGLVToTPxFO7K8=
+	t=1706868628; cv=none; b=VYvKfu6WXUlHMjjICOSd5/A0W1ghhGKK3w15uVSkz7DzILzYOg/A9rqOj/DeCmvcfKxVH3wiQmJauGov+vKT/kLEbJyDuhWbBisRPynExexKQNXoz44RAUaADOHk4ZQJcDsyVhRD61gy0Kx9Gd+7AsJfmdFmS50N4QDIZxCA3Dw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706868363; c=relaxed/simple;
-	bh=uTfOPhF7lGGU9a7RPw0FBYAE8vU05wC8egd2y8enBZM=;
-	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
-	 To:Date:Message-ID; b=D8LYDyVNIpmLpWi2PbYllrfhiw+dzrdwRdpSb5OIhmhLRVg0PZrCQEzDB5sRvMPe894yISIiYyZj0FgbM7e29OXwtcEyndolye/PElfqJ4va9sQDbObguAFJYdzZbuvACuK4zauB2GdnhjTHy6g1SoGC2dy18SJ0eeMG2QBH0Vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Dzo8R8xe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D272C433C7;
-	Fri,  2 Feb 2024 10:06:02 +0000 (UTC)
+	s=arc-20240116; t=1706868628; c=relaxed/simple;
+	bh=/u55Rx+IiTBdg/DacgDPZdGpm9UlGyfFcxW+Iw8dSsQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=u0VpnWIMoVb1X65YMVDrUXY5xhTzWoN7CkTko8DTJMib4P90D9UYAkhiJyh9jkoWp+TVl4o5DlXu8KTtZlkkneP7WLrvqAtIRvZLYmHYDd9wXEcVkS4sKgbTHT7gjJDKDMr5V0tVwcOR1hdCnheZ+18M+vzq7bjlJlD1zPMMRw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=StfPeYjR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D5364C433C7;
+	Fri,  2 Feb 2024 10:10:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706868363;
-	bh=uTfOPhF7lGGU9a7RPw0FBYAE8vU05wC8egd2y8enBZM=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=Dzo8R8xeVWazqmpA+8BHjGKyvFBT8CZho4MztMK+7zLhCg26U59z+N1CDX7z6NZre
-	 k/b3y5lz6mu6dORw1F+aAlPhC0ufiIiCJ0i5VHA+4a8vR4K04+ebpkC0Vvm9ZOfUwv
-	 dP0Bo4QVQ+rMN1STKB4dRWrqUKOu8dAwZQc2TFgKNj2MKThWjTfIVIvOUXrDb13Ieg
-	 bGT2og5yu/gm/8KJ0gN8qs/MvNx0JTQKluU9l1wU4IbpCIsuyzwASPMi8Wj39+wOsq
-	 BUNUZdcl/vN9W5r9YWjRRmSsSKfLNoTUddmM4LRubkm7HrsKG7WImAJLVj9gzh7h10
-	 kwdX2KoTHRz1w==
+	s=k20201202; t=1706868627;
+	bh=/u55Rx+IiTBdg/DacgDPZdGpm9UlGyfFcxW+Iw8dSsQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=StfPeYjRBqYjb120rx6pvww20hdGJ6GoZniIp7gLR0uSFsVufmorTJBKVZmTGPete
+	 Q27wbZ0dY0QN5k2BE0noMJxZAEnlfdtJuemGMVXcknA1x0frc7zxzsfv6AonWpGy+5
+	 p0w5zubveGe427y8RyIUlSXu/enWOxlK1tfwh8AeMJr8M+L0viXiuFTJ2aTPd1hExr
+	 CNgVzUzxh7uokaQT+EPHDDvnLOsXgxfuBHHuMVd6WmcLXx+lSg5jX9h0sQfv5tT603
+	 M3lTXQP7OdjMDfujfaFcT2pVnQxw8a5jFBZVNAiSCqTvoLBOvt0NusOAn9OjGxAyDk
+	 M4GDHrvxtPdlg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B7B18D8C970;
+	Fri,  2 Feb 2024 10:10:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -48,38 +51,50 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <65bbd2ce.050a0220.5ff09.69d5@mx.google.com>
-References: <20240201151747.7524-1-ansuelsmth@gmail.com> <20240201151747.7524-3-ansuelsmth@gmail.com> <170680473689.4979.1991415008659281513@kwain> <65bbd2ce.050a0220.5ff09.69d5@mx.google.com>
-Subject: Re: [net-next PATCH v5 2/9] net: phy: add support for scanning PHY in PHY packages nodes
-From: Antoine Tenart <atenart@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Bjorn Andersson <andersson@kernel.org>, Conor Dooley <conor+dt@kernel.org>, David S. Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Frank Rowand <frowand.list@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Robert Marko <robert.marko@sartura.hr>, Russell King <linux@armlinux.org.uk>, devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next PATCH v3 0/2] net: mdio-ipq4019: fix wrong default MDC rate
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170686862773.17682.10435156329986246682.git-patchwork-notify@kernel.org>
+Date: Fri, 02 Feb 2024 10:10:27 +0000
+References: <20240131022606.1532-1-ansuelsmth@gmail.com>
+In-Reply-To: <20240131022606.1532-1-ansuelsmth@gmail.com>
 To: Christian Marangi <ansuelsmth@gmail.com>
-Date: Fri, 02 Feb 2024 11:05:59 +0100
-Message-ID: <170686835980.5216.5174621768810456847@kwain>
+Cc: agross@kernel.org, andersson@kernel.org, konrad.dybcio@linaro.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ robert.marko@sartura.hr, linux-arm-msm@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-Quoting Christian Marangi (2024-02-01 18:20:10)
-> On Thu, Feb 01, 2024 at 05:25:36PM +0100, Antoine Tenart wrote:
-> > Quoting Christian Marangi (2024-02-01 16:17:28)
-> > > +
-> > > +                       rc =3D __of_mdiobus_parse_phys(mdio, child, a=
-ddr, scanphys);
-> >=20
-> > You might want to save passing scanphys down, PHYs w/o a reg property in
-> > a PHY package won't be "auto scanned" later.
->=20
-> I might be confused by this, but isn't this already done? (passing
-> scanphys in each recursive call so we can set it to true if needed?)
->=20
-> Also I think the scanphys should be skipped for the PHY package
-> (assuming we make reg mandatory, it would be an error condition and
-> should not be handled?)
+Hello:
 
-Sorry if that wasn't clear, this is what I meant. scanphys doesn't need
-to be set to true in a PHY package (both if we want reg to be mandatory
-there and because my understanding of the auto-scan code is PHYs in a
-PHY package won't be auto scanned anyway).
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Thanks,
-Antoine
+On Wed, 31 Jan 2024 03:26:02 +0100 you wrote:
+> This was a long journey to arrive and discover this problem.
+> 
+> To not waste too much char, there is a race problem with PHY and driver
+> probe. This was observed with Aquantia PHY firmware loading.
+> 
+> With some hacks the race problem was workarounded but an interesting
+> thing was notice. It took more than a minute for the firmware to load
+> via MDIO.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v3,1/2] dt-bindings: net: ipq4019-mdio: document now supported clock-frequency
+    https://git.kernel.org/netdev/net-next/c/9484b9555de0
+  - [net-next,v3,2/2] net: mdio: ipq4019: add support for clock-frequency property
+    https://git.kernel.org/netdev/net-next/c/bdce82e960d1
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
