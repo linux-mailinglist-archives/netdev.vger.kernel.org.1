@@ -1,264 +1,276 @@
-Return-Path: <netdev+bounces-68713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2D5D847A74
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 21:23:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 117A8847A78
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 21:25:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5782B284625
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:23:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BB636284912
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:25:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F138172B;
-	Fri,  2 Feb 2024 20:23:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DA5F8062D;
+	Fri,  2 Feb 2024 20:25:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="GCXNu06B"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N+Y9F7P4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6B981724
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 20:23:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344028062A
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 20:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706905430; cv=none; b=I926lP+4fFqHQxTUyot2MLGI0mQTfhIF4w87k7fExSfvCmDs2BpjKj6n6EJPwTfyrGWswx4EIfDr+5YZQQxXLVot7S2uZVPsubFOuFkMBu6GF4cmqiPhI6htzMWLg7VdtNqsfQdr/i1e1zVP1n+L5DELOmFhII0e64iuwBuJR1k=
+	t=1706905535; cv=none; b=qtgTRbhuGFC6mZQ/K/cDUtoSCh1KB5K3v0DfVnoXrBrjVdaGgV0x/ecEAKRowplysJXA1p17fqzzx/EsbpLdJdKcELjB64bC5XCc/iZM86l9uoGKOH3iZnJ+Y8JsFkHwg0PJpyH/VxUQV0SgTrYr+CU3b7waHX/Az6u2UsxxODs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706905430; c=relaxed/simple;
-	bh=kHh/Fwi+zgGR85Gonsy9nCSLc26QR0hWZ/EbYVLS86Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FvDiYbbg8wIjkLmFF8jI26Yt1W7FsRwhzlyYLFBRZuovsMZlhe1gscHtcnr8eH7u4CVoShJeVtUifQ64U+ACiq/IovpIWQv9m2D43QMbEVYvL+BdMvMHvBjtnlphK/KyU5HjPxDkXUXICzMNFqitePBBwHAIoJXIEYUHLiN6IUU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=GCXNu06B; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d95d67ff45so14865035ad.2
-        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 12:23:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1706905428; x=1707510228; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aGhLoepqPTEf7fOGkK9tuzMrdf1LkUJ0F04BvVx/aiI=;
-        b=GCXNu06BRb5o288k9j76q2LpYuWBNK8xWVRfV1q8m5n5FPJaeJ8PImkXqKTOPoBIt8
-         4KQBOz+pPNNE//PYPiceapmQWmGitw4q7Ywxr5Q1CSzSeYvwf8Vz/xk5evVK68jbKaw+
-         R7cFd6JVEw3qu+C9bZ+xdgD/0x6NlmTVDB7A4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706905428; x=1707510228;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aGhLoepqPTEf7fOGkK9tuzMrdf1LkUJ0F04BvVx/aiI=;
-        b=UqTT10STtUftWrr7vq1Zpt2pvop8Ia0xvV0iPACiXO0xL0nP34f7xdjCLHS0vyAWWB
-         ICD98DW9CdM6xKl/R5HzafV08Z7yNoBjWcYBM7d6zBmR14rQZ49yBpDQo9TS3adKWqE8
-         M5wXhv1YhkYY+p23FiZ+Kh9/slgC9XBkxFWJzNiW8I400xQ3N9X23BBWPDhUCNYeJr+1
-         HQEHzHwwSLxCBMu/mkitOXKGeIZlRVEOS3iAm6DJKqjpi5/Z5h8F817Gw8TCq+t/FJ8h
-         gnkm0ReqbUA+SaJuGq1kYSMYP3M/Fjq+OnI+gn45DjbDxnITmG37LgmUOrABuWtkWGLq
-         SgaQ==
-X-Gm-Message-State: AOJu0Yx1mM8tb5/YZfwhGMXkOE40tsEmuF0nRpAxVYokYoP2fNnwG78J
-	H3hGANKL0ux7ujYxOHJHGg9Rttv5j0KqtlCA6uUjh1DZolHeqdGY08ULea2gB8o=
-X-Google-Smtp-Source: AGHT+IHeA3z/fTGd19l6o022GvzdVCVu3LbORSy1WAiGDts+qleaBHwb9krLrA1bSTwU9coQQOyP+A==
-X-Received: by 2002:a17:903:41cd:b0:1d5:b275:30a3 with SMTP id u13-20020a17090341cd00b001d5b27530a3mr3642973ple.24.1706905427819;
-        Fri, 02 Feb 2024 12:23:47 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCV//NKyNno7BailUBDkzV+sl7OvHgakIe5TltmvP2n5Iw4NmztPotCGc6VMrwYZnStsutDZT+rczzoDCVLFYytIFzvTKsUzoox2w3oVh8DpvUiCcWa1w86S55ULTIpWxMviGil3unvaCsyeBnMKsDqvl605aiRuy3khHQhY+UZ4cU1KKrXFW/QnUJNBfWK02bsk5xE7tyvDeqHEBwI85TDUFjebtMKkm/emiFdcxigGvC4QIVhPd2PpVqYOc1JPGPHA7u0Qt+KKKJuJc26kDOTvLlz0rFATm1vl9rvDZYlagNXCarUjwwEPZTEA2f7VjRUXorre1kz1Ae3kPr7j0RlKLtKrNW7LBIaYamQoPEbSF9oZvKUa2Jrv0xKNhrvzAMsAj9ITFN64YWyvlHqf+uiAoYo=
-Received: from fastly.com (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id e9-20020a170902b78900b001d987771271sm199754pls.123.2024.02.02.12.23.46
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 02 Feb 2024 12:23:47 -0800 (PST)
-Date: Fri, 2 Feb 2024 12:23:44 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, chuck.lever@oracle.com,
-	jlayton@kernel.org, linux-api@vger.kernel.org, brauner@kernel.org,
-	davem@davemloft.net, alexander.duyck@gmail.com,
-	Wei Wang <weiwan@google.com>,
-	Amritha Nambiar <amritha.nambiar@intel.com>
-Subject: Re: [net-next 0/3] Per epoll context busy poll support
-Message-ID: <20240202202344.GA9283@fastly.com>
-References: <20240124025359.11419-1-jdamato@fastly.com>
- <CANn89i+YKwrgpt8VnHrw4eeVpqRamLkTSr4u+g1mRDMZa6b+7Q@mail.gmail.com>
- <5faf88de-5063-421f-ad78-ad24d931fd17@intel.com>
- <20240202032806.GA8708@fastly.com>
- <f0b4d813-d7cb-428b-9c41-a2d86684f3f1@intel.com>
- <20240202102239.274ca9bb@kernel.org>
- <20240202193332.GA8932@fastly.com>
- <20240202115828.6fd125bf@kernel.org>
+	s=arc-20240116; t=1706905535; c=relaxed/simple;
+	bh=VeuU1gtpMHD6R4y3QskCdXixRRQG76sqQMFIwVjNW8o=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ueDe7gZyGin6GwUSf0DWB5gzmg9/HJl6l9tuMs3e6/dhEJZSXeLOuD/RwOkhNwWn/Lq5MwaLvgE0jCrD9eVq80UxLKpDPaDMEaz6pePVuNmyds9uh1drWlDmby6be7O7dkSmhO8od1HS3tcquoLa0MruSeDhPpTWQbtAdw+s3GQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N+Y9F7P4; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706905533; x=1738441533;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=VeuU1gtpMHD6R4y3QskCdXixRRQG76sqQMFIwVjNW8o=;
+  b=N+Y9F7P4X5vN0yMsUJUBXbOaZboVinGE8tstRUzH5LIKlDV58RNXcvPo
+   N204bI7E5beaJii1v+qP8a1LF/54cAGCFq+jrwwGzepwbv5nGqbVSG0IG
+   cHHca2KxEiQbKtT+T1kE8mRD0G9NuRu0UoUQFGmeeivZHaiCZxmUmzitL
+   tBhHNzmcooIuQRA8zr+xjaH97fPpFmTe+jQpGm/y1WoMSkCicvAKny6ex
+   wzroaHp8qM5+rb5+ovB5nqb+iaMhLpPEidmGoO0OJyeIlKag3FpmScVqD
+   zjUEl2SwZLQ+85MfQyuZc9YmCq+KWScY3k+BY/Gh6WeFB+91GXpj1GL8n
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="10885086"
+X-IronPort-AV: E=Sophos;i="6.05,238,1701158400"; 
+   d="scan'208";a="10885086"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 12:25:32 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,238,1701158400"; 
+   d="scan'208";a="489194"
+Received: from apalla-mobl2.ger.corp.intel.com (HELO azaki-desk1.intel.com) ([10.249.41.168])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Feb 2024 12:25:27 -0800
+From: Ahmed Zaki <ahmed.zaki@intel.com>
+To: netdev@vger.kernel.org
+Cc: mkubecek@suse.cz,
+	alexander.duyck@gmail.com,
+	kuba@kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	gal@nvidia.com,
+	jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	horms@kernel.org,
+	pabeni@redhat.com,
+	andrew@lunn.ch,
+	Ahmed Zaki <ahmed.zaki@intel.com>,
+	Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: [PATCH ethtool v2] ethtool: add support for RSS input transformation
+Date: Fri,  2 Feb 2024 13:25:20 -0700
+Message-Id: <20240202202520.70162-1-ahmed.zaki@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240202115828.6fd125bf@kernel.org>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 02, 2024 at 11:58:28AM -0800, Jakub Kicinski wrote:
-> On Fri, 2 Feb 2024 11:33:33 -0800 Joe Damato wrote:
-> > On Fri, Feb 02, 2024 at 10:22:39AM -0800, Jakub Kicinski wrote:
-> > > On Fri, 2 Feb 2024 11:23:28 -0600 Samudrala, Sridhar wrote:  
-> > > > I think you should be able to get this functionality via the netdev-genl 
-> > > > API to get napi parameters. It returns ifindex as one of the parameters 
-> > > > and you should able to get the name from ifindex.
-> > > > 
-> > > > $ ./cli.py --spec netdev.yaml --do napi-get --json='{"id": 593}'
-> > > > {'id': 593, 'ifindex': 12, 'irq': 291, 'pid': 3727}  
-> > > 
-> > > FWIW we also have a C library to access those. Out of curiosity what's
-> > > the programming language you'd use in user space, Joe?  
-> > 
-> > I am using C from user space. 
-> 
-> Ah, great! Here comes the advert.. :)
-> 
->   make -C tools/net/ynl/
-> 
-> will generate the C lib for you. tools/net/ynl/generated/netdev-user.h
-> will have the full API. There are some samples in
-> tools/net/ynl/samples/. And basic info also here:
-> https://docs.kernel.org/next/userspace-api/netlink/intro-specs.html#ynl-lib
-> 
-> You should be able to convert Sridhar's cli.py into an equivalent 
-> in C in ~10 LoC.
-> 
-> > Curious what you think about
-> > SIOCGIFNAME_BY_NAPI_ID, Jakub? I think it would be very useful, but not
-> > sure if such an extension would be accepted. I can send an RFC, if you'd
-> > like to take a look and consider it. I know you are busy and I don't want
-> > to add too much noise to the list if I can help it :)
-> 
-> Nothing wrong with it in particular, but we went with the netlink API
-> because all the objects are related. There are interrupts, NAPI
-> instances, queues, page pools etc. and we need to show all sort of
-> attributes, capabilities, stats as well as the linking. So getsockopts
-> may not scale, or we'd need to create a monster mux getsockopt?
-> Plus with some luck the netlink API will send you notifications of
-> things changing.
+Add support for RSS input transformation [1]. Currently, only symmetric-xor
+is supported. The user can set the RSS input transformation via:
 
-Yes this all makes sense. The notification on changes would be excellent,
-especially if NAPI IDs get changed for some reason  (e.g. the queue count
-is adjusted or the queues are rebuilt by the driver for some reason like a
-timeout, etc).
+    # ethtool -X <dev> xfrm symmetric-xor
 
-I think the issue I'm solving with SIOCGIFNAME_BY_NAPI_ID is related, but
-different.
+and sets it off (default) by:
 
-In my case, SIOCGIFNAME_BY_NAPI_ID identifies which NIC a specific fd from
-accept arrived from.
+    # ethtool -X <dev> xfrm none
 
-AFAICT, the netlink API wouldn't be able to help me answer that question. I
-could use SIOCGIFNAME_BY_NAPI_ID to tell me which NIC the fd is from and
-then use netlink to figure out which CPU to bind to (for example), but I
-think SIOCGIFNAME_BY_NAPI_ID is still needed.
+The status of the transformation is reported by a new section at the end
+of "ethtool -x":
 
-I'll send an RFC about for that shortly, hope that's OK.
+    # ethtool -x <dev>
+      .
+      .
+      .
+      .
+      RSS hash function:
+          toeplitz: on
+          xor: off
+          crc32: off
+      RSS input transformation:
+          symmetric-xor: on
 
-> > Here's a brief description of what I'm doing, which others might find
-> > helpful:
-> > 
-> > 1. Machine has multiple NICs. Each NIC has 1 queue per busy poll app
-> > thread, plus a few extra queues for other non busy poll usage.
-> > 
-> > 2. A custom RSS context is created to distribute flows to the busy poll
-> > queues. This context is created for each NIC. The default context directs
-> > flows to the non-busy poll queues.
-> > 
-> > 3. Each NIC has n-tuple filters inserted to direct incoming connections
-> > with certain destination ports (e.g. 80, 443) to the custom RSS context.
-> > All other incoming connections will land in the default context and go to
-> > the other queues.
-> > 
-> > 4. IRQs for the busy poll queues are pinned to specific CPUs which are NUMA
-> > local to the NIC.
-> > 
-> > 5. IRQ coalescing values are setup with busy poll in mind, so IRQs are
-> > deferred as much as possible with the assumption userland will drive NAPI
-> > via epoll_wait. This is done per queue (using ethtool --per-queue and a
-> > queue mask). This is where napi_defer_hard_irqs and gro_flush_timeout
-> > could help even more. IRQ deferral is only needed for the busy poll queues.
-> 
-> Did you see SO_PREFER_BUSY_POLL by any chance? (In combination with
-> gro_flush_timeout IIRC). We added it a while back with Bjorn, it seems
-> like a great idea to me at the time but I'm unclear if anyone uses it 
-> in production..
+Link: https://lore.kernel.org/netdev/20231213003321.605376-1-ahmed.zaki@intel.com/
+Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
+---
+v2: add a note in the man page on the loss of entropy due to XORing.
 
-I have seen it while reading the code, yes. I think maybe I missed
-something about its interaction with gro_flush_timeout. In my use case,
-the machine has no traffic until after the app is started.
+ ethtool.8.in  | 14 ++++++++++++++
+ ethtool.c     | 16 ++++++++++++++++
+ netlink/rss.c | 19 +++++++++++++++++--
+ 3 files changed, 47 insertions(+), 2 deletions(-)
 
-In this case, I haven't needed to worry about regular NAPI monopolizing the
-CPU and preventing busy poll from working.
+diff --git a/ethtool.8.in b/ethtool.8.in
+index 7a3080f..5924b8d 100644
+--- a/ethtool.8.in
++++ b/ethtool.8.in
+@@ -351,6 +351,7 @@ ethtool \- query or control network driver and hardware settings
+ .RB ...\ | \ default \ ]
+ .RB [ hfunc
+ .IR FUNC ]
++.B2 xfrm symmetric-xor none
+ .RB [ context
+ .I CTX
+ .RB |\  new ]
+@@ -1201,6 +1202,19 @@ even if a nibble is zero.
+ Sets RSS hash function of the specified network device.
+ List of RSS hash functions which kernel supports is shown as a part of the --show-rxfh command output.
+ .TP
++.BI xfrm
++Sets the RSS input transformation. Currently, only the
++.B symmetric-xor
++transformation is supported where the NIC XORs the L3 and/or L4 source and
++destination fields (as selected by
++.B --config-nfc rx-flow-hash
++) before passing them to the hash algorithm. The RSS hash function will
++then yield the same hash for the other flow direction where the source and
++destination fields are swapped (i.e. Symmetric RSS). Note that XORing the
++input parameters reduces the entropy of the input set and the hash algorithm
++could potentially be exploited. Switch off (default) by
++.B xfrm none.
++.TP
+ .BI start\  N
+ For the \fBequal\fR and \fBweight\fR options, sets the starting receive queue
+ for spreading flows to \fIN\fR.
+diff --git a/ethtool.c b/ethtool.c
+index 3ac15a7..82919f8 100644
+--- a/ethtool.c
++++ b/ethtool.c
+@@ -4029,6 +4029,10 @@ static int do_grxfh(struct cmd_context *ctx)
+ 		       (const char *)hfuncs->data + i * ETH_GSTRING_LEN,
+ 		       (rss->hfunc & (1 << i)) ? "on" : "off");
+ 
++	printf("RSS input transformation:\n");
++	printf("    symmetric-xor: %s\n",
++	       (rss->input_xfrm & RXH_XFRM_SYM_XOR) ? "on" : "off");
++
+ out:
+ 	free(hfuncs);
+ 	free(rss);
+@@ -4146,6 +4150,7 @@ static int do_srxfh(struct cmd_context *ctx)
+ 	u32 arg_num = 0, indir_bytes = 0;
+ 	u32 req_hfunc = 0;
+ 	u32 entry_size = sizeof(rss_head.rss_config[0]);
++	u32 req_input_xfrm = 0xff;
+ 	u32 num_weights = 0;
+ 	u32 rss_context = 0;
+ 	int delete = 0;
+@@ -4189,6 +4194,15 @@ static int do_srxfh(struct cmd_context *ctx)
+ 			if (!req_hfunc_name)
+ 				exit_bad_args();
+ 			++arg_num;
++		} else if (!strcmp(ctx->argp[arg_num], "xfrm")) {
++			++arg_num;
++			if (!strcmp(ctx->argp[arg_num], "symmetric-xor"))
++				req_input_xfrm = RXH_XFRM_SYM_XOR;
++			else if (!strcmp(ctx->argp[arg_num], "none"))
++				req_input_xfrm = 0;
++			else
++				exit_bad_args();
++			++arg_num;
+ 		} else if (!strcmp(ctx->argp[arg_num], "context")) {
+ 			++arg_num;
+ 			if(!strcmp(ctx->argp[arg_num], "new"))
+@@ -4333,6 +4347,7 @@ static int do_srxfh(struct cmd_context *ctx)
+ 	rss->cmd = ETHTOOL_SRSSH;
+ 	rss->rss_context = rss_context;
+ 	rss->hfunc = req_hfunc;
++	rss->input_xfrm = req_input_xfrm;
+ 	if (delete) {
+ 		rss->indir_size = rss->key_size = 0;
+ 	} else {
+@@ -5887,6 +5902,7 @@ static const struct option args[] = {
+ 			  "		[ equal N | weight W0 W1 ... | default ]\n"
+ 			  "		[ hkey %x:%x:%x:%x:%x:.... ]\n"
+ 			  "		[ hfunc FUNC ]\n"
++			  "		[ xfrm symmetric-xor|none ]\n"
+ 			  "		[ delete ]\n"
+ 	},
+ 	{
+diff --git a/netlink/rss.c b/netlink/rss.c
+index 4ad6065..dc28698 100644
+--- a/netlink/rss.c
++++ b/netlink/rss.c
+@@ -21,7 +21,8 @@ struct cb_args {
+ 
+ void dump_json_rss_info(struct cmd_context *ctx, u32 *indir_table,
+ 			u32 indir_size, u8 *hkey, u32 hkey_size,
+-			const struct stringset *hash_funcs, u8 hfunc)
++			const struct stringset *hash_funcs, u8 hfunc,
++			u32 input_xfrm)
+ {
+ 	unsigned int i;
+ 
+@@ -46,6 +47,12 @@ void dump_json_rss_info(struct cmd_context *ctx, u32 *indir_table,
+ 			if (hfunc & (1 << i)) {
+ 				print_string(PRINT_JSON, "rss-hash-function",
+ 					     NULL, get_string(hash_funcs, i));
++				open_json_object("rss-input-transformation");
++				print_bool(PRINT_JSON, "symmetric-xor", NULL,
++					   (input_xfrm & RXH_XFRM_SYM_XOR) ?
++					   true : false);
++
++				close_json_object();
+ 				break;
+ 			}
+ 		}
+@@ -89,6 +96,7 @@ int rss_reply_cb(const struct nlmsghdr *nlhdr, void *data)
+ 	const struct stringset *hash_funcs;
+ 	u32 rss_hfunc = 0, indir_size;
+ 	u32 *indir_table = NULL;
++	u32 input_xfrm = 0;
+ 	u8 *hkey = NULL;
+ 	bool silent;
+ 	int err_ret;
+@@ -118,6 +126,9 @@ int rss_reply_cb(const struct nlmsghdr *nlhdr, void *data)
+ 		hkey = mnl_attr_get_payload(tb[ETHTOOL_A_RSS_HKEY]);
+ 	}
+ 
++	if (tb[ETHTOOL_A_RSS_INPUT_XFRM])
++		input_xfrm = mnl_attr_get_u32(tb[ETHTOOL_A_RSS_INPUT_XFRM]);
++
+ 	/* Fetch RSS hash functions and their status and print */
+ 	if (!nlctx->is_monitor) {
+ 		ret = netlink_init_ethnl2_socket(nlctx);
+@@ -153,7 +164,8 @@ int rss_reply_cb(const struct nlmsghdr *nlhdr, void *data)
+ 	indir_size = indir_bytes / sizeof(u32);
+ 	if (is_json_context()) {
+ 		dump_json_rss_info(nlctx->ctx, (u32 *)indir_table, indir_size,
+-				   hkey, hkey_bytes, hash_funcs, rss_hfunc);
++				   hkey, hkey_bytes, hash_funcs, rss_hfunc,
++				   input_xfrm);
+ 	} else {
+ 		print_indir_table(nlctx->ctx, args->num_rings,
+ 				  indir_size, (u32 *)indir_table);
+@@ -167,6 +179,9 @@ int rss_reply_cb(const struct nlmsghdr *nlhdr, void *data)
+ 			printf("    %s: %s\n", get_string(hash_funcs, i),
+ 			       (rss_hfunc & (1 << i)) ? "on" : "off");
+ 		}
++		printf("RSS input transformation:\n");
++		printf("    symmetric-xor: %s\n",
++		       (input_xfrm & RXH_XFRM_SYM_XOR) ? "on" : "off");
+ 	}
+ 
+ 	return MNL_CB_OK;
+-- 
+2.34.1
 
-Maybe I am missing something more nuanced, though? I'll have another look
-at the code, just incase.
-
-> 
-> > 6. userspace app config has NICs with their NUMA local CPUs listed, for
-> > example like this:
-> > 
-> >    - eth0: 0,1,2,3
-> >    - eth1: 4,5,6,7
-> > 
-> > The app reads that configuration in when it starts. Ideally, these are the
-> > same CPUs the IRQs are pinned to in step 4, but hopefully the coalesce
-> > settings let IRQs be deferred quite a bit so busy poll can take over.
-> 
-> FWIW if the driver you're using annotates things right you'll also get
-> the NAPI <> IRQ mapping via the netdev netlink. Hopefully that
-> simplifies the pinning setup.
-
-I looked last night after I learned about the netlink interface. It does
-not look like the driver I am using does, but I can fix that fairly easily,
-I think.
-
-I'll try to send a patch for this next week.
-
-> > 7. App threads are created and sockets are opened with REUSEPORT. Notably:
-> > when the sockets are created, SO_BINDTODEVICE is used* (see below for
-> > longer explanation about this).
-> > 
-> > 8. cbpf reusport program inserted to distribute incoming connections to
-> > threads based on skb->queue_mapping. skb->queue_mapping values are not
-> > unique (e.g. each NIC will have queue_mapping==0), this is why BINDTODEVICE
-> > is needed. Again, see below.
-> > 
-> > 9. worker thread epoll contexts are set to busy poll by the ioctl I've
-> > submit in my patches.
-> > 
-> > The first time a worker thread receives a connection, it:
-> > 
-> > 1. calls SO_INCOMING_NAPI_ID to get the NAPI ID associated with the
-> > connection it received.
-> > 
-> > 2. Takes that NAPI ID and calls SIOCGIFNAME_BY_NAPI_ID to figure out which
-> > NIC the connection came in on.
-> > 
-> > 3. Looks for an un-unsed CPU from the list it read in at configuration time
-> > that is associated with that NIC and then pins itself to that CPU. That CPU
-> > is removed from the list so other threads can't take it.
-> > 
-> > All future incoming connections with the same NAPI ID will be distributed
-> > to app threads which are pinned in the appropriate place and are doing busy
-> > polling.
-> > 
-> > So, as you can see, SIOCGIFNAME_BY_NAPI_ID makes this implementation very
-> > simple.
-> > 
-> > I plan to eventually add some information to the kernel networking
-> > documentation to capture some more details of the above, which I think
-> > might be helpful for others.
-> 
-> Sounds very sensible & neat indeed. And makes sense to describe this 
-> in the docs, that should hopefully put more people on the right path :)
-> 
-> > Another potential solution to avoid the above might be use an eBPF program
-> > and to build a hash that maps NAPI IDs to thread IDs and write a more
-> > complicated eBPF program to distribute connections that way. This seemed
-> > cool, but involved a lot more work so I went with the SO_BINDTODEVICE +
-> > SIOCGIFNAME_BY_NAPI_ID method instead which was pretty simple (C code wise)
-> > and easy to implement.
-> 
-> Interesting!
 
