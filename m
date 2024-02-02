@@ -1,60 +1,80 @@
-Return-Path: <netdev+bounces-68425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1119B846DD0
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:22:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A61FF846DD4
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:24:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEE4A286B63
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 10:22:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57E292901B6
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 10:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85B6D7A72F;
-	Fri,  2 Feb 2024 10:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38E627A70D;
+	Fri,  2 Feb 2024 10:24:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HEXnmJJx"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="O2jZOXpC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 627CA22067
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 10:22:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961895FDD8
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 10:24:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706869356; cv=none; b=JQb8s3aDbAXfRBrjUisBIwBAJfzD5csLdWsxBFGnZuFEnUwwQEBFrSftDTZrb3wXFb9u6LktYkltUFPpwFEe7gMq0H4ZWKRNggNeImj369FR2iv8AwxCOA+dY6PGbDAqe80ElTwHtiL55Yxstb1Fd94WYqBEpRXf29LbFEZyM68=
+	t=1706869462; cv=none; b=gQPSNXQCgnackTxYD+x6GqzAlKLNn7pn4dMVsztSnlnDFmcvzejfZpraqSEx1wQPreOhT7JLZa2AtTiL9svBdQvvI0BNpIApIfMQNedZdX6NPncHgiJi0Rdb25SigSlYeW2+GsOQsyqJHGR/3tD7s5XRXfrtjVx6bXKeM8UR8No=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706869356; c=relaxed/simple;
-	bh=rG/QNrbZCu57sdPVa3hAspHt8Aw0OWGDa4HAt4safIU=;
+	s=arc-20240116; t=1706869462; c=relaxed/simple;
+	bh=ul4MDZdUkPZs61RD/ImvWr1Ox5ZxT0jR5CzSomsFkWs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=noIegglTJdS6KQv+GKKOE/GFmq+n5xav076nCSbCeJfw6smY9PD7kgWOZ/v0w/5lELb5F3SifQQ8fwluJIOZOaXiXKXH+xBkOG0bBzjkA6XZjy2vUxbwzNOrR/Q02xkRwVFbEoRlnmrUgfDOt6w3Btx/Is0ecDhjke60VCfUP30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HEXnmJJx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F214FC433C7;
-	Fri,  2 Feb 2024 10:22:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706869355;
-	bh=rG/QNrbZCu57sdPVa3hAspHt8Aw0OWGDa4HAt4safIU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HEXnmJJxfL5LsMWWbNU7vkqFmx3C7kqM4JMKKPd/OTqHzQpAMYXO34FweOuYKyNLL
-	 dnKZqHgxvLK5w1gRtfo64BCvThLBBWDCeHPJZXArB5oGjCe3n1cpa8tfoZSgvK7znF
-	 UeILbpq11H6Le9or+37+AkA1DEja6Mk0kIOT81HmuvbxwvCbCQkCxw6ia93T33+ISs
-	 10OFc51j0TyhHpebfWqZarva+yBPckhuQzl1L74n97GUnHm704KH17QA81gBNbxSGP
-	 7AEn+0dkdVBoLG/p4vqKE9kn/g7vI0l/BqkdPxyyc5pCT9XeFJZCnsvRdTIQAWu1UB
-	 YgamFTzGcvK9A==
-Date: Fri, 2 Feb 2024 11:22:31 +0100
-From: Simon Horman <horms@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
-	Sabrina Dubroca <sd@queasysnail.net>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v7 3/4] netdevsim: add selftest for forwarding
- skb between connected ports
-Message-ID: <20240202102231.GK530335@kernel.org>
-References: <20240127040354.944744-1-dw@davidwei.uk>
- <20240127040354.944744-4-dw@davidwei.uk>
- <20240129203401.GR401354@kernel.org>
- <9bba3a59-9281-4029-958f-71b17c5670a7@davidwei.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=WT3btZ5Iz2LYK+qEA7vEviVBp0CBValPHd9GI6sDLqqi6uNJ0+qh4Ft28k3RrLqF0UXuaLEdZKzfq5hwNB9P3cBmQUHdY75roMAkYDY0NChZsTYqYx5PfvjQ5EPdCSIXUV61To5ZRmPSRhgAdwW3J6Hw9fPhwM0jyxoWuGu+DLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=O2jZOXpC; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-40fc549ab9bso4843175e9.0
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 02:24:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706869459; x=1707474259; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ul4MDZdUkPZs61RD/ImvWr1Ox5ZxT0jR5CzSomsFkWs=;
+        b=O2jZOXpC5B97Aee/Yb6ELNYOvRdFaVY8LajBwT3sAi6prbli/aeWLkJmsc6WwZIRUM
+         PcU4Z8s3Pi1/zxqTetz7acXndPKOjFXiVGKhGmuUJt7lpb0rAYuy4pTlbGZhukPqZc84
+         uvNqGPQDAlHWBEii+ih8mGNlb8wzRuq1EzeKOoGv/5jUB6VDOgUdhOiW9PQICvfmEJvt
+         IG97R6Ubu81JaXlZSnAHu85wOCepPTHx9/tYCMhDMGhXHDMiWqnaSbSJ6VFJN5cZ3k0W
+         7cLRbW8AP+9uCWSCW0c/+++IHRx9RVxhuwf9rnjWF0IYtdt8I8WB/tiNQkIrQCgaZhvb
+         4fSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706869459; x=1707474259;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ul4MDZdUkPZs61RD/ImvWr1Ox5ZxT0jR5CzSomsFkWs=;
+        b=bgodCky5Z0/Abrjs0iTTw7qBvx5BQgmOFamFbMLfehX6L2+oD8AKzyfwPPmXfZ2Ufo
+         8i4r5grMrn77ohrFwICoIX9mbpmE4C/2B5eCZCeCPLY9jVuqxHvO8H9KjXntsFgSspyd
+         hzOO6FVj1ShBrU450K3TKFshqDKTXGqlQU1eTkn7Z/4laPcxS4xU1/assIJGrn0TVJ3y
+         aqENDMs8pK/kKzHbdqZ/GNU/59zeakNDfOTCOX2UU77jHG0kMUUPaZ2Ynalb2a31agYm
+         KH1wIjcHCVXt55ZlkVJSWzzX5E9cPtZ5zpgPqYhG/c8h2I969cmL0iGxYQIROk9ktdGs
+         tfXQ==
+X-Gm-Message-State: AOJu0Yz1p8eA1A0KKRdT/Na64kco617OwBimcaYLKdEUZyAyzFBZ9dez
+	KiIwixcs46kZ2NviS12zAEz73WW+RCq2IMKoPnyEJax1b2088UV7Q6nfRg1ab3s=
+X-Google-Smtp-Source: AGHT+IGEz82usaiTajChTXTEokmpra6MzWLSqCWqKRfjlTgN4joPjwEbCpUALCl6PTNjyNsdvTazBA==
+X-Received: by 2002:a05:600c:511e:b0:40e:b93c:940f with SMTP id o30-20020a05600c511e00b0040eb93c940fmr1157300wms.28.1706869458705;
+        Fri, 02 Feb 2024 02:24:18 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCX0jIn4Wu5TDY28WX50rBXC1Ju/COhCkTkHxGfVn5zdGO3kfCv6BsnvO6D/bX1Fmu+zvjZ3hOZltIpZje5o+Pef8ZYciM02jGFcuiKA6AVXiM/5lD7sGJwNxxtOKOwLWcFi1tHYmW+vCPXQGMHpC+7Str421d1hEe5+0YSd8c2WvKLVhmaZB3/vqlji2++RiNcbtuYjrvRveLEnHQ5dMPfW+8Lvkospiy+/
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id k15-20020a05600c1c8f00b0040eea5dc778sm221405wms.1.2024.02.02.02.24.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Feb 2024 02:24:18 -0800 (PST)
+Date: Fri, 2 Feb 2024 11:24:15 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, donald.hunter@gmail.com, sdf@google.com
+Subject: Re: [PATCH net-next 2/3] tools: ynl: generate code for ovs families
+Message-ID: <ZbzCz4RuiZh-2Z4k@nanopsycho>
+References: <20240202004926.447803-1-kuba@kernel.org>
+ <20240202004926.447803-3-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,46 +83,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9bba3a59-9281-4029-958f-71b17c5670a7@davidwei.uk>
+In-Reply-To: <20240202004926.447803-3-kuba@kernel.org>
 
-On Tue, Jan 30, 2024 at 10:57:45AM -0800, David Wei wrote:
-> On 2024-01-29 12:34, Simon Horman wrote:
-> > On Fri, Jan 26, 2024 at 08:03:53PM -0800, David Wei wrote:
-> >> Connect two netdevsim ports in different namespaces together, then send
-> >> packets between them using socat.
-> >>
-> >> Signed-off-by: David Wei <dw@davidwei.uk>
-> >> ---
-> >>  .../selftests/drivers/net/netdevsim/peer.sh   | 127 ++++++++++++++++++
-> >>  1 file changed, 127 insertions(+)
-> >>  create mode 100755 tools/testing/selftests/drivers/net/netdevsim/peer.sh
-> >>
-> >> diff --git a/tools/testing/selftests/drivers/net/netdevsim/peer.sh b/tools/testing/selftests/drivers/net/netdevsim/peer.sh
-> >> new file mode 100755
-> >> index 000000000000..05f3cefa53f3
-> >> --- /dev/null
-> >> +++ b/tools/testing/selftests/drivers/net/netdevsim/peer.sh
-> >> @@ -0,0 +1,127 @@
-> >> +#!/bin/bash
-> >> +# SPDX-License-Identifier: GPL-2.0-only
-> >> +
-> >> +NSIM_DEV_1_ID=$((RANDOM % 1024))
-> >> +NSIM_DEV_1_SYS=/sys/bus/netdevsim/devices/netdevsim$NSIM_DEV_1_ID
-> >> +NSIM_DEV_1_DFS=/sys/kernel/debug/netdevsim/netdevsim$NSIM_DEV_1_ID
-> >> +NSIM_DEV_2_ID=$((RANDOM % 1024))
-> >> +NSIM_DEV_2_SYS=/sys/bus/netdevsim/devices/netdevsim$NSIM_DEV_2_ID
-> >> +NSIM_DEV_2_DFS=/sys/kernel/debug/netdevsim/netdevsim$NSIM_DEV_2_ID
-> > 
-> > nit: NSIM_DEV_1_DFS and SIM_DEV_2_DFS appear to be unused.
-> > 
-> > Flagged by shellcheck.
-> > 
-> > ...
-> 
-> Hi Simon, thanks for flagging this, these were leftover from previous
-> changes. I'll remove them in the next version.
+Fri, Feb 02, 2024 at 01:49:25AM CET, kuba@kernel.org wrote:
+>Add ovs_flow, ovs_vport and ovs_datapath to the families supported
+>in C. ovs-flow has some circular nesting which is fun to deal with,
+>but the necessary support has been added already in the previous
+>release cycle.
+>
+>Add a sample that proves that dealing with fixed headers does
+>actually work correctly.
+>
+>Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Thanks David,
-
-much appreciated.
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
