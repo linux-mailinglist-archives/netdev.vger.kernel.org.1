@@ -1,94 +1,79 @@
-Return-Path: <netdev+bounces-68454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70F59846F4E
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:45:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D15E846F54
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:46:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 278BD29775E
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:45:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C6481C21DC9
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:46:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 358FC77650;
-	Fri,  2 Feb 2024 11:43:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 530F113D4F2;
+	Fri,  2 Feb 2024 11:45:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YFqcth6h"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="pnwl8EWW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1DA13EFE1
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 11:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F5C168AB;
+	Fri,  2 Feb 2024 11:45:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706874212; cv=none; b=J+wUFpGbRaGXjb8zv73uGCl5rgo9P+wMmF0uYvKnjh9Wh5CxNwgaM46dXacUIb+xOnmg2XPbS3fhhbzP7o27VlWod3sqYS0bHGpnmliH2VVReO42C11QyRjPFcLk4K7BaAn7U1i+LSmEL021hZwijPuybQCSFohhn72H5CIn5Mk=
+	t=1706874357; cv=none; b=X0TQlqCAwlY2DyjGa1PLFVThuf1VwF4ZS51KQ0RY8UoYzcuyyNnVwcIIMTmINqZbBs0YLyGK7zBKG6J8bFxORp6DgMkbsY6AjfI++T7bTLi1WJuwhqWTdCQP9U2iyznb4Gay1er7MVK/ItyShqaBiMZM69oHZrilI6h36T9nWco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706874212; c=relaxed/simple;
-	bh=2CygvKSNNSwPxj641enH1rjHi5cr/Zfh9uBnsV7mZoE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=RfMZHRrob1SaNARJfGsR44RhUSX1/TOFtBXA0mPniUlQOvblrYasah5eaLMZr+4QCGw9/g/wPR8hQbQl2LSGlTURqbUId2GFnWzAF4XaHPORCyRX/Aj8swSgoSNJFulxTGzoSKICAJmVt/GV/aBZCEYfQYaSKmG3iAOgdbSeaHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YFqcth6h; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1706874209;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2CygvKSNNSwPxj641enH1rjHi5cr/Zfh9uBnsV7mZoE=;
-	b=YFqcth6hmrgWAKOGoZWks7LuENt560BXirOBg8eeoa7MarE26LF2UcTdgqHIHAQbDerLMF
-	T0IiBNoPtPJs7s/6xDooVuGpgJq8sNDrssxzdNL/qhmwMpvpt5w8le9vKRRmjW3hRanojV
-	9ZvAfTCm6ERXEtrZOeAad0r/C592yC8=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-564-oXqiye4PPNa5vCtkbT3psw-1; Fri, 02 Feb 2024 06:43:28 -0500
-X-MC-Unique: oXqiye4PPNa5vCtkbT3psw-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-55fe724114bso501233a12.1
-        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 03:43:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706874207; x=1707479007;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2CygvKSNNSwPxj641enH1rjHi5cr/Zfh9uBnsV7mZoE=;
-        b=W2MAexv97M8NlifaEIqf/EjW0aPZTwCW2/ArlfxzH+NQgqEVQ+8G5LOmknQKRTdPln
-         ZDD28MS0hWehshrQE9rodVSs1Uds4foPtduspNIz7YQrPCMTHFYl9wHiakIhhqLWi+o5
-         DgWQzRxy25SEguuRC675nySt/fo7hmi+xdPPdla2FRtQ47FIqMF+6A/G3ht+jv/a+cBK
-         hQ0SQpFF+shbKJ2yxVcxTSn33uMC91WLy0Z9BgrzctF0838xQxWLre1ZDLtggpEKw47u
-         5ka+yRXjvNAuZQ69qZrGPCnoCT4flrJamLSMA4j8U9R5lII1UtmyiU3lHX3Rlb2TC5Q6
-         H25w==
-X-Gm-Message-State: AOJu0YwwBVBCsqz2nYXkEMqb2fLSxvBP8wXu/Z7MKa1pXmu3hRQuU2do
-	CzNyfFOxLS88pHVtHP9g0MFVJFFfxoYItZZUBQeIZl2ojErg85mZaSIpFI8Oo7kthnDQt3SeFv1
-	ecxPez3XnrmNSX1cAW63o7atR8s9c4jxDImGZTlyPLkrFKQ7MEs5uOQ==
-X-Received: by 2002:a05:6402:2211:b0:55f:1728:3b33 with SMTP id cq17-20020a056402221100b0055f17283b33mr4341474edb.40.1706874207403;
-        Fri, 02 Feb 2024 03:43:27 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHI/kuU18hYpv9p+rkyP0JPEEB19+0uqwtQS9AFVGtwl9IzpCo1/jQC2jAQCRUFChFc9S0iBw==
-X-Received: by 2002:a05:6402:2211:b0:55f:1728:3b33 with SMTP id cq17-20020a056402221100b0055f17283b33mr4341455edb.40.1706874207130;
-        Fri, 02 Feb 2024 03:43:27 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCU841n1F9cYtbf8JrkiKtNCIi5FVCnXgjn4DLv9d6ysrzc7SWQmaHRByR/yTjsLJDtfUX6InQAhVgfDTGyuYwELJIMkTkea7XbdOMn7065BiEPNEdVgc8LNfh4N2RjcExjJyqeYsookOKOUbaV+VBUOBIdK8s2OQC2ziHElLUV6L8sp2yYNds4OmCuSY9jIyPPGtwuyOIuaOiI9y2EO3e3pygHI4gdf/ub3DpdVRLO/qMmExMXyRt6mPRUk47+FH+hT50PBz09yin2/xbjQBnhiHKszXxf2Dpkm4Y7oRVl9WHV/JMq9SOBjfgxglAi+f43cobFE2vl0L+gH33CkcMWkOaugyy2e19ZSwWDjFtmUAlnxTdOnX9i97d1VYsYOQAgmEPjd16BMmZEaV5A5onHjK1lDqCU=
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id u6-20020a05640207c600b0055f63ed667esm727572edy.57.2024.02.02.03.43.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Feb 2024 03:43:26 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 8EF98108A83B; Fri,  2 Feb 2024 12:43:26 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org
-Cc: lorenzo.bianconi@redhat.com, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, bpf@vger.kernel.org,
- willemdebruijn.kernel@gmail.com, jasowang@redhat.com, sdf@google.com,
- hawk@kernel.org, ilias.apalodimas@linaro.org, linyunsheng@huawei.com
-Subject: Re: [PATCH v7 net-next 4/4] veth: rely on skb_cow_data_for_xdp
- utility routine
-In-Reply-To: <a9e7f6c9c3f14b43e9f963d767d396f0eb611c5f.1706861261.git.lorenzo@kernel.org>
-References: <cover.1706861261.git.lorenzo@kernel.org>
- <a9e7f6c9c3f14b43e9f963d767d396f0eb611c5f.1706861261.git.lorenzo@kernel.org>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 02 Feb 2024 12:43:26 +0100
-Message-ID: <87mssjxfa9.fsf@toke.dk>
+	s=arc-20240116; t=1706874357; c=relaxed/simple;
+	bh=g2szF7J/Fir+UwcF5d5yrjX6PLRvsscIcyAHZXVyz3Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ObXkPjtDUhx+rlHxOusvQmon9aEE/Z3GwWdr0F2gHudhVvOksT8UOUo/kdh4x7e9pa/e4E97G7Flrk0fB5oGYIWaPyr+cwMpINjCn9slHNZzZ7SYWYrDTuEkpHcFA/zAhekdJyXBMhHWc9t8rawnW7VzWFJpIGRxxYN0v6JNYVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=pnwl8EWW; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=NMzyKXLvD5bCWLAnSG7LQUc76KmbvEK7xMGWqLkAp84=; b=pnwl8EWWJP/EPh7oo8FzwwNZnV
+	eNLhuPMQ8WmVsruBxONkcOgm51ooQq6kt45NBEt6yUTqPxMTsq6L6uzcYrnmK8VejdcyK9Q455ojJ
+	0uKdTi5/RuNOyShPkwARm1u5fz8kEQH+LOXXz8XM5Z6+BIDiI3dRE/vwpe8sQgC3tuRCGmvDn4oJG
+	LKjp4GbvbwHqhCSV2iYUiUxg7A7zexwby7NHHdYu1wnOkn1nOj+pzsYuoR/PDLk++f/YXo8g6ae6I
+	24CTDvu62YfX7ZS5loprhXgCANYrEItsU9ghPg5YMxjdgVCGtfxsMaoyNuJZ8QOdSh5exi/vcOqFd
+	kisPK1Mg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46388)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rVrzM-0005tt-0k;
+	Fri, 02 Feb 2024 11:45:44 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rVrzJ-0008Hw-2O; Fri, 02 Feb 2024 11:45:41 +0000
+Date: Fri, 2 Feb 2024 11:45:40 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: arinc.unal@arinc9.com
+Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v3 2/7] net: dsa: mt7530: call port 6 setup from
+ mt7530_mac_config()
+Message-ID: <ZbzV5Ly9rv6IsmVl@shell.armlinux.org.uk>
+References: <20240202-for-netnext-mt7530-improvements-2-v3-0-63d5adae99ca@arinc9.com>
+ <20240202-for-netnext-mt7530-improvements-2-v3-2-63d5adae99ca@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,17 +81,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240202-for-netnext-mt7530-improvements-2-v3-2-63d5adae99ca@arinc9.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Lorenzo Bianconi <lorenzo@kernel.org> writes:
+On Fri, Feb 02, 2024 at 12:19:08PM +0300, Arınç ÜNAL via B4 Relay wrote:
+> From: Arınç ÜNAL <arinc.unal@arinc9.com>
+> 
+> mt7530_pad_clk_setup() is called if port 6 is enabled. It used to do more
+> things than setting up port 6. That part was moved to more appropriate
+> locations, mt7530_setup() and mt7530_pll_setup().
+> 
+> Now that all it does is set up port 6, rename it to mt7530_setup_port6(),
+> and move it to a more appropriate location, under mt7530_mac_config().
+> 
+> Leave an empty mt7530_pad_clk_setup() to satisfy the pad_setup function
+> pointer.
+> 
+> This is the code path for setting up the ports before:
+> 
+> mt753x_phylink_mac_config()
+> -> mt753x_mac_config()
+>    -> mt7530_mac_config()
+>       -> mt7530_setup_port5()
+> -> mt753x_pad_setup()
+>    -> mt7530_pad_clk_setup()
+> 
+> This is after:
+> 
+> mt753x_phylink_mac_config()
+> -> mt753x_mac_config()
+>    -> mt7530_mac_config()
+>       -> mt7530_setup_port5()
+>       -> mt7530_setup_port6()
+> 
+> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
-> Rely on skb_cow_data_for_xdp utility routine and remove duplicated
-> code.
->
-> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+I hope that the "default" case in mt7530_setup_port6() is effectively
+unreachable - as long as mt7530_mac_port_get_caps() is paired with this
+and only sets the interface modes in supported_interfaces that
+mt7530_setup_port6() handles, then that will be fine.
 
-Neat that we can finally consolidate this duplication! :)
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+Thanks!
 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
