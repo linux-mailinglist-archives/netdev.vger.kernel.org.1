@@ -1,112 +1,185 @@
-Return-Path: <netdev+bounces-68414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 874CC846D82
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:14:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C18CF846D9E
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:17:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9D441C268A7
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 10:14:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5A6FDB23E09
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 10:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EE357A70A;
-	Fri,  2 Feb 2024 10:14:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D8737CF24;
+	Fri,  2 Feb 2024 10:16:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gBDpgw7Z"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="J4NAQtov"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C575B688
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 10:14:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FFC3171A6
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 10:16:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706868847; cv=none; b=bikgO4jvPAVlAmyG3TsOSVeXhC1X7zOENVB2Fbl5DUMdb+jW0hm96E19cU2PvJnvy9DtW8TzRuv5aWMv3Pq/psMkQ+c6wSrqRqIA7ba6rh+J1CCxCL/fmBYU00XncwQ/hAtLzgghzJp5DBYqNG/QfDrWPP1XAaXlhMTuJV8VhzM=
+	t=1706869008; cv=none; b=pKXyd3ZXBrbNya3xzo4r+E+N2cQQb+KciWJ4aLkrd6R+20RWu7AXiZE6JCodMz2h8j0IUy8AkOA4CJF0ZOZ/Izu10NJ5KvpBx6zC3k/UywMclX8W12BQVAZrQ40qnYR53dLuIz39/H+Z1V+QCMHRmitIS8gB0+gX7YQO3oFNcrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706868847; c=relaxed/simple;
-	bh=GGoZHDl7k06VE7vsfKH+wgAsHG7jeMnfyAjjaTV5zmo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=bZiESZ8ZCyU6depZcyg+88PAoK0OZXJBUuYxOVlpcmzcnh3nqYzwMf3V6ZkO+GoMIhBWjO1CsI65XAFnR5ARuv0i5j8jBTAZz7BzUZxvFZKPX7p24nedadB9m7owZkJO2r4fpR3qX6PTk92bsudqyYh6u5J6HJ0SPTNZ+zcWKJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gBDpgw7Z; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc693399655so3095511276.1
-        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 02:14:05 -0800 (PST)
+	s=arc-20240116; t=1706869008; c=relaxed/simple;
+	bh=2l9nEKso4+AOWcpX8WNY7A6dHeDCfYN/6uhOB8hks2s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=R6ffDp9fOCIY9/WmFjfcYVjnxcx5hjrYaKLLnp87h9x9gr+ozaQXOr7Hd4yvZuVxoZDg0R38Bfq6MxV+oVEXLv09VhsDI98NPcDO/d+OtVb2M5/goJDOKY7VhAQ67XoFCmYfwIOzh8FnEO8O2tXmPS92QeHRh3hHsLXorYMXUAI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=J4NAQtov; arc=none smtp.client-ip=209.85.210.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-6ddb129350cso1438886b3a.3
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 02:16:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1706868845; x=1707473645; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+gfzUpAM2GD9adjF6QZ5ipX/yy5ViMwcl6J4vglcx0I=;
-        b=gBDpgw7ZVWQYlX9GSaoMQBT9hu8IVqx9X3cShL6UCh7p1aVmAuIg0mjupdMtHMdJ+O
-         06knGp+U9sb+ka0Ukx9FWPwA1GbHD0E5NiAqsrYGXfWb74Z10bv59f9zxDSGZPeLamon
-         FlYKhch9QhbIQcQBP3sFcCJmuBHP1kwIW9Xyj1cL1wS/R3uuvVYFVCO4Cx/S85kh74LK
-         ESXT1q9Xi0F9XM3tt6ZSOMXyVIcGv9CsLKX60M4Pxw08CC1YSyC4dUTnwapvx6YWFESs
-         BpjKG0gC0YWgUoNFG/9nHXY1Qug2pRi4uw/X1CXyjDD+rBNP55YEwHyhTdW/otpCYz7P
-         bUMg==
+        d=chromium.org; s=google; t=1706869003; x=1707473803; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6EHXdAThkGXTR3eJPl49+AVsRbrPUkQd45PvGXZEUlI=;
+        b=J4NAQtovGcYBwjbdEE0R3Lha8so/lU+5NjSS9EDWldBsEfpOTHmiM+hxBLzvaLkTmE
+         u774oxYhU/IibYp4Mz+tgPNqHug3EO02ZMK3vFdNxJhKZ9YHA/VOB4U2RE5pbDLVUBcU
+         b6lgmEH8MxznE7FJH95y2ia3bLf6rfdCBsEnw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706868845; x=1707473645;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+gfzUpAM2GD9adjF6QZ5ipX/yy5ViMwcl6J4vglcx0I=;
-        b=R3vtycTbYatYG/K1ksuqtYSbIpQzQvInYszKGgu6xsC5fWKOOF3CtS2qheF4xqyiQL
-         sjYeFnAcsiDrddYxfmc3F2kGtbzGWO04326/gXKvKU3E5U8xSRR9iFp8ENFjlPA7GC/L
-         5mxuDQ69s13CWsCfYl+qIN9HUAWFeGRCN47zwOQvxPH8PMalUIMcSKb+1VNViAxY1gFv
-         t9COPWu3fXK4W0GW7sp2IAqXR05kxcAvOZlmcdRx0S1UIz/uLyLESb5nA7kcb3PIB39n
-         GLtpcJhDgMecu/ISciKYRTImfTE/Fi5E5Y6AryMCXl2sl220wCGXchncCgWxGqQHOPSM
-         GGyA==
-X-Gm-Message-State: AOJu0YwRs7WgEUwAzWeYsa8HXXI6S0Ff9jAFFujB8DmnkuqwQf96Ut0y
-	ftvTBhop/E0ccUn5/v8yQVuuM0Nr2bKLcNdRQS5tZEA3DYh0O/SK70apwCZWaKaSS8Sikb86vnb
-	IjEdYtYtfbw==
-X-Google-Smtp-Source: AGHT+IGZsaFncB7fDw9f7CV8h8UdlvB79RTNKQkWPeMZq3lvSt52IGFBS+VP+jGlr5plydmr72+YQWByZBZfLQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1085:b0:dc6:e5e9:f3af with SMTP
- id v5-20020a056902108500b00dc6e5e9f3afmr731530ybu.9.1706868844861; Fri, 02
- Feb 2024 02:14:04 -0800 (PST)
-Date: Fri,  2 Feb 2024 10:14:03 +0000
+        d=1e100.net; s=20230601; t=1706869003; x=1707473803;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6EHXdAThkGXTR3eJPl49+AVsRbrPUkQd45PvGXZEUlI=;
+        b=v21zqJ41QpZYwB3P0GyiUB6oGgO7zuxto3dtNLAg23aPKOGKSYdyu3bniLQNUul4pX
+         MWpWnmhN7EMhZjIePZwkjZwfzEiJwlBSx7KedHfgePmajIymNo45s4/myT53siCj242A
+         j5ESpBDhuE/X2b0ajQV3BQgGCqwQWTCb1k19PKBzviyWQC4ZkXsKaAQp5YraIRkTSHO0
+         TjxXNvo2z+KXUkq2Q/xa2ff+X2KejmpZ8I3xW01DcEFpAtA9uyFzqjqu57bo329wVAiw
+         730evHlWEyLAezY+l9cnTsKD2wQgmoImCFUPjicmwIqO7QGy8c82pKSY9iRcvTvJNMma
+         iGhw==
+X-Gm-Message-State: AOJu0Yxk0C7teCmhgL5KyYcqnZ7Tw9JO4rSwoQWL0Zlu4MI+ITc8MqI9
+	cgtH3+orfHavYlTqQTbcNHczz8Sb3hPgLX3PN8jq4y+DmZS24CgXm80dL5oe/A==
+X-Google-Smtp-Source: AGHT+IHMKOiQ6mHZakC/jI0iiftn9S+TFj6r9sQjHhGGiqUcwILCJdVCYMDM6jzLDgaScuq8as349w==
+X-Received: by 2002:a05:6a20:94cd:b0:199:c9a2:fb0 with SMTP id ht13-20020a056a2094cd00b00199c9a20fb0mr8667691pzb.16.1706869003557;
+        Fri, 02 Feb 2024 02:16:43 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWM0evwmk61ML9mKlP7sQqZt4NIu2CDf4tNN7ZfZBwVop6WGktFTrN8OQ6otbkJV/lVl6pxcL/V59G96BahEDFx4D7uY4o04C+92sAr/f+65Vbvjtnyg2OPcPHZOyvi6dhxH+kafSvPLJ0gPpvBuxExxguupg7UHSjrbBnSuY7diqz3XRNyLJLE+k3NrKhDBQVfDkjSCPv5+IPi2tsC4kTfC8bHtbQ9Ds1QNM+OfHrrAG95YPgJkHok9YDBlFI2yp2omYAuCblWCU4E8xsjCg4uDuDPIrLsHiSO/YSQ877+xeTLG4We7BgzltdppTfhDtq5LoXEOHmAuGsaNV44gP/1OkY/j2EKxPna1dwhxyWss5i11x9OKRpqTatFqLO9bRvuZjNP5JYKnM70Ypx/DONZf56mG3Z/X3xbiG9mWGOrrlhF8VkWCvK/2DlLipi7xDyBvtYleNfk9SMbxw2SILv94Pjffr/mFJybLlIBEQVzRFgY1Lzh5lWQA7tomI9J5O+hbVp6srbBPr/obebIVCKkQqaan6RFPi81BbO8TUbrbFI8LUK+uytdppF3tBQ/UWgWGYhbMHdL3uarjfDfTC+h/5sXe7a55tsWq4g=
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id u26-20020aa7839a000000b006dde0724247sm1273062pfm.149.2024.02.02.02.16.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Feb 2024 02:16:42 -0800 (PST)
+From: Kees Cook <keescook@chromium.org>
+To: linux-hardening@vger.kernel.org
+Cc: Kees Cook <keescook@chromium.org>,
+	Fangrui Song <maskray@google.com>,
+	Justin Stitt <justinstitt@google.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nicolas Schier <nicolas@fjasle.eu>,
+	Bill Wendling <morbo@google.com>,
+	Marco Elver <elver@google.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	x86@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-kbuild@vger.kernel.org,
+	llvm@lists.linux.dev,
+	linux-doc@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	kasan-dev@googlegroups.com,
+	linux-acpi@vger.kernel.org
+Subject: [PATCH v2 0/6] ubsan: Introduce wrap-around sanitizers
+Date: Fri,  2 Feb 2024 02:16:33 -0800
+Message-Id: <20240202101311.it.893-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
-Message-ID: <20240202101403.344408-1-edumazet@google.com>
-Subject: [PATCH net-next] sctp: preserve const qualifier in sctp_sk()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, 
-	Xin Long <lucien.xin@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2894; i=keescook@chromium.org;
+ h=from:subject:message-id; bh=2l9nEKso4+AOWcpX8WNY7A6dHeDCfYN/6uhOB8hks2s=;
+ b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBlvMEGR2w/jDkKre5GPT1/M/XftJt/c1PyB4wL/
+ haxlFPUi1KJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZbzBBgAKCRCJcvTf3G3A
+ JtsCD/9zn8FXQvcFAIIQgYZmbnBXO2DwIbRtXhGNbq2Nup24+qU2V23CPL1rxaHKDC/EiJJEnKb
+ e5BpVrssi1sNVM0eT1gSuZh3+Fe9MuSkT1qu5cuE+fhykPOt7JYBmAot97DhLNGpbC4Wh6wS2Gm
+ zt9zRh7VdGjswl0SiQQT3Ko7H0hMo+8Du/2ufEy3yiken9zj1VMMJ1KoVnxpVhaMUra5smuX5fZ
+ xfIadzk4bYAjWidY713+WT72pgRr7qsh7cHstL2GUq2+nI0GL0j6nmtuhPKMexyPaOp6rTzXwvb
+ Z7GBANHBt9W7RFT2e5jxCw2iSyb/9aZQDjTzC7dGQNytXEvHnP+Phzhj7xCmXOuITiwx70ObSXS
+ ME7gGoLJ13vK/Z1MOOR4KUNhbNwuaGi5yPooFb0xcsg4KnCSY2MOorFK9WWpu/OjmWo+DxUMEvR
+ 1J/KCnkcS1uyoVLsNj2Sh3VJJfz2UhtJtuwtqbFW43Uy4aaj00q7AmQ+NDje2eWQ70R0R+2XSMI
+ ndQHgrn7bxz13hk+ym9Je7oT6lJtEH74ncnlLRyN2B+2wk61/16LUCxqpP2Qjq0ZUSeYdi1IICL
+ eEpdx3A5WLH/w5PScFuSOwRUsIvtR3tCIgLvj1N4YRLGfj9EYX2DFA1VIUBOXReGwVa9kHKDz29
+ jIcc1AN WIb7pOrg==
+X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
 
-We can change sctp_sk() to propagate its argument const qualifier,
-thanks to container_of_const().
+Hi,
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Cc: Xin Long <lucien.xin@gmail.com>
----
- include/net/sctp/structs.h | 5 +----
- 1 file changed, 1 insertion(+), 4 deletions(-)
+v2:
+ - improve CC list
+ - add reviewed-by tags
+ - reword some commit logs
+v1: https://lore.kernel.org/all/20240129175033.work.813-kees@kernel.org/
 
-diff --git a/include/net/sctp/structs.h b/include/net/sctp/structs.h
-index 5a24d6d8522af9c814cfbb568c627777705051ac..f24a1bbcb3ef9442f4a739d8b25d92fae582a411 100644
---- a/include/net/sctp/structs.h
-+++ b/include/net/sctp/structs.h
-@@ -242,10 +242,7 @@ struct sctp_sock {
- 	int do_auto_asconf;
- };
- 
--static inline struct sctp_sock *sctp_sk(const struct sock *sk)
--{
--       return (struct sctp_sock *)sk;
--}
-+#define sctp_sk(ptr) container_of_const(ptr, struct sctp_sock, inet.sk)
- 
- static inline struct sock *sctp_opt2sk(const struct sctp_sock *sp)
- {
+Lay the ground work for gaining instrumentation for signed[1],
+unsigned[2], and pointer[3] wrap-around by making all 3 sanitizers
+available for testing. Additionally gets x86_64 bootable under the
+unsigned sanitizer for the first time.
+
+The compilers will need work before this can be generally useful, as the
+signed and pointer sanitizers are effectively a no-op with the kernel's
+required use of -fno-strict-overflow. The unsigned sanitizer will also
+need adjustment to deal with the many common code patterns that exist
+for unsigned wrap-around (e.g. "while (var--)", "-1UL", etc).
+
+-Kees
+
+Link: https://github.com/KSPP/linux/issues/26 [1]
+Link: https://github.com/KSPP/linux/issues/27 [2]
+Link: https://github.com/KSPP/linux/issues/344 [3]
+
+Kees Cook (6):
+  ubsan: Use Clang's -fsanitize-trap=undefined option
+  ubsan: Reintroduce signed and unsigned overflow sanitizers
+  ubsan: Introduce CONFIG_UBSAN_POINTER_WRAP
+  ubsan: Remove CONFIG_UBSAN_SANITIZE_ALL
+  ubsan: Split wrapping sanitizer Makefile rules
+  ubsan: Get x86_64 booting with unsigned wrap-around sanitizer
+
+ Documentation/dev-tools/ubsan.rst | 28 +++-------
+ arch/arm/Kconfig                  |  2 +-
+ arch/arm64/Kconfig                |  2 +-
+ arch/mips/Kconfig                 |  2 +-
+ arch/parisc/Kconfig               |  2 +-
+ arch/powerpc/Kconfig              |  2 +-
+ arch/riscv/Kconfig                |  2 +-
+ arch/s390/Kconfig                 |  2 +-
+ arch/x86/Kconfig                  |  2 +-
+ arch/x86/kernel/Makefile          |  1 +
+ arch/x86/kernel/apic/Makefile     |  1 +
+ arch/x86/mm/Makefile              |  1 +
+ arch/x86/mm/pat/Makefile          |  1 +
+ crypto/Makefile                   |  1 +
+ drivers/acpi/Makefile             |  1 +
+ include/linux/compiler_types.h    | 19 ++++++-
+ kernel/Makefile                   |  1 +
+ kernel/locking/Makefile           |  1 +
+ kernel/rcu/Makefile               |  1 +
+ kernel/sched/Makefile             |  1 +
+ lib/Kconfig.ubsan                 | 41 +++++++++-----
+ lib/Makefile                      |  1 +
+ lib/crypto/Makefile               |  1 +
+ lib/crypto/mpi/Makefile           |  1 +
+ lib/test_ubsan.c                  | 82 ++++++++++++++++++++++++++++
+ lib/ubsan.c                       | 89 +++++++++++++++++++++++++++++++
+ lib/ubsan.h                       |  5 ++
+ lib/zlib_deflate/Makefile         |  1 +
+ lib/zstd/Makefile                 |  2 +
+ mm/Makefile                       |  1 +
+ net/core/Makefile                 |  1 +
+ net/ipv4/Makefile                 |  1 +
+ scripts/Makefile.lib              | 11 +++-
+ scripts/Makefile.ubsan            | 11 +++-
+ 34 files changed, 278 insertions(+), 43 deletions(-)
+
 -- 
-2.43.0.594.gd9cf4e227d-goog
+2.34.1
 
 
