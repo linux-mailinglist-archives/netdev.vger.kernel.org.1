@@ -1,45 +1,63 @@
-Return-Path: <netdev+bounces-68406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02151846D29
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:00:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DED18846CE5
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 10:48:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10661B32F28
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:48:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 735DF1F25B2A
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:48:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B86F877F3E;
-	Fri,  2 Feb 2024 09:46:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B149879930;
+	Fri,  2 Feb 2024 09:46:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365B477F37;
-	Fri,  2 Feb 2024 09:46:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 768087762B;
+	Fri,  2 Feb 2024 09:46:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706867195; cv=none; b=iqvoczHCcDgn0c2wyPrCZqsGCJnlzIyRCTYPQ3yexYtCbz44x9shZIw/vRtJDLH8crABzJGAo4/qlX5nC1sGroFHdhul372XpWcFAucuf76TOUs5TatmFifneTfd0buawEOa11QBwuptIPICWw3147tgZLjm6uhKTo2aqmVbeog=
+	t=1706867215; cv=none; b=DZwNbMd+4QwsuefRBXH+xjA/koBVdr/oHXfmwjm2qskwOBkHnkX6nvvdPQCVSi/mXeWlGORQ8wODwjT4Q1ofF2Vtq+bmjTjrrCB7U0RqoN/b3wfcfNeY1Z5tT02ZqtjflqASY2j2oARbJBe3EDx0p0IMMfbhxmLJCUUJFJ823NQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706867195; c=relaxed/simple;
-	bh=0viBShxM0CD7785ltc0+gbW9fFDGWD3oKqNkTsfNyzw=;
+	s=arc-20240116; t=1706867215; c=relaxed/simple;
+	bh=WNz1nXGRiJEtTEPFc3N/58Kj62b4hXYnhcOMWc6UIP8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fHVylwuuSq1j0ioqG+qajpX5NzgcKYv7jp7BR/vxaVFz1f6c/+pr1xRNcxbIECEXGTryxYpWHEurWhae7DiSX0JqsliHckc1W5j5rVunWTnDBZpEV+GsmNDjd71zc+rCGz+2esc2UU2Y8YedCm5i5n39/mKz9lSQi95kLDS1K4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.216])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4TR9rz4MbWz4f3k67;
-	Fri,  2 Feb 2024 17:46:27 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.112])
-	by mail.maildlp.com (Postfix) with ESMTP id 3D8B31A038B;
-	Fri,  2 Feb 2024 17:46:30 +0800 (CST)
-Received: from [10.67.109.184] (unknown [10.67.109.184])
-	by APP1 (Coremail) with SMTP id cCh0CgBXKRLzubxlJ_zxCg--.14664S2;
-	Fri, 02 Feb 2024 17:46:28 +0800 (CST)
-Message-ID: <1c0c1ede-8595-4420-9f70-004645895a71@huaweicloud.com>
-Date: Fri, 2 Feb 2024 17:46:27 +0800
+	 In-Reply-To:Content-Type; b=URKwLRv314h/p2rx9fqNJcqhf4RjmDD0us3SUn2c7BO4y1RQREAjVsKtUrx05Vp/i7DQ3q0g1XmsZYfKIzpawGzlOfHwd7/+VCXJ+tWzTnR9w1a1nSngdlyrdtzWH71qSdnt7I/XAtRFAdP/wofIPcFKLO/tBJLQrqfjgiVl998=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 068a9a6a435c4571865aa591ef64006d-20240202
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.35,REQID:98750a05-eb2c-4d51-baa9-8ecba345d77b,IP:20,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:5
+X-CID-INFO: VERSION:1.1.35,REQID:98750a05-eb2c-4d51-baa9-8ecba345d77b,IP:20,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:5
+X-CID-META: VersionHash:5d391d7,CLOUDID:e68c8c83-8d4f-477b-89d2-1e3bdbef96d1,B
+	ulkID:240201204745Y4HHVX4X,BulkQuantity:6,Recheck:0,SF:17|19|44|64|66|24|1
+	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:40,QS:nil,BEC:nil,COL
+	:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_SNR,TF_CID_SPAM_FAS
+X-UUID: 068a9a6a435c4571865aa591ef64006d-20240202
+Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
+	(envelope-from <chentao@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1085833606; Fri, 02 Feb 2024 17:46:38 +0800
+Received: from mail.kylinos.cn (localhost [127.0.0.1])
+	by mail.kylinos.cn (NSMail) with SMTP id 56DB2E000EBC;
+	Fri,  2 Feb 2024 17:46:38 +0800 (CST)
+X-ns-mid: postfix-65BCB9FE-2849541295
+Received: from [172.20.15.254] (unknown [172.20.15.254])
+	by mail.kylinos.cn (NSMail) with ESMTPA id 3B86BE000EBC;
+	Fri,  2 Feb 2024 17:46:33 +0800 (CST)
+Message-ID: <961cc4ad-0133-44ee-be22-ba2fbf4ebe12@kylinos.cn>
+Date: Fri, 2 Feb 2024 17:46:33 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -47,71 +65,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v3 0/4] Mixing bpf2bpf and tailcalls for RV64
+Subject: Re: [PATCH net-next] rxrpc: Simplify the allocation of slab caches
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: dhowells@redhat.com, marc.dionne@auristor.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-afs@lists.infradead.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240201100924.210298-1-chentao@kylinos.cn>
+ <1706866812511330.14.seg@mailgw>
 Content-Language: en-US
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- Daniel Borkmann <daniel@iogearbox.net>
-Cc: bpf <bpf@vger.kernel.org>, linux-riscv <linux-riscv@lists.infradead.org>,
- Network Development <netdev@vger.kernel.org>, =?UTF-8?B?QmrDtnJuIFTDtnBl?=
- =?UTF-8?Q?l?= <bjorn@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Palmer Dabbelt <palmer@dabbelt.com>,
- Luke Nelson <luke.r.nels@gmail.com>, Pu Lehui <pulehui@huawei.com>,
- Leon Hwang <hffilwlqm@gmail.com>
-References: <20240201083351.943121-1-pulehui@huaweicloud.com>
- <1e7181e4-c4c5-d307-2c5c-5bf15016aa8a@iogearbox.net>
- <CAADnVQ+rLneO4t=YYmLYtc945Fz0=ucNTWZBxgvs8toFY-onRg@mail.gmail.com>
-From: Pu Lehui <pulehui@huaweicloud.com>
-In-Reply-To: <CAADnVQ+rLneO4t=YYmLYtc945Fz0=ucNTWZBxgvs8toFY-onRg@mail.gmail.com>
+From: Kunwu Chan <chentao@kylinos.cn>
+In-Reply-To: <1706866812511330.14.seg@mailgw>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:cCh0CgBXKRLzubxlJ_zxCg--.14664S2
-X-Coremail-Antispam: 1UD129KBjvdXoW7GrWxXr15JF1kWF13ZF45GFg_yoWDZwb_WF
-	9agFW8Ww1DZr17Ca18KFsY9r429FWqgry7KrW0gr9rCr1DGrn8GrnxGr9Yv345X3ZFg3Z8
-	W3WYqryqqrZrujkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUb78YFVCjjxCrM7AC8VAFwI0_Xr0_Wr1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r106r15McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1l42xK82IYc2Ij
-	64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x
-	8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE
-	2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42
-	xK8VAvwI8IcIk0rVW3JVWrJr1lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY
-	1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IUbG2NtUUUUU==
-X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+Content-Transfer-Encoding: 7bit
 
-
-
-On 2024/2/2 0:19, Alexei Starovoitov wrote:
-> On Thu, Feb 1, 2024 at 2:56 AM Daniel Borkmann <daniel@iogearbox.net> wrote:
+On 2024/2/1 20:47, Jiri Pirko wrote:
+> Thu, Feb 01, 2024 at 11:09:24AM CET, chentao@kylinos.cn wrote:
+>> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
+>> to simplify the creation of SLAB caches.
 >>
->>> will be destroyed. So we implemented mixing bpf2bpf and tailcalls
->>> similar to x86_64, i.e. using a non-callee saved register to transfer
-> ...
->> Iiuc, this still needs a respin as per the ongoing discussions. Also,
->> if you have worked on BPF selftests which exercise the corner case
->> around a6, please include them in the series as well for coverage.
+>> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
 > 
-> Hold on, folks.
-> I'm not sure it's such a code idea to support tailcalls from subprogs
-> in risc-v.
-> They're broken on x86-64 and so far several attempts to fix them
-> were not successful.
-> If we don't have a fix soon we will disable this feature completely
-> in the verifier.
-> In general tailcalling from subprogs is a niche use case.
-> If there are users they should transition to tail call from main prog only.
+> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 > 
-> See
-> https://lore.kernel.org/bpf/CAADnVQJ1szry9P00wweVDu4d0AQoM_49qT-_ueirvggAiCZrpw@mail.gmail.com/
-
-OK, will keep tracking.
+> btw, why don't you bulk these changes into patchsets of 15 patches? Or,
+> given the low complexicity of the patch, just merge multiple patches
+> that are changing similar locations togeter.
+Sorry, I haven't sent a patchset, I'm worried about messing up.
+I'll try to deal with these similar issues in the way you recommended in 
+the future, thank you for the reminder.
+-- 
+Thanks,
+   Kunwu
 
 
