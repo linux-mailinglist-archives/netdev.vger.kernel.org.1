@@ -1,197 +1,493 @@
-Return-Path: <netdev+bounces-68592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A68084753B
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:46:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4794B847570
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:55:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B183CB2761B
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:46:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CA991C2799C
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:55:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 767F41487C8;
-	Fri,  2 Feb 2024 16:46:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Qwj9mfXV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECB97148318;
+	Fri,  2 Feb 2024 16:55:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2061.outbound.protection.outlook.com [40.107.223.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCF2148314
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 16:46:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.61
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706892393; cv=fail; b=a+EDh5pbDMYQqL6P6tMihwIhFHTgvSpMw0/PSIYQDs97PX5Nd3yohyFaCY+f3YKWCZH/EeDjnVBUv5PUtJzVqF5ctxZAB3A6pl/lDcnoLzoCVrgyx84q/L41H/W62FsmyPDXIUuKzQAUfeKbxyGriKC9A6Wj2lqCj5mRjf4x2ZE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706892393; c=relaxed/simple;
-	bh=jOL+ShOkv+moD/pmhOmmGmIewyJgKwl4lqGLC+LD6XM=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=pdwsSTjhDmpM/Do5yL/JosL9nFXvAWw5kgT7RnuUuKA5PLWdhmmB8s08EMD0+comKERNj5sBf40qhMmKwzcET+iOqoCNznzB36gNeMsEzb1DiPm/jFl44c1jw47tlLR1WDVUWlP5YBX6wfITfBq7iouxBXD4uWwh+VuumyJz8Mw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Qwj9mfXV; arc=fail smtp.client-ip=40.107.223.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kH+sx+PWjESUrHKIMlpaLSNnnqEXCxjb/nX7KTUHz8VsCJyoDGc06bV76waChXe5FgtnAMoeFdwBDG057mNTc7sBKmdjrl8o7Q5GHJUy4bJA2DNh3OonXdTG62al5DlF8GBKFD28padJHf6Pn6ZurpfrDMLPPfwGGGRCnRXZEXwB1xIjhJMIzU4Rm7eObHbwZNBe+YnVsUlpc7hsvErUYG7VXi3Ifh9zjKrhC5MLbmTA3OoZm0ySXVNyASREZBsiILUbHERyo4s7WrUmxjyZNSEd6ZRXgGG+YVesFsY66Y4WANlRX5w2sSw1RZtwHT3L55DLF1AlKoFB6GErR+OAIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jOL+ShOkv+moD/pmhOmmGmIewyJgKwl4lqGLC+LD6XM=;
- b=QyTbWNvJhgSQyIDsaHur845Y6ok8hP7Xm0E4HSpaWS6Lq4329zAyEk/DxIQM74xtxuFVhMwjD0YlCGwmiDBzEm1erlhhYB780161e8Xy6cNsU6Able/rcgpgPXrd3PcncZbLaUe4GzeTO+enxSbtYSD4UvdMZpUn7/ZUK9v9LaGQAebFA1HsOrMZNKgdzUIn/ULaSMqRDfwLPevrU2jEzmfNg5k0itxT8LD10MTJW8u59KWFNfje1mbYE1wq4Lkdeqwot7srwyaLpCieWiZLwzTy5asGzOKVv3xbW/pxdjyVvMuKyGouIuL4dfBqHOwQmUAtO6wOFAcDf51fwFIh4g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jOL+ShOkv+moD/pmhOmmGmIewyJgKwl4lqGLC+LD6XM=;
- b=Qwj9mfXVTxEaz+3Etrk17JePOe9AzdJyxHENFIkb6M1PQSe/8dcmUB6Q/q0bt7qwwepUo2wm9kRNmxIkSfcwZaPU4iv9BbtSbVdDEbUGe1ahBkhwnTWXWQHDGeIpTNCY6ND2a7Yu89DLH0ROwX9qNyyaQ3O4z+Cewu9HM+QehPv879SAkJiPyEEtEl+RFYBdmloX0nQWOUjVY+wsLGHc14JfYC9RtpsjnA8k93j430DVSaYpEbO4VCKSOieJVPcsh/NDnzFDXh1/qBl+gqxRPqdjsF1rZOVeDXTR0YuHERbjXC1lLN8SrZuxf1R2qPQfGc4RRtZ+K9vWsoJVKOfoFg==
-Received: from CH0PR12MB8580.namprd12.prod.outlook.com (2603:10b6:610:192::6)
- by CH2PR12MB4134.namprd12.prod.outlook.com (2603:10b6:610:a7::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.14; Fri, 2 Feb
- 2024 16:46:28 +0000
-Received: from CH0PR12MB8580.namprd12.prod.outlook.com
- ([fe80::8825:1827:3273:bbbf]) by CH0PR12MB8580.namprd12.prod.outlook.com
- ([fe80::8825:1827:3273:bbbf%3]) with mapi id 15.20.7270.010; Fri, 2 Feb 2024
- 16:46:28 +0000
-From: Daniel Jurgens <danielj@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>, Jason Xing <kerneljasonxing@gmail.com>
-CC: "Michael S. Tsirkin" <mst@redhat.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "jasowang@redhat.com" <jasowang@redhat.com>,
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "abeni@redhat.com" <abeni@redhat.com>, Parav Pandit
-	<parav@nvidia.com>
-Subject: RE: [PATCH net-next] virtio_net: Add TX stop and wake counters
-Thread-Topic: [PATCH net-next] virtio_net: Add TX stop and wake counters
-Thread-Index:
- AQHaU4g6jvRyzH1tPUCIs6q7Q9im2rDycmwAgAAGRTCAAAXXAIAAAcJwgAABlYCAABui0IAAnRGAgAM82ACAACpvgIAAmT0AgAAG2fA=
-Date: Fri, 2 Feb 2024 16:46:28 +0000
-Message-ID:
- <CH0PR12MB858044D0E5AB3AC651AE0987C9422@CH0PR12MB8580.namprd12.prod.outlook.com>
-References: <20240130142521.18593-1-danielj@nvidia.com>
-	<20240130095645-mutt-send-email-mst@kernel.org>
-	<CH0PR12MB85809CB7678CADCC892B2259C97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
-	<20240130104107-mutt-send-email-mst@kernel.org>
-	<CH0PR12MB8580CCF10308B9935810C21DC97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
-	<20240130105246-mutt-send-email-mst@kernel.org>
-	<CH0PR12MB858067B9DB6BCEE10519F957C97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
-	<CAL+tcoCsT6UJ=2zxL-=0n7sQ2vPC5ybnQk9bGhF6PexZN=-29Q@mail.gmail.com>
-	<20240201202106.25d6dc93@kernel.org>
-	<CAL+tcoCs6x7=rBj50g2cMjwLjLOKs9xy1ZZBwSQs8bLfzm=B7Q@mail.gmail.com>
- <20240202080126.72598eef@kernel.org>
-In-Reply-To: <20240202080126.72598eef@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CH0PR12MB8580:EE_|CH2PR12MB4134:EE_
-x-ms-office365-filtering-correlation-id: 9b44a4aa-9cf5-4dba-b069-08dc240e8081
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- K91WuVZaCMB3TK8dld34aV3ZfRwagZkFt7A7COPoxkoPdkqX9Hv32B8dbzsmAqwon51Uf3/eYl9jyyl/LTPWcEmaMgIGAX3oqQkz73EUcZ99YCncPEQoxLP+LXDcCAMUOJuU5Igobf3ny4KdcM9Kpmzoo1GHAN5RQC3GbqNUXiz+QJ7So8CvVwJDqlL1Q50Emqa/h63C9VpbElXKftUfk7/EY5iXYCnF0fmcuP2IJc3en+688PhOT5+043/YdP8+a/5Gcuw6IjfD1zpRHwkYBfyWnYCD7V2qltEN9iz4u7YO3hLyOej1K6WIRmYA5MnFPukqjPRFTVgES/ZJQUtmJCBDt8+GjtoudTTctmrPNoVjJk6CPXMFD4GqLm5ILOkMb06KjPf0Vdy2DCsfqYLnvr5mxP/7MeYmes8idZDC3RnUmaI5lDKyN0/+GRlFTMWwcokYxBViJoGStlHVgACkAx5E3lbyK6g5kghRneQ1kyYXU6PgnOw84dM95KLBnQASXpjOHsFU1VnUF42wpPg8I+Y6Elkkz7h8dwxd2bI3MiSOPWwR8Z39nNBMmTu8c98Qz3oNgROVkPM5z7EDyo/SJrU6oqNXWDDr0jONzTBd3/HtjY54l7fXq+Xk1pnPRKh3ZEdjHHeKrtfWlh5sqp/rc2c+3P/AXMGXlxU/mIGZ7jg=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH0PR12MB8580.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(376002)(366004)(396003)(346002)(39860400002)(230922051799003)(64100799003)(451199024)(186009)(1800799012)(38100700002)(7696005)(6506007)(83380400001)(122000001)(55016003)(4326008)(9686003)(7416002)(2906002)(54906003)(33656002)(38070700009)(86362001)(5660300002)(316002)(8676002)(8936002)(52536014)(71200400001)(110136005)(76116006)(66946007)(66556008)(66476007)(66446008)(64756008)(107886003)(966005)(53546011)(26005)(41300700001)(478600001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?fUtyIz4yhCJp3V91dYHM+uRAwYxuEOZX7s218Fs+LyZ8mSxGAcIDev7VjuHH?=
- =?us-ascii?Q?DEDbYbS6WmdeP/Tq4PGZk37rnQmv7VhzdRl1ROR73SyaDEtRMGmvsXHZdsZs?=
- =?us-ascii?Q?7c8ZOTavaqnmpMnFcu6AZod6Hfxh2Rno0HpW97pRL8iPkbfWcKmmQR+PuQ2L?=
- =?us-ascii?Q?vf17+X9lutqYe0Shxt5sHygSaNrBOEMSTG31kuAwzJzYQetApFHLlRBQV93t?=
- =?us-ascii?Q?cEWxo0h/5mAHib/lV9Rb4GNfX5Ukkcj0toehzBcMwsyIQV+UekXEaQKcClm9?=
- =?us-ascii?Q?aaP2s/N9L0JHrnMo2VvQfPP7DVvWM/KPJOusx/9T6JbA58tAbONbKbOUZ8ab?=
- =?us-ascii?Q?IMTDjQ3EX7AIEkGNlDGHqU7uwnSiYh33aUCMcxqDdt93Xpg4eGeJ/JupwQn+?=
- =?us-ascii?Q?6OxrD8RPuh5Pa7TLFCVRUss4B4wbJE8NvkU1XJ63A3iLOsHVavfEn5mKtnG5?=
- =?us-ascii?Q?HaiZX/BTuEkyr1Su2cAaiLLeNg7295oum7J36w0NwJdHueBMJSEZwdjCjyBR?=
- =?us-ascii?Q?WruLhz8JNLOec/cFWJSUlvw1LaHYhxB3LO+R1SokCDH+8pg2EetOa0vBlfmE?=
- =?us-ascii?Q?vUWH9OJwRFfkBqr1oGZF9VbHOtsKByVc+D/wPxjB8GGW5CMwWFaW1MeEZj0S?=
- =?us-ascii?Q?BzeuH0usvLrL81XYAeYIiHxTUjS26jAslHGpUikuNUw9c6ozAkUTfeqzIA01?=
- =?us-ascii?Q?gR0PJHclYjm2XOYqd9Lf4CSy/kDU+u+rbqBRmGw1D5DoUKVShbuux4bvQhnO?=
- =?us-ascii?Q?W24gCGWtjPDy4kJOuPDYxLNhsqG0th3Z92KdIaesvrtbZrG5Xuqf3Qp4NB2i?=
- =?us-ascii?Q?2jto77bLEfhXv4baoA/awsqcd9St1sEOR3bdxe2AhBGHbdVvqbvX7zIEZBb2?=
- =?us-ascii?Q?tkF33LvMucjhRmCadSFrjHxncr7tLr2KYo6drn2U3Aypm17Ot5Cz0fEAwrvj?=
- =?us-ascii?Q?mfeEN7gsn05j5VPWFED7y+Xp91dVn2NTQA8ZeYh3VRUdvQ8DHSvKhgMuvTGf?=
- =?us-ascii?Q?+jH3iUdSZkxWKnVEFxOagSh6VWzPoVZbTs2LD8V9AJCUmFtFP3mza+qPrkBD?=
- =?us-ascii?Q?44kSwvSoMLvP4IKRHluhRcSGvqwWCdfAmVkXPZU35oz9Oips5sO7nPz2NVQs?=
- =?us-ascii?Q?oZ0J5A10jC260ISXPrdG+YkLLQsi2C6uDJqWP3WJ8787H8JW5pSzoqlRJiF8?=
- =?us-ascii?Q?nSZp3MeucYj+Cf/UcREQh0mD7TNdCw1y+prFJcqFzxmCt5vq5W8psqOieun9?=
- =?us-ascii?Q?ROMrGy4T/mfvKHzVUR6NnFAqdV9wEwUNhL/Ns49holYViPMYicl2o41kmxXz?=
- =?us-ascii?Q?1OEa5DVTczeQAlQcHPFn/BcA2rwv6ZzzDHsv6HXSivPY5tgxqGPWKaPC2BXF?=
- =?us-ascii?Q?FEXhPwUiWMNu3oJWbuujSHnotzJv3+t9chky2H56RZsHIEniU7phA1aQ+Q5u?=
- =?us-ascii?Q?VJSQaxRzvD2hzR2jR6hLhczPZ9zB+b80ZH+VrGT4pGMCPH04thw1AiA6Cd7h?=
- =?us-ascii?Q?XfoPngUj0GX4gq9tiHr/gAyJqg+liQhiGMXEWSrb5HnzZSrVuYEGm3xmYrHu?=
- =?us-ascii?Q?FtD4h3P+Pt/NYqK1CGw=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72CD1482F9;
+	Fri,  2 Feb 2024 16:55:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706892946; cv=none; b=guLzmureDRzSAcxWAsrgOC18fi10WZdIAFrqPW8A+zqUE1bESRu3wlPMWV8sZLNxyguntWVS9h8uEG6iONFl1oEh4et+v7qeuvZ9qdMYOrw50mLiUDocvECqLFjPZBWGGJxLd8gLSUVUf/ccKBJwTtFK85olzRLOwqd+cB/dUkE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706892946; c=relaxed/simple;
+	bh=JlCUJJrlNMwpfAyPTAHfmtZ32zOXQju1rAABkKeDyPw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hw8UcujIjem568jML2+osPw5FBWUawXEEm/lbRsDwu5k+HbC6HSeBPasYorclTH9dsHsCSUePkCTpjNEIZl5GX+ZvVd6OCTlAvhk9MLOOx5gTA74jLWoGzjS3eDoOHzu2pfTUhjSQTiEdh4hqH4UWxuQnpd6WnhQwACRbypJayI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-55f0b2c79cdso2974799a12.3;
+        Fri, 02 Feb 2024 08:55:40 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706892939; x=1707497739;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9kBA6RYll1yHORqHcUWb3KGp4YpRu6qlbwxwz32MBXc=;
+        b=gljk2R02mNM+MVq1PTP4eXpFnkO4M5T1qj3WNT1VFtpTKn/27GsXsfr+TAEAIvGVic
+         N2INND0IHb48FNXeryHkZnUvSU5DJrKnAQooThVZFUxl0JzCLq+cnREEvG2fA5Kc1Z23
+         aIXhvp6HzPDjhnbh84evGhi6G5sXIUmrCCZMLg4bN9TbLA4NWOemkpXhc0auFtvVYBqT
+         Bb9HIDTP8dqK2XGOOxERHueIP1wi77vSorjN4/t77H9SRVSTzgOWbP7w/uK6YeetmDE5
+         b0pcXex2S4LV09nptQE9H1Oq/EkAKocNjau70YqjZq63anZHpLUSdHoo41TTf6iP92gr
+         /Aeg==
+X-Gm-Message-State: AOJu0Yx1xRe6ZxZu5ZHbKaNqkRPMHHsfKi0Iw/IVhrVhxDW0ubV4gpTT
+	uEvQhJ199jScZoArBHpr5W953FJnJwGbjTRL5qGd8kU2mzKtryJ5
+X-Google-Smtp-Source: AGHT+IGEVPCJ/cDjUziNPRLJ2nMzwOzV4WtBKListJ1uJjtHmuDHyBygBPpGR1jzq2CBgoqH+GYVJg==
+X-Received: by 2002:a05:6402:1857:b0:560:b91:5cac with SMTP id v23-20020a056402185700b005600b915cacmr140743edy.28.1706892938791;
+        Fri, 02 Feb 2024 08:55:38 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCV06j+DpSWpn5sdSMeJ2C0OI7OJESfvvar57vkPj/sq3ZHkslPpN9QM26bcSq9L3iqfqhOKIeUaBIIIJ/RUsDnCt6/3b+Y3/pqADpLWjRt9r9E2Dy/AW6OFB2jBQb1ncwxascmHyjaWm7dP+cHlmwegmBdxxo0tQpjd4GKtmCSHbC3ccj56bJ3We6cum8fSOMF5OqA/ScIQxU3CPKR5s+JhGD4DeDbrhWZaRU4+aPySme2KHwz2K+ni1b51Uxf8K0bA5Ez3NvKpaGwDnb3pyjkLr+zL7aG1wVmUTF0sr65oE8sGuRSRHwsAWNNl6Yi4XJ/3owMfwfs2n2nQJVaBIP0F8EjCBWhiP5lE3YLh2Btd8KckUCtQDwIipyX7D/9eOe2Oo8jIVoo6gihX3UwTefKc4IcL5RqXtjL9vu08ex8AfGWoceAdrfmCAcqywlnOruycAQY65vrCCJhQVLKoaovJMgxr3Emhzoe8T5egRAEP4Ep3OkZKph5JLOpJ6DczuOg1DNts2m0vSdUn19ZuGdY7fBdEdW+74BEZybLB8eK+5jhw54A0aUc=
+Received: from localhost (fwdproxy-cln-024.fbsv.net. [2a03:2880:31ff:18::face:b00c])
+        by smtp.gmail.com with ESMTPSA id n16-20020a05640205d000b0055ff1749b15sm695342edx.66.2024.02.02.08.55.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Feb 2024 08:55:38 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: weiwan@google.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	horms@kernel.org,
+	Jonathan Corbet <corbet@lwn.net>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Johannes Berg <johannes.berg@intel.com>,
+	=?UTF-8?q?Thomas=20Wei=C3=9Fschuh?= <linux@weissschuh.net>,
+	linux-trace-kernel@vger.kernel.org (open list:TRACING)
+Subject: [PATCH net-next v3] net: dqs: add NIC stall detector based on BQL
+Date: Fri,  2 Feb 2024 08:53:06 -0800
+Message-Id: <20240202165315.2506384-1-leitao@debian.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CH0PR12MB8580.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9b44a4aa-9cf5-4dba-b069-08dc240e8081
-X-MS-Exchange-CrossTenant-originalarrivaltime: 02 Feb 2024 16:46:28.3855
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: greqeg7VII2M6DIl/hPYWzI+nJE5SrSlKG884uTVbjpmuqzqz1dKVsleU5J8zRV58oHAx/5weIvKeJABJ7mhlw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4134
+Content-Transfer-Encoding: 8bit
 
-> From: Jakub Kicinski <kuba@kernel.org>
-> Sent: Friday, February 2, 2024 10:01 AM
-> Subject: Re: [PATCH net-next] virtio_net: Add TX stop and wake counters
->=20
-> On Fri, 2 Feb 2024 14:52:59 +0800 Jason Xing wrote:
-> > > Can you say more? I'm curious what's your use case.
-> >
-> > I'm not working at Nvidia, so my point of view may differ from theirs.
-> > From what I can tell is that those two counters help me narrow down
-> > the range if I have to diagnose/debug some issues.
->=20
-> right, i'm asking to collect useful debugging tricks, nothing against the=
- patch
-> itself :)
->=20
-> > 1) I sometimes notice that if some irq is held too long (say, one
-> > simple case: output of printk printed to the console), those two
-> > counters can reflect the issue.
-> > 2) Similarly in virtio net, recently I traced such counters the
-> > current kernel does not have and it turned out that one of the output
-> > queues in the backend behaves badly.
-> > ...
-> >
-> > Stop/wake queue counters may not show directly the root cause of the
-> > issue, but help us 'guess' to some extent.
->=20
-> I'm surprised you say you can detect stall-related issues with this.
-> I guess virtio doesn't have BQL support, which makes it special.
-> Normal HW drivers with BQL almost never stop the queue by themselves.
-> I mean - if they do, and BQL is active, then the system is probably
-> misconfigured (queue is too short). This is what we use at Meta to detect
-> stalls in drivers with BQL:
->=20
-> https://lore.kernel.org/all/20240131102150.728960-3-leitao@debian.org/
->=20
-> Daniel, I think this may be a good enough excuse to add per-queue stats t=
-o
-> the netdev genl family, if you're up for that. LMK if you want more info,
-> otherwise I guess ethtool -S is fine for now.
+From: Jakub Kicinski <kuba@kernel.org>
 
-For now, I would like to go with ethtool -S. But I can take on the netdev l=
-evel as a background task. Are you suggesting adding them to rtnl_link_stat=
-s64?
+softnet_data->time_squeeze is sometimes used as a proxy for
+host overload or indication of scheduling problems. In practice
+this statistic is very noisy and has hard to grasp units -
+e.g. is 10 squeezes a second to be expected, or high?
 
+Delaying network (NAPI) processing leads to drops on NIC queues
+but also RTT bloat, impacting pacing and CA decisions.
+Stalls are a little hard to detect on the Rx side, because
+there may simply have not been any packets received in given
+period of time. Packet timestamps help a little bit, but
+again we don't know if packets are stale because we're
+not keeping up or because someone (*cough* cgroups)
+disabled IRQs for a long time.
 
+We can, however, use Tx as a proxy for Rx stalls. Most drivers
+use combined Rx+Tx NAPIs so if Tx gets starved so will Rx.
+On the Tx side we know exactly when packets get queued,
+and completed, so there is no uncertainty.
+
+This patch adds stall checks to BQL. Why BQL? Because
+it's a convenient place to add such checks, already
+called by most drivers, and it has copious free space
+in its structures (this patch adds no extra cache
+references or dirtying to the fast path).
+
+The algorithm takes one parameter - max delay AKA stall
+threshold and increments a counter whenever NAPI got delayed
+for at least that amount of time. It also records the length
+of the longest stall.
+
+To be precise every time NAPI has not polled for at least
+stall thrs we check if there were any Tx packets queued
+between last NAPI run and now - stall_thrs/2.
+
+Unlike the classic Tx watchdog this mechanism does not
+ignore stalls caused by Tx being disabled, or loss of link.
+I don't think the check is worth the complexity, and
+stall is a stall, whether due to host overload, flow
+control, link down... doesn't matter much to the application.
+
+We have been running this detector in production at Meta
+for 2 years, with the threshold of 8ms. It's the lowest
+value where false positives become rare. There's still
+a constant stream of reported stalls (especially without
+the ksoftirqd deferral patches reverted), those who like
+their stall metrics to be 0 may prefer higher value.
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Changelog:
+
+v1:
+  * https://lore.kernel.org/netdev/202306172057.jx7YhLiu-lkp@intel.com/T/
+
+v2:
+  * Fix the documentation file in patch 0001, since patch 0002 will
+    touch it later.
+  * Fix the kernel test robot issues, marking functions as statics.
+  * Use #include <linux/bitops.h> instead of <asm/bitops.h>.
+  * Added some new comments around, mainly around barriers.
+  * Format struct `netdev_queue_attribute` assignments to make
+    checkpatch happy.
+  * Updated and fixed the path in sysfs-class-net-queues
+    documentation.
+
+v3:
+  * Sending patch 0002 against net-next.
+	- The first patch was accepted against 'net'
+
+---
+ .../ABI/testing/sysfs-class-net-queues        | 23 +++++++
+ include/linux/dynamic_queue_limits.h          | 35 +++++++++++
+ include/trace/events/napi.h                   | 33 ++++++++++
+ lib/dynamic_queue_limits.c                    | 58 +++++++++++++++++
+ net/core/net-sysfs.c                          | 62 +++++++++++++++++++
+ 5 files changed, 211 insertions(+)
+
+diff --git a/Documentation/ABI/testing/sysfs-class-net-queues b/Documentation/ABI/testing/sysfs-class-net-queues
+index 5bff64d256c2..45bab9b6e3ae 100644
+--- a/Documentation/ABI/testing/sysfs-class-net-queues
++++ b/Documentation/ABI/testing/sysfs-class-net-queues
+@@ -96,3 +96,26 @@ Description:
+ 		Indicates the absolute minimum limit of bytes allowed to be
+ 		queued on this network device transmit queue. Default value is
+ 		0.
++
++What:		/sys/class/net/<iface>/queues/tx-<queue>/byte_queue_limits/stall_thrs
++Date:		Jan 2024
++KernelVersion:	6.9
++Contact:	netdev@vger.kernel.org
++Description:
++		Tx completion stall detection threshold. Kernel will guarantee
++		to detect all stalls longer than this threshold but may also
++		detect stalls longer than half of the threshold.
++
++What:		/sys/class/net/<iface>/queues/tx-<queue>/byte_queue_limits/stall_cnt
++Date:		Jan 2024
++KernelVersion:	6.9
++Contact:	netdev@vger.kernel.org
++Description:
++		Number of detected Tx completion stalls.
++
++What:		/sys/class/net/<iface>/queues/tx-<queue>/byte_queue_limits/stall_max
++Date:		Jan 2024
++KernelVersion:	6.9
++Contact:	netdev@vger.kernel.org
++Description:
++		Longest detected Tx completion stall. Write 0 to clear.
+diff --git a/include/linux/dynamic_queue_limits.h b/include/linux/dynamic_queue_limits.h
+index 407c2f281b64..288e98fe85f0 100644
+--- a/include/linux/dynamic_queue_limits.h
++++ b/include/linux/dynamic_queue_limits.h
+@@ -38,14 +38,21 @@
+ 
+ #ifdef __KERNEL__
+ 
++#include <linux/bitops.h>
+ #include <asm/bug.h>
+ 
++#define DQL_HIST_LEN		4
++#define DQL_HIST_ENT(dql, idx)	((dql)->history[(idx) % DQL_HIST_LEN])
++
+ struct dql {
+ 	/* Fields accessed in enqueue path (dql_queued) */
+ 	unsigned int	num_queued;		/* Total ever queued */
+ 	unsigned int	adj_limit;		/* limit + num_completed */
+ 	unsigned int	last_obj_cnt;		/* Count at last queuing */
+ 
++	unsigned long	history_head;
++	unsigned long	history[DQL_HIST_LEN];
++
+ 	/* Fields accessed only by completion path (dql_completed) */
+ 
+ 	unsigned int	limit ____cacheline_aligned_in_smp; /* Current limit */
+@@ -62,6 +69,11 @@ struct dql {
+ 	unsigned int	max_limit;		/* Max limit */
+ 	unsigned int	min_limit;		/* Minimum limit */
+ 	unsigned int	slack_hold_time;	/* Time to measure slack */
++
++	unsigned char	stall_thrs;
++	unsigned char	stall_max;
++	unsigned long	last_reap;
++	unsigned long	stall_cnt;
+ };
+ 
+ /* Set some static maximums */
+@@ -74,6 +86,8 @@ struct dql {
+  */
+ static inline void dql_queued(struct dql *dql, unsigned int count)
+ {
++	unsigned long map, now, now_hi, i;
++
+ 	BUG_ON(count > DQL_MAX_OBJECT);
+ 
+ 	dql->last_obj_cnt = count;
+@@ -86,6 +100,27 @@ static inline void dql_queued(struct dql *dql, unsigned int count)
+ 	barrier();
+ 
+ 	dql->num_queued += count;
++
++	now = jiffies;
++	now_hi = now / BITS_PER_LONG;
++	if (unlikely(now_hi != dql->history_head)) {
++		/* About to reuse slots, clear them */
++		for (i = 0; i < DQL_HIST_LEN; i++) {
++			/* Multiplication masks high bits */
++			if (now_hi * BITS_PER_LONG ==
++			    (dql->history_head + i) * BITS_PER_LONG)
++				break;
++			DQL_HIST_ENT(dql, dql->history_head + i + 1) = 0;
++		}
++		/* pairs with smp_rmb() in dql_check_stall() */
++		smp_wmb();
++		WRITE_ONCE(dql->history_head, now_hi);
++	}
++
++	/* __set_bit() does not guarantee WRITE_ONCE() semantics */
++	map = DQL_HIST_ENT(dql, now_hi);
++	if (!(map & BIT_MASK(now)))
++		WRITE_ONCE(DQL_HIST_ENT(dql, now_hi), map | BIT_MASK(now));
+ }
+ 
+ /* Returns how many objects can be queued, < 0 indicates over limit. */
+diff --git a/include/trace/events/napi.h b/include/trace/events/napi.h
+index 6678cf8b235b..272112ddaaa8 100644
+--- a/include/trace/events/napi.h
++++ b/include/trace/events/napi.h
+@@ -36,6 +36,39 @@ TRACE_EVENT(napi_poll,
+ 		  __entry->work, __entry->budget)
+ );
+ 
++TRACE_EVENT(dql_stall_detected,
++
++	TP_PROTO(unsigned int thrs, unsigned int len,
++		 unsigned long last_reap, unsigned long hist_head,
++		 unsigned long now, unsigned long *hist),
++
++	TP_ARGS(thrs, len, last_reap, hist_head, now, hist),
++
++	TP_STRUCT__entry(
++		__field(	unsigned int,		thrs)
++		__field(	unsigned int,		len)
++		__field(	unsigned long,		last_reap)
++		__field(	unsigned long,		hist_head)
++		__field(	unsigned long,		now)
++		__array(	unsigned long,		hist, 4)
++	),
++
++	TP_fast_assign(
++		__entry->thrs = thrs;
++		__entry->len = len;
++		__entry->last_reap = last_reap;
++		__entry->hist_head = hist_head * BITS_PER_LONG;
++		__entry->now = now;
++		memcpy(__entry->hist, hist, sizeof(entry->hist));
++	),
++
++	TP_printk("thrs %u  len %u  last_reap %lu  hist_head %lu  now %lu  hist %016lx %016lx %016lx %016lx",
++		  __entry->thrs, __entry->len,
++		  __entry->last_reap, __entry->hist_head, __entry->now,
++		  __entry->hist[0], __entry->hist[1],
++		  __entry->hist[2], __entry->hist[3])
++);
++
+ #undef NO_DEV
+ 
+ #endif /* _TRACE_NAPI_H */
+diff --git a/lib/dynamic_queue_limits.c b/lib/dynamic_queue_limits.c
+index fde0aa244148..162d30ae542c 100644
+--- a/lib/dynamic_queue_limits.c
++++ b/lib/dynamic_queue_limits.c
+@@ -10,10 +10,61 @@
+ #include <linux/dynamic_queue_limits.h>
+ #include <linux/compiler.h>
+ #include <linux/export.h>
++#include <trace/events/napi.h>
+ 
+ #define POSDIFF(A, B) ((int)((A) - (B)) > 0 ? (A) - (B) : 0)
+ #define AFTER_EQ(A, B) ((int)((A) - (B)) >= 0)
+ 
++static void dql_check_stall(struct dql *dql)
++{
++	unsigned long stall_thrs, now;
++
++	/* If we detect a stall see if anything was queued */
++	stall_thrs = READ_ONCE(dql->stall_thrs);
++	if (!stall_thrs)
++		return;
++
++	now = jiffies;
++	if (time_after_eq(now, dql->last_reap + stall_thrs)) {
++		unsigned long hist_head, t, start, end;
++
++		/* We are trying to detect a period of at least @stall_thrs
++		 * jiffies without any Tx completions, but during first half
++		 * of which some Tx was posted.
++		 */
++dqs_again:
++		hist_head = READ_ONCE(dql->history_head);
++		/* pairs with smp_wmb() in dql_queued() */
++		smp_rmb();
++		/* oldest sample since last reap */
++		start = (hist_head - DQL_HIST_LEN + 1) * BITS_PER_LONG;
++		if (time_before(start, dql->last_reap + 1))
++			start = dql->last_reap + 1;
++		/* newest sample we should have already seen a completion for */
++		end = hist_head * BITS_PER_LONG + (BITS_PER_LONG - 1);
++		if (time_before(now, end + stall_thrs / 2))
++			end = now - stall_thrs / 2;
++
++		for (t = start; time_before_eq(t, end); t++)
++			if (test_bit(t % (DQL_HIST_LEN * BITS_PER_LONG),
++				     dql->history))
++				break;
++		if (!time_before_eq(t, end))
++			goto no_stall;
++		if (hist_head != READ_ONCE(dql->history_head))
++			goto dqs_again;
++
++		dql->stall_cnt++;
++		dql->stall_max = max_t(unsigned int, dql->stall_max, now - t);
++
++		trace_dql_stall_detected(dql->stall_thrs, now - t,
++					 dql->last_reap, dql->history_head,
++					 now, dql->history);
++	}
++no_stall:
++	dql->last_reap = now;
++}
++
+ /* Records completed count and recalculates the queue limit */
+ void dql_completed(struct dql *dql, unsigned int count)
+ {
+@@ -110,6 +161,8 @@ void dql_completed(struct dql *dql, unsigned int count)
+ 	dql->prev_last_obj_cnt = dql->last_obj_cnt;
+ 	dql->num_completed = completed;
+ 	dql->prev_num_queued = num_queued;
++
++	dql_check_stall(dql);
+ }
+ EXPORT_SYMBOL(dql_completed);
+ 
+@@ -125,6 +178,10 @@ void dql_reset(struct dql *dql)
+ 	dql->prev_ovlimit = 0;
+ 	dql->lowest_slack = UINT_MAX;
+ 	dql->slack_start_time = jiffies;
++
++	dql->last_reap = jiffies;
++	dql->history_head = jiffies / BITS_PER_LONG;
++	memset(dql->history, 0, sizeof(dql->history));
+ }
+ EXPORT_SYMBOL(dql_reset);
+ 
+@@ -133,6 +190,7 @@ void dql_init(struct dql *dql, unsigned int hold_time)
+ 	dql->max_limit = DQL_MAX_LIMIT;
+ 	dql->min_limit = 0;
+ 	dql->slack_hold_time = hold_time;
++	dql->stall_thrs = 0;
+ 	dql_reset(dql);
+ }
+ EXPORT_SYMBOL(dql_init);
+diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
+index a09d507c5b03..94a622b0bb55 100644
+--- a/net/core/net-sysfs.c
++++ b/net/core/net-sysfs.c
+@@ -1409,6 +1409,65 @@ static struct netdev_queue_attribute bql_hold_time_attribute __ro_after_init
+ 	= __ATTR(hold_time, 0644,
+ 		 bql_show_hold_time, bql_set_hold_time);
+ 
++static ssize_t bql_show_stall_thrs(struct netdev_queue *queue, char *buf)
++{
++	struct dql *dql = &queue->dql;
++
++	return sprintf(buf, "%u\n", jiffies_to_msecs(dql->stall_thrs));
++}
++
++static ssize_t bql_set_stall_thrs(struct netdev_queue *queue,
++				  const char *buf, size_t len)
++{
++	struct dql *dql = &queue->dql;
++	unsigned int value;
++	int err;
++
++	err = kstrtouint(buf, 10, &value);
++	if (err < 0)
++		return err;
++
++	value = msecs_to_jiffies(value);
++	if (value && (value < 4 || value > 4 / 2 * BITS_PER_LONG))
++		return -ERANGE;
++
++	if (!dql->stall_thrs && value)
++		dql->last_reap = jiffies;
++	/* Force last_reap to be live */
++	smp_wmb();
++	dql->stall_thrs = value;
++
++	return len;
++}
++
++static struct netdev_queue_attribute bql_stall_thrs_attribute __ro_after_init =
++	__ATTR(stall_thrs, 0644, bql_show_stall_thrs, bql_set_stall_thrs);
++
++static ssize_t bql_show_stall_max(struct netdev_queue *queue, char *buf)
++{
++	return sprintf(buf, "%u\n", READ_ONCE(queue->dql.stall_max));
++}
++
++static ssize_t bql_set_stall_max(struct netdev_queue *queue,
++				 const char *buf, size_t len)
++{
++	WRITE_ONCE(queue->dql.stall_max, 0);
++	return len;
++}
++
++static struct netdev_queue_attribute bql_stall_max_attribute __ro_after_init =
++	__ATTR(stall_max, 0644, bql_show_stall_max, bql_set_stall_max);
++
++static ssize_t bql_show_stall_cnt(struct netdev_queue *queue, char *buf)
++{
++	struct dql *dql = &queue->dql;
++
++	return sprintf(buf, "%lu\n", dql->stall_cnt);
++}
++
++static struct netdev_queue_attribute bql_stall_cnt_attribute __ro_after_init =
++	__ATTR(stall_cnt, 0444, bql_show_stall_cnt, NULL);
++
+ static ssize_t bql_show_inflight(struct netdev_queue *queue,
+ 				 char *buf)
+ {
+@@ -1447,6 +1506,9 @@ static struct attribute *dql_attrs[] __ro_after_init = {
+ 	&bql_limit_min_attribute.attr,
+ 	&bql_hold_time_attribute.attr,
+ 	&bql_inflight_attribute.attr,
++	&bql_stall_thrs_attribute.attr,
++	&bql_stall_cnt_attribute.attr,
++	&bql_stall_max_attribute.attr,
+ 	NULL
+ };
+ 
+-- 
+2.34.1
 
 
