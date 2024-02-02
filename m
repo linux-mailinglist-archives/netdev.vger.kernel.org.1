@@ -1,93 +1,168 @@
-Return-Path: <netdev+bounces-68480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF88184701B
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:20:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 83900847029
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:22:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AB31290A63
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:20:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AD662825FF
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:22:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 754F213F00D;
-	Fri,  2 Feb 2024 12:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DED611419BD;
+	Fri,  2 Feb 2024 12:21:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mZJjQswF"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="zL4A5dXT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f66.google.com (mail-lf1-f66.google.com [209.85.167.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B86314078B;
-	Fri,  2 Feb 2024 12:20:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A36F14077D
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 12:21:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706876430; cv=none; b=nkQromOi7yUWWH1Bc+IgrZVQfFqeHUhk9fqDdY9mkFu3tsCrZSammdXMTcIfxAjFlLuD3l+jutL0lrvA68w30YYK2sdXTxJazHfof+ZdTG57i8kt2XUS/STqGL82NGdjuNTJC7FYZKk/sGutC5ifKSZ9kT65Z9Q1vybP4iZbVYQ=
+	t=1706876504; cv=none; b=YVmTqXDOk3sMzXsGfILCexY7MipCK1gV0w3wVZAhXPj4scirDxvkwfqAWf/fi6RAjgQ1sKb5BfdKyRQdZQLD15dhDTGfvtcgRA62k1r36iEMz4VmVBFZd2dBsIjLZrn4I1D/Wf1V00FB+JHrFZW04aMFVyA+IZ4LD1Hwdl9iAC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706876430; c=relaxed/simple;
-	bh=IL/RsTxguukES3K6D9bZQJx9fwT2/FPmdHvDvCi6g1c=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rf9q96++qMEHN7lzEe6jhTzDJzKTZIa0VMX7K2H5B7iNO/TQlN6vc703SUJjy+eILF5Y72r+yX8cexkB6ZoDbCeUW9kdphxW5F3MS4+jWVoDAJSyAj5DxpnWWns34pN9Q3Myd7MqN5Dvt7nwW36qd4m5pzbulQDZIQmzpx9DNgU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mZJjQswF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 150C8C433B1;
-	Fri,  2 Feb 2024 12:20:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706876430;
-	bh=IL/RsTxguukES3K6D9bZQJx9fwT2/FPmdHvDvCi6g1c=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mZJjQswFWz0sphtUTQvUY1tc3wOr/Rn+slmeQU6Y8V3PAD+dwg07grzyervqykxNA
-	 NV9friCwPmc+qYfw9ZXduB+h92Hk4sQJCRYpM82S8H3P2oYsUp0tsAPmZYhcfNDpm8
-	 Nf7M0LB5DPmctNo4mSPk5DegZz66PnfaQG0Lu5aJSnl6VLk0zlOSDm+zSh7bCGn04I
-	 +bI6Q+lQC/lUbURW67iI4LzbQ5qDskuLCaBe8Ot+b/XplhVMxIGqs4+YrMruw/5Bo5
-	 +suc1IqH/oceqkp9Vwe950YB6PeeEmFHRn/q9WYcyS+JS36FME0cs5YpjoV875Sn3L
-	 HL0R02kjIMzCw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E7E8EDC99E9;
-	Fri,  2 Feb 2024 12:20:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1706876504; c=relaxed/simple;
+	bh=/lSQmt72CkXTO6IuU4LTaBs/Ul5xFwmo+dJPP9Jkq4A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=syFFOq/bHnCg26s2X7qRAEbcZ95w9iKeGKwNp9Cf1rVBuBrRd0v8D0WewMfcq6rRmZyG7bOOBipE722ICephBuDgOzeENwfb9HfXOesthWCKV/lmZ9uGCnOQFB1H+97hWCCcLqIWklZBLCD+TWBi9hKEMglbXYAXI3KuD2eW4HA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=zL4A5dXT; arc=none smtp.client-ip=209.85.167.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lf1-f66.google.com with SMTP id 2adb3069b0e04-5112ea89211so2247425e87.1
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 04:21:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1706876501; x=1707481301; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=l8W2rvp+iz0AMnClCez/6mpFobBZYw1hUu+7ubVOtV0=;
+        b=zL4A5dXTjLBJxOw3GBDgZ1673e6vMGkwNs+Eq1djDcJmwHZesUf5EhiZG7QY9gbie8
+         Cfd3/Gwvxg8Yu7WKfGP1r1/oZjVoTDTwY6dYj9RSMRn5mfSF30Fa2ZDB6komU5aDqma5
+         Amq3wotPmjFn6JP14xNyUuLWMe+Gf/Ybv+3dOvQNmV8uuUrTACAeo9BJqJSISZLd8Jdi
+         nFdluGBff+rPUGBQwJSUGUl2bD43ZzarhUe2y8xB3U+p4d3QUmdxM6htS4Rta+0FLXSK
+         4xXeyz7Mx2Q3ZvcuOzSmFKHfcR/+jWkhcjfD69HbFuqq/xyz0W7NJA3tEwS8kYFgz8NN
+         SRBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706876501; x=1707481301;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=l8W2rvp+iz0AMnClCez/6mpFobBZYw1hUu+7ubVOtV0=;
+        b=ZBN6cBZ+18tngLbSybq7ZA7N3lDiS58cjvq/Xt39RSi3oPtw4BGTjBM4UrfwRNxiTW
+         rIXkHwsZFMDh7u/rk51MU09z5NWn3lkeycTa12R/42tvBwidrghfoFx4/c1/NyOmRb3S
+         b/oTBtfSpSiWwQR1OBeoWAo0+Sa/VLT0LM43CnuUZn4CUa9enCeOZhBB5dqjrxmRhA66
+         fTBJdNKDchqpYbMc3VXCq7wJbP2/TJJFeSG2mqwdMqlmLg9AZWYNv45wpnm3W58ebZdw
+         PKbqPywXN3MbsBWAYlUcIsdaBqCg6yFSdFtqAAWoxAwVx8MYbgPjXb0IdMp6gT8ffdlK
+         FSnQ==
+X-Gm-Message-State: AOJu0YzKGOd9AKbgL13LCKeNFctkkOc1HTmd6DBi9nrwMAITE2oPny7U
+	PUuihFCIa2BD/jAnXJMmvglVgO+dCbR2fnC1abBnXYl1tuZHv/jbFYB7ufLFJNM=
+X-Google-Smtp-Source: AGHT+IHuyzepGqzxcqmF4kQM1BTlD66SloEdPur1ZTqtQDOOA9um7Eu0Ctuhe5renJU0t0S1tz2q6Q==
+X-Received: by 2002:a19:6912:0:b0:511:33d4:c99b with SMTP id e18-20020a196912000000b0051133d4c99bmr1066834lfc.43.1706876500765;
+        Fri, 02 Feb 2024 04:21:40 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVlMlicMDZ+2SNsVj0g0p5WamBP0KeCBpOSXqPQk/GYHt+vJE/aOFF33umv47b05w/CnWAru0qFnVS7qz94jADuv7M6UtaKsyvZjDIOzA30pA61zxUCiS6eEWex0vYWGN6KB4OoUZsSvAzrDCCWeatv8D9Pg4pyT5NxXYj7b7aZeeAhQniRN+jZ+Uz+BgJB+GWV2LEpjvdSBsy1vVBaicedz81bcMMV3paXZqsNJQ2GX5zzw5GPdtmjTcXgTbEvCcgK0l5nBjdJwXAIQ4dN4ZPvVKDMiXHWs+fJ3lR2+H5A4YzzGzz0km/BpUzrarLtsE42WoMRqZWkGOuXvzXzsOLcsFerhIhidvqLfSKVdS+CvouHgXjHXzX7i2QU1YjoSl8KMc7x/kRvyWSHqLCC3BDSuCju8gU1/Zvgjs/KZBezhnsN91I9jf5i2xN1v3j8BlKSSD3UsYXKQXqtbxdA2KnRN6DImtafou48nE4bYquMO099mOi8n0uFTNW0P17x7SqtIdHel48xu9E5YpZgVNse/xkgwmUqtNChxhQF5cM+uLwKPzIqOQpc/8KSn8bSla3jdIKgNLt4aNUc9tzOkxD5R8D8DOV0B6hXRs5X8aJrgYYoSTTrDsZ9YljHhLnC5FWiisuceAu/o4Baqvxf9a6p7csBKVAQCPQEOSuY1owd9zhA2RBOO9Cd/aSsS7FVlZEXtm9sBPocdFn4pi6ExGt7wWzdOiZwid3t1WDRQNqu9Bjn48009TNidvwhovm9ssIqORzGFezZ7OY5eS5mRJL5OTMqVtRJ1iHi+3hkYSrmm7o1NpzGnw==
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id e17-20020a05600c4b9100b0040e3bdff98asm7131019wmp.23.2024.02.02.04.21.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Feb 2024 04:21:40 -0800 (PST)
+Date: Fri, 2 Feb 2024 13:21:37 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Michal =?iso-8859-1?Q?Koutn=FD?= <mkoutny@suse.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, cake@lists.bufferbloat.net,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@toke.dk>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Simon Horman <horms@kernel.org>,
+	Pedro Tammela <pctammela@mojatatu.com>
+Subject: Re: [PATCH v5 0/4] net/sched: Load modules via alias
+Message-ID: <ZbzeUW459-2f7iaq@nanopsycho>
+References: <20240201130943.19536-1-mkoutny@suse.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] sctp: Simplify the allocation of slab caches
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170687642994.27809.1168775974359008539.git-patchwork-notify@kernel.org>
-Date: Fri, 02 Feb 2024 12:20:29 +0000
-References: <20240131084549.142595-1-chentao@kylinos.cn>
-In-Reply-To: <20240131084549.142595-1-chentao@kylinos.cn>
-To: Kunwu Chan <chentao@kylinos.cn>
-Cc: marcelo.leitner@gmail.com, lucien.xin@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-sctp@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+In-Reply-To: <20240201130943.19536-1-mkoutny@suse.com>
 
-Hello:
+Thu, Feb 01, 2024 at 02:09:39PM CET, mkoutny@suse.com wrote:
+>These modules may be loaded lazily without user's awareness and
+>control. Add respective aliases to modules and request them under these
+>aliases so that modprobe's blacklisting mechanism (through aliases)
+>works for them. (The same pattern exists e.g. for filesystem
+>modules.)
+>
+>For example (before the change):
+>  $ tc filter add dev lo parent 10: protocol ip prio 10 handle 1: cgroup
+>  # cls_cgroup module is loaded despite a `blacklist cls_cgroup` entry
+>  # in /etc/modprobe.d/*.conf
+>
+>After the change:
+>  $ tc filter add dev lo parent 10: protocol ip prio 10 handle 1: cgroup
+>  Error: TC classifier not found.
+>  We have an error talking to the kernel
+>  # explicit/acknowledged (privileged) action is needed
+>  $ modprobe cls_cgroup
+>  # blacklist entry won't apply to this direct modprobe, module is
+>  # loaded with awareness
+>
+>A considered alternative was invoking `modprobe -b` always from
+>request_module(), however, dismissed as too intrusive and slightly
+>confusing in favor of the precedented aliases (the commit 7f78e0351394
+>("fs: Limit sys_mount to only request filesystem modules.").
+>
+>User experience suffers in both alternatives. Its improvement is
+>orthogonal to blacklist honoring.
+>
+>Changes from v1 (https://lore.kernel.org/r/20231121175640.9981-1-mkoutny@suse.com)
+>- Treat sch_ and act_ modules analogously to cls_
+>
+>Changes from v2 (https://lore.kernel.org/r/20231206192752.18989-1-mkoutny@suse.com)
+>- reorganized commits (one generated commit + manual pre-/post- work)
+>- used alias names more fitting the existing net- aliases
+>- more info in commit messages and cover letter
+>- rebased on current master
+>
+>Changes from v3 (https://lore.kernel.org/r/20240112180646.13232-1-mkoutny@suse.com)
+>- rebase on netdev/net-next/main
+>- correct aliases in cls_* modules (wrong sed)
+>- replace repeated prefix strings with a macro
+>- patch also request_module call in qdisc_set_default()
+>
+>Changes from v4 (https://lore.kernel.org/r/20240123135242.11430-1-mkoutny@suse.com)
+>- update example in cover letter to existing module (cls_tcindex->cls_cgroup)
+>  - tested that ':-)
+>- remove __stringify in alias macro, net-cls-cgroup instead of net-cls-"cgroup"
+>- pass correct argument to request_module() (Simon)
+>- rebased on netdev-next/main
+>
+>Michal Koutný (4):
+>  net/sched: Add helper macros with module names
+>  net/sched: Add module aliases for cls_,sch_,act_ modules
+>  net/sched: Load modules via their alias
+>  net/sched: Remove alias of sch_clsact
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Set looks fine to me:
 
-On Wed, 31 Jan 2024 16:45:49 +0800 you wrote:
-> commit 0a31bd5f2bbb ("KMEM_CACHE(): simplify slab cache creation")
-> introduces a new macro.
-> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-> to simplify the creation of SLAB caches.
-> 
-> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] sctp: Simplify the allocation of slab caches
-    https://git.kernel.org/netdev/net-next/c/fa33b35f86b8
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
