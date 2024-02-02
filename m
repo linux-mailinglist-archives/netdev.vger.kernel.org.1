@@ -1,83 +1,93 @@
-Return-Path: <netdev+bounces-68478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E994E846FF5
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:16:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFF2B846FFD
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:17:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85F3C1F235A3
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:16:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7C871C26A60
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:17:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4621813F00F;
-	Fri,  2 Feb 2024 12:16:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D299140788;
+	Fri,  2 Feb 2024 12:17:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I/NyzW0B"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="LpzTI4ob"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA3C813F009
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 12:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51504140771
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 12:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706876173; cv=none; b=dZ2KiETf1jKXuHIsQcoyUtNozcbjMRLPzDEOwtWohaopPIMQ+ahsANvo678gns7RnEznQWtwq47IEA/L3DlWODHOP+EnKrSO589iiKcGnIPnKkgPjR8ri4OhhR9zY4UEVBYVMoKOk0bJnKfOiAKiwoxLDBvDz3w+HS0XUK6Dr4g=
+	t=1706876226; cv=none; b=aGtNSztZousKwWaM44mi37gRz3CEE+WwfWb6kyHRX9p7ykKedPzgjIPdHUAEC0kvfs61W8018crNS/f0ykYQwL6HjWHTzNJdol3qNpJkQFdPQBcNUw6Re0s1IPDKu5mrTRS9skwom56CX/8AdBPxLa72GWeY7/i6nlfboLx0ars=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706876173; c=relaxed/simple;
-	bh=m0t2JOTQpS6s3qWWoW7EaGf06h5dEQdHGojTb04lHOk=;
+	s=arc-20240116; t=1706876226; c=relaxed/simple;
+	bh=6WMlixFsMD3YXZFA7X0TiodSA2ARpqznFCPL+NJ64J0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=biAbbHynflQXxz1jRLvInyVxkNf7jM+h9gnGqkJvy6v7x9J4Y9HKq34w8QYujTFWwvhV6pNj4kjWkGBoAgzU+AI/Sb3V/KlzhaaZdyJVgSZmwGojDUsBZQiz5vzF7ulnOXdyY0bnRvLQ74huhslIWRKddgP2NvTWVwLZUBLc3IY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I/NyzW0B; arc=none smtp.client-ip=209.85.216.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2954b34ddd0so1654395a91.0
-        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 04:16:11 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=tI2sahJu98sKqdUWUXcSbmQGMCrGjFdlyEL/0trwl4/LWGCLF0PbTuVfk90bw7GVHOyegp/rC3FIVY2NFDsAeuvVs45gHm2Ba2s2YAgLcrPb0A3U2D2zazpk8Hvh74OjYb3igiwiVGnq/KJEsphivyV73LrJoXfrtVENTTCgwKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=LpzTI4ob; arc=none smtp.client-ip=209.85.216.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-29041136f73so1509852a91.0
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 04:17:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706876171; x=1707480971; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1706876224; x=1707481024; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=xF2Oigyhs39tH8cTZgrGi5TN82rSOFExpUx88Lm1VbM=;
-        b=I/NyzW0BNdTehLV04L8jDrrmff6txpiQ7rX5brNyWwAukaFYFi2ISc3Lr6TEq1yJ42
-         wLsWMxhzM8OgFBC42rciCQU1bvnm3AEgRwGVWDa1YK9vvbjlgAYqIKttev53ZIdWww7x
-         IMsfcLDbG92qLJzfT0sulSU3vMW7OPGDKAqitfrv/H+f8t/sGCkx8q1LT4T0UZtcuRY1
-         Io0SnvNCKnj+wiwUPfsHE3x9Bq473qxVAycgO98y1rHKF4Y3UnZRo9qXiokp4ydmgYcr
-         caL8O/+f5k206o4CC3H1n8cKA1nAFEejEM/JIG/KjnvHKP4nx9o82gVf+LioGrPNEsjR
-         mnpg==
+        bh=UQ0esveh//cg9XCkiI/7xWePudzmiIjItwxrOruHVwk=;
+        b=LpzTI4obYAxHG+Gkig1OmPJWjP1D7uCoxw6UBg4vbSrdCkGBoxM0DmUc7l0biBlLHO
+         5WmQINucpkAfAX0/VONbedxa2YvfDqR8UPCIidaEWy5PTELhJMPbvyRbk1UctJFjqf5N
+         KWD9EtZB5AjPgIhMX1zUwQFe8JOb42Vh8WwsM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706876171; x=1707480971;
+        d=1e100.net; s=20230601; t=1706876224; x=1707481024;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=xF2Oigyhs39tH8cTZgrGi5TN82rSOFExpUx88Lm1VbM=;
-        b=phURjtieD0w5QrtE4QR2rIBbFhrRzAXVtK5OohLQYQRirv/WJcNsW7Yjx/wKG3Cg6w
-         IMAxQGvrJYeWBTX0iPnBGyxV5KZ6KuNq9ppR1Fbzs9DSZSBqqLp9OnJWcjY4FwdCrm7M
-         KAqIcZ0I9qm5Au0l9+RMnmch1QNd6lj32nsFcx5dHwQ55pnxux0L664hjeWSSuFRZ7Db
-         Rje7XHiRLGmFZLvBzpT10slHZA9R6Cv3u4bnvYOY3AsFJ6q7v4RaAidO+hSk5O5ReuRG
-         HqAyTffz6mnL6U+sbe2GZYaEGcgpEc92bNsBkswR0Kak4lub9HL2qVq6wbiisnQaxLCc
-         /1pg==
-X-Gm-Message-State: AOJu0YxvR++niQbVifH2SWDC5Nw0kHiikbDPEdI8IDplAlSSdJcAiIpN
-	i/GzFHVS12QJ2iVTdZ7Pgn5Lr0dyFLk5MjMM9AqBDOlrq7B1hMXP
-X-Google-Smtp-Source: AGHT+IGQsrbWdxFd1Jbl9FIN/e4WQOaZioGXDeUDhd8LGKTIKJTBcFvUfrEaLbnIq30+yUwOPe1e+Q==
-X-Received: by 2002:a17:90b:613:b0:28f:22fc:e84f with SMTP id gb19-20020a17090b061300b0028f22fce84fmr4863083pjb.10.1706876171018;
-        Fri, 02 Feb 2024 04:16:11 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXetIc7y0X3njXnJKuvJ1POH4m/GFl3ffgYL+zWqG27uof9AUZSqWlCGW2T2eWXNnf4Tw4Nf6AkVDqVWc7FxM7ewFr29/MpoCPZU4oYbihAkPIvJdi3t4sen99TvExotzali0hyuhFF6xomalSJKKEm0E16Ry+QoYMGtdkhOeU7gziuEtJaicRIzjTJ1DxAgE/lIWQffLfGf9z7M+VmSq70N5m7GmOOJOu6UuXLq0XBpcwZtQOjWq8T1vR7sRP02BrDSjZBpGK0EbUcgxbqMO8VuegBWRizOtrVoM4yibe/ZgTCUkF45EXkVVrVXJUFiAWeG5w=
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id nw8-20020a17090b254800b0029464b5fcdbsm70962pjb.42.2024.02.02.04.16.07
+        bh=UQ0esveh//cg9XCkiI/7xWePudzmiIjItwxrOruHVwk=;
+        b=nVXAwOPDj5OsokQQlLEbXWXIo8/lcLk+RCWfCOrCQaG2QfS5Xcs+/UzjZmhMpwN+iU
+         tSUTLI5iY7xHN5lSWv93hNgl4wW6hZIBsZE5/zpQo4cM2L9R4sFdabJC4TMn2k16kSBY
+         aozpUafAqMwTE521PbGU5yqGpNLvz7Utm+LW0V8i/Kwm60b8cpCu4d6CrdL5+dEKfn/M
+         K7VK/y1P1BYDYpjhZwkluR4kddeDPEzQqlXu70UhG1XpYbfQ+lsGYeo8u95SEB/eBd/M
+         Dm+liEdQ0DZlcZLlZv6VGG8u5u7orWSxYRTDngly0v/qovZNwq+7h3SaE5DpPjSgJ6T0
+         DA8g==
+X-Gm-Message-State: AOJu0YxeADCAir3KZkY5YnPljWDCAL8xjsw/PC9wzgFhWFbHrVRojk9T
+	ve8fxYsn8Pi+Wo6FjXO6o0RdJXOw6W8Eyfz6aEkvAzIbUxOact+gp/ziPyJVhA==
+X-Google-Smtp-Source: AGHT+IGg88zNLC34obB5/fOW4+rC0GoCG14stcT3rLU6L9HZrzANdbP1B4KMEzwmTO1dY9t5epZ2BQ==
+X-Received: by 2002:a17:90b:1298:b0:296:1dcf:c296 with SMTP id fw24-20020a17090b129800b002961dcfc296mr1876188pjb.18.1706876223734;
+        Fri, 02 Feb 2024 04:17:03 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUGVn+0c2h4HxapCQwK+CBO5gK3KOvlzIatkL3Eg+0hshg2pC4xRmXdAPGwrPO866Nj9YF+U6s6nJkm+zEO0B/JBsHbpfqLIrHUgGxhmDm7PR7dJOIlSKekZQeCfpS4kk6gdUCRy8AKy1koQcYXJUoBqPtoXthgUI8I+/eaEfrPbo4kflZwbchOOzcwU5swL0S6WdMTIJa+mw55to+6uV3nDPQwGmi8fzDIZ1/ceDsJxByCfPOeO0l/S81b9BgnbLDHSPgD7FlGPHvtp8Z/FomG1NkHrVilLrlukHP1pAw9wYKJnI22iJxJmSjYHmQniMGlZYsc/cdM58fBdkhFMawZoGvAvkTYiXvNll9VJlnJ8j/FX+IAuDXHo43itnq+OGQQdsBiGyQPYcczK3z4vcpWYVXqya3O7moVN8gWmQjkhvZgr8SZOqWDhbrhJgPiVmYM7CkU25sPa9I0PqKXD5aa7cvoHKmNkLXZ4/epetFyeC0sd5jBRU3IEcz8/3lo1E3SteGrn+6+Y/KEkJjGEjE/TlV+t7ZzrhslvL+T17oohFYN0g54YBk1TJzsBIkJwnqakFKkOfMS15bofbWnqaCKkx+rJlTObTtkF5AePTEEUWmqLLwa3jLiNLz4lnivpuzOGcGhWnPJl5a421rYycnirgqxJHh/cGTKPA8EmcYWycgZa67VxpoBN5oGlmkdby+KZtTF2BuWlV1VWF5HfxIzOVdG8qZz4Q257WM=
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id su13-20020a17090b534d00b002927a36b7a0sm1671429pjb.23.2024.02.02.04.17.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Feb 2024 04:16:10 -0800 (PST)
-Date: Fri, 2 Feb 2024 20:16:05 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: thinker.li@gmail.com
-Cc: netdev@vger.kernel.org, ast@kernel.org, martin.lau@linux.dev,
-	kernel-team@meta.com, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	sinquersw@gmail.com, kuifeng@meta.com
-Subject: Re: [PATCH net-next v3 4/5] net/ipv6: set expires in
- modify_prefix_route() if RTF_EXPIRES is set.
-Message-ID: <ZbzdBRd4teS_4Eey@Laptop-X1>
-References: <20240202082200.227031-1-thinker.li@gmail.com>
- <20240202082200.227031-5-thinker.li@gmail.com>
+        Fri, 02 Feb 2024 04:17:03 -0800 (PST)
+Date: Fri, 2 Feb 2024 04:17:02 -0800
+From: Kees Cook <keescook@chromium.org>
+To: Marco Elver <elver@google.com>
+Cc: linux-hardening@vger.kernel.org, Justin Stitt <justinstitt@google.com>,
+	Miguel Ojeda <ojeda@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Peter Zijlstra <peterz@infradead.org>, Hao Luo <haoluo@google.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Fangrui Song <maskray@google.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Nicolas Schier <nicolas@fjasle.eu>,
+	Bill Wendling <morbo@google.com>,
+	Andrey Konovalov <andreyknvl@gmail.com>,
+	Jonathan Corbet <corbet@lwn.net>, x86@kernel.org,
+	linux-kernel@vger.kernel.org, linux-kbuild@vger.kernel.org,
+	llvm@lists.linux.dev, linux-doc@vger.kernel.org,
+	netdev@vger.kernel.org, linux-crypto@vger.kernel.org,
+	kasan-dev@googlegroups.com, linux-acpi@vger.kernel.org
+Subject: Re: [PATCH v2 2/6] ubsan: Reintroduce signed and unsigned overflow
+ sanitizers
+Message-ID: <202402020405.7E0B5B3784@keescook>
+References: <20240202101311.it.893-kees@kernel.org>
+ <20240202101642.156588-2-keescook@chromium.org>
+ <CANpmjNPPbTNPJfM5MNE6tW-jCse+u_RB8bqGLT3cTxgCsL+x-A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,54 +96,83 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240202082200.227031-5-thinker.li@gmail.com>
+In-Reply-To: <CANpmjNPPbTNPJfM5MNE6tW-jCse+u_RB8bqGLT3cTxgCsL+x-A@mail.gmail.com>
 
-On Fri, Feb 02, 2024 at 12:21:59AM -0800, thinker.li@gmail.com wrote:
-> From: Kui-Feng Lee <thinker.li@gmail.com>
+On Fri, Feb 02, 2024 at 12:01:55PM +0100, Marco Elver wrote:
+> On Fri, 2 Feb 2024 at 11:16, Kees Cook <keescook@chromium.org> wrote:
+> > [...]
+> > +config UBSAN_UNSIGNED_WRAP
+> > +       bool "Perform checking for unsigned arithmetic wrap-around"
+> > +       depends on $(cc-option,-fsanitize=unsigned-integer-overflow)
+> > +       depends on !X86_32 # avoid excessive stack usage on x86-32/clang
+> > +       depends on !COMPILE_TEST
+> > +       help
+> > +         This option enables -fsanitize=unsigned-integer-overflow which checks
+> > +         for wrap-around of any arithmetic operations with unsigned integers. This
+> > +         currently causes x86 to fail to boot.
 > 
-> Make the decision to set or clean the expires of a route based on the
-> RTF_EXPIRES flag, rather than the value of the "expires" argument.
-> 
-> The function inet6_addr_modify() is the only caller of
-> modify_prefix_route(), and it passes the RTF_EXPIRES flag and an expiration
-> value. The RTF_EXPIRES flag is turned on or off based on the value of
-> valid_lft. The RTF_EXPIRES flag is turned on if valid_lft is a finite value
-> (not infinite, not 0xffffffff). Even if valid_lft is 0, the RTF_EXPIRES
-> flag remains on. The expiration value being passed is equal to the
-> valid_lft value if the flag is on. However, if the valid_lft value is
-> infinite, the expiration value becomes 0 and the RTF_EXPIRES flag is turned
-> off. Despite this, modify_prefix_route() decides to set the expiration
-> value if the received expiration value is not zero. This mixing of infinite
-> and zero cases creates an inconsistency.
-> 
-> Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
-> ---
->  net/ipv6/addrconf.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-> index 36bfa987c314..2f6cf6314646 100644
-> --- a/net/ipv6/addrconf.c
-> +++ b/net/ipv6/addrconf.c
-> @@ -4788,7 +4788,7 @@ static int modify_prefix_route(struct inet6_ifaddr *ifp,
->  	} else {
->  		table = f6i->fib6_table;
->  		spin_lock_bh(&table->tb6_lock);
-> -		if (!expires) {
-> +		if (!(flags & RTF_EXPIRES)) {
+> My hypothesis is that these options will quickly be enabled by various
+> test and fuzzing setups, to the detriment of kernel developers. While
+> the commit message states that these are for experimentation, I do not
+> think it is at all clear from the Kconfig options.
 
-Hi Kui-Feng,
+I can certainly rephrase it more strongly. I would hope that anyone
+enabling the unsigned sanitizer would quickly realize how extremely
+noisy it is.
 
-I may missed something. But I still could not get why we shouldn't use
-expires for checking? If expires == 0, but RTF_EXPIRES is on,
-shouldn't we call fib6_clean_expires()?
+> Unsigned integer wrap-around is relatively common (it is _not_ UB
+> after all). While I can appreciate that in some cases wrap around is a
+> genuine semantic bug, and that's what we want to find with these
+> changes, ultimately marking all semantically valid wrap arounds to
+> catch the unmarked ones. Given these patterns are so common, and C
+> programmers are used to them, it will take a lot of effort to mark all
+> the intentional cases. But I fear that even if we get to that place,
+> _unmarked_  but semantically valid unsigned wrap around will keep
+> popping up again and again.
 
-Thanks
-Hangbin
->  			fib6_clean_expires(f6i);
->  			fib6_remove_gc_list(f6i);
->  		} else {
-> -- 
-> 2.34.1
+I agree -- it's going to be quite a challenge. My short-term goal is to
+see how far the sanitizer itself can get with identifying intentional
+uses. For example, I found two more extremely common code patterns that
+trip it now:
+
+	unsigned int i = ...;
+	...
+	while (i--) { ... }
+
+This trips the sanitizer at loop exit. :P It seems like churn to
+refactor all of these into "for (; i; i--)". The compiler should be able
+to identify this by looking for later uses of "i", etc.
+
+The other is negative constants: -1UL, -3ULL, etc. These are all over
+the place and very very obviously intentional and should be ignored by
+the compiler.
+
+> What is the long-term vision to minimize the additional churn this may
+> introduce?
+
+My hope is that we can evolve the coverage over time. Solving it all at
+once won't be possible, but I think we can get pretty far with the
+signed overflow sanitizer, which runs relatively cleanly already.
+
+If we can't make meaningful progress in unsigned annotations, I think
+we'll have to work on gaining type-based operator overloading so we can
+grow type-aware arithmetic. That will serve as a much cleaner
+annotation. E.g. introduce jiffie_t, which wraps.
+
+> I think the problem reminds me a little of the data race problem,
+> although I suspect unsigned integer wraparound is much more common
+> than data races (which unlike unsigned wrap around is actually UB) -
+> so chasing all intentional unsigned integer wrap arounds and marking
+> will take even more effort than marking all intentional data races
+> (which we're still slowly, but steadily, making progress towards).
 > 
+> At the very least, these options should 'depends on EXPERT' or even
+> 'depends on BROKEN' while the story is still being worked out.
+
+Perhaps I should hold off on bringing the unsigned sanitizer back? I was
+hoping to work in parallel with the signed sanitizer, but maybe this
+isn't the right approach?
+
+-- 
+Kees Cook
 
