@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-68349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03848846AF8
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:43:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E479846AFA
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:43:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 826C01F21253
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:43:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F6AB293E7D
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:43:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F9E260DF8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C476F612D2;
 	Fri,  2 Feb 2024 08:42:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="KeApL3q9"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="LDAwv0yP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 316E76087A
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 08:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4805FDB9
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 08:42:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706863321; cv=none; b=hHTWskkuU8+Y2PGQ390P/Cb6ecfOyMrHqLOxZwd7eajIWAMgPt6wAIptAXsWHUQK9JqTksvnuf08B0d0FOwAQiRlgq7tUVVzoIlMT8ql+3OEe6Qa13en3pLe5LEZUeymxlWgPgshMc032DlOuZMmjxQm2dWfD0er79b7+AD2SNc=
+	t=1706863322; cv=none; b=qXyS/YTmBSR1b4c8wO0Wh+Y2Qwmopt+Rabwc5iirHiRC4iWMuC4hvbuEcy1/NRVbvGFrd9lPXiWx6Na0f1LEjwmWED+MgRlJ3/CC0SqM9tMg75p4m6Fqf0pTfWdYEulo2Q8/Akws5ddaTdomK7Mv1iBPJOcxtnNzJMCrB2TKFaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706863321; c=relaxed/simple;
-	bh=7knUzxJaOSATsmEqjBqD5f6xLSBKqcQD+sqyG+aVVfE=;
+	s=arc-20240116; t=1706863322; c=relaxed/simple;
+	bh=ONbLpDUQ0pxclPSJgUwLbET51iczHAS/yqhLYj7/j1w=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=WBf8VIUoSpoFBwXDKjs8mwqS7/ll9sDojIZrANB47CUYDAXw54jlhYaGjQRppESgsazA7AMp9zEqh5Y2Gz15F8yDgTtJ/b9yxGBwhhEOVRTLNJ0kbNaix5Dl5Q5B8XLRRIrkszPCsy0T6lfOIbCiObjv1hL0DKJPXQm0LegJufM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=KeApL3q9; arc=none smtp.client-ip=209.85.208.49
+	 MIME-Version; b=CYXQyxEByKQHzGV1YPdh6WNPFVjDYpv7fTOEHGxcO+FaJSWbvK81jzYRlwhVSbx4JYrsWGwibm5/FsFFP1eAYl7Dv66/uML4OiNRBkmxSIZ0+jaeZT2eDVt84S5m+kduTQUKw6aedc7LhSVUZQbhC1CmmQvg/KPYBqM6qwEF/r4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=LDAwv0yP; arc=none smtp.client-ip=209.85.218.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-55fb4b22da8so1815304a12.2
-        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 00:41:58 -0800 (PST)
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a370e7e1e02so32289666b.0
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 00:42:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1706863317; x=1707468117; darn=vger.kernel.org;
+        d=tuxon.dev; s=google; t=1706863319; x=1707468119; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QcPvbSGq6xN49QvaaQuCyF55moPeocRQPNZDf403Hwc=;
-        b=KeApL3q9VYwm1LbfD5KvpSf6/DSat/d8nFWKDdQE0QJldx+i7B5Gz5q4i1dTSJFcGo
-         qWJQeYzfGdGbPcf/aDnl0YVJG/HMPiGVGKt4GLQzwl6f0IJA76TgePN8iIzOt/dzVDJK
-         36M4lY3mE5QIwHfTJm4KWaA2G4BjWGRkctmDP3kk9JZcolQuq/AH6GxxwCFD8v3igvnt
-         I/IJjMLoBuZIOR0mvUYuRYxh/d+SCa5z4uLpG+fqsvnWAFZyMiYfhDPXUP5gwYqzfiWL
-         ZdldmpJX6QUEXeyev/v3GfRD1wk5uw8a6KrcltmPKzvkelttjFTXlt+aXmcpqlMXKXit
-         NT8g==
+        bh=YI71IkOMT1SgNH06umqK9lD2YJ8x0EnJE4QH08tMLVg=;
+        b=LDAwv0yPllK8bov9hAZ+TFwuH9APeDr0TnYLkT1pgRhcPQEilHS4KD3SgoVGNFQIsQ
+         DkOmEe9ow8vi2+DH2v962Xock94UfXSypbDrM+QFdFUVC4QoIvr3dac698/wFmHifW10
+         jFK6SkUw15NCDGkJ5c1pF9Cb/CAMadkMNajel5PP4lAKVUb+saMZZm/WDyZYnczJAXFG
+         Q00vO2qbDWFsDby9A0TG5m+Xn4c3gER/1mGkIjJjpRFU/bZ54nzcfaZQoz+JAMP+RgN9
+         kJCoVYh/qYcpDT9snQm0cDGFlDLvhFEUMOrYwBFdEuApTflz+bSUaUfiUzCC0EMfKP8z
+         A6ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706863317; x=1707468117;
+        d=1e100.net; s=20230601; t=1706863319; x=1707468119;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QcPvbSGq6xN49QvaaQuCyF55moPeocRQPNZDf403Hwc=;
-        b=eeTCztsVg/EJOxbKjvmNKm4K9JG0J7UJhmf8CZAZK6ZvQ7UdYlPQbm3P7zlNBkLoAq
-         sNDI06Vsey167BWRo9mlti+ma8vKVZykSZfH9DDcx7Lpmdnb7kfbJ9TaBPjt4JZ/MJ6K
-         GcDiV9FjG1o+rx6JYvxDWiN2gZOvcjfiDPe6uRV/jOKGA0jFWQ9MQypj2vBz4rNVVaYG
-         4FxoKT95W5AMzU8PH8i+Z/g/e9oHXZ2zPi64SPnW/EeGtuPyA5a+7G3OK+iHmtZqsyKQ
-         XQwnTNW5NpVw4IX+t7bZEaAI4QPa1ZdFTj6MP0Xuu+pyNEenoyIocxZ52xRPrJPn++at
-         gkgA==
-X-Gm-Message-State: AOJu0Yw5iy6KpshdJaeQuNN/m80A74GCqR/y8bLca1qLbZTDL6HLjyco
-	jAfPTpBGfreomL8XJdYBRyONgcLdrAev0XRqAPMsdvYmp3FucdY1YU2rMzmiL28=
-X-Google-Smtp-Source: AGHT+IHUg5QEIwAX1/FjeYfVhxorC/bkxITWEs1POR/iprN1aR+jqEPzp5x3sn7zuKVqxHeTAbGzGQ==
-X-Received: by 2002:a17:906:3612:b0:a36:8711:f7b6 with SMTP id q18-20020a170906361200b00a368711f7b6mr3487272ejb.34.1706863317150;
-        Fri, 02 Feb 2024 00:41:57 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCV3hy6AVSB5ks+zaQtr4DnV/Kixqk03qDqPraUFFQM/1B+JC0kfHttEMn8AbQJ5kvPdDJ97oThb3cJIJ/VVvpapYCn34so1BAuL57J9nGcO5LJAwOqh3u2nOlyD6uNKspJV2A9Sym6Q7Hv2oAhC763Aj8rEdWk3z+bwsFj5cyLUgeAp7ob17Wx3HTfOFp+2+aA0I9OlMGQUe+wCG1JD39yrcqR8ORml6IlCLOBdLhxi3179FdXTflWQdHLsjAqNwnUvGav9H1/Uitt9tsosglgtP3Ldq/dtv4mOju4JgA6B4jyz/4WlBFImRs58mxB+DyZVr0DnqLSMrqHD/OXxLJWEUHjWg2g0M9nr6dcs92tgf402JOdfk1Ka66LO8yi2Y/o5AM8uOBiqxalpZtAvDlEvt91EAzNJmLOk/Wr+GM8Soqgc7Qs=
+        bh=YI71IkOMT1SgNH06umqK9lD2YJ8x0EnJE4QH08tMLVg=;
+        b=wuarIDSH5yiMvq2gJCm753pfPchTgmbw9kDEvFh3PPlHcBYS0g1muHsnb6hEoJD4ir
+         Ke6dKUIp7lTV7tALNAPHidJjePEEvofpZmI28uayIaelehXRkh4dGFZacVBnFg8FgcGZ
+         m71Do4K22qkDVzSAYvpjCpj8udGV8SOhL/Rx2/sy6wZxqVb8S0HHMx+igpp4JjP2P1aM
+         YSmM7II7+qnuUYn9WYXRPyKoiqRptR8NK3EoUJytvgcSvrhswNDl81bP1L85hnQfQWY9
+         3Px1K9l3LVZXCwr+P3MCWdm8kclbV1mIKO+UhCOcsS6WRCFexHz9jC8SpcknZoXLQJ9t
+         +Acg==
+X-Gm-Message-State: AOJu0YyO1Pkd/YXnBxADXggTNqJ2dkXgg0i6/HrkEwrJKhpgLTeLGBlR
+	KwL4uJtqVGMurCHOs2hg7vW3rGsjx/+ZVN9786z3S25DCNd76UuV6jmNqjxEu8c=
+X-Google-Smtp-Source: AGHT+IGwAEtd98gv9Uj3CwlkaCRSQFY2aondW9bQppJ81yZfClAIps1aFV/4117XUjsxgw6V+YnbgQ==
+X-Received: by 2002:a17:906:b803:b0:a31:8e54:14db with SMTP id dv3-20020a170906b80300b00a318e5414dbmr5796744ejb.55.1706863319184;
+        Fri, 02 Feb 2024 00:41:59 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVycCJlmHxnoNErdRh/32hZodjiOrpxpOduG/5PQsHgwIF3io97/09VHxS0p38RtyN9ytVaKVPKLKhYWtB+BPmng5GPQoPG5I6GQcfbx1Y+rzz3MK1GqSN+LhmIjWmu4UbH1hjk5D5gjR/KlXHYcevuFzle8pgiTOaQMw0h5v6ICLIdZmRJl2HdQ7YGXMnGVWPWaPU3odIV4HY5t2GFJT5ezhCnpkw4STnO7C30QJOGz6EiJESR1e436seEfaOxe89+XI8CuJ+HErvhuZbg8R1qsa4Yzndc4PoW/243f3mcDCx8pCjkC3T6P8GarwvM75KzSEbvdgd4/64MtXfjmtZr3bSNDGw5IznO/q/YBm76LpTg8z3ddmwJtQEVKTtlRqzJt05EM/ASz0ZSvw==
 Received: from claudiu-X670E-Pro-RS.. ([82.78.167.87])
-        by smtp.gmail.com with ESMTPSA id oz35-20020a1709077da300b00a361c1375absm631642ejc.133.2024.02.02.00.41.55
+        by smtp.gmail.com with ESMTPSA id oz35-20020a1709077da300b00a361c1375absm631642ejc.133.2024.02.02.00.41.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Feb 2024 00:41:56 -0800 (PST)
+        Fri, 02 Feb 2024 00:41:57 -0800 (PST)
 From: Claudiu <claudiu.beznea@tuxon.dev>
 X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
 To: s.shtylyov@omp.ru,
@@ -80,11 +80,10 @@ Cc: netdev@vger.kernel.org,
 	linux-renesas-soc@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	claudiu.beznea@tuxon.dev,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>
-Subject: [PATCH net-next v6 04/15] net: ravb: Switch to SYSTEM_SLEEP_PM_OPS()/RUNTIME_PM_OPS() and pm_ptr()
-Date: Fri,  2 Feb 2024 10:41:25 +0200
-Message-Id: <20240202084136.3426492-5-claudiu.beznea.uj@bp.renesas.com>
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Subject: [PATCH net-next v6 05/15] net: ravb: Use tabs instead of spaces
+Date: Fri,  2 Feb 2024 10:41:26 +0200
+Message-Id: <20240202084136.3426492-6-claudiu.beznea.uj@bp.renesas.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240202084136.3426492-1-claudiu.beznea.uj@bp.renesas.com>
 References: <20240202084136.3426492-1-claudiu.beznea.uj@bp.renesas.com>
@@ -98,15 +97,11 @@ Content-Transfer-Encoding: 8bit
 
 From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-SET_SYSTEM_SLEEP_PM_OPS() and SET_RUNTIME_PM_OPS() are deprecated now
-and require __maybe_unused protection against unused function warnings.
-The usage of pm_ptr() and SYSTEM_SLEEP_PM_OPS()/RUNTIME_PM_OPS() allows
-the compiler to see the functions, thus suppressing the warning. Thus
-drop the __maybe_unused markings.
+Use tabs instead of spaces in the ravb_set_rate_gbeth() function.
+This aligns with the coding style requirements.
 
 Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-Reviewed-by: Geert Uytterhoeven <geert+renesas@glider.be>
 ---
 
 Changes in v6:
@@ -125,61 +120,30 @@ Changes in v3:
 Changes in v2:
 - collected tags
 
-
- drivers/net/ethernet/renesas/ravb_main.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/renesas/ravb_main.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index fd431f1a0b98..7ced5db04f75 100644
+index 7ced5db04f75..c05d4a2664eb 100644
 --- a/drivers/net/ethernet/renesas/ravb_main.c
 +++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -2971,7 +2971,7 @@ static int ravb_wol_restore(struct net_device *ndev)
- 	return disable_irq_wake(priv->emac_irq);
- }
- 
--static int __maybe_unused ravb_suspend(struct device *dev)
-+static int ravb_suspend(struct device *dev)
- {
- 	struct net_device *ndev = dev_get_drvdata(dev);
+@@ -96,13 +96,13 @@ static void ravb_set_rate_gbeth(struct net_device *ndev)
  	struct ravb_private *priv = netdev_priv(ndev);
-@@ -2993,7 +2993,7 @@ static int __maybe_unused ravb_suspend(struct device *dev)
- 	return ret;
- }
  
--static int __maybe_unused ravb_resume(struct device *dev)
-+static int ravb_resume(struct device *dev)
- {
- 	struct net_device *ndev = dev_get_drvdata(dev);
- 	struct ravb_private *priv = netdev_priv(ndev);
-@@ -3052,7 +3052,7 @@ static int __maybe_unused ravb_resume(struct device *dev)
- 	return ret;
- }
- 
--static int __maybe_unused ravb_runtime_nop(struct device *dev)
-+static int ravb_runtime_nop(struct device *dev)
- {
- 	/* Runtime PM callback shared between ->runtime_suspend()
- 	 * and ->runtime_resume(). Simply returns success.
-@@ -3065,8 +3065,8 @@ static int __maybe_unused ravb_runtime_nop(struct device *dev)
- }
- 
- static const struct dev_pm_ops ravb_dev_pm_ops = {
--	SET_SYSTEM_SLEEP_PM_OPS(ravb_suspend, ravb_resume)
--	SET_RUNTIME_PM_OPS(ravb_runtime_nop, ravb_runtime_nop, NULL)
-+	SYSTEM_SLEEP_PM_OPS(ravb_suspend, ravb_resume)
-+	RUNTIME_PM_OPS(ravb_runtime_nop, ravb_runtime_nop, NULL)
- };
- 
- static struct platform_driver ravb_driver = {
-@@ -3074,7 +3074,7 @@ static struct platform_driver ravb_driver = {
- 	.remove_new	= ravb_remove,
- 	.driver = {
- 		.name	= "ravb",
--		.pm	= &ravb_dev_pm_ops,
-+		.pm	= pm_ptr(&ravb_dev_pm_ops),
- 		.of_match_table = ravb_match_table,
- 	},
- };
+ 	switch (priv->speed) {
+-	case 10:                /* 10BASE */
++	case 10:		/* 10BASE */
+ 		ravb_write(ndev, GBETH_GECMR_SPEED_10, GECMR);
+ 		break;
+-	case 100:               /* 100BASE */
++	case 100:		/* 100BASE */
+ 		ravb_write(ndev, GBETH_GECMR_SPEED_100, GECMR);
+ 		break;
+-	case 1000:              /* 1000BASE */
++	case 1000:		/* 1000BASE */
+ 		ravb_write(ndev, GBETH_GECMR_SPEED_1000, GECMR);
+ 		break;
+ 	}
 -- 
 2.39.2
 
