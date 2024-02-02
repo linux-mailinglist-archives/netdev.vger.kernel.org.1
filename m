@@ -1,122 +1,239 @@
-Return-Path: <netdev+bounces-68247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68C748464CD
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:05:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3FF98464EE
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:12:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07C641F259B2
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 00:05:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95EAA1F24013
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 00:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1220115B1;
-	Fri,  2 Feb 2024 00:05:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3693E188;
+	Fri,  2 Feb 2024 00:12:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JPf2IaaP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N5ic5DpY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D8E210EF;
-	Fri,  2 Feb 2024 00:05:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E811110B;
+	Fri,  2 Feb 2024 00:11:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706832335; cv=none; b=rbezv6p2c6NtRCTYrwI0AtaE4x2rGAKJ0DJ4Y7eKeXTiHfRU+u7j6t3Efr3vata5EN0FlMq1oo5U9AfGE9JBnT4MphMbyeuuV0R57/rF2YbJJoYwUMp1zGxA2ZGfpZYrrVVTUsOJ6/j21QxmdbXHJigAKiW8DKOq5Yex+O7sN2Y=
+	t=1706832720; cv=none; b=IuY4kYXJYjCTaQF166uqNLLoaGhkK0l+5wJ2ZUuHilU/7gq/4xzFBeKaKXbgc8A3l+qhFmD5CNEIisxO4tMmTuP5KuikxW2nRP5jq5O8Nqh0now1ik2VTtVp2zKvluYVycM9gsfIdUMQeLU1a+f25SMk5tfNDebxZYs4vnxy7cE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706832335; c=relaxed/simple;
-	bh=+De4TUxIX9GGQpXLWuAEcB7P/wKiFnoQrmglfp/o8ow=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ud7ZfndJSNqOQitJgPJYGNy3QjI00elf8Dn1NV15wIngemyTdeEd2c46lsSiLoayYNIg5B5/7awGVuztJAPYTbUbqQLkXipuqjx+tPH/h8jgWEoy2TWgtEjFb/LN23NM10DUKQeou6xTliDmh2BOcDTiQ6sTByJwMcBUE6PtFM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JPf2IaaP; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a370315191dso11824066b.2;
-        Thu, 01 Feb 2024 16:05:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706832331; x=1707437131; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Kw5yCa7B5h6E5tqNELeCv4fqCVbEaQWT1fjUMOqoUrY=;
-        b=JPf2IaaPh9AU644zkZ+yh9sft/wJNiJF1gajdC+XRDd/9HR73XeMpd/AtsJdP5G7Kd
-         AVcnjLOGT8R6HBDOYxnmmNPVJK+Rdbi7ed61UxRVMyU+9TXSuVexIXv9RRNoQ1nSQf95
-         /+jCunekEmUS0Ao52PVUzeggldpCvjgGO9hpegjGN2g8PvyNuUG/oEqhOglepSBJ90yG
-         6OgPH7izCS1fqCLxzvNzHLpE5fYoUlTf0LtTAoxKwMK4WOlTctW4e3DQa/OeLL8Ah0od
-         ihJPb9lPXfZXhB9dIEg7d45qxg7OLqM9Saf3CK9WZdPQeNyzpz5BGN+wg3fQB7SOTeAL
-         t9og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706832331; x=1707437131;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kw5yCa7B5h6E5tqNELeCv4fqCVbEaQWT1fjUMOqoUrY=;
-        b=UfpcyTfFzNLyCllYe24xmEJ3pX2vdjp2rgB1QmKlp8imjmxH9ZcTc2mMrWP4KpJkTG
-         5XumSZmfYcIXIV/+pUxcF3BPHRr08hHI1NI2MDVhIb9wgxHbbqUFZYnxhTCHkf66HryM
-         aIij0BqRU325NESsH49i4yCB+e0kG9/5tjSMqHPxqWThZVfnlDRXcPD2NRi3wOV3mI4u
-         wZ5iIQmVIvCj7xOT01ubynQwS+VCD6wpVTUDcsKxQ6B4SiSwJMEVvNcVBTZsmIFZuIXp
-         fhw2f6cNtoyBFiUg0QvkohnBFCtg/R912RJ0/Az0BwFf//wJhUI8Pdyakcb4Mhprbhyy
-         sX2A==
-X-Gm-Message-State: AOJu0Yw6v0PqT8aOk6x5rxInOm4XUB9Zog0/iSBZbwGkB4SwvTBoQXTD
-	ONzg17uRBionvHy8nML2VI1Tu01z4er1m/nYDZhszv5S4rwKUk+t
-X-Google-Smtp-Source: AGHT+IG3Oc+QVcDW1imSv28f6Wfd18UPkfs0THsoQFFMSm7GDFwNpyXEsoyc6JUAhBc82NDm4akIqQ==
-X-Received: by 2002:a17:906:6c8b:b0:a31:7aca:a429 with SMTP id s11-20020a1709066c8b00b00a317acaa429mr2525716ejr.4.1706832331143;
-        Thu, 01 Feb 2024 16:05:31 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVqP+Ej+Py+JOKNXrBkFKszG2TQ5BitJp54lFM/ULnJrFAc1ThEwV37zImCs1V0f0eDefU0plz4nmA8YW3GvEpfgesqzJ8LlKKoG/cQTSLKgFdp4GlDVA7fbbENVVpIiX5Rglz9ADw69SHHTh8o8pghR4qkBmabwOP09SIfqUNUa8ziP3ewAGr/dVYf+2fuGLm0L3c0CWqnc4aV1+buL5BfYCzCDgyjKrqV783V7L21RduwjXpzinMDUJ+LzzD6P91YNrz88t0BrW2Homhh7ViZCsm+/NMsiFKs02EaAmqcDK99b02kw/c706SVeTz7P5E4LkNfp6eH0jUnieHOs9pHpLY8Mz3X3chY/UdnntiLMpAf/YRQMyMh1827YqyvR8fnU4n91AaOyZbXbV9QJWn02buVYKPHSno5klsYAemlYzsY8T87xFkGhfpNWQqgORiRY2+nBDIGQsGMzWqg7Rq1/X2g4A8WVFsaMmxp6mIE7O0z7+jKh3aSBpAjiYR3vbRqNBRr8Nta93M/1hAB9bog5PYudd/t6ezBNGXqJT3sCH12ovbVkKaAxftXTgekJMH97R6TbP+NFraj7y/peJ1wuakTP3fOXpvCtb4+ohGLj3+K38Jw/JNL7D0ns6yNLuV+l3K5DvAV3Wqho8pA7oSJ47CuZzI2
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id cx7-20020a170907168700b00a3161adb239sm279824ejd.158.2024.02.01.16.05.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 16:05:30 -0800 (PST)
-Date: Fri, 2 Feb 2024 02:05:28 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: arinc.unal@arinc9.com
-Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>, mithat.guner@xeront.com,
-	erkin.bozoglu@xeront.com,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v2 6/7] net: dsa: mt7530: correct port
- capabilities of MT7988
-Message-ID: <20240202000528.efgly2bpfhqxu332@skbuf>
-References: <20240130-for-netnext-mt7530-improvements-2-v2-0-ba06f5dd9eb0@arinc9.com>
- <20240130-for-netnext-mt7530-improvements-2-v2-0-ba06f5dd9eb0@arinc9.com>
- <20240130-for-netnext-mt7530-improvements-2-v2-6-ba06f5dd9eb0@arinc9.com>
- <20240130-for-netnext-mt7530-improvements-2-v2-6-ba06f5dd9eb0@arinc9.com>
+	s=arc-20240116; t=1706832720; c=relaxed/simple;
+	bh=liSPO8tflE3qr1uximZeCncYsczutRNkJJKNFWF0+zs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HlNpjjWUsKC2U0CAeaL+XHYed45VT77D2C3fd4/iCeI/XAP87pSZrnd8hB45pRhYgZmvjoknU+Nc5DZcM4+ISc1zNlxp/qWHIGQBO1limFdLqEpaPDsTnYz+Aza+DP65ovCGOHM7zpr2q7jzcuQkmaeuMCcH268XZGdZggR+ZgQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N5ic5DpY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2194C433F1;
+	Fri,  2 Feb 2024 00:11:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706832719;
+	bh=liSPO8tflE3qr1uximZeCncYsczutRNkJJKNFWF0+zs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=N5ic5DpYYSas+3qCk0tYHCRjQpGcqrJ2c14dZhdH1CUn3dW74bPyS4r4v59spNMgl
+	 e/+gOBx8mqFXuzUxZTbOq61CK03AMHQAE4ccEwQikmFVbE+oWV/8BqjC9NQn/Te06d
+	 U5gTjfAuxCEOGzwkHH0vSm8WZAPxargk79K4nlodyrl0XzXFtTGfytSLz8/K956Y2B
+	 mZsGn92mhNL3FEu8cR57w4bdy4Ae3REyDNYOtGjk97Ari+I86Tb98xNbhNIr434MKi
+	 08OWUWBNlZNxzOdD7nvXNcjT33V4DOxCXWLaPtohdotfKLn5fZVOFxzVeJSiwYGfA4
+	 qWEbydyePu/OQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	horms@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next] selftests: netdevsim: stop using ifconfig
+Date: Thu,  1 Feb 2024 16:11:54 -0800
+Message-ID: <20240202001154.414386-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240130-for-netnext-mt7530-improvements-2-v2-6-ba06f5dd9eb0@arinc9.com>
- <20240130-for-netnext-mt7530-improvements-2-v2-6-ba06f5dd9eb0@arinc9.com>
 
-On Tue, Jan 30, 2024 at 06:20:52PM +0300, Arınç ÜNAL via B4 Relay wrote:
-> From: Arınç ÜNAL <arinc.unal@arinc9.com>
-> 
-> On the switch on the MT7988 SoC, as shown in Block Diagram 8.1.1.3 on page
-> 125 of "MT7988A Wi-Fi 7 Generation Router Platform: Datasheet (Open
-> Version) v0.1", there are only 4 PHYs. That's port 0 to 3. Set the case for
-> ports which connect to switch PHYs to '0 ... 3'.
-> 
-> Port 4 and 5 are not used at all in this design.
-> 
-> Link: https://wiki.banana-pi.org/Banana_Pi_BPI-R4#Documents [1]
-> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> Acked-by: Daniel Golle <daniel@makrotopia.org>
-> ---
+Paolo points out that ifconfig is legacy and we should not use it.
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: shuah@kernel.org
+CC: horms@kernel.org
+CC: linux-kselftest@vger.kernel.org
+---
+ .../drivers/net/netdevsim/udp_tunnel_nic.sh   | 40 +++++++++----------
+ 1 file changed, 20 insertions(+), 20 deletions(-)
+
+diff --git a/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh b/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
+index f98435c502f6..384cfa3d38a6 100755
+--- a/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
++++ b/tools/testing/selftests/drivers/net/netdevsim/udp_tunnel_nic.sh
+@@ -270,7 +270,7 @@ for port in 0 1; do
+ 	echo 1 > $NSIM_DEV_SYS/new_port
+     fi
+     NSIM_NETDEV=`get_netdev_name old_netdevs`
+-    ifconfig $NSIM_NETDEV up
++    ip link set dev $NSIM_NETDEV up
+ 
+     msg="new NIC device created"
+     exp0=( 0 0 0 0 )
+@@ -284,8 +284,8 @@ for port in 0 1; do
+ 
+     msg="VxLAN v4 devices go down"
+     exp0=( 0 0 0 0 )
+-    ifconfig vxlan1 down
+-    ifconfig vxlan0 down
++    ip link set dev vxlan1 down
++    ip link set dev vxlan0 down
+     check_tables
+ 
+     msg="VxLAN v6 devices"
+@@ -293,7 +293,7 @@ for port in 0 1; do
+     new_vxlan vxlanA 4789 $NSIM_NETDEV 6
+ 
+     for ifc in vxlan0 vxlan1; do
+-	ifconfig $ifc up
++	ip link set dev $ifc up
+     done
+ 
+     new_vxlan vxlanB 4789 $NSIM_NETDEV 6
+@@ -307,14 +307,14 @@ for port in 0 1; do
+     new_geneve gnv0 6081
+ 
+     msg="NIC device goes down"
+-    ifconfig $NSIM_NETDEV down
++    ip link set dev $NSIM_NETDEV down
+     if [ $port -eq 1 ]; then
+ 	exp0=( 0 0 0 0 )
+ 	exp1=( 0 0 0 0 )
+     fi
+     check_tables
+     msg="NIC device goes up again"
+-    ifconfig $NSIM_NETDEV up
++    ip link set dev $NSIM_NETDEV up
+     exp0=( `mke 4789 1` `mke 4790 1` 0 0 )
+     exp1=( `mke 6081 2` 0 0 0 )
+     check_tables
+@@ -433,7 +433,7 @@ for port in 0 1; do
+ 
+     echo $port > $NSIM_DEV_SYS/new_port
+     NSIM_NETDEV=`get_netdev_name old_netdevs`
+-    ifconfig $NSIM_NETDEV up
++    ip link set dev $NSIM_NETDEV up
+ 
+     overflow_table0 "overflow NIC table"
+     overflow_table1 "overflow NIC table"
+@@ -491,7 +491,7 @@ for port in 0 1; do
+ 
+     echo $port > $NSIM_DEV_SYS/new_port
+     NSIM_NETDEV=`get_netdev_name old_netdevs`
+-    ifconfig $NSIM_NETDEV up
++    ip link set dev $NSIM_NETDEV up
+ 
+     overflow_table0 "overflow NIC table"
+     overflow_table1 "overflow NIC table"
+@@ -548,7 +548,7 @@ for port in 0 1; do
+ 
+     echo $port > $NSIM_DEV_SYS/new_port
+     NSIM_NETDEV=`get_netdev_name old_netdevs`
+-    ifconfig $NSIM_NETDEV up
++    ip link set dev $NSIM_NETDEV up
+ 
+     overflow_table0 "destroy NIC"
+     overflow_table1 "destroy NIC"
+@@ -578,7 +578,7 @@ for port in 0 1; do
+ 
+     echo $port > $NSIM_DEV_SYS/new_port
+     NSIM_NETDEV=`get_netdev_name old_netdevs`
+-    ifconfig $NSIM_NETDEV up
++    ip link set dev $NSIM_NETDEV up
+ 
+     msg="create VxLANs v6"
+     new_vxlan vxlanA0 10000 $NSIM_NETDEV 6
+@@ -639,7 +639,7 @@ for port in 0 1; do
+ 
+     echo $port > $NSIM_DEV_SYS/new_port
+     NSIM_NETDEV=`get_netdev_name old_netdevs`
+-    ifconfig $NSIM_NETDEV up
++    ip link set dev $NSIM_NETDEV up
+ 
+     echo 110 > $NSIM_DEV_DFS/ports/$port/udp_ports_inject_error
+ 
+@@ -695,7 +695,7 @@ for port in 0 1; do
+ 
+     echo $port > $NSIM_DEV_SYS/new_port
+     NSIM_NETDEV=`get_netdev_name old_netdevs`
+-    ifconfig $NSIM_NETDEV up
++    ip link set dev $NSIM_NETDEV up
+ 
+     msg="create VxLANs v6"
+     exp0=( `mke 10000 1` 0 0 0 )
+@@ -755,7 +755,7 @@ for port in 0 1; do
+ 
+     echo $port > $NSIM_DEV_SYS/new_port
+     NSIM_NETDEV=`get_netdev_name old_netdevs`
+-    ifconfig $NSIM_NETDEV up
++    ip link set dev $NSIM_NETDEV up
+ 
+     msg="create VxLANs v6"
+     exp0=( `mke 10000 1` 0 0 0 )
+@@ -768,7 +768,7 @@ for port in 0 1; do
+     check_tables
+ 
+     msg="NIC device goes down"
+-    ifconfig $NSIM_NETDEV down
++    ip link set dev $NSIM_NETDEV down
+     if [ $port -eq 1 ]; then
+ 	exp0=( 0 0 0 0 )
+ 	exp1=( 0 0 0 0 )
+@@ -779,7 +779,7 @@ for port in 0 1; do
+     check_tables
+ 
+     msg="NIC device goes up again"
+-    ifconfig $NSIM_NETDEV up
++    ip link set dev $NSIM_NETDEV up
+     exp0=( `mke 10000 1` 0 0 0 )
+     check_tables
+ 
+@@ -827,12 +827,12 @@ new_vxlan vxlan1 4789 $NSIM_NETDEV2
+ 
+ msg="VxLAN v4 devices go down"
+ exp0=( 0 0 0 0 )
+-ifconfig vxlan1 down
+-ifconfig vxlan0 down
++ip link set dev vxlan1 down
++ip link set dev vxlan0 down
+ check_tables
+ 
+ for ifc in vxlan0 vxlan1; do
+-    ifconfig $ifc up
++    ip link set dev $ifc up
+ done
+ 
+ msg="VxLAN v6 device"
+@@ -844,11 +844,11 @@ exp1=( `mke 6081 2` 0 0 0 )
+ new_geneve gnv0 6081
+ 
+ msg="NIC device goes down"
+-ifconfig $NSIM_NETDEV down
++ip link set dev $NSIM_NETDEV down
+ check_tables
+ 
+ msg="NIC device goes up again"
+-ifconfig $NSIM_NETDEV up
++ip link set dev $NSIM_NETDEV up
+ check_tables
+ 
+ for i in `seq 2`; do
+-- 
+2.43.0
+
 
