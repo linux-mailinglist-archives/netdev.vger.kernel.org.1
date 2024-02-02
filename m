@@ -1,139 +1,170 @@
-Return-Path: <netdev+bounces-68275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC3378465C6
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 03:26:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C0558465E7
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 03:33:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33304289A20
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:26:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AEA81F23B82
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:33:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0534D8839;
-	Fri,  2 Feb 2024 02:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D10723A6;
+	Fri,  2 Feb 2024 02:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kz6yYBtC"
+	dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b="NsFwKzt3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9129FBE45
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 02:25:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75598CA7A
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 02:30:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706840752; cv=none; b=Pu9Jcw3C9oRFnR08BGrMVfMjoUPSIe2/It2JF2in2/KgSH2r8HkUMNqj6kRM+ky7n4LTn5106alw3fM4Tl3Jt84R3O39M81FGbPj2oduYiGcm+7MyhvUHxzTzr/+YYX8WGoXI9FTxh50I2cftfdE3n4m3tg3bfAwe+vOm3GcWMA=
+	t=1706841058; cv=none; b=OLyiYydX1LePsiW3B+VdDZVHeu8gD/xNJMXnEU6LnMPrI5rDZQ4cz3keoY5unXPOMeyfcicqA2VDNRmNAjYsazQgHCnn2kYf8i08ub+z0u6nNy3kKQGYJcRtbQCbsIVmIwyG8sJG30BRTUAEsDBXFbJBTwxAEdqOndK+MPAuDo8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706840752; c=relaxed/simple;
-	bh=3yORcxd+xpueA4z7Bijm9hqEGEcXRqYXA69iKG9mrK0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NDTAaYkoL5mqm6ONIqg8N4DJEK4H4AmYtogg3Eu/nkj/kf3aO3gOQtSsvoHG2VY6eDZ1v0v5MeiZ7c045qkjUJKvVTn7drmr36GcRz9MXhF7ZPekVy879KBXkoyeaAYksvEgNgt0GmQK5AmhPjRnMwmHHO5p/A0C81BOiVwyWws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kz6yYBtC; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6df60be4a1dso1187364b3a.3
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 18:25:51 -0800 (PST)
+	s=arc-20240116; t=1706841058; c=relaxed/simple;
+	bh=KpL5m4Y25ECKAWZYe1aKcE9e3nSH9gZtcs480pi8j/0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KsrjfFhTwb9d3OJS+DHg+kVWwL2XHPQGNz+h4rDfMBsq96MXvFKacNq1Cgg+zy2DK7j1l2cTdmgR1fxavKIIO0Gm5pxoByWpsFg1hCUl7705ewWdqw1f9qLb5zf3oXY4vThEtSM0CBaX5Qv1ii2j2ytrYt+k35nBKfkQWvSZICw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com; spf=pass smtp.mailfrom=arista.com; dkim=pass (2048-bit key) header.d=arista.com header.i=@arista.com header.b=NsFwKzt3; arc=none smtp.client-ip=209.85.221.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=arista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arista.com
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-33b0f36b808so984028f8f.3
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 18:30:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706840751; x=1707445551; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=P0WLlOFquUGLZU7b5whU/RrHcyoJ3HcNcc+l5vn4mVQ=;
-        b=Kz6yYBtClfUeiEAIaV7KLgKZumsv0GxcdH7a11Rqro5gYu5OuKgbhLXMSqS4l3wWcJ
-         i+3f9jw9oaPYfTV7fzuRfIy1TyCoPBPfmN27TvqiyEuRQoLucGwH1Y9d+N1ovWH/qQcn
-         bgHETZjOiS9+hoqFTsjWqmKlRzpE6mUePSjrxm8eImv58n7zbFJ5CoCsb67+YTeuZ16N
-         3wEYmVkxHsQ++W3dXUqy+TQF+ZmqZBMoP/pV16nEOLRf3JCl8SBPZDbVlfzb5i1AKUkm
-         6YigCMRnY2SFA2/1YouceBAZ1lW1jNE6zECq27Zp+IkGmu2F6yRzyZpl3oha0WWMVGCw
-         jc9g==
+        d=arista.com; s=google; t=1706841055; x=1707445855; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fQCgprpOyHEK0e/SRQUIuIzVOt3Yj59dY0F+3ICLlFA=;
+        b=NsFwKzt3xv/NuA3z+nr/1kapbnl3rjpf3Bum1Bdl2IROeokoly/89mxyzDlhcsavdQ
+         oODberjOQW6fmyKDt2c/SROUXMf2FfkDadsg795JOQJkbOAzCek36U2WLbbSl2OidOk7
+         wo5sRmWPtmrJlyFhucC/6yspSVtD4/nCzJVz5doe+68j8yZfGJBk3cDqWEYSfkT+32mK
+         BBQKO8rm/ECgMoN788xzHJxcJtR9Y7TNVl8H5whmyBStBxYvYWL3LDGWXcELR/ohqArc
+         G/yURMaN27uKDQkBdSJh3KaOjmtE4Vo26oitrfV7XHl68A13sD/a90y2cdQlSy1o6J7F
+         bk/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706840751; x=1707445551;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=P0WLlOFquUGLZU7b5whU/RrHcyoJ3HcNcc+l5vn4mVQ=;
-        b=BONYBV7jCdsiCnV3Jn7kJ5XRD6gt+ysguNlTLWn5Y7QyiJ+vuuVxD1GYRr7A9hwt1/
-         SoyPqfs78Wu7v0yp86xKXMXLUOurvPJSt7are6eJwhHUXfTtsM71lnXatUF0LIXdOKf+
-         QX/vdGBcgd1LTsHZ5IaMwAQQwSxNKIs19fsMiYFeZdacaMPHusDUKDcuwnYQ0DiZ9aas
-         DQ8tAvscJp5R2c5FQ78dS3XUnXHznrSuYw3osZgtclMOpflj9I4iaILwiagaxIBVQSG+
-         zVmc6Tjd1D171heioMkAmhjDi89sUshBYWH/DKC2jZA5HD05fuXQ0Ij/+7M5I+NWA+di
-         jjYA==
-X-Gm-Message-State: AOJu0YyG3I/go4WVsE5HVFTzccStl3NMlA1vTdQoicvF1n/CjxZzPNJT
-	sHEuqYwYXu0mbUTw4yOF/H6+W17ZLldTHMoAK0FSIcP8/HVpFu96
-X-Google-Smtp-Source: AGHT+IEkaTWmnN58XDwsOM3FPt/lp8K7+0sHqo64lMUqcCgHC8SJdVp/rK+2gvIkR6iRqdYMoPW5SA==
-X-Received: by 2002:a05:6a20:1450:b0:19c:6b53:6328 with SMTP id a16-20020a056a20145000b0019c6b536328mr5563774pzi.1.1706840750739;
-        Thu, 01 Feb 2024 18:25:50 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWsAwo7BcGMmY63QHiGd8Cp30K78R9PFQ57E8h1QwnjasaaD/FuPL4eAcV9MPzf0JRrkrBovyHLIAJVhK/MpSgbgQzCL8IXf5s8sW9iFZ+X9FypEhSCHXlP7XCUijlzAZogQ02wrlfH6NFQlxK6eXFqRbOewFWulM26MBgNqTP1bAlD0hmf19u1mWGNhZk0JttFFJAz6meDLmvtU0OLL4zKORGJnxZ0MnWsvm4ZeCIrrlGwRHT6PNBTwRj6OV5xy6IxMXwV7UPM1ZOtc6Cz8OdvbfonOziMi/6Kc0iif4MxW0ovyZsc6XNtGzBmWkb1DWg81Qpv5mE=
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id u27-20020a62d45b000000b006ddd31aae37sm468152pfl.33.2024.02.01.18.25.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 18:25:49 -0800 (PST)
-Date: Fri, 2 Feb 2024 10:25:45 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Kui-Feng Lee <sinquersw@gmail.com>
-Cc: thinker.li@gmail.com, netdev@vger.kernel.org, ast@kernel.org,
-	martin.lau@linux.dev, kernel-team@meta.com, davem@davemloft.net,
-	dsahern@kernel.org, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, kuifeng@meta.com
-Subject: Re: [PATCH net-next 5/5] selftests/net: Adding test cases of
- replacing routes and route advertisements.
-Message-ID: <ZbxSqfD_UP44h_vz@Laptop-X1>
-References: <20240131064041.3445212-1-thinker.li@gmail.com>
- <20240131064041.3445212-6-thinker.li@gmail.com>
- <ZbtabpEr7I6Gy5vE@Laptop-X1>
- <22cc962a-c300-49ee-95ee-76d9f794e23a@gmail.com>
+        d=1e100.net; s=20230601; t=1706841055; x=1707445855;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fQCgprpOyHEK0e/SRQUIuIzVOt3Yj59dY0F+3ICLlFA=;
+        b=d038v+EWa2P7+K6mMcM8smH+2g8ggvuPSnuYkYRz2YGp3FJWHDlUgfOCdt7N93XIBH
+         fdOpGpKsGRU+CKjJkmEYXj8q6sOlSfAbkO7XFWoKAFhxC60F0eTByTLoeBKXIe++2ASn
+         /HBEY9/F2/YnSfRkBX6E2cWhLUm+c2drnLIAAXs0y/QInMM5ErpDsAcO/wWnnuCHfRhk
+         2nHrlIkdB8CnMwVjB5y4duZis6j60T9mm5ullK8PQhHbZz6ch2rkwZdSbKGINQGJW//1
+         iLwhBgxlnupzZ1qICiFspXawQ+/Bn4/77cpADUTwC/7qlTEN8dm2au/kbvHYNIpNtDES
+         8JKw==
+X-Gm-Message-State: AOJu0YwS14Ysasw0xVtHkR91jI9nU2VHexex0/NcE4pUV7sjO+3LHf+K
+	0bqjCOVloSkVOkG4YWLAoJB/CjYx0ZJs90+rVYnRo0Qp8RiFgSG8z+USzmWpow==
+X-Google-Smtp-Source: AGHT+IGU+GNRD1OLnjZW2xraXAipdX2qEh4m6QD8hspwdTG5tlbNntKBNpIfpaOO7GxNnbApF+8FZw==
+X-Received: by 2002:a5d:66cd:0:b0:33b:10ca:d190 with SMTP id k13-20020a5d66cd000000b0033b10cad190mr3331333wrw.24.1706841054408;
+        Thu, 01 Feb 2024 18:30:54 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWfUw5cmK7XCnawjH0IsiCOqFeJ/0vUC36eFm/aog4HwweheKPvb2eUx9wEsDMnVdBu3HcMnFprFTvj5Ao/kd/QLz/Z/gQk/mNCCMO1FwvRfb+tV+XMJV8RW/hseoTjrWN3PNp2avJGBhDN/ZmeXkcWU2YgQZ8v2OVYQxVVjAH4ts9cjmAtXr5iAiDyLv8CtxgiIYrc1pom5hpuXCm5XuBI8Rxi7Nbw2+7tk94o5jZnI++/Ww67wZQiletmfXpCFbU8zjCu3doswKNVZ/yCTqfu28GNeRC2HR+vnNqwRoyb+PuoGaTXGf3q+CRtAQFppt2FkICJuILPQj2DEQpkEi9ga4+PFdXO8xCvj93M
+Received: from [10.83.37.178] ([217.173.96.166])
+        by smtp.gmail.com with ESMTPSA id h10-20020adff18a000000b0033ae4df3cf4sm775276wro.40.2024.02.01.18.30.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Feb 2024 18:30:53 -0800 (PST)
+Message-ID: <6104436c-4c71-4427-a569-cf98174d0c20@arista.com>
+Date: Fri, 2 Feb 2024 02:30:52 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <22cc962a-c300-49ee-95ee-76d9f794e23a@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/3] selftests/net: A couple of typos fixes in
+ key-management/rst tests
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, Dmitry Safonov <0x7f454c46@gmail.com>,
+ Mohammad Nassiri <mnassiri@ciena.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240130-tcp-ao-test-key-mgmt-v2-0-d190430a6c60@arista.com>
+ <20240131163630.31309ee0@kernel.org>
+ <e88d5133-94a9-42e7-af7f-3086a6a3da7c@arista.com>
+ <20240201132153.4d68f45e@kernel.org>
+ <44d893b4-10b0-4876-bbf7-f6a81940b300@arista.com>
+ <a1ac7a6e-4447-4476-8fb7-fb5f0d7ec979@arista.com>
+From: Dmitry Safonov <dima@arista.com>
+In-Reply-To: <a1ac7a6e-4447-4476-8fb7-fb5f0d7ec979@arista.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 01, 2024 at 09:14:17AM -0800, Kui-Feng Lee wrote:
-> > > +	N_EXP=$($IP -6 route list |grep expires|wc -l)
-> > > +	if [ $N_EXP -ne 0 ]; then
-> > > +	    echo "FAIL: expected 0 routes with expires, got $N_EXP"
-> > >   	    ret=1
-> > >   	else
-> > >   	    ret=0
-> > >   	fi
-> > > +	log_test $ret 0 "ipv6 route garbage collection"
-> > > +
-> > > +	reset_dummy_10
-> > 
-> > Since you reset the dummy device and will not affect the later tests. Maybe
-> > you can log the test directly, e.g.
-> > 
-> > 	if [ "$($IP -6 route list |grep expires|wc -l)" -ne 0 ]; then
-> > 		log_test $ret 0 "ipv6 route garbage collection"
-> > 	fi
-> > 
-> > Or, if you want to keep ret and also report passed log, you can wrapper the
-> > number checking like
-> > 
-> > check_exp_number()
-> > {
-> > 	local exp=$1
-> > 	local n_exp=$($IP -6 route list |grep expires|wc -l)
-> > 	if [ "$n_exp" -ne "$exp" ]; then
-> > 		echo "FAIL: expected $exp routes with expires, got $n_exp"
-> > 		ret=1
-> > 	else
-> > 		ret=0
-> > 	fi
-> > }
-> > 
-> > Then we can call it without repeating the if/else lines
-> > 
-> > 	check_exp_number 0
-> > 	log_test $ret 0 "ipv6 route garbage collection"
+On 2/1/24 23:37, Dmitry Safonov wrote:
+> On 2/1/24 22:25, Dmitry Safonov wrote:
+>> Hi Jakub,
+>>
+>> On 2/1/24 21:21, Jakub Kicinski wrote:
+>>> On Thu, 1 Feb 2024 00:50:46 +0000 Dmitry Safonov wrote:
+>>>> Please, let me know if there will be other issues with tcp-ao tests :)
+>>>>
+>>>> Going to work on tracepoints and some other TCP-AO stuff for net-next.
+>>>
+>>> Since you're being nice and helpful I figured I'll try testing TCP-AO
+>>> with debug options enabled :) (kernel/configs/debug.config and
+>>> kernel/configs/x86_debug.config included),
+>>
+>> Haha :)
+>>
+>>> that slows things down 
+>>> and causes a bit of flakiness in unsigned-md5-* tests:
+>>>
+>>> https://netdev.bots.linux.dev/flakes.html?br-cnt=75&tn-needle=tcp-ao
+>>>
+>>> This has links to outputs:
+>>> https://netdev.bots.linux.dev/contest.html?executor=vmksft-tcp-ao-dbg&pass=0
+>>>
+>>> If it's a timing thing - FWIW we started exporting
+>>> KSFT_MACHINE_SLOW=yes on the slow runners.
+>>
+>> I think, I know what happens here:
+>>
+>> # ok 8 AO server (AO_REQUIRED): AO client: counter TCPAOGood increased 4
+>> => 6
+>> # ok 9 AO server (AO_REQUIRED): unsigned client
+>> # ok 10 AO server (AO_REQUIRED): unsigned client: counter TCPAORequired
+>> increased 1 => 2
+>> # not ok 11 AO server (AO_REQUIRED): unsigned client: Counter
+>> netns_ao_good was not expected to increase 7 => 8
+>>
+>> for each of tests the server listens at a new port, but re-uses the same
+>> namespaces+veth. If the node/machine is quite slow, I guess a segment
+>> might have been retransmitted and the test that initiated it had already
+>> finished.
+>> And as result, the per-namespace counters are incremented, which makes
+>> the test fail (IOW, the test expects all segments in ns being dropped).
+>>
+>> So, I should do one of the options:
+>>
+>> 1. relax per-namespace checks (the per-socket and per-key counters are
+>>    checked)
+>> 2. unshare(net) + veth setup for each test
+>> 3. split the selftest on smaller ones (as they create new net-ns in
+>>    initialization)
 > 
-> If I read it correctly, the point here is too many boilerplate checks,
-> and you prefer to reduce them. Right?
-> No problem! I will do it.
+> Actually, I think there may be an easier fix:
+> 
+> 4. Make sure that client close()s TCP-AO first, making it twsk.
+>    And also make sure that net-ns counters read post server's close().
+> 
+> Will do this, let's see if this fixes the flakiness on the netdev bot :)
 
-Yes, thanks!
+FWIW, I ended up with this:
+https://lore.kernel.org/all/20240202-unsigned-md5-netns-counters-v1-1-8b90c37c0566@arista.com/
 
-Hangbin
+I reproduced the issue once, running unsigned-md5* in a loop, while in
+another terminal building linux-next with all cores.
+With the patch above, it survived 77 iterations of both ipv4/ipv6 tests
+so far. So, there is a chance it fixes the issue :)
+
+Thanks,
+           Dmitry
+
 
