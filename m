@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-68457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99C96846F66
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:49:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0467E846F70
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:51:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E7741F24FBD
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:49:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36E821C241B1
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:51:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A96713D506;
-	Fri,  2 Feb 2024 11:49:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A7E713DB9E;
+	Fri,  2 Feb 2024 11:51:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Kz8RsV3J"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="OqmD8m/c"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C135FDC3;
-	Fri,  2 Feb 2024 11:49:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0107613E211;
+	Fri,  2 Feb 2024 11:51:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706874548; cv=none; b=QMew1ERcz3p3ArGQMAAzk5Ibpj2Xi48a/+wqg29GGmL4+pLNQPQC1iSBd9DMdCx7tkhi3iw1e1j/o9WRyxz7k/FUNpe31pR8i0AvSGLTYLhVnaUaaFAyysoT59KxBL2utwBMPU1L1wYlRZjtduvnjmOm4VZovoPOt9Az0fGt6Lk=
+	t=1706874687; cv=none; b=BGw0e54IV+4NxA45xHNtLJIIYj/9yESUC9EHW1wNzJjoyHaWFoEYqHYE46iPjvF0jmdOQi+OFqSWtNClympZV9We0gnQS3WV54cf5BjhnTYQDvOkLQbIsCMU4GAenvXMRHSpUtxZnyd75LcNTY9bvU+t663MVCqv3K6vues7x8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706874548; c=relaxed/simple;
-	bh=uo184ggfh3GYZsRN1j1XnH9DI8ZJwnKR9ZdCXgT5E+A=;
+	s=arc-20240116; t=1706874687; c=relaxed/simple;
+	bh=tmseyaSoz8Telz9bqfnPz+Tc5gw75RGbX7OtTxriO0k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=apKmrG3cV3PGdVV8DN9/DvHAaYb6I/zyliSO332Cy2T8zf2uQPEiM1eKPFaj8yO6u/hXofBlkvluHcvpI9sV0jl2CYcaSsoxhfuGXwTICWoq2OOQBr0CwZx+3/AT5DybRsLfGfWakm7Nosxc7FQeyT9n/W8ekyljvcOXNrMTOFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Kz8RsV3J; arc=none smtp.client-ip=78.32.30.218
+	 Content-Type:Content-Disposition:In-Reply-To; b=HThbLcAksj/mDxDOQLEYI5uTmnZkSA3rmyJoiLEGRBJzd2b3DgqxrtTcN7BGDBTDiHdTDI6IhZ4Cbx7mYFxauMr6TvDpGDbOAGx03wfyIn76j07zQG3eu2WZdgpVsA+QDMWpERI2bHjiRx6fARiwr/Vqbzbu8NGO4CdgYgt5dD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=OqmD8m/c; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,22 +37,22 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=+wtvAtiCrXRnVQNeDR1xCYojq9FyDB3BcqW6RXyS2RA=; b=Kz8RsV3J1ZNrdGoNzEEZkj0pZt
-	aUh/UPiOQh2sXYeMDp480rblngXiTDEjCPwG6p7D89Lw8ZhKnAev5241ygabQ3vSVZO3U+3u5wY1T
-	X7i+5dCOinMbOWnET3oByxwHpY62sYbkfZ6B8DnVFc4/5GzJLgQ83tnPjdfVOcSBG+No96+zULoBL
-	5+xYWQ23mk9U1kAOgWZow/qhpbDauIp2aE/Pjc6sgh1TRRe/GHRjsd8WvG3Zfz0YhmRCLGG9PNBrp
-	JcvS+ROKFA5VOXE+VVG7aTGKpLNJkePcsTdxhghJeP5rf6H4RG9HoAWSntOlXW/iBxR9kZkba1pdK
-	7YYB0e3A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52690)
+	bh=cIlxsvGg83BWYVggTT3nBjbFOe8N4Nii5E4TFnZPDZU=; b=OqmD8m/c5B7vFICq5Ev33gkvCd
+	zn9HpBZjkLeFSbjTmF0+KV3kDCfrtUU8q2XpEmCsVIdKN1fLofI4H7osUKPxlvhaGw/YYoOO/yavh
+	0RxLKv9NKCsePeKLqJfl/stdpXKdZL8yV0CsvpCq/mESPDQRb8djrtVtflee4WUJPzsAnsO5KPQ0n
+	9HgJKZefg40oAb2w5pp7GSbtniF/orPv5hKa3eyVd+ENdChW1vvuw308QnoJOEgX+IsSReMZzV4Dv
+	zEmQUn3RTgdm8vOvqYSuZyZ6yQP17vWW25KqcDIKHOVwh8JlFkcWO43yEhsyqLjD1Tii8peERhv7C
+	l8MCJAQg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56268)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1rVs2S-0005v7-2X;
-	Fri, 02 Feb 2024 11:48:56 +0000
+	id 1rVs4f-0005vW-10;
+	Fri, 02 Feb 2024 11:51:13 +0000
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rVs2Q-0008ID-NC; Fri, 02 Feb 2024 11:48:54 +0000
-Date: Fri, 2 Feb 2024 11:48:54 +0000
+	id 1rVs4b-0008IK-DO; Fri, 02 Feb 2024 11:51:09 +0000
+Date: Fri, 2 Feb 2024 11:51:09 +0000
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
 To: arinc.unal@arinc9.com
 Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
@@ -69,11 +69,11 @@ Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
 	linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v3 4/7] net: dsa: mt7530: move XTAL check to
- mt7530_setup()
-Message-ID: <ZbzWpmZrukknMsYf@shell.armlinux.org.uk>
+Subject: Re: [PATCH net-next v3 5/7] net: dsa: mt7530: simplify
+ mt7530_setup_port6() and change to void
+Message-ID: <ZbzXLZ4ZyPSbqkdg@shell.armlinux.org.uk>
 References: <20240202-for-netnext-mt7530-improvements-2-v3-0-63d5adae99ca@arinc9.com>
- <20240202-for-netnext-mt7530-improvements-2-v3-4-63d5adae99ca@arinc9.com>
+ <20240202-for-netnext-mt7530-improvements-2-v3-5-63d5adae99ca@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,28 +83,42 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240202-for-netnext-mt7530-improvements-2-v3-4-63d5adae99ca@arinc9.com>
+In-Reply-To: <20240202-for-netnext-mt7530-improvements-2-v3-5-63d5adae99ca@arinc9.com>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, Feb 02, 2024 at 12:19:10PM +0300, Arınç ÜNAL via B4 Relay wrote:
+On Fri, Feb 02, 2024 at 12:19:11PM +0300, Arınç ÜNAL via B4 Relay wrote:
 > From: Arınç ÜNAL <arinc.unal@arinc9.com>
 > 
-> The crystal frequency concerns the switch core. The frequency should be
-> checked when the switch is being set up so the driver can reject the
-> unsupported hardware earlier and without requiring port 6 to be used.
+> This code is from before this driver was converted to phylink API. Phylink
+> deals with the unsupported interface cases before mt7530_setup_port6() is
+> run. Therefore, the default case would never run. However, it must be
+> defined nonetheless to handle all the remaining enumeration values, the
+> phy-modes.
 > 
-> Move it to mt7530_setup(). Drop the unnecessary function printing.
+> Switch to if statement for RGMII and return which simplifies the code and
+> saves an indent.
 > 
+> Set P6_INTF_MODE, which is the the three least significant bits of the
+> MT7530_P6ECR register, to 0 for RGMII even though it will already be 0
+> after reset. This is to keep supporting dynamic reconfiguration of the port
+> in the case the interface changes from TRGMII to RGMII.
+> 
+> Disable the TRGMII clocks for all cases. They will be enabled if TRGMII is
+> being used.
+> 
+> Read XTAL after checking for RGMII as it's only needed for the TRGMII
+> interface mode.
+> 
+> Change mt7530_setup_port6() to void now that there're no error cases left.
+> 
+> Reviewed-by: Daniel Golle <daniel@makrotopia.org>
 > Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
-I would prefer this to be earlier in the series, before patch 2 which
-moves mt7530_setup_port6() to be called from mac_config(). mac_config()
-is supposed to be configuration error-free - in other words, all state
-should have been checked before hand.
+Yay. Less possible errors in mac_config()!
 
-Thanks.
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+
+Thanks!
 
 -- 
 RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
