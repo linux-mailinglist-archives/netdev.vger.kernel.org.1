@@ -1,165 +1,216 @@
-Return-Path: <netdev+bounces-68733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB367847C4D
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 23:28:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32D72847C94
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 23:58:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 097401C22E5A
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 22:28:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDCA22873AD
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 22:58:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 927B485934;
-	Fri,  2 Feb 2024 22:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 426F1126F34;
+	Fri,  2 Feb 2024 22:58:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="px/MNSOk"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="KIi1NqP5"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR04-VI1-obe.outbound.protection.outlook.com (mail-vi1eur04on2058.outbound.protection.outlook.com [40.107.8.58])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87F068060E;
-	Fri,  2 Feb 2024 22:28:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.8.58
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706912921; cv=fail; b=SqYgNjQKZjLCzkCfGr0vOqCCicZGQrwI/CCqHG+4GG86Vw3LzByJyy1sm4CPVz/Rpt5xswz1b5mZO+XDHYKA1CUti30+rUwVr/oKptI9I+M+r3VRa/ZAIe7hog9vJ7p9wRAiBaHZ/NOguBHFwqIngprIIxehlBl2rUFnJYs6Y3Y=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706912921; c=relaxed/simple;
-	bh=9DuXswhwfG1WFQ/F9cV8cAm0qYnZJhicZJr9WLDPqxc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=pGE1FNW06PoVE4xBz9fabpK0/2EfGLJGhXwcHHBfh+ue1r/qOWulC5hVHGO7hqWTdSc25+e06Ae51JjHBbh9FO+HeWMgQlJJ2hg53LkSaFWLa2//m4+nAOVPUZGb/iHwALU77AaJs3gNyH9CwKCSNSVY1JsIv3qqtsG8+ZsVB5k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=px/MNSOk; arc=fail smtp.client-ip=40.107.8.58
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LjZZ8OkOapOrW0I+FNoK9vWRJyc2jeYJN1MZxAKxjHwi2ATyvkgXhMZKHLLzl/v6WL23uxfBLHcGmWawudyQdD8s5urVgxwuDN5HsQFLhj76SlhHUUij+FK2xcz5IBp0cTyfHfy9vi/K5djgwXZDBfc8c9SqW3IlljiT7zUqaX+6EGcyqsRATTUw86WGRdCc9Qb+8T9zvD6NlNMytIp22dyabA7iuI3ghdfdI7zoTmEvZLoIAaXOidPalBTRU9HA19cN5ZLImQMSZSnsSAs3ut/A09auxuFUx6uLJvueGeqeptx/XujCa5W90GXzJ62j2mwdHSAlA2b1LjkpFevzEA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wHCXIc/KQJoPsJCuWRAMtN461mRFkX4g59TouOMoiv0=;
- b=X7O2A4y0hULn+Qn2BjglBOzGg95uS4Y9zpKnjORZct6XSxT61k+0jBlOxLDQGLQfUcUliuoiSQQGJUXCsuuvoZA6T2lba/LMwWZaoriuRbirYUnb75ToGsIwMLpPXOF2rOoXsMMHyBJ6Oo88KocrgdrXyatjZn7Wu7vILWxF/NXKpC8EZZ1FDMybhZu6b+lk/CgjC1y1DihPRhwaNJrIpbR7grgwxgKE/6TrhHyoBCZZxGNscL4gcWqcwb7TqbQwBM7kdKFJKio3rckd7WMh4q3zm/J1RXZUqz67GhxXlm0MAwKkh5x0rAqbroOJxLx/JTcIKO7AJyOyCzB1Cd9AWw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wHCXIc/KQJoPsJCuWRAMtN461mRFkX4g59TouOMoiv0=;
- b=px/MNSOkTAv60kInLKDoJnEC3JURumWuYIKOghT5SXMBVCSQWa+aiuj/axfQKjkjQSh2QBM+aizySJ0LF/E2BxcSGO04k+R19gHNtM2XqBOilViD4pw6m9yGezYE3iY4BbOOwfUlMm4Ak7H0CV4HNKbSZMp2PgeGCcdStMUgwzY=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com (2603:10a6:102:240::14)
- by DB9PR04MB8377.eurprd04.prod.outlook.com (2603:10a6:10:25c::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.31; Fri, 2 Feb
- 2024 22:28:36 +0000
-Received: from PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::c8b4:5648:8948:e85c]) by PAXPR04MB9642.eurprd04.prod.outlook.com
- ([fe80::c8b4:5648:8948:e85c%3]) with mapi id 15.20.7249.027; Fri, 2 Feb 2024
- 22:28:36 +0000
-Date: Fri, 2 Feb 2024 17:28:26 -0500
-From: Frank Li <Frank.li@nxp.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Ulf Hansson <ulf.hansson@linaro.org>, Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	NXP Linux Team <linux-imx@nxp.com>, Wei Fang <wei.fang@nxp.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	linux-mmc@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, imx@lists.linux.dev
-Subject: Re: [PATCH v2 0/4] Add 8qm SMMU information
-Message-ID: <Zb1sijexWGLG5gcH@lizhi-Precision-Tower-5810>
-References: <20240201-8qm_smmu-v2-0-3d12a80201a3@nxp.com>
- <20240202110511.135d26b7@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240202110511.135d26b7@kernel.org>
-X-ClientProxiedBy: SJ0PR03CA0347.namprd03.prod.outlook.com
- (2603:10b6:a03:39c::22) To PAXPR04MB9642.eurprd04.prod.outlook.com
- (2603:10a6:102:240::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DC31126F2E
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 22:58:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1706914725; cv=none; b=F+HXjWQTFqdWFzTmUpq56QpHBrYOiul2/vwbSj4s8Xy05s0/cpb/x5hSdr1YI+vVmgfN0Val9vQ9FqM6juVtQKbmjmOgbk/NquLJ+UkTIp56y7MQEzZGJd0Mo40nn7M9tVDUcXwqv7/mdQldN/RqqYLEgGnOPQxycyXOi69NL3Q=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1706914725; c=relaxed/simple;
+	bh=lZdHTBSpIOAQwH9fEkAUNqvyIh0RqARV321QonH+vv8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u4cb+fvOsTSRE79zjMUYkNkhuNAR5YOoY0YW3Ka8y0lYHtTq4vEJuQCEztaozURRRxMWhGBOpcGte69tSzGQlX4DupjTPspyH4INmDbuvCv6pxDYbGqhfqyOzUBX6SocVASNEiVA6Fc0/w1qVcs4Zyn8zpZ/IqIJmlTw3t7ifBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=KIi1NqP5; arc=none smtp.client-ip=209.85.167.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3be110bbff9so621428b6e.1
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 14:58:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1706914722; x=1707519522; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vkHG6ll7IPHRZzRe2/2j/wkTPRs5NfbRx2SENCBoh84=;
+        b=KIi1NqP5njwufkElRSxDcOERlAwPkSQqGX/VeH3v7duO7l9GsGyScXAIC0Zk+VsUl5
+         JZLQZRmP7LL80SpE1VyjFRPbEi9Pz61U5+igkTNTI4BPrYC4siLjVNB8aJWq1xJzjdO1
+         i37WDyq+wQR5DEvKJiGbLboDzfARzcryG4+tIXZj9CVr+czH96Y1p5+J7XklrJktipjo
+         HZtosrTyc9tnJrhdHGAV+8wKOJj0GllTc5rtva+58+LHYofQGp/Zl0PAhCcu7BbLpCEJ
+         wqHYvyY4MRHwUOtl6UZXYgw09vi+kQwp/lo3vbjnETupM3QT4htyGcBNlHQm2qCHNsKX
+         h53Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706914722; x=1707519522;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vkHG6ll7IPHRZzRe2/2j/wkTPRs5NfbRx2SENCBoh84=;
+        b=W905yaAQZaMv8A6f34/9MpPewIaXjzdNMUzVBG7GEb2SIl1cniab6a+UAUv8RR/XXJ
+         3WNDUYYUON6YizmYSwxnuVLMpyDYC+4asAK3EEQ94NwLOWQCbMsY7oX90vq1Hq3dwiRh
+         r+4eNgSKs4nI/RNAiW5IBSr2mfIJMOi61Q+hoLp6BO8bmBRBXehvfTOote7sUpqeSGVC
+         hYuguZDoLL3ASTvgDw36Odcuog5/lwPPrZPECqlCNLKhqAd/wklcAoUITYBqMKYHvlAR
+         pnxtZa8dp5FjxtgU4KRCXjlkS17WyUjzC6TJljlCOIrSetUVvsT9MKJmN1FBKNm8szj2
+         dV7g==
+X-Forwarded-Encrypted: i=0; AJvYcCVrZqzBk1kXaUMPoVqsb6Cv8t9PAtKApqBE4FJdrrX2L3qgbbVrp3b3vCm3/OdX1dTjG1uumpujPy99PHViQ4i3DGLNS/DE
+X-Gm-Message-State: AOJu0YzZmrAUklNKOwr1oXdimMNXtlUwRFXqEM41HANvV1B+TVAbOhkr
+	O+UDoGcB202izJmfTY5BTfn9GvN0pZVkDjIywtxx+ON1e+ZCq3dIy2waFM7Xted55gKn8YJgS1C
+	tl4I=
+X-Google-Smtp-Source: AGHT+IFq7I9kRxjbd+pNEQUNmfxSem64EVPi/xya2PNA9rrBKprcwC0miFZGbMbxXc2tDRSnG+On+w==
+X-Received: by 2002:ac5:cff3:0:b0:4c0:15bb:2070 with SMTP id m51-20020ac5cff3000000b004c015bb2070mr1277635vkf.1.1706914701229;
+        Fri, 02 Feb 2024 14:58:21 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVEixzsvLyCiJOMRL5ilFxz+PIOjKK26c4usnFV5P4+10H2lFZmv1jcs4HrI5IXxiovmi8l4XQK6AOwftkJfYv7mT036QDTBRi+2JjbsQCm92I9vWjuPCc90I8Sl7DGiSe+GCdapokAvVcAGtbWaMdQPXRkR6NqSRrvEHxgk6ZU2aE7kCQyTrplylFjkAiHcesV8sdp339K
+Received: from [172.19.131.115] ([216.250.210.90])
+        by smtp.gmail.com with ESMTPSA id kx3-20020a05621453c300b0068c8ba22806sm480810qvb.145.2024.02.02.14.58.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 02 Feb 2024 14:58:20 -0800 (PST)
+Message-ID: <8041ba2f-3ab9-44a8-b039-283be3f4960c@kernel.dk>
+Date: Fri, 2 Feb 2024 15:58:07 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB9642:EE_|DB9PR04MB8377:EE_
-X-MS-Office365-Filtering-Correlation-Id: 23d2a845-7bc1-4d49-257b-08dc243e4c27
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	zRT1Eg2DsesQLPu/AgNvYUKECE2uPMmlWkJI2Xyo87ncEi9DMCETq+GGIkpPRtnW/4eFUGJSDF8MqmjzBL4pm7ryT3CopZqeOvCaZ2fkJGzFkxl7zjv6ORm1TvKfN5HCYo5NJRbmB52ASes062pmtTZGNlmCbDtPP37o72bniYyw5E7SD22ppKsuD9bPMo57sUiQzOVy76HMEPNdq5blnJ2CbWjcep6/33gEzc0U3vc/yNanoEdk+e4pkz2o1WYmGXT7JVw6/FAfvGCAwTjcwuIYe88mYL79cnWYMoEEFPwgZRcKBg6Jt5K0iMu9T7z1+DgxqfRVvVgrvrOwQafNZCaN724TL4+agOvFKc+1luXOrK9mkzSzXTv7a3EhmI2+txLyq6wF6gJRnGOTgpt2p4AYdcs4JIfoy3WZCjqtG4clSEnbhdKw2I1p94FS2J/6oGp6UX9GIboWc+3+yQQ+llC5ASkSbyVWIKbiDDY/ppRwdS/bVdxWIkOJc46Y/NtuRorKURGDvthBUNApuqaj7H8ePNQ9nakPJSu7FTBGrD2B9eR1eUYaKICCljCuiu6NKqVa0tS5ixtR2APCKsdIRIoNDdSajhAJmbfCeroW8pvBy8ygdCSLI01bTfOIEEkc
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB9642.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(376002)(346002)(366004)(396003)(39860400002)(136003)(230922051799003)(230273577357003)(186009)(64100799003)(1800799012)(451199024)(38350700005)(52116002)(6506007)(478600001)(4744005)(7416002)(38100700002)(66476007)(6916009)(54906003)(316002)(8676002)(4326008)(8936002)(66556008)(66946007)(5660300002)(2906002)(83380400001)(86362001)(26005)(33716001)(9686003)(6512007)(6486002)(6666004)(41300700001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?fvbjC1RQbAOfy13o2ZMs8RPa6pzHGrWZvcnsER/gCgnHXZIEnAyNDd8Bmkz3?=
- =?us-ascii?Q?gyn2zshTqUZ+NvRS+Y/tjV+5/9N78oNiJvAD5m9qs2LZBJUsGdIC6dMPUTmB?=
- =?us-ascii?Q?enpIGeWq+c9SReTaDH2DcllDBv1YDiadFtZbcHKA0y1jf4zwJKi0w36oD1MG?=
- =?us-ascii?Q?HBcBXi6Kt3LiuomKF/XobCkNAgCoutLpcBrXy7VU33cUnXzZkBl02vP5eizx?=
- =?us-ascii?Q?+ID0EXA6+lT4D7ENbXlR9yllhBSUA3NwylRLIrXMyTsL5lslgw15WARrdflg?=
- =?us-ascii?Q?TSGFR+tnJk4Un6fPLf5vsk024nCs+uDQVdmZnCTjKhyWvKLKvyfNVd0fh3pS?=
- =?us-ascii?Q?F3erhBPEh7AfpVbvnoGax0/SNaEfIXusUqKgvwtkNUHIPK7+YCv56VDFDZn3?=
- =?us-ascii?Q?QpnLCz79xQW34/x55zn9A5FPuxLEHnolrcXOAtY5agqVRQQQA52mcoPrdZO/?=
- =?us-ascii?Q?kiRw9IFma/5QqyU85C703KNfo8qD8Ihh/R+xF20T8gWbtN8ZThaUMCv7VJ+d?=
- =?us-ascii?Q?C0fpYTX1v44S56BGF3PpjsmnYfdURm+jCw1It5bf97iQyXEYqoBSP3x+jDR7?=
- =?us-ascii?Q?E/3xCXRxBP1Gq99wAHHt8OVFO6kA/nEku0YFa75K8hym6uMOLFklqB/Z0jjT?=
- =?us-ascii?Q?5U2GySfaORl7aTqITIgmgv/BxYPqYuMX2AbUK1OiUBLsT5XjM2bYB2GKwwhg?=
- =?us-ascii?Q?aWBCvrIghecMhNFAWlYYf2IrNqbG258qV9p+bnC6Fnj5b5IiFHYQPnyaB94T?=
- =?us-ascii?Q?nRSA473wC9U09j2/RomXF0nUAIsrGtSPsDaQ829vfFycRx7A0c1fue8fFet6?=
- =?us-ascii?Q?LCdmtbn9o/gkq5OMOP+Au0Rqt1Qw1SbZYV9O9bcaudiLO4FTS85Hzt69YwAg?=
- =?us-ascii?Q?MjDguxxMER19Ki1bKN7HQIWp44pyiIwOO4cv1nZEVeHW99lz3t4UjDCC5jEG?=
- =?us-ascii?Q?R71kVQA6wAiSgf6z99T0SOfD1MyP/0uROb4V/gKGoC6RP/1N+mNZKByjn0Ex?=
- =?us-ascii?Q?PS20lLbgdP4tDXMywjYp0jE9WvkyUHQnEaGYghBKaQD+QZszR8f0U1pSPzgl?=
- =?us-ascii?Q?P1PyuAxT0RNtZqR8vTknrfb+2EN6nzl49T2xwhbo3nzgxBNVHdzLy2iZKEfR?=
- =?us-ascii?Q?TsdxCVCOe+z5x5aE/pmjqu/Rb7TLVUouPZEqpO8nY//zCCqE887Uv7A7gcpx?=
- =?us-ascii?Q?rQOyZnv5OHXC5dGYEnmvzfP/3yAE8DST0U0j5d2AE7Jo23oaEq+8pmtCRyHS?=
- =?us-ascii?Q?ANYTiYhmbR17VjVpnJJdhZuNryNpSfYBmtpyJZhYytGMPbMZaP4dxXY9IWD9?=
- =?us-ascii?Q?ZEfAo3SMXrLCenuD6FMrhpB3BAn1mI5JajizOggPBg5ZIISl6K64J76P9vXt?=
- =?us-ascii?Q?cUQJrGkmo8PKCwR3Jpubd3Bc3aNIchagipNi6xWFeauSuYpR65hdggXjQGky?=
- =?us-ascii?Q?HIEznfqOQhJgBgHPAMkU/7ZaYcA50Yh1GVd+KdHvrU/lCTqxaDe+ab5jKzmZ?=
- =?us-ascii?Q?M0KMiZP2zcp1x6GdHMQM9CWqAZijl2rwF64jGD48w52OUwhdliTq2kNGInsR?=
- =?us-ascii?Q?W3SoZZ8JqdAUHrJTOUpdYXiTeoUBHml2LyVAw7xz?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 23d2a845-7bc1-4d49-257b-08dc243e4c27
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB9642.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 02 Feb 2024 22:28:36.5148
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: lKMhgkZB8/3nw+OVdEmJLAyocOYvqP0GO92hpZw8IUpngnl/R0DYs7mr2LO79scj7z3H2sRM/PBpA1ERbpvY2A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB8377
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v15 0/7] io_uring: add napi busy polling support
+Content-Language: en-US
+To: Olivier Langlois <olivier@trillion01.com>,
+ Stefan Roesch <shr@devkernel.io>, io-uring@vger.kernel.org,
+ kernel-team@fb.com
+Cc: ammarfaizi2@gnuweeb.org, netdev@vger.kernel.org, kuba@kernel.org
+References: <20230608163839.2891748-1-shr@devkernel.io>
+ <58bde897e724efd7771229734d8ad2fb58b3ca48.camel@trillion01.com>
+ <2b238cec-ab1b-4160-8fb0-ad199e1d0306@kernel.dk>
+ <45a21ffe4878d77acba01ec43005c80a83f0e31a.camel@trillion01.com>
+ <b6dc538a-01eb-4f87-a9d4-dea17235ff85@kernel.dk>
+ <34560e193660122ea142daa0fbeb381eb7b0eb6d.camel@trillion01.com>
+ <c28b3f5f40ed028ba9d74e94e3cc826c04f38bf7.camel@trillion01.com>
+ <a0f5b96b-c876-4c0a-a7b5-3809c26077d6@kernel.dk>
+ <0ae91303c53aff4758bc07ee70add5c0f1ec524e.camel@trillion01.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <0ae91303c53aff4758bc07ee70add5c0f1ec524e.camel@trillion01.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 02, 2024 at 11:05:11AM -0800, Jakub Kicinski wrote:
-> On Thu, 01 Feb 2024 15:22:40 -0500 Frank Li wrote:
-> >       dt-bindings: mmc: fsl-imx-esdhc: add iommus property
-> >       dt-bindings: net: fec: add iommus property
-> >       arm64: dts: imx8qm: add smmu node
-> >       arm64: dts: imx8qm: add smmu stream id information
-> > 
-> >  .../devicetree/bindings/mmc/fsl-imx-esdhc.yaml     |  3 ++
-> >  Documentation/devicetree/bindings/net/fsl,fec.yaml |  3 ++
-> >  arch/arm64/boot/dts/freescale/imx8qm-ss-conn.dtsi  |  6 ++++
-> >  arch/arm64/boot/dts/freescale/imx8qm.dtsi          | 41 ++++++++++++++++++++++
+On 2/2/24 1:20 PM, Olivier Langlois wrote:
+> On Wed, 2024-01-31 at 13:52 -0700, Jens Axboe wrote:
+>> On 1/31/24 12:56 PM, Olivier Langlois wrote:
+>>> On Wed, 2024-01-31 at 12:59 -0500, Olivier Langlois wrote:
+>>>> On Wed, 2024-01-31 at 10:32 -0700, Jens Axboe wrote:
+>>>>>
+>>>>> Thanks for testing!
+>>>>>
+>>>>> Any chance that you could run some tests with and without NAPI
+>>>>> that
+>>>>> help
+>>>>> validate that it actually works? That part is what I'm most
+>>>>> interested
+>>>>> in, not too worried about the stability of it as I have
+>>>>> scrutinized
+>>>>> it
+>>>>> pretty close already.
+>>>>>
+>>>>
+>>>> There is maybe a test that I can perform. The data that I receive
+>>>> is
+>>>> timestamped. I have a small test program that checks the age of
+>>>> the
+>>>> updates on their reception...
+>>>>
+>>>> I would expect that it should be possible to perceive the busy
+>>>> polling
+>>>> effect by comparing the average update age with and without the
+>>>> feature
+>>>> enabled...
+>>>>
+>>>> A word of warning... The service that my client is connecting to
+>>>> has
+>>>> relocated recently. I used to have an RTT of about 8mSec with it
+>>>> to
+>>>> about 400-500 mSec today...
+>>>>
+>>>> because of the huge RTT, I am unsure that the test is going to be
+>>>> conclusive at all...
+>>>>
+>>>> However, I am also in the process of relocating my client closer
+>>>> to
+>>>> the
+>>>> service. If you can wait a week or so, I should able to do that
+>>>> test
+>>>> with a RTT < 1 mSec...
+>>>>
+>>>> Beside that, I could redo the same test that Stefan did with the
+>>>> ping
+>>>> client/server setup but would that test add any value to the
+>>>> current
+>>>> collective knowledge?
+>>>>
+>>>> I'll do the update age test when I restart my client and I'll
+>>>> report
+>>>> back the result but my expectations aren't very high that it is
+>>>> going
+>>>> to be conclusive due to the huge RTT.
+>>>>
+>>>>
+>>> As I expected, the busy polling difference in the update age test
+>>> is so
+>>> small compared to the RTT that the result is inconclusive, IMHO...
+>>>
+>>> The number of collected updates to build the stats is 500.
+>>>
+>>> System clocks are assumed to be synchronized and the RTT is the
+>>> difference between the local time and the update timestamp.
+>>> Actually, it may be more accurate to say that the displayed RTT
+>>> values
+>>> are in fact TT...
+>>>
+>>> latency NO napi busy poll:
+>>> [2024-01-31 11:28:34] INFO Main/processCollectedData rtt
+>>> min/avg/max/mdev = 74.509/76.752/115.969/3.110 ms
+>>>
+>>> latency napi busy poll:
+>>> [2024-01-31 11:33:05] INFO Main/processCollectedData rtt
+>>> min/avg/max/mdev = 75.347/76.740/134.588/1.648 ms
+>>>
+>>> I'll redo the test once my RTT is closer to 1mSec. The relative
+>>> gain
+>>> should be more impressive...
+>>
+>> Also happy to try and run it here, if you can share it? If not I have
+>> some other stuff I can try as well, with netbench.
+>>
+> I have redone my test with a fixed liburing lib that actually enable
+> io_uring NAPI busy polling correctly and I have slightly more
+> convincing result:
 > 
-> Any preference on whether all these go via a platform tree,
-> or should we pick up the net patch to netdev? I guess taking
-> the DTB via netdev would be the usual way to handle this?
+> latency NO napi busy poll (kernel v7.2.3):
+> [2024-02-02 11:42:41] INFO Main/processCollectedData rtt
+> min/avg/max/mdev = 73.089/75.142/107.169/2.954 ms
+> 
+> latency napi busy poll (kernel v7.2.3):
+> [2024-02-02 11:48:18] INFO Main/processCollectedData rtt
+> min/avg/max/mdev = 72.862/73.878/124.536/1.288 ms
+> 
+> FYI, I said that I could redo the test once I relocate my client to
+> have a RTT < 1ms...
+> 
+> I might not be able to do that. I might settle for an AWS VPS instead
+> of a bare metal setup and when you are running the kernel on a VPS,
+> AFAIK, the virtual Ethernet driver does not have NAPI...
 
-Supposed dt-bindings go through netdev tree.
+I'm going to try some local 10g testing here, I don't think the above
+says a whole lot as we're dealing with tens of msecs here. But if
+significant and stable, does look like an improvement. If NAPI works how
+it should, then sub msec ping/pong replies should show a significant
+improvement. I'll report back once I get to it...
 
-without dt-bindings, just DTB_CHECK warning. No strict dependence
-relationship between dt-bindings doc and dts file. 
+-- 
+Jens Axboe
 
-Frank
 
