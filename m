@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-68356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C96A6846B10
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:46:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59A77846B13
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:46:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 680BE1F239A9
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:46:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1106A2955F0
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 08:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 011A177651;
-	Fri,  2 Feb 2024 08:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BFB77F28;
+	Fri,  2 Feb 2024 08:42:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="DZJZjDUr"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="inpPjhzX"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311AF77622
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 08:42:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3209779F8
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 08:42:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706863337; cv=none; b=nfNuGYNa5n0blpG4kGaEt4M+3yjDrpaoNUmt2OHr7xkDLEtal9mdL70o1D27FxVwaMavOsUqzbkutncYOElwUoPD+m7FHGBZLghwZ0OjAK1B7woxt94AP8SkqHu/VR12PKRYnUf6xWdfREmwRLQiAKEkpMBZo2yj4a9y4TlaQZE=
+	t=1706863340; cv=none; b=EqgUCrefadP+O4pTQa/4s7W6KA/9AXPHC8EEDBeXhmG4H3V9oRkYhmKAE9Pgwvxn618O769wJGGNQlUnvVzN4YNWXsGvrw270VJ1761ZDXZkdVVmjNy3+ISMZo3DX8vSdetgi1TUcUlI082UIFaOx1iW2rHzoG8rnE/FRWe4iBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706863337; c=relaxed/simple;
-	bh=ga3nLsmlUPHxC6lprohW+AJrVuYSdcwOBoQLKkHF3cQ=;
+	s=arc-20240116; t=1706863340; c=relaxed/simple;
+	bh=3HIkBLfmG0k2J7i2Q48TrkFvh+JqTUAQoMPHL5/cn7A=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=IjImd4cuZDt91Gs4YXRE2J/hDK3uDQ23fFCu7QkxjQkv26jWfGQCqyJbune3lXDmtBy0ougGRm07P6mvgfQkW33kkR5dkbXN46rWkxDWi3nuY/tCi0KtyVKI6sHvxLpkoQS46hvZUzhinsNPtgyNU7fc9iMoxXR7SRJHVO2vwgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=DZJZjDUr; arc=none smtp.client-ip=209.85.218.45
+	 MIME-Version; b=b5o9v/QV1FyQOYUkbzlFcP/mcdjDGJwBDLajrPjp9HUABHtBEpOiecKhiNHYUvXk/UhZtml46DwRAvZ0qfuIyXVXzguSReNYQcWSSmkwqbu4GUmRjELQ84sMGIUT4lNQ23o3jBznMdDwZ6wZ7cjL30OOPBsdDv92CIBFfjleeCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=inpPjhzX; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a271a28aeb4so270276466b.2
-        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 00:42:15 -0800 (PST)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a3510d79ae9so239932766b.0
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 00:42:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1706863334; x=1707468134; darn=vger.kernel.org;
+        d=tuxon.dev; s=google; t=1706863337; x=1707468137; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=WdhJGQ6s9m0NV+6M+vVWcahgWKgGCVymWdzgAMvS+FE=;
-        b=DZJZjDUrNOwJoLmuu1njocvKCskmiT+FgFJ4ytSOefX/kELwOhtaJXI0GOe4DqZTbb
-         Pdf3qOn7xDZTX1b7zjPyfqI4SGD+txtX42BYSPMqntir4Wb5RbtheRfOzD4BTK7/hmQV
-         rwA5iHi/zV63THi76zmwzYHMPqbngQet23RDTY1vwFxBkVE8T3Id982KC2smjlOOo4/I
-         T56VCQ80R8ZQOSEcRefFjTuS63tCW/wYrk0eGSfdN3wFrwg7Dojj+68uUwm80cJU9S65
-         O3+02uP9qFSGAvo2SiXKJJC/5ZSrEGNzHQ8uAxTid0HXKiuhXe8xyLeNyboTwkD5/dyH
-         Z3BA==
+        bh=kPdGoRi9Q/Z94tgZI+Yh2dsfYo8XG51UXhclzkjwaXI=;
+        b=inpPjhzXyY+TgXD+R1nJ66G2gvqrc25riMI0NF2TvG1v97WBF2+Jni7kAL8ZaJupTb
+         wq9rjnh6a5S76CaPxlO6xL5RQm1Gp/rzzUdhqohgqpvQo2fyJ7LUzIdOsZXqQXKZzGiN
+         X3nFoxBfTNQZ8JGf2cdcf5oQ3Slfww7aRJ9QnJ9LabzoNAC4qISk0kDlUbgPScWbZi2t
+         KGsnGLF+1YFadfn20KPV1pxuv/N/EX9LkprRWsgCeGIZUczwkYVvNr+xJj3RBuqdbuT2
+         srG3rrrilwj5/Ca6/8bc3VJ4/dXhp9Gdu4jHyImGxMxAuT8ajsKeGkTmEQz1asR23+PT
+         F8nA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706863334; x=1707468134;
+        d=1e100.net; s=20230601; t=1706863337; x=1707468137;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=WdhJGQ6s9m0NV+6M+vVWcahgWKgGCVymWdzgAMvS+FE=;
-        b=V+vJx08v2ga3XV1GwS8tCuYxw93nY7nUlCbApG18RpEScZbRjYgSZHfkXkaWzITHRg
-         uq51Q1DieTZJoAaoKhuCqYR/BMAcaA4BgLsRDdakHQrFRIlvqDyRJNhLbBA0hEUmMEI9
-         Z8L1zzZpu/lJkaJMgJj6TxV3rOiLoS7Mnuq+bkH1dCvl59EFwcb0VuOFISb79IfQvbyD
-         yX4NK5rrG3SbhuWFPZUIsjNcThbPPXazmtD/H6zVLPWiSbY6dPlQYelzrM7+r45RZjJO
-         b74o3IeB/7obRIZbF5Ctpm/eMlQtxiKyMe0bdr6NnsKPKnvPFiGcaGcaoEeaykLNuLZf
-         AIOQ==
-X-Gm-Message-State: AOJu0YylwyhW0V1gEAa0FE7Rr0FxIXlDsm4B7o1+mgFRvoKxwquuLPDR
-	FCPcIBFhAoDTShwJoXMt8IxKyURglF22dFq0zTT7TUuiHpti1LaK31blDPKOpbE=
-X-Google-Smtp-Source: AGHT+IHnXMNwzUo2Br1/N/+O9GPS3OoaSwlapRSfwmI6tY0ezHXdEiAppUdX9nbCdqrt8XHHoCgxZg==
-X-Received: by 2002:a17:906:53cd:b0:a35:ad04:af7f with SMTP id p13-20020a17090653cd00b00a35ad04af7fmr1090979ejo.0.1706863334441;
-        Fri, 02 Feb 2024 00:42:14 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCV7uSh6uPMkU6fkq4gPzd3tNLJFMVKQ77Z+E4z7R4rS2P0qx+LV0rAsfKqUEMPt9jGqAwQ9TAribpLMglVgFtOl+5ay6lL5S0pnvPNz4b2X1yzzMGbwtaVxPwtC7vIZJH8pDyj/Ug4buSyfR5qau+TOwH8nnnPXEi2QxntsWbgBCe3aN3fDcIRAFZ3tSwTu9/1VmVfU4DeBG0BRyv+lpxZBI3duNQvkQ54DiDTh+tkRUPFdLjNxiB99no50iZLQcQ/b5ukV1RrUns60JFxIQsQyVIQLcnzapwmZ+acqEZ9C3rDRxy2c8JlzGAgA7kBN65XwmWjecHfdMXljZTtra/fb3nuaVJlx1mDmJlLMmpdv6TtUKX2rsJdHoBYnT7Dewx+cXSHm5+WNFsSsHw==
+        bh=kPdGoRi9Q/Z94tgZI+Yh2dsfYo8XG51UXhclzkjwaXI=;
+        b=mWRksumSgWiO1E7su8qzzkBorpw8slzhfNVUXFvsfIUdccoJc8TIg0IjM7JYyhkeyz
+         +hSnV9XUCNXq40kXC4igUkJ7wkxOSSSVvgMXUh1rkG8XUA8gEl/keQ+jbAb0Q5DLvmEB
+         u2TQ1Ht9VngwIBv+DQIZgsPdKthrvB0M2IEMX2s/UPxAuPxlYORSGUDys+olgSeTFfY5
+         L69/x7tWe8h8mfqQJ2Abqa7cftegLKaHNyZcC9Ha3sDnh6zEnxjH5WyrU8ovn+lmf7lU
+         6lxcCwo5F60g5wmbeT7uPq1WvhZKNodbfN/gfem7BNOG1EVWGPgObQqmH7sIERa+IP0B
+         F/3Q==
+X-Gm-Message-State: AOJu0YynG6Q1+DCNP7q5TV4LqBucernMAw7dgnsBk0QnYF0Dh9+aWtx2
+	8ndTtK+Rs+0LobFXftW7tSbQmeR6+z1SGFADCSXFsW9F/gIu+dgfAgT+7Gc3bFs=
+X-Google-Smtp-Source: AGHT+IEdkKMD2YyKIjcbZQJRMEInK5fZvN0HL2AEdTD3QAGNSDQhn3jqRZdGSvnkLfOOYK84zwmGJA==
+X-Received: by 2002:a17:906:7158:b0:a36:cd96:4b5d with SMTP id z24-20020a170906715800b00a36cd964b5dmr2660222ejj.45.1706863336919;
+        Fri, 02 Feb 2024 00:42:16 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUkcQo0AGkIAWGrtXqaZ+TEINEoWJ0aPBkGGmtlxzgxbyWn8izca7eLmJs848nuNalvr7t0zZf5NzfJH674q8K+1iv37aWhIq0BrsaAUwWsHZ3CVQFHRzF0IPz0WNsPnWg3XctHTI9xeHRzWScO13EfrL5VJ15RQAdC+ms7nnBnFauz+kZkIC5lRr+ZF1HXgSiATTe7WyQYV605cDGFgXb+YP4YF1Q3/9V20fiOCkuDW0YENrVP/heiJxuke70zembo2EpDEykCLfbToAEDihxje1YyM8j4boUbvpB6sp1t1fkU+CGdT9UHZ/3J7EgJNW6sUr2C1he4kMlXNQWtWqH4sGPrJhH4rZAau+2heezIZ98lyofMLoCjCYH/mxHROf4hwc1assGuf32FBA==
 Received: from claudiu-X670E-Pro-RS.. ([82.78.167.87])
-        by smtp.gmail.com with ESMTPSA id oz35-20020a1709077da300b00a361c1375absm631642ejc.133.2024.02.02.00.42.12
+        by smtp.gmail.com with ESMTPSA id oz35-20020a1709077da300b00a361c1375absm631642ejc.133.2024.02.02.00.42.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Feb 2024 00:42:13 -0800 (PST)
+        Fri, 02 Feb 2024 00:42:15 -0800 (PST)
 From: Claudiu <claudiu.beznea@tuxon.dev>
 X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
 To: s.shtylyov@omp.ru,
@@ -81,9 +81,9 @@ Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	claudiu.beznea@tuxon.dev,
 	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Subject: [PATCH net-next v6 11/15] net: ravb: Move DBAT configuration to the driver's ndo_open API
-Date: Fri,  2 Feb 2024 10:41:32 +0200
-Message-Id: <20240202084136.3426492-12-claudiu.beznea.uj@bp.renesas.com>
+Subject: [PATCH net-next v6 12/15] net: ravb: Move PTP initialization in the driver's ndo_open API for ccc_gac platorms
+Date: Fri,  2 Feb 2024 10:41:33 +0200
+Message-Id: <20240202084136.3426492-13-claudiu.beznea.uj@bp.renesas.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240202084136.3426492-1-claudiu.beznea.uj@bp.renesas.com>
 References: <20240202084136.3426492-1-claudiu.beznea.uj@bp.renesas.com>
@@ -97,10 +97,16 @@ Content-Transfer-Encoding: 8bit
 
 From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-DBAT setup was done in the driver's probe API. As some IP variants switch
-to reset mode (and thus registers content is lost) when setting clocks
-(due to module standby functionality) to be able to implement runtime PM
-move the DBAT configuration in the driver's ndo_open API.
+The initialization sequence for PTP is the same for platforms with ccc_gac
+and gptp (according to "Figure 50.71 Flow of gPTP Initialization (Normal,
+Common to All Modes)" of the R-Car Series, 3rd generation hardware
+manual and "Figure 37A.53 Flow of gPTP Initialization (Normal, Common to
+All Modes)" of the RZ/G Series hardware manual).
+
+As some IP variants switch to reset mode (and thus the registers content is
+lost) when setting clocks (due to module standby functionality) to be able
+to implement runtime PM, move the PTP initialization to the driver's
+ndo_open API.
 
 This commit prepares the code for the addition of runtime PM.
 
@@ -119,34 +125,80 @@ Changes in v4:
 - none
 
 Changes in v3:
+- fixed typos in patch description
 - collected tags
 
 Changes in v2:
 - none; this patch is new
 
- drivers/net/ethernet/renesas/ravb_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+
+ drivers/net/ethernet/renesas/ravb_main.c | 18 +++---------------
+ 1 file changed, 3 insertions(+), 15 deletions(-)
 
 diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index e5805e0d8e13..318ab27635bb 100644
+index 318ab27635bb..54099fef946e 100644
 --- a/drivers/net/ethernet/renesas/ravb_main.c
 +++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -1865,6 +1865,7 @@ static int ravb_open(struct net_device *ndev)
- 		napi_enable(&priv->napi[RAVB_NC]);
+@@ -1876,7 +1876,7 @@ static int ravb_open(struct net_device *ndev)
+ 	ravb_set_gti(ndev);
  
- 	ravb_set_delay_mode(ndev);
-+	ravb_write(ndev, priv->desc_bat_dma, DBAT);
+ 	/* Initialise PTP Clock driver */
+-	if (info->gptp)
++	if (info->gptp || info->ccc_gac)
+ 		ravb_ptp_init(ndev, priv->pdev);
  
- 	/* Device init */
- 	error = ravb_dmac_init(ndev);
-@@ -2808,7 +2809,6 @@ static int ravb_probe(struct platform_device *pdev)
- 	}
- 	for (q = RAVB_BE; q < DBAT_ENTRY_NUM; q++)
- 		priv->desc_bat[q].die_dt = DT_EOS;
--	ravb_write(ndev, priv->desc_bat_dma, DBAT);
+ 	/* PHY control start */
+@@ -1890,7 +1890,7 @@ static int ravb_open(struct net_device *ndev)
  
+ out_ptp_stop:
+ 	/* Stop PTP Clock driver */
+-	if (info->gptp)
++	if (info->gptp || info->ccc_gac)
+ 		ravb_ptp_stop(ndev);
+ 	ravb_stop_dma(ndev);
+ out_napi_off:
+@@ -2200,7 +2200,7 @@ static int ravb_close(struct net_device *ndev)
+ 	ravb_write(ndev, 0, TIC);
+ 
+ 	/* Stop PTP Clock driver */
+-	if (info->gptp)
++	if (info->gptp || info->ccc_gac)
+ 		ravb_ptp_stop(ndev);
+ 
+ 	/* Set the config mode to stop the AVB-DMAC's processes */
+@@ -2813,10 +2813,6 @@ static int ravb_probe(struct platform_device *pdev)
  	/* Initialise HW timestamp list */
  	INIT_LIST_HEAD(&priv->ts_skb_list);
+ 
+-	/* Initialise PTP Clock driver */
+-	if (info->ccc_gac)
+-		ravb_ptp_init(ndev, pdev);
+-
+ 	/* Debug message level */
+ 	priv->msg_enable = RAVB_DEF_MSG_ENABLE;
+ 
+@@ -2861,10 +2857,6 @@ static int ravb_probe(struct platform_device *pdev)
+ out_dma_free:
+ 	dma_free_coherent(ndev->dev.parent, priv->desc_bat_size, priv->desc_bat,
+ 			  priv->desc_bat_dma);
+-
+-	/* Stop PTP Clock driver */
+-	if (info->ccc_gac)
+-		ravb_ptp_stop(ndev);
+ out_rpm_put:
+ 	pm_runtime_put(&pdev->dev);
+ out_rpm_disable:
+@@ -2890,10 +2882,6 @@ static void ravb_remove(struct platform_device *pdev)
+ 
+ 	ravb_mdio_release(priv);
+ 
+-	/* Stop PTP Clock driver */
+-	if (info->ccc_gac)
+-		ravb_ptp_stop(ndev);
+-
+ 	dma_free_coherent(ndev->dev.parent, priv->desc_bat_size, priv->desc_bat,
+ 			  priv->desc_bat_dma);
+ 
 -- 
 2.39.2
 
