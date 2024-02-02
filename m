@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-68278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 323868465EF
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 03:38:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F09E78465F0
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 03:38:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDE0D1F24E12
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:38:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F8201C24B8B
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:38:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BACA18814;
-	Fri,  2 Feb 2024 02:38:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA35A8839;
+	Fri,  2 Feb 2024 02:38:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F4jGuH/n"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SoJsY9u+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49452BE5A
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 02:38:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5819FC2CF
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 02:38:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706841489; cv=none; b=MzHA71aEj/rG7YwSx46vWVDBq9wESm0K9K63n+y1Dd7xHcpahcnOXQEOBenM94mA/dXCd4cXDdttuAxSinkoVWmLpv7DoYOg+47sMxD+86yVqz188CG0OpNRzI9V4z9uzPt3VXV7ZIxOiP9E+Tgt9HkZqbdLARcXnlBj6FlI9CA=
+	t=1706841492; cv=none; b=oFs8EpGKWyoVlVrlAzao2GXNORqZRo7+czuoj211s5aZEJpgoy9z1lq3RdpvD4nwXl7mfptdN6ArWpP+XLZTxs67o9Oh9sdc83zrkbpPH+h6Gh9CNzLq8gCihfwskB4tD+HZtz/DUNCseDFpe2IU5jFcERJ/6EFAfrwtKPZzpcU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706841489; c=relaxed/simple;
-	bh=KDU5Sap9KmERo+IOTSOxwD/wM01vjxr94Mz5wDzVw8U=;
+	s=arc-20240116; t=1706841492; c=relaxed/simple;
+	bh=9sCZCUTM9/Bv/osCyDQdlDwrCLiHF/EY3ax+mpZSXpc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=acSzBx1USYaHNGLyGwErsEJYpgzJazwHZD+o+mLu9VKizqbVkl1DBM6YiSyGbwVBpIbKdMBIPJtqrQqc34/jQTiIp7Eecj4p1etxtc6KyQYmPDQp9+ncxtoREa+ZN6u8s8W1iBykBNZ18ny/t7cZbpyDICK3XosHSpBnOQSu+MQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F4jGuH/n; arc=none smtp.client-ip=209.85.214.174
+	 MIME-Version; b=Zqh7aSHwWs9p5L6aPlTQuQzmhKiXURsR9ldiAYGYgfIrHsYeEtuLql7+tIxM7imU78qG9ClTohtPsLtS46ZMh0zHrGAwMQzI/IlF6eUTB5P15/UJM1q+V2bOrCME7hh4E9WCDs4OKeSSSuWPn0uW0XoSqEfr193vwHbaJAvzwGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SoJsY9u+; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1d932f6ccfaso13112155ad.1
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 18:38:08 -0800 (PST)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1d94323d547so13731665ad.3
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 18:38:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706841487; x=1707446287; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706841490; x=1707446290; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=7f+YPdLV02rXa/1f3nKaHnsp07nRY0/vdqPS1EubdSo=;
-        b=F4jGuH/nAiCYeuEN3cwd6JF3YIN9ZSyUGJsz26oBluP9GF5um5NSboxJqwbKbwWCCZ
-         WIt6QwHuHS4+qRlJCH7k1I8FAF9zdQ8d1EhU8KxDqCgw7vXCqPMkT8TMt80XayvsJGf8
-         ayq0SEI5h4yN173dGzkCKg8WD2LI7ps4ukCYRYWKzyoiwqoiXzwk1y8Lkmpwg4qw3A1k
-         IRDI8psXQlj60Zl23uskLi5bXgJpP9tw2h8c5z7TddmJrOk/O+fDhU9fyucmns2R/vWh
-         vILgMQE2A/u7ILUeCP/IejN5NYJKs3G75kFf1lRutuTI84oacLJHr13WgW2GCe4HhzSt
-         gsfg==
+        bh=0292U331PRMk/JKM5bmBjV7z2aP5Wa2jlTcLtcJEHno=;
+        b=SoJsY9u+sW9AxEKwmgLEyhNdYPAQV9xPCDqTvUtE7NuYBO767tU2IewMNxPV+BIbq9
+         /2qR4Bufi0k0bwQAlcvDH22+4LYVEDU7ffOTtt9MPNocLD6fTvfY7ltUwBA1jZiuU4pA
+         j91oCQqPolKXH697stgBM9HNmAlBXZe9eJCtShZayT00+mQ8JFR0EmLIiDucR1P7tlfr
+         4ZNDJry0KmVgmOazY6JSqn8GEO44Obys3UDP7VlYB8/iwHFRYZsgLLyc1UqzgZGrlNty
+         Qhx/0sCnTuplPeEE6O6XGE6yi8ewf/mTF8FBF0lahVeiVavCqcDiSqLixAwfLRxzkROz
+         77aA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706841487; x=1707446287;
+        d=1e100.net; s=20230601; t=1706841490; x=1707446290;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=7f+YPdLV02rXa/1f3nKaHnsp07nRY0/vdqPS1EubdSo=;
-        b=s217sCEZ8CVGuwIdcBqay0o6/4Dn4uIJE+ySM1EoD3SUSclO33Rn8MsydrPUnCiaYm
-         ZUCmjg09ZpUkhSqF7iBgILukiIsTLnIOKhl4cxqDD9lii9R7qvMCHWvs1FIB2Cfdc7bn
-         CewFAJG9GodRJ6Yxczz90gg4GcZjnJCOyAGmuXNVXqjVhWhHKKWUsK8rgMwwaocmDQ+V
-         HUL8IScLhLX4Rq8edWfwSnN0CS4qA8NpPDypgh2w21gnqOc5zJZj3oUIa9zZvm3N63IJ
-         Uu06QGzb2jBd3HyZ4hBuyfG+A9Je3yF23zqyy1Q10zqGAwidhADaztHbb/V+8QA3CpFK
-         TkbQ==
-X-Gm-Message-State: AOJu0Yz31rLva1cxHttArkxnOBT0KTkHcYdear3AJRiGnud7ZCuN8o8q
-	waX8WjEQP+JbYnz/5EqVe+nLu9CHzgf3a1y7w30VfU83WCFjzrejJFa92AMv88l7D0hs
-X-Google-Smtp-Source: AGHT+IE60aE7iVtNs16/OTB6Oi5cYYl4Ls/oROOmgN/3m+JftJYc1+BE+6HL5g30nAvNOK7OSebgvQ==
-X-Received: by 2002:a17:903:2b08:b0:1d9:63db:2bd7 with SMTP id mc8-20020a1709032b0800b001d963db2bd7mr2464077plb.61.1706841487115;
-        Thu, 01 Feb 2024 18:38:07 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVQCXpwluYZWLhgSAVOEAI7WrRmfnyVaHlzzvx6zICR6OndgZS8OgCvPLIqVS4hhSaaKHqPahXiOqOLRcMu6XFTlJ4gT+8rqnbGcsJWel8NVP1uXJtIf/KtSwNi8bXjjy5aQrWUrXy+bYpdLPk7Tz0qeSpR5bYeZRWkxABYCXhW7bn3IXPzXcnrt3uBpuEK7Lmpnc5J/fmLssB7uTZ1mOkX/2KOI8Xa39rXwuTnU8/GedmJjPVUJlTfr7txzkajr8sJSg==
+        bh=0292U331PRMk/JKM5bmBjV7z2aP5Wa2jlTcLtcJEHno=;
+        b=WKvhWB/nJfnNG8jfOQTYDVo2X1/Nnh9y/eQwWv5cF/+jBoHQtsoF4Xv47h/KHFlb3w
+         7j48m11Xi7MlsPseNuXqzPcQzWPbCMsLm2WTnEvvRxl9pu5zOsJrYBw8MM/8j5s+CKpu
+         lVPEKgV1LTf3A5pQu8FkYc9AqlWJMFs5KFtaZNNSqZb0fO/GZ0dMx3VCoqRGk23PvY2W
+         tT7mrd0tgQT7s5Lw3qgvS2NUxdWCI8eiVUt09l3OjfWjzO/JXwGkWwLHkvyB8gmQe8BF
+         D9/r3jAgg3/fCJ3Hr3CZGHGhzwi2M4O7WVIXc2m38tyYVJUHYqvl5YMtWvTwMCisuyt6
+         XdPg==
+X-Gm-Message-State: AOJu0YyGrOIlAQyZIGxv2OygtWGFEq5eZuJXd6ovVyf5QafdvRs4uLHM
+	X4ga5gtq1bWMzczdawcD1oJ4sa1bPRE8d8JDiGs7SrXjHHHdtoJGS53Cz/New1AQeIho
+X-Google-Smtp-Source: AGHT+IFJaPPv+zV8irfAAXJzsiqz/qn3WEddHTNgCe97pZzkHtiGUGQthDgX1QPYO3o/s5dTtyg/ag==
+X-Received: by 2002:a17:902:f545:b0:1d9:232d:4c1c with SMTP id h5-20020a170902f54500b001d9232d4c1cmr1081597plf.52.1706841490217;
+        Thu, 01 Feb 2024 18:38:10 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXoO0RpiBdZ35WtlW4lxLcC9+yhNGkuDYf4z2BMDt4KQ8Ls5Qd5QKSTQ3S8ZLpu9hAD0TJe+8+IRSg2an/KqMQ6Cymu24NKQDyLQAtRB8uT6B6T6VFClyD34+L0WIMbXgODCEMRd3MlsdxSEJO+SHUPl0ltCFXwdCYPcba54t+EnIJDmeeJLos3bl6nkn4BH5nqjbDJeSnrVk/cjTw4EZ7p9Xz2cjCKc9n7kmPfTKJ/w+x0xnbupOTKUaT7PcdxrbHYxg==
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id ji19-20020a170903325300b001d944b3c5f1sm493256plb.178.2024.02.01.18.38.04
+        by smtp.gmail.com with ESMTPSA id ji19-20020a170903325300b001d944b3c5f1sm493256plb.178.2024.02.01.18.38.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 18:38:06 -0800 (PST)
+        Thu, 01 Feb 2024 18:38:09 -0800 (PST)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
@@ -77,9 +77,9 @@ Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
 	Liang Li <liali@redhat.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv3 net-next 1/4] selftests/net/forwarding: add slowwait functions
-Date: Fri,  2 Feb 2024 10:37:51 +0800
-Message-ID: <20240202023754.932930-2-liuhangbin@gmail.com>
+Subject: [PATCHv3 net-next 2/4] selftests: bonding: use tc filter to check if LACP was sent
+Date: Fri,  2 Feb 2024 10:37:52 +0800
+Message-ID: <20240202023754.932930-3-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240202023754.932930-1-liuhangbin@gmail.com>
 References: <20240202023754.932930-1-liuhangbin@gmail.com>
@@ -91,70 +91,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add slowwait functions to wait for some operations that may need a long time
-to finish. The busywait executes the cmd too fast, which is kind of wasting
-cpu in this scenario. At the same time, if shell debugging is enabled with
-`set -x`. the busywait will output too much logs.
+Use tc filter to check if LACP was sent, which is accurate and save
+more time.
+
+No need to remove bonding module as some test env may buildin bonding.
+And the bond link has been deleted.
 
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
- tools/testing/selftests/net/forwarding/lib.sh | 35 +++++++++++++++++++
- 1 file changed, 35 insertions(+)
+ .../net/bonding/bond-break-lacpdu-tx.sh       | 19 +++++++++----------
+ 1 file changed, 9 insertions(+), 10 deletions(-)
 
-diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
-index a7ecfc8cae98..db3688f52888 100644
---- a/tools/testing/selftests/net/forwarding/lib.sh
-+++ b/tools/testing/selftests/net/forwarding/lib.sh
-@@ -37,6 +37,32 @@ fi
+diff --git a/tools/testing/selftests/drivers/net/bonding/bond-break-lacpdu-tx.sh b/tools/testing/selftests/drivers/net/bonding/bond-break-lacpdu-tx.sh
+index 6358df5752f9..1ec7f59db7f4 100755
+--- a/tools/testing/selftests/drivers/net/bonding/bond-break-lacpdu-tx.sh
++++ b/tools/testing/selftests/drivers/net/bonding/bond-break-lacpdu-tx.sh
+@@ -20,21 +20,21 @@
+ #    +------+ +------+
+ #
+ # We use veths instead of physical interfaces
++REQUIRE_MZ=no
++NUM_NETIFS=0
++lib_dir=$(dirname "$0")
++source "$lib_dir"/../../../net/forwarding/lib.sh
  
- source "$net_forwarding_dir/../lib.sh"
- 
-+# timeout in seconds
-+slowwait()
-+{
-+	local timeout=$1; shift
-+
-+	local start_time="$(date -u +%s)"
-+	while true
-+	do
-+		local out
-+		out=$("$@")
-+		local ret=$?
-+		if ((!ret)); then
-+			echo -n "$out"
-+			return 0
-+		fi
-+
-+		local current_time="$(date -u +%s)"
-+		if ((current_time - start_time > timeout)); then
-+			echo -n "$out"
-+			return 1
-+		fi
-+
-+		sleep 0.1
-+	done
-+}
-+
- ##############################################################################
- # Sanity checks
- 
-@@ -478,6 +504,15 @@ busywait_for_counter()
- 	busywait "$timeout" until_counter_is ">= $((base + delta))" "$@"
+ set -e
+-tmp=$(mktemp -q dump.XXXXXX)
+ cleanup() {
+ 	ip link del fab-br0 >/dev/null 2>&1 || :
+ 	ip link del fbond  >/dev/null 2>&1 || :
+ 	ip link del veth1-bond  >/dev/null 2>&1 || :
+ 	ip link del veth2-bond  >/dev/null 2>&1 || :
+-	modprobe -r bonding  >/dev/null 2>&1 || :
+-	rm -f -- ${tmp}
  }
  
-+slowwait_for_counter()
-+{
-+	local timeout=$1; shift
-+	local delta=$1; shift
-+
-+	local base=$("$@")
-+	slowwait "$timeout" until_counter_is ">= $((base + delta))" "$@"
-+}
-+
- setup_wait_dev()
- {
- 	local dev=$1; shift
+ trap cleanup 0 1 2
+ cleanup
+-sleep 1
+ 
+ # create the bridge
+ ip link add fab-br0 address 52:54:00:3B:7C:A6 mtu 1500 type bridge \
+@@ -67,13 +67,12 @@ ip link set fab-br0 up
+ ip link set fbond up
+ ip addr add dev fab-br0 10.0.0.3
+ 
+-tcpdump -n -i veth1-end -e ether proto 0x8809 >${tmp} 2>&1 &
+-sleep 15
+-pkill tcpdump >/dev/null 2>&1
+ rc=0
+-num=$(grep "packets captured" ${tmp} | awk '{print $1}')
+-if test "$num" -gt 0; then
+-	echo "PASS, captured ${num}"
++tc qdisc add dev veth1-end clsact
++tc filter add dev veth1-end ingress protocol 0x8809 pref 1 handle 101 flower skip_hw action pass
++if slowwait_for_counter 15 2 \
++	tc_rule_handle_stats_get "dev veth1-end ingress" 101 ".packets" "" &> /dev/null; then
++	echo "PASS, captured 2"
+ else
+ 	echo "FAIL"
+ 	rc=1
 -- 
 2.43.0
 
