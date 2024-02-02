@@ -1,96 +1,79 @@
-Return-Path: <netdev+bounces-68244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 176BD8464B6
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 00:57:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C1768464C0
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:03:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C092282C18
-	for <lists+netdev@lfdr.de>; Thu,  1 Feb 2024 23:57:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24A51B22C52
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 00:03:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2048147F60;
-	Thu,  1 Feb 2024 23:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3119E17F3;
+	Fri,  2 Feb 2024 00:03:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VfO2deg1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o1O0LXPh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 643483F8DA;
-	Thu,  1 Feb 2024 23:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E56BA4C71;
+	Fri,  2 Feb 2024 00:03:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706831831; cv=none; b=IP0+1GypcMwIEhiyKvdFjS+W5JStGBks6WezC2eUKY8jyPP3sNFgxtdN9rB9cO7qplOLYj5FaS6yk9cgTzpqA8OU10kzeGx3S0a20+4n5N19sI4XUdCa+RgpWoypj7GNH3ynaK9IbbJAYTALBzP3+0k3b2rxg7jVBU+/RXHfMz8=
+	t=1706832198; cv=none; b=ZvLvFtPL76f50iY77iGChNyC9cKG45fNQwXHxLxcWlsj6EOOgB94RfBl8mWN4hT78f3ag10v5y0cKGil4zS6KAbqap3VUTB1pT8aafExvAqFNt+5RAvJE0h2PUDAEIA+ETz1pCu80QSp9lIEq1Mi/GLTWedUv6bbafd5d6xeStc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706831831; c=relaxed/simple;
-	bh=adT4iPkCMRDOEL5rMrtGnul/qErFA+76SbIs85UohKw=;
+	s=arc-20240116; t=1706832198; c=relaxed/simple;
+	bh=S77eR3+aBnUK3p2BE5Am64ezv1OvD+YOIoEHYe29IuI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CxWGFzrLJnKzzfFpYmjAE9TGQOhdJxv2ET8IQNftTxvkvSYSROXDEkPcw1fAK9OHx51DXaeXWGIEDFE7Y3V0UE+YXBdyjODN4uTtMHRD7+C+lqG01pUpfnV0X4W7v5Lfik7sUtX8S7Ily6QymmqeLwURNglJudvKKDXxpAKQZZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VfO2deg1; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-55fc7f63639so1482224a12.1;
-        Thu, 01 Feb 2024 15:57:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706831827; x=1707436627; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=adT4iPkCMRDOEL5rMrtGnul/qErFA+76SbIs85UohKw=;
-        b=VfO2deg1Th8agzKwW/rDp3aZoJpf5TPb4tZ2bFCogNbslOoB1X0j/x7rtcP3QdOLJj
-         wTOW1ruIVGhNA/LaNkiOP7nkY+/pPi4fa4/v7pc577D6jHFx3VDXyhV2yjG2AFHRO/Ez
-         ebr4tcFwzFv8IdS+DchxVLOShAMfg+a3Ii5s5jqDtKG74L4qay0PlEWsZDbeGM2dVG0i
-         O2bk0Xl9OZLFZsTN466vBuA5K86ATKxv7ZqJoBjyY/7x7kcZ4MIQ76ApanGBpHX907NY
-         2Bh0pshgsbGWCeqDzGUdH/IDHuXevZVdvEAMSNiw5vUYlCpRXDw7Ea8isUopNXNRvTy+
-         9v3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706831827; x=1707436627;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=adT4iPkCMRDOEL5rMrtGnul/qErFA+76SbIs85UohKw=;
-        b=h1dGSJsC0jm0BVJzjZ1TkrhuUgoSrOrLyoN4vvmD+lY1YOdv6yvrG6Dsn9vUxSEEYy
-         7r1Zt3PeHsKi5FoYxMIJYxS2RAfxAfFe12ezAH3Aj+KAW9s/zmPKlpJ+cuCkDdiI2IVS
-         TlyS87dKFsOSlNpTrARzNbSMLcc89sEjK6mJgfZQHcSE3+lqAn3BDjbV6O79uZbqQfX0
-         HB4KyWMg/rOk9/xpAB9LyppUDOvAt77BqNIMu8hRMGVZ5+qK6p6l/42Crx9XsOUH0+YU
-         Shio9YwKYaTvjOVgniqMoLeoVI7nJyIEVJxLVJOuGm+A+n+qz/8KYyBWl38jZVpQISC4
-         zFBg==
-X-Gm-Message-State: AOJu0YxRHX/o+Pr4Q697lvTDZOuTctxR4ABt2YskdRC1YZwU54bpp19t
-	y1EAXkPlGfEhELVgT27jzVtDTCO2zjQlyojfshGJDlvNovJobIyw
-X-Google-Smtp-Source: AGHT+IG3GRpEb6P3gOztp8VYIYCGF8w4fWoFWV2IqNBIPIZrFxFvH07VopDrgtziHJhcQ1hUKaZ8YA==
-X-Received: by 2002:a17:906:6d15:b0:a35:dd08:c7ab with SMTP id m21-20020a1709066d1500b00a35dd08c7abmr2828558ejr.26.1706831827348;
-        Thu, 01 Feb 2024 15:57:07 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVUl2qS8vXJYPNH/8CEBWNcoQvNoq8VNnDC5tiT41ug2qx6eB9httdjpfEMwq1/GeIzcQFfDnW3mKXY65DN75xVqDEvnMTCerLFrxvvOyFvezJ1SON+S1aj+OhUPRy5gm4dnsAoxWxbguCFfELUikvKYxwh7Fcr1gnoXhwxt3Qpi+yimXcBy/NHWY6OkacFyjE3LVc+5BYunCYhLNDTgi6jmlRF5ptJ/o3bHHHs5GwoJHT2G1AkfPZfTZc8i81lYlkl8jgvVADxirW3Kj/YzYqlh8vSrib4k3VoeaowMo3ZwwctSD6YCLjjxsDPWoKkjRza8v67yIQkF3b5r4abMlmi/bdy4gxkwi2ztKapPBTNn+sdwGhPkBKbA0Hkd+euAyC/hJkb0py1E2qcBCT83Ui9yAHyx7F/1cvOtWfZ+Swdg1HgDRKxMPa2YrSWCBHSHoTH9ga/2USLPtDxdxmu/7PAuTQ/Yz6tnK+gr+5fn6GcT3i2WBj9PI9kFIr0EW0ouCqqmeGd/c5nAf3C5qV2nfj7hIWRe7RJYblxAEx4V7LNlXExsWhaJ++GSB3yTs2WXWHy5yiE4jPqNpfC1OFgvnvwdd9tIkutlR66JRpfuESHB5O2NSbFOsVVzZaBoHALpjeJeLKrtEJoP3mibkjDIbPtO/bvUY9F
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id vu12-20020a170907a64c00b00a31c5caa750sm277937ejc.177.2024.02.01.15.57.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Feb 2024 15:57:07 -0800 (PST)
-Date: Fri, 2 Feb 2024 01:57:04 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>, mithat.guner@xeront.com,
-	erkin.bozoglu@xeront.com,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH net-next v2 5/7] net: dsa: mt7530: simplify
- mt7530_setup_port6() and change to void
-Message-ID: <20240201235704.6wxbkpli3dk4pn4w@skbuf>
-References: <20240130-for-netnext-mt7530-improvements-2-v2-0-ba06f5dd9eb0@arinc9.com>
- <20240130-for-netnext-mt7530-improvements-2-v2-5-ba06f5dd9eb0@arinc9.com>
- <Zbkc4BRORWYu79GZ@makrotopia.org>
- <77c38489-8a73-4b00-bd82-48174b4d620f@arinc9.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=fRVTNj4KTS3xbmMJH1e9f2z8BKzdN8lEulStru61NTFKWNs53piWBTQo0K+kOlRT4ygVFLr3kLh4E72UQ4UKOjN0H+HdsTHDfvVec+NDnVaOcOK3FmMuoaVWVdoM2gKIhXues1JmogqOQPJkfLvmv8yshpaSAG7qpZixOupOF6g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o1O0LXPh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F322C433F1;
+	Fri,  2 Feb 2024 00:03:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706832197;
+	bh=S77eR3+aBnUK3p2BE5Am64ezv1OvD+YOIoEHYe29IuI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=o1O0LXPhHzpi1Rs6bzSdUB3LcjO1MINeMXN+1VP+sLsOBbB1lmcWYZuIO4+mnQAL7
+	 MpNreOS7S3fgAQVhYTOwYixsFgyWORbDq1gNT16Srdh7+9QduAlF2WLSh7ATYq9A/m
+	 Y0Lm0CB7nQpLHDTRuIF6IujMeKqllKNE//q8Nn3cMmddLrW3fdHEFrHNrIdxf9+VMQ
+	 1T/iRH19Hl/og9XJiEqS8kUbH26YuegOXXgC2QmD8Clxt3tze7TsIaPCE17/GfHVgz
+	 xNSreoCPH085OxjKknjT/WMdY6EMheAbPZNwG25VNnB9eCHX5WAsJbaqJNBaD471hM
+	 CnqXZHJo7xVJg==
+Date: Thu, 1 Feb 2024 18:03:12 -0600
+From: Bjorn Andersson <andersson@kernel.org>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, 
+	Heiko Stuebner <heiko@sntech.de>, Jernej Skrabec <jernej.skrabec@gmail.com>, 
+	Chris Morgan <macromorgan@hotmail.com>, Linus Walleij <linus.walleij@linaro.org>, 
+	Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>, 
+	Neil Armstrong <neil.armstrong@linaro.org>, 
+	=?utf-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4=?= Prado <nfraprado@collabora.com>, Marek Szyprowski <m.szyprowski@samsung.com>, 
+	Peng Fan <peng.fan@nxp.com>, Robert Richter <rrichter@amd.com>, 
+	Dan Williams <dan.j.williams@intel.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
+	Terry Bowman <terry.bowman@amd.com>, Lukas Wunner <lukas@wunner.de>, 
+	Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, Abel Vesa <abel.vesa@linaro.org>, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-pci@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: Re: Re: [PATCH 4/9] PCI: create platform devices for child OF
+ nodes of the port node
+Message-ID: <oiwvcvu6wdmpvhss3t7uaqkl5q73mki5pz6liuv66bap4dr2mp@jtjjwzlvt6za>
+References: <20240117160748.37682-1-brgl@bgdev.pl>
+ <20240117160748.37682-5-brgl@bgdev.pl>
+ <2024011707-alibi-pregnancy-a64b@gregkh>
+ <CAMRc=Mef7wxRccnfQ=EDLckpb1YN4DNLoC=AYL8v1LLJ=uFH2Q@mail.gmail.com>
+ <2024011836-wok-treadmill-c517@gregkh>
+ <d2he3ufg6m46zos4swww4t3peyq55blxhirsx37ou37rwqxmz2@5khumvic62je>
+ <CAMRc=MeXJjpJhDjyn_P-SGo4rDnEuT9kGN5jAbRcuM_c7_aDzQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,27 +83,85 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <77c38489-8a73-4b00-bd82-48174b4d620f@arinc9.com>
+In-Reply-To: <CAMRc=MeXJjpJhDjyn_P-SGo4rDnEuT9kGN5jAbRcuM_c7_aDzQ@mail.gmail.com>
 
-On Tue, Jan 30, 2024 at 08:46:04PM +0300, Arınç ÜNAL wrote:
-> would supposedly achieve 2 Gbps TX & 2 Gbps RX
+On Wed, Jan 31, 2024 at 12:04:14PM +0100, Bartosz Golaszewski wrote:
+> On Tue, Jan 30, 2024 at 10:54 PM Bjorn Andersson <andersson@kernel.org> wrote:
+> >
+> > On Thu, Jan 18, 2024 at 12:15:27PM +0100, Greg Kroah-Hartman wrote:
+> > > On Thu, Jan 18, 2024 at 11:58:50AM +0100, Bartosz Golaszewski wrote:
+> > > > On Wed, Jan 17, 2024 at 5:45 PM Greg Kroah-Hartman
+> > > > <gregkh@linuxfoundation.org> wrote:
+> > > > >
+> > > > > On Wed, Jan 17, 2024 at 05:07:43PM +0100, Bartosz Golaszewski wrote:
+> > > > > > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> > > > > >
+> > > > > > In order to introduce PCI power-sequencing, we need to create platform
+> > > > > > devices for child nodes of the port node.
+> > > > >
+> > > > > Ick, why a platform device?  What is the parent of this device, a PCI
+> > > > > device?  If so, then this can't be a platform device, as that's not what
+> > > > > it is, it's something else so make it a device of that type,.
+> > > > >
+> > > >
+> > > > Greg,
+> > > >
+> > > > This is literally what we agreed on at LPC. In fact: during one of the
+> > > > hall track discussions I said that you typically NAK any attempts at
+> > > > using the platform bus for "fake" devices but you responded that this
+> > > > is what the USB on-board HUB does and while it's not pretty, this is
+> > > > what we need to do.
+> > >
+> > > Ah, you need to remind me of these things, this changelog was pretty
+> > > sparse :)
+> > >
+> >
+> > I believe I missed this part of the discussion, why does this need to be
+> > a platform_device? What does the platform_bus bring that can't be
+> > provided by some other bus?
+> >
+> 
+> Does it need to be a platform_device? No, of course not. Does it make
+> sense for it to be one? Yes, for two reasons:
+> 
+> 1. The ATH11K WLAN module is represented on the device tree like a
+> platform device, we know it's always there and it consumes regulators
+> from another platform device. The fact it uses PCIe doesn't change the
+> fact that it is logically a platform device.
 
-Source? Commit 8efaa653a8a5 ("net: ethernet: mediatek: Add MT7621 TRGMII
-mode support") says "TRGMII speed is 1200MBit.".
+Are you referring to the ath11k SNOC (firmware running on co-processor
+in the SoC) variant?
 
-> Unless the MediaTek SoC ethernet driver somehow caps TRGMII to 1 Gbps,
-> I consider this whole TRGMII shenanigans a scam
+Afaict the PCIe-attached ath11k is not represented as a platform_device
+in DeviceTree.
 
-I laughed :)
+Said platform_device is also not a child under the PCIe bus, so this
+would be a different platform_device...
 
-You have to see whether the CPU isn't in fact at 100% already, becoming
-a bottleneck before the interface speed does.
+> 2. The platform bus already provides us with the entire infrastructure
+> that we'd now need to duplicate (possibly adding bugs) in order to
+> introduce a "power sequencing bus".
+> 
 
-Also, mtk_eth_soc.c has an interesting comment "TRGMII is not permitted
-on MT7621 if using DDR2" - not sure if applicable to your setup or not.
+This is a perfectly reasonable desire. Look at our PMICs, they are full
+of platform_devices. But through the years it's been said many times,
+that this is not a valid or good reason for using platform_devices, and
+as a result we have e.g. auxiliary bus.
 
-I just got myself an ASUS RT-AX1800U (uses the mt7621_asus_rt-ax53u.dts
-device tree AFAICT) which I'll be setting up with OpenWrt in the weeks
-to come, and on which I might also be able to run some tests from time
-to time.
+Anyway, (please) don't claim that "we need to", when it actually is "we
+want to use platform_device because that's more convenient"!
+
+Regards,
+Bjorn
+
+> Bart
+> 
+> > (I'm not questioning the need for having a bus, creating devices, and
+> > matching/binding them to a set of drivers)
+> >
+> > Regards,
+> > Bjorn
+> >
+> 
+> [snip]
 
