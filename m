@@ -1,127 +1,168 @@
-Return-Path: <netdev+bounces-68312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B60B184688A
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 07:53:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CAFE846895
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 07:55:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C0ED1F25F9F
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 06:53:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CBAE28EC0C
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 06:55:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAA2D4C60;
-	Fri,  2 Feb 2024 06:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ED221756E;
+	Fri,  2 Feb 2024 06:55:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K//hfUV7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KyVi7olY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 223C01774E
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 06:53:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD5DC8839
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 06:55:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706856820; cv=none; b=DJTY+T5hGg3y0lI1zVEAEQl7CgX6/kaygF6xM91TOUAXQdHiYkacK7Gm+lzPuF5fpBslT830tPloipvvU64jo07G2okfcD1xrqpRGdk1E4qzDaw6xKYjhT86Pd9WPCHZfj4Z9qDKbLx54nEMX14wXsYTDoUGsWvfPX0mQvH8QYE=
+	t=1706856940; cv=none; b=FQpglEHBvp64q1+//pcyri7tCL0YTCEMqB61sjokhvxxG+JkEm6qNTHK5Ty1TrX6MZbK2IVOJn6IjNq7Nya0HPFDKdq0/9S9HPMn7EfLoDo0ZYzyhODJosSUgWV3i2Hj1gUq19+MWCBQF1rxNOiIVHKxVGxrd33u+rJOnioauMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706856820; c=relaxed/simple;
-	bh=ytxKKoH6m1FpvOOP2xrdqPW7rQRGcgbpp2Hofo4i82g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Yqp+0yWHk0lNPcngAoTQqI9N38j+KGTi89Mcio9FTpP/ORJNOAiKq1+ItIj1G1UA3QU6p/W7/GnW39ZITptyGvZiHXvBuI95+BgBOfQYq2hRqOy/WyR8j6si9qMaz6ou8+GBb3tOgOUiXllIon4H7EUSkoDmHOnF4t8fbgX6Wd0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K//hfUV7; arc=none smtp.client-ip=209.85.208.41
+	s=arc-20240116; t=1706856940; c=relaxed/simple;
+	bh=KKV5FdJu09zQlf34ImVtSkp2fIyle0as5aI9VeevpzA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=f68t+yZMyGZiQRPbmqE2ySR/QIdl2NUena/9sBywNJRLRjj/HWU7BEjA+lWI0BDl2Qu5YPB0z/VChGGx0vi94QOpWCwHdkxnvc7q9lJEw2mfOSMCdHXSBkUjclBQYQ2noBMOOSlMH0DmqqdKB07t/HLTUGVGsF0PHSNbmKUpfdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KyVi7olY; arc=none smtp.client-ip=209.85.218.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-55790581457so2541634a12.3
-        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 22:53:38 -0800 (PST)
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a370315191dso38758566b.2
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 22:55:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706856817; x=1707461617; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yAf503YgteKPE3E8ZXGS7zG1wXVaCsQDoyqCH3wVqBs=;
-        b=K//hfUV7L3OuEEq06wGJrsqirsHMUzF14fy0sQKvfW5Sam+lqZ3La3kkKE9agDoBGb
-         IezXRC5h8hwgq6frCr1/6Ymql59WN/jj3kqxnPp+OYF4Gx43oQYFqCaF1H3VY6MCW1Mt
-         GWqpZXpQnX3/KWxJpkLOBJjfjBOtdg/w6XrzaNlddwsAeuBgVzbt93m4gYfSfJnfXBiS
-         cn9rPttizmM3QmBOzdT/+cZNcGXSTBgg+bTHG90hj9SCapMF5D/3km5N8KH4ipYdoHBl
-         2P2nWNqa24IB3SUMdPwyCNrMzEu3u5der9+MqqoNwt3u4Arf2913BRliYvU2o5I0aTlX
-         pOBQ==
+        d=gmail.com; s=20230601; t=1706856937; x=1707461737; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=J+mPhCAZTO8qXZbfn+XWuigGuKnc9jyu67YmPlgv3mg=;
+        b=KyVi7olYvXmldNhJxVtFndvXW0S3ZYeY4sVrGnWWFfdOzAgM6scQcD//yhlPcW69WS
+         vqLykmpvk5AC1SMz5kyWYb0k5R10vcLh4NVHbHupEcwkZHahHPdNShL9xLP7NHDtuYYY
+         CriAkmuuGAteBKNELL68ZEufqqWyoKqA/E72QzmkRwhlOsYyAD7VtaA53B/OOjvZ3tGV
+         uN+EsrmaLkUXcY47sfDvo9EhddCYLr59pdLm6pZNOIH0UPzNTgvt2S9AlQSIhG4r1PXn
+         oWOdwW/BV9wmru6XngDfEHFtuYWdhsvbI5QnKYfv19KdDqoOGIUxIEbfJac39qKXIDx1
+         leDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706856817; x=1707461617;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yAf503YgteKPE3E8ZXGS7zG1wXVaCsQDoyqCH3wVqBs=;
-        b=CsOVjKN6SNvSl8A9fAnX2SQBjtmDnjL+SAyWm+YQtRu0C3vqaOVtjZb1JVglLoxLBB
-         K8VC29FY1S2OdRzEMiMLkF7LeCN/YrXMVyZGU0cOIVbffY6MxLgx8Tq0J17ROwVm8ENg
-         GiFR/HnJ8FlFkd5TAmGbHYF3hZ54uZIyZAQRPHiHKZhiUNULrenayzi4JHi9RD9zTe8i
-         2ZXCAt6HC7wAr/8JFvNOhRDJujkrSdpsP6D/IgDuzZHX5Q8JFvvsFMzyq3EHUvGWkALA
-         itDVTJILxpyqi1lK51955HRi2TflSo/fUmF2zG5DdkCVwVFSc8Bm78ygrM6mGmyBGxl/
-         j/Yg==
-X-Gm-Message-State: AOJu0YwWrrrxn9b2S2csfPZBLHzh+Q4DrGIYEt8c79CzYhx8Lm0G6wT/
-	LM4xN+A46xn+SA65cgBuS1lb7Ne7VKLAytvYbraptLx+n6rrGERagR4XJnXiu+rWN4qdqE4fmCT
-	AEWwD74p/AtNiLEXLk0/aXIsg9sftEBvd5GhMGw==
-X-Google-Smtp-Source: AGHT+IFSnJi2norEH5W/UpLjlPsSq2FcH7Nrf5O3rTb2MutI1ES6hpawvaZT7z+uaATyDRcDLlC4fFluOy1XAaFM9PY=
-X-Received: by 2002:a05:6402:164e:b0:55f:a1af:a1eb with SMTP id
- s14-20020a056402164e00b0055fa1afa1ebmr662798edx.23.1706856817038; Thu, 01 Feb
- 2024 22:53:37 -0800 (PST)
+        d=1e100.net; s=20230601; t=1706856937; x=1707461737;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J+mPhCAZTO8qXZbfn+XWuigGuKnc9jyu67YmPlgv3mg=;
+        b=r8E99CYOw2r0eonBDsIEN6I0MBraMpfzF3SfmR56xgWX1C9q2oIEd7PF7AAjzlAGO7
+         shsC+obUD2I7XgpecMAjNxZElSgLQnbG6DPocmjZnxdK8ElSPbD+Wy5uFbLT7TUYu7Gn
+         /X+Dy/tDfEChGQxqX2XaN98bYQj7tQMGTosYZ0oa4lQiVNIP+XZ4xzU1L0K+jvBA4av7
+         wMeRVhUPcgzxY0J9vaKdOjQlsvEsP4XIkmEOIalw1TrVEqapn1tcgmDB0M540yyM4d/o
+         GRd7rzmjNiUyRyrkZCvYfPqSVvWFiXPsltD8S9zAF+txIxAxRMYFm5a/6IvfiXD1Y1qn
+         cwMA==
+X-Gm-Message-State: AOJu0Yzyds3uAZrRgv1FGHLsmCnDzVuES9LkegTxonK/EgHE2vuv3Sdx
+	++XWhkaidCQC+aHJ+gqKealbi+buFRIP+n2zqQ4gDLgpllRgnpZ7
+X-Google-Smtp-Source: AGHT+IEkjsw9kAE2qCb6mu48Jz5N+V7EZGBKELHLYiD44c+BsQoX3tpyN98C6zPTFE0Tm6KFNusj2Q==
+X-Received: by 2002:a17:906:195a:b0:a36:884b:ed4f with SMTP id b26-20020a170906195a00b00a36884bed4fmr3139242eje.38.1706856936688;
+        Thu, 01 Feb 2024 22:55:36 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCU19e/p5O0jJJyYRk5gj+gXeAZCS3VjMvSXK4Y4PR22MOwjYpR0YKyxsi6+ODZJiGaMWAOHPkTcwvxJcH21PR4bT+RZjtia8kKorHOnFuDw412/emogysMwHKbNocN0+RZ+flwaURZPD0XuzYx/ZI2V3wTCfRgFvdvHboYFYSfgUV/lbQ2APTIA+mVeZOoofd03hfjj
+Received: from ?IPV6:2a01:c22:7392:d000:5c1a:bcfc:a8a4:5bea? (dynamic-2a01-0c22-7392-d000-5c1a-bcfc-a8a4-5bea.c22.pool.telefonica.de. [2a01:c22:7392:d000:5c1a:bcfc:a8a4:5bea])
+        by smtp.googlemail.com with ESMTPSA id cx7-20020a170907168700b00a3161adb239sm550878ejd.158.2024.02.01.22.55.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 01 Feb 2024 22:55:36 -0800 (PST)
+Message-ID: <be436811-af21-4c8e-9298-69706e6895df@gmail.com>
+Date: Fri, 2 Feb 2024 07:55:38 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240130142521.18593-1-danielj@nvidia.com> <20240130095645-mutt-send-email-mst@kernel.org>
- <CH0PR12MB85809CB7678CADCC892B2259C97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
- <20240130104107-mutt-send-email-mst@kernel.org> <CH0PR12MB8580CCF10308B9935810C21DC97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
- <20240130105246-mutt-send-email-mst@kernel.org> <CH0PR12MB858067B9DB6BCEE10519F957C97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
- <CAL+tcoCsT6UJ=2zxL-=0n7sQ2vPC5ybnQk9bGhF6PexZN=-29Q@mail.gmail.com> <20240201202106.25d6dc93@kernel.org>
-In-Reply-To: <20240201202106.25d6dc93@kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 2 Feb 2024 14:52:59 +0800
-Message-ID: <CAL+tcoCs6x7=rBj50g2cMjwLjLOKs9xy1ZZBwSQs8bLfzm=B7Q@mail.gmail.com>
-Subject: Re: [PATCH net-next] virtio_net: Add TX stop and wake counters
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Daniel Jurgens <danielj@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jasowang@redhat.com" <jasowang@redhat.com>, 
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>, 
-	"abeni@redhat.com" <abeni@redhat.com>, Parav Pandit <parav@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESUBMIT net-next] r8169: simplify EEE handling
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <27c336a8-ea47-483d-815b-02c45ae41da2@gmail.com>
+ <d5d18109-e882-43cd-b0e5-a91ffffa7fed@lunn.ch>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <d5d18109-e882-43cd-b0e5-a91ffffa7fed@lunn.ch>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 2, 2024 at 12:21=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 31 Jan 2024 10:54:33 +0800 Jason Xing wrote:
-> > > [danielj@sw-mtx-051 upstream]$ ethtool -S ens2f1np1 | grep 'stop\|wak=
-e'
-> > >      tx_queue_stopped: 0
-> > >      tx_queue_wake: 0
-> > >      tx0_stopped: 0
-> > >      tx0_wake: 0
-> > >      ....
-> >
-> > Yes, that's it! What I know is that only mlx drivers have those two
-> > counters, but they are very useful when debugging some issues or
-> > tracking some historical changes if we want to.
->
-> Can you say more? I'm curious what's your use case.
+On 02.02.2024 01:16, Andrew Lunn wrote:
+>> @@ -5058,7 +5033,9 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
+>>  	}
+>>  
+>>  	tp->phydev->mac_managed_pm = true;
+>> -
+>> +	if (rtl_supports_eee(tp))
+>> +		linkmode_copy(tp->phydev->advertising_eee,
+>> +			      tp->phydev->supported_eee);
+> 
+> This looks odd. Does it mean something is missing on phylib?
+> 
+Reason is that we treat "normal" advertising and EEE advertising differently
+in phylib. See this code snippet from phy_probe().
 
-I'm not working at Nvidia, so my point of view may differ from theirs.
-From what I can tell is that those two counters help me narrow down
-the range if I have to diagnose/debug some issues.
-1) I sometimes notice that if some irq is held too long (say, one
-simple case: output of printk printed to the console), those two
-counters can reflect the issue.
-2) Similarly in virtio net, recently I traced such counters the
-current kernel does not have and it turned out that one of the output
-queues in the backend behaves badly.
-...
+        phy_advertise_supported(phydev);
+        /* Get PHY default EEE advertising modes and handle them as potentially
+         * safe initial configuration.
+         */
+        err = genphy_c45_read_eee_adv(phydev, phydev->advertising_eee);
 
-Stop/wake queue counters may not show directly the root cause of the
-issue, but help us 'guess' to some extent.
+For EEE we don't change the initial advertising to what's supported,
+but preserve the EEE advertising at the time of phy probing.
+So if I want to mimic the behavior of phy_advertise_supported() for EEE,
+I have to populate advertising_eee in the driver.
 
-Thanks,
-Jason
+Alternative would be to change phy_advertise_supported(), but this may
+impact systems with PHY's with EEE flaws.
+
+> 	Andrew
+Heiner
 
