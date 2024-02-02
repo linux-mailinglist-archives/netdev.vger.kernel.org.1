@@ -1,106 +1,125 @@
-Return-Path: <netdev+bounces-68551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A88BB84727B
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:01:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FDD2847296
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:06:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C40CC1C20BB3
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 15:01:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 642611C27632
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 15:06:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5EDC1420D2;
-	Fri,  2 Feb 2024 15:01:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEC07145B29;
+	Fri,  2 Feb 2024 15:05:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LaqZS6Xj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XMuhl6K7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ADE01C33
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 15:01:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311A7145341
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 15:05:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706886102; cv=none; b=Z4lxoiSC2kRIU7l7B1Xmk67tu0oXiAV3L3T9cU2iAdFzWljMO52lvrVA3lM2uNcYW20IibR7z4SKt2cveMgd0RwOJ63BR7AyzaH2tGoqBX84fwmAz2f7C0AQzlRDrK93bhQoTh0Z44ZoD/TannMQT8QrAcHegeo3AsZ3k6HUAow=
+	t=1706886348; cv=none; b=sTMRYLYw9wQHWah1fe47lKghmQAH9mjoGZ6/Ql1/GUDZE3lhSe7Ukc6MGyXqQIpG2qzE9pnXmznnLNKETgp8R+FpIfhDw8Zhu94LvfvrTb//0AGjSra2ZZ82rMy6ErExpRrQdp4yvZnJmHrjnp6UC6KgBRaAjevKlBjVpFwD6VA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706886102; c=relaxed/simple;
-	bh=ThUfHn/qCbaOV9CqbKBBZ41/itfS9Qo5nHHG92u8sm0=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=kcrD8YJskKleSyVerTy3ehzKJE1/ASCVYsR5TRnEe2DaM866ULNL+fotp4wEQnZHYEqhimu80CQfxJ/amX3Xsz3IbW6qrPCFdADPQkALePCDQUHIEEF/N/9lAKFpkl1fYRJnbu00MWEcluvu/v3RfTEtXxwZLORtkyQQCQih9Jo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LaqZS6Xj; arc=none smtp.client-ip=209.85.219.54
+	s=arc-20240116; t=1706886348; c=relaxed/simple;
+	bh=07cHh0iUQrmJXAFLPrs9IeofxrQdEBqV67Ty6E8raY8=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=JTKi/fwiamAYcZTQV8Ul4qFrjVEaE8QGOTFviJ60UQg4uhysk/uYUSqVzTp6EHQIYjIPtpBL+EFPnnzvkFYrdipmkUMeSDdlpsVY7UGagpKUOiQz7Aq9ZZGUqtiWWxi88UHSLYSQdnYu+CQ0r3Uh0Zea76hcnkai6Nh7oRGMOrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XMuhl6K7; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6818aa07d81so12846386d6.0
-        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 07:01:41 -0800 (PST)
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-33b0e5d1e89so1606122f8f.0
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 07:05:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706886100; x=1707490900; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FL9RusRT1kKSgEC1D0VCE5IsisdRYSLw6TqhWNiuGus=;
-        b=LaqZS6XjJTsw1kxDhbr5L5B6VsCC5sFcGo/K0z3swXNi7xX37n7H2YxH+Nbi7KseHG
-         jiX6RRR9YOeEzGdsF2qp5tg3TlzKUd98HSHRdHhfN079PMriqzZqj9XqXsqKmF1fB2D/
-         sIJCiTnzQKntVpgPngjrgcaO0tCxUC+vy21iTgnfmWyVcirVThjV/bDpCLcsX+UTmUGt
-         7eH0S2XCFjknLl3QUb6xQQyes0smBxK4Hhek50CKGOaL+Ox/9/pCtGdoabCzL5zgxbqS
-         xw5LvCcVrCWXCZsiIIbqb5RQ/TO6WDKZeDfFS0KUsvhE8m/MzPkGu73LhG3q9cbTEPfR
-         LQwQ==
+        d=gmail.com; s=20230601; t=1706886345; x=1707491145; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kwWDYftar9qk+Ofb7Npj2nk3Bgn/Kk+awa6cA9G9Ef4=;
+        b=XMuhl6K7VnnEzjr5Z8bUqnZnzvNBVaFH+N1mt4seNMgmhILi858SZpcEXLdgxO/ZJt
+         OkTCtnBsaCHkWVAETzj6hV1Y4EC0TDgnMozvJO+eCAGKncQ4rL9hYBMu7TfAESpj9XG0
+         qssk6OKkmGnenYR2OlQlNI55jsfAZtEJOBe6P/bOt7dlqZiw2NTxENH74umZ40x38BhS
+         WwJ2Z6r3XTb6lKr4vz2wUfAHyUjplOZcGf6piTTHJbBjmsjkzcrfCmi4zDHgfdDFbuhs
+         dQGb20oUCqyfwHuDZZuYSQ6rRwUaNW0AR9inFMX7I107SHdZh60rVvIyPX6ExbkMekqp
+         py+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706886100; x=1707490900;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=FL9RusRT1kKSgEC1D0VCE5IsisdRYSLw6TqhWNiuGus=;
-        b=iva8vP1Jn7XIIl+yjtnc6LuxjSIIW3V8JzC8bJ1ooB6W/d8m0fHHH980Nu5uzhAvs8
-         VXRWoFgmUfgB3m0k8my9bznXNzNF1O10GPHYHnPhtsEqaSz9LT0VjCMwdBcfuaor+YWz
-         kBbHbcCaEeDe1QuccFw4yM0nVdBA7d7P3Qyz4iUm4eTgFlzA5RiPhvlW65a6fSWkpben
-         g70nSAT5L8XWbrSqj8KaQ2AwwdKhxq3sn5p3aAWlunPbSrSiwcTXcKHn7vl/TTBPOfeu
-         7/8e6GB+UbaDc2QlwWND0noYRTnegnHvtujunI9jeCUxcY5lgzmn8dliUcBVts4lq3LT
-         a1Sg==
-X-Gm-Message-State: AOJu0YzcGGRqiqCpFwhnPT3Dr/ZlEBm7z49FMbi818IIVx+oI+DHU8tz
-	lO0S1brZlJS9NIE7cH3ineImByjxxBXgUihShtDq+XXfio+Qqufm
-X-Google-Smtp-Source: AGHT+IEcoVQdIThEcRua/rmCWI+y1WHqWPeBL+RtdmocKfHKjzxy/zCeVlAvkWgo4VcyYOz9WmPKiA==
-X-Received: by 2002:ad4:4ea2:0:b0:68c:5cd0:bbc2 with SMTP id ed2-20020ad44ea2000000b0068c5cd0bbc2mr11258762qvb.26.1706886099806;
-        Fri, 02 Feb 2024 07:01:39 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVYhGUrs76nLTF2mDWzRNtLLyYtJ+fqnbjeYlj6lXVvt1964vI1Loz6MPc8Lr9I+0cK5mg67k4WyEgSYNVnJJHvoEbLvY/28XcyxJWn8PdQc352OcSkyyNiZuwf9msapmDdI/cgRdgqUl0O8EpJATrw8TYs8zhbacJYLfq1uf+h6Hm3/LwtYQGCqBa3G9jCW4IfJrQ=
-Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
-        by smtp.gmail.com with ESMTPSA id ff3-20020a0562140bc300b0068c80f69ce8sm857015qvb.142.2024.02.02.07.01.39
+        d=1e100.net; s=20230601; t=1706886345; x=1707491145;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kwWDYftar9qk+Ofb7Npj2nk3Bgn/Kk+awa6cA9G9Ef4=;
+        b=UVOjl3M6e7bmjmzLaUoF2eKXUAcGezq/rfKTsVMw+utVDzgGPn3RpsWD4OAdeQrvBr
+         79KaiyrKo7xceI9kn7VCqLZgPBAYCDb1gU4dOnVobQl1oRTjGMWBLD8kZsNLv5MS4J9R
+         0dd4Khct0g+Pm0w6U+fKUmDSflDS3mM7I56qor76gpvja+iJaM7m5V0T/txMuGquYq+x
+         uO19lJ5PaXT3lSgGRqcWSaYRxyW2apEc+GNiI6UgYvlewW3FgIRkdS/PCAaB3YNydmQl
+         1sVINJVE6YnqOJ1r/sNlEGORLUMDkbTyV2RzKaQmhoucmUtng6llcG7Z+Ukpcq3xJ3tv
+         8v8g==
+X-Gm-Message-State: AOJu0Yy6sLhxTZ8Y/T0GWx8DhSJ3cxdE9L99LpIOeKcKEvm7wjDVi0v1
+	aRkNjs951OtotGa4JXwj6Zc8vIeeOeiRPdM6LYalZJVn1irqWrpNEGQGM0juIdU=
+X-Google-Smtp-Source: AGHT+IF9tYpJgJRMn68aeVooDyhBRJYf1v3FTdET/yow8jzY574YoIvlOzI6vkbeEsiXLGXyQw6/pQ==
+X-Received: by 2002:adf:9b94:0:b0:33a:e4de:9afc with SMTP id d20-20020adf9b94000000b0033ae4de9afcmr4063426wrc.46.1706886344801;
+        Fri, 02 Feb 2024 07:05:44 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCX/NKEX17Bjv2YSTb8YRXwDQe2pWBdeph7R893rQuflVKyEAQb0AFDxAapIbyqWcWUkgFzY4zFQYFR8wT2lYz6W/aR+QF+91zKrrnxwckpJD97l+1Z0k0T9DeVpOnMzQENOMQfD7wXLPMLOXCEQ4/Bhl6ILtbqD/EXytuPv0DfcHEuSdMkd1pUXJw7q1pmkrVEJ8TuLq8/QoUvbmmu7GYMmwp9oxOo6GD7qDeG3aNua8wgdslu5inwoj4zssYehPPj+OK/kdfBVrp7ziXM1LtzWZ92G6nVnDU1zEexnS5ASRuUD8HwIYK8=
+Received: from imac ([2a02:8010:60a0:0:699e:106b:b80c:c3f0])
+        by smtp.gmail.com with ESMTPSA id p18-20020a5d4e12000000b0033afcb5b5d2sm2106477wrt.80.2024.02.02.07.05.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Feb 2024 07:01:39 -0800 (PST)
-Date: Fri, 02 Feb 2024 10:01:38 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, 
- eric.dumazet@gmail.com, 
- Eric Dumazet <edumazet@google.com>, 
- Willem de Bruijn <willemb@google.com>
-Message-ID: <65bd03d23e6b4_2ef2a9294f3@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240202095404.183274-1-edumazet@google.com>
-References: <20240202095404.183274-1-edumazet@google.com>
-Subject: Re: [PATCH net] inet: read sk->sk_family once in inet_recv_error()
+        Fri, 02 Feb 2024 07:05:44 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Alessandro Marcolini <alessandromarcolini99@gmail.com>
+Cc: davem@davemloft.net,  edumazet@google.com,  kuba@kernel.org,
+  pabeni@redhat.com,  sdf@google.com,  chuck.lever@oracle.com,
+  lorenzo@kernel.org,  jacob.e.keller@intel.com,  jiri@resnulli.us,
+  netdev@vger.kernel.org
+Subject: Re: [PATCH v3 net-next 3/3] tools: ynl: add support for encoding
+ multi-attr
+In-Reply-To: <9399f6f7bda6c845194419952dfbcf0d42142652.1706882196.git.alessandromarcolini99@gmail.com>
+	(Alessandro Marcolini's message of "Fri, 2 Feb 2024 15:00:05 +0100")
+Date: Fri, 02 Feb 2024 14:34:51 +0000
+Message-ID: <m2y1c3szn8.fsf@gmail.com>
+References: <cover.1706882196.git.alessandromarcolini99@gmail.com>
+	<9399f6f7bda6c845194419952dfbcf0d42142652.1706882196.git.alessandromarcolini99@gmail.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain
 
-Eric Dumazet wrote:
-> inet_recv_error() is called without holding the socket lock.
-> 
-> IPv6 socket could mutate to IPv4 with IPV6_ADDRFORM
-> socket option and trigger a KCSAN warning.
-> 
-> Fixes: f4713a3dfad0 ("net-timestamp: make tcp_recvmsg call ipv6_recv_error for AF_INET6 socks")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Willem de Bruijn <willemb@google.com>
+Alessandro Marcolini <alessandromarcolini99@gmail.com> writes:
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+> Multi-attr elements could not be encoded because of missing logic in the
+> ynl code. Enable encoding of these attributes by checking if the
+> attribute is a multi-attr and if the value to be processed is a list.
+>
+> This has been tested both with the taprio and ets qdisc which contain
+> this kind of attributes.
+>
+> Signed-off-by: Alessandro Marcolini <alessandromarcolini99@gmail.com>
 
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+
+> ---
+>  tools/net/ynl/lib/ynl.py | 5 +++++
+>  1 file changed, 5 insertions(+)
+>
+> diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+> index 0f4193cc2e3b..d5779d023b10 100644
+> --- a/tools/net/ynl/lib/ynl.py
+> +++ b/tools/net/ynl/lib/ynl.py
+> @@ -444,6 +444,11 @@ class YnlFamily(SpecFamily):
+>          except KeyError:
+>              raise Exception(f"Space '{space}' has no attribute '{name}'")
+>          nl_type = attr.value
+> +        if attr.is_multi and isinstance(value, list):
+> +            attr_payload = b''
+> +            for subvalue in value:
+> +                attr_payload += self._add_attr(space, name, subvalue, search_attrs)
+> +            return attr_payload
+>          if attr["type"] == 'nest':
+>              nl_type |= Netlink.NLA_F_NESTED
+>              attr_payload = b''
 
