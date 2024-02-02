@@ -1,126 +1,212 @@
-Return-Path: <netdev+bounces-68261-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68262-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96E9F846562
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:24:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63BD5846573
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 02:35:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D20231C245A1
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:24:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4B0FB257E5
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 01:35:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC07BE59;
-	Fri,  2 Feb 2024 01:24:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE2AD5668;
+	Fri,  2 Feb 2024 01:35:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mle8mWI0"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="c0kNUhLc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E49BE55
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 01:24:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C47A563AD;
+	Fri,  2 Feb 2024 01:35:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706837077; cv=none; b=u7mdJDDpg6LywYcaTAaI1WVpy5e3mnBX/oBaMSw2/nu0oboGIEARg6NHS0YOc6kI2SmS3hrzjvYh06Nh8qwd5vIV7Ii81uPzxZU1wKF/snZwJjAnqk5mgcPV6KlRLngeLGaAi2BKm1sxFBpPY4COFfhy6gnjYnAd5G01kMeL0U0=
+	t=1706837724; cv=none; b=ueV6xPjUBtp5mynErLLzU5xUQ8DZrwTf6te2RJfMGuz5FEEc34ogFoLl+mdLBsHci1uPtRWbPiuK2qIYoOGQ10cwxjo0OQVnVtvRqC/NZKNVG4igecOdHHuQZtzzDB89poyrUD0sYcP4eL649c9DJADBZi6ePjpWoid5x6vShsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706837077; c=relaxed/simple;
-	bh=ZMFg9aMmYEcvittqxuoJAHUrrVGw5BpEBs3Oavdepd8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Gbjl4gOuosyun+//129KHM2UoHTHq4o1qYJvStFWAaRva9l24bsfAvtDSdBOPZLaRQ/1a1b2J0MFa0HxVD8YDEXAHwP8HJ7r21M/FbG9uwySNkqGn8fQwFlooNKi1vNY9zczgwxn/m4Y3pqMJHOg3XeBL5nUKtPOKVdxz6C2WSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mle8mWI0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F9C1C433C7;
-	Fri,  2 Feb 2024 01:24:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706837076;
-	bh=ZMFg9aMmYEcvittqxuoJAHUrrVGw5BpEBs3Oavdepd8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mle8mWI0z/plQAkqRgEiHpQuaoPiIDRzdKpD/9ALeEMcgKqcnIwho856pc+USwNkW
-	 jEaC48wPVEorNiJsI6T8l5EE8IjJcFQ9bAyf9ZhlHN74YVbkmzwopxa8JbPFpf5nJb
-	 B7dQM39F/SIp+DHrJhWC/txfQceABpaU8pmx0G/hluOJkhZW67bnY1tqbGxV3Pzp8y
-	 6vsKlc4seQELzsLkVP8NtD6/p7AAW5TnJ98I6uGYFIt3LIMiJ+AHKRAGSOyGnl+cxa
-	 BDlu4QeX8XWdhb1L0PkYUhEk6GyVaYQVShjxqMu0HwxQjeOsTIWtfgItuzWlBKCyvE
-	 zP532XtixFYgQ==
-Date: Thu, 1 Feb 2024 17:24:31 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alessandro Marcolini <alessandromarcolini99@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- donald.hunter@gmail.com, sdf@google.com, chuck.lever@oracle.com,
- lorenzo@kernel.org, jacob.e.keller@intel.com, jiri@resnulli.us,
- netdev@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 3/3] tools: ynl: add support for encoding
- multi-attr
-Message-ID: <20240201172431.2f68dacb@kernel.org>
-In-Reply-To: <9644d866cbc6449525144fb3c679e877c427afce.1706800192.git.alessandromarcolini99@gmail.com>
-References: <cover.1706800192.git.alessandromarcolini99@gmail.com>
-	<9644d866cbc6449525144fb3c679e877c427afce.1706800192.git.alessandromarcolini99@gmail.com>
+	s=arc-20240116; t=1706837724; c=relaxed/simple;
+	bh=byn2POXh2oOuWy72oilG/vfGimtqV+4BabC/M/lIcF8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iB18LSRTj0sMKRUZfglAPFzx1kYd0b7XruvS8YdalYWtQBFDtZBwE47RzM1K4tiafImtTzDyfuVtrJxSDPUAEBAz8u/j8eG3o1Gk8WjgIbNDZ3Mpa185+wMIdFkEDQl+HNKkdGeAwm06IAKvJt4YS9+41pxp8uxNyCdA8333SCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=c0kNUhLc; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=D1Zk9eHb/+VoL10gbkI+Wk7ITnBQURZGS/tiJLappS4=; b=c0kNUhLcPT6EjXrjJCWLtufBdz
+	DyfPuatxs06fFMN9zRmii+2p/tgmnS0nqfKXaE5LBI5uVaJOjmM3yPmtUCeWgZPV8EENHRM+D8CcX
+	Y2AZ3NJTzcRKuAfuOWihWMvKPuF9KYsNGVYE0uOaWJTVcK3CsL4oTSYufzqrSDQgIQ4Q=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rViSV-006jj6-Ss; Fri, 02 Feb 2024 02:35:11 +0100
+Date: Fri, 2 Feb 2024 02:35:11 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Frank Rowand <frowand.list@gmail.com>,
+	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org
+Subject: Re: [net-next PATCH v5 7/9] net: phy: qcom: add support for QCA807x
+ PHY Family
+Message-ID: <a530f40c-b8fd-4da1-b4df-f80ab05f0394@lunn.ch>
+References: <20240201151747.7524-1-ansuelsmth@gmail.com>
+ <20240201151747.7524-8-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240201151747.7524-8-ansuelsmth@gmail.com>
 
-On Thu,  1 Feb 2024 16:12:51 +0100 Alessandro Marcolini wrote:
-> Multi-attr elements could not be encoded because of missing logic in the
-> ynl code. Enable encoding of these attributes by checking if the nest
-> attribute in the spec contains multi-attr attributes and if the value to
-> be processed is a list.
-> 
-> This has been tested both with the taprio and ets qdisc which contain
-> this kind of attributes.
-> 
-> Signed-off-by: Alessandro Marcolini <alessandromarcolini99@gmail.com>
-> ---
->  tools/net/ynl/lib/ynl.py | 17 +++++++++++++----
->  1 file changed, 13 insertions(+), 4 deletions(-)
-> 
-> diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-> index 0f4193cc2e3b..e4e6a3fe0f23 100644
-> --- a/tools/net/ynl/lib/ynl.py
-> +++ b/tools/net/ynl/lib/ynl.py
-> @@ -447,10 +447,19 @@ class YnlFamily(SpecFamily):
->          if attr["type"] == 'nest':
->              nl_type |= Netlink.NLA_F_NESTED
->              attr_payload = b''
-> -            sub_attrs = SpaceAttrs(self.attr_sets[space], value, search_attrs)
-> -            for subname, subvalue in value.items():
-> -                attr_payload += self._add_attr(attr['nested-attributes'],
-> -                                               subname, subvalue, sub_attrs)
-> +            nested_attrs = self.attr_sets[attr["nested-attributes"]]
+> +static int qca807x_read_fiber_status(struct phy_device *phydev)
+> +{
+> +	int ss, err, lpa, old_link = phydev->link;
 > +
-> +            if any(v.is_multi for _,v in nested_attrs.items()) and isinstance(value, list):
+> +	/* Update the link, but return if there was an error */
+> +	err = genphy_update_link(phydev);
+> +	if (err)
+> +		return err;
+> +
+> +	/* why bother the PHY if nothing can have changed */
+> +	if (phydev->autoneg == AUTONEG_ENABLE && old_link && phydev->link)
+> +		return 0;
+> +
+> +	phydev->speed = SPEED_UNKNOWN;
+> +	phydev->duplex = DUPLEX_UNKNOWN;
+> +	phydev->pause = 0;
+> +	phydev->asym_pause = 0;
+> +
+> +	if (phydev->autoneg == AUTONEG_ENABLE && phydev->autoneg_complete) {
+> +		lpa = phy_read(phydev, MII_LPA);
+> +		if (lpa < 0)
+> +			return lpa;
+> +
+> +		linkmode_mod_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
+> +				 phydev->lp_advertising, lpa & LPA_LPACK);
+> +		linkmode_mod_bit(ETHTOOL_LINK_MODE_1000baseX_Full_BIT,
+> +				 phydev->lp_advertising, lpa & LPA_1000XFULL);
+> +		linkmode_mod_bit(ETHTOOL_LINK_MODE_Pause_BIT,
+> +				 phydev->lp_advertising, lpa & LPA_1000XPAUSE);
+> +		linkmode_mod_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT,
+> +				 phydev->lp_advertising,
+> +				 lpa & LPA_1000XPAUSE_ASYM);
+> +
+> +		phy_resolve_aneg_linkmode(phydev);
+> +	}
 
-I think you're trying to handle this at the wrong level. The main
-message can also contain multi-attr, so looping inside nests won't
-cut it.
+This looks a lot like genphy_c37_read_status(). Can it be used?
 
-Early in the function check if attr.is_multi and isinstance(value,
-list), and if so do:
+> +
+> +	/* Read the QCA807x PHY-Specific Status register fiber page,
+> +	 * which indicates the speed and duplex that the PHY is actually
+> +	 * using, irrespective of whether we are in autoneg mode or not.
+> +	 */
+> +	ss = phy_read(phydev, AT803X_SPECIFIC_STATUS);
+> +	if (ss < 0)
+> +		return ss;
+> +
+> +	if (ss & AT803X_SS_SPEED_DUPLEX_RESOLVED) {
+> +		switch (FIELD_GET(AT803X_SS_SPEED_MASK, ss)) {
+> +		case AT803X_SS_SPEED_100:
+> +			phydev->speed = SPEED_100;
+> +			break;
+> +		case AT803X_SS_SPEED_1000:
+> +			phydev->speed = SPEED_1000;
+> +			break;
+> +		}
+> +
+> +		if (ss & AT803X_SS_DUPLEX)
+> +			phydev->duplex = DUPLEX_FULL;
+> +		else
+> +			phydev->duplex = DUPLEX_HALF;
+> +	}
+> +
+> +	return 0;
+> +}
 
-	attr_payload = b''
-	for subvalue in value:
-		attr_payload += self._add_attr(space, name, subvalue,
-					       search_attrs) 
-	return attr_payload
 
-IOW all you need to do is recursively call _add_attr() with the
-subvalues stripped. You don't have to descend into a nest.
+> +static int qca807x_phy_package_probe_once(struct phy_device *phydev)
+> +{
+> +	struct phy_package_shared *shared = phydev->shared;
+> +	struct qca807x_shared_priv *priv = shared->priv;
+> +	unsigned int tx_driver_strength = 0;
+> +	const char *package_mode_name;
+> +
+> +	of_property_read_u32(shared->np, "qcom,tx-driver-strength",
+> +			     &tx_driver_strength);
+> +	switch (tx_driver_strength) {
+> +	case 140:
+> +		priv->tx_driver_strength = PQSGMII_TX_DRIVER_140MV;
+> +		break;
+> +	case 160:
+> +		priv->tx_driver_strength = PQSGMII_TX_DRIVER_160MV;
+> +		break;
+> +	case 180:
+> +		priv->tx_driver_strength = PQSGMII_TX_DRIVER_180MV;
+> +		break;
+> +	case 200:
 
-> +                for item in value:
-> +                    sub_attrs = SpaceAttrs(self.attr_sets[space], item, search_attrs)
-> +                    for subname, subvalue in item.items():
-> +                        attr_payload += self._add_attr(attr['nested-attributes'],
-> +                                                       subname, subvalue, sub_attrs)
-> +            else:
-> +                sub_attrs = SpaceAttrs(self.attr_sets[space], value, search_attrs)
-> +                for subname, subvalue in value.items():
-> +                    attr_payload += self._add_attr(attr['nested-attributes'],
-> +                                                   subname, subvalue, sub_attrs)
->          elif attr["type"] == 'flag':
->              attr_payload = b''
->          elif attr["type"] == 'string':
+...
 
+> +	case 500:
+> +		priv->tx_driver_strength = PQSGMII_TX_DRIVER_500MV;
+> +		break;
+> +	case 600:
+> +	default:
+
+If its missing default to 600. But if its an invalid value, return
+-EINVAL.
+
+> +		priv->tx_driver_strength = PQSGMII_TX_DRIVER_600MV;
+> +	}
+> +
+> +	priv->package_mode = PHY_INTERFACE_MODE_NA;
+> +	if (!of_property_read_string(shared->np, "qcom,package-mode",
+> +				     &package_mode_name)) {
+> +		if (!strcasecmp(package_mode_name,
+> +				phy_modes(PHY_INTERFACE_MODE_PSGMII)))
+> +			priv->package_mode = PHY_INTERFACE_MODE_PSGMII;
+> +
+> +		if (!strcasecmp(package_mode_name,
+> +				phy_modes(PHY_INTERFACE_MODE_QSGMII)))
+> +			priv->package_mode = PHY_INTERFACE_MODE_QSGMII;
+
+Again, return -EINVAL if it is neither.
+
+> +static int qca807x_phy_package_config_init_once(struct phy_device *phydev)
+> +{
+> +	struct phy_package_shared *shared = phydev->shared;
+> +	struct qca807x_shared_priv *priv = shared->priv;
+> +	int val, ret;
+> +
+> +	phy_lock_mdio_bus(phydev);
+> +
+> +	/* Set correct PHY package mode */
+> +	val = __phy_package_read(phydev, QCA807X_COMBO_ADDR,
+> +				 QCA807X_CHIP_CONFIGURATION);
+> +	val &= ~QCA807X_CHIP_CONFIGURATION_MODE_CFG_MASK;
+> +	if (priv->package_mode == PHY_INTERFACE_MODE_QSGMII)
+> +		val |= QCA807X_CHIP_CONFIGURATION_MODE_QSGMII_SGMII;
+> +	else
+> +		val |= QCA807X_CHIP_CONFIGURATION_MODE_PSGMII_ALL_COPPER;
+
+What about priv->package_mode == PHY_INTERFACE_MODE_NA;
+
+     Andrew
 
