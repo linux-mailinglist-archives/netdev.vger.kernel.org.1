@@ -1,193 +1,103 @@
-Return-Path: <netdev+bounces-68521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E648847126
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 14:28:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05129847131
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 14:31:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B26AE28E202
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:28:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CF2BB246E2
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 13:31:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3736E4644E;
-	Fri,  2 Feb 2024 13:28:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9714E46452;
+	Fri,  2 Feb 2024 13:31:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XFSArmQm";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="+KZX5wHl";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="XFSArmQm";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="+KZX5wHl"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="13CS27RR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EAF345C07
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 13:28:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A1E4643A;
+	Fri,  2 Feb 2024 13:31:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706880533; cv=none; b=mGdnakdrjYZy7a58H+hIPGg7/uP9U/t3857bfWUWo9uHQNdWwzjAqgfEkzKAZr1aZ13tx2susjG0pjc9KLrr8pxPxqRTqXBTK27s2GyWvKFgZHjRuSeF7xy6KXjopQJYZHYfC56WU3CQjeAMXtB4GV5wNZj8SolOEW2f5hSkBCQ=
+	t=1706880673; cv=none; b=GvhTWdmh1KEDAP+SlNWUgyj8sxZ3BvKMhJmhN4XCVdyMoFwFLG9pRHsRI9J0/KSOcJ3K0Pj0ubY6K1ygGMJLUqIoL1jRjQpceRn4p/DhEXsEr1+aTfChq2RF3V9I4yFbqnic7GnH98DicNjns+gQvqIlQMPqVjHAKBT68iwVTcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706880533; c=relaxed/simple;
-	bh=xjDHb/nl37vfEOTHGO2vmnqCzsnrEDBY/Rf1/nL4rog=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qPhz1l3pKLmUquXSHi8xdGij7nyoIFU/jYUv9ABSFTaSe1XG1MlVJEcRp6/qGPRf3EmX5BhqDy/DCwdalToWA4gyA1lT3HX3aXGIkIXGMDfa9KDFx3Uwe1kNgCQ/BIkTld1yELq/VKN+KuZOdmKmAk/4t5jDZJ48HchiVs8ryzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XFSArmQm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=+KZX5wHl; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=XFSArmQm; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=+KZX5wHl; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id B37671F78A;
-	Fri,  2 Feb 2024 13:28:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1706880529; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i9/C1p7haXcEz+iJb96LprsTgumnZH4E464AtrJ4rLw=;
-	b=XFSArmQmU3ICb8xXeEgX8mjxlq4wsNbEZSZnrw7DtcqVxah/NSdYHQww3bekCULxeNWqiC
-	bCuYz4cm7wii04yVZWs/VJj7rmFQ1n6L5Sdn7l631alcEalpeTEwzMVx+gIpg/+OtRY1bI
-	6nw44TsYXIg9B9dE4rvA5bDYIg7dzOQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1706880529;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i9/C1p7haXcEz+iJb96LprsTgumnZH4E464AtrJ4rLw=;
-	b=+KZX5wHlw+JI0TPkauJ/ycNZp9Q50mwEZpJI+itSVsu6BhcaJuQqyXqnrVR9jRvU+kOHGD
-	R46Da5eGMd3+EADw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1706880529; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i9/C1p7haXcEz+iJb96LprsTgumnZH4E464AtrJ4rLw=;
-	b=XFSArmQmU3ICb8xXeEgX8mjxlq4wsNbEZSZnrw7DtcqVxah/NSdYHQww3bekCULxeNWqiC
-	bCuYz4cm7wii04yVZWs/VJj7rmFQ1n6L5Sdn7l631alcEalpeTEwzMVx+gIpg/+OtRY1bI
-	6nw44TsYXIg9B9dE4rvA5bDYIg7dzOQ=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1706880529;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=i9/C1p7haXcEz+iJb96LprsTgumnZH4E464AtrJ4rLw=;
-	b=+KZX5wHlw+JI0TPkauJ/ycNZp9Q50mwEZpJI+itSVsu6BhcaJuQqyXqnrVR9jRvU+kOHGD
-	R46Da5eGMd3+EADw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 6ACEE139AB;
-	Fri,  2 Feb 2024 13:28:49 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id 68X2FhHuvGUFEQAAD6G6ig
-	(envelope-from <dkirjanov@suse.de>); Fri, 02 Feb 2024 13:28:49 +0000
-Message-ID: <631a90a4-24fb-48a5-b533-131042751821@suse.de>
-Date: Fri, 2 Feb 2024 16:28:48 +0300
+	s=arc-20240116; t=1706880673; c=relaxed/simple;
+	bh=wjIesRNRmTFPIurZUIwcdu/x+OKKFfccb8BJIDCLZoU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pM3xsPP0f24FrCwTluoeRu3RR9B2Td2sXIGOd9+wDmPTzPLpSUbWsVwTqcSjt8im0Bd1gxMYjrUFWnac0LdS1xd+uQ3x8UbtDT8RuaKO82C1pW7gWqfesu+OIF3q1G3aGwEc5i8ULhAr16qTzdSJYtLFfViAy5u3WQyFuadPnPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=13CS27RR; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=UJtePW7G3zS/E7YKl1YdieFpwO+voJfGNG2qCQLfOqc=; b=13CS27RReCaCMvL2TvBp5duvQV
+	zUaK75JRSZaaYaDQaOfl44auKpA/eceP68ecjbfnIqZkmMBOsLttVXaMHN8d4ZhWwK+Yo9m+GcZUT
+	qUvmMJReymInZ03LuC8CWZJ4XwJ/xsTSafWWMq8dVke25ap8ivDunV7lZjoQxZkbyh4k=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rVtdD-006mqR-Hm; Fri, 02 Feb 2024 14:30:59 +0100
+Date: Fri, 2 Feb 2024 14:30:59 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Paul Barker <paul.barker.ct@bp.renesas.com>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 0/8] Improve GbEth performance on Renesas RZ/G2L
+ and related SoCs
+Message-ID: <d76453e6-6b47-4f40-84dc-36c874e02da0@lunn.ch>
+References: <20240131170523.30048-1-paul.barker.ct@bp.renesas.com>
+ <953f6b82-c4b1-43f7-af68-e504d663f070@lunn.ch>
+ <1daa9e95-df98-4a08-bc55-21838e555519@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2] ifstat: convert sprintf to snprintf
-Content-Language: en-US
-To: David Laight <David.Laight@ACULAB.COM>,
- 'Stephen Hemminger' <stephen@networkplumber.org>,
- Denis Kirjanov <kirjanov@gmail.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <20240131124107.1428-1-dkirjanov@suse.de>
- <20240131081418.72770d85@hermes.local>
- <913e0c6bb6114fdfaa74073fc8b6c2ee@AcuMS.aculab.com>
- <5fa65887-1f56-4470-bc99-383fe7e3f47b@suse.de>
- <d2e9ab2c4df04f0e8f12b623366123eb@AcuMS.aculab.com>
-From: Denis Kirjanov <dkirjanov@suse.de>
-In-Reply-To: <d2e9ab2c4df04f0e8f12b623366123eb@AcuMS.aculab.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=XFSArmQm;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=+KZX5wHl
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-3.60 / 50.00];
-	 TO_DN_EQ_ADDR_SOME(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 XM_UA_NO_VERSION(0.01)[];
-	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	 TO_DN_SOME(0.00)[];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_TRACE(0.00)[suse.de:+];
-	 MX_GOOD(-0.01)[];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 FREEMAIL_TO(0.00)[ACULAB.COM,networkplumber.org,gmail.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 BAYES_HAM(-0.10)[65.36%];
-	 MID_RHS_MATCH_FROM(0.00)[];
-	 ARC_NA(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 FROM_HAS_DN(0.00)[];
-	 RCPT_COUNT_THREE(0.00)[4];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 DWL_DNSWL_MED(-2.00)[suse.de:dkim];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 RCVD_TLS_ALL(0.00)[]
-X-Spam-Score: -3.60
-X-Rspamd-Queue-Id: B37671F78A
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1daa9e95-df98-4a08-bc55-21838e555519@bp.renesas.com>
 
-
-
-On 2/2/24 16:02, David Laight wrote:
-> From: Denis Kirjanov
->> Sent: 02 February 2024 12:24
->>
->> On 2/2/24 14:32, David Laight wrote:
->>> From: Stephen Hemminger
->>>> Sent: 31 January 2024 16:14
->>>
->>>>
->>>> On Wed, 31 Jan 2024 07:41:07 -0500
->>>> Denis Kirjanov <kirjanov@gmail.com> wrote:
->>>>
->>>>> @@ -893,7 +893,7 @@ int main(int argc, char *argv[])
->>>>>
->>>>>  	sun.sun_family = AF_UNIX;
->>>>>  	sun.sun_path[0] = 0;
->>>>> -	sprintf(sun.sun_path+1, "ifstat%d", getuid());
->>>>> +	snprintf(sun.sun_path+1, sizeof(sun.sun_path), "ifstat%d", getuid());
->>>>
->>>> If you are changing the line, please add spaces around plus sign
->>>
->>> Isn't the size also wrong - needs a matching '- 1'.
->>
->> I don't think it's wrong, it's just the size of the target buffer which is
->> UNIX_PATH_MAX bytes.
+On Fri, Feb 02, 2024 at 09:39:42AM +0000, Paul Barker wrote:
+> On 31/01/2024 18:26, Andrew Lunn wrote:
+> >> Changes are made specific to the GbEth IP, avoiding potential impact on
+> >> the other Renesas R-Car based SoCs which also use the ravb driver. This
+> >> follows the principle of only submitting patches that we can fully test.
+> >  
+> > Are you saying that Renesas does not have access to all Renesas RDKs?
+> > 
+> > I don't particularly like the way your first patch makes a copy of
+> > shared functions. Is it not likely that R-Car would also benefit from
+> > this?
 > 
-> But you are starting one byte in.
-> So, if the size were 8 the '\0' would be written after the end.
-yep, you're right
+> We have the required RDKs. For the R-Car based SoCs, we need to confirm
+> that gPTP still works if we change the poll/receive code paths - this
+> will require an AVB-capable network switch and additional time to test.
+> So our plan was to handle the GbEth code paths first without affecting
+> R-Car, then follow up with another patch set for the R-Car code paths
+> when we've done the required tests.
 > 
-> Also, to avoid the next patch in a few weeks it should be
-> calling scnprintf().
-I'll post the next version
+> I discussed this with our team, and we're happy to do this in one go for
+> both R-Car and GbEth code paths if that's preferred.
+
+Hi Paul
+
+I think it would be simpler, since you would then need to recombine
+the code paths you have just split. Its better to not split them in
+the first place if possible.
+
+    Andrew
 
 
-> 
-> 	David
-> 
-> -
-> Registered Address Lakeside, Bramley Road, Mount Farm, Milton Keynes, MK1 1PT, UK
-> Registration No: 1397386 (Wales)
 
