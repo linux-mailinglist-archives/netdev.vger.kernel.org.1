@@ -1,109 +1,151 @@
-Return-Path: <netdev+bounces-68726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99F37847B73
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 22:22:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A2D2847B78
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 22:24:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBC361C2354D
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 21:22:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0A6D1F26ACA
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 21:24:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC8898172E;
-	Fri,  2 Feb 2024 21:22:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 736968174B;
+	Fri,  2 Feb 2024 21:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="omBu+xpb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="teO9xkwH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4D317A723;
-	Fri,  2 Feb 2024 21:22:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 478C081723;
+	Fri,  2 Feb 2024 21:24:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706908922; cv=none; b=TDxh4bl6MnK5iHJzgPnotE7/qPFcrLeL7YHD/Zwdl5wBR0tcsy0MN1AJ6zsPoHdwIdRRDStZVSFM56Z2ulbRclXXSl7Untnb3eZP3xH6oYZdgRC7vfiWV0m46OLFPVs/eP5HJlMZk1/Tr7Y6BobCu+fpsABXO+5yyouYseFnsk4=
+	t=1706909063; cv=none; b=Xl/H97OixZJI+XjGBdIDj/1rYQNf4KvKLOZY0BZoAvcXfOalCbqb6Jd9kUQhSAbvfSofpJOFQ5sy/+0p0//zGgXADcSUrlqTBtejHCP7tqzXGAFmQ+66oTfVfM9Kp8UY3c+DkTSU4NUd05dL6fejfqnt7JVxfs88mJv7czkjJxE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706908922; c=relaxed/simple;
-	bh=dX8bqHK6dWtd6zKOSklzWQ9UXyHOad7tEhuyHxxpX7o=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=u/3hRBBlybFulNTFXKOZvt2j87KdjPXzFiR01fz+bUYEoKz4XgEBMWV7PplZc583hqmxGoCIlTDNydQkPj6/N7eNRJVY7hBYAJG7OlK8nRe7FyY2CwBQGrpF2SrvxrmEqZhq7j5x0eg7uBJTEfkpiejgDMkT0P9lRqCfhzvqszQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=omBu+xpb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 551BCC43390;
-	Fri,  2 Feb 2024 21:22:02 +0000 (UTC)
+	s=arc-20240116; t=1706909063; c=relaxed/simple;
+	bh=UZ+yJRgsFPGKwSTDFBg0r03EZWgLZlspYa2WkFy5MiA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=goq9bPtHpSphbJUcmyaffnWXk3ljf+3AEMMY5yS/NFlZTLq3rgkR1gY8IF6P8tmM/qKrM8b7ByynHMQxfWyBvUiHA6zcK/U3634HngYj1x3DEakuaNTWAImWW1HHLeIjYd7JiV4V5klkCJvv/oH3qFghWHC/QD9NAdRRkPG+UHg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=teO9xkwH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72D71C433C7;
+	Fri,  2 Feb 2024 21:24:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706908922;
-	bh=dX8bqHK6dWtd6zKOSklzWQ9UXyHOad7tEhuyHxxpX7o=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=omBu+xpb6BNz/hchfYs/tZrIeI026SlLs/E6sTdiTXQmtovZLToHoLmxAsVn4KOXb
-	 1PPEUmEJnoU5ui0BMWdPsBvTac1QCa6fbnWY/myV6c6LaQxRi22Fa5WMggZG3sFYV8
-	 UO9Gvn0zITO/5L6evrilXxUTQf64pcALLoJj70k0CKmvRYcE3iWu33wS8dSnO6WT9r
-	 g6qZ96hevKgePhd24cgSDc0yV6B9WJtmvaXUEtzaFdis5f/EITuv5yRuTGclNwUqUW
-	 G4bmHoZE7Qf1uj1E8f8ndrowKeBI53WJyTkA2ZackXZASU5CP5Nzgrp3ly9PQFwvwJ
-	 1+t3AnRicT9zA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3B242C04E27;
-	Fri,  2 Feb 2024 21:22:02 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1706909062;
+	bh=UZ+yJRgsFPGKwSTDFBg0r03EZWgLZlspYa2WkFy5MiA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=teO9xkwHltv0T0lPtU2+7uxbSRQZXu6/REzvx0bSQvNw23ajHvQTtRrzcbKgqgcto
+	 Qz5I/ZL8Yae+1FbTMmiWOORN+yWt+6zMVotV2Omv2qFLh02dsTev+gZjT+02Xoj1Pa
+	 55RKD0O1gA/FcygEaO3shOHwz1wmfjact06vT2h7azz/dnW0UEq87+/ijVeqPz8sWU
+	 J1hcDtKIs0hN1bamIt4it/ivIsZN6b5KRfDv4eSuL89IMxiDOg45sxDHcZP8OyQG7M
+	 VB6q6WyV8NOavbjqr1LVh4oqfoz3W5hMd8t5KwIAtsdrnAhkvrW5+H4RC+e+uSeed+
+	 jX/JQcBYko2Xg==
+Date: Fri, 2 Feb 2024 15:24:20 -0600
+From: Rob Herring <robh@kernel.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Bc-bocun Chen <bc-bocun.chen@mediatek.com>,
+	Steven Liu <steven.liu@mediatek.com>,
+	John Crispin <john@phrozen.org>,
+	Chunfeng Yun <chunfeng.yun@mediatek.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 1/2] dt-bindings: phy: mediatek,xfi-tphy: add new bindings
+Message-ID: <20240202212420.GA1561174-robh@kernel.org>
+References: <702afb0c1246d95c90b22e57105304028bdd3083.1706823233.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 5/7] MAINTAINERS: Bluetooth: retire Johan (for now?)
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170690892223.8971.11685624402080242796.git-patchwork-notify@kernel.org>
-Date: Fri, 02 Feb 2024 21:22:02 +0000
-References: <20240109164517.3063131-6-kuba@kernel.org>
-In-Reply-To: <20240109164517.3063131-6-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, marcel@holtmann.org, johan.hedberg@gmail.com,
- luiz.dentz@gmail.com, linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <702afb0c1246d95c90b22e57105304028bdd3083.1706823233.git.daniel@makrotopia.org>
 
-Hello:
+On Thu, Feb 01, 2024 at 09:52:20PM +0000, Daniel Golle wrote:
+> Add bindings for the MediaTek XFI T-PHY Ethernet SerDes PHY found in the
+> MediaTek MT7988 SoC which can operate at various interfaces modes:
 
-This patch was applied to bluetooth/bluetooth-next.git (master)
-by Jakub Kicinski <kuba@kernel.org>:
+This is v4 unless I'm confused[1]. Where's the revision history?
 
-On Tue,  9 Jan 2024 08:45:15 -0800 you wrote:
-> Johan moved to maintaining the Zephyr Bluetooth stack,
-> and we haven't heard from him on the ML in 3 years
-> (according to lore), and seen any tags in git in 4 years.
-> Trade the MAINTAINER entry for CREDITS, we can revert
-> whenever Johan comes back to Linux hacking :)
+Rob
+
+[1] https://lore.kernel.org/all/b875f693f6d4367a610a12ef324584f3bf3a1c1c.1702352117.git.daniel@makrotopia.org/
+
 > 
-> Subsystem BLUETOOTH SUBSYSTEM
->   Changes 173 / 986 (17%)
->   Last activity: 2023-12-22
->   Marcel Holtmann <marcel@holtmann.org>:
->     Author 91cb4c19118a 2022-01-27 00:00:00 52
->     Committer edcb185fa9c4 2022-05-23 00:00:00 446
->     Tags 000c2fa2c144 2023-04-23 00:00:00 523
->   Johan Hedberg <johan.hedberg@gmail.com>:
->   Luiz Augusto von Dentz <luiz.dentz@gmail.com>:
->     Author d03376c18592 2023-12-22 00:00:00 241
->     Committer da9065caa594 2023-12-22 00:00:00 341
->     Tags da9065caa594 2023-12-22 00:00:00 493
->   Top reviewers:
->     [33]: alainm@chromium.org
->     [31]: mcchou@chromium.org
->     [27]: abhishekpandit@chromium.org
->   INACTIVE MAINTAINER Johan Hedberg <johan.hedberg@gmail.com>
+> via USXGMII PCS:
+>  * USXGMII
+>  * 10GBase-R
+>  * 5GBase-R
 > 
-> [...]
+> via LynxI SGMII PCS:
+>  * 2500Base-X
+>  * 1000Base-X
+>  * Cisco SGMII (MAC side)
+> 
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> ---
+>  .../bindings/phy/mediatek,xfi-tphy.yaml       | 80 +++++++++++++++++++
+>  1 file changed, 80 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/phy/mediatek,xfi-tphy.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/phy/mediatek,xfi-tphy.yaml b/Documentation/devicetree/bindings/phy/mediatek,xfi-tphy.yaml
+> new file mode 100644
+> index 0000000000000..e897118dcf7e6
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/phy/mediatek,xfi-tphy.yaml
+> @@ -0,0 +1,80 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/phy/mediatek,xfi-tphy.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: MediaTek XFI T-PHY
+> +
+> +maintainers:
+> +  - Daniel Golle <daniel@makrotopia.org>
+> +
+> +description:
+> +  The MediaTek XFI SerDes T-PHY provides the physical SerDes lanes
+> +  used by the (10G/5G) USXGMII PCS and (1G/2.5G) LynxI PCS found in
+> +  MediaTek's 10G-capabale SoCs.
+> +
+> +properties:
+> +  $nodename:
+> +    pattern: "^phy@[0-9a-f]+$"
+> +
+> +  compatible:
+> +    const: mediatek,mt7988-xfi-tphy
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    items:
+> +      - description: XFI PHY clock
+> +      - description: XFI register clock
+> +
+> +  clock-names:
+> +    items:
+> +      - const: xfipll
+> +      - const: topxtal
+> +
+> +  resets:
+> +    items:
+> +      - description: PEXTP reset
 
-Here is the summary with links:
-  - [net,5/7] MAINTAINERS: Bluetooth: retire Johan (for now?)
-    https://git.kernel.org/bluetooth/bluetooth-next/c/0bfcdce867f7
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+What is PEXTP?
 
