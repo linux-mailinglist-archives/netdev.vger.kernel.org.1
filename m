@@ -1,110 +1,149 @@
-Return-Path: <netdev+bounces-68701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FADD8479C9
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:41:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80D0B8479E3
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:47:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C54531C22E75
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:41:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03C48283AFF
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 19:47:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A747D15E5DB;
-	Fri,  2 Feb 2024 19:41:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b="gZ6u0hYq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7A7780608;
+	Fri,  2 Feb 2024 19:47:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from fanzine2.igalia.com (fanzine2.igalia.com [213.97.179.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE24615E5AE;
-	Fri,  2 Feb 2024 19:41:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.97.179.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C0CC80603;
+	Fri,  2 Feb 2024 19:47:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706902895; cv=none; b=bX7aSQwfAiUYNjldwaPC0OG6T8pbsn+UkF2YY42nK45qvFD9z1bXSf7fZCCHCO7HGvKIY82W545/SNPzsqCUu2PqrDJ/w93cpMYfSTVxcnCBtjngyvEZOot+JVt6kwhFufN2kLj0JWhu6o5STkbFBvTy3zsNakb9SXe2YZFE70g=
+	t=1706903248; cv=none; b=u3W0zzB/hKm7t20Xgei7whnlKE1bzXh2Jfw4BBY7jYT4fq7zo7REtnDELqx8TKpUEozj+cqd5Pe7KoYGRmlQLOFMfc8ZUj+Kicwh+mVQscsFDL6ZnwsjHI/cIDktxkQNOKg0KQh6+4dbvCeW7jTmcoQDlbxzy+0XQExN9DOn934=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706902895; c=relaxed/simple;
-	bh=PA6V8qrjOEmRUGi+eQ/RS4oAQjuEZxBHWI8Xka+E70s=;
-	h=Message-ID:Date:MIME-Version:In-Reply-To:To:Cc:From:Subject:
-	 Content-Type; b=NTirCzr1zhK2zFq3a9n8ICk2Tc9NXv/cWjJeqwgjMkz8NlVS1XpA5u7/6foewbJPZZ9atpKoJCqseIBsxpvRt481maRYEpwbhkYTidaqN4jz7K2xYlHQ6YU5i7ZTpGquFKm3jWjXs4c/J6uuwmJBbJ2yRfkBEV8vNfp0Qrd7mYc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com; spf=pass smtp.mailfrom=igalia.com; dkim=pass (2048-bit key) header.d=igalia.com header.i=@igalia.com header.b=gZ6u0hYq; arc=none smtp.client-ip=213.97.179.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=igalia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=igalia.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=igalia.com;
-	s=20170329; h=Content-Transfer-Encoding:Content-Type:Subject:From:Cc:To:
-	In-Reply-To:MIME-Version:Date:Message-ID:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=PA6V8qrjOEmRUGi+eQ/RS4oAQjuEZxBHWI8Xka+E70s=; b=gZ6u0hYqRPUgVhYJbVeGYB/L9g
-	/Ea5eM3HWDDp2WL/dJ/L2qUe77Z/CuO0U0bqKFNk9R167WtRmTjiWOCRuUarhFKJOL5lhb51L6NYI
-	EpMlao2gZByFMHhpXgRbf6n8RspviwcY/LO6pQRwYfDRWvhCu24FkCG1TgZoTqG+pHMGlqW2Ce4KG
-	wh2Bis9xuVCJYZulzEejI0c9KYjEF94ULju972kxSHVdFOSJ7KiNH8npvewGwr1F2l9KRtcC3qWit
-	kdeaSO1LLofZUqQYqb3Hh+oLtti6W6CDhsHKM0FKi1TNLS3QGY9OCRmatKpL3d8h3mQKKku/YA/uE
-	WXyhqkfQ==;
-Received: from [187.90.178.235] (helo=[192.168.1.60])
-	by fanzine2.igalia.com with esmtpsa 
-	(Cipher TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (Exim)
-	id 1rVzPE-00D4dK-2z; Fri, 02 Feb 2024 20:40:56 +0100
-Message-ID: <66cb411b-557a-6a70-57c9-457c969fec24@igalia.com>
-Date: Fri, 2 Feb 2024 16:40:46 -0300
+	s=arc-20240116; t=1706903248; c=relaxed/simple;
+	bh=g8WdEUjO3MhOqX7G8qPPne2dului+4Z2R4meol+a1Zc=;
+	h=Subject:From:To:CC:References:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=o3muhc7mfIrRvsC64L2GpeUZ+XIFve15dQKJSY0bOrmT6pHNxQB8oBn5f2JjP+bmhFl13xbCghq6rD4rgFq5/t8drzQw+H1YXhuiYUpnK8kZEOp6cGyVS544qBlcCBAKORbwx6d+NxmkzIpJH2+A7nPvqx2yJKYJPqknt7s5E5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (178.176.78.128) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 2 Feb
+ 2024 22:47:10 +0300
+Subject: Re: [PATCH v3 net-next 1/2] ravb: Add Rx checksum offload support for
+ GbEth
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+To: Biju Das <biju.das.jz@bp.renesas.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
+	<yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
+	<wsa+renesas@sang-engineering.com>, Nikita Yushchenko
+	<nikita.yoush@cogentembedded.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, Geert Uytterhoeven
+	<geert+renesas@glider.be>, Prabhakar Mahadev Lad
+	<prabhakar.mahadev-lad.rj@bp.renesas.com>, Biju Das <biju.das.au@gmail.com>
+References: <20240201194521.139472-1-biju.das.jz@bp.renesas.com>
+ <20240201194521.139472-2-biju.das.jz@bp.renesas.com>
+ <422974a5-cbce-50ad-5a8c-7588d5eeebc2@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <20d6e13e-bfe6-6209-3a81-a9c1e32ce195@omp.ru>
+Date: Fri, 2 Feb 2024 22:47:09 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.15.1
+In-Reply-To: <422974a5-cbce-50ad-5a8c-7588d5eeebc2@omp.ru>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-In-Reply-To: <000000000000d08921060fe27342@google.com>
-To: syzbot+239f12e20785af44332c@syzkaller.appspotmail.com,
- Thomas Gleixner <tglx@linutronix.de>, jannh@google.com
-Cc: akpm@linux-foundation.org, Borislav Petkov <bp@alien8.de>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "H. Peter Anvin" <hpa@zytor.com>, linux-kernel
- <linux-kernel@vger.kernel.org>, linux-mm@kvack.org,
- "luto@kernel.org" <luto@kernel.org>, Ingo Molnar <mingo@redhat.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Peter Zijlstra <peterz@infradead.org>, syzkaller-bugs@googlegroups.com,
- "x86@kernel.org" <x86@kernel.org>, gpiccoli@igalia.com,
- "Guilherme G. Piccoli" <kernel@gpiccoli.net>, houtao1@huawei.com
-From: "Guilherme G. Piccoli" <gpiccoli@igalia.com>
-Subject: Re: [syzbot] [mm?] BUG: unable to handle kernel paging request in
- bpf_probe_read_compat_str
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/02/2024 19:34:28
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 183168 [Feb 02 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.78.128 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.78.128 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.78.128
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 02/02/2024 19:38:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 2/2/2024 4:50:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Hi folks, I've been trying to play with this report and was able to
-reproduce on v6.8-rc2, in a simple qemu VM.
+On 2/2/24 10:12 PM, Sergey Shtylyov wrote:
 
-But the thing is: after looking similar reports in MLs, this seems quite
-the same report as [0], so a dup. And we even have a candidate fix for
-it, in the form of Thomas's patch
-(https://lore.kernel.org/all/87r0jwquhv.ffs@tglx/). I've tested this
-patch and it works, preventing the crash.
+>> TOE has hardware support for calculating IP header and TCP/UDP/ICMP
+>> checksum for both IPv4 and IPv6.
+>>
+>> Add Rx checksum offload supported by TOE for IPv4 and TCP/UDP protocols.
+>>
+>> For Rx, the 4-byte result of checksum calculation is attached to the
+>> Ethernet frames.First 2-bytes is result of IPv4 header checksum and next
+>> 2-bytes is TCP/UDP/ICMP checksum.
+>>
+>> If a frame does not have checksum error, 0x0000 is attached as checksum
+>> calculation result. For unsupported frames 0xFFFF is attached as checksum
+>> calculation result. In case of an IPv6 packet, IPv4 checksum is always set
+>> to 0xFFFF.
+>>
+>> We can test this functionality by the below commands
+>>
+>> ethtool -K eth0 rx on --> to turn on Rx checksum offload
+>> ethtool -K eth0 rx off --> to turn off Rx checksum offload
+>>
+>> Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
+[...]
+>> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+>> index 0e3731f50fc2..c4dc6ec54287 100644
+>> --- a/drivers/net/ethernet/renesas/ravb_main.c
+>> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+[...]
+>> @@ -2334,11 +2381,49 @@ static void ravb_set_rx_csum(struct net_device *ndev, bool enable)
+>>  	spin_unlock_irqrestore(&priv->lock, flags);
+>>  }
+>>  
+>> +static int ravb_endisable_csum_gbeth(struct net_device *ndev, enum ravb_reg reg,
+>> +				     u32 val, u32 mask)
+> 
+>    I'd suggest to mimic ravb_wait() with the the mask param followed by
+> the val[ue] param...
 
-So...
+   Nevermind, I see now they are for different registers...
 
-Jann: could you help me confirm the reproducer here is the same of the
-other report, in which you nailed it to accessing the VSYSCALL region?
-For me it's quite similar, but I'm not experienced in reading this kind
-of BPF program...
+[...]
 
-Thomas: could you maybe re-submit/merge this patch, if you still agree
-this is the proper fix? There's a Tested-by from Hou Tao in that thread,
-and feel free to add mine as well!
-
-Thanks in advance and let me know if I can test more stuff / provide
-more data, etc - I'm glad to help here.
-Cheers,
-
-
-Guilherme
-
-
-[0] https://lore.kernel.org/all/000000000000c84343060a850bd0@google.com/
-("[syzbot] [mm?] BUG: unable to handle kernel paging request in
-copy_from_kernel_nofault")
+MBR, Sergey
 
