@@ -1,184 +1,264 @@
-Return-Path: <netdev+bounces-68712-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40355847A69
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 21:20:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2D5D847A74
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 21:23:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB5932907A0
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:20:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5782B284625
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 20:23:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF3728063B;
-	Fri,  2 Feb 2024 20:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48F138172B;
+	Fri,  2 Feb 2024 20:23:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="GCXNu06B"
 X-Original-To: netdev@vger.kernel.org
-Received: from cloud48395.mywhc.ca (cloud48395.mywhc.ca [173.209.37.211])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09FE28060F;
-	Fri,  2 Feb 2024 20:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.209.37.211
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6B981724
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 20:23:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706905208; cv=none; b=JnF9F9rwcFIJsPZvNjMyMfpfaYTm0cFdUY2R7WyTNYJA1doIrb3CDQ7NsX+0ZotnN0visB8psbjwvMgjzW4G6sMSNZztVXhQoLtSJmhGfQKGsDnd7U6utfoeI8WCe02xn8McbyH4nHlFPkaTQBALRE2kZD2RuN+V9RIVdELjztA=
+	t=1706905430; cv=none; b=I926lP+4fFqHQxTUyot2MLGI0mQTfhIF4w87k7fExSfvCmDs2BpjKj6n6EJPwTfyrGWswx4EIfDr+5YZQQxXLVot7S2uZVPsubFOuFkMBu6GF4cmqiPhI6htzMWLg7VdtNqsfQdr/i1e1zVP1n+L5DELOmFhII0e64iuwBuJR1k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706905208; c=relaxed/simple;
-	bh=Evn1w5AGptPF1Z63kSmh93Q8mPIcfW2DAXEfIIjINrM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Ubw1+xLp4JoJmdAoCcLyE0pzez3Luvf9Nx95PMv7kugUSdIhTJRN4tbMIdapxT+UuH+YBBM74z/3YppXxYbav9K2PD8vA/SiganBXWYld0pSoWRhscNjQb7H+ZsC2di8JA8+j8LE4QDciZwX5rvmQRZ5FS4jUGg5saC63UFGDT4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trillion01.com; spf=pass smtp.mailfrom=trillion01.com; arc=none smtp.client-ip=173.209.37.211
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trillion01.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trillion01.com
-Received: from [45.44.224.220] (port=57996 helo=[192.168.1.177])
-	by cloud48395.mywhc.ca with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <olivier@trillion01.com>)
-	id 1rW017-0003tB-0c;
-	Fri, 02 Feb 2024 15:20:05 -0500
-Message-ID: <0ae91303c53aff4758bc07ee70add5c0f1ec524e.camel@trillion01.com>
-Subject: Re: [PATCH v15 0/7] io_uring: add napi busy polling support
-From: Olivier Langlois <olivier@trillion01.com>
-To: Jens Axboe <axboe@kernel.dk>, Stefan Roesch <shr@devkernel.io>, 
-	io-uring@vger.kernel.org, kernel-team@fb.com
-Cc: ammarfaizi2@gnuweeb.org, netdev@vger.kernel.org, kuba@kernel.org
-Date: Fri, 02 Feb 2024 15:20:04 -0500
-In-Reply-To: <a0f5b96b-c876-4c0a-a7b5-3809c26077d6@kernel.dk>
-References: <20230608163839.2891748-1-shr@devkernel.io>
-	 <58bde897e724efd7771229734d8ad2fb58b3ca48.camel@trillion01.com>
-	 <2b238cec-ab1b-4160-8fb0-ad199e1d0306@kernel.dk>
-	 <45a21ffe4878d77acba01ec43005c80a83f0e31a.camel@trillion01.com>
-	 <b6dc538a-01eb-4f87-a9d4-dea17235ff85@kernel.dk>
-	 <34560e193660122ea142daa0fbeb381eb7b0eb6d.camel@trillion01.com>
-	 <c28b3f5f40ed028ba9d74e94e3cc826c04f38bf7.camel@trillion01.com>
-	 <a0f5b96b-c876-4c0a-a7b5-3809c26077d6@kernel.dk>
-Autocrypt: addr=olivier@trillion01.com; prefer-encrypt=mutual;
- keydata=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
-Organization: Trillion01 Inc
-Content-Type: text/plain; charset="ISO-8859-1"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.2 
+	s=arc-20240116; t=1706905430; c=relaxed/simple;
+	bh=kHh/Fwi+zgGR85Gonsy9nCSLc26QR0hWZ/EbYVLS86Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FvDiYbbg8wIjkLmFF8jI26Yt1W7FsRwhzlyYLFBRZuovsMZlhe1gscHtcnr8eH7u4CVoShJeVtUifQ64U+ACiq/IovpIWQv9m2D43QMbEVYvL+BdMvMHvBjtnlphK/KyU5HjPxDkXUXICzMNFqitePBBwHAIoJXIEYUHLiN6IUU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=GCXNu06B; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d95d67ff45so14865035ad.2
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 12:23:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1706905428; x=1707510228; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aGhLoepqPTEf7fOGkK9tuzMrdf1LkUJ0F04BvVx/aiI=;
+        b=GCXNu06BRb5o288k9j76q2LpYuWBNK8xWVRfV1q8m5n5FPJaeJ8PImkXqKTOPoBIt8
+         4KQBOz+pPNNE//PYPiceapmQWmGitw4q7Ywxr5Q1CSzSeYvwf8Vz/xk5evVK68jbKaw+
+         R7cFd6JVEw3qu+C9bZ+xdgD/0x6NlmTVDB7A4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706905428; x=1707510228;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aGhLoepqPTEf7fOGkK9tuzMrdf1LkUJ0F04BvVx/aiI=;
+        b=UqTT10STtUftWrr7vq1Zpt2pvop8Ia0xvV0iPACiXO0xL0nP34f7xdjCLHS0vyAWWB
+         ICD98DW9CdM6xKl/R5HzafV08Z7yNoBjWcYBM7d6zBmR14rQZ49yBpDQo9TS3adKWqE8
+         M5wXhv1YhkYY+p23FiZ+Kh9/slgC9XBkxFWJzNiW8I400xQ3N9X23BBWPDhUCNYeJr+1
+         HQEHzHwwSLxCBMu/mkitOXKGeIZlRVEOS3iAm6DJKqjpi5/Z5h8F817Gw8TCq+t/FJ8h
+         gnkm0ReqbUA+SaJuGq1kYSMYP3M/Fjq+OnI+gn45DjbDxnITmG37LgmUOrABuWtkWGLq
+         SgaQ==
+X-Gm-Message-State: AOJu0Yx1mM8tb5/YZfwhGMXkOE40tsEmuF0nRpAxVYokYoP2fNnwG78J
+	H3hGANKL0ux7ujYxOHJHGg9Rttv5j0KqtlCA6uUjh1DZolHeqdGY08ULea2gB8o=
+X-Google-Smtp-Source: AGHT+IHeA3z/fTGd19l6o022GvzdVCVu3LbORSy1WAiGDts+qleaBHwb9krLrA1bSTwU9coQQOyP+A==
+X-Received: by 2002:a17:903:41cd:b0:1d5:b275:30a3 with SMTP id u13-20020a17090341cd00b001d5b27530a3mr3642973ple.24.1706905427819;
+        Fri, 02 Feb 2024 12:23:47 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCV//NKyNno7BailUBDkzV+sl7OvHgakIe5TltmvP2n5Iw4NmztPotCGc6VMrwYZnStsutDZT+rczzoDCVLFYytIFzvTKsUzoox2w3oVh8DpvUiCcWa1w86S55ULTIpWxMviGil3unvaCsyeBnMKsDqvl605aiRuy3khHQhY+UZ4cU1KKrXFW/QnUJNBfWK02bsk5xE7tyvDeqHEBwI85TDUFjebtMKkm/emiFdcxigGvC4QIVhPd2PpVqYOc1JPGPHA7u0Qt+KKKJuJc26kDOTvLlz0rFATm1vl9rvDZYlagNXCarUjwwEPZTEA2f7VjRUXorre1kz1Ae3kPr7j0RlKLtKrNW7LBIaYamQoPEbSF9oZvKUa2Jrv0xKNhrvzAMsAj9ITFN64YWyvlHqf+uiAoYo=
+Received: from fastly.com (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id e9-20020a170902b78900b001d987771271sm199754pls.123.2024.02.02.12.23.46
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 02 Feb 2024 12:23:47 -0800 (PST)
+Date: Fri, 2 Feb 2024 12:23:44 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, chuck.lever@oracle.com,
+	jlayton@kernel.org, linux-api@vger.kernel.org, brauner@kernel.org,
+	davem@davemloft.net, alexander.duyck@gmail.com,
+	Wei Wang <weiwan@google.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>
+Subject: Re: [net-next 0/3] Per epoll context busy poll support
+Message-ID: <20240202202344.GA9283@fastly.com>
+References: <20240124025359.11419-1-jdamato@fastly.com>
+ <CANn89i+YKwrgpt8VnHrw4eeVpqRamLkTSr4u+g1mRDMZa6b+7Q@mail.gmail.com>
+ <5faf88de-5063-421f-ad78-ad24d931fd17@intel.com>
+ <20240202032806.GA8708@fastly.com>
+ <f0b4d813-d7cb-428b-9c41-a2d86684f3f1@intel.com>
+ <20240202102239.274ca9bb@kernel.org>
+ <20240202193332.GA8932@fastly.com>
+ <20240202115828.6fd125bf@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - cloud48395.mywhc.ca
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - trillion01.com
-X-Get-Message-Sender-Via: cloud48395.mywhc.ca: authenticated_id: olivier@trillion01.com
-X-Authenticated-Sender: cloud48395.mywhc.ca: olivier@trillion01.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240202115828.6fd125bf@kernel.org>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 
-On Wed, 2024-01-31 at 13:52 -0700, Jens Axboe wrote:
-> On 1/31/24 12:56 PM, Olivier Langlois wrote:
-> > On Wed, 2024-01-31 at 12:59 -0500, Olivier Langlois wrote:
-> > > On Wed, 2024-01-31 at 10:32 -0700, Jens Axboe wrote:
-> > > >=20
-> > > > Thanks for testing!
-> > > >=20
-> > > > Any chance that you could run some tests with and without NAPI
-> > > > that
-> > > > help
-> > > > validate that it actually works? That part is what I'm most
-> > > > interested
-> > > > in, not too worried about the stability of it as I have
-> > > > scrutinized
-> > > > it
-> > > > pretty close already.
-> > > >=20
-> > >=20
-> > > There is maybe a test that I can perform. The data that I receive
-> > > is
-> > > timestamped. I have a small test program that checks the age of
-> > > the
-> > > updates on their reception...
-> > >=20
-> > > I would expect that it should be possible to perceive the busy
-> > > polling
-> > > effect by comparing the average update age with and without the
-> > > feature
-> > > enabled...
-> > >=20
-> > > A word of warning... The service that my client is connecting to
-> > > has
-> > > relocated recently. I used to have an RTT of about 8mSec with it
-> > > to
-> > > about 400-500 mSec today...
-> > >=20
-> > > because of the huge RTT, I am unsure that the test is going to be
-> > > conclusive at all...
-> > >=20
-> > > However, I am also in the process of relocating my client closer
-> > > to
-> > > the
-> > > service. If you can wait a week or so, I should able to do that
-> > > test
-> > > with a RTT < 1 mSec...
-> > >=20
-> > > Beside that, I could redo the same test that Stefan did with the
-> > > ping
-> > > client/server setup but would that test add any value to the
-> > > current
-> > > collective knowledge?
-> > >=20
-> > > I'll do the update age test when I restart my client and I'll
-> > > report
-> > > back the result but my expectations aren't very high that it is
-> > > going
-> > > to be conclusive due to the huge RTT.
-> > >=20
-> > >=20
-> > As I expected, the busy polling difference in the update age test
-> > is so
-> > small compared to the RTT that the result is inconclusive, IMHO...
-> >=20
-> > The number of collected updates to build the stats is 500.
-> >=20
-> > System clocks are assumed to be synchronized and the RTT is the
-> > difference between the local time and the update timestamp.
-> > Actually, it may be more accurate to say that the displayed RTT
-> > values
-> > are in fact TT...
-> >=20
-> > latency NO napi busy poll:
-> > [2024-01-31 11:28:34] INFO Main/processCollectedData rtt
-> > min/avg/max/mdev =3D 74.509/76.752/115.969/3.110 ms
-> >=20
-> > latency napi busy poll:
-> > [2024-01-31 11:33:05] INFO Main/processCollectedData rtt
-> > min/avg/max/mdev =3D 75.347/76.740/134.588/1.648 ms
-> >=20
-> > I'll redo the test once my RTT is closer to 1mSec. The relative
-> > gain
-> > should be more impressive...
->=20
-> Also happy to try and run it here, if you can share it? If not I have
-> some other stuff I can try as well, with netbench.
->=20
-I have redone my test with a fixed liburing lib that actually enable
-io_uring NAPI busy polling correctly and I have slightly more
-convincing result:
+On Fri, Feb 02, 2024 at 11:58:28AM -0800, Jakub Kicinski wrote:
+> On Fri, 2 Feb 2024 11:33:33 -0800 Joe Damato wrote:
+> > On Fri, Feb 02, 2024 at 10:22:39AM -0800, Jakub Kicinski wrote:
+> > > On Fri, 2 Feb 2024 11:23:28 -0600 Samudrala, Sridhar wrote:  
+> > > > I think you should be able to get this functionality via the netdev-genl 
+> > > > API to get napi parameters. It returns ifindex as one of the parameters 
+> > > > and you should able to get the name from ifindex.
+> > > > 
+> > > > $ ./cli.py --spec netdev.yaml --do napi-get --json='{"id": 593}'
+> > > > {'id': 593, 'ifindex': 12, 'irq': 291, 'pid': 3727}  
+> > > 
+> > > FWIW we also have a C library to access those. Out of curiosity what's
+> > > the programming language you'd use in user space, Joe?  
+> > 
+> > I am using C from user space. 
+> 
+> Ah, great! Here comes the advert.. :)
+> 
+>   make -C tools/net/ynl/
+> 
+> will generate the C lib for you. tools/net/ynl/generated/netdev-user.h
+> will have the full API. There are some samples in
+> tools/net/ynl/samples/. And basic info also here:
+> https://docs.kernel.org/next/userspace-api/netlink/intro-specs.html#ynl-lib
+> 
+> You should be able to convert Sridhar's cli.py into an equivalent 
+> in C in ~10 LoC.
+> 
+> > Curious what you think about
+> > SIOCGIFNAME_BY_NAPI_ID, Jakub? I think it would be very useful, but not
+> > sure if such an extension would be accepted. I can send an RFC, if you'd
+> > like to take a look and consider it. I know you are busy and I don't want
+> > to add too much noise to the list if I can help it :)
+> 
+> Nothing wrong with it in particular, but we went with the netlink API
+> because all the objects are related. There are interrupts, NAPI
+> instances, queues, page pools etc. and we need to show all sort of
+> attributes, capabilities, stats as well as the linking. So getsockopts
+> may not scale, or we'd need to create a monster mux getsockopt?
+> Plus with some luck the netlink API will send you notifications of
+> things changing.
 
-latency NO napi busy poll (kernel v7.2.3):
-[2024-02-02 11:42:41] INFO Main/processCollectedData rtt
-min/avg/max/mdev =3D 73.089/75.142/107.169/2.954 ms
+Yes this all makes sense. The notification on changes would be excellent,
+especially if NAPI IDs get changed for some reason  (e.g. the queue count
+is adjusted or the queues are rebuilt by the driver for some reason like a
+timeout, etc).
 
-latency napi busy poll (kernel v7.2.3):
-[2024-02-02 11:48:18] INFO Main/processCollectedData rtt
-min/avg/max/mdev =3D 72.862/73.878/124.536/1.288 ms
+I think the issue I'm solving with SIOCGIFNAME_BY_NAPI_ID is related, but
+different.
 
-FYI, I said that I could redo the test once I relocate my client to
-have a RTT < 1ms...
+In my case, SIOCGIFNAME_BY_NAPI_ID identifies which NIC a specific fd from
+accept arrived from.
 
-I might not be able to do that. I might settle for an AWS VPS instead
-of a bare metal setup and when you are running the kernel on a VPS,
-AFAIK, the virtual Ethernet driver does not have NAPI...
+AFAICT, the netlink API wouldn't be able to help me answer that question. I
+could use SIOCGIFNAME_BY_NAPI_ID to tell me which NIC the fd is from and
+then use netlink to figure out which CPU to bind to (for example), but I
+think SIOCGIFNAME_BY_NAPI_ID is still needed.
 
+I'll send an RFC about for that shortly, hope that's OK.
+
+> > Here's a brief description of what I'm doing, which others might find
+> > helpful:
+> > 
+> > 1. Machine has multiple NICs. Each NIC has 1 queue per busy poll app
+> > thread, plus a few extra queues for other non busy poll usage.
+> > 
+> > 2. A custom RSS context is created to distribute flows to the busy poll
+> > queues. This context is created for each NIC. The default context directs
+> > flows to the non-busy poll queues.
+> > 
+> > 3. Each NIC has n-tuple filters inserted to direct incoming connections
+> > with certain destination ports (e.g. 80, 443) to the custom RSS context.
+> > All other incoming connections will land in the default context and go to
+> > the other queues.
+> > 
+> > 4. IRQs for the busy poll queues are pinned to specific CPUs which are NUMA
+> > local to the NIC.
+> > 
+> > 5. IRQ coalescing values are setup with busy poll in mind, so IRQs are
+> > deferred as much as possible with the assumption userland will drive NAPI
+> > via epoll_wait. This is done per queue (using ethtool --per-queue and a
+> > queue mask). This is where napi_defer_hard_irqs and gro_flush_timeout
+> > could help even more. IRQ deferral is only needed for the busy poll queues.
+> 
+> Did you see SO_PREFER_BUSY_POLL by any chance? (In combination with
+> gro_flush_timeout IIRC). We added it a while back with Bjorn, it seems
+> like a great idea to me at the time but I'm unclear if anyone uses it 
+> in production..
+
+I have seen it while reading the code, yes. I think maybe I missed
+something about its interaction with gro_flush_timeout. In my use case,
+the machine has no traffic until after the app is started.
+
+In this case, I haven't needed to worry about regular NAPI monopolizing the
+CPU and preventing busy poll from working.
+
+Maybe I am missing something more nuanced, though? I'll have another look
+at the code, just incase.
+
+> 
+> > 6. userspace app config has NICs with their NUMA local CPUs listed, for
+> > example like this:
+> > 
+> >    - eth0: 0,1,2,3
+> >    - eth1: 4,5,6,7
+> > 
+> > The app reads that configuration in when it starts. Ideally, these are the
+> > same CPUs the IRQs are pinned to in step 4, but hopefully the coalesce
+> > settings let IRQs be deferred quite a bit so busy poll can take over.
+> 
+> FWIW if the driver you're using annotates things right you'll also get
+> the NAPI <> IRQ mapping via the netdev netlink. Hopefully that
+> simplifies the pinning setup.
+
+I looked last night after I learned about the netlink interface. It does
+not look like the driver I am using does, but I can fix that fairly easily,
+I think.
+
+I'll try to send a patch for this next week.
+
+> > 7. App threads are created and sockets are opened with REUSEPORT. Notably:
+> > when the sockets are created, SO_BINDTODEVICE is used* (see below for
+> > longer explanation about this).
+> > 
+> > 8. cbpf reusport program inserted to distribute incoming connections to
+> > threads based on skb->queue_mapping. skb->queue_mapping values are not
+> > unique (e.g. each NIC will have queue_mapping==0), this is why BINDTODEVICE
+> > is needed. Again, see below.
+> > 
+> > 9. worker thread epoll contexts are set to busy poll by the ioctl I've
+> > submit in my patches.
+> > 
+> > The first time a worker thread receives a connection, it:
+> > 
+> > 1. calls SO_INCOMING_NAPI_ID to get the NAPI ID associated with the
+> > connection it received.
+> > 
+> > 2. Takes that NAPI ID and calls SIOCGIFNAME_BY_NAPI_ID to figure out which
+> > NIC the connection came in on.
+> > 
+> > 3. Looks for an un-unsed CPU from the list it read in at configuration time
+> > that is associated with that NIC and then pins itself to that CPU. That CPU
+> > is removed from the list so other threads can't take it.
+> > 
+> > All future incoming connections with the same NAPI ID will be distributed
+> > to app threads which are pinned in the appropriate place and are doing busy
+> > polling.
+> > 
+> > So, as you can see, SIOCGIFNAME_BY_NAPI_ID makes this implementation very
+> > simple.
+> > 
+> > I plan to eventually add some information to the kernel networking
+> > documentation to capture some more details of the above, which I think
+> > might be helpful for others.
+> 
+> Sounds very sensible & neat indeed. And makes sense to describe this 
+> in the docs, that should hopefully put more people on the right path :)
+> 
+> > Another potential solution to avoid the above might be use an eBPF program
+> > and to build a hash that maps NAPI IDs to thread IDs and write a more
+> > complicated eBPF program to distribute connections that way. This seemed
+> > cool, but involved a lot more work so I went with the SO_BINDTODEVICE +
+> > SIOCGIFNAME_BY_NAPI_ID method instead which was pretty simple (C code wise)
+> > and easy to implement.
+> 
+> Interesting!
 
