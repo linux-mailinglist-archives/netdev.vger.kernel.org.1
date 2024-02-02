@@ -1,148 +1,454 @@
-Return-Path: <netdev+bounces-68561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 134A48472F5
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:19:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E72C847304
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:21:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE13D2880BD
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 15:19:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B53E91F25A10
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 15:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D976145B20;
-	Fri,  2 Feb 2024 15:19:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D9951482F8;
+	Fri,  2 Feb 2024 15:20:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ctN0Iwm+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M7Ql2lHw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675BEF4F3;
-	Fri,  2 Feb 2024 15:19:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3129B1482F3
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 15:20:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706887163; cv=none; b=htz7gYCnn0zEpFqCQ/c4CaHnNBf8VRQBX2QZdNdOim3ErfY63sABr0Gfknqqj96qn2q4deSPhR09T8icHVMYYFnZC96j7DKZvJShahdS7ZUGyhb6rYw0pWin19iI3GcUKDtgETYpFG0h//Yr1hBt8jv6xDvWbBYKC8u1EtqtsFE=
+	t=1706887220; cv=none; b=MHH0y/EFmQvxbJ9F+rRvk/P1A6hmC36EOekzj8sTvG6DONLyVK0QbcXm+cpdyGe0ZieuZ04Mi/YEm2000a/te+aclWMtOCaNkgKQSUFqSlqoZjl7Fm58ZvU6GZx18z/+7VqjqNIXsDXvfTiwUu5yIeNNtpEGDtityY4Sy27ty60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706887163; c=relaxed/simple;
-	bh=Ox8L57JA4AUkcDs2pE0/4jJPX9j0BxzICdkXV9TY1Ic=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CoGe8kaMSDmKpcqJ+qYOWjNtPUYm76/zMTE6bNnebAczqDTtx6jeMQRLbOl2LZyUaGE5dAsgM1hPvXdOpRiCDe20PvDU1Eo1mlUvGzDK7eYak1uLgxTWMX8q2EmMEm6FHMCcalz78M2D8O3R+eGHg1H2jupb69jjHMOvOSVaRFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ctN0Iwm+; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40fc549ab9bso7343885e9.0;
-        Fri, 02 Feb 2024 07:19:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706887159; x=1707491959; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=aE9RDzquXUnyGWyqx2WNSmBkRu7c0fXOe0fgH0xt2RM=;
-        b=ctN0Iwm+k9xjon0XsBg6U9HdazIHPJh5CrvU7yRDRsvUqUQScVuvXvMwfmNU31NOY7
-         hm4I4Wgb3m0W6bQ6Jgo0PPxUq6hBAN/0XmvoTrzHRzSBhYizrD9DgeE2pzvVsUsmBuiN
-         u33ab2dwOcEuxNK6o7/2D4OkRq5uwjx4u8IC/G8pZl7upmzCczLOtmnB9JyNrUMza+69
-         diUgiGDxasT3kdpWuZOO3PLw0roDVIXVprW5fvoz6hXiblX97W4P26SB7Q+e6AIKGNwW
-         KBlIAzHYkKRmlJeXaF0l/GoTh8cFRXoO1pQFnh216uB9KWiFqTVHI5llBTiGRBfpx4T0
-         CWoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706887159; x=1707491959;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aE9RDzquXUnyGWyqx2WNSmBkRu7c0fXOe0fgH0xt2RM=;
-        b=BgwK25+Z5d6XQnKTA8yu+0T2gbK4on62ZBUbBgdaEo3JncKbsykwUDumkFg2srCebb
-         VFluBkvo0imI1QiDAw6bN8OO5MktWgT0p1sQxd2mU14ReFNKsWRmIBdXMemHu+85oKe3
-         QWNtOjRKk5Q6MWHe/zAM0sZrmHCez20mfbCpvGognkjEBFmyOPpTtYZv8axAX60snBPz
-         IATKusYd2bQe9/EQsU3FoEfb5EJmK+h9WoznF1vVSLz1Oez91lhAlbxI+v5gA7aDfp6y
-         McV68LteAipNsqLdggTzdnpdsq+VMGDYo66KAVgBwgeWsbMzwGiZJxowsq5vxNhQXdIF
-         G+IA==
-X-Gm-Message-State: AOJu0Yx7pXunfmZJy4H66dDoMoQq9C7OkDlDp8WdAtcuBrk/fr6qAuQL
-	/T08AKgo5+ivhrCDTb7DrZ570u8IGBC8cSBy7uD8DCUEtgYGLEqB
-X-Google-Smtp-Source: AGHT+IEo7/Rzm0+xYpDkykRaqOuEUD5HBdSjeFCGgYWOO5TRuwAEy1mX6pCrsH5WXijWGxUgOtl9Bw==
-X-Received: by 2002:a5d:4750:0:b0:33b:1b2d:1b36 with SMTP id o16-20020a5d4750000000b0033b1b2d1b36mr1584527wrs.60.1706887159342;
-        Fri, 02 Feb 2024 07:19:19 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXqaNGiczieVynTdbeIb5Hq9n8fAiBLtKq21c8lIci57jJWxN1hxES9cetibpdKn9WU1A5NCX7dIBfquSoVXp6e9WLbXWMRXkaQ8KVG6YmvyU5mszXeEa+3GmOhpIB7vuY+aDQCUkF50mtHa4prgqQN4JBfhhikRv2ZeL7ZUjvcyWjudZWvcbfnNOzIq4+nm0coCKvRJtCaoiZ7NLA8ajE5i1kmN2khux/hQYco9LDpDNQ+glw7lC9Ag+AKxsB9P3u3BQuZSuD/YU9NQ8oFCxD5ZEB5VKmx05/tIUaXE0dvgLv1Y8c8fObMomc57ZyVyRjV3o1jfDHgOsMF1TFFymTtKAFfwMqG3nVK51aeKYubwvt0Q9p/dcdQ8IhO/sSQnvl0XPRjqU4SFlZjt1X06U6yTJOF/nJDCecqnzm5yKDt/6HcRIlzteqIMt5n2R2KaB5EoTBE+aj3isj/ZQgMqDPJSiVsRXDSIK3D7YEPAgJb5ZKg0K5oUkRC5sFOG436cs9oC4H+CIzjzdUUteM+NEwk9IToD98nxD6QzlKpWoa1
-Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id k10-20020a056000004a00b0033affaade9csm2149033wrx.68.2024.02.02.07.19.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Feb 2024 07:19:19 -0800 (PST)
-Message-ID: <65bd07f7.050a0220.e8e5e.9e28@mx.google.com>
-X-Google-Original-Message-ID: <Zb0H82fRtGfMbXfQ@Ansuel-xps.>
-Date: Fri, 2 Feb 2024 16:19:15 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1706887220; c=relaxed/simple;
+	bh=eqTBeIpWu5lKWrNdATCcP5WdzFUCQXCzbvpZ3tgiErE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=cxD2n1Lb9Qj8CT5KFXBNNIhnfu2BAdilugIVMNVw+pLyDAhD7xwbVlVOBV/brdSTOtg+V78WdxbM6ExZYBKY+Zv2XS5gk2NmxItnkb74tafVO2zDS5LoH7FQk6AQoodGyWt/blrvmqtmIvctwfyGPRsCyhXdeTYag7WwKAc5Q0o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M7Ql2lHw; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1706887217;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=oZ5cG97dK26o/ijuUa+ep+TAnD2os0jmO31WuR2PRT8=;
+	b=M7Ql2lHwwL1yh9UqTFVYO3SWiWMmJoyCV8m/Uo6oxPzTSXJYYToXRN7OLw0xx/Nb0C9vKS
+	JiIJ809RZuwwqGlxZ/aU7z2cQluQ3T9M+fxPGSCSA2dcBao5XbLY3TVFwOwhhqC7uWp9/9
+	VXwDT7XTmCZHLrY92ZOp25fJXiL8Fvg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-307-_EoJGurLMhye1Yh1ayqNng-1; Fri, 02 Feb 2024 10:20:12 -0500
+X-MC-Unique: _EoJGurLMhye1Yh1ayqNng-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6866E85A596;
+	Fri,  2 Feb 2024 15:20:11 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.245])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 2F8EB1121306;
+	Fri,  2 Feb 2024 15:20:10 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Frank Rowand <frowand.list@gmail.com>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [net-next PATCH v5 5/9] dt-bindings: net: add QCA807x PHY defines
-References: <20240201151747.7524-1-ansuelsmth@gmail.com>
- <20240201151747.7524-6-ansuelsmth@gmail.com>
- <9933685a-5265-467e-aa39-d2c92a12edca@linaro.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net 4/4] rxrpc: Fix counting of new acks and nacks
+Date: Fri,  2 Feb 2024 15:19:16 +0000
+Message-ID: <20240202151920.2760446-5-dhowells@redhat.com>
+In-Reply-To: <20240202151920.2760446-1-dhowells@redhat.com>
+References: <20240202151920.2760446-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9933685a-5265-467e-aa39-d2c92a12edca@linaro.org>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-On Fri, Feb 02, 2024 at 08:41:56AM +0100, Krzysztof Kozlowski wrote:
-> On 01/02/2024 16:17, Christian Marangi wrote:
-> > From: Robert Marko <robert.marko@sartura.hr>
-> > 
-> > Add DT bindings defined for Qualcomm QCA807x PHY series related to
-> > calibration and DAC settings.
-> 
-> Nothing from this file is used and your commit msg does not provide
-> rationale "why", thus it does not look like something for bindings.
-> Otherwise please point me which patch with *driver* uses these bindings.
->
+Fix the counting of new acks and nacks when parsing a packet - something
+that is used in congestion control.
 
-Hi, since I have to squash this, I will include the reason in the schema
-patch.
+As the code stands, it merely notes if there are any nacks whereas what we
+really should do is compare the previous SACK table to the new one,
+assuming we get two successive ACK packets with nacks in them.  However, we
+really don't want to do that if we can avoid it as the tables might not
+correspond directly as one may be shifted from the other - something that
+will only get harder to deal with once extended ACK tables come into full
+use (with a capacity of up to 8192).
 
-Anyway these are raw values used to configure the qcom,control-dac
-property.
+Instead, count the number of nacks shifted out of the old SACK, the number
+of nacks retained in the portion still active and the number of new acks
+and nacks in the new table then calculate what we need.
 
-In the driver it's used by qca807x_config_init. We read what is set in
-DT and we configure the reg accordingly.
+Note this ends up a bit of an estimate as the Rx protocol allows acks to be
+withdrawn by the receiver and packets requested to be retransmitted.
 
-If this is wrong should we use a more schema friendly approach with
-declaring an enum of string and document that there?
+Fixes: d57a3a151660 ("rxrpc: Save last ACK's SACK table rather than marking txbufs")
+Signed-off-by: David Howells <dhowells@redhat.com>
+cc: Marc Dionne <marc.dionne@auristor.com>
+cc: "David S. Miller" <davem@davemloft.net>
+cc: Eric Dumazet <edumazet@google.com>
+cc: Jakub Kicinski <kuba@kernel.org>
+cc: Paolo Abeni <pabeni@redhat.com>
+cc: linux-afs@lists.infradead.org
+cc: netdev@vger.kernel.org
+---
+ include/trace/events/rxrpc.h |   8 ++-
+ net/rxrpc/ar-internal.h      |  20 ++++--
+ net/rxrpc/call_event.c       |   6 +-
+ net/rxrpc/call_object.c      |   1 +
+ net/rxrpc/input.c            | 115 +++++++++++++++++++++++++++++------
+ 5 files changed, 122 insertions(+), 28 deletions(-)
 
-> > 
-> > Signed-off-by: Robert Marko <robert.marko@sartura.hr>
-> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> > ---
-> >  include/dt-bindings/net/qcom-qca807x.h | 30 ++++++++++++++++++++++++++
-> 
-> Use filename matching compatible, so vendor,device. No wildcards, unless
-> your compatible also has them.
-> 
-> >  1 file changed, 30 insertions(+)
-> >  create mode 100644 include/dt-bindings/net/qcom-qca807x.h
-> > 
-> 
-> 
-> 
-> Best regards,
-> Krzysztof
-> 
+diff --git a/include/trace/events/rxrpc.h b/include/trace/events/rxrpc.h
+index 4c1ef7b3705c..87b8de9b6c1c 100644
+--- a/include/trace/events/rxrpc.h
++++ b/include/trace/events/rxrpc.h
+@@ -128,6 +128,7 @@
+ 	EM(rxrpc_skb_eaten_by_unshare_nomem,	"ETN unshar-nm") \
+ 	EM(rxrpc_skb_get_conn_secured,		"GET conn-secd") \
+ 	EM(rxrpc_skb_get_conn_work,		"GET conn-work") \
++	EM(rxrpc_skb_get_last_nack,		"GET last-nack") \
+ 	EM(rxrpc_skb_get_local_work,		"GET locl-work") \
+ 	EM(rxrpc_skb_get_reject_work,		"GET rej-work ") \
+ 	EM(rxrpc_skb_get_to_recvmsg,		"GET to-recv  ") \
+@@ -141,6 +142,7 @@
+ 	EM(rxrpc_skb_put_error_report,		"PUT error-rep") \
+ 	EM(rxrpc_skb_put_input,			"PUT input    ") \
+ 	EM(rxrpc_skb_put_jumbo_subpacket,	"PUT jumbo-sub") \
++	EM(rxrpc_skb_put_last_nack,		"PUT last-nack") \
+ 	EM(rxrpc_skb_put_purge,			"PUT purge    ") \
+ 	EM(rxrpc_skb_put_rotate,		"PUT rotate   ") \
+ 	EM(rxrpc_skb_put_unknown,		"PUT unknown  ") \
+@@ -1552,7 +1554,7 @@ TRACE_EVENT(rxrpc_congest,
+ 		    memcpy(&__entry->sum, summary, sizeof(__entry->sum));
+ 			   ),
+ 
+-	    TP_printk("c=%08x r=%08x %s q=%08x %s cw=%u ss=%u nA=%u,%u+%u r=%u b=%u u=%u d=%u l=%x%s%s%s",
++	    TP_printk("c=%08x r=%08x %s q=%08x %s cw=%u ss=%u nA=%u,%u+%u,%u b=%u u=%u d=%u l=%x%s%s%s",
+ 		      __entry->call,
+ 		      __entry->ack_serial,
+ 		      __print_symbolic(__entry->sum.ack_reason, rxrpc_ack_names),
+@@ -1560,9 +1562,9 @@ TRACE_EVENT(rxrpc_congest,
+ 		      __print_symbolic(__entry->sum.mode, rxrpc_congest_modes),
+ 		      __entry->sum.cwnd,
+ 		      __entry->sum.ssthresh,
+-		      __entry->sum.nr_acks, __entry->sum.saw_nacks,
++		      __entry->sum.nr_acks, __entry->sum.nr_retained_nacks,
+ 		      __entry->sum.nr_new_acks,
+-		      __entry->sum.nr_rot_new_acks,
++		      __entry->sum.nr_new_nacks,
+ 		      __entry->top - __entry->hard_ack,
+ 		      __entry->sum.cumulative_acks,
+ 		      __entry->sum.dup_acks,
+diff --git a/net/rxrpc/ar-internal.h b/net/rxrpc/ar-internal.h
+index b4ab26c3718a..7818aae1be8e 100644
+--- a/net/rxrpc/ar-internal.h
++++ b/net/rxrpc/ar-internal.h
+@@ -199,11 +199,19 @@ struct rxrpc_host_header {
+  */
+ struct rxrpc_skb_priv {
+ 	struct rxrpc_connection *conn;	/* Connection referred to (poke packet) */
+-	u16		offset;		/* Offset of data */
+-	u16		len;		/* Length of data */
+-	u8		flags;
++	union {
++		struct {
++			u16		offset;		/* Offset of data */
++			u16		len;		/* Length of data */
++			u8		flags;
+ #define RXRPC_RX_VERIFIED	0x01
+-
++		};
++		struct {
++			rxrpc_seq_t	first_ack;	/* First packet in acks table */
++			u8		nr_acks;	/* Number of acks+nacks */
++			u8		nr_nacks;	/* Number of nacks */
++		};
++	};
+ 	struct rxrpc_host_header hdr;	/* RxRPC packet header from this packet */
+ };
+ 
+@@ -692,6 +700,7 @@ struct rxrpc_call {
+ 	u8			cong_dup_acks;	/* Count of ACKs showing missing packets */
+ 	u8			cong_cumul_acks; /* Cumulative ACK count */
+ 	ktime_t			cong_tstamp;	/* Last time cwnd was changed */
++	struct sk_buff		*cong_last_nack; /* Last ACK with nacks received */
+ 
+ 	/* Receive-phase ACK management (ACKs we send). */
+ 	u8			ackr_reason;	/* reason to ACK */
+@@ -729,7 +738,8 @@ struct rxrpc_call {
+ struct rxrpc_ack_summary {
+ 	u16			nr_acks;		/* Number of ACKs in packet */
+ 	u16			nr_new_acks;		/* Number of new ACKs in packet */
+-	u16			nr_rot_new_acks;	/* Number of rotated new ACKs */
++	u16			nr_new_nacks;		/* Number of new nacks in packet */
++	u16			nr_retained_nacks;	/* Number of nacks retained between ACKs */
+ 	u8			ack_reason;
+ 	bool			saw_nacks;		/* Saw NACKs in packet */
+ 	bool			new_low_nack;		/* T if new low NACK found */
+diff --git a/net/rxrpc/call_event.c b/net/rxrpc/call_event.c
+index c61efe08695d..0f78544d043b 100644
+--- a/net/rxrpc/call_event.c
++++ b/net/rxrpc/call_event.c
+@@ -112,6 +112,7 @@ static void rxrpc_congestion_timeout(struct rxrpc_call *call)
+ void rxrpc_resend(struct rxrpc_call *call, struct sk_buff *ack_skb)
+ {
+ 	struct rxrpc_ackpacket *ack = NULL;
++	struct rxrpc_skb_priv *sp;
+ 	struct rxrpc_txbuf *txb;
+ 	unsigned long resend_at;
+ 	rxrpc_seq_t transmitted = READ_ONCE(call->tx_transmitted);
+@@ -139,14 +140,15 @@ void rxrpc_resend(struct rxrpc_call *call, struct sk_buff *ack_skb)
+ 	 * explicitly NAK'd packets.
+ 	 */
+ 	if (ack_skb) {
++		sp = rxrpc_skb(ack_skb);
+ 		ack = (void *)ack_skb->data + sizeof(struct rxrpc_wire_header);
+ 
+-		for (i = 0; i < ack->nAcks; i++) {
++		for (i = 0; i < sp->nr_acks; i++) {
+ 			rxrpc_seq_t seq;
+ 
+ 			if (ack->acks[i] & 1)
+ 				continue;
+-			seq = ntohl(ack->firstPacket) + i;
++			seq = sp->first_ack + i;
+ 			if (after(txb->seq, transmitted))
+ 				break;
+ 			if (after(txb->seq, seq))
+diff --git a/net/rxrpc/call_object.c b/net/rxrpc/call_object.c
+index 0943e54370ba..9fc9a6c3f685 100644
+--- a/net/rxrpc/call_object.c
++++ b/net/rxrpc/call_object.c
+@@ -686,6 +686,7 @@ static void rxrpc_destroy_call(struct work_struct *work)
+ 
+ 	del_timer_sync(&call->timer);
+ 
++	rxrpc_free_skb(call->cong_last_nack, rxrpc_skb_put_last_nack);
+ 	rxrpc_cleanup_ring(call);
+ 	while ((txb = list_first_entry_or_null(&call->tx_sendmsg,
+ 					       struct rxrpc_txbuf, call_link))) {
+diff --git a/net/rxrpc/input.c b/net/rxrpc/input.c
+index 92495e73b869..9691de00ade7 100644
+--- a/net/rxrpc/input.c
++++ b/net/rxrpc/input.c
+@@ -45,11 +45,9 @@ static void rxrpc_congestion_management(struct rxrpc_call *call,
+ 	}
+ 
+ 	cumulative_acks += summary->nr_new_acks;
+-	cumulative_acks += summary->nr_rot_new_acks;
+ 	if (cumulative_acks > 255)
+ 		cumulative_acks = 255;
+ 
+-	summary->mode = call->cong_mode;
+ 	summary->cwnd = call->cong_cwnd;
+ 	summary->ssthresh = call->cong_ssthresh;
+ 	summary->cumulative_acks = cumulative_acks;
+@@ -151,6 +149,7 @@ static void rxrpc_congestion_management(struct rxrpc_call *call,
+ 		cwnd = RXRPC_TX_MAX_WINDOW;
+ 	call->cong_cwnd = cwnd;
+ 	call->cong_cumul_acks = cumulative_acks;
++	summary->mode = call->cong_mode;
+ 	trace_rxrpc_congest(call, summary, acked_serial, change);
+ 	if (resend)
+ 		rxrpc_resend(call, skb);
+@@ -213,7 +212,6 @@ static bool rxrpc_rotate_tx_window(struct rxrpc_call *call, rxrpc_seq_t to,
+ 	list_for_each_entry_rcu(txb, &call->tx_buffer, call_link, false) {
+ 		if (before_eq(txb->seq, call->acks_hard_ack))
+ 			continue;
+-		summary->nr_rot_new_acks++;
+ 		if (test_bit(RXRPC_TXBUF_LAST, &txb->flags)) {
+ 			set_bit(RXRPC_CALL_TX_LAST, &call->flags);
+ 			rot_last = true;
+@@ -254,6 +252,11 @@ static void rxrpc_end_tx_phase(struct rxrpc_call *call, bool reply_begun,
+ {
+ 	ASSERT(test_bit(RXRPC_CALL_TX_LAST, &call->flags));
+ 
++	if (unlikely(call->cong_last_nack)) {
++		rxrpc_free_skb(call->cong_last_nack, rxrpc_skb_put_last_nack);
++		call->cong_last_nack = NULL;
++	}
++
+ 	switch (__rxrpc_call_state(call)) {
+ 	case RXRPC_CALL_CLIENT_SEND_REQUEST:
+ 	case RXRPC_CALL_CLIENT_AWAIT_REPLY:
+@@ -702,6 +705,43 @@ static void rxrpc_input_ackinfo(struct rxrpc_call *call, struct sk_buff *skb,
+ 		wake_up(&call->waitq);
+ }
+ 
++/*
++ * Determine how many nacks from the previous ACK have now been satisfied.
++ */
++static rxrpc_seq_t rxrpc_input_check_prev_ack(struct rxrpc_call *call,
++					      struct rxrpc_ack_summary *summary,
++					      rxrpc_seq_t seq)
++{
++	struct sk_buff *skb = call->cong_last_nack;
++	struct rxrpc_ackpacket ack;
++	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
++	unsigned int i, new_acks = 0, retained_nacks = 0;
++	rxrpc_seq_t old_seq = sp->first_ack;
++	u8 *acks = skb->data + sizeof(struct rxrpc_wire_header) + sizeof(ack);
++
++	if (after_eq(seq, old_seq + sp->nr_acks)) {
++		summary->nr_new_acks += sp->nr_nacks;
++		summary->nr_new_acks += seq - (old_seq + sp->nr_acks);
++		summary->nr_retained_nacks = 0;
++	} else if (seq == old_seq) {
++		summary->nr_retained_nacks = sp->nr_nacks;
++	} else {
++		for (i = 0; i < sp->nr_acks; i++) {
++			if (acks[i] == RXRPC_ACK_TYPE_NACK) {
++				if (before(old_seq + i, seq))
++					new_acks++;
++				else
++					retained_nacks++;
++			}
++		}
++
++		summary->nr_new_acks += new_acks;
++		summary->nr_retained_nacks = retained_nacks;
++	}
++
++	return old_seq + sp->nr_acks;
++}
++
+ /*
+  * Process individual soft ACKs.
+  *
+@@ -711,25 +751,51 @@ static void rxrpc_input_ackinfo(struct rxrpc_call *call, struct sk_buff *skb,
+  * the timer on the basis that the peer might just not have processed them at
+  * the time the ACK was sent.
+  */
+-static void rxrpc_input_soft_acks(struct rxrpc_call *call, u8 *acks,
+-				  rxrpc_seq_t seq, int nr_acks,
+-				  struct rxrpc_ack_summary *summary)
++static void rxrpc_input_soft_acks(struct rxrpc_call *call,
++				  struct rxrpc_ack_summary *summary,
++				  struct sk_buff *skb,
++				  rxrpc_seq_t seq,
++				  rxrpc_seq_t since)
+ {
+-	unsigned int i;
++	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
++	unsigned int i, old_nacks = 0;
++	rxrpc_seq_t lowest_nak = seq + sp->nr_acks;
++	u8 *acks = skb->data + sizeof(struct rxrpc_wire_header) + sizeof(struct rxrpc_ackpacket);
+ 
+-	for (i = 0; i < nr_acks; i++) {
++	for (i = 0; i < sp->nr_acks; i++) {
+ 		if (acks[i] == RXRPC_ACK_TYPE_ACK) {
+ 			summary->nr_acks++;
+-			summary->nr_new_acks++;
++			if (after_eq(seq, since))
++				summary->nr_new_acks++;
+ 		} else {
+-			if (!summary->saw_nacks &&
+-			    call->acks_lowest_nak != seq + i) {
+-				call->acks_lowest_nak = seq + i;
+-				summary->new_low_nack = true;
+-			}
+ 			summary->saw_nacks = true;
++			if (before(seq, since)) {
++				/* Overlap with previous ACK */
++				old_nacks++;
++			} else {
++				summary->nr_new_nacks++;
++				sp->nr_nacks++;
++			}
++
++			if (before(seq, lowest_nak))
++				lowest_nak = seq;
+ 		}
++		seq++;
++	}
++
++	if (lowest_nak != call->acks_lowest_nak) {
++		call->acks_lowest_nak = lowest_nak;
++		summary->new_low_nack = true;
+ 	}
++
++	/* We *can* have more nacks than we did - the peer is permitted to drop
++	 * packets it has soft-acked and re-request them.  Further, it is
++	 * possible for the nack distribution to change whilst the number of
++	 * nacks stays the same or goes down.
++	 */
++	if (old_nacks < summary->nr_retained_nacks)
++		summary->nr_new_acks += summary->nr_retained_nacks - old_nacks;
++	summary->nr_retained_nacks = old_nacks;
+ }
+ 
+ /*
+@@ -773,7 +839,7 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
+ 	struct rxrpc_skb_priv *sp = rxrpc_skb(skb);
+ 	struct rxrpc_ackinfo info;
+ 	rxrpc_serial_t ack_serial, acked_serial;
+-	rxrpc_seq_t first_soft_ack, hard_ack, prev_pkt;
++	rxrpc_seq_t first_soft_ack, hard_ack, prev_pkt, since;
+ 	int nr_acks, offset, ioffset;
+ 
+ 	_enter("");
+@@ -789,6 +855,8 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
+ 	prev_pkt = ntohl(ack.previousPacket);
+ 	hard_ack = first_soft_ack - 1;
+ 	nr_acks = ack.nAcks;
++	sp->first_ack = first_soft_ack;
++	sp->nr_acks = nr_acks;
+ 	summary.ack_reason = (ack.reason < RXRPC_ACK__INVALID ?
+ 			      ack.reason : RXRPC_ACK__INVALID);
+ 
+@@ -858,6 +926,16 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
+ 	if (nr_acks > 0)
+ 		skb_condense(skb);
+ 
++	if (call->cong_last_nack) {
++		since = rxrpc_input_check_prev_ack(call, &summary, first_soft_ack);
++		rxrpc_free_skb(call->cong_last_nack, rxrpc_skb_put_last_nack);
++		call->cong_last_nack = NULL;
++	} else {
++		summary.nr_new_acks = first_soft_ack - call->acks_first_seq;
++		call->acks_lowest_nak = first_soft_ack + nr_acks;
++		since = first_soft_ack;
++	}
++
+ 	call->acks_latest_ts = skb->tstamp;
+ 	call->acks_first_seq = first_soft_ack;
+ 	call->acks_prev_seq = prev_pkt;
+@@ -866,7 +944,7 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
+ 	case RXRPC_ACK_PING:
+ 		break;
+ 	default:
+-		if (after(acked_serial, call->acks_highest_serial))
++		if (acked_serial && after(acked_serial, call->acks_highest_serial))
+ 			call->acks_highest_serial = acked_serial;
+ 		break;
+ 	}
+@@ -905,8 +983,9 @@ static void rxrpc_input_ack(struct rxrpc_call *call, struct sk_buff *skb)
+ 	if (nr_acks > 0) {
+ 		if (offset > (int)skb->len - nr_acks)
+ 			return rxrpc_proto_abort(call, 0, rxrpc_eproto_ackr_short_sack);
+-		rxrpc_input_soft_acks(call, skb->data + offset, first_soft_ack,
+-				      nr_acks, &summary);
++		rxrpc_input_soft_acks(call, &summary, skb, first_soft_ack, since);
++		rxrpc_get_skb(skb, rxrpc_skb_get_last_nack);
++		call->cong_last_nack = skb;
+ 	}
+ 
+ 	if (test_bit(RXRPC_CALL_TX_LAST, &call->flags) &&
 
--- 
-	Ansuel
 
