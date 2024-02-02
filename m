@@ -1,115 +1,127 @@
-Return-Path: <netdev+bounces-68311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C8BD846882
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 07:49:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B60B184688A
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 07:53:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 221642870DE
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 06:49:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2C0ED1F25F9F
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 06:53:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4215617748;
-	Fri,  2 Feb 2024 06:49:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAA2D4C60;
+	Fri,  2 Feb 2024 06:53:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="t9BJDGgW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K//hfUV7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAB81F4EA;
-	Fri,  2 Feb 2024 06:49:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 223C01774E
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 06:53:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706856569; cv=none; b=tIrQG2U7xAZg0OqfFXBz/O3/xVWZ+Hv/b4snhuoUys64tG4ca79BJoTeTJWXpCxAZ8B82lNCDYZA49z841LJRRmlkiBmg8O8oxW1W2IEY1qXQlcyNu0HchrWs8ZfET/KL1wYNomRrzYv3wGFNoAPwxyk9A7RdmDXlQNHuHoi39c=
+	t=1706856820; cv=none; b=DJTY+T5hGg3y0lI1zVEAEQl7CgX6/kaygF6xM91TOUAXQdHiYkacK7Gm+lzPuF5fpBslT830tPloipvvU64jo07G2okfcD1xrqpRGdk1E4qzDaw6xKYjhT86Pd9WPCHZfj4Z9qDKbLx54nEMX14wXsYTDoUGsWvfPX0mQvH8QYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706856569; c=relaxed/simple;
-	bh=psDefbg/kF79ASsUkMz1eS3sAKLVErIE1EEhmYhufuA=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ZYdWNvzqdL6za9U7CpSqhBrRw+famd8de4iPEyu0MUjVaPRRdx2s39eTwaTs1vt7M69vwbAIkrwTRCOyCAyqvvL+7PchYMy8G9h+7MnfI1wSN/lQmLPAVMhIXQRf2MmXlehbzoeZc31wqrjtnB/CKnK5ecKBmlRzw+2tG8yAoFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=t9BJDGgW; arc=none smtp.client-ip=212.227.15.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1706856523; x=1707461323; i=markus.elfring@web.de;
-	bh=psDefbg/kF79ASsUkMz1eS3sAKLVErIE1EEhmYhufuA=;
-	h=X-UI-Sender-Class:Date:Subject:From:To:Cc:References:
-	 In-Reply-To;
-	b=t9BJDGgWqQZpeFoMDHQfgB/19gTb7Ka7GBGci1F4B4+NY0oCAUhbFu02S9quGB5N
-	 VU56dTABaPIQQfnCpIPZ2xsAkuqmbvmbHSTnLTpTNXWSgVpHmhp/QnnS0BlfchARv
-	 UEmsAwZy8R4tZV4nx9y2NcVxPou+Idt+UdDQx9I/6VnXFYpr+5Mxacst8hQjNZlhC
-	 xOYkBeOHfPkCKtBELx5vHDtPz0dZBS4sgoLMT6l340L/rT4xByQwgRhUb8f1ytgoS
-	 LB/q9otFpW/Y5UeYEjtg23XWUnMuzlsJKseh7QNZ2Rq/FGhdDKb1Azk2VgRAogEiC
-	 3bmO5CqVGOqpNgkldg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.81.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MhFhe-1qsazJ31Zi-00ea4g; Fri, 02
- Feb 2024 07:48:43 +0100
-Message-ID: <daf2172a-8d54-4097-acf3-cc539fe281e5@web.de>
-Date: Fri, 2 Feb 2024 07:48:12 +0100
+	s=arc-20240116; t=1706856820; c=relaxed/simple;
+	bh=ytxKKoH6m1FpvOOP2xrdqPW7rQRGcgbpp2Hofo4i82g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Yqp+0yWHk0lNPcngAoTQqI9N38j+KGTi89Mcio9FTpP/ORJNOAiKq1+ItIj1G1UA3QU6p/W7/GnW39ZITptyGvZiHXvBuI95+BgBOfQYq2hRqOy/WyR8j6si9qMaz6ou8+GBb3tOgOUiXllIon4H7EUSkoDmHOnF4t8fbgX6Wd0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K//hfUV7; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-55790581457so2541634a12.3
+        for <netdev@vger.kernel.org>; Thu, 01 Feb 2024 22:53:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706856817; x=1707461617; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yAf503YgteKPE3E8ZXGS7zG1wXVaCsQDoyqCH3wVqBs=;
+        b=K//hfUV7L3OuEEq06wGJrsqirsHMUzF14fy0sQKvfW5Sam+lqZ3La3kkKE9agDoBGb
+         IezXRC5h8hwgq6frCr1/6Ymql59WN/jj3kqxnPp+OYF4Gx43oQYFqCaF1H3VY6MCW1Mt
+         GWqpZXpQnX3/KWxJpkLOBJjfjBOtdg/w6XrzaNlddwsAeuBgVzbt93m4gYfSfJnfXBiS
+         cn9rPttizmM3QmBOzdT/+cZNcGXSTBgg+bTHG90hj9SCapMF5D/3km5N8KH4ipYdoHBl
+         2P2nWNqa24IB3SUMdPwyCNrMzEu3u5der9+MqqoNwt3u4Arf2913BRliYvU2o5I0aTlX
+         pOBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706856817; x=1707461617;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yAf503YgteKPE3E8ZXGS7zG1wXVaCsQDoyqCH3wVqBs=;
+        b=CsOVjKN6SNvSl8A9fAnX2SQBjtmDnjL+SAyWm+YQtRu0C3vqaOVtjZb1JVglLoxLBB
+         K8VC29FY1S2OdRzEMiMLkF7LeCN/YrXMVyZGU0cOIVbffY6MxLgx8Tq0J17ROwVm8ENg
+         GiFR/HnJ8FlFkd5TAmGbHYF3hZ54uZIyZAQRPHiHKZhiUNULrenayzi4JHi9RD9zTe8i
+         2ZXCAt6HC7wAr/8JFvNOhRDJujkrSdpsP6D/IgDuzZHX5Q8JFvvsFMzyq3EHUvGWkALA
+         itDVTJILxpyqi1lK51955HRi2TflSo/fUmF2zG5DdkCVwVFSc8Bm78ygrM6mGmyBGxl/
+         j/Yg==
+X-Gm-Message-State: AOJu0YwWrrrxn9b2S2csfPZBLHzh+Q4DrGIYEt8c79CzYhx8Lm0G6wT/
+	LM4xN+A46xn+SA65cgBuS1lb7Ne7VKLAytvYbraptLx+n6rrGERagR4XJnXiu+rWN4qdqE4fmCT
+	AEWwD74p/AtNiLEXLk0/aXIsg9sftEBvd5GhMGw==
+X-Google-Smtp-Source: AGHT+IFSnJi2norEH5W/UpLjlPsSq2FcH7Nrf5O3rTb2MutI1ES6hpawvaZT7z+uaATyDRcDLlC4fFluOy1XAaFM9PY=
+X-Received: by 2002:a05:6402:164e:b0:55f:a1af:a1eb with SMTP id
+ s14-20020a056402164e00b0055fa1afa1ebmr662798edx.23.1706856817038; Thu, 01 Feb
+ 2024 22:53:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC] perf: Reconsider an error code selection in
- bpf_map__fprintf()
-From: Markus Elfring <Markus.Elfring@web.de>
-To: linux-perf-users@vger.kernel.org, kernel-janitors@vger.kernel.org,
- Adrian Hunter <adrian.hunter@intel.com>,
- Alexander Shishkin <alexander.shishkin@linux.intel.com>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Arnaldo Carvalho de Melo <acme@kernel.org>, Christy Lee <christylee@fb.com>,
- Daniel Borkmann <daniel@iogearbox.net>, Ian Rogers <irogers@google.com>,
- Ingo Molnar <mingo@redhat.com>, Jiri Olsa <jolsa@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Mark Rutland <mark.rutland@arm.com>, Martin KaFai Lau <kafai@fb.com>,
- Namhyung Kim <namhyung@kernel.org>, Peter Zijlstra <peterz@infradead.org>,
- Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>,
- YueHaibing <yuehaibing@huawei.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>
-References: <f15f0df1-92be-4bc9-82a2-1d8fa3275dd7@web.de>
-Content-Language: en-GB
-In-Reply-To: <f15f0df1-92be-4bc9-82a2-1d8fa3275dd7@web.de>
-Content-Type: text/plain; charset=UTF-8
+References: <20240130142521.18593-1-danielj@nvidia.com> <20240130095645-mutt-send-email-mst@kernel.org>
+ <CH0PR12MB85809CB7678CADCC892B2259C97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
+ <20240130104107-mutt-send-email-mst@kernel.org> <CH0PR12MB8580CCF10308B9935810C21DC97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
+ <20240130105246-mutt-send-email-mst@kernel.org> <CH0PR12MB858067B9DB6BCEE10519F957C97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
+ <CAL+tcoCsT6UJ=2zxL-=0n7sQ2vPC5ybnQk9bGhF6PexZN=-29Q@mail.gmail.com> <20240201202106.25d6dc93@kernel.org>
+In-Reply-To: <20240201202106.25d6dc93@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 2 Feb 2024 14:52:59 +0800
+Message-ID: <CAL+tcoCs6x7=rBj50g2cMjwLjLOKs9xy1ZZBwSQs8bLfzm=B7Q@mail.gmail.com>
+Subject: Re: [PATCH net-next] virtio_net: Add TX stop and wake counters
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Daniel Jurgens <danielj@nvidia.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "jasowang@redhat.com" <jasowang@redhat.com>, 
+	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>, 
+	"abeni@redhat.com" <abeni@redhat.com>, Parav Pandit <parav@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:guMMD0U0owRRTK/o4x0F68hE8U9JJPElbEE4i3GuJqzHWW1R2HT
- sH0Z4EGWRndq02j10zfeOmlFsuMWcTocY01WQzj55IfTx2GEaofd0UiNkmU5Hp8wE3DRUxA
- 66EGuYd+WeO0W1n9MgablveKN3xDoAC58LZZzpDfV0+2DysblxvSm6H00vhzfZDimtVJV/z
- CwSuyAopcmm7tc3oD4wnQ==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:tyHFUlgJYw0=;dgrK/DspkpssIY/mInw6RaOj8L8
- zzTf2dKbygFIyNv1oeJDdblOrP8EvVmHFVb/iQ+pEefr1xabU/7uEb27OtwF4VSNs0vLi2jk8
- obLgtu7m3UCnrc9+Pluirh/Qin4j2TrTt/FlgXhWLcI0M2dmQaryGHZDcJJ59zolxXk3XTQuc
- bo1oBNAXbwcsXCjQ/RUburT/XB972gvl5v/EnKYR/mNlRc9OrQibc3bMp/CgbHKTtCx23hrs0
- E41dZKGXOjSL+RRFEVYGGe5HrWQzlzEtolFjP+aNR+1B/Zfi4kqdPENTbdJ3XHTqnSOvwpva3
- vZGUOCLhRj5wE80z2Jxhhzf6LRzDB7apmxyv+D6NphmrNUYLjPGcivWh1IlVPH1dYMsBsoBQ2
- SSO2KXlKVqKk1UEQP4wX6sU/cyKVHdapsY7Ljl71uyV4puxHx7l0nVSRJJilMkXs2iPvW89vX
- xg/r6zE2uX72n2+jmgHyrlaG2vgHfbwY8v5cytJQ2Df7TvHNgB94TRFDfp54mpkapKdEhg2ZA
- fhJ0JRzs4maXDk2sHPSNVx4by61OKVSGIRBPXA5aHTLxBCllAa2GGw5BQjEbYs6tmb4xVkGJK
- ISu3URZrlraZX+kFLKoSiovCKbEeYsSXkJNbLMkYrrFr+srhnT3IvD5ZW06zzXNQjmwctMc0t
- LoZdb9BY6Kw0C3nygGghSdp56duAB/QATwqfnxIVW9Nx7eYebs2h8pKTJnTMT+uMH8h7k11Eh
- a6Xx2JU42qVyh8Ornsp2Q13xHM0+huJJE98UY0cruVDOT/VG6RBjXVm0+IsMRSRorXAK7Wci7
- lQ7yquTHQffUVxsPE8zuRXAwbLnwE8zF0Xd44K6SiYsYg=
 
-> A null pointer check is performed for the input parameter =E2=80=9Cmap=
-=E2=80=9D.
-> It looks suspicious that the function =E2=80=9CPTR_ERR=E2=80=9D is appli=
-ed then for
-> a corresponding return statement.
+On Fri, Feb 2, 2024 at 12:21=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Wed, 31 Jan 2024 10:54:33 +0800 Jason Xing wrote:
+> > > [danielj@sw-mtx-051 upstream]$ ethtool -S ens2f1np1 | grep 'stop\|wak=
+e'
+> > >      tx_queue_stopped: 0
+> > >      tx_queue_wake: 0
+> > >      tx0_stopped: 0
+> > >      tx0_wake: 0
+> > >      ....
+> >
+> > Yes, that's it! What I know is that only mlx drivers have those two
+> > counters, but they are very useful when debugging some issues or
+> > tracking some historical changes if we want to.
+>
+> Can you say more? I'm curious what's your use case.
 
-Are contributions also by YueHaibing still waiting on further development =
-considerations?
+I'm not working at Nvidia, so my point of view may differ from theirs.
+From what I can tell is that those two counters help me narrow down
+the range if I have to diagnose/debug some issues.
+1) I sometimes notice that if some irq is held too long (say, one
+simple case: output of printk printed to the console), those two
+counters can reflect the issue.
+2) Similarly in virtio net, recently I traced such counters the
+current kernel does not have and it turned out that one of the output
+queues in the backend behaves badly.
+...
 
-[PATCH -next] perf: Fix pass 0 to PTR_ERR
-https://lore.kernel.org/lkml/20220611040719.8160-1-yuehaibing@huawei.com/
-https://lkml.org/lkml/2022/6/11/3
+Stop/wake queue counters may not show directly the root cause of the
+issue, but help us 'guess' to some extent.
 
-
-Regards,
-Markus
+Thanks,
+Jason
 
