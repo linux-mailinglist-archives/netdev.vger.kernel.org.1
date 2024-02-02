@@ -1,59 +1,83 @@
-Return-Path: <netdev+bounces-68459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6442B846F74
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:52:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EF6A846F76
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 12:52:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 511C6B248E0
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:52:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE844293E9D
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 11:52:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE3113E23A;
-	Fri,  2 Feb 2024 11:52:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF1851386C4;
+	Fri,  2 Feb 2024 11:52:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="piMwGDYf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KUBZEB3g"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CFCD13E22B;
-	Fri,  2 Feb 2024 11:52:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A81137C41
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 11:52:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706874725; cv=none; b=D0SwyceiLLVztUvGRZ560LvvW/KsoqRF2VBO+n0AxZTdXT+IMkyoi9RXLsWgLm51wjclFz+wOyR/gz2l2SF5k37fjaz6CSlY3SUFRszfw+NiYScZAY8DLtlAoYE22Xfdq/Ha7N/xVp4R+ixC3jaFlZL7jJyFuLvNGrIbNw68T8s=
+	t=1706874739; cv=none; b=EdWGrRVGZvmAF/FSc5kWTS6pl4IO/LLDCXITT83eZHvbQPqzVCKBXzuDAuWjJVJzL6HsvVeWM7PlPYY0U9QbCExSZjpqTK+JdGh501uhwfFRTEE4u/V6dKL9PVKANPLTk79tY6l/d2+9e0EDE8pIb9Fkook3d74cKcjme3SZBGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706874725; c=relaxed/simple;
-	bh=rfyC29dgn3AiLpQ41hkAc/jedTFSLQEOT9DvwX/eNqQ=;
+	s=arc-20240116; t=1706874739; c=relaxed/simple;
+	bh=5wnwSiLLu0b6qjxFN8dviNlFoEwroi5Al15bdFtZJsY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QxFs3jzPBRa+8V+i5i8AJJewk/aA/gnBA1sj9aiDFWeGW+ApsSHdDLkEsq24016Q2J/nVEPmDUhCQ+9Jlsp7ck2mjAHajReRqfmlRbZi3+tuW97RCYKaZhfcAnMeDvYJjM5EBe/yEMdKZpRGNgh+HLok/iFfWaNW9KU14gvMRd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=piMwGDYf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48BEFC433F1;
-	Fri,  2 Feb 2024 11:52:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706874724;
-	bh=rfyC29dgn3AiLpQ41hkAc/jedTFSLQEOT9DvwX/eNqQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=piMwGDYfY8riUgZvSlUZHlFnPQhiCq3/y1vxq6ljys8VCbR/su/RVtW3XTn3Eji5x
-	 njG/qNNi0jHeciTV8VRKowmKRPDprAUXpT2YhbQ6srgi3csNfD9mVs3Jg3f/01WEMg
-	 qgGBs9eFwGPixk3SdGKlKEJnV+toWBTL52QwAxTggzX0FlfdqgZFfGBMenHi49ofEj
-	 4BKCjYem3Ino1QtJpkr3ev9sIAxU1/Z80o6k0gLRKxklRjXQb/LBHX8OUKVH+9pvcK
-	 tuhl24r6hMDFnSuVNu475MxbGHJ3DwhvL66TA0LqtEKUbit5QSMS3CdgEmdvTu9hWQ
-	 vlbO3AjdTkHjQ==
-Date: Fri, 2 Feb 2024 12:51:51 +0100
-From: Simon Horman <horms@kernel.org>
-To: Matthew Wood <thepacketgeek@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	leitao@debian.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 5/8] net: netconsole: add a userdata
- config_group member to netconsole_target
-Message-ID: <20240202115151.GL530335@kernel.org>
-References: <20240126231348.281600-1-thepacketgeek@gmail.com>
- <20240126231348.281600-6-thepacketgeek@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ShNnvzsjZCX6yp98KuyvPmkJN6zOzXzDRL7SWXatZDkTcXFVOMb5uqjyD9HW0P5wMk1sgZQxPp+RECV3HP8kvFG6zIkYE2a8sUyJtOy3rkK1LIo7gV/PNOGkeN4Qip7p1SCti/6VJmIDkgZ2yPPbHVy8SIl5p6B3QkZL+grKTWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KUBZEB3g; arc=none smtp.client-ip=209.85.215.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-5d81b08d6f2so1687357a12.0
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 03:52:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706874737; x=1707479537; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ITvVa55mQEnNJu8CgrUE3gCVzEHWWZsHqL/+c7zzmq0=;
+        b=KUBZEB3gqbmt0YuYKqUsA7YMx+/orhPrqhavXYOV0JdXQa27RhFYR1CgOePvnCFj2E
+         PZ5N5NEHhIbsh+47e5FuQxkVPLL9JOazKZjTfNWlAEvk2/TjjZ9IaKgnc9iNAb7yXcko
+         8azvLXul/H/6AI1wbfDdVyU+cBOfJkOe0Of/UB/yjJMfq56XjWvdE0ZbHdf6k2iiyhuv
+         LcEytrlH2N6/DznXtsb4Y+6zqcWar/pB+tg1dq1x299Qop22uYfZ7SM2yZBlcF2AjnHp
+         D+2QMzCAUxMKcMzMUqhCYUof4g/4KXF2OmplzakU+JPimnGpmItqfO8Xqz+25EthsTsJ
+         8gAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706874737; x=1707479537;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ITvVa55mQEnNJu8CgrUE3gCVzEHWWZsHqL/+c7zzmq0=;
+        b=Lt6FlGJ8iCCLgtJMTT5YjytjarZ8bEVYLP3kaHa5SrQBAMaLMpkxnRvCPF4Co0APIC
+         DiN3oE1ZYk4sLfgF/g0Du5t7hB/Rdvpx+IJ8Tb6X9+s3+YeXuLSweUiNomolIpd69kXh
+         j7YeR5YAKsoUk1iR4RGb5UbeI78A5L2zHVbws+jGAk5x1sVnNQJc3wJl0R8YJ6WFcMsB
+         RmYT+AojlvdcRibKvPf4N57pvVOhCsegUUs5kjFZoVjsABNgOt0Xn3aAmiQId2VFYs9q
+         4PyyR4LKBR7xep98bWkeWbwqEiAoEwPPyXCDXfPg4HO+rdWVlgj+LTXtzU7+6sXri1Kp
+         I/vQ==
+X-Gm-Message-State: AOJu0YzOsjwjH8mdCLb09RU5Kzqur6NcgZ0CVuTTGH/fqRyx9yC/mZ3B
+	s6lqGXY7sqBjZX3iWOdgCGhTrx/iDhIjYWibnXIvON5lADUTN9NH
+X-Google-Smtp-Source: AGHT+IHlMNo6fUMh25e9Y8Vvzt7iY5hoFBCaUc1nka2NnAUc3ndqbmi2NJWgMWU6+QH5k/LFzD4k+g==
+X-Received: by 2002:a05:6a20:c526:b0:19c:74d1:b314 with SMTP id gm38-20020a056a20c52600b0019c74d1b314mr4224154pzb.17.1706874737541;
+        Fri, 02 Feb 2024 03:52:17 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUY6fznHSruX7Oj6EeMC1LSZhc5cifz8Ao4O69AB+WH2zQ/Ww/TJTG6KD9v5VJpGvqlCaxljHOWX9pscNvkqCzFSeVZ53EM/T+0CYOu7k28vwYCSP5OIb6a9LZYZ7w9f+CABb9YCSh6cTNBNdYVvPyt0i7jwnDZAbqdbl7lii2N6QaWoU3j5IcTh/Tw1N84WuECiZD2KBoT7X2kPoOMJ59d+SaZD5W+yA6ZjNslgcU46w8+ERpTj6YGtZJomPsSy7vWLsEvgJAcaOYn0qoq59so3novG9rSRZ10U37Arheqx+Fyl2EoitrcowQ25Zz29qAxgfw=
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 20-20020a631554000000b005d8be4c125csm1399474pgv.80.2024.02.02.03.52.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 02 Feb 2024 03:52:16 -0800 (PST)
+Date: Fri, 2 Feb 2024 19:52:11 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: thinker.li@gmail.com
+Cc: netdev@vger.kernel.org, ast@kernel.org, martin.lau@linux.dev,
+	kernel-team@meta.com, davem@davemloft.net, dsahern@kernel.org,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	sinquersw@gmail.com, kuifeng@meta.com
+Subject: Re: [PATCH net-next v3 1/5] net/ipv6: set expires in
+ rt6_add_dflt_router().
+Message-ID: <ZbzXa3ECxEBdjOJu@Laptop-X1>
+References: <20240202082200.227031-1-thinker.li@gmail.com>
+ <20240202082200.227031-2-thinker.li@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,76 +86,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240126231348.281600-6-thepacketgeek@gmail.com>
+In-Reply-To: <20240202082200.227031-2-thinker.li@gmail.com>
 
-On Fri, Jan 26, 2024 at 03:13:40PM -0800, Matthew Wood wrote:
-> Create configfs machinery for netconsole userdata appending, which depends
-> on CONFIG_NETCONSOLE_DYNAMIC (for configfs interface). Add a userdata
-> config_group to netconsole_target for managing userdata entries as a tree
-> under the netconsole configfs subsystem. Directory names created under the
-> userdata directory become userdatum keys; the userdatum value is the
-> content of the value file.
+On Fri, Feb 02, 2024 at 12:21:56AM -0800, thinker.li@gmail.com wrote:
+> From: Kui-Feng Lee <thinker.li@gmail.com>
 > 
-> Include the minimum-viable-changes for userdata configfs config_group.
-> init_target_config_group() ties in the complete configfs machinery to
-> avoid unused func/variable errors during build. Initializing the
-> netconsole_target->group is moved to init_target_config_group, which
-> will also init and add the userdata config_group.
+> Pass the duration of a lifetime (in seconds) to the function
+> rt6_add_dflt_router() so that it can properly set the expiration time.
 > 
-> Each userdatum entry has a limit of 256 bytes (54 for
-> the key/directory, 200 for the value, and 2 for '=' and '\n'
-> characters), which is enforced by the configfs functions for updating
-> the userdata config_group.
+> The function ndisc_router_discovery() is the only one that calls
+> rt6_add_dflt_router(), and it will later set the expiration time for the
+> route created by rt6_add_dflt_router(). However, there is a gap of time
+> between calling rt6_add_dflt_router() and setting the expiration time in
+> ndisc_router_discovery(). During this period, there is a possibility that a
+> new route may be removed from the routing table. By setting the correct
+> expiration time in rt6_add_dflt_router(), we can prevent this from
+> happening. The reason for setting RTF_EXPIRES in rt6_add_dflt_router() is
+> to start the Garbage Collection (GC) timer, as it only activates when a
+> route with RTF_EXPIRES is added to a table.
 > 
-> When a new netconsole_target is created, initialize the userdata
-> config_group and add it as a default group for netconsole_target
-> config_group, allowing the userdata configfs sub-tree to be presented
-> in the netconsole configfs tree under the userdata directory.
-> 
-> Co-developed-by: Breno Leitao <leitao@debian.org>
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> Signed-off-by: Matthew Wood <thepacketgeek@gmail.com>
-
-Hi Matthew,
-
-some minor feedback from my side, as it looks like there will be another
-revision of this patchset anyway.
-
+> Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
 > ---
->  drivers/net/netconsole.c | 143 +++++++++++++++++++++++++++++++++++++--
->  1 file changed, 139 insertions(+), 4 deletions(-)
+>  include/net/ip6_route.h | 3 ++-
+>  net/ipv6/ndisc.c        | 3 ++-
+>  net/ipv6/route.c        | 4 +++-
+>  3 files changed, 7 insertions(+), 3 deletions(-)
 > 
-> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-
-...
-
-> @@ -596,6 +606,123 @@ static ssize_t remote_mac_store(struct config_item *item, const char *buf,
->  	return -EINVAL;
->  }
+> diff --git a/include/net/ip6_route.h b/include/net/ip6_route.h
+> index 28b065790261..52a51c69aa9d 100644
+> --- a/include/net/ip6_route.h
+> +++ b/include/net/ip6_route.h
+> @@ -170,7 +170,8 @@ struct fib6_info *rt6_get_dflt_router(struct net *net,
+>  struct fib6_info *rt6_add_dflt_router(struct net *net,
+>  				     const struct in6_addr *gwaddr,
+>  				     struct net_device *dev, unsigned int pref,
+> -				     u32 defrtr_usr_metric);
+> +				     u32 defrtr_usr_metric,
+> +				     int lifetime);
 >  
-> +struct userdatum {
-> +	struct config_item item;
-> +	char value[MAX_USERDATA_VALUE_LENGTH];
-> +};
-> +
-> +static inline struct userdatum *to_userdatum(struct config_item *item)
-> +{
-> +	return container_of(item, struct userdatum, item);
-> +}
-
-Please don't use the inline keyword in C files,
-unless there is a demonstrable reason to do so.
-Rather, please let the compiler inline code as is sees fit.
-
-...
-
-> @@ -640,6 +767,14 @@ static const struct config_item_type netconsole_target_type = {
->  	.ct_owner		= THIS_MODULE,
->  };
+>  void rt6_purge_dflt_routers(struct net *net);
 >  
-> +static void init_target_config_group(struct netconsole_target *nt, const char *name)
+> diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+> index a19999b30bc0..a68462668158 100644
+> --- a/net/ipv6/ndisc.c
+> +++ b/net/ipv6/ndisc.c
+> @@ -1382,7 +1382,8 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
+>  			neigh_release(neigh);
+>  
+>  		rt = rt6_add_dflt_router(net, &ipv6_hdr(skb)->saddr,
+> -					 skb->dev, pref, defrtr_usr_metric);
+> +					 skb->dev, pref, defrtr_usr_metric,
+> +					 lifetime);
+>  		if (!rt) {
+>  			ND_PRINTK(0, err,
+>  				  "RA: %s failed to add default route\n",
+> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+> index 63b4c6056582..98abba8f15cd 100644
+> --- a/net/ipv6/route.c
+> +++ b/net/ipv6/route.c
+> @@ -4355,7 +4355,8 @@ struct fib6_info *rt6_add_dflt_router(struct net *net,
+>  				     const struct in6_addr *gwaddr,
+>  				     struct net_device *dev,
+>  				     unsigned int pref,
+> -				     u32 defrtr_usr_metric)
+> +				     u32 defrtr_usr_metric,
+> +				     int lifetime)
+>  {
+>  	struct fib6_config cfg = {
+>  		.fc_table	= l3mdev_fib_table(dev) ? : RT6_TABLE_DFLT,
+> @@ -4368,6 +4369,7 @@ struct fib6_info *rt6_add_dflt_router(struct net *net,
+>  		.fc_nlinfo.portid = 0,
+>  		.fc_nlinfo.nlh = NULL,
+>  		.fc_nlinfo.nl_net = net,
+> +		.fc_expires = jiffies_to_clock_t(lifetime * HZ),
+>  	};
+>  
+>  	cfg.fc_gateway = *gwaddr;
+> -- 
+> 2.34.1
+> 
 
-nit: Networking still prefers code to be 80 columns wide or less.
-
-...
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
