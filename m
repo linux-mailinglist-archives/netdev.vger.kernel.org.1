@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-68379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 023D8846C2C
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 10:36:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED7D4846C33
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 10:37:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 684541F27FC9
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:36:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D7161C246FF
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 09:37:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0BE27CF27;
-	Fri,  2 Feb 2024 09:34:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE2567E787;
+	Fri,  2 Feb 2024 09:34:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="tp+k/0ig"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="MOfTxRYF"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CFB57869A
-	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 09:34:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC8D79946
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 09:34:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706866465; cv=none; b=dGQx1abIrWvZBsT/LfM7SPkNhCl1LZBunm9pDuAMuNbaYugFuKqStMdxu2ebMu5pkSitihxWzrBHStoYs+HWz8egJgZCYliwq++rQUtj7WQUu3H7UKZnrtyDbvfVDB8IhHpzgI+PkC79hkBIU0aTnERfPky5BXbO0AjJ9sNtE9c=
+	t=1706866473; cv=none; b=rru1fuP+ifqVaiYjo15O2qQ4V8RTpgZfNjRw05tzFzG7kpdGEKbJFLD0WzKNHWc1g7Q96yfh6HmfmFf7Rf932Ohdph2YI2xECfwK+on+Sn6qifyIEc2s6mcT69rZYK6oeyqliC3yzQNGz5+xr4UIB5tVnpSOOoPOpPYKri3mJzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706866465; c=relaxed/simple;
-	bh=vHubZa8qymzdl18u3WJkx8jDGv54QU47mdTZxtb5O9k=;
+	s=arc-20240116; t=1706866473; c=relaxed/simple;
+	bh=6l//lPVP6+L1nSDqxYzbJV7+b2Nj3c6XsEsnnOVkbHU=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=SCW03PfgD2FPXwZTwld6cZ2WqgN39uJ6IC/y17Xg0+LEHMp8fAcm95uWDR0H//jSuCxu2pmWAI9eQaY1j7MVushLq12fwzUofaNVdXhUdkRAOvsKNJlnY9ttH+ZPdEPLJfng5nC2lG09FYbNz3AvXYCR0/tVP+leORgE/o5a0hM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=tp+k/0ig; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=qr61PSFK+NsnznGU4dlkIwxVkogHv5p5TqURxYmvDlZY0ONCiblJTICPXpRFpxfIArCA2BHRjB1xoD9JvXyCSD3QAM+ZiU4rm5vNj1zVXZGYcTv9td4eSQmJJI2ZI6mfzLuftopXWGdKu6LkYZRWd2DXTii3yQU3XW2CDZ/TwCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=MOfTxRYF; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=RYigqvKp+xajIPmg+6RK+NoYme7EmhQ5CBgPRCDS1Po=; b=tp+k/0igR/CtGrHFnPuhenukta
-	3JwYDgctuTSy+Y4WfYNxeQN9xgsNDd2unYkHiR+jvxGLnYpYZ/zz4pFWrx/z2ycQjq4xgkgKPBUZO
-	j5fIpL0/URZHermmyuREWU8/brcSdrOuMHZtxleb8eDxQ0tj77tyFMMP0KIU+Lw8nwRysbyoi64Tr
-	yK7IOSz3pjaQszcGygOsl7BBQMj527XYKlmaAzYjf26GLZ+DevIFU2rqw58B07E91tk/mzRAx3UYa
-	D1R4ultGUc6wcm8PFZCoD6FZqnxzGKgPJBmzVUV05kFDOWP+C1yw2bX371ibxw0AZFKSURcb+2RT3
-	OaesoQzw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:54184 helo=rmk-PC.armlinux.org.uk)
+	bh=vf7BGNl9i42pdxz8Gl6B1J2fWwi9YHL54zIOUUkQn3A=; b=MOfTxRYFoSRiWJObPmMTl7GlQK
+	qYxjPpPDJS/Z9J2jScs4o5Z3IHEJuC74nVyreC6jomiZMDGhTF4ZlliEGll/dI3oCB4u5l2wT6AqY
+	UwsU/y/Wh0C0I+gevrg5/lmLH0ffrXGHnnDjxgODAegyQUulG7YZi9zEMsWx3VaDzONEXhLs5M0N9
+	qrGK37CxUb1hk7bodP4OjJ0CYp2i+NROytIkKAOeQy8jySwdcZVgA3hUJCmmyO92vMWyJ8NR3U7jz
+	IoOjzfsXzU8mnzRaa8xW5lSNEA73DqGRPatHBlo+yQlFz/K7fnPE01yxeVcJ7dl5q+Tk8r6rVWNpz
+	uFUfArtQ==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:38142 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1rVpvs-0005jA-2T;
-	Fri, 02 Feb 2024 09:34:00 +0000
+	id 1rVpvw-0005jK-1m;
+	Fri, 02 Feb 2024 09:34:04 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1rVpvm-002Pe0-TV; Fri, 02 Feb 2024 09:33:54 +0000
+	id 1rVpvs-002Pe6-1w; Fri, 02 Feb 2024 09:34:00 +0000
 In-Reply-To: <Zby24IKSgzpvRDNF@shell.armlinux.org.uk>
 References: <Zby24IKSgzpvRDNF@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -78,8 +78,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Shenwei Wang <shenwei.wang@nxp.com>,
 	Vladimir Oltean <olteanv@gmail.com>,
 	Wei Fang <wei.fang@nxp.com>
-Subject: [PATCH net-next 3/6] net: fec: remove eee_enabled/eee_active in
- fec_enet_get_eee()
+Subject: [PATCH net-next 4/6] net: bcmgenet: remove eee_enabled/eee_active in
+ bcmgenet_get_eee()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,11 +89,11 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1rVpvm-002Pe0-TV@rmk-PC.armlinux.org.uk>
+Message-Id: <E1rVpvs-002Pe6-1w@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 02 Feb 2024 09:33:54 +0000
+Date: Fri, 02 Feb 2024 09:34:00 +0000
 
-fec_enet_get_eee() sets edata->eee_active and edata->eee_enabled from
+bcmgenet_get_eee() sets edata->eee_active and edata->eee_enabled from
 its own copy, and then calls phy_ethtool_get_eee() which in turn will
 call genphy_c45_ethtool_get_eee().
 
@@ -101,35 +101,80 @@ genphy_c45_ethtool_get_eee() will overwrite eee_enabled and eee_active
 with its own interpretation from the PHYs settings and negotiation
 result.
 
-Therefore, setting these members in fec_enet_get_eee() is redundant.
-Remove this, and remove the setting of fep->eee.eee_active member which
-becomes a write-only variable.
+Therefore, setting these members in bcmgenet_get_eee() is redundant,
+and can be removed. This also makes priv->eee.eee_active unnecessary,
+so remove this and use a local variable where appropriate.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/freescale/fec_main.c | 3 ---
- 1 file changed, 3 deletions(-)
+ drivers/net/ethernet/broadcom/genet/bcmgenet.c | 8 +++-----
+ drivers/net/ethernet/broadcom/genet/bcmmii.c   | 5 +++--
+ 2 files changed, 6 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index 63707e065141..38dcf0989e3f 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -3140,7 +3140,6 @@ static int fec_enet_eee_mode_set(struct net_device *ndev, bool enable)
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+index 051c31fb17c2..7396e2823e32 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
++++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+@@ -1313,7 +1313,6 @@ void bcmgenet_eee_enable_set(struct net_device *dev, bool enable,
+ 	}
  
- 	p->tx_lpi_enabled = enable;
- 	p->eee_enabled = enable;
--	p->eee_active = enable;
+ 	priv->eee.eee_enabled = enable;
+-	priv->eee.eee_active = enable;
+ 	priv->eee.tx_lpi_enabled = tx_lpi_enabled;
+ }
  
- 	writel(sleep_cycle, fep->hwp + FEC_LPI_SLEEP);
- 	writel(wake_cycle, fep->hwp + FEC_LPI_WAKE);
-@@ -3160,8 +3159,6 @@ fec_enet_get_eee(struct net_device *ndev, struct ethtool_keee *edata)
- 	if (!netif_running(ndev))
- 		return -ENETDOWN;
+@@ -1328,8 +1327,6 @@ static int bcmgenet_get_eee(struct net_device *dev, struct ethtool_keee *e)
+ 	if (!dev->phydev)
+ 		return -ENODEV;
  
--	edata->eee_enabled = p->eee_enabled;
--	edata->eee_active = p->eee_active;
- 	edata->tx_lpi_timer = p->tx_lpi_timer;
- 	edata->tx_lpi_enabled = p->tx_lpi_enabled;
+-	e->eee_enabled = p->eee_enabled;
+-	e->eee_active = p->eee_active;
+ 	e->tx_lpi_enabled = p->tx_lpi_enabled;
+ 	e->tx_lpi_timer = bcmgenet_umac_readl(priv, UMAC_EEE_LPI_TIMER);
+ 
+@@ -1340,6 +1337,7 @@ static int bcmgenet_set_eee(struct net_device *dev, struct ethtool_keee *e)
+ {
+ 	struct bcmgenet_priv *priv = netdev_priv(dev);
+ 	struct ethtool_keee *p = &priv->eee;
++	bool active;
+ 
+ 	if (GENET_IS_V1(priv))
+ 		return -EOPNOTSUPP;
+@@ -1352,9 +1350,9 @@ static int bcmgenet_set_eee(struct net_device *dev, struct ethtool_keee *e)
+ 	if (!p->eee_enabled) {
+ 		bcmgenet_eee_enable_set(dev, false, false);
+ 	} else {
+-		p->eee_active = phy_init_eee(dev->phydev, false) >= 0;
++		active = phy_init_eee(dev->phydev, false) >= 0;
+ 		bcmgenet_umac_writel(priv, e->tx_lpi_timer, UMAC_EEE_LPI_TIMER);
+-		bcmgenet_eee_enable_set(dev, p->eee_active, e->tx_lpi_enabled);
++		bcmgenet_eee_enable_set(dev, active, e->tx_lpi_enabled);
+ 	}
+ 
+ 	return phy_ethtool_set_eee(dev->phydev, e);
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmmii.c b/drivers/net/ethernet/broadcom/genet/bcmmii.c
+index 97ea76d443ab..cbbe004621bc 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmmii.c
++++ b/drivers/net/ethernet/broadcom/genet/bcmmii.c
+@@ -30,6 +30,7 @@ static void bcmgenet_mac_config(struct net_device *dev)
+ 	struct bcmgenet_priv *priv = netdev_priv(dev);
+ 	struct phy_device *phydev = dev->phydev;
+ 	u32 reg, cmd_bits = 0;
++	bool active;
+ 
+ 	/* speed */
+ 	if (phydev->speed == SPEED_1000)
+@@ -88,9 +89,9 @@ static void bcmgenet_mac_config(struct net_device *dev)
+ 	}
+ 	bcmgenet_umac_writel(priv, reg, UMAC_CMD);
+ 
+-	priv->eee.eee_active = phy_init_eee(phydev, 0) >= 0;
++	active = phy_init_eee(phydev, 0) >= 0;
+ 	bcmgenet_eee_enable_set(dev,
+-				priv->eee.eee_enabled && priv->eee.eee_active,
++				priv->eee.eee_enabled && active,
+ 				priv->eee.tx_lpi_enabled);
+ }
  
 -- 
 2.30.2
