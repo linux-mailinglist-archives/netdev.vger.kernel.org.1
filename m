@@ -1,110 +1,173 @@
-Return-Path: <netdev+bounces-68570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A7B984741B
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:07:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23F32847429
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 17:08:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CAAEB2975C
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:07:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E3C4B299DB
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 16:08:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30AD514900A;
-	Fri,  2 Feb 2024 16:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96F4714A09F;
+	Fri,  2 Feb 2024 16:05:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bpLXpxDw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kfMwjSao"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AC84149007;
-	Fri,  2 Feb 2024 16:01:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFE2E14A096;
+	Fri,  2 Feb 2024 16:05:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706889688; cv=none; b=cjpFB4mCUqIU3vptIJpdw5ChFxmUB0TrEGirGwLoG7P+40ekMgdix9QRT8BsluuX/FlyRRiu64PHAmaPgiMNhvqBGc5q10vnFAmspluhJCz2PicaSNxODXopBtDwVIQZz0h8ZPo6disqBc2vSznKif7TqKivVRda/ixAz28InDM=
+	t=1706889922; cv=none; b=fgQ7LgeJAVYKVX+/udC7eChjh7HkJPiZm0qye+UFvJNlMQLIMHoEvQgurq8K83rpCv75qVUrhgaf23MV1Tsf1c4GWhcBl4tFIQalb+IkC4QjHdx5NKloGDu3u9xH5de6s6RpsEOyKcem5VRH08LUve+yjlRmPTlG3eTNDH4/lXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706889688; c=relaxed/simple;
-	bh=eoBN1Wb1GGsJI8q71EDc3lzyPtxim3bTNPH5cqQ7Kmo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nYXqqrBVOMJXbmtXyaNUY+7Whm5ztU841f9OZp4xl3vP/CLttzcp9hKLv1MnvBnbGSPFey9LyxdxKCnxWbhNW72yK1w5swOlQRNrhZ8QVdHSbh5wYsMlifRntKZd9HnaFaSJ67fjQzDgoOryoKHggsryLZgz58mTZjlGRBTkcoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bpLXpxDw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F731C433F1;
-	Fri,  2 Feb 2024 16:01:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706889687;
-	bh=eoBN1Wb1GGsJI8q71EDc3lzyPtxim3bTNPH5cqQ7Kmo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bpLXpxDwW5hYNz7LABf+rzr7A4J1YM78JAx7+QG5qQZauGWSoYqz6/mYyznNatHwV
-	 q2WdIR5oCqIT+fpytq5X4WIIJ83L7oJVdVjALoVAN9P0n/onuPRK5an+t9+vR5Tfao
-	 1RPGRX16HCChd+cDKh1KZqwBtQRQXGExG97nLQLsiS43wVfLT4u2fI+v3I1nciqGbE
-	 Y+rD1gEUA7AnuGpu2onoCnv9N3DmpeyXo8VdE3EbnmuZKcWHU04MB1iV2kzeNxM8RH
-	 YeYgokNLO9DuzgMqXj5D+KIp0BnovXofiVo/h84yoHEPh5FxHV3SbymkYhNX4E2AXw
-	 It0bpCwV/1Caw==
-Date: Fri, 2 Feb 2024 08:01:26 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Xing <kerneljasonxing@gmail.com>, Daniel Jurgens
- <danielj@nvidia.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "jasowang@redhat.com" <jasowang@redhat.com>,
- "xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
- "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
- "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
- <edumazet@google.com>, "abeni@redhat.com" <abeni@redhat.com>, Parav Pandit
- <parav@nvidia.com>
-Subject: Re: [PATCH net-next] virtio_net: Add TX stop and wake counters
-Message-ID: <20240202080126.72598eef@kernel.org>
-In-Reply-To: <CAL+tcoCs6x7=rBj50g2cMjwLjLOKs9xy1ZZBwSQs8bLfzm=B7Q@mail.gmail.com>
-References: <20240130142521.18593-1-danielj@nvidia.com>
-	<20240130095645-mutt-send-email-mst@kernel.org>
-	<CH0PR12MB85809CB7678CADCC892B2259C97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
-	<20240130104107-mutt-send-email-mst@kernel.org>
-	<CH0PR12MB8580CCF10308B9935810C21DC97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
-	<20240130105246-mutt-send-email-mst@kernel.org>
-	<CH0PR12MB858067B9DB6BCEE10519F957C97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
-	<CAL+tcoCsT6UJ=2zxL-=0n7sQ2vPC5ybnQk9bGhF6PexZN=-29Q@mail.gmail.com>
-	<20240201202106.25d6dc93@kernel.org>
-	<CAL+tcoCs6x7=rBj50g2cMjwLjLOKs9xy1ZZBwSQs8bLfzm=B7Q@mail.gmail.com>
+	s=arc-20240116; t=1706889922; c=relaxed/simple;
+	bh=jX74YmxcgCmEmELepiQIjYfkj4EhbJwtDcV1u+qSGXo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QyvyWA8Bg6utS/h9jhduD8bAD6watlIc69b1IkAV+ZA2JORy6QRRS43/P7ljT7D/p+niUmOUlpixKm6fAOnDpR+rpgdJ7lyVpD3XyK4ZtBVSPC2QGbD71fL88YIfAvwAEtXdyGN7mmpLr0W55sxeVA66Jc8Y5gD05bCrP0tjzQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kfMwjSao; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-55a9008c185so1770522a12.1;
+        Fri, 02 Feb 2024 08:05:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1706889919; x=1707494719; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FLlRPXBIEL3X1bT9VeDZff9MrnDp+zQ7VNRcupI/Wt4=;
+        b=kfMwjSaoXYublwapY5si4blLRG6ens1ESSv5kMLR1VOGZC/53/U9tcS2Mh7OITYxYn
+         4OC9pJ8YdNLzUkJAkecN1uHBDg1IOiFr/gdmlqxqTz3fML9GxkIrTLdHFzBbr+UKOkuy
+         SdcYmic67OPpmcb8iCvug0Whp5Trx+Fbju2OJi6D0OkmIzk3IUj9kbwBpAKmPAb/fE5B
+         HNrOBDZKebZvquZGhdcOLk9vrl62CGLFISLqqG8QAwYiXxuGtZUeJYQ32J4SYy48bQRL
+         CNIpW9UIyPkIzWMCKsr099614FthHYJWy/oSYuNHb2X2/I9AA+HoUR17BrMdFSVtTHCT
+         bQ4g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706889919; x=1707494719;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FLlRPXBIEL3X1bT9VeDZff9MrnDp+zQ7VNRcupI/Wt4=;
+        b=ownZHHSIArlcqIQTdQIhaTj6Nesb4WYyBoPLSef2uXsz8+5gyjstJ214szKW4Hp7b1
+         muxxJasTEF3dRg5n+jbcADjdQU2VAMO5qeWwbWm9I4QUsYCMhPh/vZhze4xXCvRUxER9
+         SgCp71/+lVFxIMp8UsAwM2Cz+NwA/JaRqlSFBx3mWMz1hJRCu/2Y4Y9vrv0B93payGGD
+         sTlraM2rhJurLs/SKRKqpY1mQOHotsW1fNHUSHGcbSMS3TGAIv9XCbGW7E6h08ICxqoO
+         vv2ovPXMz9p3mBUALJQc6ePNWpylK03gAA3/S/9rotgL0ovH0r5V8pRN3ZG2la6eYOvT
+         7a2w==
+X-Gm-Message-State: AOJu0YxmQ0MH1nP+9oJNny+w426B4Z/YSpcXOjwknER3C4jfw3KD31UM
+	Qwp1ZOwefczS7Ffhzx0XIzIxnVcRWNFtyty3Oh5lYnlqdFcWqUtmZuuRXf7DfZtu300YckNEshQ
+	02SmXTRpVehNGOFJAoQq+2MEJPFU=
+X-Google-Smtp-Source: AGHT+IF2slK9fXYPzwfDD2e5yHoShmAfdPNFPYP1AwFwnfIvZq1ro3WVBw4BwoJUCQXQSeCzb/p18f/Aik+8HMPoGHg=
+X-Received: by 2002:aa7:c88d:0:b0:55f:f301:35d4 with SMTP id
+ p13-20020aa7c88d000000b0055ff30135d4mr34904eds.12.1706889918650; Fri, 02 Feb
+ 2024 08:05:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240126231348.281600-1-thepacketgeek@gmail.com>
+ <20240126231348.281600-6-thepacketgeek@gmail.com> <20240202115151.GL530335@kernel.org>
+In-Reply-To: <20240202115151.GL530335@kernel.org>
+From: Matthew Wood <thepacketgeek@gmail.com>
+Date: Fri, 2 Feb 2024 08:05:07 -0800
+Message-ID: <CADvopvb1phuPW+M3L2BQ576vJgWx2zeFN943OxcVq+iTL8_3qA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 5/8] net: netconsole: add a userdata
+ config_group member to netconsole_target
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, leitao@debian.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2 Feb 2024 14:52:59 +0800 Jason Xing wrote:
-> > Can you say more? I'm curious what's your use case.  
-> 
-> I'm not working at Nvidia, so my point of view may differ from theirs.
-> From what I can tell is that those two counters help me narrow down
-> the range if I have to diagnose/debug some issues.
-
-right, i'm asking to collect useful debugging tricks, nothing against
-the patch itself :)
-
-> 1) I sometimes notice that if some irq is held too long (say, one
-> simple case: output of printk printed to the console), those two
-> counters can reflect the issue.
-> 2) Similarly in virtio net, recently I traced such counters the
-> current kernel does not have and it turned out that one of the output
-> queues in the backend behaves badly.
+On Fri, Feb 2, 2024 at 3:52=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
+e:
+>
+> On Fri, Jan 26, 2024 at 03:13:40PM -0800, Matthew Wood wrote:
+> > Create configfs machinery for netconsole userdata appending, which depe=
+nds
+> > on CONFIG_NETCONSOLE_DYNAMIC (for configfs interface). Add a userdata
+> > config_group to netconsole_target for managing userdata entries as a tr=
+ee
+> > under the netconsole configfs subsystem. Directory names created under =
+the
+> > userdata directory become userdatum keys; the userdatum value is the
+> > content of the value file.
+> >
+> > Include the minimum-viable-changes for userdata configfs config_group.
+> > init_target_config_group() ties in the complete configfs machinery to
+> > avoid unused func/variable errors during build. Initializing the
+> > netconsole_target->group is moved to init_target_config_group, which
+> > will also init and add the userdata config_group.
+> >
+> > Each userdatum entry has a limit of 256 bytes (54 for
+> > the key/directory, 200 for the value, and 2 for '=3D' and '\n'
+> > characters), which is enforced by the configfs functions for updating
+> > the userdata config_group.
+> >
+> > When a new netconsole_target is created, initialize the userdata
+> > config_group and add it as a default group for netconsole_target
+> > config_group, allowing the userdata configfs sub-tree to be presented
+> > in the netconsole configfs tree under the userdata directory.
+> >
+> > Co-developed-by: Breno Leitao <leitao@debian.org>
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > Signed-off-by: Matthew Wood <thepacketgeek@gmail.com>
+>
+> Hi Matthew,
+>
+> some minor feedback from my side, as it looks like there will be another
+> revision of this patchset anyway.
+>
+> > ---
+> >  drivers/net/netconsole.c | 143 +++++++++++++++++++++++++++++++++++++--
+> >  1 file changed, 139 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+>
 > ...
-> 
-> Stop/wake queue counters may not show directly the root cause of the
-> issue, but help us 'guess' to some extent.
+>
+> > @@ -596,6 +606,123 @@ static ssize_t remote_mac_store(struct config_ite=
+m *item, const char *buf,
+> >       return -EINVAL;
+> >  }
+> >
+> > +struct userdatum {
+> > +     struct config_item item;
+> > +     char value[MAX_USERDATA_VALUE_LENGTH];
+> > +};
+> > +
+> > +static inline struct userdatum *to_userdatum(struct config_item *item)
+> > +{
+> > +     return container_of(item, struct userdatum, item);
+> > +}
+>
+> Please don't use the inline keyword in C files,
+> unless there is a demonstrable reason to do so.
+> Rather, please let the compiler inline code as is sees fit.
+>
+> ...
+>
+> > @@ -640,6 +767,14 @@ static const struct config_item_type netconsole_ta=
+rget_type =3D {
+> >       .ct_owner               =3D THIS_MODULE,
+> >  };
+> >
+> > +static void init_target_config_group(struct netconsole_target *nt, con=
+st char *name)
+>
+> nit: Networking still prefers code to be 80 columns wide or less.
+>
+> ...
 
-I'm surprised you say you can detect stall-related issues with this.
-I guess virtio doesn't have BQL support, which makes it special.
-Normal HW drivers with BQL almost never stop the queue by themselves.
-I mean - if they do, and BQL is active, then the system is probably
-misconfigured (queue is too short). This is what we use at Meta to
-detect stalls in drivers with BQL:
+Hi Simon,
 
-https://lore.kernel.org/all/20240131102150.728960-3-leitao@debian.org/
-
-Daniel, I think this may be a good enough excuse to add per-queue stats
-to the netdev genl family, if you're up for that. LMK if you want more
-info, otherwise I guess ethtool -S is fine for now.
+I appreciate the review, thank you for the feedback. I've addressed
+the comments here and in the other patches too. I'll be posting a v3
+soon with the changes.
 
