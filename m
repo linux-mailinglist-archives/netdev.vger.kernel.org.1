@@ -1,62 +1,42 @@
-Return-Path: <netdev+bounces-68287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68289-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2996984665E
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 04:08:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 023B8846675
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 04:17:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6E2E28CDB6
-	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 03:08:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F75F1C23673
+	for <lists+netdev@lfdr.de>; Fri,  2 Feb 2024 03:17:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5E7C8E1;
-	Fri,  2 Feb 2024 03:07:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BYE8S6Lj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A9C4BE69;
+	Fri,  2 Feb 2024 03:17:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.31])
+Received: from anchovy3.45ru.net.au (anchovy3.45ru.net.au [203.30.46.155])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1F0D289;
-	Fri,  2 Feb 2024 03:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.134.136.31
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F24F4E0
+	for <netdev@vger.kernel.org>; Fri,  2 Feb 2024 03:17:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.30.46.155
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706843274; cv=none; b=P3iA9J1B5XlKWwW4BvPsbcDxe+7jtLfYLlkUyYhwyW+pvL4P+CSkc7WrVrXMGhtMabdktq6d8S5Gea9S3LJqTCAEz1csERHSE5JmIoKXW0hKDV0w9n+8tGvaxw9ItFAZciLTwywIEbP7jw9Eh//7gQ3f+6D/jWnSPpe0dZRp6uQ=
+	t=1706843847; cv=none; b=sjqt2nMm5STNI6q7MXLYTlejABDu+FQQFE/1QrwQB6jVFDpKE/QgLxKibhJBGAe4Lyc3rBFP8cBv6gEDVC8ULxphsUFkJ4NS349eu05NwyC7sthBi1QoojyONYjta+g0NQ6X+t6/K4Azi9JB3MiHHvaTL9ldWFZ+He+FYCsJVY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706843274; c=relaxed/simple;
-	bh=obWK63Zy5XJ19imquZEyMwnqRVC/TkO3K+PmbgWqdY0=;
+	s=arc-20240116; t=1706843847; c=relaxed/simple;
+	bh=5BqSEZGI5oRLouBUdH2wy4cRQMfnUEg237kfHxqOI+Y=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TW6DWRBdIabzMYSI3bNPy1E1esgij+m/vyZuMi054omi05GxbYLx0EK9FPxP4o9Jyo26Buuo0lBmM61+X7b1P0vjRqtJhZ18IC4TrzpjjYJpKFJed0DtssA4vR9skB/qZbVbe8+Xhqpruqdm0kRb0QQUfbk3c40hw28+7c6EM0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BYE8S6Lj; arc=none smtp.client-ip=134.134.136.31
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1706843272; x=1738379272;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=obWK63Zy5XJ19imquZEyMwnqRVC/TkO3K+PmbgWqdY0=;
-  b=BYE8S6LjLkHyCNhk2dGBKMYvEP879uDHxCSlYWrNWH3umFf2yXbSj5oB
-   7PW3ug5fIZmpGuRNnWPYkfIcg6AkYAbPErFSUNuch1QDE6QsUsgZs7jiW
-   o8WKRxXX2OV3w8CJ6pkmf8oPzvXv6c90VXSuHgTvUE1raIJqVJzH/vQXC
-   R8R2FdLqA/G613qqfh2woRidkwDXF3Oi85pkVVQuFXevMZC+ZdOEqisXe
-   Kw3dJI6xnMIYcLuDdOMFb8jKbtqgZx+v1civhhvVkVKQSiH2VbRkhwmrl
-   aKnkb+e9yT3YG2jjgnAAqPQwPOqZuDlwac28lxtzmysOpHEtJmGCwJrVH
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="468284161"
-X-IronPort-AV: E=Sophos;i="6.05,237,1701158400"; 
-   d="scan'208";a="468284161"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 19:07:51 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10971"; a="859304289"
-X-IronPort-AV: E=Sophos;i="6.05,237,1701158400"; 
-   d="scan'208";a="859304289"
-Received: from choongyo-mobl.gar.corp.intel.com (HELO [10.247.22.55]) ([10.247.22.55])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Feb 2024 19:07:40 -0800
-Message-ID: <46d14e3e-a334-447f-a25c-17ed58170741@linux.intel.com>
-Date: Fri, 2 Feb 2024 11:07:40 +0800
+	 In-Reply-To:Content-Type; b=LHFTVfLOIzNgP58WzRCJeCXHgkrBULezp+zy4lvDGO+vhUXjGx+EiwsKN1qLJcHsKah7j5XnYt1lDxgeSjTxn4fsf5qS2ZS7g1F86jHH4/KyU3jA9mKnyS1UQsgwYAl12HCKPjYnWcDxXD1inrg9MgSy+RL85BKO5zkESt3rRtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=electromag.com.au; spf=pass smtp.mailfrom=electromag.com.au; arc=none smtp.client-ip=203.30.46.155
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=electromag.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=electromag.com.au
+Received: (qmail 16395 invoked by uid 5089); 2 Feb 2024 03:10:39 -0000
+Received: by simscan 1.2.0 ppid: 16271, pid: 16272, t: 0.4128s
+         scanners: regex: 1.2.0 attach: 1.2.0 clamav: 0.88.3/m:40/d:1950 spam: 3.1.4
+X-Spam-Level: 
+Received: from unknown (HELO ?192.168.2.4?) (rtresidd@electromag.com.au@203.59.235.95)
+  by anchovy2.45ru.net.au with ESMTPA; 2 Feb 2024 03:10:38 -0000
+Message-ID: <6e6adda6-26bd-45f6-a63d-8fc73a95373c@electromag.com.au>
+Date: Fri, 2 Feb 2024 11:10:32 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,69 +44,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 4/5] net: stmmac: enable Intel mGbE 1G/2.5G
- auto-negotiation support
+Subject: Re: [PATCH net v6] net: stmmac: Prevent DSA tags from breaking COE
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Romain Gantois <romain.gantois@bootlin.com>,
+  Alexandre Torgue <alexandre.torgue@foss.st.com>,
+  Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
+  Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+  netdev@vger.kernel.org, "G Thomas, Rohan" <rohan.g.thomas@intel.com>
+References: <20240116-prevent_dsa_tags-v6-1-ec44ed59744b@bootlin.com>
+ <b757b71b-2460-48fe-a163-f7ddfb982725@electromag.com.au>
+ <20240201070551.7147faee@kernel.org>
 Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Serge Semin <fancer.lancer@gmail.com>,
- Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
- David E Box <david.e.box@linux.intel.com>,
- Hans de Goede <hdegoede@redhat.com>, Mark Gross <markgross@kernel.org>,
- Jose Abreu <Jose.Abreu@synopsys.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, =?UTF-8?Q?Marek_Beh=C3=BAn?=
- <kabel@kernel.org>, Jean Delvare <jdelvare@suse.com>,
- Guenter Roeck <linux@roeck-us.net>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Philipp Zabel <p.zabel@pengutronix.de>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Wong Vee Khee
- <veekhee@apple.com>, Jon Hunter <jonathanh@nvidia.com>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Revanth Kumar Uppala <ruppala@nvidia.com>,
- Shenwei Wang <shenwei.wang@nxp.com>,
- Andrey Konovalov <andrey.konovalov@linaro.org>,
- Jochen Henneberg <jh@henneberg-systemdesign.com>,
- David E Box <david.e.box@intel.com>, Andrew Halaney <ahalaney@redhat.com>,
- Simon Horman <simon.horman@corigine.com>,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, platform-driver-x86@vger.kernel.org,
- linux-hwmon@vger.kernel.org, bpf@vger.kernel.org,
- Voon Wei Feng <weifeng.voon@intel.com>,
- Tan Tee Min <tee.min.tan@linux.intel.com>,
- Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
- Lai Peter Jun Ann <jun.ann.lai@intel.com>
-References: <20230921121946.3025771-1-yong.liang.choong@linux.intel.com>
- <20230921121946.3025771-5-yong.liang.choong@linux.intel.com>
- <jmq54bskx4zd75ay4kf5pcdo6wnz72pxzfo5ivevleef4scucr@uw4fkfs64f3c>
- <26568944-563d-4911-8f6f-14c0162db6e9@linux.intel.com>
- <07a4aa8e-800c-4564-81c8-7cfcdddf1379@lunn.ch>
-From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-In-Reply-To: <07a4aa8e-800c-4564-81c8-7cfcdddf1379@lunn.ch>
+From: Richard Tresidder <rtresidd@electromag.com.au>
+In-Reply-To: <20240201070551.7147faee@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
 
 
-On 29/1/2024 9:41 pm, Andrew Lunn wrote:
-> Hi Choong
-> 
-> Please trim the text when replying. It can be hard to find actually
-> replies when having to do lots and lots of page downs. Just give the
-> context needed to understand your reply.
-> 
-> 	Andrew
-Hi Andrew,
 
-Thank you for the feedback.
-I will trim the message next time.
+
+Richard Tresidder
+
+
+
+On 1/02/2024 11:05 pm, Jakub Kicinski wrote:
+
+> On Thu, 1 Feb 2024 17:38:07 +0800 Richard Tresidder wrote:
+>>       Thanks for your work on this patch.
+>> I was wondering if this would make it's way onto the lts kernel branch at some point?
+>> I think this patch relies on at least a few others that don't appear to have been ported across either.
+>> eg: at least 2023-09-18 	Rohan G Thomas net: stmmac: Tx coe sw fallback
+>>
+>> Just looking at having to abandon the 6.6 lts kernel I'm basing things on as we require this patchset to get our network system working.
+>> Again much appreciated!
+> Hm, it may have gotten missed because of the double space in:
+> Cc:  <stable@vger.kernel.org>
+> double check if it's present in the stable tree and if not please
+> request the backport, the info you need to provide is somewhere
+> in kernel doc's process section.
+>
+Hi Jakub
+    Thanks for the hint.
+I just found these patches noted in the stable mailing list on the 29th of Jan as part of the [PATCH 6.6] series
+So yep my bad I was looking in the wrong spot.
+
+[PATCH 6.6 008/331] net: stmmac: Tx coe sw fallback
+[PATCH 6.6 009/331] net: stmmac: Prevent DSA tags from breaking COE
+
+Cheers
+    Richard Tresidder
+
 
