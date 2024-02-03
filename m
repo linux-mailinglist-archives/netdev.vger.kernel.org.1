@@ -1,163 +1,172 @@
-Return-Path: <netdev+bounces-68851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5789684889F
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 20:54:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B90BE8488A3
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 20:59:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D39001F229EC
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 19:54:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68C45285409
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 19:59:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 986FE5EE68;
-	Sat,  3 Feb 2024 19:54:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2A75EE80;
+	Sat,  3 Feb 2024 19:59:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HkmRm+KE"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nIlnyUTu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D428A5EE79
-	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 19:54:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38555F561
+	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 19:59:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706990092; cv=none; b=OVzgMSCv6W1vt/ZgF+fp+aWEo0QtqAxYhGDPIxVTqI7/cEpuYbHEVEHNd8AN7KC3fApAoY91UjZ1zBDdhmUcqIpcU8QgDEn+pn0q5bqP6/GufedYmMHrs3zFx+zM8eCIRjWYPFCnSIZRoeHAm6Q9R1EnkyN1ODJniH1ur7bjeIc=
+	t=1706990370; cv=none; b=qmnzNvOyMsAU9557+LYK95etR5Gpbhq/ZwId3Ce+/vzBQ8346NAKTq+KYAbp8P48tgIPYde4KG5icDI3C+tiGRom3KQ5Jc+IYRx3JlUSe0ci+DPMTzhizWAkOkM2pNGu19HF5q7UW+gANVelrsvHtorGxKE2g/ytZc+Doc/enI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706990092; c=relaxed/simple;
-	bh=qc7g4Hmv/oX86EUlq8UNbs8uduzJjJ7tRToD1Q9kp4w=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=R7v5zc0X9WX1EBqP7j7W1hH/pSr+iRaRFI9gEY47RQ6azKan7nsitck9p4y3LaBT0HBfZAqAcc39kLLNSxuOemZu+5YAdmH8cIceV8tPEQMtpxTIA716SHVktX4Iet7xI33mIzSbHCuY0w8g01tgM9R6VmCsAZOiuoSXrqPlz1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HkmRm+KE; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-55fe4534e9bso2505133a12.0
-        for <netdev@vger.kernel.org>; Sat, 03 Feb 2024 11:54:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706990089; x=1707594889; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=xNYTqPh06HI8dgBx6hS/930xiBP8GYsiVYjtCayK4pE=;
-        b=HkmRm+KEsFfyKTbuyEwShxII8pC+A6z5jFaF4H/hf/YwOMktV7LPsBN65YTb4YPYiD
-         drvggQB0YO8Lj8QtOozdbb1Um03vKCfe/gt/+ElMkLxoPf+cs5Nk/HsIO3WkAogK65Jh
-         OFB3j89ZQEV1b1wg88qrcTgxFNKZUvB/0UKthfJt0ksZqnwC7VfWsraWItHxPircVC4L
-         7ycf3fIwpR+MvD1NmEs8svk6OVTfnzaNo1VLEnUoKgCPhu8NNObeZ3Glgv053+IpR41M
-         FCJ9hLkRTzmxqbQhxOidr3T7MSyp8hHeriFF9xOYa2I6QqDJz50uNZbRwVxVkF2VxIPC
-         MFxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706990089; x=1707594889;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=xNYTqPh06HI8dgBx6hS/930xiBP8GYsiVYjtCayK4pE=;
-        b=wQ/KMVIzqbchXUQkulNW0NSKWtsRmxfTp1UFM0xISAoCznn39HXtZlYFbL+CXSWHvp
-         MxV7nsNul55k2dDctC1gasUq2o+SXJx1gaTYBcrdWu8WH3VraLqp7qh78kDFvZJ33+u3
-         T3bJOk8WtCW9PH2Dcyti+4fNjcY6lAHgswVKOmwXI5MythR6jAUYAgGk+GX5+kZKtBT0
-         bAwRGPCHjaiKY+YSR+VlN+Eifv/sVnGRc1zwmdgH9bZDHc/GLcfKQg/PexJbdhS8wab5
-         SrH3tWVA0AqIFUVK5zi44aPnuiDYhRdW6Gl2DbZYdnLCVAW9b1mjBaVI57yOwJI0s1RS
-         pRjg==
-X-Gm-Message-State: AOJu0Yw5qwLyrOtAulYiAKT0dvvEVxiQJZ8m5DC/Cj60sj9G97yCKIyw
-	xGhpz95bg9c6uvXCHHUmiVUTZC5E66cGt/6cHfqfj5Hbkum5DNIaGaZuYCrw
-X-Google-Smtp-Source: AGHT+IGRBYsihUYZdLeo2mRaddmBjyOCdckC57g2XpAMIIzyICOiOfXbp8P1porTac0yWehtQ9VY+Q==
-X-Received: by 2002:a05:6402:1491:b0:560:7f1:9b24 with SMTP id e17-20020a056402149100b0056007f19b24mr2053728edv.3.1706990088754;
-        Sat, 03 Feb 2024 11:54:48 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWriDDT60ABdyUn/C4SjWq77y6T1a+9GKdn1pZXq2sDhT8bZUZq1dkO2Jer8zNodeS5XZlw3lcImw6HOhETS2uit+rCtbJN4xpY78lxgR9Rut8UgeDZ695iumpEkobAkMBxnPT5T/iGlWd2aQFsgclhgdaGRco0jKQcGk8nmnx/i7Ef+E0bgiu/kwGdMoYgWRVBUQv91Iy5btmH3P14F8Fs62N3I0H+26CR
-Received: from ?IPV6:2a01:c23:bde4:a000:48dd:a4bf:88d3:e6ac? (dynamic-2a01-0c23-bde4-a000-48dd-a4bf-88d3-e6ac.c23.pool.telefonica.de. [2a01:c23:bde4:a000:48dd:a4bf:88d3:e6ac])
-        by smtp.googlemail.com with ESMTPSA id n22-20020a05640204d600b0055f50417843sm2039152edw.22.2024.02.03.11.54.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 03 Feb 2024 11:54:48 -0800 (PST)
-Message-ID: <ddedd82e-55da-4db5-acc6-9407c03f168c@gmail.com>
-Date: Sat, 3 Feb 2024 20:54:48 +0100
+	s=arc-20240116; t=1706990370; c=relaxed/simple;
+	bh=0Cl0sgbD6FT0nxPUKA/aqwhhXsqtDupISOShia89apY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hydc3d0+rDvqhMB9Yf7OU735SMjxX31Stv8ShjIXg849UBZT6RTxwx726A4EYt4sJ8BKM60VUSNsqCThQ1QvILZtZrTXPeQTJ8B0RoiZCCvFZa3lhDewRnwH4xKbtJf8u0nMS4ZTUvj3/a6BeexWKWD8OyT104P69aBLHzN2FYU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nIlnyUTu; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706990369; x=1738526369;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0Cl0sgbD6FT0nxPUKA/aqwhhXsqtDupISOShia89apY=;
+  b=nIlnyUTuL+AAxMma9PPUB9quXa5AGnD2b3uI60aX2LjjW7Zj6qeNi3kP
+   RxVp0MxltBNR1HAH9ma3e4Z8fKpbmUZ8XvQv6OQSsT0YrOUtl62WtTXwl
+   VCXqoFP1tPZ8dniBq08HjUoU7NIRz0NrzRl9mZYfY3lmiHQvCsaRJpAtI
+   NlRMoCzVdlgo3KfCmrOVvkCk6pGlYCI0MHMiiphj9DyyTH0WiWboXQjpv
+   CwDa6qImxcIxRPZJYiOzoLMSGUSrolY2sRXVA4mqGsah1KsT5MQM0ItvH
+   cC0FuvTjTt/np9RU+rU6vCf76iXx/A+D6ysRirSoykfbzcBBnMkVEWLvY
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10973"; a="236329"
+X-IronPort-AV: E=Sophos;i="6.05,241,1701158400"; 
+   d="scan'208";a="236329"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 11:59:28 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,241,1701158400"; 
+   d="scan'208";a="577386"
+Received: from lkp-server02.sh.intel.com (HELO 59f4f4cd5935) ([10.239.97.151])
+  by fmviesa008.fm.intel.com with ESMTP; 03 Feb 2024 11:59:26 -0800
+Received: from kbuild by 59f4f4cd5935 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rWMAe-0005Xs-03;
+	Sat, 03 Feb 2024 19:59:24 +0000
+Date: Sun, 4 Feb 2024 03:59:15 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>
+Subject: Re: [PATCH v1 net-next 07/16] af_unix: Detect Strongly Connected
+ Components.
+Message-ID: <202402040348.uejoTcrq-lkp@intel.com>
+References: <20240203030058.60750-8-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next v2 2/2] r8169: use new helper phy_advertise_eee_all
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <0d886510-b2b7-43f2-b8a6-fb770d97266d@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <0d886510-b2b7-43f2-b8a6-fb770d97266d@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240203030058.60750-8-kuniyu@amazon.com>
 
-Use new helper phy_advertise_eee_all() to simplify the code.
+Hi Kuniyuki,
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/realtek/r8169_main.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+kernel test robot noticed the following build warnings:
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index c70869539..b43db3c49 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -5091,8 +5091,7 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
- 
- 	tp->phydev->mac_managed_pm = true;
- 	if (rtl_supports_eee(tp))
--		linkmode_copy(tp->phydev->advertising_eee,
--			      tp->phydev->supported_eee);
-+		phy_advertise_eee_all(tp->phydev);
- 	phy_support_asym_pause(tp->phydev);
- 
- 	/* PHY will be woken up in rtl_open() */
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/af_unix-Add-struct-unix_vertex-in-struct-unix_sock/20240203-110847
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240203030058.60750-8-kuniyu%40amazon.com
+patch subject: [PATCH v1 net-next 07/16] af_unix: Detect Strongly Connected Components.
+config: x86_64-rhel-8.3-bpf (https://download.01.org/0day-ci/archive/20240204/202402040348.uejoTcrq-lkp@intel.com/config)
+compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240204/202402040348.uejoTcrq-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202402040348.uejoTcrq-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> net/unix/garbage.c:257:2: warning: label at end of compound statement is a C2x extension [-Wc2x-extensions]
+     257 |         }
+         |         ^
+   1 warning generated.
+
+
+vim +257 net/unix/garbage.c
+
+   227	
+   228	static void __unix_walk_scc(struct unix_vertex *vertex)
+   229	{
+   230		unsigned long index = UNIX_VERTEX_INDEX_START;
+   231		LIST_HEAD(vertex_stack);
+   232		struct unix_edge *edge;
+   233		LIST_HEAD(edge_stack);
+   234	
+   235	next_vertex:
+   236		vertex->index = index;
+   237		vertex->lowlink = index;
+   238		index++;
+   239	
+   240		vertex->on_stack = true;
+   241		list_move(&vertex->scc_entry, &vertex_stack);
+   242	
+   243		list_for_each_entry(edge, &vertex->edges, entry) {
+   244			if (!edge->successor->out_degree)
+   245				continue;
+   246	
+   247			if (edge->successor->index == UNIX_VERTEX_INDEX_UNVISITED) {
+   248				list_add(&edge->stack_entry, &edge_stack);
+   249	
+   250				vertex = edge->successor;
+   251				goto next_vertex;
+   252			}
+   253	
+   254			if (edge->successor->on_stack)
+   255				vertex->lowlink = min(vertex->lowlink, edge->successor->index);
+   256	next_edge:
+ > 257		}
+   258	
+   259		if (vertex->index == vertex->lowlink) {
+   260			LIST_HEAD(scc);
+   261	
+   262			list_cut_position(&scc, &vertex_stack, &vertex->scc_entry);
+   263	
+   264			list_for_each_entry_reverse(vertex, &scc, scc_entry) {
+   265				list_move_tail(&vertex->entry, &unix_visited_vertices);
+   266	
+   267				vertex->on_stack = false;
+   268			}
+   269	
+   270			list_del(&scc);
+   271		}
+   272	
+   273		if (!list_empty(&edge_stack)) {
+   274			edge = list_first_entry(&edge_stack, typeof(*edge), stack_entry);
+   275			list_del_init(&edge->stack_entry);
+   276	
+   277			vertex = edge->predecessor;
+   278			vertex->lowlink = min(vertex->lowlink, edge->successor->lowlink);
+   279			goto next_edge;
+   280		}
+   281	}
+   282	
+
 -- 
-2.43.0
-
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
