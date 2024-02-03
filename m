@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-68767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A793847FD0
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 04:05:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1B8A847FD1
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 04:06:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 506882854BA
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 03:05:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 566681F23B32
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 03:06:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CCDD7468;
-	Sat,  3 Feb 2024 03:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C6486FCA;
+	Sat,  3 Feb 2024 03:06:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Hmp6aMn0"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="twgp5DkE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9248279C0
-	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 03:05:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00C7E7483
+	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 03:06:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706929550; cv=none; b=S+fFqE4CQ8dRzNDP79RairzquvBgkWiTRBOVR5v4gMMPbJZjN/1VrZts+Va+8fFhCCg1iGmLnXA4mTNVWV+h07XVKaPgWjL5/6HravNJQ6CLQiB0zZNKsmaR5JXslYVZaof7iypZ6ngfk/2xI2pZJWLibVEKXGoAjg6lwb3LHIQ=
+	t=1706929573; cv=none; b=mGnBDsVL4SLla72VcythQnwg05TxpoBkNyuLDPR5EvzjPTSzjmsUdIqbDa5G/ckl4klTWZGIUaKcEgdmZo2PKSDkSRBj9Vb3PFhRcvfYlTDlMIZcX6fjojnxjQ3lhZxjv/yzJqEIEkqv2T0sGQpNBHh42ghcPdxZcxnM5tTxT4U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706929550; c=relaxed/simple;
-	bh=cq8TgJIzIyxYKrg/YzpbIg5Tuqg2FYk7z+GAwiwKY7A=;
+	s=arc-20240116; t=1706929573; c=relaxed/simple;
+	bh=/HfET+wyksOk8bht9uFP2ro1mCNJ5Xvi0UZdBXqjQkY=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XizMRFWNq7J5QuKQvp7lB5oxlcbrtt8cm9cfVbk/GqBjpwQmSuBdoCYyASELxF3k7PxHcTDP5xBL5Mph6tTXW026h7AGeuPwcvcRd6lhjmDjLlVeAEF6/9pUPVzzWJSqFLXJHUfLy+5kvwUyRhWYqG/mZ2nd/oZYrZkFgbNeE2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Hmp6aMn0; arc=none smtp.client-ip=52.119.213.152
+	 MIME-Version:Content-Type; b=P6Md04ZCglfHZVqMkxUSa98/Vtk+pjvivH7125bJVnioHBEr5mDsYjG3wjdw2cY527KVxmAYVegLePpqmrVJaDaH+spHQ1gyhW1wjwT1hRoH4C4s7gciPpwhwgrGazmX3s8Etl0LW5R+W+FlwdJZf828294YrqFOZ1wPsHTiD5k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=twgp5DkE; arc=none smtp.client-ip=99.78.197.217
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1706929549; x=1738465549;
+  t=1706929572; x=1738465572;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=MUF3U+v+rbGyg73T2dafbluksmChkf/9CLlhqcv2SQs=;
-  b=Hmp6aMn0LQghsC9c2HCgOMWwaNIkSvWmGwRRi4oh8y5x5HaAizS5Uewc
-   XxooJLnstPQRq/+iWP4ScwM24l77Afqf7xPi+cpeZvD2RxAz570LS7bx8
-   9Ohsfyg00byjmyF8ZouGj9GYfpHR3WZTiB0/AcA4HLn9yvElMrvlkJeK6
-   8=;
+  bh=ekL8pusgTytjOgGhteG67UzZEjkT1u2027DpxPQsnXs=;
+  b=twgp5DkE+RcjSGChQ8ozOL0QN1udoIM2rY1QwOG5yl8D5Rvl1Qf5kc5M
+   H7q2+ACqziDEKshQsgIDdZvaa4KCmgbE14pGUHulgLqLbfXYyt8OMay/O
+   y+CTg4VPGf8WXt7AITgx/XBLh7n4fwxzseEuQQ5DQjSOo5OzS68s5Qu4z
+   g=;
 X-IronPort-AV: E=Sophos;i="6.05,238,1701129600"; 
-   d="scan'208";a="635435959"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 03:05:47 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:26755]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.53.239:2525] with esmtp (Farcaster)
- id a500922a-0ff7-4461-8b5d-5b83ed31bbc9; Sat, 3 Feb 2024 03:05:46 +0000 (UTC)
-X-Farcaster-Flow-ID: a500922a-0ff7-4461-8b5d-5b83ed31bbc9
+   d="scan'208";a="270772041"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 03:06:11 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:20819]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.9.194:2525] with esmtp (Farcaster)
+ id c9964e9a-6d0d-45f3-b3b6-93429df84541; Sat, 3 Feb 2024 03:06:11 +0000 (UTC)
+X-Farcaster-Flow-ID: c9964e9a-6d0d-45f3-b3b6-93429df84541
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Sat, 3 Feb 2024 03:05:46 +0000
+ 15.2.1118.40; Sat, 3 Feb 2024 03:06:10 +0000
 Received: from 88665a182662.ant.amazon.com.com (10.106.101.14) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Sat, 3 Feb 2024 03:05:43 +0000
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
+ Sat, 3 Feb 2024 03:06:08 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 11/16] af_unix: Assign a unique index to SCC.
-Date: Fri, 2 Feb 2024 19:00:53 -0800
-Message-ID: <20240203030058.60750-12-kuniyu@amazon.com>
+Subject: [PATCH v1 net-next 12/16] af_unix: Detect dead SCC.
+Date: Fri, 2 Feb 2024 19:00:54 -0800
+Message-ID: <20240203030058.60750-13-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240203030058.60750-1-kuniyu@amazon.com>
 References: <20240203030058.60750-1-kuniyu@amazon.com>
@@ -77,131 +77,97 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D032UWB003.ant.amazon.com (10.13.139.165) To
+X-ClientProxiedBy: EX19D036UWB003.ant.amazon.com (10.13.139.172) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-The definition of the lowlink in Tarjan's algorithm is the
-smallest index of a vertex that is reachable with at most one
-back-edge in SCC.
+When iterating SCC, we call unix_vertex_dead() for each vertex
+to check if the vertex is close()d and has no bridge to another
+SCC.
 
-If we start traversing from A in the following graph, the final
-lowlink of D is 3.
+If both conditions are true for every vertex in SCC, we can
+execute garbage collection for all skb in the SCC.
 
-  A -> B -> D   D = (4, 3)  (index, lowlink)
-  ^    |    |   C = (3, 1)
-  |    V    |   B = (2, 1)
-  `--- C <--'   A = (1, 1)
-
-This is because the lowlink of D is updated with the index of C.
-
-In the following patch, we detect a dead SCC by checking two
-conditions for each vertex.
-
-  1) vertex has no edge directed to another SCC (no bridge)
-  2) vertex's out_degree is the same as the refcount of its file
-
-If 1) is false, there is a receiver of all fds of the SCC.
-
-To evaluate 1), we need to assign a unique index to a SCC and
-assign it to all vertices in the SCC.
-
-This patch changes the lowlink update logic so that in the above
-example, the lowlink of D is updated with the lowlink of C.
-
-  A -> B -> D   D = (4, 1)  (index, lowlink)
-  ^    |    |   C = (3, 1)
-  |    V    |   B = (2, 1)
-  `--- C <--'   A = (1, 1)
-
-Then, all vertices in the same SCC have the same lowlink, and we
-can quickly find the bridge if exists.
-
-However, it is no longer called lowlink, so we rename it to
-scc_index.
-
-Also, we add a global variable to hold the last index used in DFS
-so that we do not reset the initial index in each DFS.
-
-This patch can be squashed to the SCC detection patch but is
-split deliberately for anyone wondering why lowlink is not used
-as used in the original Tarjan's algorithm.
+The actual garbage collection is done in the following patch,
+replacing the old implementation.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- include/net/af_unix.h |  2 +-
- net/unix/garbage.c    | 15 ++++++++-------
- 2 files changed, 9 insertions(+), 8 deletions(-)
+ net/unix/garbage.c | 34 +++++++++++++++++++++++++++++++++-
+ 1 file changed, 33 insertions(+), 1 deletion(-)
 
-diff --git a/include/net/af_unix.h b/include/net/af_unix.h
-index 59ec8d7880ce..66c8cf835625 100644
---- a/include/net/af_unix.h
-+++ b/include/net/af_unix.h
-@@ -38,7 +38,7 @@ struct unix_vertex {
- 	unsigned long out_degree;
- 	unsigned long self_degree;
- 	unsigned long index;
--	unsigned long lowlink;
-+	unsigned long scc_index;
- };
- 
- struct unix_edge {
 diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index cbddca5d8dd1..3d60a5379b7b 100644
+index 3d60a5379b7b..528215527b23 100644
 --- a/net/unix/garbage.c
 +++ b/net/unix/garbage.c
-@@ -263,18 +263,18 @@ void unix_free_edges(struct scm_fp_list *fpl)
+@@ -261,6 +261,29 @@ void unix_free_edges(struct scm_fp_list *fpl)
+ 	kvfree(fpl->edges);
+ }
  
++static bool unix_vertex_dead(struct unix_vertex *vertex)
++{
++	struct unix_edge *edge;
++	struct unix_sock *u;
++	long total_ref;
++
++	list_for_each_entry(edge, &vertex->edges, entry) {
++		if (!edge->successor->out_degree)
++			return false;
++
++		if (edge->successor->scc_index != vertex->scc_index)
++			return false;
++	}
++
++	u = container_of(vertex, typeof(*u), vertex);
++	total_ref = file_count(u->sk.sk_socket->file);
++
++	if (total_ref != vertex->out_degree)
++		return false;
++
++	return true;
++}
++
  static LIST_HEAD(unix_visited_vertices);
  static unsigned long unix_vertex_grouped_index = UNIX_VERTEX_INDEX_MARK2;
-+static unsigned long unix_vertex_last_index = UNIX_VERTEX_INDEX_START;
- 
- static void __unix_walk_scc(struct unix_vertex *vertex)
- {
--	unsigned long index = UNIX_VERTEX_INDEX_START;
- 	LIST_HEAD(vertex_stack);
- 	struct unix_edge *edge;
- 	LIST_HEAD(edge_stack);
- 
- next_vertex:
--	vertex->index = index;
--	vertex->lowlink = index;
--	index++;
-+	vertex->index = unix_vertex_last_index;
-+	vertex->scc_index = unix_vertex_last_index;
-+	unix_vertex_last_index++;
- 
- 	list_move(&vertex->scc_entry, &vertex_stack);
- 
-@@ -290,11 +290,11 @@ static void __unix_walk_scc(struct unix_vertex *vertex)
- 		}
- 
- 		if (edge->successor->index != unix_vertex_grouped_index)
--			vertex->lowlink = min(vertex->lowlink, edge->successor->index);
-+			vertex->scc_index = min(vertex->scc_index, edge->successor->scc_index);
- next_edge:
+ static unsigned long unix_vertex_last_index = UNIX_VERTEX_INDEX_START;
+@@ -295,6 +318,7 @@ static void __unix_walk_scc(struct unix_vertex *vertex)
  	}
  
--	if (vertex->index == vertex->lowlink) {
-+	if (vertex->index == vertex->scc_index) {
+ 	if (vertex->index == vertex->scc_index) {
++		bool dead = true;
  		LIST_HEAD(scc);
  
  		list_cut_position(&scc, &vertex_stack, &vertex->scc_entry);
-@@ -321,13 +321,14 @@ static void __unix_walk_scc(struct unix_vertex *vertex)
- 		list_del_init(&edge->stack_entry);
+@@ -303,6 +327,9 @@ static void __unix_walk_scc(struct unix_vertex *vertex)
+ 			list_move_tail(&vertex->entry, &unix_visited_vertices);
  
- 		vertex = edge->predecessor;
--		vertex->lowlink = min(vertex->lowlink, edge->successor->lowlink);
-+		vertex->scc_index = min(vertex->scc_index, edge->successor->scc_index);
- 		goto next_edge;
- 	}
- }
+ 			vertex->index = unix_vertex_grouped_index;
++
++			if (dead)
++				dead = unix_vertex_dead(vertex);
+ 		}
  
- static void unix_walk_scc(void)
+ 		if (!list_is_singular(&scc)) {
+@@ -347,14 +374,19 @@ static void unix_walk_scc_fast(void)
  {
-+	unix_vertex_last_index = UNIX_VERTEX_INDEX_START;
- 	unix_graph_maybe_cyclic = false;
- 
  	while (!list_empty(&unix_unvisited_vertices)) {
+ 		struct unix_vertex *vertex;
++		bool dead = true;
+ 		LIST_HEAD(scc);
+ 
+ 		vertex = list_first_entry(&unix_unvisited_vertices, typeof(*vertex), entry);
+ 		list_add(&scc, &vertex->scc_entry);
+ 
+-		list_for_each_entry_reverse(vertex, &scc, scc_entry)
++		list_for_each_entry_reverse(vertex, &scc, scc_entry) {
+ 			list_move_tail(&vertex->entry, &unix_visited_vertices);
+ 
++			if (dead)
++				dead = unix_vertex_dead(vertex);
++		}
++
+ 		list_del(&scc);
+ 	}
+ 
 -- 
 2.30.2
 
