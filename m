@@ -1,205 +1,828 @@
-Return-Path: <netdev+bounces-68846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4519184883C
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 19:45:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67BE1848856
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 20:10:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1B91285899
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 18:45:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B4441F2329E
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 19:10:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57C3E5FDBD;
-	Sat,  3 Feb 2024 18:45:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D6185F557;
+	Sat,  3 Feb 2024 19:09:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XINpu29U"
+	dkim=pass (2048-bit key) header.d=tesarici.cz header.i=@tesarici.cz header.b="l2lsPZlx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f52.google.com (mail-oa1-f52.google.com [209.85.160.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bee.tesarici.cz (bee.tesarici.cz [77.93.223.253])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD1A85F561;
-	Sat,  3 Feb 2024 18:45:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 446025F86E;
+	Sat,  3 Feb 2024 19:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=77.93.223.253
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706985949; cv=none; b=W+vl9/d2F0dIN8HYxHPJNts8lWTa5fnHufwGQ3XcGq9JNi92MJFHLWzbAa0QbtGCk4JDYRapa2a8HaETYotcX+56RIX7hKQWtOwUmUtoKIku3XIUpzEpZ5yCA6AnnJl288zytfldr4OESndx66KoXqQWRXQFEKL88s3ZYKIwd1o=
+	t=1706987396; cv=none; b=dbeLz2jrmKsIdCMd7oJmb47KSihL2OTTvaEDMwcog9raagdlACPZPwVUuXqa6pU2Mdu+a37Uur3dt/EsS+h4MIprONxgHiAdtrPz/0aNG+aHhOYbRCaR4BhhIqtPblRq+psu7wobWcl8JEaWeCYwajDqJnoiLEnfolbUIlLkcEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706985949; c=relaxed/simple;
-	bh=QLmB+a7rMrDFXLv1SPoxkXPhzSnXnhs+odqRkVdXqM8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s46g8JixVOhMePYuN/Uu3+YkMV6ID/jgUZouXv/In3lkhpg7B5a6zrDNpKgt4Tj2geCD509fCIDRjBjoZlWs3yR4YjV/L8BU9LFuTyRtv19w8D3q5wVqLdZs9HIy/4u6BWde58asVNsf4BAbqSDUjVzdyuutLWnD8z8y4JzX4cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XINpu29U; arc=none smtp.client-ip=209.85.160.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f52.google.com with SMTP id 586e51a60fabf-204f50f305cso2033081fac.3;
-        Sat, 03 Feb 2024 10:45:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706985938; x=1707590738; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y0N/TxnXN2qBHJ/dkfZVj0nsBZc+7pjCqkkafHOcTPY=;
-        b=XINpu29UxWjy09y+rCAxh2r+t2LPxjy3x9XN2MqmGFc0RIug/fXsdQ8pezTPDuUVHb
-         lgwfPBQeaedIOx7oK7u75/ytyxkKxALmiLFGDIhN8OhHJ4bhNE0tIWskvTqxQgGCQg4K
-         lOaTJYwQvfxxt9fmWTQuoqErvjng9hthjUEcvQZxnDKUy0V6STp4+KnMhwlgLgA5BpaL
-         yzxm2KOG93M07WrWV5P2894+57wOJZ/bhnTeGIudVr65at1wWqDiy4bFRPIO+q/2FETa
-         Hll3q6V2j4LD1mI1Qnpt9bS2tYS5fdiK4UHOqQfx8aupdESlJ5wW+2yDrQgWPtjsQNSR
-         LpXQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706985938; x=1707590738;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y0N/TxnXN2qBHJ/dkfZVj0nsBZc+7pjCqkkafHOcTPY=;
-        b=opJN4U2rdtocW5uzA3YWe5dxlcW+fzOtrUb/gvknJPr0sQ8OvzGtMZ8mTSmK1eXpg6
-         fYMD2dBiapkH3QQBoiELwNSMV2hLg7q9EZlTWQLP96/bsKDWXOKk+Cm57QNNafnjdW4+
-         +qra3Y17p12x7Egr2XHIrBGKD9+3bEKmBSzh7oTcKY7JeupOm2+lcFSGiVK1mFxgKbZz
-         BZzUi9mjc73/Ch7MWe3uX9eD2GCXe2qDjM+kAZZTWeE+rufJ2deup3/pSDIBajbGOmcX
-         z+i/chuuAjGmAQMz193SlDRlC/aP78MJL+Ck08Dbj4ucfPo+C0n9M7w+4zr9XWaY84oZ
-         Mdsw==
-X-Gm-Message-State: AOJu0YxxAy0vA+sx5dAqDWmnZ/b/AiR+AGSaOT6wEabeEGepESR0LQkd
-	VPrGgacbeTVOJ9YP3X0I1r6F6treRD4v69yW75bgGZtMl/gsqShc
-X-Google-Smtp-Source: AGHT+IE6cTsFsYxec6Cc2Nv8r8Wv7UwdJ2OkD0GT9fp4iaKTaMhjHiWk6mQDIasAcDiqRAsVsbikAg==
-X-Received: by 2002:a05:6870:4149:b0:214:ff12:3dda with SMTP id r9-20020a056870414900b00214ff123ddamr3816197oad.2.1706985938425;
-        Sat, 03 Feb 2024 10:45:38 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUQOTzlsO8lgt6pTwZLPw4119LfUrIfiaPa1wTTfdoxvsVTK1OcV2Dhbg5b2iobZcoC99Y+nA1mfBlqm8ccNuDEZ9ovSOSxF3dHJJoFa8pVW2wvNSbjP7RHN1nQlbwYiR+ZGUGPHsYbVIKUu/kExr3+mBS2LyoL7EMCy0RKTBCwZmgSJAnm8YjNjZATBXumi5rZ1guYYVe6tbB3apJ1FiMecZeZOLFGPHLSIm9lMMnedLrSL5LR+ITrAlKqzgfOzWbsLuUM4d0ufoM4ZdW8uS+lgajFrBnb5Unl8KMrPo5f7fVRDTzb+mpkXuSEfXp+VxBl9aBdT1X4Pu6RO2Vb+J9irkfLOt6ydfNho4jZIfhH5e7RejlM3xop2REcBU+7Ep2QxW6BfVclBjRvfADINXaS9e2RfWdRXu9F1/Yl7W4aoQMsEnydZd5izTj9tgYTVMJznLUUlABQlG1XUF+lALvWG6wGjF/JBqJwIeKsgiHWrSlTkPAQMEc11zIv9TBj/SgdR+1IGkyuC42IrbIYBRA6Lh1HyFcyKl9okR8mk02mHyKzcQcLfR3w3JL3Ur9d5SVkncclHqL1PxkDpGPOs3dE++/rIX2sEot24DS//9lxdPUpALKMpt4xa0iv27eylxppX5U6yH5xrfrThO7kAWWBey3QFiyYH1/6c0o0YhJJldRm9x6QOyyQUBjy8xYN3sw+NkNgjLDcwTs+DRby93OBGQ==
-Received: from surya ([70.134.61.176])
-        by smtp.gmail.com with ESMTPSA id g37-20020a635665000000b005d748902a01sm3945514pgm.43.2024.02.03.10.45.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Feb 2024 10:45:37 -0800 (PST)
-Date: Sat, 3 Feb 2024 10:45:11 -0800
-From: Manu Bretelle <chantr4@gmail.com>
-To: Jiri Olsa <olsajiri@gmail.com>
-Cc: vmalik@redhat.com, Daniel Xu <dxu@dxuuu.xyz>,
-	linux-trace-kernel@vger.kernel.org, coreteam@netfilter.org,
-	bpf@vger.kernel.org, linux-input@vger.kernel.org,
-	cgroups@vger.kernel.org, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-kselftest@vger.kernel.org, linux-doc@vger.kernel.org,
-	fsverity@lists.linux.dev, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	netfilter-devel@vger.kernel.org, alexei.starovoitov@gmail.com,
-	quentin@isovalent.com, alan.maguire@oracle.com, memxor@gmail.com
-Subject: Re: [PATCH bpf-next v4 0/3] Annotate kfuncs in .BTF_ids section
-Message-ID: <Zb6Jt30bNcNhM6zR@surya>
-References: <cover.1706491398.git.dxu@dxuuu.xyz>
- <Zb12EZt0BAKOPBk/@surya>
- <Zb5QWCw3Tg26_MDa@krava>
+	s=arc-20240116; t=1706987396; c=relaxed/simple;
+	bh=E0xEEQ1CBAkXIiSCP6tDvBU75ByQBZLEvbnBo1+rDPo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AWNBpFLnXGbxjR6JbRmGCT+HRIPCdrefuBvddVZYmsg/S+VsjoIV8ko4++eHuLvJAHEJDSirutkpqkfpe1f3RSEkKU2IXDnNGXAiLmA9zWM6zcJ58DIWoxZG4zisz61Af24sN0JfmAdi9/Qg1v4TbZg+vUIBcT3C6TuW9nxPlAQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tesarici.cz; spf=pass smtp.mailfrom=tesarici.cz; dkim=pass (2048-bit key) header.d=tesarici.cz header.i=@tesarici.cz header.b=l2lsPZlx; arc=none smtp.client-ip=77.93.223.253
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tesarici.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tesarici.cz
+Received: from meshulam.tesarici.cz (dynamic-2a00-1028-83b8-1e7a-4427-cc85-6706-c595.ipv6.o2.cz [IPv6:2a00:1028:83b8:1e7a:4427:cc85:6706:c595])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by bee.tesarici.cz (Postfix) with ESMTPSA id B36FE1A6174;
+	Sat,  3 Feb 2024 20:09:41 +0100 (CET)
+Authentication-Results: mail.tesarici.cz; dmarc=fail (p=quarantine dis=none) header.from=tesarici.cz
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=tesarici.cz; s=mail;
+	t=1706987382; bh=XkLWrDsgzqcj70+v3gJOPjBH4h8Xz04s9ixH8+pncUA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=l2lsPZlxy0oroqGirJM7zwxn6aJyMl1Hv/tyZQluUSiNxpDdij3hdSQU7SVxq/pCw
+	 oxD8IUkuiTZG5mW+dVyg+mVZ7LDmFoYQJBAIIqXaxCqgq+FBAXquG5eRuoU0MKMXxS
+	 T9SM2OmjIwxEmJnr71tTGYrYpJgYLiEdcq3doQDwYtndMQDIk68lFWt81yexeYqqCB
+	 EmQc4xeDzKpH6kxd+Vdu1OUxw1uHobE2NYym6Vc8R0u8aDXgTaSQq4VMs7we+3YQCC
+	 IWm0Br0VTIMMhYx0EAMQh2zIikaplrJhhG/S1SrWw22CtqNg+IyGA5w2Mpdn3uWHf4
+	 xK5Q6Tb9KFTxw==
+From: Petr Tesarik <petr@tesarici.cz>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	netdev@vger.kernel.org (open list:STMMAC ETHERNET DRIVER),
+	linux-stm32@st-md-mailman.stormreply.com (moderated list:ARM/STM32 ARCHITECTURE),
+	linux-arm-kernel@lists.infradead.org (moderated list:ARM/STM32 ARCHITECTURE),
+	linux-kernel@vger.kernel.org (open list),
+	linux-sunxi@lists.linux.dev (open list:ARM/Allwinner sunXi SoC support)
+Cc: Marc Haber <mh+netdev@zugschlus.de>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Petr Tesarik <petr@tesarici.cz>,
+	stable@vger.kernel.org
+Subject: [PATCH net v3] net: stmmac: protect updates of 64-bit statistics counters
+Date: Sat,  3 Feb 2024 20:09:27 +0100
+Message-ID: <20240203190927.19669-1-petr@tesarici.cz>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zb5QWCw3Tg26_MDa@krava>
+Content-Transfer-Encoding: 8bit
 
-On Sat, Feb 03, 2024 at 03:40:24PM +0100, Jiri Olsa wrote:
-> On Fri, Feb 02, 2024 at 03:09:05PM -0800, Manu Bretelle wrote:
-> > On Sun, Jan 28, 2024 at 06:24:05PM -0700, Daniel Xu wrote:
-> > > === Description ===
-> > > 
-> > > This is a bpf-treewide change that annotates all kfuncs as such inside
-> > > .BTF_ids. This annotation eventually allows us to automatically generate
-> > > kfunc prototypes from bpftool.
-> > > 
-> > > We store this metadata inside a yet-unused flags field inside struct
-> > > btf_id_set8 (thanks Kumar!). pahole will be taught where to look.
-> > > 
-> > > More details about the full chain of events are available in commit 3's
-> > > description.
-> > > 
-> > > The accompanying pahole and bpftool changes can be viewed
-> > > here on these "frozen" branches [0][1].
-> > > 
-> > > [0]: https://github.com/danobi/pahole/tree/kfunc_btf-v3-mailed
-> > > [1]: https://github.com/danobi/linux/tree/kfunc_bpftool-mailed
-> > 
-> > 
-> > I hit a similar issue to [0] on master
-> > 943b043aeecc ("selftests/bpf: Fix bench runner SIGSEGV")
-> >  when cross-compiling on x86_64 (LE) to s390x (BE).
-> > I do have CONFIG_DEBUG_INFO_BTF enable and the issue would not trigger if
-> > I disabled CONFIG_DEBUG_INFO_BTF (and with the fix mentioned in [0]).
-> > 
-> > What seems to happen is that `tools/resolve_btfids` is ran in the context of the
-> > host endianess and if I printk before the WARN_ON:
-> > diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-> > index ef380e546952..a9ed7a1a4936 100644
-> >   --- a/kernel/bpf/btf.c
-> >   +++ b/kernel/bpf/btf.c
-> >   @@ -8128,6 +8128,7 @@ int register_btf_kfunc_id_set(enum bpf_prog_type prog_type,
-> >            * WARN() for initcall registrations that do not check errors.
-> >            */
-> >           if (!(kset->set->flags & BTF_SET8_KFUNCS)) {
-> >   +        printk("Flag 0x%08X, expected 0x%08X\n", kset->set->flags, BTF_SET8_KFUNCS);
-> >                   WARN_ON(!kset->owner);
-> >                   return -EINVAL;
-> >           }
-> > 
-> > the boot logs would show:
-> >   Flag 0x01000000, expected 0x00000001
-> > 
-> > The issue did not happen prior to
-> > 6f3189f38a3e ("bpf: treewide: Annotate BPF kfuncs in BTF")
-> > has only 0 was written before.
-> > 
-> > It seems [1] will be addressing cross-compilation, but it did not fix it as is
-> > by just applying on top of master, so probably some of the changes will also need
-> > to be ported to `tools/include/linux/btf_ids.h`?
-> 
-> the fix in [1] is fixing flags in set8's pairs, but not the global flags
-> 
-> it looks like Viktor's fix should now also swap that as well? like in the
-> change below on top of Viktor's changes (untested)
-> 
-> jirka
-> 
-> 
-> ---
-> diff --git a/tools/bpf/resolve_btfids/main.c b/tools/bpf/resolve_btfids/main.c
-> index d01603ef6283..c44d57fec390 100644
-> --- a/tools/bpf/resolve_btfids/main.c
-> +++ b/tools/bpf/resolve_btfids/main.c
-> @@ -706,6 +706,8 @@ static int sets_patch(struct object *obj)
->  			 * correctly translate everything.
->  			 */
->  			if (need_bswap) {
-> +				set8->flags = bswap_32(set8->flags);
-> +
->  				for (i = 0; i < cnt; i++) {
->  					set8->pairs[i].flags =
->  						bswap_32(set8->pairs[i].flags);
-> 
+As explained by a comment in <linux/u64_stats_sync.h>, write side of struct
+u64_stats_sync must ensure mutual exclusion, or one seqcount update could
+be lost on 32-bit platforms, thus blocking readers forever. Such lockups
+have been observed in real world after stmmac_xmit() on one CPU raced with
+stmmac_napi_poll_tx() on another CPU.
 
-That should work. Here are a few tests I ran:
+To fix the issue without introducing a new lock, split the statics into
+three parts:
 
-$ md5sum /tmp/kbuild-s390x/vmlinux.*
-eb658e51e089f3c5b2c8909a29dc9997  /tmp/kbuild-s390x/vmlinux.a
-# plain vmlinux before running resolv_btfids (all 0s)
-ea907cd46a1a73b8276b5f2a82af00ca  /tmp/kbuild-s390x/vmlinux.before_resolv
-# x86_64 resolv_btfids on master without Viktor's patch
-980a40c3a3ff563d1c2d1ebdd5071a23  /tmp/kbuild-s390x/vmlinux.resolv_native
-# x86_64 resolv_btfids on master with Viktor's patch
-b986d19e242719ebea41c578235da662  /tmp/kbuild-s390x/vmlinux.resolv_native_patch_viktor
-# x86_64 resolv_btfids on master with Viktor's patch and your suggested patch
-4edd8752ff01129945bd442689b1927b  /tmp/kbuild-s390x/vmlinux.resolv_native_patch_viktor_patched
-# s390x resolv_btfids run with qemu-s390x-static
-4edd8752ff01129945bd442689b1927b  /tmp/kbuild-s390x/vmlinux.resolv_s390x
+1. fields updated only under the tx queue lock,
+2. fields updated only during NAPI poll,
+3. fields updated only from interrupt context,
 
+Updates to fields in the first two groups are already serialized through
+other locks. It is sufficient to split the existing struct u64_stats_sync
+so that each group has its own.
 
-and some hexdiff of those binaries:
+Note that tx_set_ic_bit is updated from both contexts. Split this counter
+so that each context gets its own, and calculate their sum to get the total
+value in stmmac_get_ethtool_stats().
 
+For the third group, multiple interrupts may be processed by different CPUs
+at the same time, but interrupts on the same CPU will not nest. Move fields
+from this group to a newly created per-cpu struct stmmac_pcpu_stats.
 
-# difference between master's native build and s390x build.... has byte swapping for set8 and others
-diff -ruN <(xxd /tmp/kbuild-s390x/vmlinux.resolv_s390x) <(xxd /tmp/kbuild-s390x/vmlinux.resolv_native) > diff_s390x_native.diff
-https://gist.github.com/chantra/c3d58637a08a6f7340953dc155bb18cc
+Fixes: 133466c3bbe1 ("net: stmmac: use per-queue 64 bit statistics where necessary")
+Link: https://lore.kernel.org/netdev/Za173PhviYg-1qIn@torres.zugschlus.de/t/
+Cc: stable@vger.kernel.org
+Signed-off-by: Petr Tesarik <petr@tesarici.cz>
+---
+ drivers/net/ethernet/stmicro/stmmac/common.h  |  56 +++++---
+ .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  15 +-
+ .../net/ethernet/stmicro/stmmac/dwmac4_lib.c  |  15 +-
+ .../net/ethernet/stmicro/stmmac/dwmac_lib.c   |  15 +-
+ .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |  15 +-
+ .../ethernet/stmicro/stmmac/stmmac_ethtool.c  | 129 +++++++++++------
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 133 +++++++++---------
+ 7 files changed, 221 insertions(+), 157 deletions(-)
 
-# difference betwee Viktor's version and  s390x build.... squinting my eyes I only see the global set8 is missing
-diff -ruN <(xxd /tmp/kbuild-s390x/vmlinux.resolv_s390x) <(xxd /tmp/kbuild-s390x/vmlinux.resolv_native_patch_viktor) > diff_s390x_native_viktor.diff
-https://gist.github.com/chantra/61cfff02b456ae72d3c0161ce1897097
+diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+index 721c1f8e892f..4aca20feb4b7 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/common.h
++++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+@@ -59,28 +59,51 @@
+ #undef FRAME_FILTER_DEBUG
+ /* #define FRAME_FILTER_DEBUG */
+ 
++struct stmmac_q_tx_stats {
++	u64_stats_t tx_bytes;
++	u64_stats_t tx_set_ic_bit;
++	u64_stats_t tx_tso_frames;
++	u64_stats_t tx_tso_nfrags;
++};
++
++struct stmmac_napi_tx_stats {
++	u64_stats_t tx_packets;
++	u64_stats_t tx_pkt_n;
++	u64_stats_t poll;
++	u64_stats_t tx_clean;
++	u64_stats_t tx_set_ic_bit;
++};
++
+ struct stmmac_txq_stats {
+-	u64 tx_bytes;
+-	u64 tx_packets;
+-	u64 tx_pkt_n;
+-	u64 tx_normal_irq_n;
+-	u64 napi_poll;
+-	u64 tx_clean;
+-	u64 tx_set_ic_bit;
+-	u64 tx_tso_frames;
+-	u64 tx_tso_nfrags;
+-	struct u64_stats_sync syncp;
++	/* Updates protected by tx queue lock. */
++	struct u64_stats_sync q_syncp;
++	struct stmmac_q_tx_stats q;
++
++	/* Updates protected by NAPI poll logic. */
++	struct u64_stats_sync napi_syncp;
++	struct stmmac_napi_tx_stats napi;
+ } ____cacheline_aligned_in_smp;
+ 
++struct stmmac_napi_rx_stats {
++	u64_stats_t rx_bytes;
++	u64_stats_t rx_packets;
++	u64_stats_t rx_pkt_n;
++	u64_stats_t poll;
++};
++
+ struct stmmac_rxq_stats {
+-	u64 rx_bytes;
+-	u64 rx_packets;
+-	u64 rx_pkt_n;
+-	u64 rx_normal_irq_n;
+-	u64 napi_poll;
+-	struct u64_stats_sync syncp;
++	/* Updates protected by NAPI poll logic. */
++	struct u64_stats_sync napi_syncp;
++	struct stmmac_napi_rx_stats napi;
+ } ____cacheline_aligned_in_smp;
+ 
++/* Updates on each CPU protected by not allowing nested irqs. */
++struct stmmac_pcpu_stats {
++	struct u64_stats_sync syncp;
++	u64_stats_t rx_normal_irq_n[MTL_MAX_TX_QUEUES];
++	u64_stats_t tx_normal_irq_n[MTL_MAX_RX_QUEUES];
++};
++
+ /* Extra statistic and debug information exposed by ethtool */
+ struct stmmac_extra_stats {
+ 	/* Transmit errors */
+@@ -205,6 +228,7 @@ struct stmmac_extra_stats {
+ 	/* per queue statistics */
+ 	struct stmmac_txq_stats txq_stats[MTL_MAX_TX_QUEUES];
+ 	struct stmmac_rxq_stats rxq_stats[MTL_MAX_RX_QUEUES];
++	struct stmmac_pcpu_stats __percpu *pcpu_stats;
+ 	unsigned long rx_dropped;
+ 	unsigned long rx_errors;
+ 	unsigned long tx_dropped;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+index 137741b94122..b21d99faa2d0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sun8i.c
+@@ -441,8 +441,7 @@ static int sun8i_dwmac_dma_interrupt(struct stmmac_priv *priv,
+ 				     struct stmmac_extra_stats *x, u32 chan,
+ 				     u32 dir)
+ {
+-	struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[chan];
+-	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[chan];
++	struct stmmac_pcpu_stats *stats = this_cpu_ptr(priv->xstats.pcpu_stats);
+ 	int ret = 0;
+ 	u32 v;
+ 
+@@ -455,9 +454,9 @@ static int sun8i_dwmac_dma_interrupt(struct stmmac_priv *priv,
+ 
+ 	if (v & EMAC_TX_INT) {
+ 		ret |= handle_tx;
+-		u64_stats_update_begin(&txq_stats->syncp);
+-		txq_stats->tx_normal_irq_n++;
+-		u64_stats_update_end(&txq_stats->syncp);
++		u64_stats_update_begin(&stats->syncp);
++		u64_stats_inc(&stats->tx_normal_irq_n[chan]);
++		u64_stats_update_end(&stats->syncp);
+ 	}
+ 
+ 	if (v & EMAC_TX_DMA_STOP_INT)
+@@ -479,9 +478,9 @@ static int sun8i_dwmac_dma_interrupt(struct stmmac_priv *priv,
+ 
+ 	if (v & EMAC_RX_INT) {
+ 		ret |= handle_rx;
+-		u64_stats_update_begin(&rxq_stats->syncp);
+-		rxq_stats->rx_normal_irq_n++;
+-		u64_stats_update_end(&rxq_stats->syncp);
++		u64_stats_update_begin(&stats->syncp);
++		u64_stats_inc(&stats->rx_normal_irq_n[chan]);
++		u64_stats_update_end(&stats->syncp);
+ 	}
+ 
+ 	if (v & EMAC_RX_BUF_UA_INT)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
+index 9470d3fd2ded..0d185e54eb7e 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c
+@@ -171,8 +171,7 @@ int dwmac4_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 	const struct dwmac4_addrs *dwmac4_addrs = priv->plat->dwmac4_addrs;
+ 	u32 intr_status = readl(ioaddr + DMA_CHAN_STATUS(dwmac4_addrs, chan));
+ 	u32 intr_en = readl(ioaddr + DMA_CHAN_INTR_ENA(dwmac4_addrs, chan));
+-	struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[chan];
+-	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[chan];
++	struct stmmac_pcpu_stats *stats = this_cpu_ptr(priv->xstats.pcpu_stats);
+ 	int ret = 0;
+ 
+ 	if (dir == DMA_DIR_RX)
+@@ -201,15 +200,15 @@ int dwmac4_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 	}
+ 	/* TX/RX NORMAL interrupts */
+ 	if (likely(intr_status & DMA_CHAN_STATUS_RI)) {
+-		u64_stats_update_begin(&rxq_stats->syncp);
+-		rxq_stats->rx_normal_irq_n++;
+-		u64_stats_update_end(&rxq_stats->syncp);
++		u64_stats_update_begin(&stats->syncp);
++		u64_stats_inc(&stats->rx_normal_irq_n[chan]);
++		u64_stats_update_end(&stats->syncp);
+ 		ret |= handle_rx;
+ 	}
+ 	if (likely(intr_status & DMA_CHAN_STATUS_TI)) {
+-		u64_stats_update_begin(&txq_stats->syncp);
+-		txq_stats->tx_normal_irq_n++;
+-		u64_stats_update_end(&txq_stats->syncp);
++		u64_stats_update_begin(&stats->syncp);
++		u64_stats_inc(&stats->tx_normal_irq_n[chan]);
++		u64_stats_update_end(&stats->syncp);
+ 		ret |= handle_tx;
+ 	}
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+index 7907d62d3437..85e18f9a22f9 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac_lib.c
+@@ -162,8 +162,7 @@ static void show_rx_process_state(unsigned int status)
+ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			struct stmmac_extra_stats *x, u32 chan, u32 dir)
+ {
+-	struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[chan];
+-	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[chan];
++	struct stmmac_pcpu_stats *stats = this_cpu_ptr(priv->xstats.pcpu_stats);
+ 	int ret = 0;
+ 	/* read the status register (CSR5) */
+ 	u32 intr_status = readl(ioaddr + DMA_STATUS);
+@@ -215,16 +214,16 @@ int dwmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+ 			u32 value = readl(ioaddr + DMA_INTR_ENA);
+ 			/* to schedule NAPI on real RIE event. */
+ 			if (likely(value & DMA_INTR_ENA_RIE)) {
+-				u64_stats_update_begin(&rxq_stats->syncp);
+-				rxq_stats->rx_normal_irq_n++;
+-				u64_stats_update_end(&rxq_stats->syncp);
++				u64_stats_update_begin(&stats->syncp);
++				u64_stats_inc(&stats->rx_normal_irq_n[chan]);
++				u64_stats_update_end(&stats->syncp);
+ 				ret |= handle_rx;
+ 			}
+ 		}
+ 		if (likely(intr_status & DMA_STATUS_TI)) {
+-			u64_stats_update_begin(&txq_stats->syncp);
+-			txq_stats->tx_normal_irq_n++;
+-			u64_stats_update_end(&txq_stats->syncp);
++			u64_stats_update_begin(&stats->syncp);
++			u64_stats_inc(&stats->tx_normal_irq_n[chan]);
++			u64_stats_update_end(&stats->syncp);
+ 			ret |= handle_tx;
+ 		}
+ 		if (unlikely(intr_status & DMA_STATUS_ERI))
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+index 3cde695fec91..dd2ab6185c40 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_dma.c
+@@ -337,8 +337,7 @@ static int dwxgmac2_dma_interrupt(struct stmmac_priv *priv,
+ 				  struct stmmac_extra_stats *x, u32 chan,
+ 				  u32 dir)
+ {
+-	struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[chan];
+-	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[chan];
++	struct stmmac_pcpu_stats *stats = this_cpu_ptr(priv->xstats.pcpu_stats);
+ 	u32 intr_status = readl(ioaddr + XGMAC_DMA_CH_STATUS(chan));
+ 	u32 intr_en = readl(ioaddr + XGMAC_DMA_CH_INT_EN(chan));
+ 	int ret = 0;
+@@ -367,15 +366,15 @@ static int dwxgmac2_dma_interrupt(struct stmmac_priv *priv,
+ 	/* TX/RX NORMAL interrupts */
+ 	if (likely(intr_status & XGMAC_NIS)) {
+ 		if (likely(intr_status & XGMAC_RI)) {
+-			u64_stats_update_begin(&rxq_stats->syncp);
+-			rxq_stats->rx_normal_irq_n++;
+-			u64_stats_update_end(&rxq_stats->syncp);
++			u64_stats_update_begin(&stats->syncp);
++			u64_stats_inc(&stats->rx_normal_irq_n[chan]);
++			u64_stats_update_end(&stats->syncp);
+ 			ret |= handle_rx;
+ 		}
+ 		if (likely(intr_status & (XGMAC_TI | XGMAC_TBU))) {
+-			u64_stats_update_begin(&txq_stats->syncp);
+-			txq_stats->tx_normal_irq_n++;
+-			u64_stats_update_end(&txq_stats->syncp);
++			u64_stats_update_begin(&stats->syncp);
++			u64_stats_inc(&stats->tx_normal_irq_n[chan]);
++			u64_stats_update_end(&stats->syncp);
+ 			ret |= handle_tx;
+ 		}
+ 	}
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+index 42d27b97dd1d..ec44becf0e2d 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ethtool.c
+@@ -549,44 +549,79 @@ stmmac_set_pauseparam(struct net_device *netdev,
+ 	}
+ }
+ 
++static u64 stmmac_get_rx_normal_irq_n(struct stmmac_priv *priv, int q)
++{
++	u64 total;
++	int cpu;
++
++	total = 0;
++	for_each_possible_cpu(cpu) {
++		struct stmmac_pcpu_stats *pcpu;
++		unsigned int start;
++		u64 irq_n;
++
++		pcpu = per_cpu_ptr(priv->xstats.pcpu_stats, cpu);
++		do {
++			start = u64_stats_fetch_begin(&pcpu->syncp);
++			irq_n = u64_stats_read(&pcpu->rx_normal_irq_n[q]);
++		} while (u64_stats_fetch_retry(&pcpu->syncp, start));
++		total += irq_n;
++	}
++	return total;
++}
++
++static u64 stmmac_get_tx_normal_irq_n(struct stmmac_priv *priv, int q)
++{
++	u64 total;
++	int cpu;
++
++	total = 0;
++	for_each_possible_cpu(cpu) {
++		struct stmmac_pcpu_stats *pcpu;
++		unsigned int start;
++		u64 irq_n;
++
++		pcpu = per_cpu_ptr(priv->xstats.pcpu_stats, cpu);
++		do {
++			start = u64_stats_fetch_begin(&pcpu->syncp);
++			irq_n = u64_stats_read(&pcpu->tx_normal_irq_n[q]);
++		} while (u64_stats_fetch_retry(&pcpu->syncp, start));
++		total += irq_n;
++	}
++	return total;
++}
++
+ static void stmmac_get_per_qstats(struct stmmac_priv *priv, u64 *data)
+ {
+ 	u32 tx_cnt = priv->plat->tx_queues_to_use;
+ 	u32 rx_cnt = priv->plat->rx_queues_to_use;
+ 	unsigned int start;
+-	int q, stat;
+-	char *p;
++	int q;
+ 
+ 	for (q = 0; q < tx_cnt; q++) {
+ 		struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[q];
+-		struct stmmac_txq_stats snapshot;
++		u64 pkt_n;
+ 
+ 		do {
+-			start = u64_stats_fetch_begin(&txq_stats->syncp);
+-			snapshot = *txq_stats;
+-		} while (u64_stats_fetch_retry(&txq_stats->syncp, start));
++			start = u64_stats_fetch_begin(&txq_stats->napi_syncp);
++			pkt_n = u64_stats_read(&txq_stats->napi.tx_pkt_n);
++		} while (u64_stats_fetch_retry(&txq_stats->napi_syncp, start));
+ 
+-		p = (char *)&snapshot + offsetof(struct stmmac_txq_stats, tx_pkt_n);
+-		for (stat = 0; stat < STMMAC_TXQ_STATS; stat++) {
+-			*data++ = (*(u64 *)p);
+-			p += sizeof(u64);
+-		}
++		*data++ = pkt_n;
++		*data++ = stmmac_get_tx_normal_irq_n(priv, q);
+ 	}
+ 
+ 	for (q = 0; q < rx_cnt; q++) {
+ 		struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[q];
+-		struct stmmac_rxq_stats snapshot;
++		u64 pkt_n;
+ 
+ 		do {
+-			start = u64_stats_fetch_begin(&rxq_stats->syncp);
+-			snapshot = *rxq_stats;
+-		} while (u64_stats_fetch_retry(&rxq_stats->syncp, start));
++			start = u64_stats_fetch_begin(&rxq_stats->napi_syncp);
++			pkt_n = u64_stats_read(&rxq_stats->napi.rx_pkt_n);
++		} while (u64_stats_fetch_retry(&rxq_stats->napi_syncp, start));
+ 
+-		p = (char *)&snapshot + offsetof(struct stmmac_rxq_stats, rx_pkt_n);
+-		for (stat = 0; stat < STMMAC_RXQ_STATS; stat++) {
+-			*data++ = (*(u64 *)p);
+-			p += sizeof(u64);
+-		}
++		*data++ = pkt_n;
++		*data++ = stmmac_get_rx_normal_irq_n(priv, q);
+ 	}
+ }
+ 
+@@ -645,39 +680,49 @@ static void stmmac_get_ethtool_stats(struct net_device *dev,
+ 	pos = j;
+ 	for (i = 0; i < rx_queues_count; i++) {
+ 		struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[i];
+-		struct stmmac_rxq_stats snapshot;
++		struct stmmac_napi_rx_stats snapshot;
++		u64 n_irq;
+ 
+ 		j = pos;
+ 		do {
+-			start = u64_stats_fetch_begin(&rxq_stats->syncp);
+-			snapshot = *rxq_stats;
+-		} while (u64_stats_fetch_retry(&rxq_stats->syncp, start));
+-
+-		data[j++] += snapshot.rx_pkt_n;
+-		data[j++] += snapshot.rx_normal_irq_n;
+-		normal_irq_n += snapshot.rx_normal_irq_n;
+-		napi_poll += snapshot.napi_poll;
++			start = u64_stats_fetch_begin(&rxq_stats->napi_syncp);
++			snapshot = rxq_stats->napi;
++		} while (u64_stats_fetch_retry(&rxq_stats->napi_syncp, start));
++
++		data[j++] += u64_stats_read(&snapshot.rx_pkt_n);
++		n_irq = stmmac_get_rx_normal_irq_n(priv, i);
++		data[j++] += n_irq;
++		normal_irq_n += n_irq;
++		napi_poll += u64_stats_read(&snapshot.poll);
+ 	}
+ 
+ 	pos = j;
+ 	for (i = 0; i < tx_queues_count; i++) {
+ 		struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[i];
+-		struct stmmac_txq_stats snapshot;
++		struct stmmac_napi_tx_stats napi_snapshot;
++		struct stmmac_q_tx_stats q_snapshot;
++		u64 n_irq;
+ 
+ 		j = pos;
+ 		do {
+-			start = u64_stats_fetch_begin(&txq_stats->syncp);
+-			snapshot = *txq_stats;
+-		} while (u64_stats_fetch_retry(&txq_stats->syncp, start));
+-
+-		data[j++] += snapshot.tx_pkt_n;
+-		data[j++] += snapshot.tx_normal_irq_n;
+-		normal_irq_n += snapshot.tx_normal_irq_n;
+-		data[j++] += snapshot.tx_clean;
+-		data[j++] += snapshot.tx_set_ic_bit;
+-		data[j++] += snapshot.tx_tso_frames;
+-		data[j++] += snapshot.tx_tso_nfrags;
+-		napi_poll += snapshot.napi_poll;
++			start = u64_stats_fetch_begin(&txq_stats->q_syncp);
++			q_snapshot = txq_stats->q;
++		} while (u64_stats_fetch_retry(&txq_stats->q_syncp, start));
++		do {
++			start = u64_stats_fetch_begin(&txq_stats->napi_syncp);
++			napi_snapshot = txq_stats->napi;
++		} while (u64_stats_fetch_retry(&txq_stats->napi_syncp, start));
++
++		data[j++] += u64_stats_read(&napi_snapshot.tx_pkt_n);
++		n_irq = stmmac_get_tx_normal_irq_n(priv, i);
++		data[j++] += n_irq;
++		normal_irq_n += n_irq;
++		data[j++] += u64_stats_read(&napi_snapshot.tx_clean);
++		data[j++] += u64_stats_read(&q_snapshot.tx_set_ic_bit) +
++			u64_stats_read(&napi_snapshot.tx_set_ic_bit);
++		data[j++] += u64_stats_read(&q_snapshot.tx_tso_frames);
++		data[j++] += u64_stats_read(&q_snapshot.tx_tso_nfrags);
++		napi_poll += u64_stats_read(&napi_snapshot.poll);
+ 	}
+ 	normal_irq_n += priv->xstats.rx_early_irq;
+ 	data[j++] = normal_irq_n;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 25519952f754..75d029704503 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -2482,7 +2482,6 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
+ 	struct xdp_desc xdp_desc;
+ 	bool work_done = true;
+ 	u32 tx_set_ic_bit = 0;
+-	unsigned long flags;
+ 
+ 	/* Avoids TX time-out as we are sharing with slow path */
+ 	txq_trans_cond_update(nq);
+@@ -2566,9 +2565,9 @@ static bool stmmac_xdp_xmit_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
+ 		tx_q->cur_tx = STMMAC_GET_ENTRY(tx_q->cur_tx, priv->dma_conf.dma_tx_size);
+ 		entry = tx_q->cur_tx;
+ 	}
+-	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
+-	txq_stats->tx_set_ic_bit += tx_set_ic_bit;
+-	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
++	u64_stats_update_begin(&txq_stats->napi_syncp);
++	u64_stats_add(&txq_stats->napi.tx_set_ic_bit, tx_set_ic_bit);
++	u64_stats_update_end(&txq_stats->napi_syncp);
+ 
+ 	if (tx_desc) {
+ 		stmmac_flush_tx_descriptors(priv, queue);
+@@ -2616,7 +2615,6 @@ static int stmmac_tx_clean(struct stmmac_priv *priv, int budget, u32 queue,
+ 	unsigned int bytes_compl = 0, pkts_compl = 0;
+ 	unsigned int entry, xmits = 0, count = 0;
+ 	u32 tx_packets = 0, tx_errors = 0;
+-	unsigned long flags;
+ 
+ 	__netif_tx_lock_bh(netdev_get_tx_queue(priv->dev, queue));
+ 
+@@ -2782,11 +2780,11 @@ static int stmmac_tx_clean(struct stmmac_priv *priv, int budget, u32 queue,
+ 	if (tx_q->dirty_tx != tx_q->cur_tx)
+ 		*pending_packets = true;
+ 
+-	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
+-	txq_stats->tx_packets += tx_packets;
+-	txq_stats->tx_pkt_n += tx_packets;
+-	txq_stats->tx_clean++;
+-	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
++	u64_stats_update_begin(&txq_stats->napi_syncp);
++	u64_stats_add(&txq_stats->napi.tx_packets, tx_packets);
++	u64_stats_add(&txq_stats->napi.tx_pkt_n, tx_packets);
++	u64_stats_inc(&txq_stats->napi.tx_clean);
++	u64_stats_update_end(&txq_stats->napi_syncp);
+ 
+ 	priv->xstats.tx_errors += tx_errors;
+ 
+@@ -4213,7 +4211,6 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	struct stmmac_tx_queue *tx_q;
+ 	bool has_vlan, set_ic;
+ 	u8 proto_hdr_len, hdr;
+-	unsigned long flags;
+ 	u32 pay_len, mss;
+ 	dma_addr_t des;
+ 	int i;
+@@ -4378,13 +4375,13 @@ static netdev_tx_t stmmac_tso_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		netif_tx_stop_queue(netdev_get_tx_queue(priv->dev, queue));
+ 	}
+ 
+-	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
+-	txq_stats->tx_bytes += skb->len;
+-	txq_stats->tx_tso_frames++;
+-	txq_stats->tx_tso_nfrags += nfrags;
++	u64_stats_update_begin(&txq_stats->q_syncp);
++	u64_stats_add(&txq_stats->q.tx_bytes, skb->len);
++	u64_stats_inc(&txq_stats->q.tx_tso_frames);
++	u64_stats_add(&txq_stats->q.tx_tso_nfrags, nfrags);
+ 	if (set_ic)
+-		txq_stats->tx_set_ic_bit++;
+-	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
++		u64_stats_inc(&txq_stats->q.tx_set_ic_bit);
++	u64_stats_update_end(&txq_stats->q_syncp);
+ 
+ 	if (priv->sarc_type)
+ 		stmmac_set_desc_sarc(priv, first, priv->sarc_type);
+@@ -4483,7 +4480,6 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	struct stmmac_tx_queue *tx_q;
+ 	bool has_vlan, set_ic;
+ 	int entry, first_tx;
+-	unsigned long flags;
+ 	dma_addr_t des;
+ 
+ 	tx_q = &priv->dma_conf.tx_queue[queue];
+@@ -4653,11 +4649,11 @@ static netdev_tx_t stmmac_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		netif_tx_stop_queue(netdev_get_tx_queue(priv->dev, queue));
+ 	}
+ 
+-	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
+-	txq_stats->tx_bytes += skb->len;
++	u64_stats_update_begin(&txq_stats->q_syncp);
++	u64_stats_add(&txq_stats->q.tx_bytes, skb->len);
+ 	if (set_ic)
+-		txq_stats->tx_set_ic_bit++;
+-	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
++		u64_stats_inc(&txq_stats->q.tx_set_ic_bit);
++	u64_stats_update_end(&txq_stats->q_syncp);
+ 
+ 	if (priv->sarc_type)
+ 		stmmac_set_desc_sarc(priv, first, priv->sarc_type);
+@@ -4921,12 +4917,11 @@ static int stmmac_xdp_xmit_xdpf(struct stmmac_priv *priv, int queue,
+ 		set_ic = false;
+ 
+ 	if (set_ic) {
+-		unsigned long flags;
+ 		tx_q->tx_count_frames = 0;
+ 		stmmac_set_tx_ic(priv, tx_desc);
+-		flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
+-		txq_stats->tx_set_ic_bit++;
+-		u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
++		u64_stats_update_begin(&txq_stats->q_syncp);
++		u64_stats_inc(&txq_stats->q.tx_set_ic_bit);
++		u64_stats_update_end(&txq_stats->q_syncp);
+ 	}
+ 
+ 	stmmac_enable_dma_transmission(priv, priv->ioaddr);
+@@ -5076,7 +5071,6 @@ static void stmmac_dispatch_skb_zc(struct stmmac_priv *priv, u32 queue,
+ 	unsigned int len = xdp->data_end - xdp->data;
+ 	enum pkt_hash_types hash_type;
+ 	int coe = priv->hw->rx_csum;
+-	unsigned long flags;
+ 	struct sk_buff *skb;
+ 	u32 hash;
+ 
+@@ -5106,10 +5100,10 @@ static void stmmac_dispatch_skb_zc(struct stmmac_priv *priv, u32 queue,
+ 	skb_record_rx_queue(skb, queue);
+ 	napi_gro_receive(&ch->rxtx_napi, skb);
+ 
+-	flags = u64_stats_update_begin_irqsave(&rxq_stats->syncp);
+-	rxq_stats->rx_pkt_n++;
+-	rxq_stats->rx_bytes += len;
+-	u64_stats_update_end_irqrestore(&rxq_stats->syncp, flags);
++	u64_stats_update_begin(&rxq_stats->napi_syncp);
++	u64_stats_inc(&rxq_stats->napi.rx_pkt_n);
++	u64_stats_add(&rxq_stats->napi.rx_bytes, len);
++	u64_stats_update_end(&rxq_stats->napi_syncp);
+ }
+ 
+ static bool stmmac_rx_refill_zc(struct stmmac_priv *priv, u32 queue, u32 budget)
+@@ -5191,7 +5185,6 @@ static int stmmac_rx_zc(struct stmmac_priv *priv, int limit, u32 queue)
+ 	unsigned int desc_size;
+ 	struct bpf_prog *prog;
+ 	bool failure = false;
+-	unsigned long flags;
+ 	int xdp_status = 0;
+ 	int status = 0;
+ 
+@@ -5346,9 +5339,9 @@ static int stmmac_rx_zc(struct stmmac_priv *priv, int limit, u32 queue)
+ 
+ 	stmmac_finalize_xdp_rx(priv, xdp_status);
+ 
+-	flags = u64_stats_update_begin_irqsave(&rxq_stats->syncp);
+-	rxq_stats->rx_pkt_n += count;
+-	u64_stats_update_end_irqrestore(&rxq_stats->syncp, flags);
++	u64_stats_update_begin(&rxq_stats->napi_syncp);
++	u64_stats_add(&rxq_stats->napi.rx_pkt_n, count);
++	u64_stats_update_end(&rxq_stats->napi_syncp);
+ 
+ 	priv->xstats.rx_dropped += rx_dropped;
+ 	priv->xstats.rx_errors += rx_errors;
+@@ -5386,7 +5379,6 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
+ 	unsigned int desc_size;
+ 	struct sk_buff *skb = NULL;
+ 	struct stmmac_xdp_buff ctx;
+-	unsigned long flags;
+ 	int xdp_status = 0;
+ 	int buf_sz;
+ 
+@@ -5646,11 +5638,11 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
+ 
+ 	stmmac_rx_refill(priv, queue);
+ 
+-	flags = u64_stats_update_begin_irqsave(&rxq_stats->syncp);
+-	rxq_stats->rx_packets += rx_packets;
+-	rxq_stats->rx_bytes += rx_bytes;
+-	rxq_stats->rx_pkt_n += count;
+-	u64_stats_update_end_irqrestore(&rxq_stats->syncp, flags);
++	u64_stats_update_begin(&rxq_stats->napi_syncp);
++	u64_stats_add(&rxq_stats->napi.rx_packets, rx_packets);
++	u64_stats_add(&rxq_stats->napi.rx_bytes, rx_bytes);
++	u64_stats_add(&rxq_stats->napi.rx_pkt_n, count);
++	u64_stats_update_end(&rxq_stats->napi_syncp);
+ 
+ 	priv->xstats.rx_dropped += rx_dropped;
+ 	priv->xstats.rx_errors += rx_errors;
+@@ -5665,13 +5657,12 @@ static int stmmac_napi_poll_rx(struct napi_struct *napi, int budget)
+ 	struct stmmac_priv *priv = ch->priv_data;
+ 	struct stmmac_rxq_stats *rxq_stats;
+ 	u32 chan = ch->index;
+-	unsigned long flags;
+ 	int work_done;
+ 
+ 	rxq_stats = &priv->xstats.rxq_stats[chan];
+-	flags = u64_stats_update_begin_irqsave(&rxq_stats->syncp);
+-	rxq_stats->napi_poll++;
+-	u64_stats_update_end_irqrestore(&rxq_stats->syncp, flags);
++	u64_stats_update_begin(&rxq_stats->napi_syncp);
++	u64_stats_inc(&rxq_stats->napi.poll);
++	u64_stats_update_end(&rxq_stats->napi_syncp);
+ 
+ 	work_done = stmmac_rx(priv, budget, chan);
+ 	if (work_done < budget && napi_complete_done(napi, work_done)) {
+@@ -5693,13 +5684,12 @@ static int stmmac_napi_poll_tx(struct napi_struct *napi, int budget)
+ 	struct stmmac_txq_stats *txq_stats;
+ 	bool pending_packets = false;
+ 	u32 chan = ch->index;
+-	unsigned long flags;
+ 	int work_done;
+ 
+ 	txq_stats = &priv->xstats.txq_stats[chan];
+-	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
+-	txq_stats->napi_poll++;
+-	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
++	u64_stats_update_begin(&txq_stats->napi_syncp);
++	u64_stats_inc(&txq_stats->napi.poll);
++	u64_stats_update_end(&txq_stats->napi_syncp);
+ 
+ 	work_done = stmmac_tx_clean(priv, budget, chan, &pending_packets);
+ 	work_done = min(work_done, budget);
+@@ -5729,17 +5719,16 @@ static int stmmac_napi_poll_rxtx(struct napi_struct *napi, int budget)
+ 	struct stmmac_rxq_stats *rxq_stats;
+ 	struct stmmac_txq_stats *txq_stats;
+ 	u32 chan = ch->index;
+-	unsigned long flags;
+ 
+ 	rxq_stats = &priv->xstats.rxq_stats[chan];
+-	flags = u64_stats_update_begin_irqsave(&rxq_stats->syncp);
+-	rxq_stats->napi_poll++;
+-	u64_stats_update_end_irqrestore(&rxq_stats->syncp, flags);
++	u64_stats_update_begin(&rxq_stats->napi_syncp);
++	u64_stats_inc(&rxq_stats->napi.poll);
++	u64_stats_update_end(&rxq_stats->napi_syncp);
+ 
+ 	txq_stats = &priv->xstats.txq_stats[chan];
+-	flags = u64_stats_update_begin_irqsave(&txq_stats->syncp);
+-	txq_stats->napi_poll++;
+-	u64_stats_update_end_irqrestore(&txq_stats->syncp, flags);
++	u64_stats_update_begin(&txq_stats->napi_syncp);
++	u64_stats_inc(&txq_stats->napi.poll);
++	u64_stats_update_end(&txq_stats->napi_syncp);
+ 
+ 	tx_done = stmmac_tx_clean(priv, budget, chan, &tx_pending_packets);
+ 	tx_done = min(tx_done, budget);
+@@ -7065,10 +7054,13 @@ static void stmmac_get_stats64(struct net_device *dev, struct rtnl_link_stats64
+ 		u64 tx_bytes;
+ 
+ 		do {
+-			start = u64_stats_fetch_begin(&txq_stats->syncp);
+-			tx_packets = txq_stats->tx_packets;
+-			tx_bytes   = txq_stats->tx_bytes;
+-		} while (u64_stats_fetch_retry(&txq_stats->syncp, start));
++			start = u64_stats_fetch_begin(&txq_stats->q_syncp);
++			tx_bytes   = u64_stats_read(&txq_stats->q.tx_bytes);
++		} while (u64_stats_fetch_retry(&txq_stats->q_syncp, start));
++		do {
++			start = u64_stats_fetch_begin(&txq_stats->napi_syncp);
++			tx_packets = u64_stats_read(&txq_stats->napi.tx_packets);
++		} while (u64_stats_fetch_retry(&txq_stats->napi_syncp, start));
+ 
+ 		stats->tx_packets += tx_packets;
+ 		stats->tx_bytes += tx_bytes;
+@@ -7080,10 +7072,10 @@ static void stmmac_get_stats64(struct net_device *dev, struct rtnl_link_stats64
+ 		u64 rx_bytes;
+ 
+ 		do {
+-			start = u64_stats_fetch_begin(&rxq_stats->syncp);
+-			rx_packets = rxq_stats->rx_packets;
+-			rx_bytes   = rxq_stats->rx_bytes;
+-		} while (u64_stats_fetch_retry(&rxq_stats->syncp, start));
++			start = u64_stats_fetch_begin(&rxq_stats->napi_syncp);
++			rx_packets = u64_stats_read(&rxq_stats->napi.rx_packets);
++			rx_bytes   = u64_stats_read(&rxq_stats->napi.rx_bytes);
++		} while (u64_stats_fetch_retry(&rxq_stats->napi_syncp, start));
+ 
+ 		stats->rx_packets += rx_packets;
+ 		stats->rx_bytes += rx_bytes;
+@@ -7477,9 +7469,16 @@ int stmmac_dvr_probe(struct device *device,
+ 	priv->dev = ndev;
+ 
+ 	for (i = 0; i < MTL_MAX_RX_QUEUES; i++)
+-		u64_stats_init(&priv->xstats.rxq_stats[i].syncp);
+-	for (i = 0; i < MTL_MAX_TX_QUEUES; i++)
+-		u64_stats_init(&priv->xstats.txq_stats[i].syncp);
++		u64_stats_init(&priv->xstats.rxq_stats[i].napi_syncp);
++	for (i = 0; i < MTL_MAX_TX_QUEUES; i++) {
++		u64_stats_init(&priv->xstats.txq_stats[i].q_syncp);
++		u64_stats_init(&priv->xstats.txq_stats[i].napi_syncp);
++	}
++
++	priv->xstats.pcpu_stats =
++		devm_netdev_alloc_pcpu_stats(device, struct stmmac_pcpu_stats);
++	if (!priv->xstats.pcpu_stats)
++		return -ENOMEM;
+ 
+ 	stmmac_set_ethtool_ops(ndev);
+ 	priv->pause = pause;
+-- 
+2.43.0
 
-Have a good weekend all!
-
-Manu
 
