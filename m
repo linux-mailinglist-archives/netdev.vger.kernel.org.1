@@ -1,389 +1,145 @@
-Return-Path: <netdev+bounces-68772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12C5F847FD5
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 04:08:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AEDC847FDB
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 04:12:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 712DB1F2712C
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 03:07:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 966BAB233A7
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 03:12:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4B3C7483;
-	Sat,  3 Feb 2024 03:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kI0Mf/DA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB82879FE;
+	Sat,  3 Feb 2024 03:12:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C37A79C0
-	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 03:07:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3577D79F9
+	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 03:12:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706929673; cv=none; b=pkJSiceqJdIEbpUCFNPMRAvHoNB4CZA8bTisxPaQ7ngUWeBPMb7HQAow4G/BfsoIRdDml5rhrgjK//cgL3zjNGWK8WYHbsZbBIB6Tn/fxv+nbyg4i6h9bqZlB4X0lRN2Qzs44ajjHCZxCv7EdPi3b4SgUymXlDTIYm6WnhusXe8=
+	t=1706929947; cv=none; b=F+hnT9IFO2VB3Wcmxe+r4/hWfPXrvHZqqIBfJl3ejmcVGVFXHXkBkqgLjIc4wc4nr0Fd9KyY+rDQwlgHEy90mxiNI4zMTFyb97mh2NabRBTkvERiNZ6F+sBmIVRBVO9TP+OGegejHXofTDjT72ZJmOf4KyzjMg3ShjNIfepZx0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706929673; c=relaxed/simple;
-	bh=efw5X8SfUgPcoSlFXosnOJdT+r8yEy5e5KY4lpxlLWk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dRlcrA2Vhw98c5qhwsffv370/lHUc/b2cVWtiRLRyBxAf+d4EzvBHtKL3wLKPH2G0dPCHg5QxEuKEFPagWhMY4dTKH/zRF/7ghDISrMxB+xTtj1S/NPGFc8fTqd89WkRlUdkkhO9Lo3QcehpcjXGw04dT0GaEeGBbfu83lq5RfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=kI0Mf/DA; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1706929672; x=1738465672;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=S44bcrviAt7c3Ci2JmDiDomjLiGDdcR5Jr8CWWo5IMU=;
-  b=kI0Mf/DAHXYWVGcY/K0DQVumxg9xhTkCwvMzNQrvDz0MrW2aG8/Lyxqf
-   XogFKoNW2d8lqkro00qlugbFZqee+5jpAZX+kI92Jf8n9yMD56F82kF0N
-   e+R3HJYX5brGdyvO/l5mkPr3Hq327ms4Efy88wkFKjXq/qWMO90PeO7+T
-   g=;
-X-IronPort-AV: E=Sophos;i="6.05,238,1701129600"; 
-   d="scan'208";a="635436111"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 03:07:51 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:45330]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.4.177:2525] with esmtp (Farcaster)
- id 2f66b581-12a0-4c1a-afc1-73e8a50cf011; Sat, 3 Feb 2024 03:07:50 +0000 (UTC)
-X-Farcaster-Flow-ID: 2f66b581-12a0-4c1a-afc1-73e8a50cf011
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Sat, 3 Feb 2024 03:07:50 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.106.101.14) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Sat, 3 Feb 2024 03:07:47 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 16/16] selftest: af_unix: Test GC for SCM_RIGHTS.
-Date: Fri, 2 Feb 2024 19:00:58 -0800
-Message-ID: <20240203030058.60750-17-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240203030058.60750-1-kuniyu@amazon.com>
-References: <20240203030058.60750-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1706929947; c=relaxed/simple;
+	bh=dxGXXVhs/4dgRo9jmAIcF+obGB4BDOna/EY2wTBjvoM=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=IQTvP/g1WC/A39eh0JemvjXUL1C2FASooRJNpmc+GUmy1734uQUFioggyeBdCm8irN/AMYN5SMR2r1Gq9Sj3hUZVWvgSi6MOZVGJ2pufRN2lBQKvA9NG3uC7e4ypvoBCVHDmbHTqqlAs9Su6xmqAQ7muegKTk9+z/fg8+TfwfKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7becfc75cd4so219338339f.3
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 19:12:26 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1706929945; x=1707534745;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9boHSuibTSW8wHdrZL4yEexUDDVYmeyGpHIKOqzrahY=;
+        b=Ph+/SlX3wZX6ysPpMfxyGfkalmvKPdNAX3TFymNSYBdo8/pE5X/0ePFDNthLpdZwrj
+         d4iM75SL8lbS7wwtDXOSWvlmnvgp58AgPvm5duPLQ4KSli7YgjzDCPOHIKWUF7nTN8Wn
+         i6vfU7YAN3FNSwGBltv+ifaDYRT+IsBInCqONhBMZM017kqihqNI0OYn62ShSkqPiNeK
+         RpcB8QnIGftPY9NvgEfUSZQo6barJa0Yje3kiH6L06DcV0tWzqWfdrUBlohmE1KuoINL
+         RM1uoG0/uKvvDQLMP4rIPYf3hlpO2uF3eD0rNcQNmEnhDZDy/hFD4EUfKQ7tGWKFZww9
+         po4Q==
+X-Gm-Message-State: AOJu0Yzyi2vc/pi+ZL8TG+zVKJUApqeCfWk7G/jSHJxxMQMsTWo3FZUz
+	u+mmlvMt9ij7Ak3Ud3W+foQsXwzehdlJDIYqZH2sq480UYnOzxyy8dBiSICo0DlpdMdBKHKIHNJ
+	3LQnT/wDuleFvT/8m+NSQnoZa4fA44U2rjGrzls6lB8j5BS6CZlbMOmo=
+X-Google-Smtp-Source: AGHT+IFT6BW7LJ4oUZWETS5ReP1qbXAlR/uK/E1KrsLs9Sj2TMRPjN7FMgUJ5Ol3CTvKxDAU87hEmbyQhBOG7fJLxHHxyAfobcCZ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWC001.ant.amazon.com (10.13.139.241) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-Received: by 2002:a6b:ec08:0:b0:7bf:cd7e:6a74 with SMTP id
+ c8-20020a6bec08000000b007bfcd7e6a74mr26773ioh.1.1706929945452; Fri, 02 Feb
+ 2024 19:12:25 -0800 (PST)
+Date: Fri, 02 Feb 2024 19:12:25 -0800
+In-Reply-To: <000000000000ecb4750610659876@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000000e28060610719994@google.com>
+Subject: Re: [syzbot] [netfilter?] WARNING: ODEBUG bug in hash_netiface4_destroy
+From: syzbot <syzbot+52bbc0ad036f6f0d4a25@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	fw@strlen.de, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-This patch adds test cases to verify the new GC.
+syzbot has found a reproducer for the following issue on:
 
-We run each test for 3 types of sockets.
+HEAD commit:    6897cea71837 Merge tag 'for-6.8/dm-fixes' of git://git.ker..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1181d4ffe80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=457249c250b93697
+dashboard link: https://syzkaller.appspot.com/bug?extid=52bbc0ad036f6f0d4a25
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=174bd5d3e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16fcf5b0180000
 
-  * SOCK_DGRAM
-  * SOCK_STREAM with no embryo socket
-  * SOCK_STREAM with embryo sockets
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/002e2c38dde7/disk-6897cea7.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/316b28b8e4a4/vmlinux-6897cea7.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/35f7067d9e3f/bzImage-6897cea7.xz
 
-Before and after running each test case, we ensure that there is
-no AF_UNIX socket left in the netns by reading /proc/net/protocols.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+52bbc0ad036f6f0d4a25@syzkaller.appspotmail.com
 
-We cannot use /proc/net/unix and UNIX_DIAG because the embryo socket
-does not show up there.
+------------[ cut here ]------------
+ODEBUG: free active (active state 0) object: ffff888018aee050 object type: timer_list hint: hash_netiface4_gc+0x0/0x570 net/netfilter/ipset/ip_set_hash_gen.h:445
+WARNING: CPU: 1 PID: 5074 at lib/debugobjects.c:517 debug_print_object+0x17a/0x1f0 lib/debugobjects.c:514
+Modules linked in:
+CPU: 1 PID: 5074 Comm: syz-executor696 Not tainted 6.8.0-rc2-syzkaller-00251-g6897cea71837 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
+RIP: 0010:debug_print_object+0x17a/0x1f0 lib/debugobjects.c:514
+Code: e8 fb 03 4e fd 4c 8b 0b 48 c7 c7 a0 71 fe 8b 48 8b 74 24 08 48 89 ea 44 89 e1 4d 89 f8 ff 34 24 e8 9b f8 af fc 48 83 c4 08 90 <0f> 0b 90 90 ff 05 2c 09 de 0a 48 83 c4 10 5b 41 5c 41 5d 41 5e 41
+RSP: 0018:ffffc900040cead8 EFLAGS: 00010286
+RAX: 92d7284228c9b100 RBX: ffffffff8bac9720 RCX: ffff888026548000
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffffffff8bfe7320 R08: ffffffff81577992 R09: 1ffff92000819cac
+R10: dffffc0000000000 R11: fffff52000819cad R12: 0000000000000000
+R13: ffffffff8bfe7238 R14: dffffc0000000000 R15: ffff888018aee050
+FS:  0000555555926380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000504 CR3: 000000002386a000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ __debug_check_no_obj_freed lib/debugobjects.c:989 [inline]
+ debug_check_no_obj_freed+0x45b/0x580 lib/debugobjects.c:1019
+ slab_free_hook mm/slub.c:2093 [inline]
+ slab_free mm/slub.c:4299 [inline]
+ kfree+0x110/0x380 mm/slub.c:4409
+ hash_netiface4_destroy+0x297/0x2c0 net/netfilter/ipset/ip_set_hash_gen.h:460
+ ip_set_create+0x13b6/0x1780 net/netfilter/ipset/ip_set_core.c:1157
+ nfnetlink_rcv_msg+0xbee/0x1190 net/netfilter/nfnetlink.c:302
+ netlink_rcv_skb+0x1e5/0x430 net/netlink/af_netlink.c:2543
+ nfnetlink_rcv+0x294/0x2650 net/netfilter/nfnetlink.c:659
+ netlink_unicast_kernel net/netlink/af_netlink.c:1341 [inline]
+ netlink_unicast+0x7ec/0x980 net/netlink/af_netlink.c:1367
+ netlink_sendmsg+0xa3b/0xd70 net/netlink/af_netlink.c:1908
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x223/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+ do_syscall_64+0xfb/0x240
+ entry_SYSCALL_64_after_hwframe+0x6f/0x77
+RIP: 0033:0x7f7cfc8b0bb9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffd4de24948 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f7cfc8b0bb9
+RDX: 0000000000000000 RSI: 0000000020000040 RDI: 0000000000000004
+RBP: 0000000000012024 R08: 0000000000000006 R09: 0000000000000006
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007ffd4de2495c
+R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
 
-Each test creates multiple sockets in an array.  We pass sockets in
-the even index using the peer sockets in the odd index.
 
-So, send_fd(0, 1) actually sends fd[0] to fd[2] via fd[0 + 1].
-
-  Test 1 : A <-> A
-  Test 2 : A <-> B
-  Test 3 : A -> B -> C <- D
-           ^.___|___.'    ^
-                `---------'
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- tools/testing/selftests/net/.gitignore        |   1 +
- tools/testing/selftests/net/af_unix/Makefile  |   2 +-
- .../selftests/net/af_unix/scm_rights.c        | 242 ++++++++++++++++++
- 3 files changed, 244 insertions(+), 1 deletion(-)
- create mode 100644 tools/testing/selftests/net/af_unix/scm_rights.c
-
-diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
-index 2f9d378edec3..d996a0ab0765 100644
---- a/tools/testing/selftests/net/.gitignore
-+++ b/tools/testing/selftests/net/.gitignore
-@@ -31,6 +31,7 @@ reuseport_dualstack
- rxtimestamp
- sctp_hello
- scm_pidfd
-+scm_rights
- sk_bind_sendto_listen
- sk_connect_zero_addr
- socket
-diff --git a/tools/testing/selftests/net/af_unix/Makefile b/tools/testing/selftests/net/af_unix/Makefile
-index 221c387a7d7f..3b83c797650d 100644
---- a/tools/testing/selftests/net/af_unix/Makefile
-+++ b/tools/testing/selftests/net/af_unix/Makefile
-@@ -1,4 +1,4 @@
- CFLAGS += $(KHDR_INCLUDES)
--TEST_GEN_PROGS := diag_uid test_unix_oob unix_connect scm_pidfd
-+TEST_GEN_PROGS := diag_uid test_unix_oob unix_connect scm_pidfd scm_rights
- 
- include ../../lib.mk
-diff --git a/tools/testing/selftests/net/af_unix/scm_rights.c b/tools/testing/selftests/net/af_unix/scm_rights.c
-new file mode 100644
-index 000000000000..2f21a6e12cb8
---- /dev/null
-+++ b/tools/testing/selftests/net/af_unix/scm_rights.c
-@@ -0,0 +1,242 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright Amazon.com Inc. or its affiliates. */
-+#define _GNU_SOURCE
-+#include <sched.h>
-+
-+#include <stdio.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <sys/types.h>
-+#include <sys/socket.h>
-+#include <sys/un.h>
-+
-+#include "../../kselftest_harness.h"
-+
-+FIXTURE(scm_rights)
-+{
-+	int fd[16];
-+};
-+
-+FIXTURE_VARIANT(scm_rights)
-+{
-+	int type;
-+	char name[16];
-+	bool test_listener;
-+};
-+
-+FIXTURE_VARIANT_ADD(scm_rights, dgram)
-+{
-+	.type = SOCK_DGRAM,
-+	.name = "UNIX ",
-+	.test_listener = false,
-+};
-+
-+FIXTURE_VARIANT_ADD(scm_rights, stream)
-+{
-+	.type = SOCK_STREAM,
-+	.name = "UNIX-STREAM ",
-+	.test_listener = false,
-+};
-+
-+FIXTURE_VARIANT_ADD(scm_rights, stream_listener)
-+{
-+	.type = SOCK_STREAM,
-+	.name = "UNIX-STREAM ",
-+	.test_listener = true,
-+};
-+
-+static int count_sockets(struct __test_metadata *_metadata,
-+			 const FIXTURE_VARIANT(scm_rights) *variant)
-+{
-+	int sockets = -1, len, ret;
-+	size_t unused;
-+	char *line;
-+	FILE *f;
-+
-+	f = fopen("/proc/net/protocols", "r");
-+	ASSERT_NE(NULL, f);
-+
-+	len = strlen(variant->name);
-+
-+	while (getline(&line, &unused, f) != -1) {
-+		int unused2;
-+
-+		if (strncmp(line, variant->name, len))
-+			continue;
-+
-+		ret = sscanf(line + len, "%d %d", &unused2, &sockets);
-+		ASSERT_EQ(2, ret);
-+
-+		break;
-+	}
-+
-+	ret = fclose(f);
-+	ASSERT_EQ(0, ret);
-+
-+	return sockets;
-+}
-+
-+FIXTURE_SETUP(scm_rights)
-+{
-+	int ret;
-+
-+	ret = unshare(CLONE_NEWNET);
-+	ASSERT_EQ(0, ret);
-+
-+	ret = count_sockets(_metadata, variant);
-+	ASSERT_EQ(0, ret);
-+}
-+
-+FIXTURE_TEARDOWN(scm_rights)
-+{
-+	int ret;
-+
-+	ret = count_sockets(_metadata, variant);
-+	ASSERT_EQ(0, ret);
-+}
-+
-+static void create_listeners(struct __test_metadata *_metadata,
-+			     FIXTURE_DATA(scm_rights) *self,
-+			     int n)
-+{
-+	struct sockaddr_un addr = {
-+		.sun_family = AF_UNIX,
-+	};
-+	socklen_t addrlen;
-+	int i, ret;
-+
-+	for (i = 0; i < n * 2; i += 2) {
-+		self->fd[i] = socket(AF_UNIX, SOCK_STREAM, 0);
-+		ASSERT_LE(0, self->fd[i]);
-+
-+		addrlen = sizeof(addr.sun_family);
-+		ret = bind(self->fd[i], (struct sockaddr *)&addr, addrlen);
-+		ASSERT_EQ(0, ret);
-+
-+		ret = listen(self->fd[i], -1);
-+		ASSERT_EQ(0, ret);
-+
-+		addrlen = sizeof(addr);
-+		ret = getsockname(self->fd[i], (struct sockaddr *)&addr, &addrlen);
-+		ASSERT_EQ(0, ret);
-+
-+		self->fd[i + 1] = socket(AF_UNIX, SOCK_STREAM, 0);
-+		ASSERT_LE(0, self->fd[i + 1]);
-+
-+		ret = connect(self->fd[i + 1], (struct sockaddr *)&addr, addrlen);
-+		ASSERT_EQ(0, ret);
-+	}
-+}
-+
-+static void create_socketpairs(struct __test_metadata *_metadata,
-+			       FIXTURE_DATA(scm_rights) *self,
-+			       const FIXTURE_VARIANT(scm_rights) *variant,
-+			       int n)
-+{
-+	int i, ret;
-+
-+	for (i = 0; i < n * 2; i += 2) {
-+		ret = socketpair(AF_UNIX, variant->type, 0, self->fd + i);
-+		ASSERT_EQ(0, ret);
-+	}
-+}
-+
-+static void __create_sockets(struct __test_metadata *_metadata,
-+			     FIXTURE_DATA(scm_rights) *self,
-+			     const FIXTURE_VARIANT(scm_rights) *variant,
-+			     int n)
-+{
-+	if (variant->test_listener)
-+		create_listeners(_metadata, self, n);
-+	else
-+		create_socketpairs(_metadata, self, variant, n);
-+}
-+
-+static void __close_sockets(struct __test_metadata *_metadata,
-+			    FIXTURE_DATA(scm_rights) *self,
-+			    int n)
-+{
-+	int i, ret;
-+
-+	for (i = 0; i < n * 2; i++) {
-+		ret = close(self->fd[i]);
-+		ASSERT_EQ(0, ret);
-+	}
-+}
-+
-+void __send_fd(struct __test_metadata *_metadata,
-+	       const FIXTURE_DATA(scm_rights) *self,
-+	       int inflight, int receiver)
-+{
-+#define MSG "nop"
-+#define MSGLEN 3
-+	struct {
-+		struct cmsghdr cmsghdr;
-+		int fd;
-+	} cmsg = {
-+		.cmsghdr = {
-+			.cmsg_len = CMSG_LEN(sizeof(cmsg.fd)),
-+			.cmsg_level = SOL_SOCKET,
-+			.cmsg_type = SCM_RIGHTS,
-+		},
-+		.fd = self->fd[inflight * 2],
-+	};
-+	struct iovec iov = {
-+		.iov_base = MSG,
-+		.iov_len = MSGLEN,
-+	};
-+	struct msghdr msg = {
-+		.msg_name = NULL,
-+		.msg_namelen = 0,
-+		.msg_iov = &iov,
-+		.msg_iovlen = 1,
-+		.msg_control = &cmsg,
-+		.msg_controllen = CMSG_SPACE(sizeof(cmsg.fd)),
-+	};
-+	int ret;
-+
-+	ret = sendmsg(self->fd[receiver * 2 + 1], &msg, 0);
-+	ASSERT_EQ(MSGLEN, ret);
-+}
-+
-+#define create_sockets(n)				\
-+	__create_sockets(_metadata, self, variant, n)
-+#define close_sockets(n)				\
-+	__close_sockets(_metadata, self, n)
-+#define send_fd(inflight, receiver)			\
-+	__send_fd(_metadata, self, inflight, receiver)
-+
-+TEST_F(scm_rights, self_ref)
-+{
-+	create_sockets(1);
-+
-+	send_fd(0, 0);
-+
-+	close_sockets(1);
-+}
-+
-+TEST_F(scm_rights, triangle)
-+{
-+	create_sockets(3);
-+
-+	send_fd(0, 1);
-+	send_fd(1, 2);
-+	send_fd(2, 0);
-+
-+	close_sockets(3);
-+}
-+
-+TEST_F(scm_rights, cross_edge)
-+{
-+	create_sockets(4);
-+
-+	send_fd(0, 1);
-+	send_fd(1, 2);
-+	send_fd(2, 0);
-+	send_fd(1, 3);
-+	send_fd(3, 2);
-+
-+	close_sockets(4);
-+}
-+
-+TEST_HARNESS_MAIN
--- 
-2.30.2
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
