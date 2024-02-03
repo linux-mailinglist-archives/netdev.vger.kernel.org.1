@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-68812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E484848657
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 13:50:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11CAD848655
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 13:50:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D59D4B22006
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 12:50:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8BA9EB22D66
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 12:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAC1F5D74A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A997C4EB51;
 	Sat,  3 Feb 2024 12:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rfxyDZWz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P2j66puC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D68441744;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC9339856;
 	Sat,  3 Feb 2024 12:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706964626; cv=none; b=kPxr1aH1WRSxnysiqa0qYhskVaizXZMubvcQry1t1CdkV2amlkTHdk4sIr74Z19FCOhPB7J1FSFJcSz8kqWqIPeIi5YuNSUryjY3Q2m1U6F+VzrQbEmr+lGLDkh/DK3z6kLmnc2b/YZaO+WoYjnjyaTLV/BWtKkGoMgDqu9ty8o=
+	t=1706964626; cv=none; b=N595FbwkpVUsWwEpDmGfVsKn1IwH2icaDjKE5MFehOCq+AOcQKQdJCPicLZ0ZmrhU2xC6lsiHd8rLneqY1liRLBYhKSzlDYSGkd8dTG7uKgPyww/9pIOdr9nnTb/2m5hV4dbFzVA/larKgozs0AXSV8DppbKNB7VW9pYFJA2lAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1706964626; c=relaxed/simple;
-	bh=Yzm4nkb8Kf+C6fKBjMy+5A+MsweSAM1/vdVQOYBoCQo=;
+	bh=V8osyTHbakqrx/nF2ubNYtcubBg90PdpAbMa4oh+tZU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iyBlvReXyvtKUgwhDiFBwINEZK3YMhvxn+hKpv3z8YVblkqpoXh8lVAhrlEyxYNpyyulK2xdlZdjwNDNqHOeQp3u6g21e+dxH28qdoP6u8zuowjnf+mplN78E7GlGwbajUHlfQ/xOgMpFW0wAOFFEjQ/Zgf8fjox6RsNYlcxUo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rfxyDZWz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 322D5C433B2;
+	 In-Reply-To:To:Cc; b=Katqv6EqNf7dxmGwbihotVH7OzuXafsoZ3JdS33AuBMPOK1doKpIsTMhJCG/LxWXoGcMdXQpvaC0qpkrT2EzUhLTICxThJPjPlCEes2k1+fFL00gmb+CNCf2P1d62s3nCgBcgZ2mQm5YwQMjmsoo+QxvDXHXi/swrBB+hmhK3DI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P2j66puC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1DD17C43390;
 	Sat,  3 Feb 2024 12:50:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1706964626;
-	bh=Yzm4nkb8Kf+C6fKBjMy+5A+MsweSAM1/vdVQOYBoCQo=;
+	bh=V8osyTHbakqrx/nF2ubNYtcubBg90PdpAbMa4oh+tZU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=rfxyDZWzm9jTw6Cc7iP2Zet22pVZNzxB40ywgfnvt+1oi2Zk1a3Iiu6vPlxxIqodP
-	 XJyUAacpTVzk0bb8+R18cWYYLLbwpW81gx7jSembAqztIME5++JPidCeNtdFdh9Vhs
-	 amXmmHTQoP8gIU/gW2H9/M3rhOSei/6M+I37iUUcMMXzNDo9osmLpZrvJ2qMnG0Ihj
-	 O717XhlUpRUwTje/P5DYntSZS5X1/J3BLCD+1mf17ezvHvfGluTMeT5Y3bkpV/7In6
-	 HeJ8nLqEsZ4WjYCQXUQLtUCCtB25izdu6IAfvgUDPh2vb/9P8pPsb8+Qxmb0+1lHn+
-	 1uAtfdcAD2E2A==
+	b=P2j66puCUHwBpd431+eT/xyUihHu9dCxRGXBlgryRS/VgCmvPQNBZOp82ZwgNrmWZ
+	 ox46PbWBpiQ5PGC6SB9prC1RYqfFo9Jbo5yA40sr8e9T49quAHIIjexBCe7+Zu2WDR
+	 tW9ZIdACvstLZc3HCXw6ZASAfYXT6/QR7X0R1+fG8kBQ3QnTVNrz8sE+DkxpXmdouP
+	 e/WEWDGcoObO+By/ZK2sArUO2wwE7ASn1909KDcnqFB+sD6VJJ0Lu/mOeIhwD3vI17
+	 s1U9e8imjs/PDI+rEtUKW0KOXt9GjKUNbc+ZTm59sbOiw3furFyEw8jGWDq9e3Cp4a
+	 lfvFa5Ls2sJDQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 0C72FDC99E8;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 02E03C04E32;
 	Sat,  3 Feb 2024 12:50:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] octeontx2-pf: Fix a memleak otx2_sq_init
+Subject: Re: [PATCH net] tsnep: Fix mapping for zero copy XDP_TX action
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170696462604.20224.1934212959453811747.git-patchwork-notify@kernel.org>
+ <170696462600.20224.14079985268876839637.git-patchwork-notify@kernel.org>
 Date: Sat, 03 Feb 2024 12:50:26 +0000
-References: <20240201124714.3053525-1-alexious@zju.edu.cn>
-In-Reply-To: <20240201124714.3053525-1-alexious@zju.edu.cn>
-To: Zhipeng Lu <alexious@zju.edu.cn>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
- hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, jesse.brandeburg@intel.com,
- richardcochran@gmail.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+References: <20240131201413.18805-1-gerhard@engleder-embedded.com>
+In-Reply-To: <20240131201413.18805-1-gerhard@engleder-embedded.com>
+To: Gerhard Engleder <gerhard@engleder-embedded.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, davem@davemloft.net,
+ kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, bjorn@kernel.org,
+ magnus.karlsson@intel.com, maciej.fijalkowski@intel.com,
+ jonathan.lemon@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu,  1 Feb 2024 20:47:13 +0800 you wrote:
-> When qmem_alloc and pfvf->hw_ops->sq_aq_init fails, sq->sg should be
-> freed to prevent memleak.
+On Wed, 31 Jan 2024 21:14:13 +0100 you wrote:
+> For XDP_TX action xdp_buff is converted to xdp_frame. The conversion is
+> done by xdp_convert_buff_to_frame(). The memory type of the resulting
+> xdp_frame depends on the memory type of the xdp_buff. For page pool
+> based xdp_buff it produces xdp_frame with memory type
+> MEM_TYPE_PAGE_POOL. For zero copy XSK pool based xdp_buff it produces
+> xdp_frame with memory type MEM_TYPE_PAGE_ORDER0.
 > 
-> Fixes: c9c12d339d93 ("octeontx2-pf: Add support for PTP clock")
-> Signed-off-by: Zhipeng Lu <alexious@zju.edu.cn>
-> ---
->  .../ethernet/marvell/octeontx2/nic/otx2_common.c   | 14 ++++++++++++--
->  1 file changed, 12 insertions(+), 2 deletions(-)
+> [...]
 
 Here is the summary with links:
-  - octeontx2-pf: Fix a memleak otx2_sq_init
-    https://git.kernel.org/netdev/net/c/b09b58e31b0f
+  - [net] tsnep: Fix mapping for zero copy XDP_TX action
+    https://git.kernel.org/netdev/net/c/d7f5fb33cf77
 
 You are awesome, thank you!
 -- 
