@@ -1,71 +1,61 @@
-Return-Path: <netdev+bounces-68866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16CEE8488FA
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 22:28:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F0B78488FD
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 22:34:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C57262812CB
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 21:28:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 211E3B23E33
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 21:33:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76D9A12B7D;
-	Sat,  3 Feb 2024 21:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84ADC11714;
+	Sat,  3 Feb 2024 21:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="o7WXiL8C"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dyg95770"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 994A912E46
-	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 21:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2CBD11721
+	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 21:33:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706995717; cv=none; b=XbH9jDLIYpoWjtr5r95vhxRtT+QvawrMwRBMup/t+lqd1F7UoblIUCAGomNUnG++4aWFByL+jVTLJp2/hrByCGnklzVh0kEJyXa/EteDHo5eBpMe7spySotA4+pdm+WO3kvyM7zyYtJcY1FNCWxPWIPY8wBZ9ZAdWRiv+n7nJUw=
+	t=1706996035; cv=none; b=oLsFZ9zl0yORCDy1cjwt/SjvlEfoyTK+EfJxZtGwUGL4yhbe/Z4EiqxuNfxpHiRgRf9zuG1Vy7snExEp1B7ZIUY+zdHWHjctLWMsymootDPcs9F8dS+DiJDg4pFVKW8kI/e7AGqxa08ECWLThHuU1AlipyCNAr4RxYmVfeOSTMM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706995717; c=relaxed/simple;
-	bh=lfrHHE8yhCqJloxoyGNhU88Ijb0K1qYEXH77Q8qOPZs=;
+	s=arc-20240116; t=1706996035; c=relaxed/simple;
+	bh=HvCBQVLGnJhhdsZNQb1CR58eM7ldTgAY/BiNv0yhFX4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ah0dkzNLWYEHJ/c1WpF0MyXVjkFR/VEZHbmOo0zX61Z69QH/yJMdn9T71I6qhekfl90FY8PGRJfSuBp4jWQsnR62/epGoF6avVrL3UctEQ14i9ZKH90x34rQ1tI3UBsXTEyGI4nnErL7VF3lULMl0z9LIhDC4VWrtlBr5A/5YA8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=o7WXiL8C; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=yELKVZUW+XrApwASaKAYQ84Of1LoeH3xAT4DY0I6SFk=; b=o7WXiL8C39bDXpf/w89elnPB0O
-	KgB9L9TigtmSP5sfC81ponrPDZsMcq5MmXkRo3O+dVsJFP/71oILQcP7mKreC1/z/XcjfAzbQyWSA
-	ayZdTPdmMvJOQx8KNU7syTA82b4sonG7wEtqcz/KTBYPPgiCNFOV9/7F/ZLOXr5jxAtJletdZ5I++
-	I6fsRexe8Dbgbm6TzcNA789FiMm3CTovNO8cCss068+RneCR/ZOJzntaZ3xRKaie4Pm3140/WAOx4
-	gTY33BrIVqrT16Ye5uf1dLSY4iQG5WNxj6hmo7PGIycnQJz9sNx04AtFOgYpMl+51RhxP5MzcaouG
-	2crCaqWQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33980)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rWNYk-0007QT-2U;
-	Sat, 03 Feb 2024 21:28:22 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rWNYi-00018W-2J; Sat, 03 Feb 2024 21:28:20 +0000
-Date: Sat, 3 Feb 2024 21:28:19 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org,
-	Tim Menninger <tmenninger@purestorage.com>
-Subject: Re: [PATCH net-next 0/2] Unify C22 and C45 error handling during bus
- enumeration
-Message-ID: <Zb6v8wLIp9m79ieN@shell.armlinux.org.uk>
-References: <20240203-unify-c22-c45-scan-error-handling-v1-0-8aa9fa3c4fca@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=iYx3dctS+3ttbclzC87oeFLgk1CLpht5AibLCouTIU/a0/YrXRIBa8NQNY+6HyI4BxmffMM1GweeWfXVocQBVWO2NgTmJjnnFpRyUMBFx+rsFbImsrH22dFLa9uPjo1v/TNkLW5rBLJCubgERpgmy7GYb3/uF3aUkBjTAs+acE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dyg95770; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=0PUweqmyfu39Pl04pTqkgBuH6ihtzFxPtpRWFFfXTzg=; b=dyg95770286oFniDPBV5qPw7Jo
+	86hVdmESMKk1xKRDIiBBCZ52Mzlrcm8qa5hUk05PcaD9Ver9YzkmSHjp5B33o8wtiTiP8EFyLExax
+	UAAklWtYNheTVWOi/ATdNUw6mKf1auYYAS0KK16GE7i3UJGKKKN6F7161IOH/3hQRDQ4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rWNdw-006vZK-Ci; Sat, 03 Feb 2024 22:33:44 +0100
+Date: Sat, 3 Feb 2024 22:33:44 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	Ariel Elior <aelior@marvell.com>,
+	Sudarsana Kalluru <skalluru@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] bnx2x: convert EEE handling to use linkmode
+ bitmaps
+Message-ID: <f87eac1a-0f75-44d1-a52c-1ad15b0ccd59@lunn.ch>
+References: <ca984f60-b08a-42d8-a127-13572190d155@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,20 +64,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240203-unify-c22-c45-scan-error-handling-v1-0-8aa9fa3c4fca@lunn.ch>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <ca984f60-b08a-42d8-a127-13572190d155@gmail.com>
 
-On Sat, Feb 03, 2024 at 02:52:47PM -0600, Andrew Lunn wrote:
-> When enumerating an MDIO bus, an MDIO bus driver can return -ENODEV to
-> a C22 read transaction to indicate there is no device at that address
-> on the bus. Enumeration will then continue with the next address on
-> the bus.
+On Sat, Feb 03, 2024 at 10:19:43PM +0100, Heiner Kallweit wrote:
+> Convert EEE handling to use linkmode bitmaps. This prepares for
+> removing the legacy bitmaps from struct ethtool_keee.
+> No functional change intended.
 > 
-> Modify C44 enumeration so that it also accepts -ENODEV and moves to
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+>  .../ethernet/broadcom/bnx2x/bnx2x_ethtool.c   | 45 +++++++++----------
+>  1 file changed, 22 insertions(+), 23 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
+> index 5f0e1759d..0672188bc 100644
+> --- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
+> +++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
+> @@ -2081,28 +2081,26 @@ static const char bnx2x_private_arr[BNX2X_PRI_FLAG_LEN][ETH_GSTRING_LEN] = {
+>  	"Storage only interface"
+>  };
+>  
+> -static u32 bnx2x_eee_to_adv(u32 eee_adv)
+> +static void bnx2x_eee_to_linkmode(unsigned long *mode, u32 eee_adv)
+>  {
+> -	u32 modes = 0;
+> -
+> +	linkmode_zero(mode);
 
-C45
+While i agree this is a straight translation, i don't think it is
+needed. bnx2x_eee_to_adv() is only called from bnx2x_get_eee() and the
+ethtool core will already of zeroed all the fields.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Apart from that
+
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
 
