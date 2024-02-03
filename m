@@ -1,165 +1,112 @@
-Return-Path: <netdev+bounces-68837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8DDF848770
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 17:28:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6F48848777
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 17:30:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D93BE1C21B03
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 16:28:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D3781F21C21
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 16:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C6045F57C;
-	Sat,  3 Feb 2024 16:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AB092AF09;
+	Sat,  3 Feb 2024 16:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nYR9cA9V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TyoTqgZK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F0D75F843;
-	Sat,  3 Feb 2024 16:28:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89DF718636
+	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 16:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706977691; cv=none; b=WeXEsYf4Ra970IKWm7Y9PD8WM3rETap3i4rGY7CZfKBy4rCDp3Mk4klwRacoR8RQZgPpjpopKESfkCyWkQJSgk0/06NozcEnh/KDlCJtjFkZPjmGVFKOq8QfJIOyRacXy6gDyL6c8h5XZtK1R3sLZj5qw3W3scjG/t0Zt8XWDdo=
+	t=1706977810; cv=none; b=fD3DELIK3it/BvYFYreB5CJdT6WOIuLv6BY6hHlSA/Vetwpbxqm22/z6YAgWOysl52kszavDYUtwUcuOq2TZMQhFLOtYi48fAJEc1HViFIXWrpOLFHdtn8BEO+O60LKXg7zWeJMkoK/WnnjSTqPgMBHrBZSU3IWE+H0dmkz/9T4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706977691; c=relaxed/simple;
-	bh=6V+6hanOVQqDNQ9px+eX1cNnxoJnRfwrdgS3FDJGxQs=;
+	s=arc-20240116; t=1706977810; c=relaxed/simple;
+	bh=+OljRcxjC1mklwyD/bZBrOBvNx6A3S0ZcFM1gFF2q5o=;
 	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cTsaEdsP5bR93qU1MbFtTUwqEdD6eDsYTkAquOWIYMaJTJSfovKzXgeyDIX98wiYi0HPHWtJa0gzpl7OTVfqfxjy8uSp2oOlQitmJ0CLyCLQiwW3/KG1zoupGM2rbLYyr/3mMyZBwgHf5UoA9BvexJxW953cgbshh0Hrkg6P380=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nYR9cA9V; arc=none smtp.client-ip=209.85.128.53
+	 Content-Type:Content-Disposition:In-Reply-To; b=LrY22phEuAPQYeMueAtCUCMJ9h9doXPz8aU+m6ioxoZg1KqAFu6zr2QnvNwxIDzsu3ehZrQ7XuVRwFZXSEEnbUxJZW6L3TEPyAnvfMl+UBUqSVIVfeNIMBbNU8mR68tKBd1DhqxzEalNRwLlQYJ/n0erkkCiu7eQoCuYF8pF+D4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TyoTqgZK; arc=none smtp.client-ip=209.85.221.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-40fc65783aeso14597505e9.2;
-        Sat, 03 Feb 2024 08:28:09 -0800 (PST)
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-339289fead2so1972773f8f.3
+        for <netdev@vger.kernel.org>; Sat, 03 Feb 2024 08:30:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706977687; x=1707582487; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=GS/BDC9cqJY3NsuxlNWLdJ/c0yhbHpkPVMKk/bSeWvA=;
-        b=nYR9cA9VW41te+JyUScvY72qkk4L66WhtoAmoy2BfaBx19/A9Fn70UOMpV1G1Zzj+7
-         PQ9Unu+HHjQxAfOp5Y/Qjt53JkzB/D13cuU1mEvZUCdCZBHCQhGLFxgUTOez+rrQhFqE
-         6t1EtHkBMg6Y6qA5UuHnyNqkRGtO4cX3QpJfEvfVCbM+7SL1yqnlDauL7B1smYtL4UpE
-         gz4ASu050HSgRTbhx/JJGNYX1zfpEUvhMlyV7dwuacA/uva6djBz0wDse1NCQLEPD1MX
-         U7k7Q0K/U577Zv2X1hS6NEDfBBZLbnvdJXQUqowA0Fq7KyZT/ycwAlhhbnOgUuEtlPUh
-         XVqQ==
+        d=gmail.com; s=20230601; t=1706977807; x=1707582607; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:subject:cc:to:from:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=XXy27Vu2corIDixtadziHhytUS1dHWW8iRnrl99HUak=;
+        b=TyoTqgZKZtCt1GX2hMLkgeLuJJUQbIVGLeCz76hbJsm3uhfggSU09hwbi5/f9exydU
+         YHI3TfkA0XsVIgUHESC/czdqLGRkhyIPHc/6xL2LtwXVvKESXYMrq412LlphCNfdu9b5
+         MnN6nany6Xcf+xx83K/WnWD6mTEz4rN8fhr0Ri3QqRCVQWbclGokQ77CuZZJOLhCsn7W
+         dU8BRsiQ9GjH6ObLq2FhyoRTW0/Uk/WyB/Pja8LiE5tYvMWjpCIVni4nUyCxdUNk6MPg
+         g3bYzrucffj5ePWkh9HJ9BcOMSGfghZe+SjngdzVgSNRS/t3o8uhKk1klnXTuLcKPCTt
+         +dNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706977687; x=1707582487;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GS/BDC9cqJY3NsuxlNWLdJ/c0yhbHpkPVMKk/bSeWvA=;
-        b=aUxd7BuMQX4K0AoGBSHVU/jcO7nAu9BnSn5OuyQGnp8EL6rTqr1GVK+pWkwToIF4HQ
-         RvrWmXRKn+PrKhyv8Vfqp1CFmCtRl2RzyI6v6dfRUplVdp1wvOCj6uZIMFO6kr7Hf9c0
-         OA+THYqBwxtSpmGLh3sMbz3AbbWCF4RZ/NwlW1VOdrhjQiBQT8cxa5pcujIQgvI1Cqq1
-         vZ2+6whQU48UCTHLkRMVFRHs4rPN6nrSx1nEtUAlMM/GSZGzyTOskNBl0xYz/cOwxRbB
-         kRkFLvDrrPpQQJySkx+FkuJ91h2rtGtYr23J/IRyt/QxCiBjjkpqpbPoTDBvY9YHUDg9
-         6jSg==
-X-Gm-Message-State: AOJu0YzJkRb+ObVp+f+XPQqGaojNaft63XI4p0J7icQj/eDfw64olKTF
-	OSuWvjeEeBhE25gxFwdFm229v9IJy0Bezm2k0AaorPDKbKZESdi9
-X-Google-Smtp-Source: AGHT+IFZi4hVOIAerpcyvJSDucWbbOaS3/MTQMCOcFUZOAjnLU/6PIKvKYstNkZWNd7izQcI+JNkPQ==
-X-Received: by 2002:a05:600c:3583:b0:40f:20e:bf71 with SMTP id p3-20020a05600c358300b0040f020ebf71mr1339216wmq.5.1706977687368;
-        Sat, 03 Feb 2024 08:28:07 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUDMefEEkz4sDh5F3KKg8tLo1bHdknErdzPlp3ZSApUFvoUMRZ0qL0RLovls/Zu2HjjIpB6P415JUyCkBUGrLeiD9Ztth0+a7nlfCMGEopXBnTW3YMltNr8J0HabfGtXNPARxRARxK2i29Ek8MtCayJxqL/7HbXKYLpGjuQrRNOKWhmM0lNeV3qGnoA4YqkqM4VWYHJHsJMdFGFjVicHZLmOAFSEnuhBMpa8xtzvh/L+n+EdaMhXvDKs6L6EQev10hh4JlV9LAEs/Um7TVBqY6y1pEPwvemY5ESC/9DlSG5hWtv/PWMoU3cAecmszWcyyQLIWeJ0U/BSnKqMEL1ydBwDKYffewRY1jyYdIhxpuot6kYZUhxjCRChZH2v26rhG6pqreuioaJXqSW0uErea7+RCGcpxkDlGvrOWkjlPWYiPQh2xN7CNRYVB8ljBLoUdN5hiPr93fDo2sXTWNE7yBAO/ZrBZY/pLieT5meAUL+JsB9FcQ+EsUN0KIoxWV2MvNRZfrWxcxjSIlXKj6FXgjLgdHz68wGQ1NjUo3ZRk/jhbNekzUF6IeQDKneIuVRVX59fw==
+        d=1e100.net; s=20230601; t=1706977807; x=1707582607;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:subject:cc:to:from:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XXy27Vu2corIDixtadziHhytUS1dHWW8iRnrl99HUak=;
+        b=IoeWw4HzKRNpLfqje8M9jmXqynDBhKq2w74xkuTIE6BJNGh7iNzAGDQspvrQFoNckw
+         fHINmdEsHbQNJPMuew9M1YqQGGMX5w3q9/N5K2xl5mwI52iM4yVDwy6/eIhPlkboxBuH
+         TH7b4iBj6ON6qhBhxGTt53LZ0Ttg7DO4TclcOUW+U38LxfqSCemLzuoEP7MRBSNZ73dj
+         KDa3R1t0+FIBKU30GTaWYT4CS8KUqboJbngMcHDwP1OyI9LirE2BWtqncsmD2dzPlzLB
+         aBG9Tq3y9/WeIS9ZdZ7V8LgtNHOEypfJybKdyhZQMt0QfuHaJmtVsiPcd9ZPKFAFl+F4
+         zEng==
+X-Gm-Message-State: AOJu0Yyi44gqUEaG2mxQg0RoUzybNoc5zIPSZJtULARFfSoS+mB/DGqa
+	HuphVDxSgMKdoIkpXCmFgsCK6kQmW2ek9gfCB2fZRrGD+nW4TFrR
+X-Google-Smtp-Source: AGHT+IEG0kuTTqX5xnhiVq8iGL041iU25nugdIqHrxTPlttgb1AZuJle8tk9knD/575pV4Ue3l0l0w==
+X-Received: by 2002:adf:ef11:0:b0:33b:24d5:f542 with SMTP id e17-20020adfef11000000b0033b24d5f542mr2651675wro.6.1706977806439;
+        Sat, 03 Feb 2024 08:30:06 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWKrUZForK475OgM2OJRRZAWTyeqJ0M3uTohEzuYCpLg7YE6ypyHbXZ9SZRBZSXwkkYyv5zrhi8iJhN+Y9qvEHo/jUNNScFRQWnfvcWaseZiMzRyvjyFASxKMNXmEZ4BUOkEmLHJ/r5sW1BRhtm3Zj85XaZTaHffUdMgscJqUhxFnAKiBr5E9GyF7MtX1EK6i871yCaWLTucRmKOgfaTpP+7UsAplYACCmYvf+4kII6ewWscHp2HZFI
 Received: from Ansuel-xps. (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.gmail.com with ESMTPSA id m9-20020a7bcb89000000b0040e813f1f31sm3315328wmi.25.2024.02.03.08.28.06
+        by smtp.gmail.com with ESMTPSA id f5-20020adff8c5000000b0033afcc899c1sm4362141wrq.13.2024.02.03.08.30.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 03 Feb 2024 08:28:07 -0800 (PST)
-Message-ID: <65be6997.7b0a0220.3acf.de81@mx.google.com>
-X-Google-Original-Message-ID: <Zb5pkz6b1ytMTiaI@Ansuel-xps.>
-Date: Sat, 3 Feb 2024 17:28:03 +0100
+        Sat, 03 Feb 2024 08:30:06 -0800 (PST)
+Message-ID: <65be6a0e.df0a0220.eede7.2924@mx.google.com>
+X-Google-Original-Message-ID: <Zb5qCr45m64_Ug-e@Ansuel-xps.>
+Date: Sat, 3 Feb 2024 17:30:02 +0100
 From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>,
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Frank Rowand <frowand.list@gmail.com>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [net-next PATCH v5 7/9] net: phy: qcom: add support for QCA807x
- PHY Family
-References: <20240201151747.7524-1-ansuelsmth@gmail.com>
- <20240201151747.7524-8-ansuelsmth@gmail.com>
- <a530f40c-b8fd-4da1-b4df-f80ab05f0394@lunn.ch>
- <65bd29f9.050a0220.a175d.3d5f@mx.google.com>
- <c3447c2b-4b43-4c09-b89e-d6a44971b923@lunn.ch>
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>
+Subject: Re: [PATCH net-next 2/2] net: dsa: qca8k: consistently use "ret"
+ rather than "err" for error codes
+References: <20240202163626.2375079-1-vladimir.oltean@nxp.com>
+ <20240202163626.2375079-3-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <c3447c2b-4b43-4c09-b89e-d6a44971b923@lunn.ch>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240202163626.2375079-3-vladimir.oltean@nxp.com>
 
-On Sat, Feb 03, 2024 at 05:25:23PM +0100, Andrew Lunn wrote:
-> On Fri, Feb 02, 2024 at 06:44:22PM +0100, Christian Marangi wrote:
-> > On Fri, Feb 02, 2024 at 02:35:11AM +0100, Andrew Lunn wrote:
-> > > > +static int qca807x_read_fiber_status(struct phy_device *phydev)
-> > > > +{
-> > > > +	int ss, err, lpa, old_link = phydev->link;
-> > > > +
-> > > > +	/* Update the link, but return if there was an error */
-> > > > +	err = genphy_update_link(phydev);
-> > > > +	if (err)
-> > > > +		return err;
-> > > > +
-> > > > +	/* why bother the PHY if nothing can have changed */
-> > > > +	if (phydev->autoneg == AUTONEG_ENABLE && old_link && phydev->link)
-> > > > +		return 0;
-> > > > +
-> > > > +	phydev->speed = SPEED_UNKNOWN;
-> > > > +	phydev->duplex = DUPLEX_UNKNOWN;
-> > > > +	phydev->pause = 0;
-> > > > +	phydev->asym_pause = 0;
-> > > > +
-> > > > +	if (phydev->autoneg == AUTONEG_ENABLE && phydev->autoneg_complete) {
-> > > > +		lpa = phy_read(phydev, MII_LPA);
-> > > > +		if (lpa < 0)
-> > > > +			return lpa;
-> > > > +
-> > > > +		linkmode_mod_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
-> > > > +				 phydev->lp_advertising, lpa & LPA_LPACK);
-> > > > +		linkmode_mod_bit(ETHTOOL_LINK_MODE_1000baseX_Full_BIT,
-> > > > +				 phydev->lp_advertising, lpa & LPA_1000XFULL);
-> > > > +		linkmode_mod_bit(ETHTOOL_LINK_MODE_Pause_BIT,
-> > > > +				 phydev->lp_advertising, lpa & LPA_1000XPAUSE);
-> > > > +		linkmode_mod_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT,
-> > > > +				 phydev->lp_advertising,
-> > > > +				 lpa & LPA_1000XPAUSE_ASYM);
-> > > > +
-> > > > +		phy_resolve_aneg_linkmode(phydev);
-> > > > +	}
-> > > 
-> > > This looks a lot like genphy_c37_read_status(). Can it be used?
-> > >
-> > 
-> > Yes but I had to expand genphy_c37_read_status. Hope it will be OK.
+On Fri, Feb 02, 2024 at 06:36:26PM +0200, Vladimir Oltean wrote:
+> It was pointed out during the review [1] of commit 68e1010cda79 ("net:
+> dsa: qca8k: put MDIO bus OF node on qca8k_mdio_register() failure") that
+> the rest of the qca8k driver uses "int ret" rather than "int err".
 > 
-> You can expand it, but please keep to what is defined within 802.3. We
-> don't want any vendor extensions in this common code. Vendor things
-> should be kept in the vendor driver. So you can call
-> genphy_c37_read_status() and then do any vendor specific fixups
-> needed.
->
+> Make everything consistent in that regard, not only
+> qca8k_mdio_register(), but also qca8k_setup_mdio_bus().
+> 
+> [1] https://lore.kernel.org/netdev/qyl2w3ownx5q7363kqxib52j5htar4y6pkn7gen27rj45xr4on@pvy5agi6o2te/
+> 
+> Suggested-by: Alvin Šipraga <alsi@bang-olufsen.dk>
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Sure the expansion is just adding a bool signal if the link has changed
-or not (to make it possible to exit early and skip the additional vendor
-call...) I didn't add anything to the c37 function ifself.
-
-Anyway of from this, the revision is ready, just need to understand if
-Rob is ok with absolute or relative address for PHYs in the PHY package
-node.
+Reviewed-by: Christian Marangi <ansuelsmth@gmail.com>
 
 -- 
 	Ansuel
