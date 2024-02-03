@@ -1,179 +1,202 @@
-Return-Path: <netdev+bounces-68777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E17E3847FF6
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 04:54:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 32009847FFA
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 04:55:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E35B21C21AF7
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 03:54:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 573BC1C21D12
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 03:55:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDB17F514;
-	Sat,  3 Feb 2024 03:54:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V//f1bjH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46BE6F9D3;
+	Sat,  3 Feb 2024 03:55:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C1CF9D8
-	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 03:54:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82453F9EB
+	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 03:55:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706932461; cv=none; b=pRoKB0OVq8sdMcymG7sGiY67cGlXkWzfLRzHYs5HFKV0+Qx+jF/PnCZsqISdEbXr1GPHx86hmuYpzhaolaDbEQJbq4ioYnnrv8iNZ5ZyLA4gAJhDKSrMHYTb8Pa/HaKY6AMUj8j2ombnhI3sXNJK7L+3gKCEjBLYXb+0Mb4b/lc=
+	t=1706932526; cv=none; b=QrUHsWURqIvA3fwtjUlVgivc6XJ5er3EQG/6Y+gMrjM1ybZ7Kpa3DSzB8gaeKNkil4coJ+JJqdeYNevqOtgjQjkweLMlfuv7gp7StL6B3X/soO3GXImubPD3K+kU7G1WzSHa4DX8f8m2iYCu/DMggsEGfpE2CcoW6ZA5iRMeI1Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706932461; c=relaxed/simple;
-	bh=2vtD7+lj0SR271YIcIMlwabKGu1Co46XNZqyL6r9u8U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=txPRwNfih5FGnX3EiDRFm4FLpBfTotzHhYNb/mIDLLmd4WQijHM+LXdBRn+ItLfP+ZTQGAUiz0CqHKTDfrmFK1xIf5nJLX9jOaM3j5OMc935f4kLdwsZyW3VgZXG7jrEIYrWURSgWe4lUVk/ssdr8d1m7FKwGiYTMPMe0BcNceI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V//f1bjH; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-296043e44caso2287944a91.0
-        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 19:54:20 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706932459; x=1707537259; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=0xYkddXUrDJAfgUpGpWm0VMdQ+xvDjPP8EfmN3Ikdgg=;
-        b=V//f1bjHaoMnYruaA0jumqpPG2LIfjB4YmmSAx2ayyX0Cx1tnX9hTmE6T5254fLi6h
-         BHFGNVci2wqLqkEwAleQCu07mPZ4t5Bhd6AzMsIIg/Pu1sI/n4boC0xrlrYTI+AXn9z9
-         y7ZjuiEp/KbPTBYywjlILcoH+/xMzzcO7NvElnEp4ZxAqRFVWNxpgqMmcDGhNKXwGMwe
-         A+WmPdDrVyqzT5gdQrVueyq+U1ipQq9kVeZpJBi4FmVFVCJ0D/6jsn2OUwJuVf23FF4t
-         4w9cyXS/rEZRt/ZEFc8rqtvUcC83i0wUfA0MZtTKijQH98B4do5T4kIIEZ0MWgX2La9b
-         nFdw==
+	s=arc-20240116; t=1706932526; c=relaxed/simple;
+	bh=pz3bTR4QPTBQGtNkck0ABnWfFg+OZqiAEH9+v+f9t5Q=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Ut4h0uA8mred/VgNpa+gThWXa9raXKVdBcRxOLAUO5bRn7NoLd4RXZXd7gsO05g6YPHpWZT5SJQU3xoh386h+SUh0flSSsR3r+uFJkisFKY7yMyLJKCY5ZBVIkp2Gau8DMY62igxGx9OCxvu5GhBxiwT8++M5fJ5y+V71cWLaes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-363bedeec4fso46065ab.1
+        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 19:55:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706932459; x=1707537259;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0xYkddXUrDJAfgUpGpWm0VMdQ+xvDjPP8EfmN3Ikdgg=;
-        b=Ipl9kUt4EKRNcxTSzF9kqhHAznjc//NgR5xOt4qDPsY0QZWlNw2vTO07HdGDU6vetv
-         CFuzDZMmcK/dl3PESZggEISg7LO5jTKxRFJ8GTjB4oznWkHl3b/NzjZ7xeiBa2mY7QGV
-         xjezGEsw1VDXHMaeoNUmzjfD8rOTv7wNvJ9vBxit32Gk2WdsBTpsY7kiNCdY7BdRcQNV
-         hu9qmiYT1dD3aJhXdHB6q1Z7/c/tAILseqoLjna2biWqBc8l6EoGjD3m8+vdWTjlOU6N
-         1igebhx070bo9yxw2id2CPh36wYT8HtrZM6r70cTc7Kii4jBug1cWXJZXR1ylR+NEio/
-         Mnkg==
-X-Gm-Message-State: AOJu0YzII+HQUKcK6BeYgx7Ww5S1omQwLZsczoIXK9ycZbf9ychq5DXd
-	YAPDO4/xYXe8ApCP7eP+ohN+qaWLsdu4SOd2Ai/cjfO4H77ecEhC
-X-Google-Smtp-Source: AGHT+IG2VEsTjF9/hgvp324MjfICUu/SUoBr7Zfgdyz8s7NrtoRxECFxCNheppCUG0C8Ol6gxP2W9Q==
-X-Received: by 2002:a17:902:e84c:b0:1d9:7124:a89a with SMTP id t12-20020a170902e84c00b001d97124a89amr4258525plg.58.1706932459502;
-        Fri, 02 Feb 2024 19:54:19 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVCGsRf8eDVhA4x7CsvGBEE73XNzjXxdXamxgkcfslXY5eu1BRCDqnZFHffpLQVxj0K7dTK5MEpxRquT1MDUvRAcWqJplCpyNGJdZfZ7/Gb0btjym7RoBWZ1SOQWiYjf606VzTuvYk3HTtEISc=
-Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id k10-20020a170902f28a00b001d6f8b31ddcsm2371164plc.3.2024.02.02.19.54.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 02 Feb 2024 19:54:19 -0800 (PST)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Message-ID: <bd9fa2f7-ffc5-44f6-a301-ea9be91285ab@roeck-us.net>
-Date: Fri, 2 Feb 2024 19:54:17 -0800
+        d=1e100.net; s=20230601; t=1706932523; x=1707537323;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=tvu4f2hTAGciBSeASfhgzvcyQRqm5qo/b1UAEIIZ4/k=;
+        b=cKaD9H5EKfFSVyfkklBehLD+qYbuwgCgybgI/RgU+SrYjl0u/YwJo2358WwNKn/spd
+         xCYBKjSM40kIEZPNK06tvAiLUKaOKs6KQ92VU9N6+fplh2Pebr7IHRamo6VTukxM8AUA
+         TY7fEjyZSq9xHH4X1GmDKFZODeLegpntxsu89EDIJr1k/Flkh6JGEgEUahT70i/1cAwC
+         uh9Bxm3ZpghT0eiuGN8sFrJnR6i0YGVuF4iHeVSwnxDTERkMJA97Vl8AZZFpJL1zGEHv
+         rqdRp5Nz6eHAK3x1fUIvhuHpv2Ev3KzxbsuipM/p8uu60VZuH6BAPUreQci5MBjAGsSR
+         oJJQ==
+X-Gm-Message-State: AOJu0YxVyNkVN54OsE3T6LV0ZyWt6eDo/LPQTNrDxEChp/yGu0mFCMsQ
+	qfIYkz3Oq7Nk1srw2wOzetpaK7RxXHr2vJq1rXzoSKMxCtoeKlDPRuDnzY5aKkzTfUPZyhpm+Tk
+	dnGddjeq1zOZc9+mSNSdwocoxdljCowloyyArffGWzASD7aMxWCJizVg=
+X-Google-Smtp-Source: AGHT+IG0un7nsq8gsVaj02ca0MPJ8WyRCWpMuo/2TlQzUsAA+qmdaxJgq2jEY9Cfm2msySqWkjmKvT95yz/mlRab/O7GOflLUawi
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Persistent problem with handshake unit tests
-Content-Language: en-US
-To: Chuck Lever III <chuck.lever@oracle.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
- kernel-tls-handshake <kernel-tls-handshake@lists.linux.dev>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <b22d1b62-a6b1-4dd6-9ccb-827442846f3c@roeck-us.net>
- <20240202112248.7df97993@kernel.org>
- <f76d66dd-5920-4bf1-95f5-dd64f19826d4@roeck-us.net>
- <39a8176f-7c22-41ac-a027-dac10e349c51@roeck-us.net>
- <3C9375EF-D773-48CF-98D3-920B33E02F5A@oracle.com>
-From: Guenter Roeck <linux@roeck-us.net>
-Autocrypt: addr=linux@roeck-us.net; keydata=
- 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
- mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
-In-Reply-To: <3C9375EF-D773-48CF-98D3-920B33E02F5A@oracle.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1d0d:b0:35f:f01e:bb18 with SMTP id
+ i13-20020a056e021d0d00b0035ff01ebb18mr842612ila.6.1706932523680; Fri, 02 Feb
+ 2024 19:55:23 -0800 (PST)
+Date: Fri, 02 Feb 2024 19:55:23 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000bacd1706107232cd@google.com>
+Subject: [syzbot] [net?] upstream boot error: KMSAN: use-after-free in stack_depot_save_flags
+From: syzbot <syzbot+7364c186cc00641845c5@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 2/2/24 19:46, Chuck Lever III wrote:
-> 
-> 
->> On Feb 2, 2024, at 3:51 PM, Guenter Roeck <linux@roeck-us.net> wrote:
->>
->> On 2/2/24 12:49, Guenter Roeck wrote:
->>> On 2/2/24 11:22, Jakub Kicinski wrote:
->>>> On Fri, 2 Feb 2024 09:21:22 -0800 Guenter Roeck wrote:
->>>>> when running handshake kunit tests in qemu, I always get the following
->>>>> failure.
->>>>
->>>> Sorry for sidetracking - how do you run kunit to get all the tests?
->>>> We run:
->>>>
->>>>      ./tools/testing/kunit/kunit.py run --alltests
->>>>
->>>> but more and more I feel like the --alltests is a cruel joke.
->>> I have CONFIG_NET_HANDSHAKE_KUNIT_TEST=y enabled in my configuration.
->>> The tests run during boot, so no additional work is needed. I don't run all
->>> tests because many take too long to execute in qemu.
->>
->> Follow-up: If this test isn't supposed to run during boot, please
->> let me know and I'll drop it.
-> 
-> These are pretty simple tests that should run quickly. I don't see
-> a reason to exclude them. Generally the memory environment in the
-> Kunit test harness is significantly different than the one at boot,
-> so problems like this do crop up for qemu vs. boot time on occasion.
-> 
-> Question is, has this test started to fail only recently, or has it
-> been broken since it was merged?
-> 
+Hello,
 
-I am wuite sure that it has been broken since it was merged. I only recently
-started actually checking test results, so I missed the problem for a while.
-Also, I am not sure if anyone besides me is actually running those tests ;-)
+syzbot found the following issue on:
 
-Guenter
+HEAD commit:    56897d51886f Merge tag 'trace-v6.8-rc2' of git://git.kerne..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11ef8190180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c11709bae75cc702
+dashboard link: https://syzkaller.appspot.com/bug?extid=7364c186cc00641845c5
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/3f7d6226b85a/disk-56897d51.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/129ced2080da/vmlinux-56897d51.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b0c58e85720b/bzImage-56897d51.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+7364c186cc00641845c5@syzkaller.appspotmail.com
+
+io scheduler kyber registered
+io scheduler bfq registered
+input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input0
+ACPI: button: Power Button [PWRF]
+input: Sleep Button as /devices/LNXSYSTM:00/LNXSLPBN:00/input/input1
+ACPI: button: Sleep Button [SLPF]
+ioatdma: Intel(R) QuickData Technology Driver 5.00
+ACPI: \_SB_.LNKC: Enabled at IRQ 11
+virtio-pci 0000:00:03.0: virtio_pci: leaving for legacy driver
+ACPI: \_SB_.LNKD: Enabled at IRQ 10
+virtio-pci 0000:00:04.0: virtio_pci: leaving for legacy driver
+ACPI: \_SB_.LNKB: Enabled at IRQ 10
+virtio-pci 0000:00:06.0: virtio_pci: leaving for legacy driver
+virtio-pci 0000:00:07.0: virtio_pci: leaving for legacy driver
+N_HDLC line discipline registered with maxframe=4096
+Serial: 8250/16550 driver, 4 ports, IRQ sharing enabled
+00:03: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+00:04: ttyS1 at I/O 0x2f8 (irq = 3, base_baud = 115200) is a 16550A
+00:05: ttyS2 at I/O 0x3e8 (irq = 6, base_baud = 115200) is a 16550A
+00:06: ttyS3 at I/O 0x2e8 (irq = 7, base_baud = 115200) is a 16550A
+Non-volatile memory driver v1.3
+Linux agpgart interface v0.103
+ACPI: bus type drm_connector registered
+[drm] Initialized vgem 1.0.0 20120112 for vgem on minor 0
+[drm] Initialized vkms 1.0.0 20180514 for vkms on minor 1
+Console: switching to colour frame buffer device 128x48
+platform vkms: [drm] fb0: vkmsdrmfb frame buffer device
+usbcore: registered new interface driver udl
+brd: module loaded
+loop: module loaded
+zram: Added device: zram0
+null_blk: disk nullb0 created
+null_blk: module loaded
+Guest personality initialized and is inactive
+VMCI host device registered (name=vmci, major=10, minor=118)
+Initialized host personality
+usbcore: registered new interface driver rtsx_usb
+usbcore: registered new interface driver viperboard
+usbcore: registered new interface driver dln2
+usbcore: registered new interface driver pn533_usb
+nfcsim 0.2 initialized
+usbcore: registered new interface driver port100
+usbcore: registered new interface driver nfcmrvl
+Loading iSCSI transport class v2.0-870.
+virtio_scsi virtio0: 1/0/0 default/read/poll queues
+scsi host0: Virtio SCSI HBA
+st: Version 20160209, fixed bufsize 32768, s/g segs 256
+Rounding down aligned max_sectors from 4294967295 to 4294967288
+db_root: cannot open: /etc/target
+=====================================================
+BUG: KMSAN: use-after-free in __list_del_entry_valid_or_report+0x19e/0x490 lib/list_debug.c:52
+ __list_del_entry_valid_or_report+0x19e/0x490 lib/list_debug.c:52
+ __list_del_entry_valid include/linux/list.h:124 [inline]
+ __list_del_entry include/linux/list.h:215 [inline]
+ list_del include/linux/list.h:229 [inline]
+ depot_pop_free lib/stackdepot.c:426 [inline]
+ depot_alloc_stack lib/stackdepot.c:445 [inline]
+ stack_depot_save_flags+0x3e9/0x7b0 lib/stackdepot.c:684
+ stack_depot_save+0x12/0x20 lib/stackdepot.c:722
+ ref_tracker_alloc+0x215/0x700 lib/ref_tracker.c:210
+ __netdev_tracker_alloc include/linux/netdevice.h:4147 [inline]
+ netdev_hold include/linux/netdevice.h:4176 [inline]
+ netdev_queue_add_kobject net/core/net-sysfs.c:1703 [inline]
+ netdev_queue_update_kobjects+0x24b/0x860 net/core/net-sysfs.c:1758
+ register_queue_kobjects net/core/net-sysfs.c:1819 [inline]
+ netdev_register_kobject+0x41e/0x520 net/core/net-sysfs.c:2059
+ register_netdevice+0x19ec/0x2230 net/core/dev.c:10261
+ bond_create+0x138/0x2a0 drivers/net/bonding/bond_main.c:6390
+ bonding_init+0x1a7/0x2d0 drivers/net/bonding/bond_main.c:6474
+ do_one_initcall+0x216/0x960 init/main.c:1236
+ do_initcall_level+0x140/0x350 init/main.c:1298
+ do_initcalls+0xf0/0x1d0 init/main.c:1314
+ do_basic_setup+0x22/0x30 init/main.c:1333
+ kernel_init_freeable+0x300/0x4b0 init/main.c:1551
+ kernel_init+0x2f/0x7e0 init/main.c:1441
+ ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+
+Uninit was created at:
+ free_pages_prepare mm/page_alloc.c:1094 [inline]
+ free_unref_page_prepare+0xc1/0xad0 mm/page_alloc.c:2346
+ free_unref_page+0x58/0x6d0 mm/page_alloc.c:2486
+ free_the_page mm/page_alloc.c:563 [inline]
+ __free_pages+0xb1/0x1f0 mm/page_alloc.c:4653
+ thread_stack_free_rcu+0x97/0xb0 kernel/fork.c:344
+ rcu_do_batch kernel/rcu/tree.c:2190 [inline]
+ rcu_core+0xa3c/0x1e00 kernel/rcu/tree.c:2465
+ rcu_core_si+0x12/0x20 kernel/rcu/tree.c:2482
+ __do_softirq+0x1b7/0x7c5 kernel/softirq.c:553
+
+CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.8.0-rc2-syzkaller-00397-g56897d51886f #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
