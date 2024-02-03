@@ -1,202 +1,140 @@
-Return-Path: <netdev+bounces-68778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32009847FFA
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 04:55:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CB6E848009
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 05:00:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 573BC1C21D12
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 03:55:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48AF32822FE
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 04:00:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46BE6F9D3;
-	Sat,  3 Feb 2024 03:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B273F9E6;
+	Sat,  3 Feb 2024 04:00:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="k2HRrMgL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82453F9EB
-	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 03:55:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B659F9E4;
+	Sat,  3 Feb 2024 04:00:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706932526; cv=none; b=QrUHsWURqIvA3fwtjUlVgivc6XJ5er3EQG/6Y+gMrjM1ybZ7Kpa3DSzB8gaeKNkil4coJ+JJqdeYNevqOtgjQjkweLMlfuv7gp7StL6B3X/soO3GXImubPD3K+kU7G1WzSHa4DX8f8m2iYCu/DMggsEGfpE2CcoW6ZA5iRMeI1Q=
+	t=1706932839; cv=none; b=k2Lv0rbv50mTSaDc/udh1LPzygIYEYjdKzZsQ774nHtTaC1YJT1ONb2qAipiKC9RWoqKpT35kWuOw4rN57LFrunk3XNXS1BeFwUg6SfxbodQIIIlF/UzUKs/36xw0UoNlC3/mlljjhie9Nc1diG5C5RCEO/RPUxR/zXqc/42M8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706932526; c=relaxed/simple;
-	bh=pz3bTR4QPTBQGtNkck0ABnWfFg+OZqiAEH9+v+f9t5Q=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Ut4h0uA8mred/VgNpa+gThWXa9raXKVdBcRxOLAUO5bRn7NoLd4RXZXd7gsO05g6YPHpWZT5SJQU3xoh386h+SUh0flSSsR3r+uFJkisFKY7yMyLJKCY5ZBVIkp2Gau8DMY62igxGx9OCxvu5GhBxiwT8++M5fJ5y+V71cWLaes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-363bedeec4fso46065ab.1
-        for <netdev@vger.kernel.org>; Fri, 02 Feb 2024 19:55:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706932523; x=1707537323;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tvu4f2hTAGciBSeASfhgzvcyQRqm5qo/b1UAEIIZ4/k=;
-        b=cKaD9H5EKfFSVyfkklBehLD+qYbuwgCgybgI/RgU+SrYjl0u/YwJo2358WwNKn/spd
-         xCYBKjSM40kIEZPNK06tvAiLUKaOKs6KQ92VU9N6+fplh2Pebr7IHRamo6VTukxM8AUA
-         TY7fEjyZSq9xHH4X1GmDKFZODeLegpntxsu89EDIJr1k/Flkh6JGEgEUahT70i/1cAwC
-         uh9Bxm3ZpghT0eiuGN8sFrJnR6i0YGVuF4iHeVSwnxDTERkMJA97Vl8AZZFpJL1zGEHv
-         rqdRp5Nz6eHAK3x1fUIvhuHpv2Ev3KzxbsuipM/p8uu60VZuH6BAPUreQci5MBjAGsSR
-         oJJQ==
-X-Gm-Message-State: AOJu0YxVyNkVN54OsE3T6LV0ZyWt6eDo/LPQTNrDxEChp/yGu0mFCMsQ
-	qfIYkz3Oq7Nk1srw2wOzetpaK7RxXHr2vJq1rXzoSKMxCtoeKlDPRuDnzY5aKkzTfUPZyhpm+Tk
-	dnGddjeq1zOZc9+mSNSdwocoxdljCowloyyArffGWzASD7aMxWCJizVg=
-X-Google-Smtp-Source: AGHT+IG0un7nsq8gsVaj02ca0MPJ8WyRCWpMuo/2TlQzUsAA+qmdaxJgq2jEY9Cfm2msySqWkjmKvT95yz/mlRab/O7GOflLUawi
+	s=arc-20240116; t=1706932839; c=relaxed/simple;
+	bh=nPNcVMyJMqOzODkfQyo8r4ZLd/p2EiOmJqZC2GbOwHU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=KKJOi3w2TsyqeXvsD6pObyDYTu0GulM57/OZne42WSnWnJaW8hUGKIrLwMTSCu62aTphousoEJ8LlueNIm9UZ3+lZRAeY757JGpIwBfYuVpD5ojX8pBNbdSOlNgo77TyuVCByy8sP/eHGu7W5TQlnQowVSE2zFUvoL4URBLR6w0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=k2HRrMgL; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1706932838; x=1738468838;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=k41X4sc9DdtTYFgJF4SnAf1wbpUf7pf1w3fjGixgous=;
+  b=k2HRrMgLM30o5V9m/vT1Cd8hOBNNdiLIcXO86sRQLBygApFJCsepYH3L
+   YY8pKOzq6zmnfk/zCQz5eFxKDugm4PSciZKFeNCy0xcK+eqNW4t/6nkmN
+   C0N+brAs3gdObpDf6pTwQoxBxc0polZdVjrRNsRFhAcpK+jjMykqQ5TuY
+   E=;
+X-IronPort-AV: E=Sophos;i="6.05,238,1701129600"; 
+   d="scan'208";a="182307099"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 04:00:36 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:15805]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.44.97:2525] with esmtp (Farcaster)
+ id 8e386eaa-6d50-4d8a-8bab-47c198efb151; Sat, 3 Feb 2024 04:00:35 +0000 (UTC)
+X-Farcaster-Flow-ID: 8e386eaa-6d50-4d8a-8bab-47c198efb151
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Sat, 3 Feb 2024 04:00:33 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.106.101.14) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Sat, 3 Feb 2024 04:00:30 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <syzbot+fa3ef895554bdbfd1183@syzkaller.appspotmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <syzkaller-bugs@googlegroups.com>
+Subject: Re: [syzbot] [net?] WARNING in __unix_gc
+Date: Fri, 2 Feb 2024 20:00:21 -0800
+Message-ID: <20240203040021.65783-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <0000000000003555920610660fbc@google.com>
+References: <0000000000003555920610660fbc@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d0d:b0:35f:f01e:bb18 with SMTP id
- i13-20020a056e021d0d00b0035ff01ebb18mr842612ila.6.1706932523680; Fri, 02 Feb
- 2024 19:55:23 -0800 (PST)
-Date: Fri, 02 Feb 2024 19:55:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000bacd1706107232cd@google.com>
-Subject: [syzbot] [net?] upstream boot error: KMSAN: use-after-free in stack_depot_save_flags
-From: syzbot <syzbot+7364c186cc00641845c5@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWB004.ant.amazon.com (10.13.139.150) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello,
+From: syzbot <syzbot+fa3ef895554bdbfd1183@syzkaller.appspotmail.com>
+Date: Fri, 02 Feb 2024 05:26:28 -0800
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    1701940b1a02 Merge branch 'tools-net-ynl-add-features-for-..
+> git tree:       net-next
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=15cbca88180000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=43ed254f922f56d0
+> dashboard link: https://syzkaller.appspot.com/bug?extid=fa3ef895554bdbfd1183
+> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11b512ffe80000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12d6927be80000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/00090c03ed53/disk-1701940b.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/fc03bbe45eb3/vmlinux-1701940b.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/8a5b859954ca/bzImage-1701940b.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+fa3ef895554bdbfd1183@syzkaller.appspotmail.com
+> 
+> ------------[ cut here ]------------
+> WARNING: CPU: 0 PID: 2863 at net/unix/garbage.c:345 __unix_gc+0xc74/0xe80 net/unix/garbage.c:345
+> Modules linked in:
+> CPU: 0 PID: 2863 Comm: kworker/u4:11 Not tainted 6.8.0-rc1-syzkaller-00583-g1701940b1a02 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
+> Workqueue: events_unbound __unix_gc
+> RIP: 0010:__unix_gc+0xc74/0xe80 net/unix/garbage.c:345
+> Code: 8b 5c 24 50 e9 86 f8 ff ff e8 f8 e4 22 f8 31 d2 48 c7 c6 30 6a 69 89 4c 89 ef e8 97 ef ff ff e9 80 f9 ff ff e8 dd e4 22 f8 90 <0f> 0b 90 e9 7b fd ff ff 48 89 df e8 5c e7 7c f8 e9 d3 f8 ff ff e8
+> RSP: 0018:ffffc9000b03fba0 EFLAGS: 00010293
+> RAX: 0000000000000000 RBX: ffffc9000b03fc10 RCX: ffffffff816c493e
+> RDX: ffff88802c02d940 RSI: ffffffff896982f3 RDI: ffffc9000b03fb30
+> RBP: ffffc9000b03fce0 R08: 0000000000000001 R09: fffff52001607f66
+> R10: 0000000000000003 R11: 0000000000000002 R12: dffffc0000000000
+> R13: ffffc9000b03fc10 R14: ffffc9000b03fc10 R15: 0000000000000001
+> FS:  0000000000000000(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00005559c8677a60 CR3: 000000000d57a000 CR4: 00000000003506f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>  process_one_work+0x889/0x15e0 kernel/workqueue.c:2633
+>  process_scheduled_works kernel/workqueue.c:2706 [inline]
+>  worker_thread+0x8b9/0x12a0 kernel/workqueue.c:2787
+>  kthread+0x2c6/0x3b0 kernel/kthread.c:388
+>  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x1b/0x30 arch/x86/entry/entry_64.S:242
+>  </TASK>
 
-syzbot found the following issue on:
+Ugh, I should've noticed this before sending another series.
 
-HEAD commit:    56897d51886f Merge tag 'trace-v6.8-rc2' of git://git.kerne..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11ef8190180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c11709bae75cc702
-dashboard link: https://syzkaller.appspot.com/bug?extid=7364c186cc00641845c5
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+It seems syzbot creates a self-ref cycle.
+I'll look into it.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3f7d6226b85a/disk-56897d51.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/129ced2080da/vmlinux-56897d51.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/b0c58e85720b/bzImage-56897d51.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7364c186cc00641845c5@syzkaller.appspotmail.com
-
-io scheduler kyber registered
-io scheduler bfq registered
-input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input0
-ACPI: button: Power Button [PWRF]
-input: Sleep Button as /devices/LNXSYSTM:00/LNXSLPBN:00/input/input1
-ACPI: button: Sleep Button [SLPF]
-ioatdma: Intel(R) QuickData Technology Driver 5.00
-ACPI: \_SB_.LNKC: Enabled at IRQ 11
-virtio-pci 0000:00:03.0: virtio_pci: leaving for legacy driver
-ACPI: \_SB_.LNKD: Enabled at IRQ 10
-virtio-pci 0000:00:04.0: virtio_pci: leaving for legacy driver
-ACPI: \_SB_.LNKB: Enabled at IRQ 10
-virtio-pci 0000:00:06.0: virtio_pci: leaving for legacy driver
-virtio-pci 0000:00:07.0: virtio_pci: leaving for legacy driver
-N_HDLC line discipline registered with maxframe=4096
-Serial: 8250/16550 driver, 4 ports, IRQ sharing enabled
-00:03: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
-00:04: ttyS1 at I/O 0x2f8 (irq = 3, base_baud = 115200) is a 16550A
-00:05: ttyS2 at I/O 0x3e8 (irq = 6, base_baud = 115200) is a 16550A
-00:06: ttyS3 at I/O 0x2e8 (irq = 7, base_baud = 115200) is a 16550A
-Non-volatile memory driver v1.3
-Linux agpgart interface v0.103
-ACPI: bus type drm_connector registered
-[drm] Initialized vgem 1.0.0 20120112 for vgem on minor 0
-[drm] Initialized vkms 1.0.0 20180514 for vkms on minor 1
-Console: switching to colour frame buffer device 128x48
-platform vkms: [drm] fb0: vkmsdrmfb frame buffer device
-usbcore: registered new interface driver udl
-brd: module loaded
-loop: module loaded
-zram: Added device: zram0
-null_blk: disk nullb0 created
-null_blk: module loaded
-Guest personality initialized and is inactive
-VMCI host device registered (name=vmci, major=10, minor=118)
-Initialized host personality
-usbcore: registered new interface driver rtsx_usb
-usbcore: registered new interface driver viperboard
-usbcore: registered new interface driver dln2
-usbcore: registered new interface driver pn533_usb
-nfcsim 0.2 initialized
-usbcore: registered new interface driver port100
-usbcore: registered new interface driver nfcmrvl
-Loading iSCSI transport class v2.0-870.
-virtio_scsi virtio0: 1/0/0 default/read/poll queues
-scsi host0: Virtio SCSI HBA
-st: Version 20160209, fixed bufsize 32768, s/g segs 256
-Rounding down aligned max_sectors from 4294967295 to 4294967288
-db_root: cannot open: /etc/target
-=====================================================
-BUG: KMSAN: use-after-free in __list_del_entry_valid_or_report+0x19e/0x490 lib/list_debug.c:52
- __list_del_entry_valid_or_report+0x19e/0x490 lib/list_debug.c:52
- __list_del_entry_valid include/linux/list.h:124 [inline]
- __list_del_entry include/linux/list.h:215 [inline]
- list_del include/linux/list.h:229 [inline]
- depot_pop_free lib/stackdepot.c:426 [inline]
- depot_alloc_stack lib/stackdepot.c:445 [inline]
- stack_depot_save_flags+0x3e9/0x7b0 lib/stackdepot.c:684
- stack_depot_save+0x12/0x20 lib/stackdepot.c:722
- ref_tracker_alloc+0x215/0x700 lib/ref_tracker.c:210
- __netdev_tracker_alloc include/linux/netdevice.h:4147 [inline]
- netdev_hold include/linux/netdevice.h:4176 [inline]
- netdev_queue_add_kobject net/core/net-sysfs.c:1703 [inline]
- netdev_queue_update_kobjects+0x24b/0x860 net/core/net-sysfs.c:1758
- register_queue_kobjects net/core/net-sysfs.c:1819 [inline]
- netdev_register_kobject+0x41e/0x520 net/core/net-sysfs.c:2059
- register_netdevice+0x19ec/0x2230 net/core/dev.c:10261
- bond_create+0x138/0x2a0 drivers/net/bonding/bond_main.c:6390
- bonding_init+0x1a7/0x2d0 drivers/net/bonding/bond_main.c:6474
- do_one_initcall+0x216/0x960 init/main.c:1236
- do_initcall_level+0x140/0x350 init/main.c:1298
- do_initcalls+0xf0/0x1d0 init/main.c:1314
- do_basic_setup+0x22/0x30 init/main.c:1333
- kernel_init_freeable+0x300/0x4b0 init/main.c:1551
- kernel_init+0x2f/0x7e0 init/main.c:1441
- ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
-
-Uninit was created at:
- free_pages_prepare mm/page_alloc.c:1094 [inline]
- free_unref_page_prepare+0xc1/0xad0 mm/page_alloc.c:2346
- free_unref_page+0x58/0x6d0 mm/page_alloc.c:2486
- free_the_page mm/page_alloc.c:563 [inline]
- __free_pages+0xb1/0x1f0 mm/page_alloc.c:4653
- thread_stack_free_rcu+0x97/0xb0 kernel/fork.c:344
- rcu_do_batch kernel/rcu/tree.c:2190 [inline]
- rcu_core+0xa3c/0x1e00 kernel/rcu/tree.c:2465
- rcu_core_si+0x12/0x20 kernel/rcu/tree.c:2482
- __do_softirq+0x1b7/0x7c5 kernel/softirq.c:553
-
-CPU: 0 PID: 1 Comm: swapper/0 Not tainted 6.8.0-rc2-syzkaller-00397-g56897d51886f #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-=====================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Thanks.
 
