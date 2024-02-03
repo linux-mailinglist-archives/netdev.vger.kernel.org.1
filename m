@@ -1,79 +1,85 @@
-Return-Path: <netdev+bounces-68782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FA128483D9
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 06:00:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 489168483DB
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 06:01:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44CAC285FA6
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 05:00:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D94B91F2411D
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 05:01:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A7F9101E8;
-	Sat,  3 Feb 2024 05:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oeIU5+/l"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DC70101FA;
+	Sat,  3 Feb 2024 05:01:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out28-69.mail.aliyun.com (out28-69.mail.aliyun.com [115.124.28.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA1B610796
-	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 05:00:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578C110958;
+	Sat,  3 Feb 2024 05:01:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.28.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706936426; cv=none; b=HKde0P+ziueDEBYVTcJdObSGHfCWypieo4UMHHL3g2kR/1HIuIVz3f8AQjQ4Z6a38Nw6TbAnM5dfLuT+v7EtSDlBQs/M6XHV5IALkrME2FTbCt9sRPBVCNox/yOsNQmptDn+hOzK4W7l83E5UQpJwgWf1960l6xTfU1tGawA/zA=
+	t=1706936505; cv=none; b=TdqOk/2l8Vhb7IoX7BzqZsF+GPsVfuJSELrkD1h5PyRAgh0XVtRGLMZJRzBMec3zwPZMVDWsK2hS8BXvs7IOpLveHp5Fbt3Q5oC4ubk6MJuzG3pd1aduPMN1CjGYIUrI2BDMN3IpoGXgVOEw2PVF8rGqdHwN5ojoXdjrxgt1OU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706936426; c=relaxed/simple;
-	bh=V+kyw/Rj0tOHxmSxyNf0ufRGjrBLEGmnmQvTJ/RsAqU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=oN/VPOFRbyfHcBqnzVluaNDkYGOchlTGnsirsOqB9S2R8glnBuiAlRzvkuqR9eR9nUd1pFRifoK/4fp/GiKIEiyPlqzDmu2WdJcwONr0FG4YVvO+7a3u4IwFoMqwdsNj0lv838SXIKGqgmnJ9/NlgiZSlQxvtYzO7OlTyECC2vg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oeIU5+/l; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01BCBC433C7;
-	Sat,  3 Feb 2024 05:00:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1706936426;
-	bh=V+kyw/Rj0tOHxmSxyNf0ufRGjrBLEGmnmQvTJ/RsAqU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oeIU5+/lzrx+36YsAJxuSj7RkF8Bs0Mh0FyddmdvGg6gFyvmNgekFp5J06eX6cVDF
-	 ngXwh18/2l4yQL1KbVMbJe4aueZrJCyVVA2pLnfRPJ/kdkVYL9PtG+BM4itbGtYr6e
-	 shfluy/8d4GAPd1QA/3x6YfTJcdRRV/x+qe108jYD4hXp/GwAb9cM5zrsc5uSuEwKX
-	 NE5xyclzSJOYLF7DYNigFcZv2yFllpBnezpQR3B/oULNTJJ8EVeepbF+uMLbZy3edO
-	 ZdXOCKAHjRo2FC6M6e2lL8BPtSoLviDClkKPjZkDexrz+9r/S/D6gYXP5kBBZ9C55o
-	 4yHMTnqZZ+nYw==
-Date: Fri, 2 Feb 2024 21:00:25 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Victor Nogueira <victor@mojatatu.com>
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
- kernel@mojatatu.com, pctammela@mojatatu.com
-Subject: Re: [PATCH net-next] selftests: tc-testing: add mirred to block tdc
- tests
-Message-ID: <20240202210025.555deef9@kernel.org>
-In-Reply-To: <20240202020726.529170-1-victor@mojatatu.com>
-References: <20240202020726.529170-1-victor@mojatatu.com>
+	s=arc-20240116; t=1706936505; c=relaxed/simple;
+	bh=xqQ9D7hERT/vB7vrVs/3htRauVPt9sTmgzkZogOZJTM=;
+	h=Message-ID:Date:MIME-Version:To:From:Cc:Subject:Content-Type; b=IwbDSgANH/pCB8aQYCyK5DNacVjrfAqqdCAaXU1x/jHeO2vPP6jM9/31v6L+ugljPwEn4+6yUyg4bgqWqWMp4AUpIpq+0Fs4tYunWuBlBFD94uha/x2/XRnXzxVAeUV4246JTJdL8OJESJzBXDe8BeSNeGAIMaOL2AjfWUqirK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aibsd.com; spf=pass smtp.mailfrom=aibsd.com; arc=none smtp.client-ip=115.124.28.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aibsd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aibsd.com
+X-Alimail-AntiSpam:AC=CONTINUE;BC=0.3797697|-1;CH=green;DM=|CONTINUE|false|;DS=CONTINUE|ham_news_journal|0.102483-0.00432032-0.893197;FP=0|0|0|0|0|-1|-1|-1;HT=ay29a033018047209;MF=aiden.leong@aibsd.com;NM=1;PH=DS;RN=15;RT=15;SR=0;TI=SMTPD_---.WMKQuwr_1706936486;
+Received: from 192.168.31.5(mailfrom:aiden.leong@aibsd.com fp:SMTPD_---.WMKQuwr_1706936486)
+          by smtp.aliyun-inc.com;
+          Sat, 03 Feb 2024 13:01:27 +0800
+Message-ID: <c6b8614c-6b6f-404a-a195-422b6ee8e030@aibsd.com>
+Date: Sat, 3 Feb 2024 13:01:26 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+To: davemarchevsky@fb.com, sdf@google.com
+From: Aiden Leong <aiden.leong@aibsd.com>
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ robh@kernel.org, johannes@sipsolutions.net, stephen@networkplumber.org,
+ ecree.xilinx@gmail.com, sdf@google.com, f.fainelli@gmail.com, fw@strlen.de,
+ linux-doc@vger.kernel.org, razor@blackwall.org, nicolas.dichtel@6wind.com,
+ Jakub Kicinski <kuba@kernel.org>
+Subject: net: fou: Is FOU/GUE
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Thu,  1 Feb 2024 23:07:26 -0300 Victor Nogueira wrote:
-> Add 8 new mirred tdc tests that target mirred to block:
-> 
-> - Add mirred mirror to egress block action
-> - Add mirred mirror to ingress block action
-> - Add mirred redirect to egress block action
-> - Add mirred redirect to ingress block action
-> - Try to add mirred action with both dev and block
-> - Try to add mirred action without specifying neither dev nor block
-> - Replace mirred redirect to dev action with redirect to block
-> - Replace mirred redirect to block action with mirror to dev
+Hi,
 
-I think this breaks the TDC runner.
-I'll toss it from patchwork, I can revive it when TDC is fixed (or you
-tell me that I'm wrong).
+I worked for a company that tried to adop FOU/GUE(which is basically the 
+same thing) with some extra features a few years ago.
+
+The project failed unluckily but I am still willing to contribute to 
+this protocol if possible.
+
+I've noticed that GUE is now "Expired Internet-Draft" in IETF, but I 
+also noticed that fou.c has been rename
+
+to fou_core.c, fou_bpf.c, fou_nl.c.
+
+ref: https://datatracker.ietf.org/doc/draft-ietf-intarea-gue/
+
+
+I'd like to know:
+Should I contribute to this protocol?
+
+Is FOU/GUE dead?
+
+If I'm allowed to get it involved, can I add advanced features(such as 
+FEC forward error correction) beyond the draft(version 9)?
+
+
+Cheers!
+
+Aiden Leong
+
+
 
