@@ -1,264 +1,120 @@
-Return-Path: <netdev+bounces-68825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DB948486B6
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 15:26:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 669AD8486B9
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 15:40:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CA841F2210A
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 14:26:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E5D3B23119
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 14:40:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 476955C916;
-	Sat,  3 Feb 2024 14:26:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67C055C8EF;
+	Sat,  3 Feb 2024 14:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YX0TMOJ7"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAA6C5D8FB;
-	Sat,  3 Feb 2024 14:26:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 826F780B;
+	Sat,  3 Feb 2024 14:40:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706970390; cv=none; b=Na/y6efRIuDbcBl6jeUEgxUTCGDraI3rIrioPjTDEp3QhZeroQt3aESLB0bW6mRGkpFM3+638vfwFjQEZQX8k+IFFddXcUeYz/bmpR1JT6q7GI8f+8XB0QBdFudSY+Nxo4A20uL1R+4f4qPlNAVIJdPjj7tpfWfWRL3tyVKEAoo=
+	t=1706971210; cv=none; b=RNd1vlhAzHiLVDuLPrGkcw/SgIPQ2LslFaG5KCChYwLe/lkuR4XfRvKyEomrUWUCdPrecpJRunLPwtofX7e3hE+II0zQL5pE4GTVOL8sPv0SpK462LVaAInsZ504w3Fakeu6/cb86jtutvNt3SoMqXApY7ZceoWgId7Mm4H0Gwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706970390; c=relaxed/simple;
-	bh=eE3xuSZPnIl68pJXRig8LRtv8gHe+E122lNmvIHg1l4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=cLB22ftC4TAaKxcoCcy7Vywefp57hidTnXtE3zicoDgPCFSCgiG5QjGNKo4+jxkleP9VuS2QFrVNKu7xyBylNz57OPba+DahPv8fuEwGsYAmsJ5rbgBT8F7Y10aI+Wc4ThIN3ltAnL4b8EmiMRsxnUhhNA0rmgxoLjSfPBinJAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-X-IronPort-AV: E=Sophos;i="6.05,240,1701097200"; 
-   d="scan'208";a="192732818"
-Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
-  by relmlie5.idc.renesas.com with ESMTP; 03 Feb 2024 23:26:20 +0900
-Received: from localhost.localdomain (unknown [10.226.92.48])
-	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 1B72841F86B1;
-	Sat,  3 Feb 2024 23:26:12 +0900 (JST)
-From: Biju Das <biju.das.jz@bp.renesas.com>
-To: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1706971210; c=relaxed/simple;
+	bh=1CpdW3eKi5icNSSpnuCCuvb553v/YQ6Vj4yXI49Xk6M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s37fuB2tOPZVYDLaPvSEED86lzhiqxwWHcWiQ4sA0EjF6egXwncH7zKkUVs2w4tnEs67Zl/IF/5gP2kvVIyTU0YR326W0bnjbPbpaXwTnO7FkUz/30NVsoDRwJk9F0Ylf7iMxueigIXY+JpcMsJIq0hKoNOnm9jRaQtlW6AO6mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=YX0TMOJ7; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=uDSh4X6M2mDVJsAXwHpTh/0TbjeOVYkJP3YQfqggCtY=; b=YX0TMOJ79dk8mk8oDVBVBcJuGi
+	pk2P6fsGu0ygUkUoJ2qIWKFQUCGiwdQSzQGXtiXBUcf4f1BcxNXfKpOJW26tnOnpdpM7jfKa/XHXa
+	UCSTg8OpVqjZ8rh35pxJaSbCbuky2WJ169uG3ZscDTLc4rr6pM5FG07UJnlSHhxO2gn/6faL8BUoI
+	iXwby8Q++JRnCF2iQ224fSRtqoI5ZwnJ8/AcoJoFNrF3LhPJSK5/nYEL/GKNpqkTh66KvsnvZp+WP
+	IUpC08rcG4NFzevgSL7DdqxsXDaaZhIatJ63ZhecLCAfb2SYEyt5I7OroZJa7z+nwif1MizF0QVbZ
+	n3rcc4jA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:41812)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rWHBS-00079m-0u;
+	Sat, 03 Feb 2024 14:39:54 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rWHBO-0000uG-Jn; Sat, 03 Feb 2024 14:39:50 +0000
+Date: Sat, 3 Feb 2024 14:39:50 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Tim Pambor <tp@osasysteme.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Biju Das <biju.das.jz@bp.renesas.com>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Nikita Yushchenko <nikita.yoush@cogentembedded.com>,
-	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Biju Das <biju.das.au@gmail.com>
-Subject: [PATCH v4 net-next 2/2] ravb: Add Tx checksum offload support for GbEth
-Date: Sat,  3 Feb 2024 14:25:59 +0000
-Message-Id: <20240203142559.130466-3-biju.das.jz@bp.renesas.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240203142559.130466-1-biju.das.jz@bp.renesas.com>
-References: <20240203142559.130466-1-biju.das.jz@bp.renesas.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Dan Murphy <dmurphy@ti.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: dp83822: Fix RGMII TX delay configuration
+Message-ID: <Zb5QNkcDvM6CtALf@shell.armlinux.org.uk>
+References: <20240203131152.61958-1-tp@osasysteme.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240203131152.61958-1-tp@osasysteme.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-TOE has hardware support for calculating IP header and TCP/UDP/ICMP
-checksum for both IPv4 and IPv6.
+On Sat, Feb 03, 2024 at 02:11:51PM +0100, Tim Pambor wrote:
+> diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
+> index b7cb71817780..b061036f654a 100644
+> --- a/drivers/net/phy/dp83822.c
+> +++ b/drivers/net/phy/dp83822.c
+> @@ -398,16 +398,15 @@ static int dp83822_config_init(struct phy_device *phydev)
+>  		tx_int_delay = phy_get_internal_delay(phydev, dev, NULL, 0,
+>  						      false);
+>  		if (tx_int_delay <= 0)
+> -			rgmii_delay &= ~DP83822_TX_CLK_SHIFT;
+> -		else
+>  			rgmii_delay |= DP83822_TX_CLK_SHIFT;
+> +		else
+> +			rgmii_delay &= ~DP83822_TX_CLK_SHIFT;
 
-Add Tx checksum offload supported by TOE for IPv4 and TCP/UDP.
+Further cleanup is possible here:
 
-For Tx, the result of checksum calculation is set to the checksum field of
-each IPv4 Header/TCP/UDP/ICMP of ethernet frames. For the unsupported
-frames, those fields are not changed. If a transmission frame is an UDPv4
-frame and its checksum value in the UDP header field is 0x0000, TOE does
-not calculate checksum for UDP part of this frame as it is optional
-function as per standards.
+                rx_int_delay = phy_get_internal_delay(phydev, dev, NULL, 0,
+                                                      true);
 
-We can test this functionality by the below commands
+                if (rx_int_delay <= 0)
+                        rgmii_delay = 0;
+                else
+                        rgmii_delay = DP83822_RX_CLK_SHIFT;
 
-ethtool -K eth0 tx on --> to turn on Tx checksum offload
-ethtool -K eth0 tx off --> to turn off Tx checksum offload
+At this point, rgmii_delay can only contain one of two possible values.
+Zero, and bit 12 set.
 
-Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
----
-v3->v4:
- * Restored NETIF_F_HW_CSUM and associated changes.
- * Dropped enabling IPv6 specific bits in CSR1.
- * Dropped enabling ICMPv4 specific bit and associated handling as linux
-   does not support it.
-v2->v3:
- * Updated commit header and description as suggested by Sergey.
- * Replaced NETIF_F_IP_CSUM->NETIF_F_HW_CSUM as we are supporting only IPv4.
- * Updated the comment related to UDP header field.
- * Renamed ravb_is_tx_checksum_offload_gbeth_possible()->ravb_is_tx_csum_gbeth().
-v1->v2:
- * No change.
----
- drivers/net/ethernet/renesas/ravb.h      | 16 ++++++
- drivers/net/ethernet/renesas/ravb_main.c | 73 +++++++++++++++++++++---
- 2 files changed, 82 insertions(+), 7 deletions(-)
+The the code above modifies this value by either setting bit 11, or
+clearing the already guaranteed to be clear bit 11. So, the only thing
+that has any effect is setting bit 12, so we can omit the code path that
+clears bit 11. Therefore, this can become:
 
-diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
-index 64bf29d01ad0..d7b1c6d15a17 100644
---- a/drivers/net/ethernet/renesas/ravb.h
-+++ b/drivers/net/ethernet/renesas/ravb.h
-@@ -208,6 +208,7 @@ enum ravb_reg {
- 
- 	/* RZ/G2L TOE registers */
- 	CSR0    = 0x0800,
-+	CSR1    = 0x0804,
- 	CSR2    = 0x0808,
- };
- 
-@@ -981,6 +982,21 @@ enum CSR0_BIT {
- 	CSR0_RPE	= 0x00000020,
- };
- 
-+enum CSR1_BIT {
-+	CSR1_TIP4	= 0x00000001,
-+	CSR1_TTCP4	= 0x00000010,
-+	CSR1_TUDP4	= 0x00000020,
-+	CSR1_TICMP4	= 0x00000040,
-+	CSR1_TTCP6	= 0x00100000,
-+	CSR1_TUDP6	= 0x00200000,
-+	CSR1_TICMP6	= 0x00400000,
-+	CSR1_THOP	= 0x01000000,
-+	CSR1_TROUT	= 0x02000000,
-+	CSR1_TAHD	= 0x04000000,
-+	CSR1_TDHD	= 0x08000000,
-+	CSR1_ALL	= 0x0F700071,
-+};
-+
- enum CSR2_BIT {
- 	CSR2_RIP4	= 0x00000001,
- 	CSR2_RTCP4	= 0x00000010,
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 4f310bcee7c0..fee771f14fc5 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -29,6 +29,7 @@
- #include <linux/spinlock.h>
- #include <linux/reset.h>
- #include <linux/math64.h>
-+#include <net/ip.h>
- 
- #include "ravb.h"
- 
-@@ -524,16 +525,29 @@ static int ravb_ring_init(struct net_device *ndev, int q)
- 
- static void ravb_csum_init_gbeth(struct net_device *ndev)
- {
--	if (!(ndev->features & NETIF_F_RXCSUM))
-+	bool tx_enable = ndev->features & NETIF_F_HW_CSUM;
-+	bool rx_enable = ndev->features & NETIF_F_RXCSUM;
-+
-+	if (!(tx_enable || rx_enable))
- 		goto done;
- 
- 	ravb_write(ndev, 0, CSR0);
--	if (ravb_wait(ndev, CSR0, CSR0_RPE, 0)) {
-+	if (ravb_wait(ndev, CSR0, CSR0_TPE | CSR0_RPE, 0)) {
- 		netdev_err(ndev, "Timeout enabling hardware checksum\n");
--		ndev->features &= ~NETIF_F_RXCSUM;
-+
-+		if (tx_enable)
-+			ndev->features &= ~NETIF_F_HW_CSUM;
-+
-+		if (rx_enable)
-+			ndev->features &= ~NETIF_F_RXCSUM;
- 	} else {
--		ravb_write(ndev, CSR2_ALL & ~(CSR2_RTCP6 | CSR2_RUDP6 |
--					      CSR2_RICMP6), CSR2);
-+		if (tx_enable)
-+			ravb_write(ndev, CSR1_ALL & ~(CSR1_TICMP4 | CSR1_TTCP6 |
-+						      CSR1_TUDP6 | CSR1_TICMP6), CSR1);
-+
-+		if (rx_enable)
-+			ravb_write(ndev, CSR2_ALL & ~(CSR2_RTCP6 | CSR2_RUDP6 |
-+						      CSR2_RICMP6), CSR2);
- 	}
- 
- done:
-@@ -1986,6 +2000,36 @@ static void ravb_tx_timeout_work(struct work_struct *work)
- 	rtnl_unlock();
- }
- 
-+static bool ravb_can_tx_csum_gbeth(struct sk_buff *skb)
-+{
-+	struct iphdr *ip = ip_hdr(skb);
-+
-+	/* TODO: Need to add support for VLAN tag 802.1Q */
-+	if (skb_vlan_tag_present(skb))
-+		return false;
-+
-+	/* TODO: Need to add hardware checksum for IPv6 */
-+	if (skb->protocol != htons(ETH_P_IP))
-+		return false;
-+
-+	switch (ip->protocol) {
-+	case IPPROTO_TCP:
-+		break;
-+	case IPPROTO_UDP:
-+		/* If the checksum value in the UDP header field is 0, TOE does
-+		 * not calculate checksum for UDP part of this frame as it is
-+		 * optional function as per standards.
-+		 */
-+		if (udp_hdr(skb)->check == 0)
-+			return false;
-+		break;
-+	default:
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
- /* Packet transmit function for Ethernet AVB */
- static netdev_tx_t ravb_start_xmit(struct sk_buff *skb, struct net_device *ndev)
- {
-@@ -2001,6 +2045,9 @@ static netdev_tx_t ravb_start_xmit(struct sk_buff *skb, struct net_device *ndev)
- 	u32 entry;
- 	u32 len;
- 
-+	if (skb->ip_summed == CHECKSUM_PARTIAL && !ravb_can_tx_csum_gbeth(skb))
-+		skb_checksum_help(skb);
-+
- 	spin_lock_irqsave(&priv->lock, flags);
- 	if (priv->cur_tx[q] - priv->dirty_tx[q] > (priv->num_tx_ring[q] - 1) *
- 	    num_tx_desc) {
-@@ -2418,6 +2465,18 @@ static int ravb_set_features_gbeth(struct net_device *ndev,
- 			goto done;
- 	}
- 
-+	if (changed & NETIF_F_HW_CSUM) {
-+		if (features & NETIF_F_HW_CSUM)
-+			val = CSR1_ALL & ~(CSR1_TICMP4 | CSR1_TTCP6 |
-+					   CSR1_TUDP6 | CSR1_TICMP6);
-+		else
-+			val = 0;
-+
-+		ret = ravb_endisable_csum_gbeth(ndev, CSR1, val, CSR0_TPE);
-+		if (ret)
-+			goto done;
-+	}
-+
- 	ndev->features = features;
- done:
- 	spin_unlock_irqrestore(&priv->lock, flags);
-@@ -2602,8 +2661,8 @@ static const struct ravb_hw_info gbeth_hw_info = {
- 	.emac_init = ravb_emac_init_gbeth,
- 	.gstrings_stats = ravb_gstrings_stats_gbeth,
- 	.gstrings_size = sizeof(ravb_gstrings_stats_gbeth),
--	.net_hw_features = NETIF_F_RXCSUM,
--	.net_features = NETIF_F_RXCSUM,
-+	.net_hw_features = NETIF_F_RXCSUM | NETIF_F_HW_CSUM,
-+	.net_features = NETIF_F_RXCSUM | NETIF_F_HW_CSUM,
- 	.stats_len = ARRAY_SIZE(ravb_gstrings_stats_gbeth),
- 	.max_rx_len = ALIGN(GBETH_RX_BUFF_MAX, RAVB_ALIGN),
- 	.tccr_mask = TCCR_TSRQ0,
+		// TX_CLK_SHIFT disables the delay
+                if (tx_int_delay <= 0)
+                        rgmii_delay |= DP83822_TX_CLK_SHIFT;
+
+I would also add a comment that RX_CLK_SHIFT enables the delay.
+
 -- 
-2.25.1
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
