@@ -1,306 +1,172 @@
-Return-Path: <netdev+bounces-68868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7F0A8488FE
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 22:34:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F1A08848900
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 22:36:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD4871C21C04
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 21:34:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F284C1C222D9
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 21:36:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41FB511721;
-	Sat,  3 Feb 2024 21:34:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3405912E42;
+	Sat,  3 Feb 2024 21:36:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ducpb0An"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ArBU46ZB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B5512E42
-	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 21:34:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49A4F12E4F
+	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 21:36:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706996078; cv=none; b=bGcZlB59cegaT+e/soy+Ouw/nGQtruazhOVojEVB2AayW5ZXkLF42RDWbYHSMHlaOb/v6xx9cB5lmTVCe23K4zYbryPYMgZ+NnnJPDYT6j2thlpZt3nQWVsGuwPnU+QNsA+gOxcdhCnsPfvy8nqScCC7LhGpXyMQefVNi04+LA0=
+	t=1706996204; cv=none; b=bP34vNzjCBpu2iON4+LMIfLAc94/gCG6Hg2RcWtaQpm3uwL06iU8PrMjEd+9wPabhsnObBg+IJEgLj3d75YuY7XWBQ1/yuMcNin9TULincW8tnpSovS3fhsVAleWHLVszHaqpwFgt1wC58VsT435cFYJfxAji6Jgnn6x/7IZohs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706996078; c=relaxed/simple;
-	bh=dWCunCbcubkdzPCQWN79nGhgJY9sQbD1fAMLnAsLPd0=;
-	h=Message-ID:Date:MIME-Version:Cc:From:Subject:To:Content-Type; b=HLH4IChl4Rx2vvwGq7oI34wRwQYBgZ4fwqTKQsN3rs6ctnWszRPpUTXjLjnzoGmaUed8WuIFEumiK19ra2n4Fxd4v8lIPjlABQaSXyxcb02RPbyOdz06NHh65m9XxeBtLcZA0vApskqzHeAY1tfI3spv2AxEAhGXG5N9PK8VCp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ducpb0An; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a3566c0309fso413377166b.1
-        for <netdev@vger.kernel.org>; Sat, 03 Feb 2024 13:34:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706996075; x=1707600875; darn=vger.kernel.org;
-        h=content-transfer-encoding:to:autocrypt:subject:from:cc
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lXtaHfPIs5SrFEHVmB1W6yQHCpfHFMVqboWHWyOjBo8=;
-        b=Ducpb0AnwFf3X4cf033oGkNK3bi4YL8+SWyaNcePkar6JhrDGzZfbuX0wGeRDLNYQn
-         GscvwOTHHow6TRfozT75JSI8vV8ZXgqjgSEm2zch4U1VXf2PogiiCZR/Mf3F+dhnMIgz
-         iiK1cZzTbI5xmu8OdiWC6Glk5m/x5QHfEP4GRUpfA4JWM1XmN1B+drvRsTlz8EZax88Z
-         xD5NELDqjRv73f4gJrdyx2SHuYCc97OAkj3Thp0OttOXFpPpLsaYCkMXced69Rle+iHt
-         S4In6z/guodP42o9EMuNADB7/EoXc7vVV7o0+C7W3LRN9KAIljnGfW2L0jUKZ17mgPL0
-         WRkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706996075; x=1707600875;
-        h=content-transfer-encoding:to:autocrypt:subject:from:cc
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=lXtaHfPIs5SrFEHVmB1W6yQHCpfHFMVqboWHWyOjBo8=;
-        b=U0BhVAY0tl6Dq1CNcv7v+C+yZXM/jNFYUqUD++cD3YU8sMBfjBWJ2Gl54BcOftsXy6
-         r94Y2pM+KrN/gDB1VBiDvAFhqgqj1JW4X4p9VUEMwowUxSETpOLZNp5VxKRWg5K3E1Lv
-         vyA6HIFKPf58IcKMdFhoL12bBl6QByX1sMGyW744K7Uc0CVBHgnwiKtNbq4Utx4QDBKk
-         ThRdmpqRm8nn2qiYInFL8/jEHvpP0kX190cv6xjhhtbtgtw4AQ+Z+BBBSsuA4JjxKRff
-         Ga2HjJhK8d9HS6rIYCXqZPVaORDlqUFFWX+llCHl3t10mzIcxax071ufVzAweD4kOqhR
-         m4HA==
-X-Gm-Message-State: AOJu0YzKh4UE3OPlpzIik6YLJJa0F9ovYuHzW4KkHMzAqr/NDJLJixom
-	DrDrNj9uRE5asgKQPJUHhB7gkTzwQp1KWXNgtI0YgY3AFjy9PPnO
-X-Google-Smtp-Source: AGHT+IFAul+Qow3L2YX2lGil7oxeuKeLzNsPOPbKiBwIPSch0UNOf8Ap37l1HnnR2ExKhaxLIOg74w==
-X-Received: by 2002:a17:907:552:b0:a31:29fc:6ef2 with SMTP id wk18-20020a170907055200b00a3129fc6ef2mr7891640ejb.41.1706996074352;
-        Sat, 03 Feb 2024 13:34:34 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVF5WT6D1rJ71rseSvP8mv1Xm1NVZTa8r27WIGnfk/m8e0IbdNgjx2/3Cc0gWk4PCckdrDfc0yOmiDv/3jZGi2NsYjAb6CVAl8v36aGmBuK9iFIcwfq6gx+hemcwfUB3dh4jWWsnPftkTroSuXXuH7vtnd+GF5x1s7a4oI+3j3FBrvRa34Fe/FPa3vPTMTR/RpbfGDSJDq2kXhgBJnPs+BI+aaZBoY/wXHfN3wm6g==
-Received: from ?IPV6:2a01:c23:bde4:a000:48dd:a4bf:88d3:e6ac? (dynamic-2a01-0c23-bde4-a000-48dd-a4bf-88d3-e6ac.c23.pool.telefonica.de. [2a01:c23:bde4:a000:48dd:a4bf:88d3:e6ac])
-        by smtp.googlemail.com with ESMTPSA id tl4-20020a170907c30400b00a36f9e61664sm2320556ejc.107.2024.02.03.13.34.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 03 Feb 2024 13:34:33 -0800 (PST)
-Message-ID: <10510abd-ac26-42d0-8222-8b01fe9b8059@gmail.com>
-Date: Sat, 3 Feb 2024 22:34:33 +0100
+	s=arc-20240116; t=1706996204; c=relaxed/simple;
+	bh=ObK6GFFC+UvoR9g11nygtQo+SWtL356OmJ0KUMDy8S8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=g3ZSEByqtF+qT2umeepa3TdMfZYdhSpVOr+3Xe4uKgB5FfMBQln6ewxgdirpfZFZfbc7482yXFE2rqK5RUH11nGiGgPdgBBcSLk8v+OQLUt7a0bEkZb08umCbqkpTHxmTJ8Zo2W99rt0lgemnwOtWGCfvGecDxzxrETuYGQrQtQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ArBU46ZB; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1706996202; x=1738532202;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=ObK6GFFC+UvoR9g11nygtQo+SWtL356OmJ0KUMDy8S8=;
+  b=ArBU46ZB/AO7clJJg8p4QfZYepeMOjgs1lCtdqxMxlOlLB3quxRijtln
+   C5TclJcgZpU2U4eB/2S3BXqrR89F1wzs5u+aMYIq/IpnOdIhtjDN/sAh1
+   LivCH39ziwuojvBmZNq/v0sf5lRltfB5Nm65dbioOEjYA4LLOiQVCp8gc
+   fFo9grz5sIQ8IdmcOctwEnWyXXn6lsFifZbKp7e3QTcLvKzREAIeWnCrC
+   Uldf5nNNCS02iXyDjU3b8tRKFfiXbYOc525O36PFU/e7gpRFA+nHm4QGl
+   np3rbBmWR3yauRLpGRousgS2PLfzh54KChbY146MApTZtgqNa1f/aheM2
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10973"; a="17755515"
+X-IronPort-AV: E=Sophos;i="6.05,241,1701158400"; 
+   d="scan'208";a="17755515"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 13:36:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,241,1701158400"; 
+   d="scan'208";a="5128189"
+Received: from lkp-server02.sh.intel.com (HELO 59f4f4cd5935) ([10.239.97.151])
+  by orviesa004.jf.intel.com with ESMTP; 03 Feb 2024 13:36:38 -0800
+Received: from kbuild by 59f4f4cd5935 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rWNgg-0005dU-2u;
+	Sat, 03 Feb 2024 21:36:34 +0000
+Date: Sun, 4 Feb 2024 05:36:14 +0800
+From: kernel test robot <lkp@intel.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>
+Subject: Re: [PATCH v1 net-next 07/16] af_unix: Detect Strongly Connected
+ Components.
+Message-ID: <202402040541.rLg7ze2a-lkp@intel.com>
+References: <20240203030058.60750-8-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] bnxt: convert EEE handling to use linkmode bitmaps
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-To: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, David Miller <davem@davemloft.net>,
- Andrew Lunn <andrew@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Michael Chan <michael.chan@broadcom.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240203030058.60750-8-kuniyu@amazon.com>
 
-Convert EEE handling to use linkmode bitmaps. This prepares for removing
-the legacy bitmaps from struct ethtool_keee. No functional change
-intended. When replacing _bnxt_fw_to_ethtool_adv_spds() with
-_bnxt_fw_to_linkmode(), remove the fw_pause argument because it's
-always passed as 0.
+Hi Kuniyuki,
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 19 +++++----
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 42 +++++++------------
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.h |  2 +-
- 3 files changed, 27 insertions(+), 36 deletions(-)
+kernel test robot noticed the following build warnings:
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index fde32b32f..adcddfb97 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -10624,7 +10624,7 @@ static int bnxt_hwrm_phy_qcaps(struct bnxt *bp)
- 		struct ethtool_keee *eee = &bp->eee;
- 		u16 fw_speeds = le16_to_cpu(resp->supported_speeds_eee_mode);
- 
--		eee->supported_u32 = _bnxt_fw_to_ethtool_adv_spds(fw_speeds, 0);
-+		_bnxt_fw_to_linkmode(eee->supported, fw_speeds);
- 		bp->lpi_tmr_lo = le32_to_cpu(resp->tx_lpi_timer_low) &
- 				 PORT_PHY_QCAPS_RESP_TX_LPI_TIMER_LOW_MASK;
- 		bp->lpi_tmr_hi = le32_to_cpu(resp->valid_tx_lpi_timer_high) &
-@@ -10775,8 +10775,7 @@ int bnxt_update_link(struct bnxt *bp, bool chng_link_state)
- 			eee->eee_active = 1;
- 			fw_speeds = le16_to_cpu(
- 				resp->link_partner_adv_eee_link_speed_mask);
--			eee->lp_advertised_u32 =
--				_bnxt_fw_to_ethtool_adv_spds(fw_speeds, 0);
-+			_bnxt_fw_to_linkmode(eee->lp_advertised, fw_speeds);
- 		}
- 
- 		/* Pull initial EEE config */
-@@ -10786,8 +10785,7 @@ int bnxt_update_link(struct bnxt *bp, bool chng_link_state)
- 				eee->eee_enabled = 1;
- 
- 			fw_speeds = le16_to_cpu(resp->adv_eee_link_speed_mask);
--			eee->advertised_u32 =
--				_bnxt_fw_to_ethtool_adv_spds(fw_speeds, 0);
-+			_bnxt_fw_to_linkmode(eee->advertised, fw_speeds);
- 
- 			if (resp->eee_config_phy_addr &
- 			    PORT_PHY_QCFG_RESP_EEE_CONFIG_EEE_TX_LPI) {
-@@ -11329,15 +11327,18 @@ static bool bnxt_eee_config_ok(struct bnxt *bp)
- 		return true;
- 
- 	if (eee->eee_enabled) {
--		u32 advertising =
--			_bnxt_fw_to_ethtool_adv_spds(link_info->advertising, 0);
-+		__ETHTOOL_DECLARE_LINK_MODE_MASK(advertising);
-+		__ETHTOOL_DECLARE_LINK_MODE_MASK(tmp);
-+
-+		_bnxt_fw_to_linkmode(advertising, link_info->advertising);
- 
- 		if (!(link_info->autoneg & BNXT_AUTONEG_SPEED)) {
- 			eee->eee_enabled = 0;
- 			return false;
- 		}
--		if (eee->advertised_u32 & ~advertising) {
--			eee->advertised_u32 = advertising & eee->supported_u32;
-+		if (linkmode_andnot(tmp, eee->advertised, advertising)) {
-+			linkmode_and(eee->advertised, advertising,
-+				     eee->supported);
- 			return false;
- 		}
- 	}
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 481b835a7..d1b087b90 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -1751,31 +1751,21 @@ static int bnxt_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
- 	return 0;
- }
- 
--u32 _bnxt_fw_to_ethtool_adv_spds(u16 fw_speeds, u8 fw_pause)
-+/* TODO: support 25GB, 40GB, 50GB with different cable type */
-+void _bnxt_fw_to_linkmode(unsigned long *mode, u16 fw_speeds)
- {
--	u32 speed_mask = 0;
-+	linkmode_zero(mode);
- 
--	/* TODO: support 25GB, 40GB, 50GB with different cable type */
--	/* set the advertised speeds */
- 	if (fw_speeds & BNXT_LINK_SPEED_MSK_100MB)
--		speed_mask |= ADVERTISED_100baseT_Full;
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT, mode);
- 	if (fw_speeds & BNXT_LINK_SPEED_MSK_1GB)
--		speed_mask |= ADVERTISED_1000baseT_Full;
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT, mode);
- 	if (fw_speeds & BNXT_LINK_SPEED_MSK_2_5GB)
--		speed_mask |= ADVERTISED_2500baseX_Full;
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseX_Full_BIT, mode);
- 	if (fw_speeds & BNXT_LINK_SPEED_MSK_10GB)
--		speed_mask |= ADVERTISED_10000baseT_Full;
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT, mode);
- 	if (fw_speeds & BNXT_LINK_SPEED_MSK_40GB)
--		speed_mask |= ADVERTISED_40000baseCR4_Full;
--
--	if ((fw_pause & BNXT_LINK_PAUSE_BOTH) == BNXT_LINK_PAUSE_BOTH)
--		speed_mask |= ADVERTISED_Pause;
--	else if (fw_pause & BNXT_LINK_PAUSE_TX)
--		speed_mask |= ADVERTISED_Asym_Pause;
--	else if (fw_pause & BNXT_LINK_PAUSE_RX)
--		speed_mask |= ADVERTISED_Pause | ADVERTISED_Asym_Pause;
--
--	return speed_mask;
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_40000baseCR4_Full_BIT, mode);
- }
- 
- enum bnxt_media_type {
-@@ -3886,10 +3876,11 @@ static int bnxt_set_eeprom(struct net_device *dev,
- 
- static int bnxt_set_eee(struct net_device *dev, struct ethtool_keee *edata)
- {
-+	__ETHTOOL_DECLARE_LINK_MODE_MASK(advertising);
-+	__ETHTOOL_DECLARE_LINK_MODE_MASK(tmp);
- 	struct bnxt *bp = netdev_priv(dev);
- 	struct ethtool_keee *eee = &bp->eee;
- 	struct bnxt_link_info *link_info = &bp->link_info;
--	u32 advertising;
- 	int rc = 0;
- 
- 	if (!BNXT_PHY_CFG_ABLE(bp))
-@@ -3899,7 +3890,7 @@ static int bnxt_set_eee(struct net_device *dev, struct ethtool_keee *edata)
- 		return -EOPNOTSUPP;
- 
- 	mutex_lock(&bp->link_lock);
--	advertising = _bnxt_fw_to_ethtool_adv_spds(link_info->advertising, 0);
-+	_bnxt_fw_to_linkmode(advertising, link_info->advertising);
- 	if (!edata->eee_enabled)
- 		goto eee_ok;
- 
-@@ -3919,16 +3910,15 @@ static int bnxt_set_eee(struct net_device *dev, struct ethtool_keee *edata)
- 			edata->tx_lpi_timer = eee->tx_lpi_timer;
- 		}
- 	}
--	if (!edata->advertised_u32) {
--		edata->advertised_u32 = advertising & eee->supported_u32;
--	} else if (edata->advertised_u32 & ~advertising) {
--		netdev_warn(dev, "EEE advertised %x must be a subset of autoneg advertised speeds %x\n",
--			    edata->advertised_u32, advertising);
-+	if (linkmode_empty(edata->advertised)) {
-+		linkmode_and(edata->advertised, advertising, eee->supported);
-+	} else if (linkmode_andnot(tmp, edata->advertised, advertising)) {
-+		netdev_warn(dev, "EEE advertised must be a subset of autoneg advertised speeds\n");
- 		rc = -EINVAL;
- 		goto eee_exit;
- 	}
- 
--	eee->advertised_u32 = edata->advertised_u32;
-+	linkmode_copy(eee->advertised, edata->advertised);
- 	eee->tx_lpi_enabled = edata->tx_lpi_enabled;
- 	eee->tx_lpi_timer = edata->tx_lpi_timer;
- eee_ok:
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.h
-index a8ecef8ab..694a5861c 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.h
-@@ -46,7 +46,7 @@ struct bnxt_led_cfg {
- extern const struct ethtool_ops bnxt_ethtool_ops;
- 
- u32 bnxt_get_rxfh_indir_size(struct net_device *dev);
--u32 _bnxt_fw_to_ethtool_adv_spds(u16, u8);
-+void _bnxt_fw_to_linkmode(unsigned long *mode, u16 fw_speeds);
- u32 bnxt_fw_to_ethtool_speed(u16);
- u16 bnxt_get_fw_auto_link_speeds(u32);
- int bnxt_hwrm_nvm_get_dev_info(struct bnxt *bp,
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Kuniyuki-Iwashima/af_unix-Add-struct-unix_vertex-in-struct-unix_sock/20240203-110847
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240203030058.60750-8-kuniyu%40amazon.com
+patch subject: [PATCH v1 net-next 07/16] af_unix: Detect Strongly Connected Components.
+config: riscv-defconfig (https://download.01.org/0day-ci/archive/20240204/202402040541.rLg7ze2a-lkp@intel.com/config)
+compiler: clang version 19.0.0git (https://github.com/llvm/llvm-project 7dd790db8b77c4a833c06632e903dc4f13877a64)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240204/202402040541.rLg7ze2a-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202402040541.rLg7ze2a-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> net/unix/garbage.c:257:2: warning: label at end of compound statement is a C23 extension [-Wc23-extensions]
+     257 |         }
+         |         ^
+   1 warning generated.
+
+
+vim +257 net/unix/garbage.c
+
+   227	
+   228	static void __unix_walk_scc(struct unix_vertex *vertex)
+   229	{
+   230		unsigned long index = UNIX_VERTEX_INDEX_START;
+   231		LIST_HEAD(vertex_stack);
+   232		struct unix_edge *edge;
+   233		LIST_HEAD(edge_stack);
+   234	
+   235	next_vertex:
+   236		vertex->index = index;
+   237		vertex->lowlink = index;
+   238		index++;
+   239	
+   240		vertex->on_stack = true;
+   241		list_move(&vertex->scc_entry, &vertex_stack);
+   242	
+   243		list_for_each_entry(edge, &vertex->edges, entry) {
+   244			if (!edge->successor->out_degree)
+   245				continue;
+   246	
+   247			if (edge->successor->index == UNIX_VERTEX_INDEX_UNVISITED) {
+   248				list_add(&edge->stack_entry, &edge_stack);
+   249	
+   250				vertex = edge->successor;
+   251				goto next_vertex;
+   252			}
+   253	
+   254			if (edge->successor->on_stack)
+   255				vertex->lowlink = min(vertex->lowlink, edge->successor->index);
+   256	next_edge:
+ > 257		}
+   258	
+   259		if (vertex->index == vertex->lowlink) {
+   260			LIST_HEAD(scc);
+   261	
+   262			list_cut_position(&scc, &vertex_stack, &vertex->scc_entry);
+   263	
+   264			list_for_each_entry_reverse(vertex, &scc, scc_entry) {
+   265				list_move_tail(&vertex->entry, &unix_visited_vertices);
+   266	
+   267				vertex->on_stack = false;
+   268			}
+   269	
+   270			list_del(&scc);
+   271		}
+   272	
+   273		if (!list_empty(&edge_stack)) {
+   274			edge = list_first_entry(&edge_stack, typeof(*edge), stack_entry);
+   275			list_del_init(&edge->stack_entry);
+   276	
+   277			vertex = edge->predecessor;
+   278			vertex->lowlink = min(vertex->lowlink, edge->successor->lowlink);
+   279			goto next_edge;
+   280		}
+   281	}
+   282	
+
 -- 
-2.43.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
