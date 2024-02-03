@@ -1,74 +1,73 @@
-Return-Path: <netdev+bounces-68861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 709A78488E1
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 22:07:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AE558488E3
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 22:12:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 370EB283B9D
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 21:07:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 518041C21491
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 21:12:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 351DB11714;
-	Sat,  3 Feb 2024 21:07:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48D9611739;
+	Sat,  3 Feb 2024 21:12:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BUn6R/3V"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f2Dzqvpb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A48E911CB7
-	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 21:07:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6558C12B61
+	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 21:12:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706994472; cv=none; b=YUIRYsnHRYL0yI3GRqHgHprymdqWuuEVgRw0F8r+L8Tx9dbmTk35WxvpAIgkPF88PD87IPggYO1yoeQGTtkVmMhetkvi8yaiTeCdZQHdQwwW7XLUvTnzCDSja8p6udZnHBGnsg0ccvKtLFxYLsOv95XREPeR8BXrxtG9XjhNlUo=
+	t=1706994775; cv=none; b=hf/6HFKXc+QnhN7O32MhAVcTIK7eNJiSxYBaRXtND0S+ZvZGxYc1c+/w1THThL4mxfZMx6tKs3am69OQw6n3coFgSExSWcV4VUStlYQD3B9k2PbLxsOr9MqKDp+GYKiVUXwqoeT2rE9ODvifY4LW93hJXgs8DJAfecijTvZ5HZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706994472; c=relaxed/simple;
-	bh=CJvcjLxEMC97Ikcf8mI+1kspVRG/yeMcYRqgKuCfhx4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Dlv5QbRYQ9bJlcUWGz2uNlh3QcdFIeXw9gUQBat9DrJMG3RxmxZTGASlShOIVFp0AKy3ILTInUBjFGcQe1k/1an4m4k/5BSxvMNGBkO2D4P2pWuJUPMl9JF/NEOyEQxMOiulCZ+75e+Wy3pd6HsBaToImgaTY9+B365+iQtT01M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BUn6R/3V; arc=none smtp.client-ip=209.85.167.169
+	s=arc-20240116; t=1706994775; c=relaxed/simple;
+	bh=0w6mEGpD3e4Hs2IMH21twJWagPIkhPFv64L2xHmQ9Ok=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=UqnyNjQpMdO0WqoHOzJBhpcpqcPXJ0/ZoUL5IqBGRUmfuAHpHOE4U2LRnZWPmKwxbP6bxOoRlt81SBXAcEHwJ42AIdMFwtnpx6MwGIoSd48Tlt9N775k8t7Gs69nznejojsDt2MPo9fxsR20Yh6bSTESBZM2VmL3xH+uSUVfrGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f2Dzqvpb; arc=none smtp.client-ip=209.85.167.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3bd4e6a7cb0so2105168b6e.3
-        for <netdev@vger.kernel.org>; Sat, 03 Feb 2024 13:07:50 -0800 (PST)
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-51142b5b76dso1380944e87.2
+        for <netdev@vger.kernel.org>; Sat, 03 Feb 2024 13:12:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706994469; x=1707599269; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=W6JBhOdNBv0C3Z2m/8gn8AYW6yadHTmz3ySCW2bS8N4=;
-        b=BUn6R/3VOAzQQyQmJP9nQrBTVfOg8qphkyp7sG8z6/HoKnyWDsMCEjGlkGm+wwI7ZF
-         oKnvtaDFmrrUnNDTC7bldgrskfvQ/5KLWrQHWEXj4PJrvVYF7olTOMy3W9qk2DoiC0f0
-         TNSm9zMuTExcVuf9HNOBC1HZ4ItwIun+7I/EJJNvJZ2dC5mxfy304cL7U5nDdoeO1s3f
-         7e+B4SIJdchU+6sAX9aTH5Dv4EWOMHeBqvrQrcHmsjFPEjcXWeqOqKhyfNSObUhlILoE
-         aBbIqooScCiFAG+x05zFPnERuG47lcneR+jaw6qETJU93+CCRmjmaOup0/Gv37wllgXJ
-         v0wQ==
+        d=gmail.com; s=20230601; t=1706994771; x=1707599571; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CxF9u4aP5ltJPUJ2rDWrzM7evqM4uATcpm0TzxAvUyM=;
+        b=f2DzqvpbAtDms2zGsuawp0+OVk/mRXYOjbrhcAgMohtPEGta+Cu2p3WG6l+zb4F32b
+         02JX2GBlFsytONIogniXTpSK40R+vtaQYYSotuntybyp4Cmt+QY7Myl48qFowwvDhxqq
+         XM7LeQBWNIk1fqU7947BvkTbCmnEcufcL+sWPq6qIJUQoFkSgIHsNlfyj4dSlKeyR9Xk
+         IY8wdstqwPwrnBkyENzsB3KAf4/8f8A7juoj86kcUZdxZ84WmxZFqLT5GxrZRkapg8bm
+         IXWw9ZpJ5QRC53AKlsZ54CzYp+gAlDdyQC8gooEFkQRNKAaaiHkyAjx0sGrPPtJ7Ec8z
+         GNRg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706994469; x=1707599269;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1706994771; x=1707599571;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W6JBhOdNBv0C3Z2m/8gn8AYW6yadHTmz3ySCW2bS8N4=;
-        b=MKnJrbPSBU/bTtjO3Dc6u58ZyfimTTVCeoFiDIGWA7CzzB8FehFGgE7oezHqFIP+sP
-         ShJSae+8gxk9n6O7QMZoFntXVUNO1t6mh5ZB/aNFtTdoWXjB6FtjMydMp437ZNGhvPlS
-         arCjlDatvpyS0tt96yOGTIqvVOhXSnZ+DXo1aE76EnIklCr+TKuZbtBCnbisO6sju7bP
-         9LVbifmyIewvielq9qT+Fyxf5t6S0eVsWuOxE2UHdomxodQTroR2dBEQXHl5OzMs+2zt
-         UXL0UsMLxQPq+gZcOZjaV1Dc6kQkYSFfVbS9rEv7zd5l4O7PejSgCYm0vBaIWeB1A1Vu
-         PMhQ==
-X-Gm-Message-State: AOJu0YwEoxQVtctL9vgncUaezQXcAh/4C1UbbB4yV7FtdrP+WdoLtnuO
-	s8jNGTVH9qAbGEWAtHvmKhukwI5fxVLsvKNYDgo8b2Yv8dkL9w2k
-X-Google-Smtp-Source: AGHT+IFxIvoDNhNuDw0P3tyvQU6q8aPxi0e06/PNuTEzZt2qbJ9VHrE5NnIWRC56wmcygr2y7OuO0g==
-X-Received: by 2002:a05:6808:10d2:b0:3be:b609:4de0 with SMTP id s18-20020a05680810d200b003beb6094de0mr15357001ois.2.1706994469632;
-        Sat, 03 Feb 2024 13:07:49 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWbEiPEiTy8iZBiPOz8O23eMbhnv6vpnw79gOr/TkM53asAisDqUtNsEs0bAoF33qbJqGgV6FxW18TEPqVC+esOgitl1s5qD34HrjTb/c7WbUNnFYghHvD9ZaXhIGE6+N2sAbbyE0arMOII4zBuHi3e0/yxoPZXIL8Gzx7+OqIv6MS7V4Dm8wa2RMJu6k/ytzznJZmuJsfPFLHZlEe/4jrM7mWywIlKxsCjqalGzqv2IpT31cHgMQs+eCdSTbzaBe9OQ3dCxNJBsT84IYgp9EoOGx4bSH9QocE=
-Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id gc7-20020a05622a59c700b0042be1092915sm2135641qtb.10.2024.02.03.13.07.47
+        bh=CxF9u4aP5ltJPUJ2rDWrzM7evqM4uATcpm0TzxAvUyM=;
+        b=FW/EPteZO7YZKv+h5tgutwYlYzvkH3oqkd5l6P9BnphzLRJ+yEubOjj6MOj3/AC3Cx
+         L/r/pNO39qhXvlmHP1+yqpnP0eFvJEklnacp7I8/oDLTJXDWwfaDNd8y6o7c3514QDZg
+         jSYI2mm45PoW5+ymITczKvJd2F6Bqea+gTDMH8smG3EEwNHAiOF9gkrzEbSqfqUDFquI
+         TTxVthtBZLf4WAeyfefFqvvmhCQM/nkA2O/A95KnYEuWB9RzAv/GrfgJHeuWpwjSN4iI
+         olFmR/l1sUxp/OMAkvxxAlgUn0HDL4OuF1u9wmqR3j/KSOBm2KlrNZufrRXUV3EHoXTg
+         VKyQ==
+X-Gm-Message-State: AOJu0Yw2zVsmZefV8AS353oWh9H94vrtSjcFKyMNOFghTa4xTjGzY9dK
+	tsorcEIQnGa2qjyJoazY75tO7ikDvIylsUTgSzzcTKSF38Ad9jMP
+X-Google-Smtp-Source: AGHT+IFFZuQ4Q89EutW5OxDzgyNSxIGTBsxuEOh37tnwsW4YdL8MzYZRCuGPkj/Frn1GcmUTlpy0sg==
+X-Received: by 2002:ac2:5f55:0:b0:511:35f0:559b with SMTP id 21-20020ac25f55000000b0051135f0559bmr3170772lfz.14.1706994771106;
+        Sat, 03 Feb 2024 13:12:51 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCV0enukE6jn4sABI5InTmEo7p0VHLheraZODnX26MkzTsDMG5CTK+fYdYzZzpfKTd7czCLCwqEi6PGBiErUAZW++YECrxalJVt2SoudsfZPqi9ImeZUZXVzehw/jiBX1/e5UwVN0vsj2AJvSzK/JAwZwwBekUP0qML+r3BxiOCUJaDLN16EvcB2JXhL7i57AF0zAQnkbjFTUocBGWmJMfpnRWa4IjmFB52uGX7ampKkoSl5eYhVvcs=
+Received: from ?IPV6:2a01:c23:bde4:a000:48dd:a4bf:88d3:e6ac? (dynamic-2a01-0c23-bde4-a000-48dd-a4bf-88d3-e6ac.c23.pool.telefonica.de. [2a01:c23:bde4:a000:48dd:a4bf:88d3:e6ac])
+        by smtp.googlemail.com with ESMTPSA id s12-20020a170906454c00b00a360eb62afdsm2379614ejq.32.2024.02.03.13.12.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 03 Feb 2024 13:07:48 -0800 (PST)
-Message-ID: <9098cfde-ab40-494e-bda2-11a498ff36a4@gmail.com>
-Date: Sat, 3 Feb 2024 13:07:46 -0800
+        Sat, 03 Feb 2024 13:12:50 -0800 (PST)
+Message-ID: <0652b910-6bcc-421f-8769-38f7dae5037e@gmail.com>
+Date: Sat, 3 Feb 2024 22:12:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,94 +75,152 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: dsa: mv88e6xxx: Return -ENODEV when
- C22/C45 not supported
 Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Vladimir Oltean <olteanv@gmail.com>
-Cc: netdev@vger.kernel.org, Tim Menninger <tmenninger@purestorage.com>
-References: <20240203-unify-c22-c45-scan-error-handling-v1-0-8aa9fa3c4fca@lunn.ch>
- <20240203-unify-c22-c45-scan-error-handling-v1-2-8aa9fa3c4fca@lunn.ch>
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20240203-unify-c22-c45-scan-error-handling-v1-2-8aa9fa3c4fca@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+To: Pavan Chebbi <pavan.chebbi@broadcom.com>,
+ Michael Chan <mchan@broadcom.com>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] tg3: convert EEE handling to use linkmode bitmaps
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
+Convert EEE handling to use linkmode bitmaps. This prepares for
+removing the legacy bitmaps from struct ethtool_keee.
+No functional change intended.
 
+Note: The change to mii_eee_cap1_mod_linkmode_t(tp->eee.advertised, val)
+in tg3_phy_autoneg_cfg() isn't completely obvious, but it doesn't change
+the current functionality.
 
-On 2/3/2024 12:52 PM, Andrew Lunn wrote:
-> MDIO bus drivers can return -ENODEV when they know the bus does not
-> have a device at the given address, e.g. because of hardware
-> limitation. One such limitation is that the bus does not support C22
-> or C45 at all. This is more efficient than returning 0xffff, since it
-> immediately stops the probing on the given address, where as further
-> reads can be made when 0xffff is returned.
-> 
-> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-> ---
->   drivers/net/dsa/mv88e6xxx/chip.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-> index 6eec2e4aa031..ce4e4bdf475d 100644
-> --- a/drivers/net/dsa/mv88e6xxx/chip.c
-> +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-> @@ -3633,7 +3633,7 @@ static int mv88e6xxx_mdio_read(struct mii_bus *bus, int phy, int reg)
->   	int err;
->   
->   	if (!chip->info->ops->phy_read)
-> -		return -EOPNOTSUPP;
-> +		return -ENODEV;
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/ethernet/broadcom/tg3.c | 27 ++++++++++++++-------------
+ 1 file changed, 14 insertions(+), 13 deletions(-)
 
-Still not sure this is the right way to do do it here.
-
->   
->   	mv88e6xxx_reg_lock(chip);
->   	err = chip->info->ops->phy_read(chip, bus, phy, reg, &val);
-> @@ -3659,7 +3659,7 @@ static int mv88e6xxx_mdio_read_c45(struct mii_bus *bus, int phy, int devad,
->   	int err;
->   
->   	if (!chip->info->ops->phy_read_c45)
-> -		return 0xffff;
-> +		return -ENODEV;
-
-Whereas here it makes sense to me to switch to -ENODEV.
+diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
+index f644a9131..50f674031 100644
+--- a/drivers/net/ethernet/broadcom/tg3.c
++++ b/drivers/net/ethernet/broadcom/tg3.c
+@@ -2362,13 +2362,13 @@ static void tg3_eee_pull_config(struct tg3 *tp, struct ethtool_keee *eee)
+ 	/* Pull lp advertised settings */
+ 	if (tg3_phy_cl45_read(tp, MDIO_MMD_AN, MDIO_AN_EEE_LPABLE, &val))
+ 		return;
+-	dest->lp_advertised_u32 = mmd_eee_adv_to_ethtool_adv_t(val);
++	mii_eee_cap1_mod_linkmode_t(dest->lp_advertised, val);
+ 
+ 	/* Pull advertised and eee_enabled settings */
+ 	if (tg3_phy_cl45_read(tp, MDIO_MMD_AN, MDIO_AN_EEE_ADV, &val))
+ 		return;
+ 	dest->eee_enabled = !!val;
+-	dest->advertised_u32 = mmd_eee_adv_to_ethtool_adv_t(val);
++	mii_eee_cap1_mod_linkmode_t(dest->advertised, val);
+ 
+ 	/* Pull tx_lpi_enabled */
+ 	val = tr32(TG3_CPMU_EEE_MODE);
+@@ -4364,11 +4364,9 @@ static int tg3_phy_autoneg_cfg(struct tg3 *tp, u32 advertise, u32 flowctrl)
+ 
+ 		if (!tp->eee.eee_enabled) {
+ 			val = 0;
+-			tp->eee.advertised_u32 = 0;
++			linkmode_zero(tp->eee.advertised);
+ 		} else {
+-			tp->eee.advertised_u32 = advertise &
+-					     (ADVERTISED_100baseT_Full |
+-					      ADVERTISED_1000baseT_Full);
++			mii_eee_cap1_mod_linkmode_t(tp->eee.advertised, val);
+ 		}
+ 
+ 		err = tg3_phy_cl45_write(tp, MDIO_MMD_AN, MDIO_AN_EEE_ADV, val);
+@@ -4626,13 +4624,13 @@ static bool tg3_phy_eee_config_ok(struct tg3 *tp)
+ 	tg3_eee_pull_config(tp, &eee);
+ 
+ 	if (tp->eee.eee_enabled) {
+-		if (tp->eee.advertised_u32 != eee.advertised_u32 ||
++		if (!linkmode_equal(tp->eee.advertised, eee.advertised) ||
+ 		    tp->eee.tx_lpi_timer != eee.tx_lpi_timer ||
+ 		    tp->eee.tx_lpi_enabled != eee.tx_lpi_enabled)
+ 			return false;
+ 	} else {
+ 		/* EEE is disabled but we're advertising */
+-		if (eee.advertised_u32)
++		if (!linkmode_empty(eee.advertised))
+ 			return false;
+ 	}
+ 
+@@ -14189,7 +14187,7 @@ static int tg3_set_eee(struct net_device *dev, struct ethtool_keee *edata)
+ 		return -EOPNOTSUPP;
+ 	}
+ 
+-	if (edata->advertised_u32 != tp->eee.advertised_u32) {
++	if (!linkmode_equal(edata->advertised, tp->eee.advertised)) {
+ 		netdev_warn(tp->dev,
+ 			    "Direct manipulation of EEE advertisement is not supported\n");
+ 		return -EINVAL;
+@@ -15655,10 +15653,13 @@ static int tg3_phy_probe(struct tg3 *tp)
+ 	      tg3_chip_rev_id(tp) != CHIPREV_ID_57765_A0))) {
+ 		tp->phy_flags |= TG3_PHYFLG_EEE_CAP;
+ 
+-		tp->eee.supported_u32 = SUPPORTED_100baseT_Full |
+-					SUPPORTED_1000baseT_Full;
+-		tp->eee.advertised_u32 = ADVERTISED_100baseT_Full |
+-					 ADVERTISED_1000baseT_Full;
++		linkmode_zero(tp->eee.supported);
++		linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT,
++				 tp->eee.supported);
++		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
++				 tp->eee.supported);
++		linkmode_copy(tp->eee.advertised, tp->eee.supported);
++
+ 		tp->eee.eee_enabled = 1;
+ 		tp->eee.tx_lpi_enabled = 1;
+ 		tp->eee.tx_lpi_timer = TG3_CPMU_DBTMR1_LNKIDLE_2047US;
 -- 
-Florian
+2.43.0
+
 
