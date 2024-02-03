@@ -1,59 +1,65 @@
-Return-Path: <netdev+bounces-68872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EA82848916
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 22:59:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C49F184895E
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 23:43:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D021C283FA6
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 21:59:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 65C83B23EE2
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 22:43:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06FF912E49;
-	Sat,  3 Feb 2024 21:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RjSGMDNN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E257512B78;
+	Sat,  3 Feb 2024 22:43:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from sonata.ens-lyon.org (sonata.ens-lyon.org [140.77.166.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68C41134D2
-	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 21:59:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7597212E68;
+	Sat,  3 Feb 2024 22:43:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=140.77.166.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706997564; cv=none; b=k9ovYN8VJyfRqqVZXMznJOOtDEwXI8beBaxfXBJcGgNSy+DwQktekqgQ8LWsa//1eV31mfxJTeEJxVkiZAn6TOdL6kcuztJMKvmxd0aBRsT54JvzWkaT/X5xxbwT+IK3TMVMhEoYx5C3FQJvCwEbtuhqhMPi+YuTE7UWSN7l5zU=
+	t=1707000187; cv=none; b=ka+ZHxx2iG3zLs0+AlF6NR0qUeLwrhuPLgf00scoUeGJ6jbgk8sYuNomUvZbmITtTWy+BEWKpS0tazXc2OxTadQqn54lbhX+oBU+yheb3XlxPsZXshr9WruF0c6iec7HYTPOPboEJWEmYuSbNtGavuy2mkEy71NpHwyQCAaA1UM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706997564; c=relaxed/simple;
-	bh=dGud80hs1SZIgx+NtXG35FgvoSm95JjUAWc5ti+8/bg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LcfPu3/SIXrNk6/WIxx+h2NIwncpjugoYiikhynEuc9Hh10r6WdwlVAA/fGARfOHC5dTseutgRAq5B/G+pGUuUNSvDAlxi8zmkA2sVvIYQ3xwl1spZf3/x8QdUaoEsU+v0jUEvHVj/erkG6fsK50Oo1CmLlAxUIMnHBG17oiuXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RjSGMDNN; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=WRiq4fUSC3Uac2XksDj6GjInoQYvurIHUmfcb/QgqRA=; b=RjSGMDNNCMPnsBS0PDBWD4QGov
-	IRKaRAxaKobYs5SsV4p5zUEx94K+Nh62jfYuN8HdJtgg1s8W/m2IAYfsdPfM5ldi8IjAQXrPQ+DDc
-	48gwK+J6ouV2m/SITW8l6iWdf6euvwOSE1k3/K+/9S/qJjJgns4XGynylNWNT9F4nzZk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rWO2c-006vdR-33; Sat, 03 Feb 2024 22:59:14 +0100
-Date: Sat, 3 Feb 2024 22:59:14 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, David Miller <davem@davemloft.net>,
-	Russell King - ARM Linux <linux@armlinux.org.uk>,
-	Michael Chan <michael.chan@broadcom.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] bnxt: convert EEE handling to use linkmode
- bitmaps
-Message-ID: <e65b8525-eae0-4143-aa57-009b47f09005@lunn.ch>
-References: <10510abd-ac26-42d0-8222-8b01fe9b8059@gmail.com>
+	s=arc-20240116; t=1707000187; c=relaxed/simple;
+	bh=hVfYZuMJypX8SO8Q0Mz5apUsGqZEhj917+dlLvHNxhM=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=utKkSMz5L1WI/+6G0WPu76tNmyYdbS2qgRE0blbCvurNoAQCxOWowQEG2EA/zmiPQ+qiKHY8TVAbHL0zqs1j/zccv2CL5PrTcsFmG5e8iL0ATNrwlCs4aasS1vUHefcBvUXsldWf2/8bNsxAu7IOjgrPJFiSgZi7YMjxXfmCQu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ens-lyon.org; spf=pass smtp.mailfrom=bounce.ens-lyon.org; arc=none smtp.client-ip=140.77.166.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ens-lyon.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bounce.ens-lyon.org
+Received: from localhost (localhost [127.0.0.1])
+	by sonata.ens-lyon.org (Postfix) with ESMTP id D02BAA02B7;
+	Sat,  3 Feb 2024 23:35:14 +0100 (CET)
+Received: from sonata.ens-lyon.org ([127.0.0.1])
+	by localhost (sonata.ens-lyon.org [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id ibr8YHfAeCVX; Sat,  3 Feb 2024 23:35:14 +0100 (CET)
+Received: from begin (aamiens-653-1-111-57.w83-192.abo.wanadoo.fr [83.192.234.57])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by sonata.ens-lyon.org (Postfix) with ESMTPSA id 399BEA022A;
+	Sat,  3 Feb 2024 23:35:14 +0100 (CET)
+Received: from samy by begin with local (Exim 4.97)
+	(envelope-from <samuel.thibault@ens-lyon.org>)
+	id 1rWObR-00000002MC2-3T4p;
+	Sat, 03 Feb 2024 23:35:13 +0100
+Date: Sat, 3 Feb 2024 23:35:13 +0100
+From: Samuel Thibault <samuel.thibault@ens-lyon.org>
+To: James Chapman <jchapman@katalix.com>, tparkin@katalix.com,
+	edumazet@google.com, gnault@redhat.com
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCHv3] PPPoL2TP: Add more code snippets
+Message-ID: <20240203223513.f2nfgaamgffz6dno@begin>
+Mail-Followup-To: Samuel Thibault <samuel.thibault@ens-lyon.org>,
+	James Chapman <jchapman@katalix.com>, tparkin@katalix.com,
+	edumazet@google.com, gnault@redhat.com, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, corbet@lwn.net,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,23 +68,148 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <10510abd-ac26-42d0-8222-8b01fe9b8059@gmail.com>
+User-Agent: NeoMutt/20170609 (1.8.3)
 
-> -	if (!edata->advertised_u32) {
-> -		edata->advertised_u32 = advertising & eee->supported_u32;
-> -	} else if (edata->advertised_u32 & ~advertising) {
-> -		netdev_warn(dev, "EEE advertised %x must be a subset of autoneg advertised speeds %x\n",
-> -			    edata->advertised_u32, advertising);
+The existing documentation was not telling that one has to create a PPP
+channel and a PPP interface to get PPPoL2TP data offloading working.
 
-That warning text looks wrong. I think it should be
+Also, tunnel switching was not mentioned, so that people were thinking
+it was not supported, while it actually is.
 
-EEE advertised %x must be a subset of autoneg supported speeds %x
+Signed-off-by: Samuel Thibault <samuel.thibault@ens-lyon.org>
 
-and it should print eee->supported, not advertising.
+---
+Difference from v1:
+- follow kernel coding style
+- check for failures
+- also mention netlink and ip for configuring the link
+- fix bridging channels
 
-Lets leave that to Broadcom to fix.
+Difference from v2:
+- fix text alignment
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+ Documentation/networking/l2tp.rst |   99 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 95 insertions(+), 4 deletions(-)
 
-    Andrew
+--- a/Documentation/networking/l2tp.rst
++++ b/Documentation/networking/l2tp.rst
+@@ -387,11 +387,16 @@ Sample userspace code:
+   - Create session PPPoX data socket::
+ 
+         struct sockaddr_pppol2tp sax;
+-        int fd;
++        int session_fd;
++        int ret;
+ 
+         /* Note, the tunnel socket must be bound already, else it
+          * will not be ready
+          */
++        session_fd = socket(AF_PPPOX, SOCK_DGRAM, PX_PROTO_OL2TP);
++        if (session_fd < 0)
++                return -errno;
++
+         sax.sa_family = AF_PPPOX;
+         sax.sa_protocol = PX_PROTO_OL2TP;
+         sax.pppol2tp.fd = tunnel_fd;
+@@ -406,11 +411,97 @@ Sample userspace code:
+         /* session_fd is the fd of the session's PPPoL2TP socket.
+          * tunnel_fd is the fd of the tunnel UDP / L2TPIP socket.
+          */
+-        fd = connect(session_fd, (struct sockaddr *)&sax, sizeof(sax));
+-        if (fd < 0 ) {
++        ret = connect(session_fd, (struct sockaddr *)&sax, sizeof(sax));
++        if (ret < 0 ) {
++                close(session_fd);
++                return -errno;
++        }
++
++        return session_fd;
++
++L2TP control packets will still be available for read on `tunnel_fd`.
++
++  - Create PPP channel::
++
++        int chindx;
++        int ppp_chan_fd;
++
++        ret = ioctl(session_fd, PPPIOCGCHAN, &chindx);
++        if (ret < 0)
++                return -errno;
++
++        ppp_chan_fd = open("/dev/ppp", O_RDWR);
++        if (ppp_chan_fd < 0)
++                return -errno;
++
++        ret = ioctl(ppp_chan_fd, PPPIOCATTCHAN, &chindx);
++        if (ret < 0) {
++                close(ppp_chan_fd);
++                return -errno;
++        }
++
++        return ppp_chan_fd;
++
++LCP PPP frames will be available for read on `ppp_chan_fd`.
++
++  - Create PPP interface::
++
++        int ppp_if_fd;
++        int ifunit = -1;
++
++        ppp_if_fd = open("/dev/ppp", O_RDWR);
++        if (ppp_chan_fd < 0)
++                return -errno;
++
++        ret = ioctl(ppp_if_fd, PPPIOCNEWUNIT, &ifunit);
++        if (ret < 0) {
++                close(ppp_if_fd);
++                return -errno;
++        }
++
++        ret = ioctl(ppp_chan_fd, PPPIOCCONNECT, ifunit);
++        if (ret < 0) {
++                close(ppp_if_fd);
++                return -errno;
++        }
++
++        return ppp_chan_fd;
++
++IPCP/IPv6CP PPP frames will be available for read on `ppp_if_fd`.
++
++The ppp<ifunit> interface can then be configured as usual with netlink's
++RTM_NEWLINK, RTM_NEWADDR, RTM_NEWROUTE, or ioctl's SIOCSIFMTU, SIOCSIFADDR,
++SIOCSIFDSTADDR, SIOCSIFNETMASK, SIOCSIFFLAGS, or with the `ip` command.
++
++  - L2TP session bridging (also called L2TP tunnel switching or L2TP multihop)
++    is supported by bridging the ppp channels of the two L2TP sessions to be
++    bridged::
++
++        int chindx1;
++        int chindx2;
++        int ppp_chan_fd;
++
++        ret = ioctl(session_fd1, PPPIOCGCHAN, &chindx1);
++        if (ret < 0)
++                return -errno;
++
++        ret = ioctl(session_fd2, PPPIOCGCHAN, &chind2x);
++        if (ret < 0)
++                return -errno;
++
++        ppp_chan_fd = open("/dev/ppp", O_RDWR);
++        ret = ioctl(ppp_chan_fd, PPPIOCATTCHAN, &chindx1);
++        if (ret < 0) {
++                close(ppp_chan_fd);
+                 return -errno;
+         }
+-        return 0;
++
++        ret = ioctl(ppp_chan_fd, PPPIOCBRIDGECHAN, &chindx2);
++        close(ppp_chan_fd);
++        if (ret < 0)
++                return -errno;
++
++See more details for the PPP side in ppp_generic.rst.
+ 
+ Old L2TPv2-only API
+ -------------------
 
