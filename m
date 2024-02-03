@@ -1,73 +1,50 @@
-Return-Path: <netdev+bounces-68779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CB6E848009
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 05:00:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BCC9F8483CA
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 05:50:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48AF32822FE
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 04:00:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 576DD288B76
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 04:50:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B273F9E6;
-	Sat,  3 Feb 2024 04:00:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA357101CE;
+	Sat,  3 Feb 2024 04:50:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="k2HRrMgL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OjXlsSjn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B659F9E4;
-	Sat,  3 Feb 2024 04:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F078FBFC;
+	Sat,  3 Feb 2024 04:50:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706932839; cv=none; b=k2Lv0rbv50mTSaDc/udh1LPzygIYEYjdKzZsQ774nHtTaC1YJT1ONb2qAipiKC9RWoqKpT35kWuOw4rN57LFrunk3XNXS1BeFwUg6SfxbodQIIIlF/UzUKs/36xw0UoNlC3/mlljjhie9Nc1diG5C5RCEO/RPUxR/zXqc/42M8k=
+	t=1706935828; cv=none; b=J8gKgq8xFcmJwwowaprSgK/C3pG0xSdYcXpCz7PGACy3075Si0gK+s5WM5NaHCezry4fr7+tAZKf6ZfCQDnNOGXz7coWOI7JbjS8U91ebKPdZuUWEAZYsLF/t2nPxaWJP0z8qfL1tg57Z3AxANZRz40Ekc+D8l7DxAF3lU7wh3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706932839; c=relaxed/simple;
-	bh=nPNcVMyJMqOzODkfQyo8r4ZLd/p2EiOmJqZC2GbOwHU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KKJOi3w2TsyqeXvsD6pObyDYTu0GulM57/OZne42WSnWnJaW8hUGKIrLwMTSCu62aTphousoEJ8LlueNIm9UZ3+lZRAeY757JGpIwBfYuVpD5ojX8pBNbdSOlNgo77TyuVCByy8sP/eHGu7W5TQlnQowVSE2zFUvoL4URBLR6w0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=k2HRrMgL; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1706932838; x=1738468838;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=k41X4sc9DdtTYFgJF4SnAf1wbpUf7pf1w3fjGixgous=;
-  b=k2HRrMgLM30o5V9m/vT1Cd8hOBNNdiLIcXO86sRQLBygApFJCsepYH3L
-   YY8pKOzq6zmnfk/zCQz5eFxKDugm4PSciZKFeNCy0xcK+eqNW4t/6nkmN
-   C0N+brAs3gdObpDf6pTwQoxBxc0polZdVjrRNsRFhAcpK+jjMykqQ5TuY
-   E=;
-X-IronPort-AV: E=Sophos;i="6.05,238,1701129600"; 
-   d="scan'208";a="182307099"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2024 04:00:36 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:15805]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.44.97:2525] with esmtp (Farcaster)
- id 8e386eaa-6d50-4d8a-8bab-47c198efb151; Sat, 3 Feb 2024 04:00:35 +0000 (UTC)
-X-Farcaster-Flow-ID: 8e386eaa-6d50-4d8a-8bab-47c198efb151
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Sat, 3 Feb 2024 04:00:33 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.106.101.14) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Sat, 3 Feb 2024 04:00:30 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <syzbot+fa3ef895554bdbfd1183@syzkaller.appspotmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <syzkaller-bugs@googlegroups.com>
-Subject: Re: [syzbot] [net?] WARNING in __unix_gc
-Date: Fri, 2 Feb 2024 20:00:21 -0800
-Message-ID: <20240203040021.65783-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <0000000000003555920610660fbc@google.com>
-References: <0000000000003555920610660fbc@google.com>
+	s=arc-20240116; t=1706935828; c=relaxed/simple;
+	bh=dxoDwdhwgsrylGbBAflkQtaQE7+NPSz4G5Mo6+1zpI8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=NUit3SNEbDnEtTJPyi7UsGRpB/2oIMW+F6xtIX/DV0mu7Z6yJ9yG3QBRGVTbA+gW6Iw3GnDlwSt6Hkx/pYxjOy0DdijwmH1z0kfTv4XGnEt+B2AZaGJ8JbcEZiiwKXSdCv5RfT9RqrT8CpiU2Uu1fkh9FtGKUbVlz8mzO/UYiGI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OjXlsSjn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id EB3ABC433C7;
+	Sat,  3 Feb 2024 04:50:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1706935828;
+	bh=dxoDwdhwgsrylGbBAflkQtaQE7+NPSz4G5Mo6+1zpI8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=OjXlsSjnJ+nK8NqVhAJfNAsh7f9ck81t4u1vSym5Xaqx/Vjmkp/LyOA5asi57TSNo
+	 lUG9PSCCx5DRRLMORsAJnxfMz5LUFQ6OHdtWULFI4+cG/RJwYWHbVnLC/STxoam6oM
+	 bkGUUEeE43zyAU006kLZ6Pn+Y4wf9BMIhnbRzQd/PXNLKSzmp9t9hOaAiFIXbkbVW1
+	 gVMYp9hCZaxafw+bQl+4YEL9Wlkdi9y0suXZuHbdK0MMOcQOWn5SWXWevHnrzF7Vjf
+	 //yj3abKakY8XUI7H+yAOwolGftyLQ9AM8nDw5nqO50UhgAHWF02QcIZ1VOdW968Hy
+	 4Zg3D9MTmRwIQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D1C10C04E32;
+	Sat,  3 Feb 2024 04:50:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,66 +52,75 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWB004.ant.amazon.com (10.13.139.150) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Subject: Re: [PATCH net] net: atlantic: Fix DMA mapping for PTP hwts ring
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170693582785.20949.4926544018376508267.git-patchwork-notify@kernel.org>
+Date: Sat, 03 Feb 2024 04:50:27 +0000
+References: <20240201094752.883026-1-ivecera@redhat.com>
+In-Reply-To: <20240201094752.883026-1-ivecera@redhat.com>
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, epomozov@marvell.com, irusskikh@marvell.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, dmitry.bezrukov@aquantia.com,
+ sergey.samoilenko@aquantia.com, linux-kernel@vger.kernel.org
 
-From: syzbot <syzbot+fa3ef895554bdbfd1183@syzkaller.appspotmail.com>
-Date: Fri, 02 Feb 2024 05:26:28 -0800
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    1701940b1a02 Merge branch 'tools-net-ynl-add-features-for-..
-> git tree:       net-next
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=15cbca88180000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=43ed254f922f56d0
-> dashboard link: https://syzkaller.appspot.com/bug?extid=fa3ef895554bdbfd1183
-> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11b512ffe80000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12d6927be80000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/00090c03ed53/disk-1701940b.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/fc03bbe45eb3/vmlinux-1701940b.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/8a5b859954ca/bzImage-1701940b.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+fa3ef895554bdbfd1183@syzkaller.appspotmail.com
-> 
-> ------------[ cut here ]------------
-> WARNING: CPU: 0 PID: 2863 at net/unix/garbage.c:345 __unix_gc+0xc74/0xe80 net/unix/garbage.c:345
-> Modules linked in:
-> CPU: 0 PID: 2863 Comm: kworker/u4:11 Not tainted 6.8.0-rc1-syzkaller-00583-g1701940b1a02 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-> Workqueue: events_unbound __unix_gc
-> RIP: 0010:__unix_gc+0xc74/0xe80 net/unix/garbage.c:345
-> Code: 8b 5c 24 50 e9 86 f8 ff ff e8 f8 e4 22 f8 31 d2 48 c7 c6 30 6a 69 89 4c 89 ef e8 97 ef ff ff e9 80 f9 ff ff e8 dd e4 22 f8 90 <0f> 0b 90 e9 7b fd ff ff 48 89 df e8 5c e7 7c f8 e9 d3 f8 ff ff e8
-> RSP: 0018:ffffc9000b03fba0 EFLAGS: 00010293
-> RAX: 0000000000000000 RBX: ffffc9000b03fc10 RCX: ffffffff816c493e
-> RDX: ffff88802c02d940 RSI: ffffffff896982f3 RDI: ffffc9000b03fb30
-> RBP: ffffc9000b03fce0 R08: 0000000000000001 R09: fffff52001607f66
-> R10: 0000000000000003 R11: 0000000000000002 R12: dffffc0000000000
-> R13: ffffc9000b03fc10 R14: ffffc9000b03fc10 R15: 0000000000000001
-> FS:  0000000000000000(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00005559c8677a60 CR3: 000000000d57a000 CR4: 00000000003506f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  process_one_work+0x889/0x15e0 kernel/workqueue.c:2633
->  process_scheduled_works kernel/workqueue.c:2706 [inline]
->  worker_thread+0x8b9/0x12a0 kernel/workqueue.c:2787
->  kthread+0x2c6/0x3b0 kernel/kthread.c:388
->  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x1b/0x30 arch/x86/entry/entry_64.S:242
->  </TASK>
+Hello:
 
-Ugh, I should've noticed this before sending another series.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-It seems syzbot creates a self-ref cycle.
-I'll look into it.
+On Thu,  1 Feb 2024 10:47:51 +0100 you wrote:
+> Function aq_ring_hwts_rx_alloc() maps extra AQ_CFG_RXDS_DEF bytes
+> for PTP HWTS ring but then generic aq_ring_free() does not take this
+> into account.
+> Create and use a specific function to free HWTS ring to fix this
+> issue.
+> 
+> Trace:
+> [  215.351607] ------------[ cut here ]------------
+> [  215.351612] DMA-API: atlantic 0000:4b:00.0: device driver frees DMA memory with different size [device address=0x00000000fbdd0000] [map size=34816 bytes] [unmap size=32768 bytes]
+> [  215.351635] WARNING: CPU: 33 PID: 10759 at kernel/dma/debug.c:988 check_unmap+0xa6f/0x2360
+> ...
+> [  215.581176] Call Trace:
+> [  215.583632]  <TASK>
+> [  215.585745]  ? show_trace_log_lvl+0x1c4/0x2df
+> [  215.590114]  ? show_trace_log_lvl+0x1c4/0x2df
+> [  215.594497]  ? debug_dma_free_coherent+0x196/0x210
+> [  215.599305]  ? check_unmap+0xa6f/0x2360
+> [  215.603147]  ? __warn+0xca/0x1d0
+> [  215.606391]  ? check_unmap+0xa6f/0x2360
+> [  215.610237]  ? report_bug+0x1ef/0x370
+> [  215.613921]  ? handle_bug+0x3c/0x70
+> [  215.617423]  ? exc_invalid_op+0x14/0x50
+> [  215.621269]  ? asm_exc_invalid_op+0x16/0x20
+> [  215.625480]  ? check_unmap+0xa6f/0x2360
+> [  215.629331]  ? mark_lock.part.0+0xca/0xa40
+> [  215.633445]  debug_dma_free_coherent+0x196/0x210
+> [  215.638079]  ? __pfx_debug_dma_free_coherent+0x10/0x10
+> [  215.643242]  ? slab_free_freelist_hook+0x11d/0x1d0
+> [  215.648060]  dma_free_attrs+0x6d/0x130
+> [  215.651834]  aq_ring_free+0x193/0x290 [atlantic]
+> [  215.656487]  aq_ptp_ring_free+0x67/0x110 [atlantic]
+> ...
+> [  216.127540] ---[ end trace 6467e5964dd2640b ]---
+> [  216.132160] DMA-API: Mapped at:
+> [  216.132162]  debug_dma_alloc_coherent+0x66/0x2f0
+> [  216.132165]  dma_alloc_attrs+0xf5/0x1b0
+> [  216.132168]  aq_ring_hwts_rx_alloc+0x150/0x1f0 [atlantic]
+> [  216.132193]  aq_ptp_ring_alloc+0x1bb/0x540 [atlantic]
+> [  216.132213]  aq_nic_init+0x4a1/0x760 [atlantic]
+> 
+> [...]
 
-Thanks.
+Here is the summary with links:
+  - [net] net: atlantic: Fix DMA mapping for PTP hwts ring
+    https://git.kernel.org/netdev/net/c/2e7d3b67630d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
