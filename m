@@ -1,112 +1,185 @@
-Return-Path: <netdev+bounces-68798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA57A848482
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 09:34:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 468EA8484C7
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 10:06:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 906D71F28F87
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 08:34:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6BDA21C28D16
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 09:05:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B30AE3EA67;
-	Sat,  3 Feb 2024 08:34:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2355F5CDE4;
+	Sat,  3 Feb 2024 09:01:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wNClei8f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2064F5C902
-	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 08:34:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DECE608F1
+	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 09:01:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706949280; cv=none; b=NMhrWXYj+JH2QGn3l92wUtLxAels7AlnmtyF9c7j4UTkXggkT69nvUZEus+ToDrDYa2o/J1qsGKfGsWs+An7KbbhASBcoQqxlag7wVrL/0jdWzPiUCshQnefT9HQaUa1FW10e7jD293qdIBUYv8TVvFYvOj6tFADWiwAIoxJGNE=
+	t=1706950883; cv=none; b=jcBvMx7HrxummVJ4XnPXjHD8PLLltdgu60cNwxR0GvfB3+Ov5Cz5ODH8gcrfTFMA1DrJKj62pngQqmNRC7cWAv7NUvAG7uF5tLgPp4Hqlg11m2o6M+zEEUTMUWFRY6r0tQ/4c4n+Gfk7w0GI48+P3yrdeX9+OHC625w1G/b4yiA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706949280; c=relaxed/simple;
-	bh=dREloSxjsQd3Dm2TwTvLLgS4yjeB2A4QST2I21fOKPI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=jwWGcWTIivBwkW1fCg/LaRjbkOZoxdrf0RuCYTJyAKm6oPKvP80ttqvYOq0dkiRk26u3jEExrLUZMvkMhdfWLn5AHV2m37JC8E3yTgrc1YQvK35Tdk219EerFlrL4rXIdrjSCIIp/NKBxjyYUWKrEjLnOJPE/kilwcTRPqKdDvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3637e2a2e5fso6288135ab.0
-        for <netdev@vger.kernel.org>; Sat, 03 Feb 2024 00:34:38 -0800 (PST)
+	s=arc-20240116; t=1706950883; c=relaxed/simple;
+	bh=oNL4GxQWTj4dilca9PFYMgngKx+CBnCZYOKnhj8FF+k=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fU9SkyUHSBYRn9Uh6qqqP2UYkycFwvPvcQ9g/Zg8+Plr80Hmo8yK2k/HQv05LS12hvqy8CF+1tAvjqdtKqMW+OO92NdtH3oK2LFs9YH85BmPbzlaw9r8tTj8IAL85M+BoQypvovPRC6BmUKrGyQPPRmEkuaMQPyiM+eGj5S7DXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wNClei8f; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-56012eeb755so7357a12.0
+        for <netdev@vger.kernel.org>; Sat, 03 Feb 2024 01:01:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1706950878; x=1707555678; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BdNOjPmnUHmZoaZTxhs1tBJ4MiDFY+m2JR6BiQFO9dE=;
+        b=wNClei8fRfTki675z2KXLdWWsT/q9lcBqKMOqS/J7y8E2+j6Izjrg8GbMvRhzVRzxd
+         CV/gkuqy4ze8y4asVkRV9xMa+acRkxYSoYOQirAdcsy+fsTc5ae1yxqAkg5e0pFcY8rD
+         KUpUVvfiH93k2kPv1idRXOipqE6wR2yUcDuJ59s3CJtQ+aQftsU27SL02Suj+CVb07Mq
+         sdEXoa6E+voitd7OeguimZYD0k6DvuhbmC0oHrGQIkcBz7Xw+wo7fZ9QKW1KPTj6W3B2
+         gYvulzqKUlvLfpVLsYbMGX6EDFpJ7Wpe5lfEv0faxXrGjv5Dxz39kVldG3jpFar9cTGs
+         Ti1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706949278; x=1707554078;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fET0Mp30kk4vbeHTvxgVRyoa35Y2AW8JHcb4p/vnIZs=;
-        b=mNg2q+JF9fRsX254E1KJ/y8oh7p74oQasIZzEACkr1nABtZp+XRiGwovBjybfObdyc
-         JE4TI0DISTF37x2Pza+4J6IOcIjFehEeRHG3d7AbmNWqLZTVI/PYEjv4F0EaDhuHWXhT
-         ol8hvfBNZ8QfRJBx6N3j3tEq9ELmI2PsCxGyS0ExgXe8w5ceiRoZO3DiVxbfNfcqkv7q
-         /ofG/CI08DJrAZRJoHl9/D2C/9C13DD10H1wz9+mKDAg5Meen/vI8w8tIjpEgjQLnsxr
-         /PXq/26rC53Nuy5Inf/AxBaShFZTN3HeciCzlmVbLjmaLa1zjTRz5VGhgC9wHqcq6Tz9
-         PUag==
-X-Gm-Message-State: AOJu0YzixhfeWSfJDBrRoa/k6UddHLSxNXoTgruVXb3dkOs1Tjm/zrJM
-	6Gzz8FK6lHY1LOMH8uEjQJTDVJDQBc+yRm3W787QqvsypbbaA2zlMBK8+YP8zS4lXEYqQbD/Q4F
-	P1aKOZGMEEbTTCgvsJfvCD49maAWRVp58J8kj+6Zk89+mx6OENTiwGMY=
-X-Google-Smtp-Source: AGHT+IFCSqaViRTl7MXK4bNIJv6w5IfZz0CUOIsCDXUztj9Lhe7QGIjPGGhRjUSlcdy2uM0cIfvFU0WMYzqMXfwCCvFSZP34dMZv
+        d=1e100.net; s=20230601; t=1706950878; x=1707555678;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BdNOjPmnUHmZoaZTxhs1tBJ4MiDFY+m2JR6BiQFO9dE=;
+        b=CmGCutqXnHN7xDWWgOrXf1+z7K+KSVUGwdrzAc2cofr1weoacD624RNns5I6/uLMpr
+         8ie9Valy5Fp9xxbutcjygDI9CTLvDw3P8bOJlzQWtjY4a01rH/5eoO05tDS8T6Fjxo5L
+         riNdtQrDdBCqL4iINfzhWNPTRUMMOKXmrX9uX44ahDmqWa08DdgxcNOfjQeHpmxExQU/
+         nTfuCxZtjVRtwuSPm5dQfBnmWo/S1zF8gVxlXpSg3Lyb9WRGMKAoFcA9d7edB5qtx7Vw
+         YT7QEq6dcV+EEeo53SLAA5CyvBTUNbN9ed5N0TtuKjskRQejGYokH3fJjt/zqylCDvt7
+         zlEw==
+X-Gm-Message-State: AOJu0Yx7ocURfIQPKvW1GJgmpmnH/gtEs0KiLGsokWcpkck/O4DRm+B1
+	VWd6QDHjYvbDuae2qcgIhe55e2ATNabyUfXbK0iRb8q5H4viUbGt5CBLOXim25ELhzId2QJ1KEl
+	ympGygLw3miBWJBjoW5nv45qjEFOOrcEO+79s
+X-Google-Smtp-Source: AGHT+IHafGXJ0v67fV8vF605E4vNtuGR4zSnkwzshrfk5ZZ5UaU6HNTSNQ1cjwR5aiZEeCL+dQ8VCpWqquqjXzYdKQE=
+X-Received: by 2002:a50:bb07:0:b0:560:2a1:44fc with SMTP id
+ y7-20020a50bb07000000b0056002a144fcmr69551ede.1.1706950878302; Sat, 03 Feb
+ 2024 01:01:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2166:b0:363:8b04:6df7 with SMTP id
- s6-20020a056e02216600b003638b046df7mr68726ilv.0.1706949278191; Sat, 03 Feb
- 2024 00:34:38 -0800 (PST)
-Date: Sat, 03 Feb 2024 00:34:38 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000006057050610761986@google.com>
-Subject: [syzbot] Monthly wireless report (Feb 2024)
-From: syzbot <syzbot+listce8d4b19585dfc84b816@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <20240203083259.99822-1-kuniyu@amazon.com>
+In-Reply-To: <20240203083259.99822-1-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sat, 3 Feb 2024 10:01:04 +0100
+Message-ID: <CANn89iL+BHiqZko-X0YWTdv9BCYXNY5w8rJsHf=X3NS9W+jkiA@mail.gmail.com>
+Subject: Re: [PATCH v1 net] af_unix: Call kfree_skb() for dead
+ unix_(sk)->oob_skb in GC.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	syzbot+fa3ef895554bdbfd1183@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello wireless maintainers/developers,
+On Sat, Feb 3, 2024 at 9:33=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.com=
+> wrote:
+>
+> syzbot reported a warning [0] in __unix_gc() with a repro, which
+> creates a socketpair and sends one socket's fd to itself using the
+> peer.
+>
+>   socketpair(AF_UNIX, SOCK_STREAM, 0, [3, 4]) =3D 0
+>   sendmsg(4, {msg_name=3DNULL, msg_namelen=3D0, msg_iov=3D[{iov_base=3D"\=
+360", iov_len=3D1}],
+>           msg_iovlen=3D1, msg_control=3D[{cmsg_len=3D20, cmsg_level=3DSOL=
+_SOCKET,
+>                                       cmsg_type=3DSCM_RIGHTS, cmsg_data=
+=3D[3]}],
+>           msg_controllen=3D24, msg_flags=3D0}, MSG_OOB|MSG_PROBE|MSG_DONT=
+WAIT|MSG_ZEROCOPY) =3D 1
+>
+> This forms a self-cyclic reference that GC should finally untangle
+> but does not due to lack of MSG_OOB handling, resulting in memory
+> leak.
+>
+> Recently, commit 11498715f266 ("af_unix: Remove io_uring code for
+> GC.") removed io_uring's dead code in GC and revealed the problem.
+>
+> The code was executed at the final stage of GC and unconditionally
+> moved all GC candidates from gc_candidates to gc_inflight_list.
+> That papered over the reported problem by always making the following
+> WARN_ON_ONCE(!list_empty(&gc_candidates)) false.
+>
+> The problem has been there since commit 2aab4b969002 ("af_unix: fix
+> struct pid leaks in OOB support") added full scm support for MSG_OOB
+> while fixing another bug.
+>
+> To fix this problem, we must call kfree_skb() for unix_sk(sk)->oob_skb
+> if the socket still exists in gc_candidates after purging collected skb.
+>
+> Note that the leaked socket remained being linked to a global list, so
+> kmemleak also could not detect it.  We need to check /proc/net/protocol
+> to notice the unfreed socket.
+>
+> [
+> Reported-by: syzbot+fa3ef895554bdbfd1183@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3Dfa3ef895554bdbfd1183
+> Fixes: 2aab4b969002 ("af_unix: fix struct pid leaks in OOB support")
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+> Given the commit disabling SCM_RIGHTS w/ io_uring was backporeted to
+> stable trees, we can backport this patch without commit 11498715f266,
+> so targeting net tree.
+> ---
+>  net/unix/garbage.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+>
+> diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+> index 2405f0f9af31..61f313d4a5dd 100644
+> --- a/net/unix/garbage.c
+> +++ b/net/unix/garbage.c
+> @@ -314,6 +314,15 @@ void unix_gc(void)
+>         /* Here we are. Hitlist is filled. Die. */
+>         __skb_queue_purge(&hitlist);
+>
+> +       list_for_each_entry_safe(u, next, &gc_candidates, link) {
+> +               struct sk_buff *skb =3D u->oob_skb;
+> +
+> +               if (skb) {
+> +                       u->oob_skb =3D NULL;
+> +                       kfree_skb(skb);
+> +               }
+> +       }
+> +
 
-This is a 31-day syzbot report for the wireless subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wireless
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-During the period, 1 new issues were detected and 1 were fixed.
-In total, 28 issues are still open and 120 have been fixed so far.
+Note there is already a 'struct sk_buff *skb;" variable in scope.
 
-Some of the still happening issues:
+This could be rewritten
 
-Ref  Crashes Repro Title
-<1>  6696    Yes   WARNING in __ieee80211_beacon_get
-                   https://syzkaller.appspot.com/bug?extid=18c783c5cf6a781e3e2c
-<2>  4569    Yes   WARNING in ieee80211_link_info_change_notify (2)
-                   https://syzkaller.appspot.com/bug?extid=de87c09cc7b964ea2e23
-<3>  4395    Yes   WARNING in __cfg80211_ibss_joined (2)
-                   https://syzkaller.appspot.com/bug?extid=7f064ba1704c2466e36d
-<4>  2892    No    WARNING in ieee80211_ibss_csa_beacon (2)
-                   https://syzkaller.appspot.com/bug?extid=b10a54cb0355d83fd75c
-<5>  851     Yes   WARNING in ieee80211_bss_info_change_notify (2)
-                   https://syzkaller.appspot.com/bug?extid=dd4779978217b1973180
-<6>  844     Yes   WARNING in ar5523_submit_rx_cmd/usb_submit_urb
-                   https://syzkaller.appspot.com/bug?extid=6101b0c732dea13ea55b
-<7>  747     Yes   WARNING in ieee80211_start_next_roc
-                   https://syzkaller.appspot.com/bug?extid=c3a167b5615df4ccd7fb
-<8>  717     No    INFO: task hung in ath9k_hif_usb_firmware_cb (2)
-                   https://syzkaller.appspot.com/bug?extid=d5635158fb0281b27bff
-<9>  66      Yes   WARNING in ieee80211_free_ack_frame (2)
-                   https://syzkaller.appspot.com/bug?extid=ac648b0525be1feba506
-<10> 46      Yes   WARNING in carl9170_usb_submit_cmd_urb/usb_submit_urb
-                   https://syzkaller.appspot.com/bug?extid=9468df99cb63a4a4c4e1
+list_for_each_entry_safe(u, next, &gc_candidates, link) {
+        kfree_skb(u->oob_skb);
+        u->oob_skb =3D NULL;
+}
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Also we probably can send this later:
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+index 2405f0f9af31c0ccefe2aa404002cfab8583c090..02466224445c9ec9b1259468d30=
+c89fc5e905a6b
+100644
+--- a/net/unix/garbage.c
++++ b/net/unix/garbage.c
+@@ -283,7 +283,7 @@ void unix_gc(void)
+         * inflight counters for these as well, and remove the skbuffs
+         * which are creating the cycle(s).
+         */
+-       skb_queue_head_init(&hitlist);
++       __skb_queue_head_init(&hitlist);
+        list_for_each_entry(u, &gc_candidates, link)
+                scan_children(&u->sk, inc_inflight, &hitlist);
 
