@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-68862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AE558488E3
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 22:12:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C9398488E8
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 22:19:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 518041C21491
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 21:12:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8F8531C21400
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 21:19:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48D9611739;
-	Sat,  3 Feb 2024 21:12:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8B3711721;
+	Sat,  3 Feb 2024 21:19:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f2Dzqvpb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="caMEHxW3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6558C12B61
-	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 21:12:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEEA412B70
+	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 21:19:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706994775; cv=none; b=hf/6HFKXc+QnhN7O32MhAVcTIK7eNJiSxYBaRXtND0S+ZvZGxYc1c+/w1THThL4mxfZMx6tKs3am69OQw6n3coFgSExSWcV4VUStlYQD3B9k2PbLxsOr9MqKDp+GYKiVUXwqoeT2rE9ODvifY4LW93hJXgs8DJAfecijTvZ5HZA=
+	t=1706995187; cv=none; b=ujNE5oQmPahIgMNU7IlLxVwnzQnJ4TnzIBxsAg41JvDw6WxLTiCpJ+x3geD9VSWGEWIMaJ230rsLis8p7YCWBeA0I9i/WKnqRTi2Hqce+cFVNY8LYC77auPEvA+ZSr4lGPKX+RNSxRw9NHwOqj4TpK6Lk8Rwg6lqZWj/tL/Rdsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706994775; c=relaxed/simple;
-	bh=0w6mEGpD3e4Hs2IMH21twJWagPIkhPFv64L2xHmQ9Ok=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=UqnyNjQpMdO0WqoHOzJBhpcpqcPXJ0/ZoUL5IqBGRUmfuAHpHOE4U2LRnZWPmKwxbP6bxOoRlt81SBXAcEHwJ42AIdMFwtnpx6MwGIoSd48Tlt9N775k8t7Gs69nznejojsDt2MPo9fxsR20Yh6bSTESBZM2VmL3xH+uSUVfrGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f2Dzqvpb; arc=none smtp.client-ip=209.85.167.48
+	s=arc-20240116; t=1706995187; c=relaxed/simple;
+	bh=BEBQFGhjHZAnhdyRYZlhkSNS4BU5nJT07grdtAGpMTg=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=BfQdAkHUxNbsMtfktNqrRticxSWXFQG0KpNutMClrq3WzpNqK5fsbl6QO/GiAIyDcwaaJiJ0Yewdexh8QeifkJJfsLPVmxbaDO+mo9/OoDbU6dt69Mh1Ja1Rgh8rE6J1vbksJHaZ/Y01CH7h7Pi2Pls4yzJsgwWBayAR8UO6EzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=caMEHxW3; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-51142b5b76dso1380944e87.2
-        for <netdev@vger.kernel.org>; Sat, 03 Feb 2024 13:12:53 -0800 (PST)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a36126ee41eso416952666b.2
+        for <netdev@vger.kernel.org>; Sat, 03 Feb 2024 13:19:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706994771; x=1707599571; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1706995184; x=1707599984; darn=vger.kernel.org;
         h=content-transfer-encoding:autocrypt:subject:from:cc:to
          :content-language:user-agent:mime-version:date:message-id:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CxF9u4aP5ltJPUJ2rDWrzM7evqM4uATcpm0TzxAvUyM=;
-        b=f2DzqvpbAtDms2zGsuawp0+OVk/mRXYOjbrhcAgMohtPEGta+Cu2p3WG6l+zb4F32b
-         02JX2GBlFsytONIogniXTpSK40R+vtaQYYSotuntybyp4Cmt+QY7Myl48qFowwvDhxqq
-         XM7LeQBWNIk1fqU7947BvkTbCmnEcufcL+sWPq6qIJUQoFkSgIHsNlfyj4dSlKeyR9Xk
-         IY8wdstqwPwrnBkyENzsB3KAf4/8f8A7juoj86kcUZdxZ84WmxZFqLT5GxrZRkapg8bm
-         IXWw9ZpJ5QRC53AKlsZ54CzYp+gAlDdyQC8gooEFkQRNKAaaiHkyAjx0sGrPPtJ7Ec8z
-         GNRg==
+        bh=QRKb5zZk5oGGoUTR5eRB3kiqRaezEe+xIWjS/l4voL0=;
+        b=caMEHxW3iRrUSL3dOvTZ6I/+puH6a7XuLfJHpSrqquVf3qz1D6FqApAX2kF5Iyzy/N
+         TE6MfUkPNBmm683nXEBXOr63cTl6xAv/uWuQAraUvjpKhueVbT5CA3xeNS7PgUYAfxLN
+         gcHyDX8DQAa6i6UGLDyE/7CEvhF3czv0XDUHNn5NPXsX0aJqD/kjKd/rlR91975Y8A5T
+         Z2ksqSH623j7oDBWROwCkkGSjSVzGhBOAUtioH17s9finJC45a3Jt8dOOy32ckFRenSO
+         +fYsHsJA4Qw2mbMD0iSF5XTTNEOVkFlC8V7cTgyZwitbxWraFpBPBhri7Q/YDbWoBIqJ
+         izdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706994771; x=1707599571;
+        d=1e100.net; s=20230601; t=1706995184; x=1707599984;
         h=content-transfer-encoding:autocrypt:subject:from:cc:to
          :content-language:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CxF9u4aP5ltJPUJ2rDWrzM7evqM4uATcpm0TzxAvUyM=;
-        b=FW/EPteZO7YZKv+h5tgutwYlYzvkH3oqkd5l6P9BnphzLRJ+yEubOjj6MOj3/AC3Cx
-         L/r/pNO39qhXvlmHP1+yqpnP0eFvJEklnacp7I8/oDLTJXDWwfaDNd8y6o7c3514QDZg
-         jSYI2mm45PoW5+ymITczKvJd2F6Bqea+gTDMH8smG3EEwNHAiOF9gkrzEbSqfqUDFquI
-         TTxVthtBZLf4WAeyfefFqvvmhCQM/nkA2O/A95KnYEuWB9RzAv/GrfgJHeuWpwjSN4iI
-         olFmR/l1sUxp/OMAkvxxAlgUn0HDL4OuF1u9wmqR3j/KSOBm2KlrNZufrRXUV3EHoXTg
-         VKyQ==
-X-Gm-Message-State: AOJu0Yw2zVsmZefV8AS353oWh9H94vrtSjcFKyMNOFghTa4xTjGzY9dK
-	tsorcEIQnGa2qjyJoazY75tO7ikDvIylsUTgSzzcTKSF38Ad9jMP
-X-Google-Smtp-Source: AGHT+IFFZuQ4Q89EutW5OxDzgyNSxIGTBsxuEOh37tnwsW4YdL8MzYZRCuGPkj/Frn1GcmUTlpy0sg==
-X-Received: by 2002:ac2:5f55:0:b0:511:35f0:559b with SMTP id 21-20020ac25f55000000b0051135f0559bmr3170772lfz.14.1706994771106;
-        Sat, 03 Feb 2024 13:12:51 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCV0enukE6jn4sABI5InTmEo7p0VHLheraZODnX26MkzTsDMG5CTK+fYdYzZzpfKTd7czCLCwqEi6PGBiErUAZW++YECrxalJVt2SoudsfZPqi9ImeZUZXVzehw/jiBX1/e5UwVN0vsj2AJvSzK/JAwZwwBekUP0qML+r3BxiOCUJaDLN16EvcB2JXhL7i57AF0zAQnkbjFTUocBGWmJMfpnRWa4IjmFB52uGX7ampKkoSl5eYhVvcs=
+        bh=QRKb5zZk5oGGoUTR5eRB3kiqRaezEe+xIWjS/l4voL0=;
+        b=gflg9tL5U7/v618wwoAu9+eJpvT6cuxOTGo8hK0ecmtNkvp+qOsSMXnRRIql7eculc
+         VnPuZEoy885kJXNfDioiS7RNbK5TKaO6XP3FawYlLBE+t075zbXy6NPtDuUfxzfuzzlx
+         uZXPu/Eu11BXnsowpvr4GfZWldEOrZHiqFqpGhLI2l3sCmIBkVKLBjU5/BjNyCLXSzMY
+         hfQQBAZBnatcNg66gcw4SSD8My9s5uvhFOFyCSsACOq12cYNlra7bdFvQcmBq+ZRIOB7
+         QAetlFRGr0dXcNymShwmY0/pevCtQ9f2B8Y0vWxr+AWEIBouHKdUnfJbMITR08nAILGN
+         6OzA==
+X-Gm-Message-State: AOJu0YzPGdSrfggA47KFw8JtO/tQ2XJLWgm6N5SS1DIQ5GezkWlhsOWC
+	cDvzDTsAB9ZjEa7Zoe074SSczL1Ll7S/JTU336HTVaGPX4b+hSL7
+X-Google-Smtp-Source: AGHT+IHspR0hhwKsZZ8HWhvChyOjZwI5okt36ile7t5v21XP51sBM8TTXBLO6vimdnPzjnAH4YaFUg==
+X-Received: by 2002:a17:906:e48:b0:a35:7b14:dc50 with SMTP id q8-20020a1709060e4800b00a357b14dc50mr7790143eji.17.1706995183890;
+        Sat, 03 Feb 2024 13:19:43 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCW7TguANuBo95vyEDuj4uut8uhLyytw0ytS7knfmMla+bADYbQd7SwN2I+RDsszF0EF4mxWiQPa7znxzC7CvTaPXAoe3phgj83y51+9Q29K1xoS2W7rA5XybZ5u8cqRzZn7Z9KQ+VAAXibNfvWeKVXa9fQyk40MXhmjvXuvMK8FAZsgj+Mn7aKM/9Tm5w0T2k52xzfm0aPDeSLzXVSetTVvL0e6gFEj8CfV7S663amncH8YiI6eV62dwusTO+hHgMjDHVNsmWU+y6EKam5W9LXYzQ==
 Received: from ?IPV6:2a01:c23:bde4:a000:48dd:a4bf:88d3:e6ac? (dynamic-2a01-0c23-bde4-a000-48dd-a4bf-88d3-e6ac.c23.pool.telefonica.de. [2a01:c23:bde4:a000:48dd:a4bf:88d3:e6ac])
-        by smtp.googlemail.com with ESMTPSA id s12-20020a170906454c00b00a360eb62afdsm2379614ejq.32.2024.02.03.13.12.50
+        by smtp.googlemail.com with ESMTPSA id l18-20020a170906079200b00a36f1470668sm2367102ejc.151.2024.02.03.13.19.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 03 Feb 2024 13:12:50 -0800 (PST)
-Message-ID: <0652b910-6bcc-421f-8769-38f7dae5037e@gmail.com>
-Date: Sat, 3 Feb 2024 22:12:50 +0100
+        Sat, 03 Feb 2024 13:19:43 -0800 (PST)
+Message-ID: <ca984f60-b08a-42d8-a127-13572190d155@gmail.com>
+Date: Sat, 3 Feb 2024 22:19:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,14 +76,15 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Content-Language: en-US
-To: Pavan Chebbi <pavan.chebbi@broadcom.com>,
- Michael Chan <mchan@broadcom.com>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>
+To: Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>,
+ Ariel Elior <aelior@marvell.com>, Sudarsana Kalluru <skalluru@marvell.com>,
+ Manish Chopra <manishc@marvell.com>
 Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] tg3: convert EEE handling to use linkmode bitmaps
+Subject: [PATCH net-next] bnx2x: convert EEE handling to use linkmode bitmaps
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
  sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
@@ -134,92 +135,92 @@ Convert EEE handling to use linkmode bitmaps. This prepares for
 removing the legacy bitmaps from struct ethtool_keee.
 No functional change intended.
 
-Note: The change to mii_eee_cap1_mod_linkmode_t(tp->eee.advertised, val)
-in tg3_phy_autoneg_cfg() isn't completely obvious, but it doesn't change
-the current functionality.
-
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/ethernet/broadcom/tg3.c | 27 ++++++++++++++-------------
- 1 file changed, 14 insertions(+), 13 deletions(-)
+ .../ethernet/broadcom/bnx2x/bnx2x_ethtool.c   | 45 +++++++++----------
+ 1 file changed, 22 insertions(+), 23 deletions(-)
 
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index f644a9131..50f674031 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -2362,13 +2362,13 @@ static void tg3_eee_pull_config(struct tg3 *tp, struct ethtool_keee *eee)
- 	/* Pull lp advertised settings */
- 	if (tg3_phy_cl45_read(tp, MDIO_MMD_AN, MDIO_AN_EEE_LPABLE, &val))
- 		return;
--	dest->lp_advertised_u32 = mmd_eee_adv_to_ethtool_adv_t(val);
-+	mii_eee_cap1_mod_linkmode_t(dest->lp_advertised, val);
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
+index 5f0e1759d..0672188bc 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
+@@ -2081,28 +2081,26 @@ static const char bnx2x_private_arr[BNX2X_PRI_FLAG_LEN][ETH_GSTRING_LEN] = {
+ 	"Storage only interface"
+ };
  
- 	/* Pull advertised and eee_enabled settings */
- 	if (tg3_phy_cl45_read(tp, MDIO_MMD_AN, MDIO_AN_EEE_ADV, &val))
- 		return;
- 	dest->eee_enabled = !!val;
--	dest->advertised_u32 = mmd_eee_adv_to_ethtool_adv_t(val);
-+	mii_eee_cap1_mod_linkmode_t(dest->advertised, val);
+-static u32 bnx2x_eee_to_adv(u32 eee_adv)
++static void bnx2x_eee_to_linkmode(unsigned long *mode, u32 eee_adv)
+ {
+-	u32 modes = 0;
+-
++	linkmode_zero(mode);
+ 	if (eee_adv & SHMEM_EEE_100M_ADV)
+-		modes |= ADVERTISED_100baseT_Full;
++		linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT, mode);
+ 	if (eee_adv & SHMEM_EEE_1G_ADV)
+-		modes |= ADVERTISED_1000baseT_Full;
++		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT, mode);
+ 	if (eee_adv & SHMEM_EEE_10G_ADV)
+-		modes |= ADVERTISED_10000baseT_Full;
+-
+-	return modes;
++		linkmode_set_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT, mode);
+ }
  
- 	/* Pull tx_lpi_enabled */
- 	val = tr32(TG3_CPMU_EEE_MODE);
-@@ -4364,11 +4364,9 @@ static int tg3_phy_autoneg_cfg(struct tg3 *tp, u32 advertise, u32 flowctrl)
+-static u32 bnx2x_adv_to_eee(u32 modes, u32 shift)
++static u32 bnx2x_linkmode_to_eee(const unsigned long *mode, u32 shift)
+ {
+ 	u32 eee_adv = 0;
+-	if (modes & ADVERTISED_100baseT_Full)
++
++	if (linkmode_test_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT, mode))
+ 		eee_adv |= SHMEM_EEE_100M_ADV;
+-	if (modes & ADVERTISED_1000baseT_Full)
++	if (linkmode_test_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT, mode))
+ 		eee_adv |= SHMEM_EEE_1G_ADV;
+-	if (modes & ADVERTISED_10000baseT_Full)
++	if (linkmode_test_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT, mode))
+ 		eee_adv |= SHMEM_EEE_10G_ADV;
  
- 		if (!tp->eee.eee_enabled) {
- 			val = 0;
--			tp->eee.advertised_u32 = 0;
-+			linkmode_zero(tp->eee.advertised);
- 		} else {
--			tp->eee.advertised_u32 = advertise &
--					     (ADVERTISED_100baseT_Full |
--					      ADVERTISED_1000baseT_Full);
-+			mii_eee_cap1_mod_linkmode_t(tp->eee.advertised, val);
- 		}
+ 	return eee_adv << shift;
+@@ -2120,16 +2118,17 @@ static int bnx2x_get_eee(struct net_device *dev, struct ethtool_keee *edata)
  
- 		err = tg3_phy_cl45_write(tp, MDIO_MMD_AN, MDIO_AN_EEE_ADV, val);
-@@ -4626,13 +4624,13 @@ static bool tg3_phy_eee_config_ok(struct tg3 *tp)
- 	tg3_eee_pull_config(tp, &eee);
+ 	eee_cfg = bp->link_vars.eee_status;
  
- 	if (tp->eee.eee_enabled) {
--		if (tp->eee.advertised_u32 != eee.advertised_u32 ||
-+		if (!linkmode_equal(tp->eee.advertised, eee.advertised) ||
- 		    tp->eee.tx_lpi_timer != eee.tx_lpi_timer ||
- 		    tp->eee.tx_lpi_enabled != eee.tx_lpi_enabled)
- 			return false;
- 	} else {
- 		/* EEE is disabled but we're advertising */
--		if (eee.advertised_u32)
-+		if (!linkmode_empty(eee.advertised))
- 			return false;
- 	}
+-	edata->supported_u32 =
+-		bnx2x_eee_to_adv((eee_cfg & SHMEM_EEE_SUPPORTED_MASK) >>
+-				 SHMEM_EEE_SUPPORTED_SHIFT);
++	bnx2x_eee_to_linkmode(edata->supported,
++			      (eee_cfg & SHMEM_EEE_SUPPORTED_MASK) >>
++			      SHMEM_EEE_SUPPORTED_SHIFT);
++
++	bnx2x_eee_to_linkmode(edata->advertised,
++			      (eee_cfg & SHMEM_EEE_ADV_STATUS_MASK) >>
++			      SHMEM_EEE_ADV_STATUS_SHIFT);
  
-@@ -14189,7 +14187,7 @@ static int tg3_set_eee(struct net_device *dev, struct ethtool_keee *edata)
+-	edata->advertised_u32 =
+-		bnx2x_eee_to_adv((eee_cfg & SHMEM_EEE_ADV_STATUS_MASK) >>
+-				 SHMEM_EEE_ADV_STATUS_SHIFT);
+-	edata->lp_advertised_u32 =
+-		bnx2x_eee_to_adv((eee_cfg & SHMEM_EEE_LP_ADV_STATUS_MASK) >>
+-				 SHMEM_EEE_LP_ADV_STATUS_SHIFT);
++	bnx2x_eee_to_linkmode(edata->lp_advertised,
++			      (eee_cfg & SHMEM_EEE_LP_ADV_STATUS_MASK) >>
++			      SHMEM_EEE_LP_ADV_STATUS_SHIFT);
+ 
+ 	/* SHMEM value is in 16u units --> Convert to 1u units. */
+ 	edata->tx_lpi_timer = (eee_cfg & SHMEM_EEE_TIMER_MASK) << 4;
+@@ -2162,8 +2161,8 @@ static int bnx2x_set_eee(struct net_device *dev, struct ethtool_keee *edata)
  		return -EOPNOTSUPP;
  	}
  
--	if (edata->advertised_u32 != tp->eee.advertised_u32) {
-+	if (!linkmode_equal(edata->advertised, tp->eee.advertised)) {
- 		netdev_warn(tp->dev,
- 			    "Direct manipulation of EEE advertisement is not supported\n");
- 		return -EINVAL;
-@@ -15655,10 +15653,13 @@ static int tg3_phy_probe(struct tg3 *tp)
- 	      tg3_chip_rev_id(tp) != CHIPREV_ID_57765_A0))) {
- 		tp->phy_flags |= TG3_PHYFLG_EEE_CAP;
- 
--		tp->eee.supported_u32 = SUPPORTED_100baseT_Full |
--					SUPPORTED_1000baseT_Full;
--		tp->eee.advertised_u32 = ADVERTISED_100baseT_Full |
--					 ADVERTISED_1000baseT_Full;
-+		linkmode_zero(tp->eee.supported);
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT,
-+				 tp->eee.supported);
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
-+				 tp->eee.supported);
-+		linkmode_copy(tp->eee.advertised, tp->eee.supported);
-+
- 		tp->eee.eee_enabled = 1;
- 		tp->eee.tx_lpi_enabled = 1;
- 		tp->eee.tx_lpi_timer = TG3_CPMU_DBTMR1_LNKIDLE_2047US;
+-	advertised = bnx2x_adv_to_eee(edata->advertised_u32,
+-				      SHMEM_EEE_ADV_STATUS_SHIFT);
++	advertised = bnx2x_linkmode_to_eee(edata->advertised,
++					   SHMEM_EEE_ADV_STATUS_SHIFT);
+ 	if ((advertised != (eee_cfg & SHMEM_EEE_ADV_STATUS_MASK))) {
+ 		DP(BNX2X_MSG_ETHTOOL,
+ 		   "Direct manipulation of EEE advertisement is not supported\n");
 -- 
 2.43.0
 
