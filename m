@@ -1,162 +1,224 @@
-Return-Path: <netdev+bounces-68805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24C8084854F
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 12:21:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47CC384855A
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 12:42:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BAE21C224D9
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 11:21:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A660AB23A65
+	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 11:42:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08A701CAA3;
-	Sat,  3 Feb 2024 11:21:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 105BB5D8F3;
+	Sat,  3 Feb 2024 11:42:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fSvzf4m6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TdtW8ERg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CCAB1CAAC
-	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 11:21:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE8D112E51
+	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 11:42:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1706959268; cv=none; b=joJvCLKQrWqpkSmgEswYz7v4YhQMl9BZN3/8SMDCiqFmgfKqoPKc6fuFqkNiFNioOrz1OhGwD/xpbEbKD8dQRgSPMDMDailvHUlit4/tAGT7O/52Zfhp3v7+QDLvMESJ6YBhCXJCoY8BTj11HrxTjhkr8S9j57Kg7W5a5Z2QxfI=
+	t=1706960550; cv=none; b=fsNSNB3Mqry9ysJofi8o6mHSFBKpZgIyMyaK9k6mBgL5beb+hO3sBI4xzPBrvst5aTqwfjUJ9mIodnHOXcLfMFjgt6IccNI4pHgebpt5eEdW7vffspz4AX6pCozjk0gNlE3bCdUuUe0JwR+AMCHrLWPztO1A6QoCzbY+prgObSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1706959268; c=relaxed/simple;
-	bh=kkdhy42RQoxGvS2aa4zV7RcKFbjKu2+O/+HVe6dsd+k=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Du/P5kIT0rGGZ9WJIVje4iu9enrwou8ObsswU+djUZQSI87pVp6w+6vc/amrGknHyrHcFV45rQ6Y05r3W2169YmnH9kFJNL27gvJCi6Cu1UDl5CFo29N/KeHGvvgTmCZPll2rSAPs0M2B2Ql4sD95Qx2ADjij162LCSInuyegos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fSvzf4m6; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5601eb97b29so565858a12.0
-        for <netdev@vger.kernel.org>; Sat, 03 Feb 2024 03:21:06 -0800 (PST)
+	s=arc-20240116; t=1706960550; c=relaxed/simple;
+	bh=qscmBWYItm1OYK+aYkRANbjPwGBAK2rPM53g5vl7fTk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=b8fokdxYyiLuvqzjlrtLx8WjIlRrKqMKZHwmPQ9pwMBE/wm6qLLgG4cAg8HwK8NQqqZjgowN0mHTWS4UCiEEB7dpuDy7mFnQrmTw+HMH44fi76X1OK7wEYjG4UmHPACSgCi1p4Uk9Ft884NbDa0HaIgskBVIIvoD2iUDBLHBB38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TdtW8ERg; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-55f63fd3dd8so5672a12.0
+        for <netdev@vger.kernel.org>; Sat, 03 Feb 2024 03:42:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1706959265; x=1707564065; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=kLVk9kI+Fh8dU+5aqkcIljCjYeBZbKjsFVpmVoRZeKU=;
-        b=fSvzf4m6OKah1X2Npr30RTfPp35NKL7eFhc7lCFkmBW5cJ3WxhAXrz7/3vVDwH363/
-         I1WtN5KY15zJ8wX1SmQYCjhr2vhIB0KfygMcEE/jxNslekL3hPzEeRMfehtlMyuYM8lJ
-         ns6H7UlV8A5jWEW9ikF6cSw/pzu7U38Erw/plLl52EJKZ/XjATa8QJENc1LKty8doXEf
-         qgYIkCsCl3HinpRfAvvckG8+qQJ3K1941rXFIGkXnTAWGtuxaQClDwB7rN7I10GbxLSa
-         o4uYWKTY6MP/Z2H0N7Pqdtu2aFwex9+AeD3Sy1P1peTyf7PXSGWNhbqwj+cU4YqF/P2V
-         IDiw==
+        d=google.com; s=20230601; t=1706960547; x=1707565347; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RpPCcDDznDCgjjCp36XnjNmSQNTppQ4Bwn5kv3pK/LM=;
+        b=TdtW8ERgEvXl5Y3YYpVWrWPj8JmLlu0X1RRUizgnPtrN9lVt6I4yWh4AoB0dPtB/lX
+         zvK6qTMj+UdPXi8kvll9ySs2RMmBd2RrYmOYxpKrwTjgkHKHLpeJIFZb3wFK9NIStAdM
+         ojELCRrq68Ntj3JXYUZJ9G8gcAdDkfacgMFxlYibxiVt5cnb8inwrooIIf5/xkhoorAT
+         2UXYEXZnpEWgLthTpRBesbLXpYhyCwRZTuCtLki/Cg/QkDBfLcsBIwb6Lo60F85gNK9+
+         MXkwP/h3H5XPpYjX+2L3hvvragYncrCjLTdD85WTxuA0VRrcGXuw0BfSsxChE2rMy52T
+         O1jA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1706959265; x=1707564065;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kLVk9kI+Fh8dU+5aqkcIljCjYeBZbKjsFVpmVoRZeKU=;
-        b=CPujhATSGfaaACFoDpVMeJyCyJ3wS6DENSKcXE5k/Rt2lURgDlnJGN+qaWycPiUjuL
-         EhGWJy9ksTj+4NuUfAEFNtdXh+umKcFohKWGCTvPluu4gQO2ICvDSHs8CQC80w0WflQA
-         zmOrQqONUDuH+YrXHmI2PlLT610P/0poaaS+ULWK8OyM16k/JvTPjo5H7eXUxmvIC/Lp
-         P4Wt4P3AeaACpsNVHS28aR51+0vAhQ0bRdkQy0oIA9VJeINOnI0E2lgpFwJzZjyhxGIX
-         u+Jc5mgFA1ciTJzDoFUYu7G2rs/RQycrshtfCcq18II5a7Z3VA2SF6EyjwD6X2y/8UBI
-         2i5g==
-X-Gm-Message-State: AOJu0YzbHb0xJ76I5IPkUkmeIjbvwZix8M0oWv/J20RLqatwyj7kJ0S+
-	nGoSSGsD5AuA2Zajf2Feh3eyxW6UYs4CBEcdOOuFrGlW/mnnTzhj
-X-Google-Smtp-Source: AGHT+IFNo9EnU1xhW69DsjTeUoFokWEWjy1WpJFKia7nzsdLVUNag3jJPfxjrlJMJF0a7I3UZa2ksg==
-X-Received: by 2002:aa7:cf11:0:b0:55f:16d2:46a8 with SMTP id a17-20020aa7cf11000000b0055f16d246a8mr1290878edy.3.1706959264966;
-        Sat, 03 Feb 2024 03:21:04 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWTMs54ER5wbZ571PigJ2/xkAAt3i59qdTsf2NPRPo0J/y9Avc3CkQ2qJizHbpmjTfazMq+Dv6hHGlzCjcrXqgHMzMyKN89nh0FdvhDydfEHQ5J2TukEQFrOrzd4K3+8VpTdeiPWVMiWU14YfOAPIW2nr3QjMsZRzlE7ysz3lVqdG0Pjs/X6RnekL3YT97ub2m9ACDxk2FfBMlw6AU+mzMB0OxKxclK
-Received: from ?IPV6:2a01:c23:bde4:a000:48dd:a4bf:88d3:e6ac? (dynamic-2a01-0c23-bde4-a000-48dd-a4bf-88d3-e6ac.c23.pool.telefonica.de. [2a01:c23:bde4:a000:48dd:a4bf:88d3:e6ac])
-        by smtp.googlemail.com with ESMTPSA id g18-20020a056402091200b0055ff4a88936sm1380915edz.41.2024.02.03.03.21.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 03 Feb 2024 03:21:04 -0800 (PST)
-Message-ID: <4a963539-80f9-4e85-9731-b41281eafc63@gmail.com>
-Date: Sat, 3 Feb 2024 12:21:05 +0100
+        d=1e100.net; s=20230601; t=1706960547; x=1707565347;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RpPCcDDznDCgjjCp36XnjNmSQNTppQ4Bwn5kv3pK/LM=;
+        b=hXvHi+yMi9v0WZfHRwXXX21OqnuVoxlzyeqrgHsbHjxWRElc+Wxcw404A1aZ167y/j
+         WMsLu9y/DHvskL4rbOpAxHqA+N4SaOS2UF+QR4LkROTKBU1d+ApLf1a2iLAKc/NRWA9Z
+         hisY+cyAKUmwKawnTlw1H3IpiTRQMDcpV/jE15hEg4ueK1f/X2UEwaoFKWJZgxQ6S8qG
+         j2jvF3e4yG05cPc1D/JSlf/9MVuhRRB5cL2mfk2l3n87HXRGNvZttsVHsRePIaau8B4Y
+         XUB1vknk7t8z+xn8MDKnsIL3GbejDwK+hniwUbTk8DmsNVaRqiXcH7PD2Yz8jz9/2HCA
+         3OCw==
+X-Gm-Message-State: AOJu0Yyj5I8RbjxPrw2n8hMRtKhZp9X+lSMZrsAhfZEtIwK4/pOzZWn1
+	MPc1AOl7ND/X1mvmLCh+8E5nOPSctaXSKSSqMA5fekcQUVsVHXTZ2cW9/e6Ph7Db8VL+MsSbEzk
+	9YWiXS7W8saMqi6FY/Php/oUysaNBDJVtHTmd
+X-Google-Smtp-Source: AGHT+IFA0FWCVxrX58Hi9/M2syD7ndkkZnh5qiORx6beWDSHi0f14ggXQX5Y0oCu2BAQg71YvZrZURJfPWGo++uFGOY=
+X-Received: by 2002:a50:9fa9:0:b0:560:2a2:37f7 with SMTP id
+ c38-20020a509fa9000000b0056002a237f7mr73080edf.1.1706960546689; Sat, 03 Feb
+ 2024 03:42:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 2/2] r8169: use new helper phy_advertise_eee_all
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Andrew Lunn <andrew@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Realtek linux nic maintainers <nic_swsd@realtek.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <14ee6c37-3b4f-454e-9760-ca41848fffc2@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <14ee6c37-3b4f-454e-9760-ca41848fffc2@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <CANn89iL+BHiqZko-X0YWTdv9BCYXNY5w8rJsHf=X3NS9W+jkiA@mail.gmail.com>
+ <20240203091459.9066-1-kuniyu@amazon.com>
+In-Reply-To: <20240203091459.9066-1-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Sat, 3 Feb 2024 12:42:12 +0100
+Message-ID: <CANn89i+1Uvtx+6v_ZNm6dx1zdOTeT1i=8k0b0FdcTvNHJJFmFA@mail.gmail.com>
+Subject: Re: [PATCH v1 net] af_unix: Call kfree_skb() for dead
+ unix_(sk)->oob_skb in GC.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, kuba@kernel.org, kuni1840@gmail.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzbot+fa3ef895554bdbfd1183@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Use new helper phy_advertise_eee_all() to simplify the code.
+On Sat, Feb 3, 2024 at 10:15=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> From: Eric Dumazet <edumazet@google.com>
+> Date: Sat, 3 Feb 2024 10:01:04 +0100
+> > On Sat, Feb 3, 2024 at 9:33=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon=
+.com> wrote:
+> > >
+> > > syzbot reported a warning [0] in __unix_gc() with a repro, which
+> > > creates a socketpair and sends one socket's fd to itself using the
+> > > peer.
+> > >
+> > >   socketpair(AF_UNIX, SOCK_STREAM, 0, [3, 4]) =3D 0
+> > >   sendmsg(4, {msg_name=3DNULL, msg_namelen=3D0, msg_iov=3D[{iov_base=
+=3D"\360", iov_len=3D1}],
+> > >           msg_iovlen=3D1, msg_control=3D[{cmsg_len=3D20, cmsg_level=
+=3DSOL_SOCKET,
+> > >                                       cmsg_type=3DSCM_RIGHTS, cmsg_da=
+ta=3D[3]}],
+> > >           msg_controllen=3D24, msg_flags=3D0}, MSG_OOB|MSG_PROBE|MSG_=
+DONTWAIT|MSG_ZEROCOPY) =3D 1
+> > >
+> > > This forms a self-cyclic reference that GC should finally untangle
+> > > but does not due to lack of MSG_OOB handling, resulting in memory
+> > > leak.
+> > >
+> > > Recently, commit 11498715f266 ("af_unix: Remove io_uring code for
+> > > GC.") removed io_uring's dead code in GC and revealed the problem.
+> > >
+> > > The code was executed at the final stage of GC and unconditionally
+> > > moved all GC candidates from gc_candidates to gc_inflight_list.
+> > > That papered over the reported problem by always making the following
+> > > WARN_ON_ONCE(!list_empty(&gc_candidates)) false.
+> > >
+> > > The problem has been there since commit 2aab4b969002 ("af_unix: fix
+> > > struct pid leaks in OOB support") added full scm support for MSG_OOB
+> > > while fixing another bug.
+> > >
+> > > To fix this problem, we must call kfree_skb() for unix_sk(sk)->oob_sk=
+b
+> > > if the socket still exists in gc_candidates after purging collected s=
+kb.
+> > >
+> > > Note that the leaked socket remained being linked to a global list, s=
+o
+> > > kmemleak also could not detect it.  We need to check /proc/net/protoc=
+ol
+> > > to notice the unfreed socket.
+> > >
+> > > [
+> > > Reported-by: syzbot+fa3ef895554bdbfd1183@syzkaller.appspotmail.com
+> > > Closes: https://syzkaller.appspot.com/bug?extid=3Dfa3ef895554bdbfd118=
+3
+> > > Fixes: 2aab4b969002 ("af_unix: fix struct pid leaks in OOB support")
+> > > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > > ---
+> > > Given the commit disabling SCM_RIGHTS w/ io_uring was backporeted to
+> > > stable trees, we can backport this patch without commit 11498715f266,
+> > > so targeting net tree.
+> > > ---
+> > >  net/unix/garbage.c | 9 +++++++++
+> > >  1 file changed, 9 insertions(+)
+> > >
+> > > diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+> > > index 2405f0f9af31..61f313d4a5dd 100644
+> > > --- a/net/unix/garbage.c
+> > > +++ b/net/unix/garbage.c
+> > > @@ -314,6 +314,15 @@ void unix_gc(void)
+> > >         /* Here we are. Hitlist is filled. Die. */
+> > >         __skb_queue_purge(&hitlist);
+> > >
+> > > +       list_for_each_entry_safe(u, next, &gc_candidates, link) {
+> > > +               struct sk_buff *skb =3D u->oob_skb;
+> > > +
+> > > +               if (skb) {
+> > > +                       u->oob_skb =3D NULL;
+> > > +                       kfree_skb(skb);
+> > > +               }
+> > > +       }
+> > > +
+> >
+> > Reviewed-by: Eric Dumazet <edumazet@google.com>
+> >
+> > Note there is already a 'struct sk_buff *skb;" variable in scope.
+> >
+> > This could be rewritten
+> >
+> > list_for_each_entry_safe(u, next, &gc_candidates, link) {
+> >         kfree_skb(u->oob_skb);
+> >         u->oob_skb =3D NULL;
+> > }
+>
+> I wrote that in the inital fix but noticed that this
+> kfree_skb() triggers fput(), and later in unix_release_sock()
+> we will call the duplicate kfree_skb().
+>
+>         if (u->oob_skb) {
+>                 kfree_skb(u->oob_skb);
+>                 u->oob_skb =3D NULL;
+>         }
+>
+> So, we need to set NULL before kfree_skb() in __unix_gc().
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/realtek/r8169_main.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+Okay...
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index c70869539..b43db3c49 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -5091,8 +5091,7 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
- 
- 	tp->phydev->mac_managed_pm = true;
- 	if (rtl_supports_eee(tp))
--		linkmode_copy(tp->phydev->advertising_eee,
--			      tp->phydev->supported_eee);
-+		phy_advertise_eee_all(tp->phydev);
- 	phy_support_asym_pause(tp->phydev);
- 
- 	/* PHY will be woken up in rtl_open() */
--- 
-2.43.0
+But we probably need :
+
+#if IS_ENABLED(CONFIG_AF_UNIX_OOB)
 
 
+>
+>
+> >
+> > Also we probably can send this later:
+>
+> Yes, I changed as such in a new GC implementation, this needs
+> respin for MSG_OOB support though...
+> https://lore.kernel.org/netdev/20240203030058.60750-14-kuniyu@amazon.com/
+>
+> Thanks!
+>
+> >
+> > diff --git a/net/unix/garbage.c b/net/unix/garbage.c
+> > index 2405f0f9af31c0ccefe2aa404002cfab8583c090..02466224445c9ec9b125946=
+8d30c89fc5e905a6b
+> > 100644
+> > --- a/net/unix/garbage.c
+> > +++ b/net/unix/garbage.c
+> > @@ -283,7 +283,7 @@ void unix_gc(void)
+> >          * inflight counters for these as well, and remove the skbuffs
+> >          * which are creating the cycle(s).
+> >          */
+> > -       skb_queue_head_init(&hitlist);
+> > +       __skb_queue_head_init(&hitlist);
+> >         list_for_each_entry(u, &gc_candidates, link)
+> >                 scan_children(&u->sk, inc_inflight, &hitlist);
 
