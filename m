@@ -1,142 +1,121 @@
-Return-Path: <netdev+bounces-68882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17B99848AAF
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 03:36:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79BC5848ABB
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 04:00:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC4F21F24814
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 02:36:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB8281C21220
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 03:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85DE71878;
-	Sun,  4 Feb 2024 02:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="bwlXnTLH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1DB010FF;
+	Sun,  4 Feb 2024 03:00:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF90510EB
-	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 02:35:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56EB88BF9;
+	Sun,  4 Feb 2024 03:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707014152; cv=none; b=p/+e0cZnwYMOTeN0pmUO6nMcUgmNofJq7mKOaZiaJ2ZiF23n9aCgppO9c+kk/KMddfo0+A7KB9ozMQ0jDojjUAH5Qkxno8sLx2IM4dAEyw6nANDLAj8yLG/GSrqe/lrNa8k0dBidhKyTktoWKjojbtlPMUZAEowE8BUAZ6Tm4Qk=
+	t=1707015636; cv=none; b=n2sNlze4/irYNZv4Ne0Sdhii0YsHq8qBI5X9bY5jmbl/YiER4JDOqjy0A6bAfei4t9yOFZ+mmdpr/baQVxgLJrNpfkmyXqv1i44FNqGXGsYbj+fagGTE154cLvyclXjrKu5EjDU8p1dXXQo7TPDal7eKtvQiz0hEjS1EhozYPio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707014152; c=relaxed/simple;
-	bh=eXGrpUkM4UG4cBvAJQ7Qgo/L2pXhU3blLDwhWRms55k=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UlzIz2hDuPTGPPojOi3Lk4aL2+/TM+0puK5hOzow+Q14HWIg4qs3nKMVlBUIAGZ4NnbuFIf410j7GHFvXskgPeoM5MNFKPRlNMH9raSWv0eBjZbCoGHp1e3xgh4yMolhckB0HzLePOOZvmCzTpiJuNI4YHStUqBNwKMjhV3n3VA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=bwlXnTLH; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1707014146;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=b7S8ENIwTw6+9bm+IefdHUPbMFwYSdb9IyEZNWuDgq0=;
-	b=bwlXnTLHBbiARtjYG0PC/ic2kQthw/7x4CWl2f9jvhImeSZFCI9NAI7uk8QkKk+ev6OSyB
-	RXp3HsUXJ9EnTkNIMBGAIg1vtq1zlhebAxQ2550ZDmOjNAoAl6X/AkoSUWc4Dqh3kncgPw
-	mptpAmoAGFUTggvx4xNnw8JnyV0Cp8U=
-From: George Guo <dongtai.guo@linux.dev>
-To: Jakub Kicinski <kuba@kernel.org>,
-	Paul Moore <paul@paul-moore.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: George Guo <guodongtai@kylinos.cn>,
-	netdev@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/1] netlabel: cleanup struct netlbl_lsm_catmap
-Date: Sun,  4 Feb 2024 10:35:31 +0800
-Message-Id: <20240204023531.2225264-1-dongtai.guo@linux.dev>
+	s=arc-20240116; t=1707015636; c=relaxed/simple;
+	bh=dQ2sNktUa7lj6xnK2aY0LAZoG4fH5NYspNTxVsOhZiA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CsF5IIDAJ5gBacGBJEQhrM4N0OrkhbJoevNxABINPI2UAuZjitLVcheDS9pdtkJD//ydLCIhJEIZaqXjMvuEuNgSXvq9Gc//E99ihrb0nAnGbr4rtL5SN6jkU6/e8iBq29FqpTpb5ABqFTyRaEEyxZn6gkRWPKxKFf9FiiL8Ihs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
+X-UUID: 20d56d1a04a54032ba4b0001ffe4f5a8-20240204
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.35,REQID:4b3fb53d-48eb-493c-8dd1-13e2a1d25624,IP:10,
+	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:-5
+X-CID-INFO: VERSION:1.1.35,REQID:4b3fb53d-48eb-493c-8dd1-13e2a1d25624,IP:10,UR
+	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
+	:release,TS:-5
+X-CID-META: VersionHash:5d391d7,CLOUDID:f6029783-8d4f-477b-89d2-1e3bdbef96d1,B
+	ulkID:240201204745Y4HHVX4X,BulkQuantity:18,Recheck:0,SF:64|66|24|17|19|44|
+	102,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:40,QS:nil,BEC:nil,CO
+	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_OBB,
+	TF_CID_SPAM_SNR
+X-UUID: 20d56d1a04a54032ba4b0001ffe4f5a8-20240204
+Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
+	(envelope-from <chentao@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1514006762; Sun, 04 Feb 2024 11:00:19 +0800
+Received: from mail.kylinos.cn (localhost [127.0.0.1])
+	by mail.kylinos.cn (NSMail) with SMTP id 4FEC5E000EBC;
+	Sun,  4 Feb 2024 11:00:19 +0800 (CST)
+X-ns-mid: postfix-65BEFDC3-240812241
+Received: from [172.20.15.254] (unknown [172.20.15.254])
+	by mail.kylinos.cn (NSMail) with ESMTPA id 37BC8E000EBC;
+	Sun,  4 Feb 2024 11:00:14 +0800 (CST)
+Message-ID: <e521e162-a749-4987-a040-024635fe52e4@kylinos.cn>
+Date: Sun, 4 Feb 2024 11:00:14 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] rxrpc: Simplify the allocation of slab caches
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: dhowells@redhat.com, marc.dionne@auristor.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-afs@lists.infradead.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240201100924.210298-1-chentao@kylinos.cn>
+ <1706866812511330.14.seg@mailgw>
+ <961cc4ad-0133-44ee-be22-ba2fbf4ebe12@kylinos.cn>
+ <ZbzD35e4pw5xfzLI@nanopsycho>
+Content-Language: en-US
+From: Kunwu Chan <chentao@kylinos.cn>
+In-Reply-To: <ZbzD35e4pw5xfzLI@nanopsycho>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: George Guo <guodongtai@kylinos.cn>
+On 2024/2/2 18:28, Jiri Pirko wrote:
+> Fri, Feb 02, 2024 at 10:46:33AM CET, chentao@kylinos.cn wrote:
+>> On 2024/2/1 20:47, Jiri Pirko wrote:
+>>> Thu, Feb 01, 2024 at 11:09:24AM CET, chentao@kylinos.cn wrote:
+>>>> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
+>>>> to simplify the creation of SLAB caches.
+>>>>
+>>>> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
+>>>
+>>> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+>>>
+>>> btw, why don't you bulk these changes into patchsets of 15 patches? Or,
+>>> given the low complexicity of the patch, just merge multiple patches
+>>> that are changing similar locations togeter.
+>> Sorry, I haven't sent a patchset, I'm worried about messing up.
+>> I'll try to deal with these similar issues in the way you recommended in the
+>> future, thank you for the reminder.
+> 
+> Also, please fix your email client. It breaks threads.
+Thanks for the reminder. Maybe it's my company email gateway that does 
+something bad with email.
+The last email was quarantined, this one is the same.
+I asked the administrator to release it temporarily, and now it looks 
+like there is still a problem with the gateway of my email.
 
-Simplify the code from macro NETLBL_CATMAP_MAPTYPE to u64, and fix
-warning "Macros with complex values should be enclosed in parentheses"
-on "#define NETLBL_CATMAP_BIT (NETLBL_CATMAP_MAPTYPE)0x01", which is
-modified to "#define NETLBL_CATMAP_BIT ((u64)0x01)".
+I'll try to use a new email.
 
-Signed-off-by: George Guo <guodongtai@kylinos.cn>
----
-V2:
-Yes, I understand what you are saying.
-Actually, there is a compile warnings on "#define NETLBL_CATMAP_BIT (NETLBL_CATMAP_MAPTYPE)0x01"
-which is missing parentheses.
----
- include/net/netlabel.h       | 7 +++----
- net/netlabel/netlabel_kapi.c | 8 ++++----
- 2 files changed, 7 insertions(+), 8 deletions(-)
-
-diff --git a/include/net/netlabel.h b/include/net/netlabel.h
-index d74f21f528de..0d04a8ae3811 100644
---- a/include/net/netlabel.h
-+++ b/include/net/netlabel.h
-@@ -145,15 +145,14 @@ struct netlbl_lsm_cache {
-  * processing.
-  *
-  */
--#define NETLBL_CATMAP_MAPTYPE           u64
- #define NETLBL_CATMAP_MAPCNT            4
--#define NETLBL_CATMAP_MAPSIZE           (sizeof(NETLBL_CATMAP_MAPTYPE) * 8)
-+#define NETLBL_CATMAP_MAPSIZE           (sizeof(u64) * 8)
- #define NETLBL_CATMAP_SIZE              (NETLBL_CATMAP_MAPSIZE * \
- 					 NETLBL_CATMAP_MAPCNT)
--#define NETLBL_CATMAP_BIT               (NETLBL_CATMAP_MAPTYPE)0x01
-+#define NETLBL_CATMAP_BIT               ((u64)0x01)
- struct netlbl_lsm_catmap {
- 	u32 startbit;
--	NETLBL_CATMAP_MAPTYPE bitmap[NETLBL_CATMAP_MAPCNT];
-+	u64 bitmap[NETLBL_CATMAP_MAPCNT];
- 	struct netlbl_lsm_catmap *next;
- };
- 
-diff --git a/net/netlabel/netlabel_kapi.c b/net/netlabel/netlabel_kapi.c
-index 27511c90a26f..7b844581ebee 100644
---- a/net/netlabel/netlabel_kapi.c
-+++ b/net/netlabel/netlabel_kapi.c
-@@ -610,7 +610,7 @@ int netlbl_catmap_walk(struct netlbl_lsm_catmap *catmap, u32 offset)
- 	struct netlbl_lsm_catmap *iter;
- 	u32 idx;
- 	u32 bit;
--	NETLBL_CATMAP_MAPTYPE bitmap;
-+	u64 bitmap;
- 
- 	iter = _netlbl_catmap_getnode(&catmap, offset, _CM_F_WALK, 0);
- 	if (iter == NULL)
-@@ -666,8 +666,8 @@ int netlbl_catmap_walkrng(struct netlbl_lsm_catmap *catmap, u32 offset)
- 	struct netlbl_lsm_catmap *prev = NULL;
- 	u32 idx;
- 	u32 bit;
--	NETLBL_CATMAP_MAPTYPE bitmask;
--	NETLBL_CATMAP_MAPTYPE bitmap;
-+	u64 bitmask;
-+	u64 bitmap;
- 
- 	iter = _netlbl_catmap_getnode(&catmap, offset, _CM_F_WALK, 0);
- 	if (iter == NULL)
-@@ -857,7 +857,7 @@ int netlbl_catmap_setlong(struct netlbl_lsm_catmap **catmap,
- 
- 	offset -= iter->startbit;
- 	idx = offset / NETLBL_CATMAP_MAPSIZE;
--	iter->bitmap[idx] |= (NETLBL_CATMAP_MAPTYPE)bitmap
-+	iter->bitmap[idx] |= (u64)bitmap
- 			     << (offset % NETLBL_CATMAP_MAPSIZE);
- 
- 	return 0;
+> 
+>> -- 
+>> Thanks,
+>>   Kunwu
+>>
 -- 
-2.34.1
+Thanks,
+   Kunwu
 
 
