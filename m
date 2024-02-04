@@ -1,192 +1,115 @@
-Return-Path: <netdev+bounces-68941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ACA3848EA3
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 15:50:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89EB3848EC4
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 16:00:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E44FC2825AB
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 14:50:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14295B21CB1
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 15:00:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90B011DDD7;
-	Sun,  4 Feb 2024 14:50:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E529F225A9;
+	Sun,  4 Feb 2024 15:00:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GXeVWQ0f"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="dUGOJxVv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
+Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 006931EA6F;
-	Sun,  4 Feb 2024 14:50:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2830224E0
+	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 15:00:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707058241; cv=none; b=l3H7epAEM+2IDioKvn4Y19snu+LJnZanAoJEwp1GcLLPLhL1GsOEqfrPa7OKhp5hF+X4teJLL1/nnrKRzAGP2DUCta7NxglDFq7Ly56LykcLMauVbXQAlXCscb8eifiSboDAzKw2lop8KHosAbS+vDAgdcC0swECHcjSNlKPgKs=
+	t=1707058842; cv=none; b=beZ2HZJxtxV8bYuqdSKKkscMY+affHq4K/wHW4OL95j/zBmu5yyUrMii6PjkqQnJdYvgsd3fdZ8sTv0Std9ZsApiAHXbQ0SckwaKT0R8peZkHFOJBglO382MLoastC/dPhdAdgoTZT4k4rDXdpXNkMQk179WRHdaxk4m6syLSgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707058241; c=relaxed/simple;
-	bh=ggkn1nSdlfUbbzcKp+oXfOr8UTM7M88HiCnkeHGMl50=;
+	s=arc-20240116; t=1707058842; c=relaxed/simple;
+	bh=xdSeQvV05nn5L8vGt2d4VTs22D9fCwHOm1ANUT2yxn0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nwX1wVgbSoOOgLXpjoZ6eL4OPROvjhn93q/q+zWoN/QBjo+KgkC8z/ZKGv3nbyQDJ3islXE/x48vWa4QN/o4NDTKg9exKqCQkH0E+rZTE7isJcco6pmdeSNgLrhnDnOOaXWimxzvgrcF/y6OleXngPIETttp3ZCT5LZ4IpdNL5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GXeVWQ0f; arc=none smtp.client-ip=209.85.167.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3bd72353d9fso2827747b6e.3;
-        Sun, 04 Feb 2024 06:50:39 -0800 (PST)
+	 To:Cc:Content-Type; b=BjoGlxB8SFGxvVnIZsnDGRUXKXoR8DDbRGOyvdEESmG7U2kZm3YINtiq/ipR/GydX7SKk0LiSelvXeL4lf20hBojMeW2HGhL/Ga0JJRpHm8Wq/sL7ttAcB5KMgF4mAt5ddwoHyFRYQDvwI4m98OS6Xo/XA53RmqTvcy+v5mLgMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=dUGOJxVv; arc=none smtp.client-ip=209.85.128.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-603c5d7997aso32146907b3.1
+        for <netdev@vger.kernel.org>; Sun, 04 Feb 2024 07:00:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707058239; x=1707663039; darn=vger.kernel.org;
+        d=paul-moore.com; s=google; t=1707058839; x=1707663639; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=leJJ6Axw7wD2gO6odqX9o323K4rTJGwX8umGVdANTFE=;
-        b=GXeVWQ0fYAGKyJCozHUcbjTGYQ/GsQXI7hwol4St7+kDDMpZ5h84Zo2JTl6WLzowO5
-         YP9gJ2nRefsXp0vVLhaN3bYT5VbFfNyr6jwFkIBqhdImySuijZW5K8oGH3MQf+YRABps
-         je/mhzfR3d8aQ+Mrkh5Y9xmXcc+olBn1bIJJlxB210gfIZwplx7tg1XgOtzPryh7cNw4
-         8cDSBuP4xuUJlQWCQ3Y3bmMgs/CAtLNrGZ5gujVOou7ms2MqieOIBms7YXS01jaFOBUT
-         1LvZ24hDWHl8MqeyzDj5SrFg/YAZgJ1lrEfa/ZjlzpFEcuafb/TA9bs7iwF1eTyGh5a9
-         /RDw==
+        bh=d3lqw9guILXTXW+HHup3WqoC7VU2sfl3wXM0hqsaEkk=;
+        b=dUGOJxVvIFyaOE/esF1lx2c/aJ8UIlpFFzw9Bugjv00/V4xjDrVUKwCxRoEKGliqvy
+         qpAKBABK/CzRE9rMS2V62znJ9uL8vD5BpUOL11NkesMvPY5+PJDCiVSw1ui0Y0Ivr2N1
+         EiMTZzUMUiREpK7xPsbXBuseqsRNybWg9Ch9XbKZjdlNQAvIxV4qITYgjrHBwn49B9rw
+         F7GoWMm+Vb3IQrzVrhcRwxgim35KIPEsS4WybNbSaNitkU/Qd01OV1Q9V1fy0iWx7kJo
+         JIhDGqOuoz3urEvcR7m68E8b0wfCOE8DkIA6tD4fzelxHvF9QSy8tIvM+ZKy34RPHZJQ
+         T6wA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707058239; x=1707663039;
+        d=1e100.net; s=20230601; t=1707058839; x=1707663639;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=leJJ6Axw7wD2gO6odqX9o323K4rTJGwX8umGVdANTFE=;
-        b=Gt2U0vFnGMKDeMqOVuaDWVLYulhsd8+ixrc91NDZejSQBIrYQlZiyrLusZfmhQWyHI
-         5UK4P7eIzmQBTao+ZfuXpfReqW69ASImgf344+POtRRaHi5T09P3ad8czSI/ae299IUg
-         8kSMXaC+Y2eZuw5tPXrE8x3+pq3r6/14oTfwq+mUZYfBKWpe6fsEeinDwPMkMZ9qKGPh
-         URWFXnvVkcHipqHYZ3uIUqwPM8r5cNvMXhKGW1qExvYahfBGlsduDitI2gBlCBUtiJ6x
-         BeG8VFysx9xbYoChhkPRPu6X3JcxceV4OJGpfLqiFh97UIu8nAm+QmUJKvW2pFzWJ36b
-         WHog==
-X-Gm-Message-State: AOJu0Yyv2lV6mwKWOhG01POfx/esAWt8NfPCmaI+JjHvuBGWD1YpJfFJ
-	dBnIAdMWfWerJzTf3mNyEtXQpkVcQbQz599dYKuIpOaG5YxeacSkBdhpqJp/Drq4CrJ4nVYKeWC
-	1SRqrOPCxP6d6xYuqwlBHOHrsf06nMaiEjefDL2tS7mw=
-X-Google-Smtp-Source: AGHT+IE4Q1jPytHW6rlTMBKbt6JqW0fm6nco7IQ8coY5gOCkCd5h72bte7ol91zUoHZZpHg/I+4Rir2Xy1HgDyAmxwM=
-X-Received: by 2002:a05:6808:2e99:b0:3bf:bb23:c94d with SMTP id
- gt25-20020a0568082e9900b003bfbb23c94dmr11452766oib.55.1707058238957; Sun, 04
- Feb 2024 06:50:38 -0800 (PST)
+        bh=d3lqw9guILXTXW+HHup3WqoC7VU2sfl3wXM0hqsaEkk=;
+        b=wwqCFQpPxMfQFwI07S/Nm6aqvawZS6GSboU6QJ+41rsxHjlCh8CJB7qeGRG0CHjbmR
+         B5OJOfar2wScUl627Ma7T/sI+Jsy+p0pFnGhnnhT02lo/gZCiBdW0sD27hnUBRecVQyo
+         X+21XwysOLRdcLBVqSetyTAGmsG+OmBn5NsUD9Hy9HqJXSyq1ER1UPjT2BvzBg51bPIz
+         bYGh7FbIG+YDfDhsBP5XU+WhSsMxJVGY/95T6K67W7xMkAJhXDUD6TG1xclTeOmEWbfF
+         UYKwSumMNSjFPLSqNu7O5fzlZbO8fnVitPdu6YEwvI/wFCASSKAk9loQHtinkrRy0dK8
+         LWBQ==
+X-Gm-Message-State: AOJu0YxTNgDVUi21t0+WnxoQR2sI1/oOZ4LLOTqWfVlfZfWDLO+pOTBP
+	ur5wcXh36kRYMmo+VceEYvhvU/lcJuNy+Xd5rWcwHIRJ7MAtHms1MbzS2VBzsrHAT0WFRl+rww4
+	tqh/LRExopMfwbJhDZhjSby1OwejFLSt1rCMEMZ0nD9j6bFM=
+X-Google-Smtp-Source: AGHT+IHg+0gPpQzlZZ3TALwjYC82frTLQELFYbkrSVOd3QmDViI01eEHMCvlkaUcUAORp4NaJVjUuqgO9iSCHdLFGqw=
+X-Received: by 2002:a25:e08c:0:b0:dc2:46ca:e968 with SMTP id
+ x134-20020a25e08c000000b00dc246cae968mr6398171ybg.4.1707058838640; Sun, 04
+ Feb 2024 07:00:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240117114350.3105-1-maimon.sagi@gmail.com> <8a6c5297-6e86-4f0d-a85e-1a93b2215d68@linux.dev>
- <CAMuE1bFEbrY2PiDB6OdZGzDNijPAhoGBircTpqiyVs0Qq6bOig@mail.gmail.com> <6b88bdc3-37da-423f-a665-308ac519a256@linux.dev>
-In-Reply-To: <6b88bdc3-37da-423f-a665-308ac519a256@linux.dev>
-From: Sagi Maimon <maimon.sagi@gmail.com>
-Date: Sun, 4 Feb 2024 16:50:03 +0200
-Message-ID: <CAMuE1bFc6aduG8+26t157ZcaeUt1UeVk1RP47+Hu32G68AmwZg@mail.gmail.com>
-Subject: Re: [PATCH v5] ptp: ocp: add Adva timecard support
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: richardcochran@gmail.com, jonathan.lemon@gmail.com, vadfed@fb.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org
+References: <20240204023531.2225264-1-dongtai.guo@linux.dev>
+In-Reply-To: <20240204023531.2225264-1-dongtai.guo@linux.dev>
+From: Paul Moore <paul@paul-moore.com>
+Date: Sun, 4 Feb 2024 10:00:27 -0500
+Message-ID: <CAHC9VhQUkUvpj+c0r3vZvfn7djQ5kuBej9RE2L7TZwfxg-L7UQ@mail.gmail.com>
+Subject: Re: [PATCH v2 1/1] netlabel: cleanup struct netlbl_lsm_catmap
+To: George Guo <dongtai.guo@linux.dev>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	George Guo <guodongtai@kylinos.cn>, netdev@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Thanks'
-patch v6 is on the way
+On Sat, Feb 3, 2024 at 9:35=E2=80=AFPM George Guo <dongtai.guo@linux.dev> w=
+rote:
+>
+> From: George Guo <guodongtai@kylinos.cn>
+>
+> Simplify the code from macro NETLBL_CATMAP_MAPTYPE to u64, and fix
+> warning "Macros with complex values should be enclosed in parentheses"
+> on "#define NETLBL_CATMAP_BIT (NETLBL_CATMAP_MAPTYPE)0x01", which is
+> modified to "#define NETLBL_CATMAP_BIT ((u64)0x01)".
+>
+> Signed-off-by: George Guo <guodongtai@kylinos.cn>
+> ---
+> V2:
+> Yes, I understand what you are saying.
+> Actually, there is a compile warnings on "#define NETLBL_CATMAP_BIT (NETL=
+BL_CATMAP_MAPTYPE)0x01"
+> which is missing parentheses.
+> ---
+>  include/net/netlabel.h       | 7 +++----
+>  net/netlabel/netlabel_kapi.c | 8 ++++----
+>  2 files changed, 7 insertions(+), 8 deletions(-)
 
-On Sun, Feb 4, 2024 at 4:39=E2=80=AFPM Vadim Fedorenko
-<vadim.fedorenko@linux.dev> wrote:
->
-> On 04/02/2024 11:31, Sagi Maimon wrote:
-> > Hi Vadim,
-> > Sorry but I was on vacation for the last two weeks.
-> > So What should I do now:
-> > 1) Do you want me to set my changes into the main linux git tree:
-> >      git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-> >      and use  use '[PATCH v6] ...' prefix
-> > 2) Or
-> >      set my changes into the net-next git tree:
-> >      git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
-> >      and use  use '[PATCH net-next v6] ...' prefix
->
-> Hi Sagi!
->
-> Option 2 is the way to go.
->
-> Thanks,
-> Vadim
->
-> >
-> > BR,
-> > Sagi
-> >
-> > On Wed, Jan 17, 2024 at 11:23=E2=80=AFPM Vadim Fedorenko
-> > <vadim.fedorenko@linux.dev> wrote:
-> >>
-> >> On 17/01/2024 11:43, Sagi Maimon wrote:
-> >>> Adding support for the Adva timecard.
-> >>> The card uses different drivers to provide access to the
-> >>> firmware SPI flash (Altera based).
-> >>> Other parts of the code are the same and could be reused.
-> >>>
-> >>
-> >> Hi Sagi,
-> >>
-> >> Thanks for adjusting the code. One signle still have to be
-> >> adjusted, see comments below. And this is treated as net-next
-> >> material, but net-next is closed now until merge window ends,
-> >> you will have to submit new version next week.
-> >>
-> >> Please, also use '[PATCH net-next v6] ...' prefix for it.
-> >>
-> >>> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
-> >>> ---
-> >>>    Changes since version 4:
-> >>>    - alignment fix.
-> >>>
-> >>
-> >> Please, preserve changes from all previous versions for next submissio=
-ns.
-> >>
-> >>>    drivers/ptp/ptp_ocp.c | 302 ++++++++++++++++++++++++++++++++++++++=
-++--
-> >>>    1 file changed, 293 insertions(+), 9 deletions(-)
-> >>>
-> >>
-> >> [ ..skip.. ]
-> >>
-> >>> @@ -2603,7 +2819,44 @@ ptp_ocp_art_board_init(struct ptp_ocp *bp, str=
-uct ocp_resource *r)
-> >>>        if (err)
-> >>>                return err;
-> >>>
-> >>> -     return ptp_ocp_init_clock(bp);
-> >>> +     return ptp_ocp_init_clock(bp, r->extra);
-> >>> +}
-> >>> +
-> >>> +/* ADVA specific board initializers; last "resource" registered. */
-> >>> +static int
-> >>> +ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
-> >>> +{
-> >>> +     int err;
-> >>> +     u32 version;
-> >>> +
-> >>> +     bp->flash_start =3D 0xA00000;
-> >>> +     bp->eeprom_map =3D fb_eeprom_map;
-> >>> +     bp->sma_op =3D &ocp_adva_sma_op;
-> >>> +
-> >>> +     version =3D ioread32(&bp->image->version);
-> >>> +     /* if lower 16 bits are empty, this is the fw loader. */
-> >>> +     if ((version & 0xffff) =3D=3D 0) {
-> >>> +             version =3D version >> 16;
-> >>> +             bp->fw_loader =3D true;
-> >>> +     }
-> >>> +     bp->fw_tag =3D 1;
-> >>
-> >> Please, use fw_tag =3D 3 here, other tags are for other vendors.
-> >>
-> >> Thanks,
-> >> Vadim
-> >>
-> >>> +     bp->fw_version =3D version & 0xffff;
-> >>> +     bp->fw_cap =3D OCP_CAP_BASIC | OCP_CAP_SIGNAL | OCP_CAP_FREQ;
-> >>> +
-> >>> +     ptp_ocp_tod_init(bp);
-> >>> +     ptp_ocp_nmea_out_init(bp);
-> >>> +     ptp_ocp_signal_init(bp);
-> >>> +
-> >>
->
+This is a much better approach, thank you.
+
+Acked-by: Paul Moore <paul@paul-moore.com>
+
+--=20
+paul-moore.com
 
