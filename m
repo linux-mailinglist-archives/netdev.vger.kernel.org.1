@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-68928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2750D848E23
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97F0D848E24
 	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 14:40:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 948AC1F22504
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65D831C20ACF
 	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 13:40:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E78D6224FA;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDDE3225A8;
 	Sun,  4 Feb 2024 13:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BuPESfVi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oihRNg4B"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C15B9224E4
-	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 13:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C155C224E0;
+	Sun,  4 Feb 2024 13:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707054026; cv=none; b=ajfSQ6gW26OmYGRoNAiBEkt4aixN6fnTS/VmWYqnCg4ZX4aaSqoC2xJvlKf77kPi9dJ55AzS5RJtBPG8mJisXG5+swk7AlslsnnHnYXIoOwz+GUXJb2wptPUgPxV299GQF4dSXCJwOTO9BE6CO5aBD2XGZJCDEOyFmVqfPjrrEA=
+	t=1707054026; cv=none; b=KJ+lXN3F+TNRO3oAXfuOS6ciIaASzXxOdHY2VHTFYPSuin+Ev3StiN8ajzKOdS3sv9DXMTKY/Jl1id3FMAaAXocVoOY6h6apNYgR84tG5soLkAJquIoRG2e1jdINSx0/Xomu+zaRW261Vmy329xXyxjdbW+xcYxWgiAZDPota+0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707054026; c=relaxed/simple;
-	bh=MadHqkVyeM/YJgRXrnBai2otsbDMDP189B7WCqWKGhk=;
+	bh=BMAQS7+vqkNKpPINrsTI6Gle5RLZn3L2OWtrc8K77iA=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=m4drbE/ZyuXke/ZFMyKwUQdBykNbwmNdPDF7t2XJlA4Dw4gbMsnEzGmea6CNJwo8KNfGKpGxwaq/KzkXEOtFNM+OKAcbRBQ+nEOXE8e/+TsbxycRgbskNRkZ3t7Gpw4bhNi/OYAixyvY+HgEm1POJNnLlc6n701oW20xly+SFEo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BuPESfVi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5F12AC433B2;
+	 In-Reply-To:To:Cc; b=ZjepmGqYkk+VO3w39kLk/SV3uSEKXu7VUq3yHRwtV9fMekqdhzDZjS7Vako6gJfxzd029oBWE0mjh68qlsZLxeX4ICwnHnNGCXC+iGkm+RPi1WfMv9m3IJ4I1OSbhmtW97S/uSQL0IztF8n5atvK2oYEwxxv3NkCL7BOfBZMLb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oihRNg4B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4DD9FC43390;
 	Sun,  4 Feb 2024 13:40:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707054026;
-	bh=MadHqkVyeM/YJgRXrnBai2otsbDMDP189B7WCqWKGhk=;
+	bh=BMAQS7+vqkNKpPINrsTI6Gle5RLZn3L2OWtrc8K77iA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BuPESfVigWFtoqK/jLRil3sb9MfEigMpRhz2x4vS14+K0DZXmvmxAHq723/sWz6yQ
-	 PXO3Z46qBlYCacCECjfAmST/OTCQEIy9qXo4ycy/nMpvJN3g8SX6K3n1l6D2BN+2fG
-	 uhl/f0HxP6zvA9Ev1+sW3hc+/flBkmNpAfhoGIiqgJupUxL8+FFhB+9BuXU3hg4s7n
-	 vxghcFTb2xVWWcB6IlfQspOyv7YrxCU/du+H68DBc0F1WO0Xs3VNtR1Mq2hbjy3EvT
-	 MVVQxw5MiqlPxcyqkug82OnUQgIf4EUaShkDe1ScgC4dWZNBz74UQmZNGxvzYco5zC
-	 RxtxvwXgsk5gw==
+	b=oihRNg4BCPc6Fsr3tUvkYmcpW/QFQYMe8r2EzNqKaezOinghFfKrRLIKL+Ad464Pu
+	 N7yHRlIF/hSgKLXobNpxb3SBylVC7/+Xz079luScNrDW5msDIA/gUyrLib4MDdsosL
+	 WINXNHZ7gwEFFvn2dZTAetzm2Qh4JOGsu/l9tJfi93nMygFxrTRAaXR3RAydozbkzW
+	 YTL4unwV+ofC496EjyDACGGZfhfhcx7SSYNgD9Imbl7mehYaagEAw9C6/Xfs4EPyTw
+	 T0DJvbqN0o48MEGszgRDByuRKh0zDVrgSvEdYOJyOSjf3gxba6e08V0dtlkd66vdHI
+	 DmKE4fJEd/Arg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4264EE2F2F3;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3941BE2F2EC;
 	Sun,  4 Feb 2024 13:40:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,35 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] r8169: add support for RTL8126A
+Subject: Re: [PATCH net-next] net: micrel: Fix the frequency adjustments
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170705402626.16095.1642488959165467062.git-patchwork-notify@kernel.org>
+ <170705402623.16095.16131459625270724303.git-patchwork-notify@kernel.org>
 Date: Sun, 04 Feb 2024 13:40:26 +0000
-References: <c2eaaf79-600a-4162-b439-8dbd7e7033fd@gmail.com>
-In-Reply-To: <c2eaaf79-600a-4162-b439-8dbd7e7033fd@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: nic_swsd@realtek.com, pabeni@redhat.com, edumazet@google.com,
- davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org
+References: <20240201204203.2691424-1-horatiu.vultur@microchip.com>
+In-Reply-To: <20240201204203.2691424-1-horatiu.vultur@microchip.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ UNGLinuxDriver@microchip.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 1 Feb 2024 22:38:01 +0100 you wrote:
-> This adds support for the RTL8126A found on Asus z790 Maximus Formula.
-> It was successfully tested w/o the firmware at 1000Mbps. Firmware file
-> has been provided by Realtek and submitted to linux-firmware.
-> 2.5G and 5G modes are untested.
+On Thu, 1 Feb 2024 21:42:03 +0100 you wrote:
+> By default lan8841's 1588 clock frequency is 125MHz. But when adjusting
+> the frequency, it is using the 1PPM format of the lan8814. Which is the
+> wrong format as lan8814 has a 1588 clock frequency of 250MHz. So then
+> for each 1PPM adjustment would adjust less than expected.
+> Therefore fix this by using the correct 1PPM format for lan8841.
 > 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] r8169: add support for RTL8126A
-    https://git.kernel.org/netdev/net-next/c/3907f1ffc0ec
+  - [net-next] net: micrel: Fix the frequency adjustments
+    https://git.kernel.org/netdev/net-next/c/7d7bf30f031b
 
 You are awesome, thank you!
 -- 
