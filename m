@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-68987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7951849172
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 00:14:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 600D6849174
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 00:15:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03F511C213CC
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 23:14:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 926C61C21BE1
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 23:15:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0857F3D72;
-	Sun,  4 Feb 2024 23:14:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30753BE68;
+	Sun,  4 Feb 2024 23:14:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="06QIF1u5"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hgVtu/DL"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE82D10A1E
-	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 23:14:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14C69BA2D
+	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 23:14:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707088491; cv=none; b=nnWkVFGsxjtaECnjZPCkLsMl1maXd73tAK8BZ85meW0rIfThZy7RYGo7VXk8y4peLsBxrmfeVBkvhAFiuHYVHU8E2/m/Fj/N7rUUxPJWX6ga3VcKiAQU0ftYMppG1qSgWEcGsJAnoiUev7xpivCalgpszJInnL4OhbLBvYM15pA=
+	t=1707088495; cv=none; b=ULP29NCJIoeiB/6i6TJlaQCKVZ1FtIfsYPpK9eCV1wgNui9zQeEWebTzgM7EFJiEhHFnHBDJCFKQczRXSRh7NTqYrZVurqfsPeRDurPlgam6UwjE149Wh/8UzhTRty2khSX4ziDxr8+ExCRPqGLcsN+4sWOzIiU9jMHV0RF7li4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707088491; c=relaxed/simple;
-	bh=hr3VDNqsiPzwrV4cIrfixH5ewYIEGscJvRxb7+ro83k=;
+	s=arc-20240116; t=1707088495; c=relaxed/simple;
+	bh=lSApe1f45434Y16fWlHxkIrPd3CF3MSK1dKbSaqtf7g=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ayyanR/oR98k5ymWNk7mrzWh34pKqUZI3qLCtI9o3c4up2jlLRlVDdppnAQPlrLcCj56hzbc8pzIMbp9pRWD6ZEgh4AMhxiSoQDru+aWWBuERiwCb5aRbE465BhARf4D7M3I8h9qQ9Q1h5a5GOTkGSUwD1CbJNwgWJ6F4ezr0Vg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=06QIF1u5; arc=none smtp.client-ip=156.67.10.101
+	 In-Reply-To:To:Cc; b=qWjgmRtFglJqF9/24HhHj1cmaXy856A+n7ImROPeqbHWlDYPzuIqCyTD3VGMHcTd68d/9KYKmalfpgc4unSGvYEh+Vzv3iZOuhTL5Gk5nV/ZAjr6xG4kFZCB8BewJQJQiQVw9JvH5/3g7HjemOejkWL+AbwyB7as23VjBOu0Psw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hgVtu/DL; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,19 +36,19 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:From:
 	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
 	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=dECwZK/EjJpLBQV8aj5CWOMpjNG1SYKjnGkls8vvdHc=; b=06
-	QIF1u5rbWAf1c9QHtCNU2YuKIaaBFUGxQ35pkzNnMM9/LtcQPHE84SuTiPyi0BMv/uUcq584ILOSM
-	dFSpg0iMc6+AS4eEn2jJ0hvFKhFCIqaZkkTIgvXAKQ7k1E+gGnaLS+HTXfB2DI4/IUzjpKTr7/0sZ
-	f0O89VtlRDhfWrM=;
+	In-Reply-To:References; bh=YxDRx6iIkJdAnrZ/1KbNGt9k3sbK2qsQMF3OilEVOC8=; b=hg
+	Vtu/DLHdjc6QciC/M24SQMRGb8uk3cFZ66sMYZwX09SksJg+ygKwSYE7MEW+uv26x0M7UCy48cZXl
+	LG0Lx0pUtyfqsIPF3//hZhjOmLKNZjrMmHm/l8n2FsbcbfibK/jPmctP/R0LP1LMEQlgz8nms6Z/F
+	p9synemS1oJTRkE=;
 Received: from c-76-156-36-110.hsd1.mn.comcast.net ([76.156.36.110] helo=thinkpad.home.lunn.ch)
 	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rWlhB-006z0G-LB; Mon, 05 Feb 2024 00:14:41 +0100
+	id 1rWlhE-006z0G-Gv; Mon, 05 Feb 2024 00:14:44 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-Date: Sun, 04 Feb 2024 17:14:14 -0600
-Subject: [PATCH net-next v2 1/2] net: phy: c45 scanning: Don't consider
- -ENODEV fatal
+Date: Sun, 04 Feb 2024 17:14:15 -0600
+Subject: [PATCH net-next v2 2/2] net: dsa: mv88e6xxx: Return -ENODEV when
+ C45 not supported
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240204-unify-c22-c45-scan-error-handling-v2-1-0273623f9c57@lunn.ch>
+Message-Id: <20240204-unify-c22-c45-scan-error-handling-v2-2-0273623f9c57@lunn.ch>
 References: <20240204-unify-c22-c45-scan-error-handling-v2-0-0273623f9c57@lunn.ch>
 In-Reply-To: <20240204-unify-c22-c45-scan-error-handling-v2-0-0273623f9c57@lunn.ch>
 To: Heiner Kallweit <hkallweit1@gmail.com>, 
@@ -67,70 +67,50 @@ To: Heiner Kallweit <hkallweit1@gmail.com>,
  Florian Fainelli <f.fainelli@gmail.com>, 
  Vladimir Oltean <olteanv@gmail.com>
 Cc: netdev@vger.kernel.org, Tim Menninger <tmenninger@purestorage.com>, 
- Andrew Lunn <andrew@lunn.ch>, 
- Florian Fainelli <florian.fainelli@broadcom.com>
+ Andrew Lunn <andrew@lunn.ch>
 X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1661; i=andrew@lunn.ch;
- h=from:subject:message-id; bh=hr3VDNqsiPzwrV4cIrfixH5ewYIEGscJvRxb7+ro83k=;
- b=owEBbQKS/ZANAwAKAea/DcumaUyEAcsmYgBlwBpaW5X3aNGNkAdO9xguKgjV0u6kI5xJu0FcU
- uYJgzREFLGJAjMEAAEKAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCZcAaWgAKCRDmvw3LpmlM
- hHktEADeoaPxw06cBTMAB1AwoMSJL/dgjdu4Ifa36p1vWd0Ys04UNV/oudx7zNYjE5Tjyfebjah
- Q/vDR8JajuB3B+Fy9eoLxMUWshBksWnj/RmfS85hZOj6k0pjqjLusucEnLMI+HEUeEpoq9+asuv
- lsYrLIbW3R8TI4VscoEy5j4yKf6IYx/DgX2hngXpsqYkJDI41ZWqQf9PFTfRvZGrOg4T+tpydyA
- J1nkPafQ95tjvPwIg65WWKMCXdwyzFDoYTb3yM/ENE0P9H2RLjmLx0cMAJ0+UEGGszgJNyALHk3
- 5FXRADGmwxM7jy7lOGzZkWmQH8l5Lf3uMYyPwkFZwN2gFz17UjfNVf2Q0s5yBEOv8dlGKIQ6tNE
- CPERh+akdFp72oiKjKO41f0KwAbt2RFhaEfAv7ir7MNno2/k6caextfrYn2MC7EaYMKCJqIQu49
- E2xcBqqlu2M5GeKK0zAtKfvmLKZzech0W/VTGqfsqLcbFXxNl2ugrWcTDAlFwxwMHTcG+Hyk2Ei
- IZtkcN1a/ySI7OJDzwtC/oQ4fqKK8S3GmGlqKegME9nKZRJZlLqNbgFyfa6LRu1BKFjIqcX/1HN
- omGO+9qEYTMrEot4x4WOlWmnKuPL7819Z665y/aeSoycMXDZGn2kujWM+Y+ADNFUCMiZ44i12pC
- m6DByC4Q67Lb+jg==
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1039; i=andrew@lunn.ch;
+ h=from:subject:message-id; bh=lSApe1f45434Y16fWlHxkIrPd3CF3MSK1dKbSaqtf7g=;
+ b=owEBbQKS/ZANAwAKAea/DcumaUyEAcsmYgBlwBpbetX6ZQaZKH/ZLIN45Jgh6/vRX2U9Ss54q
+ mISQSzxT7yJAjMEAAEKAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCZcAaWwAKCRDmvw3LpmlM
+ hGFlD/9zy8/JUQLJ7Q2jU4SDpd2rmXkZtL2WiKAhC/tCt9WljxpZxKqFdD5cJAKIANazKukAXfF
+ PySnNoVSBtPNzaaqNDE7mDs1XWSvc1CTRvqokQfVMo5/W1coVCdfsO6EhDnc9grJGxExkc7btmf
+ PmC9eQAZzYhYDzg1vAbe6IriiBA/gnbPkRPY0QXf3T4Mc4409T8aSbeX3wscmyrox45BXPDRRLx
+ ATEyqKU0ZCx9ID/eKv3pYH+43Y1bA1kA09B76uTRYRtp2b24WBchhQ+rHvxKSisPaaghC//APta
+ l1DZsJKkbh0vSMmOEJLo+OqCctuwnL2SJav5M4zH6/zpk3VbimJzbuUuhY0mX11Dm+t1+iJiigy
+ jt8lk9TwPPYj2uDf8dq15AXcDMF/rFlp8ekooJfBnS7LWdo/+DQeseFiVzF8av/Gd011/iKXBPf
+ TnqNCc1cmT1uiXCqoVRPcsfVsrza1wDNVZU+rQbOrym7LeEoT5LGmIoC+2wYs0WAqYBEoYi0K/B
+ xEBH2SRuLjGFLIW2lh2JAcPBUvzO/hR7nbCaEPas4EfQyoZ2HGArHUV2BG4zttiUZh03MOYbzK4
+ AwQKMau/EE1lrVvQv8/nYsr6usAg4tsGCgH0zXiM/k2LQrnTGFjdaC6R3vEHrKu3fe8dAWs2YzR
+ IHFpFHC7Sdj6tNQ==
 X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
  fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
 
-When scanning the MDIO bus for C22 devices, the driver returning
--ENODEV is not considered fatal, it just indicates the MDIO bus master
-knows there is no device at that address, maybe because of hardware
-limitation.
+MDIO bus drivers can return -ENODEV when they know the bus does not
+have a device at the given address, e.g. because of hardware
+limitation. One such limitation is that the bus does not support C45
+at all. This is more efficient than returning 0xffff, since it
+immediately stops the probing on the given address, where as further
+reads can be made when 0xffff is returned.
 
-Make the C45 scan code act on -ENODEV the same way, to make C22 and
-C45 more uniform.
-
-It is expected all reads for a given address will return -ENODEV, so
-within get_phy_c45_ids() only the first place a read occurs has been
-changed.
-
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 Signed-off-by: Andrew Lunn <andrew@lunn.ch>
 ---
- drivers/net/phy/phy_device.c | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ drivers/net/dsa/mv88e6xxx/chip.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 52828d1c64f7..962ab53c23ff 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -780,7 +780,7 @@ static int get_phy_c45_devs_in_pkg(struct mii_bus *bus, int addr, int dev_addr,
-  * and identifiers in @c45_ids.
-  *
-  * Returns zero on success, %-EIO on bus access error, or %-ENODEV if
-- * the "devices in package" is invalid.
-+ * the "devices in package" is invalid or no device responds.
-  */
- static int get_phy_c45_ids(struct mii_bus *bus, int addr,
- 			   struct phy_c45_device_ids *c45_ids)
-@@ -803,7 +803,11 @@ static int get_phy_c45_ids(struct mii_bus *bus, int addr,
- 			 */
- 			ret = phy_c45_probe_present(bus, addr, i);
- 			if (ret < 0)
--				return -EIO;
-+				/* returning -ENODEV doesn't stop bus
-+				 * scanning
-+				 */
-+				return (phy_reg == -EIO ||
-+					phy_reg == -ENODEV) ? -ENODEV : -EIO;
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index 6eec2e4aa031..9caecb4dfbfa 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -3659,7 +3659,7 @@ static int mv88e6xxx_mdio_read_c45(struct mii_bus *bus, int phy, int devad,
+ 	int err;
  
- 			if (!ret)
- 				continue;
+ 	if (!chip->info->ops->phy_read_c45)
+-		return 0xffff;
++		return -ENODEV;
+ 
+ 	mv88e6xxx_reg_lock(chip);
+ 	err = chip->info->ops->phy_read_c45(chip, bus, phy, devad, reg, &val);
 
 -- 
 2.43.0
