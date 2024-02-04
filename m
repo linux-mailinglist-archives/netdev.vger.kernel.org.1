@@ -1,126 +1,97 @@
-Return-Path: <netdev+bounces-68938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83DE3848E60
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 15:24:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F770848E7B
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 15:35:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E024B21A1B
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 14:24:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 639431C20CFB
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 14:35:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02E772231F;
-	Sun,  4 Feb 2024 14:24:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB45714295;
+	Sun,  4 Feb 2024 14:35:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YHw07PGx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z9E7sDIx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1BCD225A8
-	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 14:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BCA01DDD7;
+	Sun,  4 Feb 2024 14:35:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707056692; cv=none; b=FXB1+CxHWbpxiIqPGycAVLxloyT+U5Mm9kpSnDq3QjsLlpFqVaIjKCjQgOQajdLeem6355LDMi5L8Hhpefjzbq424go4KRFNJVH91kZ5zzX4P7a6Rq9Yj7YF5FkvIu9ZHYkzXgEZ81IBNRBa+L8hZAeB4UTQAXa0oX+Icgqu2jc=
+	t=1707057318; cv=none; b=K0sxowF8Nozm8mKpVOcbnrQAXAMUcXmcxeFhDusbZYVFTlQsgKqQ/YpN57T1WfJPA631Z7kQT1skkV4kxH0bTCie+dwqqKbQpxJw67/LJ89CgfNOhbYIzkPoh6hjU3hM1B5rGZ33l0r0zr7npo2Z2vZelECC/EnVK99W/e40+Yg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707056692; c=relaxed/simple;
-	bh=gCpB15Us/8TkBdNCL3SxQycgvy+3AfZ+DDRECsuq3fQ=;
+	s=arc-20240116; t=1707057318; c=relaxed/simple;
+	bh=awoxN+LCbkkokatZAAIy7lRCtvPNshr7ALjiqC/b9Dw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=amsPh3om6eDhvyT9hMig7QI902q63d9CIao8/w/QvhMqHOsVU/qQzWwI+xRPPx608b6z9Gws7STdbW1MKJ9EfZyqezLPc6ehoLom9eQcqRsZD156Bw6TouNMA/07eN5MpWui4dy22rMNSomax8k6pEgYRsxo6/cM5YB5sQBo8ok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YHw07PGx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F08B4C433C7;
-	Sun,  4 Feb 2024 14:24:49 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=oENV0FQESY2GITwQxZL9KEpiobiKaBV8F2peXf4ol8VFn9f+NPpy9FJAco6aLz7jrE5cGE3SmG70hS09I6LMwz2GMtY2yuphs2XzsV6uvLvJXGdLMKnQr9Mac9h22kV/pykBehzGte3VeXZq+2Qq07AQuaqP6isa2f85/9W9Rbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z9E7sDIx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5691C433C7;
+	Sun,  4 Feb 2024 14:35:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707056692;
-	bh=gCpB15Us/8TkBdNCL3SxQycgvy+3AfZ+DDRECsuq3fQ=;
+	s=k20201202; t=1707057317;
+	bh=awoxN+LCbkkokatZAAIy7lRCtvPNshr7ALjiqC/b9Dw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=YHw07PGx0b6rzcco83NcG0g8yYCBBrZAfVGo5INfoD4SpbiRfaIn8IkLatXaZguvv
-	 1UAq57s1uh8XaWlQH6fBEJlNuNeGdCZ6hCBBYfdbl8o0DvRJwxs3KKYsiFbLgAfsJB
-	 9id/0jmd9HEEkuestPF8wL1NSkAZ94KA2B994XYvFhXgjQ24ywnr/037RnEPAhuGaj
-	 hnmIXhQm73d1Y+CFHfDs28XeaQcgMkwDAMOLCjTaTKrQ8kDuewM5KXLLLzAjX/5zJP
-	 5HEIxUhIYqUsGuM06xIkyKLPu7e7HHz24ze0KKLqhEDJRxXORaRPJOInbGqlGjw0wT
-	 9xj50wTfx9pMg==
-Date: Sun, 4 Feb 2024 14:24:48 +0000
+	b=Z9E7sDIxdImlRl1LZst/Ws48XUjtoa2LWbX4doA5jXzdGfV5wBpXgTsFO665ZvNyL
+	 u8ROGapSQNwXDD05CDRNAr7HoV9OQ2VSjXtUzTy5kRQ2/6quoZqZvrBII5Pa9eCcNc
+	 /N6hy7Yi7TBxPgtx1KR/x678IaCjZWAjL9nImuughwv1M31gpbpeZ9Kwp8hQ80SDjk
+	 ZzJJNO5np00stUCmx05Ob3/s7DPUhs3+PLez+URQ55s/HH5Xwt2FwHEc6JoSj16tr8
+	 LqwJ5MSgz+a+oXjtLX2LU+6Rsw3cM8s7I7hXb/t7D6fwBimAglIKnx8n48Efav8vFL
+	 uIZ6FI4JZDrnA==
+Date: Sun, 4 Feb 2024 14:35:13 +0000
 From: Simon Horman <horms@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
-	Leon Romanovsky <leonro@nvidia.com>,
-	Hamdan Igbaria <hamdani@nvidia.com>,
-	Yevgeny Kliteynik <kliteyn@nvidia.com>
-Subject: Re: [net-next V3 13/15] net/mlx5: DR, Change SWS usage to debug fs
- seq_file interface
-Message-ID: <20240204142448.GA941651@kernel.org>
-References: <20240202190854.1308089-1-saeed@kernel.org>
- <20240202190854.1308089-14-saeed@kernel.org>
+To: Bo Liu =?utf-8?B?KOWImOazoikt5rWq5r2u5L+h5oGv?= <liubo03@inspur.com>
+Cc: "miquel.raynal@bootlin.com" <miquel.raynal@bootlin.com>,
+	"alex.aring@gmail.com" <alex.aring@gmail.com>,
+	"stefan@datenfreihafen.org" <stefan@datenfreihafen.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] net: ieee802154: at86rf230: convert to use maple tree
+ register cache
+Message-ID: <20240204143513.GB941651@kernel.org>
+References: <982c399a2bd043a186a27a399f9b2493@inspur.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240202190854.1308089-14-saeed@kernel.org>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <982c399a2bd043a186a27a399f9b2493@inspur.com>
 
-On Fri, Feb 02, 2024 at 11:08:52AM -0800, Saeed Mahameed wrote:
-> From: Hamdan Igbaria <hamdani@nvidia.com>
+On Fri, Feb 02, 2024 at 08:08:14AM +0000, Bo Liu (刘波)-浪潮信息 wrote:
 > 
-> In current SWS debug dump mechanism we implement the seq_file interface,
-> but we only implement the 'show' callback to dump the whole steering DB
-> with a single call to this callback.
-> 
-> However, for large data size the seq_printf function will fail to
-> allocate a buffer with the adequate capacity to hold such data.
-> 
-> This patch solves this problem by utilizing the seq_file interface
-> mechanism in the following way:
->  - when the user triggers a dump procedure, we will allocate a list of
->    buffers that hold the whole data dump (in the start callback)
->  - using the start, next, show and stop callbacks of the seq_file
->    API we iterate through the list and dump the whole data
-> 
-> Signed-off-by: Hamdan Igbaria <hamdani@nvidia.com>
-> Reviewed-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
-> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-> ---
->  .../mellanox/mlx5/core/steering/dr_dbg.c      | 735 ++++++++++++++----
->  .../mellanox/mlx5/core/steering/dr_dbg.h      |  20 +
->  2 files changed, 620 insertions(+), 135 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c
+> >Hi Bo,
+> >
+> >liubo03@inspur.com wrote on Fri, 2 Feb 2024 01:45:12 -0500:
+> >
+> >> The maple tree register cache is based on a much more modern data
+> >> structure than the rbtree cache and makes optimisation choices which
+> >> are probably more appropriate for modern systems than those made by the
+> >rbtree cache.
+> >
+> >What are the real intended benefits? Shall we expect any drawbacks?
+> >
+> Hi
+> 	The maple tree register cache has now got to the point where is is
+> 	roughly feature compatible with the rbtree cache. It's based on a much more modern data
+> 	structure than the rbtree cache
 
-...
+Thanks Bo Liu,
 
-> +static struct mlx5dr_dbg_dump_data *
-> +mlx5dr_dbg_create_dump_data(void)
-> +{
-> +	struct mlx5dr_dbg_dump_data *dump_data;
-> +
-> +	dump_data = kzalloc(sizeof(*dump_data), GFP_KERNEL);
-> +	if (!dump_data)
-> +		return NULL;
-> +
-> +	INIT_LIST_HEAD(&dump_data->buff_list);
-> +
-> +	if (!mlx5dr_dbg_dump_data_init_new_buff(dump_data))
-> +		kfree(dump_data);
+You have stated that maple is more modern than rbtree.
+But please address Miquel's questions: what are the real
+expected benefits; what possible drawbacks are there?
 
-Hi Hamdan and Saeed,
 
-dump_data may be freed above.
-But it is returned unconditionally below.
-This seems a little odd.
-
-Flagged by Smatch and Coccinelle.
-
-> +
-> +	return dump_data;
-> +}
-
-...
 
