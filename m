@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-68934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91EBE848E53
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 15:16:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D747D848E55
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 15:18:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C60DF1F21361
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 14:16:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B2CB1F2148E
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 14:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A2E0224D6;
-	Sun,  4 Feb 2024 14:16:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C888224D8;
+	Sun,  4 Feb 2024 14:17:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M2kref20"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kEnLShm6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C66225A9
-	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 14:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D58C225A9
+	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 14:17:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707056211; cv=none; b=nt78w1n1vIQjMTm95nsizPyBRjrOU9kAoV44i886V3cC9tpHeKOugDscwiQhd0jrePahUkGBgCGweXtqudkfavOOZoO7b3in22KRctFzlSmakxNODk7DiMnuXPemjw7kFIbinLuqwdezCckYURz0QnD72QuH9p6GeHvS6UyGJF4=
+	t=1707056277; cv=none; b=YWCZue5SOuZtQVkKezC7/J7fTdzY+RRUyp/NgQ3gB/+9bRyiU+KQxG480YIO4ech6KXN3myVeVgk2+4ugh/2mk+yspSIS0I8gneAVZ+dGC4G0QvznmmYvjk1h0V8/yD/NqaTZzCa7BNOzfDGXZEii/Sn1XFwEpWxyn4V74FYwIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707056211; c=relaxed/simple;
-	bh=p3Mtb9zjonnokPrw/KLTAIrbtWFbNUbdHyp6YJmXVEw=;
+	s=arc-20240116; t=1707056277; c=relaxed/simple;
+	bh=uSRBbBXgw2g/zLiWbN9UcCnN/Wn/wMObshUfQPJbpIM=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=ZjsGY2GercKfLArfzQFalj+GuHsTBilwRroiU2Kmil7lOqPHIVOLeL0TRA7Nnjjbvf9Nlel+VupKUa5sZ3CRHoi2XHf8Y/50tHCi4aoB3LHPRlrMyKD0S8sK1hNhj8ionGwdZFiEGttCF63tnnevetwpqbXtrEoRoI7TlOmy7Ts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M2kref20; arc=none smtp.client-ip=209.85.218.54
+	 In-Reply-To:Content-Type; b=plDmiQD0S+H2bKQWSylO1ZRsdzCX3K8BZWdjdtWQFWQa5NL3AEJKTyQRByVfUf+wpDXqn9q78uz1z4lZKInVKHUD/xPvNfflQXD6tqgvjiHFXS5+HgwCwYiN7rI3yNjPs+SaueRlNhbJ85kT6ZK8LmXAwxT5LhGzkk5GVmTMB8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kEnLShm6; arc=none smtp.client-ip=209.85.208.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a36126ee41eso456122166b.2
-        for <netdev@vger.kernel.org>; Sun, 04 Feb 2024 06:16:49 -0800 (PST)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5605c7b1f32so216290a12.0
+        for <netdev@vger.kernel.org>; Sun, 04 Feb 2024 06:17:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707056208; x=1707661008; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707056274; x=1707661074; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
          :from:content-language:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=3tDaxCCxAh0e+LVm1FVSRMkvfD/aLm4JvqFjDtEcK8M=;
-        b=M2kref20E8t94S92ozXG/dK7zv+PJOnrf+o84mhgz0s6PcXw7Ci7ws3td7vg8+XaTz
-         s+QIqfy30fDfs/sAO0CHRpHVjXmGmrS8z3tUBUlmHxXL8TZf5d3VKCT146WjOOYU3lJU
-         jGdC9vO5BLrgIb+B3WSK3W8GdBpZqbtc3JCj8T515Lz01ilRM9cae/Loe2Ol7vi5hBMR
-         Obum8M97sfz2ENCms5CwK4Eez+RdSHm/Ndl220xj36Wjm+G848qQf6uDE1isa+8sU7dR
-         j1fY7uE276Ys4nnHlLdAyis9EbeyRazi/EIC7tteQB5r0xquK7zBA9Zh6jX6UkliCfNr
-         gT5g==
+        bh=PbvwLYhjrdI0yvXPtb15yz2MZ08RSPCqysFhUlV81HQ=;
+        b=kEnLShm6/H7s7UmQ3V9ksefeF1BeM0EVC56iUqWwzGjy+QiqqXz/c/zNGViYwfbDOu
+         UMcPsRG/hsbrTrZh0t3cCn3Ap43uWI7V2lS7xUUcHZ9ZwT/2oNNNBqQHppm9iOyORTli
+         efrJnMHv8dY21dwg5ZjkBNttZzh7j5yzgGtOSreBtY8gH5N89UU3n0Esdo7wEcsvWfuU
+         NVBFu3GLT4aexCmVGVr3BXEw0xE4EPMX5Zu8ZeQrBiDM7HiTDnu9g7td6Ci3npgKA5QV
+         M5B49BzZJUzY3jv0fQKtXFAI9WqNxP8TOR3v2L0+7a7ap4MmC/me0hz7HHTf6KlnKyRF
+         nBVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707056208; x=1707661008;
+        d=1e100.net; s=20230601; t=1707056274; x=1707661074;
         h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
          :from:content-language:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=3tDaxCCxAh0e+LVm1FVSRMkvfD/aLm4JvqFjDtEcK8M=;
-        b=CXhhrt1JMvPKplCLgdPS+sIgrb/2tVcWvpyChmGcosqjdCWh+UgeHeiwFKKG0aSudU
-         pF5/7MUK7yN5O1oHhxy7tkd+C9Gvy0wCGvgdVQIEc1kbVNXcIkHuBzF9jUWuFJ897isk
-         9GGbs5TcAEcZFvBlM7eV2nX5S5f0f7SRQX5LzdYwlQMADi+vnPrjt3nrtJYkxMTxNAPD
-         cIhKgv2pUD5tx+dlQARoFYNbYDStplhUWssqe0Nj0KpECD7IEraW0c7tLty7Ul+5TVox
-         cbj17HtUvu3bw7o6FOL+QDE0u77YeavPzAavtMNIa8fQITsSbKEn5kJHRKemMNHmGPH1
-         1Adg==
-X-Gm-Message-State: AOJu0Yxsgxdw+ws/jr8uj/9IxxQcZDdnd05HYMjkXe1NUwkIHzD1BvER
-	I4tg7ukkOVvOaICURKniZz0CTa+AVI8z8A8Ifs43Gn1rG/oCk2jo
-X-Google-Smtp-Source: AGHT+IEdL0rfE2ngVLis98sz2Et2bc1ZWQFy35+vjRi6eMfzG7owZmSV8St5jB1MyvBtzTCCuSqP7g==
-X-Received: by 2002:a17:906:45:b0:a36:ff9f:4256 with SMTP id 5-20020a170906004500b00a36ff9f4256mr5171081ejg.54.1707056207394;
-        Sun, 04 Feb 2024 06:16:47 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWt29i7RWA3YhWUG+h/HUITswl/msvm8UTu4KLG7+vB1kuM2E4mY8LKRdFf2K7slVVh6B455NulOX1Au3D+te5tjH2zRKIR1zyKzioS+WsbmJhpINykCBE7/f0zVqiFLrzv3pNa4o2ypy6FVVjif9FWmhFMc3QOwd6YowvMk8oqxU7TiU0z6zGXO7xrqsqAhfo57so/tb54do8ETEHa4YIzs5cZ
+        bh=PbvwLYhjrdI0yvXPtb15yz2MZ08RSPCqysFhUlV81HQ=;
+        b=DSS7n1ajGFERB0jfgo+5v9eJZaDWP5aJjBjPuwl39jrn6MwWqNcMbrwAM4kE4BbH35
+         QGAnmHI7r5IKeWT365l8U35ZKD78JC5ZcqvgbtJOpkGWCvCDoxBLa7lms+/hx6+EhTyS
+         txgLp8k7rOv7uKY2mSVqs98gwCtFq+0Od37JbcK4MRWq89/kEf2NYbbwDbkJ55DSsAAV
+         OFtQV5INZp4J1jJhB3x2XEHIPPlI/vcsJqWIUbhQojh8u+CPVSnmp9muvckvEq7EHzzy
+         3HCvpRMTqVQor2Q4DrhR8I6sxXmjqBWjPXgU6tHdLiwxSjgZfWk9FOhNjyjOz9Y2or7J
+         lC+w==
+X-Gm-Message-State: AOJu0Yym4ROev3hMT7ps738MBRqVN2CWRp3CqDLrc8KV81zQuWqqXU47
+	0RTLTpjaLjSoVy1GFFAicbAKyjzTykwK9ULAogWG0mb9v1WpsCOz
+X-Google-Smtp-Source: AGHT+IHypukptWcewSHybaKC7TMmWcEguTTSvhzkyaX71c8TyiPBLLI952l6BlxrxDUKwCaIYOR0Zw==
+X-Received: by 2002:a17:906:2798:b0:a37:aa3b:f58 with SMTP id j24-20020a170906279800b00a37aa3b0f58mr615882ejc.59.1707056274207;
+        Sun, 04 Feb 2024 06:17:54 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCU67ppftMs2F1cF0bG+18YSsUi+Q1K7qBxdtl3ssy6tMBJmSLcrCalP1utMMyaetvljlrxJlnVotEW6JCS9IGrOAfY5NiJMzNdwrLo6yThpAA0Uuj2UZXQRHgvWozMvz54KIGyQFNYnA7MNhNTk/oXYAwc0xHQy+HQcmLUf9XuEeDXjrvwRzjUZs3qBJDOk2cSJLxfQPVyMi6Ztkp00mon1f2U+
 Received: from ?IPV6:2a01:c22:732c:d400:1402:4c43:8a0e:1a33? (dynamic-2a01-0c22-732c-d400-1402-4c43-8a0e-1a33.c22.pool.telefonica.de. [2a01:c22:732c:d400:1402:4c43:8a0e:1a33])
-        by smtp.googlemail.com with ESMTPSA id p4-20020a17090628c400b00a360239f006sm3169169ejd.37.2024.02.04.06.16.46
+        by smtp.googlemail.com with ESMTPSA id p4-20020a17090628c400b00a360239f006sm3169169ejd.37.2024.02.04.06.17.53
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 04 Feb 2024 06:16:47 -0800 (PST)
-Message-ID: <98e15038-d96c-442f-93e4-410100d27866@gmail.com>
-Date: Sun, 4 Feb 2024 15:16:46 +0100
+        Sun, 04 Feb 2024 06:17:53 -0800 (PST)
+Message-ID: <732a70d6-4191-4aae-8862-3716b062aa9e@gmail.com>
+Date: Sun, 4 Feb 2024 15:17:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,8 +77,7 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 1/3] net: mdio: add 2.5g and 5g related PMA speed
- constants
+Subject: [PATCH net-next 2/3] net: phy: realtek: use generic MDIO constants
 Content-Language: en-US
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
@@ -137,28 +136,90 @@ Content-Transfer-Encoding: 8bit
 
 From: Marek Behún <kabel@kernel.org>
 
-Add constants indicating 2.5g and 5g ability in the MMD PMA speed
-register.
+Drop the ad-hoc MDIO constants used in the driver and use generic
+constants instead.
 
 Signed-off-by: Marek Behún <kabel@kernel.org>
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- include/uapi/linux/mdio.h | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/net/phy/realtek.c | 30 +++++++++++++-----------------
+ 1 file changed, 13 insertions(+), 17 deletions(-)
 
-diff --git a/include/uapi/linux/mdio.h b/include/uapi/linux/mdio.h
-index d03863da1..3c9097502 100644
---- a/include/uapi/linux/mdio.h
-+++ b/include/uapi/linux/mdio.h
-@@ -138,6 +138,8 @@
- #define MDIO_PMA_SPEED_1000		0x0010	/* 1000M capable */
- #define MDIO_PMA_SPEED_100		0x0020	/* 100M capable */
- #define MDIO_PMA_SPEED_10		0x0040	/* 10M capable */
-+#define MDIO_PMA_SPEED_2_5G		0x2000	/* 2.5G capable */
-+#define MDIO_PMA_SPEED_5G		0x4000	/* 5G capable */
- #define MDIO_PCS_SPEED_10P2B		0x0002	/* 10PASS-TS/2BASE-TL capable */
- #define MDIO_PCS_SPEED_2_5G		0x0040	/* 2.5G capable */
- #define MDIO_PCS_SPEED_5G		0x0080	/* 5G capable */
+diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+index 894172a3e..ffc13c495 100644
+--- a/drivers/net/phy/realtek.c
++++ b/drivers/net/phy/realtek.c
+@@ -57,14 +57,6 @@
+ #define RTL8366RB_POWER_SAVE			0x15
+ #define RTL8366RB_POWER_SAVE_ON			BIT(12)
+ 
+-#define RTL_SUPPORTS_5000FULL			BIT(14)
+-#define RTL_SUPPORTS_2500FULL			BIT(13)
+-#define RTL_SUPPORTS_10000FULL			BIT(0)
+-#define RTL_ADV_2500FULL			BIT(7)
+-#define RTL_LPADV_10000FULL			BIT(11)
+-#define RTL_LPADV_5000FULL			BIT(6)
+-#define RTL_LPADV_2500FULL			BIT(5)
+-
+ #define RTL9000A_GINMR				0x14
+ #define RTL9000A_GINMR_LINK_STATUS		BIT(4)
+ 
+@@ -674,11 +666,11 @@ static int rtl822x_get_features(struct phy_device *phydev)
+ 		return val;
+ 
+ 	linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
+-			 phydev->supported, val & RTL_SUPPORTS_2500FULL);
++			 phydev->supported, val & MDIO_PMA_SPEED_2_5G);
+ 	linkmode_mod_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
+-			 phydev->supported, val & RTL_SUPPORTS_5000FULL);
++			 phydev->supported, val & MDIO_PMA_SPEED_5G);
+ 	linkmode_mod_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
+-			 phydev->supported, val & RTL_SUPPORTS_10000FULL);
++			 phydev->supported, val & MDIO_SPEED_10G);
+ 
+ 	return genphy_read_abilities(phydev);
+ }
+@@ -692,10 +684,11 @@ static int rtl822x_config_aneg(struct phy_device *phydev)
+ 
+ 		if (linkmode_test_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
+ 				      phydev->advertising))
+-			adv2500 = RTL_ADV_2500FULL;
++			adv2500 = MDIO_AN_10GBT_CTRL_ADV2_5G;
+ 
+ 		ret = phy_modify_paged_changed(phydev, 0xa5d, 0x12,
+-					       RTL_ADV_2500FULL, adv2500);
++					       MDIO_AN_10GBT_CTRL_ADV2_5G,
++					       adv2500);
+ 		if (ret < 0)
+ 			return ret;
+ 	}
+@@ -714,11 +707,14 @@ static int rtl822x_read_status(struct phy_device *phydev)
+ 			return lpadv;
+ 
+ 		linkmode_mod_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
+-			phydev->lp_advertising, lpadv & RTL_LPADV_10000FULL);
++				 phydev->lp_advertising,
++				 lpadv & MDIO_AN_10GBT_STAT_LP10G);
+ 		linkmode_mod_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
+-			phydev->lp_advertising, lpadv & RTL_LPADV_5000FULL);
++				 phydev->lp_advertising,
++				 lpadv & MDIO_AN_10GBT_STAT_LP5G);
+ 		linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
+-			phydev->lp_advertising, lpadv & RTL_LPADV_2500FULL);
++				 phydev->lp_advertising,
++				 lpadv & MDIO_AN_10GBT_STAT_LP2_5G);
+ 	}
+ 
+ 	ret = genphy_read_status(phydev);
+@@ -736,7 +732,7 @@ static bool rtlgen_supports_2_5gbps(struct phy_device *phydev)
+ 	val = phy_read(phydev, 0x13);
+ 	phy_write(phydev, RTL821x_PAGE_SELECT, 0);
+ 
+-	return val >= 0 && val & RTL_SUPPORTS_2500FULL;
++	return val >= 0 && val & MDIO_PMA_SPEED_2_5G;
+ }
+ 
+ static int rtlgen_match_phy_device(struct phy_device *phydev)
 -- 
 2.43.0
 
