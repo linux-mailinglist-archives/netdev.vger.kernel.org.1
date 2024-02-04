@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-68897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 662CC848C44
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 09:51:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B972F848C45
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 09:51:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 934B11C22B69
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 08:51:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1089C284766
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 08:51:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC68411C88;
-	Sun,  4 Feb 2024 08:51:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6647B1427A;
+	Sun,  4 Feb 2024 08:51:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B+OIF3p4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J0MoUBAp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FDE114284
-	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 08:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F30B114A84
+	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 08:51:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707036703; cv=none; b=MJg+uATB9j5qHofM0d3b1E/WxXUUCQZz51bBYKQ2Fw14TH5jnxzGLHYuFSS/Oya8vRb3qu5sEDsiHXqCHjL1TROXaf5DtO51kWo7IDJLITecF5Wm2bKt9WKE+h5cYJhbcdPchTIxZDceGVYYYT6ikzo1JGSBCOnZSsDGGKnOZ+o=
+	t=1707036706; cv=none; b=Vs7KJqXsCI2M4CKrmUQZVi+nnhfHwd/yFCPo9ZvKwPMbfdx8XEIcnNR3uygjuI7XlTWsL/EszzLLw9t1CxxFv8evlMFq5VH4fp2jOe2v12G1TD3ak1huprYh1e6lKDK98kW25MdUnqq223hyZYLn38EGPa5WoObFrdRdPU5/wRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707036703; c=relaxed/simple;
-	bh=x7+KTXbxhZvO+kRL3f1yL0fKyIkdlMSd/T+/s0p+0SE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ajqXbEmoSA3xUCz3m7NGiOsI2k5jS5FsyHqxmFDQVX/qpoAjERh9S09DDyg3n77IBtTVBDGvQpedYhH7ieUw/ki+xHdOBUxYnXG/nwp31OMH2wFGc1xbyDPdKT+Dq9WxOZydTkf9LGqyeSuwS75H/SWdhalp6DiYF95+ZFo3gz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B+OIF3p4; arc=none smtp.client-ip=209.85.167.171
+	s=arc-20240116; t=1707036706; c=relaxed/simple;
+	bh=KDU5Sap9KmERo+IOTSOxwD/wM01vjxr94Mz5wDzVw8U=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=e6q+eGx2jH2ixg8OA/mCT73MSnUY4Viz4pgZimzq0kafGytFgz+vxVCpWUGPckSz6cpFWqs2E4jGwYVomTLmi22f/oYrBFJgrdkaQNOdIZnPCoAqRbUtN3XjIL3CZq1sIq348TjEKGfbIg+ViTXYhuLh9g9MaSwGPqNxbWwrNIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J0MoUBAp; arc=none smtp.client-ip=209.85.215.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3bda4bd14e2so3084161b6e.2
-        for <netdev@vger.kernel.org>; Sun, 04 Feb 2024 00:51:41 -0800 (PST)
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-5ce942efda5so2989745a12.2
+        for <netdev@vger.kernel.org>; Sun, 04 Feb 2024 00:51:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707036700; x=1707641500; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Jr5Ma53ZIQFxVlqjjt3fvMokaHC0OGqyDT7hT2pvB9c=;
-        b=B+OIF3p4gnoGCjWva0vho5DTrJ44KYEbzTSIc90XXXbY8WZybt39OdIZ1Yl7cfezXI
-         euw75nXPLIhE+l4GqKTlHzWtZ4o94O03wjasrck56sOzJejvjPZ/4v8wdFoYzPAP8J8R
-         jVmdgbJdpvnc9UkIMOZYzzgkVcVvUYG3pvR5QYzjR+GyXyYvu6bG2RB7iWlqani3PB/V
-         coQ4+yOc+a+Yo2cF4HAxP8Xxp48TjX/PgKFWGXXflmOpdGrMtIFOi+X7RRHQz7l0KnZ5
-         sEEYj1xXioXwFT26yUHUuYVMfVrVbxaoVuITlU2eqZsqtxmr5iTCQ9K15CtILQbzKfu2
-         oUvg==
+        d=gmail.com; s=20230601; t=1707036703; x=1707641503; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7f+YPdLV02rXa/1f3nKaHnsp07nRY0/vdqPS1EubdSo=;
+        b=J0MoUBApKW2mNnC1Z3AIL2iEQFgSjOowIpRhs4kxqxRAOk9ITzf9EBUqt0tGIL07Y9
+         X7XGn+mhivnnzk29Q+Zy93Ll7vjCKo4rBjPG7QoXmzTAsmjvsglhkwoJ3RcYizYuac8t
+         qZd8NR56g2GvRUBYInRlfXnsqcL9syZdHtAMi8N7UdIEIr9lhIRvpvUu/4c5hykm6ppw
+         W6SqVB/chpdEIVZIIg3QU2Sl4lL0kUQHmkthyRJGCzQCZh0sQuB4xV4aLbO6hIABhBBz
+         3JHBnU9aZRWUzQ5a+AHmGJwMn/HeAnUoAqKkNVndUzyeIZ9sM6xitlxGSB9lsJrra1fp
+         qMVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707036700; x=1707641500;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Jr5Ma53ZIQFxVlqjjt3fvMokaHC0OGqyDT7hT2pvB9c=;
-        b=pJ1n2RwUMOsCoPCc+Gm/uvuFWmDc6ZeWU2lTgn/tGWlmNMnrNieKngktwH2xAScLFL
-         tpjnPcZe5G234WbpEWGT1fGBXyBTzJ9Gmx5/skbKvi/XpXTgdA/Cnd5khKWXtSVDZOYr
-         6zRzupROrpDiGMH7jkueZBjhsGst4oF6h2BYJzy/0rHEYBeZwfkI8nFSadgpFdg5RjYz
-         3toZyWKldks30YBJwDRC4AEBrlbvabMHcUV8UkqnMnklJxMd6NlovgTrvKgX1jnVDlo6
-         b/kCRRCLu7opvPIxq4v2fq44LBCZNi8XNKyMep1wbBKbPsuwI1auRSiIdA5A7EDEtCd4
-         RboA==
-X-Gm-Message-State: AOJu0YwuH7+Tw4NhS7t3XOZUxZGsmlASzqwiBeG0jn2LHRMt8jkJCfHW
-	P1U2pXmez75ID2kXsjiqC37FpP8gmV4Igc69T7HK/QKeWJJLDwnT/lkmmQtIpLcYQg==
-X-Google-Smtp-Source: AGHT+IFXBY/aq6l6KMRC3CsePikWzxbFKeNmEsxgAXcnn1iJxfU3hq/3OaJDdBN52wGGR2aCfEjjsQ==
-X-Received: by 2002:a05:6808:1589:b0:3bd:a199:cea2 with SMTP id t9-20020a056808158900b003bda199cea2mr15574721oiw.30.1707036700417;
-        Sun, 04 Feb 2024 00:51:40 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUpaBePN8979opwDE3jV395aAlPNOBo7vNsbG4zMx2LtvVECFKWmictwL/rpt6WTG+Yr8eJsmQzVJHIwzf+Q5MuJ4r1prjEk//PeUSlcZJPFLDgOrlKDgJrlEBd7XcDkAJbFYlJPhabxDpHKcvCFcf8F5pM4ygWRyS/0XRV4eO2VjuZjjNP4MtfGx97X1MH8XCgW/yU3d3x6hPAozNd7QAT/NB5MSnHyX1f5rFSkKD+54b02yTd05EPwmxuH/0OJAZ55Q==
+        d=1e100.net; s=20230601; t=1707036703; x=1707641503;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7f+YPdLV02rXa/1f3nKaHnsp07nRY0/vdqPS1EubdSo=;
+        b=PyGTSJE75qqFPFmYZL0Nq9vefX2Tgq9u7Xl4CN1iP+3iodEkQ4mndBH0tRNIMS1w2q
+         UTS2q04wZszQ8qGGb7XxWZBRQ6uaxrCF10G7skPSIYPo2y5MsmDXSR8lPJr1D/RJF/rG
+         m/o9DEbA3RA/1Vldi3Fy8VHvb7xpuS3+bPxgDbBmac8X+8txK1zgi+1gMqyrrMyuibsk
+         aBBznX80IanE9mzoMbvg3mu4FgS4DT25HUUo/o5qrHA/RnDPo9zqbVuJ9Na7VdcB1yb5
+         6xH59yLxOVp80Yo3Iq0mlFXKBnD4MVbFW2Ga2mXTqQ7XJvfDtQR9BUK8oqo70jub2nYZ
+         ChIw==
+X-Gm-Message-State: AOJu0Yztdr9aQanrtVLxYvhTRU+Tw8k45Dij7pEP8Qfq0tRj721hiXM/
+	YsQW7XBUtJMS09E0G30HcB0kZ8E229m6L2CnvtbOiMs6teBwRnbiS0uzukn4QBYAMA==
+X-Google-Smtp-Source: AGHT+IG6i24AD1txlGWx6h1I5GekDlSUfWp5Vqr5uBRu+/O8nyZwOM7Vfk3pB6ZytpKDg3aUp8JtKA==
+X-Received: by 2002:a05:6a20:9592:b0:19e:4790:25dc with SMTP id iu18-20020a056a20959200b0019e479025dcmr11588978pzb.60.1707036703563;
+        Sun, 04 Feb 2024 00:51:43 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVSVB6hbczM3xkr1lx8CMvgDeBsaxgJBf3YOBMwj2MU3gntq19PWR7sb7mWHtXopJhBqhMqWvnWO1PObtsz3jltSiqANm+VnRHOQOsr7C3llstTD7C5uiAjuxtDu2h3GSe99QMAuBmF6Qupcumi2OTCGKigb66YfLtt1vEuLrUE/pkgVLPVlD46vgUTWVB9bCdf5dfcjW5h8ZGMS7MDAtK0oBr6WSDLuM8KmwgBb0IY0AA3LRn89OEpJbTkw2nKROkaHA==
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id ka39-20020a056a0093a700b006d9b2694b0csm4398228pfb.200.2024.02.04.00.51.37
+        by smtp.gmail.com with ESMTPSA id ka39-20020a056a0093a700b006d9b2694b0csm4398228pfb.200.2024.02.04.00.51.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Feb 2024 00:51:39 -0800 (PST)
+        Sun, 04 Feb 2024 00:51:43 -0800 (PST)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
@@ -75,10 +77,12 @@ Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
 	Liang Li <liali@redhat.com>,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv4 net-next 0/4] selftests: bonding: use slowwait when waiting
-Date: Sun,  4 Feb 2024 16:51:24 +0800
-Message-ID: <20240204085128.1512341-1-liuhangbin@gmail.com>
+Subject: [PATCHv4 net-next 1/4] selftests/net/forwarding: add slowwait functions
+Date: Sun,  4 Feb 2024 16:51:25 +0800
+Message-ID: <20240204085128.1512341-2-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240204085128.1512341-1-liuhangbin@gmail.com>
+References: <20240204085128.1512341-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,48 +91,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-There are a lot waitings in bonding tests use sleep. Let's replace them with
-slowwait(added in the first patch). This could save much test time. e.g.
+Add slowwait functions to wait for some operations that may need a long time
+to finish. The busywait executes the cmd too fast, which is kind of wasting
+cpu in this scenario. At the same time, if shell debugging is enabled with
+`set -x`. the busywait will output too much logs.
 
-bond-break-lacpdu-tx.sh
-  before: 0m16.346s
-  after: 0m2.824s
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+---
+ tools/testing/selftests/net/forwarding/lib.sh | 35 +++++++++++++++++++
+ 1 file changed, 35 insertions(+)
 
-bond_options.sh
-  before: 9m25.299s
-  after: 6m14.439s
-
-bond-lladdr-target.sh
-  before: 0m7.090s
-  after: 0m6.148s
-
-bond_macvlan.sh
-  before: 0m44.999s
-  after: 0m26.468s
-
-In total, we could save about 200 seconds.
-
-v4: Make sure the client could reach to macvlan2 (Jakub Kicinski)
-v3: Rebase to latest net-next
-v2: Reduce slowwait sleep time to 0.1 (Paolo Abeni)
-    Reduce num_grat_arp() miimon time (Paolo Abeni)
-    Use slowwait for ping result in lag_lib.sh
-
-Hangbin Liu (4):
-  selftests/net/forwarding: add slowwait functions
-  selftests: bonding: use tc filter to check if LACP was sent
-  selftests: bonding: reduce garp_test/arp_validate test time
-  selftests: bonding: use slowwait instead of hard code sleep
-
- .../net/bonding/bond-break-lacpdu-tx.sh       | 19 +++++-----
- .../drivers/net/bonding/bond-lladdr-target.sh | 21 ++++++++--
- .../drivers/net/bonding/bond_macvlan.sh       |  5 +--
- .../drivers/net/bonding/bond_options.sh       | 38 ++++++++++++++-----
- .../drivers/net/bonding/bond_topo_2d1c.sh     |  6 +--
- .../selftests/drivers/net/bonding/lag_lib.sh  |  7 ++--
- tools/testing/selftests/net/forwarding/lib.sh | 35 +++++++++++++++++
- 7 files changed, 99 insertions(+), 32 deletions(-)
-
+diff --git a/tools/testing/selftests/net/forwarding/lib.sh b/tools/testing/selftests/net/forwarding/lib.sh
+index a7ecfc8cae98..db3688f52888 100644
+--- a/tools/testing/selftests/net/forwarding/lib.sh
++++ b/tools/testing/selftests/net/forwarding/lib.sh
+@@ -37,6 +37,32 @@ fi
+ 
+ source "$net_forwarding_dir/../lib.sh"
+ 
++# timeout in seconds
++slowwait()
++{
++	local timeout=$1; shift
++
++	local start_time="$(date -u +%s)"
++	while true
++	do
++		local out
++		out=$("$@")
++		local ret=$?
++		if ((!ret)); then
++			echo -n "$out"
++			return 0
++		fi
++
++		local current_time="$(date -u +%s)"
++		if ((current_time - start_time > timeout)); then
++			echo -n "$out"
++			return 1
++		fi
++
++		sleep 0.1
++	done
++}
++
+ ##############################################################################
+ # Sanity checks
+ 
+@@ -478,6 +504,15 @@ busywait_for_counter()
+ 	busywait "$timeout" until_counter_is ">= $((base + delta))" "$@"
+ }
+ 
++slowwait_for_counter()
++{
++	local timeout=$1; shift
++	local delta=$1; shift
++
++	local base=$("$@")
++	slowwait "$timeout" until_counter_is ">= $((base + delta))" "$@"
++}
++
+ setup_wait_dev()
+ {
+ 	local dev=$1; shift
 -- 
 2.43.0
 
