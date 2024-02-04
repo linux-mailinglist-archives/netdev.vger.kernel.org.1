@@ -1,129 +1,92 @@
-Return-Path: <netdev+bounces-68949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA1F9848EF7
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 16:43:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78557848EFD
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 16:50:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 173FF1C21172
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 15:43:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A03BD1C21ABA
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 15:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2935225D4;
-	Sun,  4 Feb 2024 15:43:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D46C2225AC;
+	Sun,  4 Feb 2024 15:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="T+dbddqf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NtPB0x2K"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906F9225CE;
-	Sun,  4 Feb 2024 15:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3474F224FB;
+	Sun,  4 Feb 2024 15:50:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707061415; cv=none; b=acGXjvMVnQI8n/N+E1jmOcEUJouJm6VsAc1iqvrEEsy1HF7XVxiIMCxYK8kRGGI83bgwNZyEWWL1E3Ao2UdrA5WvI0bD9W4EVueGfgdUxyR7ty+CNfftm2/p1scJDWAV7R7ncMNEvA3r5Fxts38oKPIxNZX3uy8uzXRB1laekfY=
+	t=1707061827; cv=none; b=Syb+Nd+0z43OuxNSmue+ay//c43l0QqDpU8+fVye1laf/tmkyfI2YywO2LFQf3lrgjgC/fKGMoZoxVwhml3y/3z6cE4vWNMih8fkTnXlIKuFfSWFoihMVK9CLp73vvQPm8uVYDQoZO3U6867bqFeOEWU43ORR74tNlxlNTjh+X8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707061415; c=relaxed/simple;
-	bh=j8bT92korZPHKU9UJD58DKUuXoIYCuBG26pqbJmYj/Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=g+EntRXWg57nL484s8JnwcXqf/1STmddp1WedsB/gIp2or9grMtJdLQO6HzIVOG5JyvWFM8dJvV6IwP5pF/haHUa4jt9yUhUiLRdgHrLFXRX3xsFMrlhwIjRNcnp7JmlfLaaPZHFhZ2UHf09s2qpL+alqCOgGvWpLYZP214Tps0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=T+dbddqf; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=HPr856mnIn7UchtaSPmbDT13xvs3uix0kLrT0nAz+H8=; b=T+dbddqfIFAZ0ZeL3RVZjQnB4g
-	ZNoTgQJSGq/5zCYsWqAPV1YQiYKCGpvkIXjV/SfBiWNVkZjfJP6/5iitKD5J83fwADBOY4voShV8d
-	yHBHzQs0TtiDpGA97fs5S7Xq5H0UjOTW36fE05FeFh+EJTIJUT+Bo9DJxbzA0/uKcnaqGC9UQPvUO
-	NbCmcoBvaZqUFB2Z+95BkqAZ5Bk9/+UCGq8FkRWbE9Hd3rxMCe3k43rncM1KXuqxY+9HGiUoEC7b8
-	Q39I9JMnH86N69gmICJTObM3/JLGwz2wiTgP18PmnR1N9mFCBhkpPg5PvjVzJkLauQLHJ4dZhhbLE
-	x8+WXYMA==;
-Received: from [50.53.50.0] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rWeeW-000000014T6-2LMA;
-	Sun, 04 Feb 2024 15:43:29 +0000
-Message-ID: <fe192b1d-da96-4f58-abe2-c3447adf0676@infradead.org>
-Date: Sun, 4 Feb 2024 07:43:28 -0800
+	s=arc-20240116; t=1707061827; c=relaxed/simple;
+	bh=K/l4XAhKUoqj0Gf4/fuP2lXIRj4zvUX24qlOR/OzA/Q=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=eqpaIHdRpHqYlCXH4el0+XLAHN46eoyCsUoPQk1VDjRCWV816rS/c43jxE5uViYQ+Hj+YIwDOeGzqOaslvmThfzYct2E5ZsGFdDCFnTFNYixSSX8bheuNnKLtcSWR0KW1kTMXESS+6vtbdgMsl1g75nqElj1PFMZbSpmmGoI3DU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NtPB0x2K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 68293C433C7;
+	Sun,  4 Feb 2024 15:50:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707061826;
+	bh=K/l4XAhKUoqj0Gf4/fuP2lXIRj4zvUX24qlOR/OzA/Q=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=NtPB0x2K/E20X26/5ARyHjievHQZfX9Rx0lxHbQ1zJATMxe1h5WiJ0++iqpMg+Hbh
+	 B9wVp0av2t5GVBYhHKOGX61jZgKuVY243bPbFTcdA7/VtIEEZkaIeemjZ2YpOhFl1K
+	 JzaNC0H1S0zqOC2VVSERq9pxds8ErCNeXkyFQZw0xFDBL+sR+/xWzvw5+JwB2SqVUP
+	 0QZ8W7LkrIIB/J/Sz0ykObuvdIBAGz8KrcCdz5/IWPdcGiXH42LhvSyipSI0GiyxuW
+	 qsomEejQeufRL+IT8L5AKFY8KE0IjM/LDuhcuyWteDQFskqGI2/g6s+J6Kvsi6L7Ag
+	 O8rL1O0I1YDbw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4DE35E2F2EC;
+	Sun,  4 Feb 2024 15:50:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: tipc: remove redundant 'bool' from
- CONFIG_TIPC_{MEDIA_UDP,CRYPTO}
-Content-Language: en-US
-To: Masahiro Yamada <masahiroy@kernel.org>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Cc: Jon Maloy <jmaloy@redhat.com>, Ying Xue <ying.xue@windriver.com>,
- linux-kernel@vger.kernel.org, tipc-discussion@lists.sourceforge.net
-References: <20240204131226.57865-1-masahiroy@kernel.org>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20240204131226.57865-1-masahiroy@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v2] tun: Fix code style issues in <linux/if_tun.h>
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170706182631.14059.17998041446894205076.git-patchwork-notify@kernel.org>
+Date: Sun, 04 Feb 2024 15:50:26 +0000
+References: <1706858755-47204-1-git-send-email-wangyunjian@huawei.com>
+In-Reply-To: <1706858755-47204-1-git-send-email-wangyunjian@huawei.com>
+To: Yunjian Wang <wangyunjian@huawei.com>
+Cc: willemdebruijn.kernel@gmail.com, jasowang@redhat.com, kuba@kernel.org,
+ davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ xudingke@huawei.com
 
+Hello:
 
+This patch was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-On 2/4/24 05:12, Masahiro Yamada wrote:
-> The 'bool' is already specified for these options.
+On Fri, 2 Feb 2024 15:25:55 +0800 you wrote:
+> This fixes the following code style problem:
+> - WARNING: please, no spaces at the start of a line
+> - CHECK: Please use a blank line after
+>          function/struct/union/enum declarations
 > 
-> The second 'bool' under the help message is redundant.
+> Signed-off-by: Yunjian Wang <wangyunjian@huawei.com>
 > 
-> While I am here, I moved 'default y' above, as it is common to place
-> the help text last.
-> 
-> Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+> [...]
 
-Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+Here is the summary with links:
+  - [net-next,v2] tun: Fix code style issues in <linux/if_tun.h>
+    https://git.kernel.org/netdev/net-next/c/bd8a8d5ec504
 
-Thanks.
-
-> ---
-> 
->  net/tipc/Kconfig | 7 +++----
->  1 file changed, 3 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/tipc/Kconfig b/net/tipc/Kconfig
-> index be1c4003d67d..bb0d71eb02a6 100644
-> --- a/net/tipc/Kconfig
-> +++ b/net/tipc/Kconfig
-> @@ -32,16 +32,17 @@ config TIPC_MEDIA_UDP
->  	bool "IP/UDP media type support"
->  	depends on TIPC
->  	select NET_UDP_TUNNEL
-> +	default y
->  	help
->  	  Saying Y here will enable support for running TIPC over IP/UDP
-> -	bool
-> -	default y
-> +
->  config TIPC_CRYPTO
->  	bool "TIPC encryption support"
->  	depends on TIPC
->  	select CRYPTO
->  	select CRYPTO_AES
->  	select CRYPTO_GCM
-> +	default y
->  	help
->  	  Saying Y here will enable support for TIPC encryption.
->  	  All TIPC messages will be encrypted/decrypted by using the currently most
-> @@ -49,8 +50,6 @@ config TIPC_CRYPTO
->  	  entering the TIPC stack.
->  	  Key setting from user-space is performed via netlink by a user program
->  	  (e.g. the iproute2 'tipc' tool).
-> -	bool
-> -	default y
->  
->  config TIPC_DIAG
->  	tristate "TIPC: socket monitoring interface"
-
+You are awesome, thank you!
 -- 
-#Randy
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
