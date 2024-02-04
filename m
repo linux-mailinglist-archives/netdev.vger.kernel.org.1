@@ -1,169 +1,160 @@
-Return-Path: <netdev+bounces-68952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E98AE848F0A
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 16:55:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B9E7848F17
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 17:01:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44A2928315C
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 15:55:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50ED11F20EE6
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 16:01:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EAF6225D9;
-	Sun,  4 Feb 2024 15:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11433225DA;
+	Sun,  4 Feb 2024 16:01:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="Zsi3a1I4"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="c+SuTy5p"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60C2D225DC;
-	Sun,  4 Feb 2024 15:55:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A2C922611
+	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 16:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707062132; cv=none; b=C+UkeEx+ZNIcqXGbk/w7GbNynSM1460FR/YiR496z6SNrsSg3HQ0/owVWubmTZ/Qrl1jIOIQKwbW5z0L21jJ0/J9+xfm5aqzLEUvtFGOnG721wwLWeMbkkHcSLvpBCc5qxiQVf0Eg4QPftVQUYT5/7VcoBFRZ0AgUxTqeC6lJWk=
+	t=1707062470; cv=none; b=rQhJnrRSrp0KUozOdFda4FkYmCNjyytbETzPpvTsgr89nRiPHdonZVYq7lvUNBJMY6rN2uZn+LsLCGt3c2Wn0BPyiyr+NVWbgBgd8G2EuEIvQGtU6NgYouzBjFocLY6Rn7FvTd6LwlXp/IXsNRgPfcQcI+vjVJpCs5/6ianX8UI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707062132; c=relaxed/simple;
-	bh=onuDlZjPiNMdYkqwugLEX7fz2s7+xlvOdrQ9LlHd4ys=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MDKpb84ZRzdvQr6KBCIGyc+59Q2NxpuYRXtM/BP1XB21wSX9cSshNsgCMn5/S0AclmpaU1g5lX5YIVeZu717h+teCIAW+xnAFUT7KJCNoJHakkbe+QbzrKkcGh3Z6kjDsKDUomGIXUq/1EhtMKMV/RDJpqsu19NRviTGo3r0IEw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=Zsi3a1I4; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 5F69AC0004;
-	Sun,  4 Feb 2024 15:55:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1707062121;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Pw/KaLqyNXN7B46B9Layw79P/0my6PltB7XkP8ad8AY=;
-	b=Zsi3a1I4x8UIMP+yLCiVz83TQxWgGQm/ZMkkbXAmXyuZsBORrwDbyXEtbnKt42BFJkIJH0
-	4fa1GLCiscX/G+oULpJt7cAQ70E6BPyYd8i01Pe5HU21TqbNFVJXrclrVXP0VF2KCwk13g
-	M0pPbT0EXdA7jk6N6hAkchT4bEiuq/jkwdkPH+GckWWa5hmoNjiRuovm9yHSauWw2QMFUp
-	+LwpBjD1VK2HOFaramUEHxD5FaRool2EE1geTIx0l9X8w0BquumaKGjy95aVe7I816n6NR
-	lCahbfbhKBWyzGii0KaXl4eKkTNSNlnSv3x1TaFkcBIljC+7a/opKSMIyyWZDw==
-Message-ID: <4fa2ff0d-2804-4a58-980f-162e62b3dc9c@arinc9.com>
-Date: Sun, 4 Feb 2024 18:55:14 +0300
+	s=arc-20240116; t=1707062470; c=relaxed/simple;
+	bh=WuvEB5xfaX8SBkIuY4XjmxEA0Z0cfhaNSttWKF3YT5w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rZ+Txebbohxydls3mSXb5RZN1Dalfd/I2crnXqR4R4/dj7KLyXpWmJdIO0bX1AU3WDWIQf+a4PjgBTQlONagIsrBklz0+78zdj2BgNXD56p8xcE3OgNKbuPnLFvBP8N3RZnh0D+k2GNNzhnf9+cmTL8+ERonV3nsSoSLvZo7rO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=c+SuTy5p; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=gpIZ+rXziBXhMftRuFCfwSdeeJZllaAcT0ftXTFYyes=; b=c+
+	SuTy5pnWMANpGnP/q/iyZQYuyPtkPK2YbJwFvbXqVzsxnCXxFYnII+k3pOyBq8WiG3Xhu9t9gfGH7
+	HxhRalyoO8doSjUN9mc0vxhrG4vrm/1JNRCDDIeY/HXfMM47mn4tlRr3EFC6XY23YZtFXDY4eF1Zs
+	MRTRODKkxmDseGU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rWevT-006y2y-9N; Sun, 04 Feb 2024 17:00:59 +0100
+Date: Sun, 4 Feb 2024 17:00:59 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>,
+	David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next 2/3] net: phy: realtek: use generic MDIO
+ constants
+Message-ID: <81779222-dab6-4e11-9fd2-6e447257c0d5@lunn.ch>
+References: <31a83fd9-90ce-402a-84c7-d5c20540b730@gmail.com>
+ <732a70d6-4191-4aae-8862-3716b062aa9e@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 4/7] net: dsa: mt7530: move XTAL check to
- mt7530_setup()
-Content-Language: en-US
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
- Bartel Eerdekens <bartel.eerdekens@constell8.be>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20240202-for-netnext-mt7530-improvements-2-v3-0-63d5adae99ca@arinc9.com>
- <20240202-for-netnext-mt7530-improvements-2-v3-4-63d5adae99ca@arinc9.com>
- <ZbzWpmZrukknMsYf@shell.armlinux.org.uk>
- <5b744f7f-2f63-4219-a0e9-8f08267b1fdd@arinc9.com>
- <Zb021ozEQSbU-gPd@makrotopia.org>
- <f6234b46-ce30-4b2a-9681-15633a06feff@arinc9.com>
- <Zb+ctEe9TVA3zhv8@shell.armlinux.org.uk>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <Zb+ctEe9TVA3zhv8@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
+In-Reply-To: <732a70d6-4191-4aae-8862-3716b062aa9e@gmail.com>
 
-On 4.02.2024 17:18, Russell King (Oracle) wrote:
-> On Sun, Feb 04, 2024 at 04:55:40PM +0300, Arınç ÜNAL wrote:
->> This is not about laziness. This is before patch 2:
->>
->> phylink_mac_ops :: mac_config() -> dsa_port_phylink_mac_config()
->> -> dsa_switch_ops :: phylink_mac_config() -> mt753x_phylink_mac_config()
->>     -> mt753x_mac_config()
->>        -> mt753x_info :: mac_port_config() -> mt7530_mac_config()
->>           -> mt7530_setup_port5()
->>     -> mt753x_pad_setup()
->>        -> mt753x_info :: pad_setup() -> mt7530_pad_clk_setup()
->>
->> This is after:
->>
->> phylink_mac_ops :: mac_config() -> dsa_port_phylink_mac_config()
->> -> dsa_switch_ops :: phylink_mac_config() -> mt753x_phylink_mac_config()
->>     -> mt753x_mac_config()
->>        -> mt753x_info :: mac_port_config() -> mt7530_mac_config()
->>           -> mt7530_setup_port5()
->>           -> mt7530_setup_port6()
->>
->> Patch 2 does not move mt7530_setup_port6() to be called from
->> phylink_mac_ops :: mac_config(), it already is. There is no valid reason to
->> reorder the patches.
->>
->> My response to Russell should've stated this instead of focusing on his
->> second sentence.
+On Sun, Feb 04, 2024 at 03:17:53PM +0100, Heiner Kallweit wrote:
+> From: Marek Beh�n <kabel@kernel.org>
 > 
-> This patch moves the test for a 20MHz crystal to mt7530_setup(),
-> which is something that is entirely orthogonal to patch 2, which
-> can be done cleanly (I've just applied the patches in the original
-> order and then reordered them:
+> Drop the ad-hoc MDIO constants used in the driver and use generic
+> constants instead.
 > 
-> 98c481f5d706 net: dsa: mt7530: do not clear config->supported_interfaces
-> 93c6b53b17f4 net: dsa: mt7530: correct port capabilities of MT7988
-> c9c6d4c51a1d net: dsa: mt7530: simplify mt7530_setup_port6() and change to void
-> adfa948253e0 net: dsa: mt7530: remove pad_setup function pointer
-> 57e21e6c2fc0 net: dsa: mt7530: call port 6 setup from mt7530_mac_config()
-> 959a0f9323c8 net: dsa: mt7530: move XTAL check to mt7530_setup()
-> 856ab64a22ef net: dsa: mt7530: empty default case on mt7530_setup_port5()
+> Signed-off-by: Marek Beh�n <kabel@kernel.org>
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+>  drivers/net/phy/realtek.c | 30 +++++++++++++-----------------
+>  1 file changed, 13 insertions(+), 17 deletions(-)
 > 
-> No problems. The end result is identical comparing the git tree at the
-> original "move XTAL" patch with adfa948253e0.
-> 
-> Now, if we look at "net: dsa: mt7530: remove pad_setup function pointer"
-> we can see that yes, the pad_setup() method was called from mac_confing,
-> but this is the exact contents of that patch removing the callsite:
-> 
-> -               mt753x_pad_setup(ds, state);
-> 
-> This returns an integer, which may be an error code, which is ignored.
-> Therefore, if the XTAL frequency check fires, and mt753x_pad_setup()
-> returns an error, it is ignored today.
-> 
-> After "net: dsa: mt7530: call port 6 setup from mt7530_mac_config()"
-> the renamed pad_setup() method is now called from mac_config() thusly:
-> 
-> +               ret = mt7530_setup_port6(priv->ds, interface);
-> +               if (ret)
-> +                       return ret;
-> 
-> So now the error checks cause mt7530_mac_config() to return an error
-> which in turn causes mt753x_mac_config() to fail, and therefore
-> mt753x_phylink_mac_config() has different behaviour.
-> 
-> So, patch 2 changes the driver behaviour in the case of a 20MHz XTAL,
-> which is then changed again by patch 4.
-> 
-> It would be better to have only one change of behaviour by moving
-> patch 4 before patch 2.
+> diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
+> index 894172a3e..ffc13c495 100644
+> --- a/drivers/net/phy/realtek.c
+> +++ b/drivers/net/phy/realtek.c
+> @@ -57,14 +57,6 @@
+>  #define RTL8366RB_POWER_SAVE			0x15
+>  #define RTL8366RB_POWER_SAVE_ON			BIT(12)
+>  
+> -#define RTL_SUPPORTS_5000FULL			BIT(14)
+> -#define RTL_SUPPORTS_2500FULL			BIT(13)
+> -#define RTL_SUPPORTS_10000FULL			BIT(0)
+> -#define RTL_ADV_2500FULL			BIT(7)
+> -#define RTL_LPADV_10000FULL			BIT(11)
+> -#define RTL_LPADV_5000FULL			BIT(6)
+> -#define RTL_LPADV_2500FULL			BIT(5)
+> -
+>  #define RTL9000A_GINMR				0x14
+>  #define RTL9000A_GINMR_LINK_STATUS		BIT(4)
+>  
+> @@ -674,11 +666,11 @@ static int rtl822x_get_features(struct phy_device *phydev)
+>  		return val;
+>  
+>  	linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
+> -			 phydev->supported, val & RTL_SUPPORTS_2500FULL);
+> +			 phydev->supported, val & MDIO_PMA_SPEED_2_5G);
+>  	linkmode_mod_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
+> -			 phydev->supported, val & RTL_SUPPORTS_5000FULL);
+> +			 phydev->supported, val & MDIO_PMA_SPEED_5G);
+>  	linkmode_mod_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
+> -			 phydev->supported, val & RTL_SUPPORTS_10000FULL);
+> +			 phydev->supported, val & MDIO_SPEED_10G);
 
-If the idea is to not bring any more error returns to mt753x_mac_config()
-because the return code is actually checked for that, I should do a bit
-more effort and put patch 5 before patch 2 as well, to live up to what you
-originally requested. Because, to get rid of all error returns on
-mt7530_setup_port6(), both "net: dsa: mt7530: move XTAL check to
-mt7530_setup()" and "net: dsa: mt7530: simplify mt7530_setup_port6() and
-change to void" patches are needed. After these patches, I can move
-mt7530_setup_port6() to mt7530_mac_config() and there won't be any error
-returns being brought under mt753x_mac_config().
+Now that this only using generic constants, should it move into mdio.h
+as a shared helper? Is this a standard register defined in 802.3, just
+at a different address?
 
-pw-bot: cr
+>  
+>  	return genphy_read_abilities(phydev);
+>  }
+> @@ -692,10 +684,11 @@ static int rtl822x_config_aneg(struct phy_device *phydev)
+>  
+>  		if (linkmode_test_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
+>  				      phydev->advertising))
+> -			adv2500 = RTL_ADV_2500FULL;
+> +			adv2500 = MDIO_AN_10GBT_CTRL_ADV2_5G;
+>  
+>  		ret = phy_modify_paged_changed(phydev, 0xa5d, 0x12,
+> -					       RTL_ADV_2500FULL, adv2500);
+> +					       MDIO_AN_10GBT_CTRL_ADV2_5G,
+> +					       adv2500);
+>  		if (ret < 0)
+>  			return ret;
+>  	}
+> @@ -714,11 +707,14 @@ static int rtl822x_read_status(struct phy_device *phydev)
+>  			return lpadv;
+>  
+>  		linkmode_mod_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
+> -			phydev->lp_advertising, lpadv & RTL_LPADV_10000FULL);
+> +				 phydev->lp_advertising,
+> +				 lpadv & MDIO_AN_10GBT_STAT_LP10G);
+>  		linkmode_mod_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
+> -			phydev->lp_advertising, lpadv & RTL_LPADV_5000FULL);
+> +				 phydev->lp_advertising,
+> +				 lpadv & MDIO_AN_10GBT_STAT_LP5G);
+>  		linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
+> -			phydev->lp_advertising, lpadv & RTL_LPADV_2500FULL);
+> +				 phydev->lp_advertising,
+> +				 lpadv & MDIO_AN_10GBT_STAT_LP2_5G);
 
-Arınç
+Is this mii_10gbt_stat_mod_linkmode_lpa_t() ?
+
+Something i've done in the past is to do this sort of conversion to
+standard macros, and the followed up with a patch which says that
+function X is now clearly the same as helper Y, so delete the function
+and use the helper...
+
+    Andrew
 
