@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-68929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13DA1848E25
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 14:40:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2750D848E23
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 14:40:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8E717B2346A
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 948AC1F22504
 	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 13:40:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED148225A6;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E78D6224FA;
 	Sun,  4 Feb 2024 13:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WXaosBf1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BuPESfVi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C152B224DF;
-	Sun,  4 Feb 2024 13:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C15B9224E4
+	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 13:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707054026; cv=none; b=rGxuLk5jD6seNCO7s1PcwAJ7mi4bPpLSKo4ySr9sruNrirorG6nO0rD4nhTjDsxWd+ORUVJAZAOH+fG30i/c+0vlylY+X44YlMrMRIbi8/cV5Gi1YFcs9AGlCc4iNJz4UkM6IIzPC4qAusCi7fjsFUyH+eCO3ZVVtFk/A0JWmnc=
+	t=1707054026; cv=none; b=ajfSQ6gW26OmYGRoNAiBEkt4aixN6fnTS/VmWYqnCg4ZX4aaSqoC2xJvlKf77kPi9dJ55AzS5RJtBPG8mJisXG5+swk7AlslsnnHnYXIoOwz+GUXJb2wptPUgPxV299GQF4dSXCJwOTO9BE6CO5aBD2XGZJCDEOyFmVqfPjrrEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707054026; c=relaxed/simple;
-	bh=OJjL0eHrtB3aaiQK3MnXRIjcVA/y6SezjGXj0aLGYJY=;
+	bh=MadHqkVyeM/YJgRXrnBai2otsbDMDP189B7WCqWKGhk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ITFMd0tdvLx0xSMl0g2S6nyELr664IfJ5atTL7XRfpS9ze4B+olGnP8B8hwZbsvLUK7LUfBKHSINee0yqofblXVtJzL66sSEMRsLtUA0PIg0TxspQQVEHZCRv7+5lQXxPVqExeuGwgOmMgIwRKJt5Eoz+ucLRFYVRLympUa4SIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WXaosBf1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 641C8C43609;
+	 In-Reply-To:To:Cc; b=m4drbE/ZyuXke/ZFMyKwUQdBykNbwmNdPDF7t2XJlA4Dw4gbMsnEzGmea6CNJwo8KNfGKpGxwaq/KzkXEOtFNM+OKAcbRBQ+nEOXE8e/+TsbxycRgbskNRkZ3t7Gpw4bhNi/OYAixyvY+HgEm1POJNnLlc6n701oW20xly+SFEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BuPESfVi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5F12AC433B2;
 	Sun,  4 Feb 2024 13:40:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707054026;
-	bh=OJjL0eHrtB3aaiQK3MnXRIjcVA/y6SezjGXj0aLGYJY=;
+	bh=MadHqkVyeM/YJgRXrnBai2otsbDMDP189B7WCqWKGhk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WXaosBf1Oe6aEN0iK9D/hmV2qpokGxJUwI6+N8HwpR3TLRzDT4L2xp6sp4DU19yF3
-	 D9JP7JegzrUiRLZundstUsmHOgDRpGH5ObDKU3AgGR/dSCVDibkdk+vl+zuWOEB6nv
-	 ylfTXkgRbzbp/FgvQWH+GtEN0FD6dwNe3xsb35Ek8tc7RIUspXFyuIenthjh7P/Jfs
-	 Ku714ycxyn8Zen9dT5S98v8xCInXZVzn9o+Osd66xAjVINdQVTHzHzV8U099PyCbaF
-	 R8vD/5eRdemWEMjZGBbnVWqe5/3QSehPyYGssJ22xz3ED4XxyknFBf91+Y5gjW0xdY
-	 vK3UhPRBMV8UA==
+	b=BuPESfVigWFtoqK/jLRil3sb9MfEigMpRhz2x4vS14+K0DZXmvmxAHq723/sWz6yQ
+	 PXO3Z46qBlYCacCECjfAmST/OTCQEIy9qXo4ycy/nMpvJN3g8SX6K3n1l6D2BN+2fG
+	 uhl/f0HxP6zvA9Ev1+sW3hc+/flBkmNpAfhoGIiqgJupUxL8+FFhB+9BuXU3hg4s7n
+	 vxghcFTb2xVWWcB6IlfQspOyv7YrxCU/du+H68DBc0F1WO0Xs3VNtR1Mq2hbjy3EvT
+	 MVVQxw5MiqlPxcyqkug82OnUQgIf4EUaShkDe1ScgC4dWZNBz74UQmZNGxvzYco5zC
+	 RxtxvwXgsk5gw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4B197E2F2EF;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4264EE2F2F3;
 	Sun,  4 Feb 2024 13:40:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,37 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: netdevsim: stop using ifconfig
+Subject: Re: [PATCH net-next] r8169: add support for RTL8126A
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170705402630.16095.15168853521199745138.git-patchwork-notify@kernel.org>
+ <170705402626.16095.1642488959165467062.git-patchwork-notify@kernel.org>
 Date: Sun, 04 Feb 2024 13:40:26 +0000
-References: <20240202001154.414386-1-kuba@kernel.org>
-In-Reply-To: <20240202001154.414386-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, shuah@kernel.org, horms@kernel.org,
- linux-kselftest@vger.kernel.org
+References: <c2eaaf79-600a-4162-b439-8dbd7e7033fd@gmail.com>
+In-Reply-To: <c2eaaf79-600a-4162-b439-8dbd7e7033fd@gmail.com>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: nic_swsd@realtek.com, pabeni@redhat.com, edumazet@google.com,
+ davem@davemloft.net, kuba@kernel.org, netdev@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu,  1 Feb 2024 16:11:54 -0800 you wrote:
-> Paolo points out that ifconfig is legacy and we should not use it.
+On Thu, 1 Feb 2024 22:38:01 +0100 you wrote:
+> This adds support for the RTL8126A found on Asus z790 Maximus Formula.
+> It was successfully tested w/o the firmware at 1000Mbps. Firmware file
+> has been provided by Realtek and submitted to linux-firmware.
+> 2.5G and 5G modes are untested.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: shuah@kernel.org
-> CC: horms@kernel.org
-> CC: linux-kselftest@vger.kernel.org
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] selftests: netdevsim: stop using ifconfig
-    https://git.kernel.org/netdev/net-next/c/e35ba5811714
+  - [net-next] r8169: add support for RTL8126A
+    https://git.kernel.org/netdev/net-next/c/3907f1ffc0ec
 
 You are awesome, thank you!
 -- 
