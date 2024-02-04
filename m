@@ -1,370 +1,189 @@
-Return-Path: <netdev+bounces-68875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85C998489C0
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 00:10:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 291EA8489DC
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 01:17:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03A291F240DF
-	for <lists+netdev@lfdr.de>; Sat,  3 Feb 2024 23:10:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5775D1C21781
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 00:17:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C1F12E6D;
-	Sat,  3 Feb 2024 23:10:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 950C923BB;
+	Sun,  4 Feb 2024 00:17:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iLP8U7Zt"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KphYGOmh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D257A12B61
-	for <netdev@vger.kernel.org>; Sat,  3 Feb 2024 23:10:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 949131C0F
+	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 00:17:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707001803; cv=none; b=C0yICvUWGACTGmU6o3Zcd6vsg9faRv5z2IAP077bMIzKufwAF7AcQqa1eT91r7oAsZljUXDzzc67eyhawuJ60leY0lCGuW6Gv5BB8LB79IO/aFCSAX3Hv9qbUZpot064IkE049Hs7roBbTbOgeZ9Ti5s2xv8V0IEGgePrBIG8WY=
+	t=1707005827; cv=none; b=AIXoj0p0PaqmLsA6yKa3MSFLim4QLP02Deopt3Gfixd0ALTTcSxbNKAV+FhkXFEl60+p4TyNtta6yO85oueCfnxow+MOhlWGt03TnQBdw32mGlY+X7DetXjWnBTYPbZsusK69QgIJLIy7zgs48OPZSNImMkoQVGnmkg+NmV75ZA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707001803; c=relaxed/simple;
-	bh=HGkF/CqE3c8q1WZWK+VMHycoTGRWW2HljyefBPE5u7M=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=RM/wjGCu5F7nLrC4KKuik9cgKneY5iaOMEsxj913n3kuxeiSxZ/EYGolsu3N0n/CyEpM1aVAbwt1BYVW+t+1HWG4aEjojSCdg537pdcU6lX8TZ3BtsKeypxLw0l9NNK8nPAOp+F5oOYgmIwQ5kIxevbNZx7aLMFVI9yMBebkEE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iLP8U7Zt; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-55ee686b5d5so4331267a12.0
-        for <netdev@vger.kernel.org>; Sat, 03 Feb 2024 15:10:00 -0800 (PST)
+	s=arc-20240116; t=1707005827; c=relaxed/simple;
+	bh=oak8IhRNNb+TYQbl1lbAVJq2CzVvoTeJVIp3fuABNkg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=D/y0puPiGRWF3plDvQGwIIp/DuIjA1xK+KZJCF7k084HeSk0IP7EBd3Ht8MNHPm/mG+ywqAUVSyZezHEZWsqZhDp5A1ZXKKeSTM4k+TSjbf99IjdxLUzq6rYnr96Zat9e9aPZf3vA64NoZYOFU64uTaO4FYM29k0ZRaFReMHlsE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KphYGOmh; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40ef6f10b56so28673625e9.2
+        for <netdev@vger.kernel.org>; Sat, 03 Feb 2024 16:17:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707001799; x=1707606599; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2cCXVW/Si+O9P1vSFVdsSBbl4rcrmHbqZK0JNYdEOz4=;
-        b=iLP8U7ZtxseNX1s9HseIfujvlOjXYec3eWlmVPWg5U4k8GVme4YreCOhoqYKMtnSWH
-         uQ+JI2m8TjaJZk+nxHJRgSpQUfTek9F+bjJGjGose0YbjfM+r7it4oPlkwb4W2WxM3eD
-         SaHKckKSkwANHf//f9GBatptdd2UK0YZSo/ZLavZZIMhy+e2NIDJuQsk9BBqFnLwCil6
-         T3NGD6U2Nh1Q9bqvfrwsqqIzv2qRxeBmwWHwsFVG4UwwDszLg80xAbzNkepANqkEb7Ri
-         qwgoiBZTR9/+8jDNybRlWQp7r55FQ32R7ZQju7YreaRopOEKMaIAvkYBT6/l0ZSbk0q4
-         fWhQ==
+        d=broadcom.com; s=google; t=1707005824; x=1707610624; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=lYCj6G13n4mFvN+J2OiKkwt/6ykaIxsIipC5lFoo48I=;
+        b=KphYGOmhhxuBTkiJfN858GXBNeCXrOYxop9FmpdjKqfpPyK6RLHocYpnLBs4FXtc30
+         wLk3j0DU1b+J4U5H/kEDdfz9NvbUOf4WvqpKwjvXYtCqF88YpI0e/nEeonWUrdfE82E0
+         j/1k0HPZIVKITSrqb4+XZN2OC0lfd+9Qfzgco=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707001799; x=1707606599;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2cCXVW/Si+O9P1vSFVdsSBbl4rcrmHbqZK0JNYdEOz4=;
-        b=Pzd98ER+XeuCvcTJJ4J5RKna/Oyq2bQ3PYSP3CO6hGwQvrFqhJY/J2Xj598NQBkEhL
-         PX2/dXQa9DplSAAmJUm1/Hn9XV0UIpxpsEscvY7V03swiBAUKJHaXl9Dl9EAY4hl9krY
-         tqTtv/gTLwupRfRciMZ/7ePCSjyGehGnsJ3ObNZ5r72o1udJsrPfXu0d7eRTtKPQ0tpg
-         mIRfKSPl1nVIIKklRJsY5dc5XTFY02LS2j+biMpRh8fbFPCRLh+FDQY+Am6uEJk50qPk
-         oLFGVa71BoA6tZDmG0Wk8i6l8nwCwhiOdvXpwa1PKkMARijNuVpf4sXvz6kGRi6XDpDr
-         ZRaQ==
-X-Gm-Message-State: AOJu0YwXdp3ePTSy24pjRu2sahp8h0c8PZzwhGZ0c9P7K/6hUqQhmfB0
-	+qYd1jmo8WxeVdUjHihfms0vg7mZy/uDOyBKpMgYQ8KlhaxCEw5L
-X-Google-Smtp-Source: AGHT+IFnIRP6rYlXFG3mlQvShQyPytUAySKBez6qAiErOPFxPfFAlPsdm+/u6bVBxuXNEtu9RUBmXg==
-X-Received: by 2002:aa7:da88:0:b0:560:24e:3ca9 with SMTP id q8-20020aa7da88000000b00560024e3ca9mr2230437eds.0.1707001798808;
-        Sat, 03 Feb 2024 15:09:58 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCV2/ANDdDyKwKie2HnDnGyl+LRd/u8Tk4LAFHu5n1UK+uXeG/rmxA21bmyvXL+MP+ox6TS1LgBjoTeE5e/Yd5POCv//Tm46cj9T7pSZ4dABdtZboocXFsTUDrRuU3Aup5sgT/sTAm5SUbV48Z9JEiHZKExvZqN1TpBnS/+9TvD7g+l1+rP75AWEr8W9ppg7TNVcpFvesY7dlTEwaKQQ15nalI6EJVDiNnJCkvmg2Q==
-Received: from ?IPV6:2a01:c23:bde4:a000:48dd:a4bf:88d3:e6ac? (dynamic-2a01-0c23-bde4-a000-48dd-a4bf-88d3-e6ac.c23.pool.telefonica.de. [2a01:c23:bde4:a000:48dd:a4bf:88d3:e6ac])
-        by smtp.googlemail.com with ESMTPSA id x4-20020a056402414400b0055ff68cce5asm1836398eda.27.2024.02.03.15.09.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 03 Feb 2024 15:09:58 -0800 (PST)
-Message-ID: <37792c4f-6ad9-4af0-bb7b-ca9888a7339f@gmail.com>
-Date: Sun, 4 Feb 2024 00:09:58 +0100
+        d=1e100.net; s=20230601; t=1707005824; x=1707610624;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lYCj6G13n4mFvN+J2OiKkwt/6ykaIxsIipC5lFoo48I=;
+        b=Bs/J8UgMwUJH6IS2QGTvH12wqGNdIDY4gOe+Om3abAd1dWhD/m+l6JLvsb/AmneL8d
+         zh7W4ovpiA4vdMeS5jGoxOw+BZDU7NFpwdSxaB/eNM3keyZqs9tM3NEu7wPQxrbPHgEq
+         w5eLnnmC9gOPU+G4dDhaii1BfCgiM2P0TT+zCZasDQnLAWq7qz0VexD6JL9yNZHfHlmz
+         SuLEjpS6rHjUQy+q1l6hXum4/KlWwevbQDFYmbLJfSIeXpQZufgSUbvHSBBzT15KXzKn
+         m8pQu4BOksLZYk3xcjk/mludqmG1WWoRSs8pgig0WpqIb0mKS30r52Fk7LrixsiGaU2+
+         JbAQ==
+X-Gm-Message-State: AOJu0YxKbirfGVIfK4uVqYZ1mbEi8LZbQDXGd380ixWgNfdBhGiRpnLt
+	KPzmxlcczSwGmU/ZR0yT4XUXiF+DS3LdjwarOpzh+sQyj6IFGBQGP94T8CmHXG9x7F4xUmBdCAX
+	x+oXXmp4BOmHSXoPyJr/WqDFUdFUfjcXzyH/4
+X-Google-Smtp-Source: AGHT+IFzmQFcc8VtiB9RXLK/dWvxxF6qwW28NMrZ5NKrRXOTAmpl7gaRqfU/L9VG+KD4AmsxDz+anOHMaGODOgXb1Lk=
+X-Received: by 2002:a5d:4643:0:b0:33b:251c:60d9 with SMTP id
+ j3-20020a5d4643000000b0033b251c60d9mr3324954wrs.10.1707005823390; Sat, 03 Feb
+ 2024 16:17:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- Andrew Lunn <andrew@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Michael Chan <michael.chan@broadcom.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH v2 net-next] bnxt: convert EEE handling to use linkmode
- bitmaps
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
- sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
- MVE4yNwdS+UsPeCF/6CQQTzHc+n7DomE7fjJD5J1hOJjqz2XWe71fTvYXzxCFLwXXbBiqDC9
- dNqOe5odPsa4TsWZ09T33g5n2nzTJs4Zw8fCy8rLqix/raVsqr8fw5qM66MVtdmEljFaJ9N8
- /W56qGCp+H8Igk/F7CjlbWXiOlKHA25mPTmbVp7VlFsvsmMokr/imQr+0nXtmvYVaKEUwY2g
- 86IU6RAOuA8E0J5bD/BeyZdMyVEtX1kT404UJZekFytJZrDZetwxM/cAH+1fMx4z751WJmxQ
- J7mIXSPuDfeJhRDt9sGM6aRVfXbZt+wBogxyXepmnlv9K4A13z9DVLdKLrYUiu9/5QEl6fgI
- kPaXlAZmJsQfoKbmPqCHVRYj1lpQtDM/2/BO6gHASflWUHzwmBVZbS/XRs64uJO8CB3+V3fa
- cIivllReueGCMsHh6/8wgPAyopXOWOxbLsZ291fmZqIR0L5Y6b2HvdFN1Xhc+YrQ8TKK+Z4R
- mJRDh0wNQ8Gm89g92/YkHji4jIWlp2fwzCcx5+lZCQ1XdqAiHQARAQABzSZIZWluZXIgS2Fs
- bHdlaXQgPGhrYWxsd2VpdDFAZ21haWwuY29tPsLBjgQTAQgAOBYhBGxfqY/yOyXjyjJehXLe
- ig9U8DoMBQJf9GRVAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEHLeig9U8DoMSycQ
- AJbfg8HZEK0ljV4M8nvdaiNixWAufrcZ+SD8zhbxl8GispK4F3Yo+20Y3UoZ7FcIidJWUUJL
- axAOkpI/70YNhlqAPMsuudlAieeYZKjIv1WV5ucNZ3VJ7dC+dlVqQdAr1iD869FZXvy91KhJ
- wYulyCf+s4T9YgmLC6jLMBZghKIf1uhSd0NzjyCqYWbk2ZxByZHgunEShOhHPHswu3Am0ftt
- ePaYIHgZs+Vzwfjs8I7EuW/5/f5G9w1vibXxtGY/GXwgGGHRDjFM7RSprGOv4F5eMGh+NFUJ
- TU9N96PQYMwXVxnQfRXl8O6ffSVmFx4H9rovxWPKobLmqQL0WKLLVvA/aOHCcMKgfyKRcLah
- 57vGC50Ga8oT2K1g0AhKGkyJo7lGXkMu5yEs0m9O+btqAB261/E3DRxfI1P/tvDZpLJKtq35
- dXsj6sjvhgX7VxXhY1wE54uqLLHY3UZQlmH3QF5t80MS7/KhxB1pO1Cpcmkt9hgyzH8+5org
- +9wWxGUtJWNP7CppY+qvv3SZtKJMKsxqk5coBGwNkMms56z4qfJm2PUtJQGjA65XWdzQACib
- 2iaDQoBqGZfXRdPT0tC1H5kUJuOX4ll1hI/HBMEFCcO8++Bl2wcrUsAxLzGvhINVJX2DAQaF
- aNetToazkCnzubKfBOyiTqFJ0b63c5dqziAgzsFNBF/0ZFUBEADF8UEZmKDl1w/UxvjeyAeX
- kghYkY3bkK6gcIYXdLRfJw12GbvMioSguvVzASVHG8h7NbNjk1yur6AONfbUpXKSNZ0skV8V
- fG+ppbaY+zQofsSMoj5gP0amwbwvPzVqZCYJai81VobefTX2MZM2Mg/ThBVtGyzV3NeCpnBa
- 8AX3s9rrX2XUoCibYotbbxx9afZYUFyflOc7kEpc9uJXIdaxS2Z6MnYLHsyVjiU6tzKCiVOU
- KJevqvzPXJmy0xaOVf7mhFSNQyJTrZpLa+tvB1DQRS08CqYtIMxRrVtC0t0LFeQGly6bOngr
- ircurWJiJKbSXVstLHgWYiq3/GmCSx/82ObeLO3PftklpRj8d+kFbrvrqBgjWtMH4WtK5uN5
- 1WJ71hWJfNchKRlaJ3GWy8KolCAoGsQMovn/ZEXxrGs1ndafu47yXOpuDAozoHTBGvuSXSZo
- ythk/0EAuz5IkwkhYBT1MGIAvNSn9ivE5aRnBazugy0rTRkVggHvt3/7flFHlGVGpBHxFUwb
- /a4UjJBPtIwa4tWR8B1Ma36S8Jk456k2n1id7M0LQ+eqstmp6Y+UB+pt9NX6t0Slw1NCdYTW
- gJezWTVKF7pmTdXszXGxlc9kTrVUz04PqPjnYbv5UWuDd2eyzGjrrFOsJEi8OK2d2j4FfF++
- AzOMdW09JVqejQARAQABwsF2BBgBCAAgFiEEbF+pj/I7JePKMl6Fct6KD1TwOgwFAl/0ZFUC
- GwwACgkQct6KD1TwOgxUfg//eAoYc0Vm4NrxymfcY30UjHVD0LgSvU8kUmXxil3qhFPS7KA+
- y7tgcKLHOkZkXMX5MLFcS9+SmrAjSBBV8omKoHNo+kfFx/dUAtz0lot8wNGmWb+NcHeKM1eb
- nwUMOEa1uDdfZeKef/U/2uHBceY7Gc6zPZPWgXghEyQMTH2UhLgeam8yglyO+A6RXCh+s6ak
- Wje7Vo1wGK4eYxp6pwMPJXLMsI0ii/2k3YPEJPv+yJf90MbYyQSbkTwZhrsokjQEaIfjrIk3
- rQRjTve/J62WIO28IbY/mENuGgWehRlTAbhC4BLTZ5uYS0YMQCR7v9UGMWdNWXFyrOB6PjSu
- Trn9MsPoUc8qI72mVpxEXQDLlrd2ijEWm7Nrf52YMD7hL6rXXuis7R6zY8WnnBhW0uCfhajx
- q+KuARXC0sDLztcjaS3ayXonpoCPZep2Bd5xqE4Ln8/COCslP7E92W1uf1EcdXXIrx1acg21
- H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
- lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
- OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <10510abd-ac26-42d0-8222-8b01fe9b8059@gmail.com> <e65b8525-eae0-4143-aa57-009b47f09005@lunn.ch>
+In-Reply-To: <e65b8525-eae0-4143-aa57-009b47f09005@lunn.ch>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Sat, 3 Feb 2024 16:16:51 -0800
+Message-ID: <CACKFLinhkS8-=QtZu9Es9ATiSMAyosuCfuPVFUOxzqJk4Tr2rA@mail.gmail.com>
+Subject: Re: [PATCH net-next] bnxt: convert EEE handling to use linkmode bitmaps
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	David Miller <davem@davemloft.net>, Russell King - ARM Linux <linux@armlinux.org.uk>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000c56a5f06108343c6"
 
-Convert EEE handling to use linkmode bitmaps. This prepares for removing
-the legacy bitmaps from struct ethtool_keee. No functional change
-intended. When replacing _bnxt_fw_to_ethtool_adv_spds() with
-_bnxt_fw_to_linkmode(), remove the fw_pause argument because it's
-always passed as 0.
+--000000000000c56a5f06108343c6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
-v2:
-- add missing conversions
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 21 +++---
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 65 ++++++++-----------
- .../net/ethernet/broadcom/bnxt/bnxt_ethtool.h |  4 +-
- 3 files changed, 40 insertions(+), 50 deletions(-)
+On Sat, Feb 3, 2024 at 1:59=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > -     if (!edata->advertised_u32) {
+> > -             edata->advertised_u32 =3D advertising & eee->supported_u3=
+2;
+> > -     } else if (edata->advertised_u32 & ~advertising) {
+> > -             netdev_warn(dev, "EEE advertised %x must be a subset of a=
+utoneg advertised speeds %x\n",
+> > -                         edata->advertised_u32, advertising);
+>
+> That warning text looks wrong. I think it should be
+>
+> EEE advertised %x must be a subset of autoneg supported speeds %x
+>
+> and it should print eee->supported, not advertising.
+>
+I think it is correct.  EEE advertised must be a subset of the
+advertised speed.  Let's say we are only advertising 1G for speed,
+then EEE must not advertise more than 1G.  Advertising for more than
+1G doesn't make sense anyway because it will only link up at 1G.
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index fde32b32f..8fe8a73ff 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -10624,7 +10624,7 @@ static int bnxt_hwrm_phy_qcaps(struct bnxt *bp)
- 		struct ethtool_keee *eee = &bp->eee;
- 		u16 fw_speeds = le16_to_cpu(resp->supported_speeds_eee_mode);
- 
--		eee->supported_u32 = _bnxt_fw_to_ethtool_adv_spds(fw_speeds, 0);
-+		_bnxt_fw_to_linkmode(eee->supported, fw_speeds);
- 		bp->lpi_tmr_lo = le32_to_cpu(resp->tx_lpi_timer_low) &
- 				 PORT_PHY_QCAPS_RESP_TX_LPI_TIMER_LOW_MASK;
- 		bp->lpi_tmr_hi = le32_to_cpu(resp->valid_tx_lpi_timer_high) &
-@@ -10775,8 +10775,7 @@ int bnxt_update_link(struct bnxt *bp, bool chng_link_state)
- 			eee->eee_active = 1;
- 			fw_speeds = le16_to_cpu(
- 				resp->link_partner_adv_eee_link_speed_mask);
--			eee->lp_advertised_u32 =
--				_bnxt_fw_to_ethtool_adv_spds(fw_speeds, 0);
-+			_bnxt_fw_to_linkmode(eee->lp_advertised, fw_speeds);
- 		}
- 
- 		/* Pull initial EEE config */
-@@ -10786,8 +10785,7 @@ int bnxt_update_link(struct bnxt *bp, bool chng_link_state)
- 				eee->eee_enabled = 1;
- 
- 			fw_speeds = le16_to_cpu(resp->adv_eee_link_speed_mask);
--			eee->advertised_u32 =
--				_bnxt_fw_to_ethtool_adv_spds(fw_speeds, 0);
-+			_bnxt_fw_to_linkmode(eee->advertised, fw_speeds);
- 
- 			if (resp->eee_config_phy_addr &
- 			    PORT_PHY_QCFG_RESP_EEE_CONFIG_EEE_TX_LPI) {
-@@ -10969,7 +10967,7 @@ static void bnxt_hwrm_set_eee(struct bnxt *bp,
- 			flags |= PORT_PHY_CFG_REQ_FLAGS_EEE_TX_LPI_DISABLE;
- 
- 		req->flags |= cpu_to_le32(flags);
--		eee_speeds = bnxt_get_fw_auto_link_speeds(eee->advertised_u32);
-+		eee_speeds = bnxt_get_fw_auto_link_speeds(eee->advertised);
- 		req->eee_link_speed_mask = cpu_to_le16(eee_speeds);
- 		req->tx_lpi_timer = cpu_to_le32(eee->tx_lpi_timer);
- 	} else {
-@@ -11329,15 +11327,18 @@ static bool bnxt_eee_config_ok(struct bnxt *bp)
- 		return true;
- 
- 	if (eee->eee_enabled) {
--		u32 advertising =
--			_bnxt_fw_to_ethtool_adv_spds(link_info->advertising, 0);
-+		__ETHTOOL_DECLARE_LINK_MODE_MASK(advertising);
-+		__ETHTOOL_DECLARE_LINK_MODE_MASK(tmp);
-+
-+		_bnxt_fw_to_linkmode(advertising, link_info->advertising);
- 
- 		if (!(link_info->autoneg & BNXT_AUTONEG_SPEED)) {
- 			eee->eee_enabled = 0;
- 			return false;
- 		}
--		if (eee->advertised_u32 & ~advertising) {
--			eee->advertised_u32 = advertising & eee->supported_u32;
-+		if (linkmode_andnot(tmp, eee->advertised, advertising)) {
-+			linkmode_and(eee->advertised, advertising,
-+				     eee->supported);
- 			return false;
- 		}
- 	}
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index 481b835a7..482ce88b1 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -1751,31 +1751,21 @@ static int bnxt_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
- 	return 0;
- }
- 
--u32 _bnxt_fw_to_ethtool_adv_spds(u16 fw_speeds, u8 fw_pause)
-+/* TODO: support 25GB, 40GB, 50GB with different cable type */
-+void _bnxt_fw_to_linkmode(unsigned long *mode, u16 fw_speeds)
- {
--	u32 speed_mask = 0;
-+	linkmode_zero(mode);
- 
--	/* TODO: support 25GB, 40GB, 50GB with different cable type */
--	/* set the advertised speeds */
- 	if (fw_speeds & BNXT_LINK_SPEED_MSK_100MB)
--		speed_mask |= ADVERTISED_100baseT_Full;
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT, mode);
- 	if (fw_speeds & BNXT_LINK_SPEED_MSK_1GB)
--		speed_mask |= ADVERTISED_1000baseT_Full;
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT, mode);
- 	if (fw_speeds & BNXT_LINK_SPEED_MSK_2_5GB)
--		speed_mask |= ADVERTISED_2500baseX_Full;
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_2500baseX_Full_BIT, mode);
- 	if (fw_speeds & BNXT_LINK_SPEED_MSK_10GB)
--		speed_mask |= ADVERTISED_10000baseT_Full;
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT, mode);
- 	if (fw_speeds & BNXT_LINK_SPEED_MSK_40GB)
--		speed_mask |= ADVERTISED_40000baseCR4_Full;
--
--	if ((fw_pause & BNXT_LINK_PAUSE_BOTH) == BNXT_LINK_PAUSE_BOTH)
--		speed_mask |= ADVERTISED_Pause;
--	else if (fw_pause & BNXT_LINK_PAUSE_TX)
--		speed_mask |= ADVERTISED_Asym_Pause;
--	else if (fw_pause & BNXT_LINK_PAUSE_RX)
--		speed_mask |= ADVERTISED_Pause | ADVERTISED_Asym_Pause;
--
--	return speed_mask;
-+		linkmode_set_bit(ETHTOOL_LINK_MODE_40000baseCR4_Full_BIT, mode);
- }
- 
- enum bnxt_media_type {
-@@ -2643,23 +2633,22 @@ bnxt_force_link_speed(struct net_device *dev, u32 ethtool_speed, u32 lanes)
- 	return 0;
- }
- 
--u16 bnxt_get_fw_auto_link_speeds(u32 advertising)
-+u16 bnxt_get_fw_auto_link_speeds(const unsigned long *mode)
- {
- 	u16 fw_speed_mask = 0;
- 
--	/* only support autoneg at speed 100, 1000, and 10000 */
--	if (advertising & (ADVERTISED_100baseT_Full |
--			   ADVERTISED_100baseT_Half)) {
-+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT, mode) ||
-+	    linkmode_test_bit(ETHTOOL_LINK_MODE_100baseT_Half_BIT, mode))
- 		fw_speed_mask |= BNXT_LINK_SPEED_MSK_100MB;
--	}
--	if (advertising & (ADVERTISED_1000baseT_Full |
--			   ADVERTISED_1000baseT_Half)) {
-+
-+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT, mode) ||
-+	    linkmode_test_bit(ETHTOOL_LINK_MODE_1000baseT_Half_BIT, mode))
- 		fw_speed_mask |= BNXT_LINK_SPEED_MSK_1GB;
--	}
--	if (advertising & ADVERTISED_10000baseT_Full)
-+
-+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT, mode))
- 		fw_speed_mask |= BNXT_LINK_SPEED_MSK_10GB;
- 
--	if (advertising & ADVERTISED_40000baseCR4_Full)
-+	if (linkmode_test_bit(ETHTOOL_LINK_MODE_40000baseCR4_Full_BIT, mode))
- 		fw_speed_mask |= BNXT_LINK_SPEED_MSK_40GB;
- 
- 	return fw_speed_mask;
-@@ -3886,10 +3875,11 @@ static int bnxt_set_eeprom(struct net_device *dev,
- 
- static int bnxt_set_eee(struct net_device *dev, struct ethtool_keee *edata)
- {
-+	__ETHTOOL_DECLARE_LINK_MODE_MASK(advertising);
-+	__ETHTOOL_DECLARE_LINK_MODE_MASK(tmp);
- 	struct bnxt *bp = netdev_priv(dev);
- 	struct ethtool_keee *eee = &bp->eee;
- 	struct bnxt_link_info *link_info = &bp->link_info;
--	u32 advertising;
- 	int rc = 0;
- 
- 	if (!BNXT_PHY_CFG_ABLE(bp))
-@@ -3899,7 +3889,7 @@ static int bnxt_set_eee(struct net_device *dev, struct ethtool_keee *edata)
- 		return -EOPNOTSUPP;
- 
- 	mutex_lock(&bp->link_lock);
--	advertising = _bnxt_fw_to_ethtool_adv_spds(link_info->advertising, 0);
-+	_bnxt_fw_to_linkmode(advertising, link_info->advertising);
- 	if (!edata->eee_enabled)
- 		goto eee_ok;
- 
-@@ -3919,16 +3909,15 @@ static int bnxt_set_eee(struct net_device *dev, struct ethtool_keee *edata)
- 			edata->tx_lpi_timer = eee->tx_lpi_timer;
- 		}
- 	}
--	if (!edata->advertised_u32) {
--		edata->advertised_u32 = advertising & eee->supported_u32;
--	} else if (edata->advertised_u32 & ~advertising) {
--		netdev_warn(dev, "EEE advertised %x must be a subset of autoneg advertised speeds %x\n",
--			    edata->advertised_u32, advertising);
-+	if (linkmode_empty(edata->advertised)) {
-+		linkmode_and(edata->advertised, advertising, eee->supported);
-+	} else if (linkmode_andnot(tmp, edata->advertised, advertising)) {
-+		netdev_warn(dev, "EEE advertised must be a subset of autoneg advertised speeds\n");
- 		rc = -EINVAL;
- 		goto eee_exit;
- 	}
- 
--	eee->advertised_u32 = edata->advertised_u32;
-+	linkmode_copy(eee->advertised, edata->advertised);
- 	eee->tx_lpi_enabled = edata->tx_lpi_enabled;
- 	eee->tx_lpi_timer = edata->tx_lpi_timer;
- eee_ok:
-@@ -3954,12 +3943,12 @@ static int bnxt_get_eee(struct net_device *dev, struct ethtool_keee *edata)
- 		/* Preserve tx_lpi_timer so that the last value will be used
- 		 * by default when it is re-enabled.
- 		 */
--		edata->advertised_u32 = 0;
-+		linkmode_zero(edata->advertised);
- 		edata->tx_lpi_enabled = 0;
- 	}
- 
- 	if (!bp->eee.eee_active)
--		edata->lp_advertised_u32 = 0;
-+		linkmode_zero(edata->lp_advertised);
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.h b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.h
-index a8ecef8ab..0ea0f4a36 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.h
-@@ -46,9 +46,9 @@ struct bnxt_led_cfg {
- extern const struct ethtool_ops bnxt_ethtool_ops;
- 
- u32 bnxt_get_rxfh_indir_size(struct net_device *dev);
--u32 _bnxt_fw_to_ethtool_adv_spds(u16, u8);
-+void _bnxt_fw_to_linkmode(unsigned long *mode, u16 fw_speeds);
- u32 bnxt_fw_to_ethtool_speed(u16);
--u16 bnxt_get_fw_auto_link_speeds(u32);
-+u16 bnxt_get_fw_auto_link_speeds(const unsigned long *mode);
- int bnxt_hwrm_nvm_get_dev_info(struct bnxt *bp,
- 			       struct hwrm_nvm_get_dev_info_output *nvm_dev_info);
- int bnxt_hwrm_firmware_reset(struct net_device *dev, u8 proc_type,
--- 
-2.43.0
+--000000000000c56a5f06108343c6
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIFapmrHVgs+ziwCDeq9c8ahfLSs73uBO
+Sx86wI1aGc++MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIw
+NDAwMTcwNFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQBN+ZZOqGxZvWAFpmANj9SbxeEPXrPQt8vzocpCeQbmTMlO1QEt
+wGItkt/AKiSycAwJ1xdN5/rQAHXEGMbMGrU5bBpv13rXJgjqCAFbg2lJwjpm9JVWqTZWxMPUfPw+
+Kon+HI+lMd4weHR8uot6dmUV2Uh7XLPsioL3nAHJnFvG4LXPS4HU9KuiYIoCL6tS9kbH8t5w26XZ
+qtVCP2dYwxpKfUhJg9lCbYRipJpYEOuGRI8AYiV1KlM8KxUNHjVKeLBiS594n5OgBKbtLcT3EC0y
+SJRYxlZuQgNlUphpc8aJPac40su5rqi5GJNBC+QjpvfSg/6VuZ8z3cocpmNtFy06
+--000000000000c56a5f06108343c6--
 
