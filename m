@@ -1,121 +1,235 @@
-Return-Path: <netdev+bounces-68883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79BC5848ABB
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 04:00:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECA23848AEF
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 04:50:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB8281C21220
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 03:00:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C3D71F2459C
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 03:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1DB010FF;
-	Sun,  4 Feb 2024 03:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 515E0138C;
+	Sun,  4 Feb 2024 03:50:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56EB88BF9;
-	Sun,  4 Feb 2024 03:00:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7110A6FD1;
+	Sun,  4 Feb 2024 03:50:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707015636; cv=none; b=n2sNlze4/irYNZv4Ne0Sdhii0YsHq8qBI5X9bY5jmbl/YiER4JDOqjy0A6bAfei4t9yOFZ+mmdpr/baQVxgLJrNpfkmyXqv1i44FNqGXGsYbj+fagGTE154cLvyclXjrKu5EjDU8p1dXXQo7TPDal7eKtvQiz0hEjS1EhozYPio=
+	t=1707018640; cv=none; b=Z1OGlCG3/XwWGkC7nlGbmSizeDagCsQeYneHYgim4wvb5lAWIy5ehTw6HF68Z49+sLPN/sEDDR1Rpbe3/q9GHyR/MrEClTMccIr3qnLJ0O3nyoWxefc0SHab+Av62VrqXfHVZHzdr3JISxo48lVTg2EB6ynvwywNJgheWrDotqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707015636; c=relaxed/simple;
-	bh=dQ2sNktUa7lj6xnK2aY0LAZoG4fH5NYspNTxVsOhZiA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CsF5IIDAJ5gBacGBJEQhrM4N0OrkhbJoevNxABINPI2UAuZjitLVcheDS9pdtkJD//ydLCIhJEIZaqXjMvuEuNgSXvq9Gc//E99ihrb0nAnGbr4rtL5SN6jkU6/e8iBq29FqpTpb5ABqFTyRaEEyxZn6gkRWPKxKFf9FiiL8Ihs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 20d56d1a04a54032ba4b0001ffe4f5a8-20240204
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:4b3fb53d-48eb-493c-8dd1-13e2a1d25624,IP:10,
-	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
-	ON:release,TS:-5
-X-CID-INFO: VERSION:1.1.35,REQID:4b3fb53d-48eb-493c-8dd1-13e2a1d25624,IP:10,UR
-	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
-	:release,TS:-5
-X-CID-META: VersionHash:5d391d7,CLOUDID:f6029783-8d4f-477b-89d2-1e3bdbef96d1,B
-	ulkID:240201204745Y4HHVX4X,BulkQuantity:18,Recheck:0,SF:64|66|24|17|19|44|
-	102,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:40,QS:nil,BEC:nil,CO
-	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
-X-CID-BVR: 0,NGT
-X-CID-BAS: 0,NGT,0,_
-X-CID-FACTOR: TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI,TF_CID_SPAM_OBB,
-	TF_CID_SPAM_SNR
-X-UUID: 20d56d1a04a54032ba4b0001ffe4f5a8-20240204
-Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
-	(envelope-from <chentao@kylinos.cn>)
-	(Generic MTA)
-	with ESMTP id 1514006762; Sun, 04 Feb 2024 11:00:19 +0800
-Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id 4FEC5E000EBC;
-	Sun,  4 Feb 2024 11:00:19 +0800 (CST)
-X-ns-mid: postfix-65BEFDC3-240812241
-Received: from [172.20.15.254] (unknown [172.20.15.254])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 37BC8E000EBC;
-	Sun,  4 Feb 2024 11:00:14 +0800 (CST)
-Message-ID: <e521e162-a749-4987-a040-024635fe52e4@kylinos.cn>
-Date: Sun, 4 Feb 2024 11:00:14 +0800
+	s=arc-20240116; t=1707018640; c=relaxed/simple;
+	bh=XJqqCkQY6hDhXX2alQOZaD95C4OOCP5Ii2WSEKcnwxs=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=Ex3Jir630BAB43BXbn8YoY0lp2koPPUuBdyo/yeBA4uI3Ti97urXfxm8RJsRjWJIpClrY89pd7YMMcP8fUhSQ4s6yC9tzjeofsf6kZzevGuzLhh9n+19LhgtEzbD4/8NiGHYG6VZBHvIKYgu02vZdROI+WkTPLG5mtN6lK5YTD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TSFrB6Wp1z1xn8j;
+	Sun,  4 Feb 2024 11:49:30 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id DD3041A016B;
+	Sun,  4 Feb 2024 11:50:34 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Sun, 4 Feb
+ 2024 11:50:34 +0800
+Subject: Re: [PATCH net-next v4 5/5] tools: virtio: introduce vhost_net_test
+To: Jason Wang <jasowang@redhat.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	<virtualization@lists.linux.dev>
+References: <20240130113710.34511-1-linyunsheng@huawei.com>
+ <20240130113710.34511-6-linyunsheng@huawei.com>
+ <CACGkMEsJq1Fg6T+9YLPzE16027sBHRZodk2+b1ySa9MeMcGjMA@mail.gmail.com>
+ <dfc3dcb0-511c-945b-6099-c4d7ccbf3253@huawei.com>
+ <CACGkMEsHLis66LntKTG01Eg7cMv-S7u05B3W6CizKRahJ5gDOw@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <16dd5732-06d1-8dd9-85b4-8de7686bd73e@huawei.com>
+Date: Sun, 4 Feb 2024 11:50:34 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] rxrpc: Simplify the allocation of slab caches
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: dhowells@redhat.com, marc.dionne@auristor.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-afs@lists.infradead.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240201100924.210298-1-chentao@kylinos.cn>
- <1706866812511330.14.seg@mailgw>
- <961cc4ad-0133-44ee-be22-ba2fbf4ebe12@kylinos.cn>
- <ZbzD35e4pw5xfzLI@nanopsycho>
+In-Reply-To: <CACGkMEsHLis66LntKTG01Eg7cMv-S7u05B3W6CizKRahJ5gDOw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-From: Kunwu Chan <chentao@kylinos.cn>
-In-Reply-To: <ZbzD35e4pw5xfzLI@nanopsycho>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-On 2024/2/2 18:28, Jiri Pirko wrote:
-> Fri, Feb 02, 2024 at 10:46:33AM CET, chentao@kylinos.cn wrote:
->> On 2024/2/1 20:47, Jiri Pirko wrote:
->>> Thu, Feb 01, 2024 at 11:09:24AM CET, chentao@kylinos.cn wrote:
->>>> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
->>>> to simplify the creation of SLAB caches.
->>>>
->>>> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
->>>
->>> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
->>>
->>> btw, why don't you bulk these changes into patchsets of 15 patches? Or,
->>> given the low complexicity of the patch, just merge multiple patches
->>> that are changing similar locations togeter.
->> Sorry, I haven't sent a patchset, I'm worried about messing up.
->> I'll try to deal with these similar issues in the way you recommended in the
->> future, thank you for the reminder.
-> 
-> Also, please fix your email client. It breaks threads.
-Thanks for the reminder. Maybe it's my company email gateway that does 
-something bad with email.
-The last email was quarantined, this one is the same.
-I asked the administrator to release it temporarily, and now it looks 
-like there is still a problem with the gateway of my email.
-
-I'll try to use a new email.
-
-> 
->> -- 
->> Thanks,
->>   Kunwu
+On 2024/2/4 9:30, Jason Wang wrote:
+> On Fri, Feb 2, 2024 at 8:24 PM Yunsheng Lin <linyunsheng@huawei.com> wrote:
 >>
--- 
-Thanks,
-   Kunwu
+>> On 2024/2/2 12:05, Jason Wang wrote:
+>>> On Tue, Jan 30, 2024 at 7:38 PM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>>>
+>>>> introduce vhost_net_test basing on virtio_test to test
+>>>> vhost_net changing in the kernel.
+>>>
+>>> Let's describe what kind of test is being done and how it is done here.
+>>
+>> How about something like below:
+>>
+>> This patch introduces testing for both vhost_net tx and rx.
+>> Steps for vhost_net tx testing:
+>> 1. Prepare a out buf
+>> 2. Kick the vhost_net to do tx processing
+>> 3. Do the receiving in the tun side
+>> 4. verify the data received by tun is correct
+>>
+>> Steps for vhost_net rx testing::
+>> 1. Prepare a in buf
+>> 2. Do the sending in the tun side
+>> 3. Kick the vhost_net to do rx processing
+>> 4. verify the data received by vhost_net is correct
+> 
+> It looks like some important details were lost, e.g the logic for batching etc.
 
+I am supposeing you are referring to the virtio desc batch handling，
+right?
+
+It was a copy & paste code of virtio_test.c, I was thinking about removing
+the virtio desc batch handling for now, as this patchset does not require
+that to do the testing, it mainly depend on the "sock->sk->sk_sndbuf" to
+be INT_MAX to call vhost_net_build_xdp(), which seems to be the default
+case for vhost_net.
+
+> 
+>>
+
+...
+
+>>>> +static void vdev_create_socket(struct vdev_info *dev)
+>>>> +{
+>>>> +       struct ifreq ifr;
+>>>> +
+>>>> +       dev->sock = socket(AF_PACKET, SOCK_RAW, htons(TEST_PTYPE));
+>>>> +       assert(dev->sock != -1);
+>>>> +
+>>>> +       snprintf(ifr.ifr_name, IFNAMSIZ, "tun_%d", getpid());
+>>>
+>>> Nit: it might be better to accept the device name instead of repeating
+>>> the snprintf trick here, this would facilitate the future changes.
+>>
+>> I am not sure I understand what did you mean by "accept the device name"
+>> here.
+>>
+>> The above is used to get ifindex of the tun netdevice created in
+>> tun_alloc(), so that we can use it in vdev_send_packet() to send
+>> a packet using the tun netdevice created in tun_alloc(). Is there
+>> anything obvious I missed here?
+> 
+> I meant a const char *ifname for this function and let the caller to
+> pass the name.
+
+Sure.
+
+> 
+>>
+
+>>>> +
+>>>> +static void run_rx_test(struct vdev_info *dev, struct vq_info *vq,
+>>>> +                       bool delayed, int batch, int bufs)
+>>>> +{
+>>>> +       const bool random_batch = batch == RANDOM_BATCH;
+>>>> +       long long spurious = 0;
+>>>> +       struct scatterlist sl;
+>>>> +       unsigned int len;
+>>>> +       int r;
+>>>> +
+>>>> +       for (;;) {
+>>>> +               long started_before = vq->started;
+>>>> +               long completed_before = vq->completed;
+>>>> +
+>>>> +               do {
+>>>> +                       if (random_batch)
+>>>> +                               batch = (random() % vq->vring.num) + 1;
+>>>> +
+>>>> +                       while (vq->started < bufs &&
+>>>> +                              (vq->started - vq->completed) < batch) {
+>>>> +                               sg_init_one(&sl, dev->res_buf, HDR_LEN + TEST_BUF_LEN);
+>>>> +
+>>>> +                               r = virtqueue_add_inbuf(vq->vq, &sl, 1,
+>>>> +                                                       dev->res_buf + vq->started,
+>>>> +                                                       GFP_ATOMIC);
+>>>> +                               if (unlikely(r != 0)) {
+>>>> +                                       if (r == -ENOSPC &&
+>>>
+>>> Drivers usually maintain a #free_slots, this can help to avoid the
+>>> trick for checking ENOSPC?
+>>
+>> The above "(vq->started - vq->completed) < batch" seems to ensure that
+>> the 'r' can't be '-ENOSPC'?
+> 
+> Well, if this is true any reason we still check ENOSPEC here?
+
+As mentioned above, It was a copy & paste code of virtio_test.c.
+Will remove 'r == -ENOSPC' checking.
+
+> 
+>> We just need to ensure the batch <= desc_num,
+>> and the 'r == -ENOSPC' checking seems to be unnecessary.
+>>
+>>>
+>>>> +                                           vq->started > started_before)
+>>>> +                                               r = 0;
+>>>> +                                       else
+>>>> +                                               r = -1;
+>>>> +                                       break;
+>>>> +                               }
+>>>> +
+>>>> +                               ++vq->started;
+>>>> +
+>>>> +                               vdev_send_packet(dev);
+>>>> +
+>>>> +                               if (unlikely(!virtqueue_kick(vq->vq))) {
+>>>> +                                       r = -1;
+>>>> +                                       break;
+>>>> +                               }
+>>>> +                       }
+>>>> +
+>>>> +                       if (vq->started >= bufs)
+>>>> +                               r = -1;
+>>>> +
+>>>> +                       /* Flush out completed bufs if any */
+>>>> +                       while (virtqueue_get_buf(vq->vq, &len)) {
+>>>> +                               struct ether_header *eh;
+>>>> +
+>>>> +                               eh = (struct ether_header *)(dev->res_buf + HDR_LEN);
+>>>> +
+>>>> +                               /* tun netdev is up and running, ignore the
+>>>> +                                * non-TEST_PTYPE packet.
+>>>> +                                */
+>>>
+>>> I wonder if it's better to set up some kind of qdisc to avoid the
+>>> unexpected packet here, or is it too complicated?
+>>
+>> Yes, at least I don't know to do that yet.
+> 
+> For example, the blackhole qdisc?
+
+It seems the blackhole_enqueue() just drop everything, which includes
+the packet sent using the raw socket in vdev_send_packet()?
+
+We may bypass qdisc for the raw socket in vdev_send_packet()，but it
+means other caller may bypass qdisc, and even cook up a packet with
+ethertype being ETH_P_LOOPBACK, there is part of the reason I added a
+simple payload verification in verify_res_buf().
+
+> 
+> Thanks
+> 
+> .
+> 
 
