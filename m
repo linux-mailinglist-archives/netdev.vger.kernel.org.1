@@ -1,121 +1,135 @@
-Return-Path: <netdev+bounces-68896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF3EB848C43
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 09:48:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 662CC848C44
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 09:51:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 073111C230EF
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 08:48:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 934B11C22B69
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 08:51:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE5DE8F4D;
-	Sun,  4 Feb 2024 08:47:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC68411C88;
+	Sun,  4 Feb 2024 08:51:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B+OIF3p4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B87D714011
-	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 08:47:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FDE114284
+	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 08:51:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707036479; cv=none; b=hx70vzt2es2zn4x0DKyY3yiPlAmYZ9vb4v2/O73aPVrjny5IAN6A2C/n+hYAaZZhZLZWm+M6wmG2H3ue9q5U428U5xVVaHZjq7OCAWKFmAfujeEPsNWa0wH3H8PE6odAcr+0BVbUIWMwS6hCSiTi8FaIxn5QeFMrUBLh97o9FeI=
+	t=1707036703; cv=none; b=MJg+uATB9j5qHofM0d3b1E/WxXUUCQZz51bBYKQ2Fw14TH5jnxzGLHYuFSS/Oya8vRb3qu5sEDsiHXqCHjL1TROXaf5DtO51kWo7IDJLITecF5Wm2bKt9WKE+h5cYJhbcdPchTIxZDceGVYYYT6ikzo1JGSBCOnZSsDGGKnOZ+o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707036479; c=relaxed/simple;
-	bh=niDXBfNwnOWxdoBKbLeGMhoxmn3LGfyE9cCbqoncwpw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c2Eesdo1UBFXyMUtWYNn9bM3f26prS+/ND/IqoLL61heRhkLYtC3WyANYg3nIzrV44MvNsS3wbMCTd3yJmqH526wSPvbnURzOMWZKNMwSkHrj57wL77wtACJGvqBHQyH7w6uVaL5HnCT6E5C3/J0u7ydWAidElyGDQNzTRfhg9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.110.18])
-	by gateway (Coremail) with SMTP id _____8Cx77s6T79lNIwKAA--.10535S3;
-	Sun, 04 Feb 2024 16:47:54 +0800 (CST)
-Received: from [192.168.100.8] (unknown [112.20.110.18])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxHs84T79lJUYvAA--.47238S3;
-	Sun, 04 Feb 2024 16:47:53 +0800 (CST)
-Message-ID: <5deddbfb-a8bd-4117-b948-313528d8e022@loongson.cn>
-Date: Sun, 4 Feb 2024 16:47:52 +0800
+	s=arc-20240116; t=1707036703; c=relaxed/simple;
+	bh=x7+KTXbxhZvO+kRL3f1yL0fKyIkdlMSd/T+/s0p+0SE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ajqXbEmoSA3xUCz3m7NGiOsI2k5jS5FsyHqxmFDQVX/qpoAjERh9S09DDyg3n77IBtTVBDGvQpedYhH7ieUw/ki+xHdOBUxYnXG/nwp31OMH2wFGc1xbyDPdKT+Dq9WxOZydTkf9LGqyeSuwS75H/SWdhalp6DiYF95+ZFo3gz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B+OIF3p4; arc=none smtp.client-ip=209.85.167.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3bda4bd14e2so3084161b6e.2
+        for <netdev@vger.kernel.org>; Sun, 04 Feb 2024 00:51:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707036700; x=1707641500; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jr5Ma53ZIQFxVlqjjt3fvMokaHC0OGqyDT7hT2pvB9c=;
+        b=B+OIF3p4gnoGCjWva0vho5DTrJ44KYEbzTSIc90XXXbY8WZybt39OdIZ1Yl7cfezXI
+         euw75nXPLIhE+l4GqKTlHzWtZ4o94O03wjasrck56sOzJejvjPZ/4v8wdFoYzPAP8J8R
+         jVmdgbJdpvnc9UkIMOZYzzgkVcVvUYG3pvR5QYzjR+GyXyYvu6bG2RB7iWlqani3PB/V
+         coQ4+yOc+a+Yo2cF4HAxP8Xxp48TjX/PgKFWGXXflmOpdGrMtIFOi+X7RRHQz7l0KnZ5
+         sEEYj1xXioXwFT26yUHUuYVMfVrVbxaoVuITlU2eqZsqtxmr5iTCQ9K15CtILQbzKfu2
+         oUvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707036700; x=1707641500;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Jr5Ma53ZIQFxVlqjjt3fvMokaHC0OGqyDT7hT2pvB9c=;
+        b=pJ1n2RwUMOsCoPCc+Gm/uvuFWmDc6ZeWU2lTgn/tGWlmNMnrNieKngktwH2xAScLFL
+         tpjnPcZe5G234WbpEWGT1fGBXyBTzJ9Gmx5/skbKvi/XpXTgdA/Cnd5khKWXtSVDZOYr
+         6zRzupROrpDiGMH7jkueZBjhsGst4oF6h2BYJzy/0rHEYBeZwfkI8nFSadgpFdg5RjYz
+         3toZyWKldks30YBJwDRC4AEBrlbvabMHcUV8UkqnMnklJxMd6NlovgTrvKgX1jnVDlo6
+         b/kCRRCLu7opvPIxq4v2fq44LBCZNi8XNKyMep1wbBKbPsuwI1auRSiIdA5A7EDEtCd4
+         RboA==
+X-Gm-Message-State: AOJu0YwuH7+Tw4NhS7t3XOZUxZGsmlASzqwiBeG0jn2LHRMt8jkJCfHW
+	P1U2pXmez75ID2kXsjiqC37FpP8gmV4Igc69T7HK/QKeWJJLDwnT/lkmmQtIpLcYQg==
+X-Google-Smtp-Source: AGHT+IFXBY/aq6l6KMRC3CsePikWzxbFKeNmEsxgAXcnn1iJxfU3hq/3OaJDdBN52wGGR2aCfEjjsQ==
+X-Received: by 2002:a05:6808:1589:b0:3bd:a199:cea2 with SMTP id t9-20020a056808158900b003bda199cea2mr15574721oiw.30.1707036700417;
+        Sun, 04 Feb 2024 00:51:40 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUpaBePN8979opwDE3jV395aAlPNOBo7vNsbG4zMx2LtvVECFKWmictwL/rpt6WTG+Yr8eJsmQzVJHIwzf+Q5MuJ4r1prjEk//PeUSlcZJPFLDgOrlKDgJrlEBd7XcDkAJbFYlJPhabxDpHKcvCFcf8F5pM4ygWRyS/0XRV4eO2VjuZjjNP4MtfGx97X1MH8XCgW/yU3d3x6hPAozNd7QAT/NB5MSnHyX1f5rFSkKD+54b02yTd05EPwmxuH/0OJAZ55Q==
+Received: from Laptop-X1.redhat.com ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id ka39-20020a056a0093a700b006d9b2694b0csm4398228pfb.200.2024.02.04.00.51.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 04 Feb 2024 00:51:39 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <j.vosburgh@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Liang Li <liali@redhat.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv4 net-next 0/4] selftests: bonding: use slowwait when waiting
+Date: Sun,  4 Feb 2024 16:51:24 +0800
+Message-ID: <20240204085128.1512341-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 02/11] net: stmmac: dwmac-loongson: Refactor
- code for loongson_dwmac_probe()
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, fancer.lancer@gmail.com,
- Jose.Abreu@synopsys.com, chenhuacai@loongson.cn, linux@armlinux.org.uk,
- guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-References: <cover.1706601050.git.siyanteng@loongson.cn>
- <6a66fdf816665c9d91c4611f47ffe3108b9bd39a.1706601050.git.siyanteng@loongson.cn>
- <20240202123336.GP530335@kernel.org>
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <20240202123336.GP530335@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8AxHs84T79lJUYvAA--.47238S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj9xXoWruryDZw13GFyxtryktFWDtrc_yoWkKFc_Za
-	y2ka48Cw1kZFyS9a4qgFW3Za97Wryq9F1rGF1qya4Fq3ZFvFZ8Ar45Grn7ZF47Ww48XFsI
-	9rnrGr4rC34UZosvyTuYvTs0mTUanT9S1TB71UUUUjDqnTZGkaVYY2UrUUUUj1kv1TuYvT
-	s0mT0YCTnIWjqI5I8CrVACY4xI64kE6c02F40Ex7xfYxn0WfASr-VFAUDa7-sFnT9fnUUI
-	cSsGvfJTRUUUbfkYFVCjjxCrM7AC8VAFwI0_Jr0_Gr1l1xkIjI8I6I8E6xAIw20EY4v20x
-	vaj40_Wr0E3s1l1IIY67AEw4v_Jrv_JF1l8cAvFVAK0II2c7xJM28CjxkF64kEwVA0rcxS
-	w2x7M28EF7xvwVC0I7IYx2IY67AKxVW8JVW5JwA2z4x0Y4vE2Ix0cI8IcVCY1x0267AKxV
-	W8JVWxJwA2z4x0Y4vEx4A2jsIE14v26r4UJVWxJr1l84ACjcxK6I8E87Iv6xkF7I0E14v2
-	6r4UJVWxJr1ln4kS14v26r126r1DM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12
-	xvs2x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q
-	6rW5McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr4
-	1lc7CjxVAaw2AFwI0_JF0_Jw1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
-	Gr1l4IxYO2xFxVAFwI0_JF0_Jw1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67
-	AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8I
-	cVAFwI0_Gr0_Xr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI
-	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVW8JVWxJwCI42IY6I8E87Iv6xkF7I0E14v2
-	6r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxU4Xo7DUUUU
 
+There are a lot waitings in bonding tests use sleep. Let's replace them with
+slowwait(added in the first patch). This could save much test time. e.g.
 
-在 2024/2/2 20:33, Simon Horman 写道:
-> On Tue, Jan 30, 2024 at 04:43:22PM +0800, Yanteng Si wrote:
->> The driver function is not changed, but the code location is
->> adjusted to prepare for adding more loongson drivers.
->>
->> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
->> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
->> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> ...
->
->> -static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id *id)
->> +static struct stmmac_pci_info loongson_gmac_pci_info = {
->> +	.setup = loongson_gmac_data,
->> +};
->> +
->> +static int loongson_dwmac_probe(struct pci_dev *pdev,
->> +				const struct pci_device_id *id)
->>   {
->> +	int ret, i, bus_id, phy_mode;
->>   	struct plat_stmmacenet_data *plat;
->> +	struct stmmac_pci_info *info;
->>   	struct stmmac_resources res;
->>   	struct device_node *np;
->> -	int ret, i, phy_mode;
-> nit: Please consider preserving reverse xmas tree order - longest line
->       to shortest - for local variable declarations in Networking code.
->
-> This tool can be helpful here:
-> https://github.com/ecree-solarflare/xmastree
+bond-break-lacpdu-tx.sh
+  before: 0m16.346s
+  after: 0m2.824s
 
-Okey, thank you!
+bond_options.sh
+  before: 9m25.299s
+  after: 6m14.439s
 
+bond-lladdr-target.sh
+  before: 0m7.090s
+  after: 0m6.148s
 
-Thanks,
+bond_macvlan.sh
+  before: 0m44.999s
+  after: 0m26.468s
 
-Yanteng
+In total, we could save about 200 seconds.
 
->
-> ...
+v4: Make sure the client could reach to macvlan2 (Jakub Kicinski)
+v3: Rebase to latest net-next
+v2: Reduce slowwait sleep time to 0.1 (Paolo Abeni)
+    Reduce num_grat_arp() miimon time (Paolo Abeni)
+    Use slowwait for ping result in lag_lib.sh
+
+Hangbin Liu (4):
+  selftests/net/forwarding: add slowwait functions
+  selftests: bonding: use tc filter to check if LACP was sent
+  selftests: bonding: reduce garp_test/arp_validate test time
+  selftests: bonding: use slowwait instead of hard code sleep
+
+ .../net/bonding/bond-break-lacpdu-tx.sh       | 19 +++++-----
+ .../drivers/net/bonding/bond-lladdr-target.sh | 21 ++++++++--
+ .../drivers/net/bonding/bond_macvlan.sh       |  5 +--
+ .../drivers/net/bonding/bond_options.sh       | 38 ++++++++++++++-----
+ .../drivers/net/bonding/bond_topo_2d1c.sh     |  6 +--
+ .../selftests/drivers/net/bonding/lag_lib.sh  |  7 ++--
+ tools/testing/selftests/net/forwarding/lib.sh | 35 +++++++++++++++++
+ 7 files changed, 99 insertions(+), 32 deletions(-)
+
+-- 
+2.43.0
 
 
