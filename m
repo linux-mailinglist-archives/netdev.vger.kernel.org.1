@@ -1,206 +1,109 @@
-Return-Path: <netdev+bounces-68970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D8E4848F6B
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 17:52:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47F19848F70
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 17:56:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6D7C283917
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 16:52:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CADBF1F21C9A
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 16:56:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AD5D23749;
-	Sun,  4 Feb 2024 16:52:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F63822F13;
+	Sun,  4 Feb 2024 16:56:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="NJiKvJ8L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PmsIf0IJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 091D6249F8;
-	Sun,  4 Feb 2024 16:52:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB7DE23750;
+	Sun,  4 Feb 2024 16:56:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707065528; cv=none; b=DafstO+qjuP4wKUHD80nMK9+paU3RTlM8BkbIbVKu3BlGkQKQGpHYc9pRS1V53FQsCLZEhGcMrvGIpeLRwbCoVKnDmpl6FHgT9KKLmm7BI5k8JmJE8aQjA6GqDPUqOlBwmGkT0mvOBfiJHk5dJU4R9v5TYayxFOnwUkPd7Ef/P4=
+	t=1707065782; cv=none; b=gsrYHTbc1S31hUxInycT0UB7Yl4fGUOGBGkYz5zg5vU2I9fKqeU46zBcIr4xwbcFm+zj7Zh+WYc/OYW1cxYyNtCquLiIudcw88DKw3H283bfWlqkhZ14MjcZDfMCuYKwX7LFPsXlWJ5Jf3lHNa/tjNE84BpL3BF8EA3QGWegLps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707065528; c=relaxed/simple;
-	bh=IuiMDzYq5uY3jd0orr9KJ2WPca7quZ/7Z8pR24y3dsw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tSOyFl9i5CSVd9y/Vi5238SPcUufMVkTupUJc6VgovnfEGG42g3WyzOkIubB3rza7ws+MT6Zfv5DV0foh6fWz9icHg2n6rboRhRUOJCG01WJC+TczASrCdsht/8JGPCH9Caj+7SoYQ7iQR1dwI2b1a0EAlKhCyaTcGWn+KNrZg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=NJiKvJ8L; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id DA2EDFF802;
-	Sun,  4 Feb 2024 16:51:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1707065516;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lTWWPxMsjq/XryQ86M+xV2rVGgxew1NiI9dJe8B9IbY=;
-	b=NJiKvJ8LE15kaHibv07wnHviWNGE1RPBEYYoFDCCEyzf9inDzPe0DfZ34OAM0XvYZPRez5
-	OTdFT62d6A8bgNBtRxtl69olsKvC46F8FFb0y8lxmH6mRvNb2KGpzbpHpHD3y++6kYFzYX
-	BzVBqMAY0U1DkHQS3TTl+KVO7IdWcQFYzfRijoiYmapJ7k1FMNzWT9xCrODyffiBBWXfs4
-	4rr6M4kR1Yk1KpuHLFKA91Nzz3PmD0wCBPSooIsM5yV7JFLxTq2sjMwGXqwyJCEdgdjogx
-	6tXI78G/pjduFqaOQwVKiUVxdEBU3O3FE+tbuZpoFQjtgXVKbAuUz2LtHyB0xg==
-Message-ID: <850064fb-59c6-4e07-962a-6a213e9e7f90@arinc9.com>
-Date: Sun, 4 Feb 2024 19:51:49 +0300
+	s=arc-20240116; t=1707065782; c=relaxed/simple;
+	bh=cU/krCbsSrG89RxP8RzRLlCr9FLW61rqp9gLy7djBYg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a32P8HfWjLw/MtPAPcmpZl8aIjI+nGtiRekoix5Qb7hdAeRtC1hzFz6wRJutgAiaqflY4FBES544xlID+3IUxFcUJfY9mJNX4R6OBZPZJybsSfo0zFYhX4QqtmRYvmXtD4LeAYIpFy4a47I0aC5LRSFqcc5GV8fD46o+zG7UViY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PmsIf0IJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26541C433C7;
+	Sun,  4 Feb 2024 16:56:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707065781;
+	bh=cU/krCbsSrG89RxP8RzRLlCr9FLW61rqp9gLy7djBYg=;
+	h=From:To:Cc:Subject:Date:From;
+	b=PmsIf0IJM9fO/oWqkJI4a+pUeU4c/wuz1jhUApaOoBUAxxDV85bZVKqU+XhutC9Hj
+	 fTpoBNVhY/06ObWTdJvXNZVyTS2vNUz6MiAdQawAP0ifpaErpzGs+7I72xnFmVRB71
+	 f/vnaJOgaECKR3aPBzI5wgYXAFq9oQXn38uTxk00t9YF26b9Na1bMA7g88DLfzN+PO
+	 nXLJ16zZTdvexncNdVvY4sWZ77sQPBmeEuATEftcBnVzxc9SycQbXTfFT03Z+dvVL5
+	 wb7Rh2Z3EDn0HC8/WgHWmxgIHC1JmjWvMUFbfq4SgstLDie9z7kot7P5kmp0/mHNeM
+	 m81OxSPhTCQPA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	shuah@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net] selftests: cmsg_ipv6: repeat the exact packet
+Date: Sun,  4 Feb 2024 08:56:18 -0800
+Message-ID: <20240204165618.1489880-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 4/7] net: dsa: mt7530: move XTAL check to
- mt7530_setup()
-Content-Language: en-US
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
- Bartel Eerdekens <bartel.eerdekens@constell8.be>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20240202-for-netnext-mt7530-improvements-2-v3-0-63d5adae99ca@arinc9.com>
- <20240202-for-netnext-mt7530-improvements-2-v3-4-63d5adae99ca@arinc9.com>
- <ZbzWpmZrukknMsYf@shell.armlinux.org.uk>
- <5b744f7f-2f63-4219-a0e9-8f08267b1fdd@arinc9.com>
- <Zb021ozEQSbU-gPd@makrotopia.org>
- <f6234b46-ce30-4b2a-9681-15633a06feff@arinc9.com>
- <Zb+ctEe9TVA3zhv8@shell.armlinux.org.uk>
- <4fa2ff0d-2804-4a58-980f-162e62b3dc9c@arinc9.com>
- <Zb+9jQUqaha3Idsi@shell.armlinux.org.uk>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <Zb+9jQUqaha3Idsi@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: arinc.unal@arinc9.com
 
-On 4.02.2024 19:38, Russell King (Oracle) wrote:
-> On Sun, Feb 04, 2024 at 06:55:14PM +0300, Arınç ÜNAL wrote:
->> On 4.02.2024 17:18, Russell King (Oracle) wrote:
->>> On Sun, Feb 04, 2024 at 04:55:40PM +0300, Arınç ÜNAL wrote:
->>>> This is not about laziness. This is before patch 2:
->>>>
->>>> phylink_mac_ops :: mac_config() -> dsa_port_phylink_mac_config()
->>>> -> dsa_switch_ops :: phylink_mac_config() -> mt753x_phylink_mac_config()
->>>>      -> mt753x_mac_config()
->>>>         -> mt753x_info :: mac_port_config() -> mt7530_mac_config()
->>>>            -> mt7530_setup_port5()
->>>>      -> mt753x_pad_setup()
->>>>         -> mt753x_info :: pad_setup() -> mt7530_pad_clk_setup()
->>>>
->>>> This is after:
->>>>
->>>> phylink_mac_ops :: mac_config() -> dsa_port_phylink_mac_config()
->>>> -> dsa_switch_ops :: phylink_mac_config() -> mt753x_phylink_mac_config()
->>>>      -> mt753x_mac_config()
->>>>         -> mt753x_info :: mac_port_config() -> mt7530_mac_config()
->>>>            -> mt7530_setup_port5()
->>>>            -> mt7530_setup_port6()
->>>>
->>>> Patch 2 does not move mt7530_setup_port6() to be called from
->>>> phylink_mac_ops :: mac_config(), it already is. There is no valid reason to
->>>> reorder the patches.
->>>>
->>>> My response to Russell should've stated this instead of focusing on his
->>>> second sentence.
->>>
->>> This patch moves the test for a 20MHz crystal to mt7530_setup(),
->>> which is something that is entirely orthogonal to patch 2, which
->>> can be done cleanly (I've just applied the patches in the original
->>> order and then reordered them:
->>>
->>> 98c481f5d706 net: dsa: mt7530: do not clear config->supported_interfaces
->>> 93c6b53b17f4 net: dsa: mt7530: correct port capabilities of MT7988
->>> c9c6d4c51a1d net: dsa: mt7530: simplify mt7530_setup_port6() and change to void
->>> adfa948253e0 net: dsa: mt7530: remove pad_setup function pointer
->>> 57e21e6c2fc0 net: dsa: mt7530: call port 6 setup from mt7530_mac_config()
->>> 959a0f9323c8 net: dsa: mt7530: move XTAL check to mt7530_setup()
->>> 856ab64a22ef net: dsa: mt7530: empty default case on mt7530_setup_port5()
->>>
->>> No problems. The end result is identical comparing the git tree at the
->>> original "move XTAL" patch with adfa948253e0.
->>>
->>> Now, if we look at "net: dsa: mt7530: remove pad_setup function pointer"
->>> we can see that yes, the pad_setup() method was called from mac_confing,
->>> but this is the exact contents of that patch removing the callsite:
->>>
->>> -               mt753x_pad_setup(ds, state);
->>>
->>> This returns an integer, which may be an error code, which is ignored.
->>> Therefore, if the XTAL frequency check fires, and mt753x_pad_setup()
->>> returns an error, it is ignored today.
->>>
->>> After "net: dsa: mt7530: call port 6 setup from mt7530_mac_config()"
->>> the renamed pad_setup() method is now called from mac_config() thusly:
->>>
->>> +               ret = mt7530_setup_port6(priv->ds, interface);
->>> +               if (ret)
->>> +                       return ret;
->>>
->>> So now the error checks cause mt7530_mac_config() to return an error
->>> which in turn causes mt753x_mac_config() to fail, and therefore
->>> mt753x_phylink_mac_config() has different behaviour.
->>>
->>> So, patch 2 changes the driver behaviour in the case of a 20MHz XTAL,
->>> which is then changed again by patch 4.
->>>
->>> It would be better to have only one change of behaviour by moving
->>> patch 4 before patch 2.
->>
->> If the idea is to not bring any more error returns to mt753x_mac_config()
->> because the return code is actually checked for that, I should do a bit
->> more effort and put patch 5 before patch 2 as well, to live up to what you
->> originally requested.
-> 
-> I assume you are referring to getting rid of the default case in
-> mt7530_pad_clk_setup().
-> 
-> In patch "net: dsa: mt7530: call port 6 setup from mt7530_mac_config()"
-> where you move this to be called from mt7530_mac_config(), you add it
-> as:
-> 
-> +       } else if (port == 6) {
-> +               ret = mt7530_setup_port6(priv->ds, interface);
-> +               if (ret)
-> +                       return ret;
-> +       }
-> 
-> So it is only called for port 6. The switch within the called function
-> deals with PHY_INTERFACE_MODE_RGMII and PHY_INTERFACE_MODE_TRGMII.
-> Anything else results in the use of the default case, and thus
-> returning an error.
-> 
-> Since mt7530_mac_port_get_caps() does this for port 6:
-> 
->                  __set_bit(PHY_INTERFACE_MODE_RGMII,
->                            config->supported_interfaces);
->                  __set_bit(PHY_INTERFACE_MODE_TRGMII,
->                            config->supported_interfaces);
-> 
-> mt7530_setup_port6() will only ever be called for these two modes,
-> which means that the default case is unreachable, thus we will never
-> execute that path, thus whether that path returns an error or not is
-> completely irrelevant.
-> 
-> The only case in mt7530_setup_port6() / mt7530_pad_clk_setup() which
-> can today return an error is the XTAL check.
-> 
-> Therefore, my suggestion makes complete sense, and there is no need
-> to also move patch 5.
+cmsg_ipv6 test requests tcpdump to capture 4 packets,
+and sends until tcpdump quits. Only the first packet
+is "real", however, and the rest are basic UDP packets.
+So if tcpdump doesn't start in time it will miss
+the real packet and only capture the UDP ones.
 
-Understood. I've already submitted v4 which moves patch 5. The remaining
-benefit is that there're fewer code changes as I don't need to add an error
-return for mt7530_setup_port6() and then remove it.
+This makes the test fail on slow machine (no KVM or with
+debug enabled) 100% of the time, while it passes in fast
+environments.
 
-Arınç
+Repeat the "real" / expected packet.
+
+Fixes: 9657ad09e1fa ("selftests: net: test IPV6_TCLASS")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: shuah@kernel.org
+CC: linux-kselftest@vger.kernel.org
+---
+ tools/testing/selftests/net/cmsg_ipv6.sh | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/tools/testing/selftests/net/cmsg_ipv6.sh b/tools/testing/selftests/net/cmsg_ipv6.sh
+index f30bd57d5e38..8bc23fb4c82b 100755
+--- a/tools/testing/selftests/net/cmsg_ipv6.sh
++++ b/tools/testing/selftests/net/cmsg_ipv6.sh
+@@ -89,7 +89,7 @@ for ovr in setsock cmsg both diff; do
+ 	check_result $? 0 "TCLASS $prot $ovr - pass"
+ 
+ 	while [ -d /proc/$BG ]; do
+-	    $NSEXE ./cmsg_sender -6 -p u $TGT6 1234
++	    $NSEXE ./cmsg_sender -6 -p $p $m $((TOS2)) $TGT6 1234
+ 	done
+ 
+ 	tcpdump -r $TMPF -v 2>&1 | grep "class $TOS2" >> /dev/null
+@@ -126,7 +126,7 @@ for ovr in setsock cmsg both diff; do
+ 	check_result $? 0 "HOPLIMIT $prot $ovr - pass"
+ 
+ 	while [ -d /proc/$BG ]; do
+-	    $NSEXE ./cmsg_sender -6 -p u $TGT6 1234
++	    $NSEXE ./cmsg_sender -6 -p $p $m $LIM $TGT6 1234
+ 	done
+ 
+ 	tcpdump -r $TMPF -v 2>&1 | grep "hlim $LIM[^0-9]" >> /dev/null
+-- 
+2.43.0
+
 
