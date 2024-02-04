@@ -1,97 +1,164 @@
-Return-Path: <netdev+bounces-68939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F770848E7B
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 15:35:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FFC1848E89
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 15:40:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 639431C20CFB
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 14:35:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A0751F22236
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 14:40:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB45714295;
-	Sun,  4 Feb 2024 14:35:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 606D1224EF;
+	Sun,  4 Feb 2024 14:39:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z9E7sDIx"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ApSE4Iec"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-176.mta1.migadu.com (out-176.mta1.migadu.com [95.215.58.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BCA01DDD7;
-	Sun,  4 Feb 2024 14:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C57A6225D2
+	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 14:39:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707057318; cv=none; b=K0sxowF8Nozm8mKpVOcbnrQAXAMUcXmcxeFhDusbZYVFTlQsgKqQ/YpN57T1WfJPA631Z7kQT1skkV4kxH0bTCie+dwqqKbQpxJw67/LJ89CgfNOhbYIzkPoh6hjU3hM1B5rGZ33l0r0zr7npo2Z2vZelECC/EnVK99W/e40+Yg=
+	t=1707057596; cv=none; b=ej8vLByyRIdQUL0jGmvKhOYFL+bEl5WhZI7+nYDq5rnU1DKso7Lxfn9Ur32XQCjgKNWFxqyKHO0qV+3sSou0Xkrxahbn1nCLnB7DuLR8n+BFw4m2AdO+V/svhr6jKL9ha07oW0PozqUgsp2uqiZxHOktvBwWobTbh/0+cDej4hY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707057318; c=relaxed/simple;
-	bh=awoxN+LCbkkokatZAAIy7lRCtvPNshr7ALjiqC/b9Dw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oENV0FQESY2GITwQxZL9KEpiobiKaBV8F2peXf4ol8VFn9f+NPpy9FJAco6aLz7jrE5cGE3SmG70hS09I6LMwz2GMtY2yuphs2XzsV6uvLvJXGdLMKnQr9Mac9h22kV/pykBehzGte3VeXZq+2Qq07AQuaqP6isa2f85/9W9Rbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z9E7sDIx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5691C433C7;
-	Sun,  4 Feb 2024 14:35:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707057317;
-	bh=awoxN+LCbkkokatZAAIy7lRCtvPNshr7ALjiqC/b9Dw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Z9E7sDIxdImlRl1LZst/Ws48XUjtoa2LWbX4doA5jXzdGfV5wBpXgTsFO665ZvNyL
-	 u8ROGapSQNwXDD05CDRNAr7HoV9OQ2VSjXtUzTy5kRQ2/6quoZqZvrBII5Pa9eCcNc
-	 /N6hy7Yi7TBxPgtx1KR/x678IaCjZWAjL9nImuughwv1M31gpbpeZ9Kwp8hQ80SDjk
-	 ZzJJNO5np00stUCmx05Ob3/s7DPUhs3+PLez+URQ55s/HH5Xwt2FwHEc6JoSj16tr8
-	 LqwJ5MSgz+a+oXjtLX2LU+6Rsw3cM8s7I7hXb/t7D6fwBimAglIKnx8n48Efav8vFL
-	 uIZ6FI4JZDrnA==
-Date: Sun, 4 Feb 2024 14:35:13 +0000
-From: Simon Horman <horms@kernel.org>
-To: Bo Liu =?utf-8?B?KOWImOazoikt5rWq5r2u5L+h5oGv?= <liubo03@inspur.com>
-Cc: "miquel.raynal@bootlin.com" <miquel.raynal@bootlin.com>,
-	"alex.aring@gmail.com" <alex.aring@gmail.com>,
-	"stefan@datenfreihafen.org" <stefan@datenfreihafen.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"linux-wpan@vger.kernel.org" <linux-wpan@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: ieee802154: at86rf230: convert to use maple tree
- register cache
-Message-ID: <20240204143513.GB941651@kernel.org>
-References: <982c399a2bd043a186a27a399f9b2493@inspur.com>
+	s=arc-20240116; t=1707057596; c=relaxed/simple;
+	bh=BL/x9orUY4Qx6/R/opi/OiQWicq/Bdzd8RXJYTHUSLw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Zw60G8Nkw3LM6O+XaxJQBwwtEo5r9DafQVWL15/Friom0MD7onYipHVhgM7xCI1BUGf6/fw6rpfNSLN7S+NCCN/kJzmzbx+R3tODqgCLogFCdvzAVt5Ll1dSRCBuQjTHZC3DVzw9byAeneV+YJ7F0qvSUi9zxxi+KARQ8DLxcKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ApSE4Iec; arc=none smtp.client-ip=95.215.58.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <6b88bdc3-37da-423f-a665-308ac519a256@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1707057591;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y80CdJjL2kWlKWe2vMEsTFd6tb84k4wJ4sCbchotmMI=;
+	b=ApSE4IecJ9joafKTB6l39BAFgHUNTXfhO+zwHvK0cYzw3KXqKm+QQ7mo6MuLlPqVWstEEm
+	WWFxpRtF6mHexGCbpGKdOdF8uq421EBc0jz5dsGlQHnAlmVxU07jESxrbRVqFg3zpvl7bu
+	RLyqjfTA+IF1u1PGlIBJlsI5SvYT/MQ=
+Date: Sun, 4 Feb 2024 14:39:46 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Subject: Re: [PATCH v5] ptp: ocp: add Adva timecard support
+Content-Language: en-US
+To: Sagi Maimon <maimon.sagi@gmail.com>
+Cc: richardcochran@gmail.com, jonathan.lemon@gmail.com, vadfed@fb.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org
+References: <20240117114350.3105-1-maimon.sagi@gmail.com>
+ <8a6c5297-6e86-4f0d-a85e-1a93b2215d68@linux.dev>
+ <CAMuE1bFEbrY2PiDB6OdZGzDNijPAhoGBircTpqiyVs0Qq6bOig@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <CAMuE1bFEbrY2PiDB6OdZGzDNijPAhoGBircTpqiyVs0Qq6bOig@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <982c399a2bd043a186a27a399f9b2493@inspur.com>
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Feb 02, 2024 at 08:08:14AM +0000, Bo Liu (刘波)-浪潮信息 wrote:
+On 04/02/2024 11:31, Sagi Maimon wrote:
+> Hi Vadim,
+> Sorry but I was on vacation for the last two weeks.
+> So What should I do now:
+> 1) Do you want me to set my changes into the main linux git tree:
+>      git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
+>      and use  use '[PATCH v6] ...' prefix
+> 2) Or
+>      set my changes into the net-next git tree:
+>      git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
+>      and use  use '[PATCH net-next v6] ...' prefix
+
+Hi Sagi!
+
+Option 2 is the way to go.
+
+Thanks,
+Vadim
+
 > 
-> >Hi Bo,
-> >
-> >liubo03@inspur.com wrote on Fri, 2 Feb 2024 01:45:12 -0500:
-> >
-> >> The maple tree register cache is based on a much more modern data
-> >> structure than the rbtree cache and makes optimisation choices which
-> >> are probably more appropriate for modern systems than those made by the
-> >rbtree cache.
-> >
-> >What are the real intended benefits? Shall we expect any drawbacks?
-> >
-> Hi
-> 	The maple tree register cache has now got to the point where is is
-> 	roughly feature compatible with the rbtree cache. It's based on a much more modern data
-> 	structure than the rbtree cache
-
-Thanks Bo Liu,
-
-You have stated that maple is more modern than rbtree.
-But please address Miquel's questions: what are the real
-expected benefits; what possible drawbacks are there?
-
+> BR,
+> Sagi
+> 
+> On Wed, Jan 17, 2024 at 11:23 PM Vadim Fedorenko
+> <vadim.fedorenko@linux.dev> wrote:
+>>
+>> On 17/01/2024 11:43, Sagi Maimon wrote:
+>>> Adding support for the Adva timecard.
+>>> The card uses different drivers to provide access to the
+>>> firmware SPI flash (Altera based).
+>>> Other parts of the code are the same and could be reused.
+>>>
+>>
+>> Hi Sagi,
+>>
+>> Thanks for adjusting the code. One signle still have to be
+>> adjusted, see comments below. And this is treated as net-next
+>> material, but net-next is closed now until merge window ends,
+>> you will have to submit new version next week.
+>>
+>> Please, also use '[PATCH net-next v6] ...' prefix for it.
+>>
+>>> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
+>>> ---
+>>>    Changes since version 4:
+>>>    - alignment fix.
+>>>
+>>
+>> Please, preserve changes from all previous versions for next submissions.
+>>
+>>>    drivers/ptp/ptp_ocp.c | 302 ++++++++++++++++++++++++++++++++++++++++--
+>>>    1 file changed, 293 insertions(+), 9 deletions(-)
+>>>
+>>
+>> [ ..skip.. ]
+>>
+>>> @@ -2603,7 +2819,44 @@ ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+>>>        if (err)
+>>>                return err;
+>>>
+>>> -     return ptp_ocp_init_clock(bp);
+>>> +     return ptp_ocp_init_clock(bp, r->extra);
+>>> +}
+>>> +
+>>> +/* ADVA specific board initializers; last "resource" registered. */
+>>> +static int
+>>> +ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+>>> +{
+>>> +     int err;
+>>> +     u32 version;
+>>> +
+>>> +     bp->flash_start = 0xA00000;
+>>> +     bp->eeprom_map = fb_eeprom_map;
+>>> +     bp->sma_op = &ocp_adva_sma_op;
+>>> +
+>>> +     version = ioread32(&bp->image->version);
+>>> +     /* if lower 16 bits are empty, this is the fw loader. */
+>>> +     if ((version & 0xffff) == 0) {
+>>> +             version = version >> 16;
+>>> +             bp->fw_loader = true;
+>>> +     }
+>>> +     bp->fw_tag = 1;
+>>
+>> Please, use fw_tag = 3 here, other tags are for other vendors.
+>>
+>> Thanks,
+>> Vadim
+>>
+>>> +     bp->fw_version = version & 0xffff;
+>>> +     bp->fw_cap = OCP_CAP_BASIC | OCP_CAP_SIGNAL | OCP_CAP_FREQ;
+>>> +
+>>> +     ptp_ocp_tod_init(bp);
+>>> +     ptp_ocp_nmea_out_init(bp);
+>>> +     ptp_ocp_signal_init(bp);
+>>> +
+>>
 
 
