@@ -1,96 +1,112 @@
-Return-Path: <netdev+bounces-68944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6CC6848EC6
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 16:05:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3095E848EE0
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 16:22:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F0511C219CB
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 15:05:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90B7F28515D
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 15:22:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC5492134F;
-	Sun,  4 Feb 2024 15:05:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53019224F2;
+	Sun,  4 Feb 2024 15:22:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O2Velfej"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qfAUkoX5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2317A224C7
-	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 15:05:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A07C225AA;
+	Sun,  4 Feb 2024 15:22:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707059146; cv=none; b=I5tyG0QZ6z5QvgF50W53dhNlfd8ztxc0YCeSeOd2Kliqk3/KNeE+S3ziNcmg5gP67jNBH7Ub65VCX9lUVBN11CqPGlnBytDeVjvqaKQWG+zACK7waBs5DkoPBmri7aeQv1EGOBTWd/PVpxOcrXvouSmLrD3ugZ93o1SQmwthm2g=
+	t=1707060150; cv=none; b=CfZSCp4SRzEgKz0BxEX7afQsIPR62VYxaCv0xGFBe8BtpCwMCzMit4mor1LP0jJ2E0yksHKlXYlcHZIUb+518tFUYA9fVanMmFyNnAv59snkoQrHVJvF6864AkE5QnSc0k1IxYZjIYipruUWIgF1rYR74g6R3lANIbUPIypntjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707059146; c=relaxed/simple;
-	bh=AJAMi8u56refPBbstHaeF9yjwnclv72YCW5sJ51shrE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hYV2t59rO0J65TK/3/8uvyrJHeVJ9rx7arBa+kGgxLlcormBRLwaeeFuB9/7mndfEg0ZjXytpfVugxwPt4v9SBcEmJp+9o+/+YzmXuAX0Q9PzEgOfXh1BQdfhUHJYwt3u5vR98qo65hCJ/xlXdPmTdtW/uxGQY6AqiiLSwPaLtg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O2Velfej; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707059145; x=1738595145;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=AJAMi8u56refPBbstHaeF9yjwnclv72YCW5sJ51shrE=;
-  b=O2VelfejpFw1KgJjIi62W++7v/ey+hNcpVtsYXW8gbpdOUrmjLioo5wE
-   pBy5ihG1Vvu3wtAWTOwowTPGcFVkMc9m+9NlKpXC3V6LGeQVfndPHbcmG
-   MpDBu0aZ5we6O0ZwOXzZzRCdlGV/aHK2N8WXyZj9moUGvQPS6hjBUxp5R
-   rRVggLcy/U0E4aZh66/5JdXUiprS09x7HtU82qtSJp7LakPZU0sG3nE3Q
-   qdmmBMHXnqWgZcHDTAMK/htLpuqApW7NjzaJprAWnPn8GM+vxPj+mZqCQ
-   E8z8KryDFawO+ZRmTttXaYlKIMHvsoWP1uWPIEIzJ3A4OlIuh8d0UOghd
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10973"; a="550260"
-X-IronPort-AV: E=Sophos;i="6.05,242,1701158400"; 
-   d="scan'208";a="550260"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2024 07:05:44 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10973"; a="823649190"
-X-IronPort-AV: E=Sophos;i="6.05,242,1701158400"; 
-   d="scan'208";a="823649190"
-Received: from naamamex-mobl.ger.corp.intel.com (HELO [10.124.132.248]) ([10.124.132.248])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2024 07:05:41 -0800
-Message-ID: <1e8740a0-b2b3-41d3-a554-9fb2d79dd32a@linux.intel.com>
-Date: Sun, 4 Feb 2024 17:05:37 +0200
+	s=arc-20240116; t=1707060150; c=relaxed/simple;
+	bh=HdEPymNokVINCHkSEa5LvnInxWnhWuDC0WVzzVWsEk8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E2Ivk0PNrxYM5TVZBqlqe7s3gtpbRyu4PjZ2nc/Z8KYM6yELp1p6DFU0qh5PVFwhdOrbUil07uYildJoP6Dbxws1sNqrss52ONS8GAyTUp3fMO/XX+G06YInLXatBlM08V9PlyDibzGjBMb0gCQE0/7cAqjJnxJSIgL75OpXXro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qfAUkoX5; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Nevq5mgSlVT/I2RCsRjjpab+WWwVDBjfunWL49iu92I=; b=qfAUkoX5Nn/s46SQ+3G23exnMe
+	jIEsEzz6WSdE+V58VpbzM5cVDDquV5M8O4HPyNrl3O6kiSLToZDXaGD6J+Tz1/+aidUF9pzILNwfK
+	4gdPqwfMgZmhBNM4QpFt6OSTizGoF/xWyejFIPKY14WMc9sHCxX0adLIfdht5SrZm1Gg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rWeJt-006xv7-0q; Sun, 04 Feb 2024 16:22:09 +0100
+Date: Sun, 4 Feb 2024 16:22:09 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jie Luo <quic_luoj@quicinc.com>
+Cc: Christian Marangi <ansuelsmth@gmail.com>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Robert Marko <robert.marko@sartura.hr>,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH v2 2/3] net: mdio: ipq4019: add support for
+ clock-frequency property
+Message-ID: <4cd01d93-7b6d-4766-8337-c4dc09aeedc2@lunn.ch>
+References: <20240130003546.1546-1-ansuelsmth@gmail.com>
+ <20240130003546.1546-3-ansuelsmth@gmail.com>
+ <7d86388d-15f5-4e72-b99f-aee3b47a5232@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH v2 iwl-next 2/3] igc: Use netdev
- printing functions for flex filters
-Content-Language: en-US
-To: Kurt Kanzenbach <kurt@linutronix.de>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: netdev@vger.kernel.org, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, Eric Dumazet <edumazet@google.com>,
- intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
-References: <20240124085532.58841-1-kurt@linutronix.de>
- <20240124085532.58841-3-kurt@linutronix.de>
-From: "naamax.meir" <naamax.meir@linux.intel.com>
-In-Reply-To: <20240124085532.58841-3-kurt@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <7d86388d-15f5-4e72-b99f-aee3b47a5232@quicinc.com>
 
-On 1/24/2024 10:55, Kurt Kanzenbach wrote:
-> All igc filter implementations use netdev_*() printing functions except for
-> the flex filters. Unify it.
+On Sun, Feb 04, 2024 at 05:59:10PM +0800, Jie Luo wrote:
 > 
-> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
-> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-> ---
->   drivers/net/ethernet/intel/igc/igc_main.c | 9 ++++-----
->   1 file changed, 4 insertions(+), 5 deletions(-)
+> 
+> On 1/30/2024 8:35 AM, Christian Marangi wrote:
+> > +
+> > +	/* If div is /256 assume nobody have set this value and
+> > +	 * try to find one MDC rate that is close the 802.3 spec of
+> > +	 * 2.5MHz
+> > +	 */
+> > +	for (div = 256; div >= 8; div /= 2) {
+> > +		/* Stop as soon as we found a divider that
+> > +		 * reached the closest value to 2.5MHz
+> > +		 */
+> > +		if (DIV_ROUND_UP(ahb_rate, div) > 2500000)
+> > +			break;
+> 
+> Hi Christian,
+> Sorry for the delayed review.
+> 
+> The MDIO hardware block supports higher frequency 6.25M and 12.5M,
+> Would you remove this 2.5MHZ limitation? On the IPQ platform, we
+> normally use 6.25MHZ.
 
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+802.3 says the clock has a maximum of 2.5MHz. So this code is correct.
+
+It is however O.K. to go faster, but since that breaks the standard,
+you need each board to indicate it knows all the devices on the bus do
+support higher speeds and its O.K. to break the standard. You indicate
+this by using the DT property in its .dts file. For an MDIO bus which
+is totally internal, you could however put the DT property in the SoC
+.dtsi file.
+
+      Andrew
 
