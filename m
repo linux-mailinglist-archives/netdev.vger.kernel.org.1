@@ -1,95 +1,111 @@
-Return-Path: <netdev+bounces-68909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BC13848CED
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 11:40:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 696F1848CEF
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 11:46:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FB9A1F21EAC
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 10:40:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0573B2814F7
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 10:46:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01ADE1B7FE;
-	Sun,  4 Feb 2024 10:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7632C210F8;
+	Sun,  4 Feb 2024 10:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ixhvbhIk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aaQdlWyQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f172.google.com (mail-pg1-f172.google.com [209.85.215.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F034210E9
-	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 10:40:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00F2F210E9
+	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 10:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707043236; cv=none; b=JPCtRY4gZHWTZ9nnKsqnMK1utDskMyCGeFSf//M2iQf+lcEhM6O3/VbZHXDdOsRDAfKRapSd528oCVcwE3vvUqNarBBlxI8AKpYA9wEMrY69UbLIIdd33bYRnswbiqkAhe7jmlW6oJ7Qb/Z6cEq4CYFsTS5ukqnN1sScKlWEEEg=
+	t=1707043579; cv=none; b=mPWznIoVCFjt8GZwi4q2kJ8MSaLk2WAr8GwezRma0vbtpNuOxK7H703ozuPropkfUjXReVCrUExjO0qys1+u2TLQKMNSIWHp8pdVVza2qwBgY44hrtWTuu89uujB5h9DhaAllA4DXtw5+BvY1mM2EPeEGtlWTJBqDbIxz3a2XYQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707043236; c=relaxed/simple;
-	bh=4d9QESwx22QVYlhgB35XOXUK5cV0Z6Y9I0alC09oJRw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HbJkWqWh7JjPE6pPPg6wEZuAN629JX8ddM+XtZX9dzaAdpnJZU/01SKm/SXGrWBGuVTLqjLdJZJ+bn7pn+QtOsli3YdU2OUo17//g9/tm/iLfhdAlh7gteDzvKoYDHhVPNggT4gMnEZCEgqZXEc01QoEPfonVTACPS4bFAyqoTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ixhvbhIk; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707043235; x=1738579235;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=4d9QESwx22QVYlhgB35XOXUK5cV0Z6Y9I0alC09oJRw=;
-  b=ixhvbhIkqUl0gSz4tp6UkJB3e65r8usUw1nuTfXgwrthuCl8pc8xPRTs
-   Y4gyFGW2RlnCPrDCAdqQBWYmLHaI6LayIeaeYHiLrcPKU4yN+xSFKxWX3
-   FDZE3/s0hEYF8bmQKZwfkzROWPIfo351u0tWRJJbJRg+t2szyN5zVbPFS
-   qKdf0a7PBVjoqdS6G5Hxy7VPJabZ7xEpNa7MECSZ/H6wcLyzlebnPqxej
-   ECJGEm8c4FPr+rNpg8cbHmeuyiFKiJVl70BR107Ek9oKQFdQ+ED3Zq/o3
-   lcBFwsjKXIKfmhU8KPum5uZpbuABfjgEUxRMLNa3G7xQ7prlhojnSczTL
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10973"; a="625536"
-X-IronPort-AV: E=Sophos;i="6.05,242,1701158400"; 
-   d="scan'208";a="625536"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2024 02:40:34 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10973"; a="932908028"
-X-IronPort-AV: E=Sophos;i="6.05,242,1701158400"; 
-   d="scan'208";a="932908028"
-Received: from naamamex-mobl.ger.corp.intel.com (HELO [10.124.132.248]) ([10.124.132.248])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2024 02:40:31 -0800
-Message-ID: <4efdd7c2-8824-41e7-a556-1f0e944faa87@linux.intel.com>
-Date: Sun, 4 Feb 2024 12:40:19 +0200
+	s=arc-20240116; t=1707043579; c=relaxed/simple;
+	bh=q5DtUPAI1E27ZF4kA8oC6FXUJpPzSL45FUt3SPOCsVs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WgZWFEFFE5fxVwWwUEC0zgZs86E0BxmMr/zXyFhGOLj4VP9qH4RoqACbuNIRzM3usGjJ2wGJZe1cKqTHo0THiaa6jVNR2Zz7fUwJie4JmpvsgIcYsLt6CjePjC5VaHuaxxcs4RXGjGpVvuT33GiicEYVEuwJuR3gnPvtR4gQ/lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aaQdlWyQ; arc=none smtp.client-ip=209.85.215.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f172.google.com with SMTP id 41be03b00d2f7-5c6bd3100fcso2585302a12.3
+        for <netdev@vger.kernel.org>; Sun, 04 Feb 2024 02:46:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707043577; x=1707648377; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Gg1Bt5ValypCpnqv2XvNHnrqSa/b8ql0aBaLUGFnrSo=;
+        b=aaQdlWyQRs1/Oigyoz9qcB/3Vbyg7+xN80oiNvE3B+4Dt4J7wDDzH6oGlLUwnMLZEi
+         UGm5vcdjr30ehOdRJFeFxSxcsNCqwUpwUzB0oEq9NNr5ybAaYPBlJ17c+XPp6UeG3chb
+         xeP+nO15qQgqLPEUn0LdsowOfwGsy0E7S+8IQFY6DgGYe31oNAr1qv74iuMS4GEb9mlv
+         nOgv7WPt/yzYjufLMHwpJZfUKF/ve2MTGEbOJO19J896ST0ve7IdjNfspo7Jnoa6k3ho
+         m0OGrX15ZDtS1yyXQDq8DOnYr2iGC8omRom+M0qkSr9/XqENKpjpjfPo+vbjzfgCIw1E
+         BZHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707043577; x=1707648377;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Gg1Bt5ValypCpnqv2XvNHnrqSa/b8ql0aBaLUGFnrSo=;
+        b=E31AwyZ3d03XYgT6z3NS9dfUEKHKOeqQT0GeeGloKLxpsHcepGwGPOVyZfJ5oghWWB
+         FevGuZAdM6TD+kAQMX9HQwIBIaL/bL7dfBMoQx6WAlmDUbwe1kWVq9eJse3w+NDDl/7M
+         18oeblWEYKqIWeUSACH8pISAUv1AE1lAtRXUUw+wmAuKYnuCxPUPkAYpuov7AQFp5J/G
+         aZ4vKCmlKyoq7wbrhdQ8qw6IjrTV4qT9lYEeECWYmk3X/6VvI0R/gXQj+N/6pMSyy8lR
+         lyWpSdHR3dH6FtUyfs2BbCbV2Xb9VlnDXpJHw7wEBz5Zsohd066ykj1K+DdVus/7xrKc
+         Md+Q==
+X-Gm-Message-State: AOJu0Yy2zDFnxYzD2kWXWGJ2A7n/wm3I06G9UjxME+G1dPsi04SYKIqq
+	v9RLGQAbpaJ8ao15RzcFMSRbMHd5jilMIAFd+74xR/pBO0x+k1eW
+X-Google-Smtp-Source: AGHT+IHIRi8dyS9VV6sSiU48r8t1b25w5OPRma4ocbp7nYTdxL9wUyHuGxscKVzrdi1ZQ2PxmZwXOA==
+X-Received: by 2002:a05:6a00:3206:b0:6db:b287:d43c with SMTP id bm6-20020a056a00320600b006dbb287d43cmr4685068pfb.24.1707043577206;
+        Sun, 04 Feb 2024 02:46:17 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWFaJjoWQPdDTOTkbD/gTBiLWrCWo8fwIjg3UxYsCxWCdkFAvv2aDkgqIvV8VisNqCA5Z3koPSqDFChrYmjVVbIcnugDsnR4ePC9G4YAgv1MbGulviYOFYgV1FtxpQ4jKcL+OBT/1jAZGLSMcKyeHXSrvCiym2rJ74v/Rlkd4JkYY7++3okr6/ET9g17vOwaLK/GZdK27PKJlvrJa0yZWrT3tKQpuPrvflvCjo8LkY=
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
+        by smtp.gmail.com with ESMTPSA id c14-20020aa7880e000000b006dd79bbcd11sm327099pfo.205.2024.02.04.02.46.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 04 Feb 2024 02:46:16 -0800 (PST)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org
+Cc: netdev@vger.kernel.org,
+	kerneljasonxing@gmail.com,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next 0/2] add more drop reasons in tcp receive path
+Date: Sun,  4 Feb 2024 18:45:58 +0800
+Message-Id: <20240204104601.55760-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH v2 iwl-next 1/3] igc: Use reverse xmas
- tree
-To: Kurt Kanzenbach <kurt@linutronix.de>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: netdev@vger.kernel.org, Sebastian Andrzej Siewior
- <bigeasy@linutronix.de>, Eric Dumazet <edumazet@google.com>,
- intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
-References: <20240124085532.58841-1-kurt@linutronix.de>
- <20240124085532.58841-2-kurt@linutronix.de>
-Content-Language: en-US
-From: "naamax.meir" <naamax.meir@linux.intel.com>
-In-Reply-To: <20240124085532.58841-2-kurt@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/24/2024 10:55, Kurt Kanzenbach wrote:
-> Use reverse xmas tree coding style convention in igc_add_flex_filter().
-> 
-> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
-> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-> ---
->   drivers/net/ethernet/intel/igc/igc_main.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+From: Jason Xing <kernelxing@tencent.com>
 
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+When I was debugging the reason about why the skb should be dropped in
+syn cookie mode, I found out that this NOT_SPECIFIED reason is too
+general. Thus I decided to refine it.
+
+Jason Xing (2):
+  tcp: add more DROP REASONs in cookie check
+  tcp: add more DROP REASONS in child process
+
+ include/net/dropreason-core.h | 18 ++++++++++++++++++
+ include/net/tcp.h             |  8 +++++---
+ net/ipv4/syncookies.c         | 18 ++++++++++++++----
+ net/ipv4/tcp_input.c          | 19 +++++++++++++++----
+ net/ipv4/tcp_ipv4.c           | 13 +++++++------
+ net/ipv4/tcp_minisocks.c      |  4 ++--
+ net/ipv6/tcp_ipv6.c           |  6 +++---
+ 7 files changed, 64 insertions(+), 22 deletions(-)
+
+-- 
+2.37.3
+
 
