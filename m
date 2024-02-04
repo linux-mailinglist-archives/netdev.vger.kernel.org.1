@@ -1,174 +1,129 @@
-Return-Path: <netdev+bounces-68914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F4BF848D27
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 12:32:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36E3D848D2D
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 12:42:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4E671F223AC
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 11:32:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF533B21E12
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 11:42:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9E5B21A14;
-	Sun,  4 Feb 2024 11:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06DB28BFD;
+	Sun,  4 Feb 2024 11:41:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I/FJDf1S"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="LLbgfSE0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C29B219F3;
-	Sun,  4 Feb 2024 11:32:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5170E2208B
+	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 11:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707046321; cv=none; b=aaYAW3YNjePGzy26orFfVDyQVjVpEi1/tUOKn34LA+DDDVz4/WnS0uu0rxUlCBEBvn6c5tTfSjLPkZa7xtMr+QNVDRlmaFsJWN+VzVeVNPLXzw28NW1JQJ/Ao70De5eEQ7G8YUiZQmSQt3twF+QDr9r1h1y0/DnEXUoqNXfKpC0=
+	t=1707046917; cv=none; b=i5Vd67nA+JMPsMHJoqq+kEdkkV0GMe4i4hyZpIE4dEnyIuB/agElmXfX/wmgbPa8VtbCy0/GQHgScsXnf3M+4cdALR/JvpBfjnGbvlHsJjtldK9kryyCV3VxrbuXIqsISboCuqRSipFNfuEsEueFrnp9WD8uS5mXc2c1fHxSl9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707046321; c=relaxed/simple;
-	bh=OysxHNR/8MLJKJoi2a1JRId6KQOu7obGUqwfNQ5mXP0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rNxWFmVtudA9t9C6cr1tJJkhi/p5uqcLQnZx6Rz+9lPzM+2NCV1tgtbG+m/1525CF9+a19eXbnhmbXA+9JYO8xXE+QvJfMNNYNp4F8EapTqzzS0E/BgbLqNeemsBlSyuDHrLdX/2y44hwknF4+iL/zqGVh3bQpTCKZQ0V6vOwv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I/FJDf1S; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-60410da20a2so33957957b3.1;
-        Sun, 04 Feb 2024 03:32:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707046319; x=1707651119; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7QkyTj57SM8MQl+b85mT92R7QgyO+Dz+wOf6Kb6ozwQ=;
-        b=I/FJDf1SGbodhq0DkXcdEkIDmuYItqAdThdwyCGOslg9TLenD6G19eU6fydKKMpAIX
-         hdl/GeHOLM2t2LMxCwqh2WUWl6syuQq0Vr7Lv0WryhbPf5dUC2WgkKV1H/rbT94VvjCd
-         ISU25U4IzwUwr4fjgf12p8cO28bSABtdNtjYrqy9B8khVX4DiFvtlwykOwyqAQaI3rE8
-         yc9+g+R4F4/FGSCpQcMEIvRp9e3EfNHatgmVmun07THjD9VUsHZfdYzb0bRY+ID+55mp
-         c43OSfp6MNDLxUV/B00ifYj8pzcGTteUADarnrHNarHjMvY1GwtGIaA+SMOZ6ob7mj/j
-         MPNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707046319; x=1707651119;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7QkyTj57SM8MQl+b85mT92R7QgyO+Dz+wOf6Kb6ozwQ=;
-        b=krDq8h6bPPPqMHk2CbRiuPzvf02Y3XsWj91u4uGNrezLYdnlVpjCL/1k1cnh6KuAeZ
-         2n1kJWmWanjtX64bKRIDuvwlai80hvlbjUsVy+IUWzx0gBR9aiBUSbPMqR9SIUR8keWW
-         YUALSiCtE6815stWQaLrONqkikKsmB2QBtO80ov3rLcRAyF6k5QRpgp0LdaQTew6M3t8
-         MUM9ec8kSStPp2DB89p3hAJL9G1sy7S2ZNJa+KQ/O3P3OMWUqSSoCP/MRIF8yqRg0rCd
-         ClTMEfP40Vf2jY4XFqKHNA5zz0GuHhUXI2A9mdDkLG3FRoMUe8eN1UIVDg7QIwggSsM0
-         grbg==
-X-Gm-Message-State: AOJu0YypOboAADaBShe2WzmS98P/220ZhVEI5AVm8wxZYjXZkmPAhiXl
-	ZYu2tfUrljjfXYuedaS6JO+ZpbBHsf98c0kXDb+yA99juwtzZq7YcN+fT8PTJcB6NTKP8IBkGcV
-	aCJs1gjvWGPFiPw2VP39tDyfaY4uble9iGdELKHb+RxSHuQ==
-X-Google-Smtp-Source: AGHT+IExAGT2STpMmSagXa312ySYM4FXedxHnwenSsbEcIAQwvxzb87TuWuoNliCrp97oW7+j/HHNWiZTlrSm5/23Co=
-X-Received: by 2002:a81:4325:0:b0:5ff:a9bc:b7f with SMTP id
- q37-20020a814325000000b005ffa9bc0b7fmr12348406ywa.21.1707046319112; Sun, 04
- Feb 2024 03:31:59 -0800 (PST)
+	s=arc-20240116; t=1707046917; c=relaxed/simple;
+	bh=6GZ1fEAFmpK6ZUNO7JGzNHW7qPj/AgfTR1FTzQgFe54=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tMSyvRauitMOxDonc4ARL4JnwgMhrFOw4AaV8Edq0xGacPPf10QqBHDt1FS0bL7xR6OE8aU0fxtyYf141yG8bT/Wv2pKruirum8EUkUxR8ZuulZXzUS0qdPg440VDeSVBP30bXDFcJ7I6YtLLdGO6HRPu+VBrey08OkfqDvhcgA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=LLbgfSE0; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=/6S0XOei2alGmsuTX/azQLspn1VbC6KI49hkXNWTry4=; b=LLbgfSE00sRJuEbK2VVknksIhv
+	kcHkJf/m2uUqM5T15x/mcGGjTJg/8YJY00RXYxQQDgeeQ87kdqW35/3a7VbDUxboMA71in0Yawd7u
+	4/4iKfHcf6I9BQ6ecNNSAfRTquPQdtjr0kugVEjGSlSsqQ3rjoqLbTZ2YPxg4hN5bOO8YPACGuYs3
+	FEGlTf4zCx8IgyywA1aVZrDdJeaNTetxAV9oTu9UJMtd8q2r9dksWtd2jhBvoB+Vsy7CwQEsiljbS
+	HHRgls2jHBLR+6s6R9QHTiDKkd3kUz8THhfbw9sDnmOqTgBqZjkNffyRWCjsyTvF2J3TeuaVhJ1YK
+	l70jOLZQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:50732)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rWasb-0007tn-2J;
+	Sun, 04 Feb 2024 11:41:45 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rWasY-0001iu-Gp; Sun, 04 Feb 2024 11:41:42 +0000
+Date: Sun, 4 Feb 2024 11:41:42 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	David Miller <davem@davemloft.net>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] bnxt: convert EEE handling to use linkmode
+ bitmaps
+Message-ID: <Zb939rzMQchueX2r@shell.armlinux.org.uk>
+References: <10510abd-ac26-42d0-8222-8b01fe9b8059@gmail.com>
+ <e65b8525-eae0-4143-aa57-009b47f09005@lunn.ch>
+ <CACKFLinhkS8-=QtZu9Es9ATiSMAyosuCfuPVFUOxzqJk4Tr2rA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240117114350.3105-1-maimon.sagi@gmail.com> <8a6c5297-6e86-4f0d-a85e-1a93b2215d68@linux.dev>
-In-Reply-To: <8a6c5297-6e86-4f0d-a85e-1a93b2215d68@linux.dev>
-From: Sagi Maimon <maimon.sagi@gmail.com>
-Date: Sun, 4 Feb 2024 13:31:48 +0200
-Message-ID: <CAMuE1bFEbrY2PiDB6OdZGzDNijPAhoGBircTpqiyVs0Qq6bOig@mail.gmail.com>
-Subject: Re: [PATCH v5] ptp: ocp: add Adva timecard support
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: richardcochran@gmail.com, jonathan.lemon@gmail.com, vadfed@fb.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACKFLinhkS8-=QtZu9Es9ATiSMAyosuCfuPVFUOxzqJk4Tr2rA@mail.gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Hi Vadim,
-Sorry but I was on vacation for the last two weeks.
-So What should I do now:
-1) Do you want me to set my changes into the main linux git tree:
-    git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-    and use  use '[PATCH v6] ...' prefix
-2) Or
-    set my changes into the net-next git tree:
-    git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git
-    and use  use '[PATCH net-next v6] ...' prefix
+On Sat, Feb 03, 2024 at 04:16:51PM -0800, Michael Chan wrote:
+> On Sat, Feb 3, 2024 at 1:59 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> >
+> > > -     if (!edata->advertised_u32) {
+> > > -             edata->advertised_u32 = advertising & eee->supported_u32;
+> > > -     } else if (edata->advertised_u32 & ~advertising) {
+> > > -             netdev_warn(dev, "EEE advertised %x must be a subset of autoneg advertised speeds %x\n",
+> > > -                         edata->advertised_u32, advertising);
+> >
+> > That warning text looks wrong. I think it should be
+> >
+> > EEE advertised %x must be a subset of autoneg supported speeds %x
+> >
+> > and it should print eee->supported, not advertising.
+> >
+> I think it is correct.  EEE advertised must be a subset of the
+> advertised speed.
 
-BR,
-Sagi
+Where is that a requirement?
 
-On Wed, Jan 17, 2024 at 11:23=E2=80=AFPM Vadim Fedorenko
-<vadim.fedorenko@linux.dev> wrote:
->
-> On 17/01/2024 11:43, Sagi Maimon wrote:
-> > Adding support for the Adva timecard.
-> > The card uses different drivers to provide access to the
-> > firmware SPI flash (Altera based).
-> > Other parts of the code are the same and could be reused.
-> >
->
-> Hi Sagi,
->
-> Thanks for adjusting the code. One signle still have to be
-> adjusted, see comments below. And this is treated as net-next
-> material, but net-next is closed now until merge window ends,
-> you will have to submit new version next week.
->
-> Please, also use '[PATCH net-next v6] ...' prefix for it.
->
-> > Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
-> > ---
-> >   Changes since version 4:
-> >   - alignment fix.
-> >
->
-> Please, preserve changes from all previous versions for next submissions.
->
-> >   drivers/ptp/ptp_ocp.c | 302 ++++++++++++++++++++++++++++++++++++++++-=
--
-> >   1 file changed, 293 insertions(+), 9 deletions(-)
-> >
->
-> [ ..skip.. ]
->
-> > @@ -2603,7 +2819,44 @@ ptp_ocp_art_board_init(struct ptp_ocp *bp, struc=
-t ocp_resource *r)
-> >       if (err)
-> >               return err;
-> >
-> > -     return ptp_ocp_init_clock(bp);
-> > +     return ptp_ocp_init_clock(bp, r->extra);
-> > +}
-> > +
-> > +/* ADVA specific board initializers; last "resource" registered. */
-> > +static int
-> > +ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
-> > +{
-> > +     int err;
-> > +     u32 version;
-> > +
-> > +     bp->flash_start =3D 0xA00000;
-> > +     bp->eeprom_map =3D fb_eeprom_map;
-> > +     bp->sma_op =3D &ocp_adva_sma_op;
-> > +
-> > +     version =3D ioread32(&bp->image->version);
-> > +     /* if lower 16 bits are empty, this is the fw loader. */
-> > +     if ((version & 0xffff) =3D=3D 0) {
-> > +             version =3D version >> 16;
-> > +             bp->fw_loader =3D true;
-> > +     }
-> > +     bp->fw_tag =3D 1;
->
-> Please, use fw_tag =3D 3 here, other tags are for other vendors.
->
-> Thanks,
-> Vadim
->
-> > +     bp->fw_version =3D version & 0xffff;
-> > +     bp->fw_cap =3D OCP_CAP_BASIC | OCP_CAP_SIGNAL | OCP_CAP_FREQ;
-> > +
-> > +     ptp_ocp_tod_init(bp);
-> > +     ptp_ocp_nmea_out_init(bp);
-> > +     ptp_ocp_signal_init(bp);
-> > +
->
+If a PHY supports e.g. 1G, 100M, and supports EEE at those two speeds,
+but is only advertising 1G, then the only speed that could be
+negotiated is 1G.
+
+The EEE negotiation will also occur, and if the link partner also
+advertises EEE at 1G and 100M, the result of that negotiation is that
+EEE _can_ _be_ _used_ at 1G and 100M speeds.
+
+However, the PHY has negotiated 1G speed, so it now checks to see
+whether the EEE negotiation included 1G speed. The fact that the EEE
+negotiation also includes 100M is irrelevant - the negotiated speed
+is 1G, and that's all that determines whether EEE will be used for
+the negotiated link speed.
+
+The exception is if the PHY is buggy and doesn't follow this, e.g.
+assuming that if any EEE speed was negotiated that EEE is supported,
+but that would be a recipe for disaster given that a link partner
+may only advertise EEE at 100M, we may be advertising 100M and 1G
+(both for EEE and link) so we end up using 1G with EEE despite the
+link partner not supporting it.
+
+So, whatever way I look at it, the statement "the EEE advertisement
+must be a subset of the link advertisement" makes absolutely no sense
+to me, and is probably wrong.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
