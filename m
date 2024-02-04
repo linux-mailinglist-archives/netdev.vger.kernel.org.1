@@ -1,283 +1,164 @@
-Return-Path: <netdev+bounces-68892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E01B848C1C
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 09:24:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C711848C2B
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 09:31:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B62322849D9
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 08:24:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A4582813BA
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 08:31:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1AAC11711;
-	Sun,  4 Feb 2024 08:24:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3449E1400A;
+	Sun,  4 Feb 2024 08:31:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="E9cnJY86"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HRCW9zPT"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2594111713;
-	Sun,  4 Feb 2024 08:24:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9A3914000
+	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 08:31:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707035071; cv=none; b=MF0UyPpC5Mrcdas3SynwJw7Imtzvlwzb8F974e4lnEkFg0ylbeEUO/rQVDgGImDguxfvL7tG9lJVyaikv06Zg3YooKDlbQpEnmDx/QGB+hrX9kDywmDXyDtU6gWlnXZZvyHJqWIELRdQ5emclnq6OTami/rtRvGSeieoywHLo4c=
+	t=1707035499; cv=none; b=m5fGIHNSxUy/pAcFhw+oO2d0LFE0SHTK26EX5r5k+1f6SXRQHQL/RnAeaYDJcb+cukbzar00rjnA5wH91lu3bYSmOfG6cTOYtR22gDA361Uo+Egv75Ata070wJ5So8ULnafso8gs1HrZFHiZGbvKqQ0qctyR4e9xkZHNXQCKJ10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707035071; c=relaxed/simple;
-	bh=5J+cliO+JfXljBtGpCxBP37ieE0cdrIyo1s8/G5n0vM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XjGoY+cJhuJyaJLI+uWmX2Om7MQDFgj+nd/ZPGd5eryitk3tdkMoJWntyIJ2xD5s+2ip5Qhp1qogP6A67qb7f5K6UdQtPqgc0lOK1qSgE+2D2Ah6fBn1aElOSyBzR3k3Cc4RDScEFceWra+i3P/ldLbQKOseVRV/GayKg5Ivivc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=E9cnJY86; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=6hr8j
-	nxuo0qxber3AjHkZ7sw07jBpaZDRkw/V8bFWuU=; b=E9cnJY86fbOiNGulMVQbc
-	Cr45HoPhTbyTNDDetFyxr6RWX84azZ7B7y+XcV6HovA47UjkSxcZnqRMVVsVRQVL
-	5kkzScCqqQNm8/ra1vT1gEyoD4RrmA3FJXqFmUoIqDnkrBBlcGE2p/lCpwdtBHWY
-	fHRWJ4d/C64lo4mPtDoBuA=
-Received: from localhost.localdomain (unknown [111.202.47.2])
-	by gzga-smtp-mta-g1-1 (Coremail) with SMTP id _____wCHD26ASb9lFOq2Ag--.34886S2;
-	Sun, 04 Feb 2024 16:23:29 +0800 (CST)
-From: Keqi Wang <wangkeqi_chris@163.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Keqi Wang <wangkeqi_chris@163.com>,
-	kernel test robot <oliver.sang@intel.com>
-Subject: [PATCH] connector/cn_proc: cn_netlink_has_listeners replaces proc_event_num_listeners
-Date: Sun,  4 Feb 2024 16:22:51 +0800
-Message-Id: <20240204082251.5118-1-wangkeqi_chris@163.com>
-X-Mailer: git-send-email 2.27.0
+	s=arc-20240116; t=1707035499; c=relaxed/simple;
+	bh=r1A/v1eHjPiuL7AiKqjoHYb4dmV50y2kBpOqXR4AzbM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rKdM0kkRh7Hw8X6M3c2dln2sR/gdjYp5oAiFtfzXBOSr60RdPv4+ViTD+CbEvF8gIn3Yl3nXtQqyGEPTtLvACj9xMkPKPDO0sLPTaEv0Cw0cTiIraHOngrQVms2FCa1eQBLy1G6mAd0au0WXD1bsO+G8lZZQCf010SiYQk84R2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HRCW9zPT; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1d8ef977f1eso25509935ad.0
+        for <netdev@vger.kernel.org>; Sun, 04 Feb 2024 00:31:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707035497; x=1707640297; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=P5rjl3F5UK/aWtPDYHKg22suQ7v7gmFu3q/2eXmMt0M=;
+        b=HRCW9zPT5FQLPjtv4sLLLpm2AasSOjtSZnifMfCqxgoIngQUOIVNfvfIO9/aqW4xsM
+         LEzt8sQQ0OcqW2rBMCJhr0c/yRh97lwi2k6Brw7lKDHbkdP7eNZNGKvUlcqTSr6j5FT1
+         0p/yBae1uaLqdOAFi46+LJnff+3U0fJIoQYDxNRGHM1j86hDAY3P0GuJ3PIkl1h3sMMA
+         G5k0HbjAMyB1PsgGdtdIx1gOsPVF5chuFoKv7RVSlRc/rwkRixlRTdmXZI1BcUqYwXt9
+         o/fBmeNh6RRG0Bf1epa30FOKu6RHKXUfMELYC0GQYHAvpffAJ/5YVuuf4hIwW6TDCiek
+         lhHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707035497; x=1707640297;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=P5rjl3F5UK/aWtPDYHKg22suQ7v7gmFu3q/2eXmMt0M=;
+        b=NDfD9HKfC30Imq7KdxCfpfNJXIfESEHyU5EJnVrh1B7MA2LDlDL2I/wcw4hK71mwpU
+         fTOI/qT7m7yRcd56CiHYaVou9TSWW/BI7cxO7Tmv1a7I0vQIOuua/DRq301b2I9xc7az
+         DvcaT1Oio1zF8bsImHTuolFYQnPzM5NtO5v/tBjLc2UkjcoTeOrKwLL/N80GsPiXb6Zs
+         QvrrAYkz1NX5/HhITh4xFdXO84p5SVcIluLmuKH7l/V07rjPNR3+GJa0O/zs9ST32ApQ
+         d7XAW+6Jgje2IZqAzXkS+80Uir4UFseL9a0xLGYEJ4/g4RBp8ElMXRKQc7WkQ9DSDdYM
+         iztw==
+X-Gm-Message-State: AOJu0YyhrsGBhWNriL12KCAZYb3VoNIXZOYqzUYjRSnEh3kRsNazvBij
+	AGH8qK6yRsKR9F02/KamAOReRzphXrjs/UAE5IhKJwcYZMkzBYOJ
+X-Google-Smtp-Source: AGHT+IFfGzse11U+c+cfAqALdf82n098u6Ym2j0H3S8Qpnv/AABeYcMxZQYfDjLBFoBu7cY+PJ/ZEw==
+X-Received: by 2002:a17:902:8685:b0:1d8:b2f4:28ce with SMTP id g5-20020a170902868500b001d8b2f428cemr10717920plo.42.1707035496768;
+        Sun, 04 Feb 2024 00:31:36 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUjK5nOs8YO0X8I8xt0ibipA001+8y5NJBzEnjFs+VzmgAmiaBRzDwPMyCNARAqHVbOJfPxoZT4ik/WBJfSvR4fM1/nfpIB+A2J12J0Wh0+xRwR3kuU11A237leM78g+QVkWAJ7vbPqmho4i/zGck/Z4PRI/qsNpw8Hss8rZUNEDFo25yqKwBo2t2q0/ZqnesS6HInwpFkds+HWIqDQChovvf4ERqKJTePiVrnuds96dSI=
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id li7-20020a170903294700b001d71729ec9csm4205362plb.188.2024.02.04.00.31.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 04 Feb 2024 00:31:35 -0800 (PST)
+Date: Sun, 4 Feb 2024 16:31:31 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, Jay Vosburgh <j.vosburgh@gmail.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Liang Li <liali@redhat.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCHv3 net-next 4/4] selftests: bonding: use slowwait instead
+ of hard code sleep
+Message-ID: <Zb9LYwfRLsi5VucO@Laptop-X1>
+References: <20240202023754.932930-1-liuhangbin@gmail.com>
+ <20240202023754.932930-5-liuhangbin@gmail.com>
+ <20240203094151.5347fba8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wCHD26ASb9lFOq2Ag--.34886S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW3Xry5uF1kur1xur4DJrW3Awb_yoW3Jr1UpF
-	Z09r9xtrWDKr17Wwn8A3Wq9rnxZa4kXayUCFWxKwn3Ar1fKr1kJFW8JanxAF1fJ34kKr17
-	Za17KFWa9F4DAaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pRqsUNUUUUU=
-X-CM-SenderInfo: 5zdqwy5htlsupkul2qqrwthudrp/xtbBzwZ63GV4HslgngAAsb
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240203094151.5347fba8@kernel.org>
 
-It is not accurate to reset proc_event_num_listeners according to
-cn_netlink_send_mult() return value -ESRCH.
+On Sat, Feb 03, 2024 at 09:41:51AM -0800, Jakub Kicinski wrote:
+> On Fri,  2 Feb 2024 10:37:54 +0800 Hangbin Liu wrote:
+> > diff --git a/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh b/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
+> > index b609fb6231f4..acd3ebed3e20 100755
+> > --- a/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
+> > +++ b/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
+> > @@ -58,7 +58,7 @@ macvlan_over_bond()
+> >  	ip -n ${m2_ns} addr add ${m2_ip4}/24 dev macv0
+> >  	ip -n ${m2_ns} addr add ${m2_ip6}/24 dev macv0
+> >  
+> > -	sleep 2
+> > +	slowwait 2 ip netns exec ${c_ns} ping ${s_ip4} -c 1 -W 0.1 &> /dev/null
+> >  
+> >  	check_connection "${c_ns}" "${s_ip4}" "IPv4: client->server"
+> >  	check_connection "${c_ns}" "${s_ip6}" "IPv6: client->server"
+> > @@ -69,8 +69,7 @@ macvlan_over_bond()
+> >  	check_connection "${m1_ns}" "${m2_ip4}" "IPv4: macvlan_1->macvlan_2"
+> >  	check_connection "${m1_ns}" "${m2_ip6}" "IPv6: macvlan_1->macvlan_2"
+> >  
+> > -
+> > -	sleep 5
+> > +	slowwait 5 ip netns exec ${s_ns} ping ${c_ip4} -c 1 -W 0.1 &> /dev/null
+> >  
+> >  	check_connection "${s_ns}" "${c_ip4}" "IPv4: server->client"
+> >  	check_connection "${s_ns}" "${c_ip6}" "IPv6: server->client"
+> 
+> This makes the bond_macvlan.sh test flaky:
+> 
+> https://netdev.bots.linux.dev/contest.html?test=bond-macvlan-sh
 
-In the case of stress-ng netlink-proc, -ESRCH will always be returned,
-because netlink_broadcast_filtered will return -ESRCH,
-which may cause stress-ng netlink-proc performance degradation.
+Hi Jakub,
 
-proc_event_num_listeners cannot accurately reflect whether
-the listener exists, so add cn_netlink_has_listeners() functon
-and use that instead of proc_event_num_listeners.
+Thanks for the report.
 
-Reported-by: kernel test robot <oliver.sang@intel.com>
-Closes: https://lore.kernel.org/oe-lkp/202401112259.b23a1567-oliver.sang@intel.com
-Fixes: c46bfba1337d ("connector: Fix proc_event_num_listeners count not cleared")
-Signed-off-by: Keqi Wang <wangkeqi_chris@163.com>
----
- drivers/connector/cn_proc.c   | 46 +++++++++++++++++------------------
- drivers/connector/connector.c |  9 +++++++
- include/linux/connector.h     |  2 ++
- 3 files changed, 34 insertions(+), 23 deletions(-)
+> 
+> I repro'd it and the ping in check_connection() fails - neigh resolution
+> fails. I guess we need to insert more of the slowwaits?
+> 
+> Reverting this patch from the pending patch tree fixes it. The runner
+> has no KVM support, and runs a VM with 64 CPUs. If I lower the number
+> of CPUs to 4 the test passes. I added the note that some flakiness may
+> be caused by high CPU count:
+> 
+> https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style#tips
 
-diff --git a/drivers/connector/cn_proc.c b/drivers/connector/cn_proc.c
-index 3d5e6d705..5d0339ee7 100644
---- a/drivers/connector/cn_proc.c
-+++ b/drivers/connector/cn_proc.c
-@@ -36,7 +36,6 @@ static inline struct cn_msg *buffer_to_cn_msg(__u8 *buffer)
- 	return (struct cn_msg *)(buffer + 4);
- }
- 
--static atomic_t proc_event_num_listeners = ATOMIC_INIT(0);
- static struct cb_id cn_proc_event_id = { CN_IDX_PROC, CN_VAL_PROC };
- 
- /* local_event.count is used as the sequence number of the netlink message */
-@@ -85,6 +84,16 @@ static int cn_filter(struct sock *dsk, struct sk_buff *skb, void *data)
- 	return 1;
- }
- 
-+static int cn_netlink_has_listeners(void)
-+{
-+	struct sock *sk = cn_cdev_nls_get();
-+
-+	if (sk)
-+		return netlink_has_listeners(sk, CN_IDX_PROC);
-+	else
-+		return 0;
-+}
-+
- static inline void send_msg(struct cn_msg *msg)
- {
- 	__u32 filter_data[2];
-@@ -108,9 +117,8 @@ static inline void send_msg(struct cn_msg *msg)
- 		filter_data[1] = 0;
- 	}
- 
--	if (cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
--			     cn_filter, (void *)filter_data) == -ESRCH)
--		atomic_set(&proc_event_num_listeners, 0);
-+	cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
-+			     cn_filter, (void *)filter_data);
- 
- 	local_unlock(&local_event.lock);
- }
-@@ -122,7 +130,7 @@ void proc_fork_connector(struct task_struct *task)
- 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
- 	struct task_struct *parent;
- 
--	if (atomic_read(&proc_event_num_listeners) < 1)
-+	if (!cn_netlink_has_listeners())
- 		return;
- 
- 	msg = buffer_to_cn_msg(buffer);
-@@ -151,7 +159,7 @@ void proc_exec_connector(struct task_struct *task)
- 	struct proc_event *ev;
- 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
- 
--	if (atomic_read(&proc_event_num_listeners) < 1)
-+	if (!cn_netlink_has_listeners())
- 		return;
- 
- 	msg = buffer_to_cn_msg(buffer);
-@@ -176,7 +184,7 @@ void proc_id_connector(struct task_struct *task, int which_id)
- 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
- 	const struct cred *cred;
- 
--	if (atomic_read(&proc_event_num_listeners) < 1)
-+	if (!cn_netlink_has_listeners())
- 		return;
- 
- 	msg = buffer_to_cn_msg(buffer);
-@@ -213,7 +221,7 @@ void proc_sid_connector(struct task_struct *task)
- 	struct proc_event *ev;
- 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
- 
--	if (atomic_read(&proc_event_num_listeners) < 1)
-+	if (!cn_netlink_has_listeners())
- 		return;
- 
- 	msg = buffer_to_cn_msg(buffer);
-@@ -237,7 +245,7 @@ void proc_ptrace_connector(struct task_struct *task, int ptrace_id)
- 	struct proc_event *ev;
- 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
- 
--	if (atomic_read(&proc_event_num_listeners) < 1)
-+	if (!cn_netlink_has_listeners())
- 		return;
- 
- 	msg = buffer_to_cn_msg(buffer);
-@@ -269,7 +277,7 @@ void proc_comm_connector(struct task_struct *task)
- 	struct proc_event *ev;
- 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
- 
--	if (atomic_read(&proc_event_num_listeners) < 1)
-+	if (!cn_netlink_has_listeners())
- 		return;
- 
- 	msg = buffer_to_cn_msg(buffer);
-@@ -295,7 +303,7 @@ void proc_coredump_connector(struct task_struct *task)
- 	struct task_struct *parent;
- 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
- 
--	if (atomic_read(&proc_event_num_listeners) < 1)
-+	if (!cn_netlink_has_listeners())
- 		return;
- 
- 	msg = buffer_to_cn_msg(buffer);
-@@ -328,7 +336,7 @@ void proc_exit_connector(struct task_struct *task)
- 	struct task_struct *parent;
- 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
- 
--	if (atomic_read(&proc_event_num_listeners) < 1)
-+	if (!cn_netlink_has_listeners())
- 		return;
- 
- 	msg = buffer_to_cn_msg(buffer);
-@@ -370,7 +378,7 @@ static void cn_proc_ack(int err, int rcvd_seq, int rcvd_ack)
- 	struct proc_event *ev;
- 	__u8 buffer[CN_PROC_MSG_SIZE] __aligned(8);
- 
--	if (atomic_read(&proc_event_num_listeners) < 1)
-+	if (!cn_netlink_has_listeners())
- 		return;
- 
- 	msg = buffer_to_cn_msg(buffer);
-@@ -396,10 +404,10 @@ static void cn_proc_ack(int err, int rcvd_seq, int rcvd_ack)
- static void cn_proc_mcast_ctl(struct cn_msg *msg,
- 			      struct netlink_skb_parms *nsp)
- {
--	enum proc_cn_mcast_op mc_op = 0, prev_mc_op = 0;
-+	enum proc_cn_mcast_op mc_op = 0;
- 	struct proc_input *pinput = NULL;
- 	enum proc_cn_event ev_type = 0;
--	int err = 0, initial = 0;
-+	int err = 0;
- 	struct sock *sk = NULL;
- 
- 	/* 
-@@ -436,10 +444,6 @@ static void cn_proc_mcast_ctl(struct cn_msg *msg,
- 				err = ENOMEM;
- 				goto out;
- 			}
--			initial = 1;
--		} else {
--			prev_mc_op =
--			((struct proc_input *)(sk->sk_user_data))->mcast_op;
- 		}
- 		((struct proc_input *)(sk->sk_user_data))->event_type =
- 			ev_type;
-@@ -448,12 +452,8 @@ static void cn_proc_mcast_ctl(struct cn_msg *msg,
- 
- 	switch (mc_op) {
- 	case PROC_CN_MCAST_LISTEN:
--		if (initial || (prev_mc_op != PROC_CN_MCAST_LISTEN))
--			atomic_inc(&proc_event_num_listeners);
- 		break;
- 	case PROC_CN_MCAST_IGNORE:
--		if (!initial && (prev_mc_op != PROC_CN_MCAST_IGNORE))
--			atomic_dec(&proc_event_num_listeners);
- 		((struct proc_input *)(sk->sk_user_data))->event_type =
- 			PROC_EVENT_NONE;
- 		break;
-diff --git a/drivers/connector/connector.c b/drivers/connector/connector.c
-index 7f7b94f61..540249d6d 100644
---- a/drivers/connector/connector.c
-+++ b/drivers/connector/connector.c
-@@ -129,6 +129,15 @@ int cn_netlink_send(struct cn_msg *msg, u32 portid, u32 __group,
- }
- EXPORT_SYMBOL_GPL(cn_netlink_send);
- 
-+struct sock *cn_cdev_nls_get(void)
-+{
-+	if (cn_already_initialized == 1)
-+		return cdev.nls;
-+	else
-+		return NULL;
-+}
-+EXPORT_SYMBOL_GPL(cn_cdev_nls_get);
-+
- /*
-  * Callback helper - queues work and setup destructor for given data.
-  */
-diff --git a/include/linux/connector.h b/include/linux/connector.h
-index cec2d99ae..ca4d0cca7 100644
---- a/include/linux/connector.h
-+++ b/include/linux/connector.h
-@@ -127,6 +127,8 @@ int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid,
-  */
- int cn_netlink_send(struct cn_msg *msg, u32 portid, u32 group, gfp_t gfp_mask);
- 
-+struct sock *cn_cdev_nls_get(void);
-+
- int cn_queue_add_callback(struct cn_queue_dev *dev, const char *name,
- 			  const struct cb_id *id,
- 			  void (*callback)(struct cn_msg *, struct netlink_skb_parms *));
--- 
-2.27.0
+Sadly, I can't reproduce it with an Intel(R) Xeon(R) CPU E5-2650 v3 @ 2.30GHz,
+which has 20 Cores and 40 Processors. From your logs[1][2][3], all the tests
+failed when ping from client to macvlan_2. e.g.
 
+# TEST: balance-tlb: IPv4: client->macvlan_1                          [ OK ]
+# TEST: balance-tlb: IPv6: client->macvlan_1                          [ OK ]
+# TEST: balance-tlb: IPv4: client->macvlan_2                          [FAIL]
+# ping failed
+# TEST: balance-tlb: IPv6: client->macvlan_2                          [ OK ]
+
+Or
+
+# TEST: balance-alb: IPv4: client->macvlan_1                          [ OK ]
+# TEST: balance-alb: IPv6: client->macvlan_1                          [ OK ]
+# TEST: balance-alb: IPv4: client->macvlan_2                          [FAIL]
+# ping failed
+# TEST: balance-alb: IPv6: client->macvlan_2                          [ OK ]
+
+Let us checking the client to macvlan2 connection via slowwait and see
+if it works.
+
+[1] https://netdev-2.bots.linux.dev/vmksft-bonding/results/449541/2-bond-macvlan-sh/stdout
+[2] https://netdev-2.bots.linux.dev/vmksft-bonding/results/449361/4-bond-macvlan-sh/stdout
+[3] https://netdev-2.bots.linux.dev/vmksft-bonding/results/449001/4-bond-macvlan-sh/stdout
+
+Thanks
+Hangbin
 
