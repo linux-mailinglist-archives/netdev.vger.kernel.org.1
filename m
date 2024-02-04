@@ -1,91 +1,95 @@
-Return-Path: <netdev+bounces-68981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-68982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 818DE84906A
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 21:39:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E10478490A0
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 22:23:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4429B21058
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 20:39:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 286101C20E0B
+	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 21:23:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4E9A25564;
-	Sun,  4 Feb 2024 20:39:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 843CB286BC;
+	Sun,  4 Feb 2024 21:23:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="EclhV4sG"
 X-Original-To: netdev@vger.kernel.org
-Received: from xavier.telenet-ops.be (xavier.telenet-ops.be [195.130.132.52])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1B6425561
-	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 20:39:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.130.132.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD88C32C6C
+	for <netdev@vger.kernel.org>; Sun,  4 Feb 2024 21:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707079191; cv=none; b=qIj6eyCPGLSDwoudRNUkjo2an6GquAlqP0BDvcH9izzpQ1aYS7j+Yshxn2ciwoQshzpilWefUwxAtjArb1I6iXWW/4y4PJBoKuNWwshnj7LWbKwaI+zNqomuhc77FS7xXdKRK8BNtOywX94J/s16CuZ+r/aCq6gtWl6FK/qxbZ8=
+	t=1707081789; cv=none; b=OQh5O6N3NBygEAkq3qehOPyxPJC7S530aVyQxz5KrXCQC/CO/D+jN8FGAuC3Bj1D41HurE4sx4NsBpAxhChS70fNMYCg02Zp5oNOzxXLLx0/9K2oQHS+f787/9JDsZpg47HRRAKyI6yS0PJM1cNlOM2QnmsPK0TEOD0tewK3d3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707079191; c=relaxed/simple;
-	bh=bZUe2GOxF3aw0+BuWiU25T7bnpBwA1o3kT8FhuMZkmM=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=c7uaMMvnIwJRWlPpPTsvibLf0jNzCEie8Rhco2w87bw7ZaF3B9Ka+KKa7sjiZcpMhZr8JY7/cKaDrFOLBIM3p+Oe51E5641pDG0XISLFE2r5T5xJ/SnXVqw5TIRiHdMwLfxU+34tEe85E36qtq90GXOFWA8A9lA5+jZNPNdCjFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=none smtp.mailfrom=linux-m68k.org; arc=none smtp.client-ip=195.130.132.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux-m68k.org
-Received: from ramsan.of.borg ([IPv6:2a02:1810:ac12:ed40:603c:67a9:634f:3025])
-	by xavier.telenet-ops.be with bizsmtp
-	id j8fn2B0091jQqGJ018fndR; Sun, 04 Feb 2024 21:39:47 +0100
-Received: from geert (helo=localhost)
-	by ramsan.of.borg with local-esmtp (Exim 4.95)
-	(envelope-from <geert@linux-m68k.org>)
-	id 1rWjHH-00HFOC-GI;
-	Sun, 04 Feb 2024 21:39:47 +0100
-Date: Sun, 4 Feb 2024 21:39:47 +0100 (CET)
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-To: linux-kernel@vger.kernel.org
-cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, 
-    Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org, 
-    netdev@vger.kernel.org
-Subject: Re: Build regressions/improvements in v6.8-rc3
-In-Reply-To: <20240204194607.3067634-1-geert@linux-m68k.org>
-Message-ID: <f839ca42-c55-4850-28fe-cb198fa9db4d@linux-m68k.org>
-References: <CAHk-=wisik=He=zySDRHq7fe6k_cOXZeZiCkR41TmbzK2KNZtg@mail.gmail.com> <20240204194607.3067634-1-geert@linux-m68k.org>
+	s=arc-20240116; t=1707081789; c=relaxed/simple;
+	bh=4UYqTxp9akS1pkLIefnrLD54gBy4Vxt9REAPqFvkPGM=;
+	h=Message-ID:Subject:From:To:Cc:Date:Content-Type:MIME-Version; b=KNXDHcumeZ8974FWE2zWF1JHgLmxNPc4NOgXI9waRXM7Kwnp7eNceK/T4m6bojuGjakLGoZO9hd4nRf5nKzNdEp2peFTCXdzrrYb2IYpPBeqrPzDMSQ6G3yzJXd/U8DWNcbZYhaJcw1zGJ50nMcAYm+D6qzhkDNJu8QCVdaW4l4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=EclhV4sG; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=googlemail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-33b1d7f736bso1774119f8f.3
+        for <netdev@vger.kernel.org>; Sun, 04 Feb 2024 13:23:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=googlemail.com; s=20230601; t=1707081786; x=1707686586; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:date:cc:to
+         :reply-to:from:subject:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=4UYqTxp9akS1pkLIefnrLD54gBy4Vxt9REAPqFvkPGM=;
+        b=EclhV4sGUHQ171fbfVew8rX9L8mTrGa3svAxdy5kEDzE3u1qmeV78znxBw6cCjxQHT
+         QBY7VyILtSMp0no+Y9W2zLq4krBQiCmmvP7msjwA1EDb0LNeiae2XHtCKoYtK1Cl/cPO
+         oTakDOCN06QWaxpfbwf4tNPPcjNiQdpVjcdBVg/qMs+BqFX/sJcKEMP2OPPAk7yQmpP3
+         8D9C1Nj8N/BZKwMbD1eYvgo8npnIZz6LQ3rO8wOCHBTvzP+aYUcywjWFHkiNBkTWLg54
+         609pOZ0zGhhhLTrJ8Psjxz4VPqDr04cDli4OrjDiiFXTf772NoHx4bQhIulm2jaZa6B+
+         UxKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707081786; x=1707686586;
+        h=mime-version:user-agent:content-transfer-encoding:date:cc:to
+         :reply-to:from:subject:message-id:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4UYqTxp9akS1pkLIefnrLD54gBy4Vxt9REAPqFvkPGM=;
+        b=Q6BoPhf0b68uw52vJhu4i91sU4tMiNn1vpOmwGG38FnjPHaq7vLaSMLLaPiMOJ0CkB
+         TFFC9lvNDIWfg4PjblqTRFzu6bWFx79fHhSYLKdMXGYAk2tclczw4q5kLTNPiSBvvGBb
+         D3q5qAl5m5yQFDYQpvK6ynJauLuQaM3wsrW6FA4ONTxC/n5i7uWYOCv9N19VmBaX1jZg
+         kxaS/ypXZKlGgS95mg/cSSnN9461N7gYqE456M147U9NF6YafMmMG8FRA+JeitLsPkVj
+         u2yWqR8c7OFKoZ7iOGZxzsvQlk1xttApOMv6znyW374yRuy9VhJ5D0k0QhAHZzrUYfpL
+         fgJQ==
+X-Gm-Message-State: AOJu0YxcdHeGM/XTRhElU0CRlXcFYzCQKAg7S4/y0zLGHDFAWBI+k8BX
+	Mt41V31i/8FD0/qf25LzZTT3hksrxmlV2w2GoyzS2hgZfp4bGEYj
+X-Google-Smtp-Source: AGHT+IGqCmup/mSuztaPfAe+aB4kb6LqRLkJK3OLqKtqt01CfirBR/w2nYZPwOIjvEC3tHHMdHOITQ==
+X-Received: by 2002:a5d:6a0a:0:b0:33b:3c79:9182 with SMTP id m10-20020a5d6a0a000000b0033b3c799182mr1001964wru.3.1707081785709;
+        Sun, 04 Feb 2024 13:23:05 -0800 (PST)
+Received: from mars-2.fritz.box ([2a02:8071:7130:82c0:da34:bd1d:ae27:5be6])
+        by smtp.gmail.com with ESMTPSA id l10-20020a5d410a000000b0033af5716a7fsm6618626wrp.61.2024.02.04.13.23.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 04 Feb 2024 13:23:05 -0800 (PST)
+Message-ID: <75ea348da98cf329099b0abf1ef383cd63c70c40.camel@googlemail.com>
+Subject: qca_spi: SPI_REG_SIGNATURE sometimes not recognized
+From: Christoph Fritz <chf.fritz@googlemail.com>
+Reply-To: chf.fritz@googlemail.com
+To: Stefan Wahren <wahrenst@gmx.net>
+Cc: netdev <netdev@vger.kernel.org>
+Date: Sun, 04 Feb 2024 22:23:04 +0100
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII; format=flowed
 
-On Sun, 4 Feb 2024, Geert Uytterhoeven wrote:
-> JFYI, when comparing v6.8-rc3[1] to v6.8-rc2[3], the summaries are:
->  - build errors: +4/-44
+Hello Stefan,
 
-   + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_1093' declared with attribute error: FIELD_GET: mask is not constant:  => 435:38
+ working on a board with QCA7005, on probe() SPI_REG_SIGNATURE
+sometimes fails (~1 out of 5 times) to be recognized correctly, even
+after multiple reads and retries.
 
-drivers/net/ethernet/intel/ice/ice_nvm.c: In function 'ice_get_orom_ver_info.isra.0':
-powerpc-gcc5/ppc64_book3e_allmodconfig
+Any suggestions?
 
-   + /kisskb/src/include/linux/compiler_types.h: error: call to '__compiletime_assert_1104' declared with attribute error: FIELD_GET: mask is not constant:  => 435:38
-
-In function 'ice_get_itr_intrl_gran.isra.2',
-     inlined from 'ice_init_hw' at drivers/net/ethernet/intel/ice/ice_common.c:984:2:
-powerpc-gcc5/ppc64_book3e_allmodconfig
-
-   + {standard input}: Error: unknown pseudo-op: `.cfi':  => 605
-   + {standard input}: Error: unknown pseudo-op: `.cfi_def_cfa_offse':  => 605
-
-SH ICE crickets
-
-> [1] http://kisskb.ellerman.id.au/kisskb/branch/linus/head/54be6c6c5ae8e0d93a6c4641cb7528eb0b6ba478/ (238 out of 239 configs)
-> [3] http://kisskb.ellerman.id.au/kisskb/branch/linus/head/41bccc98fb7931d63d03f326a746ac4d429c1dd3/ (all 239 configs)
-
-Gr{oetje,eeting}s,
-
- 						Geert
-
---
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
-
-In personal conversations with technical people, I call myself a hacker. But
-when I'm talking to journalists I just say "programmer" or something like that.
- 							    -- Linus Torvalds
+Thanks
+ -- Christoph
 
