@@ -1,687 +1,121 @@
-Return-Path: <netdev+bounces-69116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9392849AEF
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 13:52:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81C41849AF2
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 13:52:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B2831F23E10
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:52:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E312281B63
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:52:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4187C20DE1;
-	Mon,  5 Feb 2024 12:46:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C96021CA9A;
+	Mon,  5 Feb 2024 12:46:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ci4KHYjf"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99ADD481AF;
-	Mon,  5 Feb 2024 12:46:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51BEC22EF0
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 12:46:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707137172; cv=none; b=nuUTz511I2jItGTK6pn5EOta+V1X86xAacrwzFI2Ad+r0+MR2qviy/Bu1TcTRmjJgsk/qYsvpVLkbPMy3Ix0+SpWIq95aQ9GSB0Hi7dX+iEmrWswk3tahtuWiX3MOVbJefIEtDaYVNNQ5e2UC5sAF/sVXmctI4RPQZHgr59VUyo=
+	t=1707137185; cv=none; b=C0KE6Av2MR6TAsuBBnt2qXPqQ7MyU1zQGkrb4Bv28FRDx3fRQ7vUcDrNPJEaab/+hnbjbgf7skoa2/mlzREy90dzhDszGLIlpan0mRMvQHkt2fRHLyGUZDpgo6vYggM+JxKlz4v+6PYpExH8kgVkLP0WgpO0Gy91gDDgQzAyqUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707137172; c=relaxed/simple;
-	bh=TWpctkbBk1lVhqqE2Wym47YbtRSbNcC0J8CxmasIpEM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RQnjWckvwW6wZYBRAY1K9xJSsbr4lh8b7oWtmtPGU541Q4varx5HYmg5yrxZX1apdppodqJK7aTS8si/YXsNZ/RMzn8YryCnzvMRCTZdw+tMlNcquxwZfjBLvN9pgjBmNkEkxwHoOM3eiTEbyUdmSnK22ssG6nbXk/vlmI3YpSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TT5bc5bpVz1FK0g;
-	Mon,  5 Feb 2024 20:41:32 +0800 (CST)
-Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
-	by mail.maildlp.com (Postfix) with ESMTPS id 589521400C9;
-	Mon,  5 Feb 2024 20:46:07 +0800 (CST)
-Received: from localhost.localdomain (10.69.192.56) by
- dggpemm500005.china.huawei.com (7.185.36.74) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 5 Feb 2024 20:46:06 +0800
-From: Yunsheng Lin <linyunsheng@huawei.com>
-To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
-	<linyunsheng@huawei.com>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
-	<jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	<virtualization@lists.linux.dev>
-Subject: [PATCH net-next v5 5/5] tools: virtio: introduce vhost_net_test
-Date: Mon, 5 Feb 2024 20:45:05 +0800
-Message-ID: <20240205124506.57670-6-linyunsheng@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240205124506.57670-1-linyunsheng@huawei.com>
-References: <20240205124506.57670-1-linyunsheng@huawei.com>
+	s=arc-20240116; t=1707137185; c=relaxed/simple;
+	bh=E/bEA1+Rn7qyzjtzaIUP0SMxr2Z2UjJDe7OEHUFAEVQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TltpmVqr34iPZuA9rruei4ixBtWIEeiqSlnqsEddmiWjXbsFT/GKnQuYNzE4qwPAL8lYoRwktymqTUN9cBCTXZZBcXrnfVUtP2K8H12hIFoz6TIQy6fq1oNhe2VlJgBFPvKCf4VovhfN5Iryhyhg8hZx7hBFzTcq57ej6VHJJGg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ci4KHYjf; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1d7881b1843so38073795ad.3
+        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 04:46:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707137183; x=1707741983; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VJvpkLQhagvUr7dsuuWA9qAQjm4qcVzi0lOGzeS2Alc=;
+        b=Ci4KHYjfZUeURX8e0IoJ0mnqotJBdfceBrTDBbfFPrJpAoHfN8FLwYElenfbY2bzYs
+         HukZ+Cj1/OQLgmEpwOJqNZjEJceaR0V+u+Y2it+CxTVtRB5FZzEXGTJAgdYIausO6IUQ
+         Y7ys3+Q7Toabljr6AF97HwXGbhJ9ne7+XYnGGKOz7uG+ywW61u3BKH7rP0DYGl2kC/bo
+         l0kVujvnE6eT9/Pt5lgYhI8qek5rsAfRqujjrJ5I7/tFKvRBN1TItzC9ufAJLZRVE1L2
+         1GYQq+oAsUEc8muNrTuxjlRU0v3oJyZDEgPg8oRTKcEqn4/Ner5qdbDzTEI2xiQdVLzW
+         Q9tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707137183; x=1707741983;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VJvpkLQhagvUr7dsuuWA9qAQjm4qcVzi0lOGzeS2Alc=;
+        b=mc9kDt1Z6yMJkPb+pssiatr3r9P9X3KM1AlrGbeeM5SJDAnfPEsdZjMfayvzwx1a/I
+         11+oBABkU2AjAwb40VYc+qm8m1cIPizFTHYsNtUt8jt6dx1M+hR3TX/qIaiLgVsCojBs
+         ifw1/BvY7eOcruetLuBkKo5r81Kqfi8D1QRgLxuJC/EUJpA6E2VImjFco7p69V4ZtYuq
+         BAf8x3KjozwWkz8Q85AuOaWx9K7X9JXkEbtRADiQ1WK6RTm2tnUPQ1dssg3Od7sZStk2
+         ZOeozTAfrAVWhjILYhxcTu0MfMQk1ReDShXWsK1VkE3+i6TxnuilE+Lp0XyGKDSLih9K
+         cyng==
+X-Gm-Message-State: AOJu0YxLXKNZK1S5FGVieT3BOclsakzej096jRZPStgWz2BGmnJr/egZ
+	taD4nwRVUaRUyOoTGryk6qe1QDoC56bfRxCGIvCvHaOpNGL5Ddi3
+X-Google-Smtp-Source: AGHT+IGT8nL2E0jbjT93dgnoxXTihuHJMJmOGoXJqYC5+uyRXQBoZn2jLHjhWk6Iq9USG10WlKHnFg==
+X-Received: by 2002:a17:902:9a44:b0:1d9:7095:7e4e with SMTP id x4-20020a1709029a4400b001d970957e4emr10353409plv.27.1707137183501;
+        Mon, 05 Feb 2024 04:46:23 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUGoWip/yYt6Rz9ETFRAwA8olltLoP6rwTCHldl4d02i4NBSyenztikdkMoHyY5t6/coClEUtpoAhD+BIniM+4jthZQyq3kg4Ls7p6UhISIVktyPCzc4qHeHEXfjMkABSighKZEbfVqi5fWdHWh8HoSwzAGnNOD6I5FTu3zfzYjpUaJxNLXwUBMU7Xw+Uhk+/gIz18sjXMNrlBCq7WVFXWmjgVhdUL9G23EMEERW7Syr2c=
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id e6-20020a170902d38600b001d94df1f859sm6155819pld.186.2024.02.05.04.46.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Feb 2024 04:46:22 -0800 (PST)
+Date: Mon, 5 Feb 2024 20:46:18 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Liang Li <liali@redhat.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCHv4 net-next 4/4] selftests: bonding: use slowwait instead
+ of hard code sleep
+Message-ID: <ZcDYmgoqkYTARCWf@Laptop-X1>
+References: <20240204085128.1512341-1-liuhangbin@gmail.com>
+ <20240204085128.1512341-5-liuhangbin@gmail.com>
+ <20240204082858.2d823ef5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemm500005.china.huawei.com (7.185.36.74)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240204082858.2d823ef5@kernel.org>
 
-introduce vhost_net_test for both vhost_net tx and rx basing
-on virtio_test to test vhost_net changing in the kernel.
+On Sun, Feb 04, 2024 at 08:28:58AM -0800, Jakub Kicinski wrote:
+> On Sun,  4 Feb 2024 16:51:28 +0800 Hangbin Liu wrote:
+> > Use slowwait instead of hard code sleep for bonding tests.
+> > 
+> > In function setup_prepare(), the client_create() will be called after
+> > server_create(). So I think there is no need to sleep in server_create()
+> > and remove it.
+> > 
+> > For lab_lib.sh, remove bonding module may affect other running bonding tests.
+> > And some test env may buildin bond which can't be removed. The bonding
+> > link should be removed by lag_reset_network() or netns delete.
+> 
+> Unfortunately still fails here 4/10 runs :(
+> Did you try to repro with virtme-ng, --disable-kvm and many CPUs?
 
-Steps for vhost_net tx testing:
-1. Prepare a out buf.
-2. Kick the vhost_net to do tx processing.
-3. Do the receiving in the tun side.
-4. verify the data received by tun is correct.
+Yes, I use a CPU with 40 Processors. But I didn't `--disable-kvm` as I'm using
+microvm. After `--disable-microvm` I can reproduce 2/10 runs.
 
-Steps for vhost_net rx testing:
-1. Prepare a in buf.
-2. Do the sending in the tun side.
-3. Kick the vhost_net to do rx processing.
-4. verify the data received by vhost_net is correct.
+It looks that the slowwait makes the setup too quick, which makes ping failed.
+To avoid this, either we force using the previous `sleep 2`. Or wait more
+interval in check_connection(), which will consume more testing time.
 
-Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
----
- tools/virtio/.gitignore            |   1 +
- tools/virtio/Makefile              |   8 +-
- tools/virtio/linux/virtio_config.h |   4 +
- tools/virtio/vhost_net_test.c      | 536 +++++++++++++++++++++++++++++
- 4 files changed, 546 insertions(+), 3 deletions(-)
- create mode 100644 tools/virtio/vhost_net_test.c
+I tried to extend the `ping -i 0.1` to `0.2` and run the test 20 times, all
+passed. But this may extend the total test time, which is contrary with the
+current path's purpose. So I'm going to drop the change for bond_macvlan.
 
-diff --git a/tools/virtio/.gitignore b/tools/virtio/.gitignore
-index 9934d48d9a55..7e47b281c442 100644
---- a/tools/virtio/.gitignore
-+++ b/tools/virtio/.gitignore
-@@ -1,5 +1,6 @@
- # SPDX-License-Identifier: GPL-2.0-only
- *.d
- virtio_test
-+vhost_net_test
- vringh_test
- virtio-trace/trace-agent
-diff --git a/tools/virtio/Makefile b/tools/virtio/Makefile
-index d128925980e0..e25e99c1c3b7 100644
---- a/tools/virtio/Makefile
-+++ b/tools/virtio/Makefile
-@@ -1,8 +1,9 @@
- # SPDX-License-Identifier: GPL-2.0
- all: test mod
--test: virtio_test vringh_test
-+test: virtio_test vringh_test vhost_net_test
- virtio_test: virtio_ring.o virtio_test.o
- vringh_test: vringh_test.o vringh.o virtio_ring.o
-+vhost_net_test: virtio_ring.o vhost_net_test.o
- 
- try-run = $(shell set -e;		\
- 	if ($(1)) >/dev/null 2>&1;	\
-@@ -49,6 +50,7 @@ oot-clean: OOT_BUILD+=clean
- 
- .PHONY: all test mod clean vhost oot oot-clean oot-build
- clean:
--	${RM} *.o vringh_test virtio_test vhost_test/*.o vhost_test/.*.cmd \
--              vhost_test/Module.symvers vhost_test/modules.order *.d
-+	${RM} *.o vringh_test virtio_test vhost_net_test vhost_test/*.o \
-+              vhost_test/.*.cmd vhost_test/Module.symvers \
-+              vhost_test/modules.order *.d
- -include *.d
-diff --git a/tools/virtio/linux/virtio_config.h b/tools/virtio/linux/virtio_config.h
-index 2a8a70e2a950..42a564f22f2d 100644
---- a/tools/virtio/linux/virtio_config.h
-+++ b/tools/virtio/linux/virtio_config.h
-@@ -1,4 +1,6 @@
- /* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef LINUX_VIRTIO_CONFIG_H
-+#define LINUX_VIRTIO_CONFIG_H
- #include <linux/virtio_byteorder.h>
- #include <linux/virtio.h>
- #include <uapi/linux/virtio_config.h>
-@@ -95,3 +97,5 @@ static inline __virtio64 cpu_to_virtio64(struct virtio_device *vdev, u64 val)
- {
- 	return __cpu_to_virtio64(virtio_is_little_endian(vdev), val);
- }
-+
-+#endif
-diff --git a/tools/virtio/vhost_net_test.c b/tools/virtio/vhost_net_test.c
-new file mode 100644
-index 000000000000..6c41204e6707
---- /dev/null
-+++ b/tools/virtio/vhost_net_test.c
-@@ -0,0 +1,536 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#define _GNU_SOURCE
-+#include <getopt.h>
-+#include <limits.h>
-+#include <string.h>
-+#include <poll.h>
-+#include <sys/eventfd.h>
-+#include <stdlib.h>
-+#include <assert.h>
-+#include <unistd.h>
-+#include <sys/ioctl.h>
-+#include <sys/stat.h>
-+#include <sys/types.h>
-+#include <fcntl.h>
-+#include <stdbool.h>
-+#include <linux/vhost.h>
-+#include <linux/if.h>
-+#include <linux/if_tun.h>
-+#include <linux/in.h>
-+#include <linux/if_packet.h>
-+#include <linux/virtio_net.h>
-+#include <netinet/ether.h>
-+
-+#define HDR_LEN		sizeof(struct virtio_net_hdr_mrg_rxbuf)
-+#define TEST_BUF_LEN	256
-+#define TEST_PTYPE	ETH_P_LOOPBACK
-+#define DESC_NUM	256
-+
-+/* Used by implementation of kmalloc() in tools/virtio/linux/kernel.h */
-+void *__kmalloc_fake, *__kfree_ignore_start, *__kfree_ignore_end;
-+
-+struct vq_info {
-+	int kick;
-+	int call;
-+	int idx;
-+	long started;
-+	long completed;
-+	struct pollfd fds;
-+	void *ring;
-+	/* copy used for control */
-+	struct vring vring;
-+	struct virtqueue *vq;
-+};
-+
-+struct vdev_info {
-+	struct virtio_device vdev;
-+	int control;
-+	struct vq_info vqs[2];
-+	int nvqs;
-+	void *buf;
-+	size_t buf_size;
-+	char *test_buf;
-+	char *res_buf;
-+	struct vhost_memory *mem;
-+	int sock;
-+	int ifindex;
-+	unsigned char mac[ETHER_ADDR_LEN];
-+};
-+
-+static int tun_alloc(struct vdev_info *dev, char *tun_name)
-+{
-+	struct ifreq ifr;
-+	int len = HDR_LEN;
-+	int fd, e;
-+
-+	fd = open("/dev/net/tun", O_RDWR);
-+	if (fd < 0) {
-+		perror("Cannot open /dev/net/tun");
-+		return fd;
-+	}
-+
-+	memset(&ifr, 0, sizeof(ifr));
-+
-+	ifr.ifr_flags = IFF_TAP | IFF_NO_PI | IFF_VNET_HDR;
-+	strncpy(ifr.ifr_name, tun_name, IFNAMSIZ);
-+
-+	e = ioctl(fd, TUNSETIFF, &ifr);
-+	if (e < 0) {
-+		perror("ioctl[TUNSETIFF]");
-+		close(fd);
-+		return e;
-+	}
-+
-+	e = ioctl(fd, TUNSETVNETHDRSZ, &len);
-+	if (e < 0) {
-+		perror("ioctl[TUNSETVNETHDRSZ]");
-+		close(fd);
-+		return e;
-+	}
-+
-+	e = ioctl(fd, SIOCGIFHWADDR, &ifr);
-+	if (e < 0) {
-+		perror("ioctl[SIOCGIFHWADDR]");
-+		close(fd);
-+		return e;
-+	}
-+
-+	memcpy(dev->mac, &ifr.ifr_hwaddr.sa_data, ETHER_ADDR_LEN);
-+	return fd;
-+}
-+
-+static void vdev_create_socket(struct vdev_info *dev, char *tun_name)
-+{
-+	struct ifreq ifr;
-+
-+	dev->sock = socket(AF_PACKET, SOCK_RAW, htons(TEST_PTYPE));
-+	assert(dev->sock != -1);
-+
-+	strncpy(ifr.ifr_name, tun_name, IFNAMSIZ);
-+	assert(ioctl(dev->sock, SIOCGIFINDEX, &ifr) >= 0);
-+
-+	dev->ifindex = ifr.ifr_ifindex;
-+
-+	/* Set the flags that bring the device up */
-+	assert(ioctl(dev->sock, SIOCGIFFLAGS, &ifr) >= 0);
-+	ifr.ifr_flags |= (IFF_UP | IFF_RUNNING);
-+	assert(ioctl(dev->sock, SIOCSIFFLAGS, &ifr) >= 0);
-+}
-+
-+static void vdev_send_packet(struct vdev_info *dev)
-+{
-+	char *sendbuf = dev->test_buf + HDR_LEN;
-+	struct sockaddr_ll saddrll = {0};
-+	int sockfd = dev->sock;
-+	int ret;
-+
-+	saddrll.sll_family = PF_PACKET;
-+	saddrll.sll_ifindex = dev->ifindex;
-+	saddrll.sll_halen = ETH_ALEN;
-+	saddrll.sll_protocol = htons(TEST_PTYPE);
-+
-+	ret = sendto(sockfd, sendbuf, TEST_BUF_LEN, 0,
-+		     (struct sockaddr *)&saddrll,
-+		     sizeof(struct sockaddr_ll));
-+	assert(ret >= 0);
-+}
-+
-+static bool vq_notify(struct virtqueue *vq)
-+{
-+	struct vq_info *info = vq->priv;
-+	unsigned long long v = 1;
-+	int r;
-+
-+	r = write(info->kick, &v, sizeof(v));
-+	assert(r == sizeof(v));
-+
-+	return true;
-+}
-+
-+static void vhost_vq_setup(struct vdev_info *dev, struct vq_info *info)
-+{
-+	struct vhost_vring_addr addr = {
-+		.index = info->idx,
-+		.desc_user_addr = (uint64_t)(unsigned long)info->vring.desc,
-+		.avail_user_addr = (uint64_t)(unsigned long)info->vring.avail,
-+		.used_user_addr = (uint64_t)(unsigned long)info->vring.used,
-+	};
-+	struct vhost_vring_state state = { .index = info->idx };
-+	struct vhost_vring_file file = { .index = info->idx };
-+	int r;
-+
-+	state.num = info->vring.num;
-+	r = ioctl(dev->control, VHOST_SET_VRING_NUM, &state);
-+	assert(r >= 0);
-+
-+	state.num = 0;
-+	r = ioctl(dev->control, VHOST_SET_VRING_BASE, &state);
-+	assert(r >= 0);
-+
-+	r = ioctl(dev->control, VHOST_SET_VRING_ADDR, &addr);
-+	assert(r >= 0);
-+
-+	file.fd = info->kick;
-+	r = ioctl(dev->control, VHOST_SET_VRING_KICK, &file);
-+	assert(r >= 0);
-+}
-+
-+static void vq_reset(struct vq_info *info, int num, struct virtio_device *vdev)
-+{
-+	if (info->vq)
-+		vring_del_virtqueue(info->vq);
-+
-+	memset(info->ring, 0, vring_size(num, 4096));
-+	vring_init(&info->vring, num, info->ring, 4096);
-+	info->vq = vring_new_virtqueue(info->idx, num, 4096, vdev, true, false,
-+				       info->ring, vq_notify, NULL, "test");
-+	assert(info->vq);
-+	info->vq->priv = info;
-+}
-+
-+static void vq_info_add(struct vdev_info *dev, int idx, int num, int fd)
-+{
-+	struct vhost_vring_file backend = { .index = idx, .fd = fd };
-+	struct vq_info *info = &dev->vqs[idx];
-+	int r;
-+
-+	info->idx = idx;
-+	info->kick = eventfd(0, EFD_NONBLOCK);
-+	r = posix_memalign(&info->ring, 4096, vring_size(num, 4096));
-+	assert(r >= 0);
-+	vq_reset(info, num, &dev->vdev);
-+	vhost_vq_setup(dev, info);
-+
-+	r = ioctl(dev->control, VHOST_NET_SET_BACKEND, &backend);
-+	assert(!r);
-+}
-+
-+static void vdev_info_init(struct vdev_info *dev, unsigned long long features)
-+{
-+	struct ether_header *eh;
-+	int i, r;
-+
-+	dev->vdev.features = features;
-+	INIT_LIST_HEAD(&dev->vdev.vqs);
-+	spin_lock_init(&dev->vdev.vqs_list_lock);
-+
-+	dev->buf_size = (HDR_LEN + TEST_BUF_LEN) * 2;
-+	dev->buf = malloc(dev->buf_size);
-+	assert(dev->buf);
-+	dev->test_buf = dev->buf;
-+	dev->res_buf = dev->test_buf + HDR_LEN + TEST_BUF_LEN;
-+
-+	memset(dev->test_buf, 0, HDR_LEN + TEST_BUF_LEN);
-+	eh = (struct ether_header *)(dev->test_buf + HDR_LEN);
-+	eh->ether_type = htons(TEST_PTYPE);
-+	memcpy(eh->ether_dhost, dev->mac, ETHER_ADDR_LEN);
-+	memcpy(eh->ether_shost, dev->mac, ETHER_ADDR_LEN);
-+
-+	for (i = sizeof(*eh); i < TEST_BUF_LEN; i++)
-+		dev->test_buf[i + HDR_LEN] = (char)i;
-+
-+	dev->control = open("/dev/vhost-net", O_RDWR);
-+	assert(dev->control >= 0);
-+
-+	r = ioctl(dev->control, VHOST_SET_OWNER, NULL);
-+	assert(r >= 0);
-+
-+	dev->mem = malloc(offsetof(struct vhost_memory, regions) +
-+			  sizeof(dev->mem->regions[0]));
-+	assert(dev->mem);
-+	memset(dev->mem, 0, offsetof(struct vhost_memory, regions) +
-+	       sizeof(dev->mem->regions[0]));
-+	dev->mem->nregions = 1;
-+	dev->mem->regions[0].guest_phys_addr = (long)dev->buf;
-+	dev->mem->regions[0].userspace_addr = (long)dev->buf;
-+	dev->mem->regions[0].memory_size = dev->buf_size;
-+
-+	r = ioctl(dev->control, VHOST_SET_MEM_TABLE, dev->mem);
-+	assert(r >= 0);
-+
-+	r = ioctl(dev->control, VHOST_SET_FEATURES, &features);
-+	assert(r >= 0);
-+
-+	dev->nvqs = 2;
-+}
-+
-+static void wait_for_interrupt(struct vq_info *vq)
-+{
-+	unsigned long long val;
-+
-+	poll(&vq->fds, 1, -1);
-+
-+	if (vq->fds.revents & POLLIN)
-+		read(vq->fds.fd, &val, sizeof(val));
-+}
-+
-+static void verify_res_buf(char *res_buf)
-+{
-+	int i;
-+
-+	for (i = ETHER_HDR_LEN; i < TEST_BUF_LEN; i++)
-+		assert(res_buf[i] == (char)i);
-+}
-+
-+static void run_tx_test(struct vdev_info *dev, struct vq_info *vq,
-+			bool delayed, int bufs)
-+{
-+	long long spurious = 0;
-+	struct scatterlist sl;
-+	unsigned int len;
-+	int r;
-+
-+	for (;;) {
-+		long started_before = vq->started;
-+		long completed_before = vq->completed;
-+
-+		virtqueue_disable_cb(vq->vq);
-+		do {
-+			while (vq->started < bufs &&
-+			       (vq->started - vq->completed) < 1) {
-+				sg_init_one(&sl, dev->test_buf, HDR_LEN + TEST_BUF_LEN);
-+				r = virtqueue_add_outbuf(vq->vq, &sl, 1,
-+							 dev->test_buf + vq->started,
-+							 GFP_ATOMIC);
-+				if (unlikely(r != 0))
-+					break;
-+
-+				++vq->started;
-+
-+				if (unlikely(!virtqueue_kick(vq->vq))) {
-+					r = -1;
-+					break;
-+				}
-+			}
-+
-+			if (vq->started >= bufs)
-+				r = -1;
-+
-+			/* Flush out completed bufs if any */
-+			while (virtqueue_get_buf(vq->vq, &len)) {
-+				int n;
-+
-+				n = recvfrom(dev->sock, dev->res_buf, TEST_BUF_LEN, 0, NULL, NULL);
-+				assert(n == TEST_BUF_LEN);
-+				verify_res_buf(dev->res_buf);
-+
-+				++vq->completed;
-+				r = 0;
-+			}
-+		} while (r == 0);
-+
-+		if (vq->completed == completed_before && vq->started == started_before)
-+			++spurious;
-+
-+		assert(vq->completed <= bufs);
-+		assert(vq->started <= bufs);
-+		if (vq->completed == bufs)
-+			break;
-+
-+		if (delayed) {
-+			if (virtqueue_enable_cb_delayed(vq->vq))
-+				wait_for_interrupt(vq);
-+		} else {
-+			if (virtqueue_enable_cb(vq->vq))
-+				wait_for_interrupt(vq);
-+		}
-+	}
-+	printf("TX spurious wakeups: 0x%llx started=0x%lx completed=0x%lx\n",
-+	       spurious, vq->started, vq->completed);
-+}
-+
-+static void run_rx_test(struct vdev_info *dev, struct vq_info *vq,
-+			bool delayed, int bufs)
-+{
-+	long long spurious = 0;
-+	struct scatterlist sl;
-+	unsigned int len;
-+	int r;
-+
-+	for (;;) {
-+		long started_before = vq->started;
-+		long completed_before = vq->completed;
-+
-+		do {
-+			while (vq->started < bufs &&
-+			       (vq->started - vq->completed) < 1) {
-+				sg_init_one(&sl, dev->res_buf, HDR_LEN + TEST_BUF_LEN);
-+
-+				r = virtqueue_add_inbuf(vq->vq, &sl, 1,
-+							dev->res_buf + vq->started,
-+							GFP_ATOMIC);
-+				if (unlikely(r != 0))
-+					break;
-+
-+				++vq->started;
-+
-+				vdev_send_packet(dev);
-+
-+				if (unlikely(!virtqueue_kick(vq->vq))) {
-+					r = -1;
-+					break;
-+				}
-+			}
-+
-+			if (vq->started >= bufs)
-+				r = -1;
-+
-+			/* Flush out completed bufs if any */
-+			while (virtqueue_get_buf(vq->vq, &len)) {
-+				struct ether_header *eh;
-+
-+				eh = (struct ether_header *)(dev->res_buf + HDR_LEN);
-+
-+				/* tun netdev is up and running, ignore the
-+				 * non-TEST_PTYPE packet.
-+				 */
-+				if (eh->ether_type != htons(TEST_PTYPE)) {
-+					++vq->completed;
-+					r = 0;
-+					continue;
-+				}
-+
-+				assert(len == TEST_BUF_LEN + HDR_LEN);
-+				verify_res_buf(dev->res_buf + HDR_LEN);
-+
-+				++vq->completed;
-+				r = 0;
-+			}
-+		} while (r == 0);
-+
-+		if (vq->completed == completed_before && vq->started == started_before)
-+			++spurious;
-+
-+		assert(vq->completed <= bufs);
-+		assert(vq->started <= bufs);
-+		if (vq->completed == bufs)
-+			break;
-+	}
-+
-+	printf("RX spurious wakeups: 0x%llx started=0x%lx completed=0x%lx\n",
-+	       spurious, vq->started, vq->completed);
-+}
-+
-+static const char optstring[] = "h";
-+static const struct option longopts[] = {
-+	{
-+		.name = "help",
-+		.val = 'h',
-+	},
-+	{
-+		.name = "event-idx",
-+		.val = 'E',
-+	},
-+	{
-+		.name = "no-event-idx",
-+		.val = 'e',
-+	},
-+	{
-+		.name = "indirect",
-+		.val = 'I',
-+	},
-+	{
-+		.name = "no-indirect",
-+		.val = 'i',
-+	},
-+	{
-+		.name = "virtio-1",
-+		.val = '1',
-+	},
-+	{
-+		.name = "no-virtio-1",
-+		.val = '0',
-+	},
-+	{
-+		.name = "delayed-interrupt",
-+		.val = 'D',
-+	},
-+	{
-+		.name = "no-delayed-interrupt",
-+		.val = 'd',
-+	},
-+	{
-+		.name = "buf-num",
-+		.val = 'n',
-+		.has_arg = required_argument,
-+	},
-+	{
-+		.name = "batch",
-+		.val = 'b',
-+		.has_arg = required_argument,
-+	},
-+	{
-+	}
-+};
-+
-+static void help(int status)
-+{
-+	fprintf(stderr, "Usage: vhost_net_test [--help]"
-+		" [--no-indirect]"
-+		" [--no-event-idx]"
-+		" [--no-virtio-1]"
-+		" [--delayed-interrupt]"
-+		" [--buf-num]"
-+		"\n");
-+
-+	exit(status);
-+}
-+
-+int main(int argc, char **argv)
-+{
-+	unsigned long long features = (1ULL << VIRTIO_RING_F_INDIRECT_DESC) |
-+		(1ULL << VIRTIO_RING_F_EVENT_IDX) | (1ULL << VIRTIO_F_VERSION_1);
-+	char tun_name[IFNAMSIZ];
-+	long nbufs = 0x100000;
-+	struct vdev_info dev;
-+	bool delayed = false;
-+	int o, fd;
-+
-+	for (;;) {
-+		o = getopt_long(argc, argv, optstring, longopts, NULL);
-+		switch (o) {
-+		case -1:
-+			goto done;
-+		case '?':
-+			help(2);
-+		case 'e':
-+			features &= ~(1ULL << VIRTIO_RING_F_EVENT_IDX);
-+			break;
-+		case 'h':
-+			help(0);
-+		case 'i':
-+			features &= ~(1ULL << VIRTIO_RING_F_INDIRECT_DESC);
-+			break;
-+		case '0':
-+			features &= ~(1ULL << VIRTIO_F_VERSION_1);
-+			break;
-+		case 'D':
-+			delayed = true;
-+			break;
-+		case 'n':
-+			nbufs = strtol(optarg, NULL, 10);
-+			assert(nbufs > 0);
-+			break;
-+		default:
-+			assert(0);
-+			break;
-+		}
-+	}
-+
-+done:
-+	memset(&dev, 0, sizeof(dev));
-+	snprintf(tun_name, IFNAMSIZ, "tun_%d", getpid());
-+
-+	fd = tun_alloc(&dev, tun_name);
-+	assert(fd >= 0);
-+
-+	vdev_info_init(&dev, features);
-+	vq_info_add(&dev, 0, DESC_NUM, fd);
-+	vq_info_add(&dev, 1, DESC_NUM, fd);
-+	vdev_create_socket(&dev, tun_name);
-+
-+	run_rx_test(&dev, &dev.vqs[0], delayed, nbufs);
-+	run_tx_test(&dev, &dev.vqs[1], delayed, nbufs);
-+
-+	return 0;
-+}
--- 
-2.33.0
-
+Thanks
+Hangbin
 
