@@ -1,103 +1,181 @@
-Return-Path: <netdev+bounces-69154-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A98D4849CBB
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 15:15:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD62E849CC3
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 15:16:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A74B11C2413A
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 14:15:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3995528784B
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 14:16:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1E0328E09;
-	Mon,  5 Feb 2024 14:13:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BB7C2C1AF;
+	Mon,  5 Feb 2024 14:15:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="n3kNGeAl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2119.outbound.protection.outlook.com [40.107.220.119])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF73A2C69E;
-	Mon,  5 Feb 2024 14:13:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707142431; cv=none; b=R+9o4KYxjgTJvWvDahkX6JZ9TMaJ3bN/lsfhy2XwGEYALz1qAE93bSx5zrAHYaM/Ju9VDJf2MV0iUpiFs1Rwq9JRNchsiCh1lu5wVaUB6vE657S518wxbCy5VmC8knZLjV0ux+k6s6yUO1h/rEnMd3HwNTsh8gqlz+zQp6Wqd58=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707142431; c=relaxed/simple;
-	bh=KUfFaTnVcuPK7F5qH9QCHcEyVuC0AaGY+Jw1pHyJEqg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BG1AULtwwzvF/13OxX7BgDjRRpk1mQLR+K5lGXnYQ7chjisqNQ4W1laFDKXUCCGFw3D3g+kbkg+BoiyTX/inre45zyLAVJDx8Ouj0iPn7OKkR4eclfsfnsZdX78OxoFX6kDEd+4BNIqNG/ikNXNyp3+km2E/HRlxBb+EwnmbwmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-51124e08565so6809017e87.3;
-        Mon, 05 Feb 2024 06:13:49 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707142428; x=1707747228;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QjZklipkmdXJhUNXYZTkvKzntyfYj7woEZ5k2D/zz2g=;
-        b=r/vv+GzicXZVhCNYgJS3EQ1FZV0P5e1Y3R28Fw3HyvSRxNtljmLZkEzoj9d3zytc+9
-         d6iKJmV6YCnP8t8fPvVx5HyekdpfUgYB90mYBISK3dPF9HTqMErM3q1rUGPfCPFdBDoJ
-         jOwct5lXOWV15qPGRtW8y2jIAt9AMIxrfRrssro4MNC1iLayGP4dinJbceve+fH3QW1p
-         AGm0jgylmKq2ICSa+N1TVQHZxLn5W8jvkMnjSkpF2g2IJy1gDGMKDRJ5dzaS2cl2vpuW
-         TgdG9kPJERGM2vMOydvbSvv14GX1cHus7ICMcYKmKilslarMkV77Xu9debfJzRx5VHSA
-         scAA==
-X-Gm-Message-State: AOJu0Yx5FZO56mqqzHXYF75j04ePimHCe+L+IuwWGsr9GH1vIOkaDNtU
-	DAEZMVwc7mDKP+xh0Dj3jc9O7ThBuGKRaEpWetjUGJXUn/y+AY2U
-X-Google-Smtp-Source: AGHT+IFfz7N06CRxAkudHv29g5IbD95knXgAY5otzcmaknrMnsvP1nrc4pifk7LvLhw/WJSBXE9ugQ==
-X-Received: by 2002:ac2:4eca:0:b0:511:5353:2ace with SMTP id p10-20020ac24eca000000b0051153532acemr1285652lfr.22.1707142427564;
-        Mon, 05 Feb 2024 06:13:47 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVZPSlNuCnBtq9VsUUsxRgdYjVaIR64sZyNdi1stJYMIeFlt+p0BgNm4uLZgJ+iSP3IbF+Y8fmyjmPWMJ2LCtGs6lWYsuagUDrP+z6A1boNXhHIWEaVoxcYoUxBdXigwGynxUP8cBdbl3sli6KzXoU/eMaLhuVn4mkmRAECl7ip3PRq0Fy4+3xrk1khwVJDOpJwZxcv0te6a7uFDsUDpnQoO56g8fB6mz4vknBv8z3UABNIHf8AxK+PhzFb5vjsvVuVW9DKK4ssXBw12QeuqJF3OQkird8UX2zgUSvOJqoNW9T1iHoTw6YKD9wYI3kEgxbwk9q8WIguBaCDwbqn5HWuvAFAuJPq88M99Cl+KWaUZw==
-Received: from gmail.com (fwdproxy-cln-017.fbsv.net. [2a03:2880:31ff:11::face:b00c])
-        by smtp.gmail.com with ESMTPSA id j20-20020a170906475400b00a353ca3d907sm4361222ejs.217.2024.02.05.06.13.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 06:13:47 -0800 (PST)
-Date: Mon, 5 Feb 2024 06:13:40 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Miquel Raynal <miquel.raynal@bootlin.com>
-Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	edumazet@google.com, Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, horms@kernel.org, andrew@lunn.ch,
-	"open list:IEEE 802.15.4 SUBSYSTEM" <linux-wpan@vger.kernel.org>
-Subject: Re: [PATCH net 08/10] net: fill in MODULE_DESCRIPTION()s for
- ieee802154
-Message-ID: <ZcDs/GFkZ881bJR7@gmail.com>
-References: <20240205101400.1480521-1-leitao@debian.org>
- <20240205101400.1480521-9-leitao@debian.org>
- <20240205144118.12cdc824@xps-13>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 692F02C18E;
+	Mon,  5 Feb 2024 14:15:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.220.119
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707142523; cv=fail; b=kgi+McsS/itgOTBiRwKZaQJvtVXSBF3SEkC7nrRVPY9lHCXEQC+b01AZuRKnP6xWKCTdYOtsL5OkeTLqafZ/6HD7D3F53Y91UWGtlk/wQxH1Y5jvxH6R9hgLHITFFCZT9O44FZ+9BWEBltzic5PnQ1Lundmdw94j4mjzLgWkOZQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707142523; c=relaxed/simple;
+	bh=tYU4H+PlxsX11tV2dpZyAf4I/FYipSXaXyTCK7XKRw0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=CKumP1EWVRMcxY9WpnI2dyJ4FR4mhzKkP9a+Rot+IsRv0Rd+SlTw+RNlj1e75uf4WT0FDiKY9whLBNqnpIMpIOEOAeJkCqZ8CQD/gRVi/oNhiUM2E+x4MVSBkWr0fItBFzGcZsPerFlcOn+2rTmEzWqmnir38wELghhvq8SdFU4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com; spf=pass smtp.mailfrom=corigine.com; dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b=n3kNGeAl; arc=fail smtp.client-ip=40.107.220.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=corigine.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NU4f2M7u6lXLESBi42TTrnAsXImT8GaRmagQz8D6iHIEwVGNWEw/trCQaJJ5fzQvNto7prUssvibtZoQgag0QUNoJ9I+jMGQbWeFKdWWp8yVG05ElW9N0w4F6Le7uXS8hSh4MNaeoTPGdNWWsPr7NdsrXyE1u1iJHJjsWyJWi8s9EKrSmkcS1I6bVY4rT360+u7imqk5pwEtO3rHqYjB3UKcc3XFyzzhNg6l/UkKeJSyLfG5MZya/+0bIZcii0+1dG8G+UKFDlm2VCmRg84coHDgG7R+j35XppR3kt1T16U2Nqba3y9QhhZzOYGwJloJMp75FvtgL7A3SJqM7DzsBA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JfuyP2oZBUdKNWSv5zLod2Alj3QD66mptb+EmT3x91E=;
+ b=iPC+cFjC7/Hc9WLlbY6kOXHZnp+lbTjH9EOaO3QNaMPX7GoQOKFN4o7KAaTPk+oZdFWBf7KUg76E363tk4fDLahhMfSZc9SFp6ZyWrmYAmldLvxgb8log3vkM+z0Ih7LCfBjW1QpewyYR0CzIFrjoAxF9raCVVph7C53F1hqot/FQHn6E3uohj0ER2xolMWD6LkfpMxF/3Sp4+KJUxG8g7yen6sY2tywpsj101L203w5DFpNrdwTrlXBOprTeo/WTggDfBm5ArM0AUzjohDTSymPqzCmD+6jowchCrUqOwCRXZ7eQOpX4yyH9W6Bf5J69tKq3t9ZaEIwjBAFrm/Fwg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JfuyP2oZBUdKNWSv5zLod2Alj3QD66mptb+EmT3x91E=;
+ b=n3kNGeAlNXFJbW4QzcCLKd4NCL4cd/G2cUg/1UCWamrt/JQBlCaQb4oKj3I5I/PUhy6Jr5tVFiTfpJOictIBb5UhB0MyZtVAqVeG0Pluyug/xcIG2JGDomjCd7cJZSPWp1kPXMmVnusOoirhcnpo9s0wdJId7w9HW03PgimV978=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
+ by SJ0PR13MB5721.namprd13.prod.outlook.com (2603:10b6:a03:408::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.34; Mon, 5 Feb
+ 2024 14:15:18 +0000
+Received: from BL0PR13MB4403.namprd13.prod.outlook.com
+ ([fe80::2e1b:fcb6:1e02:4e8a]) by BL0PR13MB4403.namprd13.prod.outlook.com
+ ([fe80::2e1b:fcb6:1e02:4e8a%4]) with mapi id 15.20.7249.032; Mon, 5 Feb 2024
+ 14:15:18 +0000
+Date: Mon, 5 Feb 2024 16:15:08 +0200
+From: Louis Peens <louis.peens@corigine.com>
+To: Simon Horman <horms@kernel.org>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	James Hershaw <james.hershaw@corigine.com>,
+	Daniel Basilio <daniel.basilio@corigine.com>,
+	netdev@vger.kernel.org, stable@vger.kernel.org,
+	oss-drivers@corigine.com
+Subject: Re: [PATCH net 2/3] nfp: flower: prevent re-adding mac index for
+ bonded port
+Message-ID: <ZcDtbBeW5epRpZqR@LouisNoVo>
+References: <20240202113719.16171-1-louis.peens@corigine.com>
+ <20240202113719.16171-3-louis.peens@corigine.com>
+ <20240205133203.GK960600@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240205133203.GK960600@kernel.org>
+X-ClientProxiedBy: JN2P275CA0039.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:2::27)
+ To BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240205144118.12cdc824@xps-13>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL0PR13MB4403:EE_|SJ0PR13MB5721:EE_
+X-MS-Office365-Filtering-Correlation-Id: dce1451e-9d0e-45b7-5b4a-08dc2654e151
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	WhISfMwZIuCmAeBkjyWmcFMj/u3K3hR8+yMyqTIt0q31FAsezOInStEXOFiZjbNpSpFDlz0gMwT8jCo+HWuGczjTcEmwVrfgTAhDAeRmdz6oWNtZ92SQjBnRzO/QvkiaBJaeT1BIjotCO7OwFSACp2yAEmrWz/7BaPAH9KFqI7KkMkUBYEVWD2uOspCmhi96vCTC3O5LTG7zFVrtH8QQJ5J9bfntD0OxlqAJ2XAzdCU3LuLS4u3NxFBh69bgpbPGnANmDoIy7sh6cto6wC7doTUWdRluJbE14Ez2GG1oGlBamPPQ1V2Ezzk49vdclrJM7rJU9GPWSXBWPK2OKgRUkujHSI0jlfPkQ202cjrj+w0J/qxzOBbhbv8u3mXwKU0kXbugetZhmC4s6B1bpZ1eqHwb5ugw7yH06N8gnE5oRqI4Go4+ZTdq9xY5eZW3L7L0QoqC8zAhT/EkxwTWbI0625aAB1aTgL6staHLwlbWEacURQBdqO50tSVQD9Qu9im6m+AXhtdW+76Q7WhqgTtsLKUo0G12pUIwh8dNhPLX3DN+TQxX72LQ0xh8h+jG0sf3
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR13MB4403.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(346002)(376002)(136003)(396003)(39840400004)(366004)(230922051799003)(451199024)(64100799003)(1800799012)(186009)(86362001)(33716001)(6666004)(107886003)(2906002)(26005)(6506007)(6512007)(44832011)(9686003)(41300700001)(83380400001)(5660300002)(54906003)(66556008)(316002)(66476007)(66946007)(6916009)(478600001)(8676002)(6486002)(38100700002)(8936002)(4326008);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?5dU8qFdGRDYkMj0N1mtrHLkcoG3BypA5077kG1bntf6E6Ll6uqFTaW/NeUcI?=
+ =?us-ascii?Q?YsoRtLtexT+OJBM12gvwDcYF4SU8Parq7PLsHxfSzCcTcuUZUk/5XL8/Dk1K?=
+ =?us-ascii?Q?DJirt4rbAD375f/dgf/HTiAFV0Mt5SMGwSIv6c9d+koGMU8uGLiXM73c6o2A?=
+ =?us-ascii?Q?xiRKIWJgyNQBAizAVq4pugz+t7F4RfoxcElztgMCg/reRyhL7A5ovEBi9IUM?=
+ =?us-ascii?Q?sa/xQA5vxA3xibONjkxxIVI+m9UzfrNAStygGBBMQuhLtDuKX/I00Zvnskqk?=
+ =?us-ascii?Q?DAn99swLGH8jsjM5rVDAgc45Q0DuonRCVm38o9kR4HN3fPOU6kU93J2hy4xX?=
+ =?us-ascii?Q?+XzxwDFcnitw8CJL9BGqbJQLyi+uSlmYbCX/uva/Snjil9U8eMDYGrOIXApC?=
+ =?us-ascii?Q?ncO/9MiCauo9MHcL1mFnRCHcy89zI9O/PUnElJicp2FsV3FSaHSdmsqUCmZu?=
+ =?us-ascii?Q?wdQxar18isJOhcozvc08Ttb8QzldSXNu5NMn+ZW5/XV0IvclgVXFySNmsph/?=
+ =?us-ascii?Q?ncswIU8VmcZ5813mPTB7TW3QPFD/8Cxt6nyn+bqNVSurUZ8Y6288QM8659uX?=
+ =?us-ascii?Q?GWdXKpLGMAO3YgHRQxx/QwHRBQKF1u2P3fzTdjfINb3GaRyjZyqrWqPdC8U1?=
+ =?us-ascii?Q?Ym1f3Bm4Zn+3VIUnDlaMHDpyfZ+7ucF5iR3Y3vI7cHoZ2Md6X/2BF9ns2qYE?=
+ =?us-ascii?Q?/SGxc6jiCpWG70nq0dUfy4XtKrH0quzwLqhRVABonQmTYRT7iQKVSbsJe+S/?=
+ =?us-ascii?Q?vBxePVOd8mbfL6bB/HRmsg2+v2nj9JQfPXYXxBm6/VQ92dlQHI00KZkTRAAE?=
+ =?us-ascii?Q?XX6aMuG6JCOZk1vByv8ycvf+zYPvLGBVOoAgzJOZj8j4eEr358uZu2DGfJhY?=
+ =?us-ascii?Q?ks0p4bo7FS7RP22DpByRJRT8mbDxYR3jcHn0fCepmFB93fle58BT1xJy4XWD?=
+ =?us-ascii?Q?nsOIobLw6QohbLgkZIgU/1blI7RWMZhywA2EX1wUR7I5UNRlgQs1v89tscvf?=
+ =?us-ascii?Q?2CgLvsZrsyPyFE9ohEsF6200LMpOiuiwOuQ9gzRf0hxF8E+ZCEfeaCZsvrVD?=
+ =?us-ascii?Q?RmSDLiKSV+ucNWnmfJpbpNypp+XR2wrCQ21lpcR39ItDYO5Idvef230XnhrM?=
+ =?us-ascii?Q?tNO3Wlhjtq1j61jhXJ/YfZm1xQnZpOpEUu1MnciSH/XDJ84vJ+V45I0AereS?=
+ =?us-ascii?Q?OO/I3tY2aez3MCqmS+rhsrBf9U5VGzlZbl214EsEyRyYbaV4o3AB7z8WRMII?=
+ =?us-ascii?Q?6RAf3+MMTxPtr1GYfaytxUxhxAxcOR5Lil3cEVHmmNGBsjZDSRW+BP+tShsP?=
+ =?us-ascii?Q?cix7BPmK0+u45SZ0CXmg4W5cIaZyo2xwx5mzQGA9y6LQU2qmvmATBSZRAo4Z?=
+ =?us-ascii?Q?pP1hd8bhOvqOacG7nYIQvTVQ32i1cJZnln1MdXzhAPCglOkW/AsKXxP/Cj8X?=
+ =?us-ascii?Q?+82pLKLGKqXLUrUauB6aQqk1Kz02BxTym+1oKps5zaYazcn1S+uoeat3Qr8R?=
+ =?us-ascii?Q?0CfTR9fVGSgTKqzy1yrPjwC7KAWSf0FyhnmPC7wp0kL2rEhpFyXT6nxEdRr9?=
+ =?us-ascii?Q?odG4FcVGzoj1jCvtIJrbTmsXiikqRKwN1BVxbylDU2P3u+ccQj40bv6SkpFq?=
+ =?us-ascii?Q?/Q=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dce1451e-9d0e-45b7-5b4a-08dc2654e151
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR13MB4403.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2024 14:15:18.0183
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5jfjRDUHsHMiMaZjyT+FONtzKcXt1gTvO3cSHXVPgaudsnyaLGNbPVoNeAm8vHHsfpzPquDJn6ftQ3gb4I6S2ilZeKv5lHDITufPpxUlAY4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR13MB5721
 
-Hello Miquel,
-
-On Mon, Feb 05, 2024 at 02:41:18PM +0100, Miquel Raynal wrote:
-> Hi Breno,
+On Mon, Feb 05, 2024 at 01:32:03PM +0000, Simon Horman wrote:
+> On Fri, Feb 02, 2024 at 01:37:18PM +0200, Louis Peens wrote:
+> > From: Daniel de Villiers <daniel.devilliers@corigine.com>
+> > 
+> > When physical ports are reset (either through link failure or manually
+> > toggled down and up again) that are slaved to a Linux bond with a tunnel
+> > endpoint IP address on the bond device, not all tunnel packets arriving
+> > on the bond port are decapped as expected.
+> > 
+> > The bond dev assigns the same MAC address to itself and each of its
+> > slaves. When toggling a slave device, the same MAC address is therefore
+> > offloaded to the NFP multiple times with different indexes.
+> > 
+> > The issue only occurs when re-adding the shared mac. The
+> > nfp_tunnel_add_shared_mac() function has a conditional check early on
+> > that checks if a mac entry already exists and if that mac entry is
+> > global: (entry && nfp_tunnel_is_mac_idx_global(entry->index)). In the
+> > case of a bonded device (For example br-ex), the mac index is obtained,
+> > and no new index is assigned.
+> > 
+> > We therefore modify the conditional in nfp_tunnel_add_shared_mac() to
+> > check if the port belongs to the LAG along with the existing checks to
+> > prevent a new global mac index from being re-assigned to the slave port.
+> > 
+> > Fixes: 20cce8865098 ("nfp: flower: enable MAC address sharing for offloadable devs")
+> > CC: stable@vger.kernel.org # 5.1+
+> > Signed-off-by: Daniel de Villiers <daniel.devilliers@corigine.com>
+> > Signed-off-by: Louis Peens <louis.peens@corigine.com>
 > 
-> Please be more cautious with your titles. It's your second or third
-> e-mail with this content without version number. And you also forgot to
-> collect Stefan Ack.
+> Hi Daniel and Louis,
+> 
+> I'd like to encourage you to update the wording of the commit message
+> to use more inclusive language; I'd suggest describing the patch
+> in terms of members of a LAG.
+Thanks Simon, this have not even crossed my mind this time and I feel
+bad - I should be more aware. Thanks for politely pointing this out.
+This did get merged earlier today as-is unfortunately, I'm not sure if
+there is a good way (or if it is pressing enough) to have it retracted.
+I will try to be more cognizant of this in the future.
+> 
+> The code-change looks good to me.
+> 
 
-Sorry, in fact, the commit you are referring to is already in landed
-net-next:
-
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=6aa89bf8ac9a
-
-The problem here is that this commit shouldn't be against net, since it
-is already net-next.
-
-This workstream was applied part in net, and part in net-next. I am
-trying to focus in fixing all the warning in "net" and not touch those in
-net-next. This commit is already in net-next, but, and shouldn't be in
-`net`. I will resend the patch without it.
-
-Sorry if this caused any confusion.
 
