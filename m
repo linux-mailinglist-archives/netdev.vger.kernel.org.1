@@ -1,711 +1,236 @@
-Return-Path: <netdev+bounces-69213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69212-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0344B84A2D3
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 19:56:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2498684A2D0
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 19:56:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28C121C232BB
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 18:56:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D3F81C23137
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 18:56:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CF84482C4;
-	Mon,  5 Feb 2024 18:56:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="nW7ICA/8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29B7F47F67;
+	Mon,  5 Feb 2024 18:55:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05olkn2011.outbound.protection.outlook.com [40.92.89.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 783884879A
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 18:55:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707159360; cv=none; b=M5Qz8tawra3gQMyGgNlfimrUliDTIJ8xWVxnIgGzeLs94JKWrw1j9JSJcc7RjuX1cxmIOo5LFnJwB+oo6zlZJtqRErPTcP8/S+hH2VZw8ojNWFnucWwADq3AeQr8pwhaElQNmWCfs8vGLlaXGGNtp/thau+RzaJEh9X0H68rGsI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707159360; c=relaxed/simple;
-	bh=5B0FB3Yqe3JCOmDsTK5ikQ+ZtqetaPyUN+UgBS/jCnA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tyxqlThdbD895a+UAQJRldKR769Z2lo8xy1ATXt/NvMyLzrKEO0NwHh8s6qt68nSpvfqKNi3y/Erc9Az9DrX5iCbfJfxn4FLUn1jltiv0F2fdOy9sCzN1x4gBPTgvu84yxlvOopXkcmPdT8ufFU6XX6cyImGbW3IIaClM/nskm0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=nW7ICA/8; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1d932f6ccfaso35576575ad.1
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 10:55:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1707159356; x=1707764156; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=om2XWt3OTF4SoofjWJh3uzvdBwIQW++XooH1Pcka56M=;
-        b=nW7ICA/8+5TqE1ArhqkwjacU49lId2ZcnS+Pzl21qbHQ4f2LiHPDBkVZUcX4uouT/x
-         YqG68vipiq7y63BA/yQ9VbDR0yOlBKIDRA8PTNVaEOqPPgv/6e5JlK2Oq33GfBa2gWyr
-         wtwo7g2bUSbNwPJm/oiB1EQA5xNOvNZ6uBStQ3PNYHaydvcK/bcwnD08Afmqoru0Zeqs
-         uhSqpUjERh/9mY7lnvjOVB5FBKKhdeoLK1f/n+G9pvR6bIGR2jGm3op4Tsw1h48Cz8N8
-         RWCDEjhE92QpP0wi2DATJ4XaM0UDu2D5KWsd/zD63yFBSqqHk0/fTAGrmSfhWMT61o2s
-         +HgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707159357; x=1707764157;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=om2XWt3OTF4SoofjWJh3uzvdBwIQW++XooH1Pcka56M=;
-        b=fFMZYubis1EuYexoK2A3vn3zY5LD+NjTyHBCTfXWW2ZFyoMrkuVVNDG1xAtBRjb4I8
-         Y3IY367GM0t3cSTtZvmclJHEK1RCljZaDSDY1FJ8AanSldXbG3LOJooPWdaYXYkyDHvj
-         DEUoVPJox3PcZY/l39fnVDkuqK+qrjQU2ULDtZH5hIRWYku0mKbRR+5029Y5enZOK51J
-         hqaj0rn3nvnGIAGHg0dbCL2GsTJ2+tbtJevN9tAkWqorhfPY7Aoh/NG7deX133RkFcMM
-         Q9tENFJily73oBx/+X7AMV3sIdQ34dBbJkQozLyFD7ensMUgi/f6CtubK7D/RXv0KEST
-         O+uQ==
-X-Gm-Message-State: AOJu0YwAAVFzQDGJtXWcADNzzAfpWwadw1CtIKaUVGS2RsJEGjjZ78pw
-	/udizLA3nNreTgC23UxBB4+DhFR69GnVhoODtPwW8L5TPdqsXok7U+e7iwAjdlM9Px4AP4e/UlF
-	UU3w09Q==
-X-Google-Smtp-Source: AGHT+IF6FG32nghyrf67pHBQssF2m6uj0Jw1CXEGysLpajV+urcs26RLf1HZWOcBYxT9YgVbl9Ks0Q==
-X-Received: by 2002:a17:902:7802:b0:1d9:98fc:a950 with SMTP id p2-20020a170902780200b001d998fca950mr416450pll.6.1707159356630;
-        Mon, 05 Feb 2024 10:55:56 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXonApRMJ0WsZUL2H5ErEG6Y9EYBiIaK9L3RqxlM02JbEaZPFCcPC1SsX9MzMgfo8B6YPMrVN9ztgF9Jduz4wW0ced2hPuJQRzn/z+fqu71NFInMLUPwfntxodbPK6be3Cszv7svEDAH7jKf886MR+/mb6MkBS0x40BEdvOFQMJ7sRpGYhqq+HkiROIkbJptnDkt5YBPHVBBHyBS2NDQ4eMquXu9yTeszqbJxAV1+M5oIqb+XxZLWUi+ue+r40csgRyLBvdwul+10qswJwy19BUDqI70QPTdUeJ3i1TpQDxxupTG8G6gMpbjVO1UE4AP5Z4xhy2k3hRNE7k9EtLaiaBRGaKL7t6BItekHx65MSGNmIojA1YmnVTg8y58FLaDR3b1yB58R/CdnR8gY4pJ2v7FH5ix4gXd0vqqV12f0i5F5GSgW9/J+R0zi65j8RXBBKnRmksvcN/DKK4p+SwlbTUd7dtkU7UrmWRdliKAZ6K5AO42VKDeyvqMX3/Mx1GzEIun2PLTFxO/gn89QUKgGm95PzMUmmRLagHjI906RlGRge/pJ1/D/r8570peFTPVwVNqSX2SgUvj06JsmuyJ5BI8YiQsY+xbwdNc4obicTWS/Li+0PLamOAvRbheA==
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id km4-20020a17090327c400b001d94a245f3fsm206075plb.16.2024.02.05.10.55.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 10:55:56 -0800 (PST)
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Cong Wang <xiyou.wangcong@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	bpf@vger.kernel.org (open list:BPF [GENERAL] (Safe Dynamic Programs and Tools)),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next v2] net/sched: actions report errors with extack
-Date: Mon,  5 Feb 2024 10:52:40 -0800
-Message-ID: <20240205185537.216873-1-stephen@networkplumber.org>
-X-Mailer: git-send-email 2.43.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 085B1482E4;
+	Mon,  5 Feb 2024 18:55:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.89.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707159356; cv=fail; b=Z076QwkWJ6js19bVe9YpUDFSsO3raOvy9CL77Jxaz9RXc823pG9HzCMrVBxCJUoQeK/vKwui0oDFhGIX7+uRO8qYdd7gnWp1MXTZnhsJmlHzl4iC8xkEcoi0rB0Kciw/YsqZ5HeQT2nz5Kevfv2dDQ+Y4XmPXCvgS/k05eJf9M0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707159356; c=relaxed/simple;
+	bh=nm4nx7UII0sZtu4X6UE1liJIHpvEgRFve3vct/ks2RE=;
+	h=Message-ID:Date:From:Subject:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=flU8TAMxUe2SYJwhe1QyynW4PU0llY4Q7EI7INuXUFlosU56ZrKK5tx5ypwly0GPMITYacIm2zzw2bijWiAETisfQV+6ou6O5h+3cqhHefYzov6CzVzqBRByCDcEVQm53EIi2oyzB7LRESofksCsWE3SpYGcNzrbGV9txst2nes=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.it; spf=pass smtp.mailfrom=outlook.it; arc=fail smtp.client-ip=40.92.89.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.it
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=X2fiW2ELQffd47kdCKqC+vO/EgB1kIdtdsCWbt7cVHq4rmkTd5rMomNgo7X62FjOK4Dfi88rklH9RI6Qi38S+9To82q2nKia86sbuFv7AX6vRj6epd4s84fx1VHNaKtJe+B1X8NzRjzCXA5d4cAg7/lCk2cKMHOKazr7KOh4/FHxQLlUByz97j0o88f8YC7JJfISAiKuQpdTZ08qwgl73RRwH3FyhBp88m7AWIObwacpRzdvRPPpcdy3ZmjdfyDq10Q60Wa2sMeYCeirb1s52zzFKGunxtdgh9avydcU/5Ewln7OGGDXMeBjdhKA1J6wamFK3YUXJvWSHUZjwu8FCg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=piJNI8acByYRLLUjHYqdIPBwuzco4hbyGgWnYUrEfc8=;
+ b=NS+voWQg6Td28s0TJSAFi+Q7hHpMSl7NULXPtBZxSFfSoX6b2KURY/44tHMUb15il/oFRE721pBLqhAhJk6AxtMsuhfB82Vumui+zn6L/66oU+eBzsTMnyHg/lVn8QIE1cf+nuUqEIVwUDL8Vx3Twps9fjpxZxY0h0tVWyXD+va9M9sbDIV6iBPMOIhyGBKg4OHZdcEGtuhC+T6pdF8L1F3gng/27wcHKnAZPZqLELY+THkA7RlYXAZKFEmBuE2ZLP18kOB9063MLqcixJd9m87hciGMQ4JCpqP+/1VqVJvinTxE40lyKGjTwhq4K2GLOX97u+JpXhxs3FPhI2caXg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+Received: from AS1PR03MB8189.eurprd03.prod.outlook.com (2603:10a6:20b:47d::10)
+ by AM9PR03MB6914.eurprd03.prod.outlook.com (2603:10a6:20b:2df::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.31; Mon, 5 Feb
+ 2024 18:55:51 +0000
+Received: from AS1PR03MB8189.eurprd03.prod.outlook.com
+ ([fe80::ffb3:3ff8:6ea9:52b5]) by AS1PR03MB8189.eurprd03.prod.outlook.com
+ ([fe80::ffb3:3ff8:6ea9:52b5%5]) with mapi id 15.20.7249.032; Mon, 5 Feb 2024
+ 18:55:51 +0000
+Message-ID:
+ <AS1PR03MB818911164FB76698446CFEDC82472@AS1PR03MB8189.eurprd03.prod.outlook.com>
+Date: Mon, 5 Feb 2024 19:55:49 +0100
+User-Agent: Mozilla Thunderbird
+From: Sergio Palumbo <palumbo.ser@outlook.it>
+Subject: Re: [PATCH net-next] net: sfp: add quirk for OEM DFP-34X-2C2 GPON ONU
+ SFP
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <AS1PR03MB8189AD85CEB6E139F27307D3827F2@AS1PR03MB8189.eurprd03.prod.outlook.com>
+ <ZbZn8oCiyc1aNPuW@shell.armlinux.org.uk>
+ <AS1PR03MB8189B99C360FB403B8A0DD6882422@AS1PR03MB8189.eurprd03.prod.outlook.com>
+ <Zb0t+zKHx+0wTXH5@shell.armlinux.org.uk>
+ <AS1PR03MB8189D48114A559B080AF5BEA82422@AS1PR03MB8189.eurprd03.prod.outlook.com>
+ <Zb1+p6FiJwUF53xc@shell.armlinux.org.uk>
+ <f8cf41f2-4a90-4ef5-b214-906319bd82d4@outlook.it>
+Content-Language: it
+In-Reply-To: <f8cf41f2-4a90-4ef5-b214-906319bd82d4@outlook.it>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TMN: [QcFesF0ZzyPN8PWj8O4EN6Q3L2XkOi7Bownmn36wnpOf9dYyESbgUwwgND0EfaE5]
+X-ClientProxiedBy: MI2P293CA0015.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:45::9) To AS1PR03MB8189.eurprd03.prod.outlook.com
+ (2603:10a6:20b:47d::10)
+X-Microsoft-Original-Message-ID:
+ <3b08b468-42a1-4668-bcb5-5ab7d2a35a4a@outlook.it>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS1PR03MB8189:EE_|AM9PR03MB6914:EE_
+X-MS-Office365-Filtering-Correlation-Id: 15390332-2fdb-4638-3daa-08dc267c12db
+X-MS-Exchange-SLBlob-MailProps:
+	AlkLxVwsndlzyWWAZDSMMWV06JcxP2VXEiQagEbcTVQ4OvNPVOEW7NW5GIZw47c78c0nEGhvh3naIXS4DG7zST96ZiIulnrFEP7sbfgIKaGLcMljtctBSr5d5rXfjishePghkQkXFjmmEJv7etwLgvmoocUpkqU0hCmNOsNPr37yZbZOh61Ai8/l49h5FiZBDNV4OD0gQou6v1Bg8UdfaC4ptF7/JlipBgn1LlZhc6vjECH6kL0+RnnjvJ+zVyb1FvlScKA3CyWUY0BvFB7+p7gu7L+S/sNvlLRNvkLnOnnV62CKQiHKYkgmpz5kozUVyljwvbuQKq8rWyt//vTG1M9B3zIjd1wDQl+NJqTbowJzqSCD/YMcgsz+q83gjNnK7cvuEWrNzsx41+8j+AxMkDQ0pTXyH8CG7Wj86gB3jg92MjMx2vWkBtmY7kth6AfSc8NIDrubjycBUWLV7diobgzwVXQH3PHulNBQxN5hXgMk8X5/LWJVZcxaIIUkIJufwUcfrGkpKcU8yU58UmzIuXg3bDxMym2gVo8MI8vnyLXCRkh/DrCXlD98xD8NZBeCxQXeNrkO0DBH2YGkDWIxxxUXSETb3jdKQoVREebSbjefitQVRrN01vgw5ACM00zPjK0glwUX+a+U2YYOY5NsHcjnJ8TN2Nmr+wWyg3OUG1Km4fez5LhLwFG1hsOuZa3cckw4WGSib66zli9JC2NL2mxQmm4I7wF/x7GFnOs6xktsht1HdCjmlLbayBACkk0VVfxo2pwun0IyPRcXP+BnwXSHsQBbwb3B
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	wN42qsXznBgMmO4eLLctwYmeKzMc9YXR5G07pq7ylh71th2NeZSI/lV7SAOtQSITMk5mDIKz65NKtvtb6RekuA2UZzj9w70HhJZOPXmLFkihK1zCjl4u4+XFsb7Rv9vSax0o2157sPPRsVeUy8pGyLNFkzsf+GfFpI3uJO+3RBsnMjf6wvxQQPgonXtEuJClnL13slEUIiJD+2hrbQozPNs5tErEcUPJeEf/XTRl671pOeHsG5Y5QSFMhJbcTh+uBGhMKg4vaU75N+qzECMjP8hXbff8mayCkrB6FQu5iFB4hmf46Qr6CiA8wqyrnC9cPV8Tqx3l6R4Nv87GGIHPLX+b+qYi4FIXZkj1+SYSTBWFBrlox3LvLFFBQpxt4EO84CKNP6qtsxzF7RzbLnS1eNOaLBLyX8eWem2v6Tvp6oR9fezsKGgHEICE1avHJMk3Uj/+BVDNLY+Pd1cCI0c6DW9c4ezWaEWI8mEpn0IMCRTh2eEvd0zoOq3HTL//Ivv+YBwTSbro7l4AfomDgvdfIb0MIP28qwWFhiz4BhTl5+IImSGbym7VLr9FK0Ke7o8l
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WmxNQVowdVdYVTZsMzFwM2FreHVjK0lQcGhTZTVBQXFwQWNpclpQTC81c0p3?=
+ =?utf-8?B?U2l1QjhzUTBSYTRuQnZMSWxlUXc4S2JTNEp0ZzZmYkV0STBNVCtFcEJjMU5y?=
+ =?utf-8?B?bnpkK2IxYXJycEg4aEJ4Sm1TZ095ZThNWWl5Wm01MUJWSEJxUHQ0WnRhYkgw?=
+ =?utf-8?B?MGZHMDE4L2pJN2FJenFGOEFaWnJnYS9JV0dQR21aWGoxMVNvQjhJWENMUE04?=
+ =?utf-8?B?SzVUSWJIOVl0eTdzSmZhbUIzRHBZT2VtdUExdjErUWYrLy9sSWluc2ZIZjRP?=
+ =?utf-8?B?Mk0wRkw2MnYwc0Fab1dxV2pCQ0tNUU5vdWwyUVczUHNvZy9MTWJCL2VuT0RB?=
+ =?utf-8?B?aHpScEpvbkZKWHBEbER2Tzl5SzRTSmlpT0JuL0tsbE05b2FaVjA0cVB5Mnlh?=
+ =?utf-8?B?VldDam9RTW9VMVNwTmllWHdIcG5aZUx0cDNoaEpOekh5SGhxWThDSHRTaExv?=
+ =?utf-8?B?emk5QUpxbHhCTjM4R0V1VFBXNGJiZWdDL3l4V0ppVHhYNHZ2dnZlbEwwNHY3?=
+ =?utf-8?B?SkFsWnhDczRqQVdDMy90V05oWHNWMFV2ZmZWZkV4ckNYUG9BZGRwNXYxc2RQ?=
+ =?utf-8?B?bWw1MWFRVVdKcGpxOW9uRVgyWVpOYTVWWVl0dDUvVG5WbGVReS9veGtWM0xy?=
+ =?utf-8?B?aUN2T3RkRUlQSGkyNDNxRnlkbDgrdE56UFovdDREaVE2allhMjloQlB0Skdi?=
+ =?utf-8?B?cUVCKytRWTZsVS9YQzRHZzNrUVJpd0pRQjZSRWQ2SWorLzhUTXhKODN0Z3gy?=
+ =?utf-8?B?MzFwNmluYkxiSForaXJ4SS9WNzhMVUtzRnljSzRvblZ0c1dUN21hT3Y0bkNx?=
+ =?utf-8?B?RjVZVXZkaTI4S0s3aUt0NHNiUHVEeWFoRXdILzZnaFFUOGhCc2ppcS80OVJ6?=
+ =?utf-8?B?OUVtVSt3SGEzYmtEMExnUXhKOU03NGJUa2t2eUNabG5aTUJ4N3NJNWd5RHNF?=
+ =?utf-8?B?WDIxMkc3b0dCbGVDOE14eHZnWUVXWFlCR2JITy9lQnFQUDZJaFRBTkVXVko1?=
+ =?utf-8?B?cStlNmsxS3YvbnVLVGU3SlVpVHZkRjBrUzBKWEFYdEp1YUpabDA3ZzNqR0dN?=
+ =?utf-8?B?LzFReUZPb2JrcjE2b2d0TE8zcWVkdEoraWpENDBBb044TWdlbWJUNGZaRlp6?=
+ =?utf-8?B?Q2ZqZWFPcVhsUmYzOTVnZi9hKysvMy9PL1c5TlVQa2FaZUI2M29QcXBSMmJG?=
+ =?utf-8?B?Y0xvZFRzMzRnR2JqRWNtMVgyb0NGU1FxektreklkdC9YcHNyTk8rdTZhQ3lK?=
+ =?utf-8?B?ZTVkL2RWd1k3TzNVZEpxd0ZBaHhDYjdBYkVKM2crZDVXSjhpcEY0ZlUxSEJY?=
+ =?utf-8?B?SzBNbFEzeGF3bDViaWtYSndpR2JaUlo1VEQyWXZ5eGlSajNQVEJZaVE1Y0ty?=
+ =?utf-8?B?UGdabzgyM1FLd2F4ZitPMWtwTkVrZm5iNkN4c3kraklJMFkrMHIvbGJTcTlG?=
+ =?utf-8?B?cXpyOXozSnhTSlJBVTFOckc3WDZUaS9ZamZCbkdxQ0tCWW5WVGErUk51Y1NZ?=
+ =?utf-8?B?U3k3dHZIYUlSQTc0ZXh3WExOb0FIQ0dBUG5HTGZMc3VFbVdqNGlrd3RIa1lh?=
+ =?utf-8?B?OSs4YkdGQ0Z3MUhhUWJIQVdXNzZDck5uV000MnFLdVV5dWF1d2Izc1VyT3I0?=
+ =?utf-8?B?WmxSeTFVUEh2MjhIMzBUbHpIeHhaNE9RRGx4L3RvUmlwRG5WZE51NWZxVW9D?=
+ =?utf-8?B?OHBoMmZZSnBZcENxNSs1ZzNaWlh5aTdYR1hiZVFBZmM0ZXlHWUZwVlVOWVV3?=
+ =?utf-8?Q?2/uV+YP70aCQd6wKn8=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-76d7b.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 15390332-2fdb-4638-3daa-08dc267c12db
+X-MS-Exchange-CrossTenant-AuthSource: AS1PR03MB8189.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2024 18:55:51.6304
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR03MB6914
 
-When an action detects invalid parameters, it should
-be adding an external ack to netlink so that the user is
-able to diagnose the issue.
+Hello Russell,
+I back home and did the test for line 3 after the quirk:
+SFP module still showing up
+         Supported ports: [ FIBRE ]
+         Supported link modes:   2500baseX/Full
+                                                     1000baseX/Full
+         Speed: 2500Mb/s
+         Duplex: Full
+Probably auto-negotiating at 2500base-X
 
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
----
-v2 - use NL_REQ_ATTR_CHECK()
+Tried to change speed to 1000 using ethtool, but retuning an error.
 
- net/sched/act_bpf.c      | 32 +++++++++++++++++++++++---------
- net/sched/act_connmark.c |  8 ++++++--
- net/sched/act_csum.c     |  9 +++++++--
- net/sched/act_ct.c       |  5 +++--
- net/sched/act_ctinfo.c   |  6 +++---
- net/sched/act_gact.c     | 14 +++++++++++---
- net/sched/act_gate.c     | 15 +++++++++++----
- net/sched/act_ife.c      |  8 ++++++--
- net/sched/act_mirred.c   |  6 ++++--
- net/sched/act_nat.c      |  9 +++++++--
- net/sched/act_police.c   | 13 ++++++++++---
- net/sched/act_sample.c   |  8 ++++++--
- net/sched/act_simple.c   | 11 ++++++++---
- net/sched/act_skbedit.c  | 17 ++++++++++++-----
- net/sched/act_skbmod.c   |  9 +++++++--
- net/sched/act_vlan.c     |  8 ++++++--
- 16 files changed, 130 insertions(+), 48 deletions(-)
+However taking in consideration that without the quirk the module
+is working at 1000base-X with both LAN_SDS_MODE=1 and
+LAN_SDS_MODE=6 on my host 1000+2500 there i no reason why
+it should not work at 1000base-X with an host only supporting 1000.
 
-diff --git a/net/sched/act_bpf.c b/net/sched/act_bpf.c
-index 0e3cf11ae5fc..4dc6f27a4809 100644
---- a/net/sched/act_bpf.c
-+++ b/net/sched/act_bpf.c
-@@ -184,7 +184,8 @@ static const struct nla_policy act_bpf_policy[TCA_ACT_BPF_MAX + 1] = {
- 				    .len = sizeof(struct sock_filter) * BPF_MAXINSNS },
- };
- 
--static int tcf_bpf_init_from_ops(struct nlattr **tb, struct tcf_bpf_cfg *cfg)
-+static int tcf_bpf_init_from_ops(struct nlattr **tb, struct tcf_bpf_cfg *cfg,
-+				 struct netlink_ext_ack *extack)
- {
- 	struct sock_filter *bpf_ops;
- 	struct sock_fprog_kern fprog_tmp;
-@@ -193,12 +194,17 @@ static int tcf_bpf_init_from_ops(struct nlattr **tb, struct tcf_bpf_cfg *cfg)
- 	int ret;
- 
- 	bpf_num_ops = nla_get_u16(tb[TCA_ACT_BPF_OPS_LEN]);
--	if (bpf_num_ops	> BPF_MAXINSNS || bpf_num_ops == 0)
-+	if (bpf_num_ops	> BPF_MAXINSNS || bpf_num_ops == 0) {
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "Invalid number of BPF instructions %u", bpf_num_ops);
- 		return -EINVAL;
-+	}
- 
- 	bpf_size = bpf_num_ops * sizeof(*bpf_ops);
--	if (bpf_size != nla_len(tb[TCA_ACT_BPF_OPS]))
-+	if (bpf_size != nla_len(tb[TCA_ACT_BPF_OPS])) {
-+		NL_SET_ERR_MSG_FMT_MOD(extack, "BPF instruction size %u", bpf_size);
- 		return -EINVAL;
-+	}
- 
- 	bpf_ops = kmemdup(nla_data(tb[TCA_ACT_BPF_OPS]), bpf_size, GFP_KERNEL);
- 	if (bpf_ops == NULL)
-@@ -221,7 +227,8 @@ static int tcf_bpf_init_from_ops(struct nlattr **tb, struct tcf_bpf_cfg *cfg)
- 	return 0;
- }
- 
--static int tcf_bpf_init_from_efd(struct nlattr **tb, struct tcf_bpf_cfg *cfg)
-+static int tcf_bpf_init_from_efd(struct nlattr **tb, struct tcf_bpf_cfg *cfg,
-+				 struct netlink_ext_ack *extack)
- {
- 	struct bpf_prog *fp;
- 	char *name = NULL;
-@@ -230,8 +237,10 @@ static int tcf_bpf_init_from_efd(struct nlattr **tb, struct tcf_bpf_cfg *cfg)
- 	bpf_fd = nla_get_u32(tb[TCA_ACT_BPF_FD]);
- 
- 	fp = bpf_prog_get_type(bpf_fd, BPF_PROG_TYPE_SCHED_ACT);
--	if (IS_ERR(fp))
-+	if (IS_ERR(fp)) {
-+		NL_SET_ERR_MSG_MOD(extack, "BPF program type mismatch");
- 		return PTR_ERR(fp);
-+	}
- 
- 	if (tb[TCA_ACT_BPF_NAME]) {
- 		name = nla_memdup(tb[TCA_ACT_BPF_NAME], GFP_KERNEL);
-@@ -292,16 +301,20 @@ static int tcf_bpf_init(struct net *net, struct nlattr *nla,
- 	int ret, res = 0;
- 	u32 index;
- 
--	if (!nla)
-+	if (!nla) {
-+		NL_SET_ERR_MSG_MOD(extack, "Bpf requires attributes to be passed");
- 		return -EINVAL;
-+	}
- 
- 	ret = nla_parse_nested_deprecated(tb, TCA_ACT_BPF_MAX, nla,
- 					  act_bpf_policy, NULL);
- 	if (ret < 0)
- 		return ret;
- 
--	if (!tb[TCA_ACT_BPF_PARMS])
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_ACT_BPF_PARMS)) {
-+		NL_SET_ERR_MSG(extack, "Missing required attribute");
- 		return -EINVAL;
-+	}
- 
- 	parm = nla_data(tb[TCA_ACT_BPF_PARMS]);
- 	index = parm->index;
-@@ -336,14 +349,15 @@ static int tcf_bpf_init(struct net *net, struct nlattr *nla,
- 	is_ebpf = tb[TCA_ACT_BPF_FD];
- 
- 	if (is_bpf == is_ebpf) {
-+		NL_SET_ERR_MSG_MOD(extack, "Can not specify both BPF fd and ops");
- 		ret = -EINVAL;
- 		goto put_chain;
- 	}
- 
- 	memset(&cfg, 0, sizeof(cfg));
- 
--	ret = is_bpf ? tcf_bpf_init_from_ops(tb, &cfg) :
--		       tcf_bpf_init_from_efd(tb, &cfg);
-+	ret = is_bpf ? tcf_bpf_init_from_ops(tb, &cfg, extack) :
-+		       tcf_bpf_init_from_efd(tb, &cfg, extack);
- 	if (ret < 0)
- 		goto put_chain;
- 
-diff --git a/net/sched/act_connmark.c b/net/sched/act_connmark.c
-index 0fce631e7c91..00c7e52d91ca 100644
---- a/net/sched/act_connmark.c
-+++ b/net/sched/act_connmark.c
-@@ -110,16 +110,20 @@ static int tcf_connmark_init(struct net *net, struct nlattr *nla,
- 	int ret = 0, err;
- 	u32 index;
- 
--	if (!nla)
-+	if (!nla) {
-+		NL_SET_ERR_MSG_MOD(extack, "Connmark requires attributes to be passed");
- 		return -EINVAL;
-+	}
- 
- 	ret = nla_parse_nested_deprecated(tb, TCA_CONNMARK_MAX, nla,
- 					  connmark_policy, NULL);
- 	if (ret < 0)
- 		return ret;
- 
--	if (!tb[TCA_CONNMARK_PARMS])
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_CONNMARK_PARMS)) {
-+		NL_SET_ERR_MSG(extack, "Missing required attribute");
- 		return -EINVAL;
-+	}
- 
- 	nparms = kzalloc(sizeof(*nparms), GFP_KERNEL);
- 	if (!nparms)
-diff --git a/net/sched/act_csum.c b/net/sched/act_csum.c
-index 5cc8e407e791..b83e6d5f10ee 100644
---- a/net/sched/act_csum.c
-+++ b/net/sched/act_csum.c
-@@ -55,16 +55,21 @@ static int tcf_csum_init(struct net *net, struct nlattr *nla,
- 	int ret = 0, err;
- 	u32 index;
- 
--	if (nla == NULL)
-+	if (!nla) {
-+		NL_SET_ERR_MSG_MOD(extack, "Checksum requires attributes to be passed");
- 		return -EINVAL;
-+	}
- 
- 	err = nla_parse_nested_deprecated(tb, TCA_CSUM_MAX, nla, csum_policy,
- 					  NULL);
- 	if (err < 0)
- 		return err;
- 
--	if (tb[TCA_CSUM_PARMS] == NULL)
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_CSUM_PARMS)) {
-+		NL_SET_ERR_MSG(extack, "Missing required attribute");
- 		return -EINVAL;
-+	}
-+
- 	parm = nla_data(tb[TCA_CSUM_PARMS]);
- 	index = parm->index;
- 	err = tcf_idr_check_alloc(tn, &index, a, bind);
-diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
-index baac083fd8f1..7984f9f6ea2c 100644
---- a/net/sched/act_ct.c
-+++ b/net/sched/act_ct.c
-@@ -1329,10 +1329,11 @@ static int tcf_ct_init(struct net *net, struct nlattr *nla,
- 	if (err < 0)
- 		return err;
- 
--	if (!tb[TCA_CT_PARMS]) {
--		NL_SET_ERR_MSG_MOD(extack, "Missing required ct parameters");
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_CT_PARMS)) {
-+		NL_SET_ERR_MSG(extack, "Missing required attribute");
- 		return -EINVAL;
- 	}
-+
- 	parm = nla_data(tb[TCA_CT_PARMS]);
- 	index = parm->index;
- 	err = tcf_idr_check_alloc(tn, &index, a, bind);
-diff --git a/net/sched/act_ctinfo.c b/net/sched/act_ctinfo.c
-index 5dd41a012110..dde047b6b839 100644
---- a/net/sched/act_ctinfo.c
-+++ b/net/sched/act_ctinfo.c
-@@ -178,11 +178,11 @@ static int tcf_ctinfo_init(struct net *net, struct nlattr *nla,
- 	if (err < 0)
- 		return err;
- 
--	if (!tb[TCA_CTINFO_ACT]) {
--		NL_SET_ERR_MSG_MOD(extack,
--				   "Missing required TCA_CTINFO_ACT attribute");
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_CTINFO_ACT)) {
-+		NL_SET_ERR_MSG(extack, "Missing required attribute");
- 		return -EINVAL;
- 	}
-+
- 	actparm = nla_data(tb[TCA_CTINFO_ACT]);
- 
- 	/* do some basic validation here before dynamically allocating things */
-diff --git a/net/sched/act_gact.c b/net/sched/act_gact.c
-index e949280eb800..42c6b8d9002d 100644
---- a/net/sched/act_gact.c
-+++ b/net/sched/act_gact.c
-@@ -68,16 +68,21 @@ static int tcf_gact_init(struct net *net, struct nlattr *nla,
- 	struct tc_gact_p *p_parm = NULL;
- #endif
- 
--	if (nla == NULL)
-+	if (!nla) {
-+		NL_SET_ERR_MSG(extack, "Gact requires attributes to be passed");
- 		return -EINVAL;
-+	}
- 
- 	err = nla_parse_nested_deprecated(tb, TCA_GACT_MAX, nla, gact_policy,
- 					  NULL);
- 	if (err < 0)
- 		return err;
- 
--	if (tb[TCA_GACT_PARMS] == NULL)
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_GACT_PARMS)) {
-+		NL_SET_ERR_MSG(extack, "Missing required attribute");
- 		return -EINVAL;
-+	}
-+
- 	parm = nla_data(tb[TCA_GACT_PARMS]);
- 	index = parm->index;
- 
-@@ -87,8 +92,11 @@ static int tcf_gact_init(struct net *net, struct nlattr *nla,
- #else
- 	if (tb[TCA_GACT_PROB]) {
- 		p_parm = nla_data(tb[TCA_GACT_PROB]);
--		if (p_parm->ptype >= MAX_RAND)
-+		if (p_parm->ptype >= MAX_RAND) {
-+			NL_SET_ERR_MSG(extack, "Invalid ptype in gact prob");
- 			return -EINVAL;
-+		}
-+
- 		if (TC_ACT_EXT_CMP(p_parm->paction, TC_ACT_GOTO_CHAIN)) {
- 			NL_SET_ERR_MSG(extack,
- 				       "goto chain not allowed on fallback");
-diff --git a/net/sched/act_gate.c b/net/sched/act_gate.c
-index 1dd74125398a..3e8056a2c304 100644
---- a/net/sched/act_gate.c
-+++ b/net/sched/act_gate.c
-@@ -239,8 +239,10 @@ static int parse_gate_list(struct nlattr *list_attr,
- 	int err, rem;
- 	int i = 0;
- 
--	if (!list_attr)
-+	if (!list_attr) {
-+		NL_SET_ERR_MSG(extack, "Gate missing attributes");
- 		return -EINVAL;
-+	}
- 
- 	nla_for_each_nested(n, list_attr, rem) {
- 		if (nla_type(n) != TCA_GATE_ONE_ENTRY) {
-@@ -317,15 +319,19 @@ static int tcf_gate_init(struct net *net, struct nlattr *nla,
- 	ktime_t start;
- 	u32 index;
- 
--	if (!nla)
-+	if (!nla) {
-+		NL_SET_ERR_MSG_MOD(extack, "Gate requires attributes to be passed");
- 		return -EINVAL;
-+	}
- 
- 	err = nla_parse_nested(tb, TCA_GATE_MAX, nla, gate_policy, extack);
- 	if (err < 0)
- 		return err;
- 
--	if (!tb[TCA_GATE_PARMS])
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_GATE_PARMS)) {
-+		NL_SET_ERR_MSG(extack, "Missing required attribute");
- 		return -EINVAL;
-+	}
- 
- 	if (tb[TCA_GATE_CLOCKID]) {
- 		clockid = nla_get_s32(tb[TCA_GATE_CLOCKID]);
-@@ -343,7 +349,7 @@ static int tcf_gate_init(struct net *net, struct nlattr *nla,
- 			tk_offset = TK_OFFS_TAI;
- 			break;
- 		default:
--			NL_SET_ERR_MSG(extack, "Invalid 'clockid'");
-+			NL_SET_ERR_MSG_MOD(extack, "Invalid 'clockid'");
- 			return -EINVAL;
- 		}
- 	}
-@@ -409,6 +415,7 @@ static int tcf_gate_init(struct net *net, struct nlattr *nla,
- 			cycle = ktime_add_ns(cycle, entry->interval);
- 		cycletime = cycle;
- 		if (!cycletime) {
-+			NL_SET_ERR_MSG_MOD(extack, "cycle time is zero");
- 			err = -EINVAL;
- 			goto chain_put;
- 		}
-diff --git a/net/sched/act_ife.c b/net/sched/act_ife.c
-index 107c6d83dc5c..b22881363029 100644
---- a/net/sched/act_ife.c
-+++ b/net/sched/act_ife.c
-@@ -508,8 +508,10 @@ static int tcf_ife_init(struct net *net, struct nlattr *nla,
- 	if (err < 0)
- 		return err;
- 
--	if (!tb[TCA_IFE_PARMS])
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_IFE_PARMS)) {
-+		NL_SET_ERR_MSG(extack, "Missing required attribute");
- 		return -EINVAL;
-+	}
- 
- 	parm = nla_data(tb[TCA_IFE_PARMS]);
- 
-@@ -517,8 +519,10 @@ static int tcf_ife_init(struct net *net, struct nlattr *nla,
- 	 * they cannot run as the same time. Check on all other values which
- 	 * are not supported right now.
- 	 */
--	if (parm->flags & ~IFE_ENCODE)
-+	if (parm->flags & ~IFE_ENCODE) {
-+		NL_SET_ERR_MSG_MOD(extack, "Invalid ife flag parameter");
- 		return -EINVAL;
-+	}
- 
- 	p = kzalloc(sizeof(*p), GFP_KERNEL);
- 	if (!p)
-diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
-index 93a96e9d8d90..f1bdd19e0bbb 100644
---- a/net/sched/act_mirred.c
-+++ b/net/sched/act_mirred.c
-@@ -124,10 +124,12 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
- 					  mirred_policy, extack);
- 	if (ret < 0)
- 		return ret;
--	if (!tb[TCA_MIRRED_PARMS]) {
--		NL_SET_ERR_MSG_MOD(extack, "Missing required mirred parameters");
-+
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_MIRRED_PARMS)) {
-+		NL_SET_ERR_MSG(extack, "Missing required attribute");
- 		return -EINVAL;
- 	}
-+
- 	parm = nla_data(tb[TCA_MIRRED_PARMS]);
- 	index = parm->index;
- 	err = tcf_idr_check_alloc(tn, &index, a, bind);
-diff --git a/net/sched/act_nat.c b/net/sched/act_nat.c
-index d541f553805f..42019977514e 100644
---- a/net/sched/act_nat.c
-+++ b/net/sched/act_nat.c
-@@ -46,16 +46,21 @@ static int tcf_nat_init(struct net *net, struct nlattr *nla, struct nlattr *est,
- 	struct tcf_nat *p;
- 	u32 index;
- 
--	if (nla == NULL)
-+	if (!nla) {
-+		NL_SET_ERR_MSG_MOD(extack, "Nat action requires attributes");
- 		return -EINVAL;
-+	}
- 
- 	err = nla_parse_nested_deprecated(tb, TCA_NAT_MAX, nla, nat_policy,
- 					  NULL);
- 	if (err < 0)
- 		return err;
- 
--	if (tb[TCA_NAT_PARMS] == NULL)
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_NAT_PARMS)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Missing required NAT parameters");
- 		return -EINVAL;
-+	}
-+
- 	parm = nla_data(tb[TCA_NAT_PARMS]);
- 	index = parm->index;
- 	err = tcf_idr_check_alloc(tn, &index, a, bind);
-diff --git a/net/sched/act_police.c b/net/sched/act_police.c
-index 8555125ed34d..17708fe32ad1 100644
---- a/net/sched/act_police.c
-+++ b/net/sched/act_police.c
-@@ -56,19 +56,26 @@ static int tcf_police_init(struct net *net, struct nlattr *nla,
- 	u64 rate64, prate64;
- 	u64 pps, ppsburst;
- 
--	if (nla == NULL)
-+	if (!nla) {
-+		NL_SET_ERR_MSG_MOD(extack, "Police requires attributes");
- 		return -EINVAL;
-+	}
- 
- 	err = nla_parse_nested_deprecated(tb, TCA_POLICE_MAX, nla,
- 					  police_policy, NULL);
- 	if (err < 0)
- 		return err;
- 
--	if (tb[TCA_POLICE_TBF] == NULL)
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_POLICE_TBF)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Missing required police action parameters");
- 		return -EINVAL;
-+	}
-+
- 	size = nla_len(tb[TCA_POLICE_TBF]);
--	if (size != sizeof(*parm) && size != sizeof(struct tc_police_compat))
-+	if (size != sizeof(*parm) && size != sizeof(struct tc_police_compat)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Invalid size for police action parameters");
- 		return -EINVAL;
-+	}
- 
- 	parm = nla_data(tb[TCA_POLICE_TBF]);
- 	index = parm->index;
-diff --git a/net/sched/act_sample.c b/net/sched/act_sample.c
-index a69b53d54039..0492df144b39 100644
---- a/net/sched/act_sample.c
-+++ b/net/sched/act_sample.c
-@@ -49,15 +49,19 @@ static int tcf_sample_init(struct net *net, struct nlattr *nla,
- 	bool exists = false;
- 	int ret, err;
- 
--	if (!nla)
-+	if (!nla) {
-+		NL_SET_ERR_MSG_MOD(extack, "Sample requires attributes to be passed");
- 		return -EINVAL;
-+	}
- 	ret = nla_parse_nested_deprecated(tb, TCA_SAMPLE_MAX, nla,
- 					  sample_policy, NULL);
- 	if (ret < 0)
- 		return ret;
- 
--	if (!tb[TCA_SAMPLE_PARMS])
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_SAMPLE_PARMS)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Missing required sample action parameters");
- 		return -EINVAL;
-+	}
- 
- 	parm = nla_data(tb[TCA_SAMPLE_PARMS]);
- 	index = parm->index;
-diff --git a/net/sched/act_simple.c b/net/sched/act_simple.c
-index f3abe0545989..0c56c8c9ef44 100644
---- a/net/sched/act_simple.c
-+++ b/net/sched/act_simple.c
-@@ -100,16 +100,20 @@ static int tcf_simp_init(struct net *net, struct nlattr *nla,
- 	int ret = 0, err;
- 	u32 index;
- 
--	if (nla == NULL)
-+	if (!nla) {
-+		NL_SET_ERR_MSG_MOD(extack, "Sample requires attributes to be passed");
- 		return -EINVAL;
-+	}
- 
- 	err = nla_parse_nested_deprecated(tb, TCA_DEF_MAX, nla, simple_policy,
- 					  NULL);
- 	if (err < 0)
- 		return err;
- 
--	if (tb[TCA_DEF_PARMS] == NULL)
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_DEF_PARMS)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Missing required sample action parameters");
- 		return -EINVAL;
-+	}
- 
- 	parm = nla_data(tb[TCA_DEF_PARMS]);
- 	index = parm->index;
-@@ -120,7 +124,8 @@ static int tcf_simp_init(struct net *net, struct nlattr *nla,
- 	if (exists && bind)
- 		return ACT_P_BOUND;
- 
--	if (tb[TCA_DEF_DATA] == NULL) {
-+	if (NL_REQ_ATTR_CHECK(extack, NULL, tb, TCA_DEF_DATA)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Missing simple action default data");
- 		if (exists)
- 			tcf_idr_release(*a, bind);
- 		else
-diff --git a/net/sched/act_skbedit.c b/net/sched/act_skbedit.c
-index 1f1d9ce3e968..e9c4f2befb8b 100644
---- a/net/sched/act_skbedit.c
-+++ b/net/sched/act_skbedit.c
-@@ -133,16 +133,20 @@ static int tcf_skbedit_init(struct net *net, struct nlattr *nla,
- 	int ret = 0, err;
- 	u32 index;
- 
--	if (nla == NULL)
-+	if (!nla) {
-+		NL_SET_ERR_MSG_MOD(extack, "Skbedit requires attributes to be passed");
- 		return -EINVAL;
-+	}
- 
- 	err = nla_parse_nested_deprecated(tb, TCA_SKBEDIT_MAX, nla,
- 					  skbedit_policy, NULL);
- 	if (err < 0)
- 		return err;
- 
--	if (tb[TCA_SKBEDIT_PARMS] == NULL)
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_SKBEDIT_PARMS)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Missing required skbedit parameters");
- 		return -EINVAL;
-+	}
- 
- 	if (tb[TCA_SKBEDIT_PRIORITY] != NULL) {
- 		flags |= SKBEDIT_F_PRIORITY;
-@@ -161,8 +165,10 @@ static int tcf_skbedit_init(struct net *net, struct nlattr *nla,
- 
- 	if (tb[TCA_SKBEDIT_PTYPE] != NULL) {
- 		ptype = nla_data(tb[TCA_SKBEDIT_PTYPE]);
--		if (!skb_pkt_type_ok(*ptype))
-+		if (!skb_pkt_type_ok(*ptype)) {
-+			NL_SET_ERR_MSG_MOD(extack, "ptype is not a valid");
- 			return -EINVAL;
-+		}
- 		flags |= SKBEDIT_F_PTYPE;
- 	}
- 
-@@ -182,8 +188,8 @@ static int tcf_skbedit_init(struct net *net, struct nlattr *nla,
- 		if (*pure_flags & SKBEDIT_F_TXQ_SKBHASH) {
- 			u16 *queue_mapping_max;
- 
--			if (!tb[TCA_SKBEDIT_QUEUE_MAPPING] ||
--			    !tb[TCA_SKBEDIT_QUEUE_MAPPING_MAX]) {
-+			if (NL_REQ_ATTR_CHECK(extack, NULL, tb, TCA_SKBEDIT_QUEUE_MAPPING) ||
-+			    NL_REQ_ATTR_CHECK(extack, NULL, tb, TCA_SKBEDIT_QUEUE_MAPPING_MAX)) {
- 				NL_SET_ERR_MSG_MOD(extack, "Missing required range of queue_mapping.");
- 				return -EINVAL;
- 			}
-@@ -212,6 +218,7 @@ static int tcf_skbedit_init(struct net *net, struct nlattr *nla,
- 		return ACT_P_BOUND;
- 
- 	if (!flags) {
-+		NL_SET_ERR_MSG_MOD(extack, "No skbedit action flag");
- 		if (exists)
- 			tcf_idr_release(*a, bind);
- 		else
-diff --git a/net/sched/act_skbmod.c b/net/sched/act_skbmod.c
-index 39945b139c48..19b35666f357 100644
---- a/net/sched/act_skbmod.c
-+++ b/net/sched/act_skbmod.c
-@@ -119,16 +119,20 @@ static int tcf_skbmod_init(struct net *net, struct nlattr *nla,
- 	u16 eth_type = 0;
- 	int ret = 0, err;
- 
--	if (!nla)
-+	if (!nla) {
-+		NL_SET_ERR_MSG_MOD(extack, "Skbmod requires attributes to be passed");
- 		return -EINVAL;
-+	}
- 
- 	err = nla_parse_nested_deprecated(tb, TCA_SKBMOD_MAX, nla,
- 					  skbmod_policy, NULL);
- 	if (err < 0)
- 		return err;
- 
--	if (!tb[TCA_SKBMOD_PARMS])
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_SKBMOD_PARMS)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Missing required skbmod parameters");
- 		return -EINVAL;
-+	}
- 
- 	if (tb[TCA_SKBMOD_DMAC]) {
- 		daddr = nla_data(tb[TCA_SKBMOD_DMAC]);
-@@ -160,6 +164,7 @@ static int tcf_skbmod_init(struct net *net, struct nlattr *nla,
- 		return ACT_P_BOUND;
- 
- 	if (!lflags) {
-+		NL_SET_ERR_MSG_MOD(extack, "No skbmod action flag");
- 		if (exists)
- 			tcf_idr_release(*a, bind);
- 		else
-diff --git a/net/sched/act_vlan.c b/net/sched/act_vlan.c
-index 22f4b1e8ade9..414129539c4a 100644
---- a/net/sched/act_vlan.c
-+++ b/net/sched/act_vlan.c
-@@ -134,16 +134,20 @@ static int tcf_vlan_init(struct net *net, struct nlattr *nla,
- 	int ret = 0, err;
- 	u32 index;
- 
--	if (!nla)
-+	if (!nla) {
-+		NL_SET_ERR_MSG_MOD(extack, "Vlan requires attributes to be passed");
- 		return -EINVAL;
-+	}
- 
- 	err = nla_parse_nested_deprecated(tb, TCA_VLAN_MAX, nla, vlan_policy,
- 					  NULL);
- 	if (err < 0)
- 		return err;
- 
--	if (!tb[TCA_VLAN_PARMS])
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_VLAN_PARMS)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Missing required vlan action parameters");
- 		return -EINVAL;
-+	}
- 	parm = nla_data(tb[TCA_VLAN_PARMS]);
- 	index = parm->index;
- 	err = tcf_idr_check_alloc(tn, &index, a, bind);
--- 
-2.43.0
+Unfortunately I do not have any host only supporting 1000base-X.
+
+Awaiting your comments
+
+regards
+
+Sergio Palumbo
+
+Il 03/02/2024 10:16, Sergio Palumbo ha scritto:
+> Hello Russell,
+> I understand your point on third line, but I quite sure that it is 
+> working at
+> 1000-X because with LAN_SDS_MODE=1 makes the module to show up
+> at 1000-X to Linux host, but now you made me doubtful.
+> I'm now out of home and cannot do this test. I will test it on monday 
+> evening
+> when will be back at home.
+> Unfortunately not so skilled to:
+> "Add #define DEBUG in phylink.c, rebuild and run that kernel. Try
+> that exact configuration. Report to me the kernel messages."
+> Would it be enough to check if using LAN_SDS_MODULE=1 with the quirk, the
+> confirmation that  ethtool will report 1000-X only and speed connectioin
+> reported by ethtool will be 1000?
+> Will let you know the result of this test.
+> Thanks for your kind support.
+> Regards
+>
+> Sergio Palumbo
+>
+> Il 03/02/2024 00:45, Russell King (Oracle) ha scritto:
+>> On Sat, Feb 03, 2024 at 12:18:13AM +0100, Sergio Palumbo wrote:
+>>> Hello Russell,
+>>> thanks for your  explanation. I have to say that:
+>>> Module default is LAN_SDS_MODE=1
+>>> Host banana PI R3 supporting 1000base-X + 2500base-X
+>>> I would update the table as follows:
+>>>
+>>> The current situation:
+>>> Host supports        Module        Mode        Functional
+>>> 1000base-X        LAN_SDS_MODE=1    1000base-X    Not tested, but 
+>>> expect to work as 1000base-X + 2500base-X
+>>> 1000base-X        LAN_SDS_MODE=6    1000base-X    Not tested, but 
+>>> expect to work as 1000base-X + 2500base-X
+>>> 1000base-X + 2500base-X    LAN_SDS_MODE=1    1000base-X    Yes
+>>> 1000base-X + 2500base-X    LAN_SDS_MODE=6    1000base-X    Yes (host 
+>>> forcing module at 1000base-X)
+>>>
+>>> I suppose that Banana PI R3 host is forced by linux drivers
+>>> at 1000base-X so first two cases should be same as second two cases.
+>>>
+>>>
+>>> With the quirk:
+>>> Host supports        Module        Mode        Functional
+>>> 1000base-X        LAN_SDS_MODE=1    1000base-X    Not tested, but 
+>>> expect to work as 1000base-X + 2500base-X host
+>>> 1000base-X        LAN_SDS_MODE=6    1000base-X    Not tested, but 
+>>> expect to work as 1000base-X + 2500base-X host
+>>> 1000base-X + 2500base-X    LAN_SDS_MODE=1    1000base-X    Yes 
+>>> (module forcing host at 1000base-X)
+>>> 1000base-X + 2500base-X    LAN_SDS_MODE=6    2500base-X    Yes
+>> Your third line is just wrong. Given the capabilities of the host
+>> _and_ the capabilities of the module adjusted by your quirk, phylink
+>> _will_ choose 2500base-X _not_ 1000base-X for that. With your quirk,
+>> there is no way for Linux to know what LAN_SDS_MODE has been set
+>> in the module. Even without your quirk, _unless_ the module updates
+>> the EEPROM contents which is unlikely, there isn't a way to know.
+>>
+>>
+>> Adding a quirk that makes it not work in its default state is
+>> technically a regression. We can't know whether people are already
+>> using this module with Linux in this state. Adding this change
+>> potentially breaks users setups.
+>>
+>>> I suppose Banana PI R3 forcing Linux drivers at 1000-X when
+>>> module in LAN_SDS_MODE=1 and expect it should work alpso with
+>>> hosts at 1000base-X only in LAN_SDS_MODE=1 and LAN_SDS_MODE=6
+>> There is no way for Linux to know what LAN_SDS_MODE the module is
+>> in.
+>>
+>
 
 
