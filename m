@@ -1,223 +1,223 @@
-Return-Path: <netdev+bounces-69207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9CDB84A23A
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 19:29:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F87B84A29D
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 19:43:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52985B22B11
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 18:29:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C40F91C21797
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 18:43:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191C347F74;
-	Mon,  5 Feb 2024 18:26:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1258B482DB;
+	Mon,  5 Feb 2024 18:43:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ZEYJAhpS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LDCODIf9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78326481B5
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 18:25:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96F1947A76
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 18:43:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707157562; cv=none; b=NMlM167g3DQz08G4onHqNwlm/F+wBbcI7XnzrBU5KK7/f8lw3iIbWXzoLKr2zW2RntmyLOds3xblnjCTH07Dvx1lru+7uss5nu0I2tjELr1gUDJzkYc6h341x0UZphsaqN0EJp1w6SHMz0yZt88Ox00HWjv879t38kbBNSO9nc0=
+	t=1707158591; cv=none; b=plkwleDPfbcwK++Ovoh6ukiDvc4lSe0maZ1SskgeTOzWB1QT8no3RnQBKfV8mcCTEVS/mWCJP1TQDup6CWL+ETzTiez8QyfGBZMeG1Wrzq7o1QlMsFiEv3S8ibkHCfkPHUHwgqPS3/ujahdpm4AOQ+P3jq1V7c0GcDdEM5h0UeI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707157562; c=relaxed/simple;
-	bh=OhVjfgQ6ypsXAl4aTp6y2RSd+qg4DOU5DAB4K9X8HUE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CcYroErZKHtPG0HO+bNf6Sco1VNKSidLS+AC94EhYqKOOgyGFwZa3ZYGcBmOoUJlrrmhOYCPm/eFBr0JtcKztkkrUMazMnUCzlBfSfOayEsiRWfdT/gLuoaXEXg/4SW7ug2LxCgPmdNB2O+9EoRfvewPlf55NrhgSOxSGKN76/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ZEYJAhpS; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d780a392fdso40313855ad.3
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 10:25:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1707157559; x=1707762359; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8YYhJmNwACs7xWzxaru2OLoYfAu9N74lwcPjzUDB+xg=;
-        b=ZEYJAhpSf25DJNLMudbcAfzw1CZQMJLzK/SqywQ5irB9Sq2jplxCSBCbNAxBwS+Txn
-         0L7nwuaesxFlBH0w6dg1Sgv904eVAU3pbZtPqeAE1fuHmxWkP4x3w9iC7mI7SgKqiL0P
-         N1c+a55ibd5Orfi5+g50OkgB/c/mIxdCx5Ftg=
+	s=arc-20240116; t=1707158591; c=relaxed/simple;
+	bh=lxH2UkoXhtlULl/zvh0je1dal/ztpt8QeP0kl4G+Vbs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XaBSntFCYaMDibYVpGs7ce72oGCHG3nGfCaM1o5S/jnB9pad5Mod1hMDjfWhiQhW9EbHafzDkNMPHSyQ/NUYIAsdrCivOn4NQSCpXzWyB6RCdmDzxq3lzea5RPtj8hfEu7Rq4EpadnDijytVQ3Jhsh9OYIQtekSYeYiMvYCo/a0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LDCODIf9; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707158586;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LNq6oubwXmqe6ItjQ33y0Ud8zzbj1+GnKVYTNf0QWt4=;
+	b=LDCODIf9ltZ3tRdTQPs5OvjJ9JL43He9NN9YqsGnbJtT6u/qL5S3ZMpQ0HD79pWk4AbMSW
+	OJIZG+zxzO71W5CApXODc7rJ61/FGwjhpExp16DjTzBUH8aJmqcLEIWZoBgufcogbkxFii
+	oo/awuUIvYCHYJXvOPUT3QjGUufmV4A=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-466-B6IefzHaMCWMfndcRO6Iog-1; Mon, 05 Feb 2024 13:43:05 -0500
+X-MC-Unique: B6IefzHaMCWMfndcRO6Iog-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a373525d2f2so108746766b.3
+        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 10:43:04 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707157559; x=1707762359;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8YYhJmNwACs7xWzxaru2OLoYfAu9N74lwcPjzUDB+xg=;
-        b=XHgt7k3SIrvzLvtk62g48AB4fbqXvpgjFM2t+wVqV+0qG6LrFp7oqxChTouwpouYK7
-         ofTVmf3eD/stmBZ2OOMPPIJM8OVX2rK31moRuHmNCbn5FtHarAzQ9HMoeRBZxnTGKngU
-         1eQxEnDwZBwKfETEEduLwoQ6GxoAaGHxrsXyOQmPZmZ7b9m3VK92uId7HPKu9HI5XzvB
-         uaud5cam/iHAi5sUyRviucMxEpozRQUnjQiLKiPq7HKx39A04G94KB3iqU+hWwZc3xL9
-         9en4mXbCoeeTqUBZA2pqiJdnPb4gH58ZxwqHH94BHI3heO6SODP05U2sA/WnGGCjXt1W
-         9g+w==
-X-Gm-Message-State: AOJu0YzJ5eM6rQ0Saoyw7fcwLkNSyyJaBszu9fO6+J0yK7YEfkneI0yN
-	iUYSIJFGqjWL+O+NuW4fJWQvStjLMRhNjlMimxkHb+dxDeimXukXxuBQ/jagJSk=
-X-Google-Smtp-Source: AGHT+IGZSu01SCfpuVAoKxEEGhseye5jcYZ2OTQbBwLSosCOhrRB2L0bvS8C7HVgC2MzoPFWHatu+Q==
-X-Received: by 2002:a17:902:6f16:b0:1d9:742b:fedd with SMTP id w22-20020a1709026f1600b001d9742bfeddmr388747plk.34.1707157558764;
-        Mon, 05 Feb 2024 10:25:58 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUbE7iGxVCPUBH4KvD0r1Rt49gMPSuQYHBQM6KluyR+1rAgHNElceTU1aObRosTlZRh1FwTv1OVSOIf5VGTjAwMhd8Xt2ohpeA+TlBhB25QhdhzTGBdE3ky5Ly2mQFPUURjnLLXpkP7V0yvChDB3MHjgqdb95/LIxNcHrt3OPWTXCSy1W8i1mP2JAETIcueqC1VCOhWPZUjKJlAfeYpMcsRgwqmeW/AIqBe2Ll/QP8ytuhKCvwSk8zJVNm2rMXjBS7v4r2WCPZw9dPf4XXIwg1wQHfPe1mozEAE1ZyTliyzm4tbIDfCZbZQZTYE/sDVy8ZcfcMOe5hCYpNtqjaK70F6w16d3Y1cQsjnGz7pwSTQS97sPVP9HJW5NbUIyIed5uExBAzifS8OSNOShYXISKThexfg5lqTXlALwMxkIgeZdFlfrI+YbM7GE3tE/EfeEvGkoKk4MIrk0dy+qxGTkwcIgG+b4mk0Qvjmwk1Ic/Ij1hLRr1BHlAs9hb4mBBJ3Gvd70gcpQehyK2WeY6yr/Veo52kvsaNLIvPGn2vG5EI=
-Received: from fastly.com (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id iy15-20020a170903130f00b001d8f3c7fb96sm170642plb.166.2024.02.05.10.25.57
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 05 Feb 2024 10:25:58 -0800 (PST)
-Date: Mon, 5 Feb 2024 10:25:55 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Cc: chuck.lever@oracle.com, jlayton@kernel.org, linux-api@vger.kernel.org,
-	brauner@kernel.org, edumazet@google.com, davem@davemloft.net,
-	alexander.duyck@gmail.com, sridhar.samudrala@intel.com,
-	kuba@kernel.org, willemdebruijn.kernel@gmail.com, weiwan@google.com,
-	David.Laight@ACULAB.COM, arnd@arndb.de,
-	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
-	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH net-next v5 1/3] eventpoll: support busy poll per epoll
- instance
-Message-ID: <20240205182555.GA10463@fastly.com>
-References: <20240131180811.23566-1-jdamato@fastly.com>
- <20240131180811.23566-2-jdamato@fastly.com>
+        d=1e100.net; s=20230601; t=1707158584; x=1707763384;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LNq6oubwXmqe6ItjQ33y0Ud8zzbj1+GnKVYTNf0QWt4=;
+        b=IWY9oeyBbcYKEstRL+WCnVvjlZumqyM8wkgPadbkD5YmfMXf6h5F3xk5vk9TakloGv
+         CMq4af6pGNSAkX521cNHnXkXcpQMH90TGU7MPsyIDewssjFsUC1bSAB9k5BeLnAN9Nry
+         PfX2wzXxVFpCSOEuJq8Vg9ml+hiLBpvAATTutozUU8dP275SqU5Slamtu8BtTbCcfos2
+         KZ8dCDdS3SaVidDY8DLd8jApYwlkSw745kXrgzwpFyZ5UBelb6rr84jTnLivEEfv8vw1
+         w08qUbHHX5e1wLQ8wmb9+b78/ayDEzH5CLWTMjDQLwIS0JowS6+ui/ICgnyVI++bIFF2
+         /34Q==
+X-Gm-Message-State: AOJu0Yw1gG8usRuFKK/Vcq8SGQnEyZ8rdFX/Ug/zWN7GEcdfFfhPBAUR
+	vZbvm6e3Qk2t9ZQ9qF4noLMN3EiMXD8RS/hY4LtO9s6dYqZbLr+lrrOMnMcTgvir4Cn1h17PmdL
+	qXxVNS7YIev8btmaE4G4lKMBV+vhmcIz71knt0YEzLvwczC9RfRj+
+X-Received: by 2002:a17:906:c291:b0:a32:b376:489d with SMTP id r17-20020a170906c29100b00a32b376489dmr228564ejz.21.1707158584052;
+        Mon, 05 Feb 2024 10:43:04 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHBJJqi+E8gTHS8rAQpA+gl5qKoCPXD/0rXi7vARpqh0DWv7P2ivFSjS3co7lz7OUOuk2D9Nw==
+X-Received: by 2002:a17:906:c291:b0:a32:b376:489d with SMTP id r17-20020a170906c29100b00a32b376489dmr228552ejz.21.1707158583686;
+        Mon, 05 Feb 2024 10:43:03 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCW/539QzZ3CsCBd/dh6u4+Lu0RJ/lNp9RpJ+QdlVC2XRNNKX6VqeLJj50ZJA+N90OsJClBVsg5JNJx2ats/acge24t52SP1Khtr1Zb4g78xgsfghwaFLj1f6AJtfVo6O317uL1HzzNqXxmpy7ECqBJEptEIkKBxTFpYeMwuFd+BML/Xrojv2jMMXM9fitkLsKBmdYff02rTHIy1/9RYeW9KdA+vBiMMFajtXpJ9V3LInGlCjYjlUDdXOvBtO5I7hA45drv3aKenosx8u4UyB41Mz1PLz7aLENeuLx+D1O2uqJitQ5WY2/MWQsxC4hRsJLrtQSEiVEO//auoefGKYicIZXYmMBpZyobmMO+U5/AI7JRZNB4SrfhxFR3pafp6m1NPrmYlSeKc08AuIyTHk9ANC0tpyeniQJ3jCv+QnMgmLtM/kn+0P+/bRaYeDZ6d8IRlYLtr+o3sXelQ5sLfNPgIJKCnYmIVFOljcVjx7+ZUhFi0fAaUSSYmOH5KO46artcSjNhj82irK/HCSLEyg8UvWscGqbKXPwX22XgIsaFBiaZQJE98IoKW/FK5HPxvcKxRAW/5/iKxgZhKCM8KtX0dQCkHll57HIUiJSjrmPsVcn0ucLRS3jgg9lsPvnuDItmph5A4CJHwTnHeAe/8NIIZ8VBicJlP78Sc2dSEOj28GuudM2rMQLEK9T4bEzynKCV2zDJ0K6FcH+gAF302k7BBiiWiEivB
+Received: from [192.168.0.159] (185-219-167-205-static.vivo.cz. [185.219.167.205])
+        by smtp.gmail.com with ESMTPSA id t26-20020a1709066bda00b00a353d1a19a9sm121768ejs.191.2024.02.05.10.43.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Feb 2024 10:43:03 -0800 (PST)
+Message-ID: <afb2fc66-abb4-4010-8120-ada7a6881f89@redhat.com>
+Date: Mon, 5 Feb 2024 19:43:02 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240131180811.23566-2-jdamato@fastly.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v4 0/3] Annotate kfuncs in .BTF_ids section
+Content-Language: en-US
+To: Manu Bretelle <chantr4@gmail.com>, Jiri Olsa <olsajiri@gmail.com>
+Cc: Daniel Xu <dxu@dxuuu.xyz>, linux-trace-kernel@vger.kernel.org,
+ coreteam@netfilter.org, bpf@vger.kernel.org, linux-input@vger.kernel.org,
+ cgroups@vger.kernel.org, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-kselftest@vger.kernel.org,
+ linux-doc@vger.kernel.org, fsverity@lists.linux.dev,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ netfilter-devel@vger.kernel.org, alexei.starovoitov@gmail.com,
+ quentin@isovalent.com, alan.maguire@oracle.com, memxor@gmail.com
+References: <cover.1706491398.git.dxu@dxuuu.xyz> <Zb12EZt0BAKOPBk/@surya>
+ <Zb5QWCw3Tg26_MDa@krava> <Zb6Jt30bNcNhM6zR@surya>
+From: Viktor Malik <vmalik@redhat.com>
+In-Reply-To: <Zb6Jt30bNcNhM6zR@surya>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 31, 2024 at 06:08:03PM +0000, Joe Damato wrote:
-> Allow busy polling on a per-epoll context basis. The per-epoll context
-> usec timeout value is preferred, but the pre-existing system wide sysctl
-> value is still supported if it specified.
+On 2/3/24 19:45, Manu Bretelle wrote:
+> On Sat, Feb 03, 2024 at 03:40:24PM +0100, Jiri Olsa wrote:
+>> On Fri, Feb 02, 2024 at 03:09:05PM -0800, Manu Bretelle wrote:
+>>> On Sun, Jan 28, 2024 at 06:24:05PM -0700, Daniel Xu wrote:
+>>>> === Description ===
+>>>>
+>>>> This is a bpf-treewide change that annotates all kfuncs as such inside
+>>>> .BTF_ids. This annotation eventually allows us to automatically generate
+>>>> kfunc prototypes from bpftool.
+>>>>
+>>>> We store this metadata inside a yet-unused flags field inside struct
+>>>> btf_id_set8 (thanks Kumar!). pahole will be taught where to look.
+>>>>
+>>>> More details about the full chain of events are available in commit 3's
+>>>> description.
+>>>>
+>>>> The accompanying pahole and bpftool changes can be viewed
+>>>> here on these "frozen" branches [0][1].
+>>>>
+>>>> [0]: https://github.com/danobi/pahole/tree/kfunc_btf-v3-mailed
+>>>> [1]: https://github.com/danobi/linux/tree/kfunc_bpftool-mailed
+>>>
+>>>
+>>> I hit a similar issue to [0] on master
+>>> 943b043aeecc ("selftests/bpf: Fix bench runner SIGSEGV")
+>>>  when cross-compiling on x86_64 (LE) to s390x (BE).
+>>> I do have CONFIG_DEBUG_INFO_BTF enable and the issue would not trigger if
+>>> I disabled CONFIG_DEBUG_INFO_BTF (and with the fix mentioned in [0]).
+>>>
+>>> What seems to happen is that `tools/resolve_btfids` is ran in the context of the
+>>> host endianess and if I printk before the WARN_ON:
+>>> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+>>> index ef380e546952..a9ed7a1a4936 100644
+>>>   --- a/kernel/bpf/btf.c
+>>>   +++ b/kernel/bpf/btf.c
+>>>   @@ -8128,6 +8128,7 @@ int register_btf_kfunc_id_set(enum bpf_prog_type prog_type,
+>>>            * WARN() for initcall registrations that do not check errors.
+>>>            */
+>>>           if (!(kset->set->flags & BTF_SET8_KFUNCS)) {
+>>>   +        printk("Flag 0x%08X, expected 0x%08X\n", kset->set->flags, BTF_SET8_KFUNCS);
+>>>                   WARN_ON(!kset->owner);
+>>>                   return -EINVAL;
+>>>           }
+>>>
+>>> the boot logs would show:
+>>>   Flag 0x01000000, expected 0x00000001
+>>>
+>>> The issue did not happen prior to
+>>> 6f3189f38a3e ("bpf: treewide: Annotate BPF kfuncs in BTF")
+>>> has only 0 was written before.
+>>>
+>>> It seems [1] will be addressing cross-compilation, but it did not fix it as is
+>>> by just applying on top of master, so probably some of the changes will also need
+>>> to be ported to `tools/include/linux/btf_ids.h`?
+>>
+>> the fix in [1] is fixing flags in set8's pairs, but not the global flags
+>>
+>> it looks like Viktor's fix should now also swap that as well? like in the
+>> change below on top of Viktor's changes (untested)
+>>
+>> jirka
+>>
+>>
+>> ---
+>> diff --git a/tools/bpf/resolve_btfids/main.c b/tools/bpf/resolve_btfids/main.c
+>> index d01603ef6283..c44d57fec390 100644
+>> --- a/tools/bpf/resolve_btfids/main.c
+>> +++ b/tools/bpf/resolve_btfids/main.c
+>> @@ -706,6 +706,8 @@ static int sets_patch(struct object *obj)
+>>  			 * correctly translate everything.
+>>  			 */
+>>  			if (need_bswap) {
+>> +				set8->flags = bswap_32(set8->flags);
+>> +
+>>  				for (i = 0; i < cnt; i++) {
+>>  					set8->pairs[i].flags =
+>>  						bswap_32(set8->pairs[i].flags);
+>>
 > 
-> Note that this change uses an xor: either per epoll instance busy polling
-> is enabled on the epoll instance or system wide epoll is enabled. Enabling
-> both is disallowed.
+> That should work. Here are a few tests I ran:
+> 
+> $ md5sum /tmp/kbuild-s390x/vmlinux.*
+> eb658e51e089f3c5b2c8909a29dc9997  /tmp/kbuild-s390x/vmlinux.a
+> # plain vmlinux before running resolv_btfids (all 0s)
+> ea907cd46a1a73b8276b5f2a82af00ca  /tmp/kbuild-s390x/vmlinux.before_resolv
+> # x86_64 resolv_btfids on master without Viktor's patch
+> 980a40c3a3ff563d1c2d1ebdd5071a23  /tmp/kbuild-s390x/vmlinux.resolv_native
+> # x86_64 resolv_btfids on master with Viktor's patch
+> b986d19e242719ebea41c578235da662  /tmp/kbuild-s390x/vmlinux.resolv_native_patch_viktor
+> # x86_64 resolv_btfids on master with Viktor's patch and your suggested patch
+> 4edd8752ff01129945bd442689b1927b  /tmp/kbuild-s390x/vmlinux.resolv_native_patch_viktor_patched
+> # s390x resolv_btfids run with qemu-s390x-static
+> 4edd8752ff01129945bd442689b1927b  /tmp/kbuild-s390x/vmlinux.resolv_s390x
+> 
+> 
+> and some hexdiff of those binaries:
+> 
+> 
+> # difference between master's native build and s390x build.... has byte swapping for set8 and others
+> diff -ruN <(xxd /tmp/kbuild-s390x/vmlinux.resolv_s390x) <(xxd /tmp/kbuild-s390x/vmlinux.resolv_native) > diff_s390x_native.diff
+> https://gist.github.com/chantra/c3d58637a08a6f7340953dc155bb18cc
+> 
+> # difference betwee Viktor's version and  s390x build.... squinting my eyes I only see the global set8 is missing
+> diff -ruN <(xxd /tmp/kbuild-s390x/vmlinux.resolv_s390x) <(xxd /tmp/kbuild-s390x/vmlinux.resolv_native_patch_viktor) > diff_s390x_native_viktor.diff
+> https://gist.github.com/chantra/61cfff02b456ae72d3c0161ce1897097
 
-I just realized that I updated the code below to use a an or (||) instead
-of xor (^), but forgot to update the commit message.
+Thanks for the testing Manu!
 
-I can fix this and send a v6.
+Jiri's suggested fix is now a part of [1].
+
+Viktor
+
+[1] https://lore.kernel.org/bpf/cover.1707157553.git.vmalik@redhat.com/
 
 > 
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> ---
->  fs/eventpoll.c | 49 +++++++++++++++++++++++++++++++++++++++++++++----
->  1 file changed, 45 insertions(+), 4 deletions(-)
+> Have a good weekend all!
 > 
-> diff --git a/fs/eventpoll.c b/fs/eventpoll.c
-> index 3534d36a1474..ce75189d46df 100644
-> --- a/fs/eventpoll.c
-> +++ b/fs/eventpoll.c
-> @@ -227,6 +227,8 @@ struct eventpoll {
->  #ifdef CONFIG_NET_RX_BUSY_POLL
->  	/* used to track busy poll napi_id */
->  	unsigned int napi_id;
-> +	/* busy poll timeout */
-> +	u64 busy_poll_usecs;
->  #endif
->  
->  #ifdef CONFIG_DEBUG_LOCK_ALLOC
-> @@ -386,12 +388,44 @@ static inline int ep_events_available(struct eventpoll *ep)
->  		READ_ONCE(ep->ovflist) != EP_UNACTIVE_PTR;
->  }
->  
-> +/**
-> + * busy_loop_ep_timeout - check if busy poll has timed out. The timeout value
-> + * from the epoll instance ep is preferred, but if it is not set fallback to
-> + * the system-wide global via busy_loop_timeout.
-> + *
-> + * @start_time: The start time used to compute the remaining time until timeout.
-> + * @ep: Pointer to the eventpoll context.
-> + *
-> + * Return: true if the timeout has expired, false otherwise.
-> + */
-> +static inline bool busy_loop_ep_timeout(unsigned long start_time, struct eventpoll *ep)
-> +{
-> +#ifdef CONFIG_NET_RX_BUSY_POLL
-> +	unsigned long bp_usec = READ_ONCE(ep->busy_poll_usecs);
-> +
-> +	if (bp_usec) {
-> +		unsigned long end_time = start_time + bp_usec;
-> +		unsigned long now = busy_loop_current_time();
-> +
-> +		return time_after(now, end_time);
-> +	} else {
-> +		return busy_loop_timeout(start_time);
-> +	}
-> +#endif
-> +	return true;
-> +}
-> +
->  #ifdef CONFIG_NET_RX_BUSY_POLL
-> +static bool ep_busy_loop_on(struct eventpoll *ep)
-> +{
-> +	return !!ep->busy_poll_usecs || net_busy_loop_on();
-> +}
-> +
->  static bool ep_busy_loop_end(void *p, unsigned long start_time)
->  {
->  	struct eventpoll *ep = p;
->  
-> -	return ep_events_available(ep) || busy_loop_timeout(start_time);
-> +	return ep_events_available(ep) || busy_loop_ep_timeout(start_time, ep);
->  }
->  
->  /*
-> @@ -404,7 +438,7 @@ static bool ep_busy_loop(struct eventpoll *ep, int nonblock)
->  {
->  	unsigned int napi_id = READ_ONCE(ep->napi_id);
->  
-> -	if ((napi_id >= MIN_NAPI_ID) && net_busy_loop_on()) {
-> +	if ((napi_id >= MIN_NAPI_ID) && ep_busy_loop_on(ep)) {
->  		napi_busy_loop(napi_id, nonblock ? NULL : ep_busy_loop_end, ep, false,
->  			       BUSY_POLL_BUDGET);
->  		if (ep_events_available(ep))
-> @@ -430,7 +464,8 @@ static inline void ep_set_busy_poll_napi_id(struct epitem *epi)
->  	struct socket *sock;
->  	struct sock *sk;
->  
-> -	if (!net_busy_loop_on())
-> +	ep = epi->ep;
-> +	if (!ep_busy_loop_on(ep))
->  		return;
->  
->  	sock = sock_from_file(epi->ffd.file);
-> @@ -442,7 +477,6 @@ static inline void ep_set_busy_poll_napi_id(struct epitem *epi)
->  		return;
->  
->  	napi_id = READ_ONCE(sk->sk_napi_id);
-> -	ep = epi->ep;
->  
->  	/* Non-NAPI IDs can be rejected
->  	 *	or
-> @@ -466,6 +500,10 @@ static inline void ep_set_busy_poll_napi_id(struct epitem *epi)
->  {
->  }
->  
-> +static inline bool ep_busy_loop_on(struct eventpoll *ep)
-> +{
-> +	return false;
-> +}
->  #endif /* CONFIG_NET_RX_BUSY_POLL */
->  
->  /*
-> @@ -2058,6 +2096,9 @@ static int do_epoll_create(int flags)
->  		error = PTR_ERR(file);
->  		goto out_free_fd;
->  	}
-> +#ifdef CONFIG_NET_RX_BUSY_POLL
-> +	ep->busy_poll_usecs = 0;
-> +#endif
->  	ep->file = file;
->  	fd_install(fd, file);
->  	return fd;
-> -- 
-> 2.25.1
+> Manu
 > 
+
 
