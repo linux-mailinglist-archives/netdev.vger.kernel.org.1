@@ -1,127 +1,94 @@
-Return-Path: <netdev+bounces-69151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8684849C59
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 14:56:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69EC9849C8B
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 15:04:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11FB6B25F47
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 13:56:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C6AB428144A
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 14:04:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 017A82374E;
-	Mon,  5 Feb 2024 13:55:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC01D22F11;
+	Mon,  5 Feb 2024 14:03:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="HjTm0cjI"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Xc02vhhA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.3])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67DA42C18E;
-	Mon,  5 Feb 2024 13:55:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9118D23753;
+	Mon,  5 Feb 2024 14:03:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707141354; cv=none; b=hY6Cn5MgMU88MJ0xr5NUOB0LjtIIqVDlLqyu/LLJKX9albzKJoTkmH3kIOybUcJXIyn9T/VQhQxsdJ+DlY/GMDfk+pRVwRcmqUbVqJHQj7WTW3ARkKGgui1CjaPZkqZKAhZ9Rl8qUT/AYU8CH3wNBrGXKXrM+KkyYuycccO2s1c=
+	t=1707141838; cv=none; b=TOwLcgwLWB36JwLhOjPWa5dlRF4pa/CSn0tf9JW5MPgSJT+Pvl23HXaNF2l5FOx8crM6MvENTO8qtejTHa+cRjE13nshv398Wxayv0Mfy5lbWuP+HNVsbzRJzkYNguRZAX9QVkJLIGtyOWT92VDzNNMPvkie7/NVW1FzgBMCk88=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707141354; c=relaxed/simple;
-	bh=OCQlC6fsw7RMniTUmuvaoqgcVSnBwtdH0tkNLVCdCq8=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=omj06vOZfhsorxkbTyx6LDacbwX80QISf04KGaSh7peY9gT7M22a2Tce5HoXhqV6ooWJQHWajEqnm6v5IhRwUseIAq+e4//UqQXQKmFQmZa4/qr3dTArLAmXGqvLFhWXn3E7g9XuW84nt1GSd5dq4GcumgSfCiFDTqvOJGthlzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=HjTm0cjI; arc=none smtp.client-ip=212.227.15.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
-	t=1707141327; x=1707746127; i=markus.elfring@web.de;
-	bh=OCQlC6fsw7RMniTUmuvaoqgcVSnBwtdH0tkNLVCdCq8=;
-	h=X-UI-Sender-Class:Date:To:Cc:From:Subject;
-	b=HjTm0cjIhCbiMgsdEel77y7fv7NC6Nxsj7jv8GhO97SXEgb80r7lEmSsnvClOo2k
-	 VRo9narPy0zxhHgqewR5nWaWe1/RFPO8uhNXot/GYfNXg4/mfx9qGOE7ipoctl/QT
-	 7ouWHRyhDooc+FoR8S4frgEy+udQ/exFyhlmIvp4OhY7oI+cjSyUBEFxCxYvaQieB
-	 LhkMTbxEPKAPTQTLXlPgAUB5eulc/PTD6LCMHpE5o70wlqNsuYvazVxq+KOFlXygY
-	 cfCED3D1wd7mfkxSWusHEb0HtYz+uWXaizN6O6dBrhoL4x85vo3Y+nEkCkawfPi9J
-	 0yKqqnj6ySiWnpd2fg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MBS71-1rjsY53cFD-00CvRd; Mon, 05
- Feb 2024 14:55:26 +0100
-Message-ID: <f87065d0-e398-4ffa-bfa4-9ff99d73f206@web.de>
-Date: Mon, 5 Feb 2024 14:55:23 +0100
+	s=arc-20240116; t=1707141838; c=relaxed/simple;
+	bh=R9m0seibPqVjuMRXRCtFH8OBXcYn9UV3bCtWarP4u4U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cmfNUKpIO3eTy0zCFqO1bFzrkoHGgA8loee0jROtI11SSfDbapNoBkMJbanGyL0GhdGtIaA3B4cOnfttQ0zBto3vuGXSrxsrfLeOTAYv48z/Xe9GviIMOm1SxpH2DR1khP9he4LFZsbW9IUL82KNdbpLAaT68fLszTw9cxMa/ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Xc02vhhA; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=T9hBFBJxGOqEN46Rzq3IDVzYp56XQV1MU7sVARX8R3k=; b=Xc02vhhAaIX2iWZ94yDZOmR6CY
+	Uu5VlriWFu85b//G2mCV1xXSsllr8YEVdKyh5S+ym+eBG3c4j4u9aiSo4zuiRYjQ6zLxHBOt3d+U3
+	0HS69k/gU8sE5I5u9Xa5kCKG/xxCMy8KsqP9ZEkB4O2esPT5lFonAnzdKTMmAfA98U6g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rWzZZ-0072Jq-Ms; Mon, 05 Feb 2024 15:03:45 +0100
+Date: Mon, 5 Feb 2024 15:03:45 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Hewitt <christianshewitt@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Grant Grundler <grundler@chromium.org>, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] net: asix: add 0b95:1790 to AX88179A device list
+Message-ID: <ea413b7f-2086-482c-b2e6-77817acf4168@lunn.ch>
+References: <20240205104049.48900-1-christianshewitt@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Michal Simek <michal.simek@amd.com>,
- Paolo Abeni <pabeni@redhat.com>,
- Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
- Rob Herring <robh@kernel.org>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- Wei Fang <wei.fang@nxp.com>
-Content-Language: en-GB
-Cc: LKML <linux-kernel@vger.kernel.org>
-From: Markus Elfring <Markus.Elfring@web.de>
-Subject: [PATCH] net: emaclite: Use devm_platform_get_and_ioremap_resource()
- in xemaclite_of_probe()
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:HpdtEuakUvahbDKCQGbUBcJH36NhioRvkShEPpZoWqMQzGg2Udd
- /66drifHYG+/g/EHez/UbXsmBO6j0hVXMihQB7PpnVN3Kse2RaGRq1n1IJLo83c6UWHPt5s
- qikcEeE6Nn8vGJ6t1+LCL6V9QE0S+Zo0yGsJ8wCOWwtjU5U5+7xpxcjAUs2W2cQ7M0/MfYj
- x/Ow/w0rihGGsmWWtwGjA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:DX5qSgtT2yY=;FgO4dz25//lf7S/k9N4m/F1fSkO
- +78p+4kNPIMGJRtNflgVgoo8qWGIRjTl7v4YzqPB0omKxGZYcRQHS4noibbgO910/zBmyQ6gc
- 2mRH8lIwjH5IniM5IZf3sV2O/z4nGGmc0GoJyZlXe/gCjTs+9+aA/f1RhSlXkcobxzD5HWRyQ
- pJbNLEYl8APxI7gnybKG85B7hepN1/dXB4enZK9uRd0DpJaY4qLZeR7Ob2MLGv4qwBR4zotGK
- aDtz5wbpYvPWsmgfDoKcP4og+HBncBXPmw+zbsyWTIp2uWUZwUhJcetr6I18EfgT0pHscP9+I
- MYgXJ/RFbIVd5PUtzwEAHQ4W9hyCH6BUHC3lQjhwI6mFwpSNldW4PEZTCyDQySY+WYIJhmTsE
- 74KAAOXWXE+pW3aIy+TCbj9yiazBfFnxMf0hGhoxhpOzQXRx/RMD38+YMgKpdJRHMWcvWv2nT
- e7hjhAqw+QFlZgKLBpMl4PSddZcJdh+MQXTDuRt+Aqde2pMDtv84pJjDUH9n6bkJ8YMsQBS0S
- 7LJa0LXIPbVChJ1NiaWXZGHw+YjaT08Ok840dYMU0oKOhcKud4fes9nw8OeF/4ypEYQDFYIaF
- v/nSLHcxZ4G9Xi86aUJJKztZ0KdsmRmkkww+4C5Ii0yn6PLacy5Hlfz9jB7knZN0GnjZSYhS9
- wf1sAJc1rlqg74WElTVpPg0hj6l9HfZblAFKXiDPYmemE7EG1oNTq+LI8JVeuutSZGCKkZSvm
- KV/+6fWej+r7PuND9xJSZZBJx2rHyaL+wgT+zGftwKBCACI0cSx74W8ryUsdwGrfUdibxRzlR
- ZbImIoeCr/Io+lMei6EJiEb/cjz8qOscxadJIpCqJ3DiA=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240205104049.48900-1-christianshewitt@gmail.com>
 
-From: Markus Elfring <elfring@users.sourceforge.net>
-Date: Mon, 5 Feb 2024 14:44:20 +0100
+On Mon, Feb 05, 2024 at 10:40:48AM +0000, Christian Hewitt wrote:
+> Add a generic AX88179A entry for the 0b95:1790 device id:
+> 
+> kernel: usb 2-1: New USB device found, idVendor=0b95, idProduct=1790, bcdDevice= 2.00
+> kernel: usb 2-1: New USB device strings: Mfr=1, Product=2, SerialNumber=3
+> kernel: usb 2-1: Product: AX88179A
+> kernel: usb 2-1: Manufacturer: ASIX
+> kernel: usb 2-1: SerialNumber: 00D24DC0
+> kernel: asix 2-1:1.0 (unnamed net_device) (uninitialized): Failed to read reg index 0x0000: -32
+> kernel: asix: probe of 2-1:1.0 failed with error -32
+> kernel: ax88179_178a 2-1:1.0 (unnamed net_device) (uninitialized): Failed to read reg index 0x0040: -32
+> kernel: ax88179_178a 2-1:1.0 eth1: register 'ax88179_178a' at usb-0000:01:00.0-1, ASIX AX88179 USB 3.0 Gigabit Ethernet, 20:7b:d2:d2:4d:c0
+> 
+> Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
+> ---
+> The change is tested by a LibreELEC (distro) user who reports the NIC to be working
+> fine (and logs support this) but the "Failed to read reg index 0x0000: -32" errors
+> suggest ax88178_info might not be the correct choice. I'm not a serious coder so I
+> need to "ask the audience" for suggestions on what more might be needed?
 
-A wrapper function is available since the commit 890cc39a879906b63912482df=
-c41944579df2dc6
-("drivers: provide devm_platform_get_and_ioremap_resource()").
-Thus reuse existing functionality instead of keeping duplicate source code=
-.
+I would probably start by determining what ax88179_read_cmd() is
+causing that print. Maybe print in addition cmd, and value. Or add a
+WARN() so you get a stack trace.
 
-This issue was detected by using the Coccinelle software.
+It might be possible to figure it out by just looking at the code. How
+many places actually pass index=0?
 
-Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
-=2D--
- drivers/net/ethernet/xilinx/xilinx_emaclite.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/xilinx/xilinx_emaclite.c b/drivers/net/e=
-thernet/xilinx/xilinx_emaclite.c
-index 765aa516aada..940452d0a4d2 100644
-=2D-- a/drivers/net/ethernet/xilinx/xilinx_emaclite.c
-+++ b/drivers/net/ethernet/xilinx/xilinx_emaclite.c
-@@ -1114,8 +1114,7 @@ static int xemaclite_of_probe(struct platform_device=
- *ofdev)
-
- 	ndev->irq =3D rc;
-
--	res =3D platform_get_resource(ofdev, IORESOURCE_MEM, 0);
--	lp->base_addr =3D devm_ioremap_resource(&ofdev->dev, res);
-+	lp->base_addr =3D devm_platform_get_and_ioremap_resource(ofdev, 0, &res)=
-;
- 	if (IS_ERR(lp->base_addr)) {
- 		rc =3D PTR_ERR(lp->base_addr);
- 		goto error;
-=2D-
-2.43.0
-
+       Andrew
 
