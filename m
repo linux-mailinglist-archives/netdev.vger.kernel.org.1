@@ -1,57 +1,63 @@
-Return-Path: <netdev+bounces-69242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27F7C84A7D3
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 22:43:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6705D84A7F7
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 22:48:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7F0E2933A6
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 21:43:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1177F1F239E7
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 21:48:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDCCA12FF9E;
-	Mon,  5 Feb 2024 20:12:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2759B13341E;
+	Mon,  5 Feb 2024 20:24:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="I+cADej9"
 X-Original-To: netdev@vger.kernel.org
-Received: from torres.zugschlus.de (torres.zugschlus.de [85.214.160.151])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1902812FF91
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 20:12:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.160.151
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37CB133417;
+	Mon,  5 Feb 2024 20:24:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707163975; cv=none; b=okCGEb/UGVG0PNxnqis38tYp49R0GWSLYGStzDDi25NONQROuWmmhkWUVfLZuKVc9JS8kiMLmQq5wUL9MPAm367bntyEoXvBWmmrfcSF3q1JJldGBlDyZJTUmT9JGzs7CRC5EBKnWKI6tZYusuHih94I0jUlrAM1YWHFCJgRAhA=
+	t=1707164663; cv=none; b=B+FBr1eO0P6zoVsgEyVulE8slIg5uiuiROJHvtQ1gs3eJsBINFudN+SDL4UF8g4oKtcVw5iQyy0J8OSQR7tlsG7tJtWGBOnT89nScPyAUvH/fZdkn/LmY2+Ldbsez3n03TblNA8pEgq+kdoO/JJvMMysie5DEuyv1QRP9hTJqIE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707163975; c=relaxed/simple;
-	bh=c4c56hATIFyU/q9suSjf/xwzt+ZUzsBg46puy31HwaM=;
+	s=arc-20240116; t=1707164663; c=relaxed/simple;
+	bh=pjvr/I7dTXNHnTgva7B7XrxHkICB2a+rNEz5glnuyBU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZakWsiUIeq2A22VbCZ6NNt/fJQ1P/b5EovbDFP+ibVtJ7oKyk3fnv6Qy6dPaJKkRuyzB8xJR8cJMppEYSEsgSy9LFo/Osjm6vI4F/TApAx+jnoxZikXtcbK4W6YESISbWNTQDkQaCt+2t+/NJNsBKakN/82d8pEQea/dk64gppI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zugschlus.de; spf=none smtp.mailfrom=zugschlus.de; arc=none smtp.client-ip=85.214.160.151
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zugschlus.de
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=zugschlus.de
-Received: from mh by torres.zugschlus.de with local (Exim 4.96)
-	(envelope-from <mh+netdev@zugschlus.de>)
-	id 1rX5KR-001dyW-20;
-	Mon, 05 Feb 2024 21:12:31 +0100
-Date: Mon, 5 Feb 2024 21:12:31 +0100
-From: Marc Haber <mh+netdev@zugschlus.de>
-To: Petr =?utf-8?B?VGVzYcWZw61r?= <petr@tesarici.cz>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	alexandre.torgue@foss.st.com, Jose Abreu <joabreu@synopsys.com>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>,
-	Jisheng Zhang <jszhang@kernel.org>, netdev@vger.kernel.org
-Subject: Re: stmmac on Banana PI CPU stalls since Linux 6.6
-Message-ID: <ZcFBL6tCPMtmcc7c@torres.zugschlus.de>
-References: <Za173PhviYg-1qIn@torres.zugschlus.de>
- <8efb36c2-a696-4de7-b3d7-2238d4ab5ebb@lunn.ch>
- <ZbKiBKj7Ljkx6NCO@torres.zugschlus.de>
- <229642a6-3bbb-4ec8-9240-7b8e3dc57345@lunn.ch>
- <99682651-06b4-4c69-b693-a0a06947b2ca@gmail.com>
- <20240126085122.21e0a8a2@meshulam.tesarici.cz>
- <ZbOPXAFfWujlk20q@torres.zugschlus.de>
- <20240126121028.2463aa68@meshulam.tesarici.cz>
+	 Content-Type:Content-Disposition:In-Reply-To; b=l96LK029F6Ro5PCpcLLtpv3yKhEIQRfCuffC3nMkINOmD0ptJ1PGWNsCdR3Sj3JZj74a199ANf0pECfKTYjIsdXNutCLbFhJCH72HoJadjiaBgtTXIURYIr6HqeLaHRCiAEZR/RpSPSugHU4UKs4tIhxeSLHy+dQe6XsPSblQpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=I+cADej9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57B1CC433F1;
+	Mon,  5 Feb 2024 20:24:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1707164662;
+	bh=pjvr/I7dTXNHnTgva7B7XrxHkICB2a+rNEz5glnuyBU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=I+cADej9tPj1U7p85slFv3035ULoHWZfHOsJjMLO63vRBly9U8yjv0Mu+Y0EBl3GJ
+	 4wiVYwtX3vP41zR9xEa71opi5LhWWML01SCwQtTZQjrMXHeJwFywI8OBAeRh8Ae2Eo
+	 khFRJobmKQMaqSbAhU2iJU8+7G9heW7XO94GjaIo=
+Date: Mon, 5 Feb 2024 15:24:19 -0500
+From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Vladimir Oltean <olteanv@gmail.com>, 
+	Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Alvin =?utf-8?Q?=C5=A0ipraga?= <ALSI@bang-olufsen.dk>, 
+	Frank Wunderlich <frank-w@public-files.de>, Bartel Eerdekens <bartel.eerdekens@constell8.be>, 
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org, tools@kernel.org
+Subject: Re: [PATCH net RFC] net: dsa: mt7530: fix link-local frames that
+ ingress vlan filtering ports
+Message-ID: <20240205-silky-sensible-puffin-8e23ee@lemur>
+References: <65bbf40d.170a0220.a87f4.becdSMTPIN_ADDED_BROKEN@mx.google.com>
+ <20240201225943.abphuuavp7bkbrt6@skbuf>
+ <1f0e67ba-edd7-4998-bc20-1de86bd53a68@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,23 +67,21 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240126121028.2463aa68@meshulam.tesarici.cz>
-User-Agent: Mutt/2.2.12 (2023-09-09)
+In-Reply-To: <1f0e67ba-edd7-4998-bc20-1de86bd53a68@arinc9.com>
 
-On Fri, Jan 26, 2024 at 12:10:28PM +0100, Petr Tesařík wrote:
-> Then you may want to start by verifying that it is indeed the same
-> issue. Try the linked patch.
+On Fri, Feb 02, 2024 at 12:11:37PM +0300, Arınç ÜNAL wrote:
+> There're no brackets enclosing the Message-Id. That must be why Gmail
+> modified it with the SMTPIN_ADDED_BROKEN disclaimer added for you. I can't
+> come up with a theory as to why you've received it thrice though.
+> 
+> Konstantin, could you take a look at what happened here?
 
-The linked patch seemed to help for 6.7.2, the test machine ran for five
-days without problems. After going to unpatched 6.7.2, the issue was
-back in six hours.
+Oh, yay, another python email module bug. *sigh* It's not supposed to break
+items enclosed in brackets.
 
-Greetings
-Marc
+I'll see if I can work around it on the submission side of things, but for now
+the silly workaround is not to create branch names that are too long (which
+results in message-ids that are very long).
 
--- 
------------------------------------------------------------------------------
-Marc Haber         | "I don't trust Computers. They | Mailadresse im Header
-Leimen, Germany    |  lose things."    Winona Ryder | Fon: *49 6224 1600402
-Nordisch by Nature |  How to make an American Quilt | Fax: *49 6224 1600421
+-K
 
