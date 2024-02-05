@@ -1,158 +1,204 @@
-Return-Path: <netdev+bounces-69317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A74084AA85
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 00:29:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C985484AAB6
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 00:40:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACC7F1C24C47
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:29:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 474E61F2890A
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D671C487A8;
-	Mon,  5 Feb 2024 23:29:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jmTHwb8z"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C214A99C;
+	Mon,  5 Feb 2024 23:40:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f179.google.com (mail-il1-f179.google.com [209.85.166.179])
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD49948793;
-	Mon,  5 Feb 2024 23:29:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427544F5EA
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 23:40:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707175778; cv=none; b=H8EARhrOFO7pgZhXOU+14WeYHty+rnarMz9r0Nv8DdAOMXF8KyPBSOiKODrSKpt9gnOazJbBb3kH2mDJEKALSZIEm+MEHC9oFCaGhf2+Fqvs8VTnTUnpnKVSE8OiNDrIo04d+cRd4aSy3U4JQczBE+RdyPhNwlTz9KTWcdDBGms=
+	t=1707176431; cv=none; b=kzuPiwNXtibuxJUtEJ8gBZiZ72B8vxaj+luIEUKDKzsR5PRxeTW1WS9sKSZ/5RHSyDVIO6So3Nef7L0tX2CO87u/obBWAsqRXneGVSw8/Vv2idXzjRgMaEXAtC9edqJ/kYdyJZnxwKf2ZC7iGaxCbM0Rf7pRQ8dgFY88mAIvg7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707175778; c=relaxed/simple;
-	bh=MO701j1VdsFOkjix8vAIy0189lSwdgX2Svz78UZNjxE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uBDNgHLvvwgTUmr8J+KB8+SOwjafgz88QDUQY+0Av1ukpk8n6e5f7ydJRSbSfi9Sse4MbysA+BqBH+Ifl5C690SZuHLOobU9e1F7w2CSBdq46H22eAuBtb2dHvsp2jDqtskIIhdhU+7zmM1l8Vq6NpDqs5KKZfcS6aeYvQLgq8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jmTHwb8z; arc=none smtp.client-ip=209.85.166.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f179.google.com with SMTP id e9e14a558f8ab-363ac28b375so12327115ab.3;
-        Mon, 05 Feb 2024 15:29:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707175776; x=1707780576; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5h4C9UteCg9eOgceej/mmHcmrSvR8/JhU2mjiTOOjkw=;
-        b=jmTHwb8zTqMhF7KkkOqWuzpkLFz9uSfBeryIbAJmOpl7vlHppjPjwsyk9i2iIy4tdh
-         gyio7hsIlrpFr8rLwqtmDAQ8LmUHgaLYSIz0XfSEQxNGg2G0q7K9u3vdZY+e8voNUD24
-         GEnylYmqr71CUAnzaEQh+oclt236g4i9l8nBZNS4e+GB2HuaLs7nRRV9fwQYWDpeSZpv
-         Q3RiC3oToVV7OSx1XS+1OASXC34o1W1dot0cylO3bE7IoPxzcb0xWocO6VE4TH2hyWPW
-         tq8EWeof1WoIIVNOAlv2W781hUrjD3Wg5JsRAxQwNLiyt8HeSibjjfS7HhaYYTqDuI71
-         SZxw==
+	s=arc-20240116; t=1707176431; c=relaxed/simple;
+	bh=/l/BbcOUP7bWr5jYI8yoNu18RrCE0pxiWCQZSl+HmC8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=rLGDKdl5J81Egx1PbknZKHfzNq9zM+GwV/m9BG1iZ/dxvEaZ6yBYI3HDH4TaNCcep6+SIzJnzE3219H9v+n+qLXFD+7R7rzeHZWQ79j2ttQUqzGO1JmfSQAHpSOl2hQWnmWcA8wRB4G4y9TU/boS533WqwdCaaHNV8UAIDrVPS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-35fc6976630so44648505ab.0
+        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 15:40:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707175776; x=1707780576;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5h4C9UteCg9eOgceej/mmHcmrSvR8/JhU2mjiTOOjkw=;
-        b=akdvnGX5fiivLzxTNCA59tCnKUHBR+GKfPCuQG6Yu9/kywBrEsKzNaEGotKjebvUya
-         fa7KVJTILo6lCZe6SEuWAlK28Jw8FXdmSAk6faIBjHmfUylCTHyTI1JE4nIbBLlPYlTd
-         H94FxG+kUXnGqa2t/bsTYHKlvTgjoP0+DnWGbaWo3hChNy7xEMmvi+yhZbqazKkS1Goi
-         w0PXKLmQG9cJC8Reqivpm0bANKcCqWO7iHSyTMF4cxrh0KnlsE0nldUJcdVOdTlrmVo+
-         K2bAUS1vyrBLc1I+AYwMGL7qXGgUD7ygb08ACC/I/YKuOl9AVaeAy6kx0qpl4gM0Wk+u
-         +FNQ==
-X-Gm-Message-State: AOJu0YxT60jHfHZKsBicUtvunxLMcm+7be1kLiGTrWl3qk9GWDD2aVph
-	GxFpvE46hIpRywTjlLEuoLlo8aZz9bt+mGMaXEmXtIHijxEyIlPlpt0KFGWyXmitEJtOAtAyCzX
-	WlZOZeZy+NXuXG7jWWq7Qy+gMgsk=
-X-Google-Smtp-Source: AGHT+IGvR49UjNlOF4JJ6CzLSEGaTke8MRvIkg9sW3ZU9vCABHjacR/m/lVcbn8ZDbA2sjpHewO8IMkcanNIcrKbcvo=
-X-Received: by 2002:a05:6e02:1d15:b0:363:b695:5d5a with SMTP id
- i21-20020a056e021d1500b00363b6955d5amr1578168ila.18.1707175775632; Mon, 05
- Feb 2024 15:29:35 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707176428; x=1707781228;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=/ngrkC+Ev5kse1bjFQ2pRxP1v852GqG+2VMvhIKcpOs=;
+        b=CY1KgbFmj2BvQXnU9/UJGFvD5JmozAXmfRBJ2pqfgfRyk7wwcOB+6cvvx5WubuVPFy
+         QM0Hw/JptkgLbqIXb0SR9AF7iYz3lDoPJcwsAi1Faq8eP3w78mBmzV+7YwvuKOUbeYQ+
+         LSjhQb3AeV8k30q0hYQu70XyxLTWNQH7nYzstPwozVfIZyISsUQixwat4YmtxqVIZQAd
+         g3yZiq9KAQ4CfYTBcGI2djOcPIcX8y4CiV/yES582ogJwnH4NCDaAGAxjCwkG+HRyO/Y
+         MWODnxVa+PxBpfLufEzazsjheoff+DMI4TsEwvnKgwpCwlNIonXxwNLWanyA4u1tQVfj
+         DQkQ==
+X-Gm-Message-State: AOJu0Yzeg08WyzX3aCWihikome8X92s/pWfk+mk/pvhha7l2sgCjQKY3
+	9v5qWxKHrnMYjKcPfi8ZY8qo3E6xI5TDixbiagiVZOy+PWsBoTLZmKLGUeGUkzWKeS7Jtz/jqqn
+	0R4rJ1XB5illOk21qoyS0B7VLqx8RsF9uxByLg50Ju6wkxrOsKDUnu+E=
+X-Google-Smtp-Source: AGHT+IFEPa59otgEiS/TUoOMi9OMKmjSD0/Jbb+a85mDrxwfB6enbNsW0h2YRNaVdnPOxr/obL1YCHDE2GtJ77CNHM3Iol/0TImu
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240205170117.250866-1-dmantipov@yandex.ru>
-In-Reply-To: <20240205170117.250866-1-dmantipov@yandex.ru>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Mon, 5 Feb 2024 18:29:24 -0500
-Message-ID: <CADvbK_fn+gH=p-OhVXzZtGd+nK6QUKu+F4QLBpcx0c3Pig1oLg@mail.gmail.com>
-Subject: Re: [PATCH] net: sctp: fix memory leak in sctp_chunk_destroy()
-To: Dmitry Antipov <dmantipov@yandex.ru>
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, linux-sctp@vger.kernel.org, 
-	netdev@vger.kernel.org, lvc-project@linuxtesting.org, 
-	syzbot+8bb053b5d63595ab47db@syzkaller.appspotmail.com
+X-Received: by 2002:a05:6e02:221d:b0:363:819c:926d with SMTP id
+ j29-20020a056e02221d00b00363819c926dmr80890ilf.1.1707176428457; Mon, 05 Feb
+ 2024 15:40:28 -0800 (PST)
+Date: Mon, 05 Feb 2024 15:40:28 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009655270610aafce1@google.com>
+Subject: [syzbot] [netfilter?] WARNING: suspicious RCU usage in hash_netportnet6_destroy
+From: syzbot <syzbot+bcd44ebc3cd2db18f26c@syzkaller.appspotmail.com>
+To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
+	fw@strlen.de, kadlec@netfilter.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 5, 2024 at 12:02=E2=80=AFPM Dmitry Antipov <dmantipov@yandex.ru=
-> wrote:
->
-> In case of GSO, per-chunk 'skb' pointer may point to an entry from
-> fraglist created in 'sctp_packet_gso_append()'. To avoid freeing
-> random fraglist entry (and so undefined behavior and/or memory
-> leak), consume 'head_skb' (i.e. beginning of a fraglist) instead.
-Right, chunk->skb is supposed to be set to chunk->head_skb
-before calling sctp_chunk_free () in sctp_inq_pop():
+Hello,
 
-                        if (chunk->head_skb)
-                                chunk->skb =3D chunk->head_skb;
-                        sctp_chunk_free(chunk);
-                        chunk =3D queue->in_progress =3D NULL;
+syzbot found the following issue on:
 
-However, somehow the loop in sctp_assoc_bh_rcv() breaks without
-dequeuing all skbs, and I guess it's because of "asoc->base.dead".
+HEAD commit:    021533194476 Kconfig: Disable -Wstringop-overflow for GCC ..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=144caa38180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f204e0b6490f4419
+dashboard link: https://syzkaller.appspot.com/bug?extid=bcd44ebc3cd2db18f26c
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16329057e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15b8fe7be80000
 
-In this case, sctp_inq_free() should take care of its release,
-so can you try to fix it there? like:
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/0fcac44f7d25/disk-02153319.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/ec3e3d0e222c/vmlinux-02153319.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/11bfd95eb918/bzImage-02153319.xz
 
-diff --git a/net/sctp/inqueue.c b/net/sctp/inqueue.c
-index 7182c5a450fb..dda5e1ad9cac 100644
---- a/net/sctp/inqueue.c
-+++ b/net/sctp/inqueue.c
-@@ -52,8 +52,11 @@ void sctp_inq_free(struct sctp_inq *queue)
-        /* If there is a packet which is currently being worked on,
-         * free it as well.
-         */
--       if (queue->in_progress) {
--               sctp_chunk_free(queue->in_progress);
-+       chunk =3D queue->in_progress;
-+       if (chunk) {
-+               if (chunk->head_skb)
-+                       chunk->skb =3D chunk->head_skb;
-+               sctp_chunk_free(chunk);
-                queue->in_progress =3D NULL;
-        }
- }
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+bcd44ebc3cd2db18f26c@syzkaller.appspotmail.com
 
-this would avoid doing chunk->head_skb check for all chunks destroying.
+=============================
+WARNING: suspicious RCU usage
+6.8.0-rc2-syzkaller-00199-g021533194476 #0 Not tainted
+-----------------------------
+net/netfilter/ipset/ip_set_hash_gen.h:455 suspicious rcu_dereference_protected() usage!
 
-Thanks.
->
-> Reported-by: syzbot+8bb053b5d63595ab47db@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?id=3D0d8351bbe54fd04a492c2daab0=
-164138db008042
-> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
-> ---
->  net/sctp/sm_make_chunk.c | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
->
-> diff --git a/net/sctp/sm_make_chunk.c b/net/sctp/sm_make_chunk.c
-> index f80208edd6a5..30fe34743009 100644
-> --- a/net/sctp/sm_make_chunk.c
-> +++ b/net/sctp/sm_make_chunk.c
-> @@ -1500,7 +1500,10 @@ static void sctp_chunk_destroy(struct sctp_chunk *=
-chunk)
->         BUG_ON(!list_empty(&chunk->list));
->         list_del_init(&chunk->transmitted_list);
->
-> -       consume_skb(chunk->skb);
-> +       /* In case of GSO, 'skb' may be a pointer to fraglist entry.
-> +        * Consume the read head if so.
-> +        */
-> +       consume_skb(chunk->head_skb ? chunk->head_skb : chunk->skb);
->         consume_skb(chunk->auth_chunk);
->
->         SCTP_DBG_OBJCNT_DEC(chunk);
-> --
-> 2.43.0
->
+other info that might help us debug this:
+
+
+rcu_scheduler_active = 2, debug_locks = 1
+1 lock held by swapper/0/0:
+ #0: ffffffff8e130ba0 (rcu_callback){....}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+ #0: ffffffff8e130ba0 (rcu_callback){....}-{0:0}, at: rcu_do_batch kernel/rcu/tree.c:2184 [inline]
+ #0: ffffffff8e130ba0 (rcu_callback){....}-{0:0}, at: rcu_core+0xcfc/0x1810 kernel/rcu/tree.c:2465
+
+stack backtrace:
+CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.8.0-rc2-syzkaller-00199-g021533194476 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
+Call Trace:
+ <IRQ>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
+ lockdep_rcu_suspicious+0x220/0x340 kernel/locking/lockdep.c:6712
+ hash_netportnet6_destroy+0xf0/0x2c0 net/netfilter/ipset/ip_set_hash_gen.h:455
+ ip_set_destroy_set net/netfilter/ipset/ip_set_core.c:1180 [inline]
+ ip_set_destroy_set_rcu+0x6a/0xe0 net/netfilter/ipset/ip_set_core.c:1190
+ rcu_do_batch kernel/rcu/tree.c:2190 [inline]
+ rcu_core+0xd76/0x1810 kernel/rcu/tree.c:2465
+ __do_softirq+0x2bb/0x942 kernel/softirq.c:553
+ invoke_softirq kernel/softirq.c:427 [inline]
+ __irq_exit_rcu+0xf1/0x1c0 kernel/softirq.c:632
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:644
+ sysvec_apic_timer_interrupt+0x97/0xb0 arch/x86/kernel/apic/apic.c:1076
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:649
+RIP: 0010:native_irq_disable arch/x86/include/asm/irqflags.h:37 [inline]
+RIP: 0010:arch_local_irq_disable arch/x86/include/asm/irqflags.h:72 [inline]
+RIP: 0010:acpi_safe_halt+0x20/0x30 drivers/acpi/processor_idle.c:113
+Code: 90 90 90 90 90 90 90 90 90 90 65 48 8b 05 58 ea a5 74 48 f7 00 08 00 00 00 75 10 66 90 0f 00 2d c6 5c a9 00 f3 0f 1e fa fb f4 <fa> c3 cc cc cc cc 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90
+RSP: 0018:ffffffff8de07ca8 EFLAGS: 00000246
+RAX: ffffffff8de94680 RBX: ffff88801628e864 RCX: 00000000000148c9
+RDX: 0000000000000001 RSI: ffff88801628e800 RDI: ffff88801628e864
+RBP: 0000000000038f78 R08: ffff8880b9436d8b R09: 1ffff11017286db1
+R10: dffffc0000000000 R11: ffffffff8b5dd030 R12: ffff888015b47000
+R13: 0000000000000000 R14: 0000000000000001 R15: ffffffff8e885a20
+ acpi_idle_enter+0xe4/0x140 drivers/acpi/processor_idle.c:707
+ cpuidle_enter_state+0x118/0x490 drivers/cpuidle/cpuidle.c:267
+ cpuidle_enter+0x5d/0xa0 drivers/cpuidle/cpuidle.c:388
+ call_cpuidle kernel/sched/idle.c:134 [inline]
+ cpuidle_idle_call kernel/sched/idle.c:215 [inline]
+ do_idle+0x374/0x5d0 kernel/sched/idle.c:312
+----------------
+Code disassembly (best guess):
+   0:	90                   	nop
+   1:	90                   	nop
+   2:	90                   	nop
+   3:	90                   	nop
+   4:	90                   	nop
+   5:	90                   	nop
+   6:	90                   	nop
+   7:	90                   	nop
+   8:	90                   	nop
+   9:	90                   	nop
+   a:	65 48 8b 05 58 ea a5 	mov    %gs:0x74a5ea58(%rip),%rax        # 0x74a5ea6a
+  11:	74
+  12:	48 f7 00 08 00 00 00 	testq  $0x8,(%rax)
+  19:	75 10                	jne    0x2b
+  1b:	66 90                	xchg   %ax,%ax
+  1d:	0f 00 2d c6 5c a9 00 	verw   0xa95cc6(%rip)        # 0xa95cea
+  24:	f3 0f 1e fa          	endbr64
+  28:	fb                   	sti
+  29:	f4                   	hlt
+* 2a:	fa                   	cli <-- trapping instruction
+  2b:	c3                   	ret
+  2c:	cc                   	int3
+  2d:	cc                   	int3
+  2e:	cc                   	int3
+  2f:	cc                   	int3
+  30:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
+  37:	00 00 00
+  3a:	90                   	nop
+  3b:	90                   	nop
+  3c:	90                   	nop
+  3d:	90                   	nop
+  3e:	90                   	nop
+  3f:	90                   	nop
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
