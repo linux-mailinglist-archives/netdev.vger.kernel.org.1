@@ -1,110 +1,212 @@
-Return-Path: <netdev+bounces-69300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9D4184A984
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:44:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DA3B84A9AB
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:57:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBFFF1C270C0
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 22:44:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F498B25714
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 22:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 339884879D;
-	Mon,  5 Feb 2024 22:43:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F4847A61;
+	Mon,  5 Feb 2024 22:57:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DKz4TB+z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TsinSFtr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75FBC481BF;
-	Mon,  5 Feb 2024 22:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52B89487BE
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 22:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707173029; cv=none; b=CbADypHTfz56XoMyNCCaXq/TF2QOnaAa0RtHdajwjwamGK1Zyv2zwsZiug3IlfQL3+G5mWGYMsIev4nfskuGBPYPKlaaEojwIk84Cn4s2vsLpn0oi11A7tiorCBs/m26aRXpGs5B/0w5NCEazQx6F55DH3lFm0n0Vz7cNoMetPg=
+	t=1707173863; cv=none; b=LB7qCV+5Q/ia5Wyci+hgw1ZruAfNr/44sYkQzsyLDosDu6EKokc98UagA2UJoitDWx/NICLYlDFUYViH6/FkQjDKqTbO7w8aVZ3H4iVmleALou9RCSiiveGSHnCXQuOY8q4FXeDN4y6oQM3wCzesUcB5ZiNOMn6t6iTgq6FbKjk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707173029; c=relaxed/simple;
-	bh=B5LFCChfXOV41x2TfdwcmAIvY8W+Ckng0SDd0NGO450=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VEywcb9NxQzEcda/EqJbemm7cXAIEiP7Vy7nlbUEIBzMaEgCrdUmUy91SdeO9RyZnZBvWBTCp6n9BOhd7THYWv17AXR3XZWpDX4euy9PqegswlA0H4ByER+ULUechKscBrxFZNlF4NLsIV3cAiLyrPX0mFt+GuVlq9GFrUurziA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DKz4TB+z; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-511344235c6so6032321e87.0;
-        Mon, 05 Feb 2024 14:43:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707173025; x=1707777825; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=B5LFCChfXOV41x2TfdwcmAIvY8W+Ckng0SDd0NGO450=;
-        b=DKz4TB+z2Mzh81+kvdBIeXxgKHtE1bm/zcwRcG1GDYmBf+ieJjZV18zlujqeCyEVFi
-         0nVbTDBPzfizjaY7Cg+9aGCTy78WfDY+qeJCrsfE6hAe/wPIw+9iRxhWvvCA8qoKbz/U
-         OsXmVI23HvG2EnuBsVCrED9biPXD79nCUZBL4l00K2dWfDekUhitpUPr6TaYjo+K3a4O
-         jgTXnUxq0b05+ycLyleb+kevfkYWyZpSISnnBEn1x8rKIl1zbmxPr6K0qBOu7+Hge2q4
-         wpszepnx05dpRzuqa+Yg0xj86us35/7y2z+obFtpOcaTPQvRG1ghXVNPRRuay4tb3aRX
-         jGmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707173025; x=1707777825;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=B5LFCChfXOV41x2TfdwcmAIvY8W+Ckng0SDd0NGO450=;
-        b=RMeqib7COP5TA4VBGf9k2UIu0HaFtu+QkFKOrYkx0r83RNqK0whLvgwfTMehvDJpCg
-         TY5m+BY0LtfzESDF6m7LxOrXfWJtTVW6YpdPnYkobNF0oTdJLLS/ckDY6ItnqfcH+iqf
-         y10q15rgsVS7oo7tvGrzd6szIuz71vioHhYUhf1PPgwSpm8/YXk0f7ZWQkm7syDMHCju
-         pfHAIXvEXJHT9F332dFL8bVnM2o06Np0/CaUGjTO1vdGeBcGFv5utnXLx/rPvkkQ1n6J
-         z8sSAKgPFBYURPsEQcd8lDKgNAUnE4RAyXszERGgrOsfHniMacowwKO9RNaANCfl77vu
-         h0Bw==
-X-Gm-Message-State: AOJu0YzgqiGFz4vIqH6gobWYkFvPAXdfKZ49M/bnNwM1qTzxDlYw1bsy
-	DRuyexlJsGgefl36z8bGIP/lVc8cPAicq8OwQQUPa3RusQD91pe7JxMpamMNq3G2mSgoXvimDcB
-	nFqDgyZde8Q28e4Wf8dE3/2TCieU=
-X-Google-Smtp-Source: AGHT+IHseQXpYVdIoy5VWPKXjRpQk8S1Nl2OlAONy8uH9N2+8szilnpvFR6yjoGW8Wd1pLrXFfIn1CjMigxOSU9ivWc=
-X-Received: by 2002:ac2:4aca:0:b0:511:3ef8:5 with SMTP id m10-20020ac24aca000000b005113ef80005mr572988lfp.34.1707173025259;
- Mon, 05 Feb 2024 14:43:45 -0800 (PST)
+	s=arc-20240116; t=1707173863; c=relaxed/simple;
+	bh=cOQGLVhiiObfyloDgcZhWjtXBhQA9sfsF7RZwDC1qa4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O9hxffzK9uiKvc2/AdgRdpuxyFwXhDJOoGT4uWwOqR3ACv9/qqg3bSPSwxNBxV9H7o7WFoJQMT9l7+DomWSepGWygWz2gk6Uhy1Tt5V2RCD/GKMnLWoRJGS9m6xCnLilMpZAP1OJAg4NPNYWfOx4lj/fSXALTp3KbklzCYV/C6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TsinSFtr; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707173859;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=m84d7QF2RHzKEpc2iYUiWaNTbg9vVp06SyHcrHDZtG0=;
+	b=TsinSFtrALw8DPor/r6a6OzZ3SUy9qNxMM/E6+jAyTX+wLAZxzYe8JH8ecBEmvAgIe5WIH
+	cix71tHFw0N2Yk+EZebhiVEKsW62O7VAKfaaJp5RHOY46WT3MtuYrPqKOB59J3Ct99ZUxE
+	DvyJhF6JxKvK3hDl314rCwQRUyb6tCk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-287-kn07yk8aMjSd8XV0XktC_Q-1; Mon, 05 Feb 2024 17:57:31 -0500
+X-MC-Unique: kn07yk8aMjSd8XV0XktC_Q-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 35A77845DC0;
+	Mon,  5 Feb 2024 22:57:31 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.245])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 19C7B1121312;
+	Mon,  5 Feb 2024 22:57:29 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: Steve French <smfrench@gmail.com>
+Cc: David Howells <dhowells@redhat.com>,
+	Jeff Layton <jlayton@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Shyam Prasad N <sprasad@microsoft.com>,
+	Tom Talpey <tom@talpey.com>,
+	Christian Brauner <christian@brauner.io>,
+	netfs@lists.linux.dev,
+	linux-cifs@vger.kernel.org,
+	linux-fsdevel@vger.kernel.org,
+	linux-mm@kvack.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v5 00/12] netfs, cifs: Delegate high-level I/O to netfslib
+Date: Mon,  5 Feb 2024 22:57:12 +0000
+Message-ID: <20240205225726.3104808-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240130-realtek_reverse-v5-0-ecafd9283a07@gmail.com>
- <20240130-realtek_reverse-v5-9-ecafd9283a07@gmail.com> <20240201224516.pujapjenqtyejihg@skbuf>
-In-Reply-To: <20240201224516.pujapjenqtyejihg@skbuf>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Mon, 5 Feb 2024 19:43:34 -0300
-Message-ID: <CAJq09z4ForDXY322xceFJCaH5tiXKQKS=EgFMKbdiSNf8O1Lbg@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 09/11] net: dsa: realtek: migrate user_mii_bus
- setup to realtek-dsa
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-> > +/**
-> > + * rtl83xx_setup_user_mdio() - register the user mii bus driver
-> > + * @ds: DSA switch associated with this user_mii_bus
-> > + *
-> > + * This function first gets and mdio node under the dev OF node, aborting
-> > + * if missing. That mdio node describing an mdio bus is used to register a
-> > + * new mdio bus.
->
-> The description has the overall feel of "Family Guy - Peter narrates his life"
-> (https://www.youtube.com/watch?v=zw8zUMjEW0I).
+Hi Steve,
 
-Hahaha. Yes it does.
+Here are patches to convert cifs to use the netfslib library.  With this I
+can run a certain amount of xfstests on CIFS, though not all the tests work
+correctly because of fallocate issues.
 
-> You could be a bit more succinct and say something like "Registers the
-> MDIO bus for built-in Ethernet PHYs, and associates it with the
-> mandatory 'mdio' child OF node of the switch".
+The patches remove around 2000 lines from CIFS
 
-Done. Thanks.
+To do:
 
-Regards,
+ (*) Implement write-retry.  Currently, netfslib errors out on a failed DIO
+     write and relies on the VM to drive writepages again on a failed
+     buffered write.  This needs some retry logic adding into
+     fs/netfs/output.c.
 
-Luiz
+     I'm not sure what the best way to handle this is.  One way is to
+     resend each failing subreq as it fails, offloading this to a kernel
+     thread that re-splits the subreq, calling out to a rreq->op to do the
+     splitting, thereby allowing cifs to renegotiate credits.  If a subreq
+     is split, the two parts need to be adjacent in the rreq->subrequests
+     list.
+
+     An alternative way might be to try and combine failing tests and then
+     split them.
+
+     Yet a third way might be to try each failing subreq a smaller bit at a
+     time and keep track of what has been sent in
+     wdata->subreq.transferred.
+
+     Whichever way is chosen, NETFS_SREQ_RETRYING should be set in
+     wdata->subreq.flags instead of setting wdata->replay.
+
+Notes:
+
+ (1) CIFS is made to use unbuffered I/O for unbuffered caching modes and
+     write-through caching for cache=strict.
+
+ (2) Various cifs fallocate() function implementations have issues that
+     aren't easily fixed without enhanced protocol support.
+
+ (3) It should be possible to turn on multipage folio support in CIFS now.
+
+ (4) The then-unused CIFS code is removed in three patches, not one, to
+     avoid the git patch generator from producing confusing patches in
+     which it thinks code is being moved around rather than just being
+     removed.
+
+The patches can be found here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=cifs-netfs
+
+Changes
+=======
+ver #5)
+ - Rebased to -rc3 plus SteveF's for-next branch as netfslib is now
+   upstream, as are a couple of patches from this series.
+ - Replace the ->replay bool Shyam added with a flag on the netfs
+   subrequest.  This is tested by the code, but not currently set (see
+   above).
+
+ver #4)
+ - Slimmed down the branch:
+   - Split the cifs-related patches off to a separate branch (cifs-netfs)
+   - Deferred the content-encryption to the in-progress ceph changes.
+   - Deferred the use-PG_writeback rather than PG_fscache patch
+ - Rebased on a later linux-next with afs-rotation patches.
+
+ver #3)
+ - Moved the fscache module into netfslib to avoid export cycles.
+ - Fixed a bunch of bugs.
+ - Got CIFS to pass as much of xfstests as possible.
+ - Added a patch to make 9P use all the helpers.
+ - Added a patch to stop using PG_fscache, but rather dirty pages on
+   reading and have writepages write to the cache.
+
+ver #2)
+ - Folded the addition of NETFS_RREQ_NONBLOCK/BLOCKED into first patch that
+   uses them.
+ - Folded addition of rsize member into first user.
+ - Don't set rsize in ceph (yet) and set it in kafs to 256KiB.  cifs sets
+   it dynamically.
+ - Moved direct_bv next to direct_bv_count in struct netfs_io_request and
+   labelled it with a __counted_by().
+ - Passed flags into netfs_xa_store_and_mark() rather than two bools.
+ - Removed netfs_set_up_buffer() as it wasn't used.
+
+David
+
+Link: https://lore.kernel.org/r/20231213152350.431591-1-dhowells@redhat.com/ [1]
+Link: https://lore.kernel.org/r/20231013160423.2218093-1-dhowells@redhat.com/ # v1
+Link: https://lore.kernel.org/r/20231117211544.1740466-1-dhowells@redhat.com/ # v2
+Link: https://lore.kernel.org/r/20231207212206.1379128-1-dhowells@redhat.com/ # v3
+Link: https://lore.kernel.org/r/20231213154139.432922-1-dhowells@redhat.com/ # v4
+
+David Howells (12):
+  cifs: Replace cifs_readdata with a wrapper around netfs_io_subrequest
+  cifs: Set zero_point in the copy_file_range() and remap_file_range()
+  cifs: Replace cifs_writedata with a wrapper around netfs_io_subrequest
+  cifs: Use more fields from netfs_io_subrequest
+  cifs: Make wait_mtu_credits take size_t args
+  cifs: Implement netfslib hooks
+  cifs: Replace the writedata replay bool with a netfs sreq flag
+  cifs: Move cifs_loose_read_iter() and cifs_file_write_iter() to file.c
+  cifs: Cut over to using netfslib
+  cifs: Remove some code that's no longer used, part 1
+  cifs: Remove some code that's no longer used, part 2
+  cifs: Remove some code that's no longer used, part 3
+
+ fs/netfs/buffered_write.c    |    3 +
+ fs/netfs/io.c                |    7 +-
+ fs/smb/client/Kconfig        |    1 +
+ fs/smb/client/cifsfs.c       |   69 +-
+ fs/smb/client/cifsfs.h       |   10 +-
+ fs/smb/client/cifsglob.h     |   59 +-
+ fs/smb/client/cifsproto.h    |   14 +-
+ fs/smb/client/cifssmb.c      |  111 +-
+ fs/smb/client/file.c         | 2911 ++++++----------------------------
+ fs/smb/client/fscache.c      |  109 --
+ fs/smb/client/fscache.h      |   54 -
+ fs/smb/client/inode.c        |   19 +-
+ fs/smb/client/smb2ops.c      |   10 +-
+ fs/smb/client/smb2pdu.c      |  169 +-
+ fs/smb/client/smb2proto.h    |    5 +-
+ fs/smb/client/trace.h        |  144 +-
+ fs/smb/client/transport.c    |   17 +-
+ include/linux/netfs.h        |    2 +
+ include/trace/events/netfs.h |    1 +
+ 19 files changed, 852 insertions(+), 2863 deletions(-)
+
 
