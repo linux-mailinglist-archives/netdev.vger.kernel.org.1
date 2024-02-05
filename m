@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-69108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D110D849A95
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 13:40:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58EBF849A96
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 13:40:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CECF281AEE
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:40:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14F5728197C
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:40:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07DBC1C6B8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 086F01C6BB;
 	Mon,  5 Feb 2024 12:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZGfGz25k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="niwUh8fS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88DF1C69F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D89241C6A1
 	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 12:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707136830; cv=none; b=Gp0pMoGjJzdMcvnop4a5juvZU3iAaAxjPcG2NLucrJPSoOoaei7/iNXTNAT9ENGKXSGzauKCHQlbCTB6c4fTi4e0himTMhIgvzXxryeop/UbAJV/fvlsszVWCEBOFg5QeBZ7tM/Ms3wAdtJEg6vfAegrn73Wo8JynqHDuZdUGm0=
+	t=1707136830; cv=none; b=ReQqTgq5TgKYbYaTudsXQSCeNnAceM/nbjzoZ8YKwN0nj1+R8fI1csq3jU1gYjzLwG//U4krkJoP42uZw7f8CTFxQ+FlSvjBW871Q5RoluK83Vlx0nPJR5d/RPWlvYjnu8fejEIYdZtDOtzgd90JJ+I3uCLPv3cgebzA4Sk4DFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707136830; c=relaxed/simple;
-	bh=A06eZAl7IghCEpPSiYue6wl1aProEoys1xR5upotnQk=;
+	bh=2XJfc4CHFGcfxniY/WYEhLsiPHmep03l6eTFo0vtgdU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ImN6MQusn/T6MMiT4VLXgMbVQCqdFxfORvCgL4uoYPhjdnnDSdWbb4x+m84tIyDs2Trc7gDn+MHFDT0yjIpHmsVvirLAdP5XpBdxUTc0C5kAEiUq1e3Jz34QlXo24EqjaXkqg1I9vD9WKPb685ODEV95Mc1FYnEQwLPQRL7iy04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZGfGz25k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 52DEEC43330;
+	 In-Reply-To:To:Cc; b=TH1wBjrLTriSB6qwb7lEvcO4rUJf9arg8W8I7Pv2drb7AhlPFxpwRZcZQw8qD3MDdDUdfnYnESIIsc4yD8Q+FfqcpwkVOw8Aj4z5qJ30e2/xTNpjaR9ZAm5xgmcOfyFcO0ES5OcDqzHIKGqYpMhZp6EvPcOBAQzkrg/Zf8XQnJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=niwUh8fS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 56395C433F1;
 	Mon,  5 Feb 2024 12:40:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707136830;
-	bh=A06eZAl7IghCEpPSiYue6wl1aProEoys1xR5upotnQk=;
+	bh=2XJfc4CHFGcfxniY/WYEhLsiPHmep03l6eTFo0vtgdU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZGfGz25kLUxjzOJX8M+Ml8OaTipVBpELUVxYSjj7izYkkF39coUVAGIXHR0krRwSp
-	 CfdyJpEM9w/Efn4zOrSUHMU11PGSWhKijCyGKwEBM3JDxxSui+LD6lbJMlSYXie/fR
-	 7FhKuDj/vYuglqoHjYi95R8zHBoUd/OAlXbBni5nl88qNtyWmgnbaEXLtZZsVZc57f
-	 vEHurSXeDLltOwq8vw7s7eJ0eTQnPAJi/Z9V0TqUvzt5daBvdQFfe2qwLDXT9MYI6k
-	 /TQdi3ewBQgtnFXk7gMwnPJuXmPvn5sDg9cw0NPwjICley1bmJzep2ffWCU++7vCCL
-	 fuSYcbSngBZsA==
+	b=niwUh8fSH5qONKgdgtaQdENL0z4/M54LQgQdTNM1w0TsD9msOQQTJWiktkzYc4dEl
+	 vkvNQjs5s40nbyfor9SshLF4tQOpXJdbaN6yqBWmCf78eX0OIwE4UuzWRMmaXNo4q2
+	 vvUSvNjunwJDTGXK4l1k5//MDmu92fapq2Yoj4iebWrQhw5JBAP6YdyVwlmz8SdHPz
+	 zlKFi97fO/+gW8LffIuxE+Mejews3x5IWGR4mrfoMXK4O6SulJ2jw3MYir7xcoh9MK
+	 l2E1OKexZj/rOYItmxaHVmdRaVWnZt97UckH/R8n3Tr9dd4kzkfuM3NHPLPIJR4DO9
+	 a7/uiUa3MsN7g==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2DB71E2F2F1;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3517BE2F2F9;
 	Mon,  5 Feb 2024 12:40:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,35 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: dsa: reindent arguments of
- dsa_user_vlan_for_each()
+Subject: Re: [PATCH net-next 0/2] Fixups for qca8k ds->user_mii_bus cleanup
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170713683018.8022.3648864153566501617.git-patchwork-notify@kernel.org>
+ <170713683021.8022.6745560385177796412.git-patchwork-notify@kernel.org>
 Date: Mon, 05 Feb 2024 12:40:30 +0000
-References: <20240202162041.2313212-1-vladimir.oltean@nxp.com>
-In-Reply-To: <20240202162041.2313212-1-vladimir.oltean@nxp.com>
+References: <20240202163626.2375079-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20240202163626.2375079-1-vladimir.oltean@nxp.com>
 To: Vladimir Oltean <vladimir.oltean@nxp.com>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, f.fainelli@gmail.com
+ kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, f.fainelli@gmail.com,
+ alsi@bang-olufsen.dk, ansuelsmth@gmail.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Fri,  2 Feb 2024 18:20:41 +0200 you wrote:
-> These got misaligned after commit 6ca80638b90c ("net: dsa: Use conduit
-> and user terms").
+On Fri,  2 Feb 2024 18:36:24 +0200 you wrote:
+> The series "ds->user_mii_bus cleanup (part 1)" from the last development
+> cycle:
+> https://patchwork.kernel.org/project/netdevbpf/cover/20240104140037.374166-1-vladimir.oltean@nxp.com/
 > 
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> ---
->  net/dsa/user.c | 8 ++++----
->  1 file changed, 4 insertions(+), 4 deletions(-)
+> had some review comments I didn't have the time to address at the time.
+> One from Alvin and one from Luiz. They can reasonably be treated as
+> improvements for v6.9.
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] net: dsa: reindent arguments of dsa_user_vlan_for_each()
-    https://git.kernel.org/netdev/net-next/c/0cd216d769fb
+  - [net-next,1/2] net: dsa: qca8k: put MDIO controller OF node if unavailable
+    https://git.kernel.org/netdev/net-next/c/08932323ccf7
+  - [net-next,2/2] net: dsa: qca8k: consistently use "ret" rather than "err" for error codes
+    https://git.kernel.org/netdev/net-next/c/709776ea8562
 
 You are awesome, thank you!
 -- 
