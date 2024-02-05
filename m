@@ -1,151 +1,207 @@
-Return-Path: <netdev+bounces-69314-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69315-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 911AE84AA3B
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 00:04:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9670484AA4C
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 00:11:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CF5128AAD5
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:04:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D6B628C478
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:11:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDF941DA52;
-	Mon,  5 Feb 2024 23:03:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D189482F6;
+	Mon,  5 Feb 2024 23:11:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b="YpbA2d6c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HB187Jmc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f46.google.com (mail-oa1-f46.google.com [209.85.160.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02AC84F5F2
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 23:03:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C00D4A99C;
+	Mon,  5 Feb 2024 23:11:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707174199; cv=none; b=rpOpvaLxIHtBDSr9Kb87euGX1kiVbh8u42NLFLWwQpPBlo6eo2HSMwlvAxk6ZudkPUNBH4YSYfho3YX7yHYeXMreIoqBsBiAqHc0OyU+PZ2RUfz4eR6beORLTRQceYlrQKhty8oHsqK6MqAeHW+/17OYA0Ft1K5QY+Xd9bqMG08=
+	t=1707174671; cv=none; b=Vxog5655FjKEqJP6+rFkD85Jk0mo8ygCWjfo861Q7lTR0QU4/bHA/4Os8siilGCjkk6DWAihqEbwW4xJbX2HmAWIdaL3lyKtzYc6El1rZURsdiu9wSNGC1Da3a2sUjhBeL75RkwBLQTeyjjiO5rMU0cKuv+PKBNNnacECPWToAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707174199; c=relaxed/simple;
-	bh=iTafF/5LaNjbcxE8OAcm8eXOnE8aLfbUTevQOqHr0AM=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=eN5aiKQWfpZDQkUOi1KCIpZAA461QtdOvewmoXWD0NRhPOaCY4G7ZE5MPZym/BAbBGBti4+hrn4nb6YxEJ1ss/uUk6Kgp+5u7Y0xr1njF70DmenP/w2u9C13v7mI8E1k1veUSlgby3AQN3xn+P+Zg5PY/h8Tfc3lJgR+XrKXfRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net; spf=pass smtp.mailfrom=amacapital.net; dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b=YpbA2d6c; arc=none smtp.client-ip=209.85.160.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amacapital.net
-Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-2196dd318f5so1641275fac.3
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 15:03:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20230601.gappssmtp.com; s=20230601; t=1707174197; x=1707778997; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MtZW1l0tMwHN4QHdh48s9EbJKUILTLIhCVQsN3Md67s=;
-        b=YpbA2d6cQdh0diKS05sgrw6kHe7R05bT7sPrdKgZSbO6hzpGc8ItcZG4dm8mesciDC
-         BbAGkcSV90UXLnlX/vMgdDiA1LNuv7b+vYzjE5EvFsS4cf0SZPZPEK+5JMYyT+yOWXRR
-         6fmNQr2bgHqE7ibDnKIr3wyeoAq776ftYW0JQUcPmnCxAcZPrhk2DLtjyk22VtymTvpA
-         0nJRe12oKJIR8f41GYjSiusN7+NmLfw0N3Crb4tdM7o2+dsPfKnIUfpi7DKdwOW6yNY8
-         lkjacr+QyS1TcpuGX35J4QJqAnfkP5+sL18bAXnXafjq4XrZ1PlQ7y1ubMN4Q6Ao3yjq
-         54bg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707174197; x=1707778997;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MtZW1l0tMwHN4QHdh48s9EbJKUILTLIhCVQsN3Md67s=;
-        b=D16mD1UYY83kAh+mW7mmGTKERTxWcQPvqwcfmwek8mDOJICL3lMWV4dlEi74ZAJotr
-         3CpAxWr3bzZC2S/x8CM7OjNOfQMxPyOp+SVp/Rrc6aW/3RgAfSiV5naOFJciVDg6kv6J
-         PMuXFt+QqfMNuKam59xoX9UlGuOnvTRY+7aAQkDsVqtsICellJoRcZpFPsjlzMuNDExJ
-         rLz3CdShjclO3fgEdjYmwppKcDKuaYSjACMTD4wfR4n6yCKWTnNcKDpD10J840crudPb
-         y7mlyZhYc5m0MY3Zrj4w4JMW2ABRrAgXQ6dQM9xxckqfGHC5edkkM3HE5HaLRc7oGb7I
-         bgkg==
-X-Gm-Message-State: AOJu0Yw//8AenkJopJU0F/Q/yBymN/nxg5NWmkpNHsuox2FifMj9wI01
-	UtZAz/XqIyg+8N94jUzdRHN59n/ssng1Y4CaM7ND/hcf4zcfP/TYoaWKqyAWXUApDwWhEQ3ugqc
-	xdY7EQtE2UpfzJGREtEXzn9Sm1hrs7sAy9PBKBFxaxJ/v9nAL71uI
-X-Google-Smtp-Source: AGHT+IGmhpq0qgOo6A4n9dn9r0xjP8zEP+3uOp4g3/pXcE5NSrb5hxhHebDEVN6/GtPGmZz6mL3zcHjA8pOlc+s9wug=
-X-Received: by 2002:a05:6870:171a:b0:219:3db5:b540 with SMTP id
- h26-20020a056870171a00b002193db5b540mr633669oae.41.1707174196790; Mon, 05 Feb
- 2024 15:03:16 -0800 (PST)
+	s=arc-20240116; t=1707174671; c=relaxed/simple;
+	bh=kKKhcMaqwLfUrQpjENPUNxtz3qXKdR24f6zeijBX9CE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hfX4qUK1cvmFMe7F7H/ACuRkEo0AfAuOxHOUcE9ankoIM7aQIuYd+xV7vF62C6c7bOg1lpDbHcdzSFkzS2Cmf/OLEifQp+o5CwpOF+SKZ6gcbIcr45AMEb8yeda9PnWm0fHv2WkoeLs8kFZBTYEEQ4L6qSDZlbN3dkl7yuMMVDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HB187Jmc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4E64C43609;
+	Mon,  5 Feb 2024 23:11:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707174670;
+	bh=kKKhcMaqwLfUrQpjENPUNxtz3qXKdR24f6zeijBX9CE=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=HB187Jmc7N7uKVocaYk9dPVnB0bc0p+8iqaeqwMCeBQC0ZqhLdrW5YjLlU9tsfcx4
+	 pgwHPeYFLw0+aHppjkw35gZgsTrwzZEum4uVFCDDyjS6KpxNO0pjSNezg5C0DYSwB9
+	 9on4UE/EAlIFzTxnR1Z1Qd6PE6NFULCjGkN0uV93j0OpObNr3VLvi33C0ossP0j3ke
+	 /CTmygQGpqJmghvmv0/gBordhtTRSZiiRiECkmV8ubfpRSB9Hi+q7sVj7ZthVVjv1b
+	 yAonpdQ6wKRdWVgcXMuCK2PPO2vOr3+7Rg3QWuzSpCK/HHcEKU8/yU4kuS7wKlTIrK
+	 OyfXsaEhsR2sg==
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2cf4fafa386so63531461fa.1;
+        Mon, 05 Feb 2024 15:11:10 -0800 (PST)
+X-Gm-Message-State: AOJu0YziolENu1FszCFANQIQq4YZ6GRgAeGFAdzha71Q+QJxNm3JdB8k
+	ip14I5hhqIo4E7CZFVj42r16AKpZCr4ak2IrBHdN/+hHJIjogtqBXv4aKzNgURL4nd2XUdXZ4ZO
+	0vgccMY/f010pA23QMpz5NpKCr7s=
+X-Google-Smtp-Source: AGHT+IH/zQJiT8/Oo7PpxCUmoye89gZAefcTyo51dU8Du8JULRbKsx7NuW1HiTmxHkDZc8e1guuf9kncHcYJ5t3C078=
+X-Received: by 2002:a2e:9098:0:b0:2d0:996e:b014 with SMTP id
+ l24-20020a2e9098000000b002d0996eb014mr347168ljg.32.1707174669110; Mon, 05 Feb
+ 2024 15:11:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Mon, 5 Feb 2024 15:03:05 -0800
-Message-ID: <CALCETrUe23P_3YAUMT2dmqq62xAc7zN0PVYrcChm4cHGJMDmbg@mail.gmail.com>
-Subject: The sk_err mechanism is infuriating in userspace
-To: Network Development <netdev@vger.kernel.org>
-Cc: Linux API <linux-api@vger.kernel.org>
+References: <20240131104851.2311358-1-john.g.garry@oracle.com>
+ <CAK7LNATDMjzmgpBHZFTOJCkTCqpLPq8jEjdrwzEZ3uu7WMG7jg@mail.gmail.com> <23c67ffc-64a5-4e19-8fbd-ecb9bfe9d3ff@oracle.com>
+In-Reply-To: <23c67ffc-64a5-4e19-8fbd-ecb9bfe9d3ff@oracle.com>
+From: Masahiro Yamada <masahiroy@kernel.org>
+Date: Tue, 6 Feb 2024 08:10:32 +0900
+X-Gmail-Original-Message-ID: <CAK7LNASfTW+OMk1cJJWb4E6P+=k0FEsm_=6FDfDF_mTrxJCSMQ@mail.gmail.com>
+Message-ID: <CAK7LNASfTW+OMk1cJJWb4E6P+=k0FEsm_=6FDfDF_mTrxJCSMQ@mail.gmail.com>
+Subject: Re: [PATCH RFC 0/4] Introduce uts_release
+To: John Garry <john.g.garry@oracle.com>
+Cc: mcgrof@kernel.org, russ.weight@linux.dev, gregkh@linuxfoundation.org, 
+	rafael@kernel.org, rostedt@goodmis.org, mhiramat@kernel.org, 
+	mathieu.desnoyers@efficios.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, keescook@chromium.org, nathan@kernel.org, 
+	nicolas@fjasle.eu, linux-kernel@vger.kernel.org, 
+	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kbuild@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi all-
+On Mon, Feb 5, 2024 at 5:25=E2=80=AFPM John Garry <john.g.garry@oracle.com>=
+ wrote:
+>
+> On 02/02/2024 15:01, Masahiro Yamada wrote:
+> >> --
+> >> 2.35.3
+> >
+> > As you see, several drivers store UTS_RELEASE in their driver data,
+> > and even print it in debug print.
+> >
+> >
+> > I do not see why it is useful.
+>
+> I would tend to agree, and mentioned that earlier.
+>
+> > As you discussed in 3/4, if UTS_RELEASE is unneeded,
+> > it is better to get rid of it.
+>
+> Jakub replied about this.
+>
+> >
+> >
+> > If such version information is useful for drivers, the intention is
+> > whether the version of the module, or the version of vmlinux.
+> > That is a question.
+> > They differ when CONFIG_MODVERSION.
+> >
+>
+> I think often this information in UTS_RELEASE is shared as informative
+> only, so the user can conveniently know the specific kernel git version.
+>
+> >
+> > When module developers intend to printk the git version
+> > from which the module was compiled from,
+> > presumably they want to use UTS_RELEASE, which
+> > was expanded at the compile time of the module.
+> >
+> > If you replace it with uts_release, it is the git version
+> > of vmlinux.
+> >
+> >
+> > Of course, the replacement is safe for always-builtin code.
+> >
+> >
+> >
+> > Lastly, we can avoid using UTS_RELEASE without relying
+> > on your patch.
+> >
+> >
+> >
+> > For example, commit 3a3a11e6e5a2bc0595c7e36ae33c861c9e8c75b1
+> > replaced  UTS_RELEASE with init_uts_ns.name.release
+> >
+> >
+> > So, is your uts_release a shorthand of init_uts_ns.name.release?
+>
+> Yes - well that both are strings containing UTS_RELEASE. Using a struct
+> sub-member is bit ungainly, but I suppose that we should not be making
+> life easy for people using this.
+>
+> However we already have init_utsname in:
+>
+> static inline struct new_utsname *init_utsname(void)
+> {
+>         return &init_uts_ns.name;
+> }
+>
+> So could use init_utsname()->release, which is a bit nicer.
+>
+> >
+> >
+> >
+> > I think what you can contribute are:
+> >
+> >   - Explore the UTS_RELEASE users, and check if you can get rid of it.
+>
+> Unfortunately I expect resistance for this. I also expect places like FW
+> loader it is necessary. And when this is used in sysfs, people will say
+> that it is part of the ABI now.
+>
+> How about I send the patch to update to use init_uts_ns and mention also
+> that it would be better to not use at all, if possible? I can cc you.
 
-I encounter this issue every couple of years, and it still seems to be
-an issue, and it drives me nuts every time I see it.
 
-I write software that uses unconnected datagram-style sockets.  Errors
-happen for all kinds of reasons, and my software knows it.  My
-software even handles the errors and moves on with its life.  I use
-MSG_ERRQUEUE to understand the errors.  But the kernel fights back:
+OK.
 
-struct sk_buff *__skb_try_recv_datagram(struct sock *sk,
-                                        struct sk_buff_head *queue,
-                                        unsigned int flags, int *off, int *err,
-                                        struct sk_buff **last)
-{
-        struct sk_buff *skb;
-        unsigned long cpu_flags;
-        /*
-         * Caller is allowed not to check sk->sk_err before skb_recv_datagram()
-         */
-        int error = sock_error(sk);
 
-        if (error)
-                goto no_packet;
-        ^^^^^^^^^^ <----- EXCUSE ME?
+As I mentioned in the previous reply, the replacement is safe
+for builtin code.
 
-The kernel even fights back on the *send* path?!?
+When you touch modular code, please pay a little more care,
+because UTS_RELEASE and init_utsname()->release
+may differ when CONFIG_MODVERSIONS=3Dy.
 
-static long sock_wait_for_wmem(struct sock *sk, long timeo)
-{
-        DEFINE_WAIT(wait);
 
-        sk_clear_bit(SOCKWQ_ASYNC_NOSPACE, sk);
-        for (;;) {
-                if (!timeo)
-                        break;
-                if (signal_pending(current))
-                        break;
-                set_bit(SOCK_NOSPACE, &sk->sk_socket->flags);
-                ...
-                if (READ_ONCE(sk->sk_err))
-                        break;  <-- KERNEL HATES UNCONNECTED SOCKETS!
 
-This is IMO just broken.  I realize it's legacy behavior, but it's
-BROKEN legacy behavior.  sk_err does not (at least for an unconnected
-socket) indicate that anything is wrong with the socket.  It indicates
-that something is worthy of notice, and it wants to tell me.
 
-So:
 
-1. sock_wait_for_wmem should IMO just not do that on an unconnected
-socket.  AFAICS it's simply a bug.
 
-2. How, exactly, am I supposed to call recvmsg() and, unambiguously,
-find out whether recvmsg() actually failed?  There are actual errors
-(something that indicates that the kernel malfunctioned or the socket
-is broken), errors indicating that the packet being received is busted
-(skb_copy_datagram_msg, for example), and also errors indicating that
-there's an error queued up.
 
-I would like to know that there's an error queued up.  That's what
-poll and epoll are for, right?  Or a hint from recvmsg() that I should
-call MSG_RECVERR too.  Or it could have a mode where it returns a
-normal datagram *or* an error as appropriate.  But the current state
-of affairs is just brittle and racy.
+>
+> >
+> >   - Where UTS_RELEASE is useful, consider if it is possible
+> >     to replace it with init_uts_ns.name.release
+>
+> ok, but, as above, could use init_utsname()->release also
 
-Are there any reasonably implementable, non-breaking ways to improve
-the API so that programs that understand socket errors can actually
-function fully correctly without gnarly retry loops in userspace and
-silly heuristics about what errors are actually errors?
 
-Grumpily,
-Andy
+I am fine with it.
+
+
+init_utsname()->release is more commonly used
+(but less common than UTS_RELEASE)
+
+
+
+$ git grep   'init_utsname()->release' | wc
+     28      92    2065
+$ git grep   'init_uts_ns.name.release' | wc
+      7      34     587
+$ git grep   'UTS_RELEASE' | wc
+     57     304    4741
+
+
+
+
+--=20
+Best Regards
+Masahiro Yamada
 
