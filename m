@@ -1,169 +1,151 @@
-Return-Path: <netdev+bounces-69158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11979849CE7
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 15:22:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0BBF849D02
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 15:27:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5039281822
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 14:22:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07C1E1C24746
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 14:27:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D2052C190;
-	Mon,  5 Feb 2024 14:22:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A8B22F03;
+	Mon,  5 Feb 2024 14:27:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="qRme/lFQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kyoaza5M"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2114.outbound.protection.outlook.com [40.107.243.114])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4884F12B8C;
-	Mon,  5 Feb 2024 14:22:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.114
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707142969; cv=fail; b=sXyE1OH7tpVoAiMDaQbsm3jRdj/NM7YGP/AePIzfl5ANC6DjgQJIwoKkD0v46vAH55n87GVBcCxEKsIItmrOD28UbUJVt1WF4jI9nSsdNiCgkvtrIaFXwla9tBN2JKor+LeFb0Gpw3OFYlT6yOB0lEzM0MaYmOdIhJJakGYNUdo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707142969; c=relaxed/simple;
-	bh=V1fq0DBQ1XCEbGKuRui/DwqQqZiKp6CGs5vbjhWG2zM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=cesTydDUwcO8TdloD3YgWt8XaKXivaQiJjxY1Zjc3lWlRP4ACNr6E4sltcimlCbjnB3Sev9CdRaBrFxEnbYGVNVj1kuzPQUbqo9F/KyDaUiFtYg7DDOMzZc/dkHtawRUBEGPxakORZ2I8hS3WQXrlhcsrzVrxf0Qu5qq5W2WkyI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com; spf=pass smtp.mailfrom=corigine.com; dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b=qRme/lFQ; arc=fail smtp.client-ip=40.107.243.114
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=corigine.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OfP9hOIL3QdVpHBAY/g/Wbk63nuWAMd3dPpZYOLu1y556pfdFOqkMOVj/zOzNo4nym3F6CAIIsGhaKOxU373HkGh16KQfzUrZZqCsXy2qPGPGwKd1MD/6M0LoZDHgtZzrxIp//fBBPxmStJdHMBYqpmd3+EDIKDysT/eh8XYH72NrtiGkbcdHOo615SuhzXxlViDmb8+t5Cv2Fw4t5nYg+ROQ78S/eP0ZSBO8+14xkU54kMfTFt3GEpSMYL0bxNQ7FvfZd1M6PT/7RFg9RO5O+RdeoYmHO6KbWGTQ/NrIGiA6PHDncV7x0V+ztCjWGiA1iQ3HJlhc/qsxy9JKKmkzg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=A56STodY7Efx5Rf7AzUoaB+c0yqMwHpVxAt4ye/2iMw=;
- b=RlPMXA+uslRM/IZkBBJRtpYPsTJZTHCNFQODjH5QoHGZjaFA6KHms+fBw+CAhV2rm0DycWE4oKauHh+110mfjwoKBJKBJA5vvDHokGukiVAL4kojLlHiRaIlzXm5OYtMGnfjXqz1f1AjG3UYds8kfkx+CHzYMwyj3JabaAtBxJSvC2H3NZXvEY05wnC/GWLoqz6MgmYZu9fokV9IbnLb3LkoLEvfKAp/YWEDtR5Nw3CLdXrEZH+HpYr1tJMrj673KShnesCXAUVe6+ISh/skNRHFCvrrbOslnGh7dj1/Em5dHVZsoH8mSdZY/NYO2eBlxo2B/1AH6Td/8t3eNUALzA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EA8B2D611;
+	Mon,  5 Feb 2024 14:27:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707143222; cv=none; b=N9YD9Z3Wi3GsG0bBAKPGzdw4WzwQACkY6Nn81PnJhfuMZkzdJ3eCeRBRhzAcajOqmlvqQr8dSL7E8aVIwLo02CkMOl5T5V+MKx6/mqAMn00thbVqn1aM0AMJOp3uNkOtxCtrEdIiiA2Jh+fqyizSz8rdyIFYdk3pTU7u0wypODs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707143222; c=relaxed/simple;
+	bh=fHb64vAvjms1IJ+wa6ZUREjhZ5d/5ix6urd8YanzItg=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=ByJ93pDpBFIl4Wd41LBUunuAmn0neOF9NReGYl0CCnWRpeaqvgeVAnY5thz6pEEq2oHhBwD17INpHyr/8Z2gpZCJGrziCiGRsEWG3hel6Ostm1bxUyEw1TA6tb4nZK3XsUVxnRCteTTrLcSMOk/vkMAmySHRJaVGFQDyOp9Tb40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kyoaza5M; arc=none smtp.client-ip=209.85.222.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-78406c22dc7so292637185a.0;
+        Mon, 05 Feb 2024 06:27:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=A56STodY7Efx5Rf7AzUoaB+c0yqMwHpVxAt4ye/2iMw=;
- b=qRme/lFQ5YSyMH2vB+KdlhqJfmnCuXAUXUfPEr7UxKQHj8gs9SsyZR9GkY3TwZBH9ddFa8r6nC0XcH6ViAG+wkMZFQ4Ju7SUtfZtzrR508rZYdMEohVutyYRI+wPHF5/ABUvgf6Wv9eF4CoRW+6g2Jes54VeDjpY6h2po8biMuo=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
- by MW5PR13MB5856.namprd13.prod.outlook.com (2603:10b6:303:1c2::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.34; Mon, 5 Feb
- 2024 14:22:42 +0000
-Received: from BL0PR13MB4403.namprd13.prod.outlook.com
- ([fe80::2e1b:fcb6:1e02:4e8a]) by BL0PR13MB4403.namprd13.prod.outlook.com
- ([fe80::2e1b:fcb6:1e02:4e8a%4]) with mapi id 15.20.7249.032; Mon, 5 Feb 2024
- 14:22:41 +0000
-Date: Mon, 5 Feb 2024 16:22:31 +0200
-From: Louis Peens <louis.peens@corigine.com>
-To: Simon Horman <horms@kernel.org>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	James Hershaw <james.hershaw@corigine.com>,
-	Daniel Basilio <daniel.basilio@corigine.com>,
-	netdev@vger.kernel.org, stable@vger.kernel.org,
-	oss-drivers@corigine.com
-Subject: Re: [PATCH net 1/3] nfp: use correct macro for LengthSelect in BAR
- config
-Message-ID: <ZcDvJ8fLWw7DCGZv@LouisNoVo>
-References: <20240202113719.16171-1-louis.peens@corigine.com>
- <20240202113719.16171-2-louis.peens@corigine.com>
- <20240205133545.GL960600@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240205133545.GL960600@kernel.org>
-X-ClientProxiedBy: JNXP275CA0022.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:19::34)
- To BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
+        d=gmail.com; s=20230601; t=1707143219; x=1707748019; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YZ1lOhbO92PlxgtcbaAX9FzQjO9r6NgkpjBf1Q1piR4=;
+        b=kyoaza5MnLl5D5VOp+GFpLcnj+1Veu9s5eO4ZrIbWN67br3xJ+y/uAuV418xh1DYXV
+         ppQ3u9pu4/5Iy04REejdQ0d6HIgGhqYNa2alJhqppmJ10GJjFyXoDSEaipPiPjoUOp1I
+         Kv9aLNvS0uEkzmGxxbVUZZ/R1HSXzl3BN3iqDt7PQKabTiJOsOq3GnDEYMqKotpC/+7N
+         +/1Hz11kB/zD2IpkBP3OpXblWNxh6L4tk3smPwimH3qrTso686bcu+CFn4I4fHflxBq1
+         Ht+/jstE/hgSiDSE3Xt9rAlgCjHaeEV1M0j1rhLKmo3Cju9zBJlwaQUqsn25ELsMza3z
+         dbyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707143219; x=1707748019;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=YZ1lOhbO92PlxgtcbaAX9FzQjO9r6NgkpjBf1Q1piR4=;
+        b=eE4BooPfmbA+96NQrVgYpFAX4M6tj+Q7Rq6vRaTKRyrXiVtqiMSeipzk6qGOsQVTOk
+         HAsQhYhcMxuKYEDvVA9C1AgUNA0iB0Q35Q0s85qLgWOQgJLpghMrkysm8pgKQW002fvH
+         JGIunawgc1n0EB28/iXVWe6dDV5WcYQqDaTxrSsGMasZ0j3CsFz3/gtZEdcAVoyh2JFY
+         ULBfaWqnUF0B3NJHqEozFEOJKbO95aY/R+rkrh02Jz+Ni4pbKSyBzsVZ7yA3x3RzPZSR
+         XROUB0fiXV/FwzNopS6Sc8vBqjSc35NoNd+QEJfeeFudKarPwNYHoi1oVx5/ZV1V2A1H
+         kJvg==
+X-Gm-Message-State: AOJu0YwTrVXSeHvOhaM+bIYZCjBdzxNHuynCH8HTpmPznh6ZSK/20MiC
+	sInk576E9EImh6+HrBZyLRcYIRNVIoBBVduSGSVrQBzQprL1N+JP
+X-Google-Smtp-Source: AGHT+IH2MUJZjX90X/rH7UP8ZHaBw9bc04SoSE5q+JoyM6FIpTvvo9UhXAj6my6o2yS49gbeITn4VA==
+X-Received: by 2002:a05:620a:5628:b0:783:6b97:dfe5 with SMTP id vv8-20020a05620a562800b007836b97dfe5mr12915809qkn.23.1707143219332;
+        Mon, 05 Feb 2024 06:26:59 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUx2IP5MxENEjxl3zlaNMv4KZPzKoL8pmeplrCMItUEiCDIdZGE0kKhITJ3bdZh920jbp+xiCmFuQEWJih/v6G9+QGPgqU2kN95Xx5CATlQPVar65/5ZJcOSkqYfrabF4bY2mVn5Uf7OUw4FCeoINEnA8UAM1skdw3lvFe24udGpG5bmqQrnIvaU+3ayK0AJdFukHmzs+xeId1ttKRkFSc2v0qE/XCTVDqZPgSxXcmRHosflzUSTbWn/8WCjGD7G931DOM2tMCwVT5++g==
+Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
+        by smtp.gmail.com with ESMTPSA id a2-20020a05620a102200b00783e1590ebasm2995468qkk.82.2024.02.05.06.26.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Feb 2024 06:26:58 -0800 (PST)
+Date: Mon, 05 Feb 2024 09:26:58 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Magnus Karlsson <magnus.karlsson@gmail.com>, 
+ magnus.karlsson@intel.com, 
+ bjorn@kernel.org, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ netdev@vger.kernel.org, 
+ maciej.fijalkowski@intel.com, 
+ yuvale@radware.com
+Cc: bpf@vger.kernel.org
+Message-ID: <65c0f032ac71a_7396029419@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240205123553.22180-2-magnus.karlsson@gmail.com>
+References: <20240205123553.22180-1-magnus.karlsson@gmail.com>
+ <20240205123553.22180-2-magnus.karlsson@gmail.com>
+Subject: Re: [PATCH bpf-next 1/2] xsk: support redirect to any socket bound to
+ the same umem
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL0PR13MB4403:EE_|MW5PR13MB5856:EE_
-X-MS-Office365-Filtering-Correlation-Id: ac3f0f26-21df-41d2-bce5-08dc2655e9e5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	VNljLFS9g12LsRqGglJREEqMKX4fvOcwLZLSCQrNAw1CS3az2ZnB5T6z7TOU9e+pMQDnxirNTWAXoWhnEfGnBoiHGP14XOa63p0phq77tOKiJeRsz6+JSeyXxJvZYhkT+UYACA+d3qwZQ+ej6ulrLy0kB3VPTypV+YeKGaBQrIgnCZ/1p3un7Cou3R6Drd5nLrgnsqq37RS5qfml3VfykuehJCZfwHR/gwTJvzikbxhz2f0gWM+dHoL4CT68AJ/2JFb0PAK4LwjPMgkcmE9+yP29XtzZWXmysac3pWAlOBa60h8G4YL6bSTveND4ODvr/6anDSmUg0siXj5PT8YWDQyWC0MIZtA/Lto0MXpSHCvGSzJk6iuaCl6OhJlS0OmqtlfFOX7dpVVXvoRcpDjFhZnwTLEPlZVNRwKmz+HU/rEVNDOyOlrYSgCovjAJDXXBYR51fZ/1qa2f7sDgXTWqD6yBgWqSxm/93US6tfhfad3YK8htLXfKEuIyrNmRldTKirMLzd+QSc+nuo9AkT/FwT06plFtwi1XRStJOu062qMo2Nn7/88WzxpWixmsDrGO
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR13MB4403.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(136003)(366004)(396003)(346002)(376002)(39840400004)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(6486002)(478600001)(19627235002)(86362001)(33716001)(41300700001)(38100700002)(83380400001)(107886003)(26005)(6506007)(8936002)(6666004)(44832011)(4326008)(9686003)(6512007)(66556008)(8676002)(2906002)(5660300002)(54906003)(6916009)(316002)(66476007)(66946007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?6DLapVX7LSD4jijdTmKRaLxK6QhxWOl1Wy1mGO8KQUYvWS8tc4DpzmwXa2jR?=
- =?us-ascii?Q?mm5OZflfiQzzMk7FzPUUUAj0eWUzd1rMNipCsz97sRkxK92sAJ86XxON8VZH?=
- =?us-ascii?Q?aMUmYW4tc/kmWbvt0F058roXqVYmJHuyve8EEMPtGfwiZ1YiPgmGQDajCLLW?=
- =?us-ascii?Q?46/DZH8fZ1dHVRMtJmvActiEzEiK7LehcM3nG9G3f6XYQw0EFdNVEWnbeaWu?=
- =?us-ascii?Q?c/IETZg9f/Qi3wak/T2ktdPe1NcK/5+PLttltDaESf+DlKV96Rw1WMjON7oL?=
- =?us-ascii?Q?JkrKTCT3lC5zL35AH45xCVcmdkppLFIsKmdnWwwaOLdaNJ41YQAV4WYgJGX3?=
- =?us-ascii?Q?FYIBSWalk2lOwAbfUlAdy54qqBumRaSXTE74V0R8VD9Jn2ORNne77fl9Wqfr?=
- =?us-ascii?Q?5pnD2b9p3UnGlFyxjpla/MSTsb2lXgMQtyumZRZCee246TpT+SYlHCzDJB14?=
- =?us-ascii?Q?G+NNzRmP+BegnFxNnIA8clvF+5BumpWf0x4okty0uHIZaf47J6LcTR5tJPjJ?=
- =?us-ascii?Q?jquEOUShp8NqHieaOph5SorO8QCgEgXZ5L3Ias1ZbUAxBYHl0pqi5Drv5JUC?=
- =?us-ascii?Q?uWZ+ezcrUkNaVPWIXcym/tv5oqgaCFS5DcmZb1WM3imqmEmtUtAnUkkhklDQ?=
- =?us-ascii?Q?I3uzb9n3d/m2Br1/OjO3Kv7jf80R2N6smtJo6Y5b2iJ9sizQNfp2Dd2VdCGW?=
- =?us-ascii?Q?NtPVcSrIeE06T0JE9fl12Hug1wXF2CR+RdPvALMMFI5+bTCmlpUjBIhBomY2?=
- =?us-ascii?Q?SKZiqhQKgGFgsltn1Tkst4Ktw4+Le5IXDzVxhm/W1lRlz87lWqnoI97uS9AH?=
- =?us-ascii?Q?oaaAHL7G5Im9JLecqt6EqCAJHCbFwfBB6iP2OUWjKuEZOtVbqq2nJmqL5JU6?=
- =?us-ascii?Q?4wUkMC8jfVks/+P5MXMh0nz1q3WxsI8Qd7dyc1wblN8yKrkbM7v5nIj0Jwxh?=
- =?us-ascii?Q?78vFJvXREAktcZCQ670wBJ8j1vXdZSv1+nuL0/xd4blaU338nSkJtcGT5jsD?=
- =?us-ascii?Q?RD1IBac3R/IT6y3848EIuRlNpbUzH1v+QJ1P83ot03hO4kJ4j8EvsAPpWl5D?=
- =?us-ascii?Q?DKdA1azTQYlKASVnbvN0EpEQfgvW8/OdaDfBuZXb9jND2NmeQ6IvfndAn8gA?=
- =?us-ascii?Q?q/OauErg3vvm6h6Dr+q5Rm2KlymwWyadwYlo8itpEy9HXs4QxEj1AnHFMnJx?=
- =?us-ascii?Q?o0CJ+UlDptx2CZ6ezCNqpa8lVtMMHJkbJhLWINVizs7wXkNPibeJl8d5tInq?=
- =?us-ascii?Q?1YKbJlCjzcCXNitBH0R1e5rb3bm8D6Xfn0l50ZfOfvivoorBa4jYFVXcI8o5?=
- =?us-ascii?Q?4JHHJswh2eLwi5wOys5EL0QeC1ff2lDbFPoLpdoSrbQncDou/xkWQxPai8L0?=
- =?us-ascii?Q?j+HIr4K8N5ffHKNnA8xYoTqL8fdpWqox8iMQgSwvy0aYpFN2Kc7HSBKW4C5L?=
- =?us-ascii?Q?d2qnD8VfOl93PmG2gzuaWnZ0A5nz0GDA82t++HLArZPtd8KKObygvG8qGyrT?=
- =?us-ascii?Q?v3KzkiQffOiIiIMHK8o36BAgjoVTVqvwDcByZjt0lRYLCXFXrTmTJNFCZPX/?=
- =?us-ascii?Q?v98aq/Ppgon9aJhBhb59FsueeLkxlRpc/s0Dhw0/ajmM6Es/kPCNC7RFk97R?=
- =?us-ascii?Q?RQ=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ac3f0f26-21df-41d2-bce5-08dc2655e9e5
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR13MB4403.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2024 14:22:41.9237
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: u3sd72Bk8OzFvRu2M3DRV6JD8o5ZEcOvrt2yXgYsb7Gzzn4fnz5GOv/19XdGnpSaWcosjJOqg6YHL7d4+J0++iln32lbdfA5yCL/WFDwbqM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR13MB5856
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 05, 2024 at 01:35:45PM +0000, Simon Horman wrote:
-> On Fri, Feb 02, 2024 at 01:37:17PM +0200, Louis Peens wrote:
-> > From: Daniel Basilio <daniel.basilio@corigine.com>
-> > 
-> > The 1st and 2nd expansion BAR configuration registers are configured,
-> > when the driver starts up, in variables 'barcfg_msix_general' and
-> > 'barcfg_msix_xpb', respectively. The 'LengthSelect' field is ORed in
-> > from bit 0, which is incorrect. The 'LengthSelect' field should
-> > start from bit 27.
-> > 
-> > This has largely gone un-noticed because
-> > NFP_PCIE_BAR_PCIE2CPP_LengthSelect_32BIT happens to be 0.
-> > 
-> > Fixes: 4cb584e0ee7d ("nfp: add CPP access core")
-> > Cc: stable@vger.kernel.org # 4.11+
-> > Signed-off-by: Daniel Basilio <daniel.basilio@corigine.com>
-> > Signed-off-by: Louis Peens <louis.peens@corigine.com>
+Magnus Karlsson wrote:
+> From: Magnus Karlsson <magnus.karlsson@intel.com>
 > 
-> Hi Daniel and Louis,
+> Add support for directing a packet to any socket bound to the same
+> umem. This makes it possible to use the XDP program to select what
+> socket the packet should be received on. The user can populate the
+> XSKMAP with various sockets and as long as they share the same umem,
+> the XDP program can pick any one of them.
 > 
-> If I'm reading this right then this is a code-correctness issue
-> and there is no runtime effect (because 0 is 0 regardless of shifting and
-> masking).
-You are reading this correctly yes.
+> Suggested-by: Yuval El-Hanany <yuvale@radware.com>
+> Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
+
+Reviewed-by: Willem de Bruijn <willemb@google.com>
+
+This will greatly simplify using AF_XDP sockets with standard RSS.
+
+A socket can be attached to each NIC receive queue, and regardless to
+which queue RSS directs a packet, the XDP program can pass it to the
+AF_XDP socket that is the intended target.
+
+In the trivial case a single AF_XDP socket receives all XDP_REDIRECT
+traffic for the entire device. Similar to how a single PF_PACKET
+socket can access all ingress traffic.
+
+Though N fill queues still need to be maintained of course.
+
+> ---
+>  net/xdp/xsk.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> If so, I'd suggest that this is net-next material.
-> And, in turn, if so the Fixes tag should be dropped.
-Thanks Simon. I was definitely flip-flopping on which tree to pick when
-preparing this, if not already merged I would have gladly dropped it
-from this net series. Thinking of it in terms of runtime effect is
-probably a useful angle, will try and do this more when picking a tree.
+> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+> index 1eadfac03cc4..a339e9a1b557 100644
+> --- a/net/xdp/xsk.c
+> +++ b/net/xdp/xsk.c
+> @@ -313,10 +313,13 @@ static bool xsk_is_bound(struct xdp_sock *xs)
+>  
+>  static int xsk_rcv_check(struct xdp_sock *xs, struct xdp_buff *xdp, u32 len)
+>  {
+> +	struct net_device *dev = xdp->rxq->dev;
+> +	u32 qid = xdp->rxq->queue_index;
+> +
+>  	if (!xsk_is_bound(xs))
+>  		return -ENXIO;
+>  
+> -	if (xs->dev != xdp->rxq->dev || xs->queue_id != xdp->rxq->queue_index)
+> +	if (!dev->_rx[qid].pool || xs->umem != dev->_rx[qid].pool->umem)
+>  		return -EINVAL;
+>  
+>  	if (len > xsk_pool_get_rx_frame_size(xs->pool) && !xs->sg) {
+> -- 
+> 2.42.0
+> 
+
+
 
