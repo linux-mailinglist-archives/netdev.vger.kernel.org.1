@@ -1,83 +1,84 @@
-Return-Path: <netdev+bounces-69206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00D0384A1EF
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 19:17:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9CDB84A23A
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 19:29:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A533B2857BA
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 18:17:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52985B22B11
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 18:29:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6FE5481AC;
-	Mon,  5 Feb 2024 18:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191C347F74;
+	Mon,  5 Feb 2024 18:26:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QRaY28Bk"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ZEYJAhpS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8679A481CC
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 18:17:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78326481B5
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 18:25:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707157031; cv=none; b=WfYsYX/kt/p3Jf3uuYZfWDievcVoL3enk/Yf+aeROe5ZocBzyex6YEE2fUnFjIU21RfZ9p58JH6n3Gm35tyFTiji39ASR94Ea4K0crrfDbx5DnPr5OU1BaOAGUkMwPTMe2ILUDVL8oT8baKBsGROIraJsw35z7ofXQovjkvTO1w=
+	t=1707157562; cv=none; b=NMlM167g3DQz08G4onHqNwlm/F+wBbcI7XnzrBU5KK7/f8lw3iIbWXzoLKr2zW2RntmyLOds3xblnjCTH07Dvx1lru+7uss5nu0I2tjELr1gUDJzkYc6h341x0UZphsaqN0EJp1w6SHMz0yZt88Ox00HWjv879t38kbBNSO9nc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707157031; c=relaxed/simple;
-	bh=31fXBEzih1haEBrlPJ0+Hb6SlrAUzaBXdC00zCIvrTI=;
+	s=arc-20240116; t=1707157562; c=relaxed/simple;
+	bh=OhVjfgQ6ypsXAl4aTp6y2RSd+qg4DOU5DAB4K9X8HUE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=I2iNTOjscITexhk9qCUJ72grtWZqALhnGZXkiWV3kjCkuq0Wc+SHX8hEc61YzszK9450gfD6dhlSnz/pCewGP8Yo9ygiBoK19z88mub5XwF8EmlSVGWzuPiI6i5YFGhiYavTtxz7U6ohDs/9GIOj1PhQfWS+bcHKo2+nNIc7o6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QRaY28Bk; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d08d34ce3dso31037201fa.0
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 10:17:09 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=CcYroErZKHtPG0HO+bNf6Sco1VNKSidLS+AC94EhYqKOOgyGFwZa3ZYGcBmOoUJlrrmhOYCPm/eFBr0JtcKztkkrUMazMnUCzlBfSfOayEsiRWfdT/gLuoaXEXg/4SW7ug2LxCgPmdNB2O+9EoRfvewPlf55NrhgSOxSGKN76/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ZEYJAhpS; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d780a392fdso40313855ad.3
+        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 10:25:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707157027; x=1707761827; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KhJScFVR4FQNq408Z6GTxgkNo/xSodNdEGRHDyTXl4Y=;
-        b=QRaY28BkZg+gNcybgibh3QkjfgsR4ub0oLkvGzrJG+naw66/GILdulXaHX9+NYdeoT
-         yhkQJyXoZygy7KKlm04NoaS9bKsJPMqaHr8QCLPwrA4jEsUtw0+ibBBKa044ck2lobzn
-         AZt3LZ+4vlJbJywtzp4MgfR6KlHRCMci/eVVgRa+s2c9R0FX9YVP6IYIA9E7uxhcr+94
-         VtOzP0xkFBxHRaTx7jZAMxxMhCdWvgvG85Qq98Z+CyW7wBO6HuqtbOPxGOuPSlSrkoP0
-         xOd/SVnw20MM9GebSLNFMhLasSoJw7yUtFV56qcC2Lrm5sNLczcjKgfnMu4cSUqk85Fx
-         EI/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707157027; x=1707761827;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=fastly.com; s=google; t=1707157559; x=1707762359; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KhJScFVR4FQNq408Z6GTxgkNo/xSodNdEGRHDyTXl4Y=;
-        b=IEYk7Gg2DNdWCZCUg37SN0NE0o9hF0GBL4Zva7BquKxVGboXUB7jD+B2FwT/w24A+J
-         htdmLSkVSgOhvGG4srxU1vzhDIUQKcZN0D0B0OO1QDC7bUnXp7DngL2JsBX58xj3ksmy
-         fHIepSFLngzwcyp8bzfvvl+r0nW773MQGGH015+5ftXlBPdbl9dFTE+dx0l5DEMYNxfV
-         OGgZLnItOjTR2S3zBRglHN/lhyoRhnLO6DHVaQAPepOIV9aMfvRm7eNZCCvfNdvNseze
-         wAMrIQ2zebEAbiDEteel5X8CAFOKjJK/n7TYKdzrsPakKLXLx0VC16BAfDTzIZC+8Lpp
-         MYbg==
-X-Gm-Message-State: AOJu0YwLFo6mHhEIfGRWdmFogCHlefsPSPzxUI6hLuQmzpgbSkUeceE+
-	YBT70yYlcyWz6x8mmEyZwH4W8/j2uOuHbHj2qc2m1jZOcSiEvcwM
-X-Google-Smtp-Source: AGHT+IGld6JsSVG460A66/okCYVlfBmFW4NdJ/WLgzczr1K2EvNPFXeBnrOWtvOyUVfEI1Mu9fGOXw==
-X-Received: by 2002:a05:6512:3682:b0:511:54a6:1cc4 with SMTP id d2-20020a056512368200b0051154a61cc4mr241204lfs.49.1707157027072;
-        Mon, 05 Feb 2024 10:17:07 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXenKatpREsKXLrPS2NKA7o3VhrsF96EJ7WeqX++4eGCrfyfEfHpNoS71VYEAar7l5+kVPkLknh5jPHNI7p5jr8KZwa/6x0FyBc/5kOqQ2iVnxERY8pisfInbbUWQOeCzE/VloK4eJTZRB84+zqsMaV0shxokM0ww/FnJ8uVmGjHr3oD+jvPOOOzczth9IiocMcLykiEMYpN7HLJyG9tSMGjCwWCYnRTD6N0wvD+T4W+Ose3WhHtocJvhOTr/6wGRGv2Bg+R2rorX1SqrsIJ6tNBlSrZ2Kzpm88v8mUxpg8mplmqprHIp2OiVtDLuCN218PHI35MPpCQq23cV2cda0TCT0jkgPkbEpqjpVsGFqP6qp51izFw6LvETZ3ajqjjHRqc4+3aA==
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id o11-20020a056512230b00b0051154ac7267sm24504lfu.25.2024.02.05.10.17.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 10:17:06 -0800 (PST)
-Date: Mon, 5 Feb 2024 21:17:03 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH net-next v8 05/11] net: stmmac: dwmac-loongson: Add
- Loongson-specific register definitions
-Message-ID: <2gemgo5ghmtp3pmbi2mkdh4ll7lfncnkqe7xrr3ke3dhjkjsas@m2mfy5zlsmca>
-References: <cover.1706601050.git.siyanteng@loongson.cn>
- <e7e265e2d9d2f9d18d4633d037305cef3c5a18ca.1706601050.git.siyanteng@loongson.cn>
+        bh=8YYhJmNwACs7xWzxaru2OLoYfAu9N74lwcPjzUDB+xg=;
+        b=ZEYJAhpSf25DJNLMudbcAfzw1CZQMJLzK/SqywQ5irB9Sq2jplxCSBCbNAxBwS+Txn
+         0L7nwuaesxFlBH0w6dg1Sgv904eVAU3pbZtPqeAE1fuHmxWkP4x3w9iC7mI7SgKqiL0P
+         N1c+a55ibd5Orfi5+g50OkgB/c/mIxdCx5Ftg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707157559; x=1707762359;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8YYhJmNwACs7xWzxaru2OLoYfAu9N74lwcPjzUDB+xg=;
+        b=XHgt7k3SIrvzLvtk62g48AB4fbqXvpgjFM2t+wVqV+0qG6LrFp7oqxChTouwpouYK7
+         ofTVmf3eD/stmBZ2OOMPPIJM8OVX2rK31moRuHmNCbn5FtHarAzQ9HMoeRBZxnTGKngU
+         1eQxEnDwZBwKfETEEduLwoQ6GxoAaGHxrsXyOQmPZmZ7b9m3VK92uId7HPKu9HI5XzvB
+         uaud5cam/iHAi5sUyRviucMxEpozRQUnjQiLKiPq7HKx39A04G94KB3iqU+hWwZc3xL9
+         9en4mXbCoeeTqUBZA2pqiJdnPb4gH58ZxwqHH94BHI3heO6SODP05U2sA/WnGGCjXt1W
+         9g+w==
+X-Gm-Message-State: AOJu0YzJ5eM6rQ0Saoyw7fcwLkNSyyJaBszu9fO6+J0yK7YEfkneI0yN
+	iUYSIJFGqjWL+O+NuW4fJWQvStjLMRhNjlMimxkHb+dxDeimXukXxuBQ/jagJSk=
+X-Google-Smtp-Source: AGHT+IGZSu01SCfpuVAoKxEEGhseye5jcYZ2OTQbBwLSosCOhrRB2L0bvS8C7HVgC2MzoPFWHatu+Q==
+X-Received: by 2002:a17:902:6f16:b0:1d9:742b:fedd with SMTP id w22-20020a1709026f1600b001d9742bfeddmr388747plk.34.1707157558764;
+        Mon, 05 Feb 2024 10:25:58 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUbE7iGxVCPUBH4KvD0r1Rt49gMPSuQYHBQM6KluyR+1rAgHNElceTU1aObRosTlZRh1FwTv1OVSOIf5VGTjAwMhd8Xt2ohpeA+TlBhB25QhdhzTGBdE3ky5Ly2mQFPUURjnLLXpkP7V0yvChDB3MHjgqdb95/LIxNcHrt3OPWTXCSy1W8i1mP2JAETIcueqC1VCOhWPZUjKJlAfeYpMcsRgwqmeW/AIqBe2Ll/QP8ytuhKCvwSk8zJVNm2rMXjBS7v4r2WCPZw9dPf4XXIwg1wQHfPe1mozEAE1ZyTliyzm4tbIDfCZbZQZTYE/sDVy8ZcfcMOe5hCYpNtqjaK70F6w16d3Y1cQsjnGz7pwSTQS97sPVP9HJW5NbUIyIed5uExBAzifS8OSNOShYXISKThexfg5lqTXlALwMxkIgeZdFlfrI+YbM7GE3tE/EfeEvGkoKk4MIrk0dy+qxGTkwcIgG+b4mk0Qvjmwk1Ic/Ij1hLRr1BHlAs9hb4mBBJ3Gvd70gcpQehyK2WeY6yr/Veo52kvsaNLIvPGn2vG5EI=
+Received: from fastly.com (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id iy15-20020a170903130f00b001d8f3c7fb96sm170642plb.166.2024.02.05.10.25.57
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 05 Feb 2024 10:25:58 -0800 (PST)
+Date: Mon, 5 Feb 2024 10:25:55 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Cc: chuck.lever@oracle.com, jlayton@kernel.org, linux-api@vger.kernel.org,
+	brauner@kernel.org, edumazet@google.com, davem@davemloft.net,
+	alexander.duyck@gmail.com, sridhar.samudrala@intel.com,
+	kuba@kernel.org, willemdebruijn.kernel@gmail.com, weiwan@google.com,
+	David.Laight@ACULAB.COM, arnd@arndb.de,
+	Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>,
+	"open list:FILESYSTEMS (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>
+Subject: Re: [PATCH net-next v5 1/3] eventpoll: support busy poll per epoll
+ instance
+Message-ID: <20240205182555.GA10463@fastly.com>
+References: <20240131180811.23566-1-jdamato@fastly.com>
+ <20240131180811.23566-2-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,410 +87,137 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <e7e265e2d9d2f9d18d4633d037305cef3c5a18ca.1706601050.git.siyanteng@loongson.cn>
+In-Reply-To: <20240131180811.23566-2-jdamato@fastly.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 
-On Tue, Jan 30, 2024 at 04:48:17PM +0800, Yanteng Si wrote:
-> There are two types of Loongson DWGMAC. The first type shares the same
-> register definitions and has similar logic as dwmac1000. The second type
-> uses several different register definitions, we think it is necessary to
-> distinguish rx and tx, so we split these bits into two.
+On Wed, Jan 31, 2024 at 06:08:03PM +0000, Joe Damato wrote:
+> Allow busy polling on a per-epoll context basis. The per-epoll context
+> usec timeout value is preferred, but the pre-existing system wide sysctl
+> value is still supported if it specified.
 > 
-> Simply put, we split some single bit fields into double bits fileds:
+> Note that this change uses an xor: either per epoll instance busy polling
+> is enabled on the epoll instance or system wide epoll is enabled. Enabling
+> both is disallowed.
+
+I just realized that I updated the code below to use a an or (||) instead
+of xor (^), but forgot to update the commit message.
+
+I can fix this and send a v6.
+
 > 
->      Name              Tx          Rx
-> 
-> DMA_INTR_ENA_NIE = 0x00040000 | 0x00020000;
-> DMA_INTR_ENA_AIE = 0x00010000 | 0x00008000;
-> DMA_STATUS_NIS   = 0x00040000 | 0x00020000;
-> DMA_STATUS_AIS   = 0x00010000 | 0x00008000;
-> DMA_STATUS_FBI   = 0x00002000 | 0x00001000;
-> 
-> Therefore, when using, TX and RX must be set at the same time.
-> 
-> How to use them:
-> 1. Create the Loongson GNET-specific
-> stmmac_dma_ops.dma_interrupt()
-> stmmac_dma_ops.init_chan()
-> methods in the dwmac-loongson.c driver. Adding all the
-> Loongson-specific macros
-> 
-> 2. Create a Loongson GNET-specific platform setup method with the next
-> semantics:
->    + allocate stmmac_dma_ops instance and initialize it with
->      dwmac1000_dma_ops.
->    + override the stmmac_dma_ops.{dma_interrupt, init_chan} with
->      the pointers to the methods defined in 2.
->    + allocate mac_device_info instance and initialize the
->      mac_device_info.dma field with a pointer to the new
->      stmmac_dma_ops instance.
->    + initialize mac_device_info in a way it's done in
->      dwmac1000_setup().
-> 
-> 3. Initialize plat_stmmacenet_data.setup() with the pointer to the
-> method created in 2.
-> 
-> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
 > ---
->  .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 248 ++++++++++++++++++
->  1 file changed, 248 insertions(+)
+>  fs/eventpoll.c | 49 +++++++++++++++++++++++++++++++++++++++++++++----
+>  1 file changed, 45 insertions(+), 4 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> index e7ce027cc14e..3b3578318cc1 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> @@ -8,6 +8,193 @@
->  #include <linux/device.h>
->  #include <linux/of_irq.h>
->  #include "stmmac.h"
-> +#include "dwmac_dma.h"
-> +#include "dwmac1000.h"
-> +
-
-> +#define DMA_INTR_ENA_NIE_TX_LOONGSON 0x00040000	/* Normal Loongson Tx Summary */
-> +#define DMA_INTR_ENA_NIE_RX_LOONGSON 0x00020000	/* Normal Loongson Rx Summary */
-> +#define DMA_INTR_NORMAL_LOONGSON	(DMA_INTR_ENA_NIE_TX_LOONGSON | \
-> +			 DMA_INTR_ENA_NIE_RX_LOONGSON | DMA_INTR_ENA_RIE | \
-> +			 DMA_INTR_ENA_TIE)
-> +
-> +#define DMA_INTR_ENA_AIE_TX_LOONGSON 0x00010000	/* Abnormal Loongson Tx Summary */
-> +#define DMA_INTR_ENA_AIE_RX_LOONGSON 0x00008000	/* Abnormal Loongson Rx Summary */
-> +
-> +#define DMA_INTR_ABNORMAL_LOONGSON	(DMA_INTR_ENA_AIE_TX_LOONGSON | \
-> +				DMA_INTR_ENA_AIE_RX_LOONGSON | DMA_INTR_ENA_FBE | \
-> +				DMA_INTR_ENA_UNE)
-> +
-> +#define DMA_INTR_DEFAULT_MASK_LOONGSON	(DMA_INTR_NORMAL_LOONGSON | DMA_INTR_ABNORMAL_LOONGSON)
-> +
-> +#define DMA_STATUS_NIS_TX_LOONGSON	0x00040000	/* Normal Loongson Tx Interrupt Summary */
-> +#define DMA_STATUS_NIS_RX_LOONGSON	0x00020000	/* Normal Loongson Rx Interrupt Summary */
-> +
-> +#define DMA_STATUS_AIS_TX_LOONGSON	0x00010000	/* Abnormal Loongson Tx Interrupt Summary */
-> +#define DMA_STATUS_AIS_RX_LOONGSON	0x00008000	/* Abnormal Loongson Rx Interrupt Summary */
-> +
-> +#define DMA_STATUS_FBI_TX_LOONGSON	0x00002000	/* Fatal Loongson Tx Bus Error Interrupt */
-> +#define DMA_STATUS_FBI_RX_LOONGSON	0x00001000	/* Fatal Loongson Rx Bus Error Interrupt */
-> +
-> +#define DMA_STATUS_MSK_COMMON_LOONGSON		(DMA_STATUS_NIS_TX_LOONGSON | \
-> +					 DMA_STATUS_NIS_RX_LOONGSON | DMA_STATUS_AIS_TX_LOONGSON | \
-> +					 DMA_STATUS_AIS_RX_LOONGSON | DMA_STATUS_FBI_TX_LOONGSON | \
-> +					 DMA_STATUS_FBI_RX_LOONGSON)
-
-Max 80 chars per line please.
-
-> +
-> +#define DMA_STATUS_MSK_RX_LOONGSON		(DMA_STATUS_ERI | \
-> +					 DMA_STATUS_RWT | \
-> +					 DMA_STATUS_RPS | \
-> +					 DMA_STATUS_RU | \
-> +					 DMA_STATUS_RI | \
-> +					 DMA_STATUS_OVF | \
-> +					 DMA_STATUS_MSK_COMMON_LOONGSON)
-> +
-> +#define DMA_STATUS_MSK_TX_LOONGSON		(DMA_STATUS_ETI | \
-> +					 DMA_STATUS_UNF | \
-> +					 DMA_STATUS_TJT | \
-> +					 DMA_STATUS_TU | \
-> +					 DMA_STATUS_TPS | \
-> +					 DMA_STATUS_TI | \
-> +					 DMA_STATUS_MSK_COMMON_LOONGSON)
-> +
-
-> +struct loongson_data {
-> +	struct device *dev;
-> +	u32 lgmac_version;
-
-> +	struct stmmac_dma_ops dwlgmac_dma_ops;
-
-Just figured out we can do without this field being added to the
-private data. See my note in the loongson_setup() method.
-
-> +};
-> +
-
-> +static void dwlgmac_dma_init_channel(struct stmmac_priv *priv,
-
-The "dwlgmac_" prefix is confusing. There is the DW XLGMAC IP-core for
-which the "dwxlgmac_" is more appropriate and "x" is easy to miss
-should your version of the prefix is met. Consider changing it to
-something like "loongson_gnet_".
-
-> +				     void __iomem *ioaddr,
-> +				     struct stmmac_dma_cfg *dma_cfg, u32 chan)
+> diff --git a/fs/eventpoll.c b/fs/eventpoll.c
+> index 3534d36a1474..ce75189d46df 100644
+> --- a/fs/eventpoll.c
+> +++ b/fs/eventpoll.c
+> @@ -227,6 +227,8 @@ struct eventpoll {
+>  #ifdef CONFIG_NET_RX_BUSY_POLL
+>  	/* used to track busy poll napi_id */
+>  	unsigned int napi_id;
+> +	/* busy poll timeout */
+> +	u64 busy_poll_usecs;
+>  #endif
+>  
+>  #ifdef CONFIG_DEBUG_LOCK_ALLOC
+> @@ -386,12 +388,44 @@ static inline int ep_events_available(struct eventpoll *ep)
+>  		READ_ONCE(ep->ovflist) != EP_UNACTIVE_PTR;
+>  }
+>  
+> +/**
+> + * busy_loop_ep_timeout - check if busy poll has timed out. The timeout value
+> + * from the epoll instance ep is preferred, but if it is not set fallback to
+> + * the system-wide global via busy_loop_timeout.
+> + *
+> + * @start_time: The start time used to compute the remaining time until timeout.
+> + * @ep: Pointer to the eventpoll context.
+> + *
+> + * Return: true if the timeout has expired, false otherwise.
+> + */
+> +static inline bool busy_loop_ep_timeout(unsigned long start_time, struct eventpoll *ep)
 > +{
-> +	u32 value;
-> +	int txpbl = dma_cfg->txpbl ?: dma_cfg->pbl;
-> +	int rxpbl = dma_cfg->rxpbl ?: dma_cfg->pbl;
+> +#ifdef CONFIG_NET_RX_BUSY_POLL
+> +	unsigned long bp_usec = READ_ONCE(ep->busy_poll_usecs);
 > +
-> +	/* common channel control register config */
-> +	value = readl(ioaddr + DMA_CHAN_BUS_MODE(chan));
+> +	if (bp_usec) {
+> +		unsigned long end_time = start_time + bp_usec;
+> +		unsigned long now = busy_loop_current_time();
 > +
-> +	/* Set the DMA PBL (Programmable Burst Length) mode.
-> +	 *
-> +	 * Note: before stmmac core 3.50 this mode bit was 4xPBL, and
-> +	 * post 3.5 mode bit acts as 8*PBL.
-> +	 */
-> +	if (dma_cfg->pblx8)
-> +		value |= DMA_BUS_MODE_MAXPBL;
-> +	value |= DMA_BUS_MODE_USP;
-> +	value &= ~(DMA_BUS_MODE_PBL_MASK | DMA_BUS_MODE_RPBL_MASK);
-> +	value |= (txpbl << DMA_BUS_MODE_PBL_SHIFT);
-> +	value |= (rxpbl << DMA_BUS_MODE_RPBL_SHIFT);
-> +
-> +	/* Set the Fixed burst mode */
-> +	if (dma_cfg->fixed_burst)
-> +		value |= DMA_BUS_MODE_FB;
-> +
-> +	/* Mixed Burst has no effect when fb is set */
-> +	if (dma_cfg->mixed_burst)
-> +		value |= DMA_BUS_MODE_MB;
-> +
-> +	value |= DMA_BUS_MODE_ATDS;
-> +
-> +	if (dma_cfg->aal)
-> +		value |= DMA_BUS_MODE_AAL;
-> +
-> +	writel(value, ioaddr + DMA_BUS_MODE);
-> +
-> +	/* Mask interrupts by writing to CSR7 */
-> +	writel(DMA_INTR_DEFAULT_MASK_LOONGSON, ioaddr + DMA_INTR_ENA);
-> +}
-> +
-
-> +static int dwlgmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
-
-The same note as above.
-
-> +				 struct stmmac_extra_stats *x, u32 chan, u32 dir)
-> +{
-> +	struct stmmac_rxq_stats *rxq_stats = &priv->xstats.rxq_stats[chan];
-> +	struct stmmac_txq_stats *txq_stats = &priv->xstats.txq_stats[chan];
-> +	int ret = 0;
-> +	/* read the status register (CSR5) */
-> +	u32 nor_intr_status;
-> +	u32 abnor_intr_status;
-> +	u32 fb_intr_status;
-
-Reverse xmas tree please.
-
-> +	u32 intr_status = readl(ioaddr + DMA_CHAN_STATUS(chan));
-
-Please move the initialization into a separate statement.
-
-> +
-> +#ifdef DWMAC_DMA_DEBUG
-> +	/* Enable it to monitor DMA rx/tx status in case of critical problems */
-> +	pr_debug("%s: [CSR5: 0x%08x]\n", __func__, intr_status);
-> +	show_tx_process_state(intr_status);
-> +	show_rx_process_state(intr_status);
+> +		return time_after(now, end_time);
+> +	} else {
+> +		return busy_loop_timeout(start_time);
+> +	}
 > +#endif
-
-This will cause a build-error if DWMAC_DMA_DEBUG is defined. Just drop
-it.
-
-> +
-> +	if (dir == DMA_DIR_RX)
-> +		intr_status &= DMA_STATUS_MSK_RX_LOONGSON;
-> +	else if (dir == DMA_DIR_TX)
-> +		intr_status &= DMA_STATUS_MSK_TX_LOONGSON;
-> +
-> +	nor_intr_status = intr_status & (DMA_STATUS_NIS_TX_LOONGSON |
-> +		DMA_STATUS_NIS_RX_LOONGSON);
-> +	abnor_intr_status = intr_status & (DMA_STATUS_AIS_TX_LOONGSON |
-> +		DMA_STATUS_AIS_RX_LOONGSON);
-> +	fb_intr_status = intr_status & (DMA_STATUS_FBI_TX_LOONGSON |
-> +		DMA_STATUS_FBI_RX_LOONGSON);
-> +
-> +	/* ABNORMAL interrupts */
-> +	if (unlikely(abnor_intr_status)) {
-> +		if (unlikely(intr_status & DMA_STATUS_UNF)) {
-> +			ret = tx_hard_error_bump_tc;
-> +			x->tx_undeflow_irq++;
-> +		}
-> +		if (unlikely(intr_status & DMA_STATUS_TJT))
-> +			x->tx_jabber_irq++;
-> +
-> +		if (unlikely(intr_status & DMA_STATUS_OVF))
-> +			x->rx_overflow_irq++;
-> +
-> +		if (unlikely(intr_status & DMA_STATUS_RU))
-> +			x->rx_buf_unav_irq++;
-> +		if (unlikely(intr_status & DMA_STATUS_RPS))
-> +			x->rx_process_stopped_irq++;
-> +		if (unlikely(intr_status & DMA_STATUS_RWT))
-> +			x->rx_watchdog_irq++;
-> +		if (unlikely(intr_status & DMA_STATUS_ETI))
-> +			x->tx_early_irq++;
-> +		if (unlikely(intr_status & DMA_STATUS_TPS)) {
-> +			x->tx_process_stopped_irq++;
-> +			ret = tx_hard_error;
-> +		}
-> +		if (unlikely(intr_status & fb_intr_status)) {
-> +			x->fatal_bus_error_irq++;
-> +			ret = tx_hard_error;
-> +		}
-> +	}
-> +	/* TX/RX NORMAL interrupts */
-> +	if (likely(nor_intr_status)) {
-> +		if (likely(intr_status & DMA_STATUS_RI)) {
-> +			u32 value = readl(ioaddr + DMA_INTR_ENA);
-> +			/* to schedule NAPI on real RIE event. */
-> +			if (likely(value & DMA_INTR_ENA_RIE)) {
-> +				u64_stats_update_begin(&rxq_stats->syncp);
-> +				rxq_stats->rx_normal_irq_n++;
-> +				u64_stats_update_end(&rxq_stats->syncp);
-> +				ret |= handle_rx;
-> +			}
-> +		}
-> +		if (likely(intr_status & DMA_STATUS_TI)) {
-> +			u64_stats_update_begin(&txq_stats->syncp);
-> +			txq_stats->tx_normal_irq_n++;
-> +			u64_stats_update_end(&txq_stats->syncp);
-> +			ret |= handle_tx;
-> +		}
-> +		if (unlikely(intr_status & DMA_STATUS_ERI))
-> +			x->rx_early_irq++;
-> +	}
-> +	/* Optional hardware blocks, interrupts should be disabled */
-> +	if (unlikely(intr_status &
-> +		     (DMA_STATUS_GPI | DMA_STATUS_GMI | DMA_STATUS_GLI)))
-> +		pr_warn("%s: unexpected status %08x\n", __func__, intr_status);
-> +
-> +	/* Clear the interrupt by writing a logic 1 to the CSR5[15-0] */
-> +	writel((intr_status & 0x7ffff), ioaddr + DMA_CHAN_STATUS(chan));
-> +
-> +	return ret;
+> +	return true;
 > +}
->  
->  struct stmmac_pci_info {
->  	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
-> @@ -121,6 +308,48 @@ static struct stmmac_pci_info loongson_gmac_pci_info = {
->  	.config = loongson_gmac_config,
->  };
->  
-
-> +static struct mac_device_info *loongson_setup(void *apriv)
-
-Consider using the GNET-specific prefix, like "loongson_gnet_".
-
+> +
+>  #ifdef CONFIG_NET_RX_BUSY_POLL
+> +static bool ep_busy_loop_on(struct eventpoll *ep)
 > +{
-> +	struct stmmac_priv *priv = apriv;
-> +	struct mac_device_info *mac;
-> +	struct loongson_data *ld;
-> +
-> +	mac = devm_kzalloc(priv->device, sizeof(*mac), GFP_KERNEL);
-> +	if (!mac)
-> +		return NULL;
-
-What about devm_kzalloc()-ing the stmmac_dma_ops instance here and
-initializing it as it's done in the probe method? Thus ...
-
-> +
-> +	ld = priv->plat->bsp_priv;
-> +	mac->dma = &ld->dwlgmac_dma_ops;
-
-... this can be replaced with:
-
-	mac->dma = devm_kzalloc(priv->device, sizeof(*mac->dma), GFP_KERNEL);
-	if (!mac->dma)
-		return -ENOMEM;
-
-	*mac->dma = dwmac1000_dma_ops;
-	mac->dma->init_chan = loongson_gnet_dma_init_channel;
-	mac->dma->dma_interrupt = loongson_gnet_dma_interrupt;
-
-> +
-> +	/* Pre-initialize the respective "mac" fields as it's done in
-> +	 * dwmac1000_setup()
-> +	 */
-> +	priv->dev->priv_flags |= IFF_UNICAST_FLT;
-> +	mac->pcsr = priv->ioaddr;
-> +	mac->multicast_filter_bins = priv->plat->multicast_filter_bins;
-> +	mac->unicast_filter_entries = priv->plat->unicast_filter_entries;
-> +	mac->mcast_bits_log2 = 0;
-> +
-> +	if (mac->multicast_filter_bins)
-> +		mac->mcast_bits_log2 = ilog2(mac->multicast_filter_bins);
-> +
-> +	mac->link.duplex = GMAC_CONTROL_DM;
-> +	mac->link.speed10 = GMAC_CONTROL_PS;
-> +	mac->link.speed100 = GMAC_CONTROL_PS | GMAC_CONTROL_FES;
-> +	mac->link.speed1000 = 0;
-> +	mac->link.speed_mask = GMAC_CONTROL_PS | GMAC_CONTROL_FES;
-> +	mac->mii.addr = GMAC_MII_ADDR;
-> +	mac->mii.data = GMAC_MII_DATA;
-> +	mac->mii.addr_shift = 11;
-> +	mac->mii.addr_mask = 0x0000F800;
-> +	mac->mii.reg_shift = 6;
-> +	mac->mii.reg_mask = 0x000007C0;
-> +	mac->mii.clk_csr_shift = 2;
-> +	mac->mii.clk_csr_mask = GENMASK(5, 2);
-> +
-> +	return mac;
+> +	return !!ep->busy_poll_usecs || net_busy_loop_on();
 > +}
 > +
->  static int loongson_dwmac_probe(struct pci_dev *pdev,
->  				const struct pci_device_id *id)
+>  static bool ep_busy_loop_end(void *p, unsigned long start_time)
 >  {
-> @@ -129,6 +358,7 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
->  	struct stmmac_pci_info *info;
->  	struct stmmac_resources res;
->  	struct device_node *np;
-> +	struct loongson_data *ld;
-
-reverse xmas tree order please.
-
+>  	struct eventpoll *ep = p;
 >  
->  	plat = devm_kzalloc(&pdev->dev, sizeof(*plat), GFP_KERNEL);
->  	if (!plat)
-> @@ -145,6 +375,10 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
->  	if (!plat->dma_cfg)
->  		return -ENOMEM;
+> -	return ep_events_available(ep) || busy_loop_timeout(start_time);
+> +	return ep_events_available(ep) || busy_loop_ep_timeout(start_time, ep);
+>  }
 >  
-> +	ld = devm_kzalloc(&pdev->dev, sizeof(*ld), GFP_KERNEL);
-> +	if (!ld)
-> +		return -ENOMEM;
-> +
->  	np = dev_of_node(&pdev->dev);
->  	plat->mdio_node = of_get_child_by_name(np, "mdio");
->  	if (plat->mdio_node) {
-> @@ -197,6 +431,20 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
->  	if (ret)
->  		goto err_disable_device;
+>  /*
+> @@ -404,7 +438,7 @@ static bool ep_busy_loop(struct eventpoll *ep, int nonblock)
+>  {
+>  	unsigned int napi_id = READ_ONCE(ep->napi_id);
 >  
-> +	ld->dev = &pdev->dev;
-
-> +	ld->lgmac_version = readl(res.addr + GMAC_VERSION) & 0xff;
-
-AFAICS the lgmac_version is unused in out of the probe() method
-context. What about locally defining it?
-
-> +
-> +	/* Activate loongson custom ip */
-
-> +	if (ld->lgmac_version < DWMAC_CORE_3_50) {
-
-Please define a new macro for the GNET MAC.
-
-> +		ld->dwlgmac_dma_ops = dwmac1000_dma_ops;
-> +		ld->dwlgmac_dma_ops.init_chan = dwlgmac_dma_init_channel;
-> +		ld->dwlgmac_dma_ops.dma_interrupt = dwlgmac_dma_interrupt;
-
-See my comment in the loongson_setup() method.
-
--Serge(y)
-
-> +
-> +		plat->setup = loongson_setup;
-> +	}
-> +
-> +	plat->bsp_priv = ld;
-> +
->  	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
->  	if (ret)
->  		goto err_disable_device;
+> -	if ((napi_id >= MIN_NAPI_ID) && net_busy_loop_on()) {
+> +	if ((napi_id >= MIN_NAPI_ID) && ep_busy_loop_on(ep)) {
+>  		napi_busy_loop(napi_id, nonblock ? NULL : ep_busy_loop_end, ep, false,
+>  			       BUSY_POLL_BUDGET);
+>  		if (ep_events_available(ep))
+> @@ -430,7 +464,8 @@ static inline void ep_set_busy_poll_napi_id(struct epitem *epi)
+>  	struct socket *sock;
+>  	struct sock *sk;
+>  
+> -	if (!net_busy_loop_on())
+> +	ep = epi->ep;
+> +	if (!ep_busy_loop_on(ep))
+>  		return;
+>  
+>  	sock = sock_from_file(epi->ffd.file);
+> @@ -442,7 +477,6 @@ static inline void ep_set_busy_poll_napi_id(struct epitem *epi)
+>  		return;
+>  
+>  	napi_id = READ_ONCE(sk->sk_napi_id);
+> -	ep = epi->ep;
+>  
+>  	/* Non-NAPI IDs can be rejected
+>  	 *	or
+> @@ -466,6 +500,10 @@ static inline void ep_set_busy_poll_napi_id(struct epitem *epi)
+>  {
+>  }
+>  
+> +static inline bool ep_busy_loop_on(struct eventpoll *ep)
+> +{
+> +	return false;
+> +}
+>  #endif /* CONFIG_NET_RX_BUSY_POLL */
+>  
+>  /*
+> @@ -2058,6 +2096,9 @@ static int do_epoll_create(int flags)
+>  		error = PTR_ERR(file);
+>  		goto out_free_fd;
+>  	}
+> +#ifdef CONFIG_NET_RX_BUSY_POLL
+> +	ep->busy_poll_usecs = 0;
+> +#endif
+>  	ep->file = file;
+>  	fd_install(fd, file);
+>  	return fd;
 > -- 
-> 2.31.4
+> 2.25.1
 > 
 
