@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-69110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D71C849A97
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 13:40:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D110D849A95
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 13:40:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0A5F1F2248C
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:40:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CECF281AEE
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:40:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C8F31CA82;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07DBC1C6B8;
 	Mon,  5 Feb 2024 12:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QB5Ni1/w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZGfGz25k"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D89861C6A3;
-	Mon,  5 Feb 2024 12:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88DF1C69F
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 12:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707136830; cv=none; b=EbHfNJkbdzeiN1Ig5RWTahUMlO++2NfzdS9g8bPOx9xMEjZ4n8bcFe3LdLhQz+iQ1/8sU7T8dFag9qfI3R2WMBKdDJSXeMYoD3l1hu6UD+Ima3USUR6eFvNKO8rFbG03BKvdQBoTCxtd4CREBmhYW+WiaYNFnrUuFA2mtvE7fv4=
+	t=1707136830; cv=none; b=Gp0pMoGjJzdMcvnop4a5juvZU3iAaAxjPcG2NLucrJPSoOoaei7/iNXTNAT9ENGKXSGzauKCHQlbCTB6c4fTi4e0himTMhIgvzXxryeop/UbAJV/fvlsszVWCEBOFg5QeBZ7tM/Ms3wAdtJEg6vfAegrn73Wo8JynqHDuZdUGm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707136830; c=relaxed/simple;
-	bh=m3WsINejG9mt+LaZg7YOLBgHE6sg4vO0JusBqaY9D7I=;
+	bh=A06eZAl7IghCEpPSiYue6wl1aProEoys1xR5upotnQk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=W6uP33zsFenvNxDMORyBbXfUD7DmiNQUOJ4Wiu6OTXf2lTsLAbkbkj+iwYo6/mOiE6lGtmfxDnD+FoaItvDSeHtP8L8joXDLgK7qTZ2Q0VGk1QL3SufjMzlzyReikABjfyCSF4bPTEH6Vn7fxRqzEr7RmSR4WxBOsfg3zcdna9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QB5Ni1/w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5EFE1C4167D;
+	 In-Reply-To:To:Cc; b=ImN6MQusn/T6MMiT4VLXgMbVQCqdFxfORvCgL4uoYPhjdnnDSdWbb4x+m84tIyDs2Trc7gDn+MHFDT0yjIpHmsVvirLAdP5XpBdxUTc0C5kAEiUq1e3Jz34QlXo24EqjaXkqg1I9vD9WKPb685ODEV95Mc1FYnEQwLPQRL7iy04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZGfGz25k; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 52DEEC43330;
 	Mon,  5 Feb 2024 12:40:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707136830;
-	bh=m3WsINejG9mt+LaZg7YOLBgHE6sg4vO0JusBqaY9D7I=;
+	bh=A06eZAl7IghCEpPSiYue6wl1aProEoys1xR5upotnQk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=QB5Ni1/wbp3UgkVl/QlQLf7I/LpZQ51K7Xj1qer0msACsSkHQnWZ5uwWPsyrJCVK1
-	 FqAETj3tfMTQzp7iqxSyYMWA4OilhQm98Pyb9kfXURI4wXlMSgHOCyL7c/Sh2YkHkV
-	 IHJ/77vDslndlwUsLEZbjGPDFapBXqgRSUQWbIbwbE7V8k8uotTdHnZvY0ohdoQPjS
-	 ybWsCA5cD2pjpB5pta3TWi2Q/JTAD4IJYsMdEtLe37bKDpgXpYGD/iif0yNVWiYFVN
-	 wwsy1wb+P2PucZ9ktcJuwULQ7y/fX5vxNM9RRIYovtpFGod0wgx6+G4mkd20eGUacC
-	 zUGun28Cn791Q==
+	b=ZGfGz25kLUxjzOJX8M+Ml8OaTipVBpELUVxYSjj7izYkkF39coUVAGIXHR0krRwSp
+	 CfdyJpEM9w/Efn4zOrSUHMU11PGSWhKijCyGKwEBM3JDxxSui+LD6lbJMlSYXie/fR
+	 7FhKuDj/vYuglqoHjYi95R8zHBoUd/OAlXbBni5nl88qNtyWmgnbaEXLtZZsVZc57f
+	 vEHurSXeDLltOwq8vw7s7eJ0eTQnPAJi/Z9V0TqUvzt5daBvdQFfe2qwLDXT9MYI6k
+	 /TQdi3ewBQgtnFXk7gMwnPJuXmPvn5sDg9cw0NPwjICley1bmJzep2ffWCU++7vCCL
+	 fuSYcbSngBZsA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3D531E2F2F2;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2DB71E2F2F1;
 	Mon,  5 Feb 2024 12:40:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,40 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: ocelot: update the MODULE_DESCRIPTION()
+Subject: Re: [PATCH net-next] net: dsa: reindent arguments of
+ dsa_user_vlan_for_each()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170713683024.8022.2267399224887898520.git-patchwork-notify@kernel.org>
+ <170713683018.8022.3648864153566501617.git-patchwork-notify@kernel.org>
 Date: Mon, 05 Feb 2024 12:40:30 +0000
-References: <20240202160538.2139629-1-leitao@debian.org>
-In-Reply-To: <20240202160538.2139629-1-leitao@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, vladimir.oltean@nxp.com, claudiu.manoil@nxp.com,
- alexandre.belloni@bootlin.com, UNGLinuxDriver@microchip.com,
- horatiu.vultur@microchip.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+References: <20240202162041.2313212-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20240202162041.2313212-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, f.fainelli@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Fri,  2 Feb 2024 08:05:37 -0800 you wrote:
-> commit 1c870c63d7d2 ("net: fill in MODULE_DESCRIPTION()s for ocelot")
-> got a suggestion from Vladimir Oltean after it had landed in net-next.
+On Fri,  2 Feb 2024 18:20:41 +0200 you wrote:
+> These got misaligned after commit 6ca80638b90c ("net: dsa: Use conduit
+> and user terms").
 > 
-> Rewrite the module description according to Vladimir's suggestion.
-> 
-> Fixes: 1c870c63d7d2 ("net: fill in MODULE_DESCRIPTION()s for ocelot")
-> Suggested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> 
-> [...]
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+>  net/dsa/user.c | 8 ++++----
+>  1 file changed, 4 insertions(+), 4 deletions(-)
 
 Here is the summary with links:
-  - [net-next] net: ocelot: update the MODULE_DESCRIPTION()
-    https://git.kernel.org/netdev/net-next/c/1c7bbea992c8
+  - [net-next] net: dsa: reindent arguments of dsa_user_vlan_for_each()
+    https://git.kernel.org/netdev/net-next/c/0cd216d769fb
 
 You are awesome, thank you!
 -- 
