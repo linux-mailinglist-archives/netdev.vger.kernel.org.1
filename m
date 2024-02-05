@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-69070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AD448497B1
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 11:23:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A6AA8497B0
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 11:23:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6B0AEB24BF4
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 10:23:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48C08284C6D
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 10:23:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 424C216436;
-	Mon,  5 Feb 2024 10:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E40168DA;
+	Mon,  5 Feb 2024 10:23:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="G/LvXyJt"
+	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="m2a/spPV"
 X-Original-To: netdev@vger.kernel.org
-Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2157.outbound.protection.outlook.com [40.92.62.157])
+Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2153.outbound.protection.outlook.com [40.92.62.153])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91652168DC
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 10:23:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.62.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 133CD171BC
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 10:23:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.62.153
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707128614; cv=fail; b=ep0sjjBZT1vP9vHbRXIczvvFPgLE02RbMdrnTgsp/gn71PLuVR0Ls9P4VRBvOuIrdsjGEOj0l/YQJLWg/aTQ+PVMj0pvTSegJ6Yx66KyT8cddGdt9qLOHNqJD3Qd6MMRKzb5JN6d+J0JF+Y5BNgQyW25AcnSywK+mfDF9Hym6Hc=
+	t=1707128620; cv=fail; b=s8xEy6rCKoYYKzcc15X1JQo36uSgmaPQYxxrlLs6kGs1qU3ogGdd93cnOpQDST5G07De5j5r+hguT8WrgKaETBrzHK0XwHzhq1p6pXl6Psn00SIWA6qzFmynsMnd/FktJCGIkyOAXswbLxUybWrjCnbZv1pg+zLYo+1kde2FBFA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707128614; c=relaxed/simple;
-	bh=GCCWczj6fCBrAibS2s8GcINTgZ8LI3I9MY4A/FtxR0A=;
+	s=arc-20240116; t=1707128620; c=relaxed/simple;
+	bh=QhGbgy9+rl+ghWeCSxy7ADup7xXRPhV5njC2cvDo5bE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=U+A9xj3e7PJlJjoeT4ZZ631N1zfXR/uihc8xCbnjmJ4kmT3tQcljFp9zxJ+AM2Oz9d74YhjlyiPCIgLV7S3Kd3+CFHatkurQRZ7kgVHfVes/14NZ7yCOxhq8NsCEiip/5QT8k+oECQc0xhraarIdlIqQHJM8SvPThrQMY191EiY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=hotmail.com; dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b=G/LvXyJt; arc=fail smtp.client-ip=40.92.62.157
+	 Content-Type:MIME-Version; b=ZEWYxJ7SjoWWwauuY+izFcU4qc18vB27TTWZlMmfONZu81ds6tDssijXmsy6ja4wHi/2AKo3xyb+9dDBNO7B/2ubQoajSoZpTbGv5lO8R5RhGIkmxDro3A7kr0ERZwTv9h3rgi3E4UjMx58H7V9YSHfJ/A87mAwtAd/rkHH8n0g=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=hotmail.com; dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b=m2a/spPV; arc=fail smtp.client-ip=40.92.62.153
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=V+d44cH4GuU+7mTpM4efLeeGTit8q8Ke6KTcAK/wOycQMRCN/78twusrHfCnZt6AY66BD0ZH7ODLGyzv5QO2uZDg8IRFf7JQMz6w0CESkH2RNtxvpMxQfr3vdZSJKB6Rh+2eOLkP12JECLFCKqSPWfjENgTBqBvOMWyJDKRSFOSe6NEQm9leTs34lGA4437TEq1DwZUjmBIPo/qf236sM5ez/i5B63U3+Wcq99GUod8ZTE/5fRyKmew/nTXPQHwYbgBlwMdOwbIrMV9TE/ke4qVqQrhysvGQD64ddaFnV8VnORZN/6u2RUs+E9NtZ41zJljuJ/YhLrGAKNFfaODouA==
+ b=SIv9vvYejScROwlOEjWjbIJQuOHUwiX8DJMlMjXeU3I5yLuH6OjICD42OW+Zes0g4lZJMFYJMAdhAhuIQKlVhze8PKs+omyNXPCeCUmIYwxaGptZPjwYKrSVb45Iw8ljSyGQc2dwejwUrn8CErYuuBdtdLiWzmKC4JGkG+QHGB5hLe6dY4Wl9vT/De7DOiF9iguQJzx7OkXyClNiSS6FY/WtAoI4GCt5kx06OCBaNRTsGlwsYM3Oe77k7v9Wh59XfUeBkjB5scrG4+2WAX0K93LMznRtaWtIcRY/cGrwBq/g+GatRdTd6t1v7M63BRxc8QEmu8x/y1a5fS7YznLHRQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=T2qF+wLtguJmJG6CttwnwFP/h84xBEaP+NBd7LggYmk=;
- b=XogoSD7377LR3A5f5fNDDF88XX6OxQ+EkTGrWQf4hbCxG5Vn5VRZ6rMkbbA4d5oARfh/lhMJmNVgS7ncdhcDxzodH/DHALfwlI6pInaisVgJEftjE+RyQs30NrVIwls5pmg02Df0kHdj8Af9iEUoJHDj88m+w8PEkH55lXQAaIbj/A+o4clRf+mbEzSx0ZkirdEje27fMNXmbPnNOa3WmVgAzu87g6EMoeItOgC8t3+eFkiDwIKJQNcur6pjX+wFq0BlnBHTiCPPywxN5idjZHhkLGFFruEJvfsuyxfrLK3TUzkCAvQm0zFiBnatA5bN0aUBDE9+hGav1uC2CydeoA==
+ bh=PQFMu+d8fEhUzsGqXOEZeVcjvPj7yJ8NyEd/JqbpeSE=;
+ b=SErvF1JIHCoQVENr8bhX87mvp7au/wmw3xXx9Zo2pVoARKiM0p6KXb3yH1sYAh/83SeVvt3zfa4jU0oElGYgoqlrNDPK0iBNW1kSV25UCZGhm/0NOGYzbBGixZ8R+aivNNUCaXjx39Ci6zE4tPm+ol7tqGzIrQtAILTpoc9rjkRgyYeHfDNssMiAIfe6YlvGqK7hQnl9zMGXGCcUf5KlR28iqCi6UUqARg+59Z6efORMpGo/Tnbg9cQDKVJwsvAwgCLynJyOglqPDrW01rJR2nXKTpe7HiKYrcxQiTNQgEKUc+Y2aHIKTpmIaw5iaabR6Zs/sA3X4XHdzUWdyiL29Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
  dkim=none; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=T2qF+wLtguJmJG6CttwnwFP/h84xBEaP+NBd7LggYmk=;
- b=G/LvXyJtBR9szT35+3GCu2FnDNCiOvU7bdAGPlqojLkFuwr+yT8DhOY1bWG9LMXoPWDxYhh+ba13dHYpbA+BomxMCWZUwExk5XYrFoV9d8ENAPFhMe5oDC3coi3CGBqGD5s1AluPmyXOmTUnynCaNZ7YrVAVWrMtsToorM2FACENZXGB0Uc7xg8HoDCG7YIkhoYXEVGp6aylg0aEQgAdgynfwA1Z12GterBkeZRmCSYBRqAAchg3syf5q1z4t1uoce980KYJoV3WWz+WS/xXYUKKxGEn+CS7PERCeWCF/rAYCkyxvHtBGGK/LKsaL+kKDK0nhedUs9MINdA7rq3YaQ==
+ bh=PQFMu+d8fEhUzsGqXOEZeVcjvPj7yJ8NyEd/JqbpeSE=;
+ b=m2a/spPVN2dKdzD161b+uSlP5i3bRDO3dD75EIwfvJYpDVE8KmLErHWAsxIprgT3m3krsWG81fm+yYBLVaglA036XnCHb1SazVuL2cbBWcJ7SEILuLnFo95M6LTFyQeG+UEDDUBb5ig8fU2PfKUmiuKAJEDuPMMzqZK5wYWmyNYCWRLbqzmZHfSaueVsAiwe6n3cHHlR88vw9z4frPCR8Kc6uUg3Sd+qU0f98V/0Ixazx2EkDxicgtmtN4Vpzfxhb++YtfR5nm7P5KRpcRPOyS5Af4BFupI4lvlUpo2gEqj1Jo7k+h5CJ8O0Y0/W0bSkKaa8n+9ku5MMmWP0U0da5Q==
 Received: from MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:14c::12)
  by ME4P282MB0886.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:93::9) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.34; Mon, 5 Feb
- 2024 10:23:21 +0000
+ 2024 10:23:30 +0000
 Received: from MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
  ([fe80::4b5:c5db:e39a:e48f]) by MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
  ([fe80::4b5:c5db:e39a:e48f%4]) with mapi id 15.20.7249.032; Mon, 5 Feb 2024
- 10:23:21 +0000
+ 10:23:30 +0000
 From: Jinjian Song <songjinjian@hotmail.com>
 To: netdev@vger.kernel.org
 Cc: alan.zhang1@fibocom.com,
@@ -82,20 +82,20 @@ Cc: alan.zhang1@fibocom.com,
 	ryazanov.s.a@gmail.com,
 	vsankar@lenovo.com,
 	zhangrc@fibocom.com
-Subject: [net-next v9 3/4] net: wwan: t7xx: Infrastructure for early port configuration
-Date: Mon,  5 Feb 2024 18:22:29 +0800
+Subject: [net-next v9 4/4] net: wwan: t7xx: Add fastboot WWAN port
+Date: Mon,  5 Feb 2024 18:22:30 +0800
 Message-ID:
- <MEYP282MB26976131761A40D36FFF7DE8BB472@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
+ <MEYP282MB269716FCE0A2DD81815622F9BB472@MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240205102230.89081-1-songjinjian@hotmail.com>
 References: <20240205102230.89081-1-songjinjian@hotmail.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-TMN: [x12zxqh2ee5tDaSCxfIAHnH6g0d47b7m]
+X-TMN: [Lnne84yinz95x/++tgas9yZ0V3D8wIje]
 X-ClientProxiedBy: SG3P274CA0022.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:be::34)
  To MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM (2603:10c6:220:14c::12)
 X-Microsoft-Original-Message-ID:
- <20240205102230.89081-4-songjinjian@hotmail.com>
+ <20240205102230.89081-5-songjinjian@hotmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -105,39 +105,39 @@ MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
 X-MS-TrafficTypeDiagnostic: MEYP282MB2697:EE_|ME4P282MB0886:EE_
-X-MS-Office365-Filtering-Correlation-Id: e627fa51-cde9-4519-99ad-08dc263479be
+X-MS-Office365-Filtering-Correlation-Id: 2ea92c3b-48bd-45cb-da74-08dc26347f4a
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	Ih4PkTK++5frEPE3HXI0OQBBLB0tWuo7LY55K9eNV9axRR+iPHEVYRQ1fMMdNqP0G/EHeOGoz7VB3edDB1ora0bHqnMmK4fUUh86vGfwg8enLrZnzuZ+ti2chMztSTdtgj9Ctgn/GR+BLsx/FmOH4h9ilhLb1zW4+Z+hOC9dF+8D/F3FXuRC3K/30rssvv7nrE7+xjk+1XxSXdpM+4XqbXqfbrD/O0DwyKFRJEnsBj5fRHBmvRjQjS1LDVNhhapBQNbqiO6e3o8/XOMVQMr3jcvFoPFyPzbVQjabm/tAk3Iq6L+brCxxmM597KCXOvIOqntEskyg8YHJcUDRdaO9goeAhrbeA4FWGxIl/vJ02xR2s2f18WKXcRGgmC3CrvcpHzm76wu+adGxBTWb1hKYz3Y+UJJgjzMdjYkbsY8Iemr+pNo388lMgdtvJ9eUzqjEET56M+pgjBemxMqbSMMXzDOVfQrNBSWKM9J//KGofrouu7iB7vhHDfkYdvdVTfUXT9c/wilK1RiQLcISJgiKNjc7z39o7Nw6BM8UbXCqKdjqmsWZw10pdldUxRDyxlTRbQ2QNV1PqSn8KEPMt/TXwf1rsCt7+uc7DeFy9kpkOnU=
+	UlNRWtjeignWUIsuc+9iSn6w/ZHSZUwxoaJqH1MU15+ls/VAtvdl5w5yzsfvjL+ztsW6qBa6QNi4g6QLQaxyyX5kQEdv4XVupVuYecIJ1F9AKFIF7jdkDfR817AJ7780mTabhNEr4BSg8yh5Dmf982d9i9GjtCwGc1WjcayJr8+ZiA/lk8Lawief8nqSe0hqlQwRzH7fh2Busy76lD1P6VE7u7g4IysLWOjP5u4GEw7106xPtkKpACz/BYkkYDu8+CjNdSPUiWS76cnC/LBabv0vMpYZdP45nQfJwR/VxjUQzIQadQmeoBGPTI7lbhrH0Ak7gdLASsx82rUP9CyG8a9tftf7o5oOwToQdSIUmvI90sF6dRb4eQU9i2HGwE9+8f332/MNldgupjDuSmYnAcVmLc1hgbSUrPDLzdnzZwqR2+3Gf+G0ZjmlbAZHOsu24ynGjV5Shfz36f6jHhcyhLMUjyCsNs2UkkRoMy2IeW9fZ9hRE9isYcjQ72S+9dnyEP8ZyNVZRCh0Q0Dco0cddTLg4dfkph2RoquWExh+XF3AZueYjt83hg5muRDxYMe1fITO32qKTT3R+3kmXhFLWiQkPVKvS6l9XFAxMtUwlRo=
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?tMcCgHIa1sX0/MnsmkT80d/9wCxueNnEcuT9q8XIZwT+Y3SVhqVaEuscvJyx?=
- =?us-ascii?Q?5Nl3cwD/rj7j4w50DRaS3rs2wEQ3axEWxklf3KGmOxK8ItAx2jDuTCMSuFDD?=
- =?us-ascii?Q?+SrAyWPbr66zQJ7v0IIujAqTXtfMiFlQz7rdOjNrcDjnAVnNXDweA6BS9sVE?=
- =?us-ascii?Q?hSGYEEuTdWv2irZWpAKB0+44WnRgWsEsj2VVWQ9mOhZJd7YZLJnqx+HfOXXZ?=
- =?us-ascii?Q?njvBkvGFM4ZtY/V8CuQv9MQteHXG2PqcgqfYp/ZwjYiCi+Z5TyQpGa9ZXKL9?=
- =?us-ascii?Q?RBRKkXRBqYNTkPD6sYHnq8m0z5knRCCwrfHN2rX+bIXnMOe/CjiVQ5WPUeW3?=
- =?us-ascii?Q?5w21I3uG/dgHVxp1qzLgJcor38rjKc4qv++NO3uenuRI+ugcEHArTNn/C4Yp?=
- =?us-ascii?Q?451N/ZYOdarKDTJ2fHvv7Vher+6k4iHtujXYDfHV71xGsUiCQhwtQ7Ud/iC3?=
- =?us-ascii?Q?2Bwf5Le8VxTPp8k4qLCuuumhuRGSAGz1wHu7SVnPYsktj4Sn9bC8bo2apBpn?=
- =?us-ascii?Q?KvxoR6vMwqhnRAFcNK6DxGIPF7wPXttAvXfIAIHjK/ri9J4aoGxz40w6FpzE?=
- =?us-ascii?Q?reKrcG+r7mwm7Dw3+tY3Q+oy+SraZJEd9IT39OBTvVEpbm/nOnvr3ZmNz4lQ?=
- =?us-ascii?Q?xbonjpUvLaBxbDAYZwrO4PaPAb7uGVhECM/d2fQYF3AJdagxEZ2RtL2gpgSk?=
- =?us-ascii?Q?C0alo9Jouw2sb86GqQTkDAOx1L0fdrisw7V+vzM+xh1aarbn+4T4DWLMwVjJ?=
- =?us-ascii?Q?t+jw+YfBoTTTtguWLrTqZVPAFbMMim0R4RhWYeoFNiZ/ZSgKUlUr9HjqBr1F?=
- =?us-ascii?Q?+TkimFSTlJPMgE1j8sevaNX1Xba6L7z7ylKGUtXXOEnxlA7dDLH1oIIOCOBd?=
- =?us-ascii?Q?GQdSiTRnzT0bd4gQh2E5P96E2sp88/vfNy411sSQpSyxDnLnJEvrkql7dlMF?=
- =?us-ascii?Q?wh2Y8R1UWtjzdiUo7TZUpyGQXlHLrlY9yXkQrFfP+1a1qsG9ZaGfkwWwVXKd?=
- =?us-ascii?Q?vCkQgMD3e9MGNCHykVe58c0QWi2nQkdi9IRBy9lm4xQExWT+uFTk34LMX3rt?=
- =?us-ascii?Q?HZF/P2xZw0oYQdwyrImk7JOmxuifa3XkwAAhsRMAjpDkWoK2ojhf0f5CXnWh?=
- =?us-ascii?Q?Try8rNPrIvG080jwOr2FXBHWB04k+zxnTEmhajavJ7VnLiz9aFY3PUc5mEwA?=
- =?us-ascii?Q?t8Zrwvp6tAneBJHc3PlP/GzbSkY2sV1ngc0ya+eN0dRORUWUSBBh/+pUPrk?=
+	=?us-ascii?Q?/cUsCuWhPog9Lq5n4zZCqjwJlampSrCDjJwnJN5bGR44FcUwomA5AlmjFc28?=
+ =?us-ascii?Q?Wn73mkRgZjiMSAUpsf43wsbpjrQiK9krtcMeENzqXp3a0MIlrXE+WAqhrzVu?=
+ =?us-ascii?Q?YdxYkuS2jD3ctyqDiIREhBtvlodAmDHw6mWuuZri1pbQcMYAFvzGPPebycgi?=
+ =?us-ascii?Q?7nuwKCTJGrvS02OX8VkcrdtAiKccNPRC1LeN15c55UQihupEIHokymzm2ONp?=
+ =?us-ascii?Q?BaCluTohg60OqCc+vVeRF2RoOKyLdH2Bx3bhVJQ476F1rq7LKDcPfx8S+z2H?=
+ =?us-ascii?Q?Sa0XupYQN41zsYJDOyAju9hb5acS+M74A2xOYZkxJ83Sp9Tc0TaVYCkcYJUp?=
+ =?us-ascii?Q?pl+ltJuZ7NamlSghOKUQFo3T0s4ktqmHrux64W4AopfMQ1VJmRbxtI73nBPe?=
+ =?us-ascii?Q?VY2FM+hpgU+kjW1Bus8CvxDOnrBR+1iI0Ry9HUbxJnuuWOULgCLUXPRFChVS?=
+ =?us-ascii?Q?JbayFomatdJcFfJL2rNzutqQL2rruvyf7aR1IWx3ofepJ1jKrbQylMEBg/g5?=
+ =?us-ascii?Q?/QNv4lyVbzEVmwMt/EFAkiwlL4DelOYN+7Im2bxRadM3X8VWAlo8U6DMcLEt?=
+ =?us-ascii?Q?6d6dTjnyAbuOiniLX9CEq7oZVqow8GMaI7nGoedvLZYfxLXOwlMaVJvQhV+X?=
+ =?us-ascii?Q?TgrudR6O6cyT4dXO0YsxwIKx55n+fH+2MZey4M7+OOOroZulO9zIDUqaqU9A?=
+ =?us-ascii?Q?nxzDYwZtmY5m6LZQMeN2EW3vvXuTCmkmAmfPQCIqo5+noJVfjuTW1zFJJFzF?=
+ =?us-ascii?Q?oIbzzVgYIXegNmzmGZj/SAmQNGrebpJMKGCv0Qf12uKQABdTonx9nNqDJBgg?=
+ =?us-ascii?Q?StN37C5VVOIFd9oqRTx853hxPKgGplIlFgelXh1LRqKOimiVQxnKHokV9yML?=
+ =?us-ascii?Q?RRVM37iAlIImQE7MR+vgfsDelXrBO6cW6UivxtZ16k3jERgZxR00WYCASEiT?=
+ =?us-ascii?Q?4xaQRCev/Z5tAdTy/0u0j5ONoi1bg6RDoVE3y/5J8zTXFmySe7qMxt33aJXI?=
+ =?us-ascii?Q?8SDChN3/0SNI6h6vf/yEiptaWAOA8Ym23ZXgREbMO0T/3C+AUf+9vHfwWSl8?=
+ =?us-ascii?Q?21uhg/scfy0IyeGxotZP4BS4roGfrciHnEs3DbburUAtR05yVeBr2b9kJYlx?=
+ =?us-ascii?Q?Zjy4ZKevlHsUPrgBOfoFcqQ1xqwFRmktci6X5aLjzD3qqj4Yii4CcynGrwhg?=
+ =?us-ascii?Q?sAOzsmvx0aWA/A2NOmkksbscPKc2F64/+qOxQKZmlm/M+jvxCOBmipiQeSE?=
  =?us-ascii?Q?=3D?=
 X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-746f3.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: e627fa51-cde9-4519-99ad-08dc263479be
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ea92c3b-48bd-45cb-da74-08dc26347f4a
 X-MS-Exchange-CrossTenant-AuthSource: MEYP282MB2697.AUSP282.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2024 10:23:21.2717
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2024 10:23:30.1004
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
@@ -147,785 +147,301 @@ X-MS-Exchange-Transport-CrossTenantHeadersStamped: ME4P282MB0886
 
 From: Jinjian Song <jinjian.song@fibocom.com>
 
-To support cases such as FW update or Core dump, the t7xx
-device is capable of signaling the host that a special port
-needs to be created before the handshake phase.
+On early detection of wwan device in fastboot mode, driver sets
+up CLDMA0 HW tx/rx queues for raw data transfer and then create
+fastboot port to userspace.
 
-Adds the infrastructure required to create the early ports
-which also requires a different configuration of CLDMA queues.
+Application can use this port to flash firmware and collect
+core dump by fastboot protocol commands.
+E.g., flash firmware through fastboot port:
+ - "download:%08x": write data to memory with the download size.
+ - "flash:%s": write the previously downloaded image to the named partition.
+ - "reboot": reboot the device.
 
-Base on the v5 patch version of follow series:
-'net: wwan: t7xx: fw flashing & coredump support'
-(https://patchwork.kernel.org/project/netdevbpf/patch/3777bb382f4b0395cb594a602c5c79dbab86c9e0.1674307425.git.m.chetan.kumar@linux.intel.com/)
+Link: https://android.googlesource.com/platform/system/core/+/refs/heads/main/fastboot/README.md
 
 Signed-off-by: Jinjian Song <jinjian.song@fibocom.com>
 ---
-v9:
- * ignore FSM_CMD_PRE_STOP when sysfs t7xx_mode in reset and unknown in
- * t7xx_md_exit() 
+v8:
+ * modify spelling error in WWAN 
 v7:
- * optimize fsm_routine_stopping()
-v5:
- * using t7xx_mode_update to update sysfs t7xx_mode
+ * add fastboot protocol link and command description to commit info
+v6:
+ * reorganize code to avoid dumplication
 v4:
- * change PORT_CH_ID_UNIMPORTANT to PORT_CH_UNIMPORTANT
- * delete t7xx_wait_pm_config() in t7xx_pci_pm_init()
- * define T7XX_MAX_POSSIBLE_PORTS_NUM to get max port num
- * define macro wait_for_expected_dev_stage to be more readable
- * change prev_status to status in struct t7xx_fsm_ctl
+ * change function prefix to t7xx_port_fastboot
+ * change the name 'FASTBOOT' to fastboot in struct t7xx_early_port_conf
 ---
- drivers/net/wwan/t7xx/t7xx_hif_cldma.c     |  47 +++++---
- drivers/net/wwan/t7xx/t7xx_hif_cldma.h     |  18 ++-
- drivers/net/wwan/t7xx/t7xx_modem_ops.c     |   8 +-
- drivers/net/wwan/t7xx/t7xx_pci.c           |   2 +-
- drivers/net/wwan/t7xx/t7xx_port.h          |   4 +
- drivers/net/wwan/t7xx/t7xx_port_proxy.c    | 105 ++++++++++++++---
- drivers/net/wwan/t7xx/t7xx_port_proxy.h    |  10 ++
- drivers/net/wwan/t7xx/t7xx_port_wwan.c     |   5 +-
- drivers/net/wwan/t7xx/t7xx_reg.h           |  24 +++-
- drivers/net/wwan/t7xx/t7xx_state_monitor.c | 127 +++++++++++++++++----
- drivers/net/wwan/t7xx/t7xx_state_monitor.h |   1 +
- 11 files changed, 290 insertions(+), 61 deletions(-)
+ .../networking/device_drivers/wwan/t7xx.rst   |  18 +++
+ drivers/net/wwan/t7xx/t7xx_port_proxy.c       |   3 +
+ drivers/net/wwan/t7xx/t7xx_port_wwan.c        | 116 ++++++++++++++----
+ drivers/net/wwan/t7xx/t7xx_state_monitor.c    |   4 +
+ 4 files changed, 115 insertions(+), 26 deletions(-)
 
-diff --git a/drivers/net/wwan/t7xx/t7xx_hif_cldma.c b/drivers/net/wwan/t7xx/t7xx_hif_cldma.c
-index cc70360364b7..abc41a7089fa 100644
---- a/drivers/net/wwan/t7xx/t7xx_hif_cldma.c
-+++ b/drivers/net/wwan/t7xx/t7xx_hif_cldma.c
-@@ -57,8 +57,6 @@
- #define CHECK_Q_STOP_TIMEOUT_US		1000000
- #define CHECK_Q_STOP_STEP_US		10000
+diff --git a/Documentation/networking/device_drivers/wwan/t7xx.rst b/Documentation/networking/device_drivers/wwan/t7xx.rst
+index 8429b9927341..f346f5f85f15 100644
+--- a/Documentation/networking/device_drivers/wwan/t7xx.rst
++++ b/Documentation/networking/device_drivers/wwan/t7xx.rst
+@@ -125,6 +125,20 @@ The driver exposes an AT port by implementing AT WWAN Port.
+ The userspace end of the control port is a /dev/wwan0at0 character
+ device. Application shall use this interface to issue AT commands.
  
--#define CLDMA_JUMBO_BUFF_SZ		(63 * 1024 + sizeof(struct ccci_header))
--
- static void md_cd_queue_struct_reset(struct cldma_queue *queue, struct cldma_ctrl *md_ctrl,
- 				     enum mtk_txrx tx_rx, unsigned int index)
- {
-@@ -161,7 +159,7 @@ static int t7xx_cldma_gpd_rx_from_q(struct cldma_queue *queue, int budget, bool
- 		skb_reset_tail_pointer(skb);
- 		skb_put(skb, le16_to_cpu(gpd->data_buff_len));
- 
--		ret = md_ctrl->recv_skb(queue, skb);
-+		ret = queue->recv_skb(queue, skb);
- 		/* Break processing, will try again later */
- 		if (ret < 0)
- 			return ret;
-@@ -897,13 +895,13 @@ static void t7xx_cldma_hw_start_send(struct cldma_ctrl *md_ctrl, int qno,
- 
- /**
-  * t7xx_cldma_set_recv_skb() - Set the callback to handle RX packets.
-- * @md_ctrl: CLDMA context structure.
-+ * @queue: CLDMA queue.
-  * @recv_skb: Receiving skb callback.
-  */
--void t7xx_cldma_set_recv_skb(struct cldma_ctrl *md_ctrl,
-+void t7xx_cldma_set_recv_skb(struct cldma_queue *queue,
- 			     int (*recv_skb)(struct cldma_queue *queue, struct sk_buff *skb))
- {
--	md_ctrl->recv_skb = recv_skb;
-+	queue->recv_skb = recv_skb;
- }
- 
- /**
-@@ -993,6 +991,28 @@ int t7xx_cldma_send_skb(struct cldma_ctrl *md_ctrl, int qno, struct sk_buff *skb
- 	return ret;
- }
- 
-+static void t7xx_cldma_adjust_config(struct cldma_ctrl *md_ctrl, enum cldma_cfg cfg_id)
-+{
-+	int qno;
++fastboot port userspace ABI
++---------------------------
 +
-+	for (qno = 0; qno < CLDMA_RXQ_NUM; qno++) {
-+		md_ctrl->rx_ring[qno].pkt_size = CLDMA_SHARED_Q_BUFF_SZ;
-+		t7xx_cldma_set_recv_skb(&md_ctrl->rxq[qno], t7xx_port_proxy_recv_skb);
-+	}
++/dev/wwan0fastboot0 character device
++~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++The driver exposes a fastboot protocol interface by implementing
++fastboot WWAN Port. The userspace end of the fastboot channel pipe is a
++/dev/wwan0fastboot0 character device. Application shall use this interface for
++fastboot protocol communication.
 +
-+	md_ctrl->rx_ring[CLDMA_RXQ_NUM - 1].pkt_size = CLDMA_JUMBO_BUFF_SZ;
++Please note that driver needs to be reloaded to export /dev/wwan0fastboot0
++port, because device needs a cold reset after enter ``fastboot_switching``
++mode.
 +
-+	for (qno = 0; qno < CLDMA_TXQ_NUM; qno++)
-+		md_ctrl->tx_ring[qno].pkt_size = CLDMA_SHARED_Q_BUFF_SZ;
+ The MediaTek's T700 modem supports the 3GPP TS 27.007 [4] specification.
+ 
+ References
+@@ -146,3 +160,7 @@ speak the Mobile Interface Broadband Model (MBIM) protocol"*
+ [4] *Specification # 27.007 - 3GPP*
+ 
+ - https://www.3gpp.org/DynaReport/27007.htm
 +
-+	if (cfg_id == CLDMA_DEDICATED_Q_CFG) {
-+		md_ctrl->tx_ring[CLDMA_Q_IDX_DUMP].pkt_size = CLDMA_DEDICATED_Q_BUFF_SZ;
-+		md_ctrl->rx_ring[CLDMA_Q_IDX_DUMP].pkt_size = CLDMA_DEDICATED_Q_BUFF_SZ;
-+		t7xx_cldma_set_recv_skb(&md_ctrl->rxq[CLDMA_Q_IDX_DUMP],
-+					t7xx_port_proxy_recv_skb_from_dedicated_queue);
-+	}
-+}
++[5] *fastboot "a mechanism for communicating with bootloaders"*
 +
- static int t7xx_cldma_late_init(struct cldma_ctrl *md_ctrl)
- {
- 	char dma_pool_name[32];
-@@ -1018,16 +1038,9 @@ static int t7xx_cldma_late_init(struct cldma_ctrl *md_ctrl)
- 			dev_err(md_ctrl->dev, "control TX ring init fail\n");
- 			goto err_free_tx_ring;
- 		}
--
--		md_ctrl->tx_ring[i].pkt_size = CLDMA_MTU;
- 	}
- 
- 	for (j = 0; j < CLDMA_RXQ_NUM; j++) {
--		md_ctrl->rx_ring[j].pkt_size = CLDMA_MTU;
--
--		if (j == CLDMA_RXQ_NUM - 1)
--			md_ctrl->rx_ring[j].pkt_size = CLDMA_JUMBO_BUFF_SZ;
--
- 		ret = t7xx_cldma_rx_ring_init(md_ctrl, &md_ctrl->rx_ring[j]);
- 		if (ret) {
- 			dev_err(md_ctrl->dev, "Control RX ring init fail\n");
-@@ -1094,6 +1107,7 @@ int t7xx_cldma_alloc(enum cldma_id hif_id, struct t7xx_pci_dev *t7xx_dev)
- {
- 	struct device *dev = &t7xx_dev->pdev->dev;
- 	struct cldma_ctrl *md_ctrl;
-+	int qno;
- 
- 	md_ctrl = devm_kzalloc(dev, sizeof(*md_ctrl), GFP_KERNEL);
- 	if (!md_ctrl)
-@@ -1102,7 +1116,9 @@ int t7xx_cldma_alloc(enum cldma_id hif_id, struct t7xx_pci_dev *t7xx_dev)
- 	md_ctrl->t7xx_dev = t7xx_dev;
- 	md_ctrl->dev = dev;
- 	md_ctrl->hif_id = hif_id;
--	md_ctrl->recv_skb = t7xx_cldma_default_recv_skb;
-+	for (qno = 0; qno < CLDMA_RXQ_NUM; qno++)
-+		md_ctrl->rxq[qno].recv_skb = t7xx_cldma_default_recv_skb;
-+
- 	t7xx_hw_info_init(md_ctrl);
- 	t7xx_dev->md->md_ctrl[hif_id] = md_ctrl;
- 	return 0;
-@@ -1332,9 +1348,10 @@ int t7xx_cldma_init(struct cldma_ctrl *md_ctrl)
- 	return -ENOMEM;
- }
- 
--void t7xx_cldma_switch_cfg(struct cldma_ctrl *md_ctrl)
-+void t7xx_cldma_switch_cfg(struct cldma_ctrl *md_ctrl, enum cldma_cfg cfg_id)
- {
- 	t7xx_cldma_late_release(md_ctrl);
-+	t7xx_cldma_adjust_config(md_ctrl, cfg_id);
- 	t7xx_cldma_late_init(md_ctrl);
- }
- 
-diff --git a/drivers/net/wwan/t7xx/t7xx_hif_cldma.h b/drivers/net/wwan/t7xx/t7xx_hif_cldma.h
-index 4410bac6993a..f2d9941be9c8 100644
---- a/drivers/net/wwan/t7xx/t7xx_hif_cldma.h
-+++ b/drivers/net/wwan/t7xx/t7xx_hif_cldma.h
-@@ -31,6 +31,10 @@
- #include "t7xx_cldma.h"
- #include "t7xx_pci.h"
- 
-+#define CLDMA_JUMBO_BUFF_SZ		(63 * 1024 + sizeof(struct ccci_header))
-+#define CLDMA_SHARED_Q_BUFF_SZ		3584
-+#define CLDMA_DEDICATED_Q_BUFF_SZ	2048
-+
- /**
-  * enum cldma_id - Identifiers for CLDMA HW units.
-  * @CLDMA_ID_MD: Modem control channel.
-@@ -55,6 +59,11 @@ struct cldma_gpd {
- 	__le16 not_used2;
- };
- 
-+enum cldma_cfg {
-+	CLDMA_SHARED_Q_CFG,
-+	CLDMA_DEDICATED_Q_CFG,
-+};
-+
- struct cldma_request {
- 	struct cldma_gpd *gpd;	/* Virtual address for CPU */
- 	dma_addr_t gpd_addr;	/* Physical address for DMA */
-@@ -82,6 +91,7 @@ struct cldma_queue {
- 	wait_queue_head_t req_wq;	/* Only for TX */
- 	struct workqueue_struct *worker;
- 	struct work_struct cldma_work;
-+	int (*recv_skb)(struct cldma_queue *queue, struct sk_buff *skb);
- };
- 
- struct cldma_ctrl {
-@@ -101,24 +111,22 @@ struct cldma_ctrl {
- 	struct md_pm_entity *pm_entity;
- 	struct t7xx_cldma_hw hw_info;
- 	bool is_late_init;
--	int (*recv_skb)(struct cldma_queue *queue, struct sk_buff *skb);
- };
- 
-+#define CLDMA_Q_IDX_DUMP	1
- #define GPD_FLAGS_HWO		BIT(0)
- #define GPD_FLAGS_IOC		BIT(7)
- #define GPD_DMAPOOL_ALIGN	16
- 
--#define CLDMA_MTU		3584	/* 3.5kB */
--
- int t7xx_cldma_alloc(enum cldma_id hif_id, struct t7xx_pci_dev *t7xx_dev);
- void t7xx_cldma_hif_hw_init(struct cldma_ctrl *md_ctrl);
- int t7xx_cldma_init(struct cldma_ctrl *md_ctrl);
- void t7xx_cldma_exit(struct cldma_ctrl *md_ctrl);
--void t7xx_cldma_switch_cfg(struct cldma_ctrl *md_ctrl);
-+void t7xx_cldma_switch_cfg(struct cldma_ctrl *md_ctrl, enum cldma_cfg cfg_id);
- void t7xx_cldma_start(struct cldma_ctrl *md_ctrl);
- int t7xx_cldma_stop(struct cldma_ctrl *md_ctrl);
- void t7xx_cldma_reset(struct cldma_ctrl *md_ctrl);
--void t7xx_cldma_set_recv_skb(struct cldma_ctrl *md_ctrl,
-+void t7xx_cldma_set_recv_skb(struct cldma_queue *queue,
- 			     int (*recv_skb)(struct cldma_queue *queue, struct sk_buff *skb));
- int t7xx_cldma_send_skb(struct cldma_ctrl *md_ctrl, int qno, struct sk_buff *skb);
- void t7xx_cldma_stop_all_qs(struct cldma_ctrl *md_ctrl, enum mtk_txrx tx_rx);
-diff --git a/drivers/net/wwan/t7xx/t7xx_modem_ops.c b/drivers/net/wwan/t7xx/t7xx_modem_ops.c
-index ca262d2961ed..8d864d4ed77f 100644
---- a/drivers/net/wwan/t7xx/t7xx_modem_ops.c
-+++ b/drivers/net/wwan/t7xx/t7xx_modem_ops.c
-@@ -535,7 +535,7 @@ static void t7xx_md_hk_wq(struct work_struct *work)
- 
- 	/* Clear the HS2 EXIT event appended in core_reset() */
- 	t7xx_fsm_clr_event(ctl, FSM_EVENT_MD_HS2_EXIT);
--	t7xx_cldma_switch_cfg(md->md_ctrl[CLDMA_ID_MD]);
-+	t7xx_cldma_switch_cfg(md->md_ctrl[CLDMA_ID_MD], CLDMA_SHARED_Q_CFG);
- 	t7xx_cldma_start(md->md_ctrl[CLDMA_ID_MD]);
- 	t7xx_fsm_broadcast_state(ctl, MD_STATE_WAITING_FOR_HS2);
- 	md->core_md.handshake_ongoing = true;
-@@ -550,7 +550,7 @@ static void t7xx_ap_hk_wq(struct work_struct *work)
- 	 /* Clear the HS2 EXIT event appended in t7xx_core_reset(). */
- 	t7xx_fsm_clr_event(ctl, FSM_EVENT_AP_HS2_EXIT);
- 	t7xx_cldma_stop(md->md_ctrl[CLDMA_ID_AP]);
--	t7xx_cldma_switch_cfg(md->md_ctrl[CLDMA_ID_AP]);
-+	t7xx_cldma_switch_cfg(md->md_ctrl[CLDMA_ID_AP], CLDMA_SHARED_Q_CFG);
- 	t7xx_cldma_start(md->md_ctrl[CLDMA_ID_AP]);
- 	md->core_ap.handshake_ongoing = true;
- 	t7xx_core_hk_handler(md, &md->core_ap, ctl, FSM_EVENT_AP_HS2, FSM_EVENT_AP_HS2_EXIT);
-@@ -764,6 +764,7 @@ int t7xx_md_init(struct t7xx_pci_dev *t7xx_dev)
- 
- void t7xx_md_exit(struct t7xx_pci_dev *t7xx_dev)
- {
-+	enum t7xx_mode mode = READ_ONCE(t7xx_dev->mode);
- 	struct t7xx_modem *md = t7xx_dev->md;
- 
- 	t7xx_pcie_mac_clear_int(t7xx_dev, SAP_RGU_INT);
-@@ -771,7 +772,8 @@ void t7xx_md_exit(struct t7xx_pci_dev *t7xx_dev)
- 	if (!md->md_init_finish)
- 		return;
- 
--	t7xx_fsm_append_cmd(md->fsm_ctl, FSM_CMD_PRE_STOP, FSM_CMD_FLAG_WAIT_FOR_COMPLETION);
-+	if (mode != T7XX_RESET && mode != T7XX_UNKNOWN)
-+		t7xx_fsm_append_cmd(md->fsm_ctl, FSM_CMD_PRE_STOP, FSM_CMD_FLAG_WAIT_FOR_COMPLETION);
- 	t7xx_port_proxy_uninit(md->port_prox);
- 	t7xx_cldma_exit(md->md_ctrl[CLDMA_ID_AP]);
- 	t7xx_cldma_exit(md->md_ctrl[CLDMA_ID_MD]);
-diff --git a/drivers/net/wwan/t7xx/t7xx_pci.c b/drivers/net/wwan/t7xx/t7xx_pci.c
-index f99eb21cb8cc..e0b1e7a616ca 100644
---- a/drivers/net/wwan/t7xx/t7xx_pci.c
-+++ b/drivers/net/wwan/t7xx/t7xx_pci.c
-@@ -183,7 +183,7 @@ static int t7xx_pci_pm_init(struct t7xx_pci_dev *t7xx_dev)
- 	pm_runtime_set_autosuspend_delay(&pdev->dev, PM_AUTOSUSPEND_MS);
- 	pm_runtime_use_autosuspend(&pdev->dev);
- 
--	return t7xx_wait_pm_config(t7xx_dev);
-+	return 0;
- }
- 
- void t7xx_pci_pm_init_late(struct t7xx_pci_dev *t7xx_dev)
-diff --git a/drivers/net/wwan/t7xx/t7xx_port.h b/drivers/net/wwan/t7xx/t7xx_port.h
-index 4ae8a00a8532..f74d3bab810d 100644
---- a/drivers/net/wwan/t7xx/t7xx_port.h
-+++ b/drivers/net/wwan/t7xx/t7xx_port.h
-@@ -75,6 +75,8 @@ enum port_ch {
- 	PORT_CH_DSS6_TX = 0x20df,
- 	PORT_CH_DSS7_RX = 0x20e0,
- 	PORT_CH_DSS7_TX = 0x20e1,
-+
-+	PORT_CH_UNIMPORTANT = 0xffff,
- };
- 
- struct t7xx_port;
-@@ -135,11 +137,13 @@ struct t7xx_port {
- 	};
- };
- 
-+int t7xx_get_port_mtu(struct t7xx_port *port);
- struct sk_buff *t7xx_port_alloc_skb(int payload);
- struct sk_buff *t7xx_ctrl_alloc_skb(int payload);
- int t7xx_port_enqueue_skb(struct t7xx_port *port, struct sk_buff *skb);
- int t7xx_port_send_skb(struct t7xx_port *port, struct sk_buff *skb, unsigned int pkt_header,
- 		       unsigned int ex_msg);
-+int t7xx_port_send_raw_skb(struct t7xx_port *port, struct sk_buff *skb);
- int t7xx_port_send_ctl_skb(struct t7xx_port *port, struct sk_buff *skb, unsigned int msg,
- 			   unsigned int ex_msg);
- 
++- https://android.googlesource.com/platform/system/core/+/refs/heads/main/fastboot/README.md
 diff --git a/drivers/net/wwan/t7xx/t7xx_port_proxy.c b/drivers/net/wwan/t7xx/t7xx_port_proxy.c
-index 274846d39fbf..e53a152faee4 100644
+index e53a152faee4..8f5e01705af2 100644
 --- a/drivers/net/wwan/t7xx/t7xx_port_proxy.c
 +++ b/drivers/net/wwan/t7xx/t7xx_port_proxy.c
-@@ -48,6 +48,9 @@
- 	     i < (proxy)->port_count;		\
- 	     i++, (p) = &(proxy)->ports[i])
- 
-+#define T7XX_MAX_POSSIBLE_PORTS_NUM	\
-+	(max(ARRAY_SIZE(t7xx_port_conf), ARRAY_SIZE(t7xx_early_port_conf)))
-+
- static const struct t7xx_port_conf t7xx_port_conf[] = {
- 	{
- 		.tx_ch = PORT_CH_UART2_TX,
-@@ -100,6 +103,18 @@ static const struct t7xx_port_conf t7xx_port_conf[] = {
+@@ -112,6 +112,9 @@ static const struct t7xx_port_conf t7xx_early_port_conf[] = {
+ 		.txq_exp_index = CLDMA_Q_IDX_DUMP,
+ 		.rxq_exp_index = CLDMA_Q_IDX_DUMP,
+ 		.path_id = CLDMA_ID_AP,
++		.ops = &wwan_sub_port_ops,
++		.name = "fastboot",
++		.port_type = WWAN_PORT_FASTBOOT,
  	},
  };
  
-+static const struct t7xx_port_conf t7xx_early_port_conf[] = {
-+	{
-+		.tx_ch = PORT_CH_UNIMPORTANT,
-+		.rx_ch = PORT_CH_UNIMPORTANT,
-+		.txq_index = CLDMA_Q_IDX_DUMP,
-+		.rxq_index = CLDMA_Q_IDX_DUMP,
-+		.txq_exp_index = CLDMA_Q_IDX_DUMP,
-+		.rxq_exp_index = CLDMA_Q_IDX_DUMP,
-+		.path_id = CLDMA_ID_AP,
-+	},
-+};
-+
- static struct t7xx_port *t7xx_proxy_get_port_by_ch(struct port_proxy *port_prox, enum port_ch ch)
+diff --git a/drivers/net/wwan/t7xx/t7xx_port_wwan.c b/drivers/net/wwan/t7xx/t7xx_port_wwan.c
+index ddc20ddfa734..4b23ba693f3f 100644
+--- a/drivers/net/wwan/t7xx/t7xx_port_wwan.c
++++ b/drivers/net/wwan/t7xx/t7xx_port_wwan.c
+@@ -2,6 +2,7 @@
+ /*
+  * Copyright (c) 2021, MediaTek Inc.
+  * Copyright (c) 2021-2022, Intel Corporation.
++ * Copyright (c) 2024, Fibocom Wireless Inc.
+  *
+  * Authors:
+  *  Amir Hanania <amir.hanania@intel.com>
+@@ -15,6 +16,7 @@
+  *  Chiranjeevi Rapolu <chiranjeevi.rapolu@intel.com>
+  *  Eliot Lee <eliot.lee@intel.com>
+  *  Sreehari Kancharla <sreehari.kancharla@intel.com>
++ *  Jinjian Song <jinjian.song@fibocom.com>
+  */
+ 
+ #include <linux/atomic.h>
+@@ -33,7 +35,7 @@
+ #include "t7xx_port_proxy.h"
+ #include "t7xx_state_monitor.h"
+ 
+-static int t7xx_port_ctrl_start(struct wwan_port *port)
++static int t7xx_port_wwan_start(struct wwan_port *port)
  {
- 	const struct t7xx_port_conf *port_conf;
-@@ -214,7 +229,17 @@ int t7xx_port_enqueue_skb(struct t7xx_port *port, struct sk_buff *skb)
+ 	struct t7xx_port *port_mtk = wwan_port_get_drvdata(port);
+ 
+@@ -44,30 +46,60 @@ static int t7xx_port_ctrl_start(struct wwan_port *port)
  	return 0;
  }
  
--static int t7xx_port_send_raw_skb(struct t7xx_port *port, struct sk_buff *skb)
-+int t7xx_get_port_mtu(struct t7xx_port *port)
-+{
-+	enum cldma_id path_id = port->port_conf->path_id;
-+	int tx_qno = t7xx_port_get_queue_no(port);
-+	struct cldma_ctrl *md_ctrl;
-+
-+	md_ctrl = port->t7xx_dev->md->md_ctrl[path_id];
-+	return md_ctrl->tx_ring[tx_qno].pkt_size;
-+}
-+
-+int t7xx_port_send_raw_skb(struct t7xx_port *port, struct sk_buff *skb)
+-static void t7xx_port_ctrl_stop(struct wwan_port *port)
++static void t7xx_port_wwan_stop(struct wwan_port *port)
  {
- 	enum cldma_id path_id = port->port_conf->path_id;
- 	struct cldma_ctrl *md_ctrl;
-@@ -329,6 +354,39 @@ static void t7xx_proxy_setup_ch_mapping(struct port_proxy *port_prox)
- 	}
+ 	struct t7xx_port *port_mtk = wwan_port_get_drvdata(port);
+ 
+ 	atomic_dec(&port_mtk->usage_cnt);
  }
  
-+/**
-+ * t7xx_port_proxy_recv_skb_from_dedicated_queue() - Dispatch early port received skb.
-+ * @queue: CLDMA queue.
-+ * @skb: Socket buffer.
-+ *
-+ * Return:
-+ ** 0		- Packet consumed.
-+ ** -ERROR	- Failed to process skb.
-+ */
-+int t7xx_port_proxy_recv_skb_from_dedicated_queue(struct cldma_queue *queue, struct sk_buff *skb)
+-static int t7xx_port_ctrl_tx(struct wwan_port *port, struct sk_buff *skb)
++static int t7xx_port_fastboot_tx(struct t7xx_port *port, struct sk_buff *skb)
 +{
-+	struct t7xx_pci_dev *t7xx_dev = queue->md_ctrl->t7xx_dev;
-+	struct port_proxy *port_prox = t7xx_dev->md->port_prox;
-+	const struct t7xx_port_conf *port_conf;
-+	struct t7xx_port *port;
++	struct sk_buff *cur = skb, *tx_skb;
++	size_t actual, len, offset = 0;
++	int txq_mtu;
 +	int ret;
 +
-+	port = &port_prox->ports[0];
-+	if (WARN_ON_ONCE(port->port_conf->rxq_index != queue->index)) {
-+		dev_kfree_skb_any(skb);
++	txq_mtu = t7xx_get_port_mtu(port);
++	if (txq_mtu < 0)
 +		return -EINVAL;
++
++	actual = cur->len;
++	while (actual) {
++		len = min_t(size_t, actual, txq_mtu);
++		tx_skb = __dev_alloc_skb(len, GFP_KERNEL);
++		if (!tx_skb)
++			return -ENOMEM;
++
++		skb_put_data(tx_skb, cur->data + offset, len);
++
++		ret = t7xx_port_send_raw_skb(port, tx_skb);
++		if (ret) {
++			dev_kfree_skb(tx_skb);
++			dev_err(port->dev, "Write error on fastboot port, %d\n", ret);
++			break;
++		}
++		offset += len;
++		actual -= len;
 +	}
 +
++	dev_kfree_skb(skb);
++	return 0;
++}
++
++static int t7xx_port_ctrl_tx(struct t7xx_port *port, struct sk_buff *skb)
+ {
+-	struct t7xx_port *port_private = wwan_port_get_drvdata(port);
+ 	const struct t7xx_port_conf *port_conf;
+ 	struct sk_buff *cur = skb, *cloned;
+ 	struct t7xx_fsm_ctl *ctl;
+ 	enum md_state md_state;
+ 	int cnt = 0, ret;
+ 
+-	if (!port_private->chan_enable)
+-		return -EINVAL;
+-
+-	port_conf = port_private->port_conf;
+-	ctl = port_private->t7xx_dev->md->fsm_ctl;
 +	port_conf = port->port_conf;
-+	ret = port_conf->ops->recv_skb(port, skb);
-+	if (ret < 0 && ret != -ENOBUFS) {
-+		dev_err(port->dev, "drop on RX ch %d, %d\n", port_conf->rx_ch, ret);
-+		dev_kfree_skb_any(skb);
-+	}
++	ctl = port->t7xx_dev->md->fsm_ctl;
+ 	md_state = t7xx_fsm_get_md_state(ctl);
+ 	if (md_state == MD_STATE_WAITING_FOR_HS1 || md_state == MD_STATE_WAITING_FOR_HS2) {
+-		dev_warn(port_private->dev, "Cannot write to %s port when md_state=%d\n",
++		dev_warn(port->dev, "Cannot write to %s port when md_state=%d\n",
+ 			 port_conf->name, md_state);
+ 		return -ENODEV;
+ 	}
+@@ -75,10 +107,10 @@ static int t7xx_port_ctrl_tx(struct wwan_port *port, struct sk_buff *skb)
+ 	while (cur) {
+ 		cloned = skb_clone(cur, GFP_KERNEL);
+ 		cloned->len = skb_headlen(cur);
+-		ret = t7xx_port_send_skb(port_private, cloned, 0, 0);
++		ret = t7xx_port_send_skb(port, cloned, 0, 0);
+ 		if (ret) {
+ 			dev_kfree_skb(cloned);
+-			dev_err(port_private->dev, "Write error on %s port, %d\n",
++			dev_err(port->dev, "Write error on %s port, %d\n",
+ 				port_conf->name, ret);
+ 			return cnt ? cnt + ret : ret;
+ 		}
+@@ -93,14 +125,53 @@ static int t7xx_port_ctrl_tx(struct wwan_port *port, struct sk_buff *skb)
+ 	return 0;
+ }
+ 
++static int t7xx_port_wwan_tx(struct wwan_port *port, struct sk_buff *skb)
++{
++	struct t7xx_port *port_private = wwan_port_get_drvdata(port);
++	const struct t7xx_port_conf *port_conf = port_private->port_conf;
++	int ret;
++
++	if (!port_private->chan_enable)
++		return -EINVAL;
++
++	if (port_conf->port_type != WWAN_PORT_FASTBOOT)
++		ret = t7xx_port_ctrl_tx(port_private, skb);
++	else
++		ret = t7xx_port_fastboot_tx(port_private, skb);
 +
 +	return ret;
 +}
 +
- static struct t7xx_port *t7xx_port_proxy_find_port(struct t7xx_pci_dev *t7xx_dev,
- 						   struct cldma_queue *queue, u16 channel)
- {
-@@ -359,7 +417,7 @@ static struct t7xx_port *t7xx_port_proxy_find_port(struct t7xx_pci_dev *t7xx_dev
-  ** 0		- Packet consumed.
-  ** -ERROR	- Failed to process skb.
-  */
--static int t7xx_port_proxy_recv_skb(struct cldma_queue *queue, struct sk_buff *skb)
-+int t7xx_port_proxy_recv_skb(struct cldma_queue *queue, struct sk_buff *skb)
- {
- 	struct ccci_header *ccci_h = (struct ccci_header *)skb->data;
- 	struct t7xx_pci_dev *t7xx_dev = queue->md_ctrl->t7xx_dev;
-@@ -444,33 +502,54 @@ static void t7xx_proxy_init_all_ports(struct t7xx_modem *md)
- 		spin_lock_init(&port->port_update_lock);
- 		port->chan_enable = false;
- 
--		if (port_conf->ops->init)
-+		if (port_conf->ops && port_conf->ops->init)
- 			port_conf->ops->init(port);
- 	}
- 
- 	t7xx_proxy_setup_ch_mapping(port_prox);
- }
- 
-+void t7xx_port_proxy_set_cfg(struct t7xx_modem *md, enum port_cfg_id cfg_id)
-+{
-+	struct port_proxy *port_prox = md->port_prox;
-+	const struct t7xx_port_conf *port_conf;
-+	u32 port_count;
-+	int i;
-+
-+	t7xx_port_proxy_uninit(port_prox);
-+
-+	if (cfg_id == PORT_CFG_ID_EARLY) {
-+		port_conf = t7xx_early_port_conf;
-+		port_count = ARRAY_SIZE(t7xx_early_port_conf);
-+	} else {
-+		port_conf = t7xx_port_conf;
-+		port_count = ARRAY_SIZE(t7xx_port_conf);
-+	}
-+
-+	for (i = 0; i < port_count; i++)
-+		port_prox->ports[i].port_conf = &port_conf[i];
-+
-+	port_prox->cfg_id = cfg_id;
-+	port_prox->port_count = port_count;
-+
-+	t7xx_proxy_init_all_ports(md);
-+}
-+
- static int t7xx_proxy_alloc(struct t7xx_modem *md)
- {
--	unsigned int port_count = ARRAY_SIZE(t7xx_port_conf);
- 	struct device *dev = &md->t7xx_dev->pdev->dev;
- 	struct port_proxy *port_prox;
--	int i;
- 
--	port_prox = devm_kzalloc(dev, sizeof(*port_prox) + sizeof(struct t7xx_port) * port_count,
-+	port_prox = devm_kzalloc(dev, sizeof(*port_prox) +
-+				 sizeof(struct t7xx_port) * T7XX_MAX_POSSIBLE_PORTS_NUM,
- 				 GFP_KERNEL);
- 	if (!port_prox)
- 		return -ENOMEM;
- 
- 	md->port_prox = port_prox;
- 	port_prox->dev = dev;
-+	t7xx_port_proxy_set_cfg(md, PORT_CFG_ID_EARLY);
- 
--	for (i = 0; i < port_count; i++)
--		port_prox->ports[i].port_conf = &t7xx_port_conf[i];
--
--	port_prox->port_count = port_count;
--	t7xx_proxy_init_all_ports(md);
- 	return 0;
- }
- 
-@@ -492,8 +571,6 @@ int t7xx_port_proxy_init(struct t7xx_modem *md)
- 	if (ret)
- 		return ret;
- 
--	t7xx_cldma_set_recv_skb(md->md_ctrl[CLDMA_ID_AP], t7xx_port_proxy_recv_skb);
--	t7xx_cldma_set_recv_skb(md->md_ctrl[CLDMA_ID_MD], t7xx_port_proxy_recv_skb);
- 	return 0;
- }
- 
-@@ -505,7 +582,7 @@ void t7xx_port_proxy_uninit(struct port_proxy *port_prox)
- 	for_each_proxy_port(i, port, port_prox) {
- 		const struct t7xx_port_conf *port_conf = port->port_conf;
- 
--		if (port_conf->ops->uninit)
-+		if (port_conf->ops && port_conf->ops->uninit)
- 			port_conf->ops->uninit(port);
- 	}
- }
-diff --git a/drivers/net/wwan/t7xx/t7xx_port_proxy.h b/drivers/net/wwan/t7xx/t7xx_port_proxy.h
-index 81d059fbc0fb..7f5706811445 100644
---- a/drivers/net/wwan/t7xx/t7xx_port_proxy.h
-+++ b/drivers/net/wwan/t7xx/t7xx_port_proxy.h
-@@ -31,11 +31,18 @@
- #define RX_QUEUE_MAXLEN		32
- #define CTRL_QUEUE_MAXLEN	16
- 
-+enum port_cfg_id {
-+	PORT_CFG_ID_INVALID,
-+	PORT_CFG_ID_NORMAL,
-+	PORT_CFG_ID_EARLY,
-+};
-+
- struct port_proxy {
- 	int			port_count;
- 	struct list_head	rx_ch_ports[PORT_CH_ID_MASK + 1];
- 	struct list_head	queue_ports[CLDMA_NUM][MTK_QUEUES];
- 	struct device		*dev;
-+	enum port_cfg_id	cfg_id;
- 	struct t7xx_port	ports[];
+ static const struct wwan_port_ops wwan_ops = {
+-	.start = t7xx_port_ctrl_start,
+-	.stop = t7xx_port_ctrl_stop,
+-	.tx = t7xx_port_ctrl_tx,
++	.start = t7xx_port_wwan_start,
++	.stop = t7xx_port_wwan_stop,
++	.tx = t7xx_port_wwan_tx,
  };
  
-@@ -98,5 +105,8 @@ void t7xx_port_proxy_md_status_notify(struct port_proxy *port_prox, unsigned int
- int t7xx_port_enum_msg_handler(struct t7xx_modem *md, void *msg);
- int t7xx_port_proxy_chl_enable_disable(struct port_proxy *port_prox, unsigned int ch_id,
- 				       bool en_flag);
-+void t7xx_port_proxy_set_cfg(struct t7xx_modem *md, enum port_cfg_id cfg_id);
-+int t7xx_port_proxy_recv_skb(struct cldma_queue *queue, struct sk_buff *skb);
-+int t7xx_port_proxy_recv_skb_from_dedicated_queue(struct cldma_queue *queue, struct sk_buff *skb);
- 
- #endif /* __T7XX_PORT_PROXY_H__ */
-diff --git a/drivers/net/wwan/t7xx/t7xx_port_wwan.c b/drivers/net/wwan/t7xx/t7xx_port_wwan.c
-index 17389c8f6600..ddc20ddfa734 100644
---- a/drivers/net/wwan/t7xx/t7xx_port_wwan.c
-+++ b/drivers/net/wwan/t7xx/t7xx_port_wwan.c
-@@ -152,14 +152,15 @@ static int t7xx_port_wwan_disable_chl(struct t7xx_port *port)
++static void t7xx_port_wwan_create(struct t7xx_port *port)
++{
++	const struct t7xx_port_conf *port_conf = port->port_conf;
++	unsigned int header_len = sizeof(struct ccci_header), mtu;
++	struct wwan_port_caps caps;
++
++	if (!port->wwan.wwan_port) {
++		mtu = t7xx_get_port_mtu(port);
++		caps.frag_len = mtu - header_len;
++		caps.headroom_len = header_len;
++		port->wwan.wwan_port = wwan_create_port(port->dev, port_conf->port_type,
++							&wwan_ops, &caps, port);
++		if (IS_ERR(port->wwan.wwan_port))
++			dev_err(port->dev, "Unable to create WWAN port %s", port_conf->name);
++	}
++}
++
+ static int t7xx_port_wwan_init(struct t7xx_port *port)
+ {
++	const struct t7xx_port_conf *port_conf = port->port_conf;
++
++	if (port_conf->port_type == WWAN_PORT_FASTBOOT)
++		t7xx_port_wwan_create(port);
++
+ 	port->rx_length_th = RX_QUEUE_MAXLEN;
+ 	return 0;
+ }
+@@ -152,21 +223,14 @@ static int t7xx_port_wwan_disable_chl(struct t7xx_port *port)
  static void t7xx_port_wwan_md_state_notify(struct t7xx_port *port, unsigned int state)
  {
  	const struct t7xx_port_conf *port_conf = port->port_conf;
--	unsigned int header_len = sizeof(struct ccci_header);
-+	unsigned int header_len = sizeof(struct ccci_header), mtu;
- 	struct wwan_port_caps caps;
+-	unsigned int header_len = sizeof(struct ccci_header), mtu;
+-	struct wwan_port_caps caps;
++
++	if (port_conf->port_type == WWAN_PORT_FASTBOOT)
++		return;
  
  	if (state != MD_STATE_READY)
  		return;
  
- 	if (!port->wwan.wwan_port) {
--		caps.frag_len = CLDMA_MTU - header_len;
-+		mtu = t7xx_get_port_mtu(port);
-+		caps.frag_len = mtu - header_len;
- 		caps.headroom_len = header_len;
- 		port->wwan.wwan_port = wwan_create_port(port->dev, port_conf->port_type,
- 							&wwan_ops, &caps, port);
-diff --git a/drivers/net/wwan/t7xx/t7xx_reg.h b/drivers/net/wwan/t7xx/t7xx_reg.h
-index c41d7d094c08..9c7dc72ac6f6 100644
---- a/drivers/net/wwan/t7xx/t7xx_reg.h
-+++ b/drivers/net/wwan/t7xx/t7xx_reg.h
-@@ -101,11 +101,33 @@ enum t7xx_pm_resume_state {
- 	PM_RESUME_REG_STATE_L2_EXP,
- };
+-	if (!port->wwan.wwan_port) {
+-		mtu = t7xx_get_port_mtu(port);
+-		caps.frag_len = mtu - header_len;
+-		caps.headroom_len = header_len;
+-		port->wwan.wwan_port = wwan_create_port(port->dev, port_conf->port_type,
+-							&wwan_ops, &caps, port);
+-		if (IS_ERR(port->wwan.wwan_port))
+-			dev_err(port->dev, "Unable to create WWWAN port %s", port_conf->name);
+-	}
++	t7xx_port_wwan_create(port);
+ }
  
-+enum host_event_e {
-+	HOST_EVENT_INIT = 0,
-+	FASTBOOT_DL_NOTIFY = 0x3,
-+};
-+
- #define T7XX_PCIE_MISC_DEV_STATUS		0x0d1c
- #define MISC_STAGE_MASK				GENMASK(2, 0)
- #define MISC_RESET_TYPE_PLDR			BIT(26)
- #define MISC_RESET_TYPE_FLDR			BIT(27)
--#define LINUX_STAGE				4
-+#define MISC_RESET_TYPE_PLDR			BIT(26)
-+#define MISC_LK_EVENT_MASK			GENMASK(11, 8)
-+#define HOST_EVENT_MASK				GENMASK(31, 28)
-+
-+enum lk_event_id {
-+	LK_EVENT_NORMAL = 0,
-+	LK_EVENT_CREATE_PD_PORT = 1,
-+	LK_EVENT_CREATE_POST_DL_PORT = 2,
-+	LK_EVENT_RESET = 7,
-+};
-+
-+enum t7xx_device_stage {
-+	T7XX_DEV_STAGE_INIT = 0,
-+	T7XX_DEV_STAGE_BROM_PRE = 1,
-+	T7XX_DEV_STAGE_BROM_POST = 2,
-+	T7XX_DEV_STAGE_LK = 3,
-+	T7XX_DEV_STAGE_LINUX = 4,
-+};
- 
- #define T7XX_PCIE_RESOURCE_STATUS		0x0d28
- #define T7XX_PCIE_RESOURCE_STS_MSK		GENMASK(4, 0)
+ struct port_ops wwan_sub_port_ops = {
 diff --git a/drivers/net/wwan/t7xx/t7xx_state_monitor.c b/drivers/net/wwan/t7xx/t7xx_state_monitor.c
-index c5d46f45fa62..038377fed102 100644
+index 038377fed102..9889ca4621cf 100644
 --- a/drivers/net/wwan/t7xx/t7xx_state_monitor.c
 +++ b/drivers/net/wwan/t7xx/t7xx_state_monitor.c
-@@ -47,6 +47,13 @@
- #define FSM_MD_EX_PASS_TIMEOUT_MS		45000
- #define FSM_CMD_TIMEOUT_MS			2000
+@@ -229,6 +229,7 @@ static void t7xx_lk_stage_event_handling(struct t7xx_fsm_ctl *ctl, unsigned int
+ 	struct cldma_ctrl *md_ctrl;
+ 	enum lk_event_id lk_event;
+ 	struct device *dev;
++	struct t7xx_port *port;
  
-+#define wait_for_expected_dev_stage(status)	\
-+	read_poll_timeout(ioread32, status,	\
-+			  ((status & MISC_STAGE_MASK) == T7XX_DEV_STAGE_LINUX) ||	\
-+			  ((status & MISC_STAGE_MASK) == T7XX_DEV_STAGE_LK), 100000,	\
-+			  20000000, false, IREG_BASE(md->t7xx_dev) +	\
-+			  T7XX_PCIE_MISC_DEV_STATUS)
-+
- void t7xx_fsm_notifier_register(struct t7xx_modem *md, struct t7xx_fsm_notifier *notifier)
- {
- 	struct t7xx_fsm_ctl *ctl = md->fsm_ctl;
-@@ -206,6 +213,51 @@ static void fsm_routine_exception(struct t7xx_fsm_ctl *ctl, struct t7xx_fsm_comm
- 		fsm_finish_command(ctl, cmd, 0);
- }
+ 	dev = &md->t7xx_dev->pdev->dev;
+ 	lk_event = FIELD_GET(MISC_LK_EVENT_MASK, status);
+@@ -244,6 +245,9 @@ static void t7xx_lk_stage_event_handling(struct t7xx_fsm_ctl *ctl, unsigned int
+ 		t7xx_cldma_stop(md_ctrl);
+ 		t7xx_cldma_switch_cfg(md_ctrl, CLDMA_DEDICATED_Q_CFG);
  
-+static void t7xx_host_event_notify(struct t7xx_modem *md, unsigned int event_id)
-+{
-+	u32 value;
++		port = &ctl->md->port_prox->ports[0];
++		port->port_conf->ops->enable_chl(port);
 +
-+	value = ioread32(IREG_BASE(md->t7xx_dev) + T7XX_PCIE_MISC_DEV_STATUS);
-+	value &= ~HOST_EVENT_MASK;
-+	value |= FIELD_PREP(HOST_EVENT_MASK, event_id);
-+	iowrite32(value, IREG_BASE(md->t7xx_dev) + T7XX_PCIE_MISC_DEV_STATUS);
-+}
-+
-+static void t7xx_lk_stage_event_handling(struct t7xx_fsm_ctl *ctl, unsigned int status)
-+{
-+	struct t7xx_modem *md = ctl->md;
-+	struct cldma_ctrl *md_ctrl;
-+	enum lk_event_id lk_event;
-+	struct device *dev;
-+
-+	dev = &md->t7xx_dev->pdev->dev;
-+	lk_event = FIELD_GET(MISC_LK_EVENT_MASK, status);
-+	switch (lk_event) {
-+	case LK_EVENT_NORMAL:
-+	case LK_EVENT_RESET:
-+		break;
-+
-+	case LK_EVENT_CREATE_PD_PORT:
-+	case LK_EVENT_CREATE_POST_DL_PORT:
-+		md_ctrl = md->md_ctrl[CLDMA_ID_AP];
-+		t7xx_cldma_hif_hw_init(md_ctrl);
-+		t7xx_cldma_stop(md_ctrl);
-+		t7xx_cldma_switch_cfg(md_ctrl, CLDMA_DEDICATED_Q_CFG);
-+
-+		t7xx_cldma_start(md_ctrl);
-+
-+		if (lk_event == LK_EVENT_CREATE_POST_DL_PORT)
-+			t7xx_mode_update(md->t7xx_dev, T7XX_FASTBOOT_DOWNLOAD);
-+		else
-+			t7xx_mode_update(md->t7xx_dev, T7XX_FASTBOOT_DUMP);
-+		break;
-+
-+	default:
-+		dev_err(dev, "Invalid LK event %d\n", lk_event);
-+		break;
-+	}
-+}
-+
- static int fsm_stopped_handler(struct t7xx_fsm_ctl *ctl)
- {
- 	ctl->curr_state = FSM_STATE_STOPPED;
-@@ -226,8 +278,9 @@ static void fsm_routine_stopped(struct t7xx_fsm_ctl *ctl, struct t7xx_fsm_comman
+ 		t7xx_cldma_start(md_ctrl);
  
- static void fsm_routine_stopping(struct t7xx_fsm_ctl *ctl, struct t7xx_fsm_command *cmd)
- {
--	struct t7xx_pci_dev *t7xx_dev;
--	struct cldma_ctrl *md_ctrl;
-+	struct cldma_ctrl *md_ctrl = ctl->md->md_ctrl[CLDMA_ID_MD];
-+	struct t7xx_pci_dev *t7xx_dev = ctl->md->t7xx_dev;
-+	enum t7xx_mode mode = READ_ONCE(t7xx_dev->mode);
- 	int err;
- 
- 	if (ctl->curr_state == FSM_STATE_STOPPED || ctl->curr_state == FSM_STATE_STOPPING) {
-@@ -235,18 +288,20 @@ static void fsm_routine_stopping(struct t7xx_fsm_ctl *ctl, struct t7xx_fsm_comma
- 		return;
- 	}
- 
--	md_ctrl = ctl->md->md_ctrl[CLDMA_ID_MD];
--	t7xx_dev = ctl->md->t7xx_dev;
--
- 	ctl->curr_state = FSM_STATE_STOPPING;
- 	t7xx_fsm_broadcast_state(ctl, MD_STATE_WAITING_TO_STOP);
- 	t7xx_cldma_stop(md_ctrl);
- 
--	if (!ctl->md->rgu_irq_asserted) {
--		t7xx_mhccif_h2d_swint_trigger(t7xx_dev, H2D_CH_DRM_DISABLE_AP);
--		/* Wait for the DRM disable to take effect */
--		msleep(FSM_DRM_DISABLE_DELAY_MS);
-+	if (mode == T7XX_FASTBOOT_SWITCHING)
-+		t7xx_host_event_notify(ctl->md, FASTBOOT_DL_NOTIFY);
-+
-+	t7xx_mhccif_h2d_swint_trigger(t7xx_dev, H2D_CH_DRM_DISABLE_AP);
-+	/* Wait for the DRM disable to take effect */
-+	msleep(FSM_DRM_DISABLE_DELAY_MS);
- 
-+	if (mode == T7XX_FASTBOOT_SWITCHING) {
-+		t7xx_mhccif_h2d_swint_trigger(t7xx_dev, H2D_CH_DEVICE_RESET);
-+	} else {
- 		err = t7xx_acpi_fldr_func(t7xx_dev);
- 		if (err)
- 			t7xx_mhccif_h2d_swint_trigger(t7xx_dev, H2D_CH_DEVICE_RESET);
-@@ -318,7 +373,8 @@ static int fsm_routine_starting(struct t7xx_fsm_ctl *ctl)
- static void fsm_routine_start(struct t7xx_fsm_ctl *ctl, struct t7xx_fsm_command *cmd)
- {
- 	struct t7xx_modem *md = ctl->md;
--	u32 dev_status;
-+	struct device *dev;
-+	u32 status;
- 	int ret;
- 
- 	if (!md)
-@@ -330,23 +386,53 @@ static void fsm_routine_start(struct t7xx_fsm_ctl *ctl, struct t7xx_fsm_command
- 		return;
- 	}
- 
-+	dev = &md->t7xx_dev->pdev->dev;
- 	ctl->curr_state = FSM_STATE_PRE_START;
- 	t7xx_md_event_notify(md, FSM_PRE_START);
- 
--	ret = read_poll_timeout(ioread32, dev_status,
--				(dev_status & MISC_STAGE_MASK) == LINUX_STAGE, 20000, 2000000,
--				false, IREG_BASE(md->t7xx_dev) + T7XX_PCIE_MISC_DEV_STATUS);
-+	ret = wait_for_expected_dev_stage(status);
-+
- 	if (ret) {
--		struct device *dev = &md->t7xx_dev->pdev->dev;
-+		dev_err(dev, "read poll timeout %d\n", ret);
-+		goto finish_command;
-+	}
- 
--		fsm_finish_command(ctl, cmd, -ETIMEDOUT);
--		dev_err(dev, "Invalid device status 0x%lx\n", dev_status & MISC_STAGE_MASK);
--		return;
-+	if (status != ctl->status || cmd->flag != 0) {
-+		u32 stage = FIELD_GET(MISC_STAGE_MASK, status);
-+
-+		switch (stage) {
-+		case T7XX_DEV_STAGE_INIT:
-+		case T7XX_DEV_STAGE_BROM_PRE:
-+		case T7XX_DEV_STAGE_BROM_POST:
-+			dev_dbg(dev, "BROM_STAGE Entered\n");
-+			ret = t7xx_fsm_append_cmd(ctl, FSM_CMD_START, 0);
-+			break;
-+
-+		case T7XX_DEV_STAGE_LK:
-+			dev_dbg(dev, "LK_STAGE Entered\n");
-+			t7xx_lk_stage_event_handling(ctl, status);
-+			break;
-+
-+		case T7XX_DEV_STAGE_LINUX:
-+			dev_dbg(dev, "LINUX_STAGE Entered\n");
-+			t7xx_mhccif_mask_clr(md->t7xx_dev, D2H_INT_PORT_ENUM |
-+					     D2H_INT_ASYNC_MD_HK | D2H_INT_ASYNC_AP_HK);
-+			if (cmd->flag == 0)
-+				break;
-+			t7xx_cldma_hif_hw_init(md->md_ctrl[CLDMA_ID_AP]);
-+			t7xx_cldma_hif_hw_init(md->md_ctrl[CLDMA_ID_MD]);
-+			t7xx_port_proxy_set_cfg(md, PORT_CFG_ID_NORMAL);
-+			ret = fsm_routine_starting(ctl);
-+			break;
-+
-+		default:
-+			break;
-+		}
-+		ctl->status = status;
- 	}
- 
--	t7xx_cldma_hif_hw_init(md->md_ctrl[CLDMA_ID_AP]);
--	t7xx_cldma_hif_hw_init(md->md_ctrl[CLDMA_ID_MD]);
--	fsm_finish_command(ctl, cmd, fsm_routine_starting(ctl));
-+finish_command:
-+	fsm_finish_command(ctl, cmd, ret);
- }
- 
- static int fsm_main_thread(void *data)
-@@ -518,6 +604,7 @@ void t7xx_fsm_reset(struct t7xx_modem *md)
- 	fsm_flush_event_cmd_qs(ctl);
- 	ctl->curr_state = FSM_STATE_STOPPED;
- 	ctl->exp_flg = false;
-+	ctl->status = T7XX_DEV_STAGE_INIT;
- }
- 
- int t7xx_fsm_init(struct t7xx_modem *md)
-diff --git a/drivers/net/wwan/t7xx/t7xx_state_monitor.h b/drivers/net/wwan/t7xx/t7xx_state_monitor.h
-index b0b3662ae6d7..7b0a9baf488c 100644
---- a/drivers/net/wwan/t7xx/t7xx_state_monitor.h
-+++ b/drivers/net/wwan/t7xx/t7xx_state_monitor.h
-@@ -96,6 +96,7 @@ struct t7xx_fsm_ctl {
- 	bool			exp_flg;
- 	spinlock_t		notifier_lock;		/* Protects notifier list */
- 	struct list_head	notifier_list;
-+	u32			status;			/* Device boot stage */
- };
- 
- struct t7xx_fsm_event {
+ 		if (lk_event == LK_EVENT_CREATE_POST_DL_PORT)
 -- 
 2.34.1
 
