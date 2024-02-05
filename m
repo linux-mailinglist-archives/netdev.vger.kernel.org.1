@@ -1,141 +1,142 @@
-Return-Path: <netdev+bounces-69101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96C2A849A3C
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 13:31:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16AA8849A45
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 13:31:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 20AEBB24E0F
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:30:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 499A81C22BDE
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:31:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D92731BF3D;
-	Mon,  5 Feb 2024 12:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 503001C6B5;
+	Mon,  5 Feb 2024 12:30:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wqNl0Y/I"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JryIJRDC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D267C1B976
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 12:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EB91946B;
+	Mon,  5 Feb 2024 12:30:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707136176; cv=none; b=QeyDuK0pb/WZsak9RlWpq8dA6i52FoZRFWc4Q9Q/OfgpNLocrynCkSFWmfyVkzRfwoZhhl2kwS6ZvgWIq1JkebqggddNqRZfUpiTOO5bT5ZV9GvStl8x6iwRbag7/dpOlRh8/TXq9WV+LbK3AJE0DtqrdFf7Qebq9BllOxNPkvc=
+	t=1707136252; cv=none; b=rTp2kO0xAQp6ojWQ8sfjLMx1El/pzgxU28IIA2B3aDeMhzzTnZOT/Tyru1tNYlPz7Bscf33OoT1pHXmEDjowA7x+cfsjbjBluUmf1T04/4CriwfoygW+oSctE+X/g8T+Q+PMvyuXJ/pz5kFNnBRUppVui98jdn4fJzwvPKxLZRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707136176; c=relaxed/simple;
-	bh=p8w5ORQN85keSs4iHtLF0hAGuD3vblI//NXG+Z81rLI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AIZCugDLUxcP7MtVDpSqrFy2ruzr2H7C2BThCp7AcS/pfYVeFL6TQ2vX4u86N6qLih4trSGIcMYkaOzNEOCq/2eXsENhmoPjNNQshTo6HLh7g7vtUgDe0pT/Jw2Sg8MmsrkpkD9LNMmD+0IaLvSaZ0Hw7XRS05fwIli+VH1jh70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wqNl0Y/I; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-55f5d62d024so10538a12.1
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 04:29:33 -0800 (PST)
+	s=arc-20240116; t=1707136252; c=relaxed/simple;
+	bh=V9+JP0licFL9nzTN/zTG2SC4wjoCTONLqvfkJZQyCU4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aezQoiRPJbDPq31VaGGl3i9b9BFbk/FqDBhGTbJfQRPfS8vVSU+In/SRuZmCkh7W6hmGn1RObqKHtnS/SxZvnlVKLF/Yo4sT3Kik3rXQaN+RfVLDjsTihWiM6W7qfhgfThe+FZ45+VEHDgF+bt3A68EyGKw8KULFNq1jqn7mvrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JryIJRDC; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-40fcc74a0a0so5039415e9.1;
+        Mon, 05 Feb 2024 04:30:50 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707136172; x=1707740972; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k24Uyhl1+vZMArgijwhf2EF1yCtOJQ6dhObCgbS2exo=;
-        b=wqNl0Y/IleO1SJfGRzcCA4KjzTEUKCF+akmHWdzBDl+JWg/c4xNfpN9/wvRLPB1R6x
-         /Raq89Df4qqPf8x87MfUMHMlgODHO608vMumBFD7iPW7IHA6n7LNfxF/pA8tjCFre5wR
-         7dUrlBStos62GxDEj4e7VGnqy0Mv+pOy6c8476QIXCd4bkRAu0cShOieIabSb6V/ttts
-         CePiPKEybBU3zGVgDiVQSS7EelULFo8Hx65Te1wPwxZmsaPZTmNl/w9SI2RPAKBr4pOT
-         75TtLioSMOm/BGVN9hKue3+hlyuBenFFKUTZbcnhUUFT7gpSB3QGfdCxdyg8L12e3bkl
-         A2wA==
+        d=gmail.com; s=20230601; t=1707136248; x=1707741048; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+JHEgaj3hU/Ynjh/YYf+I2MAvdE2p0r3dpPmOBXTatE=;
+        b=JryIJRDCVPa3t1/yCS4sDaapckRK73bHVj7k5x4xjOONV2x4XczJpQRzJ/fPzDvpP8
+         GDmk+YZTXZ5IdN8KwmkrYz8LPb5JOdF+1C5XE4C6g/a8aAwFPLjEhWeSEjSw3ncmGLEM
+         BitJ6Xe6FqgA8tlgtTQndW96PzMcyLW3bvDNNs2OaJWbhB655q98YRId57SuyxrEkUiC
+         klhIJcWxVz/L5XWkhAQiagTcY6KVdtTSnRQd4ma2zg5hPhkvX/ZOPNfa6osHiU5aFUvN
+         V7HaonqTgtTATDCa+1MNfLy4ulhw8egxNgl0eEHbyYmmPPTb2805qvm8+tZFnBrKrQaM
+         Tfqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707136172; x=1707740972;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=k24Uyhl1+vZMArgijwhf2EF1yCtOJQ6dhObCgbS2exo=;
-        b=cZxJN5H5xzLA/stu2DCx+XmQQ0weQZMyCk2uYZpQ/LnLxGF0NU2tX+b/L/79t6ugU9
-         qQsVL132xehtplZUhh/JLx6HR2KROshAPn7gz/zm+xg2ZiiiJ3d8trOHQgPZxFD8xsKs
-         HJSgoTT1o3snSvozwenQuIsU2/29Elu3fuAI4Q5wRCot0fjqyQpWFTyWiiUHym7kzUfi
-         G/Pkp5r9Yc2aqGLy4mdqu0NH3vAj5uBVtS6NW6aaDWnjeLUsnNAGTmhZjFmDPjkBe8V/
-         bj7/Vwy7NiPUM5ANLGX2FJtIDiCsS4SQPmgvW6ljkaucnh+4TzSjSk3GN0kL1XcWFvd7
-         q6vQ==
-X-Gm-Message-State: AOJu0YwxLNYPPa4jphtXczcWX2orR6rjhrXaUqG3GNGdv6qRfXoirXXy
-	6gny0TE2jSq6vBSVtA5OetR0fqQJ6t4tkLED+zcfEiD0clCP/FsfBFCv6p9gcsNCFE/2+bcJVKZ
-	5DlY3aLF/UvmxW4SgDxjOBBDhKNPqE0JM+ABr
-X-Google-Smtp-Source: AGHT+IFzdiEyEpD5bJtfFnXpWSSyxQQjI7i+MYv5KUUWd8tWIXJwZPoB4d2ch4wJ9Fg7pBr/KbrQhvHNNzaGSNgkJfg=
-X-Received: by 2002:a50:8750:0:b0:55f:88de:bb03 with SMTP id
- 16-20020a508750000000b0055f88debb03mr249754edv.4.1707136171790; Mon, 05 Feb
- 2024 04:29:31 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707136248; x=1707741048;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+JHEgaj3hU/Ynjh/YYf+I2MAvdE2p0r3dpPmOBXTatE=;
+        b=RaJcqUVQYHbFVzpf1oEyoXLhlXkFWWCCoCsRtUQw5VKYghkjAYkzNs7SHHzTl//JPQ
+         WOdYQoo7XVsW5WTJ2Jb59qrUmIKwYAzcS8SuD6sDnFqa7/oD3u5cN7vadN8Z/Vma3j+o
+         Weil4BxSSTRZUTiDeJWRS4riWZdSPSgN/3WkgzP+R8croEb73CxfWvf952CwWskVwDVK
+         ijNfNZ0yz7VlEgGt625MTM5/xbwnd2j3Wl/gZSpD9pJks9sSPwGVJEuNhMIgb5xaxxLQ
+         EDJJPfcklUmOfHe1SvUeqikozE6y0urs2FxxsiZy1JP3uFjB/GodWiQTWyQqjUxomPwh
+         0SFw==
+X-Gm-Message-State: AOJu0Yw9aajnePJiaEVeQn4nUAO38cr7htlsSS32EykzXLaubuwUKgCF
+	zT2kgtq6Wn7qVC11zsdJqQlFB4J1e+WgM2ZattUamd3lrdjJhaM1
+X-Google-Smtp-Source: AGHT+IGyd6b2b55JgFuonGHUvNQF86Xov+P+gkyQLAVZbblgIgcHMCxrQQ1MWtVDccFM82NgbvZtdQ==
+X-Received: by 2002:a5d:400e:0:b0:33a:e4ff:57dc with SMTP id n14-20020a5d400e000000b0033ae4ff57dcmr8666430wrp.4.1707136248416;
+        Mon, 05 Feb 2024 04:30:48 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVSqh9k+UR7uY89kKun4wDXnZxWX5jHgyTT2fkrg1OXvu+rl9ViHf4oYH+wv/N6a/VQHCdP3N5BqLelRGY2k8IQkMkwmAUQye9I3dD5XzmZVTNTjHiNjXG7vCoXTDdbiobX8EVu7+t0r2f0RkMG8DiLeHcbaCj6FZHdME6U6YBdi87cbNQl0PkAKFkfI10MDg7jlU/kDhjyp6Jd54Rj8Nd0dplNofSXXUhlmH+mBepPbsQNQioADZHIcfZDr8mbUahUWvhLHv+/2qIue1fLmoFEVAD615KEWbG4m5bVX+GZr3OPVXSqlM6kir/VGc2UbA5MzGdS34aqb99zSc/nUu8ipHpAQzAuuySbgqK3m+sAhylqvFGivgGTPWCoNbxNuMJu3XnY/RqwM5IbHNnMkDlvhTlLTyd5WYas4LvJaBxHVemLCrN1Fys64dwns3NcTBEQS4o0iuwdRbwTfLT70LgVXalzHPhmStQ=
+Received: from localhost.localdomain (c188-149-162-200.bredband.tele2.se. [188.149.162.200])
+        by smtp.gmail.com with ESMTPSA id z12-20020adfe54c000000b0033ae54cdd97sm7951740wrm.100.2024.02.05.04.30.46
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 05 Feb 2024 04:30:47 -0800 (PST)
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+To: magnus.karlsson@intel.com,
+	bjorn@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	netdev@vger.kernel.org,
+	maciej.fijalkowski@intel.com,
+	kuba@kernel.org,
+	toke@redhat.com,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	j.vosburgh@gmail.com,
+	andy@greyhouse.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	edumazet@google.com
+Cc: bpf@vger.kernel.org,
+	Prashant Batra <prbatra.mail@gmail.com>
+Subject: [PATCH net] bonding: do not report NETDEV_XDP_ACT_XSK_ZEROCOPY
+Date: Mon,  5 Feb 2024 13:30:08 +0100
+Message-ID: <20240205123011.22036-1-magnus.karlsson@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240205072013.427639-1-chentao@kylinos.cn> <20240205072013.427639-6-chentao@kylinos.cn>
-In-Reply-To: <20240205072013.427639-6-chentao@kylinos.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 5 Feb 2024 13:29:18 +0100
-Message-ID: <CANn89iLkWvum6wSqSya_K+1eqnFvp=L2WLW=kAYrZTF8Ei4b7g@mail.gmail.com>
-Subject: Re: [PATCH net-next 5/6] tcp: Simplify the allocation of slab caches
-To: Kunwu Chan <chentao@kylinos.cn>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, jiri@resnulli.us, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 5, 2024 at 8:23=E2=80=AFAM Kunwu Chan <chentao@kylinos.cn> wrot=
-e:
->
-> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-> to simplify the creation of SLAB caches.
-> And change cache name from 'tcp_bind_bucket' to 'inet_bind_bucket',
-> 'tcp_bind2_bucket' to 'inet_bind2_bucket'.
->
-> Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
-> ---
->  net/ipv4/tcp.c | 14 ++++----------
->  1 file changed, 4 insertions(+), 10 deletions(-)
->
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index a1c6de385cce..2dc3dd4323c2 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -4697,17 +4697,11 @@ void __init tcp_init(void)
->                             thash_entries, 21,  /* one slot per 2 MB*/
->                             0, 64 * 1024);
->         tcp_hashinfo.bind_bucket_cachep =3D
-> -               kmem_cache_create("tcp_bind_bucket",
-> -                                 sizeof(struct inet_bind_bucket), 0,
-> -                                 SLAB_HWCACHE_ALIGN | SLAB_PANIC |
-> -                                 SLAB_ACCOUNT,
-> -                                 NULL);
-> +               KMEM_CACHE(inet_bind_bucket,
-> +                          SLAB_HWCACHE_ALIGN | SLAB_PANIC | SLAB_ACCOUNT=
-);
+From: Magnus Karlsson <magnus.karlsson@intel.com>
 
-I would prefer we do not do this.
+Do not report the XDP capability NETDEV_XDP_ACT_XSK_ZEROCOPY as the
+bonding driver does not support XDP and AF_XDP in zero-copy mode even
+if the real NIC drivers do.
 
-dccp is also using a kmem_cache_create() of "struct inet_bind_bucket"
+Fixes: cb9e6e584d58 ("bonding: add xdp_features support")
+Reported-by: Prashant Batra <prbatra.mail@gmail.com>
+Link: https://lore.kernel.org/all/CAJ8uoz2ieZCopgqTvQ9ZY6xQgTbujmC6XkMTamhp68O-h_-rLg@mail.gmail.com/T/
+Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
+---
+ drivers/net/bonding/bond_main.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-We want different caches for TCP and DCCP.
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 4e0600c7b050..79a37bed097b 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -1819,6 +1819,8 @@ void bond_xdp_set_features(struct net_device *bond_dev)
+ 	bond_for_each_slave(bond, slave, iter)
+ 		val &= slave->dev->xdp_features;
+ 
++	val &= ~NETDEV_XDP_ACT_XSK_ZEROCOPY;
++
+ 	xdp_set_features_flag(bond_dev, val);
+ }
+ 
+@@ -5910,8 +5912,10 @@ void bond_setup(struct net_device *bond_dev)
+ 		bond_dev->features |= BOND_XFRM_FEATURES;
+ #endif /* CONFIG_XFRM_OFFLOAD */
+ 
+-	if (bond_xdp_check(bond))
++	if (bond_xdp_check(bond)) {
+ 		bond_dev->xdp_features = NETDEV_XDP_ACT_MASK;
++		bond_dev->xdp_features &= ~NETDEV_XDP_ACT_XSK_ZEROCOPY;
++	}
+ }
+ 
+ /* Destroy a bonding device.
 
+base-commit: fdeba0b57d61b40a708de361294fde3e1495588d
+-- 
+2.42.0
 
->         tcp_hashinfo.bind2_bucket_cachep =3D
-> -               kmem_cache_create("tcp_bind2_bucket",
-> -                                 sizeof(struct inet_bind2_bucket), 0,
-> -                                 SLAB_HWCACHE_ALIGN | SLAB_PANIC |
-> -                                 SLAB_ACCOUNT,
-> -                                 NULL);
-> +               KMEM_CACHE(inet_bind2_bucket,
-> +                          SLAB_HWCACHE_ALIGN | SLAB_PANIC | SLAB_ACCOUNT=
-);
-
-Same here.
-
->
->         /* Size and allocate the main established and bind bucket
->          * hash tables.
-> --
-> 2.39.2
->
 
