@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-69034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E8C8849467
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 08:22:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 376C1849469
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 08:22:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 517A81C23CAB
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 07:22:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9033286D7D
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 07:22:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8C5711185;
-	Mon,  5 Feb 2024 07:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7BD61118A;
+	Mon,  5 Feb 2024 07:20:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C37C12E73;
-	Mon,  5 Feb 2024 07:20:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29CFE10A25;
+	Mon,  5 Feb 2024 07:20:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=124.126.103.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707117647; cv=none; b=EDCBBHih3hMk9ARznODPjIba1+MHKuuDv6bxGmLc9MhtoNykZw5DzWsMEsLW9cAxXkbFAQfbfgyUlGTi9T22vR23IfhBeAT9YuXZhRckHfOByuApLlxMtMxoiGJPfhFV6T8bJ9UtK/5LCi87TWf8KJWpsBhj3m7VG8JR/2NrW2M=
+	t=1707117648; cv=none; b=T0vRCpp7XotnTsEzrzIc65MLupnQNw9UQ/FwARcw4H3DMVOF+uVtvoYCMpNoj531Z34ZN+UEaWvkPr8ULNjHHWqHHipzOukxyqc3dZ63OXHTGAkIcODspI+pvd2ebcoPUuVsbn14xyjdNGjClyXK0M1q7tTgHCjyXuOi95ypj60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707117647; c=relaxed/simple;
-	bh=k6Zn+/rUFV8ZYijFcqy7Xv2FOiKYO2DWsKSu3lTTGh4=;
+	s=arc-20240116; t=1707117648; c=relaxed/simple;
+	bh=biOCybBNDhjOReD9xZnf1JAj6jSi0ruvZfoR2nzth48=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BHrw/lyxjTxpbE2oifZgJeUVvNI/8/3HViMazPj1wEndXz7klEopnNFBiHSxU+wav+fu0ZOzC7vUIVrG+ufWFZJ0V1Qx1Bk45Y//yWYQuPMABksU8N3GY3beTE77TGiwAE9OcPTwAEc8xtNftVbNJGAU+gnLZx965zDtCub4kIo=
+	 MIME-Version; b=XRCHNzd3k2Js60C4wMFybSS9bDtNDTDB9JIEW6mzTWgbyLNut22DCrCQNeI7tPmrJXliumjXRXGvACrxaOptgBmMDhlckC83+wjPzL4ZUDzYu8dwfIknOkZNVOiHDgAZU0+z1K87tkH9doUWm5O/Y0joxkE8WQRvhr+THFF+pDI=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn; spf=pass smtp.mailfrom=kylinos.cn; arc=none smtp.client-ip=124.126.103.232
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kylinos.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kylinos.cn
-X-UUID: 11b7df22684942e3a304abe1199f6ce1-20240205
+X-UUID: fddf02a90dd44ab288f898ab8ea2abeb-20240205
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.35,REQID:c67de021-7fef-4294-98f9-f2e0ec74004c,IP:10,
+X-CID-O-INFO: VERSION:1.1.35,REQID:50d1ff59-2439-4ffe-8ed1-576131a8fe74,IP:10,
 	URL:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
 	ON:release,TS:-5
-X-CID-INFO: VERSION:1.1.35,REQID:c67de021-7fef-4294-98f9-f2e0ec74004c,IP:10,UR
+X-CID-INFO: VERSION:1.1.35,REQID:50d1ff59-2439-4ffe-8ed1-576131a8fe74,IP:10,UR
 	L:0,TC:0,Content:0,EDM:0,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTION
 	:release,TS:-5
-X-CID-META: VersionHash:5d391d7,CLOUDID:76d12080-4f93-4875-95e7-8c66ea833d57,B
-	ulkID:240205152042EC5T5IF3,BulkQuantity:0,Recheck:0,SF:17|19|44|66|38|24|1
+X-CID-META: VersionHash:5d391d7,CLOUDID:23af078f-e2c0-40b0-a8fe-7c7e47299109,B
+	ulkID:240205152044NCROXGAD,BulkQuantity:0,Recheck:0,SF:44|66|38|24|17|19|1
 	02,TC:nil,Content:0,EDM:-3,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,CO
 	L:0,OSI:0,OSA:0,AV:0,LES:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
 X-CID-BVR: 0,NGT
 X-CID-BAS: 0,NGT,0,_
 X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_FAS,TF_CID_SPAM_FSD,TF_CID_SPAM_FSI
-X-UUID: 11b7df22684942e3a304abe1199f6ce1-20240205
+X-UUID: fddf02a90dd44ab288f898ab8ea2abeb-20240205
 Received: from mail.kylinos.cn [(39.156.73.10)] by mailgw
 	(envelope-from <chentao@kylinos.cn>)
 	(Generic MTA)
-	with ESMTP id 1182238079; Mon, 05 Feb 2024 15:20:40 +0800
+	with ESMTP id 2072795595; Mon, 05 Feb 2024 15:20:42 +0800
 Received: from mail.kylinos.cn (localhost [127.0.0.1])
-	by mail.kylinos.cn (NSMail) with SMTP id 1411BE000EBC;
-	Mon,  5 Feb 2024 15:20:40 +0800 (CST)
-X-ns-mid: postfix-65C08C47-86855474
+	by mail.kylinos.cn (NSMail) with SMTP id 597F8E000EBD;
+	Mon,  5 Feb 2024 15:20:42 +0800 (CST)
+X-ns-mid: postfix-65C08C4A-16642375
 Received: from kernel.. (unknown [172.20.15.254])
-	by mail.kylinos.cn (NSMail) with ESMTPA id 5E90BE000EBC;
-	Mon,  5 Feb 2024 15:20:39 +0800 (CST)
+	by mail.kylinos.cn (NSMail) with ESMTPA id A0048E000EBC;
+	Mon,  5 Feb 2024 15:20:41 +0800 (CST)
 From: Kunwu Chan <chentao@kylinos.cn>
 To: davem@davemloft.net,
 	dsahern@kernel.org,
@@ -66,9 +66,9 @@ To: davem@davemloft.net,
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Kunwu Chan <chentao@kylinos.cn>
-Subject: [PATCH net-next 2/6] ip6mr: Simplify the allocation of slab caches in ip6_mr_init
-Date: Mon,  5 Feb 2024 15:20:09 +0800
-Message-Id: <20240205072013.427639-3-chentao@kylinos.cn>
+Subject: [PATCH net-next 3/6] ipmr: Simplify the allocation of slab caches
+Date: Mon,  5 Feb 2024 15:20:10 +0800
+Message-Id: <20240205072013.427639-4-chentao@kylinos.cn>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240205072013.427639-1-chentao@kylinos.cn>
 References: <20240205072013.427639-1-chentao@kylinos.cn>
@@ -82,29 +82,29 @@ Content-Transfer-Encoding: quoted-printable
 
 Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
 to simplify the creation of SLAB caches.
-And change cache name from 'ip6_mrt_cache' to 'mfc6_cache'.
+And change cache name from 'ip_mrt_cache' to 'mfc_cache'.
 
 Signed-off-by: Kunwu Chan <chentao@kylinos.cn>
 ---
- net/ipv6/ip6mr.c | 5 +----
+ net/ipv4/ipmr.c | 5 +----
  1 file changed, 1 insertion(+), 4 deletions(-)
 
-diff --git a/net/ipv6/ip6mr.c b/net/ipv6/ip6mr.c
-index 9782c180fee6..1f19743f2540 100644
---- a/net/ipv6/ip6mr.c
-+++ b/net/ipv6/ip6mr.c
-@@ -1373,10 +1373,7 @@ int __init ip6_mr_init(void)
+diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+index 9d6f59531b3a..820c95bee6bb 100644
+--- a/net/ipv4/ipmr.c
++++ b/net/ipv4/ipmr.c
+@@ -3139,10 +3139,7 @@ int __init ip_mr_init(void)
  {
  	int err;
 =20
--	mrt_cachep =3D kmem_cache_create("ip6_mrt_cache",
--				       sizeof(struct mfc6_cache),
--				       0, SLAB_HWCACHE_ALIGN,
+-	mrt_cachep =3D kmem_cache_create("ip_mrt_cache",
+-				       sizeof(struct mfc_cache),
+-				       0, SLAB_HWCACHE_ALIGN | SLAB_PANIC,
 -				       NULL);
-+	mrt_cachep =3D KMEM_CACHE(mfc6_cache, SLAB_HWCACHE_ALIGN);
- 	if (!mrt_cachep)
- 		return -ENOMEM;
++	mrt_cachep =3D KMEM_CACHE(mfc_cache, SLAB_HWCACHE_ALIGN | SLAB_PANIC);
 =20
+ 	err =3D register_pernet_subsys(&ipmr_net_ops);
+ 	if (err)
 --=20
 2.39.2
 
