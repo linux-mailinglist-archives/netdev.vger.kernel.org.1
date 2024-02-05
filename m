@@ -1,178 +1,183 @@
-Return-Path: <netdev+bounces-69274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B955484A901
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:18:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70CB384A907
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:18:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B787289806
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 22:18:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B2FF2951E5
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 22:18:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A70BB4A990;
-	Mon,  5 Feb 2024 22:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CADB24DA18;
+	Mon,  5 Feb 2024 22:08:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nK4FQClS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J3O0rxD2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED73333CCC
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 22:06:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C2B44F60F;
+	Mon,  5 Feb 2024 22:08:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707170781; cv=none; b=BmHW61Mp+we/YzwBhrFUhpdFEstgSNf7B+fbg+ZB5Gc5qPvYt9vi+NY7vp6m1fZpGR6XDchI5nAt1CYpuoVGO/Z666vO2IYoaTHU0Dg2WbyXBafUNHzuZc8A5tXUdm9aEKi3yPPRRXRFoVZyIXWditzXqXv+qXO29RvtNW0/xT0=
+	t=1707170894; cv=none; b=bseYsIE/9xy33ABwd9J71eDXsjYb8ssUj6fNDp7f82oEQTX5kyWhO2tJN7JsIanll3or7iE2jGdRBiB/EvzW4OPEUP3WrBAJ1BrV851Uiadz8Vxn37cSJf5rTr8GKx0qMnLFKgON1KUa3eNEcGGHyls0EtAuBliJ+kRICS99dBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707170781; c=relaxed/simple;
-	bh=SL5i9nkDxjzWlUuAv96BA9Q5eE4AZje9CrMug53p5II=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WddB3jvE3SC900DE/fDyyegMmGCiaJ6jcPeNKyW4D7h34l06qca91Jmp1BQKAlaiMAXoEh8trTq+8TpKJ35hjypaP337jiWUTTJbl6/1CL6k4WFWluWDrjhWHTlb8mXIYnequZmXWm1/tYA5opN2E0HWaQ0D3QJHQZIEoG8hKg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nK4FQClS; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-51032058f17so297589e87.3
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 14:06:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707170778; x=1707775578; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oaG+2288e5EFOBFSRmlWxH9rBCGobRAYYVymST5ds0A=;
-        b=nK4FQClS6gzfdQZQkPvMvpMOTT0sbQ283nYtGIQJ16RPa/VxQ1vKzxI1/gNrdh2pgS
-         gyl789sxiMPxRRDho9LO4I8+JgforrV3eMl+dL4YDfvG5KzhPRvqPPdmjyKazufm1XMi
-         o63Npo00Q442an2UddUMWghn7kMpPmtGvJP0y55J2fmIG5F/yX4YmsIkBfiPQKcL7gqX
-         3vN6CnzHxPDBDy+szGn+gY/KqWOhXrI0yjfFYEPuo+yA0r9NlAVLQSwLw52FyM79fvS6
-         wL8XNJOA7p+CObishpQ9mXIJPCvXCIlznkSCv54V4NwUTFskNBvue/NjK0BvvMVIE5Vg
-         1Y6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707170778; x=1707775578;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oaG+2288e5EFOBFSRmlWxH9rBCGobRAYYVymST5ds0A=;
-        b=eCOTrZbqxbvQr22oaTyPG60Cf7cDYzNNrI0xR9dz9hr0euF8CMGveDr+aItULFzDVi
-         BfPKpjQrfe8QsjLgIBiIcRReAwFMyYyUgOQr4q1w4H1U9Hf53GyC03XxmlcPaAz2A7Gv
-         B+Zw3HOzQQU+EGDLN1yfa3+AbJd3S2j0GiDwUErzG51WHXAe1ar0YGFd2TEz09RFNa/L
-         n0LYusBavfwYLfElQ0zrZ/jT1YxsL0V0NPhchbFrvmOI6l/sFIu7H2WajFrJFFrTuRJz
-         y4G5LQ7T65Se94FOyH/M6WSgfs3mMdf9QrjiqeHVZxp9dyQri1Jo8O9Y7BArU6O+YNHa
-         DBDA==
-X-Gm-Message-State: AOJu0YxpE+e6ImHHOkfK4eMH4jfkuvpGiSorfgOpPWuoTp97+5Hkt7hl
-	JkZdNEznEvxnM1oncCi6nY+h8ls2TWTPzzQga6HwQqmvKYjoXsHc
-X-Google-Smtp-Source: AGHT+IF7Ouc/4Vc+/Zd+HvB5MEX7fB0D0KPQh56APCIwwz6PalIU+8M02bwdQ67hP6kaZeygRgxdzA==
-X-Received: by 2002:a05:6512:12c9:b0:511:54a8:3adb with SMTP id p9-20020a05651212c900b0051154a83adbmr841788lfg.2.1707170777840;
-        Mon, 05 Feb 2024 14:06:17 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVwp57onEb7emIDxdf74HNomugd4WAc6BLU1EGsLY4FTObN4+/yCscLGvnapqcFQF5lUKAXeiV6ufUPZ4ju65tzPtLVkXGrBhTR0wp8EtJLTnQ7foQwIFCT9Pug+gqKr0zyuVoDRz6v9MR8dnVm/8t6/uNgKVYsmcMaZ3wZsfHQO+kRUDXTKRbirtAlJq9MK+HTL5AuqJQFkGq1QKeAPUThdgh+YWDHyuFFIkYGpKEEHRdytkxYQHc4q2M/Og02zXhtQ4exdOkbNayzxz9xTc461XRULvcWSfDg4CAW4KixVFKINRlVv7t+sr6ommeaJer5nK4wSLJyo5A0o6MaHJ4NUskkDPg1a8PemKi1jgUAzt8gbxQlxWGe9rzX7obO+EOAmQjDwQ==
-Received: from mobilestation ([95.79.203.166])
-        by smtp.gmail.com with ESMTPSA id w25-20020ac24439000000b005114db52b4asm64411lfl.29.2024.02.05.14.06.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 14:06:17 -0800 (PST)
-Date: Tue, 6 Feb 2024 01:06:15 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH net-next v8 09/11] net: stmmac: dwmac-loongson: Fix half
- duplex
-Message-ID: <vostvybxawyhzmcnabnh7hsc7kk6vdxfdzqu4rkuqv6sdm7cuw@fd2y2o7di5am>
-References: <cover.1706601050.git.siyanteng@loongson.cn>
- <3382be108772ce56fe3e9bb99c9c53b7e9cd6bad.1706601050.git.siyanteng@loongson.cn>
- <dp4fhkephitylrf6a3rygjeftqf4mwrlgcdasstrq2osans3zd@zyt6lc7nu2e3>
+	s=arc-20240116; t=1707170894; c=relaxed/simple;
+	bh=A+6R9ZDS9UjRyWJgxuvz/fapj4AM3nXOKkH2EGth9G0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=bVamV60vHlEQ1w7b76MYk7x+WaCtz8kdfhsKZDAkzPhHDjf4JQCwkyKaU4rHmxwEfFC1LqYkZ1eBHrTCq2XrKC/8iGoeM5POJpOEJCdTdj6cGMqsPCByZbV6TqCWAh9K9L12O3dlAYluVWrIjIn8Yr1VhQV/6iVh1XhgwI+n8JU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J3O0rxD2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2EC62C433F1;
+	Mon,  5 Feb 2024 22:08:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707170894;
+	bh=A+6R9ZDS9UjRyWJgxuvz/fapj4AM3nXOKkH2EGth9G0=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=J3O0rxD2Ygjsj700Pm6yV4AiE6xvD57357ifkYU+ieTDB8hkV461XMsO00tlHXqYi
+	 obOsJc42LU53liXxQ7P53JrKIu5XcpbuINvFG0y1aDmPYSqnXnUoJV+dMfzf0meUB7
+	 1qcjsz1xtsOtAYAbUyty5DepmOcAFOir/Voxp7sK7lM0bHVYTubjrRGVZEkxHO1YeM
+	 7LXLtLVc2HGPodplgcDHw/4lYtgesIoT2Yn2ncE9MW9fo+wo8TTjzZzOcqOYAa0Wiv
+	 hUSyMCfaIOrnZHfSrQvJ6qhySEe32iJJVx3YJwRQIqO+uehz3Flog1nybiejhBUxvl
+	 DmBmCLZYFBxsQ==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 124B0C48298;
+	Mon,  5 Feb 2024 22:08:14 +0000 (UTC)
+From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= via B4 Relay
+ <devnull+arinc.unal.arinc9.com@kernel.org>
+Subject: [PATCH net-next v5 0/7] MT7530 DSA Subdriver Improvements Act II
+Date: Tue, 06 Feb 2024 01:08:01 +0300
+Message-Id:
+ <20240206-for-netnext-mt7530-improvements-2-v5-0-d7d92a185cb1@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <dp4fhkephitylrf6a3rygjeftqf4mwrlgcdasstrq2osans3zd@zyt6lc7nu2e3>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAEFcwWUC/43OTW7DIBAF4KtErDsWv46dVe8RZQFmaJBqiICiV
+ JHvXkoXTZVFs0GMRu97cyMZk8dMDrsbSVh99jG0Qb3syHLW4Q3B2zYTTrmkjDNwMUHAEvBaYC1
+ 7JSj49ZJixRVDycDBSCfFODIjJ0Wac0no/LV3HEmLwneWnNrm7HOJ6bOXV9b3Pz1MMMoVn4eJi
+ j0DBjr5sAwfQb+/9u88LHHtRuV3uXbM//dVDhSMpqNT1s5o6AMpfsn2PEOKRo7CKm01zvOiH0h
+ 5T8pnSNlIyo2j2mhtzfSH3LbtC79DbtO7AQAA
+To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ Russell King <linux@armlinux.org.uk>
+Cc: mithat.guner@xeront.com, erkin.bozoglu@xeront.com, 
+ Bartel Eerdekens <bartel.eerdekens@constell8.be>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, 
+ =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>, 
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+X-Mailer: b4 0.12.4
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1707170890; l=3529;
+ i=arinc.unal@arinc9.com; s=arinc9-patatt; h=from:subject:message-id;
+ bh=A+6R9ZDS9UjRyWJgxuvz/fapj4AM3nXOKkH2EGth9G0=;
+ b=lMad3J70PLiCdiP2RqMA7W8I4o6zA0ejht2u6w5ckUlGJy2YN1gQn4f5EwDCdQphg/ouy3+dp
+ BWUoF08vFkSBD7U/W9T3fZ5Zd+bPGbdXnK/FCfXthlaTVPPhRXSkQzm
+X-Developer-Key: i=arinc.unal@arinc9.com; a=ed25519;
+ pk=VmvgMWwm73yVIrlyJYvGtnXkQJy9CvbaeEqPQO9Z4kA=
+X-Endpoint-Received:
+ by B4 Relay for arinc.unal@arinc9.com/arinc9-patatt with auth_id=115
+X-Original-From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Reply-To: <arinc.unal@arinc9.com>
 
-On Tue, Feb 06, 2024 at 12:58:17AM +0300, Serge Semin wrote:
-> On Tue, Jan 30, 2024 at 04:49:14PM +0800, Yanteng Si wrote:
-> > Current GNET does not support half duplex mode.
-> > 
-> > Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-> > Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> > Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> > ---
-> >  drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 11 ++++++++++-
-> >  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c    |  3 ++-
-> >  include/linux/stmmac.h                               |  1 +
-> >  3 files changed, 13 insertions(+), 2 deletions(-)
-> > 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > index 264c4c198d5a..1753a3c46b77 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > @@ -432,8 +432,17 @@ static int loongson_gnet_config(struct pci_dev *pdev,
-> >  				struct stmmac_resources *res,
-> >  				struct device_node *np)
-> >  {
-> 
-> > -	if (pdev->revision == 0x00 || pdev->revision == 0x01)
-> > +	switch (pdev->revision) {
-> > +	case 0x00:
-> > +		plat->flags |= STMMAC_FLAG_DISABLE_FORCE_1000 |
-> > +			       STMMAC_FLAG_DISABLE_HALF_DUPLEX;
-> > +		break;
-> > +	case 0x01:
-> >  		plat->flags |= STMMAC_FLAG_DISABLE_FORCE_1000;
-> > +		break;
-> > +	default:
-> > +		break;
-> > +	}
-> 
-> Move this change into the patch
-> [PATCH net-next v8 06/11] net: stmmac: dwmac-loongson: Add GNET support
-> 
-> >  
-> >  	return 0;
-> >  }
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > index 5617b40abbe4..3aa862269eb0 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > @@ -1201,7 +1201,8 @@ static int stmmac_init_phy(struct net_device *dev)
-> >  static void stmmac_set_half_duplex(struct stmmac_priv *priv)
-> >  {
-> 
+Hello!
 
-> >  	/* Half-Duplex can only work with single tx queue */
-> > -	if (priv->plat->tx_queues_to_use > 1)
-> > +	if (priv->plat->tx_queues_to_use > 1 ||
-> > +	    (STMMAC_FLAG_DISABLE_HALF_DUPLEX & priv->plat->flags))
-> >  		priv->phylink_config.mac_capabilities &=
-> >  			~(MAC_10HD | MAC_100HD | MAC_1000HD);
-> >  	else
-> > diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-> > index 2810361e4048..197f6f914104 100644
-> > --- a/include/linux/stmmac.h
-> > +++ b/include/linux/stmmac.h
-> > @@ -222,6 +222,7 @@ struct dwmac4_addrs {
-> >  #define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(11)
-> >  #define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(12)
-> >  #define STMMAC_FLAG_DISABLE_FORCE_1000	BIT(13)
-> > +#define STMMAC_FLAG_DISABLE_HALF_DUPLEX	BIT(14)
-> >  
-> 
-> Place the patch with this change before
-> [PATCH net-next v8 06/11] net: stmmac: dwmac-loongson: Add GNET support
-> as a pre-requisite/preparation patch. Don't forget a thorough
-> description of what is wrong with the GNET Half-Duplex mode.
+This is the second patch series with the goal of simplifying the MT7530 DSA
+subdriver and improving support for MT7530, MT7531, and the switch on the
+MT7988 SoC.
 
-BTW what about re-defining the stmmac_ops.phylink_get_caps() callback
-instead of adding fixup flags in this patch and in the next one?
+I have done a simple ping test to confirm basic communication on all switch
+ports on MCM and standalone MT7530, and MT7531 switch with this patch
+series applied.
 
--Serge()
+MT7621 Unielec, MCM MT7530:
 
-> 
-> -Serge(y)
-> 
-> >  struct plat_stmmacenet_data {
-> >  	int bus_id;
-> > -- 
-> > 2.31.4
-> > 
+rgmii-only-gmac0-mt7621-unielec-u7621-06-16m.dtb
+gmac0-and-gmac1-mt7621-unielec-u7621-06-16m.dtb
+
+tftpboot 0x80008000 mips-uzImage.bin; tftpboot 0x83000000 mips-rootfs.cpio.uboot; tftpboot 0x83f00000 $dtb; bootm 0x80008000 0x83000000 0x83f00000
+
+MT7622 Bananapi, MT7531:
+
+gmac0-and-gmac1-mt7622-bananapi-bpi-r64.dtb
+
+tftpboot 0x40000000 arm64-Image; tftpboot 0x45000000 arm64-rootfs.cpio.uboot; tftpboot 0x4a000000 $dtb; booti 0x40000000 0x45000000 0x4a000000
+
+MT7623 Bananapi, standalone MT7530:
+
+rgmii-only-gmac0-mt7623n-bananapi-bpi-r2.dtb
+gmac0-and-gmac1-mt7623n-bananapi-bpi-r2.dtb
+
+tftpboot 0x80008000 arm-zImage; tftpboot 0x83000000 arm-rootfs.cpio.uboot; tftpboot 0x83f00000 $dtb; bootz 0x80008000 0x83000000 0x83f00000
+
+This patch series is the continuation of the patch series linked below.
+
+https://lore.kernel.org/r/20230522121532.86610-1-arinc.unal@arinc9.com
+
+Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+---
+Changes in v5:
+- Update the patches with the latest received trailers.
+- Patch 3
+  - Replace "return;" with "return 0;".
+- Patch 4
+  - Remove the stray brace.
+- Link to v4: https://lore.kernel.org/r/20240204-for-netnext-mt7530-improvements-2-v4-0-02bf0abaadb8@arinc9.com
+
+Changes in v4:
+- Update the patches with the latest received trailers.
+- Leave no error returns on mt7530_pad_clk_setup() before renaming it to
+  mt7530_setup_port6() and moving it to under mt7530_mac_config().
+- Link to v3: https://lore.kernel.org/r/20240202-for-netnext-mt7530-improvements-2-v3-0-63d5adae99ca@arinc9.com
+
+Changes in v3:
+- Update the patches with the latest received trailers.
+- Patch 5
+  - Disable TRGMII clocks for all cases.
+- Link to v2: https://lore.kernel.org/r/20240130-for-netnext-mt7530-improvements-2-v2-0-ba06f5dd9eb0@arinc9.com
+
+Changes in v2:
+- Update the patches with the latest received trailers.
+- Remove 'net: dsa: mt7530: move enabling port 6 to mt7530_setup_port6()'
+  which was patch 5. I will bring a more appropriate change with a later
+  patch series.
+- Patch 5
+  - Set P6_INTF_MODE(0) and explain why on the patch log.
+- Patch 6
+  - Mention the MT7988 document and explain more on the patch log.
+- Patch 7
+  - Explain more on the patch log.
+- Link to v1: https://lore.kernel.org/r/20240113102529.80371-1-arinc.unal@arinc9.com
+
+---
+Arınç ÜNAL (7):
+      net: dsa: mt7530: empty default case on mt7530_setup_port5()
+      net: dsa: mt7530: move XTAL check to mt7530_setup()
+      net: dsa: mt7530: simplify mt7530_pad_clk_setup()
+      net: dsa: mt7530: call port 6 setup from mt7530_mac_config()
+      net: dsa: mt7530: remove pad_setup function pointer
+      net: dsa: mt7530: correct port capabilities of MT7988
+      net: dsa: mt7530: do not clear config->supported_interfaces
+
+ drivers/net/dsa/mt7530.c | 152 +++++++++++++++++------------------------------
+ drivers/net/dsa/mt7530.h |   3 -
+ 2 files changed, 53 insertions(+), 102 deletions(-)
+---
+base-commit: 4acf4e62cd572b0c806035046b3698f5585ab821
+change-id: 20240121-for-netnext-mt7530-improvements-2-b4f43661b485
+
+Best regards,
+-- 
+Arınç ÜNAL <arinc.unal@arinc9.com>
+
 
