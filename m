@@ -1,181 +1,153 @@
-Return-Path: <netdev+bounces-69016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A587849234
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 02:46:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89738849238
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 02:49:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D39041F219BF
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 01:46:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A6FE1F214F9
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 01:49:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B436F801;
-	Mon,  5 Feb 2024 01:45:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C84279CD;
+	Mon,  5 Feb 2024 01:49:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cNXVdGTo"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="g40ZVIcJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C28C79E0
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 01:45:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1627B79CF
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 01:49:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707097555; cv=none; b=EeRK7YhAHC4AuQ4eitgU7Rsoc2kQcV54iC9Gwx7fVANOcV1UKLLDh7UkfbLg9iMCUMynyegbhR2EeQmNrSRXlfOWSIIoa6WN5Jq0Sa2E0ZkDcuA0mlzJ/D+P0cxnIMGJR+222md+mej31o/uWH/YmqgZ+EcSYEQymkSIWxc2zOM=
+	t=1707097760; cv=none; b=LJmELGLI+fKSS22o/lvrpN89YB/UJcnDM7hJFGckqn38zD4vrj6ApIf/O7mUV3bjmGfx7TWc0YkRCmnZ/A65LLno6MRJ1ubXziVhiFt7YQ4wUalbMZGEnJ1PiEmtJzuMLJvn1yWRACPhocD/LU8zjpXbnrr6tbQHDlRvMRkgqPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707097555; c=relaxed/simple;
-	bh=4QdQrnzQ2JRP8hTKJjhWdv85RFCeS5uR+yrlWviTv1M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Hv1a1/TQ+BplZgRQotO8tNJiAphMvz2koNTVS7Jx74tqS+b8vuLcCY3PLk7fTu+PQFXupl2YgtnLTcZTWEuU0XSWnF8n0EYc5ED9MpCipelMH8/sn5F38szjDsdVxjfjFAKk+5948agi+ZLSjqK+Bcy/eE+KVEF24IrWt8tHYhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cNXVdGTo; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707097552;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4QdQrnzQ2JRP8hTKJjhWdv85RFCeS5uR+yrlWviTv1M=;
-	b=cNXVdGToyTQc/IX6cXNiPbr0Wy58SZUfSThb3+IylV1w0VvmLeyLz0jIE81LfysHO29VDS
-	3NV2iNPjzjisoW+skF16bv+ODrSkEa4pUru7W5Cyb8fBCSOrIdIqkkGeq4xWcBiMY99soB
-	pL3H8dNXImTpR/Vsl1pgWlmz6Bh+2Ys=
-Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
- [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-575-hRAA5lXUMuWpOFH31RiZkA-1; Sun, 04 Feb 2024 20:45:51 -0500
-X-MC-Unique: hRAA5lXUMuWpOFH31RiZkA-1
-Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-5997417c351so4619370eaf.2
-        for <netdev@vger.kernel.org>; Sun, 04 Feb 2024 17:45:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707097549; x=1707702349;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4QdQrnzQ2JRP8hTKJjhWdv85RFCeS5uR+yrlWviTv1M=;
-        b=S1g1z/lgXAbVKjnt2e1NqNtVncbdOHTEXgAKyNk17XuffXSpYa7o7EPNWyrEkMPNxd
-         bHSrmeMDRspStMM4/cYKvK1nUkYCdutbxSruOKTWX4v1+eaorhQI9yGP0apQIV6ZohzQ
-         0sypdMLCAHqsUxAPysw328OSlpOB7O6aHFUH3ibwUHsxfjyC5Z82WZKHdOUxg3AgVEk3
-         9OAKBhOdMHV77ZXJxOvzBtcuBPqauN+WeAtQP83q32e1afu00J6no/91DhPM5+TwxldQ
-         rnz4dUwZK4K07+d/J1g1iL7pdIxl0FsQkjaYCzb4sfCAzUQX9GtpU3OCMMM+kv6AL5Ck
-         u+MA==
-X-Gm-Message-State: AOJu0Yx0p0T4wYUIVXVPryaVZEYzL7cCr2kGvVbqWN1z2fvCiA0E25zW
-	rPnL8QyZ+ezsBNTwoBtAy+4jvZZY4ywg+Tu2jKWgBYw/w0a9+S+3K0FWev7bIlSXyZ8U7b6uTAi
-	kV+IgE0QcNL9uFTh2XfqNZqgNt6u9MpMeTqj0XTnZow2pmRqOKJMZse5gIzIcTP9tLiZVKeTzyx
-	A5jgoM9lnhO0sG3D8dGOrQCPNP0XN9iyjqq6zfmCk=
-X-Received: by 2002:a05:6358:9da3:b0:175:f2c1:d649 with SMTP id d35-20020a0563589da300b00175f2c1d649mr7242991rwo.25.1707097549640;
-        Sun, 04 Feb 2024 17:45:49 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHqwyvJvpBl6E8NjHMKDiFV4avhR9M89w/d2RoFIpIA/tCKv9Hl3Qunp/+IitCo0r5OKTucW3sRCFoRIPIOxeU=
-X-Received: by 2002:a05:6358:9da3:b0:175:f2c1:d649 with SMTP id
- d35-20020a0563589da300b00175f2c1d649mr7242977rwo.25.1707097549374; Sun, 04
- Feb 2024 17:45:49 -0800 (PST)
+	s=arc-20240116; t=1707097760; c=relaxed/simple;
+	bh=t4v/SThxKqBvuY5KiV/FxrdsvrQqRjJYlFQy+QqVJm0=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=JPMO+a614M2csA+xpiOd9fnUGio0++1jbbNQ7uTb2PASOmX+Ur4e+ean+WuooCkWVPXJ/6FVAORfw32OleNHBGdGCKjpimT6SWLwJzbuQl9a4m5l0PMxAAD4X3FfX+HS8KPbxYROtxAXDBCDekRjQPYlhSVy5FTVDs5ezCubRp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=g40ZVIcJ; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+	:Subject:From:To:MIME-Version:Date:Message-ID:Sender:Reply-To:Cc:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=DPqCE0IQvkt4gx+/+Rj+CdFFygCszeRoTdDptYrL/hs=; b=g40ZVIcJB69MPlwCrnD5uRE8tA
+	qBiRORvKFKmvb2GnIu8xRzm9cXBam87kOxBtENyF24WWFc9r88c4K7rmJabpkuFm+R/Qg6e7FpnoK
+	kF/oL2g9Mb9TcuPZxfoaEL5JIir21VO+B2OlZbE3RY9o31BifudFlOIp5WV7sJQpDytcjEeeHDvpN
+	9wz6ZtfZqlQ2yZMohwLcHummMJ89jOBQM85XtkxLebFTRwqlk5hoglNjToi8oRhrp5d4Z/Iyt04ZL
+	wR/Hj1uMNDGgwiI+OJFs57Vp+N3JUkBnC53qRvpwR6STEdEcet/2T/8jWOqsG/kbWeFa4AuvP7p+u
+	QdULIixA==;
+Received: from fpd2fa7e2a.ap.nuro.jp ([210.250.126.42] helo=[192.168.1.6])
+	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rWo5m-0000000BXrI-1I9h;
+	Mon, 05 Feb 2024 01:48:26 +0000
+Message-ID: <2acf3fe5-7206-46d6-adac-0bf40d175d5d@infradead.org>
+Date: Mon, 5 Feb 2024 10:48:07 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CH0PR12MB85809CB7678CADCC892B2259C97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
- <20240130104107-mutt-send-email-mst@kernel.org> <CH0PR12MB8580CCF10308B9935810C21DC97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
- <20240130105246-mutt-send-email-mst@kernel.org> <CH0PR12MB858067B9DB6BCEE10519F957C97D2@CH0PR12MB8580.namprd12.prod.outlook.com>
- <CAL+tcoCsT6UJ=2zxL-=0n7sQ2vPC5ybnQk9bGhF6PexZN=-29Q@mail.gmail.com>
- <20240201202106.25d6dc93@kernel.org> <CAL+tcoCs6x7=rBj50g2cMjwLjLOKs9xy1ZZBwSQs8bLfzm=B7Q@mail.gmail.com>
- <20240202080126.72598eef@kernel.org> <CACGkMEu0x9zr09DChJtnTP4R-Tot=5gAYb3Tx2V1EMbEk3oEGw@mail.gmail.com>
- <20240204070920-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240204070920-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 5 Feb 2024 09:45:38 +0800
-Message-ID: <CACGkMEsphvgtvaFFob3OjJ-UuuDEVgqyg3pahaGvGZkAsioAFg@mail.gmail.com>
-Subject: Re: [PATCH net-next] virtio_net: Add TX stop and wake counters
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jason Xing <kerneljasonxing@gmail.com>, 
-	Daniel Jurgens <danielj@nvidia.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>, 
-	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, 
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>, 
-	"abeni@redhat.com" <abeni@redhat.com>, Parav Pandit <parav@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: sambat goson <sombat3960@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Geoff Levand <geoff@infradead.org>
+Subject: [PATCH v2 net] ps3/gelic: Fix SKB allocation
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Sun, Feb 4, 2024 at 8:39=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
-wrote:
->
-> On Sun, Feb 04, 2024 at 09:20:18AM +0800, Jason Wang wrote:
-> > On Sat, Feb 3, 2024 at 12:01=E2=80=AFAM Jakub Kicinski <kuba@kernel.org=
-> wrote:
-> > >
-> > > On Fri, 2 Feb 2024 14:52:59 +0800 Jason Xing wrote:
-> > > > > Can you say more? I'm curious what's your use case.
-> > > >
-> > > > I'm not working at Nvidia, so my point of view may differ from thei=
-rs.
-> > > > From what I can tell is that those two counters help me narrow down
-> > > > the range if I have to diagnose/debug some issues.
-> > >
-> > > right, i'm asking to collect useful debugging tricks, nothing against
-> > > the patch itself :)
-> > >
-> > > > 1) I sometimes notice that if some irq is held too long (say, one
-> > > > simple case: output of printk printed to the console), those two
-> > > > counters can reflect the issue.
-> > > > 2) Similarly in virtio net, recently I traced such counters the
-> > > > current kernel does not have and it turned out that one of the outp=
-ut
-> > > > queues in the backend behaves badly.
-> > > > ...
-> > > >
-> > > > Stop/wake queue counters may not show directly the root cause of th=
-e
-> > > > issue, but help us 'guess' to some extent.
-> > >
-> > > I'm surprised you say you can detect stall-related issues with this.
-> > > I guess virtio doesn't have BQL support, which makes it special.
-> >
-> > Yes, virtio-net has a legacy orphan mode, this is something that needs
-> > to be dropped in the future. This would make BQL much more easier to
-> > be implemented.
->
->
-> It's not that we can't implement BQL,
+    Commit 3ce4f9c3fbb3 ("net/ps3_gelic_net: Add gelic_descr structures")
+    of 6.8-rc1 did not set up the network SKB's correctly, resulting in
+    a kernel panic.
+    
+    This fix changes the way the napi buffer and corresponding SKB are
+    allocated and managed.
+    
+    Reported-by: sambat goson <sombat3960@gmail.com>
+    Fixes: 3ce4f9c3fbb3 ("net/ps3_gelic_net: Add gelic_descr structures")
+    Signed-off-by: Geoff Levand <geoff@infradead.org>
 
-Well, I don't say we can't, I say it's not easy as we need to deal
-with the switching between two modes[1]. If we just have one mode like
-TX interrupt, we don't need to care about that.
-
-> it's that it does not seem to
-> be benefitial - has been discussed many times.
-
-Virtio doesn't differ from other NIC too much, for example gve supports bql=
-.
-
-1) There's no numbers in [1]
-2) We only benchmark vhost-net but not others, for example, vhost-user
-and hardware implementations
-3) We don't have interrupt coalescing in 2018 but now we have with DIM
-
-Thanks
-
-[1] https://lore.kernel.org/netdev/20181205225323.12555-1-mst@redhat.com/
-
-
->
-> > > Normal HW drivers with BQL almost never stop the queue by themselves.
-> > > I mean - if they do, and BQL is active, then the system is probably
-> > > misconfigured (queue is too short). This is what we use at Meta to
-> > > detect stalls in drivers with BQL:
-> > >
-> > > https://lore.kernel.org/all/20240131102150.728960-3-leitao@debian.org=
-/
-> > >
-> > > Daniel, I think this may be a good enough excuse to add per-queue sta=
-ts
-> > > to the netdev genl family, if you're up for that. LMK if you want mor=
-e
-> > > info, otherwise I guess ethtool -S is fine for now.
-> > >
-> >
-> > Thanks
->
-
+diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.c b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+index d5b75af163d3..3ebe903e4b6d 100644
+--- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
++++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+@@ -375,20 +375,15 @@ static int gelic_card_init_chain(struct gelic_card *card,
+ static int gelic_descr_prepare_rx(struct gelic_card *card,
+ 				  struct gelic_descr *descr)
+ {
+-	static const unsigned int rx_skb_size =
+-		ALIGN(GELIC_NET_MAX_FRAME, GELIC_NET_RXBUF_ALIGN) +
+-		GELIC_NET_RXBUF_ALIGN - 1;
++	static const unsigned int napi_buff_size =
++		round_up(GELIC_NET_MAX_FRAME, GELIC_NET_RXBUF_ALIGN);
++	struct device *dev = ctodev(card);
+ 	dma_addr_t cpu_addr;
+-	int offset;
++	void *napi_buff;
+ 
+ 	if (gelic_descr_get_status(descr) !=  GELIC_DESCR_DMA_NOT_IN_USE)
+-		dev_info(ctodev(card), "%s: ERROR status\n", __func__);
++		dev_info(dev, "%s: ERROR status\n", __func__);
+ 
+-	descr->skb = netdev_alloc_skb(*card->netdev, rx_skb_size);
+-	if (!descr->skb) {
+-		descr->hw_regs.payload.dev_addr = 0; /* tell DMAC don't touch memory */
+-		return -ENOMEM;
+-	}
+ 	descr->hw_regs.dmac_cmd_status = 0;
+ 	descr->hw_regs.result_size = 0;
+ 	descr->hw_regs.valid_size = 0;
+@@ -397,24 +392,32 @@ static int gelic_descr_prepare_rx(struct gelic_card *card,
+ 	descr->hw_regs.payload.size = 0;
+ 	descr->skb = NULL;
+ 
+-	offset = ((unsigned long)descr->skb->data) &
+-		(GELIC_NET_RXBUF_ALIGN - 1);
+-	if (offset)
+-		skb_reserve(descr->skb, GELIC_NET_RXBUF_ALIGN - offset);
+-	/* io-mmu-map the skb */
+-	cpu_addr = dma_map_single(ctodev(card), descr->skb->data,
+-				  GELIC_NET_MAX_FRAME, DMA_FROM_DEVICE);
+-	descr->hw_regs.payload.dev_addr = cpu_to_be32(cpu_addr);
+-	if (dma_mapping_error(ctodev(card), cpu_addr)) {
+-		dev_kfree_skb_any(descr->skb);
++	napi_buff = napi_alloc_frag_align(napi_buff_size,
++					  GELIC_NET_RXBUF_ALIGN);
++
++	if (unlikely(!napi_buff))
++		return -ENOMEM;
++
++	descr->skb = napi_build_skb(napi_buff, napi_buff_size);
++
++	if (unlikely(!descr->skb)) {
++		skb_free_frag(napi_buff);
++		return -ENOMEM;
++	}
++
++	cpu_addr = dma_map_single(dev, napi_buff, napi_buff_size,
++				  DMA_FROM_DEVICE);
++
++	if (dma_mapping_error(dev, cpu_addr)) {
++		skb_free_frag(napi_buff);
+ 		descr->skb = NULL;
+-		dev_info(ctodev(card),
+-			 "%s:Could not iommu-map rx buffer\n", __func__);
++		dev_err_once(dev, "%s:Could not iommu-map rx buffer\n",
++			     __func__);
+ 		gelic_descr_set_status(descr, GELIC_DESCR_DMA_NOT_IN_USE);
+ 		return -ENOMEM;
+ 	}
+ 
+-	descr->hw_regs.payload.size = cpu_to_be32(GELIC_NET_MAX_FRAME);
++	descr->hw_regs.payload.size = cpu_to_be32(napi_buff_size);
+ 	descr->hw_regs.payload.dev_addr = cpu_to_be32(cpu_addr);
+ 
+ 	gelic_descr_set_status(descr, GELIC_DESCR_DMA_CARDOWNED);
 
