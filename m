@@ -1,115 +1,131 @@
-Return-Path: <netdev+bounces-69039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 504828494A0
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 08:38:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1BC9849520
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 09:11:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BA66281A78
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 07:38:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF19F287A25
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 08:10:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8161D51B;
-	Mon,  5 Feb 2024 07:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A81211184;
+	Mon,  5 Feb 2024 08:10:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YhzXzhdL"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="me72vfHR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4521C11705;
-	Mon,  5 Feb 2024 07:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C419B11CA9;
+	Mon,  5 Feb 2024 08:10:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707118681; cv=none; b=QKX5xPlEigZT88mIRvE+J5PztaF/bMC5iQOlBkzaL5d7svUY/CBDrGz64KBEDJDygYGD6iuVRMV9BuhhUx1iEfboBqDeSMs/WVGMugOLtq21caFQPcZPABo8iIundygdqstcIHicIbFws6/XasElkfvy4BcGSZZz6tUVcWiESIM=
+	t=1707120652; cv=none; b=mRLnFeR1u7k9A0LPZwMT0ougQVL9HA4+kyDZm3WQS89wJdmcORqUNhZ3DX9TDqoric7jOFH6G1cK4FPAEtUdBUwY5mGPVUF8di+fe0wOv9YfR+0aB4kG/6p0XJfnLik9NFZQBzrVyjNCQru3rMFE+Oa2fhjEhJIpyeixjFwyYHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707118681; c=relaxed/simple;
-	bh=8y4SOWN1mmTsTxBFewxWIapH42Wz+9Mm5QGvzz6fXQQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ern/bsoWZCBkZZugsoVtn72rLgwNVldu+pOnbT+7eCgMnf6W63/5Zu4cZT9wdotNup1JXaVCbyXgsIxkp+HzNInkoR5WDBlH18xdDDRub3cC43v3u7oMVXn+VJd2539GIeerS/VbyvgiIly7Qw3I5vM+Ekzg4KQyZCBM7OW4gzY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YhzXzhdL; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1707120652; c=relaxed/simple;
+	bh=3ucSGTFs8one78Y6iL+BGkNxpmGL9+cLmwl64Uax07E=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bvYe3ILkGWJcoEw8PwfAVbdJ8JtZlspa4VO/cjTK5waFkp8YEwzejOnEFwa+ublexsDJKK/4TYf8TzFsDkpID/5scK6TLkINMY7fbZF8uXdvaubXJX3X2TWwM2Mn8legB0pXb2UPK8O+H2qI3cZseVpO7joBMZfeeWZnqbN6/Qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=me72vfHR; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707118680; x=1738654680;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=8y4SOWN1mmTsTxBFewxWIapH42Wz+9Mm5QGvzz6fXQQ=;
-  b=YhzXzhdLvsAUZYYwctfXe9BNnWnJ0RJ8RXIWQNk9TFmvZskCnPjvBPiK
-   cLO5igmfklyw1i6Wl8Hs2bc9Lcbv7qxZX4wbEy6oKh+00P85p4UO4sGaI
-   UuPstzqY7iPVtvFLrJgGJMJih7utwO2EFkS/ywaGq5+1kvz7g2I/SkQYQ
-   M4NxSG+aHF33UoBvf9HqA9slz7sNtWL0q1kLd2U0OsXAoXaSfbJgGAOg/
-   7OEjMK7wQAW7QS9eaDT9lvhYISV+KT+swaF8ggjSWOcumkTrY4BPudj0W
-   VqcFcXLeVPrwPerS4mZTHXPKCw1EytzX8BJNmhffKOeXA8tihI/0K+npV
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10974"; a="4263076"
-X-IronPort-AV: E=Sophos;i="6.05,242,1701158400"; 
-   d="scan'208";a="4263076"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2024 23:37:59 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,242,1701158400"; 
-   d="scan'208";a="31741571"
-Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by smtpauth.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2024 23:37:57 -0800
-Date: Mon, 5 Feb 2024 08:37:48 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Kunwu Chan <chentao@kylinos.cn>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 0/6] Use KMEM_CACHE instead of kmem_cache_create
-Message-ID: <ZcCQTPUoeqUeiQsN@mev-dev>
-References: <20240205072013.427639-1-chentao@kylinos.cn>
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1707120650; x=1738656650;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=3ucSGTFs8one78Y6iL+BGkNxpmGL9+cLmwl64Uax07E=;
+  b=me72vfHRYTxo9UtdkkseLaJHowhHB/L3p3dVK9MhyIZlvsvh5SrzjSqb
+   uh++atguJbY7DxMvyLSLattn908pY7DRDndkKnEdyf3JWKYp4u9PU7iRZ
+   U60bk6RfaYWetBovGPhJekpUO/w4tGFF7KYc4DwQVpvRr62YWjZ9FwklD
+   DrzqTtWCLnvj4Wmeoo/uv2VLnVB/pkReJ2H2ohzKp79DWOVGmjjFFCzlC
+   SBcTloNkw6epx6XSlZxSXf9cnRuUoMFPV283WXa9LFHy29T3TuB6/P60i
+   E52PT+UnGcRsFg/ppkyQeQPUAdvrx1TEeUZ+RPmVUiE+4HlbuDjtoUs8+
+   Q==;
+X-CSE-ConnectionGUID: G0jFP2bBRLutVp1LQAF9Lw==
+X-CSE-MsgGUID: +XWcqZs0QeGrs5xxSawVBA==
+X-IronPort-AV: E=Sophos;i="6.05,242,1701154800"; 
+   d="scan'208";a="183027790"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 05 Feb 2024 01:10:49 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 5 Feb 2024 01:10:29 -0700
+Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Mon, 5 Feb 2024 01:10:28 -0700
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>
+Subject: [PATCH net] lan966x: Fix crash when adding interface under a lag
+Date: Mon, 5 Feb 2024 09:07:56 +0100
+Message-ID: <20240205080756.2134143-1-horatiu.vultur@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240205072013.427639-1-chentao@kylinos.cn>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Mon, Feb 05, 2024 at 03:20:07PM +0800, Kunwu Chan wrote:
-> As Jiri Pirko suggests, 
-You can add a suggested-by tag.
+There is a crash when adding one of the lan966x interfaces under a lag
+interface. The issue can be reproduced like this:
+ip link add name bond0 type bond miimon 100 mode balance-xor
+ip link set dev eth0 master bond0
 
-> I'm using a patchset to cleanup the same issues in the 'net' module.
-> Use the new KMEM_CACHE() macro instead of direct kmem_cache_create
-> to simplify the creation of SLAB caches.
->
-What about rest of the kmem_cache_create in net folder? (ex. fib_trie)
+The reason is because when adding a interface under the lag it would go
+through all the ports and try to figure out which other ports are under
+that lag interface. And the issue is that lan966x can have ports that are
+NULL pointer as they are not probed. So then iterating over these ports
+it would just crash as they are NULL pointers.
+The fix consists in actually checking for NULL pointers before accessing
+something from the ports. Like we do in other places.
 
-> Some cache names are changed to be the same as struct names. 
-> This change is recorded in the changelog for easy reference.
-> It's harmless cause it's used in /proc/slabinfo to identify this cache.
-> 
-> Kunwu Chan (6):
->   net: kcm: Simplify the allocation of slab caches
->   ip6mr: Simplify the allocation of slab caches in ip6_mr_init
->   ipmr: Simplify the allocation of slab caches
->   ipv4: Simplify the allocation of slab caches in ip_rt_init
->   tcp: Simplify the allocation of slab caches
->   ipv6: Simplify the allocation of slab caches
-> 
->  net/ipv4/ipmr.c    |  5 +----
->  net/ipv4/route.c   |  5 ++---
->  net/ipv4/tcp.c     | 14 ++++----------
->  net/ipv6/ip6_fib.c |  6 ++----
->  net/ipv6/ip6mr.c   |  5 +----
->  net/kcm/kcmsock.c  |  8 ++------
->  6 files changed, 12 insertions(+), 31 deletions(-)
-> 
-> -- 
-> 2.39.2
+Fixes: cabc9d49333d ("net: lan966x: Add lag support for lan966x")
+Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+---
+ drivers/net/ethernet/microchip/lan966x/lan966x_lag.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-Changes looks fines, thanks
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-for whole series.
+diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_lag.c b/drivers/net/ethernet/microchip/lan966x/lan966x_lag.c
+index 41fa2523d91d3..89a2c3176f1da 100644
+--- a/drivers/net/ethernet/microchip/lan966x/lan966x_lag.c
++++ b/drivers/net/ethernet/microchip/lan966x/lan966x_lag.c
+@@ -37,19 +37,24 @@ static void lan966x_lag_set_aggr_pgids(struct lan966x *lan966x)
+ 
+ 	/* Now, set PGIDs for each active LAG */
+ 	for (lag = 0; lag < lan966x->num_phys_ports; ++lag) {
+-		struct net_device *bond = lan966x->ports[lag]->bond;
++		struct lan966x_port *port = lan966x->ports[lag];
+ 		int num_active_ports = 0;
++		struct net_device *bond;
+ 		unsigned long bond_mask;
+ 		u8 aggr_idx[16];
+ 
+-		if (!bond || (visited & BIT(lag)))
++		if (!port || !port->bond || (visited & BIT(lag)))
+ 			continue;
+ 
++		bond = lan966x->ports[lag]->bond;
+ 		bond_mask = lan966x_lag_get_mask(lan966x, bond);
+ 
+ 		for_each_set_bit(p, &bond_mask, lan966x->num_phys_ports) {
+ 			struct lan966x_port *port = lan966x->ports[p];
+ 
++			if (!port)
++				continue;
++
+ 			lan_wr(ANA_PGID_PGID_SET(bond_mask),
+ 			       lan966x, ANA_PGID(p));
+ 			if (port->lag_tx_active)
+-- 
+2.34.1
 
-Thanks,
-Michal
 
