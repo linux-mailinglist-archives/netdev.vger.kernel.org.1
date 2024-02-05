@@ -1,50 +1,64 @@
-Return-Path: <netdev+bounces-69089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AC958498AD
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:20:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5652D8498F1
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:35:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D31F1C22288
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 11:20:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 87F811C2040B
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 11:35:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F32A518C28;
-	Mon,  5 Feb 2024 11:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A66D18651;
+	Mon,  5 Feb 2024 11:35:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R8WLBJe4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o0QBSRZv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C45AC18AF6;
-	Mon,  5 Feb 2024 11:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2192618E08;
+	Mon,  5 Feb 2024 11:35:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707132029; cv=none; b=VmeEVMDwGw7MgVHBi55Lq0Tshq6zkzfVsVNkE44UnSKyUG/5/mOV97luuwTC7LOlvnlbi7WQd1ka6O9lY5OBdkFegdFklY/TMqik7gdYr9utp2GpdqpoukPifguWuQZKW54UX/cPDAW+35fJpRh2//9DkXzE70i62dxfHRQ08M4=
+	t=1707132940; cv=none; b=dxjPfoJb3NyJKJ5ZhytGSA5xE07lATUN9ldUvNuYdlIP+0g1lZbmsEjkYpubB6vLhanGt7W79DaIlpeiPmtV3qRoniqxFVDG8MrTgeWC7PPBCppnkuYMM2myRsLOxBSCapNeAZCj41b5RJrz5IOve4NiE69jg5TDBbaMS4F1cos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707132029; c=relaxed/simple;
-	bh=c7Fj/wPtiOUubtTF3wjdUAiVTE4AOhMVnaoeCU913dE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DSqOSzs0ySPR0p8FLaG1cyiHzKERZEY4Ic65fDa7937KuK9RRoCMsLsS46RcT1ZHXHPjOAwSc27JemCnmcPE9owtcAiBznSBNHGnRBM5ukxCxw80wqAvPpviXYuZCvKiwmT7XSTOdw5+e5OB1zWqy00b++DdQexkF6VHWl5k/TA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R8WLBJe4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 454D5C43399;
-	Mon,  5 Feb 2024 11:20:29 +0000 (UTC)
+	s=arc-20240116; t=1707132940; c=relaxed/simple;
+	bh=yI2SqIv3nHm+DnnBvwCta43fm8yrJu4XF9CQCyTJaBw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=j9MP7cQG7zFwSlRE1+U9uYWYVXACUEfEwGy8jyU+39wcBIWCca0H4kMmdNvGLfU9bVxNNYqSYaE9VL1KzfgoS3HMiUBv8P/S0wZ8zn56XC4KZSNUNrbh3dKgJZKgjFLfVP2FwvZhhjLQojJEhzJFhSK4D6KTm0mMyXBlHNfd6Fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o0QBSRZv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27064C433F1;
+	Mon,  5 Feb 2024 11:35:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707132029;
-	bh=c7Fj/wPtiOUubtTF3wjdUAiVTE4AOhMVnaoeCU913dE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=R8WLBJe4UHRafytugFoYiqA/o3spzg9R4i70/j3gU36jMNwkjQSdPfERjiX3Wwmqy
-	 FYnAW6KZ6zVckqPA/1+LNlq7+yaV0ouaBj8UE0DX5+HLSS6gk8kTzN9e9xDA/XFeXP
-	 ZB2uYZs2ERuQ/xPmV9xRD2bk1MjUl+A8AFU0XNdrOhxDIz5+JxzL8wdd3uIe+0phGc
-	 8mosYsB+BpLBqt8RNrUNy86VosEna++048gEqH2BRg966S33RwzQ+cYK916pkKa65s
-	 EbbmoDSBfHbGZYMoNac6iN2M3ss4GgV6sGo6zsEwzEB6eQEtltyV2nuAc1W0nqO6wf
-	 5ETH66XFaliqg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 32448E2F2F2;
-	Mon,  5 Feb 2024 11:20:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1707132939;
+	bh=yI2SqIv3nHm+DnnBvwCta43fm8yrJu4XF9CQCyTJaBw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=o0QBSRZvNg0bF+UFm8BiUiYqM4HSkx0G9t+sBPI2iaD+YP5EQp9xc0WwfayY3hZuD
+	 yudCfZ2Yuj9gP+JdCdQXq0tcR9sorXZWUqd5uH84B6NsJk34GCxcHEc8ANREDMPlIE
+	 z2mN+9wuJ1qQbbYxqw37h2ATJIT7hIzZsjN6WlB3bz+PzTccQxBt/wYQWGTcREKnHO
+	 nz1wMR1tS/ETzn/4ibTF5Ng3hKz67mTlv/I2/Tx1b6+tNx6Zs0kH8hgyrWRMaTYS8T
+	 MyM5GeYwoSE94xTQ5kWxv1nDzmQTlQgOxqBrUARjGVWE3pxXyFfSNzVnvAGwa82d7s
+	 roqSaurVZbKIw==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: netdev@vger.kernel.org
+Cc: lorenzo.bianconi@redhat.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	bpf@vger.kernel.org,
+	toke@redhat.com,
+	willemdebruijn.kernel@gmail.com,
+	jasowang@redhat.com,
+	sdf@google.com,
+	hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
+	linyunsheng@huawei.com
+Subject: [PATCH v8 net-next 0/4] add multi-buff support for xdp running in generic mode
+Date: Mon,  5 Feb 2024 12:35:11 +0100
+Message-ID: <cover.1707132752.git.lorenzo@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,52 +66,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/5] mptcp: annotate lockless access
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170713202920.23951.439284843602275473.git-patchwork-notify@kernel.org>
-Date: Mon, 05 Feb 2024 11:20:29 +0000
-References: <20240202-upstream-net-next-20240202-mptcp-annotate-lockless-access-v1-0-031d6680afdc@kernel.org>
-In-Reply-To: <20240202-upstream-net-next-20240202-mptcp-annotate-lockless-access-v1-0-031d6680afdc@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang.tang@linux.dev,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello:
+Introduce multi-buffer support for xdp running in generic mode not always
+linearizing the skb in netif_receive_generic_xdp routine.
+Introduce generic percpu page_pools allocator.
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+Changes since v7:
+- fix sparse warnings
+Changes since v6:
+- remove patch 4/5 'net: page_pool: make stats available just for global pools'
+- rename netif_skb_segment_for_xdp() in
+  skb_cow_data_for_xdp()/skb_pp_cow_data()
+- rename net_page_pool_alloc() in net_page_pool_create()
+- rename page_pool percpu pointer in system_page_pool
+- set percpu page_pool memory size
+Changes since v5:
+- move percpu page_pool pointer out of softnet_data in a dedicated variable
+- make page_pool stats available just for global pools
+- rely on netif_skb_segment_for_xdp utility routine in veth driver
+Changes since v4:
+- fix compilation error if page_pools are not enabled
+Changes since v3:
+- introduce page_pool in softnet_data structure
+- rely on page_pools for xdp_generic code
+Changes since v2:
+- rely on napi_alloc_frag() and napi_build_skb() to build the new skb
+Changes since v1:
+- explicitly keep the skb segmented in netif_skb_check_for_generic_xdp() and
+  do not rely on pskb_expand_head()
 
-On Fri, 02 Feb 2024 12:40:06 +0100 you wrote:
-> This is a series of 5 patches from Paolo to annotate lockless access.
-> 
-> The MPTCP locking schema is already quite complex. We need to clarify it
-> and make the lockless access already there consistent, or later changes
-> will be even harder to follow and understand.
-> 
-> This series goes through all the msk fields accessed in the RX and TX
-> path and makes the lockless annotation consistent with the in-use
-> locking schema.
-> 
-> [...]
+Lorenzo Bianconi (4):
+  net: add generic percpu page_pool allocator
+  xdp: rely on skb pointer reference in do_xdp_generic and
+    netif_receive_generic_xdp
+  xdp: add multi-buff support for xdp running in generic mode
+  veth: rely on skb_cow_data_for_xdp utility routine
 
-Here is the summary with links:
-  - [net-next,1/5] mptcp: annotate access for msk keys
-    https://git.kernel.org/netdev/net-next/c/1c09d7cbb57a
-  - [net-next,2/5] mptcp: annotate lockless access for the tx path
-    https://git.kernel.org/netdev/net-next/c/d440a4e27acd
-  - [net-next,3/5] mptcp: annotate lockless access for RX path fields
-    https://git.kernel.org/netdev/net-next/c/9426ce476a70
-  - [net-next,4/5] mptcp: annotate lockless access for token
-    https://git.kernel.org/netdev/net-next/c/b9f4554356f6
-  - [net-next,5/5] mptcp: annotate lockless accesses around read-mostly fields
-    https://git.kernel.org/netdev/net-next/c/28e5c1380506
+ drivers/net/tun.c             |   4 +-
+ drivers/net/veth.c            |  79 ++------------------
+ include/linux/netdevice.h     |   2 +-
+ include/linux/skbuff.h        |   2 +
+ include/net/page_pool/types.h |   3 +
+ net/core/dev.c                | 131 +++++++++++++++++++++++++++-------
+ net/core/page_pool.c          |  23 ++++--
+ net/core/skbuff.c             |  96 ++++++++++++++++++++++++-
+ 8 files changed, 231 insertions(+), 109 deletions(-)
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.0
 
 
