@@ -1,281 +1,195 @@
-Return-Path: <netdev+bounces-69020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 158A18492C9
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 04:33:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C5358492CF
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 04:38:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C04DD2836B4
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 03:33:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B924C281119
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 03:38:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 456AF8C09;
-	Mon,  5 Feb 2024 03:33:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54FC28C06;
+	Mon,  5 Feb 2024 03:38:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="x1W+NMKw"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Uzf/7Cyj"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A941B641;
-	Mon,  5 Feb 2024 03:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AFC48F44
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 03:38:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707104016; cv=none; b=JhXQG7uAyFJEnGYXNsOAL5Y1iWzb5nd956Nfm30ZmuT4wN+RTVm80xOyU1IHxssUzfi0vpbZ+AnttRLG/9VJMSNklP7D8zVb4m453f2HsbVBG3y6d5nJZzCxIBGR4wM9uGmBp9WKmpv1hB8MYvj+GGp128he16Jrx47Ii9GORs8=
+	t=1707104313; cv=none; b=NdhOb0sk/XPvew6dFNF52ATy4s/so74tKlhnH8VTiYUknbuGQvujBzD9lI0Cm5bQTIF1kyJ9c+IY0feQlZ7CFokWtJ8KG5SuNDB/xy2FTS8bCxfVRf2NxtIXsflJfUnShUrE8e6jzQmFvtqGfWfnivFPN3Oxf4jfMi85OluYTso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707104016; c=relaxed/simple;
-	bh=GusX03XsSYBVcrLgizOYTdDfBRDJW0TkmlPm0Gnju3w=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hfjPOIX7BN9rOUXi3otc4P6agmKykTOFSn6TR5GAEQizl/Xz9rJioA+FE0/stRXV920shbkwd1IuLNzpMHt0UeKZudXJzk3QiS9a1+5FxXC59QV+Dqs9CjMZ7GVoKSl7V8o+5mhR3nL7X+vq7Stb0l9+skmUQhLnUU1iZ8SPc6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=x1W+NMKw; arc=none smtp.client-ip=115.124.30.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1707104010; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=yfss92uzzak+nboLgiX+RB8TBpPy1BbgGZcPC6jc+JU=;
-	b=x1W+NMKwZtKOQsVGOHm0bhip3/Q8Ua26R0F7ZkNVHVipfKWBvvzCt+jda7h4hPkYb+wZuD+iz6YN+jx3I+HpFmKwViYyGMhMRma4fQU4N0tlyTg08pCHYX4URyuGZbGzGwxHrG0D/lYKGfvnvOJTYSBAMVuWn8HzLyckhTSPJ04=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0W02KNaG_1707103997;
-Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W02KNaG_1707103997)
-          by smtp.aliyun-inc.com;
-          Mon, 05 Feb 2024 11:33:29 +0800
-From: Wen Gu <guwen@linux.alibaba.com>
-To: wenjia@linux.ibm.com,
-	jaka@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net/smc: change the term virtual ISM to Emulated-ISM
-Date: Mon,  5 Feb 2024 11:33:17 +0800
-Message-Id: <20240205033317.127269-1-guwen@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
+	s=arc-20240116; t=1707104313; c=relaxed/simple;
+	bh=KJ/CyQ7SR8uSyR5j4GVmCc6yCZxR6SdRbIJ0ndPrMqg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Hfk8cYWJwFyZMIcmt/UlhVi5FZ7qJMfRht0hitfjb7EW5chc5MLooD9mB7R2XoWTjiLCtRz5+eDFnwoY4oqYOtKx9qKSbEJSDiMPhbJY4JUuPIiJZCxwbl2+Tv1dDE72gvxQ8A/zq701XX5ShOgaV35ex0NRe3y5WVycW6dL7m4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Uzf/7Cyj; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-33b1d7f7366so1822491f8f.0
+        for <netdev@vger.kernel.org>; Sun, 04 Feb 2024 19:38:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1707104309; x=1707709109; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=gbeFYD+36/Tfk/vLTworen1pH0nGWXODqm+1IBZPoUk=;
+        b=Uzf/7Cyj/eVDWEHCAlW2z1IhJwxbUjnhyl6yatZIrFL4wWShVVrZxoTH0DJRCMpJvk
+         5qjsFpepz7Y0JoYwVDaaGJe+iC6O3/z1YNoRv2sd9mwYeeEfAev8QbTeOor90uo2+3Yr
+         Id8aVnJi/6H+jQaZviK3iYfEZBVhCOtjFYv2w=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707104309; x=1707709109;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gbeFYD+36/Tfk/vLTworen1pH0nGWXODqm+1IBZPoUk=;
+        b=uhKYJNRO+/bTKgFpFoCqNeRURNEX1JJqHEOa3uOZt4bw+Dg/XyARTQeQx3iU2o9klx
+         6zz99wwhv5bjAq+MiZEXzGamFqYDWh54SSeJLMogW7FE51ATEY4uM7LuDj/cO8pjm2Tl
+         avYKsh40D1lksd+i55jHJrQu0hc8kJlD9txSx9Y+dkl27foDVc3ii/J9wzgCJbiyFYsG
+         zGy4haSNZuFdetbjjVYrGCVoOWGltwFW7dxP9Sx5CDkOyssmz/T9z2PEkocMSVWwM/Q2
+         5VqHxYdQ15Q0XfGPUPqklniTV1zCMJiMFF6rNAYOWioUQ9uybjclLjUynF/mafo/qBcy
+         6jqw==
+X-Gm-Message-State: AOJu0Yy0cUMlR+nNhfwrf5a+3jy5zKgFNH9WcOnfj0PHNvrtki6jSSqP
+	3K6vbxkVDIWDK8LB4TRtznLfU8loOfJkhxdFJeTWYq91GSzvvGkjqOTLNdiQpI/bDXk91wvPEbP
+	i3XpMWWaZw0EUaNKlSaHFp56LuCuhlFr7u8sX
+X-Google-Smtp-Source: AGHT+IGsUDrdcz37HyUtCCJg4fb9p4ZIVBgUgK07Fc2vNsoZvg2wqoQZBlEDOkp2eV1iha/rPiqHlak/ygqnWurKDnw=
+X-Received: by 2002:a5d:5382:0:b0:33b:28ee:645d with SMTP id
+ d2-20020a5d5382000000b0033b28ee645dmr3268183wrv.68.1707104308587; Sun, 04 Feb
+ 2024 19:38:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <10510abd-ac26-42d0-8222-8b01fe9b8059@gmail.com>
+ <e65b8525-eae0-4143-aa57-009b47f09005@lunn.ch> <CACKFLinhkS8-=QtZu9Es9ATiSMAyosuCfuPVFUOxzqJk4Tr2rA@mail.gmail.com>
+ <4cafbe42-5050-4e98-aaab-fc05f76a32b4@lunn.ch>
+In-Reply-To: <4cafbe42-5050-4e98-aaab-fc05f76a32b4@lunn.ch>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Sun, 4 Feb 2024 19:38:16 -0800
+Message-ID: <CACKFLi=Mpc8GDu=r_HW36hYcGdBDx==O6wc+8vBTPm8MaMrUAQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] bnxt: convert EEE handling to use linkmode bitmaps
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	David Miller <davem@davemloft.net>, Russell King - ARM Linux <linux@armlinux.org.uk>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000f0a30406109a311e"
 
-According to latest release of SMCv2.1[1], the term 'virtual ISM' has
-been changed to 'Emulated-ISM' to avoid the ambiguity of the word
-'virtual' in different contexts. So the names or comments in the code
-need be modified accordingly.
+--000000000000f0a30406109a311e
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-[1] https://www.ibm.com/support/pages/node/7112343
+On Sat, Feb 3, 2024 at 8:46=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Sat, Feb 03, 2024 at 04:16:51PM -0800, Michael Chan wrote:
+> > I think it is correct.  EEE advertised must be a subset of the
+> > advertised speed.
+>
+> I don't think that is true. At least, i've not seen any other MAC/PHY
+> driver change EEE advertising when they change the general
+> advertising. What i expect is that the PHY and link partner first
+> resolve the general link speed. They then look at what is being
+> advertised in terms of EEE and decide if EEE is being advertised by
+> both ends at the resolved speed. So it does not matter if the link
+> speed is resolved at 1G, but both ends advertise both 40G and 1G for
+> EEE. The 40G is simply ignored because they have resolved to 1G.
 
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
----
- net/smc/af_smc.c   | 22 +++++++++++-----------
- net/smc/smc.h      |  4 ++--
- net/smc/smc_clc.c  |  6 +++---
- net/smc/smc_clc.h  |  2 +-
- net/smc/smc_core.c |  4 ++--
- net/smc/smc_ism.h  | 10 +++++-----
- 6 files changed, 24 insertions(+), 24 deletions(-)
+I need to check with the FW team to see if it's implemented the way
+you described.  If it accepts EEE advertisement bits that are not set
+for speed advertisements, then we can make the change.  Thanks.
 
-diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
-index a2cb30af46cb..66763c74ab76 100644
---- a/net/smc/af_smc.c
-+++ b/net/smc/af_smc.c
-@@ -1045,7 +1045,7 @@ static int smc_find_ism_v2_device_clnt(struct smc_sock *smc,
- 	int rc = SMC_CLC_DECL_NOSMCDDEV;
- 	struct smcd_dev *smcd;
- 	int i = 1, entry = 1;
--	bool is_virtual;
-+	bool is_emulated;
- 	u16 chid;
- 
- 	if (smcd_indicated(ini->smc_type_v1))
-@@ -1057,12 +1057,12 @@ static int smc_find_ism_v2_device_clnt(struct smc_sock *smc,
- 		chid = smc_ism_get_chid(smcd);
- 		if (!smc_find_ism_v2_is_unique_chid(chid, ini, i))
- 			continue;
--		is_virtual = __smc_ism_is_virtual(chid);
-+		is_emulated = __smc_ism_is_emulated(chid);
- 		if (!smc_pnet_is_pnetid_set(smcd->pnetid) ||
- 		    smc_pnet_is_ndev_pnetid(sock_net(&smc->sk), smcd->pnetid)) {
--			if (is_virtual && entry == SMCD_CLC_MAX_V2_GID_ENTRIES)
-+			if (is_emulated && entry == SMCD_CLC_MAX_V2_GID_ENTRIES)
- 				/* It's the last GID-CHID entry left in CLC
--				 * Proposal SMC-Dv2 extension, but a virtual
-+				 * Proposal SMC-Dv2 extension, but an Emulated-
- 				 * ISM device will take two entries. So give
- 				 * up it and try the next potential ISM device.
- 				 */
-@@ -1072,7 +1072,7 @@ static int smc_find_ism_v2_device_clnt(struct smc_sock *smc,
- 			ini->is_smcd = true;
- 			rc = 0;
- 			i++;
--			entry = is_virtual ? entry + 2 : entry + 1;
-+			entry = is_emulated ? entry + 2 : entry + 1;
- 			if (entry > SMCD_CLC_MAX_V2_GID_ENTRIES)
- 				break;
- 		}
-@@ -1413,10 +1413,10 @@ static int smc_connect_ism(struct smc_sock *smc,
- 		if (rc)
- 			return rc;
- 
--		if (__smc_ism_is_virtual(ini->ism_chid[ini->ism_selected]))
-+		if (__smc_ism_is_emulated(ini->ism_chid[ini->ism_selected]))
- 			ini->ism_peer_gid[ini->ism_selected].gid_ext =
- 						ntohll(aclc->d1.gid_ext);
--		/* for non-virtual ISM devices, peer gid_ext remains 0. */
-+		/* for non-Emulated-ISM devices, peer gid_ext remains 0. */
- 	}
- 	ini->ism_peer_gid[ini->ism_selected].gid = ntohll(aclc->d0.gid);
- 
-@@ -2117,10 +2117,10 @@ static void smc_check_ism_v2_match(struct smc_init_info *ini,
- 		if (smc_ism_get_chid(smcd) == proposed_chid &&
- 		    !smc_ism_cantalk(proposed_gid, ISM_RESERVED_VLANID, smcd)) {
- 			ini->ism_peer_gid[*matches].gid = proposed_gid->gid;
--			if (__smc_ism_is_virtual(proposed_chid))
-+			if (__smc_ism_is_emulated(proposed_chid))
- 				ini->ism_peer_gid[*matches].gid_ext =
- 							proposed_gid->gid_ext;
--				/* non-virtual ISM's peer gid_ext remains 0. */
-+				/* non-Emulated-ISM's peer gid_ext remains 0. */
- 			ini->ism_dev[*matches] = smcd;
- 			(*matches)++;
- 			break;
-@@ -2170,10 +2170,10 @@ static void smc_find_ism_v2_device_serv(struct smc_sock *new_smc,
- 		smcd_gid.gid = ntohll(smcd_v2_ext->gidchid[i].gid);
- 		smcd_gid.gid_ext = 0;
- 		chid = ntohs(smcd_v2_ext->gidchid[i].chid);
--		if (__smc_ism_is_virtual(chid)) {
-+		if (__smc_ism_is_emulated(chid)) {
- 			if ((i + 1) == smc_v2_ext->hdr.ism_gid_cnt ||
- 			    chid != ntohs(smcd_v2_ext->gidchid[i + 1].chid))
--				/* each virtual ISM device takes two GID-CHID
-+				/* each Emulated-ISM device takes two GID-CHID
- 				 * entries and CHID of the second entry repeats
- 				 * that of the first entry.
- 				 *
-diff --git a/net/smc/smc.h b/net/smc/smc.h
-index df64efd2dee8..18c8b7870198 100644
---- a/net/smc/smc.h
-+++ b/net/smc/smc.h
-@@ -56,11 +56,11 @@ enum smc_state {		/* possible states of an SMC socket */
- };
- 
- enum smc_supplemental_features {
--	SMC_SPF_VIRT_ISM_DEV	= 0,
-+	SMC_SPF_EMULATED_ISM_DEV	= 0,
- };
- 
- #define SMC_FEATURE_MASK \
--	(BIT(SMC_SPF_VIRT_ISM_DEV))
-+	(BIT(SMC_SPF_EMULATED_ISM_DEV))
- 
- struct smc_link_group;
- 
-diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
-index 9a13709bea1c..e55026c7529c 100644
---- a/net/smc/smc_clc.c
-+++ b/net/smc/smc_clc.c
-@@ -952,8 +952,8 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini)
- 				gidchids[entry].chid =
- 					htons(smc_ism_get_chid(ini->ism_dev[i]));
- 				gidchids[entry].gid = htonll(smcd_gid.gid);
--				if (smc_ism_is_virtual(smcd)) {
--					/* a virtual ISM device takes two
-+				if (smc_ism_is_emulated(smcd)) {
-+					/* an Emulated-ISM device takes two
- 					 * entries. CHID of the second entry
- 					 * repeats that of the first entry.
- 					 */
-@@ -1055,7 +1055,7 @@ smcd_clc_prep_confirm_accept(struct smc_connection *conn,
- 		clc->d1.chid = htons(chid);
- 		if (eid && eid[0])
- 			memcpy(clc->d1.eid, eid, SMC_MAX_EID_LEN);
--		if (__smc_ism_is_virtual(chid))
-+		if (__smc_ism_is_emulated(chid))
- 			clc->d1.gid_ext = htonll(smcd_gid.gid_ext);
- 		len = SMCD_CLC_ACCEPT_CONFIRM_LEN_V2;
- 		if (first_contact) {
-diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
-index a9f9bdd26dcd..7cc7070b9772 100644
---- a/net/smc/smc_clc.h
-+++ b/net/smc/smc_clc.h
-@@ -175,7 +175,7 @@ struct smc_clc_msg_proposal {	/* clc proposal message sent by Linux */
- #define SMCD_CLC_MAX_V2_GID_ENTRIES	8 /* max # of CHID-GID entries in CLC
- 					   * proposal SMC-Dv2 extension.
- 					   * each ISM device takes one entry and
--					   * each virtual ISM takes two entries.
-+					   * each Emulated-ISM takes two entries
- 					   */
- 
- struct smc_clc_msg_proposal_area {
-diff --git a/net/smc/smc_core.c b/net/smc/smc_core.c
-index e4c858411207..9b84d5897aa5 100644
---- a/net/smc/smc_core.c
-+++ b/net/smc/smc_core.c
-@@ -1535,7 +1535,7 @@ void smc_smcd_terminate(struct smcd_dev *dev, struct smcd_gid *peer_gid,
- 	list_for_each_entry_safe(lgr, l, &dev->lgr_list, list) {
- 		if ((!peer_gid->gid ||
- 		     (lgr->peer_gid.gid == peer_gid->gid &&
--		      !smc_ism_is_virtual(dev) ? 1 :
-+		      !smc_ism_is_emulated(dev) ? 1 :
- 		      lgr->peer_gid.gid_ext == peer_gid->gid_ext)) &&
- 		    (vlan == VLAN_VID_MASK || lgr->vlan_id == vlan)) {
- 			if (peer_gid->gid) /* peer triggered termination */
-@@ -1881,7 +1881,7 @@ static bool smcd_lgr_match(struct smc_link_group *lgr,
- 	    lgr->smcd != smcismdev)
- 		return false;
- 
--	if (smc_ism_is_virtual(smcismdev) &&
-+	if (smc_ism_is_emulated(smcismdev) &&
- 	    lgr->peer_gid.gid_ext != peer_gid->gid_ext)
- 		return false;
- 
-diff --git a/net/smc/smc_ism.h b/net/smc/smc_ism.h
-index ffff40c30a06..165cd013404b 100644
---- a/net/smc/smc_ism.h
-+++ b/net/smc/smc_ism.h
-@@ -15,7 +15,7 @@
- 
- #include "smc.h"
- 
--#define SMC_VIRTUAL_ISM_CHID_MASK	0xFF00
-+#define SMC_EMULATED_ISM_CHID_MASK	0xFF00
- #define SMC_ISM_IDENT_MASK		0x00FFFF
- 
- struct smcd_dev_list {	/* List of SMCD devices */
-@@ -66,10 +66,10 @@ static inline int smc_ism_write(struct smcd_dev *smcd, u64 dmb_tok,
- 	return rc < 0 ? rc : 0;
- }
- 
--static inline bool __smc_ism_is_virtual(u16 chid)
-+static inline bool __smc_ism_is_emulated(u16 chid)
- {
- 	/* CHIDs in range of 0xFF00 to 0xFFFF are reserved
--	 * for virtual ISM device.
-+	 * for Emulated-ISM device.
- 	 *
- 	 * loopback-ism:	0xFFFF
- 	 * virtio-ism:		0xFF00 ~ 0xFFFE
-@@ -77,11 +77,11 @@ static inline bool __smc_ism_is_virtual(u16 chid)
- 	return ((chid & 0xFF00) == 0xFF00);
- }
- 
--static inline bool smc_ism_is_virtual(struct smcd_dev *smcd)
-+static inline bool smc_ism_is_emulated(struct smcd_dev *smcd)
- {
- 	u16 chid = smcd->ops->get_chid(smcd);
- 
--	return __smc_ism_is_virtual(chid);
-+	return __smc_ism_is_emulated(chid);
- }
- 
- #endif
--- 
-2.32.0.3.g01195cf9f
+> What does however matter is that EEE supported lists only 1G, but user
+> space ask for both 1G and 40G to be advertised. I would expect the
+> driver to mask the requested advertised with support, see that
+> unsupported link modes are being asked for and return -EINVAL.
+>
 
+--000000000000f0a30406109a311e
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+MIIQbQYJKoZIhvcNAQcCoIIQXjCCEFoCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
+gg3EMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
+VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
+AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
+AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
+MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
+rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
+aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
+e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
+cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
+MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
+KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
+/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
+TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
+YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
+b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
+c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
+CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
+BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
+jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
+9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
+/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
+jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
+AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
+dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
+MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
+IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
+SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
+XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
+J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
+nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBUwwggQ0oAMCAQICDF5AaMOe0cZvaJpCQjANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODIxMzhaFw0yNTA5MTAwODIxMzhaMIGO
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xFTATBgNVBAMTDE1pY2hhZWwgQ2hhbjEoMCYGCSqGSIb3DQEJ
+ARYZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
+ggEBALhEmG7egFWvPKcrDxuNhNcn2oHauIHc8AzGhPyJxU4S6ZUjHM/psoNo5XxlMSRpYE7g7vLx
+J4NBefU36XTEWVzbEkAuOSuJTuJkm98JE3+wjeO+aQTbNF3mG2iAe0AZbAWyqFxZulWitE8U2tIC
+9mttDjSN/wbltcwuti7P57RuR+WyZstDlPJqUMm1rJTbgDqkF2pnvufc4US2iexnfjGopunLvioc
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIOKiU6tnQp3nLYQZKqltAGGiH5+3Hjs4
+njOpL/8AkNTXMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIw
+NTAzMzgyOVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQBFKS5N6h8r4rdCD13k1N6avDe01wIctbbgae+dmMaI4ASQ1u4J
+ubDlzYSdCxTDVTgqDY7Zna3ACnAQBbZZwm5h6jB9dwI2WXhqMJPtL5uLK1gG/1phZCdEfqcctBk5
+o067KVd1jzBURbXWPbNT7qobvzwc4Y120WWwNDVI4SL8Jq6pEsJ2+YCdonE84unTb06coAjCAvYZ
+jEPhQgZD9/ps290QM0RkyH5n+FlggGjsXr3JSCt8aj5ENFjr7IjU/IisVc4qjdmQ69pWTyWoR1fO
+s0X3CiP3pD9Z9ckcObkVQpLdIyD0ZXxPFXs22SKVpIAu3wjRuylnznPMtLW1UHjf
+--000000000000f0a30406109a311e--
 
