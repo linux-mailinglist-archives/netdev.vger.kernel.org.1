@@ -1,126 +1,126 @@
-Return-Path: <netdev+bounces-69319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD00984AAC9
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 00:44:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 037E784AADA
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 00:54:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 672CDB21380
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:44:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A5E2B2141F
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:54:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27B2048CF2;
-	Mon,  5 Feb 2024 23:44:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C90D4C3D6;
+	Mon,  5 Feb 2024 23:53:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j5CaDjy/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ew4DZpcN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 004FF1EB49;
-	Mon,  5 Feb 2024 23:44:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A1148CC6;
+	Mon,  5 Feb 2024 23:53:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707176691; cv=none; b=l8yXM1Oxbn3uiu89cQ/b3f2AYmtc4nUH659sCCXT5JXyy6wZZIU6jlkrH0Yaro7KyvPUVMs4wKSd64znZOZ6b4eQ0HV53cv++osy6/rClfWDFDoYlt9XHxCvSmBD15YWSHaWwId8Pi9uhDMQ1htQDLkpPiDz7b/5BfibLkRVpYE=
+	t=1707177239; cv=none; b=NwsQbbII/iHvjVRKdtwHBzSFNSsBRKg2QfLzYH4Pci0sSzjR4RQ7Z43lGLa5dvWRjtiiI8a62ZnKbYOt7heD3T/L0rAtaeUMkr4bMvcB6ZJZVqNpCFq3ltk8QdJ5Bf/WHnqU/1ronE+9R/l2uw/JaHHW1SeE+5k+coooeXlkHqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707176691; c=relaxed/simple;
-	bh=SxLaOpN/aBErJ9kXh6d9dU6KlKpKu99pWHS/STEMU8M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IbDxozMIvorEf5/rKabDZZeP72C8ZhJacJ1qCs+3o0sLSEUqAAF9L/2KJo5ByZ6LmzIkZ8qblmggt63xAWvDh0W+OKfXzRc9EC3VElWGQCkA9Lth4FeJP6TVXTFHN9HFtaGhmDCXSclPHH9U177vqmT6UdhdS4BJ3s27MJGnvOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j5CaDjy/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1413C433F1;
-	Mon,  5 Feb 2024 23:44:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707176690;
-	bh=SxLaOpN/aBErJ9kXh6d9dU6KlKpKu99pWHS/STEMU8M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=j5CaDjy/VjxbeQbdgNT8rBul3sjRJv85BNfhU7NBA3ouFRrZ9V9uxMt7N8/1Fxd18
-	 meUCBNTQblbFgDEQJe+UT9h1L8dqhim7LslBtyeknQzuzRhdhMQ9JaFjmoAO8zepYs
-	 nJZb2IxMHfZXpZ579O++i4hrpSVSRqECbx0e1IRiCKjkWv3IsDOgkgWkp5HhFoPZYl
-	 DiZjuRNBA2X/EI09LTQgegSqHCwSWb4bY2xNNdpL9KG/A8CefmjnXwYw7TCbixR+8j
-	 OdXgjcfz6VUfd6A0VCwlCLIJpAct5EjHtn0jkuf8N6d1XaR2rdhtcy7fbsEEsuLRkt
-	 M0tiRWjOa/Yqg==
-Date: Mon, 5 Feb 2024 15:44:48 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Shinas Rasheed <srasheed@marvell.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Haseeb Gani
- <hgani@marvell.com>, Vimlesh Kumar <vimleshk@marvell.com>, Sathesh B Edara
- <sedara@marvell.com>, "egallen@redhat.com" <egallen@redhat.com>,
- "mschmidt@redhat.com" <mschmidt@redhat.com>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>,
- "wizhao@redhat.com" <wizhao@redhat.com>, "kheib@redhat.com"
- <kheib@redhat.com>, "konguyen@redhat.com" <konguyen@redhat.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jonathan
- Corbet <corbet@lwn.net>, Veerasenareddy Burru <vburru@marvell.com>,
- Satananda Burla <sburla@marvell.com>, Shannon Nelson
- <shannon.nelson@amd.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, Joshua
- Hay <joshua.a.hay@intel.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
- Brett Creeley <brett.creeley@amd.com>, Andrew Lunn <andrew@lunn.ch>, Jacob
- Keller <jacob.e.keller@intel.com>
-Subject: Re: [EXT] Re: [PATCH net-next v5 1/8] octeon_ep_vf: Add driver
- framework and device initialization
-Message-ID: <20240205154448.1c5a5ad8@kernel.org>
-In-Reply-To: <PH0PR18MB47345E3ADCC35D0ECA763DBBC7412@PH0PR18MB4734.namprd18.prod.outlook.com>
-References: <20240129050254.3047778-1-srasheed@marvell.com>
-	<20240129050254.3047778-2-srasheed@marvell.com>
-	<20240131161406.22a9e330@kernel.org>
-	<PH0PR18MB47345E3ADCC35D0ECA763DBBC7412@PH0PR18MB4734.namprd18.prod.outlook.com>
+	s=arc-20240116; t=1707177239; c=relaxed/simple;
+	bh=nJanOS1hCRyVe/2LbmWg0rG9mmxI9LHxBGl/E28BohE=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=Zdvon3xx/iibGtfuTojm0s41o32h0AHFZ8mjoGQf/ClgUa514pDiw7OgGN3JCAgUg42RTRybnFl3oJxgU4J4sxRKU0VMcQIRQFmQ3j+4BeeyU3zAXmNr+PPhilmj/wb6hgjqYe1blo0+hSDFzhEljGXC1ehZJCqZCrBI1DenheA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ew4DZpcN; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d93edfa76dso42811695ad.1;
+        Mon, 05 Feb 2024 15:53:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707177236; x=1707782036; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=kiLTCJmbmh0u3rY3NuQEZxUH1Em6FbOtZB1pzeq5xJ0=;
+        b=Ew4DZpcNH6lFv7FnI2iVxfXeULUuVbpzAngP2eJYvGQcL2cC4wbg2kX9qke1z03V9U
+         pkEzvuNN+F+itRciCJ0AsvWH9bK9Jf2hnVxa6A0XH7az3wglo+CTg1wTfXw3WjT+hjPN
+         gkzYJNZ+hYxKiF9w0BdQ5SMImdSo6FIoYumaZ6Nvw1pqnZcyzM9Hc5z9Mj3qSodO4KCM
+         DVoBjekELePbS8GA0p01UW7Q0L7wZ9xq+r7uoZyc7ApadENjCXtsNao/6NtkwVts8AED
+         HniJ4KcodiVtMj1fCF9ipV6b13yuy/hyXl4OxvRbaMqhNAuMtf5wUy0AqMFDhuhCsvCG
+         HS3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707177236; x=1707782036;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kiLTCJmbmh0u3rY3NuQEZxUH1Em6FbOtZB1pzeq5xJ0=;
+        b=IaU425ZBw28zMGfBmLy8606jbBKodFe0LqbKO/Gy2QhC8RqqErCW1mi0ANy938V4d/
+         1qLcNiBoPWuufAARQMl8lZeteMGj7bhcVtHwLil193yI2+xbMD804dvPutmMUI3oKgOV
+         qvJBp/YgXzI8lwzO4u4BGhYfEsOMoM9TXMTUxpbRaavMsyTTRjhSEGHTidM9n/AouZmg
+         ffdFmCYV8ZWJGTLhHMNzhVDiCougr40pVNhQWU8EsfDYnk24jAJy/K0eok9cWJdEGULe
+         rIW+TBf/RXGuaacMSWAroCC3U+CZoPH4zX//rLCREgr1PQ1sQ8U3sgR0avDRBrDQmbVq
+         N+8Q==
+X-Gm-Message-State: AOJu0YypoRvPxaKm7a26esebjIzqPoanH+s3uTNBTY4c4QA6YphAcMOG
+	nh0Beb7jntti/RAzOCFqjw5M/hF2uyLWDmbMG2Vo1MhvcGKJT3gIC0iL3WY/oSw=
+X-Google-Smtp-Source: AGHT+IE0vpxwKhomBNhEmOVxBT9nKNhVmPDW9X2er55br7FsuGimIBDbtKLh28J/Mvu+QY7Qs3DZUg==
+X-Received: by 2002:a17:903:2452:b0:1d9:aa2d:db6e with SMTP id l18-20020a170903245200b001d9aa2ddb6emr28683pls.26.1707177236032;
+        Mon, 05 Feb 2024 15:53:56 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXEFoYMWX7FInwKTYhYD9FhL8+7D+jmaf8Of0hOOrY49OXMv5Y0tXifadC7tIpRJoemnDnaXo0ovfoXA2cYz1ZIEz/yunhCyncd4WT1aDRs9h5I2qhkUmT3uiAdt/3QPufNXisAF36UoX0mNo3+g5zrlVeHCoDpS89hgr7V9+R7IBpWe2SHm5atoV8SDcJNihROod9UyD/NpVonaX9EsN1T5UU7TsjFzEO8t9NkqWNb2YxcUMnO/JWqGczTHT8LUjCzDpofg/EiKLPYM6YFnZuMQFfeaRr2MChxaC+SaISYGxc4uX3e1mdk5Mjn8vr59eE1fBMpAR7sdgKh
+Received: from localhost (dhcp-141-239-144-21.hawaiiantel.net. [141.239.144.21])
+        by smtp.gmail.com with ESMTPSA id mm14-20020a1709030a0e00b001d9630e3396sm453561plb.193.2024.02.05.15.53.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Feb 2024 15:53:55 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Mon, 5 Feb 2024 13:53:54 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] ieee802154: ca8210: Drop spurious WQ_UNBOUND from
+ alloc_ordered_workqueue() call
+Message-ID: <ZcF1El7fn5xkeoB1@slm.duckdns.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Sat, 3 Feb 2024 05:35:21 +0000 Shinas Rasheed wrote:
-> > You haven't masked any IRQ or disabled NAPI. What prevents the queues
-> > from getting restarted right after this call?  
-> 
-> The napi functionality (along with disabling it when stopping), is introduced (and used) in the patch after this one [2/8]. Also we disable interrupts in the 
-> disable_interrupt hook which is also called in the next patch [2/8]. 
+Workqueue is in the process of cleaning up the distinction between unbound
+workqueues w/ @nr_active==1 and ordered workqueues. Explicit WQ_UNBOUND
+isn't needed for alloc_ordered_workqueue() and will trigger a warning in the
+future. Let's remove it. This doesn't cause any functional changes.
 
-You gotta make the patches reviewable :(
+Signed-off-by: Tejun Heo <tj@kernel.org>
+---
+ drivers/net/ieee802154/ca8210.c |   10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-> > > +static void octep_vf_tx_timeout(struct net_device *netdev, unsigned int  
-> > txqueue)  
-> > > +{
-> > > +	struct octep_vf_device *oct = netdev_priv(netdev);
-> > > +
-> > > +	queue_work(octep_vf_wq, &oct->tx_timeout_task);
-> > > +}  
-> > 
-> > I don't see you canceling this work. What if someone unregistered
-> > the device before it runs? You gotta netdev_hold() a reference.  
-> 
-> We do cancel_work_sync in octep_vf_remove function.
-
-But the device is still registered, so the timeout can happen after you
-cancel but before you unregister.
-
-> > > +static int __init octep_vf_init_module(void)
-> > > +{
-> > > +	int ret;
-> > > +
-> > > +	pr_info("%s: Loading %s ...\n", OCTEP_VF_DRV_NAME OCTEP_VF_DRV_STRING);  
-> > > +
-> > > +	/* work queue for all deferred tasks */
-> > > +	octep_vf_wq =  
-> > create_singlethread_workqueue(OCTEP_VF_DRV_NAME);
-> > 
-> > Is there a reason this wq has to be single threaded and different than
-> > system queue? All you schedule on it in this series is the reset task.  
-> 
-> We also schedule the control mailbox task on this workqueue. The
-> workqueue was created with the intention that there could be other
-> driver specific tasks to add in the future. It has been single
-> threaded for now, but we might optimize implementation in the future,
-> although for now as far as to service our control plane this has been
-> enough.
-
-I haven't spotted the mailbox task in this series, if it's not here,
-let's switch to system wq, and only add your own when needed.
+--- a/drivers/net/ieee802154/ca8210.c
++++ b/drivers/net/ieee802154/ca8210.c
+@@ -2857,19 +2857,13 @@ static int ca8210_interrupt_init(struct
+  */
+ static int ca8210_dev_com_init(struct ca8210_priv *priv)
+ {
+-	priv->mlme_workqueue = alloc_ordered_workqueue(
+-		"MLME work queue",
+-		WQ_UNBOUND
+-	);
++	priv->mlme_workqueue = alloc_ordered_workqueue("MLME work queue", 0);
+ 	if (!priv->mlme_workqueue) {
+ 		dev_crit(&priv->spi->dev, "alloc of mlme_workqueue failed!\n");
+ 		return -ENOMEM;
+ 	}
+ 
+-	priv->irq_workqueue = alloc_ordered_workqueue(
+-		"ca8210 irq worker",
+-		WQ_UNBOUND
+-	);
++	priv->irq_workqueue = alloc_ordered_workqueue("ca8210 irq worker", 0);
+ 	if (!priv->irq_workqueue) {
+ 		dev_crit(&priv->spi->dev, "alloc of irq_workqueue failed!\n");
+ 		destroy_workqueue(priv->mlme_workqueue);
 
