@@ -1,159 +1,178 @@
-Return-Path: <netdev+bounces-69075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4695E84983D
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 11:58:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 160D9849856
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:05:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9ABAEB24187
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 10:58:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39B2E1C21109
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 11:05:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 999C817C6D;
-	Mon,  5 Feb 2024 10:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4731418030;
+	Mon,  5 Feb 2024 11:05:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Cyhf8SbM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AR+4G5fV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A74BC175A5;
-	Mon,  5 Feb 2024 10:58:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9219E17C98;
+	Mon,  5 Feb 2024 11:05:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707130701; cv=none; b=fD5C1xzeNSAK617QsvJ16hrDtpqAl3gYvvgN/qnfUEr1mSgrkIGF8uRCaxxuh649WLwsYaPApWGVGEmJzsbWvsDMR206eq+IwvH5mojFCX9Mf4bp1p8Yw14Kutmvd6vrMdhSksiYlpmLKWCty7YXlaUmBAZqtTwsbPbqH4/ZhG8=
+	t=1707131113; cv=none; b=HJznqcOrQZFLreEFJNjMy5u3hKqxqJKkQ2mfYYL86OJBAipmC+wxBCX0GudDixQs1MQfull0Wf3DNTBGZTMg6I0PSMjspBkuCV8mIeWibwgjsOPKE0YLsOuTZXVMQSzOk80ZVGVCZo5KJ2iRPMXpd84pODjzbJWkn/7F1UeJETg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707130701; c=relaxed/simple;
-	bh=mEaFTy6bJYF+ZKoSXTVJN7JbVsL2cMY4NnXCamRHkn8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=epp7vMboVh6QOnRG7F7k82JF7e6Bifz1jFO3KLx87p+PJnxUxCRKygByK+Mb0cB9+joVc0RVdnW6FFJGSDieMliqc2g3sP0xc2W2rPL57N6iHX33ADat6mCmdVEtDTgHSj7vy/j4klwVqXZ1H+xZoCPnCzJ1GOReJXISQM3Ekok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Cyhf8SbM; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1707131113; c=relaxed/simple;
+	bh=VJyxnHmRqLuTEtU8FAarFurtgv+O3sQGbnrzjvXqxLE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=nBtprV6SuKLdHg36ihTqDB2IqfgX8vH7Lpxu8wu6qwrI7k3vXxnxQDLBv402h8bjgDDj3jgUjxJo1inhfTGc5hi8jhsaqFH649Anwlon7/S0iogyBIH1BLMGh/5G0JGcRxzAnJsI/F1eAVGkoeRfcSKnFV3bA/146dFMPe+VdoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AR+4G5fV; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707130699; x=1738666699;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=mEaFTy6bJYF+ZKoSXTVJN7JbVsL2cMY4NnXCamRHkn8=;
-  b=Cyhf8SbMjXSp3uOvtRzlAYt0pH/Tx+m/JPWrIImN1V0kymPhniKl+2Fn
-   AoygO/CFf5rUtcu7hdP9DMFFYUhHCKLBc+VLv1kQxKfGQjjbeHWNUXpk0
-   lGgBiL9CL6BWWHx0iEibh+Ye70OyYpdItUc1rF3q+kmeOngEaxz+q5q8e
-   QmT9mPGvu3wIs1HK+N6hCL7GgzyBcNCH7dn0ivPDeEtmLIG2oISMw9stS
-   ZExtdS3Dj7+vKZA17GhW/xYpwQbhNr1EMPgbacNDiOC/QIEs7lRWozr3/
-   qSXwF49mO4oKC9SstrSaQsie0GWD3WEL5LDJIqSxcjR2HIlTk8bSaCikF
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10974"; a="412773"
+  t=1707131107; x=1738667107;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=VJyxnHmRqLuTEtU8FAarFurtgv+O3sQGbnrzjvXqxLE=;
+  b=AR+4G5fVCeyOLUA9Z2hBvuTVJsj6m49pIoAjNnXPSNtzD8eWtO/QYDfd
+   /EDsJSK0e9IYECO8BFTGjg7deASi+AF4wSuziuNEqSR8WF43kpZ8Qa6c6
+   l8lrgW3ZJ7woGrahgNg6eaYHoGTtV/RAsa1X6XFTkEHx6U6ta7Rr6TQdl
+   ixSM9PYTByHTCd20ckOzD4imklNiX9e+x0buKXAgwsUzrLjwBTew8zsEg
+   f+RBofpKMc178NxEUG6JfbfbuNdR6Ho9R6mn3YoOe+YEyoM1LGvRDCyXE
+   Go7pLzAyGh6FOCY4Emb7XLVach3s6uVGUHFOPN1xK79DLZnO81K8YeLJA
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10974"; a="25945187"
 X-IronPort-AV: E=Sophos;i="6.05,245,1701158400"; 
-   d="scan'208";a="412773"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 02:58:18 -0800
+   d="scan'208";a="25945187"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 03:05:06 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,245,1701158400"; 
-   d="scan'208";a="688849"
-Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 02:58:16 -0800
-Date: Mon, 5 Feb 2024 11:58:05 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Horatiu Vultur <horatiu.vultur@microchip.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, UNGLinuxDriver@microchip.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] lan966x: Fix crash when adding interface under a lag
-Message-ID: <ZcC/PZZXpA4ovZY6@mev-dev>
-References: <20240205080756.2134143-1-horatiu.vultur@microchip.com>
- <ZcCf4IGJHhY8uQQd@mev-dev>
- <20240205094434.bwhjufxtrnlkwbrf@DEN-DL-M31836.microchip.com>
+   d="scan'208";a="5327463"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by fmviesa004.fm.intel.com with ESMTP; 05 Feb 2024 03:05:02 -0800
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Christoph Hellwig <hch@lst.de>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Robin Murphy <robin.murphy@arm.com>,
+	Joerg Roedel <joro@8bytes.org>,
+	Will Deacon <will@kernel.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	iommu@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2 0/7] dma: skip calling no-op sync ops when possible
+Date: Mon,  5 Feb 2024 12:04:19 +0100
+Message-ID: <20240205110426.764393-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240205094434.bwhjufxtrnlkwbrf@DEN-DL-M31836.microchip.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 05, 2024 at 10:44:34AM +0100, Horatiu Vultur wrote:
-> The 02/05/2024 09:44, Michal Swiatkowski wrote:
-> 
-> Hi Michal,
-> 
-> > 
-> > On Mon, Feb 05, 2024 at 09:07:56AM +0100, Horatiu Vultur wrote:
-> > > There is a crash when adding one of the lan966x interfaces under a lag
-> > > interface. The issue can be reproduced like this:
-> > > ip link add name bond0 type bond miimon 100 mode balance-xor
-> > > ip link set dev eth0 master bond0
-> > >
-> > > The reason is because when adding a interface under the lag it would go
-> > > through all the ports and try to figure out which other ports are under
-> > > that lag interface. And the issue is that lan966x can have ports that are
-> > > NULL pointer as they are not probed. So then iterating over these ports
-> > > it would just crash as they are NULL pointers.
-> > > The fix consists in actually checking for NULL pointers before accessing
-> > > something from the ports. Like we do in other places.
-> > >
-> > > Fixes: cabc9d49333d ("net: lan966x: Add lag support for lan966x")
-> > > Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-> > > ---
-> > >  drivers/net/ethernet/microchip/lan966x/lan966x_lag.c | 9 +++++++--
-> > >  1 file changed, 7 insertions(+), 2 deletions(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_lag.c b/drivers/net/ethernet/microchip/lan966x/lan966x_lag.c
-> > > index 41fa2523d91d3..89a2c3176f1da 100644
-> > > --- a/drivers/net/ethernet/microchip/lan966x/lan966x_lag.c
-> > > +++ b/drivers/net/ethernet/microchip/lan966x/lan966x_lag.c
-> > > @@ -37,19 +37,24 @@ static void lan966x_lag_set_aggr_pgids(struct lan966x *lan966x)
-> > >
-> > >       /* Now, set PGIDs for each active LAG */
-> > >       for (lag = 0; lag < lan966x->num_phys_ports; ++lag) {
-> > > -             struct net_device *bond = lan966x->ports[lag]->bond;
-> > > +             struct lan966x_port *port = lan966x->ports[lag];
-> > >               int num_active_ports = 0;
-> > > +             struct net_device *bond;
-> > >               unsigned long bond_mask;
-> > >               u8 aggr_idx[16];
-> > >
-> > > -             if (!bond || (visited & BIT(lag)))
-> > > +             if (!port || !port->bond || (visited & BIT(lag)))
-> > >                       continue;
-> > >
-> > > +             bond = lan966x->ports[lag]->bond;
-> > Why not bond = port->bond?
-> 
-> That is also correct and more clear.
-> I think I just copy the line that I have removed and put it here. As it
-> has the same effect.
-> I can update this in the next version.
-> 
+The series grew from Eric's idea and patch at [0]. The idea of using the
+shortcut for direct DMA as well belongs to Chris.
 
-Great, thanks, fell free to add my reviewed-by tag in next version.
+When an architecture doesn't need DMA synchronization and the buffer is
+not an SWIOTLB buffer, most of times the kernel and the drivers end up
+calling DMA sync operations for nothing.
+Even when DMA is direct, this involves a good non-inline call ladder and
+eats a bunch of CPU time. With IOMMU, this results in calling indirect
+calls on hotpath just to check what is already known and return.
+XSk is been using a custom shortcut for that for quite some time.
+I recently wanted to introduce a similar one for Page Pool. Let's combine
+all this into one generic shortcut, which would cover all DMA sync ops
+and all types of DMA (direct, IOMMU, ...).
 
-Michal
+* #1 adds stub inlines to be able to skip DMA sync ops or even compile
+     them out when not needed.
+* #2 adds the generic shortcut and enables it for direct DMA.
+* #3 adds ability to skip DMA syncs behind an IOMMU.
+* #4-5 are just cleanups for Page Pool to avoid merge conflicts in future.
+* #6 checks for the shortcut as early as possible in the Page Pool code to
+     make sure no cycles wasted.
+* #7 replaces XSk's shortcut with the generic one.
 
-> > 
-> > >               bond_mask = lan966x_lag_get_mask(lan966x, bond);
-> > >
-> > >               for_each_set_bit(p, &bond_mask, lan966x->num_phys_ports) {
-> > >                       struct lan966x_port *port = lan966x->ports[p];
-> > >
-> > > +                     if (!port)
-> > > +                             continue;
-> > > +
-> > >                       lan_wr(ANA_PGID_PGID_SET(bond_mask),
-> > >                              lan966x, ANA_PGID(p));
-> > >                       if (port->lag_tx_active)
-> > > --
-> > > 2.34.1
-> > >
-> > Only nit, otherwise:
-> > Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> > 
-> > Thanks,
-> > Michal
-> 
-> -- 
-> /Horatiu
+On 100G NIC, the result is +3-5% for direct DMA and +10-11% for IOMMU.
+As a bonus, XSk core now allows batched buffer allocations for IOMMU
+setups.
+If the shortcut is not available on some system, there should be no
+visible performance regressions.
+
+[0] https://lore.kernel.org/netdev/20221115182841.2640176-1-edumazet@google.com
+
+Alexander Lobakin (7):
+  dma: compile-out DMA sync op calls when not used
+  dma: avoid redundant calls for sync operations
+  iommu/dma: avoid expensive indirect calls for sync operations
+  page_pool: make sure frag API fields don't span between cachelines
+  page_pool: don't use driver-set flags field directly
+  page_pool: check for DMA sync shortcut earlier
+  xsk: use generic DMA sync shortcut instead of a custom one
+
+ kernel/dma/Kconfig                            |   4 +
+ include/net/page_pool/types.h                 |  21 ++-
+ include/linux/device.h                        |   5 +
+ include/linux/dma-map-ops.h                   |  20 +++
+ include/linux/dma-mapping.h                   | 122 ++++++++++++++----
+ include/net/xdp_sock_drv.h                    |   7 +-
+ include/net/xsk_buff_pool.h                   |  13 +-
+ drivers/base/dd.c                             |   2 +
+ drivers/iommu/dma-iommu.c                     |   3 +-
+ drivers/net/ethernet/engleder/tsnep_main.c    |   2 +-
+ .../net/ethernet/freescale/dpaa2/dpaa2-xsk.c  |   2 +-
+ drivers/net/ethernet/intel/i40e/i40e_xsk.c    |   2 +-
+ drivers/net/ethernet/intel/ice/ice_xsk.c      |   2 +-
+ drivers/net/ethernet/intel/igc/igc_main.c     |   2 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c  |   2 +-
+ .../ethernet/mellanox/mlx5/core/en/xsk/rx.c   |   4 +-
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   |   2 +-
+ drivers/net/ethernet/netronome/nfp/nfd3/xsk.c |   2 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |   2 +-
+ kernel/dma/mapping.c                          |  70 +++++++---
+ kernel/dma/swiotlb.c                          |  14 ++
+ net/core/page_pool.c                          |  67 ++++++----
+ net/xdp/xsk_buff_pool.c                       |  29 +----
+ 23 files changed, 276 insertions(+), 123 deletions(-)
+
+---
+From v1[1]:
+* #1:
+  * use static inlines instead of macros (Chris);
+  * move CONFIG_DMA_NEED_SYNC check into dma_skip_sync() (Robin);
+* #2:
+  * use a new dma_map_ops flag instead of new callback, assume the same
+    conditions as for direct DMA are enough (Petr, Robin);
+  * add more code comments to make sure the whole idea and path are
+    clear (Petr, Robin, Chris);
+* #2, #3: correct the Git tags and the authorship a bit.
+
+Not addressed:
+* #1:
+  * dma_sync_*range_*() are still wrapped, as some subsystems may want
+    to call the underscored versions directly (e.g. Page Pool);
+* #2:
+  * the new dev->dma_skip_sync bit is still preferred over checking for
+    READ_ONCE(dev->dma_uses_io_tlb) + dev_is_dma_coherent() on hotpath
+    as a faster solution.
+
+[1] https://lore.kernel.org/netdev/20240126135456.704351-1-aleksander.lobakin@intel.com
+-- 
+2.43.0
+
 
