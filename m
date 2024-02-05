@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-69296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B21684A958
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:33:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6C9E84A959
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:33:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82BB51F29514
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 22:33:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DC9E29304F
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 22:33:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 685D126ACC;
-	Mon,  5 Feb 2024 22:32:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C230428E31;
+	Mon,  5 Feb 2024 22:32:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="a1YxH1xz"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QqJ0GTQb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26354BA80
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 22:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1D11DA58
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 22:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707172354; cv=none; b=LAH4oAvgsL3ipQCokF/z7P0y55f453NNLHJS4tMbEe1rRfR4HmhrL0hhDItB+TiQRhqmYkiqMyCjAbvtZewC2Pi+JZOsFX5EaMUu/UqP/8zX2tb3+ycsx7xgNPwVNrL1xsYrCdZzHXv1X0dWzDvCf43raImEi23DQNBX7ASgA4A=
+	t=1707172355; cv=none; b=eXHZySTTvhS+7d0ivBXQDIAFF+h0Mt0W/RVdkmlNh/CvrIb0HxmeZPooBXFEy7wZrAnHdSNeH73YoFgei+C15IJ3+2JS2d/pQALdbgzYKc53BKeynfd/h/83uWfgFVTRM7Q7O6E+SCv2Le95xnY9+fnPoBIut6efKVj4sYgDmyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707172354; c=relaxed/simple;
-	bh=f0TEZ5auIr0f0fohuO8R/b0ggk+wHLZ9m9udsxReF/M=;
+	s=arc-20240116; t=1707172355; c=relaxed/simple;
+	bh=MAXuPCl2sFn1NUP0oXPJ8AAyQ7T0v1qHVHSFmGeCBPk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CSP/Hwlsdi4EP08JGz6Ta8loGWHsLvafwDP04B7CUb6oHqqusHQI7AczgVuT14uKL/0qNfUtOILmypmdsg6CqUk3Umk6h7dGhcHBJGx60YmpDVITW7tGXf2+Ex0c3gSFb2uq17f40oUOdTr05aWQ4alRs7VztS3q+0IsP1excy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=a1YxH1xz; arc=none smtp.client-ip=209.85.160.178
+	 MIME-Version:Content-Type; b=sZiY1WAKd6+T67yn8FAAo4fRZ0dNdXsLQ0g65laCKCcjAlSR1g1Mp3JEkjtgLuLri5q23VgCxeUaydo7PVIr99HRSbwg+E0G9QvnrmiOYmds5zJfY80hNUeZYUS9KEK5JR0CSyO+CQjKiZgB7eqhuC9dQqPDoVUbyaLeLUXraXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QqJ0GTQb; arc=none smtp.client-ip=209.85.160.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-42a8a3973c5so32567671cf.2
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 14:32:32 -0800 (PST)
+Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-42a9c21f9ecso29327811cf.0
+        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 14:32:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1707172351; x=1707777151; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1707172353; x=1707777153; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fc8bhShRns3Ka7XRAkANVdn5e6SVlv1KopwcmAiBS9E=;
-        b=a1YxH1xzSYetXWQBs0NwZXiJ+A4nM2k3ehpyX7EQFlFFCuay5ZaGVYDqpf986DaW2/
-         mjSIQl6lfe2e2y/HYd153oXM7NJHnVLMKRI0s1QwMUsZaTJeyzBluLHpioFS8RVhtxwC
-         aPTz6ACnOy2HQft2LSJ3E8kT3Rwq0m5dcgrP4=
+        bh=d72hnexSFBoKXOTEfV0exTKLLP0xzu0ruuF+i1GK1W0=;
+        b=QqJ0GTQbVzocoQX031hPVOMvhMjcpMPbkI5qcBhderuWmRw/5HPSlMSBvTBDlMjtfn
+         hvjnhohm2cLYFqmG/9P/M+72sYb5MEFF97XNMv6m4hrlFRjyB0wspdcHFlh6O4anR/Js
+         NS1XfYaCtSxd/umlpd85s+06c9Ye4GSDDja2s=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707172351; x=1707777151;
+        d=1e100.net; s=20230601; t=1707172353; x=1707777153;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fc8bhShRns3Ka7XRAkANVdn5e6SVlv1KopwcmAiBS9E=;
-        b=PycFVAHFaBWP7dyAEd0IDoElokiFWpiLJbbIpH0RnYTjNJLdgfigdSfIps6xjtVEG1
-         Easf09DWfJuhJm49k9X9T5rvcjmxZCmrzLspBgCfEYmoIc2pmJasaLHfNPtdY0UIPZsX
-         iA0ccSJQwZf9NrcU1tZhIP8hJYqEIQ3jeMqac62rHBuhRiXImHPjNQ3KOo41sgtIxahp
-         pn+ZzSu03vcmGQnvbYpGWGgQSAwljMEG36TeJJGuEY8CwzRQXVculowKvAJtcJ+3zb24
-         7J+QqDOuIbf5otCVEhhjd6mJoXRw0EW08516UnQE+1ep7aIkla6Sqmy4njPnLELxk3f9
-         3GlA==
-X-Gm-Message-State: AOJu0YyadUMIVvWAS0UD9IU06q8G4FC+scbvVbe/nzSLF0/Cm1wDB9/U
-	rIbDFnmS2mG+AZsfxOFCDZ2S7iMECGvhxQZRbcA+yemB3JZJFfvb7+157bpWsg==
-X-Google-Smtp-Source: AGHT+IEVgbduH1iOLKgc1nadVlsVA7uNVeG+I6bR6ZP7h9YQBBA9JqEkttHNcO4PduuUlX5uDrohOQ==
-X-Received: by 2002:ac8:764a:0:b0:42a:b2b1:a800 with SMTP id i10-20020ac8764a000000b0042ab2b1a800mr474421qtr.26.1707172351210;
-        Mon, 05 Feb 2024 14:32:31 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCULNlRIcXuzS1AiGcEijukubzXm4W/vI9MEQD9z8RtWORwWQFZS1X8H+XhZblLHsIdMU3NHuErioTeYEk2K13UDRus3Uexr3GOtj6ywGcxI8AXeyqSQ5shehw40NL6LFhO6k3e1Ma6u/P6/1A7Gc8Bv8T+kCHClcd1+j5qqtbrA6X4iF7QvRarnkl7L/9DcTb7HHC9Ie4yuvZBBssKZXmQeqVM=
+        bh=d72hnexSFBoKXOTEfV0exTKLLP0xzu0ruuF+i1GK1W0=;
+        b=Due+x0PR9HHQdmUbRJJ31eqGys1LovYKcWFRbeFOYLxTCnoCo/H3TNkSLcfbvg8jdU
+         xxQ8lpOMGUtri6zHPG1+CcLECcVyeqtNsJPzLDh3AsUrO4BntEcAn0LsHdK6Dx8UCOcA
+         jnhiY21bsP+5YzYWeJvwT9Rg0IwQdRzSsQozVN+mn65zI0KNdYMHMdAIuK/42U0OQbYM
+         k+amO9V5wpwBlZ0E91wSxypzaUTYfETK1Rt/Qh8dzsOzno0FMs78GE2w/dX7DI+b/QuH
+         TtP8ToewOKBq1aO9ShzbTyL3mw6P/E9827ruBkRiF77i6Z1WGDdaZoMtKmmYrIG8fRQx
+         Jjnw==
+X-Gm-Message-State: AOJu0YyOqanBLatvErltRODTx9caVj5D3GIVSnBijr0zT4iWnPJBUjjl
+	ImrGirSKj1JJ2i3a4zZVt5Jl/RsM33PZX9aTIvCzUwx26CGzNvmFHTZLGJSv0w==
+X-Google-Smtp-Source: AGHT+IFO8Lu0MA9f6cAnJHMx+TNgd/6YuXfQY45FHsJg73LK+9RNVNKOo1wbPcy61Hfzq3lkhFIFdQ==
+X-Received: by 2002:ac8:59cf:0:b0:42b:fd4a:e13d with SMTP id f15-20020ac859cf000000b0042bfd4ae13dmr649576qtf.55.1707172352837;
+        Mon, 05 Feb 2024 14:32:32 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVQURLqNjfVDGaK6LO40iXhl6ki1L2N+5dbjxhnCBs2ZbUm+k+XCISduegLOvXQGY2Sm/XvET9vGoe+iSvqwkug9Gh1hSzAS4WxLkPo5rvl8uTyk0QduYliQrAoVosrDDrES1z0p/fy1E7FUIjlXKNFFAgWxBqJrfTOffXdkxO3fKV8gxDlryqANEBZ6K1qCNY05z+AW1KxPhRMmzo+BDh7bcI=
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id x11-20020ac8120b000000b0042c2d47d7fbsm340864qti.60.2024.02.05.14.32.29
+        by smtp.gmail.com with ESMTPSA id x11-20020ac8120b000000b0042c2d47d7fbsm340864qti.60.2024.02.05.14.32.31
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 05 Feb 2024 14:32:30 -0800 (PST)
+        Mon, 05 Feb 2024 14:32:32 -0800 (PST)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -70,9 +70,9 @@ Cc: netdev@vger.kernel.org,
 	pabeni@redhat.com,
 	andrew.gospodarek@broadcom.com,
 	pavan.chebbi@broadcom.com
-Subject: [PATCH net-next 10/13] bnxt_en: Restore all the user created L2 and ntuple filters
-Date: Mon,  5 Feb 2024 14:31:59 -0800
-Message-Id: <20240205223202.25341-11-michael.chan@broadcom.com>
+Subject: [PATCH net-next 11/13] bnxt_en: Add support for user configured RSS key
+Date: Mon,  5 Feb 2024 14:32:00 -0800
+Message-Id: <20240205223202.25341-12-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20240205223202.25341-1-michael.chan@broadcom.com>
 References: <20240205223202.25341-1-michael.chan@broadcom.com>
@@ -83,94 +83,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000009a76560610aa09b2"
+	boundary="000000000000af8b370610aa0950"
 
---0000000000009a76560610aa09b2
+--000000000000af8b370610aa0950
 Content-Transfer-Encoding: 8bit
 
 From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
-Walk the usr_fltr_list and call firmware to add these filters when
-we open the NIC.  This will restore all user created filters after
-reset.
+Store the user configured or generated Toeplitz key in
+bp->rss_hash_key.  The key stays constant across ifdown/ifup
+unless updated by the user.
 
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
 Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 40 +++++++++++++++++++++--
- 1 file changed, 38 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c      | 18 ++++++++++++++++--
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h      |  4 ++++
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c  |  6 ++++--
+ 3 files changed, 24 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 41e1c6d2c127..a6e2b65c45ce 100644
+index a6e2b65c45ce..27941ade894a 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -5853,8 +5853,7 @@ static void bnxt_hwrm_clear_vnic_filter(struct bnxt *bp)
- 			struct bnxt_l2_filter *fltr = vnic->l2_filters[j];
+@@ -4246,9 +4246,23 @@ static void bnxt_init_vnics(struct bnxt *bp)
+ 				u8 *key = (void *)vnic->rss_hash_key;
+ 				int k;
  
- 			bnxt_hwrm_l2_filter_free(bp, fltr);
--			if (list_empty(&fltr->base.list))
--				bnxt_del_l2_filter(bp, fltr);
-+			bnxt_del_l2_filter(bp, fltr);
- 		}
- 		vnic->uc_filter_count = 0;
- 	}
-@@ -11537,6 +11536,42 @@ static int bnxt_reinit_after_abort(struct bnxt *bp)
- 	return rc;
- }
++				if (!bp->rss_hash_key_valid &&
++				    !bp->rss_hash_key_updated) {
++					get_random_bytes(bp->rss_hash_key,
++							 HW_HASH_KEY_SIZE);
++					bp->rss_hash_key_updated = true;
++				}
++
++				memcpy(vnic->rss_hash_key, bp->rss_hash_key,
++				       HW_HASH_KEY_SIZE);
++
++				if (!bp->rss_hash_key_updated)
++					continue;
++
++				bp->rss_hash_key_updated = false;
++				bp->rss_hash_key_valid = true;
++
+ 				bp->toeplitz_prefix = 0;
+-				get_random_bytes(vnic->rss_hash_key,
+-					      HW_HASH_KEY_SIZE);
+ 				for (k = 0; k < 8; k++) {
+ 					bp->toeplitz_prefix <<= 8;
+ 					bp->toeplitz_prefix |= key[k];
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+index a6b6db1546cc..28091889615b 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
+@@ -2222,6 +2222,10 @@ struct bnxt {
+ #define BNXT_RSS_CAP_NEW_RSS_CAP		BIT(2)
+ #define BNXT_RSS_CAP_RSS_TCAM			BIT(3)
  
-+static void bnxt_cfg_one_usr_fltr(struct bnxt *bp, struct bnxt_filter_base *fltr)
-+{
-+	struct bnxt_ntuple_filter *ntp_fltr;
-+	struct bnxt_l2_filter *l2_fltr;
++	u8			rss_hash_key[HW_HASH_KEY_SIZE];
++	u8			rss_hash_key_valid:1;
++	u8			rss_hash_key_updated:1;
 +
-+	if (list_empty(&fltr->list))
-+		return;
-+
-+	if (fltr->type == BNXT_FLTR_TYPE_NTUPLE) {
-+		ntp_fltr = container_of(fltr, struct bnxt_ntuple_filter, base);
-+		l2_fltr = bp->vnic_info[0].l2_filters[0];
-+		atomic_inc(&l2_fltr->refcnt);
-+		ntp_fltr->l2_fltr = l2_fltr;
-+		if (bnxt_hwrm_cfa_ntuple_filter_alloc(bp, ntp_fltr)) {
-+			bnxt_del_ntp_filter(bp, ntp_fltr);
-+			netdev_err(bp->dev, "restoring previously configured ntuple filter id %d failed\n",
-+				   fltr->sw_id);
-+		}
-+	} else if (fltr->type == BNXT_FLTR_TYPE_L2) {
-+		l2_fltr = container_of(fltr, struct bnxt_l2_filter, base);
-+		if (bnxt_hwrm_l2_filter_alloc(bp, l2_fltr)) {
-+			bnxt_del_l2_filter(bp, l2_fltr);
-+			netdev_err(bp->dev, "restoring previously configured l2 filter id %d failed\n",
-+				   fltr->sw_id);
-+		}
+ 	u16			max_mtu;
+ 	u8			max_tc;
+ 	u8			max_lltc;	/* lossless TCs */
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index 6721c4a88453..9b5382412db3 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -1755,8 +1755,10 @@ static int bnxt_set_rxfh(struct net_device *dev,
+ 	if (rxfh->hfunc && rxfh->hfunc != ETH_RSS_HASH_TOP)
+ 		return -EOPNOTSUPP;
+ 
+-	if (rxfh->key)
+-		return -EOPNOTSUPP;
++	if (rxfh->key) {
++		memcpy(bp->rss_hash_key, rxfh->key, HW_HASH_KEY_SIZE);
++		bp->rss_hash_key_updated = true;
 +	}
-+}
-+
-+static void bnxt_cfg_usr_fltrs(struct bnxt *bp)
-+{
-+	struct bnxt_filter_base *usr_fltr, *tmp;
-+
-+	list_for_each_entry_safe(usr_fltr, tmp, &bp->usr_fltr_list, list)
-+		bnxt_cfg_one_usr_fltr(bp, usr_fltr);
-+}
-+
- static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
- {
- 	int rc = 0;
-@@ -11623,6 +11658,7 @@ static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool link_re_init)
- 		bnxt_vf_reps_open(bp);
- 	bnxt_ptp_init_rtc(bp, true);
- 	bnxt_ptp_cfg_tstamp_filters(bp);
-+	bnxt_cfg_usr_fltrs(bp);
- 	return 0;
  
- open_err_irq:
+ 	if (rxfh->indir) {
+ 		u32 i, pad, tbl_size = bnxt_get_rxfh_indir_size(dev);
 -- 
 2.30.1
 
 
---0000000000009a76560610aa09b2
+--000000000000af8b370610aa0950
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -241,14 +239,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEILcjD9XFZydO3szkVH8m6Li2iKKcsfv/
-wYHQBrg/AQfrMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIw
-NTIyMzIzMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIO5PlNN28PjidX/E1lcyy3ibkfdXSofk
+9FOhEbwlrRdtMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIw
+NTIyMzIzM1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBbTCJoE3jvJ9ov1bwi8v54EOND8Z+8+i4YSbJYRN335i4nHkle
-nu5PMTGB4gCL61DFEBxlLZQOJPrXJEscYiR5CmR/rwd+fQ3jw9joqPrd4bUkC/nZawNcAWz0iD4h
-2rLlS8f0wjA7COdB50CPZfSA7yelKNvK9KSiJmibbucI/eVhtS2X0GWtHvBMLKD1ddeenkXcc7ty
-BddSZEhy/HpO3xhBL/Xy6rnkYdYrZCAUo7AMJtRF3ksY7Okk57GEy2+C/OsdS+w1Hh22goE3W7e8
-MOxGUbSymEra0HULMmeBFx9vAhmoNaOM3Te6s3CDAj+JZZdPqHR7xSMlZd6b/DoJ
---0000000000009a76560610aa09b2--
+ATANBgkqhkiG9w0BAQEFAASCAQCEl5tw0CQo2YDn9fjZmPB7O7WjWA0j8meql9SLMy1NEXWdxdra
+6AbZtTxdpYwHEuZDtaKJWaiH36t7jGmXEu12l6ya8tQ4YkfQR2vjVJobIyyG75lqhig8Kkh/Qr9C
+RTEwHFPdqAahgimNPFvdeswm4sVOMfE3yC672Tz8xc+CTTcx0JRiNXACPnUF+NUBkWWmAY+MgZVC
+kb9hdKEEt72uGN/v2Ru0OjUmvcvmft9nq6h3bYilH2W/EeMAuVcZ6zSYCFLXHd0zpr9ibnYpXYgp
+6ssbA175jHDZwdz410lXYLPVye8keUx91u2e70kKNjr65eI2r4HmbYInrMvLMDXk
+--000000000000af8b370610aa0950--
 
