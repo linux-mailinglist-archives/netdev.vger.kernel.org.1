@@ -1,206 +1,137 @@
-Return-Path: <netdev+bounces-69244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1141684A7FD
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 22:49:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7442284A800
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 22:49:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBCF82898C6
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 21:48:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29FAD282927
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 21:49:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80F23134730;
-	Mon,  5 Feb 2024 20:27:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4C2A134758;
+	Mon,  5 Feb 2024 20:29:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ixbk6ZDP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 498221339B8;
-	Mon,  5 Feb 2024 20:27:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20FB8134CC2;
+	Mon,  5 Feb 2024 20:29:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707164848; cv=none; b=mJGOXuf3S5ngtnq+Sh887Vwrt8uFxjf3FGktzUyjHHDDWgd4CN4yi6g3f9cd/KydU6J/BZ3QOGzZ3zmVnrLpH9HUiZgRiSSvjQlewyYnMP8QEVtn4OAhROOrisXPCNUW/WuWj4RvnW6PYBvDktvrI6DEs5qBBKe7HXnve7NmZLU=
+	t=1707164981; cv=none; b=GXn8Am9a/rvGHCGlejjubBaYkvWEgWiG5ZC6mz3xA8sjxmQvrjyiuQY33G1zVs7mpQ+xrC1S0vu3/VzaDsa1r/37juv7Jmgi3E2bOcBY1GlL7hmU045BE0DBODEYOlleM6jPzgDLxs66J1YAWNaLgRVrKSueMXkVpNDQrQYV3ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707164848; c=relaxed/simple;
-	bh=iLUOOw1QWDbi1QQztNVRK+vAnuRON36QfpWe2fiMuTs=;
-	h=From:Subject:To:CC:References:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=FaJO7nOXWu4lCF3Z53oTDxpS9d7xISR4f9FMdcDKEaZ5HB4Nhr8J2RvfFfi/CLuKiYOvocVFgRS0vPwhkAL5TAiO6GWEgIw6sl+cRpma7kNaZEWNzCfnZLPr79mWVMz/IriLydRdFGvHPdSdSOPRu069lwzygtDkltkMvNSfKLM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.75.11) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 5 Feb
- 2024 23:27:13 +0300
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: Re: [PATCH v4 net-next 2/2] ravb: Add Tx checksum offload support for
- GbEth
-To: Biju Das <biju.das.jz@bp.renesas.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
-	<yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
-	<wsa+renesas@sang-engineering.com>, Nikita Yushchenko
-	<nikita.yoush@cogentembedded.com>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, Geert Uytterhoeven
-	<geert+renesas@glider.be>, Prabhakar Mahadev Lad
-	<prabhakar.mahadev-lad.rj@bp.renesas.com>, Biju Das <biju.das.au@gmail.com>
-References: <20240203142559.130466-1-biju.das.jz@bp.renesas.com>
- <20240203142559.130466-3-biju.das.jz@bp.renesas.com>
-Organization: Open Mobile Platform
-Message-ID: <76b13c41-9f0b-daf2-9aa8-7fdaf489fe0a@omp.ru>
-Date: Mon, 5 Feb 2024 23:27:13 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1707164981; c=relaxed/simple;
+	bh=S0GzZeJ7TZ/R3/NxtXdzMehouUj/A+/TyzKjx/Jvwj4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HagOOB0KrGknkeuBQ7Nwi/cY638Eypd1qw0RFEmqzUyxv/NicRyoVEhaJJ0IRzy96Yy2bg/TsGB6cDp4zdc1U+XAOsVMoCOuJtj398uUrNARnxNMBigMmog+9iZSSILKKX3vkf5zMST5vEtu4jZ9vBXHy2pTOyiL2JoYG/2Gi0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ixbk6ZDP; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-55cca88b6a5so5780893a12.1;
+        Mon, 05 Feb 2024 12:29:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707164978; x=1707769778; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=V2vwy1xdN4YRuSNz0Zmeo13DlHz09nwHWjHo8V3zYIM=;
+        b=ixbk6ZDPKuJP22PNH+aZijhR3MA5QYUXinplrgx64oiUg39ZnFfsSYEcODJYZYrkNe
+         ktgGxD0G5rBK9GqlsgJeR9p37DfvQpsKs0O52XX9cXifpsiuKqWNb4giDUv42+5En3uZ
+         3rZaBddD39MDqeGdaWthsqogkyEC3/mBhinAUEOx1mzQrn5+Q4BuIUdHVc6bzS+5y+ME
+         avJHr5ewQMqOODF7sSwCXwcSGK8PnLXjF+6iVQaaHWnesN3hBvdVB9iCLBV93kFr4bKo
+         iuFvz6JbtVCUuAH0Mzw3tSb8h8lHVytqwIKiwHGPIQAZ5n45kvgImwcpo5pne8mia9v9
+         ypaw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707164978; x=1707769778;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=V2vwy1xdN4YRuSNz0Zmeo13DlHz09nwHWjHo8V3zYIM=;
+        b=NJuuuSEpzGWkCp6zIgj5JsGJOmdp4amFPgDHEVutmDkJJdgNQQxKAkzWt3dgLeUKJO
+         bL31lmFZDUK389bjFvjjDriVGATrZW6cJCuO33a5CxgLkeG3/ru7If6q5QSLpyA8MVWc
+         Z9rhga5Vvnmq0ZZBUth754Bkiu3hwd8H4s81VF27qznHkdoNqa4vK3o3HTNESshNfSAD
+         c/9Jx6UtCsp+FwdzTgyL3S3drF2BWvdWO5qqa5kA2ZXdTz3Vv5Yl6rpRV0V/BH5dsCce
+         AU7uaeMP3vfN4uiJvT6n1JEB8C9regJY+j1L+fzC7Pe+y3XztuIM8q8Z8qLTtINCm3NH
+         p79g==
+X-Gm-Message-State: AOJu0YwzjivkfZhjoZBBFwNN1b6R2FpuCHRiK6OYzPRCFx3K/oKOk9h2
+	SahFzelxViDSY6qNOBuqRn76WjjOmhm+vbj/0GKeI56ZsZCzd+Ia
+X-Google-Smtp-Source: AGHT+IGLRUsRndFzILv8fnlMxBbqMi2GUbAGsIlK83rBGDc2eO+rtdn+PbtPCGEGLtUd6LttiUMHAQ==
+X-Received: by 2002:aa7:c991:0:b0:560:535:864c with SMTP id c17-20020aa7c991000000b005600535864cmr300965edt.12.1707164978034;
+        Mon, 05 Feb 2024 12:29:38 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUKrZurXEx9W3ZB7XvtgoqXBVoDOIiHWDUK0OxcbnUi1TvQBb6CqHTrO9FkFWqz66OVwTWge1zAbOwH8Xay+GG1fnqHREU/Plac7osLVVNe6J3OcVcKFONw8vGiWGnoC5EX8eSLZO+l2x3/AUHgM0scbA/Y+kTy8Klw3oNqwsVrgYrgn1YMLoOToLYIMryx3gKzPaNhCAlqVe81we1X2/Dm0eh4DDolBncvdnRRzfO1KIDJnrkUiX3IcIhUWgYp0goyUqEdfCDrnYlGZPcmxmRcqfOPEYpQzz6voNLSFvkv2KcpQiSeDrYRGhBcf27Wb5GMh2OU+RSh49vfiSFw8OrsZJUZTF3VqZXtlMJZAcgnUD8JF8D/OKM/I8AseGdelA3Br/w05YzQYPg/xovo1JoT4oa/2NNvIFk2hQjLqHhq8ayZZ8BlCWY6aJxUHkUaw9YD0wD54PQROFgp2W1PK8yNWLiUA1tEWvLa35hwKk6RSWUTK5aEs3H1aJSQ7Bu1Tz1zivVLr240evdu2sOw16xquFGF42BbW73B4/0fMc10tOhz6VfU+CEBvYWYQpxYL18BkHQrZL3RSXCf16RtjFPiUPEVn440SQj0Xn9B9nVOjh/9FmCwW2+GRXYTFwQK3hrAvnZDnKPFAY6K+Hq1YqbJg8ClLLLw
+Received: from skbuf ([188.25.173.195])
+        by smtp.gmail.com with ESMTPSA id w13-20020aa7da4d000000b00560422bd11asm256428eds.30.2024.02.05.12.29.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Feb 2024 12:29:37 -0800 (PST)
+Date: Mon, 5 Feb 2024 22:29:35 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH net-next v3 1/7] net: dsa: mt7530: empty default case on
+ mt7530_setup_port5()
+Message-ID: <20240205202935.tolbbwbtrig32jlj@skbuf>
+References: <20240202-for-netnext-mt7530-improvements-2-v3-0-63d5adae99ca@arinc9.com>
+ <20240202-for-netnext-mt7530-improvements-2-v3-1-63d5adae99ca@arinc9.com>
+ <ZbzUotyQm/FyKK7G@shell.armlinux.org.uk>
+ <e3b4add6-425c-46ca-9da5-8713055fc422@arinc9.com>
+ <Zb0u8NY0q6ay17j5@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240203142559.130466-3-biju.das.jz@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/05/2024 20:16:46
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 183207 [Feb 05 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.75.11 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.75.11
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/05/2024 20:20:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/5/2024 5:20:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Zb0u8NY0q6ay17j5@shell.armlinux.org.uk>
 
-On 2/3/24 5:25 PM, Biju Das wrote:
-
-> TOE has hardware support for calculating IP header and TCP/UDP/ICMP
-> checksum for both IPv4 and IPv6.
+On Fri, Feb 02, 2024 at 06:05:36PM +0000, Russell King (Oracle) wrote:
+> > > Given everything I've said above, the only way to configure RGMII
+> > > delays is via the rx-internal-delay-ps and tx-internal-delay-ps
+> > > properties. So, DSA drivers should _not_ be configuring their ports
+> > > with RGMII delays based on the RGMII phy interface mode.
+> > > 
+> > > The above is my purely logically reasoned point of view on this
+> > > subject. Others may have other (to me completely illogical)
+> > > interpretations that can only lead to interoperability issues.
+> > 
+> > I will address this with the next patch series. Thank you for explaining it
+> > in detail.
 > 
-> Add Tx checksum offload supported by TOE for IPv4 and TCP/UDP.
-> 
-> For Tx, the result of checksum calculation is set to the checksum field of
-> each IPv4 Header/TCP/UDP/ICMP of ethernet frames. For the unsupported
-> frames, those fields are not changed. If a transmission frame is an UDPv4
-> frame and its checksum value in the UDP header field is 0x0000, TOE does
-> not calculate checksum for UDP part of this frame as it is optional
-> function as per standards.
-> 
-> We can test this functionality by the below commands
-> 
-> ethtool -K eth0 tx on --> to turn on Tx checksum offload
-> ethtool -K eth0 tx off --> to turn off Tx checksum offload
-> 
-> Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
-[...]
+> This is a good time to point out not to rush with the next patch
+> series, as my email will _likely_ provoke some additional discussion
+> from Andrew and/or Vladimir. So please give it a few days (maybe
+> around the middle of next week) to give them time to consider my
+> email and respond.
 
-> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
-> index 64bf29d01ad0..d7b1c6d15a17 100644
-> --- a/drivers/net/ethernet/renesas/ravb.h
-> +++ b/drivers/net/ethernet/renesas/ravb.h
-[...]
-> @@ -981,6 +982,21 @@ enum CSR0_BIT {
->  	CSR0_RPE	= 0x00000020,
->  };
->  
-> +enum CSR1_BIT {
-> +	CSR1_TIP4	= 0x00000001,
-> +	CSR1_TTCP4	= 0x00000010,
-> +	CSR1_TUDP4	= 0x00000020,
-> +	CSR1_TICMP4	= 0x00000040,
-> +	CSR1_TTCP6	= 0x00100000,
-> +	CSR1_TUDP6	= 0x00200000,
-> +	CSR1_TICMP6	= 0x00400000,
-> +	CSR1_THOP	= 0x01000000,
-> +	CSR1_TROUT	= 0x02000000,
-> +	CSR1_TAHD	= 0x04000000,
-> +	CSR1_TDHD	= 0x08000000,
-> +	CSR1_ALL	= 0x0F700071,
+I agree with everything you've said. The only problem is that
+Documentation/devicetree/bindings/net/ethernet-controller.yaml is
+ambiguous on this topic (to put it mildly).
 
-   I doubt we really need CSR1_ALL...
-
-[...]
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 4f310bcee7c0..fee771f14fc5 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-[...]
-> @@ -524,16 +525,29 @@ static int ravb_ring_init(struct net_device *ndev, int q)
->  
->  static void ravb_csum_init_gbeth(struct net_device *ndev)
->  {
-> -	if (!(ndev->features & NETIF_F_RXCSUM))
-> +	bool tx_enable = ndev->features & NETIF_F_HW_CSUM;
-> +	bool rx_enable = ndev->features & NETIF_F_RXCSUM;
-> +
-> +	if (!(tx_enable || rx_enable))
->  		goto done;
->  
->  	ravb_write(ndev, 0, CSR0);
-> -	if (ravb_wait(ndev, CSR0, CSR0_RPE, 0)) {
-> +	if (ravb_wait(ndev, CSR0, CSR0_TPE | CSR0_RPE, 0)) {
->  		netdev_err(ndev, "Timeout enabling hardware checksum\n");
-> -		ndev->features &= ~NETIF_F_RXCSUM;
-> +
-> +		if (tx_enable)
-> +			ndev->features &= ~NETIF_F_HW_CSUM;
-> +
-> +		if (rx_enable)
-> +			ndev->features &= ~NETIF_F_RXCSUM;
->  	} else {
-> -		ravb_write(ndev, CSR2_ALL & ~(CSR2_RTCP6 | CSR2_RUDP6 |
-> -					      CSR2_RICMP6), CSR2);
-> +		if (tx_enable)
-> +			ravb_write(ndev, CSR1_ALL & ~(CSR1_TICMP4 | CSR1_TTCP6 |
-> +						      CSR1_TUDP6 | CSR1_TICMP6), CSR1);
-
-   With the v6 bits 20...22 being 0, the bits 24...27 are ignored anyway,
-the manual says. So I think I'd prefer:
-
-			ravb_write(ndev, CSR1_TIP4 | CSR1_TTCP4 | CSR1_TUDP4, CSR1);
-[...]
-> @@ -2418,6 +2465,18 @@ static int ravb_set_features_gbeth(struct net_device *ndev,
->  			goto done;
->  	}
->  
-> +	if (changed & NETIF_F_HW_CSUM) {
-> +		if (features & NETIF_F_HW_CSUM)
-> +			val = CSR1_ALL & ~(CSR1_TICMP4 | CSR1_TTCP6 |
-> +					   CSR1_TUDP6 | CSR1_TICMP6);
-
-   Likewise, I'd prefer:
-
-			val = CSR1_TIP4 | CSR1_TTCP4 | CS12_TUDP4;
-
-[...]
-
-MBR, Sergey
+@Arınç, there are ways to handle the "tx-internal-delay-ps" in
+mt7530_setup_port5() in a way that is backwards compatible. I don't know
+about RX delays - the function doesn't handle them, and I don't have the
+time to open datasheets now. You can take inspiration from
+ksz_parse_rgmii_delay() and sja1105_parse_rgmii_delays() on how to only
+fall back to the current logic to set the tx_delay if the more specific
+OF properties are not present.
 
