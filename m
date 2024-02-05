@@ -1,130 +1,244 @@
-Return-Path: <netdev+bounces-69215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3885B84A2EF
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 20:01:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E00A384A2FE
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 20:02:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3E5D28B823
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 19:01:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 520771F219C1
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 19:02:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 004B2482FE;
-	Mon,  5 Feb 2024 19:00:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DyoUdjxg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2A6C4BAB5;
+	Mon,  5 Feb 2024 19:01:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7132848782
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 18:59:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21E0048CC6;
+	Mon,  5 Feb 2024 19:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707159599; cv=none; b=L3I99n5HgmzMTsLeZu6KQjqjtie2FJLUJwEaPHUjp7D7uFcjeLNXvQXS6pGRXHfUJsEz6dbuQwqGsNVKCIX4qR0pD4P0lxKbYY2buuRxVCIfiVH9/qhsnymRwjFv1886C4UDAzgkHIIIYtExe3Dxg2roUTSfmGfbZ10JBgxU6/c=
+	t=1707159701; cv=none; b=XR5bSuiY+rJWa8Ojo0v7xpZX/DAdwziiIIxKl6hmhAa5tabmkUULL/yejmBWgcjqxdQJP4v8QJJlpTwpKWBpMi/olG9+DWzGHQQ/ignWOX5OeUQBAQGPmKhiyXRlJ5w64pX+VU4hZaZ/s6Vg9W3jrsShEScMoEolKCvpRJpTrCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707159599; c=relaxed/simple;
-	bh=msk8C3xxp1eVQ7ZfOkUTa8KjWImCq4DW+oF2gEzaPrA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uOxghPL/iIFRhf/qeQNIKodlGsjwNPoBmjPVJv0PTd0/cJpi1phDjMNFPQ5tjwvzFmazKNlr+IDOyVoPFU8vAMAbL+/Sjm4OfRyBdivKeCx4S6Y0AKREKNXD/9bTRqLukR+mEGyPojzWj7kMP81P8VUsV8yAa4UHk7lbcklbY0k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DyoUdjxg; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-60412866c36so46376187b3.2
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 10:59:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707159597; x=1707764397; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Zn9IfxS9ZbbZv2zeA/kPulpLiO/0fwjtj5trKmKyQJg=;
-        b=DyoUdjxggn1ioXz2mE9IM5NhTl1q+r/ydQRSx8iutcYcvre9gTA+1rgyZ5jh4l8e0f
-         juwvFcFxyMvVh86eiMaxeZFIdZKzlEovGNMRlOzBuH2kEQInXpgaG1neh0XKC86+rIRL
-         b5U4Du7jeD6F6SwhKWYP63gaLxvqI+I+HRmCGoaB5H6CIQRuUiW5+ZMDsFPVE0POXnhJ
-         pUxWy2zjP5iSc9pDg45OaeRmKu+scpfHQQaxtmPIdVvhvqv4p8FcKx1jUhedlLb6Ktkn
-         lVOs08U/l7vGrRQkPaLX+NFMOoH9rWfeetWMYA3Qxd+DvdWbNZqgC9vO0YfY6oa6BRO7
-         2Vmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707159597; x=1707764397;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zn9IfxS9ZbbZv2zeA/kPulpLiO/0fwjtj5trKmKyQJg=;
-        b=MgqIV9AwXRf2EYBqNqxnYO942wzZk/QF1E18pxNrRNGtXF0sWBcW3Q5oYMnmGtjWEh
-         5CfQqH/EseeUokRrT10t6enYpSLh0CaPyEmcn+EsgGeA45bstuUUS8xRAbsFBOQgDKwu
-         h6b1bazlZftw6pKhld+BdrfHr2oXwQ4MgIJElH1yQeloR5n/FoHHXCLfY79IFAiBTVXt
-         02dnm/60OXkRH5Gug0Gy4jCRoutoUBX5ny+4hpHBhTzpmptAAqFM2MO9cTkYav1ERQl7
-         BevucliWGB5qoqpll8YzvnfQ2bmdoxRlHwaSRtQoSBgB5x2edYGpMUdSaS2PjIcYm2s8
-         jkCg==
-X-Gm-Message-State: AOJu0YwcQ8tvDndgetvbr0CiHh4k21Ob//WRGtIxRoRMwjsKO4hRQo+O
-	jdI6uVNNFGHlrf+ZbQlnUFHKwYQ+U9/RHQh3Z3ovy3c1MLj4TR7z
-X-Google-Smtp-Source: AGHT+IF9z2674+qhOO3Gr4UaHqQXUctHxtFVo7TmORp3rFDxbWdSXxyRqbu6H3srujSGoaBYX/+9qA==
-X-Received: by 2002:a0d:e6d2:0:b0:604:4f5:f258 with SMTP id p201-20020a0de6d2000000b0060404f5f258mr524383ywe.25.1707159597238;
-        Mon, 05 Feb 2024 10:59:57 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVnHI+WXAu4+VcjxsIJtJfJa5onyHMJNCUh8KvFrATZ5Ulsd6IDpRycoUcUVZTookv+oqq7R5lTGh8A7aw9PntBVv0vA3ROjCMd59yRcBtSBApg8OWmd9X3KkdtO9zv/P2GER966ytygzKJBbMCvdELLfWOqiuU10ydJ9cRwoK2YUAebWgJUE5jokXZIyGpBGnAnHGvyf2XvtCu7at1M2irFX0gekQkTqpYb8IeDwTJjpyKeQ0D75mNA/g1KjKI0ZvijD3RDHG6tkrApRcwD+wr6rkEMM8pTc3EG8Hv++bhE+ykr/ySg4bEgGq9O0CnZk/NV240vY0=
-Received: from ?IPV6:2600:1700:6cf8:1240:8b69:db05:cad3:f30f? ([2600:1700:6cf8:1240:8b69:db05:cad3:f30f])
-        by smtp.gmail.com with ESMTPSA id cd4-20020a05690c088400b0060437133f85sm81735ywb.7.2024.02.05.10.59.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Feb 2024 10:59:56 -0800 (PST)
-Message-ID: <bf2b17fc-7638-4ddf-84da-33baad34c91d@gmail.com>
-Date: Mon, 5 Feb 2024 10:59:55 -0800
+	s=arc-20240116; t=1707159701; c=relaxed/simple;
+	bh=YI+Cz/rxozFyg8d5Ypa8dOeLaDC4ZN+36rCKd3WdcmE=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=NRzJcbrVSpeCaF3E9ETCr+LZLzCY5oOwF3qyn8vjIID95e8izLj0kD/0hZXZ4Xj7xw8YvqhlRZ8xBEdQ4KTzHY49DpBSdQpbeeZOeow+nNxWhRdWMZEKtJp10iWhNDL7ermvCDJ4/ga6Q598owpIWvMmg2rQ5OhskV0sBOjcxZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (178.176.75.11) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 5 Feb
+ 2024 22:01:22 +0300
+Subject: Re: [PATCH v4 net-next 1/2] ravb: Add Rx checksum offload support for
+ GbEth
+To: Biju Das <biju.das.jz@bp.renesas.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
+	<yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
+	<wsa+renesas@sang-engineering.com>, Nikita Yushchenko
+	<nikita.yoush@cogentembedded.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, Geert Uytterhoeven
+	<geert+renesas@glider.be>, Prabhakar Mahadev Lad
+	<prabhakar.mahadev-lad.rj@bp.renesas.com>, Biju Das <biju.das.au@gmail.com>
+References: <20240203142559.130466-1-biju.das.jz@bp.renesas.com>
+ <20240203142559.130466-2-biju.das.jz@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <dd3ffb2d-23f4-49a6-e427-2b6afb96ddfd@omp.ru>
+Date: Mon, 5 Feb 2024 22:01:21 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 4/5] net/ipv6: set expires in
- modify_prefix_route() if RTF_EXPIRES is set.
+In-Reply-To: <20240203142559.130466-2-biju.das.jz@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: thinker.li@gmail.com, netdev@vger.kernel.org, ast@kernel.org,
- martin.lau@linux.dev, kernel-team@meta.com, davem@davemloft.net,
- dsahern@kernel.org, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- kuifeng@meta.com
-References: <20240202082200.227031-1-thinker.li@gmail.com>
- <20240202082200.227031-5-thinker.li@gmail.com> <ZbzdBRd4teS_4Eey@Laptop-X1>
- <536038f7-cc33-46c7-a3e9-2c9f27bc9c81@gmail.com> <Zb9kRrG_7LRl1i2W@Laptop-X1>
-From: Kui-Feng Lee <sinquersw@gmail.com>
-In-Reply-To: <Zb9kRrG_7LRl1i2W@Laptop-X1>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/05/2024 18:41:57
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 183206 [Feb 05 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.75.11 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.75.11 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.75.11
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 02/05/2024 18:48:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 2/5/2024 3:37:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
+On 2/3/24 5:25 PM, Biju Das wrote:
 
-
-On 2/4/24 02:17, Hangbin Liu wrote:
-> On Fri, Feb 02, 2024 at 09:57:46AM -0800, Kui-Feng Lee wrote:
->>> Hi Kui-Feng,
->>>
->>> I may missed something. But I still could not get why we shouldn't use
->>> expires for checking? If expires == 0, but RTF_EXPIRES is on,
->>> shouldn't we call fib6_clean_expires()?
->>
->>
->> The case that expires == 0 and RTF_EXPIES is on never happens since
->> inet6_addr_modify() rejects valid_lft == 0 at the beginning. This
->> patch doesn't make difference logically, but make inet6_addr_modify()
->> and modify_prefix_route() consistent.
->>
->> Does that make sense to you?
+> TOE has hardware support for calculating IP header and TCP/UDP/ICMP
+> checksum for both IPv4 and IPv6.
 > 
-> Thanks, this does make sense to me. If there will be a new version. It would
-> be good to add the following sentence in the description.
+> Add Rx checksum offload supported by TOE for IPv4 and TCP/UDP protocols.
 > 
-> """
-> This patch doesn't make difference logically, but make inet6_addr_modify()
-> and modify_prefix_route() consistent.
-> """
+> For Rx, the 4-byte result of checksum calculation is attached to the
+> Ethernet frames.First 2-bytes is result of IPv4 header checksum and next
+> 2-bytes is TCP/UDP/ICMP checksum.
 > 
-
-Sure, I will add it to the commit message.
-
-
-> Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+> If a frame does not have checksum error, 0x0000 is attached as checksum
+> calculation result. For unsupported frames 0xFFFF is attached as checksum
+> calculation result. In case of an IPv6 packet, IPv4 checksum is always set
+> to 0xFFFF.
 > 
-> Regards
-> Hangbin
+> We can test this functionality by the below commands
+> 
+> ethtool -K eth0 rx on --> to turn on Rx checksum offload
+> ethtool -K eth0 rx off --> to turn off Rx checksum offload
+> 
+> Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
+[...]
 
+> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
+> index e0f8276cffed..64bf29d01ad0 100644
+> --- a/drivers/net/ethernet/renesas/ravb.h
+> +++ b/drivers/net/ethernet/renesas/ravb.h
+> @@ -205,7 +205,10 @@ enum ravb_reg {
+>  	TLFRCR	= 0x0758,
+>  	RFCR	= 0x0760,
+>  	MAFCR	= 0x0778,
+> -	CSR0    = 0x0800,	/* RZ/G2L only */
+> +
+> +	/* RZ/G2L TOE registers */
+
+   Thanks. Though I think I'd prefer /* TOE registers (RZ/G2L only) */...
+
+[...]
+> @@ -978,6 +981,21 @@ enum CSR0_BIT {
+>  	CSR0_RPE	= 0x00000020,
+>  };
+>  
+> +enum CSR2_BIT {
+> +	CSR2_RIP4	= 0x00000001,
+> +	CSR2_RTCP4	= 0x00000010,
+> +	CSR2_RUDP4	= 0x00000020,
+> +	CSR2_RICMP4	= 0x00000040,
+> +	CSR2_RTCP6	= 0x00100000,
+> +	CSR2_RUDP6	= 0x00200000,
+> +	CSR2_RICMP6	= 0x00400000,
+> +	CSR2_RHOP	= 0x01000000,
+> +	CSR2_RROUT	= 0x02000000,
+> +	CSR2_RAHD	= 0x04000000,
+> +	CSR2_RDHD	= 0x08000000,
+> +	CSR2_ALL	= 0x0F700071,
+
+  I doubt we really need CSR2_ALL...
+
+[...]
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 0e3731f50fc2..4f310bcee7c0 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -522,6 +522,24 @@ static int ravb_ring_init(struct net_device *ndev, int q)
+>  	return -ENOMEM;
+>  }
+>  
+> +static void ravb_csum_init_gbeth(struct net_device *ndev)
+> +{
+> +	if (!(ndev->features & NETIF_F_RXCSUM))
+> +		goto done;
+> +
+> +	ravb_write(ndev, 0, CSR0);
+> +	if (ravb_wait(ndev, CSR0, CSR0_RPE, 0)) {
+> +		netdev_err(ndev, "Timeout enabling hardware checksum\n");
+> +		ndev->features &= ~NETIF_F_RXCSUM;
+> +	} else {
+> +		ravb_write(ndev, CSR2_ALL & ~(CSR2_RTCP6 | CSR2_RUDP6 |
+> +					      CSR2_RICMP6), CSR2);
+
+   With these 3 bits being 0, the bits 24...27 are ignored anyway,
+the manual says. So I think I'd prefer:
+
+		ravb_write(ndev, CSR2_RIP4 | CSR2_RTCP4 | CSR2_RUDP4 | CSR2_RICMP4,
+			   CSR2);
+
+> +	}
+> +
+> +done:
+> +	ravb_write(ndev, CSR0_TPE | CSR0_RPE, CSR0);
+
+   I think we shouldn't set CSR0.TPE yet at this point, as we n't setup
+CSR1 yet...
+
+[...]
+> @@ -2334,11 +2381,48 @@ static void ravb_set_rx_csum(struct net_device *ndev, bool enable)
+[...]
+>  static int ravb_set_features_gbeth(struct net_device *ndev,
+>  				   netdev_features_t features)
+>  {
+> -	/* Place holder */
+> -	return 0;
+> +	netdev_features_t changed = ndev->features ^ features;
+> +	struct ravb_private *priv = netdev_priv(ndev);
+> +	unsigned long flags;
+> +	int ret = 0;
+> +	u32 val;
+> +
+> +	spin_lock_irqsave(&priv->lock, flags);
+> +	if (changed & NETIF_F_RXCSUM) {
+> +		if (features & NETIF_F_RXCSUM)
+> +			val = CSR2_ALL & ~(CSR2_RTCP6 | CSR2_RUDP6 | CSR2_RICMP6);
+
+   Likewise, I'd prefer:
+
+			val = CSR2_RIP4 | CSR2_RTCP4 | CSR2_RUDP4 | CSR2_RICMP4;
+
+> +		else
+> +			val = 0;
+> +
+> +		ret = ravb_endisable_csum_gbeth(ndev, CSR2, val, CSR0_RPE);
+> +		if (ret)
+> +			goto done;
+> +	}
+> +
+> +	ndev->features = features;
+> +done:
+> +	spin_unlock_irqrestore(&priv->lock, flags);
+> +
+> +	return ret;
+>  }
+>  
+>  static int ravb_set_features_rcar(struct net_device *ndev,
+[...]
+
+   Otherwise LGTM. We're close! :-)
+
+MBR, Sergey
 
