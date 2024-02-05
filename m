@@ -1,136 +1,95 @@
-Return-Path: <netdev+bounces-69008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAE168491DD
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 00:44:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF2888491FD
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 01:08:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2EC422814F2
-	for <lists+netdev@lfdr.de>; Sun,  4 Feb 2024 23:44:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66E8E1F219A2
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 00:08:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6514F33CD9;
-	Sun,  4 Feb 2024 23:41:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA707F;
+	Mon,  5 Feb 2024 00:08:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="a11NRg3H"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Kfw724OM"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from casper.infradead.org (casper.infradead.org [90.155.50.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDFD7DDBB;
-	Sun,  4 Feb 2024 23:41:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED25F623
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 00:08:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.50.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707090065; cv=none; b=uOh4KyNkVRiZMrqniXgkW6Xpxa3XB/DA6C0b51IJeZMlOfPtH4t/zCL9u3jNW3BI8q71sIUa3kerKUy99aOnhfQk4Cd/PHG+xoEzb7LtRSI/wZjqWOHLGv7n7yPZNF3RHJ5mtHlsaNtzuzxDYLupFfVLaakrOondnsdtalC2JOE=
+	t=1707091721; cv=none; b=QaT1U+BIOD1JobAognchTNxgTpqBmc1IfGByFSbi8bHHiWxqo/WVfnMsOvuLH1Og1DPTPaXMXOPYQsdluNP+2rrFCKoJCDktCuJpqojgxYqJVU0FxHedA+gjUjQmFSfCrvrcKFBGpjzD790LefziRCXC9+nXYEV53u2jY28JXzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707090065; c=relaxed/simple;
-	bh=GY/i358jYl4X2zeywHliUg8zbjHunLh0+ZONAyCsEDA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=aAI++OIheVavLbfGXqVxUnmAvAKR5YQe/WKvqPkiKplhYqoxLFgxVcKvl6sQJtj8olYh27MsTRZ7KCirrGhSRmU5MMl0igljjwrG3xHiwkVFLGAM2K2uq0JzT61JxH/aTnIs2S3rGnA5BtrlS8TiX3ZkLdKdcGxFVBy5Omddj2U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=a11NRg3H; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=Cc:To:In-Reply-To:References:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=qhzUzBBE/ag86Iuv8pKOl72IzBpodGhMjRQDM/+8K5Y=; b=a1
-	1NRg3H7ioa/uQU6pi/ZYzRyp/9SW1iXD8TQh21Su2H/FGxpmTEIhW/G1CHiBRuLFnRY5iuX1nar71
-	Vp/lgjZHmQODZsHCwzFL6WN98kX9yVukadk/EWHaVtIb4yyrDBPkzfpz6q9sX59x1yZZD0w8IihVb
-	xM4YFFx/kjoZQLA=;
-Received: from c-76-156-36-110.hsd1.mn.comcast.net ([76.156.36.110] helo=thinkpad.home.lunn.ch)
-	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rWm6a-006z7T-7L; Mon, 05 Feb 2024 00:40:56 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-Date: Sun, 04 Feb 2024 17:40:25 -0600
-Subject: [PATCH 8/8] net: intel: igc: Use linkmode helpers for EEE
+	s=arc-20240116; t=1707091721; c=relaxed/simple;
+	bh=kKF1Y8EZL+egsSbRmRpOHExkAlTFonkwwk+I3HcnMFA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=TEMYO3lfLtJGjYTYW6oNITk5uYS30ua4qIHjQiTZop0BItaKd7jbY4WFHrv1Ba6oSlPJgA5r6BKF8jouMAgkQKWH0t7GR4NLhSa5OKqUa26pzB3QdPeEBjJh7eYmstSztdK7zNx5UyhgAPpbCm6Owe7A7uHw9+fF1oOPRi5Fl1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Kfw724OM; arc=none smtp.client-ip=90.155.50.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:To:Subject:MIME-Version:Date:Message-ID:Sender:
+	Reply-To:Cc:Content-ID:Content-Description;
+	bh=G//NWa802q3a6BTcq3lzQ7q7yHHK/IA7lueu2VXK8SE=; b=Kfw724OMxbUu1IpZ2jUetc0TeD
+	sbmvemjtL8oMzoL+xlCT5HhoIsXHS5iU0KMiN1DY5t+7EOX3jr/3aVA1aEcoS30V8pgZ/9kaPPFlD
+	CQ/suxJmBzgDJp60RerzdBAv4hQlfqFusnSIjvZbTMgBu0iF/G7pjJvXGP+ZP9CKtGSGFzJl9aZRR
+	w/bRxqao+ZzifB0BcYEZla5e4ywDASiiGmrDCTv12WQFdrVuz4Wzt0gUfNEX508Hcx4v/BNAY1Akr
+	oXJLgwAkg/eMrkok/NFjfMdZF/W1t4mHQxDffoPZ61ZoTBZaSZLNodrwurQKIBkmWXhsYKh7+XBle
+	3MVAt9BQ==;
+Received: from fpd2fa7e2a.ap.nuro.jp ([210.250.126.42] helo=[192.168.1.6])
+	by casper.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rWmXI-00000007uu9-1LeH;
+	Mon, 05 Feb 2024 00:08:34 +0000
+Message-ID: <0c581c16-85c5-40c9-9f44-5fa7c39ceeed@infradead.org>
+Date: Mon, 5 Feb 2024 09:08:29 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ps3/gelic: Fix SKB allocation
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>, sambat goson <sombat3960@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ "David S. Miller" <davem@davemloft.net>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <1f5ffc7d-4b2e-4f07-bc7e-97d49ccff28c@infradead.org>
+ <757018c2d9bd235cd2dad4363fb9a54354c9a372.camel@redhat.com>
+From: Geoff Levand <geoff@infradead.org>
+In-Reply-To: <757018c2d9bd235cd2dad4363fb9a54354c9a372.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240204-keee-u32-cleanup-v1-8-fb6e08329d9a@lunn.ch>
-References: <20240204-keee-u32-cleanup-v1-0-fb6e08329d9a@lunn.ch>
-In-Reply-To: <20240204-keee-u32-cleanup-v1-0-fb6e08329d9a@lunn.ch>
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Ariel Elior <aelior@marvell.com>, 
- Manish Chopra <manishc@marvell.com>, 
- Jesse Brandeburg <jesse.brandeburg@intel.com>, 
- Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
- Andrew Lunn <andrew@lunn.ch>
-X-Mailer: b4 0.12.4
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1638; i=andrew@lunn.ch;
- h=from:subject:message-id; bh=GY/i358jYl4X2zeywHliUg8zbjHunLh0+ZONAyCsEDA=;
- b=owEBbQKS/ZANAwAKAea/DcumaUyEAcsmYgBlwCBqchq37ZWAaCXguBx3KZrCunBRHw7lO6YQI
- BGeHWL/fxmJAjMEAAEKAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCZcAgagAKCRDmvw3LpmlM
- hP3+EACmrlqVvQVpi8hIGv7u5kcwmZhDfq2v8zuE8ahroCH+WVKmtXgT7ujGkPXLj5rrHSNQ/Tb
- oc2Gm0y9F67PRPsKstTJE6dA+6MbKjAt6WBUiVEQq/FKf5rRumNLyD1zJa3qQqPckX1QCdLS53R
- jS5ub1Kl29ZaY1uVJSM6maQ6TLbJDCO0fihwjnPzrQjM8yeRdCakWGGi1zOSmwqqSk53LiIk9/+
- szNw6xdTqY5leQVYyCoc+iLPDMCqeO7nMnUzXwzeaPRv9y0EU676Gc06lOKBP2X4xDU6xHZqTcu
- SKzpM9We/Bgd2sKHPUEiuywZv+OOeKktgaTksyQxG6Q+TXfLXdYAFx0INrkOb1duE9nY5nGZdPG
- 6/zXaCs2uwEHbGyEowgLAGCli6RLOMmMALU02Ti+Xc7GCXB9RuyiPhe1BMZijpEvi4rDKgTSifB
- sLkyNIgCwf31Xm/KGlZ/aGdKMS8l0Bnn+ZViQhpfHkWyjtSEEfY+Gu6845mPQt7/FXT4hRo3E0B
- TL1SUMeyGbGcb4j/OtcSgf3p6Kq1gMJgCaePXLGV5Nd3idrfpE9+LNZVPa0PSq6HvHm4hLnNhMP
- zZaFrKD+qEymoaFGnDIrjnkeoHcqtpFNI+rza8BkAxh6WVJLybo4W4ECsNFYch9pa5P7XNJOUpc
- hk4xXG7KVvmucew==
-X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
- fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
 
-Make use of the existing linkmode helpers for converting PHY EEE
-register values into links modes, now that ethtool_keee uses link
-modes, rather than u32 values.
+Hi Paolo,
 
-Signed-off-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/net/ethernet/intel/igc/igc_ethtool.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+On 1/30/24 21:37, Paolo Abeni wrote:
+> Hi,
+> 
+> On Fri, 2024-01-26 at 18:25 +0900, Geoff Levand wrote:
+>> Commit 3ce4f9c3fbb3 ("net/ps3_gelic_net: Add gelic_descr structures")
+>> of 6.8-rc1 did not set up the ps3 gelic network SKB's correctly,
+>> resulting in a kernel panic.
+>>     
+>> This fix changes the way the napi buffer and corresponding SKB are
+>> allocated and managed.
+>>     
+>> Reported-by: sambat goson <sombat3960@gmail.com>
+>> Fixes: 3ce4f9c3fbb3 ("net/ps3_gelic_net: Add gelic_descr structures")
+>> Signed-off-by: Geoff Levand <geoff@infradead.org>
+> 
+> The patch overall looks correct to me, but there are a few formal
+> issues worthy to be addressed, see below.
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_ethtool.c b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-index e9aed4069ebe..e9d78bcb0201 100644
---- a/drivers/net/ethernet/intel/igc/igc_ethtool.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ethtool.c
-@@ -1630,8 +1630,8 @@ static int igc_ethtool_get_eee(struct net_device *netdev,
- 	u32 eeer;
- 
- 	if (hw->dev_spec._base.eee_enable)
--		edata->advertised_u32 =
--			mmd_eee_adv_to_ethtool_adv_t(adapter->eee_advert);
-+		mii_eee_cap1_mod_linkmode_t(edata->advertised,
-+					    adapter->eee_advert);
- 
- 	*edata = adapter->eee;
- 
-@@ -1653,7 +1653,7 @@ static int igc_ethtool_get_eee(struct net_device *netdev,
- 		edata->eee_enabled = false;
- 		edata->eee_active = false;
- 		edata->tx_lpi_enabled = false;
--		edata->advertised_u32 &= ~edata->advertised_u32;
-+		linkmode_zero(edata->advertised);
- 	}
- 
- 	return 0;
-@@ -1695,7 +1695,8 @@ static int igc_ethtool_set_eee(struct net_device *netdev,
- 		return -EINVAL;
- 	}
- 
--	adapter->eee_advert = ethtool_adv_to_mmd_eee_adv_t(edata->advertised_u32);
-+	adapter->eee_advert = linkmode_to_mii_eee_cap1_t(edata->advertised);
-+
- 	if (hw->dev_spec._base.eee_enable != edata->eee_enabled) {
- 		hw->dev_spec._base.eee_enable = edata->eee_enabled;
- 		adapter->flags |= IGC_FLAG_EEE;
+Thanks for the review.  I'll send out an updated patch sometime soon.
 
--- 
-2.43.0
+-Geoff
+
 
 
