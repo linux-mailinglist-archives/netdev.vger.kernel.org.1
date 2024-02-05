@@ -1,204 +1,126 @@
-Return-Path: <netdev+bounces-69318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C985484AAB6
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 00:40:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD00984AAC9
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 00:44:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 474E61F2890A
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:40:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 672CDB21380
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:44:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C214A99C;
-	Mon,  5 Feb 2024 23:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27B2048CF2;
+	Mon,  5 Feb 2024 23:44:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j5CaDjy/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 427544F5EA
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 23:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 004FF1EB49;
+	Mon,  5 Feb 2024 23:44:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707176431; cv=none; b=kzuPiwNXtibuxJUtEJ8gBZiZ72B8vxaj+luIEUKDKzsR5PRxeTW1WS9sKSZ/5RHSyDVIO6So3Nef7L0tX2CO87u/obBWAsqRXneGVSw8/Vv2idXzjRgMaEXAtC9edqJ/kYdyJZnxwKf2ZC7iGaxCbM0Rf7pRQ8dgFY88mAIvg7o=
+	t=1707176691; cv=none; b=l8yXM1Oxbn3uiu89cQ/b3f2AYmtc4nUH659sCCXT5JXyy6wZZIU6jlkrH0Yaro7KyvPUVMs4wKSd64znZOZ6b4eQ0HV53cv++osy6/rClfWDFDoYlt9XHxCvSmBD15YWSHaWwId8Pi9uhDMQ1htQDLkpPiDz7b/5BfibLkRVpYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707176431; c=relaxed/simple;
-	bh=/l/BbcOUP7bWr5jYI8yoNu18RrCE0pxiWCQZSl+HmC8=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=rLGDKdl5J81Egx1PbknZKHfzNq9zM+GwV/m9BG1iZ/dxvEaZ6yBYI3HDH4TaNCcep6+SIzJnzE3219H9v+n+qLXFD+7R7rzeHZWQ79j2ttQUqzGO1JmfSQAHpSOl2hQWnmWcA8wRB4G4y9TU/boS533WqwdCaaHNV8UAIDrVPS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-35fc6976630so44648505ab.0
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 15:40:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707176428; x=1707781228;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/ngrkC+Ev5kse1bjFQ2pRxP1v852GqG+2VMvhIKcpOs=;
-        b=CY1KgbFmj2BvQXnU9/UJGFvD5JmozAXmfRBJ2pqfgfRyk7wwcOB+6cvvx5WubuVPFy
-         QM0Hw/JptkgLbqIXb0SR9AF7iYz3lDoPJcwsAi1Faq8eP3w78mBmzV+7YwvuKOUbeYQ+
-         LSjhQb3AeV8k30q0hYQu70XyxLTWNQH7nYzstPwozVfIZyISsUQixwat4YmtxqVIZQAd
-         g3yZiq9KAQ4CfYTBcGI2djOcPIcX8y4CiV/yES582ogJwnH4NCDaAGAxjCwkG+HRyO/Y
-         MWODnxVa+PxBpfLufEzazsjheoff+DMI4TsEwvnKgwpCwlNIonXxwNLWanyA4u1tQVfj
-         DQkQ==
-X-Gm-Message-State: AOJu0Yzeg08WyzX3aCWihikome8X92s/pWfk+mk/pvhha7l2sgCjQKY3
-	9v5qWxKHrnMYjKcPfi8ZY8qo3E6xI5TDixbiagiVZOy+PWsBoTLZmKLGUeGUkzWKeS7Jtz/jqqn
-	0R4rJ1XB5illOk21qoyS0B7VLqx8RsF9uxByLg50Ju6wkxrOsKDUnu+E=
-X-Google-Smtp-Source: AGHT+IFEPa59otgEiS/TUoOMi9OMKmjSD0/Jbb+a85mDrxwfB6enbNsW0h2YRNaVdnPOxr/obL1YCHDE2GtJ77CNHM3Iol/0TImu
+	s=arc-20240116; t=1707176691; c=relaxed/simple;
+	bh=SxLaOpN/aBErJ9kXh6d9dU6KlKpKu99pWHS/STEMU8M=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IbDxozMIvorEf5/rKabDZZeP72C8ZhJacJ1qCs+3o0sLSEUqAAF9L/2KJo5ByZ6LmzIkZ8qblmggt63xAWvDh0W+OKfXzRc9EC3VElWGQCkA9Lth4FeJP6TVXTFHN9HFtaGhmDCXSclPHH9U177vqmT6UdhdS4BJ3s27MJGnvOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j5CaDjy/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A1413C433F1;
+	Mon,  5 Feb 2024 23:44:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707176690;
+	bh=SxLaOpN/aBErJ9kXh6d9dU6KlKpKu99pWHS/STEMU8M=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=j5CaDjy/VjxbeQbdgNT8rBul3sjRJv85BNfhU7NBA3ouFRrZ9V9uxMt7N8/1Fxd18
+	 meUCBNTQblbFgDEQJe+UT9h1L8dqhim7LslBtyeknQzuzRhdhMQ9JaFjmoAO8zepYs
+	 nJZb2IxMHfZXpZ579O++i4hrpSVSRqECbx0e1IRiCKjkWv3IsDOgkgWkp5HhFoPZYl
+	 DiZjuRNBA2X/EI09LTQgegSqHCwSWb4bY2xNNdpL9KG/A8CefmjnXwYw7TCbixR+8j
+	 OdXgjcfz6VUfd6A0VCwlCLIJpAct5EjHtn0jkuf8N6d1XaR2rdhtcy7fbsEEsuLRkt
+	 M0tiRWjOa/Yqg==
+Date: Mon, 5 Feb 2024 15:44:48 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Haseeb Gani
+ <hgani@marvell.com>, Vimlesh Kumar <vimleshk@marvell.com>, Sathesh B Edara
+ <sedara@marvell.com>, "egallen@redhat.com" <egallen@redhat.com>,
+ "mschmidt@redhat.com" <mschmidt@redhat.com>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>,
+ "wizhao@redhat.com" <wizhao@redhat.com>, "kheib@redhat.com"
+ <kheib@redhat.com>, "konguyen@redhat.com" <konguyen@redhat.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jonathan
+ Corbet <corbet@lwn.net>, Veerasenareddy Burru <vburru@marvell.com>,
+ Satananda Burla <sburla@marvell.com>, Shannon Nelson
+ <shannon.nelson@amd.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, Joshua
+ Hay <joshua.a.hay@intel.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Brett Creeley <brett.creeley@amd.com>, Andrew Lunn <andrew@lunn.ch>, Jacob
+ Keller <jacob.e.keller@intel.com>
+Subject: Re: [EXT] Re: [PATCH net-next v5 1/8] octeon_ep_vf: Add driver
+ framework and device initialization
+Message-ID: <20240205154448.1c5a5ad8@kernel.org>
+In-Reply-To: <PH0PR18MB47345E3ADCC35D0ECA763DBBC7412@PH0PR18MB4734.namprd18.prod.outlook.com>
+References: <20240129050254.3047778-1-srasheed@marvell.com>
+	<20240129050254.3047778-2-srasheed@marvell.com>
+	<20240131161406.22a9e330@kernel.org>
+	<PH0PR18MB47345E3ADCC35D0ECA763DBBC7412@PH0PR18MB4734.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:221d:b0:363:819c:926d with SMTP id
- j29-20020a056e02221d00b00363819c926dmr80890ilf.1.1707176428457; Mon, 05 Feb
- 2024 15:40:28 -0800 (PST)
-Date: Mon, 05 Feb 2024 15:40:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000009655270610aafce1@google.com>
-Subject: [syzbot] [netfilter?] WARNING: suspicious RCU usage in hash_netportnet6_destroy
-From: syzbot <syzbot+bcd44ebc3cd2db18f26c@syzkaller.appspotmail.com>
-To: coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com, 
-	fw@strlen.de, kadlec@netfilter.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On Sat, 3 Feb 2024 05:35:21 +0000 Shinas Rasheed wrote:
+> > You haven't masked any IRQ or disabled NAPI. What prevents the queues
+> > from getting restarted right after this call?  
+> 
+> The napi functionality (along with disabling it when stopping), is introduced (and used) in the patch after this one [2/8]. Also we disable interrupts in the 
+> disable_interrupt hook which is also called in the next patch [2/8]. 
 
-syzbot found the following issue on:
+You gotta make the patches reviewable :(
 
-HEAD commit:    021533194476 Kconfig: Disable -Wstringop-overflow for GCC ..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=144caa38180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f204e0b6490f4419
-dashboard link: https://syzkaller.appspot.com/bug?extid=bcd44ebc3cd2db18f26c
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16329057e80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15b8fe7be80000
+> > > +static void octep_vf_tx_timeout(struct net_device *netdev, unsigned int  
+> > txqueue)  
+> > > +{
+> > > +	struct octep_vf_device *oct = netdev_priv(netdev);
+> > > +
+> > > +	queue_work(octep_vf_wq, &oct->tx_timeout_task);
+> > > +}  
+> > 
+> > I don't see you canceling this work. What if someone unregistered
+> > the device before it runs? You gotta netdev_hold() a reference.  
+> 
+> We do cancel_work_sync in octep_vf_remove function.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/0fcac44f7d25/disk-02153319.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ec3e3d0e222c/vmlinux-02153319.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/11bfd95eb918/bzImage-02153319.xz
+But the device is still registered, so the timeout can happen after you
+cancel but before you unregister.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+bcd44ebc3cd2db18f26c@syzkaller.appspotmail.com
+> > > +static int __init octep_vf_init_module(void)
+> > > +{
+> > > +	int ret;
+> > > +
+> > > +	pr_info("%s: Loading %s ...\n", OCTEP_VF_DRV_NAME OCTEP_VF_DRV_STRING);  
+> > > +
+> > > +	/* work queue for all deferred tasks */
+> > > +	octep_vf_wq =  
+> > create_singlethread_workqueue(OCTEP_VF_DRV_NAME);
+> > 
+> > Is there a reason this wq has to be single threaded and different than
+> > system queue? All you schedule on it in this series is the reset task.  
+> 
+> We also schedule the control mailbox task on this workqueue. The
+> workqueue was created with the intention that there could be other
+> driver specific tasks to add in the future. It has been single
+> threaded for now, but we might optimize implementation in the future,
+> although for now as far as to service our control plane this has been
+> enough.
 
-=============================
-WARNING: suspicious RCU usage
-6.8.0-rc2-syzkaller-00199-g021533194476 #0 Not tainted
------------------------------
-net/netfilter/ipset/ip_set_hash_gen.h:455 suspicious rcu_dereference_protected() usage!
-
-other info that might help us debug this:
-
-
-rcu_scheduler_active = 2, debug_locks = 1
-1 lock held by swapper/0/0:
- #0: ffffffff8e130ba0 (rcu_callback){....}-{0:0}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
- #0: ffffffff8e130ba0 (rcu_callback){....}-{0:0}, at: rcu_do_batch kernel/rcu/tree.c:2184 [inline]
- #0: ffffffff8e130ba0 (rcu_callback){....}-{0:0}, at: rcu_core+0xcfc/0x1810 kernel/rcu/tree.c:2465
-
-stack backtrace:
-CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.8.0-rc2-syzkaller-00199-g021533194476 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-Call Trace:
- <IRQ>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
- lockdep_rcu_suspicious+0x220/0x340 kernel/locking/lockdep.c:6712
- hash_netportnet6_destroy+0xf0/0x2c0 net/netfilter/ipset/ip_set_hash_gen.h:455
- ip_set_destroy_set net/netfilter/ipset/ip_set_core.c:1180 [inline]
- ip_set_destroy_set_rcu+0x6a/0xe0 net/netfilter/ipset/ip_set_core.c:1190
- rcu_do_batch kernel/rcu/tree.c:2190 [inline]
- rcu_core+0xd76/0x1810 kernel/rcu/tree.c:2465
- __do_softirq+0x2bb/0x942 kernel/softirq.c:553
- invoke_softirq kernel/softirq.c:427 [inline]
- __irq_exit_rcu+0xf1/0x1c0 kernel/softirq.c:632
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:644
- sysvec_apic_timer_interrupt+0x97/0xb0 arch/x86/kernel/apic/apic.c:1076
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:649
-RIP: 0010:native_irq_disable arch/x86/include/asm/irqflags.h:37 [inline]
-RIP: 0010:arch_local_irq_disable arch/x86/include/asm/irqflags.h:72 [inline]
-RIP: 0010:acpi_safe_halt+0x20/0x30 drivers/acpi/processor_idle.c:113
-Code: 90 90 90 90 90 90 90 90 90 90 65 48 8b 05 58 ea a5 74 48 f7 00 08 00 00 00 75 10 66 90 0f 00 2d c6 5c a9 00 f3 0f 1e fa fb f4 <fa> c3 cc cc cc cc 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90
-RSP: 0018:ffffffff8de07ca8 EFLAGS: 00000246
-RAX: ffffffff8de94680 RBX: ffff88801628e864 RCX: 00000000000148c9
-RDX: 0000000000000001 RSI: ffff88801628e800 RDI: ffff88801628e864
-RBP: 0000000000038f78 R08: ffff8880b9436d8b R09: 1ffff11017286db1
-R10: dffffc0000000000 R11: ffffffff8b5dd030 R12: ffff888015b47000
-R13: 0000000000000000 R14: 0000000000000001 R15: ffffffff8e885a20
- acpi_idle_enter+0xe4/0x140 drivers/acpi/processor_idle.c:707
- cpuidle_enter_state+0x118/0x490 drivers/cpuidle/cpuidle.c:267
- cpuidle_enter+0x5d/0xa0 drivers/cpuidle/cpuidle.c:388
- call_cpuidle kernel/sched/idle.c:134 [inline]
- cpuidle_idle_call kernel/sched/idle.c:215 [inline]
- do_idle+0x374/0x5d0 kernel/sched/idle.c:312
-----------------
-Code disassembly (best guess):
-   0:	90                   	nop
-   1:	90                   	nop
-   2:	90                   	nop
-   3:	90                   	nop
-   4:	90                   	nop
-   5:	90                   	nop
-   6:	90                   	nop
-   7:	90                   	nop
-   8:	90                   	nop
-   9:	90                   	nop
-   a:	65 48 8b 05 58 ea a5 	mov    %gs:0x74a5ea58(%rip),%rax        # 0x74a5ea6a
-  11:	74
-  12:	48 f7 00 08 00 00 00 	testq  $0x8,(%rax)
-  19:	75 10                	jne    0x2b
-  1b:	66 90                	xchg   %ax,%ax
-  1d:	0f 00 2d c6 5c a9 00 	verw   0xa95cc6(%rip)        # 0xa95cea
-  24:	f3 0f 1e fa          	endbr64
-  28:	fb                   	sti
-  29:	f4                   	hlt
-* 2a:	fa                   	cli <-- trapping instruction
-  2b:	c3                   	ret
-  2c:	cc                   	int3
-  2d:	cc                   	int3
-  2e:	cc                   	int3
-  2f:	cc                   	int3
-  30:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
-  37:	00 00 00
-  3a:	90                   	nop
-  3b:	90                   	nop
-  3c:	90                   	nop
-  3d:	90                   	nop
-  3e:	90                   	nop
-  3f:	90                   	nop
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+I haven't spotted the mailbox task in this series, if it's not here,
+let's switch to system wq, and only add your own when needed.
 
