@@ -1,138 +1,142 @@
-Return-Path: <netdev+bounces-69149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61E4C849C06
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 14:38:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B20FA849B67
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 14:09:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8989B267C3
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 13:38:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E44111C2183D
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 13:09:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F5F3249EB;
-	Mon,  5 Feb 2024 13:37:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C581CA9A;
+	Mon,  5 Feb 2024 13:08:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mistralsolutions.com header.i=@mistralsolutions.com header.b="KxWkZFs6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LAmJTaRb"
 X-Original-To: netdev@vger.kernel.org
-Received: from egress-ip43b.ess.de.barracuda.com (egress-ip43b.ess.de.barracuda.com [18.185.115.247])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BCD124219
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 13:37:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.185.115.247
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29AF1CD01
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 13:08:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707140240; cv=none; b=MToh+aBf/5wIPSsUfvCrOrjgYeW8s0hcWe/e31fQwWvoi0lY8LI6pDYsvcjoxxTb4EV5uuXLHce66Y1gSgLc1Jm9+yhLTG1bgg/j/IRBzpRn2uJJh/XgLdJVfBlL1pUd0hXjoKCM4RD2O1yJ3TgvYhWmwJu2lBbzSFoGCwJF1Uo=
+	t=1707138521; cv=none; b=EoSekl73q8OpokykIdl4HiioB1so2oKRKbVXEUiv83cc02Fk6kXbmle97ifyjXc1qPmJLrBzoFOvWumsDcKnaZi67msxYtVm0CKP8q+CLcODau343f9J77ShSIbsyF7f/1H26II+CvNsViEK30ov8JlvLDvipq/V3xyIq/m7+Ng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707140240; c=relaxed/simple;
-	bh=/6zDVpTQxTpO8Rt7fqCeo96mpq7mjUP0IlGNFtYHc1g=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=X1WjArSpomfUVQKg7KXh93W6JWNNo7nUtS3k9kwdqzasv+4qfqYRhWf8fls4gPNgxSbvWYiSVPuAp0E238tH2lqHq/Y8pUEAcxaBg/GLLwImL4kOIn0dKMGPaqTmIXEYKcMV/X54M5Mj0NEm8a/QVuyGi+aIOwwKDmBMX033HLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mistralsolutions.com; spf=pass smtp.mailfrom=mistralsolutions.com; dkim=pass (1024-bit key) header.d=mistralsolutions.com header.i=@mistralsolutions.com header.b=KxWkZFs6; arc=none smtp.client-ip=18.185.115.247
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mistralsolutions.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mistralsolutions.com
-Received: from mail-vs1-f69.google.com (mail-vs1-f69.google.com [209.85.217.69]) by mx-outbound16-171.eu-central-1b.ess.aws.cudaops.com (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO); Mon, 05 Feb 2024 13:37:12 +0000
-Received: by mail-vs1-f69.google.com with SMTP id ada2fe7eead31-46d31058c80so131898137.1
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 05:37:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mistralsolutions.com; s=google; t=1707140230; x=1707745030; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UMXVXJW0OFWoix7qY497nt0fmYOWqwLi2f9LeVZ82B0=;
-        b=KxWkZFs6liuratMdKfeZSz9DZ5E/rEi1zXIW8WTlufG+NrqvQ9RkbfbXmQr2V+Q/30
-         mR4IgJdUXUX652I0Gznjbm+4dVEXJSfEV3+LluB1ejmAdvuuXd7XBkdRcInzr2FKjYRu
-         jWTVUPfX5d+5gIt1wjbdGAFWRgKt+tgtcOVCc=
+	s=arc-20240116; t=1707138521; c=relaxed/simple;
+	bh=nkOe2A26aIi/aBtdqu6j/wWZO5uYLvItpsocnEEY3xY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=dryAV4Mvu9X4i581PUYZmiYfgI71gAsYzhasLZq9NCgJxIe1BcRpKsenwezzO2b4RxEbpNz/Fgka0SKnp+4a3dFpGyJ5g3T7FSwbHQszfKkYfCXcpb1g+BYxXsqgpMErKiJj+Tjk4WsB5HWq7qNgdJgpWcFpUUTE00yqNv/9c6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LAmJTaRb; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707138518;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Elk+v4Y+ED/4T2H+8uQLqgMyCrp4tt5/vHD0v7FV0YQ=;
+	b=LAmJTaRbfsmJB2wPc4z65jnUCb2LtOBqEEX4oF1LAg1Pn6WT/CyY/9S0OXT4+T9nQKK6KP
+	Mc6hf8Rh9mmW8DS1d4DvkWlCvShYFD1HUednMUO17z8sTUjR+IC4O5TtOsh2RSYYNZIMGp
+	nwqulpfVnfQXletnqpiqkJAkMIzA4ck=
+Received: from mail-lf1-f71.google.com (mail-lf1-f71.google.com
+ [209.85.167.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-439-GTK86jeYM22F2-xy88Xvcg-1; Mon, 05 Feb 2024 08:08:37 -0500
+X-MC-Unique: GTK86jeYM22F2-xy88Xvcg-1
+Received: by mail-lf1-f71.google.com with SMTP id 2adb3069b0e04-511545632b8so585862e87.3
+        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 05:08:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707140230; x=1707745030;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UMXVXJW0OFWoix7qY497nt0fmYOWqwLi2f9LeVZ82B0=;
-        b=ARVFba+C4rsZ86NxrhbrDs5fVDuL6Wepyz7oIsC5Jr0qOOB2wL0g4S/AHXURn8U7+W
-         2R5jGRpxpytFJ2jRNd0zfeylcISkqHRRTbvSygAyyPGRDJooNL26WbjQLT5wnENb0+w6
-         OLttTYa+s1tMZgzvl36ptQaS+x/6yCtsJ5jxhLAbWmI/t6BUFp+jTTWneepvcLCql9ym
-         QgoD6kCANCYiPAuWMcGrr8GhGt6mvT7MjH0OfifivbVlk2kxiIGYkTfZK77bmR6CMyAh
-         m0mjt1dSpxblZ+M7Nf+NmvZanbtrMcLDwmA7ClMUwaHqJbXiDlIGCGcEFnlAZWaYqsT0
-         UDtA==
-X-Gm-Message-State: AOJu0YyWEbMscxeWrHOr64ByKA5YhHhccRPp2vZyrlyiV5B4KHgEPaM9
-	bLMDxfQDnrRwQ5g+Z5B2OrpZlgxpCCQyWs4DtET5AUWT4Xs4bjcmi48Rm0liHFAr4cnRPFN/Qqn
-	+5Czchd+UFvRHpMrqZiaZ8g4JO3hWTOvES4xcuxloDw0vUC881iSEtfx2L5qSjDpfpZsQSvXCUL
-	5FWD/cDMp90AGipvmipGG3
-X-Received: by 2002:a05:6a00:2e91:b0:6db:e14f:3956 with SMTP id fd17-20020a056a002e9100b006dbe14f3956mr17014275pfb.20.1707138497340;
-        Mon, 05 Feb 2024 05:08:17 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHNXHqSPziIiSbO4sZ+G6kXuaiJtK9gYDJuk+t3nQyBe7Vx85wEELo7/664uQfeffyM3mUsPw==
-X-Received: by 2002:a05:6a00:2e91:b0:6db:e14f:3956 with SMTP id fd17-20020a056a002e9100b006dbe14f3956mr17014252pfb.20.1707138496948;
-        Mon, 05 Feb 2024 05:08:16 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVjN/4GYid4eXCABddW2uHoUktZQouQAFMefEu2Drp+ejGf8LUMxvo9I1/RCHN6P9ohqbwR7rPSdMCWl8KSKEJ/l5uKywZz9ExM7pIqzWjMErXA4ib6B7q6VYvUjg0ldfetrXMOkFj9Lonby3mTyj8rw3QlzbWUJMoF64n2v/XeEwJdwFSEe6lUuuAg7z2J8N2icB8Al9LL
-Received: from LAP568U.mistral.in ([106.51.69.35])
-        by smtp.gmail.com with ESMTPSA id j7-20020a62e907000000b006ddc5d8ecd7sm6604756pfh.32.2024.02.05.05.08.14
+        d=1e100.net; s=20230601; t=1707138516; x=1707743316;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Elk+v4Y+ED/4T2H+8uQLqgMyCrp4tt5/vHD0v7FV0YQ=;
+        b=V0zd8+YFCfqVnX3sYik1/PhTGLpi7S6KzNnxfYaKkJamucxPD4aGNZjHpKfLVfUJGF
+         yyuX2+bNbPF+GhFyCBcFqZbzOVz/aiNitkSl+8yPKfn0jieo2zCrDtjOfn8RtPVdKEBU
+         ImpPEFyVhNFSKNW5jhhomGLvwjstx5FFdNcRmSME1WkKR9KLd7/Sa8/wqxe6Q80/0ObE
+         P1QhrPxUyZhXingmqMepZlf9B3jtK+MnOTpiaKRlqKNZf+o4t8Cbaihos+HkTLjpQYh0
+         P4pcQJXlNUMLF2l7HO9hggkYf6OdosWAwEQVIRH8DgE3H1FSZPAEOCe8hLpSaQPdQe6i
+         bUUw==
+X-Gm-Message-State: AOJu0YxPH+edD8DQysRkP111p4IsqjsfT3gd/1LWZQjGBxYAZTqfGZ6w
+	auXPmA6iwwBBDrIPSZJnDQgTDpTKVc0mLjzerhLOkgEi06sziRfuiuyFZIBimedNBJ+PJHW/Bbx
+	r8rcE0l/KKzbsDqNZuulmz0sbXCNoV6/5LkdKGfmpRe/yC3bUBlBfSw==
+X-Received: by 2002:a05:6512:3a85:b0:511:4c51:d18e with SMTP id q5-20020a0565123a8500b005114c51d18emr3336180lfu.4.1707138516018;
+        Mon, 05 Feb 2024 05:08:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHiAJDw5eN6qa8POs40iTfiHHEb/rI9ieOQTBR9KzJjFWWONNoyotynQql4+bMXXnwDod1BGQ==
+X-Received: by 2002:a05:6512:3a85:b0:511:4c51:d18e with SMTP id q5-20020a0565123a8500b005114c51d18emr3336161lfu.4.1707138515690;
+        Mon, 05 Feb 2024 05:08:35 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCV41yZ8cfXLJxxZH9bT8jss4AsYLJ12FGx76gydrZPmFRyojfsDyeM9YhLPAWQGUy1IMPSMNXuSSN99FB1GAz8K06mkTcddlrieLKvSQgdlUbqWxwmx67d9NnJEkj9osyc8+NN7EJ9Xrzbgdd9Jyt+hNn56woD/A2rRtWpV0OyTrkG3N9AWSVj2cKknWYZmZMi94QSj4eC1RO6pfO1wkDrQ5txPRcZojwwb3IRGfL3lz5NKJo4L/qmyWz0vGRynH1Q8gfuWZFKvF+USWulSfrAp8vBkuT/bFBacRlX4eiVczFLFESw+Kgzwc9TnJoIhlyUrBoBgsvIuQKbwFB85nOSTfs/Z0YmG2IPFXxcYY9BtoWGiSy9HeLetJduZseFna5BeTeY09D3hmQZyLxL3XwsvCNIXXZmSsFHuCfxzdgzxGHAiFRRDxY23AwusX7slkcLiT9x5LlPW3883jdFuOmzvQC3ouweutpSAiRNgx9Uotl8/
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id lj7-20020a170907188700b00a366c9781b7sm4318288ejc.168.2024.02.05.05.08.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 05:08:16 -0800 (PST)
-From: Sinthu Raja <sinthu.raja@mistralsolutions.com>
-X-Google-Original-From: Sinthu Raja <sinthu.raja@ti.com>
-To: Denis Kirjanov <dkirjanov@suse.de>,
-	Siddharth Vadapalli <s-vadapalli@ti.com>,
-	Ravi Gunasekaran <r-gunasekaran@ti.com>,
-	Roger Quadros <rogerq@kernel.org>
-Cc: linux-omap@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Sinthu Raja <sinthu.raja@ti.com>
-Subject: [PATCH V3 0/2] CPSW: enable mac_managed_pm to fix mdio
-Date: Mon,  5 Feb 2024 18:38:08 +0530
-Message-Id: <20240205130810.14571-1-sinthu.raja@ti.com>
-X-Mailer: git-send-email 2.36.1
+        Mon, 05 Feb 2024 05:08:35 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 03D63108AEB2; Mon,  5 Feb 2024 14:08:35 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Magnus Karlsson <magnus.karlsson@gmail.com>, magnus.karlsson@intel.com,
+ bjorn@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ netdev@vger.kernel.org, maciej.fijalkowski@intel.com, kuba@kernel.org,
+ pabeni@redhat.com, davem@davemloft.net, j.vosburgh@gmail.com,
+ andy@greyhouse.net, hawk@kernel.org, john.fastabend@gmail.com,
+ edumazet@google.com
+Cc: bpf@vger.kernel.org, Prashant Batra <prbatra.mail@gmail.com>
+Subject: Re: [PATCH net] bonding: do not report NETDEV_XDP_ACT_XSK_ZEROCOPY
+In-Reply-To: <20240205123011.22036-1-magnus.karlsson@gmail.com>
+References: <20240205123011.22036-1-magnus.karlsson@gmail.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Mon, 05 Feb 2024 14:08:35 +0100
+Message-ID: <87le7zvz1o.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-BESS-ID: 1707140231-304267-12420-11367-1
-X-BESS-VER: 2019.1_20240201.2150
-X-BESS-Apparent-Source-IP: 209.85.217.69
-X-BESS-Parts: H4sIAAAAAAACA4uuVkqtKFGyUirNy1bSUcovVrKysDQDMjKAYsapiSkplkbmyR
-	bmpslmyUapholmZkYmFsYmqcmmaSZGSrWxADALva1AAAAA
-X-BESS-Outbound-Spam-Score: 0.40
-X-BESS-Outbound-Spam-Report: Code version 3.2, rules version 3.2.2.254004 [from 
-	cloudscan23-156.eu-central-1b.ess.aws.cudaops.com]
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------
-	0.00 BSF_SC0_MISMATCH_TO    META: Envelope rcpt doesn't match header 
-	0.40 BSF_SC0_SA085b         META: Custom Rule SA085b 
-	0.00 BSF_BESS_OUTBOUND      META: BESS Outbound 
-X-BESS-Outbound-Spam-Status: SCORE=0.40 using account:ESS91090 scores of KILL_LEVEL=7.0 tests=BSF_SC0_MISMATCH_TO, BSF_SC0_SA085b, BSF_BESS_OUTBOUND
-X-BESS-BRTS-Status:1
+Content-Type: text/plain
 
-From: Sinthu Raja <sinthu.raja@ti.com>
+Magnus Karlsson <magnus.karlsson@gmail.com> writes:
 
-Hi All,
-This patch fix the resume/suspend issue on CPSW interface.
+> From: Magnus Karlsson <magnus.karlsson@intel.com>
+>
+> Do not report the XDP capability NETDEV_XDP_ACT_XSK_ZEROCOPY as the
+> bonding driver does not support XDP and AF_XDP in zero-copy mode even
+> if the real NIC drivers do.
+>
+> Fixes: cb9e6e584d58 ("bonding: add xdp_features support")
+> Reported-by: Prashant Batra <prbatra.mail@gmail.com>
+> Link: https://lore.kernel.org/all/CAJ8uoz2ieZCopgqTvQ9ZY6xQgTbujmC6XkMTamhp68O-h_-rLg@mail.gmail.com/T/
+> Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
+> ---
+>  drivers/net/bonding/bond_main.c | 6 +++++-
+>  1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index 4e0600c7b050..79a37bed097b 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -1819,6 +1819,8 @@ void bond_xdp_set_features(struct net_device *bond_dev)
+>  	bond_for_each_slave(bond, slave, iter)
+>  		val &= slave->dev->xdp_features;
+>  
+> +	val &= ~NETDEV_XDP_ACT_XSK_ZEROCOPY;
+> +
+>  	xdp_set_features_flag(bond_dev, val);
+>  }
+>  
+> @@ -5910,8 +5912,10 @@ void bond_setup(struct net_device *bond_dev)
+>  		bond_dev->features |= BOND_XFRM_FEATURES;
+>  #endif /* CONFIG_XFRM_OFFLOAD */
+>  
+> -	if (bond_xdp_check(bond))
+> +	if (bond_xdp_check(bond)) {
+>  		bond_dev->xdp_features = NETDEV_XDP_ACT_MASK;
+> +		bond_dev->xdp_features &= ~NETDEV_XDP_ACT_XSK_ZEROCOPY;
+> +	}
 
-Reference from the foloowing patchwork: 
-https://lore.kernel.org/netdev/20221014144729.1159257-2-shenwei.wang@nxp.com/T/
+Shouldn't we rather drop this assignment completely? It makes no sense
+to default to all features, it should default to none...
 
-V1: https://patchwork.kernel.org/project/netdevbpf/patch/20240122083414.6246-1-sinthu.raja@ti.com/
-V2: https://patchwork.kernel.org/project/netdevbpf/patch/20240122093326.7618-1-sinthu.raja@ti.com/
-
-Changes in V3:
-Address review comments:
-	- Add the same fix to the drivers/net/ethernet/ti/cpsw.c file as a
-      seperate patch.
-
-Changes in V2:
-Address review comment:
-	- Add Fixes tag.
-
-Sinthu Raja (2):
-  net: ethernet: ti: cpsw_new: enable mac_managed_pm to fix mdio
-  net: ethernet: ti: cpsw: enable mac_managed_pm to fix mdio
-
- drivers/net/ethernet/ti/cpsw.c     | 2 ++
- drivers/net/ethernet/ti/cpsw_new.c | 3 +++
- 2 files changed, 5 insertions(+)
-
--- 
-2.36.1
+-Toke
 
 
