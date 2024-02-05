@@ -1,242 +1,305 @@
-Return-Path: <netdev+bounces-69097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98E55849939
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:51:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEB4F84993C
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:52:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B91691C21573
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 11:51:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 703D31F229F3
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 11:52:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C3CB1758C;
-	Mon,  5 Feb 2024 11:51:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFE6D18E27;
+	Mon,  5 Feb 2024 11:52:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LkINM+eq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="obEKWDma"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40BEE1A27E;
-	Mon,  5 Feb 2024 11:51:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707133896; cv=fail; b=GO/w5J8pgwt70fmZoOnXSNGbt871QmnM5aWB6l/djB06VXX1BgSyv41D9UqRWFin4/Jv4ITebKeieksK3Cwk+XvXnBUJnsA9kNJkvKAP2VeNopWiePKMP1ADTzAQtLtPPUCKTXIMcAMB0wQYQ1J5bPbv2+t/GrIv8d6vmVyXyPE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707133896; c=relaxed/simple;
-	bh=5SndGDgGKmBg/WeznQeJkZUwKMK1pBKjF6vY7wO9t+w=;
-	h=Date:From:To:CC:Subject:Message-ID:Content-Type:
-	 Content-Disposition:MIME-Version; b=XagkfDdA01tWtbISkChBJjtxi8X5PzoghcoQ+7godwxlPCfVGgYtdJ1jWR2NIw+x4qMMPF2S5RQwbJYSkvoLCfHSl//0uh4v0bRy8aiToIZdWduPvTPz5Uhz445ueN/UVYJYB/24g2Lz2HYA7pwcTswPa9Oi4WrImGFQ3nqxuEM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LkINM+eq; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707133894; x=1738669894;
-  h=date:from:to:cc:subject:message-id:mime-version;
-  bh=5SndGDgGKmBg/WeznQeJkZUwKMK1pBKjF6vY7wO9t+w=;
-  b=LkINM+eqgB5m7pzIDiKXFP97uN5rQAx2jefXY3OKUDvgV5WULIcDOI4E
-   Cors3HRzc8pGkzS+8azzFc/1YiaFxSlLJupRkrscLCkYIYvEM3HEswG3b
-   PfQGfa0Uhh9cex3pvAJQEwmVsneXFBNxf2pcfaFjNjFDQFJ6KTwYkzIgs
-   hVm0Oo9+44vrxCZLo6abePDnV+UG7RH+QijyxIpTMfU416YKCT9+lcG2Q
-   v9T1tb7q5HCWtipv/sFFdE0iGNSj9De8FsYLce5ZSXQDXkKb1PlZ2eAzx
-   GxCaR/3wk61GI0tspV2vD5caQwIHvdkw7rjIQ5/Qx0obfpI18U83Sw1WW
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10974"; a="17920966"
-X-IronPort-AV: E=Sophos;i="6.05,245,1701158400"; 
-   d="scan'208";a="17920966"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 03:51:34 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,245,1701158400"; 
-   d="scan'208";a="5330804"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Feb 2024 03:51:34 -0800
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 5 Feb 2024 03:51:33 -0800
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 5 Feb 2024 03:51:32 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 5 Feb 2024 03:51:32 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 5 Feb 2024 03:51:32 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oezAtoP1/RmL7y2LHsvPr6uPnfEm2nWynZ2rnmsD+8xnDuMOV9aLq/oDjlBlBhok79ajMLWpbYjEMaqaX1kNmiftotc7VdG8X1csdrGoaGhJeyjyr0xqXC+o0l2PlL8SK0JAkFDr+h0GZ+xb3qeAX2T7q89ITWsLk7g6rLQNxQlENdsl3zV1OmhhT/gb5CHA5a78TC6B3dR7QqQJZMVCSBJ4J1SGuw+/otIhJRNBzOOeXIrm8uhc/DwZSLFtZLxr715mclHn8DQdUitjJtJ4nz+5yoC/fF6LEV6xWRwB4hj/GMCbk577oe++Ne+lsnkht/30kc/H07JQCgdeMspZEQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pzWzqDjR53BHuKmCuJKZr1C76UFQ2URA9Rtk68bZo4w=;
- b=WLmsn1/UPPMqjJleHGJWPdVFIEpMng9BDZv6kw2Xc6yBGh/TAnPM1mqOUg6ABWTW3F5QbBGL4HMg8j/Ep92DDv/Ef62w74zIho49BAnsKkg8kb5nDGzB02VJHl+2bIfPSJ+9qr3lawlMLLZxUtXaByBi+4nE8x4pJi5zmyorDPJS96NotDAI5Tc27l8D63PRAoMtYGhI3de0iF/v3umhwvJ6x1yDLDjbSLUG736/MvaffTRWN4xfJHBP4Tj4JEkbTjDHj5b/r7MAYmLZ53Lgn43O9QvrfsLOWjBo3bw2qAvho9aQ3eM7XjG58Nm/5EWmj9PD24Gj3ErStu/IXAcLcQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CH3PR11MB8414.namprd11.prod.outlook.com (2603:10b6:610:17e::19)
- by SJ0PR11MB5168.namprd11.prod.outlook.com (2603:10b6:a03:2dc::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.34; Mon, 5 Feb
- 2024 11:51:30 +0000
-Received: from CH3PR11MB8414.namprd11.prod.outlook.com
- ([fe80::ed34:4cf2:df58:f708]) by CH3PR11MB8414.namprd11.prod.outlook.com
- ([fe80::ed34:4cf2:df58:f708%4]) with mapi id 15.20.7249.035; Mon, 5 Feb 2024
- 11:51:29 +0000
-Date: Mon, 5 Feb 2024 19:51:21 +0800
-From: kernel test robot <lkp@intel.com>
-To: Florian Westphal <fw@strlen.de>
-CC: <llvm@lists.linux.dev>, <oe-kbuild-all@lists.linux.dev>,
-	<netdev@vger.kernel.org>, <lvs-devel@vger.kernel.org>, Phil Sutter
-	<phil@nwl.cc>
-Subject: [horms-ipvs-next:main 7/9] ld.lld: error: undefined symbol: xt_recseq
-Message-ID: <ZcDLuYTvcN/NVo9K@rli9-mobl>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-X-ClientProxiedBy: SG2PR04CA0173.apcprd04.prod.outlook.com (2603:1096:4::35)
- To CH3PR11MB8414.namprd11.prod.outlook.com (2603:10b6:610:17e::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C9D18EAD;
+	Mon,  5 Feb 2024 11:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707133933; cv=none; b=W1g0kkVOxLCHHlC4iBrOaVdk55aMysEM9GnrvQONZELeoGP+2ldpTLTzvtjTtb3REKeHw/WKYFb5Ox7I7haWtwdGjtE+rwioxzh1bCXOYb0mUuf12fvCLZ6x8XuErpH/skpuuJWFE+QX1WE7USWaBFBeNPmhbT4xq/TW9XWo89I=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707133933; c=relaxed/simple;
+	bh=8XmIsB+ZUPoKXn0VaHpI1ydb0f+Ah2hw3XmSjMY0xus=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ipg4GHiXkifQrTnhi2c1rcX4HBS4EfKyD2hd4Sa/HcRoEvy6fOQbPY2XwF/2XscQJWb5933EF9ncNhVRNwXHiLflckcmaVHjaQTiq/5vVUGxLVKdIt+sTFWdT8ZBpoBWrxOFwe10Kx0DjI3+9phYBLjgMV3AL2u1GmSJMO0QiJI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=obEKWDma; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52FD0C433C7;
+	Mon,  5 Feb 2024 11:52:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707133933;
+	bh=8XmIsB+ZUPoKXn0VaHpI1ydb0f+Ah2hw3XmSjMY0xus=;
+	h=From:Date:Subject:To:Cc:From;
+	b=obEKWDmaIwKRPAm7bJdTzrT4JZwpdpii4beE3lTVswTBP/5p0C8BYrUrJ3A7l6t4l
+	 251fMfyooTJqkqP3jigUYgkyeOP7xLvhIAR2/mmSHJudsT7bbylNIMoVLWZglQCldM
+	 qtqU9hHgP93QCsN25HvPq/08tTHGvLRGrP8T9/CtRU1JI/wMkSPfzV5Ou4MroC08Z2
+	 fPFYtLU+mlOL0FiegdZI5I6wpjPdgZhQoQM2mamT/wl4oZ3nluO4R49porOWOhlO2e
+	 vSFPPt2e5o3ihHqQ3JPmZHfALOV6B+R4aQoCZX0Ec1FOGOOg2ubkjGAvVnBGYEB5xr
+	 XgrVd/Yb8u7XQ==
+From: Simon Horman <horms@kernel.org>
+Date: Mon, 05 Feb 2024 11:51:57 +0000
+Subject: [PATCH net-nex] mlx4: Address spelling errors
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH3PR11MB8414:EE_|SJ0PR11MB5168:EE_
-X-MS-Office365-Filtering-Correlation-Id: 445f93e0-35fa-4674-e2b2-08dc2640ca6b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zNoA/03xCedeHhAPcPdafGoeTI2/2ynUQqU8OkCiioMUf42Zxjj0w+WSvENlsrOcn5D++EFkrlixprYoPaNW/zgMP3pxFab4W9FW38hVWbBt4Hc2yACBMtRET56Y+qV9cBoqO9pXto9npdwIObhpO9eQGgaNsMH7tv1nfqJJoRzZ553iWQhcUO5TvoWEgt5/Tlc+2MeVm2o5SJeFZYWT3WIz/1EoIHvxdgVi2OR+HcM7AkR2i+v3M18gYu5uESz4sEvlrI3kYpJLW7S2zA+V3cODvvjkU5wobS5iLJ2edCLH7d/Y4vSKTsCW6KfbXgg3BOosJRF7NNRczWb1oFKZsUV6TRXgxZkUObnRTy9SCelLSlm1UzaAglkVCVkERTsDmFpwgPiRwLVG3qe81BRCm9mA2WNhq5N+HZ5/cUI4Dk/QBTOosGHgTBq0vK6vbrfTvx3+izSC4hlPcp2IIAN0023I2azjfaCvaq9MS1FWSmSB0F6nnCyx/GUX3qBpm+SnZph8e/d1fd0OdPKe/zg4MVq5cBfrdPLHqxCTeltaBLY5LmhhF9TfMdM+lcnyGT3rZyjTrRIe4jK1+s6VX5gZ7A==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CH3PR11MB8414.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7916004)(366004)(346002)(396003)(39860400002)(376002)(136003)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(33716001)(41300700001)(82960400001)(2906002)(83380400001)(6506007)(6666004)(26005)(38100700002)(9686003)(6512007)(66946007)(66476007)(966005)(316002)(66556008)(478600001)(6916009)(6486002)(86362001)(8676002)(4326008)(5660300002)(8936002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?F9YB/YcRNqJ7dNPTK7vAvuMS2PraCoEpzOQ0KbYNcu9DVsfuTJchivBaQV/0?=
- =?us-ascii?Q?OWkLMA7FX21zlp6kj3ERRnTLSXWNADhDJgz0ubJhzVgWs4x+A+NXCp8pon/5?=
- =?us-ascii?Q?OY9SmGxU4exSX2ZHUd9KTbmKvj2Lp87OxQUjYQJtf9tG/2BVy2JqvgNI4124?=
- =?us-ascii?Q?VksV+oq/kLQsXsCvsDnLkIQN22pEcpRlzB8wgNXW5u6eBglWP2jKaIQXKZnW?=
- =?us-ascii?Q?l/Pa2bTFx8njQNEGyqp9sDB/tMwNn7aj++GIXLgD0AfdmxdDXMrygplTS47e?=
- =?us-ascii?Q?wwYwL5qcd3IlDwe7skojd8U1phTLOt614+pr0oNL/WIgje/f+WP7yyMtAxJA?=
- =?us-ascii?Q?LFfOyvFePUc+XNRVXQ/Zp3AwARIqmxKo7IFmQ3Qn2pmlIP33I7vlveqkeMoV?=
- =?us-ascii?Q?Ll5AHA2JbgY+mi7SBNGEplRA+54H4Rz2x8DHc984AMZhx6BgVH3JYoT88PXg?=
- =?us-ascii?Q?4mtXE1mTjuszSm5GWBqc5WjhmHlr9BlcL4Y/1PnaDX2Zzk1WGrBl4C2TTpQB?=
- =?us-ascii?Q?4NkWikEpmvVXT0iCU/vI73JUlo6vsZuMCJ6RomCN0Npyxh7gmKnejV9qtg4l?=
- =?us-ascii?Q?guQSK6kig6qLKaJx4mmPseVBWnCcX/hOFDynC6yZNJ8TGIo2FrxjWgJe6fU4?=
- =?us-ascii?Q?0KQ4ex8b4IWYUDwe0cfwXatxqScIHTN+bkxDJXNsa38wBB1Ye6Fqc4gSD5pt?=
- =?us-ascii?Q?odepQNMahWCq9j+aOJs5Vn12oXmLbi1Ydh7HRMSQl05SBmGK4dGhTkykYSBG?=
- =?us-ascii?Q?OuHysXDrSPSutnPaQd42Fj+tJB8iWX9P8nSTATNp5Qra76XBsL6Mqs0bPpo1?=
- =?us-ascii?Q?BurgyI+5L0JwkLmJEpNO4mkJg0RckkIaXmwVc89wVN4x4l3B1nC2lYl6dGFk?=
- =?us-ascii?Q?lor2XQCpckSHa5ckSRS3F54ER0HaQv6ttxcEZTKWIO4nYADwSvqUvU4xn4y8?=
- =?us-ascii?Q?i/zD7yTx6osmj16HlQL4EIvPViDB/EaChtfa/N8fMsSkVH+DGqaLxiN6IXvk?=
- =?us-ascii?Q?mGojmBclJvMi3IbGx2Eki1DpgDo7CI88qlbUcZfZqKLU748O172w78JDqbUJ?=
- =?us-ascii?Q?M/INk4DaGQKffoq+HFmAX/uH73dymL07CQ3dqAhMTUrRKmTcm1CWIlR6MTJR?=
- =?us-ascii?Q?pFR55qczRD3Q2C+snRwhN8BsqEFMnrc8RJcFV2ciURXBewdybeehMHQ54/bV?=
- =?us-ascii?Q?D5K4m9J7I9iAVmcXmRY0W7VBIPyYZ82SvQH85P9XKDZL0wTZK2AwBb4E6Il6?=
- =?us-ascii?Q?H6I6083et4aF6cd/00KBUcFa2P2Q3qsX7Fb6fPrv+GwgZrNmGrt5hhJ78GEU?=
- =?us-ascii?Q?8YvBuigIzKRjWQlwbCEEZHs5YlTFC8QIFdOMCPVXxs6ZsUMp8wsGot3eYBkS?=
- =?us-ascii?Q?2+X6E0VMtnU/ubvtqtA+FeQyEw2Hb0Yn84iXjM+Rdwr3LjqOw4BuoWX1SpuG?=
- =?us-ascii?Q?o6/28aAEyzUjzCPxDJGp6zaaKQ666WKfDShOMDyVwgmYPg5jd9jPqX3Zx8Mv?=
- =?us-ascii?Q?Ws6clTddIf2qG2e9pl1kuyk/arQwU1YDNLk8jg3zANdHQsKJBge9ZA4l14J2?=
- =?us-ascii?Q?8+wTlUCpDQKni1wMk7WY07K5Knz8c+nQgpnfASjGI4oR+mc+3StgucY7ywXv?=
- =?us-ascii?Q?3w=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 445f93e0-35fa-4674-e2b2-08dc2640ca6b
-X-MS-Exchange-CrossTenant-AuthSource: CH3PR11MB8414.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2024 11:51:29.9143
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: mJYvXkaiC8nGzZsM4FcLjOhognAJR7OJ5MmLI8bXznv9ZrBPfj5Hs2ewV4Fylyn1JI+amgXTVL8qQ2f6r2WuKg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5168
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240205-mlx5-codespell-v1-1-63b86dffbb61@kernel.org>
+X-B4-Tracking: v=1; b=H4sIANzLwGUC/x3MwQqEIBRG4VeJu+6CShn0KtEi85+ZC2ahEUL07
+ sksv8U5N2UkQaaxuSnhkix7rNBtQ+tviV+w+GoyynTKqJ63UHped498IAR2Vg3WGmjtHdXoSPh
+ I+Q8nijg5otD8PC99PwI7aQAAAA==
+To: Tariq Toukan <tariqt@nvidia.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Colin Ian King <colin.i.king@gmail.com>, 
+ Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org, 
+ linux-rdma@vger.kernel.org
+X-Mailer: b4 0.12.3
 
-tree:   https://git.kernel.org/pub/scm/linux/kernel/git/horms/ipvs-next.git main
-head:   7ad269787b6615ca56bb161063331991fce51abf
-commit: 4654467dc7e111e84f43ed1b70322873ae77e7be [7/9] netfilter: arptables: allow xtables-nft only builds
-config: x86_64-randconfig-076-20240131 (https://download.01.org/0day-ci/archive/20240201/202402010345.MEUDOOiB-lkp@intel.com/config)
-compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240201/202402010345.MEUDOOiB-lkp@intel.com/reproduce)
+Address spelling errors flagged by codespell.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/r/202402010345.MEUDOOiB-lkp@intel.com/
+This patch follows-up on an earlier patch by Colin Ian King,
+which addressed a spelling error in a user-visible log message [1].
+This patch includes that change.
 
-All errors (new ones prefixed by >>):
+[1] https://lore.kernel.org/netdev/20231209225135.4055334-1-colin.i.king@gmail.com/
 
->> ld.lld: error: undefined symbol: xt_recseq
-   >>> referenced by x_tables.h:372 (include/linux/netfilter/x_tables.h:372)
-   >>>               vmlinux.o:(arpt_do_table)
-   >>> referenced by x_tables.h:379 (include/linux/netfilter/x_tables.h:379)
-   >>>               vmlinux.o:(arpt_do_table)
-   >>> referenced by x_tables.h:397 (include/linux/netfilter/x_tables.h:397)
-   >>>               vmlinux.o:(arpt_do_table)
-   >>> referenced 4 more times
---
->> ld.lld: error: undefined symbol: xt_alloc_table_info
-   >>> referenced by arp_tables.c:1513 (net/ipv4/netfilter/arp_tables.c:1513)
-   >>>               vmlinux.o:(arpt_register_table)
-   >>> referenced by arp_tables.c:970 (net/ipv4/netfilter/arp_tables.c:970)
-   >>>               vmlinux.o:(do_arpt_set_ctl)
---
->> ld.lld: error: undefined symbol: xt_request_find_target
-   >>> referenced by arp_tables.c:417 (net/ipv4/netfilter/arp_tables.c:417)
-   >>>               vmlinux.o:(translate_table)
---
->> ld.lld: error: undefined symbol: xt_check_target
-   >>> referenced by arp_tables.c:401 (net/ipv4/netfilter/arp_tables.c:401)
-   >>>               vmlinux.o:(translate_table)
---
->> ld.lld: error: undefined symbol: xt_unregister_table
-   >>> referenced by arp_tables.c:1489 (net/ipv4/netfilter/arp_tables.c:1489)
-   >>>               vmlinux.o:(__arpt_unregister_table)
---
->> ld.lld: error: undefined symbol: xt_find_table
-   >>> referenced by arp_tables.c:1566 (net/ipv4/netfilter/arp_tables.c:1566)
-   >>>               vmlinux.o:(arpt_unregister_table_pre_exit)
-   >>> referenced by arp_tables.c:1575 (net/ipv4/netfilter/arp_tables.c:1575)
-   >>>               vmlinux.o:(arpt_unregister_table)
---
->> ld.lld: error: undefined symbol: xt_copy_counters
-   >>> referenced by arp_tables.c:1010 (net/ipv4/netfilter/arp_tables.c:1010)
-   >>>               vmlinux.o:(do_arpt_set_ctl)
---
->> ld.lld: error: undefined symbol: xt_find_table_lock
-   >>> referenced by arp_tables.c:1014 (net/ipv4/netfilter/arp_tables.c:1014)
-   >>>               vmlinux.o:(do_arpt_set_ctl)
-   >>> referenced by arp_tables.c:862 (net/ipv4/netfilter/arp_tables.c:862)
-   >>>               vmlinux.o:(do_arpt_get_ctl)
---
->> ld.lld: error: undefined symbol: xt_table_unlock
-   >>> referenced by arp_tables.c:1040 (net/ipv4/netfilter/arp_tables.c:1040)
-   >>>               vmlinux.o:(do_arpt_set_ctl)
-   >>> referenced by arp_tables.c:944 (net/ipv4/netfilter/arp_tables.c:944)
-   >>>               vmlinux.o:(do_arpt_set_ctl)
-   >>> referenced by arp_tables.c:924 (net/ipv4/netfilter/arp_tables.c:924)
-   >>>               vmlinux.o:(do_arpt_set_ctl)
-   >>> referenced 2 more times
---
->> ld.lld: error: undefined symbol: xt_counters_alloc
-   >>> referenced by arp_tables.c:894 (net/ipv4/netfilter/arp_tables.c:894)
-   >>>               vmlinux.o:(do_arpt_set_ctl)
---
->> ld.lld: error: undefined symbol: xt_request_find_table_lock
-   >>> referenced by arp_tables.c:900 (net/ipv4/netfilter/arp_tables.c:900)
-   >>>               vmlinux.o:(do_arpt_set_ctl)
-   >>> referenced by arp_tables.c:808 (net/ipv4/netfilter/arp_tables.c:808)
-   >>>               vmlinux.o:(do_arpt_get_ctl)
-..
+This patch is intended to cover all files under
+drivers/net/ethernet/mellanox/mlx4
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+ drivers/net/ethernet/mellanox/mlx4/cmd.c        | 7 ++++---
+ drivers/net/ethernet/mellanox/mlx4/cq.c         | 4 ++--
+ drivers/net/ethernet/mellanox/mlx4/en_clock.c   | 4 ++--
+ drivers/net/ethernet/mellanox/mlx4/en_netdev.c  | 5 +++--
+ drivers/net/ethernet/mellanox/mlx4/en_rx.c      | 2 +-
+ drivers/net/ethernet/mellanox/mlx4/en_tx.c      | 2 +-
+ drivers/net/ethernet/mellanox/mlx4/eq.c         | 2 +-
+ drivers/net/ethernet/mellanox/mlx4/fw_qos.h     | 8 ++++----
+ drivers/net/ethernet/mellanox/mlx4/main.c       | 4 ++--
+ drivers/net/ethernet/mellanox/mlx4/mlx4_stats.h | 2 +-
+ drivers/net/ethernet/mellanox/mlx4/port.c       | 2 +-
+ 11 files changed, 22 insertions(+), 20 deletions(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx4/cmd.c b/drivers/net/ethernet/mellanox/mlx4/cmd.c
+index f5b1f8c7834f..7f20813456e2 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/cmd.c
++++ b/drivers/net/ethernet/mellanox/mlx4/cmd.c
+@@ -2199,8 +2199,9 @@ static void mlx4_master_do_cmd(struct mlx4_dev *dev, int slave, u8 cmd,
+ 	if (cmd != MLX4_COMM_CMD_RESET) {
+ 		mlx4_warn(dev, "Turn on internal error to force reset, slave=%d, cmd=0x%x\n",
+ 			  slave, cmd);
+-		/* Turn on internal error letting slave reset itself immeditaly,
+-		 * otherwise it might take till timeout on command is passed
++		/* Turn on internal error letting slave reset itself
++		 * immediately, otherwise it might take till timeout on
++		 * command is passed
+ 		 */
+ 		reply |= ((u32)COMM_CHAN_EVENT_INTERNAL_ERR);
+ 	}
+@@ -2954,7 +2955,7 @@ static bool mlx4_valid_vf_state_change(struct mlx4_dev *dev, int port,
+ 	dummy_admin.default_vlan = vlan;
+ 
+ 	/* VF wants to move to other VST state which is valid with current
+-	 * rate limit. Either differnt default vlan in VST or other
++	 * rate limit. Either different default vlan in VST or other
+ 	 * supported QoS priority. Otherwise we don't allow this change when
+ 	 * the TX rate is still configured.
+ 	 */
+diff --git a/drivers/net/ethernet/mellanox/mlx4/cq.c b/drivers/net/ethernet/mellanox/mlx4/cq.c
+index 4d4f9cf9facb..e130e7259275 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/cq.c
++++ b/drivers/net/ethernet/mellanox/mlx4/cq.c
+@@ -115,7 +115,7 @@ void mlx4_cq_completion(struct mlx4_dev *dev, u32 cqn)
+ 		return;
+ 	}
+ 
+-	/* Acessing the CQ outside of rcu_read_lock is safe, because
++	/* Accessing the CQ outside of rcu_read_lock is safe, because
+ 	 * the CQ is freed only after interrupt handling is completed.
+ 	 */
+ 	++cq->arm_sn;
+@@ -137,7 +137,7 @@ void mlx4_cq_event(struct mlx4_dev *dev, u32 cqn, int event_type)
+ 		return;
+ 	}
+ 
+-	/* Acessing the CQ outside of rcu_read_lock is safe, because
++	/* Accessing the CQ outside of rcu_read_lock is safe, because
+ 	 * the CQ is freed only after interrupt handling is completed.
+ 	 */
+ 	cq->event(cq, event_type);
+diff --git a/drivers/net/ethernet/mellanox/mlx4/en_clock.c b/drivers/net/ethernet/mellanox/mlx4/en_clock.c
+index 9e3b76182088..cd754cd76bde 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/en_clock.c
++++ b/drivers/net/ethernet/mellanox/mlx4/en_clock.c
+@@ -96,8 +96,8 @@ void mlx4_en_remove_timestamp(struct mlx4_en_dev *mdev)
+ 
+ #define MLX4_EN_WRAP_AROUND_SEC	10UL
+ /* By scheduling the overflow check every 5 seconds, we have a reasonably
+- * good chance we wont miss a wrap around.
+- * TOTO: Use a timer instead of a work queue to increase the guarantee.
++ * good chance we won't miss a wrap around.
++ * TODO: Use a timer instead of a work queue to increase the guarantee.
+  */
+ #define MLX4_EN_OVERFLOW_PERIOD (MLX4_EN_WRAP_AROUND_SEC * HZ / 2)
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx4/en_netdev.c b/drivers/net/ethernet/mellanox/mlx4/en_netdev.c
+index 33bbcced8105..d7da62cda821 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/en_netdev.c
++++ b/drivers/net/ethernet/mellanox/mlx4/en_netdev.c
+@@ -1072,7 +1072,8 @@ static void mlx4_en_do_multicast(struct mlx4_en_priv *priv,
+ 				    1, MLX4_MCAST_CONFIG);
+ 
+ 		/* Update multicast list - we cache all addresses so they won't
+-		 * change while HW is updated holding the command semaphor */
++		 * change while HW is updated holding the command semaphore
++		 */
+ 		netif_addr_lock_bh(dev);
+ 		mlx4_en_cache_mclist(dev);
+ 		netif_addr_unlock_bh(dev);
+@@ -1817,7 +1818,7 @@ int mlx4_en_start_port(struct net_device *dev)
+ 	    mlx4_en_set_rss_steer_rules(priv))
+ 		mlx4_warn(mdev, "Failed setting steering rules\n");
+ 
+-	/* Attach rx QP to bradcast address */
++	/* Attach rx QP to broadcast address */
+ 	eth_broadcast_addr(&mc_list[10]);
+ 	mc_list[5] = priv->port; /* needed for B0 steering support */
+ 	if (mlx4_multicast_attach(mdev->dev, priv->rss_map.indir_qp, mc_list,
+diff --git a/drivers/net/ethernet/mellanox/mlx4/en_rx.c b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+index a09b6e05337d..eac49657bd07 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/en_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+@@ -762,7 +762,7 @@ int mlx4_en_process_rx_cq(struct net_device *dev, struct mlx4_en_cq *cq, int bud
+ 		/* Drop packet on bad receive or bad checksum */
+ 		if (unlikely((cqe->owner_sr_opcode & MLX4_CQE_OPCODE_MASK) ==
+ 						MLX4_CQE_OPCODE_ERROR)) {
+-			en_err(priv, "CQE completed in error - vendor syndrom:%d syndrom:%d\n",
++			en_err(priv, "CQE completed in error - vendor syndrome:%d syndrome:%d\n",
+ 			       ((struct mlx4_err_cqe *)cqe)->vendor_err_syndrome,
+ 			       ((struct mlx4_err_cqe *)cqe)->syndrome);
+ 			goto next;
+diff --git a/drivers/net/ethernet/mellanox/mlx4/en_tx.c b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
+index 65cb63f6c465..1ddb11cb25f9 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/en_tx.c
++++ b/drivers/net/ethernet/mellanox/mlx4/en_tx.c
+@@ -992,7 +992,7 @@ netdev_tx_t mlx4_en_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		tx_info->ts_requested = 1;
+ 	}
+ 
+-	/* Prepare ctrl segement apart opcode+ownership, which depends on
++	/* Prepare ctrl segment apart opcode+ownership, which depends on
+ 	 * whether LSO is used */
+ 	tx_desc->ctrl.srcrb_flags = priv->ctrl_flags;
+ 	if (likely(skb->ip_summed == CHECKSUM_PARTIAL)) {
+diff --git a/drivers/net/ethernet/mellanox/mlx4/eq.c b/drivers/net/ethernet/mellanox/mlx4/eq.c
+index 6598b10a9ff4..9572a45f6143 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/eq.c
++++ b/drivers/net/ethernet/mellanox/mlx4/eq.c
+@@ -210,7 +210,7 @@ static void slave_event(struct mlx4_dev *dev, u8 slave, struct mlx4_eqe *eqe)
+ 
+ 	memcpy(s_eqe, eqe, sizeof(struct mlx4_eqe) - 1);
+ 	s_eqe->slave_id = slave;
+-	/* ensure all information is written before setting the ownersip bit */
++	/* ensure all information is written before setting the ownership bit */
+ 	dma_wmb();
+ 	s_eqe->owner = !!(slave_eq->prod & SLAVE_EVENT_EQ_SIZE) ? 0x0 : 0x80;
+ 	++slave_eq->prod;
+diff --git a/drivers/net/ethernet/mellanox/mlx4/fw_qos.h b/drivers/net/ethernet/mellanox/mlx4/fw_qos.h
+index 954b86faac29..40ca29bb928c 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/fw_qos.h
++++ b/drivers/net/ethernet/mellanox/mlx4/fw_qos.h
+@@ -44,7 +44,7 @@
+ /* Default supported priorities for VPP allocation */
+ #define MLX4_DEFAULT_QOS_PRIO (0)
+ 
+-/* Derived from FW feature definition, 0 is the default vport fo all QPs */
++/* Derived from FW feature definition, 0 is the default vport for all QPs */
+ #define MLX4_VPP_DEFAULT_VPORT (0)
+ 
+ struct mlx4_vport_qos_param {
+@@ -98,7 +98,7 @@ int mlx4_SET_PORT_SCHEDULER(struct mlx4_dev *dev, u8 port, u8 *tc_tx_bw,
+ int mlx4_ALLOCATE_VPP_get(struct mlx4_dev *dev, u8 port,
+ 			  u16 *available_vpp, u8 *vpp_p_up);
+ /**
+- * mlx4_ALLOCATE_VPP_set - Distribution of VPPs among differnt priorities.
++ * mlx4_ALLOCATE_VPP_set - Distribution of VPPs among different priorities.
+  * The total number of VPPs assigned to all for a port must not exceed
+  * the value reported by available_vpp in mlx4_ALLOCATE_VPP_get.
+  * VPP allocation is allowed only after the port type has been set,
+@@ -113,7 +113,7 @@ int mlx4_ALLOCATE_VPP_get(struct mlx4_dev *dev, u8 port,
+ int mlx4_ALLOCATE_VPP_set(struct mlx4_dev *dev, u8 port, u8 *vpp_p_up);
+ 
+ /**
+- * mlx4_SET_VPORT_QOS_get - Query QoS proporties of a Vport.
++ * mlx4_SET_VPORT_QOS_get - Query QoS properties of a Vport.
+  * Each priority allowed for the Vport is assigned with a share of the BW,
+  * and a BW limitation. This commands query the current QoS values.
+  *
+@@ -128,7 +128,7 @@ int mlx4_SET_VPORT_QOS_get(struct mlx4_dev *dev, u8 port, u8 vport,
+ 			   struct mlx4_vport_qos_param *out_param);
+ 
+ /**
+- * mlx4_SET_VPORT_QOS_set - Set QoS proporties of a Vport.
++ * mlx4_SET_VPORT_QOS_set - Set QoS properties of a Vport.
+  * QoS parameters can be modified at any time, but must be initialized
+  * before any QP is associated with the VPort.
+  *
+diff --git a/drivers/net/ethernet/mellanox/mlx4/main.c b/drivers/net/ethernet/mellanox/mlx4/main.c
+index 2581226836b5..7b02ff61126d 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/main.c
++++ b/drivers/net/ethernet/mellanox/mlx4/main.c
+@@ -129,7 +129,7 @@ static const struct mlx4_profile default_profile = {
+ 	.num_cq		= 1 << 16,
+ 	.num_mcg	= 1 << 13,
+ 	.num_mpt	= 1 << 19,
+-	.num_mtt	= 1 << 20, /* It is really num mtt segements */
++	.num_mtt	= 1 << 20, /* It is really num mtt segments */
+ };
+ 
+ static const struct mlx4_profile low_mem_profile = {
+@@ -1508,7 +1508,7 @@ static int mlx4_port_map_set(struct mlx4_dev *dev, struct mlx4_port_map *v2p)
+ 			priv->v2p.port1 = port1;
+ 			priv->v2p.port2 = port2;
+ 		} else {
+-			mlx4_err(dev, "Failed to change port mape: %d\n", err);
++			mlx4_err(dev, "Failed to change port map: %d\n", err);
+ 		}
+ 	}
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx4/mlx4_stats.h b/drivers/net/ethernet/mellanox/mlx4/mlx4_stats.h
+index e9cd4bb6f83d..d3d9ec042d2c 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/mlx4_stats.h
++++ b/drivers/net/ethernet/mellanox/mlx4/mlx4_stats.h
+@@ -112,7 +112,7 @@ struct mlx4_en_stat_out_flow_control_mbox {
+ 	__be64 tx_pause_duration;
+ 	/* Number of transmitter transitions from XOFF state to XON state */
+ 	__be64 tx_pause_transition;
+-	/* Reserverd */
++	/* Reserved */
+ 	__be64 reserved[2];
+ };
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx4/port.c b/drivers/net/ethernet/mellanox/mlx4/port.c
+index 256a06b3c096..4e43f4a7d246 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/port.c
++++ b/drivers/net/ethernet/mellanox/mlx4/port.c
+@@ -2118,7 +2118,7 @@ static void mlx4_qsfp_eeprom_params_set(u8 *i2c_addr, u8 *page_num, u16 *offset)
+  * @data: output buffer to put the requested data into.
+  *
+  * Reads cable module eeprom data, puts the outcome data into
+- * data pointer paramer.
++ * data pointer parameter.
+  * Returns num of read bytes on success or a negative error
+  * code.
+  */
 
 
