@@ -1,101 +1,182 @@
-Return-Path: <netdev+bounces-69054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85DB0849753
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 11:06:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08D2C849766
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 11:11:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1625A29072E
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 10:06:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00D0DB2BD5A
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 10:09:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C10513FE4;
-	Mon,  5 Feb 2024 10:06:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D8EF14AB3;
+	Mon,  5 Feb 2024 10:09:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="szDkV6Hc"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="0NmPUl2l";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="a2wU2Jsi";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="0NmPUl2l";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="a2wU2Jsi"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6259F12B9D;
-	Mon,  5 Feb 2024 10:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474581429E;
+	Mon,  5 Feb 2024 10:09:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707127567; cv=none; b=WSn+4nx+s5UYwurH19QDhP+Nlnp6HDyUePgejck7a2OogTGE6c3TIqAkv4IKNv3aGAunJRpf2YCQy0HXyKuYeSFC9X/Vo7sfNrWcK1q118BTPl2RW5J+DgLuNf8fSbCU2gMlk3X575lVpRg3Vw1h/XmXHWna/MXWrnGJ6yf8mcM=
+	t=1707127772; cv=none; b=BM6ivH4hE51g/m7xvAslLlckAtYMJQoOR+SE1oITURpMzs8u7eE/iI4sBdJspkY4UmmPb4d7CmpeMweyrEg+eoQ8HxtO0kWxQbgyN4l4QMQKizWRcfhJd/uSPw7lxdwDfV4K2IPycNbJeF9fTacOhkxSsr+QUQ2ssyLm8WEVh9U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707127567; c=relaxed/simple;
-	bh=xgBwL14gsjbyBxLm9I9rKQf8AqB0FAer5tOUDFLoh7k=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=bx7Qb3h+r+RW9C6toZhK6zVph/NwqHyh697vK3ZmCArHh1SQUI0ESDIYUBGnRXpca1ifbIEMmoetlud7bkW0bYY/4SDkycZkYZrw+o8RubZ1bbP6Ek6T2oS1nhF6RD2MdwgepKxRAYvik3oB5Xl0HNGg85dw7tvmZYJ1AMYe+pY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=szDkV6Hc; arc=none smtp.client-ip=115.124.30.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1707127554; h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
-	bh=FTxuB/9pVV6+BKydMw7NaZh54dsfrIIZGvhhGbnCB7g=;
-	b=szDkV6HcQRWGnwM06PpbPLiBqWOgL+rH8bCaTJOU1wTpkhp4MVfpx2fDv2Iy2Jy630nyFIa8PfWmQ2238o2nyu8VcBJ333oIki7apNQnXx0miPpcVzUMa7uiobYezmIQ2mzyL35FYNlyiLnASGd/LPlaxXLkXcrqWmDCgWGdOSk=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R361e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0W08RJ8u_1707127552;
-Received: from 30.221.129.101(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W08RJ8u_1707127552)
-          by smtp.aliyun-inc.com;
-          Mon, 05 Feb 2024 18:05:53 +0800
-Message-ID: <a29ead38-7a39-4bbb-80cc-619c1b0dfd62@linux.alibaba.com>
-Date: Mon, 5 Feb 2024 18:05:52 +0800
+	s=arc-20240116; t=1707127772; c=relaxed/simple;
+	bh=4lJmjeGnsuESibq4dkXn4aEwYKCDtRtnV3ik8Ze43YY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IW8zLK/dEqXUJc/lg1mf/qOxSnFkPR/4uqlDhT3V+jg27qOrgVtI/41dDNg6bKA6GJWF5DwX+X6k15ma4LpMN/Lia8mnde3d7yhGkj32o4IGFXnoDrIuB6f0dOfF+uQ1MRk9yuOMYlcWe9SwYQ6poFHUI0prkZ/BPO3epYL8b8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=0NmPUl2l; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=a2wU2Jsi; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=0NmPUl2l; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=a2wU2Jsi; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 68A761F8AE;
+	Mon,  5 Feb 2024 10:09:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1707127768; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xeAME5NJejmJ4/yncKQREcQWWC8NXPkaZdoWiVbdd10=;
+	b=0NmPUl2lfDqYVyYzOjo1vTt3dIIQb2/H6htvcRok60CBOdaultS7Li0P3XJ3uT77aKafoa
+	YMG9+kq7m5jcwUWI+bZMaqMq40YBJB7V5dXvUgbAHiXUnuf1+XIy6RRS2TE7XT/poxoW2s
+	lJadgenBfXH1vXms6QedkM+JMtPRpiU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1707127768;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xeAME5NJejmJ4/yncKQREcQWWC8NXPkaZdoWiVbdd10=;
+	b=a2wU2JsihZ7r0qS4ifZseKKcW3AB5l/OQWpxMAGukvELCRrEc+PcSNPdKQJs925fbWkhs9
+	VswdBMoSOVOii6Dg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1707127768; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xeAME5NJejmJ4/yncKQREcQWWC8NXPkaZdoWiVbdd10=;
+	b=0NmPUl2lfDqYVyYzOjo1vTt3dIIQb2/H6htvcRok60CBOdaultS7Li0P3XJ3uT77aKafoa
+	YMG9+kq7m5jcwUWI+bZMaqMq40YBJB7V5dXvUgbAHiXUnuf1+XIy6RRS2TE7XT/poxoW2s
+	lJadgenBfXH1vXms6QedkM+JMtPRpiU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1707127768;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=xeAME5NJejmJ4/yncKQREcQWWC8NXPkaZdoWiVbdd10=;
+	b=a2wU2JsihZ7r0qS4ifZseKKcW3AB5l/OQWpxMAGukvELCRrEc+PcSNPdKQJs925fbWkhs9
+	VswdBMoSOVOii6Dg==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5E79E136F5;
+	Mon,  5 Feb 2024 10:09:28 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id bl8LF9izwGXGKQAAD6G6ig
+	(envelope-from <jack@suse.cz>); Mon, 05 Feb 2024 10:09:28 +0000
+Received: by quack3.suse.cz (Postfix, from userid 1000)
+	id 0E5A6A0809; Mon,  5 Feb 2024 11:09:24 +0100 (CET)
+Date: Mon, 5 Feb 2024 11:09:23 +0100
+From: Jan Kara <jack@suse.cz>
+To: Kent Overstreet <kent.overstreet@linux.dev>
+Cc: Jan Kara <jack@suse.cz>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+	peterz@infradead.org, boqun.feng@gmail.com,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH 1/4] fs/pipe: Convert to lockdep_cmp_fn
+Message-ID: <20240205100923.3vb3p247c5q2a5qe@quack3>
+References: <20240127020833.487907-1-kent.overstreet@linux.dev>
+ <20240127020833.487907-2-kent.overstreet@linux.dev>
+ <20240202120357.tfjdri5rfd2onajl@quack3>
+ <3nakly5rpn4eomhlxlzutvrisasm6yzqaccrfpnpw2lenxzfmy@vpft5f4osnye>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 00/15] net/smc: implement loopback-ism used by
- SMC-D
-From: Wen Gu <guwen@linux.alibaba.com>
-To: Alexandra Winter <wintera@linux.ibm.com>,
- Wenjia Zhang <wenjia@linux.ibm.com>, hca@linux.ibm.com, gor@linux.ibm.com,
- agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240111120036.109903-1-guwen@linux.alibaba.com>
- <f98849a7-41e9-421b-97b7-36d720cc43ee@linux.alibaba.com>
- <20a1a1f3-789a-4d91-9a94-dca16161afd7@linux.ibm.com>
- <1860588f-2246-4dcd-9db5-4ccd7add0f4a@linux.alibaba.com>
- <3c51c969-3884-4104-b38d-570c61525214@linux.ibm.com>
- <47c1b777-6d4e-40ac-9297-61240c126d6a@linux.alibaba.com>
-In-Reply-To: <47c1b777-6d4e-40ac-9297-61240c126d6a@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <3nakly5rpn4eomhlxlzutvrisasm6yzqaccrfpnpw2lenxzfmy@vpft5f4osnye>
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: -2.30
+X-Spamd-Result: default: False [-2.30 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 BAYES_HAM(-3.00)[100.00%];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 TAGGED_RCPT(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 RCPT_COUNT_SEVEN(0.00)[9];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,suse.cz:email,linux.org.uk:email,suse.com:email];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 MID_RHS_NOT_FQDN(0.50)[];
+	 FREEMAIL_CC(0.00)[suse.cz,vger.kernel.org,infradead.org,gmail.com,zeniv.linux.org.uk,kernel.org];
+	 RCVD_TLS_ALL(0.00)[];
+	 SUSPICIOUS_RECIPS(1.50)[]
+X-Spam-Flag: NO
 
+On Fri 02-02-24 07:47:50, Kent Overstreet wrote:
+> On Fri, Feb 02, 2024 at 01:03:57PM +0100, Jan Kara wrote:
+> > On Fri 26-01-24 21:08:28, Kent Overstreet wrote:
+> > > *_lock_nested() is fundamentally broken; lockdep needs to check lock
+> > > ordering, but we cannot device a total ordering on an unbounded number
+> > > of elements with only a few subclasses.
+> > > 
+> > > the replacement is to define lock ordering with a proper comparison
+> > > function.
+> > > 
+> > > fs/pipe.c was already doing everything correctly otherwise, nothing
+> > > much changes here.
+> > > 
+> > > Cc: Alexander Viro <viro@zeniv.linux.org.uk>
+> > > Cc: Christian Brauner <brauner@kernel.org>
+> > > Cc: Jan Kara <jack@suse.cz>
+> > > Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
+> > 
+> > I had to digest for a while what this new lockdep lock ordering feature is
+> > about. I have one pending question - what is the motivation of this
+> > conversion of pipe code? AFAIU we don't have any problems with lockdep
+> > annotations on pipe->mutex because there are always only two subclasses?
+> 
+> It's one of the easier conversions to do, and ideally /all/ users of
+> subclasses would go away.
+> 
+> Start with the easier ones, figure out those patterns, then the
+> harder...
 
-On 2024/1/24 14:33, Wen Gu wrote:
-> 
-> 
-> On 2024/1/23 22:03, Alexandra Winter wrote:
->> Hello Wen Gu and others,
->>
->> I just wanted to let you know that unfortunately both Wenjia and Jan have called in sick and we don't know
->> when they will be back at work.
->> So I'm sorry but there may be mroe delays in the review of this patchset.
->>
->> Kind regards
->> Alexandra Winter
-> 
-> Hi Alexandra,
-> 
-> Thank you for the update. Health comes first. Wishing Wenjia and Jan
-> both make a swift recovery.
-> 
-> Best regards,
-> Wen Gu
+I see, thanks for explanation. So in the pipes case I actually like that
+the patch makes the locking less obfuscated with lockdep details (to which
+I'm mostly used to but still ;)). So feel free to add:
 
-Hi, Wenjia and Jan
+Reviewed-by: Jan Kara <jack@suse.cz>
 
-I would like to ask if I should wait for the review of this version
-or send a v2 (with some minor changes) ?
+for this patch. I'm not 100% convinced it will be always possible to
+replace subclasses with the new ordering mechanism but I guess time will
+show.
 
-Thanks!
+								Honza
+-- 
+Jan Kara <jack@suse.com>
+SUSE Labs, CR
 
