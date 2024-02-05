@@ -1,88 +1,114 @@
-Return-Path: <netdev+bounces-69045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 255F0849681
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 10:32:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D3D88496DB
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 10:43:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51C841C220DE
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 09:32:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B76D71F21403
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 09:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC11512B9C;
-	Mon,  5 Feb 2024 09:32:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A010212B82;
+	Mon,  5 Feb 2024 09:43:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xf1UoE8A"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WRsy6Eot"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2065C12B7A;
-	Mon,  5 Feb 2024 09:32:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3395612B84;
+	Mon,  5 Feb 2024 09:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707125556; cv=none; b=C894VAlQyPdJ6DEajbk88sewrz9PPT87kUGdOY45CYiZGTcKtRvFXURqgPx4PB/f/c/WtVj31XUJ67JhKylYmiQgbjMIdCxCA0iAYjEkYTyVien0kANG0pTmCFs1aUjCWgOrQ91XQy6zr6zR9xEjyNi3z/gZF5OmCFD3+ySFLHM=
+	t=1707126231; cv=none; b=LTpjWKFRlXLjMgp4hR8pDNdONVqSKTwcLXOcgKHpftn932iusDAn9gWRq3xIKWNVlhFD8WQZOiBZWuPqqBH7+XVeKz8TSeopZazutg9jSARQWfkt5HYav23AJz494Mbqt55+1VNmwzON+g1qYjEeiGQMfa35uNDTIu6t0KfwSVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707125556; c=relaxed/simple;
-	bh=bpHmoC6/wZbkso58dTx+tA/PGOeOrS6uy27L+bFjjKM=;
+	s=arc-20240116; t=1707126231; c=relaxed/simple;
+	bh=XshrRxej5JW1j777R3dRv6CxLAJqshyFFx5Qgcj9oZI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NB6P7Anif1hb27GgIY3Xus5Kl5Ttd36T4Jedreff8T5ATuLhbbuZ9uF+nzhgll27COBa7s8R8RZwkfO8as2O1UXNB8zsKXIcVX+KurUR+gNcZxrhOWv51FKws77qfQJucD8Hq9aLzF4Fa4ju3cgOzNHzCRCib+MhYX6jK3KkjuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xf1UoE8A; arc=none smtp.client-ip=209.85.208.45
+	 Content-Type:Content-Disposition:In-Reply-To; b=UReLt8ZP9k3U89xTn0ffeWvVf5/ke2+zqrFHmkCtsSQ8P6nvZZRIRNPzjPu7OVVqkKcVXEk+PRuIugLcVdlXzI3evGiTKts3jThCGKTKkvVaEIn3MRN7qgS3wSupjn5V/grGou6sYQ5/+dIDVjtFIwPWJvH6Z1OrJLB2yleOrig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WRsy6Eot; arc=none smtp.client-ip=209.85.216.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-56025fcaebaso1691751a12.0;
-        Mon, 05 Feb 2024 01:32:34 -0800 (PST)
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-296a79e6295so242222a91.3;
+        Mon, 05 Feb 2024 01:43:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707125553; x=1707730353; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707126229; x=1707731029; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=58wtEwb1JK1lopYlq43aJseGRPGR+y1RXI+NVyLV/Bw=;
-        b=Xf1UoE8A+skqkaLXanA/XUw/yriyac5JLAGSL/Lc0il8Y1APeMkiVUs+3P9jPDeqrV
-         Rit5yUL4wSXIewJRCNVSI6byDJIc8d6rIIhSUTsD0LDqnkGPPKAYzp4QhS/P4k5vBUJK
-         jNT4xRzKR5biKQ8Tfp57HUSiGybbJME9kEwASfmCADUqnrqoBSu3AgysRljRqnGr8eyJ
-         qLySui1abvRCop6hkCMpc2s3Dyhr/ZU7DMPLKJjjSbvnd5bQKvTna1b5sJuzdf8tWtsA
-         TKHfPQG7pemhCGEcJ7HVyAlHKm4ybsIgkGZhW3grVb8FZjvgsJR6EQXbgdM7Z43tSGTp
-         OSLg==
+        bh=nhsSrZqtjbGX4G5Me8+nepxYnJ3PLPOLi3AIvHxYUqE=;
+        b=WRsy6Eot52B2UDgWfv57Y63hHh6s9mwraybfZxAJNFV3tYTnxR2dok/qBtmxndtxld
+         LI9IT1yc6qjmX9WrbGbmmqhZwm5zbyLV5GC6SHWqw4XE4FvSLNvd8xA+gYH7Zh7DgczK
+         IJvvitkKNWj93K21m5SjoFvE+IgtMZToWHwauWL3fVd9g9d36hmZ5XWBsVC5qlpRZAeT
+         e2BEtvion9WaBmChJvFwUbsixWTipvLI6LTgERvj2wWCcOQjKCD+VNc71qO6LpJ3iBIl
+         yBj9kzbniNfv6XN7++76B50fpLYOc7FguN3dbvPqdJVESWF8UVeEheq5W4iZzHZC6CbE
+         Litg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707125553; x=1707730353;
+        d=1e100.net; s=20230601; t=1707126229; x=1707731029;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=58wtEwb1JK1lopYlq43aJseGRPGR+y1RXI+NVyLV/Bw=;
-        b=nu1TP3Sir3YMxB8KoYlW+RJHmn3HwbWH7vjdA7DOanb8JhUiChxMFYfypGsvgqihWF
-         C8EptoUkp4KoG8SMzvWTevxGexSF4QVwndkaPc3Hm2A5SCIavyj4umgWrHjFNW32qGY+
-         6LpAAWF6FE8eqAN6kjwAW4N+lll6wDwQITw+cf4qfj7jh1qyiMOuTfHFzalTNW0+4EpX
-         tc2A7Hs3KdZ/mCcxjrWG1G0opHQou6ptFmt0NkSWe24KYWlggLbdo8aKF7krax5JJ3Q4
-         GxOeGzbBglZOJhR3IQTcaKRy0PruuRI/ife9RLgH/MAD0dkLDAcErV0OEN1THhV7C8eE
-         uG+w==
-X-Gm-Message-State: AOJu0YzV7sWmOUlq8ujp9K1QnyUkTlQ6skA4LN4Kp/TnG9bllQmjcBJn
-	lEKj/6IYY9ubZlRFLAi3YhmsvGTFBhJUibbAnO+ic/OHdZvT7xIY
-X-Google-Smtp-Source: AGHT+IFE9mxojvDd5IcKVFks55C46OgKWOQfgZGuWRJweh/BgPILptcwj4Xcvby/kKTntLwitJiwjg==
-X-Received: by 2002:a05:6402:1853:b0:55f:fb3a:f5b0 with SMTP id v19-20020a056402185300b0055ffb3af5b0mr4025335edy.18.1707125552972;
-        Mon, 05 Feb 2024 01:32:32 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVAGkHNKhGDvjuw0bIncrxoDltrhM1q6lZMhhbIXCxnle6lIKynHA0HhfXIxlxLCHS4/+FWj48/BbRh8XtFsND8V35osH9JSpOM1PipDUherk9CAw/7LdPg/KYu7gmOM3YMcUJFUD/dae6By8oLeLbt6MYF67e5pM/J2PJoLP/QrZaijXWBp24YRR8dfaP/gMeQgXS4dX54JHAafqZ26MQqnmxzKW7fo8vDoG/IpwH3gT2Rt4sFg0XZd8+gk/XvtXQq0SG5oTDHH9RG8dAO/3Y/8ytvmUv26Xl3qV9FuRQzQdk=
-Received: from debian ([93.184.186.109])
-        by smtp.gmail.com with ESMTPSA id p3-20020aa7c883000000b0056058f2603asm1234988eds.3.2024.02.05.01.32.31
+        bh=nhsSrZqtjbGX4G5Me8+nepxYnJ3PLPOLi3AIvHxYUqE=;
+        b=g6pw0+qih2Azco48ekGFT72XtvHrw+LVucGJKA3sW2wkfjJMdrlS14WZR0wbASrleM
+         Bk/H8LfiZOZkiPiBIdGOKOw6ibCg/sLmfJy5sopqknKoKCRXO5IjLDUuM5El8ZyFBm7h
+         42wMC0Dc9qD0XcIr3TAPdmzO2DkDV5JzdsDsTCDkG60Yk9UiHHAb6XQSk6SWFPNT7s1I
+         89Fjz8VIa4zXZCjrOMnOybThMJZHNsemC0V4EMCjAdpLGFs0UscQ+SOtoW7OpELCGMKx
+         8TYiVtbAIlA6ccigCgdOk5R2XAn1/7FwO4Zd4LMy0++b66v5PFm0x/IB7ublI+r+R8HH
+         YlIg==
+X-Gm-Message-State: AOJu0YwfEH1OJNEmc+U6TxmBDaLHXiyXd6xeIHE/vsnqbSske8jr34dG
+	57A+BCLUtHba0M+P6GVbrNopRzZ5rsVJUWgDQJ0dJIy2QVnGpq4e
+X-Google-Smtp-Source: AGHT+IHFO097j/YQLLeAtsmj9mY5GZrwM73nWWGx0K3d62mTKZNyqQClmv7cTRP+6v6j+MscpsXM/g==
+X-Received: by 2002:a17:90b:a0b:b0:296:7bc4:5926 with SMTP id gg11-20020a17090b0a0b00b002967bc45926mr3965970pjb.10.1707126229479;
+        Mon, 05 Feb 2024 01:43:49 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWUJ77OY+TTLPUJ4rBAtbIQtLRDtzNn+/A7igp66tHUElMNAIs5Sp9uVHNzeBwC0ZpuU7rqLqBoN7o94EPieLu5kV5lCkbEmadmny01yPsGz835tZgmJUPZHdgzXbwK0ps+lZX3qdtUTFXkMo+04V2GYGaftHII0fb3ROxJtsNg4plnbKQL46lFrbG7xSqrfbRf4FnYUBQ2uy0J5uF1dkKdbrZDPPc3FsLJi6ZQHkZhiQfrGDfqT43Zy58BfiP/JWyrvLCxpecPGQ8LpcogT4bQ2o5ZqTK/PZbksjPy4YBXUGXP04nE6//hU9nTI6e/XbY+Ec+HA/BIEmrkXhUUlLpiWzMLjWZ0vCFT46r3Nv86DL80JoIpgWXPkTOiZvsqrWuT6Yae5ujVxGpTia6cDkhekCX8rVFqW2RBeaJ9gsydEQy69vdGH9dc3t/83eW+VyhEHFwB3uJkH4QG1RqhuZIDTayjTjMVqMt6fI6zx9LF+B7a4KvqP2VUg3OFcCoaHynvJSFFhdL/G005aHvZx5MD9vg69EkUt/dVKuyRpRWhiK3u6pjaSHxjI3ifUvNQ4LyIhXIcr/neFsQQmcsN8fup4Xg5wlC6GL3sVwSj6JaIgZ4Y2w1I8YwwyOankzrCSMGN+osME8PFf30VePb3KflDWcutrUlwiMfP3ykZmvfcTQQ2DtpbihK+tioL/FdVGMWpWFba0vbb27Lx4x89PA5L7XQbGNQhF2WnFCGdykculm918l99RaDnLhXgMO9nIZsMpQuGyt3xfPd0pnn3lHOtXdd0Go1s+D16wNCcU+DicQoveUIcrtUuxH45EFAZAmG+zWuE/8yYX+h8Mr3qoq6WGqJeg1Gbruu13sOmyaiIxoD6X+CKwbMN9t1mFv6O5rRduLJnLppF09OYdNFEXlhey6aS2K/p+/0WoKOk6j4ndIcy+CoY53mjc/d1m2loqRQs8z
+ i8TdobNoi4aXRu9uy8zwp9hHQdPgju9SYsPMyTjPtRIbFBJ8S3Vqayn6DQOoAhbEIDJUHlRnFwQfb4FBTTtdgxVcJowE61TGXDxKC+1FmkwC0rCvnoDDHOzycJmqgX8tnrXmeNEQ8ksQKXZPDWfeefA9ICa3fe8r5cZJw9xYCmDKBanp8yuRxqW1ObPJ1hVGkrOeql2Lx+DCg3Cq9Zyx7hjogO0zJnNOz4W9iQ9fdScWAatCWm9pE6GquUNG6aL4c+2DeaUCI6vAcLT+cHASC0OYgPGu1s2bXgZgN0g48YMVk54BZVk3XTkg4qipuvZs5XtrcdjKvQsMhG4ITiNgyNRGLIM4koCoL7ThJwil5OYP6R83CuLUHoIhWVxagFdb66KZ2fo5oe0W+v4iE7ldhdJQ==
+Received: from t480 (89.208.247.201.16clouds.com. [89.208.247.201])
+        by smtp.gmail.com with ESMTPSA id iy5-20020a170903130500b001d944e8f0fdsm5878958plb.32.2024.02.05.01.43.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 01:32:32 -0800 (PST)
-Date: Mon, 5 Feb 2024 10:32:30 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Stefan Eichenberger <eichest@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v5 net-next 00/13] net: phy: marvell-88q2xxx: add driver
- for the Marvell 88Q2220 PHY
-Message-ID: <20240205093230.GA2323158@debian>
-References: <20240122212848.3645785-1-dima.fedrau@gmail.com>
- <20240129180959.582dbc88@kernel.org>
- <20240202183029.GA16692@debian>
- <ff0a1ea7-fdc3-4653-a52e-52869abb7dc8@lunn.ch>
+        Mon, 05 Feb 2024 01:43:48 -0800 (PST)
+Date: Mon, 5 Feb 2024 17:43:33 +0800
+From: Shawn Guo <shawn.gsc@gmail.com>
+To: Frieder Schrempf <frieder@fris.de>
+Cc: Conor Dooley <conor+dt@kernel.org>, devicetree@vger.kernel.org,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Li Yang <leoyang.li@nxp.com>, netdev@vger.kernel.org,
+	Richard Cochran <richardcochran@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Frieder Schrempf <frieder.schrempf@kontron.de>,
+	Andre Przywara <andre.przywara@arm.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Chris Morgan <macromorgan@hotmail.com>,
+	Christoph Niedermaier <cniedermaier@dh-electronics.com>,
+	Conor Dooley <conor.dooley@microchip.com>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	Fabio Estevam <festevam@gmail.com>,
+	Gregor Herburger <gregor.herburger@ew.tq-group.com>,
+	Gregory CLEMENT <gregory.clement@bootlin.com>,
+	Heiko Stuebner <heiko@sntech.de>,
+	James Hilliard <james.hilliard1@gmail.com>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Marcel Ziswiler <marcel.ziswiler@toradex.com>,
+	Marco Felsch <m.felsch@pengutronix.de>, Marek Vasut <marex@denx.de>,
+	Markus Niebel <Markus.Niebel@ew.tq-group.com>,
+	Michal =?utf-8?B?Vm9rw6HEjQ==?= <michal.vokac@ysoft.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Rob Herring <robh@kernel.org>, Sebastian Reichel <sre@kernel.org>,
+	Stefan Wahren <stefan.wahren@chargebyte.com>,
+	Tim Harvey <tharvey@gateworks.com>,
+	Yang Xiwen <forbidden405@foxmail.com>,
+	Yannic Moog <y.moog@phytec.de>
+Subject: Re: [PATCH v2 0/3] ARM: dts: imx6dl: Add support for Sielaff i.MX6
+ Solo board
+Message-ID: <ZcCsbnNVKJk95cij@t480>
+References: <20240116181100.382388-1-frieder@fris.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,26 +117,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ff0a1ea7-fdc3-4653-a52e-52869abb7dc8@lunn.ch>
+In-Reply-To: <20240116181100.382388-1-frieder@fris.de>
 
-Am Sat, Feb 03, 2024 at 05:07:13PM +0100 schrieb Andrew Lunn:
-> On Fri, Feb 02, 2024 at 07:30:29PM +0100, Dimitri Fedrau wrote:
-> > [...]
-> > 
-> > Probably late, but there are parts of the code which are based on the
-> > sample code provided by Marvell. The sample code is licensed under BSD
-> > 2 Clause. Should I change the license in the driver to dual license ?
+On Tue, Jan 16, 2024 at 07:10:25PM +0100, Frieder Schrempf wrote:
+> From: Frieder Schrempf <frieder.schrempf@kontron.de>
 > 
-> IANAL
+> This series adds upstream support for the Sielaff i.MX6 Solo board.
+> It is used as controller and user interface in vending machines. It
+> is based on the i.MX6 Solo SoC and features the following
+> peripherals and interfaces:
 > 
-> You can take BSD code and release it with a GPL license. But it would
-> be better to indicate it is derived from BSD code. Either make it dual
-> license, or add a comment about the origin of the code.
->
-Is there a reason why the "MODULE_AUTHOR" is not in the driver and it's
-also missing in marvell-88x2222.c. I also don't see any copyright
-information. I'm just curious, not seeking for any legal advice. :) I
-just have to get this figured out to stay out of trouble.
+> * 512 MB DDR3 RAM
+> * 512 MB NAND Flash
+> * 1 MB NOR Flash
+> * SD card
+> * Debug LED
+> * Debug UART
+> * Key Inputs
+> * RTC
+> * RS232
+> * 100 MBit Ethernet
+> * USB Hub
+> * USB OTG
+> * HDMI
+> * 7" LVDS IPS panel
+> * PWM Backlight
+> * Optional Extension Board with USB Ethernet NIC
+> 
+> Patch 1 adds the vendor prefix, patch 2 adds the DT bindings and
+> patch 3 adds the DT.
+> 
+> Changes in v2:
+> * Add Acked-by from Conor (Thanks!)
+> * Fix touchscreen node names (Thanks Fabio!)
+> 
+> Frieder Schrempf (3):
+>   dt-bindings: vendor-prefixes: Add Sielaff
 
-Dimitri
+>   dt-bindings: arm: fsl: Add Sielaff i.MX6 Solo board
+>   ARM: dts: imx6dl: Add support for Sielaff i.MX6 Solo board
+
+Applied both, thanks!
 
