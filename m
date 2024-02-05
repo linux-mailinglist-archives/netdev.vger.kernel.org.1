@@ -1,152 +1,149 @@
-Return-Path: <netdev+bounces-69193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A15C84A04E
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 18:11:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D33884A08B
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 18:23:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4E909B25AD8
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 17:11:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCDD228334B
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 17:22:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F7E93FE5F;
-	Mon,  5 Feb 2024 17:11:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9DF341C9D;
+	Mon,  5 Feb 2024 17:22:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="CsT6uVuB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L9aPBAyi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8D53B19D
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 17:11:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F56C47F5B;
+	Mon,  5 Feb 2024 17:22:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707153082; cv=none; b=fVfoGGzPMQGWXxHxf9l15QmZg7K96mtoPjEG/egO16f9N4rQxp3OBdKhluklmfSe23A2/pyX5gipni/kdABahCP+QmbP2gnSLa6FUP/93LWkX3JgXs4nexmkc9rxmjCoAxT57NFs3rdIzHQRyfNAB+Vs1v9MsfXZ9D9EMiKiA8E=
+	t=1707153722; cv=none; b=HFrhsS4Epx0IjqlOdlgXTwMB8bJ3m6OxdyyHKIizmVzHfnsYgikXsRHauQus50s3SGWEs01HhkcNs/ZXFzQtc67nuZVCA1e6/C5Ms7b2n2EzJl55E4XRl6AUXDmWGen+mmbwSUy79OE0hzH2tc0nW7hvQBmYVhOznw0GvXuJ9JY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707153082; c=relaxed/simple;
-	bh=Q3mfnmo3KVoljIvD3pXHoNaBNR14lS/w/SIJfKHoM5U=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HLBmjemPUnzE9cMdVpss7ByDqCNboKq7r94RHdVbADScEW8rA4bE4TSrIO34Yw7/G1MWuPXi2uwm3awbSl9uacZBySGunhTO8+4TycJPKh3om7V5YfdkVFHFh9lETiWueG+T70PEaCF34xdGLo+03LMFNG62EBWSk9bbqd7OUS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=CsT6uVuB; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-40fdffc3831so1556015e9.1
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 09:11:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1707153077; x=1707757877; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dh1uHvpKtYfCIyb2sWjljAxqv7IXOzMPTVAI3w9EyB0=;
-        b=CsT6uVuBkbYTxlnpQHy5OwHvTZeldq7TOPuMKvXFRcu9OEs3Z2F6lJoDNR/ANU7ezm
-         Md932nu40HMqLITmOToHrnyXwpDCMWh/JNSbh8vZyxGrgPR5IwiRTZS2OL7e8Zqhc177
-         zouzcM0Gn5Zrq93wPMi3UwTJE8cUcm7RDaX8gVroynTcQQkxsUC+y66kChLsxM640v5y
-         /6GLVL6uZ/vhsIpzm6OgS+mzTz9nLYMnRRtOC5XYG2UKRYVpez0R+gtjW5UVHnjWRwMj
-         ewTr9M9ripFyzM7NdUzYLs1XtdbwZkpq+gL/Jl7p9KSAayZeAfunfM3Io5PCn1oxnCUw
-         A2aQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707153077; x=1707757877;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dh1uHvpKtYfCIyb2sWjljAxqv7IXOzMPTVAI3w9EyB0=;
-        b=vY8ERuMajIzu5ALPxYVRMbKt6zp1JLc4QbTFJCb7MQY4uY9WzmlTzHJF1wT/jDHgeL
-         fHbzj232/gqyE9Bd1Bt7sUCdbx4L0qqfPtMg9sxQuv8wtHYu6stY+Ap2Tpf4sj+NCyTh
-         AXf3fkdoL+wOluWy15cMh5mE4unKGqs9K/yJqG3F2QdAIuShN25u3mYfysVtLElde2JP
-         Jfj3P+twNj2p54HjYjsPAo36PS5dNeImxtbgZSWpe6jFHVp12OrksHdC4mdr5SUfBxvW
-         QMeYUpzq5WPrwyAslc1CgoWXyT1VcKdIDkxaLwclLQdYj8g8uJadWMYdcbV7BbP1Mv0o
-         MEIA==
-X-Gm-Message-State: AOJu0YzbPeMjNAr36Y0RdMXx5yeKSaw40xlduGMr4kEK1kqzRO9sByGe
-	ooaG6XXaedyatNMi5iObhCI+K5Yr5QBtfE0wgTtWyACV541HYSdBqAMdBm27F3XSig3xLn3p0lg
-	HpZ0=
-X-Google-Smtp-Source: AGHT+IE4DkfHGYfbRJDwx9sfe8UgnqEl5b/oT1J6DucCm0sXO1BMyI2PN995QAzFbgZ1ppX1+4LPNA==
-X-Received: by 2002:adf:e40f:0:b0:33a:fdc3:a61c with SMTP id g15-20020adfe40f000000b0033afdc3a61cmr103119wrm.31.1707153077567;
-        Mon, 05 Feb 2024 09:11:17 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWk2UlGMsAfspwH/SUTmJqTzdXQ7Xmfivol8uVD0oyX0SkdPKPohpHpPT+NAjtIzoj1lCMuhksC/BT8YCaj894FUP14aeo/Zp5rF3DXQIkz+ttoCCKE8ScyB85GigtCZfgWcemXsV5ti4qfhIh2pPs2LogMoGQK0Ms+xNvOkg==
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id p4-20020a05600c358400b0040fb7c87c73sm9212974wmq.45.2024.02.05.09.11.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 09:11:17 -0800 (PST)
-From: Jiri Pirko <jiri@resnulli.us>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	edumazet@google.com
-Subject: [patch net] devlink: avoid potential loop in devlink_rel_nested_in_notify_work()
-Date: Mon,  5 Feb 2024 18:11:14 +0100
-Message-ID: <20240205171114.338679-1-jiri@resnulli.us>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1707153722; c=relaxed/simple;
+	bh=AID71AwIzdltyqWclpSU9hAX6jdAETyQwfA1pzP+PBw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=RPT12nXUGs1M853vj3niRI/c645I9p2chPMpuerruH41hhmHMwZKUEtw1I+OGtnNGNQPrgxRNCfaPtsAH+cNcbq9WUzbd0d+73fk4/75XkpHCUcLp0uQB0wgoQoaw+vs8I5SnmnOfxzORjKEdJ5wY4zVrwlW0JqPi6ZS71EWqwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L9aPBAyi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6578AC433C7;
+	Mon,  5 Feb 2024 17:22:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707153722;
+	bh=AID71AwIzdltyqWclpSU9hAX6jdAETyQwfA1pzP+PBw=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=L9aPBAyiSSWxP7SOXs2F+0hLwlKC+UT4sQcp0CTEtgSGAAbsHKfoeZ/hJbZXjY+UT
+	 gWup3ld8LaO5T8XXSIifjVryTqe6HWUpGA/ndjB0sleTLqwNNGyt6V0edtVNzq559f
+	 Fd7VuXPWa7il0gijSL31c104bE7p54q3EqCFJnEY0p6IItr1Tely2P4SSAeQRbGF/M
+	 AuZq81WxEOWIaqYP7Y0oEMpgixt8HnhbHy9WVFi7n/p8uaBkJT4/rgHG6z1QwDvEOC
+	 4qsHffrJcb9wBHrd+OLWecLja1ktB+S10KCq1giOk4a8Evpoxz2+evhHN3JGFGfDpz
+	 tAziZUF1cWk8Q==
+Message-ID: <90c6d9b6-0bc4-468a-95fe-ebc2a23fffc1@kernel.org>
+Date: Mon, 5 Feb 2024 18:21:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [TEST] Wiki / instructions
+Content-Language: en-GB, fr-BE
+To: Jakub Kicinski <kuba@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "netdev-driver-reviewers@vger.kernel.org"
+ <netdev-driver-reviewers@vger.kernel.org>
+References: <20240202093148.33bd2b14@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240202093148.33bd2b14@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Jiri Pirko <jiri@nvidia.com>
+Hi Jakub,
 
-In case devlink_rel_nested_in_notify_work() can not take the devlink
-lock mutex. Convert the work to delayed work and in case of reschedule
-do it jiffie later and avoid potential looping.
+On 02/02/2024 18:31, Jakub Kicinski wrote:
+> We added a wiki page to the nipa repo on how to run the tests locally:
+> 
+> https://github.com/linux-netdev/nipa/wiki/How-to-test-netdev-selftests
 
-Suggested-by: Paolo Abeni <pabeni@redhat.com>
-Fixes: c137743bce02 ("devlink: introduce object and nested devlink relationship infra")
-Signed-off-by: Jiri Pirko <jiri@nvidia.com>
----
- net/devlink/core.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+Thank you for this wiki page, and all the work with the CI infrastructure!
 
-diff --git a/net/devlink/core.c b/net/devlink/core.c
-index 4275a2bc6d8e..6a58342752b4 100644
---- a/net/devlink/core.c
-+++ b/net/devlink/core.c
-@@ -46,7 +46,7 @@ struct devlink_rel {
- 		u32 obj_index;
- 		devlink_rel_notify_cb_t *notify_cb;
- 		devlink_rel_cleanup_cb_t *cleanup_cb;
--		struct work_struct notify_work;
-+		struct delayed_work notify_work;
- 	} nested_in;
- };
- 
-@@ -70,7 +70,7 @@ static void __devlink_rel_put(struct devlink_rel *rel)
- static void devlink_rel_nested_in_notify_work(struct work_struct *work)
- {
- 	struct devlink_rel *rel = container_of(work, struct devlink_rel,
--					       nested_in.notify_work);
-+					       nested_in.notify_work.work);
- 	struct devlink *devlink;
- 
- 	devlink = devlinks_xa_get(rel->nested_in.devlink_index);
-@@ -96,13 +96,13 @@ static void devlink_rel_nested_in_notify_work(struct work_struct *work)
- 	return;
- 
- reschedule_work:
--	schedule_work(&rel->nested_in.notify_work);
-+	schedule_delayed_work(&rel->nested_in.notify_work, 1);
- }
- 
- static void devlink_rel_nested_in_notify_work_schedule(struct devlink_rel *rel)
- {
- 	__devlink_rel_get(rel);
--	schedule_work(&rel->nested_in.notify_work);
-+	schedule_delayed_work(&rel->nested_in.notify_work, 0);
- }
- 
- static struct devlink_rel *devlink_rel_alloc(void)
-@@ -123,8 +123,8 @@ static struct devlink_rel *devlink_rel_alloc(void)
- 	}
- 
- 	refcount_set(&rel->refcount, 1);
--	INIT_WORK(&rel->nested_in.notify_work,
--		  &devlink_rel_nested_in_notify_work);
-+	INIT_DELAYED_WORK(&rel->nested_in.notify_work,
-+			  &devlink_rel_nested_in_notify_work);
- 	return rel;
- }
- 
+For the debug options, I see that you are using:
+
+  kernel/configs/x86_debug.config
+
+It looks like this is specific for the 'tip' tree:
+
+  Debugging options for tip tree testing
+
+I don't know if it is still maintained, e.g. it includes DEBUG_SLAB
+option. But also, it enables options that are maybe not needed: GCOV?
+X86_DEBUG_FPU?
+Maybe it is better not to use this .config file, no?
+
+For our CI validating MPTCP tests in a "debug" mode, we use
+"debug.config" without "x86_debug.config". On top of that, we also
+disable "SLUB_DEBUG_ON", because the impact on the perf is too
+important, especially with slow environments. We think it is not worth
+it for our case. You don't have the same hardware, but if you have perf
+issues, don't hesitate to do the same ;)
+
+> Also feel free to request membership in the linux-netdev org to be able
+> to edit!
+
+Linked to the discussion we had last week, I can describe which patches
+are being tested if you think it can help others :)
+
+Cheers,
+Matt
 -- 
-2.43.0
-
+Sponsored by the NGI0 Core fund.
+(matttbe on GitHub)
 
