@@ -1,182 +1,186 @@
-Return-Path: <netdev+bounces-69055-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69056-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08D2C849766
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 11:11:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB27D849777
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 11:14:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00D0DB2BD5A
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 10:09:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A30682848FB
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 10:14:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D8EF14AB3;
-	Mon,  5 Feb 2024 10:09:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="0NmPUl2l";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="a2wU2Jsi";
-	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="0NmPUl2l";
-	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="a2wU2Jsi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29BD514ABC;
+	Mon,  5 Feb 2024 10:14:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 474581429E;
-	Mon,  5 Feb 2024 10:09:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 335B514AA7;
+	Mon,  5 Feb 2024 10:14:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707127772; cv=none; b=BM6ivH4hE51g/m7xvAslLlckAtYMJQoOR+SE1oITURpMzs8u7eE/iI4sBdJspkY4UmmPb4d7CmpeMweyrEg+eoQ8HxtO0kWxQbgyN4l4QMQKizWRcfhJd/uSPw7lxdwDfV4K2IPycNbJeF9fTacOhkxSsr+QUQ2ssyLm8WEVh9U=
+	t=1707128053; cv=none; b=cHgm7BYeGEEEoU8tjVDx78vnDHJdSZy1226q4a2UMagRFo+UsFxYvP/owrYgUkB4/5acXU0RPkyoTARFM50JmT04pwv2lZ42Re+JWC0ecSdZlQCaY8fWsHJnb9Q+3k7hz/dWIpbRyuIGM/gxKlfEbj54CjBeHsAwFq4RfV9HTHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707127772; c=relaxed/simple;
-	bh=4lJmjeGnsuESibq4dkXn4aEwYKCDtRtnV3ik8Ze43YY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=IW8zLK/dEqXUJc/lg1mf/qOxSnFkPR/4uqlDhT3V+jg27qOrgVtI/41dDNg6bKA6GJWF5DwX+X6k15ma4LpMN/Lia8mnde3d7yhGkj32o4IGFXnoDrIuB6f0dOfF+uQ1MRk9yuOMYlcWe9SwYQ6poFHUI0prkZ/BPO3epYL8b8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=0NmPUl2l; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=a2wU2Jsi; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=0NmPUl2l; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=a2wU2Jsi; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id 68A761F8AE;
-	Mon,  5 Feb 2024 10:09:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1707127768; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xeAME5NJejmJ4/yncKQREcQWWC8NXPkaZdoWiVbdd10=;
-	b=0NmPUl2lfDqYVyYzOjo1vTt3dIIQb2/H6htvcRok60CBOdaultS7Li0P3XJ3uT77aKafoa
-	YMG9+kq7m5jcwUWI+bZMaqMq40YBJB7V5dXvUgbAHiXUnuf1+XIy6RRS2TE7XT/poxoW2s
-	lJadgenBfXH1vXms6QedkM+JMtPRpiU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1707127768;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xeAME5NJejmJ4/yncKQREcQWWC8NXPkaZdoWiVbdd10=;
-	b=a2wU2JsihZ7r0qS4ifZseKKcW3AB5l/OQWpxMAGukvELCRrEc+PcSNPdKQJs925fbWkhs9
-	VswdBMoSOVOii6Dg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1707127768; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xeAME5NJejmJ4/yncKQREcQWWC8NXPkaZdoWiVbdd10=;
-	b=0NmPUl2lfDqYVyYzOjo1vTt3dIIQb2/H6htvcRok60CBOdaultS7Li0P3XJ3uT77aKafoa
-	YMG9+kq7m5jcwUWI+bZMaqMq40YBJB7V5dXvUgbAHiXUnuf1+XIy6RRS2TE7XT/poxoW2s
-	lJadgenBfXH1vXms6QedkM+JMtPRpiU=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1707127768;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xeAME5NJejmJ4/yncKQREcQWWC8NXPkaZdoWiVbdd10=;
-	b=a2wU2JsihZ7r0qS4ifZseKKcW3AB5l/OQWpxMAGukvELCRrEc+PcSNPdKQJs925fbWkhs9
-	VswdBMoSOVOii6Dg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 5E79E136F5;
-	Mon,  5 Feb 2024 10:09:28 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id bl8LF9izwGXGKQAAD6G6ig
-	(envelope-from <jack@suse.cz>); Mon, 05 Feb 2024 10:09:28 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 0E5A6A0809; Mon,  5 Feb 2024 11:09:24 +0100 (CET)
-Date: Mon, 5 Feb 2024 11:09:23 +0100
-From: Jan Kara <jack@suse.cz>
-To: Kent Overstreet <kent.overstreet@linux.dev>
-Cc: Jan Kara <jack@suse.cz>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	peterz@infradead.org, boqun.feng@gmail.com,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>
-Subject: Re: [PATCH 1/4] fs/pipe: Convert to lockdep_cmp_fn
-Message-ID: <20240205100923.3vb3p247c5q2a5qe@quack3>
-References: <20240127020833.487907-1-kent.overstreet@linux.dev>
- <20240127020833.487907-2-kent.overstreet@linux.dev>
- <20240202120357.tfjdri5rfd2onajl@quack3>
- <3nakly5rpn4eomhlxlzutvrisasm6yzqaccrfpnpw2lenxzfmy@vpft5f4osnye>
+	s=arc-20240116; t=1707128053; c=relaxed/simple;
+	bh=1l3siLpuXMK44oa6b0El8BgF81vRCEyF7f8WDN3RqJw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=FiVuAqZU2C0yFPcYu85/9qoR8AKL7cQznMvIYtqw2cL9G1Tc7+QgLWPVpopOwPbkfSmqJpSkWvgBu4QltomlDeww05fMC6rfVViGCmNGalfSeaebr63/EYEVC27d+2OQRCZT6UI1DelL6A9lt9C4B/ItSCu6SwxKZJ9LLvBoHPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-557dcb0f870so5472941a12.2;
+        Mon, 05 Feb 2024 02:14:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707128049; x=1707732849;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ddHst/s1WypGQf10KbRP7GLFjlfX7i+laa1nshvJf0I=;
+        b=aTE5ArSw/8ksMVp+gbSAIVV2JpFIa1wgeQIPDto+uyIft0UaL0FH9oyG3G3NM6IenM
+         xlJ8Pi2iqD7MigfS6iALRpsuiv4aN2BEblRAXJmnuEm/EA9ePM0doYj1dcxAOEEUhpWY
+         BJK3vcE0B8UcAC0Gcjvo1FqLmfVyWM6E90znoJ4CPiQFh0G5VzLlofIyBCjRu7McZUHe
+         HlJg3FGvGoFZozuZgR9Jomihw/HPv8rNVeiFv2F0M/wmCQMtR885bCNaIjt0Ftvr1nPn
+         +BH+BjCC/aeq1TRnBk76QBIgHl+eUUSObE2oMMupbzKTYRbjdi2/9h4poRG0D1Q7WGo4
+         vFaA==
+X-Gm-Message-State: AOJu0YxjTd86WYY5fM9B0tDBI0DbF2e6P1nP2JKd4GPialyPgit27fMc
+	2yR2mcc14xYW2M2/xbiqoBb2YIR0FY8qpKbKeMbLJOkzyxn8bq93
+X-Google-Smtp-Source: AGHT+IEu/jxcISKhppzrFILb6XHoChlGGlwzeVhILTawdEO0iXqNIRKHdUNGGuClDMggNs1oubMdJw==
+X-Received: by 2002:a17:906:19b:b0:a36:fd11:8ded with SMTP id 27-20020a170906019b00b00a36fd118dedmr7049567ejb.56.1707128048983;
+        Mon, 05 Feb 2024 02:14:08 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCU80mMmeas1Ial7BRLgeBTcA2jAjlsX5HtVnWQ/atx2w0UNwP2bc2o19C1fj5HAXAUVpXKWtirFP58FDBGsLLjUYSb1/kk6Zc/EVMcDyhOuVGn0KT4QZulr3xqBfyOlkI7TfHbxRiz+4lxBAbogoKch7+Q8F7xwIl5wdDCnNvr3HNJMlzO8V8JcLPL1qGvyjvJnA7EsWUN9mKqYEk2LHrNyAHRJZRXFjwWSDnU=
+Received: from localhost (fwdproxy-lla-116.fbsv.net. [2a03:2880:30ff:74::face:b00c])
+        by smtp.gmail.com with ESMTPSA id tb16-20020a1709078b9000b00a37579fa8f1sm2633440ejc.71.2024.02.05.02.14.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Feb 2024 02:14:08 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	horms@kernel.org,
+	andrew@lunn.ch
+Subject: [PATCH net 00/10] net: Fix MODULE_DESCRIPTION() for net (p5)
+Date: Mon,  5 Feb 2024 02:13:49 -0800
+Message-Id: <20240205101400.1480521-1-leitao@debian.org>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3nakly5rpn4eomhlxlzutvrisasm6yzqaccrfpnpw2lenxzfmy@vpft5f4osnye>
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: -2.30
-X-Spamd-Result: default: False [-2.30 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 BAYES_HAM(-3.00)[100.00%];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 TAGGED_RCPT(0.00)[];
-	 MIME_GOOD(-0.10)[text/plain];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 RCPT_COUNT_SEVEN(0.00)[9];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[linux.dev:email,suse.cz:email,linux.org.uk:email,suse.com:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 MID_RHS_NOT_FQDN(0.50)[];
-	 FREEMAIL_CC(0.00)[suse.cz,vger.kernel.org,infradead.org,gmail.com,zeniv.linux.org.uk,kernel.org];
-	 RCVD_TLS_ALL(0.00)[];
-	 SUSPICIOUS_RECIPS(1.50)[]
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 8bit
 
-On Fri 02-02-24 07:47:50, Kent Overstreet wrote:
-> On Fri, Feb 02, 2024 at 01:03:57PM +0100, Jan Kara wrote:
-> > On Fri 26-01-24 21:08:28, Kent Overstreet wrote:
-> > > *_lock_nested() is fundamentally broken; lockdep needs to check lock
-> > > ordering, but we cannot device a total ordering on an unbounded number
-> > > of elements with only a few subclasses.
-> > > 
-> > > the replacement is to define lock ordering with a proper comparison
-> > > function.
-> > > 
-> > > fs/pipe.c was already doing everything correctly otherwise, nothing
-> > > much changes here.
-> > > 
-> > > Cc: Alexander Viro <viro@zeniv.linux.org.uk>
-> > > Cc: Christian Brauner <brauner@kernel.org>
-> > > Cc: Jan Kara <jack@suse.cz>
-> > > Signed-off-by: Kent Overstreet <kent.overstreet@linux.dev>
-> > 
-> > I had to digest for a while what this new lockdep lock ordering feature is
-> > about. I have one pending question - what is the motivation of this
-> > conversion of pipe code? AFAIU we don't have any problems with lockdep
-> > annotations on pipe->mutex because there are always only two subclasses?
-> 
-> It's one of the easier conversions to do, and ideally /all/ users of
-> subclasses would go away.
-> 
-> Start with the easier ones, figure out those patterns, then the
-> harder...
+There are hundreds of network modules that misses MODULE_DESCRIPTION(),
+causing a warning when compiling with W=1. Example:
 
-I see, thanks for explanation. So in the pipes case I actually like that
-the patch makes the locking less obfuscated with lockdep details (to which
-I'm mostly used to but still ;)). So feel free to add:
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_cmp.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_nbyte.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_u32.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_meta.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_text.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_canid.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/ip_tunnel.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/ipip.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/ip_gre.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/udp_tunnel.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/ip_vti.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/ah4.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/esp4.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/xfrm4_tunnel.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/tunnel4.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/xfrm/xfrm_algo.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/xfrm/xfrm_user.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv6/ah6.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv6/esp6.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv6/xfrm6_tunnel.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv6/tunnel6.o
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+This part5 of the patchset focus on the missing net/ module, which
+are now warning free.
 
-for this patch. I'm not 100% convinced it will be always possible to
-replace subclasses with the new ordering mechanism but I guess time will
-show.
+Here are all the MODULE_DESCRIPTION added:
 
-								Honza
+ MODULE_DESCRIPTION("CAN Identifier comparison network helpers");
+ MODULE_DESCRIPTION("DSA loopback fixed PHY library");
+ MODULE_DESCRIPTION("IEEE 802.15.4 IPv6 over Low-Power Wireless Personal Area Network module");
+ MODULE_DESCRIPTION("IEEE 802.15.4 socket interface");
+ MODULE_DESCRIPTION("IP-in-IPv6 tunnel driver");
+ MODULE_DESCRIPTION("IP/IP protocol decoder library");
+ MODULE_DESCRIPTION("IPv4 AH transformation library");
+ MODULE_DESCRIPTION("IPv4 ESP transformation library");
+ MODULE_DESCRIPTION("IPv4 GRE tunnels over IP library");
+ MODULE_DESCRIPTION("IPv4 tunnel implementation library");
+ MODULE_DESCRIPTION("IPv4 UDP tunnel driver");
+ MODULE_DESCRIPTION("IPv4 XFRM tunnel driver");
+ MODULE_DESCRIPTION("IPv4 XFRM tunnel library");
+ MODULE_DESCRIPTION("IPv6 AH transformation helpers");
+ MODULE_DESCRIPTION("IPv6 ESP transformation helpers");
+ MODULE_DESCRIPTION("IPv6-in-IPv4 tunnel SIT driver");
+ MODULE_DESCRIPTION("IPv6 Mobility driver");
+ MODULE_DESCRIPTION("IPv6 over Low-Power Wireless Personal Area Network core module");
+ MODULE_DESCRIPTION("IPv6 UDP tunnel driver");
+ MODULE_DESCRIPTION("IPv6 XFRM tunnel driver");
+ MODULE_DESCRIPTION("IP-VLAN based tap driver");
+ MODULE_DESCRIPTION("Metadata comparison network helpers");
+ MODULE_DESCRIPTION("Multi byte comparison network helpers");
+ MODULE_DESCRIPTION("Multi-Protocol Over ATM (MPOA) driver");
+ MODULE_DESCRIPTION("PF_KEY socket helpers");
+ MODULE_DESCRIPTION("Simple packet data comparison network helpers");
+ MODULE_DESCRIPTION("Textsearch comparison network helpers");
+ MODULE_DESCRIPTION("U32 Key comparison network helpers");
+ MODULE_DESCRIPTION("Virtual (secure) IP tunneling library");
+ MODULE_DESCRIPTION("XFRM Algorithm interface");
+ MODULE_DESCRIPTION("XFRM User interface");
+
+Breno Leitao (10):
+  net: fill in MODULE_DESCRIPTION()s for xfrm
+  net: fill in MODULE_DESCRIPTION()s for mpoa
+  net: fill in MODULE_DESCRIPTION()s for af_key
+  net: fill in MODULE_DESCRIPTION()s for 6LoWPAN
+  net: fill in MODULE_DESCRIPTION()s for ipv6 modules
+  net: fill in MODULE_DESCRIPTION()s for ipv4 modules
+  net: fill in MODULE_DESCRIPTION()s for net/sched
+  net: fill in MODULE_DESCRIPTION()s for ieee802154
+  net: fill in MODULE_DESCRIPTION()s for ipvtap
+  net: fill in MODULE_DESCRIPTION()s for dsa_loop_bdinfo
+
+ drivers/net/dsa/dsa_loop_bdinfo.c | 1 +
+ drivers/net/ipvlan/ipvtap.c       | 1 +
+ net/6lowpan/core.c                | 1 +
+ net/atm/mpc.c                     | 1 +
+ net/ieee802154/6lowpan/core.c     | 1 +
+ net/ieee802154/socket.c           | 1 +
+ net/ipv4/ah4.c                    | 1 +
+ net/ipv4/esp4.c                   | 1 +
+ net/ipv4/ip_gre.c                 | 1 +
+ net/ipv4/ip_tunnel.c              | 1 +
+ net/ipv4/ip_vti.c                 | 1 +
+ net/ipv4/ipip.c                   | 1 +
+ net/ipv4/tunnel4.c                | 1 +
+ net/ipv4/udp_tunnel_core.c        | 1 +
+ net/ipv4/xfrm4_tunnel.c           | 1 +
+ net/ipv6/ah6.c                    | 1 +
+ net/ipv6/esp6.c                   | 1 +
+ net/ipv6/ip6_udp_tunnel.c         | 1 +
+ net/ipv6/mip6.c                   | 1 +
+ net/ipv6/sit.c                    | 1 +
+ net/ipv6/tunnel6.c                | 1 +
+ net/ipv6/xfrm6_tunnel.c           | 1 +
+ net/key/af_key.c                  | 1 +
+ net/sched/em_canid.c              | 1 +
+ net/sched/em_cmp.c                | 1 +
+ net/sched/em_meta.c               | 1 +
+ net/sched/em_nbyte.c              | 1 +
+ net/sched/em_text.c               | 1 +
+ net/sched/em_u32.c                | 1 +
+ net/xfrm/xfrm_algo.c              | 1 +
+ net/xfrm/xfrm_user.c              | 1 +
+ 31 files changed, 31 insertions(+)
+
 -- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+2.39.3
+
 
