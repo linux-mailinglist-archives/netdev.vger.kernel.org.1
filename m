@@ -1,285 +1,125 @@
-Return-Path: <netdev+bounces-69255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2DA584A84B
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 22:58:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BEB984A87B
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:04:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39870B275D6
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 21:58:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD6221C29E6E
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 22:04:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A396D13EFE3;
-	Mon,  5 Feb 2024 21:05:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65B811AB7E3;
+	Mon,  5 Feb 2024 21:12:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Lp9+rMLu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TYaC5QlP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16FCE13E23A
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 21:05:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6C414B5CD;
+	Mon,  5 Feb 2024 21:12:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707167115; cv=none; b=nVZfx9VtwctOHEZ8wQhD72i7JVYXjRtj0LYIRSDNgEfyaVi48OFAjySLPc8LdS/RpCh1FfMekr5MTqxnjkCU1zTPkKNexTFTh/YYfINFwXc/FID1gYuupy/G5j9fnxMybAbiZZkjGy5QDpGiroP7cWJGxkXOFXFGd3Gwc/JOE+M=
+	t=1707167533; cv=none; b=nAUUVnMDqCNEsLT64tdCnU187Keeqz3PITH1d0HD7sc4J+v1RqOxtSCzH93/CYjXjqkHmo4m0purHUO4MOUZUHz1MW1ilSnzN9mh20ycvhz9cNzmhLrYSjoVoHSpaA/19rIH+KuSZq+trrb7eG4lC27lxcDb1BVhqKUQSsRsM6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707167115; c=relaxed/simple;
-	bh=heAQsVdQyZX1S3QWfoEAK9WpamlcuDvtpD/1aq7LXwc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=PxSTa0tJC3FMVvJvtoIBbq3pEaWDIusKNkx1K2wCdt0BwHgvDKOs92Lcc5/1wXFV7YgDbOtVcQIhhmRlux8DnvIvZURpdOm0rTzKdfYBrqHTNi6ZR6GcQXDf1n1PEVFTgJxPfWpaZ3+1LLryJLDkUf1vJ55V8lNa7kgyb2nRH0M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Lp9+rMLu; arc=none smtp.client-ip=209.85.210.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6e04c4f494cso670984b3a.2
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 13:05:13 -0800 (PST)
+	s=arc-20240116; t=1707167533; c=relaxed/simple;
+	bh=XQF2uBcHLuFqq+yOdvxRNweyMEUC2bS20cGYte1KJfQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jHMVGtHoB0DgBvJUWY9wI0ve/EiO7Pcx7FLqqW1yz2Rnt5NQ/vljAY/YDyifilyLE6D4ukIm6pguxVpkfahy7rlee0Mx3suNQrXN8j0fr7aCqkw5itfjsyXq9fNYc+3XJzExkYwbjgnpN37A2twykm69u0eRl2Xszk0O4vbzbbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TYaC5QlP; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1d72f71f222so39275205ad.1;
+        Mon, 05 Feb 2024 13:12:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1707167113; x=1707771913; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nOYgxaVhBBqkYTQLahlIJIPu6cEXeF8iHyq//4nC0Dw=;
-        b=Lp9+rMLu+2bmP1Trs+oEouQO4pUbXiU4wDoVDJVjsMrrVe0igbsYsgU25t0NTNkLl5
-         E4aXA+HvovmeQ/62QJYvtrRsjanY1kEAPTWzHnHeeZZ+VCqzRZ+iqf9FEqI862zDLLS0
-         FwGGrzFKGIgdo21lpWE8VviJIShiJMpLnT7Ck=
+        d=gmail.com; s=20230601; t=1707167531; x=1707772331; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Epr4P9xrHmvsudGJkegcnKp7KkOU0wqtIemIFUjl3bk=;
+        b=TYaC5QlPtuqysLNh/j3l9nJuXNgKkJ4EGmoXf3dgR5QKviJdT/tp3lME/hi+kIX2jQ
+         7F48TkU7532tbkkfpbCv/4G1oy3DTvM1FiiYt/gpsYIQF3GZa8zPSClVNJmBD0GHtlz2
+         o6rMmx/SFF5SzXatM6/8h3AnP/b4vjQZfnEoSXjSvYv6U7M85KRdIfhtgmh3UlCC3KY/
+         tR9zyTGo/mCjY7tP1vElUneoVoiFv5JA4GIjevLUEuxmgcz78ac/yoAvlhdHMuwhNtyT
+         yFUDEq4u1FuY/wFtt/wa2QLEIRPhXtKZuc+C4bJs/PdT3ZuuUX84Q2dmULzDW2dsWy4W
+         FKog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707167113; x=1707771913;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1707167531; x=1707772331;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=nOYgxaVhBBqkYTQLahlIJIPu6cEXeF8iHyq//4nC0Dw=;
-        b=Ky2G8d/FAgA+58cLp26SkIf76xOKGJNIbwI3Yp63lBNUzSEtgUvot6fHRcwTVdOWGc
-         mjkGMlci90Bb9We+QoyM3x6AUA+2a/xX7VMk5vmsV+Lqs4sFi3mjhoCi+6BSTRvk4hjL
-         BfP5HKyyGOYVkc4LV8WzJXv+ezE0UvkSnANtZ79+nGcVYuE2I8e9XLawPKk1UYOa3LGX
-         bYpCq25EY3Xv/yvairRRo+PgiTOmWPa1uEidwYeYWogwye2IMfqRoCmEqE5TyBjmMpgE
-         4/0HXzpAav20R2RC5070PGeK1Gy4FzU6B6hJwxMyBvNTZ9u6zkljDNLksekWDseZQcvH
-         wL3A==
-X-Gm-Message-State: AOJu0Yw270Z58Vjww1PGa3kVceQagqL4nL4BRFKBbzgpG93JJKAfFH/u
-	JiVmAIv054vigq/e8srwmxNtLJT5UCPl+QWH6IyuwG8jGci06j6XhdvF77ylG12mJAovxutKXly
-	I7TA=
-X-Google-Smtp-Source: AGHT+IEN2JzkXMgtMH2YLc2zdh+mocqw5HKQ0uqEVrGv5/eTixeVNSp66nv60dTNZ0o0bRFI9geckQ==
-X-Received: by 2002:a05:6a00:1882:b0:6e0:4797:801e with SMTP id x2-20020a056a00188200b006e04797801emr951487pfh.12.1707167112887;
-        Mon, 05 Feb 2024 13:05:12 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUXgARtOfY85fQ804fqgf9R3N0xD8xUK5NSW8I+9Y6M/3k+8ChC8R5MV2ubEiCHQXgUGHWFilMag26kloIdmvbD9DNBx86K/gl8d1bft6Nb583fIfQjKVW9R0y8f4J5+KhKgbtAUPhyZIRX/1T4HLEMMMKztQDj+Jd+ZiB84H3wbBaEgPrATM+47H8g0lag3VMroI0ZMIPKwrBkHMoh0qSU50c6/HfV8jfHaSK17tAcl0j6cPGL0t88IJlsr3+pjIv7qqdgPZ8IYpJrsu4POxQOsjEQOXt3GhgI5ovaLB2mK6DcEgkasP2zUj9CzTc6HsYuSnAvJ79QPDLOEt0u0JGm8YykxWinu8pHBBOqQ1k6Je+GQ4gLzc4yDwbmQX+14bUDRL16T/G+FIrsNw2Bv9JagyHbgTIrCRUvRG0NFHDzPZXPql61g2rQq8qVEdn/2HDRcO8y/2h9JFeseS0wbxPd6iHdco0jfe23hulnmdJcZEtw9aflDMfiNG00RXeaBvH/L/2E2nbzVn+s11S5vLOeE64mMY52ggp9vnPCWds0Kv425amQm3PMKwrbDVL1phxyhcOL6bv031sS04NBVrP3UME1/r4kL4XyZnQiK2+xjmhIvFdia4NwzMLjLcSfpboCdFCoYM4ChPQTdguCyaS+TItcwazJryiKCasKM8QLTBqnMutci0DaFPOlb0WkFfYVbdzs5dF2cIyA4ZEKAmfOFfrFGkTopmSxENnHPZxB3VX7aQ7FzFtY8/mBFipAq1mbVmc1CuHIR0xBBz88Dn8lDDh1D22FmkyGsE8U6ncOXbedp5aqBjkP0Ub9Ah+Q2jttXZ0l4F2G2UcRg8oeT5Z1DCkswlfqwWGpCK/e+YqzG1PCOEyVwtBTwCOZ5SkZ4TYiyMwtDNk7wKmQNNnO6We43Lf8Tujv/1xlYtjhQ05KMHdCty+C7O0cVdeXV5RaG2rAMK
- 0KMRCGzZ0YnIga05VUKAmY/H8enp6rxbu6VurdaXqikHPhoSOfDzWKQH2qdc8xi1WAiw==
-Received: from localhost.localdomain ([2620:11a:c018:0:ea8:be91:8d1:f59b])
-        by smtp.gmail.com with ESMTPSA id p9-20020aa79e89000000b006e03efbcb3esm315750pfq.73.2024.02.05.13.05.10
+        bh=Epr4P9xrHmvsudGJkegcnKp7KkOU0wqtIemIFUjl3bk=;
+        b=MfH5WpXHKr4iT4wTkuH1fcY3tZlY6nOVnZ5ODs2pAfuKofFychYvaqYoW1kuS6S75J
+         GQ7wGOS7pNgP/95MppLXtpmCrV77pFZ6dG5Z7g/iavSdCtQCZewvlKaxnOSCqZpcUuNo
+         pJyln3ybfKdJM6IZfHYabRC3/9uXzZqRG9QV2SArBpvwLTJHYF+Owl9pOApsUUGX/oBQ
+         PrxxcYq4ru9mwRjgBh/4CqzrpX71j15WhUMJAVTMy/IBUlWEObtpW8PfKipqHnoDnwED
+         2pQMrJ0Z/YdNMeoH2bVmH751AbUyT89AgpsSqkKAYuLpK/ePJWf+BBZeJ8PxS1taV4t0
+         qs6A==
+X-Gm-Message-State: AOJu0Ywhkby2x4GW89BFEPstfm3BNGEeYWVQQ7iUCPNkltXWXlcr2+Nd
+	Bv3o0Pkea/NUb3h/OtHVLRPwIGby07SZOP47jg81RrRs85agdABo
+X-Google-Smtp-Source: AGHT+IFf/wc235Q1LsngiAKkLZZRq99Fmkw9x7bucgz2Q7qPcj5sGnzopUSeVLnlgrt66ScPcyoO1A==
+X-Received: by 2002:a17:902:ee81:b0:1d7:7347:d80e with SMTP id a1-20020a170902ee8100b001d77347d80emr706714pld.37.1707167531226;
+        Mon, 05 Feb 2024 13:12:11 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVH5hLCVOvQ/utBPhijRYjEQzo0ZfJlK8Mhbyv3NVNlvgGrEhEMGKUy2+tlE0QIR2Txxu4BFELRanLyPgDRi9VbwYk8nkzD/6OORH608lnF0xTYa6oM6Jh708OvEET5XjMDC/hYrbk7OoN4VfhlbPv947Q2gAHulnGXZ0vOqfKS2YYJy1S73aI6b9VAY624SxEJWF/2viuz8Nf1ySJYj0ejOOfIlvPmcPI9WwaPspCbTxlZgeCr65PvcXtZg+XFU6pAlWROfsue43g8zwt9GTFnowAlOKM6ONBTJ3qKMFxwVXCspC4/vElpKs79HfK6RMylLKWQRvvtpbEraBuyKqhf0qhCirbrG/4MAlYEMxnJNx7vVvy6JCfNb7fj6ateYbCMh/Bcr+I9byyuZ9CyfN1HE2GkfqisDBzrMjcOhP0iEULMMeRLwCjNjOtVYOc=
+Received: from localhost (dhcp-141-239-144-21.hawaiiantel.net. [141.239.144.21])
+        by smtp.gmail.com with ESMTPSA id w13-20020a170902d3cd00b001d9609f2e30sm326986plb.1.2024.02.05.13.12.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 13:05:12 -0800 (PST)
-From: Joe Damato <jdamato@fastly.com>
-To: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: chuck.lever@oracle.com,
-	jlayton@kernel.org,
-	linux-api@vger.kernel.org,
-	brauner@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	alexander.duyck@gmail.com,
-	sridhar.samudrala@intel.com,
-	kuba@kernel.org,
-	willemdebruijn.kernel@gmail.com,
-	weiwan@google.com,
-	David.Laight@ACULAB.COM,
-	arnd@arndb.de,
-	sdf@google.com,
-	amritha.nambiar@intel.com,
-	Joe Damato <jdamato@fastly.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Jan Kara <jack@suse.cz>,
-	Nathan Lynch <nathanl@linux.ibm.com>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Steve French <stfrench@microsoft.com>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Julien Panis <jpanis@baylibre.com>,
-	Andrew Waterman <waterman@eecs.berkeley.edu>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	linux-doc@vger.kernel.org (open list:DOCUMENTATION),
-	linux-fsdevel@vger.kernel.org (open list:FILESYSTEMS (VFS and infrastructure))
-Subject: [PATCH net-next v6 4/4] eventpoll: Add epoll ioctl for epoll_params
-Date: Mon,  5 Feb 2024 21:04:49 +0000
-Message-Id: <20240205210453.11301-5-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240205210453.11301-1-jdamato@fastly.com>
-References: <20240205210453.11301-1-jdamato@fastly.com>
+        Mon, 05 Feb 2024 13:12:10 -0800 (PST)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Mon, 5 Feb 2024 11:12:09 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Allen <allen.lkml@gmail.com>
+Cc: torvalds@linux-foundation.org, mpatocka@redhat.com,
+	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
+	msnitzer@redhat.com, ignat@cloudflare.com, damien.lemoal@wdc.com,
+	bob.liu@oracle.com, houtao1@huawei.com, peterz@infradead.org,
+	mingo@kernel.org, netdev@vger.kernel.org, kernel-team@meta.com
+Subject: Re: [PATCHSET wq/for-6.9] workqueue: Implement BH workqueue and
+ convert several tasklet users
+Message-ID: <ZcFPKaWwxJhgy8HQ@slm.duckdns.org>
+References: <20240130091300.2968534-1-tj@kernel.org>
+ <ZcACvVz83QFuSLR6@slm.duckdns.org>
+ <CAOMdWSLNMqsZNJ-oCLN2RjckZmJSvdU_Yq0F0frmqMqa67Oy1g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAOMdWSLNMqsZNJ-oCLN2RjckZmJSvdU_Yq0F0frmqMqa67Oy1g@mail.gmail.com>
 
-Add an ioctl for getting and setting epoll_params. User programs can use
-this ioctl to get and set the busy poll usec time, packet budget, and
-prefer busy poll params for a specific epoll context.
+Hello, Allen.
 
-Parameters are limited:
-  - busy_poll_usecs is limited to <= u32_max
-  - busy_poll_budget is limited to <= NAPI_POLL_WEIGHT by unprivileged
-    users (!capable(CAP_NET_ADMIN))
-  - prefer_busy_poll must be 0 or 1
-  - __pad must be 0
+On Mon, Feb 05, 2024 at 12:50:28PM -0800, Allen wrote:
+> Thank you. I am basing my work on the branch you have
+> pushed.(or-6.9-bh-conversions)
+> https://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git/log/?h=for-6.9-bh-conversions
+> 
+> In the order of priority, I have started converting drivers/media/*,
+> drivers/dma/* followed by drivers/net/*
+> which constitutes the majority. Putting my plan out here so that the
+> work is not duplicated.
+> I will write back in a day and share the branch for review.
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- .../userspace-api/ioctl/ioctl-number.rst      |  1 +
- fs/eventpoll.c                                | 73 +++++++++++++++++++
- include/uapi/linux/eventpoll.h                | 13 ++++
- 3 files changed, 87 insertions(+)
+That's great. Thanks.
 
-diff --git a/Documentation/userspace-api/ioctl/ioctl-number.rst b/Documentation/userspace-api/ioctl/ioctl-number.rst
-index 457e16f06e04..b33918232f78 100644
---- a/Documentation/userspace-api/ioctl/ioctl-number.rst
-+++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
-@@ -309,6 +309,7 @@ Code  Seq#    Include File                                           Comments
- 0x89  0B-DF  linux/sockios.h
- 0x89  E0-EF  linux/sockios.h                                         SIOCPROTOPRIVATE range
- 0x89  F0-FF  linux/sockios.h                                         SIOCDEVPRIVATE range
-+0x8A  00-1F  linux/eventpoll.h
- 0x8B  all    linux/wireless.h
- 0x8C  00-3F                                                          WiNRADiO driver
-                                                                      <http://www.winradio.com.au/>
-diff --git a/fs/eventpoll.c b/fs/eventpoll.c
-index a69ee11682b9..8eb4ea2557af 100644
---- a/fs/eventpoll.c
-+++ b/fs/eventpoll.c
-@@ -37,6 +37,7 @@
- #include <linux/seq_file.h>
- #include <linux/compat.h>
- #include <linux/rculist.h>
-+#include <linux/capability.h>
- #include <net/busy_poll.h>
- 
- /*
-@@ -497,6 +498,50 @@ static inline void ep_set_busy_poll_napi_id(struct epitem *epi)
- 	ep->napi_id = napi_id;
- }
- 
-+static long ep_eventpoll_bp_ioctl(struct file *file, unsigned int cmd,
-+				  unsigned long arg)
-+{
-+	struct eventpoll *ep;
-+	struct epoll_params epoll_params;
-+	void __user *uarg = (void __user *) arg;
-+
-+	ep = file->private_data;
-+
-+	switch (cmd) {
-+	case EPIOCSPARAMS:
-+		if (copy_from_user(&epoll_params, uarg, sizeof(epoll_params)))
-+			return -EFAULT;
-+
-+		if (memchr_inv(epoll_params.__pad, 0, sizeof(epoll_params.__pad)))
-+			return -EINVAL;
-+
-+		if (epoll_params.busy_poll_usecs > U32_MAX)
-+			return -EINVAL;
-+
-+		if (epoll_params.prefer_busy_poll > 1)
-+			return -EINVAL;
-+
-+		if (epoll_params.busy_poll_budget > NAPI_POLL_WEIGHT &&
-+		    !capable(CAP_NET_ADMIN))
-+			return -EPERM;
-+
-+		ep->busy_poll_usecs = epoll_params.busy_poll_usecs;
-+		ep->busy_poll_budget = epoll_params.busy_poll_budget;
-+		ep->prefer_busy_poll = !!epoll_params.prefer_busy_poll;
-+		return 0;
-+	case EPIOCGPARAMS:
-+		memset(&epoll_params, 0, sizeof(epoll_params));
-+		epoll_params.busy_poll_usecs = ep->busy_poll_usecs;
-+		epoll_params.busy_poll_budget = ep->busy_poll_budget;
-+		epoll_params.prefer_busy_poll = ep->prefer_busy_poll;
-+		if (copy_to_user(uarg, &epoll_params, sizeof(epoll_params)))
-+			return -EFAULT;
-+		return 0;
-+	default:
-+		return -ENOIOCTLCMD;
-+	}
-+}
-+
- #else
- 
- static inline bool ep_busy_loop(struct eventpoll *ep, int nonblock)
-@@ -512,6 +557,12 @@ static inline bool ep_busy_loop_on(struct eventpoll *ep)
- {
- 	return false;
- }
-+
-+static long ep_eventpoll_bp_ioctl(struct file *file, unsigned int cmd,
-+				  unsigned long arg)
-+{
-+	return -EOPNOTSUPP;
-+}
- #endif /* CONFIG_NET_RX_BUSY_POLL */
- 
- /*
-@@ -871,6 +922,26 @@ static void ep_clear_and_put(struct eventpoll *ep)
- 		ep_free(ep);
- }
- 
-+static long ep_eventpoll_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
-+{
-+	int ret;
-+
-+	if (!is_file_epoll(file))
-+		return -EINVAL;
-+
-+	switch (cmd) {
-+	case EPIOCSPARAMS:
-+	case EPIOCGPARAMS:
-+		ret = ep_eventpoll_bp_ioctl(file, cmd, arg);
-+		break;
-+	default:
-+		ret = -EINVAL;
-+		break;
-+	}
-+
-+	return ret;
-+}
-+
- static int ep_eventpoll_release(struct inode *inode, struct file *file)
- {
- 	struct eventpoll *ep = file->private_data;
-@@ -977,6 +1048,8 @@ static const struct file_operations eventpoll_fops = {
- 	.release	= ep_eventpoll_release,
- 	.poll		= ep_eventpoll_poll,
- 	.llseek		= noop_llseek,
-+	.unlocked_ioctl	= ep_eventpoll_ioctl,
-+	.compat_ioctl   = compat_ptr_ioctl,
- };
- 
- /*
-diff --git a/include/uapi/linux/eventpoll.h b/include/uapi/linux/eventpoll.h
-index cfbcc4cc49ac..36a002660955 100644
---- a/include/uapi/linux/eventpoll.h
-+++ b/include/uapi/linux/eventpoll.h
-@@ -85,4 +85,17 @@ struct epoll_event {
- 	__u64 data;
- } EPOLL_PACKED;
- 
-+struct epoll_params {
-+	__aligned_u64 busy_poll_usecs;
-+	__u16 busy_poll_budget;
-+	__u8 prefer_busy_poll;
-+
-+	/* pad the struct to a multiple of 64bits for alignment on all arches */
-+	__u8 __pad[5];
-+};
-+
-+#define EPOLL_IOC_TYPE 0x8A
-+#define EPIOCSPARAMS _IOW(EPOLL_IOC_TYPE, 0x01, struct epoll_params)
-+#define EPIOCGPARAMS _IOR(EPOLL_IOC_TYPE, 0x02, struct epoll_params)
-+
- #endif /* _UAPI_LINUX_EVENTPOLL_H */
+> W.r.t the conversion, there are drivers which call
+> tasklet_[disable/enable](), which I suppose
+> can be ignored in the case of workqueues, I am not entirely sure if
+> this is the right approach.
+> Please correct me if I am wrong.
+
+I don't think we can ignore them. I was just looking at tasklet_kill() and
+thought we're good because that seemed to map well to cancel_work_sync().
+workqueue doesn't have the counterpart for tasklet_[disable/enable](). I'll
+look through them and think on it.
+
+Thanks.
+
 -- 
-2.25.1
-
+tejun
 
