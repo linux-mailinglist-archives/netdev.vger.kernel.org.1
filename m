@@ -1,102 +1,125 @@
-Return-Path: <netdev+bounces-69028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97013849309
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 05:48:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81C96849347
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 06:20:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAE8F283ACB
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 04:48:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E71A281F6A
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 05:20:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 784379455;
-	Mon,  5 Feb 2024 04:48:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C508B670;
+	Mon,  5 Feb 2024 05:20:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="QKgyu4Kn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail115-95.sinamail.sina.com.cn (mail115-95.sinamail.sina.com.cn [218.30.115.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313BDAD32
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 04:48:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 507C9BE4C
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 05:20:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707108523; cv=none; b=Ey2INnwpTMJI79lHj+wvhPEzsji9YkEQp3ktRMe1XYAf2ba+9Ft9WjfrVWvwzNcNBg1nkDF1ZKs8duch0CXNHS/UuARhG2ERCYgVFDzxUTmb3ICYDsVD6RNMbohPSQDlS9hvFqCdMyz0uZfXs+GxA49wG1wzlsnqS8UxbS4x3SY=
+	t=1707110403; cv=none; b=F38ntm9HhS+0AXge2z87zGus3l6pW0UYrMEMG5s/ogcI00OplbY8Ivp4AMrzqzfnnrp/SDhU/8UxfFU1YCbvvXtp77buFHxyU9raQLmoUOteVKoarUg9HyfIaGLu94b6jWwjY4ofRbShaLo79JPWrxLCPzL3q8Tp1coX6yqkK4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707108523; c=relaxed/simple;
-	bh=cdJQFz6hZUzWJNGzDH63QwKkJo4AU14dQ2yGTGVLD10=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FtVPNBbPjvy3a+5kVDAfJtvadhMogVYPnFGxGj1ss7ahz196WzVgP44uGr2GPfBJeRaJkPY2QiZrr53yyKRfWEF3kGy3aO+mp41zzcmXr7l2u5LySC7PVmnd0ArX5K8A8Q1/4dO78f5IvJDYu/IvtYuFS2aiW1HCxDtNA9t6Uuo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([113.118.66.117])
-	by sina.com (172.16.235.24) with ESMTP
-	id 65C0689A000008B5; Mon, 5 Feb 2024 12:48:29 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 60248245089159
-X-SMAIL-UIID: 810C1F7E0DE348C6A2CB06103849C575-20240205-124829-1
-From: Hillf Danton <hdanton@sina.com>
-To: Tejun Heo <tj@kernel.org>
-Cc: torvalds@linux-foundation.org,
-	mpatocka@redhat.com,
-	linux-kernel@vger.kernel.org,
+	s=arc-20240116; t=1707110403; c=relaxed/simple;
+	bh=b/F/IvZJvxSYV6yT8GonNahencq0VCJX3syNSsaFNgM=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=glqQ7G7C2Itx85eTWOR2KkWwy9kyW+eLiEx5bDHvSRSlQ/PVIs7beDNghzk5qox+MRxLkI9/H1fSsEr1IJYziVg41gfr7WYZLcdvpWn1coQzrwszDTvFcFoOjvvpRpXZnoM5G6oW5FmJ2Ggw8o9hIdBa71G6uSNGgP3E2W3fg7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=QKgyu4Kn; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-5dc20645871so18147a12.1
+        for <netdev@vger.kernel.org>; Sun, 04 Feb 2024 21:20:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1707110401; x=1707715201; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dW5zoXaotbxS+SYq2Yu+7hcfyLit5t9UvVc+9SbtbuU=;
+        b=QKgyu4KnQu38n2VMRkHNS5SggccUPhHeAB5NHXAIHQQDUrPtX1wBLFaCTwLDrX2HX+
+         OHyTcm7lD7ikBOun9Bx1P64lNpiEdLWY8gwj4WojiQ6vEyZI8Vj7MptLH6mNBp19rtpE
+         vmBvlOGuHDFRkvk/4GLvGMC3TsY55tuFCTqnA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707110401; x=1707715201;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dW5zoXaotbxS+SYq2Yu+7hcfyLit5t9UvVc+9SbtbuU=;
+        b=tW5UTwuUF7pm0UW9Lx3hGk4bKc4H/ftYaaE/gpvQM1H9/5LN7gD3XaBn4q0gqKQRdB
+         ScbHqTnP9WFD08AhnKNFVi98Mpzpok1DMlfhwMrwIL4a0KJHFOR0nzLROcyzvy4QH9/U
+         /cEEWEgecrooIyZJiNY01gqVNRvSs/8ctGAZISRrULvzGueSIFjQuRYJwwzB1l9LE0aN
+         vLgdNL3KlsgciNdqJhQd+dAuM5A9HHaLnoj6VuHAB3+kIOfCnK/CcT3zzkhekaYwsuw/
+         KHPPYRIqXjEsjLxXAaXIPv4k1K3SIeHt+AibS7mqdKEPawcGDA2GSe4V+umN/EU++w2p
+         qXOg==
+X-Gm-Message-State: AOJu0YyBTdEMkBkep90FWx//gbu4PvTavwjhLw3ACJM3RjzSI+7EZFav
+	C0PJeXBknq1gCZCfPtIh65ZZYF3fdon6ouRKkCxajRiJjfcO5SUr/3LYZ0tByw==
+X-Google-Smtp-Source: AGHT+IF9ggkIkGzgeO3uo/eh4fyZDfJpqokYxDxSkwePH8H9UgegtHqrBxC2F2NZ8p3jAZTfYMVDNA==
+X-Received: by 2002:a05:6a20:d909:b0:19e:5e0c:3bb8 with SMTP id jd9-20020a056a20d90900b0019e5e0c3bb8mr7970208pzb.7.1707110400605;
+        Sun, 04 Feb 2024 21:20:00 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCW49LbvIWU+foFA9+KIxmqctHvrKIaSi1hkNesPGFRM7R9cegKJcmHbSFXi3GzjE/YdnB5Fl/OpeO3vZzMH5DaqL6KSgHIyyvlhIQUpyRQReWw22hTiBxoqktD8Cs1h7bN/Cd/Brw9tVOsaoCiNwdisW/3kqqmoiX+5XZTjDIqgn/YKopHvMH6THCVhQxwRn9vXhafxdhJ7MbNsEh9Z/9YUHTbcQNqFSa+eN44LDAwcUHy+/tAEd4rqQbdLVf1pwFbD1iIlD/rVOCG5lAw/zFeMPiZY9dZ2IBAaMoBOvFsYb/QRCnW7ICYfQ42h28TqV1bbU+64mlT2XlHJn9yY0theGA3HEUVu3iIEwKYlsyLO/v8F+HDPf11iYfXrGwhw7dYZ7Am1PDIbpWcadF12ojDSrkZSe+UAP7aKohAyjC+TQld5Zn/uBnxO8g==
+Received: from akaher-virtual-machine.eng.vmware.com ([66.170.99.2])
+        by smtp.gmail.com with ESMTPSA id b16-20020aa78110000000b006dd84763ce3sm5612953pfi.169.2024.02.04.21.19.59
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sun, 04 Feb 2024 21:20:00 -0800 (PST)
+From: Ajay Kaher <ajay.kaher@broadcom.com>
+To: stable@vger.kernel.org,
+	gregkh@linuxfoundation.org
+Cc: mst@redhat.com,
+	jasowang@redhat.com,
+	kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
 	netdev@vger.kernel.org,
-	allen.lkml@gmail.com
-Subject: Re: [PATCH v3 3/8] workqueue: Implement BH workqueues to eventually replace tasklets
-Date: Mon,  5 Feb 2024 12:48:17 +0800
-Message-Id: <20240205044817.593-1-hdanton@sina.com>
-In-Reply-To: <ZcABypwUML6Osiec@slm.duckdns.org>
-References: <20240130091300.2968534-1-tj@kernel.org> <20240130091300.2968534-4-tj@kernel.org>
+	linux-kernel@vger.kernel.org,
+	alexey.makhalov@broadcom.com,
+	vasavi.sirnapalli@broadcom.com,
+	Prathu Baronia <prathubaronia2011@gmail.com>,
+	Ajay Kaher <ajay.kaher@broadcom.com>
+Subject: [PATCH v6.1.y-v4.19.y] vhost: use kzalloc() instead of kmalloc() followed by memset()
+Date: Mon,  5 Feb 2024 10:49:37 +0530
+Message-Id: <1707110377-1483-1-git-send-email-ajay.kaher@broadcom.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-On Sun, 4 Feb 2024 11:28:06 -1000 Tejun Heo <tj@kernel.org>
-> +static void bh_worker(struct worker *worker)
-> +{
-> +	struct worker_pool *pool = worker->pool;
-> +	int nr_restarts = BH_WORKER_RESTARTS;
-> +	unsigned long end = jiffies + BH_WORKER_JIFFIES;
-> +
-> +	raw_spin_lock_irq(&pool->lock);
-> +	worker_leave_idle(worker);
-> +
-> +	/*
-> +	 * This function follows the structure of worker_thread(). See there for
-> +	 * explanations on each step.
-> +	 */
-> +	if (!need_more_worker(pool))
-> +		goto done;
-> +
-> +	WARN_ON_ONCE(!list_empty(&worker->scheduled));
-> +	worker_clr_flags(worker, WORKER_PREP | WORKER_REBOUND);
-> +
-> +	do {
-> +		struct work_struct *work =
-> +			list_first_entry(&pool->worklist,
-> +					 struct work_struct, entry);
-> +
-> +		if (assign_work(work, worker, NULL))
-> +			process_scheduled_works(worker);
-> +	} while (keep_working(pool) &&
-> +		 --nr_restarts && time_before(jiffies, end));
-> +
-> +	worker_set_flags(worker, WORKER_PREP);
-> +done:
-> +	worker_enter_idle(worker);
-> +	kick_pool(pool);
-> +	raw_spin_unlock_irq(&pool->lock);
-> +}
+From: Prathu Baronia <prathubaronia2011@gmail.com>
 
-I see no need to exec bh works for 2ms with irq disabled.
+From: Prathu Baronia <prathubaronia2011@gmail.com>
+
+commit 4d8df0f5f79f747d75a7d356d9b9ea40a4e4c8a9 upstream
+
+Use kzalloc() to allocate new zeroed out msg node instead of
+memsetting a node allocated with kmalloc().
+
+Signed-off-by: Prathu Baronia <prathubaronia2011@gmail.com>
+Message-Id: <20230522085019.42914-1-prathubaronia2011@gmail.com>
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+[Ajay: This is a security fix as per CVE-2024-0340]
+Signed-off-by: Ajay Kaher <ajay.kaher@broadcom.com>
+---
+ drivers/vhost/vhost.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+index 07427302084955..ecb3b397bb3888 100644
+--- a/drivers/vhost/vhost.c
++++ b/drivers/vhost/vhost.c
+@@ -2563,12 +2563,11 @@ EXPORT_SYMBOL_GPL(vhost_disable_notify);
+ /* Create a new message. */
+ struct vhost_msg_node *vhost_new_msg(struct vhost_virtqueue *vq, int type)
+ {
+-	struct vhost_msg_node *node = kmalloc(sizeof *node, GFP_KERNEL);
++	/* Make sure all padding within the structure is initialized. */
++	struct vhost_msg_node *node = kzalloc(sizeof(*node), GFP_KERNEL);
+ 	if (!node)
+ 		return NULL;
+ 
+-	/* Make sure all padding within the structure is initialized. */
+-	memset(&node->msg, 0, sizeof node->msg);
+ 	node->vq = vq;
+ 	node->msg.type = type;
+ 	return node;
 
