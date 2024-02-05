@@ -1,89 +1,121 @@
-Return-Path: <netdev+bounces-69144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BD08849BAE
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 14:26:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F37C849BC0
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 14:28:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DB6F1C22266
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 13:26:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 520F2285EA7
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 13:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C39FE1CD0B;
-	Mon,  5 Feb 2024 13:26:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42EEE1CAAD;
+	Mon,  5 Feb 2024 13:28:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jyBR9MSN"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="g9WM9paX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mout.web.de (mout.web.de [212.227.15.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93DFA1BC2C;
-	Mon,  5 Feb 2024 13:26:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B19B1CD05;
+	Mon,  5 Feb 2024 13:28:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707139565; cv=none; b=SJkHnDTKaP3NlLEJZLwK+PUcMQTFsNEvrhqpMluJY957Xjv00aVSMQdxCMhlYvzOdnANakbMyIFgiNkG7Vsl+sExvtOfgOnnx33/fSk8g1sl8VJ6QkANjxGUsxpXFM2ZbU9USulvKWbDuXqUOTTniLq+7BfFZmC3FxmAiITyZPQ=
+	t=1707139717; cv=none; b=sy5ejbwy8kB+rhZXZUrYnUyOJ/Lw6Xo2//jWg+/zoeiV6MtW0/JH7jTlMPi4PfGQpIUu3QR3SPv8BBxe9nKzUBDZ+We8CgP1hjJ3kHZy7zaMPQh58vJ3W4Q3Y0oz+Ig5Po2qBdDaSnMHmomq6p6UPZOLq8eVQcdXsftqWRNJlvc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707139565; c=relaxed/simple;
-	bh=q7nSmRJBI2/Cgs4/oUfpOyDiIZNOR8iZOT4OzRazNA8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tQ+gh0ZMDac5FRUUX2JuaUmfB4yXjIv1tDUPBQPQRNUqRU2Wm7IbVxhkY+SeRWhpauA/1Epj4PcAszFA2jOka/RNRxUTh7DdwsjiF8y4xi1RB6JjsNYy5maUklOs7mn0xaZdU/D6SJ8MbGnlvwmalNYhbAtDDpoNcAT/j/1fsnw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jyBR9MSN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E911BC433C7;
-	Mon,  5 Feb 2024 13:26:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707139565;
-	bh=q7nSmRJBI2/Cgs4/oUfpOyDiIZNOR8iZOT4OzRazNA8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=jyBR9MSNfeZVO5FaXWHuqEZsTw/uIniXwi0dlwiIlOBTG7cqi9gQ14zr6P+ku7f53
-	 GdpB9CvayJiWiRBHqVS0wa/9V0NWwLJnWHx42Tjw5HfaQ1cKc3nj1Gk5c3j4CK2CXI
-	 y6AbHYa6ByipwbcPOwRhTkM4GwoUQezbhIOsVDGEhiUkGAtjhqFbBkzVVJpUXwWxAd
-	 Q3r57RolLiLnutnqC9l2GcgosquH/IW8lY2BC/QqRS6wed1eNBJ7lEfTvgMoMW+jKF
-	 3d7hU1w36bTI1nMlKaEsNs+yCMdUKIYq21s56l2PkoqKhw6YWOEeoUiXAuSAFRJj0f
-	 aZQwKleD70Beg==
-Date: Mon, 5 Feb 2024 13:26:00 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Colin Ian King <colin.i.king@gmail.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH][next] mlx4: Fix spelling mistake: "mape" -> "map"
-Message-ID: <20240205132600.GJ960600@kernel.org>
-References: <20231209225135.4055334-1-colin.i.king@gmail.com>
- <20231212203043.GF5817@kernel.org>
- <20231212131913.4195bc38@kernel.org>
+	s=arc-20240116; t=1707139717; c=relaxed/simple;
+	bh=YOHneSgCtSbbCAEEWSDGu9l2zrgvc3/nDi0e9391Wz0=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=l5/03DFgHgvz6gavF0onHEKADJftONKLU3zjcy4oN+Hrnq5oubRWrLS+ZhcTg9Udh5EukJRGi35F/PivRn5CRFwt26e8WMzD5sPl64kF1tl+nZCa0nuBkH0iZdwhEvTzRsQIOiCBOg3yFDLeWa0QG/LzXWeTJSYe8MsYhiJZT7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=g9WM9paX; arc=none smtp.client-ip=212.227.15.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de; s=s29768273;
+	t=1707139698; x=1707744498; i=markus.elfring@web.de;
+	bh=YOHneSgCtSbbCAEEWSDGu9l2zrgvc3/nDi0e9391Wz0=;
+	h=X-UI-Sender-Class:Date:To:Cc:From:Subject;
+	b=g9WM9paXjX9wywiuC5nYS8ycoFA8SfmefVc3BzD/de7CgVa5xl428ZKV3T2K/rXR
+	 a3uiJ6giTkCdc1D9V/3Sih5jKBSKoR7VgFXvaplcCgCyTeGI9ML58d8JjWw/UQgRH
+	 YmyvT9Tx4UeAl4VXa/Bp7QNXitL2ynZgr2pAZfUraj0eAmm/wT5Q5lqldor8SZ9Qq
+	 SGpOpdECNvPAPl7KDNpVD+MMJyNO0ANtEKWxlx2EjKR90jm1EJi2QXqYLlWIPWlY7
+	 mrsYWBAUnjwzMMZ/rQFQgDbSs+UCOJNflpSbeUBK92X945/jymU3f2FHHj/C/SRN6
+	 jhcxr1VKT8GzigsTSA==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.85.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1N5lnT-1qwC8P30jj-0170l7; Mon, 05
+ Feb 2024 14:28:18 +0100
+Message-ID: <46f64db3-3f8f-4c6c-8d70-38daeefccac1@web.de>
+Date: Mon, 5 Feb 2024 14:28:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20231212131913.4195bc38@kernel.org>
+User-Agent: Mozilla Thunderbird
+To: netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
+Content-Language: en-GB
+Cc: LKML <linux-kernel@vger.kernel.org>
+From: Markus Elfring <Markus.Elfring@web.de>
+Subject: [PATCH] ethernet: wiznet: Use
+ devm_platform_get_and_ioremap_resource() in w5300_hw_probe()
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:4kOjvGr+eOI8kHD1c1zu6LXaME5jhgkOkZMJfdQiWaPO+hwI4+V
+ 1c2xPp5WClaUGRqNxb4QwwylZTeYI3ecagsR2nLhEev5Wgk+uR9ef30UbqlRzzbvAltYQUn
+ aR1iGEWAks1T4Rj2kA/Afc8K16tQ24UXK5WjkEZBjDUppBZM57BXAKt/Bsmu8u88kRLc2u8
+ dZ+uNdjSMMSVU7D9/qjlQ==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:4Ac7b6On9jk=;4ivussFx913jbC6WDFNJonKUDMR
+ RTAavQciVlj3k8PuQ4w9/Nr5QcB+YnV+6crIhImjI3/YeAvQdK5xhu7v/jUbW1lh0mrKJd+LZ
+ DJTBersgp2hQgNZGB0pKdxzsIyEZIDHS/FuUfFIExwzpVkGpiYpMRwp5d7IGe0pyJhanZa7Mf
+ yr/CVeBpfC8+zqYgFksNNsrY6NK3Lr801dJPej85YuNjTRXZgBfZtW8ceQiz2ZFLUhEDTJ3WE
+ rF75wTPgjF17D+jHvIkVHKHb3mz0fdLrKXHgucEtPEsMLDkzAZdhcgvD/bUOAffEP2+YZu8EA
+ QiuL4EjQ3SdElBsTMtFBiimMU+1zpQ/sQzBiHcPuScpKRb9hyYW4Liq5BrX7khyWggIeFz2l5
+ rGg4T9R+Lf2tvh17lOTN9pA6prLqXUW2xVD/eMO2iyauWz1OoXNI4P9RQr/0Ey7DWJGyBgzRz
+ mXAZg02oBQKwlVyE6fAjy6T6xcfuBiFcJCku6IJ7Oy90e7JLot9wGzK5VQzqEhMsoNHPOecCj
+ +L7Z/7FyLi4wz+/LTNnd6e4GBnPYLycTkbPvSAnVsJo0r+6sV5IWR2aio2uqzjsdV9d0DkgZ5
+ Oxd4DPh+0jAmqp5ZLgvXBK1YPZNTif8+idWI0RR1mkknX27WJLKGi9/eZltTorYC1NbBEohVG
+ H/fdzra39ratSLB5h7twMuKip3V9Mfoy9QuKYmueKSHIGdJLV5Ua7rkqAr3ob3GAm4C2A/7hM
+ YVLUtCc/SJF4ygcnQGzyXzSWckd82iDebD+Xwvzg8KqF6SE5OLgYC5MCJsi4fAKqHhlgC0VoX
+ XimXV2409vqXyEenchjP888MTbdx41aJMPtm20bCOejeY=
 
-On Tue, Dec 12, 2023 at 01:19:13PM -0800, Jakub Kicinski wrote:
-> On Tue, 12 Dec 2023 20:30:43 +0000 Simon Horman wrote:
-> > On Sat, Dec 09, 2023 at 10:51:35PM +0000, Colin Ian King wrote:
-> > > There is a spelling mistake in a mlx4_err error message. Fix it.
-> > > 
-> > > Signed-off-by: Colin Ian King <colin.i.king@gmail.com>  
-> > 
-> > Hi Colin,
-> > 
-> > I am guessing that you are focusing on error messages and other user-facing
-> > spelling errors (perhaps you told me f2f in the hallway track at Kernel
-> > Recipes).  But I do wonder if you have plans to address other spelling
-> > errors in this driver. codespell flags many, including 'segements' in a
-> > comment in the same file.
-> 
-> It'd be great to fix all the codespell issues with one path, IMO.
+From: Markus Elfring <elfring@users.sourceforge.net>
+Date: Mon, 5 Feb 2024 14:22:32 +0100
 
-For the record, I have sent a follow up here:
+A wrapper function is available since the commit 890cc39a879906b63912482df=
+c41944579df2dc6
+("drivers: provide devm_platform_get_and_ioremap_resource()").
+Thus reuse existing functionality instead of keeping duplicate source code=
+.
 
- - [PATCH net-nex] mlx4: Address spelling errors
-   https://lore.kernel.org/netdev/20240205-mlx5-codespell-v1-1-63b86dffbb61@kernel.org/
+This issue was detected by using the Coccinelle software.
+
+Signed-off-by: Markus Elfring <elfring@users.sourceforge.net>
+=2D--
+ drivers/net/ethernet/wiznet/w5300.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/drivers/net/ethernet/wiznet/w5300.c b/drivers/net/ethernet/wi=
+znet/w5300.c
+index 3318b50a5911..f165616f36fe 100644
+=2D-- a/drivers/net/ethernet/wiznet/w5300.c
++++ b/drivers/net/ethernet/wiznet/w5300.c
+@@ -539,8 +539,7 @@ static int w5300_hw_probe(struct platform_device *pdev=
+)
+ 		eth_hw_addr_random(ndev);
+ 	}
+
+-	mem =3D platform_get_resource(pdev, IORESOURCE_MEM, 0);
+-	priv->base =3D devm_ioremap_resource(&pdev->dev, mem);
++	priv->base =3D devm_platform_get_and_ioremap_resource(pdev, 0, &mem);
+ 	if (IS_ERR(priv->base))
+ 		return PTR_ERR(priv->base);
+
+=2D-
+2.43.0
+
 
