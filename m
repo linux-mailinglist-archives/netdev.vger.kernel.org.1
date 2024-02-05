@@ -1,99 +1,242 @@
-Return-Path: <netdev+bounces-69169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33F53849E98
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 16:40:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57AD0849EBE
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 16:49:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E31F4288FE0
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 15:40:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C7981C21F69
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 15:49:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70DAF2E41C;
-	Mon,  5 Feb 2024 15:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49FEE2D627;
+	Mon,  5 Feb 2024 15:49:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hd05C1pH"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gJlQbXIi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BFCA2DF9D
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 15:40:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977872FE2D
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 15:49:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707147625; cv=none; b=j4eKd9xrEEUsTN1Ys1Oe6d6JVngHYGWGFKrx8DvNG9W97AesDRP0nKKZiBtDWjsnIuk2KwKCEiFghtZ0cX4hz6LY9FVaaGDepVeH9KPA8sR3qC8Ow3GeJUCqVD0/AqSpVJo6SDImhcOOlogBpOa0ChJi6Bbw8MD6GHhD1jdsDeY=
+	t=1707148182; cv=none; b=hCYp9BuMykR4s4AeqJgJRnsHKXS49dgvE37cx9f1fxordWRfoSJBH8s8bIEEEiBqj74kUJZR0vzLAoYeloXoErqqlQd7x5zE3k79hGi9NhOKbgC1mhpTCipH4eysMQa4kiftblvU+bFlO9vZ3VHlwo39PcJmn96Jjbc8EQY+MmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707147625; c=relaxed/simple;
-	bh=jDKkz6Zix4ySovCgXmnQVLCBYWku0mUzf9t6NVL6yBM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=X21ylfiEfaIZcsaDlfr1W4gXLaWNgMMEjaulvRHCdyXsD09oztDkueM/T9KoSK9AwZ/WQiWjMVul1ZcFIm4y50D34lCoc52XCMS+rbFy035h/Qoa9Z0aFMgHFEUC+xaICx0WVfe6IHU9y/hN6/Tl83yR0lJddzz5FpxW74j5iH0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hd05C1pH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C9BEAC433F1;
-	Mon,  5 Feb 2024 15:40:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707147624;
-	bh=jDKkz6Zix4ySovCgXmnQVLCBYWku0mUzf9t6NVL6yBM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hd05C1pHKAm6Cvjop2bGU1QzjL3Jy/u/PScKHBIGsD6T1GQkrK+mNY9daWCLB5Ugr
-	 7o5sPpWytjEPQfjC7TZHqNK43Hzh5mRKKpxE44qc8Uy4csAPv/KOgjzMoQBVXLUNYM
-	 LiqA0wwC7iFnYdn+cjo9bIUrxrinrPLuyXiMwbuAryhmpd0ZIWow0f3p4l8DHFR+pc
-	 0BcHotGujuRrcrO4xIvBRc+JGCkNNfZR9c0qcMvz9McanL3o9vrsn8LcW632gvnCd3
-	 Pu1PImAU6cXm4+59htGbVxKMZgTEAjA4qs87nUYozSG8cVqtpzL1Qx2jrALjZ37BS6
-	 fGC/0HRoMyZBw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B01CAE2F2ED;
-	Mon,  5 Feb 2024 15:40:24 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1707148182; c=relaxed/simple;
+	bh=jtl4zn9kWAobpMYBjdg/hkxX7S+7NkdnPpo9EtJwoXY=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=NqFW/Z+0JQmbe42mxhM1PtXjXnZNV81ghANEj628dtcEsqSWNkLtewRKHlss3VKdIujECIDfBwFe+Xz0XgrG+TDNKev1HdnwxzqIEQyjwqzzBzL0DRtYCNbaLWdYztQLsaukyGiAsZuZ5EMcyZbOudsEQ13iKFK3R5t1SzvKhnI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gJlQbXIi; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707148179;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=PWytvdzbwNmivemu1wpy4MQP/x1HOWB6HRVe6Ea1Fio=;
+	b=gJlQbXIiGj2JF/zTm+3mMiPgFWBrkEq3fjv4gP76O2Ef64X76hcBYO4e8i+fZI3A8YYxs5
+	RMGhjUgmErw1TVsc6oR8AdFpJCuWNyd8jZ1KTzNsVrl+QwbwA40rYxP6K3KgkPqmQlgxIh
+	sonmWjASpixmqjoP8waWnBfxG46r6Pk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-286-2mk2fIDiNzuhf2PUZpfjZQ-1; Mon, 05 Feb 2024 10:49:38 -0500
+X-MC-Unique: 2mk2fIDiNzuhf2PUZpfjZQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40e354aaf56so10694705e9.1
+        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 07:49:37 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707148176; x=1707752976;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=PWytvdzbwNmivemu1wpy4MQP/x1HOWB6HRVe6Ea1Fio=;
+        b=R8GIhN4x+9z7IzCO2cxfUbFmB1kDQUfp4V9T0+mW6CvTm+6ikVdG8+8pi4K2qRV0ZU
+         c75PAXIeYtVT8dcWpQRhcFROc4G918+eKGq/8IARjBG73VR4ifNWvsoj25IeuAduSWzc
+         hsljKQWtX90HrnqknIChoLAJaoNjSSUCu1d6QqYDlqGcfPl2kHQ6M5w2YPGf53I3+Nbi
+         0h8fcMtZbyRsCvwUthhmhCeRMT4MUeTrAyk6RP+z7Coth+1xkM64tiUTts7Fhn5E7Tp4
+         YvJdW/5GFlwUpg7otTQ3XWQOjt0hjic3xqdS3rH1VXJdGp+y0rqgaq0hPqKkVMzMjBDf
+         AAGA==
+X-Forwarded-Encrypted: i=1; AJvYcCW+gmV/7HdVShM6CXWp27AtYkoCPvakHnYoDXv0tMyPg9VjeA1K0xBL0lL+H1WKWfjvn7mF8agFF2IFDlM1RSnY7O057Ttj
+X-Gm-Message-State: AOJu0YzWiwZ86yY971tczCaIQpVVVOGOBMOhEzstktLgs/PtYlKEFxUn
+	cvDCQtWAl6GV8/meYXBZwKb/2xG4A9ytK/5gq0n8imSwQg0a31hSbkd6u0vUkzbkdH9BrvcQ1+/
+	g+5c6K89+Mskw8i7NQGWL6YT9O3eps6gfwiMBrrvu2TaosmJDxQ3bDw==
+X-Received: by 2002:a05:600c:1c2a:b0:40f:c996:193b with SMTP id j42-20020a05600c1c2a00b0040fc996193bmr119492wms.3.1707148176267;
+        Mon, 05 Feb 2024 07:49:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG1QfwhepoZnSsm4BWenzYrR0k9pfnBGVdJ1niYohNnxtZV/8O0jafaQB+rL3UlDpD1IHBOEA==
+X-Received: by 2002:a05:600c:1c2a:b0:40f:c996:193b with SMTP id j42-20020a05600c1c2a00b0040fc996193bmr119462wms.3.1707148175413;
+        Mon, 05 Feb 2024 07:49:35 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVM+JqNW7xABzLXF7DpTuWOZU2IwSHM/xrdq3euK6JABlo8NIBuWK94socug0n3Fa/D3Nh/u4TYDq3G4gVembzMh2rTT8lSYO6FCAhkt96ZTbE0mGmtBa8izxmZVIzFFh/ifxUT49T9l2exDogN6ifLW+16c8CoARVMvwyE7TO0MaafEkTqKL0CXNw4xXQALObId3roWpfM7rA8uOWaydfq5XvR4EgxtA+V7DSEBQr93iWJgrdnzEtIQERBWm0v7XIbUGlscAVrO9l/EFCPbIdRuvgMbH5pJaBhPU4+OKcdMkwpak7ozL3G7z9Zw14LVL6MyyAfYS2KS2NzGqiJ7mJHLa5R0Mh4PTgB6pTgUBzvBKQZELda7ScOg/O4qcY=
+Received: from gerbillo.redhat.com (146-241-230-60.dyn.eolo.it. [146.241.230.60])
+        by smtp.gmail.com with ESMTPSA id t18-20020a05600c199200b0040ecdd672fasm213707wmq.13.2024.02.05.07.49.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 05 Feb 2024 07:49:34 -0800 (PST)
+Message-ID: <d174364c12366b1f5eeb616cba078f6682d629f5.camel@redhat.com>
+Subject: Re: [PATCH v2 1/6] net: wan: Add support for QMC HDLC
+From: Paolo Abeni <pabeni@redhat.com>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>, Mark Brown
+ <broonie@kernel.org>, Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Date: Mon, 05 Feb 2024 16:49:33 +0100
+In-Reply-To: <20240205152208.73535549@bootlin.com>
+References: <20240130084035.115086-1-herve.codina@bootlin.com>
+	 <20240130084035.115086-2-herve.codina@bootlin.com>
+	 <b1968b5c7e88edd448d5f55b57dfa40257b2b06c.camel@redhat.com>
+	 <20240205152208.73535549@bootlin.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v8 0/5] netdevsim: link and forward skbs between
- ports
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170714762471.16310.3984884901020396555.git-patchwork-notify@kernel.org>
-Date: Mon, 05 Feb 2024 15:40:24 +0000
-References: <20240130214620.3722189-1-dw@davidwei.uk>
-In-Reply-To: <20240130214620.3722189-1-dw@davidwei.uk>
-To: David Wei <dw@davidwei.uk>
-Cc: kuba@kernel.org, jiri@resnulli.us, sd@queasysnail.net,
- netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 30 Jan 2024 13:46:16 -0800 you wrote:
-> This patchset adds the ability to link two netdevsim ports together and
-> forward skbs between them, similar to veth. The goal is to use netdevsim
-> for testing features e.g. zero copy Rx using io_uring.
-> 
-> This feature was tested locally on QEMU, and a selftest is included.
-> 
-> 
+On Mon, 2024-02-05 at 15:22 +0100, Herve Codina wrote:
+> Hi Paolo,
+>=20
+> On Thu, 01 Feb 2024 12:41:32 +0100
+> Paolo Abeni <pabeni@redhat.com> wrote:
+>=20
 > [...]
+> > > +static inline struct qmc_hdlc *netdev_to_qmc_hdlc(struct net_device =
+*netdev)
+> > > +{
+> > > +	return dev_to_hdlc(netdev)->priv;
+> > > +} =20
+> >=20
+> > Please, no 'inline' function in c files. You could move this function
+> > and the struct definition into a new, local, header file.
+>=20
+> 'inline' function specifier will be removed in the next iteration on the =
+series.
+>=20
+> >=20
+> > > +static int qmc_hdlc_recv_queue(struct qmc_hdlc *qmc_hdlc, struct qmc=
+_hdlc_desc *desc, size_t size);
+> > > +
+> > > +#define QMC_HDLC_RX_ERROR_FLAGS (QMC_RX_FLAG_HDLC_OVF | \
+> > > +				 QMC_RX_FLAG_HDLC_UNA | \
+> > > +				 QMC_RX_FLAG_HDLC_ABORT | \
+> > > +				 QMC_RX_FLAG_HDLC_CRC)
+> > > +
+> > > +static void qmc_hcld_recv_complete(void *context, size_t length, uns=
+igned int flags)
+> > > +{
+> > > +	struct qmc_hdlc_desc *desc =3D context;
+> > > +	struct net_device *netdev =3D desc->netdev;
+> > > +	struct qmc_hdlc *qmc_hdlc =3D netdev_to_qmc_hdlc(netdev);
+> > > +	int ret; =20
+> >=20
+> > Please, respect the reverse x-mas tree order for local variable
+> > definition.
+>=20
+> desc depends on context, netdev depends on desc and qmc_hdlc depends on n=
+etdev.
+> I think the declaration order is correct here even it doesn't respect the=
+ reverse
+> x-mas tree.
+>=20
+> [...]
+> > > +static netdev_tx_t qmc_hdlc_xmit(struct sk_buff *skb, struct net_dev=
+ice *netdev)
+> > > +{
+> > > +	struct qmc_hdlc *qmc_hdlc =3D netdev_to_qmc_hdlc(netdev);
+> > > +	struct qmc_hdlc_desc *desc;
+> > > +	unsigned long flags;
+> > > +	int ret;
+> > > +
+> > > +	spin_lock_irqsave(&qmc_hdlc->tx_lock, flags);
+> > > +	desc =3D &qmc_hdlc->tx_descs[qmc_hdlc->tx_out];
+> > > +	if (WARN_ONCE(!desc->skb, "No tx descriptors available\n")) {
+> > > +		/* Should never happen.
+> > > +		 * Previous xmit should have already stopped the queue.
+> > > +		 */
+> > > +		netif_stop_queue(netdev);
+> > > +		spin_unlock_irqrestore(&qmc_hdlc->tx_lock, flags);
+> > > +		return NETDEV_TX_BUSY;
+> > > +	}
+> > > +	spin_unlock_irqrestore(&qmc_hdlc->tx_lock, flags);
+> > > +
+> > > +	desc->netdev =3D netdev;
+> > > +	desc->dma_size =3D skb->len;
+> > > +	desc->skb =3D skb;
+> > > +	ret =3D qmc_hdlc_xmit_queue(qmc_hdlc, desc);
+> > > +	if (ret) {
+> > > +		desc->skb =3D NULL; /* Release the descriptor */
+> > > +		if (ret =3D=3D -EBUSY) {
+> > > +			netif_stop_queue(netdev);
+> > > +			return NETDEV_TX_BUSY;
+> > > +		}
+> > > +		dev_kfree_skb(skb);
+> > > +		netdev->stats.tx_dropped++;
+> > > +		return NETDEV_TX_OK;
+> > > +	}
+> > > +
+> > > +	qmc_hdlc->tx_out =3D (qmc_hdlc->tx_out + 1) % ARRAY_SIZE(qmc_hdlc->=
+tx_descs);
+> > > +
+> > > +	spin_lock_irqsave(&qmc_hdlc->tx_lock, flags);
+> > > +	if (qmc_hdlc->tx_descs[qmc_hdlc->tx_out].skb)
+> > > +		netif_stop_queue(netdev);
+> > > +	spin_unlock_irqrestore(&qmc_hdlc->tx_lock, flags); =20
+> >=20
+> > The locking schema is quite bad, as the drivers acquires and releases 3
+> > locks for each tx packet. You could improve that using the qmc_chan-
+> > > tx_lock to protect the whole qmc_hdlc_xmit() function, factoring out =
+a =20
+> > lockless variant of qmc_hdlc_xmit_queue(),=C2=A0and using it here.
+>=20
+> I will change on next iteration and keep 2 lock/unlock instead of 3:
+>   - one in qmc_hdlc_xmit()
+>   - one in qmc_hdlc_xmit_complete()=20
+> to protect the descriptors accesses.
+>=20
+> >=20
+> > In general is quite bad that the existing infra does not allow
+> > leveraging NAPI. Have you considered expanding the QMC to accomodate
+> > such user?
+>=20
+> I cannot mask/unmask the 'end of transfer' interrupt.
+> Indeed, other streams use this interrupt among them audio streams and so
+> masking the interrupt for HDLC data will also mask the interrupt for audi=
+o
+> data.
 
-Here is the summary with links:
-  - [net-next,v8,1/4] netdevsim: allow two netdevsim ports to be connected
-    (no matching commit)
-  - [net-next,v8,2/4] netdevsim: forward skbs from one connected port to another
-    (no matching commit)
-  - [net-next,v8,3/4] netdevsim: add selftest for forwarding skb between connected ports
-    (no matching commit)
-  - [net-next,v8,4/4] netdevsim: add Makefile for selftests
-    https://git.kernel.org/netdev/net-next/c/8ff25dac88f6
+Uhm... I fear the above makes the available options list empty :(
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> At the HDLC driver level, the best I can to is to store a queue of comple=
+te
+> HDLC skbs (queue filled on interrupts) and send them to the network stack
+> when the napi poll() is called.
+>=20
+> I am not sure that this kind of queue (additional level between always
+> enabled interrupts and the network stack) makes sense.
+>=20
+> Do you have any opinion about this additional queue management for NAPI
+> support?
 
+With such idea in place, what HDLC-level data will be accessed by the
+napi context? The RX interrupts will remain unmasked after the
+interrupt and before the napi poll right? That would be
+problematic/could cause drop if the ingress pkt/interrupt rate will be
+higher that what the napi could process - and that in turn could bring
+back old bad livelock times :(
+
+Cheers,
+
+Paolo
 
 
