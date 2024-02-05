@@ -1,251 +1,102 @@
-Return-Path: <netdev+bounces-69025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CEF4849300
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 05:45:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97013849309
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 05:48:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01D9C1C210E3
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 04:45:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAE8F283ACB
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 04:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F4F9468;
-	Mon,  5 Feb 2024 04:45:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cy6D5Vwq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 784379455;
+	Mon,  5 Feb 2024 04:48:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail115-95.sinamail.sina.com.cn (mail115-95.sinamail.sina.com.cn [218.30.115.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90581AD22
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 04:45:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 313BDAD32
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 04:48:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707108318; cv=none; b=iOp2jZE9TD3T77vVehpx4nL+npqHZo8rPxPPlttmRzU2o0ZRG8XRUbNZx5+lXITODjRqU79MaxzsJU7B2g+vxSjKes7FRALY4qO37kz2HnMjXKXwqT+f1QBdcPwZMkbSO3/EQPaYT6j67811Rrp5E5ZN+K4UDxR+jXkejDbks4c=
+	t=1707108523; cv=none; b=Ey2INnwpTMJI79lHj+wvhPEzsji9YkEQp3ktRMe1XYAf2ba+9Ft9WjfrVWvwzNcNBg1nkDF1ZKs8duch0CXNHS/UuARhG2ERCYgVFDzxUTmb3ICYDsVD6RNMbohPSQDlS9hvFqCdMyz0uZfXs+GxA49wG1wzlsnqS8UxbS4x3SY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707108318; c=relaxed/simple;
-	bh=zodg4pjND8pp/3Aql4d4jo/RRU8mCqXSLetSXg1Gc1s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mfvuSqll/rFZ6iCSIutNuB6+GZNiPuPT30fzH5+BRRcDzEmsIxoQajVNw+5mRTbef9nS9u+hK36S0GhutrS6KL30OsTPzI3llNQPIbJ5YyMBMb3TuUNI4y231SWO3ADSjfL32Bdj34v1t0Weh/fODf3fqqgWTZJV9K8p+94W82k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cy6D5Vwq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 525D9C433F1;
-	Mon,  5 Feb 2024 04:45:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707108317;
-	bh=zodg4pjND8pp/3Aql4d4jo/RRU8mCqXSLetSXg1Gc1s=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cy6D5VwqJmoNgZEFz57gxpDEgrqaH3KaNJpdzIbQYC4QtSIVmYG3MFOhXzqwbZu3r
-	 7+KgjoI3Hu67RuqIRup0vxec4Ms/82T2fX62EHSlVsPhFUEa1jApjQ4KjTN1vcl7CZ
-	 yz1znv9EkrJESNMhjYW2hFCD3EFABrYg5c2I3XYuNC2BBGQ3Gg42FwuzmCiaj/T0pm
-	 FDPbMxvvZh/qfQc8LHdRvQOmYAX9gv9Dca6M9qKE3LQAita8SIs7JJgE3JBcuD4Rrn
-	 MFCcHDGXy/qDxXkokXib+H5Dx8aqWpnuM5Am4gy+Uk3RDQrQ99IcAnfQeG9ocfIGEQ
-	 xKd4gJQ8YYP6w==
-Message-ID: <2ddfe75a-45e4-4499-8aae-4d83de90d1ce@kernel.org>
-Date: Sun, 4 Feb 2024 21:45:16 -0700
+	s=arc-20240116; t=1707108523; c=relaxed/simple;
+	bh=cdJQFz6hZUzWJNGzDH63QwKkJo4AU14dQ2yGTGVLD10=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=FtVPNBbPjvy3a+5kVDAfJtvadhMogVYPnFGxGj1ss7ahz196WzVgP44uGr2GPfBJeRaJkPY2QiZrr53yyKRfWEF3kGy3aO+mp41zzcmXr7l2u5LySC7PVmnd0ArX5K8A8Q1/4dO78f5IvJDYu/IvtYuFS2aiW1HCxDtNA9t6Uuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([113.118.66.117])
+	by sina.com (172.16.235.24) with ESMTP
+	id 65C0689A000008B5; Mon, 5 Feb 2024 12:48:29 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 60248245089159
+X-SMAIL-UIID: 810C1F7E0DE348C6A2CB06103849C575-20240205-124829-1
+From: Hillf Danton <hdanton@sina.com>
+To: Tejun Heo <tj@kernel.org>
+Cc: torvalds@linux-foundation.org,
+	mpatocka@redhat.com,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	allen.lkml@gmail.com
+Subject: Re: [PATCH v3 3/8] workqueue: Implement BH workqueues to eventually replace tasklets
+Date: Mon,  5 Feb 2024 12:48:17 +0800
+Message-Id: <20240205044817.593-1-hdanton@sina.com>
+In-Reply-To: <ZcABypwUML6Osiec@slm.duckdns.org>
+References: <20240130091300.2968534-1-tj@kernel.org> <20240130091300.2968534-4-tj@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 3/5] net/ipv6: Remove expired routes with a
- separated list of routes.
-Content-Language: en-US
-To: thinker.li@gmail.com, netdev@vger.kernel.org, ast@kernel.org,
- martin.lau@linux.dev, kernel-team@meta.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, liuhangbin@gmail.com
-Cc: sinquersw@gmail.com, kuifeng@meta.com
-References: <20240202082200.227031-1-thinker.li@gmail.com>
- <20240202082200.227031-4-thinker.li@gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240202082200.227031-4-thinker.li@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 2/2/24 1:21 AM, thinker.li@gmail.com wrote:
-> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-> index 733ace18806c..36bfa987c314 100644
-> --- a/net/ipv6/addrconf.c
-> +++ b/net/ipv6/addrconf.c
-> @@ -1255,6 +1255,7 @@ static void
->  cleanup_prefix_route(struct inet6_ifaddr *ifp, unsigned long expires,
->  		     bool del_rt, bool del_peer)
->  {
-> +	struct fib6_table *table;
->  	struct fib6_info *f6i;
->  
->  	f6i = addrconf_get_prefix_route(del_peer ? &ifp->peer_addr : &ifp->addr,
+On Sun, 4 Feb 2024 11:28:06 -1000 Tejun Heo <tj@kernel.org>
+> +static void bh_worker(struct worker *worker)
+> +{
+> +	struct worker_pool *pool = worker->pool;
+> +	int nr_restarts = BH_WORKER_RESTARTS;
+> +	unsigned long end = jiffies + BH_WORKER_JIFFIES;
+> +
+> +	raw_spin_lock_irq(&pool->lock);
+> +	worker_leave_idle(worker);
+> +
+> +	/*
+> +	 * This function follows the structure of worker_thread(). See there for
+> +	 * explanations on each step.
+> +	 */
+> +	if (!need_more_worker(pool))
+> +		goto done;
+> +
+> +	WARN_ON_ONCE(!list_empty(&worker->scheduled));
+> +	worker_clr_flags(worker, WORKER_PREP | WORKER_REBOUND);
+> +
+> +	do {
+> +		struct work_struct *work =
+> +			list_first_entry(&pool->worklist,
+> +					 struct work_struct, entry);
+> +
+> +		if (assign_work(work, worker, NULL))
+> +			process_scheduled_works(worker);
+> +	} while (keep_working(pool) &&
+> +		 --nr_restarts && time_before(jiffies, end));
+> +
+> +	worker_set_flags(worker, WORKER_PREP);
+> +done:
+> +	worker_enter_idle(worker);
+> +	kick_pool(pool);
+> +	raw_spin_unlock_irq(&pool->lock);
+> +}
 
-addrconf_get_prefix_route walks the table, so you know it is already
-there ...
-
-> @@ -1264,8 +1265,18 @@ cleanup_prefix_route(struct inet6_ifaddr *ifp, unsigned long expires,
->  		if (del_rt)
->  			ip6_del_rt(dev_net(ifp->idev->dev), f6i, false);
->  		else {
-> -			if (!(f6i->fib6_flags & RTF_EXPIRES))
-> +			if (!(f6i->fib6_flags & RTF_EXPIRES)) {
-> +				table = f6i->fib6_table;
-> +				spin_lock_bh(&table->tb6_lock);
->  				fib6_set_expires(f6i, expires);
-> +				/* If fib6_node is null, the f6i is just
-> +				 * removed from the table.
-> +				 */
-> +				if (rcu_dereference_protected(f6i->fib6_node,
-
-... meaning this check should not be needed
-
-> +							      lockdep_is_held(&table->tb6_lock)))
-> +					fib6_add_gc_list(f6i);
-> +				spin_unlock_bh(&table->tb6_lock);
-> +			}
->  			fib6_info_release(f6i);
->  		}
->  	}
-> @@ -2706,6 +2717,7 @@ EXPORT_SYMBOL_GPL(addrconf_prefix_rcv_add_addr);
->  void addrconf_prefix_rcv(struct net_device *dev, u8 *opt, int len, bool sllao)
->  {
->  	struct prefix_info *pinfo;
-> +	struct fib6_table *table;
->  	__u32 valid_lft;
->  	__u32 prefered_lft;
->  	int addr_type, err;
-> @@ -2782,11 +2794,23 @@ void addrconf_prefix_rcv(struct net_device *dev, u8 *opt, int len, bool sllao)
->  			if (valid_lft == 0) {
->  				ip6_del_rt(net, rt, false);
->  				rt = NULL;
-> -			} else if (addrconf_finite_timeout(rt_expires)) {
-> -				/* not infinity */
-> -				fib6_set_expires(rt, jiffies + rt_expires);
->  			} else {
-> -				fib6_clean_expires(rt);
-> +				table = rt->fib6_table;
-> +				spin_lock_bh(&table->tb6_lock);
-
-when it comes to locking, I prefer the lock and unlock lines to *pop* -
-meaning newline on both sides so it is clear and stands out.
-
-> +				if (addrconf_finite_timeout(rt_expires)) {
-> +					/* not infinity */
-> +					fib6_set_expires(rt, jiffies + rt_expires);
-> +					/* If fib6_node is null, the f6i is
-> +					 * just removed from the table.
-> +					 */
-> +					if (rcu_dereference_protected(rt->fib6_node,
-
-similarly here, this code is entered because rt is set based on
-addrconf_get_prefix_route.
-
-> +								      lockdep_is_held(&table->tb6_lock)))
-> +						fib6_add_gc_list(rt);
-> +				} else {
-> +					fib6_clean_expires(rt);
-> +					fib6_remove_gc_list(rt);
-> +				}
-> +				spin_unlock_bh(&table->tb6_lock);
->  			}
->  		} else if (valid_lft) {
->  			clock_t expires = 0;
-> @@ -4741,6 +4765,7 @@ static int modify_prefix_route(struct inet6_ifaddr *ifp,
->  			       unsigned long expires, u32 flags,
->  			       bool modify_peer)
->  {
-> +	struct fib6_table *table;
->  	struct fib6_info *f6i;
->  	u32 prio;
->  
-> @@ -4761,10 +4786,21 @@ static int modify_prefix_route(struct inet6_ifaddr *ifp,
->  				      ifp->rt_priority, ifp->idev->dev,
->  				      expires, flags, GFP_KERNEL);
->  	} else {
-> -		if (!expires)
-> +		table = f6i->fib6_table;
-> +		spin_lock_bh(&table->tb6_lock);
-> +		if (!expires) {
->  			fib6_clean_expires(f6i);
-> -		else
-> +			fib6_remove_gc_list(f6i);
-> +		} else {
->  			fib6_set_expires(f6i, expires);
-> +			/* If fib6_node is null, the f6i is just removed
-> +			 * from the table.
-> +			 */
-> +			if (rcu_dereference_protected(f6i->fib6_node,
-
-and here as well. f6i is set based on a table lookup.
-
-> +						      lockdep_is_held(&table->tb6_lock)))
-> +				fib6_add_gc_list(f6i);
-> +		}
-> +		spin_unlock_bh(&table->tb6_lock);
->  
->  		fib6_info_release(f6i);
->  	}
-
-...
-
-> diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-> index a68462668158..5ca9fd4f7945 100644
-> --- a/net/ipv6/ndisc.c
-> +++ b/net/ipv6/ndisc.c
-> @@ -1410,8 +1410,17 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
->  		inet6_rt_notify(RTM_NEWROUTE, rt, &nlinfo, NLM_F_REPLACE);
->  	}
->  
-> -	if (rt)
-> +	if (rt) {
-> +		spin_lock_bh(&rt->fib6_table->tb6_lock);
->  		fib6_set_expires(rt, jiffies + (HZ * lifetime));
-> +		/* If fib6_node is null, the f6i is just removed from the
-> +		 * table.
-> +		 */
-
-How about:
-		/* If fib6_node is NULL, the route was removed between
-		 * the rt6_get_dflt_router or rt6_add_dflt_router calls
-		 * above and here.
-		 */
-
-> +		if (rcu_dereference_protected(rt->fib6_node,> +					      lockdep_is_held(&rt->fib6_table->tb6_lock)))
-> +			fib6_add_gc_list(rt);
-> +		spin_unlock_bh(&rt->fib6_table->tb6_lock);
-> +	}
->  	if (in6_dev->cnf.accept_ra_min_hop_limit < 256 &&
->  	    ra_msg->icmph.icmp6_hop_limit) {
->  		if (in6_dev->cnf.accept_ra_min_hop_limit <= ra_msg->icmph.icmp6_hop_limit) {
-> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-> index dd6ff5b20918..cfaf226ecf98 100644
-> --- a/net/ipv6/route.c
-> +++ b/net/ipv6/route.c
-> @@ -989,10 +989,20 @@ int rt6_route_rcv(struct net_device *dev, u8 *opt, int len,
->  				 (rt->fib6_flags & ~RTF_PREF_MASK) | RTF_PREF(pref);
->  
->  	if (rt) {
-> -		if (!addrconf_finite_timeout(lifetime))
-> +		spin_lock_bh(&rt->fib6_table->tb6_lock);
-> +		if (!addrconf_finite_timeout(lifetime)) {
->  			fib6_clean_expires(rt);
-> -		else
-> +			fib6_remove_gc_list(rt);
-> +		} else {
->  			fib6_set_expires(rt, jiffies + HZ * lifetime);
-> +			/* If fib6_node is null, the f6i is just removed
-> +			 * from the table.
-> +			 */
-
-Similarly, enhance the comment:
-			/* If fib6_node is NULL, the route was removed
-			 * between the get or add calls above and here.
-			 */
-> +			if (rcu_dereference_protected(rt->fib6_node,
-> +						      lockdep_is_held(&rt->fib6_table->tb6_lock)))
-> +				fib6_add_gc_list(rt);
-> +		}
-> +		spin_unlock_bh(&rt->fib6_table->tb6_lock);
->  
->  		fib6_info_release(rt);
->  	}
-
+I see no need to exec bh works for 2ms with irq disabled.
 
