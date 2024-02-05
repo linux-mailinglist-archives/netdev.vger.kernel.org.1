@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-69123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49247849B03
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 13:54:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E977F849B04
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 13:54:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AACD1C223B8
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:54:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAC352833E6
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:54:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF7162D60F;
-	Mon,  5 Feb 2024 12:48:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A5712E41A;
+	Mon,  5 Feb 2024 12:48:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hzjdnJB+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="3rvC2F6s"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248772D052
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 12:48:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 768902D04C
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 12:48:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707137289; cv=none; b=sl2iDSBNX5GijyNsfQWhaBwUq/CoLLDYqkzih3DaVK4jW6Nk1F28xtjJ2f2aQt0n7mv0OsSRvliOBLlxe3irtLY0gDhhI26Ix7XHZqyXx1QktYjKd9UhOQk2QR2Dru2S14WnXsX+YSYHGtO/BYcTIZ65Q8vHKJVgH9qaZYzEhR4=
+	t=1707137291; cv=none; b=JvcGszpuOkKHer0Zp89UOzjVviLhvlJeutnDD9T9ZGaQKDHUxwsdECcbEcLO88M3atNnPvYgHzIVbIY01uOX7/LLiqUT8DIpm8CNEAkwvn58rFLkTV81E4MW3Aq2pyTxJUDMZ7Vqg2zuNY//EYMVK/Dv1oDRnmxQ/UOgUHlE4vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707137289; c=relaxed/simple;
-	bh=k9fUrSbW5szIVxWYbDGkn3eO8e2dGBLXV1Es3iOfIW4=;
+	s=arc-20240116; t=1707137291; c=relaxed/simple;
+	bh=D4zdKYgEI8SANhLoeqnPAi4IZHnljQAAsNLd75I1ZM0=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=YO+p/UVUVqBEVnb1pyFtCf+yZ4DWknpQpQmS2hW2RCd2d1f00DUj7TUIFIg4fGFqTnvo3FxVQtpXQN8MKRjFGKPRdSji/Wk9fW47eReBHeiGmiIJUS0EUjSOenL468ze4QdOJq0hl9boMo3yqvc6ZnkN0vtJGKZFLl0S7lTXTlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hzjdnJB+; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=KrmzI3OwTHnQQ+o0PFSSkiA6I5ADPx8yKiHbd8/NLx0eDlfoi5xzGWLoU4QUOzXgf7EVPtU2hQ3Ms8Hy3bPGn+rpnafCSIaQvheU/ehOHuciG1RpqC8I7vk0PouiLBHQrkQogWsF1+E9vA+0RMt5BHWJIsrV4sbI19HxTKHKl48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=3rvC2F6s; arc=none smtp.client-ip=209.85.128.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6043c795ee9so20629907b3.0
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 04:48:07 -0800 (PST)
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-5fc6463b0edso75395727b3.0
+        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 04:48:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707137287; x=1707742087; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1707137288; x=1707742088; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NmH2mXx1hk7X3+z9/4AcTNACq0Ffa/sBHF+P4vNg8bc=;
-        b=hzjdnJB+Od/iJh8b+Ku0iILhC+FTBR5kdoQJaKjdYUsakl75rlJV0TGXcpNHFHxBvf
-         wwGk+hkxaiSAzYcy3XOI0A4Ac15A6+5sRJIwqLS9/xY+VMn9oN3DzNUFMm0KMeKy6/FS
-         fYLLufIrFlsH5quG1rDFWjW4lmIu/CIDoPMxKxxsIBZuqWG9ILxcRkPZ7HMseGUwlw40
-         I0u78TgcHmQnNqp3suLXgtYlOSZMQt0VnCj/Sud98gQ/j+RoX1AmKRnRIHFK1UNn/iY4
-         v/vUqcO4mKy2aPg6fGFfAaYbvS0BmBu4D2Omfs42ChJtpj/QNsn8H1ikV8C/e05qZ7A0
-         kATg==
+        bh=KyZCd8Hb1FDN7k6tGmc5xiWirDlutdqrradrH80psE0=;
+        b=3rvC2F6sD+iI9qDJG0Ws2DZRdlheZpuYiT9O1XxcygsW3r/eYM0tPcgIupcw23uSZa
+         OSWfomjcWY5WyZsAEOvmI1CnD7i8Z+/c82KZrSPUPT5MM2Q0XEX8vWKJbFSFyrUiZGhg
+         W8ii9SX9NbBqHoFdVlg/6Vdt9sQ8zxCHm6rvIEZpyPGYnqAFi/ivfxuRlHmbUn7HvdCO
+         67ywlFfdrK4eYLvxZ9gIFFuu22s7yC/Plr2OjeKDjC1KtjRvbUO7H2PvrgkmJjCZJzj7
+         sXytfpZBmCBcawOJDB3rcb0+J2dBCJ2/3a5Hh1q5b4uFI2dZWxwnl9On8fDlLhoP1tJZ
+         sMIw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707137287; x=1707742087;
+        d=1e100.net; s=20230601; t=1707137288; x=1707742088;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NmH2mXx1hk7X3+z9/4AcTNACq0Ffa/sBHF+P4vNg8bc=;
-        b=ckQYLsdtDw0RE+gBQ2BzJQyH/aLfuptIBsn+7MJuYKLOidBDu6vlH/7kSIsgxB+KBb
-         VlYztoIYwXNO7Jpml9kr1r5dIPaHVR1hfurcY7XYwP4nmskpguXEACmlzCW+rsqtmCjx
-         02XJy+H5Eu2zMzGpHebMYusn0iCghnG1AW98Jwu3EOsVm4zraL5H4Lc3xfw1Q4rpeeSI
-         4bTa5o3JpshvENZzXiNmQjO68u6yGs1/26fkefyPFYNnp5Ij9lZh00UjUYKtCoPILTvi
-         vcoA3TOEeSBevZujMcUVyOtnhAseN9uZXGJxu3wz6pr1W5BBNh+ARbXvHT+E3utqoAag
-         O6PQ==
-X-Gm-Message-State: AOJu0Yz6cGVsY7ECPqoN2z6nrlrYe4An7l7iKIYcRqNWEgjx2pKkEAr8
-	5ZE1cBjw/kqgRX6/X6SIOG2ge/LbfTDcr6NE1FQ7XStxkcq6E3k5O2pa/DFqY7iW4JhIyTw+0JI
-	JYsqsxoZDpQ==
-X-Google-Smtp-Source: AGHT+IHAGfM+wGDq2ECDMM0oKtmTBhFNEJEtUf0/af//t507wxeHyVsgLcXoh5cj7A8LXl3f1KMy8MnoZyabeg==
+        bh=KyZCd8Hb1FDN7k6tGmc5xiWirDlutdqrradrH80psE0=;
+        b=ZilmFxHvKW6MXW8oUyZxGXWqBN0VZjJqiw7Ohhnhk/75tUMBHp6fq/kMDpqGQ3CISZ
+         GyNFi+tUOJoCdtDm1L9NZn6WSTfQT7sANWF4VHWgtCcrPvPiwHdHfbOCy/faP9ihZx6v
+         EJcvaMak4ygA91tbAM85NBpvtru0C+1Z/6VXPdB/okGDpe2RdwTvWh8PE1JnXaSob5wV
+         AHrZ3S/jrTB7+MFsoad9jn+9NrUmV3yAIlz9L/xaYqpaf8OyIWi5Kg5ujXTpIG+5JnhI
+         I5qVk4qKDJPTvGNtXcAP/7a2kywiZ/d1p/A1N+nNscyO1j9PDRcTSYdTMmBF035KL3z4
+         AQ7w==
+X-Gm-Message-State: AOJu0YwrhEBxgUBSie98IMf5LOJK55u5hP4o6PE7utnuLedag5QSefdi
+	9Ugcf6ihVfSOLVUwHlO0TNcYwXazj2IDpPXovY6gNNBW7i8DiEqGOlYulZd18ZyeR2e4cndR/km
+	f18dRGHZbLg==
+X-Google-Smtp-Source: AGHT+IGIsQOq1B9zrs930Co2Fie3dxx6nVLXTxvwa6nOkoaaQJAfQuA0uhn30s62sSRY//Qtf3kWl4nelQOW5A==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:4c84:0:b0:604:269:9d85 with SMTP id
- z126-20020a814c84000000b0060402699d85mr2384274ywa.6.1707137287113; Mon, 05
- Feb 2024 04:48:07 -0800 (PST)
-Date: Mon,  5 Feb 2024 12:47:42 +0000
+ (user=edumazet job=sendgmr) by 2002:a81:9b53:0:b0:604:594:2a58 with SMTP id
+ s80-20020a819b53000000b0060405942a58mr1861016ywg.2.1707137288368; Mon, 05 Feb
+ 2024 04:48:08 -0800 (PST)
+Date: Mon,  5 Feb 2024 12:47:43 +0000
 In-Reply-To: <20240205124752.811108-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240205124752.811108-1-edumazet@google.com>
 X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
-Message-ID: <20240205124752.811108-6-edumazet@google.com>
-Subject: [PATCH v3 net-next 05/15] geneve: use exit_batch_rtnl() method
+Message-ID: <20240205124752.811108-7-edumazet@google.com>
+Subject: [PATCH v3 net-next 06/15] gtp: use exit_batch_rtnl() method
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -85,48 +85,51 @@ Content-Type: text/plain; charset="UTF-8"
 exit_batch_rtnl() is called while RTNL is held,
 and devices to be unregistered can be queued in the dev_kill_list.
 
-This saves one rtnl_lock()/rtnl_unlock() pair,
-and one unregister_netdevice_many() call.
+This saves one rtnl_lock()/rtnl_unlock() pair per netns
+and one unregister_netdevice_many() call per netns.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- drivers/net/geneve.c | 13 ++++---------
- 1 file changed, 4 insertions(+), 9 deletions(-)
+ drivers/net/gtp.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
-index 32c51c244153bd760b9f58001906c04c8b0f37ff..f31fc52ef397dfe0eba854385f783fbcad7e870f 100644
---- a/drivers/net/geneve.c
-+++ b/drivers/net/geneve.c
-@@ -1900,18 +1900,13 @@ static void geneve_destroy_tunnels(struct net *net, struct list_head *head)
- 	}
+diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
+index b1919278e931f4e9fb6b2d2ec2feb2193b2cda61..62c601d9f7528d456dc6695814bf01a4d756d2da 100644
+--- a/drivers/net/gtp.c
++++ b/drivers/net/gtp.c
+@@ -1876,23 +1876,23 @@ static int __net_init gtp_net_init(struct net *net)
+ 	return 0;
  }
  
--static void __net_exit geneve_exit_batch_net(struct list_head *net_list)
-+static void __net_exit geneve_exit_batch_rtnl(struct list_head *net_list,
-+					      struct list_head *dev_to_kill)
+-static void __net_exit gtp_net_exit(struct net *net)
++static void __net_exit gtp_net_exit_batch_rtnl(struct list_head *net_list,
++					       struct list_head *dev_to_kill)
  {
- 	struct net *net;
+-	struct gtp_net *gn = net_generic(net, gtp_net_id);
+-	struct gtp_dev *gtp;
 -	LIST_HEAD(list);
++	struct net *net;
  
 -	rtnl_lock();
- 	list_for_each_entry(net, net_list, exit_list)
--		geneve_destroy_tunnels(net, &list);
--
--	/* unregister the devices gathered above */
+-	list_for_each_entry(gtp, &gn->gtp_dev_list, list)
+-		gtp_dellink(gtp->dev, &list);
++	list_for_each_entry(net, net_list, exit_list) {
++		struct gtp_net *gn = net_generic(net, gtp_net_id);
++		struct gtp_dev *gtp;
+ 
 -	unregister_netdevice_many(&list);
 -	rtnl_unlock();
-+		geneve_destroy_tunnels(net, dev_to_kill);
++		list_for_each_entry(gtp, &gn->gtp_dev_list, list)
++			gtp_dellink(gtp->dev, dev_to_kill);
++	}
+ }
  
- 	list_for_each_entry(net, net_list, exit_list) {
- 		const struct geneve_net *gn = net_generic(net, geneve_net_id);
-@@ -1922,7 +1917,7 @@ static void __net_exit geneve_exit_batch_net(struct list_head *net_list)
- 
- static struct pernet_operations geneve_net_ops = {
- 	.init = geneve_init_net,
--	.exit_batch = geneve_exit_batch_net,
-+	.exit_batch_rtnl = geneve_exit_batch_rtnl,
- 	.id   = &geneve_net_id,
- 	.size = sizeof(struct geneve_net),
+ static struct pernet_operations gtp_net_ops = {
+ 	.init	= gtp_net_init,
+-	.exit	= gtp_net_exit,
++	.exit_batch_rtnl = gtp_net_exit_batch_rtnl,
+ 	.id	= &gtp_net_id,
+ 	.size	= sizeof(struct gtp_net),
  };
 -- 
 2.43.0.594.gd9cf4e227d-goog
