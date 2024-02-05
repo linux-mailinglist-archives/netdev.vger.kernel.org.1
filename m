@@ -1,186 +1,159 @@
-Return-Path: <netdev+bounces-69095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D29A84990B
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:42:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48D6E849932
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:48:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4457B284D93
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 11:42:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7799E1C22600
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 11:48:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ECB9182D4;
-	Mon,  5 Feb 2024 11:41:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H0ykTXQG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4E6018C36;
+	Mon,  5 Feb 2024 11:48:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from davidv.dev (mail.davidv.dev [78.46.233.60])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175DD199D9
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 11:41:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0761946C
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 11:48:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.46.233.60
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707133305; cv=none; b=UIFxfYleFGt94a406fKyQqxZLZKziI+uqD+FFTDx/zms09wXa9Ia1K1BIEtxKr6HYttseVLkU5sOlo5LlQ+RicRM2JGb+NkTN6FYFbTJgG4VsIzKvEYBQOb/qqeEMpb1NAZUGiiXOa01XWuNn2X09cNWVe7Hf6zv4u2ZUGVUoIE=
+	t=1707133731; cv=none; b=hO7SlYSsNOzenfUZIBWUejQn3rzLXFLQ6g+NXJfkbfY8YL/KZchRKqkP0V93e5INH8Amq8D7bzZ5fMAApGpLBcZjOGXKujaEz6Mjf8xj1LOR+h6U114TVcFecYBg9Se21KTtvycjFwY3yRRZQYw8UuwSGzFa11f9Bic0FFf47H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707133305; c=relaxed/simple;
-	bh=0BvHj8YUx8Q8Mi86gp2nO09A7PYzIxUar6bZ+pAe+tY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Y/Sdkj3bNOh8HAQDLdFQRIfB9clOr8SwJXD8j5jqudY57yA5w/hiNVbh4Qe6d8KK3YUFisf668v7mY9YcH/aH6ouZpZqQF9OQN/mw4e1Meq49HerrViSV5oKnxSd0MmZfmgI5BkuvSyThpypTHnsZUl0ZAKo+KO+6xw+iksMcmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H0ykTXQG; arc=none smtp.client-ip=209.85.221.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-33b13332ca7so2691890f8f.2
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 03:41:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707133301; x=1707738101; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=z2NcjInO6CiSLYlF9JWwNu1WoSKPHx1fyhS9S8pVayk=;
-        b=H0ykTXQGOkNoTUmOhFpC43vxdYbSzOeCcg5jI/P6C1HAcO0gxzCKuH1rx4KelKpxUy
-         PibWj4/jDu9WCPnmYKmmrWwh2dBMWA8MOxT67ck5STPe5WnobUPgAH1/9wQfJieKRxOv
-         B8ZZHSziHfDaozhUVNqLJrG5NaN6ST+Ka46dMYtf8rL+RflBmV0CRke7AvVQD4LGHGig
-         tHGXNTT+meZSQBmqza/MIy+N741oz5P2s35+jhJSGTDRlmnf5vOfKBQxfELowMlCuVEj
-         8iKzj18QUOtTegmtHxRbVBiLraSx6kAwK5rqZm9nRe8kl//yip2IBeUoWFVGZG5p/qiC
-         4TMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707133301; x=1707738101;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z2NcjInO6CiSLYlF9JWwNu1WoSKPHx1fyhS9S8pVayk=;
-        b=Tb5rhDoMiL5EzES2GDiSoo62hudLQOdIM7pfUb/BayebcJa4Ev/v607cDnRqhyY25Q
-         63X7S8lJMYcIcrZE9NbKSIT40gH2k0Oyr67hykvrghf6J5mhMkFgddjffAnPPTuE1+Ag
-         3GRgkWVAvTOxHZIfvSPegkxMnBEXxyURWFu4hT7zcAhLCypEve1qqzf2Yu6RO5RnOhgT
-         8ffpqCowyidX6JQ3AGt0YgqZyulCqhvEbuIcnq8f7YGLph6YZhv/xhxdRnIyNGEigwpv
-         /Vs2XCL0mD+GivGFD5WpDXMxOpRl60Z7nxFbwv9G+R6VxDietX3zESUbQwqljJts19aF
-         fN3Q==
-X-Gm-Message-State: AOJu0YyA2JLRjaeO38+jBvo/Qh06bGLF9g9LQRjTaoBha+BBFCSGxUGp
-	adxSWUR0q7o57M4NKvHjBTmTOk/iBTmGzgV1Oie/ls3KjyIuqHMn
-X-Google-Smtp-Source: AGHT+IE3+PNWVFcqtxE4SQcGD7q3IvlybjIvIgFDOboMn7j+1HcsAFIUBEc0SUkUQECU9PhlRNwODw==
-X-Received: by 2002:a5d:5f4b:0:b0:33a:eb5c:aa25 with SMTP id cm11-20020a5d5f4b000000b0033aeb5caa25mr4301889wrb.23.1707133301076;
-        Mon, 05 Feb 2024 03:41:41 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWlN+MmZhTGpZ+O4h8Uvu/qEz3CfF//zsyQXfAnrYsCLKWlDHSpmWSFoMT5j1JBIPdLqrJ6/NYOtIiNO7//gH7K6sV/sWf8iQkAw4TkvYHNQpCTahYCT/3QEwn+dEDs1+erOtuHa548DRlhU4l5sBSyF+0qvfAMpiI1xVGuRqfbIqe3ZV4X4YuB9cTZo6GwNlKNntQQt8sKQ7qLN7hm9DD3bQdPkx+W0UYm0Lh3rAc3wAC/Zg7wkVeDURGzGx/qnEGO/ZGE/wzKtNKEC883jvdh
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id x5-20020adfdd85000000b0033afe6968bfsm7891052wrl.64.2024.02.05.03.41.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 03:41:40 -0800 (PST)
-Date: Mon, 5 Feb 2024 13:41:38 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Tobias Waldekranz <tobias@waldekranz.com>
-Cc: davem@davemloft.net, kuba@kernel.org, atenart@kernel.org,
-	roopa@nvidia.com, razor@blackwall.org, bridge@lists.linux.dev,
-	netdev@vger.kernel.org, jiri@resnulli.us, ivecera@redhat.com
-Subject: Re: [PATCH v3 net] net: bridge: switchdev: Skip MDB replays of
- pending events
-Message-ID: <20240205114138.uiwioqstybmzq77b@skbuf>
-References: <20240201161045.1956074-1-tobias@waldekranz.com>
- <20240201161045.1956074-1-tobias@waldekranz.com>
+	s=arc-20240116; t=1707133731; c=relaxed/simple;
+	bh=zquoTPDiDMopq79YAJN8pFBJInmPfdGsBn+pPQU1BdE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sBl+go7O2vYG1cqiptEEmJPq0DjElHKEkl+R3sGsVUUroVW+wZDtfCG3IR27WLcjYWCUaCqrgoU99+4acqvi+yxdH22dk+jyu9qUuxJhIfX2OUG6pn/aXtEhEHvo+mLXD2pVXatJguNuqpX08L+iMiAsMdb8IAt2CgBjjTCkXnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidv.dev; spf=pass smtp.mailfrom=davidv.dev; arc=none smtp.client-ip=78.46.233.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidv.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=davidv.dev
+Received: from framework.labs
+	by mail.davidv.dev (chasquid) with ESMTPSA
+	tls TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+	(over submission+TLS, TLS-1.2, envelope from "david@davidv.dev")
+	; Mon, 05 Feb 2024 12:46:51 +0100
+From: David Ventura <david@davidv.dev>
+To: 
+Cc: David Ventura <david@davidv.dev>,
+	Jonathan Corbet <corbet@lwn.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Xiongwei Song <xiongwei.song@windriver.com>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH] net: make driver settling time configurable
+Date: Mon,  5 Feb 2024 12:44:40 +0100
+Message-Id: <20240205114609.440597-1-david@davidv.dev>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240201161045.1956074-1-tobias@waldekranz.com>
- <20240201161045.1956074-1-tobias@waldekranz.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 01, 2024 at 05:10:45PM +0100, Tobias Waldekranz wrote:
-> Before this change, generation of the list of events MDB to replay
+During IP auto configuration, some drivers apparently need to wait a
+certain length of time to settle; as this is not true for all drivers,
+make this length of time configurable.
 
-s/events MDB/MDB events/
+Signed-off-by: David Ventura <david@davidv.dev>
+---
+ .../admin-guide/kernel-parameters.txt         |  4 ++++
+ Documentation/admin-guide/nfs/nfsroot.rst     |  3 +++
+ net/ipv4/ipconfig.c                           | 23 ++++++++++++++++---
+ 3 files changed, 27 insertions(+), 3 deletions(-)
 
-> would race against the IGMP/MLD snooping logic, which could concurrently
+diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+index b47940577c10..b07a035642fa 100644
+--- a/Documentation/admin-guide/kernel-parameters.txt
++++ b/Documentation/admin-guide/kernel-parameters.txt
+@@ -2291,6 +2291,10 @@
+ 
+ 	ip=		[IP_PNP]
+ 			See Documentation/admin-guide/nfs/nfsroot.rst.
++	ip.dev_wait_ms=
++			[IP_PNP]
++			See Documentation/admin-guide/nfs/nfsroot.rst.
++
+ 
+ 	ipcmni_extend	[KNL,EARLY] Extend the maximum number of unique System V
+ 			IPC identifiers from 32,768 to 16,777,216.
+diff --git a/Documentation/admin-guide/nfs/nfsroot.rst b/Documentation/admin-guide/nfs/nfsroot.rst
+index 135218f33394..f26f7a342af6 100644
+--- a/Documentation/admin-guide/nfs/nfsroot.rst
++++ b/Documentation/admin-guide/nfs/nfsroot.rst
+@@ -223,6 +223,9 @@ ip=<client-ip>:<server-ip>:<gw-ip>:<netmask>:<hostname>:<device>:<autoconf>:<dns
+   /proc/net/ipconfig/ntp_servers to an NTP client before mounting the real
+   root filesystem if it is on NFS).
+ 
++ip.dev_wait_ms=<value>
++  Set the number of milliseconds to delay after opening the network device
++  which will be autoconfigured. Defaults to 10 milliseconds.
+ 
+ nfsrootdebug
+   This parameter enables debugging messages to appear in the kernel
+diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
+index c56b6fe6f0d7..cbf35163b973 100644
+--- a/net/ipv4/ipconfig.c
++++ b/net/ipv4/ipconfig.c
+@@ -82,8 +82,6 @@
+ #define IPCONFIG_DYNAMIC
+ #endif
+ 
+-/* Define the friendly delay before and after opening net devices */
+-#define CONF_POST_OPEN		10	/* After opening: 10 msecs */
+ 
+ /* Define the timeout for waiting for a DHCP/BOOTP/RARP reply */
+ #define CONF_OPEN_RETRIES 	2	/* (Re)open devices twice */
+@@ -101,6 +99,7 @@
+ 
+ /* Wait for carrier timeout default in seconds */
+ static unsigned int carrier_timeout = 120;
++static unsigned int dev_wait_ms = 10;
+ 
+ /*
+  * Public IP configuration
+@@ -1516,7 +1515,8 @@ static int __init ip_auto_config(void)
+ 		return err;
+ 
+ 	/* Give drivers a chance to settle */
+-	msleep(CONF_POST_OPEN);
++	if(dev_wait_ms > 0)
++		msleep(dev_wait_ms);
+ 
+ 	/*
+ 	 * If the config information is insufficient (e.g., our IP address or
+@@ -1849,3 +1849,20 @@ static int __init set_carrier_timeout(char *str)
+ 	return 1;
+ }
+ __setup("carrier_timeout=", set_carrier_timeout);
++
++
++static int __init set_dev_wait_ms(char *str)
++{
++	ssize_t ret;
++
++	if (!str)
++		return 0;
++
++	ret = kstrtouint(str, 0, &dev_wait_ms);
++	if (ret)
++		return 0;
++
++	return 1;
++}
++
++__setup("ip.dev_wait_ms=", set_dev_wait_ms);
+-- 
+2.39.2
 
-logic. This could (...)
-
-> enqueue events to the switchdev deferred queue, leading to duplicate
-> events being sent to drivers. As a consequence of this, drivers which
-> reference count memberships (at least DSA), would be left with orphan
-> groups in their hardware database when the bridge was destroyed.
-
-Still missing the user impact description, aka "when would this be
-noticed by, and actively bother an user?". Something that would justify
-handling this via net.git rather than net-next.git.
-
-> 
-> Avoid this by grabbing the write-side lock of the MDB while generating
-> the replay list, making sure that no deferred version of a replay
-> event is already enqueued to the switchdev deferred queue, before
-> adding it to the replay list.
-
-The description of the solution is actually not very satisfactory to me.
-I would have liked to see a more thorough analysis.
-
-The race has 2 components, one comes from the fact that during replay,
-we iterate using RCU, which does not halt concurrent updates, and the
-other comes from the fact that the MDB addition procedure is non-atomic.
-Elements are first added to the br->mdb_list, but are notified to
-switchdev in a deferred context.
-
-Grabbing the bridge multicast spinlock only solves the first problem: it
-stops new enqueues of deferred events. We also need special handling of
-the pending deferred events. The idea there is that we cannot cancel
-them, since that would lead to complications for other potential
-listeners on the switchdev chain. And we cannot flush them either, since
-that wouldn't actually help: flushing needs sleepable context, which is
-incompatible with holding br->multicast_lock, and without
-br->multicast_lock held, we haven't actually solved anything, since new
-deferred events can still be enqueued at any time.
-
-So the only simple solution is to let the pending deferred events
-execute (eventually), but during event replay on joining port, exclude
-replaying those multicast elements which are in the bridge's multicast
-list, but were not yet added through switchdev. Eventually they will be.
-
-(side note: the handling code for excluding replays on pending event
-deletion seems to not actually help, because)
-
-Event replays on a switchdev port leaving the bridge are also
-problematic, but in a different way. The deletion procedure is also
-non-atomic, they are first removed from br->mdb_list then the switchdev
-notification is deferred. So, the replay procedure cannot enter a
-condition where it replays the deletion twice. But, there is no
-switchdev_deferred_process() call when the switchdev port unoffloads an
-intermediary LAG bridge port, and this can lead to the situation where
-neither the replay, nor the deferred switchdev object, trickle down to a
-call in the switchdev driver. So for event deletion, we need to force a
-synchronous call to switchdev_deferred_process().
-
-See how the analysis in the commit message changes the patch?
-
-> 
-> An easy way to reproduce this issue, on an mv88e6xxx system, was to
-
-s/was/is/
-
-> create a snooping bridge, and immediately add a port to it:
-> 
->     root@infix-06-0b-00:~$ ip link add dev br0 up type bridge mcast_snooping 1 && \
->     > ip link set dev x3 up master br0
->     root@infix-06-0b-00:~$ ip link del dev br0
->     root@infix-06-0b-00:~$ mvls atu
->     ADDRESS             FID  STATE      Q  F  0  1  2  3  4  5  6  7  8  9  a
->     DEV:0 Marvell 88E6393X
->     33:33:00:00:00:6a     1  static     -  -  0  .  .  .  .  .  .  .  .  .  .
->     33:33:ff:87:e4:3f     1  static     -  -  0  .  .  .  .  .  .  .  .  .  .
->     ff:ff:ff:ff:ff:ff     1  static     -  -  0  1  2  3  4  5  6  7  8  9  a
->     root@infix-06-0b-00:~$
-> 
-> The two IPv6 groups remain in the hardware database because the
-> port (x3) is notified of the host's membership twice: once via the
-> original event and once via a replay. Since only a single delete
-> notification is sent, the count remains at 1 when the bridge is
-> destroyed.
-
-These 2 paragraphs, plus the mvls output, should be placed before the
-"Avoid this" paragraph.
-
-> 
-> Fixes: 4f2673b3a2b6 ("net: bridge: add helper to replay port and host-joined mdb entries")
-> Signed-off-by: Tobias Waldekranz <tobias@waldekranz.com>
-> ---
 
