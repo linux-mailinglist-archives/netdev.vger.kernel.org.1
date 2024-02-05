@@ -1,104 +1,101 @@
-Return-Path: <netdev+bounces-69053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9C0D849749
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 11:04:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85DB0849753
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 11:06:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86E1C1F2171E
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 10:04:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1625A29072E
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 10:06:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65B2D134BC;
-	Mon,  5 Feb 2024 10:04:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C10513FE4;
+	Mon,  5 Feb 2024 10:06:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="szDkV6Hc"
 X-Original-To: netdev@vger.kernel.org
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.128.96.19
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6259F12B9D;
+	Mon,  5 Feb 2024 10:06:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707127450; cv=none; b=cHMn2GmyP9nBXxks4XWTBErvIwFvcodmOSNiNhjqsO7pB+6j/AvDZyRJmbXlc03GxH8COZ6PZU1NXRqluMof/Az/7TcChtRwmpua9SeWmktDnFodQOwvegdwnEsa6Hm17uH6y5lpKWdPTyOZEKVJZceByTotAPo3uKQcp7bghoc=
+	t=1707127567; cv=none; b=WSn+4nx+s5UYwurH19QDhP+Nlnp6HDyUePgejck7a2OogTGE6c3TIqAkv4IKNv3aGAunJRpf2YCQy0HXyKuYeSFC9X/Vo7sfNrWcK1q118BTPl2RW5J+DgLuNf8fSbCU2gMlk3X575lVpRg3Vw1h/XmXHWna/MXWrnGJ6yf8mcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707127450; c=relaxed/simple;
-	bh=5gL+3MHfdNohSQskxHC9i2nTuWBLsbEx3SuLjHbIVfU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aFPON7DPbPPyNddwa+CIHrbbpsaZBu90FRE6SLH+GN8jTLZRe8EIaO0Z9NG/2bYoo22Cp8UjYDgrqZaXwTfwlztpKtJlG7aOMW2tYQsUzmP84syuxOtxkfhHABiqgAFpY+W18HbN7AUAiCXpgrEX9dd5ecqj7RjkOvl2SvhH17Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=23.128.96.19
-Received: from mail22.mail.schwarz (mail22.mail.schwarz [185.124.192.54])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61ACF97;
-	Mon,  5 Feb 2024 02:04:05 -0800 (PST)
-X-SCHWARZ-TO: coreteam@netfilter.org, linux-kernel@vger.kernel.org, pabeni@redhat.com,
- i.maximets@ovn.org, kadlec@netfilter.org, davem@davemloft.net,
- netfilter-devel@vger.kernel.org, fw@strlen.de, netdev@vger.kernel.org,
- edumazet@google.com, pablo@netfilter.org, linux-kselftest@vger.kernel.org,
- horms@ovn.org, shuah@kernel.org
-X-SCHWARZ-ENVELOPEFROM: felix.huettner@mail.schwarz
-Received: from felix.runs.onstackit.cloud ([45.129.43.133])
-  by mail22.mail.schwarz with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 10:04:04 +0000
-Date: Mon, 5 Feb 2024 10:04:03 +0000
-From: Felix Huettner <felix.huettner@mail.schwarz>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Ilya Maximets <i.maximets@ovn.org>, linux-kernel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	kadlec@netfilter.org, fw@strlen.de, davem@davemloft.net,
-	edumazet@google.com, pabeni@redhat.com, shuah@kernel.org,
-	luca.czesla@mail.schwarz, max.lamprecht@mail.schwarz,
-	Simon Horman <horms@ovn.org>
-Subject: Re: [PATCH net-next v2] net: ctnetlink: support filtering by zone
-Message-ID: <ZcCyk3/evNdYMJK0@felix.runs.onstackit.cloud>
-References: <ZWSCPKtDuYRG1XWt@kernel-bug-kernel-bug>
- <ZYV6hgP35k6Bwk+H@calendula>
- <2032238f-31ac-4106-8f22-522e76df5a12@ovn.org>
- <ZbzOA1D1IGYX2oxS@calendula>
- <Zbzen36ahZaiR+qp@felix.runs.onstackit.cloud>
+	s=arc-20240116; t=1707127567; c=relaxed/simple;
+	bh=xgBwL14gsjbyBxLm9I9rKQf8AqB0FAer5tOUDFLoh7k=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=bx7Qb3h+r+RW9C6toZhK6zVph/NwqHyh697vK3ZmCArHh1SQUI0ESDIYUBGnRXpca1ifbIEMmoetlud7bkW0bYY/4SDkycZkYZrw+o8RubZ1bbP6Ek6T2oS1nhF6RD2MdwgepKxRAYvik3oB5Xl0HNGg85dw7tvmZYJ1AMYe+pY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=szDkV6Hc; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1707127554; h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
+	bh=FTxuB/9pVV6+BKydMw7NaZh54dsfrIIZGvhhGbnCB7g=;
+	b=szDkV6HcQRWGnwM06PpbPLiBqWOgL+rH8bCaTJOU1wTpkhp4MVfpx2fDv2Iy2Jy630nyFIa8PfWmQ2238o2nyu8VcBJ333oIki7apNQnXx0miPpcVzUMa7uiobYezmIQ2mzyL35FYNlyiLnASGd/LPlaxXLkXcrqWmDCgWGdOSk=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R361e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=17;SR=0;TI=SMTPD_---0W08RJ8u_1707127552;
+Received: from 30.221.129.101(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W08RJ8u_1707127552)
+          by smtp.aliyun-inc.com;
+          Mon, 05 Feb 2024 18:05:53 +0800
+Message-ID: <a29ead38-7a39-4bbb-80cc-619c1b0dfd62@linux.alibaba.com>
+Date: Mon, 5 Feb 2024 18:05:52 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zbzen36ahZaiR+qp@felix.runs.onstackit.cloud>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 00/15] net/smc: implement loopback-ism used by
+ SMC-D
+From: Wen Gu <guwen@linux.alibaba.com>
+To: Alexandra Winter <wintera@linux.ibm.com>,
+ Wenjia Zhang <wenjia@linux.ibm.com>, hca@linux.ibm.com, gor@linux.ibm.com,
+ agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240111120036.109903-1-guwen@linux.alibaba.com>
+ <f98849a7-41e9-421b-97b7-36d720cc43ee@linux.alibaba.com>
+ <20a1a1f3-789a-4d91-9a94-dca16161afd7@linux.ibm.com>
+ <1860588f-2246-4dcd-9db5-4ccd7add0f4a@linux.alibaba.com>
+ <3c51c969-3884-4104-b38d-570c61525214@linux.ibm.com>
+ <47c1b777-6d4e-40ac-9297-61240c126d6a@linux.alibaba.com>
+In-Reply-To: <47c1b777-6d4e-40ac-9297-61240c126d6a@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> > > 
-> > > Hi, Felix and Pablo.
-> > > 
-> > > I was looking through the code and the following part is bothering me:
-> > > 
-> > >  diff --git a/net/netfilter/nf_conntrack_netlink.c b/net/netfilter/nf_conntrack_netlink.c
-> > >  index fb0ae15e96df..4e9133f61251 100644
-> > >  --- a/net/netfilter/nf_conntrack_netlink.c
-> > >  +++ b/net/netfilter/nf_conntrack_netlink.c
-> > >  @@ -1148,6 +1149,10 @@ static int ctnetlink_filter_match(struct nf_conn *ct, void *data)
-> > >          if (filter->family && nf_ct_l3num(ct) != filter->family)
-> > >                  goto ignore_entry;
-> > >  
-> > >  +       if (filter->zone.id != NF_CT_DEFAULT_ZONE_ID &&
-> > >  +           !nf_ct_zone_equal_any(ct, &filter->zone))
-> > >  +               goto ignore_entry;
-> > >  +
-> > >          if (filter->orig_flags) {
-> > >                  tuple = nf_ct_tuple(ct, IP_CT_DIR_ORIGINAL);
-> > >                  if (!ctnetlink_filter_match_tuple(&filter->orig, tuple,
-> > > 
-> > > If I'm reading that right, the default zone is always flushed, even if the
-> > > user requested to flush a different zone.  I.e. the entry is never ignored
-> > > for a default zone.  Is that correct or am I reading that wrong?
-> > > 
-> > > If my observation is correct, then I don't think this functionality can
-> > > actually be used by applications as it does something unexpected.
-> > 
-> > This needs a fix, the NF_CT_DEFAULT_ZONE_ID is used as a marker to
-> > indicate if the filtering by zone needs to happen or not.
-> > 
-> > I'd suggest to add a boolean flag that specifies that zone filtering
-> > is set on.
 
-Hi everyone,
+On 2024/1/24 14:33, Wen Gu wrote:
+> 
+> 
+> On 2024/1/23 22:03, Alexandra Winter wrote:
+>> Hello Wen Gu and others,
+>>
+>> I just wanted to let you know that unfortunately both Wenjia and Jan have called in sick and we don't know
+>> when they will be back at work.
+>> So I'm sorry but there may be mroe delays in the review of this patchset.
+>>
+>> Kind regards
+>> Alexandra Winter
+> 
+> Hi Alexandra,
+> 
+> Thank you for the update. Health comes first. Wishing Wenjia and Jan
+> both make a swift recovery.
+> 
+> Best regards,
+> Wen Gu
 
-i build a patch along with tests for the mentioned issue. However the issue
-was rather that the filter would be skipped if we wanted to flush zone 0,
-which caused all zones to be flushed.
+Hi, Wenjia and Jan
 
-The fix is available here: https://lore.kernel.org/netdev/ZcCxn9HDsB8DUPrI@felix.runs.onstackit.cloud/T/#u
+I would like to ask if I should wait for the review of this version
+or send a v2 (with some minor changes) ?
+
+Thanks!
 
