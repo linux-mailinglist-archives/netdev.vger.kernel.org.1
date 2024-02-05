@@ -1,159 +1,118 @@
-Return-Path: <netdev+bounces-69173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4328C849F60
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 17:21:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E5C1849F77
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 17:28:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2484B20DFB
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 16:21:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 330C01F23562
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 16:28:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF67533CDB;
-	Mon,  5 Feb 2024 16:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658573589C;
+	Mon,  5 Feb 2024 16:28:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HUU2E1MZ"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="ofPN21K1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2191E39FFA
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 16:21:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CAAB36B0E
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 16:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707150105; cv=none; b=seYZtfipPvdouj16XSlB3Y9TjzdBrT2juT58vDjWYvu6rghFF0RxSmHEooVreldbyWkZazYts95G8NLhqgBYTyXh2ZMOqTO0KTzcAyRpo6+Q2tclVctiHDUmJI/PyJGK5CpWJpty0l/zduk8kcf6QZly0p4dAd9P9s1kMLZBCxs=
+	t=1707150509; cv=none; b=sHIOW5OihxZWljVMDymWL62+DAYKTg7/lprVVam/r5+4Cd93vtMaIjngepvDZzto45sElcZ1/Bo4qcsNmSmb+0tA6Y7XfjzLcE4+XHVi9thTrleK7Psco29h5CkiAd+fS9qqII9Vflsd5YjOPr6CCy2JSNTXVDpMjLBFPzLgB7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707150105; c=relaxed/simple;
-	bh=gSm0+dMHd7Lyvy8GwJPQavZvVWa0H+DWYqMpERKqQQ8=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Kbd+u68tJzjF1ZNdhw9a3WI92E0q4tw1zjJeR0I+vQ6+lEFzFbP//f1dtDG6iuOPNoMAjcyEM6u1r03GbBd4YTutTyNRRqMRth4h8TwZwrK4xmaHlGlMRQv5XXg4xT834dsPm0AHtDJd8PRiskmxirmRnh4ALRoQqHYTgCB23O0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HUU2E1MZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707150102;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=XCLWty0DVE2Ux6Y3C9RPsMJjwVXySF8wwAd+YMCj4FE=;
-	b=HUU2E1MZZPnrv5RYzYT6rQ94i1GkLaxlqSedRGUySPIXHw9mUZaDj8+ANpMO6/Z9m3tq8V
-	iJbEf8r+BY9owcJQKOHN8SGrJ1n/T/jbn5JZ85799dHB2It1I7sxY3IpI+xJgR/8UniPFZ
-	5yfdzXwacK/XNsY/4Toe365oRmsreYA=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-103-Bsp9XPVcOFeSSz5PbAjifQ-1; Mon, 05 Feb 2024 11:21:41 -0500
-X-MC-Unique: Bsp9XPVcOFeSSz5PbAjifQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40fb45c865dso9764395e9.0
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 08:21:41 -0800 (PST)
+	s=arc-20240116; t=1707150509; c=relaxed/simple;
+	bh=+yaE1VJC6QUjUoZUni7DKzE4kaw+7Py8ny8BIiCrnZM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SDu8VLMOk6EODPVm7fT+YSNHOMFmBgZ2BKq36ByOxmLW1PwPLX0LXUYoYCO5fr69pzB+rEF9YMdULyCHaG630cPQbUxap+jf5/XfUEVV9JDgC5MPXbT9cy3PuYPAHFBdPMPuoeeM3zzq5+7Sy6h/65lKCr8sr+Mox3k+mXqw1Tw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=ofPN21K1; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-29631796acdso2113777a91.3
+        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 08:28:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1707150506; x=1707755306; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LcsbQTvQGG1NmlhBrEyH/K59TBAz+MvdMoeLEVdmYgU=;
+        b=ofPN21K1iFZcZcaq6nc90n8v3B3aDvednYPlawqEiBvNep/jtKgVbIBLXSh4gajCCT
+         c9jmogkTJNSP4f0MVVCqlXLRzRZhZX/LIAfb8wqgR8k1uDvvOMt/8euJ2pjqZfFSCVt4
+         WAnHfTd+S5dv7rhtBxICDhdjGujYt0J4XercLQuZ4o3VpT4BI3glgchqMx6uI9/sBrdc
+         QPNu4/cuByL48Zbue51skjd3O5jy7x1qUuuIBhItQa5Vgj+05ScFy0+lTAllLyLpwYeQ
+         fsRoUeBC0KX5nUzSYa4W6XIeLRW2Iw2iVM97w0qmmME/NzxZKMpD4y+vT//uZKK42rKV
+         qVNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707150100; x=1707754900;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:to:from:subject:message-id
+        d=1e100.net; s=20230601; t=1707150506; x=1707755306;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XCLWty0DVE2Ux6Y3C9RPsMJjwVXySF8wwAd+YMCj4FE=;
-        b=SnvwEnFIbV7FVSEnE1lYsZU+xvA7OzOh0oXI7VqRRLGEt6Z2vp7kxFKsDHWhI+TgT4
-         vO9muMCKB18ZvCerXe46oYBC5WlSWqzqrKXaFYKSWQs6bsHB/psPCJkYdYQbIqewYtM2
-         dSSzTIOq0plR5NA2oSXzLsFnajHnsqbKZ2xIYeiB1qCZ2EFDUiKIXq6V6r5ZOpHjBwGq
-         XJVUXoKoTqgkZh8fN2XRIJ75k1koZLOM2CYlKKo5LH35MsZmAfLkZtOtz/UwRd9qBDcr
-         ZZMh/kz06PZL664xR3/gbYzGxwVCeAnsHqGBjkwTMBzKpFIQE2jgNjYN6jjeO6AS5kT6
-         bS1g==
-X-Gm-Message-State: AOJu0YwnO/O163K0QXHC8pu7hpAtci+zwvzaXQ6PUsPwR+rmIjTwe3rr
-	BYMkoKqFmeKrKYe/aEM7Ea2dFeJxJ7rRdLKkhQD1/BhTNoiapVxHhZrIPTj7h6XqnOCYWkQUnA9
-	Bm89AmEzFimQfD7hbColhYMZKNIvmCYCx8/vnprRQiaUJFeE7wd88jw==
-X-Received: by 2002:a5d:4dce:0:b0:33a:fc78:55a2 with SMTP id f14-20020a5d4dce000000b0033afc7855a2mr30778wru.0.1707150100169;
-        Mon, 05 Feb 2024 08:21:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFFZrMc9UgMapO3qXLZx0PBLA16ITx4m6HOdaOFXS1tqhVVOf592MUyJeIdAzugi3kyJCVUgg==
-X-Received: by 2002:a5d:4dce:0:b0:33a:fc78:55a2 with SMTP id f14-20020a5d4dce000000b0033afc7855a2mr30703wru.0.1707150097978;
-        Mon, 05 Feb 2024 08:21:37 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUfZAflW0R+dph8YC9I7mmGDrQo5SrQDtvUyrpCKWWHfu62PfUI6iGZmsBJYPlSL54bzwlMtaK/jBn5NPIJGuCMmsrMhLt0PCD3V4CIvul12NNu+risGXZguhK/jZ2MIjgib+deOGVn1QN9aVcH2h+3O7SJUS42lnAnqlYlrH8jh09oKUsvE2DuCjzqwb3+i7+f+FIgQtV7S4HID8zD8ooEgKt7yT5VgoaY8tWEo5/g85/XW6wAcR6avIRP9TNeFsZ0SueVPb2oWJCq+txTj2v+KnbmCm6Dmudf6j9xfFOvVInp811FoRH+m03K++YvnShd+U+Jvp1oc3KAdocVHdY9BrcwOoOhl7T54g7FKRKAZ6psmMOxmwdKnBUYK6mEfvo7idtttzQaUHyan2vA6E/0
-Received: from gerbillo.redhat.com (146-241-230-60.dyn.eolo.it. [146.241.230.60])
-        by smtp.gmail.com with ESMTPSA id x15-20020a5d54cf000000b0033b35da3842sm4003061wrv.28.2024.02.05.08.21.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 08:21:37 -0800 (PST)
-Message-ID: <e4154971623ec3cfd3b500e0ba1e09301d5fcbb0.camel@redhat.com>
-Subject: Re: [syzbot] [mptcp?] WARNING in subflow_data_ready (2)
-From: Paolo Abeni <pabeni@redhat.com>
-To: syzbot <syzbot+732ab7be796ec0d104ac@syzkaller.appspotmail.com>, 
-	davem@davemloft.net, edumazet@google.com, geliang.tang@linux.dev, 
-	geliang.tang@suse.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	martineau@kernel.org, matttbe@kernel.org, mptcp@lists.linux.dev, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Date: Mon, 05 Feb 2024 17:21:36 +0100
-In-Reply-To: <000000000000e8ecae060fae7a47@google.com>
-References: <000000000000e8ecae060fae7a47@google.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+        bh=LcsbQTvQGG1NmlhBrEyH/K59TBAz+MvdMoeLEVdmYgU=;
+        b=XygwGEwVpby7Pvc/KZxx7Gp9pcWiqZsk9MmJHr2ehtVd1UXlHsCgyVMZ7+cazcV7Ks
+         cwZ7nvh0HBWEawHoxq5WhT1njt9QFBb1yOeWrBxHMret3f6efZ8OSEvt/MJ4IYSUhUC0
+         ASCC/yh5K5DtjYH1iz5ypUQ/vUT/mFjEbCr7J/7mC6FbM1aSbt1VXbW6OpSe7groVYGf
+         +L17vyCszh5Lc5DzSyeFRCE84ZFrjdinIhx45R93GVA4DnFCgyYcERGyj0n4YjYj7mBf
+         ZIT76qqSW0eyG6a53o4UFjee74XVsbokvOyx3Y+753RTSdegc6U1EvGRZxAunoYiJUeC
+         9lCw==
+X-Gm-Message-State: AOJu0Yz8acW7347smU/KCRsOQielR8jJWpmTup6SedgdRWsWdMUsRAeI
+	0b7zOQ3pImENsyrWxkkatSMtHu31cC0FDa3szYy1QiSPgivB3niGCyfi4dDLNg==
+X-Google-Smtp-Source: AGHT+IGnFm0542ZBhwrZn/vKiCxYF//C3REJ/vIMwVq1MgfjxK6SeeHbkhC52kvxbE6VP2UiTN96iQ==
+X-Received: by 2002:a17:90b:33c8:b0:296:abfd:1980 with SMTP id lk8-20020a17090b33c800b00296abfd1980mr1716551pjb.23.1707150506595;
+        Mon, 05 Feb 2024 08:28:26 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWEebqBsfz7IIqu+fdNR3v8b0xN8gsBdw9f8Kbk08hmEWbU1zzlSSaddeicKAiTjL/aP1Gj4xMaV9O6bzdDy8M9vzS4c0AGZvGF7Y6er6kWdUmZyAVM+z5y76tkGhor7fe4zdr+wHZkWmBJx1hAfmOUU9Li+4xPDngo7acBaXIffSWgOBgSy8YYG1/W/+knz05Qwsmv8/gGTNcOh62rO+dVY7qNmnBiX7emj3O0yGO6AniKaChZsaB+21dpXqKIU1GPEuxRvbi934AP
+Received: from ?IPV6:2804:7f1:e2c1:b337:7778:d3aa:dde2:173c? ([2804:7f1:e2c1:b337:7778:d3aa:dde2:173c])
+        by smtp.gmail.com with ESMTPSA id o5-20020a17090ad24500b00295c8c120dbsm5391893pjw.20.2024.02.05.08.28.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Feb 2024 08:28:26 -0800 (PST)
+Message-ID: <4342ac71-105f-4ed4-83b7-ede3ab7255f2@mojatatu.com>
+Date: Mon, 5 Feb 2024 13:28:22 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] selftests: tc-testing: add mirred to block tdc
+ tests
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, netdev@vger.kernel.org,
+ kernel@mojatatu.com, pctammela@mojatatu.com
+References: <20240202020726.529170-1-victor@mojatatu.com>
+ <20240202210025.555deef9@kernel.org>
+ <b45bdefe-ee3b-4a07-a397-0b2f87ca56d3@mojatatu.com>
+ <20240204083325.41947dbd@kernel.org>
+From: Victor Nogueira <victor@mojatatu.com>
+In-Reply-To: <20240204083325.41947dbd@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, 2024-01-24 at 02:25 -0800, syzbot wrote:
-> Hello,
->=20
-> syzbot found the following issue on:
->=20
-> HEAD commit:    6613476e225e Linux 6.8-rc1
-> git tree:       upstream
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=3D1200cf0de8000=
-0
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Df9804db253bdf=
-c61
-> dashboard link: https://syzkaller.appspot.com/bug?extid=3D732ab7be796ec0d=
-104ac
-> compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for D=
-ebian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D111fe2bfe80=
-000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D17abc23be8000=
-0
->=20
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/cdad5c52fcde/dis=
-k-6613476e.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/14491fee3433/vmlinu=
-x-6613476e.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/953a5864daf4/b=
-zImage-6613476e.xz
->=20
-> The issue was bisected to:
->=20
-> commit 14c56686a64c65ba716ff48f1f4b19c85f4cb2a9
-> Author: Geliang Tang <geliang.tang@suse.com>
-> Date:   Wed Oct 18 18:23:55 2023 +0000
->=20
->     mptcp: avoid sending RST when closing the initial subflow
->=20
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D159a9427e8=
-0000
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D179a9427e8=
-0000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=3D139a9427e8000=
-0
->=20
-> IMPORTANT: if you fix the issue, please add the following tag to the comm=
-it:
-> Reported-by: syzbot+732ab7be796ec0d104ac@syzkaller.appspotmail.com
-> Fixes: 14c56686a64c ("mptcp: avoid sending RST when closing the initial s=
-ubflow")
+On 04/02/2024 13:33, Jakub Kicinski wrote:
+> On Sat, 3 Feb 2024 17:15:32 -0300 Victor Nogueira wrote:
+>>> I think this breaks the TDC runner.
+>>> I'll toss it from patchwork, I can revive it when TDC is fixed (or you
+>>> tell me that I'm wrong).
+>>
+>> Oh, I think you caught an issue with the process.
+>> The executor was using the release iproute2 instead of iproute2-next,
+>> which I tested on. I'm wondering if other tests in nipa are using
+>> iproute2-next or release iproute2. The issue only arises if you have
+>> patches in net-next that are not in the release iproute2. We will fix
+>> the executor shortly.
+> 
+> We merge iproute2 into iprout2-next locally and build the combined
+> thing, FWIW. I haven't solved the problem of pending patches, yet,
+> tho :( If the iproute2-next patches are just on the list but not
+> merged the new tests will fail.
 
-I forgot to mention this is looks like a legit mptcp-related issue.
-
-There is a fix for this in the mptcp devel branch that should land here
-somewhat soonish.
-
-Cheers,
-
-Paolo
-
+In this case both were merged into -next trees. It's just the executor
+that needed fixing.
+For features merged into net-next but not yet in iproute2-next perhaps
+nipa can be used to catch such issues?
+Should I resend the patch now that the executor is fixed?
 
