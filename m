@@ -1,111 +1,105 @@
-Return-Path: <netdev+bounces-69162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E9D8849D9F
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 16:01:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F38E9849DD4
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 16:20:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30A0C1F24D9F
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 15:01:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3218B1C20F2F
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 15:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B27D2C69F;
-	Mon,  5 Feb 2024 15:00:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AAE82C6B9;
+	Mon,  5 Feb 2024 15:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="oX3xciPi"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TnzMcBJ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9B42C19C;
-	Mon,  5 Feb 2024 15:00:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E4032C84C;
+	Mon,  5 Feb 2024 15:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707145245; cv=none; b=aO3jz/nIX08tZo97WzCTLDougVfmPTE2CPVpLbxHRTVg9t2noH2qYHOxBKdsFQHLzpKrTo4ep5WQAQm9hJoccih+oV59DK7D1s0iTX5widpMIQ1+4LF/g7o+Nm+aH6YKJHa72Ua7wp+aeeoD0N6tNzEfEmbvbYB6cFHvJx+N0mA=
+	t=1707146437; cv=none; b=BH5aPoY/cpDReaF6NaokJ8PqLMUPBPlPNR53VDhucFHo2XIIL2BpmQkkT/JT4CPNkObJ/iTJKzt4hkEnktOUEu1E4DMB+baH0X5/xCc5lNJ8Bwhzgc79uPfIUzp/d+uZ2fwlkTpqaAVGIbtikTKoWUQxTWmDDbawWDU8MM7vXcI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707145245; c=relaxed/simple;
-	bh=G/upHH50MlPuOxBBaB3xXpKK9F7lVAXSgZQ2cx/UUr0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZecgAJOh80lKflqo46M2Ul0twSxUjatNMRtea2dI1fPvceb0ciq2ldfvqzG5xuvreq4PVVpGG7CkymSTTfzcb6dnwx2mKc0skZ23/uDjJZ2qiwU+C/cHdwdlnlmXxob5YDPjk94lcf5alN3/whewdQ5BvYaQyj0TlMFhUqb+Fhk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=oX3xciPi; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8545EFF814;
-	Mon,  5 Feb 2024 15:00:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1707145241;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PEE4+JdfTjyn6YerADKkv+gio5Qai05SHvunF75uvZU=;
-	b=oX3xciPiOpgsx1o4tDNRxIBoA7dmBw3a39tOa1P386RMNRDh0M00hwbtZuiQQg6pZ/wtHS
-	HSgTnpDkxu/BejnrNyEVqNww/V2jr2k0ZJ1+hx3SYYdgB73/NdEeZBcHt3bjBPzZ6FlYMY
-	IjC2YdExejSDAcHawCwPefQ9a1DbrsbPuIAmum/7i00XyTJZWQZRw3hJ3Ly44jsone5EDw
-	QxORhCF4x1c0u6roUFaB8F4RX6oGu+FWBJmuS82JVdOIntjx8Phy7oZ70xXKLJnwd+vbY7
-	HHum87IPtjxZ9/EtxpZCe5nlAi0ygarL1gEABTngUxDw4/mTwf42W5KxSHnH1Q==
-Date: Mon, 5 Feb 2024 16:00:33 +0100
-From: Herve Codina <herve.codina@bootlin.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Vadim Fedorenko  <vadim.fedorenko@linux.dev>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew@lunn.ch>, Mark Brown
- <broonie@kernel.org>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2 5/6] net: wan: fsl_qmc_hdlc: Add runtime timeslots
- changes support
-Message-ID: <20240205160033.2c017f46@bootlin.com>
-In-Reply-To: <a8845eca2d9bab5d7805c19a16811820671c41f2.camel@redhat.com>
-References: <20240130084035.115086-1-herve.codina@bootlin.com>
-	<20240130084035.115086-6-herve.codina@bootlin.com>
-	<a8845eca2d9bab5d7805c19a16811820671c41f2.camel@redhat.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.38; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1707146437; c=relaxed/simple;
+	bh=hpLodnPFTzGDmybN3BEWyUWqwYKKEqaVJLjW6ZG61sY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oRUuobislM3FIyyDhaPy7IkF4L5SscKaHz86uide0zABHMc6Z3SlFqY2G52gZAkWNAq5IXmTzXUqzAph58rCCUloczPou6x57HfrY5ceJrCA5ZiC05Hoh+oiKkLo2BNqSAKEUoPLvADcOeVT8P0CE32MYpfNDvmfm1P72m6uhvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TnzMcBJ1; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ybapUfqzuvYYWTklz2FUq3Tu24rh2dOO9XsrfWbS7YY=; b=TnzMcBJ1FcNgRR3WOsGVIUTGQu
+	wsTRA8QaiF3Yhfo9HyugD5whR5g6esiNWH5+KDEozZKCZ7J1/JsCrMUsapyy1dEIyOdmSavTUyahV
+	V2MhL+OCk+UUdgoMUmyOu+aY0nwZczlEyP2G8VylzZjzxrVxzqZDKgwr8/gZXQ3+5jcc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rX0lg-0072dB-IZ; Mon, 05 Feb 2024 16:20:20 +0100
+Date: Mon, 5 Feb 2024 16:20:20 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: David <david@davidv.dev>
+Cc: Jonathan Corbet <corbet@lwn.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Paul E. McKenney" <paulmck@kernel.org>,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Xiongwei Song <xiongwei.song@windriver.com>,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] net: make driver settling time configurable
+Message-ID: <580001e3-17ef-4f24-8fd8-bc14110e874e@lunn.ch>
+References: <20240205114609.440597-1-david@davidv.dev>
+ <1e08910b-8ae2-4985-8423-45a1a823cefc@lunn.ch>
+ <bfbad418-f8c6-4cdf-97b5-5c13044539e8@davidv.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bfbad418-f8c6-4cdf-97b5-5c13044539e8@davidv.dev>
 
-Hi Paolo,
+On Mon, Feb 05, 2024 at 03:31:38PM +0100, David wrote:
+> On 2/5/24 15:06, Andrew Lunn wrote:
+> > On Mon, Feb 05, 2024 at 12:44:40PM +0100, David Ventura wrote:
+> > > During IP auto configuration, some drivers apparently need to wait a
+> > > certain length of time to settle; as this is not true for all drivers,
+> > > make this length of time configurable.
+> > Do you see this problem with multiple drivers, or just one in
+> > particular. To me this seems like a driver bug, and you are just
+> > papering over the cracks.
+> > 
+> > 	Andrew
+> I don't know of any drivers that may need to wait -- I noticed
+> this code path being hit when building a minimal kernel that only
+> had a virtio network device.
+> At least for the virtio device, the wait is unnecessary and bloats
+> the time to boot a minimal kernel from 15ms to 33ms.
 
-On Thu, 01 Feb 2024 13:01:51 +0100
-Paolo Abeni <pabeni@redhat.com> wrote:
+Looking at the code, a delay has been here a long time, since before
+git. However, 2011 the delay was changes from 1 second to 10ms. There
+was a discussion about this at the time:
 
-[...]
-> >  
-> > +static int qmc_hdlc_xlate_slot_map(struct qmc_hdlc *qmc_hdlc,
-> > +				   u32 slot_map, struct qmc_chan_ts_info *ts_info)
-> > +{
-> > +	DECLARE_BITMAP(ts_mask_avail, 64);
-> > +	DECLARE_BITMAP(ts_mask, 64);
-> > +	DECLARE_BITMAP(map, 64);
-> > +	u32 array32[2];
-> > +
-> > +	/* Tx and Rx available masks must be identical */
-> > +	if (ts_info->rx_ts_mask_avail != ts_info->tx_ts_mask_avail) {
-> > +		dev_err(qmc_hdlc->dev, "tx and rx available timeslots mismatch (0x%llx, 0x%llx)\n",
-> > +			ts_info->rx_ts_mask_avail, ts_info->tx_ts_mask_avail);
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	bitmap_from_arr64(ts_mask_avail, &ts_info->rx_ts_mask_avail, 64);
-> > +	array32[0] = slot_map;
-> > +	array32[1] = 0;
-> > +	bitmap_from_arr32(map, array32, 64);  
-> 
-> What about using bitmap_from_u64 everywhere ?
+https://lore.kernel.org/netdev/1305696161-18277-1-git-send-email-micha@neli.hopto.org/t/
 
-Yes indeed.
-Will be updated in the next series iteration.
+It was said that ARP and DHCP retries should recover any system where
+the first transmit/receive gets lost with the change from 1s to 10ms.
 
-Thanks for this review.
-Best regards,
-Hervé
+Maybe after 12 years, its time to try a default of 0ms? I would
+suggest that is a second patch, which is easy to revert if it all goes
+horribly wrong.
+
+	 Andrew
 
