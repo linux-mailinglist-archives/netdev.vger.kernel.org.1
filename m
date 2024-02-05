@@ -1,119 +1,170 @@
-Return-Path: <netdev+bounces-69010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 995F184920D
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 01:36:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCDE7849214
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 01:44:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 251FE1F21C45
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 00:36:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1FA41C2182F
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 00:44:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F964800;
-	Mon,  5 Feb 2024 00:36:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21AF0385;
+	Mon,  5 Feb 2024 00:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="j/PZI/Ht"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nKH3BHQF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D11E465C
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 00:36:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 457F3A94A;
+	Mon,  5 Feb 2024 00:44:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707093365; cv=none; b=CFH2mz2x+drQnF1LFWC182VQWS5QH8AedyEefrjXpMRNcxhZEZjY2ZT/LjKJBJ1d/JU/TrNGyVkyr89PDzoTAh1P3zaIkVISqEI0RXWapzwJC0P6hK0TlTbSsQEIZtpi6sS1/hDSFULaiGdPzJxVdTyjWuApBkVhQ+eLkhz8300=
+	t=1707093857; cv=none; b=rnKhseG/dhtqjuHhK7Smvnuz3f1A06HuVNk+RzUyxHOJF94EEfHcFFAjghti+F72vL5c7m38zrJB12L6S5Pglr4IqwopIUOuDejdNpoZBQqRmbxrDDYUTpmYTX00XFVe0YL+fTTACA/kJnX8ytDUPJW0vazeMsKdkpFlMYMbczE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707093365; c=relaxed/simple;
-	bh=m69DGvIzuKUVjW3O1QFMxwepscTybDO2RxRMOFDP7GA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=MO1Usx0pO1v6K9ftQ/L8f6iz0nw6NRo9Z2Dgjmj5caZvOR3UYFQKbar47YbCb0oP8qkmBNTJlZ3C5Nt2bgZqpqeLfbuVBjJ6bB9MtL6rtpdu25m+w7MqyH7UnzFcRTmYz8pUxGqzpAm1lYD8LEevEDpmBzdP6RFiJAvIfg+SmOQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=j/PZI/Ht; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=googlemail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-40f02b8d176so33937715e9.1
-        for <netdev@vger.kernel.org>; Sun, 04 Feb 2024 16:36:03 -0800 (PST)
+	s=arc-20240116; t=1707093857; c=relaxed/simple;
+	bh=2Z5QksJq+eDLpg7FYQtmjE2jPrkh5Zzk4bJ79okWTyE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bcyPYgHr4nSlljrnt4C8wCUO88gDx/sjuCJUPbTek2hnYbn37RTXsNaTyAr2OHVMomtBOGyykg+oZNgaEAQ2+ulozDQfTmrm4OtXu0Vu+y5TXSeAy/Hq6hvcs0vg2MzWCwGUSqe89kEEKXH87VR6tiEk5bR7b+CJsK5bTHlfIHw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nKH3BHQF; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-5111c7d40deso6369690e87.1;
+        Sun, 04 Feb 2024 16:44:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20230601; t=1707093362; x=1707698162; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:reply-to:from:subject:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tuk5rPRODqBdHzneVF/fVUHfeNieIovnQ/lNIrR8ro4=;
-        b=j/PZI/Htz7P1x4ijBvj5nHhBE3Kl8mzMBOWKYeLs3BZz7m4B+BsRoD3rzfZgklY7Rp
-         01ee155x42730LMCfWG+DjdcXVbr1y0V5ehMhyJKjSbzqsDH1x2pzbJPK1kppptH+Jog
-         NkFg0dBrwehY+6VV4ago31WAjwnp6j8WuztDQmgUm9PM+WRGFavszj4VCTw3R2ay0vQ2
-         Ku8UPi2v8ra6zgJhuHfaPQt7viMEiFUe94z2880xUkZAVLMZWUBVmx1GKR19TniJW+02
-         /8/C0YbOXM1SOw4wQxhUk/Mz3kUGIKMRpcG6G2bpNFlgTHIqbI+lwB4VeYukdknDc7ne
-         InLQ==
+        d=gmail.com; s=20230601; t=1707093853; x=1707698653; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=8pRLyNXA1Vc52Lsv+SyI/OT6snOptfaP6otyX8bc0Yg=;
+        b=nKH3BHQFsSsHTg6d79ddZLhF99zKnu4VYh4J4baVoBp6W+zggiVuAGxpAvgnQNgjMc
+         UYHBR1C/6cQYadUzeIqp2lmv8SNx2nAy9xsBKpLx1gt76ELr+rrhAsOJK55WArM0aulg
+         4UNEtnJgBTtnunpU+7VrUHhPTeA10++ZsuugFQtljG6WPUfGisTrGm+Y/Ahv/fCpPEk1
+         h0jZiGXD3IhUMqntXPfkjyWLd0l4GPeXnUQ4sHAos5kx5WqXIri8+7fkk5oGFqrE+7G2
+         9fNMooogMpaqMyBey6bDyiS86Y1g/jsRiMsT5NCElZbRgcRUBw+s7W3ekKErXJOaArKx
+         hulg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707093362; x=1707698162;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:reply-to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=tuk5rPRODqBdHzneVF/fVUHfeNieIovnQ/lNIrR8ro4=;
-        b=GPa0RJrB2fH3HjnqO8blUJmBUCg2z8YVkz2dkqmIXtJy4Si/JBABj3wpIX5xj1fCvh
-         4iwCwIOwxGortPucgKkH+hw684+4JmV9iEJZXH+WldH9RiVPkyAat4ctGFzfXFh9LWUC
-         faEamQRZq6MqeEsUR+YKouav8d710kMjbTGLTECY2p6K9LptbORkDAxdo70Ln1rt9jan
-         EIPNBEU01FU+t/v6Tt/cO+5mO+G9n/D3/9JvpfGl9b2jw66g4kLfUJI45frExlcqWVnG
-         T7+dQ1gSWXtER86UWIwmv5zqN73vD1WU9vMTAS8gYePZFw08a3XuB2KkL6SK/fz5RCrN
-         4zKQ==
-X-Gm-Message-State: AOJu0YzHsRgnTkqM6HyPjPfaZvuRPUv1e4iLx4LMF4pmHzkYj6auRTGF
-	KOBKyWKlHKsLks8ilwa+kR0IBfIwCzNFHgr9x37hILIAQPYCkAno
-X-Google-Smtp-Source: AGHT+IH9X4s7p0+kYhJiCcE+tFtELn2VmAQobbLW8gI5L1+HtbFU56PNMwYIc7iWhoArLh+OgY5WPA==
-X-Received: by 2002:a05:600c:3d9b:b0:40e:f5d0:8517 with SMTP id bi27-20020a05600c3d9b00b0040ef5d08517mr3481943wmb.33.1707093361826;
-        Sun, 04 Feb 2024 16:36:01 -0800 (PST)
-Received: from mars-2.fritz.box ([2a02:8071:7130:82c0:da34:bd1d:ae27:5be6])
-        by smtp.gmail.com with ESMTPSA id fa10-20020a05600c518a00b0040fd0b29255sm5720277wmb.13.2024.02.04.16.36.01
+        d=1e100.net; s=20230601; t=1707093853; x=1707698653;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8pRLyNXA1Vc52Lsv+SyI/OT6snOptfaP6otyX8bc0Yg=;
+        b=fo697HJbt7MwQTBP3SiomPLFD603ixUHNqtEaB8+WyVFdKk/B7+GJb4poafMhU54bA
+         1vy1iXw0bohJCZhHQiTDCPEUFxM1NYrjKpP/lZOdOoeIzb7LHq+Mw8gBRXWKKYaTPEK5
+         CwVNB2DHcetEmuJpYClVKM8zMpFrInipK/EBRvdHleckVLy+8+TI2RzrJO7gJg/ow6mc
+         iIlKq525iMoXafz2OF9TmBEmee3bIurGs3FsLTMbdU4gxxv4b7i3wdlBp06/sHBJzPpJ
+         W2vjijPiOuiazFgHndR+DO1+b255Ik4dE/yQ9lJ4VIZ43WxwR4GGcgqAOCGdyG1dbMUs
+         9b5g==
+X-Gm-Message-State: AOJu0YxUWgNXY6+S2Y22TMiNb42IpNsYbkCgptvmWcITJ40SeOSTYJG1
+	qxi0+SANtwXfPJLN+js7wUrYGGxhOKHcYXjbwShpvSkeoA90Fahq
+X-Google-Smtp-Source: AGHT+IEFvRNEOvL4TW43JBOrJ42lWSMt0EtFuLCI7i2L2aDTBb6BqadOD2oDwoUbchIwtj4xKHaTtA==
+X-Received: by 2002:a19:7415:0:b0:50e:cd02:b53d with SMTP id v21-20020a197415000000b0050ecd02b53dmr4698829lfe.15.1707093852945;
+        Sun, 04 Feb 2024 16:44:12 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCXtEWkAkHkm+tUMqIYOWc5ZHxjzdMxzIraTcDNQSS1b1z8fIWYxqFaAE2AMCZUw3GIhLPTmypIs4SGmA1JSmC6+cW8KF3II/ISMxwx43/15Z7qShRtowsW1TAMyL1PxvX357kC4gLy+8C9qrrrjHO4BMjrLjxODgxzYgkHLeZWIcOQpbdxPis9HMqWDg43V3JNUlD5G4yEo9XaAgn6WRBIGw3s44gzgzJyHs05W8/gaRxArhumHNdWGbrAOjtEVaOZxyaz3Epo8jcd46vHC2K3dk49L47E1kDJAEe5jSFt2DTQ+yqowkicHPDf8RumNywuaNTfuc1lTbiUuUAZaG5Z159TKaUrfA4siRSE4SEo1EkUTFZVwjEX1K/mKS9h5qwhUQNNaU4SijUXJWfVAlBkzEsLCrfA=
+Received: from mobilestation ([95.79.203.166])
+        by smtp.gmail.com with ESMTPSA id g16-20020ac25390000000b0051149482328sm500715lfh.26.2024.02.04.16.44.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 04 Feb 2024 16:36:01 -0800 (PST)
-Message-ID: <b7c66e3ea1a87e4dc0edb2df15e29f43fa5bf723.camel@googlemail.com>
-Subject: Re: qca_spi: SPI_REG_SIGNATURE sometimes not recognized
-From: Christoph Fritz <chf.fritz@googlemail.com>
-Reply-To: chf.fritz@googlemail.com
-To: Stefan Wahren <wahrenst@gmx.net>
-Cc: netdev <netdev@vger.kernel.org>
-Date: Mon, 05 Feb 2024 01:36:00 +0100
-In-Reply-To: <e6c64849-ded6-49e0-aa15-283346b185e4@gmx.net>
-References: <75ea348da98cf329099b0abf1ef383cd63c70c40.camel@googlemail.com>
-	 <e6c64849-ded6-49e0-aa15-283346b185e4@gmx.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+        Sun, 04 Feb 2024 16:44:12 -0800 (PST)
+Date: Mon, 5 Feb 2024 03:44:10 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Thierry Reding <thierry.reding@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, linux-tegra@vger.kernel.org
+Subject: Re: [PATCH net-next v2 3/3] net: stmmac: Configure AXI on Tegra234
+ MGBE
+Message-ID: <uzzzxx3mv6yoslijhhzdzyossvcvi52jgbulza54uqh2wrm5kd@ddd5o56b2dhu>
+References: <20240202-stmmac-axi-config-v2-0-64eab2bab17b@nvidia.com>
+ <20240202-stmmac-axi-config-v2-3-64eab2bab17b@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240202-stmmac-axi-config-v2-3-64eab2bab17b@nvidia.com>
 
-> >   working on a board with QCA7005, on probe() SPI_REG_SIGNATURE
-> > sometimes fails (~1 out of 5 times) to be recognized correctly, even
-> > after multiple reads and retries.
+On Fri, Feb 02, 2024 at 12:53:35PM +0100, Thierry Reding wrote:
+> From: Thierry Reding <treding@nvidia.com>
+> 
+> Allow the device to use bursts and increase the maximum number of
+> outstanding requests to improve performance. Measurements show an
+> increase in throughput of around 5x on a 1 Gbps link.
+> 
+> Signed-off-by: Thierry Reding <treding@nvidia.com>
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
+> index bab57d1675df..b6bfa48f279d 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c
+> @@ -199,6 +199,12 @@ static void mgbe_uphy_lane_bringup_serdes_down(struct net_device *ndev, void *mg
+>  	writel(value, mgbe->xpcs + XPCS_WRAP_UPHY_RX_CONTROL);
+>  }
+>  
+> +static const struct stmmac_axi tegra234_mgbe_axi = {
+> +	.axi_wr_osr_lmt = 63,
+> +	.axi_rd_osr_lmt = 63,
+> +	.axi_blen = { 256, },
+> +};
+> +
+>  static int tegra_mgbe_probe(struct platform_device *pdev)
+>  {
+>  	struct plat_stmmacenet_data *plat;
+> @@ -284,6 +290,9 @@ static int tegra_mgbe_probe(struct platform_device *pdev)
+>  	if (err < 0)
+>  		goto disable_clks;
+>  
+> +	/* setup default AXI configuration */
+> +	res.axi = &tegra234_mgbe_axi;
+> +
+>  	plat = devm_stmmac_probe_config_dt(pdev, &res);
+>  	if (IS_ERR(plat)) {
+>  		err = PTR_ERR(plat);
 
-> at the time of writing the driver, i assumed the QCA7000 is always
-> powered up (takes ~ 1 second) during probe of the driver and the driver
-> could do the signature check during probe. But this doesn't work in all
-> cases. So qca_spi driver has the module parameter qcaspi_pluggable,
-> which is disabled per default. If you enable this, this will skip the
-> signature check during probe and let the spi thread handle the
-> synchronization.
->=20
-> Does this fix your problem?
+The entire series can be converted to just a few lines of change:
 
-Yes, thanks - this seems to fix the probe issue.
+ 	plat = devm_stmmac_probe_config_dt(pdev, res.mac);
+ 	if (IS_ERR(plat)) {
+ 		err = PTR_ERR(plat);
+ 		goto disable_clks;
+ 	}
++
++	if (IS_ERR_OR_NULL(plat->axi)) {
++		plat->axi = devm_kzalloc(&pdev->dev, sizeof(*axi), GFP_KERNEL);
++		if (!plat->axi) {
++			ret = -ENOMEM;
++			goto disable_clks;
++		}
++	} /* else memset plat->axi with zeros if you wish */
++
++	plat->axi->axi_wr_osr_lmt = 63;
++	plat->axi->axi_rd_osr_lmt = 63;
++	plat->axi->axi_blen[0] = 256;
+ 
+ 	plat->has_xgmac = 1;
+ 	plat->flags |= STMMAC_FLAG_TSO_EN;
+ 	plat->pmt = 1;
 
-> Regardless of the results, i think qcaspi_pluggable should be enabled
-> per default.
+Please don't overcomplicate the already overcomplicated driver with a
+functionality which can be reached by the default one. In this case
+the easiest way is to let the generic code work and then
+override/replace/fix/etc the retrieved values. Thus there won't be
+need in adding the redundant functionality and keep the generic
+DT-platform code a bit simpler to read.
 
-I think so too. Because the current default (off) is only appropriate
-when the chip already gets powered up long before probing. This seems
-unusual and at the same time understandable because the driver lacks
-regulator and gpio-reset handling.
+-Serge(y)
 
-What about removing qcaspi_pluggable completely while adding a warning
-when QCASPI_SYNC_UNKNOWN hits way too many times?
-
-Thanks
-  -- Christoph
-
+> 
+> -- 
+> 2.43.0
+> 
+> 
 
