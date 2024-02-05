@@ -1,180 +1,251 @@
-Return-Path: <netdev+bounces-69027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C97A2849305
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 05:45:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CEF4849300
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 05:45:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 880941C220A8
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 04:45:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01D9C1C210E3
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 04:45:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86BCBB64C;
-	Mon,  5 Feb 2024 04:45:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F4F9468;
+	Mon,  5 Feb 2024 04:45:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="CPbdZ1+p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cy6D5Vwq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f42.google.com (mail-oo1-f42.google.com [209.85.161.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF33FAD35
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 04:45:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90581AD22
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 04:45:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707108352; cv=none; b=X/sRZ1O1UGfiFv4cMB7To4pYG2AneMsQBpQ98gbifrVFDGytza/PA6IiuDnmF8h+bMJPmJn7h7PlbnPbKFE9eKtpP9HhTZt28KoKFJAQH8XefKWJ8wWHEaiPKvKuA2k7EKGA4NloKv+WR0JmsxycQ2seVK9YiXUxfoylQMvEqYw=
+	t=1707108318; cv=none; b=iOp2jZE9TD3T77vVehpx4nL+npqHZo8rPxPPlttmRzU2o0ZRG8XRUbNZx5+lXITODjRqU79MaxzsJU7B2g+vxSjKes7FRALY4qO37kz2HnMjXKXwqT+f1QBdcPwZMkbSO3/EQPaYT6j67811Rrp5E5ZN+K4UDxR+jXkejDbks4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707108352; c=relaxed/simple;
-	bh=nnZDfL2lYVUfyeGMgfLB2kVMymyfHCXbZUS54zB1Tvo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=e2fhR4EFEs2PPjBMABIG3PUm48ifVaZhO/z7HKnI0cHE8KgjC8zNr4VpJI8kxX6orYrQ13XyMLtUSIqR/0S/3IyShznxQepCRwrpF2e8lW8PIeNBZ0mfqO4AYUsmYVxqI3fTs+fz87qvWy2bpAW2rQwGHRSubBivmYH+3o2iaLc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=CPbdZ1+p; arc=none smtp.client-ip=209.85.161.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oo1-f42.google.com with SMTP id 006d021491bc7-59a87156cb8so1748287eaf.2
-        for <netdev@vger.kernel.org>; Sun, 04 Feb 2024 20:45:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1707108350; x=1707713150; darn=vger.kernel.org;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=+l8cKr2Ar+3gm80Z7qi74idXrPpugT+r6d47IRBYS9g=;
-        b=CPbdZ1+pUknOpXGs8c2aOTW5Z/0RnCricIOUqj9lIyuCZTDewS0tSvqPvJirN0Yexj
-         mV6+s8KfSJQcEW4eMdf1jZRPH2vH4zso1MqDFPEP2QSmf8zzfDHk+4CQ/N0mU9ZM52S8
-         i8EuPEVihCOs9gN968SbEka5bYUf1QlogvoZc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707108350; x=1707713150;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+l8cKr2Ar+3gm80Z7qi74idXrPpugT+r6d47IRBYS9g=;
-        b=SFVfsy0inR/N1tFS2RAm8oRstC9TqUmYSvDuyVhhIoHkw71u3At1b+atkwYRA1v9LW
-         LpowmTNm46OI3M7qY/85JDIqbJ/wDlytY4NvR4zPZtnN9PO0Imi9kRj6vmZZFoYayJXF
-         ClGhtll4xugq5dfXe+YdrDRVOAgraL8PI85qEJ0U61YCGZvcA94CIpDYrfa2OsCRoNfc
-         LyFMNo/vnGK9tyHGpA5nOEi/ABJf8S3uCgOtl99s/45m+CytrbHzcVdgmxJHFOrBTsl1
-         EOcyPZs1Gq6KcgWSMQORs4sw7YeT4bWRCj2KANrKcLaMCZVrZD2wItld4yfeB59PpBqm
-         RLfQ==
-X-Gm-Message-State: AOJu0YyJL5CaFfazOT257mYXgTuP/5Vq2fwdtxOPp1/P9fkcIQhQ8rUY
-	UaIHkGIGSd6R67bEUQPlIQzgV/sRdvf07K6+Tj+MNEwzYKupvgTcSFH6Saj81A==
-X-Google-Smtp-Source: AGHT+IGLMowC6WyzR8w+BTpjGzc6iPM2N0JN8gb7a+0G98ERsVa31G2lPl8Fn3u/yexX5CCcsFV/3w==
-X-Received: by 2002:a05:6358:7e4c:b0:176:3457:c380 with SMTP id p12-20020a0563587e4c00b001763457c380mr16650091rwm.6.1707108349845;
-        Sun, 04 Feb 2024 20:45:49 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVjQV4S2ybY8pGan8KqUeVvYMJi6ijevtOYAi0NyG00pUt9STw260/xIUjHY7i2uw5xni2OohqS+qNGSbUbKsqZuDqV2Q//VCP9PIj/7DK0RDDOtyTww/A1cEFgL+2W1iETz2CrEzhIGoRJo3ocAYwZzPB3w+Iy2kqOUyZRO91u9tJU1Uz6MIXEdBS3RvE2/wBuzY4a9qzlUlXEDWbHFLH8Bq1cZioblAuauN69ktdN0zf1WKSiUoicD6c4IEGjIvFzTC4plu5SSoY/NHVVfo4pJG8P70dzemWzIMbWkSvieh5uAhddCkpI6oHq92o361e+MtbmX/fMnwbG7q+ZABmKaKH2qeB4MfPegltEx+SfOI1wtb0bSZB75b17qW1/ivM8i1qfKpDDJTBkJbh/gOF1gIDFjeAFq9PFaT5z6+Nb7RUj7pDUJHU55aY1njeP4CvpE2w/4CsWz26PaL2GeI6Ay0GuQTynkUQ68PlguRc//Of+p8hwhiDjYm0+d2JNsOIbl6moQvmu+wYo91LWwnzQyM6Ft/M=
-Received: from akaher-virtual-machine.eng.vmware.com ([66.170.99.2])
-        by smtp.gmail.com with ESMTPSA id bn23-20020a056a00325700b006dbda7bcf3csm5629859pfb.83.2024.02.04.20.45.47
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Sun, 04 Feb 2024 20:45:49 -0800 (PST)
-From: Ajay Kaher <ajay.kaher@broadcom.com>
-To: stable@vger.kernel.org,
-	gregkh@linuxfoundation.org
-Cc: pablo@netfilter.org,
-	kadlec@netfilter.org,
-	fw@strlen.de,
-	davem@davemloft.net,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	alexey.makhalov@broadcom.com,
-	florian.fainelli@broadcom.com,
-	vasavi.sirnapalli@broadcom.com,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Sasha Levin <sashal@kernel.org>,
-	Ajay Kaher <ajay.kaher@broadcom.com>
-Subject: [PATCH v5.4.y] netfilter: nf_tables: fix pointer math issue in  nft_byteorder_eval()
-Date: Mon,  5 Feb 2024 10:14:53 +0530
-Message-Id: <1707108293-1004-2-git-send-email-ajay.kaher@broadcom.com>
-X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1707108293-1004-1-git-send-email-ajay.kaher@broadcom.com>
-References: <1707108293-1004-1-git-send-email-ajay.kaher@broadcom.com>
+	s=arc-20240116; t=1707108318; c=relaxed/simple;
+	bh=zodg4pjND8pp/3Aql4d4jo/RRU8mCqXSLetSXg1Gc1s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mfvuSqll/rFZ6iCSIutNuB6+GZNiPuPT30fzH5+BRRcDzEmsIxoQajVNw+5mRTbef9nS9u+hK36S0GhutrS6KL30OsTPzI3llNQPIbJ5YyMBMb3TuUNI4y231SWO3ADSjfL32Bdj34v1t0Weh/fODf3fqqgWTZJV9K8p+94W82k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cy6D5Vwq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 525D9C433F1;
+	Mon,  5 Feb 2024 04:45:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707108317;
+	bh=zodg4pjND8pp/3Aql4d4jo/RRU8mCqXSLetSXg1Gc1s=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=cy6D5VwqJmoNgZEFz57gxpDEgrqaH3KaNJpdzIbQYC4QtSIVmYG3MFOhXzqwbZu3r
+	 7+KgjoI3Hu67RuqIRup0vxec4Ms/82T2fX62EHSlVsPhFUEa1jApjQ4KjTN1vcl7CZ
+	 yz1znv9EkrJESNMhjYW2hFCD3EFABrYg5c2I3XYuNC2BBGQ3Gg42FwuzmCiaj/T0pm
+	 FDPbMxvvZh/qfQc8LHdRvQOmYAX9gv9Dca6M9qKE3LQAita8SIs7JJgE3JBcuD4Rrn
+	 MFCcHDGXy/qDxXkokXib+H5Dx8aqWpnuM5Am4gy+Uk3RDQrQ99IcAnfQeG9ocfIGEQ
+	 xKd4gJQ8YYP6w==
+Message-ID: <2ddfe75a-45e4-4499-8aae-4d83de90d1ce@kernel.org>
+Date: Sun, 4 Feb 2024 21:45:16 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 3/5] net/ipv6: Remove expired routes with a
+ separated list of routes.
+Content-Language: en-US
+To: thinker.li@gmail.com, netdev@vger.kernel.org, ast@kernel.org,
+ martin.lau@linux.dev, kernel-team@meta.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, liuhangbin@gmail.com
+Cc: sinquersw@gmail.com, kuifeng@meta.com
+References: <20240202082200.227031-1-thinker.li@gmail.com>
+ <20240202082200.227031-4-thinker.li@gmail.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240202082200.227031-4-thinker.li@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Dan Carpenter <dan.carpenter@linaro.org>
+On 2/2/24 1:21 AM, thinker.li@gmail.com wrote:
+> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+> index 733ace18806c..36bfa987c314 100644
+> --- a/net/ipv6/addrconf.c
+> +++ b/net/ipv6/addrconf.c
+> @@ -1255,6 +1255,7 @@ static void
+>  cleanup_prefix_route(struct inet6_ifaddr *ifp, unsigned long expires,
+>  		     bool del_rt, bool del_peer)
+>  {
+> +	struct fib6_table *table;
+>  	struct fib6_info *f6i;
+>  
+>  	f6i = addrconf_get_prefix_route(del_peer ? &ifp->peer_addr : &ifp->addr,
 
-commit c301f0981fdd3fd1ffac6836b423c4d7a8e0eb63 upstream.
+addrconf_get_prefix_route walks the table, so you know it is already
+there ...
 
-The problem is in nft_byteorder_eval() where we are iterating through a
-loop and writing to dst[0], dst[1], dst[2] and so on...  On each
-iteration we are writing 8 bytes.  But dst[] is an array of u32 so each
-element only has space for 4 bytes.  That means that every iteration
-overwrites part of the previous element.
+> @@ -1264,8 +1265,18 @@ cleanup_prefix_route(struct inet6_ifaddr *ifp, unsigned long expires,
+>  		if (del_rt)
+>  			ip6_del_rt(dev_net(ifp->idev->dev), f6i, false);
+>  		else {
+> -			if (!(f6i->fib6_flags & RTF_EXPIRES))
+> +			if (!(f6i->fib6_flags & RTF_EXPIRES)) {
+> +				table = f6i->fib6_table;
+> +				spin_lock_bh(&table->tb6_lock);
+>  				fib6_set_expires(f6i, expires);
+> +				/* If fib6_node is null, the f6i is just
+> +				 * removed from the table.
+> +				 */
+> +				if (rcu_dereference_protected(f6i->fib6_node,
 
-I spotted this bug while reviewing commit caf3ef7468f7 ("netfilter:
-nf_tables: prevent OOB access in nft_byteorder_eval") which is a related
-issue.  I think that the reason we have not detected this bug in testing
-is that most of time we only write one element.
+... meaning this check should not be needed
 
-Fixes: ce1e7989d989 ("netfilter: nft_byteorder: provide 64bit le/be conversion")
-Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
-[Ajay: Modified to apply on v5.4.y]
-Signed-off-by: Ajay Kaher <ajay.kaher@broadcom.com>
----
- include/net/netfilter/nf_tables.h | 4 ++--
- net/netfilter/nft_byteorder.c     | 5 +++--
- net/netfilter/nft_meta.c          | 2 +-
- 3 files changed, 6 insertions(+), 5 deletions(-)
+> +							      lockdep_is_held(&table->tb6_lock)))
+> +					fib6_add_gc_list(f6i);
+> +				spin_unlock_bh(&table->tb6_lock);
+> +			}
+>  			fib6_info_release(f6i);
+>  		}
+>  	}
+> @@ -2706,6 +2717,7 @@ EXPORT_SYMBOL_GPL(addrconf_prefix_rcv_add_addr);
+>  void addrconf_prefix_rcv(struct net_device *dev, u8 *opt, int len, bool sllao)
+>  {
+>  	struct prefix_info *pinfo;
+> +	struct fib6_table *table;
+>  	__u32 valid_lft;
+>  	__u32 prefered_lft;
+>  	int addr_type, err;
+> @@ -2782,11 +2794,23 @@ void addrconf_prefix_rcv(struct net_device *dev, u8 *opt, int len, bool sllao)
+>  			if (valid_lft == 0) {
+>  				ip6_del_rt(net, rt, false);
+>  				rt = NULL;
+> -			} else if (addrconf_finite_timeout(rt_expires)) {
+> -				/* not infinity */
+> -				fib6_set_expires(rt, jiffies + rt_expires);
+>  			} else {
+> -				fib6_clean_expires(rt);
+> +				table = rt->fib6_table;
+> +				spin_lock_bh(&table->tb6_lock);
 
-diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_tables.h
-index 0a49d44..cf314ce 100644
---- a/include/net/netfilter/nf_tables.h
-+++ b/include/net/netfilter/nf_tables.h
-@@ -130,9 +130,9 @@ static inline u16 nft_reg_load16(u32 *sreg)
- 	return *(u16 *)sreg;
- }
- 
--static inline void nft_reg_store64(u32 *dreg, u64 val)
-+static inline void nft_reg_store64(u64 *dreg, u64 val)
- {
--	put_unaligned(val, (u64 *)dreg);
-+	put_unaligned(val, dreg);
- }
- 
- static inline u64 nft_reg_load64(u32 *sreg)
-diff --git a/net/netfilter/nft_byteorder.c b/net/netfilter/nft_byteorder.c
-index 7b0b8fe..9d250bd 100644
---- a/net/netfilter/nft_byteorder.c
-+++ b/net/netfilter/nft_byteorder.c
-@@ -38,20 +38,21 @@ void nft_byteorder_eval(const struct nft_expr *expr,
- 
- 	switch (priv->size) {
- 	case 8: {
-+		u64 *dst64 = (void *)dst;
- 		u64 src64;
- 
- 		switch (priv->op) {
- 		case NFT_BYTEORDER_NTOH:
- 			for (i = 0; i < priv->len / 8; i++) {
- 				src64 = nft_reg_load64(&src[i]);
--				nft_reg_store64(&dst[i], be64_to_cpu(src64));
-+				nft_reg_store64(&dst64[i], be64_to_cpu(src64));
- 			}
- 			break;
- 		case NFT_BYTEORDER_HTON:
- 			for (i = 0; i < priv->len / 8; i++) {
- 				src64 = (__force __u64)
- 					cpu_to_be64(nft_reg_load64(&src[i]));
--				nft_reg_store64(&dst[i], src64);
-+				nft_reg_store64(&dst64[i], src64);
- 			}
- 			break;
- 		}
-diff --git a/net/netfilter/nft_meta.c b/net/netfilter/nft_meta.c
-index ec2798f..ac7d3c7 100644
---- a/net/netfilter/nft_meta.c
-+++ b/net/netfilter/nft_meta.c
-@@ -247,7 +247,7 @@ void nft_meta_get_eval(const struct nft_expr *expr,
- 		strncpy((char *)dest, out->rtnl_link_ops->kind, IFNAMSIZ);
- 		break;
- 	case NFT_META_TIME_NS:
--		nft_reg_store64(dest, ktime_get_real_ns());
-+		nft_reg_store64((u64 *)dest, ktime_get_real_ns());
- 		break;
- 	case NFT_META_TIME_DAY:
- 		nft_reg_store8(dest, nft_meta_weekday(ktime_get_real_seconds()));
--- 
-2.7.4
+when it comes to locking, I prefer the lock and unlock lines to *pop* -
+meaning newline on both sides so it is clear and stands out.
+
+> +				if (addrconf_finite_timeout(rt_expires)) {
+> +					/* not infinity */
+> +					fib6_set_expires(rt, jiffies + rt_expires);
+> +					/* If fib6_node is null, the f6i is
+> +					 * just removed from the table.
+> +					 */
+> +					if (rcu_dereference_protected(rt->fib6_node,
+
+similarly here, this code is entered because rt is set based on
+addrconf_get_prefix_route.
+
+> +								      lockdep_is_held(&table->tb6_lock)))
+> +						fib6_add_gc_list(rt);
+> +				} else {
+> +					fib6_clean_expires(rt);
+> +					fib6_remove_gc_list(rt);
+> +				}
+> +				spin_unlock_bh(&table->tb6_lock);
+>  			}
+>  		} else if (valid_lft) {
+>  			clock_t expires = 0;
+> @@ -4741,6 +4765,7 @@ static int modify_prefix_route(struct inet6_ifaddr *ifp,
+>  			       unsigned long expires, u32 flags,
+>  			       bool modify_peer)
+>  {
+> +	struct fib6_table *table;
+>  	struct fib6_info *f6i;
+>  	u32 prio;
+>  
+> @@ -4761,10 +4786,21 @@ static int modify_prefix_route(struct inet6_ifaddr *ifp,
+>  				      ifp->rt_priority, ifp->idev->dev,
+>  				      expires, flags, GFP_KERNEL);
+>  	} else {
+> -		if (!expires)
+> +		table = f6i->fib6_table;
+> +		spin_lock_bh(&table->tb6_lock);
+> +		if (!expires) {
+>  			fib6_clean_expires(f6i);
+> -		else
+> +			fib6_remove_gc_list(f6i);
+> +		} else {
+>  			fib6_set_expires(f6i, expires);
+> +			/* If fib6_node is null, the f6i is just removed
+> +			 * from the table.
+> +			 */
+> +			if (rcu_dereference_protected(f6i->fib6_node,
+
+and here as well. f6i is set based on a table lookup.
+
+> +						      lockdep_is_held(&table->tb6_lock)))
+> +				fib6_add_gc_list(f6i);
+> +		}
+> +		spin_unlock_bh(&table->tb6_lock);
+>  
+>  		fib6_info_release(f6i);
+>  	}
+
+...
+
+> diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
+> index a68462668158..5ca9fd4f7945 100644
+> --- a/net/ipv6/ndisc.c
+> +++ b/net/ipv6/ndisc.c
+> @@ -1410,8 +1410,17 @@ static enum skb_drop_reason ndisc_router_discovery(struct sk_buff *skb)
+>  		inet6_rt_notify(RTM_NEWROUTE, rt, &nlinfo, NLM_F_REPLACE);
+>  	}
+>  
+> -	if (rt)
+> +	if (rt) {
+> +		spin_lock_bh(&rt->fib6_table->tb6_lock);
+>  		fib6_set_expires(rt, jiffies + (HZ * lifetime));
+> +		/* If fib6_node is null, the f6i is just removed from the
+> +		 * table.
+> +		 */
+
+How about:
+		/* If fib6_node is NULL, the route was removed between
+		 * the rt6_get_dflt_router or rt6_add_dflt_router calls
+		 * above and here.
+		 */
+
+> +		if (rcu_dereference_protected(rt->fib6_node,> +					      lockdep_is_held(&rt->fib6_table->tb6_lock)))
+> +			fib6_add_gc_list(rt);
+> +		spin_unlock_bh(&rt->fib6_table->tb6_lock);
+> +	}
+>  	if (in6_dev->cnf.accept_ra_min_hop_limit < 256 &&
+>  	    ra_msg->icmph.icmp6_hop_limit) {
+>  		if (in6_dev->cnf.accept_ra_min_hop_limit <= ra_msg->icmph.icmp6_hop_limit) {
+> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+> index dd6ff5b20918..cfaf226ecf98 100644
+> --- a/net/ipv6/route.c
+> +++ b/net/ipv6/route.c
+> @@ -989,10 +989,20 @@ int rt6_route_rcv(struct net_device *dev, u8 *opt, int len,
+>  				 (rt->fib6_flags & ~RTF_PREF_MASK) | RTF_PREF(pref);
+>  
+>  	if (rt) {
+> -		if (!addrconf_finite_timeout(lifetime))
+> +		spin_lock_bh(&rt->fib6_table->tb6_lock);
+> +		if (!addrconf_finite_timeout(lifetime)) {
+>  			fib6_clean_expires(rt);
+> -		else
+> +			fib6_remove_gc_list(rt);
+> +		} else {
+>  			fib6_set_expires(rt, jiffies + HZ * lifetime);
+> +			/* If fib6_node is null, the f6i is just removed
+> +			 * from the table.
+> +			 */
+
+Similarly, enhance the comment:
+			/* If fib6_node is NULL, the route was removed
+			 * between the get or add calls above and here.
+			 */
+> +			if (rcu_dereference_protected(rt->fib6_node,
+> +						      lockdep_is_held(&rt->fib6_table->tb6_lock)))
+> +				fib6_add_gc_list(rt);
+> +		}
+> +		spin_unlock_bh(&rt->fib6_table->tb6_lock);
+>  
+>  		fib6_info_release(rt);
+>  	}
 
 
