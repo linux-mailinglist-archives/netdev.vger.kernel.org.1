@@ -1,106 +1,136 @@
-Return-Path: <netdev+bounces-69259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A18884A8B2
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:09:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC07E84A8B5
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:09:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41FA629AA61
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 22:09:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C31229AC2F
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 22:09:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6458657867;
-	Mon,  5 Feb 2024 21:28:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E27758113;
+	Mon,  5 Feb 2024 21:32:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="oEmKs9O0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bj5cjt5c"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f182.google.com (mail-vk1-f182.google.com [209.85.221.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 969B557323;
-	Mon,  5 Feb 2024 21:28:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C7158101;
+	Mon,  5 Feb 2024 21:32:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707168513; cv=none; b=F3MvirF+xyA58NBinho8SlvO2WGE+Kr3R45m38ENLZ8Z/8MoQn7xP5OUcgKHX/2qj2t34fRYKSvXOzaqhc1LAUHFRiZPedrdYCUhjndusVP8DS3RseozB76FlJd/B/MFQjfyesnQngwuDJjQ2Qt8/HrjjzWLXno81qHf2QPRONg=
+	t=1707168727; cv=none; b=BwTUZvCY0IAUXz9PYhrhlubQOcXWlORTS6d8HqF2ara0q4qywpQEXfilrJApzMYjrMp+PDotb5VhhUL2VbW+9g3IBk2Y5lW9DMTsJYHcyFn58SJg9MFh4UGVHZrBoJ22TAVuiLYfmATAUSLQWhuQsEoTsVZ220LIwR04h4JG/Rg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707168513; c=relaxed/simple;
-	bh=z4n4Vd0n3U+lCN6DKU3eohvRYPY82wjJzBB2auU/6m4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IukBLSin/vyyeVyq3kK0Vi+tTq0UXj8zKLQ0NwKmX77gBm4O/JOKytj9DWLr9rWnAjPW2vjCvOgZtAqxUjOIri2pknBk1PaDWUoQE3LnvYlAX3aXq76qJwF20nsI7JwngVdshoaDE1nQLzBGlPAcOe+K/vA8O7fzN37Q7/uPKBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=oEmKs9O0; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=bSV0lPnPatMa4CqcYkYg+uR1nV9plc3nYeQphc9sETI=; b=oEmKs9O0iiLD4diVduUmpl/wCU
-	iNOCHOOe8ThApK9xYGKzHTT8pcMFofW0sqmQn4UFNJf3cd6yxsv8nItp1+RP7Kd1OuZwKApTnXAsF
-	dA00TH2ioXAaLcW/QTZdbwjB+MOl7n8TdD/Myz7vOlOeP4QIyBjIf3QoGMigxJ/B+UsDmoKjx8nFP
-	+7wkqTgHl0a3eqtTTSr7MoB/S/kK99kdDoNJSW9MHZ3iQwKXFksNkyTFaTXxfyiyY+i0h2zQazVj+
-	K5lXbYPyt2Bli1g2uYod5tmGjs+cmRa17wspYihKDoZ7anUZwxoyVA7Av3dEG2QsoQ6S7rSaalROT
-	r2TM5iNw==;
-Received: from [50.53.50.0] (helo=[192.168.254.15])
-	by bombadil.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rX6Vv-00000005Eti-40rR;
-	Mon, 05 Feb 2024 21:28:28 +0000
-Message-ID: <1b1aab8b-fcd2-4dbd-aa79-4b5afb0e0346@infradead.org>
-Date: Mon, 5 Feb 2024 13:28:27 -0800
+	s=arc-20240116; t=1707168727; c=relaxed/simple;
+	bh=iZASGz5Z5rm1aG0lLGE6OGbes9D4mJXmBzxTO9ghwcU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=doXtefVuQFz846oKcKp1XtE2e5q1Uza2/C0DKZJtfngDjcX/cA0XxAkjpMf6co61q9Qfe6xFBWy64VKAHlYKq0CihnxHtq+o4dBtWyWu85lVtpxp0NbRhm45aJV7ukZEiAxDUsqVZJ0cFjjkjio/pGruQqkHQpn9qIP5i2AEFlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bj5cjt5c; arc=none smtp.client-ip=209.85.221.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f182.google.com with SMTP id 71dfb90a1353d-4c02af52a21so639061e0c.3;
+        Mon, 05 Feb 2024 13:32:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707168724; x=1707773524; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=JiHlMRBtTUoGCPlkucZ3M1GzAWqR70W8aj3H555n2D0=;
+        b=Bj5cjt5chfrIpPpuwOEK8n4/k72U7Ow+OwF+DgCUE8srlAgwVJKHoFxXoONqCO3Aei
+         IbQL6ZdWXY7XjsO3sbAYc+Osyveth0pHWIYBw0jM74AarRA1iiw+0ONsbxuECE1aFRlu
+         PdCjjXLpRp2Hp0XDZG3bYyfhYdD6GE5Z7Bzpu4R0VQ2OCqV4+ebHD6ihMHsc8LXCCACo
+         EPM+ptBejoIZGhttgLbykT4uddDpz4wTMFHk766Av2lHFTWLjRTEk7tsZeKYKGI0nxqZ
+         jFP4pCZqfTr9xII9AMIAQOxVJOAQfBlPCV3I0qDiUY36x5TSgyKdpr8cXPw4Xfxb/C6e
+         12ww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707168724; x=1707773524;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JiHlMRBtTUoGCPlkucZ3M1GzAWqR70W8aj3H555n2D0=;
+        b=HfdIEfXPpN/Sdr9CX3PDpYU/DqV9Zz/iI96wc7RgNa1Zrs8PncShMTirA10hT/avQd
+         b/pvms1pi+VpBIgEcdv5R7XV5Y/cipqnyxd3+9F2Ad3okKjCqNV0JcQBYfiLwY+KT9EB
+         XO5PxNYOOjBWN1ES43Nt1il6qlgaNv+X5bHhr/SYMw/3sgEowwgyfBzzapeM9FOwWLLC
+         wUlKEsLUv11ukcqNEbFZ4wWI/qbd3u2svSaN+1bzTqcXIQXABSWl/AzMuowxwBx/RyNs
+         6egb0LWUYCiJkSanEsH7q7vrD/axmx/yyr509yHDiYhuWekoeTj3C6h1rmdS116q49Y0
+         WcDg==
+X-Gm-Message-State: AOJu0Yz8TLuRJo1miitj2ZfXI9B7MRHylEo6ZB/sOC3gIsCpj19XFP5U
+	TvJDDtLPeZIlg8E1wFW5BzNAjSvNatMs4r3uHXUQJ/wKZnZ4pR6AcGO9gcJsonecYiWjwImZtbk
+	s+yFi0byEU4FcL7ZR0KlfwPWmLqBv+D3HOdw=
+X-Google-Smtp-Source: AGHT+IFAPAEBv4SxXrw9QXtxsPmPBONJ9K2vokDXIug8vw/xA6OukvoHu9dDYGWxR+zA6Klp4z162ZXW/vH/q0w/rbM=
+X-Received: by 2002:a05:6122:16a4:b0:4c0:2af5:bb70 with SMTP id
+ 36-20020a05612216a400b004c02af5bb70mr209268vkl.4.1707168724324; Mon, 05 Feb
+ 2024 13:32:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-nex] mlx4: Address spelling errors
-Content-Language: en-US
-To: Simon Horman <horms@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Colin Ian King <colin.i.king@gmail.com>, netdev@vger.kernel.org,
- linux-rdma@vger.kernel.org
-References: <20240205-mlx5-codespell-v1-1-63b86dffbb61@kernel.org>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20240205-mlx5-codespell-v1-1-63b86dffbb61@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240130091300.2968534-1-tj@kernel.org> <ZcACvVz83QFuSLR6@slm.duckdns.org>
+ <CAOMdWSLNMqsZNJ-oCLN2RjckZmJSvdU_Yq0F0frmqMqa67Oy1g@mail.gmail.com> <ZcFPKaWwxJhgy8HQ@slm.duckdns.org>
+In-Reply-To: <ZcFPKaWwxJhgy8HQ@slm.duckdns.org>
+From: Allen <allen.lkml@gmail.com>
+Date: Mon, 5 Feb 2024 13:31:50 -0800
+Message-ID: <CAOMdWSKQC4UWXp57qubcSOHmPj0E7wHZWWbCz+yCZqROhoPSGw@mail.gmail.com>
+Subject: Re: [PATCHSET wq/for-6.9] workqueue: Implement BH workqueue and
+ convert several tasklet users
+To: Tejun Heo <tj@kernel.org>
+Cc: torvalds@linux-foundation.org, mpatocka@redhat.com, 
+	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev, msnitzer@redhat.com, 
+	ignat@cloudflare.com, damien.lemoal@wdc.com, bob.liu@oracle.com, 
+	houtao1@huawei.com, peterz@infradead.org, mingo@kernel.org, 
+	netdev@vger.kernel.org, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Simon,
+Tejun,
+> On Mon, Feb 05, 2024 at 12:50:28PM -0800, Allen wrote:
+> > Thank you. I am basing my work on the branch you have
+> > pushed.(or-6.9-bh-conversions)
+> > https://git.kernel.org/pub/scm/linux/kernel/git/tj/wq.git/log/?h=for-6.9-bh-conversions
+> >
+> > In the order of priority, I have started converting drivers/media/*,
+> > drivers/dma/* followed by drivers/net/*
+> > which constitutes the majority. Putting my plan out here so that the
+> > work is not duplicated.
+> > I will write back in a day and share the branch for review.
+>
+> That's great. Thanks.
+>
+> > W.r.t the conversion, there are drivers which call
+> > tasklet_[disable/enable](), which I suppose
+> > can be ignored in the case of workqueues, I am not entirely sure if
+> > this is the right approach.
+> > Please correct me if I am wrong.
+>
+> I don't think we can ignore them. I was just looking at tasklet_kill() and
+> thought we're good because that seemed to map well to cancel_work_sync().
+> workqueue doesn't have the counterpart for tasklet_[disable/enable](). I'll
+> look through them and think on it.
+>
 
-On 2/5/24 03:51, Simon Horman wrote:
-> Address spelling errors flagged by codespell.
-> 
-> This patch follows-up on an earlier patch by Colin Ian King,
-> which addressed a spelling error in a user-visible log message [1].
-> This patch includes that change.
-> 
-> [1] https://lore.kernel.org/netdev/20231209225135.4055334-1-colin.i.king@gmail.com/
-> 
-> This patch is intended to cover all files under
-> drivers/net/ethernet/mellanox/mlx4
-> 
-> Signed-off-by: Simon Horman <horms@kernel.org>
-> ---
->  drivers/net/ethernet/mellanox/mlx4/cmd.c        | 7 ++++---
->  drivers/net/ethernet/mellanox/mlx4/cq.c         | 4 ++--
->  drivers/net/ethernet/mellanox/mlx4/en_clock.c   | 4 ++--
->  drivers/net/ethernet/mellanox/mlx4/en_netdev.c  | 5 +++--
->  drivers/net/ethernet/mellanox/mlx4/en_rx.c      | 2 +-
->  drivers/net/ethernet/mellanox/mlx4/en_tx.c      | 2 +-
->  drivers/net/ethernet/mellanox/mlx4/eq.c         | 2 +-
->  drivers/net/ethernet/mellanox/mlx4/fw_qos.h     | 8 ++++----
->  drivers/net/ethernet/mellanox/mlx4/main.c       | 4 ++--
->  drivers/net/ethernet/mellanox/mlx4/mlx4_stats.h | 2 +-
->  drivers/net/ethernet/mellanox/mlx4/port.c       | 2 +-
->  11 files changed, 22 insertions(+), 20 deletions(-)
-> 
+Okay, I will look into it too. I have these rough and completely untested
+functions. All I am trying to do is to match what tasklets are currently doing.
 
-Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+static inline void workqueue_disable(struct work_struct *work)
+{
+     cancel_work_sync(work);
+     flush_workqueue(system_bh_wq);
+     smp_mb();
+}
+
+static inline void workqueue_enable(struct work_struct *work)
+{
+    smp_mb__before_atomic();
+  //  atomic_inc(&work->data);
+}
+
+I have to figure out a better way to handle atomic_inc() in the enable
+function.
 
 Thanks.
 
--- 
-#Randy
+      - Allen
 
