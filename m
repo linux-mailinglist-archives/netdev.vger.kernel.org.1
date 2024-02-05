@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-69119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D81B4849AFE
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 13:53:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5525849AFF
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 13:53:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 484471F25BFC
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:53:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8B1A1C22232
+	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 12:53:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04E272C68F;
-	Mon,  5 Feb 2024 12:48:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 989252C859;
+	Mon,  5 Feb 2024 12:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="A3jYWRD/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zfcAd1gs"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 503AF2C6AC
-	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 12:48:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D3072C6AD
+	for <netdev@vger.kernel.org>; Mon,  5 Feb 2024 12:48:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707137283; cv=none; b=agk4aX3LOHjaTjAlDfmboBeTW+14T1tLIyQ9C6HrN8Hg3G5Ff0krE6F3bopMtRZMY7yKQqIXmoTSI8E5i2XSr3jEaBDf6AlasnH4UUkK+vWxAI/wZJ2TbhLmJtzaLciFv/wNsZDYkUexAg0stmJCvWjaIACsdBBw4tfDYCd9sXw=
+	t=1707137285; cv=none; b=ACIIiIF52BUncZR0MwrBb/5lxmEtGuJx5R4YBhlC54qEgzcT67nqI+XarpeR+vClSlQHBzomC4JGE7RDgNBUfZqSvrguGoG07rPslaDIeKt1tTYLzt67OZVV6pRTkbBAo/TMYQ53arP47035ViyoGuv0WXomMDNToAubDR5XysM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707137283; c=relaxed/simple;
-	bh=KdAtNz/cBtMCUpp+YnWC2X++eMy2gSKBB/xydSPDLhY=;
+	s=arc-20240116; t=1707137285; c=relaxed/simple;
+	bh=vPm6pRfPkizcwo9J6YgQaA07StlJsDdt+GI12hUd+jg=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fHzsR8Q/54A6JwGigmGiiqgMJk8fZC1aN+FoByatCcIhBfGvvnm5Vx1W/mffuBdnm9ZH/RWSqR/4SSy6CMtucezClTV360MmMcaVKkfVDciMfBSvLXwDqlO76jH4iwJVk2NTXjv0wwYJAiDLF0F8U0d5nXZG0ZnPNQT99yyE4Kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=A3jYWRD/; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=Z/+oajGSl+vG73z8R+fgH6jK/EVnxLdScz42kTxUY3qDGEsNpqfVWPnhEwzRegcZeqqtbWgIkzCmXxwakYKYzCPeKg0PLjfUqIzDOwGr/Y9pi6DBzgL8L0h1b4wY6VNSXgdaR6QrM0nZaT/piA+UsuME4AdHfWO3tnx/PuFXAsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zfcAd1gs; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b26783b4so4756810276.0
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 04:48:02 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b5d1899eso7046858276.0
+        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 04:48:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707137281; x=1707742081; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1707137283; x=1707742083; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ppm1by4rYBNCXK1Qe1GGbJ+D8r3e/t1KR8J/U3dzp8Q=;
-        b=A3jYWRD/u7TaCnl/H2Y9YxTQSaSRiBUL7lDbx+Sm94uXE8Ttx7Wt8AZBYuSqF/eS4V
-         oHHeytv6jy38Fgl8KG6KXdSiXs8eT0U1LVvK3cEG07qPNO9zoZg5EwRK42wMZrXPe6tG
-         MirnmI4D4cg8zEAGeFj2uuZwLujx2qyvyLQooEfDX40bz3Z+R6JMQwsHtGvVnZpgUmWj
-         tKAGWyelljlotTn0STZJUPMMqESgT0qLODQY+U5xzaIe/K6zXZjs3HGopg72Qap4w/sk
-         4V507MQIL0KM73ACIKTFn6Vl0lp3SaXiVC/ttWe7wYnxfJMfx7R71JoPrrwmHLX3sf6r
-         F4CA==
+        bh=4Fia+sb8RWUNVXU3q1v1Z4jGJuuRjbjpwW2R8X5o5BY=;
+        b=zfcAd1gsehXYoE8dOVETmCk+4y/oDhzAcp1+xgrf3gvDeL8cfJ7Xvwjs9uK7LpLuJF
+         vX9ipiQaLK4YLMAWopuovR7OXw0QLKNd0R//ScDDPaSsXNZZgWhqk+hTcx/2iU0+59au
+         jeoYTO1sm+QYKwzYrpyaEF9xjlm+jjQEEV3/37yqDiCBmgakdWecQE9Xdtys2A1cvu3c
+         +7LqJwEa5GrKrHvkTkG+uKGH1/K+aBneMYSijzQLPv5kzzAZ41PrQa2RuInzR/btjeEn
+         5Gp9GLbLGSz7ZeEi6FhUQuKOIfKSLeXDHbp7anro7oVcDvdKteA3w8oO0jfYWfFbovSZ
+         zPEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707137281; x=1707742081;
+        d=1e100.net; s=20230601; t=1707137283; x=1707742083;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ppm1by4rYBNCXK1Qe1GGbJ+D8r3e/t1KR8J/U3dzp8Q=;
-        b=wQ1fTyoxL4Ku0MbHE3zYwXd9Blm/dAT3ZflkwDC1MQ6ghPqGtaGzQtQ5OHBjDz1Y0c
-         pui+VadCK1G+2GxaGSMWUAK0z69eTwfe++SfrA9makxWs0fJLDF5ooGCD9lH+46JRZiA
-         GlD1UW06m4RaMhkwaZcdkXqaTujm6p6ys/B3QCj6Ck0/Sx4xh1jBrzWUwyFK/PbMYsa6
-         /6XQV/A9ws/HVR1ORk7pDxpeUGrap+l5ZaX0TNhxZEv5gGRNTjUY3c5dVWc2o42t8VzF
-         62AWDOZNQxuBsRnINKJclHRK8zNU2HvPNBPPfCSCBwl9dVJTb4TkFvWopIBkFEModq/p
-         +ljQ==
-X-Gm-Message-State: AOJu0YzzBNqwKa9aq4ZzxqdYgv72sbOsI+9/2BZVBG161CYH8JjB0W1O
-	NdtLcCFQMWSbSc2e0mGYRQSMG9fRlf7Gt4wcHvV5X9Sdgrid7vJUlEvJ8vo1e6i5oaSbE8C9PY4
-	KsmtaaaM0VQ==
-X-Google-Smtp-Source: AGHT+IGpVmHNJeKg96I6WZp+ZCOH6B/tENfplAb8y+Kmgef4mVYn1dRH9UAgNYdDsAtpXQ/cAYdAitOUhuTKxA==
+        bh=4Fia+sb8RWUNVXU3q1v1Z4jGJuuRjbjpwW2R8X5o5BY=;
+        b=jp3tob7D4epXl1iTTlcc+3B71RpicbxbC2bWgQPKAK6CEWuZGc/DsjNftWx71VHg3X
+         ugQlPzzDfO5VIu1A0xzlTfe3YveSU6M/+F+fGreuqefRs3Q0M/ELtYx4Mhy1pOO0tDCN
+         pQWSzAfc5iwT4o1yO5sSghYJhBd98IjYCNspoGnlq+iB7QAsgTfikJZQ4Qjy87RVfyNp
+         ZKhGhyxe/oOGwilO4Ch6+o3GWe+LuizJpJz+CrKqFZ1RXjHQFf8mXjTc40X/NXTpXDtE
+         oBsarVgg58//nDWSQWGI7lpkrupmkzb6RMgRgtiDXSEoVPfw4/wTTZI+ion2SUdgwZRF
+         K0iQ==
+X-Gm-Message-State: AOJu0YwFfFwRk5igY+fXGSV1gPXnJnmD350pEYKTaPzvxczYkDk3+Q6g
+	hF6NVrynq7nt0J+zpFCiJZDBAGUGh2jTbONejo2np7lSqWBkDgwp2X5Z24eVfbyAaMC1f5OFC8z
+	sbtzTJbvaNA==
+X-Google-Smtp-Source: AGHT+IE9i2I2w0zxwswndjSqncI0GDyUaR3QwVPEHdhDmkp8ydOCKucvQR+qu/iAewovGQ3WH0MEdjmfmSd4fw==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:2313:b0:dc6:b84d:93f8 with SMTP
- id do19-20020a056902231300b00dc6b84d93f8mr434240ybb.3.1707137281315; Mon, 05
- Feb 2024 04:48:01 -0800 (PST)
-Date: Mon,  5 Feb 2024 12:47:38 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:dc9:b0:dbe:d0a9:2be3 with SMTP
+ id de9-20020a0569020dc900b00dbed0a92be3mr1853568ybb.3.1707137282995; Mon, 05
+ Feb 2024 04:48:02 -0800 (PST)
+Date: Mon,  5 Feb 2024 12:47:39 +0000
 In-Reply-To: <20240205124752.811108-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240205124752.811108-1-edumazet@google.com>
 X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
-Message-ID: <20240205124752.811108-2-edumazet@google.com>
-Subject: [PATCH v3 net-next 01/15] net: add exit_batch_rtnl() method
+Message-ID: <20240205124752.811108-3-edumazet@google.com>
+Subject: [PATCH v3 net-next 02/15] nexthop: convert nexthop_net_exit_batch to
+ exit_batch_rtnl method
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -82,117 +83,61 @@ Cc: Antoine Tenart <atenart@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gm
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Many (struct pernet_operations)->exit_batch() methods have
-to acquire rtnl.
+exit_batch_rtnl() is called while RTNL is held.
 
-In presence of rtnl mutex pressure, this makes cleanup_net()
-very slow.
+This saves one rtnl_lock()/rtnl_unlock() pair.
 
-This patch adds a new exit_batch_rtnl() method to reduce
-number of rtnl acquisitions from cleanup_net().
-
-exit_batch_rtnl() handlers are called while rtnl is locked,
-and devices to be killed can be queued in a list provided
-as their second argument.
-
-A single unregister_netdevice_many() is called right
-before rtnl is released.
-
-exit_batch_rtnl() handlers are called before ->exit() and
-->exit_batch() handlers.
+We also need to create nexthop_net_exit()
+to make sure net->nexthop.devhash is not freed too soon,
+otherwise we will not be able to unregister netdev
+from exit_batch_rtnl() methods.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/net_namespace.h |  3 +++
- net/core/net_namespace.c    | 31 ++++++++++++++++++++++++++++++-
- 2 files changed, 33 insertions(+), 1 deletion(-)
+ net/ipv4/nexthop.c | 19 ++++++++++++-------
+ 1 file changed, 12 insertions(+), 7 deletions(-)
 
-diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
-index cd0c2eedbb5e9ddcbd5e0a37e2eb7e0cf57495d5..20c34bd7a07783a9a13696fd74b41eff1ff860a8 100644
---- a/include/net/net_namespace.h
-+++ b/include/net/net_namespace.h
-@@ -448,6 +448,9 @@ struct pernet_operations {
- 	void (*pre_exit)(struct net *net);
- 	void (*exit)(struct net *net);
- 	void (*exit_batch)(struct list_head *net_exit_list);
-+	/* Following method is called with RTNL held. */
-+	void (*exit_batch_rtnl)(struct list_head *net_exit_list,
-+				struct list_head *dev_kill_list);
- 	unsigned int *id;
- 	size_t size;
- };
-diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
-index 72799533426b6162256d7c4eef355af96c66e844..233ec0cdd0111d5ca21c6f8a66f4c1f3fbc4657b 100644
---- a/net/core/net_namespace.c
-+++ b/net/core/net_namespace.c
-@@ -318,8 +318,9 @@ static __net_init int setup_net(struct net *net, struct user_namespace *user_ns)
+diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
+index bbff68b5b5d4a1d835c9785fbe84f4cab32a1db0..7270a8631406c508eebf85c42eb29a5268d7d7cf 100644
+--- a/net/ipv4/nexthop.c
++++ b/net/ipv4/nexthop.c
+@@ -3737,16 +3737,20 @@ void nexthop_res_grp_activity_update(struct net *net, u32 id, u16 num_buckets,
+ }
+ EXPORT_SYMBOL(nexthop_res_grp_activity_update);
+ 
+-static void __net_exit nexthop_net_exit_batch(struct list_head *net_list)
++static void __net_exit nexthop_net_exit_batch_rtnl(struct list_head *net_list,
++						   struct list_head *dev_to_kill)
  {
- 	/* Must be called with pernet_ops_rwsem held */
- 	const struct pernet_operations *ops, *saved_ops;
--	int error = 0;
- 	LIST_HEAD(net_exit_list);
-+	LIST_HEAD(dev_kill_list);
-+	int error = 0;
+ 	struct net *net;
  
- 	refcount_set(&net->ns.count, 1);
- 	ref_tracker_dir_init(&net->refcnt_tracker, 128, "net refcnt");
-@@ -357,6 +358,15 @@ static __net_init int setup_net(struct net *net, struct user_namespace *user_ns)
- 
- 	synchronize_rcu();
- 
-+	ops = saved_ops;
-+	rtnl_lock();
-+	list_for_each_entry_continue_reverse(ops, &pernet_list, list) {
-+		if (ops->exit_batch_rtnl)
-+			ops->exit_batch_rtnl(&net_exit_list, &dev_kill_list);
-+	}
-+	unregister_netdevice_many(&dev_kill_list);
-+	rtnl_unlock();
+-	rtnl_lock();
+-	list_for_each_entry(net, net_list, exit_list) {
++	ASSERT_RTNL();
++	list_for_each_entry(net, net_list, exit_list)
+ 		flush_all_nexthops(net);
+-		kfree(net->nexthop.devhash);
+-	}
+-	rtnl_unlock();
++}
 +
- 	ops = saved_ops;
- 	list_for_each_entry_continue_reverse(ops, &pernet_list, list)
- 		ops_exit_list(ops, &net_exit_list);
-@@ -573,6 +583,7 @@ static void cleanup_net(struct work_struct *work)
- 	struct net *net, *tmp, *last;
- 	struct llist_node *net_kill_list;
- 	LIST_HEAD(net_exit_list);
-+	LIST_HEAD(dev_kill_list);
- 
- 	/* Atomically snapshot the list of namespaces to cleanup */
- 	net_kill_list = llist_del_all(&cleanup_list);
-@@ -613,6 +624,14 @@ static void cleanup_net(struct work_struct *work)
- 	 */
- 	synchronize_rcu();
- 
-+	rtnl_lock();
-+	list_for_each_entry_reverse(ops, &pernet_list, list) {
-+		if (ops->exit_batch_rtnl)
-+			ops->exit_batch_rtnl(&net_exit_list, &dev_kill_list);
-+	}
-+	unregister_netdevice_many(&dev_kill_list);
-+	rtnl_unlock();
-+
- 	/* Run all of the network namespace exit methods */
- 	list_for_each_entry_reverse(ops, &pernet_list, list)
- 		ops_exit_list(ops, &net_exit_list);
-@@ -1193,7 +1212,17 @@ static void free_exit_list(struct pernet_operations *ops, struct list_head *net_
- {
- 	ops_pre_exit_list(ops, net_exit_list);
- 	synchronize_rcu();
-+
-+	if (ops->exit_batch_rtnl) {
-+		LIST_HEAD(dev_kill_list);
-+
-+		rtnl_lock();
-+		ops->exit_batch_rtnl(net_exit_list, &dev_kill_list);
-+		unregister_netdevice_many(&dev_kill_list);
-+		rtnl_unlock();
-+	}
- 	ops_exit_list(ops, net_exit_list);
-+
- 	ops_free_list(ops, net_exit_list);
++static void __net_exit nexthop_net_exit(struct net *net)
++{
++	kfree(net->nexthop.devhash);
++	net->nexthop.devhash = NULL;
  }
  
+ static int __net_init nexthop_net_init(struct net *net)
+@@ -3764,7 +3768,8 @@ static int __net_init nexthop_net_init(struct net *net)
+ 
+ static struct pernet_operations nexthop_net_ops = {
+ 	.init = nexthop_net_init,
+-	.exit_batch = nexthop_net_exit_batch,
++	.exit = nexthop_net_exit,
++	.exit_batch_rtnl = nexthop_net_exit_batch_rtnl,
+ };
+ 
+ static int __init nexthop_init(void)
 -- 
 2.43.0.594.gd9cf4e227d-goog
 
