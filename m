@@ -1,132 +1,118 @@
-Return-Path: <netdev+bounces-69638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECB5E84BF3C
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 22:31:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7445084BF54
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 22:41:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 219831C23187
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 21:31:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 056CF1F21EBE
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 21:41:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ADED1B951;
-	Tue,  6 Feb 2024 21:31:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9AC21B971;
+	Tue,  6 Feb 2024 21:41:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="lnMYX+xS"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FPRi1qH2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5D21B956
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 21:31:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A3D51B94C
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 21:41:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707255071; cv=none; b=fOYfU68pXgOM5gtw7NWnYoUNAnNu/8vwAiwMCU+NGrgcKqywW82XLmUoxGO74e4NJtx79rlHWjGLH0x+PA1kEKfWbQdVz5SB3R7HZwU6BiHxOO3diM0rJmgSPWL3B+SIjIPFZ5ix3B5VzxxX4Pv2elLufYYbzz3oK86qihHSJSk=
+	t=1707255674; cv=none; b=i2/BjvlLUI7EjQRcrmjMeXANPZ6o/FxEnaCLlmNb0U56aXklhBnEEeEJwraS141UjkMAIAWLKgrm4zzY+YX4jZTcZvaGDsXNdM65K1lZFAQLNg/+tut58S5dfRXyLURWfI4Gqb39+/PZx/yCi2UBAvB4euHm7PLQ211BXua2gE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707255071; c=relaxed/simple;
-	bh=VhV9Y2ehoq2QR/dvYkGZ3565MBi13h4c1EWlFat09sM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E3gc1NOeu33QFok69Bm9sSJMnb6PIAANRdk9IojjoXl3CoGOnY9UPzN0JAvm6/pDg4NBLmCIncHgcXQUx9qYrInRqCoGEKDA7Uykd9NckfmHDOqEAxdd11Iyqbi4SwB11TpEikkaZ1XePGA9i38PK8IM3zx1uCvwVa1q8RjrUeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=lnMYX+xS; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=umich.edu
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6043d9726adso8819737b3.0
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 13:31:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=umich.edu; s=google-2016-06-03; t=1707255068; x=1707859868; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VhV9Y2ehoq2QR/dvYkGZ3565MBi13h4c1EWlFat09sM=;
-        b=lnMYX+xSSKdpMZr27IDA7Zu4pzAF+15Kege5EY3dGOt+5lSSekvOr8NqA1N6eoaHA8
-         b9Q+CjpSHeszCI0BaL/Qzpn2pt+L02fJGEnIE/y5ktMNP/fKAFAgBk6PGP3ye6RO0ItK
-         Ixx1cOtTLlM4gWb4+brUkw9dcPMh22QMX6wyWMv8MZJ7XAdE5NnlZ485RcWak+bxGswT
-         /EZk0fmS6wgeecGvFF8q77AVtk2xr3d60hMF9N+a8BBt0m2kKakSFPp3tG2LKF37YNNU
-         pMY3oyFiIc+ka0YyM5evLuHRQJ8RGJ8f14qCiWds4du5gE2Vjpiz4G2lmMwr1k6I5Nk4
-         TEnw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707255068; x=1707859868;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VhV9Y2ehoq2QR/dvYkGZ3565MBi13h4c1EWlFat09sM=;
-        b=fXcQJrri/e94o/XpGY50XqDxC7o4ZJNnLAOnVDJepU2BY1NDLZA3fu2yrIutT7qScl
-         sKp3C8O96gmSnwkhdigL4NJjTva/GBxk9vlN6Si5X7va5h3wrYtt/FZQkNAGcbZIFqmy
-         K/fvEktHGyr8nRnTZC+4gfudUePEGl0H9w+SevRN9k4o6ZAWxmPuvbh1VSODgCkoDu0O
-         APb8KERnABSpArbqMQdN74OtND5UDXSFoKGwl6XpdCvBTb+Zdce/UdxgrlKBR4coOjp7
-         RXCBZ6MBilEURu9iOZbC3liD0aOma6WCZmqZasFUzn7M8BuLyPewQX6F12tsueVLtUB2
-         gXyw==
-X-Gm-Message-State: AOJu0YwvCwXuw07r8XoGxq9awkFDb2XMB7dxyiY6As3gguEk5iSJv7d/
-	Xukj8YUL+ATAo1czpVVnYN8x+ziTUHoDz/9at5UnPz0wtUu1iJrF1ioetMWL/ALm9OHjDlV2vOs
-	kat6mkHYbsjhIHV1ScUWfWUqayVc0wLkQQUqVLg==
-X-Google-Smtp-Source: AGHT+IFD2ZtVNg+yyFr7gOe+lmhrUgZsDA+InS6rti8MMhXWEbu1XvWLZZAzBuooSjg26Rp0Iuv+ch+bOB9DNvbOdYw=
-X-Received: by 2002:a0d:db4f:0:b0:604:3ef:a729 with SMTP id
- d76-20020a0ddb4f000000b0060403efa729mr2685245ywe.15.1707255068386; Tue, 06
- Feb 2024 13:31:08 -0800 (PST)
+	s=arc-20240116; t=1707255674; c=relaxed/simple;
+	bh=aMdZL2rd09aPLQawZGdQ0Uq2SmABgUuaIW3E4Znno+k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=D+bDhILd+e2fDSR5WQ4xu/nUuOdMzzJccNYOU8neAvKB4BZGMqQZVLeslbZuQuj/XrW+A8PMTS1niZzxJ9K2tctPcIpGfj4rBwAITxCjArFq1vbWYaocSeV0EHSgIvXnZM3iZGXImQKONqGV2BYde+XEg0oekB2m2r+B7SabtSE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FPRi1qH2; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707255673; x=1738791673;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=aMdZL2rd09aPLQawZGdQ0Uq2SmABgUuaIW3E4Znno+k=;
+  b=FPRi1qH23r3Dm/YCRCB3DzavXs17E6nwT3NupQVdAh/g2ocIHny5LLyY
+   8xPi26GpPQ6UKY6zjSv//ITxpL8PuILlzJFN7yCG5BZDHVzA1SZcnD7nx
+   t0ZOhvxuJuKmP7s8vS3Qem4asiB2HaXNaTK6FEj2aafaW2OTIuwBi0oaE
+   586a/zoxVQ7IctO9nXid1pTEagzan0rsdy/fZAgqc15M2gunskVpBZ57/
+   uM5dei3EFXP1wxndNnLlvlFD37c7DCWgPHuVrW+Dc8BPkAzqQqRVA/CKt
+   UytiErLNULnPvc5x1iiuLUmwd6c4+ncIQJI7l9tlUym2eLzR9CKLCsvyF
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10976"; a="759309"
+X-IronPort-AV: E=Sophos;i="6.05,248,1701158400"; 
+   d="scan'208";a="759309"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2024 13:41:00 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,248,1701158400"; 
+   d="scan'208";a="5917808"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa004.jf.intel.com with ESMTP; 06 Feb 2024 13:41:00 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 0/3][pull request] Intel Wired LAN Driver Updates 2024-02-06 (ixgbe)
+Date: Tue,  6 Feb 2024 13:40:50 -0800
+Message-ID: <20240206214054.1002919-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240201-rockchip-rust-phy_depend-v2-0-c5fa4faab924@christina-quast.de>
- <20240201-rockchip-rust-phy_depend-v2-3-c5fa4faab924@christina-quast.de>
- <CALNs47tnwCgyvM2jBo=bTt1=2AJFt3b6W+JsTHM3Np2tbNJYCA@mail.gmail.com> <eb229460-0efc-448a-863f-ac0634a72f2c@christina-quast.de>
-In-Reply-To: <eb229460-0efc-448a-863f-ac0634a72f2c@christina-quast.de>
-From: Trevor Gross <tmgross@umich.edu>
-Date: Tue, 6 Feb 2024 16:30:56 -0500
-Message-ID: <CALNs47tfmcayLdbLbArPS=AHwETiaQKZ09h69_Q4HmfrMPk4-A@mail.gmail.com>
-Subject: Re: [PATCH v2 3/3] net: phy: add Rust Rockchip PHY driver
-To: Christina Quast <chrysh@christina-quast.de>, Shashwat Kishore <kshashwat13@gmail.com>
-Cc: Christina Quast <contact@christina-quast.de>, Miguel Ojeda <ojeda@kernel.org>, 
-	Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, 
-	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
-	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
-	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, 
-	Alice Ryhl <aliceryhl@google.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
-	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Heiko Stuebner <heiko@sntech.de>, rust-for-linux@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 6, 2024 at 2:20=E2=80=AFPM Christina Quast
-<chrysh@christina-quast.de> wrote:
->
-> Hi Trevor!
->
-> Thanks a lot for your review, I learned a lot! I felt, from the feedback
-> in the Zulip forum that rewriting more phy drivers might be interesting,
-> but I think I misunderstood something.
->
-> There is no specific goal behind the rewrite, I just thought it would be
-> useful to bring more Rust into the Kernel.
->
-> Cheers,
->
-> Christina
+This series contains updates to ixgbe driver only.
 
-Happy to help :)
+Jedrzej continues cleanup work from conversion away from ixgbe_status;
+s32 values are changed to int, various style issues are addressed, and
+some return statements refactored to address some smatch warnings.
 
-There is definitely no harm in experimenting, but the general
-(reasonable) rule is that there shouldn't be duplicate drivers
-in-tree, even across languages.
+The following are changes since commit 60b4dfcda647f86c62dc7b8219d2bfed19bb2698:
+  Merge branch 'nfc-hci-save-a-few-bytes-of-memory-when-registering-a-nfc_llc-engine'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 10GbE
 
-What you probably saw on Zulip is that we were trying to locate newer
-phys that don't already have a C driver. Shashwat reached out to a few
-companies and mentioned that Microchip was interested in drivers for
-some of their VSC84xx/82xx families. They are a bit more complicated
-(MACSec, XFI/SFP+) and apparently somewhat difficult to get hardware
-for, but that might be an option if you are interested in working on
-something like this.
+Jedrzej Jagielski (3):
+  ixgbe: Convert ret val type from s32 to int
+  ixgbe: Rearrange args to fix reverse Christmas tree
+  ixgbe: Clarify the values of the returning status
 
-Andrew might have some ideas too. There are a lot of new phys coming
-out since MACsec is getting more popular, also some newer specs like
-10GBase-T1 and 10Base-T1S.
+ drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  16 +-
+ .../net/ethernet/intel/ixgbe/ixgbe_82598.c    |  70 ++---
+ .../net/ethernet/intel/ixgbe/ixgbe_82599.c    | 151 ++++-----
+ .../net/ethernet/intel/ixgbe/ixgbe_common.c   | 262 ++++++++--------
+ .../net/ethernet/intel/ixgbe/ixgbe_common.h   | 112 +++----
+ drivers/net/ethernet/intel/ixgbe/ixgbe_dcb.c  |  12 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_dcb.h  |  10 +-
+ .../ethernet/intel/ixgbe/ixgbe_dcb_82598.c    |  26 +-
+ .../ethernet/intel/ixgbe/ixgbe_dcb_82598.h    |  30 +-
+ .../ethernet/intel/ixgbe/ixgbe_dcb_82599.c    |  12 +-
+ .../ethernet/intel/ixgbe/ixgbe_dcb_82599.h    |  35 +--
+ .../net/ethernet/intel/ixgbe/ixgbe_ethtool.c  |  10 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c |   4 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.c  |  46 +--
+ drivers/net/ethernet/intel/ixgbe/ixgbe_mbx.h  |  10 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.c  | 210 ++++++-------
+ drivers/net/ethernet/intel/ixgbe/ixgbe_phy.h  |  52 ++--
+ .../net/ethernet/intel/ixgbe/ixgbe_sriov.c    |   8 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h | 186 +++++------
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x540.c |  66 ++--
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x540.h |  18 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c | 294 +++++++++---------
+ 22 files changed, 808 insertions(+), 832 deletions(-)
 
-- Trevor
+-- 
+2.41.0
+
 
