@@ -1,146 +1,98 @@
-Return-Path: <netdev+bounces-69466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97CB084B5C7
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 13:59:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C524F84B601
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:10:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BF941F26349
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 12:59:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80136282BA2
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 13:10:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7051912F396;
-	Tue,  6 Feb 2024 12:59:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05546130AC9;
+	Tue,  6 Feb 2024 13:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="icXsdY+L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l3cETau6"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCCF212EBDB
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 12:59:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D208612FF9E;
+	Tue,  6 Feb 2024 13:10:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707224378; cv=none; b=qALGndA/dYPRGtclny/aCnCzflYmGV1byK0YAku2c6a8jOYOJnna81jPHaN5Lkxgj2oYlznmjQqG9dlALH5M861KNLgUJW+hbZvKzi/tLp3Hp+BLgCkyfU+MhqleOPFykFwHH3bienVmT460wfRacC9kzlAbE67SEgdw2iRn2NE=
+	t=1707225027; cv=none; b=X23X/Z6AuzMklaQm32P57G5sbKfvJ/w22nOAuu8pIlcQ5qbj4lu8wtlUgKxnisKfdqOPWyizWBFk7yzcTlBZZirKnEScH9e94yt1K134Z9c8tqT2TN6XemGPVFNmFYQu4xALwAICBv78Vq3qYmyBkuv1fqTX2BFPPeOPfzhC8QA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707224378; c=relaxed/simple;
-	bh=mvFSpXXF9JUEZ5uG5sEHCsvv939PdP+Ga4W1lHDw54A=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RNvpABAZXwC5owiG4QrkCWj57FAUoj3W7Kl1/JOFD9Kh0r6dy/MQycocfPmKMqTAa8HNOLHl8WkRqatD8eU1Q2gAzhMFCa4voFSZbnVGwqq6+0uA41AWa0pGWTp7929W9xTEDg8Oi7/z+svrVfdTtXSrRMaXQfTR+XuOEOh4esM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=icXsdY+L; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707224375;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=JvGpRWpuy0T9OWLbJZcnUxTccocCFW2YPrwN0a6SYek=;
-	b=icXsdY+L116VKOpe4soqQuwxhM/hk7QK76WLKgZI5t5MaL7GdVI8AVo2nfxTolOQNPBcZC
-	OBcSzKUXyacimMxszQwYpEO7hPbMF8EwgtluRJQvLTBPfWlQihdl2D1z8Y6y1Ldf4csgP3
-	7R0CURo5KHP83k5DVCxAecoUilHZnUc=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-633-LWoMLJxZPIiKObntjvzxaw-1; Tue, 06 Feb 2024 07:59:34 -0500
-X-MC-Unique: LWoMLJxZPIiKObntjvzxaw-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-560127ce17fso2059052a12.0
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 04:59:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707224372; x=1707829172;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=JvGpRWpuy0T9OWLbJZcnUxTccocCFW2YPrwN0a6SYek=;
-        b=lHSpNvpWY7VwspykKbEOrUVNv7S5KLEf5Q535Oyaml5GsOixQ3OBu6O70TrWT00K1L
-         Ke4rRvC5rY4aDRpIxj4o2oVAhsHVNsC71zCwMMdahj28M6brxC9uH4aH098JdMciTiuC
-         FYBbAlenuGEVsMpTwyN+OpoF+qpvDrSIcHJWcgDzWWlDetkIi4Io+kUpFv7QmZjCpERu
-         jbcQ5o7Lx/iVZ7gFK4rs5nPJ7eogzH8I2Te+9lEu+tvHZ/OvAoFzpnH3QPYw+cMorsHr
-         62GjKMAz/4DzS3m0il/yjAFIv2wkZbsdUqTmEhmeQm8zsrWYklyEd3oKSenwdKc3ao2M
-         gXXQ==
-X-Gm-Message-State: AOJu0Yw3LYiemxuaszRPAYsaE6QFlXk1Mtk3LyuuMZF/PINu/qDiklQf
-	QiPOxiJjARXPx2AAbG9yVq4p4lldQYeSOJNdpmcwDa/tSqnA1+30v9/OnTLqCTQQljV3q6bteOy
-	3+EHV9K8NrvvL3E+Dl9WuWcEU33CgyyFsZa/d3oE1kRys25KrtmNo5g==
-X-Received: by 2002:a05:6402:893:b0:55f:d60a:b1ac with SMTP id e19-20020a056402089300b0055fd60ab1acmr1620034edy.16.1707224372464;
-        Tue, 06 Feb 2024 04:59:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGefh/h3pitp7txo3hSq2AXC2MPwo9tn8Ukfdo51TLjWJHf2Q+ALIco8XrRXNqKF/AGdCKELg==
-X-Received: by 2002:a05:6402:893:b0:55f:d60a:b1ac with SMTP id e19-20020a056402089300b0055fd60ab1acmr1620001edy.16.1707224372099;
-        Tue, 06 Feb 2024 04:59:32 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVR1zOr0ILdgvtBzUNXS3O4pO5CPZZQFGEDqXe2HsUTFnz+bwi1JHvEvanAHyjc6YvE3J3pphIG15fNPDMtZZVSm5pVCDjxixd3qpyCfD8rWkoZt1/2qiwqNSKObW8/q8DQTK8EFpn27xTW8RwXTH80DQ3hm4jjPs+OYeokW5g0rmkvFJo2kVXqVNu1g9ryGLv+eXEF22CvWWKHb2gAKblFfe1iqfuP1j5VOqUVx9h0qxtAyFGr/akG9WXsxeU0cwkhvm8qDevN2HtImMVYVvBu9jyHyeXo7e6hdXMJILhnjxhXaIvT2JEBKE2eRxfCGLyhh1ZC+EuRYDT2lbrw+b55n5+PAq/7lG6FEG2K/nUmro3R4CbCHUBpWAMydYvKx2IG8bNOvVAJFZW5MLMxHVGp+dm9c1yHLfIvCE5U+kU2+tBk2o3XcA+f6Blg3Fu94zCx5aFnPlRyW9nCjDN5ExpkbnFHG5T6ZPLj5b44T5uX/fA/KT40G4m82SU1cUgQFnabH79UtAkkx/gZqIrweUQ=
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id cf10-20020a0564020b8a00b005607f899175sm997772edb.70.2024.02.06.04.59.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Feb 2024 04:59:31 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 50269108AFBD; Tue,  6 Feb 2024 13:59:31 +0100 (CET)
-From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH bpf-next] libbpf: Use OPTS_SET() macro in bpf_xdp_query()
-Date: Tue,  6 Feb 2024 13:59:22 +0100
-Message-ID: <20240206125922.1992815-1-toke@redhat.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1707225027; c=relaxed/simple;
+	bh=63hxr8dgFRyLoazPW+F1Tfs3tLtAneTXVrW3w14F/Wo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Yju4EnvqAOXw5nIaE+yaNT0KyeSK1mHwPzPgXS2axi2gWfuAJoG6T3/qE1hz7UeuSJvnai3CaDLghwhtjrkZ59Oe5Foym3mVzF1GvaOhJZbkOQ4IA8fsLYmRNyr4/wALQFa7XEShmq61MsMMbS+ewl+A+0e/yyShf+BJ1Fe9Fus=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l3cETau6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2D8D0C433C7;
+	Tue,  6 Feb 2024 13:10:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707225027;
+	bh=63hxr8dgFRyLoazPW+F1Tfs3tLtAneTXVrW3w14F/Wo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=l3cETau6FE+wzLBwJXO72pNw0/ONbR1F/Um/35GkCkyZR9IHQC9gyddzl7ppajivm
+	 1i0JR2HREINMm/tz3/oC/kCxrulIj9j68B2gOA25ASG6tYP+DcGsv5Yew5wQcgBQYU
+	 Go4QLoiaaLT1RDV/1tMEk51auFGz7CoASK8widU2YqiSf8xxuNg+5SJJtVoq3Ryl2o
+	 fHJEEaHHuA38eSG//yFVr1Xl8v3kBfaeDUPYO8ggRMdb+3QQL+Ledc3B0szlrmLk0O
+	 bZY0DDHY9CN0G4MmsCpIOCBEtC0fURShqHvNh0JqmHMeomfyegVc7etczCYtHspNLe
+	 sUhj4qvmSMrOg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 021BDE2F31F;
+	Tue,  6 Feb 2024 13:10:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: stmmac: xgmac: fix a typo of register name in DPP
+ safety handling
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170722502700.6009.7954883492875206061.git-patchwork-notify@kernel.org>
+Date: Tue, 06 Feb 2024 13:10:27 +0000
+References: <20240203053133.1129236-1-0x1207@gmail.com>
+In-Reply-To: <20240203053133.1129236-1-0x1207@gmail.com>
+To: Furong Xu <0x1207@gmail.com>
+Cc: davem@davemloft.net, alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ mcoquelin.stm32@gmail.com, jpinto@synopsys.com, horms@kernel.org,
+ fancer.lancer@gmail.com, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ xfr@outlook.com, rock.xu@nio.com
 
-When the feature_flags and xdp_zc_max_segs fields were added to the libbpf
-bpf_xdp_query_opts, the code writing them did not use the OPTS_SET() macro.
-This causes libbpf to write to those fields unconditionally, which means
-that programs compiled against an older version of libbpf (with a smaller
-size of the bpf_xdp_query_opts struct) will have its stack corrupted by
-libbpf writing out of bounds.
+Hello:
 
-The patch adding the feature_flags field has an early bail out if the
-feature_flags field is not part of the opts struct (via the OPTS_HAS)
-macro, but the patch adding xdp_zc_max_segs does not. For consistency, this
-fix just changes the assignments to both fields to use the OPTS_SET()
-macro.
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Fixes: 13ce2daa259a ("xsk: add new netlink attribute dedicated for ZC max frags")
-Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
----
- tools/lib/bpf/netlink.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Sat,  3 Feb 2024 13:31:33 +0800 you wrote:
+> DDPP is copied from Synopsys Data book:
+> 
+> DDPP: Disable Data path Parity Protection.
+>     When it is 0x0, Data path Parity Protection is enabled.
+>     When it is 0x1, Data path Parity Protection is disabled.
+> 
+> The macro name should be XGMAC_DPP_DISABLE.
+> 
+> [...]
 
-diff --git a/tools/lib/bpf/netlink.c b/tools/lib/bpf/netlink.c
-index 090bcf6e3b3d..68a2def17175 100644
---- a/tools/lib/bpf/netlink.c
-+++ b/tools/lib/bpf/netlink.c
-@@ -496,8 +496,8 @@ int bpf_xdp_query(int ifindex, int xdp_flags, struct bpf_xdp_query_opts *opts)
- 	if (err)
- 		return libbpf_err(err);
- 
--	opts->feature_flags = md.flags;
--	opts->xdp_zc_max_segs = md.xdp_zc_max_segs;
-+	OPTS_SET(opts, feature_flags, md.flags);
-+	OPTS_SET(opts, xdp_zc_max_segs, md.xdp_zc_max_segs);
- 
- skip_feature_flags:
- 	return 0;
+Here is the summary with links:
+  - [net] net: stmmac: xgmac: fix a typo of register name in DPP safety handling
+    https://git.kernel.org/netdev/net/c/1ce2654d87e2
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
