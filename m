@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-69455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14BB184B53F
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 13:33:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D86D84B557
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 13:35:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BFCAB28B98
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 12:33:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37537289920
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 12:35:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F9E1133408;
-	Tue,  6 Feb 2024 12:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F7D12FF86;
+	Tue,  6 Feb 2024 12:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KtDgSyY/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W3UFHHs/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA5813340D
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 12:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A054912F399;
+	Tue,  6 Feb 2024 12:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707222026; cv=none; b=qYZo1evu+8HmKK9qH8z7VgMzOawbvgFRvRHoyHq0+2XdU9axxsylyz/Tyy6ln8UollvB7XbzmtS4yVq+B6GcDmkoQDOSZWWahr9uTvRSx+NB5Xa9MeD6ngE93TI2RwENEu3OqJ5yf3eUbIIW+y2pkTZGe/rFQQMfidWO2FoSoKM=
+	t=1707222628; cv=none; b=Uo9/6bM57b3vvKNyKMFXUSZF62DL1daTneJXZtJ1ofRLtwVz4nOYyniL5UEdcHZnQCublqvKG4jtJgBUGfNliYJHaZgH5m5ttbukMMUcpfUiAyxpcdxg/Aan7zzBL17EQxNEtGeENrGYYZ2LMh0LFSsspgKW7DfjwUov5Xm/JeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707222026; c=relaxed/simple;
-	bh=I/BMGU2sq2mpZXKWyws+96g8BVDXh7makeWHcqmb2l4=;
+	s=arc-20240116; t=1707222628; c=relaxed/simple;
+	bh=3E6W6YiXOQMimuiMDxemep8UT52NggZB36Tpv4obHjw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XIAwkKmBnwOL7r+h6nBhkFe5HdTX6EVcZZA9nE7OUtiCgU4ZLX/rgW1ClPQzikBGeLo+NH1TzHHoo8hCS3apC42B8QtfyejliNa3modrfrg3dc+vA3Tbz8k3YMLTAOf+SuBYDNpk/mMweQvK4BHKB1rCTo62oZ4oTkwZ2HIqSbw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KtDgSyY/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 76EAEC433F1;
-	Tue,  6 Feb 2024 12:20:25 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=YkibJ18POh5/w87b62QQWnJBMocimOwtURyB/sUJ4B08rrqO7ZtohaLHrt7t/fykWYGviUsn5AGqQ4m+s/eIcjuws5y9CAD7hxZ89EBOnRzOGytJWhxsqpX1659dAtj0orl93IKc/N5No5KPQOJzBUSRk30lXmbbmt5ahkeKeeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W3UFHHs/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 452E0C43394;
+	Tue,  6 Feb 2024 12:30:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707222025;
-	bh=I/BMGU2sq2mpZXKWyws+96g8BVDXh7makeWHcqmb2l4=;
+	s=k20201202; t=1707222628;
+	bh=3E6W6YiXOQMimuiMDxemep8UT52NggZB36Tpv4obHjw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KtDgSyY/f5MqvfEfztisKOnUeGLv1EjHFUNCkscRppPyWPqh/cYV2Qfs8/NU4AZkb
-	 pypf/SU87oPyzQjIZ5UrEPvlY0n7YR/i+irFA/hJpP8VkmohwLYNAGO1TrTW8YWHe9
-	 IUUe/aY0LU8jwm8Sm7vdDwx0luPRth9RumeDzlzZW6XkFKv0P/3KgO3GibFha6sWWK
-	 zMxa2fqKxNaRztPbymp1cE3u9BA7GcmjcGuHEb8Ut/i2xidbGbNfD/28xPj2gMNh67
-	 ZJsvviDnnpESmlPC/aDn1x57tkOY2xIOAwRrUf96yuJ11jtkbS85XLoZ9cQCe/KXAx
-	 dWobl2Ii6PePw==
+	b=W3UFHHs/h3tiEDunOQy+6f07g2LsRppyYqp+uSPY4Vu6gfxjTaDhrTu+OWb1aE6Rx
+	 zPAbiYN2072o7UAvR3Pbvu0otlyovH3vCleBaJLS39QM5MllCZWQpyrO1/y3/46uku
+	 wb+HOWmPLnwd5Uu674+u6kWICdCjV63k2ZaRkUXeJrAPZPqJ2IFQaEp3uG5doEmV0r
+	 +w5eYQzrZ67kbFGrHuJMd83KtPI7dIOE3L02womdhHMQ/fhF8JLXdLj0UzsCASK89L
+	 kSisW/S7SBOXsIEO+jfx/PHUQ1E8Df4ZtJe+0hjwCB2mx+aJcxWm3ebApd3YWvuMKi
+	 BMOJXwyvHOyMA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5E026E2F2F9;
-	Tue,  6 Feb 2024 12:20:25 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 23DC5D8C981;
+	Tue,  6 Feb 2024 12:30:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/4][pull request] Intel Wired LAN Driver Updates
- 2024-02-02 (ice)
+Subject: Re: [PATCH net-next v7] bonding: Add independent control state machine
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170722202537.10552.174755665758975001.git-patchwork-notify@kernel.org>
-Date: Tue, 06 Feb 2024 12:20:25 +0000
-References: <20240202175613.3470818-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20240202175613.3470818-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org
+ <170722262814.15492.1613133605046050372.git-patchwork-notify@kernel.org>
+Date: Tue, 06 Feb 2024 12:30:28 +0000
+References: <20240202175858.1573852-1-aahila@google.com>
+In-Reply-To: <20240202175858.1573852-1-aahila@google.com>
+To: Aahil Awatramani <aahila@google.com>
+Cc: dave@thedillows.org, maheshb@google.com, j.vosburgh@gmail.com,
+ liuhangbin@gmail.com, andy@greyhouse.net, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ martin.lau@kernel.org, herbert@gondor.apana.org.au, daniel@iogearbox.net,
+ jiri@resnulli.us, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On Fri,  2 Feb 2024 09:56:08 -0800 you wrote:
-> This series contains updates to ice driver only.
+On Fri,  2 Feb 2024 17:58:58 +0000 you wrote:
+> Add support for the independent control state machine per IEEE
+> 802.1AX-2008 5.4.15 in addition to the existing implementation of the
+> coupled control state machine.
 > 
-> Maciej changes some queue configuration calls to existing ones which are
-> better suited for the purpose.
-> 
-> Aniruddha adds separate reporting for Rx EIPE errors as hardware may
-> incorrectly report errors on certain packets.
+> Introduces two new states, AD_MUX_COLLECTING and AD_MUX_DISTRIBUTING in
+> the LACP MUX state machine for separated handling of an initial
+> Collecting state before the Collecting and Distributing state. This
+> enables a port to be in a state where it can receive incoming packets
+> while not still distributing. This is useful for reducing packet loss when
+> a port begins distributing before its partner is able to collect.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/4] ice: make ice_vsi_cfg_rxq() static
-    https://git.kernel.org/netdev/net-next/c/3e5fb691faee
-  - [net-next,2/4] ice: make ice_vsi_cfg_txq() static
-    https://git.kernel.org/netdev/net-next/c/a292ba981324
-  - [net-next,3/4] ice: Add a new counter for Rx EIPE errors
-    https://git.kernel.org/netdev/net-next/c/0ca6755f3cc2
-  - [net-next,4/4] ice: remove incorrect comment
-    https://git.kernel.org/netdev/net-next/c/53875f05c997
+  - [net-next,v7] bonding: Add independent control state machine
+    https://git.kernel.org/netdev/net-next/c/240fd405528b
 
 You are awesome, thank you!
 -- 
