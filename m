@@ -1,124 +1,164 @@
-Return-Path: <netdev+bounces-69497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D7B584B7DA
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:27:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F34BC84B7DB
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:27:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5AF81C2190E
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:27:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87001282300
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:27:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DDF31332A3;
-	Tue,  6 Feb 2024 14:26:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Wss+AlvB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60ECE132472;
+	Tue,  6 Feb 2024 14:27:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70780132C35
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 14:26:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5460D73195;
+	Tue,  6 Feb 2024 14:27:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707229607; cv=none; b=UNs5/AR8564sizBa1riAEf+L8+24QlfCMhig3D/ilebBMB/a2jKlSCryzYjgq0Sn7U4Ap2A5tKDV965bVU6HfN8XmebiJ0lOg3pXnJlFe7J///D6WYf6Vy38cY6XXGhMPDkBdYBTl6lJ3wgeatxO1Ep6qeGSdcKg0rSCnysGNXs=
+	t=1707229653; cv=none; b=labVn+Y00e3wId66gMFBtARhlXNoIZRkuiLOo1WQmcaSdRtOUaNBvsk845iEET6/cdkRnjPurIJgWW39+GlbVokjdzFVI3omqjCnV0xP8qDfitoYEZ6c/WKhWJWNFKZEJBa1mjCqeZ12Zy8o+rnRX0V8+a5J3pJb7TuUKMIzysw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707229607; c=relaxed/simple;
-	bh=AhYaiQirIdTgeAFrgav7YX/uK7UoH071E5WHx8NanEQ=;
+	s=arc-20240116; t=1707229653; c=relaxed/simple;
+	bh=jgY+TWgYdfR9MKXCotYSOZivElxKp66BrEYaXSOeXyo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=CrmwDkEc1neSvh7oGco3Hy0hFx23xLNTG2sfJ0M7rP6QsOgkiRnS+1EkzUyPhgz9A4/dkgtkpt3zBzctJZLAWGjde7y7/svi72r8/zr0PIhX0Z4G39msvv0DRefuvLCbgcw0PE765FGWDaVmfXjn2ggBD3br+msMooOKM3aqH8k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Wss+AlvB; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707229604;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=G/N/vRk6/fRthFrE/hmK6Y0LpIn8IaBHgzVh8Ly/Y4Q=;
-	b=Wss+AlvBB7saMwYxWWrwlU8ERoz25WOCE/IxbyJk7xfTU8RwM6x2g9JrNoYVjso+AUQcFV
-	4KFKiWORNtKwfBkp2rkARmd2M0EM/23xLIs2tvwakEmj8YR7LETFQakRP8nXu9a7ioLjPF
-	9zidWkCC1GHThmcVNusjtHCIUpbYdeg=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-261-zK1FpD-zMdiC0ZGx0Ftokg-1; Tue, 06 Feb 2024 09:26:42 -0500
-X-MC-Unique: zK1FpD-zMdiC0ZGx0Ftokg-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-56064e3e00aso1061674a12.1
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 06:26:42 -0800 (PST)
+	 To:Cc:Content-Type; b=pdSfjoGlDELDR6rrcF8i9nm7U9B5UUCLrkm3UYAvWRhGyZdrPlxR7hf737LaBX4JaVDqycJ8Y9X0iQIj84h/le7kpU2OR4g2/bJyiVZv+KFaymyVCx+XCSpZqb3Qb0edHu7ZF4rO3V5hXJRgy6eGDsOLqhsqRtgZuoiHv2oCi+4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-604713c4ee5so13652927b3.0;
+        Tue, 06 Feb 2024 06:27:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707229601; x=1707834401;
-        h=content-transfer-encoding:to:subject:message-id:date:from
+        d=1e100.net; s=20230601; t=1707229649; x=1707834449;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=G/N/vRk6/fRthFrE/hmK6Y0LpIn8IaBHgzVh8Ly/Y4Q=;
-        b=ix3zchi5i0R/13qgm6CF2tIPb0N1q7DEW3o4NZgoLejluVSYaCzmiQ2eQI+IJ2ktzU
-         7r1zS3hbZmERH19QEcK0PZ7txKt6k8/dy87soeDigzezo6ZLgywsCZlhTd2Y1z5yg/nT
-         KjvRo48yGhWdeaXwh5SAXlnP0r2a4xluBgtBeILCOyWL+Tqx20eE8QRAjcZjI/nJzIml
-         Od0wiC4fR9xy0DJwNYShGU639m6S/IMyo3NYNXKXgfam6tfDyZ2kAF3JOR8ZbHFNb23N
-         UgMzJKNBugHJ21EHvZjq13R/nhDrlzd91Ogrh3bOES4KeQmY4bGtVqJSsvffwgEUBN+d
-         Whug==
-X-Gm-Message-State: AOJu0YyTJsmDuBs6FSuiwUjis/2dYx3FIoCGFE7Gz15Am452Wcp5wGYE
-	QgMJZaJ1IWoCR7ZmElKa77CzOZYOGkOb5wQs4nW22Dr1z9Lsow9hV3t29cJBrM8Zvtt07seXYJd
-	g7jMuymOvDCNRISFG5xiRDrpc+67TMLJsqyCQQazheb8+yOYXKkXZ2y5cDbL7Q7FSQnG9Nm5vQO
-	4Z3iSi7gKXpgYltU640QtXvbbV/YX2oeiN2CLHCpY=
-X-Received: by 2002:a05:6402:695:b0:560:9267:95af with SMTP id f21-20020a056402069500b00560926795afmr1553148edy.22.1707229601137;
-        Tue, 06 Feb 2024 06:26:41 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFRdTcfjYzbCNkhZtVotCuMQmDrVhn1zSrRgefyzfviguxq2oKuaBu81VGAAbQyzom2xTsM/cQKecCshbYbRk8=
-X-Received: by 2002:a05:6402:695:b0:560:9267:95af with SMTP id
- f21-20020a056402069500b00560926795afmr1553131edy.22.1707229600709; Tue, 06
- Feb 2024 06:26:40 -0800 (PST)
+        bh=sMuL3cMWnvFZf6VJykIvule1zvnpxfniwQC+Rdv3zpU=;
+        b=T7Yg1at0aLNumPR34lTQeul44RGrYfSTczY2IwKmQMZvq4l6L3M++e3SmeUzXAUoCW
+         uoSdRuP9+lhZYqJGjLnZPrEmuLMQjljDGH5v2ebdv8ef2Ou50xlQfsUIN76TlUaoOKAo
+         m8mv9r0+GbjbUGrnMDrKld/Nb9CT8mjsGzSY2uhINwTGAlhuA5WFGjVZYthJBohBVNJ8
+         +nP/oFa1V4BwMO1IYHWmFNVZlWX7/XxObmJwakQ0Yp1TNJz8scJOhnRrG5qg97ban7z+
+         S5c/FBICnnxkz/QWYkP+SLeD7M+HbbMgqdv9MfRXc6Z/VyjbTJDFF1+4jQbWW0/QzDJq
+         fVIw==
+X-Gm-Message-State: AOJu0Yy35kTBy4NySlUVOA6qnxASsOsswk4Zoww2LkzXjwSNYpMI6/6Q
+	cLgDLI6Qo1WKnZ/jO3N8f/YsEQ62gqsdEindza/WckKOiubLhDZXiVGrXIFWCP0=
+X-Google-Smtp-Source: AGHT+IFnWLMlXiNnm03DdTsh/55xX4ggJylVN4xOxWPyv/zbMGm3WdH1LbMfqVMz8SomQ1SlfpXxzA==
+X-Received: by 2002:a81:f110:0:b0:5f0:cbce:669f with SMTP id h16-20020a81f110000000b005f0cbce669fmr1910341ywm.22.1707229649304;
+        Tue, 06 Feb 2024 06:27:29 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUgGFsNQe65pPCBvwU4bpPpqGYFMEx1EvBqyggD4/Dx8XEmZR+F9Dxa/Uf8Pv9t2uPjHu6haODBbgsYlv3DxiHJVQCGZOWwJ//+W9BV8c/hen6fuEwlEsGU0jaOxZD/phfLCrTg
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com. [209.85.128.177])
+        by smtp.gmail.com with ESMTPSA id fp3-20020a05690c34c300b005ff9d3ca38fsm492103ywb.1.2024.02.06.06.27.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Feb 2024 06:27:29 -0800 (PST)
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-60412f65124so52125877b3.3;
+        Tue, 06 Feb 2024 06:27:28 -0800 (PST)
+X-Received: by 2002:a81:b1c9:0:b0:603:d3f1:1c2b with SMTP id
+ p192-20020a81b1c9000000b00603d3f11c2bmr1698533ywh.24.1707229648647; Tue, 06
+ Feb 2024 06:27:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240206141944.774917-1-sgallagh@redhat.com>
-In-Reply-To: <20240206141944.774917-1-sgallagh@redhat.com>
-From: Stephen Gallagher <sgallagh@redhat.com>
-Date: Tue, 6 Feb 2024 09:26:29 -0500
-Message-ID: <CAFoKQtycQJd-fgosPBoXeJN8Crd31U8-kG5QHOz4KHe+5o1mTA@mail.gmail.com>
-Subject: Re: [PATCH] ifstat.c: fix type incompatibility
-To: netdev@vger.kernel.org
+References: <20240115202104.14077-1-lnimi@hotmail.com> <PH7PR03MB7064D0D56ED3A26B0F93CC12A06C2@PH7PR03MB7064.namprd03.prod.outlook.com>
+In-Reply-To: <PH7PR03MB7064D0D56ED3A26B0F93CC12A06C2@PH7PR03MB7064.namprd03.prod.outlook.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Tue, 6 Feb 2024 15:27:16 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdU=G0eYTf+n9Bv+Bwke4W8isRrh-B6zHD1=hD8yksxedw@mail.gmail.com>
+Message-ID: <CAMuHMdU=G0eYTf+n9Bv+Bwke4W8isRrh-B6zHD1=hD8yksxedw@mail.gmail.com>
+Subject: Re: [PATCH net-next v8 2/2] ptp: add FemtoClock3 Wireless as ptp
+ hardware clock
+To: Min Li <lnimi@hotmail.com>
+Cc: richardcochran@gmail.com, lee@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, Min Li <min.li.xe@renesas.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Please disregard; I titled this wrong. Please see "[PATCH] iproute2:
-fix type incompatibility in ifstat.c" instead.
+Hi Min,
 
-On Tue, Feb 6, 2024 at 9:20=E2=80=AFAM Stephen Gallagher <sgallagh@redhat.c=
-om> wrote:
+On Mon, Jan 15, 2024 at 9:22=E2=80=AFPM Min Li <lnimi@hotmail.com> wrote:
+> From: Min Li <min.li.xe@renesas.com>
 >
-> Throughout ifstat.c, ifstat_ent.val is accessed as a long long unsigned
-> type, however it is defined as __u64. This works by coincidence on many
-> systems, however on ppc64le, __u64 is a long unsigned.
+> The RENESAS FemtoClock3 Wireless is a high-performance jitter attenuator,
+> frequency translator, and clock synthesizer. The device is comprised of 3
+> digital PLLs (DPLL) to track CLKIN inputs and three independent low phase
+> noise fractional output dividers (FOD) that output low phase noise clocks=
+.
 >
-> This patch makes the type definition consistent with all of the places
-> where it is accessed.
+> FemtoClock3 supports one Time Synchronization (Time Sync) channel to enab=
+le
+> an external processor to control the phase and frequency of the Time Sync
+> channel and to take phase measurements using the TDC. Intended applicatio=
+ns
+> are synchronization using the precision time protocol (PTP) and
+> synchronization with 0.5 Hz and 1 Hz signals from GNSS.
 >
-> Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
-> ---
->  misc/ifstat.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/misc/ifstat.c b/misc/ifstat.c
-> index 721f4914..767cedd4 100644
-> --- a/misc/ifstat.c
-> +++ b/misc/ifstat.c
-> @@ -58,7 +58,7 @@ struct ifstat_ent {
->         struct ifstat_ent       *next;
->         char                    *name;
->         int                     ifindex;
-> -       __u64                   val[MAXS];
-> +       unsigned long long      val[MAXS];
->         double                  rate[MAXS];
->         __u32                   ival[MAXS];
->  };
-> --
-> 2.43.0
->
+> Signed-off-by: Min Li <min.li.xe@renesas.com>
 
+Thanks for your patch, which is now commit 1ddfecafabf71e0e ("ptp:
+add FemtoClock3 Wireless as ptp hardware clock") in net-next/main.
+
+> --- a/drivers/ptp/Kconfig
+> +++ b/drivers/ptp/Kconfig
+> @@ -155,6 +155,18 @@ config PTP_1588_CLOCK_IDTCM
+>           To compile this driver as a module, choose M here: the module
+>           will be called ptp_clockmatrix.
+>
+> +config PTP_1588_CLOCK_FC3W
+> +       tristate "RENESAS FemtoClock3 Wireless as PTP clock"
+> +       depends on PTP_1588_CLOCK && I2C
+
+This driver does not seem to use any direct i2c functionality (it
+does use regmap), so presumably it should depend on something else
+(see below) instead?
+
+> +       default n
+
+"default n" is the default.
+
+> +       help
+> +         This driver adds support for using Renesas FemtoClock3 Wireless
+> +         as a PTP clock. This clock is only useful if your time stamping
+> +         MAC is connected to the RENESAS chip.
+> +
+> +         To compile this driver as a module, choose M here: the module
+> +         will be called ptp_fc3.
+> +
+>  config PTP_1588_CLOCK_MOCK
+>         tristate "Mock-up PTP clock"
+>         depends on PTP_1588_CLOCK
+
+> --- /dev/null
+> +++ b/drivers/ptp/ptp_fc3.c
+
+> +static struct platform_driver idtfc3_driver =3D {
+> +       .driver =3D {
+> +               .name =3D "rc38xxx-phc",
+> +       },
+> +       .probe =3D idtfc3_probe,
+> +       .remove =3D idtfc3_remove,
+> +};
+
+Who is supposed to instantiate this platform device?
+I couldn't find anything in-tree or on lore.kernel.org.
+Presumably that driver should be a dependency for the
+PTP_1588_CLOCK_FC3W config symbol.
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
