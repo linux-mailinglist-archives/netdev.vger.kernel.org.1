@@ -1,107 +1,100 @@
-Return-Path: <netdev+bounces-69407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CA7284B0F3
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:21:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84B0484B0DB
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:19:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3598B23AD9
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 09:21:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41045283924
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 09:19:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE2412F379;
-	Tue,  6 Feb 2024 09:19:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C8A712C81F;
+	Tue,  6 Feb 2024 09:19:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l9LYDnjz"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B98712F386;
-	Tue,  6 Feb 2024 09:19:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2783174E2A
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 09:19:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707211190; cv=none; b=aPVtSolvTgHCUQCFBsoPWzBHkz7EV1SacPjyuv4SInB8HVm9nN3kP43j+T9k6yXe9LMvM7tR7EOiSZaO4wFvdZfQS9/l7F/a+Zw69+B4uchcYQw6ICnY6v9fAadu6KO3ed0/iyyxOUcYX2ioftbVTSsU6GBRwmnh7o46y/I+HRg=
+	t=1707211163; cv=none; b=Dcdr4VujyzkSVMSulf9PAdMR+9r6NS214/AGPqxFNF3iwz8aurVfyQw8vtaF8DoA3W/el19vBGXpv9llsCzB/sj+2kWwW9BYycgGjLI7wKUC9K+e3LdDb/0LF2Xc822kX5g/20tXpX1cBirAzxhuLfc7zvUg9gnhFk4bAupzr0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707211190; c=relaxed/simple;
-	bh=v30FjsWUe3ZhLh+6uEKl3Kbs4m0Yb16dWTX3b3fdzp8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GbynWw0Ew48m1AaJbTPC2Tyf7uRoVT4SAxPnDEQJvJRVIC5fOAKPbMwNP0xlVHTbKPeLKN+EYuT7TquEpfkPG6WDx6iLVLQQSNZ91H6IDBhYArvkGIpkoPMPgI9TnLOode2F6vdNoWBYTux81nMsDEX7jwK1fumhr915XpOl+mE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-X-IronPort-AV: E=Sophos;i="6.05,246,1701097200"; 
-   d="scan'208";a="196934676"
-Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
-  by relmlie6.idc.renesas.com with ESMTP; 06 Feb 2024 18:19:47 +0900
-Received: from GBR-5CG2373LKG.adwin.renesas.com (unknown [10.226.93.63])
-	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 0C8F041B8EF7;
-	Tue,  6 Feb 2024 18:19:43 +0900 (JST)
-From: Paul Barker <paul.barker.ct@bp.renesas.com>
-To: Sergey Shtylyov <s.shtylyov@omp.ru>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Paul Barker <paul.barker.ct@bp.renesas.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH net-next v2 7/7] net: ravb: Use NAPI threaded mode on 1-core CPUs with GbEth IP
-Date: Tue,  6 Feb 2024 09:19:09 +0000
-Message-Id: <20240206091909.3191-8-paul.barker.ct@bp.renesas.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240206091909.3191-1-paul.barker.ct@bp.renesas.com>
-References: <20240206091909.3191-1-paul.barker.ct@bp.renesas.com>
+	s=arc-20240116; t=1707211163; c=relaxed/simple;
+	bh=gklHqoeGrz9iSOsg1aejOyZbfm7UsXbsj7tqTGEBrQE=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=sdJcEJ9KA6y3hL802NNQBuGEOD5/ZQQb9oAyCs13TLEgQbKGYk/7fp3JKLUEVIeAShwBVMigso6B9KZWv+4SGBumBoUyegClWfofBPscqkdMUlqq9PDmm9nrS+0SIP9nwVfV6Ub2J0gxAvglmtLm7RazFy07xChivp80QwFAKuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l9LYDnjz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E470C433C7;
+	Tue,  6 Feb 2024 09:19:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707211162;
+	bh=gklHqoeGrz9iSOsg1aejOyZbfm7UsXbsj7tqTGEBrQE=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=l9LYDnjze8W9IBwEbrys/p6KgcMvDeBseXKcT+PBQWjSfocukiswqBqK+qqT/74YM
+	 moClz81IuvpnXb5FWQiMOl/XBDF/n8mM/NawUOo6pYPa5ZrDSIMLe08sZXXetTv3JG
+	 xF4Wwzo4K6uI2fKTmA1CzY/W0Q1fne6wrwFUpYdE6MIdE9d38gw+FnIeKJuF9j9EW4
+	 eBqMa1NFljt9BlfRI2xXGoVGHugc6iOYs7s902xBvTtUvwQLippjOKUvhpxv5nvl2L
+	 ghw379bZJmWYSunLQeJu1g7YmIBozTNgpuVigqYE9rBEFu9Vj1klrteA16JSwmbHE4
+	 ioVcebajXoKCQ==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240205124752.811108-6-edumazet@google.com>
+References: <20240205124752.811108-1-edumazet@google.com> <20240205124752.811108-6-edumazet@google.com>
+Subject: Re: [PATCH v3 net-next 05/15] geneve: use exit_batch_rtnl() method
+From: Antoine Tenart <atenart@kernel.org>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, Eric Dumazet <edumazet@google.com>
+To: David S . Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Date: Tue, 06 Feb 2024 10:19:19 +0100
+Message-ID: <170721115936.5464.3838090704873147346@kwain>
 
-NAPI Threaded mode (along with the previously enabled SW IRQ Coalescing)
-is required to improve network stack performance for single core SoCs
-using the GbEth IP (currently the RZ/G2L SoC family and the RZ/G3S SoC).
+Quoting Eric Dumazet (2024-02-05 13:47:42)
+> -static void __net_exit geneve_exit_batch_net(struct list_head *net_list)
+> +static void __net_exit geneve_exit_batch_rtnl(struct list_head *net_list,
+> +                                             struct list_head *dev_to_ki=
+ll)
+>  {
+>         struct net *net;
+> -       LIST_HEAD(list);
+> =20
+> -       rtnl_lock();
+>         list_for_each_entry(net, net_list, exit_list)
+> -               geneve_destroy_tunnels(net, &list);
+> -
+> -       /* unregister the devices gathered above */
+> -       unregister_netdevice_many(&list);
+> -       rtnl_unlock();
+> +               geneve_destroy_tunnels(net, dev_to_kill);
+> =20
+>         list_for_each_entry(net, net_list, exit_list) {
+>                 const struct geneve_net *gn =3D net_generic(net, geneve_n=
+et_id);
 
-For the RZ/G2UL, network throughput is greatly increased by this change
-(results obtained with iperf3) for all test cases except UDP TX:
-  * TCP TX: 30% more throughput
-  * TCP RX: 9.8% more throughput
-  * UDP TX: 9.7% less throughput
-  * UDP RX: 89% more throughput
+Not shown in the diff here is:
 
-For the RZ/G3S we see improvements in network throughput similar to the
-RZ/G2UL.
+  WARN_ON_ONCE(!list_empty(&gn->sock_list));
 
-The improvement of UDP RX bandwidth for the single core SoCs (RZ/G2UL &
-RZ/G3S) is particularly critical. NAPI Threaded mode can be disabled at
-runtime via sysfs for applications where UDP TX performance is a
-priority.
+I think this will be triggered as the above logic inverted two calls,
+which are now,
 
-Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
----
- drivers/net/ethernet/renesas/ravb_main.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+1. WARN_ON_ONCE(...)
+2. unregister_netdevice_many
 
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 7bb80608f260..522df82524ff 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -2984,8 +2984,11 @@ static int ravb_probe(struct platform_device *pdev)
- 	if (info->nc_queues)
- 		netif_napi_add(ndev, &priv->napi[RAVB_NC], ravb_poll);
- 
--	if (info->needs_irq_coalesce)
-+	if (info->needs_irq_coalesce) {
- 		netdev_sw_irq_coalesce_default_on(ndev);
-+		if (num_present_cpus() == 1)
-+			dev_set_threaded(ndev, true);
-+	}
- 
- 	/* Network device register */
- 	error = register_netdev(ndev);
--- 
-2.39.2
+But ->sock_list entries are removed in ndo_exit, called from
+unregister_netdevice_many.
 
+I guess the warning could be moved to exit_batch (or removed).
+
+Thanks,
+Antoine
 
