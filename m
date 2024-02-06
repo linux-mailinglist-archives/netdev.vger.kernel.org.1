@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-69366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69367-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 798BD84AD00
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 04:39:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15AFC84AD02
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 04:39:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E76B1C21280
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 03:39:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0845AB20B53
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 03:39:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8C6C745E2;
-	Tue,  6 Feb 2024 03:38:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD12F74E2D;
+	Tue,  6 Feb 2024 03:38:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mQNew7Id"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BN+4fFm4"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95ED74E2D
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 03:38:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22B0574E07
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 03:38:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707190718; cv=none; b=t9e+h1w/S/a/NTcl8EEXA0I2R5wJl7QaUK6cMLpGVR7bJeE60M+ISw1ADusNiys+/6zvlHHJC7qTnWwN8xLZqm3DfY9QIJD3fwZ+naSRXOTCcs1BEoZk6YnllhCRv6/DsMkIZC10r8oAFDTPIw9vdlGxEyECheW3iTl1lOrpQZ8=
+	t=1707190720; cv=none; b=aT+xAdLiQH9IC2hVLiDO5j8UZbwcUyfXqvJKOuulDhs00jh9Mr6zrHf+N975ty5R62+WTXpNUHsNoe9wqB7FYekGyAejz3/7psHxT7Mn8v9dof8GPczxlw4CC+v3k8sIYwd/cX9TeHU3NbryM/rZ6YuGrCjn5wjWEon+Chj4B6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707190718; c=relaxed/simple;
-	bh=LJ/v/LZdgru0exdH+W+bWnlqxtX5nsukuvMctQmq+/0=;
+	s=arc-20240116; t=1707190720; c=relaxed/simple;
+	bh=0YfsILo7bm0hFofTrESnj/p34BcdQReA5WCY2ajEa6g=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=OYMSaaJ+QBGzjywAfj8kf2u5nWYZu7GmiRSKZWePK2xPjq51BMlztcdJtLRtXrfvTY6GmcJj3Tmcn/MLIGPLh3XgOZHqVYm8Poxh/JeldPbMYihfbx7i+IMGLtdNhpGre1bCLG35s4urr9tbRNFO4YSVtjNW+SHi5vfQNLZxFbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mQNew7Id; arc=none smtp.client-ip=198.175.65.16
+	 MIME-Version; b=epePCmgeu0XF0LD9rDAQcd/TrUqKEVol9+eBrlHzedI8dIV6gap71PRH7yWKbxhdzJqFNa0UW/CKCHKYauMC+UfFQDeFjXcfhmSSmDinB9cvM3cs/1G4fA0YjShmS1IEgSNqCfpxrYishHxW1+YEVKk6uPPhHOtXrZNp22huGLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BN+4fFm4; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707190717; x=1738726717;
+  t=1707190720; x=1738726720;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=LJ/v/LZdgru0exdH+W+bWnlqxtX5nsukuvMctQmq+/0=;
-  b=mQNew7IdP4mGGrw6cfCYcQuPGZQilfoYDwqWTS0DAeLoSwkpWYZLN2zk
-   SCj83DGzLUwLqBE3ByeAvIeEQid7n6/D0/a0IC/5/eXEmeWu0n3ej0Q/e
-   FfJ1kqPDm48UBjslOPiVdz4BFe7opPXlKbqXPtBzd2eL1YQW4Gee/X/e+
-   9YTfmjfRNdphortj+rrWHDuXbVHELMYytmO5v/Br7fML9nBI+BEYsmM10
-   wP6wZYDUMSiIGlRoIkXxu0XxILYz3+BbetK1oI9D5a+piWhD75jfh/uE0
-   ZwwrweCRU6ctMX30wqCEIm3PCfSrXGBJHH9B4ED7eWLFXaEi0X13B9Y/J
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10975"; a="824836"
+  bh=0YfsILo7bm0hFofTrESnj/p34BcdQReA5WCY2ajEa6g=;
+  b=BN+4fFm4oBOVcsncdgxOZAsaA8s3hhzwXFaCB+vE078EgaSHqDqrCgk1
+   Ca5EMB7QakblnBT3x/GGAZCT/CZBX2t5zzPpUIphkixseheuDyZCfNA+S
+   aqAC63Pz6/lBsyv5fvKtK7BpctmASDPGUP8sOalTvf6hm+2uIr7Mq22M5
+   krtSG0jTxYb/TUBpLHyQkVMADK853qaXLr0jeBbAT18V9LXcszvIahW00
+   UI1nZsccxPxWIrdTTy7doRdUphFRny8uRZ7WO05xxYv9aUsnTrMnqtpDU
+   NX8uHxA2hoq6HN0eSbcZg9eiwJrPJ8M9RRcdKyy7b+dcILLHASYydazN5
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10975"; a="824848"
 X-IronPort-AV: E=Sophos;i="6.05,246,1701158400"; 
-   d="scan'208";a="824836"
+   d="scan'208";a="824848"
 Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 19:38:37 -0800
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 19:38:39 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.05,246,1701158400"; 
-   d="scan'208";a="5653942"
+   d="scan'208";a="5653947"
 Received: from dev1-atbrady.jf.intel.com ([10.166.241.35])
-  by orviesa004.jf.intel.com with ESMTP; 05 Feb 2024 19:38:36 -0800
+  by orviesa004.jf.intel.com with ESMTP; 05 Feb 2024 19:38:39 -0800
 From: Alan Brady <alan.brady@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -62,9 +62,9 @@ Cc: netdev@vger.kernel.org,
 	igor.bagnucki@intel.com,
 	aleksander.lobakin@intel.com,
 	Alan Brady <alan.brady@intel.com>
-Subject: [PATCH v4 07/10 iwl-next] idpf: cleanup virtchnl cruft
-Date: Mon,  5 Feb 2024 19:38:01 -0800
-Message-Id: <20240206033804.1198416-8-alan.brady@intel.com>
+Subject: [PATCH v4 08/10 iwl-next] idpf: prevent deinit uninitialized virtchnl core
+Date: Mon,  5 Feb 2024 19:38:02 -0800
+Message-Id: <20240206033804.1198416-9-alan.brady@intel.com>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20240206033804.1198416-1-alan.brady@intel.com>
 References: <20240206033804.1198416-1-alan.brady@intel.com>
@@ -76,284 +76,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-We can now remove a bunch of gross code we don't need anymore like the
-vc state bits and vc_buf_lock since everything is using transaction API
-now.
+In idpf_remove we need to tear down the virtchnl core with
+idpf_vc_core_deinit so we can free up resources and leave things in a
+good state. However, in the case where we failed to establish VC
+communications we may not have ever actually successfully initialized
+the virtchnl core.
 
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Igor Bagnucki <igor.bagnucki@intel.com>
+This fixes it by setting a bit once we successfully init the virtchnl
+core.  Then, in deinit, we'll check for it before going on further,
+otherwise we just return. Also clear the bit at the end of deinit so we
+know it's gone now.
+
 Signed-off-by: Alan Brady <alan.brady@intel.com>
 ---
- drivers/net/ethernet/intel/idpf/idpf.h        | 86 -------------------
- drivers/net/ethernet/intel/idpf/idpf_lib.c    | 25 +-----
- drivers/net/ethernet/intel/idpf/idpf_main.c   |  2 -
- .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 13 ---
- 4 files changed, 2 insertions(+), 124 deletions(-)
+ drivers/net/ethernet/intel/idpf/idpf.h          |  2 ++
+ drivers/net/ethernet/intel/idpf/idpf_virtchnl.c | 10 ++++++++--
+ 2 files changed, 10 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/idpf/idpf.h b/drivers/net/ethernet/intel/idpf/idpf.h
-index 2d5449b9288a..0793173bb36d 100644
+index 0793173bb36d..e7a2fbf9e6cd 100644
 --- a/drivers/net/ethernet/intel/idpf/idpf.h
 +++ b/drivers/net/ethernet/intel/idpf/idpf.h
-@@ -37,8 +37,6 @@ struct idpf_vport_max_q;
- #define IDPF_MB_MAX_ERR			20
- #define IDPF_NUM_CHUNKS_PER_MSG(struct_sz, chunk_sz)	\
- 	((IDPF_CTLQ_MAX_BUF_LEN - (struct_sz)) / (chunk_sz))
--#define IDPF_WAIT_FOR_EVENT_TIMEO_MIN	2000
--#define IDPF_WAIT_FOR_EVENT_TIMEO	60000
- #define IDPF_VC_XN_MIN_TIMEOUT_MSEC	2000
- #define IDPF_VC_XN_DEFAULT_TIMEOUT_MSEC	(60 * 1000)
- #define IDPF_VC_XN_IDX_M		GENMASK(7, 0)
-@@ -212,71 +210,6 @@ struct idpf_dev_ops {
- 	struct idpf_reg_ops reg_ops;
- };
- 
--/* These macros allow us to generate an enum and a matching char * array of
-- * stringified enums that are always in sync. Checkpatch issues a bogus warning
-- * about this being a complex macro; but it's wrong, these are never used as a
-- * statement and instead only used to define the enum and array.
-- */
--#define IDPF_FOREACH_VPORT_VC_STATE(STATE)	\
--	STATE(IDPF_VC_CREATE_VPORT)		\
--	STATE(IDPF_VC_CREATE_VPORT_ERR)		\
--	STATE(IDPF_VC_ENA_VPORT)		\
--	STATE(IDPF_VC_ENA_VPORT_ERR)		\
--	STATE(IDPF_VC_DIS_VPORT)		\
--	STATE(IDPF_VC_DIS_VPORT_ERR)		\
--	STATE(IDPF_VC_DESTROY_VPORT)		\
--	STATE(IDPF_VC_DESTROY_VPORT_ERR)	\
--	STATE(IDPF_VC_CONFIG_TXQ)		\
--	STATE(IDPF_VC_CONFIG_TXQ_ERR)		\
--	STATE(IDPF_VC_CONFIG_RXQ)		\
--	STATE(IDPF_VC_CONFIG_RXQ_ERR)		\
--	STATE(IDPF_VC_ENA_QUEUES)		\
--	STATE(IDPF_VC_ENA_QUEUES_ERR)		\
--	STATE(IDPF_VC_DIS_QUEUES)		\
--	STATE(IDPF_VC_DIS_QUEUES_ERR)		\
--	STATE(IDPF_VC_MAP_IRQ)			\
--	STATE(IDPF_VC_MAP_IRQ_ERR)		\
--	STATE(IDPF_VC_UNMAP_IRQ)		\
--	STATE(IDPF_VC_UNMAP_IRQ_ERR)		\
--	STATE(IDPF_VC_ADD_QUEUES)		\
--	STATE(IDPF_VC_ADD_QUEUES_ERR)		\
--	STATE(IDPF_VC_DEL_QUEUES)		\
--	STATE(IDPF_VC_DEL_QUEUES_ERR)		\
--	STATE(IDPF_VC_ALLOC_VECTORS)		\
--	STATE(IDPF_VC_ALLOC_VECTORS_ERR)	\
--	STATE(IDPF_VC_DEALLOC_VECTORS)		\
--	STATE(IDPF_VC_DEALLOC_VECTORS_ERR)	\
--	STATE(IDPF_VC_SET_SRIOV_VFS)		\
--	STATE(IDPF_VC_SET_SRIOV_VFS_ERR)	\
--	STATE(IDPF_VC_GET_RSS_LUT)		\
--	STATE(IDPF_VC_GET_RSS_LUT_ERR)		\
--	STATE(IDPF_VC_SET_RSS_LUT)		\
--	STATE(IDPF_VC_SET_RSS_LUT_ERR)		\
--	STATE(IDPF_VC_GET_RSS_KEY)		\
--	STATE(IDPF_VC_GET_RSS_KEY_ERR)		\
--	STATE(IDPF_VC_SET_RSS_KEY)		\
--	STATE(IDPF_VC_SET_RSS_KEY_ERR)		\
--	STATE(IDPF_VC_GET_STATS)		\
--	STATE(IDPF_VC_GET_STATS_ERR)		\
--	STATE(IDPF_VC_ADD_MAC_ADDR)		\
--	STATE(IDPF_VC_ADD_MAC_ADDR_ERR)		\
--	STATE(IDPF_VC_DEL_MAC_ADDR)		\
--	STATE(IDPF_VC_DEL_MAC_ADDR_ERR)		\
--	STATE(IDPF_VC_GET_PTYPE_INFO)		\
--	STATE(IDPF_VC_GET_PTYPE_INFO_ERR)	\
--	STATE(IDPF_VC_LOOPBACK_STATE)		\
--	STATE(IDPF_VC_LOOPBACK_STATE_ERR)	\
--	STATE(IDPF_VC_NBITS)
--
--#define IDPF_GEN_ENUM(ENUM) ENUM,
--#define IDPF_GEN_STRING(STRING) #STRING,
--
--enum idpf_vport_vc_state {
--	IDPF_FOREACH_VPORT_VC_STATE(IDPF_GEN_ENUM)
--};
--
--extern const char * const idpf_vport_vc_state_str[];
--
- /**
-  * enum idpf_vport_reset_cause - Vport soft reset causes
-  * @IDPF_SR_Q_CHANGE: Soft reset queue change
-@@ -451,11 +384,7 @@ struct idpf_vc_xn_manager {
-  * @port_stats: per port csum, header split, and other offload stats
-  * @link_up: True if link is up
-  * @link_speed_mbps: Link speed in mbps
-- * @vc_msg: Virtchnl message buffer
-- * @vc_state: Virtchnl message state
-- * @vchnl_wq: Wait queue for virtchnl messages
-  * @sw_marker_wq: workqueue for marker packets
-- * @vc_buf_lock: Lock to protect virtchnl buffer
+@@ -88,6 +88,7 @@ enum idpf_state {
+  * @IDPF_HR_RESET_IN_PROG: Reset in progress
+  * @IDPF_REMOVE_IN_PROG: Driver remove in progress
+  * @IDPF_MB_INTR_MODE: Mailbox in interrupt mode
++ * @IDPF_VC_CORE_INIT: virtchnl core has been init
+  * @IDPF_FLAGS_NBITS: Must be last
   */
- struct idpf_vport {
- 	u16 num_txq;
-@@ -501,12 +430,7 @@ struct idpf_vport {
- 	bool link_up;
- 	u32 link_speed_mbps;
- 
--	char vc_msg[IDPF_CTLQ_MAX_BUF_LEN];
--	DECLARE_BITMAP(vc_state, IDPF_VC_NBITS);
--
--	wait_queue_head_t vchnl_wq;
- 	wait_queue_head_t sw_marker_wq;
--	struct mutex vc_buf_lock;
+ enum idpf_flags {
+@@ -96,6 +97,7 @@ enum idpf_flags {
+ 	IDPF_HR_RESET_IN_PROG,
+ 	IDPF_REMOVE_IN_PROG,
+ 	IDPF_MB_INTR_MODE,
++	IDPF_VC_CORE_INIT,
+ 	IDPF_FLAGS_NBITS,
  };
  
- /**
-@@ -569,15 +493,11 @@ struct idpf_vport_user_config_data {
-  * enum idpf_vport_config_flags - Vport config flags
-  * @IDPF_VPORT_REG_NETDEV: Register netdev
-  * @IDPF_VPORT_UP_REQUESTED: Set if interface up is requested on core reset
-- * @IDPF_VPORT_ADD_MAC_REQ: Asynchronous add ether address in flight
-- * @IDPF_VPORT_DEL_MAC_REQ: Asynchronous delete ether address in flight
-  * @IDPF_VPORT_CONFIG_FLAGS_NBITS: Must be last
-  */
- enum idpf_vport_config_flags {
- 	IDPF_VPORT_REG_NETDEV,
- 	IDPF_VPORT_UP_REQUESTED,
--	IDPF_VPORT_ADD_MAC_REQ,
--	IDPF_VPORT_DEL_MAC_REQ,
- 	IDPF_VPORT_CONFIG_FLAGS_NBITS,
- };
- 
-@@ -694,9 +614,6 @@ struct idpf_vport_config {
-  * @stats_task: Periodic statistics retrieval task
-  * @stats_wq: Workqueue for statistics task
-  * @caps: Negotiated capabilities with device
-- * @vchnl_wq: Wait queue for virtchnl messages
-- * @vc_state: Virtchnl message state
-- * @vc_msg: Virtchnl message buffer
-  * @vcxn_mngr: Virtchnl transaction manager
-  * @dev_ops: See idpf_dev_ops
-  * @num_vfs: Number of allocated VFs through sysfs. PF does not directly talk
-@@ -754,9 +671,6 @@ struct idpf_adapter {
- 	struct workqueue_struct *stats_wq;
- 	struct virtchnl2_get_capabilities caps;
- 
--	wait_queue_head_t vchnl_wq;
--	DECLARE_BITMAP(vc_state, IDPF_VC_NBITS);
--	char vc_msg[IDPF_CTLQ_MAX_BUF_LEN];
- 	struct idpf_vc_xn_manager vcxn_mngr;
- 	struct idpf_dev_ops dev_ops;
- 	int num_vfs;
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index 8135a6b4a71e..1aae6963628b 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -6,10 +6,6 @@
- static const struct net_device_ops idpf_netdev_ops_splitq;
- static const struct net_device_ops idpf_netdev_ops_singleq;
- 
--const char * const idpf_vport_vc_state_str[] = {
--	IDPF_FOREACH_VPORT_VC_STATE(IDPF_GEN_STRING)
--};
--
- /**
-  * idpf_init_vector_stack - Fill the MSIX vector stack with vector index
-  * @adapter: private data struct
-@@ -975,7 +971,6 @@ static void idpf_vport_rel(struct idpf_vport *vport)
- 	struct idpf_rss_data *rss_data;
- 	struct idpf_vport_max_q max_q;
- 	u16 idx = vport->idx;
--	int i;
- 
- 	vport_config = adapter->vport_config[vport->idx];
- 	idpf_deinit_rss(vport);
-@@ -985,20 +980,6 @@ static void idpf_vport_rel(struct idpf_vport *vport)
- 
- 	idpf_send_destroy_vport_msg(vport);
- 
--	/* Set all bits as we dont know on which vc_state the vport vhnl_wq
--	 * is waiting on and wakeup the virtchnl workqueue even if it is
--	 * waiting for the response as we are going down
--	 */
--	for (i = 0; i < IDPF_VC_NBITS; i++)
--		set_bit(i, vport->vc_state);
--	wake_up(&vport->vchnl_wq);
--
--	mutex_destroy(&vport->vc_buf_lock);
--
--	/* Clear all the bits */
--	for (i = 0; i < IDPF_VC_NBITS; i++)
--		clear_bit(i, vport->vc_state);
--
- 	/* Release all max queues allocated to the adapter's pool */
- 	max_q.max_rxq = vport_config->max_q.max_rxq;
- 	max_q.max_txq = vport_config->max_q.max_txq;
-@@ -1543,9 +1524,7 @@ void idpf_init_task(struct work_struct *work)
- 	vport_config = adapter->vport_config[index];
- 
- 	init_waitqueue_head(&vport->sw_marker_wq);
--	init_waitqueue_head(&vport->vchnl_wq);
- 
--	mutex_init(&vport->vc_buf_lock);
- 	spin_lock_init(&vport_config->mac_filter_list_lock);
- 
- 	INIT_LIST_HEAD(&vport_config->user_config.mac_filter_list);
-@@ -1904,7 +1883,7 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
- 	 * mess with. Nothing below should use those variables from new_vport
- 	 * and should instead always refer to them in vport if they need to.
- 	 */
--	memcpy(new_vport, vport, offsetof(struct idpf_vport, vc_state));
-+	memcpy(new_vport, vport, offsetof(struct idpf_vport, link_speed_mbps));
- 
- 	/* Adjust resource parameters prior to reallocating resources */
- 	switch (reset_cause) {
-@@ -1953,7 +1932,7 @@ int idpf_initiate_soft_reset(struct idpf_vport *vport,
- 	/* Same comment as above regarding avoiding copying the wait_queues and
- 	 * mutexes applies here. We do not want to mess with those if possible.
- 	 */
--	memcpy(vport, new_vport, offsetof(struct idpf_vport, vc_state));
-+	memcpy(vport, new_vport, offsetof(struct idpf_vport, link_speed_mbps));
- 
- 	/* Since idpf_vport_queues_alloc was called with new_port, the queue
- 	 * back pointers are currently pointing to the local new_vport. Reset
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_main.c b/drivers/net/ethernet/intel/idpf/idpf_main.c
-index c82233b112bd..c6d7bec95d69 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_main.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_main.c
-@@ -230,8 +230,6 @@ static int idpf_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	mutex_init(&adapter->queue_lock);
- 	mutex_init(&adapter->vc_buf_lock);
- 
--	init_waitqueue_head(&adapter->vchnl_wq);
--
- 	INIT_DELAYED_WORK(&adapter->init_task, idpf_init_task);
- 	INIT_DELAYED_WORK(&adapter->serv_task, idpf_service_task);
- 	INIT_DELAYED_WORK(&adapter->mbx_task, idpf_mbx_task);
 diff --git a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-index 5a68a3908cf0..f6e6e3eff29e 100644
+index f6e6e3eff29e..2bf67f13079d 100644
 --- a/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
 +++ b/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
-@@ -2929,28 +2929,15 @@ int idpf_vc_core_init(struct idpf_adapter *adapter)
+@@ -2886,7 +2886,9 @@ int idpf_vc_core_init(struct idpf_adapter *adapter)
+ 	queue_delayed_work(adapter->init_wq, &adapter->init_task,
+ 			   msecs_to_jiffies(5 * (adapter->pdev->devfn & 0x07)));
+ 
+-	goto no_err;
++	set_bit(IDPF_VC_CORE_INIT, adapter->flags);
++
++	return 0;
+ 
+ err_intr_req:
+ 	cancel_delayed_work_sync(&adapter->serv_task);
+@@ -2895,7 +2897,6 @@ int idpf_vc_core_init(struct idpf_adapter *adapter)
+ err_netdev_alloc:
+ 	kfree(adapter->vports);
+ 	adapter->vports = NULL;
+-no_err:
+ 	return err;
+ 
+ init_failed:
+@@ -2929,6 +2930,9 @@ int idpf_vc_core_init(struct idpf_adapter *adapter)
   */
  void idpf_vc_core_deinit(struct idpf_adapter *adapter)
  {
--	int i;
--
++	if (!test_bit(IDPF_VC_CORE_INIT, adapter->flags))
++		return;
++
  	idpf_vc_xn_shutdown(&adapter->vcxn_mngr);
  	idpf_deinit_task(adapter);
  	idpf_intr_rel(adapter);
--	/* Set all bits as we dont know on which vc_state the vhnl_wq is
--	 * waiting on and wakeup the virtchnl workqueue even if it is waiting
--	 * for the response as we are going down
--	 */
--	for (i = 0; i < IDPF_VC_NBITS; i++)
--		set_bit(i, adapter->vc_state);
--	wake_up(&adapter->vchnl_wq);
+@@ -2940,6 +2944,8 @@ void idpf_vc_core_deinit(struct idpf_adapter *adapter)
  
- 	cancel_delayed_work_sync(&adapter->serv_task);
- 	cancel_delayed_work_sync(&adapter->mbx_task);
- 
- 	idpf_vport_params_buf_rel(adapter);
- 
--	/* Clear all the bits */
--	for (i = 0; i < IDPF_VC_NBITS; i++)
--		clear_bit(i, adapter->vc_state);
--
  	kfree(adapter->vports);
  	adapter->vports = NULL;
++
++	clear_bit(IDPF_VC_CORE_INIT, adapter->flags);
  }
+ 
+ /**
 -- 
 2.40.1
 
