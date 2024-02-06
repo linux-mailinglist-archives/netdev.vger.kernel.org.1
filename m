@@ -1,440 +1,240 @@
-Return-Path: <netdev+bounces-69490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 040C284B76D
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:08:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7158684B77C
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:10:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8813A281A1B
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:08:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56780B2702C
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:10:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9124133422;
-	Tue,  6 Feb 2024 14:07:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32398131727;
+	Tue,  6 Feb 2024 14:10:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="i+ZxKnK6"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="erznLLVv"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from out-176.mta0.migadu.com (out-176.mta0.migadu.com [91.218.175.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53B2B132482;
-	Tue,  6 Feb 2024 14:07:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB1D6A349
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 14:10:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707228449; cv=none; b=CR3hgJ9YUaZUVcOG3qHJFBSKPWuvYFPcymacFXaTucWq9yYtNpBlVOoitvw751LLV18b5Mtp6E9cs4IPqehCOvvm8citNA0Y7XJ8lFW2CTEPvZZoD5sw1BNIC9ZYirJVCd0hoKDfcgqZ7gIh4mIXC4odBk33lRRKt0c2H9oVOTY=
+	t=1707228616; cv=none; b=TDXZSppjQ0/E9jUY7fpkRTI56lf2KwnDith6n3O8Nq9VLNDaBkoKHcvkwsa4+hzOKJjEGii2/wUx3P2I8sP6uXupdf9vdHHc3thrCSdJKJXeu9e9UTnOeBUvIQjcbUixYL2tR28uCCh9R1etSNbvDjsR0n40niGGdmZhpNih1Hk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707228449; c=relaxed/simple;
-	bh=hU4776sYBDi68msbbKmdhIQkHDVJX9tyYRGpSrCg92A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Pv69lyXT5jCMCuziBrg05y/fH0iqhfUYfS9XCahf6JxggPpJZJqUIhEDeo3mMAIpnODwaakH0NUuCS8vt/YS4ABFoZ+YU7/XZKO5QgxbNrjtO0TxqbR/H4ece1ZZuWd3vKcAmlzxl5uek+Tu+2hpO2kVBNGhn/Rq7prZM4QMJBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=i+ZxKnK6; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPA id C90EB1C0013;
-	Tue,  6 Feb 2024 14:07:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1707228445;
+	s=arc-20240116; t=1707228616; c=relaxed/simple;
+	bh=cZeQl+T2HhEdGamQaRbIIa2pc/7wCTGf87gW2IW+1sI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=m/AluZbV687gm8U7vH0sLt2zmYgQ6HzC0vz5bAmTBE0LgEtY6iQMGpiB6hEtneo/OlwHqgxJdpC/fw/PjoCIlyt8Jl34E1QALjfA1g0Jy853m8hUvfvJmZeTW9srpT5hIYTpn2nT6ZzeKBkxGhMQ9eh/JgcJuCcx7BvLHbtUU0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=erznLLVv; arc=none smtp.client-ip=91.218.175.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <dcbd7098-be09-4309-a95f-c613977be389@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1707228612;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=BiEtrlkAacMQ7ZsOH+miZS1Nj46VD4t7KhVmkzLQVRU=;
-	b=i+ZxKnK6+BZCsUqvL713sswRyD9fX9Qm6CvbXFptiH88CopePOW82bBBzBm/1RGb4z+Iyk
-	uHUg1U3SJ7hE8soJQs4d5BqDcMja8xs/X5xBtCYhRf34o399yRZ+osmhiFXhiyP2Yfb4jm
-	1UW56KjJ+uaeiCn6Mdo6aRc4w5cWzORqKzJ/WisJuYROvPBywjlpS2Pdx4Iw+I+BRGJkd2
-	mn/tf+zz+HBoDTJcoljrmF7oDFnlgagqrfXBE57NYSehJNfdoWM5JgBMLvxYLV7YVz1LGb
-	QjkzJllx1SAa0byg+zkPb2cJ4iVesH86XJM0QQKRVB8o23pv+ihFWttLUa+F6w==
-From: Herve Codina <herve.codina@bootlin.com>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Herve Codina <herve.codina@bootlin.com>
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Mark Brown <broonie@kernel.org>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: [PATCH v3 6/6] net: wan: fsl_qmc_hdlc: Add framer support
-Date: Tue,  6 Feb 2024 15:07:16 +0100
-Message-ID: <20240206140717.107930-7-herve.codina@bootlin.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240206140717.107930-1-herve.codina@bootlin.com>
-References: <20240206140717.107930-1-herve.codina@bootlin.com>
+	bh=2iB64trQ9tMkLCadbXXhUKodOl8BVJTxT7fnE2qC/6I=;
+	b=erznLLVvMSxVXTzh+lT+1nvzrsu2SG9SpcbxDaXlly0mk1gTeVFotSL8Ojj0G7nAXPAlzz
+	Es46SAu6k5PSm05jMr9PkU4+dL2jOJEe7tCPjsiJeoNoor/VDdTFRpE6SqNVrLCUjuT4QA
+	TuxMWoNWG3jgHhdDFdNCZrdg8QjJvp4=
+Date: Tue, 6 Feb 2024 14:10:05 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: herve.codina@bootlin.com
+Subject: Re: [patch net] dpll: fix possible deadlock during netlink dump
+ operation
+Content-Language: en-US
+To: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org
+Cc: arkadiusz.kubalewski@intel.com
+References: <20240206125145.354557-1-jiri@resnulli.us>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240206125145.354557-1-jiri@resnulli.us>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Add framer support in the fsl_qmc_hdlc driver in order to be able to
-signal carrier changes to the network stack based on the framer status
-Also use this framer to provide information related to the E1/T1 line
-interface on IF_GET_IFACE and configure the line interface according to
-IF_IFACE_{E1,T1} information.
+On 06/02/2024 12:51, Jiri Pirko wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
+> 
+> Recently, I've been hitting following deadlock warning during dpll pin
+> dump:
+> 
+> [52804.637962] ======================================================
+> [52804.638536] WARNING: possible circular locking dependency detected
+> [52804.639111] 6.8.0-rc2jiri+ #1 Not tainted
+> [52804.639529] ------------------------------------------------------
+> [52804.640104] python3/2984 is trying to acquire lock:
+> [52804.640581] ffff88810e642678 (nlk_cb_mutex-GENERIC){+.+.}-{3:3}, at: netlink_dump+0xb3/0x780
+> [52804.641417]
+>                 but task is already holding lock:
+> [52804.642010] ffffffff83bde4c8 (dpll_lock){+.+.}-{3:3}, at: dpll_lock_dumpit+0x13/0x20
+> [52804.642747]
+>                 which lock already depends on the new lock.
+> 
+> [52804.643551]
+>                 the existing dependency chain (in reverse order) is:
+> [52804.644259]
+>                 -> #1 (dpll_lock){+.+.}-{3:3}:
+> [52804.644836]        lock_acquire+0x174/0x3e0
+> [52804.645271]        __mutex_lock+0x119/0x1150
+> [52804.645723]        dpll_lock_dumpit+0x13/0x20
+> [52804.646169]        genl_start+0x266/0x320
+> [52804.646578]        __netlink_dump_start+0x321/0x450
+> [52804.647056]        genl_family_rcv_msg_dumpit+0x155/0x1e0
+> [52804.647575]        genl_rcv_msg+0x1ed/0x3b0
+> [52804.648001]        netlink_rcv_skb+0xdc/0x210
+> [52804.648440]        genl_rcv+0x24/0x40
+> [52804.648831]        netlink_unicast+0x2f1/0x490
+> [52804.649290]        netlink_sendmsg+0x36d/0x660
+> [52804.649742]        __sock_sendmsg+0x73/0xc0
+> [52804.650165]        __sys_sendto+0x184/0x210
+> [52804.650597]        __x64_sys_sendto+0x72/0x80
+> [52804.651045]        do_syscall_64+0x6f/0x140
+> [52804.651474]        entry_SYSCALL_64_after_hwframe+0x46/0x4e
+> [52804.652001]
+>                 -> #0 (nlk_cb_mutex-GENERIC){+.+.}-{3:3}:
+> [52804.652650]        check_prev_add+0x1ae/0x1280
+> [52804.653107]        __lock_acquire+0x1ed3/0x29a0
+> [52804.653559]        lock_acquire+0x174/0x3e0
+> [52804.653984]        __mutex_lock+0x119/0x1150
+> [52804.654423]        netlink_dump+0xb3/0x780
+> [52804.654845]        __netlink_dump_start+0x389/0x450
+> [52804.655321]        genl_family_rcv_msg_dumpit+0x155/0x1e0
+> [52804.655842]        genl_rcv_msg+0x1ed/0x3b0
+> [52804.656272]        netlink_rcv_skb+0xdc/0x210
+> [52804.656721]        genl_rcv+0x24/0x40
+> [52804.657119]        netlink_unicast+0x2f1/0x490
+> [52804.657570]        netlink_sendmsg+0x36d/0x660
+> [52804.658022]        __sock_sendmsg+0x73/0xc0
+> [52804.658450]        __sys_sendto+0x184/0x210
+> [52804.658877]        __x64_sys_sendto+0x72/0x80
+> [52804.659322]        do_syscall_64+0x6f/0x140
+> [52804.659752]        entry_SYSCALL_64_after_hwframe+0x46/0x4e
+> [52804.660281]
+>                 other info that might help us debug this:
+> 
+> [52804.661077]  Possible unsafe locking scenario:
+> 
+> [52804.661671]        CPU0                    CPU1
+> [52804.662129]        ----                    ----
+> [52804.662577]   lock(dpll_lock);
+> [52804.662924]                                lock(nlk_cb_mutex-GENERIC);
+> [52804.663538]                                lock(dpll_lock);
+> [52804.664073]   lock(nlk_cb_mutex-GENERIC);
+> [52804.664490]
+> 
+> The issue as follows: __netlink_dump_start() calls control->start(cb)
+> with nlk->cb_mutex held. In control->start(cb) the dpll_lock is taken.
+> Then nlk->cb_mutex is released and taken again in netlink_dump(), while
+> dpll_lock still being held. That leads to ABBA deadlock when another
+> CPU races with the same operation.
+> 
+> Fix this by moving dpll_lock taking into dumpit() callback which ensures
+> correct lock taking order.
+> 
+> Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base functions")
+> Signed-off-by: Jiri Pirko <jiri@nvidia.com>
 
-Signed-off-by: Herve Codina <herve.codina@bootlin.com>
-Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
----
- drivers/net/wan/fsl_qmc_hdlc.c | 239 ++++++++++++++++++++++++++++++++-
- 1 file changed, 235 insertions(+), 4 deletions(-)
+Good catch, thanks!
 
-diff --git a/drivers/net/wan/fsl_qmc_hdlc.c b/drivers/net/wan/fsl_qmc_hdlc.c
-index b25d918d5e4e..432b5111b106 100644
---- a/drivers/net/wan/fsl_qmc_hdlc.c
-+++ b/drivers/net/wan/fsl_qmc_hdlc.c
-@@ -9,6 +9,7 @@
- 
- #include <linux/bitmap.h>
- #include <linux/dma-mapping.h>
-+#include <linux/framer/framer.h>
- #include <linux/hdlc.h>
- #include <linux/module.h>
- #include <linux/of.h>
-@@ -28,6 +29,9 @@ struct qmc_hdlc {
- 	struct device *dev;
- 	struct qmc_chan *qmc_chan;
- 	struct net_device *netdev;
-+	struct framer *framer;
-+	spinlock_t carrier_lock; /* Protect carrier detection */
-+	struct notifier_block nb;
- 	bool is_crc32;
- 	spinlock_t tx_lock; /* Protect tx descriptors */
- 	struct qmc_hdlc_desc tx_descs[8];
-@@ -41,6 +45,195 @@ static struct qmc_hdlc *netdev_to_qmc_hdlc(struct net_device *netdev)
- 	return dev_to_hdlc(netdev)->priv;
- }
- 
-+static int qmc_hdlc_framer_set_carrier(struct qmc_hdlc *qmc_hdlc)
-+{
-+	struct framer_status framer_status;
-+	unsigned long flags;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	spin_lock_irqsave(&qmc_hdlc->carrier_lock, flags);
-+
-+	ret = framer_get_status(qmc_hdlc->framer, &framer_status);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "get framer status failed (%d)\n", ret);
-+		goto end;
-+	}
-+	if (framer_status.link_is_on)
-+		netif_carrier_on(qmc_hdlc->netdev);
-+	else
-+		netif_carrier_off(qmc_hdlc->netdev);
-+
-+end:
-+	spin_unlock_irqrestore(&qmc_hdlc->carrier_lock, flags);
-+	return ret;
-+}
-+
-+static int qmc_hdlc_framer_notifier(struct notifier_block *nb, unsigned long action,
-+				    void *data)
-+{
-+	struct qmc_hdlc *qmc_hdlc = container_of(nb, struct qmc_hdlc, nb);
-+	int ret;
-+
-+	if (action != FRAMER_EVENT_STATUS)
-+		return NOTIFY_DONE;
-+
-+	ret = qmc_hdlc_framer_set_carrier(qmc_hdlc);
-+	return ret ? NOTIFY_DONE : NOTIFY_OK;
-+}
-+
-+static int qmc_hdlc_framer_start(struct qmc_hdlc *qmc_hdlc)
-+{
-+	struct framer_status framer_status;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_power_on(qmc_hdlc->framer);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer power-on failed (%d)\n", ret);
-+		return ret;
-+	}
-+
-+	/* Be sure that get_status is supported */
-+	ret = framer_get_status(qmc_hdlc->framer, &framer_status);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "get framer status failed (%d)\n", ret);
-+		goto framer_power_off;
-+	}
-+
-+	qmc_hdlc->nb.notifier_call = qmc_hdlc_framer_notifier;
-+	ret = framer_notifier_register(qmc_hdlc->framer, &qmc_hdlc->nb);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer notifier register failed (%d)\n", ret);
-+		goto framer_power_off;
-+	}
-+
-+	return 0;
-+
-+framer_power_off:
-+	framer_power_off(qmc_hdlc->framer);
-+	return ret;
-+}
-+
-+static void qmc_hdlc_framer_stop(struct qmc_hdlc *qmc_hdlc)
-+{
-+	if (!qmc_hdlc->framer)
-+		return;
-+
-+	framer_notifier_unregister(qmc_hdlc->framer, &qmc_hdlc->nb);
-+	framer_power_off(qmc_hdlc->framer);
-+}
-+
-+static int qmc_hdlc_framer_set_iface(struct qmc_hdlc *qmc_hdlc, int if_iface,
-+				     const te1_settings *te1)
-+{
-+	struct framer_config config;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_get_config(qmc_hdlc->framer, &config);
-+	if (ret)
-+		return ret;
-+
-+	switch (if_iface) {
-+	case IF_IFACE_E1:
-+		config.iface = FRAMER_IFACE_E1;
-+		break;
-+	case IF_IFACE_T1:
-+		config.iface = FRAMER_IFACE_T1;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	switch (te1->clock_type) {
-+	case CLOCK_DEFAULT:
-+		/* Keep current value */
-+		break;
-+	case CLOCK_EXT:
-+		config.clock_type = FRAMER_CLOCK_EXT;
-+		break;
-+	case CLOCK_INT:
-+		config.clock_type = FRAMER_CLOCK_INT;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+	config.line_clock_rate = te1->clock_rate;
-+
-+	return framer_set_config(qmc_hdlc->framer, &config);
-+}
-+
-+static int qmc_hdlc_framer_get_iface(struct qmc_hdlc *qmc_hdlc, int *if_iface, te1_settings *te1)
-+{
-+	struct framer_config config;
-+	int ret;
-+
-+	if (!qmc_hdlc->framer) {
-+		*if_iface = IF_IFACE_E1;
-+		return 0;
-+	}
-+
-+	ret = framer_get_config(qmc_hdlc->framer, &config);
-+	if (ret)
-+		return ret;
-+
-+	switch (config.iface) {
-+	case FRAMER_IFACE_E1:
-+		*if_iface = IF_IFACE_E1;
-+		break;
-+	case FRAMER_IFACE_T1:
-+		*if_iface = IF_IFACE_T1;
-+		break;
-+	}
-+
-+	if (!te1)
-+		return 0; /* Only iface type requested */
-+
-+	switch (config.clock_type) {
-+	case FRAMER_CLOCK_EXT:
-+		te1->clock_type = CLOCK_EXT;
-+		break;
-+	case FRAMER_CLOCK_INT:
-+		te1->clock_type = CLOCK_INT;
-+		break;
-+	default:
-+		return -EINVAL;
-+	}
-+	te1->clock_rate = config.line_clock_rate;
-+	return 0;
-+}
-+
-+static int qmc_hdlc_framer_init(struct qmc_hdlc *qmc_hdlc)
-+{
-+	int ret;
-+
-+	if (!qmc_hdlc->framer)
-+		return 0;
-+
-+	ret = framer_init(qmc_hdlc->framer);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer init failed (%d)\n", ret);
-+		return ret;
-+	}
-+
-+	return 0;
-+}
-+
-+static void qmc_hdlc_framer_exit(struct qmc_hdlc *qmc_hdlc)
-+{
-+	if (!qmc_hdlc->framer)
-+		return;
-+
-+	framer_exit(qmc_hdlc->framer);
-+}
-+
- static int qmc_hdlc_recv_queue(struct qmc_hdlc *qmc_hdlc, struct qmc_hdlc_desc *desc, size_t size);
- 
- #define QMC_HDLC_RX_ERROR_FLAGS (QMC_RX_FLAG_HDLC_OVF | \
-@@ -300,6 +493,12 @@ static int qmc_hdlc_set_iface(struct qmc_hdlc *qmc_hdlc, int if_iface, const te1
- 
- 	qmc_hdlc->slot_map = te1->slot_map;
- 
-+	ret = qmc_hdlc_framer_set_iface(qmc_hdlc, if_iface, te1);
-+	if (ret) {
-+		dev_err(qmc_hdlc->dev, "framer set iface failed %d\n", ret);
-+		return ret;
-+	}
-+
- 	return 0;
- }
- 
-@@ -307,11 +506,16 @@ static int qmc_hdlc_ioctl(struct net_device *netdev, struct if_settings *ifs)
- {
- 	struct qmc_hdlc *qmc_hdlc = netdev_to_qmc_hdlc(netdev);
- 	te1_settings te1;
-+	int ret;
- 
- 	switch (ifs->type) {
- 	case IF_GET_IFACE:
--		ifs->type = IF_IFACE_E1;
- 		if (ifs->size < sizeof(te1)) {
-+			/* Retrieve type only */
-+			ret = qmc_hdlc_framer_get_iface(qmc_hdlc, &ifs->type, NULL);
-+			if (ret)
-+				return ret;
-+
- 			if (!ifs->size)
- 				return 0; /* only type requested */
- 
-@@ -321,6 +525,11 @@ static int qmc_hdlc_ioctl(struct net_device *netdev, struct if_settings *ifs)
- 
- 		memset(&te1, 0, sizeof(te1));
- 
-+		/* Retrieve info from framer */
-+		ret = qmc_hdlc_framer_get_iface(qmc_hdlc, &ifs->type, &te1);
-+		if (ret)
-+			return ret;
-+
- 		/* Update slot_map */
- 		te1.slot_map = qmc_hdlc->slot_map;
- 
-@@ -354,10 +563,17 @@ static int qmc_hdlc_open(struct net_device *netdev)
- 	int ret;
- 	int i;
- 
--	ret = hdlc_open(netdev);
-+	ret = qmc_hdlc_framer_start(qmc_hdlc);
- 	if (ret)
- 		return ret;
- 
-+	ret = hdlc_open(netdev);
-+	if (ret)
-+		goto framer_stop;
-+
-+	/* Update carrier */
-+	qmc_hdlc_framer_set_carrier(qmc_hdlc);
-+
- 	chan_param.mode = QMC_HDLC;
- 	/* HDLC_MAX_MRU + 4 for the CRC
- 	 * HDLC_MAX_MRU + 4 + 8 for the CRC and some extraspace needed by the QMC
-@@ -407,6 +623,8 @@ static int qmc_hdlc_open(struct net_device *netdev)
- 	}
- hdlc_close:
- 	hdlc_close(netdev);
-+framer_stop:
-+	qmc_hdlc_framer_stop(qmc_hdlc);
- 	return ret;
- }
- 
-@@ -442,6 +660,7 @@ static int qmc_hdlc_close(struct net_device *netdev)
- 	}
- 
- 	hdlc_close(netdev);
-+	qmc_hdlc_framer_stop(qmc_hdlc);
- 	return 0;
- }
- 
-@@ -490,6 +709,7 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 
- 	qmc_hdlc->dev = &pdev->dev;
- 	spin_lock_init(&qmc_hdlc->tx_lock);
-+	spin_lock_init(&qmc_hdlc->carrier_lock);
- 
- 	qmc_hdlc->qmc_chan = devm_qmc_chan_get_bychild(qmc_hdlc->dev, np);
- 	if (IS_ERR(qmc_hdlc->qmc_chan)) {
-@@ -518,10 +738,19 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 	if (ret)
- 		return ret;
- 
-+	qmc_hdlc->framer = devm_framer_optional_get(qmc_hdlc->dev, "fsl,framer");
-+	if (IS_ERR(qmc_hdlc->framer))
-+		return PTR_ERR(qmc_hdlc->framer);
-+
-+	ret = qmc_hdlc_framer_init(qmc_hdlc);
-+	if (ret)
-+		return ret;
-+
- 	qmc_hdlc->netdev = alloc_hdlcdev(qmc_hdlc);
- 	if (!qmc_hdlc->netdev) {
- 		dev_err(qmc_hdlc->dev, "failed to alloc hdlc dev\n");
--		return -ENOMEM;
-+		ret = -ENOMEM;
-+		goto framer_exit;
- 	}
- 
- 	hdlc = dev_to_hdlc(qmc_hdlc->netdev);
-@@ -537,11 +766,12 @@ static int qmc_hdlc_probe(struct platform_device *pdev)
- 	}
- 
- 	platform_set_drvdata(pdev, qmc_hdlc);
--
- 	return 0;
- 
- free_netdev:
- 	free_netdev(qmc_hdlc->netdev);
-+framer_exit:
-+	qmc_hdlc_framer_exit(qmc_hdlc);
- 	return ret;
- }
- 
-@@ -551,6 +781,7 @@ static int qmc_hdlc_remove(struct platform_device *pdev)
- 
- 	unregister_hdlc_device(qmc_hdlc->netdev);
- 	free_netdev(qmc_hdlc->netdev);
-+	qmc_hdlc_framer_exit(qmc_hdlc);
- 
- 	return 0;
- }
--- 
-2.43.0
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+
+> ---
+>   drivers/dpll/dpll_netlink.c | 20 ++++++--------------
+>   drivers/dpll/dpll_nl.c      |  4 ----
+>   2 files changed, 6 insertions(+), 18 deletions(-)
+> 
+> diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+> index 314bb3775465..4ca9ad16cd95 100644
+> --- a/drivers/dpll/dpll_netlink.c
+> +++ b/drivers/dpll/dpll_netlink.c
+> @@ -1199,6 +1199,7 @@ int dpll_nl_pin_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+>   	unsigned long i;
+>   	int ret = 0;
+>   
+> +	mutex_lock(&dpll_lock);
+>   	xa_for_each_marked_start(&dpll_pin_xa, i, pin, DPLL_REGISTERED,
+>   				 ctx->idx) {
+>   		if (!dpll_pin_available(pin))
+> @@ -1218,6 +1219,8 @@ int dpll_nl_pin_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+>   		}
+>   		genlmsg_end(skb, hdr);
+>   	}
+> +	mutex_unlock(&dpll_lock);
+> +
+>   	if (ret == -EMSGSIZE) {
+>   		ctx->idx = i;
+>   		return skb->len;
+> @@ -1373,6 +1376,7 @@ int dpll_nl_device_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+>   	unsigned long i;
+>   	int ret = 0;
+>   
+> +	mutex_lock(&dpll_lock);
+>   	xa_for_each_marked_start(&dpll_device_xa, i, dpll, DPLL_REGISTERED,
+>   				 ctx->idx) {
+>   		hdr = genlmsg_put(skb, NETLINK_CB(cb->skb).portid,
+> @@ -1389,6 +1393,8 @@ int dpll_nl_device_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+>   		}
+>   		genlmsg_end(skb, hdr);
+>   	}
+> +	mutex_unlock(&dpll_lock);
+> +
+>   	if (ret == -EMSGSIZE) {
+>   		ctx->idx = i;
+>   		return skb->len;
+> @@ -1439,20 +1445,6 @@ dpll_unlock_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
+>   	mutex_unlock(&dpll_lock);
+>   }
+>   
+> -int dpll_lock_dumpit(struct netlink_callback *cb)
+> -{
+> -	mutex_lock(&dpll_lock);
+> -
+> -	return 0;
+> -}
+> -
+> -int dpll_unlock_dumpit(struct netlink_callback *cb)
+> -{
+> -	mutex_unlock(&dpll_lock);
+> -
+> -	return 0;
+> -}
+> -
+>   int dpll_pin_pre_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
+>   		      struct genl_info *info)
+>   {
+> diff --git a/drivers/dpll/dpll_nl.c b/drivers/dpll/dpll_nl.c
+> index eaee5be7aa64..1e95f5397cfc 100644
+> --- a/drivers/dpll/dpll_nl.c
+> +++ b/drivers/dpll/dpll_nl.c
+> @@ -95,9 +95,7 @@ static const struct genl_split_ops dpll_nl_ops[] = {
+>   	},
+>   	{
+>   		.cmd	= DPLL_CMD_DEVICE_GET,
+> -		.start	= dpll_lock_dumpit,
+>   		.dumpit	= dpll_nl_device_get_dumpit,
+> -		.done	= dpll_unlock_dumpit,
+>   		.flags	= GENL_ADMIN_PERM | GENL_CMD_CAP_DUMP,
+>   	},
+>   	{
+> @@ -129,9 +127,7 @@ static const struct genl_split_ops dpll_nl_ops[] = {
+>   	},
+>   	{
+>   		.cmd		= DPLL_CMD_PIN_GET,
+> -		.start		= dpll_lock_dumpit,
+>   		.dumpit		= dpll_nl_pin_get_dumpit,
+> -		.done		= dpll_unlock_dumpit,
+>   		.policy		= dpll_pin_get_dump_nl_policy,
+>   		.maxattr	= DPLL_A_PIN_ID,
+>   		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DUMP,
 
 
