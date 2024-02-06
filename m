@@ -1,145 +1,138 @@
-Return-Path: <netdev+bounces-69556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEFB684BABC
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 17:18:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2B2884BABA
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 17:17:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1EF041F24A91
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:18:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F714285DCA
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:17:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D944134CCD;
-	Tue,  6 Feb 2024 16:18:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C685F134CCC;
+	Tue,  6 Feb 2024 16:17:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ak+DxJTw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hyE2xX4q"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2050.outbound.protection.outlook.com [40.107.92.50])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D122412D150;
-	Tue,  6 Feb 2024 16:17:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707236281; cv=fail; b=sfi0o+Q167WghjpNMU20Hv9QU/xx98P/oWggY9RbxVO8uiBCmeTLbF7prp0iPlnTFitWNkbk1Mj3uevCjaFIUPeUTj1djLbtIwndWDz1TrovaEQiOOfWqUYHkc0CssgrxP+L63oYYZxdZ618E743ymNhIy384Yhup9RrNbw7iHg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707236281; c=relaxed/simple;
-	bh=QR6Ifefif4+ZmasBFcu2VouJHPKdMvKvnLVNDNaUngY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=g9wBszC2B+gy7wu6TLmrFLME/wtk9RG9jDQW27MeKLzzcPq9vwnw3cs8vxfOiVoytr2FQB1ibNVFduYExNW8D15yyC+PDcr/fpcRbCaHaX36YqMumd7BJhU1QW60CWCRlSMfhtd8ANozE/IfLgLoSsNJK9tzbtplmgesDWjUvcs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ak+DxJTw; arc=fail smtp.client-ip=40.107.92.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h8aeBkOTEGZR7QoMDeV/iO8QHvqg4+FXNBGZTLjqczy2l6CTATOTncuj5M5t1VmSD141RLevtToZ04CGE/erLiPEz5XFr2mX8yBYbJXFk+CSsDb81eWLOnO4DPoGbJzZabkqk9E04lfl3imhG5v0Q0PdstPk6RFJZUC/8W4mvHOD6S7nUHAYM5v3wCkyEzXf3NOKRwo4DrJB2Dq7q4X6pNd6XCTREh3KwnPUBaizxwLKcASBsHa1XjmfNL6+N3saq2t+8XUv0Wm6R0KtL1hJZrBu0/LVt61ZTHbYe3325hd/CLcdxxdH0Cib+Wx8bmIdTazI9NZLxLAUUG2aWTw9Tw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5fWEbHYC+Rk9+oNJUWzMUX9NoMaPLgrU44y3vZNIU1c=;
- b=FfH+t/EQy/sM6EWbij2LYAY2khNBRlbrA98Qx9qE+7KGPrj7xfhqY6NR2h2jIgW99cxUquPY7O1J5YrTO3dvRu/+fmt3986b/UfjMOtdzFIhKrqGAxYxvzgpmTXewogDUvnlAAkJoZVeh7SxKLfJArQfisTa/qx8wn8l929vHvZDo0fWYn8FtWOGfxL/9V4T40Ey5UoYgJat1GPz66uG9fVrWBYVF2yNRtU0plmemvo3spRz+BB34OHCwT3lNb02dBwVdYAl5lhC+qzkfYO7nQpY4tJgmh2r4psPDxgpcaOQtDSBfFu3iEuebvspGtE74kWrvPVdHbEhhRKFHB3pBg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5fWEbHYC+Rk9+oNJUWzMUX9NoMaPLgrU44y3vZNIU1c=;
- b=ak+DxJTwr6WKgHhq0cgVsYV633+HSGrRr1JYdwP8x3iOX7ZsyVbJb7AAXZ8K3NbzOPvN4LmSBHM78KRawMxmR91Mx05Vwf9SAfHgfYNLcc30v+y2OabuSmnfiNC8vnaDhVUGIhJOCdAC8F6wjB5/5gg8s5mD1dCiGiJmvO+IruLvRCnSyuDdTmPRQ+wPiB/Lm74upoOD0NDxoliUagxcAX/BAGQVOME5q1jEZnXpX0h3Sh4hQFkrIS5Y0wjm7Flsizu3aByX3dXn1gKbkOBV5CRqaHbLhK4msFX0tihj7LeYsyph8apF16Ojmy7hDm48oHkbWq15Dn/9p7lrRKJOzQ==
-Received: from BN9PR03CA0288.namprd03.prod.outlook.com (2603:10b6:408:f5::23)
- by MW4PR12MB7465.namprd12.prod.outlook.com (2603:10b6:303:212::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.15; Tue, 6 Feb
- 2024 16:17:55 +0000
-Received: from BN2PEPF000044A3.namprd02.prod.outlook.com
- (2603:10b6:408:f5:cafe::d1) by BN9PR03CA0288.outlook.office365.com
- (2603:10b6:408:f5::23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.36 via Frontend
- Transport; Tue, 6 Feb 2024 16:17:53 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- BN2PEPF000044A3.mail.protection.outlook.com (10.167.243.154) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7249.19 via Frontend Transport; Tue, 6 Feb 2024 16:17:52 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 6 Feb 2024
- 08:17:32 -0800
-Received: from vr-arch-host06.mtvr.labs.mlnx (10.126.231.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.12; Tue, 6 Feb 2024 08:17:30 -0800
-From: Parav Pandit <parav@nvidia.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <corbet@lwn.net>, <netdev@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>
-CC: Parav Pandit <parav@nvidia.com>, Jiri Pirko <jiri@nvidia.com>
-Subject: [PATCH net] devlink: Fix command annotation documentation
-Date: Tue, 6 Feb 2024 18:17:17 +0200
-Message-ID: <20240206161717.466653-1-parav@nvidia.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D502412E1ED
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 16:17:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707236256; cv=none; b=gRiHP86ynzvnb4Jl2zmNcwce/++A6I3Khh4/+d4M6KnGD5gxFRA+8zWXS/2YUzVxSu/sw/JN4/92LxV69G96VKetrEjEoK8KfSf8YlYcrl8U31hK4GcQhzu98Pauwoq1j/nZdarAbYp8IrGp90X4hHObxzA2RfVK4wQYqf6Bvpw=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707236256; c=relaxed/simple;
+	bh=1YgPOl85yyPc5xV29CN/k9kOat45mKw3j2GeUWWyjvs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=th4GZaPKRUQQVaCNw1XAZC1IHaKm3Dd6bjl+oI8Dm88QMgLQOWZBhjpQb6srgffxPwG+KGskzADMYknNtfAuF51GmKu0xX72HzScyb/obbEBujLurENqShYqRH6leel0oqdC6uM+JyWZWYZtH0Ga5VTFjxmkNt/Vb1U5e7UTOA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hyE2xX4q; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707236253;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rjVNrrBbv+vSdoJ+RdtqtP7bE4usPMF+D6CJSRs4s/w=;
+	b=hyE2xX4qGlIve8oY+IfuMg6umpBTFIlRD3FFfY7vVWby+ZbNiDKgafh01Pn36zH8tz5I8t
+	fGRginizvnu4vSIlDimgBFMYIvMH8Gdj7N653NOrhKz7xQ8C8IKLx/w6wkXMfixUiD/Dcf
+	uPlNd051E1kxa8iofWjw9iQSxGB7NUY=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-231-HgA8ufvXMxC0gR3vaivDjw-1; Tue, 06 Feb 2024 11:17:25 -0500
+X-MC-Unique: HgA8ufvXMxC0gR3vaivDjw-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-680b48a8189so77514336d6.1
+        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 08:17:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707236244; x=1707841044;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rjVNrrBbv+vSdoJ+RdtqtP7bE4usPMF+D6CJSRs4s/w=;
+        b=KZAUO/h+nksSdNSjuxuxb52cz42n2g+kJx91O8OCQ9IMTkmq5WDU5qSnLR+aVdoSR6
+         15PyKCEp+i+3VdgRbmh0Lcb/BC9unQMPsXXfcndiBo7daIyU2KJ8U0vYaxxradk7OqL9
+         JDYnheU3mTtB0fmvnJRDP46Hyz0LG313bWlJ9EVIGdg+EuUVCKGOT9h2CyisBjGPnhEW
+         iHRTDiSs8y3rdFT5o1cWxxG8ObNjn9bU0EUovET78OuoQEBmtErNssZD6Q7BGcrBSVwi
+         /BwKMu2aueI/iI2hARqp38WsKW8i2zF6559mQDSEG7VFyV6eK01ZKOrUMLZ2BN8slxGH
+         MG1A==
+X-Gm-Message-State: AOJu0YwlfHc0XKi9IXz+FYM2HXoVnr7M6LGpGif25coathSLXmKDaTct
+	iZgtDfwMGOz7JPUDU4rdJOdMYVui1q15txo7eUGy0f6T9UeWcqaDd60zvES/+zYeRAtXQAL9Vg2
+	5mJ+BDTi2PEE0icWMKYgkYZskI/6UYKWsVA+8jThlL4RxU12EUHOklQ==
+X-Received: by 2002:a05:6214:410e:b0:68c:49a1:5c95 with SMTP id kc14-20020a056214410e00b0068c49a15c95mr3120603qvb.55.1707236244639;
+        Tue, 06 Feb 2024 08:17:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEgad0kID5syWazkdEZRZ/7PxAEuPnPyD0Ir5Z30gCz9Y1SPZvTT55azPPCIWk39W82ZK7dng==
+X-Received: by 2002:a05:6214:410e:b0:68c:49a1:5c95 with SMTP id kc14-20020a056214410e00b0068c49a15c95mr3120586qvb.55.1707236244372;
+        Tue, 06 Feb 2024 08:17:24 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUWMkpTfHCoajAm7rsdJ//Tl8241CoivcLwOsn75rVG0ouoTDL34buRn0yddNkwotukYP7SfSSblfX/M8SyVC87tzFSOtpCrXv1c2TJ7l5Or6VI3QywhuBZX3lMoTqu
+Received: from localhost ([78.209.135.42])
+        by smtp.gmail.com with ESMTPSA id eb11-20020ad44e4b000000b0068189a17598sm1144388qvb.72.2024.02.06.08.17.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Feb 2024 08:17:23 -0800 (PST)
+Date: Tue, 6 Feb 2024 17:17:18 +0100
+From: Andrea Claudi <aclaudi@redhat.com>
+To: Stephen Gallagher <sgallagh@redhat.com>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org, dsahern@kernel.org
+Subject: Re: [PATCH] iproute2: fix type incompatibility in ifstat.c
+Message-ID: <ZcJbjmOKMNiNo5LE@renaissance-vector>
+References: <20240206142213.777317-1-sgallagh@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN2PEPF000044A3:EE_|MW4PR12MB7465:EE_
-X-MS-Office365-Filtering-Correlation-Id: 81a0c3d2-5143-4989-4ce5-08dc272f2bb8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	iI6c99t97klrBScRtczrFsuWkgNwyKnKmjBNZihZeglbqAUjGksLOfpu955df5SyQmVCOoNnUfXr/J0Kbicr9M7Gf9NJe0FsdAdn6muMHp9Dlqr91Zs0AgAKXnVBZKqPmCWyH975TorEImJEbHvKB9Eh9/Pbgr6rft0t7spbO8BOcv3VxF11zMzxJ4rgpXkuWDwIiqqPoOoqZc45JISLERbPsmithLryQssmqZZrA73IAe+ujvftSvRPwH6/Zq64kBlWUZjBanlgit9a5Wr6Q6FLXYMM2jCP4CqVo5FLv+dpqrhEb+5ajx+JiA65qtUK/klfH8iWcUXTHvdSZbiP+lVEHL2cEKNLrxhKqCv4jfvF7XqPoayjZKPHhYh961tf3dq1jQJOMaTB3meCfoL+w89WwFeiv4JRJvogYsuMeTKHhrDueUzuWY617S7GANu5bduxAMoWcDSJyULqtsew4DG9koR5nFXlzQJEEHOEIiBu/UpqijEkSODAiiK3AiZUeXZF/uPDHlWobsEWWF6HaoRpoh6JIO1aAqV/q8wA8tMpNc8zVMwkUxplMenrj5AvbTRI5sUsAC7P/0b0H12X2smLiFmT9DUD83xZBuG4sooOrhFtW0LyoVBbOR9M3VKQJfXeslHshBlLiu6AQd3LN3DI8lWqA6p1VrhvY7vkEJIKUzbsGlTXEEGawAxUCNzJXgVMe6lyceeb5aT0khvDGkmRiA1u/NewC5ml6VfuIrg=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(4636009)(376002)(346002)(396003)(39860400002)(136003)(230922051799003)(82310400011)(186009)(64100799003)(451199024)(1800799012)(40470700004)(36840700001)(46966006)(40460700003)(40480700001)(41300700001)(478600001)(36756003)(7636003)(83380400001)(336012)(356005)(426003)(1076003)(16526019)(82740400003)(47076005)(26005)(2616005)(107886003)(8676002)(5660300002)(2906002)(70206006)(36860700001)(86362001)(6666004)(8936002)(4326008)(110136005)(70586007)(54906003)(316002);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2024 16:17:52.7867
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 81a0c3d2-5143-4989-4ce5-08dc272f2bb8
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BN2PEPF000044A3.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7465
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240206142213.777317-1-sgallagh@redhat.com>
 
-Command example string is not read as command.
-Fix command annotation.
+On Tue, Feb 06, 2024 at 09:22:06AM -0500, Stephen Gallagher wrote:
+> Throughout ifstat.c, ifstat_ent.val is accessed as a long long unsigned
+> type, however it is defined as __u64. This works by coincidence on many
+> systems, however on ppc64le, __u64 is a long unsigned.
+> 
+> This patch makes the type definition consistent with all of the places
+> where it is accessed.
+> 
+> Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
+> ---
+>  misc/ifstat.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/misc/ifstat.c b/misc/ifstat.c
+> index 721f4914..767cedd4 100644
+> --- a/misc/ifstat.c
+> +++ b/misc/ifstat.c
+> @@ -58,7 +58,7 @@ struct ifstat_ent {
+>  	struct ifstat_ent	*next;
+>  	char			*name;
+>  	int			ifindex;
+> -	__u64			val[MAXS];
+> +	unsigned long long	val[MAXS];
+>  	double			rate[MAXS];
+>  	__u32			ival[MAXS];
+>  };
+> -- 
+> 2.43.0
+> 
 
-Fixes: a8ce7b26a51e ("devlink: Expose port function commands to control migratable")
-Signed-off-by: Parav Pandit <parav@nvidia.com>
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
----
- Documentation/networking/devlink/devlink-port.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Hi Stephen, thanks for taking care of this.
 
-diff --git a/Documentation/networking/devlink/devlink-port.rst b/Documentation/networking/devlink/devlink-port.rst
-index e33ad2401ad7..562f46b41274 100644
---- a/Documentation/networking/devlink/devlink-port.rst
-+++ b/Documentation/networking/devlink/devlink-port.rst
-@@ -126,7 +126,7 @@ Users may also set the RoCE capability of the function using
- `devlink port function set roce` command.
- 
- Users may also set the function as migratable using
--'devlink port function set migratable' command.
-+`devlink port function set migratable` command.
- 
- Users may also set the IPsec crypto capability of the function using
- `devlink port function set ipsec_crypto` command.
--- 
-2.34.1
+FYI, patch directed to iproute2 or iproute2-next tree should:
+- preferrably have [PATCH iproute2] in their subject
+- be directed or cc'd to iproute2 maintainers Stephen Hemminger and
+  David Ahern, and to the author of the fixed commit if possible.
+
+This should include a Fixes: line on the commit changing val to __u64:
+Fixes: 5a52102b7c8f ("ifstat: Add extended statistics to ifstat")
+Stephen, David: do Stephen needs to resend this?
+
+That said, patch looks good to me, so feel free to add my reviewed-by to
+the following versions of this patch.
+
+Reviewed-by: Andrea Claudi <aclaudi@redhat.com>
 
 
