@@ -1,72 +1,68 @@
-Return-Path: <netdev+bounces-69458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D90A84B55D
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 13:36:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC9DA84B573
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 13:41:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B150D1F269DF
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 12:36:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7848B287DD1
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 12:41:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175C6130E2B;
-	Tue,  6 Feb 2024 12:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FF861DDF6;
+	Tue,  6 Feb 2024 12:41:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="W73jhNOc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ipdjLfcV"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05021130E48;
-	Tue,  6 Feb 2024 12:31:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C64C3D54A
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 12:41:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707222715; cv=none; b=qjKZZ8BYcRiRFOCABd3EZX9GawyRj7TxlzXZkFXC0Esq9JDBWDtptZBsAqpSU2YzcsVEdt55ET1oUTZCeH2bWB+1UGvMvIFI4CDBkp7V2O3MdBMOOuEzxRh1Em+HamsVh0yg+FXg4ScFx2rCSQQ7yKHozEu9L196uL4CRW+taGY=
+	t=1707223302; cv=none; b=fIHHDK4XSmZP5vJGGj7RsuQMwscGU/T/TGCdGT4/c+RLvbvZyP1TSWIHqC7RIuXcUO9UGzLH7jmLCkYlr06bRcwtN5JGLPPOKIOZvB8LAmLLvkGWvPhv7X46R0taYIcipm16qUYOzpiksoxpW1NM3wjlpwrimVYenfPY8Cwdcgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707222715; c=relaxed/simple;
-	bh=lKFmIHEUO+dJrK7RCAPNBhE2qNe6Nhep6pxKGWFpkfo=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=J3EWWZC4+4GEcFCz6CxbOypvRX4TF9cZd+AeTk5NaKQPeUMv9aZ+InEeohyr4znuYVcEqm70dHPx342+xswJLRS7vm44NS6NTs2Kq1cBzXDo9fAg5HJRgdeYlmjpq3v/Sor6reBCtHhrU2uU/LQXGfQZSJG4aRCAyRraWkgakmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=W73jhNOc; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+	s=arc-20240116; t=1707223302; c=relaxed/simple;
+	bh=fxxjh3UqiJAydxb1IXIY8ysNe/Wha4hgqHcWwa+iSdw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ei8JgD3/FaKBl7BjRKPBigO2uQWNOlRQofv83k2KqUUQJL6u07hLWLATwnKzuQbZtsH3eGZqOnR8YSGqT43AV9ULl0rXd0xnVsPePGaRdF7JgMWAEFUTjJUCUDswrRz8l2I4iBHwgP0bZvoGy7+/voIEy4zjHnXSkXXJzhA/Y9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ipdjLfcV; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1707222713; x=1738758713;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707223301; x=1738759301;
   h=from:to:cc:subject:date:message-id:mime-version:
    content-transfer-encoding;
-  bh=lKFmIHEUO+dJrK7RCAPNBhE2qNe6Nhep6pxKGWFpkfo=;
-  b=W73jhNOc8459Y2bJC/7CrDini+cNR1rcWAuv5NDes62zODzb37e4mL8I
-   Rvt/k7S2rEh7htSOvlwaVp5p6Y9X0RqiOEea3aNbxAs8pT6Fe1KitwI/b
-   tXG5yqMNL0YBdbF+4WheWWmcd+H9rmTO7Y0JuHislh2YZ9sg9aBveTLAK
-   IyTQNZC2IG/J5m86jXpH9bUUOhC3MkS+JH6d0XFapdFkTVZOMPfAethVU
-   lhs8vN/h04yYBMdLcO2C6Xi0A3KEjDOjIm0p2C5OiKEjT/muditudC5in
-   o85Cmio0ekoaCZ6sJzqZTzNAQxEgkT4P4ujgA7czk1E0l48Kt75c/Z/bR
-   Q==;
-X-CSE-ConnectionGUID: VSc2D1OUSp6Kb5lb+VdjZg==
-X-CSE-MsgGUID: DPYhfQf4SVCc0h/wLVDLSg==
-X-IronPort-AV: E=Sophos;i="6.05,247,1701154800"; 
-   d="scan'208";a="16349947"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Feb 2024 05:31:52 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 6 Feb 2024 05:31:21 -0700
-Received: from DEN-DL-M31836.microsemi.net (10.10.85.11) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Tue, 6 Feb 2024 05:31:19 -0700
-From: Horatiu Vultur <horatiu.vultur@microchip.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Horatiu Vultur
-	<horatiu.vultur@microchip.com>, Michal Swiatkowski
-	<michal.swiatkowski@linux.intel.com>
-Subject: [PATCH net v2] lan966x: Fix crash when adding interface under a lag
-Date: Tue, 6 Feb 2024 13:30:54 +0100
-Message-ID: <20240206123054.3052966-1-horatiu.vultur@microchip.com>
-X-Mailer: git-send-email 2.34.1
+  bh=fxxjh3UqiJAydxb1IXIY8ysNe/Wha4hgqHcWwa+iSdw=;
+  b=ipdjLfcVFR2z68sKQViS4su7HeYENOpVcsyuE8Yxgagf06qG2nmZ12zB
+   LKfm83VhQ5qdUax21yDCe75Qx0+GoCWlZcUHlf1NQfT1TBAUlmEFb5lvM
+   50MKWerlLetsiKoWcmbYdtT5elTvPtqHKZL1WS9ZWqPMH969dzIJXq9zV
+   B+CWimzqwq4pdpBYo4hw5QA7lLztCPbawjek/fUeHqxtn1Rlc3h0sqMYp
+   BPvJfKX8XIoxgw3hQ8WFx/QxoS9263+d68sv3zhiPXB7lguCebVEn1arK
+   R15RYP3XMQYt2ukXHrjSgpTulSooZGdlGxBG0vc+hvx3gt2sC6u9vkxOu
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10975"; a="18255144"
+X-IronPort-AV: E=Sophos;i="6.05,247,1701158400"; 
+   d="scan'208";a="18255144"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2024 04:41:41 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,247,1701158400"; 
+   d="scan'208";a="5619960"
+Received: from boxer.igk.intel.com ([10.102.20.173])
+  by fmviesa005.fm.intel.com with ESMTP; 06 Feb 2024 04:41:38 -0800
+From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	magnus.karlsson@intel.com,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Subject: [PATCH v2 iwl-net 0/2] i40e: disable XDP Tx queues on ifdown
+Date: Tue,  6 Feb 2024 13:41:30 +0100
+Message-Id: <20240206124132.636342-1-maciej.fijalkowski@intel.com>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,63 +70,29 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 
-There is a crash when adding one of the lan966x interfaces under a lag
-interface. The issue can be reproduced like this:
-ip link add name bond0 type bond miimon 100 mode balance-xor
-ip link set dev eth0 master bond0
+Seth reported in [0] that he couldn't get traffic flowing again after a
+round of down/up of interface that i40e driver manages.
 
-The reason is because when adding a interface under the lag it would go
-through all the ports and try to figure out which other ports are under
-that lag interface. And the issue is that lan966x can have ports that are
-NULL pointer as they are not probed. So then iterating over these ports
-it would just crash as they are NULL pointers.
-The fix consists in actually checking for NULL pointers before accessing
-something from the ports. Like we do in other places.
+While looking into fixing Tx disable timeout issue I also noticed that
+there is a doubled function call on Rx side which is fixed in patch 1.
 
-Fixes: cabc9d49333d ("net: lan966x: Add lag support for lan966x")
-Signed-off-by: Horatiu Vultur <horatiu.vultur@microchip.com>
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
-v1->v2:
-- replace lan966x->ports[lag]->bond with port->bond as it is the same
-  and easier to follow
----
- drivers/net/ethernet/microchip/lan966x/lan966x_lag.c | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+Thanks,
+Maciej
 
-diff --git a/drivers/net/ethernet/microchip/lan966x/lan966x_lag.c b/drivers/net/ethernet/microchip/lan966x/lan966x_lag.c
-index 41fa2523d91d3..5f2cd9a8cf8fb 100644
---- a/drivers/net/ethernet/microchip/lan966x/lan966x_lag.c
-+++ b/drivers/net/ethernet/microchip/lan966x/lan966x_lag.c
-@@ -37,19 +37,24 @@ static void lan966x_lag_set_aggr_pgids(struct lan966x *lan966x)
- 
- 	/* Now, set PGIDs for each active LAG */
- 	for (lag = 0; lag < lan966x->num_phys_ports; ++lag) {
--		struct net_device *bond = lan966x->ports[lag]->bond;
-+		struct lan966x_port *port = lan966x->ports[lag];
- 		int num_active_ports = 0;
-+		struct net_device *bond;
- 		unsigned long bond_mask;
- 		u8 aggr_idx[16];
- 
--		if (!bond || (visited & BIT(lag)))
-+		if (!port || !port->bond || (visited & BIT(lag)))
- 			continue;
- 
-+		bond = port->bond;
- 		bond_mask = lan966x_lag_get_mask(lan966x, bond);
- 
- 		for_each_set_bit(p, &bond_mask, lan966x->num_phys_ports) {
- 			struct lan966x_port *port = lan966x->ports[p];
- 
-+			if (!port)
-+				continue;
-+
- 			lan_wr(ANA_PGID_PGID_SET(bond_mask),
- 			       lan966x, ANA_PGID(p));
- 			if (port->lag_tx_active)
+[0]: https://lore.kernel.org/netdev/ZbkE7Ep1N1Ou17sA@do-x1extreme/
+
+v2:
+- include vsi->base_queue when calculating tx_q_end
+- add tags from Simon and Seth
+
+Maciej Fijalkowski (2):
+  i40e: avoid double calling i40e_pf_rxq_wait()
+  i40e: take into account XDP Tx queues when stopping rings
+
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 22 +++++++++------------
+ 1 file changed, 9 insertions(+), 13 deletions(-)
+
 -- 
 2.34.1
 
