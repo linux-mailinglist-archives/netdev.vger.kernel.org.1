@@ -1,110 +1,108 @@
-Return-Path: <netdev+bounces-69408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7921884B0F9
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:22:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 518E584B11D
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:25:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31291285FC4
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 09:22:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 069721F24CBD
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 09:25:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60EE12D14D;
-	Tue,  6 Feb 2024 09:21:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B933912C81F;
+	Tue,  6 Feb 2024 09:25:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hpRcaBo3"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Iw4KdpID"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6CB012BF2D
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 09:21:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 145477C089;
+	Tue,  6 Feb 2024 09:25:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707211293; cv=none; b=MTzENpqgiUwdWEodQqX1Mt8d0vq33UhUDaeNRvAvt0rED9k+2Nk5wlDYnMfwEuFW6hBnYvPAOjk+EDd4MnaOITm41K98ILeydk0AvN3mwD0lPjibY4PoiNONNYHQ7uzUwfVihdGVBT2zI1fmxfGp6qzBrv8UFfvGRFmXOWjBJio=
+	t=1707211512; cv=none; b=s8tXVOM95qlbpsY9ypTr5WqxLbbTBMf4uHWpXt4hbkt8YUyh8vrasBCCSmNZY11WQpI13PrX/zFtK9MPCmlNFLPWg2woZ/e2zzPJnxehFu1QO0CG2tq1jBxnWR9FwEOcq2/9tuWdMLPGJoM3aE67kGCbcLXmPflQTjxso/YWSxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707211293; c=relaxed/simple;
-	bh=h6NyNEL1z1sFlAy1MHdMLWgOdXW2w/cMoZZ7xTp5zjU=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Content-Type; b=h9TkyoynLfJayfmUCVEo7Sr2S/IiPSWztv4SKrxsfQSzDBOrSQIVGfZcWsqvgTt7mtNAbhOf7g2fkUrj0z2z0+fn5F1ItGsNYUZe9pqvTBpU8M4LUvOrfZ7FbUXf8kOxAslO46wrSbjNoW0ehllMehniKbS5mojOKfTP3dDJntE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hpRcaBo3; arc=none smtp.client-ip=209.85.167.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-511234430a4so9401189e87.3
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 01:21:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707211289; x=1707816089; darn=vger.kernel.org;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=/pBl6xsOOoriuvKRwHFW0xSDEzNCYmlvk4kzh5AeUhs=;
-        b=hpRcaBo3Eobc9RrJwG2GH0+bnGSBc8hWyt5uEz6eR4DZJgyXQd4vmuUZhB3oX8xX8D
-         NRQOaVow4hghErwp+TyaKuvHJ4HZG0l/lYUhbSDKurVVnoI+X5M1+jmHprRJnftM9fQb
-         Me7f1jOgKbCUW3h4h9OmnSUScW2pBXoV5YZ3tOMKKt1z1fxLpsGvE2vkw/G3VdhcA1tp
-         U7cFiIvdkdAeuQTeY04mmFCTkikYVMxPeGb/sZ50ZK/YRpj6l/BjYn78HALC4dbYfYrZ
-         nLTwnWoBytO9RpORqDmeFWVKb8/TdFHiaRfsnYNEGf8+LO+xQhJ6Hkq7rjnlDnGWgEHg
-         Cm9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707211289; x=1707816089;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/pBl6xsOOoriuvKRwHFW0xSDEzNCYmlvk4kzh5AeUhs=;
-        b=XO8ZawwB4RNuDhzL4kLTPujOp4o5Gpl7YEjlWcAILWjhMj4COfiQZyozZzql05vymf
-         yDZVjTrMBy2C4S803KS9zGfSjcuQzZLkcDsSKjjZU0tsX93svQImz565lvvHTeGEz2gB
-         IUpl+LWIuiSLP3+GcMGH7DLPMUuUkDhYW7fYXorumKh/Uw8gQhJSByLULZ8yMC7yMavM
-         V/iSd8ygV7z6CL3kF42oBUTjduXWMojwauNbbBwFI1IzEAqeE3Tp/GF5VqTxjKcOu2Eu
-         I35sg1wnQtv2rwnirTPoTwtYdNDk6HRediOJQSqzXHPrOdeLC8kXQOqVj15/xFseol1T
-         4UNg==
-X-Gm-Message-State: AOJu0YxaHet7mj0yYN9FYXplCR2PQNJa/OjuWSdGM6Ab6EfxDv4b5GI4
-	9IRLRHt5m8BqnnhfggHWw/vxwXQlnsVDpuUPaVhoVjA6IN4T5J4/5139Lb2Eh56DC575iS1haXj
-	hoZmuSfemtKEhsc01ARFVqxISdaGpR4vvd681ew==
-X-Google-Smtp-Source: AGHT+IHrqoClYymELZDpvVlpwDdLrswxTATEDiAkUHiP6e7dsdrAUwL3yhdfFIrnCiCHT05c1BEcOXYGPI4PPg6SxtQ=
-X-Received: by 2002:a05:6512:49d:b0:511:5411:1144 with SMTP id
- v29-20020a056512049d00b0051154111144mr1151097lfq.14.1707211289226; Tue, 06
- Feb 2024 01:21:29 -0800 (PST)
+	s=arc-20240116; t=1707211512; c=relaxed/simple;
+	bh=riKlsk6DpHbTsX/xEYw4fkuGAFJRzfFBHy5xenHiV9w=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mMHdN9s69Q8KPRf6ZhEjFbSR/vE3iDWEs9rNQiVIpxFCgoI2h8/MQEacLs9+5H6zCCR1HNveMYUUCd6QoQOB9CKwpKtwWDh7tJqwzyBKKx+pydY0wr6PGFoSiVzCE2oVuiJnInkhZLfP5cNbsBKtk9VLocG9vyJ4tDEsTKKvITw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Iw4KdpID; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 56FAE20009;
+	Tue,  6 Feb 2024 09:25:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1707211507;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=riKlsk6DpHbTsX/xEYw4fkuGAFJRzfFBHy5xenHiV9w=;
+	b=Iw4KdpIDslEDAAsEdPCzzvsVRq1AoSGBy/Iei8CbkA2o1EFI0wSDi9kDiGUDXjxRS2GWIt
+	vqBWBXNKlcGulSAIbG50DQcFusf6tUIh5tw6YgRJS087tE4QEzZ+W10030xlPMNvl2HQJH
+	M+DrESUwaHV6Zk1ofs5zNM0GBng3nh6q5McKIy1UKA+E3BGbz3iGjrlQDIPe6owgKXi+fc
+	lBdL+4RCZW0GlQQ5iSia53vwAdT0MKeUk2zst11d/ChM57H9hjCpzwv8LFH2cXR9wYEZEf
+	tHILslCnTsAg/W5fVVALFkG93WwvscrQUcfE0um2DpDr5eiEG1yE8D7Z5DwgvQ==
+Date: Tue, 6 Feb 2024 10:25:03 +0100
+From: Miquel Raynal <miquel.raynal@bootlin.com>
+To: Alexander Aring <aahringo@redhat.com>
+Cc: Bo Liu <liubo03@inspur.com>, alex.aring@gmail.com,
+ stefan@datenfreihafen.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-wpan@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ieee802154: at86rf230: convert to use maple tree
+ register cache
+Message-ID: <20240206102503.760ecb64@xps-13>
+In-Reply-To: <CAK-6q+jnZOkSAM8_BQH=CaQhfCQwm0P+segZ+0E6oLeX=BhLHQ@mail.gmail.com>
+References: <20240202064512.39259-1-liubo03@inspur.com>
+	<20240202085547.46c81c96@xps-13>
+	<CAK-6q+jnZOkSAM8_BQH=CaQhfCQwm0P+segZ+0E6oLeX=BhLHQ@mail.gmail.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: mahendra <mahendra.sp1812@gmail.com>
-Date: Tue, 6 Feb 2024 14:50:26 +0530
-Message-ID: <CAF6A8582QOWc1k7c9sgeX5ebwY79SDAmXzfbBumW6qGoyu6HRw@mail.gmail.com>
-Subject: [Kernel 5.10.201] USGv6 conformance test issue
-To: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: miquel.raynal@bootlin.com
 
-Hi Everyone,
+Hi,
 
-We are executing IPv6 Ready Core Protocols Test Specification for
-Linux kernel 5.10.201 for USGv6 certification.
+aahringo@redhat.com wrote on Mon, 5 Feb 2024 14:42:09 -0500:
 
-Under Test v6LC.2.2.23: Processing Router Advertisement with Route
-Information Option (Host Only) , there are multiple tests from A to J
-category. We are facing issue with test category F which is described
-as below.
+> Hi,
+>=20
+> On Fri, Feb 2, 2024 at 2:56=E2=80=AFAM Miquel Raynal <miquel.raynal@bootl=
+in.com> wrote:
+> >
+> > Hi Bo,
+> >
+> > liubo03@inspur.com wrote on Fri, 2 Feb 2024 01:45:12 -0500:
+> > =20
+> > > The maple tree register cache is based on a much more modern data str=
+ucture
+> > > than the rbtree cache and makes optimisation choices which are probab=
+ly
+> > > more appropriate for modern systems than those made by the rbtree cac=
+he. =20
+> >
+> > What are the real intended benefits? Shall we expect any drawbacks?
+> > =20
+>=20
+> I doubt it has really any benefits, only the slowpath is using regmap
+> to set some registers. Maybe if you change phy setting frequently it
+> might have an impact, but this isn't even a path considered to run
+> fast.
 
-Part F: PRF change in Route Information Option.
- Here is what is happening:
+Ok, thanks Alex for the info; in this case I'm fine:
 
-Router Advertisement sent from router A with PRF low.
-Router Advertisement sent from router B with PRF medium.
-Echo Request.
-Echo Reply expected to be directed to router B. However, reply is sent
-to router A
-Router Advertisement sent from router A with PRF high.
-Echo Request.
-Echo Reply expected to be directed to router A. However,  reply is
-sent to router B
+Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com>
 
-We tried introducing delay in the test case between each request to
-allow processing to complete. This did not help.
-
-Has anyone observed this behavior? is there a patch for this issue ?
-Please suggest on how to go about finding solution for this failure.
-If I need to post this to other linux network users forums as well,
-please let me know.
-
-Thanks
-Mahendra
+Thanks,
+Miqu=C3=A8l
 
