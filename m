@@ -1,80 +1,112 @@
-Return-Path: <netdev+bounces-69615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8343A84BDE5
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 20:08:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B416C84BDEE
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 20:09:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5DFA1C23AD2
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 19:08:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8B521C24332
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 19:09:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30AE913FF9;
-	Tue,  6 Feb 2024 19:08:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C02F14013;
+	Tue,  6 Feb 2024 19:09:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="LVYTNWwY"
+	dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b="Z/68Qkyx"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail11.truemail.it (mail11.truemail.it [217.194.8.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC0D913FF0;
-	Tue,  6 Feb 2024 19:08:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76AB13FF0;
+	Tue,  6 Feb 2024 19:09:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.194.8.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707246497; cv=none; b=kU41aK9yhVmsn6+4gxuhlfhkgWhsQqxUulsDvdqKCnHb3V9qI2h3UvhrsvuncZRVujNj8lxZHNNLrwtXP3kCxZsjmSVbzrxBeYObRMssWJl8y0fueNpJ3h6d1ZIdf786L/vQIHFtCHkEEjhdy1mEVUBase+Fp3e/XP4sCQxNJ80=
+	t=1707246577; cv=none; b=MKdYnkskbopFLP0zylyKfd8Xe/zrG0diuQv5w+xwB5vRpcqVn0E2WW1KD/hZbT+VmQiGbGyEf39uwdfo+cs8KEfYQAMU5WN1/lN506jX2P1qkWV7g/XLCel9ain4e5RKSmbqCNqrWoxvTuoHZWkejqityw195aQdhIw5JrTjvP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707246497; c=relaxed/simple;
-	bh=5Z2BovTB2FP3edEraPK/nJ0WYXm/OBj4X4o2+dRHDHE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SCrHIVMxgNCPRwE4c7YaRvm3EbqJl3L0Msi9l9LV8SUhz+n4nLpoqzFYm6qSd66u1+hBO5Wj/9TAjpLuRcs2PwHfI152c7quN8muZEkSlIstb7sEBfoS6PLU2BMNts6qnt/Z0Hk+iLiaFDtm4t/d0MNpVHk6H1xCpvq9ZD7o8pA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=LVYTNWwY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F7CDC433F1;
-	Tue,  6 Feb 2024 19:08:16 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="LVYTNWwY"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1707246492;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5Z2BovTB2FP3edEraPK/nJ0WYXm/OBj4X4o2+dRHDHE=;
-	b=LVYTNWwYm9Wnifm+IPQytFsIAWPe8JRZPoAImZ+xzPkRASSk8ARmb0BFkv1v7b3KZjEBEd
-	p/QCXwDCviVUlOQQfN09tIpxSlcGQbxkxlcWz6KmGWBlb4FZw0M8l7ZdpkgmvgnrIPbLlt
-	Scnb/Mp3SgEFPF0wRmM213GES4sPrmI=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id fed1e447 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Tue, 6 Feb 2024 19:08:12 +0000 (UTC)
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6047cfd1f5cso8553327b3.2;
-        Tue, 06 Feb 2024 11:08:12 -0800 (PST)
-X-Gm-Message-State: AOJu0YxYCR3sCYh6QLMY55HCP2zPGN7wQ3kVTPAa6j6LbJM/oRr7lnW6
-	W8PyCBqrcI6MaxfZ7lC/2OGVIS9kBwbO8N8KvbSSx4x8oew7/9h4Tr3Grk3VPlKSt3HDGjaCtXX
-	NS2/lY7NNttEaY71F5bA2cNJoQ7k=
-X-Google-Smtp-Source: AGHT+IFOV3Wdo2fUCv+WtJ2o5y/XqcPp1tWUbVJd5wtVPEHmafutx5P5ZJmnK/9+OaT6VsaQgi9vpUwdxEhxJFQC1YU=
-X-Received: by 2002:a81:99ca:0:b0:5ff:85f4:27ee with SMTP id
- q193-20020a8199ca000000b005ff85f427eemr2455343ywg.10.1707246491366; Tue, 06
- Feb 2024 11:08:11 -0800 (PST)
+	s=arc-20240116; t=1707246577; c=relaxed/simple;
+	bh=ICT9GMmbWANWtV3WdQlzASzd3A+oLCs55eUv8T8iveY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WDoT7cnp64eWASETjjCTi8u/Eu3Kh0fLN5uomHRpoGsJVehLAyhaIUnl3v27jo+X+vj0Sb+7W2uhRQsi0eLRTtrpvR1WIXwkcmGIpjS6Ug4/YsIOfVglXfU8Od1h+2dx+O4GnOtDR13D4Htc/WjdswZNsZMMuUSY86nsWW838RA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it; spf=pass smtp.mailfrom=dolcini.it; dkim=pass (2048-bit key) header.d=dolcini.it header.i=@dolcini.it header.b=Z/68Qkyx; arc=none smtp.client-ip=217.194.8.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=dolcini.it
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dolcini.it
+Received: from gaggiata.pivistrello.it (93-49-2-63.ip317.fastwebnet.it [93.49.2.63])
+	by mail11.truemail.it (Postfix) with ESMTPA id EA07622268;
+	Tue,  6 Feb 2024 20:09:31 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dolcini.it;
+	s=default; t=1707246572;
+	bh=T7oA3o1/PV86rg/COPWoNeGWudEDqQS1SUtT78lzkFQ=;
+	h=Received:From:To:Subject;
+	b=Z/68Qkyx9maE5F2kdosAHBwgsa8JoWXLPIxbGMerQ3NiyEB6KxiJsyCmP69dSqGpG
+	 QoEGS0y9M0J5IvqyYSA0qmZBJyzoTkINmqrz83JYAdk6IcFnQqdOOuiQPoL5AjISRJ
+	 wfDhwYsFWINXVHHxd1GYs1LtE9KqiybGCSevQZR8k2n0pGs72RseXDGAV0XoNvsTHg
+	 dnww4I3OGkVZQ/WVRiT/lnjEvDDXSUgfMJcEyYE8/tTkOaW8SjimNZhCvJXGmQ0lmz
+	 FZudZKIiQtN2rNMQ+70KVeqJhkTTpbpTO99V940gvvU2rJb8vJrbCDajtQ9x2yp/dm
+	 YbLPyonDAO1HA==
+Received: by gaggiata.pivistrello.it (Postfix, from userid 1000)
+	id 8FB077F98B; Tue,  6 Feb 2024 20:09:31 +0100 (CET)
+Date: Tue, 6 Feb 2024 20:09:31 +0100
+From: Francesco Dolcini <francesco@dolcini.it>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Francesco Dolcini <francesco@dolcini.it>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH] net: phy: micrel: reset KSZ9x31 when resuming
+Message-ID: <ZcKD69vLxYkbvAL-@gaggiata.pivistrello.it>
+References: <20240109205223.40219-1-wsa+renesas@sang-engineering.com>
+ <20240109232838.GA3626@francesco-nb>
+ <ZafXQS1_4fHpEzL0@ninjato>
+ <20240206172645.GA24848@francesco-nb>
+ <dbae1fca-9313-40e3-9b5c-0de1a8e177df@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240205181111.43414-1-n.zhandarovich@fintech.ru>
-In-Reply-To: <20240205181111.43414-1-n.zhandarovich@fintech.ru>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Tue, 6 Feb 2024 20:08:00 +0100
-X-Gmail-Original-Message-ID: <CAHmME9qkOEzzUJmJroZp3X2j=2Q6tE+EMYCr0bW3vYyK=M5FuQ@mail.gmail.com>
-Message-ID: <CAHmME9qkOEzzUJmJroZp3X2j=2Q6tE+EMYCr0bW3vYyK=M5FuQ@mail.gmail.com>
-Subject: Re: [PATCH RESEND net v2] wireguard: receive: annotate data-race
- around receiving_counter.counter
-To: n.zhandarovich@fintech.ru
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, wireguard@lists.zx2c4.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	syzbot <syzkaller@googlegroups.com>, 
-	syzbot+d1de830e4ecdaac83d89@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <dbae1fca-9313-40e3-9b5c-0de1a8e177df@lunn.ch>
 
-Queued up, thanks.
+On Tue, Feb 06, 2024 at 06:57:37PM +0100, Andrew Lunn wrote:
+> On Tue, Feb 06, 2024 at 06:26:45PM +0100, Francesco Dolcini wrote:
+> > On Wed, Jan 17, 2024 at 02:33:53PM +0100, Wolfram Sang wrote:
+> > > Makes sense? Tests work fine here, at least.
+> > 
+> > What I do not know, is what happen to any configuration that was done to
+> > the phy before.
+> 
+> I'm assuming here WoL was not enabled, so the PHY did actually
+> suspend.
+> 
+> mdio_bus_phy_suspend() calls phy_stop_machine() which will set the
+> state of the PHY to UP.
+> 
+> During resume mdio_bus_phy_resume() calls phy_init_hw(). That should
+> do a soft reset, call the config_init() callback, and configure
+> interrupts. After that phy_resume() is called and then
+> phy_state_machine(). Do to setting the state to UP, the state machine
+> will kick off auto-negotiation, which will cause any auto-neg
+> parameters to be written to the PHY.
+> 
+> > What if you have disabled gigabit ethernet from auto negotiation before
+> > suspend, it will be enabled again after the phy get out of reset.
+> 
+> If you have set in fixed mode, the wrongly named phy_config_aneg()
+> will set the fixed modes, same as it would set the auto-neg modes. So
+> they should be preserved over suspend/resume.
+
+Thanks for the detailed explanation Andrew.
+
+What if the configuration was done using ethtool?
+
+Francesco
 
