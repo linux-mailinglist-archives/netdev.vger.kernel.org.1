@@ -1,217 +1,189 @@
-Return-Path: <netdev+bounces-69348-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CBBC84ABD3
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 02:57:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5246E84ABF8
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 03:09:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 918D91C23407
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 01:57:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 772401C23732
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 02:09:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DAD556765;
-	Tue,  6 Feb 2024 01:57:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 333E556B65;
+	Tue,  6 Feb 2024 02:09:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ltA9KMUz"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="b+KMj6tv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5BC856B63
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 01:57:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C2E5675F;
+	Tue,  6 Feb 2024 02:09:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707184624; cv=none; b=hB/e0ySdCHNicQ8PJsvIg6XF+A0ShPNQjdNAyAZLFhIO8AivG6W3fRI7T+Ne40JrEz0242q5s3KbhYu4gGL/9HIGppY3zZzFyFl0eEpTmwk0iSsXFlSlEUl/dSzU8/agkNtmwxgUqum2/WD879+jNAj+WhPnliIhJakYYEks7x0=
+	t=1707185346; cv=none; b=GbYQLpq4rcIE/1rYnR7HAKEwzMYFo1dvQvcvNhzvkr9blUH+lUqdnbS8FFsAFkiGzfc609kww8w1pBdz5xTQVJnWNR5BkZpusP/fnPdg6QCuzuKdIEQFAVE0fTgs8DCGoE7QgU2+P3ShaSTmlG+k5Ho1r4EIHxnbmxAEm94tgJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707184624; c=relaxed/simple;
-	bh=AGGj7Vod8i/cMhIocRRjpJuktqfjt3MGtAOErqqB4RM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K0Wz8X2cY10GwJAxDdRoyJY0JrpE+7mH2N/JHkJ76DWxRanHcdKxOg5wOu7y9YTwtDS1MKfNGe5SpC4UDnVD9KgRgRjUAIWI9OhYJdDMB16jzHAXG0EI7FGVRo0joDvfFAzpgANjX9Aq1xZZx9UMH/kZr53R2XNIEaI6zZPFNbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ltA9KMUz; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d8ef977f1eso38588785ad.0
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 17:57:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1707184621; x=1707789421; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6RQcHLm5QazOeCq3JvR92kEunC3ZSrNlLeaxZZfWXA0=;
-        b=ltA9KMUzeuLgMRjVzDzeOMaw74k9rxYdDq2Xe7tYf3r+Www98/j8JrnAGL6cDFl3/b
-         1L1rjYYOO7PK1C7mgse1i9m83nP2iLi6j/t0X6Y1ipQJMZUwaahPph/0w6GQFUimxWps
-         b5NdFP4QqGBJ1piPMA//0Q8yzMt/rhskaWwTg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707184621; x=1707789421;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6RQcHLm5QazOeCq3JvR92kEunC3ZSrNlLeaxZZfWXA0=;
-        b=jpzfwU9I/RIjzMcHbrxZMqyhuGNZb48NdQse/oY54NPKhs7utUJYuoETli7SSjxQOl
-         JoOdGADzOQN5xV0Pp+UjRiGc3tDy3iRzRGGcMx/j4g150UPCpgb+R7y+useQKc2JG8Mh
-         +vorZTJUs4GaQH7ibdDXg8C/DWbiHZxvIEzVm+SsXLbCHb4e8G3huCENH2iLuCGm9iWu
-         qkNoEJ1QhnjbXaevm+gmrcXl8/xkUZfmceJcTLjrNk3Bz+X+0gsqM0IpQcEWXTe8RrcN
-         PQRTECdHq4dv0kRngCfSz9oUrtyMiGw+cQmnlc4Vo8BOtS22ccubF4LPSevl5a5yXnDq
-         eq1A==
-X-Gm-Message-State: AOJu0YynQBwqQZNqbcJpMJAKfApg665flnjWDNgMr2HGbzUeJVHGayyY
-	8ldJ9+fCKNGxyZSi07Drwi/x5OmfVpcLY+EBRknELWhUdo3vLvCbxGmAJJ0kbIk=
-X-Google-Smtp-Source: AGHT+IGFs+QR1LR1g/SgL6DV+s4jv4M3sRSbSYmRfFvgvR0v1IuEhSQTG8Ns1zi+PiHPUMgc4MzHuw==
-X-Received: by 2002:a17:90a:fd96:b0:294:4637:7ed with SMTP id cx22-20020a17090afd9600b00294463707edmr934326pjb.40.1707184621159;
-        Mon, 05 Feb 2024 17:57:01 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVBA5wCZeQQujcnRN2if4vYXLgeOnWqpsGt2RhCIP5kNPaGZ1rtE2O7x2BQuY6pRumfAfzgJqNgyPJXwU/vxU4WHg5E+XZVWuEfMZJ8y8STnkZGsZli4R5IsGpvmMIxqbFyPpvMNwW6fdYZJaYQtpUNALTtL4SuToFC7WxNNMUM3blZJuEpmG/NswDe86ACCfPTxB9CX8ITbB2yafBrdoO3WnRELaoXrxPNj103INBFxVzZP306rhguXjK+sRLylOc7AVLPEIW4wKfpT0iqcusN6mA+eluGz9+QTdsL7TITQaNDaAa8PyY=
-Received: from fastly.com (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id fa2-20020a17090af0c200b00296b90d93absm172768pjb.29.2024.02.05.17.56.59
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 05 Feb 2024 17:57:00 -0800 (PST)
-Date: Mon, 5 Feb 2024 17:56:58 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, tariqt@nvidia.com,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>
-Subject: Re: [PATCH net-next] eth: mlx5: link NAPI instances to queues and
- IRQs
-Message-ID: <20240206015657.GA11257@fastly.com>
-References: <20240206010311.149103-1-jdamato@fastly.com>
- <878r3ymlnk.fsf@nvidia.com>
- <20240206013246.GA11217@fastly.com>
- <874jemml1j.fsf@nvidia.com>
- <20240206014151.GA11233@fastly.com>
- <87zfwel5qi.fsf@nvidia.com>
+	s=arc-20240116; t=1707185346; c=relaxed/simple;
+	bh=WYfoRPya76Tqck0ScDgB0y5w0roJ0OYNP1LTT+2qcEk=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LjTpMBNBxG7VMnyEmn5PV2y7SK5TK6sGGnAK4U/S9khqZrK+lM64AGfdTrrKttMcU1H3kw9b0UNyXkztJghtp2rWeRI9ybpoP6BLgS6wrWKdPG1RdpE3qqbAtUa/ljpWYk1LsD4UQv6wa7Uv9F1xHr/PIFYs8/9Zfi19AcLPs90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=b+KMj6tv; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4161Ewsc023386;
+	Tue, 6 Feb 2024 02:08:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : in-reply-to : references : mime-version :
+ content-type : content-transfer-encoding; s=corp-2023-11-20;
+ bh=TNBqmrMN0GKiz0meyol2MTt7jK7ZOMX41ADnOQ7L/UU=;
+ b=b+KMj6tvO4efzEbKZhSG/xzlHnsPmbgMlBfcTWawkZTnAIffaQla4J5cVDofspUuJqWS
+ /o00HHnk0n3gN9qp3mx/3E4gJC1I52m2sdoqn6JFMG+i8UwxEXr0NcQnIWxdhEFBJn+E
+ /x8af1pQLtk1k1AM1L7u822p8aQ15VNJPSq8MPE9D4515Gx5HixPyTgAvA3/EgoqxoHI
+ QgW4sF8UUf5WKq6QgWwluTQ92vNZ9x/szjLyibVmDwZBAu8ox17jHGO02Dm+ih1uUcH6
+ DGK4SsClE47m3SK3AzW4xYXw6GyPWvrQpLAswBi0lOq+tWmzWKU14KToHTtMKtqix0Tu 5w== 
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3w1dhddkp3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 06 Feb 2024 02:08:03 +0000
+Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 4161MK9a039504;
+	Tue, 6 Feb 2024 02:08:02 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3w1bx6cdtx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 06 Feb 2024 02:08:02 +0000
+Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41627qHJ034652;
+	Tue, 6 Feb 2024 02:08:01 GMT
+Received: from ca-mkp2.ca.oracle.com.com (mpeterse-ol9.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.251.135])
+	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3w1bx6cdrb-2;
+	Tue, 06 Feb 2024 02:08:01 +0000
+From: "Martin K. Petersen" <martin.petersen@oracle.com>
+To: linux-kernel@vger.kernel.org, Li Zhijian <lizhijian@fujitsu.com>
+Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
+        Adaptec OEM Raid Solutions <aacraid@microsemi.com>,
+        Adrian Hunter <adrian.hunter@intel.com>,
+        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+        Alistar Popple <alistair@popple.id.au>,
+        "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
+        Arnaldo Carvalho de Melo <acme@kernel.org>,
+        Artur Paszkiewicz <artur.paszkiewicz@intel.com>,
+        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        =?UTF-8?q?Bruno=20Pr=C3=A9mont?= <bonbons@linux-vserver.org>,
+        Chandrakanth patil <chandrakanth.patil@broadcom.com>,
+        Christian Gromm <christian.gromm@microchip.com>,
+        Christophe Leroy <christophe.leroy@csgroup.eu>, cocci@inria.fr,
+        Dave Hansen <dave.hansen@linux.intel.com>,
+        Don Brace <don.brace@microchip.com>, dri-devel@lists.freedesktop.org,
+        Eddie James <eajames@linux.ibm.com>,
+        GR-QLogic-Storage-Upstream@marvell.com,
+        Hannes Reinecke <hare@kernel.org>, Hannes Reinecke <hare@suse.de>,
+        Hans de Goede <hdegoede@redhat.com>, Helge Deller <deller@gmx.de>,
+        HighPoint Linux Team <linux@highpoint-tech.com>,
+        "H. Peter Anvin" <hpa@zytor.com>, Ian Rogers <irogers@google.com>,
+        =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+        Ingo Molnar <mingo@redhat.com>, Jack Wang <jinpu.wang@cloud.ionos.com>,
+        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        James Morse <james.morse@arm.com>, Jeremy Kerr <jk@ozlabs.org>,
+        Jiri Kosina <jikos@kernel.org>, Jiri Olsa <jolsa@kernel.org>,
+        Joel Stanley <joel@jms.id.au>, Jonathan Cameron <jic23@kernel.org>,
+        Julia Lawall <Julia.Lawall@inria.fr>,
+        Karan Tilak Kumar <kartilak@cisco.com>,
+        Kashyap Desai <kashyap.desai@broadcom.com>,
+        Ketan Mukadam <ketan.mukadam@broadcom.com>,
+        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
+        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
+        linux-fbdev@vger.kernel.org, linux-fsi@lists.ozlabs.org,
+        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
+        linux-perf-users@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+        linux-scsi@vger.kernel.org, Manish Rangankar <mrangankar@marvell.com>,
+        Mark Rutland <mark.rutland@arm.com>,
+        Mauro Carvalho Chehab <mchehab@kernel.org>,
+        megaraidlinux.pdl@broadcom.com, Michael Cyr <mikecyr@linux.ibm.com>,
+        Michael Ellerman <mpe@ellerman.id.au>,
+        Michal Januszewski <spock@gentoo.org>,
+        MPT-FusionLinux.pdl@broadcom.com, Namhyung Kim <namhyung@kernel.org>,
+        "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, netdev@vger.kernel.org,
+        Nicholas Piggin <npiggin@gmail.com>,
+        Nicolas Palix <nicolas.palix@imag.fr>,
+        Nilesh Javali <njavali@marvell.com>,
+        Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
+        Peter Zijlstra <peterz@infradead.org>,
+        platform-driver-x86@vger.kernel.org,
+        Richard Cochran <richardcochran@gmail.com>,
+        Robert Richter <rric@kernel.org>, Russell King <linux@armlinux.org.uk>,
+        Sathya Prakash <sathya.prakash@broadcom.com>,
+        Satish Kharat <satishkh@cisco.com>,
+        Sesidhar Baddela <sebaddel@cisco.com>,
+        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
+        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
+        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+        Stefan Achatz <erazor_de@users.sourceforge.net>,
+        storagedev@microchip.com, Stuart Yoder <stuyoder@gmail.com>,
+        Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
+        Sumit Saxena <sumit.saxena@broadcom.com>, target-devel@vger.kernel.org,
+        Thomas Gleixner <tglx@linutronix.de>, Tony Luck <tony.luck@intel.com>,
+        Tyrel Datwyler <tyreld@linux.ibm.com>,
+        Vadim Pasternak <vadimp@nvidia.com>, x86@kernel.org
+Subject: Re: (subset) [PATCH 00/42] Fix coccicheck warnings
+Date: Mon,  5 Feb 2024 21:07:38 -0500
+Message-ID: <170715263710.945763.16540743989774199712.b4-ty@oracle.com>
+X-Mailer: git-send-email 2.42.1
+In-Reply-To: <20240116041129.3937800-1-lizhijian@fujitsu.com>
+References: <20240116041129.3937800-1-lizhijian@fujitsu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87zfwel5qi.fsf@nvidia.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-05_18,2024-01-31_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 phishscore=0
+ spamscore=0 adultscore=0 mlxlogscore=980 malwarescore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2402060013
+X-Proofpoint-GUID: fwziPvoQs2DBL9rAMuJ3Du7KSNls4Hgl
+X-Proofpoint-ORIG-GUID: fwziPvoQs2DBL9rAMuJ3Du7KSNls4Hgl
 
-On Mon, Feb 05, 2024 at 05:44:27PM -0800, Rahul Rameshbabu wrote:
+On Tue, 16 Jan 2024 12:10:47 +0800, Li Zhijian wrote:
+
+> make coccicheck COCCI=$PWD/scripts/coccinelle/api/device_attr_show.cocci`
+> complians some warnnings as following[1]:
 > 
-> On Mon, 05 Feb, 2024 17:41:52 -0800 Joe Damato <jdamato@fastly.com> wrote:
-> > On Mon, Feb 05, 2024 at 05:33:39PM -0800, Rahul Rameshbabu wrote:
-> >> 
-> >> On Mon, 05 Feb, 2024 17:32:47 -0800 Joe Damato <jdamato@fastly.com> wrote:
-> >> > On Mon, Feb 05, 2024 at 05:09:09PM -0800, Rahul Rameshbabu wrote:
-> >> >> On Tue, 06 Feb, 2024 01:03:11 +0000 Joe Damato <jdamato@fastly.com> wrote:
-> >> >> > Make mlx5 compatible with the newly added netlink queue GET APIs.
-> >> >> >
-> >> >> > Signed-off-by: Joe Damato <jdamato@fastly.com>
-> >> >> > ---
-> >> >> >  drivers/net/ethernet/mellanox/mlx5/core/en.h      | 1 +
-> >> >> >  drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 8 ++++++++
-> >> >> >  2 files changed, 9 insertions(+)
-> >> >> >
-> >> >> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> >> >> > index 55c6ace0acd5..3f86ee1831a8 100644
-> >> >> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> >> >> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> >> >> > @@ -768,6 +768,7 @@ struct mlx5e_channel {
-> >> >> >  	u16                        qos_sqs_size;
-> >> >> >  	u8                         num_tc;
-> >> >> >  	u8                         lag_port;
-> >> >> > +	unsigned int		   irq;
-> >> >> >  
-> >> >> >  	/* XDP_REDIRECT */
-> >> >> >  	struct mlx5e_xdpsq         xdpsq;
-> >> >> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> >> >> > index c8e8f512803e..e1bfff1fb328 100644
-> >> >> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> >> >> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> >> >> > @@ -2473,6 +2473,9 @@ static void mlx5e_close_queues(struct mlx5e_channel *c)
-> >> >> >  	mlx5e_close_tx_cqs(c);
-> >> >> >  	mlx5e_close_cq(&c->icosq.cq);
-> >> >> >  	mlx5e_close_cq(&c->async_icosq.cq);
-> >> >> > +
-> >> >> > +	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_TX, NULL);
-> >> >> > +	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_RX, NULL);
-> >> >> 
-> >> >> This should be set to NULL *before* actually closing the rqs, sqs, and
-> >> >> related cqs right? I would expect these two lines to be the first ones
-> >> >> called in mlx5e_close_queues. Btw, I think this should be done in
-> >> >> mlx5e_deactivate_channel where the NAPI is disabled.
-> >> >> 
-> >> >> >  }
-> >> >> >  
-> >> >> >  static u8 mlx5e_enumerate_lag_port(struct mlx5_core_dev *mdev, int ix)
-> >> >> > @@ -2558,6 +2561,7 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
-> >> >> >  	c->stats    = &priv->channel_stats[ix]->ch;
-> >> >> >  	c->aff_mask = irq_get_effective_affinity_mask(irq);
-> >> >> >  	c->lag_port = mlx5e_enumerate_lag_port(priv->mdev, ix);
-> >> >> > +	c->irq		= irq;
-> >> >> >  
-> >> >> >  	netif_napi_add(netdev, &c->napi, mlx5e_napi_poll);
-> >> >> >  
-> >> >> > @@ -2602,6 +2606,10 @@ static void mlx5e_activate_channel(struct mlx5e_channel *c)
-> >> >> >  		mlx5e_activate_xsk(c);
-> >> >> >  	else
-> >> >> >  		mlx5e_activate_rq(&c->rq);
-> >> >> > +
-> >> >> > +	netif_napi_set_irq(&c->napi, c->irq);
-> >> 
-> >> One small comment that I missed in my previous iteration. I think the
-> >> above should be moved to mlx5e_open_channel right after netif_napi_add.
-> >> This avoids needing to save the irq in struct mlx5e_channel.
-> >
-> > I couldn't move it to mlx5e_open_channel because of how safe_switch_params
-> > and the mechanics around that seem to work (at least as far as I could
-> > tell).
-> >
-> > mlx5 seems to create a new set of channels before closing the previous
-> > channel. So, moving this logic to open_channels and close_channels means
-> > you end up with a flow like this:
-> >
-> >   - Create new channels (NAPI netlink API is used to set NAPIs)
-> >   - Old channels are closed (NAPI netlink API sets NULL and overwrites the
-> >     previous NAPI netlink calls)
-> >
-> > Now, the associations are all NULL.
-> >
-> > I think moving the calls to active / deactivate fixes that problem, but
-> > requires that irq is stored, if I am understanding the driver correctly.
+> Not sure if someone had tried these fixes, feel free to ignore this
+> patch set if we have come to a *NOT-FIX* conclusion before :)
 > 
-> I believe moving the changes to activate / deactivate channels resolves
-> this problem because only one set of channels will be active, so you
-> will no longer have dangling association conflicts for the queue ->
-> napi. This is partially why I suggested the change in that iteration.
-
-As far as I can tell, it does.
- 
-> As for netif_napi_set_irq, that alone can be in mlx5e_open_channel (that
-> was the intention of my most recent comment. Not that all the other
-> associations should be moved as well). I agree that the other
-> association calls should be part of activate / deactivate channels.
-
-OK, sure that makes sense. I make that change, too.
-
-> >
-> >> >> > +	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_TX, &c->napi);
-> >> >> > +	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_RX, &c->napi);
-> >> >> 
-> >> >> It's weird that netlink queue API is being configured in
-> >> >> mlx5e_activate_channel and deconfigured in mlx5e_close_queues. This
-> >> >> leads to a problem where the napi will be falsely referred to even when
-> >> >> we deactivate the channels in mlx5e_switch_priv_channels and may not
-> >> >> necessarily get to closing the channels due to an error.
-> >> >> 
-> >> >> Typically, we use the following clean up patterns.
-> >> >> 
-> >> >> mlx5e_activate_channel -> mlx5e_deactivate_channel
-> >> >> mlx5e_open_queues -> mlx5e_close_queues
-> >> >
-> >> > OK, I'll move it to mlx5e_deactivate_channel before the NAPI is disabled.
-> >> > That makes sense to me.
-> >> 
-> >> Appreciated. Thank you for the patch btw.
-> >
-> > Sure, thanks for the review.
+> This patch set also fix a few snprintf() beside coccicheck reported.
+> For example, some thing like
+> xxx_show() {
+> 	rc = snprintf();
+> ...
+> 	return rc;
+> }
 > 
+> [...]
+
+Applied to 6.9/scsi-queue, thanks!
+
+[22/42] drivers/scsi/fnic: Convert snprintf to sysfs_emit
+        https://git.kernel.org/mkp/scsi/c/1ad717c92925
+[25/42] drivers/scsi/ibmvscsi: Convert snprintf to sysfs_emit
+        https://git.kernel.org/mkp/scsi/c/29ff822f466e
+[26/42] drivers/scsi/ibmvscsi_tgt: Convert snprintf to sysfs_emit
+        https://git.kernel.org/mkp/scsi/c/01105c23de42
+[27/42] drivers/scsi/isci: Convert snprintf to sysfs_emit
+        https://git.kernel.org/mkp/scsi/c/5fbf37e53091
+[34/42] drivers/scsi/pm8001: Convert snprintf to sysfs_emit
+        https://git.kernel.org/mkp/scsi/c/8179041f801d
+
+-- 
+Martin K. Petersen	Oracle Linux Engineering
 
