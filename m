@@ -1,168 +1,208 @@
-Return-Path: <netdev+bounces-69442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE39484B352
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 12:20:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E3B384B36E
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 12:27:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AE4A1F2466A
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 11:20:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82B471C242F7
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 11:27:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BBA512B14E;
-	Tue,  6 Feb 2024 11:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A214F12EBC8;
+	Tue,  6 Feb 2024 11:25:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LXlpARtc"
+	dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b="bm4mi9bf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR01-HE1-obe.outbound.protection.outlook.com (mail-he1eur01on2051.outbound.protection.outlook.com [40.107.13.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D69F56754
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 11:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707218431; cv=none; b=D9dM5siQw+k2/FZzPy8D+ww0EwJVG9AziCr9ORVs5+piMypwXS1liGkVWahvdNlfyknnLfBkw1DMksFkKCpsoxFFtuT/mlnb/iO4A5whOTyRjgib94y1gLp/61gamm7kYIcywfc5+P1j+Opf+v1objky00ZSwhCFm+SfotKFTB0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707218431; c=relaxed/simple;
-	bh=OlB2OEQmd/K1b98VvESLu2jUoZA2XBUHEXhD14Hc9Uw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qMK2je3Wei69Vy0iYROH5CRrSR8z7FML4GjBc0jGnj2fCXCWtSd2Uy694lykNq/hR4TjQyTZMwKsUiSj1GU24ZT90UqHwE/tYHM8W4MjVMd/bQpDhImU7yqF1bskLtcSAYkeAjpR+aHA8agPBPDXECyMQ3AQgnXkGv67AEyyXS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LXlpARtc; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d04c0b1cacso68740301fa.0
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 03:20:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707218427; x=1707823227; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sZUkF6qQkW68JTbbtNstjqI5lBDrxSml80X/oZkP6Jk=;
-        b=LXlpARtc/HYXY/h4HHa6DcYG140dYmr3wZ2O1gu+HRWVELHRrsrAzMH/j94z44kFzi
-         fS+ytOMsns09ExkFm96LfRHHCrExpDDhGe0MAU51aLnSDdJw/rnJINIilQbC8yAwhAbE
-         rVrpyXmzbt3giOHAcI8WlUdi0V6sOSUbqQmv69h6pv/HlUUnX8Y54aSx8HiRqAm2Ph9M
-         UjrAx9NAfpv4+OQNkABDygtfbQtPHngFz1bJAtQARqRdOF5vtXT+w+PCi4eyX1q5c2L2
-         jPz9kllMEcaOQaR8b1U8thfkmDcgay/T4h0f2/eVdtGUJpK1D0lKSXimOjE5W10GPuJv
-         D9jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707218427; x=1707823227;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sZUkF6qQkW68JTbbtNstjqI5lBDrxSml80X/oZkP6Jk=;
-        b=NZMmie6dzMI+q4rgTsrf40pT5xDO9oSuncSVMI+hxO6T+USyDaGEadVqM+ziFyiiKg
-         LzlI/Y/+kE1yDqIBGI//NA/hIhGNqY5F/D+WpIgu/Pv7hqU4zChFKDnZNze9/ryLlYl4
-         3TDWYZ2BKBFUWnN2lrhdICB67IjVqXSaGet9NGNKqASp2VkYfKvSgowUaSjAUQtT0dcH
-         Kzsr3Nx4JoHDeLC/TExj2jNeKeAYzIuLTdCDt8LFLc/Qtn8ZJ41+xsquAG6CvOGknfNb
-         fI62P6QscjQCd0pPTJrQTXnfgaLliVoAq7PgWB/JYqyDqSMapiCsYtbKgwdlQUxLyCZU
-         rQJA==
-X-Gm-Message-State: AOJu0YzH/DiGNv+1uI4MnoQ3UETCaJQZ6/FvKD0qTEbRizq9S0NfeGNX
-	pJ6sfPNN1sTUMlLKjTLlMx5w6suPjMWVUeZOlHJw8Wq7vgFJq7u3
-X-Google-Smtp-Source: AGHT+IHW2LkipLfX++vRM5dnDW6bduLO6JoK+Xv12mfq908JaY4bohgwFQKI2raGy/UuCHKa9YF1yA==
-X-Received: by 2002:a05:651c:d5:b0:2d0:9a6e:106 with SMTP id 21-20020a05651c00d500b002d09a6e0106mr1807106ljr.43.1707218427282;
-        Tue, 06 Feb 2024 03:20:27 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCU8bYPaI3YnkZ9qObyT85rw9Qb8bPNkodfCON7S9bFI2g3Gp2FvLh44VCCd1nIXzAo0B9ZFUZHtoKmw+OQMBaV5wFUEi7okjcvOXXM2erXPOjb2kpL6G22QFBuiiDxoK62+79Axr25HLQzomCTTxoabKgEC2Q5nVG8/eAPeYqmzjybtC7L5U0VDv6jimT00eScRUEXmoFWrHQoy3wtd4iCl/tkWxKedPbgMIkuq47/ABLm/5r/7cJoiXPdk3E90Hc5G4oq0BOHzzsY5lEZiw0pj/ZVTylnhpxd+cczPUjdXgfGHAk79FgB1d4SYFWw1jADQfLv476Yi5kPH5rDzo4WAEiwm3ylHTfG+XHn2Fl6lOAbfhRwwUpDPEezP1PpSaoAcqI+VzkDkTvSJFE9b+NAljPTwmWk4DRrfUT0XLJHBiewTLqEcedFIVxU7avLKHC8Jv3sXOM6R47W+czO/we8MjegmMxPPxHvL1/B6S69QKyryLLaQ0z5D6n1yxpePuHLyPLfs/SPeAiByM6CY2ON4RYmCGC38j62t9GNjhe/HPkTT1bVj15MwCZ9hF2VResSHXmFFl2sBxcrn43PwVPRFnRzwiVcmxFVBn6IDAjWjss6UE8nGcT2wFH1M7A0qGkPic7nTD3FIe474uaTpFMN8kXtxKQh016Lr3LRc1OtlM/Qa6YHANwJb08xUVXOqcN7vTIAf9axrZ6QvTYzz7XIjyEv9
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id kt12-20020a170906aacc00b00a36c7eb251bsm1029561ejb.157.2024.02.06.03.20.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Feb 2024 03:20:27 -0800 (PST)
-Date: Tue, 6 Feb 2024 13:20:24 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Doug Berger <opendmb@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	bcm-kernel-feedback-list@broadcom.com,
-	Byungho An <bh74.an@samsung.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 266CC12EBE6
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 11:25:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.13.51
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707218756; cv=fail; b=ArJORlZn6lIUScYoWXf581wxb2+4PCIJ7ic/trU0iDO0Ol2cWukahdNMTaAWbNdvj0Wn5w/IbSHeFEDZo0Uq0kzMzIJpNRFRIerzVmvUFMH3/Jt0hIgVKmpj7D23wqZKwX/XZpOMmaelyBvvDrftyjYADKEgE3LLYMbn83Qguak=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707218756; c=relaxed/simple;
+	bh=6KRVjHPnNEzP6Fvx/PDOfMLJV3lJDUmdUuhTUUN4Lbw=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=b8MbjxQ60vpI7pjc8KxnnVfslbe/G75JCfJkp0BaCoTF3mdjqW5IcaHd59yU+FfWhfb+g1mR616Yq4JMfqktLOnq0jz4dlPr7VEye0SKYqENgtsFgXWNjdnLr0TjC86HdUuIOivWYGFjKoK6zY7yWAPVIj8XflShP4u7yagjX1A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (1024-bit key) header.d=nxp.com header.i=@nxp.com header.b=bm4mi9bf; arc=fail smtp.client-ip=40.107.13.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Rma2fVpRAX7sJNqI931Q7fDLZ599TOOUcq2Vmq7HVral9slbjQ+EbMz0G61yUgnJIX3pD5kakGxE+ov5wiqiDTpRmIRy8IlPjL1DUDe6/3+19kzoU0KGXSd1UHoyVsWinH2t8CGQpGt+yUShVdoxc88C7utuCS0wSyYMX/GD1j5G7AmrEyaiaKdn83y5wRGAQksAVeB0nRuuGobg8sTSvb/0f/g2aFdfeFhW1vz8l6erwVqexIryV57mbB8gUbqYojU2ZfoRAyiCeR51sVE+kVZOLE1dEAJZplYLdaQOmy1yHwFm0zMsLvd15gibzXwTE8/oWqczXDEGGQy2yG6O9w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mlcfF4losTH9HnVAlD7qxnEY84Uj00X7qfYCaYwJtDU=;
+ b=D3lBVAZH/tZ9dAFbKOfkFWocpa5SetdujHXVT09+yN9Bu48IvV4BD5dYbuJFoK3JcnpIrb4MJedqBd/69SV5STyphvhVPR4tCHQlQASBKSYw7bwXy44QYxBYoMTswLMgUBKEc0dKLMJXnTDKcdTfcxXjOAd1rcV5WmHK8j0ZG8FTCmQetbZMPphaWWTgimq9VmKQncskO5+9EZNJJpdMCiiEa+w03BQgZiEvGZdgFdXm7C6GB3FocSQ3O0/xqYUA0756uotabZfUfzbThvxe6GOeXj1xX+vKk4ZWus1S9GWxyNMbc+U8B2ezMKWEyhCRp7d4sEu6MuiO9uefZud7YA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mlcfF4losTH9HnVAlD7qxnEY84Uj00X7qfYCaYwJtDU=;
+ b=bm4mi9bfjT1RVIfGEJCPDVbrV9n8pNtf3tlb49LqKRsgZggWpgxmYr+Q473qod9i+q5nnyhM4wwfPUqDdTTK4HjP4Dk5WnA68/KdoD9oGtoFWe+krq7h1cTyn9QaLW0ydiWJyUiwcbg4j9dmuIbk/To0+x3SdJFvdnCcA2wUT9Q=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from VE1PR04MB7374.eurprd04.prod.outlook.com (2603:10a6:800:1ac::11)
+ by DBAPR04MB7335.eurprd04.prod.outlook.com (2603:10a6:10:1b1::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.36; Tue, 6 Feb
+ 2024 11:25:50 +0000
+Received: from VE1PR04MB7374.eurprd04.prod.outlook.com
+ ([fe80::62cb:e6bf:a1ad:ba34]) by VE1PR04MB7374.eurprd04.prod.outlook.com
+ ([fe80::62cb:e6bf:a1ad:ba34%7]) with mapi id 15.20.7249.027; Tue, 6 Feb 2024
+ 11:25:50 +0000
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	Justin Chen <justin.chen@broadcom.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	NXP Linux Team <linux-imx@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>, Wei Fang <wei.fang@nxp.com>
-Subject: Re: [PATCH net-next v2 6/6] net: dsa: b53: remove
- eee_enabled/eee_active in b53_get_mac_eee()
-Message-ID: <20240206112024.3jxtcru3dupeirnj@skbuf>
-References: <Zb9/O81fVAZw4ANr@shell.armlinux.org.uk>
- <E1rWbNI-002cCz-4x@rmk-PC.armlinux.org.uk>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Russell King <linux@armlinux.org.uk>
+Subject: [PATCH net-next] net: dsa: b53: unexport and move b53_eee_enable_set()
+Date: Tue,  6 Feb 2024 13:25:27 +0200
+Message-Id: <20240206112527.4132299-1-vladimir.oltean@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AS4P251CA0026.EURP251.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5d3::15) To VE1PR04MB7374.eurprd04.prod.outlook.com
+ (2603:10a6:800:1ac::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1rWbNI-002cCz-4x@rmk-PC.armlinux.org.uk>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: VE1PR04MB7374:EE_|DBAPR04MB7335:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7fd8d288-4908-4b19-8363-08dc27065f7a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	PVyhmmauA6tLikVyzZeOfaKfiXlEBxTzpBp0iRbAg0/tnBOkn93Ga/czA0rHhdnrnf373MlY7jmBJAmbMlAxxZhk06+XwV1Pm8E2YSwNr8ytnUKLJBdbx+t4h6l2ve4fgtxep79sj0anmW4x8t6DxGmLvjDSAQ3WZxzEbMdEeC9MMNVUbg+Y4Ad3j/Yl0AgvUi2KiHw0AQZ1LEwmprFHLkI0cHu0958gHM9chs2jvbijYoR2qyL4UFQDyAs6CCdKEETZ4G0qRRpMtTdlKtS5WN09DitTLBEGwXC1cQj2/opWyQHeWJEzFGdKdSrRXBsVFwPZhEM8a+7g7GGUISedexFDFLcsbYAM3wXZPwU9C32VN3wnTswZQqDTDNVmcL65uWLCH5nD0VCD5dsQXDz5Zrj3/RzQZ5w4hAVChaycSbTqwIJliNtv4YgC3136E54HnV5KZ489FgPG97clZnuUUhThDtk2RpyNAOusAndwlOAA6vCEaLzpAk7UvRZO+e7yAVvangcFhPJ7Bo2Y0eAplZgw6cN+hYL1Q2Gruc07pfM4QKeAGfVD00BYcCs6FeZEpGzl8+V5oowB330q7eTlMqoMrt8tlObaAAkY5EGig9h3TMydnyZ5yUpj71sYM0HL
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR04MB7374.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(136003)(39860400002)(396003)(376002)(366004)(346002)(230922051799003)(186009)(451199024)(64100799003)(1800799012)(1076003)(2616005)(26005)(86362001)(6512007)(41300700001)(6486002)(5660300002)(478600001)(2906002)(38350700005)(66556008)(66946007)(54906003)(316002)(6916009)(66476007)(44832011)(8936002)(8676002)(36756003)(4326008)(52116002)(6666004)(38100700002)(6506007)(83380400001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?loMxTKOqZ5CTxZ/NbmgEWxnJTCZWHLli35N6V8Lu7mbtCVN4v5gP5Ys/vK2S?=
+ =?us-ascii?Q?P0DQv7aPQWOpxW+DuLOMJv7ODrbneaxdOD+IY8thlibbkHcznQMQ99o8EXWO?=
+ =?us-ascii?Q?pD2FbgdDXqq4bJxKbdyNzfdW7r+wdSgWDPOhk2HxtwN42vr85SgI8FmngVIm?=
+ =?us-ascii?Q?QFoYPbOKd7sxw5hXJGY/IVNPsFGm3UJVmVoSHmTicSOVK452Uv7pkfsFj3on?=
+ =?us-ascii?Q?gQmDz7wZNQn9WPBgLvjDp+K9YKa5LYzgcyB3BBZeisl33mpMCpY67ICkvm6R?=
+ =?us-ascii?Q?yEOoZ6BZHkObQyF/vQDmZZaQkHj5UX0gmhCAe3SClFMNQgK8Y5osdxTucATw?=
+ =?us-ascii?Q?/RJ4K3bG6ne5Rej1l+ZbLdZc7SSWr5y3mDsIv8vluLAW97SKNDCWOeXnYSZN?=
+ =?us-ascii?Q?BVq2VoJqYmIt8xYg6CfgcstvpbaCNKH3QFEy5s1+sjf4QQFoMM/38D0vLSOn?=
+ =?us-ascii?Q?o9xHwrhSvI+rZg+Sm7tyfjv5ksm3QvJHDrPyp42RU28/bkd4YfEcSS/BljXQ?=
+ =?us-ascii?Q?kOXjBDoeixOYgxgNvlysYS0zIzvB5KcQUg9J6ZduaEfdyAFcHD2G82qPb9ze?=
+ =?us-ascii?Q?cPyiy1e+HTi8TqgcJJg1oeIL9zyLmKNANK157O9Wrh+P1OpVcXqbIFi6YvTH?=
+ =?us-ascii?Q?r0LE2Yemo60VIYJ7iTypm30nVSr7/U6InVnb/GYlblpGDUaWXRUEnp8/XJA8?=
+ =?us-ascii?Q?2f8IqAx0LPEvwD+OFrG9kt/vXwScwe/0jYJR0VxqDqXQAc5r1SHX/M+O5RvG?=
+ =?us-ascii?Q?NQIi31y+jO5VpV091EWzPaFclO43h09sHaNMdbfAkqeEbXVtcUtsBvOYQtTB?=
+ =?us-ascii?Q?2OddExXM76h/b2WM+GW2A+Te5C4HTa3plV0VvWLk8tYLj4hlLktoz8AaOuT8?=
+ =?us-ascii?Q?3gm0kO3wanYQAdvpBGdETEaCvR+8P2NzE3q6nZ7B5RpwinhVGYu07njorK0X?=
+ =?us-ascii?Q?4Vx8530GQ9gPpX6vO9EfW+k5VZ0vH1GeTT/BzetYMhQgbp0yleQAGrnIfUYX?=
+ =?us-ascii?Q?R6d1iZ3FnQaezgVQBS/hQjbYoL/OkP6r9RbLSvYM/jb39FmT+9ODUfDfdeIk?=
+ =?us-ascii?Q?18uNL1s8lVR+787nivOjesBQsChAXn4ZRhEhqAde6E9IeCDE/C92QBjxj77u?=
+ =?us-ascii?Q?F0Cn+C5LA3vbAJvrqfsvpgACmg9xawdZk82qGbcvDP5gHFqHqYDibNMthcxi?=
+ =?us-ascii?Q?M5Eq0x7J6MVBf0zGrbOvWqMeYcyAP5Zdl48ROvbnyJxqAZATR1m5EbgE5tWK?=
+ =?us-ascii?Q?3f5/09+SBqgDHs1ssnno9dAz8T5V6WjBDVXa9nMvCwIPEnX6EQ2yE2OTALLt?=
+ =?us-ascii?Q?fCkpLyNJ3bqmq/MvwLM31cUMAfnuzcmdMs6HK8xefZVfB1I51I2qsOAkOltp?=
+ =?us-ascii?Q?FnCu+nQsTq/UX5t3WskG8MDs/tih6bskpouAjwzeGhh3jxa2L67oogtoPa1U?=
+ =?us-ascii?Q?RBLc+FlLS98qu6i+3l94EJUVKdLXiqRH8YyrPYV5wwJf1v4MV4bohE0nnyNV?=
+ =?us-ascii?Q?gcEHiKGC8SiwI6FSzxMN8NTpMxfuf5mpZq3vIdKpxfSRkp4g9Sqtl/Dms5Ij?=
+ =?us-ascii?Q?kHnZjmlPHxRxMEKU/cXyxhOsinwf5c41qyBrBo7J0NGs3beZZtp4lwxyJDIw?=
+ =?us-ascii?Q?sg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7fd8d288-4908-4b19-8363-08dc27065f7a
+X-MS-Exchange-CrossTenant-AuthSource: VE1PR04MB7374.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2024 11:25:50.7093
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +HM+ETFHkiC3AHbbZoFzLHjG0DZpL7kG2vPObd3KLH+46M2KihipIOS45Ugqr4rE3wbfZIKZ9CModDnMEYOWng==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR04MB7335
 
-On Sun, Feb 04, 2024 at 12:13:28PM +0000, Russell King (Oracle) wrote:
-> b53_get_mac_eee() sets both eee_enabled and eee_active, and then
-> returns zero.
-> 
-> dsa_slave_get_eee(), which calls this function, will then continue to
-> call phylink_ethtool_get_eee(), which will return -EOPNOTSUPP if there
-> is no PHY present, otherwise calling phy_ethtool_get_eee() which in
-> turn will call genphy_c45_ethtool_get_eee().
+After commit f86ad77faf24 ("net: dsa: bcm_sf2: Utilize b53_{enable,
+disable}_port"), bcm_sf2.c no longer calls b53_eee_enable_set(), and all
+its callers are in b53_common.c.
 
-Nitpick: If you need to resend, the function name changed to
-dsa_user_get_eee().
+We also need to move it, because it is called within b53_common.c before
+its definition, and we want to avoid forward declarations.
 
-> 
-> genphy_c45_ethtool_get_eee() will overwrite eee_enabled and eee_active
-> with its own interpretation from the PHYs settings and negotiation
-> result.
-> 
-> Thus, when there is no PHY, dsa_slave_get_eee() will fail with
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+---
+ drivers/net/dsa/b53/b53_common.c | 28 +++++++++++++---------------
+ drivers/net/dsa/b53/b53_priv.h   |  1 -
+ 2 files changed, 13 insertions(+), 16 deletions(-)
 
-Here too.
+diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
+index 9e4c9bd6abcc..b2eeff04f4c8 100644
+--- a/drivers/net/dsa/b53/b53_common.c
++++ b/drivers/net/dsa/b53/b53_common.c
+@@ -559,6 +559,19 @@ static void b53_port_set_learning(struct b53_device *dev, int port,
+ 	b53_write16(dev, B53_CTRL_PAGE, B53_DIS_LEARNING, reg);
+ }
+ 
++static void b53_eee_enable_set(struct dsa_switch *ds, int port, bool enable)
++{
++	struct b53_device *dev = ds->priv;
++	u16 reg;
++
++	b53_read16(dev, B53_EEE_PAGE, B53_EEE_EN_CTRL, &reg);
++	if (enable)
++		reg |= BIT(port);
++	else
++		reg &= ~BIT(port);
++	b53_write16(dev, B53_EEE_PAGE, B53_EEE_EN_CTRL, reg);
++}
++
+ int b53_enable_port(struct dsa_switch *ds, int port, struct phy_device *phy)
+ {
+ 	struct b53_device *dev = ds->priv;
+@@ -2193,21 +2206,6 @@ void b53_mirror_del(struct dsa_switch *ds, int port,
+ }
+ EXPORT_SYMBOL(b53_mirror_del);
+ 
+-void b53_eee_enable_set(struct dsa_switch *ds, int port, bool enable)
+-{
+-	struct b53_device *dev = ds->priv;
+-	u16 reg;
+-
+-	b53_read16(dev, B53_EEE_PAGE, B53_EEE_EN_CTRL, &reg);
+-	if (enable)
+-		reg |= BIT(port);
+-	else
+-		reg &= ~BIT(port);
+-	b53_write16(dev, B53_EEE_PAGE, B53_EEE_EN_CTRL, reg);
+-}
+-EXPORT_SYMBOL(b53_eee_enable_set);
+-
+-
+ /* Returns 0 if EEE was not enabled, or 1 otherwise
+  */
+ int b53_eee_init(struct dsa_switch *ds, int port, struct phy_device *phy)
+diff --git a/drivers/net/dsa/b53/b53_priv.h b/drivers/net/dsa/b53/b53_priv.h
+index c26a03755e83..c13a907947f1 100644
+--- a/drivers/net/dsa/b53/b53_priv.h
++++ b/drivers/net/dsa/b53/b53_priv.h
+@@ -395,7 +395,6 @@ void b53_mirror_del(struct dsa_switch *ds, int port,
+ int b53_enable_port(struct dsa_switch *ds, int port, struct phy_device *phy);
+ void b53_disable_port(struct dsa_switch *ds, int port);
+ void b53_brcm_hdr_setup(struct dsa_switch *ds, int port);
+-void b53_eee_enable_set(struct dsa_switch *ds, int port, bool enable);
+ int b53_eee_init(struct dsa_switch *ds, int port, struct phy_device *phy);
+ int b53_get_mac_eee(struct dsa_switch *ds, int port, struct ethtool_keee *e);
+ int b53_set_mac_eee(struct dsa_switch *ds, int port, struct ethtool_keee *e);
+-- 
+2.34.1
 
-> -EOPNOTSUPP, meaning eee_enabled and eee_active will not be returned to
-> userspace. When there is a PHY, eee_enabled and eee_active will be
-> overwritten by phylib, making the setting of these members in
-> b53_get_mac_eee() entirely unnecessary.
-> 
-> Remove this code, thus simplifying b53_get_mac_eee().
-> 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  drivers/net/dsa/b53/b53_common.c | 6 ------
->  1 file changed, 6 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
-> index adc93abf4551..9e4c9bd6abcc 100644
-> --- a/drivers/net/dsa/b53/b53_common.c
-> +++ b/drivers/net/dsa/b53/b53_common.c
-> @@ -2227,16 +2227,10 @@ EXPORT_SYMBOL(b53_eee_init);
->  int b53_get_mac_eee(struct dsa_switch *ds, int port, struct ethtool_keee *e)
->  {
->  	struct b53_device *dev = ds->priv;
-> -	struct ethtool_keee *p = &dev->ports[port].eee;
-> -	u16 reg;
->  
->  	if (is5325(dev) || is5365(dev))
->  		return -EOPNOTSUPP;
->  
-> -	b53_read16(dev, B53_EEE_PAGE, B53_EEE_LPI_INDICATE, &reg);
-> -	e->eee_enabled = p->eee_enabled;
-> -	e->eee_active = !!(reg & BIT(port));
-> -
-
-I know next to nothing about EEE and especially the implementation on
-Broadcom switches. But is the information brought by B53_EEE_LPI_INDICATE
-completely redundant? Is it actually in the system's best interest to
-ignore it?
-
->  	return 0;
->  }
->  EXPORT_SYMBOL(b53_get_mac_eee);
-> -- 
-> 2.30.2
-> 
 
