@@ -1,193 +1,133 @@
-Return-Path: <netdev+bounces-69580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4AE584BBAA
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 18:12:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8424084BBC8
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 18:25:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9300FB23167
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 17:12:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 232701F252D8
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 17:25:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 102FF611B;
-	Tue,  6 Feb 2024 17:12:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F6C66FB0;
+	Tue,  6 Feb 2024 17:25:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="w85xzmud"
+	dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b="b1AzzDn+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 624AA6FA9
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 17:12:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F4D2D51D
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 17:24:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707239526; cv=none; b=DKX5z5po/s3V8zrdTo8Q7kBq3oCA4hZGxq5vapxPq+Aky9NCf+Nkj6Fse7Q9Y4TeAzn6j9S3YEAaProzQaJ6yo0LFST+PNRgXdYOZhf0Aw+PsywV5vmQrKZPpG/qh/5pNBvDafVnQJCOHB8jqlSaB2fZB4WxgcC+rCTgKaOcrbA=
+	t=1707240300; cv=none; b=HEyuqS7mU32+qU963eO7qfXF3IZkzaUc1LNpBQiZ5Bl+Jl//KzcuPZOGSEObKgf5Gj2KItdaCEYVkPSGkyY/7Uwa+kGB/9GNyJEVV9AkTS9yckPmJHDcJHpC7g6oF1APkEP4vh00LN+kbN4RamWMjL8nKukoowIR7qHAwb5cZaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707239526; c=relaxed/simple;
-	bh=udwk8gkp2gItjLFFyN+0LjX+L2AaB7Z0ACySQafe79Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l0tns88OwQobOGtTbJtfKNWKUmpHUHGMC6U1yB1nfW71OZsON6cC65aZX1u6UfpGdjLd3hGjs8QOK3/OaWEtMfjPWDljj33DgbSwjurrut8NT7gixAWOCwWTeouYg3qk2m72esZiPOZpR1WEAbWcrMrgMXasUww/cETarwiMCv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=w85xzmud; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1d7431e702dso50024375ad.1
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 09:12:04 -0800 (PST)
+	s=arc-20240116; t=1707240300; c=relaxed/simple;
+	bh=h8xOO95jCVy0Rr1WdvH+64TVszy1Zcsy0yDaXKgU5Yg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YvvFrJrULnpAN5UpBay7nWREez3d8r6gNrwp2FLac+N4h+F4ym8IceKnFPNMp1LdvM2cLVbMGtu4xhITIXL13Z8XGnuj67MDZLp0kTzwR6TtyTu2LBnUsrcjPZ2xoPcfxLgfu7zvFpK4PKnSF47c7q3brD/xEWZTisx0s7jcoeU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net; spf=pass smtp.mailfrom=amacapital.net; dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b=b1AzzDn+; arc=none smtp.client-ip=209.85.221.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amacapital.net
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-4c009d2053fso1579812e0c.3
+        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 09:24:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1707239524; x=1707844324; darn=vger.kernel.org;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=amacapital-net.20230601.gappssmtp.com; s=20230601; t=1707240297; x=1707845097; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CldblDMAlebalb5iiDPGGktolx1oR4ruKO4COeXHSk8=;
-        b=w85xzmudwnF2iNK5vpHYW7Mn7dtzYgzhc6RrwtR6um0ny4mW7oVNGiDGHXlDgOOYRG
-         XzFMiguVkXLiPzbrVAVE3YOC0xLSZn5B1m/YBSPfvcUywAXYj2CpkBPypo3FP6I0CQ/F
-         5TxSJ/ApR/KT2/HWlk1W1SfSxolwSeYJbgJdQ=
+        bh=EIzcSD9Xq+O5PETXD7ZTRHSCXOme/sQrEKE0wVFuRRU=;
+        b=b1AzzDn+QWsFAEZtul5WFsx/C5RUQcx9ziP1U7aFxQ0iwwZPpxEjj6EjRU76Eg8FsE
+         FOnxqZN23Fxlefnbc1Qh7CdyVXFE22iEh/fAzCpLDVVz93wAorcCCQcWWLFavr+p8zEv
+         YFxKf6S8km4tK8C1KFoig071p7NsYiYiIg1Qsias5MguNH8JKn94eGErzY8Cc+rPzARg
+         wM7dLBjGiknjoomRmFu13uFj9JMRfIeltsQrtNNnl+BXmbvUjKdE7A/s64GlsTlhhZWO
+         yuZJNPLYygO4cXKd0OFz4barhQ5kFFl8pdQXY3/1lHlf9xqbJgeBoM4i2L+gbVOYQshj
+         QbIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707239524; x=1707844324;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1707240297; x=1707845097;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CldblDMAlebalb5iiDPGGktolx1oR4ruKO4COeXHSk8=;
-        b=ilYvlVdhmEHd+ky5vGwQvorLxtZt7+ux72bllNHfZPEJ8Bkt1qQkHOvUDEBNn3I3uh
-         KEb129QL+vMxH5jsiavzsj7FqCkYjbMttDR4TwkR9O3c1waZwqL1G7Fc6JofU/Imz6Ac
-         S94nk28aIEEBmu8db/7D3O7HlWBIkDg/KyP1JBQuM4CG/up1Mwd4Hyj6wq2ChgFQ+EiR
-         EyoGnZdTcL3q2lF0CyfaS2wU9jB5Sr6zVmN2XE0jqdQa16VLFgh8iUgJsQLZ26/Sjuwk
-         J+pHW9TQ/GtndnjvUFBqpuZr814Zy+taTITAdDcacWRtcnCOlBdNPmHR+UzEwbhKG9Ar
-         OQ7g==
-X-Gm-Message-State: AOJu0Yz6pluD0Ef1AmfWozhTIKj7VFdKl1TphN2+zVOIAF51lNimYbtn
-	VcHtlGPHfDkp0hR50IOpMFto4BCJuRTNsoC4CskihFXFlgHcf20zhNbYv9Q4CUM=
-X-Google-Smtp-Source: AGHT+IH5WvOaU75WLDm51dcSu+n4M28I0YcP7YgAbDLBSHRa8AGItFSIR2hOfeubimVXzgpAHZ4roQ==
-X-Received: by 2002:a17:902:c20c:b0:1d9:c2c4:c61a with SMTP id 12-20020a170902c20c00b001d9c2c4c61amr2248084pll.18.1707239523686;
-        Tue, 06 Feb 2024 09:12:03 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCUe8JnVkJkj2WH/Mo1AlT5+oRZICMK2rBSPsygipayB+l+44RVrar5aiC0GyfceQkazA3TL5AvjOqwd2FbXDV9S2YBXTgEgjF6mgRgcySjbtd5QRmSt7QZ/4lC8QkQ3ILQB3rPwkzTSmmqGYlDgJLsCgT3XYh4vC6AS3dReT9zLRTGoa7D8w80hk6gM34Ki36Ai8zrLv9M7GVtD3LmKQ47qknZRRJBZqEHSYIhsW7l8wflyz/l9SNLR48A8Kny/8+b9edP3hrXHlPTys+hl9tMviuDI4jGz6hjCDmYBBD2ckclLpfJNI5TTPTps/ojaOG0cEeZILHh3quD6A/IKFBCOcJHT7sxFH5tKGahTAOLE
-Received: from fastly.com (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id g18-20020a170902c99200b001d95909478dsm2129848plc.75.2024.02.06.09.12.02
-        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 06 Feb 2024 09:12:03 -0800 (PST)
-Date: Tue, 6 Feb 2024 09:12:00 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Gal Pressman <gal@nvidia.com>, tariqt@nvidia.com,
-	rrameshbabu@nvidia.com, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>
-Subject: Re: [PATCH net-next] eth: mlx5: link NAPI instances to queues and
- IRQs
-Message-ID: <20240206171159.GA11565@fastly.com>
-References: <20240206010311.149103-1-jdamato@fastly.com>
- <7e338c2a-6091-4093-8ca2-bb3b2af3e79d@gmail.com>
+        bh=EIzcSD9Xq+O5PETXD7ZTRHSCXOme/sQrEKE0wVFuRRU=;
+        b=wQ35P2i+8DKpv9ePKsU6w+3y1vmMmUH+jJbEchsQ2P8G5EZTLPgeMaLnHG1TScqBzR
+         fMv9Th5QeEZC0NdPkyAEJttHlV9yGgUWGC9qVmwMyFtHqmMI1zzqx0h4KyMzEx3ieGPP
+         TddG7C8Oi+gzo0BTUP7Lxbz4IPF7bCz57FrxdO2lnIbJHCJN5V5bvaae+pwbibum67hR
+         xpzK6wv5eNY3c8INS4z+yKs9Bn5jzQxP2VVnUigRDn+uby5s5gHGyFwTkaPgCaa1y4qj
+         zZWaMBZ5ReW/2hOM0NbD5t8E+45/DlfzCxbANj4t9CZDJds9UBTxr68N7F0tqKauyNtc
+         D0xw==
+X-Gm-Message-State: AOJu0YyVmNsVS4tNXR+Ht+v+Q+nayPvfq6OWkblNylWgle5cr7Kf39ak
+	m7EqnwLxdxwHqL70v6Fg48i8cNUNyWQfpXhE+ZypX6sXcq6ZsvOetUgQsTHnz/AArcnfZ3AvRUr
+	bXydd9vn7oLjJQmoh2t9me0YAIOybsg9HaPfM
+X-Google-Smtp-Source: AGHT+IF7+v4LURbyg1/ybXH31ajB+XF+II0FobTXLWAIg5+nVbLNSWG2FUW/7lWsDMvDD8FoIu7avjb18yLSgXYwcQY=
+X-Received: by 2002:a05:6122:4306:b0:4c0:2416:6fd0 with SMTP id
+ cp6-20020a056122430600b004c024166fd0mr217508vkb.6.1707240297184; Tue, 06 Feb
+ 2024 09:24:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7e338c2a-6091-4093-8ca2-bb3b2af3e79d@gmail.com>
-User-Agent: Mutt/1.5.24 (2015-08-30)
+References: <CALCETrUe23P_3YAUMT2dmqq62xAc7zN0PVYrcChm4cHGJMDmbg@mail.gmail.com>
+ <852606cd9cbc8da9c6735b4ad6216ba55408b767.camel@redhat.com>
+In-Reply-To: <852606cd9cbc8da9c6735b4ad6216ba55408b767.camel@redhat.com>
+From: Andy Lutomirski <luto@amacapital.net>
+Date: Tue, 6 Feb 2024 09:24:45 -0800
+Message-ID: <CALCETrUZuhvR3GygBfyfLxeas+igNe51Tnx=HEnh9LoFutN-dQ@mail.gmail.com>
+Subject: Re: The sk_err mechanism is infuriating in userspace
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Network Development <netdev@vger.kernel.org>, Linux API <linux-api@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 06, 2024 at 10:11:28AM +0200, Tariq Toukan wrote:
-> 
-> 
-> On 06/02/2024 3:03, Joe Damato wrote:
-> >Make mlx5 compatible with the newly added netlink queue GET APIs.
-> >
-> >Signed-off-by: Joe Damato <jdamato@fastly.com>
-> 
-> + Gal
-> 
-> Hi Joe,
-> Thanks for your patch.
-> 
-> We have already prepared a similar patch, and it's part of our internal
-> submission queue, and planned to be submitted soon.
-> 
-> Please see my comments below, let us know if you're welling to respin a V2
-> or wait for our patch.
-
-Do you have a rough estimate on when it'll be submitted?
-
-If it's several months out I'll try again, but if it's expected to be
-submit in the next few weeks I'll wait for your official change.
-
-BTW, are the per queue coalesce changes in that same queue? It was
-mentioned previously [1] that this feature is coming after we submit a
-simple attempt as an RFC. If that feature isn't planned or won't be submit
-anytime soon, can you let us know and we can try to attempt an RFC v3 for
-it?
-
-[1]: https://lore.kernel.org/lkml/874jj34e67.fsf@nvidia.com/
-
-> >---
-> >  drivers/net/ethernet/mellanox/mlx5/core/en.h      | 1 +
-> >  drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 8 ++++++++
-> >  2 files changed, 9 insertions(+)
-> >
-> >diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> >index 55c6ace0acd5..3f86ee1831a8 100644
-> >--- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> >+++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-> >@@ -768,6 +768,7 @@ struct mlx5e_channel {
-> >  	u16                        qos_sqs_size;
-> >  	u8                         num_tc;
-> >  	u8                         lag_port;
-> >+	unsigned int		   irq;
-> >  	/* XDP_REDIRECT */
-> >  	struct mlx5e_xdpsq         xdpsq;
-> >diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> >index c8e8f512803e..e1bfff1fb328 100644
-> >--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> >+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> >@@ -2473,6 +2473,9 @@ static void mlx5e_close_queues(struct mlx5e_channel *c)
-> >  	mlx5e_close_tx_cqs(c);
-> >  	mlx5e_close_cq(&c->icosq.cq);
-> >  	mlx5e_close_cq(&c->async_icosq.cq);
-> >+
-> >+	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_TX, NULL);
-> >+	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_RX, NULL);
-> >  }
-> >  static u8 mlx5e_enumerate_lag_port(struct mlx5_core_dev *mdev, int ix)
-> >@@ -2558,6 +2561,7 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
-> >  	c->stats    = &priv->channel_stats[ix]->ch;
-> >  	c->aff_mask = irq_get_effective_affinity_mask(irq);
-> >  	c->lag_port = mlx5e_enumerate_lag_port(priv->mdev, ix);
-> >+	c->irq		= irq;
-> >  	netif_napi_add(netdev, &c->napi, mlx5e_napi_poll);
-> >@@ -2602,6 +2606,10 @@ static void mlx5e_activate_channel(struct mlx5e_channel *c)
-> >  		mlx5e_activate_xsk(c);
-> >  	else
-> >  		mlx5e_activate_rq(&c->rq);
-> >+
-> >+	netif_napi_set_irq(&c->napi, c->irq);
-> 
-> Can be safely moved to mlx5e_open_channel without interfering with other
-> existing mapping. This would save the new irq field in mlx5e_channel.
-
-Sure, yea, I have that change queued already from last night.
-
-> >+	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_TX, &c->napi);
-> 
-> In some configurations we have multiple txqs per channel, so the txq indices
-> are not 1-to-1 with their channel index.
-> 
-> This should be called per each txq, with the proper txq index.
+On Tue, Feb 6, 2024 at 12:43=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
 >
-> It should be done also for feture-dedicated SQs (like QOS/HTB).
+> What about 'destination/port unreachable' and many other similar errors
+> reported by sk_err? Which specific errors reported by sk_err does not
+> indicate that anything is wrong with the socket ?
 
-OK. I think the above makes sense and I'll look into it if I have some time
-this week.
- 
-> >+	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_RX, &c->napi);
-> 
-> For consistency, I'd move this one as well, to match the TX handling.
+Destination/port unreachable are *exactly* the primary offenders.  Consider=
+:
 
-Sure.
+1. TCP socket.  If the peer becomes unreachable, the connection is
+unusable.  Maybe reading previously queued data is reasonable; maybe
+it's not, but one way or another the connection isn't working any
+more.  The current API seems okay.
 
-> >  }
-> >  static void mlx5e_deactivate_channel(struct mlx5e_channel *c)
+2. UDP peer-to-peer connection.  I have a socket and it's connected to
+a peer.  The peer sends an ICMP error or a route changes and the
+kernel can't route to the peer.  The connection is at least
+temporarily dead.  If we accept that temporarily dead equals
+permanently dead, then returning errors codes makes sense.  Even if we
+expect the application to try to recover without making a new socket,
+telling the application seems fine.  The application will understand
+that an error occurred communicating with its peer and can do
+something about it.
+
+3. UDP *server* with multiple clients.  (Or unconnected UDP socket
+communicating with multiple peers, etc.)  Imagine a DNS server or a
+QUIC server -- I hear QUIC is cool lately.  A userspace server has a
+socket, and it does sendto() or sendmsg() to a whole bunch of
+addresses.  One of them sends an ICMP error.  There are multiple
+things the server might do.  It might ignore the error entirely and
+treat it just like a timeout, because it probably already has
+perfectly nice timeout handling.  Or it might want to know that there
+was an error communicating with a *specific* peer and release
+resources sooner than it would for a timeout.  Or it might want to
+collect the entire ICMP error (via RECVERR) and do something useful
+with it.  But it gets no value whatsoever from knowing that an
+unspecified peer sent an ICMP error, and it gets negative value from
+having a call to recvfrom() or recvmsg() fail and needing to look up
+in some hopefully-correct table whether the failure indicates an
+actual problem (EFAULT, for example) or a completely useless return
+value that should be ignored (EHOSTUNREACH).
+
+(#3 is probably worse if the application uses one-shot notifications
+-- the application needs to make a decision as to whether to call
+recvfrom/recvmsg again or go back to polling.)
+
+--Andy
 
