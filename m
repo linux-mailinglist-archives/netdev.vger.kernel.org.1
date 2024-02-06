@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-69627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 975C084BE49
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 20:48:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BACF884BE4B
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 20:48:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5B0F1C20319
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 19:48:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF1FB1C20B3B
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 19:48:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9266A17579;
-	Tue,  6 Feb 2024 19:48:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D075F17997;
+	Tue,  6 Feb 2024 19:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F1cJ0JrH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QM13XXhs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD1F617730;
-	Tue,  6 Feb 2024 19:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E84317732;
+	Tue,  6 Feb 2024 19:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707248883; cv=none; b=jdoyyWsbiG925wABolGb6ZZSpw5jbyt8JkiFWUJwyeR+ySBluEkiqmFMklvznR4xSS6yIXniwMys7UIJRNJzIHdwvQCrGtQQ2qlbEs0njiRbDvX50eDKtZUzhQkdsaYQmAE74uOVcYjo9Lr6Qda6+wubBuN7J+VXtzdOwglMBZs=
+	t=1707248884; cv=none; b=RO8jslA1xQwbpZmVAaAEjSuvPsl52yuFHSFSl5jjXUimGkUx+m/+05x40V3SqSqdXTX/o3ByJlGxgmQcIUcTUJqHfuGqeOJcBan7WK+4XAf/l6SmnNfmmCdZC+MYKjYwl0/ZGg6Z+A6mZO9BGAAnLC/2C2RzF4NOphKJzFhWo6w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707248883; c=relaxed/simple;
-	bh=f8momyWthQvHXshHKFaZKW4+PsSEkHD5atm8D7vlgiY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DDHPezhwPrOPYSEmcD7g1S5DevEBbt/9rhPcpATVImkX1ITU7ivZh8reIK5SedgiYA6qxArSNKOU2YFrTw1iX5ZfNPz2bYgt4HPphzAmoIl2u33Q7KxysdtEG4QdLH6iTkslm/U9hdH5aiCCkGW1/pa3jGm9ZmMzj/Zh4n8UFyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F1cJ0JrH; arc=none smtp.client-ip=209.85.218.54
+	s=arc-20240116; t=1707248884; c=relaxed/simple;
+	bh=x2MdhysimRENxyjPQHQdx2JbTpOa46tSc8/8WlNEpls=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ouF3lFUEDRoHlHV1PvFHp80ToVHjPW/PunY15qBRGnyS4Rb4ZrE946UT1bI2S3cKASnU1oBGRVV5MxGa1kwPLVudv38SOA+dGdRCh812hUyDITFmBgr+NpyM04zpI9e5Ru938n8WYmPi/H2+A4Zb2pNU4tB1rv7ZV0Bv2aJzQao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QM13XXhs; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a38271c0bd5so133190966b.0;
-        Tue, 06 Feb 2024 11:48:01 -0800 (PST)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a3850ce741bso44291366b.3;
+        Tue, 06 Feb 2024 11:48:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707248880; x=1707853680; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=1inhWZLgkqsIZoNuob5TJaNdpYv+jmAPLQY9dtW8I+4=;
-        b=F1cJ0JrHmWQxgSi7sGEMY/rSFw9grlM9PDIkU+Z6iZMwZhNEb2KCqQkEDa3f2aqD5q
-         XD+9mhntouu8ZcUBToOd6k6xJzfartCPAvtdzumIINR7V221+QGQTpUgVz3Ah7bFAqyn
-         FH3P4ZjTSXfn+chga+vvAeV8WeBoEiKe4vWJm/S9/KIHOuLhY1wZY168MMLDGTLXyNTD
-         bQjxZJuW1JmBbSYpKmUkFjFiRXf4Ta7ix65Je06ac7lcjoNDBlHlyTWKLpODMKhm1fc3
-         PN1KiEqIUcTeFD1P4X1J8wpUrtbUoVwGRlk4Bx/Is3kq9SokDFN2TWLMCMmZgLdcHcjr
-         8h7g==
+        d=gmail.com; s=20230601; t=1707248881; x=1707853681; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K/DvP+G5piodo/QeKyAlZmL/zZmPWMJigSGfpjLwzmU=;
+        b=QM13XXhsEx92LtNxDW0keuN7KDOUeGwPhNd+LqgA3aB6e72tcMyvRlL462AOW9gL4k
+         7BbUCQD1bQ6PmdHDMbjUymzp5Kxy4ns594zWqQMweB1F7kWDJJONKlu7IoCdKHhjY1In
+         Y4PWooXzqZGz3pBK3+CRWKnLjwjAcD46WtH9OU8uNr9KdFao7hbPnqGcVVFxK7DF35Z8
+         co/IpNUDxZc3qqWKqm7CXuAN+a23Uw6mY+v13e1PZ7JYcoZUxlXQiX7J9VTxIRv3WOCh
+         aexcbGWkwsxp+AgkvDN2RnJ4YT5MBXlzGOiLkHrUHEzr/yg0GLkVAIHfzrBjXnAmepSo
+         DUxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707248880; x=1707853680;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=1inhWZLgkqsIZoNuob5TJaNdpYv+jmAPLQY9dtW8I+4=;
-        b=WOTeAwK7WKAqDuc8L7Q+SXQjO6kIeSud09LXik9e11dKvF+fwY55O4XU24kodxqStC
-         Fe8FZsWOfsnMXTKloGGvWc7g5JDIbYHHWSDGJSRReamJK1eegcmU+/kxO8gZXFCci4G9
-         Yj5sy/+ukJ2al/RG5c7Gmh4BMfrWu2oWm0TB/sKktbe1+fsIiQPGi60EgYfnKfeXzaMZ
-         MrVno+yO2kI6vdakUvbnNuVsyWDaTspiKa96LDEHt70y2IvnUcrbsXEO+ZzRAITFv8i/
-         2tJkQGqzw1YUZg50frWSs6BWvubDC8mM7GtJmjseGx7WzirkfOs/cqZHtSgXMZUVuVq2
-         YASw==
-X-Gm-Message-State: AOJu0Yx2ISPV+l6hIggjREWdJoQTOVnxHNcBtzqoXYx/pMlk5XdY19rC
-	5CQteW8RJl6wYsdBGaR5AAYFoZ1iyylrgFZqQb5gYhQlAONI6ZMy
-X-Google-Smtp-Source: AGHT+IEJecEmIFbXNvKyaNthn4NmtrIZF6dG87jffosPBfxOiObTqJmO8nUyoxn2j7A2p3NYhqJQqg==
-X-Received: by 2002:a17:907:7711:b0:a38:259c:1335 with SMTP id kw17-20020a170907771100b00a38259c1335mr1787968ejc.44.1707248879789;
-        Tue, 06 Feb 2024 11:47:59 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCWs/eCwG/eDszW1BhqsR3kKejgUHwF6IjMLRdu6nSVd0+TKoNkLZsrEGrdus3W1fk2PIclI3RkUJNb4JAALOiPFWw8UwJWtSjv6f5OjXI61tBvUSpHBaYUgjvop8JERQ2AsXNgHF4M0kPaNt1wH6zq+CrIwyMp7nFXxw8rvYV6xRsOE9itQIfgr/syU0MHmb8+fNH1JmD7XawlaCwob7EzEcOYQ+I4CKO/mwYcQVpeL0tLvdYcDiNnkCkx1PB7cezbfiFBi4c/4qVu5ScSLjELiTUV4jFEJGD5h6Gs6OmoxXI2JuSbkAFr8hC4tj6SKk0pG934s5PftTRGNVraBqaZyi0HVcE3KeskADZdDPt7xbGqb2RDFqko8x9Nm9bSz6fefRMVz3gtQc0rh07cL6MKOdspRSyjSu+OEU/RHOKIiR3qC02IRjoWImgjSAV32VMrlaLNJGfMzLwQZARt9zFWOflX0UVgKtQhjUUuIL/tCbFQnIFl0Dr9M/tKDhn4vEZAtGy9LI1kW2UaD/yrnNa6tZI0Na7OiMVJJKBsIysK9LXveRNzfS2Hpdaktl0xf/rkDrUV8x9gfSqKelmYdDHMvOypi
+        d=1e100.net; s=20230601; t=1707248881; x=1707853681;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=K/DvP+G5piodo/QeKyAlZmL/zZmPWMJigSGfpjLwzmU=;
+        b=CoBvbJF8Ah1F07ltAaKmUa06Aufb085JJkXNcyB4JuX3DLjRO7M+v7H0eMi953HB6L
+         hbAGjn66vgsuq5FUMk5QjyhliS9fwPBEpVRaa9PrAH+U6kGyd9Z+eP48E7i6EaF059sr
+         ikMflFGWckOl0CYAijr48bqCeOlkmnlwl9nPiwoWn3VY6Sj4rmH9ZhThUwWTOlTKGJ8q
+         /qRAJb1er7/YYuAsaURsOMhK6R1BPaPXyIB1anI6rMKiTeTjKDKcPwOnh4HkQxGG0Nzq
+         EWcW/UJXYyuFumSX48CGvr0QaF8lDQVsso7nnITP45xySpzwPJtt72RGRelarJ6qSV2h
+         NAkQ==
+X-Gm-Message-State: AOJu0YzgJv9HFlo0acHJBTctl/nhXfiU4zVQVHRhOpCGSIxJeelr5Fla
+	yCUtHXGVAH01hbxeKi4FYEME86ymx5FOAaXzcrGLDREuS2vYxU6QiPlvPLzCtK0=
+X-Google-Smtp-Source: AGHT+IGoWnMv7SeumUMb+2VrQJkLp2YnDEEWOaoOOZ+v6qqNGg8K9Ox1suDLMmgZddT+6uNZailAPA==
+X-Received: by 2002:a17:906:185:b0:a34:a6af:22f1 with SMTP id 5-20020a170906018500b00a34a6af22f1mr2353097ejb.62.1707248881010;
+        Tue, 06 Feb 2024 11:48:01 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVCR6+j//Rky8k2bai/an7iaiHTHfa4QUpK17Tx3sIU7ksl+Nb6N5kaXPmAQSbDLzwJ9CirOBpfT8pqzZdWJOPpNy/9e6/yCSsFoJUDYuN00eyRdG1KwvxgasbomLfAazfdoL0vUzfpjaMt754pI4RcC8e9K+2nzrzfqtOrrvdpjzbIlcS6y0WEkCCBruwFwHoLFzIEFvjGOBQbI5dufHZFj9tdQoj/z25VmNbXz25dfX4D+72b+d6ZsW9GpdJoB8wmP3s4wl0Iool92MpUBjPawkMpgn+CR8bo0ejHSynXEBKQyWmpIjC3Lh/42bd80TZjRFoVY/ZQBThCEm35GxKe2fWE7fHFzWWk8bl/Pu5Wip167i+3vjxapGt0f9XG7kw32b/7sWr0dudqxoKPhudu1r7l34aESsuJyeoBFgntz09/Qi0swBpkPM0QDbQKIRYhwHBTZPwJLgeoOiF4AJfm9HUCREBgBPte3P7r7ehERiOu6lYvZscvyulH8JcJEDyssaqbNNHEUPLv48b63T3GJ5y1v2V2nRPIqja7y6Xk3ZEGDy09KrzP1PYZNQia4E9gAPwG3Od09/aB+Du0Tl3Lcd9M
 Received: from corebook.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id ps7-20020a170906bf4700b00a379be71a84sm1476767ejb.219.2024.02.06.11.47.58
+        by smtp.gmail.com with ESMTPSA id ps7-20020a170906bf4700b00a379be71a84sm1476767ejb.219.2024.02.06.11.47.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Feb 2024 11:47:59 -0800 (PST)
+        Tue, 06 Feb 2024 11:48:00 -0800 (PST)
 From: Eric Woudstra <ericwouds@gmail.com>
 To: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -85,10 +87,12 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: netdev@vger.kernel.org,
 	devicetree@vger.kernel.org,
 	Eric Woudstra <ericwouds@gmail.com>
-Subject: [PATCH net-next 0/2] Add en8811h phy driver and devicetree binding doc
-Date: Tue,  6 Feb 2024 20:47:49 +0100
-Message-ID: <20240206194751.1901802-1-ericwouds@gmail.com>
+Subject: [PATCH net-next 1/2] dt-bindings: net: airoha,en8811h: Add en8811h serdes polarity
+Date: Tue,  6 Feb 2024 20:47:50 +0100
+Message-ID: <20240206194751.1901802-2-ericwouds@gmail.com>
 X-Mailer: git-send-email 2.42.1
+In-Reply-To: <20240206194751.1901802-1-ericwouds@gmail.com>
+References: <20240206194751.1901802-1-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,27 +101,68 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the Airoha EN8811H 2.5 Gigabit PHY.
+The en8811h phy can be set with serdes polarity reversed on rx and/or tx.
 
-The phy supports 100/1000/2500 Mbps with auto negotiation only.
+Changed from rfc patch:
 
-The driver uses two firmware files, for which updated versions are added to
-linux-firmware already.
+Explicitly say what -rx and -tx means.
 
-This patch series adds the driver and the devicetree binding documentation.
-
-Eric Woudstra (2):
-  dt-bindings: net: airoha,en8811h: Add en8811h serdes polarity
-  net: phy: air_en8811h: Add the Airoha EN8811H PHY driver
-
- .../bindings/net/airoha,en8811h.yaml          |   44 +
- drivers/net/phy/Kconfig                       |    5 +
- drivers/net/phy/Makefile                      |    1 +
- drivers/net/phy/air_en8811h.c                 | 1006 +++++++++++++++++
- 4 files changed, 1056 insertions(+)
+Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+---
+ .../bindings/net/airoha,en8811h.yaml          | 44 +++++++++++++++++++
+ 1 file changed, 44 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/net/airoha,en8811h.yaml
- create mode 100644 drivers/net/phy/air_en8811h.c
 
+diff --git a/Documentation/devicetree/bindings/net/airoha,en8811h.yaml b/Documentation/devicetree/bindings/net/airoha,en8811h.yaml
+new file mode 100644
+index 000000000000..99898e2bed64
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/airoha,en8811h.yaml
+@@ -0,0 +1,44 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/airoha,en8811h.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Airoha EN8811H PHY
++
++maintainers:
++  - Eric Woudstra <ericwouds@gmail.com>
++
++description:
++  Bindings for Airoha EN8811H PHY
++
++allOf:
++  - $ref: ethernet-phy.yaml#
++
++properties:
++  airoha,pnswap-rx:
++    type: boolean
++    description:
++      Reverse rx polarity of the SERDES. This is the receiving
++      side of the lines from the MAC towards the EN881H.
++
++
++  airoha,pnswap-tx:
++    type: boolean
++    description:
++      Reverse tx polarity of SERDES. This is the transmitting
++      side of the lines from EN8811H towards the MAC.
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    mdio {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        ethphy1: ethernet-phy@1 {
++                reg = <1>;
++                airoha,pnswap-rx;
++        };
++    };
 -- 
 2.42.1
 
