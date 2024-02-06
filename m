@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-69416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 542AB84B159
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:34:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CBED84B176
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:38:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8478E1C21805
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 09:34:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3DE4B25327
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 09:38:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0561712D173;
-	Tue,  6 Feb 2024 09:34:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFB7712D153;
+	Tue,  6 Feb 2024 09:38:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hcbmDRNj"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dKXLtGPR"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911C212D14A;
-	Tue,  6 Feb 2024 09:34:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7FE12D148;
+	Tue,  6 Feb 2024 09:38:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707212078; cv=none; b=qzqQ6cSuFSNMw5AfqHovfpm/vu45hgVv9RSRSZqVTPpN2+2OCoGUIwCidDvOPInFolVDCaJkuVyVRnVHMweObldnu5nd63COpwPfiSrdzz1Graa1rZsgHijempnecko94yc/D5rZjr3DKyXRvD0m+AB9f4GWOEjlZ8OmJc0n2i0=
+	t=1707212327; cv=none; b=GgoN7f/HqddlxvYCgnxbf6LNeqtJr8ge6zXSul483yItAA81zgMXECvZb600LtFFhhr9HHxsigLmHUi0kgdB5FEPYNn5bhq5xhE1X5exuWx1+ijy2sKNGhm7bJNR98jTiND8qfopzNK5t00thHi5t2JlojlnrcAyv8OL/dQwLoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707212078; c=relaxed/simple;
-	bh=ZjwtMnb/rp1IyLFLZEuYTb0KRKrk1a1mS6/JzlAlRWc=;
+	s=arc-20240116; t=1707212327; c=relaxed/simple;
+	bh=R1JkbkHYZjBJccdGuVGW2VQafUHeELVUbK2T3y/y9DU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fq0F5HDJmN2vyxsJGxbqJDK7NcmKkHWqiCVyFci54949iF04xF9t13iGC9YAGiBvco431UVKPAWwdohmHio9snp0uPwmOmKTSkuAeTKP63mnMpdIelLEmobmF0i3C+Qy+MIjJshxyksaeXIA2sG+ug081XKkzr+STHOXRXmCJks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hcbmDRNj; arc=none smtp.client-ip=217.70.183.197
+	 MIME-Version:Content-Type; b=NmeyYu621HewxSKlRSi80Ey6KEvpAplVjFC7o+eRQNxeJGY3gnqaNOF3L7sEs6joXb0et4+x93IKSnYj/QN3F1NsGeyA9E+I8I4aDrX7HhRFIbyTT58RPbX6IDhhhX6/F/9y+yS4KIKiDN+lPDw7C48gcIZPGELn3MgJse2sD5g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dKXLtGPR; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 82AA31C0004;
-	Tue,  6 Feb 2024 09:34:26 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 26B2E1C0004;
+	Tue,  6 Feb 2024 09:38:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1707212067;
+	t=1707212323;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mUixx3iBL3zLfOd+J4Lc/59gG+HVlflMASxiV2Jzw18=;
-	b=hcbmDRNjnQSZaxjzQPjZaqpaUocQchlBfZMaA3xreLWsdAsx14y6e5eZgqWEo5sjYasnrp
-	xYzbetFMgNPSu4OEmfDPKxqlTnqL4FWDXd6VzqliPfUpJj3DeXHLeIkm7gt8UGQtPYlk/9
-	UjxrS9LqjLOos/Xo7m/onVAtOjvwV2bWZATLG9xY3f2reOlsaYA9Ona79A9+nueZCrenZk
-	FxB52U/y+uRDgVcFRXgUY0xy5Imi0AT8RZKPnger7moODGcgBM1SO0XZAjAEI5hdnon/CU
-	se8Lj8Pb0pUgMFmK5PeXHLjJxl9Dh1jYx6kuP/EwwI9GFL/5lfNnbmy55l5boA==
-Date: Tue, 6 Feb 2024 10:34:25 +0100
+	bh=R1JkbkHYZjBJccdGuVGW2VQafUHeELVUbK2T3y/y9DU=;
+	b=dKXLtGPRXyrAMOrPTXbdEyI20UREUIhUzE+Mf1Z5vpipNPJdGYMVPkrsUQeoigC1hwWnkb
+	+sM/Si7s/HdqTv9NJGKDnsV0uLZobsBHMzgjmbD4K2wnudQJXaLBCBra8zBnv8j0xNA7kC
+	8vGEoiOuRG5cnA6VA9PtfySl3RUAvBpgybPSqe+1fsUeivB74y2RiRnOcRwyMSPcRb032N
+	hOtgA17p2NVRic19T0+WnJSj06W4R2W6/zdYQQ1bcLS98kh3PkmcXJdgUjfn03M3Zfql6B
+	Kb1Rtjq5ghJdvaH+4DpXNXzP2XvEKZl5yXAe4j3mW0eXFWOMNUP9ZRiKbIWvbg==
+Date: Tue, 6 Feb 2024 10:38:42 +0100
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: Andrew Lunn <andrew@lunn.ch>
 Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
@@ -55,11 +55,11 @@ Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
  Nguyen <anthony.l.nguyen@intel.com>, linux-usb@vger.kernel.org,
  netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  intel-wired-lan@lists.osuosl.org
-Subject: Re: [PATCH 7/8] net: intel: igb: Use linkmode helpers for EEE
-Message-ID: <20240206103425.28e64a8f@device-28.home>
-In-Reply-To: <20240204-keee-u32-cleanup-v1-7-fb6e08329d9a@lunn.ch>
+Subject: Re: [PATCH 0/8] drivers: net: Convert EEE handling to use linkmode
+ bitmaps
+Message-ID: <20240206103842.0a72ed27@device-28.home>
+In-Reply-To: <20240204-keee-u32-cleanup-v1-0-fb6e08329d9a@lunn.ch>
 References: <20240204-keee-u32-cleanup-v1-0-fb6e08329d9a@lunn.ch>
-	<20240204-keee-u32-cleanup-v1-7-fb6e08329d9a@lunn.ch>
 Organization: Bootlin
 X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-redhat-linux-gnu)
 Precedence: bulk
@@ -74,68 +74,20 @@ X-GND-Sasl: maxime.chevallier@bootlin.com
 
 Hello Andrew,
 
-On Sun, 04 Feb 2024 17:40:24 -0600
+On Sun, 04 Feb 2024 17:40:17 -0600
 Andrew Lunn <andrew@lunn.ch> wrote:
 
-> Make use of the existing linkmode helpers for converting PHY EEE
-> register values into links modes, now that ethtool_keee uses link
-> modes, rather than u32 values.
-> 
-> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+> EEE has until recently been limited to lower speeds due to the use of
+> the legacy u32 for link speeds. This restriction has been lifted, with
+> the use of linkmode bitmaps. This patchset convert some MAC drivers
+> still using the old _u32 to link modes, with the aim of soon being
+> able to remove the legacy _u32 members in the keee structure.
 
-[...]
+Although I don't have proper hardware to test all these, I've read
+the patches and I didn't find any obvious issues besides the typo in
+patch 7.
 
-> @@ -3109,6 +3111,8 @@ static int igb_set_eee(struct net_device *netdev,
->  		       struct ethtool_keee *edata)
->  {
->  	struct igb_adapter *adapter = netdev_priv(netdev);
-> +	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported) = {};
-> +	__ETHTOOL_DECLARE_LINK_MODE_MASK(tmp) = {};
->  	struct e1000_hw *hw = &adapter->hw;
->  	struct ethtool_keee eee_curr;
->  	bool adv1g_eee = true, adv100m_eee = true;
-> @@ -3138,14 +3142,21 @@ static int igb_set_eee(struct net_device *netdev,
->  			return -EINVAL;
->  		}
->  
-> -		if (!edata->advertised_u32 || (edata->advertised_u32 &
-> -		    ~(ADVERTISE_100_FULL | ADVERTISE_1000_FULL))) {
-> +		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
-> +				 supported);
-> +		linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT,
-> +				 supported);
-> +		if (linkmode_andnot(tmp, edata->advertised, supported)) {
->  			dev_err(&adapter->pdev->dev,
->  				"EEE Advertisement supports only 100Tx and/or 100T full duplex\n");
->  			return -EINVAL;
->  		}
-> -		adv100m_eee = !!(edata->advertised_u32 & ADVERTISE_100_FULL);
-> -		adv1g_eee = !!(edata->advertised_u32 & ADVERTISE_1000_FULL);
-> +		adv100m_eee = linkmode_test_bit(
-> +			ETHTOOL_LINK_MODE_100baseT_Full_BIT,
-> +			edata->advertised);
-> +		adv1g_eee = linkmode_test_bit(
-> +			ETHTOOL_LINK_MODE_100baseT_Full_BIT,
-
-Probably a typo, I think it should be ETHTOOL_LINK_MODE_1000baseT_Full_BIT
-here :)
-
-> +			edata->advertised);
->  
->  	} else if (!edata->eee_enabled) {
->  		dev_err(&adapter->pdev->dev,
-> @@ -3153,7 +3164,7 @@ static int igb_set_eee(struct net_device *netdev,
->  		return -EINVAL;
->  	}
->  
-> -	adapter->eee_advert = ethtool_adv_to_mmd_eee_adv_t(edata->advertised_u32);
-> +	adapter->eee_advert = linkmode_to_mii_eee_cap1_t(edata->advertised);
->  	if (hw->dev_spec._82575.eee_disable != !edata->eee_enabled) {
->  		hw->dev_spec._82575.eee_disable = !edata->eee_enabled;
->  		adapter->flags |= IGB_FLAG_EEE;
-> 
-
-Thanks,
+Regards,
 
 Maxime
 
