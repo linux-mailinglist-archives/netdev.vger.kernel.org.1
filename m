@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-69515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6404A84B83D
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:46:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 000D784B858
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:50:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3188FB2D7AA
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:44:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C24A3B298B6
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:44:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E609133402;
-	Tue,  6 Feb 2024 14:43:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E61871332BD;
+	Tue,  6 Feb 2024 14:43:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="26iPtr/P"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TDUrnutC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D49FB1332BD
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 14:43:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 695C913246F
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 14:43:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707230615; cv=none; b=nS+LFI2uEDl8tDx5x0vAPU9fSlXhcWlGiommWeRufoTJlmxtKYj1oYneTnXRl2pfeFDLuJa7UV0MDCcH39NmI2tp1YGSEGuWeGc2zggVGMFpVscNUoLsWPDHB5qxdlM20RP6Kl0Hig+mGyoZY+7CCKb1G3LT/zy/fTf1T9EYflg=
+	t=1707230616; cv=none; b=SGWnNCzzM0mb8J+GfdzU/Tc+uIIhtHDu1MJvlEJTX1RD0OqgcdYzVGrpXiwuVENOe5dQTNlmxJsxjK9Y4GAWYH44PtzppFsj6cyKX59A1jSVu2dMEn6IOtFu+mC3EKc4Rgpf1cIuaLFO0SxKSFVGwikMTslzFtMq1GyZR7aI5ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707230615; c=relaxed/simple;
-	bh=6n9gdaY0JENPgIo8oGFslsH+VbHEMvGjQze+JywtgPg=;
+	s=arc-20240116; t=1707230616; c=relaxed/simple;
+	bh=JHINC854ia98PUJGcuLobWS/goCDxB+drerbt4+vUfo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=sVMNDFKE7+aBvqnu0aG9Tmb6n/riAuYAOvzEOlOWaFcaEFSfgNIRHVPpKlBGd2ZO2bU7N67hbt+cY47KZlIO9gL80K5+w3Nu2wWcDTbUSJlhfBSBQ9aKIhKY/FNizexcPKxMDM/h/prbkQ5DWrWhmhNQKJl04KvX+qqIKY6vuuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=26iPtr/P; arc=none smtp.client-ip=209.85.128.202
+	 To:Cc:Content-Type; b=H+rU+BgeYV1SoJtgBSqrkD+qJ8lTXreeveIpMUVjJzqouxi9pOO2vIlviAlLZciUfqsD+M6sHoR+ARlVYpMQU3vLT98wbr0J58AN7y0QDCZTL3NwtKEo21+J0H6ijqFHmMqFsxbrsl610MlL7vDqbQIUZD9byHMYkzK/RuucbBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TDUrnutC; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-603c0e020a6so72868307b3.0
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 06:43:33 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b269686aso1464506276.1
+        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 06:43:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707230612; x=1707835412; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1707230614; x=1707835414; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JUsyewKeOm1iP/Rrb+VKWW8m6kBjDn3VkleFYn6PXNc=;
-        b=26iPtr/PnyGJT+CUEqR3E3sYta/kLpSnZU8Dpe5tO94iyUyLOV7Btzpuh12lEq/w6V
-         GxlDzOt2e3trJoJbkrFCI7rG421IfK9ceXpgFiC3QkT67oXW88JHPjnlERxvaO5M+eVi
-         xCcpvAOeTdUQ3Jg0Nje1bQxrwRn5pqsPr7oKw9o8DIfpjXKJycv58M3wh9ZH0Eqgwu0b
-         fKpYpgLmVmy7gB2SA5gLdtIqZxn8tTgpRfM8DYtGVtKuVPbLV9l8jnOHPIOzbZJ/VIQn
-         emGUzFhkir5hjzMB760rOX++LmWrx+bxcxG8eIw62oYh76uKCYbXNA+a9EbaeDJbAS0b
-         Kj9Q==
+        bh=sJ5+OvkCx7q7sa2Wuj/YvUBwdeuOFa3Bfx0+2rdMfyo=;
+        b=TDUrnutCj5NGWj/4zexSKM+EOZwC76wu/KXmoVefXsCUIvF/fh6WNdC4sHVjZjJkWG
+         vfK7PnVcTXEaZkjlco1/D1idnNwZ8OSoqgYu3PAg69BLjPMLpRtKwxhyKjkz3b6VQMZj
+         nfw9+lHqqbdXEDhdlWqL3tZIX+mx7ZGxV2GyLbemeCVvYlfXO35E2XzHqc1XvmBuRLan
+         yQtvZNS18NTHiimTqb4lv9LKIPn4UK3++iPenkWBrKFb+NN/IZEoASOrAXAVgdrdYlOX
+         0uIw/NC198R9aLUSibS+oo7Jmus/CCvYweYiiMbdmlps2dXTC8uiD+hYIsLPKWuiMQoq
+         h7uQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707230612; x=1707835412;
+        d=1e100.net; s=20230601; t=1707230614; x=1707835414;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JUsyewKeOm1iP/Rrb+VKWW8m6kBjDn3VkleFYn6PXNc=;
-        b=Rv+rmGRHvKSp7v4Q2a4UpIp6297D9eVBf9gZuQ/6NHJa9xbO9wrgMwd3FfeavYLL26
-         pjCO3r852CFcsnP1lMcxr17bi1J3u+89yyUny2Sov8jncS3jfUZrk2IIvnqVwIcXk0XW
-         YFd5kRRj+IlZ+DsdbrQCXCMXEzA8bo5kOUL8jilcX8V3zS+SutQDp9Nq+jZ2ohdSxH/X
-         3P2nYjD2VltEuEoP7VhyIHJPXh7wGa0n2E29P69TCfDof2gaZPKvertnJj/LAfG+n9F8
-         eUW+aCm/jRmY+hjFAYMEeS2GjtGI5mvey9yH0ISRjSAsaEwiM+aCzWpOQCUFJ+RIWARB
-         /EDg==
-X-Gm-Message-State: AOJu0Yx6FBkc5PMXpzNMJEDNi7T6dJgcJTb8rG5yvkAoS3+656PX37O7
-	0r5WnmCz1aozZX/3I6ExTL+zSdBJ00uKTdhQDU68GVy2YDy2xxHVnj2TSGTr65cxuG4IYBE6ITF
-	LTlFhhNttHg==
-X-Google-Smtp-Source: AGHT+IFzA86TcVPkTKlc+H5iF2zowqMaom9bLNjaTAoY69L3eBW6r3BmNFp+AtZX5hYbWfIFzXzWkzXIftdI3Q==
+        bh=sJ5+OvkCx7q7sa2Wuj/YvUBwdeuOFa3Bfx0+2rdMfyo=;
+        b=b9bdz/UwX9XLRUIGE8KAIE4EpJPj1E3nKgUjn0SqGkGADwzTnSZpsnZqRp0UNw41wd
+         /+RneAKZFhR43o0iiCPDgHAzJiwubtAf8+T8R1qemJpB5dhPordICkQ2+p6ORoxM/VfD
+         li4JoL5accrjrQeh+2DDlw8vn3Mq3xM21zUq39yj+2v4IitQEQxf6TxWlOqqqm9LWjBm
+         7V2m9i2cJHma4lbzqvTRvI1aqdnc9IAv1LwIx/uQq2hfFqA0piL8aUAhoLdYA1l/m2sS
+         8g/T/pXCohATOfSLpbgcnD7GqxlPEuF5P7O3B7wdn2pvhqYochA/xIIl1M9fWo4FGRuH
+         xyVg==
+X-Gm-Message-State: AOJu0Yxy69D8bItA6axOZMTl4ntiAtVAYzCxELGwp7LVRyvSauPhl2bB
+	1KvF7dflWRutodzdv0QVL/fpuNtLUXhahS3Q7cpkCRXcalzRKzaKxbg2Gq1cRRc9yy694/dEbKU
+	8oyuntVQ/5Q==
+X-Google-Smtp-Source: AGHT+IHyC91Y+gAlHTgkM6jPP3Up3BEe0en6EYIocaa7im3qex11oNcBimtjh6ThzkNhlmQSoEkExk8Hd/+t1Q==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:2005:b0:dc6:a6e3:ca93 with SMTP
- id dh5-20020a056902200500b00dc6a6e3ca93mr47874ybb.10.1707230612798; Tue, 06
- Feb 2024 06:43:32 -0800 (PST)
-Date: Tue,  6 Feb 2024 14:43:05 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:248a:b0:dc6:d1d7:d03e with SMTP
+ id ds10-20020a056902248a00b00dc6d1d7d03emr54830ybb.8.1707230614450; Tue, 06
+ Feb 2024 06:43:34 -0800 (PST)
+Date: Tue,  6 Feb 2024 14:43:06 +0000
 In-Reply-To: <20240206144313.2050392-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240206144313.2050392-1-edumazet@google.com>
 X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
-Message-ID: <20240206144313.2050392-10-edumazet@google.com>
-Subject: [PATCH v4 net-next 08/15] vxlan: use exit_batch_rtnl() method
+Message-ID: <20240206144313.2050392-11-edumazet@google.com>
+Subject: [PATCH v4 net-next 09/15] ip6_gre: use exit_batch_rtnl() method
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -85,100 +85,44 @@ Content-Type: text/plain; charset="UTF-8"
 exit_batch_rtnl() is called while RTNL is held,
 and devices to be unregistered can be queued in the dev_kill_list.
 
-This saves one rtnl_lock()/rtnl_unlock() pair per netns
+This saves one rtnl_lock()/rtnl_unlock() pair
 and one unregister_netdevice_many() call.
-
-v4: (Paolo feedback : https://netdev-3.bots.linux.dev/vmksft-net/results/453141/17-udpgro-fwd-sh/stdout )
-  - Changed vxlan_destroy_tunnels() to use vxlan_dellink()
-    instead of unregister_netdevice_queue to propely remove
-    devices from vn->vxlan_list.
-  - vxlan_destroy_tunnels() can simply iterate one list (vn->vxlan_list)
-    to find all devices in the most efficient way.
-  - Moved sanity checks in a separate vxlan_exit_net() method.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- drivers/net/vxlan/vxlan_core.c | 50 +++++++++++++---------------------
- 1 file changed, 19 insertions(+), 31 deletions(-)
+ net/ipv6/ip6_gre.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 16106e088c6301d3aaa47dd73985107945735b6e..11707647afb9831ee430cdc13e705431b66af6c2 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -4826,55 +4826,43 @@ static __net_init int vxlan_init_net(struct net *net)
- 					 NULL);
+diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
+index 070d87abf7c0284aa23043391aab080534e144a7..428f03e9da45ac323aa357b5a9d299fb7f3d3a5b 100644
+--- a/net/ipv6/ip6_gre.c
++++ b/net/ipv6/ip6_gre.c
+@@ -1632,21 +1632,19 @@ static int __net_init ip6gre_init_net(struct net *net)
+ 	return err;
  }
  
--static void vxlan_destroy_tunnels(struct net *net, struct list_head *head)
-+static void __net_exit vxlan_destroy_tunnels(struct vxlan_net *vn,
-+					     struct list_head *dev_to_kill)
- {
--	struct vxlan_net *vn = net_generic(net, vxlan_net_id);
- 	struct vxlan_dev *vxlan, *next;
--	struct net_device *dev, *aux;
--
--	for_each_netdev_safe(net, dev, aux)
--		if (dev->rtnl_link_ops == &vxlan_link_ops)
--			unregister_netdevice_queue(dev, head);
--
--	list_for_each_entry_safe(vxlan, next, &vn->vxlan_list, next) {
--		/* If vxlan->dev is in the same netns, it has already been added
--		 * to the list by the previous loop.
--		 */
--		if (!net_eq(dev_net(vxlan->dev), net))
--			unregister_netdevice_queue(vxlan->dev, head);
--	}
- 
-+	list_for_each_entry_safe(vxlan, next, &vn->vxlan_list, next)
-+		vxlan_dellink(vxlan->dev, dev_to_kill);
- }
- 
--static void __net_exit vxlan_exit_batch_net(struct list_head *net_list)
-+static void __net_exit vxlan_exit_batch_rtnl(struct list_head *net_list,
-+					     struct list_head *dev_to_kill)
+-static void __net_exit ip6gre_exit_batch_net(struct list_head *net_list)
++static void __net_exit ip6gre_exit_batch_rtnl(struct list_head *net_list,
++					      struct list_head *dev_to_kill)
  {
  	struct net *net;
 -	LIST_HEAD(list);
--	unsigned int h;
  
-+	ASSERT_RTNL();
- 	list_for_each_entry(net, net_list, exit_list) {
- 		struct vxlan_net *vn = net_generic(net, vxlan_net_id);
- 
--		unregister_nexthop_notifier(net, &vn->nexthop_notifier_block);
--	}
 -	rtnl_lock();
--	list_for_each_entry(net, net_list, exit_list)
--		vxlan_destroy_tunnels(net, &list);
-+		__unregister_nexthop_notifier(net, &vn->nexthop_notifier_block);
- 
++	ASSERT_RTNL();
+ 	list_for_each_entry(net, net_list, exit_list)
+-		ip6gre_destroy_tunnels(net, &list);
 -	unregister_netdevice_many(&list);
 -	rtnl_unlock();
-+		vxlan_destroy_tunnels(vn, dev_to_kill);
-+	}
-+}
- 
--	list_for_each_entry(net, net_list, exit_list) {
--		struct vxlan_net *vn = net_generic(net, vxlan_net_id);
-+static void __net_exit vxlan_exit_net(struct net *net)
-+{
-+	struct vxlan_net *vn = net_generic(net, vxlan_net_id);
-+	unsigned int h;
- 
--		for (h = 0; h < PORT_HASH_SIZE; ++h)
--			WARN_ON_ONCE(!hlist_empty(&vn->sock_list[h]));
--	}
-+	for (h = 0; h < PORT_HASH_SIZE; ++h)
-+		WARN_ON_ONCE(!hlist_empty(&vn->sock_list[h]));
++		ip6gre_destroy_tunnels(net, dev_to_kill);
  }
  
- static struct pernet_operations vxlan_net_ops = {
- 	.init = vxlan_init_net,
--	.exit_batch = vxlan_exit_batch_net,
-+	.exit_batch_rtnl = vxlan_exit_batch_rtnl,
-+	.exit = vxlan_exit_net,
- 	.id   = &vxlan_net_id,
- 	.size = sizeof(struct vxlan_net),
+ static struct pernet_operations ip6gre_net_ops = {
+ 	.init = ip6gre_init_net,
+-	.exit_batch = ip6gre_exit_batch_net,
++	.exit_batch_rtnl = ip6gre_exit_batch_rtnl,
+ 	.id   = &ip6gre_net_id,
+ 	.size = sizeof(struct ip6gre_net),
  };
 -- 
 2.43.0.594.gd9cf4e227d-goog
