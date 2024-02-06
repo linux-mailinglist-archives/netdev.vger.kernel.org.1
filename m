@@ -1,56 +1,64 @@
-Return-Path: <netdev+bounces-69535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F270F84B999
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:30:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC8DD84B9B6
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:34:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 317A11C235F8
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:30:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43C51B235BF
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:31:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB8E2133431;
-	Tue,  6 Feb 2024 15:29:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gyfa5wvt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 549FA132C3E;
+	Tue,  6 Feb 2024 15:31:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF9B12B14D
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 15:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24061E521;
+	Tue,  6 Feb 2024 15:31:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707233369; cv=none; b=pPLpeyTpWoh7RBSs8qTFB+muTmmhTjQ08wOSoCo+Vzgbb+qbJBRxr3GrmHyHP9LZ7Mdfnp9K4CoXQtOnSyBsIMiTbmNI662zR+GcTNtqyAlfO9rWcYP+DWvNWATNpO9FNnIw8/JkJ0xtwJXp/02mg4LSELL0wjmnR7qGuqxSkTI=
+	t=1707233507; cv=none; b=ceDFXZuhcWoVPodn+jaFA/11BUOGmTGJAuMeRTlsFcJwZVo+uG4SrlI+D28qvOTHBJcWyLu86KDu734f2fTpsFFKNXRSYzTibYd/1QbWlUNPl1mFT0Oknb94LLJbhP3ecQY1es6GtZLLYFqH7sGQUe+d6BXvt9Y4pgA7BlOwio4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707233369; c=relaxed/simple;
-	bh=yKBiIG9BG+Q7j6QRZoyKWECEwh2S2tJ8ZY9vaXCGYao=;
+	s=arc-20240116; t=1707233507; c=relaxed/simple;
+	bh=eWNNp3S32y7S2BKW74Ia47O4cFZtP2WNZ/NhkNZi0Jg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fClwBvF84HLVmegTj2BrWgjOXxWch3IGwK+YHmc29RKVQJdDDbohjimWURulQbOVCpktuS+XMdwAWIMzIrgHft0DiI5ubEUELgwQuilcU7TMF+WMcwXlLK28NllP1MinO6HZsALhjttP81j7q02L+Iy62P3A9u1qwrHe0xH8vIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gyfa5wvt; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=y77cc7ydr1ZSgBVmSGezYHmzr8PjwperPu32cwCQL0M=; b=gyfa5wvtGLWJSShDoDQJRwunhf
-	CX124KYAVdSreYAP7IBSw8ki6CyGrPXnN1MYoqhItiGTIPmgmAhiD+k1+DnMohCmAL4fJpF8+nzW2
-	ltJUvQI6J6u1hJcNOx3Y1/gHTq0a96F5E12CvEpbDkhWx4zz8WOOFzKLQ/uv3pX7mitQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rXNNn-0079Jb-Ug; Tue, 06 Feb 2024 16:29:11 +0100
-Date: Tue, 6 Feb 2024 16:29:11 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jiawen Wu <jiawenwu@trustnetic.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, maciej.fijalkowski@intel.com,
-	netdev@vger.kernel.org, mengyuanlou@net-swift.com
-Subject: Re: [PATCH] net: txgbe: fix GPIO interrupt blocking
-Message-ID: <9259e4eb-8744-45cf-bdea-63bc376983a4@lunn.ch>
-References: <20240206070824.17460-1-jiawenwu@trustnetic.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=I6O8hnbsL7cnkkUtQDeNlxGt/igZhBmXIKXS9A5A5ZJNE3B69wj00NvJ+Jf1Ewth/h6FymUcIuOWsDB9t/Ijj67pConkoGYapTD+pMsHr0kL20PD9PfCO7bOrY/7zAdw0e2reiKLNWFGPqzK9wbPOO8smMX0BLxcRK9/Y2bk6rk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1rXNQ4-0000nG-2R;
+	Tue, 06 Feb 2024 15:31:32 +0000
+Date: Tue, 6 Feb 2024 15:31:21 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Bc-bocun Chen <bc-bocun.chen@mediatek.com>,
+	Chunfeng Yun <chunfeng.yun@mediatek.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Qingfang Deng <dqfext@gmail.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v2 1/2] dt-bindings: phy: mediatek,mt7988-xfi-tphy: add
+ new bindings
+Message-ID: <ZcJQyaTotW_bCWGU@makrotopia.org>
+References: <3251ac3db1a739e0c18ded0a824edae981c1e2df.1707153425.git.daniel@makrotopia.org>
+ <31d2c56a-5108-4265-a267-6733e1ba328e@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,32 +67,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240206070824.17460-1-jiawenwu@trustnetic.com>
+In-Reply-To: <31d2c56a-5108-4265-a267-6733e1ba328e@linaro.org>
 
-On Tue, Feb 06, 2024 at 03:08:24PM +0800, Jiawen Wu wrote:
-> GPIO interrupt is generated before MAC IRQ is enabled, it causes
-> subsequent GPIO interrupts that can no longer be reported if it is
-> not cleared in time. So clear GPIO interrupt status at the right
-> time.
+Hi Krzysztof,
 
-This does not sound correct. Since this is an interrupt controller, it
-is a level interrupt. If its not cleared, as soon as the parent
-interrupt is re-enabled, is should cause another interrupt at the
-parent level. Servicing that interrupt, should case a descent to the
-child, which will service the interrupt, and atomically clear the
-interrupt status.
+On Tue, Feb 06, 2024 at 11:53:55AM +0100, Krzysztof Kozlowski wrote:
+> On 05/02/2024 18:28, Daniel Golle wrote:
+> > Add bindings for the MediaTek XFI Ethernet SerDes T-PHY found in the
+> > MediaTek MT7988 SoC which can operate at various interfaces modes:
+> > 
+> > via USXGMII PCS:
+> >  * USXGMII
+> >  * 10GBase-R
+> >  * 5GBase-R
+> > 
+> > via LynxI SGMII PCS:
+> >  * 2500Base-X
+> >  * 1000Base-X
+> >  * Cisco SGMII (MAC side)
+> > 
+> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > ---
+> > v2: unify filename and compatible as requested
+> 
+> Several comments, from me and Rob, were ignored. Please respond to them.
 
-Is something wrong here, like you are using edge interrupts, not
-level?
+I'm sorry if I have missed something. I just checked again on
+patchwork, just in case I would have missed an email reply to this or
+any of the preceding posts of this patch as part of the old series
+going to netdev.
 
-> And executing function txgbe_gpio_irq_ack() manually since
-> handle_nested_irq() does not call .irq_ack for irq_chip.
+Comments you have made which I have addressed:
+ - removed $nodename
+ - use compatible as filename
 
-I don't know the interrupt code too well, so could you explain this in
-more detail. Your explanation sounds odd to me.
+And the only thing I found that I didn't either fix or reply to is this:
+> Can you explain what is this issue and errata about (except performance)?
 
-What is the big picture problem here? Do you have the PHY interrupt
-connected to a GPIO and you are loosing PHY interrupts?
+Not overwriting that (undocumented) value in that (undocumented)
+register results in 10GBase-R having performance issues according to a
+commit in MediaTek's SDK, see here:
 
-	Andrew
+https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/a500d94cd%5E%21/#F0
+
+Maybe Bc or SkyLake of MediaTek (added to Cc) can explain this in more
+detail?
+
+
+What I did miss was Rob's comment at the very bottom of this reply:
+> What is PEXTP?
+
+I can again only answer by referencing to MediaTek's SDK sources:
+
+https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/refs/heads/master/21.02/files/target/linux/mediatek/files-5.4/drivers/net/ethernet/mediatek/mtk_sgmii.c#96
+
+Here this reset is called XFI_PEXTP0_GRST.
+
+I personally find that name confusing (as this PHY has nothing to do with
+_P_ci _EX_press) and have tried to get rid of it where it isn't either part
+of official documentation or already merged drivers (like Sam's clock driver).
+
+If there have been any other issues with this patch which I'm not aware
+of, please point them out to me.
+
+
+Thank you
+
+
+Best regards
+
+
+Daniel
 
