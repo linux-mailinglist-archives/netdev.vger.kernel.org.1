@@ -1,103 +1,152 @@
-Return-Path: <netdev+bounces-69527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2F3584B8A2
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:59:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A66684B8F4
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:11:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7FC8F285BDE
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:59:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B385B2BDEB
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:09:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB972133420;
-	Tue,  6 Feb 2024 14:57:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB721332A3;
+	Tue,  6 Feb 2024 15:08:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yyn2UjtE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X1qyTm/0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 208E71332AE
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 14:57:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC86013328A;
+	Tue,  6 Feb 2024 15:08:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707231424; cv=none; b=MoYg7P89XcbfHGFwD/4dqkIzdE/UN1ed1QsN6+MaqXhT4xrFMGZ4r3fnG01Wh5aTKAbqWG+XaC4UO7MTtLHuIaf10GL98JClPu1yvoUBOMHH/i4bHPRGr8k5vrnHNl67b37LEP1b7chcrOfLFqkG2YYeH+ve9Sa7D1r7phsghzU=
+	t=1707232120; cv=none; b=Suyrc69GgZ0iysh3tmdT4VUri4Fgsd4zDeurId9ugjdnU+5LmSF91zjZTwlNcRd9YPUoDTctoNWOB9lI16GA2GDgZAsc/+D9mA4xWFeUCn29Ajirvpy5FUI9Y8HE9RGsrjiDXrBY2lWDULGANscX7a5LtgNC+rTV1E+xD+OIjgM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707231424; c=relaxed/simple;
-	bh=PoMW5Q6UrU4QGMhwq9QRDhrYKAr9TnNOB1wofNuBKxE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rljimmx+hJFjqCCSSKsWfe+3C467j7wkX0hI7vm3QMJvJuZ4b6PxDkM09Aaq+77Td+eOAVqka+mE56IiFuopJBh46cNoyvhWN7/6BcOAuEcZ341woHZ3FBeX2Ldexx/BLmhaSA/4uQncJzMZ1MomdA40PYak3sNAqiMN30tZjzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Yyn2UjtE; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-560530f4e21so10737a12.1
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 06:57:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707231421; x=1707836221; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BBTSg4JHj8MuJyKVh9CBbVq0JOZhhjmfpsZfG/mA1Xs=;
-        b=Yyn2UjtEaQr+irOaLGr7622CtsEFEtU6aabhfexy1tSnPcjte3frJtWKsfG2TYlQzb
-         BOsfA3B8DG2vl8VqdmYUSWSn38nu7n5T1jKr0B0dofs4hFR9Ml/p6oVpbBXvxVnA79Xg
-         x33Dl5Qk8VVWIZlFXwQZY59/+Qkf/Dty5Y7U/ZieIUe/466nDgiZMtIsZSEVnwkEQGok
-         C2T1RBSou1FYTKV+oPqEaAWUQObEPqakdzXkoyY/RmrGt7Mb27VJDQ7FlyQ6e72qo0eH
-         7oJR/vA5dsn1WT0WQoBHH1GJ5t9+/dAO8Y6ODrL1IqvdUpFF9O0KcFZpbPASAy9THVbU
-         PvIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707231421; x=1707836221;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BBTSg4JHj8MuJyKVh9CBbVq0JOZhhjmfpsZfG/mA1Xs=;
-        b=nTsWDuaIE0QoxqX8C4puXH46USJpvFQMcchlNRAI9ZGXzwtJ8FRTGP27sPI5cXQKAi
-         YTjsWQS9vA1h/i7orSr8VLPWUdn5jNamH8tAF86N6eF+V7TZlOKrK8ppFXbFFq1MNx3O
-         ea+NStJ3N6diU0L7fuK7rSkcJ9OLXRmTc1I89SQ8jgsVpggHUoI9p1zpHBKS86INao7f
-         dYa+/ePYozdJut0yVnFy5VXmuxe+1XbZ1IZjsCarJw3uwXe7/VRrK8yq7520xBAP2YMS
-         mFsk9hgQeHOCngcKzhhwhX2vfG7rgZDZaHS7Wn4DTxsTZCiBp2mdteocCgK9RmM7VKsp
-         YBFQ==
-X-Gm-Message-State: AOJu0YwEhlYLrSAK7Qzw2hWFJn/R4fTw9UmuzuBJ3wYSWvTEnDIaGCdv
-	adWhiuzDD3oP/t+Vp63Wil8YhXYomIIVQunz1bssyB3gzl4EUmFB+ciBzmu6l4OUNv4Y5xPitaA
-	seqwV8KJ4zy0sSmG0sFGcvhzQX5KHEkEeK2NG
-X-Google-Smtp-Source: AGHT+IE9bQPoVKefOR2TDqCjaJuIbiWWPLVENg3PYPhVUmxaN/CSmJ0Ag9LmwbB04h15BpwC82tV2zIDryfpf8eZ0lE=
-X-Received: by 2002:a50:c34e:0:b0:55f:e704:85ce with SMTP id
- q14-20020a50c34e000000b0055fe70485cemr158201edb.3.1707231421249; Tue, 06 Feb
- 2024 06:57:01 -0800 (PST)
+	s=arc-20240116; t=1707232120; c=relaxed/simple;
+	bh=y0RNzdVJndYWSP0vGgdOxK1NMGHChFiuRWotjCrpl0Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MXVLakBmOB7V2UeMyJ+UNhW+y5gEuBO8ruRI6/Oz2G9dytldbqeVEVjzqxyp9et+Zk72zJ/KbiIFWWpvyRC6izI6b1omhEApQ7YS2rutHGQ5lCHRqP/hvWXSZx++jIHW9pqazWy9i87wAl+IaKo3MaaMnn3JK9GYsXdKjWkiQqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X1qyTm/0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94A01C433C7;
+	Tue,  6 Feb 2024 15:08:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707232119;
+	bh=y0RNzdVJndYWSP0vGgdOxK1NMGHChFiuRWotjCrpl0Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=X1qyTm/0U+yzlb1K9Uzww22xl2BagUxKRr4E8pXRsIdKwRSutYO3C14gDCXxpMJ/d
+	 mPOgS/R5rdvmKhQPQqWgN6jB7CDkL8nbolZ2Qy/dVFSlBpc02UqkxXnh7lru3JQ6R+
+	 FHexHrssJkeJ0Fd0gepitxGMeB4XtUeU2WGxGWqZ3zdiPdsxBL08iYXnB8ZViIjSxA
+	 dIWYMhwbfW8ZcorLnhgSnUkLUOhsgtkMEZW26ZLWcZm+/Zd/OfuBb1lKum6H/aHwQE
+	 L/6ijl3lLIUQXQtXH+qlWsgLKPeSGfGP7TDQBtNzbBsFUoIx0ta5PUN+LzABn/gHKU
+	 RmXipacSQ1HGg==
+Date: Tue, 6 Feb 2024 15:07:04 +0000
+From: Simon Horman <horms@kernel.org>
+To: Pavel Sakharov <p.sakharov@ispras.ru>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Alexey Khoroshilov <khoroshilov@ispras.ru>
+Subject: Re: [PATCH] stmmac: Fix incorrect dereference in stmmac_*_interrupt()
+Message-ID: <20240206150704.GD1104779@kernel.org>
+References: <20240203150323.1041736-1-p.sakharov@ispras.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240206131147.1286530-1-aconole@redhat.com> <20240206131147.1286530-2-aconole@redhat.com>
- <CANn89iLeKwk3Pc796V7Vgvm8-GLifbwimPJsDTudBZG-1kVAMg@mail.gmail.com> <f7t5xz1k5h4.fsf@redhat.com>
-In-Reply-To: <f7t5xz1k5h4.fsf@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 6 Feb 2024 15:56:46 +0100
-Message-ID: <CANn89iLjHcLGvvRLVBnmk7tXXgKagS_t_VnetWkjs=0rhKtnJA@mail.gmail.com>
-Subject: Re: [PATCH net 1/2] net: openvswitch: limit the number of recursions
- from action sets
-To: Aaron Conole <aconole@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Pravin B Shelar <pshelar@ovn.org>, 
-	dev@openvswitch.org, Ilya Maximets <i.maximets@ovn.org>, Simon Horman <horms@ovn.org>, 
-	Eelco Chaudron <echaudro@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240203150323.1041736-1-p.sakharov@ispras.ru>
 
-On Tue, Feb 6, 2024 at 3:55=E2=80=AFPM Aaron Conole <aconole@redhat.com> wr=
-ote:
->
->
-> Oops - I didn't consider it.
->
-> Given that, maybe the best approach would not to rely on per-cpu
-> counter. I'll respin in the next series with a depth counter that I pass
-> to the function instead and compare that.  I guess that should address
-> migration and eliminate the need for per-cpu counter.
->
-> Does it make sense?
+On Sat, Feb 03, 2024 at 06:03:21PM +0300, Pavel Sakharov wrote:
+> If 'dev' is NULL, the 'priv' variable has an incorrect address when
+> dereferencing calling netdev_err().
+> 
+> Pass 'dev' instead of 'priv->dev" to the function.
+> 
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> 
+> Signed-off-by: Pavel Sakharov <p.sakharov@ispras.ru>
 
-Sure, a depth parameter would work much better ;)
+Thanks Pavel,
+
+I agree with your analysis that this can result in a NULL dereference.
+And that your proposed fix is good: netdev_err() can handle a NULL
+dev argument.
+
+As this seems to be a fix I suggest it should be for net.
+And that it should be based on that tree and designated as such
+in the subject:
+
+Subject: [PATCH net] ...
+
+Also if it is a fix, it should have a fixes tag.
+Perhaps this one:
+
+Fixes: 8532f613bc78 ("net: stmmac: introduce MSI Interrupt routines for mac, safety, RX & TX")
+
+
+I don't think there is a need to respin for the above, though please
+keep this in mind when posting Networking patches in future.
+
+
+Looking at the patch above, and stmmac_main.c, it seems that the following
+functions also suffer from a similar problem:
+
+static irqreturn_t stmmac_msi_intr_tx(int irq, void *data)
+{
+	struct stmmac_tx_queue *tx_q = (struct stmmac_tx_queue *)data;
+	...
+	dma_conf = container_of(tx_q, struct stmmac_dma_conf, tx_queue[chan]);
+	priv = container_of(dma_conf, struct stmmac_priv, dma_conf);
+
+	if (unlikely(!data)) {
+		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
+		...
+
+And stmmac_msi_intr_rx(), which follows a similar pattern
+to stmmac_msi_intr_tx().
+
+I also note that in those functions "invalid dev pointer" seems misleading,
+perhaps it ought to be "invalid queue" pointer.
+
+As these problems seem to all have been introduced at the same time,
+perhaps it is appropriate to fix them all in one patch?
+
+> ---
+>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 4727f7be4f86..5ab5148013cd 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -5848,7 +5848,7 @@ static irqreturn_t stmmac_mac_interrupt(int irq, void *dev_id)
+>  	struct stmmac_priv *priv = netdev_priv(dev);
+> 
+>  	if (unlikely(!dev)) {
+> -		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
+> +		netdev_err(dev, "%s: invalid dev pointer\n", __func__);
+>  		return IRQ_NONE;
+>  	}
+> 
+> @@ -5868,7 +5868,7 @@ static irqreturn_t stmmac_safety_interrupt(int irq, void *dev_id)
+>  	struct stmmac_priv *priv = netdev_priv(dev);
+> 
+>  	if (unlikely(!dev)) {
+> -		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
+> +		netdev_err(dev, "%s: invalid dev pointer\n", __func__);
+>  		return IRQ_NONE;
+>  	}
+> 
+> 
 
