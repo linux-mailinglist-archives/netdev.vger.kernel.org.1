@@ -1,115 +1,132 @@
-Return-Path: <netdev+bounces-69637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C30684BF34
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 22:29:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECB5E84BF3C
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 22:31:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 29021B250C9
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 21:29:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 219831C23187
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 21:31:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B17B51B96B;
-	Tue,  6 Feb 2024 21:28:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ADED1B951;
+	Tue,  6 Feb 2024 21:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dmDORtLs"
+	dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b="lnMYX+xS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270891B94A
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 21:28:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5D21B956
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 21:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707254911; cv=none; b=HVKr5zhPdmi0lydQalrR/7GDChgDqK6IUCyy1PznvpJ1SIVBvnqdce1rU7ItP0tId0f92JjjPoX8/ugGnNz7xXaZsvi0jHEiswLodCsapGxg0hcXxcQInr2Ps0K1iDgtm7Y5cdRFfXFY5JvGhVHQDl/f7JUAkUbbXzvo9ZZSImA=
+	t=1707255071; cv=none; b=fOYfU68pXgOM5gtw7NWnYoUNAnNu/8vwAiwMCU+NGrgcKqywW82XLmUoxGO74e4NJtx79rlHWjGLH0x+PA1kEKfWbQdVz5SB3R7HZwU6BiHxOO3diM0rJmgSPWL3B+SIjIPFZ5ix3B5VzxxX4Pv2elLufYYbzz3oK86qihHSJSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707254911; c=relaxed/simple;
-	bh=H2Ofz7ZA9UN1w2/A6W26dmY3Z27qOkFkRbMdznsDUyw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hV/3DsKA3DLloC2AiR32voscMDtXVTVtonPXJYPuvjynVBUBA0+90n96HAkwwQsdCa1ZXMO8sdqmgKmV8LTYa8JIDRGzzJt4Ko93pP3jwX2Mhf+Vwc/P+46Tbycn7GWHAZrY7eJL3YapkBKxp4iTXLPFwc1z0HLL/Q5ze5IXPJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dmDORtLs; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707254910; x=1738790910;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=H2Ofz7ZA9UN1w2/A6W26dmY3Z27qOkFkRbMdznsDUyw=;
-  b=dmDORtLs5T0luNkZOyEfX3/S90cJ67njH7OCVhkz774GgIm3TR1ox4u7
-   PV6KbAsDh6nPYyLhLrrfe9tDFssHMNgabzwiuQXpTqD4eOKcMMOnwTX4L
-   vfzdW7mT7+0MrzPMRGncc4/q9g9GVWc8spef8onqjn7uTR5xdRLfXrfPZ
-   SKNwhhqY5lHUHo3GXHngK24REf4LaVo4vBG6Nk7da3R3nQLtvFS4oguQ7
-   GTlBAcy5Yx0W9+UGbTpQiNQSgUbiSW6R+9iSUj09gHpyOz8uswOkgdRju
-   XZgmemfvGbnSQ5AxWGXWku2ngpQG4L7PK30H3cgJUsb/j2ulhBQijeBsg
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10976"; a="11583410"
-X-IronPort-AV: E=Sophos;i="6.05,248,1701158400"; 
-   d="scan'208";a="11583410"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2024 13:28:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,248,1701158400"; 
-   d="scan'208";a="5748304"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa004.fm.intel.com with ESMTP; 06 Feb 2024 13:28:27 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Sasha Neftin <sasha.neftin@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Naama Meir <naamax.meir@linux.intel.com>
-Subject: [PATCH net 2/2] igc: Remove temporary workaround
-Date: Tue,  6 Feb 2024 13:28:18 -0800
-Message-ID: <20240206212820.988687-3-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240206212820.988687-1-anthony.l.nguyen@intel.com>
-References: <20240206212820.988687-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1707255071; c=relaxed/simple;
+	bh=VhV9Y2ehoq2QR/dvYkGZ3565MBi13h4c1EWlFat09sM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=E3gc1NOeu33QFok69Bm9sSJMnb6PIAANRdk9IojjoXl3CoGOnY9UPzN0JAvm6/pDg4NBLmCIncHgcXQUx9qYrInRqCoGEKDA7Uykd9NckfmHDOqEAxdd11Iyqbi4SwB11TpEikkaZ1XePGA9i38PK8IM3zx1uCvwVa1q8RjrUeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu; spf=pass smtp.mailfrom=umich.edu; dkim=pass (2048-bit key) header.d=umich.edu header.i=@umich.edu header.b=lnMYX+xS; arc=none smtp.client-ip=209.85.128.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=umich.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=umich.edu
+Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6043d9726adso8819737b3.0
+        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 13:31:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=umich.edu; s=google-2016-06-03; t=1707255068; x=1707859868; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VhV9Y2ehoq2QR/dvYkGZ3565MBi13h4c1EWlFat09sM=;
+        b=lnMYX+xSSKdpMZr27IDA7Zu4pzAF+15Kege5EY3dGOt+5lSSekvOr8NqA1N6eoaHA8
+         b9Q+CjpSHeszCI0BaL/Qzpn2pt+L02fJGEnIE/y5ktMNP/fKAFAgBk6PGP3ye6RO0ItK
+         Ixx1cOtTLlM4gWb4+brUkw9dcPMh22QMX6wyWMv8MZJ7XAdE5NnlZ485RcWak+bxGswT
+         /EZk0fmS6wgeecGvFF8q77AVtk2xr3d60hMF9N+a8BBt0m2kKakSFPp3tG2LKF37YNNU
+         pMY3oyFiIc+ka0YyM5evLuHRQJ8RGJ8f14qCiWds4du5gE2Vjpiz4G2lmMwr1k6I5Nk4
+         TEnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707255068; x=1707859868;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VhV9Y2ehoq2QR/dvYkGZ3565MBi13h4c1EWlFat09sM=;
+        b=fXcQJrri/e94o/XpGY50XqDxC7o4ZJNnLAOnVDJepU2BY1NDLZA3fu2yrIutT7qScl
+         sKp3C8O96gmSnwkhdigL4NJjTva/GBxk9vlN6Si5X7va5h3wrYtt/FZQkNAGcbZIFqmy
+         K/fvEktHGyr8nRnTZC+4gfudUePEGl0H9w+SevRN9k4o6ZAWxmPuvbh1VSODgCkoDu0O
+         APb8KERnABSpArbqMQdN74OtND5UDXSFoKGwl6XpdCvBTb+Zdce/UdxgrlKBR4coOjp7
+         RXCBZ6MBilEURu9iOZbC3liD0aOma6WCZmqZasFUzn7M8BuLyPewQX6F12tsueVLtUB2
+         gXyw==
+X-Gm-Message-State: AOJu0YwvCwXuw07r8XoGxq9awkFDb2XMB7dxyiY6As3gguEk5iSJv7d/
+	Xukj8YUL+ATAo1czpVVnYN8x+ziTUHoDz/9at5UnPz0wtUu1iJrF1ioetMWL/ALm9OHjDlV2vOs
+	kat6mkHYbsjhIHV1ScUWfWUqayVc0wLkQQUqVLg==
+X-Google-Smtp-Source: AGHT+IFD2ZtVNg+yyFr7gOe+lmhrUgZsDA+InS6rti8MMhXWEbu1XvWLZZAzBuooSjg26Rp0Iuv+ch+bOB9DNvbOdYw=
+X-Received: by 2002:a0d:db4f:0:b0:604:3ef:a729 with SMTP id
+ d76-20020a0ddb4f000000b0060403efa729mr2685245ywe.15.1707255068386; Tue, 06
+ Feb 2024 13:31:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240201-rockchip-rust-phy_depend-v2-0-c5fa4faab924@christina-quast.de>
+ <20240201-rockchip-rust-phy_depend-v2-3-c5fa4faab924@christina-quast.de>
+ <CALNs47tnwCgyvM2jBo=bTt1=2AJFt3b6W+JsTHM3Np2tbNJYCA@mail.gmail.com> <eb229460-0efc-448a-863f-ac0634a72f2c@christina-quast.de>
+In-Reply-To: <eb229460-0efc-448a-863f-ac0634a72f2c@christina-quast.de>
+From: Trevor Gross <tmgross@umich.edu>
+Date: Tue, 6 Feb 2024 16:30:56 -0500
+Message-ID: <CALNs47tfmcayLdbLbArPS=AHwETiaQKZ09h69_Q4HmfrMPk4-A@mail.gmail.com>
+Subject: Re: [PATCH v2 3/3] net: phy: add Rust Rockchip PHY driver
+To: Christina Quast <chrysh@christina-quast.de>, Shashwat Kishore <kshashwat13@gmail.com>
+Cc: Christina Quast <contact@christina-quast.de>, Miguel Ojeda <ojeda@kernel.org>, 
+	Alex Gaynor <alex.gaynor@gmail.com>, Wedson Almeida Filho <wedsonaf@gmail.com>, 
+	Boqun Feng <boqun.feng@gmail.com>, Gary Guo <gary@garyguo.net>, 
+	=?UTF-8?Q?Bj=C3=B6rn_Roy_Baron?= <bjorn3_gh@protonmail.com>, 
+	Benno Lossin <benno.lossin@proton.me>, Andreas Hindborg <a.hindborg@samsung.com>, 
+	Alice Ryhl <aliceryhl@google.com>, FUJITA Tomonori <fujita.tomonori@gmail.com>, 
+	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
+	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Heiko Stuebner <heiko@sntech.de>, rust-for-linux@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-rockchip@lists.infradead.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Sasha Neftin <sasha.neftin@intel.com>
+On Tue, Feb 6, 2024 at 2:20=E2=80=AFPM Christina Quast
+<chrysh@christina-quast.de> wrote:
+>
+> Hi Trevor!
+>
+> Thanks a lot for your review, I learned a lot! I felt, from the feedback
+> in the Zulip forum that rewriting more phy drivers might be interesting,
+> but I think I misunderstood something.
+>
+> There is no specific goal behind the rewrite, I just thought it would be
+> useful to bring more Rust into the Kernel.
+>
+> Cheers,
+>
+> Christina
 
-PHY_CONTROL register works as defined in the IEEE 802.3 specification
-(IEEE 802.3-2008 22.2.4.1). Tide up the temporary workaround.
+Happy to help :)
 
-Fixes: 5586838fe9ce ("igc: Add code for PHY support")
-Signed-off-by: Sasha Neftin <sasha.neftin@intel.com>
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/igc/igc_phy.c | 6 +-----
- 1 file changed, 1 insertion(+), 5 deletions(-)
+There is definitely no harm in experimenting, but the general
+(reasonable) rule is that there shouldn't be duplicate drivers
+in-tree, even across languages.
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_phy.c b/drivers/net/ethernet/intel/igc/igc_phy.c
-index 7cd8716d2ffa..861f37076861 100644
---- a/drivers/net/ethernet/intel/igc/igc_phy.c
-+++ b/drivers/net/ethernet/intel/igc/igc_phy.c
-@@ -130,11 +130,7 @@ void igc_power_down_phy_copper(struct igc_hw *hw)
- 	/* The PHY will retain its settings across a power down/up cycle */
- 	hw->phy.ops.read_reg(hw, PHY_CONTROL, &mii_reg);
- 	mii_reg |= MII_CR_POWER_DOWN;
--
--	/* Temporary workaround - should be removed when PHY will implement
--	 * IEEE registers as properly
--	 */
--	/* hw->phy.ops.write_reg(hw, PHY_CONTROL, mii_reg);*/
-+	hw->phy.ops.write_reg(hw, PHY_CONTROL, mii_reg);
- 	usleep_range(1000, 2000);
- }
- 
--- 
-2.41.0
+What you probably saw on Zulip is that we were trying to locate newer
+phys that don't already have a C driver. Shashwat reached out to a few
+companies and mentioned that Microchip was interested in drivers for
+some of their VSC84xx/82xx families. They are a bit more complicated
+(MACSec, XFI/SFP+) and apparently somewhat difficult to get hardware
+for, but that might be an option if you are interested in working on
+something like this.
 
+Andrew might have some ideas too. There are a lot of new phys coming
+out since MACsec is getting more popular, also some newer specs like
+10GBase-T1 and 10Base-T1S.
+
+- Trevor
 
