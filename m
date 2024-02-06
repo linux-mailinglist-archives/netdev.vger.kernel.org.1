@@ -1,146 +1,203 @@
-Return-Path: <netdev+bounces-69420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D23384B1A5
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:56:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8819184B1B2
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:57:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD8D41F2281D
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 09:55:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F1BAB1F247BE
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 09:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25EA212D17A;
-	Tue,  6 Feb 2024 09:55:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1F5A12D17A;
+	Tue,  6 Feb 2024 09:57:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lQUQ0wxW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HErc9xaB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE8212C7E1;
-	Tue,  6 Feb 2024 09:55:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BBEF12D75C;
+	Tue,  6 Feb 2024 09:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707213354; cv=none; b=czriAPE3D0/w9dmokpvlUm21H3Dcoblv6ni/u+Dd6kgqFsrSV1KHGXEXehVQCTyjq2fTOc5cI9RJk5H29YQN8Nmf7pmiE5bfsJqvRf5N0aKwFl6N1G941akZORDKZfzGRaOYyILpu5bZj22T6vK7mBoTsEeMMN1kT1Qn5NiELno=
+	t=1707213444; cv=none; b=tMVMTBgAlSIQtYYLpg4Iq0knHHY07dH3jZcSDEDhGJdyT8xnsqjtJYVuOVos5uNifYc4/VE1tnI5RYly47eB1Jdys//aC3mxjKDwwIT6DCHHzYuFUyD5PyHeC0NHa1Yd+nwsHCt+/5bTefcHSSsmJFC6nkrAW5bJaTjFXS4+qY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707213354; c=relaxed/simple;
-	bh=9+W6XW1DT0/xcjV67vvB8Afk3ehs/LbVHwL1MPz6W1A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=j83QtOoGIl/jKKvGzHLMcXxKKtSND3w+28h69ETRZZy5AuA7TFScyFTL8fzwtHWgJdYSomK08R3f6Lpml1JacD9lTdsEMt6mCyt1WvJI3cEUlPVwz7MqQQQqiNF788dS1Jq/atQsOZq5zCaU2QMsizUDh8vUsvTF1lgAuo036Kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lQUQ0wxW; arc=none smtp.client-ip=209.85.219.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-68155fca099so17541906d6.1;
-        Tue, 06 Feb 2024 01:55:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707213351; x=1707818151; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6paK/6xBJ4EAsIC2x+yrHqNaN5F8qhKNNYWgufdQ5lQ=;
-        b=lQUQ0wxWojDzle8Ff/SfP0m3S+kZRiWWX+2C9rc6miV+g+ybE2uz40XuMvzQy/3A7S
-         36dW2nzrC3f1Vp0N/A9WNT4V3IIvok9XvvU5gRtj5Hp//mOOLBRLpiJAwSVwe6cfoECp
-         N6YfJqR/wKYHVhD71YLa+oyhr+TWSUTpfw/YjSHdjJ14YifUkMiaOXm01YO8QGJCJmh1
-         3EAqCDV5SOsljD9Z2Tr5OCuYoTo1mSExr6MOk1aiigHIOTjl+09gUlHddE+MqvBG/Q6P
-         Rc9wSkuvt3fGVhO0SOKPAUHQDfJYMBdqAcp5UyWOiK+APBFeC7bSpqr0PGpM69r9VO+W
-         7aJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707213351; x=1707818151;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6paK/6xBJ4EAsIC2x+yrHqNaN5F8qhKNNYWgufdQ5lQ=;
-        b=X+aXZhwyUkUqxBZmWc/Kt2j7NX6W6GzboojMHikW7mxdDLliZmCOaaRiHPu9GE+0ii
-         NT81DL1z8i59cUC+UXD4q7AReI8YKOZGVDhf+JzQoPsYmMpDtQjC5bC+JsYO0wgPufld
-         Q+aIRhfOZglq5PHnEEqHpdgevpMCUWL7iG6hbOCTZ+3LJRlkxTOU/NaGZvvmIxX0xwCV
-         COmHV33PWg9erAFhxGt5zJDwOtBrNqJJdz4vaY6hS/LZAxBeIZ8pMigzxnlyK6ga8JxB
-         HTkJ3CIsct+sG5E3dR8QhTH9pSl5FUS/EiqvCaMlFS6PTJrOSN/94FqxwAv2Ua1yEu2K
-         mMsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVzYYfoUOO1dufQgLaOFFo5GiH5fn43kEJWeKPFJKiEqw1M7PK2PxLMLd0ZQF6TE13dxNBjuUWfZzODi7oLj0VgKOJxcC7UdlhRFQy95ZgTa1ArIaIm0sqGMa7k
-X-Gm-Message-State: AOJu0Yy270t1HIiLiTv75Gsv2XEoIieNb2CBy67oHojVAPdf/7co4Lcc
-	rVpU7deltx46ckmfBaf51NH2RO4PMz4dwBgbUYPjCcPPFY9evH0eEPzPtLRjBLg9eImGBkRDHCh
-	NQYn/sE++B9E5Qca48yhmN1ofqTk=
-X-Google-Smtp-Source: AGHT+IF+oK5GAVDZ/icb/MBqJdtul50E1qWgJqqyPzsae5dVKtB8IgM2EPsrwVjw+GLN49FOGy8/8BAOJ1+Klr3uk44=
-X-Received: by 2002:a05:6214:5490:b0:68c:b761:39b0 with SMTP id
- lg16-20020a056214549000b0068cb76139b0mr281717qvb.5.1707213351275; Tue, 06 Feb
- 2024 01:55:51 -0800 (PST)
+	s=arc-20240116; t=1707213444; c=relaxed/simple;
+	bh=BV60uJJEOLl64kdc0nfcK/o6eoOdfETmPsoBrcGKdU8=;
+	h=Content-Type:MIME-Version:From:Subject:To:Cc:Message-Id:Date; b=k1ni/zn2OsVv7bayBh+yUEozaCR9CSpnAkbt7qOHxaFVgH2I42A9djw7QAbToQPboYB1cEiZwAjdcGJrtFou8f1BNi/4hKvAaBKBbSWwWfoGGJTDRw945c/zxHUw+uag43rdx9jCF+WcurcNNxWanC9ZTz5CKfxAILE0k5N91vY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HErc9xaB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD9D2C433F1;
+	Tue,  6 Feb 2024 09:57:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707213443;
+	bh=BV60uJJEOLl64kdc0nfcK/o6eoOdfETmPsoBrcGKdU8=;
+	h=From:Subject:To:Cc:Date:From;
+	b=HErc9xaBY75qYJ6ImtYh3kYt4fub9BnHlR9Z1lhSunbl/VEJicMGXlrq/XxDdF8ek
+	 wNavgTDX/DGBY8dZeyVncDYWxZCN6dqfVo6HaUjVhgmVC/fIGahmrAZiMXFXSh7XNW
+	 IkHkDiP/iXGUB5S3f/UqF/1Q4zMlZlKREiXITYLnd9xuNsttxP4JtO/M3Uo3WAA85m
+	 bs1Ak4lIv17eu57wRal367aCX1xxupPPaNDrttUabRzo8VYar5WmK9gKpZYhcQ7PPG
+	 l6B84bSNUn5wHc0Fm24i9WjceDVOYzWxVPJVFKjg4+s87020NCmS0m5yXAbtx2KsZI
+	 9vmQUuvGGRDvg==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240205123011.22036-1-magnus.karlsson@gmail.com> <87le7zvz1o.fsf@toke.dk>
-In-Reply-To: <87le7zvz1o.fsf@toke.dk>
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-Date: Tue, 6 Feb 2024 10:55:39 +0100
-Message-ID: <CAJ8uoz03-AcOwMj3-20ritbYQT9CSJMQ8oz6OuhyE-U=2F7+Gg@mail.gmail.com>
-Subject: Re: [PATCH net] bonding: do not report NETDEV_XDP_ACT_XSK_ZEROCOPY
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc: magnus.karlsson@intel.com, bjorn@kernel.org, ast@kernel.org, 
-	daniel@iogearbox.net, netdev@vger.kernel.org, maciej.fijalkowski@intel.com, 
-	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, j.vosburgh@gmail.com, 
-	andy@greyhouse.net, hawk@kernel.org, john.fastabend@gmail.com, 
-	edumazet@google.com, bpf@vger.kernel.org, 
-	Prashant Batra <prbatra.mail@gmail.com>, Lorenzo Bianconi <lorenzo@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+From: Kalle Valo <kvalo@kernel.org>
+Subject: pull-request: wireless-2024-02-06
+To: netdev@vger.kernel.org
+Cc: linux-wireless@vger.kernel.org
+Message-Id: <20240206095722.CD9D2C433F1@smtp.kernel.org>
+Date: Tue,  6 Feb 2024 09:57:22 +0000 (UTC)
 
-On Mon, 5 Feb 2024 at 14:08, Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.=
-com> wrote:
->
-> Magnus Karlsson <magnus.karlsson@gmail.com> writes:
->
-> > From: Magnus Karlsson <magnus.karlsson@intel.com>
-> >
-> > Do not report the XDP capability NETDEV_XDP_ACT_XSK_ZEROCOPY as the
-> > bonding driver does not support XDP and AF_XDP in zero-copy mode even
-> > if the real NIC drivers do.
-> >
-> > Fixes: cb9e6e584d58 ("bonding: add xdp_features support")
-> > Reported-by: Prashant Batra <prbatra.mail@gmail.com>
-> > Link: https://lore.kernel.org/all/CAJ8uoz2ieZCopgqTvQ9ZY6xQgTbujmC6XkMT=
-amhp68O-h_-rLg@mail.gmail.com/T/
-> > Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
-> > ---
-> >  drivers/net/bonding/bond_main.c | 6 +++++-
-> >  1 file changed, 5 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond=
-_main.c
-> > index 4e0600c7b050..79a37bed097b 100644
-> > --- a/drivers/net/bonding/bond_main.c
-> > +++ b/drivers/net/bonding/bond_main.c
-> > @@ -1819,6 +1819,8 @@ void bond_xdp_set_features(struct net_device *bon=
-d_dev)
-> >       bond_for_each_slave(bond, slave, iter)
-> >               val &=3D slave->dev->xdp_features;
-> >
-> > +     val &=3D ~NETDEV_XDP_ACT_XSK_ZEROCOPY;
-> > +
-> >       xdp_set_features_flag(bond_dev, val);
-> >  }
-> >
-> > @@ -5910,8 +5912,10 @@ void bond_setup(struct net_device *bond_dev)
-> >               bond_dev->features |=3D BOND_XFRM_FEATURES;
-> >  #endif /* CONFIG_XFRM_OFFLOAD */
-> >
-> > -     if (bond_xdp_check(bond))
-> > +     if (bond_xdp_check(bond)) {
-> >               bond_dev->xdp_features =3D NETDEV_XDP_ACT_MASK;
-> > +             bond_dev->xdp_features &=3D ~NETDEV_XDP_ACT_XSK_ZEROCOPY;
-> > +     }
->
-> Shouldn't we rather drop this assignment completely? It makes no sense
-> to default to all features, it should default to none...
+Hi,
 
-Good point. Seems the bond device defaults to supporting everything
-before a device is bonded to it, but I might have misunderstood
-something. Lorenzo, could you enlighten us please?
+here's a pull request to net tree, more info below. Please let me know if there
+are any problems.
 
-Thanks: Magnus
+Kalle
 
-> -Toke
->
+The following changes since commit ecb1b8288dc7ccbdcb3b9df005fa1c0e0c0388a7:
+
+  Merge tag 'net-6.8-rc2' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-01-25 10:58:35 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless.git tags/wireless-2024-02-06
+
+for you to fetch changes up to 0647903efbc84b772325b4d24d9487e24d6d1e03:
+
+  wifi: mt76: mt7996: fix fortify warning (2024-02-05 20:00:45 +0200)
+
+----------------------------------------------------------------
+wireless fixes for v6.8-rc4
+
+This time we have unusually large wireless pull request. Several
+functionality fixes to both stack and iwlwifi. Lots of fixes to
+warnings, especially to MODULE_DESCRIPTION().
+
+----------------------------------------------------------------
+Arend van Spriel (1):
+      MAINTAINERS: wifi: brcm80211: cleanup entry
+
+Benjamin Berg (2):
+      wifi: iwlwifi: mvm: skip adding debugfs symlink for reconfig
+      wifi: iwlwifi: do not announce EPCS support
+
+Breno Leitao (9):
+      wifi: fill in MODULE_DESCRIPTION()s for wlcore
+      wifi: fill in MODULE_DESCRIPTION()s for wl1251 and wl12xx
+      wifi: fill in MODULE_DESCRIPTION()s for Broadcom WLAN
+      wifi: fill in MODULE_DESCRIPTION()s for ar5523
+      wifi: fill in MODULE_DESCRIPTION()s for wcn36xx
+      wifi: fill in MODULE_DESCRIPTION()s for p54spi
+      wifi: fill in MODULE_DESCRIPTION()s for wl18xx
+      wifi: fill in MODULE_DESCRIPTION()s for wilc1000
+      wifi: fill in MODULE_DESCRIPTION()s for mt76 drivers
+
+Emmanuel Grumbach (1):
+      wifi: iwlwifi: mvm: fix a battery life regression
+
+Felix Fietkau (1):
+      wifi: mt76: mt7996: fix fortify warning
+
+Gregory Greenman (1):
+      MAINTAINERS: remove myself as iwlwifi driver maintainer
+
+Johannes Berg (13):
+      wifi: iwlwifi: fix double-free bug
+      wifi: cfg80211: fix wiphy delayed work queueing
+      wifi: iwlwifi: remove extra kernel-doc
+      wifi: cfg80211: detect stuck ECSA element in probe resp
+      wifi: mac80211: improve CSA/ECSA connection refusal
+      wifi: mac80211: fix RCU use in TDLS fast-xmit
+      wifi: mac80211: set station RX-NSS on reconfig
+      wifi: mac80211: fix driver debugfs for vif type change
+      wifi: mac80211: initialize SMPS mode correctly
+      wifi: mac80211: fix unsolicited broadcast probe config
+      wifi: mac80211: fix waiting for beacons logic
+      wifi: mac80211: adding missing drv_mgd_complete_tx() call
+      wifi: mac80211: accept broadcast probe responses on 6 GHz
+
+Kees Cook (1):
+      wifi: brcmfmac: Adjust n_channels usage for __counted_by
+
+Mario Limonciello (1):
+      wifi: mac80211: Drop WBRF debugging statements
+
+Miri Korenblit (1):
+      wifi: iwlwifi: exit eSR only after the FW does
+
+ MAINTAINERS                                        |   9 +-
+ drivers/net/wireless/ath/ar5523/ar5523.c           |   1 +
+ drivers/net/wireless/ath/wcn36xx/main.c            |   1 +
+ .../broadcom/brcm80211/brcmfmac/bca/module.c       |   1 +
+ .../broadcom/brcm80211/brcmfmac/cfg80211.c         |   6 +-
+ .../broadcom/brcm80211/brcmfmac/cyw/module.c       |   1 +
+ .../broadcom/brcm80211/brcmfmac/wcc/module.c       |   1 +
+ drivers/net/wireless/intel/iwlwifi/fw/api/debug.h  |   2 +-
+ drivers/net/wireless/intel/iwlwifi/fw/dbg.c        |   3 +-
+ drivers/net/wireless/intel/iwlwifi/iwl-drv.c       |   1 +
+ drivers/net/wireless/intel/iwlwifi/iwl-nvm-parse.c |   5 +-
+ drivers/net/wireless/intel/iwlwifi/mvm/mac80211.c  |   6 +-
+ .../net/wireless/intel/iwlwifi/mvm/mld-mac80211.c  |   9 +-
+ drivers/net/wireless/intersil/p54/p54spi.c         |   1 +
+ drivers/net/wireless/mediatek/mt76/mt7603/main.c   |   1 +
+ drivers/net/wireless/mediatek/mt76/mt7615/main.c   |   1 +
+ drivers/net/wireless/mediatek/mt76/mt7615/mmio.c   |   1 +
+ drivers/net/wireless/mediatek/mt76/mt7615/sdio.c   |   1 +
+ drivers/net/wireless/mediatek/mt76/mt7615/usb.c    |   1 +
+ .../net/wireless/mediatek/mt76/mt7615/usb_sdio.c   |   1 +
+ .../net/wireless/mediatek/mt76/mt76_connac_mcu.c   |   1 +
+ drivers/net/wireless/mediatek/mt76/mt76x0/eeprom.c |   1 +
+ drivers/net/wireless/mediatek/mt76/mt76x0/pci.c    |   1 +
+ drivers/net/wireless/mediatek/mt76/mt76x0/usb.c    |   1 +
+ .../net/wireless/mediatek/mt76/mt76x02_usb_mcu.c   |   1 +
+ drivers/net/wireless/mediatek/mt76/mt76x02_util.c  |   1 +
+ drivers/net/wireless/mediatek/mt76/mt76x2/eeprom.c |   1 +
+ drivers/net/wireless/mediatek/mt76/mt76x2/pci.c    |   1 +
+ drivers/net/wireless/mediatek/mt76/mt76x2/usb.c    |   1 +
+ drivers/net/wireless/mediatek/mt76/mt7915/mmio.c   |   1 +
+ drivers/net/wireless/mediatek/mt76/mt7921/main.c   |   1 +
+ drivers/net/wireless/mediatek/mt76/mt7921/pci.c    |   1 +
+ drivers/net/wireless/mediatek/mt76/mt7921/sdio.c   |   1 +
+ drivers/net/wireless/mediatek/mt76/mt7921/usb.c    |   1 +
+ drivers/net/wireless/mediatek/mt76/mt7925/main.c   |   1 +
+ drivers/net/wireless/mediatek/mt76/mt7925/pci.c    |   1 +
+ drivers/net/wireless/mediatek/mt76/mt7925/usb.c    |   1 +
+ drivers/net/wireless/mediatek/mt76/mt792x_core.c   |   1 +
+ drivers/net/wireless/mediatek/mt76/mt792x_usb.c    |   1 +
+ drivers/net/wireless/mediatek/mt76/mt7996/mcu.c    |   3 +-
+ drivers/net/wireless/mediatek/mt76/mt7996/mmio.c   |   1 +
+ drivers/net/wireless/mediatek/mt76/sdio.c          |   1 +
+ drivers/net/wireless/mediatek/mt76/usb.c           |   1 +
+ drivers/net/wireless/mediatek/mt76/util.c          |   1 +
+ drivers/net/wireless/microchip/wilc1000/netdev.c   |   1 +
+ drivers/net/wireless/microchip/wilc1000/sdio.c     |   1 +
+ drivers/net/wireless/microchip/wilc1000/spi.c      |   1 +
+ drivers/net/wireless/ti/wl1251/sdio.c              |   1 +
+ drivers/net/wireless/ti/wl1251/spi.c               |   1 +
+ drivers/net/wireless/ti/wl12xx/main.c              |   1 +
+ drivers/net/wireless/ti/wl18xx/main.c              |   1 +
+ drivers/net/wireless/ti/wlcore/main.c              |   1 +
+ drivers/net/wireless/ti/wlcore/sdio.c              |   1 +
+ drivers/net/wireless/ti/wlcore/spi.c               |   1 +
+ include/net/cfg80211.h                             |   4 +
+ net/mac80211/cfg.c                                 |  16 +--
+ net/mac80211/debugfs_netdev.c                      |   4 +-
+ net/mac80211/debugfs_netdev.h                      |   5 -
+ net/mac80211/iface.c                               |   2 +-
+ net/mac80211/mlme.c                                | 114 +++++++++++++++------
+ net/mac80211/scan.c                                |  30 +++---
+ net/mac80211/tx.c                                  |   7 +-
+ net/mac80211/wbrf.c                                |   2 -
+ net/wireless/core.c                                |   3 +-
+ net/wireless/scan.c                                |  59 ++++++++++-
+ 65 files changed, 247 insertions(+), 88 deletions(-)
+
 
