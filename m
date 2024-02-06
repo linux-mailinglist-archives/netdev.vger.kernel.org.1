@@ -1,147 +1,104 @@
-Return-Path: <netdev+bounces-69558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 740A884BAF8
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 17:32:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A4D384BAFD
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 17:33:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30B252892A0
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:32:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD8F71C2369F
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:33:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 286E31373;
-	Tue,  6 Feb 2024 16:32:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C6DA19A;
+	Tue,  6 Feb 2024 16:33:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="InhSnCUv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LRprm7Pj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECBDF1109;
-	Tue,  6 Feb 2024 16:32:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F3D78F68
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 16:33:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707237156; cv=none; b=tkpnxRTQoY7mw9XSfDyx7px6Idf5qIMcAmcQhB/2SeWi9TmztC1AyltVae3I/bEJon5lFGoucn5ikUCaUqrUzCFi7ge5wAG9RMZVRYTraKVDxItwODO5gjl8lkXEWpyU7xP6Dj8cS4u7s9U2JUzz8ZqgeUEw0rp/oEAphzXIZjU=
+	t=1707237233; cv=none; b=uS/TyiXO3pLi88AHLCHelsVonCJmKl32sLseyRg1t6gTGN3+oug1rsUZ8zWX3vqw/Na8a4lFYqO5ZfGXutFDmS8tKLt9VrczsY9dI6JLhK6LHI3DEuPtEJnYmOrJzpG5+X1RQgRJuo1D8iMv97lfFUODv1F/47QMdfrlLceIq/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707237156; c=relaxed/simple;
-	bh=VUVf9m+WpTmCOVnNMaOwkUB5XVPEoBw58bzOPnIkiW0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fQJ8kfgVezwgFbcRjH7G0kN3DOfhoo2ZyVZIC/K8VdjtiXjH25zC78fSGYjDq36nRJi3nMxXcWwtdCVKSfqjLFMckcfDUft+nFUk15MVAweTJuD3hkxtdyQt5weY/9OF1NSR+ds65jKd9gb63u7+bTH980j3BypVCuMvpoY1CdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=InhSnCUv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 990B6C433C7;
-	Tue,  6 Feb 2024 16:32:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707237155;
-	bh=VUVf9m+WpTmCOVnNMaOwkUB5XVPEoBw58bzOPnIkiW0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=InhSnCUvkTocP2EuFSB8wXe5XoRhXPnCJWLvJPtGmNFYnhfkx32p1VY+NDXJ/tz8v
-	 v9Q/JvOgJVcOMYV1WkQSjPAbmmSq5NvATxL7yR36wc8WO6E2X7yZqzAGJpTK2wQXst
-	 YwKKx9TCqpOOdUrCwO09ZwE/Pt1+rDpIGNvoym7BwL5eMXcQZKiTtppWeP4Jp01aNj
-	 cC5uQae8LpnnTWEd/k2cd1423ghlMtPlzfpJYKhR6wu/HSUtGXdIN2II8O7rAq+Him
-	 51ou/AWe0CPyNY4sBlqdOWVGtbGeeWK5s7/F2qW54rKvcnYQJsgy5EyftJoqCc86AQ
-	 xL2yy5ISBD7JQ==
-Date: Tue, 6 Feb 2024 16:32:29 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Robert Marko <robert.marko@sartura.hr>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org
-Subject: Re: [net-next PATCH v6 05/10] dt-bindings: net: Document Qcom
- QCA807x PHY package
-Message-ID: <20240206-correct-viscous-1f8c163f4d0c@spud>
-References: <20240205164851.1351-1-ansuelsmth@gmail.com>
- <20240205164851.1351-6-ansuelsmth@gmail.com>
+	s=arc-20240116; t=1707237233; c=relaxed/simple;
+	bh=iZRaDyxGOUkspylNPZ2qIjk46reMpuOuyAsS/xaTqI4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WnK9OjKHXQLopbgz6C+p86seW4AQvAW7hJ53v2Bc4j8K84ePby+HuCM1NvLeywpvRzV3P2oW5A+gOvS0rtXHPqym5xTPNT4NzqCg7Zt5unfCnnqaMw9AUj124NY5sGrtMsOdgZ+ukWMwecpwyQ9rcnjXTmQ3FabB7ZMUN1RbBqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LRprm7Pj; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707237232; x=1738773232;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=iZRaDyxGOUkspylNPZ2qIjk46reMpuOuyAsS/xaTqI4=;
+  b=LRprm7PjiMOvcG1DQlE+iz0EwC4DdoeaCvMCXQzAQVKftFTk1gsqaOvc
+   Hte+OMYNXhxbSrC80whC+OWlLkD6cBBfRgfGyfEBOEdGgtoWWqjyBh9Rk
+   U+ihCjyuDp/c9O7IZzoxseGmcjGoQcp+xlVNzlaoCKz+sQz0UzUAazJCK
+   RtuCKp9m6jJrSvWK6RzHszHgC+ojOr1VW209j0eGlhfMHwxD+RVMk5RKE
+   sYGr1pScKwOadpWIdBM2Mjt+xsvRmqfoxKj4ag8y2JmNFnYZwSD7co0ir
+   O0fNCmHxBcOCp0kOkbIJp8pF3iY3JxI0tCB4lVz+WMPIhnpqaArdINZ1N
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10976"; a="684429"
+X-IronPort-AV: E=Sophos;i="6.05,247,1701158400"; 
+   d="scan'208";a="684429"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2024 08:33:51 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,247,1701158400"; 
+   d="scan'208";a="24307812"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa002.fm.intel.com with ESMTP; 06 Feb 2024 08:33:47 -0800
+Received: from lplachno-mobl.ger.corp.intel.com (lplachno-mobl.ger.corp.intel.com [10.246.2.62])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 1E6FB27BBB;
+	Tue,  6 Feb 2024 16:33:42 +0000 (GMT)
+From: Lukasz Plachno <lukasz.plachno@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	brett.creeley@amd.com,
+	horms@kernel.org,
+	pmenzel@molgen.mpg.de,
+	Lukasz Plachno <lukasz.plachno@intel.com>
+Subject: [PATCH iwl-next v5 0/2] ice: Support flow director ether type filters
+Date: Tue,  6 Feb 2024 17:33:35 +0100
+Message-Id: <20240206163337.11415-1-lukasz.plachno@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="a/vFkjiZ+/oGlKeY"
-Content-Disposition: inline
-In-Reply-To: <20240205164851.1351-6-ansuelsmth@gmail.com>
+Content-Transfer-Encoding: 8bit
 
+Ethtool allows creating rules with type=ether, add support for such
+filters in ice driver.
+Patch 1 allows extending ice_fdir_comp_rules() with handling additional
+type of filters.
 
---a/vFkjiZ+/oGlKeY
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+v5: added missing documentation for parameter introduced in V4,
+    extended commit message for patch adding flow-type ether rules support
+v4: added warning explaining that masks other than broadcast and unicast
+    are not supported, added check for empty filters
+v3: fixed possible use of uninitialized variable "perfect_filter"
+v2: fixed compilation warning by moving default: case between commits
+Jakub Buchocki (1):
+  ice: Implement 'flow-type ether' rules
 
-Hey Christian,
+Lukasz Plachno (1):
+  ice: Remove unnecessary argument from ice_fdir_comp_rules()
 
-On Mon, Feb 05, 2024 at 05:48:37PM +0100, Christian Marangi wrote:
-> Document Qcom QCA807x PHY package.
->=20
-> Qualcomm QCA807X Ethernet PHY is PHY package of 2 or 5
-> IEEE 802.3 clause 22 compliant 10BASE-Te, 100BASE-TX and
-> 1000BASE-T PHY-s.
->=20
-> Document the required property to make the PHY package correctly
-> configure and work.
->=20
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+ .../net/ethernet/intel/ice/ice_ethtool_fdir.c | 141 +++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_fdir.c     | 112 ++++++++------
+ drivers/net/ethernet/intel/ice/ice_fdir.h     |  11 ++
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ 4 files changed, 218 insertions(+), 47 deletions(-)
 
-I think this looks pretty decent, some minor comments.
+-- 
+2.34.1
 
-> +  qcom,package-mode:
-> +    description: |
-> +      PHY package can be configured in 3 mode following this table:
-> +
-> +                    First Serdes mode       Second Serdes mode
-> +      Option 1      PSGMII for copper       Disabled
-> +                    ports 0-4
-> +      Option 2      PSGMII for copper       1000BASE-X / 100BASE-FX
-> +                    ports 0-4
-> +      Option 3      QSGMII for copper       SGMII for
-> +                    ports 0-3               copper port 4
-> +
-> +      PSGMII mode (option 1 or 2) is configured dynamically by the driver
-
-I'd drop mention of the driver here, with s/by the driver//.
-
-> +      based on the presence of a connected SFP device.
-> +    $ref: /schemas/types.yaml#/definitions/string
-> +    enum:
-> +      - qsgmii
-> +      - psgmii
-> +    default: psgmii
-> +
-> +  qcom,tx-driver-strength-milliwatt:
-
-Is this a typo? Should not it be "drive-strength"? There's 39 mentions
-in tree of "driver-strength" and 3500 for "drive-strength".
-
-Otherwise I think the review comments have been resolved:
-Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
-
-Cheers,
-Conor.
-
---a/vFkjiZ+/oGlKeY
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZcJfHQAKCRB4tDGHoIJi
-0tXdAQCygPRitHtARrZJDmyO9gAZQRI5ZN6riGQM9vasnNvVqwD/YZY1UhnCp8RP
-gpI63/IURIEemQZndCY9SfLKbTrt9gA=
-=2+Jh
------END PGP SIGNATURE-----
-
---a/vFkjiZ+/oGlKeY--
 
