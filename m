@@ -1,152 +1,153 @@
-Return-Path: <netdev+bounces-69528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A66684B8F4
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:11:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 843BF84B94E
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:24:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B385B2BDEB
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:09:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7A4F1C2490A
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:24:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB721332A3;
-	Tue,  6 Feb 2024 15:08:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB3791339B6;
+	Tue,  6 Feb 2024 15:16:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X1qyTm/0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="soXgTDT0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC86013328A;
-	Tue,  6 Feb 2024 15:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BC691339B4;
+	Tue,  6 Feb 2024 15:16:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707232120; cv=none; b=Suyrc69GgZ0iysh3tmdT4VUri4Fgsd4zDeurId9ugjdnU+5LmSF91zjZTwlNcRd9YPUoDTctoNWOB9lI16GA2GDgZAsc/+D9mA4xWFeUCn29Ajirvpy5FUI9Y8HE9RGsrjiDXrBY2lWDULGANscX7a5LtgNC+rTV1E+xD+OIjgM=
+	t=1707232599; cv=none; b=qRSluzhVm1kx0pz1T8vzQC+1/7Q1SgPeueAyT9rfFwbZbX/dAhFOv8jmGGN//GDap5VxTWLEth2xUhO/0Qy05y3/yF8G1eTzVwY4qHNOgcSOYsQbZVLcRhXlH4chsXyeruDxiw+RpIzEUV+YrDkZDqXzHUtfSm1r2R6ykyNzDz4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707232120; c=relaxed/simple;
-	bh=y0RNzdVJndYWSP0vGgdOxK1NMGHChFiuRWotjCrpl0Q=;
+	s=arc-20240116; t=1707232599; c=relaxed/simple;
+	bh=XsdWdytMvZwMcahXMHmv2mp3rx181G3KH+mF9flZX3E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MXVLakBmOB7V2UeMyJ+UNhW+y5gEuBO8ruRI6/Oz2G9dytldbqeVEVjzqxyp9et+Zk72zJ/KbiIFWWpvyRC6izI6b1omhEApQ7YS2rutHGQ5lCHRqP/hvWXSZx++jIHW9pqazWy9i87wAl+IaKo3MaaMnn3JK9GYsXdKjWkiQqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X1qyTm/0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94A01C433C7;
-	Tue,  6 Feb 2024 15:08:36 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=JifCunmbB9e9yExZmMO7BfbXBTr/56ckHDnBoU9bUJM3cHWPr4IJMwfOvKTMJFb6MYAQsy84onlAAdD5la1GALiFsNY9ytOFQtDIl7vOrFZIUZ54awr/9yKVDk9E7G/E3eDXBF6EI0UqK93cQbydxNBFS/fRRO7S5/leKdpOyE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=soXgTDT0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 867FFC433C7;
+	Tue,  6 Feb 2024 15:16:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707232119;
-	bh=y0RNzdVJndYWSP0vGgdOxK1NMGHChFiuRWotjCrpl0Q=;
+	s=k20201202; t=1707232599;
+	bh=XsdWdytMvZwMcahXMHmv2mp3rx181G3KH+mF9flZX3E=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=X1qyTm/0U+yzlb1K9Uzww22xl2BagUxKRr4E8pXRsIdKwRSutYO3C14gDCXxpMJ/d
-	 mPOgS/R5rdvmKhQPQqWgN6jB7CDkL8nbolZ2Qy/dVFSlBpc02UqkxXnh7lru3JQ6R+
-	 FHexHrssJkeJ0Fd0gepitxGMeB4XtUeU2WGxGWqZ3zdiPdsxBL08iYXnB8ZViIjSxA
-	 dIWYMhwbfW8ZcorLnhgSnUkLUOhsgtkMEZW26ZLWcZm+/Zd/OfuBb1lKum6H/aHwQE
-	 L/6ijl3lLIUQXQtXH+qlWsgLKPeSGfGP7TDQBtNzbBsFUoIx0ta5PUN+LzABn/gHKU
-	 RmXipacSQ1HGg==
-Date: Tue, 6 Feb 2024 15:07:04 +0000
-From: Simon Horman <horms@kernel.org>
-To: Pavel Sakharov <p.sakharov@ispras.ru>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Alexey Khoroshilov <khoroshilov@ispras.ru>
-Subject: Re: [PATCH] stmmac: Fix incorrect dereference in stmmac_*_interrupt()
-Message-ID: <20240206150704.GD1104779@kernel.org>
-References: <20240203150323.1041736-1-p.sakharov@ispras.ru>
+	b=soXgTDT0fJoGfMxzBL/HEFMqwmY4B1PXFEANujlNcYYQR0E0WP8GGHpKcb3zQRVhm
+	 HaZuByk5hj7MffetrWFZnjrD0DyFs9oOUI4kH9l6tTNsaavu2b/Xp4Z3wB86Gr5nxz
+	 LQLk9BMkE1ts083FWnD+6J6FvSNyqLyxd2BpR0OaroSyqxIYlDRBrIIui0wNKE531A
+	 AEg5A/U+DyW3U/dTWwXGE7zWtYsSz9l2HndvAoIQ4ph+ZGxzNhR4LUDz7KlNSmzup5
+	 +aIrrpbQzBpiUdM5/H1iX+tx1/sC+Tcjbio16xpeQVyaCYIKipCDoy8mcyGJVCghSr
+	 72O95WKBFEVSg==
+Date: Tue, 6 Feb 2024 16:16:35 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Magnus Karlsson <magnus.karlsson@gmail.com>
+Cc: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	magnus.karlsson@intel.com, bjorn@kernel.org, ast@kernel.org,
+	daniel@iogearbox.net, netdev@vger.kernel.org,
+	maciej.fijalkowski@intel.com, kuba@kernel.org, pabeni@redhat.com,
+	davem@davemloft.net, j.vosburgh@gmail.com, andy@greyhouse.net,
+	hawk@kernel.org, john.fastabend@gmail.com, edumazet@google.com,
+	bpf@vger.kernel.org, Prashant Batra <prbatra.mail@gmail.com>
+Subject: Re: [PATCH net] bonding: do not report NETDEV_XDP_ACT_XSK_ZEROCOPY
+Message-ID: <ZcJNUyUV_Z-GkFBV@lore-desk>
+References: <20240205123011.22036-1-magnus.karlsson@gmail.com>
+ <87le7zvz1o.fsf@toke.dk>
+ <CAJ8uoz03-AcOwMj3-20ritbYQT9CSJMQ8oz6OuhyE-U=2F7+Gg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="zCzGVAeTNowh1sME"
 Content-Disposition: inline
-In-Reply-To: <20240203150323.1041736-1-p.sakharov@ispras.ru>
-
-On Sat, Feb 03, 2024 at 06:03:21PM +0300, Pavel Sakharov wrote:
-> If 'dev' is NULL, the 'priv' variable has an incorrect address when
-> dereferencing calling netdev_err().
-> 
-> Pass 'dev' instead of 'priv->dev" to the function.
-> 
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
-> 
-> Signed-off-by: Pavel Sakharov <p.sakharov@ispras.ru>
-
-Thanks Pavel,
-
-I agree with your analysis that this can result in a NULL dereference.
-And that your proposed fix is good: netdev_err() can handle a NULL
-dev argument.
-
-As this seems to be a fix I suggest it should be for net.
-And that it should be based on that tree and designated as such
-in the subject:
-
-Subject: [PATCH net] ...
-
-Also if it is a fix, it should have a fixes tag.
-Perhaps this one:
-
-Fixes: 8532f613bc78 ("net: stmmac: introduce MSI Interrupt routines for mac, safety, RX & TX")
+In-Reply-To: <CAJ8uoz03-AcOwMj3-20ritbYQT9CSJMQ8oz6OuhyE-U=2F7+Gg@mail.gmail.com>
 
 
-I don't think there is a need to respin for the above, though please
-keep this in mind when posting Networking patches in future.
+--zCzGVAeTNowh1sME
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+> On Mon, 5 Feb 2024 at 14:08, Toke H=F8iland-J=F8rgensen <toke@redhat.com>=
+ wrote:
+> >
+> > Magnus Karlsson <magnus.karlsson@gmail.com> writes:
+> >
+> > > From: Magnus Karlsson <magnus.karlsson@intel.com>
+> > >
+> > > Do not report the XDP capability NETDEV_XDP_ACT_XSK_ZEROCOPY as the
+> > > bonding driver does not support XDP and AF_XDP in zero-copy mode even
+> > > if the real NIC drivers do.
+> > >
+> > > Fixes: cb9e6e584d58 ("bonding: add xdp_features support")
+> > > Reported-by: Prashant Batra <prbatra.mail@gmail.com>
+> > > Link: https://lore.kernel.org/all/CAJ8uoz2ieZCopgqTvQ9ZY6xQgTbujmC6Xk=
+MTamhp68O-h_-rLg@mail.gmail.com/T/
+> > > Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
+> > > ---
+> > >  drivers/net/bonding/bond_main.c | 6 +++++-
+> > >  1 file changed, 5 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bo=
+nd_main.c
+> > > index 4e0600c7b050..79a37bed097b 100644
+> > > --- a/drivers/net/bonding/bond_main.c
+> > > +++ b/drivers/net/bonding/bond_main.c
+> > > @@ -1819,6 +1819,8 @@ void bond_xdp_set_features(struct net_device *b=
+ond_dev)
+> > >       bond_for_each_slave(bond, slave, iter)
+> > >               val &=3D slave->dev->xdp_features;
+> > >
+> > > +     val &=3D ~NETDEV_XDP_ACT_XSK_ZEROCOPY;
+> > > +
+> > >       xdp_set_features_flag(bond_dev, val);
+> > >  }
+> > >
+> > > @@ -5910,8 +5912,10 @@ void bond_setup(struct net_device *bond_dev)
+> > >               bond_dev->features |=3D BOND_XFRM_FEATURES;
+> > >  #endif /* CONFIG_XFRM_OFFLOAD */
+> > >
+> > > -     if (bond_xdp_check(bond))
+> > > +     if (bond_xdp_check(bond)) {
+> > >               bond_dev->xdp_features =3D NETDEV_XDP_ACT_MASK;
+> > > +             bond_dev->xdp_features &=3D ~NETDEV_XDP_ACT_XSK_ZEROCOP=
+Y;
+> > > +     }
+> >
+> > Shouldn't we rather drop this assignment completely? It makes no sense
+> > to default to all features, it should default to none...
+>=20
+> Good point. Seems the bond device defaults to supporting everything
+> before a device is bonded to it, but I might have misunderstood
+> something. Lorenzo, could you enlighten us please?
 
-Looking at the patch above, and stmmac_main.c, it seems that the following
-functions also suffer from a similar problem:
+ack, I agree we can get rid of it since the xdp features will be calculated
+again as soon as a new device is added to the bond.
 
-static irqreturn_t stmmac_msi_intr_tx(int irq, void *data)
-{
-	struct stmmac_tx_queue *tx_q = (struct stmmac_tx_queue *)data;
-	...
-	dma_conf = container_of(tx_q, struct stmmac_dma_conf, tx_queue[chan]);
-	priv = container_of(dma_conf, struct stmmac_priv, dma_conf);
+Regards,
+Lorenzo
 
-	if (unlikely(!data)) {
-		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
-		...
+>=20
+> Thanks: Magnus
+>=20
+> > -Toke
+> >
 
-And stmmac_msi_intr_rx(), which follows a similar pattern
-to stmmac_msi_intr_tx().
+--zCzGVAeTNowh1sME
+Content-Type: application/pgp-signature; name="signature.asc"
 
-I also note that in those functions "invalid dev pointer" seems misleading,
-perhaps it ought to be "invalid queue" pointer.
+-----BEGIN PGP SIGNATURE-----
 
-As these problems seem to all have been introduced at the same time,
-perhaps it is appropriate to fix them all in one patch?
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZcJNUwAKCRA6cBh0uS2t
+rOwhAP4jhkFuBEZcqF9xSUby4YHotziOFQIxCywPqt14NCAi2wD+L6fT4PUkSWG2
+30f3jtqBO/mUEzEtfuHPBSioojO1qAw=
+=Z2iv
+-----END PGP SIGNATURE-----
 
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 4727f7be4f86..5ab5148013cd 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -5848,7 +5848,7 @@ static irqreturn_t stmmac_mac_interrupt(int irq, void *dev_id)
->  	struct stmmac_priv *priv = netdev_priv(dev);
-> 
->  	if (unlikely(!dev)) {
-> -		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
-> +		netdev_err(dev, "%s: invalid dev pointer\n", __func__);
->  		return IRQ_NONE;
->  	}
-> 
-> @@ -5868,7 +5868,7 @@ static irqreturn_t stmmac_safety_interrupt(int irq, void *dev_id)
->  	struct stmmac_priv *priv = netdev_priv(dev);
-> 
->  	if (unlikely(!dev)) {
-> -		netdev_err(priv->dev, "%s: invalid dev pointer\n", __func__);
-> +		netdev_err(dev, "%s: invalid dev pointer\n", __func__);
->  		return IRQ_NONE;
->  	}
-> 
-> 
+--zCzGVAeTNowh1sME--
 
