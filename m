@@ -1,113 +1,95 @@
-Return-Path: <netdev+bounces-69436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F03084B301
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 12:04:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A770E84B322
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 12:10:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F3D02890C5
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 11:04:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FAE61F24A38
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 11:10:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB7812D74F;
-	Tue,  6 Feb 2024 11:04:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="hVWQbIC7"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 710F712AAD4;
+	Tue,  6 Feb 2024 11:08:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [80.241.56.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D65912F389
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 11:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE53E12F5A4;
+	Tue,  6 Feb 2024 11:08:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707217458; cv=none; b=qbpolBiMIAkOBTWp4YPgevfInUTtgjlmb55LfS4/elWFi3OpWUE+nIFsUZwTFJjWlb30UqRP6WlLSrviqkiGTaKydGh+VYwdK2rPuT30tafpqLZ3EibVJQ7Xq8VAiihjlfJ7/zHcgR4PF1n57TCyAKbSlxXlh6cP66u4f/hfZbU=
+	t=1707217706; cv=none; b=IMI1UOk9H14eUrpPQLV6I01paFq74L0qoyHL0InoIZFyEtnvSmrlYe0HPBFc+Y8Psf88v75wwJjPMpOMP76U2zWiQM7LZrGFthHszwkxERky4XyyE6gu76eQXJB1+VDvZWclyg+L9jgSz4XOgLcgKgpZGhr+nwPAOCCETODksKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707217458; c=relaxed/simple;
-	bh=x0pbIQk1qP8nN3+ZGiA3qhVlXb3liKdO9iZ/xJXSuMM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Cbl2vmfIzD60fTrTrB3UDss1aE+1TWF9tJ9Qn/tY8z79noeMDFJJsTu0nqkY4F6GUbIn8EgcCatTsr/Qr7yfYBywxr8461czbAAMStIMx6Nbjk2rXTBkPGO6y+2utoQMJ3lSp3xkUyZG45mmOoFPIigUW9onQxjUPIpDrHyRgk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=hVWQbIC7; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a3832ef7726so43724166b.0
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 03:04:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707217454; x=1707822254; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=txJ4UfEaHG02zODZo80UumZhELeKYRvUYcjtXa7HnRM=;
-        b=hVWQbIC7T6puE1VFjp9sEN9nnaS886cp5T1KAHNeQJHGHe10dnd+9YiVHbNDvjD/jE
-         E0BxVBiwfpvkzuo2rTCOucLSL8/oCg3gOJ1wiZzBSuj63ElAOj3HiHjHNeYbi1r10nLy
-         N4jhCjp2ZPt5MkWnMTGOo5NrZXqNqnbC8nRYz1Bhu24xyKaOwrXF/vLLUX5hhilICiCQ
-         z84DBWNEnbsM/gNFEFjgGqemqslP2++gQYEng6ahu8YAm8hmSLcssqsGbc1nlopV+4Kq
-         Mn6nm3sgaP4Q367S43cRxs1pO4a8Z7SqoKtMsVxKwMXA2iEcPyPzIX0EXcpvz0QrtBOk
-         iV8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707217454; x=1707822254;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=txJ4UfEaHG02zODZo80UumZhELeKYRvUYcjtXa7HnRM=;
-        b=fUVOkf+AhZcf9FMyUPFsS40HGtNX9/Ml9g/fJlpbNObco0cI/cxGpP50Nq3W3xZlri
-         5bDvMKZJM3fOHO7mpK7LNrZm9zo7GReydcO9V+EiHetVK+CF/kbSKCVAgI4HSQ7ie+mW
-         tRrXdIsn2QFGJzhdSfLdlPXp8lCBLP7E+Ij1Ysy1WzP/LYyw3FRa2RsjC5UDA1Gs6t82
-         aKHbXRvzWfle9jbyimx5NrjQ8GIaK3U4kfk6OYUiMVUlTOOoGvi7PGOx3D8w6PUxZZoB
-         rdRqVmSytIAu7bHa2KkO0RKCgzrhZReaSH434iJed+etInQDUmE4NiY6OgdCHE6vXiAp
-         qKnQ==
-X-Gm-Message-State: AOJu0YzYxbIR1DDHwQPnv9gwPuohsseSF1PudG/9xxYyegzUX7HaTSGS
-	0oQgP/vmqCazm9WY/ClJqosmYmDi7ImULRHxkBRkZN/KgKBjBN5LpOY90iSXyE0=
-X-Google-Smtp-Source: AGHT+IFFAR2gf7m60D9sS1D4EdhTLyYgZOu7Cfqa7RjFOFppqcibynNTRpxTea0HEnrawmpmS83y8Q==
-X-Received: by 2002:a17:906:5ac8:b0:a36:917f:556e with SMTP id x8-20020a1709065ac800b00a36917f556emr1519178ejs.15.1707217454596;
-        Tue, 06 Feb 2024 03:04:14 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCW+eTU1hVRe+dDWI0m3fgkor2XU3vpZXvDha5qQUKJtKz8d5lIw/sHS4Gxbk+qMN2jP9BT4hjHyGqC0lbjHI36V9FSBhKhURsIkoNoxKSYHcN9JYIhD+V6W+EMs9Ot60yde0RsBOWaG0V/Ol27awVPUWuCgmkXQxSPZvTWjomcxSOePUkKetQ6t1L85qdFge5egX4yjR2Gb4rpBt0YAHyTtTVbUbiQwHuXRjwo6j4tXAEQdkcOAvIZItmn6+NE3FCBGfJyQ9nn9F1TXRLTKXECQeQZoT4NH1jPMCv+ARxnqs5cDhCYwgemV1uS5RSlaojgEjHT1Tqq78HeLk7sshVIfaYgHFzkGdv8kngGvICfXAlsQiEUUXlNQV4QHdWwf7mUIg7TtSDkHeQh16qF8UNCGTu7BZXmUqIxzoObLMXLWd+Q+aXoEckx7KK4Xdxa4u9B5tm+c+83qkWA8s0ZkQTHQad5OOxt9QCY6+UKf
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id vb7-20020a170907d04700b00a354bb5f69csm998982ejc.220.2024.02.06.03.04.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Feb 2024 03:04:14 -0800 (PST)
-Date: Tue, 6 Feb 2024 14:04:10 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Michal Kubecek <mkubecek@suse.cz>
-Cc: Florian Westphal <fw@strlen.de>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, andrea.mattiazzo@suse.com
-Subject: Re: [PATCH net] netfilter: nf_tables: fix pointer math issue in
- nft_byteorder_eval()
-Message-ID: <032e2c72-c2a1-4b8b-96da-b0da73473648@moroto.mountain>
-References: <15fdceb5-2de5-4453-98b3-cfa9d486e8da@moroto.mountain>
- <20240206104336.ctigqpkunom2ufmn@lion.mk-sys.cz>
+	s=arc-20240116; t=1707217706; c=relaxed/simple;
+	bh=H0qiN5y21fJHbc3Gsib/vVUqbIRS/mAwqCfl/lTb+XQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kulBcB0QG4p9SHR7ddU8sWSE4XlC2zpBHEJ0umKZmw32GzHhAkr2XZRUt3F4Fd6OuvyIkX4M44d2d6/VBFNo41Yce6bKJ9kkICB7vXfwfmoJCJry15rX8WppNNxZG1E5UEydbqMEHmss8SRFmvyzSqbL8v69aG9RzvX3hZo8vNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl; spf=pass smtp.mailfrom=v0yd.nl; arc=none smtp.client-ip=80.241.56.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=v0yd.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=v0yd.nl
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [10.196.197.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4TTgTb2ztYz9sX2;
+	Tue,  6 Feb 2024 12:08:19 +0100 (CET)
+From: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>,
+	linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v4 0/2] Bluetooth: Improve retrying of connection attempts
+Date: Tue,  6 Feb 2024 12:08:12 +0100
+Message-ID: <20240206110816.74995-1-verdre@v0yd.nl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240206104336.ctigqpkunom2ufmn@lion.mk-sys.cz>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 06, 2024 at 11:43:36AM +0100, Michal Kubecek wrote:
-> 
-> I stumbled upon this when the issue got a CVE id (sigh) and I share
-> Andrea's (Cc-ed) concern that the fix is incomplete. While the fix,
-> commit c301f0981fdd ("netfilter: nf_tables: fix pointer math issue in
-> nft_byteorder_eval()") now, fixes the destination side, src is still
-> a pointer to u32, i.e. we are reading 64-bit values with relative
-> offsets which are multiples of 32 bits.
-> 
-> Shouldn't we fix this as well, e.g. like indicated below?
-> 
+Since commit 4c67bc74f016 ("[Bluetooth] Support concurrent connect
+requests"), the kernel supports trying to connect again in case the
+bluetooth card is busy and fails to connect.
 
-Yep.  You're right.  Could you send that as a patch.
+The logic that should handle this became a bit spotty over time, and also
+cards these days appear to fail with more errors than just "Command
+Disallowed".
 
-regards,
-dan carpenter
+This series refactores the handling of concurrent connection requests
+by serializing all "Create Connection" commands for ACL connections
+similar to how we do it for LE connections.
+
+---
+
+v1: https://lore.kernel.org/linux-bluetooth/20240102185933.64179-1-verdre@v0yd.nl/
+v2: https://lore.kernel.org/linux-bluetooth/20240108183938.468426-1-verdre@v0yd.nl/
+v3: https://lore.kernel.org/linux-bluetooth/20240108224614.56900-1-verdre@v0yd.nl/
+v4:
+  - Removed first two commits since they are already applied
+  - Removed a BT_DBG() message in the acl_create_connection() function
+    while moving to hci_sync because it seemed out of place in hci_sync
+  - Added a mention of the test failure in mgmt-tester to commit message
+
+Jonas Dreßler (2):
+  Bluetooth: hci_conn: Only do ACL connections sequentially
+  Bluetooth: Remove pending ACL connection attempts
+
+ include/net/bluetooth/hci.h      |  1 +
+ include/net/bluetooth/hci_core.h |  1 -
+ include/net/bluetooth/hci_sync.h |  3 ++
+ net/bluetooth/hci_conn.c         | 83 +++-----------------------------
+ net/bluetooth/hci_event.c        | 21 ++------
+ net/bluetooth/hci_sync.c         | 70 +++++++++++++++++++++++++++
+ 6 files changed, 86 insertions(+), 93 deletions(-)
+
+-- 
+2.43.0
 
 
