@@ -1,123 +1,167 @@
-Return-Path: <netdev+bounces-69424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBE1F84B261
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 11:20:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8054784B26A
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 11:22:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E61C1F258BF
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:20:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B4CDB257FD
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:22:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15E2312E1D1;
-	Tue,  6 Feb 2024 10:20:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5470C12E1D5;
+	Tue,  6 Feb 2024 10:22:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XiNLNKR0"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vsljQ5HY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF53D12D777;
-	Tue,  6 Feb 2024 10:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9296612880E
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 10:22:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707214833; cv=none; b=qkVpURDQ41UhkO1KJA3jQUn2erl+r4eVT3XI9qluaQ1JTpQzM+HtI+YNWMdLVFNDC7vf0R6d0EZ7wj4GP6/37dI2TrCmTMWSozS8j1cwKyyQ80dCWVJOg26kLe5ZLdQmLT4tPUybG2hSYeW9BFvsaFTTxhZENPifPMMoKHALtjQ=
+	t=1707214961; cv=none; b=llCrbEZeV8LBd4pRIqUU1S9uVF4nmaiPa0Yge3k/MNicQGKIpjs3hbkX1WSeJEdNWYNMjE6juEeUriMJ2640KueAvRQCzjN9geDs8XSlJVa1AuZ+XOaPuvuybKq4+Q+WOl0pwFRTxmXgaypdFC1Pbhky6ord2AWqhrFWYt2nrYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707214833; c=relaxed/simple;
-	bh=Fjg4am9IQzHVyiyUiJW4bVseISNNzm8i3XEiwSZ6iQ8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=u1TqfQKIHU+LSQ0nSCAv3C1cYqvucLi6VyE6xPVajWASi0Q7HBO0k/08wSs0vjQ2D7IDOVo8I1q4unfccUO/3q80f1WWvzq0j4jvv81UBGpf6uZw5Ra/auvwh66b8c+sdwCP5mCGR5KkaESFCjB3TmUGvj/fYn5nyd9cdEUpPlk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XiNLNKR0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 48063C43390;
-	Tue,  6 Feb 2024 10:20:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707214832;
-	bh=Fjg4am9IQzHVyiyUiJW4bVseISNNzm8i3XEiwSZ6iQ8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XiNLNKR0qAHMEkw+WJtv0zjrpwpoYKL7jqrvtD/MNamOLYj1D+ZumOrg+y5sHRzKr
-	 l4ORzwUaS/VdAiYQyMdGjZP5Y8sb+tujPcMnvs1dDzAzsIvXl71C8YO8A+3Je7XzFU
-	 NJCogyd6Ms+7FfJy4fzWl+cCGLJ/3YRn/5aZFKJQpt0wLpRGcm64RD/YqOl9jpKmpM
-	 allltjkGKFJDaamYULRC6DB/x01GzCjG8IXPYs1vasfqhXg7n6DmAqWoVM/crpM1yR
-	 lpCCJbiVgbWbiJ1WLb0Boukegk58txiu6+1VX8mAkTnR57NGf/pNRg+SqZPSxQqv0o
-	 zd1gIgJTkfZpQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2A830D8C97E;
-	Tue,  6 Feb 2024 10:20:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1707214961; c=relaxed/simple;
+	bh=M4W8YPKTrAsH9n2fil5B241iL6s8q4tbReO1J8Rn9H4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dc2lH+eaOKlWwRwcRvLvtso/30PNernIIgPh4h6YpQ9ehoTJkoHwBxURZSSKbIED6X6c5hhxKRx9lWJVJ1tbGGRm3Tu6q3cDNR2fu1qLKjXmjbdKzn9/+J+tpOamU+Wa9l/cAyelJ4ewTVFQ8438EjVYZcedi8n0iy1ctqyNWYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vsljQ5HY; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-560530f4e21so7456a12.1
+        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 02:22:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707214958; x=1707819758; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hgeab0y0Ks4vMzm1Cgxum9Eoc5ZGyKRKHtPjput/NRU=;
+        b=vsljQ5HYyARJjcay2cMvCPIykAKZX0At8m4IDxnS7Eg0pv/CbeYniX2O3hy0Rmpxtq
+         b+9eoe/oWb/7r8ePFnOSNSa2I6lUvnzpqcTToVPPZDyWKoz+OBuM3dHPp6Jlocwa9Te9
+         oWTUFr6cMvZL0MdGiz1UO0bmHDpsy6UM0OgfuSKv0VJBX697xWY8Di1HGHTl/ur5ntoF
+         XHR11sbHMojP+bFWzkn1XuJ+r4eG37BXv08FCndAnIkfu8CKekuef+V6KUgNmym892MT
+         HF0KCnohLB1EUTE8lXTDDNHVuZllHeLNA4X38i+fGZrdZDSXDtys8sTwSr65YkIkfo0L
+         BUJA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707214958; x=1707819758;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hgeab0y0Ks4vMzm1Cgxum9Eoc5ZGyKRKHtPjput/NRU=;
+        b=YZotUSaPA5r5xkPzBainawVB5Ru/jCT1/YgQdcTg4269zhmb/ibNXSyLe7t6DOxIl7
+         XdsY170lyi+mCOWgeClTthCZEiiXsHGRv+Z6mXvsJAZFrZ14QZkqP4jgoNZoxpTYSFP5
+         wM2lJJEwDnDFF6W0QDEFGtcTP7V11BYN4Sl/e9dq8afT+XGPrK6Jt8M/G4D9TQJhg6KB
+         s3YbgC5k4WIJQ4BoK162ihISRJCnJJlkq6xI/EJjFifuxBsCMGbaZzwk+YCOypiNeoOk
+         6h5N/Nd7nZ1opj7xYi2QXbUvV3y8yaLyd83SnCJhAUyybIPt619G8HFkve2gsBSClF+j
+         tnNg==
+X-Gm-Message-State: AOJu0YxxeeAS1Wqn0bMo5ECBCsmIlzQQdPlthKFCQglTw4UpsGMps2k+
+	eOuNVsS++nfghc9okzM0YNrZv/5cposxFK7yDENfESowiinu7Zh3NSLeF3HKH9548ZzkY0jx+V7
+	HgRJHRE8MgD/hUv1p2KBanikNtLDAju3DQrXV
+X-Google-Smtp-Source: AGHT+IFUn2GKF+zS6Vzo2yv01A2IiAiGbcW0X79LSewCSGtCokobXcLiaGc5dcJivlkBba69ECcCFzMpfWH3x41H1yk=
+X-Received: by 2002:a50:f60b:0:b0:55f:993a:f1c2 with SMTP id
+ c11-20020a50f60b000000b0055f993af1c2mr156645edn.6.1707214957565; Tue, 06 Feb
+ 2024 02:22:37 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v6 00/15] net: ravb: Prepare for suspend to RAM and
- runtime PM support (part 1)
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170721483217.7972.7667176225745984934.git-patchwork-notify@kernel.org>
-Date: Tue, 06 Feb 2024 10:20:32 +0000
-References: <20240202084136.3426492-1-claudiu.beznea.uj@bp.renesas.com>
-In-Reply-To: <20240202084136.3426492-1-claudiu.beznea.uj@bp.renesas.com>
-To: claudiu beznea <claudiu.beznea@tuxon.dev>
-Cc: s.shtylyov@omp.ru, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com,
- p.zabel@pengutronix.de, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
- claudiu.beznea.uj@bp.renesas.com
+References: <20240205124752.811108-1-edumazet@google.com> <20240205124752.811108-6-edumazet@google.com>
+ <170721115936.5464.3838090704873147346@kwain>
+In-Reply-To: <170721115936.5464.3838090704873147346@kwain>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 6 Feb 2024 11:22:23 +0100
+Message-ID: <CANn89iLJrrJs+6Vc==Un4rVKcpV0Eof4F_4w1_wQGxUCE2FWAg@mail.gmail.com>
+Subject: Re: [PATCH v3 net-next 05/15] geneve: use exit_batch_rtnl() method
+To: Antoine Tenart <atenart@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Tue, Feb 6, 2024 at 10:19=E2=80=AFAM Antoine Tenart <atenart@kernel.org>=
+ wrote:
+>
+> Quoting Eric Dumazet (2024-02-05 13:47:42)
+> > -static void __net_exit geneve_exit_batch_net(struct list_head *net_lis=
+t)
+> > +static void __net_exit geneve_exit_batch_rtnl(struct list_head *net_li=
+st,
+> > +                                             struct list_head *dev_to_=
+kill)
+> >  {
+> >         struct net *net;
+> > -       LIST_HEAD(list);
+> >
+> > -       rtnl_lock();
+> >         list_for_each_entry(net, net_list, exit_list)
+> > -               geneve_destroy_tunnels(net, &list);
+> > -
+> > -       /* unregister the devices gathered above */
+> > -       unregister_netdevice_many(&list);
+> > -       rtnl_unlock();
+> > +               geneve_destroy_tunnels(net, dev_to_kill);
+> >
+> >         list_for_each_entry(net, net_list, exit_list) {
+> >                 const struct geneve_net *gn =3D net_generic(net, geneve=
+_net_id);
+>
+> Not shown in the diff here is:
+>
+>   WARN_ON_ONCE(!list_empty(&gn->sock_list));
+>
+> I think this will be triggered as the above logic inverted two calls,
+> which are now,
+>
+> 1. WARN_ON_ONCE(...)
+> 2. unregister_netdevice_many
+>
+> But ->sock_list entries are removed in ndo_exit, called from
+> unregister_netdevice_many.
+>
+> I guess the warning could be moved to exit_batch (or removed).
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+I will keep the warning, but move it, thanks [1]
 
-On Fri,  2 Feb 2024 10:41:21 +0200 you wrote:
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> 
-> Hi,
-> 
-> This series prepares ravb driver for runtime PM support and adjust the
-> already existing suspend to RAM code to work for RZ/G3S (R9A08G045) SoC.
-> 
-> [...]
+Speaking of geneve, I think the synchronize_net() call from
+geneve_sock_release() could easily be avoided.
 
-Here is the summary with links:
-  - [net-next,v6,01/15] net: ravb: Let IP-specific receive function to interrogate descriptors
-    https://git.kernel.org/netdev/net-next/c/2b993bfdb47b
-  - [net-next,v6,02/15] net: ravb: Rely on PM domain to enable gptp_clk
-    https://git.kernel.org/netdev/net-next/c/e1da043f2b2d
-  - [net-next,v6,03/15] net: ravb: Make reset controller support mandatory
-    https://git.kernel.org/netdev/net-next/c/b1768e3dc477
-  - [net-next,v6,04/15] net: ravb: Switch to SYSTEM_SLEEP_PM_OPS()/RUNTIME_PM_OPS() and pm_ptr()
-    https://git.kernel.org/netdev/net-next/c/6ccc22a5afcb
-  - [net-next,v6,05/15] net: ravb: Use tabs instead of spaces
-    https://git.kernel.org/netdev/net-next/c/7493bb4c400c
-  - [net-next,v6,06/15] net: ravb: Assert/de-assert reset on suspend/resume
-    https://git.kernel.org/netdev/net-next/c/c5c0714e2950
-  - [net-next,v6,07/15] net: ravb: Move reference clock enable/disable on runtime PM APIs
-    https://git.kernel.org/netdev/net-next/c/a654f6e875b7
-  - [net-next,v6,08/15] net: ravb: Move getting/requesting IRQs in the probe() method
-    https://git.kernel.org/netdev/net-next/c/32f012b8c01c
-  - [net-next,v6,09/15] net: ravb: Split GTI computation and set operations
-    https://git.kernel.org/netdev/net-next/c/f384ab481cab
-  - [net-next,v6,10/15] net: ravb: Move delay mode set in the driver's ndo_open API
-    https://git.kernel.org/netdev/net-next/c/23698a9abb62
-  - [net-next,v6,11/15] net: ravb: Move DBAT configuration to the driver's ndo_open API
-    https://git.kernel.org/netdev/net-next/c/cd1fb46e02de
-  - [net-next,v6,12/15] net: ravb: Move PTP initialization in the driver's ndo_open API for ccc_gac platorms
-    https://git.kernel.org/netdev/net-next/c/a6a85ba36fd0
-  - [net-next,v6,13/15] net: ravb: Set config mode in ndo_open and reset mode in ndo_close
-    https://git.kernel.org/netdev/net-next/c/76fd52c10077
-  - [net-next,v6,14/15] net: ravb: Simplify ravb_suspend()
-    https://git.kernel.org/netdev/net-next/c/b07bc55cbb1c
-  - [net-next,v6,15/15] net: ravb: Simplify ravb_resume()
-    https://git.kernel.org/netdev/net-next/c/e95273fe4d02
+[1] I will squash the following delta for v4 submission.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+diff --git a/drivers/net/geneve.c b/drivers/net/geneve.c
+index f31fc52ef397dfe0eba854385f783fbcad7e870f..23e97c2e4f6fcb90a8bbb117d75=
+20397f560f15f
+100644
+--- a/drivers/net/geneve.c
++++ b/drivers/net/geneve.c
+@@ -1907,17 +1907,19 @@ static void __net_exit
+geneve_exit_batch_rtnl(struct list_head *net_list,
 
+        list_for_each_entry(net, net_list, exit_list)
+                geneve_destroy_tunnels(net, dev_to_kill);
++}
 
+-       list_for_each_entry(net, net_list, exit_list) {
+-               const struct geneve_net *gn =3D net_generic(net, geneve_net=
+_id);
++static void __net_exit geneve_exit_net(struct net *net)
++{
++       const struct geneve_net *gn =3D net_generic(net, geneve_net_id);
+
+-               WARN_ON_ONCE(!list_empty(&gn->sock_list));
+-       }
++       WARN_ON_ONCE(!list_empty(&gn->sock_list));
+ }
+
+ static struct pernet_operations geneve_net_ops =3D {
+        .init =3D geneve_init_net,
+        .exit_batch_rtnl =3D geneve_exit_batch_rtnl,
++       .exit =3D geneve_exit_net,
+        .id   =3D &geneve_net_id,
+        .size =3D sizeof(struct geneve_net),
+ };
 
