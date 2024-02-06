@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-69469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23A9884B606
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:12:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC72584B607
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:12:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 488091C234FC
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 13:12:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3AB43B26888
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 13:12:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EC3F130E2B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B044B130E46;
 	Tue,  6 Feb 2024 13:11:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EuLF4pfJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ERFpZUdE"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D9E130E2C
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282F3130E2E
 	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 13:11:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707225116; cv=none; b=BIMp85Exd/PIl5EAhfJ4wZtvTExdT3+r2QQj1U97ZT06OOpFwc94DKn4S79yhFKpdsGCFjAxRtEQBvJrFXaeOdWsgybfTbd9oNqFGmNfOpV3c6iZGmsqE7iYJ4K87mTYWq05Qgfs0GEZA+DZUapfJxdKxw1lq9dYGiOdwYVE+ic=
+	t=1707225116; cv=none; b=iKyGL6L7KD9eEaQGg42CVgV686bYLRTTGDZmZPhXFt3FWYVGH/xhfTPBRs5mQ8CzzztZDoP+o0RuqGKHLFfqjsGc0EIYgBmUM44xtoBDtVh+zvYA6j22WULL6mlW3mlQmaXxh4XXWhgIO60QhzNY8Ez6B4p0eExGhhCabqu3pAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707225116; c=relaxed/simple;
-	bh=R7Cokhvgy/RQS/XK2apws5BPwMw74SZCqCHT79SPBos=;
+	bh=rIyVf4kV6BaoeCtKpNOhavupwvSR0wERy6rx2HpiSkw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=UWlZlSIF9lFJGUGRNqYafS0flos7DqE9tpOWh7uDxrLsoV3fkjocw4vsRBfqle+wXdHXbbSMbDlDs7O06U8Sjo7CDxKQ7oPg6EyYI/gkxtu5nW/SLkfwKYXdI62nhhdmeOvSuMNghHMWj6wNyJnbC4GQhnTXTmT5Y5u6xmVdMMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EuLF4pfJ; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=tRaJ439KZYq1DQ//pGQSBnU9eSrYyxT5e5GtJ//eT3jwdEJrc+c71Sd72SXs4Vy1gBWPvuoOoM3Oj29k8Xt7nvIAaKGAUvTsT/Pgvi41Vo/O9ZWVC8YX27xBc1HF4qooWWNHfN4KNkBc8jHXb8ezDr/rex9kxS0bj1icZR9MeDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ERFpZUdE; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
@@ -37,23 +37,23 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=amgb4Ydy8dxoLqJDv8UgR/Q/x3DQi0pF+4tJDUHewaU=;
-	b=EuLF4pfJa3W/XWeHKkgH1Mk7Xq4eDKs/0mvgA+xj1Am868Dlf5pix9tgB3o5CiQYbtjVV2
-	at6IEJDWqoqFuMWjQHLXzoPHXsJm+0JPawTasQgM8qnSaUbgtXtihItwaVAnBtaUtxz9Qd
-	9MxdxHq6MRuJEEAAYV3i+rKQwNNVi/g=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-246-Hz1neYocOmWr7yQyzk4_yw-1; Tue, 06 Feb 2024 08:11:49 -0500
-X-MC-Unique: Hz1neYocOmWr7yQyzk4_yw-1
+	bh=bV/sn9acX+AcYHI7dxpYyku1szU8bZPM4h5SUT5sGxY=;
+	b=ERFpZUdEXSzWiOOrhCRR44zMrPBHj8NG3dizu7jgGeh9SKQz8Y31sHD7I59FHB3HwW6IBc
+	YfB8Pq63vQ4FDL7kx2ictGykF8pXW6RFpmqOhVlWn7ROq8XTN/zd6401Jbrlgn/nRQnKg/
+	jb6As18uvpk6It5UMODVDz683NJLbLs=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-310-Vj_9-Pv1PeqIBxRlgJgnYg-1; Tue,
+ 06 Feb 2024 08:11:49 -0500
+X-MC-Unique: Vj_9-Pv1PeqIBxRlgJgnYg-1
 Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A905983FC25;
-	Tue,  6 Feb 2024 13:11:48 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 31898383E126;
+	Tue,  6 Feb 2024 13:11:49 +0000 (UTC)
 Received: from RHTPC1VM0NT.lan (unknown [10.22.8.151])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 3F5B72026D06;
+	by smtp.corp.redhat.com (Postfix) with ESMTP id BB5E92026D06;
 	Tue,  6 Feb 2024 13:11:48 +0000 (UTC)
 From: Aaron Conole <aconole@redhat.com>
 To: netdev@vger.kernel.org
@@ -66,9 +66,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Ilya Maximets <i.maximets@ovn.org>,
 	Simon Horman <horms@ovn.org>,
 	Eelco Chaudron <echaudro@redhat.com>
-Subject: [PATCH net 1/2] net: openvswitch: limit the number of recursions from action sets
-Date: Tue,  6 Feb 2024 08:11:46 -0500
-Message-ID: <20240206131147.1286530-2-aconole@redhat.com>
+Subject: [PATCH net 2/2] selftests: openvswitch: Add validation for the recursion test
+Date: Tue,  6 Feb 2024 08:11:47 -0500
+Message-ID: <20240206131147.1286530-3-aconole@redhat.com>
 In-Reply-To: <20240206131147.1286530-1-aconole@redhat.com>
 References: <20240206131147.1286530-1-aconole@redhat.com>
 Precedence: bulk
@@ -80,87 +80,194 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-The ovs module allows for some actions to recursively contain an action
-list for complex scenarios, such as sampling, checking lengths, etc.
-When these actions are copied into the internal flow table, they are
-evaluated to validate that such actions make sense, and these calls
-happen recursively.
+Add a test case into the netlink checks that will show the number of
+nested action recursions won't exceed 16.  Going to 17 on a small
+clone call isn't enough to exhaust the stack on (most) systems, so
+it should be safe to run even on systems that don't have the fix
+applied.
 
-The ovs-vswitchd userspace won't emit more than 16 recursion levels
-deep.  However, the module has no such limit and will happily accept
-limits larger than 16 levels nested.  Prevent this by tracking the
-number of recursions happening and manually limiting it to 16 levels
-nested.
-
-The initial implementation of the sample action would track this depth
-and prevent more than 3 levels of recursion, but this was removed to
-support the clone use case, rather than limited at the current userspace
-limit.
-
-Fixes: 798c166173ff ("openvswitch: Optimize sample action for the clone use cases")
 Signed-off-by: Aaron Conole <aconole@redhat.com>
 ---
- net/openvswitch/flow_netlink.c | 33 ++++++++++++++++++++++++++++-----
- 1 file changed, 28 insertions(+), 5 deletions(-)
+NOTE: This patch may be safely omitted for trees that don't
+      include the selftests
 
-diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
-index 88965e2068ac..ba5cfa67a720 100644
---- a/net/openvswitch/flow_netlink.c
-+++ b/net/openvswitch/flow_netlink.c
-@@ -48,6 +48,9 @@ struct ovs_len_tbl {
+ .../selftests/net/openvswitch/openvswitch.sh  | 13 ++++
+ .../selftests/net/openvswitch/ovs-dpctl.py    | 71 +++++++++++++++----
+ 2 files changed, 69 insertions(+), 15 deletions(-)
+
+diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+index f8499d4c87f3..30cb9d3b035d 100755
+--- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
++++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+@@ -502,7 +502,20 @@ test_netlink_checks () {
+ 	    wc -l) == 2 ] || \
+ 	      return 1
  
- #define OVS_ATTR_NESTED -1
- #define OVS_ATTR_VARIABLE -2
-+#define OVS_COPY_ACTIONS_MAX_DEPTH 16
++	info "Checking clone depth"
+ 	ERR_MSG="Flow actions may not be safe on all matching packets"
++	PRE_TEST=$(dmesg | grep -c "${ERR_MSG}")
++	ovs_add_flow "test_netlink_checks" nv0 \
++		'in_port(1),eth(),eth_type(0x800),ipv4()' \
++		'clone(clone(clone(clone(clone(clone(clone(clone(clone(clone(clone(clone(clone(clone(clone(clone(clone(drop)))))))))))))))))' \
++		&> /dev/null && return 1
++	POST_TEST=$(dmesg | grep -c "${ERR_MSG}")
 +
-+static DEFINE_PER_CPU(int, copy_actions_depth);
++	if [ "$PRE_TEST" == "$POST_TEST" ]; then
++		info "failed - clone depth too large"
++		return 1
++	fi
++
+ 	PRE_TEST=$(dmesg | grep -c "${ERR_MSG}")
+ 	ovs_add_flow "test_netlink_checks" nv0 \
+ 		'in_port(1),eth(),eth_type(0x0806),arp()' 'drop(0),2' \
+diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+index b97e621face9..5e0e539a323d 100644
+--- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
++++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+@@ -299,7 +299,7 @@ class ovsactions(nla):
+         ("OVS_ACTION_ATTR_PUSH_NSH", "none"),
+         ("OVS_ACTION_ATTR_POP_NSH", "flag"),
+         ("OVS_ACTION_ATTR_METER", "none"),
+-        ("OVS_ACTION_ATTR_CLONE", "none"),
++        ("OVS_ACTION_ATTR_CLONE", "recursive"),
+         ("OVS_ACTION_ATTR_CHECK_PKT_LEN", "none"),
+         ("OVS_ACTION_ATTR_ADD_MPLS", "none"),
+         ("OVS_ACTION_ATTR_DEC_TTL", "none"),
+@@ -465,29 +465,42 @@ class ovsactions(nla):
+                     print_str += "pop_mpls"
+             else:
+                 datum = self.get_attr(field[0])
+-                print_str += datum.dpstr(more)
++                if field[0] == "OVS_ACTION_ATTR_CLONE":
++                    print_str += "clone("
++                    print_str += datum.dpstr(more)
++                    print_str += ")"
++                else:
++                    print_str += datum.dpstr(more)
  
- static bool actions_may_change_flow(const struct nlattr *actions)
- {
-@@ -3148,11 +3151,11 @@ static int copy_action(const struct nlattr *from,
- 	return 0;
- }
+         return print_str
  
--static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
--				  const struct sw_flow_key *key,
--				  struct sw_flow_actions **sfa,
--				  __be16 eth_type, __be16 vlan_tci,
--				  u32 mpls_label_count, bool log)
-+static int ___ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
-+				   const struct sw_flow_key *key,
-+				   struct sw_flow_actions **sfa,
-+				   __be16 eth_type, __be16 vlan_tci,
-+				   u32 mpls_label_count, bool log)
- {
- 	u8 mac_proto = ovs_key_mac_proto(key);
- 	const struct nlattr *a;
-@@ -3478,6 +3481,26 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
- 	return 0;
- }
+     def parse(self, actstr):
++        totallen = len(actstr)
+         while len(actstr) != 0:
+             parsed = False
++            parencount = 0
+             if actstr.startswith("drop"):
+                 # If no reason is provided, the implicit drop is used (i.e no
+                 # action). If some reason is given, an explicit action is used.
+-                actstr, reason = parse_extract_field(
+-                    actstr,
+-                    "drop(",
+-                    "([0-9]+)",
+-                    lambda x: int(x, 0),
+-                    False,
+-                    None,
+-                )
++                reason = None
++                if actstr.startswith("drop("):
++                    parencount += 1
++
++                    actstr, reason = parse_extract_field(
++                        actstr,
++                        "drop(",
++                        "([0-9]+)",
++                        lambda x: int(x, 0),
++                        False,
++                        None,
++                    )
++
+                 if reason is not None:
+                     self["attrs"].append(["OVS_ACTION_ATTR_DROP", reason])
+                     parsed = True
+                 else:
+-                    return
++                    actstr = actstr[len("drop"): ]
++                    return (totallen - len(actstr))
  
-+static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
-+				  const struct sw_flow_key *key,
-+				  struct sw_flow_actions **sfa,
-+				  __be16 eth_type, __be16 vlan_tci,
-+				  u32 mpls_label_count, bool log)
-+{
-+	int level = this_cpu_read(copy_actions_depth);
-+	int ret;
+             elif parse_starts_block(actstr, "^(\d+)", False, True):
+                 actstr, output = parse_extract_field(
+@@ -504,6 +517,7 @@ class ovsactions(nla):
+                     False,
+                     0,
+                 )
++                parencount += 1
+                 self["attrs"].append(["OVS_ACTION_ATTR_RECIRC", recircid])
+                 parsed = True
+ 
+@@ -516,12 +530,22 @@ class ovsactions(nla):
+ 
+             for flat_act in parse_flat_map:
+                 if parse_starts_block(actstr, flat_act[0], False):
+-                    actstr += len(flat_act[0])
++                    actstr = actstr[len(flat_act[0]):]
+                     self["attrs"].append([flat_act[1]])
+                     actstr = actstr[strspn(actstr, ", ") :]
+                     parsed = True
+ 
+-            if parse_starts_block(actstr, "ct(", False):
++            if parse_starts_block(actstr, "clone(", False):
++                parencount += 1
++                subacts = ovsactions()
++                actstr = actstr[len("clone("):]
++                parsedLen = subacts.parse(actstr)
++                lst = []
++                self["attrs"].append(("OVS_ACTION_ATTR_CLONE", subacts))
++                actstr = actstr[parsedLen:]
++                parsed = True
++            elif parse_starts_block(actstr, "ct(", False):
++                parencount += 1
+                 actstr = actstr[len("ct(") :]
+                 ctact = ovsactions.ctact()
+ 
+@@ -553,6 +577,7 @@ class ovsactions(nla):
+                         natact = ovsactions.ctact.natattr()
+ 
+                         if actstr.startswith("("):
++                            parencount += 1
+                             t = None
+                             actstr = actstr[1:]
+                             if actstr.startswith("src"):
+@@ -607,15 +632,29 @@ class ovsactions(nla):
+                                     actstr = actstr[strspn(actstr, ", ") :]
+ 
+                         ctact["attrs"].append(["OVS_CT_ATTR_NAT", natact])
+-                        actstr = actstr[strspn(actstr, ",) ") :]
++                        actstr = actstr[strspn(actstr, ", ") :]
+ 
+                 self["attrs"].append(["OVS_ACTION_ATTR_CT", ctact])
+                 parsed = True
+ 
+-            actstr = actstr[strspn(actstr, "), ") :]
++            actstr = actstr[strspn(actstr, ", ") :]
++            while parencount > 0:
++                parencount -= 1
++                actstr = actstr[strspn(actstr, " "):]
++                if len(actstr) and actstr[0] != ")":
++                    raise ValueError("Action str: '%s' unbalanced" % actstr)
++                actstr = actstr[1:]
 +
-+	if (level > OVS_COPY_ACTIONS_MAX_DEPTH)
-+		return -EOVERFLOW;
++            if len(actstr) and actstr[0] == ")":
++                return (totallen - len(actstr))
 +
-+	__this_cpu_inc(copy_actions_depth);
-+	ret = ___ovs_nla_copy_actions(net, attr, key, sfa, eth_type,
-+				      vlan_tci, mpls_label_count, log);
-+	__this_cpu_dec(copy_actions_depth);
++            actstr = actstr[strspn(actstr, ", ") :]
 +
-+	return ret;
-+}
+             if not parsed:
+                 raise ValueError("Action str: '%s' not supported" % actstr)
+ 
++        return (totallen - len(actstr))
 +
- /* 'key' must be the masked key. */
- int ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
- 			 const struct sw_flow_key *key,
+ 
+ class ovskey(nla):
+     nla_flags = NLA_F_NESTED
+@@ -2111,6 +2150,8 @@ def main(argv):
+     ovsflow = OvsFlow()
+     ndb = NDB()
+ 
++    sys.setrecursionlimit(100000)
++
+     if hasattr(args, "showdp"):
+         found = False
+         for iface in ndb.interfaces:
 -- 
 2.41.0
 
