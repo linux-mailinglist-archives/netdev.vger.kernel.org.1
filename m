@@ -1,132 +1,146 @@
-Return-Path: <netdev+bounces-69465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37CE784B5B7
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 13:57:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97CB084B5C7
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 13:59:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7578B2377A
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 12:57:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BF941F26349
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 12:59:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8804E12FB28;
-	Tue,  6 Feb 2024 12:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7051912F396;
+	Tue,  6 Feb 2024 12:59:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aXDWTmM3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="icXsdY+L"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B1C12FF68
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 12:57:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCCF212EBDB
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 12:59:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707224233; cv=none; b=MbxML55OkPwvB1OnZfB5tcm6M7feSC9upOK+KnYn5/zrQa60OZFP891QulBwCwB2SkV87oOrX1MA9Q6FlJaSZK7KzxEiBnqrclIlYplf5PLfQlAYD9z15Gog8V9HNpbXX10OWWaLTpx08Ldh5sBrjcN+3ruBIZ+vlJY2f/Ah//A=
+	t=1707224378; cv=none; b=qALGndA/dYPRGtclny/aCnCzflYmGV1byK0YAku2c6a8jOYOJnna81jPHaN5Lkxgj2oYlznmjQqG9dlALH5M861KNLgUJW+hbZvKzi/tLp3Hp+BLgCkyfU+MhqleOPFykFwHH3bienVmT460wfRacC9kzlAbE67SEgdw2iRn2NE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707224233; c=relaxed/simple;
-	bh=lQsbLdL8Tqssed0wGZrcXhwd0o6AbXZEOEFKVlVzy5A=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=SwJRLgHqS3hRFpDLHp+0dcV23ouLK5BY5IN5xlSoBPb9pCornSMAYACldjYS8yhXcLOPRUO4EDxqp1Fv/zZpesgB0gdb8rXa+bhXppHtcpKi1Bn2cVkgkOSFbNZtgA2beKhfx/BPGnzrvyb5l8i3+aYvb+bDKrwqaXfQxxXN+uA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aXDWTmM3; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1707224378; c=relaxed/simple;
+	bh=mvFSpXXF9JUEZ5uG5sEHCsvv939PdP+Ga4W1lHDw54A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RNvpABAZXwC5owiG4QrkCWj57FAUoj3W7Kl1/JOFD9Kh0r6dy/MQycocfPmKMqTAa8HNOLHl8WkRqatD8eU1Q2gAzhMFCa4voFSZbnVGwqq6+0uA41AWa0pGWTp7929W9xTEDg8Oi7/z+svrVfdTtXSrRMaXQfTR+XuOEOh4esM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=icXsdY+L; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707224230;
+	s=mimecast20190719; t=1707224375;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=/1k6MOkR23iKwCezCQdkU1QkjIYXCyaU/n1ekUYcUX0=;
-	b=aXDWTmM32ytpijgBXJKXRnsmTrmV3fOFT2RX0xXvoUf8ZhlnydSCsFvpDZMMxYmJ6/Sxge
-	KwEFU/EsSq0Yacuet/RgHsfc/NUkxa45ff2hG7gkZ6rdVgwCFRl+pd1mDJkBQpfXL4H2lr
-	UtetWm9Wp64HrFkyqhopeJdjTEizyXg=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=JvGpRWpuy0T9OWLbJZcnUxTccocCFW2YPrwN0a6SYek=;
+	b=icXsdY+L116VKOpe4soqQuwxhM/hk7QK76WLKgZI5t5MaL7GdVI8AVo2nfxTolOQNPBcZC
+	OBcSzKUXyacimMxszQwYpEO7hPbMF8EwgtluRJQvLTBPfWlQihdl2D1z8Y6y1Ldf4csgP3
+	7R0CURo5KHP83k5DVCxAecoUilHZnUc=
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
+ [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-299-rjC7S962PUq8LXzZlOcG6w-1; Tue, 06 Feb 2024 07:57:09 -0500
-X-MC-Unique: rjC7S962PUq8LXzZlOcG6w-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-40e354aaf56so13003595e9.1
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 04:57:08 -0800 (PST)
+ us-mta-633-LWoMLJxZPIiKObntjvzxaw-1; Tue, 06 Feb 2024 07:59:34 -0500
+X-MC-Unique: LWoMLJxZPIiKObntjvzxaw-1
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-560127ce17fso2059052a12.0
+        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 04:59:33 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707224228; x=1707829028;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/1k6MOkR23iKwCezCQdkU1QkjIYXCyaU/n1ekUYcUX0=;
-        b=VN6hh8G+PzrH1YrU+yX02edpKDUtIHzLdxK7GezJ0hGLvN7obJnyJx+V3N/h2OwKAG
-         AA2G4EdqpiUhN8NHjsoa+UcctRjchAl2H8uqUQSiRuKCYqjHtxlABHkZ3iIlSNG9SLPU
-         jDYWkUWNpUIKfT/AnuEpPnNjeglfCcnHDJxaTzbFp+OBFZJioZ/uYQlMxC+1s3Oc2QoF
-         VX9eH25H5Ep7UsKPddiwDMASzCODRhPRiNLlYmHqACyWMaF76I3cB4ESWUhJrJfX8rVa
-         kTGif/p5q4bZcXQwp3Ao5x8ovp3ji0xmeaJQfALDDELp79ooalLUUGAyAhb5EKoj2lca
-         cSsA==
-X-Forwarded-Encrypted: i=1; AJvYcCVwFF2Pq6JGJVvxwyTGYxc9aLzxvR1utRbjV3+j45Pp1y4EmxeBvbmPaqoSZpWl6cWSc0KiV2SRij4N/VcH2iiDjF2IE37U
-X-Gm-Message-State: AOJu0YxEjZhV7zxMjRYbNktmX8ygzvuxZQjumNryx5SS9rjhX5IGtzlQ
-	8UtIp/0JpNKslzdSeqgqzerCOZS8E8jddT3H16qTU5pW0PKFrle6FOkX7Pitl5dyrgTGuBw61r3
-	TgBq+ulMaOuCg3CyMHdK9qizNrQ3Xq3xZqWjUCMNNRfDRExD8h85mlg==
-X-Received: by 2002:adf:ff87:0:b0:33b:278a:15f5 with SMTP id j7-20020adfff87000000b0033b278a15f5mr1561246wrr.6.1707224227956;
-        Tue, 06 Feb 2024 04:57:07 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE+/r+BZJ1AMNA3sDifj1tOVO7pP7JJorz2AxV/XzGUJY3E9lJnU0Ig0zj4E2wS9SNs3sbxeg==
-X-Received: by 2002:adf:ff87:0:b0:33b:278a:15f5 with SMTP id j7-20020adfff87000000b0033b278a15f5mr1561224wrr.6.1707224227590;
-        Tue, 06 Feb 2024 04:57:07 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCX10sRN0oC/+J0PgFJ0e+6CxNmAR+EoVRUnC55Q8jPprs+DMo8lofnd5V0xLOkzcFCXyjGwEO+/P4hmxx14h3WvgOzgKrLoYzB5P02x3DIbHw81oujWRSRX9qHdDquEyJq0hNaMdwJ+0l1li7amCld4XgNQVLUmwpHaTy0qDBzmPmhQrpVbXqQEZslPm/RG9XDgl7zcAYjlYqJFK9qD8PT4XiNsuYoxxeZskM+PXU6eAIfKo/Dn6B32F5yroddZN+L/vPklBdG7KzuJXl4Do5jNqb9oj+sMDvWpD3LUCobY6iYQq3jWr7F56ynCxevDzAX5HCsFbztkG6pSQT4GQaO1fBinA90nmB4/u7iqd+xpBmuga3DYxHNG6YAyeOOhQdi6ghqtY+dgvfy+8VzmLIf+LpuuXOsFbSaFGeGyRdAn7QqtCLSV80fMeX0oshSB8wE3azFAgMA7Zk9mvhuuwamsEa/2XRqEoB+GBJq+DWDBg0xOI9D//LFfdxjkYLI4qjyrTnYHc47NHvUNMqbjI5OVFSR3P7Fi5dE3QK4aBg==
-Received: from gerbillo.redhat.com (146-241-224-127.dyn.eolo.it. [146.241.224.127])
-        by smtp.gmail.com with ESMTPSA id x17-20020a5d6511000000b0033af3a43e91sm2050801wru.46.2024.02.06.04.57.06
+        d=1e100.net; s=20230601; t=1707224372; x=1707829172;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JvGpRWpuy0T9OWLbJZcnUxTccocCFW2YPrwN0a6SYek=;
+        b=lHSpNvpWY7VwspykKbEOrUVNv7S5KLEf5Q535Oyaml5GsOixQ3OBu6O70TrWT00K1L
+         Ke4rRvC5rY4aDRpIxj4o2oVAhsHVNsC71zCwMMdahj28M6brxC9uH4aH098JdMciTiuC
+         FYBbAlenuGEVsMpTwyN+OpoF+qpvDrSIcHJWcgDzWWlDetkIi4Io+kUpFv7QmZjCpERu
+         jbcQ5o7Lx/iVZ7gFK4rs5nPJ7eogzH8I2Te+9lEu+tvHZ/OvAoFzpnH3QPYw+cMorsHr
+         62GjKMAz/4DzS3m0il/yjAFIv2wkZbsdUqTmEhmeQm8zsrWYklyEd3oKSenwdKc3ao2M
+         gXXQ==
+X-Gm-Message-State: AOJu0Yw3LYiemxuaszRPAYsaE6QFlXk1Mtk3LyuuMZF/PINu/qDiklQf
+	QiPOxiJjARXPx2AAbG9yVq4p4lldQYeSOJNdpmcwDa/tSqnA1+30v9/OnTLqCTQQljV3q6bteOy
+	3+EHV9K8NrvvL3E+Dl9WuWcEU33CgyyFsZa/d3oE1kRys25KrtmNo5g==
+X-Received: by 2002:a05:6402:893:b0:55f:d60a:b1ac with SMTP id e19-20020a056402089300b0055fd60ab1acmr1620034edy.16.1707224372464;
+        Tue, 06 Feb 2024 04:59:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGefh/h3pitp7txo3hSq2AXC2MPwo9tn8Ukfdo51TLjWJHf2Q+ALIco8XrRXNqKF/AGdCKELg==
+X-Received: by 2002:a05:6402:893:b0:55f:d60a:b1ac with SMTP id e19-20020a056402089300b0055fd60ab1acmr1620001edy.16.1707224372099;
+        Tue, 06 Feb 2024 04:59:32 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCVR1zOr0ILdgvtBzUNXS3O4pO5CPZZQFGEDqXe2HsUTFnz+bwi1JHvEvanAHyjc6YvE3J3pphIG15fNPDMtZZVSm5pVCDjxixd3qpyCfD8rWkoZt1/2qiwqNSKObW8/q8DQTK8EFpn27xTW8RwXTH80DQ3hm4jjPs+OYeokW5g0rmkvFJo2kVXqVNu1g9ryGLv+eXEF22CvWWKHb2gAKblFfe1iqfuP1j5VOqUVx9h0qxtAyFGr/akG9WXsxeU0cwkhvm8qDevN2HtImMVYVvBu9jyHyeXo7e6hdXMJILhnjxhXaIvT2JEBKE2eRxfCGLyhh1ZC+EuRYDT2lbrw+b55n5+PAq/7lG6FEG2K/nUmro3R4CbCHUBpWAMydYvKx2IG8bNOvVAJFZW5MLMxHVGp+dm9c1yHLfIvCE5U+kU2+tBk2o3XcA+f6Blg3Fu94zCx5aFnPlRyW9nCjDN5ExpkbnFHG5T6ZPLj5b44T5uX/fA/KT40G4m82SU1cUgQFnabH79UtAkkx/gZqIrweUQ=
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id cf10-20020a0564020b8a00b005607f899175sm997772edb.70.2024.02.06.04.59.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Feb 2024 04:57:07 -0800 (PST)
-Message-ID: <1f5fd28c7acaf22e09a8ae41b829ea9ac0a317b5.camel@redhat.com>
-Subject: Re: [PATCH net] net: stmmac: xgmac: fix a typo of register name in
- DPP safety handling
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jiri Pirko <jiri@resnulli.us>, Furong Xu <0x1207@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, Joao Pinto <jpinto@synopsys.com>,
- Simon Horman <horms@kernel.org>, Serge Semin <fancer.lancer@gmail.com>, 
- netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
- xfr@outlook.com, rock.xu@nio.com
-Date: Tue, 06 Feb 2024 13:57:05 +0100
-In-Reply-To: <Zb49M9fKRR2HeGhR@nanopsycho>
-References: <20240203053133.1129236-1-0x1207@gmail.com>
-	 <Zb49M9fKRR2HeGhR@nanopsycho>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+        Tue, 06 Feb 2024 04:59:31 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 50269108AFBD; Tue,  6 Feb 2024 13:59:31 +0100 (CET)
+From: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: =?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH bpf-next] libbpf: Use OPTS_SET() macro in bpf_xdp_query()
+Date: Tue,  6 Feb 2024 13:59:22 +0100
+Message-ID: <20240206125922.1992815-1-toke@redhat.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sat, 2024-02-03 at 14:18 +0100, Jiri Pirko wrote:
-> Sat, Feb 03, 2024 at 06:31:33AM CET, 0x1207@gmail.com wrote:
-> > DDPP is copied from Synopsys Data book:
-> >=20
-> > DDPP: Disable Data path Parity Protection.
-> >    When it is 0x0, Data path Parity Protection is enabled.
-> >    When it is 0x1, Data path Parity Protection is disabled.
-> >=20
-> > The macro name should be XGMAC_DPP_DISABLE.
-> >=20
-> > Fixes: 46eba193d04f ("net: stmmac: xgmac: fix handling of DPP safety er=
-ror for DMA channels")
-> > Signed-off-by: Furong Xu <0x1207@gmail.com>
->=20
-> Looks okay, but this is net-next material.
+When the feature_flags and xdp_zc_max_segs fields were added to the libbpf
+bpf_xdp_query_opts, the code writing them did not use the OPTS_SET() macro.
+This causes libbpf to write to those fields unconditionally, which means
+that programs compiled against an older version of libbpf (with a smaller
+size of the bpf_xdp_query_opts struct) will have its stack corrupted by
+libbpf writing out of bounds.
 
-The blamed commit has been applied to net before Serge spotted the typo
-during patch review. I think it deserves the net target, so the typo
-will never land into vanilla.
+The patch adding the feature_flags field has an early bail out if the
+feature_flags field is not part of the opts struct (via the OPTS_HAS)
+macro, but the patch adding xdp_zc_max_segs does not. For consistency, this
+fix just changes the assignments to both fields to use the OPTS_SET()
+macro.
 
-Cheers,
+Fixes: 13ce2daa259a ("xsk: add new netlink attribute dedicated for ZC max frags")
+Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+---
+ tools/lib/bpf/netlink.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Paolo
+diff --git a/tools/lib/bpf/netlink.c b/tools/lib/bpf/netlink.c
+index 090bcf6e3b3d..68a2def17175 100644
+--- a/tools/lib/bpf/netlink.c
++++ b/tools/lib/bpf/netlink.c
+@@ -496,8 +496,8 @@ int bpf_xdp_query(int ifindex, int xdp_flags, struct bpf_xdp_query_opts *opts)
+ 	if (err)
+ 		return libbpf_err(err);
+ 
+-	opts->feature_flags = md.flags;
+-	opts->xdp_zc_max_segs = md.xdp_zc_max_segs;
++	OPTS_SET(opts, feature_flags, md.flags);
++	OPTS_SET(opts, xdp_zc_max_segs, md.xdp_zc_max_segs);
+ 
+ skip_feature_flags:
+ 	return 0;
+-- 
+2.43.0
 
 
