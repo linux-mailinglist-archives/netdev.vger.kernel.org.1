@@ -1,105 +1,124 @@
-Return-Path: <netdev+bounces-69412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF60B84B141
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:28:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6674484B13B
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:27:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8586F1F24619
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 09:28:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22B22284E42
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 09:27:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADEBF12D146;
-	Tue,  6 Feb 2024 09:28:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A194783CCC;
+	Tue,  6 Feb 2024 09:27:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="aOURwMCG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RH4QTPNR"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward103c.mail.yandex.net (forward103c.mail.yandex.net [178.154.239.214])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC8CE76023;
-	Tue,  6 Feb 2024 09:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.214
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33BE874E2A;
+	Tue,  6 Feb 2024 09:27:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707211717; cv=none; b=A+SB4WHHcbeQ0SM0czUZaz416FFLyjsQHt2zxq8wqbxZzvOdDYkAlrMyCgMOFLjL2DovwEuu2QrbXr8k3nZss9EuedHl0OFcP/LkyAQFebOoVxq6eJY6RbSKCLg1CZjkVs3ioPYyQcmplu9IljzEJTxzmMyCtA48XLDX+4416nA=
+	t=1707211666; cv=none; b=N/b7DnPUiprO4e+M6bNYjlGJiTHYrkuGT/gW5dM1UqZxHVEQntzx+gzVHAb/ZQP/z4fcDd7NI8tb96MxcUcYf9v0SWWuybbYojer42sM49xtTT8U6/4eKLsDfhFWiOCVIjf+LC2ZXmwMchUJdUKzAl+QTPhabse0MA4q02ojksg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707211717; c=relaxed/simple;
-	bh=eVUNdh6ffQILpKaUYWu6y2RSjVz8Un3wCgU4UaT7uNc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Eqv8Rkwb78w2f9Jrppym4e5gZjGkscwKCc2OSwQ5WB3lt3IQeLwN1yfuOR/U/V/ipHPiJTSsy+Y+MIjXrRRn8Ta4UYLrWN5slLBKTwGYT5Sb15RYk3LDmgaixj/96/V+w71irjpvrVINHMEslLzXLidMYHABUma82qwY8vD9fmc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=aOURwMCG; arc=none smtp.client-ip=178.154.239.214
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from mail-nwsmtp-smtp-production-main-36.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-36.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:1d22:0:640:a775:0])
-	by forward103c.mail.yandex.net (Yandex) with ESMTPS id 0EF2C60AF8;
-	Tue,  6 Feb 2024 12:28:26 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-36.iva.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id PScse5A1Ua60-zFmiTOwK;
-	Tue, 06 Feb 2024 12:28:25 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1707211705; bh=OJBlv1YEh0pJ7hkxdGwCReOEKKH4YhVi+aPM2l9cEjA=;
-	h=Message-ID:Date:In-Reply-To:Cc:Subject:References:To:From;
-	b=aOURwMCGU9Q7kSFahbsQj/SBDpQNv0UJ30bEIpLZdAbr1C/twXWwgh1gdllwGyTpR
-	 npD0hZ98DzhYWCQpVxUreQpB9bULznHuT8qgR0IFqenjLgOpwCE+JNvWibNTx4rhai
-	 uFi9vhsyMPzcrtbSpEigscdeHF3pKTDAJp23o+I0=
-Authentication-Results: mail-nwsmtp-smtp-production-main-36.iva.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-From: Dmitry Antipov <dmantipov@yandex.ru>
-To: Xin Long <lucien.xin@gmail.com>
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	linux-sctp@vger.kernel.org,
-	netdev@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Dmitry Antipov <dmantipov@yandex.ru>,
-	syzbot+8bb053b5d63595ab47db@syzkaller.appspotmail.com
-Subject: [PATCH] net: sctp: fix skb leak in sctp_inq_free()
-Date: Tue,  6 Feb 2024 12:26:17 +0300
-Message-ID: <20240206092619.74018-1-dmantipov@yandex.ru>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <CADvbK_fn+gH=p-OhVXzZtGd+nK6QUKu+F4QLBpcx0c3Pig1oLg@mail.gmail.com>
-References: <CADvbK_fn+gH=p-OhVXzZtGd+nK6QUKu+F4QLBpcx0c3Pig1oLg@mail.gmail.com>
+	s=arc-20240116; t=1707211666; c=relaxed/simple;
+	bh=ITxHgj/HKver78KkpB/A9c0skZ5CAVBg6r/R2aNy218=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WkavaJYhNQJ3AMlKjoS30myrN5HdB0A9tX7vxbJsE9e74CMMbCuUdB60gNCC7j0oc3IUYB+j//DK3tj3cjd9GxPzBx938RZf2nds83stObxryGe5MHKCElY9ZYXHnIzcsyY+7wWmQ0TnLbqi8cKe9fIChI8pSY2AaP2IQP/FR2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RH4QTPNR; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6e04eca492fso928015b3a.1;
+        Tue, 06 Feb 2024 01:27:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707211664; x=1707816464; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mvhTyBVNUZ9ioizrTOoXbcsU/A9dZDN/VfmQnyeAdwU=;
+        b=RH4QTPNRMOEUqvCHeRAht2MOMa0rIhxQNTkDRNPh3F7FxeqCXroEjt9uTeYPXkgUAL
+         8gAPFGAINtrRIzBqHoPwragxookwGSSbPdks40IhpElDfg/7IK+WJe24GiV4ZUkzUtob
+         xpWVy3Z5h+lihrCEKXmsJjIA1Xv2nWgumybDp8+1XDt10MvRXy45OBqEoeoFOZbjo1kR
+         Og629/hpoHD4VD0xM14YRGZRdSdy6SNASfmYGscsPR0HYe5aetRrozPs8eFbMGLsmJqC
+         /M2QTh1wCCWEsiTGOb08pdkSXyqKqX18dw/fHAFsfAeAsYbNEwBwlkT745HK+hgy8pYF
+         NraA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707211664; x=1707816464;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mvhTyBVNUZ9ioizrTOoXbcsU/A9dZDN/VfmQnyeAdwU=;
+        b=SDmfgsgYoCzYYsOFExnjyW18XW1KwPMBLABX/hVWGXEr7ge8aWENlROL9lV1QJhc2c
+         tpnahdKcQKmGWBFipbbB3cZ1hxnD57k2s6JBl2ts1qac07/eravpA5AoNa40gkOWxoOc
+         9Vo3OXLC7Mb+TlKGcPgt3Ddp5d34jLx7yhCJSmNfEnJ1eNHVN5ccteJ/gMDJrjNoOkU0
+         R5Y2Cll/2orDK4wXWeFFwEE7CYAAKA9s8YdxIrwtNjp8X9Xd08BWJC5pWxH6/SqOVQkl
+         rqqhjpeRePuXd5uuH3CVEZUncu8W2j+fy0uFLzzUI7jtaSnq9LSfF1CsrqUGobivf4u3
+         w1Mw==
+X-Gm-Message-State: AOJu0YwJsDTI2OACW6dbLKbwHsHGlBCQLK1PC0Qejl9IsMNjYmWtGMP/
+	2hVojJ1PKAKaOPEeaCZTU0j7z6x6RatbwAzyzGUuOz/HUyvithz6/UfEhP0lkxJRGg==
+X-Google-Smtp-Source: AGHT+IGzFrTe1/hBI8CQ3sgpfJnoz/OEGzNIZ8ZdA+2fVAyYdWU4zc8d93v4q05weBH2FL+s6QT+8A==
+X-Received: by 2002:aa7:8594:0:b0:6e0:4a24:e91 with SMTP id w20-20020aa78594000000b006e04a240e91mr1979754pfn.15.1707211664287;
+        Tue, 06 Feb 2024 01:27:44 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCWWPT/DSbkR/OaMobx/mOFfKnXv87qCdSxXXXbnu5/o/i1ElAKvmZR0I/RwaxfHdbyMFfusz5mxgp/x0sJd3ySR6fYXfr61Yq7096KP107G+jh1ETc5ujLKI48yDFbZ4IXibSk7xxPjebZvk1D+NzhnjWCsRCu+fnoneUd22yQndEApd8N2TfPG0xRiT3UWg/cMvLvGvOotmk2BeBAm6JW7/heSgYDA9c/wWDjy2A5UJ2PLtm07E6F28q2p0M2BA+O1WZDJmcdtJ5S/JeHTlWQBY5waBjoLNV8ggxPyntT4XaPshGuIR1/FOT2xlsHy3iWkuSg3RanyVPicVf8pOHRuiqwNOM3x3wgDl8ucmtMx/rgBCm7g4xHNAmE3FCQVNPxjsXDchDIDJpMPz9PnbpqdYgu8yYfw9K+9CvyjpwJAmwi76asJq7RG0M/BIQ==
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id i11-20020a63584b000000b005c6e8fa9f24sm1541854pgm.49.2024.02.06.01.27.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Feb 2024 01:27:43 -0800 (PST)
+Date: Tue, 6 Feb 2024 17:27:37 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Aahil Awatramani <aahila@google.com>
+Cc: David Dillow <dave@thedillows.org>,
+	Mahesh Bandewar <maheshb@google.com>,
+	Jay Vosburgh <j.vosburgh@gmail.com>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v7] bonding: Add independent control state
+ machine
+Message-ID: <ZcH7icQHZdRchADi@Laptop-X1>
+References: <20240202175858.1573852-1-aahila@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240202175858.1573852-1-aahila@google.com>
 
-In case of GSO, 'chunk->skb' pointer may point to an entry from
-fraglist created in 'sctp_packet_gso_append()'. To avoid freeing
-random fraglist entry (and so undefined behavior and/or memory
-leak), ensure that 'chunk->skb' is set to 'chunk->head_skb'
-(i.e. fraglist head) before calling 'sctp_chunk_free()'.
+On Fri, Feb 02, 2024 at 05:58:58PM +0000, Aahil Awatramani wrote:
+> Add support for the independent control state machine per IEEE
+> 802.1AX-2008 5.4.15 in addition to the existing implementation of the
+> coupled control state machine.
+> 
+> Introduces two new states, AD_MUX_COLLECTING and AD_MUX_DISTRIBUTING in
+> the LACP MUX state machine for separated handling of an initial
+> Collecting state before the Collecting and Distributing state. This
+> enables a port to be in a state where it can receive incoming packets
+> while not still distributing. This is useful for reducing packet loss when
+> a port begins distributing before its partner is able to collect.
+> 
+> Added new functions such as bond_set_slave_tx_disabled_flags and
+> bond_set_slave_rx_enabled_flags to precisely manage the port's collecting
+> and distributing states. Previously, there was no dedicated method to
+> disable TX while keeping RX enabled, which this patch addresses.
+> 
+> Note that the regular flow process in the kernel's bonding driver remains
+> unaffected by this patch. The extension requires explicit opt-in by the
+> user (in order to ensure no disruptions for existing setups) via netlink
+> support using the new bonding parameter coupled_control. The default value
+> for coupled_control is set to 1 so as to preserve existing behaviour.
+> 
+> Signed-off-by: Aahil Awatramani <aahila@google.com>
 
-Reported-by: syzbot+8bb053b5d63595ab47db@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?id=0d8351bbe54fd04a492c2daab0164138db008042
-Fixes: 90017accff61 ("sctp: Add GSO support")
-Suggested-by: Xin Long <lucien.xin@gmail.com>
-Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
----
- net/sctp/inqueue.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/net/sctp/inqueue.c b/net/sctp/inqueue.c
-index 7182c5a450fb..dda5e1ad9cac 100644
---- a/net/sctp/inqueue.c
-+++ b/net/sctp/inqueue.c
-@@ -52,8 +52,11 @@ void sctp_inq_free(struct sctp_inq *queue)
- 	/* If there is a packet which is currently being worked on,
- 	 * free it as well.
- 	 */
--	if (queue->in_progress) {
--		sctp_chunk_free(queue->in_progress);
-+	chunk = queue->in_progress;
-+	if (chunk) {
-+		if (chunk->head_skb)
-+			chunk->skb = chunk->head_skb;
-+		sctp_chunk_free(chunk);
- 		queue->in_progress = NULL;
- 	}
- }
--- 
-2.43.0
-
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
