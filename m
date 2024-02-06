@@ -1,123 +1,126 @@
-Return-Path: <netdev+bounces-69336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D475484AB40
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 01:57:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A50DA84AB41
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 01:57:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DF7E1C22FDC
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 00:57:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60E45289B92
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 00:57:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4A961866;
-	Tue,  6 Feb 2024 00:55:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64012646;
+	Tue,  6 Feb 2024 00:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bnMxkugv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fI/vqiUN"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81819BA31
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 00:55:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4107F10F4
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 00:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707180949; cv=none; b=RB5k0Wwrj88qNAHqf4eWmN/VkuT+/DFK3ssCjK8bkS4GtauQEmKiyGbnFcbS1ofXFyWwti07YB2tckK2vl/iF5EKYkHvsqxah3migJJWtzpZ8MD5myWDaF/+3na6Sg31a5DHvcfUq9JsMXw4vZmJgpTyohOh5h76tJAm2F0xQig=
+	t=1707180994; cv=none; b=ivuRC9NIYD9Sxw0ru4gKjEtykAx+is1g/IECWV4B48g6za3PbXj+sT4mTNhlk2DWGx+hpdsQbGYdK4cKPFtMIml1cBHn2fkKmjpljHDr9MRlkLtLaGP/npDsrs0WSL9Uo9VthKg6KIiAYicXIotlZFM4yRNFHD08zapqLfxTVTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707180949; c=relaxed/simple;
-	bh=Ars+QwO+yKKX8DHQIcvpOtaIIspa+mTb1s5wBZB/tQo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Jl47t/caId4bysLfaGPwSSi8hVELWZRwfRb3+QbUTcKdAdue8ZpgNZ8rjCMGqLFMPa7TujX4SEuwEM7KHEMMQBaSWRZ6M05zZ4FMTc6NjjuvQ1BAtj6TF0z5E96T+ZnHctNTiuS4kJ8N8+m8WzjCWaVZK48dAvGrcr94DtyDsUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bnMxkugv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E25EFC433C7;
-	Tue,  6 Feb 2024 00:55:48 +0000 (UTC)
+	s=arc-20240116; t=1707180994; c=relaxed/simple;
+	bh=6ZssyP4M/OUfBFwgrVVpvy3y6KOZHJMB+La9o2a83Gw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iPqNHKN+/STgjtekmjO4pJ36U/mArsaQGieqACWHwQf+7reRrPeY3yQA+motKpk1cO38x+bOM4wB93W1cdp65ksBhAUitrX+6wCiH31fJctc5jvJWnZJIyhfk+Gf54atRjHSdMlq+o+05AtGszLK4fZJHMQ1RRyRtpgUcA+jw1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fI/vqiUN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01374C433C7;
+	Tue,  6 Feb 2024 00:56:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707180949;
-	bh=Ars+QwO+yKKX8DHQIcvpOtaIIspa+mTb1s5wBZB/tQo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bnMxkugvGIDnpiD+wq3E3e/fX9Mr5p5cCeJoHpdv+FcB9MC6hYphXiEXKx2CLnJlX
-	 RXjYBLFTtZmxXuJBFnK6zCTvQ8pnUezsP8wUUcyjwjsDGNS0MfAx9p6uzeFfuLDJ6d
-	 X5Hn3zHgTm3VKefGrlvViaFS1KMIfj1CwlfsYS/FiO6G1zH5Z2Gg8n074Lx/Evv8GJ
-	 /BAY2MFx+nCMokDDrNpjkrKvjNPEXjgnHXL002ab7SioC7KjGtBGdd4ixTM2clUMes
-	 XJjamUw7nBW/ObZClBrRzMSPr2UVo0HJc5aZcmoyD+z55gT3z6ScV0MMJkLOwQIfY8
-	 RdoMOxsFvvjjw==
+	s=k20201202; t=1707180994;
+	bh=6ZssyP4M/OUfBFwgrVVpvy3y6KOZHJMB+La9o2a83Gw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=fI/vqiUNopa4P52qrDLNxMUMQIC9PRZ66qexxr6X2dm1TzfrzRIOgavbp03cfFKTz
+	 L7twlI/qjvFI+OZG5PElCgQqVYlmzI8WB5AZv38DJNAX4iNXXwa1oQhdgJodc6W2+N
+	 +1ohcMacP7++iHNqICqdjpEUMD7V6qADvPBeumhkAt5NhlzYCIOQgjWuVxNzicIy/g
+	 Qc3V/TphsWxofK8vlouEcV4cDMpPzPLg/c+OnJYhuJO02DY3ugd1R32Q9BvGudQonA
+	 XxPkGTvYZvQaLWBp+hsVIZc5N3/VMwQWwnu86tU8bGzrtLfQr9XXBVGfSPXhiyhtDY
+	 K8sVxOJGwv4sw==
+Date: Mon, 5 Feb 2024 16:56:32 -0800
 From: Saeed Mahameed <saeed@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>,
-	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
+To: Simon Horman <horms@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
-	Carolina Jubran <cjubran@nvidia.com>
-Subject: [net-next V4 15/15] net/mlx5e: XDP, Exclude headroom and tailroom from memory calculations
-Date: Mon,  5 Feb 2024 16:55:27 -0800
-Message-ID: <20240206005527.1353368-16-saeed@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240206005527.1353368-1-saeed@kernel.org>
-References: <20240206005527.1353368-1-saeed@kernel.org>
+	Hamdan Igbaria <hamdani@nvidia.com>,
+	Yevgeny Kliteynik <kliteyn@nvidia.com>
+Subject: Re: [net-next V3 13/15] net/mlx5: DR, Change SWS usage to debug fs
+ seq_file interface
+Message-ID: <ZcGDwJDGvX2WwqEg@x130>
+References: <20240202190854.1308089-1-saeed@kernel.org>
+ <20240202190854.1308089-14-saeed@kernel.org>
+ <20240204142448.GA941651@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20240204142448.GA941651@kernel.org>
 
-From: Carolina Jubran <cjubran@nvidia.com>
+On 04 Feb 14:24, Simon Horman wrote:
+>On Fri, Feb 02, 2024 at 11:08:52AM -0800, Saeed Mahameed wrote:
+>> From: Hamdan Igbaria <hamdani@nvidia.com>
+>>
+>> In current SWS debug dump mechanism we implement the seq_file interface,
+>> but we only implement the 'show' callback to dump the whole steering DB
+>> with a single call to this callback.
+>>
+>> However, for large data size the seq_printf function will fail to
+>> allocate a buffer with the adequate capacity to hold such data.
+>>
+>> This patch solves this problem by utilizing the seq_file interface
+>> mechanism in the following way:
+>>  - when the user triggers a dump procedure, we will allocate a list of
+>>    buffers that hold the whole data dump (in the start callback)
+>>  - using the start, next, show and stop callbacks of the seq_file
+>>    API we iterate through the list and dump the whole data
+>>
+>> Signed-off-by: Hamdan Igbaria <hamdani@nvidia.com>
+>> Reviewed-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+>> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+>> ---
+>>  .../mellanox/mlx5/core/steering/dr_dbg.c      | 735 ++++++++++++++----
+>>  .../mellanox/mlx5/core/steering/dr_dbg.h      |  20 +
+>>  2 files changed, 620 insertions(+), 135 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c
+>
+>...
+>
+>> +static struct mlx5dr_dbg_dump_data *
+>> +mlx5dr_dbg_create_dump_data(void)
+>> +{
+>> +	struct mlx5dr_dbg_dump_data *dump_data;
+>> +
+>> +	dump_data = kzalloc(sizeof(*dump_data), GFP_KERNEL);
+>> +	if (!dump_data)
+>> +		return NULL;
+>> +
+>> +	INIT_LIST_HEAD(&dump_data->buff_list);
+>> +
+>> +	if (!mlx5dr_dbg_dump_data_init_new_buff(dump_data))
+>> +		kfree(dump_data);
+>
+>Hi Hamdan and Saeed,
+>
+>dump_data may be freed above.
+>But it is returned unconditionally below.
+>This seems a little odd.
+>
+>Flagged by Smatch and Coccinelle.
+>
 
-In the case of XDP Multi-Buffer with Striding RQ, an extra
-page is allocated for the linear part of non-linear SKBs.
 
-Including headroom and tailroom in the calculation may
-result in an unnecessary increase in the amount of memory
-allocated. This could be critical, particularly for large
-MTUs (e.g. 7975B) and large RQ sizes (e.g. 8192).
-
-In this case, the requested page pool size is 64K, but
-32K would be sufficient. This causes a failure due to
-exceeding the page pool size limit of 32K.
-
-Exclude headroom and tailroom from SKB size calculations
-to reduce page pool size.
-
-Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en/params.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-index b9d39ef8053c..5757f4f10c12 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-@@ -257,6 +257,7 @@ static u32 mlx5e_rx_get_linear_stride_sz(struct mlx5_core_dev *mdev,
- 					 struct mlx5e_xsk_param *xsk,
- 					 bool mpwqe)
- {
-+	bool no_head_tail_room;
- 	u32 sz;
- 
- 	/* XSK frames are mapped as individual pages, because frames may come in
-@@ -265,7 +266,13 @@ static u32 mlx5e_rx_get_linear_stride_sz(struct mlx5_core_dev *mdev,
- 	if (xsk)
- 		return mpwqe ? 1 << mlx5e_mpwrq_page_shift(mdev, xsk) : PAGE_SIZE;
- 
--	sz = roundup_pow_of_two(mlx5e_rx_get_linear_sz_skb(params, false));
-+	no_head_tail_room = params->xdp_prog && mpwqe && !mlx5e_rx_is_linear_skb(mdev, params, xsk);
-+
-+	/* When no_head_tail_room is set, headroom and tailroom are excluded from skb calculations.
-+	 * no_head_tail_room should be set in the case of XDP with Striding RQ
-+	 * when SKB is not linear. This is because another page is allocated for the linear part.
-+	 */
-+	sz = roundup_pow_of_two(mlx5e_rx_get_linear_sz_skb(params, no_head_tail_room));
- 
- 	/* XDP in mlx5e doesn't support multiple packets per page.
- 	 * Do not assume sz <= PAGE_SIZE if params->xdp_prog is set.
--- 
-2.43.0
-
+Thanks Simon, Fixed in V4.
 
