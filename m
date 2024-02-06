@@ -1,126 +1,158 @@
-Return-Path: <netdev+bounces-69320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 037E784AADA
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 00:54:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AFC484AB30
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 01:55:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A5E2B2141F
-	for <lists+netdev@lfdr.de>; Mon,  5 Feb 2024 23:54:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05C411F2512B
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 00:55:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C90D4C3D6;
-	Mon,  5 Feb 2024 23:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7182EC7;
+	Tue,  6 Feb 2024 00:55:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ew4DZpcN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="auu5hfmf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A1148CC6;
-	Mon,  5 Feb 2024 23:53:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A58ECF
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 00:55:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707177239; cv=none; b=NwsQbbII/iHvjVRKdtwHBzSFNSsBRKg2QfLzYH4Pci0sSzjR4RQ7Z43lGLa5dvWRjtiiI8a62ZnKbYOt7heD3T/L0rAtaeUMkr4bMvcB6ZJZVqNpCFq3ltk8QdJ5Bf/WHnqU/1ronE+9R/l2uw/JaHHW1SeE+5k+coooeXlkHqg=
+	t=1707180930; cv=none; b=IKF8XQQcYMCx0n6Dc5eM4CfSV4lyegn0ydD1GOTiHbph3Z+WC3Od8jHYtvH1qcyPeKmFfKTVE0JLrPP80gbUHH9RKKMbROXYF2Y99Gv4k6G8LzzIKcOhD2eXFP8Jlue6PEYqkktBheLDjMKLgPHkQJjSuQXnICkKDBYhkdrcaYI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707177239; c=relaxed/simple;
-	bh=nJanOS1hCRyVe/2LbmWg0rG9mmxI9LHxBGl/E28BohE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=Zdvon3xx/iibGtfuTojm0s41o32h0AHFZ8mjoGQf/ClgUa514pDiw7OgGN3JCAgUg42RTRybnFl3oJxgU4J4sxRKU0VMcQIRQFmQ3j+4BeeyU3zAXmNr+PPhilmj/wb6hgjqYe1blo0+hSDFzhEljGXC1ehZJCqZCrBI1DenheA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ew4DZpcN; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1d93edfa76dso42811695ad.1;
-        Mon, 05 Feb 2024 15:53:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707177236; x=1707782036; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=kiLTCJmbmh0u3rY3NuQEZxUH1Em6FbOtZB1pzeq5xJ0=;
-        b=Ew4DZpcNH6lFv7FnI2iVxfXeULUuVbpzAngP2eJYvGQcL2cC4wbg2kX9qke1z03V9U
-         pkEzvuNN+F+itRciCJ0AsvWH9bK9Jf2hnVxa6A0XH7az3wglo+CTg1wTfXw3WjT+hjPN
-         gkzYJNZ+hYxKiF9w0BdQ5SMImdSo6FIoYumaZ6Nvw1pqnZcyzM9Hc5z9Mj3qSodO4KCM
-         DVoBjekELePbS8GA0p01UW7Q0L7wZ9xq+r7uoZyc7ApadENjCXtsNao/6NtkwVts8AED
-         HniJ4KcodiVtMj1fCF9ipV6b13yuy/hyXl4OxvRbaMqhNAuMtf5wUy0AqMFDhuhCsvCG
-         HS3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707177236; x=1707782036;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kiLTCJmbmh0u3rY3NuQEZxUH1Em6FbOtZB1pzeq5xJ0=;
-        b=IaU425ZBw28zMGfBmLy8606jbBKodFe0LqbKO/Gy2QhC8RqqErCW1mi0ANy938V4d/
-         1qLcNiBoPWuufAARQMl8lZeteMGj7bhcVtHwLil193yI2+xbMD804dvPutmMUI3oKgOV
-         qvJBp/YgXzI8lwzO4u4BGhYfEsOMoM9TXMTUxpbRaavMsyTTRjhSEGHTidM9n/AouZmg
-         ffdFmCYV8ZWJGTLhHMNzhVDiCougr40pVNhQWU8EsfDYnk24jAJy/K0eok9cWJdEGULe
-         rIW+TBf/RXGuaacMSWAroCC3U+CZoPH4zX//rLCREgr1PQ1sQ8U3sgR0avDRBrDQmbVq
-         N+8Q==
-X-Gm-Message-State: AOJu0YypoRvPxaKm7a26esebjIzqPoanH+s3uTNBTY4c4QA6YphAcMOG
-	nh0Beb7jntti/RAzOCFqjw5M/hF2uyLWDmbMG2Vo1MhvcGKJT3gIC0iL3WY/oSw=
-X-Google-Smtp-Source: AGHT+IE0vpxwKhomBNhEmOVxBT9nKNhVmPDW9X2er55br7FsuGimIBDbtKLh28J/Mvu+QY7Qs3DZUg==
-X-Received: by 2002:a17:903:2452:b0:1d9:aa2d:db6e with SMTP id l18-20020a170903245200b001d9aa2ddb6emr28683pls.26.1707177236032;
-        Mon, 05 Feb 2024 15:53:56 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXEFoYMWX7FInwKTYhYD9FhL8+7D+jmaf8Of0hOOrY49OXMv5Y0tXifadC7tIpRJoemnDnaXo0ovfoXA2cYz1ZIEz/yunhCyncd4WT1aDRs9h5I2qhkUmT3uiAdt/3QPufNXisAF36UoX0mNo3+g5zrlVeHCoDpS89hgr7V9+R7IBpWe2SHm5atoV8SDcJNihROod9UyD/NpVonaX9EsN1T5UU7TsjFzEO8t9NkqWNb2YxcUMnO/JWqGczTHT8LUjCzDpofg/EiKLPYM6YFnZuMQFfeaRr2MChxaC+SaISYGxc4uX3e1mdk5Mjn8vr59eE1fBMpAR7sdgKh
-Received: from localhost (dhcp-141-239-144-21.hawaiiantel.net. [141.239.144.21])
-        by smtp.gmail.com with ESMTPSA id mm14-20020a1709030a0e00b001d9630e3396sm453561plb.193.2024.02.05.15.53.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 05 Feb 2024 15:53:55 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Mon, 5 Feb 2024 13:53:54 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-wpan@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] ieee802154: ca8210: Drop spurious WQ_UNBOUND from
- alloc_ordered_workqueue() call
-Message-ID: <ZcF1El7fn5xkeoB1@slm.duckdns.org>
+	s=arc-20240116; t=1707180930; c=relaxed/simple;
+	bh=VpgReO22dBPQR/P4QEQrcbqz8MN0+wnQLMD2zSVI2G0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Wi8dnaxmiV0XyIjooC3szokggJ12YjETJal+FrlDOFE80Nhkv0eCG/2BEuC4PPPWyInBlXPUzQbnMsu064qGSnuKdFTUS6WkAfi8qIeqoGoR6uYXjBfO8O5kVaNWannNnk8ASmG0GVQs9HIBoGWzKZjhVPqJGRpzVEkNbTKjeW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=auu5hfmf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2700C433C7;
+	Tue,  6 Feb 2024 00:55:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707180930;
+	bh=VpgReO22dBPQR/P4QEQrcbqz8MN0+wnQLMD2zSVI2G0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=auu5hfmfmxRT9oaoKduzDQa6w2jUU0uWuACdDExL77FWT0V80ME0uE3ifqua6RvR9
+	 w7icA7IF3fBLVBDrnmGCwYNLI32fG2ZsyHFqKUC//pstt0bgZvB97V8IJIlnf4Yuy5
+	 8MLDM7lDfWcLWG4jIm4Lgc8+SO9BlXHrCJ7Ark/RS55cz4r713jtA9ngfsBiztzzob
+	 fMqabKZtwEX27+EO4shFPUXCj0GT2nzU/W3oQWe/NJWRjc0ehVyR71B+IFVJCB63Jk
+	 RBScjqwPK+3GPEKFOvqjmG8EzwZ1TwDmn5fZTBlI24P4T5MMAxwYbPixHs7hB5effe
+	 ACYgKwa6d7i/A==
+From: Saeed Mahameed <saeed@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>,
+	netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>
+Subject: [pull request][net-next V4 00/15] mlx5 updates 2024-01-26
+Date: Mon,  5 Feb 2024 16:55:12 -0800
+Message-ID: <20240206005527.1353368-1-saeed@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
-Workqueue is in the process of cleaning up the distinction between unbound
-workqueues w/ @nr_active==1 and ordered workqueues. Explicit WQ_UNBOUND
-isn't needed for alloc_ordered_workqueue() and will trigger a warning in the
-future. Let's remove it. This doesn't cause any functional changes.
+From: Saeed Mahameed <saeedm@nvidia.com>
 
-Signed-off-by: Tejun Heo <tj@kernel.org>
----
- drivers/net/ieee802154/ca8210.c |   10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+v3->v4:
+ - Prevent a use after free in case of error flow inside
+   mlx5dr_dbg_create_dump_data() patch #13
 
---- a/drivers/net/ieee802154/ca8210.c
-+++ b/drivers/net/ieee802154/ca8210.c
-@@ -2857,19 +2857,13 @@ static int ca8210_interrupt_init(struct
-  */
- static int ca8210_dev_com_init(struct ca8210_priv *priv)
- {
--	priv->mlme_workqueue = alloc_ordered_workqueue(
--		"MLME work queue",
--		WQ_UNBOUND
--	);
-+	priv->mlme_workqueue = alloc_ordered_workqueue("MLME work queue", 0);
- 	if (!priv->mlme_workqueue) {
- 		dev_crit(&priv->spi->dev, "alloc of mlme_workqueue failed!\n");
- 		return -ENOMEM;
- 	}
- 
--	priv->irq_workqueue = alloc_ordered_workqueue(
--		"ca8210 irq worker",
--		WQ_UNBOUND
--	);
-+	priv->irq_workqueue = alloc_ordered_workqueue("ca8210 irq worker", 0);
- 	if (!priv->irq_workqueue) {
- 		dev_crit(&priv->spi->dev, "alloc of irq_workqueue failed!\n");
- 		destroy_workqueue(priv->mlme_workqueue);
+v2->v3:
+ - Add noinline_for_stack to address large frame size issue patch #13
+
+v1->v2:
+ - Fix large stack buffer usage in patch #13
+
+This series provides misc updates to mlx5 and xfrm,
+the two xfrm patches are already acked by Steffen Klassert in the
+previous release cycle.
+
+For more information please see tag log below.
+Please pull and let me know if there is any problem.
+
+Thanks,
+Saeed.
+
+
+The following changes since commit 8ff25dac88f616ebebb30830e3a20f079d7a30c9:
+
+  netdevsim: add Makefile for selftests (2024-02-05 07:34:02 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-updates-2024-02-01
+
+for you to fetch changes up to a90f55916f150ced7b2635bedd43676f922ee075:
+
+  net/mlx5e: XDP, Exclude headroom and tailroom from memory calculations (2024-02-05 16:45:53 -0800)
+
+----------------------------------------------------------------
+mlx5-updates-2024-02-01
+
+1) IPSec global stats for xfrm and mlx5
+2) XSK memory improvements for non-linear SKBs
+3) Software steering debug dump to use seq_file ops
+4) Various code clean-ups
+
+----------------------------------------------------------------
+Carolina Jubran (2):
+      net/mlx5e: XSK, Exclude tailroom from non-linear SKBs memory calculations
+      net/mlx5e: XDP, Exclude headroom and tailroom from memory calculations
+
+Gal Pressman (2):
+      net/mlx5: Remove initial segmentation duplicate definitions
+      net/mlx5: Change missing SyncE capability print to debug
+
+Hamdan Igbaria (1):
+      net/mlx5: DR, Change SWS usage to debug fs seq_file interface
+
+Leon Romanovsky (4):
+      xfrm: generalize xdo_dev_state_update_curlft to allow statistics update
+      xfrm: get global statistics from the offloaded device
+      net/mlx5e: Connect mlx5 IPsec statistics with XFRM core
+      net/mlx5e: Delete obsolete IPsec code
+
+Moshe Shemesh (6):
+      Documentation: Fix counter name of mlx5 vnic reporter
+      net/mlx5: Rename mlx5_sf_dev_remove
+      net/mlx5: remove fw_fatal reporter dump option for non PF
+      net/mlx5: remove fw reporter dump option for non PF
+      net/mlx5: SF, Stop waiting for FW as teardown was called
+      net/mlx5: Return specific error code for timeout on wait_fw_init
+
+ Documentation/networking/devlink/mlx5.rst          |   5 +-
+ Documentation/networking/xfrm_device.rst           |   4 +-
+ drivers/net/ethernet/mellanox/mlx5/core/dev.c      |   2 +-
+ .../net/ethernet/mellanox/mlx5/core/en/params.c    |  24 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ipsec.c   |  26 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ipsec.h   |   1 -
+ .../mellanox/mlx5/core/en_accel/ipsec_rxtx.c       |  25 +-
+ .../mellanox/mlx5/core/en_accel/ipsec_rxtx.h       |   1 -
+ .../mellanox/mlx5/core/en_accel/ipsec_stats.c      |   1 -
+ drivers/net/ethernet/mellanox/mlx5/core/fw.c       |   6 +-
+ drivers/net/ethernet/mellanox/mlx5/core/health.c   |  45 +-
+ drivers/net/ethernet/mellanox/mlx5/core/main.c     |  38 +-
+ .../net/ethernet/mellanox/mlx5/core/mlx5_core.h    |   7 -
+ .../net/ethernet/mellanox/mlx5/core/sf/dev/dev.c   |   9 +-
+ .../ethernet/mellanox/mlx5/core/sf/dev/driver.c    |  21 +-
+ .../ethernet/mellanox/mlx5/core/steering/dr_dbg.c  | 734 +++++++++++++++++----
+ .../ethernet/mellanox/mlx5/core/steering/dr_dbg.h  |  20 +
+ include/linux/mlx5/mlx5_ifc.h                      |   1 +
+ include/linux/netdevice.h                          |   2 +-
+ include/net/xfrm.h                                 |  14 +-
+ net/xfrm/xfrm_proc.c                               |   1 +
+ net/xfrm/xfrm_state.c                              |  17 +-
+ net/xfrm/xfrm_user.c                               |   2 +-
+ 23 files changed, 766 insertions(+), 240 deletions(-)
 
