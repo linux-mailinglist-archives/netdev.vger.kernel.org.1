@@ -1,101 +1,78 @@
-Return-Path: <netdev+bounces-69573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEC3184BB63
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 17:51:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 026E884BB6E
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 17:53:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52211B29FD7
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:51:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B12FD283BB4
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:53:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38CEF17C9;
-	Tue,  6 Feb 2024 16:51:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAD344A11;
+	Tue,  6 Feb 2024 16:53:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HcNHPe98"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SpQqeEGp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD4D66FB8
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 16:51:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17891C133
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 16:53:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707238269; cv=none; b=bf4gaJI6MqTieB3wViwWyjNUFGzJSb2zrBN0GZ7xYw4plqhK7+aJA55hca8gXFqAXUJPmWvumhDhvbB400Cqjf4BdtUfaL+oqT+d/1pLn6LID1sRNP+bzGyft3B5Z2viI2VnIGlb1O3flpi/fqFIEji58+eobIJSNKbD3E65KLw=
+	t=1707238390; cv=none; b=uxPGem/H4mX5uMTy0pLiKgV9QOalh0jN9pboB9h0TJ/Wz0Ew+qBs+ZEuCdIeZqfTLWgQL8hqanSeNXMrztzGDsvMmQvf7qUrkLDNSxx4fBeQevpHFRm8k9C35EarJPjP9NKL6GUE0MNsTfiYuZQ68y/3gjsRVkdjTuztSYTdANg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707238269; c=relaxed/simple;
-	bh=8FdDaVqX6JXQ471u74PFoUoq11r3Q9AVs8SCn3bvnV8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t7qUh/VotsqgvicysdbM7Peata55/Pk2VWmuWzOj1ete9Fi1+hQA1lNflvhnvxlWOfN7pf+F8+W7rbrLJ7EOCQXGDcjA7Azb0rAs3BT4f1SOSV6gr12UmOVpT9JA8ZkNun0dK6Kdf351rPUp9rCGJrl6KSIEEvdZ2YfVF4AYIcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HcNHPe98; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-55f5d62d024so12244a12.1
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 08:51:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707238262; x=1707843062; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8FdDaVqX6JXQ471u74PFoUoq11r3Q9AVs8SCn3bvnV8=;
-        b=HcNHPe98sduBvz+SKv15elEV4B23UtqvkH/RiZgcSsPj/AcS5OoutcdN3RaFEUpo2K
-         T5JQtAsdzjWZUvt5dkRn7XCwZ9wQ4Yhh1WB3xOiBtjoOUFN47EJQJyjdn7t67wTtaB2J
-         bdn6UDAewiEJahDQPP1piQF8a5WmqDHgE1zM87MadDjVo9QrFLWGZHOd95353O+Esk41
-         YQybVZva+lPmd5LG4Rzd3G70rbOOfkK21FWr7D68m2TmitGH2/n4pLY4QlBUju2dxJp5
-         eWWZ+yS4mtyZW8D96xrWE88cwbTBK9jc9DFVLPkz0HPPNkhCANgh+jJEjlplrFiDmo/D
-         IUhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707238262; x=1707843062;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8FdDaVqX6JXQ471u74PFoUoq11r3Q9AVs8SCn3bvnV8=;
-        b=oOzu5n+XrKNglqM1e0yeW8acbpEza+4Fv/+rLwrmJJUK22CY2bfoHKfWYqeYWYhBFM
-         KA4h+rT/DPTki3xxnnFcqaDXaCI/16VyINYNK2n/RaIhk388qyppShVgQ4gkot3i87vK
-         KnKrmATxuNz4+bhyWJrQaHX6iEeD1ugZVUzq0du0QAKAFf3ied0NADt/V8KEMrPWZf09
-         ZoDtpulXREJ9CAWBpIOMo4gBwVIZladlVhYlKOW0Yddm+YCduvZinIwdHm9KxULoUYZ6
-         qzD63eZvAa2ZTdiQGNTt0z8l+upehOjM3qlRRlM4c8Pn0XZmRoTX3gew00EgVWkCC2JR
-         fXqQ==
-X-Gm-Message-State: AOJu0YyYGBBKT6doEQjRGFiVBCRIkP8HOAh/N+d+rRtjS6cEd2F4cOBO
-	KVtJExjVSEvculoNWJ00t+eox/CP5aMpbY/+LaNN6O9pMrYtXR1YPr5DlS7TbfsYaKNidxCqMzb
-	mHl9Scc0RRbke8bf+gqWkPEtbSo/EJYyRh5FA
-X-Google-Smtp-Source: AGHT+IGHO5RME9k0gNMoSkVAGJF/9iWfjkqGikShoKNT1rU/RTQBQqM9tA61jrgvnW1cjib/1M4iftje1+YgYmJRszU=
-X-Received: by 2002:a50:cc81:0:b0:55f:8851:d03b with SMTP id
- q1-20020a50cc81000000b0055f8851d03bmr176184edi.5.1707238261538; Tue, 06 Feb
- 2024 08:51:01 -0800 (PST)
+	s=arc-20240116; t=1707238390; c=relaxed/simple;
+	bh=yrbq9ZzTJzHd7ISoxxPDyWVUm6InvcDyUEiT1EIr09M=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=lVbYCcH2XlhGwiLNLdNtyIjB5BefBiS81V81O5BLEPsikv7DIMtwjUUc0FstGwNiaPINzA5QhRqp0+7gKjZZ5NM/3H6eiTxPkwy/ZAsKnrRoSCn4Erw+x6GJ9sYKIZIfGvrCcxLl8NJOYI4Rc8eoq+LTPxBNI1XcgS3bMyLjUrg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SpQqeEGp; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707238387;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yrbq9ZzTJzHd7ISoxxPDyWVUm6InvcDyUEiT1EIr09M=;
+	b=SpQqeEGpw2/0e0F0h+ubS4egiZn4tWA7nHAs8BFwB65t6z34FrLrY7IxnvgVsh84c0psFl
+	5pUsNLlKkzdeaIgPXnpzeJ5NTQwVBdfD1TapmKt+dpYR4qJNJIB+WDwFJBeSnaem/L0pCv
+	UsoM46JpcfKdfoH8gZwmZNE6PHdKc5Y=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-145-2pAa0aPwMH-Mvgk_hypa6Q-1; Tue, 06 Feb 2024 11:53:06 -0500
+X-MC-Unique: 2pAa0aPwMH-Mvgk_hypa6Q-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D7E2785A588;
+	Tue,  6 Feb 2024 16:53:05 +0000 (UTC)
+Received: from dev.redhat.com (unknown [10.22.8.235])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9AE541C060B1;
+	Tue,  6 Feb 2024 16:53:05 +0000 (UTC)
+From: Stephen Gallagher <sgallagh@redhat.com>
+To: netdev@vger.kernel.org
+Cc: stephen@networkplumber.org,
+	dsahern@kernel.org
+Subject: [PATCH iproute] Fix type incompatibility in ifstat.c
+Date: Tue,  6 Feb 2024 11:52:33 -0500
+Message-ID: <20240206165246.875567-1-sgallagh@redhat.com>
+In-Reply-To: <20240206142213.777317-1-sgallagh@redhat.com>
+References: <20240206142213.777317-1-sgallagh@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240206144313.2050392-1-edumazet@google.com> <20240206144313.2050392-3-edumazet@google.com>
-In-Reply-To: <20240206144313.2050392-3-edumazet@google.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 6 Feb 2024 17:50:47 +0100
-Message-ID: <CANn89i+tP20g2YSb-9rELT3s4Kz+ODOGTsbKf9eYH0JkzFcYSQ@mail.gmail.com>
-Subject: Re: [PATCH net] ppp_async: limit MRU to 64K
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Antoine Tenart <atenart@kernel.org>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot+c5da1f087c9e4ec6c933@syzkaller.appspotmail.com, 
-	Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-On Tue, Feb 6, 2024 at 3:43=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> syzbot triggered a warning [1] in __alloc_pages():
->
-> WARN_ON_ONCE_GFP(order > MAX_PAGE_ORDER, gfp)
->
-> Willem fixed a similar issue in commit c0a2a1b0d631 ("ppp: limit MRU to 6=
-4K")
->
-> Adopt the same sanity check for ppp_async_ioctl(PPPIOCSMRU)
->
+Fixes: 5a52102b7c8f ("ifstat: Add extended statistics to ifstat")
 
-Oops, sorry for the duplicate.
 
