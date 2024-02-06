@@ -1,99 +1,89 @@
-Return-Path: <netdev+bounces-69495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55ADC84B7B4
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:22:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A113284B7D3
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:26:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1289A28A573
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:22:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 44075B2A9E5
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:26:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56B4D132466;
-	Tue,  6 Feb 2024 14:22:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3892E132491;
+	Tue,  6 Feb 2024 14:26:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AYSV7j/V"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="b7vrV39A"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4CD131E55
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 14:22:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901DB132C09;
+	Tue,  6 Feb 2024 14:25:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707229344; cv=none; b=BuNahh/A+lTMCs7SV6KguR/GJMPwvxOaTpqpOTLsYmhluIDVRvy24SZUqPQZum9fj+lcYAFRwwmOIUvMB9CqPrjbA18oVxJUAiHInOAbQ8oKutYK0aqL/JS0sH9XaJPCgAI6ovQOB8CeeIGGxIah1O5bBJCH8kht7u9pbrIJSJA=
+	t=1707229561; cv=none; b=l60z6sr4oDVXCv2HmwJRhdWtpsgj78vKquZT09/0t2jFOLXgZrxKDX0l3N2/ON5tPXrz66QEJdw0RcwPqsHDFKUKdUSroldBGkoCyzyknUEG8xEHVvz98Mv+qnPmpIOozWRXK0fXvXAvn9jWJ1j62TYXnzUGtueKUFUY/IaVFx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707229344; c=relaxed/simple;
-	bh=1d+EQeI7ZRJejmJelMH/afAGSNnfgVWs/QGeMw7wlxc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RKSg77IQnWqY7Vr22npzcYh2oTbCUvDKI3y8dUbV7QUJDYK9yShQUqqMeApPzVeXj9lRguamjH0L4RB6NpLGcagCdPcuq83j2G0deJAisZc1PqpI4AcXEqKfGAN1YNbPcrLIVLFgX5ohIH/Gwxlm3/N9NRbwQrf1qnvFKrqWJ24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AYSV7j/V; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707229341;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=8V5/ZF2pQRxInlm+8vcoORP65KVQFSUe+GcgFA0pcLE=;
-	b=AYSV7j/V1bCemwkLx7ZXCexCfna5hJsCRiQjZV3KzE48SCgfUr21J405J5RBEbJjfAASGM
-	nXLGU1D0rARYQgWii5PkLzoTA0SD07rgEo80llq7yR7i0jQdwqMxm03jCSOrF9pebAWKvK
-	8L0cIRq3ZqDkg3RWs+BVP2yI+aCAN/c=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-365-Kftf1KD3M42edJv78Djztw-1; Tue,
- 06 Feb 2024 09:22:20 -0500
-X-MC-Unique: Kftf1KD3M42edJv78Djztw-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B15E2280C29B
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 14:22:19 +0000 (UTC)
-Received: from dev.redhat.com (unknown [10.22.8.235])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 91C77400D6D2;
-	Tue,  6 Feb 2024 14:22:19 +0000 (UTC)
-From: Stephen Gallagher <sgallagh@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Stephen Gallagher <sgallagh@redhat.com>
-Subject: [PATCH] iproute2: fix type incompatibility in ifstat.c
-Date: Tue,  6 Feb 2024 09:22:06 -0500
-Message-ID: <20240206142213.777317-1-sgallagh@redhat.com>
+	s=arc-20240116; t=1707229561; c=relaxed/simple;
+	bh=5J1DHXhtJMQ4CbzsyxiP+MOl0UOFuDY+e2LH/+A+T00=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=StAGX7qCjC2gx5SierhdhSfmqdqbCySkt7njTfOSIEELTqSPEvpDMMllhLHiqvyPtRzO8pKMPQSoGBHGL/F/BAncZBvDR4sHRY9gPNkvTZJr6q8haq7VZWVSj4Myvo5O84CKlDE69Akty04+I9qowv+xaHWROKRrimI0BwRGoqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=b7vrV39A; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=v9k+wXSjFP1gf2hdsJ6BF7YhNnlmP4KyBwDgOaZfcbI=; b=b7vrV39A71XHo6t/G+sJWupZJm
+	Iaveyf5gWkytLfoRXY2yzy15yPlqA9DSPGb72mGmuMsrpJVQOSFtmPKx8LhiPF18kSZY4OHH51UfY
+	EwS/sUZpA7wyPzfy4Z1N/rOUhayCf15zB7y6UHnKIqzkMnCAjluSKRxLreZtmgl61rks=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rXMOD-0078nm-UA; Tue, 06 Feb 2024 15:25:33 +0100
+Date: Tue, 6 Feb 2024 15:25:33 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Ariel Elior <aelior@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org
+Subject: Re: [PATCH 7/8] net: intel: igb: Use linkmode helpers for EEE
+Message-ID: <a476df99-d6f9-43ad-8af1-afc858bcd3a8@lunn.ch>
+References: <20240204-keee-u32-cleanup-v1-0-fb6e08329d9a@lunn.ch>
+ <20240204-keee-u32-cleanup-v1-7-fb6e08329d9a@lunn.ch>
+ <20240206103425.28e64a8f@device-28.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240206103425.28e64a8f@device-28.home>
 
-Throughout ifstat.c, ifstat_ent.val is accessed as a long long unsigned
-type, however it is defined as __u64. This works by coincidence on many
-systems, however on ppc64le, __u64 is a long unsigned.
+> > -		adv100m_eee = !!(edata->advertised_u32 & ADVERTISE_100_FULL);
+> > -		adv1g_eee = !!(edata->advertised_u32 & ADVERTISE_1000_FULL);
+> > +		adv100m_eee = linkmode_test_bit(
+> > +			ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+> > +			edata->advertised);
+> > +		adv1g_eee = linkmode_test_bit(
+> > +			ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+> 
+> Probably a typo, I think it should be ETHTOOL_LINK_MODE_1000baseT_Full_BIT
+> here :)
 
-This patch makes the type definition consistent with all of the places
-where it is accessed.
+Yes, good catch. Thanks.
 
-Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
+    Andrew
+
 ---
- misc/ifstat.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/misc/ifstat.c b/misc/ifstat.c
-index 721f4914..767cedd4 100644
---- a/misc/ifstat.c
-+++ b/misc/ifstat.c
-@@ -58,7 +58,7 @@ struct ifstat_ent {
- 	struct ifstat_ent	*next;
- 	char			*name;
- 	int			ifindex;
--	__u64			val[MAXS];
-+	unsigned long long	val[MAXS];
- 	double			rate[MAXS];
- 	__u32			ival[MAXS];
- };
--- 
-2.43.0
-
+pw-bot: cr
 
