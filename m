@@ -1,148 +1,168 @@
-Return-Path: <netdev+bounces-69441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E28184B341
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 12:17:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE39484B352
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 12:20:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8F781F221D3
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 11:16:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AE4A1F2466A
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 11:20:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3676012D157;
-	Tue,  6 Feb 2024 11:16:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BBA512B14E;
+	Tue,  6 Feb 2024 11:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I0LcRz9b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LXlpARtc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09E2C1EA6E;
-	Tue,  6 Feb 2024 11:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D69F56754
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 11:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707218209; cv=none; b=Bg8RTThq7NVxlxkX7wmEhEM+bXM/h0Ko/J8eoOJspTHR8ZUI+QvCQu4iS7xMK38vPIU8SC7TnJUjy1Utp+RIYqtQCEQRv+NcbrFjX3wF9VgQSqgkHugQsF60WFghBV17lhtL7UvS2kqHPV2xCKLS+b2Gr3bA+VmAfDyTRUBpsxk=
+	t=1707218431; cv=none; b=D9dM5siQw+k2/FZzPy8D+ww0EwJVG9AziCr9ORVs5+piMypwXS1liGkVWahvdNlfyknnLfBkw1DMksFkKCpsoxFFtuT/mlnb/iO4A5whOTyRjgib94y1gLp/61gamm7kYIcywfc5+P1j+Opf+v1objky00ZSwhCFm+SfotKFTB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707218209; c=relaxed/simple;
-	bh=A0CK17p98+HNaf6hZbfv0nM3T7etOo5uLlV6rgpKm+c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:Cc:
-	 In-Reply-To:Content-Type; b=tIrzcPUpq5Fryrd3L7WIxuv7Um1Ri/78wlXYXUxRnQC9GJEV5G/olDG4v+xU6FjYP/ZIvJ0hTOt4+RYn86wJL+Sz5fudQkM6HJF7PyeWLX7jSl2amw8xjyhysNQ3pM2YgzV2vC8pqrr8Vk49XkQr4T2zXoH342XUE+QkFsXHEtw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I0LcRz9b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 456B6C433C7;
-	Tue,  6 Feb 2024 11:16:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707218208;
-	bh=A0CK17p98+HNaf6hZbfv0nM3T7etOo5uLlV6rgpKm+c=;
-	h=Date:Subject:To:References:From:Cc:In-Reply-To:From;
-	b=I0LcRz9bU/OUcJYpKHvpSQGNyuPlt3O3cRqRaAQRV2c85oHLDCSoTrnCoZlJqT560
-	 L3byMH0/4p6JYYuBHve4dsuMWCj9QJtWGLWe2E9HuD6xmijVwmetooaEhw0KKwYVR8
-	 jBMlRNht+uDSPXdWIVz1qu/34DYA0bQB2+XPqA0CQHH0R71mKsM7/WkUiqvVU6B4/H
-	 NXxivO2I3dUAH7IfQTTOSfb4UoXDN8I9GCwOogzODXwr2j68y3bnFoNpuzE70hracY
-	 IuRQ68Id2nSxVk65J5hj8JnSZfOduxN94ZNc6bREHPE3agZASugqAx0Cr84y9JuvhR
-	 7MCixx318PgNw==
-Message-ID: <f6437533-b0c9-422b-af00-fb8a236b1956@kernel.org>
-Date: Tue, 6 Feb 2024 12:16:43 +0100
+	s=arc-20240116; t=1707218431; c=relaxed/simple;
+	bh=OlB2OEQmd/K1b98VvESLu2jUoZA2XBUHEXhD14Hc9Uw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=qMK2je3Wei69Vy0iYROH5CRrSR8z7FML4GjBc0jGnj2fCXCWtSd2Uy694lykNq/hR4TjQyTZMwKsUiSj1GU24ZT90UqHwE/tYHM8W4MjVMd/bQpDhImU7yqF1bskLtcSAYkeAjpR+aHA8agPBPDXECyMQ3AQgnXkGv67AEyyXS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LXlpARtc; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d04c0b1cacso68740301fa.0
+        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 03:20:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707218427; x=1707823227; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sZUkF6qQkW68JTbbtNstjqI5lBDrxSml80X/oZkP6Jk=;
+        b=LXlpARtc/HYXY/h4HHa6DcYG140dYmr3wZ2O1gu+HRWVELHRrsrAzMH/j94z44kFzi
+         fS+ytOMsns09ExkFm96LfRHHCrExpDDhGe0MAU51aLnSDdJw/rnJINIilQbC8yAwhAbE
+         rVrpyXmzbt3giOHAcI8WlUdi0V6sOSUbqQmv69h6pv/HlUUnX8Y54aSx8HiRqAm2Ph9M
+         UjrAx9NAfpv4+OQNkABDygtfbQtPHngFz1bJAtQARqRdOF5vtXT+w+PCi4eyX1q5c2L2
+         jPz9kllMEcaOQaR8b1U8thfkmDcgay/T4h0f2/eVdtGUJpK1D0lKSXimOjE5W10GPuJv
+         D9jw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707218427; x=1707823227;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sZUkF6qQkW68JTbbtNstjqI5lBDrxSml80X/oZkP6Jk=;
+        b=NZMmie6dzMI+q4rgTsrf40pT5xDO9oSuncSVMI+hxO6T+USyDaGEadVqM+ziFyiiKg
+         LzlI/Y/+kE1yDqIBGI//NA/hIhGNqY5F/D+WpIgu/Pv7hqU4zChFKDnZNze9/ryLlYl4
+         3TDWYZ2BKBFUWnN2lrhdICB67IjVqXSaGet9NGNKqASp2VkYfKvSgowUaSjAUQtT0dcH
+         Kzsr3Nx4JoHDeLC/TExj2jNeKeAYzIuLTdCDt8LFLc/Qtn8ZJ41+xsquAG6CvOGknfNb
+         fI62P6QscjQCd0pPTJrQTXnfgaLliVoAq7PgWB/JYqyDqSMapiCsYtbKgwdlQUxLyCZU
+         rQJA==
+X-Gm-Message-State: AOJu0YzH/DiGNv+1uI4MnoQ3UETCaJQZ6/FvKD0qTEbRizq9S0NfeGNX
+	pJ6sfPNN1sTUMlLKjTLlMx5w6suPjMWVUeZOlHJw8Wq7vgFJq7u3
+X-Google-Smtp-Source: AGHT+IHW2LkipLfX++vRM5dnDW6bduLO6JoK+Xv12mfq908JaY4bohgwFQKI2raGy/UuCHKa9YF1yA==
+X-Received: by 2002:a05:651c:d5:b0:2d0:9a6e:106 with SMTP id 21-20020a05651c00d500b002d09a6e0106mr1807106ljr.43.1707218427282;
+        Tue, 06 Feb 2024 03:20:27 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCU8bYPaI3YnkZ9qObyT85rw9Qb8bPNkodfCON7S9bFI2g3Gp2FvLh44VCCd1nIXzAo0B9ZFUZHtoKmw+OQMBaV5wFUEi7okjcvOXXM2erXPOjb2kpL6G22QFBuiiDxoK62+79Axr25HLQzomCTTxoabKgEC2Q5nVG8/eAPeYqmzjybtC7L5U0VDv6jimT00eScRUEXmoFWrHQoy3wtd4iCl/tkWxKedPbgMIkuq47/ABLm/5r/7cJoiXPdk3E90Hc5G4oq0BOHzzsY5lEZiw0pj/ZVTylnhpxd+cczPUjdXgfGHAk79FgB1d4SYFWw1jADQfLv476Yi5kPH5rDzo4WAEiwm3ylHTfG+XHn2Fl6lOAbfhRwwUpDPEezP1PpSaoAcqI+VzkDkTvSJFE9b+NAljPTwmWk4DRrfUT0XLJHBiewTLqEcedFIVxU7avLKHC8Jv3sXOM6R47W+czO/we8MjegmMxPPxHvL1/B6S69QKyryLLaQ0z5D6n1yxpePuHLyPLfs/SPeAiByM6CY2ON4RYmCGC38j62t9GNjhe/HPkTT1bVj15MwCZ9hF2VResSHXmFFl2sBxcrn43PwVPRFnRzwiVcmxFVBn6IDAjWjss6UE8nGcT2wFH1M7A0qGkPic7nTD3FIe474uaTpFMN8kXtxKQh016Lr3LRc1OtlM/Qa6YHANwJb08xUVXOqcN7vTIAf9axrZ6QvTYzz7XIjyEv9
+Received: from skbuf ([188.25.173.195])
+        by smtp.gmail.com with ESMTPSA id kt12-20020a170906aacc00b00a36c7eb251bsm1029561ejb.157.2024.02.06.03.20.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Feb 2024 03:20:27 -0800 (PST)
+Date: Tue, 6 Feb 2024 13:20:24 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Doug Berger <opendmb@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	bcm-kernel-feedback-list@broadcom.com,
+	Byungho An <bh74.an@samsung.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	Justin Chen <justin.chen@broadcom.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	NXP Linux Team <linux-imx@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
+	Shenwei Wang <shenwei.wang@nxp.com>, Wei Fang <wei.fang@nxp.com>
+Subject: Re: [PATCH net-next v2 6/6] net: dsa: b53: remove
+ eee_enabled/eee_active in b53_get_mac_eee()
+Message-ID: <20240206112024.3jxtcru3dupeirnj@skbuf>
+References: <Zb9/O81fVAZw4ANr@shell.armlinux.org.uk>
+ <E1rWbNI-002cCz-4x@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [TEST] The no-kvm CI instances going away
-Content-Language: en-GB, fr-BE
-To: Jakub Kicinski <kuba@kernel.org>
-References: <20240205174136.6056d596@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- MPTCP Upstream <mptcp@lists.linux.dev>, Paolo Abeni <pabeni@redhat.com>,
- Mat Martineau <martineau@kernel.org>
-In-Reply-To: <20240205174136.6056d596@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1rWbNI-002cCz-4x@rmk-PC.armlinux.org.uk>
 
-Hi Jakub,
+On Sun, Feb 04, 2024 at 12:13:28PM +0000, Russell King (Oracle) wrote:
+> b53_get_mac_eee() sets both eee_enabled and eee_active, and then
+> returns zero.
+> 
+> dsa_slave_get_eee(), which calls this function, will then continue to
+> call phylink_ethtool_get_eee(), which will return -EOPNOTSUPP if there
+> is no PHY present, otherwise calling phy_ethtool_get_eee() which in
+> turn will call genphy_c45_ethtool_get_eee().
 
-On 06/02/2024 02:41, Jakub Kicinski wrote:
-> because cloud computing is expensive I'm shutting down the instances
-> which were running without KVM support. We're left with the KVM-enabled
-> instances only (metal) - one normal and one with debug configs enabled.
+Nitpick: If you need to resend, the function name changed to
+dsa_user_get_eee().
 
-Thank you for the notification!
+> 
+> genphy_c45_ethtool_get_eee() will overwrite eee_enabled and eee_active
+> with its own interpretation from the PHYs settings and negotiation
+> result.
+> 
+> Thus, when there is no PHY, dsa_slave_get_eee() will fail with
 
-It sounds like good news if the non-support of KVM was causing issues :)
+Here too.
 
-I think we can then no longer ignore the two MPTCP tests that were
-unstable in the previous environment.
+> -EOPNOTSUPP, meaning eee_enabled and eee_active will not be returned to
+> userspace. When there is a PHY, eee_enabled and eee_active will be
+> overwritten by phylib, making the setting of these members in
+> b53_get_mac_eee() entirely unnecessary.
+> 
+> Remove this code, thus simplifying b53_get_mac_eee().
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
+> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> ---
+>  drivers/net/dsa/b53/b53_common.c | 6 ------
+>  1 file changed, 6 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/b53/b53_common.c b/drivers/net/dsa/b53/b53_common.c
+> index adc93abf4551..9e4c9bd6abcc 100644
+> --- a/drivers/net/dsa/b53/b53_common.c
+> +++ b/drivers/net/dsa/b53/b53_common.c
+> @@ -2227,16 +2227,10 @@ EXPORT_SYMBOL(b53_eee_init);
+>  int b53_get_mac_eee(struct dsa_switch *ds, int port, struct ethtool_keee *e)
+>  {
+>  	struct b53_device *dev = ds->priv;
+> -	struct ethtool_keee *p = &dev->ports[port].eee;
+> -	u16 reg;
+>  
+>  	if (is5325(dev) || is5365(dev))
+>  		return -EOPNOTSUPP;
+>  
+> -	b53_read16(dev, B53_EEE_PAGE, B53_EEE_LPI_INDICATE, &reg);
+> -	e->eee_enabled = p->eee_enabled;
+> -	e->eee_active = !!(reg & BIT(port));
+> -
 
-The results from the different tests running on the -dbg instances don't
-look good. Maybe some debug kconfig have a too big impact? [1]
+I know next to nothing about EEE and especially the implementation on
+Broadcom switches. But is the information brought by B53_EEE_LPI_INDICATE
+completely redundant? Is it actually in the system's best interest to
+ignore it?
 
-For MPTCP, one test always hits the selftest timeout [2] when using a
-debug kconfig. I don't know what to do in this case: if we need to set a
-timeout value that is supported by debug environments, the value will be
-so high, it will no longer catch issues "early enough" in "normal"
-environments.
-Or could it be possible to ignore or double the timeout value in this
-debug environment?
-
-Also, what is the plan with this debug env? It looks like the results
-are not reported to patchwork for the moment. Maybe only "important"
-issues, like kernel warnings, could be reported? Failed tests could be
-reported as "Warning" instead of "Fail"?
-
-[1]
-https://lore.kernel.org/netdev/90c6d9b6-0bc4-468a-95fe-ebc2a23fffc1@kernel.org/
-[2]
-https://netdev-3.bots.linux.dev/vmksft-mptcp-dbg/results/453502/1-mptcp-join-sh/stdout
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+>  	return 0;
+>  }
+>  EXPORT_SYMBOL(b53_get_mac_eee);
+> -- 
+> 2.30.2
+> 
 
