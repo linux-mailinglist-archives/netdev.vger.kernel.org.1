@@ -1,112 +1,158 @@
-Return-Path: <netdev+bounces-69532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B3FC84B965
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:26:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 581AE84B968
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:26:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5F4B1F277E8
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:26:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5DFD28FE32
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:26:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42BC2137C26;
-	Tue,  6 Feb 2024 15:21:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21842135A6F;
+	Tue,  6 Feb 2024 15:21:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CEad+EnP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HxU8vQAt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194B9135A6A;
-	Tue,  6 Feb 2024 15:21:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67789137C45
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 15:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707232877; cv=none; b=FEv5ZF8X+nBrAhJ7u55yoLM4hzDRoexHEJ3bSOoWhaBs0hLw4ehWpYGOqxkgdqx5BThJLJsojxttaPpYFo+7aXhTAP4nJ7riEgu4iz7cqc1zX+iMp4/hhMebMeVrGltGoqJpMqqj3J3ikPGeYD5AENHQCpsuXZ2WZIrtv6LWW2A=
+	t=1707232886; cv=none; b=Q0Bh4VySy5qDTAChdQue3Gb0jnBYYli2CZ6mRgE7pzFIh0S3IVwcFkMhS9+w1ra8xTK63GFSzm8XzE5F9t9uFsUN0vla41Bh7cUHaUp7SgosqMs5+oi3mGX6EGM/5HfV36G1ifE96MqSYjrShJ08FwCU0N7yNixyFK0JGGzCIys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707232877; c=relaxed/simple;
-	bh=LyjQlt4G4x0nfdud4poStAqX33ymR17t5R2+B2AlI2g=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lgDjvlO9nFDfnOGAmVXI8ajVF3zDwk3pwxNz8H2bf5Ic8kgDlDZe5oRQ1TKni0GHYwKkSYbEqF3rFpf/zT5OzKbk1TfHJGNc1uBl960evrUWClAdKxHPzgH+3n3NIW/veghW0lyZ5/PDO+dKN0SDKNUriwhvqAQFRzrKFDkWrrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CEad+EnP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93BF1C43390;
-	Tue,  6 Feb 2024 15:21:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707232876;
-	bh=LyjQlt4G4x0nfdud4poStAqX33ymR17t5R2+B2AlI2g=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CEad+EnPMUSBFizg/2pJsnkWPFwZP5QKGaQS7aD32TgLB2E8+yMr6sp0plnyZu3S1
-	 QjlpUwXEt9SJGFNTASyqOKO0CWh+CQ61pEBVy4gY7SimuA0P/TP5/k5/oAyDN3d1jN
-	 ShHLe0I7UtGcdYMPHVsbelbBV+mcEIKO5KPO433+98pSwAVMw0YBcU1NkLrn41z/Tc
-	 rccytoFbjcT0KP+TGOwQaeha9IKR3PHjCw49qnCC98ZsYcPDPucak61ROR2CspRV7S
-	 AqYFECKD8RQ1r3iWDZf6mV53A0Hg1xRdeypKXlsH9d6Zw+MEEEMTPXeTEHRAk7uwhJ
-	 UaeoVypy3SEAw==
-Date: Tue, 6 Feb 2024 07:21:14 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Shinas Rasheed <srasheed@marvell.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Haseeb Gani
- <hgani@marvell.com>, Vimlesh Kumar <vimleshk@marvell.com>, Sathesh B Edara
- <sedara@marvell.com>, "egallen@redhat.com" <egallen@redhat.com>,
- "mschmidt@redhat.com" <mschmidt@redhat.com>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>,
- "wizhao@redhat.com" <wizhao@redhat.com>, "kheib@redhat.com"
- <kheib@redhat.com>, "konguyen@redhat.com" <konguyen@redhat.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jonathan
- Corbet <corbet@lwn.net>, Veerasenareddy Burru <vburru@marvell.com>,
- Satananda Burla <sburla@marvell.com>, Shannon Nelson
- <shannon.nelson@amd.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, Joshua
- Hay <joshua.a.hay@intel.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
- Brett Creeley <brett.creeley@amd.com>, Andrew Lunn <andrew@lunn.ch>, Jacob
- Keller <jacob.e.keller@intel.com>
-Subject: Re: [EXT] Re: [PATCH net-next v5 1/8] octeon_ep_vf: Add driver
- framework and device initialization
-Message-ID: <20240206072114.244738a9@kernel.org>
-In-Reply-To: <PH0PR18MB473460118D0FC68BE4B3BC45C7462@PH0PR18MB4734.namprd18.prod.outlook.com>
-References: <20240129050254.3047778-1-srasheed@marvell.com>
-	<20240129050254.3047778-2-srasheed@marvell.com>
-	<20240131161406.22a9e330@kernel.org>
-	<PH0PR18MB47345E3ADCC35D0ECA763DBBC7412@PH0PR18MB4734.namprd18.prod.outlook.com>
-	<20240205154448.1c5a5ad8@kernel.org>
-	<PH0PR18MB473460118D0FC68BE4B3BC45C7462@PH0PR18MB4734.namprd18.prod.outlook.com>
+	s=arc-20240116; t=1707232886; c=relaxed/simple;
+	bh=/gMmpLzJWIxb8FFUuYsNekgWVFElmoa+JkzyU0DhqOI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ny3Z+iJ5ja1PknHRbGALMihTCAe9LAswf3FwEj9C3mf0kpoT3QSK1Xk5oj0VliD5uSxZh2bpiMQDQOpDLr9LOHGP1PO6ED5d8Xt2d1DMnlErsVXwiJVLD6zFectoi/bRnDmkom5IZfFfXwANtBF8DaZcYXKN6DhgP0jMpCDF1vY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HxU8vQAt; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707232883;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=KtZT4d27yYdTQVnM02PQAeokr633B74ghQRGfAYed60=;
+	b=HxU8vQAtm/ZbUyp4CpwowxMSJh09mTe9yRKopUd4G+PdGvOLBJREs2r9FrSLZbeUYGpKIk
+	kJ3zGLO/rosloV8iS7kxQMG0wrlyUS9afAy8LPrOAiCCvUm9cRgo5BrwyoHhQUyhXGJ29Z
+	9+S/Tc7kTrkjgWFWGcKsKKFXn4gCbHM=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-660-VGqtyDJXNEO5CL7OxvX7nw-1; Tue, 06 Feb 2024 10:21:22 -0500
+X-MC-Unique: VGqtyDJXNEO5CL7OxvX7nw-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40fc2c5818aso3880035e9.0
+        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 07:21:21 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707232880; x=1707837680;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KtZT4d27yYdTQVnM02PQAeokr633B74ghQRGfAYed60=;
+        b=b+am1GiE0Ol72gRf/NIfBiFWOWRJyShLl5DR8JtFL/Fc2Gq7Gfh/t/8z8I78bNxpjf
+         lZ/YizvNbodW9MXRsxYzuaL+CrUK8g3ngwdgkP7jTHfyx1ldISmT582RaAWWZ8gb+PdN
+         xjwMJmf3K0NPNz/gvWg0Fvf3kO75IXhe4tRIS03xvEK2CNrXyVIvQC9+icM/bnq2gbH4
+         46hZHapMjy5XpqnC18x0lA4Ksrttlg8sYvzf2yB3WdPyOTEFvSi0SXZfWa6Ub8BCXiyJ
+         xaBpuicTMg/NPKsLOow8Y2UiRnFpeiuIkxb0U+ZokoSYbXfWBijmhBHeR58jne5G7kLm
+         tfhw==
+X-Gm-Message-State: AOJu0YyWspk9AzlRvl66Un46j8ClwCNfQIiEoVYQLWXlOIJO7bh+e9/N
+	lDsw4bGognzS5UVuEYhY5LUyuGfGg4egdhI6pKL4ZVoWqo4df+uY6/zrgfG9xETJItX1mMWMv8D
+	9xGHvgIOm/0ybJn+LUz2fLyCWl4z1CDcpNsnkS3W/EdzGON/3GwH1LQbUI9+Waw==
+X-Received: by 2002:a05:600c:198f:b0:40f:bda6:ccc0 with SMTP id t15-20020a05600c198f00b0040fbda6ccc0mr2469158wmq.1.1707232880369;
+        Tue, 06 Feb 2024 07:21:20 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE3kW/Q7o9D30UrkCa43SPi85YrQbYtYPA6s5PpWkoqxyKqbVOh8q2xWSGv5dTR2TcD04ZqrQ==
+X-Received: by 2002:a05:600c:198f:b0:40f:bda6:ccc0 with SMTP id t15-20020a05600c198f00b0040fbda6ccc0mr2469133wmq.1.1707232879996;
+        Tue, 06 Feb 2024 07:21:19 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXNFiX4vOsphCQ+kSGaykMnM6WWOxavLDf4HhhMtjb8C4XXI66VGZxDkAk3xQ+vQILyzxS2KmSSPcX/wBqIK6eNQMCTVtsBSCfohIN+Z5BPR8Dnh+epDySli7dZ3dZStzk3mpVgfwTLVUED9dhErTxcc9UtW2if/sk=
+Received: from gerbillo.redhat.com (146-241-224-127.dyn.eolo.it. [146.241.224.127])
+        by smtp.gmail.com with ESMTPSA id fa26-20020a05600c519a00b0040feb292609sm1560480wmb.37.2024.02.06.07.21.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 06 Feb 2024 07:21:19 -0800 (PST)
+Message-ID: <69c9e55b40ff2151ed456d975755d9d4e359adf0.camel@redhat.com>
+Subject: Re: pull request: bluetooth 2024-02-02
+From: Paolo Abeni <pabeni@redhat.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
+	netdev@vger.kernel.org
+Date: Tue, 06 Feb 2024 16:21:18 +0100
+In-Reply-To: <CABBYNZJ3bW5wsaX=e7JGhJai_w8YXjCHTnKZVn7x+FNVpn3cXg@mail.gmail.com>
+References: <20240202213846.1775983-1-luiz.dentz@gmail.com>
+	 <f40ce06c7884fca805817f9e90aeef205ce9c899.camel@redhat.com>
+	 <CABBYNZJ3bW5wsaX=e7JGhJai_w8YXjCHTnKZVn7x+FNVpn3cXg@mail.gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=mQINBGISiDUBEAC5uMdJicjm3ZlWQJG4u2EU1EhWUSx8IZLUTmEE8zmjPJFSYDcjtfGcbzLPb63BvX7FADmTOkO7gwtDgm501XnQaZgBUnCOUT8qv5MkKsFH20h1XJyqjPeGM55YFAXc+a4WD0YyO5M0+KhDeRLoildeRna1ey944VlZ6Inf67zMYw9vfE5XozBtytFIrRyGEWkQwkjaYhr1cGM8ia24QQVQid3P7SPkR78kJmrT32sGk+TdR4YnZzBvVaojX4AroZrrAQVdOLQWR+w4w1mONfJvahNdjq73tKv51nIpu4SAC1Zmnm3x4u9r22mbMDr0uWqDqwhsvkanYmn4umDKc1ZkBnDIbbumd40x9CKgG6ogVlLYeJa9WyfVMOHDF6f0wRjFjxVoPO6p/ZDkuEa67KCpJnXNYipLJ3MYhdKWBZw0xc3LKiKc+nMfQlo76T/qHMDfRMaMhk+L8gWc3ZlRQFG0/Pd1pdQEiRuvfM5DUXDo/YOZLV0NfRFU9SmtIPhbdm9cV8Hf8mUwubihiJB/9zPvVq8xfiVbdT0sPzBtxW0fXwrbFxYAOFvT0UC2MjlIsukjmXOUJtdZqBE3v3Jf7VnjNVj9P58+MOx9iYo8jl3fNd7biyQWdPDfYk9ncK8km4skfZQIoUVqrWqGDJjHO1W9CQLAxkfOeHrmG29PK9tHIwARAQABtB9QYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+iQJSBBMBCAA8FiEEg1AjqC77wbdLX2LbKSR5jcyPE6QFAmISiDUCGwMFCwkIBwIDIgIBBhUKCQgLAgQWAgMBAh4HAheAAAoJECkkeY3MjxOkJSYQAJcc6MTsuFxYdYZkeWjW//zbD3ApRHzpNlHLVSuJqHr9/aDS+tyszgS8jj9MiqALzgq4iZbg
+ 7ZxN9ZsDL38qVIuFkSpgMZCiUHdxBC11J8nbBSLlpnc924UAyr5XrGA99 6Wl5I4Km3128GY6iAkH54pZpOmpoUyBjcxbJWHstzmvyiXrjA2sMzYjt3Xkqp0cJfIEekOi75wnNPofEEJg28XPcFrpkMUFFvB4Aqrdc2yyR8Y36rbw18sIX3dJdomIP3dL7LoJi9mfUKOnr86Z0xltgcLPGYoCiUZMlXyWgB2IPmmcMP2jLJrusICjZxLYJJLofEjznAJSUEwB/3rlvFrSYvkKkVmfnfro5XEr5nStVTECxfy7RTtltwih85LlZEHP8eJWMUDj3P4Q9CWNgz2pWr1t68QuPHWaA+PrXyasDlcRpRXHZCOcvsKhAaCOG8TzCrutOZ5NxdfXTe3f1jVIEab7lNgr+7HiNVS+UPRzmvBc73DAyToKQBn9kC4jh9HoWyYTepjdcxnio0crmara+/HEyRZDQeOzSexf85I4dwxcdPKXv0fmLtxrN57Ae82bHuRlfeTuDG3x3vl/Bjx4O7Lb+oN2BLTmgpYq7V1WJPUwikZg8M+nvDNcsOoWGbU417PbHHn3N7yS0lLGoCCWyrK1OY0QM4EVsL3TjOfUtCNQYW9sbyBBYmVuaSA8cGFvbG8uYWJlbmlAZ21haWwuY29tPokCUgQTAQgAPBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEoitAhsDBQsJCAcCAyICAQYVCgkICwIEFgIDAQIeBwIXgAAKCRApJHmNzI8TpBzHD/45pUctaCnhee1vkQnmStAYvHmwrWwIEH1lzDMDCpJQHTUQOOJWDAZOFnE/67bxSS81Wie0OKW2jvg1ylmpBA0gPpnzIExQmfP72cQ1TBoeVColVT6Io35BINn+ymM7c0Bn8RvngSEpr3jBtqvvWXjvtnJ5/HbOVQCg62NC6ewosoKJPWpGXMJ9SKsVIOUHsmoWK60spzeiJoSmAwm3zTJQnM5kRh2q
+ iWjoCy8L35zPqR5TV+f5WR5hTVCqmLHSgm1jxwKhPg9L+GfuE4d0SWd84y GeOB3sSxlhWsuTj1K6K3MO9srD9hr0puqjO9sAizd0BJP8ucf/AACfrgmzIqZXCfVS7jJ/M+0ic+j1Si3yY8wYPEi3dvbVC0zsoGj9n1R7B7L9c3g1pZ4L9ui428vnPiMnDN3jh9OsdaXeWLvSvTylYvw9q0DEXVQTv4/OkcoMrfEkfbXbtZ3PRlAiddSZA5BDEkkm6P9KA2YAuooi1OD9d4MW8LFAeEicvHG+TPO6jtKTacdXDRe611EfRwTjBs19HmabSUfFcumL6BlVyceIoSqXFe5jOfGpbBevTZtg4kTSHqymGb6ra6sKs+/9aJiONs5NXY7iacZ55qG3Ib1cpQTps9bQILnqpwL2VTaH9TPGWwMY3Nc2VEc08zsLrXnA/yZKqZ1YzSY9MGXWYLkCDQRiEog1ARAAyXMKL+x1lDvLZVQjSUIVlaWswc0nV5y2EzBdbdZZCP3ysGC+s+n7xtq0o1wOvSvaG9h5q7sYZs+AKbuUbeZPu0bPWKoO02i00yVoSgWnEqDbyNeiSW+vI+VdiXITV83lG6pS+pAoTZlRROkpb5xo0gQ5ZeYok8MrkEmJbsPjdoKUJDBFTwrRnaDOfb+Qx1D22PlAZpdKiNtwbNZWiwEQFm6mHkIVSTUe2zSemoqYX4QQRvbmuMyPIbwbdNWlItukjHsffuPivLF/XsI1gDV67S1cVnQbBgrpFDxN62USwewXkNl+ndwa+15wgJFyq4Sd+RSMTPDzDQPFovyDfA/jxN2SK1Lizam6o+LBmvhIxwZOfdYH8bdYCoSpqcKLJVG3qVcTwbhGJr3kpRcBRz39Ml6iZhJyI3pEoX3bJTlR5Pr1Kjpx13qGydSMos94CIYWAKhegI06aTdvvuiigBwjngo/Rk5S+iEGR5KmTqGyp27o6YxZy6D4NIc6PKUzhIUxfvuHNvfu
+ sD2W1U7eyLdm/jCgticGDsRtweytsgCSYfbz0gdgUuL3EBYN3JLbAU+UZpy v/fyD4cHDWaizNy/KmOI6FFjvVh4LRCpGTGDVPHsQXaqvzUybaMb7HSfmBBzZqqfVbq9n5FqPjAgD2lJ0rkzb9XnVXHgr6bmMRlaTlBMAEQEAAYkCNgQYAQgAIBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEog1AhsMAAoJECkkeY3MjxOkY1YQAKdGjHyIdOWSjM8DPLdGJaPgJdugHZowaoyCxffilMGXqc8axBtmYjUIoXurpl+f+a7S0tQhXjGUt09zKlNXxGcebL5TEPFqgJTHN/77ayLslMTtZVYHE2FiIxkvW48yDjZUlefmphGpfpoXe4nRBNto1mMB9Pb9vR47EjNBZCtWWbwJTIEUwHP2Z5fV9nMx9Zw2BhwrfnODnzI8xRWVqk7/5R+FJvl7s3nY4F+svKGD9QHYmxfd8Gx42PZc/qkeCjUORaOf1fsYyChTtJI4iNm6iWbD9HK5LTMzwl0n0lL7CEsBsCJ97i2swm1DQiY1ZJ95G2Nz5PjNRSiymIw9/neTvUT8VJJhzRl3Nb/EmO/qeahfiG7zTpqSn2dEl+AwbcwQrbAhTPzuHIcoLZYV0xDWzAibUnn7pSrQKja+b8kHD9WF+m7dPlRVY7soqEYXylyCOXr5516upH8vVBmqweCIxXSWqPAhQq8d3hB/Ww2A0H0PBTN1REVw8pRLNApEA7C2nX6RW0XmA53PIQvAP0EAakWsqHoKZ5WdpeOcH9iVlUQhRgemQSkhfNaP9LqR1XKujlTuUTpoyT3xwAzkmSxN1nABoutHEO/N87fpIbpbZaIdinF7b9srwUvDOKsywfs5HMiUZhLKoZzCcU/AEFjQsPTATACGsWf3JYPnWxL9
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-On Tue, 6 Feb 2024 07:42:12 +0000 Shinas Rasheed wrote:
-> > > We do cancel_work_sync in octep_vf_remove function.  
-> > 
-> > But the device is still registered, so the timeout can happen after you
-> > cancel but before you unregister.  
-> 
-> There is rtnl_lock inside octep_vf_tx_timeout_task (the work task
-> function), which can protect from unregister_netdev, for such cases
-> (code snippet for quick reference below):
-> 
-> static void octep_vf_tx_timeout_task(struct work_struct *work)
-> {
->         struct octep_vf_device *oct = container_of(work, struct octep_vf_device, tx_timeout_task);
->         struct net_device *netdev = oct->netdev;
-> 
->         rtnl_lock();
->         if (netif_running(netdev)) {
->                 octep_vf_stop(netdev);
->                 octep_vf_open(netdev);
->         }
->         rtnl_unlock();
-> }
-> 
-> I hope this takes care of it? Please let me know if my thought
-> process feels wrong. Thanks!
+On Tue, 2024-02-06 at 09:45 -0500, Luiz Augusto von Dentz wrote:
+> On Tue, Feb 6, 2024 at 9:33=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+> > On Fri, 2024-02-02 at 16:38 -0500, Luiz Augusto von Dentz wrote:
+> > > The following changes since commit ba5e1272142d051dcc57ca1d3225ad8a08=
+9f9858:
+> > >=20
+> > >   netdevsim: avoid potential loop in nsim_dev_trap_report_work() (202=
+4-02-02 11:00:38 -0800)
+> > >=20
+> > > are available in the Git repository at:
+> > >=20
+> > >   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.g=
+it tags/for-net-2024-02-02
+> > >=20
+> > > for you to fetch changes up to 96d874780bf5b6352e45b4c07c247e37d50263=
+c3:
+> > >=20
+> > >   Bluetooth: qca: Fix triggering coredump implementation (2024-02-02 =
+16:13:56 -0500)
+> > >=20
+> > > ----------------------------------------------------------------
+> > > bluetooth pull request for net:
+> >=20
+> > A couple of commits have some issue in the tag area (spaces between
+> > Fixes and other tag):
+> > >=20
+> > >  - btintel: Fix null ptr deref in btintel_read_version
+> > >  - mgmt: Fix limited discoverable off timeout
+> > >  - hci_qca: Set BDA quirk bit if fwnode exists in DT
+> >=20
+> > this one ^^^
+> >=20
+> > >  - hci_bcm4377: do not mark valid bd_addr as invalid
+> > >  - hci_sync: Check the correct flag before starting a scan
+> > >  - Enforce validation on max value of connection interval
+> >=20
+> > and this one ^^^
+>=20
+> Ok, do you use any tools to capture these? checkpatch at least didn't
+> capture anything for me.
 
-The problem I see is that if the queue is somehow overloaded or delayed
-there can be a race where we cancel, then timeout happens, work doesn't
-run for a while, and we free the netdev. So what I'm suggesting is -
-hold a reference on the netdevice. That way you can be sure it doesn't
-get freed and you can depend on the rtnl+netif_running() doing its job.
+We use the nipa tools:
+
+https://github.com/linux-netdev/nipa
+
+specifically:
+
+https://github.com/linux-netdev/nipa/blob/main/tests/patch/verify_fixes/ver=
+ify_fixes.sh
+
+(it can run standalone)
+
+Cheers,
+
+Paolo
+
 
