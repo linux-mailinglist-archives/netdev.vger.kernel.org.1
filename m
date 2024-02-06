@@ -1,80 +1,86 @@
-Return-Path: <netdev+bounces-69562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0758884BB03
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 17:34:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C57884BB05
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 17:34:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AC0B1F25BCB
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:34:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB20E289493
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94A2DEDE;
-	Tue,  6 Feb 2024 16:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20D81138A;
+	Tue,  6 Feb 2024 16:34:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="IHY3Qip8"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="fSagLxsh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9A8B137E
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 16:34:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EFFB1392
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 16:34:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707237268; cv=none; b=dlTnOBiYnXH5tsGmBsAs+iuvvAR53DfWcuBCCGBr84wWaGHoFXBnkCbHAEG5M87jHVx7JjeWEfbCy9IZz8JWeiknC7ktwvEpqdMHGvajNuHsPy26+SNvxrfH0/PSmHpxSBMZebB8I+5bLBtVYzdCZ4YTkVniODKg3DR7p4GK6LQ=
+	t=1707237270; cv=none; b=usUSmE3HjzflL/kaw0tQr+6oS7NzZeWSqO+xNdCjlNKGxNNeLUnwfoF6aEb/CrWZ92iSc1+wkECeCEGWviEkmYnB2yW4HQvdEbVfBtsZS1jE8dFeWI2eoLnYboGsP+Wmu69HjcrOto+Ce4EalM+/1REc4XgytjT4H++qc8dRCPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707237268; c=relaxed/simple;
-	bh=cZbEmAvgGvMMpb1K68GW9CVJS6dB30J+uuRsKHlN0Zk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KWCK8aQYqbLSRc+TIBgo0IkqxrK4j8SrOKCHtAj3QG2obEXB0MFrIC4dLfUMpXAddQ/D6/bkkdOBwmyGlxWPqK0bxq9kZJQ8EzEHbSg9I8Y14M1Bn8Fk7KnAscaf3ijZ6CmLMXKiaKpH4onNZ6ICmZkxvE1awweiUqGV7eN2S2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=IHY3Qip8; arc=none smtp.client-ip=209.85.166.50
+	s=arc-20240116; t=1707237270; c=relaxed/simple;
+	bh=5KFgeQ6e+GH7Q24OQeSwNCVYVJdZ6g3TXCXyGyBVLYg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=tMGYt8IsYUKrEyc7cfaNxPv91g5xK6WBF0//xsIuXAQjbJG5HzOiQuzqw9jiVC3xQMh9BD5reNhH7ZBbF/B8YvZALxVnC6dpnl/7byzAopBk9D6ei7rM/qAEd7jTO0Co0hUaqMqj4uzNEby4MbKAau9N6eenw+B4czdWZaOpVdQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=fSagLxsh; arc=none smtp.client-ip=209.85.166.54
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-7bbdd28a52aso98778339f.1
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 08:34:26 -0800 (PST)
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-7c3e06c8608so30351739f.1
+        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 08:34:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1707237266; x=1707842066; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZjNMAuZWWCVVxs1GmQKOGXD3osRqvyMUPn6iplEeZI4=;
-        b=IHY3Qip8VcwS7c2stbTjE0C/PCtUXws5wYhPt7OzvJCNaUZ8Ds3xK7a9G/7ZunEY00
-         qtGTfyUFu203bsJVUciEyTGjDUKzCBmAZYkZRYMqknmOo0ilFMcfx1qtWbKHJ123HkED
-         nn+gjT61LfpY2cCeIyksxYcg/6XYY5ZYTK5AtwHxFXfmdF5IaC6etfi3ZHtOIfc4l9kM
-         zt/07LVQniCiNccRohNs3dggFKPTRsN87cw1FBJWVhNe00mZd6nmHY7yBrZW7LnZymMX
-         0/s5yXjNyNivTGpprTlhg9uxdexEdVS9qJS44pZecby0mX14fVXJLC/kdzqg4mRh5sHZ
-         sYTw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1707237267; x=1707842067; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B0353+KBVocmpwKcAzO+oB9LTsTL8XRLqxQjtjBy7bs=;
+        b=fSagLxshIyGqzyDUgX9AxyqedKyuzAPmCBcGHpQbuV39OiQkUo6yDFLAXItWtPdRy0
+         SJDyJvQi95y5jtjXP5JMPFx5lkKZeYROV+fEIznyQrMw1PDQrFjtuKYchIXkzvfvPuyF
+         O2gNk6WQm8oV9M1VhjcTPg4gH099BCEffI3lVnpW6nQWhw5jDReIulx5O/vDrrdx87P+
+         sktvFSDY0rqB+YTwyrgeTrL0SOCGlYMQSV5CeTbTLEoMlX66I0TU/OYsYDJJF5PoRklc
+         vdJaHjtq2D+L7x3tFR+WsX0IHC0g808gWyZjnOR9T1DkpqTWmrZC11h3AeNR8afX07eK
+         p76w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707237266; x=1707842066;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZjNMAuZWWCVVxs1GmQKOGXD3osRqvyMUPn6iplEeZI4=;
-        b=XmYqYvRdRPL+TK41PXgQeliNoGFNh0NKFVBizg4LdTaqIAMy0NqeTGfUeQEQk+ox6f
-         gyt0KocpsLZpVSJ4vmiIvNBlje50CSlugLjaVBqfnVrncnenIzc9q+jKpX3A+GFzEBaX
-         gs2zfWSfK45vfWrDWReSYSJRgEg4ZtR7HE31KE41uOx28CT1DkqpZpbhlrKOnpL5S89j
-         WVq3GOZECoChWT6qHLTxjKpn5kL1LNcQs71MeB5aBAfrdaJlChOqwf/MDe6ppSuyeYj9
-         1fM6npN2AErIrEgv/EnT/t5UQIYDoWyvVti1HWOARQPcChMoP/JY8QuZs5nAM+Td6JN8
-         Iu4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXv6vSANb4DkKZi1NFZ4LLguo0u1LMhOY69GrW066R73iVxOpFjpibXlBXjNvMi8gS4lLirPXCob5Zb/1/PfefQp7DMAqwQ
-X-Gm-Message-State: AOJu0Yzo0Qj4Qan4hk8jL7PehuJgN+3jR0/5rZI439voam2V/tbdLSr/
-	hEXsD2PgZQTvZpcVRLZwmyMElVwB1O6Sa5x5P0Bzp5mXsLdTVMljiGLFydgU6Ms=
-X-Google-Smtp-Source: AGHT+IHGvrIrQaojR68Jd0wcVBZXGZJRB4JZovQnrrrTWesXNF83ySXKt0wyJ/0TahYnJUOIgPHG2Q==
-X-Received: by 2002:a05:6602:70c:b0:7c2:caa4:561a with SMTP id f12-20020a056602070c00b007c2caa4561amr3331085iox.2.1707237265834;
-        Tue, 06 Feb 2024 08:34:25 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCVqPyiSaPqUSE/OBqlytKGZa3frMjiLcEmsm6uAAUN0VZ2UFEV42HaFvfcbH/ziYoGkE+x01gQHQcAkx6w1LJ6sqS6tOgIg0KzgrUD1xt9M6n1bceCkk5fWvrUFkNIO
+        d=1e100.net; s=20230601; t=1707237267; x=1707842067;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=B0353+KBVocmpwKcAzO+oB9LTsTL8XRLqxQjtjBy7bs=;
+        b=avw73+8JYgVz7H+KTnwkfT5Kn5GzvkIKjm9bwFAagwc7Tk+mtcd8j4p6seQ1dYJYpR
+         DInqt4Onxpcd8Yc4/eYIc7/fTFm3VXPPXuSV9vRIkHPIaibN+rhorlGH6mFn2/b6UGrk
+         FDLTYyQRIN9fIFI3gzLJNlnIQ4QG7DrwD3p7/4RE7booQboQgh/GOv0KG1QAIy/rUbAY
+         BExwcAUTuKrDCyEVREAovWsmfH2YZ+IUpIYB4eIrTWh0VtAE9pxkL0BCoFWNj3vSQDhe
+         5me3V7CShbzWSORXEdxmZlJTlL+UqyaPv6vjBgP25cumMYvECnsikD1mV7D6r0j3h4S4
+         Vy/g==
+X-Gm-Message-State: AOJu0Yzbrpnemn2kvmIt+VBcig4llJ050I1LltTqgb55ze3dBeZ10Pqo
+	D3u5EN2SLTflTdk9QzowOjQi/IjG6Csufm4yDgD/sGJa+vz7wolXlyMwKtVbQ8QqlCWfDPg/Ymc
+	XFdk=
+X-Google-Smtp-Source: AGHT+IF/n2KlENyGG3ALXOXFV+e79eF9Gqsg0GmWLEX7EhXQSiDddLnvyXLjHknyagAhuVi06/MP9w==
+X-Received: by 2002:a6b:db13:0:b0:7c3:edbb:1816 with SMTP id t19-20020a6bdb13000000b007c3edbb1816mr2814224ioc.2.1707237267608;
+        Tue, 06 Feb 2024 08:34:27 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUyZK1/82Kc/YPV5epMBRym5L6ZevyHgFMilH16dIqUcUTIYFlDhIc41WQ9jYWqKcDmW3GWFpFVyKHlzCLk/MGchldJIJA40J0thaG50aWEGpYRg6IRumt2U6w7u/MptjuxjFkk9TwyOxdyn+Wdh5N40iKEgjRMrmVaQ/D5pn05nsI=
 Received: from localhost.localdomain ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id u8-20020a02aa88000000b00471337ff774sm573316jai.113.2024.02.06.08.34.24
+        by smtp.gmail.com with ESMTPSA id u8-20020a02aa88000000b00471337ff774sm573316jai.113.2024.02.06.08.34.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Feb 2024 08:34:25 -0800 (PST)
+        Tue, 06 Feb 2024 08:34:26 -0800 (PST)
 From: Jens Axboe <axboe@kernel.dk>
 To: io-uring@vger.kernel.org,
 	netdev@vger.kernel.org
 Cc: kuba@kernel.org,
-	olivier@trillion01.com
-Subject: [PATCHSET v16 0/7] io_uring: add napi busy polling support
-Date: Tue,  6 Feb 2024 09:30:02 -0700
-Message-ID: <20240206163422.646218-1-axboe@kernel.dk>
+	olivier@trillion01.com,
+	Stefan Roesch <shr@devkernel.io>,
+	Jens Axboe <axboe@kernel.dk>
+Subject: [PATCH 1/7] net: split off __napi_busy_poll from napi_busy_poll
+Date: Tue,  6 Feb 2024 09:30:03 -0700
+Message-ID: <20240206163422.646218-2-axboe@kernel.dk>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240206163422.646218-1-axboe@kernel.dk>
+References: <20240206163422.646218-1-axboe@kernel.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,36 +89,135 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Hi,
+From: Stefan Roesch <shr@devkernel.io>
 
-I finally got around to testing this patchset in its current form, and
-results look fine to me. It Works. Using the basic ping/pong test that's
-part of the liburing addition, without enabling NAPI I get:
+This splits off the key part of the napi_busy_poll function into its own
+function, __napi_busy_poll, and changes the prefer_busy_poll bool to be
+flag based to allow passing in more flags in the future.
 
-Stock settings, no NAPI, 100k packets:
+This is done in preparation for an additional napi_busy_poll() function,
+that doesn't take the rcu_read_lock(). The new function is introduced
+in the next patch.
 
- rtt(us) min/avg/max/mdev = 31.730/37.006/87.960/0.497
+Signed-off-by: Stefan Roesch <shr@devkernel.io>
+Link: https://lore.kernel.org/r/20230608163839.2891748-2-shr@devkernel.io
+Signed-off-by: Jens Axboe <axboe@kernel.dk>
+---
+ net/core/dev.c | 42 ++++++++++++++++++++++++++++--------------
+ 1 file changed, 28 insertions(+), 14 deletions(-)
 
- and with -t10 -b enabled:
-
- rtt(us) min/avg/max/mdev = 23.250/29.795/63.511/1.203
-
-In short, this patchset enables per io_uring NAPI enablement, rather
-than need to enable that globally. This allows targeted NAPI usage with
-io_uring.
-
-Here's Stefan's v15 posting, which predates this one:
-
-https://lore.kernel.org/io-uring/20230608163839.2891748-1-shr@devkernel.io/
-
-Patches are on top of the current 6.9 io_uring branch.
-
-Changes since v15
-- Rebase on current tree
-- Various cleanups
-- Rename NAPI_F_NO_SCHED to NAPI_F_END_ON_RESCHED
-
+diff --git a/net/core/dev.c b/net/core/dev.c
+index cb2dab0feee0..1eaed657f2c2 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -6177,8 +6177,12 @@ static void __busy_poll_stop(struct napi_struct *napi, bool skip_schedule)
+ 	clear_bit(NAPI_STATE_SCHED, &napi->state);
+ }
+ 
+-static void busy_poll_stop(struct napi_struct *napi, void *have_poll_lock, bool prefer_busy_poll,
+-			   u16 budget)
++enum {
++	NAPI_F_PREFER_BUSY_POLL	= 1,
++};
++
++static void busy_poll_stop(struct napi_struct *napi, void *have_poll_lock,
++			   unsigned flags, u16 budget)
+ {
+ 	bool skip_schedule = false;
+ 	unsigned long timeout;
+@@ -6198,7 +6202,7 @@ static void busy_poll_stop(struct napi_struct *napi, void *have_poll_lock, bool
+ 
+ 	local_bh_disable();
+ 
+-	if (prefer_busy_poll) {
++	if (flags & NAPI_F_PREFER_BUSY_POLL) {
+ 		napi->defer_hard_irqs_count = READ_ONCE(napi->dev->napi_defer_hard_irqs);
+ 		timeout = READ_ONCE(napi->dev->gro_flush_timeout);
+ 		if (napi->defer_hard_irqs_count && timeout) {
+@@ -6222,23 +6226,23 @@ static void busy_poll_stop(struct napi_struct *napi, void *have_poll_lock, bool
+ 	local_bh_enable();
+ }
+ 
+-void napi_busy_loop(unsigned int napi_id,
+-		    bool (*loop_end)(void *, unsigned long),
+-		    void *loop_end_arg, bool prefer_busy_poll, u16 budget)
++static void __napi_busy_loop(unsigned int napi_id,
++		      bool (*loop_end)(void *, unsigned long),
++		      void *loop_end_arg, unsigned flags, u16 budget)
+ {
+ 	unsigned long start_time = loop_end ? busy_loop_current_time() : 0;
+ 	int (*napi_poll)(struct napi_struct *napi, int budget);
+ 	void *have_poll_lock = NULL;
+ 	struct napi_struct *napi;
+ 
++	WARN_ON_ONCE(!rcu_read_lock_held());
++
+ restart:
+ 	napi_poll = NULL;
+ 
+-	rcu_read_lock();
+-
+ 	napi = napi_by_id(napi_id);
+ 	if (!napi)
+-		goto out;
++		return;
+ 
+ 	if (!IS_ENABLED(CONFIG_PREEMPT_RT))
+ 		preempt_disable();
+@@ -6254,14 +6258,14 @@ void napi_busy_loop(unsigned int napi_id,
+ 			 */
+ 			if (val & (NAPIF_STATE_DISABLE | NAPIF_STATE_SCHED |
+ 				   NAPIF_STATE_IN_BUSY_POLL)) {
+-				if (prefer_busy_poll)
++				if (flags & NAPI_F_PREFER_BUSY_POLL)
+ 					set_bit(NAPI_STATE_PREFER_BUSY_POLL, &napi->state);
+ 				goto count;
+ 			}
+ 			if (cmpxchg(&napi->state, val,
+ 				    val | NAPIF_STATE_IN_BUSY_POLL |
+ 					  NAPIF_STATE_SCHED) != val) {
+-				if (prefer_busy_poll)
++				if (flags & NAPI_F_PREFER_BUSY_POLL)
+ 					set_bit(NAPI_STATE_PREFER_BUSY_POLL, &napi->state);
+ 				goto count;
+ 			}
+@@ -6282,11 +6286,12 @@ void napi_busy_loop(unsigned int napi_id,
+ 
+ 		if (unlikely(need_resched())) {
+ 			if (napi_poll)
+-				busy_poll_stop(napi, have_poll_lock, prefer_busy_poll, budget);
++				busy_poll_stop(napi, have_poll_lock, flags, budget);
+ 			if (!IS_ENABLED(CONFIG_PREEMPT_RT))
+ 				preempt_enable();
+ 			rcu_read_unlock();
+ 			cond_resched();
++			rcu_read_lock();
+ 			if (loop_end(loop_end_arg, start_time))
+ 				return;
+ 			goto restart;
+@@ -6294,10 +6299,19 @@ void napi_busy_loop(unsigned int napi_id,
+ 		cpu_relax();
+ 	}
+ 	if (napi_poll)
+-		busy_poll_stop(napi, have_poll_lock, prefer_busy_poll, budget);
++		busy_poll_stop(napi, have_poll_lock, flags, budget);
+ 	if (!IS_ENABLED(CONFIG_PREEMPT_RT))
+ 		preempt_enable();
+-out:
++}
++
++void napi_busy_loop(unsigned int napi_id,
++		    bool (*loop_end)(void *, unsigned long),
++		    void *loop_end_arg, bool prefer_busy_poll, u16 budget)
++{
++	unsigned flags = prefer_busy_poll ? NAPI_F_PREFER_BUSY_POLL : 0;
++
++	rcu_read_lock();
++	__napi_busy_loop(napi_id, loop_end, loop_end_arg, flags, budget);
+ 	rcu_read_unlock();
+ }
+ EXPORT_SYMBOL(napi_busy_loop);
 -- 
-Jens Axboe
+2.43.0
 
 
