@@ -1,95 +1,141 @@
-Return-Path: <netdev+bounces-69415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5222184B14C
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:30:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 542AB84B159
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:34:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E64BC1F24C64
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 09:30:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8478E1C21805
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 09:34:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E077512DD8D;
-	Tue,  6 Feb 2024 09:30:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0561712D173;
+	Tue,  6 Feb 2024 09:34:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MsUZZYpv"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hcbmDRNj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B94CC12DD87;
-	Tue,  6 Feb 2024 09:30:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 911C212D14A;
+	Tue,  6 Feb 2024 09:34:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707211826; cv=none; b=UldQgmNYVUSTiuVPdlgnnEL1klbeRgT0xW63PS8YKCT8tkBxGLLr/7Mv7fktYsclvBnYtd7afkSg1bNRMMgN3YIHNBcBLAYjjTuEfAlciKKeUNSCXHQCVHDf05Z1JdAY9glBTTelpiWnLH19yKzKIB0HfqzZsqa+1c8T/yVyMjY=
+	t=1707212078; cv=none; b=qzqQ6cSuFSNMw5AfqHovfpm/vu45hgVv9RSRSZqVTPpN2+2OCoGUIwCidDvOPInFolVDCaJkuVyVRnVHMweObldnu5nd63COpwPfiSrdzz1Graa1rZsgHijempnecko94yc/D5rZjr3DKyXRvD0m+AB9f4GWOEjlZ8OmJc0n2i0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707211826; c=relaxed/simple;
-	bh=qsvov4oq4ERupC1CRh3t9QcxaPjnTBWsvxcxhElCRyg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nserkPRvGEnOwtU0iTPDcjsMqzfJgb6qux+78aeP4efZ/MO64zpxX6OjGRzVPF/AFgdayPhjFra/TZT8cGU36LEVn3r4uRQ9pvO2Ys2UfF6npWt+X/WEw0zJJtHbHMMCOPEbHY6l7PL7a3IAJhL1sPjSaEjegr3jCNnU2aVy+VU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MsUZZYpv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 46E83C433F1;
-	Tue,  6 Feb 2024 09:30:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707211826;
-	bh=qsvov4oq4ERupC1CRh3t9QcxaPjnTBWsvxcxhElCRyg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MsUZZYpvu/TXGdb+gJuDm13IMo1lofYjDxdrad1sw6QbmyKc/AqkVXdWjPPvs8Ahu
-	 wJvZj46gw8aeyN5ONkuyUUzGHrZWPn3VdjBj9vGkVXZrc7i3gxBgs2+tPNhDirnToC
-	 2OJGKNAtYE/fVhGDoBjpQ3ME6e8ngLEXq1Z0ZCxQ46mBD0OAE2SUadd7h6gNIVLYRy
-	 nkxwLOKrgGSxaDUXE6jQ6lul3Sqd2bJ5Tt5X4tuyr7xJPbmqCNBVYn1Iiye8A4IIdE
-	 y58fACncG+CKzPSQoP3WwfO3123tWUxfl2PBSAKWUrjqsrc7TVVxFc4MJcOzGPMDUS
-	 IYPxcVBcUm6MQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 323FCE2F31F;
-	Tue,  6 Feb 2024 09:30:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1707212078; c=relaxed/simple;
+	bh=ZjwtMnb/rp1IyLFLZEuYTb0KRKrk1a1mS6/JzlAlRWc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fq0F5HDJmN2vyxsJGxbqJDK7NcmKkHWqiCVyFci54949iF04xF9t13iGC9YAGiBvco431UVKPAWwdohmHio9snp0uPwmOmKTSkuAeTKP63mnMpdIelLEmobmF0i3C+Qy+MIjJshxyksaeXIA2sG+ug081XKkzr+STHOXRXmCJks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hcbmDRNj; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 82AA31C0004;
+	Tue,  6 Feb 2024 09:34:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1707212067;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mUixx3iBL3zLfOd+J4Lc/59gG+HVlflMASxiV2Jzw18=;
+	b=hcbmDRNjnQSZaxjzQPjZaqpaUocQchlBfZMaA3xreLWsdAsx14y6e5eZgqWEo5sjYasnrp
+	xYzbetFMgNPSu4OEmfDPKxqlTnqL4FWDXd6VzqliPfUpJj3DeXHLeIkm7gt8UGQtPYlk/9
+	UjxrS9LqjLOos/Xo7m/onVAtOjvwV2bWZATLG9xY3f2reOlsaYA9Ona79A9+nueZCrenZk
+	FxB52U/y+uRDgVcFRXgUY0xy5Imi0AT8RZKPnger7moODGcgBM1SO0XZAjAEI5hdnon/CU
+	se8Lj8Pb0pUgMFmK5PeXHLjJxl9Dh1jYx6kuP/EwwI9GFL/5lfNnbmy55l5boA==
+Date: Tue, 6 Feb 2024 10:34:25 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Ariel Elior <aelior@marvell.com>, Manish Chopra
+ <manishc@marvell.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony
+ Nguyen <anthony.l.nguyen@intel.com>, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org
+Subject: Re: [PATCH 7/8] net: intel: igb: Use linkmode helpers for EEE
+Message-ID: <20240206103425.28e64a8f@device-28.home>
+In-Reply-To: <20240204-keee-u32-cleanup-v1-7-fb6e08329d9a@lunn.ch>
+References: <20240204-keee-u32-cleanup-v1-0-fb6e08329d9a@lunn.ch>
+	<20240204-keee-u32-cleanup-v1-7-fb6e08329d9a@lunn.ch>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests/net: ignore timing errors in so_txtime if
- KSFT_MACHINE_SLOW
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170721182620.9128.9587375437123290639.git-patchwork-notify@kernel.org>
-Date: Tue, 06 Feb 2024 09:30:26 +0000
-References: <20240201162130.2278240-1-willemdebruijn.kernel@gmail.com>
-In-Reply-To: <20240201162130.2278240-1-willemdebruijn.kernel@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, linux-kselftest@vger.kernel.org,
- willemb@google.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hello:
+Hello Andrew,
 
-This patch was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+On Sun, 04 Feb 2024 17:40:24 -0600
+Andrew Lunn <andrew@lunn.ch> wrote:
 
-On Thu,  1 Feb 2024 11:21:19 -0500 you wrote:
-> From: Willem de Bruijn <willemb@google.com>
+> Make use of the existing linkmode helpers for converting PHY EEE
+> register values into links modes, now that ethtool_keee uses link
+> modes, rather than u32 values.
 > 
-> This test is time sensitive. It may fail on virtual machines and for
-> debug builds.
+> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+
+[...]
+
+> @@ -3109,6 +3111,8 @@ static int igb_set_eee(struct net_device *netdev,
+>  		       struct ethtool_keee *edata)
+>  {
+>  	struct igb_adapter *adapter = netdev_priv(netdev);
+> +	__ETHTOOL_DECLARE_LINK_MODE_MASK(supported) = {};
+> +	__ETHTOOL_DECLARE_LINK_MODE_MASK(tmp) = {};
+>  	struct e1000_hw *hw = &adapter->hw;
+>  	struct ethtool_keee eee_curr;
+>  	bool adv1g_eee = true, adv100m_eee = true;
+> @@ -3138,14 +3142,21 @@ static int igb_set_eee(struct net_device *netdev,
+>  			return -EINVAL;
+>  		}
+>  
+> -		if (!edata->advertised_u32 || (edata->advertised_u32 &
+> -		    ~(ADVERTISE_100_FULL | ADVERTISE_1000_FULL))) {
+> +		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT,
+> +				 supported);
+> +		linkmode_set_bit(ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+> +				 supported);
+> +		if (linkmode_andnot(tmp, edata->advertised, supported)) {
+>  			dev_err(&adapter->pdev->dev,
+>  				"EEE Advertisement supports only 100Tx and/or 100T full duplex\n");
+>  			return -EINVAL;
+>  		}
+> -		adv100m_eee = !!(edata->advertised_u32 & ADVERTISE_100_FULL);
+> -		adv1g_eee = !!(edata->advertised_u32 & ADVERTISE_1000_FULL);
+> +		adv100m_eee = linkmode_test_bit(
+> +			ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+> +			edata->advertised);
+> +		adv1g_eee = linkmode_test_bit(
+> +			ETHTOOL_LINK_MODE_100baseT_Full_BIT,
+
+Probably a typo, I think it should be ETHTOOL_LINK_MODE_1000baseT_Full_BIT
+here :)
+
+> +			edata->advertised);
+>  
+>  	} else if (!edata->eee_enabled) {
+>  		dev_err(&adapter->pdev->dev,
+> @@ -3153,7 +3164,7 @@ static int igb_set_eee(struct net_device *netdev,
+>  		return -EINVAL;
+>  	}
+>  
+> -	adapter->eee_advert = ethtool_adv_to_mmd_eee_adv_t(edata->advertised_u32);
+> +	adapter->eee_advert = linkmode_to_mii_eee_cap1_t(edata->advertised);
+>  	if (hw->dev_spec._82575.eee_disable != !edata->eee_enabled) {
+>  		hw->dev_spec._82575.eee_disable = !edata->eee_enabled;
+>  		adapter->flags |= IGB_FLAG_EEE;
 > 
-> Continue to run in these environments to get code coverage. But
-> optionally suppress failure for timing errors (only). This is
-> controlled with environment variable KSFT_MACHINE_SLOW.
-> 
-> [...]
 
-Here is the summary with links:
-  - [net-next] selftests/net: ignore timing errors in so_txtime if KSFT_MACHINE_SLOW
-    https://git.kernel.org/netdev/net-next/c/c41dfb0dfbec
+Thanks,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Maxime
 
