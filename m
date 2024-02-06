@@ -1,163 +1,195 @@
-Return-Path: <netdev+bounces-69453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED8C584B530
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 13:31:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7585B84B539
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 13:32:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78C481F21B9A
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 12:31:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A8971C24B20
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 12:32:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3580E131E33;
-	Tue,  6 Feb 2024 12:17:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C67EE132C3B;
+	Tue,  6 Feb 2024 12:18:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IVW8MTOM"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="l1+a2SIR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3B413175F
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 12:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7FFB132C25;
+	Tue,  6 Feb 2024 12:18:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707221839; cv=none; b=PBNedsAt6wpwQI4Hq565iIhmjE5OsCwt/VziNbSoZ23MyBi08bt92lcuwXdxZjt50s994yLXwsqFDIfc1l/Bytwq+JHnyvu7KDJ1YWd6Z8EidCzF49OIVp1Bzp0qlDj2zdmwK/W9YKWAMfBXr42Z1pX7hXn8J279CyoOs1B9+b8=
+	t=1707221918; cv=none; b=A5R6k2nCZSHduDO7U7uEu1TNcYZYbnqn+PTnetRgnBcg8djv9/WG01EAPtyflHK8tc2XBWKImXEVEdt9PhpmSYb6GWPkw9Vr2De+esmVu107KaF5juewafJhVCVKhnm3HMLDZOMLGOw8P//zY6eWzF73NScpE66mPeWjeZ1azlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707221839; c=relaxed/simple;
-	bh=Eh9mFJNu3igNOGcLHIfJ7s87Z/Jfy3nVIUd2Y6GgrWc=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tfz/pWyW0F0Jjirkb+p8o633JezkKERL6EoN3gNcEL6nvRpQSJnkTnPenIIyURYfwom3ZouerZ/onGcgaCbDNNiSfqNjxPJB/OG4WR2JEcA76vdDOiSvQXVaswbflS/PlTEDumhf/HmlrmGZ7pfMT+GpG8XpRNC7Xu0ZbH1zYGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IVW8MTOM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707221836;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=nyByeByGBXhgAjdphuIb4bp5J0+ODSHdMi41laNeFU0=;
-	b=IVW8MTOMXAxUHsaLbgThxfdyjrOEwaZccAwrJGHcaHeTDyE2sbo0g/He6DUk0qEsL4fWu6
-	zkMkiOaCGEkQ2/3+ZzCbtVr4BaAnI2tlDJ7kV7hI1VEYmSmrNs5EZ7wuMzB2DwCiOh288s
-	MiqtLwt23Z7eVMfSkR/mcUCkyGtwTzQ=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-493-hu54xbNWOH2ie5axTpzluQ-1; Tue, 06 Feb 2024 07:17:14 -0500
-X-MC-Unique: hu54xbNWOH2ie5axTpzluQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40fc2c5818aso3625615e9.0
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 04:17:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707221833; x=1707826633;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nyByeByGBXhgAjdphuIb4bp5J0+ODSHdMi41laNeFU0=;
-        b=WLwsYKl3Ik7SaTECtP1DnKNpuN+erwODnnl5TpG+N9cYl9dbwNf2jD7kuzVRzdqpnn
-         mGs5DmfnSRKiDkopzcYqpp6aamn5zz+KuzYtixPjwv+mU6lfMOKKtCRwzLDa8amZGk5C
-         pYlvoyFSkyye4mpW6JlDYb93br+4ElAcA9Dd05m7ivJxNnff/9eryktj2I+3tUvUH+f3
-         nu02p4KQgHb9gqs+RiWirbPHzz49Wqd/EqGT2W5xIil6BNVCne0gnRqHyQPXKXtRlIpv
-         xSdIX9hyPRi8jpj+J7EG76Ft2rwu+KHcf98DA5wKMpzfEuSJFNPXr2TfHIe/6XwYtX6m
-         lf2w==
-X-Gm-Message-State: AOJu0Yx6Y3Qob7jvbxlCrT7b54iRg2tpaG5TUn7bByUqYWu+pvM3qf8m
-	W02z/LpnM94x0AoR736HCAEX90xls2au6Kwo4nrpLR5LbfhuxXvTvkhJT7FbyxL2K5JKi4lRPId
-	G51MuyXtzNkKnDuJW4iGB9L7tnS3JvZ13nrwypcAatBb/YbPOO0UtgA==
-X-Received: by 2002:a05:600c:35ca:b0:40f:c475:6d36 with SMTP id r10-20020a05600c35ca00b0040fc4756d36mr2054644wmq.4.1707221833428;
-        Tue, 06 Feb 2024 04:17:13 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEnHGrchOchhuz+Pp7yLhTONaxbqaPCL/U99EVbjnNpOOGX8G6S0bgBFtfINwI1h7UFF7dv/A==
-X-Received: by 2002:a05:600c:35ca:b0:40f:c475:6d36 with SMTP id r10-20020a05600c35ca00b0040fc4756d36mr2054631wmq.4.1707221833087;
-        Tue, 06 Feb 2024 04:17:13 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUjjPgJZ/UQU0vb/3Gmvkyfz0i2QDyqRcmRXLcaySw+OBkpmVZUMQ7JrrJPMYoeB/lpPUORoaUpBF/bR/P8R7cvSJRZ86ykxKZ9qZ7xmGYt9b70t4u61hATdOwwUfyoRQGwIAIcfrmLtfBwZiaYsSlnqWp7Y9GXKwzN4K7sVmRCasiAVjWVOy4W0/EsMFCfObY8oC9qn3/ur/GyG/66QJxjYfTsTAdqyfzEzj5N+BZsEHbcHWkTOATJ4fCUXAxGt4iH1uHKG/lFEG2/aXnHwbUcuf0pgJBMfvpBSQifumeJngNSNApsTc+DaAyy70UCraDMsh2WTCu5CgxvBYJEYzmZyCtRugop9V+f67wa/yXntTOFMIIbHnUGKM6N0BsybRG5RIMqTZyfq1BCDLor4cLlLAXZqcL1iXTFC+xBJi98AKWswoxoGQkT0XaW+eD3L38NqRfnBTTDhSCzoHp9php8oYIOBQ==
-Received: from gerbillo.redhat.com (146-241-224-127.dyn.eolo.it. [146.241.224.127])
-        by smtp.gmail.com with ESMTPSA id y34-20020a05600c342200b0040d5ae2906esm1791051wmp.30.2024.02.06.04.17.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Feb 2024 04:17:12 -0800 (PST)
-Message-ID: <726c4945db02fbb130397131b13132a89697986c.camel@redhat.com>
-Subject: Re: [PATCH net-next v7] bonding: Add independent control state
- machine
-From: Paolo Abeni <pabeni@redhat.com>
-To: Aahil Awatramani <aahila@google.com>, David Dillow
- <dave@thedillows.org>,  Mahesh Bandewar <maheshb@google.com>, Jay Vosburgh
- <j.vosburgh@gmail.com>, Hangbin Liu <liuhangbin@gmail.com>,  Andy
- Gospodarek <andy@greyhouse.net>, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,
- Martin KaFai Lau <martin.lau@kernel.org>, Herbert Xu
- <herbert@gondor.apana.org.au>, Daniel Borkmann <daniel@iogearbox.net>, Jiri
- Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Date: Tue, 06 Feb 2024 13:17:11 +0100
-In-Reply-To: <20240202175858.1573852-1-aahila@google.com>
-References: <20240202175858.1573852-1-aahila@google.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1707221918; c=relaxed/simple;
+	bh=Tn8WnY+a+ept61qhjcmZvxSEPFge8/SObTTCDWxJS7g=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=iAvYu3iEFvLAhKiwRzkdSpMZuK36OW9P8j6dYBmSkK37iR8u6BcWYlb3dA2GvyRDGPT5uPDwXjAeBU7ifBJP/z236BPMHa/e6yI09WDukF/t/FfhVVucsCgj5ouAKhRG0hnRP3p5jLPITN8FB4aVr3qYB2uGk61WcnXCVzpxaZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=l1+a2SIR; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 416BtAUJ022474;
+	Tue, 6 Feb 2024 12:18:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=J0YDXL0DMuZx6qRUUagB7lMLHl0D1nro9nj04PRHnTw=;
+ b=l1+a2SIRg5PF4zDhqgXL9qLL/CahK7oNE6lSCOLCeyP8ZBo/1PhrWcNquUdgrjuzue9d
+ c/cXX+TCvKQq59XIkl8go5kDa3zo2ifNdk++37Br4OQJ8Y56gdxSFLaWBtuPvTbuHtrx
+ JBU5FPGXbqUYMAqJM21ug+/kPVUr2YIxksEkVx+9KkTHxrPDSwFgUXHMWzKsNbnbVFvI
+ y3xK4uELaBM1cmNW6Fz+I7jHDTCVDLku0BVhBqc+W4aUDuwGSWkvnAfxfrR30pHJkJ7F
+ PSc6w4oUotwRPDhbuyy6V8Dnfny190MEu8p7XKHgE23MFxde6CuufAb0u49halqZgsVR kg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w3mafrqqy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 06 Feb 2024 12:18:31 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 416BtShm024011;
+	Tue, 6 Feb 2024 12:18:31 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w3mafrqq1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 06 Feb 2024 12:18:31 +0000
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 416BXUwl019991;
+	Tue, 6 Feb 2024 12:18:29 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3w1ytsy53u-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 06 Feb 2024 12:18:29 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 416CIRTf28115506
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 6 Feb 2024 12:18:27 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 031232009F;
+	Tue,  6 Feb 2024 12:18:27 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 88BB5200A1;
+	Tue,  6 Feb 2024 12:18:26 +0000 (GMT)
+Received: from [9.152.224.145] (unknown [9.152.224.145])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  6 Feb 2024 12:18:26 +0000 (GMT)
+Message-ID: <83b9d600-339c-4c9f-860d-ab4539a0ae6b@linux.ibm.com>
+Date: Tue, 6 Feb 2024 13:18:26 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 00/15] net/smc: implement loopback-ism used by
+ SMC-D
+To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, hca@linux.ibm.com,
+        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
+        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+        jaka@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240111120036.109903-1-guwen@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <20240111120036.109903-1-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: 9Oq93biWMDhGTymW9bQMJeO9SqpPP0os
+X-Proofpoint-ORIG-GUID: zrdy_-uaFOs7-O2Gw8JOKcJKPynszSJC
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-06_05,2024-01-31_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
+ bulkscore=0 adultscore=0 impostorscore=0 clxscore=1015 malwarescore=0
+ mlxlogscore=999 suspectscore=0 phishscore=0 lowpriorityscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2402060087
 
-On Fri, 2024-02-02 at 17:58 +0000, Aahil Awatramani wrote:
-> Add support for the independent control state machine per IEEE
-> 802.1AX-2008 5.4.15 in addition to the existing implementation of the
-> coupled control state machine.
->=20
-> Introduces two new states, AD_MUX_COLLECTING and AD_MUX_DISTRIBUTING in
-> the LACP MUX state machine for separated handling of an initial
-> Collecting state before the Collecting and Distributing state. This
-> enables a port to be in a state where it can receive incoming packets
-> while not still distributing. This is useful for reducing packet loss whe=
-n
-> a port begins distributing before its partner is able to collect.
->=20
-> Added new functions such as bond_set_slave_tx_disabled_flags and
-> bond_set_slave_rx_enabled_flags to precisely manage the port's collecting
-> and distributing states. Previously, there was no dedicated method to
-> disable TX while keeping RX enabled, which this patch addresses.
->=20
-> Note that the regular flow process in the kernel's bonding driver remains
-> unaffected by this patch. The extension requires explicit opt-in by the
-> user (in order to ensure no disruptions for existing setups) via netlink
-> support using the new bonding parameter coupled_control. The default valu=
-e
-> for coupled_control is set to 1 so as to preserve existing behaviour.
->=20
-> Signed-off-by: Aahil Awatramani <aahila@google.com>
 
-A couple of minor nits: you should have retained by acked-by from the
-previous revision
 
-> v7:
->   Removed coupled_control from procfs
-> v6:
->   Added coupled_control to procfs
-> v5:
->   Merge documentation patch with changes patch
->   Add version history in comment description
-> v4:
->   Remove inline references from c source files
-> v3:
->   Edited commit description
->   Edited documentation description
->   Changed function names
->   Only allow coupled_control change when the bond is down
-> v2:
->   Removed sysfs changes
->   Added documentation for new paramater
->   Renamed parameter to coupled_control
->   Update bond_set_slave_inactive_flags() with a 8023ad check
+On 11.01.24 13:00, Wen Gu wrote:
+> This patch set acts as the second part of the new version of [1] (The first
+> part can be referred from [2]), the updated things of this version are listed
+> at the end.
+> 
+> # Background
+> 
+> SMC-D is now used in IBM z with ISM function to optimize network interconnect
+> for intra-CPC communications. Inspired by this, we try to make SMC-D available
+> on the non-s390 architecture through a software-implemented virtual ISM device,
+> that is the loopback-ism device here, to accelerate inter-process or
+> inter-containers communication within the same OS instance.
 
-The changelog section should be after a '---' separator, to avoid it
-landing into the git history. No need to repost.
 
-Cheers,
+Hello Wen Gu,
 
-Paolo
+thank you very much for this patchset. I have been looking at it a bit.
+I installed in on a testserver, but did not yet excercise the loopback-ism device.
+I want to continue investigations, but daily work interferes, so I thought I
+send you some comments now. So this is not at all a code review, but some 
+thoughts and observations about the general concept.
 
+
+In [1] there was a discussion about an abstraction layer between smc-d and the
+ism devices. 
+I am not sure what you are proposing now, is it an smc-d feature or independent of smc?
+In 3/15 you say it is part of the SMC module, but then it has its own device entry.
+Didn't you want to use it for other things as well? Or is it an SMC-D only feature?
+Is it a device (Config help: "kind of virtual device")? Or an SMC-D feature?
+
+Will we have a class of ism devices (s390 ism, ism-loopback, virtio-ism)
+That share common properties (internal API?)
+and smc-d will work with any of those?
+But they all can exist without smc ?! BTW: This is what we want for s390-ism.
+The client-registration interface [2] is currently the way to achieve this. 
+But maybe we need a more general concept?
+
+Maybe first a preparation patchset that introduces a class/ism
+Together with an improved API?
+In case you want to use ISM devices for other purposes as well..
+But then the whole picture of ism-loopback in one patchset (RFC?) 
+has its benefits as well.
+
+
+Other points that I noticed:
+
+Naming: smc loopback, ism-loopback, loopback-ism ?
+
+config: why not tristate? Why under net/smc?
+
+/sys/devices/virtual/smc  does not initially show up in my installation!!!
+root@t35lp50:/sys/devices/virtual/> ls
+3270/  bdi/  block/  graphics/  iommu/  mem/  memory_tiering/  misc/  net/  tty/  vc/  vtconsole/  workqueue/
+root@t35lp50:/sys/devices/virtual/> ls smc/loopback-ism
+active  dmb_copy  dmbs_cnt  dmb_type  subsystem@  uevent  xfer_bytes
+root@t35lp50:/sys/devices/virtual/> ls
+3270/  bdi/  block/  graphics/  iommu/  mem/  memory_tiering/  misc/  net/  smc/  tty/  vc/  vtconsole/  workqueue/
+Is that normal behaviour?
+
+You introduced a class/smc
+Maybe class/ism would be better?
+The other smc interfaces do not show up in class/smc!! Not so good
+
+Why doesn't it show in smc_rnics?
+(Maybe some deficiency of smc_rnics?)
+
+But then it shows in other smc-tools:
+root@t35lp50:/sys/> smcd device
+FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
+0000 0     loopback-ism  ffff   No        0
+0029 ISM   0000:00:00.0  07c1   No        0  NET1
+Nice!
+
+Kind regards
+Sandy
+
+
+[1] https://lore.kernel.org/lkml/e3819550-7b10-4f9c-7347-dcf1f97b8e6b@linux.alibaba.com/
+[2] 89e7d2ba61b7 ("net/ism: Add new API for client registration")
 
