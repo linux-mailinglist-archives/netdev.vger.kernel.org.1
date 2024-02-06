@@ -1,231 +1,245 @@
-Return-Path: <netdev+bounces-69380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C85484AEEA
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 08:20:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69AC684AEF2
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 08:24:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7ED51C22460
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 07:20:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DF6E1C212A7
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 07:24:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2EFD128807;
-	Tue,  6 Feb 2024 07:20:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mistralsolutions.com header.i=@mistralsolutions.com header.b="fNvBliSs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E00E2128837;
+	Tue,  6 Feb 2024 07:24:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from egress-ip12b.ess.de.barracuda.com (egress-ip12b.ess.de.barracuda.com [18.185.115.216])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88065128803
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 07:20:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.185.115.216
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4A2128810;
+	Tue,  6 Feb 2024 07:24:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707204011; cv=none; b=AeZysfOPeIpxTss3VnzDO52SjYoGTKL9jmK4U3glZD2QMl4MAZUEhYftufJ6ijtIui6vFQ95ixYWYa/A/7bHvIQf61pqzKpofNaO0nmttxCrpsy3cRWWMsUTny2jIBiUxXXcpZJP1fktzDFRRAErpxsdM3NHuAbelBGChxnA8S0=
+	t=1707204249; cv=none; b=utVAZW3jCGiYCM+JeDO4Xvn56rKelRcOmbZtQqrI5kTmo6TM+hEOwYinxBluGLGqn+o4jVTBFuHY4HeORiC/Eb1aidLwZDSVA9DZ8epaC9Cs/HGkLNHkPnCHXsnNzQzCb1V0lm7Xo2lw2BMbiotUUX2G/xmdztLa6qx5jpCU1mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707204011; c=relaxed/simple;
-	bh=RgPxP5/l8V4ZifiHFdU9QhIHaI5FNg+v9p7lwU6/BHY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pDQyIg6Q8PhQUYGZorH//Lhw/VAoLHZH9th/BgpXxqRNjSIKfbKnrvm8VLofm+8vGLPfpTcaaC4omqdg48I6QimOLPYmwUxgncO+j9APf8njALzmabuKIEzaV31VxD72dPhG4hCUokT8WqKaVByi8jnNW5eYZTgtxltCOa+NRnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mistralsolutions.com; spf=pass smtp.mailfrom=mistralsolutions.com; dkim=pass (1024-bit key) header.d=mistralsolutions.com header.i=@mistralsolutions.com header.b=fNvBliSs; arc=none smtp.client-ip=18.185.115.216
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mistralsolutions.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mistralsolutions.com
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com [209.85.167.70]) by mx-outbound40-107.eu-central-1c.ess.aws.cudaops.com (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO); Tue, 06 Feb 2024 07:20:05 +0000
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5114efefdb1so504401e87.1
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 23:20:05 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mistralsolutions.com; s=google; t=1707204005; x=1707808805; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1EfW+Jop+6OtJZdK61lMyoMmAch2Wo7mDs0McyNWYJM=;
-        b=fNvBliSsoWwsv9J5+phZ9E3WrQYsRTOnldhSFxrQlb2w3WSWeVaEoORDaB74sLQyDx
-         mQ4RpnD0qcPZdLG4cfIyuXFpsmKQoiLvsrnjsqIOZrm3M14GKRT9iljh0VmLFeADQNV5
-         oH9gNmm4KjzaanoBwyt7qWhzMq1LkV466rxeI=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707204005; x=1707808805;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1EfW+Jop+6OtJZdK61lMyoMmAch2Wo7mDs0McyNWYJM=;
-        b=Cqj5yEXN8ZBDEJQ2EbeD2wyaPWbvMp8eHXZmTIBh2SAMlb5omwjQoRAXepH0+6vWki
-         KxmLsFzIXFZ3WHBmRPE6TPKKsR0NhO+1rPa1lpNjRvLgyIKVGyg32XR+Gze2ioGRYrvD
-         uhpCM5a1e6+f6CD6GBcitK1el2LRXZ6j7s5ozZA6FTzAIvg52OQoW5vDOYT0FgE89MCr
-         nOO0pmsO4ZjkeZ1+6aMwP+H9yUmEgUNoZ4sxLF6bInGHE2CxH+D1w21m0q+vxkGCd9Mq
-         xmj0oJvWkJDTaCh9s600YZr9aMKQMURzjYxUMHu1OjS++d27naZyR2AsQU7tUmzjyd13
-         hJuA==
-X-Gm-Message-State: AOJu0YxY6g4j+IsiNYfr3LoyVHoPmap0jLe/fMdcHgShpkhGS7fLUqc9
-	CNNMWyELGyGEQJ5Xns9YP9Rn/MZG1ZqWye71Cg7xQ8uiENHnfBX12rc0B6LJZq/i85Ew6+OY3jN
-	AnVlHWwzz6RlxJ6vrSZ9czzMcObU2s6r7gHxqrzYxpd0eaC5kWS2voV81kfxbCHX6M02PsUzm6s
-	ipKv5M26Zctyn5I5/n+vV8jzvZxxG3KvHlYZgE14D52l/UiWeafloZtikKT1LFAI0=
-X-Received: by 2002:a05:6512:6c9:b0:511:5362:e5a1 with SMTP id u9-20020a05651206c900b005115362e5a1mr1743590lff.4.1707204005506;
-        Mon, 05 Feb 2024 23:20:05 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHEH5gmjFY6vp7J9Mw07UIJ3Z5V5xL4NnCZiImByeoPo/ELcgyj2fqrLnQOiVbHK7t5/o6m7nA+tqQFTj2U9FM=
-X-Received: by 2002:a05:6512:6c9:b0:511:5362:e5a1 with SMTP id
- u9-20020a05651206c900b005115362e5a1mr1743570lff.4.1707204005124; Mon, 05 Feb
- 2024 23:20:05 -0800 (PST)
+	s=arc-20240116; t=1707204249; c=relaxed/simple;
+	bh=iiVDTBtOx/9NOmmUzGulxkNRXQLjiCBuy+JJbqYZsAc=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=KHiXN7hZLyoMr/wCsgfRUpfSKw9aDn90kDpDDI9qLsWaMdvLUQ6WcPdqTElthLGcgiDaqRxOrn8A5lL2gmyCIUg+wmcPgchNj/mkSWhYZptMzR1pLklEz0MMh7hY0oAENPZeOLFH3ih8v9IVvwSz4lbsoWjmIU8srJkJ6Unwl3c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TTZTW0XDbz1xnMQ;
+	Tue,  6 Feb 2024 15:22:55 +0800 (CST)
+Received: from dggpemm500005.china.huawei.com (unknown [7.185.36.74])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5ECB31A016B;
+	Tue,  6 Feb 2024 15:24:01 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 6 Feb
+ 2024 15:23:58 +0800
+Subject: Re: [PATCH net-next v5 5/5] tools: virtio: introduce vhost_net_test
+To: Jason Wang <jasowang@redhat.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	<virtualization@lists.linux.dev>
+References: <20240205124506.57670-1-linyunsheng@huawei.com>
+ <20240205124506.57670-6-linyunsheng@huawei.com>
+ <CACGkMEsKHOefArPd56RAYPsJE8kf=jGb6B-V6eNJiViCAD7GYA@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <7416cf5f-b6dc-285f-6acc-f437dcb74a42@huawei.com>
+Date: Tue, 6 Feb 2024 15:23:57 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240206005928.15703-1-sinthu.raja@ti.com> <20240206005928.15703-2-sinthu.raja@ti.com>
- <2ffdca7f-f865-b719-b701-9ed4716da71a@ti.com>
-In-Reply-To: <2ffdca7f-f865-b719-b701-9ed4716da71a@ti.com>
-From: Sinthu Raja M <sinthu.raja@mistralsolutions.com>
-Date: Tue, 6 Feb 2024 12:49:53 +0530
-Message-ID: <CAEd-yTSXJdm0GQfA1HxHp7ACaHt7SdhYNepbwLtmc7PJETTzpg@mail.gmail.com>
-Subject: Re: [PATCH V3 1/2] net: ethernet: ti: cpsw_new: enable mac_managed_pm
- to fix mdio
-To: Ravi Gunasekaran <r-gunasekaran@ti.com>
-Cc: Denis Kirjanov <dkirjanov@suse.de>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
-	Roger Quadros <rogerq@kernel.org>, linux-omap@vger.kernel.org, netdev@vger.kernel.org, 
-	Sinthu Raja <sinthu.raja@ti.com>, stable@vger.kernel.org, 
-	Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-BESS-ID: 1707204005-310347-12432-463-1
-X-BESS-VER: 2019.1_20240206.0113
-X-BESS-Apparent-Source-IP: 209.85.167.70
-X-BESS-Parts: H4sIAAAAAAACA4uuVkqtKFGyUioBkjpK+cVKViYGZqZAVgZQ0NLIPDExxcAyzc
-	zMONHc2MAwycgw1SjZ0DwlzTLJwDJRqTYWAC+z3dhBAAAA
-X-BESS-Outbound-Spam-Score: 0.00
-X-BESS-Outbound-Spam-Report: Code version 3.2, rules version 3.2.2.254017 [from 
-	cloudscan17-93.eu-central-1b.ess.aws.cudaops.com]
-	Rule breakdown below
-	 pts rule name              description
-	---- ---------------------- --------------------------------
-	0.00 BSF_SC0_MISMATCH_TO    META: Envelope rcpt doesn't match header 
-	0.00 BSF_BESS_OUTBOUND      META: BESS Outbound 
-X-BESS-Outbound-Spam-Status: SCORE=0.00 using account:ESS91090 scores of KILL_LEVEL=7.0 tests=BSF_SC0_MISMATCH_TO, BSF_BESS_OUTBOUND
-X-BESS-BRTS-Status:1
+In-Reply-To: <CACGkMEsKHOefArPd56RAYPsJE8kf=jGb6B-V6eNJiViCAD7GYA@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
 
-On Tue, Feb 6, 2024 at 11:31=E2=80=AFAM Ravi Gunasekaran <r-gunasekaran@ti.=
-com> wrote:
->
->
->
-> On 2/6/24 6:29 AM, Sinthu Raja wrote:
-> > From: Sinthu Raja <sinthu.raja@ti.com>
-> >
-> > The below commit  introduced a WARN when phy state is not in the states=
-:
-> > PHY_HALTED, PHY_READY and PHY_UP.
-> > commit 744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resum=
-e() state")
-> >
-> > When cpsw_new resumes, there have port in PHY_NOLINK state, so the belo=
-w
-> > warning comes out. Set mac_managed_pm be true to tell mdio that the phy
-> > resume/suspend is managed by the mac, to fix the following warning:
-> >
-> > WARNING: CPU: 0 PID: 965 at drivers/net/phy/phy_device.c:326 mdio_bus_p=
-hy_resume+0x140/0x144
-> > CPU: 0 PID: 965 Comm: sh Tainted: G           O       6.1.46-g247b2535b=
-2 #1
-> > Hardware name: Generic AM33XX (Flattened Device Tree)
-> >  unwind_backtrace from show_stack+0x18/0x1c
-> >  show_stack from dump_stack_lvl+0x24/0x2c
-> >  dump_stack_lvl from __warn+0x84/0x15c
-> >  __warn from warn_slowpath_fmt+0x1a8/0x1c8
-> >  warn_slowpath_fmt from mdio_bus_phy_resume+0x140/0x144
-> >  mdio_bus_phy_resume from dpm_run_callback+0x3c/0x140
-> >  dpm_run_callback from device_resume+0xb8/0x2b8
-> >  device_resume from dpm_resume+0x144/0x314
-> >  dpm_resume from dpm_resume_end+0x14/0x20
-> >  dpm_resume_end from suspend_devices_and_enter+0xd0/0x924
-> >  suspend_devices_and_enter from pm_suspend+0x2e0/0x33c
-> >  pm_suspend from state_store+0x74/0xd0
-> >  state_store from kernfs_fop_write_iter+0x104/0x1ec
-> >  kernfs_fop_write_iter from vfs_write+0x1b8/0x358
-> >  vfs_write from ksys_write+0x78/0xf8
-> >  ksys_write from ret_fast_syscall+0x0/0x54
-> > Exception stack(0xe094dfa8 to 0xe094dff0)
-> > dfa0:                   00000004 005c3fb8 00000001 005c3fb8 00000004 00=
-000001
-> > dfc0: 00000004 005c3fb8 b6f6bba0 00000004 00000004 0059edb8 00000000 00=
-000000
-> > dfe0: 00000004 bed918f0 b6f09bd3 b6e89a66
-> >
-> > Cc: <stable@vger.kernel.org> # v6.0+
-> > Fixes: 744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resum=
-e() state")
->
-> In v1, you received a comment to add the fixes tag. The reference stmmac =
-patch also points
-> to this commit as Fixes tag. But as Paolo pointed out in v2, this is not =
-the right
-> fixes tag for your patch series.
->
-> I did a git blame on few drivers where PHY is managed by MAC. These have
-> Fixes: fba863b81604 ("net: phy: make PHY PM ops a no-op if MAC driver man=
-ages PHY PM")
+On 2024/2/6 11:08, Jason Wang wrote:
 
-Thanks, Ravi for pointing this out.
-But the warning message was caused only after the below commit had been add=
-ed.
-744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resume() state")
+...
 
-With the below commit the warning didn't pop up.
-fba863b81604 ("net: phy: make PHY PM ops a no-op if MAC driver manages PHY =
-PM")
-That is the reason I have not changed the Fixes tag.
+>> +
+>> +static void wait_for_interrupt(struct vq_info *vq)
+>> +{
+>> +       unsigned long long val;
+>> +
+>> +       poll(&vq->fds, 1, -1);
+> 
+> It's not good to wait indefinitely.
 
-Let's wait for Paolo's comment on this Fixes: fba863b81604 ("net: phy:
-make PHY PM ops a no-op if MAC driver manages PHY PM")
+How about a timeout value of 100ms as below?
+poll(&vq->fds, 1, 100);
 
-> which seems to be more appropriate, as this is the commit that introduced=
- the
-> 'mac_managed_pm' flag.
->
-> I have Cc'ed Paolo in this reply. But in future, please take care of addi=
-ng the people
-> who provided review comments in To/Cc when sending reworked patch/series.
+> 
+>> +
+>> +       if (vq->fds.revents & POLLIN)
+>> +               read(vq->fds.fd, &val, sizeof(val));
+>> +}
+>> +
+>> +static void verify_res_buf(char *res_buf)
+>> +{
+>> +       int i;
+>> +
+>> +       for (i = ETHER_HDR_LEN; i < TEST_BUF_LEN; i++)
+>> +               assert(res_buf[i] == (char)i);
+>> +}
+>> +
+>> +static void run_tx_test(struct vdev_info *dev, struct vq_info *vq,
+>> +                       bool delayed, int bufs)
+>> +{
+>> +       long long spurious = 0;
+>> +       struct scatterlist sl;
+>> +       unsigned int len;
+>> +       int r;
+>> +
+>> +       for (;;) {
+>> +               long started_before = vq->started;
+>> +               long completed_before = vq->completed;
+>> +
+>> +               virtqueue_disable_cb(vq->vq);
+>> +               do {
+>> +                       while (vq->started < bufs &&
+>> +                              (vq->started - vq->completed) < 1) {
+>> +                               sg_init_one(&sl, dev->test_buf, HDR_LEN + TEST_BUF_LEN);
+>> +                               r = virtqueue_add_outbuf(vq->vq, &sl, 1,
+>> +                                                        dev->test_buf + vq->started,
+>> +                                                        GFP_ATOMIC);
+>> +                               if (unlikely(r != 0))
+>> +                                       break;
+>> +
+>> +                               ++vq->started;
+> 
+> If we never decrease started/completed shouldn't we use unsigned here?
+> (as well as completed)
+> 
+> Otherwise we may get unexpected results for vq->started as well as
+> vq->completed.
 
-Noted.
+We have "vq->started < bufs" checking before the increasing as above,
+and there is 'assert(nbufs > 0)' when getting optarg in main(), which
+means we never allow started/completed to be greater than nbufs as
+my understanding.
 
-Regards,
-Sinthu Raja
+> 
+>> +
+>> +                               if (unlikely(!virtqueue_kick(vq->vq))) {
+>> +                                       r = -1;
+>> +                                       break;
+>> +                               }
+>> +                       }
+>> +
+>> +                       if (vq->started >= bufs)
+>> +                               r = -1;
+> 
+> Which condition do we reach here?
 
->
-> > Signed-off-by: Sinthu Raja <sinthu.raja@ti.com>
-> > ---
-> >
-> > Changes in V3:
-> >       - No Change
-> >
-> > Changes in V2:
-> >       - Add fixes tag.
-> >
-> >  drivers/net/ethernet/ti/cpsw_new.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/=
-ti/cpsw_new.c
-> > index 498c50c6d1a7..087dcb67505a 100644
-> > --- a/drivers/net/ethernet/ti/cpsw_new.c
-> > +++ b/drivers/net/ethernet/ti/cpsw_new.c
-> > @@ -773,6 +773,9 @@ static void cpsw_slave_open(struct cpsw_slave *slav=
-e, struct cpsw_priv *priv)
-> >                       slave->slave_num);
-> >               return;
-> >       }
-> > +
-> > +     phy->mac_managed_pm =3D true;
-> > +
-> >       slave->phy =3D phy;
-> >
-> >       phy_attached_info(slave->phy);
->
-> --
-> Regards,
-> Ravi
+It is also a copy & paste of virtio_test.c
+It means we have finished adding the outbuf in virtqueue, and set 'r'
+to be '-1' so that we can break the inner while loop if there is no
+result for virtqueue_get_buf() as my understanding.
 
+> 
+>> +
+>> +                       /* Flush out completed bufs if any */
+>> +                       while (virtqueue_get_buf(vq->vq, &len)) {
+>> +                               int n;
+>> +
+>> +                               n = recvfrom(dev->sock, dev->res_buf, TEST_BUF_LEN, 0, NULL, NULL);
+>> +                               assert(n == TEST_BUF_LEN);
+>> +                               verify_res_buf(dev->res_buf);
+>> +
+>> +                               ++vq->completed;
+>> +                               r = 0;
+>> +                       }
+>> +               } while (r == 0);
+>> +
+>> +               if (vq->completed == completed_before && vq->started == started_before)
+>> +                       ++spurious;
+>> +
+>> +               assert(vq->completed <= bufs);
+>> +               assert(vq->started <= bufs);
+>> +               if (vq->completed == bufs)
+>> +                       break;
+>> +
+>> +               if (delayed) {
+>> +                       if (virtqueue_enable_cb_delayed(vq->vq))
+>> +                               wait_for_interrupt(vq);
+>> +               } else {
+>> +                       if (virtqueue_enable_cb(vq->vq))
+>> +                               wait_for_interrupt(vq);
+>> +               }
+> 
+> This could be simplified with
+> 
+> if (delayed)
+> else
+> 
+> wait_for_interrupt(vq)
 
+I am not sure if I understand the above comment.
+The wait_for_interrupt() is only called conditionally depending on the
+returning of virtqueue_enable_cb_delayed() and virtqueue_enable_cb().
 
---
-With Regards
-Sinthu Raja
+> 
+>> +       }
+>> +       printf("TX spurious wakeups: 0x%llx started=0x%lx completed=0x%lx\n",
+>> +              spurious, vq->started, vq->completed);
+>> +}
+>> +
+
+...
+
+>> +
+>> +                       /* Flush out completed bufs if any */
+>> +                       while (virtqueue_get_buf(vq->vq, &len)) {
+>> +                               struct ether_header *eh;
+>> +
+>> +                               eh = (struct ether_header *)(dev->res_buf + HDR_LEN);
+>> +
+>> +                               /* tun netdev is up and running, ignore the
+>> +                                * non-TEST_PTYPE packet.
+>> +                                */
+>> +                               if (eh->ether_type != htons(TEST_PTYPE)) {
+>> +                                       ++vq->completed;
+>> +                                       r = 0;
+>> +                                       continue;
+>> +                               }
+>> +
+>> +                               assert(len == TEST_BUF_LEN + HDR_LEN);
+>> +                               verify_res_buf(dev->res_buf + HDR_LEN);
+> 
+> Let's simply the logic here:
+> 
+> if (ether_type == htons()) {
+>     assert()
+>     verify_res_buf()
+> }
+> 
+> r = 0;
+> ++vq->completed;
+
+Sure.
+
+> 
+> Others look good.
+
+Thanks for the reviewing.
+
+> 
+> Thanks
+> 
+> .
+> 
 
