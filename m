@@ -1,99 +1,133 @@
-Return-Path: <netdev+bounces-69494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12E0084B7A3
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:20:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E535084B7A0
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:19:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB81C1F22BF4
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:20:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C23B285D05
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:19:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75243131E55;
-	Tue,  6 Feb 2024 14:20:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8564131E5A;
+	Tue,  6 Feb 2024 14:19:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Phb8EEk8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W38Z4H0q"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF1A13172E
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 14:20:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FBFB131E44;
+	Tue,  6 Feb 2024 14:19:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707229216; cv=none; b=phk4ihTsx/m726iQZjgkAlwSIX6Hz1A9LbvoCAj2G2MGQih5OozZmPpvVOZC8depBfxfsSHFlmCc3lwomqGCEH7i2tWmd33RhkIk5KvU63iZ3WZLx078XnK8EoYnAUwuLPeOo7gBv8gED9ESb1K1Q2NGR+XIK5qdMzCY64AE0m0=
+	t=1707229181; cv=none; b=ndKk16MNrPiw0vLWF4p7w8dXVoq6Js/SH34tPIGwd+xkDk4wT+ygkRSG7+HhA15GvGO6SdiufTQ+8o8dmSHH9ZdctA/RVaKMjNsIumBVyX0lbjDAwr/zSOzhoBI8Mpa/k86vHase6L88cs5fMzWUFRtT32yFs2xr+zF8BYOwoEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707229216; c=relaxed/simple;
-	bh=1d+EQeI7ZRJejmJelMH/afAGSNnfgVWs/QGeMw7wlxc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VkZERUD/HXtDai0lBkg5mPMoyATAK00JxTrvAgyI6Iu2Yf8NUCYcP2j9kMqmbffQw4n5OYsYYHdFc74IN5QVR1ONjMPJNHBDs+SWuDMhHDNK6fG/6n2DiPRqRVuxt8VDgNuC8LanWDcfuC5YsA4/A0evqkazlVdsUi16eQxRPWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Phb8EEk8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707229213;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=8V5/ZF2pQRxInlm+8vcoORP65KVQFSUe+GcgFA0pcLE=;
-	b=Phb8EEk8Tx6x+z2aRUPpr79v3TBvuaJPQzkjsVUuYAut0a7Ke2V6C93TUOmzACCMwut3/0
-	ONqcJYRS/cPpBv/pghgvqh6VCsVDxhbfp/gz/kGow1jozvH9XrwM6xx+dF+FiuOS//iFmQ
-	qzBXfC3XGdUyTKWkQHxC9+EviNM/FKI=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-226-oHIkm--EORGrCMed5XWODQ-1; Tue,
- 06 Feb 2024 09:20:10 -0500
-X-MC-Unique: oHIkm--EORGrCMed5XWODQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9344C1C06913
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 14:20:09 +0000 (UTC)
-Received: from dev.redhat.com (unknown [10.22.8.235])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 738ED1121312;
-	Tue,  6 Feb 2024 14:20:09 +0000 (UTC)
-From: Stephen Gallagher <sgallagh@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Stephen Gallagher <sgallagh@redhat.com>
-Subject: [PATCH] ifstat.c: fix type incompatibility
-Date: Tue,  6 Feb 2024 09:18:54 -0500
-Message-ID: <20240206141944.774917-1-sgallagh@redhat.com>
+	s=arc-20240116; t=1707229181; c=relaxed/simple;
+	bh=1MnTEbxeUsGA7HMcn2eRPHhXYWih9ZllJehloa4wpsc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S52rviG5FewOV0w2x8v3Rpx0LCna1+d58BnHpcVAL3a8sKm5bsu3hdhjDCdFkPzJDImAExN4rvAE1bvvpJcp4fK+PInTayzuBQACEOeoXOV7gvr4a4i3nogcnqWqqF5yD1eK/jbRbyz7VzqEpzWD5qlqH5MVH91MLzQqNk9c3WQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W38Z4H0q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41C92C433C7;
+	Tue,  6 Feb 2024 14:19:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707229181;
+	bh=1MnTEbxeUsGA7HMcn2eRPHhXYWih9ZllJehloa4wpsc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=W38Z4H0qdYqSxhn84T7haOHArqaXgeHjfaoKy44OX19ZDhSftyULq0r/FMg70Ayyg
+	 e7xwz0dqu7rFdptm5oHyeXQbqIlKCTw2IHPb8ifn0IWhpuVUdjUtd1/vqHYHiskKus
+	 emdg0gItkGetPQPwjMbX3W3fHloS4plorEAOZb4jp8m6WWubTwO7C7KUNEfmuWtWJd
+	 zDY6/0HI6/GQqpBuO8do0WL0/4o+XXYwSsg8BKoJsCU5N+SjQ257MPnim1lXkUHSj8
+	 ZK/ph766zwqJpWxF6v4UD+bEzWaUrTNjU17rOna6yYGAL3WbiXN7oAf1vGxX8Vd7MR
+	 Shtxv60zYzbrg==
+Date: Tue, 6 Feb 2024 14:19:34 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Conor Dooley <conor.dooley@microchip.com>,
+	linux-riscv@lists.infradead.org,
+	Daire McNamara <daire.mcnamara@microchip.com>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org
+Subject: Re: [PATCH v2 2/7] dt-bindings: can: mpfs: add missing required clock
+Message-ID: <20240206-parole-cinnamon-2fe369f6ca74@spud>
+References: <20240122-catty-roast-d3625dbb02fe@spud>
+ <20240122-breeder-lying-0d3668d98886@spud>
+ <20240122-surely-crimp-ba4a8c55106d-mkl@pengutronix.de>
+ <20240122-cruelly-dainty-002081f0beb2@spud>
+ <20240122-smokeless-ion-63e4148c22e5-mkl@pengutronix.de>
+ <20240122-uncoated-cherub-a29cba1c0035@spud>
+ <20240122-pogo-reputable-b1d06ae1f1f1-mkl@pengutronix.de>
+ <20240130-narrow-lyricism-8b25baac7bb2@wendy>
+ <20240130-fragrance-disinfect-22cc1911bf48-mkl@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="5oAuP6RxMdm00jg7"
+Content-Disposition: inline
+In-Reply-To: <20240130-fragrance-disinfect-22cc1911bf48-mkl@pengutronix.de>
 
-Throughout ifstat.c, ifstat_ent.val is accessed as a long long unsigned
-type, however it is defined as __u64. This works by coincidence on many
-systems, however on ppc64le, __u64 is a long unsigned.
 
-This patch makes the type definition consistent with all of the places
-where it is accessed.
+--5oAuP6RxMdm00jg7
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
----
- misc/ifstat.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Tue, Jan 30, 2024 at 02:01:09PM +0100, Marc Kleine-Budde wrote:
+> On 30.01.2024 12:11:44, Conor Dooley wrote:
+> > On Mon, Jan 22, 2024 at 04:31:32PM +0100, Marc Kleine-Budde wrote:
+> > > On 22.01.2024 14:56:09, Conor Dooley wrote:
+> >=20
+> > > > I think we already had this discussion on v1, where I said that the
+> > > > binding requires the clocks to be in that order, regardless of whet=
+her
+> > > > or not clock-names is provided. You feel more strongly about it tha=
+n I
+> > > > do, so I will add them when I get around to sending a v3.
+> > >=20
+> > > Yes, this discussion sounded very familiar to me, never mind. Keep it=
+ as
+> > > is, and let's get this binding and the CAN driver upstream!
+> >=20
+> > BTW, I didn't see an ack on this nor do I see it in linux-next (yet).
+> > Are you expecting the patch to go with the rest via the clock tree,
+> > via the DT tree or will you be taking it with CAN stuff via netdev?
+> >=20
+> > I can resend this one patch with a netdev appropriate subject prefix
+> > if you like.
+>=20
+> Feel free to take the whole series via the clock tree.
 
-diff --git a/misc/ifstat.c b/misc/ifstat.c
-index 721f4914..767cedd4 100644
---- a/misc/ifstat.c
-+++ b/misc/ifstat.c
-@@ -58,7 +58,7 @@ struct ifstat_ent {
- 	struct ifstat_ent	*next;
- 	char			*name;
- 	int			ifindex;
--	__u64			val[MAXS];
-+	unsigned long long	val[MAXS];
- 	double			rate[MAXS];
- 	__u32			ival[MAXS];
- };
--- 
-2.43.0
+Okay, I've gone and applied all of the binding and driver patches to the
+branch we will send to Stephen. Thanks!
 
+
+
+--5oAuP6RxMdm00jg7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZcI/9gAKCRB4tDGHoIJi
+0kHUAP0e+rt2LDSpTC952WOfj4vXNDY3wh2XgO1MsZQXw131LQEA1UPbV0N5gf+J
+ALoxbvkmhHo0E10iiUy+SgrU+qL5yAM=
+=rlvY
+-----END PGP SIGNATURE-----
+
+--5oAuP6RxMdm00jg7--
 
