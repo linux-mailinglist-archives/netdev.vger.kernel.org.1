@@ -1,204 +1,633 @@
-Return-Path: <netdev+bounces-69357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45B7384AC94
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 03:58:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5F3584ACB8
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 04:08:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB5E51F2547F
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 02:58:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DF5B287B41
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 03:08:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AEBF73175;
-	Tue,  6 Feb 2024 02:58:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 496707317A;
+	Tue,  6 Feb 2024 03:08:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Y21gOgqz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WQCMYED/"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2079.outbound.protection.outlook.com [40.107.223.79])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD8E46E2D0;
-	Tue,  6 Feb 2024 02:58:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.79
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707188318; cv=fail; b=WNT3iXAPX5FW57Rq7ZAdBqXoSCAo+y7euaZlUk8dIADLeBopS7K+vX/eqgXaZMTDImD6Yr/sR5fdmDfDuAaSqczM7JtQMOR6BFPUj2WQbCajR0++kVLR7b0M1o2D8yyiL8dwzm/ddVOjb6N7hwewmiD7jIRWKOhT6vYOjvxEn0c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707188318; c=relaxed/simple;
-	bh=zym+UZ9HvNw+7bpSide0NsXwc6itk3aewxVhj+kSL4Q=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 Content-Type:MIME-Version; b=sryRRgfyTe9OOLOeDqLfsnwuWUypfIeoGpBaXcserxOmYZV4K/nmPVGM8kTyrkYFbMvS889dz5FFMI91GsQjz8Qa3fEQ6G+XmSSIvgt42vDhhOj5Lf9yXkhi0PK7ilzO2U63i3yHSvbT7p8ngDjKFMHO/IdYwjvCWrJzUkTVz1M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Y21gOgqz; arc=fail smtp.client-ip=40.107.223.79
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YaapRGEJA8+wFVkq4nRLBX0szITiGyEwlLb7Z6c6YJl3Z3v3tPMxjle31L6iQ0rq/oXZucQkflWcORcV9bDRu922U0L17PVSHSqMleedFykKeH/vgoOmq+weoUDD3knZGBkGPypnJ0lc8N+sUk0W45d3N344CdkQQzQvMBmn7viICXcw/MSnHTCOPNzwC1xinINzZUbaqvG7gWFNBm5KwU4j9DRgB0IlTFAPRoDL5yNlvyeBVtdOEPl5YAo3JzF4JBzR4MO1+W4Fi6VezML+A4U+7KO4n9QbXJGV4bvE6XUTJqx08C85GEIkNkEdhQO8cccpgjU9VBmD2JE7p8KcSA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=C9W48bTm7CaPzZxXhn/mG8OUJdcHLIVWdvEIlJH67tE=;
- b=V7nnuRc5I9xd1M+oR8SkdC4PSCl8H1kMMm/C7ePPZuikajCdHRr71Xplftmf0szr6ecb56RG+cE5MzcpMvqttDyyIAL/HB0jVDinf9NUtsZsGYZhaW5M0qfBr8nu9VV8T8JqPtMceIeAwE+lFmQOk0Gm/c236uK5mmWFn6Hp4qnlN2GKs4ftoP6e7URbllikfMxtAJg5b85Fc1nC3f2qzpsVFJZOKP710leypSXtMyhdWWOkcG5j25nYATI5R271eiRInCkST7Q1Y1Nz+BWtvpq/7KdCLeJ1WCORaM5/gjoqfOXvcS6S3eZ9qpFcN+pBIfHTDaMzV9ngpuipFGOdcg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=C9W48bTm7CaPzZxXhn/mG8OUJdcHLIVWdvEIlJH67tE=;
- b=Y21gOgqzHs72+wNgXjNah2kKTmcy77A71LaCRSzv+DKboq0h1+kCOtdbptLI96otOhMZC19Tci1cZ4LEtI76HI05Rabnuh7NVr1gDYsikaQbouCe9LHJUAZ3HyQaiu6tzrUVlhqkChLxqWOorYk7qpdWBXLbit9WCjSQl/D4iWrRmZ/1h0Uo/G5SvJia+YO3XASh99xvNlml+2kRFHM5JuGFdsnJzqZZVKlYsvC9mw1auvgA3h6PB1IggFCvoIpBV5NH+N1JjmEHBhQfq166c46VNZFMHdHqQsUT7dWx668gEXC66pQ9h0hsBHOZPwhgGEkigdpAZuaMmZrGtDtFzQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
- by IA1PR12MB8556.namprd12.prod.outlook.com (2603:10b6:208:452::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.14; Tue, 6 Feb
- 2024 02:58:33 +0000
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::d726:fa79:bfce:f670]) by BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::d726:fa79:bfce:f670%7]) with mapi id 15.20.7270.012; Tue, 6 Feb 2024
- 02:58:32 +0000
-References: <20240206024956.226452-1-jdamato@fastly.com>
-User-agent: mu4e 1.10.8; emacs 28.2
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-To: Joe Damato <jdamato@fastly.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, tariqt@nvidia.com,
- Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, "open list:MELLANOX MLX5 core VPI driver"
- <linux-rdma@vger.kernel.org>
-Subject: Re: [PATCH net-next v2] eth: mlx5: link NAPI instances to queues
- and IRQs
-Date: Mon, 05 Feb 2024 18:52:45 -0800
-In-reply-to: <20240206024956.226452-1-jdamato@fastly.com>
-Message-ID: <87o7cul2nf.fsf@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: BY3PR04CA0006.namprd04.prod.outlook.com
- (2603:10b6:a03:217::11) To BYAPR12MB2743.namprd12.prod.outlook.com
- (2603:10b6:a03:61::28)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5AD3745E8
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 03:08:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707188910; cv=none; b=QW+VM7K16uZXhqcdKOcPPiVh65r2tIRHBhwx5YvUUp9ZxOiIhIlcVBtdOIYnItejp6PWUliVB6W1wiVWPTCgOdHP0MK9SCotmFTaQgYG6v1Pu9qgv15yXOdmUYk4KOBkTYS9gkn6Y6TyYrJnhUf98ZhVVswEVvaHKxsa+1V4WlU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707188910; c=relaxed/simple;
+	bh=d4/Xdc3RDPX9yQFzLbD/w3v8QdUW1JkPJki7k0rJDnM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=gV/7sIlWd6SLD78+PPvDxYnejariAMeQabr1/InqqGXX80H+Ml2sOWNJL/i5EHd6UKOgEi3Mf6s3tSeZeiJEeBpmLdnV0IVef6zTrawS1g5tC39WdgVia/yZNOgAimk7qPAK/ertAwy6Lal6Hyy50hMoFnsx8toebpmBKBn6WNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WQCMYED/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707188907;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4coahlz/EBj4Pt0jKop1+g2Y8QuGd/wq0ymO/hlVzac=;
+	b=WQCMYED/vCC/e+IbKMjYGo3tP4ksOioD1u5Br7QKeoDJM18JYD1bESu8p223Jjcb/ysLDn
+	fk5LMBrXegjIRQ6E6iLhqcQDyiq92/Zat+TOqK2xiigcLdJ5Y8TEbnGZGFvhe3hJCuYR27
+	CQL1qCZIQIWOgSag3YMYNXSRX24TKAU=
+Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
+ [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-504-8cdvpwwrMU2GzgeL3M3Mdg-1; Mon, 05 Feb 2024 22:08:25 -0500
+X-MC-Unique: 8cdvpwwrMU2GzgeL3M3Mdg-1
+Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3bfd890774eso1902607b6e.1
+        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 19:08:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707188904; x=1707793704;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4coahlz/EBj4Pt0jKop1+g2Y8QuGd/wq0ymO/hlVzac=;
+        b=isyvpJwcs4iyMLQ7zuYm0SPO2gfaQ2nEA3IWmiYt3T1pMgnE3z1VdA0o2k98ZPuXBz
+         1LtEjnuWmpK+T5Gc7cqnnple2zSm11wHSlYr7Bi8vJoEObRJcW5VGnM6IHMMpvmSrUAd
+         Zd4GAHNJLMSMtWB+w6013ZfL0cPzPqBfPci1NVd5DEgKCOYLwkGaaOfUJO1+uMwtEA5W
+         2KVfhEJkr3RATgErucmF18BeDJJJHtk+cqgzXH1Ekd385tzriN/zCadFKwE9t5e0nQFG
+         Z2r6DZE7JAGhzXKxFuYLv6ll+DhAUD3uAANW8J6/jS0PJbsnIoagWZwbQAwOQZDOM8Lc
+         nyQA==
+X-Gm-Message-State: AOJu0YzTR6pS4uDNXguhTx51CQS1Zria0O6+7KRRAiugITDdooeEoj+a
+	p/F1r8oLolYagGyUOW/Vck+EnwvM73sCZe34Z4c7Lr+a4sZaSDZCoiRrbAorZicD4wB2Scxg+PO
+	VCbTTpC8foX/IztZDs8UeIaHo7lwGdPlAhQVtyc/P5RmRqocwEHSGbHOjrWhGp30UihNWCUwN1V
+	/7AIM5zopcJK7IK57AmxWJE7oL+/bT
+X-Received: by 2002:a05:6808:318e:b0:3bd:cacd:332d with SMTP id cd14-20020a056808318e00b003bdcacd332dmr2715490oib.40.1707188904513;
+        Mon, 05 Feb 2024 19:08:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEQny3V1VkYtRB2ydA1yRnrOiZEf8txFsj8hfIvEAejsnMmlzfAYMzDJtsYqOGeWCY0/xT1aXBK4lyE7E6bTcE=
+X-Received: by 2002:a05:6808:318e:b0:3bd:cacd:332d with SMTP id
+ cd14-20020a056808318e00b003bdcacd332dmr2715477oib.40.1707188904216; Mon, 05
+ Feb 2024 19:08:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|IA1PR12MB8556:EE_
-X-MS-Office365-Filtering-Correlation-Id: 85a56818-36f5-452d-e7ee-08dc26bf80b1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	ZJle3s+kVBifsKYHvydKwxfzboLiE3rFL0rBH8JMS8qcXQOgi1UM45EMXMZKZQ+k/XGXJ9Ew5jS87VuCi4w477g7hxe09a5f0u0WSYdRZg4KknmSQueteHYAHbx1FWo+yoe1G5NF6b/CV9jhywc86munM+P/yLE4UYWE3jhpHQOJVg+ZxpCQhK0HXBm9XsORq30HZy4FRaobV4XDaxnsZD/RHiuSDdFfNYG57O20dNWl9VOEGd8QZzsguj9TjF4l7AgJLMN5CGmRqXU82vspYKJosYwJGaSJjOC+cmLTryEwd+nAmNunf2z5z4s63iDN8tnVuCPkfVrHSSYk6E8C0VollivJw+UJOR3LZYfxQRmCHqcXLHgaCMGr2XnhvuIm3TeeVu8CNEHcge0B7cTKuBRQAceQwU54XHnnxnd51dEzKxomkBDYJv+48OZuVWqbSSQVJi6Lahz//bPADDCWCrvIz2n0NB77jF+pO+98M/sLiuc60s0ZYFV9zNc8UkHOEE1RbtaD7kRU1OLWiIkpVD9TlBr1IZ8/bdW8b3hACGlmqG/k25NWrgR8g6jefqhEgyw7WtlH3taKuBdHaCg9kJPt5/DLfF5Hv5Yfthq1uTE=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(346002)(39860400002)(366004)(376002)(136003)(396003)(230922051799003)(1800799012)(64100799003)(186009)(451199024)(2616005)(26005)(6486002)(41300700001)(36756003)(38100700002)(966005)(54906003)(6666004)(6506007)(478600001)(6512007)(66946007)(83380400001)(316002)(8676002)(5660300002)(2906002)(86362001)(66476007)(6916009)(8936002)(66556008)(4326008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?6schq388WSemHouyHwoOVJeKXZngJ6tbL1rYW1fVNxaboLxBKWP/4C1QP69t?=
- =?us-ascii?Q?JhGIM4yfDEw9DASKtEIJoNrHOc+mT0veRpJj3mbjVAbDx6LWne/jS+3ujgd/?=
- =?us-ascii?Q?xqO/7cREqP0GGYiM6VcOZVvs9O1eiWiT3PNbiRdc0TPqLcdwou5t0mUhtP2g?=
- =?us-ascii?Q?b8cDeb3FyRfoHxmmDLZznj13GR2iaiDXKCLveF2q1+0Tk0oJeETTuyKAz2z6?=
- =?us-ascii?Q?2Zx8tCLJUsI4Lrd/8IjkCepuaUoaThojbsU0k37PLmLUcI9P6rryliRRO62K?=
- =?us-ascii?Q?1vJ7HY3QfOMIOfwnrd0eQDYqatOmxaN7YJvyvCnO2edTMTpDA2iuhQkwTh7N?=
- =?us-ascii?Q?X/7kj81eFrk2UT5AeEhMsvT5gYtD+wspZ0Hk6WHyIi5D0dbDmu0jlifsCPZm?=
- =?us-ascii?Q?tIh2droNjXwyCmOQTBp1VREXQu0uHaz3BcFZXGASvXEj3UGhTWKqaQ0c6NYu?=
- =?us-ascii?Q?cgtUOS07oFymlhoN4HlBsTaoUokb2KfaufgWzVEaclB+6GPqr9QUFClTBtJG?=
- =?us-ascii?Q?1UgfoVnNlOVjAOD5BGyAgtsxzlvVYo6ECFiT1AGYmUsUITg+yaXM/F9SiuKv?=
- =?us-ascii?Q?sx7NAUpVY0SW+uJIMlzN2f/IOnHasWE1nkdPQynLJuo1d1tErsKbLZMoMrGS?=
- =?us-ascii?Q?ok+sZ+kD0LQNEENOgLf88sXSPPTpgZLi32JP1xXIkn+pjLOlN6+Nnf3WBuLi?=
- =?us-ascii?Q?lf1gtV1wr7m0Xw8/TnQHPv9zNTZfba5X4n6IrD8RzBjTJ9SIzrKf626JdLAe?=
- =?us-ascii?Q?EuNFRuuYdl+CQtd7RIHFr9prWEuqMnpknDAp03BC/okxFnZyUPRfxbHk+qVl?=
- =?us-ascii?Q?fgfW/4BxjuPUWt2x9PwSDiz4VHKscQ1Jpj3JnzAjIrmUWEp/D9glVL5TCKMw?=
- =?us-ascii?Q?t8PWbtVdOScxGrEfwN3FuV2k0hgXSPXEL3NVSaV2XzwY8MrKGhL4sINSbzha?=
- =?us-ascii?Q?SP+ljCdAAjWLOJtB0AUtOh3IBYa2//Z3FwmKyjDHoJl3t14a7yMmGzoL6BBW?=
- =?us-ascii?Q?nWVeZ4Z1Vlp05Glu5ZESLetmCO4Ln+xfZc9sibS4CI36Wog7s/OXoaCReBef?=
- =?us-ascii?Q?P63ExrE9WFtrT+mMt6iQxek285KlRf3d8+jSIc6IZMWwMyWAf7ZGrJ2LI4V9?=
- =?us-ascii?Q?/tOraDkM4SAOPnfuuVUCcDj4vY+74JuCM/ayBtL3JQmDQuFt0aqcNYY0HuIa?=
- =?us-ascii?Q?Ynu+fK9niKtBHFgFQh/7XGDlbmnabAMJI1Npvy70O07BTz7GAUYEsrjH0cb8?=
- =?us-ascii?Q?lbWFEtlesExN8Tyj8LtylVlePBld0DTxbyWpM6JP/SiwugGFWOwq1013jPbY?=
- =?us-ascii?Q?+U1p6AbEzJOwvedR4cOOeit+HATlFuwzDuVG3eXfQoAvzd70YhDGcgzWKJfq?=
- =?us-ascii?Q?9Xlp/R/faYqN8G7gRNxO9oEudlhPM3r2YvSwTY0cYDWaOhTpwVldXst97TZV?=
- =?us-ascii?Q?HDjv53Hw9EUkPyfb0ZKFQ/FTRBOq0YDuJgTBzdp5kFDsUoBl5mJwY/+/Se9a?=
- =?us-ascii?Q?q4cwTC5J0k8ksJliO0GtQFG8S3tXrF82ufy/8kg9fShbJr29PmkgjgYgRx8o?=
- =?us-ascii?Q?Tu8KK6sham2HvDFD0PiZ+Ds+/6SRp5JnPU4k9KJ/M7n5ysXmbZM82m16YDkH?=
- =?us-ascii?Q?sg=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 85a56818-36f5-452d-e7ee-08dc26bf80b1
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2024 02:58:32.1000
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZYYYDo+tDuEOJlM/qLR8bu/ksrUkBB7ad9VnAj0MFxobCXU+ulWiHGSRsB7jc2UVaXzpBHHbJjFotqFEN5gkFg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8556
+References: <20240205124506.57670-1-linyunsheng@huawei.com> <20240205124506.57670-6-linyunsheng@huawei.com>
+In-Reply-To: <20240205124506.57670-6-linyunsheng@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 6 Feb 2024 11:08:11 +0800
+Message-ID: <CACGkMEsKHOefArPd56RAYPsJE8kf=jGb6B-V6eNJiViCAD7GYA@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 5/5] tools: virtio: introduce vhost_net_test
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 06 Feb, 2024 02:49:56 +0000 Joe Damato <jdamato@fastly.com> wrote:
-> Make mlx5 compatible with the newly added netlink queue GET APIs.
+On Mon, Feb 5, 2024 at 8:46=E2=80=AFPM Yunsheng Lin <linyunsheng@huawei.com=
+> wrote:
 >
-> v1 -> v2:
->   - Move netlink NULL code to mlx5e_deactivate_channel
->   - Move netif_napi_set_irq to mlx5e_open_channel and avoid storing the
->     irq, after netif_napi_add which itself sets the IRQ to -1.
->   - Fix white space where IRQ is stored in mlx5e_open_channel
+> introduce vhost_net_test for both vhost_net tx and rx basing
+> on virtio_test to test vhost_net changing in the kernel.
 >
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
+> Steps for vhost_net tx testing:
+> 1. Prepare a out buf.
+> 2. Kick the vhost_net to do tx processing.
+> 3. Do the receiving in the tun side.
+> 4. verify the data received by tun is correct.
+>
+> Steps for vhost_net rx testing:
+> 1. Prepare a in buf.
+> 2. Do the sending in the tun side.
+> 3. Kick the vhost_net to do rx processing.
+> 4. verify the data received by vhost_net is correct.
+>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
 > ---
->  drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 7 +++++++
->  1 file changed, 7 insertions(+)
+>  tools/virtio/.gitignore            |   1 +
+>  tools/virtio/Makefile              |   8 +-
+>  tools/virtio/linux/virtio_config.h |   4 +
+>  tools/virtio/vhost_net_test.c      | 536 +++++++++++++++++++++++++++++
+>  4 files changed, 546 insertions(+), 3 deletions(-)
+>  create mode 100644 tools/virtio/vhost_net_test.c
 >
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> index c8e8f512803e..3e74c7de6050 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-> @@ -2560,6 +2560,7 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
->  	c->lag_port = mlx5e_enumerate_lag_port(priv->mdev, ix);
->  
->  	netif_napi_add(netdev, &c->napi, mlx5e_napi_poll);
-> +	netif_napi_set_irq(&c->napi, irq);
->  
->  	err = mlx5e_open_queues(c, params, cparam);
->  	if (unlikely(err))
-> @@ -2602,6 +2603,9 @@ static void mlx5e_activate_channel(struct mlx5e_channel *c)
->  		mlx5e_activate_xsk(c);
->  	else
->  		mlx5e_activate_rq(&c->rq);
-> +
-> +	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_TX, &c->napi);
-> +	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_RX, &c->napi);
+> diff --git a/tools/virtio/.gitignore b/tools/virtio/.gitignore
+> index 9934d48d9a55..7e47b281c442 100644
+> --- a/tools/virtio/.gitignore
+> +++ b/tools/virtio/.gitignore
+> @@ -1,5 +1,6 @@
+>  # SPDX-License-Identifier: GPL-2.0-only
+>  *.d
+>  virtio_test
+> +vhost_net_test
+>  vringh_test
+>  virtio-trace/trace-agent
+> diff --git a/tools/virtio/Makefile b/tools/virtio/Makefile
+> index d128925980e0..e25e99c1c3b7 100644
+> --- a/tools/virtio/Makefile
+> +++ b/tools/virtio/Makefile
+> @@ -1,8 +1,9 @@
+>  # SPDX-License-Identifier: GPL-2.0
+>  all: test mod
+> -test: virtio_test vringh_test
+> +test: virtio_test vringh_test vhost_net_test
+>  virtio_test: virtio_ring.o virtio_test.o
+>  vringh_test: vringh_test.o vringh.o virtio_ring.o
+> +vhost_net_test: virtio_ring.o vhost_net_test.o
+>
+>  try-run =3D $(shell set -e;              \
+>         if ($(1)) >/dev/null 2>&1;      \
+> @@ -49,6 +50,7 @@ oot-clean: OOT_BUILD+=3Dclean
+>
+>  .PHONY: all test mod clean vhost oot oot-clean oot-build
+>  clean:
+> -       ${RM} *.o vringh_test virtio_test vhost_test/*.o vhost_test/.*.cm=
+d \
+> -              vhost_test/Module.symvers vhost_test/modules.order *.d
+> +       ${RM} *.o vringh_test virtio_test vhost_net_test vhost_test/*.o \
+> +              vhost_test/.*.cmd vhost_test/Module.symvers \
+> +              vhost_test/modules.order *.d
+>  -include *.d
+> diff --git a/tools/virtio/linux/virtio_config.h b/tools/virtio/linux/virt=
+io_config.h
+> index 2a8a70e2a950..42a564f22f2d 100644
+> --- a/tools/virtio/linux/virtio_config.h
+> +++ b/tools/virtio/linux/virtio_config.h
+> @@ -1,4 +1,6 @@
+>  /* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef LINUX_VIRTIO_CONFIG_H
+> +#define LINUX_VIRTIO_CONFIG_H
+>  #include <linux/virtio_byteorder.h>
+>  #include <linux/virtio.h>
+>  #include <uapi/linux/virtio_config.h>
+> @@ -95,3 +97,5 @@ static inline __virtio64 cpu_to_virtio64(struct virtio_=
+device *vdev, u64 val)
+>  {
+>         return __cpu_to_virtio64(virtio_is_little_endian(vdev), val);
 >  }
->  
->  static void mlx5e_deactivate_channel(struct mlx5e_channel *c)
-> @@ -2619,6 +2623,9 @@ static void mlx5e_deactivate_channel(struct mlx5e_channel *c)
->  		mlx5e_deactivate_txqsq(&c->sq[tc]);
->  	mlx5e_qos_deactivate_queues(c);
->  
-> +	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_TX, NULL);
-> +	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_RX, NULL);
 > +
+> +#endif
+> diff --git a/tools/virtio/vhost_net_test.c b/tools/virtio/vhost_net_test.=
+c
+> new file mode 100644
+> index 000000000000..6c41204e6707
+> --- /dev/null
+> +++ b/tools/virtio/vhost_net_test.c
+> @@ -0,0 +1,536 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +#define _GNU_SOURCE
+> +#include <getopt.h>
+> +#include <limits.h>
+> +#include <string.h>
+> +#include <poll.h>
+> +#include <sys/eventfd.h>
+> +#include <stdlib.h>
+> +#include <assert.h>
+> +#include <unistd.h>
+> +#include <sys/ioctl.h>
+> +#include <sys/stat.h>
+> +#include <sys/types.h>
+> +#include <fcntl.h>
+> +#include <stdbool.h>
+> +#include <linux/vhost.h>
+> +#include <linux/if.h>
+> +#include <linux/if_tun.h>
+> +#include <linux/in.h>
+> +#include <linux/if_packet.h>
+> +#include <linux/virtio_net.h>
+> +#include <netinet/ether.h>
+> +
+> +#define HDR_LEN                sizeof(struct virtio_net_hdr_mrg_rxbuf)
+> +#define TEST_BUF_LEN   256
+> +#define TEST_PTYPE     ETH_P_LOOPBACK
+> +#define DESC_NUM       256
+> +
+> +/* Used by implementation of kmalloc() in tools/virtio/linux/kernel.h */
+> +void *__kmalloc_fake, *__kfree_ignore_start, *__kfree_ignore_end;
+> +
+> +struct vq_info {
+> +       int kick;
+> +       int call;
+> +       int idx;
+> +       long started;
+> +       long completed;
+> +       struct pollfd fds;
+> +       void *ring;
+> +       /* copy used for control */
+> +       struct vring vring;
+> +       struct virtqueue *vq;
+> +};
+> +
+> +struct vdev_info {
+> +       struct virtio_device vdev;
+> +       int control;
+> +       struct vq_info vqs[2];
+> +       int nvqs;
+> +       void *buf;
+> +       size_t buf_size;
+> +       char *test_buf;
+> +       char *res_buf;
+> +       struct vhost_memory *mem;
+> +       int sock;
+> +       int ifindex;
+> +       unsigned char mac[ETHER_ADDR_LEN];
+> +};
+> +
+> +static int tun_alloc(struct vdev_info *dev, char *tun_name)
+> +{
+> +       struct ifreq ifr;
+> +       int len =3D HDR_LEN;
+> +       int fd, e;
+> +
+> +       fd =3D open("/dev/net/tun", O_RDWR);
+> +       if (fd < 0) {
+> +               perror("Cannot open /dev/net/tun");
+> +               return fd;
+> +       }
+> +
+> +       memset(&ifr, 0, sizeof(ifr));
+> +
+> +       ifr.ifr_flags =3D IFF_TAP | IFF_NO_PI | IFF_VNET_HDR;
+> +       strncpy(ifr.ifr_name, tun_name, IFNAMSIZ);
+> +
+> +       e =3D ioctl(fd, TUNSETIFF, &ifr);
+> +       if (e < 0) {
+> +               perror("ioctl[TUNSETIFF]");
+> +               close(fd);
+> +               return e;
+> +       }
+> +
+> +       e =3D ioctl(fd, TUNSETVNETHDRSZ, &len);
+> +       if (e < 0) {
+> +               perror("ioctl[TUNSETVNETHDRSZ]");
+> +               close(fd);
+> +               return e;
+> +       }
+> +
+> +       e =3D ioctl(fd, SIOCGIFHWADDR, &ifr);
+> +       if (e < 0) {
+> +               perror("ioctl[SIOCGIFHWADDR]");
+> +               close(fd);
+> +               return e;
+> +       }
+> +
+> +       memcpy(dev->mac, &ifr.ifr_hwaddr.sa_data, ETHER_ADDR_LEN);
+> +       return fd;
+> +}
+> +
+> +static void vdev_create_socket(struct vdev_info *dev, char *tun_name)
+> +{
+> +       struct ifreq ifr;
+> +
+> +       dev->sock =3D socket(AF_PACKET, SOCK_RAW, htons(TEST_PTYPE));
+> +       assert(dev->sock !=3D -1);
+> +
+> +       strncpy(ifr.ifr_name, tun_name, IFNAMSIZ);
+> +       assert(ioctl(dev->sock, SIOCGIFINDEX, &ifr) >=3D 0);
+> +
+> +       dev->ifindex =3D ifr.ifr_ifindex;
+> +
+> +       /* Set the flags that bring the device up */
+> +       assert(ioctl(dev->sock, SIOCGIFFLAGS, &ifr) >=3D 0);
+> +       ifr.ifr_flags |=3D (IFF_UP | IFF_RUNNING);
+> +       assert(ioctl(dev->sock, SIOCSIFFLAGS, &ifr) >=3D 0);
+> +}
+> +
+> +static void vdev_send_packet(struct vdev_info *dev)
+> +{
+> +       char *sendbuf =3D dev->test_buf + HDR_LEN;
+> +       struct sockaddr_ll saddrll =3D {0};
+> +       int sockfd =3D dev->sock;
+> +       int ret;
+> +
+> +       saddrll.sll_family =3D PF_PACKET;
+> +       saddrll.sll_ifindex =3D dev->ifindex;
+> +       saddrll.sll_halen =3D ETH_ALEN;
+> +       saddrll.sll_protocol =3D htons(TEST_PTYPE);
+> +
+> +       ret =3D sendto(sockfd, sendbuf, TEST_BUF_LEN, 0,
+> +                    (struct sockaddr *)&saddrll,
+> +                    sizeof(struct sockaddr_ll));
+> +       assert(ret >=3D 0);
+> +}
+> +
+> +static bool vq_notify(struct virtqueue *vq)
+> +{
+> +       struct vq_info *info =3D vq->priv;
+> +       unsigned long long v =3D 1;
+> +       int r;
+> +
+> +       r =3D write(info->kick, &v, sizeof(v));
+> +       assert(r =3D=3D sizeof(v));
+> +
+> +       return true;
+> +}
+> +
+> +static void vhost_vq_setup(struct vdev_info *dev, struct vq_info *info)
+> +{
+> +       struct vhost_vring_addr addr =3D {
+> +               .index =3D info->idx,
+> +               .desc_user_addr =3D (uint64_t)(unsigned long)info->vring.=
+desc,
+> +               .avail_user_addr =3D (uint64_t)(unsigned long)info->vring=
+.avail,
+> +               .used_user_addr =3D (uint64_t)(unsigned long)info->vring.=
+used,
+> +       };
+> +       struct vhost_vring_state state =3D { .index =3D info->idx };
+> +       struct vhost_vring_file file =3D { .index =3D info->idx };
+> +       int r;
+> +
+> +       state.num =3D info->vring.num;
+> +       r =3D ioctl(dev->control, VHOST_SET_VRING_NUM, &state);
+> +       assert(r >=3D 0);
+> +
+> +       state.num =3D 0;
+> +       r =3D ioctl(dev->control, VHOST_SET_VRING_BASE, &state);
+> +       assert(r >=3D 0);
+> +
+> +       r =3D ioctl(dev->control, VHOST_SET_VRING_ADDR, &addr);
+> +       assert(r >=3D 0);
+> +
+> +       file.fd =3D info->kick;
+> +       r =3D ioctl(dev->control, VHOST_SET_VRING_KICK, &file);
+> +       assert(r >=3D 0);
+> +}
+> +
+> +static void vq_reset(struct vq_info *info, int num, struct virtio_device=
+ *vdev)
+> +{
+> +       if (info->vq)
+> +               vring_del_virtqueue(info->vq);
+> +
+> +       memset(info->ring, 0, vring_size(num, 4096));
+> +       vring_init(&info->vring, num, info->ring, 4096);
+> +       info->vq =3D vring_new_virtqueue(info->idx, num, 4096, vdev, true=
+, false,
+> +                                      info->ring, vq_notify, NULL, "test=
+");
+> +       assert(info->vq);
+> +       info->vq->priv =3D info;
+> +}
+> +
+> +static void vq_info_add(struct vdev_info *dev, int idx, int num, int fd)
+> +{
+> +       struct vhost_vring_file backend =3D { .index =3D idx, .fd =3D fd =
+};
+> +       struct vq_info *info =3D &dev->vqs[idx];
+> +       int r;
+> +
+> +       info->idx =3D idx;
+> +       info->kick =3D eventfd(0, EFD_NONBLOCK);
+> +       r =3D posix_memalign(&info->ring, 4096, vring_size(num, 4096));
+> +       assert(r >=3D 0);
+> +       vq_reset(info, num, &dev->vdev);
+> +       vhost_vq_setup(dev, info);
+> +
+> +       r =3D ioctl(dev->control, VHOST_NET_SET_BACKEND, &backend);
+> +       assert(!r);
+> +}
+> +
+> +static void vdev_info_init(struct vdev_info *dev, unsigned long long fea=
+tures)
+> +{
+> +       struct ether_header *eh;
+> +       int i, r;
+> +
+> +       dev->vdev.features =3D features;
+> +       INIT_LIST_HEAD(&dev->vdev.vqs);
+> +       spin_lock_init(&dev->vdev.vqs_list_lock);
+> +
+> +       dev->buf_size =3D (HDR_LEN + TEST_BUF_LEN) * 2;
+> +       dev->buf =3D malloc(dev->buf_size);
+> +       assert(dev->buf);
+> +       dev->test_buf =3D dev->buf;
+> +       dev->res_buf =3D dev->test_buf + HDR_LEN + TEST_BUF_LEN;
+> +
+> +       memset(dev->test_buf, 0, HDR_LEN + TEST_BUF_LEN);
+> +       eh =3D (struct ether_header *)(dev->test_buf + HDR_LEN);
+> +       eh->ether_type =3D htons(TEST_PTYPE);
+> +       memcpy(eh->ether_dhost, dev->mac, ETHER_ADDR_LEN);
+> +       memcpy(eh->ether_shost, dev->mac, ETHER_ADDR_LEN);
+> +
+> +       for (i =3D sizeof(*eh); i < TEST_BUF_LEN; i++)
+> +               dev->test_buf[i + HDR_LEN] =3D (char)i;
+> +
+> +       dev->control =3D open("/dev/vhost-net", O_RDWR);
+> +       assert(dev->control >=3D 0);
+> +
+> +       r =3D ioctl(dev->control, VHOST_SET_OWNER, NULL);
+> +       assert(r >=3D 0);
+> +
+> +       dev->mem =3D malloc(offsetof(struct vhost_memory, regions) +
+> +                         sizeof(dev->mem->regions[0]));
+> +       assert(dev->mem);
+> +       memset(dev->mem, 0, offsetof(struct vhost_memory, regions) +
+> +              sizeof(dev->mem->regions[0]));
+> +       dev->mem->nregions =3D 1;
+> +       dev->mem->regions[0].guest_phys_addr =3D (long)dev->buf;
+> +       dev->mem->regions[0].userspace_addr =3D (long)dev->buf;
+> +       dev->mem->regions[0].memory_size =3D dev->buf_size;
+> +
+> +       r =3D ioctl(dev->control, VHOST_SET_MEM_TABLE, dev->mem);
+> +       assert(r >=3D 0);
+> +
+> +       r =3D ioctl(dev->control, VHOST_SET_FEATURES, &features);
+> +       assert(r >=3D 0);
+> +
+> +       dev->nvqs =3D 2;
+> +}
+> +
+> +static void wait_for_interrupt(struct vq_info *vq)
+> +{
+> +       unsigned long long val;
+> +
+> +       poll(&vq->fds, 1, -1);
 
-I think it would be better to clean the associations before actually
-deactivating the queues. Your teardown becomes LIFO/flipped order of
-what is done in mlx5_activate_channel.
+It's not good to wait indefinitely.
 
->  	napi_disable(&c->napi);
->  }
+> +
+> +       if (vq->fds.revents & POLLIN)
+> +               read(vq->fds.fd, &val, sizeof(val));
+> +}
+> +
+> +static void verify_res_buf(char *res_buf)
+> +{
+> +       int i;
+> +
+> +       for (i =3D ETHER_HDR_LEN; i < TEST_BUF_LEN; i++)
+> +               assert(res_buf[i] =3D=3D (char)i);
+> +}
+> +
+> +static void run_tx_test(struct vdev_info *dev, struct vq_info *vq,
+> +                       bool delayed, int bufs)
+> +{
+> +       long long spurious =3D 0;
+> +       struct scatterlist sl;
+> +       unsigned int len;
+> +       int r;
+> +
+> +       for (;;) {
+> +               long started_before =3D vq->started;
+> +               long completed_before =3D vq->completed;
+> +
+> +               virtqueue_disable_cb(vq->vq);
+> +               do {
+> +                       while (vq->started < bufs &&
+> +                              (vq->started - vq->completed) < 1) {
+> +                               sg_init_one(&sl, dev->test_buf, HDR_LEN +=
+ TEST_BUF_LEN);
+> +                               r =3D virtqueue_add_outbuf(vq->vq, &sl, 1=
+,
+> +                                                        dev->test_buf + =
+vq->started,
+> +                                                        GFP_ATOMIC);
+> +                               if (unlikely(r !=3D 0))
+> +                                       break;
+> +
+> +                               ++vq->started;
 
-In general, the netdev community maintains a rule for not reposting new
-versions of patches in 24hr periods to avoid these types of situations.
+If we never decrease started/completed shouldn't we use unsigned here?
+(as well as completed)
 
-Lets add the feedback of updating the commit message feedback in the v1
-thread into v3.
+Otherwise we may get unexpected results for vq->started as well as
+vq->completed.
 
-       https://lore.kernel.org/netdev/20240206025153.GA11388@fastly.com/T/#mcbf987c817c0d06c29364410ba8ab10b144c753d
+> +
+> +                               if (unlikely(!virtqueue_kick(vq->vq))) {
+> +                                       r =3D -1;
+> +                                       break;
+> +                               }
+> +                       }
+> +
+> +                       if (vq->started >=3D bufs)
+> +                               r =3D -1;
 
-Lets send out that v3 a day from now if that's alright. This way we can
-pick up feedback from others if needed, but I think we are converging
-here.
+Which condition do we reach here?
 
---
-Thanks,
+> +
+> +                       /* Flush out completed bufs if any */
+> +                       while (virtqueue_get_buf(vq->vq, &len)) {
+> +                               int n;
+> +
+> +                               n =3D recvfrom(dev->sock, dev->res_buf, T=
+EST_BUF_LEN, 0, NULL, NULL);
+> +                               assert(n =3D=3D TEST_BUF_LEN);
+> +                               verify_res_buf(dev->res_buf);
+> +
+> +                               ++vq->completed;
+> +                               r =3D 0;
+> +                       }
+> +               } while (r =3D=3D 0);
+> +
+> +               if (vq->completed =3D=3D completed_before && vq->started =
+=3D=3D started_before)
+> +                       ++spurious;
+> +
+> +               assert(vq->completed <=3D bufs);
+> +               assert(vq->started <=3D bufs);
+> +               if (vq->completed =3D=3D bufs)
+> +                       break;
+> +
+> +               if (delayed) {
+> +                       if (virtqueue_enable_cb_delayed(vq->vq))
+> +                               wait_for_interrupt(vq);
+> +               } else {
+> +                       if (virtqueue_enable_cb(vq->vq))
+> +                               wait_for_interrupt(vq);
+> +               }
 
-Rahul Rameshbabu
+This could be simplified with
+
+if (delayed)
+else
+
+wait_for_interrupt(vq)
+
+> +       }
+> +       printf("TX spurious wakeups: 0x%llx started=3D0x%lx completed=3D0=
+x%lx\n",
+> +              spurious, vq->started, vq->completed);
+> +}
+> +
+> +static void run_rx_test(struct vdev_info *dev, struct vq_info *vq,
+> +                       bool delayed, int bufs)
+> +{
+> +       long long spurious =3D 0;
+> +       struct scatterlist sl;
+> +       unsigned int len;
+> +       int r;
+> +
+> +       for (;;) {
+> +               long started_before =3D vq->started;
+> +               long completed_before =3D vq->completed;
+> +
+> +               do {
+> +                       while (vq->started < bufs &&
+> +                              (vq->started - vq->completed) < 1) {
+> +                               sg_init_one(&sl, dev->res_buf, HDR_LEN + =
+TEST_BUF_LEN);
+> +
+> +                               r =3D virtqueue_add_inbuf(vq->vq, &sl, 1,
+> +                                                       dev->res_buf + vq=
+->started,
+> +                                                       GFP_ATOMIC);
+> +                               if (unlikely(r !=3D 0))
+> +                                       break;
+> +
+> +                               ++vq->started;
+> +
+> +                               vdev_send_packet(dev);
+> +
+> +                               if (unlikely(!virtqueue_kick(vq->vq))) {
+> +                                       r =3D -1;
+> +                                       break;
+> +                               }
+> +                       }
+> +
+> +                       if (vq->started >=3D bufs)
+> +                               r =3D -1;
+> +
+> +                       /* Flush out completed bufs if any */
+> +                       while (virtqueue_get_buf(vq->vq, &len)) {
+> +                               struct ether_header *eh;
+> +
+> +                               eh =3D (struct ether_header *)(dev->res_b=
+uf + HDR_LEN);
+> +
+> +                               /* tun netdev is up and running, ignore t=
+he
+> +                                * non-TEST_PTYPE packet.
+> +                                */
+> +                               if (eh->ether_type !=3D htons(TEST_PTYPE)=
+) {
+> +                                       ++vq->completed;
+> +                                       r =3D 0;
+> +                                       continue;
+> +                               }
+> +
+> +                               assert(len =3D=3D TEST_BUF_LEN + HDR_LEN)=
+;
+> +                               verify_res_buf(dev->res_buf + HDR_LEN);
+
+Let's simply the logic here:
+
+if (ether_type =3D=3D htons()) {
+    assert()
+    verify_res_buf()
+}
+
+r =3D 0;
+++vq->completed;
+
+Others look good.
+
+Thanks
+
 
