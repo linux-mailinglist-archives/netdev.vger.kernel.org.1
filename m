@@ -1,102 +1,99 @@
-Return-Path: <netdev+bounces-69492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69494-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B979E84B792
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:15:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12E0084B7A3
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:20:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB5A81C25A19
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:15:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB81C1F22BF4
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:20:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72592131E44;
-	Tue,  6 Feb 2024 14:15:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75243131E55;
+	Tue,  6 Feb 2024 14:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VG5X2Y3t"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Phb8EEk8"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 278A3131727;
-	Tue,  6 Feb 2024 14:15:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF1A13172E
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 14:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707228923; cv=none; b=CFvwYpsyJ9MTMVG0nz8Z6WLiiEWA3bsixNcg80mu3TKfjVrfALgqpbGEQ2d9WylZ3VoLm0QfSeuWrwCbg3nhrrJ/dOtgKMFxdCx5LiyRkejkZhchR2FS1fHNd/8lGhqgEfBx0bSkfbOzgpZbBHDXBehC06B1YGjFYrgg9o6u3jo=
+	t=1707229216; cv=none; b=phk4ihTsx/m726iQZjgkAlwSIX6Hz1A9LbvoCAj2G2MGQih5OozZmPpvVOZC8depBfxfsSHFlmCc3lwomqGCEH7i2tWmd33RhkIk5KvU63iZ3WZLx078XnK8EoYnAUwuLPeOo7gBv8gED9ESb1K1Q2NGR+XIK5qdMzCY64AE0m0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707228923; c=relaxed/simple;
-	bh=eDbkObCHYe2dA5zx4FEUZ1qpSNTByRHIYJBIlt2dn4c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vDzDbbZHzQw7lTsywlYEvlPt1ssOsHnK64RJj85/EV8jNn4tV1ewfmeg7PhUDizMm9gwoKYs5NIIqtTRtyzl9JI0HjthBD3bWbFWrXahGw7X6lco54NKdx8k0fuCIFhnVJW4yJRJ5LayCfqK2CYV3NDVQ+iXLIjYPUvN2fAREaM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VG5X2Y3t; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=vIbBwGKCBr1o0pb8V027f4JDzuee4KE6Li1uf6tax2w=; b=VG5X2Y3tvMuPu/KaXcCTQa5YTX
-	3pgQuT6f17QKJXMCIUQPvI3LsUfP933NtaTzcNpOCY3KY2Y7DPwO14jR14I3OXV/qHWfNv4GbZsi/
-	mvLEq+hnwRbJVur9K417OHLyzu8RZB8xX7amAGSzoJsr00e8M7mcvBvCfouquLfEMq2jqjMkHgSj6
-	WCSZNlOsf8Lrgwzz160gyxwWDKcL31VJX9dpxLSgQ6bDaKfaqFEJIECb3eRN/2P9IWN1OQW33hpfG
-	RgyvjD2FZdBzo2HILiFEoYHhlKlshvO5FRbaYmRyHw/b1yH8Xw7owoILeiCdJZqgj1MztnJHW6eet
-	jsGhr6cQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47196)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rXMED-00025Z-38;
-	Tue, 06 Feb 2024 14:15:14 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rXMEB-0003hM-0r; Tue, 06 Feb 2024 14:15:11 +0000
-Date: Tue, 6 Feb 2024 14:15:10 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Sergio Palumbo <palumbo.ser@outlook.it>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: sfp: add quirk for OEM DFP-34X-2C2 GPON
- ONU SFP
-Message-ID: <ZcI+7grKa33oLtwc@shell.armlinux.org.uk>
-References: <AS1PR03MB8189AD85CEB6E139F27307D3827F2@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <ZbZn8oCiyc1aNPuW@shell.armlinux.org.uk>
- <AS1PR03MB8189B99C360FB403B8A0DD6882422@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <Zb0t+zKHx+0wTXH5@shell.armlinux.org.uk>
- <AS1PR03MB8189D48114A559B080AF5BEA82422@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <Zb1+p6FiJwUF53xc@shell.armlinux.org.uk>
- <f8cf41f2-4a90-4ef5-b214-906319bd82d4@outlook.it>
- <AS1PR03MB818911164FB76698446CFEDC82472@AS1PR03MB8189.eurprd03.prod.outlook.com>
+	s=arc-20240116; t=1707229216; c=relaxed/simple;
+	bh=1d+EQeI7ZRJejmJelMH/afAGSNnfgVWs/QGeMw7wlxc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VkZERUD/HXtDai0lBkg5mPMoyATAK00JxTrvAgyI6Iu2Yf8NUCYcP2j9kMqmbffQw4n5OYsYYHdFc74IN5QVR1ONjMPJNHBDs+SWuDMhHDNK6fG/6n2DiPRqRVuxt8VDgNuC8LanWDcfuC5YsA4/A0evqkazlVdsUi16eQxRPWQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Phb8EEk8; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707229213;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=8V5/ZF2pQRxInlm+8vcoORP65KVQFSUe+GcgFA0pcLE=;
+	b=Phb8EEk8Tx6x+z2aRUPpr79v3TBvuaJPQzkjsVUuYAut0a7Ke2V6C93TUOmzACCMwut3/0
+	ONqcJYRS/cPpBv/pghgvqh6VCsVDxhbfp/gz/kGow1jozvH9XrwM6xx+dF+FiuOS//iFmQ
+	qzBXfC3XGdUyTKWkQHxC9+EviNM/FKI=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-226-oHIkm--EORGrCMed5XWODQ-1; Tue,
+ 06 Feb 2024 09:20:10 -0500
+X-MC-Unique: oHIkm--EORGrCMed5XWODQ-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9344C1C06913
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 14:20:09 +0000 (UTC)
+Received: from dev.redhat.com (unknown [10.22.8.235])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 738ED1121312;
+	Tue,  6 Feb 2024 14:20:09 +0000 (UTC)
+From: Stephen Gallagher <sgallagh@redhat.com>
+To: netdev@vger.kernel.org
+Cc: Stephen Gallagher <sgallagh@redhat.com>
+Subject: [PATCH] ifstat.c: fix type incompatibility
+Date: Tue,  6 Feb 2024 09:18:54 -0500
+Message-ID: <20240206141944.774917-1-sgallagh@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AS1PR03MB818911164FB76698446CFEDC82472@AS1PR03MB8189.eurprd03.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-Hi Sergio,
+Throughout ifstat.c, ifstat_ent.val is accessed as a long long unsigned
+type, however it is defined as __u64. This works by coincidence on many
+systems, however on ppc64le, __u64 is a long unsigned.
 
-I did ask for the kernel messages from a specific scenario:
+This patch makes the type definition consistent with all of the places
+where it is accessed.
 
-- host that supports 1000base-X and 2500base-X with your quirk
-- SFP inserted with LAN_SDS_MODE=1
+Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
+---
+ misc/ifstat.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-What I expet to see in the kernel messages is that the system will
-use 2500base-X, and a failure.
-
-You claim that the kernel will link at 1000base-X. There is no
-mechanism in the kernel for this to happen, and I believe that
-if you look at the kernel messages, this will prove my point.
-
+diff --git a/misc/ifstat.c b/misc/ifstat.c
+index 721f4914..767cedd4 100644
+--- a/misc/ifstat.c
++++ b/misc/ifstat.c
+@@ -58,7 +58,7 @@ struct ifstat_ent {
+ 	struct ifstat_ent	*next;
+ 	char			*name;
+ 	int			ifindex;
+-	__u64			val[MAXS];
++	unsigned long long	val[MAXS];
+ 	double			rate[MAXS];
+ 	__u32			ival[MAXS];
+ };
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.43.0
+
 
