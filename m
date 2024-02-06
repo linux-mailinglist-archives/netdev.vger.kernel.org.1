@@ -1,104 +1,160 @@
-Return-Path: <netdev+bounces-69350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E72BB84AC0E
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 03:13:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4ECFB84AC30
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 03:29:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2520E1C2343F
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 02:13:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3748A1C22950
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 02:29:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 738A45677B;
-	Tue,  6 Feb 2024 02:13:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53AAD56B73;
+	Tue,  6 Feb 2024 02:29:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d1lD9pMP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 124A456B65;
-	Tue,  6 Feb 2024 02:13:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3097D56B62;
+	Tue,  6 Feb 2024 02:29:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707185584; cv=none; b=KnGYZItBA4Xqpbfs80y0fktIZa5oytCnHkCAOoR3rNIQ4WkW6uLyYVssKjzVOWc+wl+NSRczg6MgBwulwSITOgO1epXoYOOlHQZZNC486zJTFtfaANiURQYJ8NMt3GF/tEdmAXBCaSfhvNvc4CYWTBXkTD4QK82vVNlWTjPTKKw=
+	t=1707186567; cv=none; b=FKG6yfP19BronO0p3OhTow8R2SqBxS0rF1sZE8LOkhOuocYPtkrCotoXhwwwgx+KLWVRY1yvrVEZvbSXBYQUfca0rcJ0Ol8QFWg4+JvnI78K/OQ5t69e2AFWJ1Z0eQTX+vq33uLSPijHK/9XCAYr7r7+oWJx42buyWBgSVeD0/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707185584; c=relaxed/simple;
-	bh=bs/ur/xiB+EKXQSIm4/pErFIuws9bv1BgqZoNxClTT8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=krhpB/feyL2G/BtRsCjVVs5QQ795vAwJkD0/Uos9Yywn5FSIthQzdLinMcSW7faa0Sc6ZSXSMeuRmivsDj5VHxs6+ciMdDNWpRxnmIHRvrEeuHI+nf9AUNOPKlaHrp8uks25cwWpgNK6BuL8Rj7qQA3P4AR+dW/n6bTW+t0XSuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-5cddc5455aeso4476655a12.1;
-        Mon, 05 Feb 2024 18:13:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707185582; x=1707790382;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KTAyl5iKOFA0ikqjI1lmw6AmuPGoKHG8xJSD/r8dg+4=;
-        b=lB45QgIWh0gsXfWvptPQgjq4wPGoEgC7nR3PgTO1BK45Scx2nRr5EK787Zk/ZeE2fl
-         UwBnLgK4Ilq8eO0gUoTLRSsVb75TpDg5Q1DpX5yd76EBeq2ALKNBRlCeuxQXC7DrYlgt
-         PPDwIH3UunHlpaZnHSIoBYJviZrUGkoaImxq1zEoT51i3xkLjkG5wVaq8mU/SDcju85Z
-         AL1Xh4iKJa6Q9cENPi1qND6q6Dx+CbvkdfiaZwrjBD+Na054iSPe8IMNQbgXsq7hok3C
-         /jL1RDKExNfWY88Cydfk0reNZelVcEX9PIQh0tyZmnSfunhTOOPyAcSKQ5MMPo2FFNxY
-         F+Pg==
-X-Gm-Message-State: AOJu0YyT11PiQYbwT+d92h2sdubCPa+j/TJtV0ego4e2VvD12TBdSO7B
-	jgDGDGqMiOIPlbuV1UAtqwD94N2YJgjS6xnVnZFfdXycBrckQEw76tDes9TwegESEnWVne71/z1
-	JKQf6He0wuzwpwU8MCzGVh9QpayY=
-X-Google-Smtp-Source: AGHT+IGDb6iQTUWs9BOothXuSb/aiVn8KF27r5Fivt/1qfUFGuDtcyXcnRyNdG1Al1jAcC5DU7YBRZMcb1n1Vm4pF9s=
-X-Received: by 2002:a05:6a20:1ea5:b0:19c:53e4:e67f with SMTP id
- dl37-20020a056a201ea500b0019c53e4e67fmr280535pzb.15.1707185581779; Mon, 05
- Feb 2024 18:13:01 -0800 (PST)
+	s=arc-20240116; t=1707186567; c=relaxed/simple;
+	bh=D7IRLtF3PH0jQetL8lTh/A1nJy/dExwyhkIVcV8BgRY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=L9jUbi9PVjUt1BX+ZhKBB+HkTMw7GGzwOnfe9coeHvt94XzgX3AfilJjJso8k8S5VjZDT96eVBIuBANZlDcjmkqccyqd8IQFQNR/X+VJzNWQQ4mQ5xS+8aOHBRpeOw4GqOlzE4Z4co/AZXJObqcTclih6VTXhqjLFU1L2k9Z/oQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d1lD9pMP; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707186565; x=1738722565;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=D7IRLtF3PH0jQetL8lTh/A1nJy/dExwyhkIVcV8BgRY=;
+  b=d1lD9pMPlZG5cxQYF4WAZo38G1ngZ5Bgko6ZMLBFdW7vSt/DQNpcGKKd
+   NaKXij+IfWasHDC01jAzEKax8ycaknuiry6A8rK7vm/9VQ4EVjiGhahDE
+   l2whGhpdcFWIH6/EiQ7BOp4NEZpwnRye3r2+MG1K2iK2AHI1rhv1WjQN9
+   OgdxWcmJKEJlm9uot2qDSebFjD5jq7XQmyG0wRh+TV1fqH3kE3SVHvfM4
+   ouL21+pby+xcPNg8FXowDzHz7v1XSW64mTfGm+kmm4hiOwmy3pVYdQ/qe
+   nLidM+ERwRbGzVDyPwMxs+OHK5loci3SrkJ2QaWF1rtNSL9UqL4HqeJLN
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10975"; a="556643"
+X-IronPort-AV: E=Sophos;i="6.05,245,1701158400"; 
+   d="scan'208";a="556643"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 18:29:25 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,245,1701158400"; 
+   d="scan'208";a="1167781"
+Received: from jbrandeb-spr1.jf.intel.com ([10.166.28.233])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 18:29:24 -0800
+From: Jesse Brandeburg <jesse.brandeburg@intel.com>
+To: linux-kernel@vger.kernel.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	Arnd Bergmann <arnd@arndb.de>,
+	Geert Uytterhoeven <geert@linux-m68k.org>
+Subject: [PATCH net v1] net: intel: fix old compiler regressions
+Date: Mon,  5 Feb 2024 18:29:06 -0800
+Message-Id: <20240206022906.2194214-1-jesse.brandeburg@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <f15f0df1-92be-4bc9-82a2-1d8fa3275dd7@web.de> <daf2172a-8d54-4097-acf3-cc539fe281e5@web.de>
-In-Reply-To: <daf2172a-8d54-4097-acf3-cc539fe281e5@web.de>
-From: Namhyung Kim <namhyung@kernel.org>
-Date: Mon, 5 Feb 2024 18:12:50 -0800
-Message-ID: <CAM9d7ciHGv9s92Yz4VuFUhuN9HCHe=Bq7dMD_XSBTkg1+tYw+w@mail.gmail.com>
-Subject: Re: [RFC] perf: Reconsider an error code selection in bpf_map__fprintf()
-To: Markus Elfring <Markus.Elfring@web.de>
-Cc: linux-perf-users@vger.kernel.org, kernel-janitors@vger.kernel.org, 
-	Adrian Hunter <adrian.hunter@intel.com>, 
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, Christy Lee <christylee@fb.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Ian Rogers <irogers@google.com>, 
-	Ingo Molnar <mingo@redhat.com>, Jiri Olsa <jolsa@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Mark Rutland <mark.rutland@arm.com>, Martin KaFai Lau <kafai@fb.com>, 
-	Peter Zijlstra <peterz@infradead.org>, Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>, 
-	YueHaibing <yuehaibing@huawei.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hello,
+The kernel build regressions/improvements email contained a couple of
+issues with old compilers (in fact all the reports were on different
+architectures, but all gcc 5.5) and the FIELD_PREP() and FIELD_GET()
+conversions. They're all because an integer #define that should have
+been declared as unsigned, was shifted to the point that it could set
+the sign bit.
 
-On Thu, Feb 1, 2024 at 10:49=E2=80=AFPM Markus Elfring <Markus.Elfring@web.=
-de> wrote:
->
-> > A null pointer check is performed for the input parameter =E2=80=9Cmap=
-=E2=80=9D.
-> > It looks suspicious that the function =E2=80=9CPTR_ERR=E2=80=9D is appl=
-ied then for
-> > a corresponding return statement.
->
-> Are contributions also by YueHaibing still waiting on further development=
- considerations?
->
-> [PATCH -next] perf: Fix pass 0 to PTR_ERR
-> https://lore.kernel.org/lkml/20220611040719.8160-1-yuehaibing@huawei.com/
-> https://lkml.org/lkml/2022/6/11/3
+The fix just involves making sure the defines use the "U" identifier on
+the constants to make sure they're unsigned. Should make the checkers
+happier.
 
-I think we dropped the bpf-loader and it seems bpf_map.[ch] is
-leftover.  I don't see any users of bpf_map__fprintf() in the tree.
-Maybe we can drop it too.
+Confirmed with objdump before/after that there is no change to the
+binaries.
 
-Thanks,
-Namhyung
+Issues were reported as follows:
+./drivers/net/ethernet/intel/ice/ice_base.c:238:7: note: in expansion of macro 'FIELD_GET'
+      (FIELD_GET(GLINT_CTL_ITR_GRAN_25_M, regval) == ICE_ITR_GRAN_US))
+       ^
+./include/linux/compiler_types.h:435:38: error: call to '__compiletime_assert_1093' declared with attribute error: FIELD_GET: mask is not constant
+drivers/net/ethernet/intel/ice/ice_nvm.c:709:16: note: in expansion of macro ‘FIELD_GET’
+  orom->major = FIELD_GET(ICE_OROM_VER_MASK, combo_ver);
+                ^
+./include/linux/compiler_types.h:435:38: error: call to ‘__compiletime_assert_796’ declared with attribute error: FIELD_GET: mask is not constant
+drivers/net/ethernet/intel/ice/ice_common.c:945:18: note: in expansion of macro ‘FIELD_GET’
+  u8 max_agg_bw = FIELD_GET(GL_PWR_MODE_CTL_CAR_MAX_BW_M,
+                  ^
+./include/linux/compiler_types.h:435:38: error: call to ‘__compiletime_assert_420’ declared with attribute error: FIELD_GET: mask is not constant
+drivers/net/ethernet/intel/i40e/i40e_dcb.c:458:8: note: in expansion of macro ‘FIELD_GET’
+  oui = FIELD_GET(I40E_LLDP_TLV_OUI_MASK, ouisubtype);
+        ^
+
+Reported-by: Geert Uytterhoeven <geert@linux-m68k.org>
+Closes: https://lore.kernel.org/lkml/d03e90ca-8485-4d1b-5ec1-c3398e0e8da@linux-m68k.org/ #i40e #ice
+Fixes: 62589808d73b ("i40e: field get conversion")
+Fixes: 5a259f8e0baf ("ice: field get conversion")
+Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+---
+ drivers/net/ethernet/intel/i40e/i40e_dcb.h | 2 +-
+ drivers/net/ethernet/intel/ice/ice_osdep.h | 2 +-
+ drivers/net/ethernet/intel/ice/ice_type.h  | 2 +-
+ 3 files changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_dcb.h b/drivers/net/ethernet/intel/i40e/i40e_dcb.h
+index 6b60dc9b7736..d76497566e40 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_dcb.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_dcb.h
+@@ -43,7 +43,7 @@
+ #define I40E_LLDP_TLV_SUBTYPE_SHIFT	0
+ #define I40E_LLDP_TLV_SUBTYPE_MASK	(0xFF << I40E_LLDP_TLV_SUBTYPE_SHIFT)
+ #define I40E_LLDP_TLV_OUI_SHIFT		8
+-#define I40E_LLDP_TLV_OUI_MASK		(0xFFFFFF << I40E_LLDP_TLV_OUI_SHIFT)
++#define I40E_LLDP_TLV_OUI_MASK		(0xFFFFFFU << I40E_LLDP_TLV_OUI_SHIFT)
+ 
+ /* Defines for IEEE ETS TLV */
+ #define I40E_IEEE_ETS_MAXTC_SHIFT	0
+diff --git a/drivers/net/ethernet/intel/ice/ice_osdep.h b/drivers/net/ethernet/intel/ice/ice_osdep.h
+index 82bc54fec7f3..a2562f04267f 100644
+--- a/drivers/net/ethernet/intel/ice/ice_osdep.h
++++ b/drivers/net/ethernet/intel/ice/ice_osdep.h
+@@ -24,7 +24,7 @@
+ #define rd64(a, reg)		readq((a)->hw_addr + (reg))
+ 
+ #define ice_flush(a)		rd32((a), GLGEN_STAT)
+-#define ICE_M(m, s)		((m) << (s))
++#define ICE_M(m, s)		((m ## U) << (s))
+ 
+ struct ice_dma_mem {
+ 	void *va;
+diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
+index 41ab6d7bbd9e..a508e917ce5f 100644
+--- a/drivers/net/ethernet/intel/ice/ice_type.h
++++ b/drivers/net/ethernet/intel/ice/ice_type.h
+@@ -1072,7 +1072,7 @@ struct ice_aq_get_set_rss_lut_params {
+ #define ICE_OROM_VER_BUILD_SHIFT	8
+ #define ICE_OROM_VER_BUILD_MASK		(0xffff << ICE_OROM_VER_BUILD_SHIFT)
+ #define ICE_OROM_VER_SHIFT		24
+-#define ICE_OROM_VER_MASK		(0xff << ICE_OROM_VER_SHIFT)
++#define ICE_OROM_VER_MASK		(0xffU << ICE_OROM_VER_SHIFT)
+ #define ICE_SR_PFA_PTR			0x40
+ #define ICE_SR_1ST_NVM_BANK_PTR		0x42
+ #define ICE_SR_NVM_BANK_SIZE		0x43
+-- 
+2.39.3
+
 
