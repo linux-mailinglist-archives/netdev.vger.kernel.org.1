@@ -1,180 +1,280 @@
-Return-Path: <netdev+bounces-69426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 534EC84B29E
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 11:39:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F06F784B2A2
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 11:43:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B88361F25B33
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:39:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46EDBB218A5
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:43:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA33D43AB8;
-	Tue,  6 Feb 2024 10:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D28DA1DDC9;
+	Tue,  6 Feb 2024 10:43:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s5BrUhbr"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="bqx/HFnG";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="DdqX2+OR";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="dMNap4FK";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="ITzOJ/hM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90AF51EA7F;
-	Tue,  6 Feb 2024 10:39:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE5031EA7D;
+	Tue,  6 Feb 2024 10:43:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707215962; cv=none; b=ToCPp+cS71O0OpMqYPBSLXjuVqkr7hwcy2zgoSJ0nYn9vgjuawitKTn7l/7dor6UQtIhNxEDsL24YmZd0I/3pNMVXbvafo7TDIpknAnjRpSqe/waHl07aoFVFGoP3HZMXQTZz+wt9nmv7yMQMEjEuTt0OVbPVaRi+IITNk9ytz8=
+	t=1707216220; cv=none; b=LyeckqmWV5yd7GXNXCh353UjzWfUoKE+OCV38g7E7YfrpBVAWy3durIk+AK4gY8ezRhWv80PFJJQuGZSDS9A5Hp+uBjat5PTlR91Rql4zOV+3WfIVWd07/ou7ctdKUeaWh5GAOONYEi4C0ZWempJLFQ/9QEEyagGydUUQLRljKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707215962; c=relaxed/simple;
-	bh=8hLhnndyxUSDCrbFEOGm0osgEsk+27nFrTG5+McF3xA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=erzdUM1KXp3LZR+35Yu6T9sjlt+N/xFNnubfvpTbZ1Bxh+WUkuawF8sbDxkplZ6U+k+C2f0dNFNXmY4Nxq0gXCO8ldrcF9SAhVtJQpm1+nLdZE4cvymngxBpXjq8UJJfoK8QE+zmegvF1D3DOQBSmgRoCxRJ3wZIx5wPc3z2zbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s5BrUhbr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56C4AC433C7;
-	Tue,  6 Feb 2024 10:39:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707215962;
-	bh=8hLhnndyxUSDCrbFEOGm0osgEsk+27nFrTG5+McF3xA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=s5BrUhbri3kR6DKzEWcb9pq0zPwrL/uuKW/tu9PRhLTgD0xyCwXAF3iQjUR0RRcma
-	 7qLhzVHTiybKPVele1AoKNNT9OEVef10MpCWF1uGWDJXGhz7pHZHQsVVlgj6Ysp7Oj
-	 9TTWRGUHJyEZU6Bkd1L+11WvEthVzSpja7No7MByic4Z6ASafQMkfOkw2ZGEfPW2el
-	 eEtN0JoJHX6p5Ufe8BiP/bk6D82SkkdJ9CIFdXZl6jVpc66HSZWRnhIP2uKL1wLM6g
-	 SEFCSiEaI3iswswlOVDg+8dPXwQ96/udpveboj9PuIEys1kSO4BPZjqL8SxW031wek
-	 IAUpKF9r1slTw==
-Message-ID: <15cc2bc2-4db9-4209-9c06-207bf613ea5a@kernel.org>
-Date: Tue, 6 Feb 2024 11:38:59 +0100
+	s=arc-20240116; t=1707216220; c=relaxed/simple;
+	bh=eLDBoAWHndMbGf27s8TgD2Jw68rJIJDhNz9sDl9B2dc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V9Gu6aBGIfpMwoLxX0Af7yDvzeD3JPZCZg2Q6Iucv3GAJY0A3tHBysixfOQveh/r78AHPK2p+MfW7lPGxyElmB7XMyCBH/SLcJut2CJcBjdZTpZJy1DMm/fZ2d0MuCBedJyzGWG7oq+BAVtWz6D/L7b4mxl3Kl5jqgo8b9ZBUsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=bqx/HFnG; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=DdqX2+OR; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=dMNap4FK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=ITzOJ/hM; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from lion.mk-sys.cz (unknown [10.100.225.114])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id E009A220EC;
+	Tue,  6 Feb 2024 10:43:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1707216217; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e29oyO37i95pTLMkje0Wsv+5pthrbUWw/AkjX6REjE4=;
+	b=bqx/HFnGa6rFB+PJh/7nh88ao1vE8d2/4JQbltclyvqL1JVzOeiuoWz7r2JJb4NK9XGYPq
+	ADXe6qA+gj33RudVy1C+3PbbWajtItxY3DJPnjd+RZSKpItAAm5BfKA892ChLc+JhvvV2l
+	CZs5Nmkqb4MooGGB44+bSI2AGM+QH5M=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1707216217;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e29oyO37i95pTLMkje0Wsv+5pthrbUWw/AkjX6REjE4=;
+	b=DdqX2+ORP3cG6Wgm8M7yiImK3L28QrCZcuzObqHfThMsvUPcCeLICFTyFdCAhGrpeze5WG
+	uBYtS3P5neXt5fDg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1707216216; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e29oyO37i95pTLMkje0Wsv+5pthrbUWw/AkjX6REjE4=;
+	b=dMNap4FKk/3n47Zg49pbHUVQTGj88ZGC3b6fbWkvwJnmDAyLhm/aNbw/e9rypNAZ27u1kg
+	ft726zjNqRzVjRkAJQv6KSJCAuPsamOrW4YcpTYYBjciRwhyy0Gk4mZHgDOAIJoj1WMdLr
+	cDcou/LeOTYjbWd/1eIHuLq48VsQTuM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1707216216;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e29oyO37i95pTLMkje0Wsv+5pthrbUWw/AkjX6REjE4=;
+	b=ITzOJ/hMNM9ANK132FE87xw5jJujEq96OXlg7Av//nN6JH+JmeNW7ygoQ3n7ochGRJAYCn
+	tprx7S7MbvpPk2CA==
+Received: by lion.mk-sys.cz (Postfix, from userid 1000)
+	id CAD0820147; Tue,  6 Feb 2024 11:43:36 +0100 (CET)
+Date: Tue, 6 Feb 2024 11:43:36 +0100
+From: Michal Kubecek <mkubecek@suse.cz>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Florian Westphal <fw@strlen.de>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, andrea.mattiazzo@suse.com
+Subject: Re: [PATCH net] netfilter: nf_tables: fix pointer math issue in
+ nft_byteorder_eval()
+Message-ID: <20240206104336.ctigqpkunom2ufmn@lion.mk-sys.cz>
+References: <15fdceb5-2de5-4453-98b3-cfa9d486e8da@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] selftests/net: ignore timing errors in so_txtime
- if KSFT_MACHINE_SLOW
-Content-Language: en-GB, fr-BE
-To: Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- linux-kselftest@vger.kernel.org, Willem de Bruijn <willemb@google.com>
-References: <20240201162130.2278240-1-willemdebruijn.kernel@gmail.com>
- <20240202153909.79c08063@kernel.org>
- <65bd894de7b93_38e921294a9@willemb.c.googlers.com.notmuch>
- <cc2ac7cb99e09a3898f033690fd0b7978d0b120d.camel@redhat.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <cc2ac7cb99e09a3898f033690fd0b7978d0b120d.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="vuphuwffpatba3uh"
+Content-Disposition: inline
+In-Reply-To: <15fdceb5-2de5-4453-98b3-cfa9d486e8da@moroto.mountain>
+Authentication-Results: smtp-out1.suse.de;
+	none
+X-Spamd-Result: default: False [2.90 / 50.00];
+	 ARC_NA(0.00)[];
+	 BAYES_SPAM(5.10)[100.00%];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 RCPT_COUNT_TWELVE(0.00)[14];
+	 SIGNED_PGP(-2.00)[];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 RCVD_COUNT_ZERO(0.00)[0];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+,1:+,2:~]
+X-Spam-Level: **
+X-Spam-Score: 2.90
+X-Spam-Flag: NO
 
-Hi Paolo, Willem, Jakub,
 
-On 06/02/2024 10:18, Paolo Abeni wrote:
-> On Fri, 2024-02-02 at 19:31 -0500, Willem de Bruijn wrote:
->> Jakub Kicinski wrote:
->>> On Thu,  1 Feb 2024 11:21:19 -0500 Willem de Bruijn wrote:
->>>> This test is time sensitive. It may fail on virtual machines and for
->>>> debug builds.
->>>>
->>>> Continue to run in these environments to get code coverage. But
->>>> optionally suppress failure for timing errors (only). This is
->>>> controlled with environment variable KSFT_MACHINE_SLOW.
->>>>
->>>> The test continues to return 0 (KSFT_PASS), rather than KSFT_XFAIL
->>>> as previously discussed. Because making so_txtime.c return that and
->>>> then making so_txtime.sh capture runs that pass that vs KSFT_FAIL
->>>> and pass it on added a bunch of (fragile bash) boilerplate, while the
->>>> result is interpreted the same as KSFT_PASS anyway.
->>>
->>> FWIW another idea that came up when talking to Matthieu -
->>> isolate the VMs which run time-sensitive tests to dedicated
->>> CPUs. Right now we kick off around 70 4 CPU VMs and let them 
->>> battle for 72 cores. The machines don't look overloaded but
->>> there can be some latency spikes (CPU use diagram attached).
->>>
->>> So the idea would be to have a handful of special VMs running 
->>> on dedicated CPUs without any CPU time competition. That could help 
->>> with latency spikes. But we'd probably need to annotate the tests
->>> which need some special treatment.
->>>
->>> Probably too much work both to annotate tests and set up env,
->>> but I thought I'd bring it up here in case you had an opinion.
->>
->> I'm not sure whether the issue with timing in VMs is CPU affinity.
->> Variance may just come from expensive hypercalls, even with a
->> dedicated CPU. Though tests can tell.
-> 
-> FTR, I think the CPU affinity setup is a bit too complex, and hard to
-> reproduce for 3rd parties willing to investigate eventual future CI
-> failures, I think the current env-variable-based approach would help
-> with reproducibility.
+--vuphuwffpatba3uh
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I agree with you. Initially, with 70 VMs with 4 CPU cores, I thought it
-would have taken more CPU resources, especially when KVM is not used.
+On Fri, Nov 03, 2023 at 09:42:51AM +0300, Dan Carpenter wrote:
+> The problem is in nft_byteorder_eval() where we are iterating through a
+> loop and writing to dst[0], dst[1], dst[2] and so on...  On each
+> iteration we are writing 8 bytes.  But dst[] is an array of u32 so each
+> element only has space for 4 bytes.  That means that every iteration
+> overwrites part of the previous element.
+>=20
+> I spotted this bug while reviewing commit caf3ef7468f7 ("netfilter:
+> nf_tables: prevent OOB access in nft_byteorder_eval") which is a related
+> issue.  I think that the reason we have not detected this bug in testing
+> is that most of time we only write one element.
+>=20
+> Fixes: ce1e7989d989 ("netfilter: nft_byteorder: provide 64bit le/be conve=
+rsion")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+>  include/net/netfilter/nf_tables.h | 4 ++--
+>  net/netfilter/nft_byteorder.c     | 5 +++--
+>  net/netfilter/nft_meta.c          | 2 +-
+>  3 files changed, 6 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf=
+_tables.h
+> index 3bbd13ab1ecf..b157c5cafd14 100644
+> --- a/include/net/netfilter/nf_tables.h
+> +++ b/include/net/netfilter/nf_tables.h
+> @@ -178,9 +178,9 @@ static inline __be32 nft_reg_load_be32(const u32 *sre=
+g)
+>  	return *(__force __be32 *)sreg;
+>  }
+> =20
+> -static inline void nft_reg_store64(u32 *dreg, u64 val)
+> +static inline void nft_reg_store64(u64 *dreg, u64 val)
+>  {
+> -	put_unaligned(val, (u64 *)dreg);
+> +	put_unaligned(val, dreg);
+>  }
+> =20
+>  static inline u64 nft_reg_load64(const u32 *sreg)
+> diff --git a/net/netfilter/nft_byteorder.c b/net/netfilter/nft_byteorder.c
+> index e596d1a842f7..f6e791a68101 100644
+> --- a/net/netfilter/nft_byteorder.c
+> +++ b/net/netfilter/nft_byteorder.c
+> @@ -38,13 +38,14 @@ void nft_byteorder_eval(const struct nft_expr *expr,
+> =20
+>  	switch (priv->size) {
+>  	case 8: {
+> +		u64 *dst64 =3D (void *)dst;
+>  		u64 src64;
+> =20
+>  		switch (priv->op) {
+>  		case NFT_BYTEORDER_NTOH:
+>  			for (i =3D 0; i < priv->len / 8; i++) {
+>  				src64 =3D nft_reg_load64(&src[i]);
+> -				nft_reg_store64(&dst[i],
+> +				nft_reg_store64(&dst64[i],
+>  						be64_to_cpu((__force __be64)src64));
+>  			}
+>  			break;
+> @@ -52,7 +53,7 @@ void nft_byteorder_eval(const struct nft_expr *expr,
+>  			for (i =3D 0; i < priv->len / 8; i++) {
+>  				src64 =3D (__force __u64)
+>  					cpu_to_be64(nft_reg_load64(&src[i]));
+> -				nft_reg_store64(&dst[i], src64);
+> +				nft_reg_store64(&dst64[i], src64);
+>  			}
+>  			break;
+>  		}
 
-Looking at the screenshot provided by Jakub, the host doesn't seem
-overloaded, and the VM isolation is probably enough. Maybe only the
-first test(s) can be impacted?
+I stumbled upon this when the issue got a CVE id (sigh) and I share
+Andrea's (Cc-ed) concern that the fix is incomplete. While the fix,
+commit c301f0981fdd ("netfilter: nf_tables: fix pointer math issue in
+nft_byteorder_eval()") now, fixes the destination side, src is still
+a pointer to u32, i.e. we are reading 64-bit values with relative
+offsets which are multiples of 32 bits.
 
-At the end, now that the runner without KVM is no longer there, the
-situation should be improved :)
+Shouldn't we fix this as well, e.g. like indicated below?
 
->> There's still the debug builds, as well.
+Michal
 
-For one MPTCP selftest checking the time to transfer some data, we
-increase the tolerance by looking at kallsyms:
+---------------------------------------------------------------------------=
+---
+diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_t=
+ables.h
+index 001226c34621..bb4b83ea2908 100644
+--- a/include/net/netfilter/nf_tables.h
++++ b/include/net/netfilter/nf_tables.h
+@@ -183,9 +183,9 @@ static inline void nft_reg_store64(u64 *dreg, u64 val)
+ 	put_unaligned(val, dreg);
+ }
+=20
+-static inline u64 nft_reg_load64(const u32 *sreg)
++static inline u64 nft_reg_load64(const u64 *sreg)
+ {
+-	return get_unaligned((u64 *)sreg);
++	return get_unaligned(sreg);
+ }
+=20
+ static inline void nft_data_copy(u32 *dst, const struct nft_data *src,
+diff --git a/net/netfilter/nft_byteorder.c b/net/netfilter/nft_byteorder.c
+index f6e791a68101..2a64c69ed507 100644
+--- a/net/netfilter/nft_byteorder.c
++++ b/net/netfilter/nft_byteorder.c
+@@ -39,21 +39,22 @@ void nft_byteorder_eval(const struct nft_expr *expr,
+ 	switch (priv->size) {
+ 	case 8: {
+ 		u64 *dst64 =3D (void *)dst;
+-		u64 src64;
++		u64 *src64 =3D (void *)src;
++		u64 val64;
+=20
+ 		switch (priv->op) {
+ 		case NFT_BYTEORDER_NTOH:
+ 			for (i =3D 0; i < priv->len / 8; i++) {
+-				src64 =3D nft_reg_load64(&src[i]);
++				val64 =3D nft_reg_load64(&src64[i]);
+ 				nft_reg_store64(&dst64[i],
+-						be64_to_cpu((__force __be64)src64));
++						be64_to_cpu((__force __be64)val64));
+ 			}
+ 			break;
+ 		case NFT_BYTEORDER_HTON:
+ 			for (i =3D 0; i < priv->len / 8; i++) {
+-				src64 =3D (__force __u64)
+-					cpu_to_be64(nft_reg_load64(&src[i]));
+-				nft_reg_store64(&dst64[i], src64);
++				val64 =3D (__force __u64)
++					cpu_to_be64(nft_reg_load64(&src64[i]));
++				nft_reg_store64(&dst64[i], val64);
+ 			}
+ 			break;
+ 		}
+---------------------------------------------------------------------------=
+---
 
-  grep -q ' kmemleak_init$\| lockdep_init$\| kasan_init$\|
-prove_locking$' /proc/kallsyms
+--vuphuwffpatba3uh
+Content-Type: application/pgp-signature; name="signature.asc"
 
-We can also look at KSFT_MACHINE_SLOW if it is the new standard.
+-----BEGIN PGP SIGNATURE-----
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmXCDVMACgkQ538sG/LR
+dpVLYwf/SKJnMxraCQMxRMfJwRCMRFwIdmxy7ROUbMnL2jE+tTYbGSuezhnRDq5v
+nws0SeWQtoztU+s9Uq15xeaBf25S0bAVcJluXL+8rz2cka4Rr/T9C+ZkyoqDg3va
+Nd4f5l6GGSP3HhnQpD5XBH/H1UUyj+I3o1sFsyo7FSTEBD4BvjkMy4qGExuTVNgy
+En42gfsDykiLAQJ+Sopw8uk1A4e6FWSg6mkP9qn+gN328MFTQya/VossxCE9w5fn
+L80MUqY54jsgiNGOtDMGxWOdxk44WYa4CYGmGuRslrAMS476Bu0+Ulsq+d15uGvh
+XTCUggn8Bi7DttIMf2jUoC7y8TsqKw==
+=YriJ
+-----END PGP SIGNATURE-----
+
+--vuphuwffpatba3uh--
 
