@@ -1,128 +1,137 @@
-Return-Path: <netdev+bounces-69472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8471084B65B
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:29:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D855584B686
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:36:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0E611C21124
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 13:29:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 160D11C24130
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 13:36:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0B11130E2B;
-	Tue,  6 Feb 2024 13:29:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9400131720;
+	Tue,  6 Feb 2024 13:36:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UUWbUDj/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="X0T7x79O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 016CD130AD4
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 13:29:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCF9A130E44;
+	Tue,  6 Feb 2024 13:36:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707226170; cv=none; b=qCGwMk628H10gr/jBEzfSuB/eHcy+KeC6nUIO1I7HXai94wgc40FewW7s8FV7q5IwhLj0HeQUdFxtmwSDnB75rwEYLHBk0+c8kuNtZtHBkBLgbw2F+uZgY84YHcvn6gn3xetRoQQ5DF0qUWrHKbkEQtTSWEVonoftAnIP4CICfY=
+	t=1707226574; cv=none; b=t6+VVYBy9F9bzs1GSOXpVWi4crznS+Kew5rb9R6009qZ0g2MoQtECM5o+jLtivR3dJImtL2mNegqLfsY2nhg4uhPTxP16vJhfKYAA+WI82SPHXwZXZg9sRolUJDAe5ssNNzYNcn075ZWVmtltKxpcsDag1uuQFmS1ftwCCGF/oQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707226170; c=relaxed/simple;
-	bh=nwvEGcgiwQhQF9OEUFrrtJKyA3WCqpHSpAv6LHGajGo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PV9KPHpb22pht9BoVU/m+38wWLWl0dDZGi7twFZpo9yvIQKi+vAF5DvWLlfB8rkYoyBrXuikrryYpuA1wC84h54Mp3bvVoWikprgAsqHlemo+SJfyQwgzYd7VTSUZkcXMDWkyCkp+znzN2tS/K/nesLQMyLCRzQHIfuvRD6sWY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UUWbUDj/; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-55ad2a47b7aso7167465a12.3
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 05:29:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707226167; x=1707830967; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T3K8mbqYkN2pkZybDOCl4vjMSCHUwiGmdLNrVAvodoY=;
-        b=UUWbUDj/1WBK9m7147jrOmpyScVl/GfHBUpcCqmJngAQYHF9JavRXxORGVzWv90tu+
-         gzkZB84wiKkUebjyhwWezLUrl1Z237FSrGZwQ+ZKnoJYS1DFn/BXOFnwg2d2YOKHJ4W3
-         4ukaFet1d+5RaWfn+Irg1himQbeaLWIrCfDTKMvgGaEA0awtbnBrbyGELw/f8biisBqI
-         I4jvw9fX88vkR1oZ3Du8FR2nzWiDg5Yrl20fWkYpyqUT1CmQEPm3SoGbX3gnBKPA7tq4
-         SF4iBLs03GofLXZENaRo82WsjTi/+eEgaRRthKTeTbPnVv6DgF/tyO3N/V3czz+veboW
-         /zyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707226167; x=1707830967;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T3K8mbqYkN2pkZybDOCl4vjMSCHUwiGmdLNrVAvodoY=;
-        b=xOGvq426oWocz8KhIoNlNr/XP9kzJlCWJJQ+iZv4DFQkaMbCiUD4B+wrMGIBP/1O7Y
-         ZwvDl7XrEFN3bIkFXfJw7M7gKhyOYGsxSNJCHf/gsMdCEYmlP6cZ0ptdM81ps3pr7xRy
-         qqJY9oqZMKCVgvGDoFrn4ndzJLyyj0NVXHojJAb4RbzPipkMnTyfR2Z7NfkLcrcKJ2eP
-         9Wq5u06vlGqy4W/1icJJ/vZM0Qs6fiPwNGCkaybijoECPA6fWXWvME+3ZIcarcJcyOHf
-         cnvnyNFlBG5HfgD3LtfyKlv7ZpAbeU5b/hWS3XyHQWtq2J1s0O80fXxsufqYi09+/q+W
-         1Ecw==
-X-Gm-Message-State: AOJu0YwxxlREJ3GF4AgKomliEGRGPWNBM+hwCbLRUV6dyR29/Znno3R2
-	TxyMxBhdGkIbheaVWnga6iVSqxK4Uzkvm5+FpceV6A+o0fna5JTR
-X-Google-Smtp-Source: AGHT+IGTLVlI+eqWQ1ZQHpgJ55q3BV6R5mXCQxRL1l7fryYx1ZyrC2J6wB/lmr+IJkT8F+ppYUfZzA==
-X-Received: by 2002:a17:907:7f17:b0:a37:7fb9:ea27 with SMTP id qf23-20020a1709077f1700b00a377fb9ea27mr2353193ejc.48.1707226166913;
-        Tue, 06 Feb 2024 05:29:26 -0800 (PST)
-X-Forwarded-Encrypted: i=0; AJvYcCXk8hbCICCWddyCzOnK4U/3MlJvCaV6Wpr8b1jGhhgqCOBdc8qhnubiPfFoS0MAPd/0dffFuFzHlR9IAyVo398lMI/r6ANV7fOIjpmQyicICoI6lbsqnHDAdu6wzUV4zswDsBD1Za/4BBdWU4s6nnP1ldHTrMw/gzlp+VIC9Fdj4AvAn6kWbRhr8lwv+QYH8qyDUdGhwHeKd1TjOEXRY0Yjaly+wKTINW1KyHG8D3XnSj6ztr1HvyDI3AdBhkt7kR3hcXuOtZsF7uriIqp3AYgU8TBlbMPMYjwQpGUj2F226OMakQwNyLODHhsFqCXKsDCYAhEm91M0VbxioWFRyH3UPGZrkcjov+nH85+ySQjCsFsULQBXJYjc2gK0Ph0VjuxbUrgAUG5NkLhcmV+O77qsehH4hWbk3ygPoU7POkNjuApBE1RRK+ManeeTi56VNVD0pnbMlg6XINvE4H2GEv5EUNjceNNiY6yJmPtPbB1PBZV9UFMYK0cGHqFLJMCk2D4LofN3JIjl2c5TgrzyVaNywp1/1aiK1+ZbpTBect2MRkezoWJOrzt0frBaBHAMnuXVJ2dUbXVPS0vuD4BOwS4hO77KB9rH69OjjO/2t8I0BgI39komLmZQ1EjULK9kow0dFApOOv6+27h6iT7EXGbdwKbRfWqvIDDSXFtnhIIdRgvQSzsf77IUz/BmUv/xrgjEtuDG
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id cb6-20020a170906a44600b00a35a11fd795sm1137050ejb.129.2024.02.06.05.29.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Feb 2024 05:29:26 -0800 (PST)
-Date: Tue, 6 Feb 2024 15:29:23 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Doug Berger <opendmb@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	bcm-kernel-feedback-list@broadcom.com,
-	Byungho An <bh74.an@samsung.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
+	s=arc-20240116; t=1707226574; c=relaxed/simple;
+	bh=4oU3LUHNrs8jLGbT1E6XO3a3ua+p8aFuNmYBj3lq8DQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=KK1bmKMrNEQBMQP+usuiq8ssOW3BxtTXu+D0GkKER9Il/DeQZzscr1A1epdhO7i8BLjd7B3AsS24Q9CrsYzB9xqNJEReaXG07FL0LL206VBETjYnMAlPrsgM3aa/dKJWHRY23eP+2i34xZZJtn20tlxmgrWvBJxNqZfrVd51AO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=X0T7x79O; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707226572; x=1738762572;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4oU3LUHNrs8jLGbT1E6XO3a3ua+p8aFuNmYBj3lq8DQ=;
+  b=X0T7x79O6kyRRxJbxXbTd+9sjqmKHBcQOWjnfoYj5voED8EOkhnOyKSQ
+   FgWACiKofBkQ9PJgA8ZoL9AScmEk1MWjmqayuu77eJ0MhrJTMMXRoi+T2
+   bnY7R86JU+nsbqojTYwoLqGYSb37wN7UZMWafgJ3Zh/sMpcn1bubFVBZT
+   V+n+emZ/FI7kBi8cBNOoZOw6MIMf6NsuLMSV9JWQ5ugxGwgPZa5+/fLmE
+   9Z0mJe71rqr5lT7yCEDMJbzC8Rwiy5l7ZotrGQZbj27sGveDfTNVvD7gM
+   FZcHKWGuYplA+0Icp4wbbaVOrNOq2jpRiKYxNf2Uj6ytRIh2oz8qEspQT
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10975"; a="630528"
+X-IronPort-AV: E=Sophos;i="6.05,247,1701158400"; 
+   d="scan'208";a="630528"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2024 05:36:11 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,247,1701158400"; 
+   d="scan'208";a="5788654"
+Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.60.196])
+  by orviesa004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2024 05:36:08 -0800
+From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
+To: linux-pm@vger.kernel.org
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>,
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+	Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	Justin Chen <justin.chen@broadcom.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	NXP Linux Team <linux-imx@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>, Wei Fang <wei.fang@nxp.com>
-Subject: Re: [PATCH net-next v2 6/6] net: dsa: b53: remove
- eee_enabled/eee_active in b53_get_mac_eee()
-Message-ID: <20240206132923.eypnqvqwe3cga5tp@skbuf>
-References: <Zb9/O81fVAZw4ANr@shell.armlinux.org.uk>
- <E1rWbNI-002cCz-4x@rmk-PC.armlinux.org.uk>
- <20240206112024.3jxtcru3dupeirnj@skbuf>
- <ZcIwQcn3qlk0UjS4@shell.armlinux.org.uk>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Florian Westphal <fw@strlen.de>,
+	netdev@vger.kernel.org
+Subject: [PATCH v2 0/3] thermal/netlink/intel_hfi: Enable HFI feature only when required
+Date: Tue,  6 Feb 2024 14:36:02 +0100
+Message-Id: <20240206133605.1518373-1-stanislaw.gruszka@linux.intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZcIwQcn3qlk0UjS4@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 06, 2024 at 01:12:33PM +0000, Russell King (Oracle) wrote:
-> > I know next to nothing about EEE and especially the implementation on
-> > Broadcom switches. But is the information brought by B53_EEE_LPI_INDICATE
-> > completely redundant? Is it actually in the system's best interest to
-> > ignore it?
-> 
-> That's a review comment that should have been made when the original
-> change to phylib was done, because it's already ignored in kernels
-> today since the commit changing phylib that I've referenced in this
-> series - since e->eee_enabled and e->eee_active will be overwritten by
-> phylib.
+The patchset introduces a new genetlink family bind/unbind callbacks
+and thermal/netlink notifications, which allow drivers to send netlink
+multicast events based on the presence of actual user-space consumers.
+This functionality optimizes resource usage by allowing disabling
+of features when not needed.
 
-That's fair, but commit d1420bb99515 ("net: phy: improve generic EEE
-ethtool functions") is dated November 2018, and my involvement with the
-kernel started in March 2019. So it would have been a bit difficult for
-me to make this observation back then.
+Then implement the notification mechanism in the intel_hif driver,
+it is utilized to disable the Hardware Feedback Interface (HFI)
+dynamically. By implementing a thermal genl notify callback, the driver
+can now enable or disable the HFI based on actual demand, particularly
+when user-space applications like intel-speed-select or Intel Low Power
+daemon utilize events related to performance and energy efficiency
+capabilities.
 
-> If we need B53_EEE_LPI_INDICATE to do something, then we need to have
-> a discussion about it, and decide how that fits in with the EEE
-> interface, and how to work around phylib's implementation.
+On machines where Intel HFI is present, but there are no user-space
+components installed, we can save tons of CPU cycles.
 
-Hopefully Florian or Doug can quickly clarify whether this is the case
-or not.
+Changes v1 -> v2:
+
+- Rewrite using netlink_bind/netlink_unbind callbacks.
+
+- Minor changelog tweaks.
+
+- Add missing check in intel hfi syscore resume (had it on my testing,
+but somehow missed in post).
+
+- Do not use netlink_has_listeners() any longer, use custom counter instead.
+To keep using netlink_has_listners() would be required to rearrange 
+netlink_setsockopt() and possibly netlink_bind() functions, to call 
+nlk->netlink_bind() after listeners are updated. So I decided to custom
+counter. This have potential issue as thermal netlink registers before
+intel_hif, so theoretically intel_hif can miss events. But since both
+are required to be kernel build-in (if CONFIG_INTEL_HFI_THERMAL is
+configured), they start before any user-space.
+
+v1: https://lore.kernel.org/linux-pm/Zb48Z408e18QgsAr@nanopsycho/#r
+
+Stanislaw Gruszka (3):
+  genetlink: Add per family bind/unbind callbacks
+  thermal: netlink: Add genetlink bind/unbind notifications
+  thermal: intel: hfi: Enable interface only when required
+
+ drivers/thermal/intel/intel_hfi.c | 96 +++++++++++++++++++++++++++----
+ drivers/thermal/thermal_netlink.c | 40 +++++++++++--
+ drivers/thermal/thermal_netlink.h | 25 ++++++++
+ include/net/genetlink.h           |  4 ++
+ net/netlink/genetlink.c           | 33 +++++++++++
+ 5 files changed, 183 insertions(+), 15 deletions(-)
+
+
+base-commit: bd0e3c391ff3c3c5c9b41227d6b7433fcf4d9c61
+-- 
+2.34.1
+
 
