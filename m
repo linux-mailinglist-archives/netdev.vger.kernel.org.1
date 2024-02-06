@@ -1,76 +1,97 @@
-Return-Path: <netdev+bounces-69504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62D4984B80B
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:36:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6541F84B81B
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:40:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F2B951F26CCA
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:36:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 97B111C210F0
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 14:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F23080026;
-	Tue,  6 Feb 2024 14:35:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7B5712F5A4;
+	Tue,  6 Feb 2024 14:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Df1b2z7N"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sbJyShs6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 460DC22F1C;
-	Tue,  6 Feb 2024 14:35:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD88638DFE;
+	Tue,  6 Feb 2024 14:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707230151; cv=none; b=sz2WBVN72MRsKn6yteRSGDIIGoQnC55ajJFDidGLs2M1VweDH8c7Zqy5TMoNHf/2WAVO34Vdg7j06UupRMpcuaz8A6g7OO0qvh2FxpY52niV9Lnv+7vUYhVlZhZNIfuhhiGC/jMvEK8G9V+7qnnMzps6RrePKHq29jzh+ucQ5Z0=
+	t=1707230426; cv=none; b=Xlrza9a/y1spctjk2iwqBKSjEx7XHVjfa5XhkXI5rstFM9zDobfXhzp/frCT+RMYg/pJm1Ek2TNmkd3cBlXRTS49tV0AFitCgJWqJr9UpLK5KOkKoWm/T0u3AupPe5HuCwCsQ5WLpjmzsvVQHyCl5cxov7TT30QQq/xZFKzrbiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707230151; c=relaxed/simple;
-	bh=0trDy6wcqwUr/47UQdt5PyNJOKfMwbQCB+kmGzzwG4g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yu2ykpZU7I9TRclWnUnowge31xBvC8hrS8Lq+3noRUpmGgsMmxULC3cdu9eKOy5yxgbXXiIbjeqMfMLXte/lR7RDa2GmoAQaIwrA7opoTVTbKH5nPQ8m9o8+wz9w0DAez57eEpKr5uNaKT0UGmtXmrzdaQs0IIvLxGnVO5frGzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Df1b2z7N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D11A3C433F1;
-	Tue,  6 Feb 2024 14:35:48 +0000 (UTC)
+	s=arc-20240116; t=1707230426; c=relaxed/simple;
+	bh=bHseTnLnWIH2LxdTdqbctGEv05OIuqUtFNnWZkhSZkQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=YpgkHnbNFX2vFn0sK4cR1TF3Ii1C3rTRqj/w8WAaHgpn5SQvEPpY2fJBXwrYMk+mfnjOmS7WIESwPLo47wYuHxt0thGGD+iUCGV9q+zbUKb8RKP2UieqyDKiaVoQ1yH54EsrZXsn/u3gsQpmBd51gOfhlsjq4FpXlsnRP6/OUvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sbJyShs6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 409F6C433C7;
+	Tue,  6 Feb 2024 14:40:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707230150;
-	bh=0trDy6wcqwUr/47UQdt5PyNJOKfMwbQCB+kmGzzwG4g=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Df1b2z7Nd44BXPbrnR9LM+6F9r8NXDadjpFefdBvw4tsMjC12zUTYcWDzC+co2w4c
-	 FB/3T/q+I5+r5IX3xC/jGmcOHm8hlYdq15SIJgzDDvzLmu9lAyB5/dHrt1jrLheCjd
-	 PsqO4w3EnyK3uic75Tv6UOw0VgOgu8V0CkKEcvnGkQGtAlgBi2jL8S6suXNi8YdUch
-	 9t40eFo9kX1I1O1EcJM1DM1WsZn3ZMxg2qauL5UZFEMsWC9+L2wqF0QLciSlfn2zTp
-	 7Iae3xnXXSPGkQiGlIg/DMjUfx/fAWty2lVEYyf0U+NYLcUpH8wjbwRpN1m31PD4US
-	 qp+4HG/YImQcQ==
-Date: Tue, 6 Feb 2024 14:34:16 +0000
-From: Simon Horman <horms@kernel.org>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: krzysztof.kozlowski@linaro.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] nfc: hci: Save a few bytes of memory when
- registering a 'nfc_llc' engine
-Message-ID: <20240206143416.GC1104779@kernel.org>
-References: <cover.1706946099.git.christophe.jaillet@wanadoo.fr>
- <01cafe43646575d843ce81221ef4e0cdef6df84b.1706946099.git.christophe.jaillet@wanadoo.fr>
+	s=k20201202; t=1707230426;
+	bh=bHseTnLnWIH2LxdTdqbctGEv05OIuqUtFNnWZkhSZkQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=sbJyShs63FJK/CNw6MczVlisezULuA0sQ7Z2AixQPuHxiVZcqSjqrCNaql/E+L3rl
+	 w7re0vYtEPLCDOfRimOUcXOIxusmI6mdi2HUJaAggW13tRnSGACMtxLmIJhTXgYhk1
+	 domk43sblHLqOJ9EiL8W/MIum+WzbOOIHyEz6bthZ8vaqNoMtXdGgvT+0gjYwYsAMI
+	 UJ5GkM5qawXWb5Wu7BFM3+M0/IctE8BxQU8XUd4VKVLUlK+sSdBtj959fs0fmVlSwr
+	 lrnaq+hlrENezkudgpJZewQRG9vh/WkEh9RfhhFPTpKdx41nmVP7qMNO3YXveRxNnU
+	 Vk8uK72Iw+BFg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 215F5E2F2ED;
+	Tue,  6 Feb 2024 14:40:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <01cafe43646575d843ce81221ef4e0cdef6df84b.1706946099.git.christophe.jaillet@wanadoo.fr>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 0/2] nfc: hci: Save a few bytes of memory when registering
+ a 'nfc_llc' engine
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170723042613.26701.2610648109297572739.git-patchwork-notify@kernel.org>
+Date: Tue, 06 Feb 2024 14:40:26 +0000
+References: <cover.1706946099.git.christophe.jaillet@wanadoo.fr>
+In-Reply-To: <cover.1706946099.git.christophe.jaillet@wanadoo.fr>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: krzysztof.kozlowski@linaro.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
 
-On Sat, Feb 03, 2024 at 08:51:04AM +0100, Christophe JAILLET wrote:
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Sat,  3 Feb 2024 08:51:02 +0100 you wrote:
 > nfc_llc_register() calls pass a string literal as the 'name' parameter.
 > 
 > So kstrdup_const() can be used instead of kfree() to avoid a memory
 > allocation in such cases.
 > 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> v2: Add a new helper function, nfc_llc_del_engine(), to reduce code
+>     duplication. This is needed to address Jakub Kicinski's comment
+>     about nfc_llc_exit() that was not updated in v1.
+> 
+> [...]
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Here is the summary with links:
+  - [v2,1/2] nfc: hci: Introduce nfc_llc_del_engine() to reduce code duplication
+    https://git.kernel.org/netdev/net-next/c/d6f4aac19ad4
+  - [v2,2/2] nfc: hci: Save a few bytes of memory when registering a 'nfc_llc' engine
+    https://git.kernel.org/netdev/net-next/c/83cdd8db7508
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
