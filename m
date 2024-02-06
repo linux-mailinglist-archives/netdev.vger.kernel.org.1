@@ -1,199 +1,178 @@
-Return-Path: <netdev+bounces-69386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C940184AFA8
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 09:10:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F34984AFAB
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 09:11:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EFBFAB249F3
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 08:10:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA916285853
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 08:11:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC5EB12A17C;
-	Tue,  6 Feb 2024 08:10:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DB4D12AAD3;
+	Tue,  6 Feb 2024 08:11:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="P7jybM2H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TSJvVd+G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE8C7129A72
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 08:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57BA5129A77;
+	Tue,  6 Feb 2024 08:11:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707207047; cv=none; b=rjW5uSm2PxTeYLZFkPtL8y2I/CIinB/cU2SNLrBB9q5HzCivpxnaIVRCj8VoGny/uvf/X4KP1zF8k6Rq4D+oS2GkgtEIToGTzlSR9gpsVcG1/aFYcNAy5lTYQIrnnxNy0f6AvefpzDD0Vm99PoCFCaDXTdFf75P2Q/qRzy+uz0k=
+	t=1707207095; cv=none; b=nCasxB7gYF4Uy1nkLNOtFyQM8GL+yt8ATEFAUgBDNFO1iPMehCHs84AHwOFsUgoKaVWbBbdvVe2BwMq7vbwivNGQZUUCIt1Cl9IX483KdRUYxsWEy0JsledzgClHuhoDo0YWqGnL7uFw7xv+W4Go63wO8c6BOS4sA+J+OfvoMtE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707207047; c=relaxed/simple;
-	bh=kkiHic7yxvb7R4MYc965X0Am8ChfCES8vFvGkRQ9Qlo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=thZmbKYF3gpV4pT1qMlNC22OnnOM/DIImYbVxpErl5FdK75dPTp1QTSlovUdlgO7IzzUxJ94kw4gSt4anLaxcBoqVIwZrIDoEhj26Ech55TfykfTbrjYWu0KJS3MfOW2vTUXtnGbXAiv+gFRqoei21afGoTEizsn1VCARIVVGI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=P7jybM2H; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-55790581457so7364376a12.3
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 00:10:45 -0800 (PST)
+	s=arc-20240116; t=1707207095; c=relaxed/simple;
+	bh=bzaP4tS/Ihj8LOtcdwRdIJBniTBCeSCXqbR0BrYvcI0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=gR8fhS5GxRSJaaPstOI5rie5P1dwjw6rSFSWtzWudV81ZqUhC46loa2HrBflCJ5ZtmgDo/2z574v/JirClPtNsdNP5a9T3CTrdUjn6A4WKbo0dhUxeVF5A/xTDxPTShCIg9Dlq0lyKTsNtxgEmrd1okEhPWwrbBAdoredmpwR78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TSJvVd+G; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5114fa38434so724997e87.0;
+        Tue, 06 Feb 2024 00:11:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1707207044; x=1707811844; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kf+RZjO7bQrq6YyrWc7yC9CFEd+xGo/HLd06tJjl504=;
-        b=P7jybM2H75KNURO59v6n0kLJStxLCcdDUEGreA6s8VgIOZPvEIWA9R+WOf+dqNEoJs
-         QCk7/J+jIZ/YHJmV7skEvJOFsvNhwdWD1jsdXv84Q/U9U+L/c2y22vafZXIEbKdN7hRS
-         +FC1lgB0brs/pF17ob4cPmWt9Y18qpeGtChFA=
+        d=gmail.com; s=20230601; t=1707207091; x=1707811891; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=4gcF4s0kU7RHAT/txtIoRwLQVX+W9y2wHrbaZEyuOrY=;
+        b=TSJvVd+GtkY9urhRWUuWW6Vk3DV5Q4UCy/Y5O2TfDQmOS2zjxE4fOHDb+VjcqFVKM8
+         ghyAQToo2RUvTjZmaftgqPv4VD04h8z4QU5T12hUZpkOz6BO6nZVmSpXYP3nfLgI90pH
+         AkVY0z6YqqHmvNh25NxAt62qoyLBrshYGgm2xfy9oIe5Je2uIQEJLKVdEH7JUG9X4cry
+         Un7StFNw0thoxVFibCjKqD2y6F1gT4mnmFKk9ImsPNjHV1j6pUtFBdVQKmv9R/6Btkb+
+         NqJZIZKfxWT/fUaF9KRo9O0knnecPW5kpQbOBZ9UduGMqpjMRtCwOA5v65Rj9uPbHa/h
+         Sbzw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707207044; x=1707811844;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Kf+RZjO7bQrq6YyrWc7yC9CFEd+xGo/HLd06tJjl504=;
-        b=YnNAU1zConINvHS+57BWNPTjWRQlMoZF4WDZzXf3y/ng8eHGWqEfXivrihfmqG/W1J
-         HD7BpPcsr+7dxUpn4Hb6AzN4F1WA197XtQ2/+t7dAocmOBr8zh4iiw5cEV7F1GnJ5uE3
-         pZ5vLhdE750FeiyvEkFVbBcdxaJG2Shof+HwgTL8KJdwT0jyeg5aPe5fVTV0GSyUpHrn
-         hKIAABCV5fCm2zsgsXNtBuhEMbLugUpt70+gMOAbQB8Ru+a9lGDPfsDrndaOimsLeWhP
-         n0wwAMlqcUR/hwgvQA8kvkwSXyhKFQB0YFS56aC2cu6zM3MuH+qn/4jEbpN0p1AzeZSP
-         5alA==
-X-Gm-Message-State: AOJu0Ywr/C+rcHuXC5aRvdKq9Qybso03RplSuOUgRTo6OiShCNh/LD1T
-	fXt9wXMILKjk5r0TvEQ2d9Y3si4gDlljcO0tsNf4upr7rhgROnWdPXFHWXhAkl4m+4i1yF5Cyep
-	72iwtyywaaJL4FY8zyGLCrkHR1psMoBMEA84Z
-X-Google-Smtp-Source: AGHT+IEWMbt8fz6nwcrWZ73kOPLQEVuEMS8/UwxCt6mRYT1hj16Sfi4L+HLDBGPb9b/XkOQbP9VPAqak/o0DrF77lA4=
-X-Received: by 2002:aa7:cfd4:0:b0:560:8f9:5a8a with SMTP id
- r20-20020aa7cfd4000000b0056008f95a8amr1032591edy.42.1707207043814; Tue, 06
- Feb 2024 00:10:43 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707207091; x=1707811891;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4gcF4s0kU7RHAT/txtIoRwLQVX+W9y2wHrbaZEyuOrY=;
+        b=NYJNgvuvVMkGDVAMCpmX24b7352R+rS0pPP5LRjTPCpAwuWezjkPascwURv+LrNInM
+         GNn6wL+7E/cBZzCTK4OHSzynF/MBEIIbNHIKu/XF2X9vND7Qt05u9EOOdhwTg6Bhbnid
+         I/izP0pvYA2DDvEFGv3hNz9XsLag7oqNVROsVn464ka0thXLqrNBA61/Nj5HOVJan/no
+         dBh8ppullA+nx2fMqP6ff53UVqQfDgSo4oNHXCcQ6apyQGBIzCzFB/fG0Vn3aLS9kz2/
+         1bbNqDPm+pac7+0YcH1JStj4j7A1fjDvfi7Fx/PUVoMUG/A3JjwKMf5OUZAt9b+Kt/dy
+         ySfw==
+X-Gm-Message-State: AOJu0Ywjx/pc1HSsP6/B+qtH4vwkFdcHTAS7ic8p/nlXgXeOvu0yE8lD
+	r09P6/QEe7Rs8avuiZxMh+JrVArpLIvDldz8mNUBXjBDSL5t17bn
+X-Google-Smtp-Source: AGHT+IFHw6eoEuoqTi2YiCwoM3MF79h0S/QvtI+RHeekpeDQDm2GrgBgmMZus27A/ylIr1LmGLHbBA==
+X-Received: by 2002:ac2:52a3:0:b0:511:3164:3f3e with SMTP id r3-20020ac252a3000000b0051131643f3emr1296691lfm.29.1707207091035;
+        Tue, 06 Feb 2024 00:11:31 -0800 (PST)
+X-Forwarded-Encrypted: i=0; AJvYcCUVGAMplA8ghrbV48Vq6tuyeriAdjNTE6ipxuwt4ZAmzfj9j91M09euhIn8Nl5tJdJfvyOjGnF1o3oZbz/GACmdP7FzWWCci941xhSIDPxkXy0J0ezfL/1ibR9vOPoBPJme+uLl8olNwB3IGvmPKz16+bspVi+qYxi0IwQOx6DT+hfpoB6Cd+dzFXOQ8tfSkmVGSwaGIGCgM43AVQ0KF6aYYoPq8+hz9eMIIwanzvl14bh1aDnitNdAbj6Hrn/dMCpZG+vRH8kD/QH90rrgNQ4TG2Vcua5TEoBdYutO0rl6lsOWj1TvWCi/VaiEKhOHQ5Oaov/sdKetx5TQr/mjs0RneTFBe6N455b4G+Y2CfWE1EN26QSy4G6gZEM=
+Received: from [172.27.55.67] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id bi18-20020a05600c3d9200b0040ebf340759sm1151605wmb.21.2024.02.06.00.11.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Feb 2024 00:11:30 -0800 (PST)
+Message-ID: <7e338c2a-6091-4093-8ca2-bb3b2af3e79d@gmail.com>
+Date: Tue, 6 Feb 2024 10:11:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240205223202.25341-1-michael.chan@broadcom.com>
- <20240205223202.25341-3-michael.chan@broadcom.com> <ZcHZ6JgacSpGmyDQ@mev-dev>
-In-Reply-To: <ZcHZ6JgacSpGmyDQ@mev-dev>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Tue, 6 Feb 2024 00:10:32 -0800
-Message-ID: <CACKFLi=cwJzA+igWnKNsGdVqY9OvBPao4aheKF_j7PWc1xF3vw@mail.gmail.com>
-Subject: Re: [PATCH net-next 02/13] bnxt_en: Add ethtool -N support for ether filters.
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, andrew.gospodarek@broadcom.com, 
-	pavan.chebbi@broadcom.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000006df6b40610b21d7d"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] eth: mlx5: link NAPI instances to queues and
+ IRQs
+Content-Language: en-US
+To: Joe Damato <jdamato@fastly.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Gal Pressman <gal@nvidia.com>
+Cc: tariqt@nvidia.com, rrameshbabu@nvidia.com,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>
+References: <20240206010311.149103-1-jdamato@fastly.com>
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20240206010311.149103-1-jdamato@fastly.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---0000000000006df6b40610b21d7d
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 5, 2024 at 11:04=E2=80=AFPM Michal Swiatkowski
-<michal.swiatkowski@linux.intel.com> wrote:
->
-> On Mon, Feb 05, 2024 at 02:31:51PM -0800, Michael Chan wrote:
-> > +     spin_lock_bh(&bp->ntp_fltr_lock);
-> > +     fltr =3D __bnxt_lookup_l2_filter(bp, key, idx);
-> > +     if (fltr) {
-> > +             fltr =3D ERR_PTR(-EEXIST);
-> > +             goto l2_filter_exit;
-> > +     }
-> > +     fltr =3D kzalloc(sizeof(*fltr), GFP_ATOMIC);
-> > +     if (!fltr) {
-> > +             fltr =3D ERR_PTR(-ENOMEM);
-> > +             goto l2_filter_exit;
-> > +     }
-> > +     fltr->base.flags =3D flags;
-> > +     rc =3D bnxt_init_l2_filter(bp, fltr, key, idx);
-> > +     if (rc) {
-> > +             spin_unlock_bh(&bp->ntp_fltr_lock);
-> Why filter needs to be deleted without lock? If you can change the order
-> it looks more natural:
->
-> +if (rc) {
-> +       fltr =3D ERR_PTR(rc);
-> +       goto l2_filter_del;
-> +}
 
-Thanks for the review.  bnxt_del_l2_filter() will take the same lock
-inside the function if it goes ahead to delete the filter.  That's why
-the lock needs to be released first.
+On 06/02/2024 3:03, Joe Damato wrote:
+> Make mlx5 compatible with the newly added netlink queue GET APIs.
+> 
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
 
---0000000000006df6b40610b21d7d
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
++ Gal
 
-MIIQbQYJKoZIhvcNAQcCoIIQXjCCEFoCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-gg3EMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
-VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
-AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
-AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
-MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
-vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
-rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
-aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
-e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
-cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
-MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
-KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
-/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
-TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
-YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
-b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
-c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
-CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
-BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
-jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
-9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
-/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
-jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
-AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
-dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
-MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
-IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
-SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
-XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
-J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
-nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBUwwggQ0oAMCAQICDF5AaMOe0cZvaJpCQjANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODIxMzhaFw0yNTA5MTAwODIxMzhaMIGO
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xFTATBgNVBAMTDE1pY2hhZWwgQ2hhbjEoMCYGCSqGSIb3DQEJ
-ARYZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
-ggEBALhEmG7egFWvPKcrDxuNhNcn2oHauIHc8AzGhPyJxU4S6ZUjHM/psoNo5XxlMSRpYE7g7vLx
-J4NBefU36XTEWVzbEkAuOSuJTuJkm98JE3+wjeO+aQTbNF3mG2iAe0AZbAWyqFxZulWitE8U2tIC
-9mttDjSN/wbltcwuti7P57RuR+WyZstDlPJqUMm1rJTbgDqkF2pnvufc4US2iexnfjGopunLvioc
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIFq4SbhlQI9l+Yk63CYgeRDBcmxFlZ/k
-r45dFK4c6AfdMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIw
-NjA4MTA0NFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCpBHnOU9WiDIRKeyNDkooj0tzKRWQIpLnK2vcW8H8zRN+R8/+K
-kFZ0RS4uw1y2mH324cYNM1mxI2WMFlD8sfr+iL7QEvvQTfOIq2DRydSRmLk697dCKq3uGJPhoKU/
-emZQhAqOfPrBUUJEq+lrzZI1u17yp0nkg8Fxo29ZuMfAjArB0mCW+JNdzMUTbb9sem4PlAKINelC
-AqogOvshq1d0vXEm2PXHE7Jauq8yiAP/AWi7VCBkZdW3WgfsbE8Wgww3FcFmbZSBVy7Ytpj2ngfy
-kpxyBEzK4sn4uSCE9eupDAKxdvIOmb8KcsZqYbwEM1BUHN1rF6uxHJpTe7k6Rd8n
---0000000000006df6b40610b21d7d--
+Hi Joe,
+Thanks for your patch.
+
+We have already prepared a similar patch, and it's part of our internal 
+submission queue, and planned to be submitted soon.
+
+Please see my comments below, let us know if you're welling to respin a 
+V2 or wait for our patch.
+
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/en.h      | 1 +
+>   drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 8 ++++++++
+>   2 files changed, 9 insertions(+)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+> index 55c6ace0acd5..3f86ee1831a8 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+> @@ -768,6 +768,7 @@ struct mlx5e_channel {
+>   	u16                        qos_sqs_size;
+>   	u8                         num_tc;
+>   	u8                         lag_port;
+> +	unsigned int		   irq;
+>   
+>   	/* XDP_REDIRECT */
+>   	struct mlx5e_xdpsq         xdpsq;
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> index c8e8f512803e..e1bfff1fb328 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> @@ -2473,6 +2473,9 @@ static void mlx5e_close_queues(struct mlx5e_channel *c)
+>   	mlx5e_close_tx_cqs(c);
+>   	mlx5e_close_cq(&c->icosq.cq);
+>   	mlx5e_close_cq(&c->async_icosq.cq);
+> +
+> +	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_TX, NULL);
+> +	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_RX, NULL);
+>   }
+>   
+>   static u8 mlx5e_enumerate_lag_port(struct mlx5_core_dev *mdev, int ix)
+> @@ -2558,6 +2561,7 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
+>   	c->stats    = &priv->channel_stats[ix]->ch;
+>   	c->aff_mask = irq_get_effective_affinity_mask(irq);
+>   	c->lag_port = mlx5e_enumerate_lag_port(priv->mdev, ix);
+> +	c->irq		= irq;
+>   
+>   	netif_napi_add(netdev, &c->napi, mlx5e_napi_poll);
+>   
+> @@ -2602,6 +2606,10 @@ static void mlx5e_activate_channel(struct mlx5e_channel *c)
+>   		mlx5e_activate_xsk(c);
+>   	else
+>   		mlx5e_activate_rq(&c->rq);
+> +
+> +	netif_napi_set_irq(&c->napi, c->irq);
+
+Can be safely moved to mlx5e_open_channel without interfering with other 
+existing mapping. This would save the new irq field in mlx5e_channel.
+
+> +	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_TX, &c->napi);
+
+In some configurations we have multiple txqs per channel, so the txq 
+indices are not 1-to-1 with their channel index.
+
+This should be called per each txq, with the proper txq index.
+
+It should be done also for feture-dedicated SQs (like QOS/HTB).
+
+> +	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_RX, &c->napi);
+
+For consistency, I'd move this one as well, to match the TX handling.
+
+>   }
+>   
+>   static void mlx5e_deactivate_channel(struct mlx5e_channel *c)
 
