@@ -1,159 +1,175 @@
-Return-Path: <netdev+bounces-69377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CEC784AEA4
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 08:10:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE90384AED3
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 08:19:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E8701F24BBB
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 07:10:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78DCDB2293D
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 07:18:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35242128803;
-	Tue,  6 Feb 2024 07:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40C212882B;
+	Tue,  6 Feb 2024 07:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KIewqL/m"
 X-Original-To: netdev@vger.kernel.org
-Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.62.65])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5085E128807
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 07:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.62.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB64128828
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 07:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707203423; cv=none; b=Km9HyVJbj1NAEC2QKLnd/LdMCzEuLSdGN2XKToBeYgZ4dA0PbCPUKI8OIll/PaIkMwM2wstr7jX1fbTaubDW7n/msQAJHHcghC39RWye5qc4iiKizwFiqquGVjLADAQ3iQuTqbw68LPsnONgmBmRqrj6ZmsPWBQWulUlsmnlHUo=
+	t=1707203754; cv=none; b=nERLOxU4i3sIIko6MQSOBO9X9ooTSmL9t9fa+2sAQWJUNxh9P3B76vdTEqVjxUuXgWnXBzyTMX6+XL+gSA4N/X5yR7uJ/C3bdYAksVgh1kr9yrghEPgS2MP9hD3xnoyyF1hhvALB640g2IpaYg9Tj6KubVuufeTjRq2dqGzmSt4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707203423; c=relaxed/simple;
-	bh=C5jFswG8b+UaOfeVTV0E+tt5g4B7a0VklDTKRlszfUo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GJCn9BpWVlXJrj4w+v4EllZ/iHHpRMYKg4lzOBNQSIg9+KB5VyLa4eGGk6eAA4wOj1TUNUzydkw1Rn8861GW9pCScfaybiCOsDrqidcupoC3LK2QfTg2YccRualvYkQ3MZ/KthEHH7yY7BplNvxgCiso4BMRZDJnfQMok+j/oxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=114.132.62.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
-X-QQ-mid: bizesmtp89t1707203310t9i3y7dd
-X-QQ-Originating-IP: 6vtsevcW0pvtAfV8b6EI0HrqD4fqb/ytB8EW27VqNe0=
-Received: from lap-jiawenwu.trustnetic.com ( [115.192.112.184])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 06 Feb 2024 15:08:27 +0800 (CST)
-X-QQ-SSF: 01400000000000L0Z000000A0000000
-X-QQ-FEAT: qOAV9bwDT/kuu38F2q/Tg5bW+GeZGkbpnr+OG234UYH4pxW8zH+nBuiBW8vr+
-	evYIkCvWi88GzmuoBq4cjjFr30AgB3LmU1EFqMiyroL4ko6R19kRHqvJDD4Jm0Oz5EK0cVN
-	HxZrwqTmfOk3jkvyvodqkeSj3LcjstUGAh1R4tardC2ahbm+B06eCvzvGC0dac66i0X7Lol
-	cu0dMounxzewhAsj/e7fZVahWC/N3tv3jyW6EszpymYtOZUQSyKrbFt4jWrEbrzvMiA1tgl
-	syoSqH6NkTUxs7DDdEVthgbRJLVWHta/oQkc9MNedTKVaIr70m8GtLMWuBsm4IoTplpyPi3
-	ngqnZSuRUP7+BrmeiEDI3oM5BKTJHfn4nRhm6Z6t3wfU94QZffk+uNTSdKY/Q==
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 4159978867216461553
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	maciej.fijalkowski@intel.com,
-	andrew@lunn.ch,
-	netdev@vger.kernel.org
-Cc: mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH] net: txgbe: fix GPIO interrupt blocking
-Date: Tue,  6 Feb 2024 15:08:24 +0800
-Message-Id: <20240206070824.17460-1-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.21.0.windows.1
+	s=arc-20240116; t=1707203754; c=relaxed/simple;
+	bh=flafyVSmnkvva9LgjVB1CVjfJS6L2DTlLXRzeFgj2MY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tny+/Z+hYRIPyqLlOkF9Yg8SCn6O5X27weeg5iBqOGwX9asQGX0BU57863VFHVbaWr/owCZgQHny+c/UBrlLaBSeqNVKE7x2pUISjoL+6YKH8WXix/H2tXgqJa6VRbXvZ0GJwgeQ46JQQTEZ3pgdejV9FRnJvsR/SmXIlmmhOzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KIewqL/m; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707203754; x=1738739754;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=flafyVSmnkvva9LgjVB1CVjfJS6L2DTlLXRzeFgj2MY=;
+  b=KIewqL/mxeTBpgIvDyrbV1DvzxCr76pd+tCJGcBQmJh6lcQExpqybBwO
+   oUlrpUnkguxG5xRogPVC+HOTBjL8mUi8YB/1dLF+AQt4R3m7HJ7IIMnqY
+   5Y5xlrDFXcLDYHNTPwA5AOmjRnDsikGMzX/aXggBwvxOxUnUeLr9nFtiY
+   PoGeBF8JlvjtJFsi/XnZ/uQi0DxvC7dA3uik/8BYqHsi1kAuf1M6fwvtb
+   Y2SK5g/tvEgHbW+R3ZnXTSxsr1KX5w5lDsmwF5rRoNkq/mKWDvaNqceMD
+   2zcXVOPMdNHK0qZnt4TnVenNxX8+8XwNXVRr9ssRGceow3GhKV49dckrJ
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10975"; a="4566186"
+X-IronPort-AV: E=Sophos;i="6.05,246,1701158400"; 
+   d="scan'208";a="4566186"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 23:15:53 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10975"; a="933372747"
+X-IronPort-AV: E=Sophos;i="6.05,246,1701158400"; 
+   d="scan'208";a="933372747"
+Received: from unknown (HELO mev-dev) ([10.237.112.144])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 23:15:50 -0800
+Date: Tue, 6 Feb 2024 08:15:42 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew.gospodarek@broadcom.com,
+	pavan.chebbi@broadcom.com
+Subject: Re: [PATCH net-next 03/13] bnxt_en: Support ethtool -n to display
+ ether filters.
+Message-ID: <ZcHcnmsi6OPfJ+mI@mev-dev>
+References: <20240205223202.25341-1-michael.chan@broadcom.com>
+ <20240205223202.25341-4-michael.chan@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240205223202.25341-4-michael.chan@broadcom.com>
 
-GPIO interrupt is generated before MAC IRQ is enabled, it causes
-subsequent GPIO interrupts that can no longer be reported if it is
-not cleared in time. So clear GPIO interrupt status at the right
-time. And executing function txgbe_gpio_irq_ack() manually since
-handle_nested_irq() does not call .irq_ack for irq_chip.
+On Mon, Feb 05, 2024 at 02:31:52PM -0800, Michael Chan wrote:
+> Implement ETHTOOL_GRXCLSRULE for the user defined ether filters.  Use
+> the common functions to walk the L2 filter hash table.
+> 
+> Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
+> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  1 +
+>  .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 38 ++++++++++++++++++-
+>  2 files changed, 38 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index 3cc3504181c7..da298f4512b5 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -5484,6 +5484,7 @@ static int bnxt_init_l2_filter(struct bnxt *bp, struct bnxt_l2_filter *fltr,
+>  		if (bit_id < 0)
+>  			return -ENOMEM;
+>  		fltr->base.sw_id = (u16)bit_id;
+> +		bp->ntp_fltr_count++;
+>  	}
+>  	head = &bp->l2_fltr_hash_tbl[idx];
+>  	hlist_add_head_rcu(&fltr->base.hash, head);
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> index 2d8e847e8fdd..4d4dd2b231b8 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+> @@ -1058,11 +1058,17 @@ static struct bnxt_filter_base *bnxt_get_one_fltr_rcu(struct bnxt *bp,
+>  static int bnxt_grxclsrlall(struct bnxt *bp, struct ethtool_rxnfc *cmd,
+>  			    u32 *rule_locs)
+>  {
+> +	u32 count;
+> +
+>  	cmd->data = bp->ntp_fltr_count;
+>  	rcu_read_lock();
+> +	count = bnxt_get_all_fltr_ids_rcu(bp, bp->l2_fltr_hash_tbl,
+> +					  BNXT_L2_FLTR_HASH_SIZE, rule_locs, 0,
+> +					  cmd->rule_cnt);
+>  	cmd->rule_cnt = bnxt_get_all_fltr_ids_rcu(bp, bp->ntp_fltr_hash_tbl,
+>  						  BNXT_NTP_FLTR_HASH_SIZE,
+> -						  rule_locs, 0, cmd->rule_cnt);
+> +						  rule_locs, count,
+> +						  cmd->rule_cnt);
+>  	rcu_read_unlock();
+>  
+>  	return 0;
+> @@ -1081,6 +1087,36 @@ static int bnxt_grxclsrule(struct bnxt *bp, struct ethtool_rxnfc *cmd)
+>  		return rc;
+>  
+>  	rcu_read_lock();
+> +	fltr_base = bnxt_get_one_fltr_rcu(bp, bp->l2_fltr_hash_tbl,
+> +					  BNXT_L2_FLTR_HASH_SIZE,
+> +					  fs->location);
+> +	if (fltr_base) {
+> +		struct ethhdr *h_ether = &fs->h_u.ether_spec;
+> +		struct ethhdr *m_ether = &fs->m_u.ether_spec;
+> +		struct bnxt_l2_filter *l2_fltr;
+> +		struct bnxt_l2_key *l2_key;
+> +
+> +		l2_fltr = container_of(fltr_base, struct bnxt_l2_filter, base);
+> +		l2_key = &l2_fltr->l2_key;
+> +		fs->flow_type = ETHER_FLOW;
+> +		ether_addr_copy(h_ether->h_dest, l2_key->dst_mac_addr);
+> +		eth_broadcast_addr(m_ether->h_dest);
+> +		if (l2_key->vlan) {
+> +			struct ethtool_flow_ext *m_ext = &fs->m_ext;
+> +			struct ethtool_flow_ext *h_ext = &fs->h_ext;
+> +
+> +			fs->flow_type |= FLOW_EXT;
+> +			m_ext->vlan_tci = htons(0xfff);
+> +			h_ext->vlan_tci = htons(l2_key->vlan);
+> +		}
+> +		if (fltr_base->flags & BNXT_ACT_RING_DST)
+> +			fs->ring_cookie = fltr_base->rxq;
+> +		if (fltr_base->flags & BNXT_ACT_FUNC_DST)
+> +			fs->ring_cookie = (u64)(fltr_base->vf_idx + 1) <<
+> +					  ETHTOOL_RX_FLOW_SPEC_RING_VF_OFF;
+Wonder if saving ring_cookie in fltr_base won't be cleaner, but I am not
+sure if it is worth to introduce new field for only that.
 
-Fixes: aefd013624a1 ("net: txgbe: use irq_domain for interrupt controller")
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- .../net/ethernet/wangxun/txgbe/txgbe_main.c   |  1 +
- .../net/ethernet/wangxun/txgbe/txgbe_phy.c    | 29 +++++++++++++++++++
- .../net/ethernet/wangxun/txgbe/txgbe_phy.h    |  1 +
- 3 files changed, 31 insertions(+)
+> +		rcu_read_unlock();
+> +		return 0;
+> +	}
+>  	fltr_base = bnxt_get_one_fltr_rcu(bp, bp->ntp_fltr_hash_tbl,
+>  					  BNXT_NTP_FLTR_HASH_SIZE,
+>  					  fs->location);
 
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-index e67a21294158..bd4624d14ca0 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
-@@ -81,6 +81,7 @@ static void txgbe_up_complete(struct wx *wx)
- {
- 	struct net_device *netdev = wx->netdev;
- 
-+	txgbe_reinit_gpio_intr(wx);
- 	wx_control_hw(wx, true);
- 	wx_configure_vectors(wx);
- 
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-index bae0a8ee7014..93295916b1d2 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-@@ -475,8 +475,10 @@ irqreturn_t txgbe_gpio_irq_handler(int irq, void *data)
- 	gc = txgbe->gpio;
- 	for_each_set_bit(hwirq, &gpioirq, gc->ngpio) {
- 		int gpio = irq_find_mapping(gc->irq.domain, hwirq);
-+		struct irq_data *d = irq_get_irq_data(gpio);
- 		u32 irq_type = irq_get_trigger_type(gpio);
- 
-+		txgbe_gpio_irq_ack(d);
- 		handle_nested_irq(gpio);
- 
- 		if ((irq_type & IRQ_TYPE_SENSE_MASK) == IRQ_TYPE_EDGE_BOTH) {
-@@ -489,6 +491,33 @@ irqreturn_t txgbe_gpio_irq_handler(int irq, void *data)
- 	return IRQ_HANDLED;
- }
- 
-+void txgbe_reinit_gpio_intr(struct wx *wx)
-+{
-+	struct txgbe *txgbe = wx->priv;
-+	irq_hw_number_t hwirq;
-+	unsigned long gpioirq;
-+	struct gpio_chip *gc;
-+	unsigned long flags;
-+
-+	/* for gpio interrupt pending before irq enable */
-+	gpioirq = rd32(wx, WX_GPIO_INTSTATUS);
-+
-+	gc = txgbe->gpio;
-+	for_each_set_bit(hwirq, &gpioirq, gc->ngpio) {
-+		int gpio = irq_find_mapping(gc->irq.domain, hwirq);
-+		struct irq_data *d = irq_get_irq_data(gpio);
-+		u32 irq_type = irq_get_trigger_type(gpio);
-+
-+		txgbe_gpio_irq_ack(d);
-+
-+		if ((irq_type & IRQ_TYPE_SENSE_MASK) == IRQ_TYPE_EDGE_BOTH) {
-+			raw_spin_lock_irqsave(&wx->gpio_lock, flags);
-+			txgbe_toggle_trigger(gc, hwirq);
-+			raw_spin_unlock_irqrestore(&wx->gpio_lock, flags);
-+		}
-+	}
-+}
-+
- static int txgbe_gpio_init(struct txgbe *txgbe)
- {
- 	struct gpio_irq_chip *girq;
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
-index 9855d44076cb..8a026d804fe2 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
-@@ -5,6 +5,7 @@
- #define _TXGBE_PHY_H_
- 
- irqreturn_t txgbe_gpio_irq_handler(int irq, void *data);
-+void txgbe_reinit_gpio_intr(struct wx *wx);
- irqreturn_t txgbe_link_irq_handler(int irq, void *data);
- int txgbe_init_phy(struct txgbe *txgbe);
- void txgbe_remove_phy(struct txgbe *txgbe);
--- 
-2.27.0
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+
+Thanks,
+Michal
+> -- 
+> 2.30.1
+> 
+
 
 
