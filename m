@@ -1,108 +1,112 @@
-Return-Path: <netdev+bounces-69531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CA0E84B963
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:26:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B3FC84B965
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:26:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3ADC428F702
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:26:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B5F4B1F277E8
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:26:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0F5F135A5D;
-	Tue,  6 Feb 2024 15:21:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42BC2137C26;
+	Tue,  6 Feb 2024 15:21:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="dn05NAVj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CEad+EnP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-65-226.siemens.flowmailer.net (mta-65-226.siemens.flowmailer.net [185.136.65.226])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3623E134744
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 15:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194B9135A6A;
+	Tue,  6 Feb 2024 15:21:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707232869; cv=none; b=lXJd0yVBos1qCsxHOHy4dvPSLsM71xI3Q6LbKkQ2c5Iih2EZOn+YXBxZFaAih2sK+fbpAHQnZcvjdpDA+mGuyMZFV8PqqcgSaaz7JgK+B7IMal0u+T63cfvTvY7Qjj/b8BwLe7PkjAUmeKcHMhvempDCdeGHTPurtSmaZY6eoBE=
+	t=1707232877; cv=none; b=FEv5ZF8X+nBrAhJ7u55yoLM4hzDRoexHEJ3bSOoWhaBs0hLw4ehWpYGOqxkgdqx5BThJLJsojxttaPpYFo+7aXhTAP4nJ7riEgu4iz7cqc1zX+iMp4/hhMebMeVrGltGoqJpMqqj3J3ikPGeYD5AENHQCpsuXZ2WZIrtv6LWW2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707232869; c=relaxed/simple;
-	bh=Uo+hzVvYiTSM3TfC3L5ycdXoYui57fZKBJq1cLhea5o=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LD72TGAMJOvSXJ1e5XOps0QWmpE4GYV1iz1Kexf/hDMVmFDWwnmQrFiHcWEyyuuyTxX+xua6vYTTzoQztoJcv3fNZItzungrX2jmLc+0TnFpOrRFsnkxXeVrRWbPt2ScIg0AFMMjZNvCwHYAW2a4AIg+2V2d+m7eJhkR7R4MrpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=dn05NAVj; arc=none smtp.client-ip=185.136.65.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-65-226.siemens.flowmailer.net with ESMTPSA id 202402061520553e5259e6484a7aa781
-        for <netdev@vger.kernel.org>;
-        Tue, 06 Feb 2024 16:20:56 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
- d=siemens.com; i=diogo.ivo@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
- bh=aO9HXYqOshN4TxCHyIoXrsxFdzEISczVko5LuJ38+O4=;
- b=dn05NAVjXK31qK8Z6fAuMvdEI8pz/ekx1yY5Yrf4V8yEvZ5bWmt9TPmCtJWbAh9RMjd1Si
- U0zkonrvbnsLE6br30E2AgnaMauqxFkNzIouAJBOtYCARZcOkZEdLQsH1XtCtJ4Y1OuM8iX6
- s15SHCz31r29Enh68Gf9NcLzVf2Jk=;
-From: Diogo Ivo <diogo.ivo@siemens.com>
-To: danishanwar@ti.com,
-	rogerq@kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew@lunn.ch,
-	vigneshr@ti.com,
-	jan.kiszka@siemens.com,
-	dan.carpenter@linaro.org,
-	robh@kernel.org,
-	grygorii.strashko@ti.com,
-	horms@kernel.org
-Cc: Diogo Ivo <diogo.ivo@siemens.com>,
-	linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net] net: ti: icssg-prueth: Remove duplicate cleanup calls in emac_ndo_stop()
-Date: Tue,  6 Feb 2024 15:20:51 +0000
-Message-ID: <20240206152052.98217-1-diogo.ivo@siemens.com>
+	s=arc-20240116; t=1707232877; c=relaxed/simple;
+	bh=LyjQlt4G4x0nfdud4poStAqX33ymR17t5R2+B2AlI2g=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=lgDjvlO9nFDfnOGAmVXI8ajVF3zDwk3pwxNz8H2bf5Ic8kgDlDZe5oRQ1TKni0GHYwKkSYbEqF3rFpf/zT5OzKbk1TfHJGNc1uBl960evrUWClAdKxHPzgH+3n3NIW/veghW0lyZ5/PDO+dKN0SDKNUriwhvqAQFRzrKFDkWrrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CEad+EnP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 93BF1C43390;
+	Tue,  6 Feb 2024 15:21:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707232876;
+	bh=LyjQlt4G4x0nfdud4poStAqX33ymR17t5R2+B2AlI2g=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=CEad+EnPMUSBFizg/2pJsnkWPFwZP5QKGaQS7aD32TgLB2E8+yMr6sp0plnyZu3S1
+	 QjlpUwXEt9SJGFNTASyqOKO0CWh+CQ61pEBVy4gY7SimuA0P/TP5/k5/oAyDN3d1jN
+	 ShHLe0I7UtGcdYMPHVsbelbBV+mcEIKO5KPO433+98pSwAVMw0YBcU1NkLrn41z/Tc
+	 rccytoFbjcT0KP+TGOwQaeha9IKR3PHjCw49qnCC98ZsYcPDPucak61ROR2CspRV7S
+	 AqYFECKD8RQ1r3iWDZf6mV53A0Hg1xRdeypKXlsH9d6Zw+MEEEMTPXeTEHRAk7uwhJ
+	 UaeoVypy3SEAw==
+Date: Tue, 6 Feb 2024 07:21:14 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Haseeb Gani
+ <hgani@marvell.com>, Vimlesh Kumar <vimleshk@marvell.com>, Sathesh B Edara
+ <sedara@marvell.com>, "egallen@redhat.com" <egallen@redhat.com>,
+ "mschmidt@redhat.com" <mschmidt@redhat.com>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "horms@kernel.org" <horms@kernel.org>,
+ "wizhao@redhat.com" <wizhao@redhat.com>, "kheib@redhat.com"
+ <kheib@redhat.com>, "konguyen@redhat.com" <konguyen@redhat.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jonathan
+ Corbet <corbet@lwn.net>, Veerasenareddy Burru <vburru@marvell.com>,
+ Satananda Burla <sburla@marvell.com>, Shannon Nelson
+ <shannon.nelson@amd.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, Joshua
+ Hay <joshua.a.hay@intel.com>, Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Brett Creeley <brett.creeley@amd.com>, Andrew Lunn <andrew@lunn.ch>, Jacob
+ Keller <jacob.e.keller@intel.com>
+Subject: Re: [EXT] Re: [PATCH net-next v5 1/8] octeon_ep_vf: Add driver
+ framework and device initialization
+Message-ID: <20240206072114.244738a9@kernel.org>
+In-Reply-To: <PH0PR18MB473460118D0FC68BE4B3BC45C7462@PH0PR18MB4734.namprd18.prod.outlook.com>
+References: <20240129050254.3047778-1-srasheed@marvell.com>
+	<20240129050254.3047778-2-srasheed@marvell.com>
+	<20240131161406.22a9e330@kernel.org>
+	<PH0PR18MB47345E3ADCC35D0ECA763DBBC7412@PH0PR18MB4734.namprd18.prod.outlook.com>
+	<20240205154448.1c5a5ad8@kernel.org>
+	<PH0PR18MB473460118D0FC68BE4B3BC45C7462@PH0PR18MB4734.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-1320519:519-21489:flowmailer
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Remove the duplicate calls to prueth_emac_stop() and
-prueth_cleanup_tx_chns() in emac_ndo_stop().
+On Tue, 6 Feb 2024 07:42:12 +0000 Shinas Rasheed wrote:
+> > > We do cancel_work_sync in octep_vf_remove function.  
+> > 
+> > But the device is still registered, so the timeout can happen after you
+> > cancel but before you unregister.  
+> 
+> There is rtnl_lock inside octep_vf_tx_timeout_task (the work task
+> function), which can protect from unregister_netdev, for such cases
+> (code snippet for quick reference below):
+> 
+> static void octep_vf_tx_timeout_task(struct work_struct *work)
+> {
+>         struct octep_vf_device *oct = container_of(work, struct octep_vf_device, tx_timeout_task);
+>         struct net_device *netdev = oct->netdev;
+> 
+>         rtnl_lock();
+>         if (netif_running(netdev)) {
+>                 octep_vf_stop(netdev);
+>                 octep_vf_open(netdev);
+>         }
+>         rtnl_unlock();
+> }
+> 
+> I hope this takes care of it? Please let me know if my thought
+> process feels wrong. Thanks!
 
-Fixes: 128d5874c082 ("net: ti: icssg-prueth: Add ICSSG ethernet driver")
-Fixes: 186734c15886 ("net: ti: icssg-prueth: add packet timestamping and ptp support")
-Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
----
- drivers/net/ethernet/ti/icssg/icssg_prueth.c | 4 ----
- 1 file changed, 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/ti/icssg/icssg_prueth.c b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-index 411898a4f38c..cf7b73f8f450 100644
---- a/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-+++ b/drivers/net/ethernet/ti/icssg/icssg_prueth.c
-@@ -1489,9 +1489,6 @@ static int emac_ndo_stop(struct net_device *ndev)
- 	/* Destroying the queued work in ndo_stop() */
- 	cancel_delayed_work_sync(&emac->stats_work);
- 
--	/* stop PRUs */
--	prueth_emac_stop(emac);
--
- 	if (prueth->emacs_initialized == 1)
- 		icss_iep_exit(emac->iep);
- 
-@@ -1502,7 +1499,6 @@ static int emac_ndo_stop(struct net_device *ndev)
- 
- 	free_irq(emac->rx_chns.irq[rx_flow], emac);
- 	prueth_ndev_del_tx_napi(emac, emac->tx_ch_num);
--	prueth_cleanup_tx_chns(emac);
- 
- 	prueth_cleanup_rx_chns(emac, &emac->rx_chns, max_rx_flows);
- 	prueth_cleanup_tx_chns(emac);
--- 
-2.43.0
-
+The problem I see is that if the queue is somehow overloaded or delayed
+there can be a race where we cancel, then timeout happens, work doesn't
+run for a while, and we free the netdev. So what I'm suggesting is -
+hold a reference on the netdevice. That way you can be sure it doesn't
+get freed and you can depend on the rtnl+netif_running() doing its job.
 
