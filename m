@@ -1,175 +1,231 @@
-Return-Path: <netdev+bounces-69378-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE90384AED3
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 08:19:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C85484AEEA
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 08:20:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78DCDB2293D
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 07:18:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7ED51C22460
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 07:20:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40C212882B;
-	Tue,  6 Feb 2024 07:15:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2EFD128807;
+	Tue,  6 Feb 2024 07:20:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KIewqL/m"
+	dkim=pass (1024-bit key) header.d=mistralsolutions.com header.i=@mistralsolutions.com header.b="fNvBliSs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from egress-ip12b.ess.de.barracuda.com (egress-ip12b.ess.de.barracuda.com [18.185.115.216])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB64128828
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 07:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88065128803
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 07:20:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.185.115.216
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707203754; cv=none; b=nERLOxU4i3sIIko6MQSOBO9X9ooTSmL9t9fa+2sAQWJUNxh9P3B76vdTEqVjxUuXgWnXBzyTMX6+XL+gSA4N/X5yR7uJ/C3bdYAksVgh1kr9yrghEPgS2MP9hD3xnoyyF1hhvALB640g2IpaYg9Tj6KubVuufeTjRq2dqGzmSt4=
+	t=1707204011; cv=none; b=AeZysfOPeIpxTss3VnzDO52SjYoGTKL9jmK4U3glZD2QMl4MAZUEhYftufJ6ijtIui6vFQ95ixYWYa/A/7bHvIQf61pqzKpofNaO0nmttxCrpsy3cRWWMsUTny2jIBiUxXXcpZJP1fktzDFRRAErpxsdM3NHuAbelBGChxnA8S0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707203754; c=relaxed/simple;
-	bh=flafyVSmnkvva9LgjVB1CVjfJS6L2DTlLXRzeFgj2MY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tny+/Z+hYRIPyqLlOkF9Yg8SCn6O5X27weeg5iBqOGwX9asQGX0BU57863VFHVbaWr/owCZgQHny+c/UBrlLaBSeqNVKE7x2pUISjoL+6YKH8WXix/H2tXgqJa6VRbXvZ0GJwgeQ46JQQTEZ3pgdejV9FRnJvsR/SmXIlmmhOzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KIewqL/m; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707203754; x=1738739754;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=flafyVSmnkvva9LgjVB1CVjfJS6L2DTlLXRzeFgj2MY=;
-  b=KIewqL/mxeTBpgIvDyrbV1DvzxCr76pd+tCJGcBQmJh6lcQExpqybBwO
-   oUlrpUnkguxG5xRogPVC+HOTBjL8mUi8YB/1dLF+AQt4R3m7HJ7IIMnqY
-   5Y5xlrDFXcLDYHNTPwA5AOmjRnDsikGMzX/aXggBwvxOxUnUeLr9nFtiY
-   PoGeBF8JlvjtJFsi/XnZ/uQi0DxvC7dA3uik/8BYqHsi1kAuf1M6fwvtb
-   Y2SK5g/tvEgHbW+R3ZnXTSxsr1KX5w5lDsmwF5rRoNkq/mKWDvaNqceMD
-   2zcXVOPMdNHK0qZnt4TnVenNxX8+8XwNXVRr9ssRGceow3GhKV49dckrJ
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10975"; a="4566186"
-X-IronPort-AV: E=Sophos;i="6.05,246,1701158400"; 
-   d="scan'208";a="4566186"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 23:15:53 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10975"; a="933372747"
-X-IronPort-AV: E=Sophos;i="6.05,246,1701158400"; 
-   d="scan'208";a="933372747"
-Received: from unknown (HELO mev-dev) ([10.237.112.144])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 23:15:50 -0800
-Date: Tue, 6 Feb 2024 08:15:42 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, andrew.gospodarek@broadcom.com,
-	pavan.chebbi@broadcom.com
-Subject: Re: [PATCH net-next 03/13] bnxt_en: Support ethtool -n to display
- ether filters.
-Message-ID: <ZcHcnmsi6OPfJ+mI@mev-dev>
-References: <20240205223202.25341-1-michael.chan@broadcom.com>
- <20240205223202.25341-4-michael.chan@broadcom.com>
+	s=arc-20240116; t=1707204011; c=relaxed/simple;
+	bh=RgPxP5/l8V4ZifiHFdU9QhIHaI5FNg+v9p7lwU6/BHY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pDQyIg6Q8PhQUYGZorH//Lhw/VAoLHZH9th/BgpXxqRNjSIKfbKnrvm8VLofm+8vGLPfpTcaaC4omqdg48I6QimOLPYmwUxgncO+j9APf8njALzmabuKIEzaV31VxD72dPhG4hCUokT8WqKaVByi8jnNW5eYZTgtxltCOa+NRnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mistralsolutions.com; spf=pass smtp.mailfrom=mistralsolutions.com; dkim=pass (1024-bit key) header.d=mistralsolutions.com header.i=@mistralsolutions.com header.b=fNvBliSs; arc=none smtp.client-ip=18.185.115.216
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mistralsolutions.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mistralsolutions.com
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com [209.85.167.70]) by mx-outbound40-107.eu-central-1c.ess.aws.cudaops.com (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO); Tue, 06 Feb 2024 07:20:05 +0000
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-5114efefdb1so504401e87.1
+        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 23:20:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mistralsolutions.com; s=google; t=1707204005; x=1707808805; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1EfW+Jop+6OtJZdK61lMyoMmAch2Wo7mDs0McyNWYJM=;
+        b=fNvBliSsoWwsv9J5+phZ9E3WrQYsRTOnldhSFxrQlb2w3WSWeVaEoORDaB74sLQyDx
+         mQ4RpnD0qcPZdLG4cfIyuXFpsmKQoiLvsrnjsqIOZrm3M14GKRT9iljh0VmLFeADQNV5
+         oH9gNmm4KjzaanoBwyt7qWhzMq1LkV466rxeI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707204005; x=1707808805;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1EfW+Jop+6OtJZdK61lMyoMmAch2Wo7mDs0McyNWYJM=;
+        b=Cqj5yEXN8ZBDEJQ2EbeD2wyaPWbvMp8eHXZmTIBh2SAMlb5omwjQoRAXepH0+6vWki
+         KxmLsFzIXFZ3WHBmRPE6TPKKsR0NhO+1rPa1lpNjRvLgyIKVGyg32XR+Gze2ioGRYrvD
+         uhpCM5a1e6+f6CD6GBcitK1el2LRXZ6j7s5ozZA6FTzAIvg52OQoW5vDOYT0FgE89MCr
+         nOO0pmsO4ZjkeZ1+6aMwP+H9yUmEgUNoZ4sxLF6bInGHE2CxH+D1w21m0q+vxkGCd9Mq
+         xmj0oJvWkJDTaCh9s600YZr9aMKQMURzjYxUMHu1OjS++d27naZyR2AsQU7tUmzjyd13
+         hJuA==
+X-Gm-Message-State: AOJu0YxY6g4j+IsiNYfr3LoyVHoPmap0jLe/fMdcHgShpkhGS7fLUqc9
+	CNNMWyELGyGEQJ5Xns9YP9Rn/MZG1ZqWye71Cg7xQ8uiENHnfBX12rc0B6LJZq/i85Ew6+OY3jN
+	AnVlHWwzz6RlxJ6vrSZ9czzMcObU2s6r7gHxqrzYxpd0eaC5kWS2voV81kfxbCHX6M02PsUzm6s
+	ipKv5M26Zctyn5I5/n+vV8jzvZxxG3KvHlYZgE14D52l/UiWeafloZtikKT1LFAI0=
+X-Received: by 2002:a05:6512:6c9:b0:511:5362:e5a1 with SMTP id u9-20020a05651206c900b005115362e5a1mr1743590lff.4.1707204005506;
+        Mon, 05 Feb 2024 23:20:05 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHEH5gmjFY6vp7J9Mw07UIJ3Z5V5xL4NnCZiImByeoPo/ELcgyj2fqrLnQOiVbHK7t5/o6m7nA+tqQFTj2U9FM=
+X-Received: by 2002:a05:6512:6c9:b0:511:5362:e5a1 with SMTP id
+ u9-20020a05651206c900b005115362e5a1mr1743570lff.4.1707204005124; Mon, 05 Feb
+ 2024 23:20:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240205223202.25341-4-michael.chan@broadcom.com>
+References: <20240206005928.15703-1-sinthu.raja@ti.com> <20240206005928.15703-2-sinthu.raja@ti.com>
+ <2ffdca7f-f865-b719-b701-9ed4716da71a@ti.com>
+In-Reply-To: <2ffdca7f-f865-b719-b701-9ed4716da71a@ti.com>
+From: Sinthu Raja M <sinthu.raja@mistralsolutions.com>
+Date: Tue, 6 Feb 2024 12:49:53 +0530
+Message-ID: <CAEd-yTSXJdm0GQfA1HxHp7ACaHt7SdhYNepbwLtmc7PJETTzpg@mail.gmail.com>
+Subject: Re: [PATCH V3 1/2] net: ethernet: ti: cpsw_new: enable mac_managed_pm
+ to fix mdio
+To: Ravi Gunasekaran <r-gunasekaran@ti.com>
+Cc: Denis Kirjanov <dkirjanov@suse.de>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
+	Roger Quadros <rogerq@kernel.org>, linux-omap@vger.kernel.org, netdev@vger.kernel.org, 
+	Sinthu Raja <sinthu.raja@ti.com>, stable@vger.kernel.org, 
+	Paolo Abeni <pabeni@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-BESS-ID: 1707204005-310347-12432-463-1
+X-BESS-VER: 2019.1_20240206.0113
+X-BESS-Apparent-Source-IP: 209.85.167.70
+X-BESS-Parts: H4sIAAAAAAACA4uuVkqtKFGyUioBkjpK+cVKViYGZqZAVgZQ0NLIPDExxcAyzc
+	zMONHc2MAwycgw1SjZ0DwlzTLJwDJRqTYWAC+z3dhBAAAA
+X-BESS-Outbound-Spam-Score: 0.00
+X-BESS-Outbound-Spam-Report: Code version 3.2, rules version 3.2.2.254017 [from 
+	cloudscan17-93.eu-central-1b.ess.aws.cudaops.com]
+	Rule breakdown below
+	 pts rule name              description
+	---- ---------------------- --------------------------------
+	0.00 BSF_SC0_MISMATCH_TO    META: Envelope rcpt doesn't match header 
+	0.00 BSF_BESS_OUTBOUND      META: BESS Outbound 
+X-BESS-Outbound-Spam-Status: SCORE=0.00 using account:ESS91090 scores of KILL_LEVEL=7.0 tests=BSF_SC0_MISMATCH_TO, BSF_BESS_OUTBOUND
+X-BESS-BRTS-Status:1
 
-On Mon, Feb 05, 2024 at 02:31:52PM -0800, Michael Chan wrote:
-> Implement ETHTOOL_GRXCLSRULE for the user defined ether filters.  Use
-> the common functions to walk the L2 filter hash table.
-> 
-> Reviewed-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
-> Signed-off-by: Michael Chan <michael.chan@broadcom.com>
-> ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt.c     |  1 +
->  .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 38 ++++++++++++++++++-
->  2 files changed, 38 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> index 3cc3504181c7..da298f4512b5 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> @@ -5484,6 +5484,7 @@ static int bnxt_init_l2_filter(struct bnxt *bp, struct bnxt_l2_filter *fltr,
->  		if (bit_id < 0)
->  			return -ENOMEM;
->  		fltr->base.sw_id = (u16)bit_id;
-> +		bp->ntp_fltr_count++;
->  	}
->  	head = &bp->l2_fltr_hash_tbl[idx];
->  	hlist_add_head_rcu(&fltr->base.hash, head);
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> index 2d8e847e8fdd..4d4dd2b231b8 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> @@ -1058,11 +1058,17 @@ static struct bnxt_filter_base *bnxt_get_one_fltr_rcu(struct bnxt *bp,
->  static int bnxt_grxclsrlall(struct bnxt *bp, struct ethtool_rxnfc *cmd,
->  			    u32 *rule_locs)
->  {
-> +	u32 count;
-> +
->  	cmd->data = bp->ntp_fltr_count;
->  	rcu_read_lock();
-> +	count = bnxt_get_all_fltr_ids_rcu(bp, bp->l2_fltr_hash_tbl,
-> +					  BNXT_L2_FLTR_HASH_SIZE, rule_locs, 0,
-> +					  cmd->rule_cnt);
->  	cmd->rule_cnt = bnxt_get_all_fltr_ids_rcu(bp, bp->ntp_fltr_hash_tbl,
->  						  BNXT_NTP_FLTR_HASH_SIZE,
-> -						  rule_locs, 0, cmd->rule_cnt);
-> +						  rule_locs, count,
-> +						  cmd->rule_cnt);
->  	rcu_read_unlock();
->  
->  	return 0;
-> @@ -1081,6 +1087,36 @@ static int bnxt_grxclsrule(struct bnxt *bp, struct ethtool_rxnfc *cmd)
->  		return rc;
->  
->  	rcu_read_lock();
-> +	fltr_base = bnxt_get_one_fltr_rcu(bp, bp->l2_fltr_hash_tbl,
-> +					  BNXT_L2_FLTR_HASH_SIZE,
-> +					  fs->location);
-> +	if (fltr_base) {
-> +		struct ethhdr *h_ether = &fs->h_u.ether_spec;
-> +		struct ethhdr *m_ether = &fs->m_u.ether_spec;
-> +		struct bnxt_l2_filter *l2_fltr;
-> +		struct bnxt_l2_key *l2_key;
-> +
-> +		l2_fltr = container_of(fltr_base, struct bnxt_l2_filter, base);
-> +		l2_key = &l2_fltr->l2_key;
-> +		fs->flow_type = ETHER_FLOW;
-> +		ether_addr_copy(h_ether->h_dest, l2_key->dst_mac_addr);
-> +		eth_broadcast_addr(m_ether->h_dest);
-> +		if (l2_key->vlan) {
-> +			struct ethtool_flow_ext *m_ext = &fs->m_ext;
-> +			struct ethtool_flow_ext *h_ext = &fs->h_ext;
-> +
-> +			fs->flow_type |= FLOW_EXT;
-> +			m_ext->vlan_tci = htons(0xfff);
-> +			h_ext->vlan_tci = htons(l2_key->vlan);
-> +		}
-> +		if (fltr_base->flags & BNXT_ACT_RING_DST)
-> +			fs->ring_cookie = fltr_base->rxq;
-> +		if (fltr_base->flags & BNXT_ACT_FUNC_DST)
-> +			fs->ring_cookie = (u64)(fltr_base->vf_idx + 1) <<
-> +					  ETHTOOL_RX_FLOW_SPEC_RING_VF_OFF;
-Wonder if saving ring_cookie in fltr_base won't be cleaner, but I am not
-sure if it is worth to introduce new field for only that.
+On Tue, Feb 6, 2024 at 11:31=E2=80=AFAM Ravi Gunasekaran <r-gunasekaran@ti.=
+com> wrote:
+>
+>
+>
+> On 2/6/24 6:29 AM, Sinthu Raja wrote:
+> > From: Sinthu Raja <sinthu.raja@ti.com>
+> >
+> > The below commit  introduced a WARN when phy state is not in the states=
+:
+> > PHY_HALTED, PHY_READY and PHY_UP.
+> > commit 744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resum=
+e() state")
+> >
+> > When cpsw_new resumes, there have port in PHY_NOLINK state, so the belo=
+w
+> > warning comes out. Set mac_managed_pm be true to tell mdio that the phy
+> > resume/suspend is managed by the mac, to fix the following warning:
+> >
+> > WARNING: CPU: 0 PID: 965 at drivers/net/phy/phy_device.c:326 mdio_bus_p=
+hy_resume+0x140/0x144
+> > CPU: 0 PID: 965 Comm: sh Tainted: G           O       6.1.46-g247b2535b=
+2 #1
+> > Hardware name: Generic AM33XX (Flattened Device Tree)
+> >  unwind_backtrace from show_stack+0x18/0x1c
+> >  show_stack from dump_stack_lvl+0x24/0x2c
+> >  dump_stack_lvl from __warn+0x84/0x15c
+> >  __warn from warn_slowpath_fmt+0x1a8/0x1c8
+> >  warn_slowpath_fmt from mdio_bus_phy_resume+0x140/0x144
+> >  mdio_bus_phy_resume from dpm_run_callback+0x3c/0x140
+> >  dpm_run_callback from device_resume+0xb8/0x2b8
+> >  device_resume from dpm_resume+0x144/0x314
+> >  dpm_resume from dpm_resume_end+0x14/0x20
+> >  dpm_resume_end from suspend_devices_and_enter+0xd0/0x924
+> >  suspend_devices_and_enter from pm_suspend+0x2e0/0x33c
+> >  pm_suspend from state_store+0x74/0xd0
+> >  state_store from kernfs_fop_write_iter+0x104/0x1ec
+> >  kernfs_fop_write_iter from vfs_write+0x1b8/0x358
+> >  vfs_write from ksys_write+0x78/0xf8
+> >  ksys_write from ret_fast_syscall+0x0/0x54
+> > Exception stack(0xe094dfa8 to 0xe094dff0)
+> > dfa0:                   00000004 005c3fb8 00000001 005c3fb8 00000004 00=
+000001
+> > dfc0: 00000004 005c3fb8 b6f6bba0 00000004 00000004 0059edb8 00000000 00=
+000000
+> > dfe0: 00000004 bed918f0 b6f09bd3 b6e89a66
+> >
+> > Cc: <stable@vger.kernel.org> # v6.0+
+> > Fixes: 744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resum=
+e() state")
+>
+> In v1, you received a comment to add the fixes tag. The reference stmmac =
+patch also points
+> to this commit as Fixes tag. But as Paolo pointed out in v2, this is not =
+the right
+> fixes tag for your patch series.
+>
+> I did a git blame on few drivers where PHY is managed by MAC. These have
+> Fixes: fba863b81604 ("net: phy: make PHY PM ops a no-op if MAC driver man=
+ages PHY PM")
 
-> +		rcu_read_unlock();
-> +		return 0;
-> +	}
->  	fltr_base = bnxt_get_one_fltr_rcu(bp, bp->ntp_fltr_hash_tbl,
->  					  BNXT_NTP_FLTR_HASH_SIZE,
->  					  fs->location);
+Thanks, Ravi for pointing this out.
+But the warning message was caused only after the below commit had been add=
+ed.
+744d23c71af3 ("net: phy: Warn about incorrect mdio_bus_phy_resume() state")
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+With the below commit the warning didn't pop up.
+fba863b81604 ("net: phy: make PHY PM ops a no-op if MAC driver manages PHY =
+PM")
+That is the reason I have not changed the Fixes tag.
 
-Thanks,
-Michal
-> -- 
-> 2.30.1
-> 
+Let's wait for Paolo's comment on this Fixes: fba863b81604 ("net: phy:
+make PHY PM ops a no-op if MAC driver manages PHY PM")
+
+> which seems to be more appropriate, as this is the commit that introduced=
+ the
+> 'mac_managed_pm' flag.
+>
+> I have Cc'ed Paolo in this reply. But in future, please take care of addi=
+ng the people
+> who provided review comments in To/Cc when sending reworked patch/series.
+
+Noted.
+
+Regards,
+Sinthu Raja
+
+>
+> > Signed-off-by: Sinthu Raja <sinthu.raja@ti.com>
+> > ---
+> >
+> > Changes in V3:
+> >       - No Change
+> >
+> > Changes in V2:
+> >       - Add fixes tag.
+> >
+> >  drivers/net/ethernet/ti/cpsw_new.c | 3 +++
+> >  1 file changed, 3 insertions(+)
+> >
+> > diff --git a/drivers/net/ethernet/ti/cpsw_new.c b/drivers/net/ethernet/=
+ti/cpsw_new.c
+> > index 498c50c6d1a7..087dcb67505a 100644
+> > --- a/drivers/net/ethernet/ti/cpsw_new.c
+> > +++ b/drivers/net/ethernet/ti/cpsw_new.c
+> > @@ -773,6 +773,9 @@ static void cpsw_slave_open(struct cpsw_slave *slav=
+e, struct cpsw_priv *priv)
+> >                       slave->slave_num);
+> >               return;
+> >       }
+> > +
+> > +     phy->mac_managed_pm =3D true;
+> > +
+> >       slave->phy =3D phy;
+> >
+> >       phy_attached_info(slave->phy);
+>
+> --
+> Regards,
+> Ravi
 
 
+
+--
+With Regards
+Sinthu Raja
 
