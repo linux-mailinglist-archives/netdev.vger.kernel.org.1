@@ -1,195 +1,99 @@
-Return-Path: <netdev+bounces-69454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7585B84B539
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 13:32:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14BB184B53F
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 13:33:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A8971C24B20
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 12:32:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9BFCAB28B98
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 12:33:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C67EE132C3B;
-	Tue,  6 Feb 2024 12:18:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F9E1133408;
+	Tue,  6 Feb 2024 12:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="l1+a2SIR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KtDgSyY/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7FFB132C25;
-	Tue,  6 Feb 2024 12:18:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AA5813340D
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 12:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707221918; cv=none; b=A5R6k2nCZSHduDO7U7uEu1TNcYZYbnqn+PTnetRgnBcg8djv9/WG01EAPtyflHK8tc2XBWKImXEVEdt9PhpmSYb6GWPkw9Vr2De+esmVu107KaF5juewafJhVCVKhnm3HMLDZOMLGOw8P//zY6eWzF73NScpE66mPeWjeZ1azlI=
+	t=1707222026; cv=none; b=qYZo1evu+8HmKK9qH8z7VgMzOawbvgFRvRHoyHq0+2XdU9axxsylyz/Tyy6ln8UollvB7XbzmtS4yVq+B6GcDmkoQDOSZWWahr9uTvRSx+NB5Xa9MeD6ngE93TI2RwENEu3OqJ5yf3eUbIIW+y2pkTZGe/rFQQMfidWO2FoSoKM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707221918; c=relaxed/simple;
-	bh=Tn8WnY+a+ept61qhjcmZvxSEPFge8/SObTTCDWxJS7g=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=iAvYu3iEFvLAhKiwRzkdSpMZuK36OW9P8j6dYBmSkK37iR8u6BcWYlb3dA2GvyRDGPT5uPDwXjAeBU7ifBJP/z236BPMHa/e6yI09WDukF/t/FfhVVucsCgj5ouAKhRG0hnRP3p5jLPITN8FB4aVr3qYB2uGk61WcnXCVzpxaZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=l1+a2SIR; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 416BtAUJ022474;
-	Tue, 6 Feb 2024 12:18:32 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- subject : to : cc : references : from : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=J0YDXL0DMuZx6qRUUagB7lMLHl0D1nro9nj04PRHnTw=;
- b=l1+a2SIRg5PF4zDhqgXL9qLL/CahK7oNE6lSCOLCeyP8ZBo/1PhrWcNquUdgrjuzue9d
- c/cXX+TCvKQq59XIkl8go5kDa3zo2ifNdk++37Br4OQJ8Y56gdxSFLaWBtuPvTbuHtrx
- JBU5FPGXbqUYMAqJM21ug+/kPVUr2YIxksEkVx+9KkTHxrPDSwFgUXHMWzKsNbnbVFvI
- y3xK4uELaBM1cmNW6Fz+I7jHDTCVDLku0BVhBqc+W4aUDuwGSWkvnAfxfrR30pHJkJ7F
- PSc6w4oUotwRPDhbuyy6V8Dnfny190MEu8p7XKHgE23MFxde6CuufAb0u49halqZgsVR kg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w3mafrqqy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Feb 2024 12:18:31 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 416BtShm024011;
-	Tue, 6 Feb 2024 12:18:31 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w3mafrqq1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Feb 2024 12:18:31 +0000
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 416BXUwl019991;
-	Tue, 6 Feb 2024 12:18:29 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 3w1ytsy53u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 06 Feb 2024 12:18:29 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 416CIRTf28115506
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 6 Feb 2024 12:18:27 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 031232009F;
-	Tue,  6 Feb 2024 12:18:27 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 88BB5200A1;
-	Tue,  6 Feb 2024 12:18:26 +0000 (GMT)
-Received: from [9.152.224.145] (unknown [9.152.224.145])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue,  6 Feb 2024 12:18:26 +0000 (GMT)
-Message-ID: <83b9d600-339c-4c9f-860d-ab4539a0ae6b@linux.ibm.com>
-Date: Tue, 6 Feb 2024 13:18:26 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 00/15] net/smc: implement loopback-ism used by
- SMC-D
-To: Wen Gu <guwen@linux.alibaba.com>, wenjia@linux.ibm.com, hca@linux.ibm.com,
-        gor@linux.ibm.com, agordeev@linux.ibm.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, linux-s390@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240111120036.109903-1-guwen@linux.alibaba.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <20240111120036.109903-1-guwen@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: 9Oq93biWMDhGTymW9bQMJeO9SqpPP0os
-X-Proofpoint-ORIG-GUID: zrdy_-uaFOs7-O2Gw8JOKcJKPynszSJC
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	s=arc-20240116; t=1707222026; c=relaxed/simple;
+	bh=I/BMGU2sq2mpZXKWyws+96g8BVDXh7makeWHcqmb2l4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=XIAwkKmBnwOL7r+h6nBhkFe5HdTX6EVcZZA9nE7OUtiCgU4ZLX/rgW1ClPQzikBGeLo+NH1TzHHoo8hCS3apC42B8QtfyejliNa3modrfrg3dc+vA3Tbz8k3YMLTAOf+SuBYDNpk/mMweQvK4BHKB1rCTo62oZ4oTkwZ2HIqSbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KtDgSyY/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 76EAEC433F1;
+	Tue,  6 Feb 2024 12:20:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707222025;
+	bh=I/BMGU2sq2mpZXKWyws+96g8BVDXh7makeWHcqmb2l4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KtDgSyY/f5MqvfEfztisKOnUeGLv1EjHFUNCkscRppPyWPqh/cYV2Qfs8/NU4AZkb
+	 pypf/SU87oPyzQjIZ5UrEPvlY0n7YR/i+irFA/hJpP8VkmohwLYNAGO1TrTW8YWHe9
+	 IUUe/aY0LU8jwm8Sm7vdDwx0luPRth9RumeDzlzZW6XkFKv0P/3KgO3GibFha6sWWK
+	 zMxa2fqKxNaRztPbymp1cE3u9BA7GcmjcGuHEb8Ut/i2xidbGbNfD/28xPj2gMNh67
+	 ZJsvviDnnpESmlPC/aDn1x57tkOY2xIOAwRrUf96yuJ11jtkbS85XLoZ9cQCe/KXAx
+	 dWobl2Ii6PePw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5E026E2F2F9;
+	Tue,  6 Feb 2024 12:20:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-06_05,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- bulkscore=0 adultscore=0 impostorscore=0 clxscore=1015 malwarescore=0
- mlxlogscore=999 suspectscore=0 phishscore=0 lowpriorityscore=0 spamscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2402060087
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next 0/4][pull request] Intel Wired LAN Driver Updates
+ 2024-02-02 (ice)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170722202537.10552.174755665758975001.git-patchwork-notify@kernel.org>
+Date: Tue, 06 Feb 2024 12:20:25 +0000
+References: <20240202175613.3470818-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20240202175613.3470818-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org
 
+Hello:
 
+This series was applied to netdev/net-next.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-On 11.01.24 13:00, Wen Gu wrote:
-> This patch set acts as the second part of the new version of [1] (The first
-> part can be referred from [2]), the updated things of this version are listed
-> at the end.
+On Fri,  2 Feb 2024 09:56:08 -0800 you wrote:
+> This series contains updates to ice driver only.
 > 
-> # Background
+> Maciej changes some queue configuration calls to existing ones which are
+> better suited for the purpose.
 > 
-> SMC-D is now used in IBM z with ISM function to optimize network interconnect
-> for intra-CPC communications. Inspired by this, we try to make SMC-D available
-> on the non-s390 architecture through a software-implemented virtual ISM device,
-> that is the loopback-ism device here, to accelerate inter-process or
-> inter-containers communication within the same OS instance.
+> Aniruddha adds separate reporting for Rx EIPE errors as hardware may
+> incorrectly report errors on certain packets.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,1/4] ice: make ice_vsi_cfg_rxq() static
+    https://git.kernel.org/netdev/net-next/c/3e5fb691faee
+  - [net-next,2/4] ice: make ice_vsi_cfg_txq() static
+    https://git.kernel.org/netdev/net-next/c/a292ba981324
+  - [net-next,3/4] ice: Add a new counter for Rx EIPE errors
+    https://git.kernel.org/netdev/net-next/c/0ca6755f3cc2
+  - [net-next,4/4] ice: remove incorrect comment
+    https://git.kernel.org/netdev/net-next/c/53875f05c997
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
-Hello Wen Gu,
-
-thank you very much for this patchset. I have been looking at it a bit.
-I installed in on a testserver, but did not yet excercise the loopback-ism device.
-I want to continue investigations, but daily work interferes, so I thought I
-send you some comments now. So this is not at all a code review, but some 
-thoughts and observations about the general concept.
-
-
-In [1] there was a discussion about an abstraction layer between smc-d and the
-ism devices. 
-I am not sure what you are proposing now, is it an smc-d feature or independent of smc?
-In 3/15 you say it is part of the SMC module, but then it has its own device entry.
-Didn't you want to use it for other things as well? Or is it an SMC-D only feature?
-Is it a device (Config help: "kind of virtual device")? Or an SMC-D feature?
-
-Will we have a class of ism devices (s390 ism, ism-loopback, virtio-ism)
-That share common properties (internal API?)
-and smc-d will work with any of those?
-But they all can exist without smc ?! BTW: This is what we want for s390-ism.
-The client-registration interface [2] is currently the way to achieve this. 
-But maybe we need a more general concept?
-
-Maybe first a preparation patchset that introduces a class/ism
-Together with an improved API?
-In case you want to use ISM devices for other purposes as well..
-But then the whole picture of ism-loopback in one patchset (RFC?) 
-has its benefits as well.
-
-
-Other points that I noticed:
-
-Naming: smc loopback, ism-loopback, loopback-ism ?
-
-config: why not tristate? Why under net/smc?
-
-/sys/devices/virtual/smc  does not initially show up in my installation!!!
-root@t35lp50:/sys/devices/virtual/> ls
-3270/  bdi/  block/  graphics/  iommu/  mem/  memory_tiering/  misc/  net/  tty/  vc/  vtconsole/  workqueue/
-root@t35lp50:/sys/devices/virtual/> ls smc/loopback-ism
-active  dmb_copy  dmbs_cnt  dmb_type  subsystem@  uevent  xfer_bytes
-root@t35lp50:/sys/devices/virtual/> ls
-3270/  bdi/  block/  graphics/  iommu/  mem/  memory_tiering/  misc/  net/  smc/  tty/  vc/  vtconsole/  workqueue/
-Is that normal behaviour?
-
-You introduced a class/smc
-Maybe class/ism would be better?
-The other smc interfaces do not show up in class/smc!! Not so good
-
-Why doesn't it show in smc_rnics?
-(Maybe some deficiency of smc_rnics?)
-
-But then it shows in other smc-tools:
-root@t35lp50:/sys/> smcd device
-FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
-0000 0     loopback-ism  ffff   No        0
-0029 ISM   0000:00:00.0  07c1   No        0  NET1
-Nice!
-
-Kind regards
-Sandy
-
-
-[1] https://lore.kernel.org/lkml/e3819550-7b10-4f9c-7347-dcf1f97b8e6b@linux.alibaba.com/
-[2] 89e7d2ba61b7 ("net/ism: Add new API for client registration")
 
