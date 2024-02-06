@@ -1,189 +1,104 @@
-Return-Path: <netdev+bounces-69349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5246E84ABF8
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 03:09:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E72BB84AC0E
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 03:13:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 772401C23732
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 02:09:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2520E1C2343F
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 02:13:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 333E556B65;
-	Tue,  6 Feb 2024 02:09:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="b+KMj6tv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 738A45677B;
+	Tue,  6 Feb 2024 02:13:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58C2E5675F;
-	Tue,  6 Feb 2024 02:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 124A456B65;
+	Tue,  6 Feb 2024 02:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707185346; cv=none; b=GbYQLpq4rcIE/1rYnR7HAKEwzMYFo1dvQvcvNhzvkr9blUH+lUqdnbS8FFsAFkiGzfc609kww8w1pBdz5xTQVJnWNR5BkZpusP/fnPdg6QCuzuKdIEQFAVE0fTgs8DCGoE7QgU2+P3ShaSTmlG+k5Ho1r4EIHxnbmxAEm94tgJQ=
+	t=1707185584; cv=none; b=KnGYZItBA4Xqpbfs80y0fktIZa5oytCnHkCAOoR3rNIQ4WkW6uLyYVssKjzVOWc+wl+NSRczg6MgBwulwSITOgO1epXoYOOlHQZZNC486zJTFtfaANiURQYJ8NMt3GF/tEdmAXBCaSfhvNvc4CYWTBXkTD4QK82vVNlWTjPTKKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707185346; c=relaxed/simple;
-	bh=WYfoRPya76Tqck0ScDgB0y5w0roJ0OYNP1LTT+2qcEk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LjTpMBNBxG7VMnyEmn5PV2y7SK5TK6sGGnAK4U/S9khqZrK+lM64AGfdTrrKttMcU1H3kw9b0UNyXkztJghtp2rWeRI9ybpoP6BLgS6wrWKdPG1RdpE3qqbAtUa/ljpWYk1LsD4UQv6wa7Uv9F1xHr/PIFYs8/9Zfi19AcLPs90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=b+KMj6tv; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 4161Ewsc023386;
-	Tue, 6 Feb 2024 02:08:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type : content-transfer-encoding; s=corp-2023-11-20;
- bh=TNBqmrMN0GKiz0meyol2MTt7jK7ZOMX41ADnOQ7L/UU=;
- b=b+KMj6tvO4efzEbKZhSG/xzlHnsPmbgMlBfcTWawkZTnAIffaQla4J5cVDofspUuJqWS
- /o00HHnk0n3gN9qp3mx/3E4gJC1I52m2sdoqn6JFMG+i8UwxEXr0NcQnIWxdhEFBJn+E
- /x8af1pQLtk1k1AM1L7u822p8aQ15VNJPSq8MPE9D4515Gx5HixPyTgAvA3/EgoqxoHI
- QgW4sF8UUf5WKq6QgWwluTQ92vNZ9x/szjLyibVmDwZBAu8ox17jHGO02Dm+ih1uUcH6
- DGK4SsClE47m3SK3AzW4xYXw6GyPWvrQpLAswBi0lOq+tWmzWKU14KToHTtMKtqix0Tu 5w== 
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.appoci.oracle.com [147.154.114.232])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3w1dhddkp3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 06 Feb 2024 02:08:03 +0000
-Received: from pps.filterd (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 4161MK9a039504;
-	Tue, 6 Feb 2024 02:08:02 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3w1bx6cdtx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 06 Feb 2024 02:08:02 +0000
-Received: from phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 41627qHJ034652;
-	Tue, 6 Feb 2024 02:08:01 GMT
-Received: from ca-mkp2.ca.oracle.com.com (mpeterse-ol9.allregionaliads.osdevelopmeniad.oraclevcn.com [100.100.251.135])
-	by phxpaimrmta02.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTP id 3w1bx6cdrb-2;
-	Tue, 06 Feb 2024 02:08:01 +0000
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-To: linux-kernel@vger.kernel.org, Li Zhijian <lizhijian@fujitsu.com>
-Cc: "Martin K . Petersen" <martin.petersen@oracle.com>,
-        Adaptec OEM Raid Solutions <aacraid@microsemi.com>,
-        Adrian Hunter <adrian.hunter@intel.com>,
-        Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-        Alistar Popple <alistair@popple.id.au>,
-        "Aneesh Kumar K.V" <aneesh.kumar@kernel.org>,
-        Arnaldo Carvalho de Melo <acme@kernel.org>,
-        Artur Paszkiewicz <artur.paszkiewicz@intel.com>,
-        Benjamin Tissoires <benjamin.tissoires@redhat.com>,
-        Borislav Petkov <bp@alien8.de>,
-        =?UTF-8?q?Bruno=20Pr=C3=A9mont?= <bonbons@linux-vserver.org>,
-        Chandrakanth patil <chandrakanth.patil@broadcom.com>,
-        Christian Gromm <christian.gromm@microchip.com>,
-        Christophe Leroy <christophe.leroy@csgroup.eu>, cocci@inria.fr,
-        Dave Hansen <dave.hansen@linux.intel.com>,
-        Don Brace <don.brace@microchip.com>, dri-devel@lists.freedesktop.org,
-        Eddie James <eajames@linux.ibm.com>,
-        GR-QLogic-Storage-Upstream@marvell.com,
-        Hannes Reinecke <hare@kernel.org>, Hannes Reinecke <hare@suse.de>,
-        Hans de Goede <hdegoede@redhat.com>, Helge Deller <deller@gmx.de>,
-        HighPoint Linux Team <linux@highpoint-tech.com>,
-        "H. Peter Anvin" <hpa@zytor.com>, Ian Rogers <irogers@google.com>,
-        =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-        Ingo Molnar <mingo@redhat.com>, Jack Wang <jinpu.wang@cloud.ionos.com>,
-        "James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        James Morse <james.morse@arm.com>, Jeremy Kerr <jk@ozlabs.org>,
-        Jiri Kosina <jikos@kernel.org>, Jiri Olsa <jolsa@kernel.org>,
-        Joel Stanley <joel@jms.id.au>, Jonathan Cameron <jic23@kernel.org>,
-        Julia Lawall <Julia.Lawall@inria.fr>,
-        Karan Tilak Kumar <kartilak@cisco.com>,
-        Kashyap Desai <kashyap.desai@broadcom.com>,
-        Ketan Mukadam <ketan.mukadam@broadcom.com>,
-        Laurentiu Tudor <laurentiu.tudor@nxp.com>,
-        linux-arm-kernel@lists.infradead.org, linux-edac@vger.kernel.org,
-        linux-fbdev@vger.kernel.org, linux-fsi@lists.ozlabs.org,
-        linux-iio@vger.kernel.org, linux-input@vger.kernel.org,
-        linux-perf-users@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-        linux-scsi@vger.kernel.org, Manish Rangankar <mrangankar@marvell.com>,
-        Mark Rutland <mark.rutland@arm.com>,
-        Mauro Carvalho Chehab <mchehab@kernel.org>,
-        megaraidlinux.pdl@broadcom.com, Michael Cyr <mikecyr@linux.ibm.com>,
-        Michael Ellerman <mpe@ellerman.id.au>,
-        Michal Januszewski <spock@gentoo.org>,
-        MPT-FusionLinux.pdl@broadcom.com, Namhyung Kim <namhyung@kernel.org>,
-        "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, netdev@vger.kernel.org,
-        Nicholas Piggin <npiggin@gmail.com>,
-        Nicolas Palix <nicolas.palix@imag.fr>,
-        Nilesh Javali <njavali@marvell.com>,
-        Parthiban Veerasooran <parthiban.veerasooran@microchip.com>,
-        Peter Zijlstra <peterz@infradead.org>,
-        platform-driver-x86@vger.kernel.org,
-        Richard Cochran <richardcochran@gmail.com>,
-        Robert Richter <rric@kernel.org>, Russell King <linux@armlinux.org.uk>,
-        Sathya Prakash <sathya.prakash@broadcom.com>,
-        Satish Kharat <satishkh@cisco.com>,
-        Sesidhar Baddela <sebaddel@cisco.com>,
-        Shivasharan S <shivasharan.srikanteshwara@broadcom.com>,
-        Sreekanth Reddy <sreekanth.reddy@broadcom.com>,
-        Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-        Stefan Achatz <erazor_de@users.sourceforge.net>,
-        storagedev@microchip.com, Stuart Yoder <stuyoder@gmail.com>,
-        Suganath Prabu Subramani <suganath-prabu.subramani@broadcom.com>,
-        Sumit Saxena <sumit.saxena@broadcom.com>, target-devel@vger.kernel.org,
-        Thomas Gleixner <tglx@linutronix.de>, Tony Luck <tony.luck@intel.com>,
-        Tyrel Datwyler <tyreld@linux.ibm.com>,
-        Vadim Pasternak <vadimp@nvidia.com>, x86@kernel.org
-Subject: Re: (subset) [PATCH 00/42] Fix coccicheck warnings
-Date: Mon,  5 Feb 2024 21:07:38 -0500
-Message-ID: <170715263710.945763.16540743989774199712.b4-ty@oracle.com>
-X-Mailer: git-send-email 2.42.1
-In-Reply-To: <20240116041129.3937800-1-lizhijian@fujitsu.com>
-References: <20240116041129.3937800-1-lizhijian@fujitsu.com>
+	s=arc-20240116; t=1707185584; c=relaxed/simple;
+	bh=bs/ur/xiB+EKXQSIm4/pErFIuws9bv1BgqZoNxClTT8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=krhpB/feyL2G/BtRsCjVVs5QQ795vAwJkD0/Uos9Yywn5FSIthQzdLinMcSW7faa0Sc6ZSXSMeuRmivsDj5VHxs6+ciMdDNWpRxnmIHRvrEeuHI+nf9AUNOPKlaHrp8uks25cwWpgNK6BuL8Rj7qQA3P4AR+dW/n6bTW+t0XSuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-5cddc5455aeso4476655a12.1;
+        Mon, 05 Feb 2024 18:13:02 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707185582; x=1707790382;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=KTAyl5iKOFA0ikqjI1lmw6AmuPGoKHG8xJSD/r8dg+4=;
+        b=lB45QgIWh0gsXfWvptPQgjq4wPGoEgC7nR3PgTO1BK45Scx2nRr5EK787Zk/ZeE2fl
+         UwBnLgK4Ilq8eO0gUoTLRSsVb75TpDg5Q1DpX5yd76EBeq2ALKNBRlCeuxQXC7DrYlgt
+         PPDwIH3UunHlpaZnHSIoBYJviZrUGkoaImxq1zEoT51i3xkLjkG5wVaq8mU/SDcju85Z
+         AL1Xh4iKJa6Q9cENPi1qND6q6Dx+CbvkdfiaZwrjBD+Na054iSPe8IMNQbgXsq7hok3C
+         /jL1RDKExNfWY88Cydfk0reNZelVcEX9PIQh0tyZmnSfunhTOOPyAcSKQ5MMPo2FFNxY
+         F+Pg==
+X-Gm-Message-State: AOJu0YyT11PiQYbwT+d92h2sdubCPa+j/TJtV0ego4e2VvD12TBdSO7B
+	jgDGDGqMiOIPlbuV1UAtqwD94N2YJgjS6xnVnZFfdXycBrckQEw76tDes9TwegESEnWVne71/z1
+	JKQf6He0wuzwpwU8MCzGVh9QpayY=
+X-Google-Smtp-Source: AGHT+IGDb6iQTUWs9BOothXuSb/aiVn8KF27r5Fivt/1qfUFGuDtcyXcnRyNdG1Al1jAcC5DU7YBRZMcb1n1Vm4pF9s=
+X-Received: by 2002:a05:6a20:1ea5:b0:19c:53e4:e67f with SMTP id
+ dl37-20020a056a201ea500b0019c53e4e67fmr280535pzb.15.1707185581779; Mon, 05
+ Feb 2024 18:13:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-05_18,2024-01-31_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 bulkscore=0 phishscore=0
- spamscore=0 adultscore=0 mlxlogscore=980 malwarescore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2402060013
-X-Proofpoint-GUID: fwziPvoQs2DBL9rAMuJ3Du7KSNls4Hgl
-X-Proofpoint-ORIG-GUID: fwziPvoQs2DBL9rAMuJ3Du7KSNls4Hgl
+References: <f15f0df1-92be-4bc9-82a2-1d8fa3275dd7@web.de> <daf2172a-8d54-4097-acf3-cc539fe281e5@web.de>
+In-Reply-To: <daf2172a-8d54-4097-acf3-cc539fe281e5@web.de>
+From: Namhyung Kim <namhyung@kernel.org>
+Date: Mon, 5 Feb 2024 18:12:50 -0800
+Message-ID: <CAM9d7ciHGv9s92Yz4VuFUhuN9HCHe=Bq7dMD_XSBTkg1+tYw+w@mail.gmail.com>
+Subject: Re: [RFC] perf: Reconsider an error code selection in bpf_map__fprintf()
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: linux-perf-users@vger.kernel.org, kernel-janitors@vger.kernel.org, 
+	Adrian Hunter <adrian.hunter@intel.com>, 
+	Alexander Shishkin <alexander.shishkin@linux.intel.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Arnaldo Carvalho de Melo <acme@kernel.org>, Christy Lee <christylee@fb.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Ian Rogers <irogers@google.com>, 
+	Ingo Molnar <mingo@redhat.com>, Jiri Olsa <jolsa@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Martin KaFai Lau <kafai@fb.com>, 
+	Peter Zijlstra <peterz@infradead.org>, Song Liu <songliubraving@fb.com>, Yonghong Song <yhs@fb.com>, 
+	YueHaibing <yuehaibing@huawei.com>, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 16 Jan 2024 12:10:47 +0800, Li Zhijian wrote:
+Hello,
 
-> make coccicheck COCCI=$PWD/scripts/coccinelle/api/device_attr_show.cocci`
-> complians some warnnings as following[1]:
-> 
-> Not sure if someone had tried these fixes, feel free to ignore this
-> patch set if we have come to a *NOT-FIX* conclusion before :)
-> 
-> This patch set also fix a few snprintf() beside coccicheck reported.
-> For example, some thing like
-> xxx_show() {
-> 	rc = snprintf();
-> ...
-> 	return rc;
-> }
-> 
-> [...]
+On Thu, Feb 1, 2024 at 10:49=E2=80=AFPM Markus Elfring <Markus.Elfring@web.=
+de> wrote:
+>
+> > A null pointer check is performed for the input parameter =E2=80=9Cmap=
+=E2=80=9D.
+> > It looks suspicious that the function =E2=80=9CPTR_ERR=E2=80=9D is appl=
+ied then for
+> > a corresponding return statement.
+>
+> Are contributions also by YueHaibing still waiting on further development=
+ considerations?
+>
+> [PATCH -next] perf: Fix pass 0 to PTR_ERR
+> https://lore.kernel.org/lkml/20220611040719.8160-1-yuehaibing@huawei.com/
+> https://lkml.org/lkml/2022/6/11/3
 
-Applied to 6.9/scsi-queue, thanks!
+I think we dropped the bpf-loader and it seems bpf_map.[ch] is
+leftover.  I don't see any users of bpf_map__fprintf() in the tree.
+Maybe we can drop it too.
 
-[22/42] drivers/scsi/fnic: Convert snprintf to sysfs_emit
-        https://git.kernel.org/mkp/scsi/c/1ad717c92925
-[25/42] drivers/scsi/ibmvscsi: Convert snprintf to sysfs_emit
-        https://git.kernel.org/mkp/scsi/c/29ff822f466e
-[26/42] drivers/scsi/ibmvscsi_tgt: Convert snprintf to sysfs_emit
-        https://git.kernel.org/mkp/scsi/c/01105c23de42
-[27/42] drivers/scsi/isci: Convert snprintf to sysfs_emit
-        https://git.kernel.org/mkp/scsi/c/5fbf37e53091
-[34/42] drivers/scsi/pm8001: Convert snprintf to sysfs_emit
-        https://git.kernel.org/mkp/scsi/c/8179041f801d
-
--- 
-Martin K. Petersen	Oracle Linux Engineering
+Thanks,
+Namhyung
 
