@@ -1,122 +1,90 @@
-Return-Path: <netdev+bounces-69534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A825784B98F
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:29:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F270F84B999
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 16:30:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB8821C24A5E
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:29:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 317A11C235F8
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 15:30:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8E17131E2B;
-	Tue,  6 Feb 2024 15:27:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB8E2133431;
+	Tue,  6 Feb 2024 15:29:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fmLWp/3d"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gyfa5wvt"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34CF1332B8
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 15:27:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF9B12B14D
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 15:29:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707233271; cv=none; b=KSHjK8I9mI0Kq+IsQ6fZkIBVCLfVMS3VN7KLc8COz3GWf2xFzMxnj+yJNsBD52QyQWAuBj+n390vZ/bLm0xQTvw6rbEE3hNT/ciSEKyZJfFsgA94KmI4Gf3ctcft+PSYC5LpqTys81GaRRyp6RoU6v8eJDc2VUgJNuYij+ugf9A=
+	t=1707233369; cv=none; b=pPLpeyTpWoh7RBSs8qTFB+muTmmhTjQ08wOSoCo+Vzgbb+qbJBRxr3GrmHyHP9LZ7Mdfnp9K4CoXQtOnSyBsIMiTbmNI662zR+GcTNtqyAlfO9rWcYP+DWvNWATNpO9FNnIw8/JkJ0xtwJXp/02mg4LSELL0wjmnR7qGuqxSkTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707233271; c=relaxed/simple;
-	bh=9u1dMsiaosyRB4lzwc8Ed34DePp+0a7Z2kA4o0DY4Bk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GabPrvnVEdXzXVMfDwewpm7ZM0Y1kKdN4kqIv1TVZWBQrr1F0bw5C/rKtNGjxopcHaTPdJbM0BNludEIwpvS5UXMSdg4gVzTicfxCJSuCJSB0RSLiKeUIQvrbRW5ItZYNXAsDLW8RpqPby+rEBpL138lscUfFAeKPjYmEmVQCrA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fmLWp/3d; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707233268;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Fq9scFE4YcfgjmX5UvcXbGzet+l7McK0LQVifIhtSf0=;
-	b=fmLWp/3dPg3rPqhbQ6JtJRUfkV4lNcTs9Vqa0uVOCJKtmodP+9qNOg+5EEGFKQtNdhnTj8
-	kh3xpAtPmFqWVCIN6/a5HlEP4wcT3EyhvJ9Ujd6FRKT0eOkCkzQaLGQaLfAWtx+JhX4Ljv
-	77IF7G4D8VomezwKqagXMxsxFoy2x7g=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-609-H-uMpYSFOsya9Z7DSAkaPQ-1; Tue,
- 06 Feb 2024 10:27:45 -0500
-X-MC-Unique: H-uMpYSFOsya9Z7DSAkaPQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9F6CF3813BD1;
-	Tue,  6 Feb 2024 15:27:44 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.45.225.229])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 200282166B31;
-	Tue,  6 Feb 2024 15:27:42 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Shuah Khan <shuah@kernel.org>,
-	Willem de Bruijn <willemb@google.com>,
-	Coco Li <lixiaoyan@google.com>,
-	linux-kselftest@vger.kernel.org
-Subject: [PATCH net] selftests: net: cope with slow env in gro.sh test
-Date: Tue,  6 Feb 2024 16:27:40 +0100
-Message-ID: <117a20b1b09addb804b27167fafe1a47bfb2b18e.1707233152.git.pabeni@redhat.com>
+	s=arc-20240116; t=1707233369; c=relaxed/simple;
+	bh=yKBiIG9BG+Q7j6QRZoyKWECEwh2S2tJ8ZY9vaXCGYao=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fClwBvF84HLVmegTj2BrWgjOXxWch3IGwK+YHmc29RKVQJdDDbohjimWURulQbOVCpktuS+XMdwAWIMzIrgHft0DiI5ubEUELgwQuilcU7TMF+WMcwXlLK28NllP1MinO6HZsALhjttP81j7q02L+Iy62P3A9u1qwrHe0xH8vIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gyfa5wvt; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=y77cc7ydr1ZSgBVmSGezYHmzr8PjwperPu32cwCQL0M=; b=gyfa5wvtGLWJSShDoDQJRwunhf
+	CX124KYAVdSreYAP7IBSw8ki6CyGrPXnN1MYoqhItiGTIPmgmAhiD+k1+DnMohCmAL4fJpF8+nzW2
+	ltJUvQI6J6u1hJcNOx3Y1/gHTq0a96F5E12CvEpbDkhWx4zz8WOOFzKLQ/uv3pX7mitQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rXNNn-0079Jb-Ug; Tue, 06 Feb 2024 16:29:11 +0100
+Date: Tue, 6 Feb 2024 16:29:11 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, maciej.fijalkowski@intel.com,
+	netdev@vger.kernel.org, mengyuanlou@net-swift.com
+Subject: Re: [PATCH] net: txgbe: fix GPIO interrupt blocking
+Message-ID: <9259e4eb-8744-45cf-bdea-63bc376983a4@lunn.ch>
+References: <20240206070824.17460-1-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240206070824.17460-1-jiawenwu@trustnetic.com>
 
-The gro self-tests sends the packets to be aggregated with
-multiple write operations.
+On Tue, Feb 06, 2024 at 03:08:24PM +0800, Jiawen Wu wrote:
+> GPIO interrupt is generated before MAC IRQ is enabled, it causes
+> subsequent GPIO interrupts that can no longer be reported if it is
+> not cleared in time. So clear GPIO interrupt status at the right
+> time.
 
-When running is slow environment, it's hard to guarantee that
-the GRO engine will wait for the last packet in an intended
-train.
+This does not sound correct. Since this is an interrupt controller, it
+is a level interrupt. If its not cleared, as soon as the parent
+interrupt is re-enabled, is should cause another interrupt at the
+parent level. Servicing that interrupt, should case a descent to the
+child, which will service the interrupt, and atomically clear the
+interrupt status.
 
-The above causes almost deterministic failures in our CI for
-the 'large' test-case.
+Is something wrong here, like you are using edge interrupts, not
+level?
 
-Address the issue explicitly ignoring failures for such case
-in slow environments (KSFT_MACHINE_SLOW==true).
+> And executing function txgbe_gpio_irq_ack() manually since
+> handle_nested_irq() does not call .irq_ack for irq_chip.
 
-Fixes: 7d1575014a63 ("selftests/net: GRO coalesce test")
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
-Note that the fixes tag is there mainly to justify targeting the net
-tree, and this is aiming at net to hopefully make the test more stable
-ASAP for both trees.
+I don't know the interrupt code too well, so could you explain this in
+more detail. Your explanation sounds odd to me.
 
-I experimented with a largish refactory replacing the multiple writes
-with a single GSO packet, but exhausted by time budget before reaching
-any good result.
----
- tools/testing/selftests/net/gro.sh | 4 ++++
- 1 file changed, 4 insertions(+)
+What is the big picture problem here? Do you have the PHY interrupt
+connected to a GPIO and you are loosing PHY interrupts?
 
-diff --git a/tools/testing/selftests/net/gro.sh b/tools/testing/selftests/net/gro.sh
-index 19352f106c1d..114b5281a3f5 100755
---- a/tools/testing/selftests/net/gro.sh
-+++ b/tools/testing/selftests/net/gro.sh
-@@ -31,6 +31,10 @@ run_test() {
-       1>>log.txt
-     wait "${server_pid}"
-     exit_code=$?
-+    if [ ${test} == "large" -a -n "${KSFT_MACHINE_SLOW}" ]; then
-+        echo "Ignoring errors due to slow environment" 1>&2
-+        exit_code=0
-+    fi
-     if [[ "${exit_code}" -eq 0 ]]; then
-         break;
-     fi
--- 
-2.43.0
-
+	Andrew
 
