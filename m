@@ -1,80 +1,96 @@
-Return-Path: <netdev+bounces-69648-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69649-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A73D284C0BE
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 00:17:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF48A84C0D6
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 00:24:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64BFB1F23A39
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 23:17:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA0291C21708
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 23:24:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D968E1C69D;
-	Tue,  6 Feb 2024 23:17:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N8p+DySB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A13D1CD26;
+	Tue,  6 Feb 2024 23:24:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65E41CD27
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 23:17:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D41681CA8E
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 23:24:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707261455; cv=none; b=W3srRd50CnHzf4Pfh7i4csV1/SwCJhJgVHidKX1Cr2DR1EOStZKGmHGEUrwnvq5QpJQ2ZZrDBp2EZbSFkeoi5pIeS3LZxDwNvq7UdIe1afZ30b94jlGJlqw8+5e7QPN6ycm5oYxAXI57yAJX9YmjXhU7cMsnS5cOTglrGN7nnLI=
+	t=1707261847; cv=none; b=utPH38L5Nq6rlVFO2ksJs+KSboQlAyHRjM9QBlecWj92wDMrcJBQBurd0u7GkuvGQHkimWsiNKb7/kdJMOE3FkokOvVPVV11Ww3Wmr246g1JALcSsCu2tt29fiDYp/p3m8clfhd3yn+stcC8FVqsxpd7Q9ZWNpZIgW3mYxqRbfs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707261455; c=relaxed/simple;
-	bh=xDeP1WzOK7z0TrBaP7cyYGKrsqjlegG7W3Yixb26mAM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GFW3/mDLC/xgVAV4AtzmZlaT4qbDKwH4qfohWZpExs3FZrqaKKQb9RCXBrJFdnmMNX7gwhNwNLkxWfwSw6wkmRtv3rIiJaLns031PEgoQIJmNF8Qf13nFzlgsC2VBbmN6DaHMdHngTdGc+mG97gyI6rQyyNangOJTfsQt9ABL1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N8p+DySB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3F3EC433C7;
-	Tue,  6 Feb 2024 23:17:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707261455;
-	bh=xDeP1WzOK7z0TrBaP7cyYGKrsqjlegG7W3Yixb26mAM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=N8p+DySBWJ75qkCh7OjMVqv9bMVjApCJNhKXHlo2S+sDkIVQItorHFPY0strszai/
-	 3YlgUQbtcJz4asTMTowCqnHCrTkIQ3BpdnpJnZg6EYAFasbGKgkKjtVpHmTIowJ5xs
-	 A/bwZI9Tb6+w1e1k2ut0Cr++uml61X1D5/yNOg5GPktwZYumJjlVqptxU3CLLc8v22
-	 0mQqg8hfe66G861JpvCwBE2Q1oIEwjmkrDyO/8zmiZdB8UQxODrvPxVenhNfEE/Nil
-	 V6p0e/bfQhM6eCUXCeQBayzNuS1aXwFb57FwPunnJuAA4f+wmwzw+YNc2oyK+yg05S
-	 +Py/FxQLeMvKA==
-Date: Tue, 6 Feb 2024 15:17:33 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Keller, Jacob E" <jacob.e.keller@intel.com>
-Cc: "Brady, Alan" <alan.brady@intel.com>, "intel-wired-lan@lists.osuosl.org"
- <intel-wired-lan@lists.osuosl.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "willemdebruijn.kernel@gmail.com"
- <willemdebruijn.kernel@gmail.com>, "Kitszel, Przemyslaw"
- <przemyslaw.kitszel@intel.com>, "Bagnucki, Igor" <igor.bagnucki@intel.com>,
- "Lobakin, Aleksander" <aleksander.lobakin@intel.com>
-Subject: Re: [PATCH v4 00/10 iwl-next] idpf: refactor virtchnl messages
-Message-ID: <20240206151733.076ddfcd@kernel.org>
-In-Reply-To: <CO1PR11MB508916E50B5BA5A85BE28852D6462@CO1PR11MB5089.namprd11.prod.outlook.com>
-References: <20240206033804.1198416-1-alan.brady@intel.com>
-	<20240206105737.50149937@kernel.org>
-	<d93d8608-be23-401a-b163-da7ce4dc476f@intel.com>
-	<20240206120303.0fd22238@kernel.org>
-	<CO1PR11MB508916E50B5BA5A85BE28852D6462@CO1PR11MB5089.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1707261847; c=relaxed/simple;
+	bh=avaOUcgWWADF6KLGwzoW9QsC+X9ueBhEDEJuX1SutnY=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=YEdDfY44y7Q4IyTQZEGgDPwi1A96EXkWDYb6ms0Ho7mjZqZecQbDh9EXygjWXwVYXQ/v0qE7zz5EyAXis7LgvbPh4zoF8Un05FwKeK0F/Ef5ebJ1r9viQykQynjZOIXeDYpoHeOa6402hI42sk8EmJc475V1HUjPBeq+jYgD6qY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-363c3eb46e3so82915ab.3
+        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 15:24:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707261845; x=1707866645;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=dyU9aBXxURAl9A5KuV1JqmHm0E55rA4SNAlAUuaADxs=;
+        b=mIdrz7BX29SXL3W0tab7A5Q8MWrZAkd6CsFiddWtO49oehqtel40GzuoeF1D0FzOhh
+         xg6L06atmyyIwR/SHZ2ikVBkjux3jGHBZxyOhp4DXmqdcaX7+P93S8l1IJPTGCA4KGmd
+         SOXeu61FI3vM0ifQMgesQqn4mY49JG/MbAtcJ04ATPSpj92YyxVV4wdSU2tv43FTRAU3
+         bVmi8noeq/YN2q+PO5OZg6nVmMNN2iSedaC0hyX6a14ZvsC1Ru0z5EpQDQ4NxWiQ32wX
+         FDoXU0fVqFJ1/vH37v+fJlwtdivcBI+MMDBGJek/7vEn5x6DdWKH0xFgwTnsg4eXfDB8
+         DQyg==
+X-Forwarded-Encrypted: i=1; AJvYcCXROK1t2WIeNU7M2pkhMuOG5mhpnTjQ8oTLCqK7yuGyuyK8JPwVxN6DXuUjr4ptUOqZ0HuO5jY7Cc9Am1YHCfb+NwJE2RqB
+X-Gm-Message-State: AOJu0YzgxvFHSwT2exZYcEcmHrgcxtIRBhyUDtZ48yOudDWa0bXMhgd9
+	02k6xbbOc4qn1KPlYfuP3+W+s8HdZD7nrQ1r/9ed7i+gEIcF3F+3uLZkiiFbK87xLxvfvHzmtWI
+	+6NhMOsXzRznYqR1Jqbh7siA8pKtWWvVAvaVebWQu5eCzJdpco1qcrkI=
+X-Google-Smtp-Source: AGHT+IGSXSHoJP49btDMUUbQR8POUN20RhhYPv9Heu/t1qcOYXiDcq7JQgRofse+fmN8ylccOMewqdmAQJFGKKPWHm8kVCz6GLrK
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1d9e:b0:363:ca65:7d12 with SMTP id
+ h30-20020a056e021d9e00b00363ca657d12mr207768ila.6.1707261845064; Tue, 06 Feb
+ 2024 15:24:05 -0800 (PST)
+Date: Tue, 06 Feb 2024 15:24:05 -0800
+In-Reply-To: <0000000000009655270610aafce1@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d053f20610bedf3b@google.com>
+Subject: Re: [syzbot] [netfilter?] WARNING: suspicious RCU usage in hash_netportnet6_destroy
+From: syzbot <syzbot+bcd44ebc3cd2db18f26c@syzkaller.appspotmail.com>
+To: 00107082@163.com, coreteam@netfilter.org, davem@davemloft.net, 
+	edumazet@google.com, fw@strlen.de, justinstitt@google.com, 
+	kadlec@netfilter.org, kuba@kernel.org, kuniyu@amazon.com, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 6 Feb 2024 22:50:25 +0000 Keller, Jacob E wrote:
-> > Hm, okay, that does sound like making it worse.
-> > I'll disable the minmax coccicheck for now, it seems noisy.  
-> 
-> Maybe you could make the coccicheck only complain if the value is
-> non-zero or not const? Maybe that's a bit too complicated... Hm
+syzbot has bisected this issue to:
 
-Non-zero could work. It may be worthwhile to look at the warnings cocci
-currently generates and figure out what's common among the cases where
-warning doesn't make sense.
+commit 97f7cf1cd80eeed3b7c808b7c12463295c751001
+Author: Jozsef Kadlecsik <kadlec@netfilter.org>
+Date:   Mon Jan 29 09:57:01 2024 +0000
+
+    netfilter: ipset: fix performance regression in swap operation
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15790a38180000
+start commit:   021533194476 Kconfig: Disable -Wstringop-overflow for GCC ..
+git tree:       upstream
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=17790a38180000
+console output: https://syzkaller.appspot.com/x/log.txt?x=13790a38180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=f204e0b6490f4419
+dashboard link: https://syzkaller.appspot.com/bug?extid=bcd44ebc3cd2db18f26c
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16329057e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15b8fe7be80000
+
+Reported-by: syzbot+bcd44ebc3cd2db18f26c@syzkaller.appspotmail.com
+Fixes: 97f7cf1cd80e ("netfilter: ipset: fix performance regression in swap operation")
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
