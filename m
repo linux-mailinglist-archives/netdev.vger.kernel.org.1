@@ -1,93 +1,95 @@
-Return-Path: <netdev+bounces-69417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CBED84B176
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:38:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83E5C84B17E
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 10:40:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A3DE4B25327
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 09:38:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9096B21E91
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 09:40:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFB7712D153;
-	Tue,  6 Feb 2024 09:38:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3765F12D152;
+	Tue,  6 Feb 2024 09:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="dKXLtGPR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fxhcc8GA"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7FE12D148;
-	Tue,  6 Feb 2024 09:38:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C23012D148;
+	Tue,  6 Feb 2024 09:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707212327; cv=none; b=GgoN7f/HqddlxvYCgnxbf6LNeqtJr8ge6zXSul483yItAA81zgMXECvZb600LtFFhhr9HHxsigLmHUi0kgdB5FEPYNn5bhq5xhE1X5exuWx1+ijy2sKNGhm7bJNR98jTiND8qfopzNK5t00thHi5t2JlojlnrcAyv8OL/dQwLoA=
+	t=1707212428; cv=none; b=NdJE+HfxDh+qYKcHlPG/nTFhIhNazi9f1XTXFqGID9jtqjQM6czH0Kt3Ae1rYm1eqnXKSIOin8P0JgagPqYAd5aheGVINyK/d1DBGYHb6eqLPqfwM9OYukTlKE54z/Ny68HY4z3/yTPHQNV/Wo3q0TJ4mO3MdLchg9pel0e3/Hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707212327; c=relaxed/simple;
-	bh=R1JkbkHYZjBJccdGuVGW2VQafUHeELVUbK2T3y/y9DU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NmeyYu621HewxSKlRSi80Ey6KEvpAplVjFC7o+eRQNxeJGY3gnqaNOF3L7sEs6joXb0et4+x93IKSnYj/QN3F1NsGeyA9E+I8I4aDrX7HhRFIbyTT58RPbX6IDhhhX6/F/9y+yS4KIKiDN+lPDw7C48gcIZPGELn3MgJse2sD5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=dKXLtGPR; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 26B2E1C0004;
-	Tue,  6 Feb 2024 09:38:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1707212323;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R1JkbkHYZjBJccdGuVGW2VQafUHeELVUbK2T3y/y9DU=;
-	b=dKXLtGPRXyrAMOrPTXbdEyI20UREUIhUzE+Mf1Z5vpipNPJdGYMVPkrsUQeoigC1hwWnkb
-	+sM/Si7s/HdqTv9NJGKDnsV0uLZobsBHMzgjmbD4K2wnudQJXaLBCBra8zBnv8j0xNA7kC
-	8vGEoiOuRG5cnA6VA9PtfySl3RUAvBpgybPSqe+1fsUeivB74y2RiRnOcRwyMSPcRb032N
-	hOtgA17p2NVRic19T0+WnJSj06W4R2W6/zdYQQ1bcLS98kh3PkmcXJdgUjfn03M3Zfql6B
-	Kb1Rtjq5ghJdvaH+4DpXNXzP2XvEKZl5yXAe4j3mW0eXFWOMNUP9ZRiKbIWvbg==
-Date: Tue, 6 Feb 2024 10:38:42 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Ariel Elior <aelior@marvell.com>, Manish Chopra
- <manishc@marvell.com>, Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony
- Nguyen <anthony.l.nguyen@intel.com>, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org
-Subject: Re: [PATCH 0/8] drivers: net: Convert EEE handling to use linkmode
- bitmaps
-Message-ID: <20240206103842.0a72ed27@device-28.home>
-In-Reply-To: <20240204-keee-u32-cleanup-v1-0-fb6e08329d9a@lunn.ch>
-References: <20240204-keee-u32-cleanup-v1-0-fb6e08329d9a@lunn.ch>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.39; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1707212428; c=relaxed/simple;
+	bh=b5Q0bEGFlliOgO8ZPlU1DX/9fSkj/V0AMapQ6831k+8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=He2/eQ8USVIvU+N87COZsh5rVwv6WIcmNQHw/dt62883HVE7UZJUsUp4um2SFZo92lm+b5i6SPHQu9SrVfshKGorjSW8bnnEzjOZSBqIfbmDh1iaNO6V7sMEFEvqfqsR/gak8uCPgTQok8pos/wevLP1VkNElhZMwZpto/We2D0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fxhcc8GA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 865D1C43394;
+	Tue,  6 Feb 2024 09:40:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707212427;
+	bh=b5Q0bEGFlliOgO8ZPlU1DX/9fSkj/V0AMapQ6831k+8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Fxhcc8GAAwMtDqDlpvW/wvOCt0kgP0Kl6DS7ncS9vJnXJ/8NIW/WZyvkLrcy0c25c
+	 EJSOXEk0Oas+0x/YvDINKldHlMO58doR6okuTCqzPCifsfx8pl4rytWP6PWkW8y5tr
+	 Dt3xIQrNLvWNxPovrHjxCYKwOKOuOOkbj6pEPNIMYHZzVU72W/Ea0R416olnvGLhjO
+	 OHgDzstf/ZccPRpqhnuczte8W3bZSx5RLCcNldQnd/uSZP791pSGJjO5RMdlQsT+f7
+	 dchzQhln0QiXPO1rzVhZw0coL1pa4GSTA0vB2OuRv3CLGEZCvXzERLKkTSPwDVPvUM
+	 u9LZuSWCaTDzQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6C8E7D8C97E;
+	Tue,  6 Feb 2024 09:40:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] selftests/net: Amend per-netns counter checks
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170721242744.16343.3381362430812280443.git-patchwork-notify@kernel.org>
+Date: Tue, 06 Feb 2024 09:40:27 +0000
+References: <20240202-unsigned-md5-netns-counters-v1-1-8b90c37c0566@arista.com>
+In-Reply-To: <20240202-unsigned-md5-netns-counters-v1-1-8b90c37c0566@arista.com>
+To: Dmitry Safonov <dima@arista.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, shuah@kernel.org, 0x7f454c46@gmail.com, horms@kernel.org,
+ mnassiri@ciena.com, netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-Hello Andrew,
+Hello:
 
-On Sun, 04 Feb 2024 17:40:17 -0600
-Andrew Lunn <andrew@lunn.ch> wrote:
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-> EEE has until recently been limited to lower speeds due to the use of
-> the legacy u32 for link speeds. This restriction has been lifted, with
-> the use of linkmode bitmaps. This patchset convert some MAC drivers
-> still using the old _u32 to link modes, with the aim of soon being
-> able to remove the legacy _u32 members in the keee structure.
+On Fri,  2 Feb 2024 02:24:59 +0000 you wrote:
+> Selftests here check not only that connect()/accept() for
+> TCP-AO/TCP-MD5/non-signed-TCP combinations do/don't establish
+> connections, but also counters: those are per-AO-key, per-socket and
+> per-netns.
+> 
+> The counters are checked on the server's side, as the server listener
+> has TCP-AO/TCP-MD5/no keys for different peers. All tests run in
+> the same namespaces with the same veth pair, created in test_init().
+> 
+> [...]
 
-Although I don't have proper hardware to test all these, I've read
-the patches and I didn't find any obvious issues besides the typo in
-patch 7.
+Here is the summary with links:
+  - selftests/net: Amend per-netns counter checks
+    https://git.kernel.org/netdev/net/c/b083d24fcf57
 
-Regards,
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Maxime
+
 
