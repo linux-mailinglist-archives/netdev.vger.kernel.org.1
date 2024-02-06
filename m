@@ -1,633 +1,170 @@
-Return-Path: <netdev+bounces-69358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69359-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5F3584ACB8
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 04:08:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50E0184ACF9
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 04:38:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DF5B287B41
-	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 03:08:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A014B1F235C0
+	for <lists+netdev@lfdr.de>; Tue,  6 Feb 2024 03:38:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 496707317A;
-	Tue,  6 Feb 2024 03:08:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 846FA745CE;
+	Tue,  6 Feb 2024 03:38:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WQCMYED/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NdA5A+9b"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5AD3745E8
-	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 03:08:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8830B2CA4
+	for <netdev@vger.kernel.org>; Tue,  6 Feb 2024 03:38:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707188910; cv=none; b=QW+VM7K16uZXhqcdKOcPPiVh65r2tIRHBhwx5YvUUp9ZxOiIhIlcVBtdOIYnItejp6PWUliVB6W1wiVWPTCgOdHP0MK9SCotmFTaQgYG6v1Pu9qgv15yXOdmUYk4KOBkTYS9gkn6Y6TyYrJnhUf98ZhVVswEVvaHKxsa+1V4WlU=
+	t=1707190695; cv=none; b=EC0cGiYVGr/B7qoauaC25AzrMmMUQeGf9vKcmprcNzF6ptk1gZdQYTnO3bjj+PMYPsCPUI2KF0oSzeMsFmqXjROB+3gSZfrOlxyOCeH/fFO/rWeizgR/xp4oZsPDmOLrzaAq+MHXwQsxLEDL0j0mnqcBp01RAAh5FwYX9KsXe+Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707188910; c=relaxed/simple;
-	bh=d4/Xdc3RDPX9yQFzLbD/w3v8QdUW1JkPJki7k0rJDnM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gV/7sIlWd6SLD78+PPvDxYnejariAMeQabr1/InqqGXX80H+Ml2sOWNJL/i5EHd6UKOgEi3Mf6s3tSeZeiJEeBpmLdnV0IVef6zTrawS1g5tC39WdgVia/yZNOgAimk7qPAK/ertAwy6Lal6Hyy50hMoFnsx8toebpmBKBn6WNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WQCMYED/; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707188907;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=4coahlz/EBj4Pt0jKop1+g2Y8QuGd/wq0ymO/hlVzac=;
-	b=WQCMYED/vCC/e+IbKMjYGo3tP4ksOioD1u5Br7QKeoDJM18JYD1bESu8p223Jjcb/ysLDn
-	fk5LMBrXegjIRQ6E6iLhqcQDyiq92/Zat+TOqK2xiigcLdJ5Y8TEbnGZGFvhe3hJCuYR27
-	CQL1qCZIQIWOgSag3YMYNXSRX24TKAU=
-Received: from mail-oi1-f199.google.com (mail-oi1-f199.google.com
- [209.85.167.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-504-8cdvpwwrMU2GzgeL3M3Mdg-1; Mon, 05 Feb 2024 22:08:25 -0500
-X-MC-Unique: 8cdvpwwrMU2GzgeL3M3Mdg-1
-Received: by mail-oi1-f199.google.com with SMTP id 5614622812f47-3bfd890774eso1902607b6e.1
-        for <netdev@vger.kernel.org>; Mon, 05 Feb 2024 19:08:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707188904; x=1707793704;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4coahlz/EBj4Pt0jKop1+g2Y8QuGd/wq0ymO/hlVzac=;
-        b=isyvpJwcs4iyMLQ7zuYm0SPO2gfaQ2nEA3IWmiYt3T1pMgnE3z1VdA0o2k98ZPuXBz
-         1LtEjnuWmpK+T5Gc7cqnnple2zSm11wHSlYr7Bi8vJoEObRJcW5VGnM6IHMMpvmSrUAd
-         Zd4GAHNJLMSMtWB+w6013ZfL0cPzPqBfPci1NVd5DEgKCOYLwkGaaOfUJO1+uMwtEA5W
-         2KVfhEJkr3RATgErucmF18BeDJJJHtk+cqgzXH1Ekd385tzriN/zCadFKwE9t5e0nQFG
-         Z2r6DZE7JAGhzXKxFuYLv6ll+DhAUD3uAANW8J6/jS0PJbsnIoagWZwbQAwOQZDOM8Lc
-         nyQA==
-X-Gm-Message-State: AOJu0YzTR6pS4uDNXguhTx51CQS1Zria0O6+7KRRAiugITDdooeEoj+a
-	p/F1r8oLolYagGyUOW/Vck+EnwvM73sCZe34Z4c7Lr+a4sZaSDZCoiRrbAorZicD4wB2Scxg+PO
-	VCbTTpC8foX/IztZDs8UeIaHo7lwGdPlAhQVtyc/P5RmRqocwEHSGbHOjrWhGp30UihNWCUwN1V
-	/7AIM5zopcJK7IK57AmxWJE7oL+/bT
-X-Received: by 2002:a05:6808:318e:b0:3bd:cacd:332d with SMTP id cd14-20020a056808318e00b003bdcacd332dmr2715490oib.40.1707188904513;
-        Mon, 05 Feb 2024 19:08:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEQny3V1VkYtRB2ydA1yRnrOiZEf8txFsj8hfIvEAejsnMmlzfAYMzDJtsYqOGeWCY0/xT1aXBK4lyE7E6bTcE=
-X-Received: by 2002:a05:6808:318e:b0:3bd:cacd:332d with SMTP id
- cd14-20020a056808318e00b003bdcacd332dmr2715477oib.40.1707188904216; Mon, 05
- Feb 2024 19:08:24 -0800 (PST)
+	s=arc-20240116; t=1707190695; c=relaxed/simple;
+	bh=SivssqEd2AifeIrqAszgd/JFRTzLlRswVDVW8rQyOZw=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Z5Ct+H15uh6GcnVaNy6PZzd/CAvf729sPmvE6ZZrOhzObw0Auskcgac2xBTjkgzA+ih2pTRvggfbx1yT0eCk1RSoXmYIHZJXm8i6Q8+A1Kpllhcg7TwBnv5Iv2BPuoBwP3blX9q/q5xyGdUpm730QfQAi5d4h4L2dzYAMEuXoyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NdA5A+9b; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707190694; x=1738726694;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=SivssqEd2AifeIrqAszgd/JFRTzLlRswVDVW8rQyOZw=;
+  b=NdA5A+9b/V9pe2aGTEs4UifF/7W4YaBBBbjcboljlr5I11TUdEVTEUQY
+   Q0LYwWS+le8/KPt4TnRYdUrEzsolz9zfchChPByVC/LU3KthunupWV8lB
+   rJA5i4uVIK1OUIyyT/4sg9osS4KkZpsvDMSd/+KZq0SZS28X/Ddrk9PJ/
+   6qAOoYlXLoi741bytlJgvfyWlx6fqUOYc/t5aTvKD/i5//qoVB3MnJoy1
+   fnEV6q+3YnB5oHLNeaqTBHH0vb/woTj4z6A6AAWdKubSPBO/vAJbexT5v
+   Jm3iiAE/RiiDIW/yzcOE38ExRf5lUEDmA/1zy/xA/wZZinh5KMbjExNqN
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10975"; a="824746"
+X-IronPort-AV: E=Sophos;i="6.05,246,1701158400"; 
+   d="scan'208";a="824746"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2024 19:38:14 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,246,1701158400"; 
+   d="scan'208";a="5653855"
+Received: from dev1-atbrady.jf.intel.com ([10.166.241.35])
+  by orviesa004.jf.intel.com with ESMTP; 05 Feb 2024 19:38:13 -0800
+From: Alan Brady <alan.brady@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	willemdebruijn.kernel@gmail.com,
+	przemyslaw.kitszel@intel.com,
+	igor.bagnucki@intel.com,
+	aleksander.lobakin@intel.com,
+	Alan Brady <alan.brady@intel.com>
+Subject: [PATCH v4 00/10 iwl-next] idpf: refactor virtchnl messages
+Date: Mon,  5 Feb 2024 19:37:54 -0800
+Message-Id: <20240206033804.1198416-1-alan.brady@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240205124506.57670-1-linyunsheng@huawei.com> <20240205124506.57670-6-linyunsheng@huawei.com>
-In-Reply-To: <20240205124506.57670-6-linyunsheng@huawei.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 6 Feb 2024 11:08:11 +0800
-Message-ID: <CACGkMEsKHOefArPd56RAYPsJE8kf=jGb6B-V6eNJiViCAD7GYA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 5/5] tools: virtio: introduce vhost_net_test
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	virtualization@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 5, 2024 at 8:46=E2=80=AFPM Yunsheng Lin <linyunsheng@huawei.com=
-> wrote:
->
-> introduce vhost_net_test for both vhost_net tx and rx basing
-> on virtio_test to test vhost_net changing in the kernel.
->
-> Steps for vhost_net tx testing:
-> 1. Prepare a out buf.
-> 2. Kick the vhost_net to do tx processing.
-> 3. Do the receiving in the tun side.
-> 4. verify the data received by tun is correct.
->
-> Steps for vhost_net rx testing:
-> 1. Prepare a in buf.
-> 2. Do the sending in the tun side.
-> 3. Kick the vhost_net to do rx processing.
-> 4. verify the data received by vhost_net is correct.
->
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> ---
->  tools/virtio/.gitignore            |   1 +
->  tools/virtio/Makefile              |   8 +-
->  tools/virtio/linux/virtio_config.h |   4 +
->  tools/virtio/vhost_net_test.c      | 536 +++++++++++++++++++++++++++++
->  4 files changed, 546 insertions(+), 3 deletions(-)
->  create mode 100644 tools/virtio/vhost_net_test.c
->
-> diff --git a/tools/virtio/.gitignore b/tools/virtio/.gitignore
-> index 9934d48d9a55..7e47b281c442 100644
-> --- a/tools/virtio/.gitignore
-> +++ b/tools/virtio/.gitignore
-> @@ -1,5 +1,6 @@
->  # SPDX-License-Identifier: GPL-2.0-only
->  *.d
->  virtio_test
-> +vhost_net_test
->  vringh_test
->  virtio-trace/trace-agent
-> diff --git a/tools/virtio/Makefile b/tools/virtio/Makefile
-> index d128925980e0..e25e99c1c3b7 100644
-> --- a/tools/virtio/Makefile
-> +++ b/tools/virtio/Makefile
-> @@ -1,8 +1,9 @@
->  # SPDX-License-Identifier: GPL-2.0
->  all: test mod
-> -test: virtio_test vringh_test
-> +test: virtio_test vringh_test vhost_net_test
->  virtio_test: virtio_ring.o virtio_test.o
->  vringh_test: vringh_test.o vringh.o virtio_ring.o
-> +vhost_net_test: virtio_ring.o vhost_net_test.o
->
->  try-run =3D $(shell set -e;              \
->         if ($(1)) >/dev/null 2>&1;      \
-> @@ -49,6 +50,7 @@ oot-clean: OOT_BUILD+=3Dclean
->
->  .PHONY: all test mod clean vhost oot oot-clean oot-build
->  clean:
-> -       ${RM} *.o vringh_test virtio_test vhost_test/*.o vhost_test/.*.cm=
-d \
-> -              vhost_test/Module.symvers vhost_test/modules.order *.d
-> +       ${RM} *.o vringh_test virtio_test vhost_net_test vhost_test/*.o \
-> +              vhost_test/.*.cmd vhost_test/Module.symvers \
-> +              vhost_test/modules.order *.d
->  -include *.d
-> diff --git a/tools/virtio/linux/virtio_config.h b/tools/virtio/linux/virt=
-io_config.h
-> index 2a8a70e2a950..42a564f22f2d 100644
-> --- a/tools/virtio/linux/virtio_config.h
-> +++ b/tools/virtio/linux/virtio_config.h
-> @@ -1,4 +1,6 @@
->  /* SPDX-License-Identifier: GPL-2.0 */
-> +#ifndef LINUX_VIRTIO_CONFIG_H
-> +#define LINUX_VIRTIO_CONFIG_H
->  #include <linux/virtio_byteorder.h>
->  #include <linux/virtio.h>
->  #include <uapi/linux/virtio_config.h>
-> @@ -95,3 +97,5 @@ static inline __virtio64 cpu_to_virtio64(struct virtio_=
-device *vdev, u64 val)
->  {
->         return __cpu_to_virtio64(virtio_is_little_endian(vdev), val);
->  }
-> +
-> +#endif
-> diff --git a/tools/virtio/vhost_net_test.c b/tools/virtio/vhost_net_test.=
-c
-> new file mode 100644
-> index 000000000000..6c41204e6707
-> --- /dev/null
-> +++ b/tools/virtio/vhost_net_test.c
-> @@ -0,0 +1,536 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +#define _GNU_SOURCE
-> +#include <getopt.h>
-> +#include <limits.h>
-> +#include <string.h>
-> +#include <poll.h>
-> +#include <sys/eventfd.h>
-> +#include <stdlib.h>
-> +#include <assert.h>
-> +#include <unistd.h>
-> +#include <sys/ioctl.h>
-> +#include <sys/stat.h>
-> +#include <sys/types.h>
-> +#include <fcntl.h>
-> +#include <stdbool.h>
-> +#include <linux/vhost.h>
-> +#include <linux/if.h>
-> +#include <linux/if_tun.h>
-> +#include <linux/in.h>
-> +#include <linux/if_packet.h>
-> +#include <linux/virtio_net.h>
-> +#include <netinet/ether.h>
-> +
-> +#define HDR_LEN                sizeof(struct virtio_net_hdr_mrg_rxbuf)
-> +#define TEST_BUF_LEN   256
-> +#define TEST_PTYPE     ETH_P_LOOPBACK
-> +#define DESC_NUM       256
-> +
-> +/* Used by implementation of kmalloc() in tools/virtio/linux/kernel.h */
-> +void *__kmalloc_fake, *__kfree_ignore_start, *__kfree_ignore_end;
-> +
-> +struct vq_info {
-> +       int kick;
-> +       int call;
-> +       int idx;
-> +       long started;
-> +       long completed;
-> +       struct pollfd fds;
-> +       void *ring;
-> +       /* copy used for control */
-> +       struct vring vring;
-> +       struct virtqueue *vq;
-> +};
-> +
-> +struct vdev_info {
-> +       struct virtio_device vdev;
-> +       int control;
-> +       struct vq_info vqs[2];
-> +       int nvqs;
-> +       void *buf;
-> +       size_t buf_size;
-> +       char *test_buf;
-> +       char *res_buf;
-> +       struct vhost_memory *mem;
-> +       int sock;
-> +       int ifindex;
-> +       unsigned char mac[ETHER_ADDR_LEN];
-> +};
-> +
-> +static int tun_alloc(struct vdev_info *dev, char *tun_name)
-> +{
-> +       struct ifreq ifr;
-> +       int len =3D HDR_LEN;
-> +       int fd, e;
-> +
-> +       fd =3D open("/dev/net/tun", O_RDWR);
-> +       if (fd < 0) {
-> +               perror("Cannot open /dev/net/tun");
-> +               return fd;
-> +       }
-> +
-> +       memset(&ifr, 0, sizeof(ifr));
-> +
-> +       ifr.ifr_flags =3D IFF_TAP | IFF_NO_PI | IFF_VNET_HDR;
-> +       strncpy(ifr.ifr_name, tun_name, IFNAMSIZ);
-> +
-> +       e =3D ioctl(fd, TUNSETIFF, &ifr);
-> +       if (e < 0) {
-> +               perror("ioctl[TUNSETIFF]");
-> +               close(fd);
-> +               return e;
-> +       }
-> +
-> +       e =3D ioctl(fd, TUNSETVNETHDRSZ, &len);
-> +       if (e < 0) {
-> +               perror("ioctl[TUNSETVNETHDRSZ]");
-> +               close(fd);
-> +               return e;
-> +       }
-> +
-> +       e =3D ioctl(fd, SIOCGIFHWADDR, &ifr);
-> +       if (e < 0) {
-> +               perror("ioctl[SIOCGIFHWADDR]");
-> +               close(fd);
-> +               return e;
-> +       }
-> +
-> +       memcpy(dev->mac, &ifr.ifr_hwaddr.sa_data, ETHER_ADDR_LEN);
-> +       return fd;
-> +}
-> +
-> +static void vdev_create_socket(struct vdev_info *dev, char *tun_name)
-> +{
-> +       struct ifreq ifr;
-> +
-> +       dev->sock =3D socket(AF_PACKET, SOCK_RAW, htons(TEST_PTYPE));
-> +       assert(dev->sock !=3D -1);
-> +
-> +       strncpy(ifr.ifr_name, tun_name, IFNAMSIZ);
-> +       assert(ioctl(dev->sock, SIOCGIFINDEX, &ifr) >=3D 0);
-> +
-> +       dev->ifindex =3D ifr.ifr_ifindex;
-> +
-> +       /* Set the flags that bring the device up */
-> +       assert(ioctl(dev->sock, SIOCGIFFLAGS, &ifr) >=3D 0);
-> +       ifr.ifr_flags |=3D (IFF_UP | IFF_RUNNING);
-> +       assert(ioctl(dev->sock, SIOCSIFFLAGS, &ifr) >=3D 0);
-> +}
-> +
-> +static void vdev_send_packet(struct vdev_info *dev)
-> +{
-> +       char *sendbuf =3D dev->test_buf + HDR_LEN;
-> +       struct sockaddr_ll saddrll =3D {0};
-> +       int sockfd =3D dev->sock;
-> +       int ret;
-> +
-> +       saddrll.sll_family =3D PF_PACKET;
-> +       saddrll.sll_ifindex =3D dev->ifindex;
-> +       saddrll.sll_halen =3D ETH_ALEN;
-> +       saddrll.sll_protocol =3D htons(TEST_PTYPE);
-> +
-> +       ret =3D sendto(sockfd, sendbuf, TEST_BUF_LEN, 0,
-> +                    (struct sockaddr *)&saddrll,
-> +                    sizeof(struct sockaddr_ll));
-> +       assert(ret >=3D 0);
-> +}
-> +
-> +static bool vq_notify(struct virtqueue *vq)
-> +{
-> +       struct vq_info *info =3D vq->priv;
-> +       unsigned long long v =3D 1;
-> +       int r;
-> +
-> +       r =3D write(info->kick, &v, sizeof(v));
-> +       assert(r =3D=3D sizeof(v));
-> +
-> +       return true;
-> +}
-> +
-> +static void vhost_vq_setup(struct vdev_info *dev, struct vq_info *info)
-> +{
-> +       struct vhost_vring_addr addr =3D {
-> +               .index =3D info->idx,
-> +               .desc_user_addr =3D (uint64_t)(unsigned long)info->vring.=
-desc,
-> +               .avail_user_addr =3D (uint64_t)(unsigned long)info->vring=
-.avail,
-> +               .used_user_addr =3D (uint64_t)(unsigned long)info->vring.=
-used,
-> +       };
-> +       struct vhost_vring_state state =3D { .index =3D info->idx };
-> +       struct vhost_vring_file file =3D { .index =3D info->idx };
-> +       int r;
-> +
-> +       state.num =3D info->vring.num;
-> +       r =3D ioctl(dev->control, VHOST_SET_VRING_NUM, &state);
-> +       assert(r >=3D 0);
-> +
-> +       state.num =3D 0;
-> +       r =3D ioctl(dev->control, VHOST_SET_VRING_BASE, &state);
-> +       assert(r >=3D 0);
-> +
-> +       r =3D ioctl(dev->control, VHOST_SET_VRING_ADDR, &addr);
-> +       assert(r >=3D 0);
-> +
-> +       file.fd =3D info->kick;
-> +       r =3D ioctl(dev->control, VHOST_SET_VRING_KICK, &file);
-> +       assert(r >=3D 0);
-> +}
-> +
-> +static void vq_reset(struct vq_info *info, int num, struct virtio_device=
- *vdev)
-> +{
-> +       if (info->vq)
-> +               vring_del_virtqueue(info->vq);
-> +
-> +       memset(info->ring, 0, vring_size(num, 4096));
-> +       vring_init(&info->vring, num, info->ring, 4096);
-> +       info->vq =3D vring_new_virtqueue(info->idx, num, 4096, vdev, true=
-, false,
-> +                                      info->ring, vq_notify, NULL, "test=
-");
-> +       assert(info->vq);
-> +       info->vq->priv =3D info;
-> +}
-> +
-> +static void vq_info_add(struct vdev_info *dev, int idx, int num, int fd)
-> +{
-> +       struct vhost_vring_file backend =3D { .index =3D idx, .fd =3D fd =
-};
-> +       struct vq_info *info =3D &dev->vqs[idx];
-> +       int r;
-> +
-> +       info->idx =3D idx;
-> +       info->kick =3D eventfd(0, EFD_NONBLOCK);
-> +       r =3D posix_memalign(&info->ring, 4096, vring_size(num, 4096));
-> +       assert(r >=3D 0);
-> +       vq_reset(info, num, &dev->vdev);
-> +       vhost_vq_setup(dev, info);
-> +
-> +       r =3D ioctl(dev->control, VHOST_NET_SET_BACKEND, &backend);
-> +       assert(!r);
-> +}
-> +
-> +static void vdev_info_init(struct vdev_info *dev, unsigned long long fea=
-tures)
-> +{
-> +       struct ether_header *eh;
-> +       int i, r;
-> +
-> +       dev->vdev.features =3D features;
-> +       INIT_LIST_HEAD(&dev->vdev.vqs);
-> +       spin_lock_init(&dev->vdev.vqs_list_lock);
-> +
-> +       dev->buf_size =3D (HDR_LEN + TEST_BUF_LEN) * 2;
-> +       dev->buf =3D malloc(dev->buf_size);
-> +       assert(dev->buf);
-> +       dev->test_buf =3D dev->buf;
-> +       dev->res_buf =3D dev->test_buf + HDR_LEN + TEST_BUF_LEN;
-> +
-> +       memset(dev->test_buf, 0, HDR_LEN + TEST_BUF_LEN);
-> +       eh =3D (struct ether_header *)(dev->test_buf + HDR_LEN);
-> +       eh->ether_type =3D htons(TEST_PTYPE);
-> +       memcpy(eh->ether_dhost, dev->mac, ETHER_ADDR_LEN);
-> +       memcpy(eh->ether_shost, dev->mac, ETHER_ADDR_LEN);
-> +
-> +       for (i =3D sizeof(*eh); i < TEST_BUF_LEN; i++)
-> +               dev->test_buf[i + HDR_LEN] =3D (char)i;
-> +
-> +       dev->control =3D open("/dev/vhost-net", O_RDWR);
-> +       assert(dev->control >=3D 0);
-> +
-> +       r =3D ioctl(dev->control, VHOST_SET_OWNER, NULL);
-> +       assert(r >=3D 0);
-> +
-> +       dev->mem =3D malloc(offsetof(struct vhost_memory, regions) +
-> +                         sizeof(dev->mem->regions[0]));
-> +       assert(dev->mem);
-> +       memset(dev->mem, 0, offsetof(struct vhost_memory, regions) +
-> +              sizeof(dev->mem->regions[0]));
-> +       dev->mem->nregions =3D 1;
-> +       dev->mem->regions[0].guest_phys_addr =3D (long)dev->buf;
-> +       dev->mem->regions[0].userspace_addr =3D (long)dev->buf;
-> +       dev->mem->regions[0].memory_size =3D dev->buf_size;
-> +
-> +       r =3D ioctl(dev->control, VHOST_SET_MEM_TABLE, dev->mem);
-> +       assert(r >=3D 0);
-> +
-> +       r =3D ioctl(dev->control, VHOST_SET_FEATURES, &features);
-> +       assert(r >=3D 0);
-> +
-> +       dev->nvqs =3D 2;
-> +}
-> +
-> +static void wait_for_interrupt(struct vq_info *vq)
-> +{
-> +       unsigned long long val;
-> +
-> +       poll(&vq->fds, 1, -1);
+The motivation for this series has two primary goals. We want to enable
+support of multiple simultaneous messages and make the channel more
+robust. The way it works right now, the driver can only send and receive
+a single message at a time and if something goes really wrong, it can
+lead to data corruption and strange bugs.
 
-It's not good to wait indefinitely.
+This works by conceptualizing a send and receive as a "virtchnl
+transaction" (idpf_vc_xn) and introducing a "transaction manager"
+(idpf_vc_xn_manager). The vcxn_mngr will init a ring of transactions
+from which the driver will pop from a bitmap of free transactions to
+track in-flight messages. Instead of needing to handle a complicated
+send/recv for every a message, the driver now just needs to fill out a
+xn_params struct and hand it over to idpf_vc_xn_exec which will take
+care of all the messy bits. Once a message is sent and receives a reply,
+we leverage the completion API to signal the received buffer is ready to
+be used (assuming success, or an error code otherwise).
 
-> +
-> +       if (vq->fds.revents & POLLIN)
-> +               read(vq->fds.fd, &val, sizeof(val));
-> +}
-> +
-> +static void verify_res_buf(char *res_buf)
-> +{
-> +       int i;
-> +
-> +       for (i =3D ETHER_HDR_LEN; i < TEST_BUF_LEN; i++)
-> +               assert(res_buf[i] =3D=3D (char)i);
-> +}
-> +
-> +static void run_tx_test(struct vdev_info *dev, struct vq_info *vq,
-> +                       bool delayed, int bufs)
-> +{
-> +       long long spurious =3D 0;
-> +       struct scatterlist sl;
-> +       unsigned int len;
-> +       int r;
-> +
-> +       for (;;) {
-> +               long started_before =3D vq->started;
-> +               long completed_before =3D vq->completed;
-> +
-> +               virtqueue_disable_cb(vq->vq);
-> +               do {
-> +                       while (vq->started < bufs &&
-> +                              (vq->started - vq->completed) < 1) {
-> +                               sg_init_one(&sl, dev->test_buf, HDR_LEN +=
- TEST_BUF_LEN);
-> +                               r =3D virtqueue_add_outbuf(vq->vq, &sl, 1=
-,
-> +                                                        dev->test_buf + =
-vq->started,
-> +                                                        GFP_ATOMIC);
-> +                               if (unlikely(r !=3D 0))
-> +                                       break;
-> +
-> +                               ++vq->started;
+At a low-level, this implements the "sw cookie" field of the virtchnl
+message descriptor to enable this. We have 16 bits we can put whatever
+we want and the recipient is required to apply the same cookie to the
+reply for that message.  We use the first 8 bits as an index into the
+array of transactions to enable fast lookups and we use the second 8
+bits as a salt to make sure each cookie is unique for that message. As
+transactions are received in arbitrary order, it's possible to reuse a
+transaction index and the salt guards against index conflicts to make
+certain the lookup is correct. As a primitive example, say index 1 is
+used with salt 1. The message times out without receiving a reply so
+index 1 is renewed to be ready for a new transaction, we report the
+timeout, and send the message again. Since index 1 is free to be used
+again now, index 1 is again sent but now salt is 2. This time we do get
+a reply, however it could be that the reply is _actually_ for the
+previous send index 1 with salt 1.  Without the salt we would have no
+way of knowing for sure if it's the correct reply, but with we will know
+for certain.
 
-If we never decrease started/completed shouldn't we use unsigned here?
-(as well as completed)
+Through this conversion we also get several other benefits. We can now
+more appropriately handle asynchronously sent messages by providing
+space for a callback to be defined. This notably allows us to handle MAC
+filter failures better; previously we could potentially have stale,
+failed filters in our list, which shouldn't really have a major impact
+but is obviously not correct. I also managed to remove fairly
+significant more lines than I added which is a win in my book.
 
-Otherwise we may get unexpected results for vq->started as well as
-vq->completed.
+Additionally, this converts some variables to use auto-variables where
+appropriate. This makes the alloc paths much cleaner and less prone to
+memory leaks. We also fix a few virtchnl related bugs while we're here.
 
-> +
-> +                               if (unlikely(!virtqueue_kick(vq->vq))) {
-> +                                       r =3D -1;
-> +                                       break;
-> +                               }
-> +                       }
-> +
-> +                       if (vq->started >=3D bufs)
-> +                               r =3D -1;
+Alan Brady (10):
+  idpf: implement virtchnl transaction manager
+  idpf: refactor vport virtchnl messages
+  idpf: refactor queue related virtchnl messages
+  idpf: refactor remaining virtchnl messages
+  idpf: add async_handler for MAC filter messages
+  idpf: refactor idpf_recv_mb_msg
+  idpf: cleanup virtchnl cruft
+  idpf: prevent deinit uninitialized virtchnl core
+  idpf: fix minor controlq issues
+  idpf: remove dealloc vector msg err in idpf_intr_rel
 
-Which condition do we reach here?
+ drivers/net/ethernet/intel/idpf/idpf.h        |  194 +-
+ .../net/ethernet/intel/idpf/idpf_controlq.c   |    7 +-
+ .../ethernet/intel/idpf/idpf_controlq_api.h   |    5 +
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |   38 +-
+ drivers/net/ethernet/intel/idpf/idpf_main.c   |    3 +-
+ drivers/net/ethernet/intel/idpf/idpf_vf_dev.c |    2 +-
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 2175 ++++++++---------
+ 7 files changed, 1096 insertions(+), 1328 deletions(-)
 
-> +
-> +                       /* Flush out completed bufs if any */
-> +                       while (virtqueue_get_buf(vq->vq, &len)) {
-> +                               int n;
-> +
-> +                               n =3D recvfrom(dev->sock, dev->res_buf, T=
-EST_BUF_LEN, 0, NULL, NULL);
-> +                               assert(n =3D=3D TEST_BUF_LEN);
-> +                               verify_res_buf(dev->res_buf);
-> +
-> +                               ++vq->completed;
-> +                               r =3D 0;
-> +                       }
-> +               } while (r =3D=3D 0);
-> +
-> +               if (vq->completed =3D=3D completed_before && vq->started =
-=3D=3D started_before)
-> +                       ++spurious;
-> +
-> +               assert(vq->completed <=3D bufs);
-> +               assert(vq->started <=3D bufs);
-> +               if (vq->completed =3D=3D bufs)
-> +                       break;
-> +
-> +               if (delayed) {
-> +                       if (virtqueue_enable_cb_delayed(vq->vq))
-> +                               wait_for_interrupt(vq);
-> +               } else {
-> +                       if (virtqueue_enable_cb(vq->vq))
-> +                               wait_for_interrupt(vq);
-> +               }
-
-This could be simplified with
-
-if (delayed)
-else
-
-wait_for_interrupt(vq)
-
-> +       }
-> +       printf("TX spurious wakeups: 0x%llx started=3D0x%lx completed=3D0=
-x%lx\n",
-> +              spurious, vq->started, vq->completed);
-> +}
-> +
-> +static void run_rx_test(struct vdev_info *dev, struct vq_info *vq,
-> +                       bool delayed, int bufs)
-> +{
-> +       long long spurious =3D 0;
-> +       struct scatterlist sl;
-> +       unsigned int len;
-> +       int r;
-> +
-> +       for (;;) {
-> +               long started_before =3D vq->started;
-> +               long completed_before =3D vq->completed;
-> +
-> +               do {
-> +                       while (vq->started < bufs &&
-> +                              (vq->started - vq->completed) < 1) {
-> +                               sg_init_one(&sl, dev->res_buf, HDR_LEN + =
-TEST_BUF_LEN);
-> +
-> +                               r =3D virtqueue_add_inbuf(vq->vq, &sl, 1,
-> +                                                       dev->res_buf + vq=
-->started,
-> +                                                       GFP_ATOMIC);
-> +                               if (unlikely(r !=3D 0))
-> +                                       break;
-> +
-> +                               ++vq->started;
-> +
-> +                               vdev_send_packet(dev);
-> +
-> +                               if (unlikely(!virtqueue_kick(vq->vq))) {
-> +                                       r =3D -1;
-> +                                       break;
-> +                               }
-> +                       }
-> +
-> +                       if (vq->started >=3D bufs)
-> +                               r =3D -1;
-> +
-> +                       /* Flush out completed bufs if any */
-> +                       while (virtqueue_get_buf(vq->vq, &len)) {
-> +                               struct ether_header *eh;
-> +
-> +                               eh =3D (struct ether_header *)(dev->res_b=
-uf + HDR_LEN);
-> +
-> +                               /* tun netdev is up and running, ignore t=
-he
-> +                                * non-TEST_PTYPE packet.
-> +                                */
-> +                               if (eh->ether_type !=3D htons(TEST_PTYPE)=
-) {
-> +                                       ++vq->completed;
-> +                                       r =3D 0;
-> +                                       continue;
-> +                               }
-> +
-> +                               assert(len =3D=3D TEST_BUF_LEN + HDR_LEN)=
-;
-> +                               verify_res_buf(dev->res_buf + HDR_LEN);
-
-Let's simply the logic here:
-
-if (ether_type =3D=3D htons()) {
-    assert()
-    verify_res_buf()
-}
-
-r =3D 0;
-++vq->completed;
-
-Others look good.
-
-Thanks
+-- 
+v1 -> v2:
+    - don't take spin_lock in idpf_vc_xn_init, it's not needed
+    - fix set but unused error on payload_size var in idpf_recv_mb_msg
+    - prefer bitmap_fill and bitmap_zero if not setting an explicit
+      range per documention
+    - remove a couple unnecessary casts in idpf_send_get_stats_msg and
+      idpf_send_get_rx_ptype_msg
+    - split patch 4/6 such that the added functionality for MAC filters
+      is separate
+v2 -> v3:
+    - fix 'mac' -> 'MAC' in async handler error messages
+    - fix size_t format specifier in async handler error message
+    - change some variables to use auto-variables instead
+v3 -> v4:
+    - revert changes to idpf_send_mb_msg that were introduced in v3,
+      this will be addressed in future patch
+    - tweak idpf_recv_mb_msg refactoring to avoid bailing out of the
+      while loop when there are more messages to process and add comment
+      in idpf_vc_xn_forward_reply about ENXIO
+    - include some minor fixes to lower level ctrlq that seem like good
+      candidates to add here
+    - include fix to prevent deinit uninitialized vc core
+    - remove idpf_send_dealloc_vectors_msg error
+2.40.1
 
 
