@@ -1,377 +1,149 @@
-Return-Path: <netdev+bounces-69992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5FCD84D312
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 21:35:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A6D784D31E
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 21:43:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 716A01F22ED1
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 20:35:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE7231F2598E
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 20:43:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F881DFC1;
-	Wed,  7 Feb 2024 20:35:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CF9F1EB5D;
+	Wed,  7 Feb 2024 20:43:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="YSyKl1aH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CrYp0CNZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A8961E525
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 20:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47ADC1E525
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 20:43:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707338137; cv=none; b=pWIqkOhsR/gMcYLDW0ifoXkEAwtOvzKRwvsaaNXGeLtNMCfeRQ8DyXrqtFapuWoLcLWXCGoqxakmIrJaDXD0mmO6Ps3RNQOYqlV2aG4CPE6hAFxLmFZRDp2OY273TNRdVTCsRUUq1rBpNqNBZNthS8/XKWn6SWeJoeA4jneMZ+8=
+	t=1707338622; cv=none; b=igzxP+nmKL02pHE9qmF+9o2u6J8aP6mOuAV985nilC/efew6HRbiiprTZ1qzOPkNbSFM3yPBmhmViXPBw2RLMtejq6wnusEALdrCFT/trI3Nbq+waIL7TkcuMLdKlxDAvwJGOPLb6O0c4AXoivnRPHYNfOp/ugFq1/5BQX8XUak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707338137; c=relaxed/simple;
-	bh=xRezsPyrMmcWpoqHxxGflx+F/i6P7AEn4jI6XLdWQS8=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=r+7WTUavDBq18LJQpTqEXRhuJYnoTGzJQPKutvnad9fGfK7HHPHyz+ayrK2a0j7lEKNl2VnIuZmwq5Zag/og2NePAPOBMtTb+n5fdCVfXeESAyccJW5aY/cIpmNAj2Xdf5L4WUPBnNlkN6u1PHDXodjZyEG/11ITRxguyBaUEgM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=YSyKl1aH; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2d066b532f0so16236681fa.1
-        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 12:35:35 -0800 (PST)
+	s=arc-20240116; t=1707338622; c=relaxed/simple;
+	bh=aZnS/ozK9Q3nmtCH4KG36f1krg7vVVn/T7ZpY1pxZmE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lkIlGvEyMPjK4z8A3JVD0LagGW5VqLRT2p2ZTBWiajaPAEUIGMxucq9LyCP26jcvvvQ6CTxMIqsGYfvRf7idvRblrMtL3lGUqrp7ymuhKn9RTS4oUpxyMxLC/5/xfvnYU0/PBQFY3mWMHt+iUgCu4RRqUVpOndg3YeOtbrIcdwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CrYp0CNZ; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2cf4fafa386so14324741fa.1
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 12:43:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1707338133; x=1707942933; darn=vger.kernel.org;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=wN/5impcpG49BrraXlVb8tLALmWXDoV+Tzy/hBNpHUM=;
-        b=YSyKl1aHCMbUtJhMWx2rUKNeoDmQrLS5aIPqQhaf5tVOI6WyX1RxF2Z2WcMEQUvyYZ
-         /nalsKHdqfqztOEmkweQqe8LIQXOK/Gq5koCDtypCcBlArTH1on3eHp3J2Bqig0X8JS7
-         t2f2i5I34i4M6mNdguzqj5S5Il4r8y5rPbEkqI3bTdPK6hPDasV5+TJeTeqyUTn/V6rh
-         Myv5UJ4FIEpRSOsUBfG/ieKkmGVTj7XJPo425hKKBW4QfkMmCW/IodGYP0Donmk5+Ogz
-         ueGIZ72gu7yEJoO0B4J/8qlMybV0bhsS/wV5wApeQno9LS78RN1swYwwp7f+2J5jPv2P
-         2/+w==
+        d=gmail.com; s=20230601; t=1707338619; x=1707943419; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HzOYbr0NlWwDE7ZwyyejfXX5ZbOEq5K4GY5Kn/91C1o=;
+        b=CrYp0CNZImQAEGQHWEk9XvD2/ZVLQyL0zlb6BPqihIIKOkQJHVQ8kFcRPPub8AySig
+         Tk48ym32Tfrk5bnEt+6OG7jgS0mtszSnyulfmW+ogt8usr81pY0IcbjRJQEjb1f6KxcV
+         n0HbQtYlrP0YdWFNWQtVtMv92d9aTs0dDcAcQyFoqTPSM3fBM0GUnuj+FlLY2XaM0qAS
+         ie2RyyL7VXKvidR7a8CVCuyYSH0qNap/ISsbBNfbPkFdKy30CmAB5rItAFQ5tR3R39MN
+         akAfCYXmrl52kRE8dAZRqurAcuFoZv+e7eWRniaXRlwzUUMsvgtH1LMsWUM2BHU4etE6
+         FP5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707338133; x=1707942933;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=wN/5impcpG49BrraXlVb8tLALmWXDoV+Tzy/hBNpHUM=;
-        b=pBENiMVLPzoHw9pUQkf+lPmmwv1fHOwdtksje7MiOstiYrMpRU1b5i1bX3AvgXhn26
-         iSzfiP2VLcVkSlu6W3PsLFbwD4Mdph68KH/fz2wd3Hxtkq2z15tT9olqEJJLW0Xy8z4y
-         KNsIOkxHYXJJhQxELxij/42uyWDMa/teNdQwdsQYw1Q+cfJ00MEr5mDu5LKQhbHxAyk3
-         JCbej2YxYF47HaUWwhjuOj/lDDxuIW8e2TWLe5QoWbfkVh/+Ph+3ln1jyYIufadWXy2d
-         i+UhoNqCcY0WqVB0Fpe5Cutv3BinwOHAu/lGNiDtV33x5n9kAitiCIC6lr7AFxm+Ezcs
-         xXCA==
-X-Gm-Message-State: AOJu0YznesXEOZyPDgC3KStEbKyl0SvamZxDtrsrjuYfuOdY27G87SAV
-	/jNC6etepvTo7lvYtA1m+NY7VC3Gco/ALWq968qkreBz81g2OVQi9vL5YliK36c=
-X-Google-Smtp-Source: AGHT+IE38s9YDan8wsueTkKuvrlSUMxrOdAd6RB0RRPQV7jjGaNE7hSGsgW49vcC+h6NPgW1x+m5Sg==
-X-Received: by 2002:a2e:3208:0:b0:2d0:b750:514c with SMTP id y8-20020a2e3208000000b002d0b750514cmr5919426ljy.9.1707338133214;
-        Wed, 07 Feb 2024 12:35:33 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWsa/2W4EICgKHL/bhhRL01PlQ4w4/S4TDhvZhGZfrT9KTnyMscYS4do1RWJiJZmLp98TEKaO6Ydb+I/eHGjjIB8LSgeyDBnMVsbmNbv/dpaBBq+5AReFnxNdUjXjZMqp7bKZRayQ77bFH3QHthvvytz7rYRN1L4KrxFELBi+QHkFu36rro3Bi3ni/bBIQVPF8Wrkg8Zl0tfpJBY/o/lpEZA54lmJsIed4no7qWRQ==
-Received: from cloudflare.com ([2a09:bac5:5064:2dc::49:83])
-        by smtp.gmail.com with ESMTPSA id u20-20020aa7db94000000b0056011a877dasm72509edt.29.2024.02.07.12.35.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Feb 2024 12:35:32 -0800 (PST)
-From: Jakub Sitnicki <jakub@cloudflare.com>
-Date: Wed, 07 Feb 2024 21:35:22 +0100
-Subject: [PATCH net-next v3] selftests: udpgso: Pull up network setup into
- shell script
+        d=1e100.net; s=20230601; t=1707338619; x=1707943419;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HzOYbr0NlWwDE7ZwyyejfXX5ZbOEq5K4GY5Kn/91C1o=;
+        b=FC8RoQDfI3A+iEsrVD3iYlgatZRuyfNMLM/A1uqlwSJfOQpic8GXgT0hPH07uUckde
+         Ardr57G0kR74Q97EcemzfJWUoIQLd25L+qreb7YOeaLS1J49hCRj2cYRVCFSP4xXbp47
+         Wr+4cTGlO0WKf4eaeFsErrAUDNbx3TpPP7ga4XMYAmLck85b0/Ia+eldNdWYTk+FJsFE
+         kmbT3GTKqNhVodIDWUD+LynIyNS0qtgqNK0a1juO2f4Pc6fPWQUKBkY4e+4rB547K3wO
+         OsGZNg8Kd6OxTEZ6kqZ9fYxfXNEHMaXH8wk53xV1vFeAtar0TDoPss9fmoH2TgoPQEQJ
+         YjLg==
+X-Gm-Message-State: AOJu0YyDmy/TydzHY5LjVgq4WSHl2U+YoPovEGgQHQmyb61SonnDpx2n
+	aAg/VAHD5aKWRZMQ/WLYJls0lcBGsK4i8WxHz+K54As2GkaMUecf
+X-Google-Smtp-Source: AGHT+IGBQS91y9gY+0aH4WwVqQ/dQeWxl2QgQxDVFTEhBfN/2b3NZWmcIT76xW5kbMtkS1K9wWd9DQ==
+X-Received: by 2002:a05:651c:a06:b0:2d0:cfe6:4364 with SMTP id k6-20020a05651c0a0600b002d0cfe64364mr990306ljq.36.1707338619010;
+        Wed, 07 Feb 2024 12:43:39 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVQ40FjeOG2AlI7t3qC+R/P+/hIutP9r7AZSqCxtmW0oVi1teoBbz0J9SRl8wr9ogihaRTMDStnfjBuJOvydwXlXKI/8uyG+IQV0cuEJb0KKMB1tBdYMpwtJqNzl0oTbjPWBFrP6Q9p3Jc5I7NHDlr69ZUvb5Sldjxhx2GoZjOmOPJyzZrN+MtxqiSsJ6XX9issfjal
+Received: from ?IPV6:2a01:c22:76b1:9500:5d1b:fc9d:6dc2:24a? (dynamic-2a01-0c22-76b1-9500-5d1b-fc9d-6dc2-024a.c22.pool.telefonica.de. [2a01:c22:76b1:9500:5d1b:fc9d:6dc2:24a])
+        by smtp.googlemail.com with ESMTPSA id s5-20020a50d485000000b0055ff68cce5asm82619edi.27.2024.02.07.12.43.38
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 07 Feb 2024 12:43:38 -0800 (PST)
+Message-ID: <7edda20e-d8a2-4049-81a1-1ef946934bc6@gmail.com>
+Date: Wed, 7 Feb 2024 21:43:38 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] r8169: remove setting LED default trigger, this
+ is done by LED core now
+Content-Language: en-US
+To: Simon Horman <horms@kernel.org>
+Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <3a9cd1a1-40ad-487d-8b1e-6bf255419232@gmail.com>
+ <20240207200713.GN1297511@kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20240207200713.GN1297511@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240207-jakub-krn-635-v3-1-3dfa3da8a7d3@cloudflare.com>
-X-B4-Tracking: v=1; b=H4sIAInpw2UC/2WOQQqDMBBFr1KybiQZNWpXvUfpIiZjTbVJiRos4
- t0bQqHQwmw+n/f+bGRCb3Aip8NGPAYzGWdjyI8Honppb0iNjpkAg4IB4/Quh6Wlg7dU5CXVrda
- KccVQ1iQyT4+dWZPvQizO1OI6k2tsejPNzr/SUOCpT06ex+MFQMbzshEl/Uyc1egW3Y3SY6bcI
- zkCfDlg4ueXAJGtuaoaUbVMQPGn2Pf9Ddnll7zxAAAA
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, kernel-team@cloudflare.com, 
- Willem de Bruijn <willemb@google.com>, 
- Jakub Sitnicki <jakub@cloudflare.com>
-X-Mailer: b4 0.13-dev-2d940
 
-udpgso regression test configures routing and device MTU directly through
-uAPI (Netlink, ioctl) to do its job. While there is nothing wrong with it,
-it takes more effort than doing it from shell.
+On 07.02.2024 21:07, Simon Horman wrote:
+> On Mon, Feb 05, 2024 at 10:54:08PM +0100, Heiner Kallweit wrote:
+>> After 1c75c424bd43 ("leds: class: If no default trigger is given, make
+>> hw_control trigger the default trigger") this line isn't needed any
+>> longer.
+>>
+>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> 
+> This patch looks fine to me,
+> but the cited commit is not present in net-next.
 
-Looking forward, we would like to extend the udpgso regression tests to
-cover the EIO corner case [1], once it gets addressed. That will require a
-dummy device and device feature manipulation to set it up. Which means more
-Netlink code.
-
-So, in preparation, pull out network configuration into the shell script
-part of the test, so it is easily extendable in the future.
-
-Also, because it now easy to setup routing, add a second local IPv6
-address. Because the second address is not managed by the kernel, we can
-"replace" the corresponding local route with a reduced-MTU one. This
-unblocks the disabled "ipv6 connected" test case. Add a similar setup for
-IPv4 for symmetry.
-
-[1] https://lore.kernel.org/netdev/87jzqsld6q.fsf@cloudflare.com/
-
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: Jakub Sitnicki <jakub@cloudflare.com>
----
-Changes in v3:
-- Tabify udpgso.sh script
-- Link to v2: https://lore.kernel.org/r/20240206-jakub-krn-635-v2-1-81c7967b0624@cloudflare.com
-
-Changes in v2:
-- Switch from documentation to private IP range
-- Clean up debug comment from shell script
-- Link to v1: https://lore.kernel.org/r/20240130131422.135965-1-jakub@cloudflare.com
----
- tools/testing/selftests/net/udpgso.c  | 134 ++--------------------------------
- tools/testing/selftests/net/udpgso.sh |  49 ++++++++++---
- 2 files changed, 47 insertions(+), 136 deletions(-)
-
-diff --git a/tools/testing/selftests/net/udpgso.c b/tools/testing/selftests/net/udpgso.c
-index 7badaf215de2..1d975bf52af3 100644
---- a/tools/testing/selftests/net/udpgso.c
-+++ b/tools/testing/selftests/net/udpgso.c
-@@ -56,7 +56,6 @@ static bool		cfg_do_msgmore;
- static bool		cfg_do_setsockopt;
- static int		cfg_specific_test_id = -1;
- 
--static const char	cfg_ifname[] = "lo";
- static unsigned short	cfg_port = 9000;
- 
- static char buf[ETH_MAX_MTU];
-@@ -69,8 +68,13 @@ struct testcase {
- 	int r_len_last;		/* recv(): size of last non-mss dgram, if any */
- };
- 
--const struct in6_addr addr6 = IN6ADDR_LOOPBACK_INIT;
--const struct in_addr addr4 = { .s_addr = __constant_htonl(INADDR_LOOPBACK + 2) };
-+const struct in6_addr addr6 = {
-+	{ { 0xfd, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 } }, /* fd00::1 */
-+};
-+
-+const struct in_addr addr4 = {
-+	__constant_htonl(0x0a000001), /* 10.0.0.1 */
-+};
- 
- struct testcase testcases_v4[] = {
- 	{
-@@ -274,48 +278,6 @@ struct testcase testcases_v6[] = {
- 	}
- };
- 
--static unsigned int get_device_mtu(int fd, const char *ifname)
--{
--	struct ifreq ifr;
--
--	memset(&ifr, 0, sizeof(ifr));
--
--	strcpy(ifr.ifr_name, ifname);
--
--	if (ioctl(fd, SIOCGIFMTU, &ifr))
--		error(1, errno, "ioctl get mtu");
--
--	return ifr.ifr_mtu;
--}
--
--static void __set_device_mtu(int fd, const char *ifname, unsigned int mtu)
--{
--	struct ifreq ifr;
--
--	memset(&ifr, 0, sizeof(ifr));
--
--	ifr.ifr_mtu = mtu;
--	strcpy(ifr.ifr_name, ifname);
--
--	if (ioctl(fd, SIOCSIFMTU, &ifr))
--		error(1, errno, "ioctl set mtu");
--}
--
--static void set_device_mtu(int fd, int mtu)
--{
--	int val;
--
--	val = get_device_mtu(fd, cfg_ifname);
--	fprintf(stderr, "device mtu (orig): %u\n", val);
--
--	__set_device_mtu(fd, cfg_ifname, mtu);
--	val = get_device_mtu(fd, cfg_ifname);
--	if (val != mtu)
--		error(1, 0, "unable to set device mtu to %u\n", val);
--
--	fprintf(stderr, "device mtu (test): %u\n", val);
--}
--
- static void set_pmtu_discover(int fd, bool is_ipv4)
- {
- 	int level, name, val;
-@@ -354,81 +316,6 @@ static unsigned int get_path_mtu(int fd, bool is_ipv4)
- 	return mtu;
- }
- 
--/* very wordy version of system("ip route add dev lo mtu 1500 127.0.0.3/32") */
--static void set_route_mtu(int mtu, bool is_ipv4)
--{
--	struct sockaddr_nl nladdr = { .nl_family = AF_NETLINK };
--	struct nlmsghdr *nh;
--	struct rtattr *rta;
--	struct rtmsg *rt;
--	char data[NLMSG_ALIGN(sizeof(*nh)) +
--		  NLMSG_ALIGN(sizeof(*rt)) +
--		  NLMSG_ALIGN(RTA_LENGTH(sizeof(addr6))) +
--		  NLMSG_ALIGN(RTA_LENGTH(sizeof(int))) +
--		  NLMSG_ALIGN(RTA_LENGTH(0) + RTA_LENGTH(sizeof(int)))];
--	int fd, ret, alen, off = 0;
--
--	alen = is_ipv4 ? sizeof(addr4) : sizeof(addr6);
--
--	fd = socket(AF_NETLINK, SOCK_RAW, NETLINK_ROUTE);
--	if (fd == -1)
--		error(1, errno, "socket netlink");
--
--	memset(data, 0, sizeof(data));
--
--	nh = (void *)data;
--	nh->nlmsg_type = RTM_NEWROUTE;
--	nh->nlmsg_flags = NLM_F_REQUEST | NLM_F_CREATE;
--	off += NLMSG_ALIGN(sizeof(*nh));
--
--	rt = (void *)(data + off);
--	rt->rtm_family = is_ipv4 ? AF_INET : AF_INET6;
--	rt->rtm_table = RT_TABLE_MAIN;
--	rt->rtm_dst_len = alen << 3;
--	rt->rtm_protocol = RTPROT_BOOT;
--	rt->rtm_scope = RT_SCOPE_UNIVERSE;
--	rt->rtm_type = RTN_UNICAST;
--	off += NLMSG_ALIGN(sizeof(*rt));
--
--	rta = (void *)(data + off);
--	rta->rta_type = RTA_DST;
--	rta->rta_len = RTA_LENGTH(alen);
--	if (is_ipv4)
--		memcpy(RTA_DATA(rta), &addr4, alen);
--	else
--		memcpy(RTA_DATA(rta), &addr6, alen);
--	off += NLMSG_ALIGN(rta->rta_len);
--
--	rta = (void *)(data + off);
--	rta->rta_type = RTA_OIF;
--	rta->rta_len = RTA_LENGTH(sizeof(int));
--	*((int *)(RTA_DATA(rta))) = 1; //if_nametoindex("lo");
--	off += NLMSG_ALIGN(rta->rta_len);
--
--	/* MTU is a subtype in a metrics type */
--	rta = (void *)(data + off);
--	rta->rta_type = RTA_METRICS;
--	rta->rta_len = RTA_LENGTH(0) + RTA_LENGTH(sizeof(int));
--	off += NLMSG_ALIGN(rta->rta_len);
--
--	/* now fill MTU subtype. Note that it fits within above rta_len */
--	rta = (void *)(((char *) rta) + RTA_LENGTH(0));
--	rta->rta_type = RTAX_MTU;
--	rta->rta_len = RTA_LENGTH(sizeof(int));
--	*((int *)(RTA_DATA(rta))) = mtu;
--
--	nh->nlmsg_len = off;
--
--	ret = sendto(fd, data, off, 0, (void *)&nladdr, sizeof(nladdr));
--	if (ret != off)
--		error(1, errno, "send netlink: %uB != %uB\n", ret, off);
--
--	if (close(fd))
--		error(1, errno, "close netlink");
--
--	fprintf(stderr, "route mtu (test): %u\n", mtu);
--}
--
- static bool __send_one(int fd, struct msghdr *msg, int flags)
- {
- 	int ret;
-@@ -591,15 +478,10 @@ static void run_test(struct sockaddr *addr, socklen_t alen)
- 	/* Do not fragment these datagrams: only succeed if GSO works */
- 	set_pmtu_discover(fdt, addr->sa_family == AF_INET);
- 
--	if (cfg_do_connectionless) {
--		set_device_mtu(fdt, CONST_MTU_TEST);
-+	if (cfg_do_connectionless)
- 		run_all(fdt, fdr, addr, alen);
--	}
- 
- 	if (cfg_do_connected) {
--		set_device_mtu(fdt, CONST_MTU_TEST + 100);
--		set_route_mtu(CONST_MTU_TEST, addr->sa_family == AF_INET);
--
- 		if (connect(fdt, addr, alen))
- 			error(1, errno, "connect");
- 
-diff --git a/tools/testing/selftests/net/udpgso.sh b/tools/testing/selftests/net/udpgso.sh
-index fec24f584fe9..6c63178086b0 100755
---- a/tools/testing/selftests/net/udpgso.sh
-+++ b/tools/testing/selftests/net/udpgso.sh
-@@ -3,27 +3,56 @@
- #
- # Run a series of udpgso regression tests
- 
-+set -o errexit
-+set -o nounset
-+
-+setup_loopback() {
-+	ip addr add dev lo 10.0.0.1/32
-+	ip addr add dev lo fd00::1/128 nodad noprefixroute
-+}
-+
-+test_dev_mtu() {
-+	setup_loopback
-+	# Reduce loopback MTU
-+	ip link set dev lo mtu 1500
-+}
-+
-+test_route_mtu() {
-+	setup_loopback
-+	# Remove default local routes
-+	ip route del local 10.0.0.1/32 table local dev lo
-+	ip route del local fd00::1/128 table local dev lo
-+	# Install local routes with reduced MTU
-+	ip route add local 10.0.0.1/32 table local dev lo mtu 1500
-+	ip route add local fd00::1/128 table local dev lo mtu 1500
-+}
-+
-+if [ "$#" -gt 0 ]; then
-+	"$1"
-+	shift 2 # pop "test_*" arg and "--" delimiter
-+	exec "$@"
-+fi
-+
- echo "ipv4 cmsg"
--./in_netns.sh ./udpgso -4 -C
-+./in_netns.sh "$0" test_dev_mtu -- ./udpgso -4 -C
- 
- echo "ipv4 setsockopt"
--./in_netns.sh ./udpgso -4 -C -s
-+./in_netns.sh "$0" test_dev_mtu -- ./udpgso -4 -C -s
- 
- echo "ipv6 cmsg"
--./in_netns.sh ./udpgso -6 -C
-+./in_netns.sh "$0" test_dev_mtu -- ./udpgso -6 -C
- 
- echo "ipv6 setsockopt"
--./in_netns.sh ./udpgso -6 -C -s
-+./in_netns.sh "$0" test_dev_mtu -- ./udpgso -6 -C -s
- 
- echo "ipv4 connected"
--./in_netns.sh ./udpgso -4 -c
-+./in_netns.sh "$0" test_route_mtu -- ./udpgso -4 -c
- 
--# blocked on 2nd loopback address
--# echo "ipv6 connected"
--# ./in_netns.sh ./udpgso -6 -c
-+echo "ipv6 connected"
-+./in_netns.sh "$0" test_route_mtu -- ./udpgso -6 -c
- 
- echo "ipv4 msg_more"
--./in_netns.sh ./udpgso -4 -C -m
-+./in_netns.sh "$0" test_dev_mtu -- ./udpgso -4 -C -m
- 
- echo "ipv6 msg_more"
--./in_netns.sh ./udpgso -6 -C -m
-+./in_netns.sh "$0" test_dev_mtu -- ./udpgso -6 -C -m
-
+It's present in linux-next. Not sure when it will show up in net-next.
 
