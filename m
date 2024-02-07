@@ -1,141 +1,139 @@
-Return-Path: <netdev+bounces-69860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A512C84CD13
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:43:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97AE084CD1C
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:45:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60DF4281867
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 14:43:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37FB72869FB
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 14:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BBCD7E766;
-	Wed,  7 Feb 2024 14:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78DFD7C0AB;
+	Wed,  7 Feb 2024 14:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hXWfsr6w"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lzRmuCHH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F11476C99
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 14:42:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C5F57E76F
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 14:45:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707316973; cv=none; b=uuPU9cknr/khrKs9cUgfWGSJAA6qQceO5AAPG5wSFpVZTUpjioEhsZMApVtK86sgcdHagS4qZaS+rM23pQxCVLgm/zwQnbIUR5Mw4HNYQqgyQn0hZMz7+OcUUvIfToEA+VgDInfVwic3X3lcdxKW86F2oDPgl/fF7PJ6O7t6ZmA=
+	t=1707317107; cv=none; b=kHQ8uk3gBmCwHGBnw2qUykb9jMKZDApsMVp3wVa634IdeTbxBtiAfctUn3em2Xx+0hrtXG4aA/ty0QAIId89uDUIrluAQj7PjrXzaTGFKhPeFXHRKjNISJlswOwW/lGIIGX2crVrz0qorVeL547nLg+HWViKD6p7kCz800WW4PE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707316973; c=relaxed/simple;
-	bh=P6PlwTTDk91K0CjVrearkQBMy1zvLO1tHcOKTzVZSBY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OYctq0/+vwsiBi7HrX1zcV4+ncfTgwSyDk9O4NkBIxG9PbLPfyaCZDdd1Y9VoPbYo6a607lF+840JQbHydzfek/G8LTFgYtDFtXlAG15NDTodI/uaqvzTT8d6HJdh1cbbgN1zGwGKefk6qtgSOX9NiJAqaDoPJ6vuIA39PMaJTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hXWfsr6w; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a2f22bfb4e6so95551066b.0
-        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 06:42:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707316969; x=1707921769; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=IrZ7ZNYsXKDBg7F86KQox1K2NwLqOhHWWvyghsa0Ef4=;
-        b=hXWfsr6w6rGHdB7wSdl6BKZWsV8BlU7HD8pt0e2Tkn6fpjFFH1AL5AkFW/+B1FnB+X
-         BVBiFRt/w23puEEhmz4l3jP148uNWQxz+3ymXpNraIRokeyHphVn0tfS5YX0GHbKo0LT
-         Xt24wOD30+m9PpYTav1qU65UXG6icnXY5aaKOvWQa5bkaPcKimObE1pEWsawYU8iNJgk
-         ybhz8g5Hi6G8OCS9NFkPfWONZ1emqVWXotaFSvL1SHV3ZA00mkBjnq6dyyK+70s9xUOt
-         knNDqUtYpba0ex2BAVA+vkM9dmRaZOyEQ2ia694iRD27+x6sSMUxklRTdvXjOY/hHjhx
-         8ZNQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707316969; x=1707921769;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IrZ7ZNYsXKDBg7F86KQox1K2NwLqOhHWWvyghsa0Ef4=;
-        b=RZDd7+w9vbkurNdwaSEUHtuc5Y9umrLUaL4HwODyhqlEA0kYLnnT7AxzYW6GKqhegF
-         T7GUtUZ6Vnics7rFPPde9Qj86VUCQDyPqZyuDzmWbTbmb1stEJKbBBh63B321Q8prz+l
-         iM6p4g8PfwJQg6rud7ANWEFUHKbVdbqrzo6oIwiPdopbo1vzG3J4x4EQt7aJl0DWq2a8
-         Z8zVMIK1PEWHGS7gazzYebMc/jBwsLcXkV20DQ7Vqpa0SNyBisG/xP0c3PqxIojQevvr
-         E6MKzJek96I2MDvgA+u7tl4DCeZA2fjeq3j4jiXPDpTXSLp3X2nLEyfqMhTBw5MGfAU9
-         HuRw==
-X-Gm-Message-State: AOJu0YzKzF/Etk/t8WGJnQr3+1xhsKP9rPj+wMx146h8IhjrM1xSx/op
-	WH40B8f6vaWhkkBoS4xWDzSV0wpkwlgUspk4XE+pMMtSIKwRKZIytXLzC5Q5
-X-Google-Smtp-Source: AGHT+IEs3Du2ORmFIrCwEZ/gD3ush/0aIg/2bdwkS/GUU+S5LQUeOKnFMZ1yqi8/ra51a31SdQ6BSw==
-X-Received: by 2002:a17:906:30c7:b0:a38:215c:89b with SMTP id b7-20020a17090630c700b00a38215c089bmr3075512ejb.73.1707316968953;
-        Wed, 07 Feb 2024 06:42:48 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVWbE+QJHqMheeRWbyrcvoOXakxce+JbUpLE5b7cqAARHmsrvDq7W2/b195yCdxQH2MmC5/yqm198qnJvqImylYbZVZXt7cRBilH07FryZWz35ZD4GDPVBhJxjH1AptP7rqy9X7uDcxFlubWloQeWyRD/WInbpts747EZ+qzj580geQrIC7aP9PwVZb9KXkoqI=
-Received: from 127.com ([2620:10d:c092:600::1:fbbf])
-        by smtp.gmail.com with ESMTPSA id l10-20020a1709065a8a00b00a368903fc98sm814579ejq.136.2024.02.07.06.42.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Feb 2024 06:42:48 -0800 (PST)
-From: Pavel Begunkov <asml.silence@gmail.com>
-To: netdev@vger.kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	pabeni@redhat.com,
-	kuba@kernel.org
-Cc: Pavel Begunkov <asml.silence@gmail.com>
-Subject: [PATCH net-next] net: cache for same cpu skb_attempt_defer_free
-Date: Wed,  7 Feb 2024 14:41:07 +0000
-Message-ID: <2b94ee2e65cfd4d2d7f30896ec796f3f9af0a733.1707316651.git.asml.silence@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1707317107; c=relaxed/simple;
+	bh=q8jDyRmKbTii/oLJ2WetHtI+x/SSG/53uGzxq2XL3Gc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SJUC6kRsdFgwV2ocqUvBQJCEDsjAct4usc+cq3KcTOEtc/7uY9x5sFQtFemSzpbQnL2sZaB75uXfx+vir5/UAzOxCXu+rnNrT0oSWkG8KkultJjE51EQIK2GPvDlOpjcpCvnTfbUhMvWkV/IX8DieNMTY5soIJKa/Yu16Vw5OY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lzRmuCHH; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=OaDyFGTBmW8TYo26UkjMw5f5pDRDa7VcA9uT14YqIdA=; b=lz
+	RmuCHHjcdqj9N6kND3ESObO/i+mhnzCyS8D2Lz9bnoQR/UEe7RdPFHKjGOdwMCR13sHhePofzWdqM
+	vCI5zta3o+BX8aFkUT5xMnZBts50RGXPoU8FzrmbFbzs4U/tx3ccCFHqv+AW4t2v8m5PVd70h6C8A
+	j+HS07nmLWdfVx8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rXjAW-007E5g-3Q; Wed, 07 Feb 2024 15:44:56 +0100
+Date: Wed, 7 Feb 2024 15:44:56 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: =?iso-8859-1?B?Q3Pza+Fz?= Bence <csokas.bence@prolan.hu>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>
+Subject: Re: [PATCH resubmit] net: fec: Add ECR bit macros, fix
+ FEC_ECR_EN1588 being cleared on link-down
+Message-ID: <8c0e21da-4f6a-4a42-90c0-011b226ffae7@lunn.ch>
+References: <20240207123610.16337-1-csokas.bence@prolan.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240207123610.16337-1-csokas.bence@prolan.hu>
 
-Optimise skb_attempt_defer_free() executed by the CPU the skb was
-allocated on. Instead of __kfree_skb() -> kmem_cache_free() we can
-disable softirqs and put the buffer into cpu local caches.
+On Wed, Feb 07, 2024 at 01:36:11PM +0100, Csókás Bence wrote:
+> FEC_ECR_EN1588 bit gets cleared after MAC reset in `fec_stop()`, which
+> makes all 1588 functionality shut down on link-down. However, some
+> functionality needs to be retained (e.g. PPS) even without link.
 
-Trying it with a TCP CPU bound ping pong benchmark (i.e. netbench), it
-showed a 1% throughput improvement (392.2 -> 396.4 Krps). Cross checking
-with profiles, the total CPU share of skb_attempt_defer_free() dropped by
-0.6%. Note, I'd expect the win doubled with rx only benchmarks, as the
-optimisation is for the receive path, but the test spends >55% of CPU
-doing writes.
+This is the second version of the patch, so the subject should say v2
+within the [PATCH ].
 
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+Is this fixing a regression, or did it never work correctly?
+
+> Signed-off-by: Csókás Bence <csokas.bence@prolan.hu>
+> ---
+>  drivers/net/ethernet/freescale/fec_main.c | 17 +++++++++++++----
+>  1 file changed, 13 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+> index 63707e065141..652251e48ad4 100644
+> --- a/drivers/net/ethernet/freescale/fec_main.c
+> +++ b/drivers/net/ethernet/freescale/fec_main.c
+> @@ -273,8 +273,11 @@ MODULE_PARM_DESC(macaddr, "FEC Ethernet MAC address");
+>  #define FEC_MMFR_TA		(2 << 16)
+>  #define FEC_MMFR_DATA(v)	(v & 0xffff)
+>  /* FEC ECR bits definition */
+> -#define FEC_ECR_MAGICEN		(1 << 2)
+> -#define FEC_ECR_SLEEP		(1 << 3)
+> +#define FEC_ECR_RESET   BIT(0)
+> +#define FEC_ECR_ETHEREN BIT(1)
+> +#define FEC_ECR_MAGICEN BIT(2)
+> +#define FEC_ECR_SLEEP   BIT(3)
+> +#define FEC_ECR_EN1588  BIT(4)
+
+There was a request to keep the indentation the same. So the BIT()
+need moving right.
+
+>  
+>  #define FEC_MII_TIMEOUT		30000 /* us */
+>  
+> @@ -1213,7 +1216,7 @@ fec_restart(struct net_device *ndev)
+>  	}
+>  
+>  	if (fep->bufdesc_ex)
+> -		ecntl |= (1 << 4);
+> +		ecntl |= FEC_ECR_EN1588;
+
+Please could you split this into two patches. The first patch
+introduced the new #defines, and uses them in the existing code. That
+should be obviously correct. And a second patch adding the new
+functionality, with a good commit message explaining the change,
+particularly the Why?
+
+>  
+>  	if (fep->quirks & FEC_QUIRK_DELAYED_CLKS_SUPPORT &&
+>  	    fep->rgmii_txc_dly)
+> @@ -1314,6 +1317,7 @@ fec_stop(struct net_device *ndev)
+>  	struct fec_enet_private *fep = netdev_priv(ndev);
+>  	u32 rmii_mode = readl(fep->hwp + FEC_R_CNTRL) & (1 << 8);
+>  	u32 val;
+> +	u32 ecntl = 0;
+
+Reverse Christmas tree, as pointed out in your first version of the
+patch.
+
+Thanks
+    Andrew
+
 ---
- net/core/skbuff.c | 16 +++++++++++++++-
- 1 file changed, 15 insertions(+), 1 deletion(-)
-
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index edbbef563d4d..5ac3c353c8a4 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -6877,6 +6877,20 @@ void __skb_ext_put(struct skb_ext *ext)
- EXPORT_SYMBOL(__skb_ext_put);
- #endif /* CONFIG_SKB_EXTENSIONS */
- 
-+static void kfree_skb_napi_cache(struct sk_buff *skb)
-+{
-+	/* if SKB is a clone, don't handle this case */
-+	if (skb->fclone != SKB_FCLONE_UNAVAILABLE || in_hardirq()) {
-+		__kfree_skb(skb);
-+		return;
-+	}
-+
-+	local_bh_disable();
-+	skb_release_all(skb, SKB_DROP_REASON_NOT_SPECIFIED, false);
-+	napi_skb_cache_put(skb);
-+	local_bh_enable();
-+}
-+
- /**
-  * skb_attempt_defer_free - queue skb for remote freeing
-  * @skb: buffer
-@@ -6895,7 +6909,7 @@ void skb_attempt_defer_free(struct sk_buff *skb)
- 	if (WARN_ON_ONCE(cpu >= nr_cpu_ids) ||
- 	    !cpu_online(cpu) ||
- 	    cpu == raw_smp_processor_id()) {
--nodefer:	__kfree_skb(skb);
-+nodefer:	kfree_skb_napi_cache(skb);
- 		return;
- 	}
- 
--- 
-2.43.0
-
+pw-bot: cr
 
