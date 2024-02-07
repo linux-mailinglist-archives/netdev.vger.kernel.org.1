@@ -1,178 +1,102 @@
-Return-Path: <netdev+bounces-69785-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69786-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E029184C99C
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 12:30:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA86784C99F
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 12:33:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C4801C24E65
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 11:30:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55CA01F249D0
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 11:33:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB07018EA1;
-	Wed,  7 Feb 2024 11:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F07F817BDD;
+	Wed,  7 Feb 2024 11:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FJDQcUvN"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 984DA1AADA
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 11:30:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F731B7E3;
+	Wed,  7 Feb 2024 11:33:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707305455; cv=none; b=MybXXc+QXbScnzrtPm4G9L2uk9MQ08vL7TdfOkhY0gODNuuzdMrR0tFJYNHon27o7I/LZBdYMrwCgooyQ6VgnYPe6IHZxTOikX+Hym1NGAWW8V1khChDCsul501Oi5yPBB1qidXZm+dKDrdrn7aAugKlLIvDWjgCDX4Pg7ziCac=
+	t=1707305595; cv=none; b=o2W0y1plV8AS9bu/3mL4PibacUb+k+HpjjrTkFtrbnNT7djptWcW7+l5W/xklwf6FtS2FGHHnOiZ6FqQzoG+8DWt/h0bUYyonEB/GebN61JwmDFEZivlOz60YEiVNw0eBUjEb1U+JEp9U/mdR1hzlPUpzWSRZ1fDece9PmU4Chs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707305455; c=relaxed/simple;
-	bh=mJPb3Csc9S+IPjh9zm7ZZ5fDJg1ab6QD0TMbnPaw/SU=;
+	s=arc-20240116; t=1707305595; c=relaxed/simple;
+	bh=gyo235aVjYRC8Ovs+OpeW93VAIBVmWCkzUNg5AzcKdI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PS79VVkFkh565aYsk8N8tXsQYhncyQYaWaYEvRrgm8wMluXF8EnHEygFogIGir3DfsU5vQU+Yto6YWL5K0thJozkdBbIE2+Ts2KU6d2XsC64WTndgW5m9FrFeELkx1P8X/JEif4Tig+RT5W3/u/IshSLRt/Y9SbkkGgoU8oQjIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rXg8U-0007Ap-8G; Wed, 07 Feb 2024 12:30:38 +0100
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rXg8S-0050gf-KI; Wed, 07 Feb 2024 12:30:36 +0100
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 3A7D4288803;
-	Wed,  7 Feb 2024 11:30:36 +0000 (UTC)
-Date: Wed, 7 Feb 2024 12:30:35 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: =?utf-8?B?Q3PDs2vDoXM=?= Bence <csokas.bence@prolan.hu>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
-	Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Francesco Dolcini <francesco.dolcini@toradex.com>, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH] net: fec: Add ECR bit macros, fix FEC_ECR_EN1588 being
- cleared on link-down
-Message-ID: <20240207-abreast-appraiser-7165418af08e-mkl@pengutronix.de>
-References: <20240207111859.15463-1-csokas.bence@prolan.hu>
+	 Content-Type:Content-Disposition:In-Reply-To; b=UYMFoJVgFOKq4TQJh2a9KCFLawAIeM8GPAXL9UiiVOwH4iLvSMUGwe7mdXD41nSGPsaZenI1boLU+2MC70PlyKkw1t0lwjEZercEjbayx4Mcp9wVkAM2CTWqr8pfA2K+Vml53o1Sa8C2ggsZutSOT78KRNyQtT0pom/N1QeOE7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FJDQcUvN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE73BC433F1;
+	Wed,  7 Feb 2024 11:33:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707305595;
+	bh=gyo235aVjYRC8Ovs+OpeW93VAIBVmWCkzUNg5AzcKdI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FJDQcUvNMSiZKwfV3rUCNm+SBPvaChR9vz6jg+V3OXMgkDZOflWgwJKWXltXsoZiI
+	 Inp2SU+sfh7n3lQmqxIH7JQe7BglD+sxDMG/oFV5EBCXUrpaBoGjsD03E6X+DbUdSl
+	 kw7rrAHbUPxsy7tfDREpIJf0ND2Tt73vQBRV4gKgDDLKvkTD0pSz09QZWqs+m5ta/z
+	 WagrgrNvX3fOyyDk8Y7YWh+t13O7mnTaTsTO/I7B5WY90M+TlXVWJrq+S1xiemIcpK
+	 JAnHAx/i/chC5vsQRSvvbT/DEIWwq07gyTh699/5YwZTm8EjbbMf0XCPCj+Ni9/R/4
+	 lxpDK8A7BTCfQ==
+Date: Wed, 7 Feb 2024 11:33:10 +0000
+From: Simon Horman <horms@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+	edumazet@google.com,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, andrew@lunn.ch
+Subject: Re: [PATCH net v2 5/9] net: fill in MODULE_DESCRIPTION()s for ipv6
+ modules
+Message-ID: <20240207113310.GC1297511@kernel.org>
+References: <20240207101929.484681-1-leitao@debian.org>
+ <20240207101929.484681-6-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="cu4vj53txk47ei46"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240207111859.15463-1-csokas.bence@prolan.hu>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20240207101929.484681-6-leitao@debian.org>
 
+On Wed, Feb 07, 2024 at 02:19:24AM -0800, Breno Leitao wrote:
+> W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add descriptions to the IPv6 modules.
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
---cu4vj53txk47ei46
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+...
 
-On 07.02.2024 12:18:59, Cs=C3=B3k=C3=A1s Bence wrote:
-> Signed-off-by: Cs=C3=B3k=C3=A1s Bence <csokas.bence@prolan.hu>
-
-Please provide a patch description.
-
-> ---
->  drivers/net/ethernet/freescale/fec_main.c | 17 +++++++++++++----
->  1 file changed, 13 insertions(+), 4 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethe=
-rnet/freescale/fec_main.c
-> index 63707e065141..652251e48ad4 100644
-> --- a/drivers/net/ethernet/freescale/fec_main.c
-> +++ b/drivers/net/ethernet/freescale/fec_main.c
-> @@ -273,8 +273,11 @@ MODULE_PARM_DESC(macaddr, "FEC Ethernet MAC address"=
-);
->  #define FEC_MMFR_TA		(2 << 16)
->  #define FEC_MMFR_DATA(v)	(v & 0xffff)
->  /* FEC ECR bits definition */
-> -#define FEC_ECR_MAGICEN		(1 << 2)
-> -#define FEC_ECR_SLEEP		(1 << 3)
-> +#define FEC_ECR_RESET   BIT(0)
-> +#define FEC_ECR_ETHEREN BIT(1)
-> +#define FEC_ECR_MAGICEN BIT(2)
-> +#define FEC_ECR_SLEEP   BIT(3)
-> +#define FEC_ECR_EN1588  BIT(4)
-
-nitpick: can you keep the original indention?
-
-> =20
->  #define FEC_MII_TIMEOUT		30000 /* us */
-> =20
-> @@ -1213,7 +1216,7 @@ fec_restart(struct net_device *ndev)
->  	}
-> =20
->  	if (fep->bufdesc_ex)
-> -		ecntl |=3D (1 << 4);
-> +		ecntl |=3D FEC_ECR_EN1588;
-> =20
->  	if (fep->quirks & FEC_QUIRK_DELAYED_CLKS_SUPPORT &&
->  	    fep->rgmii_txc_dly)
-> @@ -1314,6 +1317,7 @@ fec_stop(struct net_device *ndev)
->  	struct fec_enet_private *fep =3D netdev_priv(ndev);
->  	u32 rmii_mode =3D readl(fep->hwp + FEC_R_CNTRL) & (1 << 8);
->  	u32 val;
-> +	u32 ecntl =3D 0;
-
-nitpick: please move it before the "u32 val;" so that it looks more
-reverse-xmas-treeish.
-
-> =20
->  	/* We cannot expect a graceful transmit stop without link !!! */
->  	if (fep->link) {
-> @@ -1342,12 +1346,17 @@ fec_stop(struct net_device *ndev)
->  	writel(fep->phy_speed, fep->hwp + FEC_MII_SPEED);
->  	writel(FEC_DEFAULT_IMASK, fep->hwp + FEC_IMASK);
-> =20
-> +	if (fep->bufdesc_ex)
-> +		ecntl |=3D FEC_ECR_EN1588;
-> +
->  	/* We have to keep ENET enabled to have MII interrupt stay working */
->  	if (fep->quirks & FEC_QUIRK_ENET_MAC &&
->  		!(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
-> -		writel(2, fep->hwp + FEC_ECNTRL);
-> +		ecntl |=3D FEC_ECR_ETHEREN;
->  		writel(rmii_mode, fep->hwp + FEC_R_CNTRL);
->  	}
-> +
-> +	writel(ecntl, fep->hwp + FEC_ECNTRL);
+> index a7bf0327b380..8820bf5b101a 100644
+> --- a/net/ipv6/ip6_udp_tunnel.c
+> +++ b/net/ipv6/ip6_udp_tunnel.c
+> @@ -182,4 +182,5 @@ struct dst_entry *udp_tunnel6_dst_lookup(struct sk_buff *skb,
 >  }
+>  EXPORT_SYMBOL_GPL(udp_tunnel6_dst_lookup);
+>  
+> +MODULE_DESCRIPTION("IPv6 UDP tunnel driver");
+>  MODULE_LICENSE("GPL");
 
-regards,
-Marc
+Hi Breno,
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+I don't feel strongly about this,
+but looking at NET_UDP_TUNNEL and NET_FOU in net/ipv4/Kconfig, maybe:
 
---cu4vj53txk47ei46
-Content-Type: application/pgp-signature; name="signature.asc"
+	IPv6 Foo over UDP tunnel driver
 
------BEGIN PGP SIGNATURE-----
+Likewise for the change to net/ipv4/udp_tunnel_core.c
+in the following patch.
 
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmXDadYACgkQKDiiPnot
-vG/E3QgAncnNsVMkgTePvIOhdjGWiKWBEVgOsiYbBHyP66pFGcI+O9W5H9L/uMGd
-RcaPxP2xRIml6Y5IwyPu0/UnZmLfODKYn6YNuYbqPe+IKQaTclRE85kemylMdpDW
-49uDbKWVebcFUqoodguzW4OUAvfpg3FHg+imsQaQYkWfSz6ULHEcJL2Oer2VYRsl
-7lZYbMxa7e2m/DuSNtsvagGonJe0IJzDoLDMsyMYN+9Ml/7esWgTt630I56fO6Q0
-cJVKyhOASc0SoSY8oBqK0g07mSOIl2cNe/ifvf2vJvDU3Puw3dKEaFN4SDMtIyAm
-5QQG04q7M5HdVsYPKtrJovMbG0lS0w==
-=tzM9
------END PGP SIGNATURE-----
 
---cu4vj53txk47ei46--
+The above not withstanding, this looks good to me.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+...
 
