@@ -1,61 +1,91 @@
-Return-Path: <netdev+bounces-69740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 614AC84C752
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 10:29:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3211F84C762
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 10:32:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1625D28671A
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 09:29:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DBA12283C1C
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 09:32:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C74F122338;
-	Wed,  7 Feb 2024 09:29:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFEA520DCE;
+	Wed,  7 Feb 2024 09:32:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="GnkNsfFm"
 X-Original-To: netdev@vger.kernel.org
-Received: from relmlie5.idc.renesas.com (relmlor1.renesas.com [210.160.252.171])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C08A224CC;
-	Wed,  7 Feb 2024 09:29:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.171
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1D320DE5
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 09:32:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707298145; cv=none; b=FjDlvtmLFTBxWCkhOzVsw851L6MN3QSBscK+3G3vmeOf4hmsvBkJ/LRzBgJEH/Z91Kt15K3QMWCeE4muXe4YxqIlxo5mzculINTbVRzsjTWKHNL+SuSenTiXnWg7zUOXemr3Z1qX529xy9QPDL6IzERhwe1zqXD32IsAD5nEivc=
+	t=1707298359; cv=none; b=MBnd1wlQExa5hlcXvgLj8XPmEZQWvB5aLC2SlrA/gjnl/KqnREioE/8KrF+EHave5K5JDFm2r7lQFnRlhVP3qWEMH7cn167nfiADGXEacMGeJrauvOeMuopoz5Cf0FKidlek6enyJ3mFTKWwil2UvJPnvKZZhFOzMqEVpE+hPFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707298145; c=relaxed/simple;
-	bh=SDoFdGGq5E8kxciPxeQR9oxfhRDD2VPIuixKUXKI4yU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=KeLjzBKgk6f6qJYj512UZX24TzrY72+z6aK7nw/BkBqzQNhZtWUWNemWmAOSuOdmcJlhdsUF5W6Jk2NoVQG+pMP7GRXchMQ6XZ0+ugcCtESl6Wqe4tGIIcBmsdojMoqsQgU7CdjPVvtZMnE/LIW6ewzOrL+RZmUN+n7hxh8f5LA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-X-IronPort-AV: E=Sophos;i="6.05,250,1701097200"; 
-   d="scan'208";a="193197650"
-Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
-  by relmlie5.idc.renesas.com with ESMTP; 07 Feb 2024 18:28:56 +0900
-Received: from localhost.localdomain (unknown [10.226.92.232])
-	by relmlir6.idc.renesas.com (Postfix) with ESMTP id 8F06341B48F9;
-	Wed,  7 Feb 2024 18:28:51 +0900 (JST)
-From: Biju Das <biju.das.jz@bp.renesas.com>
-To: "David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1707298359; c=relaxed/simple;
+	bh=gCB0UcHb6qylodQJW7kwMHN8wVeTKb1KA6xEZW4xp9o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=p1zW09I6YHLFmVGJCe1nyRwCdKlfS2n2U/dkNTaFVDuSwPVw+/DNM8WPdp/d6/xG53E7juX9vvCAw2pigNwFy6f62Cj+5Zl4PbLvm49b6x56ZOBHQqhyenZqt3SrrBLoteVCDe9YkSljpG68mLUkyMrhX4yi/RNB176iRhTvNCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=GnkNsfFm; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a28a6cef709so55995666b.1
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 01:32:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1707298355; x=1707903155; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6UcXcnxreNPZ0+lBZNHI7oVubogo1HeEr+FyK2euNzk=;
+        b=GnkNsfFmBfrB6fKK0IgfwvRAMQtSU5ITeTOTYjH43Pg6LJ9/mYlDfm9nX8ujnlGX2v
+         Jq3WR5gmcw+c6M2r57en44LFn14WRjT9dYHGsitY4yNr1Xf6gsBbuAJNQRz4MsCzq8lL
+         895HJd7bmz/ZpmjoePDSUsn8X7TQeMeBzriamvxeRU7AiHvCJ+SAnHysHc6+tTt+3s7b
+         fWv/LFO4ITXhuTaAIs7sA2iYF51QBbiaXk+zKFNWj+zIL9wn1muU8+z7ecl7bujMTDdz
+         Vo5Xvgc0uyasxpDv0jTJV89tkmKrL2vljBlUivwqLZG0ZGN2BWZFTE/gCOpuz3XseleS
+         motw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707298355; x=1707903155;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6UcXcnxreNPZ0+lBZNHI7oVubogo1HeEr+FyK2euNzk=;
+        b=wUPMCGAsOED5FDr6kCvt+NrNye+Bgyl3rtWEWhOKRpGyPRD8F9lVzfJ9U8NerHodAu
+         /f9EcpRhi0zUXdlUzS0PdtW9/9G1YcOJy9Vfy89NTsOAFQVrEw5YfftaYBLdmJsgXwnh
+         okqZGho50GdqrgsnMbGQHrN7sh/jFm6bm4mgJg2G70wlmldZA/tzOFGpVmezkXhnLxi9
+         hZJq6q9EYIuHtR84GRQWJqqCzB6Au847ilLI+4Clv1kWvLbubVUUPVbfOukQZnJ0quui
+         N0nO3CZ8LqL0mhNAWlcMvnotw+wOUKR7yFvxFMdeDvLEzccwqofXdqDarNzOhjwxqUW4
+         B+QA==
+X-Gm-Message-State: AOJu0YzDSqjiH4VAyn8opQs2kpsenSJICdPCryqjyjYc0VxRXd1fpXz7
+	ApZ9LDnd6b9B+XXDfWoy0H9v7NZTkhbsgBXnXYkWXQLyGTg6PNXBKvtN1g3HKkA=
+X-Google-Smtp-Source: AGHT+IGm4noXnf+W2a3cctx/ARsa6HZtNSbpbfpE5rhLWAtrga16pBWnrMX5TtjHV8LYxxcOQrhEVQ==
+X-Received: by 2002:a17:906:4691:b0:a38:7541:36f6 with SMTP id a17-20020a170906469100b00a38754136f6mr810040ejr.21.1707298354981;
+        Wed, 07 Feb 2024 01:32:34 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUixUh7Sy14PL292x1SBMSh/XJB29tAE5aoidPm3S/uZt32EwsI5F2apCjoCBnZeJpXSXowFvlkhpL/jEBOAsdmZuLORVwIRwHQ2Ii+Heu/qfreN0CeSIvI1Y/k313LpqedUDsXRuQNFTX8o4zI6xeH1dQAmbxKVW/QHr3oZqcMF3MVbccQdtN0ty1l41XkPNrt78wBBhX48q5n8wbqE1Npj+ofMqbgynMrJylSFvBZaUy88KUQ7skZDpzaYX57A4thYn/bIWDZc5VLERIqDAwkB51ZccUrn7QZbtFo1yyYqLvp0EMplItjo3Pp4R1za6g1yEwm7+kPumM3/UpB3RSipI/Ma0L/3UlOmS6MbgviH4YUJudyRJE35ZaKUgrLxcWdDxWEkukKy8dIBfKjZyQrdNVc1EZHR/7Xa/GQMRC6JXZDr+5N0QVVL/XU
+Received: from blmsp.fritz.box ([2001:4091:a246:821e:6f3b:6b50:4762:8343])
+        by smtp.gmail.com with ESMTPSA id qo9-20020a170907874900b00a388e24f533sm122336ejc.148.2024.02.07.01.32.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Feb 2024 01:32:34 -0800 (PST)
+From: Markus Schneider-Pargmann <msp@baylibre.com>
+To: Marc Kleine-Budde <mkl@pengutronix.de>,
+	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Biju Das <biju.das.jz@bp.renesas.com>,
-	Sergey Shtylyov <s.shtylyov@omp.ru>,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Nikita Yushchenko <nikita.yoush@cogentembedded.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Tony Lindgren <tony@atomide.com>,
+	Judith Mendez <jm@ti.com>
+Cc: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>,
+	Simon Horman <horms@kernel.org>,
+	linux-can@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>,
-	Biju Das <biju.das.au@gmail.com>
-Subject: [PATCH v5 net-next 2/2] ravb: Add Tx checksum offload support for GbEth
-Date: Wed,  7 Feb 2024 09:28:38 +0000
-Message-Id: <20240207092838.160627-3-biju.das.jz@bp.renesas.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240207092838.160627-1-biju.das.jz@bp.renesas.com>
-References: <20240207092838.160627-1-biju.das.jz@bp.renesas.com>
+	linux-kernel@vger.kernel.org,
+	Julien Panis <jpanis@baylibre.com>,
+	Markus Schneider-Pargmann <msp@baylibre.com>
+Subject: [PATCH 00/14] can: m_can: Optimizations for m_can/tcan part 2
+Date: Wed,  7 Feb 2024 10:32:06 +0100
+Message-ID: <20240207093220.2681425-1-msp@baylibre.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,201 +94,103 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-TOE has hardware support for calculating IP header and TCP/UDP/ICMP
-checksum for both IPv4 and IPv6.
+Hi Marc, Simon, Martin and everyone,
 
-Add Tx checksum offload supported by TOE for IPv4 and TCP/UDP.
+v7 is a rebase on v6.8. During my am62 tests I discovered some problems
+which are fixed with this update.
 
-For Tx, the result of checksum calculation is set to the checksum field of
-each IPv4 Header/TCP/UDP/ICMP of ethernet frames. For the unsupported
-frames, those fields are not changed. If a transmission frame is an UDPv4
-frame and its checksum value in the UDP header field is 0x0000, TOE does
-not calculate checksum for UDP part of this frame as it is optional
-function as per standards.
+@Simon: I had to remove most of your reviews again, due to a few
+fixes I made.
 
-We can test this functionality by the below commands
+The series implements many small and bigger throughput improvements and
+adds rx/tx coalescing at the end.
 
-ethtool -K eth0 tx on --> to turn on Tx checksum offload
-ethtool -K eth0 tx off --> to turn off Tx checksum offload
+Based on v6.8-rc1. Also available at
+https://gitlab.baylibre.com/msp8/linux/-/tree/topic/mcan-optimization/v6.8?ref_type=heads
 
-Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
----
-v4->v5:
- * Dropped CSR1_ALL from enum CSR1_BIT.
- * Removed setting unnecessary bits in CSR1.
-v3->v4:
- * Restored NETIF_F_HW_CSUM and associated changes.
- * Dropped enabling IPv6 specific bits in CSR1.
- * Dropped enabling ICMPv4 specific bit and associated handling as linux
-   does not support it.
-v2->v3:
- * Updated commit header and description as suggested by Sergey.
- * Replaced NETIF_F_IP_CSUM->NETIF_F_HW_CSUM as we are supporting only IPv4.
- * Updated the comment related to UDP header field.
- * Renamed ravb_is_tx_checksum_offload_gbeth_possible()->ravb_is_tx_csum_gbeth().
-v1->v2:
- * No change.
----
- drivers/net/ethernet/renesas/ravb.h      | 15 +++++
- drivers/net/ethernet/renesas/ravb_main.c | 71 +++++++++++++++++++++---
- 2 files changed, 79 insertions(+), 7 deletions(-)
+Best,
+Markus
 
-diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
-index b98677c7c8e1..35e642fc4b2a 100644
---- a/drivers/net/ethernet/renesas/ravb.h
-+++ b/drivers/net/ethernet/renesas/ravb.h
-@@ -208,6 +208,7 @@ enum ravb_reg {
- 
- 	/* TOE registers (RZ/G2L only) */
- 	CSR0    = 0x0800,
-+	CSR1    = 0x0804,
- 	CSR2    = 0x0808,
- };
- 
-@@ -981,6 +982,20 @@ enum CSR0_BIT {
- 	CSR0_RPE	= 0x00000020,
- };
- 
-+enum CSR1_BIT {
-+	CSR1_TIP4	= 0x00000001,
-+	CSR1_TTCP4	= 0x00000010,
-+	CSR1_TUDP4	= 0x00000020,
-+	CSR1_TICMP4	= 0x00000040,
-+	CSR1_TTCP6	= 0x00100000,
-+	CSR1_TUDP6	= 0x00200000,
-+	CSR1_TICMP6	= 0x00400000,
-+	CSR1_THOP	= 0x01000000,
-+	CSR1_TROUT	= 0x02000000,
-+	CSR1_TAHD	= 0x04000000,
-+	CSR1_TDHD	= 0x08000000,
-+};
-+
- enum CSR2_BIT {
- 	CSR2_RIP4	= 0x00000001,
- 	CSR2_RTCP4	= 0x00000010,
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 3e0c7977f2f8..f9a1e9038dbf 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -29,6 +29,7 @@
- #include <linux/spinlock.h>
- #include <linux/reset.h>
- #include <linux/math64.h>
-+#include <net/ip.h>
- 
- #include "ravb.h"
- 
-@@ -514,16 +515,28 @@ static int ravb_ring_init(struct net_device *ndev, int q)
- 
- static void ravb_csum_init_gbeth(struct net_device *ndev)
- {
--	if (!(ndev->features & NETIF_F_RXCSUM))
-+	bool tx_enable = ndev->features & NETIF_F_HW_CSUM;
-+	bool rx_enable = ndev->features & NETIF_F_RXCSUM;
-+
-+	if (!(tx_enable || rx_enable))
- 		goto done;
- 
- 	ravb_write(ndev, 0, CSR0);
--	if (ravb_wait(ndev, CSR0, CSR0_RPE, 0)) {
-+	if (ravb_wait(ndev, CSR0, CSR0_TPE | CSR0_RPE, 0)) {
- 		netdev_err(ndev, "Timeout enabling hardware checksum\n");
--		ndev->features &= ~NETIF_F_RXCSUM;
-+
-+		if (tx_enable)
-+			ndev->features &= ~NETIF_F_HW_CSUM;
-+
-+		if (rx_enable)
-+			ndev->features &= ~NETIF_F_RXCSUM;
- 	} else {
--		ravb_write(ndev, CSR2_RIP4 | CSR2_RTCP4 | CSR2_RUDP4 | CSR2_RICMP4,
--			   CSR2);
-+		if (tx_enable)
-+			ravb_write(ndev, CSR1_TIP4 | CSR1_TTCP4 | CSR1_TUDP4, CSR1);
-+
-+		if (rx_enable)
-+			ravb_write(ndev, CSR2_RIP4 | CSR2_RTCP4 | CSR2_RUDP4 | CSR2_RICMP4,
-+				   CSR2);
- 	}
- 
- done:
-@@ -2053,6 +2066,36 @@ static void ravb_tx_timeout_work(struct work_struct *work)
- 	rtnl_unlock();
- }
- 
-+static bool ravb_can_tx_csum_gbeth(struct sk_buff *skb)
-+{
-+	struct iphdr *ip = ip_hdr(skb);
-+
-+	/* TODO: Need to add support for VLAN tag 802.1Q */
-+	if (skb_vlan_tag_present(skb))
-+		return false;
-+
-+	/* TODO: Need to add hardware checksum for IPv6 */
-+	if (skb->protocol != htons(ETH_P_IP))
-+		return false;
-+
-+	switch (ip->protocol) {
-+	case IPPROTO_TCP:
-+		break;
-+	case IPPROTO_UDP:
-+		/* If the checksum value in the UDP header field is 0, TOE does
-+		 * not calculate checksum for UDP part of this frame as it is
-+		 * optional function as per standards.
-+		 */
-+		if (udp_hdr(skb)->check == 0)
-+			return false;
-+		break;
-+	default:
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
- /* Packet transmit function for Ethernet AVB */
- static netdev_tx_t ravb_start_xmit(struct sk_buff *skb, struct net_device *ndev)
- {
-@@ -2068,6 +2111,9 @@ static netdev_tx_t ravb_start_xmit(struct sk_buff *skb, struct net_device *ndev)
- 	u32 entry;
- 	u32 len;
- 
-+	if (skb->ip_summed == CHECKSUM_PARTIAL && !ravb_can_tx_csum_gbeth(skb))
-+		skb_checksum_help(skb);
-+
- 	spin_lock_irqsave(&priv->lock, flags);
- 	if (priv->cur_tx[q] - priv->dirty_tx[q] > (priv->num_tx_ring[q] - 1) *
- 	    num_tx_desc) {
-@@ -2473,6 +2519,17 @@ static int ravb_set_features_gbeth(struct net_device *ndev,
- 			goto done;
- 	}
- 
-+	if (changed & NETIF_F_HW_CSUM) {
-+		if (features & NETIF_F_HW_CSUM)
-+			val = CSR1_TIP4 | CSR1_TTCP4 | CSR1_TUDP4;
-+		else
-+			val = 0;
-+
-+		ret = ravb_endisable_csum_gbeth(ndev, CSR1, val, CSR0_TPE);
-+		if (ret)
-+			goto done;
-+	}
-+
- 	ndev->features = features;
- done:
- 	spin_unlock_irqrestore(&priv->lock, flags);
-@@ -2657,8 +2714,8 @@ static const struct ravb_hw_info gbeth_hw_info = {
- 	.emac_init = ravb_emac_init_gbeth,
- 	.gstrings_stats = ravb_gstrings_stats_gbeth,
- 	.gstrings_size = sizeof(ravb_gstrings_stats_gbeth),
--	.net_hw_features = NETIF_F_RXCSUM,
--	.net_features = NETIF_F_RXCSUM,
-+	.net_hw_features = NETIF_F_RXCSUM | NETIF_F_HW_CSUM,
-+	.net_features = NETIF_F_RXCSUM | NETIF_F_HW_CSUM,
- 	.stats_len = ARRAY_SIZE(ravb_gstrings_stats_gbeth),
- 	.max_rx_len = ALIGN(GBETH_RX_BUFF_MAX, RAVB_ALIGN),
- 	.tccr_mask = TCCR_TSRQ0,
+Changes in v7:
+- Rebased to v6.8-rc1
+- Fixed NULL pointer dereference in m_can_clean() on am62 that happened
+  when doing ip link up, ip link down, ip link up
+- Fixed a racecondition on am62 observed with high throughput tests.
+  netdev_completed_queue() was called before netdev_sent_queue() as the
+  interrupt was processed so fast. netdev_sent_queue() is now reported
+  before the actual sent is done.
+- Fixed an initializing issue on am62 where active interrupts are
+  getting lost between runs. Fixed by resetting cdev->active_interrupts
+  in m_can_disable_all_interrupts()
+- Removed m_can_start_fast_xmit() because of a reordering of operations
+  due to above mentioned racecondition
+
+Changes in v6:
+- Rebased to v6.6-rc2
+- Added two small changes for the newly integrated polling feature
+- Reuse the polling hrtimer for coalescing as the timer used for
+  coalescing has a similar purpose as the one for polling. Also polling
+  and coalescing will never be active at the same time.
+
+Changes in v5:
+- Add back parenthesis in m_can_set_coalesce(). This will make
+  checkpatch unhappy but gcc happy.
+- Remove unused fifo_header variable in m_can_tx_handler().
+- Rebased to v6.5-rc1
+
+Changes in v4:
+- Create and use struct m_can_fifo_element in m_can_tx_handler
+- Fix memcpy_and_pad to copy the full buffer
+- Fixed a few checkpatch warnings
+- Change putidx to be unsigned
+- Print hard_xmit error only once when TX FIFO is full
+
+Changes in v3:
+- Remove parenthesis in error messages
+- Use memcpy_and_pad for buffer copy in 'can: m_can: Write transmit
+  header and data in one transaction'.
+- Replace spin_lock with spin_lock_irqsave. I got a report of a
+  interrupt that was calling start_xmit just after the netqueue was
+  woken up before the locked region was exited. spin_lock_irqsave should
+  fix this. I attached the full stack at the end of the mail if someone
+  wants to know.
+- Rebased to v6.3-rc1.
+- Removed tcan4x5x patches from this series.
+
+Changes in v2:
+- Rebased on v6.2-rc5
+- Fixed missing/broken accounting for non peripheral m_can devices.
+
+previous versions:
+v1 - https://lore.kernel.org/lkml/20221221152537.751564-1-msp@baylibre.com
+v2 - https://lore.kernel.org/lkml/20230125195059.630377-1-msp@baylibre.com
+v3 - https://lore.kernel.org/lkml/20230315110546.2518305-1-msp@baylibre.com/
+v4 - https://lore.kernel.org/lkml/20230621092350.3130866-1-msp@baylibre.com/
+v5 - https://lore.kernel.org/lkml/20230718075708.958094-1-msp@baylibre.com
+v6 - https://lore.kernel.org/lkml/20230929141304.3934380-1-msp@baylibre.com
+
+Markus Schneider-Pargmann (14):
+  can: m_can: Start/Cancel polling timer together with interrupts
+  can: m_can: Move hrtimer init to m_can_class_register
+  can: m_can: Write transmit header and data in one transaction
+  can: m_can: Implement receive coalescing
+  can: m_can: Implement transmit coalescing
+  can: m_can: Add rx coalescing ethtool support
+  can: m_can: Add tx coalescing ethtool support
+  can: m_can: Use u32 for putidx
+  can: m_can: Cache tx putidx
+  can: m_can: Use the workqueue as queue
+  can: m_can: Introduce a tx_fifo_in_flight counter
+  can: m_can: Use tx_fifo_in_flight for netif_queue control
+  can: m_can: Implement BQL
+  can: m_can: Implement transmit submission coalescing
+
+ drivers/net/can/m_can/m_can.c          | 551 ++++++++++++++++++-------
+ drivers/net/can/m_can/m_can.h          |  34 +-
+ drivers/net/can/m_can/m_can_platform.c |   4 -
+ 3 files changed, 439 insertions(+), 150 deletions(-)
+
 -- 
-2.25.1
+2.43.0
 
 
