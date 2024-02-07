@@ -1,113 +1,155 @@
-Return-Path: <netdev+bounces-70017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D804F84D5A5
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 23:15:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B30C984D5AB
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 23:16:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5CCB1B28E19
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 22:15:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D599F1C2363F
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 22:16:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9D0E6BFB6;
-	Wed,  7 Feb 2024 22:05:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB401CFA9;
+	Wed,  7 Feb 2024 22:12:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="sqre3xCQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kfCOSaGP"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25AED535BB
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 22:05:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52496BFCE;
+	Wed,  7 Feb 2024 22:12:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707343546; cv=none; b=bs/NraFI3S5FuFG0JaC9gDQXYngTGBtsgKhRWcmp2Tou8peKOTCezMvis8j7Rxm+c53IdhFeQzPjSOiWgS2lAfwv6iwg7VocYIj8WwoJSZhTY31mOl3ViciJOlCZan18Gh1sLGU2kxlEwL9BUCIQxoeePxuw9coEtuM+G0OhhKw=
+	t=1707343964; cv=none; b=qs1q7Id6uWmhPeIJl/U/CHzqGw6GZebceW89TTUxOBoGE41HJcGZbCH2ZUcWIi3zorV6iE7TUfEu8mjCVTfMkFhwfxE4r5JiBYrGAyLbhtCux6qVMjHM+aG6jzd1cn/iM/BRTEzDowqZcFhc4ln4Nmow8GAOT2lj5iU87hyFPhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707343546; c=relaxed/simple;
-	bh=9AUxqsjYp21nVVo7TSlTfghqeIXfMOGAwOz+WexpO1E=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=pjeXeMnPczZGSamktFReSbsCjio2Ih9z83EIQBPZGMY6lsPPKLNAxCPQwMLcM0kjvqProdqFTF1LUFHWr7QxL3DY2+txSzMtnQ6qNeQ1s9Wy0p11LSj2BGbwG/d0WsJwcnxLgZfBEvF2wBR+1MitA7yRJOVxIrYgs5mfEzWkxJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=sqre3xCQ; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 31BB82C0230;
-	Thu,  8 Feb 2024 11:05:36 +1300 (NZDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1707343536;
-	bh=9AUxqsjYp21nVVo7TSlTfghqeIXfMOGAwOz+WexpO1E=;
-	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
-	b=sqre3xCQXZsGtHLRgtU1j7FBYvOmnVxLquG2Om+XM+cgFhjA/WpPIqHdceprBTjBb
-	 mpL9T/jrsbF5gS5+7eeuOGoVyqIgZmNc/62s+2cYpdbzMZzWh+S4TIDHHZXq68SDcv
-	 RVhY6ZYzkfMWjlNzPLKcTZTeJ5nzCq/lzCt+J1jv2jMaqwfCSsvaO2h/WI01RVnftL
-	 NBGilbIKyrcGLDbb/dD5nmK/jO81GejscgPvtgcvQ2Qggt5B9hrM9bp/UWD6icI6Lx
-	 ReGt2bRh8kSwfjXQ5OSy02KPJaW4/BYz7H3390EcB5EL+BEQfjvV2A6AgZaT11H3yc
-	 wH7VjcMmh6C7w==
-Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B65c3feb00001>; Thu, 08 Feb 2024 11:05:36 +1300
-Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8::76) by
- svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8::76) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Thu, 8 Feb 2024 11:05:35 +1300
-Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
- svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
- 15.02.1118.040; Thu, 8 Feb 2024 11:05:35 +1300
-From: Thomas Winter <Thomas.Winter@alliedtelesis.co.nz>
-To: "jansaley@gmail.com" <jansaley@gmail.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: "pabeni@redhat.com" <pabeni@redhat.com>, "dsahern@kernel.org"
-	<dsahern@kernel.org>, "a@unstable.cc" <a@unstable.cc>, "davem@davemloft.net"
-	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>
-Subject: Re: [BUG] gre interface incorrectly generates link-local addresses
-Thread-Topic: [BUG] gre interface incorrectly generates link-local addresses
-Thread-Index: AQHaVCrRZ+x1H873S0iWHD4uCDBUpbD+oQUA
-Date: Wed, 7 Feb 2024 22:05:35 +0000
-Message-ID: <4af69c165836c2e22217341c4a64228bcd43a877.camel@alliedtelesis.co.nz>
-References: <AS2PR09MB6293D2C85ABD5029AB9C69DAF37C2@AS2PR09MB6293.eurprd09.prod.outlook.com>
-In-Reply-To: <AS2PR09MB6293D2C85ABD5029AB9C69DAF37C2@AS2PR09MB6293.eurprd09.prod.outlook.com>
-Accept-Language: en-GB, en-NZ, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8980564157A9E341B99EB452D29E4F1F@atlnz.lc>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1707343964; c=relaxed/simple;
+	bh=YUwb9LPhByrA5rHlYzP6QyFWe353UDXpzQHTrHwvmsg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qC2/AUHLo8McMgygk2lQ5hV7EAiHVrK8mPBCbiomnMCSot9bpWNNmaj5W29vZSyrQwrsxEaPLglF+YVQc7ka11DTZhaZWuJZC72CDb7nsUi43a3QXRAnRgZo20dCVZbSFNrVconLtCMrAbwfSNMh1bfrReTl/xaOA2yziKrWQ9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kfCOSaGP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A3B9C433F1;
+	Wed,  7 Feb 2024 22:12:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707343964;
+	bh=YUwb9LPhByrA5rHlYzP6QyFWe353UDXpzQHTrHwvmsg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=kfCOSaGPlIPrjeGjTjlWPLA3Ee1P/v5pMNFoAsmMuDFscDEHL8oLLwoqVgZdBsNZm
+	 g0IfsSgIygSWbfJt23h28pCfvHmgU4fFbBUcLJlzEqwY4WM+gRC21dWcRnYWMqBXqL
+	 aEFJNYKfa/Iasi8IJT9FHOzaZdfvnXPRRdmWVbAAkwVTgdwy/dq4cQnKa+XMRO8gZS
+	 vLZdk8r786+00JCRWU9RyJ3dZm2+HgGR0JpOdD9h/oozE/oNprJEl4Im6M7ZabZzyW
+	 dI+w/3yG7Gf59wrrE2sOTk53sJEdTcJhOYOPbSIm3g3iQLpUuiOwqaNLY+xggsJ1vT
+	 54Rozk+LSJDgQ==
+Message-ID: <7a3d2c33-74ce-45fb-bddc-9eceb6dd928b@kernel.org>
+Date: Wed, 7 Feb 2024 23:12:38 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SEG-SpamProfiler-Analysis: v=2.3 cv=LZFCFQXi c=1 sm=1 tr=0 a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=IkcTkHD0fZMA:10 a=k7vzHIieQBIA:10 a=CP-8VDb144vVogvyZAUA:9 a=QEXdDO2ut3YA:10
-X-SEG-SpamProfiler-Score: 0
+User-Agent: Mozilla Thunderbird
+Subject: Re: KFENCE: included in x86 defconfig?
+Content-Language: en-GB, fr-BE
+To: Borislav Petkov <bp@alien8.de>
+Cc: Marco Elver <elver@google.com>, Alexander Potapenko <glider@google.com>,
+ Dmitry Vyukov <dvyukov@google.com>, kasan-dev@googlegroups.com,
+ Netdev <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ linux-hardening@vger.kernel.org, Kees Cook <keescook@chromium.org>,
+ the arch/x86 maintainers <x86@kernel.org>
+References: <e2871686-ea25-4cdb-b29d-ddeb33338a21@kernel.org>
+ <CANpmjNP==CANQi4_qFV_VVFDMsj1wHROxt3RKzwJBqo8_McCTg@mail.gmail.com>
+ <20240207181619.GDZcPI87_Bq0Z3ozUn@fat_crate.local>
+ <d301faa8-548e-4e8f-b8a6-c32d6a56f45b@kernel.org>
+ <20240207190444.GFZcPUTAnZb_aSlSjV@fat_crate.local>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240207190444.GFZcPUTAnZb_aSlSjV@fat_crate.local>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-SGVsbG8sDQoNCk9uIEZyaSwgMjAyNC0wMi0wMiBhdCAxMzowMSArMDAwMCwg0JDQvdGC0LDRgNC4
-0L4g0J/RgNC+0YHQv9C10YDQviB3cm90ZToNCj4gSGVsbA0KPiBJIHdhbnQgdG8gYnJpbmcgdXAg
-dGhpcyB0b3BpYyBhZ2Fpbg0KPiBJcyBpdCBwb3NzaWJsZSB0byB1c2UgdGhlIGFkZHJfZ2VuX21v
-ZGUgcGFyYW1ldGVyIGZvciBHUkUgaW4gdGhlDQo+IGN1cnJlbnQgdmVyc2lvbiBvZiBhZGRyY29u
-Zj8NCg0KU2hvcnQgYW5zd2VyLCBuby4NCg0KPiBUaGVyZSB3YXMgYW4gZWRpdCBpbiB0aGUgZTVk
-ZDcyOTQ2MGNhIGNvbW1pdCB0aGF0IGRldi0+aW50ZXJmYWNlIHR5cGUNCj4gc2hvdWxkIGJlIGVx
-dWFsIHRvIEFSUEhSRF9FVEhFUiwgdGhlbiBhZGRyY29uZl9hZGRyX2dlbiB3aWxsIGJlDQo+IGNh
-bGxlZC4NCj4gQnV0IGRvZXNuJ3QgdGhpcyBjb250cmFkaWN0IHRoZSBmYWN0IHRoYXQgYmVmb3Jl
-IGNhbGxpbmcgdGhlDQo+IGFkZHJjb25mX2dyZV9jb25maWcgZnVuY3Rpb24sIHRoZXJlIGlzIGEg
-Y2hlY2sgdGhhdCBkZXYtPnR5cGUgc2hvdWxkDQo+IGJlIGVxdWFsIHRvIEFSUEhSRF9JUEdSRSBv
-ciBBUlBIUkRfSVA2R1JFPw0KDQpDb21taXQgZTVkZDcyOTQ2MGNhIGJyb2tlIHRoZSBhZGRyY29u
-Zl9hZGRyX2dlbiBzeXNjdGwgdmFsdWUgZ2VuZXJhdGluZw0KYSBsaW5rIGxvY2FsIGFkZHJlc3Mg
-Zm9yIEdSRSB0dW5uZWxzIHdoaWNoIG91ciB1c2Vyc3BhY2Ugd2FzIHJlbHlpbmcNCm9uLiBNeSBj
-b21taXRzIDMwZTIyOTFmNjFmOSBhbmQgMjNjYTBjMmM5MzQwIGF0dGVtcHRlZCB0byByZXNvbHZl
-IHRoaXMNCmJ5IG1ha2luZyBhZGRyY29uZl9ncmVfY29uZmlnIGdldCBjYWxsZWQNCmJ5IGFkZHJj
-b25mX3N5c2N0bF9hZGRyX2dlbl9tb2RlIHdpdGggdGhlIG5ldw0KZnVuY3Rpb24gYWRkcmNvbmZf
-aW5pdF9hdXRvX2FkZHJzIHdoaWNoIHdpbGwgY2FsbCBhZGRyY29uZl9ncmVfY29uZmlnLg0KDQpJ
-IHRyaWVkIHRvIGtlZXAgdGhlIG5ldyBmdW5jdGlvbmFsaXR5IGZyb20gZTVkZDcyOTQ2MGNhIGlu
-dGFjdCBzbw0KYWRkcmNvbmZfYWRkcl9nZW4gaXMgc3RpbGwgY2FsbGVkIG9ubHkgd2hlbiBkZXYt
-PnR5cGUgPT0gQVJQSFJEX0VUSEVSDQp3aGljaCBtZWFucyB0aGF0IHRoZSB0eXBlIG9mIGFkZHJl
-c3MgZ2VuZXJhdGlvbg0KKGVnIElONl9BRERSX0dFTl9NT0RFX1JBTkRPTSBvciBJTjZfQUREUl9H
-RU5fTU9ERV9FVUk2NCkgaXMgbm90IG5vdA0KY29uc2lkZXJlZCB3aGVuIHRoZSB0eXBlIGlzIEFS
-UEhSRF9JUEdSRSBvciBBUlBIUkRfSVA2R1JFIGluc3RlYWQgdGhlDQphZGRyZXNzIHdpbGwgYmUg
-Z2VuZXJhdGVkIGJhc2VkIG9uIGFub3RoZXIgaW50ZXJmYWNlIHdpdGggYWRkX3Y0X2FkZHJzLg0K
+On 07/02/2024 20:04, Borislav Petkov wrote:
+> On Wed, Feb 07, 2024 at 07:35:53PM +0100, Matthieu Baerts wrote:
+>> Sorry, I'm sure I understand your suggestion: do you mean not including
+>> KFENCE in hardening.config either, but in another one?
+>>
+>> For the networking tests, we are already merging .config files, e.g. the
+>> debug.config one. We are not pushing to have KFENCE in x86 defconfig, it
+>> can be elsewhere, and we don't mind merging other .config files if they
+>> are maintained.
+> 
+> Well, depends on where should KFENCE be enabled? Do you want people to
+> run their tests with it too, or only the networking tests? If so, then
+> hardening.config probably makes sense. 
+> 
+> Judging by what Documentation/dev-tools/kfence.rst says:
+> 
+> "KFENCE is designed to be enabled in production kernels, and has near zero
+> performance overhead."
+> 
+> this reads like it should be enabled *everywhere* - not only in some
+> hardening config.
+> 
+> But then again I've never played with it so I don't really know.
+> 
+> If only the networking tests should enable it, then it should be a local
+> .config snippet which is not part of the kernel.
+> 
+> Makes more sense?
+
+Yes, thank you!
+
+On my side, KFENCE is currently in local .config snippet, not part of
+the kernel. If it has near zero performance overhead and can be used in
+productions kernel, maybe it can be set elsewhere to be used by more
+people? But not everywhere, according to Marco.
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
