@@ -1,136 +1,139 @@
-Return-Path: <netdev+bounces-69829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A56B84CC1E
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 14:55:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E44C84CC28
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 14:57:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52A90B265E9
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 13:55:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE3E829008B
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 13:57:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CCC277644;
-	Wed,  7 Feb 2024 13:55:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78B2477F20;
+	Wed,  7 Feb 2024 13:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nhLERExa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OxVPdrK/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09E37A713
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 13:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FCBD1E499
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 13:57:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707314127; cv=none; b=NwDI6Pjx4RPCpwlDpTQxElXXlfyElLI4/hyjBJIZRoU5bFUDeM68yluCE2mfDdionw4XyMF68hN0Devx8UT7U6bZO6L6+Fw34QVpHtzxOR4uVCpV60/G3lBDX8LBOHqY4sV5NfivdTi5bknQepvmgcEzz5PSGsgg+6k9n7V2fz8=
+	t=1707314232; cv=none; b=cgs5icIDo9LMGCS2stirjiPkfzAokcSrl4t5JJNJrHSkZAjwIdee03AI9C6aaeJoBIAgdiN6i91vvevY/Jm2EVIDUjHXU6LfndcuCJqc1O2v3gJvin/lK2BMztMtpB1bDDVYooWtofwfXTf+hSyP8KI1LNrcICpUWXzaa5t6pOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707314127; c=relaxed/simple;
-	bh=Z7rQC1fkFIqC/tJTWNXMD0dUUmRdRuNQULPDoiyeO1Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nx4xjEjkkqVD5NasmEK+09xnreKxMM5sVuQuqTXrYweJmlx0FyRKSc0t3X5UG/rvl+eWwIotBzSWodqpok+I4ind7J2gTkRU+R0gYPAcdXoY+/fXFlUBm0czKwpXNXtqljRGynfKJ164HRLihcha1XiYEhXIuHvRLS2QYePR+ZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nhLERExa; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5116588189aso1119143e87.1
-        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 05:55:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707314124; x=1707918924; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=by92DEK9XSM7323pyJ6TZwfJcKH/EW0cCEEjPXbhw7o=;
-        b=nhLERExaIVsbgfny0PkbHtN2xsMixr55aJ0l8ofyoK/VlX8NHBmSy5SQwdINITrUIZ
-         vXiF1gHKAb8HTw7btqH1VsW/Eq+RBPmtGKI/S+FVjpGpKG3awYExggjtI+SVEXC6dUG5
-         tXaDAUYnuu/kNxy/C9ycIC0dycN+jAw9Zn9LfhXwSJwDSKGQA+Plg6RVfNAJMuwbatVt
-         JUY9ZNqH1d5Ap1CAbGoS8hcOMxl4KP5PMBPwFziqy7e5BItouZeaLQ5ruto0wL4sqaD3
-         Zgev96yX7mNnLDfMqRuarc8zuoD6wj65eyBcZ8npswyy3TKNH0We+qoHSopzXcDTuQ0Q
-         P3Fg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707314124; x=1707918924;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=by92DEK9XSM7323pyJ6TZwfJcKH/EW0cCEEjPXbhw7o=;
-        b=aLPsW44qN61O+D/MeLbVSHJRVKuA8L/7iCCpumOmyHOD9C8M+Xalvc807Lg5PBpucE
-         1zZ1+g+Db+83Aj8SmOTs+qPBzch+Z7XW51iVIC8WBwNmuG6S8jOVo5rAU9PFN+CbMFnk
-         AWuufWkmA0nnlGln4lT4lh5NDg2fFPuN6WbsntGGH0/SJX+2ZVYFpdfjOaS/JEvGsw7m
-         gMGYXccG3WLHrFxRTNe7Wibkze26p5hMWdu8H5lxRIRS7jFC/dFv8ICcKr4UtqTnpvba
-         W13xTYvcb4817NErJ6a8H6DA0vNY0W/ta88p/AACK7TpoEHicm7SnGieQxOcG+utBCai
-         SCCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXtdJfouZ+9FJMuslNL2cBk/gYfdT5w1bNj46wOhjFBNhUma3yj79y6FUFwY5VXKcT8cNa/BNk1WJMKyogdVJmzAyn8tgXi
-X-Gm-Message-State: AOJu0Ywy0Cx9KAzuRfFiLV3iKfdqL6AhqW0sjjGW7Hl+B4h++DLsJqDC
-	ADRG6f0fqZu0H+N8V6KkyorPfnOS4pBvPf8xKTclaPQr6gfTic8e
-X-Google-Smtp-Source: AGHT+IEOk2AGdPkr7JjjRj6vF2sVns8SA640c0gyoR1lwxnBMBbazqa3bKt4C73kzX1xoHZE68EIJQ==
-X-Received: by 2002:ac2:5617:0:b0:511:519f:ce76 with SMTP id v23-20020ac25617000000b00511519fce76mr3986759lfd.57.1707314123579;
-        Wed, 07 Feb 2024 05:55:23 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUjIt/4gQu1zQesvxRtHLJAF5eS33qGSRoCJO2FtTNPXb1q75lKmjmmgZwe1g+ew0Mphc9I1vYxMMYOLQXkwgdeDq+eHtiMexn/lqKbb0sy9NKkFE/6c5/DL6oNQF+5dy82P79bLa7JDxwu3auc6KaU8xyuInyU5cY0ipGHYsIPOOyGbuJEvaUD5Wa2XtrR2e+9b1f4COALVpyqLPx8CXB7FnpkSorKs7rBrCcZb7jkPzmw++DxjFkXndUd6IheVyeQnOxIuv++wAPTOAyWWv+MhmaeEhqjPbplqioiVcNtJRv3doP0tlmqxml4u+nCPAsDS/ZVc2P9QOWfIF8zEgKckADaRZ+UBdGPoJDk759wqyxLH+8rVtj3ZQJpnKinysqyt9TbFtK4Dd1warPD+Qe6ErZyoaXPbF5BJP91mL66WEhEv2QxrEbIbzZ3IRvUFKasGsj7zt1+Mnc6fkhxjT+/wfi4Fk0ZnjwOOL93IqfUbLGz4b/yBgVUq4INNgji4r68Sm6TiDWpqFLwJ78cMFJay43NGPNUVhuX/LsCS8l35Bsx0/RRC9DVzT462gkTtSFMJpfNaNOh1P8ZVHewQrOda1lGKyeQa1UgIqN3kLsyIncLHQT3rqYkyKzTkP1shgKcXqxyoO2hhZFGIdnAJTi/5zaznFZdpIZzlJ0coO/dvSQCePXO6ZRLE0CLKnOgB+cMy9DVoscSHJ5KvBt8NP61luZA
-Received: from skbuf ([188.25.173.195])
-        by smtp.gmail.com with ESMTPSA id gr8-20020a170906e2c800b00a3840fbeef9sm779222ejb.70.2024.02.07.05.55.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Feb 2024 05:55:23 -0800 (PST)
-Date: Wed, 7 Feb 2024 15:55:20 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	bcm-kernel-feedback-list@broadcom.com,
-	Byungho An <bh74.an@samsung.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Doug Berger <opendmb@gmail.com>, Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Jakub Kicinski <kuba@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	Justin Chen <justin.chen@broadcom.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
-	NXP Linux Team <linux-imx@nxp.com>, Paolo Abeni <pabeni@redhat.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>, Wei Fang <wei.fang@nxp.com>
-Subject: Re: [PATCH net-next v2 6/6] net: dsa: b53: remove
- eee_enabled/eee_active in b53_get_mac_eee()
-Message-ID: <20240207135520.2zvinnv5w3v7kruk@skbuf>
-References: <Zb9/O81fVAZw4ANr@shell.armlinux.org.uk>
- <E1rWbNI-002cCz-4x@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1707314232; c=relaxed/simple;
+	bh=ZKbHAdPSxFjL+QsWSRsm1Xq856avq8hYQeDJezdKKdI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MB6JeIpNIFqgI00VBCZ0gi2L90k+hc+V1Qrnw5Oes3CADm2W2uz6x+rL3nPM49YW5GdS9FZbs3G/tgVvz7ttzcs7ZB2Y6WCaLcYwZyQ6JkJeK6C6u7pfbopp54FSXv4Zvb2P7SpUcYzC0svLHD2X/hW72Wqmm182N/QXnQQ0QPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OxVPdrK/; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707314229;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SJWbOOPpNp6pIwb5DBnwYalBOWA2pdGW/NlT+/6riTc=;
+	b=OxVPdrK/cBfpwxXc4/+jXckZA0kvvxlRS1IP6pjv9Rl9kTfLgXkTAJFo86kTBmCQ57A6lV
+	d3iHt+k7NFDjrnd1VmUDIRi5YPCbycCcfvwVN3sLjrBSElilYJCdPRW92CuhhN1+7Vvrij
+	0foFXjJqhHcbYQNLLHWNLN1k1Q3vDfA=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-297-PWcOvnFoN2SfCsupwSLdbQ-1; Wed, 07 Feb 2024 08:57:03 -0500
+X-MC-Unique: PWcOvnFoN2SfCsupwSLdbQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 99BAB84ACA3;
+	Wed,  7 Feb 2024 13:57:02 +0000 (UTC)
+Received: from [10.45.225.55] (unknown [10.45.225.55])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id B19DA2026D06;
+	Wed,  7 Feb 2024 13:57:01 +0000 (UTC)
+Message-ID: <0294ada0-b0ae-47ea-8b58-247c916468dd@redhat.com>
+Date: Wed, 7 Feb 2024 14:57:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1rWbNI-002cCz-4x@rmk-PC.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 iwl-net 1/2] i40e: avoid double calling
+ i40e_pf_rxq_wait()
+Content-Language: en-US
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, anthony.l.nguyen@intel.com,
+ magnus.karlsson@intel.com, Simon Horman <horms@kernel.org>
+References: <20240206124132.636342-1-maciej.fijalkowski@intel.com>
+ <20240206124132.636342-2-maciej.fijalkowski@intel.com>
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <20240206124132.636342-2-maciej.fijalkowski@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-On Sun, Feb 04, 2024 at 12:13:28PM +0000, Russell King (Oracle) wrote:
-> b53_get_mac_eee() sets both eee_enabled and eee_active, and then
-> returns zero.
+On 06. 02. 24 13:41, Maciej Fijalkowski wrote:
+> Currently, when interface is being brought down and
+> i40e_vsi_stop_rings() is called, i40e_pf_rxq_wait() is called two times,
+> which is wrong. To showcase this scenario, simplified call stack looks
+> as follows:
 > 
-> dsa_slave_get_eee(), which calls this function, will then continue to
-> call phylink_ethtool_get_eee(), which will return -EOPNOTSUPP if there
-> is no PHY present, otherwise calling phy_ethtool_get_eee() which in
-> turn will call genphy_c45_ethtool_get_eee().
+> i40e_vsi_stop_rings()
+> 	i40e_control wait rx_q()
+> 		i40e_control_rx_q()
+> 		i40e_pf_rxq_wait()
+> 	i40e_vsi_wait_queues_disabled()
+> 		i40e_pf_rxq_wait()  // redundant call
 > 
-> genphy_c45_ethtool_get_eee() will overwrite eee_enabled and eee_active
-> with its own interpretation from the PHYs settings and negotiation
-> result.
+> To fix this, let us s/i40e_control_wait_rx_q/i40e_control_rx_q within
+> i40e_vsi_stop_rings().
 > 
-> Thus, when there is no PHY, dsa_slave_get_eee() will fail with
-> -EOPNOTSUPP, meaning eee_enabled and eee_active will not be returned to
-> userspace. When there is a PHY, eee_enabled and eee_active will be
-> overwritten by phylib, making the setting of these members in
-> b53_get_mac_eee() entirely unnecessary.
-> 
-> Remove this code, thus simplifying b53_get_mac_eee().
-> 
-> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Fixes: 65662a8dcdd0 ("i40e: Fix logic of disabling queues")
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
 > ---
+>   drivers/net/ethernet/intel/i40e/i40e_main.c | 12 +++---------
+>   1 file changed, 3 insertions(+), 9 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> index 6e7fd473abfd..2c46a5e7d222 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -4926,7 +4926,7 @@ int i40e_vsi_start_rings(struct i40e_vsi *vsi)
+>   void i40e_vsi_stop_rings(struct i40e_vsi *vsi)
+>   {
+>   	struct i40e_pf *pf = vsi->back;
+> -	int pf_q, err, q_end;
+> +	int pf_q, q_end;
+>   
+>   	/* When port TX is suspended, don't wait */
+>   	if (test_bit(__I40E_PORT_SUSPENDED, vsi->back->state))
+> @@ -4936,16 +4936,10 @@ void i40e_vsi_stop_rings(struct i40e_vsi *vsi)
+>   	for (pf_q = vsi->base_queue; pf_q < q_end; pf_q++)
+>   		i40e_pre_tx_queue_cfg(&pf->hw, (u32)pf_q, false);
+>   
+> -	for (pf_q = vsi->base_queue; pf_q < q_end; pf_q++) {
+> -		err = i40e_control_wait_rx_q(pf, pf_q, false);
+> -		if (err)
+> -			dev_info(&pf->pdev->dev,
+> -				 "VSI seid %d Rx ring %d disable timeout\n",
+> -				 vsi->seid, pf_q);
+> -	}
+> +	for (pf_q = vsi->base_queue; pf_q < q_end; pf_q++)
+> +		i40e_control_rx_q(pf, pf_q, false);
+>   
+>   	msleep(I40E_DISABLE_TX_GAP_MSEC);
+> -	pf_q = vsi->base_queue;
+>   	for (pf_q = vsi->base_queue; pf_q < q_end; pf_q++)
+>   		wr32(&pf->hw, I40E_QTX_ENA(pf_q), 0);
+>   
+Reviewed-by: Ivan Vecera <ivecera@redhat.com>
 
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
-
-I see the series was put in "Changes Requested", possibly due to my
-clarification question. Let's see if I can change that.
-
----
-pw-bot: under-review
 
