@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-69846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A197C84CCB4
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:27:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD21B84CCB5
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:27:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 554B61F21679
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 14:27:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D20EA1C254E1
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 14:27:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 052F07E590;
-	Wed,  7 Feb 2024 14:26:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FD877F477;
+	Wed,  7 Feb 2024 14:26:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lsxmVct2"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p4T4Cilf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-yw1-f201.google.com (mail-yw1-f201.google.com [209.85.128.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A7837E567
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 14:26:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A237E78E
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 14:26:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707316009; cv=none; b=QZ8msfTMt5KxOVBHLUr2GjElEQ7Yyzg2EIdgmxLhWEAJ7i/EQhn5PR3xSuC96NM5rmpfHKxSkkkhzNGhoZXym+B58pCSrdzI6qR1+nEh9gJvZ3SGbNBKUYWiOG+CFMC0dee7HnEuIQ+ReDZT9g3PUEPgeF50CuoDpKkgfwQJ9RQ=
+	t=1707316012; cv=none; b=hyROjjkF2fpqpl7cPhNHP0IE/LGj3bkfqVPLvSIy8nbODYGUwrT5abDSpJ/IWJyQwIRq/EWF6huSHzW1lXGLAao5cPXhj3Hy0BPiAdfzlXmgNaBH4h7bTwHO2eu/bkUkdL5j2epg/bSzcfGlSUKVXI7oydO/LcHarPAdkzN9suw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707316009; c=relaxed/simple;
-	bh=25ClL7WoqH767H4g7uyDndpTdLFT1mSh66swzGoqCYQ=;
+	s=arc-20240116; t=1707316012; c=relaxed/simple;
+	bh=SwDFr3U2rPeF2hWWNUiqbC0QXPxvAE5vSYFtdA3Js50=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SvMex+WuM/IoQmeKvxEv56CrHW0V0LLNwLyeeRo1/0ER4qR+Zcj37d/MSG8nGq6kHW3HtVamz9RhGPChi/EQ1HbpIqpwFVGa4FwvNK16j5K5L/s3Atiw8QMHOuOWLnJymwzkJBdTtfX/SXi8KPRK9RNPaDo7UhNkWQGyIki91d0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lsxmVct2; arc=none smtp.client-ip=209.85.219.202
+	 To:Cc:Content-Type; b=dLeuwfFDU35Zj8utcshQ168aYvzrCmXzOqLzUfxla3VVdc3Zr2mhKsyq3EWQfPnLSNhypcfq/lRHI/syiuHQCP9gYxwr8TkkEhEKeckfMSBeiBNl6J7tTvFuqKfcPulJ+fVOatqjVZPj05pw2a2DgJgFNnw+hOPaEZofej3d4p0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p4T4Cilf; arc=none smtp.client-ip=209.85.128.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6df2b2d1aso854745276.1
-        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 06:26:48 -0800 (PST)
+Received: by mail-yw1-f201.google.com with SMTP id 00721157ae682-5ffee6fcdc1so10055447b3.2
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 06:26:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707316007; x=1707920807; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1707316009; x=1707920809; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W0IAsWsB1rkkDQSBmIH07o3Uzv0VcNGVc215KBSmS+E=;
-        b=lsxmVct2mqJVDJbIcTwfNqyme+DNirGycn4bweXFuDMWx9bp2/BO3zEiGs+K5OO1op
-         ZXYe8wigYxY5g09qxx8D2NCvh//jgXvAR17NFb2th+zEypzapNkE1w9e8XCy4CqicEP0
-         SknIcRHKctRbmGWOxfEUL7wNlj6FniNxlbMf260ynpecNgPUh3AlpBW+ps8diLNpjjN5
-         nfQTdtJAchESnbTKManpg+TaPKLhrHrMg2r2g7+KE0QUzSeZaCVRDKk1bxmzHbrsgsP/
-         vw2n3vqMnXYJhf188VQf1UPKPPEtXFP+ulBglGAW/Ubxjmp0q2UxOCfeFYg8dBGHaxpd
-         OTyw==
+        bh=xY6NVRYFT70uw+pOqEAvhmYGu+N2ydDZyZMjn8nLKEI=;
+        b=p4T4CilfANRtgUy2BLbLy1OovlTiFiucRHfZCNFonPu2BfA3W9t1cXN3bSvCFsEW+R
+         N07IsAo6QMNZVgoxMZ8j/NYB+u8McLfuTncD1FcSjFO6k29ENomZeyhMTIrc+UXAf3Rm
+         tPzEgD5//x19UPVjJNYcWT8uVCX7k234fbc1bD2gcNe8ffBkmjFkSHvyRhw0YQdjLx+s
+         JFHM9gLmblNpECEr0r2JwbCSqmy/4VAXCA0h3EbdrYVlExFHXAqcxApJHetGBWZ5QTN3
+         DOxYlyXrCIDy8BuhBeGuvcddt2RXo712l4VPKtqHXyvKTgZjQ14RDijeE1W1hbthWBHS
+         RORw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707316007; x=1707920807;
+        d=1e100.net; s=20230601; t=1707316009; x=1707920809;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W0IAsWsB1rkkDQSBmIH07o3Uzv0VcNGVc215KBSmS+E=;
-        b=qq7vOhiewPGk8Hv8RBbGkpAIvSOgg6P1JGKkS9hW9FJGFY0mUBpAsOhKEPdpOGxOAJ
-         2qcV03SMVhagS7dyz9+y42CQnBgeWhIoXqstvdNmov4Q39a3ldzideggF6jSxVeFqXqB
-         aCx7euiKXy15uVYzX8EHXz6wybqMW7Sr2Ea6B54Mwh720v5ThgS46L8WK3i6BbLJ0Pkf
-         WlJkkPWb+LHSqvkU0AM04rC7lg/J2Pch11kggIm/FWP5wXphKOA20tbCSt4FR9APW80m
-         bTcLBGdMpDHrszFRamS78z96Dtd6dVueDzk1N9d6vX/0EU3fxBUdMFBZxDf+Oy7A5nbe
-         hDfw==
-X-Gm-Message-State: AOJu0YyFvk6c3rb40E8vT+zVBugCDQAMAQKvnKCo/8dNk6TMXEAmRIyN
-	/WyPIgo7luKxc+ThjAXuAnghukUmOa7lIfvDSoPSQxvHFKaeoBETCEbs2KGwUNPIovH23m1DiT8
-	DDcjYAb1+GA==
-X-Google-Smtp-Source: AGHT+IEfU9i8Dic/6/T5TTaK5E65VIFzt/ENU/4yZzR634OYNlGv6k4n1lH1pggLE+kEaEjeqizG9bPCNusv4w==
+        bh=xY6NVRYFT70uw+pOqEAvhmYGu+N2ydDZyZMjn8nLKEI=;
+        b=Yjthda/V56qxLm58tL0siWdhFqe+xN76hFOJsvh4eK+UBxj06vgXT/PITJBP85QztM
+         pbX+ritlsat3gQA7KisQCpKrWE7+qbfT18a7KG6qgFS/WaiWpHcslIry6WCQaqLgyWXR
+         BHRivJ8gTAgtWZIVZYZ6/dBxb9iUyRcDOFnY3Ptxksqv5GPHU5beJq7y3+5P2UlhkPfH
+         K67Kt8WmqNIbw31vumYvmzlV+PdulqDiQAy9/4qkDCv/AhLjsSq3nathDre1WPRZpJmt
+         5kFrrO8biLIQEzo9Wn826btkXddzxEYpCMLU5M9ZR3qnjZfIhIRuazAzPbvNX1ilyfUO
+         +/6w==
+X-Gm-Message-State: AOJu0YwTNP3DcdV7gMPYyE6pcOJr03AHiQhpPnPNj6KyteAvPLujZ+EH
+	nY3CrpmyghAu05uVCPpYyyMPAhbRlDZyG2+ZaSqbRsz6NUqcTSPGrNoQTJbL/+oI/uzyNbJLPq/
+	mVK/6dOQVoA==
+X-Google-Smtp-Source: AGHT+IGj1+KXTOtFNltSNiOpXQME2HHlAGPI93Egj8675sP0JAZgc4XBwBAZEY+h4sJ+aIDYx8m0i3NbqUupnA==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:178f:b0:dc1:f6f0:1708 with SMTP
- id ca15-20020a056902178f00b00dc1f6f01708mr178870ybb.7.1707316007420; Wed, 07
- Feb 2024 06:26:47 -0800 (PST)
-Date: Wed,  7 Feb 2024 14:26:24 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:248d:b0:dc2:3cf3:5471 with SMTP
+ id ds13-20020a056902248d00b00dc23cf35471mr191490ybb.6.1707316009256; Wed, 07
+ Feb 2024 06:26:49 -0800 (PST)
+Date: Wed,  7 Feb 2024 14:26:25 +0000
 In-Reply-To: <20240207142629.3456570-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240207142629.3456570-1-edumazet@google.com>
 X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
-Message-ID: <20240207142629.3456570-9-edumazet@google.com>
-Subject: [PATCH net-next 08/13] net-sysfs: convert netstat_show() to RCU
+Message-ID: <20240207142629.3456570-10-edumazet@google.com>
+Subject: [PATCH net-next 09/13] net: remove stale mentions of dev_base_lock in comments
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -82,47 +82,107 @@ Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-dev_get_stats() can be called from RCU, there is no need
-to acquire dev_base_lock.
-
-Change dev_isalive() comment to reflect we no longer use
-dev_base_lock from net/core/net-sysfs.c
+Change comments incorrectly mentioning dev_base_lock.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/core/net-sysfs.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ Documentation/networking/netdevices.rst     | 4 ++--
+ drivers/net/ethernet/cisco/enic/enic_main.c | 2 +-
+ drivers/net/ethernet/nvidia/forcedeth.c     | 4 ++--
+ drivers/net/ethernet/sfc/efx_common.c       | 2 +-
+ drivers/net/ethernet/sfc/falcon/efx.c       | 2 +-
+ drivers/net/ethernet/sfc/siena/efx_common.c | 2 +-
+ 6 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index c5d164b8c6bfb53793f8422063c6281d6339b36e..946caefdd9599f631a73487e950305c978f8bc66 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -34,7 +34,7 @@ static const char fmt_dec[] = "%d\n";
- static const char fmt_ulong[] = "%lu\n";
- static const char fmt_u64[] = "%llu\n";
+diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
+index 9e4cccb90b8700aea49bb586ca0da79f2fe185b9..c2476917a6c37d9b87e8b5d59f2e00fa0a30e26a 100644
+--- a/Documentation/networking/netdevices.rst
++++ b/Documentation/networking/netdevices.rst
+@@ -252,8 +252,8 @@ ndo_eth_ioctl:
+ 	Context: process
  
--/* Caller holds RTNL, RCU or dev_base_lock */
-+/* Caller holds RTNL or RCU */
- static inline int dev_isalive(const struct net_device *dev)
- {
- 	return READ_ONCE(dev->reg_state) <= NETREG_REGISTERED;
-@@ -685,14 +685,14 @@ static ssize_t netstat_show(const struct device *d,
- 	WARN_ON(offset > sizeof(struct rtnl_link_stats64) ||
- 		offset % sizeof(u64) != 0);
+ ndo_get_stats:
+-	Synchronization: rtnl_lock() semaphore, dev_base_lock rwlock, or RCU.
+-	Context: atomic (can't sleep under rwlock or RCU)
++	Synchronization: rtnl_lock() semaphore, or RCU.
++	Context: atomic (can't sleep under RCU)
  
--	read_lock(&dev_base_lock);
-+	rcu_read_lock();
- 	if (dev_isalive(dev)) {
- 		struct rtnl_link_stats64 temp;
- 		const struct rtnl_link_stats64 *stats = dev_get_stats(dev, &temp);
- 
- 		ret = sysfs_emit(buf, fmt_u64, *(u64 *)(((u8 *)stats) + offset));
- 	}
--	read_unlock(&dev_base_lock);
-+	rcu_read_unlock();
- 	return ret;
+ ndo_start_xmit:
+ 	Synchronization: __netif_tx_lock spinlock.
+diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
+index 37bd38d772e80967e50342f8b87dfa331192c5a0..d266a87297a5e3a5281acda9243a024fc2f7d742 100644
+--- a/drivers/net/ethernet/cisco/enic/enic_main.c
++++ b/drivers/net/ethernet/cisco/enic/enic_main.c
+@@ -872,7 +872,7 @@ static netdev_tx_t enic_hard_start_xmit(struct sk_buff *skb,
+ 	return NETDEV_TX_OK;
  }
  
+-/* dev_base_lock rwlock held, nominally process context */
++/* rcu_read_lock potentially held, nominally process context */
+ static void enic_get_stats(struct net_device *netdev,
+ 			   struct rtnl_link_stats64 *net_stats)
+ {
+diff --git a/drivers/net/ethernet/nvidia/forcedeth.c b/drivers/net/ethernet/nvidia/forcedeth.c
+index 7a549b834e970a5ac40330513e3220466d78acef..31f896c4aa266032cbabdd3c0086eae5969d203a 100644
+--- a/drivers/net/ethernet/nvidia/forcedeth.c
++++ b/drivers/net/ethernet/nvidia/forcedeth.c
+@@ -1761,7 +1761,7 @@ static void nv_get_stats(int cpu, struct fe_priv *np,
+ /*
+  * nv_get_stats64: dev->ndo_get_stats64 function
+  * Get latest stats value from the nic.
+- * Called with read_lock(&dev_base_lock) held for read -
++ * Called with rcu_read_lock() held -
+  * only synchronized against unregister_netdevice.
+  */
+ static void
+@@ -3090,7 +3090,7 @@ static void set_bufsize(struct net_device *dev)
+ 
+ /*
+  * nv_change_mtu: dev->change_mtu function
+- * Called with dev_base_lock held for read.
++ * Called with RTNL held for read.
+  */
+ static int nv_change_mtu(struct net_device *dev, int new_mtu)
+ {
+diff --git a/drivers/net/ethernet/sfc/efx_common.c b/drivers/net/ethernet/sfc/efx_common.c
+index 175bd9cdfdac3ac8183e52f2e76b99839b9c2ed7..551f890db90a609319dca95af9b464bddb252121 100644
+--- a/drivers/net/ethernet/sfc/efx_common.c
++++ b/drivers/net/ethernet/sfc/efx_common.c
+@@ -595,7 +595,7 @@ void efx_stop_all(struct efx_nic *efx)
+ 	efx_stop_datapath(efx);
+ }
+ 
+-/* Context: process, dev_base_lock or RTNL held, non-blocking. */
++/* Context: process, rcu_read_lock or RTNL held, non-blocking. */
+ void efx_net_stats(struct net_device *net_dev, struct rtnl_link_stats64 *stats)
+ {
+ 	struct efx_nic *efx = efx_netdev_priv(net_dev);
+diff --git a/drivers/net/ethernet/sfc/falcon/efx.c b/drivers/net/ethernet/sfc/falcon/efx.c
+index e001f27085c6614374a0e5e1493b215d6c55e9db..1cb32aedd89c7393c7881efb11963cf334bca3ae 100644
+--- a/drivers/net/ethernet/sfc/falcon/efx.c
++++ b/drivers/net/ethernet/sfc/falcon/efx.c
+@@ -2085,7 +2085,7 @@ int ef4_net_stop(struct net_device *net_dev)
+ 	return 0;
+ }
+ 
+-/* Context: process, dev_base_lock or RTNL held, non-blocking. */
++/* Context: process, rcu_read_lock or RTNL held, non-blocking. */
+ static void ef4_net_stats(struct net_device *net_dev,
+ 			  struct rtnl_link_stats64 *stats)
+ {
+diff --git a/drivers/net/ethernet/sfc/siena/efx_common.c b/drivers/net/ethernet/sfc/siena/efx_common.c
+index e4b294b8e9acb15f68b6597047d493add699196f..88e5bc347a44cea66e36dcc6afe10ef10c1383fa 100644
+--- a/drivers/net/ethernet/sfc/siena/efx_common.c
++++ b/drivers/net/ethernet/sfc/siena/efx_common.c
+@@ -605,7 +605,7 @@ static size_t efx_siena_update_stats_atomic(struct efx_nic *efx, u64 *full_stats
+ 	return efx->type->update_stats(efx, full_stats, core_stats);
+ }
+ 
+-/* Context: process, dev_base_lock or RTNL held, non-blocking. */
++/* Context: process, rcu_read_lock or RTNL held, non-blocking. */
+ void efx_siena_net_stats(struct net_device *net_dev,
+ 			 struct rtnl_link_stats64 *stats)
+ {
 -- 
 2.43.0.594.gd9cf4e227d-goog
 
