@@ -1,237 +1,525 @@
-Return-Path: <netdev+bounces-69727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B88884C5D5
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 08:53:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6420084C602
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 09:10:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E669D28981D
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 07:53:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8925C1C22F5A
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 08:10:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 505D21F955;
-	Wed,  7 Feb 2024 07:52:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB80F1F95D;
+	Wed,  7 Feb 2024 08:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="q0qxNt6g"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="O0lSSrcg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780D1200B8
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 07:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9761B200AD
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 08:10:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707292377; cv=none; b=Lf7e2vyb3ybvCAFs/W7tDB4E+WIQAhxMzygr9N2R1lrIXtHtdN5d3x01Jmf6L0IAEy0f49L7PdO0hE546srn3/KQh6NIUo9PPOwM4q5ccWjCeYSWriKVjLDo0UjopjAX7UTTzHJS7bp4xwTyOk8YEjYtjSiajJR7g+9Xg6MhEwg=
+	t=1707293407; cv=none; b=qBLc9jf6yLbUdfylu1qxGJ7yrG3Zn+GzIt2ToJhou8J5gsIoAcNdJKsDsxDAOQtRVP2Vq9N9Q1subWzHb7YKPyuVNTpUHkcCd9hmW4T2XCtaJ+p844TrbdEMO9D+PNzReH1uanM4cSIoOzbOZAIj2BwKzfCv559Ir/w8QJF/iMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707292377; c=relaxed/simple;
-	bh=KPfQuWi/PXVkKmq8lELu0pIH64nc2bAJSKfva0E2W9U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TxkxWe29+AmLLIvFnv9E+OC1csz+4rHzW8jQslirBuMnSNQQrFAyfpRuwidges11EaYKw4NUEBmsKDJKM10ALIcQ+88yjZt7YKkPrtS03ILxAr1XCI3poYwyifRMycWvY+q/B9O7l0W4azqu2RIiHXZQ4AVCgPia2zN8lrxje2Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=q0qxNt6g; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-337d05b8942so317383f8f.3
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 23:52:55 -0800 (PST)
+	s=arc-20240116; t=1707293407; c=relaxed/simple;
+	bh=Cd3SNNpj1FA5iBMd94W0jznAiZhtn7AC2Pai4A9iT54=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=C/aICguBYb1ppAisX0nopERy44DOiE2iZkK/0UK75JPrb54gVOZCH0wKoYfkn0zF5U4talBiWAyDsmaxcyWm78v/J1LrxJYokZblJGMqswxcZM8J/64+1xLDQ6s3IIx3lFvwlw/ftbzzue3C2gUxORqfTVztfqIB4ep55anUuKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=O0lSSrcg; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-51165a488baso394812e87.2
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 00:10:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707292374; x=1707897174; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4m7Si2JFAYJeO9yLW8w4qmaSrLD1aYrFf/y2zpA4ILM=;
-        b=q0qxNt6gv+E/hGFNAq+dK9U6faq5MSy0rs1ix5y83IJp9416UdBAC+/FOPIyyFG7w1
-         1ykDQzjMWtjbH3SRVstL6Z8oiK2AQdbpWHNhzo9XSqR0zPOkWjYPwOtDWG2EMLfa2F72
-         dXL3Le2E9TEA8cFHHvxKalkZYStptHaRkyRkERK58JE8CVjwTkg8E9Q6VNca1N2eI3bt
-         tlC2dbaTbrYtDKk9FuJTWmXKnn5g/Xa9Ti08+U8MSCdV7tk1+JYiBSiPkXbU09IVFRYE
-         yn6ApAN7tM8KXINra6p8uDKZbR+WB0XrpdFhzvX9dFr+osI71Mb/5z+Q8mEiY4A36hDg
-         fWdg==
+        d=broadcom.com; s=google; t=1707293403; x=1707898203; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=9HZjVnGPb44XuYUvCTZG2oiaLovrhVhTv6i5UZjwJIY=;
+        b=O0lSSrcgJ5OepFVzZwULaPGtpD3DjAQn6OD4135eI/Sgh5Ieb+geocxXwg5ePTLrlr
+         R1ZaKa2s/w81PM8wprQydPJwiWwKm6ZviM+oIPtTPgs/xhxbBUvuxXqqXhpP9Ehmf3uM
+         IG/JJErRQrfRldqh3NTv8Vz4lUGMKq9iKaV5Q=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707292374; x=1707897174;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4m7Si2JFAYJeO9yLW8w4qmaSrLD1aYrFf/y2zpA4ILM=;
-        b=RN03iysLyEb4S1dV0hLLEKIw8MZ9jv0fqWPNDb7M0OuHzBCxsy7j7pBybsgM3m1Xut
-         +540rUzCPi92HFxnxR2ZgO7jdm/LptePKPMc/sj0cWEBUXbDL4kzCmvEkMVJoJVEtNzE
-         JXEptK9Ticr+CzYeLTwuPCR6y6o8zMWU/AJL44pqI5mLuTNGCj/XqBtPOvvJVL0EMC9m
-         5olOmw0mOoZV+p3Cdp3vUQSRNcD3+7gpN182S0wAwikYQpTcYnhwzq+RDyrj1HR1U+iP
-         oNaY8kq6w+ngPY/OIx92C03vKpbelrkZ3CXIGDXBxaecyXXgSn95cMwyf06Eq+TT34Y+
-         7L2Q==
-X-Gm-Message-State: AOJu0Yx6e6RpevMF/LZD4jSOGgs4aKk247kye069Z55r58z3geQxT9j8
-	OIDnyeVlPiscX+hNHjhtlBLl2Qc5EJhuFBdtCK+wuaBovJq1IU1BPDgI6GqmHG0=
-X-Google-Smtp-Source: AGHT+IH/aKBWw+eJLUYv8QGZd4sXrwuaM+XNWQReNDxtgKZa2iR4o45DsEoZsG80TSSFCTqcpInx/g==
-X-Received: by 2002:adf:e50b:0:b0:33b:4b01:cc94 with SMTP id j11-20020adfe50b000000b0033b4b01cc94mr1866833wrm.63.1707292373570;
-        Tue, 06 Feb 2024 23:52:53 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXsFMp0lx84Jc2lvposEF66wvq1wewxRpxX3R80XKreT90wcFbPNlQ5oeJ35WcI+vCO7nNGO49KLQtPVAPGimHJB45pR17NRhFxm80WRhXFPeaMNdqMy7HXFJn9LueYfgDRYOFBK5quYUPIMEBg4Uf05jPudnwIqeMyM2rNjkYiiclDXirjviJu8B2IcPpuBiPHtuZdz/eMkIUnkHPmPKbaTHMIm0Y/HqmF8TSiIHd2T98eyIb4FfRlI+AS0Vbbusg1BBy/VsFhx7rqS6D883FqY/tu+3RLXomNY2/Soi9AP1q9cwc/6ImQnkLlDB+v6S2G/OaAKsWVgpV0hkmjmzuv41SNKcTwg6jEokw8ntxcOKKpOJrX3R/LmYSGuxTCYOYaDKd2k5hj6hsCVYKG5HNIC9gbegp5h8sHCZWma9BhlDsYovSmgncBYWvlDNmU0Dbilqv52C9wjwUdKAXb3OJexxRja5XkS1U7UXawP1yG3ppJTzOV9eU4zf2tm3ABJmTMLav8iXyy1Vjw8Z7LPKmDOLLZqph5riwKMTDMDgekdLLKq1GUMXwZmmVK7HD7nABYzM6DP1GE6fI6L02lu21ztK/A
-Received: from [192.168.1.20] ([178.197.222.62])
-        by smtp.gmail.com with ESMTPSA id d11-20020adff2cb000000b0033b278cf5fesm806286wrp.102.2024.02.06.23.52.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 06 Feb 2024 23:52:53 -0800 (PST)
-Message-ID: <76f9aeed-9c8c-4bbf-98b5-98e9ee7dfff8@linaro.org>
-Date: Wed, 7 Feb 2024 08:52:51 +0100
+        d=1e100.net; s=20230601; t=1707293403; x=1707898203;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9HZjVnGPb44XuYUvCTZG2oiaLovrhVhTv6i5UZjwJIY=;
+        b=iboAdj/ltuwflBv7c3fg5ldAQXZsNKxf+overFRef2wxy+5whqfVkzZFYglcIQewO6
+         c7zIARiXpiQhaSJJMtRRpVefaw2wQjii7IjjJtKlwy+JTNWgUpLDkUlVqZLDkEl4zitr
+         jO8qMLf+VPnTutp6m0YfqEMD+ekhF5uJygq3hA8HnDz8CmBZntFbxuNndidTtP+avSIr
+         Ngiw3+jM97Zu/aP6TwUJTN8kNdSxgW06cWy9NbilrHyK3Ylnf5dN5NTLp7wngXIX89l9
+         uSxByBvV8ngILXil9k18sypizldIBcFxIaoYgOkONxLz9FbuOLH3hHgPg+VFs13KzIi9
+         2jIw==
+X-Gm-Message-State: AOJu0YzHtMsDFZoO5crkopqvLvwhaqG4rN9/I38U2P8RvHPNtELaSWjK
+	LCSGxp2sVz2b/r28/j4KHJPxjKfoDVW9o3mQtSA0+vhwA2mUoW/3kNlc85FBUCpzIVE1SFeMW+Y
+	VaHVBSSZ4dC9BJvFHbI94+Y2emJ7Eoc1aAhyn
+X-Google-Smtp-Source: AGHT+IHeooc31o+ITQqZLaho0vKILTtlPpO0DR0u0ENOCkC3UYc0yJOS5jBMbKamLIsiaP6jaoim7suj68//OOIrqGA=
+X-Received: by 2002:ac2:555a:0:b0:511:3ee1:4edf with SMTP id
+ l26-20020ac2555a000000b005113ee14edfmr2938402lfk.68.1707293403453; Wed, 07
+ Feb 2024 00:10:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] dt-bindings: net: airoha,en8811h: Add
- en8811h serdes polarity
-Content-Language: en-US
-To: Eric Woudstra <ericwouds@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Frank Wunderlich <frank-w@public-files.de>,
- Daniel Golle <daniel@makrotopia.org>, Lucien Jheng
- <lucien.jheng@airoha.com>, Zhi-Jun You <hujy652@protonmail.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org
-References: <20240206194751.1901802-1-ericwouds@gmail.com>
- <20240206194751.1901802-2-ericwouds@gmail.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
- cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
- JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
- gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
- J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
- NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
- BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
- vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
- Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
- TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzTRLcnp5c3p0b2Yg
- S296bG93c2tpIDxrcnp5c3p0b2Yua296bG93c2tpQGxpbmFyby5vcmc+wsGUBBMBCgA+FiEE
- m9B+DgxR+NWWd7dUG5NDfTtBYpsFAmI+BxMCGwMFCRRfreEFCwkIBwIGFQoJCAsCBBYCAwEC
- HgECF4AACgkQG5NDfTtBYptgbhAAjAGunRoOTduBeC7V6GGOQMYIT5n3OuDSzG1oZyM4kyvO
- XeodvvYv49/ng473E8ZFhXfrre+c1olbr1A8pnz9vKVQs9JGVa6wwr/6ddH7/yvcaCQnHRPK
- mnXyP2BViBlyDWQ71UC3N12YCoHE2cVmfrn4JeyK/gHCvcW3hUW4i5rMd5M5WZAeiJj3rvYh
- v8WMKDJOtZFXxwaYGbvFJNDdvdTHc2x2fGaWwmXMJn2xs1ZyFAeHQvrp49mS6PBQZzcx0XL5
- cU9ZjhzOZDn6Apv45/C/lUJvPc3lo/pr5cmlOvPq1AsP6/xRXsEFX/SdvdxJ8w9KtGaxdJuf
- rpzLQ8Ht+H0lY2On1duYhmro8WglOypHy+TusYrDEry2qDNlc/bApQKtd9uqyDZ+rx8bGxyY
- qBP6bvsQx5YACI4p8R0J43tSqWwJTP/R5oPRQW2O1Ye1DEcdeyzZfifrQz58aoZrVQq+innR
- aDwu8qDB5UgmMQ7cjDSeAQABdghq7pqrA4P8lkA7qTG+aw8Z21OoAyZdUNm8NWJoQy8m4nUP
- gmeeQPRc0vjp5JkYPgTqwf08cluqO6vQuYL2YmwVBIbO7cE7LNGkPDA3RYMu+zPY9UUi/ln5
- dcKuEStFZ5eqVyqVoZ9eu3RTCGIXAHe1NcfcMT9HT0DPp3+ieTxFx6RjY3kYTGLOwU0EVUNc
- NAEQAM2StBhJERQvgPcbCzjokShn0cRA4q2SvCOvOXD+0KapXMRFE+/PZeDyfv4dEKuCqeh0
- hihSHlaxTzg3TcqUu54w2xYskG8Fq5tg3gm4kh1Gvh1LijIXX99ABA8eHxOGmLPRIBkXHqJY
- oHtCvPc6sYKNM9xbp6I4yF56xVLmHGJ61KaWKf5KKWYgA9kfHufbja7qR0c6H79LIsiYqf92
- H1HNq1WlQpu/fh4/XAAaV1axHFt/dY/2kU05tLMj8GjeQDz1fHas7augL4argt4e+jum3Nwt
- yupodQBxncKAUbzwKcDrPqUFmfRbJ7ARw8491xQHZDsP82JRj4cOJX32sBg8nO2N5OsFJOcd
- 5IE9v6qfllkZDAh1Rb1h6DFYq9dcdPAHl4zOj9EHq99/CpyccOh7SrtWDNFFknCmLpowhct9
- 5ZnlavBrDbOV0W47gO33WkXMFI4il4y1+Bv89979rVYn8aBohEgET41SpyQz7fMkcaZU+ok/
- +HYjC/qfDxT7tjKXqBQEscVODaFicsUkjheOD4BfWEcVUqa+XdUEciwG/SgNyxBZepj41oVq
- FPSVE+Ni2tNrW/e16b8mgXNngHSnbsr6pAIXZH3qFW+4TKPMGZ2rZ6zITrMip+12jgw4mGjy
- 5y06JZvA02rZT2k9aa7i9dUUFggaanI09jNGbRA/ABEBAAHCwXwEGAEKACYCGwwWIQSb0H4O
- DFH41ZZ3t1Qbk0N9O0FimwUCYDzvagUJFF+UtgAKCRAbk0N9O0Fim9JzD/0auoGtUu4mgnna
- oEEpQEOjgT7l9TVuO3Qa/SeH+E0m55y5Fjpp6ZToc481za3xAcxK/BtIX5Wn1mQ6+szfrJQ6
- 59y2io437BeuWIRjQniSxHz1kgtFECiV30yHRgOoQlzUea7FgsnuWdstgfWi6LxstswEzxLZ
- Sj1EqpXYZE4uLjh6dW292sO+j4LEqPYr53hyV4I2LPmptPE9Rb9yCTAbSUlzgjiyyjuXhcwM
- qf3lzsm02y7Ooq+ERVKiJzlvLd9tSe4jRx6Z6LMXhB21fa5DGs/tHAcUF35hSJrvMJzPT/+u
- /oVmYDFZkbLlqs2XpWaVCo2jv8+iHxZZ9FL7F6AHFzqEFdqGnJQqmEApiRqH6b4jRBOgJ+cY
- qc+rJggwMQcJL9F+oDm3wX47nr6jIsEB5ZftdybIzpMZ5V9v45lUwmdnMrSzZVgC4jRGXzsU
- EViBQt2CopXtHtYfPAO5nAkIvKSNp3jmGxZw4aTc5xoAZBLo0OV+Ezo71pg3AYvq0a3/oGRG
- KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
- fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240206194751.1901802-2-ericwouds@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240207065207.3092004-1-srasheed@marvell.com> <20240207065207.3092004-6-srasheed@marvell.com>
+In-Reply-To: <20240207065207.3092004-6-srasheed@marvell.com>
+From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
+Date: Wed, 7 Feb 2024 13:39:51 +0530
+Message-ID: <CAH-L+nN04MuWS-QOxpPfQMD5iAvdZPFCp0nffuhB43+puLgk_Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 5/8] octeon_ep_vf: add support for ndo ops
+To: Shinas Rasheed <srasheed@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, hgani@marvell.com, 
+	vimleshk@marvell.com, sedara@marvell.com, egallen@redhat.com, 
+	mschmidt@redhat.com, pabeni@redhat.com, kuba@kernel.org, horms@kernel.org, 
+	wizhao@redhat.com, kheib@redhat.com, konguyen@redhat.com, 
+	Veerasenareddy Burru <vburru@marvell.com>, Satananda Burla <sburla@marvell.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000ddc83f0610c63818"
 
-On 06/02/2024 20:47, Eric Woudstra wrote:
-> The en8811h phy can be set with serdes polarity reversed on rx and/or tx.
-> 
-> Changed from rfc patch:
-> 
-> Explicitly say what -rx and -tx means.
+--000000000000ddc83f0610c63818
+Content-Type: multipart/alternative; boundary="000000000000d7a04f0610c6385f"
 
-I don't know what does it mean. This is v1, so we don't expect
-changelog. If this is v2 (because there was RFC/RFT/RFkisses/RFhugs
-which are states of patchsets, not versions), then please mark it as v2
-and put changelog under ---.
+--000000000000d7a04f0610c6385f
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+On Wed, Feb 7, 2024 at 12:23=E2=80=AFPM Shinas Rasheed <srasheed@marvell.co=
+m> wrote:
+
+> Add support for ndo ops to set MAC address, change MTU, get stats.
+> Add control path support to set MAC address, change MTU, get stats,
+> set speed, get and set link mode.
+>
+[Kalesh]: You are adding support for only one ndo hook ".ndo_get_stats64"
+in this patch. Am I missing something?
+
+>
+> Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
 > ---
->  .../bindings/net/airoha,en8811h.yaml          | 44 +++++++++++++++++++
->  1 file changed, 44 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/airoha,en8811h.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/airoha,en8811h.yaml b/Documentation/devicetree/bindings/net/airoha,en8811h.yaml
-> new file mode 100644
-> index 000000000000..99898e2bed64
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/airoha,en8811h.yaml
-> @@ -0,0 +1,44 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/airoha,en8811h.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> V6:
+>   - No changes
+>
+> V5:
+> https://lore.kernel.org/all/20240129050254.3047778-6-srasheed@marvell.com=
+/
+>   - No changes
+>
+> V4:
+> https://lore.kernel.org/all/20240108124213.2966536-6-srasheed@marvell.com=
+/
+>   - Provide more stats in ndo_get_stats64 such as tx_dropped, rx_dropped
+>     etc.
+>
+> V3:
+> https://lore.kernel.org/all/20240105203823.2953604-6-srasheed@marvell.com=
+/
+>   - No changes
+>
+> V2:
+> https://lore.kernel.org/all/20231223134000.2906144-6-srasheed@marvell.com=
+/
+>   - No changes
+>
+> V1:
+> https://lore.kernel.org/all/20231221092844.2885872-6-srasheed@marvell.com=
+/
+>
+>  .../marvell/octeon_ep_vf/octep_vf_main.c      | 58 +++++++++++++++++++
+>  1 file changed, 58 insertions(+)
+>
+> diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+> b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+> index 562beed9af6a..ff879b1e846e 100644
+> --- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+> +++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+> @@ -186,6 +186,23 @@ static netdev_tx_t octep_vf_start_xmit(struct sk_buf=
+f
+> *skb,
+>         return NETDEV_TX_OK;
+>  }
+>
+> +int octep_vf_get_if_stats(struct octep_vf_device *oct)
+>
+[Kalesh]: You may want to make this function static.
+
+> +{
+> +       struct octep_vf_iface_rxtx_stats vf_stats;
+> +       int ret, size;
 > +
-> +title: Airoha EN8811H PHY
+> +       memset(&vf_stats, 0, sizeof(struct octep_vf_iface_rxtx_stats));
+>
+[Kalesh]: You can avoid memset by initializing vf_stats =3D {};
+
+> +       ret =3D octep_vf_mbox_bulk_read(oct, OCTEP_PFVF_MBOX_CMD_GET_STAT=
+S,
+> +                                     (u8 *)&vf_stats, &size);
+> +       if (!ret) {
+>
+[Kalesh] For better alignment:
+if (ret)
+     return ret;
+
+> +               memcpy(&oct->iface_rx_stats, &vf_stats.iface_rx_stats,
+> +                      sizeof(struct octep_vf_iface_rx_stats));
+> +               memcpy(&oct->iface_tx_stats, &vf_stats.iface_tx_stats,
+> +                      sizeof(struct octep_vf_iface_tx_stats));
+> +       }
+> +       return ret;
+> +}
 > +
-> +maintainers:
-> +  - Eric Woudstra <ericwouds@gmail.com>
+>  int octep_vf_get_link_info(struct octep_vf_device *oct)
+>  {
+>         int ret, size;
+> @@ -199,6 +216,46 @@ int octep_vf_get_link_info(struct octep_vf_device
+> *oct)
+>         return 0;
+>  }
+>
+> +/**
+> + * octep_vf_get_stats64() - Get Octeon network device statistics.
+> + *
+> + * @netdev: kernel network device.
+> + * @stats: pointer to stats structure to be filled in.
+> + */
+> +static void octep_vf_get_stats64(struct net_device *netdev,
+> +                                struct rtnl_link_stats64 *stats)
+> +{
+> +       struct octep_vf_device *oct =3D netdev_priv(netdev);
+> +       u64 tx_packets, tx_bytes, rx_packets, rx_bytes;
+> +       int q;
 > +
-> +description:
-> +  Bindings for Airoha EN8811H PHY
-
-Drop "Bindings for" and instead describe the hardware. You are
-duplicating now title.
-
-
+> +       tx_packets =3D 0;
+> +       tx_bytes =3D 0;
+> +       rx_packets =3D 0;
+> +       rx_bytes =3D 0;
+> +       for (q =3D 0; q < oct->num_oqs; q++) {
+> +               struct octep_vf_iq *iq =3D oct->iq[q];
+> +               struct octep_vf_oq *oq =3D oct->oq[q];
 > +
-> +allOf:
-> +  - $ref: ethernet-phy.yaml#
+> +               tx_packets +=3D iq->stats.instr_completed;
+> +               tx_bytes +=3D iq->stats.bytes_sent;
+> +               rx_packets +=3D oq->stats.packets;
+> +               rx_bytes +=3D oq->stats.bytes;
+> +       }
+> +       stats->tx_packets =3D tx_packets;
+> +       stats->tx_bytes =3D tx_bytes;
+> +       stats->rx_packets =3D rx_packets;
+> +       stats->rx_bytes =3D rx_bytes;
+> +       if (!octep_vf_get_if_stats(oct)) {
+> +               stats->multicast =3D oct->iface_rx_stats.mcast_pkts;
+> +               stats->rx_errors =3D oct->iface_rx_stats.err_pkts;
+> +               stats->rx_dropped =3D
+> oct->iface_rx_stats.dropped_pkts_fifo_full +
+> +                                   oct->iface_rx_stats.err_pkts;
+> +               stats->rx_missed_errors =3D
+> oct->iface_rx_stats.dropped_pkts_fifo_full;
+> +               stats->tx_dropped =3D oct->iface_tx_stats.dropped;
+> +       }
+> +}
 > +
-> +properties:
+>  /**
+>   * octep_vf_tx_timeout_task - work queue task to Handle Tx queue timeout=
+.
+>   *
+> @@ -313,6 +370,7 @@ static const struct net_device_ops octep_vf_netdev_op=
+s
+> =3D {
+>         .ndo_open                =3D octep_vf_open,
+>         .ndo_stop                =3D octep_vf_stop,
+>         .ndo_start_xmit          =3D octep_vf_start_xmit,
+> +       .ndo_get_stats64         =3D octep_vf_get_stats64,
+>         .ndo_tx_timeout          =3D octep_vf_tx_timeout,
+>         .ndo_set_mac_address     =3D octep_vf_set_mac,
+>         .ndo_change_mtu          =3D octep_vf_change_mtu,
+> --
+> 2.25.1
+>
+>
+>
 
-This won't match to anything... missing compatible. You probably want to
-align with ongoing work on the lists.
+--=20
+Regards,
+Kalesh A P
 
+--000000000000d7a04f0610c6385f
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> +  airoha,pnswap-rx:
-> +    type: boolean
-> +    description:
-> +      Reverse rx polarity of the SERDES. This is the receiving
-> +      side of the lines from the MAC towards the EN881H.
-> +
-> +
+<div dir=3D"ltr"><div dir=3D"ltr"><br></div><br><div class=3D"gmail_quote">=
+<div dir=3D"ltr" class=3D"gmail_attr">On Wed, Feb 7, 2024 at 12:23=E2=80=AF=
+PM Shinas Rasheed &lt;<a href=3D"mailto:srasheed@marvell.com">srasheed@marv=
+ell.com</a>&gt; wrote:<br></div><blockquote class=3D"gmail_quote" style=3D"=
+margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-lef=
+t:1ex">Add support for ndo ops to set MAC address, change MTU, get stats.<b=
+r>
+Add control path support to set MAC address, change MTU, get stats,<br>
+set speed, get and set link mode.<br></blockquote><div>[Kalesh]: You are ad=
+ding support for only one ndo hook &quot;.ndo_get_stats64&quot; in this pat=
+ch. Am I missing something?</div><blockquote class=3D"gmail_quote" style=3D=
+"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);padding-le=
+ft:1ex">
+<br>
+Signed-off-by: Shinas Rasheed &lt;<a href=3D"mailto:srasheed@marvell.com" t=
+arget=3D"_blank">srasheed@marvell.com</a>&gt;<br>
+---<br>
+V6:<br>
+=C2=A0 - No changes<br>
+<br>
+V5: <a href=3D"https://lore.kernel.org/all/20240129050254.3047778-6-srashee=
+d@marvell.com/" rel=3D"noreferrer" target=3D"_blank">https://lore.kernel.or=
+g/all/20240129050254.3047778-6-srasheed@marvell.com/</a><br>
+=C2=A0 - No changes<br>
+<br>
+V4: <a href=3D"https://lore.kernel.org/all/20240108124213.2966536-6-srashee=
+d@marvell.com/" rel=3D"noreferrer" target=3D"_blank">https://lore.kernel.or=
+g/all/20240108124213.2966536-6-srasheed@marvell.com/</a><br>
+=C2=A0 - Provide more stats in ndo_get_stats64 such as tx_dropped, rx_dropp=
+ed<br>
+=C2=A0 =C2=A0 etc.<br>
+<br>
+V3: <a href=3D"https://lore.kernel.org/all/20240105203823.2953604-6-srashee=
+d@marvell.com/" rel=3D"noreferrer" target=3D"_blank">https://lore.kernel.or=
+g/all/20240105203823.2953604-6-srasheed@marvell.com/</a><br>
+=C2=A0 - No changes<br>
+<br>
+V2: <a href=3D"https://lore.kernel.org/all/20231223134000.2906144-6-srashee=
+d@marvell.com/" rel=3D"noreferrer" target=3D"_blank">https://lore.kernel.or=
+g/all/20231223134000.2906144-6-srasheed@marvell.com/</a><br>
+=C2=A0 - No changes<br>
+<br>
+V1: <a href=3D"https://lore.kernel.org/all/20231221092844.2885872-6-srashee=
+d@marvell.com/" rel=3D"noreferrer" target=3D"_blank">https://lore.kernel.or=
+g/all/20231221092844.2885872-6-srasheed@marvell.com/</a><br>
+<br>
+=C2=A0.../marvell/octeon_ep_vf/octep_vf_main.c=C2=A0 =C2=A0 =C2=A0 | 58 +++=
+++++++++++++++++<br>
+=C2=A01 file changed, 58 insertions(+)<br>
+<br>
+diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c b/dr=
+ivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c<br>
+index 562beed9af6a..ff879b1e846e 100644<br>
+--- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c<br>
++++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c<br>
+@@ -186,6 +186,23 @@ static netdev_tx_t octep_vf_start_xmit(struct sk_buff =
+*skb,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return NETDEV_TX_OK;<br>
+=C2=A0}<br>
+<br>
++int octep_vf_get_if_stats(struct octep_vf_device *oct)<br></blockquote><di=
+v>[Kalesh]: You may want to make this function static.=C2=A0</div><blockquo=
+te class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1px =
+solid rgb(204,204,204);padding-left:1ex">
++{<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0struct octep_vf_iface_rxtx_stats vf_stats;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0int ret, size;<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0memset(&amp;vf_stats, 0, sizeof(struct octep_vf=
+_iface_rxtx_stats));<br></blockquote><div>[Kalesh]: You can avoid memset by=
+ initializing vf_stats =3D {};=C2=A0</div><blockquote class=3D"gmail_quote"=
+ style=3D"margin:0px 0px 0px 0.8ex;border-left:1px solid rgb(204,204,204);p=
+adding-left:1ex">
++=C2=A0 =C2=A0 =C2=A0 =C2=A0ret =3D octep_vf_mbox_bulk_read(oct, OCTEP_PFVF=
+_MBOX_CMD_GET_STATS,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0(u8 *)&amp;vf_st=
+ats, &amp;size);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0if (!ret) {<br></blockquote><div>[Kalesh] For b=
+etter alignment:</div><div>if (ret)</div><div>=C2=A0 =C2=A0 =C2=A0return re=
+t;=C2=A0</div><blockquote class=3D"gmail_quote" style=3D"margin:0px 0px 0px=
+ 0.8ex;border-left:1px solid rgb(204,204,204);padding-left:1ex">
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0memcpy(&amp;oct-&gt=
+;iface_rx_stats, &amp;vf_stats.iface_rx_stats,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 sizeof(struct octep_vf_iface_rx_stats));<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0memcpy(&amp;oct-&gt=
+;iface_tx_stats, &amp;vf_stats.iface_tx_stats,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 sizeof(struct octep_vf_iface_tx_stats));<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0return ret;<br>
++}<br>
++<br>
+=C2=A0int octep_vf_get_link_info(struct octep_vf_device *oct)<br>
+=C2=A0{<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 int ret, size;<br>
+@@ -199,6 +216,46 @@ int octep_vf_get_link_info(struct octep_vf_device *oct=
+)<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 return 0;<br>
+=C2=A0}<br>
+<br>
++/**<br>
++ * octep_vf_get_stats64() - Get Octeon network device statistics.<br>
++ *<br>
++ * @netdev: kernel network device.<br>
++ * @stats: pointer to stats structure to be filled in.<br>
++ */<br>
++static void octep_vf_get_stats64(struct net_device *netdev,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 struct rtnl_link_stats64 *stats)<br>
++{<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0struct octep_vf_device *oct =3D netdev_priv(net=
+dev);<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0u64 tx_packets, tx_bytes, rx_packets, rx_bytes;=
+<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0int q;<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0tx_packets =3D 0;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0tx_bytes =3D 0;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0rx_packets =3D 0;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0rx_bytes =3D 0;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0for (q =3D 0; q &lt; oct-&gt;num_oqs; q++) {<br=
+>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0struct octep_vf_iq =
+*iq =3D oct-&gt;iq[q];<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0struct octep_vf_oq =
+*oq =3D oct-&gt;oq[q];<br>
++<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tx_packets +=3D iq-=
+&gt;stats.instr_completed;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0tx_bytes +=3D iq-&g=
+t;stats.bytes_sent;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rx_packets +=3D oq-=
+&gt;stats.packets;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0rx_bytes +=3D oq-&g=
+t;stats.bytes;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0stats-&gt;tx_packets =3D tx_packets;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0stats-&gt;tx_bytes =3D tx_bytes;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0stats-&gt;rx_packets =3D rx_packets;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0stats-&gt;rx_bytes =3D rx_bytes;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0if (!octep_vf_get_if_stats(oct)) {<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0stats-&gt;multicast=
+ =3D oct-&gt;iface_rx_stats.mcast_pkts;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0stats-&gt;rx_errors=
+ =3D oct-&gt;iface_rx_stats.err_pkts;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0stats-&gt;rx_droppe=
+d =3D oct-&gt;iface_rx_stats.dropped_pkts_fifo_full +<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0oct-&gt;iface_rx_stats.=
+err_pkts;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0stats-&gt;rx_missed=
+_errors =3D oct-&gt;iface_rx_stats.dropped_pkts_fifo_full;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0stats-&gt;tx_droppe=
+d =3D oct-&gt;iface_tx_stats.dropped;<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0}<br>
++}<br>
++<br>
+=C2=A0/**<br>
+=C2=A0 * octep_vf_tx_timeout_task - work queue task to Handle Tx queue time=
+out.<br>
+=C2=A0 *<br>
+@@ -313,6 +370,7 @@ static const struct net_device_ops octep_vf_netdev_ops =
+=3D {<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 .ndo_open=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =3D octep_vf_open,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 .ndo_stop=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =C2=A0 =C2=A0 =3D octep_vf_stop,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 .ndo_start_xmit=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =3D octep_vf_start_xmit,<br>
++=C2=A0 =C2=A0 =C2=A0 =C2=A0.ndo_get_stats64=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0=3D octep_vf_get_stats64,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 .ndo_tx_timeout=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =3D octep_vf_tx_timeout,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 .ndo_set_mac_address=C2=A0 =C2=A0 =C2=A0=3D oct=
+ep_vf_set_mac,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 .ndo_change_mtu=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=
+=A0 =3D octep_vf_change_mtu,<br>
+-- <br>
+2.25.1<br>
+<br>
+<br>
+</blockquote></div><br clear=3D"all"><div><br></div><span class=3D"gmail_si=
+gnature_prefix">-- </span><br><div dir=3D"ltr" class=3D"gmail_signature"><d=
+iv dir=3D"ltr">Regards,<div>Kalesh A P</div></div></div></div>
 
-Only one blank line.
+--000000000000d7a04f0610c6385f--
 
-> +  airoha,pnswap-tx:
-> +    type: boolean
-> +    description:
-> +      Reverse tx polarity of SERDES. This is the transmitting
-> +      side of the lines from EN8811H towards the MAC.
-> +
-> +unevaluatedProperties: false
-> +
-> +examples:
-> +  - |
-> +    mdio {
-> +        #address-cells = <1>;
-> +        #size-cells = <0>;
-> +
-> +        ethphy1: ethernet-phy@1 {
-> +                reg = <1>;
-> +                airoha,pnswap-rx;
+--000000000000ddc83f0610c63818
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-You have broken indentation.
-
-Use 4 spaces for example indentation.
-
-> +        };
-> +    };
-
-Best regards,
-Krzysztof
-
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
+BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
+hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
+JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
+aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
+FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
+T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
+o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
+aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
+YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
+cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
+ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
+HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
+Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
+LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
+zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
+4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
+cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
+u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
+a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
+x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
+VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
+bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
+AQkEMSIEIPjPk7Ut5IG+4qOwrN2HSsCc81Xqh0f3rrX8eR1jHhB0MBgGCSqGSIb3DQEJAzELBgkq
+hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDIwNzA4MTAwM1owaQYJKoZIhvcNAQkPMVwwWjAL
+BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
+9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQC9s2ESSqh8
+ZpgwfrYfZx9QDnMocqB2I9KekkIkj2/p0A/6xJxTFZSJr9pLTTv+YjCs9foNZe7bKsQByI+y9+mI
+Z2gu6xo/C0rZq31eVSbwdGcwPKJH9+9G4YgAbkCR0yWSOVZKWZ/30RpNRd48Gg6u0vsqBgby7Z+Q
+KCcHbygP29naBg1ecx+XXC/Tu+fHumbACbL0XMmTDTRIELYWurxlmXGGPUedTTZWcCc+VT1xxJ5a
+gy1BvX882qW9JkWZ7rTdIqN+dYg473SwsGYRfEEEwOj8afYebonl3JCC2kPN7YmLg/CoIOHqEEv1
+KuprIoxp9h3g6bK7BAXy11/vm5KB
+--000000000000ddc83f0610c63818--
 
