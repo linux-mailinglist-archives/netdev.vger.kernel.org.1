@@ -1,282 +1,785 @@
-Return-Path: <netdev+bounces-69670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1815B84C1E3
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 02:30:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A754484C1EF
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 02:37:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF54828666C
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 01:30:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECAF5B22721
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 01:36:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81CE57460;
-	Wed,  7 Feb 2024 01:29:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DEEDDDA0;
+	Wed,  7 Feb 2024 01:36:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="bR5Q7BKB"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A239DF46;
-	Wed,  7 Feb 2024 01:29:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7A3DDDAD
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 01:36:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707269399; cv=none; b=fO9jy8XtzoZY6cRYjcYm9WRUCzMENtqxYQ1EBZ7sZ4RDZtWLWM0FRPq9ZZ90QnJrleGqvKjO+lG3TITNEE1SeFYV30LnPf7cKvIc2l8VuLi+iwwn7fCPUSP49isfMZToxGmUye8WT2jRuHguKyYlRw3/jRKp0xC639olNi3vC5A=
+	t=1707269814; cv=none; b=AJpbUtyCmmtfKgl4QEGp7fuUvDcoVzOLXy2uPIb4B3sksPUK79jUYbO9B1jldVGDb5BC8/y1BFvsqqqrtoYlDqjcxsuC3oF23klU4yrmJmZGFp/AZjyKYA1IVEjSk9C/GZM9sFBDCMIbPIB3EYp3SLMjD6vvLpaVisglr3YvSVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707269399; c=relaxed/simple;
-	bh=ohmllKtVlbYUWok2hoh+BqT7pWSvSHMd0W1JQhg1ISM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SOZ0qTKhbX6RyEgnpE1UN5SvaS0gMoS9X+44vExKj45fC3qEpYbbe9u0c1J3eymW1LPwpPvhdW+GXCz8Je40vZNtzxuVm6y4WzfJCtPdpPWlMbIw+EboDy3HrhZAMRU0QBIqv5f1fXfb8KxXz8z5qO6nzEAJQRB3hVMLTtENEX8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1rXWki-0004bF-0d;
-	Wed, 07 Feb 2024 01:29:28 +0000
-Date: Wed, 7 Feb 2024 01:29:18 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Chunfeng Yun <chunfeng.yun@mediatek.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Kishon Vijay Abraham I <kishon@kernel.org>,
-	Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Alexander Couzens <lynxis@fe80.eu>,
-	Qingfang Deng <dqfext@gmail.com>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org
-Subject: Re: [RFC PATCH net-next v3 3/8] net: pcs: pcs-mtk-lynxi: add
- platform driver for MT7988
-Message-ID: <ZcLc7vJ4fPmRyuxn@makrotopia.org>
-References: <cover.1702352117.git.daniel@makrotopia.org>
- <8aa905080bdb6760875d62cb3b2b41258837f80e.1702352117.git.daniel@makrotopia.org>
- <ZXnV/Pk1PYxAm/jS@shell.armlinux.org.uk>
+	s=arc-20240116; t=1707269814; c=relaxed/simple;
+	bh=8/IXU+3A+BigWLFJTjjnh7adLXY58gs2T4x67o9TK6g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=SvvfCM4BKYacSFqEJm4tzQ1AJR3J/N7KE2ginABqmHHUGMXzyxZWTp5Gb0tDd8Ho91MbcY2VW5o607vO9r39hDmZVmMbMqk6mEee7ws2icui5u5c3JMl9+N/WS+gIB1A2HUmAxmgix6soIsYiNEPVWXC75HUOxROekTZ742oCNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=bR5Q7BKB; arc=none smtp.client-ip=209.85.219.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-dc6e08fde11so91604276.1
+        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 17:36:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1707269811; x=1707874611; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=x4UVXt0fxIgi47UM0Lcd+kHeDNX9b2q5xQI04Cos9NU=;
+        b=bR5Q7BKBzUPH9TRrhY0Ts+AanYwmXGPiB3n/Y87LU4ml8E9F60X3/Str2En+ZB7Cyx
+         uwhVJztNMpEcteWAQB55Ut6o4har2eHNKZblu5zlZX7JgrgDhjRF3MuVvIZdNNHYgj4E
+         ax5GNr3rOb+iHD0WYWQ/DmhN/1yKJUKGaUy7TyJRKT3Z9jEINj84X57cxiGHLuIyFN4o
+         bLbo0xNG3GVqgf4pxWpKsnEZiAk8BGof5EB6xdZgjs7J3aZh+iNHazVenvziLuzyEwcC
+         rCRrpt6B+IzsGRM5I7IbL2hUvOfCShOAt374uXrqJ4k51eDrh9Q49ZeeFGwm3dCG7S9a
+         xjXA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707269811; x=1707874611;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=x4UVXt0fxIgi47UM0Lcd+kHeDNX9b2q5xQI04Cos9NU=;
+        b=KA5Cu2qaP+NeqjnPIkKluRRDeWgjRgR/6K8KLBLayl3biD6yQu8Kw/WSxxglJBRVfl
+         hr6pHMlMUnCfWseqYv+saye/kfQoJyK1ROq1sjynxN6aktonb+qXkeJfwjk5nDNzMN/a
+         LuZNU9l2z/QlbTujYcY/SMrkMCcSIVNdgz1vPsXqA0f9cfXReknVGM9hB3mAEeuhyHUG
+         2vUPPFvm+B54wfZs0Xd6m3vkVLlnlV8MDO+ekcKGEKfHyvhSB8wfH6sqTE2ZklEQG2be
+         TMZu3ryRjReq82f2onjrczTPaS95dIcq7ARWuOlpQ4ZZWsf2Tkv7aBsNz3Ffo/MQDezJ
+         SouQ==
+X-Gm-Message-State: AOJu0YzsIU+UD/GG9PXnYC3KKmCLNLFGcoUozfmaI4fUApoI3cL5y1qY
+	yNDtgE3kZsETOVNIsVvDZkMKQCrrbg792j9LQ+wHBODxdpSyzIFQUhhsvJXPXddkeAQd7xlaaPq
+	keaRsUTN3jeRlou8hELiAgQXMCf3fpk5ejRG1
+X-Google-Smtp-Source: AGHT+IHbdMjBFE9gkcG2DKXZMOZiL36BSA5BN+4JT8Qstkewyemi4FKBoYvBYFum6TvDvPsoKico4ITsjLy2IelT1nE=
+X-Received: by 2002:a25:ac94:0:b0:dc6:4ad3:1671 with SMTP id
+ x20-20020a25ac94000000b00dc64ad31671mr3366444ybi.15.1707269811453; Tue, 06
+ Feb 2024 17:36:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZXnV/Pk1PYxAm/jS@shell.armlinux.org.uk>
+References: <20240205185537.216873-1-stephen@networkplumber.org>
+In-Reply-To: <20240205185537.216873-1-stephen@networkplumber.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Tue, 6 Feb 2024 20:36:40 -0500
+Message-ID: <CAM0EoMnZ=WcSy7me3Tf=_znWqp_ep8UTpyHuX3iUNFtVvzUufQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] net/sched: actions report errors with extack
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"open list:BPF [GENERAL] (Safe Dynamic Programs and Tools)" <bpf@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Russell,
+On Mon, Feb 5, 2024 at 1:55=E2=80=AFPM Stephen Hemminger
+<stephen@networkplumber.org> wrote:
+>
+> When an action detects invalid parameters, it should
+> be adding an external ack to netlink so that the user is
+> able to diagnose the issue.
+>
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 
-sorry for the extended time it took me to get back to this patch and
-the comments you made for it. Understanding the complete scope of the
-problem took a while (plus there were holidays and other fun things),
-and also brought up further questions which I hope you can help me
-find good answers for, see below:
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-On Wed, Dec 13, 2023 at 04:04:12PM +0000, Russell King (Oracle) wrote:
-> On Tue, Dec 12, 2023 at 03:47:18AM +0000, Daniel Golle wrote:
-> > Introduce a proper platform MFD driver for the LynxI (H)SGMII PCS which
-> > is going to initially be used for the MT7988 SoC.
-> > 
-> > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
-> 
-> I made some specific suggestions about what I wanted to see for
-> "getting" PCS in the previous review, and I'm disappointed that this
-> patch set is still inventing its own solution.
-> 
-> > +struct phylink_pcs *mtk_pcs_lynxi_get(struct device *dev, struct device_node *np)
-> > +{
-> > +	struct platform_device *pdev;
-> > +	struct mtk_pcs_lynxi *mpcs;
-> > +
-> > +	if (!np)
-> > +		return NULL;
-> > +
-> > +	if (!of_device_is_available(np))
-> > +		return ERR_PTR(-ENODEV);
-> > +
-> > +	if (!of_match_node(mtk_pcs_lynxi_of_match, np))
-> > +		return ERR_PTR(-EINVAL);
-> > +
-> > +	pdev = of_find_device_by_node(np);
-> > +	if (!pdev || !platform_get_drvdata(pdev)) {
-> 
-> This is racy - as I thought I described before, userspace can unbind
-> the device in one thread, while another thread is calling this
-> function. With just the right timing, this check succeeds, but...
-> 
-> > +		if (pdev)
-> > +			put_device(&pdev->dev);
-> > +		return ERR_PTR(-EPROBE_DEFER);
-> > +	}
-> > +
-> > +	mpcs = platform_get_drvdata(pdev);
-> 
-> mpcs ends up being read as NULL here. Even if you did manage to get a
-> valid pointer, "mpcs" being devm-alloced could be freed from under
-> you at this point...
-> 
-> > +	device_link_add(dev, mpcs->dev, DL_FLAG_AUTOREMOVE_CONSUMER);
-> 
-> resulting in this accessing memory which has been freed.
-> 
-> The solution would be either to suppress the bind/unbind attributes
-> (provided the underlying struct device can't go away, which probably
-> also means ensuring the same of the MDIO bus. Aternatively, adding
-> a lock around the remove path and around the checking of
-> platform_get_drvdata() down to adding the device link would probably
-> solve it.
-> 
-> However, I come back to my general point - this kind of stuff is
-> hairy. Do we want N different implementations of it in various drivers
-> with subtle bugs, or do we want _one_ implemenatation.
-> 
-> If we go with the one implemenation approach, then we need to think
-> about whether we should be using device links or not. The problem
-> could be for network interfaces where one struct device is
-> associated with multiple network interfaces. Using device links has
-> the unfortunate side effect that if the PCS for one of those network
-> interfaces is removed, _all_ network interfaces disappear.
+cheers,
+jamal
 
-I agree, esp. on this MT7988 removal of a PCS which may then not
-even be in use also impairs connectivity on the built-in gigE DSA
-switch. It would be nice to try to avoid this.
-
-> 
-> My original suggestion was to hook into phylink to cause that to
-> take the link down when an in-use PCS gets removed.
-
-I took a deep dive into how this could be done correctly and how
-similar things are done for other drivers. Apart from the PCS there
-often also is a muxing-PHY involved, eg. MediaTek's XFI T-PHY in this
-case (previously often called "pextp" for no apparent reason) or
-Marvell's comphy (mvebu-comphy).
-
-So let's try something simple on an already well-supported platform,
-I thought and grabbed Marvell Armada CN9131-DB running vanilla Linux,
-and it didn't even take some something racy, but plain:
-
-ip link set eth6 up
-cd /sys/bus/platform/drivers/mvebu-comphy
-echo f2120000.phy > unbind
-echo f4120000.phy > unbind
-echo f6120000.phy > unbind
-ip link set eth6 down
-
-
-That was enough. The result is a kernel crash, and the same should
-apply on popular platforms like the SolidRun MACCHIATOBin and other
-similar boards.
-
-So this gets me to think that there is a wider problem around
-non-phylink-managed resources which may disappear while in use by
-network drivers, and I guess that the same applies in many other
-places. I don't have a SATA drive connected to that Marvell board, but
-I can imagine what happens when suddenly removing the comphy instance
-in charge of the SATA link and then a subsequent SATA hotplug event
-happens or stuff like that...
-
-Anyway, back to network subsystem and phylink:
-
-Do you agree that we need a way to register (and unregister) PCS
-providers with phylink, so we don't need *_get_by_of_node implementations
-in each driver? If so, can you sketch out what the basic requirements
-for an acceptable solution would be?
-
-Also, do you agree that lack of handling of disappearing resources,
-such as PHYs (*not* network PHYs, but PHYs as in drivers/phy/*) or
-syscons, is already a problem right now which should be addressed?
-
-If you imagine phylink to take care of the life-cycle of all link-
-resources, what is vision about those things other than classic MDIO-
-connected PHYs?
-
-And well, of course, the easy fix for the example above would be:
-diff --git a/drivers/phy/marvell/phy-mvebu-cp110-comphy.c b/drivers/phy/marvell/phy-mvebu-cp110-comphy.c
-index b0dd133665986..9517c96319595 100644
---- a/drivers/phy/marvell/phy-mvebu-cp110-comphy.c
-+++ b/drivers/phy/marvell/phy-mvebu-cp110-comphy.c
-@@ -1099,6 +1099,7 @@ static const struct of_device_id mvebu_comphy_of_match_table[] = {
- MODULE_DEVICE_TABLE(of, mvebu_comphy_of_match_table);
- 
- static struct platform_driver mvebu_comphy_driver = {
-+	.suppress_bind_attrs = true,
- 	.probe	= mvebu_comphy_probe,
- 	.driver	= {
- 		.name = "mvebu-comphy",
-
-But that should then apply to every single driver in drivers/phy/...
-
-
-> 
-> > +
-> > +	return &mpcs->pcs;
-> > +}
-> > +EXPORT_SYMBOL(mtk_pcs_lynxi_get);
-> > +
-> > +void mtk_pcs_lynxi_put(struct phylink_pcs *pcs)
-> > +{
-> > +	struct mtk_pcs_lynxi *cur, *mpcs = NULL;
-> > +
-> > +	if (!pcs)
-> > +		return;
-> > +
-> > +	mutex_lock(&instance_mutex);
-> > +	list_for_each_entry(cur, &mtk_pcs_lynxi_instances, node)
-> > +		if (pcs == &cur->pcs) {
-> > +			mpcs = cur;
-> > +			break;
-> > +		}
-> > +	mutex_unlock(&instance_mutex);
-> 
-> I don't see what this loop gains us, other than checking that the "pcs"
-> is still on the list and hasn't already been removed. If that is all
-> that this is about, then I would suggest:
-> 
-> 	bool found = false;
-> 
-> 	if (!pcs)
-> 		return;
-> 
-> 	mpcs = pcs_to_mtk_pcs_lynxi(pcs);
-> 	mutex_lock(&instance_mutex);
-> 	list_for_each_entry(cur, &mtk_pcs_lynxi_instances, node)
-> 		if (cur == mpcs) {
-> 			found = true;
-> 			break;
-> 		}
-> 	mutex_unlock(&instance_mutex);
-> 
-> 	if (WARN_ON(!found))
-> 		return;
-> 
-> which makes it more obvious why this exists.
-
-The idea was not only to make sure it hasn't been removed, but also
-to be sure that what ever the private data pointer points to has
-actually been created by that very driver.
-
-But yes, doing it in the way you suggest will work in the same way,
-just when having my idea in mind it looks more fishy to use
-pcs_to_mtk_pcs_lynxi() before we are 100% sure that what we dealing
-with has previously been created by this driver.
-
-
-Cheers
-
-
-Daniel
+> ---
+> v2 - use NL_REQ_ATTR_CHECK()
+>
+>  net/sched/act_bpf.c      | 32 +++++++++++++++++++++++---------
+>  net/sched/act_connmark.c |  8 ++++++--
+>  net/sched/act_csum.c     |  9 +++++++--
+>  net/sched/act_ct.c       |  5 +++--
+>  net/sched/act_ctinfo.c   |  6 +++---
+>  net/sched/act_gact.c     | 14 +++++++++++---
+>  net/sched/act_gate.c     | 15 +++++++++++----
+>  net/sched/act_ife.c      |  8 ++++++--
+>  net/sched/act_mirred.c   |  6 ++++--
+>  net/sched/act_nat.c      |  9 +++++++--
+>  net/sched/act_police.c   | 13 ++++++++++---
+>  net/sched/act_sample.c   |  8 ++++++--
+>  net/sched/act_simple.c   | 11 ++++++++---
+>  net/sched/act_skbedit.c  | 17 ++++++++++++-----
+>  net/sched/act_skbmod.c   |  9 +++++++--
+>  net/sched/act_vlan.c     |  8 ++++++--
+>  16 files changed, 130 insertions(+), 48 deletions(-)
+>
+> diff --git a/net/sched/act_bpf.c b/net/sched/act_bpf.c
+> index 0e3cf11ae5fc..4dc6f27a4809 100644
+> --- a/net/sched/act_bpf.c
+> +++ b/net/sched/act_bpf.c
+> @@ -184,7 +184,8 @@ static const struct nla_policy act_bpf_policy[TCA_ACT=
+_BPF_MAX + 1] =3D {
+>                                     .len =3D sizeof(struct sock_filter) *=
+ BPF_MAXINSNS },
+>  };
+>
+> -static int tcf_bpf_init_from_ops(struct nlattr **tb, struct tcf_bpf_cfg =
+*cfg)
+> +static int tcf_bpf_init_from_ops(struct nlattr **tb, struct tcf_bpf_cfg =
+*cfg,
+> +                                struct netlink_ext_ack *extack)
+>  {
+>         struct sock_filter *bpf_ops;
+>         struct sock_fprog_kern fprog_tmp;
+> @@ -193,12 +194,17 @@ static int tcf_bpf_init_from_ops(struct nlattr **tb=
+, struct tcf_bpf_cfg *cfg)
+>         int ret;
+>
+>         bpf_num_ops =3D nla_get_u16(tb[TCA_ACT_BPF_OPS_LEN]);
+> -       if (bpf_num_ops > BPF_MAXINSNS || bpf_num_ops =3D=3D 0)
+> +       if (bpf_num_ops > BPF_MAXINSNS || bpf_num_ops =3D=3D 0) {
+> +               NL_SET_ERR_MSG_FMT_MOD(extack,
+> +                                      "Invalid number of BPF instruction=
+s %u", bpf_num_ops);
+>                 return -EINVAL;
+> +       }
+>
+>         bpf_size =3D bpf_num_ops * sizeof(*bpf_ops);
+> -       if (bpf_size !=3D nla_len(tb[TCA_ACT_BPF_OPS]))
+> +       if (bpf_size !=3D nla_len(tb[TCA_ACT_BPF_OPS])) {
+> +               NL_SET_ERR_MSG_FMT_MOD(extack, "BPF instruction size %u",=
+ bpf_size);
+>                 return -EINVAL;
+> +       }
+>
+>         bpf_ops =3D kmemdup(nla_data(tb[TCA_ACT_BPF_OPS]), bpf_size, GFP_=
+KERNEL);
+>         if (bpf_ops =3D=3D NULL)
+> @@ -221,7 +227,8 @@ static int tcf_bpf_init_from_ops(struct nlattr **tb, =
+struct tcf_bpf_cfg *cfg)
+>         return 0;
+>  }
+>
+> -static int tcf_bpf_init_from_efd(struct nlattr **tb, struct tcf_bpf_cfg =
+*cfg)
+> +static int tcf_bpf_init_from_efd(struct nlattr **tb, struct tcf_bpf_cfg =
+*cfg,
+> +                                struct netlink_ext_ack *extack)
+>  {
+>         struct bpf_prog *fp;
+>         char *name =3D NULL;
+> @@ -230,8 +237,10 @@ static int tcf_bpf_init_from_efd(struct nlattr **tb,=
+ struct tcf_bpf_cfg *cfg)
+>         bpf_fd =3D nla_get_u32(tb[TCA_ACT_BPF_FD]);
+>
+>         fp =3D bpf_prog_get_type(bpf_fd, BPF_PROG_TYPE_SCHED_ACT);
+> -       if (IS_ERR(fp))
+> +       if (IS_ERR(fp)) {
+> +               NL_SET_ERR_MSG_MOD(extack, "BPF program type mismatch");
+>                 return PTR_ERR(fp);
+> +       }
+>
+>         if (tb[TCA_ACT_BPF_NAME]) {
+>                 name =3D nla_memdup(tb[TCA_ACT_BPF_NAME], GFP_KERNEL);
+> @@ -292,16 +301,20 @@ static int tcf_bpf_init(struct net *net, struct nla=
+ttr *nla,
+>         int ret, res =3D 0;
+>         u32 index;
+>
+> -       if (!nla)
+> +       if (!nla) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Bpf requires attributes to be=
+ passed");
+>                 return -EINVAL;
+> +       }
+>
+>         ret =3D nla_parse_nested_deprecated(tb, TCA_ACT_BPF_MAX, nla,
+>                                           act_bpf_policy, NULL);
+>         if (ret < 0)
+>                 return ret;
+>
+> -       if (!tb[TCA_ACT_BPF_PARMS])
+> +       if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_ACT_BPF_PARMS)) {
+> +               NL_SET_ERR_MSG(extack, "Missing required attribute");
+>                 return -EINVAL;
+> +       }
+>
+>         parm =3D nla_data(tb[TCA_ACT_BPF_PARMS]);
+>         index =3D parm->index;
+> @@ -336,14 +349,15 @@ static int tcf_bpf_init(struct net *net, struct nla=
+ttr *nla,
+>         is_ebpf =3D tb[TCA_ACT_BPF_FD];
+>
+>         if (is_bpf =3D=3D is_ebpf) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Can not specify both BPF fd a=
+nd ops");
+>                 ret =3D -EINVAL;
+>                 goto put_chain;
+>         }
+>
+>         memset(&cfg, 0, sizeof(cfg));
+>
+> -       ret =3D is_bpf ? tcf_bpf_init_from_ops(tb, &cfg) :
+> -                      tcf_bpf_init_from_efd(tb, &cfg);
+> +       ret =3D is_bpf ? tcf_bpf_init_from_ops(tb, &cfg, extack) :
+> +                      tcf_bpf_init_from_efd(tb, &cfg, extack);
+>         if (ret < 0)
+>                 goto put_chain;
+>
+> diff --git a/net/sched/act_connmark.c b/net/sched/act_connmark.c
+> index 0fce631e7c91..00c7e52d91ca 100644
+> --- a/net/sched/act_connmark.c
+> +++ b/net/sched/act_connmark.c
+> @@ -110,16 +110,20 @@ static int tcf_connmark_init(struct net *net, struc=
+t nlattr *nla,
+>         int ret =3D 0, err;
+>         u32 index;
+>
+> -       if (!nla)
+> +       if (!nla) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Connmark requires attributes =
+to be passed");
+>                 return -EINVAL;
+> +       }
+>
+>         ret =3D nla_parse_nested_deprecated(tb, TCA_CONNMARK_MAX, nla,
+>                                           connmark_policy, NULL);
+>         if (ret < 0)
+>                 return ret;
+>
+> -       if (!tb[TCA_CONNMARK_PARMS])
+> +       if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_CONNMARK_PARMS)) {
+> +               NL_SET_ERR_MSG(extack, "Missing required attribute");
+>                 return -EINVAL;
+> +       }
+>
+>         nparms =3D kzalloc(sizeof(*nparms), GFP_KERNEL);
+>         if (!nparms)
+> diff --git a/net/sched/act_csum.c b/net/sched/act_csum.c
+> index 5cc8e407e791..b83e6d5f10ee 100644
+> --- a/net/sched/act_csum.c
+> +++ b/net/sched/act_csum.c
+> @@ -55,16 +55,21 @@ static int tcf_csum_init(struct net *net, struct nlat=
+tr *nla,
+>         int ret =3D 0, err;
+>         u32 index;
+>
+> -       if (nla =3D=3D NULL)
+> +       if (!nla) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Checksum requires attributes =
+to be passed");
+>                 return -EINVAL;
+> +       }
+>
+>         err =3D nla_parse_nested_deprecated(tb, TCA_CSUM_MAX, nla, csum_p=
+olicy,
+>                                           NULL);
+>         if (err < 0)
+>                 return err;
+>
+> -       if (tb[TCA_CSUM_PARMS] =3D=3D NULL)
+> +       if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_CSUM_PARMS)) {
+> +               NL_SET_ERR_MSG(extack, "Missing required attribute");
+>                 return -EINVAL;
+> +       }
+> +
+>         parm =3D nla_data(tb[TCA_CSUM_PARMS]);
+>         index =3D parm->index;
+>         err =3D tcf_idr_check_alloc(tn, &index, a, bind);
+> diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
+> index baac083fd8f1..7984f9f6ea2c 100644
+> --- a/net/sched/act_ct.c
+> +++ b/net/sched/act_ct.c
+> @@ -1329,10 +1329,11 @@ static int tcf_ct_init(struct net *net, struct nl=
+attr *nla,
+>         if (err < 0)
+>                 return err;
+>
+> -       if (!tb[TCA_CT_PARMS]) {
+> -               NL_SET_ERR_MSG_MOD(extack, "Missing required ct parameter=
+s");
+> +       if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_CT_PARMS)) {
+> +               NL_SET_ERR_MSG(extack, "Missing required attribute");
+>                 return -EINVAL;
+>         }
+> +
+>         parm =3D nla_data(tb[TCA_CT_PARMS]);
+>         index =3D parm->index;
+>         err =3D tcf_idr_check_alloc(tn, &index, a, bind);
+> diff --git a/net/sched/act_ctinfo.c b/net/sched/act_ctinfo.c
+> index 5dd41a012110..dde047b6b839 100644
+> --- a/net/sched/act_ctinfo.c
+> +++ b/net/sched/act_ctinfo.c
+> @@ -178,11 +178,11 @@ static int tcf_ctinfo_init(struct net *net, struct =
+nlattr *nla,
+>         if (err < 0)
+>                 return err;
+>
+> -       if (!tb[TCA_CTINFO_ACT]) {
+> -               NL_SET_ERR_MSG_MOD(extack,
+> -                                  "Missing required TCA_CTINFO_ACT attri=
+bute");
+> +       if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_CTINFO_ACT)) {
+> +               NL_SET_ERR_MSG(extack, "Missing required attribute");
+>                 return -EINVAL;
+>         }
+> +
+>         actparm =3D nla_data(tb[TCA_CTINFO_ACT]);
+>
+>         /* do some basic validation here before dynamically allocating th=
+ings */
+> diff --git a/net/sched/act_gact.c b/net/sched/act_gact.c
+> index e949280eb800..42c6b8d9002d 100644
+> --- a/net/sched/act_gact.c
+> +++ b/net/sched/act_gact.c
+> @@ -68,16 +68,21 @@ static int tcf_gact_init(struct net *net, struct nlat=
+tr *nla,
+>         struct tc_gact_p *p_parm =3D NULL;
+>  #endif
+>
+> -       if (nla =3D=3D NULL)
+> +       if (!nla) {
+> +               NL_SET_ERR_MSG(extack, "Gact requires attributes to be pa=
+ssed");
+>                 return -EINVAL;
+> +       }
+>
+>         err =3D nla_parse_nested_deprecated(tb, TCA_GACT_MAX, nla, gact_p=
+olicy,
+>                                           NULL);
+>         if (err < 0)
+>                 return err;
+>
+> -       if (tb[TCA_GACT_PARMS] =3D=3D NULL)
+> +       if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_GACT_PARMS)) {
+> +               NL_SET_ERR_MSG(extack, "Missing required attribute");
+>                 return -EINVAL;
+> +       }
+> +
+>         parm =3D nla_data(tb[TCA_GACT_PARMS]);
+>         index =3D parm->index;
+>
+> @@ -87,8 +92,11 @@ static int tcf_gact_init(struct net *net, struct nlatt=
+r *nla,
+>  #else
+>         if (tb[TCA_GACT_PROB]) {
+>                 p_parm =3D nla_data(tb[TCA_GACT_PROB]);
+> -               if (p_parm->ptype >=3D MAX_RAND)
+> +               if (p_parm->ptype >=3D MAX_RAND) {
+> +                       NL_SET_ERR_MSG(extack, "Invalid ptype in gact pro=
+b");
+>                         return -EINVAL;
+> +               }
+> +
+>                 if (TC_ACT_EXT_CMP(p_parm->paction, TC_ACT_GOTO_CHAIN)) {
+>                         NL_SET_ERR_MSG(extack,
+>                                        "goto chain not allowed on fallbac=
+k");
+> diff --git a/net/sched/act_gate.c b/net/sched/act_gate.c
+> index 1dd74125398a..3e8056a2c304 100644
+> --- a/net/sched/act_gate.c
+> +++ b/net/sched/act_gate.c
+> @@ -239,8 +239,10 @@ static int parse_gate_list(struct nlattr *list_attr,
+>         int err, rem;
+>         int i =3D 0;
+>
+> -       if (!list_attr)
+> +       if (!list_attr) {
+> +               NL_SET_ERR_MSG(extack, "Gate missing attributes");
+>                 return -EINVAL;
+> +       }
+>
+>         nla_for_each_nested(n, list_attr, rem) {
+>                 if (nla_type(n) !=3D TCA_GATE_ONE_ENTRY) {
+> @@ -317,15 +319,19 @@ static int tcf_gate_init(struct net *net, struct nl=
+attr *nla,
+>         ktime_t start;
+>         u32 index;
+>
+> -       if (!nla)
+> +       if (!nla) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Gate requires attributes to b=
+e passed");
+>                 return -EINVAL;
+> +       }
+>
+>         err =3D nla_parse_nested(tb, TCA_GATE_MAX, nla, gate_policy, exta=
+ck);
+>         if (err < 0)
+>                 return err;
+>
+> -       if (!tb[TCA_GATE_PARMS])
+> +       if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_GATE_PARMS)) {
+> +               NL_SET_ERR_MSG(extack, "Missing required attribute");
+>                 return -EINVAL;
+> +       }
+>
+>         if (tb[TCA_GATE_CLOCKID]) {
+>                 clockid =3D nla_get_s32(tb[TCA_GATE_CLOCKID]);
+> @@ -343,7 +349,7 @@ static int tcf_gate_init(struct net *net, struct nlat=
+tr *nla,
+>                         tk_offset =3D TK_OFFS_TAI;
+>                         break;
+>                 default:
+> -                       NL_SET_ERR_MSG(extack, "Invalid 'clockid'");
+> +                       NL_SET_ERR_MSG_MOD(extack, "Invalid 'clockid'");
+>                         return -EINVAL;
+>                 }
+>         }
+> @@ -409,6 +415,7 @@ static int tcf_gate_init(struct net *net, struct nlat=
+tr *nla,
+>                         cycle =3D ktime_add_ns(cycle, entry->interval);
+>                 cycletime =3D cycle;
+>                 if (!cycletime) {
+> +                       NL_SET_ERR_MSG_MOD(extack, "cycle time is zero");
+>                         err =3D -EINVAL;
+>                         goto chain_put;
+>                 }
+> diff --git a/net/sched/act_ife.c b/net/sched/act_ife.c
+> index 107c6d83dc5c..b22881363029 100644
+> --- a/net/sched/act_ife.c
+> +++ b/net/sched/act_ife.c
+> @@ -508,8 +508,10 @@ static int tcf_ife_init(struct net *net, struct nlat=
+tr *nla,
+>         if (err < 0)
+>                 return err;
+>
+> -       if (!tb[TCA_IFE_PARMS])
+> +       if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_IFE_PARMS)) {
+> +               NL_SET_ERR_MSG(extack, "Missing required attribute");
+>                 return -EINVAL;
+> +       }
+>
+>         parm =3D nla_data(tb[TCA_IFE_PARMS]);
+>
+> @@ -517,8 +519,10 @@ static int tcf_ife_init(struct net *net, struct nlat=
+tr *nla,
+>          * they cannot run as the same time. Check on all other values wh=
+ich
+>          * are not supported right now.
+>          */
+> -       if (parm->flags & ~IFE_ENCODE)
+> +       if (parm->flags & ~IFE_ENCODE) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Invalid ife flag parameter");
+>                 return -EINVAL;
+> +       }
+>
+>         p =3D kzalloc(sizeof(*p), GFP_KERNEL);
+>         if (!p)
+> diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+> index 93a96e9d8d90..f1bdd19e0bbb 100644
+> --- a/net/sched/act_mirred.c
+> +++ b/net/sched/act_mirred.c
+> @@ -124,10 +124,12 @@ static int tcf_mirred_init(struct net *net, struct =
+nlattr *nla,
+>                                           mirred_policy, extack);
+>         if (ret < 0)
+>                 return ret;
+> -       if (!tb[TCA_MIRRED_PARMS]) {
+> -               NL_SET_ERR_MSG_MOD(extack, "Missing required mirred param=
+eters");
+> +
+> +       if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_MIRRED_PARMS)) {
+> +               NL_SET_ERR_MSG(extack, "Missing required attribute");
+>                 return -EINVAL;
+>         }
+> +
+>         parm =3D nla_data(tb[TCA_MIRRED_PARMS]);
+>         index =3D parm->index;
+>         err =3D tcf_idr_check_alloc(tn, &index, a, bind);
+> diff --git a/net/sched/act_nat.c b/net/sched/act_nat.c
+> index d541f553805f..42019977514e 100644
+> --- a/net/sched/act_nat.c
+> +++ b/net/sched/act_nat.c
+> @@ -46,16 +46,21 @@ static int tcf_nat_init(struct net *net, struct nlatt=
+r *nla, struct nlattr *est,
+>         struct tcf_nat *p;
+>         u32 index;
+>
+> -       if (nla =3D=3D NULL)
+> +       if (!nla) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Nat action requires attribute=
+s");
+>                 return -EINVAL;
+> +       }
+>
+>         err =3D nla_parse_nested_deprecated(tb, TCA_NAT_MAX, nla, nat_pol=
+icy,
+>                                           NULL);
+>         if (err < 0)
+>                 return err;
+>
+> -       if (tb[TCA_NAT_PARMS] =3D=3D NULL)
+> +       if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_NAT_PARMS)) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Missing required NAT paramete=
+rs");
+>                 return -EINVAL;
+> +       }
+> +
+>         parm =3D nla_data(tb[TCA_NAT_PARMS]);
+>         index =3D parm->index;
+>         err =3D tcf_idr_check_alloc(tn, &index, a, bind);
+> diff --git a/net/sched/act_police.c b/net/sched/act_police.c
+> index 8555125ed34d..17708fe32ad1 100644
+> --- a/net/sched/act_police.c
+> +++ b/net/sched/act_police.c
+> @@ -56,19 +56,26 @@ static int tcf_police_init(struct net *net, struct nl=
+attr *nla,
+>         u64 rate64, prate64;
+>         u64 pps, ppsburst;
+>
+> -       if (nla =3D=3D NULL)
+> +       if (!nla) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Police requires attributes");
+>                 return -EINVAL;
+> +       }
+>
+>         err =3D nla_parse_nested_deprecated(tb, TCA_POLICE_MAX, nla,
+>                                           police_policy, NULL);
+>         if (err < 0)
+>                 return err;
+>
+> -       if (tb[TCA_POLICE_TBF] =3D=3D NULL)
+> +       if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_POLICE_TBF)) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Missing required police actio=
+n parameters");
+>                 return -EINVAL;
+> +       }
+> +
+>         size =3D nla_len(tb[TCA_POLICE_TBF]);
+> -       if (size !=3D sizeof(*parm) && size !=3D sizeof(struct tc_police_=
+compat))
+> +       if (size !=3D sizeof(*parm) && size !=3D sizeof(struct tc_police_=
+compat)) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Invalid size for police actio=
+n parameters");
+>                 return -EINVAL;
+> +       }
+>
+>         parm =3D nla_data(tb[TCA_POLICE_TBF]);
+>         index =3D parm->index;
+> diff --git a/net/sched/act_sample.c b/net/sched/act_sample.c
+> index a69b53d54039..0492df144b39 100644
+> --- a/net/sched/act_sample.c
+> +++ b/net/sched/act_sample.c
+> @@ -49,15 +49,19 @@ static int tcf_sample_init(struct net *net, struct nl=
+attr *nla,
+>         bool exists =3D false;
+>         int ret, err;
+>
+> -       if (!nla)
+> +       if (!nla) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Sample requires attributes to=
+ be passed");
+>                 return -EINVAL;
+> +       }
+>         ret =3D nla_parse_nested_deprecated(tb, TCA_SAMPLE_MAX, nla,
+>                                           sample_policy, NULL);
+>         if (ret < 0)
+>                 return ret;
+>
+> -       if (!tb[TCA_SAMPLE_PARMS])
+> +       if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_SAMPLE_PARMS)) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Missing required sample actio=
+n parameters");
+>                 return -EINVAL;
+> +       }
+>
+>         parm =3D nla_data(tb[TCA_SAMPLE_PARMS]);
+>         index =3D parm->index;
+> diff --git a/net/sched/act_simple.c b/net/sched/act_simple.c
+> index f3abe0545989..0c56c8c9ef44 100644
+> --- a/net/sched/act_simple.c
+> +++ b/net/sched/act_simple.c
+> @@ -100,16 +100,20 @@ static int tcf_simp_init(struct net *net, struct nl=
+attr *nla,
+>         int ret =3D 0, err;
+>         u32 index;
+>
+> -       if (nla =3D=3D NULL)
+> +       if (!nla) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Sample requires attributes to=
+ be passed");
+>                 return -EINVAL;
+> +       }
+>
+>         err =3D nla_parse_nested_deprecated(tb, TCA_DEF_MAX, nla, simple_=
+policy,
+>                                           NULL);
+>         if (err < 0)
+>                 return err;
+>
+> -       if (tb[TCA_DEF_PARMS] =3D=3D NULL)
+> +       if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_DEF_PARMS)) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Missing required sample actio=
+n parameters");
+>                 return -EINVAL;
+> +       }
+>
+>         parm =3D nla_data(tb[TCA_DEF_PARMS]);
+>         index =3D parm->index;
+> @@ -120,7 +124,8 @@ static int tcf_simp_init(struct net *net, struct nlat=
+tr *nla,
+>         if (exists && bind)
+>                 return ACT_P_BOUND;
+>
+> -       if (tb[TCA_DEF_DATA] =3D=3D NULL) {
+> +       if (NL_REQ_ATTR_CHECK(extack, NULL, tb, TCA_DEF_DATA)) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Missing simple action default=
+ data");
+>                 if (exists)
+>                         tcf_idr_release(*a, bind);
+>                 else
+> diff --git a/net/sched/act_skbedit.c b/net/sched/act_skbedit.c
+> index 1f1d9ce3e968..e9c4f2befb8b 100644
+> --- a/net/sched/act_skbedit.c
+> +++ b/net/sched/act_skbedit.c
+> @@ -133,16 +133,20 @@ static int tcf_skbedit_init(struct net *net, struct=
+ nlattr *nla,
+>         int ret =3D 0, err;
+>         u32 index;
+>
+> -       if (nla =3D=3D NULL)
+> +       if (!nla) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Skbedit requires attributes t=
+o be passed");
+>                 return -EINVAL;
+> +       }
+>
+>         err =3D nla_parse_nested_deprecated(tb, TCA_SKBEDIT_MAX, nla,
+>                                           skbedit_policy, NULL);
+>         if (err < 0)
+>                 return err;
+>
+> -       if (tb[TCA_SKBEDIT_PARMS] =3D=3D NULL)
+> +       if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_SKBEDIT_PARMS)) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Missing required skbedit para=
+meters");
+>                 return -EINVAL;
+> +       }
+>
+>         if (tb[TCA_SKBEDIT_PRIORITY] !=3D NULL) {
+>                 flags |=3D SKBEDIT_F_PRIORITY;
+> @@ -161,8 +165,10 @@ static int tcf_skbedit_init(struct net *net, struct =
+nlattr *nla,
+>
+>         if (tb[TCA_SKBEDIT_PTYPE] !=3D NULL) {
+>                 ptype =3D nla_data(tb[TCA_SKBEDIT_PTYPE]);
+> -               if (!skb_pkt_type_ok(*ptype))
+> +               if (!skb_pkt_type_ok(*ptype)) {
+> +                       NL_SET_ERR_MSG_MOD(extack, "ptype is not a valid"=
+);
+>                         return -EINVAL;
+> +               }
+>                 flags |=3D SKBEDIT_F_PTYPE;
+>         }
+>
+> @@ -182,8 +188,8 @@ static int tcf_skbedit_init(struct net *net, struct n=
+lattr *nla,
+>                 if (*pure_flags & SKBEDIT_F_TXQ_SKBHASH) {
+>                         u16 *queue_mapping_max;
+>
+> -                       if (!tb[TCA_SKBEDIT_QUEUE_MAPPING] ||
+> -                           !tb[TCA_SKBEDIT_QUEUE_MAPPING_MAX]) {
+> +                       if (NL_REQ_ATTR_CHECK(extack, NULL, tb, TCA_SKBED=
+IT_QUEUE_MAPPING) ||
+> +                           NL_REQ_ATTR_CHECK(extack, NULL, tb, TCA_SKBED=
+IT_QUEUE_MAPPING_MAX)) {
+>                                 NL_SET_ERR_MSG_MOD(extack, "Missing requi=
+red range of queue_mapping.");
+>                                 return -EINVAL;
+>                         }
+> @@ -212,6 +218,7 @@ static int tcf_skbedit_init(struct net *net, struct n=
+lattr *nla,
+>                 return ACT_P_BOUND;
+>
+>         if (!flags) {
+> +               NL_SET_ERR_MSG_MOD(extack, "No skbedit action flag");
+>                 if (exists)
+>                         tcf_idr_release(*a, bind);
+>                 else
+> diff --git a/net/sched/act_skbmod.c b/net/sched/act_skbmod.c
+> index 39945b139c48..19b35666f357 100644
+> --- a/net/sched/act_skbmod.c
+> +++ b/net/sched/act_skbmod.c
+> @@ -119,16 +119,20 @@ static int tcf_skbmod_init(struct net *net, struct =
+nlattr *nla,
+>         u16 eth_type =3D 0;
+>         int ret =3D 0, err;
+>
+> -       if (!nla)
+> +       if (!nla) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Skbmod requires attributes to=
+ be passed");
+>                 return -EINVAL;
+> +       }
+>
+>         err =3D nla_parse_nested_deprecated(tb, TCA_SKBMOD_MAX, nla,
+>                                           skbmod_policy, NULL);
+>         if (err < 0)
+>                 return err;
+>
+> -       if (!tb[TCA_SKBMOD_PARMS])
+> +       if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_SKBMOD_PARMS)) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Missing required skbmod param=
+eters");
+>                 return -EINVAL;
+> +       }
+>
+>         if (tb[TCA_SKBMOD_DMAC]) {
+>                 daddr =3D nla_data(tb[TCA_SKBMOD_DMAC]);
+> @@ -160,6 +164,7 @@ static int tcf_skbmod_init(struct net *net, struct nl=
+attr *nla,
+>                 return ACT_P_BOUND;
+>
+>         if (!lflags) {
+> +               NL_SET_ERR_MSG_MOD(extack, "No skbmod action flag");
+>                 if (exists)
+>                         tcf_idr_release(*a, bind);
+>                 else
+> diff --git a/net/sched/act_vlan.c b/net/sched/act_vlan.c
+> index 22f4b1e8ade9..414129539c4a 100644
+> --- a/net/sched/act_vlan.c
+> +++ b/net/sched/act_vlan.c
+> @@ -134,16 +134,20 @@ static int tcf_vlan_init(struct net *net, struct nl=
+attr *nla,
+>         int ret =3D 0, err;
+>         u32 index;
+>
+> -       if (!nla)
+> +       if (!nla) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Vlan requires attributes to b=
+e passed");
+>                 return -EINVAL;
+> +       }
+>
+>         err =3D nla_parse_nested_deprecated(tb, TCA_VLAN_MAX, nla, vlan_p=
+olicy,
+>                                           NULL);
+>         if (err < 0)
+>                 return err;
+>
+> -       if (!tb[TCA_VLAN_PARMS])
+> +       if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_VLAN_PARMS)) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Missing required vlan action =
+parameters");
+>                 return -EINVAL;
+> +       }
+>         parm =3D nla_data(tb[TCA_VLAN_PARMS]);
+>         index =3D parm->index;
+>         err =3D tcf_idr_check_alloc(tn, &index, a, bind);
+> --
+> 2.43.0
+>
 
