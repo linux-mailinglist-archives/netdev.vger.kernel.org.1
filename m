@@ -1,255 +1,131 @@
-Return-Path: <netdev+bounces-69975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E55DF84D267
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 20:51:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9155484D285
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 21:01:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A56F9284731
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 19:51:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0D5128AFC9
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 20:01:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 778B985943;
-	Wed,  7 Feb 2024 19:51:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FyFq+ysR"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9A9086ADD;
+	Wed,  7 Feb 2024 20:01:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903EB84FC7
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 19:51:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6772185C7A;
+	Wed,  7 Feb 2024 20:01:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707335494; cv=none; b=X1EN/zF1yP227aKkoEo7LHWSR4bCfTP6scPDJpvtZ6OKDgtUP97O2HORYRygp6+rG/fVSxM1gdLU3S2QJAnPuLgOxlWvmTvZfY19gKECiwIDREqZikVhMIv+R805+b9ky8tiJiJHk8pO5fIRe828WP3xGg1+nYJhB0RHRFzh27I=
+	t=1707336087; cv=none; b=b8Mqb5/NI+UbUGSkdAaIKPUmfyKStnRO3hU9oqbkWRm2zr8kHOjD3oApyrFdrlt/Pb5oAnONBQioTsGeh2RRXtkiz1yS24whVz2hs8L4LwXptM4CXAEYtVoDxCv6cQVXW+aX/5oIAxAzeYY3IJ1MU7PFU26PLhyzu+U5U3YPsk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707335494; c=relaxed/simple;
-	bh=Yg331hnS17VJNVuT89MJvMnjnqRrzEiw489h4pJz8Ts=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=BhNmf++Gp/l4tdqupAVGTxMNxUs/h4n8Yi34k+APGmTJ0p/lYRkjIVXF4byJC/UXQY38d1CAQ4n+iiTzSQ1t36nDw/7Q8MGGN7AYemnYAif2wn4V6ePvrUan+Sni3CNRLWfsQYTqmmilTVWr9AjViK194NIpWXjk+m5yabYc0Nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FyFq+ysR; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-56001d49cc5so1192464a12.2
-        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 11:51:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707335490; x=1707940290; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=SBO7uaDKTeww2gIP0KS+tgCRhVGb/60QDv2/P5QAZHk=;
-        b=FyFq+ysRo9dEBIOb5vzaM7JbopFnKotdNupT59n1rYNNFu6CwUzrx+c5JD9h26ddm2
-         gCzLYFWg06Or+DHlV4Aw9Ld43psUldAdM1/CKsoHrdupvJzLbOIjUSKgKE5fUfkt0nhv
-         /9xhYoNeADqeVo3YxtBFzT9z5pz3uu/El91JA5AKnqr3Ng50/1ixvJ/nRb3yOBtulSxe
-         Nd61wci2KgeRFy1SXu0VIVZsjx+Yn9K8X1QW8W/jnKNep6qzOLZRv1jRU2ZJ+YuQ30Up
-         3I6Vn7hqXv68vRA35PKqYxs1eSp7zpiXjGTAglCVafs23ICkUNn1sIRAWfDm2zGCHdTf
-         yUng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707335490; x=1707940290;
-        h=content-transfer-encoding:in-reply-to:autocrypt:references:cc:to
-         :from:content-language:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SBO7uaDKTeww2gIP0KS+tgCRhVGb/60QDv2/P5QAZHk=;
-        b=qfc42qIhX9C+v/5N6Puldue+vcNzOpH9eMZE0X99YSDRb3Y/euoXSWDZTUm0eqzTdo
-         y8HMAqcGsGIDEiptU0y2uhN6FGr9AuI4DCWUOuAfKlJYqg12XZ4WrDfMqFMam8cP2BDA
-         yBZfDiYfLscchBf0IqXiFE5TueJ9HY0jN8PYRAbxsN7W+udr0A14mdI4cyUT3s8iuzSx
-         M99yJ0FgPy8q4D4ibosi3LsgkDgpZPJ/BdUBRFJQcIkdk8lTGwP2X2007PpfaAqtRhqI
-         IrnVTyW8j+4ZVyaLByx4bikyuPegymjh0p3EmpLyEv5aFY1f9EWXNsBoFs7mv7KLJMIO
-         yB6g==
-X-Forwarded-Encrypted: i=1; AJvYcCXC10L1Pu2zdOFTygLmGH1nigpcOr5L+GqgXGDSITISGFoU1bYeELajHdQSYqJaC9YYicQ2b8qYsumR6BV+0MLDWEgZ1q26
-X-Gm-Message-State: AOJu0YyK15BTQJ5sxJ2/iJLUO4v0WBOnxR5e3HcTJIQD+bXb4YPlDJWm
-	drS1r5yEO57fM+zITdIhrGXy4W4Z+fANfX6OTY1nxJ4yZGw7n60t
-X-Google-Smtp-Source: AGHT+IFbbA/pwpuUbZsbKika/oiYQCdr+EbqvM/YNUHHd6eZ6SBRbVxEog8r0p3/5bNkt/MCF1JpmA==
-X-Received: by 2002:aa7:da98:0:b0:55f:4ce3:597a with SMTP id q24-20020aa7da98000000b0055f4ce3597amr5003254eds.2.1707335489870;
-        Wed, 07 Feb 2024 11:51:29 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUnrP9V8L9woUKIu+qZjEvooaQyrVbbwnjeByL+pTWwQz91xHH4hO+6KRwkJIMamb0zLblOFBywiXm2Hoqm57EMPRHkEgtMk40yv1Ms3RJ68i2+k4kQ7XUnXgZjBBr6OUdKw0L6EUc/xxGlvGuTS9rN/VIB1DmLV475wiWzcEiimcpGx+JWp2serl63ixBCUnqEIWrb2poL5wD50LU/dl38lOCTMngt6cPjDFk=
-Received: from ?IPV6:2a01:c22:76b1:9500:5d1b:fc9d:6dc2:24a? (dynamic-2a01-0c22-76b1-9500-5d1b-fc9d-6dc2-024a.c22.pool.telefonica.de. [2a01:c22:76b1:9500:5d1b:fc9d:6dc2:24a])
-        by smtp.googlemail.com with ESMTPSA id fe6-20020a056402390600b005608ebc2be1sm38512edb.18.2024.02.07.11.51.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Feb 2024 11:51:29 -0800 (PST)
-Message-ID: <6c5d7946-0776-4129-89db-2602e1874615@gmail.com>
-Date: Wed, 7 Feb 2024 20:51:29 +0100
+	s=arc-20240116; t=1707336087; c=relaxed/simple;
+	bh=K6mT9xLk3i9LmTbezxfIfkBb+hNOV9DN/be3jW+el30=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=f7R+QwJDrlQI6zpiT+oxY13ajsp7YQR3xqpSCDhdDarhjvtyRl18i8urLbbPCdk5Yn2FvV2AALSHHfuyNIOlZKbEbqg8/7+vVJmDrceDtOhQC4WaYnxoGIQV5dcLzK5V3POARRz5x51eOXLTSYu8Uu1RfdohqAraUxa40qkdCdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (178.176.76.58) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 7 Feb
+ 2024 23:01:15 +0300
+Subject: Re: [PATCH v5 net-next 2/2] ravb: Add Tx checksum offload support for
+ GbEth
+To: Biju Das <biju.das.jz@bp.renesas.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
+	<yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
+	<wsa+renesas@sang-engineering.com>, Nikita Yushchenko
+	<nikita.yoush@cogentembedded.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, Geert Uytterhoeven
+	<geert+renesas@glider.be>, Prabhakar Mahadev Lad
+	<prabhakar.mahadev-lad.rj@bp.renesas.com>, Biju Das <biju.das.au@gmail.com>
+References: <20240207092838.160627-1-biju.das.jz@bp.renesas.com>
+ <20240207092838.160627-3-biju.das.jz@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <98cfdb06-9c1d-2368-bef1-38a9bfe2d13f@omp.ru>
+Date: Wed, 7 Feb 2024 22:59:02 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/3] net: phy: realtek: use generic MDIO
- constants
+In-Reply-To: <20240207092838.160627-3-biju.das.jz@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: =?UTF-8?Q?Marek_Beh=C3=BAn?= <kabel@kernel.org>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <31a83fd9-90ce-402a-84c7-d5c20540b730@gmail.com>
- <732a70d6-4191-4aae-8862-3716b062aa9e@gmail.com>
- <81779222-dab6-4e11-9fd2-6e447257c0d5@lunn.ch>
- <a4bea8c5-b7d7-41ed-9c10-47d087e7dff8@gmail.com>
- <de75885e-d996-4e23-9ef8-3917fe1160c4@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <de75885e-d996-4e23-9ef8-3917fe1160c4@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/07/2024 19:47:58
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 183286 [Feb 07 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.76.58 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.76.58 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.76.58
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 02/07/2024 19:53:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 2/7/2024 5:40:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-Hi Andrew,
+On 2/7/24 12:28 PM, Biju Das wrote:
 
-On 04.02.2024 17:35, Heiner Kallweit wrote:
-> On 04.02.2024 17:26, Heiner Kallweit wrote:
->> On 04.02.2024 17:00, Andrew Lunn wrote:
->>> On Sun, Feb 04, 2024 at 03:17:53PM +0100, Heiner Kallweit wrote:
->>>> From: Marek Behún <kabel@kernel.org>
->>>>
->>>> Drop the ad-hoc MDIO constants used in the driver and use generic
->>>> constants instead.
->>>>
->>>> Signed-off-by: Marek Behún <kabel@kernel.org>
->>>> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
->>>> ---
->>>>  drivers/net/phy/realtek.c | 30 +++++++++++++-----------------
->>>>  1 file changed, 13 insertions(+), 17 deletions(-)
->>>>
->>>> diff --git a/drivers/net/phy/realtek.c b/drivers/net/phy/realtek.c
->>>> index 894172a3e..ffc13c495 100644
->>>> --- a/drivers/net/phy/realtek.c
->>>> +++ b/drivers/net/phy/realtek.c
->>>> @@ -57,14 +57,6 @@
->>>>  #define RTL8366RB_POWER_SAVE			0x15
->>>>  #define RTL8366RB_POWER_SAVE_ON			BIT(12)
->>>>  
->>>> -#define RTL_SUPPORTS_5000FULL			BIT(14)
->>>> -#define RTL_SUPPORTS_2500FULL			BIT(13)
->>>> -#define RTL_SUPPORTS_10000FULL			BIT(0)
->>>> -#define RTL_ADV_2500FULL			BIT(7)
->>>> -#define RTL_LPADV_10000FULL			BIT(11)
->>>> -#define RTL_LPADV_5000FULL			BIT(6)
->>>> -#define RTL_LPADV_2500FULL			BIT(5)
->>>> -
->>>>  #define RTL9000A_GINMR				0x14
->>>>  #define RTL9000A_GINMR_LINK_STATUS		BIT(4)
->>>>  
->>>> @@ -674,11 +666,11 @@ static int rtl822x_get_features(struct phy_device *phydev)
->>>>  		return val;
->>>>  
->>>>  	linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
->>>> -			 phydev->supported, val & RTL_SUPPORTS_2500FULL);
->>>> +			 phydev->supported, val & MDIO_PMA_SPEED_2_5G);
->>>>  	linkmode_mod_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
->>>> -			 phydev->supported, val & RTL_SUPPORTS_5000FULL);
->>>> +			 phydev->supported, val & MDIO_PMA_SPEED_5G);
->>>>  	linkmode_mod_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
->>>> -			 phydev->supported, val & RTL_SUPPORTS_10000FULL);
->>>> +			 phydev->supported, val & MDIO_SPEED_10G);
->>>
->>> Now that this only using generic constants, should it move into mdio.h
->>> as a shared helper? Is this a standard register defined in 802.3, just
->>> at a different address?
->>>
->> This is register 1.4 (PMA/PMD speed ability), mapped to a vendor-specific
->> register. There's very few users of this register, and nothing where such
->> a helper could be reused.
->>
->>>>  
->>>>  	return genphy_read_abilities(phydev);
->>>>  }
->>>> @@ -692,10 +684,11 @@ static int rtl822x_config_aneg(struct phy_device *phydev)
->>>>  
->>>>  		if (linkmode_test_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
->>>>  				      phydev->advertising))
->>>> -			adv2500 = RTL_ADV_2500FULL;
->>>> +			adv2500 = MDIO_AN_10GBT_CTRL_ADV2_5G;
->>>>  
+> TOE has hardware support for calculating IP header and TCP/UDP/ICMP
+> checksum for both IPv4 and IPv6.
 > 
-> Similarly linkmode_adv_to_mii_10gbt_adv_t() can be used here.
+> Add Tx checksum offload supported by TOE for IPv4 and TCP/UDP.
 > 
->>>>  		ret = phy_modify_paged_changed(phydev, 0xa5d, 0x12,
->>>> -					       RTL_ADV_2500FULL, adv2500);
->>>> +					       MDIO_AN_10GBT_CTRL_ADV2_5G,
->>>> +					       adv2500);
->>>>  		if (ret < 0)
->>>>  			return ret;
->>>>  	}
->>>> @@ -714,11 +707,14 @@ static int rtl822x_read_status(struct phy_device *phydev)
->>>>  			return lpadv;
->>>>  
->>>>  		linkmode_mod_bit(ETHTOOL_LINK_MODE_10000baseT_Full_BIT,
->>>> -			phydev->lp_advertising, lpadv & RTL_LPADV_10000FULL);
->>>> +				 phydev->lp_advertising,
->>>> +				 lpadv & MDIO_AN_10GBT_STAT_LP10G);
->>>>  		linkmode_mod_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
->>>> -			phydev->lp_advertising, lpadv & RTL_LPADV_5000FULL);
->>>> +				 phydev->lp_advertising,
->>>> +				 lpadv & MDIO_AN_10GBT_STAT_LP5G);
->>>>  		linkmode_mod_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
->>>> -			phydev->lp_advertising, lpadv & RTL_LPADV_2500FULL);
->>>> +				 phydev->lp_advertising,
->>>> +				 lpadv & MDIO_AN_10GBT_STAT_LP2_5G);
->>>
->>> Is this mii_10gbt_stat_mod_linkmode_lpa_t() ?
->>>
->> Indeed, it is. Thanks for the hint. I'd prefer to submit the patch making use
->> of this helper as a follow-up patch. Then it's obvious that the helper is
->> the same as the replaced code.
->>
-Is it fine with you to do this in a follow-up patch?
-The series is marked "under review", so Jakub seems to wait for an outcome
-of our discussion.
+> For Tx, the result of checksum calculation is set to the checksum field of
+> each IPv4 Header/TCP/UDP/ICMP of ethernet frames. For the unsupported
+> frames, those fields are not changed. If a transmission frame is an UDPv4
+> frame and its checksum value in the UDP header field is 0x0000, TOE does
+> not calculate checksum for UDP part of this frame as it is optional
+> function as per standards.
+> 
+> We can test this functionality by the below commands
+> 
+> ethtool -K eth0 tx on --> to turn on Tx checksum offload
+> ethtool -K eth0 tx off --> to turn off Tx checksum offload
+> 
+> Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
 
->>> Something i've done in the past is to do this sort of conversion to
->>> standard macros, and the followed up with a patch which says that
->>> function X is now clearly the same as helper Y, so delete the function
->>> and use the helper...
->>>
->>>     Andrew
->> Heiner
-> 
-Heiner
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+
+[...]
+
+MBR, Sergey
 
