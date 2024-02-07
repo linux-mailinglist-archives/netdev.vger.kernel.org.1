@@ -1,136 +1,106 @@
-Return-Path: <netdev+bounces-69871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A43984CE0A
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 16:29:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5660D84CE14
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 16:31:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15E9328AFBC
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:29:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 896E31C22CF5
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:31:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15F517F7DF;
-	Wed,  7 Feb 2024 15:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E2067FBC3;
+	Wed,  7 Feb 2024 15:31:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ahmZAQRq"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="pX3LTP6j";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="rd8/9nVM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E113B7E775;
-	Wed,  7 Feb 2024 15:29:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A727FBAA;
+	Wed,  7 Feb 2024 15:31:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707319755; cv=none; b=IEPqkYX3jr9NlzkwP1DDzv3/UW6e2ddpXwMUTqMvY5C0KUJ0+ZSW3nAr6w9K/kZVKyjZiA0OZrnA1GtS4TAj5o+8hemo8lk8YMTO7clRbigCwaB1nsgRPQZ0vnDQLdsFYaCKgdLZ1KnNhcxIGa9M7bS/UHZwVLWPfwd5LVLtsjA=
+	t=1707319866; cv=none; b=JxL3vXlDcnyiQXtzd8sZZj4CKTOFs5eb8iDodgM8YJHKavlTKiaDeAdBm2gOS7uxv/LRwq4mLgs6yNlcgqKmrxfIjAe3Dij5iW9fHhaBc+d8MCYm7Q966I7DJJ8b1Eu28+BDa8nOqT9EACw+sgc58b5wD+sXGW8syBx4YyxcBkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707319755; c=relaxed/simple;
-	bh=JWviqLWSlkjLE1/8WvC8zTpCHoR7PyALE6nthzU0xjA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DOlE5mugqdcszxmqviQT+hG5aXeU/Q2LdP8KybktW0yJQRDa2aIKWlCxMrkd74aczf2fpSD8Sso3prR2j1Gh15JEMQAQpt76y71qQczEGueswUGSSfwZikfNfsyM27AeUlDf6V1ub4ccyxCegbpgqSPzc+qU/Q+wE/cSiyFOJkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ahmZAQRq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2417BC433C7;
-	Wed,  7 Feb 2024 15:29:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707319754;
-	bh=JWviqLWSlkjLE1/8WvC8zTpCHoR7PyALE6nthzU0xjA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ahmZAQRq7Ylcy0DCBteiiZhf56yvtHOGm3NI+PJZFwn0ScULRFohqc1WVGm5CiVaE
-	 +rkyrxxiWe46P6X1AwX/+ioACVvl0L8WY65GQCMlt3+wzYTQxO3V3PKmwpd6tNDnuW
-	 YCaZpl3NK04Ox4afBR4uXBe/CdhUaNd3P3kztvJmlDZ78D2kDGZ9xYMwTnjzEHjc7m
-	 j6dWgGEJEDJecaBIpQSf1/OJunZeUbuFGj740DIOuhluT+PlXG7hfR9j2sPoK/D7n+
-	 DbUciKWdd/AK3fVbXuvTZsiAt9sOGWmh/0DQoDsOYfEsLqUSjNmcZ4oAyEYdqE5d3j
-	 TWQqKBFz0H7Iw==
-Date: Wed, 7 Feb 2024 07:29:13 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, MPTCP Upstream
- <mptcp@lists.linux.dev>, Paolo Abeni <pabeni@redhat.com>, Mat Martineau
- <martineau@kernel.org>
-Subject: Re: [TEST] The no-kvm CI instances going away
-Message-ID: <20240207072913.0c69225c@kernel.org>
-In-Reply-To: <e216081b-8755-46be-a687-2c61d335aedb@kernel.org>
-References: <20240205174136.6056d596@kernel.org>
-	<f6437533-b0c9-422b-af00-fb8a236b1956@kernel.org>
-	<20240206174407.36ca59c4@kernel.org>
-	<2d0eb4ef-dd07-4800-8fcf-637a924570fa@kernel.org>
-	<20240207062540.5fe5563b@kernel.org>
-	<e216081b-8755-46be-a687-2c61d335aedb@kernel.org>
+	s=arc-20240116; t=1707319866; c=relaxed/simple;
+	bh=eJeLndhWGRvAdTc5kciWtPegu1uaVizibVG6t8sSW7A=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=P7PPlaKe0sF5QCjEF/VsBpsEV9CaUr6y+aCD2grZA8vYCPN8DgUXLCOy7eG0RI1Sip1nfGTmUnWpEvyF67gCxeBq1mQj1cEdTvCefsS700BGKSQtc1pvJKfF4OcWo1SS9eaCRoROL+3T59EywIjWkzKH+SCX9tq5DqU3tTDKH/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=pX3LTP6j; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=rd8/9nVM; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1707319863;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=c04kwZUxrvzi0qvbSSBFwoEI3C7fipYQbJIv4qBO2mM=;
+	b=pX3LTP6jV2sgdSLm1wYHtfx8ErZl1KpxVfPY9rb03KkNx8HshqzA+MQcD1oD+pi1+98JnT
+	hukHm/rQE4T/Lr0aLnUxVqVvqkE0SolHJ/yHRTHKhMDUDtp0CvUlgAXyz3HCF10+FoOdYz
+	IJEsyZlpaw3Vl+KUtMsDd3Ev5iCeIl3bNmEbHx0zde9t7+1gvIJ2x2N2xH0LzDgNQxSKj3
+	9yTiqHI/Ds4eZBsIRW9Lgdb+gtmkus9yy91OC+l1pbflBSuHxvfOEsSJ+IJZmVXCyL3zmN
+	TxDv/fPfWOpMNNhgZ4GKkOJlg/J7BeDb/iQCkcKbXsDjLp3f/uk2NESKg/0wFw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1707319863;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=c04kwZUxrvzi0qvbSSBFwoEI3C7fipYQbJIv4qBO2mM=;
+	b=rd8/9nVMjgPNsldK9YDX7YWT5kRNdt7AE4DtqnZ0JUjYD/Rpywr6xjdjT/asiFcpRtTF+B
+	CWRJeVKy5QeunoCw==
+To: lakshmi.sowjanya.d@intel.com, jstultz@google.com, giometti@enneenne.com,
+ corbet@lwn.net, linux-kernel@vger.kernel.org
+Cc: x86@kernel.org, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, andriy.shevchenko@linux.intel.com,
+ eddie.dong@intel.com, christopher.s.hall@intel.com,
+ jesse.brandeburg@intel.com, davem@davemloft.net,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+ mcoquelin.stm32@gmail.com, perex@perex.cz, linux-sound@vger.kernel.org,
+ anthony.l.nguyen@intel.com, peter.hilber@opensynergy.com,
+ pandith.n@intel.com, mallikarjunappa.sangannavar@intel.com,
+ subramanian.mohan@intel.com, thejesh.reddy.t.r@intel.com,
+ lakshmi.sowjanya.d@intel.com
+Subject: Re: [PATCH v4 07/11] ice/ptp: remove convert_art_to_tsc()
+In-Reply-To: <20240207060854.6524-8-lakshmi.sowjanya.d@intel.com>
+References: <20240207060854.6524-1-lakshmi.sowjanya.d@intel.com>
+ <20240207060854.6524-8-lakshmi.sowjanya.d@intel.com>
+Date: Wed, 07 Feb 2024 16:31:02 +0100
+Message-ID: <87bk8smguh.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On Wed, 7 Feb 2024 15:37:22 +0100 Matthieu Baerts wrote:
-> > I'd rather not modify the tree. Poking around - this seems to work:
-> > 
-> >   export kselftest_override_timeout=1  
-> 
-> Even better :)
-> 
->   f=tools/testing/selftests/net/settings
->   kselftest_override_timeout=$(awk -F = '/^timeout=/ {print $2*2}' $f)
-> 
-> > Now it's just a matter of finding 15min to code it up :)  
-> I'm not sure if I can help here :)
+On Wed, Feb 07 2024 at 11:38, lakshmi sowjanya d. wrote:
 
-If you're willing to touch my nasty Python - that'd be very welcome! :)
+> From: Thomas Gleixner <tglx@linutronix.de>
+>
+> Remove convert_art_to_tsc() function call, Pass system clock cycles and
+> clocksource ID as input to get_device_system_crosststamp().
+>
+> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+> Signed-off-by: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_ptp.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> index 3b6605c8585e..104b3f7a7cfc 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> @@ -2101,7 +2101,7 @@ ice_ptp_get_syncdevicetime(ktime_t *device,
+>  			hh_ts_lo = rd32(hw, GLHH_ART_TIME_L);
+>  			hh_ts_hi = rd32(hw, GLHH_ART_TIME_H);
+>  			hh_ts = ((u64)hh_ts_hi << 32) | hh_ts_lo;
+> -			*system = convert_art_ns_to_tsc(hh_ts);
+> +			system->cycles = hh_ts;
 
-Right now I put this in the configs:
-
-[vm]
-exports=KSFT_MACHINE_SLOW=yes
-
-We can leave the support for adding exports in place, but we should add
-a new config option like
-
-[vm]
-slowdown=2
-
-(exact name up for debate), if it's present generate the
-KSFT_MACHINE_SLOW=yes export automatically, without the explicit entry
-in the config. And add the export for the timeout matching the logic
-you propose (but in Python).
-
-FWIW here's the configs we currently use:
-
-$ cat remote.config
-[remote]
-branches=https://netdev.bots.linux.dev/static/nipa/branches.json
-filters=https://netdev.bots.linux.dev/contest/filters.json
-[local]
-results_path=results
-json_path=jsons
-[env]
-paths=/home/virtme/virtme-ng/
-[vm]
-paths=/home/virtme/tools/fs/bin:/home/virtme/tools/fs/sbin:/home/virtme/tools/fs/usr/bin:/home/virtme/tools/fs/usr/sbin
-ld_paths=/lib64/:/home/virtme/tools/fs/usr/lib/:/home/virtme/tools/fs/lib64/:/home/virtme/tools/fs/usr/lib64/
-init_prompt=bash-5.2#
-default_timeout=200
-boot_timeout=45
-
-
-$ cat ksft-mptcp-dbg.config
-[executor]
-name=vmksft-mptcp-dbg
-[local]
-tree_path=/home/virtme/testing-12/
-base_path=/home/virtme/outputs-12/
-[www]
-url=https://netdev-3.bots.linux.dev/vmksft-mptcp-dbg
-[vm]
-exports=KSFT_MACHINE_SLOW=yes
-configs=kernel/configs/debug.config,kernel/configs/x86_debug.config
-default_timeout=300
-cpus=4
-[ksft]
-target=net/mptcp
-[cfg]
-thread_cnt=1
-
+Fails to set the ID.
 
