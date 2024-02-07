@@ -1,144 +1,175 @@
-Return-Path: <netdev+bounces-69853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69854-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92F9C84CCC5
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:31:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B409E84CCC8
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:32:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50F4128D655
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 14:31:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D89C31C25559
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 14:32:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EC0F7E596;
-	Wed,  7 Feb 2024 14:31:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D69A7E791;
+	Wed,  7 Feb 2024 14:31:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NGdt/vGH"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fw6WuOcu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f169.google.com (mail-pg1-f169.google.com [209.85.215.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A247E587;
-	Wed,  7 Feb 2024 14:31:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFABF374E0
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 14:31:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707316308; cv=none; b=c4bu/pdIZudm0w5jX4TCey5MJqDsoXIVgmaXDsKIEILQKg7/SoZi3GYcWbnIaEjE8m1TZ0fsdfeeg/n7vz2CruboFDEkTdu4xPybPH9mY2VKqVR1UpsRGPlqaYgHvbGw59UQL1BPNsBhvbh88nBmBkvx5IYLQuqrW5vR0UFBagQ=
+	t=1707316310; cv=none; b=sI86AftqFK051wcXqajs3qhr/0DEUjXeetY2JvtU4ZUlWPdln8eZW1Ob3DJ/Wpf+AEinTUYxa0sbkARpZH9HoILOa8ZG0US79FmwqwkBfGEScj1Y/Cddye2DqnwAXui1dvNL6FFP/cnddHjAqNwu6fJ0oKhM9L78pNUFAfwZcPs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707316308; c=relaxed/simple;
-	bh=OPIgeCr9tX3JgphTgoxiOM/JEwMrIKmZmGk/wNxhpwk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TNiX0cEakSW2lAPMAQWooY8Gh2/DoXev0zFtn31fDAvOzAGee12gIjtUdJisE2rRm3/6vqQSOyzwWzqOwUEcm81TMQxzBRYHa+5Uwis/lFMw5f+8RWtx9jSQP+D/hnbR9cwA5GUCU5+t8p60ZTTD0odMa3CoOzHuijw6B6oI9Ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NGdt/vGH; arc=none smtp.client-ip=209.85.215.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f169.google.com with SMTP id 41be03b00d2f7-5d8df2edd29so439723a12.2;
-        Wed, 07 Feb 2024 06:31:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707316306; x=1707921106; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OPIgeCr9tX3JgphTgoxiOM/JEwMrIKmZmGk/wNxhpwk=;
-        b=NGdt/vGHBJwqh4gJF261gOHwnKsNfNEUT09uM0N3ujCS0XthxdaEtQC4pWAxvvRjHg
-         nYokGQtIIj9B4T64OBhxGoZYpyBGXbBYPfJYuGt/uY6/Jr05KRXzWfWazEGiqmogSyiQ
-         zw2dSUORq/z+XR/10gBLiy3YZP0sqnvZRqEGIfCAoqTSJq6kIBJ5aITp8tl0yD9y+P6E
-         D391+w8C30ZKO7SjTj+1HqeLbepefrSZFC4bMCayg+qhgBHFinEPrPOTsaviY/YPvdxk
-         5XyHGt8NqkSN9Sm3iNRvRFUrXVc64uTtOlVZhQSAQ0jubJgAoEkK7sqp2muMZ3HO0vAz
-         lKgA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707316306; x=1707921106;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OPIgeCr9tX3JgphTgoxiOM/JEwMrIKmZmGk/wNxhpwk=;
-        b=CUHV/XQ41yUh32ERyEyFYtNNkwxozYQiAUqecGFUrKlsBqD5FM1KUgCNfroROkMxkd
-         ujQ44F5Tf1HtciZSCZ9pWAGof1AkThrUQlfzfqcDja4CAPqxzqK4iO1XEinzKXa8K16A
-         xMJv+GuX8g9GYmmJpqA7VlDvh5442ZQb5i5MAq353GHVA5WmcejyzobKwLcyD4NCAuuC
-         p1qbcs1xJvvtMU5qjUZTjLtZMwx3O8uCcyXyV9xtjwQfjLHNCI6r7G54tlytRX6B2E1g
-         K4QDax5Ybg4jlYZdcHULvnc9H55rfFuaHIp0EOljrY3JRxUJ0lFeypdk+MxKYyx6BMD3
-         Vx/g==
-X-Forwarded-Encrypted: i=1; AJvYcCUYu7HjfKVR0HWAieW6OiUNA/HRzVhYPFoNZnQNqcJezHlJrsyz2V2sBHc9gwzr+kC/5jkFlXfLjKVjjWeFaswwRD+L51qnwGo4G34j10XMxhsgt42FWws7lvtjnkLEJd7f2YvvVDlQQxCGLoq+UXgB4Jf1L/b/GuovSfn3i4EcPw==
-X-Gm-Message-State: AOJu0YyKNgRvPuhWDpMqjnq9jYxAAWoIwzyJeMGtpb5noWghPz7qojHs
-	VArja2P89IDk59q6M1cfnLNVh+ueua7cBqWs8vWyLZQnuOrwXjnxY61eA5g4kewfWfk5B72LZ2Z
-	1ST4x8m9V29d8Nap8xygMaitbTjXZaYSk
-X-Google-Smtp-Source: AGHT+IFxgrOu+ahtaoPMOs67gwkpG6ceSI7wXNAVBWDW5vLpOtek9d22tntZIeUSdN3qHaaaghql1346fultsMOr/Hc=
-X-Received: by 2002:a05:6a21:a59b:b0:19a:4e56:d81b with SMTP id
- gd27-20020a056a21a59b00b0019a4e56d81bmr5159619pzc.27.1707316306040; Wed, 07
- Feb 2024 06:31:46 -0800 (PST)
+	s=arc-20240116; t=1707316310; c=relaxed/simple;
+	bh=aIDKgHVlE62xv3WCnwOJ/N9CDtEKAfk6VOY0pgKBzzs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JNAPdgck41tzImzf8TKhfXvh9haVjNSnwmSDBI4obPY5oYaYCD4YUS53/syFG/QkD7PXWYyTX/XLAQLgzPnSV6S0rXelI3iLR0siRarFIsUyASVYhXBxGK7Kvw4+vXJDzr9hp72PJfNXF1N8AhQeP3YwIUdIXJAnzHyVO1/aPJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fw6WuOcu; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E14CD24000B;
+	Wed,  7 Feb 2024 14:31:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1707316299;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y46VQEpUp9PGmEYBOoV/e0gsPjjWFVf/i7i6PVK9jeo=;
+	b=fw6WuOcuFTEkYODnwdPSjYGu3tAcXWwxRiBIsM6K3LGuIKlOjO2R2BJ3GHKIVvUGH4+rZD
+	tU7jSjdfns1rLVHh0hOWYjIDS52x8Hgpfag74ZPwoxK8DDku96AWEck6mPSpPCzvKL7ukQ
+	3P/vfaHZjVitLqdpWDowXgHhs4fX+SU1OGxt59o+9Qj4EmomTi6wXTkpOoC11mZ9kLxV9r
+	qteJ/aUjCn7O9g5SCOQnhwru9iklAs0exjDwoWrxYOibD6zlHTJUCYc2pKmQCKaHItCLdp
+	uxvek0LDDTRCX96m9PQVJfbtp9IMF8JyRfO+ADF9wwYLnOliK6YBeecKnfsNHA==
+Date: Wed, 7 Feb 2024 15:31:36 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Elad Nachman <enachman@marvell.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Taras Chornyi
+ <taras.chornyi@plvision.eu>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: Re: [EXT] Prestera driver fail to probe twice
+Message-ID: <20240207153136.761ef376@kmaincent-XPS-13-7390>
+In-Reply-To: <BN9PR18MB4251F1904C5C56381FE976C4DB452@BN9PR18MB4251.namprd18.prod.outlook.com>
+References: <20240206165406.24008997@kmaincent-XPS-13-7390>
+	<BN9PR18MB42519830967969DEA4E329EFDB462@BN9PR18MB4251.namprd18.prod.outlook.com>
+	<20240207112231.2d555d3e@kmaincent-XPS-13-7390>
+	<BN9PR18MB42510F2EA6F4091E5CA3B409DB452@BN9PR18MB4251.namprd18.prod.outlook.com>
+	<20240207122838.382fd1b2@kmaincent-XPS-13-7390>
+	<BN9PR18MB4251F1904C5C56381FE976C4DB452@BN9PR18MB4251.namprd18.prod.outlook.com>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240206010311.149103-1-jdamato@fastly.com> <7e338c2a-6091-4093-8ca2-bb3b2af3e79d@gmail.com>
- <20240206171159.GA11565@fastly.com> <44d321bf-88a0-4d6f-8572-dfbda088dd8f@nvidia.com>
- <20240206192314.GA11982@fastly.com> <b3c595d8-b30a-41ac-bb82-c1264678b3c4@nvidia.com>
- <20240207142529.GA12897@fastly.com>
-In-Reply-To: <20240207142529.GA12897@fastly.com>
-From: Dave Taht <dave.taht@gmail.com>
-Date: Wed, 7 Feb 2024 09:31:33 -0500
-Message-ID: <CAA93jw6_KMR_T6vs5S40n6OGeCdxbhikE7DCEAbN1N8_nFW_5g@mail.gmail.com>
-Subject: Re: [PATCH net-next] eth: mlx5: link NAPI instances to queues and IRQs
-To: Joe Damato <jdamato@fastly.com>
-Cc: Gal Pressman <gal@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, 
-	Tariq Toukan <ttoukan.linux@gmail.com>, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, rrameshbabu@nvidia.com, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Wed, Feb 7, 2024 at 9:26=E2=80=AFAM Joe Damato <jdamato@fastly.com> wrot=
-e:
->
-> On Wed, Feb 07, 2024 at 08:59:18AM +0200, Gal Pressman wrote:
-> > On 06/02/2024 21:23, Joe Damato wrote:
-> > >> The per queue coalesce series is going through internal code review,=
- and is
-> > >> expected to also be ready in a matter of a few weeks.
+On Wed, 7 Feb 2024 12:24:16 +0000
+Elad Nachman <enachman@marvell.com> wrote:
+
+> > -----Original Message-----
+> > From: K=C3=B6ry Maincent <kory.maincent@bootlin.com>
+> > Sent: Wednesday, February 7, 2024 1:29 PM
+> > To: Elad Nachman <enachman@marvell.com>
+> > Cc: netdev@vger.kernel.org; Taras Chornyi <taras.chornyi@plvision.eu>;
+> > Thomas Petazzoni <thomas.petazzoni@bootlin.com>; Miquel Raynal
+> > <miquel.raynal@bootlin.com>
+> > Subject: Re: [EXT] Prestera driver fail to probe twice
+> >=20
+> > On Wed, 7 Feb 2024 10:56:29 +0000
+> > Elad Nachman <enachman@marvell.com> wrote:
+> >  =20
+> > > > -----Original Message-----
+> > > > From: K=C3=B6ry Maincent <kory.maincent@bootlin.com>
+> > > > Sent: Wednesday, February 7, 2024 12:23 PM
+> > > > To: Elad Nachman <enachman@marvell.com>
+> > > > Cc: netdev@vger.kernel.org; Taras Chornyi
+> > > > <taras.chornyi@plvision.eu>; Thomas Petazzoni
+> > > > <thomas.petazzoni@bootlin.com>; Miquel Raynal
+> > > > <miquel.raynal@bootlin.com>
+> > > > Subject: Re: [EXT] Prestera driver fail to probe twice
+> > > >
+> > > > On Tue, 6 Feb 2024 18:30:33 +0000
+> > > > Elad Nachman <enachman@marvell.com> wrote:
+> > > > =20
+> > > > > Sorry, that's not how this works.
+> > > > >
+> > > > > The firmware CPU loader will only reload if the firmware crashed =
+or
+> > > > > exit.
+> > > > >
+> > > > > Hence, insmod on the host side will fail, as the firmware side
+> > > > > loader is not waiting For the host to send a new firmware, but
+> > > > > first for the existing firmware to exit. =20
+> > > >
+> > > > With the current implementation we can't rmmod/insmod the driver.
+> > > > Also, in case of deferring probe the same problem appears and the
+> > > > driver will never probe. I don't think this is a good behavior.
+> > > >
+> > > > Isn't it possible to verify that the firmware has already been sent
+> > > > and is working well at the probe time? Then we wouldn't try to flash
+> > > > it. =20
 > > >
-> > > OK, great. Thanks for letting me know; we are definitely interested i=
-n
-> > > using this feature.
-> >
-> > Hi Joe,
-> > Can you please share some details about your usecase for this feature?
->
-> It was outlined in the cover letter for the RFC [1].
->
-> But, briefly: we set a number of queues (say 16) via ethtool. We then
-> create a series of n-tuple filters directing certain flows to queues 0-7
-> via a custom RSS context. The remaining queues, 8-15 are for all other
-> flows via the default RSS context.
->
-> Queues 0-7 are used with busy polling from userland so we want those queu=
-es
-> to have a larger rx/tx-usecs rx/tx-frames than queues 8-15.
+> > > Everything is possible, but that is the way the firmware interface was
+> > > initially designed. Changing this will break compatibility with board
+> > > already deployed in the field. =20
+> >=20
+> > I don't understand, why fixing the probe by not flashing the firmware i=
+f it
+> > is already flashed, will break compatibility?
+> > Do I miss something? =20
+>=20
+> First, firmware is loaded to RAM and not flashed.
+> Second, there is a certain control loop which dictates when the firmware
+> loader expects new firmware by ABI, and that can only happen when the
+> previous firmware code has terminated.
 
-I am looking forward to trying this to chop some usec off of eBPF. I
-am curious as to how low can you go...
+I still don't understand why it will break the compatibility.
+You never entered the second times probe as you would have faced this issue.
 
-> We implemented basic support for this in the RFC we sent to the mailing
-> list.
+I haven't tested it yet but wouldn't this do the job:
 
-thank you for re-citing this:
+--- a/drivers/net/ethernet/marvell/prestera/prestera_pci.c
++++ b/drivers/net/ethernet/marvell/prestera/prestera_pci.c
+@@ -457,16 +457,21 @@ static int prestera_fw_init(struct prestera_fw *fw)
+        fw->dev.send_req =3D prestera_fw_send_req;
+        fw->ldr_regs =3D fw->dev.ctl_regs;
+=20
+-       err =3D prestera_fw_load(fw);
+-       if (err)
+-               return err;
+-
+        err =3D prestera_fw_wait_reg32(fw, PRESTERA_FW_READY_REG,
+                                     PRESTERA_FW_READY_MAGIC,
+                                     PRESTERA_FW_READY_WAIT_MS);
+        if (err) {
+-               dev_err(fw->dev.dev, "FW failed to start\n");
+-               return err;
++               err =3D prestera_fw_load(fw);
++               if (err)
++                       return err;
++
++               err =3D prestera_fw_wait_reg32(fw, PRESTERA_FW_READY_REG,
++                                            PRESTERA_FW_READY_MAGIC,
++                                            PRESTERA_FW_READY_WAIT_MS);
++               if (err) {
++                       dev_err(fw->dev.dev, "FW failed to start\n");
++                       return err;
++               }
+        }
 
-> [1]: https://lore.kernel.org/lkml/20230823223121.58676-1-dev@nalramli.com=
-/
 
-The big feature that I hope appears in some ethernet card someday the
-ability to map (say 16k) LPMs to a hw queue, as opposed to a mere
-tuple. It's the biggest overhead operation we have (presently in
-vectoring data via ebpf) to libreqos for 10k+ ISP subscribers.
-
->
-
-
+Regards,
 --=20
-40 years of net history, a couple songs:
-https://www.youtube.com/watch?v=3DD9RGX6QFm5E
-Dave T=C3=A4ht CSO, LibreQos
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
