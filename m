@@ -1,332 +1,297 @@
-Return-Path: <netdev+bounces-69800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E662B84CA0A
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 12:56:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2090684CA10
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 12:59:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DA72289106
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 11:56:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 145231C23EDE
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 11:59:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C331B816;
-	Wed,  7 Feb 2024 11:56:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADAFA58AAA;
+	Wed,  7 Feb 2024 11:59:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="L82nF6DA"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="mywlBo92"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E41451BF24;
-	Wed,  7 Feb 2024 11:56:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707306998; cv=fail; b=ZJA0YVE2YCpoj7HouRJgPmqCTgHekji79wnY+ZCkzTnGtIP+n3rq7DBzxb/Nv2cGn8MpbRpghSrLPe428JI4cNWRVICBYzrBspeLCqoypiVvSF9hft8vGCtnaM24oZfOziw2y/UhV0Wi8LIHj12hB3r0eDILTaSWZpIG/835Ttc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707306998; c=relaxed/simple;
-	bh=RC6XTHldkY93z+M8mqt5cdQIdkSpLOlLOt9irQVSWG8=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=sqV+r8pYLA7gP//AtOZiUn7pEUp4dB5IywVcx5l9pgBxSk+QItPZqIItAxCLAweVfgc24ASIzEl/NVH91pFhd80YNMYOWqFdav6jd4saX7MOMqJJas0q6IdfHJKA7mPDhBirwT0s1yMlsJBbLCMi/kvykBVb57AO7HnrsAvX2iw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=L82nF6DA; arc=fail smtp.client-ip=40.107.236.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e0HKM7xrK2R7mX4OHSzj9CHbEXeQhX5U8wjhiQIudtRKlTbfpf1ZhtmEsaHQzJU2x3sl3lji1nvRn+wCnQLs1xi5aPYHsKqmFPQKkaRIlakYg8l19ou4EJ58upu5zgonEM9bat/3NJs60BX+Neukfj6Xji1nhk7BDCqyz8ir3HtudeGj4uoKERh3wJXlGk3L5i0adANhoyJXMD1FETjT07ZhABFCiwJOSSj1X8t7iJT9h7TvOV5B4kMlToHx+HNp8nMDMzf6mW7Ec3lWByQaZT48LUTMMGO7yMuMAFyZLNtwYlvq68AzyiAT3suxALVrJOZbRtE59W8hWTmN+2+9dw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kpjZibRKgiBCeEEc5IiM/1bSP1xe9iLDPC4lU6+4wcw=;
- b=Ijw3M6udnO9Paee9Kz8WpNweecn3R6ccGA7KIox50RNfFHAcKU/U3IrghufYL7guoJQW51S2XIlJquZPu0Miq0WN7PDEdyH2VGZ1y6cBXTw0qvp8ffBTmqIrrKpoQJcVBwe8ROkKOVwEQ72OZUu0RGudQXY8r4a5F/N+PceOYMkGyff+D3vY7V+gXmAjzHELuodTrgQD8ZYjBkzP09opViy4pwmfTWFZhRmvqEu4/upGm1NekZVnsJQ3Za6Inbq9XaHApsIzgoPfy0of99aleOwq+XGSSFSg4JBiBKVcdkAjmuBxeUekhCii0hdpG96yrWNo1SH7PxREn+s09tgFmA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kpjZibRKgiBCeEEc5IiM/1bSP1xe9iLDPC4lU6+4wcw=;
- b=L82nF6DAWQGDKLFOjrBM3viWI6rprQXvwHrJ5BnI2YE+HxbTMMeEA8d1h61GMjTq8F186OPJ9IvYz3FkwBaZY5427aTLszeGm76wX5JkCAoSBFnjJuuh/of3Bp/zIxfmmubo1cBVVigrEvsbz4ewI6WTUucF+0jCOQ9RfMFYmIH8jbMJJfbq8F8I6sdVwLIH55A1yTJd7hrVBayYJhdb7gQByBrag5u4Q2TABjNF826poP2NspHRGyBi0NEGs5rOBJzNLkK3KkSiKjWo23pmg3lYAZH4ivyLHZazzZjCdRnFZKpy8ZlGWgsl1wK6L8I11E7wCIp1I14sca4vySmq4Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CO6PR12MB5444.namprd12.prod.outlook.com (2603:10b6:5:35e::8) by
- DM6PR12MB4450.namprd12.prod.outlook.com (2603:10b6:5:28e::18) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7292.10; Wed, 7 Feb 2024 11:56:33 +0000
-Received: from CO6PR12MB5444.namprd12.prod.outlook.com
- ([fe80::acb6:8bd8:e40b:2bfe]) by CO6PR12MB5444.namprd12.prod.outlook.com
- ([fe80::acb6:8bd8:e40b:2bfe%3]) with mapi id 15.20.7270.016; Wed, 7 Feb 2024
- 11:56:33 +0000
-Message-ID: <c25eb595-8d91-40ea-9f52-efa15ebafdbc@nvidia.com>
-Date: Wed, 7 Feb 2024 11:56:26 +0000
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4] net: stmmac: xgmac: fix handling of DPP safety
- error for DMA channels
-Content-Language: en-US
-To: Furong Xu <0x1207@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, Joao Pinto
- <jpinto@synopsys.com>, Simon Horman <horms@kernel.org>,
- Serge Semin <fancer.lancer@gmail.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- xfr@outlook.com, rock.xu@nio.com,
- "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-References: <20240203051439.1127090-1-0x1207@gmail.com>
-From: Jon Hunter <jonathanh@nvidia.com>
-In-Reply-To: <20240203051439.1127090-1-0x1207@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO4P265CA0181.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:311::8) To CO6PR12MB5444.namprd12.prod.outlook.com
- (2603:10b6:5:35e::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EEAF59B57
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 11:59:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707307148; cv=none; b=fCGqTVoBVywow39fNwh7FF7qsyjV5ar+PSeq7oM/GpUh5E9MrR0vjBnTAYljPUV4wPduy7dqBKbUiCQ2iiDERsz1XpKyxGAqs/tk5YVzefCXVHZfv01iRwUqe/p61p3kTeqTbqkcDzwvCe8jE3QrALWJ7Q1dKmP0gY/fR7LNeGs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707307148; c=relaxed/simple;
+	bh=esJJ365ckljhCIbb4FHdZy603b3Drl9v1vV1g6qhgcg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=j7ZHCMMYlKFlppYOMKhXWjysN8XBzx0KeGBeuHYEMDGtcy8wyt6mymVPsgyDH/Iy5PGKEhStQOXRtRW8sos38SrKKern+xwopxJqySEQpAGL0k6Bv3mdpEntlZDf/pmBqp8Zmp7xHv4PoV4S1hGH35iOeBvj8mAHcKcge8o0jfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=mywlBo92; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4101fc00832so713415e9.3
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 03:59:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1707307144; x=1707911944; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xlbZUUttCgJYIxTJGUqyDS2dQ/NKR2yB0Sm9y5e5rH4=;
+        b=mywlBo92DVSc81zw/cbzHj252wpTyf8Fu7R7fSVDmg5iYRxwOlwo0t0G7VJ1LWgARV
+         ARX8U6ugaO2MCTsjetYHHpFpqzyoGByGNuplB14UaSmSrix7gJyNaIC4L5RBl4vvXQgv
+         iTgroWyYQT9T/EWzrlxqWxRYSgcb0yY48aWXiThGfZ4ZtJ19IOlJ64XaYdrmey3IuO6v
+         iFVB7svihvOWJx7B/5RaXfBu+6lY5CsqqPoffpY3lxjuinNs0xnPCyFHlMGLOLK1LJdU
+         CxFV+dUbFifkD1fCBpkFSq1nUev0nwMsf4BEGLmoEzpynTsPB1ffz2jgK9h4KBBBibRX
+         X9hQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707307144; x=1707911944;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xlbZUUttCgJYIxTJGUqyDS2dQ/NKR2yB0Sm9y5e5rH4=;
+        b=H+OSJdIIdhHx0ooYwKqOW0Yhyvb313lyhMncDKmD8X0xKfLhU5dJqnXzpEG8oVDNy3
+         v6tEyBcK9/A4nBcZF1s9EI6KgZ9uyFNCdwNkjxNYvHVOt23U1lP+EdSYhfns3v57bOR3
+         KMYfUaqktLMDUucS1LA0oJ+nUbYdheZvwpHWSZ86CjLcsZov1wpqkONXvSzEyeP55ILB
+         utXCv1hsGJSTSDQEkHy9w9LkVG2LXEZp2Tk0g0lWzh3Hp+3/Yg55Nx1p57uA+ubYRTvR
+         W9cVoaD8qhVPEkIt6fOzpN9zqpY47yZT6vE0HV14oIcd1QdqnLVUw5fnamTezVHfUiwt
+         A+ZA==
+X-Gm-Message-State: AOJu0Yx7+/YIy8QGzEx3qXSXzT5vTfF/R+ygfgk3foiaDZ29AnjxZH6y
+	bAaHW5fNPMRBHmHXTZE6fuLuNZUKda7uwZ1WDRkHmGxvkLdrA1W07CRrUIJ56hoTW+lpX36Px2p
+	tdb4=
+X-Google-Smtp-Source: AGHT+IHd6tD/e8s4+d/SyHLTMqIfWUBNolw2QsoCIFMMjpK83gsVYxnJ23UfqOxh9YqgZCtvkFqPeQ==
+X-Received: by 2002:a05:600c:3146:b0:40d:484e:935 with SMTP id h6-20020a05600c314600b0040d484e0935mr4288807wmo.12.1707307144168;
+        Wed, 07 Feb 2024 03:59:04 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWdG72alH5NiBZv98VEl3rKIBwtuqF5R+23ni4S5h1Hb/D25dDnkpuzTsoq3rbcXX0HPf8f3EwQdPjJMGCznAoMWHPgvs2jmHgHCJtj5S1InGdrJb9VEa/2Srko63Z4Z3RDJKKi3XOtOS0oV7QfHlSU3g==
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id y7-20020a7bcd87000000b0040fd2f3dc0esm1789108wmj.45.2024.02.07.03.59.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Feb 2024 03:59:03 -0800 (PST)
+From: Jiri Pirko <jiri@resnulli.us>
+To: netdev@vger.kernel.org
+Cc: vadim.fedorenko@linux.dev,
+	arkadiusz.kubalewski@intel.com,
+	kuba@kernel.org
+Subject: [patch net v2] dpll: fix possible deadlock during netlink dump operation
+Date: Wed,  7 Feb 2024 12:59:02 +0100
+Message-ID: <20240207115902.371649-1-jiri@resnulli.us>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO6PR12MB5444:EE_|DM6PR12MB4450:EE_
-X-MS-Office365-Filtering-Correlation-Id: 34f248cf-7ba1-41f5-b463-08dc27d3d444
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	U3+inSCB7dtR0JM72UHlQlnJUTjyN/l6utqFMgfM6uXNA6qK3mCcwKeviTA944CNiTygg2ZAT1zU098fjsu81J7hwrMXCdQry33ZzmOiyovmPt+TTSblqcHcev9NYoF4XZ3YWa3IlCNdtjZKHiab+OdYLc0amhC3aVNjoq8q5kzgsmvUi+fSPVxv3o6v/264N6F0qGLzCN9mAjSNDTp+ytZL/WDPcMx59lNrvvDO+WyYeC21+TvWT6adFGc5W64nRc+NmUg77C0/mOzpGuU4dWplNlEKe01VO6elasDkqWy+72L7ZMrSX62bh1rlmAtxRJjNu0TAqVbPCrvzSe9W8bspcgX7b/HJh76lU4wyIwftPm5cDNdHgzZTWM97VUFoxHfB5G/4bAMAWMm4Q5+TM8I6flGsyuTXfpU0I1WPrtMLuNlDLTsroLVlBwh5+Xk9oCkTBc9xlqIE1Jw5D8roG3xi2fO6xy2kTG1GuwTjB8gbt6eZhVAhL97smArgzK9bDehOBDsO+i4Hw6narvtf9PZV2IgLB7jUqbLP6mzdoWVwIGXJTKGHICV9fYKqZwFb408dHfHgBN0jzG6WTm62b7a+57FnYbH8hA0qLBKu6MI42vjXrFYjoHBlZ0Ao6D/mDTG7/smprYLJIYWYQQoPK77yWFB0TYe6aywZn6lAn1rHvJMCQfT3qlcMW4ov1M0+5WFA4JLZoLwfTXdRq7ftxQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO6PR12MB5444.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366004)(396003)(136003)(39860400002)(376002)(346002)(230922051799003)(1800799012)(64100799003)(451199024)(186009)(41300700001)(36756003)(6486002)(966005)(66946007)(110136005)(53546011)(6506007)(6512007)(66476007)(478600001)(6666004)(66556008)(8676002)(4326008)(8936002)(316002)(38100700002)(86362001)(2616005)(83380400001)(31696002)(5660300002)(921011)(2906002)(7416002)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NkR5N0hHWkNjUmo2STNoUWJSN0RXTTNSMnVLeitCYklpaURleFZRNTRvS0xS?=
- =?utf-8?B?V280TW93VTVwaERiUGV3QVVGT1VFRHVtVWlVbXorWDBsajJ6Y3JDaWlvMnZU?=
- =?utf-8?B?RlhRaHFWam1yU05KbG9hNUEyUXpvR3FxWStXVldQUVRzYmNhNURaZnlkd2pj?=
- =?utf-8?B?NWhCb09uM2dRak5YQnlUSVVCT2VSOWdRUVVjdDFValNxQVUxV3B5b0pweW10?=
- =?utf-8?B?UU5MZklnVEtuUS9yaTJIVXJPNVpUckYzSXlmamVTQXkxZ2Y1aXV6M0xmeXBN?=
- =?utf-8?B?YS80SThuY0dOeEVTZTJWYWpmWlUzMUhYc0gyQTdjS3JYUGRCcVBuZ2wveitY?=
- =?utf-8?B?L3BBM0lKSUxtL0hzaFFuYkVISEFjQ0VucUpmUHJaTXh2ZUdwUk5rR0F0OHBo?=
- =?utf-8?B?cXRwUWsrdVNYeVpDb2NqTitHS2luTTl0RFdIalA3QTNQMjN4cVNFWkNqSE1X?=
- =?utf-8?B?SFRyaGxJR01hQUhCbzF0NHJoTVo1Q041OUhpQTZpYU9NYmI0NVgvZEJvMnkv?=
- =?utf-8?B?T3BWWGJ6SEQwUWJyOWlnYnlzN0NqeTEvb0lWVXlJbjhJeEFOL0lRNnNML0Jz?=
- =?utf-8?B?VTNRcU5VZUJYT01UdDlCZmJtTThqSGthVU1lbHFNb0xSOEtCMkxCTGYzYUM0?=
- =?utf-8?B?cjZKQkpTckNIajgxbytqRDJwZkZiRXdYcHlDNUJya0I1alRaSnQyU0dPU01t?=
- =?utf-8?B?N0NDcmRLNDIzL3dOSEpuZm9CK0NpVTJENHd3NmRSbldNWDR5UFY4bVdZSEp5?=
- =?utf-8?B?aklPTDJIbHV6V0VJREtGRmo5bTZwUEVFTVJDY01uc0tGZ3ZlOUpqNzI1enBI?=
- =?utf-8?B?dEJYeTNRTC9yV3ZPUDNOelptNWtIMzBPSkpsNUdhTVpoRUwyamNLSnJyeUtr?=
- =?utf-8?B?bE1uMU5zQytCc1BZSDRZZE0ycEcxWkNvVzBkYUlpSEF5ZDZlVWIwdWdEM2k1?=
- =?utf-8?B?c1N6eXNNTlJFRmtCQktUa2NqVGsxUjg1TnNTdGl1NVpnK3JtRXR1TitkRTE3?=
- =?utf-8?B?MVhXU1ZyRU1pRDdITGd2U0FLdFYyNmhpTVNFNHl0eWdlVnRKYk5hTmhUSFBS?=
- =?utf-8?B?MDVRdGx2Mm84RzYzL09BcDlsbFdaNUU4QjdtUzVTREdDRVFJZUdIbGxlWUdn?=
- =?utf-8?B?ajBiVTdIQ0gwaGlWdlZaQjVqTDhDTWlJN0QvdjRGRm9ka0M4NTYySGVIcjJC?=
- =?utf-8?B?ck83RjRpK0dEZ3B3T0pDN05RM1lWNUM2K3NRd1A0bGZPaDRjWVlZTmhBSHZY?=
- =?utf-8?B?N1crZ1loNDBtVTFiWUVjVUwvTlFrNHVKZmJRKzhOd2xvbzN3aHpmd2ZwZisw?=
- =?utf-8?B?Q3g4eXVtTVRYRzNwems3dWNsK3NjK0l5ZGNHWE9TaWdjamJSL0tZdDNLdWR1?=
- =?utf-8?B?WExKekVISHJFT3ZieGNhYmxMQ2lxdjg1WVc1S1gwdnFtZU1IY0VJaTh4Y2lL?=
- =?utf-8?B?VzNjYjQ0Vm5JcTBscHcxYW9wYXl6dG9UYTZnY2pGUGV6aGc2VU5MVTkvNEVz?=
- =?utf-8?B?Tk5vQWY2TU1XNE95Tjd0TlNCd0hzWkUrQ01vSVU1cC9YZllkWkxwdzB5RlVl?=
- =?utf-8?B?d3c2R2ZlVGxPVU03bCs3THBta09FUTV4bXNtM1UwU251Y0t1bXdxaWM0YVB5?=
- =?utf-8?B?Y3VGS1BYTTNZSjdCRUkxVlh5M01ZWEZxUTdZeiswUWhPeU9tWGo4ZTB6NTJj?=
- =?utf-8?B?R01PQXpyRWVFblNsMndabTBEYjJCV3lDMERxRERkVjRJVTA0emdMc2l4eEVi?=
- =?utf-8?B?SnNBMVFBVkVFaWthVHNWZzJWVlk2d0FNVzl2SnNBV3MwWFBGa1JQWmg4aFBB?=
- =?utf-8?B?R1BxVzAvVEEraWdFYVFpcEgwRElQazNNdjdJQXBoRStMM3RwQnVlaEFzRFpl?=
- =?utf-8?B?VjBnZDNxUGJHZU5FTlF1RTRSUGZEYmxlL0J5NXIwWEhJci81YVNGdDNKN21L?=
- =?utf-8?B?cmRzTWhiOGkrdHhnbkdQeXpNOHZ4bUNxZHVJVkM2eHVYcDdpNVU1OGlmSGxV?=
- =?utf-8?B?N0NxRGE1RlB5cWtQbElvbnJIbm12aFMvWUI0RHNBZW5SZC9ITlI2ZUxUc3hq?=
- =?utf-8?B?amJGcXB3elphL0tobndYYTVIYVMvcDRLdm9xUkZudzVrUVZMbFgvTy9SS1hE?=
- =?utf-8?B?QWRidHM3eHBhTytpVXZQbmdDQSs0YytLbWlxTUR1bEQwbFNTb0FlaDFvMlo3?=
- =?utf-8?B?OEc2MmxKNG1FQWRXWUU2dlVMWFFtTktFUGx6UjV2eGZGOWcxM0djMmpQR01u?=
- =?utf-8?B?L3ZlbGlZaDFpZ0JZRUNDNEJSaVFRPT0=?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 34f248cf-7ba1-41f5-b463-08dc27d3d444
-X-MS-Exchange-CrossTenant-AuthSource: CO6PR12MB5444.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Feb 2024 11:56:33.4608
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: E0OAF3AJMGb9X7qntPtkTbA41S/NHyvz4FQV0XPWO/sE9mAe13Ge8Ou3qd7juY6OqYxmPqO3IVFT3enW03cBdg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4450
+Content-Transfer-Encoding: 8bit
 
+From: Jiri Pirko <jiri@nvidia.com>
 
-On 03/02/2024 05:14, Furong Xu wrote:
-> Commit 56e58d6c8a56 ("net: stmmac: Implement Safety Features in
-> XGMAC core") checks and reports safety errors, but leaves the
-> Data Path Parity Errors for each channel in DMA unhandled at all, lead to
-> a storm of interrupt.
-> Fix it by checking and clearing the DMA_DPP_Interrupt_Status register.
-> 
-> Fixes: 56e58d6c8a56 ("net: stmmac: Implement Safety Features in XGMAC core")
-> Signed-off-by: Furong Xu <0x1207@gmail.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
-> ---
-> Changes in v4:
->   - fix a typo name of DDPP bit, thanks Serge Semin
-> 
-> Changes in v3:
->   - code style fix, thanks Paolo Abeni
-> 
-> Changes in v2:
->    - explicit enable Data Path Parity Protection
->    - add new counters to stmmac_safety_stats
->    - add detailed log
-> ---
->   drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
->   .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  3 +
->   .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 57 ++++++++++++++++++-
->   3 files changed, 60 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
-> index 721c1f8e892f..b4f60ab078d6 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/common.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-> @@ -216,6 +216,7 @@ struct stmmac_safety_stats {
->   	unsigned long mac_errors[32];
->   	unsigned long mtl_errors[32];
->   	unsigned long dma_errors[32];
-> +	unsigned long dma_dpp_errors[32];
->   };
->   
->   /* Number of fields in Safety Stats */
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> index 207ff1799f2c..5c67a3f89f08 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> @@ -303,6 +303,8 @@
->   #define XGMAC_RXCEIE			BIT(4)
->   #define XGMAC_TXCEIE			BIT(0)
->   #define XGMAC_MTL_ECC_INT_STATUS	0x000010cc
-> +#define XGMAC_MTL_DPP_CONTROL		0x000010e0
-> +#define XGMAC_DPP_DISABLE		BIT(0)
->   #define XGMAC_MTL_TXQ_OPMODE(x)		(0x00001100 + (0x80 * (x)))
->   #define XGMAC_TQS			GENMASK(25, 16)
->   #define XGMAC_TQS_SHIFT			16
-> @@ -385,6 +387,7 @@
->   #define XGMAC_DCEIE			BIT(1)
->   #define XGMAC_TCEIE			BIT(0)
->   #define XGMAC_DMA_ECC_INT_STATUS	0x0000306c
-> +#define XGMAC_DMA_DPP_INT_STATUS	0x00003074
->   #define XGMAC_DMA_CH_CONTROL(x)		(0x00003100 + (0x80 * (x)))
->   #define XGMAC_SPH			BIT(24)
->   #define XGMAC_PBLx8			BIT(16)
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> index eb48211d9b0e..04d7c4dc2e35 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> @@ -830,6 +830,43 @@ static const struct dwxgmac3_error_desc dwxgmac3_dma_errors[32]= {
->   	{ false, "UNKNOWN", "Unknown Error" }, /* 31 */
->   };
->   
-> +static const char * const dpp_rx_err = "Read Rx Descriptor Parity checker Error";
-> +static const char * const dpp_tx_err = "Read Tx Descriptor Parity checker Error";
-> +static const struct dwxgmac3_error_desc dwxgmac3_dma_dpp_errors[32] = {
-> +	{ true, "TDPES0", dpp_tx_err },
-> +	{ true, "TDPES1", dpp_tx_err },
-> +	{ true, "TDPES2", dpp_tx_err },
-> +	{ true, "TDPES3", dpp_tx_err },
-> +	{ true, "TDPES4", dpp_tx_err },
-> +	{ true, "TDPES5", dpp_tx_err },
-> +	{ true, "TDPES6", dpp_tx_err },
-> +	{ true, "TDPES7", dpp_tx_err },
-> +	{ true, "TDPES8", dpp_tx_err },
-> +	{ true, "TDPES9", dpp_tx_err },
-> +	{ true, "TDPES10", dpp_tx_err },
-> +	{ true, "TDPES11", dpp_tx_err },
-> +	{ true, "TDPES12", dpp_tx_err },
-> +	{ true, "TDPES13", dpp_tx_err },
-> +	{ true, "TDPES14", dpp_tx_err },
-> +	{ true, "TDPES15", dpp_tx_err },
-> +	{ true, "RDPES0", dpp_rx_err },
-> +	{ true, "RDPES1", dpp_rx_err },
-> +	{ true, "RDPES2", dpp_rx_err },
-> +	{ true, "RDPES3", dpp_rx_err },
-> +	{ true, "RDPES4", dpp_rx_err },
-> +	{ true, "RDPES5", dpp_rx_err },
-> +	{ true, "RDPES6", dpp_rx_err },
-> +	{ true, "RDPES7", dpp_rx_err },
-> +	{ true, "RDPES8", dpp_rx_err },
-> +	{ true, "RDPES9", dpp_rx_err },
-> +	{ true, "RDPES10", dpp_rx_err },
-> +	{ true, "RDPES11", dpp_rx_err },
-> +	{ true, "RDPES12", dpp_rx_err },
-> +	{ true, "RDPES13", dpp_rx_err },
-> +	{ true, "RDPES14", dpp_rx_err },
-> +	{ true, "RDPES15", dpp_rx_err },
-> +};
-> +
->   static void dwxgmac3_handle_dma_err(struct net_device *ndev,
->   				    void __iomem *ioaddr, bool correctable,
->   				    struct stmmac_safety_stats *stats)
-> @@ -841,6 +878,13 @@ static void dwxgmac3_handle_dma_err(struct net_device *ndev,
->   
->   	dwxgmac3_log_error(ndev, value, correctable, "DMA",
->   			   dwxgmac3_dma_errors, STAT_OFF(dma_errors), stats);
-> +
-> +	value = readl(ioaddr + XGMAC_DMA_DPP_INT_STATUS);
-> +	writel(value, ioaddr + XGMAC_DMA_DPP_INT_STATUS);
-> +
-> +	dwxgmac3_log_error(ndev, value, false, "DMA_DPP",
-> +			   dwxgmac3_dma_dpp_errors,
-> +			   STAT_OFF(dma_dpp_errors), stats);
->   }
->   
->   static int
-> @@ -881,6 +925,12 @@ dwxgmac3_safety_feat_config(void __iomem *ioaddr, unsigned int asp,
->   	value |= XGMAC_TMOUTEN; /* FSM Timeout Feature */
->   	writel(value, ioaddr + XGMAC_MAC_FSM_CONTROL);
->   
-> +	/* 5. Enable Data Path Parity Protection */
-> +	value = readl(ioaddr + XGMAC_MTL_DPP_CONTROL);
-> +	/* already enabled by default, explicit enable it again */
-> +	value &= ~XGMAC_DPP_DISABLE;
-> +	writel(value, ioaddr + XGMAC_MTL_DPP_CONTROL);
-> +
->   	return 0;
->   }
->   
-> @@ -914,7 +964,11 @@ static int dwxgmac3_safety_feat_irq_status(struct net_device *ndev,
->   		ret |= !corr;
->   	}
->   
-> -	err = dma & (XGMAC_DEUIS | XGMAC_DECIS);
-> +	/* DMA_DPP_Interrupt_Status is indicated by MCSIS bit in
-> +	 * DMA_Safety_Interrupt_Status, so we handle DMA Data Path
-> +	 * Parity Errors here
-> +	 */
-> +	err = dma & (XGMAC_DEUIS | XGMAC_DECIS | XGMAC_MCSIS);
->   	corr = dma & XGMAC_DECIS;
->   	if (err) {
->   		dwxgmac3_handle_dma_err(ndev, ioaddr, corr, stats);
-> @@ -930,6 +984,7 @@ static const struct dwxgmac3_error {
->   	{ dwxgmac3_mac_errors },
->   	{ dwxgmac3_mtl_errors },
->   	{ dwxgmac3_dma_errors },
-> +	{ dwxgmac3_dma_dpp_errors },
->   };
->   
->   static int dwxgmac3_safety_feat_dump(struct stmmac_safety_stats *stats,
+Recently, I've been hitting following deadlock warning during dpll pin
+dump:
 
+[52804.637962] ======================================================
+[52804.638536] WARNING: possible circular locking dependency detected
+[52804.639111] 6.8.0-rc2jiri+ #1 Not tainted
+[52804.639529] ------------------------------------------------------
+[52804.640104] python3/2984 is trying to acquire lock:
+[52804.640581] ffff88810e642678 (nlk_cb_mutex-GENERIC){+.+.}-{3:3}, at: netlink_dump+0xb3/0x780
+[52804.641417]
+               but task is already holding lock:
+[52804.642010] ffffffff83bde4c8 (dpll_lock){+.+.}-{3:3}, at: dpll_lock_dumpit+0x13/0x20
+[52804.642747]
+               which lock already depends on the new lock.
 
-This change is breaking the build on some of our builders that are still using GCC 6.x ...
+[52804.643551]
+               the existing dependency chain (in reverse order) is:
+[52804.644259]
+               -> #1 (dpll_lock){+.+.}-{3:3}:
+[52804.644836]        lock_acquire+0x174/0x3e0
+[52804.645271]        __mutex_lock+0x119/0x1150
+[52804.645723]        dpll_lock_dumpit+0x13/0x20
+[52804.646169]        genl_start+0x266/0x320
+[52804.646578]        __netlink_dump_start+0x321/0x450
+[52804.647056]        genl_family_rcv_msg_dumpit+0x155/0x1e0
+[52804.647575]        genl_rcv_msg+0x1ed/0x3b0
+[52804.648001]        netlink_rcv_skb+0xdc/0x210
+[52804.648440]        genl_rcv+0x24/0x40
+[52804.648831]        netlink_unicast+0x2f1/0x490
+[52804.649290]        netlink_sendmsg+0x36d/0x660
+[52804.649742]        __sock_sendmsg+0x73/0xc0
+[52804.650165]        __sys_sendto+0x184/0x210
+[52804.650597]        __x64_sys_sendto+0x72/0x80
+[52804.651045]        do_syscall_64+0x6f/0x140
+[52804.651474]        entry_SYSCALL_64_after_hwframe+0x46/0x4e
+[52804.652001]
+               -> #0 (nlk_cb_mutex-GENERIC){+.+.}-{3:3}:
+[52804.652650]        check_prev_add+0x1ae/0x1280
+[52804.653107]        __lock_acquire+0x1ed3/0x29a0
+[52804.653559]        lock_acquire+0x174/0x3e0
+[52804.653984]        __mutex_lock+0x119/0x1150
+[52804.654423]        netlink_dump+0xb3/0x780
+[52804.654845]        __netlink_dump_start+0x389/0x450
+[52804.655321]        genl_family_rcv_msg_dumpit+0x155/0x1e0
+[52804.655842]        genl_rcv_msg+0x1ed/0x3b0
+[52804.656272]        netlink_rcv_skb+0xdc/0x210
+[52804.656721]        genl_rcv+0x24/0x40
+[52804.657119]        netlink_unicast+0x2f1/0x490
+[52804.657570]        netlink_sendmsg+0x36d/0x660
+[52804.658022]        __sock_sendmsg+0x73/0xc0
+[52804.658450]        __sys_sendto+0x184/0x210
+[52804.658877]        __x64_sys_sendto+0x72/0x80
+[52804.659322]        do_syscall_64+0x6f/0x140
+[52804.659752]        entry_SYSCALL_64_after_hwframe+0x46/0x4e
+[52804.660281]
+               other info that might help us debug this:
 
-drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:836:20: error: initialiser element is not constant
-   { true, "TDPES0", dpp_tx_err },
-                     ^~~~~~~~~~
-drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:836:20: note: (near initialisation for ‘dwxgmac3_dma_dpp_errors[0].detailed_desc’)
-drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:837:20: error: initialiser element is not constant
-   { true, "TDPES1", dpp_tx_err },
-                     ^~~~~~~~~~
-drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:837:20: note: (near initialisation for ‘dwxgmac3_dma_dpp_errors[1].detailed_desc’)
-...
+[52804.661077]  Possible unsafe locking scenario:
 
-I know that this is quite old but the minimum supported by the kernel is v5.1 ...
+[52804.661671]        CPU0                    CPU1
+[52804.662129]        ----                    ----
+[52804.662577]   lock(dpll_lock);
+[52804.662924]                                lock(nlk_cb_mutex-GENERIC);
+[52804.663538]                                lock(dpll_lock);
+[52804.664073]   lock(nlk_cb_mutex-GENERIC);
+[52804.664490]
 
-https://www.kernel.org/doc/html/next/process/changes.html
+The issue as follows: __netlink_dump_start() calls control->start(cb)
+with nlk->cb_mutex held. In control->start(cb) the dpll_lock is taken.
+Then nlk->cb_mutex is released and taken again in netlink_dump(), while
+dpll_lock still being held. That leads to ABBA deadlock when another
+CPU races with the same operation.
 
-Jon
+Fix this by moving dpll_lock taking into dumpit() callback which ensures
+correct lock taking order.
 
+Fixes: 9d71b54b65b1 ("dpll: netlink: Add DPLL framework base functions")
+Signed-off-by: Jiri Pirko <jiri@nvidia.com>
+---
+v1->v2:
+- fixed in dpll.yaml and regenerated c/h files
+---
+ Documentation/netlink/specs/dpll.yaml |  4 ----
+ drivers/dpll/dpll_netlink.c           | 20 ++++++--------------
+ drivers/dpll/dpll_nl.c                |  4 ----
+ drivers/dpll/dpll_nl.h                |  2 --
+ 4 files changed, 6 insertions(+), 24 deletions(-)
+
+diff --git a/Documentation/netlink/specs/dpll.yaml b/Documentation/netlink/specs/dpll.yaml
+index b14aed18065f..3dcc9ece272a 100644
+--- a/Documentation/netlink/specs/dpll.yaml
++++ b/Documentation/netlink/specs/dpll.yaml
+@@ -384,8 +384,6 @@ operations:
+             - type
+ 
+       dump:
+-        pre: dpll-lock-dumpit
+-        post: dpll-unlock-dumpit
+         reply: *dev-attrs
+ 
+     -
+@@ -473,8 +471,6 @@ operations:
+             - fractional-frequency-offset
+ 
+       dump:
+-        pre: dpll-lock-dumpit
+-        post: dpll-unlock-dumpit
+         request:
+           attributes:
+             - id
+diff --git a/drivers/dpll/dpll_netlink.c b/drivers/dpll/dpll_netlink.c
+index 314bb3775465..4ca9ad16cd95 100644
+--- a/drivers/dpll/dpll_netlink.c
++++ b/drivers/dpll/dpll_netlink.c
+@@ -1199,6 +1199,7 @@ int dpll_nl_pin_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ 	unsigned long i;
+ 	int ret = 0;
+ 
++	mutex_lock(&dpll_lock);
+ 	xa_for_each_marked_start(&dpll_pin_xa, i, pin, DPLL_REGISTERED,
+ 				 ctx->idx) {
+ 		if (!dpll_pin_available(pin))
+@@ -1218,6 +1219,8 @@ int dpll_nl_pin_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ 		}
+ 		genlmsg_end(skb, hdr);
+ 	}
++	mutex_unlock(&dpll_lock);
++
+ 	if (ret == -EMSGSIZE) {
+ 		ctx->idx = i;
+ 		return skb->len;
+@@ -1373,6 +1376,7 @@ int dpll_nl_device_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ 	unsigned long i;
+ 	int ret = 0;
+ 
++	mutex_lock(&dpll_lock);
+ 	xa_for_each_marked_start(&dpll_device_xa, i, dpll, DPLL_REGISTERED,
+ 				 ctx->idx) {
+ 		hdr = genlmsg_put(skb, NETLINK_CB(cb->skb).portid,
+@@ -1389,6 +1393,8 @@ int dpll_nl_device_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+ 		}
+ 		genlmsg_end(skb, hdr);
+ 	}
++	mutex_unlock(&dpll_lock);
++
+ 	if (ret == -EMSGSIZE) {
+ 		ctx->idx = i;
+ 		return skb->len;
+@@ -1439,20 +1445,6 @@ dpll_unlock_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
+ 	mutex_unlock(&dpll_lock);
+ }
+ 
+-int dpll_lock_dumpit(struct netlink_callback *cb)
+-{
+-	mutex_lock(&dpll_lock);
+-
+-	return 0;
+-}
+-
+-int dpll_unlock_dumpit(struct netlink_callback *cb)
+-{
+-	mutex_unlock(&dpll_lock);
+-
+-	return 0;
+-}
+-
+ int dpll_pin_pre_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
+ 		      struct genl_info *info)
+ {
+diff --git a/drivers/dpll/dpll_nl.c b/drivers/dpll/dpll_nl.c
+index eaee5be7aa64..1e95f5397cfc 100644
+--- a/drivers/dpll/dpll_nl.c
++++ b/drivers/dpll/dpll_nl.c
+@@ -95,9 +95,7 @@ static const struct genl_split_ops dpll_nl_ops[] = {
+ 	},
+ 	{
+ 		.cmd	= DPLL_CMD_DEVICE_GET,
+-		.start	= dpll_lock_dumpit,
+ 		.dumpit	= dpll_nl_device_get_dumpit,
+-		.done	= dpll_unlock_dumpit,
+ 		.flags	= GENL_ADMIN_PERM | GENL_CMD_CAP_DUMP,
+ 	},
+ 	{
+@@ -129,9 +127,7 @@ static const struct genl_split_ops dpll_nl_ops[] = {
+ 	},
+ 	{
+ 		.cmd		= DPLL_CMD_PIN_GET,
+-		.start		= dpll_lock_dumpit,
+ 		.dumpit		= dpll_nl_pin_get_dumpit,
+-		.done		= dpll_unlock_dumpit,
+ 		.policy		= dpll_pin_get_dump_nl_policy,
+ 		.maxattr	= DPLL_A_PIN_ID,
+ 		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DUMP,
+diff --git a/drivers/dpll/dpll_nl.h b/drivers/dpll/dpll_nl.h
+index 92d4c9c4f788..f491262bee4f 100644
+--- a/drivers/dpll/dpll_nl.h
++++ b/drivers/dpll/dpll_nl.h
+@@ -30,8 +30,6 @@ dpll_post_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
+ void
+ dpll_pin_post_doit(const struct genl_split_ops *ops, struct sk_buff *skb,
+ 		   struct genl_info *info);
+-int dpll_lock_dumpit(struct netlink_callback *cb);
+-int dpll_unlock_dumpit(struct netlink_callback *cb);
+ 
+ int dpll_nl_device_id_get_doit(struct sk_buff *skb, struct genl_info *info);
+ int dpll_nl_device_get_doit(struct sk_buff *skb, struct genl_info *info);
 -- 
-nvpublic
+2.43.0
+
 
