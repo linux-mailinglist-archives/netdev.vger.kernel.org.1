@@ -1,78 +1,79 @@
-Return-Path: <netdev+bounces-70002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA5B184D36E
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 22:05:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9972984D397
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 22:18:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EE081F260C6
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 21:05:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C3F2C1C21FF4
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 21:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E03E485624;
-	Wed,  7 Feb 2024 21:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B27612A178;
+	Wed,  7 Feb 2024 21:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gYsbT1Vq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q/IJMm4U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20872127B50
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 21:05:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 737AE12A17D
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 21:17:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707339947; cv=none; b=eSAraO6LD4sO+UIHe39/d2Fgics4LvduEkWTr0Rr/PzhJNQ+5DJozgmJzzJJGTsA/DrMybEKlo81VukfjJDttYFj+w2vmSXDxlhi1+DED1ITdOMh5wCaKEpLkho1ZPANwXxYa+1uL7McCzItTQF00E2yRKuVucN0zRX7ofwApXM=
+	t=1707340650; cv=none; b=NwzotwGga03xBsXBfexwIDeKsvNy738yg3VJqKejNj/6/izQJejexLPWZcmg+J8a4ZdT58OmIV5vp54Se/sT6eavIC/SPb/F5/Jb996R2KlOULR/iRF92OU2lpMElWQzlRb01rIfO/oRUTMsdvb8AMeReq/baDnH6/lEMwnuR/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707339947; c=relaxed/simple;
-	bh=5GBIdx7QOforEfWSX9f7GXOz8XaoAmfxYVi1+B5cpoE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fZP5kpuIBtPMI7p/fMN2BbRU+K5U6dBiFMjmkIHaXo0UNTjBhtkOqXcNA9EwEljUuZ+ImFPGyOZDIZBsU3QxzR8w1kdqwfetUYTO+YH8YHYu5H29Y0In76hu4P1p689MaixiUGjnwxttco/PZP6NWMFRNX/S4Ne5TtWgrfyXEis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gYsbT1Vq; arc=none smtp.client-ip=209.85.167.43
+	s=arc-20240116; t=1707340650; c=relaxed/simple;
+	bh=DhJqMZpycZIfu9MvC78R+2In+rk4fZyXpWixUJ/Tbg4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=G/Fv04W5iVVXSo3R37s+HUpP73zZ+AwfvyeZWcvVbR38pwYh7qcW7XFAvW4T9BJ7cQjpDaNYBatfouZLCim4nuBFf6BPv8fYE++gYIr7S2xXShupEJ7YULy9EbQ/ye8/JUCc9QDL0gqAzeQngFhlVDjVm6X5B3ognBF+9dy1CwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q/IJMm4U; arc=none smtp.client-ip=209.85.167.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-51167496943so1836966e87.2
-        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 13:05:45 -0800 (PST)
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-5101cd91017so1392141e87.2
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 13:17:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707339944; x=1707944744; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707340646; x=1707945446; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=z/ytDIX54Nb7rPsFznPXw/fkWlpC9/8epxoXFGn4yoc=;
-        b=gYsbT1Vqj9uIZ21rM2r6ABbgyD8bVsLMtpn84AC1UwclN0eRFUxG+0VmbNigBhNG/U
-         5iha+/J8fcYIlv1Dy4uDrKk5DfnfcJqEVqJgrqwXzZmrLtOCmTvjPKoySgNq79AyO9qb
-         AiwYIID1Llvjy0GuXjFhrZDqumnlXINUMivQ20EhVxBdYyWBYqtzsyiqop0KP8BnCQmA
-         OnKgdW5P958P9veRdn0YSW4/+QJyNkp+Q/Q4nsNkIrosBZhDXJhVVFczqR3fB/qeOHJD
-         AvTnOoHzi7Lv+tAkkOB4g+cCIQ/CAxyN2ycCJ79tFjrxIVXaUdpbpLvU9BrP31Bpz9yG
-         FFcQ==
+        bh=31Olk8glwTzC3fH7FgHuDdTWhaIrj6bTBNRWB7P7aDs=;
+        b=Q/IJMm4USh18CyIflf537rQFzg7NjOebmejeXKT5iLNPN9Y+bvGEopDfjhVWEuuaBN
+         07Q9Kz3XB+9ii3gf1wR5QFFrvLb37LNThlXaJ6iNk2o8p58DnXhL+1znKAe3wvLp3lGS
+         Ep+adIg8vU9dTBNs3vU+8uRsyxKpmmRtp9rnLI5K6MNuL8klvG+a5Ob/sC35KkWw4WP4
+         VmKggu8Qds4S6ShXkj+PSOg1kprC9vC+HKJkA1XwZuXn6MevDwAzg92Q+33V5qF/SHMI
+         gT9vn7aM3jvpQ3l7vpmjKlrDXULcIbUulILPM6CGwe+PlF/HytcV45hrNdYeKpNpeTfq
+         88EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707339944; x=1707944744;
+        d=1e100.net; s=20230601; t=1707340646; x=1707945446;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=z/ytDIX54Nb7rPsFznPXw/fkWlpC9/8epxoXFGn4yoc=;
-        b=ey4Z4E9AK9MJdqx5GLCXaujdyLlUbKa5oM2gpdTmBfK805A2GbvrW0F3FVg3326SYl
-         3BQXvUh/NETZSZV0dnrZA1Ww85w1EfSKJNOYKON8jiQdgkj4C4jaPgmQDvU++QBCQseI
-         zPb7fr7b/2KY7+u1efdWJTLk+A3jKKzXw73ry5nmZeP/Ha5gGVm9nV1XT9Sdsy68OHOa
-         zJDl9kXQlK3zK+S4AzoqXpVkUPw3qduRohARBUmSk3bNHVVHuaRnBN8xYRii26mOrFlg
-         72HSS1vezaYYsBvKxavuLYNOFi+jPAdx82kK8t4ReIIjFaZ+AzfRey0KGnvnXrHlYWx5
-         tG2g==
-X-Gm-Message-State: AOJu0Yxi9c5W86bM+cYqvX2ZB32+40hLGsxJUr56Y79MBg0enj7Y4jNR
-	yob/TBGDtt58aXfk5lUrJiXGd5fJtUj5xtt4fVKRihV2mQzXx6Cm
-X-Google-Smtp-Source: AGHT+IFiL/EnX42oq0UWKaYm7lEMYbIY3VZQqGNpMmsCcNVNgs0pNyfs/6KhK1VGK3Qe/WXZXhRIww==
-X-Received: by 2002:ac2:530a:0:b0:511:5936:c874 with SMTP id c10-20020ac2530a000000b005115936c874mr4561291lfh.6.1707339943802;
-        Wed, 07 Feb 2024 13:05:43 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVF6GbFJvRS1QPw+2RzJucDBzsReDLqbtAVDAN6W16EqSf4g5xnSSoDmc7AjLrSZmkcnfVIi13IOVKQLqt9e7LyIxC/Eqdx
+        bh=31Olk8glwTzC3fH7FgHuDdTWhaIrj6bTBNRWB7P7aDs=;
+        b=us/RLxgdaJWkUtHSiU1M64bwnT5gARv3j3vwhvi8ZJCCpc8LaSyFlVFM8AhzCjgkN1
+         T9cDbA8KIIIjksThRSi04ulLEopJaggoSDpKsZstzVTKxMSDbnDqGylYHctt4P8b/uQB
+         lxK4jkT9ygsA10gjIAnawC76Mg2HGZak6R+9q4/S564LZeH87VNBKK6/Tm3CRrC8STOm
+         UObXqspr/OkLdaJ7VPcBfD0toGPayh21r5nuxV712NKrGP3R5HQb+utHNUGhnODadL6I
+         0Z1hSsPFUQK6JUWI2sIRJXMWs8GOLZDE2OpVTPRT/hlkSmVEsApp3kYZGioI+P504OWn
+         uRbA==
+X-Forwarded-Encrypted: i=1; AJvYcCVQTSlqqp5c7luWC7qUo7632CWUnBuvp3huY2Tvd0V8e2mP5Z5fr8lQtsFJiIph/MOvG9eombF6lRfDyYBe7s4beJJfneMc
+X-Gm-Message-State: AOJu0Yx1GZHFohEl8XfHblSfVqTDFxwKHG+OM814lE0ei/JiaPPT4jLR
+	RHz8ES3dhAoptRTjgrmdRa+CvUt1YY7K7OXmflRIGMnZHawQ/6R5
+X-Google-Smtp-Source: AGHT+IElKgvG4DEAuE3HH9s9SwKtLaJZazm6R/aKbpFBOuZORQZmQPjQ4fp1pM95nHYarrckMKQQ7w==
+X-Received: by 2002:a05:6512:34ce:b0:511:4df9:1949 with SMTP id w14-20020a05651234ce00b005114df91949mr4743081lfr.41.1707340646231;
+        Wed, 07 Feb 2024 13:17:26 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWDTwB/YPnOfNHFiDtvJLqIF4uG4EBh2pupOsL26fMAhR74vCI3aJFazeDEuBZfmwU+gl/AfMC6VDiTOH2KeGRTqt7eraXf
 Received: from mishin.sarov.local (95-37-3-243.dynamic.mts-nn.ru. [95.37.3.243])
-        by smtp.gmail.com with ESMTPSA id a17-20020a056512201100b005116578916dsm316918lfb.164.2024.02.07.13.05.42
+        by smtp.gmail.com with ESMTPSA id h13-20020a0565123c8d00b0051121bedf76sm322915lfv.34.2024.02.07.13.17.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Feb 2024 13:05:43 -0800 (PST)
+        Wed, 07 Feb 2024 13:17:25 -0800 (PST)
 From: Maks Mishin <maks.mishinfz@gmail.com>
 X-Google-Original-From: Maks Mishin <maks.mishinFZ@gmail.com>
 To: Stephen Hemminger <stephen@networkplumber.org>
 Cc: Maks Mishin <maks.mishinFZ@gmail.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH] iplink: Fix descriptor leak in get_link_kind()
-Date: Thu,  8 Feb 2024 00:04:50 +0300
-Message-Id: <20240207210450.14652-1-maks.mishinFZ@gmail.com>
+Subject: [PATCH] m_action: Fix descriptor leak in get_action_kind()
+Date: Thu,  8 Feb 2024 00:16:32 +0300
+Message-Id: <20240207211632.15660-1-maks.mishinFZ@gmail.com>
 X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -86,22 +87,22 @@ Found by RASU JSC
 
 Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
 ---
- ip/iplink.c | 3 +++
+ tc/m_action.c | 3 +++
  1 file changed, 3 insertions(+)
 
-diff --git a/ip/iplink.c b/ip/iplink.c
-index 95314af5..7e31b95c 100644
---- a/ip/iplink.c
-+++ b/ip/iplink.c
-@@ -168,6 +168,9 @@ struct link_util *get_link_kind(const char *id)
+diff --git a/tc/m_action.c b/tc/m_action.c
+index 16474c56..7d18f7fa 100644
+--- a/tc/m_action.c
++++ b/tc/m_action.c
+@@ -111,6 +111,9 @@ restart_s:
  
- 	snprintf(buf, sizeof(buf), "%s_link_util", id);
- 	l = dlsym(dlh, buf);
+ 	snprintf(buf, sizeof(buf), "%s_action_util", str);
+ 	a = dlsym(dlh, buf);
 +	if (dlh != NULL)
 +		dlclose(dlh);
 +
- 	if (l == NULL)
- 		return NULL;
+ 	if (a == NULL)
+ 		goto noexist;
  
 -- 
 2.30.2
