@@ -1,215 +1,204 @@
-Return-Path: <netdev+bounces-69729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56EF084C655
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 09:37:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1DC984C65D
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 09:39:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C70AEB24AAF
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 08:37:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D76F61C24CC7
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 08:39:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33A4D20337;
-	Wed,  7 Feb 2024 08:37:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0B7920326;
+	Wed,  7 Feb 2024 08:39:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L4e1Ky6j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 554AA2031C;
-	Wed,  7 Feb 2024 08:37:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC3C208B0
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 08:39:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707295041; cv=none; b=lbBEjB1cPqrfytDZfl7+uocNcokN2FEjHHYJ5EVGC0rPg9U05okyowIB8c62BpkqaQM7kUiKoSwylOdew6rB1C7FoTuslsz7d/+rGU6WXncpJWd72zKOVVcUXbZQVmVugjNMC+LVUHWssuO4zPIzBIIPnTTgeXPruYPKNf8FROI=
+	t=1707295173; cv=none; b=rj4DJ0Q1YXhaO3KDcJgcpUo4IZzFoBc8mz0tw+SEbMnluKh7CTi7rW0Ll0OVSs8f6jipDhYQ7H4c4SpiuNsO1lHz2ZUl7tjnm95pUAngBbkIMN0vy9D80RH1+uzeFOIlJ/A3bSJ5b5B5ALCtduA5GRCXT7CG50S7i86Xno3n+z0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707295041; c=relaxed/simple;
-	bh=a62Qe+OkzOix6n4E9jvUjz3W0HHUEkc1RpP+Q3LpxWw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c5GKlivpO6wYEr8f0iHD7zUnFjLYLOoO5JZatD2c2vUdga5koPBqLEU2UzliELFPHgQ83FFBQ+quwSAKpRxu6NL3b79D3wtEKKKc3Ty5pXSDzhPy9r0Naj0iK05assYAgZfu3FkSWYuqmH8wkmAmDmJbmo3SwW2MRFSQB3+C/Dk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-56001d49cc5so347204a12.2;
-        Wed, 07 Feb 2024 00:37:19 -0800 (PST)
+	s=arc-20240116; t=1707295173; c=relaxed/simple;
+	bh=ac9WGCOPPgNEkiYYzCiJVtWgr45GmwAPXfRv3awco68=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rkyOUEjb0DBJz7VDuppnu4CuVhwT/0tnBO+aPwWUJNwtwGeXz5y1QMyzobP9WOpFwwfE90RpJZpOfkIBHLZz8XEttawMDgLdTFQ/Y8FTF7hYXN8mWRarUEzIzfyXgg9j4t6S0DTTDYrr/wTNnvpI5aPGaF2IYODeiEJAWtUIpPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L4e1Ky6j; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707295170;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZAXzbRx8bTrXW8mIoidP0h+87BdFw4xKcLSssnrU6kI=;
+	b=L4e1Ky6jhp3jBT29f84WPeXIe22+kt5BaQBFJGITZpxJRMIsM4zdpZ9vsKdkD9hW/qz+lC
+	IeQ4qDL6F465pAQ9cyvlVGSOKlq1jwaZsQUAx7/RIOM8Te8O6LV9MARs/eaA0cAaJfSUj0
+	kRaysZzk3TULt8sG9wRcro3VLX+gdyU=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-684-mKjnWYywOuWtHZCvNNDrLg-1; Wed, 07 Feb 2024 03:39:29 -0500
+X-MC-Unique: mKjnWYywOuWtHZCvNNDrLg-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a37913402a3so21297066b.2
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 00:39:29 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707295037; x=1707899837;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1707295168; x=1707899968;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=nV42hv6cpuX4brq4lqpQ5oyaSmY9OdIUk6vM2n0m8g0=;
-        b=sE/sCztlJ7hinuhaO69p45WrzCXVpM/7jNBaqR26eFVKog1XOzBi03MGNcrtJbVfIw
-         103doygm/NlziDfRbYvWLeF35caNUKik8/Eeg8j6RKDI6X0VGcPHvoS8yeb1oppzRbT+
-         blVAia9LNIbgp6VIR0gwUff0Eh/1d71D4mbdYfVjfrc84nN0moT7bZI1Lqy4TKjifNrq
-         53LJ+CLjMuBTcBz7j1TqKBvXPGIeTrEjdFKC280LZ5RDLPkoqxCuieB/NGK8o733Flwl
-         1BQ0oO46002ndksBXKG6S7B4UUjVTDR/4FC/BPx0+1BrCnyJlIoic/+7EiuSYX/4Vn+B
-         2Mkw==
-X-Gm-Message-State: AOJu0Yxoqxd5zFgLhbwodeBCD9jbJmDgCAvtsytB/fR/3mnk8YMSGJFf
-	5SId2W6q/slcKIiNo//t7BLauD0LJAMiA5iwl65VGpdmolAzboPJ
-X-Google-Smtp-Source: AGHT+IEEEiHYJI+b6scg9420GxTSMXSd3kJvcKNNLeOb4Vv2MuIamRerOxz+6A18SIElO1n0+gVhXA==
-X-Received: by 2002:a17:906:374f:b0:a38:526e:8474 with SMTP id e15-20020a170906374f00b00a38526e8474mr2051652ejc.53.1707295037337;
-        Wed, 07 Feb 2024 00:37:17 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUvTY8sR/HtRsqE/L9yipVOIltNGRzG4Qe8np0UHEstRqagfL00t06pUoKFsKa1lXeHSJzj5xZ/MRSSXBifuQa7U+4v+3V+oGq0AVsVdYFcWNRPeWlpRc1eLsO4rfrsBDs2i0+HYt/+F2VLYx9vPz9GDE5rt2jSPesi/bitJQvYkdtyPCk1duwtfW6V+0KlSzP42qbnLt0Yap4GvvgDXASIcUSluwqjjM30+oWiNZoHoqKNkDfZIm6tzBbfGSAb/XhW0ccU5w8E1wNBbxtkBod5Dv7odwtZMdv3Ct+uV0+FjwiftunLpQU/YXOg5CTrYkvLbbkD53yfVwhmggSZTh0yUicoQeBrgE4NUq2k9sjBAO5EsmqAGFRLnpreOPvDaXI4gfVs9dIIEP9FP8CPjLU0zpZwsqNTjauvgM4cNwXKxk9hDWgAwnaoU1pqfrFxVc1+eoXbF3qxjOhSaCA5BNi5eD8vdo7wkh2h0WvQQLVN8W17tKIDHRTbv+DuNOZlgiz3znUibfRAGxbvmWPFxOiX4pEgiKPSPNt8C7so95P6ILqhipBd0ZypOvL1APn+H63WdotVm5URV+6m4/VY4aLbMVxE4IHlOnUgeIftg8EFGF/2SCBrPvqu2AfM4vwFS34gegFd5+j82qtiHPGrmHBPNmqaTl22cPQvVtKN0vH631LiTC3fdlFZJ2S7pTEvWakeEACk5x/7z4G/Ouj1mVFZZB137LSJd7CDpfsMytQspLoCHgHIaZbl8Gz4tfBISm/2m7v0Sbe/V2z+kPA/FE3RpFdzbI4JNQF8d+QTt8963JazWgstE5SHtSLCb6uoZnbPeKB5ZKz4yVrjddLdXe+ibCgpNYuoc25hSVEvpxGPsSkZiZjlLG0faY6gj668aeGxZUAWknOIjHFVVhZClGWSQriaDecrUS6ylgJPhIHCR12WX8NdGc/ykrQo8CXIxZnG31
- BcOpdNKX1o5konwmyF7CZdb1N15is2MgkZ6gVIbWKEznktg3uaHQ==
-Received: from ?IPV6:2a0b:e7c0:0:107::aaaa:59? ([2a0b:e7c0:0:107::aaaa:59])
-        by smtp.gmail.com with ESMTPSA id gs11-20020a170906f18b00b00a371037a42bsm489672ejb.208.2024.02.07.00.37.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Feb 2024 00:37:16 -0800 (PST)
-Message-ID: <ec9791cf-d0a2-4d75-a7d6-00bcab92e823@kernel.org>
-Date: Wed, 7 Feb 2024 09:37:14 +0100
+        bh=ZAXzbRx8bTrXW8mIoidP0h+87BdFw4xKcLSssnrU6kI=;
+        b=YIjpFG8MVQK7rknjR5aEa7sU2RnVpvGwWkvqyvAwMBEKhX0Z8WitC92ZxkR+DQ8qs4
+         4xJIYcbbJrOZXkba17bd9d6UGGVXpvHP3J/VjZF5iEOeAfManx1cVoHBYnaHFeUZtQCp
+         p7Hoq5x3ClDR39Tc+IjhqL9Ux2P+oQn1/hDDDR5ltDvDncMz4mXaQMY8nYd/ydxNGQKs
+         hkFPeE3hdaRUDeEJ0B3pUKMYTf5hP/OVih2qNU9Z/Fe2ThG9bgyCJ1xBdRLOYiti788V
+         L2ycQY/SqZ07rngqTpNGFmBDWAOAQ7RLPW7a7Y6x8LgXuE45dX5q1nT6QUvR3+sLgmkB
+         YYkA==
+X-Forwarded-Encrypted: i=1; AJvYcCUfWCLErBiwT2eo0ssak9a3ggyyeyiszs1e36iFtN4tA4kgoFXT9kbXBSrPGahtYl2CDMIFGuGckW2dFaeZWB+K5iLy4iCU
+X-Gm-Message-State: AOJu0YxNLxpGzZ/KrwGWKyBSDWfu+g0GJtibh7ATDOZg5a/Gxng6iK68
+	KDf7oMox9Dvh3FNmPwk0HQXy9MxgxTM7kOhAekhGibXvKOAKLttLfjtlNBjwTG2igh2VlEk77kG
+	r5B3PrftijSV7OakZl0Tm1PSsjX5xGGHwHIsG1UCdvPMtq3tVC4LIJw==
+X-Received: by 2002:a05:6402:5154:b0:560:5fbb:a148 with SMTP id n20-20020a056402515400b005605fbba148mr3754134edd.39.1707295168124;
+        Wed, 07 Feb 2024 00:39:28 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH2NsvT4sc6tbDBunK98s9BxDYPuRaNGFxjLy/cDFmkZ9+vFiimAUV20Le1jH9Jq916ADH4gw==
+X-Received: by 2002:a05:6402:5154:b0:560:5fbb:a148 with SMTP id n20-20020a056402515400b005605fbba148mr3754124edd.39.1707295167716;
+        Wed, 07 Feb 2024 00:39:27 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXmXD5gssWICrqVD4rXZExDudFbZYFR2RZeq+rMKAk4PNSqGJyVYi6dsTVcI41S1tFy7j/DSDMaVpAcS9U7JjFFrFdzxKjDIdVHlAXE6d4jIuNlpUNS+z/cs4AWYEg6ZJg9Zu+TQlheXCLTqcQkGgHV16qh2Thea3iaajmeXxbjQPhbXP68udVDcEOvSjb3S+jS6lJYMv6Uef0o/GdexErkRX7VNSNlJ9v8KyxR1BgFmBCJYoHi7E38rkAbeqhN7wHPNwm8f4vmtyF+G+2TrI7oBd8KtDmTS+ITz7MV45g6hA==
+Received: from sgarzare-redhat (host-87-12-25-87.business.telecomitalia.it. [87.12.25.87])
+        by smtp.gmail.com with ESMTPSA id 15-20020a0564021f4f00b00560622cd10fsm424307edz.68.2024.02.07.00.39.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Feb 2024 00:39:27 -0800 (PST)
+Date: Wed, 7 Feb 2024 09:39:23 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux.dev, 
+	Shannon Nelson <shannon.nelson@amd.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Zhu Lingshan <lingshan.zhu@intel.com>
+Subject: Re: Re: [PATCH] vhost-vdpa: fail enabling virtqueue in certain
+ conditions
+Message-ID: <wixps4w7rnbd67t5is6wtqvuw7e3waat4no3embl3vnjimtxvz@pemiyojtmunz>
+References: <20240206145154.118044-1-sgarzare@redhat.com>
+ <CACGkMEs-FAz7Xv7j6k3grq97q9qO18Em2bLDS4qBaCDZS7+gbQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 4/4] eventpoll: Add epoll ioctl for
- epoll_params
-Content-Language: en-US
-To: Joe Damato <jdamato@fastly.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: chuck.lever@oracle.com, jlayton@kernel.org, linux-api@vger.kernel.org,
- brauner@kernel.org, edumazet@google.com, davem@davemloft.net,
- alexander.duyck@gmail.com, sridhar.samudrala@intel.com, kuba@kernel.org,
- willemdebruijn.kernel@gmail.com, weiwan@google.com, David.Laight@ACULAB.COM,
- arnd@arndb.de, sdf@google.com, amritha.nambiar@intel.com,
- Jonathan Corbet <corbet@lwn.net>, Alexander Viro <viro@zeniv.linux.org.uk>,
- Jan Kara <jack@suse.cz>, Nathan Lynch <nathanl@linux.ibm.com>,
- Michael Ellerman <mpe@ellerman.id.au>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Namjae Jeon <linkinjeon@kernel.org>, Steve French <stfrench@microsoft.com>,
- Thomas Zimmermann <tzimmermann@suse.de>, Julien Panis <jpanis@baylibre.com>,
- Andrew Waterman <waterman@eecs.berkeley.edu>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- "open list:FILESYSTEMS (VFS and infrastructure)"
- <linux-fsdevel@vger.kernel.org>
-References: <20240205210453.11301-1-jdamato@fastly.com>
- <20240205210453.11301-5-jdamato@fastly.com>
-From: Jiri Slaby <jirislaby@kernel.org>
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <20240205210453.11301-5-jdamato@fastly.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEs-FAz7Xv7j6k3grq97q9qO18Em2bLDS4qBaCDZS7+gbQ@mail.gmail.com>
 
-On 05. 02. 24, 22:04, Joe Damato wrote:
-> Add an ioctl for getting and setting epoll_params. User programs can use
-> this ioctl to get and set the busy poll usec time, packet budget, and
-> prefer busy poll params for a specific epoll context.
-> 
-> Parameters are limited:
->    - busy_poll_usecs is limited to <= u32_max
->    - busy_poll_budget is limited to <= NAPI_POLL_WEIGHT by unprivileged
->      users (!capable(CAP_NET_ADMIN))
->    - prefer_busy_poll must be 0 or 1
->    - __pad must be 0
-> 
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-...
-> --- a/fs/eventpoll.c
-> +++ b/fs/eventpoll.c
-...
-> @@ -497,6 +498,50 @@ static inline void ep_set_busy_poll_napi_id(struct epitem *epi)
->   	ep->napi_id = napi_id;
->   }
->   
-> +static long ep_eventpoll_bp_ioctl(struct file *file, unsigned int cmd,
-> +				  unsigned long arg)
-> +{
-> +	struct eventpoll *ep;
-> +	struct epoll_params epoll_params;
-> +	void __user *uarg = (void __user *) arg;
-> +
-> +	ep = file->private_data;
+On Wed, Feb 07, 2024 at 11:27:14AM +0800, Jason Wang wrote:
+>On Tue, Feb 6, 2024 at 10:52 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>
+>> If VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK is not negotiated, we expect
+>> the driver to enable virtqueue before setting DRIVER_OK. If the driver
+>> tries anyway, better to fail right away as soon as we get the ioctl.
+>> Let's also update the documentation to make it clearer.
+>>
+>> We had a problem in QEMU for not meeting this requirement, see
+>> https://lore.kernel.org/qemu-devel/20240202132521.32714-1-kwolf@redhat.com/
+>
+>Maybe it's better to only enable cvq when the backend supports
+>VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK. Eugenio, any comment on this?
+>
+>>
+>> Fixes: 9f09fd6171fe ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature")
+>> Cc: eperezma@redhat.com
+>> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
+>> ---
+>>  include/uapi/linux/vhost_types.h | 3 ++-
+>>  drivers/vhost/vdpa.c             | 4 ++++
+>>  2 files changed, 6 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
+>> index d7656908f730..5df49b6021a7 100644
+>> --- a/include/uapi/linux/vhost_types.h
+>> +++ b/include/uapi/linux/vhost_types.h
+>> @@ -182,7 +182,8 @@ struct vhost_vdpa_iova_range {
+>>  /* Device can be resumed */
+>>  #define VHOST_BACKEND_F_RESUME  0x5
+>>  /* Device supports the driver enabling virtqueues both before and after
+>> - * DRIVER_OK
+>> + * DRIVER_OK. If this feature is not negotiated, the virtqueues must be
+>> + * enabled before setting DRIVER_OK.
+>>   */
+>>  #define VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK  0x6
+>>  /* Device may expose the virtqueue's descriptor area, driver area and
+>> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+>> index bc4a51e4638b..1fba305ba8c1 100644
+>> --- a/drivers/vhost/vdpa.c
+>> +++ b/drivers/vhost/vdpa.c
+>> @@ -651,6 +651,10 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
+>>         case VHOST_VDPA_SET_VRING_ENABLE:
+>>                 if (copy_from_user(&s, argp, sizeof(s)))
+>>                         return -EFAULT;
+>> +               if (!vhost_backend_has_feature(vq,
+>> +                       VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK) &&
+>> +                   (ops->get_status(vdpa) & VIRTIO_CONFIG_S_DRIVER_OK))
+>> +                       return -EINVAL;
+>
+>As discussed, without VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK, we don't
+>know if parents can do vq_ready after driver_ok.
+>
+>So maybe we need to keep this behaviour to unbreak some "legacy" userspace?
 
-This might have been on the ep declaration line.
+I'm not sure it's a good idea, since "legacy" userspace are currently 
+broken if used with VDUSE device. So we need to fix userspace in any 
+case, and IMHO is better if we start to return an error, so the user 
+understands what went wrong, because the problem in QEMU took us quite 
+some time to figure out that we couldn't enable vq after DRIVER_OK.
 
-> +	switch (cmd) {
-> +	case EPIOCSPARAMS:
-> +		if (copy_from_user(&epoll_params, uarg, sizeof(epoll_params)))
-> +			return -EFAULT;
-> +
-> +		if (memchr_inv(epoll_params.__pad, 0, sizeof(epoll_params.__pad)))
-> +			return -EINVAL;
-> +
-> +		if (epoll_params.busy_poll_usecs > U32_MAX)
-> +			return -EINVAL;
-> +
-> +		if (epoll_params.prefer_busy_poll > 1)
-> +			return -EINVAL;
-> +
-> +		if (epoll_params.busy_poll_budget > NAPI_POLL_WEIGHT &&
-> +		    !capable(CAP_NET_ADMIN))
-> +			return -EPERM;
-> +
-> +		ep->busy_poll_usecs = epoll_params.busy_poll_usecs;
-> +		ep->busy_poll_budget = epoll_params.busy_poll_budget;
-> +		ep->prefer_busy_poll = !!epoll_params.prefer_busy_poll;
+Since userspace is unable to understand if a vhost-vdpa device is VDUSE 
+or not, I think we have only 2 options either merge this patch or fix 
+VDUSE somehow. But the last one I think is more complicated/intrusive.
 
-This !! is unnecessary. Nonzero values shall be "converted" to true.
+Thanks,
+Stefano
 
-But FWIW, the above is nothing which should be blocking, so:
-
-Reviewed-by: Jiri Slaby <jirislaby@kernel.org>
-
-> +		return 0;
-> +	case EPIOCGPARAMS:
-> +		memset(&epoll_params, 0, sizeof(epoll_params));
-> +		epoll_params.busy_poll_usecs = ep->busy_poll_usecs;
-> +		epoll_params.busy_poll_budget = ep->busy_poll_budget;
-> +		epoll_params.prefer_busy_poll = ep->prefer_busy_poll;
-> +		if (copy_to_user(uarg, &epoll_params, sizeof(epoll_params)))
-> +			return -EFAULT;
-> +		return 0;
-> +	default:
-> +		return -ENOIOCTLCMD;
-> +	}
-> +}
-...
-thanks,
--- 
-js
-suse labs
+>
+>For example ifcvf did:
+>
+>static void ifcvf_vdpa_set_vq_ready(struct vdpa_device *vdpa_dev,
+>                                    u16 qid, bool ready)
+>{
+>  struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
+>
+>        ifcvf_set_vq_ready(vf, qid, ready);
+>}
+>
+>And it did:
+>
+>void ifcvf_set_vq_ready(struct ifcvf_hw *hw, u16 qid, bool ready)
+>{
+>        struct virtio_pci_common_cfg __iomem *cfg = hw->common_cfg;
+>
+>        vp_iowrite16(qid, &cfg->queue_select);
+>        vp_iowrite16(ready, &cfg->queue_enable);
+>}
+>
+>Though it didn't advertise VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK?
+>
+>Adding LingShan for more thought.
+>
+>Thanks
+>
+>>                 ops->set_vq_ready(vdpa, idx, s.num);
+>>                 return 0;
+>>         case VHOST_VDPA_GET_VRING_GROUP:
+>> --
+>> 2.43.0
+>>
+>
 
 
