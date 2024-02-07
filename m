@@ -1,148 +1,254 @@
-Return-Path: <netdev+bounces-69961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D47F84D233
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 20:23:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1AB384D23B
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 20:29:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A9DC1C224ED
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 19:23:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08787B25C8A
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 19:29:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 071BE85641;
-	Wed,  7 Feb 2024 19:23:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D621A8289E;
+	Wed,  7 Feb 2024 19:29:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UePaxCxa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XjbbicFK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56D5C7F7FC;
-	Wed,  7 Feb 2024 19:23:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 229A585946
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 19:29:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707333787; cv=none; b=LuYN82KHgABR0nYD+1nu+MVmMSiIa+OasWiDCAReDq4fIlS1ARJe+huOohkOQwzfgmqn9uGmkAVSfqUkeDkH3wnkywP3JKAVxUigeIVJEpXAAlGL/0MoMkYtUaiJLgA9r/58yRyHBed5RQfAcZPLRO4DX5oeWOeY/7NdTDi7MsA=
+	t=1707334183; cv=none; b=HksCA0uH3r3abNdlGAcvuMrkXGSOdXZVsevWO27SrWpWhm8GG6Yq6UX3CbrJyOQUPAsUVCX1YOLkWpzaA/oO1G1uR0oIOIVqw7JPf/TnTT6cDPkxEnGmRun2N6Z7rjh/PTvTBhRcnvKXEx6Nz05oBKSxhNyTJ9TYHn5b9aH0TLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707333787; c=relaxed/simple;
-	bh=46cdCkZUfEb61wP23W0zdofoxTmaW/ZSbVVjq/XPmp8=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=u2lXh/2kN67moXV/vuPRdeYNb+tzJs9CsuZR7n8JlE1gS48AMuY8Fww75ekfeHieC05cTHSwAGXZJF7mpYdDHQnVtKwDW45uYoW82nJMXWhiacAczLm/ZIDc+ulGMdvvlXDAgrCyztDYV9vAo9pmC1f4KcxORLrOrBNZTmzIuTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UePaxCxa; arc=none smtp.client-ip=209.85.208.43
+	s=arc-20240116; t=1707334183; c=relaxed/simple;
+	bh=ElOWcIrt0UyCHpk3MBgPtwnB8cW37tSV/hPiRcs54TI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mIB/MsKIwCxsD4qB57AAairT76kSfIUvyt4we/FUf5SK7os+Cb9TGo/kHJsXg1hG4Sda7ZA5TJ4eYvmgFRvk8t3Yw8WPYY/nBSp6xfL6LwjdyZX82UHjcpwUUBn57jt1o+ngvTkUPdjZQqAMpB7M9YLK2Xr0bGfj00roTN92L0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XjbbicFK; arc=none smtp.client-ip=209.85.128.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5600c43caddso1053817a12.2;
-        Wed, 07 Feb 2024 11:23:06 -0800 (PST)
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-60487b4ba0eso10440747b3.2
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 11:29:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707333784; x=1707938584; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=zPLawAZmVpSkl4t0aQX4pq2PhjmmXTupRhpu+j87PvE=;
-        b=UePaxCxaYc2blLgOHPJfws35S+LiqkEtiZVvcEAYz/DxtIZPuQOybyrcHusdBMfIOQ
-         Nx/JS05v5n3Bfyh3NDLU2IkvSgN8FKLGmTyAgfTaDciqH778iv9fJ8WddDJYNurJpa25
-         VC7JgDLLFPSdwfjiTDpJwT9sSPgvgZvA3zoVXS2TfwleoEHHRirWBYSwHY6VDrCWLdlm
-         klOxEhHFM7t1bl+edJni8O8WrqTCBAf63EFQE3agoUgxDrkaXcKvK/fm8N/ibGFXAlvl
-         CENkh/q9W8EO5OSJoYHcQe0CatfRGEcN72JrJjc9mYdu6LgnBy78o4K7vB4Hh0DIiRid
-         uRdw==
+        d=gmail.com; s=20230601; t=1707334181; x=1707938981; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5oyJ9kVKQh7P3q/AstK3yPZ0I8rhSqVsWgyYHWLwLFk=;
+        b=XjbbicFKM3Fn3taimEmYerxyTCKLvkjbiBqEQjyfWoLwFGK6VLXGMf5z/cmnhOZwzB
+         mohnCKsehMD+29OQ/BlHQTMaVjmA6PJ1r7dCPby0ecV68MSF/f6taippCZsLBWDe+kI1
+         rOjdbqbmlFMQuwBet3HwopsxvxurfiRik9r7nRftcHDhTvTXK96mEemVCpzwu/biMp3i
+         DxPinldJFxPdNnRzeiiakb4OP3Ab++hhgNHyggirl3lPBKpaViYez7ay3YA4in89FMUI
+         tqh+w4H2tAGimiXIzPlz64qzZ+zc0bDLCCg0diwWgfJAdErhafinA8OooeMZoMmCgXOd
+         XyvQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707333784; x=1707938584;
-        h=content-transfer-encoding:in-reply-to:references:cc:to:from
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zPLawAZmVpSkl4t0aQX4pq2PhjmmXTupRhpu+j87PvE=;
-        b=U6uc+6XkuVlU8dxwJsavf4dFBAiBlwgSg3DL09T0IQR5GmV+KJcJ9XbzornDNrEJfD
-         /beyl5BAYqKUvIh1iJ5coOQSSetzQKl5YfvP44Yqcm9wMVUM25O/77vj3vXHxcfb8qal
-         o6AzwGE4seGmFqd4+HBSxT6VuhCbWKjYLnHFXPR8YajUgK+wUMxP0Rkva1RyzjCOuX5/
-         nFgYsO8N6pj0DSPtW0Jt+0uQF3D5J7d5LfyN+npxx0PnAV9jpFHGnR/F79S8RHxg+FOT
-         5TMCql1Q+GBoHgZzXViQE/u+obQme/BAJZzgZgtEDwmYLeGQIQk3rnGyjqdhTdsYuaqz
-         z4Ew==
-X-Forwarded-Encrypted: i=1; AJvYcCW24CiUK2K/6uusEiOIgqfb8AzYgS7tUw8/SOzUM9ZbFAEToYYBGIeFyTvl3pifY+IqsgIF0a0QsOHU58aAC7UQ7MKRcRgFI8k97cCSAKDR160ba9DSzMM18xW55InBHDLP3Q==
-X-Gm-Message-State: AOJu0YzdCIXcZAtQ5Kh09yN83Y1KF7UaqJ6Tjzckx5R+PLZcPaCno4sp
-	vHwfwX1RXPW4Zaewt/Tjm+lk3+X8Af/YlmGpRKvPvxZ4Llki6G2r
-X-Google-Smtp-Source: AGHT+IE6TAJIcDK541gPd6MtddPZPWrFvF2wMqpK9XL9q+/zJdZJYMuLV8KP4nAKolOWsZ2+6n7SMA==
-X-Received: by 2002:aa7:c317:0:b0:560:c8cb:c2c8 with SMTP id l23-20020aa7c317000000b00560c8cbc2c8mr2469327edq.11.1707333784149;
-        Wed, 07 Feb 2024 11:23:04 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVuAkCPXmFoLUssf9rSApGtG4jI/41Vj3mG1COcq4oIj8rPv06LXT5DaIpdnVKErdTG1h+pBIBAEuP1Fa1aPGSLkBV6ZoScAvnDPgdXvCsDIgGh/ZQ9ESVrML3Bm59d7Gnv9PnyZPdi9TkuVzXONea1TPqOG9euhvh0ekw7J9FaKW0ISwxCwJsXr8EnabDvPCqbhKU20yeHe+cBA5NhSKimoI3SDy/4Ig7WkNistpPmrGQI8LD+bRrtZnVJ/ByDidqrqPmYuKQV7vowf/7rCjTORG4DMBzkAMBKwDOjC2aQb3Wtl1Y/gOamUclgwHSW72quMlRLV9Rleb0owlKiuTbRoRMnCXLWPalk3OQi1TGfGfWpZZDNREkA7VKlyHGA5zMtWyf/s4oikEYwAv8ldmbZQsPGaElsGlfS0NVJkVTom7LTBUSRe760OSubvvcUICFGZEsWpYsFinbN3tz9dv6W3gJQ8GizTAouu90yM3odYp5xfIf3+e9bZfzvdMXyenC/k0jDyLGk/lybYlAlsfgCGubSKKXa10YYd/I5D8bJMff0Ve63Ce8IfwpwaOhIHg==
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id n24-20020aa7c698000000b0056023efc5besm14829edq.53.2024.02.07.11.23.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 07 Feb 2024 11:23:02 -0800 (PST)
-Message-ID: <f3f811f8-07cd-416c-ad30-b6db42a78b03@gmail.com>
-Date: Wed, 7 Feb 2024 20:23:00 +0100
+        d=1e100.net; s=20230601; t=1707334181; x=1707938981;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5oyJ9kVKQh7P3q/AstK3yPZ0I8rhSqVsWgyYHWLwLFk=;
+        b=SZefM5r1dfCrMMN6+JIrKW+m8Q+oRZaoiCAUrmHxt/zOCLbc9Ewtc37wfYuYu6hIJH
+         8YvgT85Fv7C+hyy0z5LB++hqqP05H4P0NqkcUjXtGXtTHFlo4NTSe13W2UNFByKKN5yQ
+         60unEcqVytrCr89vIMYZoaBPw+DT6HRzvGdiONTnMH7LJck7Ok8ZsULZbphRaOLThtMP
+         MokOhTOFhoK0MSCnaIZIHecngxOw68pvuvAqC0aOT4gwprKB1atnKPv4aKO2o6xPko7W
+         GjP1em7u7rmnQpGPJhSMePJnnztpyehJv6ttHzmxFEe+cIRaNrk9Qnkk1XrQ8UGLGPoO
+         gfag==
+X-Gm-Message-State: AOJu0YwIAjLER8960qxyQL5TQGv5HraMwoGMWKQiB+M5En8YMyWBft7k
+	4pur4KzxxKD+vtaFex70Tn/Pfb4s/T0APk2HbJqwLIkQ2059XFv3b2hfdiTo
+X-Google-Smtp-Source: AGHT+IEscltbBwNUf4cIJsP6PbWHdcKaAt8ToOQjs/W0RljIhvwyiekRx/Fu8hY+RtQCBZgxzfJOSA==
+X-Received: by 2002:a81:82c2:0:b0:5f5:bdef:748b with SMTP id s185-20020a8182c2000000b005f5bdef748bmr6754970ywf.47.1707334180673;
+        Wed, 07 Feb 2024 11:29:40 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVXFJu4i0vpVsDyGLqe05KsFjpoqywX6dla/OUENHgLJyJWGVh/r5IHLfcFHtIG1mGudHskjxeQ8x6P0o6ahOJjtNtTDb1f+giT1fVIYcQx8QWSJ3PxD6ppXsQV0Cq/pQUWNcZj4CIbNFnFmH7trSMWqJogz4rrY4trXc9GNHk6HxEhV1cd/V3xJtjdH/HaNVdo4oJ/VhNIIWIJm+MJ5VkTCGE2+S7JJ8FWu9qwhraZ2LVXQysi8lns/Da4fvtPksaVD6Mvw+DKoULJswNamqDuGQ+NryxrqUUF7MdY9N87EQT4N1NvXtxLkV/25OGjkGuqes4+k9mjYhTo4dcWRllZBG3Rkc1pjk+y5A==
+Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:50ba:b8f8:e3dd:4d24])
+        by smtp.gmail.com with ESMTPSA id cn33-20020a05690c0d2100b006040cbbe952sm380088ywb.89.2024.02.07.11.29.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Feb 2024 11:29:40 -0800 (PST)
+From: thinker.li@gmail.com
+To: netdev@vger.kernel.org,
+	ast@kernel.org,
+	martin.lau@linux.dev,
+	kernel-team@meta.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	liuhangbin@gmail.com
+Cc: sinquersw@gmail.com,
+	kuifeng@meta.com,
+	Kui-Feng Lee <thinker.li@gmail.com>
+Subject: [PATCH net-next v5 0/5] Remove expired routes with a separated list of routes.
+Date: Wed,  7 Feb 2024 11:29:28 -0800
+Message-Id: <20240207192933.441744-1-thinker.li@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: phy: air_en8811h: Add the Airoha
- EN8811H PHY driver
-Content-Language: en-US
-From: Eric Woudstra <ericwouds@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Frank Wunderlich <frank-w@public-files.de>,
- Daniel Golle <daniel@makrotopia.org>, Lucien Jheng
- <lucien.jheng@airoha.com>, Zhi-Jun You <hujy652@protonmail.com>,
- netdev@vger.kernel.org, devicetree@vger.kernel.org
-References: <20240206194751.1901802-1-ericwouds@gmail.com>
- <20240206194751.1901802-3-ericwouds@gmail.com>
- <ZcLGkmavpBAN02xq@shell.armlinux.org.uk>
- <32897bd5-4b53-4280-a5c0-5765cfe5b7d6@gmail.com>
-In-Reply-To: <32897bd5-4b53-4280-a5c0-5765cfe5b7d6@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-Hi Russell,
+From: Kui-Feng Lee <thinker.li@gmail.com>
 
->> Searching the driver for "air_buckpbus_reg_read", there are four
->> instances where you read-modify-write, and only one instance which is
->> just a read.
->>
->> I wonder whether it would make more sense to structure the accessors as
->>
->> 	__air_buckpbus_set_address(phydev, addr)
->> 	__air_buckpbus_read(phydev, *data)
->> 	__air_buckpbus_write(phydev, data)
->>
->> which would make implementing reg_read, reg_write and reg_modify()
->> easier, and the addition of reg_modify() means that (a) there are less
->> bus cycles (through having to set the address twice) and (b) ensures
->> that the read-modify-write can be done atomically on the bus. This
->> assumes that reading data doesn't auto-increment the address (which
->> you would need to check.)
-> 
-> I will see if I can change the code to:
-> 
->         __air_buckpbus_set_address(phydev, addr)
->         __air_buckpbus_read(phydev, *data)
->         __air_buckpbus_write(phydev, data)
->         air_buckpbus_reg_read()
->         air_buckpbus_reg_write()
->         air_buckpbus_reg_modify()
-> 
-> While not changing (except if (saved_page >= 0)):
-> 
->         __air_write_buf()
->         air_write_buf()
-> 
+This patchset is resent due to previous reverting. [1]
 
-I just remember, the address register for write, is a different
-register from the address register for read. So we always have
-to write to address registers twice.
+FIB6 GC walks trees of fib6_tables to remove expired routes. Walking a tree
+can be expensive if the number of routes in a table is big, even if most of
+them are permanent. Checking routes in a separated list of routes having
+expiration will avoid this potential issue.
 
-I can still implement an atomic air_buckpbus_reg_modify() though.
+Background
+==========
 
-Best regards,
+The size of a Linux IPv6 routing table can become a big problem if not
+managed appropriately.  Now, Linux has a garbage collector to remove
+expired routes periodically.  However, this may lead to a situation in
+which the routing path is blocked for a long period due to an
+excessive number of routes.
 
-Eric Woudstra
+For example, years ago, there is a commit c7bb4b89033b ("ipv6: tcp:
+drop silly ICMPv6 packet too big messages").  The root cause is that
+malicious ICMPv6 packets were sent back for every small packet sent to
+them. These packets add routes with an expiration time that prompts
+the GC to periodically check all routes in the tables, including
+permanent ones.
+
+Why Route Expires
+=================
+
+Users can add IPv6 routes with an expiration time manually. However,
+the Neighbor Discovery protocol may also generate routes that can
+expire.  For example, Router Advertisement (RA) messages may create a
+default route with an expiration time. [RFC 4861] For IPv4, it is not
+possible to set an expiration time for a route, and there is no RA, so
+there is no need to worry about such issues.
+
+Create Routes with Expires
+==========================
+
+You can create routes with expires with the  command.
+
+For example,
+
+    ip -6 route add 2001:b000:591::3 via fe80::5054:ff:fe12:3457 \
+        dev enp0s3 expires 30
+
+The route that has been generated will be deleted automatically in 30
+seconds.
+
+GC of FIB6
+==========
+
+The function called fib6_run_gc() is responsible for performing
+garbage collection (GC) for the Linux IPv6 stack. It checks for the
+expiration of every route by traversing the trees of routing
+tables. The time taken to traverse a routing table increases with its
+size. Holding the routing table lock during traversal is particularly
+undesirable. Therefore, it is preferable to keep the lock for the
+shortest possible duration.
+
+Solution
+========
+
+The cause of the issue is keeping the routing table locked during the
+traversal of large trees. To solve this problem, we can create a separate
+list of routes that have expiration. This will prevent GC from checking
+permanent routes.
+
+Result
+======
+
+We conducted a test to measure the execution times of fib6_gc_timer_cb()
+and observed that it enhances the GC of FIB6. During the test, we added
+permanent routes with the following numbers: 1000, 3000, 6000, and
+9000. Additionally, we added a route with an expiration time.
+
+Here are the average execution times for the kernel without the patch.
+ - 120020 ns with 1000 permanent routes
+ - 308920 ns with 3000 ...
+ - 581470 ns with 6000 ...
+ - 855310 ns with 9000 ...
+
+The kernel with the patch consistently takes around 14000 ns to execute,
+regardless of the number of permanent routes that are installed.
+
+Major changes from v4:
+
+ - Fix the comment of fib6_add_gc_list().
+
+Major changes from v3:
+
+ - Move the checks of f6i->fib6_node to fib6_add_gc_list().
+
+ - Make spin_lock_bh() and spin_unlock_bh() stands out.
+
+ - Explain the reason of the changes in the commit message of the
+   patch 4.
+
+Major changes from v2:
+
+ - Refactory the boilerplate checks in the test case.
+
+   - check_rt_num() and check_rt_num_clean()
+
+Major changes from v1:
+
+ - Reduce the numbers of routes (5) in the test cases to work with
+   slow environments. Due to the failure on patchwork.
+
+ - Remove systemd related commands in the test case.
+
+Major changes from the previous patchset [2]:
+
+ - Split helpers.
+
+   - fib6_set_expires() -> fib6_set_expires() and fib6_add_gc_list().
+
+   - fib6_clean_expires() -> fib6_clean_expires() and
+     fib6_remove_gc_list().
+
+ - Fix rt6_add_dflt_router() to avoid racing of setting expires.
+
+ - Remove unnecessary calling to fib6_clean_expires() in
+   ip6_route_info_create().
+
+ - Add test cases of toggling routes between permanent and temporary
+   and handling routes from RA messages.
+
+   - Clean up routes by deleting the existing device and adding a new
+     one.
+
+ - Fix a potential issue in modify_prefix_route().
+
+---
+[1] https://lore.kernel.org/all/20231219030243.25687-1-dsahern@kernel.org/
+[2] https://lore.kernel.org/all/20230815180706.772638-1-thinker.li@gmail.com/
+v1: https://lore.kernel.org/all/20240131064041.3445212-1-thinker.li@gmail.com/
+v2: https://lore.kernel.org/all/20240201082024.1018011-1-thinker.li@gmail.com/
+v3: https://lore.kernel.org/all/20240202082200.227031-1-thinker.li@gmail.com/
+v4: https://lore.kernel.org/all/20240205214033.937814-1-thinker.li@gmail.com/
+
+Kui-Feng Lee (5):
+  net/ipv6: set expires in rt6_add_dflt_router().
+  net/ipv6: Remove unnecessary clean.
+  net/ipv6: Remove expired routes with a separated list of routes.
+  net/ipv6: set expires in modify_prefix_route() if RTF_EXPIRES is set.
+  selftests/net: Adding test cases of replacing routes and route
+    advertisements.
+
+ include/net/ip6_fib.h                    |  46 ++++++-
+ include/net/ip6_route.h                  |   3 +-
+ net/ipv6/addrconf.c                      |  41 +++++--
+ net/ipv6/ip6_fib.c                       |  60 ++++++++-
+ net/ipv6/ndisc.c                         |  13 +-
+ net/ipv6/route.c                         |  19 ++-
+ tools/testing/selftests/net/fib_tests.sh | 148 +++++++++++++++++++----
+ 7 files changed, 287 insertions(+), 43 deletions(-)
+
+-- 
+2.34.1
+
 
