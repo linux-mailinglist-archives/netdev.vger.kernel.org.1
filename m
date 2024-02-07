@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-69807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D36E84CA84
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 13:11:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC6D284CA87
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 13:12:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33816291581
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 12:11:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF5971C23FDA
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 12:12:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0394E5BAC8;
-	Wed,  7 Feb 2024 12:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C958B5C5F2;
+	Wed,  7 Feb 2024 12:08:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="ov5mgB4g"
+	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="dQPdc6pF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E34E25C5F2
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 12:07:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0CCE5CDD0
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 12:07:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707307679; cv=none; b=g+uFwibt+KI+xTfTMUTnNxWxoP9O/VCBBxutGr1rbq7CFchLd3aMHbsTJ0pZezf5NYJXjr/+eT36OCEDZv6EviwpZRvgLyU54djUNW+9wJqEkfZoNnFHVTDCfynfXeJVjUpzf+kqFO87eg9NM0AtHg5QPitz7b47aLARRjq4rE8=
+	t=1707307681; cv=none; b=i8JaeRAHMYIVOgkqmBtlp7MkDolT6G+PUmvwpv19IrBtSPKQvz2I/ZZQUrTKu+/UlNOsvwCMKQ4/N7f1MOvQb5DaPjZ5zh2TmYw7rjykH8avcta/RU/Jna+zphobD4gcqpmobljOdfUEAZBZAbdYG4JRTwtloukM/4kDqatvYYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707307679; c=relaxed/simple;
-	bh=F9b6vWTtJjoroXcTR8WWfJ3XK0LPvKUUjYgH6P43a3A=;
+	s=arc-20240116; t=1707307681; c=relaxed/simple;
+	bh=8myFEFdHxubvxUdidyiyBKUjeNFZRh73aQh+IGE32GI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Nf/afDxFkTEBJlu7rT0hOSn8ySoe3Jw1t2sM8PWh54hRKDWcDkk05mqUJqYcj1WLESsAfSUn06NhIUoMFQlhPaxddnT6F5hWCVuAoOjPmoDCoaLF8R8poZpPjiXIfqY4otFwAT0dDgQt1/LweJkIFZU7m1qYKPh/vBV9x4eV+yQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=ov5mgB4g; arc=none smtp.client-ip=209.85.128.41
+	 MIME-Version; b=NI3kDCpgIdVBxvkLNvMlfCDsFcNrlQI34Dg+6hEzIZBoOZIWLzDF6wJCQrGQotooacaRccyIUD3CaUKth8w8xBfKajrcLxi+4my/IhKmxN93oWnoe2CnyutfJ//oujnk0gA1vevWPDscSwXTybOtlDGOity8dSK7svbAp8n9YwI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=dQPdc6pF; arc=none smtp.client-ip=209.85.167.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-40fe59b22dbso4099075e9.3
-        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 04:07:57 -0800 (PST)
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-5101cd91017so682350e87.2
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 04:07:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1707307676; x=1707912476; darn=vger.kernel.org;
+        d=tuxon.dev; s=google; t=1707307677; x=1707912477; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eXrz4m7f0rJ3JiKSvzdX6uwlbnfuFKCWsRP1dHUwshs=;
-        b=ov5mgB4gwBWLiewhnc2EstSSHr3JGjJe0u66oBvYtPoOkSlgQIumAwvkBOsvRJWbyc
-         7LSYG8khWVtc09z6Nb9MzH/xNfhbbeOCYdYcsaDwbSH7Lpxdfs7X5GRMWiHC33hCxtxo
-         mY9zNSsmRxCUJpjeQNzBVRTdeE20HUYPbu/LYWNcRWwG2kwC3nc2qS+rNgGy1znF/i4g
-         t1kwvdyT2G6auEqp7JY0oaLiGEe9et19kWtoMedqKc1bMdIB6w/yWmh7Po1ZvjvVQcv3
-         vU1JdLRLpAGSMu0IZ3yAz5aGG9jzr1hnA8PktFJtDUvMWssIQ8S/jEllCqHTm3yU/LU/
-         ztMA==
+        bh=C9pUYyEyHMbAgMlD3we/lMOjIaBa3lJL0ER73fS7AMY=;
+        b=dQPdc6pFpR8mxpP6IFUQBHUlPt99Npd6N2zHf/xuufV6PFSkkyNFodfAJHlOfxw2uO
+         qLkITM+80amcg7IWEB2pQ9jOb1KeGwyvVCXpXS9IWztpKVir2GW+NpCut7Sq6UOGzpcs
+         G6IOzz+laYoH+GMIECBa52yGqn2cFr3C2PpG/3JHhRwA7a2wUvrZAcPsNCZDk5q4QbZJ
+         69BwEeI3f0KYMaSQSV/JXrHCdfx8AXbq1TsbHkjB6XETLoin8DSSuJFDBYpgHtG8sjb5
+         gsl6duvQMO9dYA8qLZAYrBBBLPo3PIuL7bdDEpAIpqec4uXUdbPMpRqt0dFYFLyDm9MB
+         v+Fg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707307676; x=1707912476;
+        d=1e100.net; s=20230601; t=1707307677; x=1707912477;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eXrz4m7f0rJ3JiKSvzdX6uwlbnfuFKCWsRP1dHUwshs=;
-        b=VhubHD4KK5rPpdsJOakKb8+GdkYOQk2lap9LVROULRz8vNtoqcZRNckRKwo/EpVnNm
-         Q1fV4yVwjNZhZIpZ+S2xMJRfsBabN2yOz+tm8SFGYjppW24NZ+ppJP1NvttdoGjFcMYT
-         OAuYUveVf2S+53xnecMGlMtLyDmR3T/T7ad9Sm1WWQ4kDh/T2v9XK1haeVYk2gRPTJXw
-         MVfLYg1POjqNLmVvdfbpoU8SNpT9AQ2/SwAv+3uCENTLr7dm27gHzlLpwFvGVoyu8Jxe
-         ESsjNprq1pQ632P1Xk4Be7TIHxpevX45pzMTMrEpMcJ8c0EwqHSaUObyt2xZHtaghnwJ
-         ULSw==
-X-Gm-Message-State: AOJu0YwrwrnwP1EtKmkFr1smLN9s9/Ge3FyZi2aEphfodUiHR2iNPzyZ
-	5Bp7EIpBXYO2GFBU9tM8lsWO+gBMG9bSD28PxRLKYRyVoi4LIEntvUzB6SrJHHs=
-X-Google-Smtp-Source: AGHT+IHqgCbrwi/B6iOm1M7wrFOpNwO6bCbtWz4pRYf8W+JVuhruT0mh9p3lHzZxaXmmCsd3Ply5JQ==
-X-Received: by 2002:a05:600c:a48:b0:40f:d3d8:c8d5 with SMTP id c8-20020a05600c0a4800b0040fd3d8c8d5mr4758685wmq.9.1707307676300;
-        Wed, 07 Feb 2024 04:07:56 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXt+qPwWfutWoTuu5m18N3VTIW5s+99Y11Ssn0X6+okgZLtO6Bc/dIi+xYQSsj5hCMdDX43+1bjs8JiZUvV8BFePNa+pPx3w6EYREmI3XiKK38+EcDl3Vs8Cr2AcjCnY2cTTWvd9g3i2p0NZuCWflQYjf85e4tRdObt7NoaZD+wzF5G8kLtioazEegYeroQMZMS4btE3XZXsgJmTwwEBE7dEbioRnTG2eho41Q7S5NHvgN/KB8dHavGhSMlGCLAQ2OKDn2dNGeFbKSuviVR3dHf/mqcblmigSyCy+cXGeerMZhoj6uXJSkoElnpWnguWhReTzB/SptjRaU=
+        bh=C9pUYyEyHMbAgMlD3we/lMOjIaBa3lJL0ER73fS7AMY=;
+        b=jBpbEO/sTjrW+0LhrCHTb17nGWbd6BA8QWonalUIMsIyMtUqDw4Dk2kPL4vJPjU+aN
+         5YfRIZLMuCgKXOJsKCnYFkpwV/p+btPhO5tKwCpRGI+SoXvG8luQtT0a0SLlShgLG4jZ
+         11EEQpUGZ7oNcGlQJFleERVcMdvaFZ7rOqDXg16amwR0pHzG/YP6n08Uzhx/QKROz3qF
+         GQO+C2PKKRFhaZrzeG3+GM48ffmPhGIlWrWIsQ4tkSK8Qo21a/sH4T4oT4g+uXm3vHap
+         0HmWsIPP0JacahIDmWqNPLvz/ClU9egmRHgsvU8X1xQmdd6QHjz2zLkcTvPGDMxiOCXF
+         mruA==
+X-Gm-Message-State: AOJu0YwbBbRyX0OdrHc8/i8iAQf/NbYCs38C6JdFp6Pn/WAK0ZMGNlBf
+	zjook8xmhsvmarIhBddxGBuJbnAHDdRGbQ0yQYGnpP1qPg6awLoZuL82B6XCZR8=
+X-Google-Smtp-Source: AGHT+IFvm2K0sydvLOZo2QG9HI63+zSNMi0XDoXWtebHAXEukgs5AmG9Z8DYNKZfDB9OPEvlqjqeww==
+X-Received: by 2002:a05:6512:3255:b0:511:4d22:dcf9 with SMTP id c21-20020a056512325500b005114d22dcf9mr3539493lfr.23.1707307677694;
+        Wed, 07 Feb 2024 04:07:57 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCW2DpxgUHQ/7TWBk9ACo+3yDy3x5MTCFX4dP3IVsi4E+2wDKnwtKNe/BK4Ao10lcIJNf/skgBkhEO3614h900nokp7v4iJMpX7RMt4jzQ3+STOWF1eCkdjFxTNiK8Ji+VPRXcQIoTM9eTyf0nbRNuKveoSYZauTJmTjRWftBa56jSj+hC/xcTc0llqbpUWXCYIONWzTKuX7gtj8C6Q0sQ8PkHNmmyKrhxdVeZ3POGJVK9+CCy6pAfsltft3TVHOX9WeIzM92AKVjCpDOAgy/+pN3dkM4bUDDaSbFArvxW+VxG9KotQwCJNLgXQkqZE4zlLJ5Y5vYxYsCfQ=
 Received: from claudiu-X670E-Pro-RS.. ([82.78.167.114])
-        by smtp.gmail.com with ESMTPSA id f2-20020a5d50c2000000b0033b4db744e5sm1363957wrt.12.2024.02.07.04.07.55
+        by smtp.gmail.com with ESMTPSA id f2-20020a5d50c2000000b0033b4db744e5sm1363957wrt.12.2024.02.07.04.07.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Feb 2024 04:07:55 -0800 (PST)
+        Wed, 07 Feb 2024 04:07:57 -0800 (PST)
 From: Claudiu <claudiu.beznea@tuxon.dev>
 X-Google-Original-From: Claudiu <claudiu.beznea.uj@bp.renesas.com>
 To: s.shtylyov@omp.ru,
@@ -79,9 +79,9 @@ Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	claudiu.beznea@tuxon.dev,
 	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-Subject: [PATCH net-next 4/5] net: ravb: Do not apply RX checksum settings to hardware if the interface is down
-Date: Wed,  7 Feb 2024 14:07:32 +0200
-Message-Id: <20240207120733.1746920-5-claudiu.beznea.uj@bp.renesas.com>
+Subject: [PATCH net-next 5/5] net: ravb: Add runtime PM support
+Date: Wed,  7 Feb 2024 14:07:33 +0200
+Message-Id: <20240207120733.1746920-6-claudiu.beznea.uj@bp.renesas.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240207120733.1746920-1-claudiu.beznea.uj@bp.renesas.com>
 References: <20240207120733.1746920-1-claudiu.beznea.uj@bp.renesas.com>
@@ -95,70 +95,207 @@ Content-Transfer-Encoding: 8bit
 
 From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-Do not apply the RX checksum settings to hardware if the interface is down.
-In case runtime PM is enabled, and while the interface is down, the IP will
-be in reset mode (as for some platforms disabling the clocks will switch
-the IP to reset mode, which will lead to losing registers content) and
-applying settings in reset mode is not an option. Instead, cache the RX
-checksum settings and apply them in ravb_open() through ravb_emac_init().
-This has been solved by introducing pm_runtime_active() check. The device
-runtime PM usage counter has been incremented to avoid disabling the device
-clocks while the check is in progress (if any).
+Add runtime PM support for the ravb driver. As the driver is used by
+different IP variants, with different behaviors, to be able to have the
+runtime PM support available for all devices, the preparatory commits
+moved all the resources parsing and allocations in the driver's probe
+function and kept the settings for ravb_open(). This is due to the fact
+that on some IP variants-platforms tuples disabling/enabling the clocks
+will switch the IP to the reset operation mode where registers' content is
+lost and reconfiguration needs to be done. For this the rabv_open()
+function enables the clocks, switches the IP to configuration mode, applies
+all the registers settings and switches the IP to the operational mode. At
+the end of ravb_open() IP is ready to send/receive data.
 
-Commit prepares for the addition of runtime PM.
+In ravb_close() necessary reverts are done (compared with ravb_open()), the
+IP is switched to reset mode and clocks are disabled.
+
+The ethtool APIs or IOCTLs that might execute while the interface is down
+are either cached (and applied in ravb_open()) or rejected (as at that time
+the IP is in reset mode). Keeping the IP in the reset mode also increases
+the power saved (according to the hardware manual).
 
 Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 ---
 
 Changes since [2]:
-- use pm_runtime_get_noresume() and pm_runtime_active() and updated the
-  commit message to describe that
-- fixed typos
-- s/CSUM/checksum in patch title and description
+- none
+- didn't returned directly the ret code of pm_runtime_put_autosuspend()
+  as, in theory, it might return 1 in case device is suspended through
+  this calltrace:
+  pm_runtime_put_autosuspend() ->
+    __pm_runtime_suspend() ->
+      rpm_suspend() ->
+        rpm_check_suspend_allowed()
 
 Changes in v3 of [2]:
-- this was patch 20/21 in v2
+- this was patch 21/21 in v2
+- collected tags
 - fixed typos in patch description
-- removed code from ravb_open()
-- use ndev->flags & IFF_UP checks instead of netif_running()
 
 Changes in v2 of [2]:
-- none; this patch is new
+- keep RPM support for all platforms
 
 [2] https://lore.kernel.org/all/20240105082339.1468817-1-claudiu.beznea.uj@bp.renesas.com/
 
- drivers/net/ethernet/renesas/ravb_main.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ drivers/net/ethernet/renesas/ravb_main.c | 54 ++++++++++++++++++++++--
+ 1 file changed, 50 insertions(+), 4 deletions(-)
 
 diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index 4f8d5c9e9e03..df47d3e057c5 100644
+index df47d3e057c5..a7381a90b739 100644
 --- a/drivers/net/ethernet/renesas/ravb_main.c
 +++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -2385,8 +2385,14 @@ static int ravb_change_mtu(struct net_device *ndev, int new_mtu)
- static void ravb_set_rx_csum(struct net_device *ndev, bool enable)
+@@ -1879,16 +1879,21 @@ static int ravb_open(struct net_device *ndev)
  {
  	struct ravb_private *priv = netdev_priv(ndev);
+ 	const struct ravb_hw_info *info = priv->info;
 +	struct device *dev = &priv->pdev->dev;
- 	unsigned long flags;
+ 	int error;
  
-+	pm_runtime_get_noresume(dev);
+ 	napi_enable(&priv->napi[RAVB_BE]);
+ 	if (info->nc_queues)
+ 		napi_enable(&priv->napi[RAVB_NC]);
+ 
++	error = pm_runtime_resume_and_get(dev);
++	if (error < 0)
++		goto out_napi_off;
 +
-+	if (!pm_runtime_active(dev))
+ 	/* Set AVB config mode */
+ 	error = ravb_set_config_mode(ndev);
+ 	if (error)
+-		goto out_napi_off;
 +		goto out_rpm_put;
-+
- 	spin_lock_irqsave(&priv->lock, flags);
  
- 	/* Disable TX and RX */
-@@ -2399,6 +2405,9 @@ static void ravb_set_rx_csum(struct net_device *ndev, bool enable)
- 	ravb_rcv_snd_enable(ndev);
- 
- 	spin_unlock_irqrestore(&priv->lock, flags);
-+
+ 	ravb_set_delay_mode(ndev);
+ 	ravb_write(ndev, priv->desc_bat_dma, DBAT);
+@@ -1922,6 +1927,9 @@ static int ravb_open(struct net_device *ndev)
+ 	ravb_stop_dma(ndev);
+ out_set_reset:
+ 	ravb_set_opmode(ndev, CCC_OPC_RESET);
 +out_rpm_put:
-+	pm_runtime_put_noidle(dev);
++	pm_runtime_mark_last_busy(dev);
++	pm_runtime_put_autosuspend(dev);
+ out_napi_off:
+ 	if (info->nc_queues)
+ 		napi_disable(&priv->napi[RAVB_NC]);
+@@ -2229,6 +2237,8 @@ static int ravb_close(struct net_device *ndev)
+ 	struct ravb_private *priv = netdev_priv(ndev);
+ 	const struct ravb_hw_info *info = priv->info;
+ 	struct ravb_tstamp_skb *ts_skb, *ts_skb2;
++	struct device *dev = &priv->pdev->dev;
++	int error;
+ 
+ 	netif_tx_stop_all_queues(ndev);
+ 
+@@ -2278,7 +2288,14 @@ static int ravb_close(struct net_device *ndev)
+ 	ravb_get_stats(ndev);
+ 
+ 	/* Set reset mode. */
+-	return ravb_set_opmode(ndev, CCC_OPC_RESET);
++	error = ravb_set_opmode(ndev, CCC_OPC_RESET);
++	if (error)
++		return error;
++
++	pm_runtime_mark_last_busy(dev);
++	pm_runtime_put_autosuspend(dev);
++
++	return 0;
  }
  
- static int ravb_set_features_gbeth(struct net_device *ndev,
+ static int ravb_hwtstamp_get(struct net_device *ndev, struct ifreq *req)
+@@ -2779,6 +2796,8 @@ static int ravb_probe(struct platform_device *pdev)
+ 	clk_prepare(priv->refclk);
+ 
+ 	platform_set_drvdata(pdev, ndev);
++	pm_runtime_set_autosuspend_delay(&pdev->dev, 100);
++	pm_runtime_use_autosuspend(&pdev->dev);
+ 	pm_runtime_enable(&pdev->dev);
+ 	error = pm_runtime_resume_and_get(&pdev->dev);
+ 	if (error < 0)
+@@ -2884,6 +2903,9 @@ static int ravb_probe(struct platform_device *pdev)
+ 	netdev_info(ndev, "Base address at %#x, %pM, IRQ %d.\n",
+ 		    (u32)ndev->base_addr, ndev->dev_addr, ndev->irq);
+ 
++	pm_runtime_mark_last_busy(&pdev->dev);
++	pm_runtime_put_autosuspend(&pdev->dev);
++
+ 	return 0;
+ 
+ out_napi_del:
+@@ -2901,6 +2923,7 @@ static int ravb_probe(struct platform_device *pdev)
+ 	pm_runtime_put(&pdev->dev);
+ out_rpm_disable:
+ 	pm_runtime_disable(&pdev->dev);
++	pm_runtime_dont_use_autosuspend(&pdev->dev);
+ 	clk_unprepare(priv->refclk);
+ out_reset_assert:
+ 	reset_control_assert(rstc);
+@@ -2914,6 +2937,12 @@ static void ravb_remove(struct platform_device *pdev)
+ 	struct net_device *ndev = platform_get_drvdata(pdev);
+ 	struct ravb_private *priv = netdev_priv(ndev);
+ 	const struct ravb_hw_info *info = priv->info;
++	struct device *dev = &priv->pdev->dev;
++	int error;
++
++	error = pm_runtime_resume_and_get(dev);
++	if (error < 0)
++		return;
+ 
+ 	unregister_netdev(ndev);
+ 	if (info->nc_queues)
+@@ -2925,8 +2954,9 @@ static void ravb_remove(struct platform_device *pdev)
+ 	dma_free_coherent(ndev->dev.parent, priv->desc_bat_size, priv->desc_bat,
+ 			  priv->desc_bat_dma);
+ 
+-	pm_runtime_put_sync(&pdev->dev);
++	pm_runtime_put_sync_suspend(&pdev->dev);
+ 	pm_runtime_disable(&pdev->dev);
++	pm_runtime_dont_use_autosuspend(dev);
+ 	clk_unprepare(priv->refclk);
+ 	reset_control_assert(priv->rstc);
+ 	free_netdev(ndev);
+@@ -3008,6 +3038,10 @@ static int ravb_suspend(struct device *dev)
+ 	if (ret)
+ 		return ret;
+ 
++	ret = pm_runtime_force_suspend(&priv->pdev->dev);
++	if (ret)
++		return ret;
++
+ reset_assert:
+ 	return reset_control_assert(priv->rstc);
+ }
+@@ -3030,16 +3064,28 @@ static int ravb_resume(struct device *dev)
+ 		ret = ravb_wol_restore(ndev);
+ 		if (ret)
+ 			return ret;
++	} else {
++		ret = pm_runtime_force_resume(dev);
++		if (ret)
++			return ret;
+ 	}
+ 
+ 	/* Reopening the interface will restore the device to the working state. */
+ 	ret = ravb_open(ndev);
+ 	if (ret < 0)
+-		return ret;
++		goto out_rpm_put;
+ 
+ 	ravb_set_rx_mode(ndev);
+ 	netif_device_attach(ndev);
+ 
++	return 0;
++
++out_rpm_put:
++	if (!priv->wol_enabled) {
++		pm_runtime_mark_last_busy(dev);
++		pm_runtime_put_autosuspend(dev);
++	}
++
+ 	return ret;
+ }
+ 
 -- 
 2.39.2
 
