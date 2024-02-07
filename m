@@ -1,96 +1,126 @@
-Return-Path: <netdev+bounces-69890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6626D84CEB4
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 17:14:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1907184CEBE
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 17:17:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 035861F28248
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 16:14:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF94A1F281EC
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 16:17:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95BA98060E;
-	Wed,  7 Feb 2024 16:14:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F9F80BE7;
+	Wed,  7 Feb 2024 16:16:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FLKvS12u"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EpI6HsMc"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B249020DCF
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 16:14:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8588062A
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 16:16:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707322483; cv=none; b=CgYOR2qvxRR0XDRrD6YT7cHfxfYJCaXK+cwSuPtkCJbJWgBSkQiqJmkR2w99QeGIzQwVtQNkfciSArSmQv7f3GBApcWedADrwmHoXN+hYY9SEYLqTp46riN/JRvwBTqE6gKd82BBnIeKfG6V4JmOTV3frMOpf4SVk/FHw1LowsY=
+	t=1707322596; cv=none; b=lllyK7JqCzuIx1jdhjPPhPfWBF0/yFJ/1FSIvZlOJnmQ6H8ZLzHgbdSgc7x1b1m4Rr/i7//xsZhtJs/JO21xJb5EF+xsHxbAR4VuxRBbnxXRpnvkvxIFIOer6wTltDtEc8qQAtxY39+YJyH7DJaq/JcMpA3xLIwvf/Le/8lrU6s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707322483; c=relaxed/simple;
-	bh=6vEhRaMZalIVplBDmcr2WR2nxcZk76/9Eq0dy5jY5sU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nv0O3B9TSqrYCw6LZp8TBIsZNpprSkHRuZzVeY+cNrRrFJ0dD/7sdkP+BZ0faquv86hbljpuYA5/9KD4ZizjLLwgXuA/fYR6yH1bwateJP78pA5GEhaf/+ze/4b1NoF7jfCBblhaBS2tASzg3E3uN8hQt+6yaJ4/UqK2mKf7yEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FLKvS12u; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Bip1UTDx5KuvZif9ify8FWQX/djbb3/ZjQmnCvYXEAs=; b=FLKvS12uaDmVJgP7DblFo4Hr7J
-	nkAMISOovdeN2WEYKj9kXlRgV07DgyqrngCCmX1tSARXdNxgvOeSeRcRn5hFCFKPKzG1sI3n5JNs7
-	9V9Fd/qkHGsocnj5pHuC1AwlBw9i2DPxB6kX2JEQ97KGgcbcn0TZjgKRh1d5dqFC4IBk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rXkZ8-007Eat-AZ; Wed, 07 Feb 2024 17:14:26 +0100
-Date: Wed, 7 Feb 2024 17:14:26 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	David Miller <davem@davemloft.net>,
-	Russell King - ARM Linux <linux@armlinux.org.uk>,
-	Igor Russkikh <irusskikh@marvell.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: atlantic: convert EEE handling to use
- linkmode bitmaps
-Message-ID: <ba71c38d-23ad-4e78-bb34-ea383ba8d13e@lunn.ch>
-References: <7d34ec3f-a2b7-41f5-8f4b-46ee78a76267@gmail.com>
- <c7979b55-142b-469b-8da3-2662f0fe826e@lunn.ch>
- <2046e53a-6de4-41e0-b816-3e7926ad489b@gmail.com>
- <20240207075314.5458bd68@kernel.org>
+	s=arc-20240116; t=1707322596; c=relaxed/simple;
+	bh=EiuKgL0y1Tew//AERYzJpszv7yjAW+wR5Tql1elcIv8=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=Zwpj+CdfBDF1zfZD6CPp2oIO1Fb8fBnh/SWLjK9OEDtPnmqhO0QhwrtZfAsFzt1LlcwwcNPCmhf+sLXUWlYgE01HdstgOUSvZPvOU8ykxoapB1Kp8BYwT+EONfzXrGQwzNTp3d0lJyz5T82TUgYhg+HcF+drZwpZTkkzLziOqt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EpI6HsMc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50BE1C433F1;
+	Wed,  7 Feb 2024 16:16:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707322595;
+	bh=EiuKgL0y1Tew//AERYzJpszv7yjAW+wR5Tql1elcIv8=;
+	h=Date:To:Cc:From:Subject:From;
+	b=EpI6HsMcbfIUkhBCt91ggU99h/Qs6tXgehy4TgGbDIBvFMno5CUqihieSDQB1yU4J
+	 S0foqQ9i0XMFeBcHylKDiaC/7pju9pdPyEzmF8rXNcT4Bv2IqeF/XVBpc+j2K1CZVf
+	 R2LL3Q8TDaQ1Rg3zx7Xx89Zv9LBiB6lL3ulOzeFB3a9PhhxkNJkdrS9X59VLpc0PsF
+	 Li/vxXWEk060S+U1FrB0+1H99Y4Ag3IrVE2ZYxarVwh2z8PRrqsPYHH+LogA2WpjFX
+	 hcgzXjkoKaFaX4RolBDWzuwvQ0DI06Gq2XsJzoSuKwBDl/l1l2/tcCUV0mCOCnkmfC
+	 Xy1gHPrtsqnGg==
+Message-ID: <e2871686-ea25-4cdb-b29d-ddeb33338a21@kernel.org>
+Date: Wed, 7 Feb 2024 17:16:16 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240207075314.5458bd68@kernel.org>
+User-Agent: Mozilla Thunderbird
+Content-Language: en-GB, fr-BE
+To: Alexander Potapenko <glider@google.com>, Marco Elver <elver@google.com>,
+ Dmitry Vyukov <dvyukov@google.com>
+Cc: kasan-dev@googlegroups.com, Netdev <netdev@vger.kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Subject: KFENCE: included in x86 defconfig?
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 07, 2024 at 07:53:14AM -0800, Jakub Kicinski wrote:
-> On Wed, 7 Feb 2024 07:52:49 +0100 Heiner Kallweit wrote:
-> > > This is again a correct translation. But the underlying implementation
-> > > seems wrong. aq_ethtool_set_eee() does not appear to allow the
-> > > advertisement to be changed, so advertised does equal
-> > > supported. However aq_ethtool_set_eee() does not validate that the
-> > > user is not changing what is advertised and returning an error. Lets
-> > > leave it broken, and see if Aquantia/Marvell care.
-> > > 
-> > > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> > 
-> > This patch was by mistake set to "Changes requested".
-> 
-> It's because of the comment about zeroing, not the latter one.
-> 
-> Sorry, it's impossible for me to guess whether he meant the tag
-> for v2 or he's fine with the patch as is. Andrew has the powers
-> to change pw state, I'm leaving this to him.
+Hi Alexander, Marco, Dmitry,
 
-Hi Heiner
+I hope you are well!
 
-Sorry, i was not explicitly. The linkmode_zero() is not needed, so it
-would be good to remove it. Then feel free to add my Reviewed-by:
+First, thank you for your nice work with KFENCE!
 
-      Andrew
+When talking to Jakub about the kernel config used by the new CI for the
+net tree [1], Jakub suggested [2] to check if KFENCE could not be
+enabled by default for x86 architecture.
+
+As KFENCE maintainers, what do you think about that? Do you see some
+blocking points? Do you plan to add it in x86_64_defconfig?
+
+[1] https://netdev.bots.linux.dev/status.html
+[2] https://lore.kernel.org/netdev/20240207072159.33198b36@kernel.org/
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
