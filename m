@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-69672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF46F84C1F2
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 02:37:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B8EC84C21B
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 02:46:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B9BFB2402C
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 01:37:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18624B28C30
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 01:46:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 486B346B1;
-	Wed,  7 Feb 2024 01:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D7B5D535;
+	Wed,  7 Feb 2024 01:44:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZCOC9kka"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B33E/tnu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 239AAFBE9;
-	Wed,  7 Feb 2024 01:37:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 543BA6110;
+	Wed,  7 Feb 2024 01:44:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707269828; cv=none; b=AreLHfcqJJ258joR5Cxic0/m026uQFUv3rtVaUDkweilC3x6yQCrCI8c4DkwlnoEr4FbfuyhX2nPweV9jtgWk/ZGU7wTijMidog3Drk/qWzlh5x2I4PtD7jdnTuvI+5oh/jGtYtWZlLT9O24YjvQRwgJysmbX58EqbLe+2nEFR4=
+	t=1707270249; cv=none; b=MHyAgPl0ojdEx1maRdiUCRTeDAnElW3Gf2wJHEBdbYa6rMu8ntUYVwoESyuzMBxdgrX9ufynOv+w7rLFvr+ZX859m/6QBK+KQ6wtuEcLgaz3lM0Zy7Hmd8UZWVETen/lgWh8Z4LmilI+0qiPxSQJNJf1XToAsGMRY0LnKBCDFO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707269828; c=relaxed/simple;
-	bh=5EKdeJd7hLSZua52syw/apXSV4DJ7iUDO8Ukyigp1vQ=;
+	s=arc-20240116; t=1707270249; c=relaxed/simple;
+	bh=VtLm8iXEQmPd78upVKjrBvCXxUUWtTQqhbFstC/uJ+k=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u6cgOjHnUzJ7VlbYWKGOpZSf4749C0muu7/Q1521YC1IEGLLrI6vlB49Lp+nwdveWWPKgjGN7b0VXowQTf8jOFui25OXaJPjNKOQY/WRuk44H1JywmwgcZgbD43dBL3dsUqJDzNBmItaDn0b+S+rlc5tCaj7bFMgLMJ8kmyqo10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZCOC9kka; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 610D0C433C7;
-	Wed,  7 Feb 2024 01:37:06 +0000 (UTC)
+	 MIME-Version:Content-Type; b=TJxl4rUavezmkKLUj3hEGoWSbzxkOXamBPCVeUscNVrv4Z/MXUI799S60PZ+95VYbwiEgU3G342z9U0Astbvxek4R9Q7RwDd21p/65KLyAlCfSQsaw7a2pBareBSDT8mU9NgmAk3lYMr/eo0WkHS7E1u9Bkdb8qhr829Iryb47s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B33E/tnu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0686CC433C7;
+	Wed,  7 Feb 2024 01:44:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707269826;
-	bh=5EKdeJd7hLSZua52syw/apXSV4DJ7iUDO8Ukyigp1vQ=;
+	s=k20201202; t=1707270248;
+	bh=VtLm8iXEQmPd78upVKjrBvCXxUUWtTQqhbFstC/uJ+k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZCOC9kkaFj+56azpNEKw8NRiJj8W8XzEpQLVeCx+UGGSN//NKdPBx0YFQ2IZxqfY0
-	 ymDB4FGZtDXsl8yV5aakIq5+Rc/MvNgpu8qhbuLtFXYWr9AH+O2WXh+GbhC4ma6W8o
-	 iP11NnC9K02E/xjP217X3Z6KFPK1g1GoZy4PEmDV9TlB8HCXC++qFOQMwbhHzo3YE5
-	 81fzwVs4uSCP9xfeDos4aA+nx1VtqQc3D2d+VjN8fhpvd7utW7KNFq0BKk/SNpMAJV
-	 RwlGKIEBBnqvJ2yKNfjgJ5UJOQ0afSQ7Qxh3jVamb/Z76QYqYli0sVMLeqgj1DRQaL
-	 iCKHDu1tb5BRA==
-Date: Tue, 6 Feb 2024 17:37:05 -0800
+	b=B33E/tnu4crn5H1QOID/aUwJAPCk6yuDDleoHkde9VsH1vIvoeQ5JMMmB/W/GKW4Z
+	 VxNZNKtT1YvrZwuS5H0tDPoZMHOrmT+ldMRHwD9Ra6uPzBjmWKJ872XPQ44km3769s
+	 bUFMrD8PBesRCeZVVoSY0h3t1YiFEu9ajQnBtnPAgFpnaz4IDnE2BgmspWREZkLWo/
+	 R4mlyFLaCMmx95lcozzmWCZIJSGjetiuiEz8ehQjkPP62YpqsDp/lANptueciVeK0m
+	 HnsBIf4JdR3K9z9oF0dCfdaajkNvGJmd/D/ngcuAC5nke3hKwjvGArQut6dq3qrWdG
+	 Vy/YETJrqqnig==
+Date: Tue, 6 Feb 2024 17:44:07 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Matthieu Baerts <matttbe@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "netdev-driver-reviewers@vger.kernel.org"
- <netdev-driver-reviewers@vger.kernel.org>
-Subject: Re: [TEST] Wiki / instructions
-Message-ID: <20240206173705.544f4cb2@kernel.org>
-In-Reply-To: <90c6d9b6-0bc4-468a-95fe-ebc2a23fffc1@kernel.org>
-References: <20240202093148.33bd2b14@kernel.org>
-	<90c6d9b6-0bc4-468a-95fe-ebc2a23fffc1@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, MPTCP Upstream
+ <mptcp@lists.linux.dev>, Paolo Abeni <pabeni@redhat.com>, Mat Martineau
+ <martineau@kernel.org>
+Subject: Re: [TEST] The no-kvm CI instances going away
+Message-ID: <20240206174407.36ca59c4@kernel.org>
+In-Reply-To: <f6437533-b0c9-422b-af00-fb8a236b1956@kernel.org>
+References: <20240205174136.6056d596@kernel.org>
+	<f6437533-b0c9-422b-af00-fb8a236b1956@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,38 +61,44 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 5 Feb 2024 18:21:56 +0100 Matthieu Baerts wrote:
-> Thank you for this wiki page, and all the work with the CI infrastructure!
+On Tue, 6 Feb 2024 12:16:43 +0100 Matthieu Baerts wrote:
+> Hi Jakub,
 > 
-> For the debug options, I see that you are using:
+> On 06/02/2024 02:41, Jakub Kicinski wrote:
+> > because cloud computing is expensive I'm shutting down the instances
+> > which were running without KVM support. We're left with the KVM-enabled
+> > instances only (metal) - one normal and one with debug configs enabled.  
 > 
->   kernel/configs/x86_debug.config
+> Thank you for the notification!
 > 
-> It looks like this is specific for the 'tip' tree:
+> It sounds like good news if the non-support of KVM was causing issues :)
 > 
->   Debugging options for tip tree testing
+> I think we can then no longer ignore the two MPTCP tests that were
+> unstable in the previous environment.
 > 
-> I don't know if it is still maintained, e.g. it includes DEBUG_SLAB
-> option. But also, it enables options that are maybe not needed: GCOV?
-> X86_DEBUG_FPU?
-> Maybe it is better not to use this .config file, no?
+> The results from the different tests running on the -dbg instances don't
+> look good. Maybe some debug kconfig have a too big impact? [1]
 
-I haven't looked to closely. I noticed that the basic debug config
-doesn't enable LOCKDEP ?! so I put the x86 one on top.
+Sorry, I'm behind on the reading the list. FWIW if you want to reach me
+quickly make sure the To: doesn't include anyone else. That gets sorted
+to a higher prio folder :S
 
-I added a local patch to cut out all the obviously pointless stuff from
-x86_debug.config, we should probably start our own config for networking
-at some stage.
+> For MPTCP, one test always hits the selftest timeout [2] when using a
+> debug kconfig. I don't know what to do in this case: if we need to set a
+> timeout value that is supported by debug environments, the value will be
+> so high, it will no longer catch issues "early enough" in "normal"
+> environments.
+> Or could it be possible to ignore or double the timeout value in this
+> debug environment?
+> 
+> Also, what is the plan with this debug env? It looks like the results
+> are not reported to patchwork for the moment. Maybe only "important"
+> issues, like kernel warnings, could be reported? Failed tests could be
+> reported as "Warning" instead of "Fail"?
 
-> For our CI validating MPTCP tests in a "debug" mode, we use
-> "debug.config" without "x86_debug.config". On top of that, we also
-> disable "SLUB_DEBUG_ON", because the impact on the perf is too
-> important, especially with slow environments. We think it is not worth
-> it for our case. You don't have the same hardware, but if you have perf
-> issues, don't hesitate to do the same ;)
+Unfortunately I'm really behind on my "real job". I don't have a clear
+plan. I think we should scale the timeout by 2x or so, but I haven't
+looked how to do that.
 
-The mptcp tests take <60min to run with debug enabled, and just 
-a single thread / VM. I think that's fine for now. But thanks for 
-the heads up that SLUB_DEBUG_ON is problematic, for it may matter for
-forwarding or net tests.
+I wish the selftest subsystem had some basic guidance.
 
