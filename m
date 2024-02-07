@@ -1,83 +1,107 @@
-Return-Path: <netdev+bounces-69762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7A9984C7E0
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 10:49:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA07884C7E4
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 10:50:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47C69287B72
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 09:49:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6ABF0289699
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 09:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65495224CC;
-	Wed,  7 Feb 2024 09:49:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J+Vul9bq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAEB121107;
+	Wed,  7 Feb 2024 09:50:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3221624B2F;
-	Wed,  7 Feb 2024 09:49:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18BF825566;
+	Wed,  7 Feb 2024 09:49:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707299383; cv=none; b=KZ5ocmu+BqCe3I4EyOLKDgCKPvsdRAPejqUtCWLRkoR9bij84YmPXDUNaZdpkdUrPF1ENcT6Iq3lPPX6Bf169w8IIoEdADzXCJ0moR9C5seIbohssheOplIuIKxXunOj2ORD0+2FRk1p28PxQalUyPtBzqX9E7qQoSNx5OP0mHo=
+	t=1707299400; cv=none; b=h35NCT1TCMB/3iEjhm23je6b85NJ535RGvKJA5wnC4g3yXgSzPlGM4pnLXx9DAVMBWiRYfwqTRPAzocokDrWISdLRTQGhvtQrpZgCPKe8PIgOIaA7n1sH8bfgY20ofyakRSPFB2H+NfBI2dJ7DdV3BTBBKmY7dJYk42dX8sElqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707299383; c=relaxed/simple;
-	bh=iaPJLCw/Xy+KGXqtOa/G1rsYICV+i+x8OmFlAgHnp7U=;
+	s=arc-20240116; t=1707299400; c=relaxed/simple;
+	bh=wt4ZprwlP8v6zV9OXc1Z0Lh35uAg28FnADGaGyUzur8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NaTra8wYXIPw387ys7PU0sDj8Etbu9cnuGffySuzvU8amtQQUd01XiDfjUblrAY9NWWTDbOIs4kth97LBOlJY91J+VESL77PdkjbvUgvQQbpbOgSpwsbGZZItaxdkSPFduRaBIvZcB9sj08YXPKOXUwe0damvAFZrmjA8OpcaCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J+Vul9bq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCE59C433C7;
-	Wed,  7 Feb 2024 09:49:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707299383;
-	bh=iaPJLCw/Xy+KGXqtOa/G1rsYICV+i+x8OmFlAgHnp7U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=J+Vul9bqfemWsLYL963wUa4MjMJGapEgDfRHrT1NByLcjIGeELuDwCbLITaom9AeY
-	 Rep4tYFuHlv8iNYCJzFdvw1OC3COym1wVptqJrVnDEtoa5Gm0pzpF4baL+3J9sHmTf
-	 08WM61TGPbzR4Qa2Qo61alnOcUu8mYArqElhk5XbaaZ0pVaxl63jL0sPoFZAKvp1IQ
-	 E9KMiYavIim0MtCaPZ+KTNbMxVgMHDGJliuL4zcZrdDdeE2wMJTTq1Y05UJuSLfusQ
-	 JR15HUZ6Ym3oJMQQc8JqsjdXntvOuefg78Uarl5/EsFdDPWmEu5zs4xKFadGdLFCgX
-	 KurQ3rTSg6C1w==
-Date: Wed, 7 Feb 2024 09:48:08 +0000
-From: Simon Horman <horms@kernel.org>
-To: Colin Ian King <colin.i.king@gmail.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] net/mlx5: remove redundant assignment to variable
- object_range
-Message-ID: <20240207094808.GO1104779@kernel.org>
-References: <20240206165815.2420951-1-colin.i.king@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=B0xj5i459YcSenx46FFJv6B9hNx5QhDnukKmPIH8KFPKDrCXOKHmpM9G3D9rzhbdrbcBsuhvg16yrhrBMNKTGT3rjrNa+tv1wb6H0ZAlQ9B1rwJVSa4HBVxOo06aRm6NG0cAacioFo4cL6wBIScP9ANUdMwU/iWhUfmCa9orfBQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.41.52] (port=48492 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1rXeYx-008edM-3s; Wed, 07 Feb 2024 10:49:53 +0100
+Date: Wed, 7 Feb 2024 10:49:50 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
+	coreteam@netfilter.org, netdev-driver-reviewers@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>, netfilter-devel@vger.kernel.org
+Subject: Re: [netfilter-core] [ANN] net-next is OPEN
+Message-ID: <ZcNSPoqQkMBenwue@calendula>
+References: <20240122091612.3f1a3e3d@kernel.org>
+ <Za98C_rCH8iO_yaK@Laptop-X1>
+ <20240123072010.7be8fb83@kernel.org>
+ <d0e28c67-51ad-4da1-a6df-7ebdbd45cd2b@kernel.org>
+ <65b133e83f53e_225ba129414@willemb.c.googlers.com.notmuch>
+ <20240124082255.7c8f7c55@kernel.org>
+ <20240124090123.32672a5b@kernel.org>
+ <26616300-dc28-47d1-88bb-1c7247d1699d@kernel.org>
+ <ZbFiixyMFpQnxzCH@calendula>
+ <7a1014ee-7e1d-4be4-bab2-07ddde8a84b7@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240206165815.2420951-1-colin.i.king@gmail.com>
+In-Reply-To: <7a1014ee-7e1d-4be4-bab2-07ddde8a84b7@kernel.org>
+X-Spam-Score: -1.9 (-)
 
-On Tue, Feb 06, 2024 at 04:58:15PM +0000, Colin Ian King wrote:
-> The variable object_range to log_header_modify_argument_granularity
-> is being assigned a value that is never read, the following statement
-> assigns object_range to the max of log_header_modify_argument_granularity
-> and DR_ICM_MODIFY_HDR_GRANULARITY_4K, so clearly the initial
-> assignment is redundant. Remove it.
+Hi Matthieu,
+
+On Tue, Feb 06, 2024 at 07:31:44PM +0100, Matthieu Baerts wrote:
+[...]
+> Good point, I understand it sounds better to use 'iptables-nft' in new
+> kselftests. I should have added a bit of background and not just a link
+> to this commit: at that time (around ~v6.4), we didn't need to force
+> using 'iptables-legacy' on -net or net-next tree. But we needed that
+> when testing kernels <= v5.15.
 > 
-> Cleans up clang-scan build warning:
-> drivers/net/ethernet/mellanox/mlx5/core/steering/dr_arg.c:42:2: warning:
-> Value stored to 'object_range' is never read [deadcode.DeadStores]
-> 
-> Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
+> When validating (old) stable kernels, the recommended practice is
+> apparently [1] to use the kselftests from the last stable version, e.g.
+> using the kselftests from v6.7.4 when validating kernel v5.15.148. The
+> kselftests are then supposed to support older kernels, e.g. by skipping
+> some parts if a feature is not available. I didn't know about that
+> before, and I don't know if all kselftests devs know about that.
 
-Thanks Colin,
+We are sending backports to stable kernels, if one stable kernel
+fails, then we have to fix it.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+> I don't think that's easy to support old kernels, especially in the
+> networking area, where some features/behaviours are not directly exposed
+> to the userspace. Some MPTCP kselftests have to look at /proc/kallsyms
+> or use other (ugly?) workarounds [2] to predict what we are supposed to
+> have, depending on the kernel that is being used. But something has to
+> be done, not to have big kselftests, with many different subtests,
+> always marked as "failed" when validating new stable releases.
+
+iptables-nft is supported in all of the existing stable kernels.
+
+> Back to the modification to use 'iptables-legacy', maybe a kernel config
+> was missing, but the same kselftest, with the same list of kconfig to
+> add, was not working with the v5.15 kernel, while everything was OK with
+> a v6.4 one. With 'iptables-legacy', the test was running fine on both. I
+> will check if maybe an old kconfig option was not missing.
+
+I suspect this is most likely kernel config missing, as it happened to Jakub.
+
+Thanks.
 
