@@ -1,108 +1,106 @@
-Return-Path: <netdev+bounces-69979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 053E384D2A0
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 21:09:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 055AA84D2A3
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 21:11:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37F7B1C24711
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 20:09:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE9191F22546
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 20:11:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 842A0126F0C;
-	Wed,  7 Feb 2024 20:09:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 669B585947;
+	Wed,  7 Feb 2024 20:11:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a5lr5q6W"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="TpFusNdp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3C6C126F0B
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 20:09:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998651EA72
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 20:11:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707336562; cv=none; b=UvgFwcKdjaVX2rrAPr5lnL8OgKFLMoyaF9YQOswvNz2EwU7hAtqJif+E0+LhWEQes1MU5R5URVnKMmaT10cvsi1dD7PwldkiHWyutxMp65AQskJ8uZtJYwUjs3Vk3R6se0FIn8n6TrBXHb+CmsOnPBFj0H6dL9kPJicgRNbMWwg=
+	t=1707336684; cv=none; b=g3ZTD2PzsO5JV/7vLH9x5HZ4vloGUdOWgyNaTzQFjFH2iR5CnttbLY5JtVUIH82sdN0WU5GFedYN5JSm1Yi9Nb39FUDlRVz4I5zOCIPTYRH3dFnT5HpWmcSys1qGuc0GOrWmCxRIB6432zm4gbVC5EmBXDs+PVTM9ztc5yanZ9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707336562; c=relaxed/simple;
-	bh=2HKfLsGBKWZtT9ToVjE5xbyaP9Hkd4XNm8jbjc6FJEE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YC1XxiuNrHD7LRzZM8kOa5Qas1jAp8Elt6H3hE8fp0fZFWaQ3o1YQKc4ZE8YWkrTUR+iWY5WR0o+9FWcb3FJxDOtbqBIIpzAe758JkTxWkwe8ejASXiDbuPK2sSKsQqQ7j58/sJ05nNJdXAR9/it81CiVZRSm9ypW/9/7GCGDjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a5lr5q6W; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-51142b5b76dso1718950e87.2
-        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 12:09:20 -0800 (PST)
+	s=arc-20240116; t=1707336684; c=relaxed/simple;
+	bh=NQ+Q8H/U4ZfuC8lHL254K99StUSvVBudm4xIyBVMXrY=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=DNPNBFkT+qY6JC/HaLhJupv7Swn3IFCYnAMIOL29V7VGABrpzm+iVS5Rp12YfHRAyuoeL95FN8JjbkEPIzSmXBcMwVRID/Pudb+pyxP/vxFfYJ/hCtUp54Tg4J3sxgeT7zj6eVU5bgzmsD9Xg8kOuv/nklFkDZArrQOjgS7wxnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=TpFusNdp; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a3122b70439so144850166b.3
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 12:11:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707336558; x=1707941358; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=0NSFzsd2krYQoyvWOh/dTgU21d75kEdZiO5Ggc8Azps=;
-        b=a5lr5q6W5YHsl/z05ZasD32MCALBr9pb2NqxrNKBUHoWWmgB62nrBfWT90jldR7eWb
-         qfIXKBHAQIWsizx61SN1wxhXrtYGAdArfqVmPEv8PmzeKz2eG7p2e13Sg7XOqryGavCx
-         Yooi8p6Uvi8o4yogfR2iIHMExsZhz85InmGdxgE+g4Z9SFNeA7BBf0PmeR1WCMm5cO7m
-         AW5WCoFtMjMBg31gXEowUKMQJRioiSLrTWK5juGAT41Cblcd8OF5j1XWFap84my+EwuJ
-         kVrImtPhQeaAEhBgqQLfpJq0iYzCx9C3+i0/bRgn5qvYhD0Ry1c0yaqs/pyIb02xv9mj
-         iThw==
+        d=cloudflare.com; s=google09082023; t=1707336681; x=1707941481; darn=vger.kernel.org;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=iU2dtQa1wZUe6n5r6nZoKzZeNqaRVQQ9jjKRwmP1JiI=;
+        b=TpFusNdp5rZfzNGGhXyxmmpNOuLeT+HyZZS2xPdIFnQJGNnOoLu+I0jabtIC7e8J4E
+         CDKfLhduZdV9RnxxNMpA3JwhWOR0d3lRnAxKS/YI1iKGzNfhj4ZEKhBOBtnINumvSa24
+         1jmkXs6ZAovwA6C6DUW+WLgXyukPLEsCQ5KqJN9oraLb5D/AiwI78MIVoPa5VjhfdOfn
+         kUIzPpHGYjb4IJ5/HfMZaVPYE4CRJNqQMMsH9geW7sEbS9gatHoeNqMANss3RmyzKar7
+         FLNOtQSs4cJgu8+p1fomzm4MGC8dALbl9YCH44bjGsh2xaM1FyjU16nGOPPlI9H1yG4Q
+         /DEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707336558; x=1707941358;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0NSFzsd2krYQoyvWOh/dTgU21d75kEdZiO5Ggc8Azps=;
-        b=vO7mTzoY0J7hubbuVYTlTx0RVlgCb3LCoRTjEtlIQe3dNEwDJqtaWWyzKtxNM9isAb
-         ndRW8dFQX24xs4JjASYaeo2YItQYjDOBFIB1hLFM5gw7tr+q8qA6yzz6tmEkRNZFBijn
-         T8mSUvxCQeOMc0fsrr7EvKTudn9TGxMiigjYDcUVPkZdYBLBeSHdwMRL3PhKKdTKXjdq
-         gn8LexBX9sPI5u96d4jJIMeO4DjEV65udR925W1HWfAyTC+k8nrq0ibPsx+UjkQr5AkB
-         mUNW5bRhz+M0+OpA48k+25nXtmAspDoG79SMkAjHA7gbclYpx5NpnvoM3oOCTtxlgPks
-         6RJA==
-X-Forwarded-Encrypted: i=1; AJvYcCWLDKVwUgAdh5YSOSo7l6YMj5au2D+kdYUAAOPh7Svd/DubpQ6G+G84pDfHfzPHPABv9l2AcS/S58zQ3oCBZxbN91Xg/bQv
-X-Gm-Message-State: AOJu0Yx+R5KQJqxnSFAL6Vwn7f1SK6KFq2odhW38yJM7EhTXlSfgjr8q
-	7XaTZewGABiGLyyvFl9ZeKIMESCKDEqZVOrVDR3BT4cPFkUEl6sZ
-X-Google-Smtp-Source: AGHT+IGX/A6vhp/2iYXS6p1gzCZ6Eu0+ygO70R4gM7/lDhmWdFvfskcc+c31G51QB+7l54X2Wl8Vfw==
-X-Received: by 2002:ac2:5df6:0:b0:511:3cfd:fdaa with SMTP id z22-20020ac25df6000000b005113cfdfdaamr4716617lfq.68.1707336558244;
-        Wed, 07 Feb 2024 12:09:18 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCV8qDFx9zOi55dFphQ9slx9fuYQC5paRacHYW0AHeSs/Zj63ar4rPHpYrsXIwg7w7choEC+cmXTAmYCSQPzrgAJQVV/glFA
-Received: from mishin.sarov.local (95-37-3-243.dynamic.mts-nn.ru. [95.37.3.243])
-        by smtp.gmail.com with ESMTPSA id q30-20020ac2515e000000b005114dc093desm302671lfd.259.2024.02.07.12.09.17
+        d=1e100.net; s=20230601; t=1707336681; x=1707941481;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iU2dtQa1wZUe6n5r6nZoKzZeNqaRVQQ9jjKRwmP1JiI=;
+        b=rNHsn5FzHqpNsnisAnM6au5hFV2iqBvJl+UKQcukiGn0bX209Cvu/GtoB3Y0NYwgmC
+         Q3NmcBbvbDLCvol7nYiA+hbCybGhnC0EsIFY0z1D+gftKGKKlK0bqz+NXZ1W88FkOdh1
+         Wd8AkcTz+eAR+R2j5Etd5Tp16Itsf89ayaujW2DVjbVJvnbcdhMfqVy7R8jSC/rxPgRq
+         z2pVOqQXUBgFKc7cOLQNc3dqKyv4ufty2yd8dkazgdajJqCzIDn9ghHpltkbmCg0lCRg
+         X9WodREG6GhBaysWrxOBAmdtKvvYFf1pm7Eftih4YGx2qmJ9sktf/s94sOQEFQYuPDG5
+         Nolg==
+X-Gm-Message-State: AOJu0YxXZ2W/cdcw2Gv1zj7RI0rVul9xagtDXR3FIg8tYrbhmQskl3II
+	NApTbLQsFum1n2KPIG6XxJvlDNMz16MkYuPFRUOSvOn/GmEZ7eSCEO0BO3m2lww=
+X-Google-Smtp-Source: AGHT+IHd/o1KTzCJanFRhATo8F0Y2+BIPFr03c1L+fExxdaxLR1/g0AZoyG8v9LXPqirc100nXCIMQ==
+X-Received: by 2002:a17:906:a14c:b0:a37:ff6a:744e with SMTP id bu12-20020a170906a14c00b00a37ff6a744emr5201946ejb.25.1707336680727;
+        Wed, 07 Feb 2024 12:11:20 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUU0c4aHV/h27UMfou4JrSdiWEDAEMVDBN4LyqUg/onTIyVx5bJ3cbx4+nrHgtwKWNntf15uSpNRWnMMd9b06DhDTsIu9gKmuAvxLZ+uy/89qlYRflM+1Ju/nM90/NXeHAFDOyssyPU5kKlUHH28qOHK9z9Hlv5aY7wkZ6fOUfcBpIJV+sxiSquNto9v3BVZGUHm4ImjNvsrQw7QEeq9Cc8nQb4J1b2tIU=
+Received: from cloudflare.com ([2a09:bac5:5064:2dc::49:83])
+        by smtp.gmail.com with ESMTPSA id mm13-20020a170906cc4d00b00a37b795348fsm1094483ejb.127.2024.02.07.12.11.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Feb 2024 12:09:17 -0800 (PST)
-From: Maks Mishin <maks.mishinfz@gmail.com>
-X-Google-Original-From: Maks Mishin <maks.mishinFZ@gmail.com>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Maks Mishin <maks.mishinFZ@gmail.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH] genl: Fix descriptor leak in get_genl_kind()
-Date: Wed,  7 Feb 2024 23:08:23 +0300
-Message-Id: <20240207200823.7229-1-maks.mishinFZ@gmail.com>
-X-Mailer: git-send-email 2.30.2
+        Wed, 07 Feb 2024 12:11:20 -0800 (PST)
+References: <20240206-jakub-krn-635-v2-1-81c7967b0624@cloudflare.com>
+ <20240207102410.7062dcb0@kernel.org>
+User-agent: mu4e 1.6.10; emacs 28.3
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, kernel-team@cloudflare.com
+Subject: Re: [PATCH net-next v2] selftests: udpgso: Pull up network setup
+ into shell script
+Date: Wed, 07 Feb 2024 21:09:55 +0100
+In-reply-to: <20240207102410.7062dcb0@kernel.org>
+Message-ID: <87sf24qbkp.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
----
- genl/genl.c | 3 +++
- 1 file changed, 3 insertions(+)
+On Wed, Feb 07, 2024 at 10:24 AM -08, Jakub Kicinski wrote:
+> On Tue, 06 Feb 2024 19:58:31 +0100 Jakub Sitnicki wrote:
+>> +setup_loopback() {
+>> +  ip addr add dev lo 10.0.0.1/32
+>> +  ip addr add dev lo fd00::1/128 nodad noprefixroute
+>> +}
+>
+> Can I nit pick on stupid stuff?
+> Quick look at other udpg*s*.sh scripts indicates we use tabs
+> for indent. IDK what the rules should be but I have an uneducated
+> feeling that 2 spaces are quite rare.
 
-diff --git a/genl/genl.c b/genl/genl.c
-index 85cc73bb..74100dad 100644
---- a/genl/genl.c
-+++ b/genl/genl.c
-@@ -71,6 +71,9 @@ static struct genl_util *get_genl_kind(const char *str)
- 	snprintf(buf, sizeof(buf), "%s_genl_util", str);
- 
- 	f = dlsym(dlh, buf);
-+	if (dlh != NULL)
-+		dlclose(dlh);
-+
- 	if (f == NULL)
- 		goto noexist;
- reg:
--- 
-2.30.2
+My oversight. ~/.editorconfig kicked in and I didn't notice.
 
+Let me respin.
 
