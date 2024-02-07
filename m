@@ -1,141 +1,197 @@
-Return-Path: <netdev+bounces-70010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F058184D54D
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 23:05:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55AE284D55B
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 23:07:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 909C8B2568D
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 22:05:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1FCF1F2B28F
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 22:07:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6C2E146002;
-	Wed,  7 Feb 2024 21:27:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9048136990;
+	Wed,  7 Feb 2024 21:28:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WjOy17k3"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="SNqUyqqT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B700A145FFC;
-	Wed,  7 Feb 2024 21:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9E6B136993
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 21:28:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707341265; cv=none; b=giTq6EA59AcW6c4Yiyo0X9Rz9smJrBGI7NLvByP4cVq6pdXpDM5f75FFo8zK/6HiHuCQfsQ22DivL97lWwLnXOK4S+BRGZuDwXFrfgy6upws469U5zjbtmasxsKcP0UXmB4sT+pYzqObNCi8pk2q4bUfWfcImEIGOnkKaRhGEpQ=
+	t=1707341283; cv=none; b=j75PSMfq7ucokjb8HWUOPkFRm3gbh0eORn0UNYc/XYQM5qEa1KRHHAOcXkuVzFxn+Uu4XZPbIpXOgkQkuXbZffLzldqfJhOgQ68Ot1unexE4K5RQ7jnnc+tN6LMypcyIUeH7pfAqTOA47nbdiagBgG1zFRWQM5JpNvfEBHzb/hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707341265; c=relaxed/simple;
-	bh=E0n0WtPXjjLzD4BIqomJfWF09IPPkuCcdD6GAPIpkhw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T/LJO1WHA1ClitZEqZAPsVqUS2bLmyiGODdk4LyaF4zLWFDFPzKEH3X20XzYt+oLCTfnkppQdSMQHa6fdZXF7oFRs4+jc0KwFnKe/0HkllJNMnl88dxp1Kqxe5mpMSV/kcnHNcYmtIxTIQl4k3pwW38pyxCNxMq22vfLVs1tGjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WjOy17k3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 883BAC43394;
-	Wed,  7 Feb 2024 21:27:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707341265;
-	bh=E0n0WtPXjjLzD4BIqomJfWF09IPPkuCcdD6GAPIpkhw=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WjOy17k3oIGAogrz0mGTuxqzvwAe1dVbwBd/EUSDpSoqklXkCLFDsiT3ENV9PDBZt
-	 AOcBln1MVdWxoYcGtUq1CnAsjxkDEpqLVN7De0MJ/dwpR0DoV3KnlSxf78wGbtLAZG
-	 Oe0kLVbK7HwLCQABIW7vVabGfdLyHiPlcQVmLRBYZji07rYQztqL6uLr50GqYNAKSS
-	 9qXganRp6bcTblr2d/GqDtjxHOy7q+3CgWln5hTpgXIkhs/I7rqm1OHz9267yhzVwy
-	 6m44X1dHfTSrPcHqYl+25J+d5dAHjOv8E9ljmJYzXtBylmzSZ2I9/sYHzxHHBhEH//
-	 Q8LSfQr3kghzg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Xin Long <lucien.xin@gmail.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Sasha Levin <sashal@kernel.org>,
-	kadlec@netfilter.org,
-	fw@strlen.de,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 6/7] netfilter: conntrack: check SCTP_CID_SHUTDOWN_ACK for vtag setting in sctp_new
-Date: Wed,  7 Feb 2024 16:27:30 -0500
-Message-ID: <20240207212732.4627-6-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240207212732.4627-1-sashal@kernel.org>
-References: <20240207212732.4627-1-sashal@kernel.org>
+	s=arc-20240116; t=1707341283; c=relaxed/simple;
+	bh=q31bgicYaWHpH21aqzUEXUC1pWsCHfkb+EzH4p0wWdM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oU2ofYynTxlGXvWBEY+ZI3FwLV3vkqitmjqkFWzhJtY6IbZJ3l/ASVB+A2kYt11x1A/bAz5m4saXEub+TM38A55FuxFjGGWka6FqY7HlSXHOHDKrcZcT5Qnm2OA5ks52f7E7v6vMZxxoXkVNSwBNFoBNuJDwVZzop1yizlM5ezY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=SNqUyqqT; arc=none smtp.client-ip=209.85.219.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-dc6c0dc50dcso969362276.2
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 13:28:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1707341280; x=1707946080; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WNi99T1nROigThww20pAjGWc1T88MfKDCoW7KDY0Ayk=;
+        b=SNqUyqqTOxpdTA/yLmR6oAeDQoJwJY4Bzw1hxgCmCDqrMrzWw8qgJolJwdtMTUq1Vu
+         pn9K6qYwVFGpYZMW+dlUuJBAdXDh4uSHnti3lR8DlG9u4xtWiXJPCE1ave2a+gA1H2ry
+         slMNqDfAUAKLcC/j6y6qIsClxNEXpL6cb7KnKnsE4+wU+spGUbrCd0e2/z6qJ5IzrBV7
+         OljDsr5j2H9H0vW8FnYU0HI/0i4DBccF7zf69Ww1TkzlQb8iiJK08w0ShlvxHwXLR9Yd
+         khUZSnMRQP6XYep4EeR4bmbIa3S/qAGU5LEHZn10vUxbLohw9meqkU3ViYCEBl8YaV5F
+         MSJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707341280; x=1707946080;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WNi99T1nROigThww20pAjGWc1T88MfKDCoW7KDY0Ayk=;
+        b=mO7Rw5gdFnpXoST4jtl0Qh4ZQQO6KOqH+dqpRwOHTBU78j10jL94OSi86pnMRDxr7v
+         /SSJK0LxXmiSsYtibXI0zurPSMny6VBFJGMaRFfLqGAD5jn7Yw4IQTp0f885egtbC6iG
+         lMJPE9DmDQtqb3bRHR8aLCaTgnEaYsDL2H0H5FJnCRCRS6+UmsgeevluZY/KbKaBWpaJ
+         b407ro1tgBOeSKJ+coyyz1GTK4AcfMbotElAqrPah6VAvX0WwsoZ5zPlUUGuWygcZqoV
+         afXkBDZwYZXnoVaEcsaYKW9J5RFJvIJ8FZiRy+pcyPWPxWguuZF7Nu38ArP+Hp3Ycmh9
+         4Zrg==
+X-Gm-Message-State: AOJu0YwXMxvlyXfCBmYz9abpauRmEk/x37ODduSOsdTszeyNhncBsmld
+	veZKumU9XE3MgVm+HpdnCg4MUFaLRjjdST3BSly3AkfEHLQMNOkt5jrHSbajo+0vV0aWqBNC3jS
+	JJb84MqfOrfeQpd9R7CIhBzxrqxPZd7LhcraS
+X-Google-Smtp-Source: AGHT+IFHQUUb9rxkBdli0M+OpewK7V4N8lqOlkAbunqI5nxoYR2FGdUbo01LW7S6k0x2Sf6cX8+w3VR5e+NNNnIOPHo=
+X-Received: by 2002:a25:6843:0:b0:dc2:4397:6add with SMTP id
+ d64-20020a256843000000b00dc243976addmr5669174ybc.32.1707341280567; Wed, 07
+ Feb 2024 13:28:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 5.4.268
-Content-Transfer-Encoding: 8bit
+References: <20240207101929.484681-1-leitao@debian.org> <20240207101929.484681-8-leitao@debian.org>
+In-Reply-To: <20240207101929.484681-8-leitao@debian.org>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 7 Feb 2024 16:27:49 -0500
+Message-ID: <CAM0EoMkRZJicRtYKJcOso0dZNGVM48HHqKag3AoF52zB_PRupA@mail.gmail.com>
+Subject: Re: [PATCH net v2 7/9] net: fill in MODULE_DESCRIPTION()s for net/sched
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com, 
+	edumazet@google.com, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	horms@kernel.org, andrew@lunn.ch
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Xin Long <lucien.xin@gmail.com>
+On Wed, Feb 7, 2024 at 5:19=E2=80=AFAM Breno Leitao <leitao@debian.org> wro=
+te:
+>
+> W=3D1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add descriptions to the network schedulers.
+>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+>  net/sched/em_canid.c | 1 +
+>  net/sched/em_cmp.c   | 1 +
+>  net/sched/em_meta.c  | 1 +
+>  net/sched/em_nbyte.c | 1 +
+>  net/sched/em_text.c  | 1 +
+>  net/sched/em_u32.c   | 1 +
+>  6 files changed, 6 insertions(+)
+>
+> diff --git a/net/sched/em_canid.c b/net/sched/em_canid.c
+> index 5ea84decec19..c1852d79c00a 100644
+> --- a/net/sched/em_canid.c
+> +++ b/net/sched/em_canid.c
+> @@ -222,6 +222,7 @@ static void __exit exit_em_canid(void)
+>         tcf_em_unregister(&em_canid_ops);
+>  }
+>
+> +MODULE_DESCRIPTION("CAN Identifier comparison network helpers");
 
-[ Upstream commit 6e348067ee4bc5905e35faa3a8fafa91c9124bc7 ]
+ematch classifier to match CAN IDs embedded in skb CAN frames
 
-The annotation says in sctp_new(): "If it is a shutdown ack OOTB packet, we
-expect a return shutdown complete, otherwise an ABORT Sec 8.4 (5) and (8)".
-However, it does not check SCTP_CID_SHUTDOWN_ACK before setting vtag[REPLY]
-in the conntrack entry(ct).
+>  MODULE_LICENSE("GPL");
+>
+>  module_init(init_em_canid);
+> diff --git a/net/sched/em_cmp.c b/net/sched/em_cmp.c
+> index f17b049ea530..285b36c32c16 100644
+> --- a/net/sched/em_cmp.c
+> +++ b/net/sched/em_cmp.c
+> @@ -87,6 +87,7 @@ static void __exit exit_em_cmp(void)
+>         tcf_em_unregister(&em_cmp_ops);
+>  }
+>
+> +MODULE_DESCRIPTION("Simple packet data comparison network helpers");
 
-Because of that, if the ct in Router disappears for some reason in [1]
-with the packet sequence like below:
+ematch classifier for basic data types(8/16/32 bit) against skb data
 
-   Client > Server: sctp (1) [INIT] [init tag: 3201533963]
-   Server > Client: sctp (1) [INIT ACK] [init tag: 972498433]
-   Client > Server: sctp (1) [COOKIE ECHO]
-   Server > Client: sctp (1) [COOKIE ACK]
-   Client > Server: sctp (1) [DATA] (B)(E) [TSN: 3075057809]
-   Server > Client: sctp (1) [SACK] [cum ack 3075057809]
-   Server > Client: sctp (1) [HB REQ]
-   (the ct in Router disappears somehow)  <-------- [1]
-   Client > Server: sctp (1) [HB ACK]
-   Client > Server: sctp (1) [DATA] (B)(E) [TSN: 3075057810]
-   Client > Server: sctp (1) [DATA] (B)(E) [TSN: 3075057810]
-   Client > Server: sctp (1) [HB REQ]
-   Client > Server: sctp (1) [DATA] (B)(E) [TSN: 3075057810]
-   Client > Server: sctp (1) [HB REQ]
-   Client > Server: sctp (1) [ABORT]
+>  MODULE_LICENSE("GPL");
+>
+>  module_init(init_em_cmp);
+> diff --git a/net/sched/em_meta.c b/net/sched/em_meta.c
+> index 09d8afd04a2a..cab43356824a 100644
+> --- a/net/sched/em_meta.c
+> +++ b/net/sched/em_meta.c
+> @@ -1006,6 +1006,7 @@ static void __exit exit_em_meta(void)
+>         tcf_em_unregister(&em_meta_ops);
+>  }
+>
+> +MODULE_DESCRIPTION("Metadata comparison network helpers");
 
-when processing HB ACK packet in Router it calls sctp_new() to initialize
-the new ct with vtag[REPLY] set to HB_ACK packet's vtag.
+ematch classifier for various internal kernel metadata, skb metadata
+and sk metadata
 
-Later when sending DATA from Client, all the SACKs from Server will get
-dropped in Router, as the SACK packet's vtag does not match vtag[REPLY]
-in the ct. The worst thing is the vtag in this ct will never get fixed
-by the upcoming packets from Server.
+>  MODULE_LICENSE("GPL");
+>
+>  module_init(init_em_meta);
+> diff --git a/net/sched/em_nbyte.c b/net/sched/em_nbyte.c
+> index a83b237cbeb0..34c6e8c8b695 100644
+> --- a/net/sched/em_nbyte.c
+> +++ b/net/sched/em_nbyte.c
+> @@ -68,6 +68,7 @@ static void __exit exit_em_nbyte(void)
+>         tcf_em_unregister(&em_nbyte_ops);
+>  }
+>
+> +MODULE_DESCRIPTION("Multi byte comparison network helpers");
 
-This patch fixes it by checking SCTP_CID_SHUTDOWN_ACK before setting
-vtag[REPLY] in the ct in sctp_new() as the annotation says. With this
-fix, it will leave vtag[REPLY] in ct to 0 in the case above, and the
-next HB REQ/ACK from Server is able to fix the vtag as its value is 0
-in nf_conntrack_sctp_packet().
+ematch classifier for arbitrary skb multi-bytes
 
-Signed-off-by: Xin Long <lucien.xin@gmail.com>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/netfilter/nf_conntrack_proto_sctp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+>  MODULE_LICENSE("GPL");
+>
+>  module_init(init_em_nbyte);
+> diff --git a/net/sched/em_text.c b/net/sched/em_text.c
+> index f176afb70559..7a89db8e5409 100644
+> --- a/net/sched/em_text.c
+> +++ b/net/sched/em_text.c
+> @@ -147,6 +147,7 @@ static void __exit exit_em_text(void)
+>         tcf_em_unregister(&em_text_ops);
+>  }
+>
+> +MODULE_DESCRIPTION("Textsearch comparison network helpers");
 
-diff --git a/net/netfilter/nf_conntrack_proto_sctp.c b/net/netfilter/nf_conntrack_proto_sctp.c
-index e7545bcca805..6b2a215b2786 100644
---- a/net/netfilter/nf_conntrack_proto_sctp.c
-+++ b/net/netfilter/nf_conntrack_proto_sctp.c
-@@ -299,7 +299,7 @@ sctp_new(struct nf_conn *ct, const struct sk_buff *skb,
- 			pr_debug("Setting vtag %x for secondary conntrack\n",
- 				 sh->vtag);
- 			ct->proto.sctp.vtag[IP_CT_DIR_ORIGINAL] = sh->vtag;
--		} else {
-+		} else if (sch->type == SCTP_CID_SHUTDOWN_ACK) {
- 		/* If it is a shutdown ack OOTB packet, we expect a return
- 		   shutdown complete, otherwise an ABORT Sec 8.4 (5) and (8) */
- 			pr_debug("Setting vtag %x for new conn OOTB\n",
--- 
-2.43.0
+ematch classifier for embedded text in skbs
 
+>  MODULE_LICENSE("GPL");
+>
+>  module_init(init_em_text);
+> diff --git a/net/sched/em_u32.c b/net/sched/em_u32.c
+> index 71b070da0437..ea32e4e12a99 100644
+> --- a/net/sched/em_u32.c
+> +++ b/net/sched/em_u32.c
+> @@ -52,6 +52,7 @@ static void __exit exit_em_u32(void)
+>         tcf_em_unregister(&em_u32_ops);
+>  }
+>
+> +MODULE_DESCRIPTION("U32 Key comparison network helpers");
+
+ematch skb classifier using 32 bit chunks of data
+
+>  MODULE_LICENSE("GPL");
+>
+>  module_init(init_em_u32);
+> --
+> 2.39.3
+>
 
