@@ -1,95 +1,96 @@
-Return-Path: <netdev+bounces-69889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C96784CEA4
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 17:10:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6626D84CEB4
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 17:14:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF4021F293A1
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 16:10:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 035861F28248
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 16:14:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFEAE80612;
-	Wed,  7 Feb 2024 16:10:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95BA98060E;
+	Wed,  7 Feb 2024 16:14:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EhgA7COQ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="FLKvS12u"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD347F7DF;
-	Wed,  7 Feb 2024 16:10:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B249020DCF
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 16:14:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707322226; cv=none; b=cV7GziCTSCesD4BDpP3DiJn4Qz+IKtA9FlAT8LfQGqvMWL3PmJif/8tGfnFCBviMK4iNqJDBcGxRpZMFTXEOdx2Lzg4Lnk0QUTEOwOI6c6aRSKG79OsKP++mf7qa/ijZvgaKUTQreJ9kvw1qmsV8lXJC2v0aMN+IGZZYqRMHImE=
+	t=1707322483; cv=none; b=CgYOR2qvxRR0XDRrD6YT7cHfxfYJCaXK+cwSuPtkCJbJWgBSkQiqJmkR2w99QeGIzQwVtQNkfciSArSmQv7f3GBApcWedADrwmHoXN+hYY9SEYLqTp46riN/JRvwBTqE6gKd82BBnIeKfG6V4JmOTV3frMOpf4SVk/FHw1LowsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707322226; c=relaxed/simple;
-	bh=PJbRFquDFS5PjoXy1Tp0XeTWuHvBy+YC5ZPjygbcMzI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=YJikEvVX1n1oyXZakJVLp3yySXJtmX8jxIKaJHuBngzM3TQtdI0e6tpfxVsGCm3wQRrv6Nrodlw2S82um7iGur9LAzhCoypR+RERAFh3R8qtrbAuiO+FxRpKB97q7XrMm0krqg2u9PugIqn+Vq1L4RnCJJcG17zit2Z2Lf+RH34=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EhgA7COQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4F5E9C433A6;
-	Wed,  7 Feb 2024 16:10:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707322226;
-	bh=PJbRFquDFS5PjoXy1Tp0XeTWuHvBy+YC5ZPjygbcMzI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EhgA7COQyuQt+GU35BYtbZ7fpKQmwnqADSmDVZ7xrzTgTx0giO6i+KJavGu4/xjvo
-	 Qg2NO3WrgBCFng7gFN9nToVjyEWANNiFppflxK9QmtYiuIDkbkfMM72Ab9Qqp4iB97
-	 /ODjPZ/QGhaYOZ95JvFdn9+4Ij6Uv9kiY2bpMHQbDlTybFRXhBETK/y65eqVAoh7zg
-	 Qrf+BPU4cxSWa3d1wwe1BYNNgjCoyCDNbdv6/PAdAJQgxoVDzB0ix8uxmom5SFJzBp
-	 FgEzqbFquQg6lX/X/18t12oHVeaEc+shhXb5lOl7gbi3MSTtGODn84uzl19OvBH6A0
-	 3LH/9zSZ3p+bQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 35FA3D8C96F;
-	Wed,  7 Feb 2024 16:10:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1707322483; c=relaxed/simple;
+	bh=6vEhRaMZalIVplBDmcr2WR2nxcZk76/9Eq0dy5jY5sU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nv0O3B9TSqrYCw6LZp8TBIsZNpprSkHRuZzVeY+cNrRrFJ0dD/7sdkP+BZ0faquv86hbljpuYA5/9KD4ZizjLLwgXuA/fYR6yH1bwateJP78pA5GEhaf/+ze/4b1NoF7jfCBblhaBS2tASzg3E3uN8hQt+6yaJ4/UqK2mKf7yEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=FLKvS12u; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Bip1UTDx5KuvZif9ify8FWQX/djbb3/ZjQmnCvYXEAs=; b=FLKvS12uaDmVJgP7DblFo4Hr7J
+	nkAMISOovdeN2WEYKj9kXlRgV07DgyqrngCCmX1tSARXdNxgvOeSeRcRn5hFCFKPKzG1sI3n5JNs7
+	9V9Fd/qkHGsocnj5pHuC1AwlBw9i2DPxB6kX2JEQ97KGgcbcn0TZjgKRh1d5dqFC4IBk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rXkZ8-007Eat-AZ; Wed, 07 Feb 2024 17:14:26 +0100
+Date: Wed, 7 Feb 2024 17:14:26 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	David Miller <davem@davemloft.net>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	Igor Russkikh <irusskikh@marvell.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH net-next] net: atlantic: convert EEE handling to use
+ linkmode bitmaps
+Message-ID: <ba71c38d-23ad-4e78-bb34-ea383ba8d13e@lunn.ch>
+References: <7d34ec3f-a2b7-41f5-8f4b-46ee78a76267@gmail.com>
+ <c7979b55-142b-469b-8da3-2662f0fe826e@lunn.ch>
+ <2046e53a-6de4-41e0-b816-3e7926ad489b@gmail.com>
+ <20240207075314.5458bd68@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 0/2] Bluetooth: Improve retrying of connection attempts
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <170732222621.9598.18285805408891036019.git-patchwork-notify@kernel.org>
-Date: Wed, 07 Feb 2024 16:10:26 +0000
-References: <20240206110816.74995-1-verdre@v0yd.nl>
-In-Reply-To: <20240206110816.74995-1-verdre@v0yd.nl>
-To: =?utf-8?q?Jonas_Dre=C3=9Fler_=3Cverdre=40v0yd=2Enl=3E?=@codeaurora.org
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240207075314.5458bd68@kernel.org>
 
-Hello:
-
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Tue,  6 Feb 2024 12:08:12 +0100 you wrote:
-> Since commit 4c67bc74f016 ("[Bluetooth] Support concurrent connect
-> requests"), the kernel supports trying to connect again in case the
-> bluetooth card is busy and fails to connect.
+On Wed, Feb 07, 2024 at 07:53:14AM -0800, Jakub Kicinski wrote:
+> On Wed, 7 Feb 2024 07:52:49 +0100 Heiner Kallweit wrote:
+> > > This is again a correct translation. But the underlying implementation
+> > > seems wrong. aq_ethtool_set_eee() does not appear to allow the
+> > > advertisement to be changed, so advertised does equal
+> > > supported. However aq_ethtool_set_eee() does not validate that the
+> > > user is not changing what is advertised and returning an error. Lets
+> > > leave it broken, and see if Aquantia/Marvell care.
+> > > 
+> > > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> > 
+> > This patch was by mistake set to "Changes requested".
 > 
-> The logic that should handle this became a bit spotty over time, and also
-> cards these days appear to fail with more errors than just "Command
-> Disallowed".
+> It's because of the comment about zeroing, not the latter one.
 > 
-> [...]
+> Sorry, it's impossible for me to guess whether he meant the tag
+> for v2 or he's fine with the patch as is. Andrew has the powers
+> to change pw state, I'm leaving this to him.
 
-Here is the summary with links:
-  - [v4,1/2] Bluetooth: hci_conn: Only do ACL connections sequentially
-    https://git.kernel.org/bluetooth/bluetooth-next/c/456561ba8e49
-  - [v4,2/2] Bluetooth: Remove pending ACL connection attempts
-    https://git.kernel.org/bluetooth/bluetooth-next/c/8e14d581d125
+Hi Heiner
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Sorry, i was not explicitly. The linkmode_zero() is not needed, so it
+would be good to remove it. Then feel free to add my Reviewed-by:
 
-
+      Andrew
 
