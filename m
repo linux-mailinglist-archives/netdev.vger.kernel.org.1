@@ -1,102 +1,68 @@
-Return-Path: <netdev+bounces-69680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41E1484C290
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 03:42:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 31CD384C2AF
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 03:48:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 759E7284F8E
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 02:42:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF7B9283DB9
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 02:48:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14E238C10;
-	Wed,  7 Feb 2024 02:42:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56F155382;
+	Wed,  7 Feb 2024 02:48:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DInrIvJc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F9+bkopP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E19A4F9DA;
-	Wed,  7 Feb 2024 02:42:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA5F125C1;
+	Wed,  7 Feb 2024 02:48:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707273725; cv=none; b=cuRj6UCapbDnNSq/qlutIc403Gr7JRbngxy9weSOeP4n4dPOTDhFV856k2wyXqW5HUGDbqPX6C2A6tnsR8Zdne9XAywdriGWoD6yqE2VBWVXbok6G3Q7mJlhrL3VGkUHAiMwyXD4ulRV9sEkK8go0Kv3b424jIadilildjnj7P8=
+	t=1707274091; cv=none; b=ia3dSlrFeqgDCEwxZ1R8Py6D8nk/C6bfsqPtFPOc4DC0aVSvRJj9BsC28T/CdVxIuE6/8tE95Kx4j8f99TaDJgM3wMjHY2+mhAbpOiY9W7PQ+QLxNBctdxZOmrEZ3fl2iXOZ9CydBZjIdftO2RiPpkgN68Tv+hSKc7zYkXrtEQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707273725; c=relaxed/simple;
-	bh=KqdTQlE9n+pcxn54PEEOzOz103tE1dBz1xoavx0jeEM=;
+	s=arc-20240116; t=1707274091; c=relaxed/simple;
+	bh=l9Cx7GFhHopBXLBZMG3XW2aycI48hJGl20X5dWgr2nI=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jMFX51Kys32pmkILead6kaPgIFgDPXOcxJLHAgZAxMbuv7zqSN+erFe63PkzsUeN4l4aR30wzvbbkxnT+QmPk829Vov/swIiRVY2RxUzGIKNr7zkLOCysUnTOQvuqedZod2BqGzd3uEJsbW+A7Z4AVa14LBQObESW9tpbvbuFow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DInrIvJc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E30EDC433F1;
-	Wed,  7 Feb 2024 02:42:03 +0000 (UTC)
+	 MIME-Version:Content-Type; b=mgCU1Ib4UQDzvh3AYjST/Bg/qbQH0jviRS9lrSDTN74Stvoi6bQbnOiuTOQHm2kZmi6S7Fcgp9PoYdr+tY8jc/knRy/UhGUNkWrgrhlJPBBLmw+4sZ2FG3wM4DlgN0CwHI+QjXLHxZ0p0hEiL8+HtKO2DG6QWSuuqH0HTLC8Zgk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F9+bkopP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5218CC433C7;
+	Wed,  7 Feb 2024 02:48:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707273724;
-	bh=KqdTQlE9n+pcxn54PEEOzOz103tE1dBz1xoavx0jeEM=;
+	s=k20201202; t=1707274090;
+	bh=l9Cx7GFhHopBXLBZMG3XW2aycI48hJGl20X5dWgr2nI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DInrIvJcpYBL8rWmUTYRQA9oF4iS/QMZrpNtaXmbjWvwbhJGvhEPMYpb8GIRqB0I1
-	 DTgce3OUJLLVHRSB7CxaVGBoqmJcemVIStiV3wz3/D8PiFqdjzEc2luBUrLYQNa0In
-	 8b7rv24h4Q6NtpxZ8LdZcegXUVI4PPAbN+Ip3sYx+sDcpNgS48tB/yQ5wU6QUBwSDX
-	 NLKvY8JnKFyxM3oHznvzbn/TUrOhuYUAOEsBvTJpz63HcDRURRsyR8tCVJKQc3BCKK
-	 Z+RrtU91qUWG6Obbj2k85qUNUr0trc+XG46tra/hZhZr7n1frq7QFbXnb9J/IAuK4d
-	 NLBVbvx247yCg==
-Date: Tue, 6 Feb 2024 18:42:02 -0800
+	b=F9+bkopPNBVv6deJ2R44MUvWx0DJxslxL9MYbbb/QgFvOK0KxsMkYAjjFK4WVMiCD
+	 H07WSklCOcJhJWcQ0UIjq4FTPq5R6DxZbVjCFwU4gw7nFzDAco0ix5Wp4g+hFzDccl
+	 gdoRSWcAo7PqDhs7MoNc197YnHYuG/bj2Ziw5iN3qxmXO6QOUNN0rLp0SNdo9FoLCe
+	 JVuHbnJByiERJzKeG+KOale9Uk+4butwxRNHBHwM4KZqG235E/+NxUBtHkUnLnGuoq
+	 ly27vzSwQ82HCPMWr/9y42PoEf9HGtAcWWgTop3QIVNc/yNSnGkdnijLBEIKfT28ix
+	 0oSrvKICHoPTA==
+Date: Tue, 6 Feb 2024 18:48:09 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
-Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
- Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>, Ricardo Neri
- <ricardo.neri-calderon@linux.intel.com>, Daniel Lezcano
- <daniel.lezcano@linaro.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko
- <jiri@resnulli.us>, Johannes Berg <johannes@sipsolutions.net>, Florian
- Westphal <fw@strlen.de>, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 1/3] genetlink: Add per family bind/unbind callbacks
-Message-ID: <20240206184202.3089c098@kernel.org>
-In-Reply-To: <20240206133605.1518373-2-stanislaw.gruszka@linux.intel.com>
-References: <20240206133605.1518373-1-stanislaw.gruszka@linux.intel.com>
-	<20240206133605.1518373-2-stanislaw.gruszka@linux.intel.com>
+To: allison.henderson@oracle.com
+Cc: netdev@vger.kernel.org, rds-devel@oss.oracle.com,
+ linux-rdma@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
+ davem@davemloft.net, santosh.shilimkar@oracle.com
+Subject: Re: [PATCH v2 1/1] net:rds: Fix possible deadlock in
+ rds_message_put
+Message-ID: <20240206184809.1a245236@kernel.org>
+In-Reply-To: <20240131175417.19715-1-allison.henderson@oracle.com>
+References: <20240131175417.19715-1-allison.henderson@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue,  6 Feb 2024 14:36:03 +0100 Stanislaw Gruszka wrote:
-> +static void genl_unbind(struct net *net, int group)
-> +{
-> +	const struct genl_family *family;
-> +	unsigned int id;
-> +
-> +	down_read(&cb_lock);
-> +
-> +	idr_for_each_entry(&genl_fam_idr, family, id) {
-> +		const struct genl_multicast_group *grp;
-> +		int i;
-> +
-> +		if (family->n_mcgrps =3D=3D 0)
-> +			continue;
-> +
-> +		i =3D group - family->mcgrp_offset;
-> +		if (i < 0 || i >=3D family->n_mcgrps)
-> +			continue;
-> +
-> +		grp =3D &family->mcgrps[i];
-> +
-> +		if (family->unbind)
-> +			family->unbind(i);
-> +
-> +		break;
+On Wed, 31 Jan 2024 10:54:17 -0700 allison.henderson@oracle.com wrote:
+> Fixes: possible deadlock in rds_message_put
 
-Compiler says:
-
-net/netlink/genetlink.c:1857:52: warning: variable =E2=80=98grp=E2=80=99 se=
-t but not used [-Wunused-but-set-variable]
- 1857 |                 const struct genl_multicast_group *grp;
-      |                                                    ^~~
---=20
-pw-bot: cr
+This is not a correct Fixes tag. Please look at git history
 
