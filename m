@@ -1,103 +1,115 @@
-Return-Path: <netdev+bounces-69775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98A3C84C883
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 11:22:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8048984C885
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 11:23:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37F4A1F22F23
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 10:22:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B18BB1C24E9A
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 10:23:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422573F9D5;
-	Wed,  7 Feb 2024 10:20:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E74AA25571;
+	Wed,  7 Feb 2024 10:22:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="iGHYtPcn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 739242232C;
-	Wed,  7 Feb 2024 10:20:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CD2320DCF
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 10:22:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707301203; cv=none; b=FHcWZYjVtpbJnMqRmob1caxyC78ZQTdmRY8g9YMc5Le3lwDaCWw44eqCxrzwJWvuXYNfo9MgCY0VHy+JY7W4i83/5YPmqR5gEUrBlImxUWyyDcfXF3xYHvLDJlD0RcPHqXZonfgRqtBg+thldaqebDjEJZ0oAeGiUZ/UvaAqXeA=
+	t=1707301363; cv=none; b=k/whPliHh2QLW9V64j9Hp/3t0o/U5X8OjErK2CqRY5GXt+niL7srXcnS8+F/hFPGmtuGUKMRzf4bFJKFQLDy1v8O23g2XvrlQRVRi9ISYu2lJUWZ8GFA1yz3l0izFgRw1AG3eXZapE0ZV1qa4Vzl2dG1jgUQiN4yOohFiSpsyM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707301203; c=relaxed/simple;
-	bh=ZIYJJskWurszPGjPRZpJUtbt1AXZlUpfp0K0t1yduDU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CVD8mNLkQ1YKb3sb+AJWp8tr22PatMKQ6JBUSTz2wvN7+ATqPjRHTs8y73EN7oungt5jV1bbyb4svHc7Ujh5y9o6JfdqwyV+k4CqmddVwNLpNLDfyd5aKB2dpw1bPctJ9R9xPtqMoyP/6fXoxwBG3HIyUHToUk5Knx6RP7OI6mc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-5116588189aso742490e87.1;
-        Wed, 07 Feb 2024 02:20:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707301199; x=1707905999;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4PeYGuM2VzWmaP8pGOHtb0MhEd16/0MAF4k7QK8QyX8=;
-        b=NIS0uXBc/A3O9NEdY8sTiwUxPXmyazMeNAhWN4Hn0AIRH3AVvpHKZjtfJ9/IZqDLpK
-         2brP747V/zZog37FOY63a8XlbnIOo4BUa9vMDWGcINAsnJlTM6ob80SsHnqQhb7o8Z5q
-         H2XgzS6F/u9uWcZ41YtJJPSb1xgCX2aPjc9yOxR6zgTOdblKRX9xpKQIwnA8s3dwr3xG
-         4WPrHbir8qG/fm2OIyhLl2M+XqwOn15Oy7tdwvvqnJCFcYoR91vBEwoDooma4+e5NEIw
-         k+cRIRoy5ngXcRT+LebWJ9Sg1YUxeDcvh5cWr6XBhSrWYpGb9FNNWJfIjLeCnfotnkyQ
-         Vfbw==
-X-Forwarded-Encrypted: i=1; AJvYcCXqaE5tA9p5lozJ3wjqTijTKAoAsP2g3eE12a8Yb/cWShuj6glV0hoOuGtwCCcWBAVbnVe5MRSN0BlIhnm+BDISFg1GTPomFHPJLowr
-X-Gm-Message-State: AOJu0YzaO4TkIa/jM9tnyhB16/Yv/tqG/7eYmexaYRwK+VggyHxKS/R1
-	Pr/IpBChqJ0MypfVwBYNNhiqsjWyGYbc74G9ohTzXU2K422YMznE
-X-Google-Smtp-Source: AGHT+IFJfUPvqhYCHaBjDbiqHzik7FlqWyPHWDSh9+YHk/9V8T3UTX1M49MB9lEX2Vr1IGry9YsKDg==
-X-Received: by 2002:a05:651c:20e:b0:2d0:a3ff:33c4 with SMTP id y14-20020a05651c020e00b002d0a3ff33c4mr3709585ljn.16.1707301199331;
-        Wed, 07 Feb 2024 02:19:59 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWDn2j3lviigQChRqa1aH1Rwws/2aEuJJUKb0/JECozRGJtISUxS9QOn8ABjvYc8ZPBsNIjg+WKHzq+5FRg3HjNKSNRTO3sz9lDp0vf5PNwtpa+sJCJI4DRebpBToV/BIfagXyHY00CDZE43RcyClLPE5t7qTiqH/B/GtTdXTN5E+Llt5oC2dr+vWzd0kPPu3/X8FlVB1KVhfjdYAH4ayFfOaVb+9/x6+t/Gi5C8/Vlubm71WAiQUlVPMAt5D/2o/yp6J33CEWZ5qsohB0PsoCB0vbKLA==
-Received: from localhost (fwdproxy-lla-002.fbsv.net. [2a03:2880:30ff:2::face:b00c])
-        by smtp.gmail.com with ESMTPSA id br10-20020a170906d14a00b00a3522154450sm603159ejb.12.2024.02.07.02.19.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Feb 2024 02:19:59 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-To: kuba@kernel.org,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	horms@kernel.org
-Subject: [PATCH net v2 9/9] net: fill in MODULE_DESCRIPTION()s for dsa_loop_bdinfo
-Date: Wed,  7 Feb 2024 02:19:28 -0800
-Message-Id: <20240207101929.484681-10-leitao@debian.org>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20240207101929.484681-1-leitao@debian.org>
-References: <20240207101929.484681-1-leitao@debian.org>
+	s=arc-20240116; t=1707301363; c=relaxed/simple;
+	bh=UrCEdE2RKwippZQRH5gNyXV5Y7JV344lQyXLn41khhA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LH2ppc3eryqYXAi05otb4Xw2Iq7B+jr6h5Opdvd6WrbOAHq3twGLEubypHDc5S1i12U7vpUNe5GmbNXdwQ+T48e09f6DbzPsLbBkWexGuyvqvcNis1SBYtVGT/KYCRaB59YoQfAhglidLNUqPdNaLIIloYar1yx2r1K1ic/pFAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=iGHYtPcn; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E0F1E6000C;
+	Wed,  7 Feb 2024 10:22:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1707301353;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1kw7T8Vrms6nIk+zbJmIsnSNdRSFsOuj6MWR+pEJ0wY=;
+	b=iGHYtPcnvD9MLOsbUVRJ+5wdaB70q2n4E8a9ISTIZgRubxtwxQi/eCzmf0spioTC2JIhnJ
+	ijer+f6KARnF9YowBRBOk9lFTt7wElMCjQm8mYQGcxprOW0nWsjH3CtU/jQXniiyT54Pah
+	aHn5pPtvxNGTlD1xq/RTlqUMHehK427GEX1G1T06KQn33CjqUdrwBqDTPXAM6SumIBHniz
+	rM8HZZwdqfsWx4Bn/E85Hy4CzDdBzqAioeKDxa81PaYVws16vzLXGbqC4byiIfhdnj8DwS
+	CztLx8CxScmdExk1eB7sSiW59HUIysp3rnmSonV4X7/WtGJ9gwmU0z/x2LDNJA==
+Date: Wed, 7 Feb 2024 11:22:31 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Elad Nachman <enachman@marvell.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Taras Chornyi
+ <taras.chornyi@plvision.eu>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: Re: [EXT] Prestera driver fail to probe twice
+Message-ID: <20240207112231.2d555d3e@kmaincent-XPS-13-7390>
+In-Reply-To: <BN9PR18MB42519830967969DEA4E329EFDB462@BN9PR18MB4251.namprd18.prod.outlook.com>
+References: <20240206165406.24008997@kmaincent-XPS-13-7390>
+	<BN9PR18MB42519830967969DEA4E329EFDB462@BN9PR18MB4251.namprd18.prod.outlook.com>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-W=1 builds now warn if module is built without a MODULE_DESCRIPTION().
-Add descriptions to the DSA loopback fixed PHY module.
+On Tue, 6 Feb 2024 18:30:33 +0000
+Elad Nachman <enachman@marvell.com> wrote:
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- drivers/net/dsa/dsa_loop_bdinfo.c | 1 +
- 1 file changed, 1 insertion(+)
+> Sorry, that's not how this works.
+>=20
+> The firmware CPU loader will only reload if the firmware crashed or exit.
+>=20
+> Hence, insmod on the host side will fail, as the firmware side loader is =
+not
+> waiting For the host to send a new firmware, but first for the existing
+> firmware to exit.
 
-diff --git a/drivers/net/dsa/dsa_loop_bdinfo.c b/drivers/net/dsa/dsa_loop_bdinfo.c
-index 237066d30704..fd412ae4e84b 100644
---- a/drivers/net/dsa/dsa_loop_bdinfo.c
-+++ b/drivers/net/dsa/dsa_loop_bdinfo.c
-@@ -32,4 +32,5 @@ static int __init dsa_loop_bdinfo_init(void)
- }
- arch_initcall(dsa_loop_bdinfo_init)
- 
-+MODULE_DESCRIPTION("DSA loopback fixed PHY library");
- MODULE_LICENSE("GPL");
--- 
-2.39.3
+With the current implementation we can't rmmod/insmod the driver.
+Also, in case of deferring probe the same problem appears and the driver wi=
+ll
+never probe. I don't think this is a good behavior.
 
+Isn't it possible to verify that the firmware has already been sent and is
+working well at the probe time? Then we wouldn't try to flash it.
+
+Or stop the firmware at remove time and in case of probe defer.
+=20
+> By design, the way to load new firmware is by resetting both CPUs (this
+> should be covered by CPLD).
+
+Are you saying the only way to stop the firmware is to shutdown the CPU?
+As ask above, can't we know if the firmware has already been load?
+
+> Can you please explain:
+>=20
+> 1. What kind of HW / board are you trying this on?
+> 2. Who is the customer requesting  this?
+> 3. What is the design purpose of this change?
+
+I have no particular request for that.
+I was debugging a PoE controller driver that the prestera was depending on,=
+ I
+was playing with these in a module state to verify the kref free.
+
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
