@@ -1,147 +1,154 @@
-Return-Path: <netdev+bounces-69731-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69732-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EF2684C691
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 09:48:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98A9184C6A4
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 09:50:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A759B1C217DC
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 08:48:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34ED01F295B4
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 08:50:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C770200A4;
-	Wed,  7 Feb 2024 08:48:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E430F208DE;
+	Wed,  7 Feb 2024 08:49:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QZ5+efRE"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="Eom+s0jk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6257120DD8;
-	Wed,  7 Feb 2024 08:48:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F29A7241E7
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 08:49:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707295683; cv=none; b=QQGT0UulxUbE85JdEAN+QWjgHQYNA+oP/WQJ1xMr8OHi84ID4+5BIbNTnqtdv9ZazOa0BbtxhqTPNsgx+0Uv1BI3EaYe0Fy5Y0wJp9K4GdLCY6F6iUVjAzduwqflolt75lQSoYqdLuBuozl0+bRlGooh4w+piAs2m1ElpHavWrA=
+	t=1707295776; cv=none; b=ZwUt11CLTDf43PemlsDLv7pvToSpDGCQHN/yTzhGOMbhtW4OaSbmsxEqabxPveVLyhXpp78mnDtP/T5j6dxZeiSYD2oR82YeDtySwb6Om0n965RHP/dTNNoGR774jTj2U4R7svODZderptlaSr8S+uZxIv1rRTvm32Yj8LD3XFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707295683; c=relaxed/simple;
-	bh=Ob3G3uS77jv9IBqBz/Ayr/vtbRlwHRFDLvJo7yFWl0I=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t3gD12U/F+jwhhyOGVZYdNfJbNv7xkCBm9Vl8zpaIaRAEDF92siudj1ZgJMy3NuFYzueiGr21ap44A+YW+qufWHGJN5NL8NoQqLF8ZN8g5jiVTtOpTrxwexlREjOBAgpi2VbgXrcRQgTh+iiu3Sa4vZ53jE+5SwC/m9F4hdqJYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QZ5+efRE; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-33b1c33b9c9so83531f8f.0;
-        Wed, 07 Feb 2024 00:48:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707295679; x=1707900479; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PNZDQhXm5PMJ7sIVLmTHOOeuso3IU3bmrVPAnHG4hCU=;
-        b=QZ5+efREi9NBkMLUI5lFvHONPBIikgOh+ZbkkJeetTyLFAinrNWzVtRbozHgtuRRQb
-         S0KvHIyWsunc0d7DUydVSRtUN0qy4C9aX0YNbP+kpl/7o91Dio3Mks/gafy4A6eOzkDY
-         qfoRj9kNjLEJdHHGvCLBChaeNyQ8gvMeoZmdewSNIXKVpwcemETcGcLjwBU6UFXpbzm6
-         8rhS4NWyYVUxGP+YDPe5pab6O25mjgmzD7+bJYNrGoRDHl3weNjBKzRVe7VAFD9vYVyO
-         Kosl8qmX42SdvN3xvdVp69RZks0Bz9GH55R037xhzQVBSzIS4/iJUS3RoQhM8fHEK2Ix
-         qlFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707295679; x=1707900479;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PNZDQhXm5PMJ7sIVLmTHOOeuso3IU3bmrVPAnHG4hCU=;
-        b=axheDrfTI7Q4wiOXmsh3xluPGJRz+lJa5zwsDmHB0ScSVlY0WcL8DjWdkteX7zTm7n
-         4/g+HH8v6OJaQRGdKgxurCLba7H9kIXO+UNI4nv0wIMtj4yoXxW2bOzKMcrVmDxv4cBy
-         OKjVY+CQz89NRQ/uuf8cRP1xXCXZPBHdEbvDQICEJDJV8QwIoPgIiaT4DxN1xIUO1sMV
-         f9vTRbpG1AXvTz8ze4sP2QDmfi1Tx2glGT9CgbZCB13uiQwSIfJs6k8RfD6Upim3zt8r
-         WvZUuUDshxjz0Qc+17KZSiu5x8br0AUmd94pvM8hmD4kyDoW514uhmsICxzKLHkWlEsx
-         pdvw==
-X-Gm-Message-State: AOJu0YxlTcDySPExDxnBbv6cp48aquddYqtna9CIbwM3yRo53KHeAkOv
-	KNX5ofJ0tORMTrC2c38k4aJ3C6XLxKEr2wzhqWQEOMB9RJ19EvBV
-X-Google-Smtp-Source: AGHT+IEnSSV9fm87Li5GQk9Ie8kmLXD/Yq2c7jpoWAU8udLECt2uQsv7ikcYdWCxQ9+dQwRUGirumg==
-X-Received: by 2002:a05:600c:198f:b0:40f:bda6:ccc0 with SMTP id t15-20020a05600c198f00b0040fbda6ccc0mr4120618wmq.1.1707295679326;
-        Wed, 07 Feb 2024 00:47:59 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXbaBmjbacNDfw4uTYbb75EMgYuAMEFd/3fCWa9kU9Bb/wDmXCfkZsgQow4FlFmtBTljn8oobn8N+LOOiqPgXm9sZvSVAh5CjKlGm8q3Q5BnyZGgI/ZussR26fvgKGnixwNT+1aK7+kO4XFwRRkRZ/UqvSZ406GVebBJpygZydvjODGs7n89zX/h0f4jARrBA8Mdanv7Vbx3TpWVOWyFeAiVai1uM4kPJULX34vXnNbXIUBz2cM52UKu9vOy6ji2m7jk2RHHEJHmLKbQfxtKwAzoPeVMOPFCVz9VKBY/SRIjomzHT/lSjKExndPy/cN60tGpYEWzbnEIVmQshqj5QVqEZrhBCWdO/N+d26lnawPcOZ5AAcvd2i5LxMfjR4m1PyRgc49wJJhPKLCLUpOCbrwy9Nx59HRWrG7g2UtiKovat1I3xz5+FovvISQ829mxC4IxFZyekee06NpvvE38RHK0zVQcup5hlGUMoqkRuK0YfR9W5G+7Lf8eeffmw==
-Received: from localhost.localdomain (h-158-174-22-45.NA.cust.bahnhof.se. [158.174.22.45])
-        by smtp.gmail.com with ESMTPSA id n13-20020a05600c4f8d00b0040fd1629443sm1311404wmq.18.2024.02.07.00.47.57
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 07 Feb 2024 00:47:58 -0800 (PST)
-From: Magnus Karlsson <magnus.karlsson@gmail.com>
-To: magnus.karlsson@intel.com,
-	bjorn@kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	netdev@vger.kernel.org,
-	maciej.fijalkowski@intel.com,
-	kuba@kernel.org,
-	toke@redhat.com,
-	pabeni@redhat.com,
-	davem@davemloft.net,
-	j.vosburgh@gmail.com,
-	andy@greyhouse.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	edumazet@google.com,
-	lorenzo@kernel.org
-Cc: bpf@vger.kernel.org,
-	Prashant Batra <prbatra.mail@gmail.com>
-Subject: [PATCH net v2] bonding: do not report NETDEV_XDP_ACT_XSK_ZEROCOPY
-Date: Wed,  7 Feb 2024 09:47:36 +0100
-Message-ID: <20240207084737.20890-1-magnus.karlsson@gmail.com>
-X-Mailer: git-send-email 2.42.0
+	s=arc-20240116; t=1707295776; c=relaxed/simple;
+	bh=4MxWQqU8xb3ytrnFvWJU0IS1o75oyezzHeccMvg2eVA=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Content-Type; b=Yndb2/oxkZIcZ1J5Pk3gI0x8XUuqXW7H/0Y7TGHaeLgP78uWf12rTz45TfxaUJI+7Ng0WTkSyuYPeoeTrAPBWKPsUh1UZOkI0UOen9jYMoBTtPSZFmBEGnkafrdCVD5xnNjXnaiTtfOu+gMavt1M2q3ZeB7oYfNtyIFpfbOOwCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=Eom+s0jk; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+	:Subject:From:To:MIME-Version:Date:Message-ID:Sender:Reply-To:Cc:Content-ID:
+	Content-Description:In-Reply-To:References;
+	bh=lYTTIA439EQ7SPVHcgh/tpZXPjwduRsZgpK7i59sQnM=; b=Eom+s0jkBxZSvzd0Hjx1gJuiHs
+	Urr92Ll1zwxmLC2cjOErf714MDgGd+N4qmKNrzTXvASuRaqrry7uw/xMNY3egOgJqWN82eO/abxMo
+	MxoKgwaR+BRXUnYgvhQGZcNkGUIiyoqEmB3C/3vYiyW8ZEjQG/mOYdYFBIWkRsYOZA3oKf3chATk6
+	QO8QZ1NwME5egAeroV0XBR5SkmbuYmLhFIF4MHGwSY1qHCI5TVOOqZ+cui8Mtn/O/36XBqlE7vUSG
+	1Pq6fDYXyeZJBQqv1u0kjj60SV3jBWiu5DNmzhB/t/XBA5toMaFx/ULYJnYCXwRtvvCWYJAtOPE2d
+	dAo7p62A==;
+Received: from fpd2fa7e2a.ap.nuro.jp ([210.250.126.42] helo=[192.168.1.6])
+	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rXdcX-0000000Ctta-0G8m;
+	Wed, 07 Feb 2024 08:49:29 +0000
+Message-ID: <e0c28bda-4b8a-48eb-b2e6-033abc82ff5b@infradead.org>
+Date: Wed, 7 Feb 2024 17:49:22 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: sambat goson <sombat3960@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Geoff Levand <geoff@infradead.org>
+Subject: [PATCH v3 net] ps3/gelic: Fix SKB allocation
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Magnus Karlsson <magnus.karlsson@intel.com>
+Commit 3ce4f9c3fbb3 ("net/ps3_gelic_net: Add gelic_descr structures") of
+6.8-rc1 did not allocate a network SKB for the gelic_descr, resulting in a
+kernel panic when the SKB variable (struct gelic_descr.skb) was accessed.  
 
-Do not report the XDP capability NETDEV_XDP_ACT_XSK_ZEROCOPY as the
-bonding driver does not support XDP and AF_XDP in zero-copy mode even
-if the real NIC drivers do.
+This fix changes the way the napi buffer and corresponding SKB are
+allocated and managed.
 
-Note that the driver used to report everything as supported before a
-device was bonded. Instead of just masking out the zero-copy support
-from this, have the driver report that no XDP feature is supported
-until a real device is bonded. This seems to be more truthful as it is
-the real drivers that decide what XDP features are supported.
+Reported-by: sambat goson <sombat3960@gmail.com>
+Fixes: 3ce4f9c3fbb3 ("net/ps3_gelic_net: Add gelic_descr structures")
+Signed-off-by: Geoff Levand <geoff@infradead.org>
 
-Fixes: cb9e6e584d58 ("bonding: add xdp_features support")
-Reported-by: Prashant Batra <prbatra.mail@gmail.com>
-Link: https://lore.kernel.org/all/CAJ8uoz2ieZCopgqTvQ9ZY6xQgTbujmC6XkMTamhp68O-h_-rLg@mail.gmail.com/T/
-Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
----
- drivers/net/bonding/bond_main.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 4e0600c7b050..a11748b8d69b 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -1819,6 +1819,8 @@ void bond_xdp_set_features(struct net_device *bond_dev)
- 	bond_for_each_slave(bond, slave, iter)
- 		val &= slave->dev->xdp_features;
+diff --git a/drivers/net/ethernet/toshiba/ps3_gelic_net.c b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+index d5b75af163d3..3ebe903e4b6d 100644
+--- a/drivers/net/ethernet/toshiba/ps3_gelic_net.c
++++ b/drivers/net/ethernet/toshiba/ps3_gelic_net.c
+@@ -375,20 +375,15 @@ static int gelic_card_init_chain(struct gelic_card *card,
+ static int gelic_descr_prepare_rx(struct gelic_card *card,
+ 				  struct gelic_descr *descr)
+ {
+-	static const unsigned int rx_skb_size =
+-		ALIGN(GELIC_NET_MAX_FRAME, GELIC_NET_RXBUF_ALIGN) +
+-		GELIC_NET_RXBUF_ALIGN - 1;
++	static const unsigned int napi_buff_size =
++		round_up(GELIC_NET_MAX_FRAME, GELIC_NET_RXBUF_ALIGN);
++	struct device *dev = ctodev(card);
+ 	dma_addr_t cpu_addr;
+-	int offset;
++	void *napi_buff;
  
-+	val &= ~NETDEV_XDP_ACT_XSK_ZEROCOPY;
+ 	if (gelic_descr_get_status(descr) !=  GELIC_DESCR_DMA_NOT_IN_USE)
+-		dev_info(ctodev(card), "%s: ERROR status\n", __func__);
++		dev_info(dev, "%s: ERROR status\n", __func__);
+ 
+-	descr->skb = netdev_alloc_skb(*card->netdev, rx_skb_size);
+-	if (!descr->skb) {
+-		descr->hw_regs.payload.dev_addr = 0; /* tell DMAC don't touch memory */
+-		return -ENOMEM;
+-	}
+ 	descr->hw_regs.dmac_cmd_status = 0;
+ 	descr->hw_regs.result_size = 0;
+ 	descr->hw_regs.valid_size = 0;
+@@ -397,24 +392,32 @@ static int gelic_descr_prepare_rx(struct gelic_card *card,
+ 	descr->hw_regs.payload.size = 0;
+ 	descr->skb = NULL;
+ 
+-	offset = ((unsigned long)descr->skb->data) &
+-		(GELIC_NET_RXBUF_ALIGN - 1);
+-	if (offset)
+-		skb_reserve(descr->skb, GELIC_NET_RXBUF_ALIGN - offset);
+-	/* io-mmu-map the skb */
+-	cpu_addr = dma_map_single(ctodev(card), descr->skb->data,
+-				  GELIC_NET_MAX_FRAME, DMA_FROM_DEVICE);
+-	descr->hw_regs.payload.dev_addr = cpu_to_be32(cpu_addr);
+-	if (dma_mapping_error(ctodev(card), cpu_addr)) {
+-		dev_kfree_skb_any(descr->skb);
++	napi_buff = napi_alloc_frag_align(napi_buff_size,
++					  GELIC_NET_RXBUF_ALIGN);
 +
- 	xdp_set_features_flag(bond_dev, val);
- }
++	if (unlikely(!napi_buff))
++		return -ENOMEM;
++
++	descr->skb = napi_build_skb(napi_buff, napi_buff_size);
++
++	if (unlikely(!descr->skb)) {
++		skb_free_frag(napi_buff);
++		return -ENOMEM;
++	}
++
++	cpu_addr = dma_map_single(dev, napi_buff, napi_buff_size,
++				  DMA_FROM_DEVICE);
++
++	if (dma_mapping_error(dev, cpu_addr)) {
++		skb_free_frag(napi_buff);
+ 		descr->skb = NULL;
+-		dev_info(ctodev(card),
+-			 "%s:Could not iommu-map rx buffer\n", __func__);
++		dev_err_once(dev, "%s:Could not iommu-map rx buffer\n",
++			     __func__);
+ 		gelic_descr_set_status(descr, GELIC_DESCR_DMA_NOT_IN_USE);
+ 		return -ENOMEM;
+ 	}
  
-@@ -5909,9 +5911,6 @@ void bond_setup(struct net_device *bond_dev)
- 	if (BOND_MODE(bond) == BOND_MODE_ACTIVEBACKUP)
- 		bond_dev->features |= BOND_XFRM_FEATURES;
- #endif /* CONFIG_XFRM_OFFLOAD */
--
--	if (bond_xdp_check(bond))
--		bond_dev->xdp_features = NETDEV_XDP_ACT_MASK;
- }
+-	descr->hw_regs.payload.size = cpu_to_be32(GELIC_NET_MAX_FRAME);
++	descr->hw_regs.payload.size = cpu_to_be32(napi_buff_size);
+ 	descr->hw_regs.payload.dev_addr = cpu_to_be32(cpu_addr);
  
- /* Destroy a bonding device.
-
-base-commit: cb88cb53badb8aeb3955ad6ce80b07b598e310b8
--- 
-2.42.0
-
+ 	gelic_descr_set_status(descr, GELIC_DESCR_DMA_CARDOWNED);
 
