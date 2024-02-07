@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-69882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9958784CE7A
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 16:59:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE24A84CE7B
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 16:59:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52C412847DE
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:59:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 758A92881A8
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:59:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F79580032;
-	Wed,  7 Feb 2024 15:59:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A3CB8003D;
+	Wed,  7 Feb 2024 15:59:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f9vTUO+a"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uc+gBrxl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69FD47FBDE
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 15:59:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E657A723;
+	Wed,  7 Feb 2024 15:59:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707321556; cv=none; b=DzIuDyEJCGGJm9QYKrW1nTMpMka6eoZ3g6tISxHDnayjb2OCAr2bPJM9cde42hWGaz34iYx0o9L/wSpIqaot7YlUg2TR0/VbxgVVOhxaL1WMQHFFFXCJ6zqFZW3CK0qsvmFMqhMi+yh4JqdqnnTkIYAoYx+LC5nwbiv1JwTisNc=
+	t=1707321575; cv=none; b=Gdts2cx5kNKYWqzNkcnBsRqz85tzkJwOOP8gRA1r/zelDe6JKflgHdbROlKKVxylQjbFk+kcxWmFzwPfgrrhtgC2r8nfFAFtyWEC5xN1gTjzYTbpQQgW+sSFXL2965q7ZNqccUBdqBf2laBNHIVDoT1TL7EKKInYZ7JKwXuMaOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707321556; c=relaxed/simple;
-	bh=3HnDxcHSTSy88S9pAPkg6Vx3dtiAzZ4FP7G9/sZGiKE=;
+	s=arc-20240116; t=1707321575; c=relaxed/simple;
+	bh=DRRUUJRsaGfjxEzJJlvyIViu2yXOOjmEuzOzTh+lAOE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tsuz2yrZkE4d6/0bgtt/MpW2xJbNyv7RVIPzQriTaxaGioYblLSkK9M5fkHpgmuQjCNg3mczz3mauUoCbu86yPgDdi+zwSuIzkymc689ifKjbWSGQoeAXJaV4lgyQWvlOymrE38/40mp8jn0DG5itc/iYaA+AAlt1VXoBcQCEno=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f9vTUO+a; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5856DC433C7;
-	Wed,  7 Feb 2024 15:59:15 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=TaZwdcw+CeYQ74A1hpuGyEmoCioMANgBy4TM4lDnx3VgkMFWMxglmwySUHM8MQSEy0+aTbVg9yks5QWk54TaVgsGWZtE5VSZB5U6RW/lfMkuifGPSsfDLkzn6IWirKkm35nSa8sBObGFrZ3v6INu1Y2JQD4mnCTwoS30zrneFTc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uc+gBrxl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F41E0C433F1;
+	Wed,  7 Feb 2024 15:59:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707321555;
-	bh=3HnDxcHSTSy88S9pAPkg6Vx3dtiAzZ4FP7G9/sZGiKE=;
+	s=k20201202; t=1707321574;
+	bh=DRRUUJRsaGfjxEzJJlvyIViu2yXOOjmEuzOzTh+lAOE=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=f9vTUO+a06Bn/SdLwCMMAnmsZ1LMw/ea5/mLxWaZ4eMAswimc1LxXfFgWzfHnKTxu
-	 hfYV5GRxiKUQn4a3M6r6znuNOuRS6OzbCXyHe3oxLZ8FzzKntYxumIIxJwp0J9CKac
-	 PuUMDdHetW1ix99iBZJCKZkxOwwh8Nc2qwiMiGEfW3sbFBuVgV2MIWbpDsbao9rznl
-	 bX5BKWnqh6VEmSuxIhLRw11f+UWbVAtJH2Y3uI12mqCT9cX2RLGFNab8SM52wlTu2+
-	 BVeepv4R3xJmArwuOIsFsHL82e59e/W2Fr34wLs1/PEgckb3oTNJYzF1tNromgMplI
-	 YjkmUvsN2UATg==
-Message-ID: <7bedca5f-de17-4692-b46a-bc5b2b974aa3@kernel.org>
-Date: Wed, 7 Feb 2024 08:59:15 -0700
+	b=uc+gBrxl4siKKAcZeuYuSaOarhYI0/hJOj6Il3ALhygUKUhBSzL64PA2VSIDT00uC
+	 32VzBBTxChI2daOJMlV1Jta/c3aXl7HjJmtX+gZeyzLiIbSl95+kL+m3/rR5rCvNNw
+	 pe0DBdyKoEyRxjXUbL+gTocs35523nn/vmuCR7rkR+xFXar54fG13fmF3jyPotHpku
+	 gWhPkyFJJJ/6Bw7qVtfnJo+XY8JIWqBONs0o6jlI+HkiQwu+kvAVblvokavQJu0Ki+
+	 30t797iWpDcQagDl7hAy7AbHmZKOKH3Dz93CDmiN/8eBLGTF5qnguDqoEaf/0ZAmt9
+	 8kTx0eZoDMMMg==
+Message-ID: <f5233a6a-7b89-4b5c-a136-5284440f1951@kernel.org>
+Date: Wed, 7 Feb 2024 16:59:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,49 +50,206 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 4/5] net/ipv6: set expires in
- modify_prefix_route() if RTF_EXPIRES is set.
-Content-Language: en-US
-To: thinker.li@gmail.com, netdev@vger.kernel.org, ast@kernel.org,
- martin.lau@linux.dev, kernel-team@meta.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, liuhangbin@gmail.com
-Cc: sinquersw@gmail.com, kuifeng@meta.com
-References: <20240205214033.937814-1-thinker.li@gmail.com>
- <20240205214033.937814-5-thinker.li@gmail.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240205214033.937814-5-thinker.li@gmail.com>
+Subject: Re: [TEST] Wiki / instructions
+Content-Language: en-GB, fr-BE
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "netdev-driver-reviewers@vger.kernel.org"
+ <netdev-driver-reviewers@vger.kernel.org>
+References: <20240202093148.33bd2b14@kernel.org>
+ <90c6d9b6-0bc4-468a-95fe-ebc2a23fffc1@kernel.org>
+ <20240206173705.544f4cb2@kernel.org>
+ <bd1462f0-83e9-4c0d-8591-e76eb002fb08@kernel.org>
+ <20240207072159.33198b36@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240207072159.33198b36@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2/5/24 2:40 PM, thinker.li@gmail.com wrote:
-> From: Kui-Feng Lee <thinker.li@gmail.com>
+On 07/02/2024 16:21, Jakub Kicinski wrote:
+> On Wed, 7 Feb 2024 09:50:48 +0100 Matthieu Baerts wrote:
+>> On 07/02/2024 02:37, Jakub Kicinski wrote:
+>>> On Mon, 5 Feb 2024 18:21:56 +0100 Matthieu Baerts wrote:  
+>>>> Thank you for this wiki page, and all the work with the CI infrastructure!
+>>>>
+>>>> For the debug options, I see that you are using:
+>>>>
+>>>>   kernel/configs/x86_debug.config
+>>>>
+>>>> It looks like this is specific for the 'tip' tree:
+>>>>
+>>>>   Debugging options for tip tree testing
+>>>>
+>>>> I don't know if it is still maintained, e.g. it includes DEBUG_SLAB
+>>>> option. But also, it enables options that are maybe not needed: GCOV?
+>>>> X86_DEBUG_FPU?
+>>>> Maybe it is better not to use this .config file, no?  
+>>>
+>>> I haven't looked to closely. I noticed that the basic debug config
+>>> doesn't enable LOCKDEP ?! so I put the x86 one on top.  
+>>
+>> I was surprised not to see LOCKDEP there, but in fact, it is: it enables
+>> PROVE_LOCKING, which selects LOCKDEP and a few other DEBUG_xxx ones.
+>>
+>> So maybe it is not needed to include the x86 one?
 > 
-> Make the decision to set or clean the expires of a route based on the
-> RTF_EXPIRES flag, rather than the value of the "expires" argument.
+> I'm confused. Now doing:
 > 
-> This patch doesn't make difference logically, but make inet6_addr_modify()
-> and modify_prefix_route() consistent.
+>   make O=built_test defconfig
+>   make O=built_test debug.config
 > 
-> The function inet6_addr_modify() is the only caller of
-> modify_prefix_route(), and it passes the RTF_EXPIRES flag and an expiration
-> value. The RTF_EXPIRES flag is turned on or off based on the value of
-> valid_lft. The RTF_EXPIRES flag is turned on if valid_lft is a finite value
-> (not infinite, not 0xffffffff). Even if valid_lft is 0, the RTF_EXPIRES
-> flag remains on. The expiration value being passed is equal to the
-> valid_lft value if the flag is on. However, if the valid_lft value is
-> infinite, the expiration value becomes 0 and the RTF_EXPIRES flag is turned
-> off. Despite this, modify_prefix_route() decides to set the expiration
-> value if the received expiration value is not zero. This mixing of infinite
-> and zero cases creates an inconsistency.
-> 
-> Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
-> Signed-off-by: Kui-Feng Lee <thinker.li@gmail.com>
-> ---
->  net/ipv6/addrconf.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
+> I don't get KASAN but I get LOCKDEP :S Bleh, maybe because of the
+> options vng throws in?
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+Strange, I get both of them on my side.
 
+Same if I include the two targets:
 
+  make O=built_test defconfig debug.config
+
+>>> I added a local patch to cut out all the obviously pointless stuff from
+>>> x86_debug.config  
+>>
+>> Thank you!
+>>
+>>> we should probably start our own config for networking
+>>> at some stage.  
+>>
+>> Good idea!
+>>
+>> On our side, we always enable DEBUG_NET, and the "debug" environment
+>> also has NET_NS_REFCNT_TRACKER. We should probably enable
+>> NET_DEV_REFCNT_TRACKER too.
+>>
+>> Do you want me to add a new file in "kernel/configs" for net including
+>> these 3 options?
+> 
+> Just the three? What about KASAN, OBJECT debug, DEBUG_VM etc?
+> As much as we can without going over the 3h limit in the tests :)
+
+Sorry, I meant to say: we would use the existing "debug.config" + a new
+"net_debug.config" containing these 3 options (and maybe more that are
+specific to the net tree).
+
+>> Not directly related to "Net", we also enable DEBUG_INFO (+ compressed)
+>> everywhere
+> 
+> We have debug_info, maybe vng adds it..
+
+Great!
+
+>> + KFENCE in the "non-debug" env only,
+> 
+> We could do KFENCE I guess. I'm a bit surprised it's not on by default
+> for x86. My first choice would be to try to change that..
+
+Good point. I can ask KFENCE maintainers what they think about that.
+
+>> disable RETPOLINE (+
+>> mitigations=off) not to slow down the tests in already slow envs, and
+>> disable a few components we don't need to accelerate the build and boot:
+> 
+> RETPOLINE we could kill, agreed
+
+I still need to check vrg: is it easy to add kconfig you want to
+enable/disable? Do you need a new file? Should we maintain this file in
+the tree?
+
+>> DRM, SOUND, etc.
+>>
+>> https://github.com/multipath-tcp/mptcp-upstream-virtme-docker/blob/latest/entrypoint.sh#L284
+> 
+> Yes, vng also adds some stuff we don't need in this area :(
+
+With the non-ng virtme, I disable those:
+
+  -d PCCARD -d MACINTOSH_DRIVERS -d SOUND -d USB_SUPPORT -d NEW_LEDS
+  -d SURFACE_PLATFORMS -d DRM -d FB
+
+I will check when I will switch to vng to see what else we can disable.
+But on your side, you probably have more CPU resources to compile the
+kernel, and that's fine to keep them :)
+
+>> It is also possible to add some kconfig in the selftests if preferred,
+>> e.g. in
+>>
+>>   ./tools/testing/selftests/net/debug.config
+> 
+> Would be great if everyone didn't have to go thru this exercise.
+> How about we start sending patches to kernel/configs/debug.config
+> and see if anyone screams at us?
+
+I guess the 3 net debug ones could go there indeed.
+
+Do you want me to try?
+
+>>>> For our CI validating MPTCP tests in a "debug" mode, we use
+>>>> "debug.config" without "x86_debug.config". On top of that, we also
+>>>> disable "SLUB_DEBUG_ON", because the impact on the perf is too
+>>>> important, especially with slow environments. We think it is not worth
+>>>> it for our case. You don't have the same hardware, but if you have perf
+>>>> issues, don't hesitate to do the same ;)  
+>>>
+>>> The mptcp tests take <60min to run with debug enabled, and just 
+>>> a single thread / VM. I think that's fine for now. But thanks for 
+>>> the heads up that SLUB_DEBUG_ON is problematic, for it may matter for
+>>> forwarding or net tests.  
+>>
+>> The longest MPTCP selftest is currently stopped after 30 minutes due to
+>> the selftest timeout. I will see what we can do. That's not just because
+>> of SLUB_DEBUG_ON, that's normal to be very slow in such particular env.
+> 
+> I'll 2x the timeouts before reporting debug to patchwork, so don't
+> worry about it, yet. 
+
+Thanks :)
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
