@@ -1,140 +1,120 @@
-Return-Path: <netdev+bounces-69783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E46884C998
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 12:27:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B526684C99B
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 12:28:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A3011F219A4
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 11:27:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69B0B1F23817
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 11:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D13418EBF;
-	Wed,  7 Feb 2024 11:27:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D2FF18EBF;
+	Wed,  7 Feb 2024 11:28:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="NrNImYYI"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DNRweZIG"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53829199DC
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 11:27:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC17C1D528
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 11:28:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707305272; cv=none; b=nVWtTaLEOyoQc6tCC6UCpiBvADw67ncUPlM+aciaJKgvNpX5rOFUFfL66FZ5x/yqnVGtzIGLL/c8+R6/EABh9C/bR2+m7Z+DLDkHvSg1TQzbN5wYr9uKdXP5o+h8Et77lcPBWHWP60XcDXpIkgQkBhuJ8lr8D9Vm+L96S5TkvzU=
+	t=1707305331; cv=none; b=Q0UseAoYiwhiz/UYzkcetmfGTN3oz4Es88SRCks2sCJfv1NAPEGzQ2Zri2wnTaVOrv3+A8Di73a65RPxNcrSsWXoKZcUZE1UENFa19I+37LaXLYjLIPMmvXcse2Heh34eKzmgM3YJ+UOkQTOUv58azdR3lDefeZ8OYRbxfYWAM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707305272; c=relaxed/simple;
-	bh=MQjoyTUC8RNB36w5sTev0QAlLhksX+9RUHrdXIsLaoM=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=R5JcPMS/uRLyw3RrhD4xU1WrfF1YGsJ8KDRBh66KIJm2W++dzfsqBxo7NMuvyV/oNRl7xOCu7T9t+m0S4sk7F79HQg3lMhxFTmADqoK7YBh2bBubSz1YCHvTawSRalhVplLOlH/hmsOh8D8253Rb33W7cHHr5IDLiMisQO+kfdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=NrNImYYI; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 36B5EA09B8;
-	Wed,  7 Feb 2024 12:19:01 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:from:from:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=mail; bh=1MhkQyENh48+1sTnIIQ0p6HUF/W0m7FkG7ghm6Oa8oo=; b=
-	NrNImYYIGk2qKFTyTTrlIxPHohAdJzLAWh/wTmchMa1+bSeEdXQRgNlmlHNHHoZu
-	u8eIgI0S7BMDxIbzMJfNdn+BMDAcx+zRdzb4jf5qmi9derbU2xNlmYKH7wO1WdOp
-	Gu7p9NttrhXIYM9t0+h7QSM2leB8NHOWG3BrjK4Q9XR//4xGwpDV4lVv2n9sZhFR
-	YkHu0awoOdVx27Ql406Y817/DYevqo5SkreXPf7LkIsqNALlubdpkMNC8rRCUM4H
-	KyWun1e9okPRnuDGtJzTrH30LZWYpsoklBDGSd6uQX7kIBBP7SqZwKwjkJi/C/eg
-	YtsUqn0BpYOhqk4dy3r93/z4/ehOs6lMRzv4ivHuHoXAw/ptmSgas5KXSNmKPNI/
-	qjvB37HtQkVF8nCeYPkjPucCzES9EFWmUKI5wO4WMVj1a9P+FEAASmFw2Q38zHEP
-	Sq8VtzGFgTDHqOuC2+Ba7G8f8FQA9H2jOkMD0SETdMmq8lMIGUsVU/iaTiIlQ7BJ
-	QvANCv4KWVOqB442HbN1J/PWAnQTJW38ika6ApR+T925gnwAtQ5oqvF0nBHmoBQ7
-	AvZpkBgqj7Bnk15LBuqohXUAfl+8L2iDLhB1Be4FRnm9lz3WJoRQ8KOX3HXl3ZiD
-	3EmZiGyJO7twD20qOVzqtzW97UVk8gYPmSVF3HH9HH4=
-From: =?UTF-8?q?Cs=C3=B3k=C3=A1s=20Bence?= <csokas.bence@prolan.hu>
-To: <netdev@vger.kernel.org>
-CC: Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Francesco Dolcini
-	<francesco.dolcini@toradex.com>, Andrew Lunn <andrew@lunn.ch>, "Marc
- Kleine-Budde" <mkl@pengutronix.de>, =?UTF-8?q?Cs=C3=B3k=C3=A1s=20Bence?=
-	<csokas.bence@prolan.hu>
-Subject: [PATCH] net: fec: Add ECR bit macros, fix FEC_ECR_EN1588 being cleared on link-down
-Date: Wed, 7 Feb 2024 12:18:59 +0100
-Message-ID: <20240207111859.15463-1-csokas.bence@prolan.hu>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1707305331; c=relaxed/simple;
+	bh=C5DvaEHoSMeatRly/COi+FQoLDKQbAo0pRsQb7xxJvI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f3291BLJab3tXxR+x1C9I2DyXZWYEHc+79eV/uQQXAglcBIG3o4TLJ9NTfjdgp9aN0lyZm1IblA4IL8OUCodc4XeUkKE7vLS5+0Mrh+ZHkh1Yp5mNZ6TSjhfvuvGSkl0NjILxsCEHEQ/4svnnCd9+Ya5s55L0gkAvhM7vjDEStk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DNRweZIG; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BCD10E0006;
+	Wed,  7 Feb 2024 11:28:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1707305320;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sQJ6PmALTBQ2hfZPUY+Q2vI8lvfYCzJAB5/EoBmMYAs=;
+	b=DNRweZIGDGK5HQ9TQWm0GWx/c6UqssGmxtxOK63Yr5rX/PpoiKKhevmJ0bE8iS44QK49de
+	CWRiPPA5yFK2/fgvdhcXjFr/dzKTKPYEPVexeyOzYzz46tcwuVNJ5FKdDQjX9trv+iZSaU
+	F6kTcTB2RsB5k9E1MhrSIlnVJ3yY4dblLZlckwg6T0/BpcF+T7ekUgrYeRV2w/5iVwYDbo
+	i5MtqObFFS+XeLnSa+q4L2/rq/QfoSzNilUyy3YwX8PKIkHnrt983MsAQy6tzn6D+NrJWm
+	b8XE9CUM2yAXBGgADszBUJo8AU70HKscH41iQrla6IWj2ZzdzhC8vxJ3II5SoA==
+Date: Wed, 7 Feb 2024 12:28:38 +0100
+From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
+To: Elad Nachman <enachman@marvell.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Taras Chornyi
+ <taras.chornyi@plvision.eu>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, Miquel Raynal <miquel.raynal@bootlin.com>
+Subject: Re: [EXT] Prestera driver fail to probe twice
+Message-ID: <20240207122838.382fd1b2@kmaincent-XPS-13-7390>
+In-Reply-To: <BN9PR18MB42510F2EA6F4091E5CA3B409DB452@BN9PR18MB4251.namprd18.prod.outlook.com>
+References: <20240206165406.24008997@kmaincent-XPS-13-7390>
+	<BN9PR18MB42519830967969DEA4E329EFDB462@BN9PR18MB4251.namprd18.prod.outlook.com>
+	<20240207112231.2d555d3e@kmaincent-XPS-13-7390>
+	<BN9PR18MB42510F2EA6F4091E5CA3B409DB452@BN9PR18MB4251.namprd18.prod.outlook.com>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1707304740;VERSION=7967;MC=2569388289;ID=665117;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
-X-ESET-Antispam: OK
-X-EsetResult: clean, is OK
-X-EsetId: 37303A29CE703B5561766A
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Signed-off-by: Csókás Bence <csokas.bence@prolan.hu>
----
- drivers/net/ethernet/freescale/fec_main.c | 17 +++++++++++++----
- 1 file changed, 13 insertions(+), 4 deletions(-)
+On Wed, 7 Feb 2024 10:56:29 +0000
+Elad Nachman <enachman@marvell.com> wrote:
 
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index 63707e065141..652251e48ad4 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -273,8 +273,11 @@ MODULE_PARM_DESC(macaddr, "FEC Ethernet MAC address");
- #define FEC_MMFR_TA		(2 << 16)
- #define FEC_MMFR_DATA(v)	(v & 0xffff)
- /* FEC ECR bits definition */
--#define FEC_ECR_MAGICEN		(1 << 2)
--#define FEC_ECR_SLEEP		(1 << 3)
-+#define FEC_ECR_RESET   BIT(0)
-+#define FEC_ECR_ETHEREN BIT(1)
-+#define FEC_ECR_MAGICEN BIT(2)
-+#define FEC_ECR_SLEEP   BIT(3)
-+#define FEC_ECR_EN1588  BIT(4)
- 
- #define FEC_MII_TIMEOUT		30000 /* us */
- 
-@@ -1213,7 +1216,7 @@ fec_restart(struct net_device *ndev)
- 	}
- 
- 	if (fep->bufdesc_ex)
--		ecntl |= (1 << 4);
-+		ecntl |= FEC_ECR_EN1588;
- 
- 	if (fep->quirks & FEC_QUIRK_DELAYED_CLKS_SUPPORT &&
- 	    fep->rgmii_txc_dly)
-@@ -1314,6 +1317,7 @@ fec_stop(struct net_device *ndev)
- 	struct fec_enet_private *fep = netdev_priv(ndev);
- 	u32 rmii_mode = readl(fep->hwp + FEC_R_CNTRL) & (1 << 8);
- 	u32 val;
-+	u32 ecntl = 0;
- 
- 	/* We cannot expect a graceful transmit stop without link !!! */
- 	if (fep->link) {
-@@ -1342,12 +1346,17 @@ fec_stop(struct net_device *ndev)
- 	writel(fep->phy_speed, fep->hwp + FEC_MII_SPEED);
- 	writel(FEC_DEFAULT_IMASK, fep->hwp + FEC_IMASK);
- 
-+	if (fep->bufdesc_ex)
-+		ecntl |= FEC_ECR_EN1588;
-+
- 	/* We have to keep ENET enabled to have MII interrupt stay working */
- 	if (fep->quirks & FEC_QUIRK_ENET_MAC &&
- 		!(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
--		writel(2, fep->hwp + FEC_ECNTRL);
-+		ecntl |= FEC_ECR_ETHEREN;
- 		writel(rmii_mode, fep->hwp + FEC_R_CNTRL);
- 	}
-+
-+	writel(ecntl, fep->hwp + FEC_ECNTRL);
- }
- 
- 
--- 
-2.25.1
+> > -----Original Message-----
+> > From: K=C3=B6ry Maincent <kory.maincent@bootlin.com>
+> > Sent: Wednesday, February 7, 2024 12:23 PM
+> > To: Elad Nachman <enachman@marvell.com>
+> > Cc: netdev@vger.kernel.org; Taras Chornyi <taras.chornyi@plvision.eu>;
+> > Thomas Petazzoni <thomas.petazzoni@bootlin.com>; Miquel Raynal
+> > <miquel.raynal@bootlin.com>
+> > Subject: Re: [EXT] Prestera driver fail to probe twice
+> >=20
+> > On Tue, 6 Feb 2024 18:30:33 +0000
+> > Elad Nachman <enachman@marvell.com> wrote:
+> >  =20
+> > > Sorry, that's not how this works.
+> > >
+> > > The firmware CPU loader will only reload if the firmware crashed or e=
+xit.
+> > >
+> > > Hence, insmod on the host side will fail, as the firmware side loader
+> > > is not waiting For the host to send a new firmware, but first for the
+> > > existing firmware to exit. =20
+> >=20
+> > With the current implementation we can't rmmod/insmod the driver.
+> > Also, in case of deferring probe the same problem appears and the driver
+> > will never probe. I don't think this is a good behavior.
+> >=20
+> > Isn't it possible to verify that the firmware has already been sent and=
+ is
+> > working well at the probe time? Then we wouldn't try to flash it. =20
+>=20
+> Everything is possible, but that is the way the firmware interface was
+> initially designed. Changing this will break compatibility with board alr=
+eady
+> deployed in the field.
 
+I don't understand, why fixing the probe by not flashing the firmware if it=
+ is
+already flashed, will break compatibility?
+Do I miss something?
 
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
