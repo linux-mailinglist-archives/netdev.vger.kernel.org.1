@@ -1,111 +1,111 @@
-Return-Path: <netdev+bounces-69984-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AE3D84D2C5
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 21:18:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 337C584D2CA
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 21:20:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34D2A1C2254B
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 20:18:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FB50281118
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 20:20:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D69991272A8;
-	Wed,  7 Feb 2024 20:18:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49B01126F01;
+	Wed,  7 Feb 2024 20:19:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NEFuw/ej"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RkAFHBwH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C6F0126F37;
-	Wed,  7 Feb 2024 20:18:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89031126F00
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 20:19:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707337126; cv=none; b=Cx/COZtc7Y6hH5hInCguPVyjAI9OYB3o4Z7pfO+6JOvu7PN5uofOwmsEDkD41b7XeAu3ZcPmJIOwa9cqI62Jr2+x7EVzhHIKy2qH2goUCwsi9a1hzRtfYb9YDaRpqsVrGsuvF0vTcEQsDwVxjQCQNPh2LBeQqBLz8yH1nTBE688=
+	t=1707337199; cv=none; b=l9jzcC4cRwzzmQdCGMuxUrRtBY7ImlLFk65xqM+UF/dF+mEbzMTKwHkKxmcUetyxQTXD3CsDR7jnRioq2+Q797lOJ2HRB7xd4fZG8BNvBstOm4DO7I3id+IfgrNeGVWboeDBxm4ZGqkeHQ4WJEbJWZZmydqIGll+q5w8OjoH+bE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707337126; c=relaxed/simple;
-	bh=3DBdSkr1+oN510ucK4APN7lecmvtDgNwN2r/J31Mba0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=B4NzmW+shwoHcNQHfbUfj/dVrWujbzCgpJNgFA3niE829LC/1xb0ilIPDbs3oDYUl+JvP1Q4TO2L2gkU4h7JOkgNmB8ZmJqiu6HjaCDuh15RNrff/NAERV+eQk9YmN/UA05zdHhw6B+jP7VwN5co5sHAqV6zkv9a5RHWtB+itRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NEFuw/ej; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E61FC433C7;
-	Wed,  7 Feb 2024 20:18:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707337126;
-	bh=3DBdSkr1+oN510ucK4APN7lecmvtDgNwN2r/J31Mba0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=NEFuw/ejNPdZC/T+TmKCAo/eVBLcHKGs+gAzsnAOT1Z3Pk1+kHIFk5qOiqT+x7LvO
-	 ibzQMw15E9lNzOdHZIEI3EVuyp22O8Xfo21T64QhQazWamkzSRHbWdBgaJqbZsp6EL
-	 IbsZxi1ThJgF17+yE0hpL2iruWh2V3Sw0gsHiOPH+DzEo6MjJ04Fml8EqKOGrE6Pio
-	 2c9Okoqr3741mPdoHwQJEVFO7x+lFuBqWjEWOqv8AUFxPCV7vQYQ8+Mk6y/shdNKAk
-	 ZvunoN+G00tuZe1DW516zTmTO5VRY3h5nkUQ8KkNA7C/svrr/+jSYU69TvIARo6ljn
-	 aXXMdSQxTjIrg==
-Date: Wed, 7 Feb 2024 12:18:44 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- chuck.lever@oracle.com, jlayton@kernel.org, linux-api@vger.kernel.org,
- brauner@kernel.org, edumazet@google.com, davem@davemloft.net,
- alexander.duyck@gmail.com, sridhar.samudrala@intel.com,
- willemdebruijn.kernel@gmail.com, weiwan@google.com,
- David.Laight@ACULAB.COM, arnd@arndb.de, sdf@google.com,
- amritha.nambiar@intel.com, Jonathan Corbet <corbet@lwn.net>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Nathan Lynch
- <nathanl@linux.ibm.com>, Michael Ellerman <mpe@ellerman.id.au>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Namjae Jeon
- <linkinjeon@kernel.org>, Steve French <stfrench@microsoft.com>, Thomas
- Zimmermann <tzimmermann@suse.de>, Julien Panis <jpanis@baylibre.com>,
- Andrew Waterman <waterman@eecs.berkeley.edu>, Palmer Dabbelt
- <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, "open
- list:DOCUMENTATION" <linux-doc@vger.kernel.org>, "open list:FILESYSTEMS
- (VFS and infrastructure)" <linux-fsdevel@vger.kernel.org>
-Subject: Re: [PATCH net-next v6 4/4] eventpoll: Add epoll ioctl for
- epoll_params
-Message-ID: <20240207121844.6bf34083@kernel.org>
-In-Reply-To: <20240207191603.GB1313@fastly.com>
-References: <20240205210453.11301-1-jdamato@fastly.com>
-	<20240205210453.11301-5-jdamato@fastly.com>
-	<ec9791cf-d0a2-4d75-a7d6-00bcab92e823@kernel.org>
-	<20240207185014.GA1221@fastly.com>
-	<20240207110726.68c07188@kernel.org>
-	<20240207191603.GB1313@fastly.com>
+	s=arc-20240116; t=1707337199; c=relaxed/simple;
+	bh=2ImmVy5A/Q4xHBYUvUXpHKnC5HP8CFZQ1weQ/v7zbVc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hyitjHPL1owl5qlZjMUJsvepc5ayGBL4iZ60neewuMVlTGZPtdNNjb319x+MXnRxaifii0rN4On5Ktq6UgZVL17X/XaNUqIVMxJVSVHFP11MRvxC41dpjm61r4M4qSrM8VGVWMNxL4FAcI6JPjWEJVeb3jI2yKvQMYGWQtS0iZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RkAFHBwH; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-51124e08565so1634500e87.3
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 12:19:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707337195; x=1707941995; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kozUwEImhusiQUKKwhyVCeDesgqaCxVuwdCkmOFA1C4=;
+        b=RkAFHBwHiqt+CInBvBujOSwhxLqNNBCf3vA2dafdhwBrVwoPH7glChAV6cskPf2/Mc
+         jkyGnwtqMBJkFFMySSQBIfmh3a3zlWNMI3869HHr/tdW3iNlOlTu8Y2ac5gUjFEUAkt2
+         azRL1eI1hOPn4Kk0sbM8tf9Xhq1spyV4bem4A/tGPaSTSJ713PunF6aS5o/vEDfbsRet
+         OV5mb/hIlYbYwlFUR0XGHfYHXFW76WsoizysqkbgFUtmrdZTSJzODmXYx7oZBc0xAU/d
+         I/I9t1MdaN4P9Ukdhnz1WPzUbMu3+LZCIycLHzDhrL/JsN5URmvNWLF80FOlkPak3SAZ
+         hbIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707337195; x=1707941995;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kozUwEImhusiQUKKwhyVCeDesgqaCxVuwdCkmOFA1C4=;
+        b=bg0MmB5rwhAn/XB4Og3qrLd3Ewqa2LhLDNq5JsTxWTU6WMlraH8WnTCcbW89QHNyKk
+         VEgSexqmBvV/rv/vZ9ZDpeEcgSyMnXCFwY2NMso8Z4dnbyj685CqR4jMf0EwNSnQQmSj
+         2paqn1GuQy2A5amROaN+fHoYYueqmPoaAVT0CPiZUaKcqyq2RBj9WyF2WL8sr++e6KyP
+         eOR4aIIdvhizQDP/vtYniNgAqA/JG/MkOST4sI83DkMeqqUFdyba+leRHtuymzAY7T65
+         u+YOegQQk8JFo/yZqWlxjV/RtRtww97z8Y1BgN1WbjmoiIOxTwPt5OqvBOESbFHgMJwj
+         3Cuw==
+X-Gm-Message-State: AOJu0YzVqsbBCpLyCPPqvnuozj7Vj4MhlIziMQs/Rvh7N6//g4I0mg/a
+	ppOxmpkdLx25uSmW+SeTNPpFxqSkZZz0Usl3FZxIvJ3WcL5NRNmr
+X-Google-Smtp-Source: AGHT+IGST8us3KX7vTyyMJghhpmC0h0uxf9L9ASRQAln2iG41Koivs3CF5cL+ETZRm+mDQANsr9qkA==
+X-Received: by 2002:a05:6512:209:b0:511:3b77:6972 with SMTP id a9-20020a056512020900b005113b776972mr5700172lfo.41.1707337195446;
+        Wed, 07 Feb 2024 12:19:55 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV12tU9sOG2QW3SJLquk+NsUl/WLc81+9HdJ1hwOfmXpOBnVIQ2pAAkG/Y5tC0Z5dFNUKFq2rGFWO5RHBoGba15bYbpNaLQ
+Received: from mishin.sarov.local (95-37-3-243.dynamic.mts-nn.ru. [95.37.3.243])
+        by smtp.gmail.com with ESMTPSA id z16-20020a056512309000b0051157349af3sm306108lfd.47.2024.02.07.12.19.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Feb 2024 12:19:55 -0800 (PST)
+From: Maks Mishin <maks.mishinfz@gmail.com>
+X-Google-Original-From: Maks Mishin <maks.mishinFZ@gmail.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Maks Mishin <maks.mishinFZ@gmail.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH] iprule: Fix descriptor leak in flush_rule()
+Date: Wed,  7 Feb 2024 23:19:00 +0300
+Message-Id: <20240207201900.8813-1-maks.mishinFZ@gmail.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Wed, 7 Feb 2024 11:16:03 -0800 Joe Damato wrote:
-> > > netdev maintainers: Jiri marked this with Reviewed-by, but was this review
-> > > what caused "Changes Requested" to be the status set for this patch set in
-> > > patchwork?
-> > > 
-> > > If needed, I'll send a v7 with the changes Jiri suggested and add the
-> > > "Reviewed-by" since the changes are cosmetic, but I wanted to make sure
-> > > this was the reason.  
-> > 
-> > Yes, I think that's it.  
-> 
-> OK, thanks for letting me know. I wasn't sure if it was because of the
-> netdev/source_inline which marked 1/4 as "fail" because of the inlines
-> added.
-> 
-> Does that need to be changed, as well?
+Added closure of file descriptor `rth2` when returning from function.
 
-For background our preference is to avoid using static inline in C
-sources, unless the author compiled the code and actually confirmed
-the code doesn't get inlined correctly. But it's not a hard
-requirement, and technically the code is under fs/.
+Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
+---
+ ip/iprule.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-In general the patchwork checks are a bit noisy, see here the top left
-graph of how many of the patches we merge are "all green":
-https://netdev.bots.linux.dev/checks.html
-Some of the checks are also largely outside of our control (checkpatch)
-so consider the patchwork checks as automation for maintainers. 
-The maintainers should respond on the list if any of the failures 
-are indeed legit. 
+diff --git a/ip/iprule.c b/ip/iprule.c
+index e503e5c6..ce40726a 100644
+--- a/ip/iprule.c
++++ b/ip/iprule.c
+@@ -534,8 +534,10 @@ static int flush_rule(struct nlmsghdr *n, void *arg)
+ 		n->nlmsg_type = RTM_DELRULE;
+ 		n->nlmsg_flags = NLM_F_REQUEST;
+ 
+-		if (rtnl_open(&rth2, 0) < 0)
++		if (rtnl_open(&rth2, 0) < 0) {
++			rtnl_close(&rth2);
+ 			return -1;
++		}
+ 
+ 		if (rtnl_talk(&rth2, n, NULL) < 0)
+ 			return -2;
+-- 
+2.30.2
+
 
