@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-70018-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70019-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B30C984D5AB
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 23:16:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 529D184D5B1
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 23:17:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D599F1C2363F
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 22:16:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AB69EB2997D
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 22:17:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEB401CFA9;
-	Wed,  7 Feb 2024 22:12:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B525535C3;
+	Wed,  7 Feb 2024 22:14:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kfCOSaGP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RTD1mu8P"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C52496BFCE;
-	Wed,  7 Feb 2024 22:12:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B9F535A8;
+	Wed,  7 Feb 2024 22:14:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707343964; cv=none; b=qs1q7Id6uWmhPeIJl/U/CHzqGw6GZebceW89TTUxOBoGE41HJcGZbCH2ZUcWIi3zorV6iE7TUfEu8mjCVTfMkFhwfxE4r5JiBYrGAyLbhtCux6qVMjHM+aG6jzd1cn/iM/BRTEzDowqZcFhc4ln4Nmow8GAOT2lj5iU87hyFPhY=
+	t=1707344066; cv=none; b=q1YU27OQA/dyNLGM/OlSP0nDr1NscNpIgxrZmTJpl7CTDhbo4q0iM052Zk1u+6IaDcqC9xMfHQektHR8ZsVAi7c/UQfpo7AT2ciOeskzf71FLW9C3zjJmiV1NJiGV01xk4wrO3EkbNB5YY0YxOUYtee6xdLiDipg/xNKTIsyjqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707343964; c=relaxed/simple;
-	bh=YUwb9LPhByrA5rHlYzP6QyFWe353UDXpzQHTrHwvmsg=;
+	s=arc-20240116; t=1707344066; c=relaxed/simple;
+	bh=Bh9omnbbUSoqpfukpPQqmvg8v59Ai61dq3RqukoYqHk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qC2/AUHLo8McMgygk2lQ5hV7EAiHVrK8mPBCbiomnMCSot9bpWNNmaj5W29vZSyrQwrsxEaPLglF+YVQc7ka11DTZhaZWuJZC72CDb7nsUi43a3QXRAnRgZo20dCVZbSFNrVconLtCMrAbwfSNMh1bfrReTl/xaOA2yziKrWQ9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kfCOSaGP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A3B9C433F1;
-	Wed,  7 Feb 2024 22:12:41 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=SsuqLAHmB/ayULAMH+/fW2PCjbnTFCKifQslRtVbtgs2FwhNZ78+Xbq3ktLmYNPTatJbm/W19tuHLHs6w3glsi8df7C/38VVnfT4eB9RSC/HnPRC3gzZR8QOMaSE+/jOCMfwnJENncqyWwUCnU5XCj17os728jk73mn+cHJURcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RTD1mu8P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 077C6C433F1;
+	Wed,  7 Feb 2024 22:14:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707343964;
-	bh=YUwb9LPhByrA5rHlYzP6QyFWe353UDXpzQHTrHwvmsg=;
+	s=k20201202; t=1707344065;
+	bh=Bh9omnbbUSoqpfukpPQqmvg8v59Ai61dq3RqukoYqHk=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=kfCOSaGPlIPrjeGjTjlWPLA3Ee1P/v5pMNFoAsmMuDFscDEHL8oLLwoqVgZdBsNZm
-	 g0IfsSgIygSWbfJt23h28pCfvHmgU4fFbBUcLJlzEqwY4WM+gRC21dWcRnYWMqBXqL
-	 aEFJNYKfa/Iasi8IJT9FHOzaZdfvnXPRRdmWVbAAkwVTgdwy/dq4cQnKa+XMRO8gZS
-	 vLZdk8r786+00JCRWU9RyJ3dZm2+HgGR0JpOdD9h/oozE/oNprJEl4Im6M7ZabZzyW
-	 dI+w/3yG7Gf59wrrE2sOTk53sJEdTcJhOYOPbSIm3g3iQLpUuiOwqaNLY+xggsJ1vT
-	 54Rozk+LSJDgQ==
-Message-ID: <7a3d2c33-74ce-45fb-bddc-9eceb6dd928b@kernel.org>
-Date: Wed, 7 Feb 2024 23:12:38 +0100
+	b=RTD1mu8PQxZJWV4BYfaUGDNt+fOIAsu8Pw42Z8Q/8CSuYYQg7T9812CgsihS6HEFP
+	 1DsxN02g010esNPbktFRj6Y6HDEnhfbmvwASOT4ne6HrCfy4mvdJCZQv1x5fwfX/jD
+	 Ce6cuc7C37he5h/7jrhg7It3tZ7gRcYsrXKX/Yv3epeSX6cSNTI2OgjpqNr9A+LakO
+	 Fdw7Gxk1pz2xejvzcqjfFXNBNXzHMZxeB2cvodkt3oGI4JhxcfFRGeffXlJUziE+MM
+	 RVaIsszW5y9BqPQJQIKeOLstkJ+FmIVf5/XkR6L5993qZ8q9O5OCBsTmUTBfaXq7Ja
+	 JwcLXqIbaKpAw==
+Message-ID: <ee1341b3-6479-446f-b835-6bab5f15b971@kernel.org>
+Date: Wed, 7 Feb 2024 23:14:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,19 +50,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: KFENCE: included in x86 defconfig?
+Subject: Re: [PATCH net v2] selftests: net: cope with slow env in gro.sh test
 Content-Language: en-GB, fr-BE
-To: Borislav Petkov <bp@alien8.de>
-Cc: Marco Elver <elver@google.com>, Alexander Potapenko <glider@google.com>,
- Dmitry Vyukov <dvyukov@google.com>, kasan-dev@googlegroups.com,
- Netdev <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- linux-hardening@vger.kernel.org, Kees Cook <keescook@chromium.org>,
- the arch/x86 maintainers <x86@kernel.org>
-References: <e2871686-ea25-4cdb-b29d-ddeb33338a21@kernel.org>
- <CANpmjNP==CANQi4_qFV_VVFDMsj1wHROxt3RKzwJBqo8_McCTg@mail.gmail.com>
- <20240207181619.GDZcPI87_Bq0Z3ozUn@fat_crate.local>
- <d301faa8-548e-4e8f-b8a6-c32d6a56f45b@kernel.org>
- <20240207190444.GFZcPUTAnZb_aSlSjV@fat_crate.local>
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Willem de Bruijn <willemb@google.com>,
+ Coco Li <lixiaoyan@google.com>, linux-kselftest@vger.kernel.org
+References: <c777f75ac70e70aabf1398cefa5c51c0f4ea00f2.1707330768.git.pabeni@redhat.com>
 From: Matthieu Baerts <matttbe@kernel.org>
 Autocrypt: addr=matttbe@kernel.org; keydata=
  xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
@@ -108,45 +103,36 @@ Autocrypt: addr=matttbe@kernel.org; keydata=
  JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
  lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
 Organization: NGI0 Core
-In-Reply-To: <20240207190444.GFZcPUTAnZb_aSlSjV@fat_crate.local>
+In-Reply-To: <c777f75ac70e70aabf1398cefa5c51c0f4ea00f2.1707330768.git.pabeni@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 07/02/2024 20:04, Borislav Petkov wrote:
-> On Wed, Feb 07, 2024 at 07:35:53PM +0100, Matthieu Baerts wrote:
->> Sorry, I'm sure I understand your suggestion: do you mean not including
->> KFENCE in hardening.config either, but in another one?
->>
->> For the networking tests, we are already merging .config files, e.g. the
->> debug.config one. We are not pushing to have KFENCE in x86 defconfig, it
->> can be elsewhere, and we don't mind merging other .config files if they
->> are maintained.
-> 
-> Well, depends on where should KFENCE be enabled? Do you want people to
-> run their tests with it too, or only the networking tests? If so, then
-> hardening.config probably makes sense. 
-> 
-> Judging by what Documentation/dev-tools/kfence.rst says:
-> 
-> "KFENCE is designed to be enabled in production kernels, and has near zero
-> performance overhead."
-> 
-> this reads like it should be enabled *everywhere* - not only in some
-> hardening config.
-> 
-> But then again I've never played with it so I don't really know.
-> 
-> If only the networking tests should enable it, then it should be a local
-> .config snippet which is not part of the kernel.
-> 
-> Makes more sense?
+Hi Paolo,
 
-Yes, thank you!
+On 07/02/2024 19:36, Paolo Abeni wrote:
+> The gro self-tests sends the packets to be aggregated with
+> multiple write operations.
+> 
+> When running is slow environment, it's hard to guarantee that
+> the GRO engine will wait for the last packet in an intended
+> train.
+> 
+> The above causes almost deterministic failures in our CI for
+> the 'large' test-case.
+> 
+> Address the issue explicitly ignoring failures for such case
+> in slow environments (KSFT_MACHINE_SLOW==true).
+> 
+> Fixes: 7d1575014a63 ("selftests/net: GRO coalesce test")
+> Reviewed-by: Willem de Bruijn <willemb@google.com>
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ---
+> v1 -> v2:
+>   - replace the '-a' operator with '&&' - Mattbe
 
-On my side, KFENCE is currently in local .config snippet, not part of
-the kernel. If it has near zero performance overhead and can be used in
-productions kernel, maybe it can be set elsewhere to be used by more
-people? But not everywhere, according to Marco.
+Thank you for the v2!
+
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 Cheers,
 Matt
