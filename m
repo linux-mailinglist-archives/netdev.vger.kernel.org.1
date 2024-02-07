@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-69749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7976B84C77B
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 10:35:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 330A284C77F
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 10:35:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90AAF1C21794
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 09:35:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA1111F28F9D
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 09:35:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACCEB25779;
-	Wed,  7 Feb 2024 09:32:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 942B4339BC;
+	Wed,  7 Feb 2024 09:32:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="GLQ8EsSm"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="yr52eb1m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 680BB2C6AA
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 09:32:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7857A2D629
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 09:32:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707298368; cv=none; b=CYHjesbiuf6ylrYdVYJE21oMH3wnTW3FOezrVCaFr7RhVXBUzZ4Mu/65aiDesdF3AdaWaPleTLZeuS2XFOfePiD67gxL9Ah6H07fYQxPbM79yQSgfXoQDnQF/YHscKh0eey7Rv7llUw7H4ltCxccdwvX9jrD2EhnxIhg3m1Dfj0=
+	t=1707298369; cv=none; b=AdODamuhnP2uCqHrmI/4c18LOUPzozDmRbIyoQs45NpacTpf6jWsnEfnF0JNdQCWSiJR4cFvAddhFh24EhYecMzVp/GDZRtJUhI6+nCaHVGqghOw5ena/LYLcqy2t/iJ+w3MiMJmt3JDsAgDbZ8ie/1fDXkbjp8AlPut9MfTs9w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707298368; c=relaxed/simple;
-	bh=3bOx6w0LTuN8pcOfYHhxFGJ5/H17MO4GBppv0GaUmBI=;
+	s=arc-20240116; t=1707298369; c=relaxed/simple;
+	bh=aKBUlv2DFPCwVWl5pJMCuyW+k9TrqdFHUb5U5vXcunk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=sY5lv+18Yp6trSryaD/W7ivVi7RHwNCicfVn1lMjKKpu1SnAyeFPjhNCAaVy+LYnbV4qbMtA5fwjQWmyLUicaE82ZIEEuHVfTLTIxogq59EJn0yxAAqpHCkuIlqvwlXOiQ1f3LfAFuRTwQpIyDsVRs1oYB/9Qt8arMgI106j4vA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=GLQ8EsSm; arc=none smtp.client-ip=209.85.218.44
+	 MIME-Version; b=m2HLFpjT7RD8TEGbkpCcmXzmhdjrE8TYNvM5+Xs2xiHrZ1S8awDdKmebosz7pMjiw7Du+6zE6qJbMN8xHC7WRV+rN+uVFKwff7tLwMZo912ufcfKTIfEEI1OhxJb1Bi9miXK8+2VBK8mK3+oyDf9O+xn3iwLQygqfw18+xnhqkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=yr52eb1m; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a3122b70439so53650066b.3
-        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 01:32:46 -0800 (PST)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a388c5542e9so24173166b.1
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 01:32:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1707298364; x=1707903164; darn=vger.kernel.org;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1707298366; x=1707903166; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yUP/ICSTgUrZXFT7bioEQjzIDbumAO5zjpvQT5yRgD4=;
-        b=GLQ8EsSmvQ/wXg0UiyD9zmWuiUYlHG4GHWFuQF/JhV7s/04ACU2A168Gf8t2GAM7JT
-         UclpxqvN9GK1cHyFK0yirJxqYr/30e8bXM0h/eUaltW2vkRSVibTC58XimLuK/WBtP0z
-         r8vUAAI0J5t2dsRy9vBwBFecGH5rERL7yQFLUZsBxMCzi57YZ8Gb8uUuHjMyMFJmOLRH
-         WBiEUsEEB+fjlfie64jfyd9D2SiPRvZIpop09MEq7TDjhUsiFWnMcUPYmROOP4cJJQat
-         OieqKYgPTEdPL8DJBycgMcXmb9fHPIhDdvk0Ylf0gq11iCKvYdw7g2zwlrWtIL7SN6Cp
-         zG1g==
+        bh=8wnVAPfyJw/OWLzF0KC9/8j6EFFYXdSKnHtbnBIj0M4=;
+        b=yr52eb1mW125jCltaBGmDjWa/s//g6OqeZgJm5+0jg99pU05Hq3lxheaasPtXu2Fmv
+         Kxsv/KykeFvUskDsHI0d6U8F7W9TtzLdMiN45+7V4v8YOP1lVwIojtt0+m67IYtKOfId
+         a1coJOe+p5R3ie1HGHqZfN9f+EfQF84wZLQdd5uL1w0KG4EYHKO84kMTMrxdpmtZ+Ek9
+         miQ5qO4jupNeKC+Hj/l6SfamsDnOIVl6/je1uKNqNx4tzoFJvve8b2qlF9l62+JEMwyI
+         dXRj5hzv5WxM0p84joxOE5Vlnt9y1M3v+87qni+xZJ/FogbV13aqIWsqFQ0LM5LYQvHt
+         kYEg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707298364; x=1707903164;
+        d=1e100.net; s=20230601; t=1707298366; x=1707903166;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=yUP/ICSTgUrZXFT7bioEQjzIDbumAO5zjpvQT5yRgD4=;
-        b=wZd6jN2jyYO1ev1jxnHuhnlWpV8HBJ/ZqKHWK7a0/+MXUHprBPQem90d7I01ywOfWS
-         alpt6OK5hD15RAn4lAAVgE4pZRicklTzXR6lFTKYDLlGQuXKpklUY6pXXJY6Kvzh9zxJ
-         GRt2lT7a6ULLSbpppEG2J3Dz8s6QjtjvRYivMI2yn/X55LoC+1nmKw+59wNLvBTQF8V/
-         7x1sZTLzAaGfN4TlqcqslORxx71IWhZaArWAeftRbqIJQNwGj+jZbDEQvQVxlcHtZ0Kz
-         WWOcR1RXej8ukPxJh/bj9mHpo2bnl0j7T/ZByNOinpRWXTpYre/sroHJnfyq319njZBo
-         c1pQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW8ycGLQiqhtRbTHuSrRADNLU8rryZeqeLP8/u0DFOvqsyOS2C8iDxFE/WvTyRWLZ1Hg3EDiFEUIiGBAtJ3dm/jrAdmHcMd
-X-Gm-Message-State: AOJu0YyuKFFpFJmOJBb6IW1uSWTc/XiluP0W3tsSFHQ+p6RrTN49CKjV
-	yRPtFNN2OOq9o5x4VUDaZUtwWis9qdEOaZhziYvVbHs1GsvRYKG1K2mI3irdGl0=
-X-Google-Smtp-Source: AGHT+IHK9IPkeDp33DRPPtDCbYtIAgI9YsCp7lpP9Vaga9kbgBw5dwf1+IBv3dC54jyBLhxpaDPKGA==
-X-Received: by 2002:a17:906:7d83:b0:a37:a66b:b361 with SMTP id v3-20020a1709067d8300b00a37a66bb361mr3524242ejo.21.1707298364738;
-        Wed, 07 Feb 2024 01:32:44 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUD0fnBBAqOWKl54sKKfHDzSLNwOsuRXN4OB4P5dEQHf2+fkGuifRlm/VbppuuKAWM9Vt8pq1b/xiw+HQBKCk7yaC5en261Y/cGMsWD/PnGQae1i7il6L/81aeE44FYoTZxk2cVNpaKsxqQkRzxEaEYaBZMYAnXVfJaP9bMRabavuOiIoEy1vMMTP4daU3OGXyu9HNEqgMyrDRtN86cCKi1CR56tTCZUqHEk6sqV6UUrYuALKKnvq5HXg89NpwkSublj2cLEIVHfOk5upTf9WPhJ/S1Olt0LIJFMZDgh/srQYwyAjlI42L+OWcEk6ic4nsLoi/D/QX0pedbGjy8was/yc4gXI46JpdF/kiCLSRILLAOMtqM3nJvAsHRHars5ZsWJ6PVtw/WcDDYxNACyqmqaBnbFJy57qUbNl2N+x67sX/HBfFnhNeUh4Pd10NT6SqakjaY9PPhAHDBRMbQhVi7Qg/ilO90
+        bh=8wnVAPfyJw/OWLzF0KC9/8j6EFFYXdSKnHtbnBIj0M4=;
+        b=PQc2/pEE6CE2P82xtFNYnaiV0cCkQ27Bf33EiGfbEZjGz76X1fV5Fj/YKDuvEhFUFp
+         yxTOvNf8gfmhr/SN+pk8BziNnnqinFMW3WzgYUpqMrRVz5GJpFgGSYkuaYasYcKME1Cu
+         SvCDqflaGTKDxSFzuU1KCvO+tm4SbwUqDoRgdxS1plTWXopkKcpIE3wt+qPy6Mrq4T9J
+         JL61BsLhXdydPIbFVF3JN4bsEScWrScSyPaHDoZpApY6XTKM0pl3Kycja5vHXxacj+Sm
+         4y5dL13EET5HdT+lw3x7FNCCjTAZlyvnUURBwKKj0OrsNES7aPu7xS171lTOE/sIO/Js
+         vvMg==
+X-Gm-Message-State: AOJu0Ywmay7bO+2cmuUFa0EVmhH9LlYlHerfLRMDNw4IqRbv5E9lVJQb
+	YVxZRQFGUw973PRKRwq2YTR+GJovDan0h29CuXijYuELMrX2YYRKFjzXO0lQonOGsBUHn75c6OY
+	G
+X-Google-Smtp-Source: AGHT+IH/ac8IYvq7UtxjoqJsQqsYKi7OfrJ0bxLeaVa4t92XhpXT9PVqfuRz747vxJlfzrBWeeQQBg==
+X-Received: by 2002:a17:906:4a55:b0:a29:b31d:1dc6 with SMTP id a21-20020a1709064a5500b00a29b31d1dc6mr6433899ejv.6.1707298365844;
+        Wed, 07 Feb 2024 01:32:45 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWyB+sEDgwVroEEABf/EC8CBwKYStKI1pDrhDVBp+wYYsW4z0rBIht3GoJpe1ZZTp/K+ai0i4RUed/8k/inlZRsbRhPDmbz3gJziXnSv0jqDCMReuRfCEczWtF+zhjLDTBgI+LIOzdbOxRLYhEMIsUXEWp7MvDvFTF2u6ufwunQn0pxxCxKyL5WPNGtEscZwe6wpspeFo3MZWDn4n5YHlOM7GvEQ5UXs+NTmmCSTtJT7A52yYwhr+YVNjBl5snpno56dRb02mTzj31OO5UlCbJj0F3jw9Vy8f8fQ2A/EI2lxOoMmC4HvIInNfUKzKh1ZQ0N1v+CTkaOYR9X4RanHuIwNuMGYodxcc9CTwMXobhGL9VPODR8Ge/RTdzyM4JPch8qARgg81F9K18vp0GqQxwuATlYxYqTtXSlYcAtjs1Yop6sInKLSBUtX88hx/NfVYUImd2obnrdNkRmn34Rt8eGf4FUa2oK
 Received: from blmsp.fritz.box ([2001:4091:a246:821e:6f3b:6b50:4762:8343])
-        by smtp.gmail.com with ESMTPSA id qo9-20020a170907874900b00a388e24f533sm122336ejc.148.2024.02.07.01.32.43
+        by smtp.gmail.com with ESMTPSA id qo9-20020a170907874900b00a388e24f533sm122336ejc.148.2024.02.07.01.32.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Feb 2024 01:32:44 -0800 (PST)
+        Wed, 07 Feb 2024 01:32:45 -0800 (PST)
 From: Markus Schneider-Pargmann <msp@baylibre.com>
 To: Marc Kleine-Budde <mkl@pengutronix.de>,
 	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
@@ -86,9 +86,9 @@ Cc: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>,
 	Julien Panis <jpanis@baylibre.com>,
 	Markus Schneider-Pargmann <msp@baylibre.com>,
 	Simon Horman <simon.horman@corigine.com>
-Subject: [PATCH 08/14] can: m_can: Use u32 for putidx
-Date: Wed,  7 Feb 2024 10:32:14 +0100
-Message-ID: <20240207093220.2681425-9-msp@baylibre.com>
+Subject: [PATCH 09/14] can: m_can: Cache tx putidx
+Date: Wed,  7 Feb 2024 10:32:15 +0100
+Message-ID: <20240207093220.2681425-10-msp@baylibre.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240207093220.2681425-1-msp@baylibre.com>
 References: <20240207093220.2681425-1-msp@baylibre.com>
@@ -100,52 +100,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-putidx is not an integer normally, it is an unsigned field used in
-hardware registers. Use a u32 for it.
+m_can_tx_handler is the only place where data is written to the tx fifo.
+We can calculate the putidx in the driver code here to avoid the
+dependency on the txfqs register.
 
 Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
 Reviewed-by: Simon Horman <simon.horman@corigine.com>
 ---
- drivers/net/can/m_can/m_can.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+ drivers/net/can/m_can/m_can.c | 8 +++++++-
+ drivers/net/can/m_can/m_can.h | 3 +++
+ 2 files changed, 10 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-index b31df3e3ceeb..1b62613f195c 100644
+index 1b62613f195c..a8e7b910ef81 100644
 --- a/drivers/net/can/m_can/m_can.c
 +++ b/drivers/net/can/m_can/m_can.c
-@@ -486,7 +486,7 @@ static void m_can_clean(struct net_device *net)
- 	struct m_can_classdev *cdev = netdev_priv(net);
+@@ -1504,6 +1504,10 @@ static int m_can_start(struct net_device *dev)
  
- 	if (cdev->tx_skb) {
--		int putidx = 0;
-+		u32 putidx = 0;
+ 	m_can_enable_all_interrupts(cdev);
  
- 		net->stats.tx_errors++;
- 		if (cdev->version > 30)
-@@ -1695,12 +1695,12 @@ static int m_can_close(struct net_device *dev)
++	if (cdev->version > 30)
++		cdev->tx_fifo_putidx = FIELD_GET(TXFQS_TFQPI_MASK,
++						 m_can_read(cdev, M_CAN_TXFQS));
++
  	return 0;
  }
  
--static int m_can_next_echo_skb_occupied(struct net_device *dev, int putidx)
-+static int m_can_next_echo_skb_occupied(struct net_device *dev, u32 putidx)
- {
- 	struct m_can_classdev *cdev = netdev_priv(dev);
- 	/*get wrap around for loopback skb index */
- 	unsigned int wrap = cdev->can.echo_skb_max;
--	int next_idx;
-+	u32 next_idx;
+@@ -1793,7 +1797,7 @@ static netdev_tx_t m_can_tx_handler(struct m_can_classdev *cdev)
+ 		}
  
- 	/* calculate next index */
- 	next_idx = (++putidx >= wrap ? 0 : putidx);
-@@ -1719,7 +1719,7 @@ static netdev_tx_t m_can_tx_handler(struct m_can_classdev *cdev)
- 	u32 cccr, fdflags;
- 	u32 txfqs;
- 	int err;
--	int putidx;
-+	u32 putidx;
+ 		/* get put index for frame */
+-		putidx = FIELD_GET(TXFQS_TFQPI_MASK, txfqs);
++		putidx = cdev->tx_fifo_putidx;
  
- 	cdev->tx_skb = NULL;
+ 		/* Construct DLC Field, with CAN-FD configuration.
+ 		 * Use the put index of the fifo as the message marker,
+@@ -1827,6 +1831,8 @@ static netdev_tx_t m_can_tx_handler(struct m_can_classdev *cdev)
  
+ 		/* Enable TX FIFO element to start transfer  */
+ 		m_can_write(cdev, M_CAN_TXBAR, (1 << putidx));
++		cdev->tx_fifo_putidx = (++cdev->tx_fifo_putidx >= cdev->can.echo_skb_max ?
++					0 : cdev->tx_fifo_putidx);
+ 
+ 		/* stop network queue if fifo full */
+ 		if (m_can_tx_fifo_full(cdev) ||
+diff --git a/drivers/net/can/m_can/m_can.h b/drivers/net/can/m_can/m_can.h
+index 1e461d305bce..0de42fc5ef1e 100644
+--- a/drivers/net/can/m_can/m_can.h
++++ b/drivers/net/can/m_can/m_can.h
+@@ -101,6 +101,9 @@ struct m_can_classdev {
+ 	u32 tx_max_coalesced_frames_irq;
+ 	u32 tx_coalesce_usecs_irq;
+ 
++	// Store this internally to avoid fetch delays on peripheral chips
++	int tx_fifo_putidx;
++
+ 	struct mram_cfg mcfg[MRAM_CFG_NUM];
+ 
+ 	struct hrtimer hrtimer;
 -- 
 2.43.0
 
