@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-69999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 305C384D363
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 22:01:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 937C384D364
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 22:01:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2A16284A4B
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 21:01:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B41BB23103
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 21:01:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84447127B53;
-	Wed,  7 Feb 2024 21:01:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2C0A128814;
+	Wed,  7 Feb 2024 21:01:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jK+c5liW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IDgsbFq5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B340784A30
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 21:01:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BE812838C
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 21:01:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707339664; cv=none; b=h79WLTZkVKox42eNNTPkznBk6a+sAPnIGtiA+29RIc2/6z5v2PD4mH3U1jlekOqP43JbGXEld7uwQ8QyJOdBjrwcih6XKdBc++2LiXSX5U/UnElr3SIdEeDJdgtokd2NoZuqwTRL9cksSGTucevDxPmt2A7Bq0nZQ5061vvo+Jc=
+	t=1707339671; cv=none; b=bExLIrwJ8swiseeMqHqUC9O08fYwJAyp8P3zTEWMmxLdjNYO4dZehIdCpoY8Mb3NrXiq0+1YSOCXfKIO3CRGTYtjZdnHX75zH/lv3zxHPBPpzkpxKgYjKCj6h2OTWgB81cop1Rec3MptJi3j7ateRQN/x7EBI1A6Jw+IKvk8svk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707339664; c=relaxed/simple;
-	bh=GUEAS/KSa+L/32rBCmRQ5wVdn8XKv/WUapg3H7JBTDg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=o9ZQZrMpkBTVneCGCmC8bggpfenzGiDz/1iFjoUtjMqoCmnuPv6v8qoPREBez8S/ZQb2OOtZd8A3dTOpy2wP+LaJafoO2uc+ifpRds9Z0EgAXZl+xO8hcA/ZjpEg80S+58jB7W9UGQyhNY1SURnIFrstz6/8+jn1/t1eFlskdmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jK+c5liW; arc=none smtp.client-ip=209.85.167.48
+	s=arc-20240116; t=1707339671; c=relaxed/simple;
+	bh=PwerdDp7wCoE8EO6/xoms5W2Sj9M/x8Z5FpXbvmD4lo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rPjCWm8aCx7pmmueJZiQdWOKCG6xqLfatCMXwhE0dMVwY7Mf35OJCfESfKma97cMPzaSQpjuFNJ+ReFntTe9e/UhnM/knjAcdg2KrTBgxONXwZUmABGgzTiwst3DGmdl9c6YbQ7l14zqGWhGo/cYB8qrHAlQMUOtZ/HuQawdAiI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IDgsbFq5; arc=none smtp.client-ip=209.85.208.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-511570b2f49so210066e87.1
-        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 13:01:02 -0800 (PST)
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d0a96bad85so17285681fa.1
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 13:01:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707339661; x=1707944461; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707339668; x=1707944468; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4ogkN6LEaTSz/BYO4QwmYZ0SQAykq4f6RwEWzKx8qQ4=;
-        b=jK+c5liWeR3LwuDO/AKk9uTgukweYsKE8THnhgTNJ1B33Qy8dHvItYVvqLRaGYbu37
-         PLa1+Ri333yhqpMjbHMcYPiRo9l2dS2s6JAp2q5gvamgw1oaa67SNmgQzei1SFGBw2gi
-         bGPLqdBSAw0nGnkTdsMGa8Hkvg9EnN05KYwv+Wa2eB6f+3UHjZKuV4bAQOU5XC2y2uHV
-         pWqfD/AVQRRfnk6rrnEsqfF/TQOSzY97aVdSUqi16/OhEmKKKg2Ov2PmKg2VFaPHsgP2
-         WbVK0W6ivmcCqgN60b0xeJqUDJFzWPMtEQOPbjg0bswYyjUFfL5+gfJvMjiHZMrurPi2
-         d6Lw==
+        bh=XvL/tOSWck1ZSBp2NCk9xU8fBE5w8xX/1OJJSjQ+zIY=;
+        b=IDgsbFq5cACrWQlZxDHwECidZ0uT/4PEOCpuLEo5W3ctgb7+qBZCWNpb+AJmvfVD1Y
+         zC5v42yfBNqyfGYBUTqJB8qOzniAk5McgL1aXmLmrgqCdtwlAjFtNJFezCY2JgVmlbY4
+         FKYUG43O26CgCn+1d961FRUXpc4TgTkZlm5RZseTwKM/6jScro6B/X1jbPylLLlVKSJA
+         Kf6KZX6L8KQlxCnnSdZmuHHiSOYDZYLrNXQz8hbDJADrhBJ+9iiYqDWS1H8oYeZd1vy4
+         E0zdySW4RztmhtUBNd6z3wsITIkKWLN6jk9doZ8rYtj4sHm5xvkNeiSKHyEIctto+nFI
+         ngjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707339661; x=1707944461;
+        d=1e100.net; s=20230601; t=1707339668; x=1707944468;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=4ogkN6LEaTSz/BYO4QwmYZ0SQAykq4f6RwEWzKx8qQ4=;
-        b=YwNk1DoEIomWZl946QnCLe3jLKq8PKSJU69/gGytK9GnX8VD24rQ+z1TJX+DE/6bDD
-         BEb/xfAlR/N5WdDsdiLLFn3VRxP1k3UiVkQvPbT423EC0FM09SKTAUCdH+3nQYxUKYlM
-         DUBa/oXtw8IQBEvW9V3pd2ZwWq2JYknl1A1EQcA5bGMI72QngKGOMXPNAR/Dx6OJkNDf
-         zqqAZqIF60wXFj4CizelTDVqkSc6ofHO+Z2W/7NOIeoWS1xpRSAbJpx78DoG7dGfrsBj
-         b91ddFHtYAIH3UjYU/7X555dT/yBwr0m6rZB4IrO/fXKNPMk+L2KBtZj9FvKEc2ueQOm
-         RtEg==
-X-Forwarded-Encrypted: i=1; AJvYcCW+CRCHqeNHJEfAAF43dD7avF4LO0R0HQkdIhtbJ5NQowfYNCtzz4COQHBK7SEtb12zypDjJciU7pQ3faE5J8OWq/pt+tCd
-X-Gm-Message-State: AOJu0YyMRlakmA7ivFVYGPmKV1fEvehZpn0oNiSnNypudrpJrrLmA0XP
-	Fh18RsTDBH3XocEaXjISAaUzvUeYn4s3XiozsbJ064IDmK1hjoTW
-X-Google-Smtp-Source: AGHT+IGQGfnrr6DogjZWWIL77rEWuQwyWMU/D9t8X4sbHx/SQnvBXgsgOAEVdtlhaGlGgEjszjxSbg==
-X-Received: by 2002:a05:6512:304e:b0:511:344a:fad5 with SMTP id b14-20020a056512304e00b00511344afad5mr203107lfb.31.1707339660586;
-        Wed, 07 Feb 2024 13:01:00 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWrexxqgIV8w8bZcjRUbgkUD6HrebOTZd8knRLKT+QZjOLHBrNP+Fsg12e22JnbYR4ZXsMvqgjFly/BeWLAQcXeY9WaQWEp
+        bh=XvL/tOSWck1ZSBp2NCk9xU8fBE5w8xX/1OJJSjQ+zIY=;
+        b=PWBpZWC1RXerMjrsxjSbv37l/q00sSjXIKgKVPhdhUjMMFJlQPsMJb4UD2twm/eZAc
+         cvpDTwjaSYwaxrCjVH901sWjX7jOqu5Is9wEdd2oZMfCiQKHjV4k8OOP14xLyZ+tAlTs
+         zO1okxNfPmueQBgO1x/WqN/qH2MUjwTIfDSFOv8GP9aW1eJPN1yBiFoaLMblNf1+lP/9
+         HJDW9XWdsQFdFphgP1PEglx7vzUKh1Z3if5x42cZDSgafa952KyVlVDny+G5ncDeMV1T
+         bceNHM7aeMN+nWvvc48Bi/EQoJK5JEswW0721bBGAjqA8DYCQYSE5i3Psw8Mrk3mW5SR
+         3GCw==
+X-Forwarded-Encrypted: i=1; AJvYcCUjzbj8xd9QdLts+fxdZB9DgpSWVb2LgfzVn3sjsnUac3z12MxeocGf1tyvTE8gDVf2Gek8bf+jwfWWaQF8qH6CMFByecLP
+X-Gm-Message-State: AOJu0YxYhb25wnpGkzn3Fb0JqYBrmkbg5jEpRj5C4rvdA7gn6eXAmf9b
+	IkdK+2UXzbvuQt2MM69jiZ3RdEvVqv1eNByn5zYn403tZZcK5JkO
+X-Google-Smtp-Source: AGHT+IHl28Nm/SyONyW3tGq6bw68Y3dkc7OhaZHGL3ILNvbP97C56mbfR+2qWJut+1wbrgB8JynUHQ==
+X-Received: by 2002:a2e:b8c4:0:b0:2d0:c6f9:b58e with SMTP id s4-20020a2eb8c4000000b002d0c6f9b58emr2798157ljp.2.1707339668077;
+        Wed, 07 Feb 2024 13:01:08 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV0iRMkLbq1LwFfRp2Ssy0DkbYZ6hMwnnXWTr4z2fcb2CJtc0wUobiYzxLcM/KdlD2I/L6/X2zk8tt9CShD9y3Uc+Uryx8K
 Received: from mishin.sarov.local (95-37-3-243.dynamic.mts-nn.ru. [95.37.3.243])
-        by smtp.gmail.com with ESMTPSA id fc4-20020a056512138400b0051155926e0bsm313524lfb.139.2024.02.07.13.00.59
+        by smtp.gmail.com with ESMTPSA id v19-20020a2ea613000000b002cf1cf44a00sm313739ljp.52.2024.02.07.13.01.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Feb 2024 13:01:00 -0800 (PST)
+        Wed, 07 Feb 2024 13:01:07 -0800 (PST)
 From: Maks Mishin <maks.mishinfz@gmail.com>
 X-Google-Original-From: Maks Mishin <maks.mishinFZ@gmail.com>
 To: Stephen Hemminger <stephen@networkplumber.org>
 Cc: Maks Mishin <maks.mishinFZ@gmail.com>,
 	netdev@vger.kernel.org
-Subject: [PATCH] tc: Fix descriptor leak in get_qdisc_kind()
-Date: Thu,  8 Feb 2024 00:00:06 +0300
-Message-Id: <20240207210006.13706-1-maks.mishinFZ@gmail.com>
+Subject: [PATCH] tc: Fix descriptor leak in get_filter_kind()
+Date: Thu,  8 Feb 2024 00:00:14 +0300
+Message-Id: <20240207210014.13820-1-maks.mishinFZ@gmail.com>
 X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -83,31 +83,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add closure of fd `dlh` and fix incorrect comparison of `dlh` with NULL.
+Add closure of fd `dlh`.
 
 Found by RASU JSC
 
 Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
 ---
- tc/tc.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+ tc/tc.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
 diff --git a/tc/tc.c b/tc/tc.c
-index 575157a8..162700b2 100644
+index 575157a8..4f89719c 100644
 --- a/tc/tc.c
 +++ b/tc/tc.c
-@@ -112,7 +112,7 @@ struct qdisc_util *get_qdisc_kind(const char *str)
+@@ -167,6 +167,9 @@ struct filter_util *get_filter_kind(const char *str)
  
- 	snprintf(buf, sizeof(buf), "%s/q_%s.so", get_tc_lib(), str);
- 	dlh = dlopen(buf, RTLD_LAZY);
--	if (!dlh) {
-+	if (dlh != NULL) {
- 		/* look in current binary, only open once */
- 		dlh = BODY;
- 		if (dlh == NULL) {
-@@ -124,6 +124,9 @@ struct qdisc_util *get_qdisc_kind(const char *str)
- 
- 	snprintf(buf, sizeof(buf), "%s_qdisc_util", str);
+ 	snprintf(buf, sizeof(buf), "%s_filter_util", str);
  	q = dlsym(dlh, buf);
 +	if (dlh != NULL)
 +		dlclose(dlh);
