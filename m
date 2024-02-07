@@ -1,83 +1,61 @@
-Return-Path: <netdev+bounces-69864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25DC684CD93
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 16:03:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BC1084CD97
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 16:03:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A775D28319D
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:03:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7276D28264E
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:03:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E5B55A118;
-	Wed,  7 Feb 2024 15:03:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E56C7F7D0;
+	Wed,  7 Feb 2024 15:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="QeD8NyS8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F4I3/AT4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 339687E77F
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 15:03:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78E425A118;
+	Wed,  7 Feb 2024 15:03:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707318186; cv=none; b=rC+MJsrle4x6ZHqF8U9M00AcN1iXJOfewClbbjJjdidiyw6qtEBHgEFiqmKjZVyk8AvmJifAeNHaqE2DkcFX3FUhlHv4HFvqIJrpkQqqCSOIXz3N9aDaNvazpuvLKGybpPXkSxVetwZ3MHwOQ+0u0JgYX5sYcqT/sWROMTlseg4=
+	t=1707318225; cv=none; b=WzKhQsOsuEtQ1Q6Mx4WuhDfjKxXu300C+OiKpV6suRju/bR25N1ZfiagC8RRy9inogCh1Eo4PegzDdCiH7IjcT5kU4pKlCBD8TVO5ntccZ9febQvjAweWAXfSwtvMdda5oqxUmtgp674ySsz2HIOybU6v1JOl5lX8QOq72bhTRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707318186; c=relaxed/simple;
-	bh=qj4sBKquNJsa6JjdBukWFgRky9J6PjC1lcEC2PLxRJo=;
+	s=arc-20240116; t=1707318225; c=relaxed/simple;
+	bh=HgWvn5bAM4Im/qqGraSiL8Ix3OSmzKgABaZhyzWAiKg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DNTL8ntv+VhAsoU9Tkx+Zb5cMJdUtBu0J0g+fjO2VUXduPLy+H96mYzAyCeJxhVyvN57I7Lg0mj1LPHRD9M9jn8PDTDOVzMp486fI0W3lkh4BrdhUbIf7iWMQAkiFO3bghrDBorVITCpQ6YmPRBJorOOu8qYrcq5A4EIg0NsIRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=QeD8NyS8; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6e065098635so516207b3a.3
-        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 07:03:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1707318183; x=1707922983; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qj4sBKquNJsa6JjdBukWFgRky9J6PjC1lcEC2PLxRJo=;
-        b=QeD8NyS8AH2Y7jqs74s/hoD8/WreEMEWxgWwg3nXUZhnHjyUkYwUPWaUo3qoeKLJ5t
-         KDqdQRiJBdYVO2aLExvoF2u3aP5vHreYBOfR82BnBah2VkhHb1GwIytB8i4qcD5YUUbn
-         36oZFrP/i4+TJocoELZsK1Bd8Jm8I+7crgoPJ3UtAVqbc7P171PMYiv7JutnypS43DTX
-         0Rkf2+H9Pl2Y4CQvd+anaMTBM9Nd4297isL6+nr6D9+YrPE8rXzL1xS3EIR0izaSGy9L
-         Dcmth7gWuBCEeF1r3dY/UeNooVy3bRU4ZqJiCZdYu63dGkFJxkqhouQFzcUQCqqtkKZ5
-         pGdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707318183; x=1707922983;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qj4sBKquNJsa6JjdBukWFgRky9J6PjC1lcEC2PLxRJo=;
-        b=AW2+cNwhVEfnD5duKTpIzqbkfMskj3kRSKXI0C9Ky94bwZfLHvhU0mm/02JRLKmJsa
-         LJbXrYFxTSvgKFtp/cDZrZxKcDjFaI8v97jJtQGWBxwcGnWgLeMUxtTUxk0A2UXKMqmq
-         tLmLUWjaQxpmH+UATmVRVT1xwm9Dc8f8mjUkBUUnGfdOMZepGdgYXcpgRP6VDZkNWPBU
-         mMld/6KmmmGVt/NIfaiqGwNnJr7NchDhUil1KSCNXtynnI3p0H35jN6ZtF1JWYOZtD0d
-         QgOcCRcmIJ/SN31tKOC98vuo0c6CP6IRHgFPv5tQImqXjep46d/Aw4pWmn8PTOREOXbq
-         bZfA==
-X-Forwarded-Encrypted: i=1; AJvYcCWQfuy+VKUCBN5U2imKcy+vkV1sLNVFGcmu/bLeV9W875SwZdzbKIdojjNtnnaAnmp8foKjtuw+MZdF6Hyt9b3EUCcG1tNc
-X-Gm-Message-State: AOJu0YxUSdnOo++kK1J1tewTjSSz99PZgt/p3ee5i2F0fmvLuIPH7DRB
-	0ka2AevIj03wO4lLuPlo+O9M7wkC4mKA2ErSWWkKZBoIDabqrXSEaXMxEl7x/jw=
-X-Google-Smtp-Source: AGHT+IHbN4vbIcsgi4bVcxp+6A8g0KI7mqKgCobm5KY5ELFhbrXQy36Lctlwxb4A8K+1bnpxDt1K7g==
-X-Received: by 2002:a05:6a20:d90e:b0:19e:9bcb:9344 with SMTP id jd14-20020a056a20d90e00b0019e9bcb9344mr5793288pzb.53.1707318183322;
-        Wed, 07 Feb 2024 07:03:03 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWEs3KDwCb+/+DbWUspqQlq1t3VVCTCgBXdrb3GVQpou2fgeIQy1Ni9oojRcdijV51y0+Pt2WGQB7dm+6oL1NR5nmL13nkJMJF/C4w1rN/asNLO9U9iMZ3p8bI=
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id l185-20020a6325c2000000b005dc19ac7162sm1652953pgl.3.2024.02.07.07.03.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Feb 2024 07:03:03 -0800 (PST)
-Date: Wed, 7 Feb 2024 07:03:01 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Dave Taht via Bloat <bloat@lists.bufferbloat.net>
-Cc: Dave Taht <dave.taht@gmail.com>, Michael Welzl <michawe@ifi.uio.no>,
- Linux Kernel Network Developers <netdev@vger.kernel.org>
-Subject: Re: [Bloat] Trying to *really* understand Linux pacing
-Message-ID: <20240207070301.30c92e23@hermes.local>
-In-Reply-To: <CAA93jw6di-ypNHH0kz70mhYitT_wsbpZR4gMbSx7FEpSvHx3qg@mail.gmail.com>
-References: <1BAA689A-D44E-4122-9AD8-25F6D024377E@ifi.uio.no>
-	<CAA93jw6di-ypNHH0kz70mhYitT_wsbpZR4gMbSx7FEpSvHx3qg@mail.gmail.com>
+	 MIME-Version:Content-Type; b=CBt8NjLKudW/H1QkrN99cBxZhyf+m2OnXsxkdEPOwfIACb1ulHulAuvL7kjx5P/U6UB4mL38CTk7rP35Gv3NLH7/Lb5uxvOeMTYGIyY9kUpDm6F7dydoy7REHGDbTGICtiNk3S7MAsQg8QWbxDbsygxEGGWKK+oTf6azjpd5qms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F4I3/AT4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C766BC433F1;
+	Wed,  7 Feb 2024 15:03:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707318224;
+	bh=HgWvn5bAM4Im/qqGraSiL8Ix3OSmzKgABaZhyzWAiKg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=F4I3/AT4d/5kejR4u5TiWh8m1He0YasYGQJiNftNfXfbHjKkuYGUtVpL6iPzskJOQ
+	 r5dX6Vfsb0rEERFPG+F+RNbxMrstoUDJURRCTulxaBfnpYES70bWWf747850ptkUou
+	 JtjqARFRlU/52AW0t/4rHZWfQfAMCecINeS6OsNteqpx1d29yjOBBmz6DY9mrn1IEF
+	 bTByxUceRMOrpgWd5sRsk8RqV+KOuj4f9GnzyG385X0yq46oWSUPBGDHH95tsvbnLY
+	 6fHEmH7tiZCzxUMhLEKdIyVwP/+CT/afS0ZRH9v2PASWXpqQX5Ten9/8JOP79fA4wx
+	 pc0oMmfXOEa3A==
+Date: Wed, 7 Feb 2024 07:03:42 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: Arnd Bergmann <arnd@arndb.de>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, Leon Romanovsky <leonro@nvidia.com>, Jason
+ Gunthorpe <jgg@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, Leonid Bloch
+ <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>, Saeed Mahameed
+ <saeedm@nvidia.com>, David Ahern <dsahern@kernel.org>, Aron Silverton
+ <aron.silverton@oracle.com>, Christoph Hellwig <hch@infradead.org>,
+ andrew.gospodarek@broadcom.com, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Message-ID: <20240207070342.21ad3e51@kernel.org>
+In-Reply-To: <20240207072435.14182-1-saeed@kernel.org>
+References: <20240207072435.14182-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,21 +65,90 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 7 Feb 2024 07:05:27 -0500
-Dave Taht via Bloat <bloat@lists.bufferbloat.net> wrote:
+On Tue,  6 Feb 2024 23:24:30 -0800 Saeed Mahameed wrote:
+> From: Saeed Mahameed <saeedm@nvidia.com>
+> 
+> Recap from V3 discussion:
+> =========================
+> 
+> LWN has published an article on this series aptly summarizing the debate.
+> LINK: https://lwn.net/Articles/955001/
+> 
+> We continue to think that mlx5ctl is reasonable and aligned with the
+> greater kernel community values. People have pointed to the HW RAID
+> miscdevices as a good analog. The MD developers did not get to block HW
+> RAID configuration on the basis that it undermines their work on the
+> software RAID stack. Further, while there is a superficial similarity to
+> the DRM/accel debate, that was grounded in a real concern that DRM values
+> on open source would be bypassed. That argument does not hold up here as
+> this does come with open source userspace and the functionality mlx5ctl
+> enables on lockdown has always been available to ConnectX users through
+> the non-lockdown PCI sysfs. netdev has been doing just fine despite the
+> long standing presence of this tooling and we have continued to work with
+> Jakub on building common APIs when appropriate. mlx5 already implements
+> a wide range of the netdev common interfaces, many of which were pushed
+> forward by our staff - the DPLL configuration netlink being a recent
+> example.
 
-> I also tend to think that attempting it in various cloudy
-> environments and virtualization schemes, and with certain drivers, the
-> side effects are not as well understood as I would like. For example,
-> AWS's nitro lacks BQL as does virtio-net.
+I appreciate Jiri's contributions (and you hired Maciej off of Intel at
+some point) but don't make it sound like nVidia lead DPLL, or pushed for
+a common interface :| Intel posted SyncE support. I asked them make it
+a standalone API family:
 
-FYI - Microsoft Azure drivers don't do BQL either.
-Both netvsc and mana.
+https://lore.kernel.org/netdev/20210830162909.110753ec@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com/
 
-The problem is that implementing BQL is not as easy as it looks
-and has possibility of introducing bugs. One big customer with a stuck
-connection totally negates any benefit!
+Vadim from Meta joined in and helped a lot based on the OCP time card.
+Then after some delaying and weird noises y'all started participating.
 
-For virtio, there have been several attempts at BQL and they never worked
-perfectly.
+> mlx5 ConnectX control misc driver:
+> ==================================
+> 
+> The ConnectX HW family supported by the mlx5 drivers uses an architecture
+> where a FW component executes "mailbox RPCs" issued by the driver to make
+> changes to the device. This results in a complex debugging environment
+> where the FW component has information and low level configuration that
+> needs to be accessed to userspace for debugging purposes.
+
+You don't explain anywhere why addressing the challenges of using
+debugfs in secure environments isn't the way to go.
+
+Also you keep saying debugging purposes but the driver is called
+"control misc driver", you need to iron out your narrative just 
+a bit more.
+
+> Historically a userspace program was used that accessed the PCI register
+> and config space directly through /sys/bus/pci/.../XXX and could operate
+> these debugging interfaces in parallel with the running driver.
+> This approach is incompatible with secure boot and kernel lockdown so this
+> driver provides a secure and restricted interface to that.
+
+[snip]
+
+>     i) mstreg
+>       The mlxreg utility allows users to obtain information regarding
+>       supported access registers, such as their fields
+
+So the access mstreg gives over this interface is read only? That's
+what your description sounds like, but given your complaints about
+"inability to add knobs" and "control" in the name of the driver that
+must be false.
+
+> Other usecases with umem:
+>   - dynamic HW and FW trace monitoring
+>   - high frequency diagnostic counters sampling
+
+Ah yes, the high frequency counters. Something that is definitely
+impossible to implement in a generic way. You were literally in the
+room at netconf when David Ahern described his proposal for this.
+
+Anyway, I don't want to waste any more time arguing with you.
+My opinion is that the kernel community is under no obligation to carry
+your proprietary gateway interfaces. I may be wrong, but I'm entitled
+to my opinion.
+
+Please do me the basic courtesy of carrying my nack on these patches:
+
+Nacked-by: Jakub Kicinski <kuba@kernel.org>
+
+and CC netdev, so I don't have to respond again :|
 
