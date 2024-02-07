@@ -1,61 +1,59 @@
-Return-Path: <netdev+bounces-69877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E27684CE6D
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 16:53:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 84ECE84CE71
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 16:55:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3103A1F23C8A
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:53:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E6F8289483
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:55:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D5A97FBC9;
-	Wed,  7 Feb 2024 15:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 788E17FBC3;
+	Wed,  7 Feb 2024 15:55:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WsZXxawd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L3hRE9ns"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388B57E775
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 15:53:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 520B45FEE1
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 15:55:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707321196; cv=none; b=LfV+LD5AkDbtYFGZH8tERJM5aCn08sFmEmslSzn4wIMG98uARo5jRtbgOqSR0q/nKbo7BnQ5gY4bap9ElCCciPe2JVVXDrJx/y8FRyoz/IhlmWCgraf2KVotIESm/nKT+CjyXJfERIjrBwEuG625OjiXmMH6GHpmk55QM8X2Cc4=
+	t=1707321314; cv=none; b=Y3nnRL+qMhZm8dgQW24v/NRl6utYvK63m/OmMPByJJsAmOXM/PX/d+rrxGBZwqyiv/lpiF4CWAQmwywtr6RMi1zJtmly0diipELOMI0nIdt3F+xOYGeb3j4NZubxwpaTQrX+MOYK+3Qdxvwb0RE++j0vsQA+H7K1U2RYOyrqogM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707321196; c=relaxed/simple;
-	bh=NkdMDw0u5nZZCGQMBtc/IR+YcuOIVLU1n3HZwh763RY=;
+	s=arc-20240116; t=1707321314; c=relaxed/simple;
+	bh=nLbSVH1EdeZ5dT/6SOP41mYl8vLfKMNe7Qap87vrbxo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r+Sfk5FnWFlji2iUgg/tJ0luaQ6SOaU4Wgt5/7WrbC7+k91KE2/oY6kc25HoiDIvNqvXxH4/ES4RJXlsH3jxQv3iBXXtx0iwgZwgn8nX+0QV6iB0UThUUfBy9d43uqyQytkp/MZ4cbzeZfqY83Z1fqKiJtqwdSu3D0/yTS+YDIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WsZXxawd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6F9CAC433C7;
-	Wed,  7 Feb 2024 15:53:15 +0000 (UTC)
+	 MIME-Version:Content-Type; b=ZGYPVhui45uLIsN7M5iCTaIq8pNK+rfGvM4MNJWVsH/pMYbqPHVrE9hGPC7lK36zGR7JFEW1mG/LC3cQBDqeZaZioYjcmjkOPyCSRIUQmWkczQ+cJhV3lANxo/dWfj3hGPesbXSoG+yAtu3oPNvspK5r2UibwSwG93Yt0pCMM+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L3hRE9ns; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71736C433F1;
+	Wed,  7 Feb 2024 15:55:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707321195;
-	bh=NkdMDw0u5nZZCGQMBtc/IR+YcuOIVLU1n3HZwh763RY=;
+	s=k20201202; t=1707321313;
+	bh=nLbSVH1EdeZ5dT/6SOP41mYl8vLfKMNe7Qap87vrbxo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WsZXxawdVwxBcIFGKCg6t3vbDWBrhC27YoaQ6OHOmBK3JnV1+PBqv0Ccocps4hrMO
-	 TVGM0/fvoajS46EYrCn+7JeJKGAwT32C/LyFKmqo0PdBhWIxCUIOo87eHLyKk2tbD+
-	 +lMMZWmOjAT41Rt+vyHAtp90ylMsL3ii08TcPjtNfeBMkDbUQiEjIuytAwgoFeGXvD
-	 ZOfByKfhZ2LHl3tPGUbjM4sBYb8wtvCmnimsB/SsU8WGHfa6Hy72eGLmqaNO5qFiYW
-	 LLGMqcccrfui6df+jvL/yUSan1mGxwHBDs048ao4cx/j4EN5/i4h0PVIqU7ckunImz
-	 XtVfVMTMq0OhQ==
-Date: Wed, 7 Feb 2024 07:53:14 -0800
+	b=L3hRE9ns3Fw+0t4QTDGBfiEOyd35VYIJ9mV1BaAA2fxPA4eHjQCvRodM9RYj/Wn1I
+	 Jz75Igc1ZZhV1Be/M8Nn9JAB1u6ukigdASMmpo0cW5R8CzRhs03UXkSPIsRIE+MjeF
+	 gbKjtVY43V71Az4cHxnJYZgs1zWqNIC1kOQ28Kf6DwCt6+8TaX+m+GxYLPMPp36zCE
+	 p0Ezkq4/EA3GEP5Mgsx7lThGVNzSM8U0ksBuHOkRu6eApFMGu1gLKrsM8yks0zibhy
+	 qRVcBo41k5vPOCASUk1zlutpM3NMqJ3JjdW3/Xu7APTgb1RyjaYIhSsfYG8edjPy0C
+	 5uczLlgoRlgSg==
+Date: Wed, 7 Feb 2024 07:55:12 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- David Miller <davem@davemloft.net>, Russell King - ARM Linux
- <linux@armlinux.org.uk>, Igor Russkikh <irusskikh@marvell.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Andrew Lunn
- <andrew@lunn.ch>
-Subject: Re: [PATCH net-next] net: atlantic: convert EEE handling to use
- linkmode bitmaps
-Message-ID: <20240207075314.5458bd68@kernel.org>
-In-Reply-To: <2046e53a-6de4-41e0-b816-3e7926ad489b@gmail.com>
-References: <7d34ec3f-a2b7-41f5-8f4b-46ee78a76267@gmail.com>
-	<c7979b55-142b-469b-8da3-2662f0fe826e@lunn.ch>
-	<2046e53a-6de4-41e0-b816-3e7926ad489b@gmail.com>
+Cc: David Miller <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, Russell King - ARM Linux
+ <linux@armlinux.org.uk>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Michael Chan <michael.chan@broadcom.com>
+Subject: Re: [PATCH v2 net-next] bnxt: convert EEE handling to use linkmode
+ bitmaps
+Message-ID: <20240207075512.314da513@kernel.org>
+In-Reply-To: <a52c2a77-4d0c-48a9-88ea-3ec301212b31@gmail.com>
+References: <37792c4f-6ad9-4af0-bb7b-ca9888a7339f@gmail.com>
+	<a52c2a77-4d0c-48a9-88ea-3ec301212b31@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,21 +63,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 7 Feb 2024 07:52:49 +0100 Heiner Kallweit wrote:
-> > This is again a correct translation. But the underlying implementation
-> > seems wrong. aq_ethtool_set_eee() does not appear to allow the
-> > advertisement to be changed, so advertised does equal
-> > supported. However aq_ethtool_set_eee() does not validate that the
-> > user is not changing what is advertised and returning an error. Lets
-> > leave it broken, and see if Aquantia/Marvell care.
-> > 
-> > Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-> 
-> This patch was by mistake set to "Changes requested".
+On Wed, 7 Feb 2024 11:43:39 +0100 Heiner Kallweit wrote:
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 21 +++---
+> >  .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 65 ++++++++-----------
+> >  .../net/ethernet/broadcom/bnxt/bnxt_ethtool.h |  4 +-
+> >  3 files changed, 40 insertions(+), 50 deletions(-)
+> >   
+> This patch has been set to "Not applicable" in patchwork. Why that?
 
-It's because of the comment about zeroing, not the latter one.
-
-Sorry, it's impossible for me to guess whether he meant the tag
-for v2 or he's fine with the patch as is. Andrew has the powers
-to change pw state, I'm leaving this to him.
+I'm guessing Dave did that because the conversation on v1 was happening
+while v2 was already on the list. Repost.
 
