@@ -1,94 +1,192 @@
-Return-Path: <netdev+bounces-69893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAA5484CEE2
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 17:30:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6681B84CEE7
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 17:33:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23F631C25D60
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 16:30:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB6CB28BA95
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 16:33:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF7D781AA1;
-	Wed,  7 Feb 2024 16:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2981381ABD;
+	Wed,  7 Feb 2024 16:32:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fiW52+9C"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="ZL+hZ9pA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC1BA80035
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 16:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3047A70E
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 16:32:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707323428; cv=none; b=s7v4ZXv/BQ3bOk+W007UkFIj6Ss0K3b4dLzOgH1seitpSyymyL8dUxk7It8sSRuGnwbg7jaF6d4kRnm1xt9oWTTDzKa/ZZeVKOogzDlj5OI+aFAL3ZajY5tsOm8n/4DsArWrmWqMZkhH2oxMJJUYIYcFQeSTjQeBGtmr2iMHGho=
+	t=1707323574; cv=none; b=taF8HJJFy6W9AGAWE0ciUxLTQkCuvpDnyKf1Yoa1aVsWIoxfsEdSzJdjqXwXbMpfKYLgwD+QXd5N071ge3e+kT7oD4AdWmCTntDrDKX0FSo96KfMpV1fotSJjg4SXM/3biQ6yHqn8rgy79qzjiiTNo4EHY6tAKdoBeCOU0Od+Wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707323428; c=relaxed/simple;
-	bh=K0adONo8PpzTxplkQJIQkLflc3fHvAAoNNFtGVHuV8c=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RryJ5j+5y4qm4KEDaHdZ68cpHz0VkvnDUwHWhY15mmgJVFDl8Y2Av4CEcQAkekxpmKwdBc7AvhfggTQoSVhSUIHGjgsxMVii1aymfzcceXVNTVfllbYx4rmjAnjAEy17K6RmHjBOL/n1n04Q2uGwHfGU2L45K6Xn8nnafdUzX4Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fiW52+9C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 982FEC43390;
-	Wed,  7 Feb 2024 16:30:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707323428;
-	bh=K0adONo8PpzTxplkQJIQkLflc3fHvAAoNNFtGVHuV8c=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fiW52+9CY7SPOzVuQCksExvnnHfNzSC5g4Sob373e8ASjzxCbaq87xs0J2eBCsWkD
-	 KAIgH0s6uHeuQZyezzk8CxZl81KXzUHKYVwMe3esvWyaegSBqdPLt4u7T0GQxcgtJg
-	 C+4DZIqbW84PoZRP9cSCQP3jgTB4cPu3LD4aasaZf1fsh2i1ns6m79czDrLUC2Q02V
-	 G2ZrzEUD44Y+oxkiPnhnuo0flU8kasWywC+z/v6+kH2CqVtwBdlYuoeqREmynTq2pr
-	 5XaW+QRhhe9RsC6ZLcYjdfBc57O9NIOqu3HOxwXSc54lvRkwge6+WcNT90WZU/IQ1q
-	 GqKVv50Dgaoqg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7E5B6D8C96F;
-	Wed,  7 Feb 2024 16:30:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1707323574; c=relaxed/simple;
+	bh=6Yo/fyYh7fG38u08ZGJVpdUslT92MuMedlOE+fskdT4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ig+xylaEVu5zB0Dw7couaha3T+auBDIlh6uuJ1zLUYxcRqYRZQll2gp0xfih7LVmJ/JnH1HEJYJMYp3JTYmIvtxjzKf7DN6sSDL/U9v6a3bpW97sJhfA3+OgjNfl53B/CiLgssrl1IkZT2KVzi8fJsyg2/CT08+xJPi7miids1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=ZL+hZ9pA; arc=none smtp.client-ip=209.85.219.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-dc6d2e82f72so776515276.2
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 08:32:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1707323570; x=1707928370; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6Yo/fyYh7fG38u08ZGJVpdUslT92MuMedlOE+fskdT4=;
+        b=ZL+hZ9pAzfYVNJ5X4fBcLg98ndLaGNBYNck/AGtAA7VIwl+S3EzDE5SR8pbD2kfH5l
+         Z1TncIKTTzRVVDES9JJYV1zrVXgx57Vi5m1lZvp14iG/TIlWwfTNZRULuKa4ZQGQDo/j
+         rNpe1Svy1sqh88W83WF4u3ZZozQpX6xZX0Go07Cl6o0E9jfIwQ4upB2+hN5+d8mQy7jQ
+         HCj7onieCi3bvpel3sD5Y6BilbfKMoDilGzKNVagV77JXL4aFaBNsdNcb9Tfa/fFwj7a
+         gZKGCWpVW7Xialj9vVy7WMbglDL3NPCof+8Bn+QFI1EhM2cqXmOzVqJd10LSat8CbeAi
+         7mlw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707323570; x=1707928370;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6Yo/fyYh7fG38u08ZGJVpdUslT92MuMedlOE+fskdT4=;
+        b=H43FsYIT9YJTBTTe2n2MJyqxOdRqBx5aIREHIe4wsWUgTAdWvHwFPIacFS6arzhWIF
+         JRO9zwEQT9D3W6B3O1Q5mmBvAXvGDN0rC8uYpiOV41gWRCT2agmF/hZZQP9wURMpEqiG
+         WsV9ylVMekCD0lfzP46cWUjR2vgX2ZSDApq/2zjfE4Q7jvryb+1zsT2a0zYm+kwytcUC
+         OpoNSnvZWAkMaXTtfgAJAp6Ft2W5e+To0MkOeqAUaKL5ihyNT3OctuD4TQgKv3x5ohhy
+         eX3MZ6k9CwnV4n0vTOH15KGaq8JGo/Qy+7h0dho+aX1asq6h+r0uKq3wcQUYRGgKlikl
+         9RtQ==
+X-Gm-Message-State: AOJu0YwN3+mccIy9+f72BxyzXM26iY55AA3KjYbr3fWwTtPoJl5HdBDK
+	FaOVvj/QrwxCT9BE2rDbQa/oZ0a+7u7RAI4e6dkmgUrqaalgy7/orK9qEOxOBlxcioHp9TNOb3S
+	6expoFi1/UN/K3tzdBr6zKmNYBMOOXreHFv6OcQ==
+X-Google-Smtp-Source: AGHT+IE3zCdfJVGHV2I6xOZuAs5X41g7XZwMrMfSjZMfsSrqtH+jCnKdu76h60nVbqejDK2GD8n0GFHFIxgNUHOMEGE=
+X-Received: by 2002:a5b:74f:0:b0:dc6:de64:f74 with SMTP id s15-20020a5b074f000000b00dc6de640f74mr4960135ybq.9.1707323569174;
+ Wed, 07 Feb 2024 08:32:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next] ip/bond: add coupled_control support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170732342851.21265.15674501372010367095.git-patchwork-notify@kernel.org>
-Date: Wed, 07 Feb 2024 16:30:28 +0000
-References: <20240125231148.416193-1-aahila@google.com>
-In-Reply-To: <20240125231148.416193-1-aahila@google.com>
-To: Aahil Awatramani <aahila@google.com>
-Cc: maheshb@google.com, dillow@google.com, j.vosburgh@gmail.com,
- dsahern@gmail.com, liuhangbin@gmail.com, stephen@networkplumber.org,
- netdev@vger.kernel.org
+References: <20240117160748.37682-1-brgl@bgdev.pl> <20240117160748.37682-5-brgl@bgdev.pl>
+ <2024011707-alibi-pregnancy-a64b@gregkh> <CAMRc=Mef7wxRccnfQ=EDLckpb1YN4DNLoC=AYL8v1LLJ=uFH2Q@mail.gmail.com>
+ <2024011836-wok-treadmill-c517@gregkh> <d2he3ufg6m46zos4swww4t3peyq55blxhirsx37ou37rwqxmz2@5khumvic62je>
+ <CAMRc=MeXJjpJhDjyn_P-SGo4rDnEuT9kGN5jAbRcuM_c7_aDzQ@mail.gmail.com>
+ <oiwvcvu6wdmpvhss3t7uaqkl5q73mki5pz6liuv66bap4dr2mp@jtjjwzlvt6za> <CAMRc=McT8wt6UbKtyofkJo3WcyJ-S4d2MPp8oZmjWbX6LGbETQ@mail.gmail.com>
+In-Reply-To: <CAMRc=McT8wt6UbKtyofkJo3WcyJ-S4d2MPp8oZmjWbX6LGbETQ@mail.gmail.com>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Wed, 7 Feb 2024 17:32:38 +0100
+Message-ID: <CAMRc=MeWgp27YcS=-dbYdN1is1MEuZ2ar=pW_p9oY0Nf1EbFHA@mail.gmail.com>
+Subject: Re: Re: Re: [PATCH 4/9] PCI: create platform devices for child OF
+ nodes of the port node
+To: Bjorn Andersson <andersson@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>, Heiko Stuebner <heiko@sntech.de>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Chris Morgan <macromorgan@hotmail.com>, 
+	Linus Walleij <linus.walleij@linaro.org>, Geert Uytterhoeven <geert+renesas@glider.be>, 
+	Arnd Bergmann <arnd@arndb.de>, Neil Armstrong <neil.armstrong@linaro.org>, 
+	=?UTF-8?B?TsOtY29sYXMgRiAuIFIgLiBBIC4gUHJhZG8=?= <nfraprado@collabora.com>, 
+	Marek Szyprowski <m.szyprowski@samsung.com>, Peng Fan <peng.fan@nxp.com>, 
+	Robert Richter <rrichter@amd.com>, Dan Williams <dan.j.williams@intel.com>, 
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>, Terry Bowman <terry.bowman@amd.com>, 
+	Lukas Wunner <lukas@wunner.de>, Huacai Chen <chenhuacai@kernel.org>, Alex Elder <elder@linaro.org>, 
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>, Abel Vesa <abel.vesa@linaro.org>, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-pci@vger.kernel.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Fri, Feb 2, 2024 at 11:02=E2=80=AFAM Bartosz Golaszewski <brgl@bgdev.pl>=
+ wrote:
+>
+> On Fri, Feb 2, 2024 at 1:03=E2=80=AFAM Bjorn Andersson <andersson@kernel.=
+org> wrote:
+> >
+>
+> [snip]
+>
+> > > >
+> > > > I believe I missed this part of the discussion, why does this need =
+to be
+> > > > a platform_device? What does the platform_bus bring that can't be
+> > > > provided by some other bus?
+> > > >
+> > >
+> > > Does it need to be a platform_device? No, of course not. Does it make
+> > > sense for it to be one? Yes, for two reasons:
+> > >
+> > > 1. The ATH11K WLAN module is represented on the device tree like a
+> > > platform device, we know it's always there and it consumes regulators
+> > > from another platform device. The fact it uses PCIe doesn't change th=
+e
+> > > fact that it is logically a platform device.
+> >
+> > Are you referring to the ath11k SNOC (firmware running on co-processor
+> > in the SoC) variant?
+> >
+> > Afaict the PCIe-attached ath11k is not represented as a platform_device
+> > in DeviceTree.
+> >
+>
+> My bad. In RB5 it isn't (yet - I want to add it in the power
+> sequencing series). It is in X13s though[1].
+>
+> > Said platform_device is also not a child under the PCIe bus, so this
+> > would be a different platform_device...
+> >
+>
+> It's the child of the PCIe port node but there's a reason for it to
+> have the `compatible` property. It's because it's an entity of whose
+> existence we are aware before the system boots.
+>
+> > > 2. The platform bus already provides us with the entire infrastructur=
+e
+> > > that we'd now need to duplicate (possibly adding bugs) in order to
+> > > introduce a "power sequencing bus".
+> > >
+> >
+> > This is a perfectly reasonable desire. Look at our PMICs, they are full
+> > of platform_devices. But through the years it's been said many times,
+> > that this is not a valid or good reason for using platform_devices, and
+> > as a result we have e.g. auxiliary bus.
+> >
+>
+> Ok, so I cannot find this information anywhere (nor any example). Do
+> you happen to know if the auxiliary bus offers any software node
+> integration so that the `compatible` property from DT can get
+> seamlessly mapped to auxiliary device IDs?
+>
 
-This patch was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
+So I was just trying to port this to using the auxiliary bus, only to
+find myself literally reimplementing functions from
+drivers/of/device.c. I have a feeling that this is simply wrong. If
+we're instantiating devices well defined on the device-tree then IMO
+we *should* make them platform devices. Anything else and we'll be
+reimplementing drivers/of/ because we will need to parse the device
+nodes, check the compatible, match it against drivers etc. Things that
+are already implemented for the platform bus and of_* APIs.
 
-On Thu, 25 Jan 2024 23:11:47 +0000 you wrote:
-> coupled_control specifies whether the LACP state machine's MUX in the
-> 802.3ad mode should have separate Collecting and Distributing states per
-> IEEE 802.1AX-2008 5.4.15 for coupled and independent control state.
-> 
-> By default this setting is on and does not separate the Collecting and
-> Distributing states, maintaining the bond in coupled control. If set off,
-> will toggle independent control state machine which will seperate
-> Collecting and Distributing states.
-> 
-> [...]
+Greg: Could you chime in and confirm that it's alright to use the
+platform bus here? Or maybe there is some infrastructure to create
+auxiliary devices from software nodes?
 
-Here is the summary with links:
-  - [iproute2-next] ip/bond: add coupled_control support
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=e8dcb1214a21
+Bartosz
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> > Anyway, (please) don't claim that "we need to", when it actually is "we
+> > want to use platform_device because that's more convenient"!
+>
+> Bart
+>
+> [snip]
+>
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tr=
+ee/arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts#n744
 
