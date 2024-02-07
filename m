@@ -1,96 +1,153 @@
-Return-Path: <netdev+bounces-70029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C89F784D698
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 00:33:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3866084D6A3
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 00:37:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01DA41C217AA
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 23:33:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 672FE1C224DA
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 23:37:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 177BA2560C;
-	Wed,  7 Feb 2024 23:33:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FX1MbzFH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DD5F535CD;
+	Wed,  7 Feb 2024 23:37:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF8FE1EB2B;
-	Wed,  7 Feb 2024 23:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B3D320316;
+	Wed,  7 Feb 2024 23:37:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707348809; cv=none; b=qU/vRwCerQ9pBETeMvY0HsYGVtYWnIMC4rZb0bWn9j+3c2g86B4/NQ3qke/d+2K7HwFoQMIKsro3BdAVv2+XwLjg5ogMzM16BIf+WFiDj/rAe+gkAfGUrUnM0VUmjitB/taD/E3npnsq7Y4lj0CC8eD2rMCuMt4vZRlm8nX0MbM=
+	t=1707349057; cv=none; b=sctnavtf2cOhXxy1q+O4zFAvXjqkelOfVRFBr1DQ3LqFLd5QGMQh9aQh0Vj0FamqUewDP79+zQL+GsBIEXT0/Jxf9MhaT5UU/eOpLQIZO2YA/HFgvWDa1VPk9JaMWXzxxcS9cATcKL1PAvGSj362XYGwqqH3M6ueAAfnMG66O4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707348809; c=relaxed/simple;
-	bh=v+KkGQ/m2w8jCp8yIBBt86Fjn3X9n3Uwu1iwEuTE+eY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qnOW3k0GgY6sw0qkBzeakpeQW2aPCYnJP1mRHWeQlHwV7EJoS1kOt5Cpuy4uVZ/6dVl8AV7FDkOGRi/LNhb9/jRWrmywhgXO81I/O3hL7AGYyBnp7Ed5oiaXACg9TToWRI6vMGk94TUeYxV4jG1JniXjmASNas/KS+mq2ZMy+ZY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FX1MbzFH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18E1EC433F1;
-	Wed,  7 Feb 2024 23:33:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707348808;
-	bh=v+KkGQ/m2w8jCp8yIBBt86Fjn3X9n3Uwu1iwEuTE+eY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FX1MbzFHOAH+Lr1Y05FgNzW1cU5fT0ZY8f0iWlVnSn+4IU4OsVUCb/porJ3mLhnVk
-	 sFQ519bMozbb1LsTbqDIy8oLwcysrKReZgJUKwH19BveVYYrFUFii/421uz0SXQU0O
-	 +k5DcDCbVO2FuBzKVmE1HQaXH6wXpThI2hk2Ei0xhXTVD1YmzpZZrMBUrs9mtWFmLa
-	 ehfu2AvX4GmcamLeJrwt/x7NYdsXAdUNplgsWofcWW7KA196vFGkEnnbAkS0di967W
-	 fGQfQzyDKEND9NBIyjk+haI9c3KBdP+UGfnpFeleUj5KEVJu82cFMz0UHSnSgn7GVs
-	 p8OfsgJ9wPn3w==
-Date: Wed, 7 Feb 2024 15:33:27 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Borislav Petkov <bp@alien8.de>
-Cc: Matthieu Baerts <matttbe@kernel.org>, Marco Elver <elver@google.com>,
- Alexander Potapenko <glider@google.com>, Dmitry Vyukov
- <dvyukov@google.com>, kasan-dev@googlegroups.com, Netdev
- <netdev@vger.kernel.org>, linux-hardening@vger.kernel.org, Kees Cook
- <keescook@chromium.org>, the arch/x86 maintainers <x86@kernel.org>
-Subject: Re: KFENCE: included in x86 defconfig?
-Message-ID: <20240207153327.22b5c848@kernel.org>
-In-Reply-To: <20240207190444.GFZcPUTAnZb_aSlSjV@fat_crate.local>
-References: <e2871686-ea25-4cdb-b29d-ddeb33338a21@kernel.org>
-	<CANpmjNP==CANQi4_qFV_VVFDMsj1wHROxt3RKzwJBqo8_McCTg@mail.gmail.com>
-	<20240207181619.GDZcPI87_Bq0Z3ozUn@fat_crate.local>
-	<d301faa8-548e-4e8f-b8a6-c32d6a56f45b@kernel.org>
-	<20240207190444.GFZcPUTAnZb_aSlSjV@fat_crate.local>
+	s=arc-20240116; t=1707349057; c=relaxed/simple;
+	bh=tezj1F3Jw+1FollDUZ9yfdFqu9ABRgNlUCM7paYQqSE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=FVOvYAM+sNe5C8mnSo44M8ONnOXarxuITkRtbmsHmCLTjdwm0Kaz+LZNJYmBPLC8IvDXnLAQx9yQ1GdcZh4vK75wTCCoCohpbeGrQEdM9eGc3lmp7UDaITT/vrcgJNKMG/UDtfvfH6i2knqW6ikis13h6UMC3zzfPXDsxnUNcC4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net 00/13] Netfilter fixes for net
+Date: Thu,  8 Feb 2024 00:37:13 +0100
+Message-Id: <20240207233726.331592-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, 7 Feb 2024 20:04:44 +0100 Borislav Petkov wrote:
-> On Wed, Feb 07, 2024 at 07:35:53PM +0100, Matthieu Baerts wrote:
-> > Sorry, I'm sure I understand your suggestion: do you mean not including
-> > KFENCE in hardening.config either, but in another one?
-> > 
-> > For the networking tests, we are already merging .config files, e.g. the
-> > debug.config one. We are not pushing to have KFENCE in x86 defconfig, it
-> > can be elsewhere, and we don't mind merging other .config files if they
-> > are maintained.  
-> 
-> Well, depends on where should KFENCE be enabled? Do you want people to
-> run their tests with it too, or only the networking tests? If so, then
-> hardening.config probably makes sense. 
-> 
-> Judging by what Documentation/dev-tools/kfence.rst says:
-> 
-> "KFENCE is designed to be enabled in production kernels, and has near zero
-> performance overhead."
-> 
-> this reads like it should be enabled *everywhere* - not only in some
-> hardening config.
+Hi,
 
-Right, a lot of distros enable it and so do hyperscalers (Fedora, Meta
-and Google at least, AFAIK). Linus is pretty clear on the policy that
-"feature" type Kconfig options should default to disabled. But for
-something like KFENCE we were wondering what the cut-over point is
-for making it enabled by default.
+The following patchset contains Netfilter fixes for net:
+
+1) Narrow down target/match revision to u8 in nft_compat.
+
+2) Bail out with unused flags in nft_compat.
+
+3) Restrict layer 4 protocol to u16 in nft_compat.
+
+4) Remove static in pipapo get command that slipped through when
+   reducing set memory footprint.
+
+5) Follow up incremental fix for the ipset performance regression,
+   this includes the missing gc cancellation, from Jozsef Kadlecsik.
+
+6) Allow to filter by zone 0 in ctnetlink, do not interpret zone 0
+   as no filtering, from Felix Huettner.
+
+7) Reject direction for NFT_CT_ID.
+
+8) Use timestamp to check for set element expiration while transaction
+   is handled to prevent garbage collection from removing set elements
+   that were just added by this transaction. Packet path and netlink
+   dump/get path still use current time to check for expiration.
+
+9) Restore NF_REPEAT in nfnetlink_queue, from Florian Westphal.
+
+10) map_index needs to be percpu and per-set, not just percpu.
+    At this time its possible for a pipapo set to fill the all-zero part
+    with ones and take the 'might have bits set' as 'start-from-zero' area.
+    From Florian Westphal. This includes three patches:
+
+    - Change scratchpad area to a structure that provides space for a
+      per-set-and-cpu toggle and uses it of the percpu one.
+
+    - Add a new free helper to prepare for the next patch.
+
+    - Remove the scratch_aligned pointer and makes AVX2 implementation
+      use the exact same memory addresses for read/store of the matching
+      state.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-02-08
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit eef00a82c568944f113f2de738156ac591bbd5cd:
+
+  inet: read sk->sk_family once in inet_recv_error() (2024-02-04 16:06:53 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-24-02-08
+
+for you to fetch changes up to a7eaa3316ffa17957ee70a705000a3a942128820:
+
+  netfilter: nft_set_pipapo: remove scratch_aligned pointer (2024-02-07 22:56:30 +0100)
+
+----------------------------------------------------------------
+netfilter pull request 24-02-08
+
+----------------------------------------------------------------
+Felix Huettner (1):
+      netfilter: ctnetlink: fix filtering for zone 0
+
+Florian Westphal (4):
+      netfilter: nfnetlink_queue: un-break NF_REPEAT
+      netfilter: nft_set_pipapo: store index in scratch maps
+      netfilter: nft_set_pipapo: add helper to release pcpu scratch area
+      netfilter: nft_set_pipapo: remove scratch_aligned pointer
+
+Jozsef Kadlecsik (1):
+      netfilter: ipset: Missing gc cancellations fixed
+
+Pablo Neira Ayuso (7):
+      netfilter: nft_compat: narrow down revision to unsigned 8-bits
+      netfilter: nft_compat: reject unused compat flag
+      netfilter: nft_compat: restrict match/target protocol to u16
+      netfilter: nft_set_pipapo: remove static in nft_pipapo_get()
+      netfilter: nft_ct: reject direction for ct id
+      netfilter: nf_tables: use timestamp to check for set element timeout
+      netfilter: nft_set_rbtree: skip end interval element from gc
+
+ include/net/netfilter/nf_tables.h                  |  16 ++-
+ include/uapi/linux/netfilter/nf_tables.h           |   2 +
+ net/netfilter/ipset/ip_set_core.c                  |   2 +
+ net/netfilter/ipset/ip_set_hash_gen.h              |   4 +-
+ net/netfilter/nf_conntrack_netlink.c               |  12 +-
+ net/netfilter/nf_tables_api.c                      |   4 +-
+ net/netfilter/nfnetlink_queue.c                    |  13 ++-
+ net/netfilter/nft_compat.c                         |  17 ++-
+ net/netfilter/nft_ct.c                             |   3 +
+ net/netfilter/nft_set_hash.c                       |   8 +-
+ net/netfilter/nft_set_pipapo.c                     | 127 +++++++++++----------
+ net/netfilter/nft_set_pipapo.h                     |  18 ++-
+ net/netfilter/nft_set_pipapo_avx2.c                |  17 ++-
+ net/netfilter/nft_set_rbtree.c                     |  17 +--
+ .../selftests/netfilter/conntrack_dump_flush.c     |  43 ++++++-
+ 15 files changed, 201 insertions(+), 102 deletions(-)
 
