@@ -1,141 +1,285 @@
-Return-Path: <netdev+bounces-69887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50A7484CE90
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 17:06:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5C0684CE9A
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 17:07:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B4081C23E7D
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 16:06:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9286928BD03
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 16:07:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DC707FBDC;
-	Wed,  7 Feb 2024 16:06:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9BE5811F4;
+	Wed,  7 Feb 2024 16:07:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F9hhMNEu"
+	dkim=pass (2048-bit key) header.d=x3me.net header.i=@x3me.net header.b="bBop/lQK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55B955A100;
-	Wed,  7 Feb 2024 16:06:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA69C80BEF
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 16:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707322014; cv=none; b=slcJ9gcCxR1gMPgA2DsYhA3F/E2u6TMlWvKMWgjXhnTclGPpJGdWaP4vpLER0cELv4FPZ4VL/CCTSUp7fWyZr8txu8GXmvbALuUy22cN/BlZvS0fxMWM+dgqzlVh9v7rA+uDvxuTSRHC7kRXxxJL5v0OpRSnzPb4HvwnW3Q0QNY=
+	t=1707322057; cv=none; b=tmhPLF92fg+DYDQamDqJc8bDTNH9eTTKVzteikfYByM8vqRgqFy20J5Q5UxrD6M9vVkF28nSbSS7D9Pg4A+SNqZQ1hnMoNko2nzWfKHOu43d7Zr39cuqRL9H+EA0jzxzjUaY5CfpjMd+F9NJW+NwaYKYvUaSkOMmr/Xf6JVuMGo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707322014; c=relaxed/simple;
-	bh=mTghWPRZxLNFJcv0965nlydf6d5BvOetUXSyvhzKWCQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ViQsSV+G8HrU7m7jbOqrM22d7lOwYplrvGLReoZWteUPUY/5Inmcx1OFie1NGmr2fJT4yA2ugtRq0WIir+FbeTIH5XoEh2cyAAcprrgzd3+SYaSRyps94PCNt4pf+LixCTemIlwEZk0G4KfMtML1cdOoCFJQsGPpq/g4Lirz/8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F9hhMNEu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76EEAC433F1;
-	Wed,  7 Feb 2024 16:06:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707322013;
-	bh=mTghWPRZxLNFJcv0965nlydf6d5BvOetUXSyvhzKWCQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=F9hhMNEue4ryzB69JiaAm3vfsHlqdUFF2OYfGIG/wK5JHzv6KJPRZcQ0qvjRzEASI
-	 MAwkrCI7PTYdMBBP+oqnSsVT/FrCVZQVEH97cuTt0QV+elLu+8LTtERG2ECZqmZpXW
-	 RfdFrmjrhTJ7N0nnPmg/IXsaHnwsxrUQqlBziaoPVcRS05QLcDH9QLhKS9PeCWfPUw
-	 hVhqIdZoPIL9CF/lvQR3iJem1Vh4Exl370eLpl27TaAUbaTDWf1uyEEAmZmE5s0sK2
-	 PhGV8/ThEd4fkL+Cz2VXOQrCwvp6HEmK+/dwo5PqExa8C448QPiw+PkAq3JwNPp1pZ
-	 0ATKv5ssQNAsg==
-Message-ID: <13464996-353d-41f5-aaf8-d28a7f988679@kernel.org>
-Date: Wed, 7 Feb 2024 17:06:44 +0100
+	s=arc-20240116; t=1707322057; c=relaxed/simple;
+	bh=Xi9vkY3FucQy/ZUeWlMY4/hABM8R3qHw0/wXihxDvUY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HDwHiyj6Q2NkbdngGpKqmmzuM6VDjtMKCxWIriD5sQyH4SDdK4npLIgxB4I2aYufNzqHQFm4yN4wn84dfG4npnkuGTw9a6z5A3fG10ssN62rLPIBI0dy/dWQh859zR3A/ijSFhTm1sdPJF02GKegLbmbhT1HOgaepp5MM2Acqzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=x3me.net; spf=pass smtp.mailfrom=x3me.net; dkim=pass (2048-bit key) header.d=x3me.net header.i=@x3me.net header.b=bBop/lQK; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=x3me.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=x3me.net
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a2d7e2e7fe0so155484166b.1
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 08:07:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=x3me.net; s=google; t=1707322053; x=1707926853; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NiJmcwrzLDdgx3+XHkCG3hEo4hl/SjDl3dmkyY3ZL+Q=;
+        b=bBop/lQKq1aAFymj0tJbsNt+KcwgWwVkYKbJZqDt9aH2U6ObsjzBXFfq7TWq89OXrK
+         iymRhd7T0xemWVaVJOQPhUyWJlm8EVHK3fBgCoFxU+NUAyrJeArLJ8vXZpwJWUWDtJ8d
+         a+TL/HDnjSnd9iF+rqGAFx1s3pHGpVjYvAkkDZmAWsBvHv9ehcVzVcwQ/wU72Nk4ZQdD
+         0gbVvEwHqIurhJoYSzWvtBh+HlChTCYyF/VyKfPiRANS5rX4D/53o4/aEkjeRJ9DBVhg
+         zlcd3Wi6mNaxB6xnJfpF7gePMFP906vpSmXK0GjGMlUivsHNc0THPDBaehfT9XyqipRT
+         y8PQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707322053; x=1707926853;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NiJmcwrzLDdgx3+XHkCG3hEo4hl/SjDl3dmkyY3ZL+Q=;
+        b=kgvOmbSMLVdiu6iGti+k6ab+mjLyhLDQFSXI8tLMIbMkOEB17bN2gFe5Z52rm89H/d
+         kvF1YQUooXnpgrPIGf+mmldK/g8xI1L4ZNUNOP0fXPYIEp/274SfUWFUTjS6dzYoyepB
+         bNbBe7hNBxE7g8eaG7F/Sq61zvmUWlpA5c3uemrl2b/p3P6MSC2SUc1lpjEGaz0DSsvY
+         m6CTZ9DDDgRAQj/mn5MkPy7I1RYyGKkyAWabW4P5NayymHqmHvc+A2ileSMXJHkDKe/i
+         cZUix0zhWMYNs2DueW8uM274l80PBDbmDEWpP1h6UweTmG2GikFJ13H3F3nv/ux1f6Ot
+         potw==
+X-Gm-Message-State: AOJu0YxWoClpOb1i2DVaFtY+u75c4B+JmTbta5CHk9dNgzCanUQT76qV
+	THbGNshqMUZkugVCpD1D/pYZyHUob1I1ZXhiAb69s4rUEjab46kX2aLDqPgDGd5iBO6FvReG+xu
+	4gbuzkbUje7NkUdUj82dXPk3l3EYuRr/335nkCw==
+X-Google-Smtp-Source: AGHT+IFAaZSKWkR9bLcMjhO5M+JwRqD01X7Ytd43Ys/SF3mO/MxlH1rzMd5k7nHoTRjbY77hlo6J408Gsrf8vWnw1lQ=
+X-Received: by 2002:a17:907:7759:b0:a38:1711:ee61 with SMTP id
+ kx25-20020a170907775900b00a381711ee61mr6448648ejc.19.1707322052920; Wed, 07
+ Feb 2024 08:07:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [TEST] The no-kvm CI instances going away
-Content-Language: en-GB, fr-BE
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- MPTCP Upstream <mptcp@lists.linux.dev>, Paolo Abeni <pabeni@redhat.com>,
- Mat Martineau <martineau@kernel.org>
-References: <20240205174136.6056d596@kernel.org>
- <f6437533-b0c9-422b-af00-fb8a236b1956@kernel.org>
- <20240206174407.36ca59c4@kernel.org>
- <2d0eb4ef-dd07-4800-8fcf-637a924570fa@kernel.org>
- <20240207062540.5fe5563b@kernel.org>
- <e216081b-8755-46be-a687-2c61d335aedb@kernel.org>
- <20240207072913.0c69225c@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20240207072913.0c69225c@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <CAJEV1ijxNyPTwASJER1bcZzS9nMoZJqfR86nu_3jFFVXzZQ4NA@mail.gmail.com>
+ <87y1cb28tg.fsf@toke.dk> <CAJEV1igULtS-e0sBd3G=P1AHr8nqTd3kT+0xc8BL2vAfDM_TuA@mail.gmail.com>
+ <20240126203916.1e5c2eee@kernel.org> <CAJEV1igqV-Yb3YvZEiMOBCGyZXRQ2KTS=yq483+xOVFehvgDAw@mail.gmail.com>
+ <CAJEV1ij=K5Xi5LtpH7SHXLxve+JqMWhimdF50Ddy99G0E9dj_Q@mail.gmail.com>
+ <CAJEV1igHVsqmk0ctxb-9gM2+PLs_gvpE1fyZwoASgv+jYXOcmg@mail.gmail.com>
+ <87wmrqzyc9.fsf@toke.dk> <CAJEV1ig2Gyqb2MPHU+qN_G7XDVNZffU5HDm5VkoGev_QOe7bXg@mail.gmail.com>
+ <87r0hyzxbd.fsf@toke.dk> <CAJ8uoz0bZjeJKJbCOfaogJZg2o5zoWNf3XjAF-4ZubpxDoQhcg@mail.gmail.com>
+ <CAJEV1ihnwDxkkeMtAkkkZpP5O-VMxVvJojLs6dMbeMYgsn7sGA@mail.gmail.com>
+In-Reply-To: <CAJEV1ihnwDxkkeMtAkkkZpP5O-VMxVvJojLs6dMbeMYgsn7sGA@mail.gmail.com>
+From: Pavel Vazharov <pavel@x3me.net>
+Date: Wed, 7 Feb 2024 18:07:21 +0200
+Message-ID: <CAJEV1ijyteQ9BxS1xtythC3O0y5+mdostL7-RKQhnkCf93iufg@mail.gmail.com>
+Subject: Re: Need of advice for XDP sockets on top of the interfaces behind a
+ Linux bonding device
+To: Magnus Karlsson <magnus.karlsson@gmail.com>
+Cc: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>, 
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	"Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 07/02/2024 16:29, Jakub Kicinski wrote:
-> On Wed, 7 Feb 2024 15:37:22 +0100 Matthieu Baerts wrote:
->>> I'd rather not modify the tree. Poking around - this seems to work:
->>>
->>>   export kselftest_override_timeout=1  
->>
->> Even better :)
->>
->>   f=tools/testing/selftests/net/settings
->>   kselftest_override_timeout=$(awk -F = '/^timeout=/ {print $2*2}' $f)
->>
->>> Now it's just a matter of finding 15min to code it up :)  
->> I'm not sure if I can help here :)
-> 
-> If you're willing to touch my nasty Python - that'd be very welcome! :)
+On Wed, Feb 7, 2024 at 5:49=E2=80=AFPM Pavel Vazharov <pavel@x3me.net> wrot=
+e:
+>
+> On Mon, Feb 5, 2024 at 9:07=E2=80=AFAM Magnus Karlsson
+> <magnus.karlsson@gmail.com> wrote:
+> >
+> > On Tue, 30 Jan 2024 at 15:54, Toke H=C3=B8iland-J=C3=B8rgensen <toke@ke=
+rnel.org> wrote:
+> > >
+> > > Pavel Vazharov <pavel@x3me.net> writes:
+> > >
+> > > > On Tue, Jan 30, 2024 at 4:32=E2=80=AFPM Toke H=C3=B8iland-J=C3=B8rg=
+ensen <toke@kernel.org> wrote:
+> > > >>
+> > > >> Pavel Vazharov <pavel@x3me.net> writes:
+> > > >>
+> > > >> >> On Sat, Jan 27, 2024 at 7:08=E2=80=AFAM Pavel Vazharov <pavel@x=
+3me.net> wrote:
+> > > >> >>>
+> > > >> >>> On Sat, Jan 27, 2024 at 6:39=E2=80=AFAM Jakub Kicinski <kuba@k=
+ernel.org> wrote:
+> > > >> >>> >
+> > > >> >>> > On Sat, 27 Jan 2024 05:58:55 +0200 Pavel Vazharov wrote:
+> > > >> >>> > > > Well, it will be up to your application to ensure that i=
+t is not. The
+> > > >> >>> > > > XDP program will run before the stack sees the LACP mana=
+gement traffic,
+> > > >> >>> > > > so you will have to take some measure to ensure that any=
+ such management
+> > > >> >>> > > > traffic gets routed to the stack instead of to the DPDK =
+application. My
+> > > >> >>> > > > immediate guess would be that this is the cause of those=
+ warnings?
+> > > >> >>> > >
+> > > >> >>> > > Thank you for the response.
+> > > >> >>> > > I already checked the XDP program.
+> > > >> >>> > > It redirects particular pools of IPv4 (TCP or UDP) traffic=
+ to the application.
+> > > >> >>> > > Everything else is passed to the Linux kernel.
+> > > >> >>> > > However, I'll check it again. Just to be sure.
+> > > >> >>> >
+> > > >> >>> > What device driver are you using, if you don't mind sharing?
+> > > >> >>> > The pass thru code path may be much less well tested in AF_X=
+DP
+> > > >> >>> > drivers.
+> > > >> >>> These are the kernel version and the drivers for the 3 ports i=
+n the
+> > > >> >>> above bonding.
+> > > >> >>> ~# uname -a
+> > > >> >>> Linux 6.3.2 #1 SMP Wed May 17 08:17:50 UTC 2023 x86_64 GNU/Lin=
+ux
+> > > >> >>> ~# lspci -v | grep -A 16 -e 1b:00.0 -e 3b:00.0 -e 5e:00.0
+> > > >> >>> 1b:00.0 Ethernet controller: Intel Corporation 82599ES 10-Giga=
+bit
+> > > >> >>> SFI/SFP+ Network Connection (rev 01)
+> > > >> >>>        ...
+> > > >> >>>         Kernel driver in use: ixgbe
+> > > >> >>> --
+> > > >> >>> 3b:00.0 Ethernet controller: Intel Corporation 82599ES 10-Giga=
+bit
+> > > >> >>> SFI/SFP+ Network Connection (rev 01)
+> > > >> >>>         ...
+> > > >> >>>         Kernel driver in use: ixgbe
+> > > >> >>> --
+> > > >> >>> 5e:00.0 Ethernet controller: Intel Corporation 82599ES 10-Giga=
+bit
+> > > >> >>> SFI/SFP+ Network Connection (rev 01)
+> > > >> >>>         ...
+> > > >> >>>         Kernel driver in use: ixgbe
+> > > >> >>>
+> > > >> >>> I think they should be well supported, right?
+> > > >> >>> So far, it seems that the present usage scenario should work a=
+nd the
+> > > >> >>> problem is somewhere in my code.
+> > > >> >>> I'll double check it again and try to simplify everything in o=
+rder to
+> > > >> >>> pinpoint the problem.
+> > > >> > I've managed to pinpoint that forcing the copying of the packets
+> > > >> > between the kernel and the user space
+> > > >> > (XDP_COPY) fixes the issue with the malformed LACPDUs and the no=
+t
+> > > >> > working bonding.
+> > > >>
+> > > >> (+Magnus)
+> > > >>
+> > > >> Right, okay, that seems to suggest a bug in the internal kernel co=
+pying
+> > > >> that happens on XDP_PASS in zero-copy mode. Which would be a drive=
+r bug;
+> > > >> any chance you could test with a different driver and see if the s=
+ame
+> > > >> issue appears there?
+> > > >>
+> > > >> -Toke
+> > > > No, sorry.
+> > > > We have only servers with Intel 82599ES with ixgbe drivers.
+> > > > And one lab machine with Intel 82540EM with igb driver but we can't
+> > > > set up bonding there
+> > > > and the problem is not reproducible there.
+> > >
+> > > Right, okay. Another thing that may be of some use is to try to captu=
+re
+> > > the packets on the physical devices using tcpdump. That should (I thi=
+nk)
+> > > show you the LACDPU packets as they come in, before they hit the bond=
+ing
+> > > device, but after they are copied from the XDP frame. If it's a packe=
+t
+> > > corruption issue, that should be visible in the captured packet; you =
+can
+> > > compare with an xdpdump capture to see if there are any differences..=
+.
+> >
+> > Pavel,
+> >
+> > Sounds like an issue with the driver in zero-copy mode as it works
+> > fine in copy mode. Maciej and I will take a look at it.
+> >
+> > > -Toke
+> > >
+>
+> First I want to apologize for not responding for such a long time.
+> I had different tasks the previous week and this week went back to this i=
+ssue.
+> I had to modify the code of the af_xdp driver inside the DPDK so that it =
+loads
+> the XDP program in a way which is compatible with the xdp-dispatcher.
+> Finally, I was able to run our application with the XDP sockets and the x=
+dpdump
+> at the same time.
+>
+> Back to the issue.
+> I just want to say again that we are not binding the XDP sockets to
+> the bonding device.
+> We are binding the sockets to the queues of the physical interfaces
+> "below" the bonding device.
+> My further observation this time is that when the issue happens and
+> the remote device reports
+> the LACP error there is no incoming LACP traffic on the corresponding
+> local port,
+> as seen by the xdump.
+> The tcpdump at the same time sees only outgoing LACP packets and
+> nothing incoming.
+> For example:
+> Remote device
+>                           Local Server
+> TrunkName=3DEth-Trunk20, PortName=3DXGigabitEthernet0/0/12 <---> eth0
+> TrunkName=3DEth-Trunk20, PortName=3DXGigabitEthernet0/0/13 <---> eth2
+> TrunkName=3DEth-Trunk20, PortName=3DXGigabitEthernet0/0/14 <---> eth4
+> And when the remote device reports "received an abnormal LACPDU"
+> for PortName=3DXGigabitEthernet0/0/14 I can see via xdpdump that there
+> is no incoming LACP traffic
+> on eth4 but there is incoming LACP traffic on eth0 and eth2.
+> At the same time, according to the dmesg the kernel sees all of the
+> interfaces as
+> "link status definitely up, 10000 Mbps full duplex".
+> The issue goes aways if I stop the application even without removing
+> the XDP programs
+> from the interfaces - the running xdpdump starts showing the incoming
+> LACP traffic immediately.
+> The issue also goes away if I do "ip link set down eth4 && ip link set up=
+ eth4".
+> However, I'm not sure what happens with the bound XDP sockets in this cas=
+e
+> because I haven't tested further.
+>
+> It seems to me that something racy happens when the interfaces go down
+> and back up
+> (visible in the dmesg) when the XDP sockets are bound to their queues.
+> I mean, I'm not sure why the interfaces go down and up but setting
+> only the XDP programs
+> on the interfaces doesn't cause this behavior. So, I assume it's
+> caused by the binding of the XDP sockets.
+> It could be that the issue is not related to the XDP sockets but just
+> to the down/up actions of the interfaces.
+> On the other hand, I'm not sure why the issue is easily reproducible
+> when the zero copy mode is enabled
+> (4 out of 5 tests reproduced the issue).
+> However, when the zero copy is disabled this issue doesn't happen
+> (I tried 10 times in a row and it doesn't happen).
+>
+> Pavel.
 
-Sure, I can have a look (but not today) :)
+My thoughts at the end are not correct. I forgot that we tested with
+traffic too.
+Even when the bonding/LACP looked OK after the application start, it starte=
+d
+breaking later when the traffic is started for the case of zero copy mode.
+However, it worked OK when the zero copy is disabled.
 
-Thank you for the guide! Like with my PR to support subtests, I might
-only test the code I modify not to have to set up everything, I hope it
-is fine :)
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+Pavel.
 
