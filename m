@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-69844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 985FF84CCAE
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:27:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 032B284CCB0
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:27:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5415F289C01
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 14:27:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AE7502872E6
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 14:27:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C17B07E576;
-	Wed,  7 Feb 2024 14:26:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0AD7E760;
+	Wed,  7 Feb 2024 14:26:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MLSpeV1F"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="H5yU2Mac"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B487CF14
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 14:26:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5147E58A
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 14:26:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707316006; cv=none; b=b8jl1lv85R7NDvH3B1UaN+rMA1mUH+REjbys+58iXYY+S2OSdVhYwKHe/K2OaFRGldhOMGgnmFmOuqcn0+BkWDpMHy5NtBpmiDcN0ZnhfjF0Ag7f4fwYDRfVmWOg0ii0uBzNF7NzrxUzqHlwJDFJyI+CeeEdpiUYkhhRw2VZ4J4=
+	t=1707316008; cv=none; b=Ofo21Y30VTXau9C2IfkHHOH6gV39aX5UhOiBSp+Q7XGi7w063Zebom97Rrn7jLxuZGYps7qpdlY4Rs+israP5nvlcFlUI1eFvDpnpHq79TBqoPUvTM/M9FJIDwxo4Umk2jZeJYiZJL6CL4y7rwxpHGfQdwyi34bjq+ITvcIEUQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707316006; c=relaxed/simple;
-	bh=hMaDRYHKIlC6mDinN4ZyUeSrzcmEpWdP98uc0qQFVZw=;
+	s=arc-20240116; t=1707316008; c=relaxed/simple;
+	bh=V8eHJhy6elWUYbSZSMkOEjyunc7rGKcoj4spuUJKhzY=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=fCqacU2D6f5G4xRA24lzHa/4Z1Pp3/JGPX+7M8tSlDuj/1PzLTH4Yp6mwfMcCyybA3a4hNtZkoMB5bfseTgUrQnLXD1hq0Cws/AYpze/ar8W9OnNM+H6NBk4rwr9R1d662vHXdIQvMU4agFEliT3LMVTaR5mVW7x7knM+slYf/4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MLSpeV1F; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=T+wkBthn7RytlUaBmZnGhF4+/oy79e4IO204AXlpWN0pMCvi0riREcbwDlPfcKzl1ZGPR60My/eYSdcmHVmzshCj0n4cblCAhV6QbV4g/1wmgtWvf3kpX8jLK2t+iGbEgg0T6FIVuesLBx2bAKGntngIp2ZrN2WK9MZD6hjAKSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=H5yU2Mac; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6df2b2d1aso854632276.1
-        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 06:26:44 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b267bf11so856065276.2
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 06:26:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707316004; x=1707920804; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1707316006; x=1707920806; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K8FUmQSm0SyTa71msP7ZrPTvJh5Lg0Np6y7f/wDkNfY=;
-        b=MLSpeV1FO4dM3pA6bssTUc+oZL7p7SZ6lcYCoal94rMdd5G3X63igj5L6/Pbhlxk1b
-         MjNi3At6AQxnomK9J6HMA/Q+iaUyQ5DHwKj3/luuv2r5u3U5/2PnATJdbLmDSNlI3aBJ
-         WBewOr0oXYkQ6CBRzk1o9hQpmc6+Iov3wqQnMf9qeXibzccfVGVK98WO3oS6z3D+TpaP
-         ZcIsICAbWJZASsTERmWrZbaw5Cn3EstGbxmVnuCW8TGRaen7tFu1a9lGD/C0X+MVUTy2
-         1GZbMeL+3DuJRy+WI9Jt7u5qqIn+vtLAbaC22drA6jh+Y1ptsreNL0I2GpycOJAILMSA
-         0VxA==
+        bh=d4bfHQ6X2xRYBj0erTXFl9yyMMjnLqivYw8QAS42Pk0=;
+        b=H5yU2MacsRPMLDXvlTir9Q+tE5Jc1428crYV+tVbv+GFszjDuJwGq3QlHNDWDO4zGK
+         /c6qC9JIoGuY/8BxeI3XEGReelmh5XVDT6KzN2URIGN31gLEMC1S7XKIR6mgD0MwbIMP
+         UireSiJAZNRDJGLJ82TTg5kr84dGz+oN4PCjLeUX+kGLk5htkkq4+7Um2i4yHy4ATwFI
+         RGEooA6QFSn7q2/14j7nT/iK98iUC9ulwE9YRr1VWOG7Rf73lj1Mf4ehMNdEqVlyio23
+         IBxNGDbTRLv+DqhFsYoViY5jxiqDoxok1JByqgO3eUbgFNs6E8upHDC/fsZHMD7bZOg3
+         MUlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707316004; x=1707920804;
+        d=1e100.net; s=20230601; t=1707316006; x=1707920806;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=K8FUmQSm0SyTa71msP7ZrPTvJh5Lg0Np6y7f/wDkNfY=;
-        b=oKo0iBxRtM4BPPZI1EHtiMq6EL6dtB1ix7n8/8/I3DlRREYQTiJUFzWb9ksAL+ZrxK
-         6i9lm6mROL+BlTcYn7C/qKb0a+dlQY5oFmC5wGzqS/LMQbqxXg1g1fzjBDk3gWzv3Wc2
-         HCAPR6QOITLNKwqDUqTSyxmUOYxbE7wJHt8IF+iT5smalxSi3FUCkTafKv1CpNQExMI0
-         2LAKGQcJoBrBy8RtahLVLaGotMiAACI3Bq9TVdfYH4pk+rsncsnPTzarNjLK2sLFVVoE
-         oDMxqlQ9lSwS7vCjLS9O7FsdR4Zy/JyAxFxRhaaeqw57gVWOniHfNbhnpYm+/HY+rfHY
-         1i1w==
-X-Gm-Message-State: AOJu0YyjURrYzMb/TPY9F60NMCcpkz+RRXVX/jXGKqTuiaL0BtGmbwCw
-	DXOyY/Hd0OEypD00LKRZdOpEBp7N0PAOmA9gPONLtlqPh4w77AfBghN+rdKabkz9bOrp9VKEoUA
-	oLD0jzjdPAA==
-X-Google-Smtp-Source: AGHT+IGQUAXLhw/DVqeGvCkFTANyAtbAN7nJ8JZoSWJS06YtHlHWSVZI0H1HwCGGeYB0L1DgJRbHIGveImHdbA==
+        bh=d4bfHQ6X2xRYBj0erTXFl9yyMMjnLqivYw8QAS42Pk0=;
+        b=o9IXBWfo7wF4fjVte+RSOlyvL57sWrenJgzocAVraoeJ0nGJcKnkNWkmHamtVhXyMf
+         KQ12w+6agA6bS2GXwa1SW2SmVc7b+2FhI5/g0RdR8oJVU7QA2r01ZSZLcZWPGt44HLQX
+         fL3+iSBLLpjZ2fMjEG11HLGGLB8hva6O3ZRGwkV+rUnaGiCrsgl0gYgEmi2FM+Mg41RJ
+         MFrBCydb/SERk9jyXvl8fqxrspJIIxnzFBCC4jbeWRJvQqnXFkEb15gWFRcGfYawA8ri
+         Nuc8qI6a0rhvFgQ7q6iNZgiySAgvZaXswWldvxjmwUGfkk7TLRVY5aXAKeIB/vnrasFs
+         /h0A==
+X-Gm-Message-State: AOJu0YwxPIIIDbQ3K7oiYZFsRYTne1L6X+Hu6GO7xclrphJ7IdqfhCCH
+	o5mnOTpuuhF/Wked41zqeiOzJ59WiRcxCz5zd0EDyOgmGYWW4d8swMd6NV1mRkUq8oBuc/y3u5p
+	DN9mVWrUOOQ==
+X-Google-Smtp-Source: AGHT+IF/VzRbtQIgJxetCxBcumH78s/c3DOCViNSZb9+QXxjYYCUn/n9vt2+/pDsHLyti95LKioXjgRtw96bRQ==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:220c:b0:dc2:5456:d9ac with SMTP
- id dm12-20020a056902220c00b00dc25456d9acmr178853ybb.5.1707316004186; Wed, 07
- Feb 2024 06:26:44 -0800 (PST)
-Date: Wed,  7 Feb 2024 14:26:22 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:985:b0:dc2:4921:cc0 with SMTP id
+ bv5-20020a056902098500b00dc249210cc0mr158352ybb.5.1707316006097; Wed, 07 Feb
+ 2024 06:26:46 -0800 (PST)
+Date: Wed,  7 Feb 2024 14:26:23 +0000
 In-Reply-To: <20240207142629.3456570-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240207142629.3456570-1-edumazet@google.com>
 X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
-Message-ID: <20240207142629.3456570-7-edumazet@google.com>
-Subject: [PATCH net-next 06/13] net-sysfs: use dev_addr_sem to remove races in address_show()
+Message-ID: <20240207142629.3456570-8-edumazet@google.com>
+Subject: [PATCH net-next 07/13] net-sysfs: convert dev->operstate reads to
+ lockless ones
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -82,71 +83,146 @@ Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Using dev_base_lock is not preventing from reading garbage.
+operstate_show() can omit dev_base_lock acquisition only
+to read dev->operstate.
 
-Use dev_addr_sem instead.
+Annotate accesses to dev->operstate.
+
+Writers still acquire dev_base_lock for mutual exclusion.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/linux/netdevice.h |  1 +
- net/core/dev.c            |  2 +-
- net/core/net-sysfs.c      | 10 +++++++---
- 3 files changed, 9 insertions(+), 4 deletions(-)
+ net/bridge/br_netlink.c |  3 ++-
+ net/core/link_watch.c   |  4 ++--
+ net/core/net-sysfs.c    |  4 +---
+ net/core/rtnetlink.c    |  4 ++--
+ net/hsr/hsr_device.c    | 10 +++++-----
+ net/ipv6/addrconf.c     |  2 +-
+ 6 files changed, 13 insertions(+), 14 deletions(-)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index bed8de91e91a4bd83fe80f6835643af68f1adc53..b9140499630fa84108a1f22a2987c0c1934e8f8d 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -4031,6 +4031,7 @@ int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
- 			struct netlink_ext_ack *extack);
- int dev_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
- 			     struct netlink_ext_ack *extack);
-+extern struct rw_semaphore dev_addr_sem;
- int dev_get_mac_address(struct sockaddr *sa, struct net *net, char *dev_name);
- int dev_get_port_parent_id(struct net_device *dev,
- 			   struct netdev_phys_item_id *ppid, bool recurse);
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 027d0b7976f337df885266aeab2c90fe631decf1..2b96d1ed7f481cbd022368b3f16608cce4c6bc49 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -8922,7 +8922,7 @@ int dev_set_mac_address(struct net_device *dev, struct sockaddr *sa,
+diff --git a/net/bridge/br_netlink.c b/net/bridge/br_netlink.c
+index 5ad4abfcb7ba3960bf69613ae7975180ae48854b..2cf4fc756263992eefe6a3580410766fea0c2c1f 100644
+--- a/net/bridge/br_netlink.c
++++ b/net/bridge/br_netlink.c
+@@ -455,7 +455,8 @@ static int br_fill_ifinfo(struct sk_buff *skb,
+ 			  u32 filter_mask, const struct net_device *dev,
+ 			  bool getlink)
+ {
+-	u8 operstate = netif_running(dev) ? dev->operstate : IF_OPER_DOWN;
++	u8 operstate = netif_running(dev) ? READ_ONCE(dev->operstate) :
++					    IF_OPER_DOWN;
+ 	struct nlattr *af = NULL;
+ 	struct net_bridge *br;
+ 	struct ifinfomsg *hdr;
+diff --git a/net/core/link_watch.c b/net/core/link_watch.c
+index 429571c258da7720baf387fef81081a56a655ef5..1b93e054c9a3cfcdd5d1251a9982d88a071abbaa 100644
+--- a/net/core/link_watch.c
++++ b/net/core/link_watch.c
+@@ -67,7 +67,7 @@ static void rfc2863_policy(struct net_device *dev)
+ {
+ 	unsigned char operstate = default_operstate(dev);
+ 
+-	if (operstate == dev->operstate)
++	if (operstate == READ_ONCE(dev->operstate))
+ 		return;
+ 
+ 	write_lock(&dev_base_lock);
+@@ -87,7 +87,7 @@ static void rfc2863_policy(struct net_device *dev)
+ 		break;
+ 	}
+ 
+-	dev->operstate = operstate;
++	WRITE_ONCE(dev->operstate, operstate);
+ 
+ 	write_unlock(&dev_base_lock);
  }
- EXPORT_SYMBOL(dev_set_mac_address);
- 
--static DECLARE_RWSEM(dev_addr_sem);
-+DECLARE_RWSEM(dev_addr_sem);
- 
- int dev_set_mac_address_user(struct net_device *dev, struct sockaddr *sa,
- 			     struct netlink_ext_ack *extack)
 diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 678e4be690821c5cdb933f5e91af2247ebecb830..23ef2df549c3036a702f3be1dca1eda14ee5e76f 100644
+index 23ef2df549c3036a702f3be1dca1eda14ee5e76f..c5d164b8c6bfb53793f8422063c6281d6339b36e 100644
 --- a/net/core/net-sysfs.c
 +++ b/net/core/net-sysfs.c
-@@ -142,17 +142,21 @@ static ssize_t name_assign_type_show(struct device *dev,
- }
- static DEVICE_ATTR_RO(name_assign_type);
- 
--/* use same locking rules as GIFHWADDR ioctl's */
-+/* use same locking rules as GIFHWADDR ioctl's (dev_get_mac_address()) */
- static ssize_t address_show(struct device *dev, struct device_attribute *attr,
- 			    char *buf)
- {
- 	struct net_device *ndev = to_net_dev(dev);
- 	ssize_t ret = -EINVAL;
+@@ -325,11 +325,9 @@ static ssize_t operstate_show(struct device *dev,
+ 	const struct net_device *netdev = to_net_dev(dev);
+ 	unsigned char operstate;
  
 -	read_lock(&dev_base_lock);
-+	down_read(&dev_addr_sem);
-+
-+	rcu_read_lock();
- 	if (dev_isalive(ndev))
- 		ret = sysfs_format_mac(buf, ndev->dev_addr, ndev->addr_len);
+-	operstate = netdev->operstate;
++	operstate = READ_ONCE(netdev->operstate);
+ 	if (!netif_running(netdev))
+ 		operstate = IF_OPER_DOWN;
 -	read_unlock(&dev_base_lock);
-+	rcu_read_unlock();
-+
-+	up_read(&dev_addr_sem);
- 	return ret;
+ 
+ 	if (operstate >= ARRAY_SIZE(operstates))
+ 		return -EINVAL; /* should not happen */
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 8d95e0863534f80cecceb2dd4a7b2a16f7f4bca3..4e797326c88fe1e23ca66e82103176767fe5c32e 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -866,9 +866,9 @@ static void set_operstate(struct net_device *dev, unsigned char transition)
+ 		break;
+ 	}
+ 
+-	if (dev->operstate != operstate) {
++	if (READ_ONCE(dev->operstate) != operstate) {
+ 		write_lock(&dev_base_lock);
+-		dev->operstate = operstate;
++		WRITE_ONCE(dev->operstate, operstate);
+ 		write_unlock(&dev_base_lock);
+ 		netdev_state_change(dev);
+ 	}
+diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
+index 9d71b66183daf94e19945d75cfb5c33df6ce346c..be0e43f46556e028e675147e63c6b787aa72e894 100644
+--- a/net/hsr/hsr_device.c
++++ b/net/hsr/hsr_device.c
+@@ -31,8 +31,8 @@ static bool is_slave_up(struct net_device *dev)
+ static void __hsr_set_operstate(struct net_device *dev, int transition)
+ {
+ 	write_lock(&dev_base_lock);
+-	if (dev->operstate != transition) {
+-		dev->operstate = transition;
++	if (READ_ONCE(dev->operstate) != transition) {
++		WRITE_ONCE(dev->operstate, transition);
+ 		write_unlock(&dev_base_lock);
+ 		netdev_state_change(dev);
+ 	} else {
+@@ -78,14 +78,14 @@ static void hsr_check_announce(struct net_device *hsr_dev,
+ 
+ 	hsr = netdev_priv(hsr_dev);
+ 
+-	if (hsr_dev->operstate == IF_OPER_UP && old_operstate != IF_OPER_UP) {
++	if (READ_ONCE(hsr_dev->operstate) == IF_OPER_UP && old_operstate != IF_OPER_UP) {
+ 		/* Went up */
+ 		hsr->announce_count = 0;
+ 		mod_timer(&hsr->announce_timer,
+ 			  jiffies + msecs_to_jiffies(HSR_ANNOUNCE_INTERVAL));
+ 	}
+ 
+-	if (hsr_dev->operstate != IF_OPER_UP && old_operstate == IF_OPER_UP)
++	if (READ_ONCE(hsr_dev->operstate) != IF_OPER_UP && old_operstate == IF_OPER_UP)
+ 		/* Went down */
+ 		del_timer(&hsr->announce_timer);
  }
- static DEVICE_ATTR_RO(address);
+@@ -100,7 +100,7 @@ void hsr_check_carrier_and_operstate(struct hsr_priv *hsr)
+ 	/* netif_stacked_transfer_operstate() cannot be used here since
+ 	 * it doesn't set IF_OPER_LOWERLAYERDOWN (?)
+ 	 */
+-	old_operstate = master->dev->operstate;
++	old_operstate = READ_ONCE(master->dev->operstate);
+ 	has_carrier = hsr_check_carrier(master);
+ 	hsr_set_operstate(master, has_carrier);
+ 	hsr_check_announce(master->dev, old_operstate);
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index d63f5d063f073cb53f52e187efdbd09b8f78d622..1122c9ef09f6210fc373d9678a9da1ec1a3e78fa 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -5998,7 +5998,7 @@ static int inet6_fill_ifinfo(struct sk_buff *skb, struct inet6_dev *idev,
+ 	    (dev->ifindex != dev_get_iflink(dev) &&
+ 	     nla_put_u32(skb, IFLA_LINK, dev_get_iflink(dev))) ||
+ 	    nla_put_u8(skb, IFLA_OPERSTATE,
+-		       netif_running(dev) ? dev->operstate : IF_OPER_DOWN))
++		       netif_running(dev) ? READ_ONCE(dev->operstate) : IF_OPER_DOWN))
+ 		goto nla_put_failure;
+ 	protoinfo = nla_nest_start_noflag(skb, IFLA_PROTINFO);
+ 	if (!protoinfo)
 -- 
 2.43.0.594.gd9cf4e227d-goog
 
