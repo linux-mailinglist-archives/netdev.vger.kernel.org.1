@@ -1,117 +1,96 @@
-Return-Path: <netdev+bounces-69678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B38C384C27B
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 03:24:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31A9584C28E
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 03:40:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69C51286C4B
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 02:24:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D688B288758
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 02:40:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CDE7DDD4;
-	Wed,  7 Feb 2024 02:24:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4467B10962;
+	Wed,  7 Feb 2024 02:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YLlt5EIR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FVUwWom8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9927134A8
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 02:24:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E09810961
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 02:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707272670; cv=none; b=jgNOY5BURlL9IBkCUKqAEeFe6mZPMN0/SpFnUZQwIJDPJplhfIpJv+Zx2suqhFjvyy5D5z7U0t1T3kxzYwU+vsN3YTi/b2u09IdGCkUTHYrnThWlsqvrsrTheo8zMslfdSbozIBNOSB1o2eMl23VcGsPphxbJ+9xf+NgtByeRLM=
+	t=1707273627; cv=none; b=ZlNsJ10N2Msdn0ZtF9WwvAszC/Q6QgN28Q490pRpzD8XgortxVUU774utBTQns1lNjMH21uKZLzWgfNWzMhPMc4l8Kj2IgZEQyG0MwSPVQdbBxoAIARyp5Zfl9D9nSn72E8OZsYUlCiw3vCxlHkyaz5xaqMrNqHaaeJQhPpfISA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707272670; c=relaxed/simple;
-	bh=Wr1cSZmWUevh1p4qQ9I6SDYfX6Gybu59uC8rTDv8ZEQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t+s+Hp0MACfuRT1wGGFLWpefyxKillW8fiOMZiuKjgcKo5tLa+prAr52GWHfVR2dVB4OKBliMfy3X5Txjk6o5wmZdPLPuk34UAoGxLhjiJ5NnMq6aDLzttQ4R96QjreU1lawjcBqoq+c47omxLx26eyiYWJ7jf9aEioGlPN2rNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YLlt5EIR; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-55790581457so143391a12.3
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 18:24:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707272667; x=1707877467; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BLmc1Qc1yNuECN/M/DHNgea1UKbbefnp3y8K+KzNOkc=;
-        b=YLlt5EIR6TfdHsQhkLZkr1esNg7uvqXHSmJ3U7RYfGkOeNIHXest+dLXGq5/Fh+vjz
-         IwQ3KaB9LXfmc3V6HLtPw0dxAlpX992sUOtHQZNAWHK1q6JuyclqxY4K8T+fW3j4kqg6
-         iOYZYIs1OpfIJavyWMY9jflb90agLpPsVt5nYM45PMZJABJmu/npRxD5gOYYwFLdVqys
-         vnmsEvaF/b7/j60FZOxoEvMBliLpvgHeb/7ppE6NwZF/nW0Zx4pEn2jiD2m4GbwqqsuQ
-         uvORtVeJv0j/PytC8jykxDNB0xs03zB8dCgq/JGk3/rfI6X8fqyLmmg8OapTFiRwvMJE
-         TaFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707272667; x=1707877467;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BLmc1Qc1yNuECN/M/DHNgea1UKbbefnp3y8K+KzNOkc=;
-        b=kMMWDQyxvY8aWaqRehfw2JEyeD9s6PG03a+T/e4wTAaGjY+DMJBalytdHb5gXg3yz1
-         l6VbaL94Wtx8RdL6Ma0PKn9EBLqkoIoJ4GRp9E7i8qiqO5byix/EBpmWOup1V82o0SkV
-         RyrjajJvcxBK4WzBs3pJf020iTrMlvMm/KF9PmqE2Eb3Cfyh+7CVXjmwRfhONxrFlmGm
-         sGiP7EARpQ/bb6SPID+MIM8GctRREcCyMUDXEeLiH0WAPfH83ObaSZOc3rZYudOoz3xn
-         pA3xTrSXuEndF5wlljoSVe5LrewylgIh0ZzeD6tBk+vyL+upQQn3ThLSwF3WMMX+c39+
-         neGg==
-X-Gm-Message-State: AOJu0Ywp1oLJamjw0ksp1fCKLrXs9bi9ItdnjnOdhQ+0DbFpJGKKPULE
-	QrqFwvi+vZOOlQDIZeu5/HWX4PhTBapH3GVxsgbeBjBlSlAlNT4E0btO3cOaG3pNNcGz0Rg3ybk
-	fsGXLBxvL1KYiuKDbtkTFnYKumGk=
-X-Google-Smtp-Source: AGHT+IGU7wbrq7EVDNueY4gk18lq7wJQm3Vhj03fApg+zb3CFcQA6ap4Mo9vXpIF1xx2oKpm8ByX0pE1A8pEWf8dpiI=
-X-Received: by 2002:a05:6402:715:b0:560:93b1:a351 with SMTP id
- w21-20020a056402071500b0056093b1a351mr3016151edx.37.1707272666976; Tue, 06
- Feb 2024 18:24:26 -0800 (PST)
+	s=arc-20240116; t=1707273627; c=relaxed/simple;
+	bh=g+SoCxSF6kiZLoXNy+14ShM4+s+IWHUrONiLpTe3cKo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qAZ8NNXdH4ZEWjjWLlR/ZMkusBpKYntyVH3TZ273Im5u3kB5XSnmcuf61AX/rPq0KrWDiii1gCII6f4SlUUwd24jX+I79a5NltIo715UWjascGsEoBx5j0l8QhSraQF8jAv4XHQvbe1MmodQnHbiqDp2pDQ1mTQ0llvecRxCbuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FVUwWom8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8CC40C43390;
+	Wed,  7 Feb 2024 02:40:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707273626;
+	bh=g+SoCxSF6kiZLoXNy+14ShM4+s+IWHUrONiLpTe3cKo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=FVUwWom8da6CuPbiuQ6UgvHA8ydrLmCpFddCvau59clqb04F6ZhKdnxPsIreCzDlW
+	 DjvEfNJSx8bF2DoeSMz2A7nDKzfxuZjr8In7zWgl6OO3A1c1c4dIumV2qHw+lR0ppd
+	 inWlKgfX9kORG1lkaeJW7n3Aj5p/+EGs9gExUqjpMjZF3nsdHa+8BxU3Db192dYNzV
+	 opGsOMcFtoM3IWFCkqMfpkrVjucO0KXoIdkjJno/vGnPMryl1yC9NmNAnmP/e4c/sQ
+	 GEwka9ziECcwDp/okcnk3jmc/bSZ/hec8GZiJnKZCCu7mLDepyhPe2UTB2VUETis/A
+	 eSsFaYCKAZjbg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6ECD0E2F2F9;
+	Wed,  7 Feb 2024 02:40:26 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240204104601.55760-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20240204104601.55760-1-kerneljasonxing@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 7 Feb 2024 10:23:50 +0800
-Message-ID: <CAL+tcoCZG=SCPZDd3ErxFCW6K8A_RHaYR6vJTQJB_BOkhsg-JQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/2] add more drop reasons in tcp receive path
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org
-Cc: netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net] af_unix: Call kfree_skb() for dead unix_(sk)->oob_skb
+ in GC.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170727362644.24781.15529744831223761876.git-patchwork-notify@kernel.org>
+Date: Wed, 07 Feb 2024 02:40:26 +0000
+References: <20240203183149.63573-1-kuniyu@amazon.com>
+In-Reply-To: <20240203183149.63573-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kuni1840@gmail.com, netdev@vger.kernel.org,
+ syzbot+fa3ef895554bdbfd1183@syzkaller.appspotmail.com
 
-On Sun, Feb 4, 2024 at 6:46=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.co=
-m> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> When I was debugging the reason about why the skb should be dropped in
-> syn cookie mode, I found out that this NOT_SPECIFIED reason is too
-> general. Thus I decided to refine it.
+Hello:
 
-Hello, any suggestions? Those names in the patchset could be improper,
-but I've already tried to name them in English :S
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Thanks,
-Jason
+On Sat, 3 Feb 2024 10:31:49 -0800 you wrote:
+> syzbot reported a warning [0] in __unix_gc() with a repro, which
+> creates a socketpair and sends one socket's fd to itself using the
+> peer.
+> 
+>   socketpair(AF_UNIX, SOCK_STREAM, 0, [3, 4]) = 0
+>   sendmsg(4, {msg_name=NULL, msg_namelen=0, msg_iov=[{iov_base="\360", iov_len=1}],
+>           msg_iovlen=1, msg_control=[{cmsg_len=20, cmsg_level=SOL_SOCKET,
+>                                       cmsg_type=SCM_RIGHTS, cmsg_data=[3]}],
+>           msg_controllen=24, msg_flags=0}, MSG_OOB|MSG_PROBE|MSG_DONTWAIT|MSG_ZEROCOPY) = 1
+> 
+> [...]
 
->
-> Jason Xing (2):
->   tcp: add more DROP REASONs in cookie check
->   tcp: add more DROP REASONS in child process
->
->  include/net/dropreason-core.h | 18 ++++++++++++++++++
->  include/net/tcp.h             |  8 +++++---
->  net/ipv4/syncookies.c         | 18 ++++++++++++++----
->  net/ipv4/tcp_input.c          | 19 +++++++++++++++----
->  net/ipv4/tcp_ipv4.c           | 13 +++++++------
->  net/ipv4/tcp_minisocks.c      |  4 ++--
->  net/ipv6/tcp_ipv6.c           |  6 +++---
->  7 files changed, 64 insertions(+), 22 deletions(-)
->
-> --
-> 2.37.3
->
+Here is the summary with links:
+  - [v2,net] af_unix: Call kfree_skb() for dead unix_(sk)->oob_skb in GC.
+    https://git.kernel.org/netdev/net/c/1279f9d9dec2
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
