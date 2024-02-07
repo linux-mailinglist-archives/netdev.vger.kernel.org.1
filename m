@@ -1,223 +1,209 @@
-Return-Path: <netdev+bounces-69725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22A1F84C581
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 08:16:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 823B984C584
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 08:17:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78666288CDB
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 07:16:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBE861F23C2E
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 07:17:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 893631CF87;
-	Wed,  7 Feb 2024 07:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C9481CFBC;
+	Wed,  7 Feb 2024 07:16:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H1ybhTEk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC8781F614
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 07:16:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C7BB200A8
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 07:16:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707290195; cv=none; b=EIKEgJdUBS2rjXjiBL4CXBAj5+h8wn20jn7UlM9y56JHGmpO8lKP/4bQRhBSPOClCQFJ6P5lIqZy0w4Vz75SnK7hP7J/M6SwyC0JSp9BPNRP/xrBQzhI8m+bjYEmP/V0yKdQSXjKF0wnweNMunKWSGaN8Ss4vga2T+lxcUmhRg0=
+	t=1707290203; cv=none; b=ZrQCpwb9S915X2axTbaq8bRSkLTWwM9PULQbgpp0NhnXfGJ8NOW0P0A+2PMZglreujguRtHZpiiKP83eEQ2wLUJTYExCJFSNYwWNixi55bfzw5FnMioJKwWqlGOPk2RjZTJw7iFC5Vj4mq2t+lt/aPfp1YODyUaBzUIqKh+jIks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707290195; c=relaxed/simple;
-	bh=CTsUXrTAB6nRpLhQYKfEczchp3HwG9lBYoaZemAua2s=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=AZTmN9iDCbNUcy48/sGadvEuX7fXEChEPEP1qOM7l7kYoOzm7EYnrceTy2fcC/hb/vqZCvkCleGuyh2lnGZpVcwRqL4gIE2zKwpe1y9pp+NgT717VFSwl7qUBqIuEF9t0CfLNHcEsCod/3jGLhpcr7uBN/KKUJW2qqv6jR423eA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-363d5475522so1893165ab.1
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 23:16:33 -0800 (PST)
+	s=arc-20240116; t=1707290203; c=relaxed/simple;
+	bh=26xeSa7sP4t/TtyAW6VrLQob5iC1bN+qVFhJuCnBOmg=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=r/HI6yVNVeCVxFVcDnEHZ2JoFcueh69kyfGyJfBQ/ze8/wJqiOeoKQfFwnsJFf4rutl5Ry69iG82cJSBQyUT4LGLMj11AjEOR2Pw5dt8kWsu4IJt/IOfRVMvNTnO9Ul7JIwfpVR1JtE331LkNgEuPZQhPxLErYNJytUoW57efew=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H1ybhTEk; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a3884b1a441so13614066b.2
+        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 23:16:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707290200; x=1707895000; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jdkiH/WZUSE1m65pkhmqy7y5DpThlA2r/cwVsig9LNE=;
+        b=H1ybhTEkK2sFfG+3C3rf2An5c8YrDNsnZdzAq3IZKAeD13xY6WsZRCT7F2l7Vz/bjW
+         lq0b4STLcbLrdk2xCo6IYFdFMPH1nuyF9SCqWScHL2rSGJat4Elsgqz1+mKJ7EAntrk3
+         UzZkioNPcZ21SEvR9ibBKcqCX+QB3jdDpF86KrBDd+7Hi0jzbxMJSQgK+R4D3ac2xW+L
+         a8XxDCEYYFyHbEetdB5a6KAPHNEPq0Gf/iRB5f5MBVedaNj8OBilO92NbGwuYmzR6/H/
+         CjqGMxPAGlJaxnyZPgZRhO5CMnIS+ny9/4veRaPOh2/gzL/gsx/rE6DE5jjPsSy8XPhH
+         e0QQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707290193; x=1707894993;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KEbRscJsWpR3uA/en5wCgkuZiQ1JKpTV6p5kPNxbslk=;
-        b=RIuyNsmu9Co7Zy+/UpEx6AdzzknLJJBgh1t9P+hoAEcbYZIrMqqWRqAB6SaMHMJxPX
-         snRUcd7PnJIkxYiplmg+0LNhOJ+3oufXYOgsolvvFbivofJ58E7jtwZt5GMnJYXBfxoj
-         NuLkORBP8HbMq8i/fbwGlogFmIFGcc+i+ESFkPpgLM7TipDh8xA3lF9rrPOSn+yQraZg
-         Embh4ZlvZWKZKNurzFno/v0nUUr9iJ7wgU75YtGteNnzCxr11R+H4/WlNV0u5WIyQmZ/
-         JZPHN22tEzlWPWp8ftf/KxrDWn/Q3fMax64nKsFP591RH+/Vwh7hHxq9rehpWB5snvMD
-         IMVg==
-X-Forwarded-Encrypted: i=1; AJvYcCUhfHdIAwEbnykLXSmFB7Vj562aEZ9MLVrdx/kkYYw0PlJB+sdrpaFelnBIjLhm/LIi3KOjatalpv1oiA2zmu6KBSbjVusV
-X-Gm-Message-State: AOJu0YyXfuiqALqrXlobVQnykjqQ3GtVQAUA4FyQSzpRUGfJ7V0DF0yJ
-	A1l/zmXfxCQ/velnnrYPn8WXxipfqKWB9wtGkdoZ/TDk4JShSgnG5p/RXa6OyjZoB2A4QXTsjE+
-	4P2QlSybPi33jIfPGxJwTtcX6ectbyO+HSJ569oiJhcd0RkKBP6hMflw=
-X-Google-Smtp-Source: AGHT+IF8kxkQkmT/5KCHM1C6ZTdhk8VcSKb0boOoqBidqGLqxylxrhdpl3CiQk6xofkS39/+opYEdb+icMZGeEHbDeCdmFQ1aqyP
+        d=1e100.net; s=20230601; t=1707290200; x=1707895000;
+        h=content-transfer-encoding:autocrypt:subject:from:cc:to
+         :content-language:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jdkiH/WZUSE1m65pkhmqy7y5DpThlA2r/cwVsig9LNE=;
+        b=axDEd6Za9XCWuSX4jG2j/c0C/iL8fGbTuATV+QiCua1ahAT1bRZgzfZyg8VPQWTbSt
+         HLl/zeRqCSSClUy5odgBRvNgiCMU0LRqyNqTRIFD8RKNSWjMqTHWpJJ0eBQ9VODgW/hu
+         y0X6BrUrbByAKlkz/FxHMnmUxCrfEFyrob3ftNsMN/U7W/w6yotX1btXpUnA2GbrOpd+
+         8AycrhywkzqX60rpsSlyD2scyMRTTm7S9Tx7tlWZNR/UDGRNT8/s5yBwdhk+sbzhJJHw
+         igLzBYfWowvZbuEfaNI/YqAqQb0u0/DORKihO3CWau56UI4stEXQ9BWMSMr6QM/yEvlr
+         RRbA==
+X-Gm-Message-State: AOJu0Yw7wqp7fai5ruy9fy4igSe+NIxP53uo/y/7lw7IqY+Em/6THo/s
+	l8QqYDBXETnoS6K5NUeVlVou+YuJ0rdek8IHUW7EjkCiKRgb8NaC
+X-Google-Smtp-Source: AGHT+IGd0rkZNDWTP8Fg26H+75EckUvsxwLeBgCSX88bFD+tiRwzSXJ7552NMkVokvIWAmte1HBttg==
+X-Received: by 2002:a17:907:508e:b0:a38:3f63:1ae4 with SMTP id fv14-20020a170907508e00b00a383f631ae4mr1800601ejc.27.1707290200308;
+        Tue, 06 Feb 2024 23:16:40 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUvhYzN7i8L6x6mbOZp+l1TrdiWmU0oTj7ypCj2jAWGhTN53pNODFf8MoQ4grWZK/jxp4WnIDVu9v6Oaeld+uDGHKiBgheigcSX6OwHV1UXSDPfMVJ8gk/2rhJc9toEwNJ8ExGhoApEIvGGae4+PcqHLvn/VR+48SFjBTze
+Received: from ?IPV6:2a01:c22:76b1:9500:754d:f584:769d:10e? (dynamic-2a01-0c22-76b1-9500-754d-f584-769d-010e.c22.pool.telefonica.de. [2a01:c22:76b1:9500:754d:f584:769d:10e])
+        by smtp.googlemail.com with ESMTPSA id st7-20020a170907c08700b00a35cd148c7esm413070ejc.212.2024.02.06.23.16.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 06 Feb 2024 23:16:39 -0800 (PST)
+Message-ID: <8876a9f4-7a2d-48c3-8eae-0d834f5c27c5@gmail.com>
+Date: Wed, 7 Feb 2024 08:16:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1748:b0:361:a872:157a with SMTP id
- y8-20020a056e02174800b00361a872157amr404588ill.6.1707290192926; Tue, 06 Feb
- 2024 23:16:32 -0800 (PST)
-Date: Tue, 06 Feb 2024 23:16:32 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007a5ef50610c5799c@google.com>
-Subject: [syzbot] [mm?] BUG: unable to handle kernel paging request in bpf_probe_read_kernel_str
-From: syzbot <syzbot+a0fa177e13690b663c74@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, bp@alien8.de, bp@suse.de, 
-	dave.hansen@linux.intel.com, hpa@zytor.com, linux-kernel@vger.kernel.org, 
-	linux-mm@kvack.org, luto@kernel.org, mingo@redhat.com, netdev@vger.kernel.org, 
-	peterz@infradead.org, syzkaller-bugs@googlegroups.com, tglx@linutronix.de, 
-	x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] r8169: improve checking for valid LED modes
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+After 3a2746320403 ("leds: trigger: netdev: Display only supported link
+speed attribute") the check for valid link modes can be simplified.
+In addition factor it out, so that it can be re-used by the upcoming
+LED support for RTL8125.
 
-syzbot found the following issue on:
-
-HEAD commit:    6fb3f72702fb Merge branch 'improvements-for-tracking-scala..
-git tree:       bpf-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1356a9b7e80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1b95408789b2ce1a
-dashboard link: https://syzkaller.appspot.com/bug?extid=a0fa177e13690b663c74
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=121231e4180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15419118180000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/df63acb4ac9d/disk-6fb3f727.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/62f12d4789e3/vmlinux-6fb3f727.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/3390f746a855/bzImage-6fb3f727.xz
-
-The issue was bisected to:
-
-commit ca247283781d754216395a41c5e8be8ec79a5f1c
-Author: Andy Lutomirski <luto@kernel.org>
-Date:   Wed Feb 10 02:33:45 2021 +0000
-
-    x86/fault: Don't run fixups for SMAP violations
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14ab3c9fe80000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16ab3c9fe80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12ab3c9fe80000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a0fa177e13690b663c74@syzkaller.appspotmail.com
-Fixes: ca247283781d ("x86/fault: Don't run fixups for SMAP violations")
-
-BUG: unable to handle page fault for address: ffffffffff600000
-#PF: supervisor read access in kernel mode
-#PF: error_code(0x0000) - not-present page
-PGD df36067 P4D df36067 PUD df38067 PMD df5b067 PTE 0
-Oops: 0000 [#1] PREEMPT SMP KASAN PTI
-CPU: 1 PID: 5064 Comm: syz-executor171 Not tainted 6.8.0-rc1-syzkaller-00523-g6fb3f72702fb #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-RIP: 0010:strncpy_from_kernel_nofault+0x8d/0x1d0 mm/maccess.c:91
-Code: 00 48 89 d0 48 c1 e8 03 48 89 44 24 10 0f b6 04 28 84 c0 48 89 14 24 0f 85 d9 00 00 00 ff 02 45 31 f6 49 89 df 48 8b 54 24 08 <42> 8a 1c 33 4a 8d 3c 32 48 89 f8 48 c1 e8 03 49 89 ec 0f b6 04 28
-RSP: 0018:ffffc90003b5f888 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffffffffff600000 RCX: ffff88801871d940
-RDX: ffffc90003b5f900 RSI: ffffffffff600000 RDI: ffffffffff600000
-RBP: dffffc0000000000 R08: ffffffff8141da1d R09: 1ffffffff2591484
-R10: dffffc0000000000 R11: ffffffffa0001f90 R12: ffffffffff600000
-R13: 0000000000000005 R14: 0000000000000000 R15: ffffffffff600000
-FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffffffff600000 CR3: 000000000df32000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- bpf_probe_read_kernel_str_common kernel/trace/bpf_trace.c:266 [inline]
- ____bpf_probe_read_kernel_str kernel/trace/bpf_trace.c:275 [inline]
- bpf_probe_read_kernel_str+0x2a/0x70 kernel/trace/bpf_trace.c:272
- bpf_prog_ef3a4661c9d1378e+0x4a/0x4c
- bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
- __bpf_prog_run include/linux/filter.h:651 [inline]
- bpf_prog_run include/linux/filter.h:658 [inline]
- __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
- bpf_trace_run2+0x204/0x420 kernel/trace/bpf_trace.c:2420
- trace_kfree include/trace/events/kmem.h:94 [inline]
- kfree+0x28e/0x380 mm/slub.c:4396
- vma_numab_state_free include/linux/mm.h:638 [inline]
- __vm_area_free+0x42/0x110 kernel/fork.c:505
- remove_vma mm/mmap.c:146 [inline]
- exit_mmap+0x6a9/0xd40 mm/mmap.c:3301
- __mmput+0x115/0x3c0 kernel/fork.c:1343
- exit_mm+0x21f/0x310 kernel/exit.c:569
- do_exit+0x9af/0x2740 kernel/exit.c:858
- do_group_exit+0x206/0x2c0 kernel/exit.c:1020
- __do_sys_exit_group kernel/exit.c:1031 [inline]
- __se_sys_exit_group kernel/exit.c:1029 [inline]
- __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1029
- do_syscall_64+0xf9/0x240
- entry_SYSCALL_64_after_hwframe+0x6f/0x77
-RIP: 0033:0x7fddca0c0c89
-Code: Unable to access opcode bytes at 0x7fddca0c0c5f.
-RSP: 002b:00007fff7476ad38 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fddca0c0c89
-RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000000
-RBP: 00007fddca13b290 R08: ffffffffffffffb8 R09: 0000000000000006
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007fddca13b290
-R13: 0000000000000000 R14: 00007fddca13bce0 R15: 00007fddca091ec0
- </TASK>
-Modules linked in:
-CR2: ffffffffff600000
----[ end trace 0000000000000000 ]---
-RIP: 0010:strncpy_from_kernel_nofault+0x8d/0x1d0 mm/maccess.c:91
-Code: 00 48 89 d0 48 c1 e8 03 48 89 44 24 10 0f b6 04 28 84 c0 48 89 14 24 0f 85 d9 00 00 00 ff 02 45 31 f6 49 89 df 48 8b 54 24 08 <42> 8a 1c 33 4a 8d 3c 32 48 89 f8 48 c1 e8 03 49 89 ec 0f b6 04 28
-RSP: 0018:ffffc90003b5f888 EFLAGS: 00010246
-RAX: 0000000000000000 RBX: ffffffffff600000 RCX: ffff88801871d940
-RDX: ffffc90003b5f900 RSI: ffffffffff600000 RDI: ffffffffff600000
-RBP: dffffc0000000000 R08: ffffffff8141da1d R09: 1ffffffff2591484
-R10: dffffc0000000000 R11: ffffffffa0001f90 R12: ffffffffff600000
-R13: 0000000000000005 R14: 0000000000000000 R15: ffffffffff600000
-FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: ffffffffff600000 CR3: 000000000df32000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	00 48 89             	add    %cl,-0x77(%rax)
-   3:	d0 48 c1             	rorb   -0x3f(%rax)
-   6:	e8 03 48 89 44       	call   0x4489480e
-   b:	24 10                	and    $0x10,%al
-   d:	0f b6 04 28          	movzbl (%rax,%rbp,1),%eax
-  11:	84 c0                	test   %al,%al
-  13:	48 89 14 24          	mov    %rdx,(%rsp)
-  17:	0f 85 d9 00 00 00    	jne    0xf6
-  1d:	ff 02                	incl   (%rdx)
-  1f:	45 31 f6             	xor    %r14d,%r14d
-  22:	49 89 df             	mov    %rbx,%r15
-  25:	48 8b 54 24 08       	mov    0x8(%rsp),%rdx
-* 2a:	42 8a 1c 33          	mov    (%rbx,%r14,1),%bl <-- trapping instruction
-  2e:	4a 8d 3c 32          	lea    (%rdx,%r14,1),%rdi
-  32:	48 89 f8             	mov    %rdi,%rax
-  35:	48 c1 e8 03          	shr    $0x3,%rax
-  39:	49 89 ec             	mov    %rbp,%r12
-  3c:	0f b6 04 28          	movzbl (%rax,%rbp,1),%eax
-
-
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/net/ethernet/realtek/r8169_leds.c | 38 ++++++++++++-----------
+ 1 file changed, 20 insertions(+), 18 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+diff --git a/drivers/net/ethernet/realtek/r8169_leds.c b/drivers/net/ethernet/realtek/r8169_leds.c
+index f082bd7d6..78078eca3 100644
+--- a/drivers/net/ethernet/realtek/r8169_leds.c
++++ b/drivers/net/ethernet/realtek/r8169_leds.c
+@@ -20,11 +20,6 @@
+ 
+ #define RTL8168_NUM_LEDS		3
+ 
+-#define RTL8168_SUPPORTED_MODES \
+-	(BIT(TRIGGER_NETDEV_LINK_1000) | BIT(TRIGGER_NETDEV_LINK_100) | \
+-	 BIT(TRIGGER_NETDEV_LINK_10) | BIT(TRIGGER_NETDEV_RX) | \
+-	 BIT(TRIGGER_NETDEV_TX))
+-
+ struct r8169_led_classdev {
+ 	struct led_classdev led;
+ 	struct net_device *ndev;
+@@ -33,28 +28,35 @@ struct r8169_led_classdev {
+ 
+ #define lcdev_to_r8169_ldev(lcdev) container_of(lcdev, struct r8169_led_classdev, led)
+ 
++static bool r8169_trigger_mode_is_valid(unsigned long flags)
++{
++	bool rx, tx;
++
++	if (flags & BIT(TRIGGER_NETDEV_HALF_DUPLEX))
++		return false;
++	if (flags & BIT(TRIGGER_NETDEV_FULL_DUPLEX))
++		return false;
++
++	rx = flags & BIT(TRIGGER_NETDEV_RX);
++	tx = flags & BIT(TRIGGER_NETDEV_TX);
++
++	return rx == tx;
++}
++
+ static int rtl8168_led_hw_control_is_supported(struct led_classdev *led_cdev,
+ 					       unsigned long flags)
+ {
+ 	struct r8169_led_classdev *ldev = lcdev_to_r8169_ldev(led_cdev);
+ 	struct rtl8169_private *tp = netdev_priv(ldev->ndev);
+ 	int shift = ldev->index * 4;
+-	bool rx, tx;
+-
+-	if (flags & ~RTL8168_SUPPORTED_MODES)
+-		goto nosupp;
+ 
+-	rx = flags & BIT(TRIGGER_NETDEV_RX);
+-	tx = flags & BIT(TRIGGER_NETDEV_TX);
+-	if (rx != tx)
+-		goto nosupp;
++	if (!r8169_trigger_mode_is_valid(flags)) {
++		/* Switch LED off to indicate that mode isn't supported */
++		rtl8168_led_mod_ctrl(tp, 0x000f << shift, 0);
++		return -EOPNOTSUPP;
++	}
+ 
+ 	return 0;
+-
+-nosupp:
+-	/* Switch LED off to indicate that mode isn't supported */
+-	rtl8168_led_mod_ctrl(tp, 0x000f << shift, 0);
+-	return -EOPNOTSUPP;
+ }
+ 
+ static int rtl8168_led_hw_control_set(struct led_classdev *led_cdev,
+-- 
+2.43.0
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
