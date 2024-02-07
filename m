@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-69664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1C1584C1CC
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 02:19:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8392184C1CD
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 02:19:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A8BD1C24823
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 01:19:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C812283C2E
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 01:19:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874419457;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E89EEDF57;
 	Wed,  7 Feb 2024 01:19:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bvZrZx1N"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fwMcOu3b"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62D83DDC1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2EC6DDD5
 	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 01:19:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707268747; cv=none; b=WydlZVP/Ib5lgEu9vK4NeEUzAvK8S9NEzY5GLZVEM+1FdxEPf/yQlWBxypvNj/trGlj2XU9PnhaOhHmNIQNbmjuGPjWXmyLQjIOnZn/qOcZSOyd5m8cO6iCwq3mE1iEIzQ1GnJtsX3UxFaITVB+9n+WtTcNW0Fja+Bx2E1wfsF0=
+	t=1707268747; cv=none; b=R19ytxxUJPvOCfdyxGaqfl8A90N8Q3+f3CAx/vbXnfkPaCaV3qCJLYKvC7pGP37pXKR9eWUCmO+2ZiN2CYB8DnDUBmFFlLf7s3pu52EgKHUAlqZX5i5AOwqR6wUgYd5UHJBg8ajMULKojcXK5nRFEWpeI0S9EqThGuDXvU8cz4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707268747; c=relaxed/simple;
-	bh=lF/mdvlKkje8no8Kd9f9/LDGoqiM26kXocIW3GBIqA4=;
+	bh=mncymzkQD0sxqMMAFIiUe9EF8JYqlrDLeGl45urf5/w=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KP05N1ZPtfLHuAqZurjpbfwNcNi0KXDLhLZaEfvf89X19UVrLmHPg7bNk5FQ2EBLY1iQloHxEDewXLoJh/EpbkA/Vn1CKaaTbq+yVNeuNNsUgkDC6qctC2Y0hGtkHPMoSZJnpYEFlwiSDmnQFPWBEr6OYPBagwig0vXgrL+N2HM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bvZrZx1N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72790C433A6;
-	Wed,  7 Feb 2024 01:19:06 +0000 (UTC)
+	 MIME-Version; b=IZh9oodebK2e0C90YlTVm3+QB1Y6Xx4H4tH40SG4ayg1mosHfkra+pUlKEy3fBpVlcfcY+JHzRkYEigJLaACY4R/DXWg91S04sZcMlr3H/7hRk11wsSTb4zg/bkPl85Rm6wGrgFWHLphCFNVQ2Knyahp5C4Wo9X5pbByjnH5ypg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fwMcOu3b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11B35C43390;
+	Wed,  7 Feb 2024 01:19:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707268746;
-	bh=lF/mdvlKkje8no8Kd9f9/LDGoqiM26kXocIW3GBIqA4=;
+	s=k20201202; t=1707268747;
+	bh=mncymzkQD0sxqMMAFIiUe9EF8JYqlrDLeGl45urf5/w=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bvZrZx1NkjzdneXULJhchkovfsmN/0ZBepMSnZaWCbbgx9jtHA5/8R6EQRNW0EJZD
-	 w5nJnCZ4AV+OtedOxPHZzOu2sjeQ0jNSS/SYRnOga+UISaywgEhPBzVWr39MJdtzvt
-	 pgMfU6Ua8RFwHbPR5E785dNYVgKHeqiSqZey3NG1DC/NZFJuCM47rF/bsJuR6wBGow
-	 O8KmI+ZK42a8u5h9Gcw6RWJk4gf6uV9waPyvGKRQPD4RVed03gIqaU6gb7I1h+7/EL
-	 EUefNyb43VUITEd6DH/ugumxqdzVj+YJ6HJMpYKiwNz5rHwBjf9tEdDCRA38s5iNbz
-	 WTBxnFVQYAsng==
+	b=fwMcOu3bdH4CLkkGYoSt7DOuAzsoCuG9S4E+LJL0cOYKz4jKjE+N2FjWrABfOZgbF
+	 lD2oo9dEUBM6I5PiUrLqOKGYbw1lKcB1D3Z6Zn3Oj0DNfRVwv5G7Z+oPPGD47wOrHN
+	 5PEsl1fXNAOVjC1+Nbz6xhC9INSDM86KioWXlCWkEgBEDNZjqEmz70hHMAxo8hIbdl
+	 anBwxG3z9uNNMOOS6+fe8hZ/jjkgNj83+0jTmvT/14xPZ4px6rjG18XHaMRL3/Cc0J
+	 klVeBRLn9LlPb9Vb1qBZYKL8jDKVun+7zAJBXPryq2NorNGHRV3SyVKoCsIIivmXlZ
+	 9FNfTqazyPR0Q==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,12 +50,10 @@ Cc: netdev@vger.kernel.org,
 	vadim.fedorenko@linux.dev,
 	Jakub Kicinski <kuba@kernel.org>,
 	borisp@nvidia.com,
-	john.fastabend@gmail.com,
-	vakul.garg@nxp.com,
-	davejwatson@fb.com
-Subject: [PATCH net 4/7] net: tls: handle backlogging of crypto requests
-Date: Tue,  6 Feb 2024 17:18:21 -0800
-Message-ID: <20240207011824.2609030-5-kuba@kernel.org>
+	john.fastabend@gmail.com
+Subject: [PATCH net 5/7] net: tls: fix use-after-free with partial reads and async decrypt
+Date: Tue,  6 Feb 2024 17:18:22 -0800
+Message-ID: <20240207011824.2609030-6-kuba@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240207011824.2609030-1-kuba@kernel.org>
 References: <20240207011824.2609030-1-kuba@kernel.org>
@@ -67,89 +65,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Since we're setting the CRYPTO_TFM_REQ_MAY_BACKLOG flag on our
-requests to the crypto API, crypto_aead_{encrypt,decrypt} can return
- -EBUSY instead of -EINPROGRESS in valid situations. For example, when
-the cryptd queue for AESNI is full (easy to trigger with an
-artificially low cryptd.cryptd_max_cpu_qlen), requests will be enqueued
-to the backlog but still processed. In that case, the async callback
-will also be called twice: first with err == -EINPROGRESS, which it
-seems we can just ignore, then with err == 0.
+From: Sabrina Dubroca <sd@queasysnail.net>
 
-Compared to Sabrina's original patch this version uses the new
-tls_*crypt_async_wait() helpers and converts the EBUSY to
-EINPROGRESS to avoid having to modify all the error handling
-paths. The handling is identical.
+tls_decrypt_sg doesn't take a reference on the pages from clear_skb,
+so the put_page() in tls_decrypt_done releases them, and we trigger
+a use-after-free in process_rx_list when we try to read from the
+partially-read skb.
 
-Fixes: a54667f6728c ("tls: Add support for encryption using async offload accelerator")
-Fixes: 94524d8fc965 ("net/tls: Add support for async decryption of tls records")
-Co-developed-by: Sabrina Dubroca <sd@queasysnail.net>
+Fixes: fd31f3996af2 ("tls: rx: decrypt into a fresh skb")
 Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
-Link: https://lore.kernel.org/netdev/9681d1febfec295449a62300938ed2ae66983f28.1694018970.git.sd@queasysnail.net/
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+This is pretty much Sabrina's patch just addressing my own
+feedback, so I'm keeping her as the author.
 ---
 CC: borisp@nvidia.com
 CC: john.fastabend@gmail.com
-CC: vakul.garg@nxp.com
-CC: davejwatson@fb.com
 ---
- net/tls/tls_sw.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ net/tls/tls_sw.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 9374a61cef00..63bef5666e36 100644
+index 63bef5666e36..a6eff21ade23 100644
 --- a/net/tls/tls_sw.c
 +++ b/net/tls/tls_sw.c
-@@ -196,6 +196,17 @@ static void tls_decrypt_done(void *data, int err)
- 	struct sock *sk;
- 	int aead_size;
+@@ -63,6 +63,7 @@ struct tls_decrypt_ctx {
+ 	u8 iv[TLS_MAX_IV_SIZE];
+ 	u8 aad[TLS_MAX_AAD_SIZE];
+ 	u8 tail;
++	bool free_sgout;
+ 	struct scatterlist sg[];
+ };
  
-+	/* If requests get too backlogged crypto API returns -EBUSY and calls
-+	 * ->complete(-EINPROGRESS) immediately followed by ->complete(0)
-+	 * to make waiting for backlog to flush with crypto_wait_req() easier.
-+	 * First wait converts -EBUSY -> -EINPROGRESS, and the second one
-+	 * -EINPROGRESS -> 0.
-+	 * We have a single struct crypto_async_request per direction, this
-+	 * scheme doesn't help us, so just ignore the first ->complete().
-+	 */
-+	if (err == -EINPROGRESS)
-+		return;
-+
- 	aead_size = sizeof(*aead_req) + crypto_aead_reqsize(aead);
- 	aead_size = ALIGN(aead_size, __alignof__(*dctx));
- 	dctx = (void *)((u8 *)aead_req + aead_size);
-@@ -269,6 +280,10 @@ static int tls_do_decryption(struct sock *sk,
+@@ -187,7 +188,6 @@ static void tls_decrypt_done(void *data, int err)
+ 	struct aead_request *aead_req = data;
+ 	struct crypto_aead *aead = crypto_aead_reqtfm(aead_req);
+ 	struct scatterlist *sgout = aead_req->dst;
+-	struct scatterlist *sgin = aead_req->src;
+ 	struct tls_sw_context_rx *ctx;
+ 	struct tls_decrypt_ctx *dctx;
+ 	struct tls_context *tls_ctx;
+@@ -224,7 +224,7 @@ static void tls_decrypt_done(void *data, int err)
  	}
  
- 	ret = crypto_aead_decrypt(aead_req);
-+	if (ret == -EBUSY) {
-+		ret = tls_decrypt_async_wait(ctx);
-+		ret = ret ?: -EINPROGRESS;
-+	}
- 	if (ret == -EINPROGRESS) {
- 		if (darg->async)
- 			return 0;
-@@ -449,6 +464,9 @@ static void tls_encrypt_done(void *data, int err)
- 	struct sk_msg *msg_en;
- 	struct sock *sk;
+ 	/* Free the destination pages if skb was not decrypted inplace */
+-	if (sgout != sgin) {
++	if (dctx->free_sgout) {
+ 		/* Skip the first S/G entry as it points to AAD */
+ 		for_each_sg(sg_next(sgout), sg, UINT_MAX, pages) {
+ 			if (!sg)
+@@ -1583,6 +1583,7 @@ static int tls_decrypt_sg(struct sock *sk, struct iov_iter *out_iov,
+ 	} else if (out_sg) {
+ 		memcpy(sgout, out_sg, n_sgout * sizeof(*sgout));
+ 	}
++	dctx->free_sgout = !!pages;
  
-+	if (err == -EINPROGRESS) /* see the comment in tls_decrypt_done() */
-+		return;
-+
- 	msg_en = &rec->msg_encrypted;
- 
- 	sk = rec->sk;
-@@ -553,6 +571,10 @@ static int tls_do_encryption(struct sock *sk,
- 	atomic_inc(&ctx->encrypt_pending);
- 
- 	rc = crypto_aead_encrypt(aead_req);
-+	if (rc == -EBUSY) {
-+		rc = tls_encrypt_async_wait(ctx);
-+		rc = rc ?: -EINPROGRESS;
-+	}
- 	if (!rc || rc != -EINPROGRESS) {
- 		atomic_dec(&ctx->encrypt_pending);
- 		sge->offset -= prot->prepend_size;
+ 	/* Prepare and submit AEAD request */
+ 	err = tls_do_decryption(sk, sgin, sgout, dctx->iv,
 -- 
 2.43.0
 
