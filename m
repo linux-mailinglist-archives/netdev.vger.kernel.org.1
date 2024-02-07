@@ -1,204 +1,147 @@
-Return-Path: <netdev+bounces-69730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1DC984C65D
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 09:39:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EF2684C691
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 09:48:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D76F61C24CC7
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 08:39:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A759B1C217DC
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 08:48:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0B7920326;
-	Wed,  7 Feb 2024 08:39:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C770200A4;
+	Wed,  7 Feb 2024 08:48:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L4e1Ky6j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QZ5+efRE"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC3C208B0
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 08:39:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6257120DD8;
+	Wed,  7 Feb 2024 08:48:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707295173; cv=none; b=rj4DJ0Q1YXhaO3KDcJgcpUo4IZzFoBc8mz0tw+SEbMnluKh7CTi7rW0Ll0OVSs8f6jipDhYQ7H4c4SpiuNsO1lHz2ZUl7tjnm95pUAngBbkIMN0vy9D80RH1+uzeFOIlJ/A3bSJ5b5B5ALCtduA5GRCXT7CG50S7i86Xno3n+z0=
+	t=1707295683; cv=none; b=QQGT0UulxUbE85JdEAN+QWjgHQYNA+oP/WQJ1xMr8OHi84ID4+5BIbNTnqtdv9ZazOa0BbtxhqTPNsgx+0Uv1BI3EaYe0Fy5Y0wJp9K4GdLCY6F6iUVjAzduwqflolt75lQSoYqdLuBuozl0+bRlGooh4w+piAs2m1ElpHavWrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707295173; c=relaxed/simple;
-	bh=ac9WGCOPPgNEkiYYzCiJVtWgr45GmwAPXfRv3awco68=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rkyOUEjb0DBJz7VDuppnu4CuVhwT/0tnBO+aPwWUJNwtwGeXz5y1QMyzobP9WOpFwwfE90RpJZpOfkIBHLZz8XEttawMDgLdTFQ/Y8FTF7hYXN8mWRarUEzIzfyXgg9j4t6S0DTTDYrr/wTNnvpI5aPGaF2IYODeiEJAWtUIpPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L4e1Ky6j; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707295170;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZAXzbRx8bTrXW8mIoidP0h+87BdFw4xKcLSssnrU6kI=;
-	b=L4e1Ky6jhp3jBT29f84WPeXIe22+kt5BaQBFJGITZpxJRMIsM4zdpZ9vsKdkD9hW/qz+lC
-	IeQ4qDL6F465pAQ9cyvlVGSOKlq1jwaZsQUAx7/RIOM8Te8O6LV9MARs/eaA0cAaJfSUj0
-	kRaysZzk3TULt8sG9wRcro3VLX+gdyU=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-684-mKjnWYywOuWtHZCvNNDrLg-1; Wed, 07 Feb 2024 03:39:29 -0500
-X-MC-Unique: mKjnWYywOuWtHZCvNNDrLg-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a37913402a3so21297066b.2
-        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 00:39:29 -0800 (PST)
+	s=arc-20240116; t=1707295683; c=relaxed/simple;
+	bh=Ob3G3uS77jv9IBqBz/Ayr/vtbRlwHRFDLvJo7yFWl0I=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=t3gD12U/F+jwhhyOGVZYdNfJbNv7xkCBm9Vl8zpaIaRAEDF92siudj1ZgJMy3NuFYzueiGr21ap44A+YW+qufWHGJN5NL8NoQqLF8ZN8g5jiVTtOpTrxwexlREjOBAgpi2VbgXrcRQgTh+iiu3Sa4vZ53jE+5SwC/m9F4hdqJYY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QZ5+efRE; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-33b1c33b9c9so83531f8f.0;
+        Wed, 07 Feb 2024 00:48:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707295679; x=1707900479; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PNZDQhXm5PMJ7sIVLmTHOOeuso3IU3bmrVPAnHG4hCU=;
+        b=QZ5+efREi9NBkMLUI5lFvHONPBIikgOh+ZbkkJeetTyLFAinrNWzVtRbozHgtuRRQb
+         S0KvHIyWsunc0d7DUydVSRtUN0qy4C9aX0YNbP+kpl/7o91Dio3Mks/gafy4A6eOzkDY
+         qfoRj9kNjLEJdHHGvCLBChaeNyQ8gvMeoZmdewSNIXKVpwcemETcGcLjwBU6UFXpbzm6
+         8rhS4NWyYVUxGP+YDPe5pab6O25mjgmzD7+bJYNrGoRDHl3weNjBKzRVe7VAFD9vYVyO
+         Kosl8qmX42SdvN3xvdVp69RZks0Bz9GH55R037xhzQVBSzIS4/iJUS3RoQhM8fHEK2Ix
+         qlFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707295168; x=1707899968;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZAXzbRx8bTrXW8mIoidP0h+87BdFw4xKcLSssnrU6kI=;
-        b=YIjpFG8MVQK7rknjR5aEa7sU2RnVpvGwWkvqyvAwMBEKhX0Z8WitC92ZxkR+DQ8qs4
-         4xJIYcbbJrOZXkba17bd9d6UGGVXpvHP3J/VjZF5iEOeAfManx1cVoHBYnaHFeUZtQCp
-         p7Hoq5x3ClDR39Tc+IjhqL9Ux2P+oQn1/hDDDR5ltDvDncMz4mXaQMY8nYd/ydxNGQKs
-         hkFPeE3hdaRUDeEJ0B3pUKMYTf5hP/OVih2qNU9Z/Fe2ThG9bgyCJ1xBdRLOYiti788V
-         L2ycQY/SqZ07rngqTpNGFmBDWAOAQ7RLPW7a7Y6x8LgXuE45dX5q1nT6QUvR3+sLgmkB
-         YYkA==
-X-Forwarded-Encrypted: i=1; AJvYcCUfWCLErBiwT2eo0ssak9a3ggyyeyiszs1e36iFtN4tA4kgoFXT9kbXBSrPGahtYl2CDMIFGuGckW2dFaeZWB+K5iLy4iCU
-X-Gm-Message-State: AOJu0YxNLxpGzZ/KrwGWKyBSDWfu+g0GJtibh7ATDOZg5a/Gxng6iK68
-	KDf7oMox9Dvh3FNmPwk0HQXy9MxgxTM7kOhAekhGibXvKOAKLttLfjtlNBjwTG2igh2VlEk77kG
-	r5B3PrftijSV7OakZl0Tm1PSsjX5xGGHwHIsG1UCdvPMtq3tVC4LIJw==
-X-Received: by 2002:a05:6402:5154:b0:560:5fbb:a148 with SMTP id n20-20020a056402515400b005605fbba148mr3754134edd.39.1707295168124;
-        Wed, 07 Feb 2024 00:39:28 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH2NsvT4sc6tbDBunK98s9BxDYPuRaNGFxjLy/cDFmkZ9+vFiimAUV20Le1jH9Jq916ADH4gw==
-X-Received: by 2002:a05:6402:5154:b0:560:5fbb:a148 with SMTP id n20-20020a056402515400b005605fbba148mr3754124edd.39.1707295167716;
-        Wed, 07 Feb 2024 00:39:27 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXmXD5gssWICrqVD4rXZExDudFbZYFR2RZeq+rMKAk4PNSqGJyVYi6dsTVcI41S1tFy7j/DSDMaVpAcS9U7JjFFrFdzxKjDIdVHlAXE6d4jIuNlpUNS+z/cs4AWYEg6ZJg9Zu+TQlheXCLTqcQkGgHV16qh2Thea3iaajmeXxbjQPhbXP68udVDcEOvSjb3S+jS6lJYMv6Uef0o/GdexErkRX7VNSNlJ9v8KyxR1BgFmBCJYoHi7E38rkAbeqhN7wHPNwm8f4vmtyF+G+2TrI7oBd8KtDmTS+ITz7MV45g6hA==
-Received: from sgarzare-redhat (host-87-12-25-87.business.telecomitalia.it. [87.12.25.87])
-        by smtp.gmail.com with ESMTPSA id 15-20020a0564021f4f00b00560622cd10fsm424307edz.68.2024.02.07.00.39.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Feb 2024 00:39:27 -0800 (PST)
-Date: Wed, 7 Feb 2024 09:39:23 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: virtualization@lists.linux.dev, 
-	Shannon Nelson <shannon.nelson@amd.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Zhu Lingshan <lingshan.zhu@intel.com>
-Subject: Re: Re: [PATCH] vhost-vdpa: fail enabling virtqueue in certain
- conditions
-Message-ID: <wixps4w7rnbd67t5is6wtqvuw7e3waat4no3embl3vnjimtxvz@pemiyojtmunz>
-References: <20240206145154.118044-1-sgarzare@redhat.com>
- <CACGkMEs-FAz7Xv7j6k3grq97q9qO18Em2bLDS4qBaCDZS7+gbQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1707295679; x=1707900479;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PNZDQhXm5PMJ7sIVLmTHOOeuso3IU3bmrVPAnHG4hCU=;
+        b=axheDrfTI7Q4wiOXmsh3xluPGJRz+lJa5zwsDmHB0ScSVlY0WcL8DjWdkteX7zTm7n
+         4/g+HH8v6OJaQRGdKgxurCLba7H9kIXO+UNI4nv0wIMtj4yoXxW2bOzKMcrVmDxv4cBy
+         OKjVY+CQz89NRQ/uuf8cRP1xXCXZPBHdEbvDQICEJDJV8QwIoPgIiaT4DxN1xIUO1sMV
+         f9vTRbpG1AXvTz8ze4sP2QDmfi1Tx2glGT9CgbZCB13uiQwSIfJs6k8RfD6Upim3zt8r
+         WvZUuUDshxjz0Qc+17KZSiu5x8br0AUmd94pvM8hmD4kyDoW514uhmsICxzKLHkWlEsx
+         pdvw==
+X-Gm-Message-State: AOJu0YxlTcDySPExDxnBbv6cp48aquddYqtna9CIbwM3yRo53KHeAkOv
+	KNX5ofJ0tORMTrC2c38k4aJ3C6XLxKEr2wzhqWQEOMB9RJ19EvBV
+X-Google-Smtp-Source: AGHT+IEnSSV9fm87Li5GQk9Ie8kmLXD/Yq2c7jpoWAU8udLECt2uQsv7ikcYdWCxQ9+dQwRUGirumg==
+X-Received: by 2002:a05:600c:198f:b0:40f:bda6:ccc0 with SMTP id t15-20020a05600c198f00b0040fbda6ccc0mr4120618wmq.1.1707295679326;
+        Wed, 07 Feb 2024 00:47:59 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXbaBmjbacNDfw4uTYbb75EMgYuAMEFd/3fCWa9kU9Bb/wDmXCfkZsgQow4FlFmtBTljn8oobn8N+LOOiqPgXm9sZvSVAh5CjKlGm8q3Q5BnyZGgI/ZussR26fvgKGnixwNT+1aK7+kO4XFwRRkRZ/UqvSZ406GVebBJpygZydvjODGs7n89zX/h0f4jARrBA8Mdanv7Vbx3TpWVOWyFeAiVai1uM4kPJULX34vXnNbXIUBz2cM52UKu9vOy6ji2m7jk2RHHEJHmLKbQfxtKwAzoPeVMOPFCVz9VKBY/SRIjomzHT/lSjKExndPy/cN60tGpYEWzbnEIVmQshqj5QVqEZrhBCWdO/N+d26lnawPcOZ5AAcvd2i5LxMfjR4m1PyRgc49wJJhPKLCLUpOCbrwy9Nx59HRWrG7g2UtiKovat1I3xz5+FovvISQ829mxC4IxFZyekee06NpvvE38RHK0zVQcup5hlGUMoqkRuK0YfR9W5G+7Lf8eeffmw==
+Received: from localhost.localdomain (h-158-174-22-45.NA.cust.bahnhof.se. [158.174.22.45])
+        by smtp.gmail.com with ESMTPSA id n13-20020a05600c4f8d00b0040fd1629443sm1311404wmq.18.2024.02.07.00.47.57
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 07 Feb 2024 00:47:58 -0800 (PST)
+From: Magnus Karlsson <magnus.karlsson@gmail.com>
+To: magnus.karlsson@intel.com,
+	bjorn@kernel.org,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	netdev@vger.kernel.org,
+	maciej.fijalkowski@intel.com,
+	kuba@kernel.org,
+	toke@redhat.com,
+	pabeni@redhat.com,
+	davem@davemloft.net,
+	j.vosburgh@gmail.com,
+	andy@greyhouse.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	edumazet@google.com,
+	lorenzo@kernel.org
+Cc: bpf@vger.kernel.org,
+	Prashant Batra <prbatra.mail@gmail.com>
+Subject: [PATCH net v2] bonding: do not report NETDEV_XDP_ACT_XSK_ZEROCOPY
+Date: Wed,  7 Feb 2024 09:47:36 +0100
+Message-ID: <20240207084737.20890-1-magnus.karlsson@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEs-FAz7Xv7j6k3grq97q9qO18Em2bLDS4qBaCDZS7+gbQ@mail.gmail.com>
 
-On Wed, Feb 07, 2024 at 11:27:14AM +0800, Jason Wang wrote:
->On Tue, Feb 6, 2024 at 10:52 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
->>
->> If VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK is not negotiated, we expect
->> the driver to enable virtqueue before setting DRIVER_OK. If the driver
->> tries anyway, better to fail right away as soon as we get the ioctl.
->> Let's also update the documentation to make it clearer.
->>
->> We had a problem in QEMU for not meeting this requirement, see
->> https://lore.kernel.org/qemu-devel/20240202132521.32714-1-kwolf@redhat.com/
->
->Maybe it's better to only enable cvq when the backend supports
->VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK. Eugenio, any comment on this?
->
->>
->> Fixes: 9f09fd6171fe ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature")
->> Cc: eperezma@redhat.com
->> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->> ---
->>  include/uapi/linux/vhost_types.h | 3 ++-
->>  drivers/vhost/vdpa.c             | 4 ++++
->>  2 files changed, 6 insertions(+), 1 deletion(-)
->>
->> diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_types.h
->> index d7656908f730..5df49b6021a7 100644
->> --- a/include/uapi/linux/vhost_types.h
->> +++ b/include/uapi/linux/vhost_types.h
->> @@ -182,7 +182,8 @@ struct vhost_vdpa_iova_range {
->>  /* Device can be resumed */
->>  #define VHOST_BACKEND_F_RESUME  0x5
->>  /* Device supports the driver enabling virtqueues both before and after
->> - * DRIVER_OK
->> + * DRIVER_OK. If this feature is not negotiated, the virtqueues must be
->> + * enabled before setting DRIVER_OK.
->>   */
->>  #define VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK  0x6
->>  /* Device may expose the virtqueue's descriptor area, driver area and
->> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
->> index bc4a51e4638b..1fba305ba8c1 100644
->> --- a/drivers/vhost/vdpa.c
->> +++ b/drivers/vhost/vdpa.c
->> @@ -651,6 +651,10 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa *v, unsigned int cmd,
->>         case VHOST_VDPA_SET_VRING_ENABLE:
->>                 if (copy_from_user(&s, argp, sizeof(s)))
->>                         return -EFAULT;
->> +               if (!vhost_backend_has_feature(vq,
->> +                       VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK) &&
->> +                   (ops->get_status(vdpa) & VIRTIO_CONFIG_S_DRIVER_OK))
->> +                       return -EINVAL;
->
->As discussed, without VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK, we don't
->know if parents can do vq_ready after driver_ok.
->
->So maybe we need to keep this behaviour to unbreak some "legacy" userspace?
+From: Magnus Karlsson <magnus.karlsson@intel.com>
 
-I'm not sure it's a good idea, since "legacy" userspace are currently 
-broken if used with VDUSE device. So we need to fix userspace in any 
-case, and IMHO is better if we start to return an error, so the user 
-understands what went wrong, because the problem in QEMU took us quite 
-some time to figure out that we couldn't enable vq after DRIVER_OK.
+Do not report the XDP capability NETDEV_XDP_ACT_XSK_ZEROCOPY as the
+bonding driver does not support XDP and AF_XDP in zero-copy mode even
+if the real NIC drivers do.
 
-Since userspace is unable to understand if a vhost-vdpa device is VDUSE 
-or not, I think we have only 2 options either merge this patch or fix 
-VDUSE somehow. But the last one I think is more complicated/intrusive.
+Note that the driver used to report everything as supported before a
+device was bonded. Instead of just masking out the zero-copy support
+from this, have the driver report that no XDP feature is supported
+until a real device is bonded. This seems to be more truthful as it is
+the real drivers that decide what XDP features are supported.
 
-Thanks,
-Stefano
+Fixes: cb9e6e584d58 ("bonding: add xdp_features support")
+Reported-by: Prashant Batra <prbatra.mail@gmail.com>
+Link: https://lore.kernel.org/all/CAJ8uoz2ieZCopgqTvQ9ZY6xQgTbujmC6XkMTamhp68O-h_-rLg@mail.gmail.com/T/
+Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
+---
+ drivers/net/bonding/bond_main.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
->
->For example ifcvf did:
->
->static void ifcvf_vdpa_set_vq_ready(struct vdpa_device *vdpa_dev,
->                                    u16 qid, bool ready)
->{
->  struct ifcvf_hw *vf = vdpa_to_vf(vdpa_dev);
->
->        ifcvf_set_vq_ready(vf, qid, ready);
->}
->
->And it did:
->
->void ifcvf_set_vq_ready(struct ifcvf_hw *hw, u16 qid, bool ready)
->{
->        struct virtio_pci_common_cfg __iomem *cfg = hw->common_cfg;
->
->        vp_iowrite16(qid, &cfg->queue_select);
->        vp_iowrite16(ready, &cfg->queue_enable);
->}
->
->Though it didn't advertise VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK?
->
->Adding LingShan for more thought.
->
->Thanks
->
->>                 ops->set_vq_ready(vdpa, idx, s.num);
->>                 return 0;
->>         case VHOST_VDPA_GET_VRING_GROUP:
->> --
->> 2.43.0
->>
->
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 4e0600c7b050..a11748b8d69b 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -1819,6 +1819,8 @@ void bond_xdp_set_features(struct net_device *bond_dev)
+ 	bond_for_each_slave(bond, slave, iter)
+ 		val &= slave->dev->xdp_features;
+ 
++	val &= ~NETDEV_XDP_ACT_XSK_ZEROCOPY;
++
+ 	xdp_set_features_flag(bond_dev, val);
+ }
+ 
+@@ -5909,9 +5911,6 @@ void bond_setup(struct net_device *bond_dev)
+ 	if (BOND_MODE(bond) == BOND_MODE_ACTIVEBACKUP)
+ 		bond_dev->features |= BOND_XFRM_FEATURES;
+ #endif /* CONFIG_XFRM_OFFLOAD */
+-
+-	if (bond_xdp_check(bond))
+-		bond_dev->xdp_features = NETDEV_XDP_ACT_MASK;
+ }
+ 
+ /* Destroy a bonding device.
+
+base-commit: cb88cb53badb8aeb3955ad6ce80b07b598e310b8
+-- 
+2.42.0
 
 
