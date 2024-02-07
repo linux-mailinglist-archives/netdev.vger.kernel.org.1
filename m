@@ -1,120 +1,178 @@
-Return-Path: <netdev+bounces-69784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B526684C99B
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 12:28:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E029184C99C
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 12:30:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69B0B1F23817
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 11:28:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C4801C24E65
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 11:30:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D2FF18EBF;
-	Wed,  7 Feb 2024 11:28:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DNRweZIG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB07018EA1;
+	Wed,  7 Feb 2024 11:30:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC17C1D528
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 11:28:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 984DA1AADA
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 11:30:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707305331; cv=none; b=Q0UseAoYiwhiz/UYzkcetmfGTN3oz4Es88SRCks2sCJfv1NAPEGzQ2Zri2wnTaVOrv3+A8Di73a65RPxNcrSsWXoKZcUZE1UENFa19I+37LaXLYjLIPMmvXcse2Heh34eKzmgM3YJ+UOkQTOUv58azdR3lDefeZ8OYRbxfYWAM4=
+	t=1707305455; cv=none; b=MybXXc+QXbScnzrtPm4G9L2uk9MQ08vL7TdfOkhY0gODNuuzdMrR0tFJYNHon27o7I/LZBdYMrwCgooyQ6VgnYPe6IHZxTOikX+Hym1NGAWW8V1khChDCsul501Oi5yPBB1qidXZm+dKDrdrn7aAugKlLIvDWjgCDX4Pg7ziCac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707305331; c=relaxed/simple;
-	bh=C5DvaEHoSMeatRly/COi+FQoLDKQbAo0pRsQb7xxJvI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f3291BLJab3tXxR+x1C9I2DyXZWYEHc+79eV/uQQXAglcBIG3o4TLJ9NTfjdgp9aN0lyZm1IblA4IL8OUCodc4XeUkKE7vLS5+0Mrh+ZHkh1Yp5mNZ6TSjhfvuvGSkl0NjILxsCEHEQ/4svnnCd9+Ya5s55L0gkAvhM7vjDEStk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DNRweZIG; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id BCD10E0006;
-	Wed,  7 Feb 2024 11:28:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1707305320;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sQJ6PmALTBQ2hfZPUY+Q2vI8lvfYCzJAB5/EoBmMYAs=;
-	b=DNRweZIGDGK5HQ9TQWm0GWx/c6UqssGmxtxOK63Yr5rX/PpoiKKhevmJ0bE8iS44QK49de
-	CWRiPPA5yFK2/fgvdhcXjFr/dzKTKPYEPVexeyOzYzz46tcwuVNJ5FKdDQjX9trv+iZSaU
-	F6kTcTB2RsB5k9E1MhrSIlnVJ3yY4dblLZlckwg6T0/BpcF+T7ekUgrYeRV2w/5iVwYDbo
-	i5MtqObFFS+XeLnSa+q4L2/rq/QfoSzNilUyy3YwX8PKIkHnrt983MsAQy6tzn6D+NrJWm
-	b8XE9CUM2yAXBGgADszBUJo8AU70HKscH41iQrla6IWj2ZzdzhC8vxJ3II5SoA==
-Date: Wed, 7 Feb 2024 12:28:38 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: Elad Nachman <enachman@marvell.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Taras Chornyi
- <taras.chornyi@plvision.eu>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: Re: [EXT] Prestera driver fail to probe twice
-Message-ID: <20240207122838.382fd1b2@kmaincent-XPS-13-7390>
-In-Reply-To: <BN9PR18MB42510F2EA6F4091E5CA3B409DB452@BN9PR18MB4251.namprd18.prod.outlook.com>
-References: <20240206165406.24008997@kmaincent-XPS-13-7390>
-	<BN9PR18MB42519830967969DEA4E329EFDB462@BN9PR18MB4251.namprd18.prod.outlook.com>
-	<20240207112231.2d555d3e@kmaincent-XPS-13-7390>
-	<BN9PR18MB42510F2EA6F4091E5CA3B409DB452@BN9PR18MB4251.namprd18.prod.outlook.com>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1707305455; c=relaxed/simple;
+	bh=mJPb3Csc9S+IPjh9zm7ZZ5fDJg1ab6QD0TMbnPaw/SU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PS79VVkFkh565aYsk8N8tXsQYhncyQYaWaYEvRrgm8wMluXF8EnHEygFogIGir3DfsU5vQU+Yto6YWL5K0thJozkdBbIE2+Ts2KU6d2XsC64WTndgW5m9FrFeELkx1P8X/JEif4Tig+RT5W3/u/IshSLRt/Y9SbkkGgoU8oQjIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rXg8U-0007Ap-8G; Wed, 07 Feb 2024 12:30:38 +0100
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rXg8S-0050gf-KI; Wed, 07 Feb 2024 12:30:36 +0100
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 3A7D4288803;
+	Wed,  7 Feb 2024 11:30:36 +0000 (UTC)
+Date: Wed, 7 Feb 2024 12:30:35 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: =?utf-8?B?Q3PDs2vDoXM=?= Bence <csokas.bence@prolan.hu>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, 
+	Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Francesco Dolcini <francesco.dolcini@toradex.com>, Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH] net: fec: Add ECR bit macros, fix FEC_ECR_EN1588 being
+ cleared on link-down
+Message-ID: <20240207-abreast-appraiser-7165418af08e-mkl@pengutronix.de>
+References: <20240207111859.15463-1-csokas.bence@prolan.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="cu4vj53txk47ei46"
+Content-Disposition: inline
+In-Reply-To: <20240207111859.15463-1-csokas.bence@prolan.hu>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+
+
+--cu4vj53txk47ei46
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
 
-On Wed, 7 Feb 2024 10:56:29 +0000
-Elad Nachman <enachman@marvell.com> wrote:
+On 07.02.2024 12:18:59, Cs=C3=B3k=C3=A1s Bence wrote:
+> Signed-off-by: Cs=C3=B3k=C3=A1s Bence <csokas.bence@prolan.hu>
 
-> > -----Original Message-----
-> > From: K=C3=B6ry Maincent <kory.maincent@bootlin.com>
-> > Sent: Wednesday, February 7, 2024 12:23 PM
-> > To: Elad Nachman <enachman@marvell.com>
-> > Cc: netdev@vger.kernel.org; Taras Chornyi <taras.chornyi@plvision.eu>;
-> > Thomas Petazzoni <thomas.petazzoni@bootlin.com>; Miquel Raynal
-> > <miquel.raynal@bootlin.com>
-> > Subject: Re: [EXT] Prestera driver fail to probe twice
-> >=20
-> > On Tue, 6 Feb 2024 18:30:33 +0000
-> > Elad Nachman <enachman@marvell.com> wrote:
-> >  =20
-> > > Sorry, that's not how this works.
-> > >
-> > > The firmware CPU loader will only reload if the firmware crashed or e=
-xit.
-> > >
-> > > Hence, insmod on the host side will fail, as the firmware side loader
-> > > is not waiting For the host to send a new firmware, but first for the
-> > > existing firmware to exit. =20
-> >=20
-> > With the current implementation we can't rmmod/insmod the driver.
-> > Also, in case of deferring probe the same problem appears and the driver
-> > will never probe. I don't think this is a good behavior.
-> >=20
-> > Isn't it possible to verify that the firmware has already been sent and=
- is
-> > working well at the probe time? Then we wouldn't try to flash it. =20
+Please provide a patch description.
+
+> ---
+>  drivers/net/ethernet/freescale/fec_main.c | 17 +++++++++++++----
+>  1 file changed, 13 insertions(+), 4 deletions(-)
 >=20
-> Everything is possible, but that is the way the firmware interface was
-> initially designed. Changing this will break compatibility with board alr=
-eady
-> deployed in the field.
+> diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethe=
+rnet/freescale/fec_main.c
+> index 63707e065141..652251e48ad4 100644
+> --- a/drivers/net/ethernet/freescale/fec_main.c
+> +++ b/drivers/net/ethernet/freescale/fec_main.c
+> @@ -273,8 +273,11 @@ MODULE_PARM_DESC(macaddr, "FEC Ethernet MAC address"=
+);
+>  #define FEC_MMFR_TA		(2 << 16)
+>  #define FEC_MMFR_DATA(v)	(v & 0xffff)
+>  /* FEC ECR bits definition */
+> -#define FEC_ECR_MAGICEN		(1 << 2)
+> -#define FEC_ECR_SLEEP		(1 << 3)
+> +#define FEC_ECR_RESET   BIT(0)
+> +#define FEC_ECR_ETHEREN BIT(1)
+> +#define FEC_ECR_MAGICEN BIT(2)
+> +#define FEC_ECR_SLEEP   BIT(3)
+> +#define FEC_ECR_EN1588  BIT(4)
 
-I don't understand, why fixing the probe by not flashing the firmware if it=
- is
-already flashed, will break compatibility?
-Do I miss something?
+nitpick: can you keep the original indention?
 
-Regards,
+> =20
+>  #define FEC_MII_TIMEOUT		30000 /* us */
+> =20
+> @@ -1213,7 +1216,7 @@ fec_restart(struct net_device *ndev)
+>  	}
+> =20
+>  	if (fep->bufdesc_ex)
+> -		ecntl |=3D (1 << 4);
+> +		ecntl |=3D FEC_ECR_EN1588;
+> =20
+>  	if (fep->quirks & FEC_QUIRK_DELAYED_CLKS_SUPPORT &&
+>  	    fep->rgmii_txc_dly)
+> @@ -1314,6 +1317,7 @@ fec_stop(struct net_device *ndev)
+>  	struct fec_enet_private *fep =3D netdev_priv(ndev);
+>  	u32 rmii_mode =3D readl(fep->hwp + FEC_R_CNTRL) & (1 << 8);
+>  	u32 val;
+> +	u32 ecntl =3D 0;
+
+nitpick: please move it before the "u32 val;" so that it looks more
+reverse-xmas-treeish.
+
+> =20
+>  	/* We cannot expect a graceful transmit stop without link !!! */
+>  	if (fep->link) {
+> @@ -1342,12 +1346,17 @@ fec_stop(struct net_device *ndev)
+>  	writel(fep->phy_speed, fep->hwp + FEC_MII_SPEED);
+>  	writel(FEC_DEFAULT_IMASK, fep->hwp + FEC_IMASK);
+> =20
+> +	if (fep->bufdesc_ex)
+> +		ecntl |=3D FEC_ECR_EN1588;
+> +
+>  	/* We have to keep ENET enabled to have MII interrupt stay working */
+>  	if (fep->quirks & FEC_QUIRK_ENET_MAC &&
+>  		!(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
+> -		writel(2, fep->hwp + FEC_ECNTRL);
+> +		ecntl |=3D FEC_ECR_ETHEREN;
+>  		writel(rmii_mode, fep->hwp + FEC_R_CNTRL);
+>  	}
+> +
+> +	writel(ecntl, fep->hwp + FEC_ECNTRL);
+>  }
+
+regards,
+Marc
+
 --=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--cu4vj53txk47ei46
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmXDadYACgkQKDiiPnot
+vG/E3QgAncnNsVMkgTePvIOhdjGWiKWBEVgOsiYbBHyP66pFGcI+O9W5H9L/uMGd
+RcaPxP2xRIml6Y5IwyPu0/UnZmLfODKYn6YNuYbqPe+IKQaTclRE85kemylMdpDW
+49uDbKWVebcFUqoodguzW4OUAvfpg3FHg+imsQaQYkWfSz6ULHEcJL2Oer2VYRsl
+7lZYbMxa7e2m/DuSNtsvagGonJe0IJzDoLDMsyMYN+9Ml/7esWgTt630I56fO6Q0
+cJVKyhOASc0SoSY8oBqK0g07mSOIl2cNe/ifvf2vJvDU3Puw3dKEaFN4SDMtIyAm
+5QQG04q7M5HdVsYPKtrJovMbG0lS0w==
+=tzM9
+-----END PGP SIGNATURE-----
+
+--cu4vj53txk47ei46--
 
