@@ -1,146 +1,138 @@
-Return-Path: <netdev+bounces-69858-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D0C784CCF4
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:37:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2B1C84CCFD
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 15:40:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D0C52B21D86
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 14:37:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2ED9F1C2136F
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 14:40:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6877C09D;
-	Wed,  7 Feb 2024 14:37:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D11247E773;
+	Wed,  7 Feb 2024 14:40:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cF0r91oX"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="gwquoAEy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f173.google.com (mail-pg1-f173.google.com [209.85.215.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40B802561C;
-	Wed,  7 Feb 2024 14:37:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4106D7E76A
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 14:40:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707316648; cv=none; b=DPfQfC1H01CEVIKcaqctyG0s+rksR7ZJoM0kkrI48CIIFXObelJ6bGP2U5Rga5uM5OculJ9BqNeYsv4yKEJzsVoX3nQs+xQk2WPR2sjqSZ9jpVbUbGt3H5wCQZIc7qSNisaRM56e7cLuguS0/RE46XPC1IPz+D4H7QScZuouU04=
+	t=1707316812; cv=none; b=Cfg3OLyeoYFGYp4qMuKZPKKG4XcktI7NCrr8ukaI+6/MKrcrCzxrYZPQmu9sgTlsnNB9vv/HKfLB7l7eMrTStcfXf1LVOpy4cmy0a8cOBAANMWjLBAFwVjt6x6tvhsxWL1gvGDJ7p4S7qk0l5hH331L4IuvzsrxFdgwn8KmlE7c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707316648; c=relaxed/simple;
-	bh=6qZqQhExsZp1tQV0Wb32AQzHw0mWIBbTFnb0UFD3aJY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=elts/KIxfepKsCcUKqhm67vhReVh4SinxQ90LBZ7ulXtcyld/fYX/sskPujNKbv0hBI2OBjR6zXOlgK6/aSIs/ZwbPSy44vJg+rmsOeNUJdgG/N7+kdjhlu6L1iBbs6I2UTEH0TOw6t2IokIwtWvGE6oIL5aaZQnQBQZgs1SlGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cF0r91oX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C30FC433F1;
-	Wed,  7 Feb 2024 14:37:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707316647;
-	bh=6qZqQhExsZp1tQV0Wb32AQzHw0mWIBbTFnb0UFD3aJY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=cF0r91oX0uXy+2WWQSG8yLIbIOUnVCM5u7zIahd6CJNG5Rz7+sI9WYu+zp0fMTAqC
-	 hfQr1uRixdpcmvAiaM8UgzBAM759d/IAuDO/tX9kDJknjMRuW64lo7WbwBL0IdHHNS
-	 N4eNUZguiQ7m2JWM8SYo592yckrAcjzntvAoh/AhSnG7d0XdXbpVzM5U7SLt0klL7Z
-	 NqhATEkhmBh0intJV2SyIMesU2sZyjRc9CWXhVIJabuIVhxAHQWPnmnvjFDPk1h+0s
-	 agBBfKrksSA2rRKh7jbV9NfHw6KU5d5m20eRMXUmFCJaSqfZ2AsM1jkuKgVMC3NGFx
-	 5W7LZsXnFLvcg==
-Message-ID: <e216081b-8755-46be-a687-2c61d335aedb@kernel.org>
-Date: Wed, 7 Feb 2024 15:37:22 +0100
+	s=arc-20240116; t=1707316812; c=relaxed/simple;
+	bh=Ntw5fiG6U4x7V0dQ7rNOcoT+esXPB/rpqIFiRH2YhbY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U1Oej6HnJMCOEq9uiZSczvydLjCHYMYDlqtkBx3yv9FnROXUBRRqRa+MbhAP5czeouxLYD/MA8ealjgqsxK7sCw4f+6JZ7GCB3h+E5JUrHoEokxs4Q5erigwIS6Zvc7OLDB+HzokfawuOwfBR/tKnFtgAdCn7+FHAIvuv+4Ot/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=gwquoAEy; arc=none smtp.client-ip=209.85.215.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pg1-f173.google.com with SMTP id 41be03b00d2f7-5c6bd3100fcso516245a12.3
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 06:40:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1707316810; x=1707921610; darn=vger.kernel.org;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BTy0TD/WzR5RIh6lZhgnOebUhLZ8bbC+FvuZI+ulvFU=;
+        b=gwquoAEy34dFvJSTqXRIanVMZCQaFlrE9wtu6C1dkC0nsCKWoxqJBaq/f9eFAZ7ipf
+         XD/0Mr8JuvjIv8XnTlRWK1fH9f2GU0CMIM4dfipHd/9uCfNmKzAVI1MOCD7pyunagG7W
+         vs9BsFtj+077CMaq/R9EFMHE2hCmrzIFeAPXw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707316810; x=1707921610;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BTy0TD/WzR5RIh6lZhgnOebUhLZ8bbC+FvuZI+ulvFU=;
+        b=c39SlfxDiOsTB54KEU3XzIgyxVnFWypS3f0Rck5404a3lS/FdZwKDmYSCEA21oAFlW
+         jGvni7dMDytYtQofVfUe6SBddtrdPGah5dnFtJpILM0X/St0gIHklDtY7d0fmAjQIKKp
+         JK3RrHaz7jDcTjJhTv4fbIkCy9srOX1NVYoUctM4VxsrTJ4iAUZ5M30Szy6XDy2Q2E5v
+         qvwWqCXx7ZhJG9QaDzVnyhG4ppppLjgTlY2msqk9YnqJ8v7BKyFQP+5ETUPS3raiol83
+         MJ2mw5/GDSDL1/8dXgTlLR6oCet86MeO52PWq0DkAk2DvypPxFeVgEu2ltt5EGL41aQ7
+         fMqQ==
+X-Gm-Message-State: AOJu0Yxiy5hPr+OWpY0QCzAmv5cP0m3AiqfHLm76EU+8oRrk+gHGmT4/
+	PSBp0fAraNYGqxv5SsVwyD7xSUc9KvDBvSeiEcxDDx8SdP3mkq3kWSFB0mXOn54=
+X-Google-Smtp-Source: AGHT+IFRoT58DRturmHXvkZDAyT8/9JHrm65jJYXEqbtGPJc/79fabXhyu2Y1L3ntiopc0MLhhppgw==
+X-Received: by 2002:a17:902:dac4:b0:1d9:c876:b840 with SMTP id q4-20020a170902dac400b001d9c876b840mr6229185plx.2.1707316810481;
+        Wed, 07 Feb 2024 06:40:10 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWAMqWy/7rZfxs+UZ1xWTANMYi47f8HisJ/+M0EQCvUkJrdf+qRIBnCAus7+SLsBYmDGd9gxyc4d/f7V4Jz7bwggv4Y/jK8Z8HMHc+SeppnVqBGE8cb21dpHnR0x6DYXmItsgwtp+sZAwnmA5ZSA6olj79S+HybqyCjdwItJYy43U+N5w+Ae3jni2u+MXPHRH6P9mlzfgFml7Sa6gt++mkC/UeEJejGme4hOQNd0U1aSDF0aPZTbLzzQ6Jwodqrgb1axquKJ79d9WWA6TxnyikniR+JR51Owv+GcAHbcH4/6evizQVlnk8QJ7ZWrFd/aSx35Znj1YKWyTt2xW+7B04J0iFJ+NAnWI7lalNUzN3+YJPZs055JSjC/yo=
+Received: from fastly.com (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id m17-20020a170902f21100b001d9fadd2e22sm259608plc.252.2024.02.07.06.40.09
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 07 Feb 2024 06:40:10 -0800 (PST)
+Date: Wed, 7 Feb 2024 06:40:07 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: Tariq Toukan <tariqt@nvidia.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, Gal Pressman <gal@nvidia.com>,
+	rrameshbabu@nvidia.com, Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"open list:MELLANOX MLX5 core VPI driver" <linux-rdma@vger.kernel.org>
+Subject: Re: [PATCH net-next] eth: mlx5: link NAPI instances to queues and
+ IRQs
+Message-ID: <20240207144007.GA13147@fastly.com>
+References: <20240206010311.149103-1-jdamato@fastly.com>
+ <7e338c2a-6091-4093-8ca2-bb3b2af3e79d@gmail.com>
+ <20240206171159.GA11565@fastly.com>
+ <44d321bf-88a0-4d6f-8572-dfbda088dd8f@nvidia.com>
+ <20240206192314.GA11982@fastly.com>
+ <b19c4280-df54-409e-b3fd-00de6d6958d4@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [TEST] The no-kvm CI instances going away
-Content-Language: en-GB, fr-BE
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- MPTCP Upstream <mptcp@lists.linux.dev>, Paolo Abeni <pabeni@redhat.com>,
- Mat Martineau <martineau@kernel.org>
-References: <20240205174136.6056d596@kernel.org>
- <f6437533-b0c9-422b-af00-fb8a236b1956@kernel.org>
- <20240206174407.36ca59c4@kernel.org>
- <2d0eb4ef-dd07-4800-8fcf-637a924570fa@kernel.org>
- <20240207062540.5fe5563b@kernel.org>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20240207062540.5fe5563b@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b19c4280-df54-409e-b3fd-00de6d6958d4@gmail.com>
+User-Agent: Mutt/1.5.24 (2015-08-30)
 
-On 07/02/2024 15:25, Jakub Kicinski wrote:
-> On Wed, 7 Feb 2024 10:44:14 +0100 Matthieu Baerts wrote:
->>> Unfortunately I'm really behind on my "real job". I don't have a clear
->>> plan. I think we should scale the timeout by 2x or so, but I haven't
->>> looked how to do that.  
->>
->> No hurry, I understand.
->>
->> It is not clear to me how the patches you add on top of the ones from
->> patchwork are managed. Then, I don't know if it can help, but on the
->> debug instance, this command could be launched before starting the tests
->> to double the timeout values in all the "net" selftests:
->>
->>   $ find tools/testing/selftests/net -name settings -print0 | xargs -0 \
->>        awk -i inplace -F '=' \
->>            '{if ($1 == "timeout") { print $1 "=" $2*2 } else { print }}'
+On Wed, Feb 07, 2024 at 03:23:47PM +0200, Tariq Toukan wrote:
 > 
-> I'd rather not modify the tree. Poking around - this seems to work:
 > 
->   export kselftest_override_timeout=1
+> On 06/02/2024 21:23, Joe Damato wrote:
+> >On Tue, Feb 06, 2024 at 09:10:27PM +0200, Tariq Toukan wrote:
+> >>
+> >>
+> >>On 06/02/2024 19:12, Joe Damato wrote:
+> >>>On Tue, Feb 06, 2024 at 10:11:28AM +0200, Tariq Toukan wrote:
+> >>>>
+> >>>>
+> >>>>On 06/02/2024 3:03, Joe Damato wrote:
+> >>>>>Make mlx5 compatible with the newly added netlink queue GET APIs.
+> >>>>>
+> >>>>>Signed-off-by: Joe Damato <jdamato@fastly.com>
+> 
+> ...
+> 
+> >
+> >OK, well I tweaked the v3 I had queued  based on your feedback. I am
+> >definitiely not an mlx5 expert, so I have no idea if it's correct.
+> >
+> >The changes can be summed up as:
+> >   - mlx5e_activate_channel and mlx5e_deactivate_channel to use
+> >     netif_queue_set_napi for each mlx5e_txqsq as it is
+> >     activated/deactivated. I assumed sq->txq_ix is the correct index, but I
+> >     have no idea.
+> >   - mlx5e_activate_qos_sq and mlx5e_deactivate_qos_sq to handle the QOS/HTB
+> >     case, similar to the above.
+> >   - IRQ storage removed
+> >
+> >If you think that sounds vaguely correct, I can send the v3 tomorrow when
+> >it has been >24hrs as per Rahul's request.
+> >
+> 
+> Sounds correct.
+> Please go on and send when it's time so we can review.
 
-Even better :)
-
-  f=tools/testing/selftests/net/settings
-  kselftest_override_timeout=$(awk -F = '/^timeout=/ {print $2*2}' $f)
-
-> Now it's just a matter of finding 15min to code it up :)
-I'm not sure if I can help here :)
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+OK, I'll send it a bit later today. After looking at it again just now, I
+am wondering if the PTP txqsq case needs to be handled, as well.
 
