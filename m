@@ -1,60 +1,59 @@
-Return-Path: <netdev+bounces-69761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EC0B84C7CE
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 10:46:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7A9984C7E0
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 10:49:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EEAA3282D9A
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 09:46:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47C69287B72
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 09:49:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEFB822309;
-	Wed,  7 Feb 2024 09:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65495224CC;
+	Wed,  7 Feb 2024 09:49:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W+OpaAY4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J+Vul9bq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5BE0224CC;
-	Wed,  7 Feb 2024 09:46:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3221624B2F;
+	Wed,  7 Feb 2024 09:49:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707299173; cv=none; b=HyvTI10p8b5WOstY+Xrpj3Kx5LKm1OPMubIxfGC1qy5dTHDz2loPqo+e33P0lhtFXAzU7m759nRx8E5Js10/y0iWcvR8j6ffQFIri19GtdzZqg/KBDZTueJ8rYTtNXqquhKkWVBM6ojwery+4R2aBeikWbU7GPhVqJQr+piQdNk=
+	t=1707299383; cv=none; b=KZ5ocmu+BqCe3I4EyOLKDgCKPvsdRAPejqUtCWLRkoR9bij84YmPXDUNaZdpkdUrPF1ENcT6Iq3lPPX6Bf169w8IIoEdADzXCJ0moR9C5seIbohssheOplIuIKxXunOj2ORD0+2FRk1p28PxQalUyPtBzqX9E7qQoSNx5OP0mHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707299173; c=relaxed/simple;
-	bh=hkrf29qHJozatNFewJsMGAqd91LzfIcTuGK9E1t1LtI=;
+	s=arc-20240116; t=1707299383; c=relaxed/simple;
+	bh=iaPJLCw/Xy+KGXqtOa/G1rsYICV+i+x8OmFlAgHnp7U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gskgXwy990quUu91Z5VrI3qqUlzbTn5xuTWuy+sdFFGQdJdWDnA8fT0CEaTylqzgZbu+6p8bintpBu4NUc1vrVMDSMJAmELMYEd6iMhcq5HAsIUz+36E//apaSpm83Sg52MyMSENdaW7/zLxvbIjrY4uTzc+RL81Zo5I3D/d/ko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W+OpaAY4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4457CC433C7;
-	Wed,  7 Feb 2024 09:46:11 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=NaTra8wYXIPw387ys7PU0sDj8Etbu9cnuGffySuzvU8amtQQUd01XiDfjUblrAY9NWWTDbOIs4kth97LBOlJY91J+VESL77PdkjbvUgvQQbpbOgSpwsbGZZItaxdkSPFduRaBIvZcB9sj08YXPKOXUwe0damvAFZrmjA8OpcaCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J+Vul9bq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCE59C433C7;
+	Wed,  7 Feb 2024 09:49:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707299173;
-	bh=hkrf29qHJozatNFewJsMGAqd91LzfIcTuGK9E1t1LtI=;
+	s=k20201202; t=1707299383;
+	bh=iaPJLCw/Xy+KGXqtOa/G1rsYICV+i+x8OmFlAgHnp7U=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=W+OpaAY4HT4KwIzZQl8KtgYFQiSKDgvJH5Z8iTfZHwDywdRqNtQgDAl1NRhx57Rrf
-	 wWMvDfmwVdEWa2BfaVK8o9bh9F0LPOHFxar91VFDB2oG4Vd6KePKtqdfHvDayK0L1m
-	 LFT0Hxc38QuIQmkjmjqqQe9ygWc/8BZmmdT39Yl74oi8e1JTjYfQIXcw/UBOTMrDKZ
-	 4r80d3LYaQQitMU8/E66IfRD6qTPwa3RU0rr1P2X6PEY0bYPECMv1JcZXttLgYUl+M
-	 0hh9o/H7lOzqeq0oa0XvDDbx6MOo6LPom4lhhBtFMsOegHFhiSRNajAzRVYBhHcKQq
-	 ay5kPd7s5tbJw==
-Date: Wed, 7 Feb 2024 09:46:09 +0000
+	b=J+Vul9bqfemWsLYL963wUa4MjMJGapEgDfRHrT1NByLcjIGeELuDwCbLITaom9AeY
+	 Rep4tYFuHlv8iNYCJzFdvw1OC3COym1wVptqJrVnDEtoa5Gm0pzpF4baL+3J9sHmTf
+	 08WM61TGPbzR4Qa2Qo61alnOcUu8mYArqElhk5XbaaZ0pVaxl63jL0sPoFZAKvp1IQ
+	 E9KMiYavIim0MtCaPZ+KTNbMxVgMHDGJliuL4zcZrdDdeE2wMJTTq1Y05UJuSLfusQ
+	 JR15HUZ6Ym3oJMQQc8JqsjdXntvOuefg78Uarl5/EsFdDPWmEu5zs4xKFadGdLFCgX
+	 KurQ3rTSg6C1w==
+Date: Wed, 7 Feb 2024 09:48:08 +0000
 From: Simon Horman <horms@kernel.org>
 To: Colin Ian King <colin.i.king@gmail.com>
-Cc: Manish Chopra <manishc@marvell.com>, Rahul Verma <rahulv@marvell.com>,
-	GR-Linux-NIC-Dev@marvell.com,
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
 	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH][next] netxen_nic: remove redundant assignment to
- variable capability
-Message-ID: <20240207094609.GN1104779@kernel.org>
-References: <20240206115049.1879389-1-colin.i.king@gmail.com>
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net/mlx5: remove redundant assignment to variable
+ object_range
+Message-ID: <20240207094808.GO1104779@kernel.org>
+References: <20240206165815.2420951-1-colin.i.king@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,55 +62,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240206115049.1879389-1-colin.i.king@gmail.com>
+In-Reply-To: <20240206165815.2420951-1-colin.i.king@gmail.com>
 
-On Tue, Feb 06, 2024 at 11:50:49AM +0000, Colin Ian King wrote:
-> The variable capability is being assigned a value that is never
-> read and is being re-assigned later. The assignment is redundant and
-> can be removed. Also remove empty line before assignment to capability.
+On Tue, Feb 06, 2024 at 04:58:15PM +0000, Colin Ian King wrote:
+> The variable object_range to log_header_modify_argument_granularity
+> is being assigned a value that is never read, the following statement
+> assigns object_range to the max of log_header_modify_argument_granularity
+> and DR_ICM_MODIFY_HDR_GRANULARITY_4K, so clearly the initial
+> assignment is redundant. Remove it.
 > 
-> Cleans up clang scan build warning:
-> drivers/net/ethernet/qlogic/netxen/netxen_nic_init.c:1189:2: warning:
-> Value stored to 'capability' is never read [deadcode.DeadStores]
+> Cleans up clang-scan build warning:
+> drivers/net/ethernet/mellanox/mlx5/core/steering/dr_arg.c:42:2: warning:
+> Value stored to 'object_range' is never read [deadcode.DeadStores]
 > 
 > Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
-> ---
->  drivers/net/ethernet/qlogic/netxen/netxen_nic_init.c | 2 --
->  1 file changed, 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/qlogic/netxen/netxen_nic_init.c b/drivers/net/ethernet/qlogic/netxen/netxen_nic_init.c
-> index 35ec9aab3dc7..51fa880eaf6c 100644
-> --- a/drivers/net/ethernet/qlogic/netxen/netxen_nic_init.c
-> +++ b/drivers/net/ethernet/qlogic/netxen/netxen_nic_init.c
-> @@ -1186,7 +1186,6 @@ static int
->  netxen_p3_has_mn(struct netxen_adapter *adapter)
->  {
->  	u32 capability, flashed_ver;
-> -	capability = 0;
 
-This part looks correct :)
-
->  
->  	/* NX2031 always had MN */
->  	if (NX_IS_REVISION_P2(adapter->ahw.revision_id))
-> @@ -1197,7 +1196,6 @@ netxen_p3_has_mn(struct netxen_adapter *adapter)
->  	flashed_ver = NETXEN_DECODE_VERSION(flashed_ver);
->  
->  	if (flashed_ver >= NETXEN_VERSION_CODE(4, 0, 220)) {
-> -
-
-This part doesn't seem strictly related to the patch description.
-But in looking at it more closely, I wonder if it would be good
-to reduce the scope of capability to this context (and leave the bank
-line).
-
->  		capability = NXRD32(adapter, NX_PEG_TUNE_CAPABILITY);
->  		if (capability & NX_PEG_TUNE_MN_PRESENT)
->  			return 1;
-
-In any case, I agree that this patch is correct, and I'm happy with
-it with or without the change I suggested above.
+Thanks Colin,
 
 Reviewed-by: Simon Horman <horms@kernel.org>
-
 
