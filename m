@@ -1,123 +1,241 @@
-Return-Path: <netdev+bounces-69765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A42B384C819
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 10:57:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CD9284C86F
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 11:19:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17D021F26CD2
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 09:57:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E195E2827A7
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 10:19:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D98CC2376D;
-	Wed,  7 Feb 2024 09:57:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EQUG6FWK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B74372555B;
+	Wed,  7 Feb 2024 10:19:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6881625566
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 09:57:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D23E0A21;
+	Wed,  7 Feb 2024 10:19:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707299829; cv=none; b=d/AtkiR4KxGfEuGvqwMxph+feX+ur9/VCGFetub5WPwc6CQfGotS91xOyfg+jaWHP3CP72osHZLYYYFpFBJqrDi9+dfqOte5HxD+T359GzQO6dmssmfYnQG+4xsMsSpxyIjLJQfcmbwkPvJWtUL29UayP02aY9INcUOWUk5JP18=
+	t=1707301181; cv=none; b=GRH80LZiIC9dRXPGhpLzeTBO7wg4SblSTo9YWRtBE4Domd/vteecIKvWzvOEgR1qrG8Y8vbAUcd2r/x59oVKi9/S2pqQmHQWiKNZfapwC1sQHjRco0kr6pfkwcdKPTmeeUHvMEOIpDqiLrn+jy7zJZWYCLQxdz95gF0dDKxURHM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707299829; c=relaxed/simple;
-	bh=Cv7/9dP3yWXOSwSLBEBu/XNpX5fgFWr4tiIcfDvbPTA=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=LsHWmcXHO0Yc+Om6VS04XK1UugpF6FXY5vExfqlXo73DlX6NVeJQLS0FTmFmvewg2Q1eulq3FGv4InLvsu5Xu/pHH2xzizjvFZ1KrW3F1IQE+zI0eWsONSo1KfY4pwRzpUTcl3s18282F0H5ZD28Zuqzwnl+dVh5kXPUVYDAegk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EQUG6FWK; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707299826;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Cv7/9dP3yWXOSwSLBEBu/XNpX5fgFWr4tiIcfDvbPTA=;
-	b=EQUG6FWKlOc+3A0XZaZh2RLHmAendT8545+S/yDLKTq7DESppFJew9t0NHT6AQwLzFUIgG
-	n0P+1rkx6kDLKfx8TRFAiNtlyxxdNi7SqUHjgEfpJj05scAVO287aeeJJHid7TogJvyxp3
-	DIMwLlf6bjAixqKZ7RrFy5E74LFMSB4=
-Received: from mail-ed1-f71.google.com (mail-ed1-f71.google.com
- [209.85.208.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-467-KKk4C4L3NtqS67beJQSR4A-1; Wed, 07 Feb 2024 04:57:04 -0500
-X-MC-Unique: KKk4C4L3NtqS67beJQSR4A-1
-Received: by mail-ed1-f71.google.com with SMTP id 4fb4d7f45d1cf-560ead77e0cso15264a12.0
-        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 01:57:04 -0800 (PST)
+	s=arc-20240116; t=1707301181; c=relaxed/simple;
+	bh=UJddGSh7ieqyuMNDXtFQKskOPYVKDAwZVD9O/la4KEQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kvmfNDNtZbhX3y74hL+uM+uKC13zW1rGZTjyTWxDlSTHa/40nlGLFNMjdwOPeEVtS2op6CSXr9+KgXuzCHl/mfPGjqfp8Vc9E7LWy2aeEnhIAGhf7fesweh5EBALhOsTxpGTmWyUDqfD+XiobMc9bAC7xTBy7N2ozUdsNAZrcXE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a38271c0bd5so63426466b.0;
+        Wed, 07 Feb 2024 02:19:39 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707299823; x=1707904623;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Cv7/9dP3yWXOSwSLBEBu/XNpX5fgFWr4tiIcfDvbPTA=;
-        b=cAWnzhvC1/ym9YY6nLbO/h18HM05T+RhxY1+UEaltEUIUSh9j9B4RkB1Q7+X4jdOzm
-         d4vri5kB7LzLVgcEhxT3i79toa7hhDKh9e8A9+ZnmXoiQg1u/AShtZBdmf/fVIYUUCUF
-         ES+AhK4INVSJmzAhCQ8rJlZK9iMY5hg9s5qOB94GDakkOtp7wo1ms2UaINysyK/Xa9OP
-         XXc7qUKyZcw3YLoTJeBMe8cd4CzgfWTF4G1IpumjyVwsxdpBs/RsPm+lu09SaYr0Y3u3
-         854isThdKAiRY0co6WXgRwoET2sgKpjMVOGTNTKBO1Xh4qOVz9so/sC8g28zRH+Tju4h
-         ERkw==
-X-Gm-Message-State: AOJu0YxUrZnNIajuJOL1c4oAOV87W6HRts+lnV1xYVOmakDiIXctVeis
-	gX9TA+h1OAtiM/FfbGWjXN2wy+SATdDPGGPAtH/T3wBpw3uZJrrWF+Z8Dw82gcPUw347JT93v75
-	K9enZU3GDD3BYWRMUmbNo+sBKctN3+19+Fgisn0JD8zmRoUO4xPFPEw==
-X-Received: by 2002:a17:906:81d2:b0:a35:b7e6:e6f1 with SMTP id e18-20020a17090681d200b00a35b7e6e6f1mr4063798ejx.1.1707299823632;
-        Wed, 07 Feb 2024 01:57:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHSwAmWY9RJJ9TUjSBXFh9kgpiVX2NKugmz0T8d/UqurWryGKbM7hfHALn2pzP7Yq20/18XtQ==
-X-Received: by 2002:a17:906:81d2:b0:a35:b7e6:e6f1 with SMTP id e18-20020a17090681d200b00a35b7e6e6f1mr4063775ejx.1.1707299823283;
-        Wed, 07 Feb 2024 01:57:03 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWKPS/bKWSeOFffzQPpPbeysS2Op/4B+/Qoow7qwB8GhXD86cynZcog4BGMd4I60H8vixL+cC8niAaW1ySC94GbWKcNSflNMSQG04ekaxvBAnLyhTMdxLpWZsFDVSin1nkDSKZpCeuSOjq2U972amigDIJ3AU5jYq5tFJ4VN27SXgvqXq1uKew0P//+jLkGnTCq61+oi8x7iUedqBEcML+jdjxLHAW1WIjB81xIPxEbm6GGy8ppiJkl0Evy6HsOcE1Bokn17YCFVVkpooJ3aS9Y76b2NQbY4fNNUfSttEOuSE2dx255nykkBsrYZ660ZjnkZTPenXfIBV+PSDHyLVuBbwou1MaIy1VqXHZDM/TKFkL2/7wpGoXydWAUyrox2dGh8Q8hJeWeyQTfgb/wa6WHgqAlTXFhd8nvptkPOi2c4aVsVXAunpObTBNnd6JXIrajzohFvbU8H5PFEE0kenT2C3tTJs3JpqSy5O8eiMv/dVYx0+M/nrI0nb6DxSjl0pu+mVrsszw=
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id vw4-20020a170907a70400b00a3881262235sm337321ejc.78.2024.02.07.01.57.02
+        d=1e100.net; s=20230601; t=1707301178; x=1707905978;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=v/mDSaTwVDca440uano94ccpG3KV0z1ZaeCER3eTF2M=;
+        b=Yf3WOK0T6hVo3aJ19jLEuFYz5yfb9rF4xyxITzGRP5ZHldATtnwQryod3Tfrla3TBW
+         NVDnFHv9wl50eleNpPOFmO+g+x/jM7mqIXGsvT/aBPuSv5id7jXzFAFeIBunPcEszfpC
+         nkmTu75cTC7cauXjANwsAkhZzk6ySGlflmlK7M0oV6lZa8wE6pqwDfvgWAK7RFJ6tH2y
+         /OEbow4fwK7Bf7FdfuATgxCvY7oQ882Z6w3WUA+FP8fS1kR8u0zcVEO3sR6OW+ncciet
+         LbbnnO6YxPbNdfhs985NjShzM+IY3qSx9Y+DUZERuO3Lz/wgiymlWmpBQ3VrwD3kwUcM
+         IrQw==
+X-Forwarded-Encrypted: i=1; AJvYcCX/++TVF/9DpUeLUySlQ6Favs7tJFfhQrxhrS5IIIkOa94VyiXU58f6aXhiSEcNP1whXuGzscqqnczJF+evtUfnusN8LyjqLctyONAr
+X-Gm-Message-State: AOJu0YxgQqFPxgfOd36Xq5ZA2C6Hozoq/cey4a6bUNtJjpnCpwKGfDp9
+	J4NrgDZZUYibLvPSw5xnFRPOOGBQ382+EhJqfNThVwCCw+IaXv8b
+X-Google-Smtp-Source: AGHT+IEmQJ9h4uUXoIME2V0kheL9SvtImmgqO008Kw7Mg3Ui480zHM8A5NFQ+6wvX2NpRyrq9t4TcQ==
+X-Received: by 2002:a17:906:3559:b0:a37:b8fb:50e0 with SMTP id s25-20020a170906355900b00a37b8fb50e0mr811463eja.52.1707301177895;
+        Wed, 07 Feb 2024 02:19:37 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVmHb1aYXhImur8+C9WXLMMZaDDXYTUOYNRwbn5hXuvGjvpq8eeeSzpTl6iznnFqUGEAm2kUvi7DQrr3a5pPHaEIGMgBSktplmqoO8n1OHnE9pHS2Evi1znEBdCNjzrBGjtVrzRw0a5W9HFt2MuIq8sKzLyEeodkqibgcSxUMhtZGInzG4hvCM7OINE3vIEKCUdcgB0aJUbxtJYLnbIAVu4pFspZYgrhgjpwGg=
+Received: from localhost (fwdproxy-lla-000.fbsv.net. [2a03:2880:30ff::face:b00c])
+        by smtp.gmail.com with ESMTPSA id un9-20020a170907cb8900b00a36ed37683fsm575923ejc.215.2024.02.07.02.19.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 07 Feb 2024 01:57:02 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 1F71D108B18B; Wed,  7 Feb 2024 10:57:02 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Magnus Karlsson <magnus.karlsson@gmail.com>, magnus.karlsson@intel.com,
- bjorn@kernel.org, ast@kernel.org, daniel@iogearbox.net,
- netdev@vger.kernel.org, maciej.fijalkowski@intel.com, kuba@kernel.org,
- pabeni@redhat.com, davem@davemloft.net, j.vosburgh@gmail.com,
- andy@greyhouse.net, hawk@kernel.org, john.fastabend@gmail.com,
- edumazet@google.com, lorenzo@kernel.org
-Cc: bpf@vger.kernel.org, Prashant Batra <prbatra.mail@gmail.com>
-Subject: Re: [PATCH net v2] bonding: do not report NETDEV_XDP_ACT_XSK_ZEROCOPY
-In-Reply-To: <20240207084737.20890-1-magnus.karlsson@gmail.com>
-References: <20240207084737.20890-1-magnus.karlsson@gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 07 Feb 2024 10:57:02 +0100
-Message-ID: <87plx8vbpt.fsf@toke.dk>
+        Wed, 07 Feb 2024 02:19:37 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	horms@kernel.org,
+	andrew@lunn.ch
+Subject: [PATCH net v2 0/9] net: Fix MODULE_DESCRIPTION() for net (p5)
+Date: Wed,  7 Feb 2024 02:19:19 -0800
+Message-Id: <20240207101929.484681-1-leitao@debian.org>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Magnus Karlsson <magnus.karlsson@gmail.com> writes:
+There are hundreds of network modules that misses MODULE_DESCRIPTION(),
+causing a warning when compiling with W=1. Example:
 
-> From: Magnus Karlsson <magnus.karlsson@intel.com>
->
-> Do not report the XDP capability NETDEV_XDP_ACT_XSK_ZEROCOPY as the
-> bonding driver does not support XDP and AF_XDP in zero-copy mode even
-> if the real NIC drivers do.
->
-> Note that the driver used to report everything as supported before a
-> device was bonded. Instead of just masking out the zero-copy support
-> from this, have the driver report that no XDP feature is supported
-> until a real device is bonded. This seems to be more truthful as it is
-> the real drivers that decide what XDP features are supported.
->
-> Fixes: cb9e6e584d58 ("bonding: add xdp_features support")
-> Reported-by: Prashant Batra <prbatra.mail@gmail.com>
-> Link: https://lore.kernel.org/all/CAJ8uoz2ieZCopgqTvQ9ZY6xQgTbujmC6XkMTam=
-hp68O-h_-rLg@mail.gmail.com/T/
-> Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_cmp.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_nbyte.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_u32.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_meta.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_text.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_canid.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/ip_tunnel.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/ipip.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/ip_gre.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/udp_tunnel.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/ip_vti.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/ah4.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/esp4.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/xfrm4_tunnel.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/tunnel4.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/xfrm/xfrm_algo.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/xfrm/xfrm_user.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv6/ah6.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv6/esp6.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv6/xfrm6_tunnel.o
+	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv6/tunnel6.o
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+This part5 of the patchset focus on the missing net/ module, which
+are now warning free.
+
+Here are all the MODULE_DESCRIPTION added:
+
+ MODULE_DESCRIPTION("CAN Identifier comparison network helpers");
+ MODULE_DESCRIPTION("DSA loopback fixed PHY library");
+ MODULE_DESCRIPTION("IP-in-IPv6 tunnel driver");
+ MODULE_DESCRIPTION("IP/IP protocol decoder library");
+ MODULE_DESCRIPTION("IPv4 AH transformation library");
+ MODULE_DESCRIPTION("IPv4 ESP transformation library");
+ MODULE_DESCRIPTION("IPv4 GRE tunnels over IP library");
+ MODULE_DESCRIPTION("IPv4 tunnel implementation library");
+ MODULE_DESCRIPTION("IPv4 UDP tunnel driver");
+ MODULE_DESCRIPTION("IPv4 XFRM tunnel driver");
+ MODULE_DESCRIPTION("IPv4 XFRM tunnel library");
+ MODULE_DESCRIPTION("IPv6 AH transformation helpers");
+ MODULE_DESCRIPTION("IPv6 ESP transformation helpers");
+ MODULE_DESCRIPTION("IPv6-in-IPv4 tunnel SIT driver");
+ MODULE_DESCRIPTION("IPv6 Mobility driver");
+ MODULE_DESCRIPTION("IPv6 over Low-Power Wireless Personal Area Network core module");
+ MODULE_DESCRIPTION("IPv6 UDP tunnel driver");
+ MODULE_DESCRIPTION("IPv6 XFRM tunnel driver");
+ MODULE_DESCRIPTION("IP-VLAN based tap driver");
+ MODULE_DESCRIPTION("Metadata comparison network helpers");
+ MODULE_DESCRIPTION("Multi byte comparison network helpers");
+ MODULE_DESCRIPTION("Multi-Protocol Over ATM (MPOA) driver");
+ MODULE_DESCRIPTION("PF_KEY socket helpers");
+ MODULE_DESCRIPTION("Simple packet data comparison network helpers");
+ MODULE_DESCRIPTION("Textsearch comparison network helpers");
+ MODULE_DESCRIPTION("U32 Key comparison network helpers");
+ MODULE_DESCRIPTION("Virtual (secure) IP tunneling library");
+ MODULE_DESCRIPTION("XFRM Algorithm interface");
+ MODULE_DESCRIPTION("XFRM User interface");
+
+Changelog:
+
+v1:
+ * https://lore.kernel.org/all/20240205101400.1480521-1-leitao@debian.org/
+
+v2:
+ * Remove the patch for the ieee802154 , since the fix is already in
+   net-next. See discussion at:
+   https://lore.kernel.org/all/ZcDs%2FGFkZ881bJR7@gmail.com/#t
+
+Breno Leitao (10):
+  net: fill in MODULE_DESCRIPTION()s for xfrm
+  net: fill in MODULE_DESCRIPTION()s for mpoa
+  net: fill in MODULE_DESCRIPTION()s for af_key
+  net: fill in MODULE_DESCRIPTION()s for 6LoWPAN
+  net: fill in MODULE_DESCRIPTION()s for ipv6 modules
+  net: fill in MODULE_DESCRIPTION()s for ipv4 modules
+  net: fill in MODULE_DESCRIPTION()s for net/sched
+  net: fill in MODULE_DESCRIPTION()s for ieee802154
+  net: fill in MODULE_DESCRIPTION()s for ipvtap
+  net: fill in MODULE_DESCRIPTION()s for dsa_loop_bdinfo
+
+ drivers/net/dsa/dsa_loop_bdinfo.c | 1 +
+ drivers/net/ipvlan/ipvtap.c       | 1 +
+ net/6lowpan/core.c                | 1 +
+ net/atm/mpc.c                     | 1 +
+ net/ieee802154/6lowpan/core.c     | 1 +
+ net/ieee802154/socket.c           | 1 +
+ net/ipv4/ah4.c                    | 1 +
+ net/ipv4/esp4.c                   | 1 +
+ net/ipv4/ip_gre.c                 | 1 +
+ net/ipv4/ip_tunnel.c              | 1 +
+ net/ipv4/ip_vti.c                 | 1 +
+ net/ipv4/ipip.c                   | 1 +
+ net/ipv4/tunnel4.c                | 1 +
+ net/ipv4/udp_tunnel_core.c        | 1 +
+ net/ipv4/xfrm4_tunnel.c           | 1 +
+ net/ipv6/ah6.c                    | 1 +
+ net/ipv6/esp6.c                   | 1 +
+ net/ipv6/ip6_udp_tunnel.c         | 1 +
+ net/ipv6/mip6.c                   | 1 +
+ net/ipv6/sit.c                    | 1 +
+ net/ipv6/tunnel6.c                | 1 +
+ net/ipv6/xfrm6_tunnel.c           | 1 +
+ net/key/af_key.c                  | 1 +
+ net/sched/em_canid.c              | 1 +
+ net/sched/em_cmp.c                | 1 +
+ net/sched/em_meta.c               | 1 +
+ net/sched/em_nbyte.c              | 1 +
+ net/sched/em_text.c               | 1 +
+ net/sched/em_u32.c                | 1 +
+ net/xfrm/xfrm_algo.c              | 1 +
+ net/xfrm/xfrm_user.c              | 1 +
+ 31 files changed, 31 insertions(+)
+
+-- 
+2.39.3
+
+
+Breno Leitao (9):
+  net: fill in MODULE_DESCRIPTION()s for xfrm
+  net: fill in MODULE_DESCRIPTION()s for mpoa
+  net: fill in MODULE_DESCRIPTION()s for af_key
+  net: fill in MODULE_DESCRIPTION()s for 6LoWPAN
+  net: fill in MODULE_DESCRIPTION()s for ipv6 modules
+  net: fill in MODULE_DESCRIPTION()s for ipv4 modules
+  net: fill in MODULE_DESCRIPTION()s for net/sched
+  net: fill in MODULE_DESCRIPTION()s for ipvtap
+  net: fill in MODULE_DESCRIPTION()s for dsa_loop_bdinfo
+
+ drivers/net/dsa/dsa_loop_bdinfo.c | 1 +
+ drivers/net/ipvlan/ipvtap.c       | 1 +
+ net/6lowpan/core.c                | 1 +
+ net/atm/mpc.c                     | 1 +
+ net/ipv4/ah4.c                    | 1 +
+ net/ipv4/esp4.c                   | 1 +
+ net/ipv4/ip_gre.c                 | 1 +
+ net/ipv4/ip_tunnel.c              | 1 +
+ net/ipv4/ip_vti.c                 | 1 +
+ net/ipv4/ipip.c                   | 1 +
+ net/ipv4/tunnel4.c                | 1 +
+ net/ipv4/udp_tunnel_core.c        | 1 +
+ net/ipv4/xfrm4_tunnel.c           | 1 +
+ net/ipv6/ah6.c                    | 1 +
+ net/ipv6/esp6.c                   | 1 +
+ net/ipv6/ip6_udp_tunnel.c         | 1 +
+ net/ipv6/mip6.c                   | 1 +
+ net/ipv6/sit.c                    | 1 +
+ net/ipv6/tunnel6.c                | 1 +
+ net/ipv6/xfrm6_tunnel.c           | 1 +
+ net/key/af_key.c                  | 1 +
+ net/sched/em_canid.c              | 1 +
+ net/sched/em_cmp.c                | 1 +
+ net/sched/em_meta.c               | 1 +
+ net/sched/em_nbyte.c              | 1 +
+ net/sched/em_text.c               | 1 +
+ net/sched/em_u32.c                | 1 +
+ net/xfrm/xfrm_algo.c              | 1 +
+ net/xfrm/xfrm_user.c              | 1 +
+ 29 files changed, 29 insertions(+)
+
+-- 
+2.39.3
 
 
