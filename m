@@ -1,97 +1,117 @@
-Return-Path: <netdev+bounces-69920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0454584D0E0
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 19:12:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 58D6984D0E7
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 19:13:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A75CF1F229B9
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 18:12:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 080AF1F21876
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 18:13:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBF208564F;
-	Wed,  7 Feb 2024 18:04:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4F0682D73;
+	Wed,  7 Feb 2024 18:06:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZRmnYruK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lz2hSV7a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BDB682D88
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 18:04:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BDAC128816
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 18:06:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707329087; cv=none; b=uv2RsAfsB0aZvTb2bfZs2MVjBU3pVOYWBZc3dvZkp0aw5hPkc1A3C6GC3k/UCKrNaS40W+WAopaX8OsDkw4esL0yWK5LDQ4Wh0otannvS2kRTZTfN2H+PdkAUblVhRmnydDmNqf66PWLYymNTf22f2Qu+AA6u6hE+c2cW7WRnNg=
+	t=1707329193; cv=none; b=jh9PCtMqc0Z9Hp4o2emaQ+8ML7fOq3xRhqlT185mCB2JvTf7Wb4nunRIkUc3+GZfU/MUyRPiozUp9ASIY7gxrHpnL1i9TwrgYKXlxlItmn4tUfn06+YSBHVVynpi6jzfzBMwvZfEDbGu1mYkwHD4NO5CgqrIF9J23FUpuyi4W80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707329087; c=relaxed/simple;
-	bh=MxlJu+J6TLx8yj+iNOuTo7euy0CLu6uztwIQApSEcdw=;
+	s=arc-20240116; t=1707329193; c=relaxed/simple;
+	bh=FbPnNAGdA+Z4vkIjVqGfUek4LBzvBXvj6UQfxJdNe4k=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pIFAGZaG8GGH5haHkd2faJrpidD8A6zybNw+33yvacffsXTd9UXZV/ORPPsFX1/X9RAXmAI/RfqPU9CQs8e5JJrC+A5aI64apKb+lGZzUn7ZoXy2EfgW20m4qF5VsjUumfFih+ht8OggrtvGnD50cJZ73tT1uy6IR9qiFzwxmTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZRmnYruK; arc=none smtp.client-ip=209.85.208.43
+	 To:Cc:Content-Type; b=pcrOvDz/iPgf7litvit4j2EJhn4U14r19FdQgnI9nuKrrsKgjB9TSpyW3oTPGOkp9qUjecFNu5AumoZ4AMfNsr8ZYnWekkjVlFRZXeej+33F59pG4ydi6BfqzeU6+z/7z5c/MIXk48P4Nd3++XhPPecmGNMfulLt8LuU0Mqargc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lz2hSV7a; arc=none smtp.client-ip=209.85.219.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-560daf8e9eeso611a12.0
-        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 10:04:45 -0800 (PST)
+Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-dc7319a07a2so1057009276.2
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 10:06:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707329084; x=1707933884; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MxlJu+J6TLx8yj+iNOuTo7euy0CLu6uztwIQApSEcdw=;
-        b=ZRmnYruKBuH/13Moea6Bi7TOWWw2+RIYKHX83n+CP0a1BtX8LtX1H3++iDshWmCHmf
-         sOPywdnCcDKSKnESQho54iOEpihxGvtvJPUa8hI5UcCDVv1wETlrVCNSxeCdlMge1JqN
-         mP7H/PS9ChFRJDQ86N+YgZi+Ves3pAkpcfBl/s76A5eO444zUO6icpengm9MwHuwR7H3
-         iKdI3p7ymYKMLRC+urrcmiRUDEG6eed00PPr1FIEhxE5FgJsvAOLRl++eCy4JA0TiQy1
-         FLOenSnxUanj3+zSOtI/0GKPe34hqcdacWdl7t9V/twmO+TjypxPM1Wpt7HqC+aEV+L+
-         YSdQ==
+        d=google.com; s=20230601; t=1707329191; x=1707933991; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=FbPnNAGdA+Z4vkIjVqGfUek4LBzvBXvj6UQfxJdNe4k=;
+        b=lz2hSV7aH1YH9XsTdpNFeWTQl+l6HC9/gjk2lpVcY9+4+wnJkAn6G/6QXS5zYA/2I+
+         MSk57tMpMHQkDpCnte8zb/drmSw+5lDPXBd2m/NJx78Y13wZGP4Q2tjbFGlbttIbZV+5
+         qBKYuP4SOPgWk7uEEjzb96ZxZxHymSC0ZL94kWRbffhRodJN1MEKU4YTBN9kOR2oEi+X
+         b1Mp9WIcgk2zOgf7DQCfXCLUeXSIOCtMJ5Ga8O+x3PAPPzKKN510MQ27ENqcDAUnkAeW
+         RFeAK3mBhMXjEzsLmElwZxYKICfi6CIeRaFMX1sBeNuuhUm9sjPoU8Gq3AALZziK/7Mh
+         vcjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707329084; x=1707933884;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MxlJu+J6TLx8yj+iNOuTo7euy0CLu6uztwIQApSEcdw=;
-        b=ksiHfm6WO4bupQqa6lG1nV03jzpwncv9MrNNffySNt2XA3mYv6q/d1fwOjxmqa7IG8
-         XdS/59QTD/1g4zVGrkUNT3c9Sgwo9v2C5K/i/ZFNXb80efGTJAT7jS99Vc9MJPg9nMwm
-         uG16e1FhLIapT6aPoCYQaHLhgMHB6KVeO9Z7yE5ajYjf1Ur1TMvBrcZ/nzO2nlH9Qjx+
-         bd5i9+HQ/0MQqsJo46IJ8N2w0i1vq62MWWi/58OxORE2gxW3aMWGE2GN1l8QK8NdMMyn
-         NczltEKJ58RAMz9kmm3pkrOGnzwbLNQAqyFOQGx4mXOEvgdavW5DiyHVZBqCabB85SuR
-         bCBg==
-X-Gm-Message-State: AOJu0Yz/2vNHqS/FVUEjEmmqAZVeDBucxQiNRG92eVsbvMKaleO5Pmz0
-	FJYWRVlROCvIF7kWgrPWcV9xJXiYhc4UOUzxFjwD6KasMzJSBWwXCIlVP4I2uDuJLW7aPgHq6ty
-	jFoyTPG7BFhYeaRnuI5OiiqIfp+7jLnyEbv4k2BMmSF7/ZTMbYQ==
-X-Google-Smtp-Source: AGHT+IGI0Nj8OAAEvuNW0mz5/CZNiXvVPMS0pCsSld6e6qLsiP5wS+LBjIVJBP6jozn13Ag77CnMg0Dgf+o6GhL9CpA=
-X-Received: by 2002:a50:9fa7:0:b0:560:f419:71ea with SMTP id
- c36-20020a509fa7000000b00560f41971eamr51348edf.7.1707329084080; Wed, 07 Feb
- 2024 10:04:44 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707329191; x=1707933991;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FbPnNAGdA+Z4vkIjVqGfUek4LBzvBXvj6UQfxJdNe4k=;
+        b=mSLS3RW/gq7zce1QhrxSeI0ZIQL4BicxzO8E4TLQVgLhPBDL5g0Q654Y18t0PnFe7U
+         41hXXWHcwV+JT9BDW6aQEkbB7Pi1Av4zTf/JwcYvhvwVWNjZhCRbYRqU3JKTCfa/ka/T
+         wqFZlMRBYHUNy3qg8AphFSiTfiZpLYLcKc4R6ueeQixmClNR4TYAFSy69CHhvlur53JY
+         tesKXTm8oidFBejScFdwTEPAfuMEthFn8k7RF+sdLMwFbCUeq2BI5G01cIjdFBXxyAvw
+         I2NRWTbFtg4oa3GDLPeutjSYQzNuin2eZLk/0+WCsKdO5WlFDdziTP41s5HU1Wb0Mo6K
+         NJbQ==
+X-Gm-Message-State: AOJu0YzXeJBrGV2fmcxkBJK0huKcEhSFFfMeAG7e3wpo26qPRSAOOac7
+	cWay5DTYmbvt0bqGhUVVDdG+oixB4lHbQmxd7V68WOq3xnqBS5/3t0UgDiCsOqu7vpz43iP7aEC
+	Qtw80oe+GAhCOuWgGKloa3he2TjvE93LJZyPykwKlcP3gv/Iyumcv
+X-Google-Smtp-Source: AGHT+IHiHfdXSidG+UIo+maPrsvLOXJqVcz2vALelw+WT2KPbSH1zbreoW7LTGliN0/tbJJTyJ1mg6NwB8XOFhC8Kl8=
+X-Received: by 2002:a5b:609:0:b0:dc2:1d13:2f4c with SMTP id
+ d9-20020a5b0609000000b00dc21d132f4cmr1820152ybq.46.1707329190680; Wed, 07 Feb
+ 2024 10:06:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <38d3ca7f909736c1aef56e6244d67c82a9bba6ff.1707326987.git.pabeni@redhat.com>
-In-Reply-To: <38d3ca7f909736c1aef56e6244d67c82a9bba6ff.1707326987.git.pabeni@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 7 Feb 2024 19:04:28 +0100
-Message-ID: <CANn89iLi7J0Hi28k9O6S3RnTt-opj2pNV6cEw3oyWUV_CiRPZQ@mail.gmail.com>
-Subject: Re: [PATCH net] selftests: net: add more missing kernel config
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org
+References: <e2871686-ea25-4cdb-b29d-ddeb33338a21@kernel.org>
+In-Reply-To: <e2871686-ea25-4cdb-b29d-ddeb33338a21@kernel.org>
+From: Marco Elver <elver@google.com>
+Date: Wed, 7 Feb 2024 19:05:31 +0100
+Message-ID: <CANpmjNP==CANQi4_qFV_VVFDMsj1wHROxt3RKzwJBqo8_McCTg@mail.gmail.com>
+Subject: Re: KFENCE: included in x86 defconfig?
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: Alexander Potapenko <glider@google.com>, Dmitry Vyukov <dvyukov@google.com>, kasan-dev@googlegroups.com, 
+	Netdev <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>, 
+	linux-hardening@vger.kernel.org, Kees Cook <keescook@chromium.org>, 
+	"the arch/x86 maintainers" <x86@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 7, 2024 at 6:31=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> The reuseport_addr_any.sh is currently skipping DCCP tests and
-> pmtu.sh is skipping all the FOU/GUE related cases: add the missing
-> options.
->
-> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> ---
+[Cc'ing a bunch more people to get input]
 
-SGTM thanks.
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Hi Matt,
+
+On Wed, 7 Feb 2024 at 17:16, Matthieu Baerts <matttbe@kernel.org> wrote:
+[...]
+> When talking to Jakub about the kernel config used by the new CI for the
+> net tree [1], Jakub suggested [2] to check if KFENCE could not be
+> enabled by default for x86 architecture.
+>
+> As KFENCE maintainers, what do you think about that? Do you see some
+> blocking points? Do you plan to add it in x86_64_defconfig?
+
+We have no concrete plans to add it to x86 defconfig. I don't think
+there'd be anything wrong with that from a technical point of view,
+but I think defconfig should remain relatively minimal.
+
+I guess different groups of people will disagree here: as kernel
+maintainers, it'd be a good thing because we get more coverage and
+higher probability of catching memory-safety bugs; as a user, I think
+having defconfig enable KFENCE seems unintuitive.
+
+I think this would belong into some "hardening" config - while KFENCE
+is not a mitigation (due to sampling) it has the performance
+characteristics of unintrusive hardening techniques, so I think it
+would be a good fit. I think that'd be
+"kernel/configs/hardening.config".
+
+Preferences?
+
+Thanks,
+-- Marco
 
