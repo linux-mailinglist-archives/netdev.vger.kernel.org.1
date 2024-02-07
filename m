@@ -1,135 +1,263 @@
-Return-Path: <netdev+bounces-69674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC21784C220
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 02:47:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EC3B84C235
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 03:03:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A426128F8BE
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 01:47:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E6C41F278A0
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 02:03:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29C4DD271;
-	Wed,  7 Feb 2024 01:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B90A6D27D;
+	Wed,  7 Feb 2024 02:02:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WG0Fl5r/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BJaBcWne"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B27310962
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 01:45:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 935C81CD1E
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 02:02:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707270357; cv=none; b=mlM/wZon9hqhWASbwz1P09zaGr1Wa7OkOcji5HtrE7Nvdfnfr00FMvG/N1rDcozCRpcmScxUROCOMWxz2PkFQwnRGsOOiESrrFhSysIPJCr6O8+qv/IDfPQjKZVdT8OFs9QLDl48/9VBn/15P35eja4WAh1U8lOq7fP0HDzgoPw=
+	t=1707271346; cv=none; b=KvFN1aceByJCUh46tQ9igMtD99WSJW3fonBpe6Tej6Xr99JxADotlzHbRbjPNm+K0tHTPwWf7oKgrlUHcDqh3ujlmXs6IHxDREwUOJo9qcBK7QIvNulI6sUS+tEIrQC9pg+VMvapmskFnAEjBt6F683i+NsdQsE+cUtvODwWCxY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707270357; c=relaxed/simple;
-	bh=r8YA/ZTwPxYai29i39djvq0vr1ID4/+uV/LK4EMs1hA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=APiu6vmXMs2NiU0jlL0FXknUL5t71IB79IhPG+KgZlJRBEmVh8Wad43bb7PKRighKMpjomoVtuTVACPxDDfbzbsVkSxxoZrXvK4nTqEF1j2d0jV2+mdZF5dYo4V9IGItKkU+prVqEQzKN6Jh1HyRx5mCeSTJybIj5fwSxWqMGlc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WG0Fl5r/; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-296dc0cab6aso111997a91.1
-        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 17:45:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707270355; x=1707875155; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=WxfKM3s1RoskVoSnXHHH6seSwo8V6zmijFmN9/TtGFM=;
-        b=WG0Fl5r/3563QTMjJluW3CnmZWvlRuj7bzKZOLz7QnWvHwkJ7R51/+nBIl1PQGRO7f
-         3TWKXhuXTuzgD1d5GaE+XIP1aL6/Oh/5GNm0siuj7Or7PSxWmbbTt2cwfS6vFXtdKRtI
-         KtKvE7i8Xxs2KA407xsVKfRAt0OADw1XwzZZXoNhfqD4X8o4E//jJxkijs/llI9CKuaU
-         akF+crQucIskh/obVCdVYbD+rPGIrjn6FLOFGZMxl6F1nor7GWi7eMKHovkcbqPouTEk
-         yQAZmjt0msDVoohfnCr6xF3rWFimWA5OKqK+d8r1s5w/1Z8AbiQeijfv2uXW3SDNxYxw
-         LNoQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707270355; x=1707875155;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WxfKM3s1RoskVoSnXHHH6seSwo8V6zmijFmN9/TtGFM=;
-        b=cbn2nnnPGGrV7mHdx4elSjBtBrqQdDwPjjsYqbuGe4G8db2CGGV2OnMj+/tG9+t32j
-         pjKp9cugXXzw3MEqn0V2HmEoDGKsMF+aHVhf/sN444ZNHBjrntcQdUecn7OeM+JTii8F
-         I7klM+sEIP8Mapgzgp/K6RQ0VV4yGw0tEjXcNouBcW+4XUcGv7I4cykA+rSWZAdVf+PV
-         G4BvKMrZWiCU4NnM4xJiFLp659t9xjMtraQoZzf7FBGtf2BytTBJ2q2+e1zhjDxZh+ky
-         YcLeYKlLz3qJji1lkPKdVFBf+TlPCvXj8QRpCUeVg5DwWzkHPh78RcKqJrT7AXh/uTUf
-         xtYw==
-X-Gm-Message-State: AOJu0YxiO7vMkGXTfv+7mZ6sMrJdnA1WIxeOUtA6E00hBf1pso5NKNS7
-	+Nqe5atZzUucZ/eA9WoFA2VhwaTxraIohcyQv4xnZ75wflu/tMyL
-X-Google-Smtp-Source: AGHT+IGeT0yIwxg/VJvfr1kSAeL058PorKIHl86cQpQSA4LlYffpd7gt+26ZMWDMkasTfP1vOD00vQ==
-X-Received: by 2002:a17:90a:d243:b0:295:cf1a:fd65 with SMTP id o3-20020a17090ad24300b00295cf1afd65mr1639151pjw.22.1707270354744;
-        Tue, 06 Feb 2024 17:45:54 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVnzjb20AvqERsYOn2XNi2Lb1MTMSolNKEEzno+CnQt5nR5eCMYfzo891UB5ybPGn/UbwIZ++IcKRwfQkjLmpaXf1te0NgHmihnUv4BYRn8dhz5tJCTJ2m+gWq4CVt9w97QZ+ZjbdC+UY/sALj9vf7PwG99b4b31qQ2XCZbyxKsO1C05kaaQ5EWASV7h6+5V0YrcdHPLdw89YLugMWuX9lmbQnGnbdvpbBBs5KIvPk6ERhmquomb+VFqTNRlpmzED2aTg==
-Received: from Laptop-X1 ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id q22-20020a17090a065600b00296d2483d10sm246838pje.47.2024.02.06.17.45.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 06 Feb 2024 17:45:53 -0800 (PST)
-Date: Wed, 7 Feb 2024 09:45:49 +0800
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, Jay Vosburgh <j.vosburgh@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>, Liang Li <liali@redhat.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [PATCH net] selftests: bonding: fix macvlan2's namespace name
-Message-ID: <ZcLgzYeGeuSZcXOC@Laptop-X1>
-References: <20240204083828.1511334-1-liuhangbin@gmail.com>
- <20240206153515.GE1104779@kernel.org>
+	s=arc-20240116; t=1707271346; c=relaxed/simple;
+	bh=DLNmxqloaietIfYE4YK4JsqY8uWh/VNRcpHAtKRd7NE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=r+TxzNv5W70uiOoP4X8+2gyUOH4PgJVpdzuGKQfguKkld8Yq5ou+QN4REf+sO/oqrlZSnDOKQHoyGV8RO7kbFeqdO2SUIbV6mEJAolsT29y4VLD1qwVQ+FwJHKBmPvj40NLnmYLgUn7H4u9NNr8xwyqNhc7rIS+OiFi0buWsupQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BJaBcWne; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707271344; x=1738807344;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=DLNmxqloaietIfYE4YK4JsqY8uWh/VNRcpHAtKRd7NE=;
+  b=BJaBcWnent/fE2ucDKwPs7cR7Axov7gMjYl7Mb8eZMft/5kaWPiLEaWt
+   VPSAcaZfUkACM5VCf9W/GTxh7PFdECvjpehkHjmrHWaeZ79KmtiJyKrnK
+   ksA7WOqeGnGdfNap6hsmKtoQjbJAVvxGkx6tntIvQ+6dbgLqsAr9wbdQB
+   ee6bGjrwDYDRmablxgyCveBaN8BKG3/ClpOk6u5RcrSLkfMjNMmzsZZIS
+   KpB8YizlRnsHb0EvyGFAMo/INIDCB1hH/70VvmQwEb6PdiMuUosBo/p8Y
+   K8lOWDsRdKJogOqmFjaBh3OwRThc3mfcWicMbHqvicXNZ9Mxy4o93nBDZ
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10976"; a="1037074"
+X-IronPort-AV: E=Sophos;i="6.05,248,1701158400"; 
+   d="scan'208";a="1037074"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2024 18:02:23 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,248,1701158400"; 
+   d="scan'208";a="1416213"
+Received: from wp3.sh.intel.com ([10.240.108.102])
+  by fmviesa008.fm.intel.com with ESMTP; 06 Feb 2024 18:02:20 -0800
+From: Steven Zou <steven.zou@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	aleksander.lobakin@intel.com,
+	maciej.fijalkowski@intel.com,
+	mschmidt@redhat.com,
+	jiri@resnulli.us,
+	daniel.machon@microchip.com,
+	jesse.brandeburg@intel.com,
+	david.m.ertman@intel.com,
+	przemyslaw.kitszel@intel.com,
+	andriy.shevchenko@linux.intel.com,
+	andrii.staikov@intel.com,
+	jan.sokolowski@intel.com,
+	horms@kernel.org,
+	steven.zou@intel.com
+Subject: [PATCH iwl-net] ice: Refactor FW data type and fix bitmap casting issue
+Date: Wed,  7 Feb 2024 09:49:59 +0800
+Message-Id: <20240207014959.24012-1-steven.zou@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240206153515.GE1104779@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 06, 2024 at 03:35:15PM +0000, Simon Horman wrote:
-> On Sun, Feb 04, 2024 at 04:38:28PM +0800, Hangbin Liu wrote:
-> > The m2's ns name should be m2-xxxxxx, not m1.
-> > 
-> > Fixes: 246af950b940 ("selftests: bonding: add macvlan over bond testing")
-> > Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
-> 
-> Hi Hangbin Liu,
-> 
-> I agree this is a nice change.
-> But it is not clear to me that this is fixing a bug.
+According to the datasheet, the recipe association data is an 8-byte
+little-endian value. It is described as 'Bitmap of the recipe indexes
+associated with this profile', it is from 24 to 31 byte area in FW.
+Therefore, it is defined to '__le64 recipe_assoc' in struct
+ice_aqc_recipe_to_profile. And then fix the bitmap casting issue, as we
+must never ever use castings for bitmap type.
 
-Ah, you are right. I also just realise that the previous code also
-works as we use mktemp, so the m1 and m2's name are unique, although
-the m2's name using m1 as prefix.
+Fixes: 1e0f9881ef79 ("ice: Flesh out implementation of support for SRIOV on bonded interface")
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Andrii Staikov <andrii.staikov@intel.com>
+Reviewed-by: Jan Sokolowski <jan.sokolowski@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Steven Zou <steven.zou@intel.com>
+---
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  3 ++-
+ drivers/net/ethernet/intel/ice/ice_lag.c      |  4 ++--
+ drivers/net/ethernet/intel/ice/ice_switch.c   | 24 +++++++++++--------
+ drivers/net/ethernet/intel/ice/ice_switch.h   |  4 ++--
+ 4 files changed, 20 insertions(+), 15 deletions(-)
 
-Please feel free to drop this patch. I can do the name modification in future
-when updating the bond_macvlan test.
+diff --git a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+index 8040317c9561..1f3e7a6903e5 100644
+--- a/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
++++ b/drivers/net/ethernet/intel/ice/ice_adminq_cmd.h
+@@ -593,8 +593,9 @@ struct ice_aqc_recipe_data_elem {
+ struct ice_aqc_recipe_to_profile {
+ 	__le16 profile_id;
+ 	u8 rsvd[6];
+-	DECLARE_BITMAP(recipe_assoc, ICE_MAX_NUM_RECIPES);
++	__le64 recipe_assoc;
+ };
++static_assert(sizeof(struct ice_aqc_recipe_to_profile) == 16);
+ 
+ /* Add/Update/Remove/Get switch rules (indirect 0x02A0, 0x02A1, 0x02A2, 0x02A3)
+  */
+diff --git a/drivers/net/ethernet/intel/ice/ice_lag.c b/drivers/net/ethernet/intel/ice/ice_lag.c
+index 467372d541d2..a7a342809935 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lag.c
++++ b/drivers/net/ethernet/intel/ice/ice_lag.c
+@@ -2041,7 +2041,7 @@ int ice_init_lag(struct ice_pf *pf)
+ 	/* associate recipes to profiles */
+ 	for (n = 0; n < ICE_PROFID_IPV6_GTPU_IPV6_TCP_INNER; n++) {
+ 		err = ice_aq_get_recipe_to_profile(&pf->hw, n,
+-						   (u8 *)&recipe_bits, NULL);
++						   &recipe_bits, NULL);
+ 		if (err)
+ 			continue;
+ 
+@@ -2049,7 +2049,7 @@ int ice_init_lag(struct ice_pf *pf)
+ 			recipe_bits |= BIT(lag->pf_recipe) |
+ 				       BIT(lag->lport_recipe);
+ 			ice_aq_map_recipe_to_profile(&pf->hw, n,
+-						     (u8 *)&recipe_bits, NULL);
++						     recipe_bits, NULL);
+ 		}
+ 	}
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
+index f84bab80ca42..ba0ef91e4c19 100644
+--- a/drivers/net/ethernet/intel/ice/ice_switch.c
++++ b/drivers/net/ethernet/intel/ice/ice_switch.c
+@@ -2025,12 +2025,12 @@ ice_update_recipe_lkup_idx(struct ice_hw *hw,
+  * ice_aq_map_recipe_to_profile - Map recipe to packet profile
+  * @hw: pointer to the HW struct
+  * @profile_id: package profile ID to associate the recipe with
+- * @r_bitmap: Recipe bitmap filled in and need to be returned as response
++ * @r_assoc: Recipe bitmap filled in and need to be returned as response
+  * @cd: pointer to command details structure or NULL
+  * Recipe to profile association (0x0291)
+  */
+ int
+-ice_aq_map_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u8 *r_bitmap,
++ice_aq_map_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u64 r_assoc,
+ 			     struct ice_sq_cd *cd)
+ {
+ 	struct ice_aqc_recipe_to_profile *cmd;
+@@ -2042,7 +2042,7 @@ ice_aq_map_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u8 *r_bitmap,
+ 	/* Set the recipe ID bit in the bitmask to let the device know which
+ 	 * profile we are associating the recipe to
+ 	 */
+-	memcpy(cmd->recipe_assoc, r_bitmap, sizeof(cmd->recipe_assoc));
++	cmd->recipe_assoc = cpu_to_le64(r_assoc);
+ 
+ 	return ice_aq_send_cmd(hw, &desc, NULL, 0, cd);
+ }
+@@ -2051,12 +2051,12 @@ ice_aq_map_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u8 *r_bitmap,
+  * ice_aq_get_recipe_to_profile - Map recipe to packet profile
+  * @hw: pointer to the HW struct
+  * @profile_id: package profile ID to associate the recipe with
+- * @r_bitmap: Recipe bitmap filled in and need to be returned as response
++ * @r_assoc: Recipe bitmap filled in and need to be returned as response
+  * @cd: pointer to command details structure or NULL
+  * Associate profile ID with given recipe (0x0293)
+  */
+ int
+-ice_aq_get_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u8 *r_bitmap,
++ice_aq_get_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u64 *r_assoc,
+ 			     struct ice_sq_cd *cd)
+ {
+ 	struct ice_aqc_recipe_to_profile *cmd;
+@@ -2069,7 +2069,7 @@ ice_aq_get_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u8 *r_bitmap,
+ 
+ 	status = ice_aq_send_cmd(hw, &desc, NULL, 0, cd);
+ 	if (!status)
+-		memcpy(r_bitmap, cmd->recipe_assoc, sizeof(cmd->recipe_assoc));
++		*r_assoc = le64_to_cpu(cmd->recipe_assoc);
+ 
+ 	return status;
+ }
+@@ -2108,6 +2108,7 @@ int ice_alloc_recipe(struct ice_hw *hw, u16 *rid)
+ static void ice_get_recp_to_prof_map(struct ice_hw *hw)
+ {
+ 	DECLARE_BITMAP(r_bitmap, ICE_MAX_NUM_RECIPES);
++	u64 recp_assoc;
+ 	u16 i;
+ 
+ 	for (i = 0; i < hw->switch_info->max_used_prof_index + 1; i++) {
+@@ -2115,8 +2116,9 @@ static void ice_get_recp_to_prof_map(struct ice_hw *hw)
+ 
+ 		bitmap_zero(profile_to_recipe[i], ICE_MAX_NUM_RECIPES);
+ 		bitmap_zero(r_bitmap, ICE_MAX_NUM_RECIPES);
+-		if (ice_aq_get_recipe_to_profile(hw, i, (u8 *)r_bitmap, NULL))
++		if (ice_aq_get_recipe_to_profile(hw, i, &recp_assoc, NULL))
+ 			continue;
++		bitmap_from_arr64(r_bitmap, &recp_assoc, ICE_MAX_NUM_RECIPES);
+ 		bitmap_copy(profile_to_recipe[i], r_bitmap,
+ 			    ICE_MAX_NUM_RECIPES);
+ 		for_each_set_bit(j, r_bitmap, ICE_MAX_NUM_RECIPES)
+@@ -5390,22 +5392,24 @@ ice_add_adv_recipe(struct ice_hw *hw, struct ice_adv_lkup_elem *lkups,
+ 	 */
+ 	list_for_each_entry(fvit, &rm->fv_list, list_entry) {
+ 		DECLARE_BITMAP(r_bitmap, ICE_MAX_NUM_RECIPES);
++		u64 recp_assoc;
+ 		u16 j;
+ 
+ 		status = ice_aq_get_recipe_to_profile(hw, fvit->profile_id,
+-						      (u8 *)r_bitmap, NULL);
++						      &recp_assoc, NULL);
+ 		if (status)
+ 			goto err_unroll;
+ 
++		bitmap_from_arr64(r_bitmap, &recp_assoc, ICE_MAX_NUM_RECIPES);
+ 		bitmap_or(r_bitmap, r_bitmap, rm->r_bitmap,
+ 			  ICE_MAX_NUM_RECIPES);
+ 		status = ice_acquire_change_lock(hw, ICE_RES_WRITE);
+ 		if (status)
+ 			goto err_unroll;
+ 
++		bitmap_to_arr64(&recp_assoc, r_bitmap, ICE_MAX_NUM_RECIPES);
+ 		status = ice_aq_map_recipe_to_profile(hw, fvit->profile_id,
+-						      (u8 *)r_bitmap,
+-						      NULL);
++						      recp_assoc, NULL);
+ 		ice_release_change_lock(hw);
+ 
+ 		if (status)
+diff --git a/drivers/net/ethernet/intel/ice/ice_switch.h b/drivers/net/ethernet/intel/ice/ice_switch.h
+index db7e501b7e0a..89ffa1b51b5a 100644
+--- a/drivers/net/ethernet/intel/ice/ice_switch.h
++++ b/drivers/net/ethernet/intel/ice/ice_switch.h
+@@ -424,10 +424,10 @@ int ice_aq_add_recipe(struct ice_hw *hw,
+ 		      struct ice_aqc_recipe_data_elem *s_recipe_list,
+ 		      u16 num_recipes, struct ice_sq_cd *cd);
+ int
+-ice_aq_get_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u8 *r_bitmap,
++ice_aq_get_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u64 *r_assoc,
+ 			     struct ice_sq_cd *cd);
+ int
+-ice_aq_map_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u8 *r_bitmap,
++ice_aq_map_recipe_to_profile(struct ice_hw *hw, u32 profile_id, u64 r_assoc,
+ 			     struct ice_sq_cd *cd);
+ 
+ #endif /* _ICE_SWITCH_H_ */
 
-Thanks
-Hangbin
+base-commit: f6d4e45c3a386dd7deeb1500e51ce8a6140b02f1
+-- 
+2.31.1
 
-> 
-> > ---
-> >  tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh b/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
-> > index dc99e4ac262e..969bf9af1b94 100755
-> > --- a/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
-> > +++ b/tools/testing/selftests/drivers/net/bonding/bond_macvlan.sh
-> > @@ -7,7 +7,7 @@ lib_dir=$(dirname "$0")
-> >  source ${lib_dir}/bond_topo_2d1c.sh
-> >  
-> >  m1_ns="m1-$(mktemp -u XXXXXX)"
-> > -m2_ns="m1-$(mktemp -u XXXXXX)"
-> > +m2_ns="m2-$(mktemp -u XXXXXX)"
-> >  m1_ip4="192.0.2.11"
-> >  m1_ip6="2001:db8::11"
-> >  m2_ip4="192.0.2.12"
-> > -- 
-> > 2.43.0
-> > 
-> > 
 
