@@ -1,285 +1,186 @@
-Return-Path: <netdev+bounces-69695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2A2584C2F8
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 04:17:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A76F84C313
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 04:27:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3CC711F26966
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 03:17:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4208028D409
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 03:27:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070F1F515;
-	Wed,  7 Feb 2024 03:17:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7EF2F9EF;
+	Wed,  7 Feb 2024 03:27:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k9AW5i/K"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cB47q0Lw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1895D1CAB3;
-	Wed,  7 Feb 2024 03:17:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1652134A5
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 03:27:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707275859; cv=none; b=L8NGb49feKz/1IK9dv8vq4GNErdHZKff7owqib4fWe3cPoBL3rf+3wQpDoX5CBsrqubElSnhWONf8w21VFgbHpCVrw4Hz085l6KNMoYLyrDkjMaqtlD6n8smRGbZqy+tEPmZDeXMbpnO7m9oa58lG6Dyc2tI1uq1swRKtAVOkO4=
+	t=1707276451; cv=none; b=dgFQWm7RqxttXTtvALDtOQFv2o6abuaRvZr0exysps3pvkVerx8tlFfVH8VfdrUXq8xMcrJ6VtrjWZHs6ER6cXMRw4aY2L85Wr5IYgMxTTPyYzWfiGXp2txPd0uZdN/BD2NV0lk2EtKEnAi7Ki8SgqVyWeFU7r4aHKBZuk2RCsY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707275859; c=relaxed/simple;
-	bh=UM1c6ee1czq19GX2kBBAW2nsfxfKEYoOdX0v8dDrmiQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DBejCqHRvKykHgFGojiN/4wJEq8xHrmRJKUCgxAaRrnJlSqYyE63LWMFhZXJsL6H8UfdqqFkEUMd71ObQtcQrQIwHAfj+8xsvPKY9zPWbaSaJZg4rekWh9/eDGdznw+o8NfuuLYlSl+UexNvl8KDAzXZcD00DGjofBnmpGKbDfI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k9AW5i/K; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707275859; x=1738811859;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=UM1c6ee1czq19GX2kBBAW2nsfxfKEYoOdX0v8dDrmiQ=;
-  b=k9AW5i/KUKkDH9heFfP/0sTbeZWCNIW3/8usaMV2PHHO/vTTehSM4uRu
-   i/sJ56UlQ0SWYeOPsxUroH/wbmWs3KsYIDr58iCuIlcQ8MXPlCiNVOVFS
-   kDb/OV6JjOi6eB35NLTbfGTBJEc/6zNfHrnW2mQ/eZoT2nrhRyUFbu8XX
-   /6pKIBacspw7hrIGSZgklEENIlFpvEykTsykx+2W03zF8Bn+hDcnGeGNN
-   3nQ8kNcARUv3AcHZ+/C0k+zt4NbN+qiDeF2RCD5jcRY04J9zycT+d1VhA
-   th1wxIYGqBBfy2virAW9UknT3pXqcjcizkKOiRqLp16D+TwnKVBTmHG9M
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10976"; a="12256403"
-X-IronPort-AV: E=Sophos;i="6.05,250,1701158400"; 
-   d="scan'208";a="12256403"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2024 19:17:38 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,250,1701158400"; 
-   d="scan'208";a="1565836"
-Received: from ranerica-svr.sc.intel.com ([172.25.110.23])
-  by orviesa008.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2024 19:17:37 -0800
-Date: Tue, 6 Feb 2024 19:18:54 -0800
-From: Ricardo Neri <ricardo.neri-calderon@linux.intel.com>
-To: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
-Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org,
-	Zhuocheng Ding <zhuocheng.ding@intel.com>,
-	Zhao Liu <zhao1.liu@intel.com>, zhenyu.z.wang@intel.com
-Subject: Re: [PATCH v2 3/3] thermal: intel: hfi: Enable interface only when
- required
-Message-ID: <20240207031854.GC19695@ranerica-svr.sc.intel.com>
-References: <20240206133605.1518373-1-stanislaw.gruszka@linux.intel.com>
- <20240206133605.1518373-4-stanislaw.gruszka@linux.intel.com>
+	s=arc-20240116; t=1707276451; c=relaxed/simple;
+	bh=qsE//gaQh/ELevMsklLn/ApppxOTlK4xCHYMHM46s2I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RocVhktUCUJChC7YA0r9ZUEFoigX+CX6qGQ2XlLNwmF4gWs0ed2WBBfFjYcCiZzbq1AvPQzLXbubiynN64x7m66PHHIUk8zleNG0G83KeIUv3lP6d6krKnTJaoE4wta/obwCu9EPmsFPGH6vAGphK9Nw8BMxJXmod9cy8rYjPoE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cB47q0Lw; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707276448;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ECyPdLbuQ8n+CIX5LY9BuiN4WFH5pGMhm7CI6F18Oro=;
+	b=cB47q0LwVLp0f+1wvJ6ZyQGxoTr7qMwDQsOH6MFAk54gI5YSBUpxjFyfStZodn4WtM4T8N
+	fhaC4CWzRqaLpUPo/US3azQuy8nYoZ/ERChsznwpHpy3IbVwtmndZcMhAiQwiaM+wEl6CO
+	JueMgUKzxmpT57HnciBkAX+DAAifkik=
+Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com
+ [209.85.210.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-589-IZ2yXtQcPPaM3-jkyDsfxQ-1; Tue, 06 Feb 2024 22:27:27 -0500
+X-MC-Unique: IZ2yXtQcPPaM3-jkyDsfxQ-1
+Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-6e04ef89a15so178761b3a.1
+        for <netdev@vger.kernel.org>; Tue, 06 Feb 2024 19:27:27 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707276446; x=1707881246;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ECyPdLbuQ8n+CIX5LY9BuiN4WFH5pGMhm7CI6F18Oro=;
+        b=r4T/qqeNqlXfKvNKeQXM4vHvyib3SxRsotk6H5UKxgSl5f6jI6WGhINLeEYp47qLVl
+         IhYVTD56n9YfVptvNBVArGlAtwiG/gFLcXJwm3JE/14oBxsY0uwVb28Xf0tBudckE9xY
+         0PkNIMTTTet1n/DKO4KU3J8Fqdg6kZex+s/yExHPRth1dz001s1jV0I5DBIy4TOeLvBz
+         MqT3I0cq6/7jMW6nMocgKU4gbzLutuyi45LJqa0OhqOyp9RFE98FOXWY4K2zh+YFdDo4
+         gEVLUNkJqwDR39F5TBGKIvBJsSosxijU4qT/Km+AamVt2aL+kOwEY0LlcLB9p7ckt5fq
+         FN/g==
+X-Gm-Message-State: AOJu0YzITCDJ5mM5GnHNnQWZtaiVCLLZEZQ0LYhyR6rRgFlshS0gduv/
+	R4OmrTsf0WceHBdSxE0U1up/DnbMb14mH2+CwQDaCIL4zqDwgwQAJUZZ5OJWk1LnaYW0eRTZ/3V
+	tigTVMdoYKHUveTmA6M7+LAiM1c044S8+8e280VXmtkpuBibMK2/XQSgo4WdAIUO7D+KfEkHOgz
+	pWpnFRhmCSnC/ob76x4GJABWOnnueh
+X-Received: by 2002:aa7:84c6:0:b0:6dd:84ce:4602 with SMTP id x6-20020aa784c6000000b006dd84ce4602mr1445735pfn.6.1707276446477;
+        Tue, 06 Feb 2024 19:27:26 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEOduHPoLP4mCVG39rBl1Z8IToYghCDdc8bbnZRY4nXuhv/6H/c+FYVQ3yUyKyTYydLTVyAuvDaqusFQbjMZgQ=
+X-Received: by 2002:aa7:84c6:0:b0:6dd:84ce:4602 with SMTP id
+ x6-20020aa784c6000000b006dd84ce4602mr1445717pfn.6.1707276446144; Tue, 06 Feb
+ 2024 19:27:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240206133605.1518373-4-stanislaw.gruszka@linux.intel.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+References: <20240206145154.118044-1-sgarzare@redhat.com>
+In-Reply-To: <20240206145154.118044-1-sgarzare@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 7 Feb 2024 11:27:14 +0800
+Message-ID: <CACGkMEs-FAz7Xv7j6k3grq97q9qO18Em2bLDS4qBaCDZS7+gbQ@mail.gmail.com>
+Subject: Re: [PATCH] vhost-vdpa: fail enabling virtqueue in certain conditions
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: virtualization@lists.linux.dev, Shannon Nelson <shannon.nelson@amd.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, kvm@vger.kernel.org, Kevin Wolf <kwolf@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Zhu Lingshan <lingshan.zhu@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 06, 2024 at 02:36:05PM +0100, Stanislaw Gruszka wrote:
-> Enable and disable hardware feedback interface (HFI) when user space
-> handler is present. For example, enable HFI, when intel-speed-select or
-> Intel Low Power daemon is running and subscribing to thermal netlink
-> events. When user space handlers exit or remove subscription for
-> thermal netlink events, disable HFI.
-> 
-> Summary of changes:
-> 
-> - Register a thermal genetlink notifier
-> 
-> - In the notifier, process THERMAL_NOTIFY_BIND and THERMAL_NOTIFY_UNBIND
-> reason codes to count number of thermal event group netlink multicast
-> clients. If thermal netlink group has any listener enable HFI on all
-> packages. If there are no listener disable HFI on all packages.
-> 
-> - When CPU is online, instead of blindly enabling HFI, check if
-> the thermal netlink group has any listener. This will make sure that
-> HFI is not enabled by default during boot time.
-> 
-> - Actual processing to enable/disable matches what is done in
-> suspend/resume callbacks. Create two functions hfi_do_enable()
-> and hfi_do_disable(), which can be called from  the netlink notifier
-> callback and suspend/resume callbacks.
-> 
-> Signed-off-by: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
+On Tue, Feb 6, 2024 at 10:52=E2=80=AFPM Stefano Garzarella <sgarzare@redhat=
+.com> wrote:
+>
+> If VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK is not negotiated, we expect
+> the driver to enable virtqueue before setting DRIVER_OK. If the driver
+> tries anyway, better to fail right away as soon as we get the ioctl.
+> Let's also update the documentation to make it clearer.
+>
+> We had a problem in QEMU for not meeting this requirement, see
+> https://lore.kernel.org/qemu-devel/20240202132521.32714-1-kwolf@redhat.co=
+m/
+
+Maybe it's better to only enable cvq when the backend supports
+VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK. Eugenio, any comment on this?
+
+>
+> Fixes: 9f09fd6171fe ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK=
+ backend feature")
+> Cc: eperezma@redhat.com
+> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
 > ---
->  drivers/thermal/intel/intel_hfi.c | 95 +++++++++++++++++++++++++++----
->  1 file changed, 85 insertions(+), 10 deletions(-)
-> 
-> diff --git a/drivers/thermal/intel/intel_hfi.c b/drivers/thermal/intel/intel_hfi.c
-> index 3b04c6ec4fca..5e1e2b5269b7 100644
-> --- a/drivers/thermal/intel/intel_hfi.c
-> +++ b/drivers/thermal/intel/intel_hfi.c
-> @@ -159,6 +159,7 @@ struct hfi_cpu_info {
->  static DEFINE_PER_CPU(struct hfi_cpu_info, hfi_cpu_info) = { .index = -1 };
->  
->  static int max_hfi_instances;
-> +static int hfi_thermal_clients_num;
+>  include/uapi/linux/vhost_types.h | 3 ++-
+>  drivers/vhost/vdpa.c             | 4 ++++
+>  2 files changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/include/uapi/linux/vhost_types.h b/include/uapi/linux/vhost_=
+types.h
+> index d7656908f730..5df49b6021a7 100644
+> --- a/include/uapi/linux/vhost_types.h
+> +++ b/include/uapi/linux/vhost_types.h
+> @@ -182,7 +182,8 @@ struct vhost_vdpa_iova_range {
+>  /* Device can be resumed */
+>  #define VHOST_BACKEND_F_RESUME  0x5
+>  /* Device supports the driver enabling virtqueues both before and after
+> - * DRIVER_OK
+> + * DRIVER_OK. If this feature is not negotiated, the virtqueues must be
+> + * enabled before setting DRIVER_OK.
+>   */
+>  #define VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK  0x6
+>  /* Device may expose the virtqueue's descriptor area, driver area and
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index bc4a51e4638b..1fba305ba8c1 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -651,6 +651,10 @@ static long vhost_vdpa_vring_ioctl(struct vhost_vdpa=
+ *v, unsigned int cmd,
+>         case VHOST_VDPA_SET_VRING_ENABLE:
+>                 if (copy_from_user(&s, argp, sizeof(s)))
+>                         return -EFAULT;
+> +               if (!vhost_backend_has_feature(vq,
+> +                       VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK) &&
+> +                   (ops->get_status(vdpa) & VIRTIO_CONFIG_S_DRIVER_OK))
+> +                       return -EINVAL;
 
-Perhaps this counter can be generalized for other clients besides netlink.
-KVM could also use it to enable/disable HFI as needed for virtual machines.
+As discussed, without VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK, we don't
+know if parents can do vq_ready after driver_ok.
 
-Maybe we should expose a function intel_hfi_toggle(bool enable) or a couple
-of intel_hfi_enable()/intel_hfi_disable() functions. The former would
-increase the counter and enable HFI on all packages. The latter would
-decrease the counter and disable HFI if the counter becomes 0.
+So maybe we need to keep this behaviour to unbreak some "legacy" userspace?
 
->  static struct hfi_instance *hfi_instances;
->  
->  static struct hfi_features hfi_features;
-> @@ -477,8 +478,11 @@ void intel_hfi_online(unsigned int cpu)
->  enable:
->  	cpumask_set_cpu(cpu, hfi_instance->cpus);
->  
-> -	/* Enable this HFI instance if this is its first online CPU. */
-> -	if (cpumask_weight(hfi_instance->cpus) == 1) {
-> +	/*
-> +	 * Enable this HFI instance if this is its first online CPU and
-> +	 * there are user-space clients of thermal events.
-> +	 */
-> +	if (cpumask_weight(hfi_instance->cpus) == 1 && hfi_thermal_clients_num > 0) {
->  		hfi_set_hw_table(hfi_instance);
->  		hfi_enable();
->  	}
-> @@ -573,28 +577,93 @@ static __init int hfi_parse_features(void)
->  	return 0;
->  }
->  
-> -static void hfi_do_enable(void)
-> +/*
-> + * HFI enable/disable run in non-concurrent manner on boot CPU in syscore
-> + * callbacks or under protection of hfi_instance_lock.
-> + */
-> +static void hfi_do_enable(void *ptr)
-> +{
-> +	struct hfi_instance *hfi_instance = ptr;
-> +
-> +	hfi_set_hw_table(hfi_instance);
-> +	hfi_enable();
-> +}
-> +
-> +static void hfi_do_disable(void *ptr)
-> +{
-> +	hfi_disable();
-> +}
-> +
-> +static void hfi_syscore_resume(void)
->  {
->  	/* This code runs only on the boot CPU. */
->  	struct hfi_cpu_info *info = &per_cpu(hfi_cpu_info, 0);
->  	struct hfi_instance *hfi_instance = info->hfi_instance;
->  
-> -	/* No locking needed. There is no concurrency with CPU online. */
-> -	hfi_set_hw_table(hfi_instance);
-> -	hfi_enable();
-> +	if (hfi_thermal_clients_num > 0)
-> +		hfi_do_enable(hfi_instance);
->  }
->  
-> -static int hfi_do_disable(void)
-> +static int hfi_syscore_suspend(void)
->  {
-> -	/* No locking needed. There is no concurrency with CPU offline. */
->  	hfi_disable();
->  
->  	return 0;
->  }
->  
->  static struct syscore_ops hfi_pm_ops = {
-> -	.resume = hfi_do_enable,
-> -	.suspend = hfi_do_disable,
-> +	.resume = hfi_syscore_resume,
-> +	.suspend = hfi_syscore_suspend,
-> +};
-> +
-> +static int hfi_thermal_notify(struct notifier_block *nb, unsigned long state,
-> +			      void *_notify)
-> +{
-> +	struct thermal_genl_notify *notify = _notify;
-> +	struct hfi_instance *hfi_instance;
-> +	smp_call_func_t func;
-> +	unsigned int cpu;
-> +	int i;
-> +
-> +	if (notify->mcgrp != THERMAL_GENL_EVENT_GROUP)
-> +		return NOTIFY_DONE;
-> +
-> +	if (state != THERMAL_NOTIFY_BIND && state != THERMAL_NOTIFY_UNBIND)
-> +		return NOTIFY_DONE;
-> +
-> +	mutex_lock(&hfi_instance_lock);
-> +
-> +	switch (state) {
-> +	case THERMAL_NOTIFY_BIND:
-> +		hfi_thermal_clients_num++;
-> +		break;
+For example ifcvf did:
 
-Perhaps here you could call intel_hfi_enable()
+static void ifcvf_vdpa_set_vq_ready(struct vdpa_device *vdpa_dev,
+                                    u16 qid, bool ready)
+{
+  struct ifcvf_hw *vf =3D vdpa_to_vf(vdpa_dev);
 
-> +	case THERMAL_NOTIFY_UNBIND:
-> +		hfi_thermal_clients_num--;
-> +		break;
-> +	}
+        ifcvf_set_vq_ready(vf, qid, ready);
+}
 
-and here intel_hfi_disable().
+And it did:
 
-> +
-> +	if (hfi_thermal_clients_num > 0)
-> +		func = hfi_do_enable;
-> +	else
-> +		func = hfi_do_disable;
-> +
-> +	for (i = 0; i < max_hfi_instances; i++) {
-> +		hfi_instance = &hfi_instances[i];
-> +		if (cpumask_empty(hfi_instance->cpus))
-> +			continue;
-> +
-> +		cpu = cpumask_any(hfi_instance->cpus);
-> +		smp_call_function_single(cpu, func, hfi_instance, true);
-> +	}
+void ifcvf_set_vq_ready(struct ifcvf_hw *hw, u16 qid, bool ready)
+{
+        struct virtio_pci_common_cfg __iomem *cfg =3D hw->common_cfg;
 
-This block would go in a helper function.
+        vp_iowrite16(qid, &cfg->queue_select);
+        vp_iowrite16(ready, &cfg->queue_enable);
+}
 
-I know this is beyond the scope of the patchset but it would make the
-logic more generic for other clients to use.
-> +
-> +	mutex_unlock(&hfi_instance_lock);
-> +
-> +	return NOTIFY_OK;
-> +}
-> +
-> +static struct notifier_block hfi_thermal_nb = {
-> +	.notifier_call = hfi_thermal_notify,
->  };
->  
->  void __init intel_hfi_init(void)
-> @@ -628,10 +697,16 @@ void __init intel_hfi_init(void)
->  	if (!hfi_updates_wq)
->  		goto err_nomem;
->  
-> +	if (thermal_genl_register_notifier(&hfi_thermal_nb))
-> +		goto err_nl_notif;
-> +
->  	register_syscore_ops(&hfi_pm_ops);
->  
->  	return;
->  
-> +err_nl_notif:
-> +	destroy_workqueue(hfi_updates_wq);
-> +
->  err_nomem:
->  	for (j = 0; j < i; ++j) {
->  		hfi_instance = &hfi_instances[j];
-> -- 
-> 2.34.1
-> 
+Though it didn't advertise VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK?
+
+Adding LingShan for more thought.
+
+Thanks
+
+>                 ops->set_vq_ready(vdpa, idx, s.num);
+>                 return 0;
+>         case VHOST_VDPA_GET_VRING_GROUP:
+> --
+> 2.43.0
+>
+
 
