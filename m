@@ -1,109 +1,131 @@
-Return-Path: <netdev+bounces-69973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36E9884D256
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 20:45:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D46FD84D259
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 20:47:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1A241F24403
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 19:45:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8188D289D94
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 19:47:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283D58662E;
-	Wed,  7 Feb 2024 19:45:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tLx/JptS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8BE8663B;
+	Wed,  7 Feb 2024 19:47:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 003221B7E5
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 19:45:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D09882D97;
+	Wed,  7 Feb 2024 19:47:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707335102; cv=none; b=csfGILMeAyzMyumGV8Bj9oZ7l2Ic9Xss0OSAf9YLNNKL1d/JWQI0HnQBGHcwBqIf+bAHHQa7QybQv7sPZI59Rzs1VdWV7tHcZ57c+Uzl6NqKG3j7eIVlRux6wkZ9viuz5UDVATRV6V2aD/6s3KfD2prAli/05MOuW85WevBBP5Q=
+	t=1707335268; cv=none; b=aadjMtYO0cgfT/VmgoHbaAn7odCLw8bNaiiPrOUS1RiXsivWXyqfjtbHXUS7H8ZfA1GWzp8Jl2ABhSaJ4ILZUCQILG0zUf184qEmRtAVw1+tZ08udCdC1w66Ih3m2aVoWGqw/30aEurSaARy7vWzZoSdAOWWENFPlGvX8I3K+mE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707335102; c=relaxed/simple;
-	bh=mMLuca8XgOTb3fTTQ5E00oQ+Dn9by07ek7d8ZQ9Kqcs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CpGocyV2kJn9DBsqCMaZv/u1IV1B4KamcPiLygK1eO8zCOo82p08OvPaqUspn1lEfbvDpmsXzC70p7dEDsjEDag/ehuAqbrrx0m7dwwC4YVrrfRl1yQPC6iFSK+LUdWJRWdTp0O6fO2uu/M04aW5T7bfVCrRMP8RzkVZUQna0wg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tLx/JptS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C77EC433F1;
-	Wed,  7 Feb 2024 19:45:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707335101;
-	bh=mMLuca8XgOTb3fTTQ5E00oQ+Dn9by07ek7d8ZQ9Kqcs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=tLx/JptSxeHzuukTuwYS+5HtAwhapmfyM6y2dN6lGEykg4JTXomW1rkhUlZ/qpz38
-	 sqDrpuLjlnGWvbB4nbcNm8qmex6e62Y/QjfChuTrBf3NL5pEs/p9iMw5q+ZQYLh2h2
-	 aXWdUfU6HLsr6tAQl0tGfbFkJcJ9QOeqAaweNB1jHI46nQzModwE/rbvR9SGs8PfoP
-	 gVxcYqTkYX+zDrcLJazgd+uoEemvynj9hz3229TKqqB3o0Cb0zdZ+HCEv3qWR8lRIr
-	 K1y0r5RN/FXMGabeZtXNQed+jU6HKGXnaOejt0cZ2vCLk9Qo7bUlyPRXToCVjEK2DN
-	 2PhDEU81iMpLQ==
-Message-ID: <1dddd3ba-aabe-4ad8-aefa-fd5e337c88d0@kernel.org>
-Date: Wed, 7 Feb 2024 12:45:00 -0700
+	s=arc-20240116; t=1707335268; c=relaxed/simple;
+	bh=dQ/x5R03GrVAGKoGaXUa2JoC/9ntFhQZ0Z9Yoe+BNq0=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=c8gPiXaT+a7/3EMerEhFulIUKUU+LTZR8cv/73xWNiO3th6267V9eUJZyzsX61aj8BIUpaBLpMlG+YbJpahxma0yd6BwUAJWlSSLS1uFyCopZCVtVD8fwPCpCmb2WCYu8IdTm0ONnCX7Qx1L5ox04UQ6pfS8n8UjKH+wxhOfvTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (178.176.76.58) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 7 Feb
+ 2024 22:47:28 +0300
+Subject: Re: [PATCH v5 net-next 1/2] ravb: Add Rx checksum offload support for
+ GbEth
+To: Biju Das <biju.das.jz@bp.renesas.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
+	<yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
+	<wsa+renesas@sang-engineering.com>, Nikita Yushchenko
+	<nikita.yoush@cogentembedded.com>, <netdev@vger.kernel.org>,
+	<linux-renesas-soc@vger.kernel.org>, Geert Uytterhoeven
+	<geert+renesas@glider.be>, Prabhakar Mahadev Lad
+	<prabhakar.mahadev-lad.rj@bp.renesas.com>, Biju Das <biju.das.au@gmail.com>
+References: <20240207092838.160627-1-biju.das.jz@bp.renesas.com>
+ <20240207092838.160627-2-biju.das.jz@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <eab8cbd7-f630-375e-546c-4f3458e91cdc@omp.ru>
+Date: Wed, 7 Feb 2024 22:47:28 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [TEST] The no-kvm CI instances going away
+In-Reply-To: <20240207092838.160627-2-biju.das.jz@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <20240205174136.6056d596@kernel.org>
- <c5be3d50-0edb-424b-b592-7c539acd3e3b@kernel.org>
- <20240207105507.3761b12e@kernel.org>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240207105507.3761b12e@kernel.org>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/07/2024 19:35:40
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 183286 [Feb 07 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.76.58 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.76.58
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 02/07/2024 19:40:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 2/7/2024 2:01:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 2/7/24 11:55 AM, Jakub Kicinski wrote:
-> On Wed, 7 Feb 2024 10:45:26 -0700 David Ahern wrote:
->> On 2/5/24 6:41 PM, Jakub Kicinski wrote:
->>> because cloud computing is expensive I'm shutting down the instances
->>> which were running without KVM support. We're left with the KVM-enabled
->>> instances only (metal) - one normal and one with debug configs enabled.  
->>
->> who is covering the cost of the cloud VMs?
-> 
-> Meta
-> 
->> Have you considered cheaper alternatives to AWS?
-> 
-> If I'm completely honest it's more a time thing than cost thing.
-> I have set a budget for the project in internal tooling to 3x
-> what I expected just the build bot to consume, so it can fit one
-> large instance without me having to jump thru any hoops.
-> I will slowly jump thru hoops to get more as time allows,
-> but I figured the VM instance was a mistake in the first place,
-> so I can as well just kill it off already. The -dbg runners
-> are also slow. Or do you see benefit to running without KVM?
-> Another potential extension is running on ARM.
-> 
-> And yes, it was much cheaper when the builder run in Digital Ocean.
-> 
-> But why do you ask? :) Just to offer cheaper alternatives or do you
-> happen to have the ability to get a check written to support the
-> effort? :)
+On 2/7/24 12:28 PM, Biju Das wrote:
 
-I have no such ability :-) I cover the costs myself when I use VMs on
-DigitalOcean and Vultr for Linux development and testing.
+> TOE has hardware support for calculating IP header and TCP/UDP/ICMP
+> checksum for both IPv4 and IPv6.
+> 
+> Add Rx checksum offload supported by TOE for IPv4 and TCP/UDP protocols.
+> 
+> For Rx, the 4-byte result of checksum calculation is attached to the
+> Ethernet frames.First 2-bytes is result of IPv4 header checksum and next
+> 2-bytes is TCP/UDP/ICMP checksum.
+> 
+> If a frame does not have checksum error, 0x0000 is attached as checksum
+> calculation result. For unsupported frames 0xFFFF is attached as checksum
+> calculation result. In case of an IPv6 packet, IPv4 checksum is always set
+> to 0xFFFF.
+> 
+> We can test this functionality by the below commands
+> 
+> ethtool -K eth0 rx on --> to turn on Rx checksum offload
+> ethtool -K eth0 rx off --> to turn off Rx checksum offload
+> 
+> Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
 
-Kernel builds and selftests just need raw compute power, none of the
-fancy enterprise features that AWS provides (and bills accordingly).
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-The first question about who is covering the cost is to avoid
-assumptions and acknowledge the service (and costs) provided to the
-community. Having the selftests tied to patchsets is really helpful to
-proactively identify potential regressions.
+[...]
 
-For the second question I was just curious as to whether you had tried
-the cheaper options (DO, Vultr, Linode, ...) and if they worked ok for
-you. ie., why AWS. I like the range of OS versions that are accessible
-within minutes.
+MBR, Sergey
 
