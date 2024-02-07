@@ -1,152 +1,101 @@
-Return-Path: <netdev+bounces-69812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69809-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A08FD84CAAF
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 13:26:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E4BFA84CA96
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 13:18:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C48361C20EC5
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 12:26:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 239661C20FB5
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 12:18:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D244758AAA;
-	Wed,  7 Feb 2024 12:26:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F8BB59B6C;
+	Wed,  7 Feb 2024 12:17:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=ifi.uio.no header.i=@ifi.uio.no header.b="3tZVme9/"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="yZuTQunY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-out01.uio.no (mail-out01.uio.no [129.240.10.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB4858AD0
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 12:26:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=129.240.10.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E55259B73
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 12:17:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707308783; cv=none; b=VgcTQfFOddSIgvzoBwefqNT/B1LfYX1JPBOQjYW3a6Af4TDFc93E8suM1An/+pbAHMXizO4TVcv/woEMJ+aIRubwSPiEZlpnwa4vkyuObj8IAhrlxSgzxCFwbcRr8H5n7EaHSCOsWGQcrl+9wD9+DsSk67NqNEnShtIxgVbhxBQ=
+	t=1707308277; cv=none; b=iCxIUjpwt1YteLT4cFXPoSGMpQhLdZ4j0HZ/4iqG2VDSbCepuoxyy8orSXOCIWB4Czkfd7+SQAI8gRQ97Aq3Oa9X9WXBXcaVeih9RBvZDvV+rmJcIhA9CxW02047FOPl/OdJLGv19Nm4bNgqinLwQ4ym6o1H+p5TP3dUmGAcalE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707308783; c=relaxed/simple;
-	bh=Y3EJNb8vlYwryxDxPFMdybtNOuiCzDdq8PBRxb6vGLI=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=rt87hqHmm+VhEkuidd7amRw/DR7vzQLCRsMsKZM5jphB53MUNLBssc+1ftvgmdTRLhKxfmm0pKhNmuOdMKdI5EjPEeqJAQ8tFerx6qKwgD/bCzdF87HZgqKZzjkK0QerRLiwproLWrtET+K2dT9D00bohCqhJN2HDRrCb0z8Em4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ifi.uio.no; spf=pass smtp.mailfrom=ifi.uio.no; dkim=pass (2048-bit key) header.d=ifi.uio.no header.i=@ifi.uio.no header.b=3tZVme9/; arc=none smtp.client-ip=129.240.10.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ifi.uio.no
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ifi.uio.no
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=ifi.uio.no;
-	s=key2309; h=To:References:Message-Id:Content-Transfer-Encoding:Cc:Date:
-	In-Reply-To:From:Subject:Mime-Version:Content-Type:Sender:Reply-To:Content-ID
-	:Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:
-	Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe
-	:List-Post:List-Owner:List-Archive;
-	bh=OAnOaiL6Wkk3dvlwtJxxwSf6mNkkcBGOAp7wBOqPlmk=; b=3tZVme9/nkECPMxSKfS5olxEPt
-	xaxDGMsDZZQZvBNDQ6HAegD/ZBCIIFOwoJYC/EaNsN9H7TwZs4cDIgX+yOAracUma06cFE8jCHNJS
-	gwTMXHMomOtmZ8+Bqw4zry4HE7wo0n9Z+VVXDOgkVMShtCLEQmAO1rMj4CaV2ndhvYxhlFLeRHEU3
-	2/svVSeTqX49ZVqP4cLKa7YaD+nrzWFJHf2Kb3ZWeOLFNZBCTZLK0NjfvhR+8egR+yKAX6dxAIFR0
-	xma/UOxs1qrNPZFdD3lMOBAZSSMZIty/L9qigYLs840Wz4XEMMb/ym6SqNfU7xQxqLZOHguNqbsBQ
-	rotoBqSw==;
-Received: from mail-mx12.uio.no ([129.240.10.84])
-	by mail-out01.uio.no with esmtps  (TLS1.2) tls TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <michawe@ifi.uio.no>)
-	id 1rXgjJ-00BYwv-1Y;
-	Wed, 07 Feb 2024 13:08:41 +0100
-Received: from collaborix.ifi.uio.no ([129.240.69.78] helo=smtpclient.apple)
-	by mail-mx12.uio.no with esmtps (TLS1.2:ECDHE-ECDSA-AES256-GCM-SHA384:256)
-	 (Exim 4.96.2)
-	(envelope-from <michawe@ifi.uio.no>)
-	id 1rXgjI-0003b4-2z;
-	Wed, 07 Feb 2024 13:08:41 +0100
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1707308277; c=relaxed/simple;
+	bh=TmRmyMzLdp2YmskWP/aR9FpT708Rv7UXoqw3qvUX1yY=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=AlAjA0Uf31cPbfZt6GdGn8cevfsie/NfnKHOVTjYqhnU1vs1BTEZuP15iUUPx2S3yjtR57KloFw4eEqQ3j9UKi4iyGBTWMu2HWgnzfnZqtbljDKTiPH9/ob7XlXVPqB9s3K83HfDAjPYQN37PDADTDqQARibSjSsAmHumoBrZRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=yZuTQunY; arc=none smtp.client-ip=209.85.219.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-dc7319a07a2so560435276.2
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 04:17:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1707308274; x=1707913074; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=pSdkh+ng7Yeu68weliCQGWed6e78g0TdpBEq9N2FNbY=;
+        b=yZuTQunYT5/6WPgHY4U/knbiWGap1c4W6lYM3+kgqzn3zCSlD9H4UmoghBHqKiCMO4
+         kFqZ2O0kprzX6LLBxJCYb6IoXw0OPdsYaI7ojHeXK+2MMSCiiS+zDw62XxtWvD5QJqi9
+         Ud4mFY7wPRIMSwpO9DdPfE65vtbRYyzZRPC2xBcJzeHpjNGLghluZHhyyL3gBzbAPijB
+         NZwInr6U2JgVT3OwvsWZ+V8ugQZMFoppfV5l0jRsjpGK5nOGp+xGLr+mXPx4u+WmUJJG
+         pXBdhvE9+ZVovy7/LaOP5dQuBpuwNIy7Ib1pvjfEEc1qc4XYgWRmH5Asb9rClnT4KKkL
+         UUhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707308274; x=1707913074;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pSdkh+ng7Yeu68weliCQGWed6e78g0TdpBEq9N2FNbY=;
+        b=X8tEZhIZTHD35qrPKXsdkSZF9Wj6RY/GrXuSpR69ljD+zDbW7PF63n7TwdaorwVVqT
+         k3mKa0HxOlbojS9ADo/2FjwMwfqPmbPS0aMoZdsxuXOYEsSWa/t5Ec4hiX0tnuMOLO4j
+         /LrtdbVLR3yFzUpGxstNKx+ssVkAIu5lypIuAGSiQYkR0gMuPtC1iZH9LAXZM8AtiMXx
+         9QjxnXTnva+JTtggC2zCmedOUHcGQaD7q+mHs7cmEGdH6SVydeI9cTFKV1MGvhEF1f35
+         mibqku6xWLWa4fzWH7HrBV9T57HaMNjQmKyv/BSQdfIJMJyVKAC3oPQke7vy8Ux4nkJJ
+         UFgQ==
+X-Gm-Message-State: AOJu0Yz+4oL1F+PU5tmOc4GYoVWjup5zoYiRdtBg+xzBAUyvB757PgLW
+	ull5tEAdmu/YZAk+dwXlcD4QfQFtIj4z29nGfIHYCPClfNPlVoGMQ6f6LYRsVJSruYQ5VxKugJL
+	HmQpOPZtfYC/9TVhkeM7kdJf7ZvUC5obPvI+B
+X-Google-Smtp-Source: AGHT+IGomE1piNDlMKWQLJkfkkV5OEDncqJpPADNjfGpeZGIhrHl1O7OlVsG3bzGMYGNK6X5gYHVKU+jDi4MJ6VDMt8=
+X-Received: by 2002:a5b:646:0:b0:dbd:987d:2491 with SMTP id
+ o6-20020a5b0646000000b00dbd987d2491mr4044248ybq.58.1707308274470; Wed, 07 Feb
+ 2024 04:17:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3696.120.41.1.1\))
-Subject: Re: [Bloat] Trying to *really* understand Linux pacing
-From: Michael Welzl <michawe@ifi.uio.no>
-In-Reply-To: <CAA93jw6di-ypNHH0kz70mhYitT_wsbpZR4gMbSx7FEpSvHx3qg@mail.gmail.com>
-Date: Wed, 7 Feb 2024 13:08:40 +0100
-Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>,
- bloat@lists.bufferbloat.net
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <B4827A61-6324-40BB-9BDE-3A87DEABB65C@ifi.uio.no>
-References: <1BAA689A-D44E-4122-9AD8-25F6D024377E@ifi.uio.no>
- <CAA93jw6di-ypNHH0kz70mhYitT_wsbpZR4gMbSx7FEpSvHx3qg@mail.gmail.com>
-To: Dave Taht <dave.taht@gmail.com>
-X-Mailer: Apple Mail (2.3696.120.41.1.1)
-X-UiO-SPF-Received: Received-SPF: neutral (mail-mx12.uio.no: 129.240.69.78 is neither permitted nor denied by domain of ifi.uio.no) client-ip=129.240.69.78; envelope-from=michawe@ifi.uio.no; helo=smtpclient.apple;
-X-UiO-Spam-info: not spam, SpamAssassin (score=-4.6, required=5.0, autolearn=disabled, KHOP_HELO_FCRDNS=0.4,T_SCC_BODY_TEXT_LINE=-0.01,UIO_MAIL_IS_INTERNAL=-5)
-X-UiO-Scanned: 2CCAA68EDBB96D2186333327B15102915C74D20E
-X-UiOonly: 940DBC83520B41C5D4A4388A9D537D71DCC88203
+MIME-Version: 1.0
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 7 Feb 2024 07:17:43 -0500
+Message-ID: <CAM0EoMmZSB6CyA0ghz8QL6iGrrAi5FFDLMU8uzPPSW3U8n=Yfg@mail.gmail.com>
+Subject: 0x18: Dates And Location for upcoming conference
+To: people <people@netdevconf.info>
+Cc: Linux Kernel Network Developers <netdev@vger.kernel.org>, Christie Geldart <christie@ambedia.com>, 
+	Kimberley Jeffries <kimberleyjeffries@gmail.com>, lwn@lwn.net, 
+	Lael Santos <lael.santos@expertisesolutions.com.br>, 
+	Felipe Magno de Almeida <felipe@expertise.dev>, linux-wireless <linux-wireless@vger.kernel.org>, 
+	"board@netdevconf.org" <board@netdevconf.info>, netfilter-devel@vger.kernel.org, 
+	lartc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Whoa=E2=80=A6 and now I=E2=80=99m even more afraid   :-)
+This is a pre-announcement on behalf of the NetDev Society so folks
+can plan travel etc.
 
-My sincere apologies to anyone whose code I may have mis-represented!  I =
-just tried to get it=E2=80=A6  sorry if there are silly mistakes in =
-there!
+Netdev conf 0x18 is going to be a hybrid conference.  We will be
+updating you with more details in the near future on the exact
+coordinates. Either watch https://netdevconf.info/0x18/ or join
+people@ mailing list[1] for more frequent updates.
 
+Date : July 15, 2024
+Location : Silicon Valley, .ca.us
 
-> On 7 Feb 2024, at 13:05, Dave Taht <dave.taht@gmail.com> wrote:
->=20
-> Dear Michael:
->=20
-> Thank you for digging deeply into packet pacing, TSQ, etc. I think
-> there are some interesting new possibilities in probing (especially
-> during slow start) that could make the core idea even more effective
-> than it is. I also tend to think that attempting it in various cloudy
-> environments and virtualization schemes, and with certain drivers, the
-> side effects are not as well understood as I would like. For example,
-> AWS's nitro lacks BQL as does virtio-net.
->=20
-> I think the netdev community, now cc'd, would be interested in your
-> document and explorations so far, below. I hope for more
-> enlightenment.
->=20
-> On Wed, Feb 7, 2024 at 6:57=E2=80=AFAM Michael Welzl via Bloat
-> <bloat@lists.bufferbloat.net> wrote:
->>=20
->> Dear de-bloaters of buffers,
->> Esteemed experts of low delay and pacing!
->>=20
->> I have no longer been satisfied with high-level descriptions of how =
-pacing works in Linux, and how it interacts with TSQ (I=E2=80=99ve seen =
-some, in various papers, over the years) - but I wanted to REALLY =
-understand it. So, I have dug through the code.
->>=20
->> I documented this experience here:
->> =
-https://docs.google.com/document/d/1-uXnPDcVBKmg5krkG5wYBgaA2yLSFK_kZa7xGD=
-Wc7XU/edit?usp=3Dsharing
->> but it has some holes and may have mistakes.
->>=20
->> Actually, my main problem is that I don=E2=80=99t really know what =
-goes on when I configure a larger IW=E2=80=A6 things seem to get quite =
-=E2=80=9Coff=E2=80=9D there. Why? Anyone up for solving that riddle?  =
-;-)
->> (see the tests I documented towards the end of the document)
->>=20
->> Generally, if someone who has their hands on files such as =
-tcp_output.c all the time could take a look, and perhaps =E2=80=9Cfill=E2=80=
-=9D my holes, or improve anything that might be wrong, that would be =
-fantastic!   I think that anyone should be allowed to comment and make =
-suggestions in this doc.
->>=20
->> MANY thanks to whoever finds the time to take a look !
->>=20
->> Cheers,
->> Michael
->>=20
->> _______________________________________________
->> Bloat mailing list
->> Bloat@lists.bufferbloat.net
->> https://lists.bufferbloat.net/listinfo/bloat
->=20
->=20
->=20
-> --=20
-> 40 years of net history, a couple songs:
-> https://www.youtube.com/watch?v=3DD9RGX6QFm5E
-> Dave T=C3=A4ht CSO, LibreQos
+Be ready to share your work with the community. CFS coming soon.
 
+sincerely,
+Netdev Society Board:
+Roopa Prabhu, Shrijeet Mukherjee, Tom Herbert, Jamal Hadi Salim
+
+[1] https://lists.netdevconf.info/postorius/lists/people.netdevconf.info/
 
