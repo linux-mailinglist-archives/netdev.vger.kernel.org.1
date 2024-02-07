@@ -1,108 +1,90 @@
-Return-Path: <netdev+bounces-69939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF4EC84D18C
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 19:46:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BBD384D152
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 19:40:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E9DC1F2480E
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 18:46:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6ECBC1C20E12
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 18:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A02321292EE;
-	Wed,  7 Feb 2024 18:43:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCDD041C91;
+	Wed,  7 Feb 2024 18:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hAdutPn+"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57BE2128816
-	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 18:43:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3B7983CC1;
+	Wed,  7 Feb 2024 18:40:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707331408; cv=none; b=ofUumzXUhGCUNRSktntOS/NQtIiFI6CpSs28rnqKGcQQR+8Oh2gWIe3w0lCG//qwwpuACbjiEbieoV1WJyyOJsfdTxtC1ecgJv+NNi7AagEPTkyjNuhykng899O93MCMEdS+wDt+uSe5GbPJAic5kBKx9Plqp4ZZiUVhqkDELAQ=
+	t=1707331233; cv=none; b=j5Qt6PbWvee77HhBnJJnajZyuokzCyjHNNqQlS36gpBVBKKXZnSVKuyCUbdneo5xbIo2OXCbcvZrTIZJX1xOO0AfmMcd3QAzG4TUOsO6ivtZc9C4/JT5WfwfbGWY+pxkMSeCRUM1IQSlI5eeP7sfJF+LvSjRL/EHCkmgS3eXoZE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707331408; c=relaxed/simple;
-	bh=Ev++aCx6/d1wDcv2MJFM1i0hfOpiN4a5Nl2m2PQoCTE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YHZcNZNcnMSYtHgxxfgB8t1VDWvFmmfck9KUeMLAbXU/4Bl2IxaODz7Swno5w8vQ2kUM9nRvDWbUHG5lZPbZ53vwnRPQ4j8GEUyTigcCejW/P6Dev2AvtH7ONLjD9aT2hz1rSno1nDh5CiqPgEQgDcS8r9c0zEeMrZyZ1b81GZ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rXmt6-0007ag-HB; Wed, 07 Feb 2024 19:43:12 +0100
-Received: from [2a0a:edc0:0:900:1d::77] (helo=ptz.office.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rXmt5-0054Xf-O1; Wed, 07 Feb 2024 19:43:11 +0100
-Received: from ukl by ptz.office.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ukl@pengutronix.de>)
-	id 1rXmt5-00HRsg-26;
-	Wed, 07 Feb 2024 19:43:11 +0100
-From: =?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>
-To: Mark Brown <broonie@kernel.org>
-Cc: kernel@pengutronix.de,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
-	Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v3 14/32] net: vertexcom: mse102x: Follow renaming of SPI "master" to "controller"
-Date: Wed,  7 Feb 2024 19:40:28 +0100
-Message-ID:  <feacee68c00f6f976c82864ba2f10a3f0c1b99f2.1707324794.git.u.kleine-koenig@pengutronix.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1707324793.git.u.kleine-koenig@pengutronix.de>
-References: <cover.1707324793.git.u.kleine-koenig@pengutronix.de>
+	s=arc-20240116; t=1707331233; c=relaxed/simple;
+	bh=z8a4Ls29S/rSHVCmTqo32Le5LWs9M/zkuvJ4ILb3smY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=WIBCOcqJt8FK1sYlynyXfJ+yBD+gznirzMG9vkE9/ay1Bca+TK3oWHhE7a5Wdpgj0FiaYLttrTtD7Nw1BoW3Aoryga0FOog9sn8bBJb7EpQhzushax9P/ptRraHBGLyG0/R7OvO9ayP+0FBiGGaMS1nALferNqrTSEySuUDvUFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hAdutPn+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 20273C433C7;
+	Wed,  7 Feb 2024 18:40:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707331233;
+	bh=z8a4Ls29S/rSHVCmTqo32Le5LWs9M/zkuvJ4ILb3smY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=hAdutPn+0+1vBnCdwqnPJHyb7pa6O6oc05Y1LJrXyp1WJeyxDmCbj/2y4VOb4eV5b
+	 rI3MM77ceQklp0IaYew+4ayoLsezZVjKfxxXWAMoAZaYjVO/L25oDv21XmZFCQnG+f
+	 u6pIAgvJRrBEPTex1/SnyEDino9sWTGtxSUBJ+vNlvGNX6vviRq6hDRQl1VOrNoYTx
+	 FCvMPsxPctgOATU/tiUUzGhwaCIbKTXY7dInbhzl0l/tqvsTko/e1Ahf9yLuo4jKI1
+	 m2MuLXthcxZcjVaS8PeZmX12eB66J+5XPPbJKOInEskOtIhytFadeWOTzjD0Qfmpx/
+	 oJin1VxKFet8Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EEE20D8C976;
+	Wed,  7 Feb 2024 18:40:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1148; i=u.kleine-koenig@pengutronix.de; h=from:subject:message-id; bh=Ev++aCx6/d1wDcv2MJFM1i0hfOpiN4a5Nl2m2PQoCTE=; b=owEBbQGS/pANAwAKAY+A+1h9Ev5OAcsmYgBlw86lVfFyg9pBoMFRnaLT01mJvefY9M/ZVZrT8 YfKGChibRyJATMEAAEKAB0WIQQ/gaxpOnoeWYmt/tOPgPtYfRL+TgUCZcPOpQAKCRCPgPtYfRL+ TuJJB/406hU4AmOMOAe9HQg+TMU8xoT78Kq/OjYU65U9i95ZrB/WZLlnQ4y2S+udBxYeBIQmRLh cjtIv3qTJk4a/fLnPaxMs2TweEcl0dFwopgw34Tw2OpQIwtXmehUR2/xBOoY4WUDhmryJPLJlCQ 3PuX9o/qTo59i10zvC/MPugL6KP6DvHCiflEik+pNqvDRlo8PXODoZDg1z6pMjYkHy67+YuZ48p m8wZlbqoLgW3/HdPEt53C86ahFMfgPFXBHj6LCYLCjRz7NsmbsbwrjT0usOd0MsqhvM7YaTWGpB SRgJbHAxvcJ/HqIbCTGH4a7FZQtvwQNj0jEyhM/UqP7eYeps
-X-Developer-Key: i=u.kleine-koenig@pengutronix.de; a=openpgp; fpr=0D2511F322BFAB1C1580266BE2DCDD9132669BD6
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ukl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Subject: Re: pull-request: wireless-2024-02-06
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170733123297.1949.5137395590781704085.git-patchwork-notify@kernel.org>
+Date: Wed, 07 Feb 2024 18:40:32 +0000
+References: <20240206095722.CD9D2C433F1@smtp.kernel.org>
+In-Reply-To: <20240206095722.CD9D2C433F1@smtp.kernel.org>
+To: Kalle Valo <kvalo@kernel.org>
+Cc: netdev@vger.kernel.org, linux-wireless@vger.kernel.org
 
-In commit 8caab75fd2c2 ("spi: Generalize SPI "master" to "controller"")
-some functions and struct members were renamed. To not break all drivers
-compatibility macros were provided.
+Hello:
 
-To be able to remove these compatibility macros push the renaming into
-this driver.
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-Signed-off-by: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
----
- drivers/net/ethernet/vertexcom/mse102x.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On Tue,  6 Feb 2024 09:57:22 +0000 (UTC) you wrote:
+> Hi,
+> 
+> here's a pull request to net tree, more info below. Please let me know if there
+> are any problems.
+> 
+> Kalle
+> 
+> [...]
 
-diff --git a/drivers/net/ethernet/vertexcom/mse102x.c b/drivers/net/ethernet/vertexcom/mse102x.c
-index aeed2a093e34..edd8b59680e5 100644
---- a/drivers/net/ethernet/vertexcom/mse102x.c
-+++ b/drivers/net/ethernet/vertexcom/mse102x.c
-@@ -664,7 +664,7 @@ static int mse102x_probe_spi(struct spi_device *spi)
- 	spi->bits_per_word = 8;
- 	spi->mode |= SPI_MODE_3;
- 	/* enforce minimum speed to ensure device functionality */
--	spi->master->min_speed_hz = MIN_FREQ_HZ;
-+	spi->controller->min_speed_hz = MIN_FREQ_HZ;
- 
- 	if (!spi->max_speed_hz)
- 		spi->max_speed_hz = MAX_FREQ_HZ;
+Here is the summary with links:
+  - pull-request: wireless-2024-02-06
+    https://git.kernel.org/netdev/net/c/335bac1daae3
+
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
