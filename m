@@ -1,138 +1,121 @@
-Return-Path: <netdev+bounces-69908-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69909-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F33184CFC3
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 18:26:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 910D684CFCF
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 18:31:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F7F2B2865F
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 17:26:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42B5A1F22DFE
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 17:31:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C344582877;
-	Wed,  7 Feb 2024 17:26:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B6CC8286F;
+	Wed,  7 Feb 2024 17:31:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="E8m1HfsY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Krkgxu6N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF5A3823B8;
-	Wed,  7 Feb 2024 17:26:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EE701E498
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 17:31:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707326798; cv=none; b=SkQr1rceGvGV8Q1I0FMlg+ZNEgRfGRB7iKDnn8zprFbWrDH2uERahGhyw+IXcbVvdH91r5MwHhYBXJVWL1PLoHsp4aF7zCVEfCWD5wc0O7RLiCAU1akOGgcaH63A9LS43cWSlxEkY5gVtNqjekrLbeGXXwI9BZydq5vp8KDN+ww=
+	t=1707327080; cv=none; b=Ikf1uOyPMR4y5jnEslHJllCeoaRe+mOSqq/ioD6Zu4fz2cwS8CuS1+CeEr1RtCgiyd6PQGdQdk7ui/rVYhdwsCRIEzkLzny8zRmK+QChOfqbR5T/sC80MjJRa669z/5+aSWreIaqZBu+1/jaUkPmEBHxfwtodiOo+7uUTmg3TVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707326798; c=relaxed/simple;
-	bh=WJY7bRLc+6QBXlwk3j67JAGs1qGHaeAeWvs21rNTsDA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=N67ZQLI3VDPaFFTr1TN8+HaqVl9+xfsNeU/snWwxrNWIAKBV7gckZKpNRqmH2NAcoJVvk8BhJj3K/4zdexrZlZJOein0i0Buwapu25B1KT7LFJX8Q9AWjyyHInz78Qv+EUlZBk2+0NnGKRapdPuM66YDxBKiZ5kM0ppfqT7+yrg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=E8m1HfsY; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 417GLQ13005974;
-	Wed, 7 Feb 2024 17:26:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=IeY4ENqyM6DquNVGtOMdp371wYPINtiRe/4HRffDQ3c=; b=E8
-	m1HfsYNKB2wq3CjI6Xms8FjgW0KXlqJOdYl4rgYruitZFj3M6oiogwYWUPvjDVkg
-	zlUqEeI0XoZx5bf0KWFsI8g68K8tBvZMD3Lc29st+AjqB97OZuCMe2QGoyFNMD8r
-	zD0Xiam9xysQpJ6rqbLo35Ufpzae1xcdhmvm/U4CKCp4vYUoOotz+94RH2E8tWZE
-	rIR7DEi7k69ehWuqfm6QJ5A+d/aapIObr6X0JR4CAFYb4Mg6ZCugviZv4dySBdKO
-	KbbLNp03L2IVtlrQqkh3mRwIuHEatsDkryXQF2+VWqnu75hI3WR6rEgWMt1s47CW
-	CqFnw9mmsHwy7eDaOGug==
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3w4021ssgh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 07 Feb 2024 17:26:16 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 417HQ90x030684
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 7 Feb 2024 17:26:10 GMT
-Received: from [10.110.62.200] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 7 Feb
- 2024 09:26:06 -0800
-Message-ID: <578b6a6e-83df-4113-9c1f-cdd7aa65f65e@quicinc.com>
-Date: Wed, 7 Feb 2024 09:26:05 -0800
+	s=arc-20240116; t=1707327080; c=relaxed/simple;
+	bh=gDfuUYVgKUW/r12EBAceePRcXBkBeDQFRcNeAuQSi/w=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TczfpkRpxVEYMUscEY0nD5Ob5ZnGJ5ymwOGunY+QzhPe0pGNfMbTd+WXN6ZJB6zoofmvmeLb1/p/VFkXX0iMvhwpq3g3+eKKzz8MHzfyBu+J7joIq1P34UBpz/69gpygWiCZB32xLmND3AM0onPXh9BaccA+j57nCQdcVT/4o78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Krkgxu6N; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707327078;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=SO8sv7/cO3G6RaqEjajadlzIMLSqMZLWmNNb2a1ypb0=;
+	b=Krkgxu6NtaaAl+zOFNH9VR8btWbUd08Jctn2j8OK2/7p/63ahKvRVu8e7V1JKrhry9HPT+
+	wNQdIsvUdgMYiZItbCCxa1l83g6N9+eK+xfYJ8mrs4bnwPamVF3gvMt5LLY/K2fgxSvR1e
+	VuacBCNOXNbP+5hSN+drvUNglfRdYq0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-637-Mh36QTEUNgKcBkpPO_ZnWQ-1; Wed, 07 Feb 2024 12:31:15 -0500
+X-MC-Unique: Mh36QTEUNgKcBkpPO_ZnWQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9FBB787A38A;
+	Wed,  7 Feb 2024 17:31:14 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.224.200])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 632A82026D08;
+	Wed,  7 Feb 2024 17:31:13 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net] selftests: net: add more missing kernel config
+Date: Wed,  7 Feb 2024 18:31:10 +0100
+Message-ID: <38d3ca7f909736c1aef56e6244d67c82a9bba6ff.1707326987.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] net: stmmac: dwmac-qcom-ethqos: Enable TBS on all
- queues but 0
-Content-Language: en-US
-To: Abhishek Chauhan <quic_abchauha@quicinc.com>,
-        Vinod Koul
-	<vkoul@kernel.org>,
-        Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Andy Gross
-	<agross@kernel.org>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konrad.dybcio@linaro.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Eric
- Dumazet" <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Rob Herring
-	<robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Jose Abreu
-	<joabreu@synopsys.com>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        Prasad Sodagudi
-	<psodagud@quicinc.com>,
-        Andrew Halaney <ahalaney@redhat.com>, Rob Herring
-	<robh@kernel.org>
-CC: <kernel@quicinc.com>
-References: <20240207001036.1333450-1-quic_abchauha@quicinc.com>
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-In-Reply-To: <20240207001036.1333450-1-quic_abchauha@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: Ujof3VBVxrMBwZfiN1GFhhbJXa7VDHpK
-X-Proofpoint-GUID: Ujof3VBVxrMBwZfiN1GFhhbJXa7VDHpK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-07_09,2024-02-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=1 malwarescore=0 suspectscore=0
- phishscore=0 impostorscore=0 spamscore=1 clxscore=1011 adultscore=0
- mlxlogscore=212 mlxscore=1 lowpriorityscore=0 priorityscore=1501
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2401310000 definitions=main-2402070129
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.4
 
-On 2/6/2024 4:10 PM, Abhishek Chauhan wrote:
-> TSO and TBS cannot co-exist. TBS requires special descriptor to be
-> allocated at bootup. Initialising Tx queues at probe to support
-> TSO and TBS can help in allocating those resources at bootup.
-> 
-> TX queues with TBS can support etf qdisc hw offload.
-> 
-> This is similar to the patch raised by NXP <3b12ec8f618e>
-> <"net: stmmac: dwmac-imx: set TSO/TBS TX queues default settings">
+The reuseport_addr_any.sh is currently skipping DCCP tests and
+pmtu.sh is skipping all the FOU/GUE related cases: add the missing
+options.
 
-note that there is a standard way to refer to a prior patch, in your case:
-3b12ec8f618e ("net: stmmac: dwmac-imx: set TSO/TBS TX queues default
-settings")
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+---
+Note that this does not include the - still missing - OVS-related
+option and pmtu.sh is will keep skipping such cases. Such tests
+will still fail in the virtme environment even with the relevant
+kernel options enabled, as they have an hard to solve dependency
+on systemd/dbus.
+The longer term plan is to move such test cases in the openvswitch
+directory. One short term option to avoid skips in selftests results
+while retaining the potential code coverage would be making the ovs
+tests disabled by default but reachable via pmtu.sh command line
+arguments.
+---
+ tools/testing/selftests/net/config | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-(note this format is defined in the context of the Fixes tag at
-<https://www.kernel.org/doc/html/latest/process/submitting-patches.html#using-reported-by-tested-by-reviewed-by-suggested-by-and-fixes>)
+diff --git a/tools/testing/selftests/net/config b/tools/testing/selftests/net/config
+index 3b749addd364..54d21e2911a9 100644
+--- a/tools/testing/selftests/net/config
++++ b/tools/testing/selftests/net/config
+@@ -13,6 +13,10 @@ CONFIG_IPV6=y
+ CONFIG_IPV6_MULTIPLE_TABLES=y
+ CONFIG_VETH=y
+ CONFIG_NET_IPVTI=y
++CONFIG_NET_FOU=y
++CONFIG_NET_FOU_IP_TUNNELS=y
++CONFIG_NET_IPIP=y
++CONFIG_IPV6_SIT=y
+ CONFIG_IPV6_VTI=y
+ CONFIG_DUMMY=y
+ CONFIG_BRIDGE_VLAN_FILTERING=y
+@@ -24,6 +28,7 @@ CONFIG_IFB=y
+ CONFIG_INET_DIAG=y
+ CONFIG_INET_ESP=y
+ CONFIG_INET_ESP_OFFLOAD=y
++CONFIG_IP_DCCP=m
+ CONFIG_IP_GRE=m
+ CONFIG_NETFILTER=y
+ CONFIG_NETFILTER_ADVANCED=y
+-- 
+2.43.0
 
-/jeff
 
