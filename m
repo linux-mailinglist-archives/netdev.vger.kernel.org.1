@@ -1,124 +1,143 @@
-Return-Path: <netdev+bounces-69710-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-69711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19D8784C4D1
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 07:13:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A282D84C51E
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 07:45:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBA4428B1F8
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 06:13:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5A841C2199A
+	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 06:45:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57F931CD38;
-	Wed,  7 Feb 2024 06:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7AE51B95B;
+	Wed,  7 Feb 2024 06:45:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R/QGJuhJ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T6sO21/I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E51524B2C;
-	Wed,  7 Feb 2024 06:10:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37891CD38
+	for <netdev@vger.kernel.org>; Wed,  7 Feb 2024 06:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707286219; cv=none; b=lTIHc9A84j+YsAaY8TRnRjkFkgZmLC1GmBtCJbi32XwOiclJ54PeWa4AibNeDvHsiG/tAz8c1S+xGtY5upfDQO6LmredQWjvDCznGeSYHZ8BcCcbYEyBDAOX6jTn4FpKbJEWgE8tY6Cb1INW3DlLEI64q6DTaL3AZphxl2Ybj+8=
+	t=1707288309; cv=none; b=IoCNmpYVpz1r4Ji/jnu+FCSIz0ShQPNDiB2TSGC4/+NwL63N2z4YGt9Xp/sc4gW2/OdHLbsfGMhIr6gKPYuKRYOHVvb448kE1OSlzGoR4uOBpy9ASI3lZvX99yrRuL+8BGv7IRslRiZmMhHXrEeA/zl3IB0eqtrH5ZYIsa+R1DA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707286219; c=relaxed/simple;
-	bh=h5RpRwAivJEkMgOQGPSE31O4QbdHWmr5WM+YPfbxP60=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=q84qk5Az/16ylgFku4keNv7rKR3wa13mY2SLmaCMDW7gbLgTitgIfszk1mCP6DQT5dxAoPfUiHlFkRzWKOR65h/mq8dAdxoBlGhW1OaaRKt+foSbrA5xfb3UjtxWEiKRR2ppDK2etMRw4a30QmonsifTp+kgCD3mURTD0FCDQBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R/QGJuhJ; arc=none smtp.client-ip=192.55.52.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707286217; x=1738822217;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=h5RpRwAivJEkMgOQGPSE31O4QbdHWmr5WM+YPfbxP60=;
-  b=R/QGJuhJeH6vyZzDlQ586EVPCWAifHvtjB3ViCDvQdJvr+nE3UZGUEbg
-   /wXJhUxDRc7esyM9g+VUimKnfkL7SCywKNshUe5/1NElsmWQQmWri3nkp
-   ItR+N7NyRrCWz4rxR+9QZgWgJjEG/I/dJeX51OLSUk5ihR/SUI3M7MNVh
-   5A/ex+jxK3XMKOyFs/0G2uGb/zJkn2MoZloonIkXAyjTR78zz0xrtoaYz
-   NK7ABAdpHNJnK/6Fyv/ElElJ2o1gUr3DEi1nUtEokBvhmUaU5YJUhqgFy
-   Hg+3RQtmJv+550p8TnFkrkKZ71hEI6CfvGjuy7WoD+J5lKVYYZ5MWNbIk
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10976"; a="436054113"
-X-IronPort-AV: E=Sophos;i="6.05,250,1701158400"; 
-   d="scan'208";a="436054113"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2024 22:10:16 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,250,1701158400"; 
-   d="scan'208";a="5849952"
-Received: from inlubt0316.iind.intel.com ([10.191.20.213])
-  by fmviesa004.fm.intel.com with ESMTP; 06 Feb 2024 22:10:10 -0800
-From: lakshmi.sowjanya.d@intel.com
-To: tglx@linutronix.de,
-	jstultz@google.com,
-	giometti@enneenne.com,
-	corbet@lwn.net,
-	linux-kernel@vger.kernel.org
-Cc: x86@kernel.org,
-	netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	andriy.shevchenko@linux.intel.com,
-	eddie.dong@intel.com,
-	christopher.s.hall@intel.com,
-	jesse.brandeburg@intel.com,
-	davem@davemloft.net,
-	alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com,
-	mcoquelin.stm32@gmail.com,
-	perex@perex.cz,
-	linux-sound@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	peter.hilber@opensynergy.com,
-	pandith.n@intel.com,
-	mallikarjunappa.sangannavar@intel.com,
-	subramanian.mohan@intel.com,
-	thejesh.reddy.t.r@intel.com,
-	lakshmi.sowjanya.d@intel.com
-Subject: [PATCH v4 11/11] ABI: pps: Add ABI documentation for Intel TIO
-Date: Wed,  7 Feb 2024 11:38:54 +0530
-Message-Id: <20240207060854.6524-12-lakshmi.sowjanya.d@intel.com>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <20240207060854.6524-1-lakshmi.sowjanya.d@intel.com>
-References: <20240207060854.6524-1-lakshmi.sowjanya.d@intel.com>
+	s=arc-20240116; t=1707288309; c=relaxed/simple;
+	bh=qeDEPTK4m6VBZwGjwpCHxfCWgFesd/WrAsfsyaMOeJk=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=R8t3Nf8coo1WghA+PF0CfoEFWmOB+IMF9MwhX9gFxOHvuvYCao2bX3dlUOxzaL/spJbIyA9N/evgBEw8XlEWMGXpFO/aLH2Y9BgCFA7Sqsh8sOBKR9YKKRsw4mvl2fOqNKDt4vzLV+rJrxqJ2pv8MUjRDnpME6CyPgdAswqyLQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T6sO21/I; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707288306;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yhtIBc1C8bQwbqg4JYyqcWdulDcmw0/HXgXvj6B8//o=;
+	b=T6sO21/Ihv6qb+ci28DLw/aXiwL+3nvogPFCVIcJ7cjLOEYTs99hOPH6BQTJy7g76ZMwIo
+	HZCCSYR5xi7AxTRsHUxmQZoLP+fnoHheA78Aair1c7UxtB1BaIIsHQraBluETjTkSYS/PA
+	SJhyx2HZ6Zx0f0yj+ssa6yS6LHB1F6o=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-326-5JCEKhvfOhG1NIIdaYYkiQ-1; Wed,
+ 07 Feb 2024 01:45:02 -0500
+X-MC-Unique: 5JCEKhvfOhG1NIIdaYYkiQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 64971280AA20;
+	Wed,  7 Feb 2024 06:45:02 +0000 (UTC)
+Received: from oldenburg.str.redhat.com (unknown [10.39.192.94])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 5304A492BC6;
+	Wed,  7 Feb 2024 06:45:01 +0000 (UTC)
+From: Florian Weimer <fweimer@redhat.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Stephen Gallagher <sgallagh@redhat.com>,  netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-toolchains@vger.kernel.org
+Subject: Re: [PATCH] iproute2: fix type incompatibility in ifstat.c
+References: <20240206142213.777317-1-sgallagh@redhat.com>
+	<20240206191209.3aaf9916@hermes.local>
+Date: Wed, 07 Feb 2024 07:44:59 +0100
+In-Reply-To: <20240206191209.3aaf9916@hermes.local> (Stephen Hemminger's
+	message of "Tue, 6 Feb 2024 19:12:09 -0800")
+Message-ID: <877cjg6adw.fsf@oldenburg.str.redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.3 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
+* Stephen Hemminger:
 
-Document sysfs interface for Intel Timed I/O PPS driver.
+> On Tue,  6 Feb 2024 09:22:06 -0500
+> Stephen Gallagher <sgallagh@redhat.com> wrote:
+>
+>> Throughout ifstat.c, ifstat_ent.val is accessed as a long long unsigned
+>> type, however it is defined as __u64. This works by coincidence on many
+>> systems, however on ppc64le, __u64 is a long unsigned.
+>>=20
+>> This patch makes the type definition consistent with all of the places
+>> where it is accessed.
+>>=20
+>> Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
+>> ---
 
-Signed-off-by: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
----
- Documentation/ABI/testing/sysfs-platform-pps-tio | 7 +++++++
- 1 file changed, 7 insertions(+)
- create mode 100644 Documentation/ABI/testing/sysfs-platform-pps-tio
+Patch was:
 
-diff --git a/Documentation/ABI/testing/sysfs-platform-pps-tio b/Documentation/ABI/testing/sysfs-platform-pps-tio
-new file mode 100644
-index 000000000000..b9b8c97a7840
---- /dev/null
-+++ b/Documentation/ABI/testing/sysfs-platform-pps-tio
-@@ -0,0 +1,7 @@
-+What:		/sys/devices/platform/INTCxxxx/enable
-+Date:		March 2024
-+KernelVersion	6.9
-+Contact:	Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
-+Description:
-+		(RW) Enable or disable PPS TIO generator output, read to
-+		see the status of hardware (Enabled/Disabled).
--- 
-2.35.3
+diff --git a/misc/ifstat.c b/misc/ifstat.c
+index 721f4914..767cedd4 100644
+--- a/misc/ifstat.c
++++ b/misc/ifstat.c
+@@ -58,7 +58,7 @@ struct ifstat_ent {
+ 	struct ifstat_ent	*next;
+ 	char			*name;
+ 	int			ifindex;
+-	__u64			val[MAXS];
++	unsigned long long	val[MAXS];
+ 	double			rate[MAXS];
+ 	__u32			ival[MAXS];
+ };
+
+> Why not fix the use of unsigned long long to be __u64 instead?
+> That would make more sense.
+
+You still won't be able to use %llu to print it.  I don't think the UAPI
+headers provide anything like the <stdint.h> macros because the
+assumption is that %llu is okay for printing __u64 on all architectures.
+
+But we have this in POWER:
+
+/*
+ * This is here because we used to use l64 for 64bit powerpc
+ * and we don't want to impact user mode with our change to ll64
+ * in the kernel.
+ *
+ * However, some user programs are fine with this.  They can
+ * flag __SANE_USERSPACE_TYPES__ to get int-ll64.h here.
+ */
+#if !defined(__SANE_USERSPACE_TYPES__) && defined(__powerpc64__) && !define=
+d(__KERNEL__)
+# include <asm-generic/int-l64.h>
+#else
+# include <asm-generic/int-ll64.h>
+#endif
+
+I didn't know some architectures are that =E2=80=A6 different.  Sadly this
+wasn't fixed as part of the transition to powerpc64le.
+
+I suppose iproute2 should build with -D__SANE_USERSPACE_TYPES__.
+
+Thanks,
+Florian
 
 
