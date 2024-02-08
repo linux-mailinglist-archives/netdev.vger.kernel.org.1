@@ -1,191 +1,199 @@
-Return-Path: <netdev+bounces-70384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C32E584EAD7
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 22:51:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 790C984EADF
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 22:53:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7AEB128D4F8
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 21:51:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34A7928C67A
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 21:53:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A564C618;
-	Thu,  8 Feb 2024 21:51:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C55774F5E6;
+	Thu,  8 Feb 2024 21:53:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HhYdeRS8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="loMuMepI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C76E4F5E5
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 21:51:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A39954C618;
+	Thu,  8 Feb 2024 21:52:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707429069; cv=none; b=lBSvCqgKZVJuLW0wNS0KeYmxCizD8+GEKXL8bSyhnmG1MgJEIyk3AZJwfni00VqfBxcEuH4cNEjIgKj+iMrqYgyA1qpBapDI4MGEZwqUkcjhyTAvxztJNUFJ/Nyha/8QVdGkzCJCbdjzk65/RWuAREDj4e0ZM+NJrIkupVBAm2E=
+	t=1707429180; cv=none; b=GKQvSTQWE0iBO5sbGzNkaMs99gOcnaZV4N69wE8vijbaBgYLFIjcRs814wr2fZcN8L5EWFqI+5W0RJS3qB4ZTl5ryt3XPUUqjISyq6sqLdzIrr1AtSShdRd+7S8G7+HTsNvUf6DbexR+S7h3RNqKxZIHyYIh8JSc3HPL/ssULeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707429069; c=relaxed/simple;
-	bh=Idu3qGPO/g/Etri0oM1k3dU5UPdINQgZ5cDiEHVrcZw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=APiQwZhAF7Q27s0tThDRcwcboYxEozsDvyM1InCrHT2XP+aPShgMFyKEPOx//YDxViMUmIkER6eIvagjUCPAKagc526JJfMPzghMCsA8+bpNpwf8Ey0B1soLICniP1xJjx/ddH0lNt5fg2t9h8pzBAgnz1CTf/z7jobUlDB6NVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HhYdeRS8; arc=none smtp.client-ip=209.85.167.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3bfd3db19baso118899b6e.0
-        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 13:51:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707429066; x=1708033866; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fIYiS1TTUPCk9T95S8njC1Yp6siu1vGkgx9QWAdSP6M=;
-        b=HhYdeRS8shONBy7yW+1K492lony2z6up2HQK0SneSsVhjdfX6Ra/fGklT3m/LSGu7b
-         K18ZUAXL6nw9oCK6a9gk1Ey8WKza/n3z4/jQ4dzsgIDoclK6WiXXxqujAQ0wF6O/zHEw
-         rd7xprOKjXUjF29KaRI0pUBEd5bhVT0/UYhY4k4V1ttBCIYLl7cf5FNn9W+Utd6kb9d+
-         65X+pnTAEJ+3Jy6Ww287UHj0QhspsbSMk4Wt5J3LX97zcJcDctBYmWjajPksCQHe3Eho
-         YdiizPtSQbnzAQfY5JQVXiMQLJnwxKGI7nYOb7ZlBQp+0kznSo/Uil0MJ0envwGoH/e0
-         QqBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707429066; x=1708033866;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=fIYiS1TTUPCk9T95S8njC1Yp6siu1vGkgx9QWAdSP6M=;
-        b=lqVe/WHjFmnv16eL6DVijZh7784qXvxNo+LDHqfzIWaoKKy6GHU7ET5a+LUcNeZY2c
-         8p7vjw1ridllbbqku3+yexs6ZjJ4sFD/8ptFq9C3a0GkScpY1uRFSTVrzJyGxQIDC89J
-         TW9uJP0Gzy1nsuy1oNambvQORGY8ql25yZgLIi3Z/veWsEFkYR1Ox+2zunpzR/IAn20F
-         z8s+yeVJ0VDmi/D8daIRAvww+FBdl7ct6/gSIjwC2zbtCALd42/Mj37rkXf/8xXPuZxv
-         EeuQyBE++9y/z/pRu2xtO6L443RGrwQR9SzE+nBL2wYpFld/TzgI3chqIvCTm4CdDPY+
-         Vs3A==
-X-Forwarded-Encrypted: i=1; AJvYcCWbQwq4XyprlTiyRzGxSm2Lyo8Ov/9PuPYD190tifzl5f2wqLJLc7neBiEhfsgziqO8eOixZMFgsU6tx0irOupxsNVExPev
-X-Gm-Message-State: AOJu0YxSH2i4Qh0qFi8DnWjdshntf4m+7PkPpjms7EwXu2k7fxDrUZp4
-	DXuR0HojyZPSE9OfmknMK6b7VQNC558rGIz+RJY+XduMda2vMY6M
-X-Google-Smtp-Source: AGHT+IEzw50FuLMT6gPEIoloy6Wn56dW1QPJ3loSVNW3CG4N3ucItR122GvV+8WOF8IlcN78Y96CDA==
-X-Received: by 2002:a05:6808:114f:b0:3bf:eb08:da79 with SMTP id u15-20020a056808114f00b003bfeb08da79mr695597oiu.2.1707429066531;
-        Thu, 08 Feb 2024 13:51:06 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU9qcCiVwuMp5F6We8sgt/iXMbeq35Y24AXEXQIb7dll3Qk3Z3hRDg9NkEdlwaPOZwuDM3BH1FA0ATJHgXQ9J9xliVMpJ6si8RAVYqAYB3JxTZV3O7IOag21Tb3jZzM6W/feEnU3dyKHnMih/jWqMeSFjnoNeZ8V73o5rfhpr0030pHfnlHCUo=
-Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
-        by smtp.gmail.com with ESMTPSA id p4-20020a05620a22a400b00783fe340e2asm184901qkh.107.2024.02.08.13.51.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 13:51:06 -0800 (PST)
-Date: Thu, 08 Feb 2024 16:51:05 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Andy Lutomirski <luto@amacapital.net>, 
- Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Willem de Bruijn <willemb@google.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Network Development <netdev@vger.kernel.org>, 
- Jakub Kicinski <kuba@kernel.org>
-Message-ID: <65c54cc9ea70c_1cb6bf29492@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CALCETrWu63SB+R8hw-1gZ-fbutXAAFKuWJD-wJ9GejX+p8jhSw@mail.gmail.com>
-References: <CALCETrU0jB+kg0mhV6A8mrHfTE1D1pr1SD_B9Eaa9aDPfgHdtA@mail.gmail.com>
- <f454d60a-c68e-4fcc-a963-fc5c4503d0ee@linux.dev>
- <CALCETrWu63SB+R8hw-1gZ-fbutXAAFKuWJD-wJ9GejX+p8jhSw@mail.gmail.com>
-Subject: Re: SOF_TIMESTAMPING_OPT_ID is unreliable when sendmsg fails
+	s=arc-20240116; t=1707429180; c=relaxed/simple;
+	bh=8QAG6Cro55Jx09o5dkxYkDEqva+UxRXkLO1iDXdFo4E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZsZiZvn8mwnYbpe7SK7Rxs1264iPFWctS2FEvCgx1QMsaZ/jzaTMJ11TO8Tl9JMNAjupjzlNn5C9KEJonTWAPoj9hKjrxAjFocI1hS9DimRQvkqpMKRFGOd+tqqr4MqZI0LHPPvT3y5ezXTWfMWn31kVkp7nOeoiK/GAUlErY1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=loMuMepI; arc=none smtp.client-ip=192.198.163.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707429179; x=1738965179;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=8QAG6Cro55Jx09o5dkxYkDEqva+UxRXkLO1iDXdFo4E=;
+  b=loMuMepIm4AeedvYTNBnJKXvN8XfFA7xY8szT2hweg5LKdDkHKO5Mmur
+   ZjT57FnYA7ZkEqeEPDU1lpxLGTx5OVMuqrm7i+dLV9zuclaLVQ5QyKwHa
+   xx3V1LucyAzKKfioRX+0TaLcQ4iHlE8EvLPlXOS0jla1PAA+DwdhHnG3W
+   Y5jHT0pjaBgQb2Sg8BSVN+fQ+W2AdT4dG3pFnbGxzgNYi1rD2MnCc7rxD
+   FNZSt09w3PwUKP4uD7tOFteqxC/MP9hVLyLK+exn/PCTrroobJF7BbrLu
+   LZdub05J4iBosWSOj2o9rY+qRCm1qc52VYq7nCZsyT06NarNQw4Y+XtbT
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10978"; a="1623333"
+X-IronPort-AV: E=Sophos;i="6.05,254,1701158400"; 
+   d="scan'208";a="1623333"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2024 13:52:58 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,254,1701158400"; 
+   d="scan'208";a="6389144"
+Received: from millermi-mobl1.amr.corp.intel.com (HELO [10.255.229.182]) ([10.255.229.182])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2024 13:52:57 -0800
+Message-ID: <273bac88-db72-4282-861d-e9886d32ca7f@linux.intel.com>
+Date: Thu, 8 Feb 2024 13:52:56 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/8] platform/x86/intel/sdsi: Add header file
+Content-Language: en-US
+To: "David E. Box" <david.e.box@linux.intel.com>, netdev@vger.kernel.org,
+ ilpo.jarvinen@linux.intel.com
+Cc: linux-kernel@vger.kernel.org, platform-driver-x86@vger.kernel.org
+References: <20240201010747.471141-1-david.e.box@linux.intel.com>
+ <20240201010747.471141-4-david.e.box@linux.intel.com>
+From: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>
+In-Reply-To: <20240201010747.471141-4-david.e.box@linux.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Andy Lutomirski wrote:
-> On Thu, Feb 8, 2024 at 11:55=E2=80=AFAM Vadim Fedorenko
-> <vadim.fedorenko@linux.dev> wrote:
-> >
-> > On 08/02/2024 18:02, Andy Lutomirski wrote:
-> > > I=E2=80=99ve been using OPT_ID-style timestamping for years, but fo=
-r some
-> > > reason this issue only bit me last week: if sendmsg() fails on a UD=
-P
-> > > or ping socket, sk_tskey is poorly.  It may or may not get incremen=
-ted
-> > > by the failed sendmsg().
 
-The intent is indeed to only increment on a successful send.
+On 1/31/24 5:07 PM, David E. Box wrote:
+> In preparation for new source files, move common structures to a new
+> header flie.
 
-The implementation is complicated a bit by (1) being a socket level
-option, thus also supporting SOCK_RAW and (2) MSG_MORE using multiple
-send calls to only produce a single datagram and (3) fragmentation
-producing multiple skbs for a single datagram.
+Add some detail about why you adding new source files.
 
-If only SOCK_DGRAM, conceivably we could move this to udp_send_skb,
-after the skb is created and after the usual error exit paths.
+Reviewed-by: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>
+>
+> Signed-off-by: David E. Box <david.e.box@linux.intel.com>
+> ---
+>  MAINTAINERS                       |  1 +
+>  drivers/platform/x86/intel/sdsi.c | 23 +----------------------
+>  drivers/platform/x86/intel/sdsi.h | 31 +++++++++++++++++++++++++++++++
+>  3 files changed, 33 insertions(+), 22 deletions(-)
+>  create mode 100644 drivers/platform/x86/intel/sdsi.h
+>
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 8d1052fa6a69..09ef8497e48a 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -11042,6 +11042,7 @@ INTEL SDSI DRIVER
+>  M:	David E. Box <david.e.box@linux.intel.com>
+>  S:	Supported
+>  F:	drivers/platform/x86/intel/sdsi.c
+> +F:	drivers/platform/x86/intel/sdsi.h
+>  F:	tools/arch/x86/intel_sdsi/
+>  F:	tools/testing/selftests/drivers/sdsi/
+>  
+> diff --git a/drivers/platform/x86/intel/sdsi.c b/drivers/platform/x86/intel/sdsi.c
+> index 05a35f2f85b6..d48bb648f0b2 100644
+> --- a/drivers/platform/x86/intel/sdsi.c
+> +++ b/drivers/platform/x86/intel/sdsi.c
+> @@ -22,24 +22,16 @@
+>  #include <linux/types.h>
+>  #include <linux/uaccess.h>
+>  
+> +#include "sdsi.h"
+>  #include "vsec.h"
+>  
+>  #define ACCESS_TYPE_BARID		2
+>  #define ACCESS_TYPE_LOCAL		3
+>  
+>  #define SDSI_MIN_SIZE_DWORDS		276
+> -#define SDSI_SIZE_MAILBOX		1024
+>  #define SDSI_SIZE_REGS			80
+>  #define SDSI_SIZE_CMD			sizeof(u64)
+>  
+> -/*
+> - * Write messages are currently up to the size of the mailbox
+> - * while read messages are up to 4 times the size of the
+> - * mailbox, sent in packets
+> - */
+> -#define SDSI_SIZE_WRITE_MSG		SDSI_SIZE_MAILBOX
+> -#define SDSI_SIZE_READ_MSG		(SDSI_SIZE_MAILBOX * 4)
+> -
+>  #define SDSI_ENABLED_FEATURES_OFFSET	16
+>  #define SDSI_FEATURE_SDSI		BIT(3)
+>  #define SDSI_FEATURE_METERING		BIT(26)
+> @@ -103,19 +95,6 @@ struct disc_table {
+>  	u32	offset;
+>  };
+>  
+> -struct sdsi_priv {
+> -	struct mutex		mb_lock;	/* Mailbox access lock */
+> -	struct device		*dev;
+> -	void __iomem		*control_addr;
+> -	void __iomem		*mbox_addr;
+> -	void __iomem		*regs_addr;
+> -	int			control_size;
+> -	int			maibox_size;
+> -	int			registers_size;
+> -	u32			guid;
+> -	u32			features;
+> -};
+> -
+>  /* SDSi mailbox operations must be performed using 64bit mov instructions */
+>  static __always_inline void
+>  sdsi_memcpy64_toio(u64 __iomem *to, const u64 *from, size_t count_bytes)
+> diff --git a/drivers/platform/x86/intel/sdsi.h b/drivers/platform/x86/intel/sdsi.h
+> new file mode 100644
+> index 000000000000..d0d7450c7b2b
+> --- /dev/null
+> +++ b/drivers/platform/x86/intel/sdsi.h
+> @@ -0,0 +1,31 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#ifndef __PDx86_SDSI_H_
+> +#define __PDx86_SDSI_H_
+> +#include <linux/mutex.h>
+> +#include <linux/types.h>
+> +
+> +#define SDSI_SIZE_MAILBOX		1024
+> +
+> +/*
+> + * Write messages are currently up to the size of the mailbox
+> + * while read messages are up to 4 times the size of the
+> + * mailbox, sent in packets
+> + */
+> +#define SDSI_SIZE_WRITE_MSG		SDSI_SIZE_MAILBOX
+> +#define SDSI_SIZE_READ_MSG		(SDSI_SIZE_MAILBOX * 4)
+> +
+> +struct device;
+> +
+> +struct sdsi_priv {
+> +	struct mutex			mb_lock;	/* Mailbox access lock */
+> +	struct device			*dev;
+> +	void __iomem			*control_addr;
+> +	void __iomem			*mbox_addr;
+> +	void __iomem			*regs_addr;
+> +	int				control_size;
+> +	int				maibox_size;
+> +	int				registers_size;
+> +	u32				guid;
+> +	u32				features;
+> +};
+> +#endif
 
-An alternative is in error paths to decrement the counter. This is
-what we do for MSG_ZEROCOPY references. Unfortunately, with the
-lockless UDP path, other threads could come inbetween the inc and dec,
-so this is not really workable.
+-- 
+Sathyanarayanan Kuppuswamy
+Linux Kernel Developer
 
-> > Well, there are several error paths, for sure. For the sockets you
-> > mention the increment of tskey happens at __ip{,6}_append_data. There=
-
-> > are 2 different types of failures which can happen after the incremen=
-t.
-> > The first is MTU check fail, another one is memory allocation failure=
-s.
-> > I believe we can move increment to a later position, after MTU check =
-in
-> > both functions to avoid first type of problem.
-> =
-
-> For reasons that I still haven't deciphered, I'm sporadically getting
-> EHOSTUNREACH after the increment.  I can't find anything in the code
-> that would cause that, and every time I try to instrument it, it stops
-> happening :(  I sendmsg to the same destination several times in rapid
-> succession, and at most one of them will get EHOSTUNREACH.
-
-UDP might fail on ICMP responses. Try sending to a closed port. A few
-send calls will succeed, but eventually the send call will refuse to
-send. The cause is in the IP layer.
-
-> >
-> > > I can think of at least three ways to improve this:
-> > >
-> > > 1. Make it so that the sequence number is genuinely only incremente=
-d
-> > > on success. This may be tedious to implement and may be nearly
-> > > impossible if there are multiple concurrent sendmsg() calls on the
-> > > same socket.
-> >
-> > Multiple concurrent sendmsg() should bring a lot of problems on user-=
-
-> > space side. With current implementation the application has to track =
-the
-> > value of tskey to check incoming TX timestamp later. But with paralle=
-l
-> > sendmsg() the app cannot be sure which value is assigned to which cal=
-l
-> > even in case of proper track value synchronization. That brings us to=
-
-> > the other solutions if we consider having parallel threads working wi=
-th
-> > same socket. Or we can simply pretend that it's impossible and then f=
-ix
-> > error path to decrement tskey value.
-> > >
-> > > 2. Allow the user program to specify an explicit ID.  cmsg values a=
-re
-> > > variable length, so for datagram sockets, extending the
-> > > SO_TIMESTAMPING cmsg with 64 bits of sequence number to be used for=
-
-> > > the TX timestamp on that particular packet might be a nice solution=
-.
-> > >
-> >
-> > This option can be really useful in case of really parallel work with=
-
-> > sockets.
-> =
-
-> I personally like this one the best.  Some care would be needed to
-> allow programs to detect the new functionality.  Any preferred way to
-> handle it?
-
-Regardless of whether we can fix the existing behavior, I also think
-this is a worthwhile cmsg. As timestamping is a SOL_SOCKET option, the
-cmsg should likely also be that, processed in __sock_cmsg_send.
 
