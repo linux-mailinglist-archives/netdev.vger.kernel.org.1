@@ -1,193 +1,186 @@
-Return-Path: <netdev+bounces-70123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C202584DC22
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 09:58:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F08EC84DC44
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:01:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E608A1C25ED9
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 08:58:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20F391C2676A
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 09:01:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 755BA6A8A9;
-	Thu,  8 Feb 2024 08:58:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F24116BB30;
+	Thu,  8 Feb 2024 09:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b="lc510mV/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="U37XRqqV"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2044.outbound.protection.outlook.com [40.107.104.44])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EEE167C45;
-	Thu,  8 Feb 2024 08:58:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.104.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707382693; cv=fail; b=MGxHOotW8KPCdpuWitOld/SjntV4hoYpMo7HtHqPl65AzSUUb/opEgkMMQuktcfW60ujgxArVweYx+QkOkn8gQ8ms+ew5rqR4FOiyUB8C8RqDsUJIHLI1HRKLdqqzfj4Bai3fQfyEl6QfQo6JG5pvzvY6DPEtzPvXpupwCgfyis=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707382693; c=relaxed/simple;
-	bh=ycmzxQG9ijfaNJ+SxVC0gklawaCQ1fCEreHu5JSEMF8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=rSDm8PQMwmdoVl3wCYHPD5tv8I+sYXfMu21/vQvJNKx0QVK9SrIWkd6ClWSugMfBtT3Y4UKei9g3TIMwXuOGaorEHPv1LzQLLNRydyLav9lxQitj47YF3U7IaAUatWMWNsYqB8MnYwPeeIi5LjFnTyGlnUB0A1y9L9VKojYeGAo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com; spf=fail smtp.mailfrom=leica-geosystems.com; dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b=lc510mV/; arc=fail smtp.client-ip=40.107.104.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=leica-geosystems.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZGIH5jta7IDgUUjTGDpDqM1RoK/6y//cwGmkhrgroxuOvB/D2uqBpbQlUZzSShoCGTehBgsBkSDS7i/nHiMXZnRQzlvwdBCBY4txH88JtGUCiyac5BdtMcyDBSGyPR+TVwGi9ZTRgdkjCMNcB5Tj+tl8tj/kI7xKwk/NJa/lA29nj/Tr47jRQgBchxmu2zb6lNkgUylC73MmSK60H3hiO/nmn2SFvJg5C3uMIelb5si7TceqgZqQYUFOWAi/U+/oxkcd48ZDFHGrU8Px9vh5gKf8p65Cb1Ef7LDNf8vYL1tlKxE2UJUdLWnkweMYtJWJjw94MzIqq9wZfPYzWa9x1A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ycmzxQG9ijfaNJ+SxVC0gklawaCQ1fCEreHu5JSEMF8=;
- b=YO6R+R+vu5l4RmPoo/iOTX9d1kmPeUJh9Cvw5QvmsEaoSCNmc7I+gTUFzR2LQ5dGqx08LfZ4gass9eAubYa0AefSYtG06lIhJk3Wjq4wqhJ6P9PgYrc7qcHbRHaV+hRkstcomRoYnwm/icbAjmoiWomorQPO/b96uWaIqvKY6zQQw/7dyT1+2DY/Hk2MkEfLstj3PL16k5k1YspZPgrMqXFYC9QXdqMByDbzjgUjQuNb46VnCydTtVAIauLUADGBIiO5ACwUoGxzZeNbPc3FpL/b+sqCbb48rvsTx+5v9s7QOkb1mp/4ICz3v9mewnGcbeX7UlaPvBnIfgsDX/NsLQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=leica-geosystems.com; dmarc=pass action=none
- header.from=leica-geosystems.com; dkim=pass header.d=leica-geosystems.com;
- arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=leica-geosystems.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ycmzxQG9ijfaNJ+SxVC0gklawaCQ1fCEreHu5JSEMF8=;
- b=lc510mV/sAQaXyfRPqWo1Unz1KBWO53PswMF019dpBvYlak0gopVsAsZ2wIH4uGDtuqtb+jJL5hLXubVDPoeYNO3wYF7Xp8Nlyk11NhVgIVLoHdraD4/gN770fgtqgsYLtyt37mB6aPIqkmUwJwAvra2RQbZGT393AYMsA3houo=
-Received: from AM6PR06MB4705.eurprd06.prod.outlook.com (2603:10a6:20b:59::18)
- by VI1PR06MB8781.eurprd06.prod.outlook.com (2603:10a6:800:1d8::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.36; Thu, 8 Feb
- 2024 08:58:08 +0000
-Received: from AM6PR06MB4705.eurprd06.prod.outlook.com
- ([fe80::2eff:83f6:f08f:4d3a]) by AM6PR06MB4705.eurprd06.prod.outlook.com
- ([fe80::2eff:83f6:f08f:4d3a%6]) with mapi id 15.20.7249.037; Thu, 8 Feb 2024
- 08:58:08 +0000
-From: POPESCU Catalin <catalin.popescu@leica-geosystems.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>, "afd@ti.com" <afd@ti.com>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>, "linux@armlinux.org.uk"
-	<linux@armlinux.org.uk>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	GEO-CHHER-bsp-development <bsp-development.geo@leica-geosystems.com>,
-	"m.felsch@pengutronix.de" <m.felsch@pengutronix.de>
-Subject: Re: [PATCH v2 2/2] net: phy: dp83826: support TX data voltage tuning
-Thread-Topic: [PATCH v2 2/2] net: phy: dp83826: support TX data voltage tuning
-Thread-Index: AQHaWe9Wo7eR3DxLokuTFbBUDe4Vo7D/NRCAgADw8AA=
-Date: Thu, 8 Feb 2024 08:58:08 +0000
-Message-ID: <f37e9df4-e1bd-4d40-bd99-3998cfd803f4@leica-geosystems.com>
-References: <20240207175845.764775-1-catalin.popescu@leica-geosystems.com>
- <20240207175845.764775-2-catalin.popescu@leica-geosystems.com>
- <4dc382bd-3477-45cb-8044-fc5c2c7251f4@lunn.ch>
-In-Reply-To: <4dc382bd-3477-45cb-8044-fc5c2c7251f4@lunn.ch>
-Accept-Language: en-CH, en-US
-Content-Language: aa
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=leica-geosystems.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM6PR06MB4705:EE_|VI1PR06MB8781:EE_
-x-ms-office365-filtering-correlation-id: 5d300b32-82f7-4664-9b37-08dc28841226
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- iQb4l2s4cXeAkI+NVV7m8G7pP9x+WxIdwC8YXpqfiGERx5EOXBItxvQ47IzXb0ZCjEEOuDWTNXHGcvZXu93eG+sgkFBCPdgrJkuyATyWjzyoEzrpSDR5FSFaTZFGNLsiPMk641OffcEpntMsUuZLK8juMCEz7Sk3za8lQptLeJMILiWAqZtPmCaODPmp4OCIt/M0X8VGqeY2YMtjdhKMM40aqWY9gJIkHy26VM3Q6LiPBht2jB2XNgFvGfxB4PmtwA9DZa9U/3ajkS8BSoArQDGIY2ggGEaheGsvyV/E72koTbOaTaueiyU9N1HxiF7G6ftHm69kA6tlvJyPNqbr4rxSGJjT+NTbmWeijK2yvrtyQe4tqhze2xL48XpgTmaaQT9+pCxZ333ZWLDqm9TZovzMS1xwda1UNcKzV3REQHKnZnVyNBE07hqAgPpRWIQ7gkzHrARROz3KHHTyTucAXUgrw1drRLS7g9SomB+WJXDWBrbi1xYwkhXSOTcvOTtHTJkz1EHi3RQy4SWPLlvpRp+GWW9RR37VGOwpTMtMnF5xhKJQ0Du/a32qxivM7JodEO7oF/KvTZyzuRK7IfTvKZl0JjfXCxmxifVsYvWkZ/ToONIqy06uEr3MH+5KNi2J
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM6PR06MB4705.eurprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376002)(39860400002)(136003)(366004)(396003)(346002)(230273577357003)(230922051799003)(64100799003)(186009)(451199024)(1800799012)(38100700002)(122000001)(31686004)(83380400001)(26005)(2616005)(6486002)(45080400002)(86362001)(31696002)(71200400001)(478600001)(53546011)(6506007)(6512007)(966005)(36756003)(76116006)(91956017)(66946007)(6916009)(4326008)(316002)(38070700009)(41300700001)(54906003)(66556008)(66476007)(66446008)(64756008)(8676002)(2906002)(8936002)(5660300002)(7416002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?UlRYdE9LYm83NFJZVVlIa2RXWnJyeWdBN2FUVUZEZlUwRHRyWnlub3FBWEc0?=
- =?utf-8?B?ZFVUQ1dxU3hVTlAxd2diT2JZUjN4VU9VUnBQYzlMRDJBVWhkK0dFYUVRZkx6?=
- =?utf-8?B?UUxvWTZod1BXdmZ4bDgwMEVqbVBSZW02enVjdzdmRU0vV0VFdFRpQWFITGhO?=
- =?utf-8?B?WHV6aXBJNytuZDVQRTR4dVpWQ1lvOElOcmRuM01yUGNzaVpQbFZqeG9vWVFr?=
- =?utf-8?B?d2pkSkFvSC9aOG5zWTdKcG9WaldDZ09DK0R3MVV6WmFSZTF1blJielM5ZGhn?=
- =?utf-8?B?c3R6WGcxbE1wV3ZOY1RGVTZSV1R6OGVSMUxOcDlkL2p6Z1BCb0E1MVVDRExs?=
- =?utf-8?B?QkkxeW9uSUtrYjJTekk5bnRtelhTYlE4bHMzS0cxT2dsL1NNN0l6VHZ1UlE3?=
- =?utf-8?B?U25Hb2JnWVVOSDg3QWdIMUxHZVBaQjhnRzU2bmdRUW9kQk50aXRZdVllRm4z?=
- =?utf-8?B?NVVyWmVzd1haWms3UDAzdEZBN3Q4NSs3OTZVR2VLa2d4VzhnS0JIRG9mUVAy?=
- =?utf-8?B?cUdoZFI5SUNYM3I0MVc1KytSTWRPV2pDWW9HMkpBTjlEU2lGekVabHJpeE54?=
- =?utf-8?B?YWhEeTc4QnBBQkZZL2JUbmt4QVl4dVV5R2lRL3ZSdEJKNzBwTzFETU9IUXNU?=
- =?utf-8?B?aWpMM0UrWFBZTWdldmloMG93WVcyRWtKNjVoQllWWFhJZ0hPMjB5cHhkNnFH?=
- =?utf-8?B?SjdZeThaOXczUEhRUnY2NEkyMWM0SVJVR1psWVhId1paYjlLeGN0TW1RUlFT?=
- =?utf-8?B?YXJCQXhIcHVXTW90dGJ2VXN1WUx0K2NENEQyM2NhMzNuMmRKMzI4anl5V05a?=
- =?utf-8?B?R1NBS2dodmhPODY0V1ZqdTZLYTNFQm80UE1qZHNkUGlsVGVZdldqYUg1RytR?=
- =?utf-8?B?VnFjeHJFMnBvclNyc2pQL0RmMVhrTkZiVzRrbkxsY2s2cThhamk4RFJLMXh5?=
- =?utf-8?B?MndSV1dSTWFhTWZpdHJ2MnArNzMwTHYxcUNvbVhZVkpSdmh5a0EyOVdhd1M1?=
- =?utf-8?B?ck5Fc2k5aU5iMXBLYzZEVFQrTmlmQVpSUkNjY3A0ak9MMFc2c1BMZ1h1cWJY?=
- =?utf-8?B?aEpNaWR1c0hEV1hTajlKbHZjc3RJK2ErQ3JMWnh4SEdtVm02OHphdnJJMnBu?=
- =?utf-8?B?NlZndXBuSy9XbklvU3IzYUV1bWJXTXF3bk1wMlRNM2RNNnpzeGR0dFZEUHNQ?=
- =?utf-8?B?VHFMb2IxQWtEYXZxZkZYNFFDTlJLb0xMT2l3QW54UDJoM0VsaDYwUWU0NUxh?=
- =?utf-8?B?VFhORUd5RTJuKzVjalRBQWtVMkZ4c292RUNEaUZSWVpHL1E2Y25pdThYV2pC?=
- =?utf-8?B?ZkxVaXFzdUV3S2pySU5PWXNsNnZyYnQvNXNrbkZsdk5vTVd5eWFHcys1VzI3?=
- =?utf-8?B?bmd2WncxR3RvTjNWdzRUQ0xyeUZOenpjb1huUUR1d05SeFUzLzlWbmtINkpK?=
- =?utf-8?B?blI3WE5YYVBDK2pGcFVjUDZPbUZnb1J5VWZZOWVXNURHeDc4dXZ5TVB6Y1Mw?=
- =?utf-8?B?cmQ2ak9SWDBWWkF4YVcyVUlzU3RzWTM4bTN6REV2TjdiREpoZnB2WDNhVTQz?=
- =?utf-8?B?bG8xcWN4ZlJnZXR2L0lzQkZHeDQwQkc0aCsvVXZjVm02ZG1QelJuRGNkM1Fl?=
- =?utf-8?B?UjJnZ1IzWUtJYmp1MnhzdGJuTUx4UWRMWU8yVDB2ZmJSWERVZjN4VUE3VzYw?=
- =?utf-8?B?dXpZMXBHdCtRekRZTEdXUUZpM3dPOGFhVXpROFQyZEgxMWwxSmRodkhrYzEr?=
- =?utf-8?B?Rmt1WElqWUQ4aGhzd1Y5ajlNT213V0dHV0pqZFNyRTJFM0oxaHNoeGhvWHp4?=
- =?utf-8?B?WVlETWowK1poMVhOVGtESWx1bVBlU1B1ei9OZG5uV013U2kxV1IyQXF0bzZ5?=
- =?utf-8?B?WC9aU0JKY1B1TDJTTGlCL2xxRTgya0pPYWlzS2hVTzJWT0xhT05JUG5YcUdP?=
- =?utf-8?B?akNCMk9Yb1RQbGQvcGpZVGxMeXhPN3YwS3IrUHY4S01scWZjUFVmTG1iRWFE?=
- =?utf-8?B?SytjdGtSUGVCbjI1ZSs0TFVjL21kZk56aW5VQXMvUEZOV01USTNDS3NuTGRi?=
- =?utf-8?B?Mm1YdnozdG1hQmZDc1lPdkVpWWZoZk9oZllVRkoyMUx4aUJtQ2VpUkNQUTBz?=
- =?utf-8?B?OHlKa0RxYzlmTXlNenRLdW92M3hSbDdQNmVmV1BJQjZ6NHBvc3dqTHdhbmZu?=
- =?utf-8?B?Z2c9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <6C35675D51B7154DB4AB18460C827D5C@eurprd06.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23A5B6A8D2
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 09:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707382897; cv=none; b=M5jOP5ZDmi9UdUtKkM+iFtRzLBERNZmWpbYjT2o2T0W6cYUDyBfrAb2c7yvbGxPTtCS+5uMpABRSAebksTeyjFjF75HHrBgwgHJ0gx9Ljaxci0wTq+nxplDgekHGyPvYZiZdKOWH5QW2+euzTDgk/IJA1OCC/a2nrxtrAKWLn2A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707382897; c=relaxed/simple;
+	bh=OWe9RB+lXu6X3YOsp6WbD1IhjLdVI5LF9xOYUXXsJr8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=HhxpirDCucDccezEH4gbf45Smrr/mK1nfUefZKH0Yjc59wB5DY+W8ZsvANaEwRY0htUn4IES3rgEk7PysG6NuXcQE0UaasjmXt0WUrJakUXK19vskvP8SZkTbIPgO9Ja9Wyg4a3l1k4NgdAYiyvlE9ZMBSTV+fa7/Cq9L2noyh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=U37XRqqV; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707382895;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=4/JqOjABGbJ9Vm9FDvp8u2Gkr9TWn4syrnCybYECDUw=;
+	b=U37XRqqVCfLhRQpCZTvL7B2a+sF63XzSvJ5bEMhAwl8AextP/FPT/GSdLSOyI1AsX05DoY
+	c/SNMN95w62AzaW/ZxDnconRzdzakhNLN5t9OHMYyrKxtN2dc1F8fq+8r10AClQz82ngXa
+	HqohDe95Th29jy+DnqS+TufZmzSGHNI=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-164-XHjj7F6FOfy_yyyedNVc4A-1; Thu, 08 Feb 2024 04:01:33 -0500
+X-MC-Unique: XHjj7F6FOfy_yyyedNVc4A-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40ef6441d1aso3437475e9.0
+        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 01:01:33 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707382892; x=1707987692;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4/JqOjABGbJ9Vm9FDvp8u2Gkr9TWn4syrnCybYECDUw=;
+        b=Y1WojciPJonLDgK7FBMuwXeEOZwttBrJhaDEeHUD9x/9eS+VEkAOsDp0J6dOMezrX7
+         1QCk6wvT40ur3JLEp1JhBoUrXWcDRxNtr/4TJO4rdPGWXpvfATtTwGCf3tIWrlRv6uDW
+         l5QfnHtnBjDCDRI3MyBBneQ6vewQRx8vx0U9rE87RjuJJOPmxbOmt1/ZDbIZHeb0fiy3
+         V4CClFkGD8pHEmfI5WwhMIZT5QDopDLWvsAuksp4uEbKoF0sASaNIexqQ8i6V2TYlWl9
+         JAo4yJ6/gFaNw2fGabYutQaozZnvvWijDJHAvg1ac/kF2yiX+6WuvV/sR96opyfVLul3
+         jnIw==
+X-Forwarded-Encrypted: i=1; AJvYcCWi1cOnALcTJ2raAcjOXiEWMLWgkVqyL1wpfWSDYxET/EybuC0ttx6w4pdl7fpHh300GxxX5WarnY9xA5dBd9LVzD9QPj4i
+X-Gm-Message-State: AOJu0YxXgFpDv/7E6h7dpP4TxzMTZtvE4tRlNSt1c4GWHaWubBYOEgaB
+	GZIfKed4IUMU1c3TKbiO7hjcgPixiMPkVfSQXdxJNFzfs9YjZ5Chd3e/iu/3l3ptPWy3F2SlbEp
+	Yn3auhsR4A16wMKmvoxfb1lz74ySLQeVpUNtSPn3nfHOYNTXErBE5dw==
+X-Received: by 2002:adf:ff92:0:b0:33b:5197:7182 with SMTP id j18-20020adfff92000000b0033b51977182mr2228616wrr.2.1707382892069;
+        Thu, 08 Feb 2024 01:01:32 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFZnrKijswVPJcSUlOl45mv2Hv8o6L1FQvc/XOtNYAZOI/Y1HopPxQuYATmebdzXzFAXOvtgQ==
+X-Received: by 2002:adf:ff92:0:b0:33b:5197:7182 with SMTP id j18-20020adfff92000000b0033b51977182mr2228598wrr.2.1707382891670;
+        Thu, 08 Feb 2024 01:01:31 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUYo9vTErVLCzx3QOCnpjvmyojOuc0WKCN9RG0vA4j5+MMTAyFGc2wm3DOdT8MfJZ5rAjUh57w5Gs6cbYceE122xibDRqK4cyFP3RJqw1PoQOeiL/slTlzIgeyWudy3p2rnYxh3+yeHS45jsMQjJIKrJcdD5khUH3Ay73v+po+/Lp00CzaH6nn6r9Mr0W8ZNBPnDT3NEt+FnMmgRA==
+Received: from gerbillo.redhat.com (146-241-238-112.dyn.eolo.it. [146.241.238.112])
+        by smtp.gmail.com with ESMTPSA id b14-20020adfee8e000000b0033af4848124sm3143463wro.109.2024.02.08.01.01.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Feb 2024 01:01:31 -0800 (PST)
+Message-ID: <85a149ff1f960f59d11af20b5f0e25e5e074acdd.camel@redhat.com>
+Subject: Re: [PATCH net 05/13] netfilter: ipset: Missing gc cancellations
+ fixed
+From: Paolo Abeni <pabeni@redhat.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org, 
+	edumazet@google.com, fw@strlen.de
+Date: Thu, 08 Feb 2024 10:01:29 +0100
+In-Reply-To: <20240207233726.331592-6-pablo@netfilter.org>
+References: <20240207233726.331592-1-pablo@netfilter.org>
+	 <20240207233726.331592-6-pablo@netfilter.org>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: leica-geosystems.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR06MB4705.eurprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5d300b32-82f7-4664-9b37-08dc28841226
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Feb 2024 08:58:08.4857
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: eSmA7Lr5oYkpX4fexboIU4XhOb4Md4nenl2953qQDaBe7GSeMQxagckigz4/YzJWApD654QMQ8UkX4XPKXGwSF2QDlqlwfjC9VHjAwvcVzwnuFkN64ImaeCCArtdkV5i
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR06MB8781
 
-T24gMDcuMDIuMjQgMTk6MzUsIEFuZHJldyBMdW5uIHdyb3RlOg0KPiBbU29tZSBwZW9wbGUgd2hv
-IHJlY2VpdmVkIHRoaXMgbWVzc2FnZSBkb24ndCBvZnRlbiBnZXQgZW1haWwgZnJvbSBhbmRyZXdA
-bHVubi5jaC4gTGVhcm4gd2h5IHRoaXMgaXMgaW1wb3J0YW50IGF0IGh0dHBzOi8vYWthLm1zL0xl
-YXJuQWJvdXRTZW5kZXJJZGVudGlmaWNhdGlvbiBdDQo+DQo+IFRoaXMgZW1haWwgaXMgbm90IGZy
-b20gSGV4YWdvbuKAmXMgT2ZmaWNlIDM2NSBpbnN0YW5jZS4gUGxlYXNlIGJlIGNhcmVmdWwgd2hp
-bGUgY2xpY2tpbmcgbGlua3MsIG9wZW5pbmcgYXR0YWNobWVudHMsIG9yIHJlcGx5aW5nIHRvIHRo
-aXMgZW1haWwuDQo+DQo+DQo+PiArc3RhdGljIGludCBkcDgzODI2X2NvbmZpZ19pbml0KHN0cnVj
-dCBwaHlfZGV2aWNlICpwaHlkZXYpDQo+PiArew0KPj4gKyAgICAgc3RydWN0IGRwODM4MjJfcHJp
-dmF0ZSAqZHA4MzgyMiA9IHBoeWRldi0+cHJpdjsNCj4+ICsgICAgIHUxNiB2YWwsIG1hc2s7DQo+
-PiArICAgICBpbnQgcmV0Ow0KPj4gKw0KPj4gKyAgICAgaWYgKGRwODM4MjItPmNmZ19kYWNfbWlu
-dXMgIT0gRFA4MzgyNl9DRkdfREFDX01JTlVTX0RFRkFVTFQpIHsNCj4+ICsgICAgICAgICAgICAg
-dmFsID0gRklFTERfUFJFUChEUDgzODI2X1ZPRF9DRkcxX01JTlVTX01ESV9NQVNLLCBkcDgzODIy
-LT5jZmdfZGFjX21pbnVzKSB8DQo+PiArICAgICAgICAgICAgICAgICAgIEZJRUxEX1BSRVAoRFA4
-MzgyNl9WT0RfQ0ZHMV9NSU5VU19NRElYX01BU0ssDQo+PiArICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgRklFTERfR0VUKERQODM4MjZfQ0ZHX0RBQ19NSU5VU19NRElYXzVfVE9fNCwNCj4+
-ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZHA4MzgyMi0+Y2ZnX2Rh
-Y19taW51cykpOw0KPj4gKyAgICAgICAgICAgICBtYXNrID0gRFA4MzgyNl9WT0RfQ0ZHMV9NSU5V
-U19NRElYX01BU0sgfCBEUDgzODI2X1ZPRF9DRkcxX01JTlVTX01ESV9NQVNLOw0KPj4gKyAgICAg
-ICAgICAgICByZXQgPSBwaHlfbW9kaWZ5X21tZChwaHlkZXYsIERQODM4MjJfREVWQUREUiwgTUlJ
-X0RQODM4MjZfVk9EX0NGRzEsIG1hc2ssIHZhbCk7DQo+PiArICAgICAgICAgICAgIGlmIChyZXQp
-DQo+PiArICAgICAgICAgICAgICAgICAgICAgcmV0dXJuIHJldDsNCj4+ICsNCj4+ICsgICAgICAg
-ICAgICAgdmFsID0gRklFTERfUFJFUChEUDgzODI2X1ZPRF9DRkcyX01JTlVTX01ESVhfTUFTSywN
-Cj4+ICsgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBGSUVMRF9HRVQoRFA4MzgyNl9DRkdf
-REFDX01JTlVTX01ESVhfM19UT18wLA0KPj4gKyAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
-ICAgICAgICAgICBkcDgzODIyLT5jZmdfZGFjX21pbnVzKSk7DQo+PiArICAgICAgICAgICAgIG1h
-c2sgPSBEUDgzODI2X1ZPRF9DRkcyX01JTlVTX01ESVhfTUFTSzsNCj4+ICsgICAgICAgICAgICAg
-cmV0ID0gcGh5X21vZGlmeV9tbWQocGh5ZGV2LCBEUDgzODIyX0RFVkFERFIsIE1JSV9EUDgzODI2
-X1ZPRF9DRkcyLCBtYXNrLCB2YWwpOw0KPj4gKyAgICAgICAgICAgICBpZiAocmV0KQ0KPj4gKyAg
-ICAgICAgICAgICAgICAgICAgIHJldHVybiByZXQ7DQo+PiArICAgICB9DQo+IEkgY291bGQgYmUg
-cmVhZGluZyB0aGlzIHdyb25nLCBidXQgaXQgbG9va3MgbGlrZQ0KPiBEUDgzODI2X0NGR19EQUNf
-TUlOVVNfREVGQVVMVCBhY3R1YWxseSBtZWFucyBsZWF2ZSB0aGUgdmFsdWUNCj4gdW5jaGFuZ2Vk
-PyBJcyB0aGVyZSBhbnl0aGluZyBndWFyYW50ZWVpbmcgaXQgZG9lcyBpbiBmYWN0IGhhdmUgdGhl
-DQo+IGRlZmF1bHQgdmFsdWUgaW4gdGhlIGhhcmR3YXJlPw0KPg0KPiAgICAgICAgICBBbmRyZXcN
-Cg0KWWVzLCB0aGUgZGF0YXNoZWV0IGNsZWFybHkgc3RhdGVzIHRoZSBkZWZhdWx0L3Jlc2V0IHZh
-bHVlcyBvZiBib3RoIA0KcmVnaXN0ZXJzIFZPRF9DRkcxICYgVk9EX0NGRzIgd2hpY2ggYXJlIDoN
-Ci0gY2ZnX2RhY19taW51cyA6IDMwaA0KLSBjZmdfZGFjX3BsdXMgOiAxMGgNCg0KDQo=
+On Thu, 2024-02-08 at 00:37 +0100, Pablo Neira Ayuso wrote:
+> From: Jozsef Kadlecsik <kadlec@netfilter.org>
+>=20
+> The patch fdb8e12cc2cc ("netfilter: ipset: fix performance regression
+> in swap operation") missed to add the calls to gc cancellations
+> at the error path of create operations and at module unload. Also,
+> because the half of the destroy operations now executed by a
+> function registered by call_rcu(), neither NFNL_SUBSYS_IPSET mutex
+> or rcu read lock is held and therefore the checking of them results
+> false warnings.
+>=20
+> Reported-by: syzbot+52bbc0ad036f6f0d4a25@syzkaller.appspotmail.com
+> Reported-by: Brad Spengler <spender@grsecurity.net>
+> Reported-by: =D0=A1=D1=82=D0=B0=D1=81 =D0=9D=D0=B8=D1=87=D0=B8=D0=BF=D0=
+=BE=D1=80=D0=BE=D0=B2=D0=B8=D1=87 <stasn77@gmail.com>
+> Fixes: fdb8e12cc2cc ("netfilter: ipset: fix performance regression in swa=
+p operation")
+> Tested-by: Brad Spengler <spender@grsecurity.net>
+> Tested-by: =D0=A1=D1=82=D0=B0=D1=81 =D0=9D=D0=B8=D1=87=D0=B8=D0=BF=D0=BE=
+=D1=80=D0=BE=D0=B2=D0=B8=D1=87 <stasn77@gmail.com>
+> Signed-off-by: Jozsef Kadlecsik <kadlec@netfilter.org>
+> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+> ---
+>  net/netfilter/ipset/ip_set_core.c     | 2 ++
+>  net/netfilter/ipset/ip_set_hash_gen.h | 4 ++--
+>  2 files changed, 4 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/net/netfilter/ipset/ip_set_core.c b/net/netfilter/ipset/ip_s=
+et_core.c
+> index bcaad9c009fe..3184cc6be4c9 100644
+> --- a/net/netfilter/ipset/ip_set_core.c
+> +++ b/net/netfilter/ipset/ip_set_core.c
+> @@ -1154,6 +1154,7 @@ static int ip_set_create(struct sk_buff *skb, const=
+ struct nfnl_info *info,
+>  	return ret;
+> =20
+>  cleanup:
+> +	set->variant->cancel_gc(set);
+>  	set->variant->destroy(set);
+>  put_out:
+>  	module_put(set->type->me);
+> @@ -2378,6 +2379,7 @@ ip_set_net_exit(struct net *net)
+>  		set =3D ip_set(inst, i);
+>  		if (set) {
+>  			ip_set(inst, i) =3D NULL;
+> +			set->variant->cancel_gc(set);
+>  			ip_set_destroy_set(set);
+>  		}
+>  	}
+> diff --git a/net/netfilter/ipset/ip_set_hash_gen.h b/net/netfilter/ipset/=
+ip_set_hash_gen.h
+> index 1136510521a8..cfa5eecbe393 100644
+> --- a/net/netfilter/ipset/ip_set_hash_gen.h
+> +++ b/net/netfilter/ipset/ip_set_hash_gen.h
+> @@ -432,7 +432,7 @@ mtype_ahash_destroy(struct ip_set *set, struct htable=
+ *t, bool ext_destroy)
+>  	u32 i;
+> =20
+>  	for (i =3D 0; i < jhash_size(t->htable_bits); i++) {
+> -		n =3D __ipset_dereference(hbucket(t, i));
+
+AFAICS __ipset_dereference() should not trigger any warning, as it
+boils down to rcu_dereference_protected()
+
+> +		n =3D hbucket(t, i);
+
+This statement instead triggers a sparse warning.
+
+>  		if (!n)
+>  			continue;
+>  		if (set->extensions & IPSET_EXT_DESTROY && ext_destroy)
+> @@ -452,7 +452,7 @@ mtype_destroy(struct ip_set *set)
+>  	struct htype *h =3D set->data;
+>  	struct list_head *l, *lt;
+> =20
+> -	mtype_ahash_destroy(set, ipset_dereference_nfnl(h->table), true);
+> +	mtype_ahash_destroy(set, h->table, true);
+
+The same here. What about using always __ipset_dereference()?
+
+Cheers,
+
+Paolo
+
 
