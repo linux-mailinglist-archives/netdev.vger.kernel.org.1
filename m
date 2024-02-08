@@ -1,191 +1,200 @@
-Return-Path: <netdev+bounces-70147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE03984DDE2
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 11:12:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94A2D84DE00
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 11:19:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A559528D590
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:12:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA73D1C26BB5
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:19:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 388926BFDD;
-	Thu,  8 Feb 2024 10:12:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A7B6D1B0;
+	Thu,  8 Feb 2024 10:19:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="denpnWJZ"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="kfyTY0kn"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68BB46BB4B
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 10:12:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A4A6E2CA;
+	Thu,  8 Feb 2024 10:19:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707387158; cv=none; b=DMP1eOV/88UJObv7eVDcbbmKg83u6g5qO+bNA8baoInC2Vzrh5/cTHc4P+Toqhh5jsHGtGdyqx7SVQIiaB1VAHv6lQR9D7jApbx5tlcvRwS7/3hoiw1RbmZL+88lUJ5/Rv4jwnY7xJvkKko0v1jhzLHOCeFaNeCezOWpS50gU6E=
+	t=1707387547; cv=none; b=hO+iqTXU6NBXu0fq20XPVKJaD0S5XhDK2sXLVhIWx0TSzs5b/4+EzThreWMlRY6RNsXFHmL9UhoHvaPdnuxIpYlPucPJm+vgFRIqi04OvWQnoY/0Gk2ixUdFFcqDak4+34WPi9B+97tpnhB+QBv2nykKQjtD0eQIqhO1IrMm+pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707387158; c=relaxed/simple;
-	bh=PEWJ09jifRFAAlLjcVc4iKAqSR7wR85dz0SRx0aVLSg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=KeVLbWcIzNqx0feQpl7FjFekLYFLw7YMZmtmQSQ3p6/q11Xz0pF6O8+pvPY/0IO7DOT8S2l7lbKto1dzSDwLtRAMk2N6spS4QMt/NXABZBUuMRZ39gE2kU4zBX59/TScWVy0l2ZD00PeRes908eSQGYj0tcd+rtoGH9N7UsbOt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=denpnWJZ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707387155;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=2xFFELdl4FuzvLcR7hSHd94J0Sm6euURDyqSxsU4JA4=;
-	b=denpnWJZBZ8UZA9b3QVfXJzlFVCZOcoXhZlfXHvhWS3Uaqp4OocxAqau7iqvS3Cr5iGhFG
-	HK6xUf7/vMHuI4nzGoF/2WRqjI/jTN2HqRCQNQdEr0j8VCHCIKIZd97kvRcjFBW0clNmim
-	H0/9wVe0kHjOfSLfb5wvjZilPn2SBuI=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-33-AWhUyQnjM-al177VmVkunA-1; Thu, 08 Feb 2024 05:12:33 -0500
-X-MC-Unique: AWhUyQnjM-al177VmVkunA-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-40efaee41dbso1015765e9.1
-        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 02:12:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707387150; x=1707991950;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2xFFELdl4FuzvLcR7hSHd94J0Sm6euURDyqSxsU4JA4=;
-        b=b6qIGBWQYf6oNzp8OZwuG2oyGRlkvHMh4Q0+0XO8jX4olre8B5gIbpPchstILu7Utl
-         L4SoKuCCmx8vHpXkjhYBjPP/O6JDnB7uFiHHtFZsdpL2+/2TVwU0BxsL5VOUXN5PmtV9
-         OYfGGPyJaAt2U6ERreihJGX42ul8tu8bBKgFpnBRd/fAJhGb1LGnuM0zzwLa7cUY5HkW
-         4Srd1h8FxyRjPQtFbDLPN4NJohwn0YnXw0Y/VzFWvZlKUtX47Vk2XF4JQ+zCPaeaVxOr
-         /M1WO3T7VisPXzBqrVyQmu35ktGcMpsgzO18tWh5UqxjKzi6xiiohS7bjRZwHqyI+2wq
-         /utA==
-X-Gm-Message-State: AOJu0YyyUGudlUMSfQvnThR6e4pbyFKoMImD91KIfoj3q0uz2Rf54hqp
-	/T4vgBI0q7lzG+bvoo+Ou204sBcCRvaaY7/yntsMNWes0FRa5U8r1PBDQeNkDuNEAhaSZkVplM7
-	5T3DxG+cGXiP8d0LFejohm+ro4Pbd6MPp1nILiuS0S1oi+lEqswGAOg==
-X-Received: by 2002:a05:600c:1d07:b0:40f:c996:307f with SMTP id l7-20020a05600c1d0700b0040fc996307fmr6728391wms.3.1707387150294;
-        Thu, 08 Feb 2024 02:12:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH78/GRltwIxEgIU+8Y7+NU4Q4kqElIeGIOwpokqq1fSu2KdOgrVrhKBlh9KprEw1Zrt0zakA==
-X-Received: by 2002:a05:600c:1d07:b0:40f:c996:307f with SMTP id l7-20020a05600c1d0700b0040fc996307fmr6728375wms.3.1707387149932;
-        Thu, 08 Feb 2024 02:12:29 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXnsIxnq53mDLozbjJ3fZAb8+suXi7BF8TSIURB8mIK8DOG9FXPIZfU3FXRaSoS8XmbleXl0vluyFQEmyQhvG5V9yejM7Ii8Z9CPrIsiW2dPuWnNFixWc8KrgrkIEuHcy9dSTGcxJKth2bGEXzsJd/2A4MHwDQAVwyNpdp81G/Tj/vOaTCXgtDltgPrUeNt8p5cmEE3cePb6c+Tf3EXc8KmrW4WKq5G8BfjS1ZFLpk/5iAIvedV/Z8/ocL6gahj10uapy+c9Xg/Rqv0RxX1UyDyxDBISQtJ
-Received: from gerbillo.redhat.com (146-241-238-112.dyn.eolo.it. [146.241.238.112])
-        by smtp.gmail.com with ESMTPSA id u12-20020a05600c138c00b004100c0882fdsm1170260wmf.31.2024.02.08.02.12.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 02:12:29 -0800 (PST)
-Message-ID: <63d59bff272f572c94f97000475c4ac3e157c013.camel@redhat.com>
-Subject: Re: [PATCH v2] net: phy: dp83822: Fix RGMII TX delay configuration
-From: Paolo Abeni <pabeni@redhat.com>
-To: Tim Pambor <tp@osasysteme.de>, Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>,  "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Dan Murphy
- <dmurphy@ti.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Date: Thu, 08 Feb 2024 11:12:28 +0100
-In-Reply-To: <20240204101128.49336-1-tp@osasysteme.de>
-References: <20240204101128.49336-1-tp@osasysteme.de>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1707387547; c=relaxed/simple;
+	bh=IudSft82J5bh0vU6smrPXuwB3up+uxat83+QZVVUCSE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=t326ECo5lCn7TmtG8v5HgEHYr2QxxYDeKAXTRI1au77SNvkTMfB8es4s+WOHJvIbslwU7d+ujNpjnDsGXYPo0UOeld727u1BecG+SQrOCs7QnEqzZhW94mCanFB1WymryMi50ga/gv+veaPICbYHjYXaYs1yA+2AX6ccCtYP5Lw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=kfyTY0kn; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4184Gl8j001166;
+	Thu, 8 Feb 2024 02:18:48 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=pfpt0220; bh=Q4kGmOXe
+	SE3YSc9uti9XSX1GdBtx2l5z+ZGBjuldvmM=; b=kfyTY0knQW+sLSdyIsZLr6GW
+	agt1LagYoqDuqUw0ViKs3123EJSk32I4rJ1U47rq2uWjYEI4QZhwZ8NiwSdsIZjN
+	bHnST/aaJ3498jnc1oZkcl49zHuVxGL2Hz9Udp+wOUFx5z0TTwPbtyL83wvf2Y8U
+	Pa1r10xUK1mP4E0yYH/syarQ1HaRBClQS1xn0bRwRYkLZnC5Z5NB87a+Ny4D/pNB
+	g15lqeu/eP11dJG9EXtqYNVvKZWpPvpvG00FSOHu65N5HttnK01CIqE542UBo5rX
+	nKNBxVYDeRiF/H0JyX9KrLPAVCGW7UZO5iKY6EtasMEBjBKipWAErvMa3XST8w==
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3w4qsq0wf4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Thu, 08 Feb 2024 02:18:48 -0800 (PST)
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 8 Feb
+ 2024 02:18:46 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Thu, 8 Feb 2024 02:18:46 -0800
+Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
+	by maili.marvell.com (Postfix) with ESMTP id 136B83F7072;
+	Thu,  8 Feb 2024 02:18:46 -0800 (PST)
+From: Shinas Rasheed <srasheed@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <linux-doc@vger.kernel.org>, <hgani@marvell.com>, <vimleshk@marvell.com>,
+        <sedara@marvell.com>, <srasheed@marvell.com>, <egallen@redhat.com>,
+        <mschmidt@redhat.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
+        <horms@kernel.org>, <wizhao@redhat.com>, <kheib@redhat.com>,
+        <konguyen@redhat.com>
+Subject: [PATCH net-next v7 0/8] add octeon_ep_vf driver
+Date: Thu, 8 Feb 2024 02:18:32 -0800
+Message-ID: <20240208101841.3108103-1-srasheed@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: gYjQGXERyoE6Y2nD4P611mI-VRFbosNR
+X-Proofpoint-GUID: gYjQGXERyoE6Y2nD4P611mI-VRFbosNR
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-08_01,2024-02-07_01,2023-05-22_02
 
-On Sun, 2024-02-04 at 11:11 +0100, Tim Pambor wrote:
-> The logic for enabling the TX clock shift is inverse of enabling the RX
-> clock shift. The TX clock shift is disabled when DP83822_TX_CLK_SHIFT is
-> set. Correct the current behavior and always write the delay configuratio=
-n
-> to ensure consistent delay settings regardless of bootloader configuratio=
-n.
->=20
-> Reference: https://www.ti.com/lit/ds/symlink/dp83822i.pdf p. 69
->=20
-> Fixes: 8095295292b5 ("net: phy: DP83822: Add setting the fixed internal d=
-elay")
-> Signed-off-by: Tim Pambor <tp@osasysteme.de>
-> ---
-> Changes in v2:
->   - Further cleanup of RGMII configuration
+This driver implements networking functionality of Marvell's Octeon
+PCI Endpoint NIC VF.
 
-This overall makes the change more invasive, I'm unsure is in the
-direction pointed by Russell
+This driver support following devices:
+ * Network controller: Cavium, Inc. Device b203
+ * Network controller: Cavium, Inc. Device b403
+ * Network controller: Cavium, Inc. Device b103
+ * Network controller: Cavium, Inc. Device b903
+ * Network controller: Cavium, Inc. Device ba03
+ * Network controller: Cavium, Inc. Device bc03
+ * Network controller: Cavium, Inc. Device bd03
 
->   - Check for errors setting DP83822_RGMII_MODE_EN
-> ---
->  drivers/net/phy/dp83822.c | 41 +++++++++++++--------------------------
->  1 file changed, 14 insertions(+), 27 deletions(-)
->=20
-> diff --git a/drivers/net/phy/dp83822.c b/drivers/net/phy/dp83822.c
-> index b7cb71817780..1b2c34a97396 100644
-> --- a/drivers/net/phy/dp83822.c
-> +++ b/drivers/net/phy/dp83822.c
-> @@ -380,42 +380,29 @@ static int dp83822_config_init(struct phy_device *p=
-hydev)
->  {
->  	struct dp83822_private *dp83822 =3D phydev->priv;
->  	struct device *dev =3D &phydev->mdio.dev;
-> -	int rgmii_delay;
-> -	s32 rx_int_delay;
-> -	s32 tx_int_delay;
-> +	int rcsr_mask =3D DP83822_RGMII_MODE_EN;
-> +	int rcsr =3D 0;
->  	int err =3D 0;
->  	int bmcr;
-> =20
->  	if (phy_interface_is_rgmii(phydev)) {
-> -		rx_int_delay =3D phy_get_internal_delay(phydev, dev, NULL, 0,
-> -						      true);
-> +		rcsr |=3D DP83822_RGMII_MODE_EN;
-> =20
-> -		if (rx_int_delay <=3D 0)
-> -			rgmii_delay =3D 0;
-> -		else
-> -			rgmii_delay =3D DP83822_RX_CLK_SHIFT;
-> +		/* Set DP83822_RX_CLK_SHIFT to enable rx clk internal delay */
-> +		if (phy_get_internal_delay(phydev, dev, NULL, 0, true) > 0)
-> +			rcsr |=3D DP83822_RX_CLK_SHIFT;
-> =20
-> -		tx_int_delay =3D phy_get_internal_delay(phydev, dev, NULL, 0,
-> -						      false);
-> -		if (tx_int_delay <=3D 0)
-> -			rgmii_delay &=3D ~DP83822_TX_CLK_SHIFT;
-> -		else
-> -			rgmii_delay |=3D DP83822_TX_CLK_SHIFT;
-> +		/* Set DP83822_TX_CLK_SHIFT to disable tx clk internal delay */
-> +		if (phy_get_internal_delay(phydev, dev, NULL, 0, false) <=3D 0)
-> +			rcsr |=3D DP83822_TX_CLK_SHIFT;
-> =20
-> -		if (rgmii_delay) {
-> -			err =3D phy_set_bits_mmd(phydev, DP83822_DEVADDR,
-> -					       MII_DP83822_RCSR, rgmii_delay);
-> -			if (err)
-> -				return err;
-> -		}
-> -
-> -		phy_set_bits_mmd(phydev, DP83822_DEVADDR,
-> -					MII_DP83822_RCSR, DP83822_RGMII_MODE_EN);
-> -	} else {
-> -		phy_clear_bits_mmd(phydev, DP83822_DEVADDR,
-> -					MII_DP83822_RCSR, DP83822_RGMII_MODE_EN);
-> +		rcsr_mask |=3D DP83822_RX_CLK_SHIFT | DP83822_TX_CLK_SHIFT;
+Changes:
+V7:
+  - Separated octep_vf_get_if_stats from octep_vf_main.h to later patch
+    in [1/8]
+  - Moved introducing ndo_ops from [3/8] to [5/8]
 
-It looks like there is a change of behavior here. The current code
-clear the DP83822_RGMII_MODE_EN, while this patch will clear
-DP83822_RX_CLK_SHIFT | DP83822_TX_CLK_SHIFT, leaving
-DP83822_RGMII_MODE_EN unmodified.
+V6: https://lore.kernel.org/all/20240207065207.3092004-1-srasheed@marvell.com/
+  - Removed reuse of netif_tx_stop_all_queues, called implicitly in
+    netif_tx_disable, when stopping netdev
+  - Corrected error jump labels to have proper action-specific names in
+    probe function
+  - Removed singlethreaded workqueue implementation, since only tx
+    timeout task is run. Run the same in the system workqueue
+  - netdev_hold when tx_timeout happens to protect against free_netdev
+    if race occurs between rmmod and a tx timeout. netdev_put the
+    reference when timeout task ends to progress freeing netdev
+ 
 
-It does not look correct to me.
+V5: https://lore.kernel.org/all/20240129050254.3047778-1-srasheed@marvell.com/
+  - Changed unchecked return types to void and removed unnecessary
+    initializations in [2/8] patch.
 
-Cheers,
+V4: https://lore.kernel.org/all/20240108124213.2966536-1-srasheed@marvell.com/
+  - Moved some stats from ethtool and added more to ndo_get_stats64
+  - Replaced code in IQ full check function to use helper from
+    net/netdev_queues.h
+  - Refactored code so that NETDEV_TX_BUSY is avoided
 
-Paolo
+V3: https://lore.kernel.org/all/20240105203823.2953604-1-srasheed@marvell.com/
+  - Removed UINT64_MAX, which is unused
+  - Replaced masks and ULL declarations with GENMASK_ULL(), ULL() and
+    other linux/bits.h macros, corrected declarations to conform to xmas tree format in patch [2/8]
+  - Moved vfree and vzalloc null pointer casting corrections to patch
+    [3/8], and corrected return values to follow standard kernel error codes in same
+   - Set static budget of 64 for tx completion processing in NAPI
+  - Replaces napi_complete and build_skb APIs to napi_complete_done and
+    napi_build_skb APIs respectively
+  - Replaced code with helper from net/netdev_queues.h to wake queues in TX completion
+    processing
+  - Removed duplicate reporting of TX/RX packets/bytes, which is already
+    done during ndo_get_stats64
+
+V2: https://lore.kernel.org/all/20231223134000.2906144-1-srasheed@marvell.com/
+  - Removed linux/version.h header file from inclusion in
+    octep_vf_main.c
+  - Corrected Makefile entry to include building octep_vf_mbox.c in
+    [6/8] patch.
+  - Removed redundant vzalloc pointer cast and vfree pointer check in
+    [6/8] patch.
+
+V1: https://lore.kernel.org/all/20231221092844.2885872-1-srasheed@marvell.com/
+
+Shinas Rasheed (8):
+  octeon_ep_vf: Add driver framework and device initialization
+  octeon_ep_vf: add hardware configuration APIs
+  octeon_ep_vf: add VF-PF mailbox communication.
+  octeon_ep_vf: add Tx/Rx ring resource setup and cleanup
+  octeon_ep_vf: add support for ndo ops
+  octeon_ep_vf: add Tx/Rx processing and interrupt support
+  octeon_ep_vf: add ethtool support
+  octeon_ep_vf: update MAINTAINERS
+
+ .../device_drivers/ethernet/index.rst         |    1 +
+ .../ethernet/marvell/octeon_ep_vf.rst         |   24 +
+ MAINTAINERS                                   |    9 +
+ drivers/net/ethernet/marvell/Kconfig          |    1 +
+ drivers/net/ethernet/marvell/Makefile         |    1 +
+ .../net/ethernet/marvell/octeon_ep_vf/Kconfig |   19 +
+ .../ethernet/marvell/octeon_ep_vf/Makefile    |   10 +
+ .../marvell/octeon_ep_vf/octep_vf_cn9k.c      |  489 +++++++
+ .../marvell/octeon_ep_vf/octep_vf_cnxk.c      |  500 +++++++
+ .../marvell/octeon_ep_vf/octep_vf_config.h    |  160 +++
+ .../marvell/octeon_ep_vf/octep_vf_ethtool.c   |  273 ++++
+ .../marvell/octeon_ep_vf/octep_vf_main.c      | 1231 +++++++++++++++++
+ .../marvell/octeon_ep_vf/octep_vf_main.h      |  334 +++++
+ .../marvell/octeon_ep_vf/octep_vf_mbox.c      |  430 ++++++
+ .../marvell/octeon_ep_vf/octep_vf_mbox.h      |  166 +++
+ .../marvell/octeon_ep_vf/octep_vf_regs_cn9k.h |  154 +++
+ .../marvell/octeon_ep_vf/octep_vf_regs_cnxk.h |  162 +++
+ .../marvell/octeon_ep_vf/octep_vf_rx.c        |  510 +++++++
+ .../marvell/octeon_ep_vf/octep_vf_rx.h        |  224 +++
+ .../marvell/octeon_ep_vf/octep_vf_tx.c        |  330 +++++
+ .../marvell/octeon_ep_vf/octep_vf_tx.h        |  276 ++++
+ 21 files changed, 5305 insertions(+)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/marvell/octeon_ep_vf.rst
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/Kconfig
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/Makefile
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cn9k.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_cnxk.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_config.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_ethtool.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_mbox.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_mbox.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_regs_cn9k.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_regs_cnxk.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_rx.h
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_tx.c
+ create mode 100644 drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_tx.h
+
+-- 
+2.25.1
 
 
