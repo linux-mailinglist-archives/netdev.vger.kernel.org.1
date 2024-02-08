@@ -1,132 +1,83 @@
-Return-Path: <netdev+bounces-70166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9496084DE68
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 11:35:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92F8484DE96
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 11:47:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC3781C20992
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:35:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4487B1F21BFC
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:47:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12E1322065;
-	Thu,  8 Feb 2024 10:35:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AC9D6A8A1;
+	Thu,  8 Feb 2024 10:47:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="i1R6VbZa";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="rVNmJZso"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G9199IHz"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542611DFCE
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 10:35:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 275D56A335
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 10:47:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707388555; cv=none; b=kUw8wobte3nlk+weP2xd597+wVirCQVzkh6xYx/40Y8koVGq1abtKFOjM3nf1SGOHYGOp3+LFU/xBNvQi8zFtRVDQ0YT12x4EIClxF7miX1ZakC0r8zrLkdV1xp6gi+qn7qWYiZjMvVZinG663OxNcFV2N/zKurbmP1a92UONic=
+	t=1707389226; cv=none; b=GZG+WzgQ9tETW/+eopW7N5dG83EKeJM9HM9ywd4shS/FhV1Sfso88Kgum3jHjPY6aeEA8UgcgkaM0gbhJp1o4yqVHU5978ts84CmaxVqa6CGdUzlIjnlZRYujjLBUhdxnKw+sK70a9CrxjoremNFHhkgMKTHQa+CWggjqnMXAsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707388555; c=relaxed/simple;
-	bh=XYU8UThxyVM/BmRkaWbkfJ/UUWs7MkJRNJWR7CTFe+g=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=pGMWhbWPHSAGTqOazSFKZ6AngM8oA86HCxt/BjyyF5ClerKXc9/j5DmnApIxcQYPhHMG3/pmgQwFsLmYN5re8Q2SgrayHmPz+uox4dqxW5M6TmKj0SjT4LpvmoK+w5fAzmre79twgx2GYM2nOM2gbbkN54rSH+u+YS6P6vQIHKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=i1R6VbZa; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=rVNmJZso; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1707388545;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=O8FbyMLRAf0MPPkiZw7u/45AM7lfLrYJ9PmRTbq1LVE=;
-	b=i1R6VbZadJXN4evezJU3+AfnzMNV8Ufv037Ye1lMlAU9W4BqV73Bl3olyJhF/UfVyyYm6i
-	AzvxBaW9KTA23MIUOn/NPVJwTv6qyNIbM5GkDnOZN58ZDzhFka16o0mD6quoKyJddMEwr5
-	EgLxYUwWxj9BZJ5nunC0tC8jxNuyUFEM+iAhE/CKiQBBxy07+/B3iID+Q5OEeufDLVljee
-	pIJv8Z0FU08xpDSjfABqFuCITnCZpwrSo1/F81WPlK69tYSnmTKbnGXSrZisfwSrLXSnDc
-	JGFzfsjYKIOdYEcjBPWcDb+BlK0elp9oqI44Mfl/f3grZAVn2a6ImzpVb8rRrg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1707388545;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=O8FbyMLRAf0MPPkiZw7u/45AM7lfLrYJ9PmRTbq1LVE=;
-	b=rVNmJZsoRL/7zc5amA+WEs/jUMej37PPpGOnmELL1OLBfqFWEzbFhYOwpGRrZZ/G8yTA83
-	nLpKpS9US8okTlAQ==
-Date: Thu, 08 Feb 2024 11:35:25 +0100
-Subject: [PATCH net-next] net: stmmac: Simplify mtl IRQ status checking
+	s=arc-20240116; t=1707389226; c=relaxed/simple;
+	bh=sPqmIJG0j0Uvrtvc2UIvS8rx1hAClYJBsgbyABemMpQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QYGMu3clLpEb3+q5XTDA4kYW2lvu0cMBrcXgGKLdej1abRpSGVzNxPRTI/5aLmivQPeKnWh+rEiajlSkIiTOMR4gabV3VT7tJcSY2mFBTWKbapWHk4yrhYO0ks/9DfsnGe8TrZSUYkZN93kHfu58+TlRF+poQkgoGnolNVliTqI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G9199IHz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8277C433F1;
+	Thu,  8 Feb 2024 10:47:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707389225;
+	bh=sPqmIJG0j0Uvrtvc2UIvS8rx1hAClYJBsgbyABemMpQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=G9199IHza2HfLtJsyzAbJ18admPXPU3144BdmYC+e/ReX9WePUpmSYTjcuFbQuIjC
+	 3hVYZURLW3bZARH1YuG6vCmxGNtH5ucIoZ+q02Mr2ENTTt2aCbK+oP0LZfYcZ69XwL
+	 3gTLpKPLvo37O7k5ERr1PBtFHgwer4ptn4flr9kWQfXxmjkwCWuWqprhy7sm+8/zGH
+	 8wIgej8BYwDHBsJePSMPe5dbvlbc59Uq5qmjlY2v/6yip0dQmdcXCQ5Ud4IAyA7gI8
+	 RXSOGB8AxJwx1WnuyWa4EqEF1nBRVVui7TaFWFqZLaen3c0ztBCtAJUGrIxUvCp+ob
+	 v42RS4V8GEGHw==
+Date: Thu, 8 Feb 2024 10:47:00 +0000
+From: Simon Horman <horms@kernel.org>
+To: Diogo Ivo <diogo.ivo@siemens.com>
+Cc: danishanwar@ti.com, rogerq@kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	andrew@lunn.ch, vigneshr@ti.com, jan.kiszka@siemens.com,
+	dan.carpenter@linaro.org, robh@kernel.org, grygorii.strashko@ti.com,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net] net: ti: icssg-prueth: Remove duplicate cleanup
+ calls in emac_ndo_stop()
+Message-ID: <20240208104700.GF1435458@kernel.org>
+References: <20240206152052.98217-1-diogo.ivo@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240208-stmmac_irq-v1-1-8bab236026d4@linutronix.de>
-X-B4-Tracking: v=1; b=H4sIAGyuxGUC/x2N0QrCMAwAf2Xk2UItzlZ/RUSymrk8NGpSZDD27
- +t8PI7jFjBSJoNrt4DSj43f0uB46CBPKC9y/GwMwYeTDz45q6VgfrB+XR/PKYwYY8oXaMGARm5
- QlDztSUGrpLv4KI08/y83EKpOaK5wX9cNWvkro38AAAA=
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>
-Cc: Yannick Vignon <yannick.vignon@nxp.com>, 
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, Kurt Kanzenbach <kurt@linutronix.de>
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1321; i=kurt@linutronix.de;
- h=from:subject:message-id; bh=XYU8UThxyVM/BmRkaWbkfJ/UUWs7MkJRNJWR7CTFe+g=;
- b=owEBbQKS/ZANAwAKAcGT0fKqRnOCAcsmYgBlxK6Atb08JaTdEHu7F+d5W5Op9N65/uLVyQhBt
- IlsR7kKKRaJAjMEAAEKAB0WIQS8ub+yyMN909/bWZLBk9HyqkZzggUCZcSugAAKCRDBk9HyqkZz
- gm5XD/43iUUdoU4KgOL+dc14oqp3MKYJwu278fwqFSQWR8q9etX6XukXKnNp3QFfDet2+nwrCk/
- vjO93JpRiaL3UBsxrw6pljF1hAPwdfPHFOsk1WAXFRXvc4V5/RSjskdxOTbuBOexmPhvTph+gpg
- p19k8FVIEwnao1Zw/MVpslZNGW5DbLCwNIxnqVvoKjXkd/3WUrMEvWdCj/Lg3gIYjewXJbx9jxB
- 9SnDFqMHN8diP4ybcS7xsnt3drAOiKaLsdhu8O8ID7VaMyj2j8UfJSZ/lUgAr6TgmFN/dJ1w3Q/
- PVWOH2blV0Md9Pf45U0Hivc632odzpInvaMOv1eHtrGeIHWM/7vVsNZXWW3BgYZDjAqrH1emM/Q
- 8s7IzXLytvKO2DOMxCjgewx5OXOo5UW5KGQHN5XDXmqGGmpT/RiowcQBZUHrob6sbbl0je/x4T/
- VMKeZk97xA4z7xI03rEvsobCWDuSe67eTBA8W9+9PfN3xqTom8f2ImjasCQ0GRj/ZswRyEP70Om
- qBDrd6+Ss1mXosZu9kNYNkX1jtZ9PTaMnVGEgBSYoV2Rg7TcwjByMMDZGLC9qQkGwfbHKYrZXhZ
- kTSBuR8RTMpi1CLXy9MuJTPSf8+pU5XJPqtUkN1O4qekO+WwtZYY4HWnmjKWGeYCqITAtCNQoI1
- BlWB4xJLbkdMK0g==
-X-Developer-Key: i=kurt@linutronix.de; a=openpgp;
- fpr=BCB9BFB2C8C37DD3DFDB5992C193D1F2AA467382
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240206152052.98217-1-diogo.ivo@siemens.com>
 
-Commit 8a7cb245cf28 ("net: stmmac: Do not enable RX FIFO overflow
-interrupts") disabled the RX FIFO overflow interrupts. However, it left the
-status variable around, but never checks it.
+On Tue, Feb 06, 2024 at 03:20:51PM +0000, Diogo Ivo wrote:
+> Remove the duplicate calls to prueth_emac_stop() and
+> prueth_cleanup_tx_chns() in emac_ndo_stop().
+> 
+> Fixes: 128d5874c082 ("net: ti: icssg-prueth: Add ICSSG ethernet driver")
+> Fixes: 186734c15886 ("net: ti: icssg-prueth: add packet timestamping and ptp support")
+> Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
 
-As stmmac_host_mtl_irq_status() returns only 0 now, the code can be
-simplified.
+Hi Doigo,
 
-Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+I see that there are indeed duplicate calls,
+but I do wonder if this is a cleanup rather than a bug:
+is there a user-visible problem that this addresses?
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index 04d817dc5899..10ce2f272b62 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -6036,10 +6036,8 @@ static void stmmac_common_interrupt(struct stmmac_priv *priv)
- 				priv->tx_path_in_lpi_mode = false;
- 		}
- 
--		for (queue = 0; queue < queues_count; queue++) {
--			status = stmmac_host_mtl_irq_status(priv, priv->hw,
--							    queue);
--		}
-+		for (queue = 0; queue < queues_count; queue++)
-+			stmmac_host_mtl_irq_status(priv, priv->hw, queue);
- 
- 		/* PCS link status */
- 		if (priv->hw->pcs &&
+If so, I think it would be good to spell this out in the commit message.
 
----
-base-commit: 006e89649fa913e285b931f1b8dfd6485d153ca7
-change-id: 20240208-stmmac_irq-57682fa778c9
-
-Best regards,
--- 
-Kurt Kanzenbach <kurt@linutronix.de>
-
+...
 
