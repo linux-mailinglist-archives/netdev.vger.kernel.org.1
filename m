@@ -1,115 +1,117 @@
-Return-Path: <netdev+bounces-70240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 004BD84E222
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 14:41:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B56EC84E22B
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 14:42:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3337A1C24262
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 13:41:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F72C28D741
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 13:42:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE43276409;
-	Thu,  8 Feb 2024 13:41:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E73776417;
+	Thu,  8 Feb 2024 13:42:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F846Mvyb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ByXtfVjM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from mgamail.intel.com (mgamail.intel.com [192.55.52.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E2B7763F4;
-	Thu,  8 Feb 2024 13:41:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67331E485;
+	Thu,  8 Feb 2024 13:42:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.55.52.88
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707399698; cv=none; b=Lrm0a8w9yomz/MOrMHgc738OrIJ3s1dmqYMCyOEwxfpXNrggrjlDAKCdnoCZPWfINwMABmfvdhn+NSmkkrVbT9uTBycGewWkLX5Ui7AvkMiJ8eB3sYqMr9ODFJxtNDPeNZrxftDvPCvCgsBTODyPebXY3+JUHQ2HKgIsZl5ihA0=
+	t=1707399755; cv=none; b=EMfyL4MVOQA9p3ZzjEj4NoFPz8JIeb+hlS/8ToD0OT5dSdqJgOWgHVhomSTMtaBHcqPOAi2WkMf/AVE20NEHTVqnZ1jUEMXcdhVSlsoUFdhINfDLfTuwxcn7TcbCju843gb0RlR6ygy1d0XxjGUhZxMeraxOWSQtyONprihLj24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707399698; c=relaxed/simple;
-	bh=qrSI/kREa3yZP1NKtjRF9qEXDlbnGJ1y+I/iMwvn1BU=;
+	s=arc-20240116; t=1707399755; c=relaxed/simple;
+	bh=pyRGOt/cCSoXwL5MuB6r980v2EdUtNXRYTnNkulb+nQ=;
 	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=ZAFhDvL1CfLHu/yNDJdbqooMq6lIMLeUfq3v8L7iKze/uuKjmvEoJh5yLKsWoMoOWKNCbp0InbdCJhI81dTRlJcxykDG2MgpkBI46DtUvve6gOo6XvVqmcC/Ugz2qogUZFfwq6xnDjms3bV5m2odz0r2/13CzR2SRXgjGi84RRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F846Mvyb; arc=none smtp.client-ip=192.198.163.13
+	 MIME-Version:Content-Type; b=qTiNTttFoZLQ+SFcw5IxVvf87dAGSqbalXnaPJzPIGZMcMxedzcJ5QZ94ElLlgWKpE5DPsNnDnzos3t2yyIbYf+FRTa4pD/kxevNDtOJD8P5E+fWcInY6Jxtg/ZPES3dDsRz1uKGHlF9g+JEm0oY7p+TW3fWwVBm3LK4OXmpfGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ByXtfVjM; arc=none smtp.client-ip=192.55.52.88
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707399697; x=1738935697;
+  t=1707399753; x=1738935753;
   h=from:date:to:cc:subject:in-reply-to:message-id:
    references:mime-version;
-  bh=qrSI/kREa3yZP1NKtjRF9qEXDlbnGJ1y+I/iMwvn1BU=;
-  b=F846MvybVb9hSTfCI0rAmcToaMoaJSaEt7bAfP4ycA8bPO1sl+lE4aCA
-   a0/k5SihFzHxwLXUxdGRn+AFjRLjPlxmCztZtgm9cp/TRujVbC3NxN3g/
-   AcY4RNj7xMczWOuo9av7hp3odgfi5QAjyKHwD7O0qjpyKvP4MfCJWageo
-   kwmIsW+lGLArCGgEj3d3Dq/dRbLbNy0pun9nzra4XE0iTdJvgEf7iTYQD
-   QihgrIp/Vu1mO33cI9l7Mc1X06kIWeNA9Gaq1s6VGWcti3nwH3be+p16G
-   h55KhE3ZD+OBoONQbHVgPgD9PN8oJWDA2MuMkw3dEzJCsPZh21aSwoT4L
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10977"; a="4198770"
+  bh=pyRGOt/cCSoXwL5MuB6r980v2EdUtNXRYTnNkulb+nQ=;
+  b=ByXtfVjMintXni95PHwKMxDH82JuKGyJkAhaj4uWCno7yTt3ggv4E4X3
+   ZiWF6RXZmRu68LhFukf4LHbv+RQX+gz8+eil8jV8iptYhGxkh4eNaEfeY
+   WX5a9AAuL2KCPnPexj0vGP0iULT7UgTAUzzO76+UYVkvq5zXxYoN1AbnR
+   1kQV3/g97bp4h3B/vaJ5ptO83trao2B/WWBI6jgQelJX8ntCTZyrUtHcH
+   AadhdkWnbOaCuEAMaPTIu4r5vY+WcQ2AIH2KPk9R5ofvsjfTUusszTAl7
+   8eK7vsv84tlEpvrLd2AZQJi5C5Nqj9mYtL55M8QxXjSmWK7d+lGrkYpqx
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10977"; a="436353636"
 X-IronPort-AV: E=Sophos;i="6.05,254,1701158400"; 
-   d="scan'208";a="4198770"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2024 05:41:37 -0800
+   d="scan'208";a="436353636"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2024 05:42:33 -0800
 X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10977"; a="910360041"
 X-IronPort-AV: E=Sophos;i="6.05,254,1701158400"; 
-   d="scan'208";a="1641312"
+   d="scan'208";a="910360041"
 Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.246.52.95])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2024 05:41:34 -0800
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2024 05:42:31 -0800
 From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Date: Thu, 8 Feb 2024 15:41:30 +0200 (EET)
+Date: Thu, 8 Feb 2024 15:42:28 +0200 (EET)
 To: "David E. Box" <david.e.box@linux.intel.com>
 cc: Netdev <netdev@vger.kernel.org>, 
     sathyanarayanan.kuppuswamy@linux.intel.com, 
     LKML <linux-kernel@vger.kernel.org>, platform-driver-x86@vger.kernel.org
-Subject: Re: [PATCH 3/8] platform/x86/intel/sdsi: Add header file
-In-Reply-To: <20240201010747.471141-4-david.e.box@linux.intel.com>
-Message-ID: <271a61ec-1784-78c8-3c10-b58aef804abd@linux.intel.com>
-References: <20240201010747.471141-1-david.e.box@linux.intel.com> <20240201010747.471141-4-david.e.box@linux.intel.com>
+Subject: Re: [PATCH 1/8] platform/x86/intel/sdsi: Set message size during
+ writes
+In-Reply-To: <20240201010747.471141-2-david.e.box@linux.intel.com>
+Message-ID: <0d83b5fc-03ff-b96d-a55a-57ee954fed26@linux.intel.com>
+References: <20240201010747.471141-1-david.e.box@linux.intel.com> <20240201010747.471141-2-david.e.box@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323328-1983480225-1707399690=:1104"
+Content-Type: multipart/mixed; boundary="8323328-425400672-1707399748=:1104"
 
   This message is in MIME format.  The first part should be readable text,
   while the remaining parts are likely unreadable without MIME-aware tools.
 
---8323328-1983480225-1707399690=:1104
+--8323328-425400672-1707399748=:1104
 Content-Type: text/plain; charset=ISO-8859-15
 Content-Transfer-Encoding: QUOTED-PRINTABLE
 
 On Wed, 31 Jan 2024, David E. Box wrote:
 
-> In preparation for new source files, move common structures to a new
-> header flie.
+> New mailbox commands will support sending multi packet writes and updated
+> firmware now requires that the message size be written for all commands
+> along with the packet size. Since the driver doesn't perform writes large=
+r
+> than the packet size, set the message size to the same value.
 >=20
 > Signed-off-by: David E. Box <david.e.box@linux.intel.com>
 > ---
->  MAINTAINERS                       |  1 +
->  drivers/platform/x86/intel/sdsi.c | 23 +----------------------
->  drivers/platform/x86/intel/sdsi.h | 31 +++++++++++++++++++++++++++++++
->  3 files changed, 33 insertions(+), 22 deletions(-)
->  create mode 100644 drivers/platform/x86/intel/sdsi.h
+>  drivers/platform/x86/intel/sdsi.c | 1 +
+>  1 file changed, 1 insertion(+)
 >=20
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 8d1052fa6a69..09ef8497e48a 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -11042,6 +11042,7 @@ INTEL SDSI DRIVER
->  M:=09David E. Box <david.e.box@linux.intel.com>
->  S:=09Supported
->  F:=09drivers/platform/x86/intel/sdsi.c
-> +F:=09drivers/platform/x86/intel/sdsi.h
-
-Use this instead:
-
-drivers/platform/x86/intel/sdsi*
+> diff --git a/drivers/platform/x86/intel/sdsi.c b/drivers/platform/x86/int=
+el/sdsi.c
+> index 556e7c6dbb05..a70c071de6e2 100644
+> --- a/drivers/platform/x86/intel/sdsi.c
+> +++ b/drivers/platform/x86/intel/sdsi.c
+> @@ -252,6 +252,7 @@ static int sdsi_mbox_cmd_write(struct sdsi_priv *priv=
+, struct sdsi_mbox_info *in
+>  =09=09  FIELD_PREP(CTRL_SOM, 1) |
+>  =09=09  FIELD_PREP(CTRL_RUN_BUSY, 1) |
+>  =09=09  FIELD_PREP(CTRL_READ_WRITE, 1) |
+> +=09=09  FIELD_PREP(CTRL_MSG_SIZE, info->size) |
+>  =09=09  FIELD_PREP(CTRL_PACKET_SIZE, info->size);
+>  =09writeq(control, priv->control_addr);
 
 Reviewed-by: Ilpo J=E4rvinen <ilpo.jarvinen@linux.intel.com>
 
 --=20
  i.
 
---8323328-1983480225-1707399690=:1104--
+--8323328-425400672-1707399748=:1104--
 
