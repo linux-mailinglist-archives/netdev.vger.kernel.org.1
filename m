@@ -1,154 +1,106 @@
-Return-Path: <netdev+bounces-70379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35AFC84E9D0
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 21:44:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2685484E9F4
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 21:53:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5BBE290555
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 20:44:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDE531F286B9
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 20:53:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC91C4EB40;
-	Thu,  8 Feb 2024 20:44:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCDD148CC6;
+	Thu,  8 Feb 2024 20:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DB0vd2QE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-oi1-f169.google.com (mail-oi1-f169.google.com [209.85.167.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C353487B8;
-	Thu,  8 Feb 2024 20:44:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C7038385;
+	Thu,  8 Feb 2024 20:51:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707425059; cv=none; b=ailrq4Qe60yPaq1T/qOT+gidEFBuslC2oWXzl6YRUz679FFklCAb8PmTma9MnU5bTFeVqW661mD1WTJ1rmr+xQCgOGRvcixAxYWi42pq0M1oTKiwXZCAih5djM+x6/fz9qGokFhIMh852FAnSThWotZGfY3pk0DqGapGA5kyVZw=
+	t=1707425494; cv=none; b=Z4wlniR6jmuq3SeTb/BpuujJhckcpKxd0DywoeEOLuRTnbMMNT7cDwERu/fwiDRHHD87RGyCh8fXOTclAcPx31/txmZHZprKmIKsMB/6bX/4ov4NS2eMKjNDQAWiCAIv3t/u7snej6fsYTL+zvW7zG6qOANZvtLoVgOjPJr/Xwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707425059; c=relaxed/simple;
-	bh=Y1YO1yeJfR//2U1rH7TemWwVUP+2PWnGC2CmS8SSITk=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=p0w1fCQJoQAka+KrumKg71pvUx8rx5XYiD/7IPXPBg8RWSJxj2rY9n33SE5azG2ON7ef4k/RezjARE6ScPsSOxeah2mskMym6oom3JY40MxnTjNsx1hKS0koVDiae+mgcFoKEz+yDmbyoiJLkjS5GnxT3Hx5/EQUfU1y/rk072U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.74.49) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 8 Feb
- 2024 23:44:10 +0300
-Subject: Re: [PATCH net-next 1/5] net: ravb: Get rid of the temporary variable
- irq
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20240207120733.1746920-1-claudiu.beznea.uj@bp.renesas.com>
- <20240207120733.1746920-2-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <d348420d-59a0-f869-061d-5a1d736e12d5@omp.ru>
-Date: Thu, 8 Feb 2024 23:44:09 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1707425494; c=relaxed/simple;
+	bh=sm8uQrEOfdfvF2X+EvyKhAGidf7HO+Jtciuv0HVc6qE=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=pxNVreS8x6my8bTRa5I6Zj+JDxjPljkD19BQlSztRb3mpAMJuv7b/Mvh6Q7O94xXbn4yneiv7ACjvzfh8/SZDGHrO7a0ZuHvxyuTlDs5Mlb4juJQhUWPvYoDWXZuU4l44tkYii6wBcby0O0y2m2GpDbH//pQIoW+/RtDXtp6RiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DB0vd2QE; arc=none smtp.client-ip=209.85.167.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f169.google.com with SMTP id 5614622812f47-3bfedaaeeacso125102b6e.0;
+        Thu, 08 Feb 2024 12:51:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1707425492; x=1708030292; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6TTQhGymrB+mjkxDaS78rz/awRKS+8KTVwd9AhLRl6M=;
+        b=DB0vd2QExf/wPM/ioUaXoxAaiKqAVrMXP627B4PX/drwo8fL1b21zJv8cpSKs+H9Yn
+         +QZZDXXZtbfX0nTgqUP3kvJFb1ozS9Z0tFGl1i4aQK8/ua3ZFISH9x6V1Hu6hSd7tSng
+         Y56uM2AHW9VR4l2oK25gMX7ILtlHA8Ks+IwrT6cpiAHF70typC7m3iNItNPvLU5h/prt
+         P6/pXqRIcXreS+Kl+1ln3CLEhSM/hSiMuHzojdD8Lix8TaYPUyvgv36D3eGTHIiJcJYW
+         CzcgPNmTzitlsvB1bLzaINFA7xI2gn7ZB1oCGYGts0DLveFFrIUetKy4aT6jZ4nO0mfc
+         83sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707425492; x=1708030292;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=6TTQhGymrB+mjkxDaS78rz/awRKS+8KTVwd9AhLRl6M=;
+        b=KZjDCPmzILOP41Qtq0EnFM2q3VOdnsbhmYuipBVliuvbzTpaRKPkT6XpFJw/C1ieLv
+         Y6OcxRljojj8ExrAwocv1x+S3zGgHjEzMLM2d81ZdwJ+PrZh3Xl88Dyo+3eSg9A/cI11
+         SafnW2AiZvnHnsWmysyyiok5ctJh/rk+C5wEzIAPsoR0kglDSQeN1/G4Tvi0T1B4qZ/2
+         Ciz43Zff1uz3qbmIWneYguPdUb+MbZNVfr0HpLEirsmYC0SiU8k9Oy8IGq14YABaf/oB
+         kx5zuKHvlM5BFLp0qJJmCK9nwrvn/xSFUTOgBMxNzeuFHV+gBa92ACTHLqPXwUNS3ww/
+         zz9g==
+X-Gm-Message-State: AOJu0YwyobR2Qqdur3XCKKUd1CkKouU2HIMqWt2rTCJJKMzVMvMOlQHT
+	nlkWrMiT1N45enyXTSdwB8AQu0kVUZyi4UaDqeyLbIT6n0wbd9Wt
+X-Google-Smtp-Source: AGHT+IHFk50jH2OsJ6VFeNIybyD60lzXrgLoyMmMtplz9rWvm4r8H2DxOWLnxBUsPLZWQubjAo2aSQ==
+X-Received: by 2002:a05:6808:11c2:b0:3be:bd8:31cd with SMTP id p2-20020a05680811c200b003be0bd831cdmr551962oiv.53.1707425492345;
+        Thu, 08 Feb 2024 12:51:32 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUacJ7ZjcbuVyx4Wh85yUXVrlDqPHxvF/+Fw0Sar9tk3KHw6NvEWrnEfh4CZ2b2m/7AOOQu4C+gRAEQ7S6Rgt96xqyC6I/bxpC2AeV1Ay0ffIm+cMHQfwluxosjQT2o5htJfRXgDPM7hfiSkif9/xq23ayZVL4NVvpN+A8/ohTK89xIilojc1TjuxeN/oN48fH4vcrgUJXthzaYjWleMos=
+Received: from localhost (131.65.194.35.bc.googleusercontent.com. [35.194.65.131])
+        by smtp.gmail.com with ESMTPSA id o11-20020a05620a2a0b00b0078563251932sm147491qkp.99.2024.02.08.12.51.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Feb 2024 12:51:32 -0800 (PST)
+Date: Thu, 08 Feb 2024 15:51:31 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <65c53ed3bbeee_1ca1e229434@willemb.c.googlers.com.notmuch>
+In-Reply-To: <bca0a7a2bac7fb1db6288a54936cdacdb0eb345b.1707411748.git.pabeni@redhat.com>
+References: <bca0a7a2bac7fb1db6288a54936cdacdb0eb345b.1707411748.git.pabeni@redhat.com>
+Subject: Re: [PATCH net-next] selftests: net: ignore timing errors in
+ txtimestamp if KSFT_MACHINE_SLOW
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20240207120733.1746920-2-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/08/2024 20:24:37
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 183308 [Feb 08 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.74.49 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.74.49 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.74.49
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/08/2024 20:30:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/8/2024 4:38:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 2/7/24 3:07 PM, Claudiu wrote:
-
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+Paolo Abeni wrote:
+> This test is time sensitive. It may fail on virtual machines and for
+> debug builds.
 > 
-> The 4th argument of ravb_setup_irq() is used to save the IRQ number that
-> will be further used by the driver code. Not all ravb_setup_irqs() calls
-> need to save the IRQ number. The previous code used to pass a dummy
-> variable as the 4th argument in case the IRQ is not needed for further
-> usage. That is not necessary as the code from ravb_setup_irq() can detect
-> by itself if the IRQ needs to be saved. Thus, get rid of the code that is
-> not needed.
+> Similar to commit c41dfb0dfbec ("selftests/net: ignore timing errors in
+> so_txtime if KSFT_MACHINE_SLOW"), optionally suppress failure for timing
+> errors (only).
 > 
-> Reported-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-[...]
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index 9521cd054274..e235342e0827 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -2611,17 +2611,20 @@ static int ravb_setup_irq(struct ravb_private *priv, const char *irq_name,
->  		if (!dev_name)
->  			return -ENOMEM;
->  
-> -		*irq = platform_get_irq_byname(pdev, irq_name);
-> +		error = platform_get_irq_byname(pdev, irq_name);
->  		flags = 0;
->  	} else {
->  		dev_name = ndev->name;
-> -		*irq = platform_get_irq(pdev, 0);
-> +		error = platform_get_irq(pdev, 0);
->  		flags = IRQF_SHARED;
->  	}
-> -	if (*irq < 0)
-> -		return *irq;
-> +	if (error < 0)
-> +		return error;
->  
-> -	error = devm_request_irq(dev, *irq, handler, flags, dev_name, ndev);
-> +	if (irq)
-> +		*irq = error;
-> +
-> +	error = devm_request_irq(dev, error, handler, flags, dev_name, ndev);
->  	if (error)
->  		netdev_err(ndev, "cannot request IRQ %s\n", dev_name);
->  
-
-   Thanks for addressing my IRC comment! Tho the naming seems awful. :-)
-   I'd suggest to add a local variable (named e.g. irq_num) and use it to
-store the result of platform_get_irq[_byname]().
-
-[...]
-
-MBR, Sergey
+Is this still failing after commit 5264ab612e28
+("selftests/net: calibrate txtimestamp")?
 
