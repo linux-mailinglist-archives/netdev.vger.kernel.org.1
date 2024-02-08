@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-70084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 315D784D935
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 04:54:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 593F384D936
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 04:54:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3D352841AD
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 03:54:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CAA01C23ADC
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 03:54:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E532D2E83F;
-	Thu,  8 Feb 2024 03:54:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DE4C2E83C;
+	Thu,  8 Feb 2024 03:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PIInL7cc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="toHnNujr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C18872E83C
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 03:54:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE0F3172D
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 03:54:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707364455; cv=none; b=nOENvJWnS9VshzIjT7rKgK9YbtMhnowciOcYIn2wk9N4S8rb7yZ/IBgbAu2tbmLYVsOj6vZEc6+yiXh6do4em2ZUvM1aO8pinMF291w3B/rKisLqHile2jYBInNusdxHgtdwdLkO62uBW7nmEV05iP6vHM8OIfdrcdRLVPeBsL0=
+	t=1707364457; cv=none; b=i2Nqqi7s3Qb1LKR7dWwfRh6z7BvwYPVuHxPj7xQfoxVLeuvGz7P5wNQmIqVcDvxZRbOVoIVujRrSAhteooGWB7u1JK7QhH7i+RB0Ija8cEVSIDsnHuI6n0vv4tHg8yHHJ8xCZjs+75nr0/6OgVmx8Elus54ffCmJUPZUarQsOrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707364455; c=relaxed/simple;
-	bh=gDbps/6ATsXpIaTLypnNU+yZpLcsovJA+GHrDn5LBP8=;
+	s=arc-20240116; t=1707364457; c=relaxed/simple;
+	bh=54XDbstzlruaOzyTOHLh/wiImj+xZ+oWNWJm8jPeQb8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Th09PxcemWR4aogEcrXPFLN/mIm34TUbx+y5ZnRaHPbcElal+i59M6Amb2NDPNiHB2By2PA4ZbAaQBD/8gqfq037IKwPI8ctUwnEb8GEjY59PRkZLsubosaqB4JbJeggLGoqoKi7BFMQJRPHNljeS+WPJrilASTfNV3Dv9ex39g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PIInL7cc; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56D8CC43394;
-	Thu,  8 Feb 2024 03:54:15 +0000 (UTC)
+	 MIME-Version; b=kzuSYXYCc+zKBjpgq/m3RLYeJUPPEcjJe4Hn2YZbRhOiiF0x3qWUt0wQUU2w0R2VXIbYjRpBSFlVaecFp7gZ6ldnYxEZ6whb9n6Na1TXNNxoJxXqeTyp7veYwmOxWWj6PVg9sqoW+MrK+EL0TGOcVif4AgmJ91BoMmW49sOq18I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=toHnNujr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71887C433C7;
+	Thu,  8 Feb 2024 03:54:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707364455;
-	bh=gDbps/6ATsXpIaTLypnNU+yZpLcsovJA+GHrDn5LBP8=;
+	s=k20201202; t=1707364456;
+	bh=54XDbstzlruaOzyTOHLh/wiImj+xZ+oWNWJm8jPeQb8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PIInL7ccqL4mqToZKhUrNg0YKcp4YXGskdQMVD8SAfuHzxs5qyWz4G8H4MtgJqqjd
-	 48IGsJAoB5bH7mGgHIIZ7oW5nfMD07ebXzra4VVKDGfYE6bjDjiF3GT6ghE+ztWkly
-	 hYwbOkqKwFHtshJcBC/H9M0sknBf6FTQzON9YSNBQWQn5qs3g3QIlIULqCSEnVqcDq
-	 Fj0rFCvAJfeoWHTT9P49PsKQVBgaXeZvWzzD79omav93ir4TTrSKwcr2Z5gwxosp4q
-	 TG/47iWKsvNC5ZLciS+dxt81KbwLHNO2RRnyjEXVXRpLFMAk944EbJp68vWKG5kjTT
-	 lmiDKGd78pjSw==
+	b=toHnNujr7D7jmHOZ1bSy+ahWfWfFRo29qO91LPWSMEYN4GbTwZyi75r+S/QMrihhm
+	 u59xIPwtFEd5mIPN161c2fwrMDHyarObMGPfza+t3eEnRNH+9/jW0ybuOtZZAEdNAd
+	 XIjpoS8aTg3E3qPv/1xloWhw1jbcSufHloDk5A3QhzG2WXOBoe2BfboiP1CWVo1KJq
+	 0SxVjoAO54TR+uqSO+uQVIKyzdCRi+VwYvGobH9hWgCt6IEudAJ13DWv1QommJjlqe
+	 Cd148bD/bL3k15XHGVOfiZMzbpr+DtRCOwdQxRavfRRkIQMwAh7iKZh/Q7IuZvHZJg
+	 t3ctOkL2utmHQ==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -51,9 +51,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>
-Subject: [net-next V2 07/15] net/mlx5: SD, Add debugfs
-Date: Wed,  7 Feb 2024 19:53:44 -0800
-Message-ID: <20240208035352.387423-8-saeed@kernel.org>
+Subject: [net-next V2 08/15] net/mlx5e: Create single netdev per SD group
+Date: Wed,  7 Feb 2024 19:53:45 -0800
+Message-ID: <20240208035352.387423-9-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240208035352.387423-1-saeed@kernel.org>
 References: <20240208035352.387423-1-saeed@kernel.org>
@@ -67,104 +67,153 @@ Content-Transfer-Encoding: 8bit
 
 From: Tariq Toukan <tariqt@nvidia.com>
 
-Add debugfs entries that describe the Socket-Direct group.
+Integrate the SD library calls into the auxiliary_driver ops in
+preparation for creating a single netdev for the multiple devices
+belonging to the same SD group.
 
-Example:
-$ grep -H . /sys/kernel/debug/mlx5/0000\:08\:00.0/sd/*
-/sys/kernel/debug/mlx5/0000:08:00.0/sd/group_id:0x00000101
-/sys/kernel/debug/mlx5/0000:08:00.0/sd/primary:0000:08:00.0 vhca 0x0
-/sys/kernel/debug/mlx5/0000:08:00.0/sd/secondary_0:0000:09:00.0 vhca 0x2
+SD is still disabled at this stage. It is enabled by a downstream patch
+when all needed parts are implemented.
+
+The netdev is created only when the SD group, with all its participants,
+are ready. It is later destroyed if any of the participating devices
+drops.
 
 Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Reviewed-by: Gal Pressman <gal@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/lib/sd.c  | 34 +++++++++++++++++++
- 1 file changed, 34 insertions(+)
+ .../net/ethernet/mellanox/mlx5/core/en_main.c | 69 +++++++++++++++++--
+ 1 file changed, 62 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
-index 918138c13a92..5012510a69d5 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
-@@ -6,6 +6,7 @@
- #include "lib/mlx5.h"
- #include "fs_cmd.h"
- #include <linux/mlx5/vport.h>
-+#include <linux/debugfs.h>
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index c8e8f512803e..2c47c9076aa6 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -70,6 +70,7 @@
+ #include "qos.h"
+ #include "en/trap.h"
+ #include "lib/devcom.h"
++#include "lib/sd.h"
  
- #define sd_info(__dev, format, ...) \
- 	dev_info((__dev)->device, "Socket-Direct: " format, ##__VA_ARGS__)
-@@ -16,6 +17,7 @@ struct mlx5_sd {
- 	u32 group_id;
- 	u8 host_buses;
- 	struct mlx5_devcom_comp_dev *devcom;
-+	struct dentry *dfs;
- 	bool primary;
- 	union {
- 		struct { /* primary */
-@@ -391,6 +393,26 @@ static void sd_print_group(struct mlx5_core_dev *primary)
- 			MLX5_CAP_GEN(pos, vhca_id));
+ bool mlx5e_check_fragmented_striding_rq_cap(struct mlx5_core_dev *mdev, u8 page_shift,
+ 					    enum mlx5e_mpwrq_umr_mode umr_mode)
+@@ -5980,7 +5981,7 @@ void mlx5e_destroy_netdev(struct mlx5e_priv *priv)
+ 	free_netdev(netdev);
  }
  
-+static ssize_t dev_read(struct file *filp, char __user *buf, size_t count,
-+			loff_t *pos)
+-static int mlx5e_resume(struct auxiliary_device *adev)
++static int _mlx5e_resume(struct auxiliary_device *adev)
+ {
+ 	struct mlx5_adev *edev = container_of(adev, struct mlx5_adev, adev);
+ 	struct mlx5e_dev *mlx5e_dev = auxiliary_get_drvdata(adev);
+@@ -6005,6 +6006,23 @@ static int mlx5e_resume(struct auxiliary_device *adev)
+ 	return 0;
+ }
+ 
++static int mlx5e_resume(struct auxiliary_device *adev)
 +{
-+	struct mlx5_core_dev *dev;
-+	char tbuf[32];
-+	int ret;
++	struct mlx5_adev *edev = container_of(adev, struct mlx5_adev, adev);
++	struct mlx5_core_dev *mdev = edev->mdev;
++	struct auxiliary_device *actual_adev;
++	int err;
 +
-+	dev = filp->private_data;
-+	ret = snprintf(tbuf, sizeof(tbuf), "%s vhca %#x\n", pci_name(dev->pdev),
-+		       MLX5_CAP_GEN(dev, vhca_id));
++	err = mlx5_sd_init(mdev);
++	if (err)
++		return err;
 +
-+	return simple_read_from_buffer(buf, count, pos, tbuf, ret);
++	actual_adev = mlx5_sd_get_adev(mdev, adev, edev->idx);
++	if (actual_adev)
++		return _mlx5e_resume(actual_adev);
++	return 0;
 +}
 +
-+static const struct file_operations dev_fops = {
-+	.owner	= THIS_MODULE,
-+	.open	= simple_open,
-+	.read	= dev_read,
-+};
-+
- int mlx5_sd_init(struct mlx5_core_dev *dev)
+ static int _mlx5e_suspend(struct auxiliary_device *adev)
  {
- 	struct mlx5_core_dev *primary, *pos, *to;
-@@ -422,10 +444,20 @@ int mlx5_sd_init(struct mlx5_core_dev *dev)
- 	if (err)
- 		goto err_sd_unregister;
+ 	struct mlx5e_dev *mlx5e_dev = auxiliary_get_drvdata(adev);
+@@ -6025,7 +6043,17 @@ static int _mlx5e_suspend(struct auxiliary_device *adev)
  
-+	sd->dfs = debugfs_create_dir("sd", mlx5_debugfs_get_dev_root(primary));
-+	debugfs_create_x32("group_id", 0400, sd->dfs, &sd->group_id);
-+	debugfs_create_file("primary", 0400, sd->dfs, primary, &dev_fops);
+ static int mlx5e_suspend(struct auxiliary_device *adev, pm_message_t state)
+ {
+-	return _mlx5e_suspend(adev);
++	struct mlx5_adev *edev = container_of(adev, struct mlx5_adev, adev);
++	struct mlx5_core_dev *mdev = edev->mdev;
++	struct auxiliary_device *actual_adev;
++	int err = 0;
 +
- 	mlx5_sd_for_each_secondary(i, primary, pos) {
-+		char name[32];
++	actual_adev = mlx5_sd_get_adev(mdev, adev, edev->idx);
++	if (actual_adev)
++		err = _mlx5e_suspend(actual_adev);
 +
- 		err = sd_cmd_set_secondary(pos, primary, alias_key);
- 		if (err)
- 			goto err_unset_secondaries;
-+
-+		snprintf(name, sizeof(name), "secondary_%d", i - 1);
-+		debugfs_create_file(name, 0400, sd->dfs, pos, &dev_fops);
-+
++	mlx5_sd_cleanup(mdev);
++	return err;
+ }
+ 
+ static int _mlx5e_probe(struct auxiliary_device *adev)
+@@ -6071,9 +6099,9 @@ static int _mlx5e_probe(struct auxiliary_device *adev)
+ 		goto err_destroy_netdev;
  	}
  
- 	sd_info(primary, "group id %#x, size %d, combined\n",
-@@ -439,6 +471,7 @@ int mlx5_sd_init(struct mlx5_core_dev *dev)
- 	mlx5_sd_for_each_secondary_to(i, primary, to, pos)
- 		sd_cmd_unset_secondary(pos);
- 	sd_cmd_unset_primary(primary);
-+	debugfs_remove_recursive(sd->dfs);
- err_sd_unregister:
- 	sd_unregister(dev);
- err_sd_cleanup:
-@@ -462,6 +495,7 @@ void mlx5_sd_cleanup(struct mlx5_core_dev *dev)
- 	mlx5_sd_for_each_secondary(i, primary, pos)
- 		sd_cmd_unset_secondary(pos);
- 	sd_cmd_unset_primary(primary);
-+	debugfs_remove_recursive(sd->dfs);
+-	err = mlx5e_resume(adev);
++	err = _mlx5e_resume(adev);
+ 	if (err) {
+-		mlx5_core_err(mdev, "mlx5e_resume failed, %d\n", err);
++		mlx5_core_err(mdev, "_mlx5e_resume failed, %d\n", err);
+ 		goto err_profile_cleanup;
+ 	}
  
- 	sd_info(primary, "group id %#x, uncombined\n", sd->group_id);
- out:
+@@ -6104,15 +6132,29 @@ static int _mlx5e_probe(struct auxiliary_device *adev)
+ static int mlx5e_probe(struct auxiliary_device *adev,
+ 		       const struct auxiliary_device_id *id)
+ {
+-	return _mlx5e_probe(adev);
++	struct mlx5_adev *edev = container_of(adev, struct mlx5_adev, adev);
++	struct mlx5_core_dev *mdev = edev->mdev;
++	struct auxiliary_device *actual_adev;
++	int err;
++
++	err = mlx5_sd_init(mdev);
++	if (err)
++		return err;
++
++	actual_adev = mlx5_sd_get_adev(mdev, adev, edev->idx);
++	if (actual_adev)
++		return _mlx5e_probe(actual_adev);
++	return 0;
+ }
+ 
+-static void mlx5e_remove(struct auxiliary_device *adev)
++static void _mlx5e_remove(struct auxiliary_device *adev)
+ {
++	struct mlx5_adev *edev = container_of(adev, struct mlx5_adev, adev);
+ 	struct mlx5e_dev *mlx5e_dev = auxiliary_get_drvdata(adev);
+ 	struct mlx5e_priv *priv = mlx5e_dev->priv;
++	struct mlx5_core_dev *mdev = edev->mdev;
+ 
+-	mlx5_core_uplink_netdev_set(priv->mdev, NULL);
++	mlx5_core_uplink_netdev_set(mdev, NULL);
+ 	mlx5e_dcbnl_delete_app(priv);
+ 	unregister_netdev(priv->netdev);
+ 	_mlx5e_suspend(adev);
+@@ -6122,6 +6164,19 @@ static void mlx5e_remove(struct auxiliary_device *adev)
+ 	mlx5e_destroy_devlink(mlx5e_dev);
+ }
+ 
++static void mlx5e_remove(struct auxiliary_device *adev)
++{
++	struct mlx5_adev *edev = container_of(adev, struct mlx5_adev, adev);
++	struct mlx5_core_dev *mdev = edev->mdev;
++	struct auxiliary_device *actual_adev;
++
++	actual_adev = mlx5_sd_get_adev(mdev, adev, edev->idx);
++	if (actual_adev)
++		_mlx5e_remove(actual_adev);
++
++	mlx5_sd_cleanup(mdev);
++}
++
+ static const struct auxiliary_device_id mlx5e_id_table[] = {
+ 	{ .name = MLX5_ADEV_NAME ".eth", },
+ 	{},
 -- 
 2.43.0
 
