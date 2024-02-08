@@ -1,155 +1,79 @@
-Return-Path: <netdev+bounces-70161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2821484DE77
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 11:39:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12D0884DE42
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 11:27:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6BDEB2CFFA
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:27:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 455A01C2278D
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:27:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70BF56DCF6;
-	Thu,  8 Feb 2024 10:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3571E6D1D0;
+	Thu,  8 Feb 2024 10:27:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TV+Jl6Hv";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="PJ8H54sj";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="TV+Jl6Hv";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="PJ8H54sj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Bqpmk6wv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1E0A6BB43;
-	Thu,  8 Feb 2024 10:26:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1114B6BFAD
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 10:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707388011; cv=none; b=T5mJiUyOuRR2CNsY0c0oyBRg8s8gy7LlJUB8XKY6Ir2fkdvJSgJCx34DvLp/kqoomUhFq19+RWBa8OJR3hwjqf4C84nj2KMTsehk4qyWJBOPVSebdsh+Yn8tHQV2sa/QL6rBQ4Q5RtNu7Kyn39S18EeBnZQkn+clJgHxeX9DLhE=
+	t=1707388032; cv=none; b=DTe2pWynCqDV7wICouAv373v4v2dDdWJZCoxyDZ2hGkU9ZRE6/yMIKlWSFGNTj8iDbpV8OD2PasigWs1S0wPvNY8R5AJKMgzIYoecA5ydUETLxNpM9E66nYLqQG9dgukmrUwt0Iivcwf0g35xQYXDHCWTQebfgPO13ns/wBOooo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707388011; c=relaxed/simple;
-	bh=UtxUE6IoeJgtEm9lYVXJ8l65gnFyjvidFV2NZr3vEOs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FAwl+uAvsnASmXQEJyRBDmtjKIaF86d0g6uYQ+28deW9j2zGxM/dElOCKtWlxPCKYQ0dzv/M0nVwWcQvqdjyCgjrzjyLkf8xcXS27e5OqSiLJdmzVBkYBM+4tk74xejsczcUwCLNoLYeUtyYZ0Y1Vy2BG/D0PXNO28T0HRVs1kQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TV+Jl6Hv; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=PJ8H54sj; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=TV+Jl6Hv; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=PJ8H54sj; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id C4DE021E40;
-	Thu,  8 Feb 2024 10:26:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1707388007; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7l1Hzsbgh/dM4Eg7kH6VEERVic/fqlclsX/STOV6QiU=;
-	b=TV+Jl6HvUdJGEofKQUWenxE09osqYOqfchXsSq80AiDF3LNosGBALEx2KsYWLENzfRb+s6
-	mKM69lmHHG7fZLnbtiUocXhyjNxPYZt1z/dpuvZQ6pU3oY/HuM9qe8Nu6lyig3Y5cgk0xL
-	d8k4LvfccCNwf73MXHha6nxDtRUtlrc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1707388007;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7l1Hzsbgh/dM4Eg7kH6VEERVic/fqlclsX/STOV6QiU=;
-	b=PJ8H54sjYEBVpkvSFT7e7/3P8QpOR0Ws3WHPd7/+zzES+CxtKJBTnoz/yv9Fap/PPmMjTf
-	nAYlDrWaXXtBGzBw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1707388007; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7l1Hzsbgh/dM4Eg7kH6VEERVic/fqlclsX/STOV6QiU=;
-	b=TV+Jl6HvUdJGEofKQUWenxE09osqYOqfchXsSq80AiDF3LNosGBALEx2KsYWLENzfRb+s6
-	mKM69lmHHG7fZLnbtiUocXhyjNxPYZt1z/dpuvZQ6pU3oY/HuM9qe8Nu6lyig3Y5cgk0xL
-	d8k4LvfccCNwf73MXHha6nxDtRUtlrc=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1707388007;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7l1Hzsbgh/dM4Eg7kH6VEERVic/fqlclsX/STOV6QiU=;
-	b=PJ8H54sjYEBVpkvSFT7e7/3P8QpOR0Ws3WHPd7/+zzES+CxtKJBTnoz/yv9Fap/PPmMjTf
-	nAYlDrWaXXtBGzBw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CEB541326D;
-	Thu,  8 Feb 2024 10:26:46 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id ENvCLmasxGUJKAAAD6G6ig
-	(envelope-from <dkirjanov@suse.de>); Thu, 08 Feb 2024 10:26:46 +0000
-Message-ID: <e7b4a82d-8942-4e7b-bd4d-3a3ede42a85e@suse.de>
-Date: Thu, 8 Feb 2024 13:26:46 +0300
+	s=arc-20240116; t=1707388032; c=relaxed/simple;
+	bh=GpCDK4oIPH72AhyPeeUmc/bT9ksVXizrIRL4kTnTS0E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lEjm0n1tkR4jXZOvD0A386YJQJvgVmwnvgqxjUNzKVhkNlioE1zg4MOEfmypXe00vjMOaqC0/KDEk7impznk/TRDxEXKxeMs2ldTPcxrvqUUexG+KducLFYjYadFtOVI8N9He8vlp8alGQtTg1nIxLBGvC8npgtV+W4464OG8Xw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Bqpmk6wv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3238C433F1;
+	Thu,  8 Feb 2024 10:27:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707388031;
+	bh=GpCDK4oIPH72AhyPeeUmc/bT9ksVXizrIRL4kTnTS0E=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Bqpmk6wv/nJ0GG9KfUIMsJSfZs9bzoNoiNczqtZHCDeg6J/+wcfzSS00nTRjurKF/
+	 yqrWf92wdTKt/8wgygHCYKMAze69i+5iOJ3ecPwLoL+uV+lQG9wBhz8ajYz6zyMGOr
+	 +M5fNWZCyT2QWe3Vs22hAE2xGgGZQjRQVOfTWa/CLUXCz8EVhcQIerO1bFmRv0/iu3
+	 fi+k8efYzsVP618H1FjGV+sfiKDMZUKIAj1CA5+jR04vMsm5LuHSmklDaKEavTp2XA
+	 +ZaV0rHtH0d9HvSNGLtf7plSRvIxEpRplzod82jyCBCq2OchNc37fx7JlrliwVy6+L
+	 7aD6SK57Wgvkw==
+Date: Thu, 8 Feb 2024 10:27:07 +0000
+From: Simon Horman <horms@kernel.org>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Russell King <linux@armlinux.org.uk>
+Subject: Re: [PATCH net-next] net: dsa: b53: unexport and move
+ b53_eee_enable_set()
+Message-ID: <20240208102707.GC1435458@kernel.org>
+References: <20240206112527.4132299-1-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/2] net: ipconfig: remove wait for drivers
-Content-Language: en-US
-To: David Ventura <david@davidv.dev>
-Cc: Jonathan Corbet <corbet@lwn.net>, "David S. Miller"
- <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Paul E. McKenney" <paulmck@kernel.org>, Randy Dunlap
- <rdunlap@infradead.org>, Xiongwei Song <xiongwei.song@windriver.com>,
- "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>,
- "open list:NETWORKING [IPv4/IPv6]" <netdev@vger.kernel.org>
-References: <20240208093722.246930-1-david@davidv.dev>
-From: Denis Kirjanov <dkirjanov@suse.de>
-In-Reply-To: <20240208093722.246930-1-david@davidv.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Spamd-Result: default: False [-0.25 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 XM_UA_NO_VERSION(0.01)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 BAYES_HAM(-0.16)[69.11%];
-	 MIME_GOOD(-0.10)[text/plain];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 TO_DN_ALL(0.00)[];
-	 RCPT_COUNT_TWELVE(0.00)[14];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
-X-Spam-Level: 
-X-Spam-Flag: NO
-X-Spam-Score: -0.25
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240206112527.4132299-1-vladimir.oltean@nxp.com>
 
+On Tue, Feb 06, 2024 at 01:25:27PM +0200, Vladimir Oltean wrote:
+> After commit f86ad77faf24 ("net: dsa: bcm_sf2: Utilize b53_{enable,
+> disable}_port"), bcm_sf2.c no longer calls b53_eee_enable_set(), and all
+> its callers are in b53_common.c.
+> 
+> We also need to move it, because it is called within b53_common.c before
+> its definition, and we want to avoid forward declarations.
+> 
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-On 2/8/24 12:35, David Ventura wrote:
-> Currently ip autoconfiguration has a hardcoded delay of 10ms.
-
-The subject line should be prefixed with net-next
-
-> 
-> Make the delay configurable via the new `ip.dev_wait_ms` argument, and
-> set the default value to 0ms.
->     
-> 
->     David
-> 
-> 
-> 
 
