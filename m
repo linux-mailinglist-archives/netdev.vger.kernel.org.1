@@ -1,255 +1,184 @@
-Return-Path: <netdev+bounces-70137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E89FA84DCE8
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:29:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D86A84DCF7
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:31:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1891F1C26756
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 09:29:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFF011C267C7
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 09:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0211A6BB46;
-	Thu,  8 Feb 2024 09:26:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XRu8/JvU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E4E67C72;
+	Thu,  8 Feb 2024 09:31:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp2-kfki.kfki.hu (smtp2-kfki.kfki.hu [148.6.0.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7705171B4;
-	Thu,  8 Feb 2024 09:26:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87D5B6BB46;
+	Thu,  8 Feb 2024 09:31:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.6.0.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707384393; cv=none; b=PHI+CKry0i97KO5BxKKIFBGsgbCYstjBYdhpZbRrUGpB7d/GVuQ+LFTUlaO8j2Vn2au73qYbiH9hle6KMwPKruJl+2m2wTFD3D6tFnuT4EqsTj8GCQpFYZIKVjs4jk80hNPRTRbxQEiS18peTbhfiXaZr5pT0p1D4M53576jccM=
+	t=1707384674; cv=none; b=UqZl8ATyMbwzFItQKq0opdt2w3iJ6sTetwZqb8AS0l8PnlJgQMPJicfUDwZTfsobxS4xWNnzx2u+IZVGAD91oDG/HiWIHzt41fbFwXiw6r7z2WrWdJcjVy/546s/rVDGh+MzBH2Zh6BYQ0M9CuigiVZSVdCuONm9waK90vbIdAU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707384393; c=relaxed/simple;
-	bh=DJn/JznV4z6gHv7cVHFcfLco3THQI2iFxeIjFcAeR5U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qyiDFwDryc3apqIrFexVKqFn7ZCQjU6IwgPoo0+8itNGx3xqDR4nHeKZIAksCHwjjenU1zQQI3sFzsXTZpBQ3DfVa+XiqEOy07IxNCd0TtMZy9TVpLHZOM4Sf9KDW9mIshKNl0Mus/5h7CD05V53jVs1ssGQxhRJN4nrbEAWrV8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XRu8/JvU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B83EBC433C7;
-	Thu,  8 Feb 2024 09:26:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707384393;
-	bh=DJn/JznV4z6gHv7cVHFcfLco3THQI2iFxeIjFcAeR5U=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XRu8/JvUYQ3LRRE7NieWOIEMI5jR0RbvmIng0aOkFS2Rj/gVCVdMjQ8FxxVrgvAAm
-	 7OfNfkva16HRK8+2FS+CH3gsDZMMdRV0wVZw/l/DNIQFSUSYY/I0JATtG8G9MZY2We
-	 RrskuRl2UMdcVPeOH3EWrN3AnHO9U792zatvgVapsq4bw4zUe/rUttOW6BFW7KZ6Hu
-	 sjJEYfv8bJ5a576g7soea/ckwko3A3hietiDU5Wbi8/AP0FZciUE2cWDub69NHgcew
-	 tw0z+MTh1PaccjMqYtDwAsJIoc4wi9wmQgLBud9yMnKQXy6v9Hn9Ls3+ejIpatUunK
-	 CUuuRz17hiROA==
-Date: Thu, 8 Feb 2024 09:26:27 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jon Hunter <jonathanh@nvidia.com>
-Cc: Furong Xu <0x1207@gmail.com>, "David S. Miller" <davem@davemloft.net>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Joao Pinto <jpinto@synopsys.com>,
-	Serge Semin <fancer.lancer@gmail.com>, netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	xfr@outlook.com, rock.xu@nio.com,
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-Subject: Re: [PATCH net v4] net: stmmac: xgmac: fix handling of DPP safety
- error for DMA channels
-Message-ID: <20240208092627.GP1297511@kernel.org>
-References: <20240203051439.1127090-1-0x1207@gmail.com>
- <c25eb595-8d91-40ea-9f52-efa15ebafdbc@nvidia.com>
+	s=arc-20240116; t=1707384674; c=relaxed/simple;
+	bh=xVBQQayOZ0YSdYt0maumTD+C6w2wOcS4Npun3dXUHkw=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=Ym4mW2hfAAW4PDT+jjx83Yt3KKC73bojEwkZIYH0WHWInA02FBste78OgHrtiCi0Iz6Fp2UwdQ9iLwEmCcIHVo5AeI9Lwb4yViAaRqj5hGBG7SP18AvxLRl2EYLVUnP/zfibLR0fGcXVezfyc3TS0YCn/eIl56x5Zb3ip8QdQrU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=148.6.0.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: from localhost (localhost [127.0.0.1])
+	by smtp2.kfki.hu (Postfix) with ESMTP id 008EACC02D4;
+	Thu,  8 Feb 2024 10:31:08 +0100 (CET)
+X-Virus-Scanned: Debian amavisd-new at smtp2.kfki.hu
+Received: from smtp2.kfki.hu ([127.0.0.1])
+	by localhost (smtp2.kfki.hu [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP; Thu,  8 Feb 2024 10:31:05 +0100 (CET)
+Received: from blackhole.kfki.hu (blackhole.szhk.kfki.hu [148.6.240.2])
+	by smtp2.kfki.hu (Postfix) with ESMTP id 7B42BCC02CB;
+	Thu,  8 Feb 2024 10:31:05 +0100 (CET)
+Received: by blackhole.kfki.hu (Postfix, from userid 1000)
+	id 39EAB343167; Thu,  8 Feb 2024 10:31:05 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by blackhole.kfki.hu (Postfix) with ESMTP id 386DF343166;
+	Thu,  8 Feb 2024 10:31:05 +0100 (CET)
+Date: Thu, 8 Feb 2024 10:31:05 +0100 (CET)
+From: Jozsef Kadlecsik <kadlec@netfilter.org>
+To: Paolo Abeni <pabeni@redhat.com>
+cc: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org, 
+    David Miller <davem@davemloft.net>, netdev@vger.kernel.org, 
+    kuba@kernel.org, edumazet@google.com, Florian Westphal <fw@strlen.de>
+Subject: Re: [PATCH net 05/13] netfilter: ipset: Missing gc cancellations
+ fixed
+In-Reply-To: <85a149ff1f960f59d11af20b5f0e25e5e074acdd.camel@redhat.com>
+Message-ID: <d1ce814d-0ee9-3711-02e1-e9e005df0b05@netfilter.org>
+References: <20240207233726.331592-1-pablo@netfilter.org>  <20240207233726.331592-6-pablo@netfilter.org> <85a149ff1f960f59d11af20b5f0e25e5e074acdd.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <c25eb595-8d91-40ea-9f52-efa15ebafdbc@nvidia.com>
+Content-Type: multipart/mixed; boundary="110363376-899249153-1707383611=:2980"
+Content-ID: <cd211d76-725b-88c4-4358-57a890003733@blackhole.kfki.hu>
 
-On Wed, Feb 07, 2024 at 11:56:26AM +0000, Jon Hunter wrote:
-> 
-> On 03/02/2024 05:14, Furong Xu wrote:
-> > Commit 56e58d6c8a56 ("net: stmmac: Implement Safety Features in
-> > XGMAC core") checks and reports safety errors, but leaves the
-> > Data Path Parity Errors for each channel in DMA unhandled at all, lead to
-> > a storm of interrupt.
-> > Fix it by checking and clearing the DMA_DPP_Interrupt_Status register.
-> > 
-> > Fixes: 56e58d6c8a56 ("net: stmmac: Implement Safety Features in XGMAC core")
-> > Signed-off-by: Furong Xu <0x1207@gmail.com>
-> > Reviewed-by: Simon Horman <horms@kernel.org>
-> > Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
+
+--110363376-899249153-1707383611=:2980
+Content-Type: text/plain; charset=UTF-8
+Content-ID: <1baca950-3d11-52e8-d093-6438a98fa3a9@blackhole.kfki.hu>
+Content-Transfer-Encoding: quoted-printable
+
+On Thu, 8 Feb 2024, Paolo Abeni wrote:
+
+> On Thu, 2024-02-08 at 00:37 +0100, Pablo Neira Ayuso wrote:
+> > From: Jozsef Kadlecsik <kadlec@netfilter.org>
+> >=20
+> > The patch fdb8e12cc2cc ("netfilter: ipset: fix performance regression
+> > in swap operation") missed to add the calls to gc cancellations
+> > at the error path of create operations and at module unload. Also,
+> > because the half of the destroy operations now executed by a
+> > function registered by call_rcu(), neither NFNL_SUBSYS_IPSET mutex
+> > or rcu read lock is held and therefore the checking of them results
+> > false warnings.
+> >=20
+> > Reported-by: syzbot+52bbc0ad036f6f0d4a25@syzkaller.appspotmail.com
+> > Reported-by: Brad Spengler <spender@grsecurity.net>
+> > Reported-by: =D0=A1=D1=82=D0=B0=D1=81 =D0=9D=D0=B8=D1=87=D0=B8=D0=BF=D0=
+=BE=D1=80=D0=BE=D0=B2=D0=B8=D1=87 <stasn77@gmail.com>
+> > Fixes: fdb8e12cc2cc ("netfilter: ipset: fix performance regression in=
+ swap operation")
+> > Tested-by: Brad Spengler <spender@grsecurity.net>
+> > Tested-by: =D0=A1=D1=82=D0=B0=D1=81 =D0=9D=D0=B8=D1=87=D0=B8=D0=BF=D0=
+=BE=D1=80=D0=BE=D0=B2=D0=B8=D1=87 <stasn77@gmail.com>
+> > Signed-off-by: Jozsef Kadlecsik <kadlec@netfilter.org>
+> > Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
 > > ---
-> > Changes in v4:
-> >   - fix a typo name of DDPP bit, thanks Serge Semin
-> > 
-> > Changes in v3:
-> >   - code style fix, thanks Paolo Abeni
-> > 
-> > Changes in v2:
-> >    - explicit enable Data Path Parity Protection
-> >    - add new counters to stmmac_safety_stats
-> >    - add detailed log
-> > ---
-> >   drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
-> >   .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  3 +
-> >   .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 57 ++++++++++++++++++-
-> >   3 files changed, 60 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
-> > index 721c1f8e892f..b4f60ab078d6 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/common.h
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-> > @@ -216,6 +216,7 @@ struct stmmac_safety_stats {
-> >   	unsigned long mac_errors[32];
-> >   	unsigned long mtl_errors[32];
-> >   	unsigned long dma_errors[32];
-> > +	unsigned long dma_dpp_errors[32];
-> >   };
-> >   /* Number of fields in Safety Stats */
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> > index 207ff1799f2c..5c67a3f89f08 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-> > @@ -303,6 +303,8 @@
-> >   #define XGMAC_RXCEIE			BIT(4)
-> >   #define XGMAC_TXCEIE			BIT(0)
-> >   #define XGMAC_MTL_ECC_INT_STATUS	0x000010cc
-> > +#define XGMAC_MTL_DPP_CONTROL		0x000010e0
-> > +#define XGMAC_DPP_DISABLE		BIT(0)
-> >   #define XGMAC_MTL_TXQ_OPMODE(x)		(0x00001100 + (0x80 * (x)))
-> >   #define XGMAC_TQS			GENMASK(25, 16)
-> >   #define XGMAC_TQS_SHIFT			16
-> > @@ -385,6 +387,7 @@
-> >   #define XGMAC_DCEIE			BIT(1)
-> >   #define XGMAC_TCEIE			BIT(0)
-> >   #define XGMAC_DMA_ECC_INT_STATUS	0x0000306c
-> > +#define XGMAC_DMA_DPP_INT_STATUS	0x00003074
-> >   #define XGMAC_DMA_CH_CONTROL(x)		(0x00003100 + (0x80 * (x)))
-> >   #define XGMAC_SPH			BIT(24)
-> >   #define XGMAC_PBLx8			BIT(16)
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> > index eb48211d9b0e..04d7c4dc2e35 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-> > @@ -830,6 +830,43 @@ static const struct dwxgmac3_error_desc dwxgmac3_dma_errors[32]= {
-> >   	{ false, "UNKNOWN", "Unknown Error" }, /* 31 */
-> >   };
-> > +static const char * const dpp_rx_err = "Read Rx Descriptor Parity checker Error";
-> > +static const char * const dpp_tx_err = "Read Tx Descriptor Parity checker Error";
-> > +static const struct dwxgmac3_error_desc dwxgmac3_dma_dpp_errors[32] = {
-> > +	{ true, "TDPES0", dpp_tx_err },
-> > +	{ true, "TDPES1", dpp_tx_err },
-> > +	{ true, "TDPES2", dpp_tx_err },
-> > +	{ true, "TDPES3", dpp_tx_err },
-> > +	{ true, "TDPES4", dpp_tx_err },
-> > +	{ true, "TDPES5", dpp_tx_err },
-> > +	{ true, "TDPES6", dpp_tx_err },
-> > +	{ true, "TDPES7", dpp_tx_err },
-> > +	{ true, "TDPES8", dpp_tx_err },
-> > +	{ true, "TDPES9", dpp_tx_err },
-> > +	{ true, "TDPES10", dpp_tx_err },
-> > +	{ true, "TDPES11", dpp_tx_err },
-> > +	{ true, "TDPES12", dpp_tx_err },
-> > +	{ true, "TDPES13", dpp_tx_err },
-> > +	{ true, "TDPES14", dpp_tx_err },
-> > +	{ true, "TDPES15", dpp_tx_err },
-> > +	{ true, "RDPES0", dpp_rx_err },
-> > +	{ true, "RDPES1", dpp_rx_err },
-> > +	{ true, "RDPES2", dpp_rx_err },
-> > +	{ true, "RDPES3", dpp_rx_err },
-> > +	{ true, "RDPES4", dpp_rx_err },
-> > +	{ true, "RDPES5", dpp_rx_err },
-> > +	{ true, "RDPES6", dpp_rx_err },
-> > +	{ true, "RDPES7", dpp_rx_err },
-> > +	{ true, "RDPES8", dpp_rx_err },
-> > +	{ true, "RDPES9", dpp_rx_err },
-> > +	{ true, "RDPES10", dpp_rx_err },
-> > +	{ true, "RDPES11", dpp_rx_err },
-> > +	{ true, "RDPES12", dpp_rx_err },
-> > +	{ true, "RDPES13", dpp_rx_err },
-> > +	{ true, "RDPES14", dpp_rx_err },
-> > +	{ true, "RDPES15", dpp_rx_err },
-> > +};
-> > +
-> >   static void dwxgmac3_handle_dma_err(struct net_device *ndev,
-> >   				    void __iomem *ioaddr, bool correctable,
-> >   				    struct stmmac_safety_stats *stats)
-> > @@ -841,6 +878,13 @@ static void dwxgmac3_handle_dma_err(struct net_device *ndev,
-> >   	dwxgmac3_log_error(ndev, value, correctable, "DMA",
-> >   			   dwxgmac3_dma_errors, STAT_OFF(dma_errors), stats);
-> > +
-> > +	value = readl(ioaddr + XGMAC_DMA_DPP_INT_STATUS);
-> > +	writel(value, ioaddr + XGMAC_DMA_DPP_INT_STATUS);
-> > +
-> > +	dwxgmac3_log_error(ndev, value, false, "DMA_DPP",
-> > +			   dwxgmac3_dma_dpp_errors,
-> > +			   STAT_OFF(dma_dpp_errors), stats);
-> >   }
-> >   static int
-> > @@ -881,6 +925,12 @@ dwxgmac3_safety_feat_config(void __iomem *ioaddr, unsigned int asp,
-> >   	value |= XGMAC_TMOUTEN; /* FSM Timeout Feature */
-> >   	writel(value, ioaddr + XGMAC_MAC_FSM_CONTROL);
-> > +	/* 5. Enable Data Path Parity Protection */
-> > +	value = readl(ioaddr + XGMAC_MTL_DPP_CONTROL);
-> > +	/* already enabled by default, explicit enable it again */
-> > +	value &= ~XGMAC_DPP_DISABLE;
-> > +	writel(value, ioaddr + XGMAC_MTL_DPP_CONTROL);
-> > +
-> >   	return 0;
-> >   }
-> > @@ -914,7 +964,11 @@ static int dwxgmac3_safety_feat_irq_status(struct net_device *ndev,
-> >   		ret |= !corr;
-> >   	}
-> > -	err = dma & (XGMAC_DEUIS | XGMAC_DECIS);
-> > +	/* DMA_DPP_Interrupt_Status is indicated by MCSIS bit in
-> > +	 * DMA_Safety_Interrupt_Status, so we handle DMA Data Path
-> > +	 * Parity Errors here
-> > +	 */
-> > +	err = dma & (XGMAC_DEUIS | XGMAC_DECIS | XGMAC_MCSIS);
-> >   	corr = dma & XGMAC_DECIS;
-> >   	if (err) {
-> >   		dwxgmac3_handle_dma_err(ndev, ioaddr, corr, stats);
-> > @@ -930,6 +984,7 @@ static const struct dwxgmac3_error {
-> >   	{ dwxgmac3_mac_errors },
-> >   	{ dwxgmac3_mtl_errors },
-> >   	{ dwxgmac3_dma_errors },
-> > +	{ dwxgmac3_dma_dpp_errors },
-> >   };
-> >   static int dwxgmac3_safety_feat_dump(struct stmmac_safety_stats *stats,
-> 
-> 
-> This change is breaking the build on some of our builders that are still using GCC 6.x ...
-> 
-> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:836:20: error: initialiser element is not constant
->   { true, "TDPES0", dpp_tx_err },
->                     ^~~~~~~~~~
-> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:836:20: note: (near initialisation for ‘dwxgmac3_dma_dpp_errors[0].detailed_desc’)
-> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:837:20: error: initialiser element is not constant
->   { true, "TDPES1", dpp_tx_err },
->                     ^~~~~~~~~~
-> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:837:20: note: (near initialisation for ‘dwxgmac3_dma_dpp_errors[1].detailed_desc’)
-> ...
-> 
-> I know that this is quite old but the minimum supported by the kernel is v5.1 ...
-> 
-> https://www.kernel.org/doc/html/next/process/changes.html
+> >  net/netfilter/ipset/ip_set_core.c     | 2 ++
+> >  net/netfilter/ipset/ip_set_hash_gen.h | 4 ++--
+> >  2 files changed, 4 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/net/netfilter/ipset/ip_set_core.c b/net/netfilter/ipset/=
+ip_set_core.c
+> > index bcaad9c009fe..3184cc6be4c9 100644
+> > --- a/net/netfilter/ipset/ip_set_core.c
+> > +++ b/net/netfilter/ipset/ip_set_core.c
+> > @@ -1154,6 +1154,7 @@ static int ip_set_create(struct sk_buff *skb, c=
+onst struct nfnl_info *info,
+> >  	return ret;
+> > =20
+> >  cleanup:
+> > +	set->variant->cancel_gc(set);
+> >  	set->variant->destroy(set);
+> >  put_out:
+> >  	module_put(set->type->me);
+> > @@ -2378,6 +2379,7 @@ ip_set_net_exit(struct net *net)
+> >  		set =3D ip_set(inst, i);
+> >  		if (set) {
+> >  			ip_set(inst, i) =3D NULL;
+> > +			set->variant->cancel_gc(set);
+> >  			ip_set_destroy_set(set);
+> >  		}
+> >  	}
+> > diff --git a/net/netfilter/ipset/ip_set_hash_gen.h b/net/netfilter/ip=
+set/ip_set_hash_gen.h
+> > index 1136510521a8..cfa5eecbe393 100644
+> > --- a/net/netfilter/ipset/ip_set_hash_gen.h
+> > +++ b/net/netfilter/ipset/ip_set_hash_gen.h
+> > @@ -432,7 +432,7 @@ mtype_ahash_destroy(struct ip_set *set, struct ht=
+able *t, bool ext_destroy)
+> >  	u32 i;
+> > =20
+> >  	for (i =3D 0; i < jhash_size(t->htable_bits); i++) {
+> > -		n =3D __ipset_dereference(hbucket(t, i));
+>=20
+> AFAICS __ipset_dereference() should not trigger any warning, as it
+> boils down to rcu_dereference_protected()
 
-Thanks Jon,
+The destroy operation is split into two parts. The second one is called=20
+now via call_rcu() when neither NFNL_SUBSYS_IPSET is held nor it is an rc=
+u=20
+protected area, which conditions are checked by __ipset_dereference(). So=
+=20
+the original lines above and below would generate suspicious RCU usage=20
+warnings. That's why I removed these two __ipset_dereference() calls.
+=20
+> > +		n =3D hbucket(t, i);
+>=20
+> This statement instead triggers a sparse warning.
 
-I separately received a notification about this occurring with gcc 7.
+Yeah, that's due to 'struct hbucket *' !=3D 'struct hbucket __rcu *'.=20
+I'll send a patch to fix it. Thanks!
 
-https://lore.kernel.org/oe-kbuild-all/202402081135.lAxxBXHk-lkp@intel.com/
+Best regards,
+Jozsef
+=20
+> >  		if (!n)
+> >  			continue;
+> >  		if (set->extensions & IPSET_EXT_DESTROY && ext_destroy)
+> > @@ -452,7 +452,7 @@ mtype_destroy(struct ip_set *set)
+> >  	struct htype *h =3D set->data;
+> >  	struct list_head *l, *lt;
+> > =20
+> > -	mtype_ahash_destroy(set, ipset_dereference_nfnl(h->table), true);
+> > +	mtype_ahash_destroy(set, h->table, true);
+>=20
+> The same here. What about using always __ipset_dereference()?
+>=20
+> Cheers,
+>=20
+> Paolo
+>=20
+>=20
+>=20
 
-It is unclear to me why this occurs, as dpp_tx_err and dpp_tx_err are const.
-But I do seem to be able to address this problem by using #defines for
-these values instead.
-
-I plan to post a patch shortly.
+--=20
+E-mail  : kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
+PGP key : https://wigner.hu/~kadlec/pgp_public_key.txt
+Address : Wigner Research Centre for Physics
+          H-1525 Budapest 114, POB. 49, Hungary
+--110363376-899249153-1707383611=:2980--
 
