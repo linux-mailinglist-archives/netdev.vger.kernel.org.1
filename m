@@ -1,221 +1,99 @@
-Return-Path: <netdev+bounces-70305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3F9584E4F5
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 17:23:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D069684E507
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 17:29:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D965B1C22025
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 16:23:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 850411F26F86
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 16:29:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B0F27EEF3;
-	Thu,  8 Feb 2024 16:22:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F1CD7E574;
+	Thu,  8 Feb 2024 16:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="DJcRibhC"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057E27E59F;
-	Thu,  8 Feb 2024 16:22:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 960617D416;
+	Thu,  8 Feb 2024 16:28:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707409369; cv=none; b=NaUMK85qnUK62ESXVTjo7+wOMakWPpjS4sKznXmOQ8NN36JAPFmLHrIpiGEcv1l447Kv7AkwO2I7Uc4o+lYHOMNUtUdas1Q19mGDi/AEDtBu2jeJcDFxaKXPfiS9z9s5v6Jcwu2OU3DNzOkOp0Ca10F9Nc3NKd2VvHaVfQwBb+A=
+	t=1707409739; cv=none; b=DbB7ZVuFkdS9ljavumoIWrHEytf5hf2kU7i2copehy2UkQDBqw6x9yEC0JFaxPxKDr8vo9cP+LA5y0uGoIrhz+BzXRSuRL9u61P+QR2RHujT8LzTJI59E2wwQDBfyul/NtYJ/Yr1AxoIopDJCo0W5uAjTlJtjMeYJN/8Rs73NO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707409369; c=relaxed/simple;
-	bh=MBrKiKWR78aRQohSnwR71yciqdbXWCE/pYxZWoLdR1Y=;
+	s=arc-20240116; t=1707409739; c=relaxed/simple;
+	bh=pG3hD7BNqQBz51nLa5LhJvaNVAFxuXxojG2yZf3XVxA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KccLj+Le0SxzuOuy/WWuLfLWmK6w01yZozEQgZ4GWwDGQ23Z7xPKlEIA7UUdNpHWtzw2pQiylCfC+Qooj95PQ4edehvrNevVR9WFMitWswzZ8Si0hu1aiwqvmjZoOhY0s517dWuSWCx16GSdKNUTV7Dl5kCmweyCg/bpg5kDE2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1rY7AH-0004wG-0D;
-	Thu, 08 Feb 2024 16:22:17 +0000
-Date: Thu, 8 Feb 2024 16:22:07 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: arinc.unal@arinc9.com
-Cc: DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=HQccSj41gAOhG2lQ+oW89hqiHuolKfTSJjkcbLaSAeq9SQJNkNCMyGzoBbKWWMCSlik1J6NcwXp2CiqAMoKgBsuxCvf3cyIU6G9XYy0nT68ls/LMah8YQOkrUTRJBUgekBkbd2vYDuEfUNMOOuT49IfUKf+/Ei6jsQv7XU8wwAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=DJcRibhC; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=h216siugj8ahtN6cphm3ZoqpCGaHT/mNmdUJWUfGAwQ=; b=DJcRibhCc+zxmCGRMgGLdNdhwb
+	NhneNQ67Yj0Uj/SDaxKWs2Qo7SezhwM/fPX76yWwtIDRjSnMywM1gy8Nk0fAy8a3uZVvAYHxy6os2
+	+G1YaNbxoMBUkxAk6C5QBJ+wAnn+sijMfuGABaFmjrVigEFUW+2bEHf27dcg0skVJVcLVRsP/uZZG
+	wvqEv6WqWfHPeMzBvHnT57OaX3e0HlAsnERwmwHwU8peH0bm8ydnlW0gu37W6lP6hFbhaeR1lh32+
+	VaOAc1MbBGhneWPDEjuuGn57uAbr7ZTla6iQzggmWg/aR6a1BTnh4yXZaU8YLi9421dACz4dZpkvY
+	0ARSFxcw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57080)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rY7Gc-0004fQ-0P;
+	Thu, 08 Feb 2024 16:28:50 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rY7GZ-0005eG-5L; Thu, 08 Feb 2024 16:28:47 +0000
+Date: Thu, 8 Feb 2024 16:28:47 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Sergio Palumbo <palumbo.ser@outlook.it>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Russell King <linux@armlinux.org.uk>, mithat.guner@xeront.com,
-	erkin.bozoglu@xeront.com,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH netnext 8/8] net: dsa: mt7530: simplify link operations
- and force link down on all ports
-Message-ID: <ZcT_r68mStRAC3Uk@makrotopia.org>
-References: <20240208-for-netnext-mt7530-improvements-3-v1-0-d7c1cfd502ca@arinc9.com>
- <20240208-for-netnext-mt7530-improvements-3-v1-8-d7c1cfd502ca@arinc9.com>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: sfp: add quirk for OEM DFP-34X-2C2 GPON
+ ONU SFP
+Message-ID: <ZcUBP3g0XNMG/aU2@shell.armlinux.org.uk>
+References: <AS1PR03MB8189D48114A559B080AF5BEA82422@AS1PR03MB8189.eurprd03.prod.outlook.com>
+ <Zb1+p6FiJwUF53xc@shell.armlinux.org.uk>
+ <f8cf41f2-4a90-4ef5-b214-906319bd82d4@outlook.it>
+ <AS1PR03MB818911164FB76698446CFEDC82472@AS1PR03MB8189.eurprd03.prod.outlook.com>
+ <ZcI+7grKa33oLtwc@shell.armlinux.org.uk>
+ <AS1PR03MB818926990092981B0E09E60B82442@AS1PR03MB8189.eurprd03.prod.outlook.com>
+ <ZcSZtLSWd09xqc10@shell.armlinux.org.uk>
+ <AS1PR03MB8189A24B92030AA8F011C7B582442@AS1PR03MB8189.eurprd03.prod.outlook.com>
+ <ZcTzMgxmA6WOoiA/@shell.armlinux.org.uk>
+ <AS1PR03MB81891A5F3C8B1A7542746CB582442@AS1PR03MB8189.eurprd03.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240208-for-netnext-mt7530-improvements-3-v1-8-d7c1cfd502ca@arinc9.com>
+In-Reply-To: <AS1PR03MB81891A5F3C8B1A7542746CB582442@AS1PR03MB8189.eurprd03.prod.outlook.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Feb 08, 2024 at 08:51:36AM +0300, Arınç ÜNAL via B4 Relay wrote:
-> From: Arınç ÜNAL <arinc.unal@arinc9.com>
-> 
-> Currently, the link operations for switch MACs are scattered across
-> port_enable, port_disable, phylink_mac_config, phylink_mac_link_up, and
-> phylink_mac_link_down.
-> 
-> port_enable and port_disable clears the link settings. Move that to
-> mt7530_setup() and mt7531_setup_common() which set up the switches. This
-> way, the link settings are cleared on all ports at setup, and then only
-> once with phylink_mac_link_down() when a link goes down.
-> 
-> Enable force mode at setup to apply the force part of the link settings.
-> This ensures that only active ports will have their link up.
-> 
-> Now that the bit for setting the port on force mode is done on
-> mt7530_setup() and mt7531_setup_common(), get rid of PMCR_FORCE_MODE_ID()
-> which helped determine which bit to use for the switch model.
-> 
-> The "MT7621 Giga Switch Programming Guide v0.3", "MT7531 Reference Manual
-> for Development Board v1.0", and "MT7988A Wi-Fi 7 Generation Router
-> Platform: Datasheet (Open Version) v0.1" documents show that these bits are
-> enabled at reset:
-> 
-> PMCR_IFG_XMIT(1) (not part of PMCR_LINK_SETTINGS_MASK)
-> PMCR_MAC_MODE (not part of PMCR_LINK_SETTINGS_MASK)
-> PMCR_TX_EN
-> PMCR_RX_EN
-> PMCR_BACKOFF_EN (not part of PMCR_LINK_SETTINGS_MASK)
-> PMCR_BACKPR_EN (not part of PMCR_LINK_SETTINGS_MASK)
-> PMCR_TX_FC_EN
-> PMCR_RX_FC_EN
-> 
-> These bits also don't exist on the MT7530_PMCR_P(6) register of the switch
-> on the MT7988 SoC:
-> 
-> PMCR_IFG_XMIT()
-> PMCR_MAC_MODE
-> PMCR_BACKOFF_EN
-> PMCR_BACKPR_EN
-> 
-> Remove the setting of the bits not part of PMCR_LINK_SETTINGS_MASK on
-> phylink_mac_config as they're already set.
-> 
-> Suggested-by: Vladimir Oltean <olteanv@gmail.com>
-> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> ---
->  drivers/net/dsa/mt7530.c | 26 +++++++++++++-------------
->  drivers/net/dsa/mt7530.h |  2 --
->  2 files changed, 13 insertions(+), 15 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-> index 5c8ad41ce8cd..f67db577d1c0 100644
-> --- a/drivers/net/dsa/mt7530.c
-> +++ b/drivers/net/dsa/mt7530.c
-> @@ -1018,7 +1018,6 @@ mt7530_port_enable(struct dsa_switch *ds, int port,
->  	priv->ports[port].enable = true;
->  	mt7530_rmw(priv, MT7530_PCR_P(port), PCR_MATRIX_MASK,
->  		   priv->ports[port].pm);
-> -	mt7530_clear(priv, MT7530_PMCR_P(port), PMCR_LINK_SETTINGS_MASK);
->  
->  	mutex_unlock(&priv->reg_mutex);
->  
-> @@ -1038,7 +1037,6 @@ mt7530_port_disable(struct dsa_switch *ds, int port)
->  	priv->ports[port].enable = false;
->  	mt7530_rmw(priv, MT7530_PCR_P(port), PCR_MATRIX_MASK,
->  		   PCR_MATRIX_CLR);
-> -	mt7530_clear(priv, MT7530_PMCR_P(port), PMCR_LINK_SETTINGS_MASK);
->  
->  	mutex_unlock(&priv->reg_mutex);
->  }
-> @@ -2257,6 +2255,12 @@ mt7530_setup(struct dsa_switch *ds)
->  	mt7530_mib_reset(ds);
->  
->  	for (i = 0; i < MT7530_NUM_PORTS; i++) {
-> +		/* Clear link settings and enable force mode to force link down
-> +		 * on all ports until they're enabled later.
-> +		 */
-> +		mt7530_clear(priv, MT7530_PMCR_P(i), PMCR_LINK_SETTINGS_MASK);
-> +		mt7530_set(priv, MT7530_PMCR_P(i), PMCR_FORCE_MODE);
+On Thu, Feb 08, 2024 at 05:19:24PM +0100, Sergio Palumbo wrote:
+> Dear Russell,
+> I understand your point, but I think ODI DFP-34X-2C2 situation is quite
+> similar to:
+> FS GPON-INU-34-20BI
+> HUAWEI MA5671A
 
-Any reason to not combine the two lines above into a single call:
+MA5671A is configured by the OLT. The user can't configure it.
 
-mt7530_rmw(priv, MT7530_PMCR_P(i),
-	   PMCR_LINK_SETTINGS_MASK | PMCR_FORCE_MODE,
-	   PMCR_FORCE_MODE);
-
-> +
->  		/* Disable forwarding by default on all ports */
->  		mt7530_rmw(priv, MT7530_PCR_P(i), PCR_MATRIX_MASK,
->  			   PCR_MATRIX_CLR);
-> @@ -2359,6 +2363,12 @@ mt7531_setup_common(struct dsa_switch *ds)
->  		     UNU_FFP_MASK);
->  
->  	for (i = 0; i < MT7530_NUM_PORTS; i++) {
-> +		/* Clear link settings and enable force mode to force link down
-> +		 * on all ports until they're enabled later.
-> +		 */
-> +		mt7530_clear(priv, MT7530_PMCR_P(i), PMCR_LINK_SETTINGS_MASK);
-> +		mt7530_set(priv, MT7530_PMCR_P(i), MT7531_FORCE_MODE);
-> +
-
-Same here obviously.
-
->  		/* Disable forwarding by default on all ports */
->  		mt7530_rmw(priv, MT7530_PCR_P(i), PCR_MATRIX_MASK,
->  			   PCR_MATRIX_CLR);
-> @@ -2657,23 +2667,13 @@ mt753x_phylink_mac_config(struct dsa_switch *ds, int port, unsigned int mode,
->  			  const struct phylink_link_state *state)
->  {
->  	struct mt7530_priv *priv = ds->priv;
-> -	u32 mcr_cur, mcr_new;
->  
->  	if ((port == 5 || port == 6) && priv->info->mac_port_config)
->  		priv->info->mac_port_config(ds, port, mode, state->interface);
->  
-> -	mcr_cur = mt7530_read(priv, MT7530_PMCR_P(port));
-> -	mcr_new = mcr_cur;
-> -	mcr_new &= ~PMCR_LINK_SETTINGS_MASK;
-> -	mcr_new |= PMCR_IFG_XMIT(1) | PMCR_MAC_MODE | PMCR_BACKOFF_EN |
-> -		   PMCR_BACKPR_EN | PMCR_FORCE_MODE_ID(priv->id);
-> -
->  	/* Are we connected to external phy */
->  	if (port == 5 && dsa_is_user_port(ds, 5))
-> -		mcr_new |= PMCR_EXT_PHY;
-> -
-> -	if (mcr_new != mcr_cur)
-> -		mt7530_write(priv, MT7530_PMCR_P(port), mcr_new);
-> +		mt7530_set(priv, MT7530_PMCR_P(port), PMCR_EXT_PHY);
->  }
->  
->  static void mt753x_phylink_mac_link_down(struct dsa_switch *ds, int port,
-> diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
-> index 8a8144868eaa..a71166e0a7fc 100644
-> --- a/drivers/net/dsa/mt7530.h
-> +++ b/drivers/net/dsa/mt7530.h
-> @@ -304,8 +304,6 @@ enum mt7530_vlan_port_acc_frm {
->  					 MT7531_FORCE_DPX | \
->  					 MT7531_FORCE_RX_FC | \
->  					 MT7531_FORCE_TX_FC)
-> -#define  PMCR_FORCE_MODE_ID(id)		((((id) == ID_MT7531) || ((id) == ID_MT7988)) ?	\
-> -					 MT7531_FORCE_MODE : PMCR_FORCE_MODE)
->  #define  PMCR_LINK_SETTINGS_MASK	(PMCR_TX_EN | PMCR_FORCE_SPEED_1000 | \
->  					 PMCR_RX_EN | PMCR_FORCE_SPEED_100 | \
->  					 PMCR_TX_FC_EN | PMCR_RX_FC_EN | \
-> 
-> -- 
-> 2.40.1
-> 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
