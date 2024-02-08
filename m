@@ -1,225 +1,97 @@
-Return-Path: <netdev+bounces-70117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70118-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 289BE84DB72
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 09:31:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CFFAA84DB9C
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 09:42:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90F551F268F0
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 08:31:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70C12B248E5
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 08:42:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC2A67E8A;
-	Thu,  8 Feb 2024 08:30:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB9626A8A9;
+	Thu,  8 Feb 2024 08:42:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01olkn2065.outbound.protection.outlook.com [40.92.66.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB22D1D54D;
-	Thu,  8 Feb 2024 08:30:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.66.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707381059; cv=fail; b=VPTV7DXNJg609IMh7xMlOl86da7KCCw4MERSp4XEz3AoWejnPss57/C2Mv+FI+lkuE96YyEe0/3rvpV2m2k2lq9TrO9p6aLqN/pfeHudzczqosHK+xJU4vUX2NzdW8lT7LBL8FiGUCIz6NM4S0qc1Zpg7FqO+tLkfKHcbkPpzmo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707381059; c=relaxed/simple;
-	bh=7IpiKfYKVacJ1t4P6O5c1ugnropKbaWyydy42TgHZkA=;
-	h=Message-ID:Date:From:Subject:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=diLGKdy5KRaKsF6ERzYtNjuk03ZVMDX51e1e2pTzwVsxS9ad0kAKMmGlWiEZZu2HKvz1/tQbNm2wfPLg2S40LaSRpGTACNOX9tpgVQGEiaZURw1j8JnrI8TcJpPyP1Pvw0bIw145RgbCdeb10RR6TynxTi1pBJFc6KghvHRxXW8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.it; spf=pass smtp.mailfrom=outlook.it; arc=fail smtp.client-ip=40.92.66.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.it
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.it
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=KlJyaBGsMHI5cRJcQbDvjyux5EdM3X08g/Kvr9lOb4TTmCNIM9Nyj6p9Eo4DPG6jFGZ0GyhGLuGx3DfbIFBkdJii222/Odgp570lQqfkyv7SH0ieQsOg1B4CmyjECueJqrqu0OLVZhEDZ6pRVvbkyt4/tuIDgbvKEWFg6GJzGhD1H2a17HPaI4BwZZdA3e2HmoUaNLdNN13o22W4VpYWBF32MK9dFXU4o3tqv1WH4PUnRGMa1bxzHJkKJw/qD+cusQ0zxbqKP+fwjZVOPJ/tsEcG+IapWK/Fa79tLDxfe/2TB3w7gW3zNaUhl8a7tj3Ypc20jOj0v3aVsG0ofmpbCQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KRStz896llpSM7qMGVKNvhUPpVQs/Yo1dv3hQf54n/M=;
- b=jxyHgQYXo1L1GrAQrHT1ioXBc1HGa+cRi/z+Z4lLHY/W8Ris4MepnrEx2vLwqqj73X83UoZ5jIRrFGPffd6fA8TuJqUmwru6s7VT/DvkpcJf9H+waI4qDd50/VDFLOYX6YPtG7dNEk5PRQ2PVdlY4DDBFryxlT73OHxu+OvM8P4oZZxKQ+jY6vCrHo/M2ZiKmlJlndOhkACGzXnh5lAEJFkdM80lkukazdv1Mk/ZPWXONiiyeCn2r3acztX5hzqdwi7G5s60JnNF9jvST1U8CvIFSyjIrw0o3Nwe/QMbRSSyrCyVk2+V81e36NU+ixf/+ms86EHjO6cb8pFN9D+Jpw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-Received: from AS1PR03MB8189.eurprd03.prod.outlook.com (2603:10a6:20b:47d::10)
- by DB4PR03MB9484.eurprd03.prod.outlook.com (2603:10a6:10:3f4::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.36; Thu, 8 Feb
- 2024 08:30:54 +0000
-Received: from AS1PR03MB8189.eurprd03.prod.outlook.com
- ([fe80::ffb3:3ff8:6ea9:52b5]) by AS1PR03MB8189.eurprd03.prod.outlook.com
- ([fe80::ffb3:3ff8:6ea9:52b5%5]) with mapi id 15.20.7249.032; Thu, 8 Feb 2024
- 08:30:54 +0000
-Message-ID:
- <AS1PR03MB818926990092981B0E09E60B82442@AS1PR03MB8189.eurprd03.prod.outlook.com>
-Date: Thu, 8 Feb 2024 09:30:48 +0100
-User-Agent: Mozilla Thunderbird
-From: Sergio Palumbo <palumbo.ser@outlook.it>
-Subject: Re: [PATCH net-next] net: sfp: add quirk for OEM DFP-34X-2C2 GPON ONU
- SFP
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <AS1PR03MB8189AD85CEB6E139F27307D3827F2@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <ZbZn8oCiyc1aNPuW@shell.armlinux.org.uk>
- <AS1PR03MB8189B99C360FB403B8A0DD6882422@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <Zb0t+zKHx+0wTXH5@shell.armlinux.org.uk>
- <AS1PR03MB8189D48114A559B080AF5BEA82422@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <Zb1+p6FiJwUF53xc@shell.armlinux.org.uk>
- <f8cf41f2-4a90-4ef5-b214-906319bd82d4@outlook.it>
- <AS1PR03MB818911164FB76698446CFEDC82472@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <ZcI+7grKa33oLtwc@shell.armlinux.org.uk>
-Content-Language: it
-In-Reply-To: <ZcI+7grKa33oLtwc@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TMN: [QwV3UvbXfYaYAIrFQf/fChZd8cpMpZQW9Sd48hqf06gsuQV3zjqF5kfMk3VF38D3]
-X-ClientProxiedBy: MI1P293CA0019.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:3::16) To AS1PR03MB8189.eurprd03.prod.outlook.com
- (2603:10a6:20b:47d::10)
-X-Microsoft-Original-Message-ID:
- <8b1a4992-4db6-45a7-9f72-f47b2069a592@outlook.it>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60E9969E1E
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 08:42:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707381727; cv=none; b=fmqOV8b3Scyv2QmmYc5ZJqdpmjV6389yHyVSvUdZ5M4X93wScIQ3hY1NpNYNCIwJBxVJtfUV3ywOPgGmoEaCOys6LaFDjyYHx5YjiZWnkuVczUunI25Nas63F5+kNQVeBX368uK+V9dxxX+ToGZ7plYFBBXJOkNSdVT4R2n7Hik=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707381727; c=relaxed/simple;
+	bh=owM+DNpsKkXyinnw4wd0FBpjXm/GovegDPMh1yJNq3k=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=c9JSGh/tVj4u5M306pQpnnG/mGw5u37DijlFedIxMrKnJjw8EhNhjf7edMl058YPOnU5YBXqGZsRiFp3FLu31xEVtMoOQ1u8C4Q6p+L3ZQHshe22izkW/macef+FkZg1Qx3yN6+uNKVEyg5S7JBMCgZAPNC/UQyCah1LSBiwpCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7c018d53e7fso116465239f.2
+        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 00:42:06 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707381725; x=1707986525;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gi3Aj5CpZSqfEPpOTz0NyFdtwkFwo4vzB4CbD3V/hMU=;
+        b=c7ItGzjLXtgsMC3fYvyi8HP19QdRyqohNfkz59gki6vai5PDBoq1AYq8G9jeATNaWQ
+         VcsJDXLxUjaFSw9ZcHF0XtztiQvfoRzGkDYnOLDSEP+5O60pjrkMAWrpSffCCFnxfAr7
+         Myg5FNlb1eKrQEzkjBe+VZzV2hT3BXpU+7f7T3MT9odvv+uI5+NMsQMDZQuShjFE5JfB
+         EEQVlvIeOeRgbkjjLb9GE+7PHRdgJlrD+fxeemAVjI+VXjYMq54hFomzaTZ+hjN3TzAc
+         fjgOu8EPlo91k+4AFuFkaJYAyPKThz2qTHOdV+Uezap0P2EwrzJd0BGsQYtjx0M7C0rS
+         k9bg==
+X-Gm-Message-State: AOJu0Ywv8HmTmYel5+0wHSXqyT8aIGgwcdT1mK4FBPCsYVI4wP8w6X19
+	UNXWO86Dv8mc3EOgNBVazw8PUnPa875+80sqjxIVJzRY69UhjI/x2VJQTwg7Ok6LSocp07y1EWo
+	zImdgCw8EuoFZ7zrNorOIXgrwWQ0TjY9PGbrEdEQahQyKu7fXuNty3u0=
+X-Google-Smtp-Source: AGHT+IG7PoBe/+uQDEV3xHx1bDZIx7KmSroS4aAxMKdS6uE3XoEiKFcrp+MQPEGidl9GEYHKZ9GTPfdaZh84P8DZd8F1RvyrB1SV
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AS1PR03MB8189:EE_|DB4PR03MB9484:EE_
-X-MS-Office365-Filtering-Correlation-Id: 998a1c6b-c4ce-48f2-d8c4-08dc2880437b
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	BXKPnuJxaClcn9e+NwTbX/mTxRWlqDqd7/q4Hd8Hm/cAzoLN2Uih+PnNU0EPt5ZsBwCZ5EBMt3fbbdSvzrEr+JdOq2J+wQ2UxIK/mYeYApjTrmS6bx44fD3LCk5WKv78niM4Xa8ePvTOAxv+ahuR+uitVv2izVket/vkkY+8CyfKIwSRQRYuehX6j3sE0XBBwDodQv62EMvdazSNd3LQ58JqKbhjw9II6kDKZJJdI5ETDYv4PQycSps+TOP0yWquFnULsPxALz0jwDYrUDLsmoQLG0bmbmu3/ThNnhFHf8tBE/wk5lxuFqtZ97o4GC6mEicD228Btzg1olqxO8Z+7g7miM5tNjCcO8cPFnycHzPIAv9hyjJ+LA2CzM58VSvIFO3TmaP5AMlqtScBn9LoU1RT/Sq1foWVsgPvQkofXdTzVeF0uJHHHTwPGHUGA3yxochQUeY9x8LYu8CWPODQ14MzmZd3kL6YGX+2P5yv04dYSpeGQUnRHKkC9a14c2+DGeuMP6B2d4h8wKVrZfpupQJEYZ+ShSzUvKlEt+16Rf65sNsrr9v+MdQnfwkNHgtm
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?cHU2dFZVcG8vbzVOd3kyVDZDOEVBV0RPTzlYL2JoaEdGbWVLb2JzTVhKaGRF?=
- =?utf-8?B?SWx4QVBJb2ovTHFVVVRPVENHRnNYaWprRy83bW9TaFZuZ1pvVzQrdnVVcTQv?=
- =?utf-8?B?VkdMdHBPTVhpSnF0WUFIejdiWUZjOVk1WXpmWU5NTENIR1RLVmZPbGp1RUYr?=
- =?utf-8?B?Mk5PSllWajQ2OU43VjNLUFoxNFVLbnFWRDFVSFZVNEZFQ1VJNldUVUxFRWRT?=
- =?utf-8?B?K2tMM2tMdHlTRnJiYVF3Y3VSTUx5VmVES1VmeFJxYXh1NkdrdkxiNmttSjA4?=
- =?utf-8?B?VGhiQW9ab2pDQ2JyaldWV1FCUjN0RDJGK2x6OHdXcUUzcHp6U2pncytNRTlI?=
- =?utf-8?B?c0FvU3lUTCtRVHR6QTlGTUgxSE5CMlZPaHVvWUdQeVFvU2VNYWhkVWNsbFd5?=
- =?utf-8?B?L0d4dVlKdXhySDI0Y2V3Q2pBTU5uTkViU0hIa2xkYnMrNEp1K3pBUnVvQ3RT?=
- =?utf-8?B?MWZWZFVKNnNTK2N3SzJPcEd4WDcwa1BwUlNYd3BtRXZsZGhhZ2UwOG5xZCtI?=
- =?utf-8?B?L1dQSHVTT2NEUTd2dlg3NDZ3MjFTRlNiRUp5Y082Qzl0V2UwV0tLZmJhK1N0?=
- =?utf-8?B?MFZUVnBzNVFQMDF5dTdsdk9KZ3Ftak9TbkhlRi9JSjZlaFJXay9hOE92cGpJ?=
- =?utf-8?B?bGZVNUMyVENtVFJiOFJ0c2taRzJCY2M3WmNKNUt5UVBMQldoUHh0b29BME1a?=
- =?utf-8?B?eWVrb1NmdzhJVEdhTlpoYk4yUmRpTzJMMndJZzJmNE96MHJXUE9lV0tGa2Rn?=
- =?utf-8?B?RTF6SE0zWDR1QldaNjd0YU1jejFMeG5HRlBmTFFYS29XbTdCRkhMeHl3d0Jm?=
- =?utf-8?B?M2hhbHp4NTJ4cDVvdW5BazFES3lSQXJUd1RlSzhuellhakpIMENWQU1SUmZm?=
- =?utf-8?B?aVZqbm9UTUhVbE5SaWZmNlNZV00reDBQTzZsY2RJNmVVWlpweVRJb2xGK0tC?=
- =?utf-8?B?UGZLZzlTS2ZOZ0I3WEZmK1U4bkllQ0hxb3BzZVU5Zm9LQVNhbU9UM3JWWFZF?=
- =?utf-8?B?VXRJbXRuaDNmMGRzcmZUbTUzTHRJOGUrekRReFByMmZWeDNhTVdsc1ZYWlZj?=
- =?utf-8?B?cUJ3c3EwaVBjSEpuYTJWN1lhdnlmSTdzNE56a0EvYWlyOStBZlBsenZ5K1Ar?=
- =?utf-8?B?WjJlc0RYUVM2TlJOZDVLZzY2Y0Z3b2RUL0hrZFVOU3ludjFqT1lNb1BLb0VL?=
- =?utf-8?B?MFJLdGZTa0FSeEczanZiSndieE11d0ViUER1cjdFb3gxYS80UEMxVnViUzFX?=
- =?utf-8?B?ZHlmd1E5VjM1YzRzWVVGMlRzYmF2OGFDTHVpeS9SWE5oeVdyME9oMWlvWWdN?=
- =?utf-8?B?cjB6Tkwyamk4bHpjK1E4L2ZiOGx2c1VBbW1yMG9tRDVhSFdlRkZRUkJNblZl?=
- =?utf-8?B?azhvUTlyVjRaM0VjckJDTVI3MTNLZXhGQkJBQW9iZU1UdklTRzI0TGJGWEZO?=
- =?utf-8?B?elFCQW9zOGZYUVlPQkFjY0h1dnhwV2lyeURkMWdpSUtoaEJxOEhUQU5sbWdI?=
- =?utf-8?B?MmYweXBORVZrcXhHK2Nmci9UbUlneGxYb3llajNoeVpkYUFTcDdDZFFDVkY3?=
- =?utf-8?B?RDlDMVRQbi9GNU9MZ29sMjg1bmRLTlIrREFuU0RRcS8xM1VsdEVYazMvb1hZ?=
- =?utf-8?B?ancreE1rcW5aYThVZGswZHVlRmpocUt4bVY0eVliUHVJeDhCRmFPYWRiSCtQ?=
- =?utf-8?B?MFV6QXFYS09keXhsRU12S3NaNTRhNy9lMjR0ckp4QUlZa0UzQkZNWE80WHNR?=
- =?utf-8?Q?quLNVAgSZJSuzrDTbc=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-76d7b.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 998a1c6b-c4ce-48f2-d8c4-08dc2880437b
-X-MS-Exchange-CrossTenant-AuthSource: AS1PR03MB8189.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Feb 2024 08:30:54.6780
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB4PR03MB9484
+X-Received: by 2002:a05:6602:6428:b0:7c0:38b:403c with SMTP id
+ gn40-20020a056602642800b007c0038b403cmr395454iob.4.1707381725627; Thu, 08 Feb
+ 2024 00:42:05 -0800 (PST)
+Date: Thu, 08 Feb 2024 00:42:05 -0800
+In-Reply-To: <0000000000006f7cb5060cc9c9ac@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000408e8f0610dac93b@google.com>
+Subject: Re: [syzbot] [bpf?] UBSAN: shift-out-of-bounds in adjust_reg_min_max_vals
+From: syzbot <syzbot+46700eea57ecc7f84776@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
+	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, llvm@lists.linux.dev, martin.lau@linux.dev, 
+	nathan@kernel.org, ndesaulniers@google.com, netdev@vger.kernel.org, 
+	sdf@google.com, shung-hsi.yu@suse.com, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, trix@redhat.com, yhs@fb.com, 
+	yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hello Russell,
-I did the requested test
+syzbot suspects this issue was fixed by commit:
 
-- host that supports 1000base-X and 2500base-X with your quirk (Banana PI R3)
-- SFP inserted with LAN_SDS_MODE=1 (DFP-34X-2C2
+commit 96381879a370425a30b810906946f64c0726450e
+Author: Andrii Nakryiko <andrii@kernel.org>
+Date:   Sun Nov 12 01:05:58 2023 +0000
 
-and here below system messages concerning sfp:
+    bpf: generalize is_scalar_branch_taken() logic
 
-Sun Feb  4 00:35:06 2024 kern.info kernel: [   14.686771] sfp sfp-1: 
-Host maximum power 3.0W
-Sun Feb  4 00:35:06 2024 kern.info kernel: [   14.692137] sfp sfp-2: 
-Host maximum power 3.0W
-Sun Feb  4 00:35:06 2024 kern.info kernel: [   15.029727] sfp sfp-1: 
-module OEM              DFP-34X-2C2      rev      sn XPONxxxxxxxx     dc 
-230912
-Sun Feb  4 00:35:06 2024 kern.info kernel: [   15.068806] sfp sfp-2: 
-module                                   rev 1.0  sn 2307210038       dc 
-230721
-Sun Feb  4 00:35:08 2024 kern.info kernel: [   22.767328] mt7530-mdio 
-mdio-bus:1f sfp2: configuring for inband/2500base-x link mode
-Sun Feb  4 00:35:08 2024 kern.info kernel: [   22.777097] br-lan: port 
-5(sfp2) entered blocking state
-Sun Feb  4 00:35:08 2024 kern.info kernel: [   22.782390] br-lan: port 
-5(sfp2) entered disabled state
-Sun Feb  4 00:35:12 2024 kern.info kernel: [   26.970294] mt7530-mdio 
-mdio-bus:1f sfp2: Link is Up - 2.5Gbps/Full - flow control off
-Sun Feb  4 00:35:12 2024 kern.info kernel: [   26.978403] br-lan: port 
-5(sfp2) entered blocking state
-Sun Feb  4 00:35:12 2024 kern.info kernel: [   26.983623] br-lan: port 
-5(sfp2) entered forwarding state
-Sun Feb  4 00:35:12 2024 daemon.notice netifd: Network device 'sfp2' 
-link is up
-Sun Feb  4 00:35:08 2024 kern.info kernel: [   22.834307] mtk_soc_eth 
-15100000.ethernet eth1: configuring for inband/2500base-x link mode
-Sun Feb  4 00:35:08 2024 kern.info kernel: [   22.846214] device eth1 
-entered promiscuous mode
-Sun Feb  4 00:35:58 2024 kern.info kernel: [   72.800035] mtk_soc_eth 
-15100000.ethernet eth1: Link is Up - 2.5Gbps/Full - flow control off
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=16e65a9fe80000
+start commit:   b1dfc0f76231 net: phy: skip LED triggers on PHYs on SFP mo..
+git tree:       net
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e043d554f0a5f852
+dashboard link: https://syzkaller.appspot.com/bug?extid=46700eea57ecc7f84776
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=128c8ad1e80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12456fb6e80000
 
-sfp-1 is linked to eth1
-eth1 is running at 2500base-x
+If the result looks correct, please mark the issue as fixed by replying with:
 
-Same result with ethtool:
+#syz fix: bpf: generalize is_scalar_branch_taken() logic
 
-Settings for eth1:
-         Supported ports: [ FIBRE ]
-         Supported link modes:   2500baseX/Full
-                                 1000baseX/Full
-         Supported pause frame use: Symmetric Receive-only
-         Supports auto-negotiation: Yes
-         Supported FEC modes: Not reported
-         Advertised link modes:  2500baseX/Full
-         Advertised pause frame use: Symmetric Receive-only
-         Advertised auto-negotiation: Yes
-         Advertised FEC modes: Not reported
-         Speed: 2500Mb/s
-         Duplex: Full
-         Auto-negotiation: on
-         Port: FIBRE
-         PHYAD: 0
-         Transceiver: internal
-         Current message level: 0x000000ff (255)
-                                drv probe link timer ifdown ifup rx_err 
-tx_err
-         Link detected: yes
-
-Please let me have your comments.
-
-Sergio Palumbo
-
-
-Il 06/02/2024 15:15, Russell King (Oracle) ha scritto:
-> Hi Sergio,
->
-> I did ask for the kernel messages from a specific scenario:
->
-> - host that supports 1000base-X and 2500base-X with your quirk
-> - SFP inserted with LAN_SDS_MODE=1
->
-> What I expet to see in the kernel messages is that the system will
-> use 2500base-X, and a failure.
->
-> You claim that the kernel will link at 1000base-X. There is no
-> mechanism in the kernel for this to happen, and I believe that
-> if you look at the kernel messages, this will prove my point.
->
-
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
