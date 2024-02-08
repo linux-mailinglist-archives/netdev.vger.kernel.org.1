@@ -1,114 +1,118 @@
-Return-Path: <netdev+bounces-70321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BB8584E598
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 17:56:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7B2B84E5A1
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 17:56:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05276286506
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 16:56:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56988286CE8
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 16:56:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8E8811E0;
-	Thu,  8 Feb 2024 16:56:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C7E823C2;
+	Thu,  8 Feb 2024 16:56:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mjZSofCF"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="vg7+YDUM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C08C7FBAF;
-	Thu,  8 Feb 2024 16:56:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C9597FBA6
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 16:56:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707411380; cv=none; b=ATrPgHlvDljjMs8q74QoK1z1bzAe8Jq6KNMRtc+R4udzbgwW5R99EtkyYL+PUNxK+dPW08y7hknt2IJiZRCe3ewUeKZeN0IcKBgYac4hy7+aVrvqfgSA4DkwAUr49I3A7Iic1kobJ+yoHNspsUpw542EvzsAw+XE3dSIdYofiOU=
+	t=1707411382; cv=none; b=r5Zt7cedisUfN4oAcc+g6VyDCXMsDse6D7FCtnsfrc0ETg8l8pEBcQWEWP9/MUhgo67J2r00oX/Nlbmuwsjo5t7r5/FZXfrq799VALDd/7ok3QLUGLGd8824zW65UwL4Cx02GSIGmfFR3XD1xidOAlAaP9O1jBqxNSUhPsejFtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707411380; c=relaxed/simple;
-	bh=BWu/28fRzjkSvdnGNYlpR0IqiCP38+waS7beyb9M788=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jVTe2pZvlZrUu2ztKUdEoRp9mS3OmH+czXA0WmCU2ssmm//ZtPUxqC3j4YCtr3RYG2NrLE8XiPKLs9t4SBti7RSGRf7CdMxMHrgbxRF3ZgiNsI9oLT6OqBRF4BRFqt22hFi7KNDQPEf0gZ/GEKTkBbqPT75UmB0B5eCPwo1U+io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mjZSofCF; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1d94323d547so18878375ad.3;
-        Thu, 08 Feb 2024 08:56:18 -0800 (PST)
+	s=arc-20240116; t=1707411382; c=relaxed/simple;
+	bh=DohX8sAB7IIvNrFjxtvDTOKnv+ntZDy+c28KQSpW01o=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=YI+HCV5T8GoVnRNleWK767Qn6KoVjG4xiiPlK+E/GRYYnpbrKggscbSEBvbbRVbczoVtXUNLxFPMrMGS/hjnn2HA1h3BnKNum4D2oTy4Dxca6Kuxv/fh2nn+xjBumZVaxc/J7gfrTtQw27uuQZ5rcnO0VFxIr9Wctns1+gfMTEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=vg7+YDUM; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-6e0518c83c6so27060b3a.0
+        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 08:56:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707411378; x=1708016178; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=N4xRu64XxLbwyXH7oYCu6PRDtlp7yUhISnlJKKI/0Tc=;
-        b=mjZSofCFCF65DXVvicEdVrSOBM/2KU6+r3LjnwCz+Thlven8vWsHZ1MqcEiu2jPSX+
-         deLD0Ys9/5W0BPtXV7zeShp00e0jaF3dhCC7w1iDbZoK5udahorRIf6feQhcAOGnTzD0
-         e5Eryey6actlTF/YfrIYkZ++BE533a/y/Tyzg4BSatIEds3Utd/qS4KDVT3mxcMviXwk
-         WoCs3ujZhdJFrVSTXoo8ziYF2EVtPSxKil+KGOd4cz/j7PVLQ7DDw5aUm9hPGj4RzvhM
-         6+ETj7JjtognXztJvWykPH1MpeaWPGCf4wX7RRItYUKvRg3CT2+mA1M5EZYybkHV2J1u
-         64+A==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1707411379; x=1708016179; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1IWTganX0llgMryD07FfLPr661KFW9fTZBnn+PsTA4k=;
+        b=vg7+YDUMhK5HsjRS6AgZImmojOhrs0MY1GIhTdUxtoDU6DWzBHjB5ordI1CY7FRZfO
+         vANnl2eFxD8FeCaCpaONuYWUa1gQ6xwBfSiD6LrdNzetg8DUQI5f9EGYQ9/8+7flDict
+         hufKYBIZxVQtpK0TCRh9EAXjB+o4Pf/ub7zo1+0dRNhVrb/xD0s/MVXQzwHrL/Gu9rOO
+         z7HuBv/p4Gt+gdlBsvOH2pY320Ry6FGNY38CBH7QgABUHxvUpgLIDr79S9TWCMXpP+A3
+         uugTmsvcLBBwv0suWdbU2DZaGScNdI6yTt/kZCfSIi00ica4AI1gKTMt+VlO80CV0EeN
+         kZ0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707411378; x=1708016178;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1707411379; x=1708016179;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=N4xRu64XxLbwyXH7oYCu6PRDtlp7yUhISnlJKKI/0Tc=;
-        b=gIZEIbz0I3CQ36xtjEBtM/uao3XxMiIAgZ/j1O0ED17bGslxVxKzWiYYBPa2SsJC9T
-         ROkdRarRWoOtG1ohvYlg0ke7juIsm2CP5oaHZ8c7Wt3fbUF3y+O/QOkU0iUJLdgl9n48
-         1U5XKrmUWb+fKtP9WBa/AGPWE/sjYEC/dDARwLGB2XWY+MZMQY6u86zV+edIq0ckA6zO
-         W9T8IhfeALXPZQzWoI9f8L5Af4cgHamS4WNLZpEJfw+RJufa14R+RcoXzkYsRD7179Ag
-         nHHiRKxu3PbCGn04CqvYR27jWe4FBHJTgO67pXhgmQ2gyCUvCWZNH13y0v+JXcX1uj60
-         WVJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXkTME7Fo2eNsqhayDB6F6tKjOkY6a3iun3DW5YywBPIxHBwmyYenwE1CncZtCBtqxnSZ1Y8hZtG/MiVOcKrstlfS6Rvrl76yevaCZuuA30ZiEhML0iFGMxaqzh+HL/PB2KxuIE
-X-Gm-Message-State: AOJu0YwnEjmoVUp6rAJSs1SLJ5TGjYFnImY6KGld0nNI8HpfjXzPBrfW
-	S6TYEeApZPdAq6ya4XwZBCBpzu98TQ/RuefgDJnF4nmtzhGgj5iL
-X-Google-Smtp-Source: AGHT+IHOzIx5Ag+DssraT1KoaXuGtKOQFpMJMlaapfeV7Mba5cBbHY7UXR37Bl9QXvIi0G8qvZShSA==
-X-Received: by 2002:a17:902:6bc1:b0:1d9:b89c:1bd2 with SMTP id m1-20020a1709026bc100b001d9b89c1bd2mr8331484plt.63.1707411378283;
-        Thu, 08 Feb 2024 08:56:18 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXW/GNbCDzV0WwQk4yUkzYM+KTU+52Xlbx7rNGl0IimjaMAKSmnUrqBf5JekcRV0M3g8ZYMeRo9E9LhChbKrDG5J+PK5X4WuPAtlxRcjY5f67ZpTNya395BntBypX2JwlSkE4vJl7KymTrEX2CzKtnxHIaac6PvS82qQ8nx056xBI9KfVWOmeLXl2+Q9tl6yyAQYLll5xPmvUvXUokP+BF38Hr9L0pFFlkMrAJg5lR7nq+l9HiwjdyDAMavs7h+au4Oo15mCEMN0VyEP7DHukUs/1aN+li9tP9KcmQAYXjTFGabTO+KqQuHWHrIMk4PdodOhY1POZoJvXct+SW64h5aGy34nkJ9ot/NI/2A91ae5D06U77mMUq2/xfqAhoDxTS8nbO93V1MLtm+vm3wNVSMN0176ekXPLFYa5IWxeRaqi0LU8Ir6EZfvndgzcM=
-Received: from localhost ([2620:10d:c090:400::4:3c45])
-        by smtp.gmail.com with ESMTPSA id ko4-20020a17090307c400b001d9606aac46sm9840plb.212.2024.02.08.08.56.17
+        bh=1IWTganX0llgMryD07FfLPr661KFW9fTZBnn+PsTA4k=;
+        b=nrHVT8dbdpRxPeovsyDaos5D/w6QomDIeXQ+W/70p7tV9BsYpqv0eLajHBPhZp81nv
+         tOWPkna6jqnkB92qZ6pB3MfFE5DKpcB39eojmZtnMZ2jE2RexZ2hHpkJQXfcjDxN0y3k
+         Ybq0oEGCivzkOliNW2civuNmhb1G6EK0THv3+aP6431ZK+ydHNunb5J1nndufkxa32tH
+         dVfG4K8P+sNbcNGppPgc3df7anBxUyMuSmwWlcHbMxBcp+SwSb5hXkVl0SD2leoC3lQ1
+         XOwb4lOySA/ErQzA9CFS3I62RfHv1r92wJHHoDkHBesbqqjHCPcfIoOFWyhh2uqjsfvr
+         Gd0A==
+X-Gm-Message-State: AOJu0YxI9zenUokFwDMPd85uPFI+H8+oAvdzU6ZfOZHOzdXVC5t8m3RH
+	zSz0I98+J5lMNyxsvMnU3LKMUQhVqzmlXmNeH9AX4C/KBvzpOzw2m8mVOwpwUQoYDTi3888PbWr
+	3Uvo=
+X-Google-Smtp-Source: AGHT+IHKpgciWfCvEAamdzdwajcc2hXa7KoBn4n7ri7RlokQfnb2pX5w07mQatp9dtfTTalDBHUUwA==
+X-Received: by 2002:a05:6a21:3a84:b0:19c:a632:e176 with SMTP id zv4-20020a056a213a8400b0019ca632e176mr175496pzb.11.1707411379410;
+        Thu, 08 Feb 2024 08:56:19 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id s9-20020a17090a6e4900b002926be9cebcsm1779604pjm.51.2024.02.08.08.56.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 08:56:17 -0800 (PST)
-Sender: Tejun Heo <htejun@gmail.com>
-Date: Thu, 8 Feb 2024 06:56:16 -1000
-From: Tejun Heo <tj@kernel.org>
-To: Allen <allen.lkml@gmail.com>
-Cc: torvalds@linux-foundation.org, mpatocka@redhat.com,
-	linux-kernel@vger.kernel.org, dm-devel@lists.linux.dev,
-	msnitzer@redhat.com, ignat@cloudflare.com, damien.lemoal@wdc.com,
-	bob.liu@oracle.com, houtao1@huawei.com, peterz@infradead.org,
-	mingo@kernel.org, netdev@vger.kernel.org, kernel-team@meta.com
-Subject: Re: [PATCHSET wq/for-6.9] workqueue: Implement BH workqueue and
- convert several tasklet users
-Message-ID: <ZcUHsHzlLpE7meaW@slm.duckdns.org>
-References: <20240130091300.2968534-1-tj@kernel.org>
- <ZcACvVz83QFuSLR6@slm.duckdns.org>
- <CAOMdWSLNMqsZNJ-oCLN2RjckZmJSvdU_Yq0F0frmqMqa67Oy1g@mail.gmail.com>
- <ZcFPKaWwxJhgy8HQ@slm.duckdns.org>
- <CAOMdWSKQC4UWXp57qubcSOHmPj0E7wHZWWbCz+yCZqROhoPSGw@mail.gmail.com>
- <CAOMdWSLF9AaQF0ux03-tonw-Jy+4rXdKEZGzPrp_v+fnas6SnQ@mail.gmail.com>
+        Thu, 08 Feb 2024 08:56:19 -0800 (PST)
+Date: Thu, 8 Feb 2024 08:56:17 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Maks Mishin <maks.mishinfz@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH] ipaddrlabel: Fix descriptor leak in flush_addrlabel()
+Message-ID: <20240208085617.1fc58a59@hermes.local>
+In-Reply-To: <20240207202542.9872-1-maks.mishinFZ@gmail.com>
+References: <20240207202542.9872-1-maks.mishinFZ@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOMdWSLF9AaQF0ux03-tonw-Jy+4rXdKEZGzPrp_v+fnas6SnQ@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 07, 2024 at 11:02:37AM -0800, Allen wrote:
-> https://github.com/allenpais/for-6.9-bh-conversions
+On Wed,  7 Feb 2024 23:25:42 +0300
+Maks Mishin <maks.mishinfz@gmail.com> wrote:
+
+> Added closure of descriptor `rth2.fd` created by rtnl_open() when
+> returning from function.
 > 
->  I am holding on to the patch that converts drivers/media/*, as I haven't found
-> a right way to replace tasklet_[disable/enable] api's. The rest should be ready
-> in a day or two.
+> Signed-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
+> ---
+>  ip/ipaddrlabel.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/ip/ipaddrlabel.c b/ip/ipaddrlabel.c
+> index b045827a..3857fcf5 100644
+> --- a/ip/ipaddrlabel.c
+> +++ b/ip/ipaddrlabel.c
+> @@ -201,8 +201,10 @@ static int flush_addrlabel(struct nlmsghdr *n, void *arg)
+>  		n->nlmsg_type = RTM_DELADDRLABEL;
+>  		n->nlmsg_flags = NLM_F_REQUEST;
+>  
+> -		if (rtnl_open(&rth2, 0) < 0)
+> +		if (rtnl_open(&rth2, 0) < 0) {
+> +			rtnl_close(&rth2);
+>  			return -1;
+> +		}
+>  
+>  		if (rtnl_talk(&rth2, n, NULL) < 0)
+>  			return -2;
 
-Yeah, we'll need to add something to workqueue to support that. As for the
-rest, looking at the code, I think tasklet_kill() should be converted to
-cancel_work_sync(), not flush_work().
 
-Thanks.
-
--- 
-tejun
+This doesn't make sense, the error path in rtnl_open cleans up
+itself. Do you have a reproducer or is this just some static analyzer?
 
