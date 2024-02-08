@@ -1,192 +1,140 @@
-Return-Path: <netdev+bounces-70347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AE6D84E741
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 19:03:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80CE684E742
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 19:04:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D5EE1F25603
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 18:03:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B0E911C24262
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 18:04:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0F487EF0C;
-	Thu,  8 Feb 2024 18:03:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E7683CAB;
+	Thu,  8 Feb 2024 18:04:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lsZzz4uH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KHHlQcq5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [134.134.136.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D78B823D3
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 18:03:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=134.134.136.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 640D67EF0C;
+	Thu,  8 Feb 2024 18:04:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707415423; cv=none; b=RAxHiLI9kuX6MYbVC2s4p5RHJJ6sdUgF3kqqShJEBdYKeEOLJrR0TDrJ03RGxsT4C+3nr869SXkEg2z82s1lCFM/S2FQxEhMySOjWwsyOPcr45KdHBn4vf0UUQGNGLdBlRfldTTWS05ywiv2w7D43giDN6XMU3N4HBfz1lFqYq0=
+	t=1707415462; cv=none; b=E/AQbA/ZA4EqAiW3Sc9WA/U0ibv1gH+L78oQnMsEPF7iqqsXFbtf2K4wzRwqZoiDovmklSlII51IGM6KOq7+SNHIpT0WRLs+Lg+/YpCoU6MVGSo4mrXdLj48yK5iRTxiSzVAUHWhVoXcj4E7ATtUwLvHj1JaT/ER6hpvZe1C6tU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707415423; c=relaxed/simple;
-	bh=VgB9GBN+vGw6/CetNX+8Z/FzuZNNsFcSdiSoEJ4ci+k=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=SS6IrLTY9CJXig35FOuYDhQmzMl/O4QvXfmlCRjmGc3yOOOIGPCEhQeOiX4xI8Kx9jIxHDwK/NykSFoGxVAw+1QGzWcIVtGlQKWyXYjebNjMS29BYHBJ4U6Gf00j3M13h38hRNYGWFlT6SGcy9yw0ioROzdWa5RFPHOgULKMSAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lsZzz4uH; arc=none smtp.client-ip=134.134.136.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707415421; x=1738951421;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=VgB9GBN+vGw6/CetNX+8Z/FzuZNNsFcSdiSoEJ4ci+k=;
-  b=lsZzz4uHnhuzYZAdhqn/0c1BRdLdlrjAJPgNUxccYkvMTkVwmvZhgedk
-   MJSeI0INDvPN7m7G31yrUSwb1u7vUD5PcpKdKbh0bq/hmOdl1T/tVjzqX
-   PTdd2maOoP+IigKH+vzV4VbNQVnT4JJ+amkgK4rCSUQ+m97xZ5MQfgh1W
-   beBHpi/4bJg5OphA6ajcMoEXz5vvHUC3C3MEVqP9swYM5l3BzyaS9xp0C
-   pKqI5CgQOMhErfiBtE51n1obDxZtEbTN4Q427dHFKggOfbKpZFCCSl5pg
-   ISTDfdHEY/2mZkvqEK1KsBdMYcoTsRbkv9tPbHC5qc5nyiaubf5/k0Kfk
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10978"; a="395695634"
-X-IronPort-AV: E=Sophos;i="6.05,254,1701158400"; 
-   d="scan'208";a="395695634"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2024 10:03:40 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,254,1701158400"; 
-   d="scan'208";a="24951333"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa002.fm.intel.com with ESMTP; 08 Feb 2024 10:03:40 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Ivan Vecera <ivecera@redhat.com>,
-	anthony.l.nguyen@intel.com,
-	Simon Horman <horms@kernel.org>,
-	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net] i40e: Do not allow untrusted VF to remove administratively set MAC
-Date: Thu,  8 Feb 2024 10:03:33 -0800
-Message-ID: <20240208180335.1844996-1-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
+	s=arc-20240116; t=1707415462; c=relaxed/simple;
+	bh=gg5lRi0FckXjDkUVqSo3pBy+xDC24jMwih4308TMI/o=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=HoYjkEVJ3miEXV4qly/mfNMLG/+rXMbVg5SkfpwSPEOmtOD0n/hmwjRoYVva7Ml1244sUdfe+yLn4cxTTJi3vglHoIj9CAHxcDhYQS78KwmF7xPOPEldiA7ZPrQhCzlungxrVWdOVNf65MIHlyZTwqyCMBUar9RaUDwEmsrYYVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KHHlQcq5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CF7DC433F1;
+	Thu,  8 Feb 2024 18:04:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707415461;
+	bh=gg5lRi0FckXjDkUVqSo3pBy+xDC24jMwih4308TMI/o=;
+	h=From:Subject:Date:To:Cc:From;
+	b=KHHlQcq5ZRssevtCuJ1jlYCWk7seL1eQX+J123YgSdNo/gIlpycdN3GTjZJSXUKCL
+	 cRu3DB9FYwI4NsZsjTQkQ4S2ny1l7wtUkJeBGdVhHBNeHqmwnMvNqr8C8OejjwEzb9
+	 mdlZCaL6AO9BE6yWCFp7vayYzHKlX6M35ltxGvGBMtnLYrSqRb4dslgzpan1mrSVWV
+	 igUNxRLi6s2WtM5mmxk7Fk8746M/uadJ9CRPlZ+k4lSt/iSp+oyLh8kK5UwP0xyy5X
+	 AYocyg1c8fYrcRKJ9s71j48HhPYNvtPOwfDU3e5zTCBKNW+Q0V8Ok3D5XdM6w/NpL2
+	 T60n12mfK5nLg==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net 0/7] mptcp: locking cleanup & misc. fixes
+Date: Thu, 08 Feb 2024 19:03:48 +0100
+Message-Id: <20240208-upstream-net-20240202-locking-cleanup-misc-v1-0-f75cc5b97e5a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAIQXxWUC/z2NSwrCQBBErxJ6bUMcjb+riIthUomNSWeYTkQIu
+ buNCzcFr+BVrWQoAqNbtVLBW0wmddjvKkrPqD1YWmcKdTjWHrxkmwviyIqZ/+0wpZdoz2lA1CX
+ zKJa46QJwvraXQ3MiH8wFnXx+Z3dynR7b9gVntgzggQAAAA==
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Kishen Maloor <kishen.maloor@intel.com>, 
+ Florian Westphal <fw@strlen.de>, 
+ Peter Krystad <peter.krystad@linux.intel.com>, 
+ Dmytro Shytyi <dmytro@shytyi.net>, 
+ Benjamin Hesmans <benjamin.hesmans@tessares.net>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Christoph Paasch <cpaasch@apple.com>, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, stable@vger.kernel.org, 
+ syzbot+c53d4d3ddb327e80bc51@syzkaller.appspotmail.com, 
+ Geliang Tang <geliang@kernel.org>
+X-Mailer: b4 0.12.4
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2167; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=gg5lRi0FckXjDkUVqSo3pBy+xDC24jMwih4308TMI/o=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBlxRehYosQjMTFqZJREP9PUCIdS9tEwvEMEsEbU
+ iOtu15J4KKJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZcUXoQAKCRD2t4JPQmmg
+ c2JpEACuYOjFpW4L3CHGYvKnQbqwEOVjCxx9bX305RgAFWX2TMhBDnG82+An3yuQ7ld8wOWc7W3
+ A2sgba96KbnIOQWl1tjlzUS8NohRywHqHjbHPo/LyT1B3ReJeMZ0mihFy29zJOvLDzD9HCh0kl7
+ KvZnL2Fz1FjS8akZejt8eJi99v0munrTr0WUGk6sm9vvDqiJwprR6VK46V3wY5SgOEA6VEHznXt
+ DxsGk6lAEsNBK0OOr4nPOmbV9buQq5IqSVZLr09fUUUNVALJnCwJ6fbO0mPgE7zUEPkhAFWnCix
+ 3LscvV1g2V1sfyyUBCiPK3KKeYzTG8I5Ze7VILHCgd9haA3UBfdOl2gwVz6qk+08psm7U0Ijoe3
+ kTz9fjY62clQAxEZ4LAu5uXg95tncUn6H+x8hwN86c+SuXqtUggEPuTKFIruUiwxmUP92CIVtBX
+ We1bAUj4yBROFo9PNWi03ui4orDCJ45U4hTzO4qPit+3TEkAdNqd0IjbEncGuyJJcsv0WMRJNmV
+ KuqUoUbkek0WzQb7/nlVflpyOH0Yr3z//YfO2h6kAA4jLBvAdL9zFkoY2Y/s0N6f5vXvEJDZx7Z
+ l98N15iQVxSovB1Nj9BtWVqCPHTKPjPl8RCtQPYyPwDNZ5ZLvogXQ3lI7bqEvDx2w9BgbImDQn1
+ z3LMCeWXVy9qDyQ==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-From: Ivan Vecera <ivecera@redhat.com>
+Patches 1-4 are fixes for issues found by Paolo while working on adding
+TCP_NOTSENT_LOWAT support. The latter will need to track more states
+under the msk data lock. Since the locking msk locking schema is already
+quite complex, do a long awaited clean-up step by moving several
+confusing lockless initialization under the relevant locks. Note that it
+is unlikely a real race could happen even prior to such patches as the
+MPTCP-level state machine implicitly ensures proper serialization of the
+write accesses, even lacking explicit lock. But still, simplification is
+welcome and this will help for the maintenance. This can be backported
+up to v5.6.
 
-Currently when PF administratively sets VF's MAC address and the VF
-is put down (VF tries to delete all MACs) then the MAC is removed
-from MAC filters and primary VF MAC is zeroed.
+Patch 5 is a fix for the userspace PM, not to add new local address
+entries if the address is already in the list. This behaviour can be
+seen since v5.19.
 
-Do not allow untrusted VF to remove primary MAC when it was set
-administratively by PF.
+Patch 6 fixes an issue when Fastopen is used. The issue can happen since
+v6.2. A previous fix has already been applied, but not taking care of
+all cases according to syzbot.
 
-Reproducer:
-1) Create VF
-2) Set VF interface up
-3) Administratively set the VF's MAC
-4) Put VF interface down
+Patch 7 updates Geliang's email address in the MAINTAINERS file.
 
-[root@host ~]# echo 1 > /sys/class/net/enp2s0f0/device/sriov_numvfs
-[root@host ~]# ip link set enp2s0f0v0 up
-[root@host ~]# ip link set enp2s0f0 vf 0 mac fe:6c:b5:da:c7:7d
-[root@host ~]# ip link show enp2s0f0
-23: enp2s0f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
-    link/ether 3c:ec:ef:b7:dd:04 brd ff:ff:ff:ff:ff:ff
-    vf 0     link/ether fe:6c:b5:da:c7:7d brd ff:ff:ff:ff:ff:ff, spoof checking on, link-state auto, trust off
-[root@host ~]# ip link set enp2s0f0v0 down
-[root@host ~]# ip link show enp2s0f0
-23: enp2s0f0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
-    link/ether 3c:ec:ef:b7:dd:04 brd ff:ff:ff:ff:ff:ff
-    vf 0     link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff, spoof checking on, link-state auto, trust off
-
-Fixes: 700bbf6c1f9e ("i40e: allow VF to remove any MAC filter")
-Fixes: ceb29474bbbc ("i40e: Add support for VF to specify its primary MAC address")
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- .../ethernet/intel/i40e/i40e_virtchnl_pf.c    | 38 ++++++++++++++++---
- 1 file changed, 33 insertions(+), 5 deletions(-)
+Geliang Tang (2):
+      mptcp: check addrs list in userspace_pm_get_local_id
+      MAINTAINERS: update Geliang's email address
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index 908cdbd3ec5d..b34c71770887 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -2848,6 +2848,24 @@ static int i40e_vc_get_stats_msg(struct i40e_vf *vf, u8 *msg)
- 				      (u8 *)&stats, sizeof(stats));
- }
- 
-+/**
-+ * i40e_can_vf_change_mac
-+ * @vf: pointer to the VF info
-+ *
-+ * Return true if the VF is allowed to change its MAC filters, false otherwise
-+ */
-+static bool i40e_can_vf_change_mac(struct i40e_vf *vf)
-+{
-+	/* If the VF MAC address has been set administratively (via the
-+	 * ndo_set_vf_mac command), then deny permission to the VF to
-+	 * add/delete unicast MAC addresses, unless the VF is trusted
-+	 */
-+	if (vf->pf_set_mac && !vf->trusted)
-+		return false;
-+
-+	return true;
-+}
-+
- #define I40E_MAX_MACVLAN_PER_HW 3072
- #define I40E_MAX_MACVLAN_PER_PF(num_ports) (I40E_MAX_MACVLAN_PER_HW /	\
- 	(num_ports))
-@@ -2907,8 +2925,8 @@ static inline int i40e_check_vf_permission(struct i40e_vf *vf,
- 		 * The VF may request to set the MAC address filter already
- 		 * assigned to it so do not return an error in that case.
- 		 */
--		if (!test_bit(I40E_VIRTCHNL_VF_CAP_PRIVILEGE, &vf->vf_caps) &&
--		    !is_multicast_ether_addr(addr) && vf->pf_set_mac &&
-+		if (!i40e_can_vf_change_mac(vf) &&
-+		    !is_multicast_ether_addr(addr) &&
- 		    !ether_addr_equal(addr, vf->default_lan_addr.addr)) {
- 			dev_err(&pf->pdev->dev,
- 				"VF attempting to override administratively set MAC address, bring down and up the VF interface to resume normal operation\n");
-@@ -3114,19 +3132,29 @@ static int i40e_vc_del_mac_addr_msg(struct i40e_vf *vf, u8 *msg)
- 			ret = -EINVAL;
- 			goto error_param;
- 		}
--		if (ether_addr_equal(al->list[i].addr, vf->default_lan_addr.addr))
--			was_unimac_deleted = true;
- 	}
- 	vsi = pf->vsi[vf->lan_vsi_idx];
- 
- 	spin_lock_bh(&vsi->mac_filter_hash_lock);
- 	/* delete addresses from the list */
--	for (i = 0; i < al->num_elements; i++)
-+	for (i = 0; i < al->num_elements; i++) {
-+		const u8 *addr = al->list[i].addr;
-+
-+		/* Allow to delete VF primary MAC only if it was not set
-+		 * administratively by PF or if VF is trusted.
-+		 */
-+		if (ether_addr_equal(addr, vf->default_lan_addr.addr) &&
-+		    i40e_can_vf_change_mac(vf))
-+			was_unimac_deleted = true;
-+		else
-+			continue;
-+
- 		if (i40e_del_mac_filter(vsi, al->list[i].addr)) {
- 			ret = -EINVAL;
- 			spin_unlock_bh(&vsi->mac_filter_hash_lock);
- 			goto error_param;
- 		}
-+	}
- 
- 	spin_unlock_bh(&vsi->mac_filter_hash_lock);
- 
+Paolo Abeni (5):
+      mptcp: drop the push_pending field
+      mptcp: fix rcv space initialization
+      mptcp: fix more tx path fields initialization
+      mptcp: corner case locking for rx path fields initialization
+      mptcp: really cope with fastopen race
+
+ .mailmap                 |  9 +++---
+ MAINTAINERS              |  2 +-
+ net/mptcp/fastopen.c     |  6 ++--
+ net/mptcp/options.c      |  9 +++---
+ net/mptcp/pm_userspace.c | 13 ++++++++-
+ net/mptcp/protocol.c     | 31 +++++++++++----------
+ net/mptcp/protocol.h     | 16 ++++++-----
+ net/mptcp/subflow.c      | 71 ++++++++++++++++++++++++++++++------------------
+ 8 files changed, 95 insertions(+), 62 deletions(-)
+---
+base-commit: 335bac1daae3fd9070d0f9f34d7d7ba708729256
+change-id: 20240202-upstream-net-20240202-locking-cleanup-misc-5f2ee79d8356
+
+Best regards,
 -- 
-2.41.0
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
