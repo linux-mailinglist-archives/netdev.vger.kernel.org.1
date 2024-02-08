@@ -1,80 +1,81 @@
-Return-Path: <netdev+bounces-70337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A01384E6BB
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 18:28:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A57B84E6BA
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 18:28:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B16271F215C2
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 17:28:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F0661F2A05D
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 17:28:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7709682D71;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32A61823AA;
 	Thu,  8 Feb 2024 17:27:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="uAnoltDl"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="3WOcK9m7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5A682D9A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2796C82D8C
 	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 17:26:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707413221; cv=none; b=h4Zodz68yPLtohJxnK2WUPZRFG5WWTk8W6RzRQ5XGPSHgSnbOS7FOLrmVVgNjPj6sgg1oK7thCjdqyEOwCAERRCIqHE1I6HK5pRT5ZMXgQKt1YGLiaEE2dJKojss5wc1Oba8DOaTK6lUns9QdI6zhYSzqshD5XP22zJMW7jmTTw=
+	t=1707413221; cv=none; b=GRAuxlC9px8k0lqmNIm3SuVITd499gA0xtZuKup9TtXIUlHP1O2lAKAzuuIz86DZMrnY7nHGe2zH5DZoAmtmTpcTgdM8mWrw7OEVms2VFtCQZhgSoSB7iAl2wsIZXU02ym8ZMgDSLtJe0zD8MFvy3RBTXa+Zz7rox587J9k6XqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707413221; c=relaxed/simple;
-	bh=sAUcYMJMyzFIiyiV+W23YViwmOLGkJIxgCN9P9C4P7g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gfejkfZJFYMa+EosClhgm72skF/LAY3JBlMTJy4QuHZbK44dTcHcw6H6HE2BFQrTXz3SHFa0gK2+1rKwUuNA3uT7q0HbSp5FG561ezPaFyqpmLNUmqbAoOSo91Q7rVzrT4pf71S76nLvMx+JZzyVjaIBU0yzD/jdtc5fXNTIvjk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=uAnoltDl; arc=none smtp.client-ip=209.85.214.174
+	bh=AG8jG6dAnrcRElapPLvkRRBQUOO7ZJsaMCUziJj/mIA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=CWzfrtUJd1/b7QdTGKLqwhewtJGeteXecPY0NJXuGI0+MuLITC2NG1XEjF8GELrM7lkPOMfEUh5EbLHbeKJqODctS6KAxxqwFeooCPVL1VVCLHye8sXRl2Lqn6fZDhSSHQoWp83o15Vn5bHzd8Gpe5iJloWcEfZk+WpqyG+D87Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=3WOcK9m7; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1d71cb97937so76705ad.3
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1d751bc0c15so36325ad.2
         for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 09:26:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1707413217; x=1708018017; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sDMUhkhn6m1E5wpu6uGtdgKk5XvzlhzIOpvLeEmDVgI=;
-        b=uAnoltDlZHJHRvArCSm3VUyS4UqVEYYAsGs5sELtiFPQe+9yzC1VB40BwyGzLfqqb+
-         LC35Y7CNPO/sSp+71hApPQWAA2YQH0JHF3mbowWpi1MYJ7LA+o1lfpBh88r+FPTMyj57
-         GDItKNPnbSvSWO6JJjdaiXgDEVgqnKk0NcAo0NcT0WT77i+HPABXdGu2M1FgI2ctBw5q
-         5FYDRJpx7ZhKjgMsBpF+2Cw6h5ok1P0IoEp0XI2FJd5W7jWpCFVzzamwW8KP3ZOmD+G/
-         qTNRTPBKf2xnEB5x6B6pGq2XVkXg0ho/UZPvQTAJ0C4nd6rQRJO9B3c3qi7zxsPhVgVN
-         zlyg==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1707413218; x=1708018018; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Vd5Y0BCj/r3EVE4i6V+IZkFH+Ey+uHymlZ8rC/cUF+E=;
+        b=3WOcK9m7a6/UEdwz3oduy4PgJJcmcP6769fLzqqNfI0ThPerPCK/w7dI4gYDv1iqHv
+         9a17wbMx7JgDsYAuIbGQoz+j1JCn5B3vWAAvFInWTxcGILUCk9gr/IsnpV7CuVrGV0X4
+         Bzj1SARYCvbuJdIODlwq0OC28Jh0Uz8bY3TTsrwqzaolbETEBnKvTzSLhdrI8DIEqBhG
+         E6yLNOjufuKKb4scxzj6Kcmv6WJe+YjhBHjSbyutzXpxiyzP7YkfzDFUqA7U5e3R50Qa
+         AT8+BpFmjxiDsj5zz1CTbHKrukFU5e5UWAkcieJmGsOE4Ptuk/neqYmB9vlNWbP5+Thc
+         FDUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707413217; x=1708018017;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sDMUhkhn6m1E5wpu6uGtdgKk5XvzlhzIOpvLeEmDVgI=;
-        b=fx0jHW841MxDWlxJwFhCT3CBRVWDLae567G7CjA1C+ZO+M4GemCrTpOoVBejvFZQLV
-         RAknFIo6b+UoiQHF7b1tfMxUELLPAEsuGcZKqUXbZgSFene/fK51RwfDJsbgkuD9Brjt
-         os/5JvAgrSZ5b6mUl4x5bc6eGo4o0ykVoFtejsfMJEGJXi6fz5MpjuIm3C/O432FAmqe
-         NUWJ/NwOaIQ4MR6l1wcxabJzFTGram/U6WurewK751uCZ3nM/dc3sq75Re6L0YRzWe7J
-         GIQ8AZyzhD6VEUMWvwru0BoP2ljnFSdkFHB2M+RpVq4/MqcDckCoEsj3viguBHcLjq4G
-         BE6w==
-X-Gm-Message-State: AOJu0Yw2On3Cwnc36X8GZ3dUuBSVV480LRgwhPTkrSUAvC59ZxQVlPif
-	OkfWOTwC8R2K7QtFkiFWTcUUHcDybBFCtNB7XwETqwzn1btSAbe3n4k5udkvp1AHxB4fU3diRV3
-	BIis=
-X-Google-Smtp-Source: AGHT+IHfcwupqHhTPu8cr0mqIpBdXCrNvQ/CQpYmcmLCyqFGNtHhjmDFeZx1/vmBRuyckznHQg3D/w==
-X-Received: by 2002:a17:902:e751:b0:1d9:727d:e84f with SMTP id p17-20020a170902e75100b001d9727de84fmr11371126plf.47.1707413217677;
-        Thu, 08 Feb 2024 09:26:57 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWfMR6h+KCM6J91q/bWGUjmeqHK//gZ+xUWN02uKxXZDia76tVjJcmvH/HiRp3pHzzUm/mTlkVwvwpMMQKSqxwl368rww5oVMAczA==
+        d=1e100.net; s=20230601; t=1707413218; x=1708018018;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Vd5Y0BCj/r3EVE4i6V+IZkFH+Ey+uHymlZ8rC/cUF+E=;
+        b=vNeIpplJbArxuASxxx+29tfcRdqFmLRo5U1+gPnVBauwwjGaVorP8Rk+gDTH8g6TQB
+         maP3/wRIySbHRyI6cYhVZ9cDnmRyZLxo9ugyAUBu/SwIxZmcyGqQs+Wn3DMSSWL1ZDyL
+         ZOFZ21NCeLukfgSKms4aZSklH6LkCR61YO93g7I/Isj/CsYDoyUSQrjoUD01n6OLB/rc
+         SEHhv3IU5OFCcgkGpiiA5ExTDDOm3/0Auq5lsuuf6mSwDDGX1ItY8vvkCgTnuC9aDdRv
+         UyaUDFdxJkMB8NZ2oI/c58m9o8aBpHIZ3Sly0/brsuJWEdAvCoBlREFgE261PIo9jvQ/
+         H5ZQ==
+X-Gm-Message-State: AOJu0YxAoQwp/c2JuGcKWW8vx9inXhWZ7L8/hhoKykjjb/43UMUd7IFy
+	iIE+oWvjonJ06Eu0nFeJWOyEXeZJA11qtZDxAHq/VikNsCYI1plJ2+861t5IJdjz+tyxHSzyKkc
+	Q4kU=
+X-Google-Smtp-Source: AGHT+IFeyoHYMLPR9x523CVQ37x9vPYaNBhnE2DjpqhYvBuD1UGazegjNNIFA43dvCOOF6S4fQ3gyQ==
+X-Received: by 2002:a17:902:d550:b0:1d9:a148:49c with SMTP id z16-20020a170902d55000b001d9a148049cmr10371879plf.57.1707413218313;
+        Thu, 08 Feb 2024 09:26:58 -0800 (PST)
 Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
         by smtp.gmail.com with ESMTPSA id g14-20020a170902f74e00b001d9d4375149sm42265plw.215.2024.02.08.09.26.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 09:26:57 -0800 (PST)
+        Thu, 08 Feb 2024 09:26:58 -0800 (PST)
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
-Cc: Maks Mishin <maks.mishinfz@gmail.com>,
-	Maks Mishin <maks.mishinFZ@gmail.com>,
-	Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute2 1/3] ctrl: Fix fd leak in ctrl_listen()
-Date: Thu,  8 Feb 2024 09:26:27 -0800
-Message-ID: <20240208172647.324168-1-stephen@networkplumber.org>
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH iproute2 2/3] ip: detect errors in netconf monitor mode
+Date: Thu,  8 Feb 2024 09:26:28 -0800
+Message-ID: <20240208172647.324168-2-stephen@networkplumber.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240208172647.324168-1-stephen@networkplumber.org>
+References: <20240208172647.324168-1-stephen@networkplumber.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,34 +84,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Maks Mishin <maks.mishinfz@gmail.com>
+If rtnl_listen() returns error while looking for netconf events,
+then exit with status of 2 as other iproute2 monitor actions do.
 
-Use the same pattern for handling rtnl_listen() errors that
-is used across other iproute2 commands. All other commands
-exit with status of 2 if rtnl_listen fails.
-
-Reported-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- genl/ctrl.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ ip/ipnetconf.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/genl/ctrl.c b/genl/ctrl.c
-index bae73a54bc37..72a9b01302cf 100644
---- a/genl/ctrl.c
-+++ b/genl/ctrl.c
-@@ -334,8 +334,9 @@ static int ctrl_listen(int argc, char **argv)
- 	}
- 
- 	if (rtnl_listen(&rth, print_ctrl, (void *) stdout) < 0)
--		return -1;
--
-+		exit(2);
-+	
-+	rtnl_close(&rth);	
- 	return 0;
- }
- 
+diff --git a/ip/ipnetconf.c b/ip/ipnetconf.c
+index 9ae6c45e7fd1..a0c7e051bac5 100644
+--- a/ip/ipnetconf.c
++++ b/ip/ipnetconf.c
+@@ -193,7 +193,8 @@ static int do_show(int argc, char **argv)
+ 			perror("Can not send request");
+ 			exit(1);
+ 		}
+-		rtnl_listen(&rth, print_netconf, stdout);
++		if (rtnl_listen(&rth, print_netconf, stdout) < 0)
++			exit(2);
+ 	} else {
+ 		rth.flags = RTNL_HANDLE_F_SUPPRESS_NLERR;
+ dump:
 -- 
 2.43.0
 
