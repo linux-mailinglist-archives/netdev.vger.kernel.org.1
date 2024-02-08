@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-70363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70364-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EB3984E89C
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 20:00:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC4FB84E89D
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 20:00:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E19841F2648E
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 19:00:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47D231F26ADC
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 19:00:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8CC425635;
-	Thu,  8 Feb 2024 18:55:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF310364C1;
+	Thu,  8 Feb 2024 18:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="fdMQYXri"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="lBtaRNPI"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F69522307
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 18:55:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1F7936137
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 18:55:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707418552; cv=none; b=m7xC4aEa61RxFQtlay4/mARKmLPAT1iege/kUYIMJQm9owbDBWOzfKSrX2ZYzh9YbIAeKxLJwnjudBty6J5eBi4N8elRS64ol5EY0puOWbG6hPGG5qiSLDUMYZgfMnbcUOEDw9n1DIes3yOz/G15vnCQZO8MNMycZO2GKzTPaxk=
+	t=1707418554; cv=none; b=a9N0WZzJa3kmOv+GlJHPQljJMsARB1mx/rCJTT0ac8ffBEomW9X3+VDWap6AaC21lD/nFh5rzG+uTQUfha2+/vGDm7MgN3B7/X3f37k4Ihl9gsA9OKqvCJEX/HAYcdlglZga9BSscpJ1JxiaEEDu/EobmxFa9yZsMPNE3m8wk/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707418552; c=relaxed/simple;
-	bh=q0Pra//mGwCbjZlHhJ/f3ylRcotyDIRk8Bim+sC3vwo=;
+	s=arc-20240116; t=1707418554; c=relaxed/simple;
+	bh=KztBA/abl2hjycWS33L2FBCLP0fmSNi2+MIEcIq87oE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZQ9rm3fQ6IwmHQZWz6wctRGJhZozbxuDJb6oqd0GYjXXAX+cNsmOgfFK/H7PdK3wfV1Rz2ifBmOHCUev+DKnWTwNtxVJcAfwuxek4dNBzMwdO00P2e8zjSPWrI+z3y261QWyWDbWeO7RDTFIrwOZkDbRG8TMuR1ct54j85TSAe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=fdMQYXri; arc=none smtp.client-ip=148.163.158.5
+	 MIME-Version; b=PhZLas4qXrmbrMCojFXGkoan8VPBYj1MdU8la/PM3JmfSB0yrzrmcoMF4NweKONW/vEW1q+cfgu5mvFr0XjgEGnXXaFQCI3FlAi8jw8EqFS96Or4ybIHuRmugyFUOtCzmBZjtWeFkiJMfa1eM0cyS8XYNCYlb3Phd6mhf3OaQQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com; spf=none smtp.mailfrom=linux.vnet.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=lBtaRNPI; arc=none smtp.client-ip=148.163.158.5
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.vnet.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.vnet.ibm.com
-Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 418IO956029009;
-	Thu, 8 Feb 2024 18:55:44 GMT
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 418I2Sdv030061;
+	Thu, 8 Feb 2024 18:55:45 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
  : date : message-id : in-reply-to : references : mime-version :
  content-transfer-encoding; s=pp1;
- bh=K7mwluweTltb1QqsYFGT3Kp4r7TGyjiD6BZIiASbg8U=;
- b=fdMQYXri2knGLIKvXMroRl8wYexodqfnXXsSqhu6Lsee2nD8c18VT60pC0zoM+geQeJN
- tq6cyJlLSMxn6mvMKBq3ryM5PXWRPkkEpYBy0TjmYz6xFQ7vuDV5HeOMOgiyTfpvO0+s
- BxTbIxD770lcrssDTl0f4L1eIb/V7l06hsJAePBLP7LrQx26QJtznrwktFTosMazsmQ0
- gUEGclFmlZjCPuw6N9aIEXsX+NbxbFAf4QiIc3uNVoN/gSoiPjO46U+9eY+DBIrKTFmb
- 9dwkR6cy/l4rmErAPgZuJlt8a2cRGlz0P0X9y0xyH2M3Z36LElftzRDrYGahwmXGoQc2 BQ== 
+ bh=GSRLGIo7qsDj7J6VwFVttdc6Ip1pQnZOVRZ3QuoUkUM=;
+ b=lBtaRNPItH/5ycx5fzChg9iYt18uzj3zHjCOsOellyIL2ErWSN/Md0wGgeCPdHXTRw4U
+ gMi59HaH2uaHit/qz4KTahpbEg2i6SxnYZy/irOVYHDGDEV0tmhvNnsJO0Y1NrZN0Fxb
+ NSTHv1OGoU+THMAX3h0FT0I5yL0LusUlyFnOgOhGlHL3HLXLTEKsx1RyodDF8oEUh8RC
+ P0enqzvrRveR38XGzVzC2nmSYYYzTj9qrsL0zFhLsswQPVx+cZDYHgMhCTUzXw5k3AHY
+ KxFZBqC7kpjatTiftcvlD8+VKv5sXgEZ/HUWZcvPaAzVWe6qoK3t6/GbFt7Ul++/UReP /g== 
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w53tr1bgu-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w52xqjrdw-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 08 Feb 2024 18:55:43 +0000
-Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 418I0KAM009522;
-	Thu, 8 Feb 2024 18:55:42 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w53tr1bg8-1
+	Thu, 08 Feb 2024 18:55:45 +0000
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 418ItioF029239;
+	Thu, 8 Feb 2024 18:55:44 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3w52xqjrdn-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 08 Feb 2024 18:55:42 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 418IiVKd008487;
-	Thu, 8 Feb 2024 18:55:42 GMT
-Received: from smtprelay06.wdc07v.mail.ibm.com ([172.16.1.73])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3w221ke48n-1
+	Thu, 08 Feb 2024 18:55:44 +0000
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 418HGOHP008818;
+	Thu, 8 Feb 2024 18:55:44 GMT
+Received: from smtprelay03.dal12v.mail.ibm.com ([172.16.1.5])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3w206yxms7-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 08 Feb 2024 18:55:42 +0000
+	Thu, 08 Feb 2024 18:55:44 +0000
 Received: from smtpav04.dal12v.mail.ibm.com (smtpav04.dal12v.mail.ibm.com [10.241.53.103])
-	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 418Itdcp27001412
+	by smtprelay03.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 418ItftN17433236
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 8 Feb 2024 18:55:39 GMT
+	Thu, 8 Feb 2024 18:55:41 GMT
 Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4C0765805E;
-	Thu,  8 Feb 2024 18:55:39 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id 31D455805E;
+	Thu,  8 Feb 2024 18:55:41 +0000 (GMT)
 Received: from smtpav04.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 07BB958052;
-	Thu,  8 Feb 2024 18:55:39 +0000 (GMT)
+	by IMSVA (Postfix) with ESMTP id E32505805A;
+	Thu,  8 Feb 2024 18:55:40 +0000 (GMT)
 Received: from linux.vnet.ibm.com (unknown [9.41.99.4])
 	by smtpav04.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  8 Feb 2024 18:55:38 +0000 (GMT)
+	Thu,  8 Feb 2024 18:55:40 +0000 (GMT)
 From: Thinh Tran <thinhtr@linux.vnet.ibm.com>
 To: kuba@kernel.org
 Cc: netdev@vger.kernel.org, aelior@marvell.com, davem@davemloft.net,
@@ -81,9 +81,9 @@ Cc: netdev@vger.kernel.org, aelior@marvell.com, davem@davemloft.net,
         simon.horman@corigine.com, edumazet@google.com,
         VENKATA.SAI.DUGGI@ibm.com, drc@linux.vnet.ibm.com, abdhalee@in.ibm.com,
         Thinh Tran <thinhtr@linux.vnet.ibm.com>
-Subject: [PATCH v8 1/2] net/bnx2x: Prevent access to a freed page in page_pool
-Date: Thu,  8 Feb 2024 12:55:15 -0600
-Message-Id: <90238577e00a7a996767b84769b5e03ef840b13a.1707414045.git.thinhtr@linux.vnet.ibm.com>
+Subject: [PATCH v8 2/2] net/bnx2x: refactor common code to bnx2x_stop_nic()
+Date: Thu,  8 Feb 2024 12:55:16 -0600
+Message-Id: <1149c0efc9b000bf6c28807b3f1d173079e807bd.1707414045.git.thinhtr@linux.vnet.ibm.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <cover.1707414045.git.thinhtr@linux.vnet.ibm.com>
 References: <cover.1707414045.git.thinhtr@linux.vnet.ibm.com>
@@ -95,81 +95,151 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: p11_RORuEU5G6SQtzkcEgCpMSK1hzdIu
-X-Proofpoint-GUID: 6k6GS7ujRvuhufy6LyA7ThdjM8pxuiM8
+X-Proofpoint-ORIG-GUID: Y-TxjPTYBrCdFiJ68vCY_MU0RmZqNg1r
+X-Proofpoint-GUID: xo_oM-Rra8qg-hGddhzhnZO6p8XQPK2G
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
  definitions=2024-02-08_08,2024-02-08_01,2023-05-22_02
 X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=822 impostorscore=0 adultscore=0 mlxscore=0 spamscore=0
- phishscore=0 lowpriorityscore=0 priorityscore=1501 suspectscore=0
- bulkscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ mlxlogscore=925 impostorscore=0 suspectscore=0 priorityscore=1501
+ mlxscore=0 lowpriorityscore=0 spamscore=0 adultscore=0 phishscore=0
+ clxscore=1015 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
  engine=8.12.0-2311290000 definitions=main-2402080099
 
-Fix race condition leading to system crash during EEH error handling
-
-During EEH error recovery, the bnx2x driver's transmit timeout logic
-could cause a race condition when handling reset tasks. The
-bnx2x_tx_timeout() schedules reset tasks via bnx2x_sp_rtnl_task(),
-which ultimately leads to bnx2x_nic_unload(). In bnx2x_nic_unload()
-SGEs are freed using bnx2x_free_rx_sge_range(). However, this could
-overlap with the EEH driver's attempt to reset the device using 
-bnx2x_io_slot_reset(), which also frees SGEs. This race condition can
-result in system crashes due to accessing freed memory locations.
-
-[  793.003930] EEH: Beginning: 'slot_reset'
-[  793.003937] PCI 0011:01:00.0#10000: EEH: Invoking bnx2x->slot_reset()
-[  793.003939] bnx2x: [bnx2x_io_slot_reset:14228(eth1)]IO slot reset initializing...
-[  793.004037] bnx2x 0011:01:00.0: enabling device (0140 -> 0142)
-[  793.008839] bnx2x: [bnx2x_io_slot_reset:14244(eth1)]IO slot reset --> driver unload
-[  793.122134] Kernel attempted to read user page (0) - exploit attempt? (uid: 0)
-[  793.122143] BUG: Kernel NULL pointer dereference on read at 0x00000000
-[  793.122147] Faulting instruction address: 0xc0080000025065fc
-[  793.122152] Oops: Kernel access of bad area, sig: 11 [#1]
-.....
-[  793.122315] Call Trace:
-[  793.122318] [c000000003c67a20] [c00800000250658c] bnx2x_io_slot_reset+0x204/0x610 [bnx2x] (unreliable)
-[  793.122331] [c000000003c67af0] [c0000000000518a8] eeh_report_reset+0xb8/0xf0
-[  793.122338] [c000000003c67b60] [c000000000052130] eeh_pe_report+0x180/0x550
-[  793.122342] [c000000003c67c70] [c00000000005318c] eeh_handle_normal_event+0x84c/0xa60
-[  793.122347] [c000000003c67d50] [c000000000053a84] eeh_event_handler+0xf4/0x170
-[  793.122352] [c000000003c67da0] [c000000000194c58] kthread+0x1c8/0x1d0
-[  793.122356] [c000000003c67e10] [c00000000000cf64] ret_from_kernel_thread+0x5c/0x64
-
-To solve this issue, we need to verify page pool allocations before
-freeing.
-
+Refactor common code which disables and releases HW interrupts, deletes
+NAPI objects, into a new bnx2x_stop_nic() function.
 
 Signed-off-by: Thinh Tran <thinhtr@linux.vnet.ibm.com>
 
 ---
- drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ .../net/ethernet/broadcom/bnx2x/bnx2x_cmn.c   | 28 +++++++++++--------
+ .../net/ethernet/broadcom/bnx2x/bnx2x_cmn.h   |  1 +
+ .../net/ethernet/broadcom/bnx2x/bnx2x_main.c  | 25 +++--------------
+ .../net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c  | 12 ++------
+ 4 files changed, 24 insertions(+), 42 deletions(-)
 
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
+index e9c1e1bb5580..e34aff5fb782 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
+@@ -3097,17 +3097,8 @@ int bnx2x_nic_unload(struct bnx2x *bp, int unload_mode, bool keep_link)
+ 		if (!CHIP_IS_E1x(bp))
+ 			bnx2x_pf_disable(bp);
+ 
+-		if (!bp->nic_stopped) {
+-			/* Disable HW interrupts, NAPI */
+-			bnx2x_netif_stop(bp, 1);
+-			/* Delete all NAPI objects */
+-			bnx2x_del_all_napi(bp);
+-			if (CNIC_LOADED(bp))
+-				bnx2x_del_all_napi_cnic(bp);
+-			/* Release IRQs */
+-			bnx2x_free_irq(bp);
+-			bp->nic_stopped = true;
+-		}
++		/* Disable HW interrupts, delete NAPIs, Release IRQs */
++		bnx2x_stop_nic(bp, 1);
+ 
+ 		/* Report UNLOAD_DONE to MCP */
+ 		bnx2x_send_unload_done(bp, false);
+@@ -5139,3 +5130,18 @@ void bnx2x_schedule_sp_rtnl(struct bnx2x *bp, enum sp_rtnl_flag flag,
+ 	   flag);
+ 	schedule_delayed_work(&bp->sp_rtnl_task, 0);
+ }
++
++void bnx2x_stop_nic(struct bnx2x *bp, int disable_hw)
++{
++	if (!bp->nic_stopped) {
++		/* Disable HW interrupts, NAPI */
++		bnx2x_netif_stop(bp, disable_hw);
++		/* Delete all NAPI objects */
++		bnx2x_del_all_napi(bp);
++		if (CNIC_LOADED(bp))
++			bnx2x_del_all_napi_cnic(bp);
++		/* Release IRQs */
++		bnx2x_free_irq(bp);
++		bp->nic_stopped = true;
++	}
++}
 diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
-index d8b1824c334d..0bc1367fd649 100644
+index 0bc1367fd649..a35a02299b33 100644
 --- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
 +++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
-@@ -1002,9 +1002,6 @@ static inline void bnx2x_set_fw_mac_addr(__le16 *fw_hi, __le16 *fw_mid,
- static inline void bnx2x_free_rx_mem_pool(struct bnx2x *bp,
- 					  struct bnx2x_alloc_pool *pool)
- {
--	if (!pool->page)
--		return;
+@@ -553,6 +553,7 @@ void bnx2x_free_skbs(struct bnx2x *bp);
+ void bnx2x_netif_stop(struct bnx2x *bp, int disable_hw);
+ void bnx2x_netif_start(struct bnx2x *bp);
+ int bnx2x_load_cnic(struct bnx2x *bp);
++void bnx2x_stop_nic(struct bnx2x *bp, int disable_hw);
+ 
+ /**
+  * bnx2x_enable_msix - set msix configuration.
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
+index 0d8e61c63c7c..ff75c883cffe 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
+@@ -9474,18 +9474,8 @@ void bnx2x_chip_cleanup(struct bnx2x *bp, int unload_mode, bool keep_link)
+ 		}
+ 	}
+ 
+-	if (!bp->nic_stopped) {
+-		/* Disable HW interrupts, NAPI */
+-		bnx2x_netif_stop(bp, 1);
+-		/* Delete all NAPI objects */
+-		bnx2x_del_all_napi(bp);
+-		if (CNIC_LOADED(bp))
+-			bnx2x_del_all_napi_cnic(bp);
 -
- 	put_page(pool->page);
+-		/* Release IRQs */
+-		bnx2x_free_irq(bp);
+-		bp->nic_stopped = true;
+-	}
++	/* Disable HW interrupts, delete NAPIs, Release IRQs */
++	bnx2x_stop_nic(bp, 1);
  
- 	pool->page = NULL;
-@@ -1015,6 +1012,9 @@ static inline void bnx2x_free_rx_sge_range(struct bnx2x *bp,
- {
- 	int i;
+ 	/* Reset the chip, unless PCI function is offline. If we reach this
+ 	 * point following a PCI error handling, it means device is really
+@@ -14241,16 +14231,9 @@ static pci_ers_result_t bnx2x_io_slot_reset(struct pci_dev *pdev)
+ 		}
+ 		bnx2x_drain_tx_queues(bp);
+ 		bnx2x_send_unload_req(bp, UNLOAD_RECOVERY);
+-		if (!bp->nic_stopped) {
+-			bnx2x_netif_stop(bp, 1);
+-			bnx2x_del_all_napi(bp);
  
-+	if (!fp->page_pool.page)
-+		return;
-+
- 	if (fp->mode == TPA_MODE_DISABLED)
- 		return;
+-			if (CNIC_LOADED(bp))
+-				bnx2x_del_all_napi_cnic(bp);
+-
+-			bnx2x_free_irq(bp);
+-			bp->nic_stopped = true;
+-		}
++		/* Disable HW interrupts, delete NAPIs, Release IRQs */
++		bnx2x_stop_nic(bp, 1);
  
+ 		/* Report UNLOAD_DONE to MCP */
+ 		bnx2x_send_unload_done(bp, true);
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c
+index 8946a931e87e..e92e82423096 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_vfpf.c
+@@ -529,16 +529,8 @@ void bnx2x_vfpf_close_vf(struct bnx2x *bp)
+ 	bnx2x_vfpf_finalize(bp, &req->first_tlv);
+ 
+ free_irq:
+-	if (!bp->nic_stopped) {
+-		/* Disable HW interrupts, NAPI */
+-		bnx2x_netif_stop(bp, 0);
+-		/* Delete all NAPI objects */
+-		bnx2x_del_all_napi(bp);
+-
+-		/* Release IRQs */
+-		bnx2x_free_irq(bp);
+-		bp->nic_stopped = true;
+-	}
++	/* Disable HW interrupts, delete NAPIs, Release IRQs */
++	bnx2x_stop_nic(bp, 0);
+ }
+ 
+ static void bnx2x_leading_vfq_init(struct bnx2x *bp, struct bnx2x_virtf *vf,
 -- 
 2.25.1
 
