@@ -1,131 +1,188 @@
-Return-Path: <netdev+bounces-70392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFABD84EB4E
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 23:10:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E5E984EB5B
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 23:11:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C3071F22839
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 22:10:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E1321C24DD6
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 22:11:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB06F4F219;
-	Thu,  8 Feb 2024 22:10:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 935974F8AB;
+	Thu,  8 Feb 2024 22:11:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="S3mpyD9H"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="TiF3HWMr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+Received: from mail-yb1-f182.google.com (mail-yb1-f182.google.com [209.85.219.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EF3D4F5EA
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 22:10:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7634F8A2
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 22:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707430216; cv=none; b=J/8V168rGtMYrBpCtHqodNcZRGZV1sF2yf/hQ3odC4ZQFTeNDg/5/ekDSLa1jnVJcKEH9WK7XNw3duMyQKBlMgyWaH96ha6nX7lMK8xmYIa62wb2zmpgbgFmu6lcI9zl4hTJOqK1y1V3bZzkxwHcNEbeZSPMKgSvc4ZYEcSYOCE=
+	t=1707430278; cv=none; b=bHinrSzvO+dHia7NuM4QmWP4yA0ALTnjrilwk1IjGN8koo9MbpE30Le7RG9NRAxzDxq7nXzSN94ouiUyoQYyKJ0f9K/FanhgQxJb5gBYKrFGKzEfGcsnW9+2X+OClNRE4WeqHoeTshWv/SzBG5X6qVrvtIMPddfe5shhlwQ1Psw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707430216; c=relaxed/simple;
-	bh=cIDPeKDb1D6Nxdo3/WB7Z4Qb/tehFQHdNJvHvDA7mlc=;
+	s=arc-20240116; t=1707430278; c=relaxed/simple;
+	bh=WEf2O+BigS2jZRoOKQXdQYIoHZM4Jwq2kgMcdS0LIGc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GWg7aTnu8ORm2kT1RLe2++naldaJNqWNnor5j2BSm8xjHWJqQye/cS5+9eT/yLlxoHgCCLgNeeAqvD61nGP/7GLWGAdVFnCODNgmD0q6ufpZ7NlETr8hccvdKyYHGmsHvj+fBv6CzC3Y4CxHKbiQJtT2vjwopLQnYf5HnW95cqw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=S3mpyD9H; arc=none smtp.client-ip=209.85.128.177
+	 To:Cc:Content-Type; b=hBWnIr+vmLHeujAZfbFN1LazEYk6OyJJ9dQ7ntroAEJ5DDNNE/dxoDYb2fyYO9EoTqsqPBThYi8iHUixEAoLr/eAWe4+gJ1EPFLcxP3sFQNAC0WjVPp5ENKQx/e7agVp8etbEjaWz/lfLqhq1L50MthFvfnUkUsZl+8ixCrzMyk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=TiF3HWMr; arc=none smtp.client-ip=209.85.219.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-6049b3deee8so3766557b3.1
-        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 14:10:13 -0800 (PST)
+Received: by mail-yb1-f182.google.com with SMTP id 3f1490d57ef6-dc74897c01bso313287276.3
+        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 14:11:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1707430213; x=1708035013; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1707430276; x=1708035076; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Eq8iz/pVIEfh06m3jcgvpLtauQXrbptz8sS8cX4N2Tk=;
-        b=S3mpyD9HSX2IP6ixJJdypHpupVhp3YtJeELxuFwPQ5OtXph1VeA3kC5K+OhFkol3mk
-         icX+g3EigBnyiBcRulD0KDShokm2SpEqjtNfEVn/SsoYyxOwCb0qL3//8ZPSysoVApfO
-         a5WR2yIPXuDZ0Yhn/A2yjfiUcRPAuX9X5M44hvF0Zxf1CJslDwpItlMYGR6cesgIhcdp
-         X7jq1ZT8o/YPgs0B3Qf4UvKSjBDh2jm8YxgkoJs1Q4SjdR8QV498WBpCB1WPd3/9lMrq
-         w/6s/+5PKnuOxdE8HMO9wn6CvXGva0Fy4JNa+pIeI8MmLY+Oa9z6O1vFUjSPRUM+QxX+
-         Ae7w==
+        bh=mbD3Ab67e0FuudOFI/lHLwL0zswy8Knqo0sCgR8RT4s=;
+        b=TiF3HWMr9WL2SGx9LUoHoFYqtaBlWfjZ0vkXvCE3oERG3jQlmLbISOik645lGUUjPN
+         FfR/UdV9vxXhmty/V8Jg1JESPNl4lgqbT9R/dGrCsMS0eMUPHcGCYEroj7JDCSqtygEZ
+         wp0miv+qrYysUH/YjaygI4+cEwyoMyNJ2p5A62EjUMEu4HgeJN4WsYDXG73a1XxopkmE
+         xOtJcmV3hWHWOaROE8D2i8HivQWxusJ+mHaKzbTe3WuPE7nqXI8yRQZwQpBQnmSBIUsQ
+         O9vAuFEkEoX1HZ2d/5zUmg2Fi150vQzfis9cdkh3h+YYxphabPW+Ih0SqaRKU32R/IDA
+         8rJw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707430213; x=1708035013;
+        d=1e100.net; s=20230601; t=1707430276; x=1708035076;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Eq8iz/pVIEfh06m3jcgvpLtauQXrbptz8sS8cX4N2Tk=;
-        b=FVttlYwAjiTB+TnXifywmRpeV/iIxeUjhZsseBH1SSJlvIYLJO+qP+9vzCUllnsGyH
-         QtGVfPk0oebNsH092FbwT2GtV1Fhgct8JxokRT6QWkMUJaF/h3GYSW3tnCLD80xQ7mbj
-         /GDwxfjarHM3yzs/ewAx2gvfvi6XI2l9nbA43cYnGOXLFWujSajBJQUXZVqSQwZbPus1
-         dWZODO6fXtUO2pnFO6ryQa6apQyEUUPHtQO0x0PNcFWVcKtt2LOMoFl784XygM9WVv/A
-         ZXSGnEY2ykb41yEo4iXCkQjSnfWGL4c6UWu1SaBAjvui2NBABVDkOPH83SziIREiiLyN
-         9j+g==
-X-Forwarded-Encrypted: i=1; AJvYcCVSUjPC7o03cbWcT9B+ns2Uw7fEzWrlMngFwAIPRKcVeixxSga3+I9xIMQQk9ajmcu9QTtwHne+CkkxdH+z5OqP9co58NGe
-X-Gm-Message-State: AOJu0YyAtuR5w7Z6iLlDKqMkAd4f7wNFnF70tVVFNU0Zixf1zoCoB8r6
-	UsN1G8CJ4jckMSX5PNvwywmyJ0vim54wSQOV+HcYeRzR3cBywg6o27F4jsQejA16Z0zeC2/UzKP
-	fjmaCBi5rqFfBs6tNihmHKDDdBTozVEAD9MjR
-X-Google-Smtp-Source: AGHT+IFOTZPclPHlmCWRUIiNbEX/lHCcB02NaSHfE62lAtGR+P0Gx2rcEmf/k+ZEGfaGx7K+PElwMnocQIfChp2nWIU=
-X-Received: by 2002:a25:b324:0:b0:dc6:d02b:f913 with SMTP id
- l36-20020a25b324000000b00dc6d02bf913mr872990ybj.22.1707430213193; Thu, 08 Feb
- 2024 14:10:13 -0800 (PST)
+        bh=mbD3Ab67e0FuudOFI/lHLwL0zswy8Knqo0sCgR8RT4s=;
+        b=PKHm/NxtQtIYqhD9VFKLCdsuXovelZBgsJZJVyeFWUE67OBdXfI1pyFvIZWBT8Bq0e
+         GB+oLxIeZiiMQdsxT1xVdr+ZpZHyKJIc96Xq11HxqsChGJKNDhMCqttbsttAhmSmg8s6
+         EtIyrhUp8N0eR275y6zck+YWcHIE1YhuRuJE75PWYz7bMWUqZTu95YuRTlxjCu589oAe
+         Oan7RjniVTPQvOD1aH04KRfx05bXHv2+W5jcD3Tte57erNuUIjs6y9wUUwcZO7DuPh4w
+         FZnnyFhke65hU+SsGwLpi/kTNhqKKDtSFryzTmbyfflLuMkuDz7JQpu0zwlZQWgX1rfZ
+         r4wA==
+X-Gm-Message-State: AOJu0YwZszBb1JBdk5tEQczjdssjh49ATe0AheKTLjtI8+Im8UAuU8x4
+	dLCiZF+WwcProKWw6zrwf8rfDUOxJOSA1K8SgFugu1XcLOiJtQO8z79wlJ1nnRu98ZlYIbCJVNw
+	6QKPBV6DIHNxfh/o5UA/uhPgFPStKV7G885nV
+X-Google-Smtp-Source: AGHT+IH7HT2xjL2wo04Ce3vG2hy8V8F1MsA5zD3w7pmCZFDAtcTdmu8xY+zNdQ7KU7jg1CfLuRNGKPXsey2rtvJaZdE=
+X-Received: by 2002:a25:2606:0:b0:dc7:4cb1:6817 with SMTP id
+ m6-20020a252606000000b00dc74cb16817mr876351ybm.22.1707430275645; Thu, 08 Feb
+ 2024 14:11:15 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240208102508.262907-1-edumazet@google.com>
-In-Reply-To: <20240208102508.262907-1-edumazet@google.com>
+References: <20240208164244.3818498-1-leitao@debian.org> <20240208164244.3818498-8-leitao@debian.org>
+In-Reply-To: <20240208164244.3818498-8-leitao@debian.org>
 From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 8 Feb 2024 17:10:01 -0500
-Message-ID: <CAM0EoM=5g2ZRDW-mFTKAZ9jC+gWYcwrmGQ6eyC3jTSzd1GVsnA@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/2] net/sched: act_api: speed up netns dismantles
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com
+Date: Thu, 8 Feb 2024 17:11:04 -0500
+Message-ID: <CAM0EoM=A81V8X-UMAivq_u=52tbv8z+dAzE3TfYG5wqzww6ivg@mail.gmail.com>
+Subject: Re: [PATCH net v3 7/9] net: fill in MODULE_DESCRIPTION()s for net/sched
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com, 
+	edumazet@google.com, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	horms@kernel.org, andrew@lunn.ch, f.fainelli@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 8, 2024 at 5:25=E2=80=AFAM Eric Dumazet <edumazet@google.com> w=
-rote:
+On Thu, Feb 8, 2024 at 11:43=E2=80=AFAM Breno Leitao <leitao@debian.org> wr=
+ote:
 >
-> Adopt the new exit_batch_rtnl() method to avoid extra
-> rtnl_lock()//rtnl_unlock() pairs.
+> W=3D1 builds now warn if module is built without a MODULE_DESCRIPTION().
+> Add descriptions to the network schedulers.
 >
+> Suggested-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> Signed-off-by: Breno Leitao <leitao@debian.org>
 
-For the patchset:
 Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
 cheers,
 jamal
 
-> Eric Dumazet (2):
->   net/sched: act_api: uninline tc_action_net_init() and
->     tc_action_net_exit()
->   net/sched: act_api: use exit_batch_rtnl() method
+> ---
+>  net/sched/em_canid.c | 1 +
+>  net/sched/em_cmp.c   | 1 +
+>  net/sched/em_meta.c  | 1 +
+>  net/sched/em_nbyte.c | 1 +
+>  net/sched/em_text.c  | 1 +
+>  net/sched/em_u32.c   | 1 +
+>  6 files changed, 6 insertions(+)
 >
->  include/net/act_api.h      | 34 +++-------------------------------
->  net/sched/act_api.c        | 35 ++++++++++++++++++++++++++++++++---
->  net/sched/act_bpf.c        |  7 ++++---
->  net/sched/act_connmark.c   |  7 ++++---
->  net/sched/act_csum.c       |  7 ++++---
->  net/sched/act_ct.c         |  7 ++++---
->  net/sched/act_ctinfo.c     |  7 ++++---
->  net/sched/act_gact.c       |  7 ++++---
->  net/sched/act_gate.c       |  7 ++++---
->  net/sched/act_ife.c        |  7 ++++---
->  net/sched/act_mirred.c     |  7 ++++---
->  net/sched/act_mpls.c       |  7 ++++---
->  net/sched/act_nat.c        |  7 ++++---
->  net/sched/act_pedit.c      |  7 ++++---
->  net/sched/act_police.c     |  7 ++++---
->  net/sched/act_sample.c     |  7 ++++---
->  net/sched/act_simple.c     |  7 ++++---
->  net/sched/act_skbedit.c    |  7 ++++---
->  net/sched/act_skbmod.c     |  7 ++++---
->  net/sched/act_tunnel_key.c |  7 ++++---
->  net/sched/act_vlan.c       |  7 ++++---
->  21 files changed, 111 insertions(+), 91 deletions(-)
+> diff --git a/net/sched/em_canid.c b/net/sched/em_canid.c
+> index 5ea84decec19..5337bc462755 100644
+> --- a/net/sched/em_canid.c
+> +++ b/net/sched/em_canid.c
+> @@ -222,6 +222,7 @@ static void __exit exit_em_canid(void)
+>         tcf_em_unregister(&em_canid_ops);
+>  }
 >
+> +MODULE_DESCRIPTION("ematch classifier to match CAN IDs embedded in skb C=
+AN frames");
+>  MODULE_LICENSE("GPL");
+>
+>  module_init(init_em_canid);
+> diff --git a/net/sched/em_cmp.c b/net/sched/em_cmp.c
+> index f17b049ea530..c90ad7ea26b4 100644
+> --- a/net/sched/em_cmp.c
+> +++ b/net/sched/em_cmp.c
+> @@ -87,6 +87,7 @@ static void __exit exit_em_cmp(void)
+>         tcf_em_unregister(&em_cmp_ops);
+>  }
+>
+> +MODULE_DESCRIPTION("ematch classifier for basic data types(8/16/32 bit) =
+against skb data");
+>  MODULE_LICENSE("GPL");
+>
+>  module_init(init_em_cmp);
+> diff --git a/net/sched/em_meta.c b/net/sched/em_meta.c
+> index 09d8afd04a2a..8996c73c9779 100644
+> --- a/net/sched/em_meta.c
+> +++ b/net/sched/em_meta.c
+> @@ -1006,6 +1006,7 @@ static void __exit exit_em_meta(void)
+>         tcf_em_unregister(&em_meta_ops);
+>  }
+>
+> +MODULE_DESCRIPTION("ematch classifier for various internal kernel metada=
+ta, skb metadata and sk metadata");
+>  MODULE_LICENSE("GPL");
+>
+>  module_init(init_em_meta);
+> diff --git a/net/sched/em_nbyte.c b/net/sched/em_nbyte.c
+> index a83b237cbeb0..4f9f21a05d5e 100644
+> --- a/net/sched/em_nbyte.c
+> +++ b/net/sched/em_nbyte.c
+> @@ -68,6 +68,7 @@ static void __exit exit_em_nbyte(void)
+>         tcf_em_unregister(&em_nbyte_ops);
+>  }
+>
+> +MODULE_DESCRIPTION("ematch classifier for arbitrary skb multi-bytes");
+>  MODULE_LICENSE("GPL");
+>
+>  module_init(init_em_nbyte);
+> diff --git a/net/sched/em_text.c b/net/sched/em_text.c
+> index f176afb70559..420c66203b17 100644
+> --- a/net/sched/em_text.c
+> +++ b/net/sched/em_text.c
+> @@ -147,6 +147,7 @@ static void __exit exit_em_text(void)
+>         tcf_em_unregister(&em_text_ops);
+>  }
+>
+> +MODULE_DESCRIPTION("ematch classifier for embedded text in skbs");
+>  MODULE_LICENSE("GPL");
+>
+>  module_init(init_em_text);
+> diff --git a/net/sched/em_u32.c b/net/sched/em_u32.c
+> index 71b070da0437..fdec4db5ec89 100644
+> --- a/net/sched/em_u32.c
+> +++ b/net/sched/em_u32.c
+> @@ -52,6 +52,7 @@ static void __exit exit_em_u32(void)
+>         tcf_em_unregister(&em_u32_ops);
+>  }
+>
+> +MODULE_DESCRIPTION("ematch skb classifier using 32 bit chunks of data");
+>  MODULE_LICENSE("GPL");
+>
+>  module_init(init_em_u32);
 > --
-> 2.43.0.594.gd9cf4e227d-goog
+> 2.39.3
 >
 
