@@ -1,73 +1,108 @@
-Return-Path: <netdev+bounces-70266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DE4684E34E
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 15:36:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8D3A84E360
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 15:43:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEA65285166
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 14:36:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBBA21C262AB
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 14:43:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C540D762CE;
-	Thu,  8 Feb 2024 14:36:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81EC279942;
+	Thu,  8 Feb 2024 14:43:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="F89dvR5e"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="D6FECP8r"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BD2B1E89A;
-	Thu,  8 Feb 2024 14:36:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 058D378B75
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 14:43:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707402995; cv=none; b=APF8RqLsHQ3RhlHML3pQdOtkshDd0q2jnFlAhBfy92C/T0s2p+NAt01DozUBBJWvmD89cyYXXEMua7kg6oGCNqkZaajyHByMZA5sgAmRDCXLE3bBiiQIzSH9oRSTtOu941zECe8P4sAxdfaqVEWS8v/NLpYWKqAX+s8Kuh8fHQY=
+	t=1707403408; cv=none; b=IHxkvlzozaRJxKjqoC+r7izj0gjOqBIYP8r8f8xzrav0CNLkELKOod6GFKXCdLYBAqInifdiyOs5gxZ/XgHV9Nul0uRUvgP+kvjb0SZ9NzfCmq4N5mmvtpT8QCsEAHCLysU5RX7dhwPhHBwLzLSBXhMqYpow2A/jLB5AAYw21vY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707402995; c=relaxed/simple;
-	bh=ZOFEzPp2Vx6z00VEJaxYp2bG8Q5CLe9q20m1Ox5HXiA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DbYXuyvAdqYx+IxjgIzFHM68SF37fn1BCmc9raeOg2uHWe4J7MMsR5eMvLmqTnK6mpURSOZdmTdK7UmVWaOYcvTgo2Tlr9vzme2Q2efNGqMIchojs/xynDlT6kHwcZqjcn0EjfJj06UYM8HbocCdB993vfb80gC+w7a7kk01gAw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=F89dvR5e; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BCDDC433F1;
-	Thu,  8 Feb 2024 14:36:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707402995;
-	bh=ZOFEzPp2Vx6z00VEJaxYp2bG8Q5CLe9q20m1Ox5HXiA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F89dvR5eDyRjrjnyH1oPcLBj2UIiBAF+zyiHntNNESWE8sv9Z617+3oyuqtNRRLfP
-	 /weKX0OWl8j9sfCLt6Gva5wWWqG8yvCsMIr8mq7ebx0xuUuTw1ZZeKEhzmuGCKH4ff
-	 gdEFSH2nfmntnpvIfSE7xQB/129H/jNhUbv5NrZ5PqYQaxZ285TqN/241Ci5nGiRF/
-	 m/3CE7daYYaydGAYYtAhGVpBbBpjrsbWd/eAzjrs+6SO2qz91P5rwMSAPViK5bretD
-	 hmR1vGiwr6OSQA67myue+axCDrs1APw9pRT6Hwh10MgzEOT7NACuuT8by0+qTJGFsn
-	 Om1Ug395mOgUw==
-Date: Thu, 8 Feb 2024 14:36:31 +0000
-From: Simon Horman <horms@kernel.org>
-To: Parav Pandit <parav@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, corbet@lwn.net, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Jiri Pirko <jiri@nvidia.com>
-Subject: Re: [PATCH net] devlink: Fix command annotation documentation
-Message-ID: <20240208143631.GJ1435458@kernel.org>
-References: <20240206161717.466653-1-parav@nvidia.com>
+	s=arc-20240116; t=1707403408; c=relaxed/simple;
+	bh=pCYNjfstlb4jKwI1KW9Nrlg9rEEdGxlyKMgQM/CJJsQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Ts7n3vn6XluoQzLOGfCSgB3oNjEKrGBs3db2Uxgaa7f+ssBygdUyad+amv4DOx0U2WijR1RXJsSaoV5Sl6G695Zd8CyvNREqgac4Iua/i1JVLRp7nc6gCZUhL12f1qeLej/D/rs6YLWXKnxbpmN602RbVGsLVQMNsinwOvDtclM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=D6FECP8r; arc=none smtp.client-ip=209.85.219.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-68c4f4411f8so20419576d6.0
+        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 06:43:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707403406; x=1708008206; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=PCPnpMCmyUTB6tiTxjO5UUfHysvYBygm9etO61LRCVg=;
+        b=D6FECP8ry5Dt1Z/MNUq4JW/LaZnp6yZNJyZdQ/nI47/aumHGF4nfT4P1oXQPrQh+M8
+         xTPA5hU95B2xsiGDgMYlT9ss2e2+s3T7hcN/eXfs4JEKHEpcRkrszgzLjVzW7kszA5Gj
+         nZY/oWXyd/f46v3Tgst+sKuIueHZqvBgHkDKIv7n9RrJLSZDetuQPxH8E95irjwlZENo
+         8qhsKzLIUYrzP8zlBefMAE0U1OoaaytOGFK8EPt7CQywCUjXelW5jPX5jG+T87/IJVvl
+         AjrKU46bdOKCplMbOpReG/Lh6NhdshqA1iVllcS5C7ioNFve2Vf0uIbJy37DfCUMp3td
+         hq3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707403406; x=1708008206;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PCPnpMCmyUTB6tiTxjO5UUfHysvYBygm9etO61LRCVg=;
+        b=pgQMma/Crku1x9Fs/ldmRbSDbQjOkMBnWy8Y41CirriYarnO6t28JyPYqsuy7/pPzE
+         E7AgxsHC7YlaZvrrySfBoV71KDktMdcrfBHoEjAAqws7+AMI3RWM5oyE3kuCS76Vky75
+         QFrhQ3XssjVFJGaBEQ3KNUHTyWzgL5ixxLzWTn5PzDlUwTCSdRBnfvUoEn5jh0+3XbQP
+         nPNI52+rqcz4OfH8WaKcDN7dG6Pqy98VqRDeF8EmBQW0x9nGFuwHOkzwm9BH8VgCvfi+
+         uTchIls+34CMaU0D5z0lIqFJknhHdBo7ftk/NjtA3rKMkQXnA4hat3tPhzgml0jlp0nc
+         KAUA==
+X-Gm-Message-State: AOJu0Yz9ttKxNvcTvzWFf1XSbNxCavZXVVaiTMU4pR7iif5PvATqa6G1
+	mlBQmbhvnKmwEfBFuDx6D5XbGimgyt7ncmkuNdQ/igHkb6s8Xy1V6pDCz6piZEwDo/V6byfUODy
+	nL306pVXHaA==
+X-Google-Smtp-Source: AGHT+IF4l/wwD5wJwktZRy9xJvzy+9ghxsh0ZGpj1seG3HYt1HI5Y6fmLRasOwJqPfSeXBxC2SQwx9wFr4qiag==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6214:2688:b0:68c:aaec:10b8 with SMTP
+ id gm8-20020a056214268800b0068caaec10b8mr135336qvb.3.1707403405863; Thu, 08
+ Feb 2024 06:43:25 -0800 (PST)
+Date: Thu,  8 Feb 2024 14:43:20 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240206161717.466653-1-parav@nvidia.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
+Message-ID: <20240208144323.1248887-1-edumazet@google.com>
+Subject: [PATCH net 0/3] net: more three misplaced fields
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Naman Gulati <namangulati@google.com>, 
+	Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Feb 06, 2024 at 06:17:17PM +0200, Parav Pandit wrote:
-> Command example string is not read as command.
-> Fix command annotation.
-> 
-> Fixes: a8ce7b26a51e ("devlink: Expose port function commands to control migratable")
-> Signed-off-by: Parav Pandit <parav@nvidia.com>
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+We recently reorganized some structures for better data locality
+in networking fast paths.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+This series moves three fields that were not correctly classified.
+
+There probably more to come.
+
+Reference : https://lwn.net/Articles/951321/
+
+Eric Dumazet (3):
+  tcp: move tp->scaling_ratio to tcp_sock_read_txrx group
+  tcp: move tp->tcp_usec_ts to tcp_sock_read_txrx group
+  net-device: move lstats in net_device_read_txrx
+
+ Documentation/networking/net_cachelines/net_device.rst |  4 ++--
+ Documentation/networking/net_cachelines/tcp_sock.rst   |  4 ++--
+ include/linux/netdevice.h                              | 10 +++++-----
+ include/linux/tcp.h                                    |  6 +++---
+ net/core/dev.c                                         |  3 ++-
+ net/ipv4/tcp.c                                         |  3 ++-
+ 6 files changed, 16 insertions(+), 14 deletions(-)
+
+-- 
+2.43.0.594.gd9cf4e227d-goog
 
 
