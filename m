@@ -1,142 +1,100 @@
-Return-Path: <netdev+bounces-70275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D907284E380
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 15:53:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A20B84E383
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 15:53:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E48391C27051
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 14:53:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9CA81F2848F
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 14:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DE1D7A738;
-	Thu,  8 Feb 2024 14:53:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5916879DB3;
+	Thu,  8 Feb 2024 14:53:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iFR1XY0B"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="zCSaQKOK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C3B7995D;
-	Thu,  8 Feb 2024 14:53:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8845167A01
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 14:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707403986; cv=none; b=Rt3k6gH85cE/y6vJSOkrCBG/IlWMqyCIXFBYhOraI5CFKQBaKmeLW85NaE0aXVOXxR95NBMzweZjf8SZQjmMwEyXFruhdkc5+b+rXIYRfZrwQVIBMqdEypyZ2eLysamuHW57KpsH47ZtG+MBio/9ofdtgBGYICXmtgRYm7YE6nI=
+	t=1707404034; cv=none; b=sp8DWvGaho5u9CwV2RQ94laneEBVXtYaFoV9mtkTAPr9bW5hj2lXV4jpicuahdiZSi76U8RcCYsGBGf0BUWkmRro3c512MKpqmxH1f9EX8y5SivRm0Lgoz4CBaim8SDhzryjWEs8yXJxpea6ed7yaFiAsjZqg0cwmk41omQturs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707403986; c=relaxed/simple;
-	bh=2fMEyyKJRcrOmxoY0/lT0uNbd0529gjTYxA9DzWBnnw=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=InXFqw/t02dYdUHlLT+srKW0n5gjuy7JhOEXFmQ9OKbCMGSpkpaHvn/wwwF+CFsOfCduQT+VPGuRShXvBS4LTgQkNB2w6Q0SYyT0U33UZ0Ga/3+OXMkvc6RSFnbO4Ci51kW16GYWEABgU6H8muRPxkQwXcI9xVxkpaQVoKu0zOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iFR1XY0B; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707403984; x=1738939984;
-  h=from:date:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=2fMEyyKJRcrOmxoY0/lT0uNbd0529gjTYxA9DzWBnnw=;
-  b=iFR1XY0B+Eq/7fD9cCpZKiF77GFcyuk86U24dYPmdDo2wDANnyi91H+z
-   0b83Kp2QBK/RMCq/HYON4xIamSm7yl63ouvkXX+va7NOVTyRlmex707Tu
-   6/J74y6MhcjCfF+Sc4zLxwaVw2O6Ndx9fSWBCuPzVz7umo5qmBaZD1bry
-   T6mDjl8XZQmJYkrXPj58aeiUVaPm9wSwLelquq5E+1LD+e1WeUrUXtkja
-   ZKxJiRxzsS+7+0czn9I3Nciaqu8MSuGpyIelibjCYcji827vmrNEaSv78
-   h9zaO30tjXzUl+eci+boCVb99iQPDPcXrB6NbJ3HbzSmrAW8/U/DgCJf8
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10978"; a="1098741"
-X-IronPort-AV: E=Sophos;i="6.05,254,1701158400"; 
-   d="scan'208";a="1098741"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2024 06:53:03 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,254,1701158400"; 
-   d="scan'208";a="6285544"
-Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.246.52.95])
-  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2024 06:53:01 -0800
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Date: Thu, 8 Feb 2024 16:52:58 +0200 (EET)
-To: "David E. Box" <david.e.box@linux.intel.com>
-cc: Netdev <netdev@vger.kernel.org>, 
-    sathyanarayanan.kuppuswamy@linux.intel.com, 
-    LKML <linux-kernel@vger.kernel.org>, platform-driver-x86@vger.kernel.org
-Subject: Re: [PATCH 8/8] tools: intel_sdsi: Add current meter support
-In-Reply-To: <20240201010747.471141-9-david.e.box@linux.intel.com>
-Message-ID: <ffdd7e28-9ed1-9380-7666-a7b108d84949@linux.intel.com>
-References: <20240201010747.471141-1-david.e.box@linux.intel.com> <20240201010747.471141-9-david.e.box@linux.intel.com>
+	s=arc-20240116; t=1707404034; c=relaxed/simple;
+	bh=q9YoLf32PHIiRxJzmYTRvH5+VrTUwqrjluzG5twaNEY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=gtunrcqMNF2/Vs4SeDJDa8p5vlQ+q1ruOVfmMNTy0oP2fjvBQLp91k7gqqW17nfP3mRjEhfQ2s5FlvSpISw6PxTxqT/cDpeLjxx+wsMIkFv9sv9SvWwWSzOE++bZ3hYTn3BeOQm7bfpvjW8EbUeiSxBSafZ1AUypcs4XKvTo1bM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=zCSaQKOK; arc=none smtp.client-ip=198.47.23.248
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 418ErX9K103128;
+	Thu, 8 Feb 2024 08:53:33 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1707404013;
+	bh=3uDKHQbj5Z7JrKhXzfc23R/UQa6a6kK/v2nH8r+kt3A=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=zCSaQKOKbwV2Foe1meSMSAqNDfad3mIlw61EJZnprO8KxOBXLQSpK857Z95nlWt32
+	 pEfId30I56FwVzr+qvcn4WzNDCLWLeNOVPnWJbC2tb5UQXhSc5YYW/PXhdXnULpq7E
+	 DbwN5DXsVVJ7gr4ysn8kA2MRr4GzrIttld4SwzHQ=
+Received: from DFLE114.ent.ti.com (dfle114.ent.ti.com [10.64.6.35])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 418ErXGR045108
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 8 Feb 2024 08:53:33 -0600
+Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE114.ent.ti.com
+ (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 8
+ Feb 2024 08:53:33 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 8 Feb 2024 08:53:33 -0600
+Received: from [10.249.135.225] ([10.249.135.225])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 418ErSn9088552;
+	Thu, 8 Feb 2024 08:53:28 -0600
+Message-ID: <b4ae0bdf-0763-4cc0-87c3-0b7fd87f6633@ti.com>
+Date: Thu, 8 Feb 2024 20:23:27 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: ti: icssg-prueth: Remove duplicate cleanup calls
+ in emac_ndo_stop()
+Content-Language: en-US
+To: Diogo Ivo <diogo.ivo@siemens.com>, <danishanwar@ti.com>,
+        <rogerq@kernel.org>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <andrew@lunn.ch>,
+        <vigneshr@ti.com>, <jan.kiszka@siemens.com>,
+        <dan.carpenter@linaro.org>, <robh@kernel.org>,
+        <grygorii.strashko@ti.com>, <horms@kernel.org>
+CC: <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>
+References: <20240206152052.98217-1-diogo.ivo@siemens.com>
+From: "Anwar, Md Danish" <a0501179@ti.com>
+In-Reply-To: <20240206152052.98217-1-diogo.ivo@siemens.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-On Wed, 31 Jan 2024, David E. Box wrote:
 
-> Add support to read the 'meter_current' file. The display is the same as
-> the 'meter_certificate', but will show the current snapshot of the
-> counters.
+
+On 2/6/2024 8:50 PM, Diogo Ivo wrote:
+> Remove the duplicate calls to prueth_emac_stop() and
+> prueth_cleanup_tx_chns() in emac_ndo_stop().
 > 
-> Signed-off-by: David E. Box <david.e.box@linux.intel.com>
-> ---
->  tools/arch/x86/intel_sdsi/intel_sdsi.c | 48 +++++++++++++++++---------
->  1 file changed, 31 insertions(+), 17 deletions(-)
-> 
-> diff --git a/tools/arch/x86/intel_sdsi/intel_sdsi.c b/tools/arch/x86/intel_sdsi/intel_sdsi.c
-> index a8fb6d17405f..c9b3e457885d 100644
-> --- a/tools/arch/x86/intel_sdsi/intel_sdsi.c
-> +++ b/tools/arch/x86/intel_sdsi/intel_sdsi.c
-> @@ -182,6 +182,7 @@ struct sdsi_dev {
->  enum command {
->  	CMD_SOCKET_INFO,
->  	CMD_METER_CERT,
-> +	CMD_METER_CURRENT_CERT,
->  	CMD_STATE_CERT,
->  	CMD_PROV_AKC,
->  	CMD_PROV_CAP,
-> @@ -329,7 +330,7 @@ static void get_feature(uint32_t encoding, char *feature)
->  	feature[0] = name[3];
->  }
->  
-> -static int sdsi_meter_cert_show(struct sdsi_dev *s)
-> +static int sdsi_meter_cert_show(struct sdsi_dev *s, bool show_current)
->  {
->  	char buf[METER_CERT_MAX_SIZE] = {0};
->  	struct bundle_encoding_counter *bec;
-> @@ -360,7 +361,11 @@ static int sdsi_meter_cert_show(struct sdsi_dev *s)
->  		return ret;
->  	}
->  
-> -	cert_ptr = fopen("meter_certificate", "r");
-> +	if (!show_current)
-> +		cert_ptr = fopen("meter_certificate", "r");
-> +	else
-> +		cert_ptr = fopen("meter_current", "r");
+> Fixes: 128d5874c082 ("net: ti: icssg-prueth: Add ICSSG ethernet driver")
+> Fixes: 186734c15886 ("net: ti: icssg-prueth: add packet timestamping and ptp support")
+> Signed-off-by: Diogo Ivo <diogo.ivo@siemens.com>
 
-Please calculate the filename only once:
-
-	cert_fname = show_current ? "meter_current" : "meter_certificate";
-	cert_ptr = fopen(cert_fname, "r");
-
-> +
->  	if (!cert_ptr) {
->  		perror("Could not open 'meter_certificate' file");
-
-This line still has 'meter_certificate' so you need to convert it to 
-fprintf() + strerror().
-
->  		return -1;
-> @@ -368,7 +373,8 @@ static int sdsi_meter_cert_show(struct sdsi_dev *s)
->  
->  	size = fread(buf, 1, sizeof(buf), cert_ptr);
->  	if (!size) {
-> -		fprintf(stderr, "Could not read 'meter_certificate' file\n");
-> +		fprintf(stderr, "Could not read '%s' file\n",
-> +			show_current ? "meter_current" : "meter_certificate");
-
-Use the local variable from above.
+Reviewed-by: MD Danish Anwar <danishanwar@ti.com>
 
 -- 
- i.
+Thanks and Regards,
+Md Danish Anwar
 
