@@ -1,246 +1,158 @@
-Return-Path: <netdev+bounces-70182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8845384DF99
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 12:27:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 812EA84DF9B
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 12:28:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 427DB28BF33
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 11:27:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 201D41F275D0
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 11:28:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B86A6F075;
-	Thu,  8 Feb 2024 11:26:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="DvawBBJb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93B346F06D;
+	Thu,  8 Feb 2024 11:28:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 305F56EB4F
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 11:26:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 116EB6BFCA;
+	Thu,  8 Feb 2024 11:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707391619; cv=none; b=GwIyoN1Q2VUhMfBrtNjMtuwFgLJGFasCsrbcZaWUwY+kNzcsGpcIWNX+9935+6ik6mHqZn/2zwCUNlmUbcUmKefBOp1N2a7Wui5atgk89EHSJ1y7+0bBlwVRHyaNw2J2FtD0inAUHMBVE1+ClbSlCYwqvBu0hWhFc+qofNpBDxM=
+	t=1707391722; cv=none; b=CV9EeJxGUnj3WOR4qpo7GWOdq/TRSZrhw1YZcdk/4JSKkd0CtqdN7IOHBk5rADHX80ZE0x6zjfkWS6MF79uZ7V9gJK49qo4oWQGGdNRuOsdXxFLgIMPvWDM9iud5y1r6iTFAOn4zeiBkS8cNlUt7Go3IYerqSQ2cksISDQApdRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707391619; c=relaxed/simple;
-	bh=PV3Cqb0WoNn1J9rsLHGrcOE6c3VTz+5cxRIhc352BgE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NwnrZf18wf2BaP8Bm0IuvPmCN/CgcIT+Bbxh7JS9WZ++/6gm+q4jcbMPM8eFXR5x96MW/X0nl/XflCf1r9AYFS/J9dtWFBYMZ6LQxcrgizX2Ak3gcWNDPcLyiNxRl6oW6mYoOh6aakOfFcdWB5BuGWBX5kaG7YNznrgieFdowpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=DvawBBJb; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4101d4c5772so4595985e9.0
-        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 03:26:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1707391613; x=1707996413; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ENe6a0MGhFAYwxbIJ6WLGpev+wUMn3WNP3NeinQqkpk=;
-        b=DvawBBJbCISpjxBI1dj4jmEYLEff9Igk3MG1q8XOjGaa7AAVmw6JVBoLL666nEy9hc
-         hz8cgO8ADi5swCesACf7VIRRtI1hsEEw52NmaBqyqotqY5Hd3dc/PZzGFo8bMAYPpL0M
-         qHLWPLeccsEshl500Fo6t8GmNRvoOJZ209KmgYT28gbyErK4TyABy9wg36zdHHr/1eyV
-         c8sJQyaks7TwaaKsbzMTyFO187fK1kmGH/4qXPZFLbfVqkQGbpdAeMPaBFe7wytwhac5
-         8aSi01c9T7hhrcJN9PRh7MRGkuO7ul1phMUi02WZT44G8ThBOQ169DNehhOj/AgGbzS1
-         knZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707391613; x=1707996413;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ENe6a0MGhFAYwxbIJ6WLGpev+wUMn3WNP3NeinQqkpk=;
-        b=q4I9wzAMCZeaEBxwLZDBUpfPLumbjPF0NCEIyec9JH3jucCnw7i5Zr43whjsLzbgSF
-         A+aNxJCvaKUctkRphCy18zDI0LEeciQw144qmLy07YWMbhYUpqbtJ5PK5SwlltATcFnU
-         Z6t15j4RNEZbqdBVZq5PFENPfPlNCIyVZMk8fbhKlTNA+32SFTtiBQue18x9yE/iulyD
-         54skbPhLbwXTiOMsBYm+R+X5PyZrHzlAIReyJ+cr9Hj8WXunnXryUJc3YDP63T5DuXqF
-         dGcUSAp+N9nc5t/b4WATlbUBA9lKqesDW+ejQYalfwCheWCLCc0lzctIpPDFYFvKu8d7
-         iN/w==
-X-Forwarded-Encrypted: i=1; AJvYcCUZvASTeukhFvXeJVzWE+TuszP9y2kL1UTaNWXuIQZlRLrrnAu9a40fz+I50/LeXNFMcCJvUyFgfwOb1cdP91abZommN28x
-X-Gm-Message-State: AOJu0Yzn1aV/4WG7gib/CKaH5SxW1EWjZ2Ub9ABc98yQLILxVWWDe53S
-	Nqkk4VhxbkUBSLIY/pwYihv4B4pQaZHRotCfZkBw5YofqPzEeExpKUHnwlzBwm8=
-X-Google-Smtp-Source: AGHT+IFynlbwaELVo7GaJVr7oESUnpHbKAXacrmgWYI4W/2zafauLyOMJtviUIiHO9Q94lIKXOCKWg==
-X-Received: by 2002:a05:600c:4f85:b0:40f:cb0d:4de6 with SMTP id n5-20020a05600c4f8500b0040fcb0d4de6mr1845639wmq.5.1707391613110;
-        Thu, 08 Feb 2024 03:26:53 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVW2Sm7rwhnabfFI7IcIwsENsKhtSUWvyRauqFuYAvoIjG/4y7F+DfxNyxTxHGb0FC7lUWC4P8zebZuakFqVkSGmy2Yf/jd/UpReDdaGbvflchYAAZqAUuYSnAIDb2VJU2exvpPCNWGfX2rGUvgE8rBkOfGX+SRTzea9Mg2OFLwmhDGjQuMhoQNRQLKfwM5JwuqEKHczoxOdTo0cYNaOJo07RAeuo4yVky/5el9GY65WyIYI4jHfigrA5/+qnQUEicm1joLlowjxL8S4j3o3hiLwa315369rc07YXFhdQFksLjg9ME1WwIXXleVHWjXFGIyWpCSxam41nkLM1WNFia6/bmOSvC6hy5GTymBQ9kxL2tcgGXyM/tF/lZZRyXWFnBNJCa1g8dxOg87xmjUo5suYF9sEHQGpBQqXhMOWXaptvauVU8xFzdYoNUqQ88m+UIewxzPCoN7PC/+QzPPI2VT89k3Yrnz/Jioj/mE9Ef8IHWVyf2w0BAlWd9auzfvdA16rHTJ/dAQFDm5SKTOtSo=
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id fb12-20020a05600c520c00b004103bd6f21dsm1181908wmb.35.2024.02.08.03.26.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 03:26:52 -0800 (PST)
-Date: Thu, 8 Feb 2024 12:26:51 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Karthik Sundaravel <ksundara@redhat.com>
-Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	pmenzel@molgen.mpg.de, michal.swiatkowski@linux.intel.com,
-	rjarry@redhat.com, aharivel@redhat.com, vchundur@redhat.com,
-	cfontain@redhat.com
-Subject: Re: [PATCH v2] ice: Add get/set hw address for VFs using devlink
- commands
-Message-ID: <ZcS6e1Z4w76Z2F_K@nanopsycho>
-References: <20240208082455.66726-1-ksundara@redhat.com>
- <20240208082455.66726-2-ksundara@redhat.com>
+	s=arc-20240116; t=1707391722; c=relaxed/simple;
+	bh=mjZCA2oTXaPNqvxrblpxeZdt1vWT+fBYjE0eqqSr9wU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=pWJn7iNLz4VlNwuGpKhjnx+kJPVmuyCzlI0Erc2dOnHwMUwn9hX+3tT9M7Waurfvpnxo/55zhSjgMTXldBTLulqOI9Qgz5PTw2T1eUqH6CMq93BWCW5pvSiV0gKz2HPDRcM3IPD9Bod41jqC95Zy8Jv7OqcdSRXp5e94nH+9pfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de,
+	kadlec@netfilter.org
+Subject: [PATCH net,v2 00/13] Netfilter fixes for net
+Date: Thu,  8 Feb 2024 12:28:21 +0100
+Message-Id: <20240208112834.1433-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240208082455.66726-2-ksundara@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Thu, Feb 08, 2024 at 09:24:55AM CET, ksundara@redhat.com wrote:
->Changing the MAC address of the VF ports are not available
->via devlink. Add the function handlers to set and get
->the HW address for the VF ports.
+This v2 including changes requested by Paolo Abeni.
 
-"VFs". Avoid the word "port" here, as it may falsely indicate you are
-talking about the eswitch representor port.
+-o-
 
+Hi,
 
->
->Signed-off-by: Karthik Sundaravel <ksundara@redhat.com>
->---
-> drivers/net/ethernet/intel/ice/ice_devlink.c | 89 +++++++++++++++++++-
-> 1 file changed, 88 insertions(+), 1 deletion(-)
->
->diff --git a/drivers/net/ethernet/intel/ice/ice_devlink.c b/drivers/net/ethernet/intel/ice/ice_devlink.c
->index 80dc5445b50d..8455fa94a687 100644
->--- a/drivers/net/ethernet/intel/ice/ice_devlink.c
->+++ b/drivers/net/ethernet/intel/ice/ice_devlink.c
->@@ -1576,6 +1576,92 @@ void ice_devlink_destroy_pf_port(struct ice_pf *pf)
-> 	devlink_port_unregister(&pf->devlink_port);
-> }
-> 
->+/**
->+ * ice_devlink_port_get_vf_mac_address - .port_fn_hw_addr_get devlink handler
->+ * @port: devlink port structure
->+ * @hw_addr: MAC address of the port
->+ * @hw_addr_len: length of MAC address
->+ * @extack: extended netdev ack structure
->+ *
->+ * Callback for the devlink .port_fn_hw_addr_get operation
->+ * Return: zero on success or an error code on failure.
->+ */
->+
->+static int ice_devlink_port_get_vf_mac_address(struct devlink_port *port,
->+					       u8 *hw_addr, int *hw_addr_len,
->+					       struct netlink_ext_ack *extack)
->+{
->+	struct devlink *devlink = port->devlink;
->+	struct ice_pf *pf = devlink_priv(devlink);
->+	struct device *dev = ice_pf_to_dev(pf);
->+	struct devlink_port_attrs *attrs = &port->attrs;
->+	struct devlink_port_pci_vf_attrs *pci_vf;
->+	int vf_id;
->+	struct ice_vf *vf;
+The following patchset contains Netfilter fixes for net:
 
-Reverse xmas tree:
-https://www.kernel.org/doc/html/v6.7/process/maintainer-netdev.html#tl-dr
+1) Narrow down target/match revision to u8 in nft_compat.
 
+2) Bail out with unused flags in nft_compat.
 
->+
->+	if (attrs->flavour == DEVLINK_PORT_FLAVOUR_PCI_VF) {
->+		pci_vf = &attrs->pci_vf;
->+		vf_id = pci_vf->vf;
->+	} else {
->+		dev_err(dev, "Unable to get the vf id for PF %d\n", pf->hw.pf_id);
+3) Restrict layer 4 protocol to u16 in nft_compat.
 
-Fill the extack message instead.
+4) Remove static in pipapo get command that slipped through when
+   reducing set memory footprint.
 
+5) Follow up incremental fix for the ipset performance regression,
+   this includes the missing gc cancellation, from Jozsef Kadlecsik.
 
->+		return -EADDRNOTAVAIL;
->+	}
->+	vf = ice_get_vf_by_id(pf, vf_id);
->+	if (!vf) {
->+		dev_err(dev, "Unable to get the vf for PF %d\n", pf->hw.pf_id);
+6) Allow to filter by zone 0 in ctnetlink, do not interpret zone 0
+   as no filtering, from Felix Huettner.
 
-Fill the extack message instead.
+7) Reject direction for NFT_CT_ID.
 
+8) Use timestamp to check for set element expiration while transaction
+   is handled to prevent garbage collection from removing set elements
+   that were just added by this transaction. Packet path and netlink
+   dump/get path still use current time to check for expiration.
 
->+		return -EINVAL;
->+	}
->+	ether_addr_copy(hw_addr, vf->dev_lan_addr);
->+	*hw_addr_len = ETH_ALEN;
->+	return 0;
->+}
->+
->+/**
->+ * ice_devlink_port_set_vf_mac_address - .port_fn_hw_addr_set devlink handler
->+ * @port: devlink port structure
->+ * @hw_addr: MAC address of the port
->+ * @hw_addr_len: length of MAC address
->+ * @extack: extended netdev ack structure
->+ *
->+ * Callback for the devlink .port_fn_hw_addr_set operation
->+ * Return: zero on success or an error code on failure.
->+ */
->+static int ice_devlink_port_set_vf_mac_address(struct devlink_port *port,
->+					       const u8 *hw_addr,
->+					       int hw_addr_len,
->+					       struct netlink_ext_ack *extack)
->+{
->+	struct devlink *devlink = port->devlink;
->+	struct ice_pf *pf = devlink_priv(devlink);
->+	struct device *dev = ice_pf_to_dev(pf);
->+	struct net_device *netdev = port->type_eth.netdev;
->+	struct devlink_port_attrs *attrs = &port->attrs;
->+	struct devlink_port_pci_vf_attrs *pci_vf;
->+	int vf_id;
->+	u8 mac[ETH_ALEN];
+9) Restore NF_REPEAT in nfnetlink_queue, from Florian Westphal.
 
-Reverse xmas tree:
-https://www.kernel.org/doc/html/v6.7/process/maintainer-netdev.html#tl-dr
+10) map_index needs to be percpu and per-set, not just percpu.
+    At this time its possible for a pipapo set to fill the all-zero part
+    with ones and take the 'might have bits set' as 'start-from-zero' area.
+    From Florian Westphal. This includes three patches:
 
+    - Change scratchpad area to a structure that provides space for a
+      per-set-and-cpu toggle and uses it of the percpu one.
 
->+
->+	if (attrs->flavour == DEVLINK_PORT_FLAVOUR_PCI_VF) {
->+		pci_vf = &attrs->pci_vf;
->+		vf_id = pci_vf->vf;
->+	} else {
->+		dev_err(dev, "Unable to get the vf id for PF %d\n", pf->hw.pf_id);
+    - Add a new free helper to prepare for the next patch.
 
-Fill the extack message instead.
+    - Remove the scratch_aligned pointer and makes AVX2 implementation
+      use the exact same memory addresses for read/store of the matching
+      state.
 
+Please, pull these changes from:
 
->+		return -EADDRNOTAVAIL;
->+	}
->+
->+	if (!netdev) {
->+		dev_err(dev, "Unable to get the netdev for PF %d\n", pf->hw.pf_id);
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-02-08
 
-Fill the extack message instead.
+Thanks.
 
+----------------------------------------------------------------
 
->+		return -EADDRNOTAVAIL;
->+	}
->+	ether_addr_copy(mac, hw_addr);
->+
->+	return ice_set_vf_mac(netdev, vf_id, mac);
->+}
->+
->+static const struct devlink_port_ops ice_devlink_vf_port_ops = {
->+	.port_fn_hw_addr_get = ice_devlink_port_get_vf_mac_address,
->+	.port_fn_hw_addr_set = ice_devlink_port_set_vf_mac_address,
->+};
->+
-> /**
->  * ice_devlink_create_vf_port - Create a devlink port for this VF
->  * @vf: the VF to create a port for
->@@ -1611,7 +1697,8 @@ int ice_devlink_create_vf_port(struct ice_vf *vf)
-> 	devlink_port_attrs_set(devlink_port, &attrs);
-> 	devlink = priv_to_devlink(pf);
-> 
->-	err = devlink_port_register(devlink, devlink_port, vsi->idx);
->+	err = devlink_port_register_with_ops(devlink, devlink_port,
->+					     vsi->idx, &ice_devlink_vf_port_ops);
-> 	if (err) {
-> 		dev_err(dev, "Failed to create devlink port for VF %d, error %d\n",
-> 			vf->vf_id, err);
->-- 
->2.39.3 (Apple Git-145)
->
+The following changes since commit eef00a82c568944f113f2de738156ac591bbd5cd:
+
+  inet: read sk->sk_family once in inet_recv_error() (2024-02-04 16:06:53 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-24-02-08
+
+for you to fetch changes up to 5a8cdf6fd860ac5e6d08d72edbcecee049a7fec4:
+
+  netfilter: nft_set_pipapo: remove scratch_aligned pointer (2024-02-08 12:24:02 +0100)
+
+----------------------------------------------------------------
+netfilter pull request 24-02-08
+
+----------------------------------------------------------------
+Felix Huettner (1):
+      netfilter: ctnetlink: fix filtering for zone 0
+
+Florian Westphal (4):
+      netfilter: nfnetlink_queue: un-break NF_REPEAT
+      netfilter: nft_set_pipapo: store index in scratch maps
+      netfilter: nft_set_pipapo: add helper to release pcpu scratch area
+      netfilter: nft_set_pipapo: remove scratch_aligned pointer
+
+Jozsef Kadlecsik (1):
+      netfilter: ipset: Missing gc cancellations fixed
+
+Pablo Neira Ayuso (7):
+      netfilter: nft_compat: narrow down revision to unsigned 8-bits
+      netfilter: nft_compat: reject unused compat flag
+      netfilter: nft_compat: restrict match/target protocol to u16
+      netfilter: nft_set_pipapo: remove static in nft_pipapo_get()
+      netfilter: nft_ct: reject direction for ct id
+      netfilter: nf_tables: use timestamp to check for set element timeout
+      netfilter: nft_set_rbtree: skip end interval element from gc
+
+ include/net/netfilter/nf_tables.h                  |  16 ++-
+ include/uapi/linux/netfilter/nf_tables.h           |   2 +
+ net/netfilter/ipset/ip_set_core.c                  |   2 +
+ net/netfilter/ipset/ip_set_hash_gen.h              |   4 +-
+ net/netfilter/nf_conntrack_netlink.c               |  12 +-
+ net/netfilter/nf_tables_api.c                      |   4 +-
+ net/netfilter/nfnetlink_queue.c                    |  13 ++-
+ net/netfilter/nft_compat.c                         |  17 ++-
+ net/netfilter/nft_ct.c                             |   3 +
+ net/netfilter/nft_set_hash.c                       |   8 +-
+ net/netfilter/nft_set_pipapo.c                     | 128 +++++++++++----------
+ net/netfilter/nft_set_pipapo.h                     |  18 ++-
+ net/netfilter/nft_set_pipapo_avx2.c                |  17 ++-
+ net/netfilter/nft_set_rbtree.c                     |  17 +--
+ .../selftests/netfilter/conntrack_dump_flush.c     |  43 ++++++-
+ 15 files changed, 202 insertions(+), 102 deletions(-)
 
