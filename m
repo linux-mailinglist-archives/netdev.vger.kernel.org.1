@@ -1,121 +1,116 @@
-Return-Path: <netdev+bounces-70210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F384084E08F
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 13:20:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E44D784E0A9
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 13:30:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A618C1F2A985
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 12:20:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FCAC28662B
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 12:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2520171B4F;
-	Thu,  8 Feb 2024 12:20:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76FDB7602A;
+	Thu,  8 Feb 2024 12:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZbDu/bjn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SszNSoTF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D316A029;
-	Thu,  8 Feb 2024 12:20:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DDF11B7F6;
+	Thu,  8 Feb 2024 12:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707394818; cv=none; b=u0IsJ0s84IRe9bS8fjpP0BKLuFeQfehpN64zhdxESZRigYNHzfnJHqmrQ/IQcYBSZPBgdgiYIsPEbggj7THSR8lBigvIj7pJQpHHzpkXptePnh1zNIj6iy3n9MiemwZfDqz9Xns2cGIMyqeNr6JKEPMjvbqOISH9JsiaH9OgT50=
+	t=1707395430; cv=none; b=GhcT+z4N+yw7Rgpu81hM1um2exV+dEk0ytDpJaw1oP6DC57+rKjNONL+Wy9P1vot22D84IEKdZ1O/8AypeE7FMqbLaLDO2eTlTf49cGAB81eAOq7z+xaLAqbnO2aCT11j+1dC4YS75xyVY22DXloC6SXFwRnwJiFk1xFfMbWp+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707394818; c=relaxed/simple;
-	bh=1/jElOUkOjtycqTK7uBY+Fqg6b2L402KOEq/KFj5Lvw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=NX0UUW3PftQp7FZPSIqlgj+XPotr44VpeSdiuanKtR6YIr3dK5aXHMAMVcZMSXf3MZuR1WJ84GdIK5fkTWnHeJfjkauLhLVNwgiIzEopJD3VT1OuiZHjJeKt6oJAjeP0HaLG04KM6PSDD2DSbcN5dxKzY3uQzyi3zQrDk26rIk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZbDu/bjn; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-511717231bfso374250e87.2;
-        Thu, 08 Feb 2024 04:20:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707394814; x=1707999614; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=72psFLs8Gi+MNEJgx2lwnlswN63/mhrnZDzpSoNcpqc=;
-        b=ZbDu/bjnHzI54pLS2rmiI/0zsGt4CAY9+SXrBjF1DAmMbQ+3tSsPlQf8svAmTvZkas
-         UzM59oujXfX4pXI4meQUZHz37rHpB6P/BXG/2eecsumx+TsK85QwEn5kcGnhPEcBD0ef
-         V6xI+q0sZ29tx4ZxKDVkqalZq05/lq6uvFnaEh/DAZGZFWxBzkSgyVpuP5DbUAci1vy5
-         8eRtH2QZcwbqexZvxoAyMlbUE0ODh0oFVWK7fGq0pyDqwMD7dm3TfpObyUXvQaYEk9gS
-         1uneRam1tmOsKSuQL2N1xsuu8U5guC3XZvNC/1bfn4CGO12vcIdCcuX0+PzJMpCuk0iF
-         Ll8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707394814; x=1707999614;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=72psFLs8Gi+MNEJgx2lwnlswN63/mhrnZDzpSoNcpqc=;
-        b=L4wzViiKF8y7DQhBPCmJSV1igtgOcUOD9NDt807wMedeF9qxdIe+dddnv9CypDhykT
-         dJYJSxLPxy121D1YwGtBAGQggu3XBPVMrURcTI+AH5GFestwHw48g3he3jZLtMSkyqEr
-         M0rk412dIjuviecyQw1PeB2T6u09SxV8davDxZQrQcbE51J6P1029seYAQP4ZMWNp/YB
-         XUD8Dm8NHU1lEeFaw0MVbfBnXOszTDBSKNyY+WJ8jGZHqY99yRzl8fM2vddZRFsK75HB
-         FszBgSTmIqEFikc/2gQyXhk379DX0JiNgl6BMEbsGQbqSSimKVU0t+95km6xb5KoVspE
-         ECGA==
-X-Gm-Message-State: AOJu0YywJj6odoSqCIJMvQDIni3rcQlI0s+r7h8BuTtl3YO4uDtuRXld
-	UDWyCjwfGxIXUEe8+1F04oQ20+eV5FmcpPvxibQhOTYvxfAHbipp
-X-Google-Smtp-Source: AGHT+IGicXRwsRzgk7/Ac/cqOV3jVHrfpZad2G3PO9HaODZw8hrKFZ16lSB3JhLAjhZy5MzUc85kLg==
-X-Received: by 2002:a05:6512:1ce:b0:511:6f52:9592 with SMTP id f14-20020a05651201ce00b005116f529592mr867243lfp.62.1707394814110;
-        Thu, 08 Feb 2024 04:20:14 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUj10yafoWt1eIWzfE3DFvv66rQwqJhRT1Gjr9TL7+Pt4Uy3nGc0MnTLVQPVAxpcZUeYU95/mgzLBQ63zX9B7ozVyMhU3JsIEMUjm1Rss/BXuinS8M6wqgppfHkWh/gJL/1A6q406YOib8rhQ2X1yTAlECjRturQ5qYaDVI7D5vJGkWMlgt6QvbRtzJYXWR5+m4NBEVyWny0g8dXYVhG5iwczNIJuI1PMtt3+8NoIYtL66/++4lOBkJUPeDy1NMv2QPiR8f+HCoAGh+6bTk++CVeeRWwA3N7Jzyn+zOhAuPuhXfIJ1G2m0gY2J+7+YHR1Ku1HqfXwTdVgX6WCEG97UDvg4E4H0=
-Received: from localhost (cpc154979-craw9-2-0-cust193.16-3.cable.virginm.net. [80.193.200.194])
-        by smtp.gmail.com with ESMTPSA id r17-20020a05600c35d100b0040fdb17e66csm1489447wmq.4.2024.02.08.04.20.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 04:20:13 -0800 (PST)
-From: Colin Ian King <colin.i.king@gmail.com>
-To: Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Cc: kernel-janitors@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH][next] drivers: net: xgene: remove redundant assignment to variable offset
-Date: Thu,  8 Feb 2024 12:20:12 +0000
-Message-Id: <20240208122012.2597561-1-colin.i.king@gmail.com>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1707395430; c=relaxed/simple;
+	bh=RTaUdoh+BAG+eyTkiOwrqSe1WubALAkCc+XbhNrFSAs=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=guKPeNMc+2Y8xTb1KhW3spVpO9RpGhZ5HXa4bsRNJSaIptvCP9UaCEFnGYiEn8jf/WOOoDBNbpCG1SJqXY/hynoac2/LLaQh4H+JrxUe+T8sJxpbzgN73qkDv1wC0zQRdcUBhNFVxbgWJiD+wKR8TPp7L/Z8y0aiVNhNwVxeeEk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SszNSoTF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BE07DC433F1;
+	Thu,  8 Feb 2024 12:30:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707395429;
+	bh=RTaUdoh+BAG+eyTkiOwrqSe1WubALAkCc+XbhNrFSAs=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=SszNSoTFn039KPGvS1ht3yRqiaBx60akO0qsy1zE8ZFymfv2J62HSBDsqk9zSz8JG
+	 39/hXSwhS/gdPwGPAeu4oP2BzeDjYfXI474fvxAdOVYaOhjK6t1k7KliqurXeQXIFK
+	 84OVC8DF0aQOXffqIJU2wWONflCsaAnC1vT/dcZLtF0WJejBJFM0wu7NcEWs9QR4ER
+	 2Fw0JoR4Tgk+DR+Racd+TJIWjgbc05I9Nfx4dLnT7rjohgz9JTRRCMpwwtSsT+sStn
+	 ABOuZJQphH167rgDD/6YdZrv3F7ObuPj6YD739xtmuDff+pKAfWbPKlJsKQKw3bljr
+	 jzvct/CA4d0TQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A4AD6E2F2F9;
+	Thu,  8 Feb 2024 12:30:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 01/13] netfilter: nft_compat: narrow down revision to
+ unsigned 8-bits
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170739542966.30179.12730184449437976359.git-patchwork-notify@kernel.org>
+Date: Thu, 08 Feb 2024 12:30:29 +0000
+References: <20240208112834.1433-2-pablo@netfilter.org>
+In-Reply-To: <20240208112834.1433-2-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, fw@strlen.de, kadlec@netfilter.org
 
-The variable offset is being initialized with a value that is never
-read, it is being re-assigned later on in either path of an if
-statement before being used. The initialization is redundant and
-can be removed.
+Hello:
 
-Cleans up clang scan build warning:
-drivers/net/ethernet/apm/xgene/xgene_enet_cle.c:736:2: warning: Value
-stored to 'offset' is never read [deadcode.DeadStores]
+This series was applied to netdev/net.git (main)
+by Pablo Neira Ayuso <pablo@netfilter.org>:
 
-Signed-off-by: Colin Ian King <colin.i.king@gmail.com>
----
- drivers/net/ethernet/apm/xgene/xgene_enet_cle.c | 1 -
- 1 file changed, 1 deletion(-)
+On Thu,  8 Feb 2024 12:28:22 +0100 you wrote:
+> xt_find_revision() expects u8, restrict it to this datatype.
+> 
+> Fixes: 0ca743a55991 ("netfilter: nf_tables: add compatibility layer for x_tables")
+> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+> ---
+>  net/netfilter/nft_compat.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/apm/xgene/xgene_enet_cle.c b/drivers/net/ethernet/apm/xgene/xgene_enet_cle.c
-index de5464322311..8f104642897b 100644
---- a/drivers/net/ethernet/apm/xgene/xgene_enet_cle.c
-+++ b/drivers/net/ethernet/apm/xgene/xgene_enet_cle.c
-@@ -733,7 +733,6 @@ static int xgene_cle_setup_rss(struct xgene_enet_pdata *pdata)
- 	u32 offset, val = 0;
- 	int i, ret = 0;
- 
--	offset = CLE_PORT_OFFSET;
- 	for (i = 0; i < cle->parsers; i++) {
- 		if (cle->active_parser != PARSER_ALL)
- 			offset = cle->active_parser * CLE_PORT_OFFSET;
+Here is the summary with links:
+  - [net,01/13] netfilter: nft_compat: narrow down revision to unsigned 8-bits
+    https://git.kernel.org/netdev/net/c/36fa8d697132
+  - [net,02/13] netfilter: nft_compat: reject unused compat flag
+    https://git.kernel.org/netdev/net/c/292781c3c548
+  - [net,03/13] netfilter: nft_compat: restrict match/target protocol to u16
+    https://git.kernel.org/netdev/net/c/d694b754894c
+  - [net,04/13] netfilter: nft_set_pipapo: remove static in nft_pipapo_get()
+    https://git.kernel.org/netdev/net/c/ab0beafd52b9
+  - [net,05/13] netfilter: ipset: Missing gc cancellations fixed
+    https://git.kernel.org/netdev/net/c/27c5a095e251
+  - [net,06/13] netfilter: ctnetlink: fix filtering for zone 0
+    https://git.kernel.org/netdev/net/c/fa173a1b4e3f
+  - [net,07/13] netfilter: nft_ct: reject direction for ct id
+    https://git.kernel.org/netdev/net/c/38ed1c7062ad
+  - [net,08/13] netfilter: nf_tables: use timestamp to check for set element timeout
+    https://git.kernel.org/netdev/net/c/7395dfacfff6
+  - [net,09/13] netfilter: nfnetlink_queue: un-break NF_REPEAT
+    https://git.kernel.org/netdev/net/c/f82777e8ce6c
+  - [net,10/13] netfilter: nft_set_rbtree: skip end interval element from gc
+    https://git.kernel.org/netdev/net/c/60c0c230c6f0
+  - [net,11/13] netfilter: nft_set_pipapo: store index in scratch maps
+    https://git.kernel.org/netdev/net/c/76313d1a4aa9
+  - [net,12/13] netfilter: nft_set_pipapo: add helper to release pcpu scratch area
+    https://git.kernel.org/netdev/net/c/47b1c03c3c1a
+  - [net,13/13] netfilter: nft_set_pipapo: remove scratch_aligned pointer
+    https://git.kernel.org/netdev/net/c/5a8cdf6fd860
+
+You are awesome, thank you!
 -- 
-2.39.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
