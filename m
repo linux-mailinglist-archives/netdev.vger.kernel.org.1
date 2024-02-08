@@ -1,124 +1,217 @@
-Return-Path: <netdev+bounces-70130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42B5784DC83
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:12:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 929F084DC86
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:12:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 678871C20BF9
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 09:12:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B85921C20CB9
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 09:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB3756D1A3;
-	Thu,  8 Feb 2024 09:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92A6F6BB3D;
+	Thu,  8 Feb 2024 09:12:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="No5MrsmM"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="gQ5Ju95+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6276E6BFD1
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 09:11:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94ED867C45
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 09:12:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707383501; cv=none; b=LDmz23aVqIzglA+eZBisy+ZtkADJAZPbUtkZA9rvzrCmeCpGDFRuNlqtiF9T8VIctrElT3D6GGfY4tZB1sFuu9xODsoqDAIE6D/imj6Xu3APCRYr/8MP9BC8ZahdQ7YAChOHAjBW6uRtCSa9WY8leDx5AAHYxEUNJY+aTDQdsWQ=
+	t=1707383554; cv=none; b=A9jMNVvRt64qu/jXcUiz76PzmCPaFbhQwBcEwKWKdF2INuEe5FqSGd584demD36uBTagGk/Blrzao92ja36r2T5W56a4my58WH9uvicLwQnpQcGcqL63xXgRBX4cqxWdvF5e7QFvv2KpHc1cqesdrkUeHZcDd77u4N/ruVZZCtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707383501; c=relaxed/simple;
-	bh=I8QES0h6STId6YvXwZzxlev8VjeO3+6+rMH4r2zY4AI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Drrhop+tci1sE6k/jNaObhXmigNzszPXFEqq3xv/TxJrmVyVsu6CdjNMlZCP2ZaMQptP+9DJS5O5y8L3X20+OWoqBkId1a5j6g0tvgWHM3736o7/2b65nXGpXtBA5GicMnv5P7cOKFwJe0+mTQ90yH2ViUVeM/k9kO8Fvwjyrzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=No5MrsmM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707383499;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=GjN3erzpeOu+lVqwFmAKx0QvgvU4nCXyPHeDUJyovt4=;
-	b=No5MrsmMgxuwTn1v1cDjdGM9tLF/A2jQ2rUVsx+5YbY8/2BrDcLVpDh3rNIzZZJfBzQ3AQ
-	NYvE9iq0bnd5RF64qNPmh0iMTENMVHMtNz64nRge1XfqF2ue5XDc//gO1q7AcrjmBN5HYp
-	lNc2IWXNokVcZccjpfbBLyMkMbB/yVc=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-59--s9HKZWhNiiQuOmBeuPf1g-1; Thu, 08 Feb 2024 04:11:37 -0500
-X-MC-Unique: -s9HKZWhNiiQuOmBeuPf1g-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-40fc2c5818aso931295e9.0
-        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 01:11:37 -0800 (PST)
+	s=arc-20240116; t=1707383554; c=relaxed/simple;
+	bh=e5f5GRj9rwLD/m3HqFj8t/1npzy9Xt+rj3nQlCMLK9Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CRQHRvcmkTGYLyF0uwuwwfSUgPSWyEnq70btC33a5PiOzsqy55yFHMvhkuM0JdT5M6VzR6JAYAdKlbTGgv4b15OaWKScmonmK+HobaxD/exbMwF5tEpzoHnzL+zZ+7THEpIhMWgEXglXBmTD09GRb84+HJqXFmqIcMZOgkBiTt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=gQ5Ju95+; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-339289fead2so1109101f8f.3
+        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 01:12:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1707383551; x=1707988351; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Y5eybrynvjns/Wtq7b/PZsWmH5mdyHyY+UrR2V8V3g4=;
+        b=gQ5Ju95+RRhuEh7pLqWFjwKTDBxJz4FlHzJ0JF/U2Nf5zSBNnNew3ZiwzenKORXzin
+         fuNmZgeY6rxWu4kNjExn5oju1HtcxXCyUe7oGSR+mQ0o84SecUo6Rhvo/eoEYNpAD55B
+         1O/2fp/iOavn240CbrQbJ0gFgDoTj5DWYfcizyjfSCfzWKfRqv4gGl7hdwahpH2elrdS
+         njC82+Q9IEjlWOBR9QyLYgyXhi8MndBDzpuAUFOQATTSve4dHW2kPjyWky6cGFvXeSH7
+         gDHtpeNc0PPIBNZY50gcb1Brem/awsMNO1cw8G6g9hFwO11eq4LWOBWSYA7zNogT99dn
+         kDuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707383496; x=1707988296;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
+        d=1e100.net; s=20230601; t=1707383551; x=1707988351;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GjN3erzpeOu+lVqwFmAKx0QvgvU4nCXyPHeDUJyovt4=;
-        b=lPI5v/IpJG7eVQerP3yvzgg+x4g+1Aw3W3KXB+2KXka7ypH8cXC27pHRZBIxVlIvFw
-         Ph0fAPv6dsv1cAroHKkjItxkVfD+fBbcd+tuPpSi7hKkaLvrM3U+yuwNVEnS7+QtKKo2
-         IEO0//cR+bppuiuynVdzzAoYjaPFQTulWffQsBmBa2ezpF/LPv3WvAfrG6O3tS9gnAGj
-         Olgeem3JPANUQu9e69j3nwo09UzhgHykvHgovsbFwQY794t05AjVwi/+a3UzV7xTOxsp
-         38pFeEr6YL0zEiiTg+JDUdWe5ClC8MQ7i+BObLkNDjYFF5MyBrkNFUq2vvlPSeu88HL9
-         9rLw==
-X-Gm-Message-State: AOJu0Yx1nh3i0NX+kwpOnSK2DDAnRzDk5eUzZvEViGI10ALD+d6DfsJZ
-	OMaPF0ohtC684ap6yygx0v+YcPs3/Z4Rgl6O1MZ1oenznagX6FrNMDdvEIEtU1oOwzEtQ+bMwtf
-	7EcXk7D2yV2eGObmtWij1Ii5DE5/9/zUnk/Fj9kCSi4CkwI7pDJm4bw==
-X-Received: by 2002:a5d:4689:0:b0:33b:4d82:a472 with SMTP id u9-20020a5d4689000000b0033b4d82a472mr3338562wrq.5.1707383496155;
-        Thu, 08 Feb 2024 01:11:36 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFE+4PNgUa34QIZV8YtlDoA1AXKgr4WL59rEhpLLEmRPcPeKpCnN0QnLIyQYwW3XZegi5vTOQ==
-X-Received: by 2002:a5d:4689:0:b0:33b:4d82:a472 with SMTP id u9-20020a5d4689000000b0033b4d82a472mr3338539wrq.5.1707383495797;
-        Thu, 08 Feb 2024 01:11:35 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUNYyR9sEr9YNRB+MkVd1dz861yjg0RjLc2Myck3wBtaAQUSN7f8IhlWC92YQ6Pmyv4Yune3Rmu0pBfHmiAFTl+HdtTNtsdt7iyGT6jaA+2jLd0iAwvXZFH8KOnv7YNNpzjjZR69RjZIX0R4WTxrIqCwkT8PO2J39vybiNW5bqJ6vS6cyHrl1/cNOnIL3YStnHwVhn3Lqf4n/xJXg==
-Received: from gerbillo.redhat.com (146-241-238-112.dyn.eolo.it. [146.241.238.112])
-        by smtp.gmail.com with ESMTPSA id x7-20020a5d54c7000000b0033b444a39a9sm3169465wrv.54.2024.02.08.01.11.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 01:11:35 -0800 (PST)
-Message-ID: <ccd18502ced7c753a6783010416ff7fe65ca2746.camel@redhat.com>
-Subject: Re: [PATCH net 11/13] netfilter: nft_set_pipapo: store index in
- scratch maps
-From: Paolo Abeni <pabeni@redhat.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org, 
-	edumazet@google.com, fw@strlen.de
-Date: Thu, 08 Feb 2024 10:11:34 +0100
-In-Reply-To: <20240207233726.331592-12-pablo@netfilter.org>
-References: <20240207233726.331592-1-pablo@netfilter.org>
-	 <20240207233726.331592-12-pablo@netfilter.org>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+        bh=Y5eybrynvjns/Wtq7b/PZsWmH5mdyHyY+UrR2V8V3g4=;
+        b=OAA3dozKN9MH5EJ4g5C2e1US/pim0HyhhVzWHEzWYpOGdFiOdfDTuU0fne1ERS/z1t
+         4RiaChpWU9VYgTmY7gavjwn2m4Fkd54EGeMOJASYOCN7D4XaFDXJAkDUQPm3hjdmJVv/
+         5ng9h56h4Sf13CI2P21JPQY/y2YT51DOLtSJ4wIW0FyN5haSJv2kskifY4VZb6+/6+cN
+         nmjTeC5toolBvrfOou+oJnbcUcP/b5GqJDCnfg9PHNSpoUrArVLpCe+2KY8LMyoB9YUm
+         YVAKhPXCHaSS3G9cTU3xd9OKFmnMSvwVt7agXqWj20JvPuIW1bfDdiwR1Z2QoQk1Qhe/
+         eFKQ==
+X-Gm-Message-State: AOJu0Yy89w6lJ/qd5jkmMZLJ636XDkc1M/OKgs2rcSUrofo01L4zfglQ
+	HyamIbvN4aA9pjxyKJs15j5oB0xMUWvf9XATFSVgFdL26THuS+bsVzN31CEq8IM=
+X-Google-Smtp-Source: AGHT+IFEVSjU54mXWQNKgdwLchAZkMEQQmVLOMO4sUAlJHwkGiVK5NVODPQN1MRg66rCkEtDhDDW8w==
+X-Received: by 2002:a05:6000:ce:b0:33b:5b90:f62a with SMTP id q14-20020a05600000ce00b0033b5b90f62amr325224wrx.17.1707383550696;
+        Thu, 08 Feb 2024 01:12:30 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVx3rY+59XE52vIbPHrU4E5vT1UjVE0bm4rYjHlOZiLI6VlVcMWKIZ83ubcvWdBbFc76L7Q42ItPf7G2xEHQMmrUn5Un2sLNQ2B4E2TE1q1I4AyLz4HvMAK/stJUQNnqKnN5XWIrfp3WSIYrhDxZ9nwTr4/rhM6rt+Z4pY2Cae7FFQ9OOXA2YfOkFyD2B9s3cSt0b6Kqf9fumsb/R0k97/DteQrTNupkqznzj0ugdXuXsWkFRI2Z3u56Nmw/UZUqtG1pA9BP1S7bln7qtt8j54Ys5yspLEeWr9LTJIXbQXd68MyCL5wzkFxpRJuzfZnUJ7ObkiEDrIjHAzj0sIyJO2e1SDrfjDp8gft9yJmfOcsnAEnENA9IwYAtcDuvB/CJyat56F4BW5KJbNjxKi+JuYzoOHxyHRCmi+6sjOhlAvf8aZHWikUCahWBCOgg7S7TVSEv6Kz50sQEa65GrpjhdLiLRkS2+GPUYJJ+UEO0IlXfoWptfk/BoULOQ==
+Received: from [192.168.1.20] ([178.197.222.62])
+        by smtp.gmail.com with ESMTPSA id a6-20020a056000100600b0033b3c03053esm3174687wrx.78.2024.02.08.01.12.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 08 Feb 2024 01:12:30 -0800 (PST)
+Message-ID: <cb7b7f91-5fcc-4efe-9066-2eb3de836361@linaro.org>
+Date: Thu, 8 Feb 2024 10:12:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] dt-bindings: net: dp83826: support TX data voltage
+ tuning
+Content-Language: en-US
+To: POPESCU Catalin <catalin.popescu@leica-geosystems.com>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "robh+dt@kernel.org" <robh+dt@kernel.org>,
+ "krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+ "conor+dt@kernel.org" <conor+dt@kernel.org>, "afd@ti.com" <afd@ti.com>,
+ "andrew@lunn.ch" <andrew@lunn.ch>,
+ "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+ "linux@armlinux.org.uk" <linux@armlinux.org.uk>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ GEO-CHHER-bsp-development <bsp-development.geo@leica-geosystems.com>,
+ "m.felsch@pengutronix.de" <m.felsch@pengutronix.de>
+References: <20240207175845.764775-1-catalin.popescu@leica-geosystems.com>
+ <a4949983-f6ba-4d98-b180-755de6b11d0f@linaro.org>
+ <83f00386-e741-4bde-bcfb-462fadde1519@leica-geosystems.com>
+ <2c4e76f5-0a13-44b5-8ece-3deb957dd260@linaro.org>
+ <f35e239d-3f78-40e1-8d5b-4d7b949f08aa@leica-geosystems.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <f35e239d-3f78-40e1-8d5b-4d7b949f08aa@leica-geosystems.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, 2024-02-08 at 00:37 +0100, Pablo Neira Ayuso wrote:
-> diff --git a/net/netfilter/nft_set_pipapo.h b/net/netfilter/nft_set_pipap=
-o.h
-> index 1040223da5fa..144b186c4caf 100644
-> --- a/net/netfilter/nft_set_pipapo.h
-> +++ b/net/netfilter/nft_set_pipapo.h
-> @@ -130,6 +130,16 @@ struct nft_pipapo_field {
->  	union nft_pipapo_map_bucket *mt;
->  };
-> =20
-> +/**
-> + * struct nft_pipapo_scratch - percpu data used for lookup and matching
-> + * @map_index	Current working bitmap index, toggled between field matche=
-s
-> + * @map		store partial matching results during lookup
+On 08/02/2024 10:08, POPESCU Catalin wrote:
+> On 08.02.24 09:50, Krzysztof Kozlowski wrote:
+>> This email is not from Hexagon’s Office 365 instance. Please be careful while clicking links, opening attachments, or replying to this email.
+>>
+>>
+>> On 08/02/2024 09:48, POPESCU Catalin wrote:
+>>> On 08.02.24 08:35, Krzysztof Kozlowski wrote:
+>>>> [You don't often get email from krzysztof.kozlowski@linaro.org. Learn why this is important at https://aka.ms/LearnAboutSenderIdentification ]
+>>>>
+>>>> This email is not from Hexagon’s Office 365 instance. Please be careful while clicking links, opening attachments, or replying to this email.
+>>>>
+>>>>
+>>>> On 07/02/2024 18:58, Catalin Popescu wrote:
+>>>>> Add properties ti,cfg-dac-minus-one-milli-percent and
+>>>>> ti,cfg-dac-plus-one-milli-percent to support voltage tuning
+>>>>> of logical levels -1/+1 of the MLT-3 encoded TX data.
+>>>>>
+>>>>> Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+>>>>> ---
+>>>>> Changes in v2:
+>>>>>    - squash the 2 DT bindings patches in one single patch
+>>>>>    - drop redundant "binding" from the DT bindings patch title
+>>>>>    - rename DT properties and define them as percentage
+>>>>>    - add default value for each new DT property
+>>>>> ---
+>>>>>    .../devicetree/bindings/net/ti,dp83822.yaml    | 18 ++++++++++++++++++
+>>>>>    1 file changed, 18 insertions(+)
+>>>>>
+>>>>> diff --git a/Documentation/devicetree/bindings/net/ti,dp83822.yaml b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+>>>>> index db74474207ed..6bbd465e51d6 100644
+>>>>> --- a/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+>>>>> +++ b/Documentation/devicetree/bindings/net/ti,dp83822.yaml
+>>>>> @@ -62,6 +62,24 @@ properties:
+>>>>>           for the PHY.  The internal delay for the PHY is fixed to 3.5ns relative
+>>>>>           to transmit data.
+>>>>>
+>>>>> +  ti,cfg-dac-minus-one-milli-percent:
+>>>>> +    description: |
+>>>>> +       DP83826 PHY only.
+>>>>> +       Sets the voltage ratio (with respect to the nominal value)
+>>>>> +       of the logical level -1 for the MLT-3 encoded TX data.
+>>>>> +    enum: [50000, 56250, 62500, 68750, 75000, 81250, 87500, 93750, 100000,
+>>>>> +           106250, 112500, 118750, 125000, 131250, 137500, 143750, 150000]
+>>>> I see all values being multiple of basis points, so why not using -bp
+>>>> suffix?
+>>> I can read :
+>>>
+>>>     "-bp$":
+>>>       $ref: types.yaml#/definitions/int32-array
+>>>       description: basis points (1/100 of a percent)
+>>>
+>>> In my case it's 1/1000 of a percent. As I'm not sure exactly what the
+>>> author meant by "basis points", would this apply to my patch as well?
+>> So please show me the value which does not fit in -bp.
+> 
+> "Basis points" doesn't mean anything to me, that's why I was asking for 
+> confirmation :)
+> I don't have any issue to use "-bp" at all, I'm not pusing against.
 
-(just if v2 is coming): you need to add ':' after the field names to
-please kdoc.
+https://en.wikipedia.org/wiki/Basis_point
 
-Cheers,
+Looks like all your values fit there, at least for these devices. Maybe
+you would need to be sure other devices do not require mpercent after all.
 
-Paolo
+Best regards,
+Krzysztof
 
 
