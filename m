@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-70171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEA9D84DF71
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 12:11:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 274F684DF73
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 12:11:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B34F28B36F
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 11:11:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3616AB27C81
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 11:11:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1A46EB56;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E5C76EB5F;
 	Thu,  8 Feb 2024 11:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MSUdiyV6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tLtWXJmu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3808B6D1B1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380BF6DCFA;
 	Thu,  8 Feb 2024 11:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707390630; cv=none; b=B6m+IUji5yJmEgo+tHpNRxij3LJVgOatA8pq8lMMfum3XUJe96vHGH1xgHE8TUynV4yvPReftKBmQFv7py++8laFKQmKSqo1JPlo1xTl+MlUSht3LLNSEehgRnSXCXaDba99WaLf59cp9/tYBcaOlXdjmX271JSqat0Gq/T3yAU=
+	t=1707390630; cv=none; b=I+Aj9iYee3SKMkgJ7hugkmA9zCS0jyJsIc4aUpFOkk6jsDkk1VGdnHMIqLSoxFnLz4owi7C85BIxWZXfINr1zl6Rf759V0/qsoDjY6L2zxgsCguU0HDqeI/ra0lZeoOJALZ6QCzj2PLLb4DUx34OcfLfmQ5OadbvOd0WOiWjgpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707390630; c=relaxed/simple;
-	bh=GLdEbc2UAtbAbTDq73Jc2aWiLnCE774GGgGxlB8M+Gs=;
+	bh=p+OUfWlrzA+M4vjTxp8+4tn9B0VIKOQSbkS2Ogl3CDs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=U/gMEi7m5KYTspXPJvRMxsjyXHG2PRWOeCFnTDSI/C236lP5VnryHT9cls/9uhRdE7LPgaCCH3aQEls9CpYiwQupT+BwME1BMfSEb6aFah0gOqxFBjJIFC/lvsPQRmKmy6+whDtucG0ZbI80A9724B73a3vf7ucrU3Ghxj9zWVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MSUdiyV6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CF830C43394;
+	 In-Reply-To:To:Cc; b=Qt19dfuEFGxzsXKmLogIMXWONUq03eg+kCgopeJYUWmwsGqtqJqEQmv+NnOh2yiV3jTywYZswQhmFVAzRXgENFjcH40bRIE5b6FeYQeeVND5SBIUJ2MqGqPgxfn5eOj0b9fesS/0ZzP82IXSrQJeJZg3rw56LMS/A6G2cxSEYfg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tLtWXJmu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BF9D0C43390;
 	Thu,  8 Feb 2024 11:10:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707390629;
-	bh=GLdEbc2UAtbAbTDq73Jc2aWiLnCE774GGgGxlB8M+Gs=;
+	bh=p+OUfWlrzA+M4vjTxp8+4tn9B0VIKOQSbkS2Ogl3CDs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MSUdiyV6rycYGLgJEHJW82We/FWtEETejSRb+OI8WXJYAxakZBONAfsIg9bOiOlHW
-	 FXEnGjDAKy89mQoAhGaA1dJN5W8FcS8o3U52hbXypuZvffwKE7tphjYpkVQHv9OnJ9
-	 wjxrMYe2ENkXumOT/maSEv/RVk1U7Xjxvy8cJDy8pV1RKit07su/mUZDOPcXG30cEL
-	 iFHczGtE5JYmLA8jiFwcj3fNp14Bglj6x9CrzvoCG17Ih1tQamWqhjCLIzb/0R9kJv
-	 FcvNRAuMKgtUFSyuSp6j/OXb+rtNIztEFFSHbUqurYoaWJVjkAu+etO0VjYrMrURq/
-	 7He0JHoPHQ0fg==
+	b=tLtWXJmuOYFnp1AfFe/z/SZ58wkuAO3UJfZufjXnLwSsWCizUNW1Oh2sa/mSmDAsY
+	 4cF5sjvcHSyphL6bi6D9qaUAfuAXeTEamih0p3pC+XJjB5Nne3uMSsGMk+3TQsYSdF
+	 OCaYLwxfQ9yOQ2mCQ9uRvYYugiZ7Zf7CXwxBLDuiJEfNpqpWTBrLcTETPNQY2v5RUC
+	 ACkTQSiDtA0bcq1LJmW+Wlzr+Lnt5sAp2zpMXqeAs/Pkx4TYmy7MgJDbjrBIuA6jDk
+	 k0EjLZ4qKrPOXXlrCPoIvbXpis6b6eRoTOdOuGOU/O+eJwHkfLU+EXA+6NflJEUAUr
+	 wWzZz1eVbM5vA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AA9F9E2F2F0;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A2E9FC395F1;
 	Thu,  8 Feb 2024 11:10:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,39 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH V3 0/2] CPSW: enable mac_managed_pm to fix mdio
+Subject: Re: [PATCH net v4] octeontx2-af: Initialize maps.
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170739062969.21022.14406524530432111122.git-patchwork-notify@kernel.org>
+ <170739062966.21022.12692038098590787305.git-patchwork-notify@kernel.org>
 Date: Thu, 08 Feb 2024 11:10:29 +0000
-References: <20240206005928.15703-1-sinthu.raja@ti.com>
-In-Reply-To: <20240206005928.15703-1-sinthu.raja@ti.com>
-To: Sinthu Raja <sinthu.raja@mistralsolutions.com>
-Cc: dkirjanov@suse.de, s-vadapalli@ti.com, r-gunasekaran@ti.com,
- rogerq@kernel.org, linux-omap@vger.kernel.org, netdev@vger.kernel.org,
- sinthu.raja@ti.com
+References: <20240206024000.1070260-1-rkannoth@marvell.com>
+In-Reply-To: <20240206024000.1070260-1-rkannoth@marvell.com>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ sgoutham@marvell.com, davem@davemloft.net, edumazet@google.com,
+ horms@kernel.org, kuba@kernel.org, pabeni@redhat.com, bcreeley@amd.com,
+ sbhatta@marvell.com, gakula@marvell.com, hkelam@marvell.com,
+ sumang@marvell.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Tue,  6 Feb 2024 06:29:26 +0530 you wrote:
-> From: Sinthu Raja <sinthu.raja@ti.com>
+On Tue, 6 Feb 2024 08:10:00 +0530 you wrote:
+> kmalloc_array() without __GFP_ZERO flag does not initialize
+> memory to zero. This causes issues. Use kcalloc() for maps and
+> bitmap_zalloc() for bitmaps.
 > 
-> Hi All,
-> This patch fix the resume/suspend issue on CPSW interface.
-> 
-> Reference from the foloowing patchwork:
-> https://lore.kernel.org/netdev/20221014144729.1159257-2-shenwei.wang@nxp.com/T/
+> Fixes: dd7842878633 ("octeontx2-af: Add new devlink param to configure maximum usable NIX block LFs")
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+> Reviewed-by: Brett Creeley <bcreeley@amd.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [V3,1/2] net: ethernet: ti: cpsw_new: enable mac_managed_pm to fix mdio
-    https://git.kernel.org/netdev/net/c/9def04e759ca
-  - [V3,2/2] net: ethernet: ti: cpsw: enable mac_managed_pm to fix mdio
-    https://git.kernel.org/netdev/net/c/bc4ce46b1e3d
+  - [net,v4] octeontx2-af: Initialize maps.
+    https://git.kernel.org/netdev/net/c/db010ff6700f
 
 You are awesome, thank you!
 -- 
