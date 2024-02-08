@@ -1,433 +1,487 @@
-Return-Path: <netdev+bounces-70169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B9FA84DF4A
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 12:07:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2FC584DF6A
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 12:10:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBF841F2B6E6
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 11:07:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 591BF1F2B313
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 11:10:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61750762EA;
-	Thu,  8 Feb 2024 11:00:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDB04762ED;
+	Thu,  8 Feb 2024 11:07:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=x3me.net header.i=@x3me.net header.b="BU3k08+P"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="alW9HAqT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B5F6F08D
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 10:59:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA12D2E3F2
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 11:07:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707390000; cv=none; b=Zb0gUBHja9OphdNdvHPbHmj9sTGNZVmzzNYCmPftYSZ8bWH9UdrqnmghPuqv6tvYe2DwC3NO+cgA28k1xHV8crqWKXCYzs7tYl1RDxSSVZGoltmMmogfc6TGGxXG4W+0g7SXuJXPilZFtdEzWAk8cMoLw/vH0PRB1GNTjgpZI64=
+	t=1707390439; cv=none; b=OEWR7juOdDR3nOygKZ8/WSS2brpJuNV+6zNNBZ15tPbHWQE5j7TIRsea4donCuveRMAP9YiaRvHXevivpzKOCVX7058tmlTFIG7zhDdiB71romWodjoZ38wkNtEAwcpmoVE25MkrU7SDBS7AsX6oiz+BsFpOj+Vgr7u/7R3VR8c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707390000; c=relaxed/simple;
-	bh=Norx/St29rJogm9tTcstx5nZ1PnVgSAbmFt5WEUUuMk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QMZHqg+KxZeGL37ym+dn/fzUZNqTonFduovvHN+gw6GG5pV3WerHKFijbEfxMQ2OaESvEQ5+A52cYBLALuSQTrT98trfDiZQ7hqYDBBehnnVh+2YqWcz+x6esyX9/eln26lcg5BbEgNXm3Nh6tC+ynF5vQMZ0MoU4OBFFQFLV3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=x3me.net; spf=pass smtp.mailfrom=x3me.net; dkim=pass (2048-bit key) header.d=x3me.net header.i=@x3me.net header.b=BU3k08+P; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=x3me.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=x3me.net
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a389a3b9601so161886466b.1
-        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 02:59:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=x3me.net; s=google; t=1707389996; x=1707994796; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2t6DZIieLw4GaIRXOmeXoB00e2wacKXdksaUlmS2dFE=;
-        b=BU3k08+PwHHKnducsRuE+HwM8orbd6yLSucHtOpZm7ZecSmLmiLgFjTInRRQaSNYc3
-         CdBUZzQ+v65DvoP2xa4K7hKtE+WIFyEGVMpG89upq10eB5SeyNkArlo3TqIiuuu4W2bt
-         WS4X8GYKCpNXxEGcwJn0in+3n+cDSZ4j6ma8eZxbOKCkwpwm4oLymx6cbw0q/Gm+UQyT
-         sZcBSpCN50lHXKtYb7t5ZiM4vfyL2mlSbKI2EgICFbODiePaOrmeAkiVBro9ADcJx1Wf
-         CD7fSSuSBOgmoUSy42CyFnRUmdfqbAqe6FubSQdwUg44m798tvbYwhmNMvqT0r5rrBce
-         H7KA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707389996; x=1707994796;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2t6DZIieLw4GaIRXOmeXoB00e2wacKXdksaUlmS2dFE=;
-        b=LCEJbiMbumvGTGsNR6sRnA8tmGbx2Pw7CRFvpPPwp0bFNDDl1jAzvDgOunKvX8xNAN
-         ezsqKNkoa75MSWmOw0C+l84HdxtGt5Je7N/DTwo6p1X7VJSjcv6H71F7B0G7QfHoizMp
-         6M/3E8NTaUi3FXlDrtSWlurAjFl09iteRAg/XN7QncBh55z26OKDReB/DlGOdXGAbWSp
-         IIkkUApGtcFh3HW1nBLqmcXcyRE0rhbgCYUNNZYkFyDQ/cNYu0naCQKPXvTGCotDJqqF
-         rYQrYsgy0khOzGDoaDgUybyJDxA8wV3eWuvUmPJzA1gQLvvfUD7dFV4tfwNLSSFfwYnD
-         ky5Q==
-X-Gm-Message-State: AOJu0YyPyYa+BfJFrsk05fHVR1zyxat+QbHYqkPXbYwzE6tNsQpAPKot
-	b+fn1umgutUIijPrDskgxqfVISaFrH/aMoTaQtEJkZ+q7gVqe82+T5uPZGnz+UgJq4km18JShZ7
-	HPYH1m9h4x+tqwKAyM8XmAo3fYFkVk+Q0j1vW4A==
-X-Google-Smtp-Source: AGHT+IE3GR9fclYj2Mi/zRxNDRDrAKgcQl5cgQsrSiWAcyMoGjw4egjspwldHvxlCMxs8/u95HCnlWmgFKFznAO2Ai4=
-X-Received: by 2002:a17:906:23e9:b0:a31:4e96:f40a with SMTP id
- j9-20020a17090623e900b00a314e96f40amr5830518ejg.26.1707389995705; Thu, 08 Feb
- 2024 02:59:55 -0800 (PST)
+	s=arc-20240116; t=1707390439; c=relaxed/simple;
+	bh=ACMNzRmrp6Vsp+C/qiQ5eQ5AfyyKWk3Id0ATHeIha8w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dzCwO92wgT5YYRGaj6asi57LlLwvT68s/g2SMdwVg8J5yhz5xHB/rK9fvkCyXtmuahRqSS/exsRVifJ+Ef2QDQZurd0V+lgFhvLwvlnCNLXMVkGVx0QTRqlHA8dqccSdj1edS3t51MkBAayQV56o+q+wdITcJgIr3JZk+MhpwOo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=alW9HAqT; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <630965ea-a1f1-427d-bf33-26f8ed5385a0@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1707390432;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uX0eBi/51/NRCVn1TEHhIht3eMevMkmxopm/0qR9YD8=;
+	b=alW9HAqTi/ZlzkPiqOsm6pAI65sDEFcY+GhD++yTdaXobwlvRyIlNBEzrgcuC2FLZak2MP
+	wXETLBrGqelV5BXrMX+sj8lTarzJZCs0a4MTiJiJgCh+vIMiZYUogFGlbOCGrpV9cvLRqE
+	AmBxXm+e35CfLgUxSV3gj6iQytd+m0g=
+Date: Thu, 8 Feb 2024 11:07:07 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAJEV1igULtS-e0sBd3G=P1AHr8nqTd3kT+0xc8BL2vAfDM_TuA@mail.gmail.com>
- <20240126203916.1e5c2eee@kernel.org> <CAJEV1igqV-Yb3YvZEiMOBCGyZXRQ2KTS=yq483+xOVFehvgDAw@mail.gmail.com>
- <CAJEV1ij=K5Xi5LtpH7SHXLxve+JqMWhimdF50Ddy99G0E9dj_Q@mail.gmail.com>
- <CAJEV1igHVsqmk0ctxb-9gM2+PLs_gvpE1fyZwoASgv+jYXOcmg@mail.gmail.com>
- <87wmrqzyc9.fsf@toke.dk> <CAJEV1ig2Gyqb2MPHU+qN_G7XDVNZffU5HDm5VkoGev_QOe7bXg@mail.gmail.com>
- <87r0hyzxbd.fsf@toke.dk> <CAJ8uoz0bZjeJKJbCOfaogJZg2o5zoWNf3XjAF-4ZubpxDoQhcg@mail.gmail.com>
- <CAJEV1ihnwDxkkeMtAkkkZpP5O-VMxVvJojLs6dMbeMYgsn7sGA@mail.gmail.com> <ZcPTNpzGyqQI+DXw@boxer>
-In-Reply-To: <ZcPTNpzGyqQI+DXw@boxer>
-From: Pavel Vazharov <pavel@x3me.net>
-Date: Thu, 8 Feb 2024 12:59:44 +0200
-Message-ID: <CAJEV1ihMuP6Oq+=ubd05DReBXuLwmZLYFwO=ha2C995wBuWeLA@mail.gmail.com>
-Subject: Re: Need of advice for XDP sockets on top of the interfaces behind a
- Linux bonding device
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Magnus Karlsson <magnus.karlsson@gmail.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next v6] ptp: ocp: add Adva timecard support
+To: Sagi Maimon <maimon.sagi@gmail.com>, richardcochran@gmail.com,
+ jonathan.lemon@gmail.com
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org
+References: <20240205153046.3642-1-maimon.sagi@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240205153046.3642-1-maimon.sagi@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Feb 7, 2024 at 9:00=E2=80=AFPM Maciej Fijalkowski
-<maciej.fijalkowski@intel.com> wrote:
+On 05.02.2024 15:30, Sagi Maimon wrote:
+> Adding support for the Adva timecard.
+> The card uses different drivers to provide access to the
+> firmware SPI flash (Altera based).
+> Other parts of the code are the same and could be reused.
+> 
+> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
+> ---
+>   Changes since version 5:
+>   - set Adva fw_tag = 3, since other tags are for other vendors.
+>   
+>   drivers/ptp/ptp_ocp.c | 302 ++++++++++++++++++++++++++++++++++++++++--
+>   1 file changed, 293 insertions(+), 9 deletions(-)
 >
-> On Wed, Feb 07, 2024 at 05:49:47PM +0200, Pavel Vazharov wrote:
-> > On Mon, Feb 5, 2024 at 9:07=E2=80=AFAM Magnus Karlsson
-> > <magnus.karlsson@gmail.com> wrote:
-> > >
-> > > On Tue, 30 Jan 2024 at 15:54, Toke H=C3=B8iland-J=C3=B8rgensen <toke@=
-kernel.org> wrote:
-> > > >
-> > > > Pavel Vazharov <pavel@x3me.net> writes:
-> > > >
-> > > > > On Tue, Jan 30, 2024 at 4:32=E2=80=AFPM Toke H=C3=B8iland-J=C3=B8=
-rgensen <toke@kernel.org> wrote:
-> > > > >>
-> > > > >> Pavel Vazharov <pavel@x3me.net> writes:
-> > > > >>
-> > > > >> >> On Sat, Jan 27, 2024 at 7:08=E2=80=AFAM Pavel Vazharov <pavel=
-@x3me.net> wrote:
-> > > > >> >>>
-> > > > >> >>> On Sat, Jan 27, 2024 at 6:39=E2=80=AFAM Jakub Kicinski <kuba=
-@kernel.org> wrote:
-> > > > >> >>> >
-> > > > >> >>> > On Sat, 27 Jan 2024 05:58:55 +0200 Pavel Vazharov wrote:
-> > > > >> >>> > > > Well, it will be up to your application to ensure that=
- it is not. The
-> > > > >> >>> > > > XDP program will run before the stack sees the LACP ma=
-nagement traffic,
-> > > > >> >>> > > > so you will have to take some measure to ensure that a=
-ny such management
-> > > > >> >>> > > > traffic gets routed to the stack instead of to the DPD=
-K application. My
-> > > > >> >>> > > > immediate guess would be that this is the cause of tho=
-se warnings?
-> > > > >> >>> > >
-> > > > >> >>> > > Thank you for the response.
-> > > > >> >>> > > I already checked the XDP program.
-> > > > >> >>> > > It redirects particular pools of IPv4 (TCP or UDP) traff=
-ic to the application.
-> > > > >> >>> > > Everything else is passed to the Linux kernel.
-> > > > >> >>> > > However, I'll check it again. Just to be sure.
-> > > > >> >>> >
-> > > > >> >>> > What device driver are you using, if you don't mind sharin=
-g?
-> > > > >> >>> > The pass thru code path may be much less well tested in AF=
-_XDP
-> > > > >> >>> > drivers.
-> > > > >> >>> These are the kernel version and the drivers for the 3 ports=
- in the
-> > > > >> >>> above bonding.
-> > > > >> >>> ~# uname -a
-> > > > >> >>> Linux 6.3.2 #1 SMP Wed May 17 08:17:50 UTC 2023 x86_64 GNU/L=
-inux
-> > > > >> >>> ~# lspci -v | grep -A 16 -e 1b:00.0 -e 3b:00.0 -e 5e:00.0
-> > > > >> >>> 1b:00.0 Ethernet controller: Intel Corporation 82599ES 10-Gi=
-gabit
-> > > > >> >>> SFI/SFP+ Network Connection (rev 01)
-> > > > >> >>>        ...
-> > > > >> >>>         Kernel driver in use: ixgbe
-> > > > >> >>> --
-> > > > >> >>> 3b:00.0 Ethernet controller: Intel Corporation 82599ES 10-Gi=
-gabit
-> > > > >> >>> SFI/SFP+ Network Connection (rev 01)
-> > > > >> >>>         ...
-> > > > >> >>>         Kernel driver in use: ixgbe
-> > > > >> >>> --
-> > > > >> >>> 5e:00.0 Ethernet controller: Intel Corporation 82599ES 10-Gi=
-gabit
-> > > > >> >>> SFI/SFP+ Network Connection (rev 01)
-> > > > >> >>>         ...
-> > > > >> >>>         Kernel driver in use: ixgbe
-> > > > >> >>>
-> > > > >> >>> I think they should be well supported, right?
-> > > > >> >>> So far, it seems that the present usage scenario should work=
- and the
-> > > > >> >>> problem is somewhere in my code.
-> > > > >> >>> I'll double check it again and try to simplify everything in=
- order to
-> > > > >> >>> pinpoint the problem.
-> > > > >> > I've managed to pinpoint that forcing the copying of the packe=
-ts
-> > > > >> > between the kernel and the user space
-> > > > >> > (XDP_COPY) fixes the issue with the malformed LACPDUs and the =
-not
-> > > > >> > working bonding.
-> > > > >>
-> > > > >> (+Magnus)
-> > > > >>
-> > > > >> Right, okay, that seems to suggest a bug in the internal kernel =
-copying
-> > > > >> that happens on XDP_PASS in zero-copy mode. Which would be a dri=
-ver bug;
-> > > > >> any chance you could test with a different driver and see if the=
- same
-> > > > >> issue appears there?
-> > > > >>
-> > > > >> -Toke
-> > > > > No, sorry.
-> > > > > We have only servers with Intel 82599ES with ixgbe drivers.
-> > > > > And one lab machine with Intel 82540EM with igb driver but we can=
-'t
-> > > > > set up bonding there
-> > > > > and the problem is not reproducible there.
-> > > >
-> > > > Right, okay. Another thing that may be of some use is to try to cap=
-ture
-> > > > the packets on the physical devices using tcpdump. That should (I t=
-hink)
-> > > > show you the LACDPU packets as they come in, before they hit the bo=
-nding
-> > > > device, but after they are copied from the XDP frame. If it's a pac=
-ket
-> > > > corruption issue, that should be visible in the captured packet; yo=
-u can
-> > > > compare with an xdpdump capture to see if there are any differences=
-...
-> > >
-> > > Pavel,
-> > >
-> > > Sounds like an issue with the driver in zero-copy mode as it works
-> > > fine in copy mode. Maciej and I will take a look at it.
-> > >
-> > > > -Toke
-> > > >
-> >
-> > First I want to apologize for not responding for such a long time.
-> > I had different tasks the previous week and this week went back to this=
- issue.
-> > I had to modify the code of the af_xdp driver inside the DPDK so that i=
-t loads
-> > the XDP program in a way which is compatible with the xdp-dispatcher.
-> > Finally, I was able to run our application with the XDP sockets and the=
- xdpdump
-> > at the same time.
-> >
-> > Back to the issue.
-> > I just want to say again that we are not binding the XDP sockets to
-> > the bonding device.
-> > We are binding the sockets to the queues of the physical interfaces
-> > "below" the bonding device.
-> > My further observation this time is that when the issue happens and
-> > the remote device reports
-> > the LACP error there is no incoming LACP traffic on the corresponding
-> > local port,
-> > as seen by the xdump.
-> > The tcpdump at the same time sees only outgoing LACP packets and
-> > nothing incoming.
-> > For example:
-> > Remote device
-> >                           Local Server
-> > TrunkName=3DEth-Trunk20, PortName=3DXGigabitEthernet0/0/12 <---> eth0
-> > TrunkName=3DEth-Trunk20, PortName=3DXGigabitEthernet0/0/13 <---> eth2
-> > TrunkName=3DEth-Trunk20, PortName=3DXGigabitEthernet0/0/14 <---> eth4
-> > And when the remote device reports "received an abnormal LACPDU"
-> > for PortName=3DXGigabitEthernet0/0/14 I can see via xdpdump that there
-> > is no incoming LACP traffic
->
-> Hey Pavel,
->
-> can you also look at /proc/interrupts at eth4 and what ethtool -S shows
-> there?
-I reproduced the problem but this time the interface with the weird
-state was eth0.
-It's different every time and sometimes even two of the interfaces are
-in such a state.
-Here are the requested info while being in this state:
-~# ethtool -S eth0 > /tmp/stats0.txt ; sleep 10 ; ethtool -S eth0 >
-/tmp/stats1.txt ; diff /tmp/stats0.txt /tmp/stats1.txt
-6c6
-<      rx_pkts_nic: 81426
----
->      rx_pkts_nic: 81436
-8c8
-<      rx_bytes_nic: 10286521
----
->      rx_bytes_nic: 10287801
-17c17
-<      multicast: 72216
----
->      multicast: 72226
-48c48
-<      rx_no_dma_resources: 1109
----
->      rx_no_dma_resources: 1119
 
-~# cat /proc/interrupts | grep eth0 > /tmp/interrupts0.txt ; sleep 10
-; cat /proc/interrupts | grep eth0 > /tmp/interrupts1.txt
-interrupts0: 430 3098 64 108199 108199 108199 108199 108199 108199
-108199 108201 63 64 1865 108199  61
-interrupts1: 435 3103 69 117967 117967  117967 117967 117967  117967
-117967 117969 68 69 1870  117967 66
+Looks good, thanks!
 
-So, it seems that packets are coming on the interface but they don't
-reach to the XDP layer and deeper.
-rx_no_dma_resources - this counter seems to give clues about a possible iss=
-ue?
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
->
-> > on eth4 but there is incoming LACP traffic on eth0 and eth2.
-> > At the same time, according to the dmesg the kernel sees all of the
-> > interfaces as
-> > "link status definitely up, 10000 Mbps full duplex".
-> > The issue goes aways if I stop the application even without removing
-> > the XDP programs
-> > from the interfaces - the running xdpdump starts showing the incoming
-> > LACP traffic immediately.
-> > The issue also goes away if I do "ip link set down eth4 && ip link set =
-up eth4".
->
-> and the setup is what when doing the link flap? XDP progs are loaded to
-> each of the 3 interfaces of bond?
-Yes, the same XDP program is loaded on application startup on each one
-of the interfaces which are part of bond0 (eth0, eth2, eth4):
-# xdp-loader status
-CURRENT XDP PROGRAM STATUS:
 
-Interface        Prio  Program name      Mode     ID   Tag
-  Chain actions
----------------------------------------------------------------------------=
------------
-lo                     <No XDP program loaded!>
-eth0                   xdp_dispatcher    native   1320 90f686eb86991928
- =3D>              50     x3sp_splitter_func          1329
-3b185187f1855c4c  XDP_PASS
-eth1                   <No XDP program loaded!>
-eth2                   xdp_dispatcher    native   1334 90f686eb86991928
- =3D>              50     x3sp_splitter_func          1337
-3b185187f1855c4c  XDP_PASS
-eth3                   <No XDP program loaded!>
-eth4                   xdp_dispatcher    native   1342 90f686eb86991928
- =3D>              50     x3sp_splitter_func          1345
-3b185187f1855c4c  XDP_PASS
-eth5                   <No XDP program loaded!>
-eth6                   <No XDP program loaded!>
-eth7                   <No XDP program loaded!>
-bond0                  <No XDP program loaded!>
-Each of these interfaces is setup to have 16 queues i.e. the application,
-through the DPDK machinery, opens 3x16 XSK sockets each bound to the
-corresponding queue of the corresponding interface.
-~# ethtool -l eth0 # It's same for the other 2 devices
-Channel parameters for eth0:
-Pre-set maximums:
-RX:             n/a
-TX:             n/a
-Other:          1
-Combined:       48
-Current hardware settings:
-RX:             n/a
-TX:             n/a
-Other:          1
-Combined:       16
+> diff --git a/drivers/ptp/ptp_ocp.c b/drivers/ptp/ptp_ocp.c
+> index 9507681e0d12..6506cfb89aa9 100644
+> --- a/drivers/ptp/ptp_ocp.c
+> +++ b/drivers/ptp/ptp_ocp.c
+> @@ -34,6 +34,9 @@
+>   #define PCI_VENDOR_ID_OROLIA			0x1ad7
+>   #define PCI_DEVICE_ID_OROLIA_ARTCARD		0xa000
+>   
+> +#define PCI_VENDOR_ID_ADVA			0xad5a
+> +#define PCI_DEVICE_ID_ADVA_TIMECARD		0x0400
+> +
+>   static struct class timecard_class = {
+>   	.name		= "timecard",
+>   };
+> @@ -63,6 +66,13 @@ struct ocp_reg {
+>   	u32	status_drift;
+>   };
+>   
+> +struct ptp_ocp_servo_conf {
+> +	u32	servo_offset_p;
+> +	u32	servo_offset_i;
+> +	u32	servo_drift_p;
+> +	u32	servo_drift_i;
+> +};
+> +
+>   #define OCP_CTRL_ENABLE		BIT(0)
+>   #define OCP_CTRL_ADJUST_TIME	BIT(1)
+>   #define OCP_CTRL_ADJUST_OFFSET	BIT(2)
+> @@ -397,10 +407,14 @@ static int ptp_ocp_sma_store(struct ptp_ocp *bp, const char *buf, int sma_nr);
+>   
+>   static int ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r);
+>   
+> +static int ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r);
+> +
+>   static const struct ocp_attr_group fb_timecard_groups[];
+>   
+>   static const struct ocp_attr_group art_timecard_groups[];
+>   
+> +static const struct ocp_attr_group adva_timecard_groups[];
+> +
+>   struct ptp_ocp_eeprom_map {
+>   	u16	off;
+>   	u16	len;
+> @@ -700,6 +714,12 @@ static struct ocp_resource ocp_fb_resource[] = {
+>   	},
+>   	{
+>   		.setup = ptp_ocp_fb_board_init,
+> +		.extra = &(struct ptp_ocp_servo_conf) {
+> +			.servo_offset_p = 0x2000,
+> +			.servo_offset_i = 0x1000,
+> +			.servo_drift_p = 0,
+> +			.servo_drift_i = 0,
+> +		},
+>   	},
+>   	{ }
+>   };
+> @@ -831,6 +851,170 @@ static struct ocp_resource ocp_art_resource[] = {
+>   	},
+>   	{
+>   		.setup = ptp_ocp_art_board_init,
+> +		.extra = &(struct ptp_ocp_servo_conf) {
+> +			.servo_offset_p = 0x2000,
+> +			.servo_offset_i = 0x1000,
+> +			.servo_drift_p = 0,
+> +			.servo_drift_i = 0,
+> +		},
+> +	},
+> +	{ }
+> +};
+> +
+> +static struct ocp_resource ocp_adva_resource[] = {
+> +	{
+> +		OCP_MEM_RESOURCE(reg),
+> +		.offset = 0x01000000, .size = 0x10000,
+> +	},
+> +	{
+> +		OCP_EXT_RESOURCE(ts0),
+> +		.offset = 0x01010000, .size = 0x10000, .irq_vec = 1,
+> +		.extra = &(struct ptp_ocp_ext_info) {
+> +			.index = 0,
+> +			.irq_fcn = ptp_ocp_ts_irq,
+> +			.enable = ptp_ocp_ts_enable,
+> +		},
+> +	},
+> +	{
+> +		OCP_EXT_RESOURCE(ts1),
+> +		.offset = 0x01020000, .size = 0x10000, .irq_vec = 2,
+> +		.extra = &(struct ptp_ocp_ext_info) {
+> +			.index = 1,
+> +			.irq_fcn = ptp_ocp_ts_irq,
+> +			.enable = ptp_ocp_ts_enable,
+> +		},
+> +	},
+> +	{
+> +		OCP_EXT_RESOURCE(ts2),
+> +		.offset = 0x01060000, .size = 0x10000, .irq_vec = 6,
+> +		.extra = &(struct ptp_ocp_ext_info) {
+> +			.index = 2,
+> +			.irq_fcn = ptp_ocp_ts_irq,
+> +			.enable = ptp_ocp_ts_enable,
+> +		},
+> +	},
+> +	/* Timestamp for PHC and/or PPS generator */
+> +	{
+> +		OCP_EXT_RESOURCE(pps),
+> +		.offset = 0x010C0000, .size = 0x10000, .irq_vec = 0,
+> +		.extra = &(struct ptp_ocp_ext_info) {
+> +			.index = 5,
+> +			.irq_fcn = ptp_ocp_ts_irq,
+> +			.enable = ptp_ocp_ts_enable,
+> +		},
+> +	},
+> +	{
+> +		OCP_EXT_RESOURCE(signal_out[0]),
+> +		.offset = 0x010D0000, .size = 0x10000, .irq_vec = 11,
+> +		.extra = &(struct ptp_ocp_ext_info) {
+> +			.index = 1,
+> +			.irq_fcn = ptp_ocp_signal_irq,
+> +			.enable = ptp_ocp_signal_enable,
+> +		},
+> +	},
+> +	{
+> +		OCP_EXT_RESOURCE(signal_out[1]),
+> +		.offset = 0x010E0000, .size = 0x10000, .irq_vec = 12,
+> +		.extra = &(struct ptp_ocp_ext_info) {
+> +			.index = 2,
+> +			.irq_fcn = ptp_ocp_signal_irq,
+> +			.enable = ptp_ocp_signal_enable,
+> +		},
+> +	},
+> +	{
+> +		OCP_MEM_RESOURCE(pps_to_ext),
+> +		.offset = 0x01030000, .size = 0x10000,
+> +	},
+> +	{
+> +		OCP_MEM_RESOURCE(pps_to_clk),
+> +		.offset = 0x01040000, .size = 0x10000,
+> +	},
+> +	{
+> +		OCP_MEM_RESOURCE(tod),
+> +		.offset = 0x01050000, .size = 0x10000,
+> +	},
+> +	{
+> +		OCP_MEM_RESOURCE(image),
+> +		.offset = 0x00020000, .size = 0x1000,
+> +	},
+> +	{
+> +		OCP_MEM_RESOURCE(pps_select),
+> +		.offset = 0x00130000, .size = 0x1000,
+> +	},
+> +	{
+> +		OCP_MEM_RESOURCE(sma_map1),
+> +		.offset = 0x00140000, .size = 0x1000,
+> +	},
+> +	{
+> +		OCP_MEM_RESOURCE(sma_map2),
+> +		.offset = 0x00220000, .size = 0x1000,
+> +	},
+> +	{
+> +		OCP_SERIAL_RESOURCE(gnss_port),
+> +		.offset = 0x00160000 + 0x1000, .irq_vec = 3,
+> +		.extra = &(struct ptp_ocp_serial_port) {
+> +			.baud = 9600,
+> +		},
+> +	},
+> +	{
+> +		OCP_SERIAL_RESOURCE(mac_port),
+> +		.offset = 0x00180000 + 0x1000, .irq_vec = 5,
+> +		.extra = &(struct ptp_ocp_serial_port) {
+> +			.baud = 115200,
+> +		},
+> +	},
+> +	{
+> +		OCP_MEM_RESOURCE(freq_in[0]),
+> +		.offset = 0x01200000, .size = 0x10000,
+> +	},
+> +	{
+> +		OCP_MEM_RESOURCE(freq_in[1]),
+> +		.offset = 0x01210000, .size = 0x10000,
+> +	},
+> +	{
+> +		OCP_SPI_RESOURCE(spi_flash),
+> +		.offset = 0x00310400, .size = 0x10000, .irq_vec = 9,
+> +		.extra = &(struct ptp_ocp_flash_info) {
+> +			.name = "spi_altera", .pci_offset = 0,
+> +			.data_size = sizeof(struct altera_spi_platform_data),
+> +			.data = &(struct altera_spi_platform_data) {
+> +				.num_chipselect = 1,
+> +				.num_devices = 1,
+> +				.devices = &(struct spi_board_info) {
+> +					.modalias = "spi-nor",
+> +				},
+> +			},
+> +		},
+> +	},
+> +	{
+> +		OCP_I2C_RESOURCE(i2c_ctrl),
+> +		.offset = 0x150000, .size = 0x100, .irq_vec = 7,
+> +		.extra = &(struct ptp_ocp_i2c_info) {
+> +			.name = "ocores-i2c",
+> +			.fixed_rate = 50000000,
+> +			.data_size = sizeof(struct ocores_i2c_platform_data),
+> +			.data = &(struct ocores_i2c_platform_data) {
+> +				.clock_khz = 50000,
+> +				.bus_khz = 100,
+> +				.reg_io_width = 4, // 32-bit/4-byte
+> +				.reg_shift = 2, // 32-bit addressing
+> +				.num_devices = 2,
+> +				.devices = (struct i2c_board_info[]) {
+> +					{ I2C_BOARD_INFO("24c02", 0x50) },
+> +					{ I2C_BOARD_INFO("24mac402", 0x58),
+> +					 .platform_data = "mac" },
+> +				},
+> +			},
+> +		},
+> +	},
+> +	{
+> +		.setup = ptp_ocp_adva_board_init,
+> +		.extra = &(struct ptp_ocp_servo_conf) {
+> +			.servo_offset_p = 0xc000,
+> +			.servo_offset_i = 0x1000,
+> +			.servo_drift_p = 0,
+> +			.servo_drift_i = 0,
+> +		},
+>   	},
+>   	{ }
+>   };
+> @@ -839,6 +1023,7 @@ static const struct pci_device_id ptp_ocp_pcidev_id[] = {
+>   	{ PCI_DEVICE_DATA(FACEBOOK, TIMECARD, &ocp_fb_resource) },
+>   	{ PCI_DEVICE_DATA(CELESTICA, TIMECARD, &ocp_fb_resource) },
+>   	{ PCI_DEVICE_DATA(OROLIA, ARTCARD, &ocp_art_resource) },
+> +	{ PCI_DEVICE_DATA(ADVA, TIMECARD, &ocp_adva_resource) },
+>   	{ }
+>   };
+>   MODULE_DEVICE_TABLE(pci, ptp_ocp_pcidev_id);
+> @@ -917,6 +1102,30 @@ static const struct ocp_selector ptp_ocp_art_sma_out[] = {
+>   	{ }
+>   };
+>   
+> +static const struct ocp_selector ptp_ocp_adva_sma_in[] = {
+> +	{ .name = "10Mhz",	.value = 0x0000,      .frequency = 10000000},
+> +	{ .name = "PPS1",	.value = 0x0001,      .frequency = 1 },
+> +	{ .name = "PPS2",	.value = 0x0002,      .frequency = 1 },
+> +	{ .name = "TS1",	.value = 0x0004,      .frequency = 0 },
+> +	{ .name = "TS2",	.value = 0x0008,      .frequency = 0 },
+> +	{ .name = "FREQ1",	.value = 0x0100,      .frequency = 0 },
+> +	{ .name = "FREQ2",	.value = 0x0200,      .frequency = 0 },
+> +	{ .name = "None",	.value = SMA_DISABLE, .frequency = 0 },
+> +	{ }
+> +};
+> +
+> +static const struct ocp_selector ptp_ocp_adva_sma_out[] = {
+> +	{ .name = "10Mhz",	.value = 0x0000,  .frequency = 10000000},
+> +	{ .name = "PHC",	.value = 0x0001,  .frequency = 1 },
+> +	{ .name = "MAC",	.value = 0x0002,  .frequency = 1 },
+> +	{ .name = "GNSS1",	.value = 0x0004,  .frequency = 1 },
+> +	{ .name = "GEN1",	.value = 0x0040 },
+> +	{ .name = "GEN2",	.value = 0x0080 },
+> +	{ .name = "GND",	.value = 0x2000 },
+> +	{ .name = "VCC",	.value = 0x4000 },
+> +	{ }
+> +};
+> +
+>   struct ocp_sma_op {
+>   	const struct ocp_selector *tbl[2];
+>   	void (*init)(struct ptp_ocp *bp);
+> @@ -1363,7 +1572,7 @@ ptp_ocp_estimate_pci_timing(struct ptp_ocp *bp)
+>   }
+>   
+>   static int
+> -ptp_ocp_init_clock(struct ptp_ocp *bp)
+> +ptp_ocp_init_clock(struct ptp_ocp *bp, struct ptp_ocp_servo_conf *servo_conf)
+>   {
+>   	struct timespec64 ts;
+>   	u32 ctrl;
+> @@ -1371,12 +1580,11 @@ ptp_ocp_init_clock(struct ptp_ocp *bp)
+>   	ctrl = OCP_CTRL_ENABLE;
+>   	iowrite32(ctrl, &bp->reg->ctrl);
+>   
+> -	/* NO DRIFT Correction */
+> -	/* offset_p:i 1/8, offset_i: 1/16, drift_p: 0, drift_i: 0 */
+> -	iowrite32(0x2000, &bp->reg->servo_offset_p);
+> -	iowrite32(0x1000, &bp->reg->servo_offset_i);
+> -	iowrite32(0,	  &bp->reg->servo_drift_p);
+> -	iowrite32(0,	  &bp->reg->servo_drift_i);
+> +	/* servo configuration */
+> +	iowrite32(servo_conf->servo_offset_p, &bp->reg->servo_offset_p);
+> +	iowrite32(servo_conf->servo_offset_i, &bp->reg->servo_offset_i);
+> +	iowrite32(servo_conf->servo_drift_p, &bp->reg->servo_drift_p);
+> +	iowrite32(servo_conf->servo_drift_p, &bp->reg->servo_drift_i);
+>   
+>   	/* latch servo values */
+>   	ctrl |= OCP_CTRL_ADJUST_SERVO;
+> @@ -2348,6 +2556,14 @@ static const struct ocp_sma_op ocp_fb_sma_op = {
+>   	.set_output	= ptp_ocp_sma_fb_set_output,
+>   };
+>   
+> +static const struct ocp_sma_op ocp_adva_sma_op = {
+> +	.tbl		= { ptp_ocp_adva_sma_in, ptp_ocp_adva_sma_out },
+> +	.init		= ptp_ocp_sma_fb_init,
+> +	.get		= ptp_ocp_sma_fb_get,
+> +	.set_inputs	= ptp_ocp_sma_fb_set_inputs,
+> +	.set_output	= ptp_ocp_sma_fb_set_output,
+> +};
+> +
+>   static int
+>   ptp_ocp_set_pins(struct ptp_ocp *bp)
+>   {
+> @@ -2427,7 +2643,7 @@ ptp_ocp_fb_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+>   		return err;
+>   	ptp_ocp_sma_init(bp);
+>   
+> -	return ptp_ocp_init_clock(bp);
+> +	return ptp_ocp_init_clock(bp, r->extra);
+>   }
+>   
+>   static bool
+> @@ -2589,7 +2805,44 @@ ptp_ocp_art_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+>   	if (err)
+>   		return err;
+>   
+> -	return ptp_ocp_init_clock(bp);
+> +	return ptp_ocp_init_clock(bp, r->extra);
+> +}
+> +
+> +/* ADVA specific board initializers; last "resource" registered. */
+> +static int
+> +ptp_ocp_adva_board_init(struct ptp_ocp *bp, struct ocp_resource *r)
+> +{
+> +	int err;
+> +	u32 version;
+> +
+> +	bp->flash_start = 0xA00000;
+> +	bp->eeprom_map = fb_eeprom_map;
+> +	bp->sma_op = &ocp_adva_sma_op;
+> +
+> +	version = ioread32(&bp->image->version);
+> +	/* if lower 16 bits are empty, this is the fw loader. */
+> +	if ((version & 0xffff) == 0) {
+> +		version = version >> 16;
+> +		bp->fw_loader = true;
+> +	}
+> +	bp->fw_tag = 3;
+> +	bp->fw_version = version & 0xffff;
+> +	bp->fw_cap = OCP_CAP_BASIC | OCP_CAP_SIGNAL | OCP_CAP_FREQ;
+> +
+> +	ptp_ocp_tod_init(bp);
+> +	ptp_ocp_nmea_out_init(bp);
+> +	ptp_ocp_signal_init(bp);
+> +
+> +	err = ptp_ocp_attr_group_add(bp, adva_timecard_groups);
+> +	if (err)
+> +		return err;
+> +
+> +	err = ptp_ocp_set_pins(bp);
+> +	if (err)
+> +		return err;
+> +	ptp_ocp_sma_init(bp);
+> +
+> +	return ptp_ocp_init_clock(bp, r->extra);
+>   }
+>   
+>   static ssize_t
+> @@ -3564,6 +3817,37 @@ static const struct ocp_attr_group art_timecard_groups[] = {
+>   	{ },
+>   };
+>   
+> +static struct attribute *adva_timecard_attrs[] = {
+> +	&dev_attr_serialnum.attr,
+> +	&dev_attr_gnss_sync.attr,
+> +	&dev_attr_clock_source.attr,
+> +	&dev_attr_available_clock_sources.attr,
+> +	&dev_attr_sma1.attr,
+> +	&dev_attr_sma2.attr,
+> +	&dev_attr_sma3.attr,
+> +	&dev_attr_sma4.attr,
+> +	&dev_attr_available_sma_inputs.attr,
+> +	&dev_attr_available_sma_outputs.attr,
+> +	&dev_attr_clock_status_drift.attr,
+> +	&dev_attr_clock_status_offset.attr,
+> +	&dev_attr_ts_window_adjust.attr,
+> +	&dev_attr_tod_correction.attr,
+> +	NULL,
+> +};
+> +
+> +static const struct attribute_group adva_timecard_group = {
+> +	.attrs = adva_timecard_attrs,
+> +};
+> +
+> +static const struct ocp_attr_group adva_timecard_groups[] = {
+> +	{ .cap = OCP_CAP_BASIC,	    .group = &adva_timecard_group },
+> +	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal0_group },
+> +	{ .cap = OCP_CAP_SIGNAL,    .group = &fb_timecard_signal1_group },
+> +	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq0_group },
+> +	{ .cap = OCP_CAP_FREQ,	    .group = &fb_timecard_freq1_group },
+> +	{ },
+> +};
+> +
+>   static void
+>   gpio_input_map(char *buf, struct ptp_ocp *bp, u16 map[][2], u16 bit,
+>   	       const char *def)
 
->
-> > However, I'm not sure what happens with the bound XDP sockets in this c=
-ase
-> > because I haven't tested further.
->
-> can you also try to bind xsk sockets before attaching XDP progs?
-I looked into the DPDK code again.
-The DPDK framework provides callback hooks like eth_rx_queue_setup
-and each "driver" implements it as needed. Each Rx/Tx queue of the device i=
-s
-set up separately. The af_xdp driver currently does this for each Rx
-queue separately:
-1. configures the umem for the queue
-2. loads the XDP program on the corresponding interface, if not already loa=
-ded
-   (i.e. this happens only once per interface when its first queue is set u=
-p).
-3. does xsk_socket__create which as far as I looked also internally binds t=
-he
-socket to the given queue
-4. places the socket in the XSKS map of the XDP program via bpf_map_update_=
-elem
-
-So, it seems to me that the change needed will be a bit more involved.
-I'm not sure if it'll be possible to hardcode, just for the test, the
-program loading and
-the placing of all XSK sockets in the map to happen when the setup of the l=
-ast
-"queue" for the given interface is done. I need to think a bit more about t=
-his.
-
->
-> >
-> > It seems to me that something racy happens when the interfaces go down
-> > and back up
-> > (visible in the dmesg) when the XDP sockets are bound to their queues.
-> > I mean, I'm not sure why the interfaces go down and up but setting
-> > only the XDP programs
-> > on the interfaces doesn't cause this behavior. So, I assume it's
-> > caused by the binding of the XDP sockets.
->
-> hmm i'm lost here, above you said you got no incoming traffic on eth4 eve=
-n
-> without xsk sockets being bound?
-Probably I've phrased something in a wrong way.
-The issue is not observed if I load the XDP program on all interfaces
-(eth0, eth2, eth4)
-with the xdp-loader:
-xdp-loader load --mode native <iface> <path-to-the-xdp-program>
-It's not observed probably because there are no interface down/up actions.
-I also modified the DPDK "driver" to not remove the XDP program on exit and=
- thus
-when the application stops only the XSK sockets are closed but the
-program remains
-loaded at the interfaces. When I stop this version of the application
-while running the
-xdpdump at the same time I see that the traffic immediately appears in
-the xdpdump.
-Also, note that I basically trimmed the XDP program to simply contain
-the XSK map
-(BPF_MAP_TYPE_XSKMAP) and the function just does "return XDP_PASS;".
-I wanted to exclude every possibility for the XDP program to do something w=
-rong.
-So, from the above it seems to me that the issue is triggered somehow by th=
-e XSK
-sockets usage.
-
->
-> > It could be that the issue is not related to the XDP sockets but just
-> > to the down/up actions of the interfaces.
-> > On the other hand, I'm not sure why the issue is easily reproducible
-> > when the zero copy mode is enabled
-> > (4 out of 5 tests reproduced the issue).
-> > However, when the zero copy is disabled this issue doesn't happen
-> > (I tried 10 times in a row and it doesn't happen).
->
-> any chances that you could rule out the bond of the picture of this issue=
-?
-I'll need to talk to the network support guys because they manage the netwo=
-rk
-devices and they'll need to change the LACP/Trunk setup of the above
-"remote device".
-I can't promise that they'll agree though.
-
-> on my side i'll try to play with multiple xsk sockets within same netdev
-> served by ixgbe and see if i observe something broken. I recently fixed
-> i40e Tx disable timeout issue, so maybe ixgbe has something off in down/u=
-p
-> actions as you state as well.
 
