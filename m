@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-70077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D1FA84D92E
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 04:54:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F095D84D92F
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 04:54:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A08D283B2E
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 03:54:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B6ED1F22BA5
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 03:54:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 310961F61F;
-	Thu,  8 Feb 2024 03:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54FEF2C195;
+	Thu,  8 Feb 2024 03:54:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aj07s1m7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ccx4hOvC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CCFF2C1A2
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 03:54:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31D4A2C6B0
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 03:54:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707364448; cv=none; b=VJ5/Ri6XRrjkLG0sXB2WsFIle36tBB+dwPiCcB5z+FH9SGlb/rCNLomMk8inSRPAuPTysBBujSNS04lGu1iNtZdpMV8ZhrpUsHm1zHsoTGMP1oeWTuLyjqylY4X/56Hfti6it1EZzBPw9OiZkeaSUOyzwrH5lDjPBPWgd/veyMo=
+	t=1707364449; cv=none; b=WQmWu223gbDmxeBl62x/tehTkp6iwxStwRr3+G3SM/qIoiUbSsAJmB4moGzCehhbQWUh0ahlY5qNUAyu7hsAkYqcHWr8PxQcHN5+mNOmXC03UvB/X7KFzSDt+kNrLiC9ImApnWsX8I447OOw0zlFo0j7YsZJ/Jn83X5adcxWb8w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707364448; c=relaxed/simple;
-	bh=qX45WS31FDqtKiQnMD0KbrePdnVMx9yzO11AsjVnctw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jf7CQ6HHRxdWR9QgsUj5/VT4QtAKV1HwKjffo5UtnsEnZUA9P86njH43n/tdh5SzNhTWLuTrNsWDsnIrZd7eNSPrcllDDuwrmSTic8pujluXA9uIFd3Zw3jhWtvTIUL63eELTp2jNJYWhgbRuW5q6nge64ZEm+Ke3l2Iqp0kgu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aj07s1m7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6B62CC433C7;
-	Thu,  8 Feb 2024 03:54:07 +0000 (UTC)
+	s=arc-20240116; t=1707364449; c=relaxed/simple;
+	bh=/AMKKmVOpLVP1UGwV9ohySO6Y6AM9QwsGNUtyANxEw0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=BlFdJka4BWU8U9Y6CiuI40SCVnXp5eo8q43UHZr5gejG/A1hjuAV4LmEyhJf1KRC+xfuReQeXcQdBDvyB1uRv8OXNoSueNKMRH9wL6kjGsECZqLiK6ITXp+LUzIz77uiPlDCYzRsBlMg1bQDK3352FD24JwXymIKB3JzRuEk7LQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ccx4hOvC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8150FC433F1;
+	Thu,  8 Feb 2024 03:54:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707364447;
-	bh=qX45WS31FDqtKiQnMD0KbrePdnVMx9yzO11AsjVnctw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=aj07s1m7+vyW1teDyK547ekeN5Jdkj2yoTX0/OjjYuGgYmRjUznuWXQ+6H7jH1bYN
-	 zltl+PVaB3YHmsINnz0FA0q+2jVUWS+JFNDb/Hr3Gx2IVDnmDzGcKP+tc+zQSYfcyo
-	 8LFGcNetOx33aSNVfn3QC8DgXxyX7TSnv+SXrb5RY0ffH/e5TPPn+YzMCjyr9yl2x0
-	 ahlkmVdl3NAyQLmNAKvuiJQ4AXD3TWvYxzwEwQS5nwoS1MdlTYrgiIEHa2jPXgIPPZ
-	 spdITGhkhqhXvADiRik3KIGRxOMRKmnDqBBj7Fv4OPe3rWTvAgzOpZ15+D6IIw9fee
-	 4DptkGweRA6jg==
+	s=k20201202; t=1707364448;
+	bh=/AMKKmVOpLVP1UGwV9ohySO6Y6AM9QwsGNUtyANxEw0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=ccx4hOvC7A3FEALXpuKWF5J5I2WpNTv7zxUCz4+21zICH3QX/GnqYtWGd0zDQEUnz
+	 6YnjlW+jCL2TR2a6ZjR3u+YS85mGTWl+kOBkAqEeauxOOMvoWOmjodBoCCoTSibGtE
+	 zOuj1/Muj1t4zSwpKWjZjz0clQ5rQqRycpajAhu3Z6afGUbF8UwJepqu42z0djE5xI
+	 e+8acA0NtAeHc/vod2wuPcEe9gnL/H69f4Y/kFmhXlNXMEFMuiH3E9PpEM6QSSbVY4
+	 L11b3sEPDOIVTjdrUi7pGvvvpop92p7sDE9CizVUTrL7xuj160uZGooXg0/IE8MxIu
+	 GKFZ4jhhOFEdg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -50,10 +51,12 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>
-Subject: [pull request][net-next V2 00/15] mlx5 socket direct
-Date: Wed,  7 Feb 2024 19:53:37 -0800
-Message-ID: <20240208035352.387423-1-saeed@kernel.org>
+Subject: [net-next V2 01/15] net/mlx5: Add MPIR bit in mcam_access_reg
+Date: Wed,  7 Feb 2024 19:53:38 -0800
+Message-ID: <20240208035352.387423-2-saeed@kernel.org>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240208035352.387423-1-saeed@kernel.org>
+References: <20240208035352.387423-1-saeed@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,118 +65,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Saeed Mahameed <saeedm@nvidia.com>
+From: Tariq Toukan <tariqt@nvidia.com>
 
-Support Socket-Direct multi-dev netdev.
+Add a cap bit in mcam_access_reg to check for MPIR support.
 
-V1:
-- https://lore.kernel.org/netdev/20231221005721.186607-1-saeed@kernel.org/
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Reviewed-by: Gal Pressman <gal@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+---
+ include/linux/mlx5/mlx5_ifc.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-V2:
-- Add documentation in a new patch.
-- Add debugfs in a new patch.
-- Add mlx5_ifc bit for MPIR cap check and use it before query.
+diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
+index c726f90ab752..8bc35f221ee9 100644
+--- a/include/linux/mlx5/mlx5_ifc.h
++++ b/include/linux/mlx5/mlx5_ifc.h
+@@ -10253,7 +10253,9 @@ struct mlx5_ifc_mcam_access_reg_bits {
+ 	u8         mcqi[0x1];
+ 	u8         mcqs[0x1];
+ 
+-	u8         regs_95_to_87[0x9];
++	u8         regs_95_to_90[0x6];
++	u8         mpir[0x1];
++	u8         regs_88_to_87[0x2];
+ 	u8         mpegc[0x1];
+ 	u8         mtutc[0x1];
+ 	u8         regs_84_to_68[0x11];
+-- 
+2.43.0
 
-For more information please see tag log below.
-
-Please pull and let me know if there is any problem.
-
-Thanks,
-Saeed.
-
-
-The following changes since commit 1701940b1a02addc8fe445538442112e84270b02:
-
-  Merge branch 'tools-net-ynl-add-features-for-tc-family' (2024-01-31 21:19:22 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux.git tags/mlx5-socket-direct-v2
-
-for you to fetch changes up to 1bf74fd7f25345fa46cd8e7c44c0b39c62bea119:
-
-  Documentation: net/mlx5: Add description for Socket-Direct netdev combining (2024-02-01 00:08:06 -0800)
-
-----------------------------------------------------------------
-mlx5-socket-direct-v2
-
-Support Socket-Direct multi-dev netdev
-
-This series adds support for combining multiple devices (PFs) of the
-same port under one netdev instance. Passing traffic through different
-devices belonging to different NUMA sockets saves cross-numa traffic and
-allows apps running on the same netdev from different numas to still
-feel a sense of proximity to the device and acheive improved
-performance.
-
-We acheive this by grouping PFs together, and creating the netdev only
-once all group members are probed. Symmetrically, we destroy the netdev
-once any of the PFs is removed.
-
-The channels are distributed between all devices, a proper configuration
-would utilize the correct close numa when working on a certain app/cpu.
-
-We pick one device to be a primary (leader), and it fills a special
-role.  The other devices (secondaries) are disconnected from the network
-in the chip level (set to silent mode). All RX/TX traffic is steered
-through the primary to/from the secondaries.
-
-Currently, we limit the support to PFs only, and up to two devices
-(sockets).
-
-----------------------------------------------------------------
-Tariq Toukan (15):
-      net/mlx5: Add MPIR bit in mcam_access_reg
-      net/mlx5: SD, Introduce SD lib
-      net/mlx5: SD, Implement basic query and instantiation
-      net/mlx5: SD, Implement devcom communication and primary election
-      net/mlx5: SD, Implement steering for primary and secondaries
-      net/mlx5: SD, Add informative prints in kernel log
-      net/mlx5: SD, Add debugfs
-      net/mlx5e: Create single netdev per SD group
-      net/mlx5e: Create EN core HW resources for all secondary devices
-      net/mlx5e: Let channels be SD-aware
-      net/mlx5e: Support cross-vhca RSS
-      net/mlx5e: Support per-mdev queue counter
-      net/mlx5e: Block TLS device offload on combined SD netdev
-      net/mlx5: Enable SD feature
-      Documentation: net/mlx5: Add description for Socket-Direct netdev combining
-
- .../device_drivers/ethernet/mellanox/mlx5/sd.rst   | 134 ++++++
- drivers/net/ethernet/mellanox/mlx5/core/Makefile   |   2 +-
- drivers/net/ethernet/mellanox/mlx5/core/en.h       |   9 +-
- .../net/ethernet/mellanox/mlx5/core/en/channels.c  |  10 +-
- .../net/ethernet/mellanox/mlx5/core/en/channels.h  |   6 +-
- .../ethernet/mellanox/mlx5/core/en/monitor_stats.c |  48 +-
- .../net/ethernet/mellanox/mlx5/core/en/params.c    |   9 +-
- .../net/ethernet/mellanox/mlx5/core/en/params.h    |   3 -
- drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c   |  12 +-
- drivers/net/ethernet/mellanox/mlx5/core/en/qos.c   |   8 +-
- .../ethernet/mellanox/mlx5/core/en/reporter_rx.c   |   4 +-
- .../ethernet/mellanox/mlx5/core/en/reporter_tx.c   |   3 +-
- drivers/net/ethernet/mellanox/mlx5/core/en/rqt.c   | 123 ++++-
- drivers/net/ethernet/mellanox/mlx5/core/en/rqt.h   |   9 +-
- drivers/net/ethernet/mellanox/mlx5/core/en/rss.c   |  17 +-
- drivers/net/ethernet/mellanox/mlx5/core/en/rss.h   |   4 +-
- .../net/ethernet/mellanox/mlx5/core/en/rx_res.c    |  62 ++-
- .../net/ethernet/mellanox/mlx5/core/en/rx_res.h    |   1 +
- drivers/net/ethernet/mellanox/mlx5/core/en/trap.c  |  11 +-
- .../net/ethernet/mellanox/mlx5/core/en/xsk/pool.c  |   6 +-
- .../net/ethernet/mellanox/mlx5/core/en/xsk/setup.c |   8 +-
- .../ethernet/mellanox/mlx5/core/en_accel/ktls.c    |   2 +-
- .../ethernet/mellanox/mlx5/core/en_accel/ktls.h    |   4 +-
- .../ethernet/mellanox/mlx5/core/en_accel/ktls_rx.c |   6 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c  | 176 +++++--
- drivers/net/ethernet/mellanox/mlx5/core/en_stats.c |  39 +-
- drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |   4 +-
- .../net/ethernet/mellanox/mlx5/core/lib/devcom.h   |   1 +
- drivers/net/ethernet/mellanox/mlx5/core/lib/mlx5.h |  12 +
- drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c   | 524 +++++++++++++++++++++
- drivers/net/ethernet/mellanox/mlx5/core/lib/sd.h   |  38 ++
- include/linux/mlx5/driver.h                        |   1 +
- include/linux/mlx5/mlx5_ifc.h                      |   4 +-
- 33 files changed, 1127 insertions(+), 173 deletions(-)
- create mode 100644 Documentation/networking/device_drivers/ethernet/mellanox/mlx5/sd.rst
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/sd.c
- create mode 100644 drivers/net/ethernet/mellanox/mlx5/core/lib/sd.h
 
