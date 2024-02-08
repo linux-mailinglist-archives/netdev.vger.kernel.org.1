@@ -1,179 +1,269 @@
-Return-Path: <netdev+bounces-70395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71C9084EBC6
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 23:40:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25A1B84EBC7
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 23:41:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FB741C23E89
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 22:40:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A46771F2A1ED
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 22:41:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A87F950271;
-	Thu,  8 Feb 2024 22:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A77350253;
+	Thu,  8 Feb 2024 22:40:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b="Sj1Kx4fC"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="h49ZYYJR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f170.google.com (mail-vk1-f170.google.com [209.85.221.170])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA4BC50255
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 22:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ACC450255
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 22:40:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707432035; cv=none; b=HmdOWPY3nhObLRGE7KzO2YrJuEaEUw4n5eAr+Mr+y235VnvSRkRd9mqY5SFjw29WmtlF5Gm6OIPcjhrNfRLvyTHfAFVyerEDFIu17wZTr4o9+AjFJRcPtf0u77MLCvbqqd4TwuX759pKLHntNl5mBwDEJ8TwHR+WIEFuLr1gvRw=
+	t=1707432040; cv=none; b=iUJEh+FKe6Es3F6UNyTyDBdGy/Ksmy+CL6C31VqQfyzkX3xohVmaFvT7mLXZhnnNHKV4QiNuHocSzmvIHpx0qdAApffuPcjVb6arfSbJwbxn+ETlupnrzf669gYAh01kyq2vFhA8YoQa6JgnFvl4/QNxlJzMfdedBFObgB09j54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707432035; c=relaxed/simple;
-	bh=So4aeRiMyONRzC1FOgNjabmSHvbOX0qgbFWEnNdNiWk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ebKbyQ7tukI/jQcgfVrWL1f82jTWCeSdubmY1xdGgz+XWA6wBUxQ5rKufJxQCSLbrAK2+EhkhBarVtwRMvSg8f5+b7bwpH8lG7gRq9iWlcUXWOhaQ0MwGkVPabpZGgnB7F+OqU7tDj1Fom28tOrBa3cemnHyUDuNGknLiBe4HIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net; spf=pass smtp.mailfrom=amacapital.net; dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b=Sj1Kx4fC; arc=none smtp.client-ip=209.85.221.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amacapital.net
-Received: by mail-vk1-f170.google.com with SMTP id 71dfb90a1353d-4b739b49349so84522e0c.1
-        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 14:40:33 -0800 (PST)
+	s=arc-20240116; t=1707432040; c=relaxed/simple;
+	bh=Z1bQz0sR/8sF+fGRm3k16unqn3qiVVBjHfu9ZS2SXVk=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=rp/iwjFRMXrGrSxMV+Vvspky1MhK//EvFdwG/8J6Btd0yo0ZClovysK7HTAWvnwPnAQxEPx29KZld5xO4MAaaxS+RHb1Yckc5VWxDDzE8oXn4qX1qhlmLsBV8g/AUNJnaaBn27v0JWpKtTvEW9iDmDPekHq4cZb0rWjvOpdXNSU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=h49ZYYJR; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-51171c9f4c0so369622e87.3
+        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 14:40:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20230601.gappssmtp.com; s=20230601; t=1707432032; x=1708036832; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x3lJ5/PEKTBbs3STYt/PCrWknijWDm4oZWwDaq5DHI0=;
-        b=Sj1Kx4fCLh1AfMAU1+io5EU1zwaD58gtoBXVMF1hFAA2ilWSGqoFIwrhoIKeSciZnI
-         Qt+6KlnEOxtsUChjGWlL5N6aN1HgLWsShCl+NEZM89+ZkF8peDw1+oCsQmyfcJjaa6xL
-         2bsgRncNL1vgQNJikbRJ34Ro5ni6+ciFCpKlibukg+06Dczm1B3e9FkyrnkaH2dMO5WG
-         cdD0rMMqlKMvan8FSh+N1pfxOpEO2BceZa8rbL/PDy3oeBV8xWvNgmkUzuhF33XqPzZJ
-         thQ4dfvE/dxv7RuHf+++Nqh5oZYWn3k2Yn4Tfpz13q61S7nEmQgpZdT8z8PNloFhDnk6
-         bC9A==
+        d=linaro.org; s=google; t=1707432036; x=1708036836; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+DMz+clbkBzw5kmOkNiPQdWqo+n21lhmKzZ0h+DrZ60=;
+        b=h49ZYYJREpHrysCPY91alYTC7PfJad7EKMplAA7H+JI3nMi5a/sMaBp8O7/uefWgFV
+         SLppp4NLOLlgjh4AoouiAt0EgaBC0QLDYI9XfAfjD01a2fMz9Hw72RbmBIP4tlKbgcWg
+         Pma5qNRSsT32mnCJRpPERsOJ8uwRDNQK8+2wQjmy1SBdebLEE1rf/Z+lfn3Ng5LjRkXU
+         8ljsV4AIKnB9BUNQo9FkxBaxxUJP1QM7QJ0QBDdWD2gbRWuQeBz9FPqGg8ktMVSzsjI8
+         7MkDaIJTklDrg018yjRi7Rivwc9za3Xpsn8RJ2HiHmueTGVZO2Kl0vEf5IjlX4gDQov/
+         LEnA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707432032; x=1708036832;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x3lJ5/PEKTBbs3STYt/PCrWknijWDm4oZWwDaq5DHI0=;
-        b=KbM3cQHBdREU1b122zbWdsJ7VQre1AsZAamvRaop1okZSdrJh/Dt7eX+HqLg3rXWq6
-         uiGxv/XCKM6VhCCQyYjzGDac930zI6Wa5mbD2CeyLO8NIGJOl0wSw1t1pGJg9ZMQBJaL
-         6M2KajXvvRp4CKxqsN2uOBbxIxdeweuwEMVfY7u+QmzyLsm6+inRIbyADPH28iiXJpTs
-         8OAkpj/lXZvibpR5AUP5teyio6z3giVGccTZ70eJxwh85bP/1oZj5cxHPsrM6zkfOyF7
-         gkMxQfMcXOqys4ZIPCG8L7faGFAUPMaWOwjvOCJugnurM+gQZFrn44vpI8aO40TMaZCP
-         cKNQ==
-X-Gm-Message-State: AOJu0YwWQ+yQkxUYnlky3zoed3w1z4an0GSV+0/8tnDuF33kdkcEiltx
-	IJpEyzq11IyQRMa/bKVbD5xaeE0XplWZWXlmyaA5LrwR9leR9pXQDkRl4TJFfWmzleRmRJBBm35
-	qK6mkRoCcw7hnwRK81pyGOQMLTB/ZXWzbwqJ3
-X-Google-Smtp-Source: AGHT+IHWAboIgDWGtFrvLeIIqUbq2ZeXCrWTEzNavW92E7YiBCEGMwaQV95fRD3i4XbIwNEifp9KksFPBqxzUf041rA=
-X-Received: by 2002:a1f:4c46:0:b0:4c0:292d:193d with SMTP id
- z67-20020a1f4c46000000b004c0292d193dmr1013503vka.12.1707432032515; Thu, 08
- Feb 2024 14:40:32 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707432036; x=1708036836;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+DMz+clbkBzw5kmOkNiPQdWqo+n21lhmKzZ0h+DrZ60=;
+        b=VaHkFELJe5fm5fpXfK5jleaS3nYtVpZPizttyZ9oqMkuX+ricRPFN7LjMNBDQXVENh
+         ytloButa7pVdGbLoVZ+6u8RQeKR3wZ7ePEIkCL0EVQH5/R/ADDr81fXxOzKeV9XblOAP
+         4U75NbKgNpG9Txt6GGUhS954+G8zlP53I9LyDsRNeVLOj37+G7WAWNJj9ZqJaMjnaxUT
+         BAp874u7HwOO0fhWSnlECz7mvmZcpwviv0psS25Ji8Ho5tWn/mlRUlqloOmbnsdGGZf2
+         BdZ/Cw5qhOvEkoGZ/k8HwhIq6/eFjq+1k0dyNLEMrujST2Ank3uN5Cym7R8h4hXEejB7
+         3zqw==
+X-Gm-Message-State: AOJu0YwF/NfC7mbG3KLcrD0dxwyYaIadVVlWvzzUjDLac2SMEVZu23ZY
+	lhnDx9gll4UqxM9MM4ss/1V9imDkKleBuY9cEQDSHVQX/59CT44DDkH/ILCt6yE=
+X-Google-Smtp-Source: AGHT+IFoBM3tLY5z7WB27zNlX9wIwsWV/ahGe0KNK8CD0wKS4NChc9G47lgxgPfwPaD2xhjJsJGtaQ==
+X-Received: by 2002:ac2:4d84:0:b0:511:61ab:406e with SMTP id g4-20020ac24d84000000b0051161ab406emr413745lfe.28.1707432036121;
+        Thu, 08 Feb 2024 14:40:36 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXXuNNa6lLA4f8wORKdX7lRpg3i5L+9fKXIq2Ian8KIddY6qopz+yn6ALiS6CfjbTiVgCafNjJAO8vU7I3Ahw8lHE8PFl5gU6FDluvqsl0tV605diwzSdq+v4J1AF/CQVRIgL3wwFitlqZRYYvzUTkiM2lOxgxtCMvM92x0PIYQXPcPY+cCBb4DeR6KXGfiBbM+eyh4DSF7QWkawnGzAvugSUO7jL2nGJBwRy34Y7A/DkjC8ckxun/IJeF3dRJAn4gY9oDLpaWaYXyoghYbELF7xHG6gWmQqoKdCZnVtQXSqxHjBJrkzY2EE2aWAxD4HZQGzJuM39t9WfjdTid1VgmZ1Ezc72ENh1Cd4PRSEoqK2FjBN4+rLBWtRzcLaXvqMGfrNbq1dnZA4xn6X0/z/moSHYuSsUxmUw==
+Received: from [127.0.1.1] ([85.235.12.238])
+        by smtp.gmail.com with ESMTPSA id n12-20020ac2490c000000b00511767de71bsm22098lfi.291.2024.02.08.14.40.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Feb 2024 14:40:35 -0800 (PST)
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Thu, 08 Feb 2024 23:40:28 +0100
+Subject: [PATCH] dt-bindings: net: realtek: Use proper node names
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALCETrU0jB+kg0mhV6A8mrHfTE1D1pr1SD_B9Eaa9aDPfgHdtA@mail.gmail.com>
- <f454d60a-c68e-4fcc-a963-fc5c4503d0ee@linux.dev> <CALCETrWu63SB+R8hw-1gZ-fbutXAAFKuWJD-wJ9GejX+p8jhSw@mail.gmail.com>
- <65c54cc9ea70c_1cb6bf29492@willemb.c.googlers.com.notmuch>
-In-Reply-To: <65c54cc9ea70c_1cb6bf29492@willemb.c.googlers.com.notmuch>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Thu, 8 Feb 2024 14:40:20 -0800
-Message-ID: <CALCETrV3S1hj5tdQ1oCgm6ytgUOY8M3t9OSn0WcRLNYn3ZBURg@mail.gmail.com>
-Subject: Re: SOF_TIMESTAMPING_OPT_ID is unreliable when sendmsg fails
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Willem de Bruijn <willemb@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Network Development <netdev@vger.kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240208-realtek-bindings-fixup-v1-1-b1cf7f7e9eed@linaro.org>
+X-B4-Tracking: v=1; b=H4sIAFtYxWUC/x2MQQqAIBAAvxJ7bkGlg/WV6KC51VJYrBVB+Pek4
+ zDMvJBImBJ01QtCNyfeYwFdVzAuLs6EHAqDUaZRRlkUcttJK3qOgeOccOLnOlAHS95Nug3eQYk
+ PoSL+cT/k/AHaqySqaAAAAA==
+To: =?utf-8?q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh+dt@kernel.org>, 
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
+ Conor Dooley <conor+dt@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
+ Linus Walleij <linus.walleij@linaro.org>
+X-Mailer: b4 0.12.4
 
-On Thu, Feb 8, 2024 at 1:51=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Andy Lutomirski wrote:
-> > On Thu, Feb 8, 2024 at 11:55=E2=80=AFAM Vadim Fedorenko
-> > <vadim.fedorenko@linux.dev> wrote:
-> > >
-> > > On 08/02/2024 18:02, Andy Lutomirski wrote:
-> > > > I=E2=80=99ve been using OPT_ID-style timestamping for years, but fo=
-r some
-> > > > reason this issue only bit me last week: if sendmsg() fails on a UD=
-P
-> > > > or ping socket, sk_tskey is poorly.  It may or may not get incremen=
-ted
-> > > > by the failed sendmsg().
->
-> The intent is indeed to only increment on a successful send.
->
-> The implementation is complicated a bit by (1) being a socket level
-> option, thus also supporting SOCK_RAW and (2) MSG_MORE using multiple
-> send calls to only produce a single datagram and (3) fragmentation
-> producing multiple skbs for a single datagram.
->
-> If only SOCK_DGRAM, conceivably we could move this to udp_send_skb,
-> after the skb is created and after the usual error exit paths.
->
-> An alternative is in error paths to decrement the counter. This is
-> what we do for MSG_ZEROCOPY references. Unfortunately, with the
-> lockless UDP path, other threads could come inbetween the inc and dec,
-> so this is not really workable.
->
-> > > Well, there are several error paths, for sure. For the sockets you
-> > > mention the increment of tskey happens at __ip{,6}_append_data. There
-> > > are 2 different types of failures which can happen after the incremen=
-t.
-> > > The first is MTU check fail, another one is memory allocation failure=
-s.
-> > > I believe we can move increment to a later position, after MTU check =
-in
-> > > both functions to avoid first type of problem.
-> >
-> > For reasons that I still haven't deciphered, I'm sporadically getting
-> > EHOSTUNREACH after the increment.  I can't find anything in the code
-> > that would cause that, and every time I try to instrument it, it stops
-> > happening :(  I sendmsg to the same destination several times in rapid
-> > succession, and at most one of them will get EHOSTUNREACH.
->
-> UDP might fail on ICMP responses. Try sending to a closed port. A few
-> send calls will succeed, but eventually the send call will refuse to
-> send. The cause is in the IP layer.
->
+Replace:
+- switch with ethernet-switch
+- ports with ethernet-ports
+- port with ethernet-port
 
-I tracked down the code, finally.
+Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
+---
+ .../devicetree/bindings/net/dsa/realtek.yaml       | 46 +++++++++++-----------
+ 1 file changed, 23 insertions(+), 23 deletions(-)
 
-But I maintain that this behavior is absurd.  Sure, if I do:
+diff --git a/Documentation/devicetree/bindings/net/dsa/realtek.yaml b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
+index cce692f57b08..4971dac6a233 100644
+--- a/Documentation/devicetree/bindings/net/dsa/realtek.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
+@@ -145,7 +145,7 @@ examples:
+     #include <dt-bindings/interrupt-controller/irq.h>
+ 
+     platform {
+-            switch {
++            ethernet-switch {
+                     compatible = "realtek,rtl8366rb";
+                     /* 22 = MDIO (has input reads), 21 = MDC (clock, output only) */
+                     mdc-gpios = <&gpio0 21 GPIO_ACTIVE_HIGH>;
+@@ -161,35 +161,35 @@ examples:
+                             #interrupt-cells = <1>;
+                     };
+ 
+-                    ports {
++                    ethernet-ports {
+                             #address-cells = <1>;
+                             #size-cells = <0>;
+-                            port@0 {
++                            ethernet-port@0 {
+                                     reg = <0>;
+                                     label = "lan0";
+                                     phy-handle = <&phy0>;
+                             };
+-                            port@1 {
++                            ethernet-port@1 {
+                                     reg = <1>;
+                                     label = "lan1";
+                                     phy-handle = <&phy1>;
+                             };
+-                            port@2 {
++                            ethernet-port@2 {
+                                     reg = <2>;
+                                     label = "lan2";
+                                     phy-handle = <&phy2>;
+                             };
+-                            port@3 {
++                            ethernet-port@3 {
+                                     reg = <3>;
+                                     label = "lan3";
+                                     phy-handle = <&phy3>;
+                             };
+-                            port@4 {
++                            ethernet-port@4 {
+                                     reg = <4>;
+                                     label = "wan";
+                                     phy-handle = <&phy4>;
+                             };
+-                            port@5 {
++                            ethernet-port@5 {
+                                     reg = <5>;
+                                     ethernet = <&gmac0>;
+                                     phy-mode = "rgmii";
+@@ -239,7 +239,7 @@ examples:
+     #include <dt-bindings/interrupt-controller/irq.h>
+ 
+     platform {
+-            switch {
++            ethernet-switch {
+                     compatible = "realtek,rtl8365mb";
+                     mdc-gpios = <&gpio1 16 GPIO_ACTIVE_HIGH>;
+                     mdio-gpios = <&gpio1 17 GPIO_ACTIVE_HIGH>;
+@@ -253,30 +253,30 @@ examples:
+                             #interrupt-cells = <1>;
+                     };
+ 
+-                    ports {
++                    ethernet-ports {
+                             #address-cells = <1>;
+                             #size-cells = <0>;
+-                            port@0 {
++                            ethernet-port@0 {
+                                     reg = <0>;
+                                     label = "swp0";
+                                     phy-handle = <&ethphy0>;
+                             };
+-                            port@1 {
++                            ethernet-port@1 {
+                                     reg = <1>;
+                                     label = "swp1";
+                                     phy-handle = <&ethphy1>;
+                             };
+-                            port@2 {
++                            ethernet-port@2 {
+                                     reg = <2>;
+                                     label = "swp2";
+                                     phy-handle = <&ethphy2>;
+                             };
+-                            port@3 {
++                            ethernet-port@3 {
+                                     reg = <3>;
+                                     label = "swp3";
+                                     phy-handle = <&ethphy3>;
+                             };
+-                            port@6 {
++                            ethernet-port@6 {
+                                     reg = <6>;
+                                     ethernet = <&fec1>;
+                                     phy-mode = "rgmii";
+@@ -328,7 +328,7 @@ examples:
+             #address-cells = <1>;
+             #size-cells = <0>;
+ 
+-            switch@29 {
++            ethernet-switch@29 {
+                     compatible = "realtek,rtl8365mb";
+                     reg = <29>;
+ 
+@@ -342,36 +342,36 @@ examples:
+                             #interrupt-cells = <1>;
+                     };
+ 
+-                    ports {
++                    ethernet-ports {
+                             #address-cells = <1>;
+                             #size-cells = <0>;
+ 
+-                            port@0 {
++                            ethernet-port@0 {
+                                     reg = <0>;
+                                     label = "lan4";
+                             };
+ 
+-                            port@1 {
++                            ethernet-port@1 {
+                                     reg = <1>;
+                                     label = "lan3";
+                             };
+ 
+-                            port@2 {
++                            ethernet-port@2 {
+                                     reg = <2>;
+                                     label = "lan2";
+                             };
+ 
+-                            port@3 {
++                            ethernet-port@3 {
+                                     reg = <3>;
+                                     label = "lan1";
+                             };
+ 
+-                            port@4 {
++                            ethernet-port@4 {
+                                     reg = <4>;
+                                     label = "wan";
+                             };
+ 
+-                            port@7 {
++                            ethernet-port@7 {
+                                     reg = <7>;
+                                     ethernet = <&ethernet>;
+                                     phy-mode = "rgmii";
 
-connect(fd, some address);
-send(fd, ...);
-<-- ICMP error because the port was closed
-send(fd, ...) =3D -ECONNREFUSED;
+---
+base-commit: 618b16bbf071a7e8d9601f7ba259a00a169a3937
+change-id: 20240208-realtek-bindings-fixup-1d8ebaf19dba
 
-then this makes a little bit of sense.  But that's about as far as it
-makes sense to me.  This variant is a bit different:
+Best regards,
+-- 
+Linus Walleij <linus.walleij@linaro.org>
 
-connect(fd, some address);
-send(fd, ...);
-<-- ICMP error because the port was closed
-send(fd, ...) =3D -ECONNREFUSED;
-send(fd, ...) =3D 0;  <-- now it works again by magic!
-
-okay, maybe I can stretch my imagination so this makes sense.  But
-then this comes out of left field:
-
-connect(fd, some address);
-sendto(fd, ..., willem:1);
-<-- ICMP error because the port was closed
-sendto(fd, ..., andy:2) =3D -ECONNREFUSED;
-
-excuse me?  And setting IP_RECVERR broadens the set of errors that
-cause this IMO rather silly behavior, presumably motivated by the
-login in the ip(7) manpage:
-
-   When the user receives an error from a socket operation, the errors
-can be received by calling recvmsg(2) with the MSG_ERRQUEUE flag set.
-
-Isn't that what POLLERR is for?
-
-And somehow the implementation of this logic for send, etc makes it
-most of the way through the code before checking sock_error at all.
-
-Anyway, I'll continue contemplating.
 
