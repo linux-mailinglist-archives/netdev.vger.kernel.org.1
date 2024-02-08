@@ -1,122 +1,117 @@
-Return-Path: <netdev+bounces-70335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0157184E6B9
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 18:27:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A01384E6BB
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 18:28:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7E901F29F84
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 17:27:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B16271F215C2
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 17:28:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B83DA127B6A;
-	Thu,  8 Feb 2024 17:26:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7709682D71;
+	Thu,  8 Feb 2024 17:27:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Z3Jlwune"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="uAnoltDl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AD18127B55;
-	Thu,  8 Feb 2024 17:26:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B5A682D9A
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 17:26:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707413170; cv=none; b=g9PLWZaSDDzT/+rKruAvKS4EeupY/WiHHCD3C/BuasXzgtMZTyKqFsFT3qutVJYXHkbPpnEoM9XGf2WwkasegE849bYAYzDWMDCm/7oaYQlg7CCcZw4G9MC7nGQDShhpAEvz7SmT4YjjL6PN3doHqta62FAUp9o6d1iwjkowoTs=
+	t=1707413221; cv=none; b=h4Zodz68yPLtohJxnK2WUPZRFG5WWTk8W6RzRQ5XGPSHgSnbOS7FOLrmVVgNjPj6sgg1oK7thCjdqyEOwCAERRCIqHE1I6HK5pRT5ZMXgQKt1YGLiaEE2dJKojss5wc1Oba8DOaTK6lUns9QdI6zhYSzqshD5XP22zJMW7jmTTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707413170; c=relaxed/simple;
-	bh=RMHXhee+EKsjbCO8kxQOehhJzu4DfanOp53f7KtNCnQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=KiUOi6eXxVEaZWCtoz5j+xofIdDeAk0JhFKqvp4IkFyypP1qBc8FjU7t0dgYhcUbDLgsQQrovlvuYVGVfZe1re3Wx55X8U/uXPITw+FXPXuDpNNf7dcqFhq379pMDOEXMFzyySru2c+hJqnOytCRLXXhvL0/Fk3OvP+xvZTY6Ek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Z3Jlwune; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B106BC433F1;
-	Thu,  8 Feb 2024 17:26:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707413169;
-	bh=RMHXhee+EKsjbCO8kxQOehhJzu4DfanOp53f7KtNCnQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Z3JlwunewmfhhvYhJVni6pjFAiAM+CRhW7DTGyyWotKPTaYOzrwGyiF7BX8+KVrhX
-	 uLXUcCi6Y+6jArt3XdBxi/4j9cP17u1fzdzCFVN/ixj4eFHBU5SinAl7+t7jCDGUlT
-	 +T8eWUtGanEi0mB+kPdqqIWNIAh3MAWAzTfQKTGKXiwtzJb5v3h3/F/IRT09V9MNwd
-	 MUI1H4idZOSpAsOOh/l1ULEIi3xymiWTe5Vw/Nb/+xLsa9YcPI8I8i4BymKjepGjkp
-	 7l23zQWEZKKPgMz0XErw151utORw4sxTbQxQU2N6v4k+Ub8X/7TeHFGHXaknefSi9x
-	 zqLwYAF1o376w==
-Date: Thu, 8 Feb 2024 09:26:08 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ido Schimmel <idosch@idosch.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "netdev-driver-reviewers@vger.kernel.org"
- <netdev-driver-reviewers@vger.kernel.org>
-Subject: Re: [TEST] bridge tests (was: net-next is OPEN)
-Message-ID: <20240208092608.3765b222@kernel.org>
-In-Reply-To: <ZcT_iSwnYmORF-8A@shredder>
-References: <ZbedgjUqh8cGGcs3@shredder>
-	<ZbeeKFke4bQ_NCFd@shredder>
-	<20240129070057.62d3f18d@kernel.org>
-	<ZbfZwZrqdBieYvPi@shredder>
-	<20240129091810.0af6b81a@kernel.org>
-	<ZbpJ5s6Lcl5SS3ck@shredder>
-	<20240131080137.50870aa4@kernel.org>
-	<Zbugr2V8cYdMlSrx@shredder>
-	<20240201073025.04cc760f@kernel.org>
-	<20240201161619.0d248e4e@kernel.org>
-	<ZcT_iSwnYmORF-8A@shredder>
+	s=arc-20240116; t=1707413221; c=relaxed/simple;
+	bh=sAUcYMJMyzFIiyiV+W23YViwmOLGkJIxgCN9P9C4P7g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gfejkfZJFYMa+EosClhgm72skF/LAY3JBlMTJy4QuHZbK44dTcHcw6H6HE2BFQrTXz3SHFa0gK2+1rKwUuNA3uT7q0HbSp5FG561ezPaFyqpmLNUmqbAoOSo91Q7rVzrT4pf71S76nLvMx+JZzyVjaIBU0yzD/jdtc5fXNTIvjk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=uAnoltDl; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1d71cb97937so76705ad.3
+        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 09:26:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1707413217; x=1708018017; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=sDMUhkhn6m1E5wpu6uGtdgKk5XvzlhzIOpvLeEmDVgI=;
+        b=uAnoltDlZHJHRvArCSm3VUyS4UqVEYYAsGs5sELtiFPQe+9yzC1VB40BwyGzLfqqb+
+         LC35Y7CNPO/sSp+71hApPQWAA2YQH0JHF3mbowWpi1MYJ7LA+o1lfpBh88r+FPTMyj57
+         GDItKNPnbSvSWO6JJjdaiXgDEVgqnKk0NcAo0NcT0WT77i+HPABXdGu2M1FgI2ctBw5q
+         5FYDRJpx7ZhKjgMsBpF+2Cw6h5ok1P0IoEp0XI2FJd5W7jWpCFVzzamwW8KP3ZOmD+G/
+         qTNRTPBKf2xnEB5x6B6pGq2XVkXg0ho/UZPvQTAJ0C4nd6rQRJO9B3c3qi7zxsPhVgVN
+         zlyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707413217; x=1708018017;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=sDMUhkhn6m1E5wpu6uGtdgKk5XvzlhzIOpvLeEmDVgI=;
+        b=fx0jHW841MxDWlxJwFhCT3CBRVWDLae567G7CjA1C+ZO+M4GemCrTpOoVBejvFZQLV
+         RAknFIo6b+UoiQHF7b1tfMxUELLPAEsuGcZKqUXbZgSFene/fK51RwfDJsbgkuD9Brjt
+         os/5JvAgrSZ5b6mUl4x5bc6eGo4o0ykVoFtejsfMJEGJXi6fz5MpjuIm3C/O432FAmqe
+         NUWJ/NwOaIQ4MR6l1wcxabJzFTGram/U6WurewK751uCZ3nM/dc3sq75Re6L0YRzWe7J
+         GIQ8AZyzhD6VEUMWvwru0BoP2ljnFSdkFHB2M+RpVq4/MqcDckCoEsj3viguBHcLjq4G
+         BE6w==
+X-Gm-Message-State: AOJu0Yw2On3Cwnc36X8GZ3dUuBSVV480LRgwhPTkrSUAvC59ZxQVlPif
+	OkfWOTwC8R2K7QtFkiFWTcUUHcDybBFCtNB7XwETqwzn1btSAbe3n4k5udkvp1AHxB4fU3diRV3
+	BIis=
+X-Google-Smtp-Source: AGHT+IHfcwupqHhTPu8cr0mqIpBdXCrNvQ/CQpYmcmLCyqFGNtHhjmDFeZx1/vmBRuyckznHQg3D/w==
+X-Received: by 2002:a17:902:e751:b0:1d9:727d:e84f with SMTP id p17-20020a170902e75100b001d9727de84fmr11371126plf.47.1707413217677;
+        Thu, 08 Feb 2024 09:26:57 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWfMR6h+KCM6J91q/bWGUjmeqHK//gZ+xUWN02uKxXZDia76tVjJcmvH/HiRp3pHzzUm/mTlkVwvwpMMQKSqxwl368rww5oVMAczA==
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id g14-20020a170902f74e00b001d9d4375149sm42265plw.215.2024.02.08.09.26.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Feb 2024 09:26:57 -0800 (PST)
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Cc: Maks Mishin <maks.mishinfz@gmail.com>,
+	Maks Mishin <maks.mishinFZ@gmail.com>,
+	Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH iproute2 1/3] ctrl: Fix fd leak in ctrl_listen()
+Date: Thu,  8 Feb 2024 09:26:27 -0800
+Message-ID: <20240208172647.324168-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Thu, 8 Feb 2024 18:21:29 +0200 Ido Schimmel wrote:
-> On Thu, Feb 01, 2024 at 04:16:19PM -0800, Jakub Kicinski wrote:
-> > On Thu, 1 Feb 2024 07:30:25 -0800 Jakub Kicinski wrote:  
-> > > Ah, ugh, sorry for the misdirection, you're right.  
-> > 
-> > Confirmed, with the SUID cleared test-bridge-neigh-suppress-sh now
-> > passes on everything with the exception of metal+debug kernel.  
-> 
-> I'm sorry for bothering you with this, 
+From: Maks Mishin <maks.mishinfz@gmail.com>
 
-No worries at all :)
+Use the same pattern for handling rtnl_listen() errors that
+is used across other iproute2 commands. All other commands
+exit with status of 2 if rtnl_listen fails.
 
-> but I checked today's logs and it
-> seems there is a similar problem with arping:
-> https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/456561/8-test-bridge-neigh-suppress-sh/stdout
-> https://netdev-3.bots.linux.dev/vmksft-net/results/456562/6-test-bridge-neigh-suppress-sh/stdout
-> 
-> And according to this log the ndisc6 problem resurfaced:
-> https://netdev-3.bots.linux.dev/vmksft-net/results/456382/6-test-bridge-neigh-suppress-sh/stdout
+Reported-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
+Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+---
+ genl/ctrl.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-It seems pretty faily:
+diff --git a/genl/ctrl.c b/genl/ctrl.c
+index bae73a54bc37..72a9b01302cf 100644
+--- a/genl/ctrl.c
++++ b/genl/ctrl.c
+@@ -334,8 +334,9 @@ static int ctrl_listen(int argc, char **argv)
+ 	}
+ 
+ 	if (rtnl_listen(&rth, print_ctrl, (void *) stdout) < 0)
+-		return -1;
+-
++		exit(2);
++	
++	rtnl_close(&rth);	
+ 	return 0;
+ }
+ 
+-- 
+2.43.0
 
-https://netdev.bots.linux.dev/flakes.html?br-cnt=80&tn-needle=bridge-neigh&min-flip=0
-
-I guess the short green streak does coincide with the fix, tho. Hm.
-
-> Any chance that something in the OS changed since last week?
-
-My memory is bad so I started keeping a log:
-
-https://docs.google.com/spreadsheets/d/1mFnt91SKtA9ENIUfY0v2UmZSXJzmvsa4oqha4t6JVBs/edit?pli=1#gid=338019672
-
-But it's not the suid:
-
-$ find tools/fs/ -perm -4000
-$ ll $(find tools/fs/ -name arping)
--rwxr-xr-x. 1 virtme virtme 79360 Jan 29 14:38 tools/fs/usr/bin/arping
-$ ll $(find tools/fs/ -name ndisc6)
--rwxr-xr-x. 1 virtme virtme 53840 Jan 29 14:36 tools/fs/usr/bin/ndisc6
-
-And it occasionally blips to "pass" so can't be completely broken env.
-
-I run the test now with VERBOSE=1 and -q removed from arping and ndisc6:
-https://netdev-3.bots.linux.dev/vmksft-net/test_bridge_neigh_suppress/
-
-It just says: Received 0 response(s) :(
-
-Repro is 100%, LMK if you'd like me to try with some custom diff on
-top..
 
