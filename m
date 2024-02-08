@@ -1,157 +1,151 @@
-Return-Path: <netdev+bounces-70264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6494C84E2EA
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 15:14:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46F2984E343
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 15:32:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 835A91C23521
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 14:14:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BEE0BB2811C
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 14:32:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D4CD78B5A;
-	Thu,  8 Feb 2024 14:13:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA13B76416;
+	Thu,  8 Feb 2024 14:32:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="pig0KT9B"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="bGpOxOdZ";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="l2Hlnwmg"
 X-Original-To: netdev@vger.kernel.org
-Received: from omta040.useast.a.cloudfilter.net (omta040.useast.a.cloudfilter.net [44.202.169.39])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC4278B44
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 14:13:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.39
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2501E149DFF
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 14:32:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707401630; cv=none; b=dDu5hryPfTvUdNPpzjtLJW5Luf+ucAxc/SBpt6DRVuRyJCygGXm/cP4uz+hIvy5f0vIU6jCZAffgX4Y4X7RGNuEQEqd/F4bQXOruiRJXAByAmwR7DjPwzprA7c1xkM8z5icY/OEjS5Mf6Lkhw3L57Levg6OkFAUkfqzbLl0AxmA=
+	t=1707402755; cv=none; b=Ve+2iEVJ7ghPg3g69l83g0AI1Z23EPdHPdGFiKombe8dRo/XP2nKXPlnIJBwusJDyigOnNwaNrdSn5wYK+G+h/6OuGJfdVKLPtQeZu1fmw4mc7OzedyBkvi5e508PNh24Nmc4A+D781V8dsOfE1lQtuYU7+j6fiLpww5OGFRiKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707401630; c=relaxed/simple;
-	bh=3ik1VeqZqvrBk+hkQ4LISwGyPWvT053eJy+F7I6/4gI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=d4TRUe30PXNnD+Xg0dPNbaZCQGgn2I2jsBZjbJ/d9KFJ4z8/azK+teT0x/XTynhu+epu5PmYOi6kgamyAkyVHXsrP8JIUWzl74WZlKa3KZSQ8QJoV8qqkx2lPkp2xjzRKWE1IyBo5pRcml0e8mgSYYThEdw5lijbJqUPn4g3y4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=pig0KT9B; arc=none smtp.client-ip=44.202.169.39
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
-Received: from eig-obgw-5002a.ext.cloudfilter.net ([10.0.29.215])
-	by cmsmtp with ESMTPS
-	id Y4jKrKti3THHuY58OrLGqL; Thu, 08 Feb 2024 14:12:12 +0000
-Received: from gator4166.hostgator.com ([108.167.133.22])
-	by cmsmtp with ESMTPS
-	id Y58Nr494ML5RlY58Nra9vg; Thu, 08 Feb 2024 14:12:12 +0000
-X-Authority-Analysis: v=2.4 cv=NfZF1HD4 c=1 sm=1 tr=0 ts=65c4e13c
- a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=WzbPXH4gqzPVN0x6HrNMNA==:17
- a=IkcTkHD0fZMA:10 a=k7vzHIieQBIA:10 a=wYkD_t78qR0A:10 a=NEAV23lmAAAA:8
- a=avmgtr1mAAAA:8 a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8 a=VwQbUJbxAAAA:8
- a=20KFwNOVAAAA:8 a=cm27Pg_UAAAA:8 a=9s2EZlhbFvVYUlpcnmcA:9 a=QEXdDO2ut3YA:10
- a=8jQmqnmTF30O56MVTtdJ:22 a=y1Q9-5lHfBjTkpIzbSAN:22 a=AjGcO6oz07-iQ99wixmX:22
- a=xmb-EsYY8bH0VWELuYED:22
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=NdzT1jnddPo3C2ofpdSb1STcn6/8gN+XK0UoGk/aM80=; b=pig0KT9BGEQTUgiqFgvo34xd5R
-	92e52VRIZKp8OxiD9dXKPNQyP1uBFPWMorhd9dNeZDgQb+Q8bvvwjmm+DZUywpzQFlkPKFaDB1vfY
-	frmH3A4pz5IDFDDDHuum4RjmBoeiOoC2FqCkLNj5zULzptXcZuOVNxbMuBgWwpAOxH6Ew2cqKNfSU
-	t31rJYBL0q2FdSvmJMab8qCaLAKFGbe9iRfJa1uT72N9FrMmTStNIrFa1CsufQVZN+JSoSwWoPnqH
-	/Im9Rc+aVHhmF+Fzlxr3TVGaNQuTMTqpBL4i1+CIG5MVoPuRLnDfN9nDC8aEs1Ua9KiJJ8vafRPUD
-	y44VAjvA==;
-Received: from 187-162-21-192.static.axtel.net ([187.162.21.192]:48510 helo=[192.168.15.10])
-	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.96.2)
-	(envelope-from <gustavo@embeddedor.com>)
-	id 1rY58M-003UCd-2o;
-	Thu, 08 Feb 2024 08:12:10 -0600
-Message-ID: <98572347-e83b-41bf-aad0-08ed8e967431@embeddedor.com>
-Date: Thu, 8 Feb 2024 08:12:09 -0600
+	s=arc-20240116; t=1707402755; c=relaxed/simple;
+	bh=1l7WrWXm+4qDe52ts9QBgcAOL5XUwWvb6/fiCXA4wuU=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=tJEmuK+JT0bQOyeKFhp7LlSTUbeMPRuM4zfqQ4jGnRYrWNW4x6Zvjc5xmWDK6zHPw8XSpKrItTucG94Xfiw0KEvf721XtiHwtJnMohszjSU0ua6Movo+obQZ8TJtmmlb8tCmTdKORa9NX1wCPHVLnACnU9wayu1SuMJaLxRVpfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=bGpOxOdZ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=l2Hlnwmg; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1707402752;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0kmnynK8D4W3OfNuOIakrEyfM7cioDAxgVK3FbytS1U=;
+	b=bGpOxOdZz8KjIh3Scht2Wl87HpaRmBa9E6aSTbQ4MeB4JrLU4CQbks1axiceU91YTAN4SP
+	1f0UJixuPUpQvEZeL7Cjj9K5cjw/IjHUDWNPKhop8GqGyox3Wnr3u7flz6tzNMf8EirgYd
+	xCuEjuYNJY+uWUom+lCCTn39HTinS8/QbKNCxMFAtDh4bcYOw8v2LfOHIRM2eKc7tBwmz2
+	KIUxOE+eHNS4dLoUAe/dkHiQKvy3AklloYgLvpU+78DKum0ARqd0mERdi0DRXO0lzA4vRf
+	/Ey/Np4r3CnVNfkGJeEfXeyo7TbVA1uVrkgDMrzmkVkngTZlcI8tkLOhwcAJRQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1707402752;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0kmnynK8D4W3OfNuOIakrEyfM7cioDAxgVK3FbytS1U=;
+	b=l2Hlnwmg21eD+EOblp3zmFXVSzKQLlL+jBRqJ6ezflWTXHuUah7YE9Sav4hgzNlxyfc2Pw
+	0/u0JfQuqs9z9YBQ==
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
+ <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Yannick
+ Vignon <yannick.vignon@nxp.com>, Sebastian Andrzej Siewior
+ <bigeasy@linutronix.de>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next] net: stmmac: Simplify mtl IRQ status checking
+In-Reply-To: <ZcTNCxrWTAfj90Es@boxer>
+References: <20240208-stmmac_irq-v1-1-8bab236026d4@linutronix.de>
+ <ZcTNCxrWTAfj90Es@boxer>
+Date: Thu, 08 Feb 2024 15:32:30 +0100
+Message-ID: <871q9n81s1.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/sun3_82586: Avoid reading past buffer in debug output
-Content-Language: en-US
-To: Kees Cook <keescook@chromium.org>, Sam Creasey <sammy@sammy.net>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- "Gustavo A . R . Silva" <gustavoars@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-References: <20240206161651.work.876-kees@kernel.org>
-From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-In-Reply-To: <20240206161651.work.876-kees@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - embeddedor.com
-X-BWhitelist: no
-X-Source-IP: 187.162.21.192
-X-Source-L: No
-X-Exim-ID: 1rY58M-003UCd-2o
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
-X-Source-Sender: 187-162-21-192.static.axtel.net ([192.168.15.10]) [187.162.21.192]:48510
-X-Source-Auth: gustavo@embeddedor.com
-X-Email-Count: 3
-X-Org: HG=hgshared;ORG=hostgator;
-X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
-X-Local-Domain: yes
-X-CMAE-Envelope: MS4xfK50ypFJih4BNgOwzNJq3q+ZfM45rNU0pRjJy6P9sLhC4MfEpIcQCpMYNndAA3ynBEpXwJGpNK7ytyrcWqfNCRg5W3SFFeK7P/R5ECif6jxrdYlxh4TT
- P8xdw6eLeRCJWVaeIpDHdBJRfbg08OvZgynj87G0tVpXf1BGioe965WA5b6tSzOdVxqt7xD7+u9KZxhahz9ymSUVeqqDtqX0Mcw=
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
+On Thu Feb 08 2024, Maciej Fijalkowski wrote:
+> On Thu, Feb 08, 2024 at 11:35:25AM +0100, Kurt Kanzenbach wrote:
+>> Commit 8a7cb245cf28 ("net: stmmac: Do not enable RX FIFO overflow
+>> interrupts") disabled the RX FIFO overflow interrupts. However, it left =
+the
+>> status variable around, but never checks it.
+>>=20
+>> As stmmac_host_mtl_irq_status() returns only 0 now, the code can be
+>> simplified.
+>>=20
+>> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+>> ---
+>>  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 6 ++----
+>>  1 file changed, 2 insertions(+), 4 deletions(-)
+>>=20
+>> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers=
+/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> index 04d817dc5899..10ce2f272b62 100644
+>> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>> @@ -6036,10 +6036,8 @@ static void stmmac_common_interrupt(struct stmmac=
+_priv *priv)
+>>  				priv->tx_path_in_lpi_mode =3D false;
+>>  		}
+>>=20=20
+>> -		for (queue =3D 0; queue < queues_count; queue++) {
+>> -			status =3D stmmac_host_mtl_irq_status(priv, priv->hw,
+>> -							    queue);
+>> -		}
+>> +		for (queue =3D 0; queue < queues_count; queue++)
+>> +			stmmac_host_mtl_irq_status(priv, priv->hw, queue);
+>
+> Hey Kurt,
+>
+> looks to me that all of the current callbacks just return 0 so why not
+> make them return void instead?
 
-On 2/6/24 10:16, Kees Cook wrote:
-> Since NUM_XMIT_BUFFS is always 1, building m68k with sun3_defconfig and
-> -Warraybounds, this build warning is visible[1]:
-> 
-> drivers/net/ethernet/i825xx/sun3_82586.c: In function 'sun3_82586_timeout':
-> drivers/net/ethernet/i825xx/sun3_82586.c:990:122: warning: array subscript 1 is above array bounds of 'volatile struct transmit_cmd_struct *[1]' [-Warray-bounds=]
->    990 |                 printk("%s: command-stats: %04x %04x\n",dev->name,swab16(p->xmit_cmds[0]->cmd_status),swab16(p->xmit_cmds[1]->cmd_status));
->        |                                                                                                               ~~~~~~~~~~~~^~~
-> ...
-> drivers/net/ethernet/i825xx/sun3_82586.c:156:46: note: while referencing 'xmit_cmds'
->    156 |         volatile struct transmit_cmd_struct *xmit_cmds[NUM_XMIT_BUFFS];
-> 
-> Avoid accessing index 1 since it doesn't exist.
-> 
-> Link: https://github.com/KSPP/linux/issues/325 [1]
-> Cc: Sam Creasey <sammy@sammy.net>
-> Cc: "David S. Miller" <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Gustavo A. R. Silva <gustavoars@kernel.org>
-> Cc: netdev@vger.kernel.org
-> Signed-off-by: Kees Cook <keescook@chromium.org>
+Well, there are two callbacks of this in dwmac4 and dwxgmac2. Both of
+them still have the code for handling the overflow interrupt (and then
+returning !=3D 0). However, as of commit 8a7cb245cf28 the interrupt
+shouldn't fire. So yes, it could be changed to void along with some
+code removal. But, maybe i'm missing something.
 
-Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Thanks,
+Kurt
 
-Thanks!
--- 
-Gustavo
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
-> ---
->   drivers/net/ethernet/i825xx/sun3_82586.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/i825xx/sun3_82586.c b/drivers/net/ethernet/i825xx/sun3_82586.c
-> index 5e27470c6b1e..f2d4669c81cf 100644
-> --- a/drivers/net/ethernet/i825xx/sun3_82586.c
-> +++ b/drivers/net/ethernet/i825xx/sun3_82586.c
-> @@ -987,7 +987,7 @@ static void sun3_82586_timeout(struct net_device *dev, unsigned int txqueue)
->   	{
->   #ifdef DEBUG
->   		printk("%s: xmitter timed out, try to restart! stat: %02x\n",dev->name,p->scb->cus);
-> -		printk("%s: command-stats: %04x %04x\n",dev->name,swab16(p->xmit_cmds[0]->cmd_status),swab16(p->xmit_cmds[1]->cmd_status));
-> +		printk("%s: command-stats: %04x\n", dev->name, swab16(p->xmit_cmds[0]->cmd_status));
->   		printk("%s: check, whether you set the right interrupt number!\n",dev->name);
->   #endif
->   		sun3_82586_close(dev);
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmXE5f4THGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgoVNEACRQG38O8qvFH2wPmjBeFoLAK3lGxP9
+bezvRO/XBO+/YBwOfbfDcFVq4IV46JU3wPsWwSUob/X6dtVWrbuvo18PmIJQLbf7
+/w09ozvI59oMpgyGuht7p+sMW6rZJopvnnHcXWyZx5Q6dm78sqxpXJRCOJGgdq2R
+LNs6DFtw3GNLC+mgz2qlWKWZb15eNMfPkI9pfzlfIiHC3NOoU06tRGM+u3O8zIkA
+LuiZy9jeUW0lfTs73EictPtAWV+kIjAC0Gt20R0D7Y8IqgqhRQLKzsa1Yq2n4oV5
+CQgcRZqcsxakjVfNp2P2yubTE9q6OlYYEBL/zW2tKmX93EPQLdKW5e+l04uv5scO
+ppbcyFnw4flKX6eNBE5p1Ls2xJx5UypS0B/E/MTmGC/sytC5C6UWvv+S9c/tmbhb
+fMWUwqa2nR2weXo7rRqu3Y9BncycxDAl99xCLq7tQJ3TifuX1WQKw6V49w1CTCu1
+v98dHRh8Hcb46ZygVRyorNDjynf+ykWJ+arEynZL2qRpoaghPu53zQcwfus2P20D
+Iwx8Ps/qRxUimLuyb9xlLaqbMo7pyx7xUf2JX9HCr5MeiDiGEH89IxQ6kmRapaSs
+cqoWc8HbLrfRGSaTIzVOHyANQFDZh8yONokswgK3VWb6sJKnc5gTX2IcILiyUMSG
+zVDIO7KCp60RvA==
+=ersf
+-----END PGP SIGNATURE-----
+--=-=-=--
 
