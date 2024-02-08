@@ -1,161 +1,262 @@
-Return-Path: <netdev+bounces-70144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0437384DD5D
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:55:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90C9684DD59
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:54:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 921571F26F54
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 09:55:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B53871C2459D
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 09:54:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49C7A6DCF0;
-	Thu,  8 Feb 2024 09:54:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75F886E2AE;
+	Thu,  8 Feb 2024 09:53:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RQi+rpdI"
 X-Original-To: netdev@vger.kernel.org
-Received: from davidv.dev (mail.davidv.dev [78.46.233.60])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55A746D1AE
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 09:54:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.46.233.60
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A0006DD1C;
+	Thu,  8 Feb 2024 09:53:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707386050; cv=none; b=uATq/8lDcQWeDmGMeVjDiyE8MTU43jqRbvp0KyQ8les5TUOjHWsD/2HaJRj2v3/TV+DZvofhC8o/lQs/5Q+0la2dSt/2qbGLRJN3x8OeMAranv1+YeOUP89XJVz1/DSwLRjAOEClhmywSbN2NSKIWlVm7TR9wpMtf14KXYg7erY=
+	t=1707386034; cv=none; b=tfRWodgIYEaa4RWzJWRxatproWMX2Z9MCg8ujnGE9EMcpCWYlp3xCxnXJzcHLyTdFu29LoTAfFeATj1REy7Px23HYcWSjYQd+N3PSOg/GCMOYAUivAEFnSQ3RJqHg2BZ3e6ceTlCKQPDOsxsn0NGI0zoRt0RbnF67HDK4WqhMZw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707386050; c=relaxed/simple;
-	bh=zquoTPDiDMopq79YAJN8pFBJInmPfdGsBn+pPQU1BdE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=HQ6hg+wXV8bBk2QV/mXMMrGCQZfy0NjhsEhJ+EcXvcrrYIfhApCv24wJyYL2RCM+ZicOwhNOtoFUgatW/CORDxDckB54i1Pe4iq4np/UQPAqEgnC5noAfx4zQIgZZj1gRrOSZqVN1uNcjftvB6izzQvSA9Q3uo++jSOYgItEkuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidv.dev; spf=pass smtp.mailfrom=davidv.dev; arc=none smtp.client-ip=78.46.233.60
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidv.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=davidv.dev
-Received: from framework.labs
-	by mail.davidv.dev (chasquid) with ESMTPSA
-	tls TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
-	(over submission+TLS, TLS-1.2, envelope from "david@davidv.dev")
-	; Thu, 08 Feb 2024 10:54:06 +0100
-From: David Ventura <david@davidv.dev>
-To: david@davidv.dev
-Cc: Jonathan Corbet <corbet@lwn.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
+	s=arc-20240116; t=1707386034; c=relaxed/simple;
+	bh=nbfg0Gx52d/qcbW7/rm/yJ54WM1bD93/zqjyFrQALIQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ma8hlx4aqMAl/d09t9Q1Oi2cbxNWq7g6iSiykoXoXgoeTKU7vwXEPu5sFLe6Pqnjmp5vvvi1rP8SFgMPYdD4EhC9tZNk47fwbssgeRIa1BJjhkyXSWnU5qXSVyrB05Q92SdhMSSO1s6eHc01g86FgbFnw8TqyVo6am4F73TVR24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RQi+rpdI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A331C433C7;
+	Thu,  8 Feb 2024 09:53:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707386033;
+	bh=nbfg0Gx52d/qcbW7/rm/yJ54WM1bD93/zqjyFrQALIQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RQi+rpdI22K+N6hKk7cWedZtbH5ITgmMjh65WTq8PO30GUPourd3yKw6ZR0fH6ylw
+	 LF8N+W94jek1r8JR87VILyd0ep1JfHefWx+tzNKbQXMR7GkD6dAXY0jpcJbxhzWZD8
+	 vaG6+NWeeVgN2W2dAHuZMVkzpQN7mEJ1YuarUQ2dusR9aD5AvTU6WFcM+vPxPkjoSg
+	 56UqDsNjNYLpUb11ZvzY2McnxmcJGSnUDV75d9+UMEGLKWFaoxgOppRRaKH0xfVc63
+	 dSLqsgAxYTGXEQE3Tl2eRcsZ0N+dublcOWs2q1UuwvbALZbBZBiQTkhj7PhBF7HPc/
+	 /aL8ew+rYMBXw==
+Date: Thu, 8 Feb 2024 09:53:48 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jon Hunter <jonathanh@nvidia.com>
+Cc: Furong Xu <0x1207@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Xiongwei Song <xiongwei.song@windriver.com>,
-	linux-doc@vger.kernel.org (open list:DOCUMENTATION),
-	linux-kernel@vger.kernel.org (open list),
-	netdev@vger.kernel.org (open list:NETWORKING [IPv4/IPv6])
-Subject: [PATCH v2 1/2] net: make driver settling time configurable
-Date: Thu,  8 Feb 2024 10:52:29 +0100
-Message-Id: <20240208095358.251381-1-david@davidv.dev>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240208093722.246930-1-david@davidv.dev>
-References: <20240208093722.246930-1-david@davidv.dev>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>,
+	Serge Semin <fancer.lancer@gmail.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	xfr@outlook.com, rock.xu@nio.com,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH net v4] net: stmmac: xgmac: fix handling of DPP safety
+ error for DMA channels
+Message-ID: <20240208095348.GA1435458@kernel.org>
+References: <20240203051439.1127090-1-0x1207@gmail.com>
+ <c25eb595-8d91-40ea-9f52-efa15ebafdbc@nvidia.com>
+ <20240208092627.GP1297511@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240208092627.GP1297511@kernel.org>
 
-During IP auto configuration, some drivers apparently need to wait a
-certain length of time to settle; as this is not true for all drivers,
-make this length of time configurable.
+On Thu, Feb 08, 2024 at 09:26:27AM +0000, Simon Horman wrote:
+> On Wed, Feb 07, 2024 at 11:56:26AM +0000, Jon Hunter wrote:
+> > 
+> > On 03/02/2024 05:14, Furong Xu wrote:
+> > > Commit 56e58d6c8a56 ("net: stmmac: Implement Safety Features in
+> > > XGMAC core") checks and reports safety errors, but leaves the
+> > > Data Path Parity Errors for each channel in DMA unhandled at all, lead to
+> > > a storm of interrupt.
+> > > Fix it by checking and clearing the DMA_DPP_Interrupt_Status register.
+> > > 
+> > > Fixes: 56e58d6c8a56 ("net: stmmac: Implement Safety Features in XGMAC core")
+> > > Signed-off-by: Furong Xu <0x1207@gmail.com>
+> > > Reviewed-by: Simon Horman <horms@kernel.org>
+> > > Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+> > > ---
+> > > Changes in v4:
+> > >   - fix a typo name of DDPP bit, thanks Serge Semin
+> > > 
+> > > Changes in v3:
+> > >   - code style fix, thanks Paolo Abeni
+> > > 
+> > > Changes in v2:
+> > >    - explicit enable Data Path Parity Protection
+> > >    - add new counters to stmmac_safety_stats
+> > >    - add detailed log
+> > > ---
+> > >   drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
+> > >   .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  3 +
+> > >   .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 57 ++++++++++++++++++-
+> > >   3 files changed, 60 insertions(+), 1 deletion(-)
+> > > 
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+> > > index 721c1f8e892f..b4f60ab078d6 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/common.h
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+> > > @@ -216,6 +216,7 @@ struct stmmac_safety_stats {
+> > >   	unsigned long mac_errors[32];
+> > >   	unsigned long mtl_errors[32];
+> > >   	unsigned long dma_errors[32];
+> > > +	unsigned long dma_dpp_errors[32];
+> > >   };
+> > >   /* Number of fields in Safety Stats */
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> > > index 207ff1799f2c..5c67a3f89f08 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> > > @@ -303,6 +303,8 @@
+> > >   #define XGMAC_RXCEIE			BIT(4)
+> > >   #define XGMAC_TXCEIE			BIT(0)
+> > >   #define XGMAC_MTL_ECC_INT_STATUS	0x000010cc
+> > > +#define XGMAC_MTL_DPP_CONTROL		0x000010e0
+> > > +#define XGMAC_DPP_DISABLE		BIT(0)
+> > >   #define XGMAC_MTL_TXQ_OPMODE(x)		(0x00001100 + (0x80 * (x)))
+> > >   #define XGMAC_TQS			GENMASK(25, 16)
+> > >   #define XGMAC_TQS_SHIFT			16
+> > > @@ -385,6 +387,7 @@
+> > >   #define XGMAC_DCEIE			BIT(1)
+> > >   #define XGMAC_TCEIE			BIT(0)
+> > >   #define XGMAC_DMA_ECC_INT_STATUS	0x0000306c
+> > > +#define XGMAC_DMA_DPP_INT_STATUS	0x00003074
+> > >   #define XGMAC_DMA_CH_CONTROL(x)		(0x00003100 + (0x80 * (x)))
+> > >   #define XGMAC_SPH			BIT(24)
+> > >   #define XGMAC_PBLx8			BIT(16)
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> > > index eb48211d9b0e..04d7c4dc2e35 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> > > @@ -830,6 +830,43 @@ static const struct dwxgmac3_error_desc dwxgmac3_dma_errors[32]= {
+> > >   	{ false, "UNKNOWN", "Unknown Error" }, /* 31 */
+> > >   };
+> > > +static const char * const dpp_rx_err = "Read Rx Descriptor Parity checker Error";
+> > > +static const char * const dpp_tx_err = "Read Tx Descriptor Parity checker Error";
+> > > +static const struct dwxgmac3_error_desc dwxgmac3_dma_dpp_errors[32] = {
+> > > +	{ true, "TDPES0", dpp_tx_err },
+> > > +	{ true, "TDPES1", dpp_tx_err },
+> > > +	{ true, "TDPES2", dpp_tx_err },
+> > > +	{ true, "TDPES3", dpp_tx_err },
+> > > +	{ true, "TDPES4", dpp_tx_err },
+> > > +	{ true, "TDPES5", dpp_tx_err },
+> > > +	{ true, "TDPES6", dpp_tx_err },
+> > > +	{ true, "TDPES7", dpp_tx_err },
+> > > +	{ true, "TDPES8", dpp_tx_err },
+> > > +	{ true, "TDPES9", dpp_tx_err },
+> > > +	{ true, "TDPES10", dpp_tx_err },
+> > > +	{ true, "TDPES11", dpp_tx_err },
+> > > +	{ true, "TDPES12", dpp_tx_err },
+> > > +	{ true, "TDPES13", dpp_tx_err },
+> > > +	{ true, "TDPES14", dpp_tx_err },
+> > > +	{ true, "TDPES15", dpp_tx_err },
+> > > +	{ true, "RDPES0", dpp_rx_err },
+> > > +	{ true, "RDPES1", dpp_rx_err },
+> > > +	{ true, "RDPES2", dpp_rx_err },
+> > > +	{ true, "RDPES3", dpp_rx_err },
+> > > +	{ true, "RDPES4", dpp_rx_err },
+> > > +	{ true, "RDPES5", dpp_rx_err },
+> > > +	{ true, "RDPES6", dpp_rx_err },
+> > > +	{ true, "RDPES7", dpp_rx_err },
+> > > +	{ true, "RDPES8", dpp_rx_err },
+> > > +	{ true, "RDPES9", dpp_rx_err },
+> > > +	{ true, "RDPES10", dpp_rx_err },
+> > > +	{ true, "RDPES11", dpp_rx_err },
+> > > +	{ true, "RDPES12", dpp_rx_err },
+> > > +	{ true, "RDPES13", dpp_rx_err },
+> > > +	{ true, "RDPES14", dpp_rx_err },
+> > > +	{ true, "RDPES15", dpp_rx_err },
+> > > +};
+> > > +
+> > >   static void dwxgmac3_handle_dma_err(struct net_device *ndev,
+> > >   				    void __iomem *ioaddr, bool correctable,
+> > >   				    struct stmmac_safety_stats *stats)
+> > > @@ -841,6 +878,13 @@ static void dwxgmac3_handle_dma_err(struct net_device *ndev,
+> > >   	dwxgmac3_log_error(ndev, value, correctable, "DMA",
+> > >   			   dwxgmac3_dma_errors, STAT_OFF(dma_errors), stats);
+> > > +
+> > > +	value = readl(ioaddr + XGMAC_DMA_DPP_INT_STATUS);
+> > > +	writel(value, ioaddr + XGMAC_DMA_DPP_INT_STATUS);
+> > > +
+> > > +	dwxgmac3_log_error(ndev, value, false, "DMA_DPP",
+> > > +			   dwxgmac3_dma_dpp_errors,
+> > > +			   STAT_OFF(dma_dpp_errors), stats);
+> > >   }
+> > >   static int
+> > > @@ -881,6 +925,12 @@ dwxgmac3_safety_feat_config(void __iomem *ioaddr, unsigned int asp,
+> > >   	value |= XGMAC_TMOUTEN; /* FSM Timeout Feature */
+> > >   	writel(value, ioaddr + XGMAC_MAC_FSM_CONTROL);
+> > > +	/* 5. Enable Data Path Parity Protection */
+> > > +	value = readl(ioaddr + XGMAC_MTL_DPP_CONTROL);
+> > > +	/* already enabled by default, explicit enable it again */
+> > > +	value &= ~XGMAC_DPP_DISABLE;
+> > > +	writel(value, ioaddr + XGMAC_MTL_DPP_CONTROL);
+> > > +
+> > >   	return 0;
+> > >   }
+> > > @@ -914,7 +964,11 @@ static int dwxgmac3_safety_feat_irq_status(struct net_device *ndev,
+> > >   		ret |= !corr;
+> > >   	}
+> > > -	err = dma & (XGMAC_DEUIS | XGMAC_DECIS);
+> > > +	/* DMA_DPP_Interrupt_Status is indicated by MCSIS bit in
+> > > +	 * DMA_Safety_Interrupt_Status, so we handle DMA Data Path
+> > > +	 * Parity Errors here
+> > > +	 */
+> > > +	err = dma & (XGMAC_DEUIS | XGMAC_DECIS | XGMAC_MCSIS);
+> > >   	corr = dma & XGMAC_DECIS;
+> > >   	if (err) {
+> > >   		dwxgmac3_handle_dma_err(ndev, ioaddr, corr, stats);
+> > > @@ -930,6 +984,7 @@ static const struct dwxgmac3_error {
+> > >   	{ dwxgmac3_mac_errors },
+> > >   	{ dwxgmac3_mtl_errors },
+> > >   	{ dwxgmac3_dma_errors },
+> > > +	{ dwxgmac3_dma_dpp_errors },
+> > >   };
+> > >   static int dwxgmac3_safety_feat_dump(struct stmmac_safety_stats *stats,
+> > 
+> > 
+> > This change is breaking the build on some of our builders that are still using GCC 6.x ...
+> > 
+> > drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:836:20: error: initialiser element is not constant
+> >   { true, "TDPES0", dpp_tx_err },
+> >                     ^~~~~~~~~~
+> > drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:836:20: note: (near initialisation for ‘dwxgmac3_dma_dpp_errors[0].detailed_desc’)
+> > drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:837:20: error: initialiser element is not constant
+> >   { true, "TDPES1", dpp_tx_err },
+> >                     ^~~~~~~~~~
+> > drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:837:20: note: (near initialisation for ‘dwxgmac3_dma_dpp_errors[1].detailed_desc’)
+> > ...
+> > 
+> > I know that this is quite old but the minimum supported by the kernel is v5.1 ...
+> > 
+> > https://www.kernel.org/doc/html/next/process/changes.html
+> 
+> Thanks Jon,
+> 
+> I separately received a notification about this occurring with gcc 7.
+> 
+> https://lore.kernel.org/oe-kbuild-all/202402081135.lAxxBXHk-lkp@intel.com/
+> 
+> It is unclear to me why this occurs, as dpp_tx_err and dpp_tx_err are const.
+> But I do seem to be able to address this problem by using #defines for
+> these values instead.
+> 
+> I plan to post a patch shortly.
 
-Signed-off-by: David Ventura <david@davidv.dev>
----
- .../admin-guide/kernel-parameters.txt         |  4 ++++
- Documentation/admin-guide/nfs/nfsroot.rst     |  3 +++
- net/ipv4/ipconfig.c                           | 23 ++++++++++++++++---
- 3 files changed, 27 insertions(+), 3 deletions(-)
-
-diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
-index b47940577c10..b07a035642fa 100644
---- a/Documentation/admin-guide/kernel-parameters.txt
-+++ b/Documentation/admin-guide/kernel-parameters.txt
-@@ -2291,6 +2291,10 @@
- 
- 	ip=		[IP_PNP]
- 			See Documentation/admin-guide/nfs/nfsroot.rst.
-+	ip.dev_wait_ms=
-+			[IP_PNP]
-+			See Documentation/admin-guide/nfs/nfsroot.rst.
-+
- 
- 	ipcmni_extend	[KNL,EARLY] Extend the maximum number of unique System V
- 			IPC identifiers from 32,768 to 16,777,216.
-diff --git a/Documentation/admin-guide/nfs/nfsroot.rst b/Documentation/admin-guide/nfs/nfsroot.rst
-index 135218f33394..f26f7a342af6 100644
---- a/Documentation/admin-guide/nfs/nfsroot.rst
-+++ b/Documentation/admin-guide/nfs/nfsroot.rst
-@@ -223,6 +223,9 @@ ip=<client-ip>:<server-ip>:<gw-ip>:<netmask>:<hostname>:<device>:<autoconf>:<dns
-   /proc/net/ipconfig/ntp_servers to an NTP client before mounting the real
-   root filesystem if it is on NFS).
- 
-+ip.dev_wait_ms=<value>
-+  Set the number of milliseconds to delay after opening the network device
-+  which will be autoconfigured. Defaults to 10 milliseconds.
- 
- nfsrootdebug
-   This parameter enables debugging messages to appear in the kernel
-diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
-index c56b6fe6f0d7..cbf35163b973 100644
---- a/net/ipv4/ipconfig.c
-+++ b/net/ipv4/ipconfig.c
-@@ -82,8 +82,6 @@
- #define IPCONFIG_DYNAMIC
- #endif
- 
--/* Define the friendly delay before and after opening net devices */
--#define CONF_POST_OPEN		10	/* After opening: 10 msecs */
- 
- /* Define the timeout for waiting for a DHCP/BOOTP/RARP reply */
- #define CONF_OPEN_RETRIES 	2	/* (Re)open devices twice */
-@@ -101,6 +99,7 @@
- 
- /* Wait for carrier timeout default in seconds */
- static unsigned int carrier_timeout = 120;
-+static unsigned int dev_wait_ms = 10;
- 
- /*
-  * Public IP configuration
-@@ -1516,7 +1515,8 @@ static int __init ip_auto_config(void)
- 		return err;
- 
- 	/* Give drivers a chance to settle */
--	msleep(CONF_POST_OPEN);
-+	if(dev_wait_ms > 0)
-+		msleep(dev_wait_ms);
- 
- 	/*
- 	 * If the config information is insufficient (e.g., our IP address or
-@@ -1849,3 +1849,20 @@ static int __init set_carrier_timeout(char *str)
- 	return 1;
- }
- __setup("carrier_timeout=", set_carrier_timeout);
-+
-+
-+static int __init set_dev_wait_ms(char *str)
-+{
-+	ssize_t ret;
-+
-+	if (!str)
-+		return 0;
-+
-+	ret = kstrtouint(str, 0, &dev_wait_ms);
-+	if (ret)
-+		return 0;
-+
-+	return 1;
-+}
-+
-+__setup("ip.dev_wait_ms=", set_dev_wait_ms);
--- 
-2.39.2
+Patch posted:
+- [PATCH net] net: stmmac: xgmac: use #define for string constants
+  https://lore.kernel.org/netdev/20240208-xgmac-const-v1-1-e69a1eeabfc8@kernel.org/
 
 
