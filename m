@@ -1,120 +1,103 @@
-Return-Path: <netdev+bounces-70285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9C1F84E410
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 16:29:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B7D084E415
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 16:32:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 909DA2830D4
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 15:29:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD0DAB21037
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 15:32:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 758B67B3F3;
-	Thu,  8 Feb 2024 15:29:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jYVNYEcZ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46CB17BAE3;
+	Thu,  8 Feb 2024 15:32:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A121B7B3E8;
-	Thu,  8 Feb 2024 15:29:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5BE47B3EE
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 15:32:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707406145; cv=none; b=gLxfuWiFPSzJpZ8Ssg/IqW677AotnKbpus3A0Zmca0kQS7OH1byU8L0HuyUK89ZJKmpaVjrqq/wxYiDo7ZNjsAVfgZ/KWGXigN9QLryQ/hrlt4zRz+PLr9NnMf4y4pS0+HLgx7KyvshgFSkAkV9uAVeKTfXZTMRfuCQc0EAyYdM=
+	t=1707406327; cv=none; b=DZciJ3ODstix0pDu9lAZAlJUwCIzkHdIYPoKCLrxyiEWdMY7BNfDoiyjUdcpoCPjCXgZjBr9yf4d2j2eO9XBPvXzKqiXHWhlkhDnvFAHztTYYGRAKD/EMa+TtJQKSc6IixAnSnsqcjIKwQ44f4fiJlcEUUpeB9DMDHyd9cG711U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707406145; c=relaxed/simple;
-	bh=PWKix2jKXr3GaATEVoBS68T9Tfwt6Jo13vkkigskCYc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fuiu/CVZ9sB1FRMKRxtx2iGvKJ1+v6JaRH/HDnjIQvnXLiXAScGYrXBlN89XRhBtbo7rIkmHKe4LZE9p3myu6WSp3y9SliqFt9PhSwOoiRAuR2eCC/IYRpvd7QshNDpOPBwO+NVVAeOdzbqM1f2Dd36Tq/AUI+600iI8YJs5yM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jYVNYEcZ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ti0YAgSioGF9FSFHJYn0ruEVqEp65nTgDbJ/iL5dHSs=; b=jYVNYEcZ9HmlQ+cD7nhE40Nu6z
-	GnC8qmWuIQpLCyMSApowCI4ER3NhLw90JKR+PuBijJ2FyWkLyPC1g/xTBn2LPZjtpWDdmm0bo6/Nb
-	LDM6M9O1bMIw0TX75iB8X9QRlK9iS1m93ii8bARZHvWeo/nZikzATkE4pZ3K+lKLSz+SUxHpcPqEN
-	353B4FQPLh52U9UvRS5zouhs7AyzD3dVPkcU+S8j/k4E3pDwYE0WPSJOGtIR+46nyMvIKFSouxWym
-	NskBuZBLRBEZ/sMT8uNT8KJOafFaLZPMYdKLef/bVzFwVNAI4ezHPCqBrEf2faRhShRIP6UOz7q/l
-	HI+s4ESQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:47690)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rY6Ka-0004bQ-39;
-	Thu, 08 Feb 2024 15:28:53 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rY6KY-0005cD-7X; Thu, 08 Feb 2024 15:28:50 +0000
-Date: Thu, 8 Feb 2024 15:28:50 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Sergio Palumbo <palumbo.ser@outlook.it>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] net: sfp: add quirk for OEM DFP-34X-2C2 GPON
- ONU SFP
-Message-ID: <ZcTzMgxmA6WOoiA/@shell.armlinux.org.uk>
-References: <AS1PR03MB8189B99C360FB403B8A0DD6882422@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <Zb0t+zKHx+0wTXH5@shell.armlinux.org.uk>
- <AS1PR03MB8189D48114A559B080AF5BEA82422@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <Zb1+p6FiJwUF53xc@shell.armlinux.org.uk>
- <f8cf41f2-4a90-4ef5-b214-906319bd82d4@outlook.it>
- <AS1PR03MB818911164FB76698446CFEDC82472@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <ZcI+7grKa33oLtwc@shell.armlinux.org.uk>
- <AS1PR03MB818926990092981B0E09E60B82442@AS1PR03MB8189.eurprd03.prod.outlook.com>
- <ZcSZtLSWd09xqc10@shell.armlinux.org.uk>
- <AS1PR03MB8189A24B92030AA8F011C7B582442@AS1PR03MB8189.eurprd03.prod.outlook.com>
+	s=arc-20240116; t=1707406327; c=relaxed/simple;
+	bh=fjsov3uRgEiW3nYU2LA5ZmDxMOxNF1PFM1P2zKSNJWE=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=Y8wz+eWDSpiDghQtzocd6nzHFVZLkw7S/gbO7y+w6uIYV4GFyvUNC7s18z4GbM4ATq5t39oMlj7PVEKX5NecR7e5w6DVyXAJEYJixAB2VMB+wMVLFJhp63/UADPrvAPTC6dXqaQyeQbrhAma6be+rGnGWo/FTfqorcbxzR/LL2M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-363d6348a07so15329895ab.3
+        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 07:32:05 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707406325; x=1708011125;
+        h=content-transfer-encoding:to:from:subject:message-id:in-reply-to
+         :date:mime-version:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=J13MMIPfh9m7LdVejmcRDcZr7MHiXnjkLGh32J/ubZA=;
+        b=XhoGk8R0JAg1jQoKsk6ne3fqT1x+mWbjrTXQjEkfrz1O5S45GKeAmG9iKh7leZZ4i5
+         EmHvJW+pr8U31StZwCbTnlICSA+v9PyXoAz20+U7qt6gNFmimfSo2ItRkOq+B0yJSQZ2
+         IhpyCDZ0vRn48oYaA2301DjaHZMS/EIGzXYv2iR5kZ2czmJ/TAbURE+ZtKZBdLgcJVuN
+         9OS3Ef5WR4GXIYlWGNoAvp9wU/PLViEjMb1Tp+JZpu6jdriB1vQmralNWp7EznJE9KP2
+         HXMLzT2uJD6zsMl3jBA1oKY9bSMIuLySpSjIlEy/zjQasSjUdHNchXgT7VajlScLzbY8
+         DHtg==
+X-Gm-Message-State: AOJu0YxH7SpXtHuDqFyH7ikYuL2II+zpZLlbqiQi/yuw84AE1F2OObrF
+	sRE2rXsq2s+lIOsTf8eZP9uoUVpQziLS8HBohhfe6SzRj6IAZnmGJPAaaokqPDkTkSZZsewFPGB
+	qPJMwmj0cQ9Zs1pGVSlAKTCLCxRcaGFTBumnJ+7OXYXGvcEDqM+UpLuQ=
+X-Google-Smtp-Source: AGHT+IEXxARntCtqw9oujDkbqJu9ADvKd22NWzIad3D7h/2PbUtbLKRNZ1E6fc45LDIqWXP+mEWNhrOSFdMlCPfWKUfh+NZCzaLl
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <AS1PR03MB8189A24B92030AA8F011C7B582442@AS1PR03MB8189.eurprd03.prod.outlook.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Received: by 2002:a05:6e02:1c87:b0:363:b51a:7e59 with SMTP id
+ w7-20020a056e021c8700b00363b51a7e59mr638787ill.0.1707406324981; Thu, 08 Feb
+ 2024 07:32:04 -0800 (PST)
+Date: Thu, 08 Feb 2024 07:32:04 -0800
+In-Reply-To: <000000000000b7b62e0610db6b8a@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000007cea730610e083e8@google.com>
+Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Write in __hci_acl_create_connection_sync
+From: syzbot <syzbot+3f0a39be7a2035700868@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com, 
+	kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
+	marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, verdre@v0yd.nl
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 08, 2024 at 03:00:08PM +0100, Sergio Palumbo wrote:
-> Dear Russel,
-> this is the first time I do such a test and kindly ask you to help me in
-> preparing it.
-> In my openwrt environment I have found phylink.c file in two different
-> directories:
-> /build_dir/toolchain-aarch64_cortex-a53__gcc-112.30_musl/linux-5.15.137/drivers/net/phy
-> /build_dir/toolchain-aarch64_cortex-a53__gcc-112.30_musllinux-mediatek_filogic/linux-5.15.137/drivers/net/phy
+syzbot has bisected this issue to:
 
-Oh, openwrt. That means I need to re-understand their build system to
-advise how to do it. I only know the mainline kernel.
+commit 456561ba8e495e9320c1f304bf1cd3d1043cbe7b
+Author: Jonas Dre=C3=9Fler <verdre@v0yd.nl>
+Date:   Tue Feb 6 11:08:13 2024 +0000
 
-> do I have to change both adding a line:
-> #define DEBUG
-> 
-> before the first #define line:
-> #define SUPPORTED_interfaces \
+    Bluetooth: hci_conn: Only do ACL connections sequentially
 
-Mainline has never had "SUPPORTED_interfaces" in phylink.c, so I'm
-wondeirng what that's about. I'm also wondering what other changes
-there are to it. I'm also wondering whether the behaviour you're
-seeing is somehow special to openwrt. Too many things to wonder about
-and effectively means there's too much that I don't know.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D154f85501800=
+00
+start commit:   b1d3a0e70c38 Add linux-next specific files for 20240208
+git tree:       linux-next
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D174f85501800=
+00
+console output: https://syzkaller.appspot.com/x/log.txt?x=3D134f8550180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dbb693ba195662a0=
+6
+dashboard link: https://syzkaller.appspot.com/bug?extid=3D3f0a39be7a2035700=
+868
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D11d95147e8000=
+0
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D107c2d8fe80000
 
-Therefore, I don't think I can help you, and I don't think I can
-possibly accept your proposal for this quirk. For mainline, as far
-as I'm aware, it will cause these modules to regress when they are
-in the manufacturer default state when used with a host that supports
-both 1000base-X and 2500base-X.
+Reported-by: syzbot+3f0a39be7a2035700868@syzkaller.appspotmail.com
+Fixes: 456561ba8e49 ("Bluetooth: hci_conn: Only do ACL connections sequenti=
+ally")
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+For information about bisection process see: https://goo.gl/tpsmEJ#bisectio=
+n
 
