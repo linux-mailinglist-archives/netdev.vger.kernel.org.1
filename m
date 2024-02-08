@@ -1,170 +1,107 @@
-Return-Path: <netdev+bounces-70046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8AD884D6CD
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 00:55:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FCF484D6E5
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 01:04:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D2952841A5
-	for <lists+netdev@lfdr.de>; Wed,  7 Feb 2024 23:55:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 72D321C22738
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 00:04:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C43535B4;
-	Wed,  7 Feb 2024 23:55:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D33E3DF4D;
+	Thu,  8 Feb 2024 00:04:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="YOWaCVfl"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AWYPE2gP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD36220335;
-	Wed,  7 Feb 2024 23:55:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BC8F4C70;
+	Thu,  8 Feb 2024 00:04:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707350116; cv=none; b=BfJB3Y9zajfFMcv43tdiSq1bm2MtcZ9andgB+hjd2q450pQBBcl4xRqSyayoKF8UaA4xxWMvMVDTS3LnZu7uo1n0og2V1DrHG4zKOw1vJui27yeBi9HHvWLHxZPsk5nWirgRAxhLGWgv1DgMl5FXQBAyCDTAZzpj4FRE4gvxdOg=
+	t=1707350684; cv=none; b=VQE4SbOBZvz6BlwvUmp3muWcQKikyBv3v1k6fGbd4sI7sCd4BWLkr5wx3iwsfTAI8JrBhn609IbcmzhGFdBw+9QmLEGo0qptKqGiYY9J97by7D83s9ViffRN61VmoP96k8NsMFqAaqQE+s7z5LwjDqxrYG8BzkO6TeS+Ycz80vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707350116; c=relaxed/simple;
-	bh=VDfAjHW8McZv39SIa3owamfR7WXBRmrXLZFuoUTHIio=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=iwtR1SIg4dAPFufPwPaBK/XdSrbk+cLIuzUbpMMH4RE/iDaSO8uAKkvUBAvKNqXO+EkJHMu2zzyOKtU8btripm/+reQFK2hqhdK/VzbUHIljNLa8nR9hgrvPNQvTLCHrtUSlfcgJ2Ea4F2QUkY2qFjBtOFzB5jiJXpnnr2zKzDE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=YOWaCVfl; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 417Ms4e4021166;
-	Wed, 7 Feb 2024 23:54:57 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=jASkXHgSccq7FXFfSwb1V8nIGVqTlFnM5UN8uHvrymw=; b=YO
-	WaCVflOxTvqjvWq14NV9UNrgD4PBnIlZyc6fmsYMHDVS/U6ILkMefRgcRoCvfRIB
-	u7v6+uUk18xgm5saMtotBIxzD6OpHkfDPzbALzQqSyKcxibYCxl0AoTh5dkn+shO
-	eXgKFYS/FSpFl7K8fcLcpsSdCFXyqAUndCJhcH5SOu0BM/KKQ0HqwQQG+2qvNLJU
-	9mrrwAK48MWUJBlDqg2DKY5rANFv7ZOdH9dG/3dVOUzwuuB7Xb7SvWdNqz3fz91h
-	xCbTc8AsiEEfeEDFLIZNP8vZQUXOdmnzZYoU/SYS7u3XUqx8bQkm0R45UmBxd9Ci
-	1R9mWbAtjmkktggju4dg==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3w3x41tru5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 07 Feb 2024 23:54:57 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 417NsuJJ007717
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 7 Feb 2024 23:54:56 GMT
-Received: from [10.110.62.200] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Wed, 7 Feb
- 2024 15:54:52 -0800
-Message-ID: <182afe94-e6db-4329-8653-93f6315dea54@quicinc.com>
-Date: Wed, 7 Feb 2024 15:54:52 -0800
+	s=arc-20240116; t=1707350684; c=relaxed/simple;
+	bh=rUuhQxO5hijHzVr31s2tQ1oM73M+cCIiWMvwpUFCVWY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JZbo63Pn+Tl9gAJRcXqydFU0K3qSvVxCigmdv2qQi25Z3Wxs1jrqwDZA2nCGZbjZYMB6fu63jw210sDaS5ikDpz/yBk4A0rG/DRiXrDtlMV/uB2pM4Rr2qdjxbY2Bmx2LG6n8Jydjkja6fg1CJe315AvRNphS5uFsKJEza8ijU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AWYPE2gP; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=tZeUAfa9RbjQgBECn/qu6rSKPyPLTMOJXAfT7Ol4Lo4=; b=AWYPE2gPECpdOo0HyywKFwofzn
+	7PoFX+CsN0BmAngxv/WIWboVxZAQenabvsk0nx+9g+wHSUx1VUkvkhaCvA4U/skO4rNSqwGl47Rrr
+	KVvDDkChL4QzheXD33QbNXIznetLqWf7ofbM80MxFA3s6m6N6nqTCOwFrBnzLe3Glz6E=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rXru6-007GKM-J4; Thu, 08 Feb 2024 01:04:34 +0100
+Date: Thu, 8 Feb 2024 01:04:34 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jon Maxwell <jmaxwell37@gmail.com>
+Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next] intel: make module parameters readable in sys
+ filesystem
+Message-ID: <36a95b38-99c5-4fda-b9bf-8b9fb3b67e1c@lunn.ch>
+References: <20240207230430.82801-1-jmaxwell37@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3] net: stmmac: dwmac-qcom-ethqos: Enable TBS on
- all queues but 0
-Content-Language: en-US
-To: Abhishek Chauhan <quic_abchauha@quicinc.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        Andrew Halaney <ahalaney@redhat.com>
-CC: <kernel@quicinc.com>
-References: <20240207224001.2109224-1-quic_abchauha@quicinc.com>
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-In-Reply-To: <20240207224001.2109224-1-quic_abchauha@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: ygOZdbS30vKfvIBTNfdCtE1xVWs4KkyC
-X-Proofpoint-GUID: ygOZdbS30vKfvIBTNfdCtE1xVWs4KkyC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-07_09,2024-02-07_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0 impostorscore=0
- mlxlogscore=976 clxscore=1015 spamscore=0 priorityscore=1501
- suspectscore=0 adultscore=0 phishscore=0 lowpriorityscore=0 malwarescore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2401310000 definitions=main-2402070174
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240207230430.82801-1-jmaxwell37@gmail.com>
 
-On 2/7/2024 2:40 PM, Abhishek Chauhan wrote:
-> TSO and TBS cannot co-exist. TBS requires special descriptor to be
-> allocated at bootup. Initialising Tx queues at probe to support
-> TSO and TBS can help in allocating those resources at bootup.
+On Thu, Feb 08, 2024 at 10:04:30AM +1100, Jon Maxwell wrote:
+> Linux users sometimes need an easy way to check current values of module
+> parameters. For example the module may be manually reloaded with different
+> parameters. Make these visible and readable in the /sys filesystem to allow
+> that.
 > 
-> TX queues with TBS can support etf qdisc hw offload.
-> 
-> This is similar to the patch raised by NXP
-> commit 3b12ec8f618e ("net: stmmac: dwmac-imx: set TSO/TBS TX queues default 
-> settings")
-> 
-> Changes since v2:
-> - Fixed the styling of comment in the dwmac-qcom-ethqos.c
-> - Followed the upstream format to give other glue
->   driver references to solve the same problem
-> - Appended  the subject with net-next
-> - Discussion of why this patch is required is discussed in
-> https://lore.kernel.org/netdev/c2497eef-1041-4cd0-8220-42622c8902f4@quicinc.com/
-> 
-> Changes since v1:
-> - Subject is changed as per upstream guidelines
-> - Added a reference of a similar change done by NXP in
->   body of the commit message
-
-Note that your patch change history should not be part of your commit
-text, but instead should be below the "---" line.
-> 
-> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
+> Signed-off-by: Jon Maxwell <jmaxwell37@gmail.com>
 > ---
-
-in other words put it here. the change history will not be part of the
-git history
-
-I strongly suggest looking at b4 since it will manage your patch history:
-https://b4.docs.kernel.org/en/latest/index.html#for-developers
-
->  drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
+>  drivers/net/ethernet/intel/e100.c                 | 6 +++---
+>  drivers/net/ethernet/intel/e1000/e1000_main.c     | 2 +-
+>  drivers/net/ethernet/intel/e1000e/netdev.c        | 2 +-
+>  drivers/net/ethernet/intel/i40e/i40e_main.c       | 2 +-
+>  drivers/net/ethernet/intel/igb/igb_main.c         | 4 ++--
+>  drivers/net/ethernet/intel/igbvf/netdev.c         | 2 +-
+>  drivers/net/ethernet/intel/igc/igc_main.c         | 2 +-
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c     | 6 +++---
+>  drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c | 2 +-
+>  9 files changed, 14 insertions(+), 14 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> index 31631e3f89d0..2691a250a5a7 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> @@ -728,7 +728,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
->  	struct stmmac_resources stmmac_res;
->  	struct device *dev = &pdev->dev;
->  	struct qcom_ethqos *ethqos;
-> -	int ret;
-> +	int ret, i;
->  
->  	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
->  	if (ret)
-> @@ -822,6 +822,10 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
->  		plat_dat->serdes_powerdown  = qcom_ethqos_serdes_powerdown;
->  	}
->  
-> +	/* Enable TSO on queue0 and enable TBS on rest of the queues */
-> +	for (i = 1; i < plat_dat->tx_queues_to_use; i++)
-> +		plat_dat->tx_queues_cfg[i].tbs_en = 1;
-> +
->  	return devm_stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
->  }
->  
+> diff --git a/drivers/net/ethernet/intel/e100.c b/drivers/net/ethernet/intel/e100.c
+> index 01f0f12035caeb7ca1657387538fcebf5c608322..2d879579fc888abda880e7105304941db5d4e263 100644
+> --- a/drivers/net/ethernet/intel/e100.c
+> +++ b/drivers/net/ethernet/intel/e100.c
+> @@ -170,9 +170,9 @@ MODULE_FIRMWARE(FIRMWARE_D102E);
+>  static int debug = 3;
+>  static int eeprom_bad_csum_allow = 0;
+>  static int use_io = 0;
+> -module_param(debug, int, 0);
+> -module_param(eeprom_bad_csum_allow, int, 0);
+> -module_param(use_io, int, 0);
+> +module_param(debug, int, 0444);
 
+ethtool should show you debug. And it is pretty much standardized, it
+should work for most ethernet interfaces which support msglvl. So i
+would say it is better to teach your Linux users how to use ethtool
+for this.
+
+There might be some value in this change for module parameters which
+are not standardised, but i suggest you drop debug from the patchset.
+
+    Andrew
 
