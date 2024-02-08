@@ -1,151 +1,154 @@
-Return-Path: <netdev+bounces-70377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8741A84E9C7
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 21:41:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC9F084E9CC
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 21:44:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 33C6AB28047
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 20:40:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8380B1F2C451
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 20:44:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74D6C3EA67;
-	Thu,  8 Feb 2024 20:40:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b="I8oRC6K5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFCE244C73;
+	Thu,  8 Feb 2024 20:44:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f174.google.com (mail-vk1-f174.google.com [209.85.221.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ED744F1E1
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 20:40:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1726148794;
+	Thu,  8 Feb 2024 20:44:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707424851; cv=none; b=gw7OfWa4Jclkpcmt1JNZTpcGaZNGNjjgMKemGuXaGqcbJq2h7fJ3ZD9y8X+r7GbTLRMT9a7WXiHH+38NTixIZyMAGIYNSLGRbd/SZ15zORV8UtHIaSMZ8wBLrwt+XoSZaGw079llj2C5PxQwTgzTbJ4A3Wg+EHefWzj1Mkuw0Ec=
+	t=1707425056; cv=none; b=o2Xrsw2rSsT/e+rRMuz7idR7I4xDVKHp/CoTuVhfWY+i7oeetpJFZ7ahZzK1It5MBFyA3TB6EWrtqNI/WSp/NrXWe8YY6mUeMTtoDmoKOaseofHKF7PARSJX1G6OTF8e/GcE+ci0bkUoVcnO153jYZ5iUTXvbh2VX/ZPMcvtaa0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707424851; c=relaxed/simple;
-	bh=ga4ULga7g2GIWamrr4laebCK5Zjy0BEhbeQ7MlM0618=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uuUnhwdmu2KsyBZBJ2l5Qu5Ng86wyLReYXNpSagNYES7YmXS8cdHXq8o2p0697B06/7SrLaSaxk3+kUIWGhaXYRtnCm+3cm+ULkuFBt+ODQ7Qp7+6Cd7XBvwYz9leAB0dbsxliECDQK1KK8ZnpYba3mXaHCpZgHZTjegEP03JTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net; spf=pass smtp.mailfrom=amacapital.net; dkim=pass (2048-bit key) header.d=amacapital-net.20230601.gappssmtp.com header.i=@amacapital-net.20230601.gappssmtp.com header.b=I8oRC6K5; arc=none smtp.client-ip=209.85.221.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amacapital.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amacapital.net
-Received: by mail-vk1-f174.google.com with SMTP id 71dfb90a1353d-4c03b2ac77aso34723e0c.3
-        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 12:40:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amacapital-net.20230601.gappssmtp.com; s=20230601; t=1707424848; x=1708029648; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=TQYuhPwf89MOoIk/qFHllaTijS8wOxvgEWYqCkWWJ2A=;
-        b=I8oRC6K5342/JJMPYGtW3pkePdHFKVCqVNvxbYIOFrrsCVapMfi1zgzCn/CVFwncWI
-         db5OBNTDPFvMBhTNJsrQToee2nBZ323GQkGXP0lBnIRYYs4xSMGnRdOwP9XtI28TwfVb
-         sZ07ggodClwTJ1QVG2QWZUnX/1VyROVvFo044avdNo0jW+NZwcvZpZw2xAysvOA3A+xH
-         0w1EbbjEJPJjYU/LITRWHCKDdkJI2MV4DuJh/7kkexoVmr4THMMNMaUFzTcJLVS1a0RS
-         BdR2yTexs7VIgup3p0Ps/ZgoREfUEnDdlxBRIY9lE2DkwLKyNfPgTP1m+UqGYyuQYlId
-         sAYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707424848; x=1708029648;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TQYuhPwf89MOoIk/qFHllaTijS8wOxvgEWYqCkWWJ2A=;
-        b=uXp8hrMlyzo16Gjx6Iyl+3iBA/IBg7ejfr79jCZvd1k0vhhu/fPM5jUNLmM3IfQu8D
-         czD/LUUo0NL/2WMLUZjJXqTMy4F+y+fviR9CtFXMID7Py7hOttBuMtTJkpCZupU9CqCm
-         AoRuW1sqL5v3jelcKe4jDksmbeifLTN27nGo3tuuTQyCfsoMkb2fetyba62LsiODvQ/i
-         YhnZZT+RLU8W8DpnWGVb5/oOYZuVcaVRjqDjhRwE78wVgmW6BFaTOh3wPSgxXz6nSx1W
-         t4/Ogbi9K6MZZ1okICGshhaam8jLohlSzakNGaHnB8+yV4nGOLhhzSZaVFKej4ggxVsB
-         BWWg==
-X-Forwarded-Encrypted: i=1; AJvYcCVlEyQ43V7I16tFZs0rc/zqW2Q8migynM65aK8sLE0L2t0EjzAWU44hClABrzv7+mngUiir1Lhlviv6OdkuzAwkkIsv0CUW
-X-Gm-Message-State: AOJu0Ywae1O765iQN8Xg3TK7qGp3DUFBe9axjfvVRY57dtpAv1i/zBul
-	7R9M+FJ1ccDb2ts1xryU9ErMJtxCMFkKVtv1TxR/PqfQ0/2eKly5+2mzcJS1j4jLRwPZs76xSh4
-	CbNjcNwCKGyqcygS9PuxWqaMkbbytV3iMuGDk
-X-Google-Smtp-Source: AGHT+IHtFk/NgwQNlxYZ2ENGD8BCV+5dayWmsUIXGgmvFZaaYcwaA9MLABKKvd3jDU6QK5KD7rLTS/SJQklg46AQSwA=
-X-Received: by 2002:a1f:c8c7:0:b0:4b6:aeb7:3f1d with SMTP id
- y190-20020a1fc8c7000000b004b6aeb73f1dmr771409vkf.9.1707424848434; Thu, 08 Feb
- 2024 12:40:48 -0800 (PST)
+	s=arc-20240116; t=1707425056; c=relaxed/simple;
+	bh=0xnupxFj9c0DgQKxN89wXQQQe9ADhY3zOQTEun0xfX4=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=c+QAmHSrFIBYVupHGY+lHTncNH3JQxHEQ9pn6ZZ8HCWrwa2sU+A+PQ4eW/HsI/13CgrT+IflJUlJ46oE/HsBCKDoq7xfC6Mbd4dB/MX1eF6dOBa8dATwKDvoagLRKiHAQ+5Lp64UoN7gkEcW39dlN7GR+XamgyIpknPyy0f0Aqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (178.176.74.49) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Thu, 8 Feb
+ 2024 23:43:58 +0300
+Subject: Re: [PATCH net-next 1/5] net: ravb: Get rid of the temporary variable
+ irq
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20240207120733.1746920-1-claudiu.beznea.uj@bp.renesas.com>
+ <20240207120733.1746920-2-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <c284aab3-faf0-969c-7256-5bc72afe7e3e@omp.ru>
+Date: Thu, 8 Feb 2024 23:43:57 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CALCETrU0jB+kg0mhV6A8mrHfTE1D1pr1SD_B9Eaa9aDPfgHdtA@mail.gmail.com>
- <f454d60a-c68e-4fcc-a963-fc5c4503d0ee@linux.dev> <CALCETrWu63SB+R8hw-1gZ-fbutXAAFKuWJD-wJ9GejX+p8jhSw@mail.gmail.com>
-In-Reply-To: <CALCETrWu63SB+R8hw-1gZ-fbutXAAFKuWJD-wJ9GejX+p8jhSw@mail.gmail.com>
-From: Andy Lutomirski <luto@amacapital.net>
-Date: Thu, 8 Feb 2024 12:40:36 -0800
-Message-ID: <CALCETrVM6ooAH7eaZc6Ugh3FOon3M-ohWAS_CVQFc_194Vj9GA@mail.gmail.com>
-Subject: Re: SOF_TIMESTAMPING_OPT_ID is unreliable when sendmsg fails
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: Willem de Bruijn <willemb@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Network Development <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240207120733.1746920-2-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/08/2024 20:24:37
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 59
+X-KSE-AntiSpam-Info: Lua profiles 183308 [Feb 08 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {relay has no DNS name}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.74.49 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.74.49 in (user)
+ dbl.spamhaus.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.74.49
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 59
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 02/08/2024 20:30:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 2/8/2024 4:38:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Thu, Feb 8, 2024 at 12:05=E2=80=AFPM Andy Lutomirski <luto@amacapital.ne=
-t> wrote:
->
-> On Thu, Feb 8, 2024 at 11:55=E2=80=AFAM Vadim Fedorenko
-> <vadim.fedorenko@linux.dev> wrote:
-> >
-> > On 08/02/2024 18:02, Andy Lutomirski wrote:
-> > > I=E2=80=99ve been using OPT_ID-style timestamping for years, but for =
-some
-> > > reason this issue only bit me last week: if sendmsg() fails on a UDP
-> > > or ping socket, sk_tskey is poorly.  It may or may not get incremente=
-d
-> > > by the failed sendmsg().
-> > >
-> > Well, there are several error paths, for sure. For the sockets you
-> > mention the increment of tskey happens at __ip{,6}_append_data. There
-> > are 2 different types of failures which can happen after the increment.
-> > The first is MTU check fail, another one is memory allocation failures.
-> > I believe we can move increment to a later position, after MTU check in
-> > both functions to avoid first type of problem.
->
-> For reasons that I still haven't deciphered, I'm sporadically getting
-> EHOSTUNREACH after the increment.  I can't find anything in the code
-> that would cause that, and every time I try to instrument it, it stops
-> happening :(  I sendmsg to the same destination several times in rapid
-> succession, and at most one of them will get EHOSTUNREACH.
+On 2/7/24 3:07 PM, Claudiu wrote:
 
-I caught it in strace, finally.  And I also finally grepped the right
-part of the kernel tree to (I think) find the offending call chain.
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> The 4th argument of ravb_setup_irq() is used to save the IRQ number that
+> will be further used by the driver code. Not all ravb_setup_irqs() calls
+> need to save the IRQ number. The previous code used to pass a dummy
+> variable as the 4th argument in case the IRQ is not needed for further
+> usage. That is not necessary as the code from ravb_setup_irq() can detect
+> by itself if the IRQ needs to be saved. Thus, get rid of the code that is
+> not needed.
+> 
+> Reported-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+[...]
 
-__ip_append_data first increments sk_tskey.  Then it does:
+> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
+> index 9521cd054274..e235342e0827 100644
+> --- a/drivers/net/ethernet/renesas/ravb_main.c
+> +++ b/drivers/net/ethernet/renesas/ravb_main.c
+> @@ -2611,17 +2611,20 @@ static int ravb_setup_irq(struct ravb_private *priv, const char *irq_name,
+>  		if (!dev_name)
+>  			return -ENOMEM;
+>  
+> -		*irq = platform_get_irq_byname(pdev, irq_name);
+> +		error = platform_get_irq_byname(pdev, irq_name);
+>  		flags = 0;
+>  	} else {
+>  		dev_name = ndev->name;
+> -		*irq = platform_get_irq(pdev, 0);
+> +		error = platform_get_irq(pdev, 0);
+>  		flags = IRQF_SHARED;
+>  	}
+> -	if (*irq < 0)
+> -		return *irq;
+> +	if (error < 0)
+> +		return error;
+>  
+> -	error = devm_request_irq(dev, *irq, handler, flags, dev_name, ndev);
+> +	if (irq)
+> +		*irq = error;
+> +
+> +	error = devm_request_irq(dev, error, handler, flags, dev_name, ndev);
+>  	if (error)
+>  		netdev_err(ndev, "cannot request IRQ %s\n", dev_name);
+>  
 
-            if (transhdrlen) {
-                skb =3D sock_alloc_send_skb(sk, alloclen,
-                        (flags & MSG_DONTWAIT), &err);
+   Thanks for addressing my IRC comment! Tho the naming seems awful. :-)
+   I'd suggest to add a local variable (named e.g, irq_num) and use it to
+store the result of platform_get_irq[_byname]().
 
-(I have no idea why the transhdrlen path is different.)  That does:
+[...]
 
-static inline struct sk_buff *sock_alloc_send_skb(struct sock *sk,
-                          unsigned long size,
-                          int noblock, int *errcode)
-{
-    return sock_alloc_send_pskb(sk, size, 0, noblock, errcode, 0);
-}
-
-That does:
-
-struct sk_buff *sock_alloc_send_pskb(struct sock *sk, unsigned long header_=
-len,
-                     unsigned long data_len, int noblock,
-                     int *errcode, int max_page_order)
-{
-    struct sk_buff *skb;
-    long timeo;
-    int err;
-
-    timeo =3D sock_sndtimeo(sk, noblock);
-    for (;;) {
-        err =3D sock_error(sk);
-
-I'm utterly baffled why that check makes any sense whatsoever.  git
-blame informs me that it predates 2002.
-
-I'll contemplate a bit more and send a patch.
+MBR, Sergey
 
