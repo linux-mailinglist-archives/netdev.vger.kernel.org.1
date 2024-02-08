@@ -1,206 +1,157 @@
-Return-Path: <netdev+bounces-70263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 536A184E2E5
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 15:13:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6494C84E2EA
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 15:14:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 781291C27065
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 14:13:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 835A91C23521
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 14:14:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80C9D79928;
-	Thu,  8 Feb 2024 14:12:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D4CD78B5A;
+	Thu,  8 Feb 2024 14:13:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="APmOIA9j"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="pig0KT9B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from omta040.useast.a.cloudfilter.net (omta040.useast.a.cloudfilter.net [44.202.169.39])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB9F27B3FF
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 14:12:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC4278B44
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 14:13:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.39
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707401556; cv=none; b=ob2wsUwLopirO8bKTb8K5oQXoGtBhmjwS22n3g1wRjiZ8m0k8HjhAVHuGrHexvW+EaqW5E+tv8f8M9N+CNQypnR3c1flEx0E8FVZVRFrwiKIbx4AInMAwIq14rKx9WzWd+W/zFaljDjz2FMP6Z0UZSe2ARDs1YrjuhlngWKgWKs=
+	t=1707401630; cv=none; b=dDu5hryPfTvUdNPpzjtLJW5Luf+ucAxc/SBpt6DRVuRyJCygGXm/cP4uz+hIvy5f0vIU6jCZAffgX4Y4X7RGNuEQEqd/F4bQXOruiRJXAByAmwR7DjPwzprA7c1xkM8z5icY/OEjS5Mf6Lkhw3L57Levg6OkFAUkfqzbLl0AxmA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707401556; c=relaxed/simple;
-	bh=w2Ie9+bdPUx67CZqRE+quRI+wvl7Gn7OrPB9rRmrf8g=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=d3uQvY6XN7Qs8pN1KVIcW/QNj0vCHy8ldYf81rnEyemvKSAGEf7LmEmponp/jwm5XcBncSO6mCluNNalHfr9qgxhJtfJPT9HrpZ+2JdDVqDwsQAFmBn9ls6STJ7rY3Cl8fdU/kpXee9FP5M6zcN+z6HfAsm31iMQyA3aEaRLEeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=APmOIA9j; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7859d428fdfso208902085a.3
-        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 06:12:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707401553; x=1708006353; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=irhLyWxRXaUv1DlK+A4rXy6maAaO4CWIx5DziglKFXg=;
-        b=APmOIA9j5WUUQ6Vhxg5yXyCGFlm112qR3wShhRsBrXU7zMVc2my5CBiJ+Rl0XwiS2q
-         sU3BHWidXOGs+0plxTI66HOMphtAkGN37nE8tz9qAesrAMe53kvElTe03yaRqBCD+uFt
-         HurKGRxeu4Cmk77L8gPQKHlNexnOyR+tlMi/T19Fc5HYbtmijy4bYEIaCOw1OA5kLtyg
-         w+zfaB8CFmWlH0FTpUHJLrnwpLx9pgBgqri7rUsAXfGakJtsbWpWoTHqscFjhwR1y0pL
-         z5bAkrcrDQPyUccx4+njyYuO81Zij6Fjclsaak469CavVhIzxb+y43+LVgPgk5fY6TLX
-         6tcw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707401553; x=1708006353;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=irhLyWxRXaUv1DlK+A4rXy6maAaO4CWIx5DziglKFXg=;
-        b=ij1y0Go4iJBgH2uT96G9NBA+75TS95yBOCNsYt9O+pbvjaqIysgcDx2FnTB8+ss0sz
-         DPDX3rVShQ2iio7gr9HA3P4pHcn/flL6A9r7NZxrk4XsbD5s2m/ggcp4Ev7+VxONKS8i
-         6Fwg/6mtaUC8AdPGVWCxQ+fu82W+0boGEgox20EvJMkYyLLhgo4AP0CKTi3zMyav2IYV
-         CfzMdqoo+DiMOInEUKYc3S/opw6DTcWMr4I2YmDIMig+RNgnvLlW2BfgkgTZGpKdhXaB
-         IuX41wTOKmIZO9IYoRzy/MlFs2UVuV66ZKGZSBNCQQ7BOBMYUHf2x50t2rk1LZpGlLzk
-         1e3g==
-X-Gm-Message-State: AOJu0Yzkja+o4tcOsIOAYbjzZ5PkrvFA1QhW4RgnOKdbjm3j7TAoXPSi
-	wF+rL3RbsWfwBmWZ2/9AaBM9mt+0pa/dL/H+gW7Ab2FNa+iOeC41HYfYULCqGyjSnDVS/A0QSK5
-	g5Yg0hWvr4Q==
-X-Google-Smtp-Source: AGHT+IH4YwHXsnC8Iy9np7IsIX1ZuMlHYWbgArktYb2OttZsicgBMkDE5SN8X3wCIeaDx0gojNSzjCbX6L6Y2A==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:620a:8c04:b0:785:53d9:38f1 with SMTP
- id qz4-20020a05620a8c0400b0078553d938f1mr56775qkn.15.1707401553591; Thu, 08
- Feb 2024 06:12:33 -0800 (PST)
-Date: Thu,  8 Feb 2024 14:11:54 +0000
-In-Reply-To: <20240208141154.1131622-1-edumazet@google.com>
+	s=arc-20240116; t=1707401630; c=relaxed/simple;
+	bh=3ik1VeqZqvrBk+hkQ4LISwGyPWvT053eJy+F7I6/4gI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d4TRUe30PXNnD+Xg0dPNbaZCQGgn2I2jsBZjbJ/d9KFJ4z8/azK+teT0x/XTynhu+epu5PmYOi6kgamyAkyVHXsrP8JIUWzl74WZlKa3KZSQ8QJoV8qqkx2lPkp2xjzRKWE1IyBo5pRcml0e8mgSYYThEdw5lijbJqUPn4g3y4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=pig0KT9B; arc=none smtp.client-ip=44.202.169.39
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-5002a.ext.cloudfilter.net ([10.0.29.215])
+	by cmsmtp with ESMTPS
+	id Y4jKrKti3THHuY58OrLGqL; Thu, 08 Feb 2024 14:12:12 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id Y58Nr494ML5RlY58Nra9vg; Thu, 08 Feb 2024 14:12:12 +0000
+X-Authority-Analysis: v=2.4 cv=NfZF1HD4 c=1 sm=1 tr=0 ts=65c4e13c
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=WzbPXH4gqzPVN0x6HrNMNA==:17
+ a=IkcTkHD0fZMA:10 a=k7vzHIieQBIA:10 a=wYkD_t78qR0A:10 a=NEAV23lmAAAA:8
+ a=avmgtr1mAAAA:8 a=J1Y8HTJGAAAA:8 a=1XWaLZrsAAAA:8 a=VwQbUJbxAAAA:8
+ a=20KFwNOVAAAA:8 a=cm27Pg_UAAAA:8 a=9s2EZlhbFvVYUlpcnmcA:9 a=QEXdDO2ut3YA:10
+ a=8jQmqnmTF30O56MVTtdJ:22 a=y1Q9-5lHfBjTkpIzbSAN:22 a=AjGcO6oz07-iQ99wixmX:22
+ a=xmb-EsYY8bH0VWELuYED:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=NdzT1jnddPo3C2ofpdSb1STcn6/8gN+XK0UoGk/aM80=; b=pig0KT9BGEQTUgiqFgvo34xd5R
+	92e52VRIZKp8OxiD9dXKPNQyP1uBFPWMorhd9dNeZDgQb+Q8bvvwjmm+DZUywpzQFlkPKFaDB1vfY
+	frmH3A4pz5IDFDDDHuum4RjmBoeiOoC2FqCkLNj5zULzptXcZuOVNxbMuBgWwpAOxH6Ew2cqKNfSU
+	t31rJYBL0q2FdSvmJMab8qCaLAKFGbe9iRfJa1uT72N9FrMmTStNIrFa1CsufQVZN+JSoSwWoPnqH
+	/Im9Rc+aVHhmF+Fzlxr3TVGaNQuTMTqpBL4i1+CIG5MVoPuRLnDfN9nDC8aEs1Ua9KiJJ8vafRPUD
+	y44VAjvA==;
+Received: from 187-162-21-192.static.axtel.net ([187.162.21.192]:48510 helo=[192.168.15.10])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96.2)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1rY58M-003UCd-2o;
+	Thu, 08 Feb 2024 08:12:10 -0600
+Message-ID: <98572347-e83b-41bf-aad0-08ed8e967431@embeddedor.com>
+Date: Thu, 8 Feb 2024 08:12:09 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240208141154.1131622-1-edumazet@google.com>
-X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
-Message-ID: <20240208141154.1131622-14-edumazet@google.com>
-Subject: [PATCH v2 net-next 13/13] net: remove dev_base_lock
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net/sun3_82586: Avoid reading past buffer in debug output
+Content-Language: en-US
+To: Kees Cook <keescook@chromium.org>, Sam Creasey <sammy@sammy.net>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ "Gustavo A . R . Silva" <gustavoars@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20240206161651.work.876-kees@kernel.org>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <20240206161651.work.876-kees@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 187.162.21.192
+X-Source-L: No
+X-Exim-ID: 1rY58M-003UCd-2o
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: 187-162-21-192.static.axtel.net ([192.168.15.10]) [187.162.21.192]:48510
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 3
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfK50ypFJih4BNgOwzNJq3q+ZfM45rNU0pRjJy6P9sLhC4MfEpIcQCpMYNndAA3ynBEpXwJGpNK7ytyrcWqfNCRg5W3SFFeK7P/R5ECif6jxrdYlxh4TT
+ P8xdw6eLeRCJWVaeIpDHdBJRfbg08OvZgynj87G0tVpXf1BGioe965WA5b6tSzOdVxqt7xD7+u9KZxhahz9ymSUVeqqDtqX0Mcw=
 
-dev_base_lock is not needed anymore, all remaining users also hold RTNL.
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/linux/netdevice.h |  2 --
- net/core/dev.c            | 39 ++++-----------------------------------
- 2 files changed, 4 insertions(+), 37 deletions(-)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 636bea0a3587bd1d73389f2fe7f12b726bf56824..379220c28c423747cb7993596aafee168f85e6d7 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -3077,8 +3077,6 @@ int call_netdevice_notifiers(unsigned long val, struct net_device *dev);
- int call_netdevice_notifiers_info(unsigned long val,
- 				  struct netdev_notifier_info *info);
- 
--extern rwlock_t				dev_base_lock;		/* Device list lock */
--
- #define for_each_netdev(net, d)		\
- 		list_for_each_entry(d, &(net)->dev_base_head, dev_list)
- #define for_each_netdev_reverse(net, d)	\
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 4adf1b93eefe8052dfd907727fe6f1996b3477fd..c8a51fb39c9f5474bbf0c6c98a7e16b2a759aaf0 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -166,28 +166,6 @@ static int call_netdevice_notifiers_extack(unsigned long val,
- 					   struct net_device *dev,
- 					   struct netlink_ext_ack *extack);
- 
--/*
-- * The @dev_base_head list is protected by @dev_base_lock and the rtnl
-- * semaphore.
-- *
-- * Pure readers hold dev_base_lock for reading, or rcu_read_lock()
-- *
-- * Writers must hold the rtnl semaphore while they loop through the
-- * dev_base_head list, and hold dev_base_lock for writing when they do the
-- * actual updates.  This allows pure readers to access the list even
-- * while a writer is preparing to update it.
-- *
-- * To put it another way, dev_base_lock is held for writing only to
-- * protect against pure readers; the rtnl semaphore provides the
-- * protection against other writers.
-- *
-- * See, for example usages, register_netdevice() and
-- * unregister_netdevice(), which must be called with the rtnl
-- * semaphore held.
-- */
--DEFINE_RWLOCK(dev_base_lock);
--EXPORT_SYMBOL(dev_base_lock);
--
- static DEFINE_MUTEX(ifalias_mutex);
- 
- /* protects napi_hash addition/deletion and napi_gen_id */
-@@ -393,12 +371,10 @@ static void list_netdevice(struct net_device *dev)
- 
- 	ASSERT_RTNL();
- 
--	write_lock(&dev_base_lock);
- 	list_add_tail_rcu(&dev->dev_list, &net->dev_base_head);
- 	netdev_name_node_add(net, dev->name_node);
- 	hlist_add_head_rcu(&dev->index_hlist,
- 			   dev_index_hash(net, dev->ifindex));
--	write_unlock(&dev_base_lock);
- 
- 	netdev_for_each_altname(dev, name_node)
- 		netdev_name_node_add(net, name_node);
-@@ -425,11 +401,9 @@ static void unlist_netdevice(struct net_device *dev)
- 		netdev_name_node_del(name_node);
- 
- 	/* Unlink dev from the device chain */
--	write_lock(&dev_base_lock);
- 	list_del_rcu(&dev->dev_list);
- 	netdev_name_node_del(dev->name_node);
- 	hlist_del_rcu(&dev->index_hlist);
--	write_unlock(&dev_base_lock);
- 
- 	dev_base_seq_inc(dev_net(dev));
- }
-@@ -744,9 +718,9 @@ EXPORT_SYMBOL_GPL(dev_fill_forward_path);
-  *	@net: the applicable net namespace
-  *	@name: name to find
-  *
-- *	Find an interface by name. Must be called under RTNL semaphore
-- *	or @dev_base_lock. If the name is found a pointer to the device
-- *	is returned. If the name is not found then %NULL is returned. The
-+ *	Find an interface by name. Must be called under RTNL semaphore.
-+ *	If the name is found a pointer to the device is returned.
-+ *	If the name is not found then %NULL is returned. The
-  *	reference counters are not incremented so the caller must be
-  *	careful with locks.
-  */
-@@ -827,8 +801,7 @@ EXPORT_SYMBOL(netdev_get_by_name);
-  *	Search for an interface by index. Returns %NULL if the device
-  *	is not found or a pointer to the device. The device has not
-  *	had its reference counter increased so the caller must be careful
-- *	about locking. The caller must hold either the RTNL semaphore
-- *	or @dev_base_lock.
-+ *	about locking. The caller must hold the RTNL semaphore.
-  */
- 
- struct net_device *__dev_get_by_index(struct net *net, int ifindex)
-@@ -1233,15 +1206,11 @@ int dev_change_name(struct net_device *dev, const char *newname)
- 
- 	netdev_adjacent_rename_links(dev, oldname);
- 
--	write_lock(&dev_base_lock);
- 	netdev_name_node_del(dev->name_node);
--	write_unlock(&dev_base_lock);
- 
- 	synchronize_rcu();
- 
--	write_lock(&dev_base_lock);
- 	netdev_name_node_add(net, dev->name_node);
--	write_unlock(&dev_base_lock);
- 
- 	ret = call_netdevice_notifiers(NETDEV_CHANGENAME, dev);
- 	ret = notifier_to_errno(ret);
+On 2/6/24 10:16, Kees Cook wrote:
+> Since NUM_XMIT_BUFFS is always 1, building m68k with sun3_defconfig and
+> -Warraybounds, this build warning is visible[1]:
+> 
+> drivers/net/ethernet/i825xx/sun3_82586.c: In function 'sun3_82586_timeout':
+> drivers/net/ethernet/i825xx/sun3_82586.c:990:122: warning: array subscript 1 is above array bounds of 'volatile struct transmit_cmd_struct *[1]' [-Warray-bounds=]
+>    990 |                 printk("%s: command-stats: %04x %04x\n",dev->name,swab16(p->xmit_cmds[0]->cmd_status),swab16(p->xmit_cmds[1]->cmd_status));
+>        |                                                                                                               ~~~~~~~~~~~~^~~
+> ...
+> drivers/net/ethernet/i825xx/sun3_82586.c:156:46: note: while referencing 'xmit_cmds'
+>    156 |         volatile struct transmit_cmd_struct *xmit_cmds[NUM_XMIT_BUFFS];
+> 
+> Avoid accessing index 1 since it doesn't exist.
+> 
+> Link: https://github.com/KSPP/linux/issues/325 [1]
+> Cc: Sam Creasey <sammy@sammy.net>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: Gustavo A. R. Silva <gustavoars@kernel.org>
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+
+Thanks!
 -- 
-2.43.0.594.gd9cf4e227d-goog
+Gustavo
 
+> ---
+>   drivers/net/ethernet/i825xx/sun3_82586.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/i825xx/sun3_82586.c b/drivers/net/ethernet/i825xx/sun3_82586.c
+> index 5e27470c6b1e..f2d4669c81cf 100644
+> --- a/drivers/net/ethernet/i825xx/sun3_82586.c
+> +++ b/drivers/net/ethernet/i825xx/sun3_82586.c
+> @@ -987,7 +987,7 @@ static void sun3_82586_timeout(struct net_device *dev, unsigned int txqueue)
+>   	{
+>   #ifdef DEBUG
+>   		printk("%s: xmitter timed out, try to restart! stat: %02x\n",dev->name,p->scb->cus);
+> -		printk("%s: command-stats: %04x %04x\n",dev->name,swab16(p->xmit_cmds[0]->cmd_status),swab16(p->xmit_cmds[1]->cmd_status));
+> +		printk("%s: command-stats: %04x\n", dev->name, swab16(p->xmit_cmds[0]->cmd_status));
+>   		printk("%s: check, whether you set the right interrupt number!\n",dev->name);
+>   #endif
+>   		sun3_82586_close(dev);
 
