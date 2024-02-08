@@ -1,50 +1,87 @@
-Return-Path: <netdev+bounces-70070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70071-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B84AB84D806
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 04:00:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B08B84D819
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 04:07:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 473A81F22AB7
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 03:00:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 802E2B23462
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 03:07:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1583A1CFA8;
-	Thu,  8 Feb 2024 03:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A76E1D532;
+	Thu,  8 Feb 2024 03:07:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m/IGb7ZH"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="v05K2LjN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E32841CD25
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 03:00:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 364501D526
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 03:07:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707361231; cv=none; b=RbWocckOHhu8MVHXgmsj39gNFRF6XQWaKiR93rL6gpdmDuB/SvyLcFxacFtEDpufh1+V8A2HTdoTLgZvbcG2LGnEoqIRIvRcDJc32Az3z8cEjLLWLFCyIA0QF1gqPwrJY0QRwn2VQO4mLiJuDciGZuvHY8hRveFdszPN/XbayrQ=
+	t=1707361632; cv=none; b=cYDZjG88dVHK12N1Rlxu4JzfOTtxBE3vwnwGfHAY72YEn9V8icklDIvbpMz67r+uZPSbZlKoXOnV8FXowYHRTawJudZKnBw30KgLVuIMlv5SCxY7XFdx3PVOblKq6F/fETi//G5LRNrvKAgNnJXBBIgNDVTn16MNJ4ld0MtJboc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707361231; c=relaxed/simple;
-	bh=2H8s4tiAdGf5Br7jsD/rhqzzB/l+97EC8tZuSoby/hQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=sbr3sZ2UuN29PDUl0Q3MVN6nrJNcFBj4tVZ4JGxAIMNsviN7nme4TXtjYGUXrIKl81lmoGYWOBnsozzeRiSln9c1mBUO+2IZZf5K0c7dDG7u8BP0mWoxV8AqgPsCICj5hjcCQemeupkYC4JXtunrXo6sMxWtU0WC46WKBi0Y3Y8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m/IGb7ZH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6A44FC43390;
-	Thu,  8 Feb 2024 03:00:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707361230;
-	bh=2H8s4tiAdGf5Br7jsD/rhqzzB/l+97EC8tZuSoby/hQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=m/IGb7ZHW+Cl0ZCq0bzWT1Kf6TF60DO72Ls5yDTyMRmcT1hjwXORSfJX2malKoCaw
-	 MsATPFAlQAPUzbwGB1Ve+YMM7dqo6B8uIvpjiR+VM2v1D7DyHiWPDowm4SdCWPPXKH
-	 TKY4CIItt8BxRg3q6arv2FAvJl4a+ENwMaLHnboeWDs7idRAA15dzJIkCVnS5eZy3s
-	 q/RT6iau7kLvb5qs5RXcbiNPrSmEkmm6x4gq0voUbp4zxSVS2mafZ8khygYjGTt08a
-	 3FuLAhX35MXRIsY5/cdDykD0nh4QrMiw6NtQ8guFJ0BuaQv98QyWFkmMUXZF6BRn5M
-	 Oa6K5vo+sRIUg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5279FD8C96F;
-	Thu,  8 Feb 2024 03:00:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1707361632; c=relaxed/simple;
+	bh=Uh3Rm8V4VHsu71sBjaBczwz61EnKx5fFtPzxEMRZyvI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WaSYXu1rLFqFDbl2bSFyZCbpOWNIiCMG5PRff6SGeJOTKJiLXNBLHB7m60rlmuAsocyX4TWhw9n604dvoHksqL1wRMGXYy9NGJZuKt5XrNkcCt4P6/rKYcIoahl12ca9Z82UmU/Gc42qJfbxx7e3WqMJ23za0Dtzz3pez/NHV5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=v05K2LjN; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1d746ce7d13so12575295ad.0
+        for <netdev@vger.kernel.org>; Wed, 07 Feb 2024 19:07:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1707361628; x=1707966428; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=egs7rCfpH1ftbki48KCuJAklsR0MNJ7M7ZSfGS5ub5U=;
+        b=v05K2LjNf419fOZY8Hlm9F1vAYGv552eZ8LjB3QAZwNxzCWxAiapna16aDvXUurOCH
+         9kZIIT3tOXmE5xVMG0c6jYnbwX2GPV4aJzHqdTex24L0BPRZAAnXQXx0FhiB5Xq0yLqy
+         nc9I3mCCyUqty+rNfFQ6Z0TxbWmNHMBUXBQNY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707361628; x=1707966428;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=egs7rCfpH1ftbki48KCuJAklsR0MNJ7M7ZSfGS5ub5U=;
+        b=OIotRFRZurkAbo9KK8YKYn/dDtrK8hz4NPt9C+VsBOdddgRYtein5L5oj/lee3d7wP
+         /VVX9btAHI3K7C1JeR/Prywc7VWqwslgnNt/pr+YJ+3Bcjiyj0o9U/YVtPpLl/z5Tluo
+         fAEjFauHv9GoBcikO9tFEPi0mU3I3QL8LWM5Ij8IPxnCLOImfyuPO3MuuAM0psgUrfFj
+         WlkdPwzej8zBqP5VrNwcIOJ15tcvz7+iTCzbN/otRN33KbzFW9owPhBqSCnngh0JHxJD
+         UQ1cYKp1mFlzKRQ7eLoN+d2rkZjX+JLTGc0Tj5oT2wBbcat/tR6zVn+PDbHW/5hkwZKK
+         oPTw==
+X-Gm-Message-State: AOJu0Yz+vc2i5vB0//bv/gcyOz+vOOLdE6Yyb30Y9R8ZHFWfsn4I2Qy+
+	fp8KZifrCR0KqGKh9Xh1mHmeMludKBfoUWyVQHg6vUNB8HdJi6wuujlgMoJ96xo=
+X-Google-Smtp-Source: AGHT+IFeQByc3Ud6HAkpe54Ssf4Ks5auR0GRuMFO0189+CN7FpKYZqgiGhkuedzUoLJa+6jvKIo9Gw==
+X-Received: by 2002:a17:902:6b44:b0:1d9:bc11:66e with SMTP id g4-20020a1709026b4400b001d9bc11066emr6196112plt.37.1707361628549;
+        Wed, 07 Feb 2024 19:07:08 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWLLVbDAWkfFtyhSVVzh+qvy66GqylkUIRMroRtqJlDWxFeOc32pUB9RrPlUQyPQHQRsIEh7PCjqZYG9FT/j36boFo3nuhugbBy5NNz579ZY6vYDjR8jpJXPRxdTPZ3D+az1RklSBm1Y09QIYvUO/VyKE7LJTRMyRnHzjVW2PTdSsSSztuyIbCEf+5LlBC1NwF7ivTlCmtXDKFgwQraNBX96xDu3UOmSjROOfGxWCEYNoPzo11QOfbOdGgPDBchllmsEGaiTsKw3VOaBZej2Y7/b377piUFa8OF28Qto619MBsAVagNNwpbNMFE28Tj9u6bGGYxi81MfDA4uwItTZBdly95ViAD6ziwyRr1z6fZCj/iNhOmioMGkOa1eACs86sG9wWx0Blp9f/KYMdU24cinrZmGyLEBAcdkMS1/uvJHKjDO6bT
+Received: from localhost.localdomain ([2620:11a:c018:0:ea8:be91:8d1:f59b])
+        by smtp.gmail.com with ESMTPSA id q5-20020a170902c9c500b001d8b8bf8e44sm2235232pld.92.2024.02.07.19.07.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Feb 2024 19:07:08 -0800 (PST)
+From: Joe Damato <jdamato@fastly.com>
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: tariqt@nvidia.com,
+	rrameshbabu@nvidia.com,
+	Joe Damato <jdamato@fastly.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	linux-rdma@vger.kernel.org (open list:MELLANOX MLX5 core VPI driver)
+Subject: [PATCH net-next v3] net/mlx5e: link NAPI instances to queues and IRQs
+Date: Thu,  8 Feb 2024 03:07:00 +0000
+Message-Id: <20240208030702.27296-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,73 +89,99 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next V4 01/15] xfrm: generalize xdo_dev_state_update_curlft to
- allow statistics update
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170736123033.21845.6120628380850293061.git-patchwork-notify@kernel.org>
-Date: Thu, 08 Feb 2024 03:00:30 +0000
-References: <20240206005527.1353368-2-saeed@kernel.org>
-In-Reply-To: <20240206005527.1353368-2-saeed@kernel.org>
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, saeedm@nvidia.com, netdev@vger.kernel.org,
- tariqt@nvidia.com, gal@nvidia.com, leonro@nvidia.com,
- steffen.klassert@secunet.com
 
-Hello:
+Make mlx5 compatible with the newly added netlink queue GET APIs.
 
-This series was applied to netdev/net-next.git (main)
-by Saeed Mahameed <saeedm@nvidia.com>:
+Signed-off-by: Joe Damato <jdamato@fastly.com>
+---
+v2 -> v3:
+  - Fix commit message subject
+  - call netif_queue_set_napi in mlx5e_ptp_activate_channel and
+    mlx5e_ptp_deactivate_channel to enable/disable NETDEV_QUEUE_TYPE_RX for
+    the PTP channel.
+  - Modify mlx5e_activate_txqsq and mlx5e_deactivate_txqsq to set
+    NETDEV_QUEUE_TYPE_TX which should take care of all TX queues including
+    QoS/HTB and PTP.
+  - Rearrange mlx5e_activate_channel and mlx5e_deactivate_channel for
+    better ordering when setting and unsetting NETDEV_QUEUE_TYPE_RX NAPI
+    structs
 
-On Mon,  5 Feb 2024 16:55:13 -0800 you wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
-> 
-> In order to allow drivers to fill all statistics, change the name
-> of xdo_dev_state_update_curlft to be xdo_dev_state_update_stats.
-> 
-> Acked-by: Steffen Klassert <steffen.klassert@secunet.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-> 
-> [...]
+v1 -> v2:
+  - Move netlink NULL code to mlx5e_deactivate_channel
+  - Move netif_napi_set_irq to mlx5e_open_channel and avoid storing the
+    irq, after netif_napi_add which itself sets the IRQ to -1
 
-Here is the summary with links:
-  - [net-next,V4,01/15] xfrm: generalize xdo_dev_state_update_curlft to allow statistics update
-    https://git.kernel.org/netdev/net-next/c/fd2bc4195d51
-  - [net-next,V4,02/15] xfrm: get global statistics from the offloaded device
-    https://git.kernel.org/netdev/net-next/c/f9f221c98fd8
-  - [net-next,V4,03/15] net/mlx5e: Connect mlx5 IPsec statistics with XFRM core
-    https://git.kernel.org/netdev/net-next/c/6fb7f9408779
-  - [net-next,V4,04/15] net/mlx5e: Delete obsolete IPsec code
-    https://git.kernel.org/netdev/net-next/c/77bed87f7620
-  - [net-next,V4,05/15] Documentation: Fix counter name of mlx5 vnic reporter
-    https://git.kernel.org/netdev/net-next/c/21e16fa5dc6c
-  - [net-next,V4,06/15] net/mlx5: Rename mlx5_sf_dev_remove
-    https://git.kernel.org/netdev/net-next/c/8d7db0abafb8
-  - [net-next,V4,07/15] net/mlx5: remove fw_fatal reporter dump option for non PF
-    https://git.kernel.org/netdev/net-next/c/daa6a6eb8f88
-  - [net-next,V4,08/15] net/mlx5: remove fw reporter dump option for non PF
-    https://git.kernel.org/netdev/net-next/c/17aa2d79b7e5
-  - [net-next,V4,09/15] net/mlx5: SF, Stop waiting for FW as teardown was called
-    https://git.kernel.org/netdev/net-next/c/137cef6d5556
-  - [net-next,V4,10/15] net/mlx5: Return specific error code for timeout on wait_fw_init
-    https://git.kernel.org/netdev/net-next/c/bcad0e531231
-  - [net-next,V4,11/15] net/mlx5: Remove initial segmentation duplicate definitions
-    https://git.kernel.org/netdev/net-next/c/91a72ada6605
-  - [net-next,V4,12/15] net/mlx5: Change missing SyncE capability print to debug
-    https://git.kernel.org/netdev/net-next/c/507472ed0e37
-  - [net-next,V4,13/15] net/mlx5: DR, Change SWS usage to debug fs seq_file interface
-    https://git.kernel.org/netdev/net-next/c/917d1e799ddf
-  - [net-next,V4,14/15] net/mlx5e: XSK, Exclude tailroom from non-linear SKBs memory calculations
-    https://git.kernel.org/netdev/net-next/c/fb3bfdfcd106
-  - [net-next,V4,15/15] net/mlx5e: XDP, Exclude headroom and tailroom from memory calculations
-    https://git.kernel.org/netdev/net-next/c/a90f55916f15
+ drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c  | 3 +++
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 7 +++++++
+ 2 files changed, 10 insertions(+)
 
-You are awesome, thank you!
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
+index 078f56a3cbb2..fbbc287d924d 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
+@@ -927,6 +927,8 @@ void mlx5e_ptp_activate_channel(struct mlx5e_ptp *c)
+ 	int tc;
+ 
+ 	napi_enable(&c->napi);
++	netif_queue_set_napi(c->netdev, c->rq.ix, NETDEV_QUEUE_TYPE_RX,
++			     &c->napi);
+ 
+ 	if (test_bit(MLX5E_PTP_STATE_TX, c->state)) {
+ 		for (tc = 0; tc < c->num_tc; tc++)
+@@ -951,6 +953,7 @@ void mlx5e_ptp_deactivate_channel(struct mlx5e_ptp *c)
+ 			mlx5e_deactivate_txqsq(&c->ptpsq[tc].txqsq);
+ 	}
+ 
++	netif_queue_set_napi(c->netdev, c->rq.ix, NETDEV_QUEUE_TYPE_RX, NULL);
+ 	napi_disable(&c->napi);
+ }
+ 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index c8e8f512803e..2f1792854dd5 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -1806,6 +1806,7 @@ void mlx5e_activate_txqsq(struct mlx5e_txqsq *sq)
+ 	set_bit(MLX5E_SQ_STATE_ENABLED, &sq->state);
+ 	netdev_tx_reset_queue(sq->txq);
+ 	netif_tx_start_queue(sq->txq);
++	netif_queue_set_napi(sq->channel->netdev, sq->txq_ix, NETDEV_QUEUE_TYPE_TX, &sq->channel->napi);
+ }
+ 
+ void mlx5e_tx_disable_queue(struct netdev_queue *txq)
+@@ -1819,6 +1820,7 @@ void mlx5e_deactivate_txqsq(struct mlx5e_txqsq *sq)
+ {
+ 	struct mlx5_wq_cyc *wq = &sq->wq;
+ 
++	netif_queue_set_napi(sq->channel->netdev, sq->txq_ix, NETDEV_QUEUE_TYPE_TX, NULL);
+ 	clear_bit(MLX5E_SQ_STATE_ENABLED, &sq->state);
+ 	synchronize_net(); /* Sync with NAPI to prevent netif_tx_wake_queue. */
+ 
+@@ -2560,6 +2562,7 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
+ 	c->lag_port = mlx5e_enumerate_lag_port(priv->mdev, ix);
+ 
+ 	netif_napi_add(netdev, &c->napi, mlx5e_napi_poll);
++	netif_napi_set_irq(&c->napi, irq);
+ 
+ 	err = mlx5e_open_queues(c, params, cparam);
+ 	if (unlikely(err))
+@@ -2602,12 +2605,16 @@ static void mlx5e_activate_channel(struct mlx5e_channel *c)
+ 		mlx5e_activate_xsk(c);
+ 	else
+ 		mlx5e_activate_rq(&c->rq);
++
++	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_RX, &c->napi);
+ }
+ 
+ static void mlx5e_deactivate_channel(struct mlx5e_channel *c)
+ {
+ 	int tc;
+ 
++	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_RX, NULL);
++
+ 	if (test_bit(MLX5E_CHANNEL_STATE_XSK, c->state))
+ 		mlx5e_deactivate_xsk(c);
+ 	else
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.25.1
 
 
