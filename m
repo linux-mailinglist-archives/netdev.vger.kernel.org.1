@@ -1,51 +1,66 @@
-Return-Path: <netdev+bounces-70136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7093284DCB5
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:22:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E89FA84DCE8
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:29:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3D4E1C21E83
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 09:22:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1891F1C26756
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 09:29:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26266F08D;
-	Thu,  8 Feb 2024 09:21:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0211A6BB46;
+	Thu,  8 Feb 2024 09:26:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XRu8/JvU"
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA01F6E2B9;
-	Thu,  8 Feb 2024 09:20:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7705171B4;
+	Thu,  8 Feb 2024 09:26:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707384061; cv=none; b=AxE14At3VQO+I3Ch+YHXYEA7zwBEqtSaFvaGmlj8fs57KqCKuCalUmGFScPdFTBrRBUS2UH11A0eliKGVTi8RtFipWVI4rxN1Eyk54HPxV6893Ym2W6HrIPx/LiPSeWY6tEXRjLjglsfJO5eBBsI9mEoeJlC/7pbblJg/ZxqLIs=
+	t=1707384393; cv=none; b=PHI+CKry0i97KO5BxKKIFBGsgbCYstjBYdhpZbRrUGpB7d/GVuQ+LFTUlaO8j2Vn2au73qYbiH9hle6KMwPKruJl+2m2wTFD3D6tFnuT4EqsTj8GCQpFYZIKVjs4jk80hNPRTRbxQEiS18peTbhfiXaZr5pT0p1D4M53576jccM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707384061; c=relaxed/simple;
-	bh=B/HKn+CrCkg62+tnugbIGxmQwdsYdT1rFcR2OMqEXpk=;
+	s=arc-20240116; t=1707384393; c=relaxed/simple;
+	bh=DJn/JznV4z6gHv7cVHFcfLco3THQI2iFxeIjFcAeR5U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u3/8sadnS0KXX4kn0aIQDjh1a4XVMo+XDNtNJOjWi5kMXT1CbuTlHr0cb1cwRRx2vAyiJMNSOJISttIbjkhe0549LjPw5a2/1rEuz9c6aUigh21S7J3w0YtK82X6tWeY+QxNO1uExCK4oaoBnpdfA2ht50AH4ROd7BfOC5r1Y4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.41.52] (port=41052 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1rY0aS-009yn1-E4; Thu, 08 Feb 2024 10:20:54 +0100
-Date: Thu, 8 Feb 2024 10:20:51 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
-	edumazet@google.com, fw@strlen.de, netfilter-devel@vger.kernel.org
-Subject: Re: [PATCH net 05/13] netfilter: ipset: Missing gc cancellations
- fixed
-Message-ID: <ZcSc86Sipo0atl/L@calendula>
-References: <20240207233726.331592-1-pablo@netfilter.org>
- <20240207233726.331592-6-pablo@netfilter.org>
- <9fb4e908-832c-44ae-8049-f6e9092f9b10@leemhuis.info>
- <b40f03126ec8380704d7ff1b7364a977196ef083.camel@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=qyiDFwDryc3apqIrFexVKqFn7ZCQjU6IwgPoo0+8itNGx3xqDR4nHeKZIAksCHwjjenU1zQQI3sFzsXTZpBQ3DfVa+XiqEOy07IxNCd0TtMZy9TVpLHZOM4Sf9KDW9mIshKNl0Mus/5h7CD05V53jVs1ssGQxhRJN4nrbEAWrV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XRu8/JvU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B83EBC433C7;
+	Thu,  8 Feb 2024 09:26:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707384393;
+	bh=DJn/JznV4z6gHv7cVHFcfLco3THQI2iFxeIjFcAeR5U=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XRu8/JvUYQ3LRRE7NieWOIEMI5jR0RbvmIng0aOkFS2Rj/gVCVdMjQ8FxxVrgvAAm
+	 7OfNfkva16HRK8+2FS+CH3gsDZMMdRV0wVZw/l/DNIQFSUSYY/I0JATtG8G9MZY2We
+	 RrskuRl2UMdcVPeOH3EWrN3AnHO9U792zatvgVapsq4bw4zUe/rUttOW6BFW7KZ6Hu
+	 sjJEYfv8bJ5a576g7soea/ckwko3A3hietiDU5Wbi8/AP0FZciUE2cWDub69NHgcew
+	 tw0z+MTh1PaccjMqYtDwAsJIoc4wi9wmQgLBud9yMnKQXy6v9Hn9Ls3+ejIpatUunK
+	 CUuuRz17hiROA==
+Date: Thu, 8 Feb 2024 09:26:27 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jon Hunter <jonathanh@nvidia.com>
+Cc: Furong Xu <0x1207@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Joao Pinto <jpinto@synopsys.com>,
+	Serge Semin <fancer.lancer@gmail.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	xfr@outlook.com, rock.xu@nio.com,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH net v4] net: stmmac: xgmac: fix handling of DPP safety
+ error for DMA channels
+Message-ID: <20240208092627.GP1297511@kernel.org>
+References: <20240203051439.1127090-1-0x1207@gmail.com>
+ <c25eb595-8d91-40ea-9f52-efa15ebafdbc@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,52 +70,186 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <b40f03126ec8380704d7ff1b7364a977196ef083.camel@redhat.com>
-X-Spam-Score: -1.8 (-)
+In-Reply-To: <c25eb595-8d91-40ea-9f52-efa15ebafdbc@nvidia.com>
 
-Hi Paolo,
+On Wed, Feb 07, 2024 at 11:56:26AM +0000, Jon Hunter wrote:
+> 
+> On 03/02/2024 05:14, Furong Xu wrote:
+> > Commit 56e58d6c8a56 ("net: stmmac: Implement Safety Features in
+> > XGMAC core") checks and reports safety errors, but leaves the
+> > Data Path Parity Errors for each channel in DMA unhandled at all, lead to
+> > a storm of interrupt.
+> > Fix it by checking and clearing the DMA_DPP_Interrupt_Status register.
+> > 
+> > Fixes: 56e58d6c8a56 ("net: stmmac: Implement Safety Features in XGMAC core")
+> > Signed-off-by: Furong Xu <0x1207@gmail.com>
+> > Reviewed-by: Simon Horman <horms@kernel.org>
+> > Reviewed-by: Serge Semin <fancer.lancer@gmail.com>
+> > ---
+> > Changes in v4:
+> >   - fix a typo name of DDPP bit, thanks Serge Semin
+> > 
+> > Changes in v3:
+> >   - code style fix, thanks Paolo Abeni
+> > 
+> > Changes in v2:
+> >    - explicit enable Data Path Parity Protection
+> >    - add new counters to stmmac_safety_stats
+> >    - add detailed log
+> > ---
+> >   drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
+> >   .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  3 +
+> >   .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 57 ++++++++++++++++++-
+> >   3 files changed, 60 insertions(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
+> > index 721c1f8e892f..b4f60ab078d6 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/common.h
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/common.h
+> > @@ -216,6 +216,7 @@ struct stmmac_safety_stats {
+> >   	unsigned long mac_errors[32];
+> >   	unsigned long mtl_errors[32];
+> >   	unsigned long dma_errors[32];
+> > +	unsigned long dma_dpp_errors[32];
+> >   };
+> >   /* Number of fields in Safety Stats */
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> > index 207ff1799f2c..5c67a3f89f08 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
+> > @@ -303,6 +303,8 @@
+> >   #define XGMAC_RXCEIE			BIT(4)
+> >   #define XGMAC_TXCEIE			BIT(0)
+> >   #define XGMAC_MTL_ECC_INT_STATUS	0x000010cc
+> > +#define XGMAC_MTL_DPP_CONTROL		0x000010e0
+> > +#define XGMAC_DPP_DISABLE		BIT(0)
+> >   #define XGMAC_MTL_TXQ_OPMODE(x)		(0x00001100 + (0x80 * (x)))
+> >   #define XGMAC_TQS			GENMASK(25, 16)
+> >   #define XGMAC_TQS_SHIFT			16
+> > @@ -385,6 +387,7 @@
+> >   #define XGMAC_DCEIE			BIT(1)
+> >   #define XGMAC_TCEIE			BIT(0)
+> >   #define XGMAC_DMA_ECC_INT_STATUS	0x0000306c
+> > +#define XGMAC_DMA_DPP_INT_STATUS	0x00003074
+> >   #define XGMAC_DMA_CH_CONTROL(x)		(0x00003100 + (0x80 * (x)))
+> >   #define XGMAC_SPH			BIT(24)
+> >   #define XGMAC_PBLx8			BIT(16)
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> > index eb48211d9b0e..04d7c4dc2e35 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
+> > @@ -830,6 +830,43 @@ static const struct dwxgmac3_error_desc dwxgmac3_dma_errors[32]= {
+> >   	{ false, "UNKNOWN", "Unknown Error" }, /* 31 */
+> >   };
+> > +static const char * const dpp_rx_err = "Read Rx Descriptor Parity checker Error";
+> > +static const char * const dpp_tx_err = "Read Tx Descriptor Parity checker Error";
+> > +static const struct dwxgmac3_error_desc dwxgmac3_dma_dpp_errors[32] = {
+> > +	{ true, "TDPES0", dpp_tx_err },
+> > +	{ true, "TDPES1", dpp_tx_err },
+> > +	{ true, "TDPES2", dpp_tx_err },
+> > +	{ true, "TDPES3", dpp_tx_err },
+> > +	{ true, "TDPES4", dpp_tx_err },
+> > +	{ true, "TDPES5", dpp_tx_err },
+> > +	{ true, "TDPES6", dpp_tx_err },
+> > +	{ true, "TDPES7", dpp_tx_err },
+> > +	{ true, "TDPES8", dpp_tx_err },
+> > +	{ true, "TDPES9", dpp_tx_err },
+> > +	{ true, "TDPES10", dpp_tx_err },
+> > +	{ true, "TDPES11", dpp_tx_err },
+> > +	{ true, "TDPES12", dpp_tx_err },
+> > +	{ true, "TDPES13", dpp_tx_err },
+> > +	{ true, "TDPES14", dpp_tx_err },
+> > +	{ true, "TDPES15", dpp_tx_err },
+> > +	{ true, "RDPES0", dpp_rx_err },
+> > +	{ true, "RDPES1", dpp_rx_err },
+> > +	{ true, "RDPES2", dpp_rx_err },
+> > +	{ true, "RDPES3", dpp_rx_err },
+> > +	{ true, "RDPES4", dpp_rx_err },
+> > +	{ true, "RDPES5", dpp_rx_err },
+> > +	{ true, "RDPES6", dpp_rx_err },
+> > +	{ true, "RDPES7", dpp_rx_err },
+> > +	{ true, "RDPES8", dpp_rx_err },
+> > +	{ true, "RDPES9", dpp_rx_err },
+> > +	{ true, "RDPES10", dpp_rx_err },
+> > +	{ true, "RDPES11", dpp_rx_err },
+> > +	{ true, "RDPES12", dpp_rx_err },
+> > +	{ true, "RDPES13", dpp_rx_err },
+> > +	{ true, "RDPES14", dpp_rx_err },
+> > +	{ true, "RDPES15", dpp_rx_err },
+> > +};
+> > +
+> >   static void dwxgmac3_handle_dma_err(struct net_device *ndev,
+> >   				    void __iomem *ioaddr, bool correctable,
+> >   				    struct stmmac_safety_stats *stats)
+> > @@ -841,6 +878,13 @@ static void dwxgmac3_handle_dma_err(struct net_device *ndev,
+> >   	dwxgmac3_log_error(ndev, value, correctable, "DMA",
+> >   			   dwxgmac3_dma_errors, STAT_OFF(dma_errors), stats);
+> > +
+> > +	value = readl(ioaddr + XGMAC_DMA_DPP_INT_STATUS);
+> > +	writel(value, ioaddr + XGMAC_DMA_DPP_INT_STATUS);
+> > +
+> > +	dwxgmac3_log_error(ndev, value, false, "DMA_DPP",
+> > +			   dwxgmac3_dma_dpp_errors,
+> > +			   STAT_OFF(dma_dpp_errors), stats);
+> >   }
+> >   static int
+> > @@ -881,6 +925,12 @@ dwxgmac3_safety_feat_config(void __iomem *ioaddr, unsigned int asp,
+> >   	value |= XGMAC_TMOUTEN; /* FSM Timeout Feature */
+> >   	writel(value, ioaddr + XGMAC_MAC_FSM_CONTROL);
+> > +	/* 5. Enable Data Path Parity Protection */
+> > +	value = readl(ioaddr + XGMAC_MTL_DPP_CONTROL);
+> > +	/* already enabled by default, explicit enable it again */
+> > +	value &= ~XGMAC_DPP_DISABLE;
+> > +	writel(value, ioaddr + XGMAC_MTL_DPP_CONTROL);
+> > +
+> >   	return 0;
+> >   }
+> > @@ -914,7 +964,11 @@ static int dwxgmac3_safety_feat_irq_status(struct net_device *ndev,
+> >   		ret |= !corr;
+> >   	}
+> > -	err = dma & (XGMAC_DEUIS | XGMAC_DECIS);
+> > +	/* DMA_DPP_Interrupt_Status is indicated by MCSIS bit in
+> > +	 * DMA_Safety_Interrupt_Status, so we handle DMA Data Path
+> > +	 * Parity Errors here
+> > +	 */
+> > +	err = dma & (XGMAC_DEUIS | XGMAC_DECIS | XGMAC_MCSIS);
+> >   	corr = dma & XGMAC_DECIS;
+> >   	if (err) {
+> >   		dwxgmac3_handle_dma_err(ndev, ioaddr, corr, stats);
+> > @@ -930,6 +984,7 @@ static const struct dwxgmac3_error {
+> >   	{ dwxgmac3_mac_errors },
+> >   	{ dwxgmac3_mtl_errors },
+> >   	{ dwxgmac3_dma_errors },
+> > +	{ dwxgmac3_dma_dpp_errors },
+> >   };
+> >   static int dwxgmac3_safety_feat_dump(struct stmmac_safety_stats *stats,
+> 
+> 
+> This change is breaking the build on some of our builders that are still using GCC 6.x ...
+> 
+> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:836:20: error: initialiser element is not constant
+>   { true, "TDPES0", dpp_tx_err },
+>                     ^~~~~~~~~~
+> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:836:20: note: (near initialisation for ‘dwxgmac3_dma_dpp_errors[0].detailed_desc’)
+> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:837:20: error: initialiser element is not constant
+>   { true, "TDPES1", dpp_tx_err },
+>                     ^~~~~~~~~~
+> drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c:837:20: note: (near initialisation for ‘dwxgmac3_dma_dpp_errors[1].detailed_desc’)
+> ...
+> 
+> I know that this is quite old but the minimum supported by the kernel is v5.1 ...
+> 
+> https://www.kernel.org/doc/html/next/process/changes.html
 
-Working on v2 series, it should be ready in before noon.
+Thanks Jon,
 
-On Thu, Feb 08, 2024 at 09:50:55AM +0100, Paolo Abeni wrote:
-> Hi,
-> 
-> On Thu, 2024-02-08 at 06:48 +0100, Thorsten Leemhuis wrote:
-> > On 08.02.24 00:37, Pablo Neira Ayuso wrote:
-> > > From: Jozsef Kadlecsik <kadlec@netfilter.org>
-> > > 
-> > > The patch fdb8e12cc2cc ("netfilter: ipset: fix performance regression
-> > > in swap operation") missed to add the calls to gc cancellations
-> > > at the error path of create operations and at module unload. Also,
-> > > because the half of the destroy operations now executed by a
-> > > function registered by call_rcu(), neither NFNL_SUBSYS_IPSET mutex
-> > > or rcu read lock is held and therefore the checking of them results
-> > > false warnings.
-> > > 
-> > > Reported-by: syzbot+52bbc0ad036f6f0d4a25@syzkaller.appspotmail.com
-> > > Reported-by: Brad Spengler <spender@grsecurity.net>
-> > > Reported-by: Стас Ничипорович <stasn77@gmail.com>
-> > > Fixes: fdb8e12cc2cc ("netfilter: ipset: fix performance regression in swap operation")
-> > 
-> > FWIW, in case anyone cares: that afaics should be
-> > 
-> >  Fixes: 97f7cf1cd80e ("netfilter: ipset: fix performance regression in swap operation")
-> > 
-> > instead, as noted yesterday elsewhere[1].
-> > 
-> > Ciao, Thorsten
-> > 
-> > [1] https://lore.kernel.org/all/07cf1cf8-825e-47b9-9837-f91ae958dd6b@leemhuis.info/
-> 
-> I think it would be better to update the commit message, to help stable
-> teams. 
-> 
-> Unless you absolutely need series in today PR, could you please send
-> out a v2? Note that if v2 comes soon enough it can still land into the
-> mentioned PR.
-> 
-> Thanks,
-> 
-> Paolo
-> 
+I separately received a notification about this occurring with gcc 7.
+
+https://lore.kernel.org/oe-kbuild-all/202402081135.lAxxBXHk-lkp@intel.com/
+
+It is unclear to me why this occurs, as dpp_tx_err and dpp_tx_err are const.
+But I do seem to be able to address this problem by using #defines for
+these values instead.
+
+I plan to post a patch shortly.
 
