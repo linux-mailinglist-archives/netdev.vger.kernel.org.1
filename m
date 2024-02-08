@@ -1,94 +1,95 @@
-Return-Path: <netdev+bounces-70067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2674A84D7E9
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 03:40:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60DB784D7F0
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 03:42:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE55F1F2283E
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 02:40:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41A092875B6
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 02:42:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43F2F1CF9A;
-	Thu,  8 Feb 2024 02:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3AAED52E;
+	Thu,  8 Feb 2024 02:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G+5c7Cr4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Sm6f/fzJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11ADE1D540;
-	Thu,  8 Feb 2024 02:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8AF51D522;
+	Thu,  8 Feb 2024 02:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707360029; cv=none; b=VjPvM8aF6UU7NvhGri9cQdV211lVRXXG57tRhtMzh64jvsA3YCpuOFkvB1zC33VCXMyvmvB702P4WS4mwVSN7o+AYQqH/QFH98h7/sZuHIZVSa40Uo+PCUTFhsn1OjcyxTp6t2tele65OEfLSI7QVjs0UetdMFbUUc5igrb086Q=
+	t=1707360173; cv=none; b=DaOPEyyUK5LlmHQ3Er0jd3CBJAfF+yRg6oHcZKN5HzNW83DKWksDbhDdDHOLAl2WnwulCHA7tRtOw6XqwQyxsN8lL0Z28efS2SizdW2sa5BJXFfSexb8VF382nLMk9c6pEnmr+YAE66/UwL4M3iKV9cLx9LRmcdf88e1Of4s5VA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707360029; c=relaxed/simple;
-	bh=oqIUq0+9PWDUdp7JNIr+uhslNtaLYeLhrukFS7asBjo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=c+z333uonqlt33z3s1gIIfnCshaZRCyIY1ScMkShuPfaTdWpfN3q6vJroVJlJSGwKmbsiceltBCzzAmaEwium6ldowNlE1FnGQxwm8p0o0KDoDtKgOjZsmSwsIgMCkmQyO9wJIVS0yiIAI3/Yh1n90nSTqJKHLvHgoThuSn1QUs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G+5c7Cr4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9CD78C43394;
-	Thu,  8 Feb 2024 02:40:28 +0000 (UTC)
+	s=arc-20240116; t=1707360173; c=relaxed/simple;
+	bh=C4fuvlVmQnT6nWFGWMaKy4k/11SGN2a7GPJbdzHB4wI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ji7KIJxnjhyYvIpT3nFeLkd3BE9gYgSHqCmMe+6c8GZt2wK/puXwkVNBwykrWSBzZ4anGWdMZ7FnDlrsoAE4nYprd4mcPq/qjM+gkvja5suHg6v3A9e8LUkckSlVQMXvveMtDs2+LEI9oEWaLJTgxTYlVujfO881J2wCbEr1BKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Sm6f/fzJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2168C433C7;
+	Thu,  8 Feb 2024 02:42:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707360028;
-	bh=oqIUq0+9PWDUdp7JNIr+uhslNtaLYeLhrukFS7asBjo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=G+5c7Cr49LkcyojTmvwep/kbT/HMRYFQ20v3HW11MicTuxv7guWrHYkH7rSaPKicd
-	 s+3C7reg3t+VPKRtDSaSIr/LBFJfwR6fwYJrCfG7IWuD5jz+tdsTsF/vfUJnKlm5jt
-	 MgPL7KoQ5meWUF9BwUqAUdASHi86bQTraaoHyXcgvy3Ogh8wSJelL47XP4OoEC6Gzi
-	 AvrlaxExU/vr4HsIohWyHVLa00ngPLR8huLMRjnLJSyBgjUtfGadJJsAbV3f7YJDjX
-	 0E7kmJv+kl0YU62RqjkFeYaOHUZraiSEFI3bQpIAjyNjyLSB2FxJZvY3HXmMPChgO3
-	 AEeUCT/kKbugg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7F2F7E2F2F1;
-	Thu,  8 Feb 2024 02:40:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1707360173;
+	bh=C4fuvlVmQnT6nWFGWMaKy4k/11SGN2a7GPJbdzHB4wI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Sm6f/fzJOS7VCX7N5mXAHV+I6ydsE/PGbxXLjDA236KQ+QX8aeHHjBL537yTwBdPE
+	 XSSO0O7lmxx+KRhQ8/DtCd9rhZktY7yXUFzQtKT9StqFdZfw9imVn9XIT15q5cmsox
+	 HcDSUUR2bs/jBpvJJSgslVUh020K/6NCTK5PrmByF1xBTodIt/kWbUaV5au9lmuXSa
+	 8fADzxmcLtjfIZ9h3hYLA2S+VbwNbWjPM4zkGozXlYG1yNAc+PB4nSJY8n/ekdEUkY
+	 MBtLk0ptgoCL5jNsQmyD2qRQ++jrQUMz00sS+JfOfgotGYd8Ms4nX20DdxN0ERAOIf
+	 8PMfKGsXmAcOQ==
+Date: Wed, 7 Feb 2024 18:42:52 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>, Willem de
+ Bruijn <willemb@google.com>, Coco Li <lixiaoyan@google.com>,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net] selftests: net: cope with slow env in gro.sh test
+Message-ID: <20240207184252.5d7327fa@kernel.org>
+In-Reply-To: <117a20b1b09addb804b27167fafe1a47bfb2b18e.1707233152.git.pabeni@redhat.com>
+References: <117a20b1b09addb804b27167fafe1a47bfb2b18e.1707233152.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net/smc: change the term virtual ISM to Emulated-ISM
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170736002851.13402.12604224600010407697.git-patchwork-notify@kernel.org>
-Date: Thu, 08 Feb 2024 02:40:28 +0000
-References: <20240205033317.127269-1-guwen@linux.alibaba.com>
-In-Reply-To: <20240205033317.127269-1-guwen@linux.alibaba.com>
-To: Wen Gu <guwen@linux.alibaba.com>
-Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon,  5 Feb 2024 11:33:17 +0800 you wrote:
-> According to latest release of SMCv2.1[1], the term 'virtual ISM' has
-> been changed to 'Emulated-ISM' to avoid the ambiguity of the word
-> 'virtual' in different contexts. So the names or comments in the code
-> need be modified accordingly.
+On Tue,  6 Feb 2024 16:27:40 +0100 Paolo Abeni wrote:
+> The gro self-tests sends the packets to be aggregated with
+> multiple write operations.
 > 
-> [1] https://www.ibm.com/support/pages/node/7112343
+> When running is slow environment, it's hard to guarantee that
+> the GRO engine will wait for the last packet in an intended
+> train.
 > 
-> [...]
+> The above causes almost deterministic failures in our CI for
+> the 'large' test-case.
+> 
+> Address the issue explicitly ignoring failures for such case
+> in slow environments (KSFT_MACHINE_SLOW==true).
+> 
+> Fixes: 7d1575014a63 ("selftests/net: GRO coalesce test")
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ---
+> Note that the fixes tag is there mainly to justify targeting the net
+> tree, and this is aiming at net to hopefully make the test more stable
+> ASAP for both trees.
+> 
+> I experimented with a largish refactory replacing the multiple writes
+> with a single GSO packet, but exhausted by time budget before reaching
+> any good result.
 
-Here is the summary with links:
-  - [net-next] net/smc: change the term virtual ISM to Emulated-ISM
-    https://git.kernel.org/netdev/net-next/c/b27696cd8fcc
+It does make things a lot more stable, but there was still a failure
+recently:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/455661/36-gro-sh/stdout
 
-
+:(
 
