@@ -1,166 +1,204 @@
-Return-Path: <netdev+bounces-70270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B80C84E363
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 15:43:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 648AE84E365
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 15:43:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C71212826EF
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 14:43:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AB6B2818E7
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 14:43:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57EE77B3DA;
-	Thu,  8 Feb 2024 14:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2166E79DB3;
+	Thu,  8 Feb 2024 14:43:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="kH5rtjyn"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cgpXii9w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0DB7B3C1
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 14:43:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 426A979956;
+	Thu,  8 Feb 2024 14:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707403413; cv=none; b=aKYYs0HrGZ7iztwGNRlAkXejdVasSq6oSHaEGGQl5Lti/gIkA2/4kDXJvN1JXsQ2xYw4GR/+8G/cXz2WIXouytnmxLaKtpwcS+z1ZHgfgp1esFO6tjShaOq+zS1ES+j44ZBEkHLb1GybcdIkY3iPCOBKdz1SUd5JkKpb0WuQrYI=
+	t=1707403432; cv=none; b=We4ZURFc6hKXGOBjSV16pEVFl2aR9bMHyne9qSR2XLnk4BohTMSAotY0uvM3oetwHd8/UGBoMZDmWp0+ubJffmYGJzRVUPL2cWoK9DpVXgA9mpVBRT2gd66zh0jLvUoDxDwzP7rVCM6ynaTaZ4c6+57KweNKzmRP8c/LVB4oX5Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707403413; c=relaxed/simple;
-	bh=wrNRMHPMJ707slzF8xy6hM954RnvDIRVqaqg2KgO94M=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=g3P+5fnf+SuFa6Ip3qpbm8wpMMezxM5s7XFhG8frjmQC7TeKs5FBfKG8DvwPYjJG8Ote+V82NGo+xMRhZ3j8wzE1YqxNP3JVyNdWgWA2y9wNXRz3R3M073Fi9imaAP27+AzJn3uf7u4Ubb6fgDxSy6ck2tR0fidaxHMaBs/e+pU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=kH5rtjyn; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc693399655so3097939276.1
-        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 06:43:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707403410; x=1708008210; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1USIfrqAQcZZWPqpBIx/L91kD8lxH26Fisj7vCBXiEE=;
-        b=kH5rtjynvlqpvjn3MR6UZQQOD8u/o+x2IBiUk3wYvFMVCXQcIHSqcib6/6Lb/mtKJP
-         CGEJtpUrC8EeF/mu8L64o7vyhFBjQlbEuqMYw4kULChsNpH4qBO9iDvJxhfEQWcIdTji
-         pmhr/0gSUAJFSIpZwhI1+ophyfXEYiTUmumZBNIYAMWJvpmstMbB920CsHQkzhsgh9Ep
-         bHLatSjGTBCUx3kXmDaZl2iIiU29Hl2Zc545Iu0q9x2UmFCl77ebKCAxu2lSThox1xY1
-         CKj61bPQ6nNgtQkWM4K6Hhsw61JH9oHfpPJI+gB/aFFGcp2l8+VeZR+z5yFXV+bSYLTg
-         RKaw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707403410; x=1708008210;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1USIfrqAQcZZWPqpBIx/L91kD8lxH26Fisj7vCBXiEE=;
-        b=OrSubcjF3y+WeheXhxwIKB3XdIUre7WxAk3Su7Fp+qvTjgEVV51YJZR+fGSmMbjC2F
-         yNTqJW1QxyfU7z9ngRb3OmIeR+2jMzzN4e2c1zSoDG6z7tZLwY3hp4semcRQbFhMLaE7
-         BJThnkJ9bN/XFDPhZ2YBhyFI/P1T3/3v0qfjMTUObODPgIWJFvXiOxIJN1sqzvbqXwVV
-         ZvQRETeh3FOatvf1eTuEos2hiXGBv5eSxSh9n9PIxPP2dDVSXieNXmpB8/zzRfRpbuVu
-         ssBQs0F4id8fXx313HS5H+os0yg7zR6gHr9AnRVdCkjTG3Kydw8Fi3Ts83zGF9+Y5xDX
-         zxHg==
-X-Gm-Message-State: AOJu0YwS95lpc+dnH8bqxmfuCuJisFM23R3XiteQvhFXCCRnCA77Y3jE
-	POL0gOF9HXnW6R3Cho/jgYhJJpvKXBeBS37kX7F0goipWm3Om491ugF0yXsPJEdENuqwSB/CFYo
-	7YmoV0Cl4vA==
-X-Google-Smtp-Source: AGHT+IFJJCO2r9PHUdL1a+ab3PoM2Np8CNJHn94cTjZr+eHrk9tSQBCOY9MtSU6L3IxBOkI5hQeF/SRuqi/KuA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1025:b0:dc7:3a6f:e0f0 with SMTP
- id x5-20020a056902102500b00dc73a6fe0f0mr929676ybt.11.1707403410792; Thu, 08
- Feb 2024 06:43:30 -0800 (PST)
-Date: Thu,  8 Feb 2024 14:43:23 +0000
-In-Reply-To: <20240208144323.1248887-1-edumazet@google.com>
+	s=arc-20240116; t=1707403432; c=relaxed/simple;
+	bh=HfSHLYsgKhk5M3JSS42Ig5lg08AF0g9eFj70VaxI34M=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=JM0Kuw2+3ykXodfh3mHlldlS2MBDA/VjFzkCwm+yaYBQCz1ITSJOo1stM/acKfwxKB9jqYYt03Tatt5LMGgzIta2VFX+yzMQ2kKcwyhGX4IK0CeBBZm7o8f+cNUDSUKWE7qszSOszUDcM699rt16favkqmOkE6z27Dy6QKZWJB8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cgpXii9w; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707403431; x=1738939431;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=HfSHLYsgKhk5M3JSS42Ig5lg08AF0g9eFj70VaxI34M=;
+  b=cgpXii9wdsObmtzRErk1M8rCLz1FF2/6YbDa91/VkNSe/4tp7hr+jCJ7
+   u9cWGbq650sLC7XMSlaEWxnJt1usC3CEf3hK2ZDiHXnE092ZZmBITod9E
+   d0hIk+YegATwmzPsffkbgakGP/X3uFAbsNG644yNlUUDOjIDSStcWXskc
+   49gbRrBxTNQIRjmeS2UC+/ikrVCeT1QqDrSpKxKvTuXHolDFvey3Q+T9Q
+   9RliVHMSS44/HpOKanNzX9dgdmD6aHhdYV63A5RxykXtQT2DMgblXAiG5
+   tbSRba4/iIpgD7p4ZDbj79et1ZrQgVJbx4fZk2CT67+2bFPe6SPIYIGqe
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10978"; a="1097098"
+X-IronPort-AV: E=Sophos;i="6.05,254,1701158400"; 
+   d="scan'208";a="1097098"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2024 06:43:50 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,254,1701158400"; 
+   d="scan'208";a="6283651"
+Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.246.52.95])
+  by fmviesa003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2024 06:43:47 -0800
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Thu, 8 Feb 2024 16:43:44 +0200 (EET)
+To: "David E. Box" <david.e.box@linux.intel.com>
+cc: Netdev <netdev@vger.kernel.org>, 
+    sathyanarayanan.kuppuswamy@linux.intel.com, 
+    LKML <linux-kernel@vger.kernel.org>, platform-driver-x86@vger.kernel.org
+Subject: Re: [PATCH 6/8] platform/x86/intel/sdsi: Add attribute to read the
+ current meter state
+In-Reply-To: <20240201010747.471141-7-david.e.box@linux.intel.com>
+Message-ID: <1b91ed16-ab06-8b67-187d-c6de596cb176@linux.intel.com>
+References: <20240201010747.471141-1-david.e.box@linux.intel.com> <20240201010747.471141-7-david.e.box@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240208144323.1248887-1-edumazet@google.com>
-X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
-Message-ID: <20240208144323.1248887-4-edumazet@google.com>
-Subject: [PATCH net 3/3] net-device: move lstats in net_device_read_txrx
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Naman Gulati <namangulati@google.com>, 
-	Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 
-dev->lstats is notably used from loopback ndo_start_xmit()
-and other virtual drivers.
+On Wed, 31 Jan 2024, David E. Box wrote:
 
-Per cpu stats updates are dirtying per-cpu data,
-but the pointer itself is read-only.
+> The meter_certificate file provides access to metering information that may
+> be attested but is only updated every 8 hours. Add new attribute,
+> meter_current, to allow reading an untested snapshot of the current values.
+> 
+> Signed-off-by: David E. Box <david.e.box@linux.intel.com>
+> ---
+>  drivers/platform/x86/intel/sdsi.c | 42 ++++++++++++++++++++++++++++---
+>  drivers/platform/x86/intel/sdsi.h |  2 ++
+>  2 files changed, 41 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/platform/x86/intel/sdsi.c b/drivers/platform/x86/intel/sdsi.c
+> index 287780fe65bb..171899b4a671 100644
+> --- a/drivers/platform/x86/intel/sdsi.c
+> +++ b/drivers/platform/x86/intel/sdsi.c
+> @@ -62,6 +62,7 @@
+>  #define CTRL_COMPLETE			BIT(6)
+>  #define CTRL_READY			BIT(7)
+>  #define CTRL_INBAND_LOCK		BIT(32)
+> +#define CTRL_METER_ENABLE_DRAM		BIT(33)
+>  #define CTRL_STATUS			GENMASK(15, 8)
+>  #define CTRL_PACKET_SIZE		GENMASK(31, 16)
+>  #define CTRL_MSG_SIZE			GENMASK(63, 48)
+> @@ -235,8 +236,10 @@ static int sdsi_mbox_cmd_read(struct sdsi_priv *priv, struct sdsi_mbox_info *inf
+>  	control = FIELD_PREP(CTRL_EOM, 1) |
+>  		  FIELD_PREP(CTRL_SOM, 1) |
+>  		  FIELD_PREP(CTRL_RUN_BUSY, 1) |
+> -		  FIELD_PREP(CTRL_PACKET_SIZE, info->size);
+> +		  FIELD_PREP(CTRL_PACKET_SIZE, info->size) |
+> +		  priv->control_flags;
+>  	writeq(control, priv->control_addr);
+> +	priv->control_flags = 0;
 
-Fixes: 43a71cd66b9c ("net-device: reorganize net_device fast path variables")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Coco Li <lixiaoyan@google.com>
-Cc: Simon Horman <horms@kernel.org>
----
- Documentation/networking/net_cachelines/net_device.rst |  4 ++--
- include/linux/netdevice.h                              | 10 +++++-----
- net/core/dev.c                                         |  3 ++-
- 3 files changed, 9 insertions(+), 8 deletions(-)
+I'm slightly worried about this. The function is named with a generic 
+name but I suppose meter_lock that has less generic name is supposed to 
+protect this also?
 
-diff --git a/Documentation/networking/net_cachelines/net_device.rst b/Documentation/networking/net_cachelines/net_device.rst
-index e75a53593bb9606f1c0595d8f7227881ec932b9c..dceb49d56a91158232543e920c7ed23bed74106e 100644
---- a/Documentation/networking/net_cachelines/net_device.rst
-+++ b/Documentation/networking/net_cachelines/net_device.rst
-@@ -136,8 +136,8 @@ struct_netpoll_info*                npinfo                  -
- possible_net_t                      nd_net                  -                   read_mostly         (dev_net)napi_busy_loop,tcp_v(4/6)_rcv,ip(v6)_rcv,ip(6)_input,ip(6)_input_finish
- void*                               ml_priv                                                         
- enum_netdev_ml_priv_type            ml_priv_type                                                    
--struct_pcpu_lstats__percpu*         lstats                                                          
--struct_pcpu_sw_netstats__percpu*    tstats                                                          
-+struct_pcpu_lstats__percpu*         lstats                  read_mostly                             dev_lstats_add()
-+struct_pcpu_sw_netstats__percpu*    tstats                  read_mostly                             dev_sw_netstats_tx_add()
- struct_pcpu_dstats__percpu*         dstats                                                          
- struct_garp_port*                   garp_port                                                       
- struct_mrp_port*                    mrp_port                                                        
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 118c40258d07b787adf518e576e75545e4bae846..ef7bfbb9849733fa7f1f097ba53a36a68cc3384b 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -2141,6 +2141,11 @@ struct net_device {
- 
- 	/* TXRX read-mostly hotpath */
- 	__cacheline_group_begin(net_device_read_txrx);
-+	union {
-+		struct pcpu_lstats __percpu		*lstats;
-+		struct pcpu_sw_netstats __percpu	*tstats;
-+		struct pcpu_dstats __percpu		*dstats;
-+	};
- 	unsigned int		flags;
- 	unsigned short		hard_header_len;
- 	netdev_features_t	features;
-@@ -2395,11 +2400,6 @@ struct net_device {
- 	enum netdev_ml_priv_type	ml_priv_type;
- 
- 	enum netdev_stat_type		pcpu_stat_type:8;
--	union {
--		struct pcpu_lstats __percpu		*lstats;
--		struct pcpu_sw_netstats __percpu	*tstats;
--		struct pcpu_dstats __percpu		*dstats;
--	};
- 
- #if IS_ENABLED(CONFIG_GARP)
- 	struct garp_port __rcu	*garp_port;
-diff --git a/net/core/dev.c b/net/core/dev.c
-index cb2dab0feee0abe758479a7a001342bf6613df08..9bb792cecc16f07449a91e4ca96357600d7453f9 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11652,11 +11652,12 @@ static void __init net_dev_struct_check(void)
- 	CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_tx, 160);
- 
- 	/* TXRX read-mostly hotpath */
-+	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_txrx, lstats);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_txrx, flags);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_txrx, hard_header_len);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_txrx, features);
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_txrx, ip6_ptr);
--	CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_txrx, 30);
-+	CACHELINE_ASSERT_GROUP_SIZE(struct net_device, net_device_read_txrx, 38);
- 
- 	/* RX read-mostly hotpath */
- 	CACHELINE_ASSERT_GROUP_MEMBER(struct net_device, net_device_read_rx, ptype_specific);
+Also, resetting it after every use smells like it should be a parameter 
+instead of struct member.
+
+>  	return sdsi_mbox_poll(priv, info, data_size);
+>  }
+> @@ -468,11 +471,42 @@ meter_certificate_read(struct file *filp, struct kobject *kobj,
+>  {
+>  	struct device *dev = kobj_to_dev(kobj);
+>  	struct sdsi_priv *priv = dev_get_drvdata(dev);
+> +	int ret;
+>  
+> -	return certificate_read(SDSI_CMD_READ_METER, priv, buf, off, count);
+> +	ret = mutex_lock_interruptible(&priv->meter_lock);
+> +	if (ret)
+> +		return ret;
+> +
+> +	ret = certificate_read(SDSI_CMD_READ_METER, priv, buf, off, count);
+> +
+> +	mutex_unlock(&priv->meter_lock);
+> +
+> +	return ret;
+>  }
+>  static BIN_ATTR_ADMIN_RO(meter_certificate, SDSI_SIZE_READ_MSG);
+>  
+> +static ssize_t
+> +meter_current_read(struct file *filp, struct kobject *kobj,
+> +		   struct bin_attribute *attr, char *buf, loff_t off,
+> +		   size_t count)
+> +{
+> +	struct device *dev = kobj_to_dev(kobj);
+> +	struct sdsi_priv *priv = dev_get_drvdata(dev);
+> +	int ret;
+> +
+> +	ret = mutex_lock_interruptible(&priv->meter_lock);
+> +	if (ret)
+> +		return ret;
+> +
+> +	priv->control_flags = CTRL_METER_ENABLE_DRAM;
+> +	ret = certificate_read(SDSI_CMD_READ_METER, priv, buf, off, count);
+> +
+> +	mutex_unlock(&priv->meter_lock);
+> +
+> +	return ret;
+> +}
+> +static BIN_ATTR_ADMIN_RO(meter_current, SDSI_SIZE_READ_MSG);
+> +
+>  static ssize_t registers_read(struct file *filp, struct kobject *kobj,
+>  			      struct bin_attribute *attr, char *buf, loff_t off,
+>  			      size_t count)
+> @@ -503,6 +537,7 @@ static struct bin_attribute *sdsi_bin_attrs[] = {
+>  	&bin_attr_registers,
+>  	&bin_attr_state_certificate,
+>  	&bin_attr_meter_certificate,
+> +	&bin_attr_meter_current,
+>  	&bin_attr_provision_akc,
+>  	&bin_attr_provision_cap,
+>  	NULL
+> @@ -522,7 +557,7 @@ sdsi_battr_is_visible(struct kobject *kobj, struct bin_attribute *attr, int n)
+>  	if (!(priv->features & SDSI_FEATURE_SDSI))
+>  		return 0;
+>  
+> -	if (attr == &bin_attr_meter_certificate)
+> +	if (attr == &bin_attr_meter_certificate || attr == &bin_attr_meter_current)
+>  		return (priv->features & SDSI_FEATURE_METERING) ?
+>  				attr->attr.mode : 0;
+>  
+> @@ -725,6 +760,7 @@ static int sdsi_probe(struct auxiliary_device *auxdev, const struct auxiliary_de
+>  	priv->dev = &auxdev->dev;
+>  	priv->id = auxdev->id;
+>  	mutex_init(&priv->mb_lock);
+> +	mutex_init(&priv->meter_lock);
+>  	auxiliary_set_drvdata(auxdev, priv);
+>  
+>  	/* Get the SDSi discovery table */
+> diff --git a/drivers/platform/x86/intel/sdsi.h b/drivers/platform/x86/intel/sdsi.h
+> index 256618eb3136..e20cf279212e 100644
+> --- a/drivers/platform/x86/intel/sdsi.h
+> +++ b/drivers/platform/x86/intel/sdsi.h
+> @@ -18,12 +18,14 @@ struct device;
+>  
+>  struct sdsi_priv {
+>  	struct mutex			mb_lock;	/* Mailbox access lock */
+> +	struct mutex			meter_lock;
+
+Please add information what this protects.
+
+
 -- 
-2.43.0.594.gd9cf4e227d-goog
+ i.
 
 
