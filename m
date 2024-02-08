@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-70073-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19B5084D830
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 04:10:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F58484D831
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 04:10:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 802E71F233B3
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 03:10:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E80D1F234F9
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 03:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E85211D530;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFBC21D535;
 	Thu,  8 Feb 2024 03:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q9wzNqUm"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gsMbSDfe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4BA51D52D
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 03:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4B5F1D52C;
+	Thu,  8 Feb 2024 03:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707361831; cv=none; b=IcGcPitpzQo5gg6Fj2VP+Qia7K58VpeCCl1Hg0yC6Wblbeb+dOvek3/l6bQQ5eaXtF9oSDvijdylmsLZ9ot0I5MiFdKZCH4GSxemNYzPeHMhRB3IfibThWwWrVMi/XP87G+FB53Njh1tuQMWvlx4chOjjZfkZOeU5pOgEyUdgi8=
+	t=1707361831; cv=none; b=LthZ5AbWL2L659oSHR6Zc6NtLbElIhCCdfWk6oTBRkWk1UNcbSUsPJMuqNq6rc0y3feVTc/busIHjX+Mvp42QHe9iqbZ6L24Zq2x1GCH3zNp3O+E/iy5wacoTayKJXXhmEaoM/QJEpS5NQ6VFO7AYYDN0XEOXgbq5uoPmlUWEVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707361831; c=relaxed/simple;
-	bh=rWlR20dxEQGVxmBKH4h7lMxjFjpizcgl3ZxP/fr31tE=;
+	bh=QPH1yr6VHuRyaB6xH/FtQKMvMHLE/l58r4MMmJTwfmo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ni7+yf8MmugboCQl2cBe2N+kCx/JLKuuwqSvKwC/WqK33hK50Fn6hy0u81UN+g/AAFP9KU+sc5ejYkYD6Szdb6iY1Ro9P6FC55ALzA7dl+EJlpHqA4CPGWCyMB9i09TnD1U4RGXDm2TgqQv9PSy1OiPOu6Kfo+J6hYdlpHXi0NE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q9wzNqUm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 43CB9C433C7;
+	 In-Reply-To:To:Cc; b=Uu7TlnvwGbQ1JOpxVQBjmvYWpKLk7+r8BkVr6vFj975pDlvzxVuDDtPrufNnK/2tTDd8n22FgkbEjet3EZsfIeiFU0Jzz4jJJydgwKYOvRoa1FbL7xzXaqYhg1zflQoMWajuOCIC9WIpCWPZ0o3kIpsVtL18lod7r0VJa/Od+ZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gsMbSDfe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 453E0C43394;
 	Thu,  8 Feb 2024 03:10:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707361831;
-	bh=rWlR20dxEQGVxmBKH4h7lMxjFjpizcgl3ZxP/fr31tE=;
+	bh=QPH1yr6VHuRyaB6xH/FtQKMvMHLE/l58r4MMmJTwfmo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=q9wzNqUmrjAAHHNmkH0Yz8cTglaI9EyNDfpPl9AO0gXc5hKfOUAYNYK1WJcKQOeqr
-	 kBQpfnPFsqXNUUlMc3qH1qHkH8kLdwZ3ecaB+dXFyyfhdZCChxMbl2hZPwKBAmVdv3
-	 FXj3mvT7rlr3OdrSkFmWKFb9Jn6ugNYVfizUUzzS0j7TiGfbPJP0J+AbYbEJRmlIbM
-	 Yntj47qHCuK1WkfHniOjs7c/Al6S05t7Ze8+US4POXqzBxsO9I1xy6YeCxg9fteNjW
-	 d5ulVQcvmDPsNv5HwAe+WTibzcatb864zR3b3+hhxrJpXXCB+MJQ6BnmZYIfTh7m9Z
-	 dskNTrKrc/sKA==
+	b=gsMbSDfezpPDvaH2NSZJXCJjbnoFukNxn4keKuVYtZzd3ZZbWV4NKGYtqxx+ujeiE
+	 omGPpuHZtb/K1O6rZoESp9YcgrQ47/kZ6QWzcT/bjw/olF6td4Ia4DACQtJe8CxjZW
+	 a2erQRvQFpDlE7uJhSoZIaiMEULipED8ibrd211ppS8b4rbiWMz0vn0qULIAg1elLy
+	 vt2hUgmc2eO/a/zCeYgPKslzVR43JGZwxi1BuqHsxGJLu7c63xsatwTUkXSRIQG5TS
+	 ogya1HH+8DPWjHSRvMJrwsjYZB7ZeESUrr5CWEAE+jdmfo/vGy3QtBf/kELl11DOrE
+	 naz30cauu+0kA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 173D7E2F2F1;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1F27AD8C97D;
 	Thu,  8 Feb 2024 03:10:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,67 +52,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 net-next 00/15] net: more factorization in cleanup_net()
- paths
+Subject: Re: [PATCH net-next v5 0/7] MT7530 DSA Subdriver Improvements Act II
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170736183108.28016.16429043012584720341.git-patchwork-notify@kernel.org>
+ <170736183112.28016.638375642700204813.git-patchwork-notify@kernel.org>
 Date: Thu, 08 Feb 2024 03:10:31 +0000
-References: <20240206144313.2050392-1-edumazet@google.com>
-In-Reply-To: <20240206144313.2050392-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- atenart@kernel.org, netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <20240206-for-netnext-mt7530-improvements-2-v5-0-d7d92a185cb1@arinc9.com>
+In-Reply-To: <20240206-for-netnext-mt7530-improvements-2-v5-0-d7d92a185cb1@arinc9.com>
+To: =?utf-8?b?QXLEsW7DpyDDnE5BTCB2aWEgQjQgUmVsYXkgPGRldm51bGwrYXJpbmMudW5hbC5h?=@codeaurora.org,
+	=?utf-8?b?cmluYzkuY29tQGtlcm5lbC5vcmc+?=@codeaurora.org
+Cc: daniel@makrotopia.org, dqfext@gmail.com, sean.wang@mediatek.com,
+ andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ linux@armlinux.org.uk, mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+ bartel.eerdekens@constell8.be, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, arinc.unal@arinc9.com,
+ rmk+kernel@armlinux.org.uk
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  6 Feb 2024 14:42:56 +0000 you wrote:
-> This series is inspired by recent syzbot reports hinting to RTNL and
-> workqueue abuses.
+On Tue, 06 Feb 2024 01:08:01 +0300 you wrote:
+> Hello!
 > 
-> rtnl_lock() is unfair to (single threaded) cleanup_net(), because
-> many threads can cause contention on it.
+> This is the second patch series with the goal of simplifying the MT7530 DSA
+> subdriver and improving support for MT7530, MT7531, and the switch on the
+> MT7988 SoC.
 > 
-> This series adds a new (struct pernet_operations) method,
-> so that cleanup_net() can hold RTNL longer once it finally
-> acquires it.
+> I have done a simple ping test to confirm basic communication on all switch
+> ports on MCM and standalone MT7530, and MT7531 switch with this patch
+> series applied.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v4,net-next,01/15] net: add exit_batch_rtnl() method
-    https://git.kernel.org/netdev/net-next/c/fd4f101edbd9
-  - [v4,net-next,02/15] nexthop: convert nexthop_net_exit_batch to exit_batch_rtnl method
-    https://git.kernel.org/netdev/net-next/c/a7ec2512ad7b
-  - [v4,net-next,03/15] bareudp: use exit_batch_rtnl() method
-    https://git.kernel.org/netdev/net-next/c/422b5ae9c5e5
-  - [v4,net-next,04/15] bonding: use exit_batch_rtnl() method
-    https://git.kernel.org/netdev/net-next/c/669966bc94d8
-  - [v4,net-next,05/15] geneve: use exit_batch_rtnl() method
-    https://git.kernel.org/netdev/net-next/c/f4b57b9dc96b
-  - [v4,net-next,06/15] gtp: use exit_batch_rtnl() method
-    https://git.kernel.org/netdev/net-next/c/6eedda01b2bf
-  - [v4,net-next,07/15] ipv4: add __unregister_nexthop_notifier()
-    https://git.kernel.org/netdev/net-next/c/70f16ea2e4f6
-  - [v4,net-next,08/15] vxlan: use exit_batch_rtnl() method
-    https://git.kernel.org/netdev/net-next/c/110d3047a3ec
-  - [v4,net-next,09/15] ip6_gre: use exit_batch_rtnl() method
-    https://git.kernel.org/netdev/net-next/c/bc50c535c3a0
-  - [v4,net-next,10/15] ip6_tunnel: use exit_batch_rtnl() method
-    https://git.kernel.org/netdev/net-next/c/a1fab9aff5c0
-  - [v4,net-next,11/15] ip6_vti: use exit_batch_rtnl() method
-    https://git.kernel.org/netdev/net-next/c/7a99f3c1994b
-  - [v4,net-next,12/15] sit: use exit_batch_rtnl() method
-    https://git.kernel.org/netdev/net-next/c/de02deab27fd
-  - [v4,net-next,13/15] ip_tunnel: use exit_batch_rtnl() method
-    https://git.kernel.org/netdev/net-next/c/9b5b36374ed6
-  - [v4,net-next,14/15] bridge: use exit_batch_rtnl() method
-    https://git.kernel.org/netdev/net-next/c/806b67850787
-  - [v4,net-next,15/15] xfrm: interface: use exit_batch_rtnl() method
-    https://git.kernel.org/netdev/net-next/c/8962daccc2d3
+  - [net-next,v5,1/7] net: dsa: mt7530: empty default case on mt7530_setup_port5()
+    https://git.kernel.org/netdev/net-next/c/01fc42942e30
+  - [net-next,v5,2/7] net: dsa: mt7530: move XTAL check to mt7530_setup()
+    https://git.kernel.org/netdev/net-next/c/fd7929095a52
+  - [net-next,v5,3/7] net: dsa: mt7530: simplify mt7530_pad_clk_setup()
+    https://git.kernel.org/netdev/net-next/c/4eec447ef640
+  - [net-next,v5,4/7] net: dsa: mt7530: call port 6 setup from mt7530_mac_config()
+    https://git.kernel.org/netdev/net-next/c/4ea4c040ddc8
+  - [net-next,v5,5/7] net: dsa: mt7530: remove pad_setup function pointer
+    https://git.kernel.org/netdev/net-next/c/8c2703f55837
+  - [net-next,v5,6/7] net: dsa: mt7530: correct port capabilities of MT7988
+    https://git.kernel.org/netdev/net-next/c/c9d70a1d3d64
+  - [net-next,v5,7/7] net: dsa: mt7530: do not clear config->supported_interfaces
+    https://git.kernel.org/netdev/net-next/c/b43990bc552e
 
 You are awesome, thank you!
 -- 
