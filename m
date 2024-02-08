@@ -1,140 +1,215 @@
-Return-Path: <netdev+bounces-70357-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70358-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF5BD84E78E
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 19:18:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0AD984E791
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 19:20:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A17A1C2303D
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 18:18:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F193EB213F0
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 18:20:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4181184FCF;
-	Thu,  8 Feb 2024 18:18:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A93B85C67;
+	Thu,  8 Feb 2024 18:20:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MkpYEiLp"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="P6cJ9wjF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from relay.smtp-ext.broadcom.com (unknown [192.19.166.228])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6464C84FBD
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 18:18:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A6983CD5;
+	Thu,  8 Feb 2024 18:20:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.166.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707416296; cv=none; b=d/BjxT+bo7XaNOMa1oNPYZizLwClW4/a/yWjyBWhGYKyx5BELhKdDlM8Q/lrYUGTNW580OM1KiAvqH3KFvlSFA+2sPIlfOxhjAoRpcPxYLftMRG2x58cfXZ1MbTb8h5/ewBSCvsseyJXuitByew2jRfuOoh2BhzUwi/a6uGrRu4=
+	t=1707416451; cv=none; b=B+0qIT+vlnb42eqXhJcgGKon6I8vMZFR+yhX/bZoOmEAQiuA3mze+uzMV/VBZTbAfueDpxffpVbM35WsqKSsR7daLh8XkCe6nbnOPMlGJl2zd9rHSXNm9X2Ee394sklOlCFeXH8sI1OQDslA0C5DyO32D6DRWdpKwRrdoWf+U34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707416296; c=relaxed/simple;
-	bh=8WQrh0Yb38/CEEp0K8aQH4tZQIw9SlnBpD3HzicDqg8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KSNLL0vqq7zBU+Gn9GQ5ayXeUCzjHngtCPJaozAH1WGCmc6/V+8zLQBpcD+vcLQh5dXGSE+PSdXNe7QXUoIH9MEUbwLRz/FgwXq7DalTqK40SNpJJ/me6rgYBQM2h1RKW+jGg14CZ3XTTHnCLlEb/p4hNCeLOqyCPtdNm5MKub0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MkpYEiLp; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707416293;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=RjTSOuqmKK3C/LJtQNnSoXwJu384NMrU80esiJ7Q4R0=;
-	b=MkpYEiLp6WGTCeB6uTLJnsxjvBT2vDkOH2p9+z3koigKKOPxscLWyB9pgcVP0OCCqisbS6
-	2+i6sAn+LlHgYs9C2YIsNxsQmDrlLpAwKB6xE3O7n+139dU7sv8x06phV/CccsLqvzKbBh
-	9kcc3v18ad0uj+lbocbHu5Tg/3nG+vc=
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com
- [209.85.208.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-424-bmIaSEeuOkWdE7xFHZXmfA-1; Thu, 08 Feb 2024 13:18:11 -0500
-X-MC-Unique: bmIaSEeuOkWdE7xFHZXmfA-1
-Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-558b84a7eeeso121260a12.0
-        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 10:18:10 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707416289; x=1708021089;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RjTSOuqmKK3C/LJtQNnSoXwJu384NMrU80esiJ7Q4R0=;
-        b=HJVaH1zucJSwGszP/j7IrWWfoyi8hKWYIdyulIx5a00bnc/i9CJhBZk4FvFksTOXTL
-         x8ATrlL+nirFBujcdoB5Wgu3WuGL3XRoB/7Te59Vg3vQDlaXG0wUKL203UsXGEuD/M4B
-         LC/TlAq3pOVYsn8+xqdryqxo02SDC/6WWuM5M/S/wgCZQtdCqqZRX1BeeXEMx1WrWLPE
-         Ln/0vOMRNABOKIZcF9mSwzJVColxfKz8Dpa9E9l7K5qEPdaXCeMYAvhtLf5qzPPoZlmE
-         sT6QBrLswhWMWhIB4Yy3MlOuR7nBmtD8s7hgDeWrj1HzzolSkl1cglcjBrpYFixgOCPw
-         BYlg==
-X-Gm-Message-State: AOJu0Ywgw3PPEc8w4B7VR1Uo4rje8gU44GIr+PRGxZLNiNJ3dXNHjR29
-	AF5dpvpILIojSPKNpzOhYfUari1u6DToSuQH1kmJrzj7A0l4DUDnpn9utxpGLKfiHjBhVpZHGx/
-	ygDu5Ftl1Yg+6ITrj/voQ5R9JAnMhyTPEh+0jBMrRKi28OEm89xIJlpOtaGY9CTAAZuiTXCGWJm
-	botM4QJpPNNAOWeR2El5jlMjG8R42kJGyTXzLF
-X-Received: by 2002:a05:6402:753:b0:560:3745:6576 with SMTP id p19-20020a056402075300b0056037456576mr48168edy.6.1707416289611;
-        Thu, 08 Feb 2024 10:18:09 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEEvcYZyKwJ4cajYNmQK437p4mT1kP2gz7h4kYzJNBzo0manu46HZSfDasFlASGB6RoTZiJiCP08qMnm5nZtgA=
-X-Received: by 2002:a05:6402:753:b0:560:3745:6576 with SMTP id
- p19-20020a056402075300b0056037456576mr48155edy.6.1707416289315; Thu, 08 Feb
- 2024 10:18:09 -0800 (PST)
+	s=arc-20240116; t=1707416451; c=relaxed/simple;
+	bh=3DhEN22lmOWhxC+qxvJ3t5FlzdbECygh0mh33F0j8to=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Kc/JKngr3wF0hXbE1d3eBEuX1Slzmz4QOj+s1N3b2+vVVpjpA7A2Ky98sEhSjaCg7XrCjQniBe8OY0FCY61qHKov/mguBKdzavgss0XW3ppcuoHsLJJHKMqxYozc7ILfeBKLmq/oIs87hFnsb5nnBS3QjMa46A30NUi9SiZvbDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=P6cJ9wjF; arc=none smtp.client-ip=192.19.166.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
+	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id B6FFCC002E47;
+	Thu,  8 Feb 2024 10:20:48 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com B6FFCC002E47
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
+	s=dkimrelay; t=1707416448;
+	bh=3DhEN22lmOWhxC+qxvJ3t5FlzdbECygh0mh33F0j8to=;
+	h=From:To:Cc:Subject:Date:From;
+	b=P6cJ9wjF3OdWzzOTxverzTBk09CfD3FgoPi8ETN0iIrHZStgdPnmvPqUvzC1koaw4
+	 fQmg3aRNeS6jenN28xePfqLLEAPd+DcpMVHeKBMemb1VC7nywMBf7qxJ3bFsMJJP82
+	 Sz03//zB2cltCGN3AuA9Oc2Xv+vWdNTO7Jm0RBYE=
+Received: from stbirv-lnx-1.igp.broadcom.net (stbirv-lnx-1.igp.broadcom.net [10.67.48.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id 31D3518041CAC4;
+	Thu,  8 Feb 2024 10:20:47 -0800 (PST)
+From: Florian Fainelli <florian.fainelli@broadcom.com>
+To: stable@vger.kernel.org
+Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Doug Berger <opendmb@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	bcm-kernel-feedback-list@broadcom.com (open list:BROADCOM GENET ETHERNET DRIVER),
+	netdev@vger.kernel.org (open list:BROADCOM GENET ETHERNET DRIVER),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH stable 5.4] net: bcmgenet: Fix EEE implementation
+Date: Thu,  8 Feb 2024 10:20:40 -0800
+Message-Id: <20240208182041.3228898-1-florian.fainelli@broadcom.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240206142213.777317-1-sgallagh@redhat.com> <20240206191209.3aaf9916@hermes.local>
-In-Reply-To: <20240206191209.3aaf9916@hermes.local>
-From: Stephen Gallagher <sgallagh@redhat.com>
-Date: Thu, 8 Feb 2024 13:17:58 -0500
-Message-ID: <CAFoKQtwcXPMs1ecABfBhJbgXpRqz2OKp=ir3qHO3XbMR4eWVYQ@mail.gmail.com>
-Subject: Re: [PATCH] iproute2: fix type incompatibility in ifstat.c
-To: stephen@networkplumber.org
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Feb 6, 2024 at 10:12=E2=80=AFPM Stephen Hemminger
-<stephen@networkplumber.org> wrote:
->
-> On Tue,  6 Feb 2024 09:22:06 -0500
-> Stephen Gallagher <sgallagh@redhat.com> wrote:
->
-> > Throughout ifstat.c, ifstat_ent.val is accessed as a long long unsigned
-> > type, however it is defined as __u64. This works by coincidence on many
-> > systems, however on ppc64le, __u64 is a long unsigned.
-> >
-> > This patch makes the type definition consistent with all of the places
-> > where it is accessed.
-> >
-> > Signed-off-by: Stephen Gallagher <sgallagh@redhat.com>
-> > ---
->
-> Why not fix the use of unsigned long long to be __u64 instead?
-> That would make more sense.
->
+commit a9f31047baca57d47440c879cf259b86f900260c upstream
 
+We had a number of short comings:
 
-FWIW, that's the first path I tried, but it's accessed in dozens of
-places, every one of which treats it as a 'long long unsigned'. That
-led me to the belief that the specified type was just wrong (or at
-minimum, in contravention of the consumers' expectations).
+- EEE must be re-evaluated whenever the state machine detects a link
+  change as wight be switching from a link partner with EEE
+  enabled/disabled
 
-> Looking at ifstat it has other problems.
-> It doesn't check the sizes in the netlink response.
->
-> It really should be using 64 bit stat counters, not the legacy 32 bit
-> values. (ie IFLA_STATS64). Anyone want to take this on?X
+- tx_lpi_enabled controls whether EEE should be enabled/disabled for the
+  transmit path, which applies to the TBUF block
 
-I definitely don't have the subject-matter expertise to do this,
-sorry. Given that this issue is blocking our builds in Fedora/RHEL, I
-was hoping we could try to solve the acute problem and leave
-wider-ranging fixes to a separate effort.
+- We do not need to forcibly enable EEE upon system resume, as the PHY
+  state machine will trigger a link event that will do that, too
 
-> Also, the cpu_hits offload code is a wart. If it is of interest, it shoul=
-d
-> be more than one stat.
->
-> One last issue, is that change the size of this structure will break old
-> history files.
->
+Fixes: 6ef398ea60d9 ("net: bcmgenet: add EEE support")
+Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Reviewed-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Link: https://lore.kernel.org/r/20230606214348.2408018-1-florian.fainelli@broadcom.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Change-Id: I9e9d9d9e10817c7fcf3d9cde2389a1f6fe42a2ba
+---
+ .../net/ethernet/broadcom/genet/bcmgenet.c    | 22 +++++++------------
+ .../net/ethernet/broadcom/genet/bcmgenet.h    |  3 +++
+ drivers/net/ethernet/broadcom/genet/bcmmii.c  |  6 +++++
+ 3 files changed, 17 insertions(+), 14 deletions(-)
 
-I'm not sure I understand this; it looks to me like this is a private
-structure. If it has API impact (as in, it's written directly to
-output data meant to be re-read), shouldn't it be in a public header
-and/or otherwise denoted as API?
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+index eeadeeec17ba..380bf7a328ba 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
++++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
+@@ -1018,7 +1018,8 @@ static void bcmgenet_get_ethtool_stats(struct net_device *dev,
+ 	}
+ }
+ 
+-static void bcmgenet_eee_enable_set(struct net_device *dev, bool enable)
++void bcmgenet_eee_enable_set(struct net_device *dev, bool enable,
++			     bool tx_lpi_enabled)
+ {
+ 	struct bcmgenet_priv *priv = netdev_priv(dev);
+ 	u32 off = priv->hw_params->tbuf_offset + TBUF_ENERGY_CTRL;
+@@ -1038,7 +1039,7 @@ static void bcmgenet_eee_enable_set(struct net_device *dev, bool enable)
+ 
+ 	/* Enable EEE and switch to a 27Mhz clock automatically */
+ 	reg = bcmgenet_readl(priv->base + off);
+-	if (enable)
++	if (tx_lpi_enabled)
+ 		reg |= TBUF_EEE_EN | TBUF_PM_EN;
+ 	else
+ 		reg &= ~(TBUF_EEE_EN | TBUF_PM_EN);
+@@ -1059,6 +1060,7 @@ static void bcmgenet_eee_enable_set(struct net_device *dev, bool enable)
+ 
+ 	priv->eee.eee_enabled = enable;
+ 	priv->eee.eee_active = enable;
++	priv->eee.tx_lpi_enabled = tx_lpi_enabled;
+ }
+ 
+ static int bcmgenet_get_eee(struct net_device *dev, struct ethtool_eee *e)
+@@ -1074,6 +1076,7 @@ static int bcmgenet_get_eee(struct net_device *dev, struct ethtool_eee *e)
+ 
+ 	e->eee_enabled = p->eee_enabled;
+ 	e->eee_active = p->eee_active;
++	e->tx_lpi_enabled = p->tx_lpi_enabled;
+ 	e->tx_lpi_timer = bcmgenet_umac_readl(priv, UMAC_EEE_LPI_TIMER);
+ 
+ 	return phy_ethtool_get_eee(dev->phydev, e);
+@@ -1083,7 +1086,6 @@ static int bcmgenet_set_eee(struct net_device *dev, struct ethtool_eee *e)
+ {
+ 	struct bcmgenet_priv *priv = netdev_priv(dev);
+ 	struct ethtool_eee *p = &priv->eee;
+-	int ret = 0;
+ 
+ 	if (GENET_IS_V1(priv))
+ 		return -EOPNOTSUPP;
+@@ -1094,16 +1096,11 @@ static int bcmgenet_set_eee(struct net_device *dev, struct ethtool_eee *e)
+ 	p->eee_enabled = e->eee_enabled;
+ 
+ 	if (!p->eee_enabled) {
+-		bcmgenet_eee_enable_set(dev, false);
++		bcmgenet_eee_enable_set(dev, false, false);
+ 	} else {
+-		ret = phy_init_eee(dev->phydev, 0);
+-		if (ret) {
+-			netif_err(priv, hw, dev, "EEE initialization failed\n");
+-			return ret;
+-		}
+-
++		p->eee_active = phy_init_eee(dev->phydev, false) >= 0;
+ 		bcmgenet_umac_writel(priv, e->tx_lpi_timer, UMAC_EEE_LPI_TIMER);
+-		bcmgenet_eee_enable_set(dev, true);
++		bcmgenet_eee_enable_set(dev, p->eee_active, e->tx_lpi_enabled);
+ 	}
+ 
+ 	return phy_ethtool_set_eee(dev->phydev, e);
+@@ -3688,9 +3685,6 @@ static int bcmgenet_resume(struct device *d)
+ 	if (!device_may_wakeup(d))
+ 		phy_resume(dev->phydev);
+ 
+-	if (priv->eee.eee_enabled)
+-		bcmgenet_eee_enable_set(dev, true);
+-
+ 	bcmgenet_netif_start(dev);
+ 
+ 	netif_device_attach(dev);
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.h b/drivers/net/ethernet/broadcom/genet/bcmgenet.h
+index 5b7c2f9241d0..29bf256d13f6 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmgenet.h
++++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.h
+@@ -736,4 +736,7 @@ int bcmgenet_wol_power_down_cfg(struct bcmgenet_priv *priv,
+ void bcmgenet_wol_power_up_cfg(struct bcmgenet_priv *priv,
+ 			       enum bcmgenet_power_mode mode);
+ 
++void bcmgenet_eee_enable_set(struct net_device *dev, bool enable,
++			     bool tx_lpi_enabled);
++
+ #endif /* __BCMGENET_H__ */
+diff --git a/drivers/net/ethernet/broadcom/genet/bcmmii.c b/drivers/net/ethernet/broadcom/genet/bcmmii.c
+index 2fbec2acb606..026f00ccaa0c 100644
+--- a/drivers/net/ethernet/broadcom/genet/bcmmii.c
++++ b/drivers/net/ethernet/broadcom/genet/bcmmii.c
+@@ -25,6 +25,7 @@
+ 
+ #include "bcmgenet.h"
+ 
++
+ /* setup netdev link state when PHY link status change and
+  * update UMAC and RGMII block when link up
+  */
+@@ -96,6 +97,11 @@ void bcmgenet_mii_setup(struct net_device *dev)
+ 			       CMD_RX_PAUSE_IGNORE | CMD_TX_PAUSE_IGNORE);
+ 		reg |= cmd_bits;
+ 		bcmgenet_umac_writel(priv, reg, UMAC_CMD);
++
++		priv->eee.eee_active = phy_init_eee(phydev, 0) >= 0;
++		bcmgenet_eee_enable_set(dev,
++					priv->eee.eee_enabled && priv->eee.eee_active,
++					priv->eee.tx_lpi_enabled);
+ 	} else {
+ 		/* done if nothing has changed */
+ 		if (!status_changed)
+-- 
+2.34.1
 
 
