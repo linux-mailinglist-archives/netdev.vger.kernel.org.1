@@ -1,133 +1,104 @@
-Return-Path: <netdev+bounces-70246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2E3984E28F
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 14:56:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65F5084E29C
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 14:57:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 500131F291D6
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 13:56:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 757251C2705C
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 13:57:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A9257B3E9;
-	Thu,  8 Feb 2024 13:53:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBBBA79941;
+	Thu,  8 Feb 2024 13:56:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PHhLjtj2"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="lRfpav/j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A7157D41F;
-	Thu,  8 Feb 2024 13:53:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75DBD1E485;
+	Thu,  8 Feb 2024 13:56:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707400389; cv=none; b=P6K098ZoVSr0XQLjik6csn1magBG0Fls3LEwl2rsXOMvoCb+L94ZbQz42OAF+BHt02IN4mDRj5/yj6EtOhmsIQRfBwqsRVh7aIq4prn+Nvn70KemY07duq7GhvHg5K9ef9SVXsJX2PPu7UCAmAqUun1zGDSbKYrjSiSsHGxBUtE=
+	t=1707400608; cv=none; b=Us9ZvfUXtTMzjJHL4K0MM/ZLJbPa0ZhHKkfFGo0QwiBUWO+Wgv/Czo5F37RZIFU/hAPYiSMi9rJ6nlKrq9NwrmXejAjnnu+iTFsmaDHSBQjQgOe/nFffY96MxrlPK4DIa3p/18LhDnRhhFz3/d0unm+7JMzezxlbhOm7+xv+moU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707400389; c=relaxed/simple;
-	bh=hmXHpXwIBBF6KpV1XzdkD8LH/WZiO4oxEaDM9Yg5alg=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=IkpBbHASU/cgz0IZps6G6jsK5OdDKFOkbdRPlDRH5mF5SzEasv4L899D7x9IM3VsSyuKGnVeWfiFFu70Zs1AkDrGcYtLozRmZLIVs6dADO6+wVgO2PPOMudfqZuzDlCltQt5jgcAgLwq6mJWdo8hS69p5jUNkLTFvLjnbRKAf8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PHhLjtj2; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707400388; x=1738936388;
-  h=from:date:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=hmXHpXwIBBF6KpV1XzdkD8LH/WZiO4oxEaDM9Yg5alg=;
-  b=PHhLjtj2nMishLFevut7xp1SYLxKjY51YgPJ+MXqDUQpi6BNa/GTM/V0
-   w0xpq5OUBl3RqEb0zGw0CGujsTxtTUeEYYYuzlus47Jw2egjdBoCfp8/3
-   94bQLNR6eChaB9t3QwCaRRMtmSNp2h28nqpmTP1eAJufZZikgh0u5+cBq
-   HOD+IUzpi3gFLzMg9H2GbK/SFjBWGiAfn5JsC4je7yd6HZmMXpq706lGr
-   NTRsEmY5HDu2hnFhGR6mS+dnRL+RZSoY7pTWCg7xTFYy6HMHv3l7TSsBG
-   UHx+ko82WBmiyLOQYRpNM1ePFRxe9ymUwn8+U/cosopYaaHTREeBRo84r
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10977"; a="26662698"
-X-IronPort-AV: E=Sophos;i="6.05,254,1701158400"; 
-   d="scan'208";a="26662698"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2024 05:53:06 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,254,1701158400"; 
-   d="scan'208";a="1694872"
-Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.246.52.95])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2024 05:53:04 -0800
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Date: Thu, 8 Feb 2024 15:52:59 +0200 (EET)
-To: "David E. Box" <david.e.box@linux.intel.com>
-cc: Netdev <netdev@vger.kernel.org>, 
-    sathyanarayanan.kuppuswamy@linux.intel.com, 
-    LKML <linux-kernel@vger.kernel.org>, platform-driver-x86@vger.kernel.org
-Subject: Re: [PATCH 5/8] platform/x86/intel/sdsi: Add in-band BIOS lock
- support
-In-Reply-To: <20240201010747.471141-6-david.e.box@linux.intel.com>
-Message-ID: <4135a390-22c9-f483-2aca-b89439dc682c@linux.intel.com>
-References: <20240201010747.471141-1-david.e.box@linux.intel.com> <20240201010747.471141-6-david.e.box@linux.intel.com>
+	s=arc-20240116; t=1707400608; c=relaxed/simple;
+	bh=FuVF+eJ+3ABnfmzK4oUj76/6C587TcB1yKwdLXQapuU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i6HDQRRyRdmX+msf0TVLrKgQxO+3MRWfElsqN3jiducaj7Eu85n8Rk1DBfCh9dqKzrujRjIUbvKvez8hhrWw4G+MR6eF4wQsgvkUPZZvoOenZPvd/S+T7tyYk3MqFyLUBN0jlh1P22KKOYn74F8qhLhcOHTkQW4SbQtSL/CaDt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=lRfpav/j; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Dej5H/0l4N8S9JwfsbANmrzhys6YFfTllssE9ozh6P8=; b=lRfpav/jSMFg7FFOHIB3QgRiKg
+	atqKDwftQSwxyTcLW5pAccjMVhyraxElasRoopDU0yh6CnPTJq14ROx4k/LBhCQbsTn4FkqoEfGQf
+	00huKYVp70PB4+jj8/qs2qNQoOu/TCmiqdDz2ZOpycZydLwL653u+ZTjx4YNCrJ6fHbc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rY4tF-007JSy-Kl; Thu, 08 Feb 2024 14:56:33 +0100
+Date: Thu, 8 Feb 2024 14:56:33 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: POPESCU Catalin <catalin.popescu@leica-geosystems.com>
+Cc: "davem@davemloft.net" <davem@davemloft.net>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"afd@ti.com" <afd@ti.com>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	GEO-CHHER-bsp-development <bsp-development.geo@leica-geosystems.com>,
+	"m.felsch@pengutronix.de" <m.felsch@pengutronix.de>
+Subject: Re: [PATCH v2 2/2] net: phy: dp83826: support TX data voltage tuning
+Message-ID: <145e1c28-af2b-4aca-9fd3-f9d7a272516c@lunn.ch>
+References: <20240207175845.764775-1-catalin.popescu@leica-geosystems.com>
+ <20240207175845.764775-2-catalin.popescu@leica-geosystems.com>
+ <4dc382bd-3477-45cb-8044-fc5c2c7251f4@lunn.ch>
+ <f37e9df4-e1bd-4d40-bd99-3998cfd803f4@leica-geosystems.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f37e9df4-e1bd-4d40-bd99-3998cfd803f4@leica-geosystems.com>
 
-On Wed, 31 Jan 2024, David E. Box wrote:
-
-> From: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>
+> > I could be reading this wrong, but it looks like
+> > DP83826_CFG_DAC_MINUS_DEFAULT actually means leave the value
+> > unchanged? Is there anything guaranteeing it does in fact have the
+> > default value in the hardware?
+> >
+> >          Andrew
 > 
-> As per SDSi in-band interface specification, sec titled "BIOS lock for
-> in-band provisioning", when IB_LOCK bit is set in control qword, the
-> SDSI agent is only allowed to perform the read flow, but not allowed to
-> provision license blob or license key. So add check for it in
-> sdsi_provision().
-> 
-> Signed-off-by: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>
-> Signed-off-by: David E. Box <david.e.box@linux.intel.com>
-> ---
->  drivers/platform/x86/intel/sdsi.c | 10 ++++++++++
->  1 file changed, 10 insertions(+)
-> 
-> diff --git a/drivers/platform/x86/intel/sdsi.c b/drivers/platform/x86/intel/sdsi.c
-> index 14821fee249c..287780fe65bb 100644
-> --- a/drivers/platform/x86/intel/sdsi.c
-> +++ b/drivers/platform/x86/intel/sdsi.c
-> @@ -61,6 +61,7 @@
->  #define CTRL_OWNER			GENMASK(5, 4)
->  #define CTRL_COMPLETE			BIT(6)
->  #define CTRL_READY			BIT(7)
-> +#define CTRL_INBAND_LOCK		BIT(32)
->  #define CTRL_STATUS			GENMASK(15, 8)
->  #define CTRL_PACKET_SIZE		GENMASK(31, 16)
->  #define CTRL_MSG_SIZE			GENMASK(63, 48)
-> @@ -331,12 +332,21 @@ static int sdsi_mbox_read(struct sdsi_priv *priv, struct sdsi_mbox_info *info, s
->  	return sdsi_mbox_cmd_read(priv, info, data_size);
->  }
->  
-> +static bool sdsi_ib_locked(struct sdsi_priv *priv)
-> +{
-> +	return !!FIELD_GET(CTRL_INBAND_LOCK, readq(priv->control_addr));
-> +}
-> +
->  static ssize_t sdsi_provision(struct sdsi_priv *priv, char *buf, size_t count,
->  			      enum sdsi_command command)
->  {
->  	struct sdsi_mbox_info info = {};
->  	int ret;
->  
-> +	/* Make sure In-band lock is not set */
-> +	if (sdsi_ib_locked(priv))
-> +		return -EPERM;
-> +
->  	if (count > (SDSI_SIZE_WRITE_MSG - SDSI_SIZE_CMD))
->  		return -EOVERFLOW;
+> Yes, the datasheet clearly states the default/reset values of both 
+> registers VOD_CFG1 & VOD_CFG2 which are :
+> - cfg_dac_minus : 30h
+> - cfg_dac_plus : 10h
 
-Any reason why this order was chosen? I'd prefer these checks be other way 
-around (a stupid caller providing too long count gets notified of its 
-stupidity regardless of the locked state).
+And the device is actually and always reset by Linux when the driver
+loads? Anything the bootloader has done, or a previous kernel, will be
+cleared?
 
--- 
- i.
+Please add this explanation to the commit message.
 
+I'm being pedantic because we have had problems like this in the past.
+If a register was not actually set back to the default value, the
+bootloader set it to some other value, the board can work fine. Then a
+board can came along which the bootloader set the wrong value, and the
+default is actually needed. Fixing the driver to actually enforce the
+default breaks boards...
+
+	 Andrew
 
