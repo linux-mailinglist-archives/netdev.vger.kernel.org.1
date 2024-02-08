@@ -1,602 +1,247 @@
-Return-Path: <netdev+bounces-70159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0708384DE3D
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 11:26:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DDA884DE4D
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 11:29:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A84D1F2397E
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:26:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1B8E2B2BA57
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:26:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B7B6E2B8;
-	Thu,  8 Feb 2024 10:25:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 962F76EB54;
+	Thu,  8 Feb 2024 10:26:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="orsowU/f"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YmAP94Zg";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vYGXMgZZ";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="YmAP94Zg";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="vYGXMgZZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A37E6D1AE
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 10:25:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1CA6DCFE;
+	Thu,  8 Feb 2024 10:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707387916; cv=none; b=OgtaL1p5UOzXqxEAdKTamqn0cQ3IcTsOLxaqkwmm2r2XJqPQx5ph91exdruzN9jczgbGI2q1kGTvx2chr21gZ52jo0/DwSCpZr8wzwXH4QYOaUJVze0MFEXMyEKCw4M0zBLY7qYn/CRgyHeiG10k1H1R8pDJfCGSIL8/XVVJEEU=
+	t=1707387975; cv=none; b=uaJ/aMZfkN2MXXro3y/G7E61c3ldhm8fWABiSJwzMhMVqYNrntOihWnk16DGNkx6XH9SL/SCg+5oM4woO60XpO0irPAoAovwvo9aHKh9oRo6cDoqVc8J/bqhceWeRn/hBthQS4uFjcKtqIks/Mb44iCNNu+/mUerGiCeGNrGu2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707387916; c=relaxed/simple;
-	bh=ebO6pdQTvVDp5sbdn11vx9wnfJW0PzkwaYUKfnlOvMY=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=AScTl5lmZQbQkrtABGrjE8DouwqDxzWAbr6BuTnBBsTaycv8PsSgzTjwDcrK0Rvoh61ECr9XzHgYKbe869S+jKNq8lifZfExOYn7+uJS9KL6AwvjNlEaJkrK5DlbZwtI6MCqXbyn/wA5L7K6pRBK56cvgBmXPEc2R26ghdChugQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=orsowU/f; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc6bad01539so2391425276.3
-        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 02:25:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707387913; x=1707992713; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8PsemiEWHQz0P00/F7dOZm4T8rvQszoCPzw9gOsY8kI=;
-        b=orsowU/fUfLN6teRubJY5zIMqc4nWk5c1xDeQGVH5y9EJIgt9sB9r2oI6lWHAoyZFb
-         T7h5sZG5gmwP9u7zVY4Q34PJI1hDrBPWWx1WaGcLmWF+ybODhCvWAXZ44SHcFxviDK33
-         D3UAYZTPdwVJWJNE908hq1o5OFFPpyOfwMkASf+s073psZsHfTLclqeUJ/FO1753wEko
-         ei5LPD3iAoNj49NGqBktqQBkrr5Zj1BqTilIcx6Kj8LIs7aA+iUC0NI6CjBwJqTf/+fe
-         /hI/5df81vz1B2AU36TIBM5YKM/OcYd14sJlOYqpo8aRrYWh8YPMHQjEk9mSVwsyiJ4R
-         VcdQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707387913; x=1707992713;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8PsemiEWHQz0P00/F7dOZm4T8rvQszoCPzw9gOsY8kI=;
-        b=HqrNuNEMCxpaW7OU/zPJ0TBuUfBSdJJzJ4bRwlmg5mjz5CAF34TwxKfxqZ2+sfo+AD
-         E8AnDyL9m3x2der7SY38O7Vvht6lnClpTlHiFnh6oJGFt2XYIvGyOIBcxqwO8cFM6X4H
-         uGhmkp25pnnBJRjtVQEWxlce/XJ6HkjIP/io4mBP1Cs+PgH77A9JfL7aViNKRECO6mqq
-         vuC3nFEKnps79wVNJ4WXNnywLBtO7y71fKi7In/LPZ2BQHrYvPi/pxXCrc31uRAWBnxR
-         2OPJ6pbYNUCg0hY4BeB5DQlf+nkROiGS6HRZ9exUur/Fk3MRcCRbgr7Mzp311dKr6Iu4
-         gV2A==
-X-Gm-Message-State: AOJu0YzMzQkVOsoMwXskycup5wBiSTSxaKXjspl+V0iQnuiP3Vg1ItdL
-	Wn/B1z2nRTCpFy6q6nF1dnRhPiDlGz0nRLBvnQY8EpiGIpzFDOPLRu/u0qBQqXQFUUQRPuyNx+U
-	7rIiZpiwsew==
-X-Google-Smtp-Source: AGHT+IH2am2/3sYRVoHRCe9kn5IcjiSXOU+kuLh4PRTb0scPZ//4XM/oUC9dVJPff5DNTPnEZlNBWmFr5w0ApQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:2005:b0:dc6:a6e3:ca93 with SMTP
- id dh5-20020a056902200500b00dc6a6e3ca93mr267013ybb.10.1707387913364; Thu, 08
- Feb 2024 02:25:13 -0800 (PST)
-Date: Thu,  8 Feb 2024 10:25:08 +0000
-In-Reply-To: <20240208102508.262907-1-edumazet@google.com>
+	s=arc-20240116; t=1707387975; c=relaxed/simple;
+	bh=k9/QmS/ylPFheQDtEbsOTzpU8sUoCUqGH8YOPR3OWvc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Alx3FOXTgOd49h/X/SRj1vAKK71tIVpVx0PBslIJjenxrEOCxUm3xWYoxZeai5dmCJw0T5b+ArLBi3iYtUQJ2D5nSBGUY3BmcfjJTVz4islFA3iq/BpoqoB0SOJN2rIe/LoEx64J1OM9RZnLFfeYiVaaAIcT176OnR+M6XotZGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YmAP94Zg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vYGXMgZZ; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=YmAP94Zg; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=vYGXMgZZ; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 954A61FCDA;
+	Thu,  8 Feb 2024 10:26:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1707387971; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LZzZ9jLIvRqAb77M6zja7IcHKFPoI8mCipcHtHdDUmA=;
+	b=YmAP94ZgNzOuL5wWhPGJjHIoTA5de5g9eIboAI6viu6kay5cQIrnpFCMYWS477J9yLHw6d
+	BDyKEoAHN0mYGCKVf/3dMmEWkqdzpJ3xFqPq4O0GaSNfUxXG+VdqdXmOQkNG1cVhC4SIj6
+	We5ewc/jBMQoqwm9g7EwW8v9K7wcfC4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1707387971;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LZzZ9jLIvRqAb77M6zja7IcHKFPoI8mCipcHtHdDUmA=;
+	b=vYGXMgZZsMsfnFTr49UoTz5Wo9gJf4Dwj2yDMi/jn5rX1zpgkMsSr7tzPOFzICvWvhwxBO
+	lwW5Bj3AkcozGsBQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1707387971; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LZzZ9jLIvRqAb77M6zja7IcHKFPoI8mCipcHtHdDUmA=;
+	b=YmAP94ZgNzOuL5wWhPGJjHIoTA5de5g9eIboAI6viu6kay5cQIrnpFCMYWS477J9yLHw6d
+	BDyKEoAHN0mYGCKVf/3dMmEWkqdzpJ3xFqPq4O0GaSNfUxXG+VdqdXmOQkNG1cVhC4SIj6
+	We5ewc/jBMQoqwm9g7EwW8v9K7wcfC4=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1707387971;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LZzZ9jLIvRqAb77M6zja7IcHKFPoI8mCipcHtHdDUmA=;
+	b=vYGXMgZZsMsfnFTr49UoTz5Wo9gJf4Dwj2yDMi/jn5rX1zpgkMsSr7tzPOFzICvWvhwxBO
+	lwW5Bj3AkcozGsBQ==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id B84621326D;
+	Thu,  8 Feb 2024 10:26:10 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id BDLUKUKsxGUJKAAAD6G6ig
+	(envelope-from <dkirjanov@suse.de>); Thu, 08 Feb 2024 10:26:10 +0000
+Message-ID: <0e129417-53c8-4931-af76-a37762472fb0@suse.de>
+Date: Thu, 8 Feb 2024 13:26:05 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240208102508.262907-1-edumazet@google.com>
-X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
-Message-ID: <20240208102508.262907-3-edumazet@google.com>
-Subject: [PATCH net-next 2/2] net/sched: act_api: use exit_batch_rtnl() method
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
-	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] net: make driver settling time configurable
+Content-Language: en-US
+To: David Ventura <david@davidv.dev>
+Cc: Jonathan Corbet <corbet@lwn.net>, "David S. Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Paul E. McKenney" <paulmck@kernel.org>, Randy Dunlap
+ <rdunlap@infradead.org>, Xiongwei Song <xiongwei.song@windriver.com>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:NETWORKING [IPv4/IPv6]" <netdev@vger.kernel.org>
+References: <20240208093722.246930-1-david@davidv.dev>
+ <20240208095358.251381-1-david@davidv.dev>
+From: Denis Kirjanov <dkirjanov@suse.de>
+In-Reply-To: <20240208095358.251381-1-david@davidv.dev>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=YmAP94Zg;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=vYGXMgZZ
+X-Spamd-Result: default: False [-0.30 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 DWL_DNSWL_BLOCKED(0.00)[suse.de:dkim];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 DKIM_TRACE(0.00)[suse.de:+];
+	 MX_GOOD(-0.01)[];
+	 RCPT_COUNT_TWELVE(0.00)[14];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[davidv.dev:email,suse.de:dkim];
+	 TO_DN_ALL(0.00)[];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
+X-Spam-Score: -0.30
+X-Rspamd-Queue-Id: 954A61FCDA
+X-Spam-Level: 
+X-Spam-Flag: NO
+X-Spamd-Bar: /
 
-tc_action_net_exit() is called for each act module,
-and grabs rtnl each time, making netns dismantles slow.
 
-exit_batch_rtnl() is called while RTNL is already held,
-saving one rtnl_lock()/rtnl_unlock() pair.
 
-Rename tc_action_net_exit() to tc_action_net_exit_batch_rtnl()
-and change all callers.
+On 2/8/24 12:52, David Ventura wrote:
+> During IP auto configuration, some drivers apparently need to wait a
+> certain length of time to settle; as this is not true for all drivers,
+> make this length of time configurable.
+> 
+> Signed-off-by: David Ventura <david@davidv.dev>
+> ---
+>  .../admin-guide/kernel-parameters.txt         |  4 ++++
+>  Documentation/admin-guide/nfs/nfsroot.rst     |  3 +++
+>  net/ipv4/ipconfig.c                           | 23 ++++++++++++++++---
+>  3 files changed, 27 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/admin-guide/kernel-parameters.txt b/Documentation/admin-guide/kernel-parameters.txt
+> index b47940577c10..b07a035642fa 100644
+> --- a/Documentation/admin-guide/kernel-parameters.txt
+> +++ b/Documentation/admin-guide/kernel-parameters.txt
+> @@ -2291,6 +2291,10 @@
+>  
+>  	ip=		[IP_PNP]
+>  			See Documentation/admin-guide/nfs/nfsroot.rst.
+> +	ip.dev_wait_ms=
+> +			[IP_PNP]
+> +			See Documentation/admin-guide/nfs/nfsroot.rst.
+> +
+>  
+>  	ipcmni_extend	[KNL,EARLY] Extend the maximum number of unique System V
+>  			IPC identifiers from 32,768 to 16,777,216.
+> diff --git a/Documentation/admin-guide/nfs/nfsroot.rst b/Documentation/admin-guide/nfs/nfsroot.rst
+> index 135218f33394..f26f7a342af6 100644
+> --- a/Documentation/admin-guide/nfs/nfsroot.rst
+> +++ b/Documentation/admin-guide/nfs/nfsroot.rst
+> @@ -223,6 +223,9 @@ ip=<client-ip>:<server-ip>:<gw-ip>:<netmask>:<hostname>:<device>:<autoconf>:<dns
+>    /proc/net/ipconfig/ntp_servers to an NTP client before mounting the real
+>    root filesystem if it is on NFS).
+>  
+> +ip.dev_wait_ms=<value>
+> +  Set the number of milliseconds to delay after opening the network device
+> +  which will be autoconfigured. Defaults to 10 milliseconds.
+>  
+>  nfsrootdebug
+>    This parameter enables debugging messages to appear in the kernel
+> diff --git a/net/ipv4/ipconfig.c b/net/ipv4/ipconfig.c
+> index c56b6fe6f0d7..cbf35163b973 100644
+> --- a/net/ipv4/ipconfig.c
+> +++ b/net/ipv4/ipconfig.c
+> @@ -82,8 +82,6 @@
+>  #define IPCONFIG_DYNAMIC
+>  #endif
+>  
+> -/* Define the friendly delay before and after opening net devices */
+> -#define CONF_POST_OPEN		10	/* After opening: 10 msecs */
+>  
+>  /* Define the timeout for waiting for a DHCP/BOOTP/RARP reply */
+>  #define CONF_OPEN_RETRIES 	2	/* (Re)open devices twice */
+> @@ -101,6 +99,7 @@
+>  
+>  /* Wait for carrier timeout default in seconds */
+>  static unsigned int carrier_timeout = 120;
+> +static unsigned int dev_wait_ms = 10;
+>  
+>  /*
+>   * Public IP configuration
+> @@ -1516,7 +1515,8 @@ static int __init ip_auto_config(void)
+>  		return err;
+>  
+>  	/* Give drivers a chance to settle */
+> -	msleep(CONF_POST_OPEN);
+> +	if(dev_wait_ms > 0)
+> +		msleep(dev_wait_ms);
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/net/act_api.h      | 3 ++-
- net/sched/act_api.c        | 7 +++----
- net/sched/act_bpf.c        | 7 ++++---
- net/sched/act_connmark.c   | 7 ++++---
- net/sched/act_csum.c       | 7 ++++---
- net/sched/act_ct.c         | 7 ++++---
- net/sched/act_ctinfo.c     | 7 ++++---
- net/sched/act_gact.c       | 7 ++++---
- net/sched/act_gate.c       | 7 ++++---
- net/sched/act_ife.c        | 7 ++++---
- net/sched/act_mirred.c     | 7 ++++---
- net/sched/act_mpls.c       | 7 ++++---
- net/sched/act_nat.c        | 7 ++++---
- net/sched/act_pedit.c      | 7 ++++---
- net/sched/act_police.c     | 7 ++++---
- net/sched/act_sample.c     | 7 ++++---
- net/sched/act_simple.c     | 7 ++++---
- net/sched/act_skbedit.c    | 7 ++++---
- net/sched/act_skbmod.c     | 7 ++++---
- net/sched/act_tunnel_key.c | 7 ++++---
- net/sched/act_vlan.c       | 7 ++++---
- 21 files changed, 81 insertions(+), 62 deletions(-)
+What's the point to wait more than CONF_POST_OPEN with the change?
 
-diff --git a/include/net/act_api.h b/include/net/act_api.h
-index 8ec97644edf86d5d95960b74b9b57908ca19a198..2aa0060f51a6d7b0cbe0063792548469d41496e2 100644
---- a/include/net/act_api.h
-+++ b/include/net/act_api.h
-@@ -149,7 +149,8 @@ struct tc_action_net {
- int tc_action_net_init(struct net *net, struct tc_action_net *tn,
- 		       const struct tc_action_ops *ops);
- 
--void tc_action_net_exit(struct list_head *net_list, unsigned int id);
-+void tc_action_net_exit_batch_rtnl(struct list_head *net_list,
-+				   unsigned int id);
- 
- int tcf_generic_walker(struct tc_action_net *tn, struct sk_buff *skb,
- 		       struct netlink_callback *cb, int type,
-diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-index 9492eae0ebe5844419e1631122871d19b443bc4e..642ff499fa03cffe9873a987ee09ceb76707f2aa 100644
---- a/net/sched/act_api.c
-+++ b/net/sched/act_api.c
-@@ -921,20 +921,19 @@ static void tcf_idrinfo_destroy(const struct tc_action_ops *ops,
- 	idr_destroy(&idrinfo->action_idr);
- }
- 
--void tc_action_net_exit(struct list_head *net_list, unsigned int id)
-+void tc_action_net_exit_batch_rtnl(struct list_head *net_list, unsigned int id)
- {
- 	struct net *net;
- 
--	rtnl_lock();
-+	ASSERT_RTNL();
- 	list_for_each_entry(net, net_list, exit_list) {
- 		struct tc_action_net *tn = net_generic(net, id);
- 
- 		tcf_idrinfo_destroy(tn->ops, tn->idrinfo);
- 		kfree(tn->idrinfo);
- 	}
--	rtnl_unlock();
- }
--EXPORT_SYMBOL(tc_action_net_exit);
-+EXPORT_SYMBOL(tc_action_net_exit_batch_rtnl);
- 
- static LIST_HEAD(act_base);
- static DEFINE_RWLOCK(act_mod_lock);
-diff --git a/net/sched/act_bpf.c b/net/sched/act_bpf.c
-index 0e3cf11ae5fc042f1e6f960fb5159153cc67fb27..cad8696ee505f6389cf5af56ea419650b1692d35 100644
---- a/net/sched/act_bpf.c
-+++ b/net/sched/act_bpf.c
-@@ -410,14 +410,15 @@ static __net_init int bpf_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_bpf_ops);
- }
- 
--static void __net_exit bpf_exit_net(struct list_head *net_list)
-+static void __net_exit bpf_exit_batch_rtnl(struct list_head *net_list,
-+					   struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_bpf_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_bpf_ops.net_id);
- }
- 
- static struct pernet_operations bpf_net_ops = {
- 	.init = bpf_init_net,
--	.exit_batch = bpf_exit_net,
-+	.exit_batch_rtnl = bpf_exit_batch_rtnl,
- 	.id   = &act_bpf_ops.net_id,
- 	.size = sizeof(struct tc_action_net),
- };
-diff --git a/net/sched/act_connmark.c b/net/sched/act_connmark.c
-index 0fce631e7c91113e5559d12ddc4d0ebeef1237e4..110618266ddbd727fa0d207071288d7a101776d5 100644
---- a/net/sched/act_connmark.c
-+++ b/net/sched/act_connmark.c
-@@ -251,14 +251,15 @@ static __net_init int connmark_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_connmark_ops);
- }
- 
--static void __net_exit connmark_exit_net(struct list_head *net_list)
-+static void __net_exit connmark_exit_batch_rtnl(struct list_head *net_list,
-+						struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_connmark_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_connmark_ops.net_id);
- }
- 
- static struct pernet_operations connmark_net_ops = {
- 	.init = connmark_init_net,
--	.exit_batch = connmark_exit_net,
-+	.exit_batch_rtnl = connmark_exit_batch_rtnl,
- 	.id   = &act_connmark_ops.net_id,
- 	.size = sizeof(struct tc_action_net),
- };
-diff --git a/net/sched/act_csum.c b/net/sched/act_csum.c
-index 5cc8e407e7911c6c9f252d58b458728174913317..d2c2824317d5249ac86ddfa66e6f9d83afbded4c 100644
---- a/net/sched/act_csum.c
-+++ b/net/sched/act_csum.c
-@@ -718,14 +718,15 @@ static __net_init int csum_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_csum_ops);
- }
- 
--static void __net_exit csum_exit_net(struct list_head *net_list)
-+static void __net_exit csum_exit_batch_rtnl(struct list_head *net_list,
-+					    struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_csum_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_csum_ops.net_id);
- }
- 
- static struct pernet_operations csum_net_ops = {
- 	.init = csum_init_net,
--	.exit_batch = csum_exit_net,
-+	.exit_batch_rtnl = csum_exit_batch_rtnl,
- 	.id   = &act_csum_ops.net_id,
- 	.size = sizeof(struct tc_action_net),
- };
-diff --git a/net/sched/act_ct.c b/net/sched/act_ct.c
-index baac083fd8f1096eb717a5ae6cd744ae15d6d17d..b3351e9a6ba541e3aefba70346aedd8b5a7de3a7 100644
---- a/net/sched/act_ct.c
-+++ b/net/sched/act_ct.c
-@@ -1609,14 +1609,15 @@ static __net_init int ct_init_net(struct net *net)
- 	return tc_action_net_init(net, &tn->tn, &act_ct_ops);
- }
- 
--static void __net_exit ct_exit_net(struct list_head *net_list)
-+static void __net_exit ct_exit_batch_rtnl(struct list_head *net_list,
-+					  struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_ct_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_ct_ops.net_id);
- }
- 
- static struct pernet_operations ct_net_ops = {
- 	.init = ct_init_net,
--	.exit_batch = ct_exit_net,
-+	.exit_batch_rtnl = ct_exit_batch_rtnl,
- 	.id   = &act_ct_ops.net_id,
- 	.size = sizeof(struct tc_ct_action_net),
- };
-diff --git a/net/sched/act_ctinfo.c b/net/sched/act_ctinfo.c
-index 5dd41a012110e04d4e7b199367a84fa1905156b3..5ee8b9ce32893782f99a75a1138e289fa8979e26 100644
---- a/net/sched/act_ctinfo.c
-+++ b/net/sched/act_ctinfo.c
-@@ -372,14 +372,15 @@ static __net_init int ctinfo_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_ctinfo_ops);
- }
- 
--static void __net_exit ctinfo_exit_net(struct list_head *net_list)
-+static void __net_exit ctinfo_exit_batch_rtnl(struct list_head *net_list,
-+					      struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_ctinfo_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_ctinfo_ops.net_id);
- }
- 
- static struct pernet_operations ctinfo_net_ops = {
- 	.init		= ctinfo_init_net,
--	.exit_batch	= ctinfo_exit_net,
-+	.exit_batch_rtnl = ctinfo_exit_batch_rtnl,
- 	.id		= &act_ctinfo_ops.net_id,
- 	.size		= sizeof(struct tc_action_net),
- };
-diff --git a/net/sched/act_gact.c b/net/sched/act_gact.c
-index e949280eb800d9558cf101ced8f0d9742926c5f7..ada08c61b6d4dfcc521de6c31c848dbd386607f7 100644
---- a/net/sched/act_gact.c
-+++ b/net/sched/act_gact.c
-@@ -305,14 +305,15 @@ static __net_init int gact_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_gact_ops);
- }
- 
--static void __net_exit gact_exit_net(struct list_head *net_list)
-+static void __net_exit gact_exit_batch_rtnl(struct list_head *net_list,
-+					    struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_gact_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_gact_ops.net_id);
- }
- 
- static struct pernet_operations gact_net_ops = {
- 	.init = gact_init_net,
--	.exit_batch = gact_exit_net,
-+	.exit_batch_rtnl = gact_exit_batch_rtnl,
- 	.id   = &act_gact_ops.net_id,
- 	.size = sizeof(struct tc_action_net),
- };
-diff --git a/net/sched/act_gate.c b/net/sched/act_gate.c
-index 1dd74125398a0f41751fab72397f006b2c63d1db..65946e3450262aaf515d23d9fcf1e40f85f4bbc9 100644
---- a/net/sched/act_gate.c
-+++ b/net/sched/act_gate.c
-@@ -654,14 +654,15 @@ static __net_init int gate_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_gate_ops);
- }
- 
--static void __net_exit gate_exit_net(struct list_head *net_list)
-+static void __net_exit gate_exit_batch_rtnl(struct list_head *net_list,
-+					    struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_gate_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_gate_ops.net_id);
- }
- 
- static struct pernet_operations gate_net_ops = {
- 	.init = gate_init_net,
--	.exit_batch = gate_exit_net,
-+	.exit_batch_rtnl = gate_exit_batch_rtnl,
- 	.id   = &act_gate_ops.net_id,
- 	.size = sizeof(struct tc_action_net),
- };
-diff --git a/net/sched/act_ife.c b/net/sched/act_ife.c
-index 107c6d83dc5c4b586b534bacd7b185bcf891812a..ad11ef0aade95358a2463f7bd7d786c5981dbf37 100644
---- a/net/sched/act_ife.c
-+++ b/net/sched/act_ife.c
-@@ -898,14 +898,15 @@ static __net_init int ife_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_ife_ops);
- }
- 
--static void __net_exit ife_exit_net(struct list_head *net_list)
-+static void __net_exit ife_exit_batch_rtnl(struct list_head *net_list,
-+					   struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_ife_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_ife_ops.net_id);
- }
- 
- static struct pernet_operations ife_net_ops = {
- 	.init = ife_init_net,
--	.exit_batch = ife_exit_net,
-+	.exit_batch_rtnl = ife_exit_batch_rtnl,
- 	.id   = &act_ife_ops.net_id,
- 	.size = sizeof(struct tc_action_net),
- };
-diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
-index 93a96e9d8d900c238c9a84d75201b6edf01ba198..97429da4491f15aa78064785b28eb2eed0b2c3f1 100644
---- a/net/sched/act_mirred.c
-+++ b/net/sched/act_mirred.c
-@@ -652,14 +652,15 @@ static __net_init int mirred_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_mirred_ops);
- }
- 
--static void __net_exit mirred_exit_net(struct list_head *net_list)
-+static void __net_exit mirred_exit_batch_rtnl(struct list_head *net_list,
-+					      struct list_head *batch_rtnl)
- {
--	tc_action_net_exit(net_list, act_mirred_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_mirred_ops.net_id);
- }
- 
- static struct pernet_operations mirred_net_ops = {
- 	.init = mirred_init_net,
--	.exit_batch = mirred_exit_net,
-+	.exit_batch_rtnl = mirred_exit_batch_rtnl,
- 	.id   = &act_mirred_ops.net_id,
- 	.size = sizeof(struct tc_action_net),
- };
-diff --git a/net/sched/act_mpls.c b/net/sched/act_mpls.c
-index 44a37a71ae9236cc1967239d6db8aba74d77355c..347d439f87f3f8d9586081a90106b3efebb3eeed 100644
---- a/net/sched/act_mpls.c
-+++ b/net/sched/act_mpls.c
-@@ -461,14 +461,15 @@ static __net_init int mpls_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_mpls_ops);
- }
- 
--static void __net_exit mpls_exit_net(struct list_head *net_list)
-+static void __net_exit mpls_exit_batch_rtnl(struct list_head *net_list,
-+					    struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_mpls_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_mpls_ops.net_id);
- }
- 
- static struct pernet_operations mpls_net_ops = {
- 	.init = mpls_init_net,
--	.exit_batch = mpls_exit_net,
-+	.exit_batch_rtnl = mpls_exit_batch_rtnl,
- 	.id   = &act_mpls_ops.net_id,
- 	.size = sizeof(struct tc_action_net),
- };
-diff --git a/net/sched/act_nat.c b/net/sched/act_nat.c
-index d541f553805face5a0d444659c17e0b720aeb843..af43b962d66838af715172cdb7f304b3e37e6aef 100644
---- a/net/sched/act_nat.c
-+++ b/net/sched/act_nat.c
-@@ -333,14 +333,15 @@ static __net_init int nat_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_nat_ops);
- }
- 
--static void __net_exit nat_exit_net(struct list_head *net_list)
-+static void __net_exit nat_exit_batch_rtnl(struct list_head *net_list,
-+					   struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_nat_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_nat_ops.net_id);
- }
- 
- static struct pernet_operations nat_net_ops = {
- 	.init = nat_init_net,
--	.exit_batch = nat_exit_net,
-+	.exit_batch_rtnl = nat_exit_batch_rtnl,
- 	.id   = &act_nat_ops.net_id,
- 	.size = sizeof(struct tc_action_net),
- };
-diff --git a/net/sched/act_pedit.c b/net/sched/act_pedit.c
-index df5a02d5f919c3e8b26308f5128ee35f63e5401a..9509760d4663b8b18e2e9431cdde3043263e6a6e 100644
---- a/net/sched/act_pedit.c
-+++ b/net/sched/act_pedit.c
-@@ -629,14 +629,15 @@ static __net_init int pedit_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_pedit_ops);
- }
- 
--static void __net_exit pedit_exit_net(struct list_head *net_list)
-+static void __net_exit pedit_exit_batch_rtnl(struct list_head *net_list,
-+					     struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_pedit_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_pedit_ops.net_id);
- }
- 
- static struct pernet_operations pedit_net_ops = {
- 	.init = pedit_init_net,
--	.exit_batch = pedit_exit_net,
-+	.exit_batch_rtnl = pedit_exit_batch_rtnl,
- 	.id   = &act_pedit_ops.net_id,
- 	.size = sizeof(struct tc_action_net),
- };
-diff --git a/net/sched/act_police.c b/net/sched/act_police.c
-index 8555125ed34d83eaadd36391da869bd46f2372fe..00ed38e2632131ee00bb751f2db17078417078da 100644
---- a/net/sched/act_police.c
-+++ b/net/sched/act_police.c
-@@ -511,14 +511,15 @@ static __net_init int police_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_police_ops);
- }
- 
--static void __net_exit police_exit_net(struct list_head *net_list)
-+static void __net_exit police_exit_batch_rtnl(struct list_head *net_list,
-+					      struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_police_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_police_ops.net_id);
- }
- 
- static struct pernet_operations police_net_ops = {
- 	.init = police_init_net,
--	.exit_batch = police_exit_net,
-+	.exit_batch_rtnl = police_exit_batch_rtnl,
- 	.id   = &act_police_ops.net_id,
- 	.size = sizeof(struct tc_action_net),
- };
-diff --git a/net/sched/act_sample.c b/net/sched/act_sample.c
-index a69b53d54039eda131bea4d4022ce1b86506c275..7da5cd7701d31014abdcae7450c97215b2947d40 100644
---- a/net/sched/act_sample.c
-+++ b/net/sched/act_sample.c
-@@ -325,14 +325,15 @@ static __net_init int sample_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_sample_ops);
- }
- 
--static void __net_exit sample_exit_net(struct list_head *net_list)
-+static void __net_exit sample_exit_batch_rtnl(struct list_head *net_list,
-+					      struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_sample_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_sample_ops.net_id);
- }
- 
- static struct pernet_operations sample_net_ops = {
- 	.init = sample_init_net,
--	.exit_batch = sample_exit_net,
-+	.exit_batch_rtnl = sample_exit_batch_rtnl,
- 	.id   = &act_sample_ops.net_id,
- 	.size = sizeof(struct tc_action_net),
- };
-diff --git a/net/sched/act_simple.c b/net/sched/act_simple.c
-index f3abe05459895661d9600f719379773a55a1c456..e2620722a2f77478b53d1e5423a3a7afb3c2b78a 100644
---- a/net/sched/act_simple.c
-+++ b/net/sched/act_simple.c
-@@ -218,14 +218,15 @@ static __net_init int simp_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_simp_ops);
- }
- 
--static void __net_exit simp_exit_net(struct list_head *net_list)
-+static void __net_exit simp_exit_batch_rtnl(struct list_head *net_list,
-+					    struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_simp_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_simp_ops.net_id);
- }
- 
- static struct pernet_operations simp_net_ops = {
- 	.init = simp_init_net,
--	.exit_batch = simp_exit_net,
-+	.exit_batch_rtnl = simp_exit_batch_rtnl,
- 	.id   = &act_simp_ops.net_id,
- 	.size = sizeof(struct tc_action_net),
- };
-diff --git a/net/sched/act_skbedit.c b/net/sched/act_skbedit.c
-index 1f1d9ce3e968a2342a524c068d15912623de058f..ac4784315133c5b670a6bcb33a4f46aa843f090f 100644
---- a/net/sched/act_skbedit.c
-+++ b/net/sched/act_skbedit.c
-@@ -435,14 +435,15 @@ static __net_init int skbedit_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_skbedit_ops);
- }
- 
--static void __net_exit skbedit_exit_net(struct list_head *net_list)
-+static void __net_exit skbedit_exit_batch_rtnl(struct list_head *net_list,
-+					       struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_skbedit_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_skbedit_ops.net_id);
- }
- 
- static struct pernet_operations skbedit_net_ops = {
- 	.init = skbedit_init_net,
--	.exit_batch = skbedit_exit_net,
-+	.exit_batch_rtnl = skbedit_exit_batch_rtnl,
- 	.id   = &act_skbedit_ops.net_id,
- 	.size = sizeof(struct tc_action_net),
- };
-diff --git a/net/sched/act_skbmod.c b/net/sched/act_skbmod.c
-index 39945b139c4817584fb9803b9e65c89fef68eca0..cf01c94d2453cef229dbdb8ecb029af63ebb2b04 100644
---- a/net/sched/act_skbmod.c
-+++ b/net/sched/act_skbmod.c
-@@ -296,14 +296,15 @@ static __net_init int skbmod_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_skbmod_ops);
- }
- 
--static void __net_exit skbmod_exit_net(struct list_head *net_list)
-+static void __net_exit skbmod_exit_batch_rtnl(struct list_head *net_list,
-+					      struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_skbmod_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_skbmod_ops.net_id);
- }
- 
- static struct pernet_operations skbmod_net_ops = {
- 	.init = skbmod_init_net,
--	.exit_batch = skbmod_exit_net,
-+	.exit_batch_rtnl = skbmod_exit_batch_rtnl,
- 	.id   = &act_skbmod_ops.net_id,
- 	.size = sizeof(struct tc_action_net),
- };
-diff --git a/net/sched/act_tunnel_key.c b/net/sched/act_tunnel_key.c
-index 1536f8b16f1b250eb62ae5530f01cbc6f7ea632a..6d167a0feed1d5f3d29c06781ffc372743d123be 100644
---- a/net/sched/act_tunnel_key.c
-+++ b/net/sched/act_tunnel_key.c
-@@ -851,14 +851,15 @@ static __net_init int tunnel_key_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_tunnel_key_ops);
- }
- 
--static void __net_exit tunnel_key_exit_net(struct list_head *net_list)
-+static void __net_exit tunnel_key_exit_batch_rtnl(struct list_head *net_list,
-+						  struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_tunnel_key_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_tunnel_key_ops.net_id);
- }
- 
- static struct pernet_operations tunnel_key_net_ops = {
- 	.init = tunnel_key_init_net,
--	.exit_batch = tunnel_key_exit_net,
-+	.exit_batch_rtnl = tunnel_key_exit_batch_rtnl,
- 	.id   = &act_tunnel_key_ops.net_id,
- 	.size = sizeof(struct tc_action_net),
- };
-diff --git a/net/sched/act_vlan.c b/net/sched/act_vlan.c
-index 22f4b1e8ade9f5a5bb5ece4c2fc600f94d8053fd..6b0ab1750f05b3523d5c96abd2ab7820db57d4a0 100644
---- a/net/sched/act_vlan.c
-+++ b/net/sched/act_vlan.c
-@@ -436,14 +436,15 @@ static __net_init int vlan_init_net(struct net *net)
- 	return tc_action_net_init(net, tn, &act_vlan_ops);
- }
- 
--static void __net_exit vlan_exit_net(struct list_head *net_list)
-+static void __net_exit vlan_exit_batch_rtnl(struct list_head *net_list,
-+					    struct list_head *dev_to_kill)
- {
--	tc_action_net_exit(net_list, act_vlan_ops.net_id);
-+	tc_action_net_exit_batch_rtnl(net_list, act_vlan_ops.net_id);
- }
- 
- static struct pernet_operations vlan_net_ops = {
- 	.init = vlan_init_net,
--	.exit_batch = vlan_exit_net,
-+	.exit_batch_rtnl = vlan_exit_batch_rtnl,
- 	.id   = &act_vlan_ops.net_id,
- 	.size = sizeof(struct tc_action_net),
- };
--- 
-2.43.0.594.gd9cf4e227d-goog
-
+>  
+>  	/*
+>  	 * If the config information is insufficient (e.g., our IP address or
+> @@ -1849,3 +1849,20 @@ static int __init set_carrier_timeout(char *str)
+>  	return 1;
+>  }
+>  __setup("carrier_timeout=", set_carrier_timeout);
+> +
+> +
+> +static int __init set_dev_wait_ms(char *str)
+> +{
+> +	ssize_t ret;
+> +
+> +	if (!str)
+> +		return 0;
+> +
+> +	ret = kstrtouint(str, 0, &dev_wait_ms);
+> +	if (ret)
+> +		return 0;
+> +
+> +	return 1;
+> +}
+> +
+> +__setup("ip.dev_wait_ms=", set_dev_wait_ms);
 
