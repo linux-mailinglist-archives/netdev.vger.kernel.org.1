@@ -1,79 +1,142 @@
-Return-Path: <netdev+bounces-70287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29C9E84E421
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 16:37:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D403784E436
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 16:45:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAEF7281030
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 15:37:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F96328C245
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 15:45:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 165C07BAE0;
-	Thu,  8 Feb 2024 15:37:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A5D27B3E9;
+	Thu,  8 Feb 2024 15:45:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MhYsSy/a"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MzZSof19"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7AE47640A
-	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 15:37:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37517B3C8
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 15:45:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707406640; cv=none; b=TrgvpPVyBpO7LT7buA5Y47YXI2cTV7Liouc/O45OsC6OhsrEaBI34kaTNRcXRLpFutdwt5ngpfx5U8vsHX6HZ5tMLScFGjY/pDNgMYXE4Z6wQmLF5w1gCqz+n56/zFC7mj+fwVoz5yc6Ru9UXbFeE6qFVUTuzZhQeftV4W3e0QE=
+	t=1707407151; cv=none; b=jry3cG0k+jLyWslXsGojTE29kE8Ti7PHuAzgmFtG2bqrBqHeRJKhspqWfsXYxIWgzyWZxLclFV9ex6V1QhP/nEUwYRRGHOWs371yFuQCyVnH+JF5wueL6oJKNy3gry2S4wAJjAkjhjU5SARZ4fAoEGn0QyrseA3Ufu3iQeDxPRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707406640; c=relaxed/simple;
-	bh=GJUn2Iv9BdzNCcDgPeLa/+beNiBpTsKWFx4RPFZY3y4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bn7B/JbRe1jhvGXfpwcaLa2fhvlsZfMf44HAwbilGV1w8GDoJ+Yrrl8TBzcjLbVk3ui50K53fwfu8aN464rnH85AOUmNjHv/TacYgp0S/gdTTUxGSH9/lgH5hXMdDJLo4LkQf9TU3Px0FEM2fmUnPXNNDHbxV5sUjMZK0fL++wI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MhYsSy/a; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C205C433F1;
-	Thu,  8 Feb 2024 15:37:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707406639;
-	bh=GJUn2Iv9BdzNCcDgPeLa/+beNiBpTsKWFx4RPFZY3y4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MhYsSy/aSHH0K4OHxcoQTJfYFjKpax8qlbZEJKJAVo8Os261hJA4N0K1YTl+HWKtW
-	 0JZ1gbn5Llhxb1zbGiMJ//I6p6gQH+vuJsxnHRmQEeqWMt9gB5ePqLgJJ0wN3BOkFu
-	 Paaxa//ihaYMDg9gzQ+eOo1ILQvNy0GBL3W3pkcOK4MQKxPgZBGURAIdLL2M+n7sTj
-	 TTkvRMT4v987R6/33cuDN8AHdpR8zYfApefty6lJLUA0g9vjEFjGzuCz+3LhpMzBqr
-	 5E2ilcPj0+LbHaPtxaRtjREGIm4XcMp4HdjBWy1alVGcoORECKXiqsbWaWF6Nt9P6L
-	 6WsnrUG1mfzBw==
-Date: Thu, 8 Feb 2024 07:37:18 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Elad Nachman <enachman@marvell.com>
-Cc: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Taras Chornyi
- <taras.chornyi@plvision.eu>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: Re: [EXT] Prestera driver fail to probe twice
-Message-ID: <20240208073718.7fcb93d4@kernel.org>
-In-Reply-To: <BN9PR18MB4251BC09AAD68BDA10AD4C9FDB442@BN9PR18MB4251.namprd18.prod.outlook.com>
-References: <20240206165406.24008997@kmaincent-XPS-13-7390>
-	<BN9PR18MB42519830967969DEA4E329EFDB462@BN9PR18MB4251.namprd18.prod.outlook.com>
-	<20240207112231.2d555d3e@kmaincent-XPS-13-7390>
-	<BN9PR18MB42510F2EA6F4091E5CA3B409DB452@BN9PR18MB4251.namprd18.prod.outlook.com>
-	<20240207122838.382fd1b2@kmaincent-XPS-13-7390>
-	<BN9PR18MB4251F1904C5C56381FE976C4DB452@BN9PR18MB4251.namprd18.prod.outlook.com>
-	<20240207153136.761ef376@kmaincent-XPS-13-7390>
-	<BN9PR18MB42516CB6F1DA53D8BAD47B17DB452@BN9PR18MB4251.namprd18.prod.outlook.com>
-	<20240207103135.33e01d2d@kernel.org>
-	<BN9PR18MB4251BC09AAD68BDA10AD4C9FDB442@BN9PR18MB4251.namprd18.prod.outlook.com>
+	s=arc-20240116; t=1707407151; c=relaxed/simple;
+	bh=+HJYZ8oqHC3FdNT1e4ehv7w01FCjmZKJPFhODlJSz5o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hSTYANRS8sF2EPu/ZfSJCpkzwM8zFrepcQcHu+S+PqRsUY0Bfo1JpLfgbEmlkygiGMVynlpJNiC2PlQp2xPJZKROliC3xczsXJoqUH5ca1SmxfXL5fn5iu8jOIAiTIGqXYbfPXIwf0bbv+H8nclQ+XYlSAjmKfl2uZZVTvKRibQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MzZSof19; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707407148;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=PkIkmm1xiMrNbNoPpK4ngd8OZ7yo/e1nfxvctzpMBYM=;
+	b=MzZSof19w8/xkPPC/3rWKHiyuD2+7qc6qr8D+XbdL5ODNIQxkaRszxqXQAyswGLMOAzt/O
+	6tbG0DGz8xapzz+scEFWIoV8S5V9eZ+lgRozJvVOosAK2d+pac1L/qnps38GLyNNKo+3D8
+	EpzerGKXyiL/ahB2t/qNQtaR0hqr2oc=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-223-rKduAvwiNq-EryYzdOdk5A-1; Thu, 08 Feb 2024 10:45:45 -0500
+X-MC-Unique: rKduAvwiNq-EryYzdOdk5A-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B474885A588;
+	Thu,  8 Feb 2024 15:45:44 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.224.247])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 30D6D2166B31;
+	Thu,  8 Feb 2024 15:45:43 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net] selftests: net: wait for receiver startup in so_txtime.sh
+Date: Thu,  8 Feb 2024 16:45:34 +0100
+Message-ID: <53a7e56424756ef35434bc15a90b256bcf724651.1707407012.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.6
 
-On Thu, 8 Feb 2024 07:36:54 +0000 Elad Nachman wrote:
-> Once again, existing deployed firmware does not check the enum below,
-> so this does not ensure backward compatibility.
+The mentioned test is failing in slow environments:
 
-Okay, if it's a bigger rework - how much time do you need to get
-it fixed?
+  # SO_TXTIME ipv4 clock monotonic
+  # ./so_txtime: recv: timeout: Resource temporarily unavailable
+  not ok 1 selftests: net: so_txtime.sh # exit=1
+
+The receiver is started in background and the sender could end-up
+transmitting the packet before the receiver is ready, so that the
+later recv times out.
+
+Address the issue explcitly waiting for the socket being bound to
+the relevant port.
+
+Fixes: af5136f95045 ("selftests/net: SO_TXTIME with ETF and FQ")
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+---
+Note that to really cope with slow env the mentioned self-tests also
+need net-next commit c41dfb0dfbec ("selftests/net: ignore timing
+errors in so_txtime if KSFT_MACHINE_SLOW"), so this could be applied to
+net-next, too
+---
+ tools/testing/selftests/net/so_txtime.sh | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/tools/testing/selftests/net/so_txtime.sh b/tools/testing/selftests/net/so_txtime.sh
+index 3f06f4d286a9..ade0e5755099 100755
+--- a/tools/testing/selftests/net/so_txtime.sh
++++ b/tools/testing/selftests/net/so_txtime.sh
+@@ -5,6 +5,8 @@
+ 
+ set -e
+ 
++source net_helper.sh
++
+ readonly DEV="veth0"
+ readonly BIN="./so_txtime"
+ 
+@@ -51,13 +53,16 @@ do_test() {
+ 	local readonly CLOCK="$2"
+ 	local readonly TXARGS="$3"
+ 	local readonly RXARGS="$4"
++	local PROTO
+ 
+ 	if [[ "${IP}" == "4" ]]; then
+ 		local readonly SADDR="${SADDR4}"
+ 		local readonly DADDR="${DADDR4}"
++		PROTO=udp
+ 	elif [[ "${IP}" == "6" ]]; then
+ 		local readonly SADDR="${SADDR6}"
+ 		local readonly DADDR="${DADDR6}"
++		PROTO=udp6
+ 	else
+ 		echo "Invalid IP version ${IP}"
+ 		exit 1
+@@ -65,6 +70,7 @@ do_test() {
+ 
+ 	local readonly START="$(date +%s%N --date="+ 0.1 seconds")"
+ 	ip netns exec "${NS2}" "${BIN}" -"${IP}" -c "${CLOCK}" -t "${START}" -S "${SADDR}" -D "${DADDR}" "${RXARGS}" -r &
++	wait_local_port_listen "${NS2}" 8000 "${PROTO}"
+ 	ip netns exec "${NS1}" "${BIN}" -"${IP}" -c "${CLOCK}" -t "${START}" -S "${SADDR}" -D "${DADDR}" "${TXARGS}"
+ 	wait "$!"
+ }
+-- 
+2.43.0
+
 
