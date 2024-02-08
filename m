@@ -1,137 +1,118 @@
-Return-Path: <netdev+bounces-70155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F07A084DE17
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 11:21:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A966284DE3B
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 11:26:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B5A8B2A613
-	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:21:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B4501F216D2
+	for <lists+netdev@lfdr.de>; Thu,  8 Feb 2024 10:26:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79EFA745E6;
-	Thu,  8 Feb 2024 10:19:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0D56A8DD;
+	Thu,  8 Feb 2024 10:25:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="F7f1Hdmn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f9eeIUG7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658EF71B2D;
-	Thu,  8 Feb 2024 10:19:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 450B36D1AE
+	for <netdev@vger.kernel.org>; Thu,  8 Feb 2024 10:25:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707387574; cv=none; b=E8WAg3jkdusQUkS4b2OjymOBD+cQePhZS2qatBWcb6kHRdxVe7k8OqJKvkWiuxsub4aXp6s/2fXV9z0DSpIoHV0+RHwr7/tzrr8D8sryzh2KWN9V86mROcfKLr7Spu1j8A7OodHwiv7jTy2veL/JftdnHuF5axcBTeZML4gpiW4=
+	t=1707387912; cv=none; b=pKW97vbWSMJ0EZJ/beSF04+thyr/ODWwHbmKkX9ItjRw7EU9XdARnJbebYMwK+bs4me7CSWEK8hDTgCGGlcoZme73+fKqQLKHv8ccQh3sHvrBX1ZPQOl/7jFZN5JnVd+MMj42XomQi+4F3tWfbfLxjcvcAhH/2St+7OVRQJ/zuM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707387574; c=relaxed/simple;
-	bh=a8omMV6Mtf7DbIxI/PaXF2Oa2IF2DNNOExyu1bwySJk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=d1KVxZriGNmZD4veD/3AgUW6zfD6Zx1OHlMwkuUdEGHXh/twpo40s4SV94RT0YG9wryQS/hhdcaB6ENYAhw61uMYwnCUyS38U1Rg8Rnck1jc93OEJ3IddQQcWsoX7ZkcwQ9ipxi9IBcvWAa6VVmhyeiM+ImUDL96fAngNJRQOSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=F7f1Hdmn; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4184GWBT000444;
-	Thu, 8 Feb 2024 02:19:27 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:in-reply-to:references
-	:mime-version:content-transfer-encoding:content-type; s=
-	pfpt0220; bh=dx6r30rxAqDubdOjGGSy+gN+rrEcPcbRySV+C9U7xPw=; b=F7f
-	1HdmngUuZ3mDEhtUjlZMGEmPkyeQAMG7cdh5HC0ITdf39JvYol+lqdRScj+TL2Y0
-	jghpxwY1aQx5DJNJ7xeWg4n983A8BSvWDS8MiBGyv9KecQseJ4RTGU/mE+0RQaS7
-	QTQnYBzLn6h/2tJkeMx4W790kXTYVQJklrSjGTcexOmLtBi3nhFm+GJRlmZqMFZs
-	wk371t1/4Mh3IDLcOIG1AtBI1+8l6p+wYYbr7osK3FHUC6ZE0VsAtPDrWT4n/QRy
-	RcrSdSoNAWttwe5APE1BsrRQ1vmvpvG2oNesH0sOYv8nc3kkQsos3CC9+Gee8zYA
-	2C2ZjjgsNfhTdimlcmQ==
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3w4qsq0whg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Thu, 08 Feb 2024 02:19:27 -0800 (PST)
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 8 Feb
- 2024 02:19:25 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Thu, 8 Feb 2024 02:19:25 -0800
-Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id 162D13F7054;
-	Thu,  8 Feb 2024 02:19:25 -0800 (PST)
-From: Shinas Rasheed <srasheed@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <linux-doc@vger.kernel.org>, <hgani@marvell.com>, <vimleshk@marvell.com>,
-        <sedara@marvell.com>, <srasheed@marvell.com>, <egallen@redhat.com>,
-        <mschmidt@redhat.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
-        <horms@kernel.org>, <wizhao@redhat.com>, <kheib@redhat.com>,
-        <konguyen@redhat.com>
-Subject: [PATCH net-next v7 8/8] octeon_ep_vf: update MAINTAINERS
-Date: Thu, 8 Feb 2024 02:18:40 -0800
-Message-ID: <20240208101841.3108103-9-srasheed@marvell.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240208101841.3108103-1-srasheed@marvell.com>
-References: <20240208101841.3108103-1-srasheed@marvell.com>
+	s=arc-20240116; t=1707387912; c=relaxed/simple;
+	bh=UZkesqE3Z+fphwdpGKkcZ7Dbx7DxSuZE/LQC7ct2Opk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=OCXAj2mKa8yssuL3aZdb6ybqKbEI/9QAg0lObUJDcHf2fytIw13w+MyW1p/zJkS5R3HNcgwbG5275WZp0xJQjV+YbOkgTxEeDsgdeNaHsz/5MYvLngVwYV55ciVQ9nmfl8IDB5s1I/XVifaGKwAlabZEZ9tdUJ0BQPvTyJUWpao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f9eeIUG7; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b26783b4so2224065276.0
+        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 02:25:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707387910; x=1707992710; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=OT6I3LG46q3v0s6Ue0UOjiNgxiLfN7T4q8q71xmtnnk=;
+        b=f9eeIUG7tAY1R7AfQCxsQbdVGNfgZjUpOrua8RPRMsomZsC4rcq83qM1fW35ZJk2bV
+         Fq87zfao0cWvCg7sPeg1iGHtFtgjktQnBXQMhISvuHb2fZa91rA4+kDT7xdzUIFzKpKx
+         ROEJG3Uj+pW1CYAhzi8eDf/8muL5gPokS70Err0+bpZ6o2EIxy1eSYJjlIvRvPccWQTY
+         FUuuT26gZkzAQ2IKm/tBIAovncuGdbopemFdTiU/ZdHZiCYO/SxXOyCXOLCt3fnPVEtA
+         0PQxbYoopk6jqLwE2jfnS26M68K+RQGNV2ramlkaekoESq6l9T3uS3ycfGUxaqHFwY/4
+         uEcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707387910; x=1707992710;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OT6I3LG46q3v0s6Ue0UOjiNgxiLfN7T4q8q71xmtnnk=;
+        b=IBRkFExXX/YNINT0OaR7Tq+RRIcKSpW7gT8KLEfBRCgch6h9CvFyukoPe5EyzvffrA
+         pstiatDGWD9m8qB0GqGeUq6RIi8c4o+d+HCZJqiBHCDi05ZG/dHiL5xMawDkHmk66XwY
+         ONHfGJ9hhWtXma+6PW3dou0ysrGTDU4VT4RWT5iac/tmGslgVyrULetGvZkCWGQxcAWy
+         4RcHybVbI261K2Wrw82nVMhMs2hASBinjzF8h74npSBWihbfZxvUBG6+u/5tZlX9V+PG
+         dzBnrUsZOwau/Dk9aRuUk1z9rYKjGp+qtRd+1eB9MyEpfluBpBnIteWnXaSAwxSBqzWm
+         J7hA==
+X-Forwarded-Encrypted: i=1; AJvYcCUpwMlJhdtCL5sT8xqzYgE1GFJCEl5aQzhwCWKjIyir04cpXCtAAn9uW8Mapt+A6V3H065xdztGJCqKIeIbu6GNRj4SMq9X
+X-Gm-Message-State: AOJu0YwP6/bLgeoVO8qsodslcUqB/FO0AavosBET+H5OBJwbBdwqAPWa
+	IYvv2Yn64QJp9eGc4o/CLb41ebDsd5YmCKtvMc2v4mLOaMN0Bcnha1netT42n5Zmx87igtTMtUm
+	1FX9Ohu2JJA==
+X-Google-Smtp-Source: AGHT+IGt25fdard+2VoXZ353IDGZ5RQmMmrZLO7u2jV7rEJ90HNNE0mjPt0NdJJg0mniR7Xvi1SYTsix2sKdbg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:118f:b0:dc6:c623:ce6f with SMTP
+ id m15-20020a056902118f00b00dc6c623ce6fmr266132ybu.13.1707387910252; Thu, 08
+ Feb 2024 02:25:10 -0800 (PST)
+Date: Thu,  8 Feb 2024 10:25:06 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: len-7IA0T8GEfQN8sO0xQew4U1EBqVfD
-X-Proofpoint-GUID: len-7IA0T8GEfQN8sO0xQew4U1EBqVfD
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-08_01,2024-02-07_01,2023-05-22_02
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.594.gd9cf4e227d-goog
+Message-ID: <20240208102508.262907-1-edumazet@google.com>
+Subject: [PATCH net-next 0/2] net/sched: act_api: speed up netns dismantles
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, 
+	Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-add MAINTAINERS for octeon_ep_vf driver.
+Adopt the new exit_batch_rtnl() method to avoid extra
+rtnl_lock()//rtnl_unlock() pairs.
 
-Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
----
-V7:
-  - No changes
+Eric Dumazet (2):
+  net/sched: act_api: uninline tc_action_net_init() and
+    tc_action_net_exit()
+  net/sched: act_api: use exit_batch_rtnl() method
 
-V6: https://lore.kernel.org/all/20240207065207.3092004-9-srasheed@marvell.com/
-  - No changes
+ include/net/act_api.h      | 34 +++-------------------------------
+ net/sched/act_api.c        | 35 ++++++++++++++++++++++++++++++++---
+ net/sched/act_bpf.c        |  7 ++++---
+ net/sched/act_connmark.c   |  7 ++++---
+ net/sched/act_csum.c       |  7 ++++---
+ net/sched/act_ct.c         |  7 ++++---
+ net/sched/act_ctinfo.c     |  7 ++++---
+ net/sched/act_gact.c       |  7 ++++---
+ net/sched/act_gate.c       |  7 ++++---
+ net/sched/act_ife.c        |  7 ++++---
+ net/sched/act_mirred.c     |  7 ++++---
+ net/sched/act_mpls.c       |  7 ++++---
+ net/sched/act_nat.c        |  7 ++++---
+ net/sched/act_pedit.c      |  7 ++++---
+ net/sched/act_police.c     |  7 ++++---
+ net/sched/act_sample.c     |  7 ++++---
+ net/sched/act_simple.c     |  7 ++++---
+ net/sched/act_skbedit.c    |  7 ++++---
+ net/sched/act_skbmod.c     |  7 ++++---
+ net/sched/act_tunnel_key.c |  7 ++++---
+ net/sched/act_vlan.c       |  7 ++++---
+ 21 files changed, 111 insertions(+), 91 deletions(-)
 
-V5: https://lore.kernel.org/all/20240129050254.3047778-9-srasheed@marvell.com/
-  - No changes
-
-V4: https://lore.kernel.org/all/20240108124213.2966536-9-srasheed@marvell.com/
-  - No changes
-
-V3: https://lore.kernel.org/all/20240105203823.2953604-9-srasheed@marvell.com/
-  - No changes
-
-V2: https://lore.kernel.org/all/20231223134000.2906144-9-srasheed@marvell.com/
-  - No changes
-
-V1: https://lore.kernel.org/all/20231221092844.2885872-9-srasheed@marvell.com/
-
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 3f465fd778b1..d3689c9a4a62 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -13060,6 +13060,15 @@ L:	netdev@vger.kernel.org
- S:	Supported
- F:	drivers/net/ethernet/marvell/octeon_ep
- 
-+MARVELL OCTEON ENDPOINT VF DRIVER
-+M:	Veerasenareddy Burru <vburru@marvell.com>
-+M:	Sathesh Edara <sedara@marvell.com>
-+M:	Shinas Rasheed <srasheed@marvell.com>
-+M:	Satananda Burla <sburla@marvell.com>
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+F:	drivers/net/ethernet/marvell/octeon_ep_vf
-+
- MARVELL OCTEONTX2 PHYSICAL FUNCTION DRIVER
- M:	Sunil Goutham <sgoutham@marvell.com>
- M:	Geetha sowjanya <gakula@marvell.com>
 -- 
-2.25.1
+2.43.0.594.gd9cf4e227d-goog
 
 
