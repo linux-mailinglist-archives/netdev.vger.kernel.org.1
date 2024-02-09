@@ -1,123 +1,132 @@
-Return-Path: <netdev+bounces-70630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15BB784FD8E
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:27:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B93E84FDA6
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:35:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCB35283EAE
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 20:27:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 009041F2563E
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 20:35:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 117ED1272A2;
-	Fri,  9 Feb 2024 20:27:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70E453A7;
+	Fri,  9 Feb 2024 20:34:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fQZvuad2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE9C2E632;
-	Fri,  9 Feb 2024 20:27:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49DB9A23
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 20:34:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707510449; cv=none; b=bQEAYEmupAtvkQPcTHzRLulNUgRx821jNhy4AIB1LDLaUthktdH03elsaVGdN0W1BcLZWL+Ze26lPII/1NAvl32BrstL+eR1mSWuaFMwhD60MDe9jYTv9ubxYXwETA96gz/cko+gXsOfso0fdwaLJGuPuYG8kA5Gp8/idOEzDA4=
+	t=1707510897; cv=none; b=C5762a76J8CIrZEESYeGGrKKXs5kpd7n9HZLqXoMhcGCMkIjkcnPeX87sRPiQ8LBjv+Tq9l5NZNazZyTBf+H6H1BGWXwH01qtaxU+4lB1gFnlCg/18HbFvOTsJ6aFLjnDp27tqkiVn7Yve5qwtEyLBMaIgQestxo51fD+MLHRi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707510449; c=relaxed/simple;
-	bh=mM2oKvySIgGN/vGqzG5/rsL3rv5M7pPny1NAqaenVEM=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=XlOMwiwZ4COiXf93WgHwzX8gcH9a2hh8aEuM2TnG038tG6nQsaz3MZkbV88tM08K0iTJA+ASCI1abT8rqx1p3sIkmTOb1P274kZImD41fv88vaaJvzX0GLvSTJzqeXhmS4F5Hqxmzg3P6CeS1rn730+9HPG6Lv0LQrRqi5lIujI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.73.169) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 9 Feb
- 2024 23:27:16 +0300
-Subject: Re: [PATCH net-next v2 4/5] net: ravb: Do not apply RX checksum
- settings to hardware if the interface is down
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20240209170459.4143861-1-claudiu.beznea.uj@bp.renesas.com>
- <20240209170459.4143861-5-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <6f907f89-7588-fd99-1a63-8291f9e29c81@omp.ru>
-Date: Fri, 9 Feb 2024 23:27:15 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1707510897; c=relaxed/simple;
+	bh=FjdK2KUfIImxRXB7QHTEHVSz+EukvoDv2iQ7aEzvdOA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=ohlbcM9eH83n/H62F9T7xL34eGz4lGZFwlfBZthVIlRmC3Hby1vld5TjLrieOfU+mLjCNMIzrNidfC6kxlEjE+S3tZrkSsk3CE9yDrQJW9x9bC5BmO4dQ78qKzuhb9Pi38jilNNOn3EFPDiKaKJOdmL4F5I1xP6whJ3NhHqicXM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fQZvuad2; arc=none smtp.client-ip=209.85.219.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-680b2c9b0ccso20368266d6.1
+        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 12:34:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707510895; x=1708115695; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=vLtxURuyfPsucgOWlgwG1VvMMBCuPW+2fQz0/+JlQLw=;
+        b=fQZvuad2QjOpFXqkMIFz0qu80bzAn8eBLS6V84YrMX2Z2/sg58eZnaGRzdcsykGWXn
+         n1loJAi4sp6ZiY8d3FxFea/yePTQUj8ax7wCo7D6MTVCab5OHedjcBFO8IvCU4lu3+BO
+         jhe4H2AuNmI8tIs7+SCJLW20om3FDiZrIMIoJTwKIgA3yozTnX/OaybhP9uo0cCghrIz
+         tHB/nhx5zNJMzIHnOK5rFAN3EGsux1RtyWTMM7qHk9m6KD/9SewovmLUr9CljvK/lqDf
+         gNrZaX+Vv5iCGyr1P/LJ9b1HuYtYj2WxVHf4yvPw19mVjrYhfnFJgDhmgbccW8yPP+Ga
+         K82Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707510895; x=1708115695;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vLtxURuyfPsucgOWlgwG1VvMMBCuPW+2fQz0/+JlQLw=;
+        b=ANTRL+8hxKI0VUeDTLER06OqvYH0eBD9XHG2fwBhUqMXIWVe3teSk0Pu5ENjGUG0AX
+         rSMQmm4VEK9GpVAaa0Xjxnn84cLCW6UHe6IhbxNkkInOvr4+M6ZArmye11760U5L0PxK
+         F9fGJBM9OOsiR2oNtVO+8rwIdwtlQWXf2B9YRP8LImpMXqqaVJmWP+dEXJ+7Zz5M++Im
+         p9kxneY85ticyUblJXGmJWdtb4UCm36f1EQjjfkc8CJMgURHZ9Mx66FfajjuR8Bmroqn
+         Mu4KRw+v6Wvny4ZFtY1cp6NhaQCXPnWbQRnWxZoW7TXVzSRuK235dpxe13TQiD//tH6o
+         NjcQ==
+X-Gm-Message-State: AOJu0YyCSKkOxRC8rhX1wkmR2wgINSKvEXQ5MLtK2JeeBwFp8BzCH93u
+	aOFwT7yo0zpVBcXRn/2MmApfEUmNaRm0pvUKXyHGvsRiB1pZ9uadbOd1TUDXhFe5SmFp0YX/nfy
+	5LWPl4CXWHQ==
+X-Google-Smtp-Source: AGHT+IEub8kVej+1VorIPqXw1zH/Hs823R6h8DSn1gcDm7rJNvsaYBx6s5hPr7KFuG6yQEc1PRYDbdVrECF+Wg==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6214:194c:b0:68c:930d:d527 with SMTP
+ id q12-20020a056214194c00b0068c930dd527mr557qvk.8.1707510895152; Fri, 09 Feb
+ 2024 12:34:55 -0800 (PST)
+Date: Fri,  9 Feb 2024 20:34:15 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20240209170459.4143861-5-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/09/2024 20:00:11
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 183341 [Feb 09 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.169 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.169 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;omp.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.169
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/09/2024 20:06:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/9/2024 5:38:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
+Message-ID: <20240209203428.307351-1-edumazet@google.com>
+Subject: [PATCH v3 net-next 00/13] net: complete dev_base_lock removal
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On 2/9/24 8:04 PM, Claudiu wrote:
+Back in 2009 we started an effort to get rid of dev_base_lock
+in favor of RCU.
 
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> 
-> Do not apply the RX checksum settings to hardware if the interface is down.
-> In case runtime PM is enabled, and while the interface is down, the IP will
-> be in reset mode (as for some platforms disabling the clocks will switch
-> the IP to reset mode, which will lead to losing register contents) and
-> applying settings in reset mode is not an option. Instead, cache the RX
-> checksum settings and apply them in ravb_open() through ravb_emac_init().
-> This has been solved by introducing pm_runtime_active() check. The device
-> runtime PM usage counter has been incremented to avoid disabling the device
-> clocks while the check is in progress (if any).
-> 
-> Commit prepares for the addition of runtime PM.
-> 
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+It is time to finish this work.
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+Say goodbye to dev_base_lock !
 
-[...]
+v3: I misread kbot reports, the issue was with dev->operstate (patch 10/13)
+    So dev->reg_state is back to u8, and dev->operstate becomes an u32.
+    Sorry for the noise.
 
-MBR, Sergey
+v2: dev->reg_state must be a standard enum, some arches
+    do not support cmpxchg() on u8.
+
+Eric Dumazet (13):
+  net: annotate data-races around dev->name_assign_type
+  ip_tunnel: annotate data-races around t->parms.link
+  dev: annotate accesses to dev->link
+  net: convert dev->reg_state to u8
+  net-sysfs: convert netdev_show() to RCU
+  net-sysfs: use dev_addr_sem to remove races in address_show()
+  net-sysfs: convert dev->operstate reads to lockless ones
+  net-sysfs: convert netstat_show() to RCU
+  net: remove stale mentions of dev_base_lock in comments
+  net: add netdev_set_operstate() helper
+  net: remove dev_base_lock from do_setlink()
+  net: remove dev_base_lock from register_netdevice() and friends.
+  net: remove dev_base_lock
+
+ Documentation/networking/netdevices.rst     |  4 +-
+ drivers/net/ethernet/cisco/enic/enic_main.c |  2 +-
+ drivers/net/ethernet/nvidia/forcedeth.c     |  4 +-
+ drivers/net/ethernet/sfc/efx_common.c       |  2 +-
+ drivers/net/ethernet/sfc/falcon/efx.c       |  2 +-
+ drivers/net/ethernet/sfc/siena/efx_common.c |  2 +-
+ include/linux/netdevice.h                   | 28 ++++----
+ include/linux/rtnetlink.h                   |  2 +
+ net/bridge/br_netlink.c                     |  3 +-
+ net/core/dev.c                              | 71 +++++----------------
+ net/core/link_watch.c                       | 13 ++--
+ net/core/net-sysfs.c                        | 39 ++++++-----
+ net/core/rtnetlink.c                        | 26 +++++---
+ net/hsr/hsr_device.c                        | 28 +++-----
+ net/ipv4/ip_tunnel.c                        | 27 ++++----
+ net/ipv6/addrconf.c                         |  2 +-
+ 16 files changed, 110 insertions(+), 145 deletions(-)
+
+-- 
+2.43.0.687.g38aa6559b0-goog
+
 
