@@ -1,112 +1,309 @@
-Return-Path: <netdev+bounces-70478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60C7484F288
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 10:47:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F9CC84F2CF
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 10:56:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91E841C24200
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 09:47:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F150AB290AA
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 09:56:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64ACE67E6E;
-	Fri,  9 Feb 2024 09:47:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1va/iMPU"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A48EA679E2;
+	Fri,  9 Feb 2024 09:56:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FD7467C5B
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 09:47:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CAA769946;
+	Fri,  9 Feb 2024 09:56:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707472059; cv=none; b=bn06zwe/xoQ42yN6NUOiaph+reo+H/zs1Bl4z6I+QVD495LtAbLYRaymNLISm/0UmsrwddrLI7LJFHGTC3NA1v5WT8K9diAjthQZhYkE0eCVW66fKYC6CifsDQmuhFrfXd44H8CnYRJHZXdVoec41WOruQI0JDWyXMTXTwjh5iQ=
+	t=1707472586; cv=none; b=m7YguIhaM1t31d1IrJyvJLnOes5WPU7esOiciOt8XwvoY0ChpAbUP89cdcPvGqWqQ/kiMK34Q2blANASDpUtUn3Rlq39TkSzfmT3VutTOB5zApJ7aEvYb6+/6Nu56gcyz7sHH9B2tJqLuT3Ce7RWpS8myujvrt5ylxAI5LMRxHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707472059; c=relaxed/simple;
-	bh=JGazZxmRKDV84NmOpcjeIU/ahnty4P4fiAZyie0Cwnc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CZBvk1Svg+UHpiIuLj/ocw+RmkkMInMTEKz0MuFOeLC5Kzbg+muK5XM4B6fI8lyfRMzbeoebhdm8uyUHbppTmv2x1u5T8jndoWjQhEJ8UAXN3xu48RJnwMim+5RHZDdiDAu75cc/6Gg5yd6TCd+PR2WVLexUDMYyNsJpWrkjKiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1va/iMPU; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-56037115bb8so24015a12.0
-        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 01:47:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707472056; x=1708076856; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JGazZxmRKDV84NmOpcjeIU/ahnty4P4fiAZyie0Cwnc=;
-        b=1va/iMPUuSOSnXiXAcDkvRrJKU7BdnR6ZPevehBWOHoQFfDZ749KXSPX+xNratdLQF
-         F65KG5iCcLiUDHAquTUlxCIXvR1Vv+GP2dGCc9gxCj9UTC+pbZ2OnObsZJ86VHKxnnl2
-         ZAcE9j/DyOjTL4YKpoUalgQXNfaU7U1cxdFBic8GSvLLJPH/6ti5PXcULqQNMrJ+FgVu
-         tq46Vv5R8E7jsQWju0lVRnsMZQzaCjS/GQpjJ4faIx+XPSJbHOESGdl0J8fAuX6G3F6q
-         LpoC/F3gWoY5BqF8hgg663n/TXwQHS5sSDHBtPrUzgbJq38WSqvCVZDCEiDyaMsQMEyZ
-         zRcQ==
+	s=arc-20240116; t=1707472586; c=relaxed/simple;
+	bh=IIJB+il/YAqgBdhhLd/x55BSBVFoKksYvq3l+V1p/Vs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qkS+vgroR7TXcAKDLxaccuo+Ue7a7hmdaC9qtAr2QLztTDmWq8c8fnYhOCzMDtsYsHCisq7fqAvG3ylDJhnL1QQNkFDPCNlyupGeKsgwsl2XG6Z2/yn0FVPqdP9draEzod7JNQwZmu8QtxnEqQ8hTopik+Jrg+EuovtOqhMKj8Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-55f50cf2021so1177399a12.1;
+        Fri, 09 Feb 2024 01:56:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707472056; x=1708076856;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JGazZxmRKDV84NmOpcjeIU/ahnty4P4fiAZyie0Cwnc=;
-        b=t68vsACIJ15lpbEutydbTxkpKJuH8Fhwrrm2kqk0wnTGwmDNR59Nr1sQ3VAXcl3fav
-         w3tclRxF7ckZma5Z5OoYH9rtTWu9grbmRethUl3cYoUEhORupEqQVtgHlgopHlSQbAh9
-         aDA382Si2ECmd9FGJCGKtJ4by1Ovbx8w8dpP8Hd5KSUI+BtHV69gZUKfmCMKJzTm7gm2
-         SSGQxXRlY2rToYBdIv/aCCWTtrnTEXKSBDRsDuwnMoGeeA0faD7WcrOJeQte8iiC0J8i
-         YpHTJKUl9kOUPbofORebnfvfHDy7/unthGmMJ1DBWKAgY6HU+o/rgQEsVcJfxUbZ4Aoy
-         6NaQ==
-X-Gm-Message-State: AOJu0Yz5YROWLFDvJ+Fr0vN/A4mqy4peHBh5hB2wVbygO/wMXl/MAGW1
-	fySY0cQUi04/sRsPdnj6vtgJOme0vziA2zqVVATDDGEW07JmzMrwjdnMZOPdPKZHUYoXVC0I7A2
-	fS8BcpPrHWn5fAFWgYspxo2hjYHIqpZyToayj
-X-Google-Smtp-Source: AGHT+IEJzkD4kRpOtBq6NgofG982NoJBOUPWChnSDk8p3iDXf40TPun5R3qVTqpT4siLyN1UGMmOtEqmpq3eJKiisqs=
-X-Received: by 2002:a50:9ea6:0:b0:560:1a1:eb8d with SMTP id
- a35-20020a509ea6000000b0056001a1eb8dmr94214edf.7.1707472055544; Fri, 09 Feb
- 2024 01:47:35 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707472582; x=1708077382;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Uin1djr9wjEmSC5e19XpHLz28aFoFMGRjrPrYFjt5vY=;
+        b=RQHGY3jKxEwqXVagp3Ymutom3zlxzpwaHHg6FUM2/Oxl/LEpVolwsbZ1Qoun6gVVra
+         wUbAdVzc5dZ18qU0k6nvENdgDmwHoGp2ps4IapuBs7XkR8jpcwDRoqAUuNgf6b+h6LRX
+         lgZlloZ8aubgvw0PYxEsU8vtmu4qjIUc2rn9t084zk1kPgt4SxWTtjwgaW5ERHjpAKm+
+         Te0razsDP6VqkRgMrop2GN1CubaEOpVHPIt6FMDAZW0MGnM7DSuzm+uww6kCmRbYVh7K
+         Td3LNwL4vetk+VYlkDSl5ZtVFmFFwIMuOJfpIm2N7hw2FuQ0UAJr+uuZ5PR3Nex3LuVb
+         XAbw==
+X-Forwarded-Encrypted: i=1; AJvYcCUkTIHOdWhPUFKI3ZvFJcYBqzr0y9Apyy0XxlXTcVkNDI0wHRXj16qQTgPKqsm3KcvcfpY+COhmgG7iONW2ypK4BRRjeEqTpemPYhnZ
+X-Gm-Message-State: AOJu0Yy2boDzWrh9oLx/bPnT4fYHPMC7/ccIqaRJ3foMa9Xc9Vm0KnSa
+	5r/azSbuZdaLp2iy34JGhmqFTkF2BUpqfK5lXVqOqrkvaC0LK/EL
+X-Google-Smtp-Source: AGHT+IHs+9l8aKZ19hOvC2jXHCv+iPMgv9WAYscFS2sh3Jeul6Kv3oCDFgLl25Yo8CAQn5mb3wfa7w==
+X-Received: by 2002:a05:6402:1ed3:b0:561:4020:982f with SMTP id g19-20020a0564021ed300b005614020982fmr911342edg.22.1707472582146;
+        Fri, 09 Feb 2024 01:56:22 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVbSl2hNlU4WsCI+NqYOEx9SQaLAJgRfQpxVSepjWk1PtiND6yCBP8k5iLpU9HoXzKF1IiRHZ164tV7B9sN19SFWtY0jKL7aA9uAC38XO377YB2mo3YfWpAyvDXkmA8puojk+ahxzhEIwV9j5zkERaen1q4RfuKW0WB4wmeASyDYeYxXL/eSg9vWGhHRnVT+jhcoWlNg7dpp9j9XYEG0dJHL/UM8EhETe+j1TYRTRAwF7s=
+Received: from localhost (fwdproxy-lla-003.fbsv.net. [2a03:2880:30ff:3::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a23-20020aa7d757000000b005607fdd90b8sm624693eds.23.2024.02.09.01.56.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Feb 2024 01:56:21 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+To: kuba@kernel.org,
+	davem@davemloft.net,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	Florian Fainelli <f.fainelli@gmail.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	horms@kernel.org
+Subject: [PATCH net] net: sysfs: Fix /sys/class/net/<iface> path for statistics
+Date: Fri,  9 Feb 2024 01:55:18 -0800
+Message-Id: <20240209095520.252555-1-leitao@debian.org>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240207011824.2609030-1-kuba@kernel.org> <20240207011824.2609030-3-kuba@kernel.org>
-In-Reply-To: <20240207011824.2609030-3-kuba@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 9 Feb 2024 10:47:21 +0100
-Message-ID: <CANn89iKzJVEsO75JjjfMv4oMtA2ieStr3pLk_qjUjKJF0vrUqg@mail.gmail.com>
-Subject: Re: [PATCH net 2/7] tls: fix race between async notify and socket close
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
-	sd@queasysnail.net, vadim.fedorenko@linux.dev, valis <sec@valis.email>, 
-	borisp@nvidia.com, john.fastabend@gmail.com, vinay.yadav@chelsio.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 7, 2024 at 2:19=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> The submitting thread (one which called recvmsg/sendmsg)
-> may exit as soon as the async crypto handler calls complete()
-> so any code past that point risks touching already freed data.
->
-> Try to avoid the locking and extra flags altogether.
-> Have the main thread hold an extra reference, this way
-> we can depend solely on the atomic ref counter for
-> synchronization.
->
-> Don't futz with reiniting the completion, either, we are now
-> tightly controlling when completion fires.
->
-> Reported-by: valis <sec@valis.email>
-> Fixes: 0cada33241d9 ("net/tls: fix race condition causing kernel panic")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: borisp@nvidia.com
-> CC: john.fastabend@gmail.com
-> CC: vinay.yadav@chelsio.com
+The Documentation/ABI/testing/sysfs-class-net-statistics documentation
+is pointing to the wrong path for the interface.  Documentation is
+pointing to /sys/class/<iface>, instead of /sys/class/net/<iface>.
 
-Thanks Jakub, this looks much nicer indeed.
+Fix it by adding the `net/` directory before the interface.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Fixes: 6044f9700645 ("net: sysfs: document /sys/class/net/statistics/*")
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ .../ABI/testing/sysfs-class-net-statistics    | 48 +++++++++----------
+ 1 file changed, 24 insertions(+), 24 deletions(-)
+
+diff --git a/Documentation/ABI/testing/sysfs-class-net-statistics b/Documentation/ABI/testing/sysfs-class-net-statistics
+index 55db27815361..53e508c6936a 100644
+--- a/Documentation/ABI/testing/sysfs-class-net-statistics
++++ b/Documentation/ABI/testing/sysfs-class-net-statistics
+@@ -1,4 +1,4 @@
+-What:		/sys/class/<iface>/statistics/collisions
++What:		/sys/class/net/<iface>/statistics/collisions
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -6,7 +6,7 @@ Description:
+ 		Indicates the number of collisions seen by this network device.
+ 		This value might not be relevant with all MAC layers.
+ 
+-What:		/sys/class/<iface>/statistics/multicast
++What:		/sys/class/net/<iface>/statistics/multicast
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -14,7 +14,7 @@ Description:
+ 		Indicates the number of multicast packets received by this
+ 		network device.
+ 
+-What:		/sys/class/<iface>/statistics/rx_bytes
++What:		/sys/class/net/<iface>/statistics/rx_bytes
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -23,7 +23,7 @@ Description:
+ 		See the network driver for the exact meaning of when this
+ 		value is incremented.
+ 
+-What:		/sys/class/<iface>/statistics/rx_compressed
++What:		/sys/class/net/<iface>/statistics/rx_compressed
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -32,7 +32,7 @@ Description:
+ 		network device. This value might only be relevant for interfaces
+ 		that support packet compression (e.g: PPP).
+ 
+-What:		/sys/class/<iface>/statistics/rx_crc_errors
++What:		/sys/class/net/<iface>/statistics/rx_crc_errors
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -41,7 +41,7 @@ Description:
+ 		by this network device. Note that the specific meaning might
+ 		depend on the MAC layer used by the interface.
+ 
+-What:		/sys/class/<iface>/statistics/rx_dropped
++What:		/sys/class/net/<iface>/statistics/rx_dropped
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -51,7 +51,7 @@ Description:
+ 		packet processing. See the network driver for the exact
+ 		meaning of this value.
+ 
+-What:		/sys/class/<iface>/statistics/rx_errors
++What:		/sys/class/net/<iface>/statistics/rx_errors
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -59,7 +59,7 @@ Description:
+ 		Indicates the number of receive errors on this network device.
+ 		See the network driver for the exact meaning of this value.
+ 
+-What:		/sys/class/<iface>/statistics/rx_fifo_errors
++What:		/sys/class/net/<iface>/statistics/rx_fifo_errors
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -68,7 +68,7 @@ Description:
+ 		network device. See the network driver for the exact
+ 		meaning of this value.
+ 
+-What:		/sys/class/<iface>/statistics/rx_frame_errors
++What:		/sys/class/net/<iface>/statistics/rx_frame_errors
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -78,7 +78,7 @@ Description:
+ 		on the MAC layer protocol used. See the network driver for
+ 		the exact meaning of this value.
+ 
+-What:		/sys/class/<iface>/statistics/rx_length_errors
++What:		/sys/class/net/<iface>/statistics/rx_length_errors
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -87,7 +87,7 @@ Description:
+ 		error, oversized or undersized. See the network driver for the
+ 		exact meaning of this value.
+ 
+-What:		/sys/class/<iface>/statistics/rx_missed_errors
++What:		/sys/class/net/<iface>/statistics/rx_missed_errors
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -96,7 +96,7 @@ Description:
+ 		due to lack of capacity in the receive side. See the network
+ 		driver for the exact meaning of this value.
+ 
+-What:		/sys/class/<iface>/statistics/rx_nohandler
++What:		/sys/class/net/<iface>/statistics/rx_nohandler
+ Date:		February 2016
+ KernelVersion:	4.6
+ Contact:	netdev@vger.kernel.org
+@@ -104,7 +104,7 @@ Description:
+ 		Indicates the number of received packets that were dropped on
+ 		an inactive device by the network core.
+ 
+-What:		/sys/class/<iface>/statistics/rx_over_errors
++What:		/sys/class/net/<iface>/statistics/rx_over_errors
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -114,7 +114,7 @@ Description:
+ 		(e.g: larger than MTU). See the network driver for the exact
+ 		meaning of this value.
+ 
+-What:		/sys/class/<iface>/statistics/rx_packets
++What:		/sys/class/net/<iface>/statistics/rx_packets
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -122,7 +122,7 @@ Description:
+ 		Indicates the total number of good packets received by this
+ 		network device.
+ 
+-What:		/sys/class/<iface>/statistics/tx_aborted_errors
++What:		/sys/class/net/<iface>/statistics/tx_aborted_errors
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -132,7 +132,7 @@ Description:
+ 		a medium collision). See the network driver for the exact
+ 		meaning of this value.
+ 
+-What:		/sys/class/<iface>/statistics/tx_bytes
++What:		/sys/class/net/<iface>/statistics/tx_bytes
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -143,7 +143,7 @@ Description:
+ 		transmitted packets or all packets that have been queued for
+ 		transmission.
+ 
+-What:		/sys/class/<iface>/statistics/tx_carrier_errors
++What:		/sys/class/net/<iface>/statistics/tx_carrier_errors
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -152,7 +152,7 @@ Description:
+ 		because of carrier errors (e.g: physical link down). See the
+ 		network driver for the exact meaning of this value.
+ 
+-What:		/sys/class/<iface>/statistics/tx_compressed
++What:		/sys/class/net/<iface>/statistics/tx_compressed
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -161,7 +161,7 @@ Description:
+ 		this might only be relevant for devices that support
+ 		compression (e.g: PPP).
+ 
+-What:		/sys/class/<iface>/statistics/tx_dropped
++What:		/sys/class/net/<iface>/statistics/tx_dropped
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -170,7 +170,7 @@ Description:
+ 		See the driver for the exact reasons as to why the packets were
+ 		dropped.
+ 
+-What:		/sys/class/<iface>/statistics/tx_errors
++What:		/sys/class/net/<iface>/statistics/tx_errors
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -179,7 +179,7 @@ Description:
+ 		a network device. See the driver for the exact reasons as to
+ 		why the packets were dropped.
+ 
+-What:		/sys/class/<iface>/statistics/tx_fifo_errors
++What:		/sys/class/net/<iface>/statistics/tx_fifo_errors
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -188,7 +188,7 @@ Description:
+ 		FIFO error. See the driver for the exact reasons as to why the
+ 		packets were dropped.
+ 
+-What:		/sys/class/<iface>/statistics/tx_heartbeat_errors
++What:		/sys/class/net/<iface>/statistics/tx_heartbeat_errors
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -197,7 +197,7 @@ Description:
+ 		reported as heartbeat errors. See the driver for the exact
+ 		reasons as to why the packets were dropped.
+ 
+-What:		/sys/class/<iface>/statistics/tx_packets
++What:		/sys/class/net/<iface>/statistics/tx_packets
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+@@ -206,7 +206,7 @@ Description:
+ 		device. See the driver for whether this reports the number of all
+ 		attempted or successful transmissions.
+ 
+-What:		/sys/class/<iface>/statistics/tx_window_errors
++What:		/sys/class/net/<iface>/statistics/tx_window_errors
+ Date:		April 2005
+ KernelVersion:	2.6.12
+ Contact:	netdev@vger.kernel.org
+-- 
+2.39.3
+
 
