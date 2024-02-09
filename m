@@ -1,237 +1,202 @@
-Return-Path: <netdev+bounces-70627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2684084FD59
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:15:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A846884FD7F
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:23:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8906B1F267D5
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 20:15:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38B481F21D3C
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 20:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A16A1272AE;
-	Fri,  9 Feb 2024 20:15:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 322711272BE;
+	Fri,  9 Feb 2024 20:23:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="deP8stjw"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="k/nFKFRo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+Received: from mail-oo1-f44.google.com (mail-oo1-f44.google.com [209.85.161.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675D186ADC;
-	Fri,  9 Feb 2024 20:15:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E38554F86
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 20:23:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707509710; cv=none; b=jbzkRIszhs5QM1AwmRw4JQiV5qSyFhy/ponJewMCSKLsPRL0QJtzfHAK5CxeKu3Ic9LZZ8vImwiaItggexaxs3ojJD3objJ5IC3VdrdQ9CW0dq6g76wurjAKIMFi0vjYhHMoOPJLo7sXaPE2szxOiXGVxPZrmJKmI0IBayRNYms=
+	t=1707510202; cv=none; b=DbHhdcoGfm1ludrhSP6GNvbrqvrYFX+1hW9IjT8YHOzkMJNi5/aeJ/5U56BaOj76czRpvnXykXFpb/scykdRq4TfH9WDBiF/wAWW+iV+umLzlYDpyryeyCT3q52S9+vta8XnFvMDz+IPdDhM9DY8i3JgqkciFHRyTegevOQO3Ho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707509710; c=relaxed/simple;
-	bh=KbQ7F0Liz/IR0JdyUYKRu0MD8EOx1z2A8SO9DHOuelI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lUunrlLXsniP7sb7PIa4TNP8C8iz0QnpEcVcVu0FyJaH8OoLbwbSjEttZDP8ID/pq9jcfMtRbkWeO8k8ze+9CcR16qUJJIuBNsSqZ9HKh2uhYKQNusMkaMpJG9LZwoPCRK3/b3c/aASXy3gzU+J+Rax2CconCMH9DRAERlD00Vk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=deP8stjw; arc=none smtp.client-ip=209.85.128.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-604b2c3c643so14824237b3.0;
-        Fri, 09 Feb 2024 12:15:08 -0800 (PST)
+	s=arc-20240116; t=1707510202; c=relaxed/simple;
+	bh=Qa7WBTIDQpNbeS/hiyhWQzSVHICDNi2Lqssf/YFEgRQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=MBGwJtygJgEpJ+ErKmIxb5f70piqtDvpPZ+HGT2u3Y3VPENOAgMybL40TFHMxvhNmRiAKugEud9dey2wftpg4sjWLt9O/gQO1MZuJrCNEd8gA4ttCD8o3t5ckDyTOLsQBR1aT3ghJWgevVgHbnalyeJsrirN5UPkg4SMx4DdqPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=k/nFKFRo; arc=none smtp.client-ip=209.85.161.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-59a31c14100so561486eaf.0
+        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 12:23:18 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707509707; x=1708114507; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y384vEWgOGq2E/xd1hs0bcs64tGP1Jnw5tGzeqsFTv4=;
-        b=deP8stjwTt38WOoUc6AtSoYRGBLpOVgdsJecuhGZznoTCcFP+GdF3N/GUhgMq/Yub1
-         2YqLZ387MkMwTWTQQ+wGpUSgA98HuAQj4NWMT9QiFOwLRh0zv3QbRAXBfBK1TeFZ4kDJ
-         pV24UOUXAxRg/ZhLr3d+ia3tiLNurNztCAibd2b42bGvRib5nGpAGQD0sM7khTNuZdTf
-         dEp7pE8r5Xf9ZMCBv8L+ZFsxxrQuzj6owgh3mBjhpGqg0K7cJqX+/0XwaZXHALzGTMzV
-         k69taGxP3ST2JRJH2da3E2iEgv5ZvaOcWbx1nQQrtbSUZUlaGdkwJA5v5+hxjQRVJFl7
-         EuNA==
+        d=fastly.com; s=google; t=1707510198; x=1708114998; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rDZ3Jmq4/nSFOD85T2yiUnizUyC/JrtpL4z0B/Jmq+Q=;
+        b=k/nFKFRoIeO5UyIXezOjU30+kbylY8X0rdH7lU4D4U22GLlP9xx/qMLNRMw9s1q/FM
+         Y++AG17tiVa3nnrR2QkltW4NqiQThgQstzq7+7bDLlDz3+9Om3ShVOlg0nC1QZVZrmnj
+         eMnmfmlf3uypwlMNZr0CbUzRHtjH1HSkfX4Qs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707509707; x=1708114507;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Y384vEWgOGq2E/xd1hs0bcs64tGP1Jnw5tGzeqsFTv4=;
-        b=Rde2KHBaEmxvjB6qFrugEzZ7qB4zpLJWakO04bAItrc0x1zVwcOpuOQmYbXw2RZ+SO
-         X1cXW97XTkGIpCyfEB0E7QZtauuBgXO6dal77Omfb/c58B8JXpbnxgxINoAjToqb9ZBa
-         O8o8o8pCGwhCyNofiaKaozpbClq5T/L9/PCHot7jVeJCFmq88u/edu47DD14vTrW+yWO
-         JrX6K6M5zQcIfSwqiD8YKbGJZEOAwpCc0XCXExTS5L5mqiejfkUbS9sOp72GR5gmsCGa
-         JEvm+lX2s3uGzzC28H36G78MUIhqi69EnmgM6jYAd/1L1bVI3Drng3itgBuvJoEUFROE
-         vK4A==
-X-Gm-Message-State: AOJu0YyevZlrATuuff+YppBDpO0eKyuDz4LuQL7cN/2UpO3S+UFxe09s
-	nRUhgXYn6Wb+aMBd5Tup8gNx8Owzc2kLi5VNqxGYLvK04GrNCyMXltDhZbvzwEBdz5OiDSxOzi5
-	ErBngz8/pkSRK8k8zCQBo8JsbjRqkJx8a6FgZow==
-X-Google-Smtp-Source: AGHT+IELL7MsofjVJYIGuxc495CS3KQKm5r1oY0HMALcGYcprqTvRyEOSCPQ4xxYGtetKMx73h3dttKcEwyvj9oElAk=
-X-Received: by 2002:a81:a142:0:b0:604:1709:a5f9 with SMTP id
- y63-20020a81a142000000b006041709a5f9mr328219ywg.18.1707509707107; Fri, 09 Feb
- 2024 12:15:07 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707510198; x=1708114998;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rDZ3Jmq4/nSFOD85T2yiUnizUyC/JrtpL4z0B/Jmq+Q=;
+        b=anrS/nWKunKK/5Nc4m7swnnYk7j5OWyTzg0XswLaACeX8OgqJDIB+HGsKn8fEAT+OQ
+         xTiXdEQqnmmhdBzrImEzFNoFMMQHAeIDlFtUQexO6d/BjtAjg1+pFQQw5pjno1j1+bn3
+         xRebiIaf11+y2ZRuQ90nOvzWME1LxqgOfQAHDrGD7TlmBcs2ZVzUUPb2sjMqd4Ov/uIE
+         jFE7mhiycHDbJPtxB4pkcuVrI3tPKFtDWrj9gn2IpWg7YNbU5r19MTMrH4nCijg3Z3NI
+         1UmKJ0l1t3Z1yduni41PJBamKPhFPSivNZSzr4l8tMhTZJwn0h1zssW3IQT+E5ghRY2u
+         2x0g==
+X-Forwarded-Encrypted: i=1; AJvYcCWjUlvmIqr2rmEVDGrjv7Iwi8WmnkKymiZwCpoLxS4cwjlzXYQyFWevxTUequepy7RuKkejTJroLq3JLW+qGBc6cKu8NEi9
+X-Gm-Message-State: AOJu0Yxchm22TdgvQz1wzggTnSFj78hgmfcYw2GAymDpH3R8Vh7haRAq
+	w15goiN709wjVZZAUULhOGPy5drjUK1+hm4/jw32qzKcueFOGhoC/KOujSyoIfw=
+X-Google-Smtp-Source: AGHT+IG/BuQR5ro/SbMkt/wRVmSLRrb8pcixKb+A/Usu4R6NRLr71H1G3HJsj0W0HfRlB7IyDnKkBA==
+X-Received: by 2002:a05:6358:1212:b0:178:8ec9:a2f with SMTP id h18-20020a056358121200b001788ec90a2fmr602645rwi.5.1707510198038;
+        Fri, 09 Feb 2024 12:23:18 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV9gYyDVJ/FTepbkZQWu3Aexv8qHVS0hrlr6yspf74pQaoAyp4jb/aaAEShwx8G0I0JF64bQF9DRoyw+vjK2VOuOd/N+ZjwRQnKTZ/0/RENVtV5Q9qXujjeJo+UJWx3Ku7z+XPP57RCd2F/wJDbaOZmySQTKUyv62JIUVVoj+Xo1xyLufeMnuDWwPxHpTkgJHDd8CTYykBE/gZ0LTgqmJ+kY1/t2ATggIS/IE9CnVm7C8wNXntCa6X94WvNdAakwC0eU8cZncggC3/Xqzdcso5l40SRE9WGdecCHd/8S+jbsfyfkokOvelVGw8otO96Ktlui4zilWlJjvOSNbGLTsrCQnY+nw+Mlh+jj8e95ovv6zuenZ7CrKyJjq5j8zy/4CCbU370DH0/vTnAWfqFZX7d2bwg9uulY0r3efo7usGizAXonVLf
+Received: from localhost.localdomain ([2620:11a:c018:0:ea8:be91:8d1:f59b])
+        by smtp.gmail.com with ESMTPSA id e25-20020a62aa19000000b006ddc71607a7sm933742pff.191.2024.02.09.12.23.16
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Feb 2024 12:23:17 -0800 (PST)
+From: Joe Damato <jdamato@fastly.com>
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: tariqt@nvidia.com,
+	rrameshbabu@nvidia.com,
+	Joe Damato <jdamato@fastly.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	linux-rdma@vger.kernel.org (open list:MELLANOX MLX5 core VPI driver)
+Subject: [PATCH net-next v4] net/mlx5e: link NAPI instances to queues and IRQs
+Date: Fri,  9 Feb 2024 20:23:08 +0000
+Message-Id: <20240209202312.30181-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1705432850.git.amery.hung@bytedance.com>
- <232881645a5c4c05a35df4ff1f08a19ef9a02662.1705432850.git.amery.hung@bytedance.com>
- <0484f7f7-715f-4084-b42d-6d43ebb5180f@linux.dev> <CAMB2axM1TVw05jZsFe7TsKKRN8jw=YOwu-+rA9bOAkOiCPyFqQ@mail.gmail.com>
- <01fdb720-c0dc-495d-a42d-756aa2bf4455@linux.dev> <CAMB2axOZqwgksukO5d4OiXeEgo2jFrgnzO5PQwABi_WxYFycGg@mail.gmail.com>
- <8c00bd63-2d00-401e-af6d-1b6aebac4701@linux.dev> <CAMB2axOdeE5dPeFGvgM5QVd9a47srtvDFZd1VUYjSarNJC=T_w@mail.gmail.com>
- <8a2e9cf6-ef36-4ba8-bb95-fb592bdce5db@linux.dev>
-In-Reply-To: <8a2e9cf6-ef36-4ba8-bb95-fb592bdce5db@linux.dev>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Fri, 9 Feb 2024 12:14:55 -0800
-Message-ID: <CAMB2axMg1RQOaOA+5bvh234YK98o7vMmm5B4+VT__kS1=Tcqyw@mail.gmail.com>
-Subject: Re: [RFC PATCH v7 1/8] net_sched: Introduce eBPF based Qdisc
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: bpf@vger.kernel.org, yangpeihao@sjtu.edu.cn, toke@redhat.com, 
-	jhs@mojatatu.com, jiri@resnulli.us, sdf@google.com, xiyou.wangcong@gmail.com, 
-	yepeilin.cs@gmail.com, netdev@vger.kernel.org, 
-	Kui-Feng Lee <thinker.li@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 1, 2024 at 5:47=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.d=
-ev> wrote:
->
-> On 1/31/24 8:23 AM, Amery Hung wrote:
-> >>> 1. Passing a referenced kptr into a bpf program, which will also need
-> >>> to be released, or exchanged into maps or allocated objects.
-> >> "enqueue" should be the one considering here:
-> >>
-> >> struct Qdisc_ops {
-> >>          /* ... */
-> >>          int                     (*enqueue)(struct sk_buff *skb,
-> >>                                             struct Qdisc *sch,
-> >>                                             struct sk_buff **to_free);
-> >>
-> >> };
-> >>
-> >> The verifier only marks the skb as a trusted kptr but does not mark it=
-s
-> >> reg->ref_obj_id. Take a look at btf_ctx_access(). In particular:
-> >>
-> >>          if (prog_args_trusted(prog))
-> >>                  info->reg_type |=3D PTR_TRUSTED;
-> >>
-> >> The verifier does not know the skb ownership is passed into the ".enqu=
-eue" ops
-> >> and does not know the bpf prog needs to release it or store it in a ma=
-p.
-> >>
-> >> The verifier tracks the reference state when a KF_ACQUIRE kfunc is cal=
-led (just
-> >> an example, not saying we need to use KF_ACQUIRE kfunc). Take a look a=
-t
-> >> acquire_reference_state() which is the useful one here.
-> >>
-> >> Whenever the verifier is loading the ".enqueue" bpf_prog, the verifier=
- can
-> >> always acquire_reference_state() for the "struct sk_buff *skb" argumen=
-t.
-> >>
-> >> Take a look at a recent RFC:
-> >> https://lore.kernel.org/bpf/20240122212217.1391878-1-thinker.li@gmail.=
-com/
-> >> which is tagging the argument of an ops (e.g. ".enqueue" here). That R=
-FC patch
-> >> is tagging the argument could be NULL by appending "__nullable" to the=
- argument
-> >> name. The verifier will enforce that the bpf prog must check for NULL =
-first.
-> >>
-> >> The similar idea can be used here but with a different tagging (for ex=
-ample,
-> >> "__must_release", admittedly not a good name). While the RFC patch is
-> >> in-progress, for now, may be hardcode for the ".enqueue" ops in
-> >> check_struct_ops_btf_id() and always acquire_reference_state() for the=
- skb. This
-> >> part can be adjusted later once the RFC patch will be in shape.
-> >>
-> > Make sense. One more thing to consider here is that .enqueue is
-> > actually a reference acquiring and releasing function at the same
-> > time. Assuming ctx written to by a struct_ops program can be seen by
-> > the kernel, another new tag for the "to_free" argument will still be
-> > needed so that the verifier can recognize when writing skb to
-> > "to_free".
->
-> I don't think "to_free" needs special tagging. I was thinking the
-> "bpf_qdisc_drop" kfunc could be a KF_RELEASE. Ideally, it should be like
->
-> __bpf_kfunc int bpf_qdisc_drop(struct sk_buff *skb, struct Qdisc *sch,
->                                struct sk_buff **to_free)
-> {
->         return qdisc_drop(skb, sch, to_free);
-> }
->
-> However, I don't think the verifier supports pointer to pointer now. Mean=
-ing
-> "struct sk_buff **to_free" does not work.
->
-> If the ptr indirection spinning in my head is sound, one possible solutio=
-n to
-> unblock the qdisc work is to introduce:
->
-> struct bpf_sk_buff_ptr {
->         struct sk_buff *skb;
-> };
->
-> and the bpf_qdisc_drop kfunc:
->
-> __bpf_kfunc int bpf_qdisc_drop(struct sk_buff *skb, struct Qdisc *sch,
->                                 struct bpf_sk_buff_ptr *to_free_list)
->
-> and the enqueue prog:
->
-> SEC("struct_ops/enqueue")
-> int BPF_PROG(test_enqueue, struct sk_buff *skb,
->               struct Qdisc *sch,
->               struct bpf_sk_buff_ptr *to_free_list)
-> {
->         return bpf_qdisc_drop(skb, sch, to_free_list);
-> }
->
-> and the ".is_valid_access" needs to change the btf_type from "struct sk_b=
-uff **"
-> to "struct bpf_sk_buff_ptr *" which is sort of similar to the bpf_tcp_ca.=
-c that
-> is changing the "struct sock *" type to the "struct tcp_sock *" type.
->
-> I have the compiler-tested idea here:
-> https://git.kernel.org/pub/scm/linux/kernel/git/martin.lau/bpf-next.git/l=
-og/?h=3Dqdisc-ideas
->
->
-> >
-> >> Then one more thing is to track when the struct_ops bpf prog is actual=
-ly reading
-> >> the value of the skb pointer. One thing is worth to mention here, e.g.=
- a
-> >> struct_ops prog for enqueue:
-> >>
-> >> SEC("struct_ops")
-> >> int BPF_PROG(bpf_dropall_enqueue, struct sk_buff *skb, struct Qdisc *s=
-ch,
-> >>               struct sk_buff **to_free)
-> >> {
-> >>          return bpf_qdisc_drop(skb, sch, to_free);
-> >> }
-> >>
-> >> Take a look at the BPF_PROG macro, the bpf prog is getting a pointer t=
-o an array
-> >> of __u64 as the only argument. The skb is actually in ctx[0], sch is i=
-n
-> >> ctx[1]...etc. When ctx[0] is read to get the skb pointer (e.g. r1 =3D =
-ctx[0]),
-> >> btf_ctx_access() marks the reg_type to PTR_TRUSTED. It needs to also i=
-nitialize
-> >> the reg->ref_obj_id by the id obtained earlier from acquire_reference_=
-state()
-> >> during check_struct_ops_btf_id() somehow.
->
+Make mlx5 compatible with the newly added netlink queue GET APIs.
 
-I appreciate the idea. The pointer redirection works without problems.
-I now have a working fifo bpf qdisc using struct_ops. I will explore
-how other parts of qdisc work with struct_ops.
+Signed-off-by: Joe Damato <jdamato@fastly.com>
+---
+v3 -> v4:
+  - Use sq->netdev and sq->cq.napi to get the netdev and NAPI structures in
+    mlx5e_activate_txqsq and mlx5e_deactivate_txqsq as requested by Tariq
+    Toukan [1]
+  - Only set or unset NETDEV_QUEUE_TYPE_RX when the MLX5E_PTP_STATE_RX bit
+    is on in mlx5e_ptp_activate_channel and mlx5e_ptp_deactivate_channel as
+    requested by Rahul Rameshbabu [2]
 
-Thanks,
-Amery
+v2 -> v3:
+  - Fix commit message subject
+  - call netif_queue_set_napi in mlx5e_ptp_activate_channel and
+    mlx5e_ptp_deactivate_channel to enable/disable NETDEV_QUEUE_TYPE_RX for
+    the PTP channel.
+  - Modify mlx5e_activate_txqsq and mlx5e_deactivate_txqsq to set
+    NETDEV_QUEUE_TYPE_TX which should take care of all TX queues including
+    QoS/HTB and PTP.
+  - Rearrange mlx5e_activate_channel and mlx5e_deactivate_channel for
+    better ordering when setting and unsetting NETDEV_QUEUE_TYPE_RX NAPI
+    structs
+
+v1 -> v2:
+  - Move netlink NULL code to mlx5e_deactivate_channel
+  - Move netif_napi_set_irq to mlx5e_open_channel and avoid storing the
+    irq, after netif_napi_add which itself sets the IRQ to -1
+
+[1]: https://lore.kernel.org/all/8c083e6d-5fcd-4557-88dd-0f95acdbc747@gmail.com/
+[2]: https://lore.kernel.org/all/871q9mz1a0.fsf@nvidia.com/
+
+ drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c  | 5 ++++-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 7 +++++++
+ 2 files changed, 11 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
+index 078f56a3cbb2..fd4ef6431142 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c
+@@ -935,6 +935,7 @@ void mlx5e_ptp_activate_channel(struct mlx5e_ptp *c)
+ 	if (test_bit(MLX5E_PTP_STATE_RX, c->state)) {
+ 		mlx5e_ptp_rx_set_fs(c->priv);
+ 		mlx5e_activate_rq(&c->rq);
++		netif_queue_set_napi(c->netdev, c->rq.ix, NETDEV_QUEUE_TYPE_RX, &c->napi);
+ 	}
+ 	mlx5e_trigger_napi_sched(&c->napi);
+ }
+@@ -943,8 +944,10 @@ void mlx5e_ptp_deactivate_channel(struct mlx5e_ptp *c)
+ {
+ 	int tc;
+ 
+-	if (test_bit(MLX5E_PTP_STATE_RX, c->state))
++	if (test_bit(MLX5E_PTP_STATE_RX, c->state)) {
++		netif_queue_set_napi(c->netdev, c->rq.ix, NETDEV_QUEUE_TYPE_RX, NULL);
+ 		mlx5e_deactivate_rq(&c->rq);
++	}
+ 
+ 	if (test_bit(MLX5E_PTP_STATE_TX, c->state)) {
+ 		for (tc = 0; tc < c->num_tc; tc++)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index c8e8f512803e..be809556b2e1 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -1806,6 +1806,7 @@ void mlx5e_activate_txqsq(struct mlx5e_txqsq *sq)
+ 	set_bit(MLX5E_SQ_STATE_ENABLED, &sq->state);
+ 	netdev_tx_reset_queue(sq->txq);
+ 	netif_tx_start_queue(sq->txq);
++	netif_queue_set_napi(sq->netdev, sq->txq_ix, NETDEV_QUEUE_TYPE_TX, sq->cq.napi);
+ }
+ 
+ void mlx5e_tx_disable_queue(struct netdev_queue *txq)
+@@ -1819,6 +1820,7 @@ void mlx5e_deactivate_txqsq(struct mlx5e_txqsq *sq)
+ {
+ 	struct mlx5_wq_cyc *wq = &sq->wq;
+ 
++	netif_queue_set_napi(sq->netdev, sq->txq_ix, NETDEV_QUEUE_TYPE_TX, NULL);
+ 	clear_bit(MLX5E_SQ_STATE_ENABLED, &sq->state);
+ 	synchronize_net(); /* Sync with NAPI to prevent netif_tx_wake_queue. */
+ 
+@@ -2560,6 +2562,7 @@ static int mlx5e_open_channel(struct mlx5e_priv *priv, int ix,
+ 	c->lag_port = mlx5e_enumerate_lag_port(priv->mdev, ix);
+ 
+ 	netif_napi_add(netdev, &c->napi, mlx5e_napi_poll);
++	netif_napi_set_irq(&c->napi, irq);
+ 
+ 	err = mlx5e_open_queues(c, params, cparam);
+ 	if (unlikely(err))
+@@ -2602,12 +2605,16 @@ static void mlx5e_activate_channel(struct mlx5e_channel *c)
+ 		mlx5e_activate_xsk(c);
+ 	else
+ 		mlx5e_activate_rq(&c->rq);
++
++	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_RX, &c->napi);
+ }
+ 
+ static void mlx5e_deactivate_channel(struct mlx5e_channel *c)
+ {
+ 	int tc;
+ 
++	netif_queue_set_napi(c->netdev, c->ix, NETDEV_QUEUE_TYPE_RX, NULL);
++
+ 	if (test_bit(MLX5E_CHANNEL_STATE_XSK, c->state))
+ 		mlx5e_deactivate_xsk(c);
+ 	else
+-- 
+2.25.1
+
 
