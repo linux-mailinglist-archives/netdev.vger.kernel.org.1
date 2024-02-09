@@ -1,191 +1,94 @@
-Return-Path: <netdev+bounces-70579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 295D484F9F7
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 17:49:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 209D984FA37
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 17:54:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DFF61C2769B
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 16:49:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4917B233AA
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 16:54:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 334F67FBBC;
-	Fri,  9 Feb 2024 16:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3FA9823AA;
+	Fri,  9 Feb 2024 16:50:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ehkFeSbN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="t3tCQerJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A2A7BAF6
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 16:45:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C1081ACB
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 16:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707497136; cv=none; b=I6ytRo3nLCS+xZhsUvlwIt0fEIdmu84b73ENfjeIjQRVMKFNuU/8RElNf33AI7gIsmqsRKDZPGDVO0xpLvgCiDT/DXD7gdq/6QyF926VeoHXddNsb4SA1lMU5WWjkTtFnm//v/tJa9luT6lbUmbBVl+GdjXS7lB5p8L5qFDZUKI=
+	t=1707497430; cv=none; b=Qud3om+dh2XFuKxvVSnvcpMj/iW3dBtt1ZvkNPdDelbnLM/8b7RumHGCRk9Lhni0F9jMn+XlJf6HDtm02HTxGd/Ftbv6jNn/eHxmyFMCs2F1w0feTUIHQFLoyVxfr2J+J+JRX/lhPcbts3zOWA/rcio523pR8hpg1+5stVho/nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707497136; c=relaxed/simple;
-	bh=fOr7xFvfM4rd/02JsZAgF/8VCH/+1220k69orXmDPo8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=iyfH9mFrqFkA77tfaEyKj3ilmjMAV/GRowLG+MSZ6JRp+Q92uwPE2R5Ib10E6lY+3TqQRW4584AyPPHz4B8NHKq69wTo6lNu/cY82qsKpqB/NmTxbE1tNOhWD6JhGUP1e6ryv2muYpmFc7CginhlSMxhcgUZ6mlmALuNPBkpzF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ehkFeSbN; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707497133;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=y8IUz/WHM9+M3AF6O/llN6R76VK+QIIm7K5QCYPk/1Y=;
-	b=ehkFeSbNgxEfFcdWcxJEMq3Cw9lVMPLjwjH/HL4bQ+3IFmpTDoZULa6pkzOHHD2jcsTSg+
-	WRcpgCBrI+Zfa/UVe66wWjd4W4m7lbQyZ1Sai8duTOgj9gJ/VvrbUKRPEvpmpr0ooA1MY1
-	0d+8n23Az74oGsgSD3moKp5odiyvnGk=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-460-PcO5oKZFMYiB-qjEbOHWQg-1; Fri, 09 Feb 2024 11:45:31 -0500
-X-MC-Unique: PcO5oKZFMYiB-qjEbOHWQg-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3377bf95b77so94071f8f.0
-        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 08:45:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707497130; x=1708101930;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y8IUz/WHM9+M3AF6O/llN6R76VK+QIIm7K5QCYPk/1Y=;
-        b=ctH1tIbHQSo1N/EtmXoRdMy5eU052rWcKrxsNPjoo2IEB9UN8BczPf2kUA93F2Si14
-         f4gOKCr+RPejs6oCALOfOW8R1UTExyJLeyU7tAvW8c+dtkDoCMjn/mkgyoIqXWSq1Rx8
-         ig8vm8k/N74HqjrT97S7uZHpB6gOp5DObsugKtYAHNPK2jnu/mrkPsCeP2nDjUqFRgoT
-         MSHJPzY3hu94M3lB5+6xxTPqKLuPvFhIWdkWTqDVa6RAGCBMPx9PqhsDox4kwxJ0EjSL
-         7P+4SXIYLUUhG9Ms5snUD5W957w54YEl9Pe4jZnmxO3oVabyyY5Za8YRs5qdvKg/bVvx
-         gWEQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUriH5pxAMmQ5JB4wUG9V33TOhu9AxBMNtQRjZRrsIs1jeW9w2D+Mg+ghvZRvmUU6vnSv8sbXXkYMpAdXliL1q3G/1dhpDO
-X-Gm-Message-State: AOJu0Yw3RqwuE9f0pNIMYlIeK6OGrjHQb7S1fGuUKaRKlUded9jEz7Bf
-	ggToVqc6F0osgRmCg2y0ZVZmXKoUNMmAQIWWRJCi/sRMepXdA0TN2D0/iY+aV7nlQThXeKY14xj
-	hBLze7TcDYkfJKvwnH/SfH7UNr2+/2q1cmygiLxztCbcmxpFpT3fBxg==
-X-Received: by 2002:a05:6000:3cb:b0:33b:49da:5f27 with SMTP id b11-20020a05600003cb00b0033b49da5f27mr1832834wrg.1.1707497130733;
-        Fri, 09 Feb 2024 08:45:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEEvCJJlndPkjei3/7GOG8/YYBOrqkwvyHOuioq8DS51khP1dKywMY+YGkDvQK2oK2nI/HnSA==
-X-Received: by 2002:a05:6000:3cb:b0:33b:49da:5f27 with SMTP id b11-20020a05600003cb00b0033b49da5f27mr1832814wrg.1.1707497130393;
-        Fri, 09 Feb 2024 08:45:30 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUJmo3n564UEjJfDhs0TCLa5VkqFjuqGV/4K5bOmdklnoc0C7kKlv3gHLVEDT7FSzgvWdFt0C8j9ciO8OIAn0KJJNqbQcCvtc2T05N2G2qOKIQXEKNgkGMOElDrfeQ0oA4SZYFeOS9dlwdFf2J3XuRAMbKU3CtvoG3dZgxJCjE10MVtVDDDFo2Q3QILseSRAcH0JrbrzAhBUNOrTlOhCgStyClGe4O/wFmWkgntVRyzHvBSBsoWumYLSg==
-Received: from gerbillo.redhat.com (146-241-228-88.dyn.eolo.it. [146.241.228.88])
-        by smtp.gmail.com with ESMTPSA id bk14-20020a0560001d8e00b0033b11e91c0bsm2236407wrb.81.2024.02.09.08.45.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Feb 2024 08:45:29 -0800 (PST)
-Message-ID: <ee9d2e224d063dc66070b060f716219c976759cd.camel@redhat.com>
-Subject: Re: [PATCH net] selftests: net: wait for receiver startup in
- so_txtime.sh
-From: Paolo Abeni <pabeni@redhat.com>
-To: Willem de Bruijn <willemb@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Shuah Khan
- <shuah@kernel.org>, Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- linux-kselftest@vger.kernel.org,  netdev@vger.kernel.org
-Date: Fri, 09 Feb 2024 17:45:28 +0100
-In-Reply-To: <5b768c89eb2992c22ca7016de9f90ff7d4eecd5f.camel@redhat.com>
-References: 
-	<53a7e56424756ef35434bc15a90b256bcf724651.1707407012.git.pabeni@redhat.com>
-	 <5b768c89eb2992c22ca7016de9f90ff7d4eecd5f.camel@redhat.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=mQINBGISiDUBEAC5uMdJicjm3ZlWQJG4u2EU1EhWUSx8IZLUTmEE8zmjPJFSYDcjtfGcbzLPb63BvX7FADmTOkO7gwtDgm501XnQaZgBUnCOUT8qv5MkKsFH20h1XJyqjPeGM55YFAXc+a4WD0YyO5M0+KhDeRLoildeRna1ey944VlZ6Inf67zMYw9vfE5XozBtytFIrRyGEWkQwkjaYhr1cGM8ia24QQVQid3P7SPkR78kJmrT32sGk+TdR4YnZzBvVaojX4AroZrrAQVdOLQWR+w4w1mONfJvahNdjq73tKv51nIpu4SAC1Zmnm3x4u9r22mbMDr0uWqDqwhsvkanYmn4umDKc1ZkBnDIbbumd40x9CKgG6ogVlLYeJa9WyfVMOHDF6f0wRjFjxVoPO6p/ZDkuEa67KCpJnXNYipLJ3MYhdKWBZw0xc3LKiKc+nMfQlo76T/qHMDfRMaMhk+L8gWc3ZlRQFG0/Pd1pdQEiRuvfM5DUXDo/YOZLV0NfRFU9SmtIPhbdm9cV8Hf8mUwubihiJB/9zPvVq8xfiVbdT0sPzBtxW0fXwrbFxYAOFvT0UC2MjlIsukjmXOUJtdZqBE3v3Jf7VnjNVj9P58+MOx9iYo8jl3fNd7biyQWdPDfYk9ncK8km4skfZQIoUVqrWqGDJjHO1W9CQLAxkfOeHrmG29PK9tHIwARAQABtB9QYW9sbyBBYmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+iQJSBBMBCAA8FiEEg1AjqC77wbdLX2LbKSR5jcyPE6QFAmISiDUCGwMFCwkIBwIDIgIBBhUKCQgLAgQWAgMBAh4HAheAAAoJECkkeY3MjxOkJSYQAJcc6MTsuFxYdYZkeWjW//zbD3ApRHzpNlHLVSuJqHr9/aDS+tyszgS8jj9MiqALzgq4iZbg
- 7ZxN9ZsDL38qVIuFkSpgMZCiUHdxBC11J8nbBSLlpnc924UAyr5XrGA99 6Wl5I4Km3128GY6iAkH54pZpOmpoUyBjcxbJWHstzmvyiXrjA2sMzYjt3Xkqp0cJfIEekOi75wnNPofEEJg28XPcFrpkMUFFvB4Aqrdc2yyR8Y36rbw18sIX3dJdomIP3dL7LoJi9mfUKOnr86Z0xltgcLPGYoCiUZMlXyWgB2IPmmcMP2jLJrusICjZxLYJJLofEjznAJSUEwB/3rlvFrSYvkKkVmfnfro5XEr5nStVTECxfy7RTtltwih85LlZEHP8eJWMUDj3P4Q9CWNgz2pWr1t68QuPHWaA+PrXyasDlcRpRXHZCOcvsKhAaCOG8TzCrutOZ5NxdfXTe3f1jVIEab7lNgr+7HiNVS+UPRzmvBc73DAyToKQBn9kC4jh9HoWyYTepjdcxnio0crmara+/HEyRZDQeOzSexf85I4dwxcdPKXv0fmLtxrN57Ae82bHuRlfeTuDG3x3vl/Bjx4O7Lb+oN2BLTmgpYq7V1WJPUwikZg8M+nvDNcsOoWGbU417PbHHn3N7yS0lLGoCCWyrK1OY0QM4EVsL3TjOfUtCNQYW9sbyBBYmVuaSA8cGFvbG8uYWJlbmlAZ21haWwuY29tPokCUgQTAQgAPBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEoitAhsDBQsJCAcCAyICAQYVCgkICwIEFgIDAQIeBwIXgAAKCRApJHmNzI8TpBzHD/45pUctaCnhee1vkQnmStAYvHmwrWwIEH1lzDMDCpJQHTUQOOJWDAZOFnE/67bxSS81Wie0OKW2jvg1ylmpBA0gPpnzIExQmfP72cQ1TBoeVColVT6Io35BINn+ymM7c0Bn8RvngSEpr3jBtqvvWXjvtnJ5/HbOVQCg62NC6ewosoKJPWpGXMJ9SKsVIOUHsmoWK60spzeiJoSmAwm3zTJQnM5kRh2q
- iWjoCy8L35zPqR5TV+f5WR5hTVCqmLHSgm1jxwKhPg9L+GfuE4d0SWd84y GeOB3sSxlhWsuTj1K6K3MO9srD9hr0puqjO9sAizd0BJP8ucf/AACfrgmzIqZXCfVS7jJ/M+0ic+j1Si3yY8wYPEi3dvbVC0zsoGj9n1R7B7L9c3g1pZ4L9ui428vnPiMnDN3jh9OsdaXeWLvSvTylYvw9q0DEXVQTv4/OkcoMrfEkfbXbtZ3PRlAiddSZA5BDEkkm6P9KA2YAuooi1OD9d4MW8LFAeEicvHG+TPO6jtKTacdXDRe611EfRwTjBs19HmabSUfFcumL6BlVyceIoSqXFe5jOfGpbBevTZtg4kTSHqymGb6ra6sKs+/9aJiONs5NXY7iacZ55qG3Ib1cpQTps9bQILnqpwL2VTaH9TPGWwMY3Nc2VEc08zsLrXnA/yZKqZ1YzSY9MGXWYLkCDQRiEog1ARAAyXMKL+x1lDvLZVQjSUIVlaWswc0nV5y2EzBdbdZZCP3ysGC+s+n7xtq0o1wOvSvaG9h5q7sYZs+AKbuUbeZPu0bPWKoO02i00yVoSgWnEqDbyNeiSW+vI+VdiXITV83lG6pS+pAoTZlRROkpb5xo0gQ5ZeYok8MrkEmJbsPjdoKUJDBFTwrRnaDOfb+Qx1D22PlAZpdKiNtwbNZWiwEQFm6mHkIVSTUe2zSemoqYX4QQRvbmuMyPIbwbdNWlItukjHsffuPivLF/XsI1gDV67S1cVnQbBgrpFDxN62USwewXkNl+ndwa+15wgJFyq4Sd+RSMTPDzDQPFovyDfA/jxN2SK1Lizam6o+LBmvhIxwZOfdYH8bdYCoSpqcKLJVG3qVcTwbhGJr3kpRcBRz39Ml6iZhJyI3pEoX3bJTlR5Pr1Kjpx13qGydSMos94CIYWAKhegI06aTdvvuiigBwjngo/Rk5S+iEGR5KmTqGyp27o6YxZy6D4NIc6PKUzhIUxfvuHNvfu
- sD2W1U7eyLdm/jCgticGDsRtweytsgCSYfbz0gdgUuL3EBYN3JLbAU+UZpy v/fyD4cHDWaizNy/KmOI6FFjvVh4LRCpGTGDVPHsQXaqvzUybaMb7HSfmBBzZqqfVbq9n5FqPjAgD2lJ0rkzb9XnVXHgr6bmMRlaTlBMAEQEAAYkCNgQYAQgAIBYhBINQI6gu+8G3S19i2ykkeY3MjxOkBQJiEog1AhsMAAoJECkkeY3MjxOkY1YQAKdGjHyIdOWSjM8DPLdGJaPgJdugHZowaoyCxffilMGXqc8axBtmYjUIoXurpl+f+a7S0tQhXjGUt09zKlNXxGcebL5TEPFqgJTHN/77ayLslMTtZVYHE2FiIxkvW48yDjZUlefmphGpfpoXe4nRBNto1mMB9Pb9vR47EjNBZCtWWbwJTIEUwHP2Z5fV9nMx9Zw2BhwrfnODnzI8xRWVqk7/5R+FJvl7s3nY4F+svKGD9QHYmxfd8Gx42PZc/qkeCjUORaOf1fsYyChTtJI4iNm6iWbD9HK5LTMzwl0n0lL7CEsBsCJ97i2swm1DQiY1ZJ95G2Nz5PjNRSiymIw9/neTvUT8VJJhzRl3Nb/EmO/qeahfiG7zTpqSn2dEl+AwbcwQrbAhTPzuHIcoLZYV0xDWzAibUnn7pSrQKja+b8kHD9WF+m7dPlRVY7soqEYXylyCOXr5516upH8vVBmqweCIxXSWqPAhQq8d3hB/Ww2A0H0PBTN1REVw8pRLNApEA7C2nX6RW0XmA53PIQvAP0EAakWsqHoKZ5WdpeOcH9iVlUQhRgemQSkhfNaP9LqR1XKujlTuUTpoyT3xwAzkmSxN1nABoutHEO/N87fpIbpbZaIdinF7b9srwUvDOKsywfs5HMiUZhLKoZzCcU/AEFjQsPTATACGsWf3JYPnWxL9
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
+	s=arc-20240116; t=1707497430; c=relaxed/simple;
+	bh=dXk3RmAwr0COeaMQA/wDiMw6BAuXmDZU+vqaqPEGt5s=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=d6Fgy58BQwtjfSIFKmvAgl1N+jmAa7O4SP1SWIv8uKkJzYOKN1fBHX8vqyAEdc3FNB8YeI+HR3GqLtZRQoBOYp7SlNVsHgLGnxejfuQVI6TP36+x8Sbg1IHsz6BLyOj8++xFHLFkBnhrrY/Lz+yeejB/wWl2AlQZ3+STHbYenuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=t3tCQerJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3AF7CC43399;
+	Fri,  9 Feb 2024 16:50:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707497430;
+	bh=dXk3RmAwr0COeaMQA/wDiMw6BAuXmDZU+vqaqPEGt5s=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=t3tCQerJUq9GM8/RNVObDDgaskNvh56N/uklwUJ+VjHtJScIGmdTHp2GjIKnEydyh
+	 srGTKg8mmkV0yeMegDWYm2+3zQCFUbdYRjytXlYE2f59eYDQSKZD8arZ9KswBtfn8R
+	 OVPxrrxLiGT2Gvnb34fgSk8qpR6IsMVWQd/5xrO6gUnC5tzFppSOw+rjoOiyV/Ok2a
+	 i2nFhiJhUC9f6n8MtQ2rzeEPC4bykVQG8xa2JbpfMMdRbIMrZ4CNh7OjA7GJhLbWTB
+	 wTv4UOwyVEBcsQ/bktTbVzo+E0OzvE8Tsg2huCvY2+7Nn1nCzHiPM4pKoK1aHOADBG
+	 RoSJSdbIv6YgA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1EDF8E2F312;
+	Fri,  9 Feb 2024 16:50:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2 v2 0/2] Fix some more typos in docs and comments 
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170749743011.28784.1458264970928294129.git-patchwork-notify@kernel.org>
+Date: Fri, 09 Feb 2024 16:50:30 +0000
+References: <cover.1707492043.git.aclaudi@redhat.com>
+In-Reply-To: <cover.1707492043.git.aclaudi@redhat.com>
+To: Andrea Claudi <aclaudi@redhat.com>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org, dsahern@gmail.com
 
-On Fri, 2024-02-09 at 15:51 +0100, Paolo Abeni wrote:
-> On Thu, 2024-02-08 at 16:45 +0100, Paolo Abeni wrote:
-> > The mentioned test is failing in slow environments:
-> >=20
-> >   # SO_TXTIME ipv4 clock monotonic
-> >   # ./so_txtime: recv: timeout: Resource temporarily unavailable
-> >   not ok 1 selftests: net: so_txtime.sh # exit=3D1
-> >=20
-> > The receiver is started in background and the sender could end-up
-> > transmitting the packet before the receiver is ready, so that the
-> > later recv times out.
-> >=20
-> > Address the issue explcitly waiting for the socket being bound to
-> > the relevant port.
-> >=20
-> > Fixes: af5136f95045 ("selftests/net: SO_TXTIME with ETF and FQ")
-> > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> > ---
-> > Note that to really cope with slow env the mentioned self-tests also
-> > need net-next commit c41dfb0dfbec ("selftests/net: ignore timing
-> > errors in so_txtime if KSFT_MACHINE_SLOW"), so this could be applied to
-> > net-next, too
->=20
-> Oops... CI is saying the above is not enough...
->=20
-> > @@ -65,6 +70,7 @@ do_test() {
-> > =20
-> >  	local readonly START=3D"$(date +%s%N --date=3D"+ 0.1 seconds")"
-> >  	ip netns exec "${NS2}" "${BIN}" -"${IP}" -c "${CLOCK}" -t "${START}" =
--S "${SADDR}" -D "${DADDR}" "${RXARGS}" -r &
-> > +	wait_local_port_listen "${NS2}" 8000 "${PROTO}"
-> >  	ip netns exec "${NS1}" "${BIN}" -"${IP}" -c "${CLOCK}" -t "${START}" =
--S "${SADDR}" -D "${DADDR}" "${TXARGS}"
->=20
-> The binary explicitly waits up to $START time, and that conflicts with
-> the wait_local_port_listen, something different is needed. Apparently I
-> was just "lucky" during my local testing.
+Hello:
 
-I experimented a few different solutions and so far the only option
-that gave some positive result is increasing start delay and the etf
-delta by an order of magnitude, see below.
+This series was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
 
-But I'm pretty sure that even with that there will be sporadic failures
-in slow enough environments.
+On Fri,  9 Feb 2024 16:25:44 +0100 you wrote:
+> Time for some start-of-the-year cleanup :)
+> 
+> Using codespell, fix most of the typos in iproute2 docs and comments,
+> except for some false positives. I didn't bother to report a Fixes tag
+> for all the typos, but I can do that if needed.
+> 
+> v1 --> v2:
+> - rebased and dropped some unnecessary changes.
+> 
+> [...]
 
-When the host-induced jitter/delay is high enough, packets are dropped
-and there are functional failures. I'm wondering if we should skip this
-test entirely when KSFT_MACHINE_SLOW=3Dyes.
+Here is the summary with links:
+  - [iproute2,v2,1/2] treewide: fix typos in various comments
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=9cf6493cab29
+  - [iproute2,v2,2/2] docs, man: fix some typos
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=3c4712b95d0c
 
-Do you see any other options?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Paolo
-
----
-diff --git a/tools/testing/selftests/net/so_txtime.sh b/tools/testing/selft=
-ests/net/so_txtime.sh
-index 3f06f4d286a9..6445580f0a66 100755
---- a/tools/testing/selftests/net/so_txtime.sh
-+++ b/tools/testing/selftests/net/so_txtime.sh
-@@ -63,7 +63,9 @@ do_test() {
- 		exit 1
- 	fi
-=20
--	local readonly START=3D"$(date +%s%N --date=3D"+ 0.1 seconds")"
-+	local delta=3D0.1
-+	[ -n "${KSFT_MACHINE_SLOW}" ] && delta=3D1
-+	local readonly START=3D"$(date +%s%N --date=3D"+ ${delta} seconds")"
- 	ip netns exec "${NS2}" "${BIN}" -"${IP}" -c "${CLOCK}" -t "${START}" -S "=
-${SADDR}" -D "${DADDR}" "${RXARGS}" -r &
- 	ip netns exec "${NS1}" "${BIN}" -"${IP}" -c "${CLOCK}" -t "${START}" -S "=
-${SADDR}" -D "${DADDR}" "${TXARGS}"
- 	wait "$!"
-@@ -76,7 +78,9 @@ do_test 6 mono a,10 a,10
- do_test 4 mono a,10,b,20 a,10,b,20
- do_test 6 mono a,20,b,10 b,20,a,20
-=20
--if ip netns exec "${NS1}" tc qdisc replace dev "${DEV}" root etf clockid C=
-LOCK_TAI delta 400000; then
-+delta=3D400000
-+[ -n "${KSFT_MACHINE_SLOW}" ] && delta=3D$((delta*10))
-+if ip netns exec "${NS1}" tc qdisc replace dev "${DEV}" root etf clockid C=
-LOCK_TAI delta "${delta}"; then
- 	! do_test 4 tai a,-1 a,-1
- 	! do_test 6 tai a,0 a,0
- 	do_test 6 tai a,10 a,10
 
 
