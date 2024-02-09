@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-70423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB08484EF3C
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 04:11:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8519884EF45
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 04:12:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6E19AB25419
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 03:11:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B78FF1C262F1
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 03:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6614C98;
-	Fri,  9 Feb 2024 03:11:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AC3210785;
+	Fri,  9 Feb 2024 03:11:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fHsfKKx/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hLB6RbP4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C133B4C6F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE5D4C8B;
 	Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707448268; cv=none; b=XMCxseVqADzXgUep6PTFMhDa8ibxOvkUkwjZtSSkEG6Ngc/95UIRxJilLymCXcYDiluAaVraj7uGy5ajmI6OfkrEaPujN3qzeEdD3y9UTWyE5KQfylRhV4IOFPWs/01qf0GorKq16PDajPdzVRjb3y41r8Gqb7XynVi2pqLy6IU=
+	t=1707448269; cv=none; b=nUEZYqfBbcEh20KQetjJDiCNP2XPzl1lvmfYebDSfqAy2vFYOulYdCF48HmDo7vxGKdO72E3BEfmpN8R7djz4Sd0TWjINjVv/vAqZ1P+Q65PXsVi5ZLpp4n7TTHMuWuoEan63zyLiy1UhB5Eixj31NrpjOYmkiqGKNQqkLzA3FM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707448268; c=relaxed/simple;
-	bh=nDSwJmMJ2uuolYdgWkjq0EkHl0zZvUu2RDqequxfG+A=;
+	s=arc-20240116; t=1707448269; c=relaxed/simple;
+	bh=IGK3/aKzRGBu17JJaI5GYQZ9QiBJsZ88T2WUDQD9Fds=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MU+P29AlL1EiNVgf2pSC+MODaFa4XlJtpADTjmQJpQSZ2kwskJIM3fWHSNlJjqgP7Ew/o0MDtEGlL+0fTu9gZj6uYHC2rAiXbVZS7GeSVg8ZhrgLa/jXd7jIC/BKFZPrBeP1W1ayaCpjCnZjP2rKK2Zp8JS/YlhZEQ4NMKFAAfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fHsfKKx/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 65FE6C43601;
+	 In-Reply-To:To:Cc; b=Tvk5rn3HYl+XEX9Wd8PkvXam0u7Aad0WXZsv71BndRnyji/9/2HD8CHCKRV+NYh+hU7Lx1DpvicWz6jHxJxNMAENbcph7v6cEf3cNP6SB0RM3TCkQdRJL90xLEyGFG1WIT6aVeJ6STQGyToEA1XctiLtysYBYKfu2HDFHk5I9bw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hLB6RbP4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6CAD1C43609;
 	Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707448268;
-	bh=nDSwJmMJ2uuolYdgWkjq0EkHl0zZvUu2RDqequxfG+A=;
+	bh=IGK3/aKzRGBu17JJaI5GYQZ9QiBJsZ88T2WUDQD9Fds=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=fHsfKKx/R1LhoXNJ5OOZyE3/OFt4Yvkvc5CrsYYvo/ooIs5PCH5dLBSsii+x3ia2G
-	 emoQsvn1hnloF5+1lW3nIQMHF33oY6lWQv8me8RwjeNdH4odFybQZlTIVIu0U0pjv4
-	 nGdmel1XJhq3PSGE1M8gOGttu65qTOOEJhgMBxtK7Nfri6/WJviqGecE73kSo1RfYu
-	 nTRRmIMsnNDRxfTQ2G+6wbsnYfIXM66nbv2I6MV3kXuruj1imcmrotIoKTWOVgsAF+
-	 W6qnsTZ6fJM2xzYBqCCaL7awEP8rMsGsCzrCKopMcomhFvPvJgFuqxDDcS8Sid+p0W
-	 r/zh7fJoLN5Xg==
+	b=hLB6RbP4cH7XnuC71eMQjZGzbd+UPyk2J/WCudxfz2iO+KA/vBWszqak4FcwqmVzQ
+	 6P0ILzyKtbqSSrDY7rrxUjQIG5zuG/C++DnWpBNYP6HLN9H7pgtM4VHcbEtKtgNYBo
+	 vf1bdBQfiRQs7LvIbA0fJw1hUW0W6f0xJSsC5QT6mBibKclD8gMEEu8CdvHrwSvf7N
+	 O3svXSWhdA8R6RU9Y1TVipq8xXZUQUD5hCD4fK6ITwA2SRHQdnS0K89PI/djP/8siR
+	 ayX+4FWMSqLLohmQEn3tCWk/CUMGwVmQNz3WBLLKpcl4kBKn6FtGi1d07IGBfB5BTk
+	 jUkZrRYKWp5fQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4E841E2F311;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 570A3D8C96B;
 	Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,39 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH][next] xirc2ps_cs: remove redundant assignment to variable
- okay, clean up freespace
+Subject: Re: [PATCH] net/sun3_82586: Avoid reading past buffer in debug output
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170744826831.23533.786898690563333566.git-patchwork-notify@kernel.org>
+ <170744826835.23533.602886165980090200.git-patchwork-notify@kernel.org>
 Date: Fri, 09 Feb 2024 03:11:08 +0000
-References: <20240205213643.1850420-1-colin.i.king@gmail.com>
-In-Reply-To: <20240205213643.1850420-1-colin.i.king@gmail.com>
-To: Colin Ian King <colin.i.king@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
- linux-kernel@vger.kernel.org
+References: <20240206161651.work.876-kees@kernel.org>
+In-Reply-To: <20240206161651.work.876-kees@kernel.org>
+To: Kees Cook <keescook@chromium.org>
+Cc: sammy@sammy.net, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, gustavoars@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  5 Feb 2024 21:36:43 +0000 you wrote:
-> The variable okay is being initialized with a value that is never
-> read, it is being re-assigned later on. The initialization is
-> redundant and can be removed.  Also clean up assignment to
-> variable freespace using an assignment and mask operation.
+On Tue,  6 Feb 2024 08:16:54 -0800 you wrote:
+> Since NUM_XMIT_BUFFS is always 1, building m68k with sun3_defconfig and
+> -Warraybounds, this build warning is visible[1]:
 > 
-> Cleans up clang scan build warning:
-> drivers/net/ethernet/xircom/xirc2ps_cs.c:1244:5: warning: Value stored
-> to 'okay' is never read [deadcode.DeadStores]
+> drivers/net/ethernet/i825xx/sun3_82586.c: In function 'sun3_82586_timeout':
+> drivers/net/ethernet/i825xx/sun3_82586.c:990:122: warning: array subscript 1 is above array bounds of 'volatile struct transmit_cmd_struct *[1]' [-Warray-bounds=]
+>   990 |                 printk("%s: command-stats: %04x %04x\n",dev->name,swab16(p->xmit_cmds[0]->cmd_status),swab16(p->xmit_cmds[1]->cmd_status));
+>       |                                                                                                               ~~~~~~~~~~~~^~~
+> ...
+> drivers/net/ethernet/i825xx/sun3_82586.c:156:46: note: while referencing 'xmit_cmds'
+>   156 |         volatile struct transmit_cmd_struct *xmit_cmds[NUM_XMIT_BUFFS];
 > 
 > [...]
 
 Here is the summary with links:
-  - [next] xirc2ps_cs: remove redundant assignment to variable okay, clean up freespace
-    https://git.kernel.org/netdev/net-next/c/e084a1c1dff6
+  - net/sun3_82586: Avoid reading past buffer in debug output
+    https://git.kernel.org/netdev/net-next/c/4bea747f3fbe
 
 You are awesome, thank you!
 -- 
