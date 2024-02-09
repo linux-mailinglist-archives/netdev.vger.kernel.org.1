@@ -1,129 +1,113 @@
-Return-Path: <netdev+bounces-70625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF67B84FD44
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 20:58:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DEA184FD4F
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:04:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90B5D28ACCB
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 19:58:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 239071F225BB
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 20:04:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C57684A53;
-	Fri,  9 Feb 2024 19:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wyriwFU8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D23698564E;
+	Fri,  9 Feb 2024 20:04:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DFB84E1A2
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 19:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CCDB57861;
+	Fri,  9 Feb 2024 20:04:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707508714; cv=none; b=jNC96r8/OPipDya4I1QuMvgrInDlzSH9TF2EWUGFlYQ9f+QeOv3JZT0hLGtWligQJDeQBA6iyYJ9BJ/rRvYqCvt8Sf2dQASXfID/b7gmwofcr65CYsR5yGmMo2POvUYDef982Q83f387D4SXnS3RkhOP2xdLOGiQTZ3JITo+zVc=
+	t=1707509059; cv=none; b=V/Fca/RXzCuOL6qZ+XmbWJAa6J0n2pZFxY9PpK2AQDDJIM/Ff5AHxGKZ/q95rTiBp1jHiepaXddcW4NmpyXoszWXXH84o3Wunt8TBr7Yxkpf82/WAxbBs40mxijyUrSk1HO+INKHoZjftGYuU2nEoMbl9S9uA9oNu8LoBctT75s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707508714; c=relaxed/simple;
-	bh=eD9EQcFDBNiBgcU5tvMZBRIekyRKjj9vzifDaj4xy+8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bfnjqJV7glFHzZN+9tRqC+OtiN3fybcISyUNvVE40yBHhf6FSNr6O/qugu5OuTmvfVh2ecTjktgxmfsMjxxPm9uyRZvVnBxVfP9OCgcpjO9vd29z3EwoLWbhnsv6i1NJUGVPJ15qVjQGnr6OfG/5Q3uhnv9/WWvVzPEYRYC/e1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wyriwFU8; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-56037115bb8so31941a12.0
-        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 11:58:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707508711; x=1708113511; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p20YnXv7NpCJx02QrzV6jlP0H9fDT2JyoFdNhx5bIEA=;
-        b=wyriwFU8Ae9V8bemiik4vZ9fboHfx1a/bR+mfxzugCHRPiSug5OALC/geHU0sXLKs8
-         RQ6wJa+LI5BOFEhoUxD8X8Tr0vw3cWEu9Hh1S6oEfuYV3QBhrd/k3HvlO/zc1AeP0jzd
-         tsf0dcrLL+sYDkvrIqemfp/0nRtJClESGD1D8VvpMLMWpyBlqUw/epL3rU9wymjLqfmZ
-         Dql3+OQnQ74RG/ydFY8CoAjqxfCVewAN+XjUc7TkhDhOkzhqiVtvHqBA0aJwj0OWdisj
-         mAlpXuLKYdpL/6cHgxZvLpGmVb3DNjQ5NqHPJmOVRzMWl7BMfnUXgXXup73ogYyIuj2r
-         8lfQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707508711; x=1708113511;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=p20YnXv7NpCJx02QrzV6jlP0H9fDT2JyoFdNhx5bIEA=;
-        b=uz/KJh5Y5xY2NKUkzV1p3dwKTyWfCBW2vMDgdSEOtpz7hJH8n1QbennPTafcGYBSOl
-         wjQKQMoBVJkr49qz8bAW52Y9Z4j7n645PGiroY/8rkSkZrvWsfqjiLNqEij8PHiq+vk2
-         r0/C/U+Fv0p1XjB/UpJiKe7g923Z1kvVScxlCbXqjvypnE/MprjTSLhmWlH2juscUUjd
-         6NXoz6GBFAd3mdfZdgJOKtv6UE1tgBoBhyjll5JoSKjuVMnEn69NGBEcTIADtgN85rue
-         k0x9ub4PtDndcXMBWhW1FjlU9BFXQNIeNkTnJ/FuiXHGE80c76EVFKlOdz4LD46Stt8C
-         bQIA==
-X-Gm-Message-State: AOJu0Ywa6NKcVzOlrWsuVsHm4AnOl2+3J/mkrywqR/BZH3IjRIO9iRqk
-	PaGkAPXERmlzrpBtv/Nh7kLbV6rMy2Gp891Kn0OICjRKRLJ6FCa+JgOa+P5d2XZJYurnvhpnDW0
-	gmDDfr2MvnWaDG34bUXQvYteuhxPZFMNOWIT+
-X-Google-Smtp-Source: AGHT+IGJN2AMdvjrJdhIoLmn1ZUADI/e7sMUkA35RQJWoOSTrSGAMPfObja6Fhu4Ifki9/iguSDWuW03WbCKF92s7v8=
-X-Received: by 2002:a50:c30b:0:b0:561:207f:d089 with SMTP id
- a11-20020a50c30b000000b00561207fd089mr194005edb.6.1707508710608; Fri, 09 Feb
- 2024 11:58:30 -0800 (PST)
+	s=arc-20240116; t=1707509059; c=relaxed/simple;
+	bh=0qrCtPECgtI/x+r4iRx5/1y3ghcz5lDR4VVoh57xCoA=;
+	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=lnHwrRj3Az5gs2PdWl9IfmW1EDVkWPEEj3WWxamM98ohql1KE5okdsj1Zl2cxhAgyU7qfzG3Jsan1N+Fbu3sZTQXX5G4rvcImDbIOdXu8osW3227l60aUwmVAwIzPpWwywprt5I5OvZ6hICqZJUJosVhhJLv5+MObDWJ83HIakI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from [192.168.1.105] (178.176.73.169) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Fri, 9 Feb
+ 2024 23:04:12 +0300
+Subject: Re: [PATCH net-next v2 1/5] net: ravb: Get rid of the temporary
+ variable irq
+To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Claudiu Beznea
+	<claudiu.beznea.uj@bp.renesas.com>
+References: <20240209170459.4143861-1-claudiu.beznea.uj@bp.renesas.com>
+ <20240209170459.4143861-2-claudiu.beznea.uj@bp.renesas.com>
+From: Sergey Shtylyov <s.shtylyov@omp.ru>
+Organization: Open Mobile Platform
+Message-ID: <bbe3b99e-99e5-8ffb-3361-91796969fd11@omp.ru>
+Date: Fri, 9 Feb 2024 23:04:11 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240208141154.1131622-11-edumazet@google.com> <202402100218.Gmr6NGqc-lkp@intel.com>
-In-Reply-To: <202402100218.Gmr6NGqc-lkp@intel.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 9 Feb 2024 20:58:16 +0100
-Message-ID: <CANn89iKPjqXu9EBHsGcvdpZmC7ZRFFt_aKixiP0=bXN9wRDs0g@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 10/13] net: add netdev_set_operstate() helper
-To: kernel test robot <lkp@intel.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240209170459.4143861-2-claudiu.beznea.uj@bp.renesas.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/09/2024 19:19:42
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 183341 [Feb 09 2024]
+X-KSE-AntiSpam-Info: Version: 6.1.0.3
+X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info:
+	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.169
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 02/09/2024 19:32:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 2/9/2024 5:38:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Fri, Feb 9, 2024 at 8:13=E2=80=AFPM kernel test robot <lkp@intel.com> wr=
-ote:
->
-> Hi Eric,
->
-> kernel test robot noticed the following build errors:
->
-> [auto build test ERROR on net-next/main]
->
-> url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Dumazet/net-a=
-nnotate-data-races-around-dev-name_assign_type/20240208-222037
-> base:   net-next/main
-> patch link:    https://lore.kernel.org/r/20240208141154.1131622-11-edumaz=
-et%40google.com
-> patch subject: [PATCH v2 net-next 10/13] net: add netdev_set_operstate() =
-helper
-> config: sh-sh2007_defconfig (https://download.01.org/0day-ci/archive/2024=
-0210/202402100218.Gmr6NGqc-lkp@intel.com/config)
-> compiler: sh4-linux-gcc (GCC) 13.2.0
-> reproduce (this is a W=3D1 build): (https://download.01.org/0day-ci/archi=
-ve/20240210/202402100218.Gmr6NGqc-lkp@intel.com/reproduce)
->
-> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
-ion of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202402100218.Gmr6NGqc-lkp=
-@intel.com/
->
-> All errors (new ones prefixed by >>):
->
->    sh4-linux-ld: net/core/rtnetlink.o: in function `set_operstate':
-> >> net/core/rtnetlink.c:873:(.text+0x1140): undefined reference to `__cmp=
-xchg_called_with_bad_pointer'
->    sh4-linux-ld: net/core/rtnetlink.o: in function `netdev_set_operstate'=
-:
->    net/core/rtnetlink.c:855:(.text+0x16d0): undefined reference to `__cmp=
-xchg_called_with_bad_pointer'
->
+On 2/9/24 8:04 PM, Claudiu wrote:
 
-Ah right, there was also dev->operstate.
+> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> 
+> The 4th argument of ravb_setup_irq() is used to save the IRQ number that
+> will be further used by the driver code. Not all ravb_setup_irqs() calls
+> need to save the IRQ number. The previous code used to pass a dummy
+> variable as the 4th argument in case the IRQ is not needed for further
+> usage. That is not necessary as the code from ravb_setup_irq() can detect
+> by itself if the IRQ needs to be saved. Thus, get rid of the code that is
+> not needed.
+> 
+> Reported-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
 
-These old arches...
+Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+
+[...]
+
+MBR, Sergey
 
