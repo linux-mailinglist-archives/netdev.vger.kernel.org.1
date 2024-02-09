@@ -1,76 +1,115 @@
-Return-Path: <netdev+bounces-70665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBCFF84FF1C
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 22:47:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF3B784FF1E
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 22:47:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9AD1F1F2414E
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:47:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E11D11C22277
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:47:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5315D18AE4;
-	Fri,  9 Feb 2024 21:47:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CACA618623;
+	Fri,  9 Feb 2024 21:47:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ng9DbyxR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XgdGDBVO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28EF16FC6;
-	Fri,  9 Feb 2024 21:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1AAF210EE;
+	Fri,  9 Feb 2024 21:47:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707515225; cv=none; b=XHrWQNElkjF9Bp2Z5w8zpMuNbt/5abKCKXWx1Ye4Dsemzg7l7gx7GQ/9An/3WVUdMFuMmt8YmdkJ6E51CKOqQuktv299GOsJSXMLK5ixl7PGGSvAIbNbgEB3s8iaMVTYvF63OX7Tu9AQKCiPgWRZpAtolVNoCrfmH/BdZS2k8TU=
+	t=1707515243; cv=none; b=fwBwHIB2BPvCw0OgDagGmP8qKUHqwYX+FDkJlcaoGr/aZTMKvFMHzgBK4BpNIyk6StEKD87Mjtz5KnB8TipoPHOLyxB+NaDV+3t6iQpldmxaIzKpyjVQgJxN6qvCy64zP6QA5vQuZIy6+pWvdr4CVGtnlbc7DOVOPz2qO+3ld7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707515225; c=relaxed/simple;
-	bh=/tDUPJkwhOx4viRfkJ9TmOy8asfx5XzqzTXyYkx9xGM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GM0fcjN98VcBgq/C1w2yltivbkPy942UW7+SFS9Ac0caRC1bq0KRk0vla3eogLrh5c3c3+cV07GMx6zzbKOhRYFQhmfrMq9WqWf9QvaNdXdsWMR1ICt2xvGReK7mHe+OK8Rw4/yI7tcAFDJKJlMMoiRBvNIF8cvybbxfijVtFus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ng9DbyxR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75062C433C7;
-	Fri,  9 Feb 2024 21:47:04 +0000 (UTC)
+	s=arc-20240116; t=1707515243; c=relaxed/simple;
+	bh=Gtqx3D5Gbbnno6TsCD64LQ0pTqiMIshXtXteTUCc1g4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oazw9fPrkvXhI2RXLHYHBOO1lyAae0iDV88nwOQ0m6rwgK7NIcA0zVB7fonu74DhltUdLVS0Kke0UVHkJ6AGUTYBAYw0j9zIn778RLemM7U0ZPhI5yf7EsJLOGpLNdv4tVZN7wjW6Y0KnhZGO9Vl2PQRYpJBDsKJZ19sQHsGu/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XgdGDBVO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF4A5C433F1;
+	Fri,  9 Feb 2024 21:47:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707515224;
-	bh=/tDUPJkwhOx4viRfkJ9TmOy8asfx5XzqzTXyYkx9xGM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Ng9DbyxRLvw40yr2w632UWwL5d7EnpWq53YPnFTu3xkk668+AUiQSKUOXdPLSjh5K
-	 KGCO+gdTia7UAYcqG4W01KZ+DN1JrToh8tDednk6xGy5uqcrMuOWmyNo/8czJWor/T
-	 MFU0lO22+RB+pRjKnOiV8cQA48WvBb+GTBxZf8URrpSLeLUjXzrgBlwsRtq9nVm9RH
-	 i8LtSlr7bGUyllaaf3q1PGFGgRcCgWshl+CFVAToquFmxnUHAUAY7dyeMmqQFS75RL
-	 JRrXeY/IkjXDqizuZJp/h7M3FyM59KmRE8T7WLcN6ZfoVgOdBL3eMuKQCL/HGH5HVF
-	 X5IdxrpFDuWTQ==
-Date: Fri, 9 Feb 2024 13:47:03 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Dmitry Antipov <dmantipov@yandex.ru>
-Cc: Xin Long <lucien.xin@gmail.com>, Marcelo Ricardo Leitner
- <marcelo.leitner@gmail.com>, linux-sctp@vger.kernel.org,
- netdev@vger.kernel.org, lvc-project@linuxtesting.org,
- syzbot+8bb053b5d63595ab47db@syzkaller.appspotmail.com
-Subject: Re: [PATCH] net: sctp: fix skb leak in sctp_inq_free()
-Message-ID: <20240209134703.63a9167b@kernel.org>
-In-Reply-To: <20240206092619.74018-1-dmantipov@yandex.ru>
-References: <CADvbK_fn+gH=p-OhVXzZtGd+nK6QUKu+F4QLBpcx0c3Pig1oLg@mail.gmail.com>
-	<20240206092619.74018-1-dmantipov@yandex.ru>
+	s=k20201202; t=1707515243;
+	bh=Gtqx3D5Gbbnno6TsCD64LQ0pTqiMIshXtXteTUCc1g4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=XgdGDBVOuzv+za9SNorNgn+PTtSl9mPVciU4CqjuFS64a26En4KXo1PALP5sydVNt
+	 dXLOuPe741TTnd9bElcOAdjaqqSkDMMLD8pSgX1GjAjvpc4aqwPuBqYnLeqB4mLad0
+	 wWKlJsuroOlNzhhX5Sd3aolX6GseyapCzj+8OK6GbXrO7hTAVU1Q5XUxE+6trl+GOt
+	 VgISeaG6PjpiKhjly/tJ4cANj4Afdlnr8BD3u0jauP6mqu4tu7kPz9M/qSx5C7dxty
+	 tR36Iv/+ETzHK+9oUiGB/Vx3iyUww5OQqOmyO8JPcbhb0AnBm6LVHsCgvSerlL3uhF
+	 tYiDX889EBflg==
+Date: Fri, 9 Feb 2024 22:47:19 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, lorenzo.bianconi@redhat.com,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	bpf@vger.kernel.org, toke@redhat.com,
+	willemdebruijn.kernel@gmail.com, jasowang@redhat.com,
+	sdf@google.com, hawk@kernel.org, ilias.apalodimas@linaro.org,
+	linyunsheng@huawei.com
+Subject: Re: [PATCH v8 net-next 0/4] add multi-buff support for xdp running
+ in generic mode
+Message-ID: <ZcadZx1IMoB9xgG8@lore-desk>
+References: <cover.1707132752.git.lorenzo@kernel.org>
+ <20240209083834.78a9e941@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="QPYuqvCzkqYHWj6Y"
+Content-Disposition: inline
+In-Reply-To: <20240209083834.78a9e941@kernel.org>
 
-On Tue,  6 Feb 2024 12:26:17 +0300 Dmitry Antipov wrote:
-> In case of GSO, 'chunk->skb' pointer may point to an entry from
-> fraglist created in 'sctp_packet_gso_append()'. To avoid freeing
-> random fraglist entry (and so undefined behavior and/or memory
-> leak), ensure that 'chunk->skb' is set to 'chunk->head_skb'
-> (i.e. fraglist head) before calling 'sctp_chunk_free()'.
 
-The code already exists in another place in this file, let's factor it
-out to a helper function.
--- 
-pw-bot: cr
+--QPYuqvCzkqYHWj6Y
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+> On Mon,  5 Feb 2024 12:35:11 +0100 Lorenzo Bianconi wrote:
+> > Introduce multi-buffer support for xdp running in generic mode not alwa=
+ys
+> > linearizing the skb in netif_receive_generic_xdp routine.
+> > Introduce generic percpu page_pools allocator.
+>=20
+> breaks the veth test, apparently:
+>=20
+> https://netdev-3.bots.linux.dev/vmksft-net/results/458181/60-veth-sh/stdo=
+ut
+>=20
+> could be that the test needs fixing not the code.
+> But either way we need a respin :(
+> --=20
+> pw-bot: cr
+
+Hi Jakub,
+
+Ack, thx for reporting the problem. The issue is we should use skb_pp_cow_d=
+ata()
+instead of skb_cow_data_for_xdp() in veth_convert_skb_to_xdp_buff() since w=
+e do
+not have any requirement for the attached bpf_prog there. I will fix it in =
+v9.
+
+Regards,
+Lorenzo
+
+--QPYuqvCzkqYHWj6Y
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZcadZwAKCRA6cBh0uS2t
+rMb9AQCaD1jFTLZkYCpxZWkclrCBKsWkCh82J9PKeqBVVCRx5AD6Aqtj/sbfnW4u
+nrO5sxyd2Y84Nrqp6Gcx0Te82zm6eg0=
+=9Nar
+-----END PGP SIGNATURE-----
+
+--QPYuqvCzkqYHWj6Y--
 
