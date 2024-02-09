@@ -1,127 +1,168 @@
-Return-Path: <netdev+bounces-70600-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E71184FB83
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 19:07:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8462A84FBA4
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 19:10:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EBF61C24D09
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 18:07:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 443FB28EDBB
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 18:10:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5BEE80C0B;
-	Fri,  9 Feb 2024 18:07:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDB837F490;
+	Fri,  9 Feb 2024 18:09:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="eqf/GXHK"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="DLedd2OK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1B180BF5;
-	Fri,  9 Feb 2024 18:07:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D28F480BF8
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 18:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.46.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707502040; cv=none; b=KGF19STA304lv7RL4V2gbG+oj7p5bNrqRydQ8SJddanSAAuzF5Pqc50hqxYMLXDE83YETRH+06N6vxTlj5jbGbjdCqDiTF/fA9rMHcPnxFq3vniyyfaEEbg/KIDSj2cL2XpTP9xWEoVXuzIMgJU5uvMOfiCaxWGSSKHycu/1pOc=
+	t=1707502175; cv=none; b=ezqoWNZeH4nDZGthvZO0wGftBVvEBfigpDIy8vQdzy71cmIqC6+QRc8omdg6a4AQkLqxTcgxElAyaFQPRU5EeBh6OZsdiMJyPkbm1FjIGHtnfnYetwUBPTlcVaFk2aySPgAqw2YLLxo+xXshMmXBDHwkrAJYu5bw9Aj8iPJQrA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707502040; c=relaxed/simple;
-	bh=/vVHfU4e8VpEUslZI8rvDFAJFug05ANihwQevcdLXQQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oeguQDkly1PvJeoJUC74Yv4zTbrl/KZ8TafSNJvISfkVGyMLNh6xztXREt2VoLxdqP+1UUqreKiDhuQOR/XAShgIdk0wfcQsduDYPDDdInk0tmOVj1T+A0xyHXlonJ35KMFNXKkfN8+YZbu7oienHLTx0uo3AoU71RFAKNSU9iY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=eqf/GXHK; arc=none smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 419H42nH011805;
-	Fri, 9 Feb 2024 18:07:09 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding;
- s=corp-2023-11-20; bh=6HOUs3KwIxMYByg9Nllb37I2V7KbdMSxVpV5fSt60Z8=;
- b=eqf/GXHKvfNdsi/IJ/lqrq2ZJQF2Rvxl2udzjgMibw75EVx00/oKkLiF0TWllOTYnHeT
- rutaM1E3Dm9RB9ywIndwo7Ss8qU0MIxfYFm3EN6Fl7HUplz/ZfRRjol3d+EGOCPyT9oI
- 0hiy2POjXG06wcslOr1O7PE1yf2WFs973hDveK5Rzr8WJdjY/mNCBGPLpO4xTfZvmpoZ
- ROlwgHRS5cqkRQTjNjkdCKzTr1No+sPFuih52RPNFbZkyn/XiFT6AnJgXOWvY8lCLYgt
- Zx1Ov42kVOCkR+XgBWHdBwHHF0tvaxhl75bc/gSeT6Z/InOJaGBjunr/X0ByMUY6O2Hy Zw== 
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3w1d3ur102-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 09 Feb 2024 18:07:08 +0000
-Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 419HgVNm019807;
-	Fri, 9 Feb 2024 18:07:08 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3w1bxjtcer-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 09 Feb 2024 18:07:08 +0000
-Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 419I77HK003846;
-	Fri, 9 Feb 2024 18:07:07 GMT
-Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
-	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3w1bxjtcdd-1;
-	Fri, 09 Feb 2024 18:07:07 +0000
-From: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
-        Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Cc: darren.kenny@oracle.com,
-        Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
-Subject: [PATCH] net: sched: Remove NET_ACT_IPT from Kconfig
-Date: Fri,  9 Feb 2024 10:06:56 -0800
-Message-ID: <20240209180656.867546-1-harshit.m.mogalapalli@oracle.com>
-X-Mailer: git-send-email 2.42.0
+	s=arc-20240116; t=1707502175; c=relaxed/simple;
+	bh=jgwtZY6Br+6RQYtM/fWMRBsyktZhTocx/l4vrTqdJig=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dvLU9OnyilUxuNMdIZAfYOS5A00UESgHkw6ilIuDQpRRpBjWPQAH69owtfpAhxnJeppOtwb74exuirNqdmlAliehPJ3+VhaQAUwfJNCLSsPjHQYLIDNJlb8xdD8M3v/shSvQUqE311f3PXbaOErqvyFA417sN7CUCY2M9xqgXeQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=DLedd2OK; arc=none smtp.client-ip=151.80.46.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
+	s=mail2022; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=XFOWM3XhBimS2qTrXP2fKQ9j7YM3vCfRxVwfTzdYos0=; b=DLedd2OKW8ZaunUoGIfsXzjE3z
+	xKNqdNx4cnEdasZYQrVM3J+d5RKNAkKR1nBI02Yv+TKbF5pwoj5AQJMSSywr0RkftloL3lyZRP+Kg
+	P6eac6aRsy5WYzZPx2LD5DSK1L8vhLGclsHgV5flEOG/ivnhPxp6AQBRRShHI+OkUqjBitT95GZt1
+	BQP28vIGokboKISkegOakmn1OhXd3phuUwU357DgM6bfQ4WfeJInjWAEOPgwSxCp6TU+XpIlxvMLA
+	zoV6t19McG7N3oqpIbsMtSa3e+LjXW0PMScwxYfIBzgOpzjMS2/NAJbETVo+VjYDlAF/eEsy/RVLk
+	qSMdcjgQ==;
+Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.97)
+	(envelope-from <phil@nwl.cc>)
+	id 1rYVJU-000000002Mu-1TCr;
+	Fri, 09 Feb 2024 19:09:24 +0100
+Date: Fri, 9 Feb 2024 19:09:24 +0100
+From: Phil Sutter <phil@nwl.cc>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [RFC iproute2] tc/u32: use standard flexible array
+Message-ID: <ZcZqVDfUeOZsVP6j@orbyte.nwl.cc>
+Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	netdev@vger.kernel.org
+References: <20240209170714.370259-1-stephen@networkplumber.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-09_15,2024-02-08_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 suspectscore=0 mlxscore=0
- adultscore=0 spamscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
- definitions=main-2402090131
-X-Proofpoint-ORIG-GUID: qN2dE4OUBodg7SCRNEV7sqwNg7ONaBS3
-X-Proofpoint-GUID: qN2dE4OUBodg7SCRNEV7sqwNg7ONaBS3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240209170714.370259-1-stephen@networkplumber.org>
 
-After this commit ba24ea129126 ("net/sched: Retire ipt action")
-NET_ACT_IPT is not needed anymore as the action is retired and the code
-is removed.
+On Fri, Feb 09, 2024 at 09:06:17AM -0800, Stephen Hemminger wrote:
+> The code to parse selectors was depending on C extension to implement
+> the array of keys. This would cause warnings if built with clang.
+> Instead use ISO C99 flexible array.
+> 
+> Also the maximum number of keys was hardcoded already in two places.
+> 
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+> ---
+>  tc/f_u32.c | 46 +++++++++++++++++++++++++++-------------------
+>  1 file changed, 27 insertions(+), 19 deletions(-)
+> 
+> diff --git a/tc/f_u32.c b/tc/f_u32.c
+> index 913ec1de435d..a6e699d53d24 100644
+> --- a/tc/f_u32.c
+> +++ b/tc/f_u32.c
+> @@ -21,6 +21,8 @@
+>  #include "utils.h"
+>  #include "tc_util.h"
+>  
+> +#define SEL_MAX_KEYS	128
+> +
+>  static void explain(void)
+>  {
+>  	fprintf(stderr,
+> @@ -129,7 +131,7 @@ static int pack_key(struct tc_u32_sel *sel, __u32 key, __u32 mask,
+>  		}
+>  	}
+>  
+> -	if (hwm >= 128)
+> +	if (hwm >= SEL_MAX_KEYS)
+>  		return -1;
+>  	if (off % 4)
+>  		return -1;
+> @@ -1017,10 +1019,7 @@ static __u32 u32_hash_fold(struct tc_u32_key *key)
+>  static int u32_parse_opt(struct filter_util *qu, char *handle,
+>  			 int argc, char **argv, struct nlmsghdr *n)
+>  {
+> -	struct {
+> -		struct tc_u32_sel sel;
+> -		struct tc_u32_key keys[128];
+> -	} sel = {};
+> +	struct tc_u32_sel *sel;
+>  	struct tcmsg *t = NLMSG_DATA(n);
+>  	struct rtattr *tail;
+>  	int sel_ok = 0, terminal_ok = 0;
+> @@ -1037,12 +1036,18 @@ static int u32_parse_opt(struct filter_util *qu, char *handle,
+>  	if (argc == 0)
+>  		return 0;
+>  
+> +	sel = alloca(sizeof(*sel) + SEL_MAX_KEYS * sizeof(struct tc_u32_key));
+> +	if (sel == NULL)
+> +		return -1;
+> +
+> +	memset(sel, 0, sizeof(*sel) + SEL_MAX_KEYS * sizeof(struct tc_u32_key));
 
-Clean the Kconfig part as well.
+Maybe a wrapper would clean things up a bit (untested):
 
-Signed-off-by: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
----
-This is just based on observation.
+| static void *calloca(size_t nmemb, size_t size)
+| {
+| 	void *ret = alloca(nmemb * size);
+| 
+| 	if (ret)
+| 		memset(ret, 0, nmemb * size);
+| 
+| 	return ret;
+| }
 
- net/sched/Kconfig | 10 ----------
- 1 file changed, 10 deletions(-)
+[...]
+> @@ -1122,17 +1127,21 @@ static int u32_parse_opt(struct filter_util *qu, char *handle,
+>  		} else if (strcmp(*argv, "sample") == 0) {
+>  			__u32 hash;
+>  			unsigned int divisor = 0x100;
+> -			struct {
+> -				struct tc_u32_sel sel;
+> -				struct tc_u32_key keys[4];
+> -			} sel2 = {};
+> +			struct tc_u32_sel *sel2;
 
-diff --git a/net/sched/Kconfig b/net/sched/Kconfig
-index 470c70deffe2..8180d0c12fce 100644
---- a/net/sched/Kconfig
-+++ b/net/sched/Kconfig
-@@ -737,16 +737,6 @@ config NET_ACT_SAMPLE
- 	  To compile this code as a module, choose M here: the
- 	  module will be called act_sample.
- 
--config NET_ACT_IPT
--	tristate "IPtables targets"
--	depends on NET_CLS_ACT && NETFILTER && NETFILTER_XTABLES
--	help
--	  Say Y here to be able to invoke iptables targets after successful
--	  classification.
--
--	  To compile this code as a module, choose M here: the
--	  module will be called act_ipt.
--
- config NET_ACT_NAT
- 	tristate "Stateless NAT"
- 	depends on NET_CLS_ACT
--- 
-2.39.3
+Not directly related to your patch, but seeing this makes me wonder
+where the code asserts parse_selector won't exceed the key space.
+pack_key() itself only checks it won't exceed 128 keys.
 
+>  
+>  			NEXT_ARG();
+> -			if (parse_selector(&argc, &argv, &sel2.sel, n)) {
+> +
+> +			sel2 = alloca(sizeof(*sel) + 4 * sizeof(struct tc_u32_key));
+> +			if (sel2 == NULL)
+> +				return -1;
+> +
+> +			memset(sel2, 0, sizeof(*sel2));
+
+The sizeof(*sel2) is identical to sizeof(struct tc_u32_sel) and thus too
+small. Another point for the wrapper suggested above, as it avoids these
+typical mistakes.
+
+Cheers, Phil
 
