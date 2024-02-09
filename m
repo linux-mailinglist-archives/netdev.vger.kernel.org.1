@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-70642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8412F84FDB4
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:36:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE85A84FDB5
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:36:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B6BE41C21F1C
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 20:36:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85C4A1F2998D
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 20:36:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFF725C96;
-	Fri,  9 Feb 2024 20:35:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B479B611E;
+	Fri,  9 Feb 2024 20:35:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HYF/nXis"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="xdz7meRw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CAD7568A
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 20:35:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D73610D
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 20:35:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707510915; cv=none; b=MgWGG3V5fxMgw2RAucM/Z9L6y7YUDAJNamlBH03k3PlzmU7ztAYkx94fpu2aS2mG37KjfUGfMcpUCpB1nRRyeHl2/jyQKeT0uvbAh8uWZ45NjA9HUViA4mNWJWL7yOL/hwF7bOdrwBoIJStjXc0ZiS/HJWUn8QvJ9BshEEG5slU=
+	t=1707510917; cv=none; b=aPUGf9Crqunv/vRoJkgeY1YzheNkYb+CkIxH1JfGrziC/7HUniAxDUyaHB6hY7P6nXwRweKlvKr1D7FbKT8yrzXiPmPsWZ3kyuhf2+o16zYdKEvrx8aGcb1W08q51DG/jYaFlIt3IVrpqQGjyCmcO5jkbt8LqPej0p6soWBIoEw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707510915; c=relaxed/simple;
-	bh=Cp/AN9/HGGXoAPiTYJogFYMkfFcAC2rlQPrKzKguFQU=;
+	s=arc-20240116; t=1707510917; c=relaxed/simple;
+	bh=GTbkbCA5bdwhJciFRe6AaAz0OxCe0Kt6owl98OPMuxM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ZDXObi5FICAXGzb05EuEAJGSEeDf0R92ItYbUShMKBtNMV5zlJ+IxXQZps84frh0HekCq/DVan8bwPUKbwEjXcNLw+X05q3zfTDmQ+cTp77hZa7FUoZKOkwSO57naYq/AwVJKnh0vX1lFJQIlOSJp/vWivPTpqsgTeNMwLXlz10=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HYF/nXis; arc=none smtp.client-ip=209.85.160.201
+	 To:Cc:Content-Type; b=fuwhgw1XfB4RLCbEIm2WOaTDLP0hSDN8A3F15pHDAaOwwE7YKz8rjB8d+nrU5cKiZ9F7yRwGVZsg3tZK5N6zrehEYPa/2640sQ37aSTo+q4MRc3EzukyN0m3x2pRO7rRgTP1s5Pt471A+9Rod4E/M4Y48lCyOJWakULtfq6Vua0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=xdz7meRw; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-42b875efad3so44883371cf.0
-        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 12:35:14 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc7441509bdso1773013276.3
+        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 12:35:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707510913; x=1708115713; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1707510915; x=1708115715; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=6wQ7ycFTq+UkWN04lv4Q9eRhEGXWS4c+3KCfqAqIE6M=;
-        b=HYF/nXisR9CBEGZhKZNjSt6PYe2Tr1FGUo5/S0FAw4gWKvmgKS3CpehBCF+D/gxFe9
-         rxhr8ig0u/qi9l4FjkX2F0z4mAjE+baihRvfmZnZyY2Pto2apMtIjNHqqUjtOU19xiad
-         AMkwA92YHGmR3KLojN1l671l79x9QZtUTWjXlxGJcSUFkwFw//EEylgqZ3mQBpMysgge
-         74Xw46/EUVPk11ebYb8Yts4qXwrXUx4uTTaljLk4CGZDpWpGad7nl8k1BGrgAFdiNPpb
-         8CGCzBmPlQ1ELSfnRng0SYi4I9X0mTPVVuOh6ALmpoBmVgZjbdWihy+i4iY9zK7FExZi
-         BNoA==
+        bh=to+/9xcAr+X14yJQKJlLGBRFNzvqzZuEv3ILo1LuoXw=;
+        b=xdz7meRwJ0FcU919qf7h1bk5I6t7Ow9+Q83Re6wk30D98W9E8DF2zlMc94AaZutrue
+         07RdID3CHZ5htlgnpTSWCHh8dCebIDodWwNaYB6CtYl3o9HsOrxkFFODQQ6XWyhJY2w/
+         l69S6FRz3cYDvcgMciTCT63/u2I5tRRvMcKEKA0TAihG04Err4acygOgVFqCTH9qe42m
+         ACJP4P77vYGV9vKtIDdQ0Djy2g6w4dnL9K3fjRuuW0k45ypb1Sz4RvuAzKhB/t85Ai0K
+         yC3KgaQibOmmRokRZLsKWwTfsjgMCQ/S6gd3bGKebf9KreVxEyq2BqcaMWcCpHwnbwer
+         0cig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707510913; x=1708115713;
+        d=1e100.net; s=20230601; t=1707510915; x=1708115715;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6wQ7ycFTq+UkWN04lv4Q9eRhEGXWS4c+3KCfqAqIE6M=;
-        b=tlOPq3Qt/Yb+Wiu3Zh2P2qu0jNMnHYM5waagztUESk5kMenAg5iomLP+7rVC+S3K/l
-         GxVT6F6MZwYLmbm7DvWc3iek9qqkfnZA9lnLr/IsK0E1XIEGYycDsl2UWSReQPrIbKux
-         91HAuyXF9sepX/OMh66u6hWvc3ovtPuDf9tQ9COKhMC02MskqINqfwcHJrX+weLUTMEP
-         k3DzhFQkYVEOQhQpH9s0NJ90m0nyyRI3d4QQqfryZ3s5epzdtNi3fU7n7c9LT+OICnCr
-         Q8H7NGbrltLr+t9D8DMGgn+LiJBDfVmltpfTcAei0RDFMM/ucmeOuToI1v3J4bjy5tXk
-         rVQA==
-X-Gm-Message-State: AOJu0Yzrr9nVSfU+KX/Jqrnuf1jYc8UFjke/aP+GfotkjhGDKOfmDHQw
-	H1dTNLpK/z4RAPddsIN25fWOitiWGkRVmYBnYFPxtiekkbRdgQiaYU86YMW6qzadC9f+pLaWVIK
-	BXObp5JtMvA==
-X-Google-Smtp-Source: AGHT+IGSv8dfiyjx25/ppmvhb6xaU6XtnxIw4SzcUlrbnKhXn0zlAqW8Vev7s6wbTiR30U2YR1JWUnShDs5DAg==
+        bh=to+/9xcAr+X14yJQKJlLGBRFNzvqzZuEv3ILo1LuoXw=;
+        b=Hq6NY1FqprkJeqgo8/CSWtTRfTFZdPs40WFbzkE1jsOz/Av2vYeGzcE72XSwZE5RGi
+         Rn/JIBEQpZDeXJtYrN/5KDl5ExFJvkFvxx5//Jhs7h1qTXkv9XeQKAix48yx0g7em6UC
+         y2lz0MOjQWFykDjekTgCzPReYAReZYbC8wDITHGX++lCNDP9/IgcJi26aKrFSjKknkyi
+         Pbr0ooAtqQLp0jMQ0XuX/YSWZgcF1xO4E+D3XjJqiipr0CSnc4fhSTMRAo5saCoJMnrt
+         gV5P9JyRjmrumUdpXilPJR/dl7tG6DBzEMkwdgBykFWP9MTO/w3ME3URpyKPxTC5h6Vj
+         rVfg==
+X-Gm-Message-State: AOJu0YwlZugxgGdzOmPRhZHPpA8gKF9KMFL3+Yyfji2kvGFAbkfonw4E
+	pO2/Hc8d4ggAfxDJXn193MKxuB3O9BsT8Ni6Ms3v+PFC1JncS7MuTsDJD8A7oqjZO5mnH/p8HMH
+	8vLuL+raStg==
+X-Google-Smtp-Source: AGHT+IHJJBrEN5PSgmzBQDGuw2gM2QADo/cLEL1FoYTufWqGdcZA7cmvbVuKzoVb0hiyOk/938tNWCqLoi2lOQ==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:ac8:58c4:0:b0:42c:4572:ac1c with SMTP id
- u4-20020ac858c4000000b0042c4572ac1cmr6136qta.2.1707510913213; Fri, 09 Feb
- 2024 12:35:13 -0800 (PST)
-Date: Fri,  9 Feb 2024 20:34:26 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1547:b0:dbe:32b0:9250 with SMTP
+ id r7-20020a056902154700b00dbe32b09250mr9163ybu.0.1707510915181; Fri, 09 Feb
+ 2024 12:35:15 -0800 (PST)
+Date: Fri,  9 Feb 2024 20:34:27 +0000
 In-Reply-To: <20240209203428.307351-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240209203428.307351-1-edumazet@google.com>
 X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
-Message-ID: <20240209203428.307351-12-edumazet@google.com>
-Subject: [PATCH v3 net-next 11/13] net: remove dev_base_lock from do_setlink()
+Message-ID: <20240209203428.307351-13-edumazet@google.com>
+Subject: [PATCH v3 net-next 12/13] net: remove dev_base_lock from
+ register_netdevice() and friends.
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -82,30 +83,88 @@ Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-We hold RTNL here, and dev->link_mode readers already
-are using READ_ONCE().
+RTNL already protects writes to dev->reg_state, we no longer need to hold
+dev_base_lock to protect the readers.
+
+unlist_netdevice() second argument can be removed.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/core/rtnetlink.c | 2 --
- 1 file changed, 2 deletions(-)
+ net/core/dev.c | 20 +++++++-------------
+ 1 file changed, 7 insertions(+), 13 deletions(-)
 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 16634c6b1f2b9c0d818bb757c8428039c3f3320f..c2e3d8db8b013585dea62d8fbb0728a85ccac952 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -2979,11 +2979,9 @@ static int do_setlink(const struct sk_buff *skb,
- 	if (tb[IFLA_LINKMODE]) {
- 		unsigned char value = nla_get_u8(tb[IFLA_LINKMODE]);
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 0c158dd534f80c46e66c890628be9a876e85068a..a1cb7d3cab2c521fc28bd5f522c147bffca8d15e 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -412,7 +412,7 @@ static void list_netdevice(struct net_device *dev)
+ /* Device list removal
+  * caller must respect a RCU grace period before freeing/reusing dev
+  */
+-static void unlist_netdevice(struct net_device *dev, bool lock)
++static void unlist_netdevice(struct net_device *dev)
+ {
+ 	struct netdev_name_node *name_node;
+ 	struct net *net = dev_net(dev);
+@@ -425,13 +425,11 @@ static void unlist_netdevice(struct net_device *dev, bool lock)
+ 		netdev_name_node_del(name_node);
+ 
+ 	/* Unlink dev from the device chain */
+-	if (lock)
+-		write_lock(&dev_base_lock);
++	write_lock(&dev_base_lock);
+ 	list_del_rcu(&dev->dev_list);
+ 	netdev_name_node_del(dev->name_node);
+ 	hlist_del_rcu(&dev->index_hlist);
+-	if (lock)
+-		write_unlock(&dev_base_lock);
++	write_unlock(&dev_base_lock);
+ 
+ 	dev_base_seq_inc(dev_net(dev));
+ }
+@@ -10296,9 +10294,9 @@ int register_netdevice(struct net_device *dev)
+ 		goto err_ifindex_release;
+ 
+ 	ret = netdev_register_kobject(dev);
+-	write_lock(&dev_base_lock);
++
+ 	WRITE_ONCE(dev->reg_state, ret ? NETREG_UNREGISTERED : NETREG_REGISTERED);
+-	write_unlock(&dev_base_lock);
++
+ 	if (ret)
+ 		goto err_uninit_notify;
+ 
+@@ -10587,9 +10585,7 @@ void netdev_run_todo(void)
+ 			continue;
+ 		}
  
 -		write_lock(&dev_base_lock);
- 		if (dev->link_mode ^ value)
- 			status |= DO_SETLINK_NOTIFY;
- 		WRITE_ONCE(dev->link_mode, value);
+ 		WRITE_ONCE(dev->reg_state, NETREG_UNREGISTERED);
 -		write_unlock(&dev_base_lock);
+ 		linkwatch_sync_dev(dev);
  	}
  
- 	if (tb[IFLA_VFINFO_LIST]) {
+@@ -11096,10 +11092,8 @@ void unregister_netdevice_many_notify(struct list_head *head,
+ 
+ 	list_for_each_entry(dev, head, unreg_list) {
+ 		/* And unlink it from device chain. */
+-		write_lock(&dev_base_lock);
+-		unlist_netdevice(dev, false);
++		unlist_netdevice(dev);
+ 		WRITE_ONCE(dev->reg_state, NETREG_UNREGISTERING);
+-		write_unlock(&dev_base_lock);
+ 	}
+ 	flush_all_backlogs();
+ 
+@@ -11281,7 +11275,7 @@ int __dev_change_net_namespace(struct net_device *dev, struct net *net,
+ 	dev_close(dev);
+ 
+ 	/* And unlink it from device chain */
+-	unlist_netdevice(dev, true);
++	unlist_netdevice(dev);
+ 
+ 	synchronize_net();
+ 
 -- 
 2.43.0.687.g38aa6559b0-goog
 
