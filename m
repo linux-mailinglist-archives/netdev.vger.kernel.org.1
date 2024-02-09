@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-70640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45A4C84FDB2
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:36:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE7DC84FDB3
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:36:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABC18B2990A
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 20:36:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 200821C21430
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 20:36:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B089168AA;
-	Fri,  9 Feb 2024 20:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31E055681;
+	Fri,  9 Feb 2024 20:35:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ZMox9x5S"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MmogfbLM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C1D171D5
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 20:35:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AFF65677
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 20:35:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707510912; cv=none; b=n6Qvvk4+dsbxi6pmT3hXzcsPwSZsZ7BiR/3ZF8I+Ul5/rjZL8BbWnT2BzhajOulj0mPWK1Q7srxAWi8EA07JXpE+U7gMTXxNm9zxKOcc2xiLC6tBOIAh3YYrUpBeHsObmXQHBU6GahmmaOgU/M4dvJMPF6v/n2tS2g/mg9grnY8=
+	t=1707510914; cv=none; b=rNFz7Zt1ZZbcMIfRXUvUrsCISYjxxRsMD9fM16gEXaMdxqnM+c+7y8jWkeOuj4uGRLIDAZKs+PUT7NulbV50qbBsmpblxnCkyiYhtI/4vrvoMIj2J7rXNwI0PUSYmYfJIu1tqOierjxoOQ5icMyXaTp6ItX3l2pjgWUfvIk0KdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707510912; c=relaxed/simple;
-	bh=bkA6LpEyf4ynruGmcKu4Fn8AVdk38mhPKYfrv2KW6vA=;
+	s=arc-20240116; t=1707510914; c=relaxed/simple;
+	bh=y+q6hgQ6V9XXesoaFRFvTAQ8BHlhCzEQfIhCIgUACyk=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Nwntdkc9itj8DG/UgWE1A+6ot7bxkyowq9cT6MlNjnh4JXEbfJ7E8YsXE4kAWi+F422G/1j8p207o6eDlSla/yavertWwS2G7XRXSU2O1kBd9SRBkVl926AEHYHzMImJttpNgJk2/Kd9pKhyPa/AKcBl8PeDQBex/Z8E1KSbs84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ZMox9x5S; arc=none smtp.client-ip=209.85.222.202
+	 To:Cc:Content-Type; b=b/WqGUS7PmJmlRJ12qAg6wYp6RlhQDIKSnG6qAPXp0rNi2WgbFpY8/PaVEG1WQxS7rGf4jN809dJNj/2oW5mEc1S5FmN/e2lmZ/8aZ1mjPt5PTfrXVmbkOeOkzHowN1qG2dkl1zms8WAhduLr2Dy4eesTDbo7Ql4bwUeN8iK0FM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MmogfbLM; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-78346521232so172839785a.3
-        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 12:35:10 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc75a87e0e5so633310276.1
+        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 12:35:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707510909; x=1708115709; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1707510911; x=1708115711; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VYMUVb5DAWkrWMbDjui3feJfJ97QtmDCkRsv3LxWbBk=;
-        b=ZMox9x5SAGwuiSgKrYF2wnuWTLlBv/MXcaZN/HnVyZM+B+19a0skBix/+aqdUSMTHY
-         wlXMCeDWnwNcrm9VSWm4w8LFdioWhzbEGB9XDEwxp2can0HXNaTpuco5oAuMioiZ/xor
-         tAZWcy6rIucukw+PDcA1jIGIpEzWPWp5DY0j6mliNmfnLqDGyCn52rqUvD0HGcZYMVur
-         yb8h2Ea8k8+yIYMpiqv2idvszor4zwDzRyN1jn+wBiF+gkNQPPtGlMiNY83AlRcuB9Y7
-         gQTvYK39MFEqTarESa10tyL0bnWhNOd5P9WH4LVz8XH50p0JVBuSvyFWh10KBawUjsDy
-         n2SA==
+        bh=LqXV5Ysk4KM8pb1+jvbQ/UqklYv6x7+ly8qvh2CNGoo=;
+        b=MmogfbLMvUSwuTp9g9Kw6P0Q9f61/QOJKga3+RAmLZEg2r2RStgUOvWywcICiIFe8Z
+         eXUyDzfeAKpsIbmmEnLWaBxHirgjB/GIgUsyfda6OFCWsLvMmyZ8fW2f8PlN6RBbXGIy
+         4hN+uwSnCw8RdAilEodCtDtKagv7y3jlYFCk2kIumvlpGuJzeJt+UZwfi71UD+wRZ6sJ
+         +y6y+8+hhh7qG7tIpC1X9aCqdzuD5yEze0PHaCslyGDsyx6TpG/H89AzTwZxLlB5Dif5
+         D4qSj5ry/cZEvory83Navo6ZZtxRpNJxGisPxbk5car+uQc3oaDeWcFUJfVII79ILSRC
+         Kg3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707510909; x=1708115709;
+        d=1e100.net; s=20230601; t=1707510911; x=1708115711;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VYMUVb5DAWkrWMbDjui3feJfJ97QtmDCkRsv3LxWbBk=;
-        b=BeeXr8iz7uQl1iFbap2LAxMHWlWepfUg1WEKZppgMXs5OEBISfKzO2SZwKZqPhWqEJ
-         Aw5S/6L5KHii/QV0QsJly1YoS7V0emhoxsctPbktqSs/XkgyFf6wQYiCPBCFLKuB4lfo
-         D94OmyOLHBCvIwfBiXQX5rkvULisnORebvHMPfGds0GvHWlCbWCAnmtNITljLP52CAUs
-         kC27456yZlD6uok4LPvJICeI8xs6jBZJKS5cvlGWD1HEiaApY2wuGzKfgkZbFFyJq933
-         wlASfFceOaQCy6PcQ7c0fFasXgYLVgly87w36FaRVNgspfjT6WDC+0ujQ7EjFUZ5kOSe
-         1dkQ==
-X-Gm-Message-State: AOJu0YzWoOrhDJzLogilWZ575RbmdlcmGmJJ2dt0z/qUjzajkwfs/H7y
-	aOUFSOoD7Mewdx8/V5mgtnF96gv/hkUTfjSdxRmnQgntXcHcSmH5QxQ9D33pI+ueoJZ67Qu2Mc4
-	FzQ1hR6SHKw==
-X-Google-Smtp-Source: AGHT+IFgfzmEx1ExbjzMny7/b+5jiz404bTwOcywy7Rmt27gnliwdw+1zmIpzNxqRYihGr2ml7FCOLdkR8QFXA==
+        bh=LqXV5Ysk4KM8pb1+jvbQ/UqklYv6x7+ly8qvh2CNGoo=;
+        b=P13oSaizR8ykw87C8qw3iQzGB1K1n3EFYVMHVs7YyWRGln4fIrN/pBN63BCsG5qWB+
+         B6uyL1iAB6sdrxxUqbdu2K1En3uamKXVJFYPaJkGK7y/qMHRuASZpjVjcuuEHSETnaTg
+         sAt/iYfF5wet+OpuAc5O8d7Zuvksd48u3Rsne6dMtev70T/8GXBP1eOfM9/OMV7npYra
+         Qq0jjrY9W1ROK8xyodjjMawofmV9PzIe5vhNg8a/EMaVdKi6iGSupF4fuwLesnZ2405x
+         S2xoHTfVwtB9rtJl86XuDOyvlouEbpJCWlRphKtJTY3lyr46SBTWJRI4aru9EjPEruOr
+         Xxpg==
+X-Gm-Message-State: AOJu0Yx0O/JUFudLnUMgTSpEweYMs93zju8QpPZ6V3CpZT5LTKY1aP2H
+	dXQkvuZLzfs7bMF5p7tt+u2kPqp68LHusn/hghJSw06gFH3Qahmgp+9TjeUbJcgX3MMfOl4BNxD
+	ZpekwLM6wPg==
+X-Google-Smtp-Source: AGHT+IHawNbUO8wnO+hoJVpibrA1zQ2WMvrN1lBGt1NTpYqmd9PVZT8bllGFdUSDz2OH0cB5YhXvoSvP3Ap3SA==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:620a:6189:b0:785:ae7c:1530 with SMTP
- id or9-20020a05620a618900b00785ae7c1530mr647qkn.2.1707510909781; Fri, 09 Feb
- 2024 12:35:09 -0800 (PST)
-Date: Fri,  9 Feb 2024 20:34:24 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:dc6:b0:dc2:3426:c9ee with SMTP
+ id de6-20020a0569020dc600b00dc23426c9eemr5054ybb.11.1707510911619; Fri, 09
+ Feb 2024 12:35:11 -0800 (PST)
+Date: Fri,  9 Feb 2024 20:34:25 +0000
 In-Reply-To: <20240209203428.307351-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,9 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240209203428.307351-1-edumazet@google.com>
 X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
-Message-ID: <20240209203428.307351-10-edumazet@google.com>
-Subject: [PATCH v3 net-next 09/13] net: remove stale mentions of dev_base_lock
- in comments
+Message-ID: <20240209203428.307351-11-edumazet@google.com>
+Subject: [PATCH v3 net-next 10/13] net: add netdev_set_operstate() helper
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,107 +82,170 @@ Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Change comments incorrectly mentioning dev_base_lock.
+dev_base_lock is going away, add netdev_set_operstate() helper
+so that hsr does not have to know core internals.
+
+Remove dev_base_lock acquisition from rfc2863_policy()
+
+v3: use an "unsigned int" for dev->operstate,
+    so that try_cmpxchg() can work on all arches.
+        ( https://lore.kernel.org/oe-kbuild-all/202402081918.OLyGaea3-lkp@intel.com/ )
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- Documentation/networking/netdevices.rst     | 4 ++--
- drivers/net/ethernet/cisco/enic/enic_main.c | 2 +-
- drivers/net/ethernet/nvidia/forcedeth.c     | 4 ++--
- drivers/net/ethernet/sfc/efx_common.c       | 2 +-
- drivers/net/ethernet/sfc/falcon/efx.c       | 2 +-
- drivers/net/ethernet/sfc/siena/efx_common.c | 2 +-
- 6 files changed, 8 insertions(+), 8 deletions(-)
+ include/linux/netdevice.h |  2 +-
+ include/linux/rtnetlink.h |  2 ++
+ net/core/link_watch.c     |  9 ++-------
+ net/core/rtnetlink.c      | 22 +++++++++++++++-------
+ net/hsr/hsr_device.c      | 22 ++++++----------------
+ 5 files changed, 26 insertions(+), 31 deletions(-)
 
-diff --git a/Documentation/networking/netdevices.rst b/Documentation/networking/netdevices.rst
-index 9e4cccb90b8700aea49bb586ca0da79f2fe185b9..c2476917a6c37d9b87e8b5d59f2e00fa0a30e26a 100644
---- a/Documentation/networking/netdevices.rst
-+++ b/Documentation/networking/netdevices.rst
-@@ -252,8 +252,8 @@ ndo_eth_ioctl:
- 	Context: process
+diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+index 28569f195a449700b6403006f70257b8194b516a..d4d1e438ab8f1d2bd6426837b504ad6891fe83b7 100644
+--- a/include/linux/netdevice.h
++++ b/include/linux/netdevice.h
+@@ -2258,7 +2258,7 @@ struct net_device {
+ 	const struct tlsdev_ops *tlsdev_ops;
+ #endif
  
- ndo_get_stats:
--	Synchronization: rtnl_lock() semaphore, dev_base_lock rwlock, or RCU.
--	Context: atomic (can't sleep under rwlock or RCU)
-+	Synchronization: rtnl_lock() semaphore, or RCU.
-+	Context: atomic (can't sleep under RCU)
+-	unsigned char		operstate;
++	unsigned int		operstate;
+ 	unsigned char		link_mode;
  
- ndo_start_xmit:
- 	Synchronization: __netif_tx_lock spinlock.
-diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
-index 37bd38d772e80967e50342f8b87dfa331192c5a0..d266a87297a5e3a5281acda9243a024fc2f7d742 100644
---- a/drivers/net/ethernet/cisco/enic/enic_main.c
-+++ b/drivers/net/ethernet/cisco/enic/enic_main.c
-@@ -872,7 +872,7 @@ static netdev_tx_t enic_hard_start_xmit(struct sk_buff *skb,
- 	return NETDEV_TX_OK;
+ 	unsigned char		if_port;
+diff --git a/include/linux/rtnetlink.h b/include/linux/rtnetlink.h
+index 21780608cf47ca0687dbaaf0d07b561e8631412c..cdfc897f1e3c683940a0958bc8a790c07ae819b0 100644
+--- a/include/linux/rtnetlink.h
++++ b/include/linux/rtnetlink.h
+@@ -172,4 +172,6 @@ rtnl_notify_needed(const struct net *net, u16 nlflags, u32 group)
+ 	return (nlflags & NLM_F_ECHO) || rtnl_has_listeners(net, group);
  }
  
--/* dev_base_lock rwlock held, nominally process context */
-+/* rcu_read_lock potentially held, nominally process context */
- static void enic_get_stats(struct net_device *netdev,
- 			   struct rtnl_link_stats64 *net_stats)
- {
-diff --git a/drivers/net/ethernet/nvidia/forcedeth.c b/drivers/net/ethernet/nvidia/forcedeth.c
-index 7a549b834e970a5ac40330513e3220466d78acef..31f896c4aa266032cbabdd3c0086eae5969d203a 100644
---- a/drivers/net/ethernet/nvidia/forcedeth.c
-+++ b/drivers/net/ethernet/nvidia/forcedeth.c
-@@ -1761,7 +1761,7 @@ static void nv_get_stats(int cpu, struct fe_priv *np,
- /*
-  * nv_get_stats64: dev->ndo_get_stats64 function
-  * Get latest stats value from the nic.
-- * Called with read_lock(&dev_base_lock) held for read -
-+ * Called with rcu_read_lock() held -
-  * only synchronized against unregister_netdevice.
-  */
- static void
-@@ -3090,7 +3090,7 @@ static void set_bufsize(struct net_device *dev)
++void netdev_set_operstate(struct net_device *dev, int newstate);
++
+ #endif	/* __LINUX_RTNETLINK_H */
+diff --git a/net/core/link_watch.c b/net/core/link_watch.c
+index 1b93e054c9a3cfcdd5d1251a9982d88a071abbaa..8ec35194bfcb8574f53a9fd28f0cb2ebfe9a3f2e 100644
+--- a/net/core/link_watch.c
++++ b/net/core/link_watch.c
+@@ -33,7 +33,7 @@ static DECLARE_DELAYED_WORK(linkwatch_work, linkwatch_event);
+ static LIST_HEAD(lweventlist);
+ static DEFINE_SPINLOCK(lweventlist_lock);
  
- /*
-  * nv_change_mtu: dev->change_mtu function
-- * Called with dev_base_lock held for read.
-+ * Called with RTNL held for read.
-  */
- static int nv_change_mtu(struct net_device *dev, int new_mtu)
+-static unsigned char default_operstate(const struct net_device *dev)
++static unsigned int default_operstate(const struct net_device *dev)
  {
-diff --git a/drivers/net/ethernet/sfc/efx_common.c b/drivers/net/ethernet/sfc/efx_common.c
-index 175bd9cdfdac3ac8183e52f2e76b99839b9c2ed7..551f890db90a609319dca95af9b464bddb252121 100644
---- a/drivers/net/ethernet/sfc/efx_common.c
-+++ b/drivers/net/ethernet/sfc/efx_common.c
-@@ -595,7 +595,7 @@ void efx_stop_all(struct efx_nic *efx)
- 	efx_stop_datapath(efx);
+ 	if (netif_testing(dev))
+ 		return IF_OPER_TESTING;
+@@ -62,16 +62,13 @@ static unsigned char default_operstate(const struct net_device *dev)
+ 	return IF_OPER_UP;
  }
  
--/* Context: process, dev_base_lock or RTNL held, non-blocking. */
-+/* Context: process, rcu_read_lock or RTNL held, non-blocking. */
- void efx_net_stats(struct net_device *net_dev, struct rtnl_link_stats64 *stats)
+-
+ static void rfc2863_policy(struct net_device *dev)
  {
- 	struct efx_nic *efx = efx_netdev_priv(net_dev);
-diff --git a/drivers/net/ethernet/sfc/falcon/efx.c b/drivers/net/ethernet/sfc/falcon/efx.c
-index e001f27085c6614374a0e5e1493b215d6c55e9db..1cb32aedd89c7393c7881efb11963cf334bca3ae 100644
---- a/drivers/net/ethernet/sfc/falcon/efx.c
-+++ b/drivers/net/ethernet/sfc/falcon/efx.c
-@@ -2085,7 +2085,7 @@ int ef4_net_stop(struct net_device *net_dev)
- 	return 0;
+-	unsigned char operstate = default_operstate(dev);
++	unsigned int operstate = default_operstate(dev);
+ 
+ 	if (operstate == READ_ONCE(dev->operstate))
+ 		return;
+ 
+-	write_lock(&dev_base_lock);
+-
+ 	switch(dev->link_mode) {
+ 	case IF_LINK_MODE_TESTING:
+ 		if (operstate == IF_OPER_UP)
+@@ -88,8 +85,6 @@ static void rfc2863_policy(struct net_device *dev)
+ 	}
+ 
+ 	WRITE_ONCE(dev->operstate, operstate);
+-
+-	write_unlock(&dev_base_lock);
  }
  
--/* Context: process, dev_base_lock or RTNL held, non-blocking. */
-+/* Context: process, rcu_read_lock or RTNL held, non-blocking. */
- static void ef4_net_stats(struct net_device *net_dev,
- 			  struct rtnl_link_stats64 *stats)
+ 
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 4e797326c88fe1e23ca66e82103176767fe5c32e..16634c6b1f2b9c0d818bb757c8428039c3f3320f 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -842,9 +842,22 @@ int rtnl_put_cacheinfo(struct sk_buff *skb, struct dst_entry *dst, u32 id,
+ }
+ EXPORT_SYMBOL_GPL(rtnl_put_cacheinfo);
+ 
++void netdev_set_operstate(struct net_device *dev, int newstate)
++{
++	unsigned int old = READ_ONCE(dev->operstate);
++
++	do {
++		if (old == newstate)
++			return;
++	} while (!try_cmpxchg(&dev->operstate, &old, newstate));
++
++	netdev_state_change(dev);
++}
++EXPORT_SYMBOL(netdev_set_operstate);
++
+ static void set_operstate(struct net_device *dev, unsigned char transition)
  {
-diff --git a/drivers/net/ethernet/sfc/siena/efx_common.c b/drivers/net/ethernet/sfc/siena/efx_common.c
-index e4b294b8e9acb15f68b6597047d493add699196f..88e5bc347a44cea66e36dcc6afe10ef10c1383fa 100644
---- a/drivers/net/ethernet/sfc/siena/efx_common.c
-+++ b/drivers/net/ethernet/sfc/siena/efx_common.c
-@@ -605,7 +605,7 @@ static size_t efx_siena_update_stats_atomic(struct efx_nic *efx, u64 *full_stats
- 	return efx->type->update_stats(efx, full_stats, core_stats);
+-	unsigned char operstate = dev->operstate;
++	unsigned char operstate = READ_ONCE(dev->operstate);
+ 
+ 	switch (transition) {
+ 	case IF_OPER_UP:
+@@ -866,12 +879,7 @@ static void set_operstate(struct net_device *dev, unsigned char transition)
+ 		break;
+ 	}
+ 
+-	if (READ_ONCE(dev->operstate) != operstate) {
+-		write_lock(&dev_base_lock);
+-		WRITE_ONCE(dev->operstate, operstate);
+-		write_unlock(&dev_base_lock);
+-		netdev_state_change(dev);
+-	}
++	netdev_set_operstate(dev, operstate);
  }
  
--/* Context: process, dev_base_lock or RTNL held, non-blocking. */
-+/* Context: process, rcu_read_lock or RTNL held, non-blocking. */
- void efx_siena_net_stats(struct net_device *net_dev,
- 			 struct rtnl_link_stats64 *stats)
+ static unsigned int rtnl_dev_get_flags(const struct net_device *dev)
+diff --git a/net/hsr/hsr_device.c b/net/hsr/hsr_device.c
+index be0e43f46556e028e675147e63c6b787aa72e894..5ef6d437db727e60bfd8cf68f010f0151d0db98b 100644
+--- a/net/hsr/hsr_device.c
++++ b/net/hsr/hsr_device.c
+@@ -28,29 +28,19 @@ static bool is_slave_up(struct net_device *dev)
+ 	return dev && is_admin_up(dev) && netif_oper_up(dev);
+ }
+ 
+-static void __hsr_set_operstate(struct net_device *dev, int transition)
+-{
+-	write_lock(&dev_base_lock);
+-	if (READ_ONCE(dev->operstate) != transition) {
+-		WRITE_ONCE(dev->operstate, transition);
+-		write_unlock(&dev_base_lock);
+-		netdev_state_change(dev);
+-	} else {
+-		write_unlock(&dev_base_lock);
+-	}
+-}
+-
+ static void hsr_set_operstate(struct hsr_port *master, bool has_carrier)
  {
+-	if (!is_admin_up(master->dev)) {
+-		__hsr_set_operstate(master->dev, IF_OPER_DOWN);
++	struct net_device *dev = master->dev;
++
++	if (!is_admin_up(dev)) {
++		netdev_set_operstate(dev, IF_OPER_DOWN);
+ 		return;
+ 	}
+ 
+ 	if (has_carrier)
+-		__hsr_set_operstate(master->dev, IF_OPER_UP);
++		netdev_set_operstate(dev, IF_OPER_UP);
+ 	else
+-		__hsr_set_operstate(master->dev, IF_OPER_LOWERLAYERDOWN);
++		netdev_set_operstate(dev, IF_OPER_LOWERLAYERDOWN);
+ }
+ 
+ static bool hsr_check_carrier(struct hsr_port *master)
 -- 
 2.43.0.687.g38aa6559b0-goog
 
