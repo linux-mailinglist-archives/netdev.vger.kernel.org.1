@@ -1,153 +1,145 @@
-Return-Path: <netdev+bounces-70547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7B9984F7E4
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 15:50:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A371E84F7E8
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 15:51:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72EF5283C34
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 14:50:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C78321C24027
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 14:51:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 845656A037;
-	Fri,  9 Feb 2024 14:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC976A00B;
+	Fri,  9 Feb 2024 14:51:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Xba1DbnX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TE7JMC1u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98F1037145;
-	Fri,  9 Feb 2024 14:50:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B769B4D112
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 14:51:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707490202; cv=none; b=LHnWLG0r7aciOsNDoNY2M7GP07jyAomzz7VPke2WRAKSerE9Fi11RJ3HHcZdtMSFpE+y/ImwdGquFXIk3s84/fZs5fqZPfDugYvj2n2PeVpRFKJM0ZeVMvlDI6PTGwepj5FwmgjQEY4uTRbMetl0lnOBc1xGlvzF9hl34Yme4JA=
+	t=1707490302; cv=none; b=ohkAIgn1Y+xKKhOYpxeu/Vc8Ar/cI/R/jfXWWqDKU9Je/KxAT0q119CkzfTmvN54zmxaxDth8R6qH6xBf75Vx1de5Slg+/NRfEvc6USMEdTCZz6ABff9/Q6nIe02TpArgn6Gg4/QCrdqeI5NCfJkqU+pNqBh2QNYgOq3mC9t4Mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707490202; c=relaxed/simple;
-	bh=BKZ2mtO8cS0Ik5dmaQV6ifo7dNShLGEHdT1wapWSz8M=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YlGOSgQt5h56j4DoVSPScfLQw7vplYpkaF8NLVi5tIyeuk3HZ7FBY3Q1/DOIII7kGgD9dVyUnbvvTJ3Pl/KFi40732xANnUFmJhElQfVp6Zpxu6zIxTCGQWJjSYJpzhJsYNXZRkly5y0Ncahtj2xImjfzNrAI6EZXNvqpVpAnQM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Xba1DbnX; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707490201; x=1739026201;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=BKZ2mtO8cS0Ik5dmaQV6ifo7dNShLGEHdT1wapWSz8M=;
-  b=Xba1DbnXMnOwY7vxa+JxDvLFth77t3bFqcpyZcXR9znBRGEKkx9OTjrV
-   3Ubof3meJc3b37drBKBT0MMVuiPK5v5Q+WaVK1PS5gDGJNeU+PqGkC2mT
-   3sebE3uHJsSh7cIQbhSgb7+90/XAlPcOyfhQxEEDRkKmADRulK9pdp30i
-   9StDVcXuZOw/TIuLS8I85qS2dJlOnq/n5imAcMWI7fdbEDb/5qCxVjyUy
-   4pt7UM1ni2xiL/OlHOHpsF8Jxa6SaF9i0vHSipVb09hgK9Ze7OLXyE6L+
-   4mZfo4Vs7+bi8N4rhPLDRcJuGKw0p8OvbO0oLUWuh3ERt/XKHkVGMe9cB
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10979"; a="12810651"
-X-IronPort-AV: E=Sophos;i="6.05,257,1701158400"; 
-   d="scan'208";a="12810651"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2024 06:50:00 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10979"; a="825157463"
-X-IronPort-AV: E=Sophos;i="6.05,257,1701158400"; 
-   d="scan'208";a="825157463"
-Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.43.96])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2024 06:49:53 -0800
-Date: Fri, 9 Feb 2024 15:49:51 +0100
-From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
-To: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-Cc: Linux PM <linux-pm@vger.kernel.org>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Lukasz Luba <lukasz.luba@arm.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-	Zhang Rui <rui.zhang@intel.com>, netdev@vger.kernel.org,
-	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	linux-wireless@vger.kernel.org, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>
-Subject: Re: [PATCH v1 6/9] iwlwifi: mvm: Set THERMAL_TRIP_WRITABLE_TEMP
- directly
-Message-ID: <ZcY7jyyFJq1yfOCj@linux.intel.com>
-References: <3232442.5fSG56mABF@kreacher>
- <3757041.MHq7AAxBmi@kreacher>
+	s=arc-20240116; t=1707490302; c=relaxed/simple;
+	bh=jOeCwyPswZHY5R6F2dlSuqjnfqYjAL+/Y8Ahs1V2ei0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=cesZnKUb6lgNKPltkVg6Rhu7FPp/ENdmrMC2RjieHCbS3yyat4XmVv5O3TnV6DzYda2TjndJ+kribBHR6gRUTzXw2OZbg4p0svRnBmgW6XvQh8ro4uYfzNrHP3pArkYPbQgKR6MCmB6aBu8zMK5lYIwLn/DrtXTwHJP3SxX2mR0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TE7JMC1u; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707490299;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=aSFq6OQR7rXjF8YgbnTHTb9jTuycNmtR+05B/t3D3Mg=;
+	b=TE7JMC1uS/Pr9vrDdhNSXluzWBxeFZGJVZddnCLL7fZKS3fCSpo0d3v0rkpvV3pr8g0CfS
+	3FRTungjgCzBlWaspHY9O9YvoNLnOGDquO3bcrBAULoJ6IbcbIPlXHvMg5GXPrB95sXJwj
+	erN1OzDos2HYiV4/jITPi3VqQ6xZ8l4=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-434-hlxrhK5kNDCC0xYwbKa79Q-1; Fri, 09 Feb 2024 09:51:38 -0500
+X-MC-Unique: hlxrhK5kNDCC0xYwbKa79Q-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4103bb38a68so1269375e9.1
+        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 06:51:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707490296; x=1708095096;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aSFq6OQR7rXjF8YgbnTHTb9jTuycNmtR+05B/t3D3Mg=;
+        b=H3tFSP8Zsa2TXLPKlIv1JpgbC56sq3kvwOMq4aE8gvyrbj5OK8C+Rea9QYwwkn6uBE
+         vB9Zj1lMQPPbLkkZC2QtIgjIlZ0zTTX7oZuHYvXG6pQkfMvTSFcXQwEH9hxPhc8WM0qR
+         /MwWSHU2buVl/xQrLWNPUn7VbV6RQxOWSzjBJys0vByKQIg2RleGB98zG7cnk9chxta2
+         hYyWBne99eg9F0HYuJINKv4w6HUpgt6c37S0v6smLFSDNgGu1ng0zh4iQ8eAjwz5zdgH
+         h7DkECBSHUVs4UyBR/XNwypYg8/Q7CHit08X00srRJIFEJmYeHTjD3SCCC3fm5Wv97z6
+         Scgw==
+X-Gm-Message-State: AOJu0Yy4bg9u4gdVEGd+j2QAwN5bf2SRuK3xiVh+opS868q9OZuD3wyF
+	Cbhva+HXfPB6tzXtlnyRaA1HRFHtI8cF7gwJLupcpUNORH0vT6Qgh7eWMY+fgDpxpi1UivKHPTq
+	AnywkhJHEnFkjmfspAx4p6Vt/xCo0SQ53t0y2vvnhmYm93R+t4BbJ/83blzJMMr1UeJfBrxYgft
+	DW1sO2QqmE+x/9LeIlKwfc+qCab0od3ROEcBM=
+X-Received: by 2002:a05:6000:1709:b0:33b:6499:db96 with SMTP id n9-20020a056000170900b0033b6499db96mr1433249wrc.7.1707490296719;
+        Fri, 09 Feb 2024 06:51:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEY0emP7YCrTpNPE57bNJbsJ47uctKmUHkuoSW2x9+Jl/n5DO8nb08a9y3JLZtapUVkr09nTg==
+X-Received: by 2002:a05:6000:1709:b0:33b:6499:db96 with SMTP id n9-20020a056000170900b0033b6499db96mr1433231wrc.7.1707490296260;
+        Fri, 09 Feb 2024 06:51:36 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXZiVpy/SXU4w44G64F+lIvctmRI0HBopZgiPM+JaBu2yXOug/a1F2JxsL6QQT43Tafa82Fzavjkcce3NNrVfU8IfjQqUWoewGAg6CX+iA6ewzlsGIf+8Ioawbeqx6ZdxT2STzhbpX/9oWRSmlMau2QRNUpyNtai6vz+Htpstvuo53tDS8amL/+g9D7dEofs5XadpxK5Dv3hwjt/exNCXH420ox2ZAv3x6nW6YN3a2n8OPA9JRg
+Received: from gerbillo.redhat.com (146-241-228-88.dyn.eolo.it. [146.241.228.88])
+        by smtp.gmail.com with ESMTPSA id bk27-20020a0560001d9b00b0033b55661f32sm2078215wrb.9.2024.02.09.06.51.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Feb 2024 06:51:35 -0800 (PST)
+Message-ID: <5b768c89eb2992c22ca7016de9f90ff7d4eecd5f.camel@redhat.com>
+Subject: Re: [PATCH net] selftests: net: wait for receiver startup in
+ so_txtime.sh
+From: Paolo Abeni <pabeni@redhat.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Shuah Khan
+ <shuah@kernel.org>, Willem de Bruijn <willemb@google.com>, Vinicius Costa
+ Gomes <vinicius.gomes@intel.com>,  linux-kselftest@vger.kernel.org
+Date: Fri, 09 Feb 2024 15:51:34 +0100
+In-Reply-To: <53a7e56424756ef35434bc15a90b256bcf724651.1707407012.git.pabeni@redhat.com>
+References: 
+	<53a7e56424756ef35434bc15a90b256bcf724651.1707407012.git.pabeni@redhat.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3757041.MHq7AAxBmi@kreacher>
 
-On Fri, Feb 09, 2024 at 03:10:24PM +0100, Rafael J. Wysocki wrote:
-> From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> 
-> It is now possible to flag trip points with THERMAL_TRIP_WRITABLE_TEMP
-> to allow their temperature to be set from user space via sysfs instead
-> of using a nonzero writable trips mask during thermal zone registration,
-> so make the iwlwifi code do that.
-> 
-> No intentional functional impact.
-> 
-> Note that this change is requisite for dropping the mask argument from
-> thermal_zone_device_register_with_trips() going forward.
-> 
-> Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+On Thu, 2024-02-08 at 16:45 +0100, Paolo Abeni wrote:
+> The mentioned test is failing in slow environments:
+>=20
+>   # SO_TXTIME ipv4 clock monotonic
+>   # ./so_txtime: recv: timeout: Resource temporarily unavailable
+>   not ok 1 selftests: net: so_txtime.sh # exit=3D1
+>=20
+> The receiver is started in background and the sender could end-up
+> transmitting the packet before the receiver is ready, so that the
+> later recv times out.
+>=20
+> Address the issue explcitly waiting for the socket being bound to
+> the relevant port.
+>=20
+> Fixes: af5136f95045 ("selftests/net: SO_TXTIME with ETF and FQ")
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 > ---
-> 
-> This patch obviously depends on
-> 
-> https://patchwork.kernel.org/project/linux-pm/patch/8346768.T7Z3S40VBb@kreacher/
-> 
-> which has been queued up for 6.9 already.
-> 
-> ---
->  drivers/net/wireless/intel/iwlwifi/mvm/tt.c |    6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> Index: linux-pm/drivers/net/wireless/intel/iwlwifi/mvm/tt.c
-> ===================================================================
-> --- linux-pm.orig/drivers/net/wireless/intel/iwlwifi/mvm/tt.c
-> +++ linux-pm/drivers/net/wireless/intel/iwlwifi/mvm/tt.c
-> @@ -667,9 +667,6 @@ static  struct thermal_zone_device_ops t
->  	.set_trip_temp = iwl_mvm_tzone_set_trip_temp,
->  };
->  
-> -/* make all trips writable */
-> -#define IWL_WRITABLE_TRIPS_MSK (BIT(IWL_MAX_DTS_TRIPS) - 1)
-> -
->  static void iwl_mvm_thermal_zone_register(struct iwl_mvm *mvm)
->  {
->  	int i, ret;
-> @@ -692,11 +689,12 @@ static void iwl_mvm_thermal_zone_registe
->  	for (i = 0 ; i < IWL_MAX_DTS_TRIPS; i++) {
->  		mvm->tz_device.trips[i].temperature = THERMAL_TEMP_INVALID;
->  		mvm->tz_device.trips[i].type = THERMAL_TRIP_PASSIVE;
-> +		mvm->tz_device.trips[i].type = THERMAL_TRIP_WRITABLE_TEMP;
+> Note that to really cope with slow env the mentioned self-tests also
+> need net-next commit c41dfb0dfbec ("selftests/net: ignore timing
+> errors in so_txtime if KSFT_MACHINE_SLOW"), so this could be applied to
+> net-next, too
 
-		mvm->tz_device.trips[i].flags = THERMAL_TRIP_WRITABLE_TEMP;
+Oops... CI is saying the above is not enough...
 
-Consider using diffrent prefix for constants to diffrenciate flags and types.
+> @@ -65,6 +70,7 @@ do_test() {
+> =20
+>  	local readonly START=3D"$(date +%s%N --date=3D"+ 0.1 seconds")"
+>  	ip netns exec "${NS2}" "${BIN}" -"${IP}" -c "${CLOCK}" -t "${START}" -S=
+ "${SADDR}" -D "${DADDR}" "${RXARGS}" -r &
+> +	wait_local_port_listen "${NS2}" 8000 "${PROTO}"
+>  	ip netns exec "${NS1}" "${BIN}" -"${IP}" -c "${CLOCK}" -t "${START}" -S=
+ "${SADDR}" -D "${DADDR}" "${TXARGS}"
 
-Regards
-Stanislaw
+The binary explicitly waits up to $START time, and that conflicts with
+the wait_local_port_listen, something different is needed. Apparently I
+was just "lucky" during my local testing.
 
->  	}
->  	mvm->tz_device.tzone = thermal_zone_device_register_with_trips(name,
->  							mvm->tz_device.trips,
->  							IWL_MAX_DTS_TRIPS,
-> -							IWL_WRITABLE_TRIPS_MSK,
-> +							0,
->  							mvm, &tzone_ops,
->  							NULL, 0, 0);
->  	if (IS_ERR(mvm->tz_device.tzone)) {
-> 
-> 
-> 
+Cheers,
+
+Paolo
+
 
