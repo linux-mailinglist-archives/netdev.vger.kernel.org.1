@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-70425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8519884EF45
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 04:12:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14C1984EF47
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 04:12:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B78FF1C262F1
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 03:12:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD4441F29955
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 03:12:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AC3210785;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5951A125CB;
 	Fri,  9 Feb 2024 03:11:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hLB6RbP4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q4RyDntX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE5D4C8B;
-	Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0108F4C90
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707448269; cv=none; b=nUEZYqfBbcEh20KQetjJDiCNP2XPzl1lvmfYebDSfqAy2vFYOulYdCF48HmDo7vxGKdO72E3BEfmpN8R7djz4Sd0TWjINjVv/vAqZ1P+Q65PXsVi5ZLpp4n7TTHMuWuoEan63zyLiy1UhB5Eixj31NrpjOYmkiqGKNQqkLzA3FM=
+	t=1707448269; cv=none; b=Nl9hvLImIpEblpOMnkoJYLDG69s0HHJelQk5NiyEXsu0GYkyEuvguydf5S5xkhe6CPHf6xBLTCS2CQD/ouuG28BXYJcNWoUxrYtaOpcelBU4U/r71DE/jUYfMS4/fjJDb+vuyCeEa8geZve6wMBrsrtbG5Qgr3T2F3P4F5RRf3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707448269; c=relaxed/simple;
-	bh=IGK3/aKzRGBu17JJaI5GYQZ9QiBJsZ88T2WUDQD9Fds=;
+	bh=DhMWyrnwsxAvJtpSs9jMCf8u/GIkhgKmjB4L2I4MNPI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Tvk5rn3HYl+XEX9Wd8PkvXam0u7Aad0WXZsv71BndRnyji/9/2HD8CHCKRV+NYh+hU7Lx1DpvicWz6jHxJxNMAENbcph7v6cEf3cNP6SB0RM3TCkQdRJL90xLEyGFG1WIT6aVeJ6STQGyToEA1XctiLtysYBYKfu2HDFHk5I9bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hLB6RbP4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6CAD1C43609;
+	 In-Reply-To:To:Cc; b=JySbYPEwZj/r6W4AnhILACkoOD0xFn7vBOXHb46ZDHCpJ+mnLn71jLZK+0jayviuWNh6PRb4ldSPXWUp/dMuao2NN4VxiorhyVWj9O1TGxP3+1uOuxm051lSYw5bwiBCkDFe0AdaUCCnS4lAzYrVeBBYRYV1bab7cfAvupOwrpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q4RyDntX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7A095C4166A;
 	Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707448268;
-	bh=IGK3/aKzRGBu17JJaI5GYQZ9QiBJsZ88T2WUDQD9Fds=;
+	bh=DhMWyrnwsxAvJtpSs9jMCf8u/GIkhgKmjB4L2I4MNPI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hLB6RbP4cH7XnuC71eMQjZGzbd+UPyk2J/WCudxfz2iO+KA/vBWszqak4FcwqmVzQ
-	 6P0ILzyKtbqSSrDY7rrxUjQIG5zuG/C++DnWpBNYP6HLN9H7pgtM4VHcbEtKtgNYBo
-	 vf1bdBQfiRQs7LvIbA0fJw1hUW0W6f0xJSsC5QT6mBibKclD8gMEEu8CdvHrwSvf7N
-	 O3svXSWhdA8R6RU9Y1TVipq8xXZUQUD5hCD4fK6ITwA2SRHQdnS0K89PI/djP/8siR
-	 ayX+4FWMSqLLohmQEn3tCWk/CUMGwVmQNz3WBLLKpcl4kBKn6FtGi1d07IGBfB5BTk
-	 jUkZrRYKWp5fQ==
+	b=q4RyDntXmPkhnB8LdqbtPgnixc7TqRGpesA0flqn/P4fU1BP7SKR7sRU99MccOkth
+	 bWukwN43XpbI69f4x9vkRXMzkzjClaDfVrht9pQBonoHtK3hymnxbjDJLltlfDoLiT
+	 hl6+CFgOzvHC0WyRJVYMuK1slF2Zvi2rVoQxlbK5EXJiC23R4UiWxqeV++U6zidjpb
+	 MR1+nuzC25G4+EyjsQ38iL2g37cNek+iGsYRnA6BmNPkQrZZK7bF5iIQom1heodh7c
+	 0rOtdxP+Ah6rZ5SESSuEAAKJ/HldtqTO31Zvw3VSIAjnDQn1JhS5dRezz08GGjEimU
+	 +nrKHgheex3Jw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 570A3D8C96B;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5F910C395F1;
 	Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,41 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net/sun3_82586: Avoid reading past buffer in debug output
+Subject: Re: [PATCH net-next 1/2] net: dsa: remove "inline" from
+ dsa_user_netpoll_send_skb()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170744826835.23533.602886165980090200.git-patchwork-notify@kernel.org>
+ <170744826838.23533.10102337486281499654.git-patchwork-notify@kernel.org>
 Date: Fri, 09 Feb 2024 03:11:08 +0000
-References: <20240206161651.work.876-kees@kernel.org>
-In-Reply-To: <20240206161651.work.876-kees@kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: sammy@sammy.net, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, gustavoars@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-hardening@vger.kernel.org
+References: <20240206112927.4134375-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20240206112927.4134375-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, andrew@lunn.ch, f.fainelli@gmail.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  6 Feb 2024 08:16:54 -0800 you wrote:
-> Since NUM_XMIT_BUFFS is always 1, building m68k with sun3_defconfig and
-> -Warraybounds, this build warning is visible[1]:
+On Tue,  6 Feb 2024 13:29:26 +0200 you wrote:
+> The convention is to not use "inline" functions in C files, and let the
+> compiler decide whether to inline or not.
 > 
-> drivers/net/ethernet/i825xx/sun3_82586.c: In function 'sun3_82586_timeout':
-> drivers/net/ethernet/i825xx/sun3_82586.c:990:122: warning: array subscript 1 is above array bounds of 'volatile struct transmit_cmd_struct *[1]' [-Warray-bounds=]
->   990 |                 printk("%s: command-stats: %04x %04x\n",dev->name,swab16(p->xmit_cmds[0]->cmd_status),swab16(p->xmit_cmds[1]->cmd_status));
->       |                                                                                                               ~~~~~~~~~~~~^~~
-> ...
-> drivers/net/ethernet/i825xx/sun3_82586.c:156:46: note: while referencing 'xmit_cmds'
->   156 |         volatile struct transmit_cmd_struct *xmit_cmds[NUM_XMIT_BUFFS];
-> 
-> [...]
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+>  net/dsa/user.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 
 Here is the summary with links:
-  - net/sun3_82586: Avoid reading past buffer in debug output
-    https://git.kernel.org/netdev/net-next/c/4bea747f3fbe
+  - [net-next,1/2] net: dsa: remove "inline" from dsa_user_netpoll_send_skb()
+    https://git.kernel.org/netdev/net-next/c/83acbb9d0716
+  - [net-next,2/2] net: dsa: tag_sja1105: remove "inline" keyword
+    https://git.kernel.org/netdev/net-next/c/36f75f74dc07
 
 You are awesome, thank you!
 -- 
