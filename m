@@ -1,72 +1,50 @@
-Return-Path: <netdev+bounces-70417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7479D84EF14
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 03:54:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C13A84EF35
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 04:10:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7ADF1F23F3D
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 02:54:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB7D01F262E8
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 03:10:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F1CF5663;
-	Fri,  9 Feb 2024 02:54:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E260B2103;
+	Fri,  9 Feb 2024 03:10:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="DP0zh/P+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BVr6/dX6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5663A4C6D
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 02:54:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B104A33;
+	Fri,  9 Feb 2024 03:10:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707447272; cv=none; b=JDMcVLn/0maJz1g78nHOzTCqvVjJxwNs25iftusE40bruVHcQ+u0uhi1W38c739uSCEXsQxa8OWfY+Z2sg4ClkutrXq5f8mkRn/nurZzbGoMvoE1ersvVzhcx4oMBah/6t6lK/wj21HEa8on9RPidoTKolI625XEFMaO0faiWq0=
+	t=1707448226; cv=none; b=Vdt4ymgBnOsLIqfU92NWTuySlYJsE6+bYsclJbHSO/VuWfnEigXEV7ycJKp4K09BVblFC4PtDy+ZBGWNkb9Q8NwV58M7ehYOz2MNyq154J16zdnC5e8082bBDo75tsa+6rhA3SvmZiu1SVegd+UMxpJ64qoyS2sPaLeIMad0yUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707447272; c=relaxed/simple;
-	bh=V0NcreXRY6lDZJO3dzBb7IhCogdnEXC5gaAngR14STw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TuNd2j2D2RXmyTcuvPw3b70w2KvNB3wtckqlweYRudqZvuow0APFYKIhaJbud7z0cbgsAL3sqQpBKIv0JDLq4OrGb8XaejwDGRycDdwJPFmtbuIUMvWolNlRwh8cO390P6S2x5979Qsehn6i/tYiyJiTtiHd8oh7KSmFX8HmvE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=DP0zh/P+; arc=none smtp.client-ip=52.119.213.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1707447266; x=1738983266;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=lCz9y8A8qRqToVxrytQHqXVHZyuHNQvaQnzPFuI+xOw=;
-  b=DP0zh/P+26pBVaRA7mbn1ec8HobLftghu4zgxnrUYnkrb0qwH5TSU4cP
-   XUKSLOL0Xz/GDM4L2Imx3KtsHoA/+tSTivD8K49AiHACnqGMT3vCAEL8Q
-   ZlIDwCzzuZd5C9FSj45tHYwYNNBw/G7H/8577/MpLm7V9+nsEy8Ch/m7P
-   U=;
-X-IronPort-AV: E=Sophos;i="6.05,255,1701129600"; 
-   d="scan'208";a="183677600"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2024 02:54:23 +0000
-Received: from EX19MTAUWA002.ant.amazon.com [10.0.21.151:42372]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.122:2525] with esmtp (Farcaster)
- id 44693a33-86fe-4e5c-85cc-7c0cc4d3cd92; Fri, 9 Feb 2024 02:54:23 +0000 (UTC)
-X-Farcaster-Flow-ID: 44693a33-86fe-4e5c-85cc-7c0cc4d3cd92
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.40; Fri, 9 Feb 2024 02:54:22 +0000
-Received: from 88665a182662.ant.amazon.com (10.135.219.169) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
- Fri, 9 Feb 2024 02:54:20 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
-CC: Joanne Koong <joannelkoong@gmail.com>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>, Kuniyuki Iwashima <kuni1840@gmail.com>,
-	<netdev@vger.kernel.org>, syzkaller <syzkaller@googlegroups.com>
-Subject: [PATCH v1 net] dccp/tcp: Unhash sk from ehash for tb2 alloc failure after check_estalblished().
-Date: Thu, 8 Feb 2024 18:54:09 -0800
-Message-ID: <20240209025409.27235-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1707448226; c=relaxed/simple;
+	bh=Cs4mdukg4pg89OUG0OzgtWbbg6RpGW845x+lhFVlMPI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=IQdlmsMuGqL2HAWvUMU+emkGNXGo8XOVk9zENsSKykiFa9/4urjZ4KuDGtPvc+Z6QqhZUp6M8mNhdWjUOr0fCvPqZvjWwL5XKb1SfWKsZHips4vOULdNKR/JVZbCxC3ClzGQBkhGov/jbtkP3gYG6EY28JvCYx2qayJgHxjpPqM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BVr6/dX6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1E459C43390;
+	Fri,  9 Feb 2024 03:10:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707448226;
+	bh=Cs4mdukg4pg89OUG0OzgtWbbg6RpGW845x+lhFVlMPI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BVr6/dX6eBgkPPNq7KU+6dHDUnB+iRplsjnqSUOvNdx2eIO5z/cMct6ldERC0NOk4
+	 ogsTfE0614/uTCStZdWwbyWiflibYXPCw1XXwjX/Wbn7SQxaRMx3neUWqDExcP2s5x
+	 Bz6VzrCGhj4W/C8oaWyq1yV40WlUbINENsOLncr6Bz5tRO1mMxgVa75q4rwO1My3fa
+	 33ZqKRclYYlTXsRpvVUktwH1zCI1/lQUqgZoQCwhV712YL039OKxXD9N6HYTUbIIEJ
+	 RAJMBmPFvv5wrJzZ/0NEnwiXMYhT+X1pc1R0SW/StK/xyvaBY7dmij3bYtpz86ql5L
+	 AlADY4uUwVxbQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F2C90C395F1;
+	Fri,  9 Feb 2024 03:10:25 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,134 +52,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWC004.ant.amazon.com (10.13.139.254) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Subject: Re: [PATCH net] selftests: net: add more missing kernel config
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170744822598.23533.10537868285259056914.git-patchwork-notify@kernel.org>
+Date: Fri, 09 Feb 2024 03:10:25 +0000
+References: <38d3ca7f909736c1aef56e6244d67c82a9bba6ff.1707326987.git.pabeni@redhat.com>
+In-Reply-To: <38d3ca7f909736c1aef56e6244d67c82a9bba6ff.1707326987.git.pabeni@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, shuah@kernel.org, linux-kselftest@vger.kernel.org
 
-syzkaller reported a warning [0] in inet_csk_destroy_sock() with
-no repro.
+Hello:
 
-  WARN_ON(inet_sk(sk)->inet_num && !inet_csk(sk)->icsk_bind_hash);
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-However, the syzkaller's log hinted that every time the warning was
-triggered, connect() failed just before that due to FAULT_INJECTION. [1]
+On Wed,  7 Feb 2024 18:31:10 +0100 you wrote:
+> The reuseport_addr_any.sh is currently skipping DCCP tests and
+> pmtu.sh is skipping all the FOU/GUE related cases: add the missing
+> options.
+> 
+> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> ---
+> Note that this does not include the - still missing - OVS-related
+> option and pmtu.sh is will keep skipping such cases. Such tests
+> will still fail in the virtme environment even with the relevant
+> kernel options enabled, as they have an hard to solve dependency
+> on systemd/dbus.
+> The longer term plan is to move such test cases in the openvswitch
+> directory. One short term option to avoid skips in selftests results
+> while retaining the potential code coverage would be making the ovs
+> tests disabled by default but reachable via pmtu.sh command line
+> arguments.
+> 
+> [...]
 
-When connect() is called for an unbound socket, we search for an
-available ephemeral port.  If a bhash bucket exists for the port,
-we call __inet_check_established() or __inet6_check_established()
-to check if the bucket is reusable.
+Here is the summary with links:
+  - [net] selftests: net: add more missing kernel config
+    https://git.kernel.org/netdev/net/c/02d9009f4e8c
 
-If so, we add the socket into ehash and set inet_sk(sk)->inet_num.
-
-Later, we look up the corresponding bhash2 bucket and try to allocate
-it if it does not exist.
-
-Although it rarely occurs in real use, if the allocation fails,
-we must revert the changes by check_established().  Otherwise, an
-unconnected socket could illegally occupy an ehash entry.
-
-[0]:
-WARNING: CPU: 0 PID: 350830 at net/ipv4/inet_connection_sock.c:1193 inet_csk_destroy_sock (net/ipv4/inet_connection_sock.c:1193)
-Modules linked in:
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-RIP: 0010:inet_csk_destroy_sock (net/ipv4/inet_connection_sock.c:1193)
-Code: 41 5c 41 5d 41 5e e9 2d 4a 3d fd e8 28 4a 3d fd 48 89 ef e8 f0 cd 7d ff 5b 5d 41 5c 41 5d 41 5e e9 13 4a 3d fd e8 0e 4a 3d fd <0f> 0b e9 61 fe ff ff e8 02 4a 3d fd 4c 89 e7 be 03 00 00 00 e8 05
-RSP: 0018:ffffc9000b21fd38 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000009e78 RCX: ffffffff840bae40
-RDX: ffff88806e46c600 RSI: ffffffff840bb012 RDI: ffff88811755cca8
-RBP: ffff88811755c880 R08: 0000000000000003 R09: 0000000000000000
-R10: 0000000000009e78 R11: 0000000000000000 R12: ffff88811755c8e0
-R13: ffff88811755c892 R14: ffff88811755c918 R15: 0000000000000000
-FS:  00007f03e5243800(0000) GS:ffff88811ae00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b32f21000 CR3: 0000000112ffe001 CR4: 0000000000770ef0
-PKRU: 55555554
-Call Trace:
- <TASK>
- ? inet_csk_destroy_sock (net/ipv4/inet_connection_sock.c:1193)
- dccp_close (net/dccp/proto.c:1078)
- inet_release (net/ipv4/af_inet.c:434)
- __sock_release (net/socket.c:660)
- sock_close (net/socket.c:1423)
- __fput (fs/file_table.c:377)
- __fput_sync (fs/file_table.c:462)
- __x64_sys_close (fs/open.c:1557 fs/open.c:1539 fs/open.c:1539)
- do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
- entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:129)
-RIP: 0033:0x7f03e53852bb
-Code: 03 00 00 00 0f 05 48 3d 00 f0 ff ff 77 41 c3 48 83 ec 18 89 7c 24 0c e8 43 c9 f5 ff 8b 7c 24 0c 41 89 c0 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 35 44 89 c7 89 44 24 0c e8 a1 c9 f5 ff 8b 44
-RSP: 002b:00000000005dfba0 EFLAGS: 00000293 ORIG_RAX: 0000000000000003
-RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 00007f03e53852bb
-RDX: 0000000000000002 RSI: 0000000000000002 RDI: 0000000000000003
-RBP: 0000000000000000 R08: 0000000000000000 R09: 000000000000167c
-R10: 0000000008a79680 R11: 0000000000000293 R12: 00007f03e4e43000
-R13: 00007f03e4e43170 R14: 00007f03e4e43178 R15: 00007f03e4e43170
- </TASK>
-
-[1]:
-FAULT_INJECTION: forcing a failure.
-name failslab, interval 1, probability 0, space 0, times 0
-CPU: 0 PID: 350833 Comm: syz-executor.1 Not tainted 6.7.0-12272-g2121c43f88f5 #9
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl (lib/dump_stack.c:107 (discriminator 1))
- should_fail_ex (lib/fault-inject.c:52 lib/fault-inject.c:153)
- should_failslab (mm/slub.c:3748)
- kmem_cache_alloc (mm/slub.c:3763 mm/slub.c:3842 mm/slub.c:3867)
- inet_bind2_bucket_create (net/ipv4/inet_hashtables.c:135)
- __inet_hash_connect (net/ipv4/inet_hashtables.c:1100)
- dccp_v4_connect (net/dccp/ipv4.c:116)
- __inet_stream_connect (net/ipv4/af_inet.c:676)
- inet_stream_connect (net/ipv4/af_inet.c:747)
- __sys_connect_file (net/socket.c:2048 (discriminator 2))
- __sys_connect (net/socket.c:2065)
- __x64_sys_connect (net/socket.c:2072)
- do_syscall_64 (arch/x86/entry/common.c:52 arch/x86/entry/common.c:83)
- entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:129)
-RIP: 0033:0x7f03e5284e5d
-Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 73 9f 1b 00 f7 d8 64 89 01 48
-RSP: 002b:00007f03e4641cc8 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
-RAX: ffffffffffffffda RBX: 00000000004bbf80 RCX: 00007f03e5284e5d
-RDX: 0000000000000010 RSI: 0000000020000000 RDI: 0000000000000003
-RBP: 00000000004bbf80 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 000000000000000b R14: 00007f03e52e5530 R15: 0000000000000000
- </TASK>
-
-Reported-by: syzkaller <syzkaller@googlegroups.com>
-Fixes: 28044fc1d495 ("net: Add a bhash2 table hashed by port and address")
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/ipv4/inet_hashtables.c | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
-
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index 93e9193df544..abb9399d4f72 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -1130,6 +1130,20 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 	return 0;
- 
- error:
-+	if (sk_hashed(sk)) {
-+		spinlock_t *lock = inet_ehash_lockp(hinfo, sk->sk_hash);
-+
-+		sock_prot_inuse_add(net, sk->sk_prot, -1);
-+
-+		spin_lock(lock);
-+		sk_nulls_del_node_init_rcu(sk);
-+		spin_unlock(lock);
-+
-+		sk->sk_hash = 0;
-+		inet_sk(sk)->inet_sport = 0;
-+		inet_sk(sk)->inet_num = 0;
-+	}
-+
- 	spin_unlock(&head2->lock);
- 	if (tb_created)
- 		inet_bind_bucket_destroy(hinfo->bind_bucket_cachep, tb);
+You are awesome, thank you!
 -- 
-2.30.2
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
