@@ -1,61 +1,62 @@
-Return-Path: <netdev+bounces-70672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E80484FF4A
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 22:55:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AF3584FF52
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 22:59:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6343628161C
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:55:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C638A1F21569
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:59:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC6420DE3;
-	Fri,  9 Feb 2024 21:55:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B38B9210EE;
+	Fri,  9 Feb 2024 21:59:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Viou+F6c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qcBCEuri"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DE5F18B00;
-	Fri,  9 Feb 2024 21:55:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 744B420DE8;
+	Fri,  9 Feb 2024 21:59:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707515754; cv=none; b=lyD56a1X4HyeKNsOlmqYf4BwdFMU0QZJGFrE1sunn7f7dn+oVWJfT6WqpIXD9bLM9m7rQx9Ol/38wLKGvF69bXEsGwkT1anuC2cavVJ2EhZCe5LIL8PBv0PagkZCnRGRxm7E5sLgKMpQjQdMb3xqncqfbrXJ4mWLson8ZPIrheE=
+	t=1707515986; cv=none; b=rW9W839hcxe/Qcf2kokBBSsJg67fdBQVfTPNoSY7WWS2lMhiQiG379JZWxBv+93YNil0wM+//3yvTzRRfkhgVXVJVVw3QvYm5jpk5nM/BeUFW1aSoa8iHMoSmm/EWRwrFnQY93M0Uc1b5+9Dujvwj55c8q6KIH0JcmFjdFY5NYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707515754; c=relaxed/simple;
-	bh=VaagvheN7saZUzKsPo7gmknjWK+wFtrvCmdNycGk3jI=;
+	s=arc-20240116; t=1707515986; c=relaxed/simple;
+	bh=N+nalO7T63dk1WwyO167dEeC237jLd+fkrNm8eoIfRc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=blLmVJGH1WGgrwMSXMsWg0LbwWtZgkJsStzg6qGD4+rUBWjTMv8rphminQTYSG45kEXbLFuCP15KtiT1G9M7HkauTcgYiZUi9JFrTJ+HqwsuFVeDvLBHddv2b8r2NMrOKwQ4AC1IPLd05GdoLWXyh2xoR42L9yXEKdZyCJtRnR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Viou+F6c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E519C433C7;
-	Fri,  9 Feb 2024 21:55:53 +0000 (UTC)
+	 MIME-Version:Content-Type; b=uWf7KDR8klQREDc9uyzba4Ut4O/6TpevQeDYqHC5hb3WY0EsbTD9PVgb2qZ3eKNuenZ7iR5syV0nSiDywvn6lW3pKxBoQq1fwpjXInw/nKPhblTbrfrUg05dJnD07QpKTzO+T/m80x+jZUVCoXIpeZMCLphXl8rwBgrxNwYvB5w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qcBCEuri; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78A3DC43390;
+	Fri,  9 Feb 2024 21:59:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707515753;
-	bh=VaagvheN7saZUzKsPo7gmknjWK+wFtrvCmdNycGk3jI=;
+	s=k20201202; t=1707515985;
+	bh=N+nalO7T63dk1WwyO167dEeC237jLd+fkrNm8eoIfRc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Viou+F6co0PZLLGEreODXZ7F3Gs6bvwvX4PPUhvxlq4pXi1A5yHNAgIRJaoIxZ9mD
-	 ZKceOR9IIjO3II4h5NMVZAYIapkEwoWJm/8pFIuvXVOEMjI7rS/x9mS+iKfwHl/Dzy
-	 Y+VjNLHLI9cq18IfqEtx/acM0BZDsbb3wvKRtLQhSWMDEHkdyadAbrhA2BojMHzQmb
-	 +LZvBJBIloMbgLP46qdR9vlP/J8S6MxRtUgJa4tBscZ6abLH+OogbxK+1WUNG7qKFH
-	 7pe2AsEE/ZOD5xfYSao6asCJ3sZvTQjHkenz8WGYrIzT/QC5cxXe8Gb/zzHZko99Gl
-	 K9CitYygs0XlQ==
-Date: Fri, 9 Feb 2024 13:55:52 -0800
+	b=qcBCEurixvSanBDZzwL/H8t1HAlZhS40hckT9FvmrXI8rLg0aeNS/pHPXojJ6h2cP
+	 DkHNV8JDpkLdHyD56aqjR8urUzxQEsH0Nh2dAciHBGEkN0dvT3UHFJgKOavQym4nRb
+	 khtEgxNdLP2T5H5aVR833gVKMiP50GYc0VmSvZ5Halv9WJxUFNYt9ctfo67oRYworG
+	 RYIDZx8HkznRW4XFBxFoZ745UaV3vgExTnxM/+coYSGX0eR8s+0C0BE0VQAOXa3fFb
+	 cB4j+VZK6YH+xq5y6N7QkJY/XOa4KHh+0KFXf+q2K7C91Yz8kVIn2DTJbe4Dv+R9eH
+	 ov2alAP0HkhHQ==
+Date: Fri, 9 Feb 2024 13:59:44 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: David Ventura <david@davidv.dev>
-Cc: Jonathan Corbet <corbet@lwn.net>, "David S. Miller"
- <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, "Paul E. McKenney" <paulmck@kernel.org>,
- Randy Dunlap <rdunlap@infradead.org>, Xiongwei Song
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: David Ventura <david@davidv.dev>, Jonathan Corbet <corbet@lwn.net>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, "Paul E. McKenney"
+ <paulmck@kernel.org>, Randy Dunlap <rdunlap@infradead.org>, Xiongwei Song
  <xiongwei.song@windriver.com>, linux-doc@vger.kernel.org (open
  list:DOCUMENTATION), linux-kernel@vger.kernel.org (open list),
  netdev@vger.kernel.org (open list:NETWORKING [IPv4/IPv6])
-Subject: Re: [PATCH v2 0/2] net: ipconfig: remove wait for drivers
-Message-ID: <20240209135552.239c5590@kernel.org>
-In-Reply-To: <20240208093722.246930-1-david@davidv.dev>
+Subject: Re: [PATCH v2 1/2] net: make driver settling time configurable
+Message-ID: <20240209135944.265953be@kernel.org>
+In-Reply-To: <20240208095358.251381-1-david@davidv.dev>
 References: <20240208093722.246930-1-david@davidv.dev>
+	<20240208095358.251381-1-david@davidv.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,20 +66,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu,  8 Feb 2024 10:35:53 +0100 David Ventura wrote:
-> Currently ip autoconfiguration has a hardcoded delay of 10ms.
-> 
-> Make the delay configurable via the new `ip.dev_wait_ms` argument, and
-> set the default value to 0ms.
+On Thu,  8 Feb 2024 10:52:29 +0100 David Ventura wrote:
+> During IP auto configuration, some drivers apparently need to wait a
+> certain length of time to settle; as this is not true for all drivers,
+> make this length of time configurable.
 
-Does not apply, you'll have to respin:
+Please CC folks who gave you feedback, Andrew's is missing.
 
-Applying: net: make driver settling time configurable
-error: sha1 information is lacking or useless (Documentation/admin-guide/kernel-parameters.txt).
-error: could not build fake ancestor
-hint: Use 'git am --show-current-patch=diff' to see the failed patch
-Patch failed at 0001 net: make driver settling time configurable
-When you have resolved this problem, run "git am --continue".
-If you prefer to skip this patch, run "git am --skip" instead.
-To restore the original branch and stop patching, run "git am --abort".
+Andrew, what do you think about just removing the wait?
+Or decreasing it to 1ms?
+It feels a little wasteful to be adding uAPI for something
+which as you said is likely papering over ancient bugs. We'll 
+fix the bugs which are still around and the uAPI will stay 
+forever :(
 
