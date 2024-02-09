@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-70526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8026284F61C
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 14:42:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2477284F632
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 14:53:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89D081C20C31
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 13:42:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 622CFB2140C
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 13:53:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599CF37703;
-	Fri,  9 Feb 2024 13:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A768D4CE11;
+	Fri,  9 Feb 2024 13:53:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dq4juRgP"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="M1u0bQG+"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CCA020311
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 13:42:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A69604CB55
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 13:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707486143; cv=none; b=OBFZCq4OT0Gn6/IUaqc4Djjui48ddwXU6tiWmttlIEWXg5oYe7zk6mTZNbj3xEFWXiM5UKtUl2KP0VNpez21cJT1tH+No5Nc9fEqa7nCDW72hYZK55RJGbx4GbJQOL3e5izYVUa5H/9rxI7RplRSagkFGwxYEgn2n08EDq5QuyE=
+	t=1707486805; cv=none; b=qq5KMUEAw1mMoZ2hdnk4HTSbMWLQGSahEqKIze4hqY1/pPI5jZB9L0g80Vlb46Y9KyiNYDJRf0iBL3W5UphYO7RSCnCpxCXHDM4ToAOICn1f+kA69hpFv758FgzvbeA/TUD8qV1mbHvZIqeOC5bJDbCwEe9j60RCj+NViYqGLE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707486143; c=relaxed/simple;
-	bh=/E0nQfdHcA+bplIE7jl2vutQaQnOdRSl7xp9ERc7Bpc=;
+	s=arc-20240116; t=1707486805; c=relaxed/simple;
+	bh=5RhsgdJresF56qDCXIphNCFUI6oED9nM8lGKzMGMzXs=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aDKpRNUb9g70mryryJWPeQgcA2OFr7a28t6awkH0lv+LNJ9jyLJBgJ739KdqRxJ5P9e22R/eEsHsZRo8ouEinnSovPxbLwLncQS8kTmfyjESExbcQH07Hj5LmrBMX0xSXQpRqfOS6niwr4f4+hXhDEglJCOWj91RwOBChlsDfUc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dq4juRgP; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=Y4ism3S65Bgy3Lnm9oRynT1tBcE1rcxSbjcVQSECimfbS8cVQgb1TkbELwBMPtxKWqr6krI3o8DqkpWi5gm/8PoxchEN6s6lFrbKvUcG0F6Vm6fzdOee0rpbRqp7HxXWMns6B4RlLspCzyNE7/JvRMl0KkfMIJL7qEaUOLrVmq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=M1u0bQG+; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,26 +36,26 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ZA0d2tUx9BOaL4/iom+fr1y+VpaYISLBcmEVA4Ju7lw=; b=dq4juRgPOxXaaQxir8OfNJzP+m
-	A00AGpu701wnkMxy9J0JsS4zVVZq0RWRPvcoOEc7h1FJPNek1MupZUMAlyC40+PwR6tV1q6Q9/RO1
-	x0+0HcptEuJqgYsWb+3I/4yVZChRx1VJ3taZUIVrXPHSANR+AaTMurRmmVtABPhuY3AM=;
+	bh=65ARAjROPYkna+cIwJ13eOj0iaHSf8+W5VwZKxBMxR8=; b=M1u0bQG+vumn3qbuEtBnzbAiyA
+	rk6qXFLVNbNOxRBttLnFzpaypDtjeHUdAnnBwOrjU5wSjkiRHXEeTw9/7uUJORTCo2iRKH4JI/435
+	a3wJydCzobVDtp6Y/XQS55otpDws/HRCr1dP9rz7bXAbwEL009iiR6No5sdvgsi3rbFk=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rYR8w-007O4W-2E; Fri, 09 Feb 2024 14:42:14 +0100
-Date: Fri, 9 Feb 2024 14:42:14 +0100
+	id 1rYRJk-007O6J-O2; Fri, 09 Feb 2024 14:53:24 +0100
+Date: Fri, 9 Feb 2024 14:53:24 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Miller <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Russell King - ARM Linux <linux@armlinux.org.uk>,
-	Pavan Chebbi <pavan.chebbi@broadcom.com>,
-	Michael Chan <mchan@broadcom.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"Aithal, Srikanth" <sraithal@amd.com>
-Subject: Re: [PATCH net-next] tg3: fix bug caused by uninitialized variable
-Message-ID: <9fcaa6bb-3f31-4943-9731-251223e092bc@lunn.ch>
-References: <3e4a74f6-3a3b-478d-b09a-6fb29b0f8252@gmail.com>
+To: =?iso-8859-1?B?Q3Pza+Fz?= Bence <csokas.bence@prolan.hu>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Francesco Dolcini <francesco.dolcini@toradex.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>
+Subject: Re: [PATCH v2] net: fec: Refactor: #define magic constants
+Message-ID: <2f855efe-e16f-4fcb-8992-b9f287d4bc22@lunn.ch>
+References: <20240209091100.5341-1-csokas.bence@prolan.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,20 +64,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3e4a74f6-3a3b-478d-b09a-6fb29b0f8252@gmail.com>
+In-Reply-To: <20240209091100.5341-1-csokas.bence@prolan.hu>
 
-On Fri, Feb 09, 2024 at 07:47:39AM +0100, Heiner Kallweit wrote:
-> The reported bug is caused by using mii_eee_cap1_mod_linkmode_t()
-> with an uninitialized bitmap. Fix this by zero-initializing the
-> struct containing the bitmap.
-> 
-> Fixes: 9bc791341bc9a5c22b ("tg3: convert EEE handling to use linkmode bitmaps")
-> Reported-by: Srikanth Aithal <sraithal@amd.com>
-> Tested-by: Srikanth Aithal <sraithal@amd.com>
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> @@ -1181,7 +1194,7 @@ fec_restart(struct net_device *ndev)
+>  	if ((fep->pause_flag & FEC_PAUSE_FLAG_ENABLE) ||
+>  	    ((fep->pause_flag & FEC_PAUSE_FLAG_AUTONEG) &&
+>  	     ndev->phydev && ndev->phydev->pause)) {
+> -		rcntl |= FEC_ENET_FCE;
+> +		rcntl |= FEC_RCR_FLOWCTL;
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+This immediately stood out to me while looking at the diff. Its not
+obvious why this is correct. Looking back, i see you removed
+FEC_ENET_FCE, not renamed it.
 
-    Andrew
+Ideally, you want lots of small patches which are obviously correct.
+This change is not obvious, there is no explanation in the commit
+message etc.
 
+Please keep this patch about straight, obvious, replacement of bit
+shifts with macros.
+
+Do all other changes in additional patches. It is much easier to
+review then, both by you before you post, and us when it hits the
+list.
+
+       Andrew
 
