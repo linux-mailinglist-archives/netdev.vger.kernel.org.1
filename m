@@ -1,58 +1,56 @@
-Return-Path: <netdev+bounces-70595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D7B984FAE1
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 18:19:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0D1284FAEB
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 18:20:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 807831C23134
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 17:19:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 771F31F288D8
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 17:20:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C34097BB07;
-	Fri,  9 Feb 2024 17:19:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D9A97F48A;
+	Fri,  9 Feb 2024 17:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LHznyKEG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WjKFXlGw"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4457BB02;
-	Fri,  9 Feb 2024 17:19:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4560E7F480;
+	Fri,  9 Feb 2024 17:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707499159; cv=none; b=bKuWRekmQVJ4pAlVMpNE5kbvuQoTUMblm/Fbx1SEjFjgeIWPMrxA7GJOtS48flIBqpVg4ONvAHYAQM8odYntbTFU7EI1sUavJueMSBWCM96HYCMSr/k+K5WLDgauoA8eJB8e407FtgAyArOUcW66+tqFPpqirGKfNTzJuq14hKg=
+	t=1707499214; cv=none; b=X158OVcT7MglXFaSH+WWcqFhk8E9V5XpmZ60m0kVozSyCu3W2iSVQk8z2aZqMVKe+9EuqgSMqpxy4fPdWuXsqb8AEI27QDJLGVnu2JY0R6UflSaMyjrS1p90uWVv6+hIcVi4cQY721a1SsbqVWiBsVUdFJmKfWVkOC4jhlV/WTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707499159; c=relaxed/simple;
-	bh=5chEcUoZy69N+Njxway//+D9Qq97cnHEhm7OTKP1+z4=;
+	s=arc-20240116; t=1707499214; c=relaxed/simple;
+	bh=biXrXtUUMc8bsD9DKAzd1JgINnjgpBuCRZyKhuA727g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VZRwM9QXziM55KyrVvGaxtBb3Pl3yfnYJcWt1AYTWc5WFxlXDGBbUw2uPNYj0W2yIkRqnLgIGuati1b3yPQWMX7Q446lc1vvFueuJYSdFlmJpIcmgOSLy5EnigIOZFyaoU+8SVHWh+YRoz1Y1nGxHMOXwO6cQuKc3lhH2msIuw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LHznyKEG; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=mCTkf7Uhk05htdUngOFotI43lknoNa0E5lP/jBopk84=; b=LHznyKEGKRt7UxP+B/ChINmYVD
-	fZWLUuYEyPS5FhCXMRw/ImIQBWn503zlvLefjzwSgOG+QwOlAnW06F8p38bPX+ksKWjDOi9ORuN+3
-	LWP4qJOtgpJ10JjchxgOVW4PEHkw4jZY/a4xnYq7ss0K3AJ62uOBJUjcntUZYILHyJaA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rYUWo-007P7U-3P; Fri, 09 Feb 2024 18:19:06 +0100
-Date: Fri, 9 Feb 2024 18:19:06 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jon Maxwell <jmaxwell37@gmail.com>
-Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next v2] intel: make module parameters readable in sys
- filesystem
-Message-ID: <135d4123-29f5-46dd-b06e-d5a66bd7f598@lunn.ch>
-References: <20240208221802.131087-1-jmaxwell37@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=JBELN2q1L6sb//Gx1h1DizBsp9Fg1HN/Fz0JBY943kRi5nXLpcXmFJ7Jl+5/gnm7nDRPqEHolS3P75fpcipaNJWI2VdH9vO9W99HFIVs8vjayGZJ1FBMbWz8MPiEh3t/e3VGj6c44zKJCk84qJwR16Ol6YpQwOTyWqi79eCNDHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WjKFXlGw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03A39C433C7;
+	Fri,  9 Feb 2024 17:20:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707499213;
+	bh=biXrXtUUMc8bsD9DKAzd1JgINnjgpBuCRZyKhuA727g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WjKFXlGwithoO2azOmtmRTQfj+llpCUvLZLyfnbbjqSkb4tVbbBUmN/1PdHpKiUWQ
+	 EP7CqFp+U2neNF6aED5V6Yh0BQ7JmnkvE6wosvSkRwuEHiNJ22zMsHlhC0uu4fEQ46
+	 TWov8j0tWGakv6Q/ofR5GQq1TLFhIPFE7szQeujp1wBscM6FVskKh0VXaegVyxp5LN
+	 wSrPuD0YMI/YeQ1cE4qaORfNhMpvo1hS6gwxUm6Xr4F4DrLbgsjKS4a61LkBts8So9
+	 ZTRT8k/japOvD0CQ69Mdrt+eIGSjCKvt5+GMavdQiczaarv4UTsE6nfgoDK8201zNE
+	 5tW6ZIAHrq4eg==
+Date: Fri, 9 Feb 2024 17:20:09 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, shuah@kernel.org, petrm@nvidia.com
+Subject: Re: [PATCH net-next] selftests: forwarding: Add missing multicast
+ routing config entries
+Message-ID: <20240209172009.GF1533412@kernel.org>
+References: <20240208165538.1303021-1-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,18 +59,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240208221802.131087-1-jmaxwell37@gmail.com>
+In-Reply-To: <20240208165538.1303021-1-idosch@nvidia.com>
 
-On Fri, Feb 09, 2024 at 09:18:02AM +1100, Jon Maxwell wrote:
-> v2: Remove the "debug" module parameter as per Andrew Lunns suggestion.
->     It's not really needed as ethtool msglvl can control that.
+On Thu, Feb 08, 2024 at 06:55:38PM +0200, Ido Schimmel wrote:
+> The two tests that make use of multicast routig (router.sh and
+> router_multicast.sh) are currently failing in the netdev CI because the
+> kernel is missing multicast routing support.
+> 
+> Fix by adding the required config entries.
+> 
+> Fixes: 6d4efada3b82 ("selftests: forwarding: Add multicast routing test")
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+> Targeting at net-next because this is where 4acf4e62cd57 ("selftests:
+> forwarding: Add missing config entries") was applied to, but you can
+> apply to net as well.
 
-It is normal to places comments like the above under the ---. In its
-current place, it will be part of the commit message. Under the --- it
-gets dropped when the patch is applied.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-    Andrew
-
----
-pw-bot: cr
 
