@@ -1,75 +1,82 @@
-Return-Path: <netdev+bounces-70683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70F0684FFD7
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 23:25:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A76EB84FFDC
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 23:27:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3281C28189A
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 22:25:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B2CC1F22ABB
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 22:27:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69E9D2134B;
-	Fri,  9 Feb 2024 22:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F84021362;
+	Fri,  9 Feb 2024 22:27:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mHVYeHAx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xs//XXqW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44A7A6AA7
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 22:25:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3666F538A;
+	Fri,  9 Feb 2024 22:27:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707517538; cv=none; b=jKwyd5ClKl12C+Rd9Ywp9sMEXIPmv9AJ1o5/K0LRU5Ga0wq1GugjOSJdfQi6GNlA2ht0Pm4+8sHAG2b5N2vuD+Q9Dp+2kkvKzpotN+c400GyvakdzwX0DLWmF9/j1+PtNY0WKsAFWJ+1bUjS2cfVpDaADlV2DTgs/WdlwSsJVUU=
+	t=1707517637; cv=none; b=WkL6xPU5U6TBo5RWoGC+DEIfsMg2TIl9sxLjEMW/PiGZLjFJauleeYeL4ULKc2vi+5filP7kA+AcfbCE1eVjaGG2NsPd0fHGb70e5w+yp7SOmgL4KIi1PAn5E3ePXq8ts5sV28OTxhZhJZVgsZTqQvlxUkE/bKvA2I1qjL78cI4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707517538; c=relaxed/simple;
-	bh=RrIJhRZog/C1vzMz6iahRpLn/+/UM2WtsXznIa+KB8A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pOMXcw/o0LVeDEeDoLduIPoVBUcvnmicJl4Saydg5km0Tqx68CEtctcc84YjjG18yfWhk/8qMTQGNptOWt1j8IIb60gLinNpAHR5r+4lt2p2z8Ku8jxaEqZnwMxb4PjJWKEBNx1T/aeWe24fXBEdBzWdL50x4LKIkgvbbacTdRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mHVYeHAx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99BB9C433F1;
-	Fri,  9 Feb 2024 22:25:37 +0000 (UTC)
+	s=arc-20240116; t=1707517637; c=relaxed/simple;
+	bh=XKSPUWEMjH3vv5ObtYK5tHZ32yK2oms1MOCSVnvaXBk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dv1tPQLLpE9Y8fqnVmsqFlNE/MPTpL4j9ViBWPGUMW9gqGrvNTNbQuTNdHi/+UJ4SKWVNywkf51oB+G2svP01Blk/9y6InapYvBXIk/aSa0JFiIH8ij6pg8SunORiYBDaHVvaZ2RD6sXLtKw5e68iFdRoM4ne7+gc4OiKcYsaH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xs//XXqW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1577CC433C7;
+	Fri,  9 Feb 2024 22:27:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707517537;
-	bh=RrIJhRZog/C1vzMz6iahRpLn/+/UM2WtsXznIa+KB8A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=mHVYeHAx+pkE1Qbb4TS/p6t2tytxd5maiZ+7VL0OTf8qK1HNiIwKK6NArbup942iY
-	 ycxX2xcQipSaX7trOlS9oQNcxroMc3booIlzL62GVMH0jgShFPdTex1hXWQ7ep+sdl
-	 zpAx0Unc0tWvQjmKlNtcPwdBXd0kQrZ1VkA8mAZ8+jfnN3pR584Q1W5t4Xuvmt/JHv
-	 aht7aUJncZZ0L948bolh/ON1ACwwZfdhdTFUgiiv3uXmfHODW1HueYFf6BTVOAMC7K
-	 YdxwiGoTp6DaXHA6YCpEInJiHZgiwo2yTmA/6siEi6NeKVTFgszP8VdjKhk9K+CCUR
-	 ++j3LEoZpfjHA==
-Date: Fri, 9 Feb 2024 14:25:36 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 1/2] vlan: use xarray iterator to implement
- /proc/net/vlan/config
-Message-ID: <20240209142536.583f10a2@kernel.org>
-In-Reply-To: <20240209145615.3708207-2-edumazet@google.com>
-References: <20240209145615.3708207-1-edumazet@google.com>
-	<20240209145615.3708207-2-edumazet@google.com>
+	s=k20201202; t=1707517636;
+	bh=XKSPUWEMjH3vv5ObtYK5tHZ32yK2oms1MOCSVnvaXBk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Xs//XXqWfXd1kOPFVH0FAG5j+y5njvDIJz/H/GBAwlwZc2hBhOAJcA95LBuxunAwE
+	 K2PBBKcYjUfe262dL4Qps1duHltv4w6crA+CWukamxxWojctSm1fqMyBhv4ktaUQLg
+	 MDnpjxpz5Ey6lp/Rl4Ei2dg8OiRT9ug0aZjWLjWFcXRnf15uA0NGKQipRuuRjoBP/7
+	 U/F9hUgebbFLLs9WLeR3hTAWSViivY8qdxJMQPpJZRijl1LpPBUq89lhtmWJxx0kqp
+	 IciWXsI4CytcnhUaDRZJFLZNS+Pu+ItTBU2Ki309lsUzncfj56iTsE6xsTjRlZ9ED5
+	 ax7w9CV8aXioA==
+Message-ID: <06b1be40-06be-4bea-b79c-ec869dd60a2c@kernel.org>
+Date: Fri, 9 Feb 2024 15:27:15 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net] ipv4: Fix broken PMTUD when using L4 multipath hash
+Content-Language: en-US
+To: Suresh Bhogavilli <sbhogavilli@fastly.com>,
+ "Nabil S. Alramli" <nalramli@fastly.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: jdamato@fastly.com, srao@fastly.com, dev@nalramli.com
+References: <20231012005721.2742-2-nalramli@fastly.com>
+ <20231012234025.4025-1-nalramli@fastly.com>
+ <e18c52e8-116e-f258-7f2c-030a80e88343@kernel.org>
+ <4be64c29-f495-4fdb-a565-2540745d5412@fastly.com>
+ <9d636726-514b-417f-ab46-6f570a563eed@fastly.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <9d636726-514b-417f-ab46-6f570a563eed@fastly.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Fri,  9 Feb 2024 14:56:14 +0000 Eric Dumazet wrote:
-> Adopt net->dev_by_index as I did in commit 0e0939c0adf9
-> ("net-procfs: use xarray iterator to implement /proc/net/dev")
+On 2/9/24 10:11 AM, Suresh Bhogavilli wrote:
 > 
-> Not only this removes quadratic behavior, it also makes sure
-> an existing vlan device is always visible in the dump,
-> regardless of concurrent net->dev_base_head changes.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Does that answer your question? Do you need me to make any changes to
+> get your Reviewed-by?
 
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+
+re-send the patch enhancing the commit message with what happens for
+different policies.
+
+Would be good to get a unit test added to
+tools/testing/selftests/net/pmtu.sh (ipv4 and ipv6)
+
 
