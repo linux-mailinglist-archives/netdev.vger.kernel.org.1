@@ -1,99 +1,127 @@
-Return-Path: <netdev+bounces-70599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06D5884FB23
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 18:38:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E71184FB83
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 19:07:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 432841C24193
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 17:38:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EBF61C24D09
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 18:07:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1EE17BB1C;
-	Fri,  9 Feb 2024 17:38:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5BEE80C0B;
+	Fri,  9 Feb 2024 18:07:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kerfjuN5"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="eqf/GXHK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C740D7B3D2;
-	Fri,  9 Feb 2024 17:38:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1B180BF5;
+	Fri,  9 Feb 2024 18:07:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707500324; cv=none; b=gtcfygO0BQZ0Ezic7s7e/8JvzTbb/bdM/0B71N0Co01KquC1BaZ8UhXSiOwMHqPgsbGFWAPO7JHomuKAzE3iCzs18Dy04QAymPKgPPIEj65S8AHshX9kuWz1T9doos3q7kLnNSDVg7awW4dQhl58SF7xslZ1SqrrsSCOGTMnSKg=
+	t=1707502040; cv=none; b=KGF19STA304lv7RL4V2gbG+oj7p5bNrqRydQ8SJddanSAAuzF5Pqc50hqxYMLXDE83YETRH+06N6vxTlj5jbGbjdCqDiTF/fA9rMHcPnxFq3vniyyfaEEbg/KIDSj2cL2XpTP9xWEoVXuzIMgJU5uvMOfiCaxWGSSKHycu/1pOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707500324; c=relaxed/simple;
-	bh=HravDwgHEdCMpMGa6CrqloF7sVySm2L8D8y1O2Do7lc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=isypjgPHSO8Y0caClEw5igS72KgWuDk5TVS3oa+U1X9ykvbXrpxQOmrDbtss3IvU97g885Eu2pnv8YOiBlE2Y2xPtdnV7SjfxcmOc9TurQSKt4cHQ/dpLas0uhk/IG67+0X7v5FoUTHn800nIqn9Tqh3VmG7hiH9MLb9VQKxz70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kerfjuN5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 712F2C433F1;
-	Fri,  9 Feb 2024 17:38:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707500324;
-	bh=HravDwgHEdCMpMGa6CrqloF7sVySm2L8D8y1O2Do7lc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kerfjuN5jyjh7Iq+1DOcDabahKbMAmoRDLrtb30fs4WS1zuswq4yoePYrSk7sLA5B
-	 ABE3qeI81FOY0b3nQF3bBfYoTzpxXpxvOvvVZZY+tKW3Iqcb8FEurBWf8UOkQqkpsF
-	 hvUcYu6Al9JHWShocndQW1QrIOYHqdhJ22jeSiZKaw/3hvAnljZJVrgVBd8SX6K6YD
-	 RK+e0HrHMlpB1/dNfmnLLHbm2mKCcjaj1xBakrPbywxz1VQO0UTm+ZTBgtrKnSvQR2
-	 Jv/pTzO/mhp5gmKijD4th/XDi81p8TaNWTeXTLjRptBuYqz0jb0yTQWdwi80RAKVH4
-	 4AnarJn9OZzbg==
-Date: Fri, 9 Feb 2024 17:38:38 +0000
-From: Simon Horman <horms@kernel.org>
-To: Takeru Hayasaka <hayatake396@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, mailhol.vincent@wanadoo.fr,
-	vladimir.oltean@nxp.com, laforge@gnumonks.org
-Subject: Re: [PATCH net-next v6] ethtool: ice: Support for RSS settings to
- GTP from ethtool
-Message-ID: <20240209173838.GH1533412@kernel.org>
-References: <20240131134621.1017530-1-hayatake396@gmail.com>
- <20240131131258.47c05b7e@kernel.org>
- <CADFiAc+y_SXGtVqZkLoiWw-YBArMovMkuWw3X596QDwEtdBJ2g@mail.gmail.com>
- <CADFiAcK_XjLNjzZuF+OZDWjZA4tFB8VgeYXVJHR8+N3XryGxwA@mail.gmail.com>
- <20240208072351.3a806dda@kernel.org>
- <CADFiAc+i9i29SL0PM8gzmDG6o=ARS6fSrTPKNyqh9RLmWWB78A@mail.gmail.com>
+	s=arc-20240116; t=1707502040; c=relaxed/simple;
+	bh=/vVHfU4e8VpEUslZI8rvDFAJFug05ANihwQevcdLXQQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oeguQDkly1PvJeoJUC74Yv4zTbrl/KZ8TafSNJvISfkVGyMLNh6xztXREt2VoLxdqP+1UUqreKiDhuQOR/XAShgIdk0wfcQsduDYPDDdInk0tmOVj1T+A0xyHXlonJ35KMFNXKkfN8+YZbu7oienHLTx0uo3AoU71RFAKNSU9iY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=eqf/GXHK; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 419H42nH011805;
+	Fri, 9 Feb 2024 18:07:09 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding;
+ s=corp-2023-11-20; bh=6HOUs3KwIxMYByg9Nllb37I2V7KbdMSxVpV5fSt60Z8=;
+ b=eqf/GXHKvfNdsi/IJ/lqrq2ZJQF2Rvxl2udzjgMibw75EVx00/oKkLiF0TWllOTYnHeT
+ rutaM1E3Dm9RB9ywIndwo7Ss8qU0MIxfYFm3EN6Fl7HUplz/ZfRRjol3d+EGOCPyT9oI
+ 0hiy2POjXG06wcslOr1O7PE1yf2WFs973hDveK5Rzr8WJdjY/mNCBGPLpO4xTfZvmpoZ
+ ROlwgHRS5cqkRQTjNjkdCKzTr1No+sPFuih52RPNFbZkyn/XiFT6AnJgXOWvY8lCLYgt
+ Zx1Ov42kVOCkR+XgBWHdBwHHF0tvaxhl75bc/gSeT6Z/InOJaGBjunr/X0ByMUY6O2Hy Zw== 
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3w1d3ur102-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 09 Feb 2024 18:07:08 +0000
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 419HgVNm019807;
+	Fri, 9 Feb 2024 18:07:08 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3w1bxjtcer-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 09 Feb 2024 18:07:08 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 419I77HK003846;
+	Fri, 9 Feb 2024 18:07:07 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 3w1bxjtcdd-1;
+	Fri, 09 Feb 2024 18:07:07 +0000
+From: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>,
+        Jiri Pirko <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc: darren.kenny@oracle.com,
+        Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+Subject: [PATCH] net: sched: Remove NET_ACT_IPT from Kconfig
+Date: Fri,  9 Feb 2024 10:06:56 -0800
+Message-ID: <20240209180656.867546-1-harshit.m.mogalapalli@oracle.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CADFiAc+i9i29SL0PM8gzmDG6o=ARS6fSrTPKNyqh9RLmWWB78A@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-09_15,2024-02-08_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 suspectscore=0 mlxscore=0
+ adultscore=0 spamscore=0 malwarescore=0 mlxlogscore=999 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2311290000
+ definitions=main-2402090131
+X-Proofpoint-ORIG-GUID: qN2dE4OUBodg7SCRNEV7sqwNg7ONaBS3
+X-Proofpoint-GUID: qN2dE4OUBodg7SCRNEV7sqwNg7ONaBS3
 
-On Fri, Feb 09, 2024 at 02:25:50AM +0900, Takeru Hayasaka wrote:
-> Hi Jakub-san
-> 
-> Thank you for your reply.
-> 
-> > We're expecting a v7 with the patch split into two.
-> 
-> I see, I had not informed you that we have released v7. My apologies.
-> The split patch for v7 has already been submitted. Could you please
-> check this link?
-> https://patchwork.kernel.org/project/netdevbpf/patch/20240201033310.1028154-1-hayatake396@gmail.com/
-> https://patchwork.kernel.org/project/netdevbpf/patch/20240201033310.1028154-2-hayatake396@gmail.com/
+After this commit ba24ea129126 ("net/sched: Retire ipt action")
+NET_ACT_IPT is not needed anymore as the action is retired and the code
+is removed.
 
-Hi Hayasaka-san,
+Clean the Kconfig part as well.
 
-It appears that the series at the link above has been marked as
-"Changes Requested" in patchwork. Although I am unsure why.
+Signed-off-by: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+---
+This is just based on observation.
 
-I would suggest reposting it, say with the tags supplied by Marcin Szycik
-as [PATCH net-next v8].
+ net/sched/Kconfig | 10 ----------
+ 1 file changed, 10 deletions(-)
 
-Also, please don't top-post on the Kernel MLs [1]
+diff --git a/net/sched/Kconfig b/net/sched/Kconfig
+index 470c70deffe2..8180d0c12fce 100644
+--- a/net/sched/Kconfig
++++ b/net/sched/Kconfig
+@@ -737,16 +737,6 @@ config NET_ACT_SAMPLE
+ 	  To compile this code as a module, choose M here: the
+ 	  module will be called act_sample.
+ 
+-config NET_ACT_IPT
+-	tristate "IPtables targets"
+-	depends on NET_CLS_ACT && NETFILTER && NETFILTER_XTABLES
+-	help
+-	  Say Y here to be able to invoke iptables targets after successful
+-	  classification.
+-
+-	  To compile this code as a module, choose M here: the
+-	  module will be called act_ipt.
+-
+ config NET_ACT_NAT
+ 	tristate "Stateless NAT"
+ 	depends on NET_CLS_ACT
+-- 
+2.39.3
 
-[1] https://www.kernel.org/doc/html/latest/process/submitting-patches.html#use-trimmed-interleaved-replies-in-email-discussions
 
