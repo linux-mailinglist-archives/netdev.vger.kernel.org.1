@@ -1,309 +1,241 @@
-Return-Path: <netdev+bounces-70479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F9CC84F2CF
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 10:56:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 377E884F2EC
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 11:05:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F150AB290AA
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 09:56:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2DFD288817
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 10:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A48EA679E2;
-	Fri,  9 Feb 2024 09:56:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80E8167E62;
+	Fri,  9 Feb 2024 10:05:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="mzfPkFvT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CAA769946;
-	Fri,  9 Feb 2024 09:56:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3489567E61
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 10:05:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707472586; cv=none; b=m7YguIhaM1t31d1IrJyvJLnOes5WPU7esOiciOt8XwvoY0ChpAbUP89cdcPvGqWqQ/kiMK34Q2blANASDpUtUn3Rlq39TkSzfmT3VutTOB5zApJ7aEvYb6+/6Nu56gcyz7sHH9B2tJqLuT3Ce7RWpS8myujvrt5ylxAI5LMRxHo=
+	t=1707473122; cv=none; b=C7ArUlvXLjHbOWkfFtxhJKkyq1OzR8YuxgIyGRmQGJTIKNaTE1Ay5TbGVMc2clwnfGmjew7NyeBl+KheYCAg6cP9OtJjAoJ53WnQxkDpfz4483+AONUYqOKhRKBLoePCxkEBQzaHra7sMd93MMS1V1g+PQt6Bu5XxDy0iwbSTrg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707472586; c=relaxed/simple;
-	bh=IIJB+il/YAqgBdhhLd/x55BSBVFoKksYvq3l+V1p/Vs=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qkS+vgroR7TXcAKDLxaccuo+Ue7a7hmdaC9qtAr2QLztTDmWq8c8fnYhOCzMDtsYsHCisq7fqAvG3ylDJhnL1QQNkFDPCNlyupGeKsgwsl2XG6Z2/yn0FVPqdP9draEzod7JNQwZmu8QtxnEqQ8hTopik+Jrg+EuovtOqhMKj8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-55f50cf2021so1177399a12.1;
-        Fri, 09 Feb 2024 01:56:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707472582; x=1708077382;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Uin1djr9wjEmSC5e19XpHLz28aFoFMGRjrPrYFjt5vY=;
-        b=RQHGY3jKxEwqXVagp3Ymutom3zlxzpwaHHg6FUM2/Oxl/LEpVolwsbZ1Qoun6gVVra
-         wUbAdVzc5dZ18qU0k6nvENdgDmwHoGp2ps4IapuBs7XkR8jpcwDRoqAUuNgf6b+h6LRX
-         lgZlloZ8aubgvw0PYxEsU8vtmu4qjIUc2rn9t084zk1kPgt4SxWTtjwgaW5ERHjpAKm+
-         Te0razsDP6VqkRgMrop2GN1CubaEOpVHPIt6FMDAZW0MGnM7DSuzm+uww6kCmRbYVh7K
-         Td3LNwL4vetk+VYlkDSl5ZtVFmFFwIMuOJfpIm2N7hw2FuQ0UAJr+uuZ5PR3Nex3LuVb
-         XAbw==
-X-Forwarded-Encrypted: i=1; AJvYcCUkTIHOdWhPUFKI3ZvFJcYBqzr0y9Apyy0XxlXTcVkNDI0wHRXj16qQTgPKqsm3KcvcfpY+COhmgG7iONW2ypK4BRRjeEqTpemPYhnZ
-X-Gm-Message-State: AOJu0Yy2boDzWrh9oLx/bPnT4fYHPMC7/ccIqaRJ3foMa9Xc9Vm0KnSa
-	5r/azSbuZdaLp2iy34JGhmqFTkF2BUpqfK5lXVqOqrkvaC0LK/EL
-X-Google-Smtp-Source: AGHT+IHs+9l8aKZ19hOvC2jXHCv+iPMgv9WAYscFS2sh3Jeul6Kv3oCDFgLl25Yo8CAQn5mb3wfa7w==
-X-Received: by 2002:a05:6402:1ed3:b0:561:4020:982f with SMTP id g19-20020a0564021ed300b005614020982fmr911342edg.22.1707472582146;
-        Fri, 09 Feb 2024 01:56:22 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVbSl2hNlU4WsCI+NqYOEx9SQaLAJgRfQpxVSepjWk1PtiND6yCBP8k5iLpU9HoXzKF1IiRHZ164tV7B9sN19SFWtY0jKL7aA9uAC38XO377YB2mo3YfWpAyvDXkmA8puojk+ahxzhEIwV9j5zkERaen1q4RfuKW0WB4wmeASyDYeYxXL/eSg9vWGhHRnVT+jhcoWlNg7dpp9j9XYEG0dJHL/UM8EhETe+j1TYRTRAwF7s=
-Received: from localhost (fwdproxy-lla-003.fbsv.net. [2a03:2880:30ff:3::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a23-20020aa7d757000000b005607fdd90b8sm624693eds.23.2024.02.09.01.56.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Feb 2024 01:56:21 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-To: kuba@kernel.org,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	Florian Fainelli <f.fainelli@gmail.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	horms@kernel.org
-Subject: [PATCH net] net: sysfs: Fix /sys/class/net/<iface> path for statistics
-Date: Fri,  9 Feb 2024 01:55:18 -0800
-Message-Id: <20240209095520.252555-1-leitao@debian.org>
-X-Mailer: git-send-email 2.39.3
+	s=arc-20240116; t=1707473122; c=relaxed/simple;
+	bh=LpId7MWNO6tC/dT5AyI2e2h2RKJBUol2yT2jrwBH+o8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=MXGrZ2nfUfs2HZBopwbg+bImOACfadh55p/hDhXE661XZm/W1Dgg/imOPp/mbiWJ9jcIiw4CTuC/0uNcGtWK+rS9jO2y4i3Cdx/jyref6CJCzxily9KHDy8/T+NXGuzmNycIw/LrI1EbL2HqwiaASFhaDi/hW0UW/Gejv1cb+e0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=mzfPkFvT; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 98561A0921;
+	Fri,  9 Feb 2024 11:05:15 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=4rlVR1nRwMZg34654zIfRzA6Fn02BC7ITCz7grW4Lgc=; b=
+	mzfPkFvTEX6K7bVsW9WeTa+D+V+yOgQPRjCtyLBEnpZfq1QzW+2tm40VZ394hVYk
+	nYX3dHdokICflfnQrP9G7JmtrF5inMferoeYe6jbSzBQR0jNDX+iHEwp0kKGRzJ8
+	JXbBlEjFBCJGAYda9puPxWN6ULwmoG3D9B3JhD3jKptBqvkoSeKmR6WgOCUJvmf8
+	Pkb3xD3iKlZ4mIYWQLRIL9AT76tnGcTIgXevgdP6xyIQf14opCPoJSf/gsd/BKKh
+	Okz7lX3fymRC9Ti14tsa+4GK8rQIc0QZ92eQNo2I0TXabUrlpOGdHfRmUvuYSB9f
+	9Sue34yXqeaQ0C7E3Dj51nWiRKx+R1EUAHah5r3BjYqQ0xLwcnTnwfeL7Bi2cGyj
+	NlZrIw+sn7yaaFRPVXP1Y1jQ9YaTs+8GJOOCplQJWhr/IKuj7pLVtKSWn8a5G3wC
+	cLVc9jd8cBSmiYZE1BYVKnQpgQqM2H6t4YQk2TeOZa0AIeJ+WP6aCC+Xxqan5w4a
+	I+dbEKsFrKrGXDvcbwnXpYEL8RAXhGCuXQwn+FE7DUgx1yMIa6iC7OTNB0Dp5LOz
+	3EVBNxb2pUeoc07W0/UZI1BcvwBwW36rFlQh5NHMelGpolV63nv2q8sN43NOd8hB
+	j0GFmOpOYz0VeOECo27k/61cOM1rhwuW4ZcA+NXWXWU=
+From: =?UTF-8?q?Cs=C3=B3k=C3=A1s=20Bence?= <csokas.bence@prolan.hu>
+To: <netdev@vger.kernel.org>
+CC: Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
+	<xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, Eric Dumazet
+	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Francesco Dolcini
+	<francesco.dolcini@toradex.com>, Andrew Lunn <andrew@lunn.ch>, "Marc
+ Kleine-Budde" <mkl@pengutronix.de>, Denis Kirjanov <dkirjanov@suse.de>,
+	=?UTF-8?q?Cs=C3=B3k=C3=A1s=20Bence?= <csokas.bence@prolan.hu>
+Subject: [PATCH net-next v3] net: fec: Refactor: #define magic constants
+Date: Fri, 9 Feb 2024 11:01:33 +0100
+Message-ID: <20240209100132.8649-1-csokas.bence@prolan.hu>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1707473114;VERSION=7967;MC=1952559061;ID=738635;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29CE703B55617362
 
-The Documentation/ABI/testing/sysfs-class-net-statistics documentation
-is pointing to the wrong path for the interface.  Documentation is
-pointing to /sys/class/<iface>, instead of /sys/class/net/<iface>.
+Add defines for bits of ECR, RCR control registers, TX watermark etc.
 
-Fix it by adding the `net/` directory before the interface.
-
-Fixes: 6044f9700645 ("net: sysfs: document /sys/class/net/statistics/*")
-Signed-off-by: Breno Leitao <leitao@debian.org>
+Signed-off-by: Csókás Bence <csokas.bence@prolan.hu>
 ---
- .../ABI/testing/sysfs-class-net-statistics    | 48 +++++++++----------
- 1 file changed, 24 insertions(+), 24 deletions(-)
+Notes:
+    Changes in v3:
+    * remove `u32 ecntl` from `fec_stop()`
+    * found another ETHEREN in `fec_restart()`
+ drivers/net/ethernet/freescale/fec_main.c | 52 ++++++++++++++---------
+ 1 file changed, 32 insertions(+), 20 deletions(-)
 
-diff --git a/Documentation/ABI/testing/sysfs-class-net-statistics b/Documentation/ABI/testing/sysfs-class-net-statistics
-index 55db27815361..53e508c6936a 100644
---- a/Documentation/ABI/testing/sysfs-class-net-statistics
-+++ b/Documentation/ABI/testing/sysfs-class-net-statistics
-@@ -1,4 +1,4 @@
--What:		/sys/class/<iface>/statistics/collisions
-+What:		/sys/class/net/<iface>/statistics/collisions
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -6,7 +6,7 @@ Description:
- 		Indicates the number of collisions seen by this network device.
- 		This value might not be relevant with all MAC layers.
+diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+index 63707e065141..84f24a0fe278 100644
+--- a/drivers/net/ethernet/freescale/fec_main.c
++++ b/drivers/net/ethernet/freescale/fec_main.c
+@@ -85,8 +85,6 @@ static int fec_enet_xdp_tx_xmit(struct fec_enet_private *fep,
  
--What:		/sys/class/<iface>/statistics/multicast
-+What:		/sys/class/net/<iface>/statistics/multicast
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -14,7 +14,7 @@ Description:
- 		Indicates the number of multicast packets received by this
- 		network device.
+ static const u16 fec_enet_vlan_pri_to_queue[8] = {0, 0, 1, 1, 1, 2, 2, 2};
  
--What:		/sys/class/<iface>/statistics/rx_bytes
-+What:		/sys/class/net/<iface>/statistics/rx_bytes
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -23,7 +23,7 @@ Description:
- 		See the network driver for the exact meaning of when this
- 		value is incremented.
+-/* Pause frame feild and FIFO threshold */
+-#define FEC_ENET_FCE	(1 << 5)
+ #define FEC_ENET_RSEM_V	0x84
+ #define FEC_ENET_RSFL_V	16
+ #define FEC_ENET_RAEM_V	0x8
+@@ -240,8 +238,8 @@ MODULE_PARM_DESC(macaddr, "FEC Ethernet MAC address");
+ #define PKT_MINBUF_SIZE		64
  
--What:		/sys/class/<iface>/statistics/rx_compressed
-+What:		/sys/class/net/<iface>/statistics/rx_compressed
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -32,7 +32,7 @@ Description:
- 		network device. This value might only be relevant for interfaces
- 		that support packet compression (e.g: PPP).
+ /* FEC receive acceleration */
+-#define FEC_RACC_IPDIS		(1 << 1)
+-#define FEC_RACC_PRODIS		(1 << 2)
++#define FEC_RACC_IPDIS		BIT(1)
++#define FEC_RACC_PRODIS		BIT(2)
+ #define FEC_RACC_SHIFT16	BIT(7)
+ #define FEC_RACC_OPTIONS	(FEC_RACC_IPDIS | FEC_RACC_PRODIS)
  
--What:		/sys/class/<iface>/statistics/rx_crc_errors
-+What:		/sys/class/net/<iface>/statistics/rx_crc_errors
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -41,7 +41,7 @@ Description:
- 		by this network device. Note that the specific meaning might
- 		depend on the MAC layer used by the interface.
+@@ -273,8 +271,23 @@ MODULE_PARM_DESC(macaddr, "FEC Ethernet MAC address");
+ #define FEC_MMFR_TA		(2 << 16)
+ #define FEC_MMFR_DATA(v)	(v & 0xffff)
+ /* FEC ECR bits definition */
+-#define FEC_ECR_MAGICEN		(1 << 2)
+-#define FEC_ECR_SLEEP		(1 << 3)
++#define FEC_ECR_RESET           BIT(0)
++#define FEC_ECR_ETHEREN         BIT(1)
++#define FEC_ECR_MAGICEN         BIT(2)
++#define FEC_ECR_SLEEP           BIT(3)
++#define FEC_ECR_EN1588          BIT(4)
++#define FEC_ECR_BYTESWP         BIT(8)
++/* FEC RCR bits definition */
++#define FEC_RCR_LOOP            BIT(0)
++#define FEC_RCR_HALFDPX         BIT(1)
++#define FEC_RCR_MII             BIT(2)
++#define FEC_RCR_PROMISC         BIT(3)
++#define FEC_RCR_BC_REJ          BIT(4)
++#define FEC_RCR_FLOWCTL         BIT(5)
++#define FEC_RCR_RMII            BIT(8)
++#define FEC_RCR_10BASET         BIT(9)
++/* TX WMARK bits */
++#define FEC_TXWMRK_STRFWD       BIT(8)
  
--What:		/sys/class/<iface>/statistics/rx_dropped
-+What:		/sys/class/net/<iface>/statistics/rx_dropped
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -51,7 +51,7 @@ Description:
- 		packet processing. See the network driver for the exact
- 		meaning of this value.
+ #define FEC_MII_TIMEOUT		30000 /* us */
  
--What:		/sys/class/<iface>/statistics/rx_errors
-+What:		/sys/class/net/<iface>/statistics/rx_errors
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -59,7 +59,7 @@ Description:
- 		Indicates the number of receive errors on this network device.
- 		See the network driver for the exact meaning of this value.
+@@ -1062,7 +1075,7 @@ fec_restart(struct net_device *ndev)
+ 	struct fec_enet_private *fep = netdev_priv(ndev);
+ 	u32 temp_mac[2];
+ 	u32 rcntl = OPT_FRAME_SIZE | 0x04;
+-	u32 ecntl = 0x2; /* ETHEREN */
++	u32 ecntl = FEC_ECR_ETHEREN;
  
--What:		/sys/class/<iface>/statistics/rx_fifo_errors
-+What:		/sys/class/net/<iface>/statistics/rx_fifo_errors
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -68,7 +68,7 @@ Description:
- 		network device. See the network driver for the exact
- 		meaning of this value.
+ 	/* Whack a reset.  We should wait for this.
+ 	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
+@@ -1137,18 +1150,18 @@ fec_restart(struct net_device *ndev)
+ 		    fep->phy_interface == PHY_INTERFACE_MODE_RGMII_TXID)
+ 			rcntl |= (1 << 6);
+ 		else if (fep->phy_interface == PHY_INTERFACE_MODE_RMII)
+-			rcntl |= (1 << 8);
++			rcntl |= FEC_RCR_RMII;
+ 		else
+-			rcntl &= ~(1 << 8);
++			rcntl &= ~FEC_RCR_RMII;
  
--What:		/sys/class/<iface>/statistics/rx_frame_errors
-+What:		/sys/class/net/<iface>/statistics/rx_frame_errors
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -78,7 +78,7 @@ Description:
- 		on the MAC layer protocol used. See the network driver for
- 		the exact meaning of this value.
+ 		/* 1G, 100M or 10M */
+ 		if (ndev->phydev) {
+ 			if (ndev->phydev->speed == SPEED_1000)
+ 				ecntl |= (1 << 5);
+ 			else if (ndev->phydev->speed == SPEED_100)
+-				rcntl &= ~(1 << 9);
++				rcntl &= ~FEC_RCR_10BASET;
+ 			else
+-				rcntl |= (1 << 9);
++				rcntl |= FEC_RCR_10BASET;
+ 		}
+ 	} else {
+ #ifdef FEC_MIIGSK_ENR
+@@ -1181,7 +1194,7 @@ fec_restart(struct net_device *ndev)
+ 	if ((fep->pause_flag & FEC_PAUSE_FLAG_ENABLE) ||
+ 	    ((fep->pause_flag & FEC_PAUSE_FLAG_AUTONEG) &&
+ 	     ndev->phydev && ndev->phydev->pause)) {
+-		rcntl |= FEC_ENET_FCE;
++		rcntl |= FEC_RCR_FLOWCTL;
  
--What:		/sys/class/<iface>/statistics/rx_length_errors
-+What:		/sys/class/net/<iface>/statistics/rx_length_errors
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -87,7 +87,7 @@ Description:
- 		error, oversized or undersized. See the network driver for the
- 		exact meaning of this value.
+ 		/* set FIFO threshold parameter to reduce overrun */
+ 		writel(FEC_ENET_RSEM_V, fep->hwp + FEC_R_FIFO_RSEM);
+@@ -1192,7 +1205,7 @@ fec_restart(struct net_device *ndev)
+ 		/* OPD */
+ 		writel(FEC_ENET_OPD_V, fep->hwp + FEC_OPD);
+ 	} else {
+-		rcntl &= ~FEC_ENET_FCE;
++		rcntl &= ~FEC_RCR_FLOWCTL;
+ 	}
+ #endif /* !defined(CONFIG_M5272) */
  
--What:		/sys/class/<iface>/statistics/rx_missed_errors
-+What:		/sys/class/net/<iface>/statistics/rx_missed_errors
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -96,7 +96,7 @@ Description:
- 		due to lack of capacity in the receive side. See the network
- 		driver for the exact meaning of this value.
+@@ -1207,13 +1220,13 @@ fec_restart(struct net_device *ndev)
  
--What:		/sys/class/<iface>/statistics/rx_nohandler
-+What:		/sys/class/net/<iface>/statistics/rx_nohandler
- Date:		February 2016
- KernelVersion:	4.6
- Contact:	netdev@vger.kernel.org
-@@ -104,7 +104,7 @@ Description:
- 		Indicates the number of received packets that were dropped on
- 		an inactive device by the network core.
+ 	if (fep->quirks & FEC_QUIRK_ENET_MAC) {
+ 		/* enable ENET endian swap */
+-		ecntl |= (1 << 8);
++		ecntl |= FEC_ECR_BYTESWP;
+ 		/* enable ENET store and forward mode */
+-		writel(1 << 8, fep->hwp + FEC_X_WMRK);
++		writel(FEC_TXWMRK_STRFWD, fep->hwp + FEC_X_WMRK);
+ 	}
  
--What:		/sys/class/<iface>/statistics/rx_over_errors
-+What:		/sys/class/net/<iface>/statistics/rx_over_errors
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -114,7 +114,7 @@ Description:
- 		(e.g: larger than MTU). See the network driver for the exact
- 		meaning of this value.
+ 	if (fep->bufdesc_ex)
+-		ecntl |= (1 << 4);
++		ecntl |= FEC_ECR_EN1588;
  
--What:		/sys/class/<iface>/statistics/rx_packets
-+What:		/sys/class/net/<iface>/statistics/rx_packets
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -122,7 +122,7 @@ Description:
- 		Indicates the total number of good packets received by this
- 		network device.
+ 	if (fep->quirks & FEC_QUIRK_DELAYED_CLKS_SUPPORT &&
+ 	    fep->rgmii_txc_dly)
+@@ -1312,7 +1325,7 @@ static void
+ fec_stop(struct net_device *ndev)
+ {
+ 	struct fec_enet_private *fep = netdev_priv(ndev);
+-	u32 rmii_mode = readl(fep->hwp + FEC_R_CNTRL) & (1 << 8);
++	u32 rmii_mode = readl(fep->hwp + FEC_R_CNTRL) & FEC_RCR_RMII;
+ 	u32 val;
  
--What:		/sys/class/<iface>/statistics/tx_aborted_errors
-+What:		/sys/class/net/<iface>/statistics/tx_aborted_errors
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -132,7 +132,7 @@ Description:
- 		a medium collision). See the network driver for the exact
- 		meaning of this value.
+ 	/* We cannot expect a graceful transmit stop without link !!! */
+@@ -1331,7 +1344,7 @@ fec_stop(struct net_device *ndev)
+ 		if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES) {
+ 			writel(0, fep->hwp + FEC_ECNTRL);
+ 		} else {
+-			writel(1, fep->hwp + FEC_ECNTRL);
++			writel(FEC_ECR_RESET, fep->hwp + FEC_ECNTRL);
+ 			udelay(10);
+ 		}
+ 	} else {
+@@ -1345,12 +1358,11 @@ fec_stop(struct net_device *ndev)
+ 	/* We have to keep ENET enabled to have MII interrupt stay working */
+ 	if (fep->quirks & FEC_QUIRK_ENET_MAC &&
+ 		!(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
+-		writel(2, fep->hwp + FEC_ECNTRL);
++		writel(FEC_ECR_ETHEREN, fep->hwp + FEC_ECNTRL);
+ 		writel(rmii_mode, fep->hwp + FEC_R_CNTRL);
+ 	}
+ }
  
--What:		/sys/class/<iface>/statistics/tx_bytes
-+What:		/sys/class/net/<iface>/statistics/tx_bytes
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -143,7 +143,7 @@ Description:
- 		transmitted packets or all packets that have been queued for
- 		transmission.
- 
--What:		/sys/class/<iface>/statistics/tx_carrier_errors
-+What:		/sys/class/net/<iface>/statistics/tx_carrier_errors
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -152,7 +152,7 @@ Description:
- 		because of carrier errors (e.g: physical link down). See the
- 		network driver for the exact meaning of this value.
- 
--What:		/sys/class/<iface>/statistics/tx_compressed
-+What:		/sys/class/net/<iface>/statistics/tx_compressed
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -161,7 +161,7 @@ Description:
- 		this might only be relevant for devices that support
- 		compression (e.g: PPP).
- 
--What:		/sys/class/<iface>/statistics/tx_dropped
-+What:		/sys/class/net/<iface>/statistics/tx_dropped
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -170,7 +170,7 @@ Description:
- 		See the driver for the exact reasons as to why the packets were
- 		dropped.
- 
--What:		/sys/class/<iface>/statistics/tx_errors
-+What:		/sys/class/net/<iface>/statistics/tx_errors
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -179,7 +179,7 @@ Description:
- 		a network device. See the driver for the exact reasons as to
- 		why the packets were dropped.
- 
--What:		/sys/class/<iface>/statistics/tx_fifo_errors
-+What:		/sys/class/net/<iface>/statistics/tx_fifo_errors
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -188,7 +188,7 @@ Description:
- 		FIFO error. See the driver for the exact reasons as to why the
- 		packets were dropped.
- 
--What:		/sys/class/<iface>/statistics/tx_heartbeat_errors
-+What:		/sys/class/net/<iface>/statistics/tx_heartbeat_errors
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -197,7 +197,7 @@ Description:
- 		reported as heartbeat errors. See the driver for the exact
- 		reasons as to why the packets were dropped.
- 
--What:		/sys/class/<iface>/statistics/tx_packets
-+What:		/sys/class/net/<iface>/statistics/tx_packets
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
-@@ -206,7 +206,7 @@ Description:
- 		device. See the driver for whether this reports the number of all
- 		attempted or successful transmissions.
- 
--What:		/sys/class/<iface>/statistics/tx_window_errors
-+What:		/sys/class/net/<iface>/statistics/tx_window_errors
- Date:		April 2005
- KernelVersion:	2.6.12
- Contact:	netdev@vger.kernel.org
+-
+ static void
+ fec_timeout(struct net_device *ndev, unsigned int txqueue)
+ {
 -- 
-2.39.3
+2.25.1
+
 
 
