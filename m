@@ -1,191 +1,260 @@
-Return-Path: <netdev+bounces-70551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50E9584F7F6
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 15:56:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13C8584F7F8
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 15:57:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EC42B221E6
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 14:56:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62497B23862
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 14:57:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A159D6A037;
-	Fri,  9 Feb 2024 14:56:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jNbKbGRV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F72D6EB4E;
+	Fri,  9 Feb 2024 14:57:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 140756DCEB
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 14:56:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6DA66DCEB
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 14:57:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707490583; cv=none; b=dfr/eAFxTOeDwWiKikeoDtU/T3tAGcNTmel0RLluIqkp0PbeAhcLi93bWJwTqFMdrRh2kC9O8DDPhmAxTlOBXt7OsziD2rP9eNp2vf9fpFTA9j4/ATCP03yJLfUXXa5weVkQHBW04ocZguv8Ie3nElkOZ6e2+oDo/qFlFL7amlA=
+	t=1707490640; cv=none; b=m1wpxB5/CwGW3rxiHy+ntKLQ9hPKUg8xvQG8t6f/o1gH95QjHCMUO7fz5DDQ5A6JKVODr2ub8RghnWBbg5HEaz/m/PBtxhZWWdBS/qFnc9rjiwGbhRQvRuoUfyRZevKDtR/ZYJ6lJzfTLUVCUxRjfAxHBc1Q34TEYiDWS1rZjzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707490583; c=relaxed/simple;
-	bh=8yQF8FR1l9TVynptGgh2ccwZDV7Su20nOHFxFeuQ5hg=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=i01PEzktVFfKpmcvsy9C4hM/rIO29iMJIyEUbk0OHAQPzQCX9HlWeisRJCq7d/5v72Lw0oZ/NFoNhN0Ie9lCuO/T2pF/2noawrqEam5TLy+n5FXctwhSD1ydvFQ+1UHDHHvEHhW2tJB6LTA/cZhWQsNDNLZmmfMxN8xWwy4aD0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jNbKbGRV; arc=none smtp.client-ip=209.85.219.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b267bf11so1435574276.2
-        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 06:56:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707490581; x=1708095381; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HH3vdhmKs6CuIDGtYb1dSzhwGgMJ2U2w+361jJK3Fu0=;
-        b=jNbKbGRVovO+6Xfj8K94nO9KSUJTxVUB6+ymwpPrGjWpYFr83cvWyj/icKLKnTIQcL
-         41sy5z1vgpYfetWQX4OsvJAFggch+uQGyYpkmy7EjARlSOwqkgbyQ6i/96rMUrJwEJAF
-         YqktVPVfSnYGzF/ewDtAeyhwGFzOwNYzZUa2yL7bbhvkoG4YlK7prlaE/Nn3LJQwlA6m
-         eTwOjso7qztMm4UQi72Z1AuDFj4wkevsViKRloRCPz8dGcOf71N2VkKFLBiMLuIZHy4A
-         biKwNHAKsB/M5WEXvyqdJ1Gp/BKH8zep0/mxVH6le0lYbkpbjm15PkIsN+qJ1uXCwOGP
-         K/pA==
+	s=arc-20240116; t=1707490640; c=relaxed/simple;
+	bh=1GkUptlAGWiFzmVyFPJnkTLCBRWyXZKVXwJz1OpOL+w=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Xpi7XUKfXhEiRPJ5oUQJIIVDDFRrFvEofPbp1hsadPyCZzoVAHBzDIvnDz42bYuePS/wifpfepHKymPJnpFrIcezSY5KiXDFKCmjYWat5i8SqiR3tLIHfD015xpmwX3WqoRz/cyr1815+oSRaOyc7k2gzKXyDs4xf+cXZ54vhas=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-363d169c770so11383895ab.0
+        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 06:57:18 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707490581; x=1708095381;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HH3vdhmKs6CuIDGtYb1dSzhwGgMJ2U2w+361jJK3Fu0=;
-        b=gMRjo5K9rGMjcIFo07PDPxvMRFevzQ8X0W/rrkLvvcFJh58QsfJ4dqSWnLonDiZIWP
-         JIJH8YyB4SSycKyaA8fbgP1lqMdxQP14uew7Kxq9swWn6U1KdN5zsX0Ely9ZYNnAcP5/
-         Zlz37pos4uQG3QiqKGgpxfSv6vmb1X81UDyUKjl97e2etP+RrkwhQt3hiK2IjQyDtbXM
-         hXW1VS/BB/QhCLLbx3cozzy+WqJ3rx8knn2jeAVTdLtv3RupWbkoqufdxp1sKeHTuoBj
-         nuyfCjczW2EyheT2OJKid6FKuaLjFnVqNnmq41YlmH/tCL6t2UznLkIMu6cjkGGbGVUF
-         n82w==
-X-Gm-Message-State: AOJu0YxTtAFXhHMkbgX295cUkymgCn8YhVFsLo5umAFk2gFIKrHpOt5S
-	BIuucI2ydtDbuYU28hXSS7j2eOHIj4oiy3zFN3CgHAyQukY3raNtOXjPnen5t2ipI3O4/R27dgJ
-	ZAfp7opngxg==
-X-Google-Smtp-Source: AGHT+IG5DixspMpKqYFxU0Yydy8roHiS1C4uTQpAXIjprFhOJiaKVHuDKFgTHh2m3aczC7JMu5ELoatufVYaeA==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:c586:0:b0:dc6:a6e3:ca93 with SMTP id
- v128-20020a25c586000000b00dc6a6e3ca93mr29414ybe.10.1707490581041; Fri, 09 Feb
- 2024 06:56:21 -0800 (PST)
-Date: Fri,  9 Feb 2024 14:56:15 +0000
-In-Reply-To: <20240209145615.3708207-1-edumazet@google.com>
+        d=1e100.net; s=20230601; t=1707490638; x=1708095438;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=h7Puv2RhPnFRFU7g/xtnaNvGInJRzTflHLAZrr7bSvY=;
+        b=bt1xKwr3d3O8rOsiWCp7H4Qk7PkQsGl05WCXEvFU93Z0W1GIUrMGCDJH4nwHYbnVsD
+         YxRfol7B5PuoEXGQ312rGhP6rtdNlsp/S4vAK7awFgekLkKRgThL01dU3O9I0YBkyave
+         m2BVZN6zhUhrafNFUkaJvNt8mmo3q9kl5MFCyMVvDUdPPKXN+nL1pi5m6oHdnbYPPJxJ
+         lSKdlmvRF/q8X1bTqQB+pho8FciaDdGaPf8GZ3iRZbHI4jeQ+5CierXy7fhJUTSGIgCY
+         60eTytBY2+S309qpsVwEWxKXJH46RAfQEA8UrsOZH/HlkwzECWLrCndFEvjga9u3riuI
+         9txQ==
+X-Gm-Message-State: AOJu0YwgYWS86e1sR5/9bBSxvJDDnWraD9iEfVc9uiqy6ZfkDnV8Qwcz
+	GbKNnP6Fjyx4JTn++jRqcPPnSiMxrCP/SoR95pmiIquZCew+/bEFztAD5YyUCXKt4WyV65NzaRa
+	YA2ctqHwp5E+LIjge2B+5zNnppDV4WKzoUbbcEV1x0G0Y+Tgr10VlAZI=
+X-Google-Smtp-Source: AGHT+IFNBCVh1gKLKcUcrGT1ZHGiHMQU0Q/sfIWkI0Sx6XESTM8aYVjsMRLWQJyswJlKG/r+J5S+CCw7WVGl5vuChWu4xIP38aKv
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20240209145615.3708207-1-edumazet@google.com>
-X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
-Message-ID: <20240209145615.3708207-3-edumazet@google.com>
-Subject: [PATCH net-next 2/2] rtnetlink: use xarray iterator to implement rtnl_dump_ifinfo()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
+MIME-Version: 1.0
+X-Received: by 2002:a92:c263:0:b0:363:cdfb:7fd1 with SMTP id
+ h3-20020a92c263000000b00363cdfb7fd1mr110124ild.1.1707490637906; Fri, 09 Feb
+ 2024 06:57:17 -0800 (PST)
+Date: Fri, 09 Feb 2024 06:57:17 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ee09930610f42470@google.com>
+Subject: [syzbot] [kernel?] KASAN: slab-use-after-free Read in __unix_gc
+From: syzbot <syzbot+5a630f8ca0120ab43f55@syzkaller.appspotmail.com>
+To: bp@alien8.de, dave.hansen@linux.intel.com, hpa@zytor.com, 
+	linux-kernel@vger.kernel.org, mingo@redhat.com, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, tglx@linutronix.de, x86@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Adopt net->dev_by_index as I did in commit 0e0939c0adf9
-("net-procfs: use xarray iterator to implement /proc/net/dev")
+Hello,
 
-This makes sure an existing device is always visible in the dump,
-regardless of concurrent insertions/deletions.
+syzbot found the following issue on:
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+HEAD commit:    e7689879d14e ethtool: do not use rtnl in ethnl_default_dum..
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1195b6e0180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ac1116e4986e7570
+dashboard link: https://syzkaller.appspot.com/bug?extid=5a630f8ca0120ab43f55
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=121d9b5c180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=165f9cec180000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/c5b791d72e1e/disk-e7689879.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/472cf2131e7b/vmlinux-e7689879.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c1e5a4b33244/bzImage-e7689879.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5a630f8ca0120ab43f55@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KASAN: slab-use-after-free in __unix_gc+0xe0f/0xf70
+Read of size 8 at addr ffff8880237e3640 by task kworker/u4:4/59
+
+CPU: 0 PID: 59 Comm: kworker/u4:4 Not tainted 6.8.0-rc3-syzkaller-00766-ge7689879d14e #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
+Workqueue: events_unbound __unix_gc
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0x167/0x540 mm/kasan/report.c:488
+ kasan_report+0x142/0x180 mm/kasan/report.c:601
+ __unix_gc+0xe0f/0xf70
+ process_one_work kernel/workqueue.c:2633 [inline]
+ process_scheduled_works+0x913/0x1420 kernel/workqueue.c:2706
+ worker_thread+0xa5f/0x1000 kernel/workqueue.c:2787
+ kthread+0x2ef/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1b/0x30 arch/x86/entry/entry_64.S:242
+ </TASK>
+
+Allocated by task 5076:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ unpoison_slab_object mm/kasan/common.c:314 [inline]
+ __kasan_slab_alloc+0x66/0x80 mm/kasan/common.c:340
+ kasan_slab_alloc include/linux/kasan.h:201 [inline]
+ slab_post_alloc_hook mm/slub.c:3813 [inline]
+ slab_alloc_node mm/slub.c:3860 [inline]
+ kmem_cache_alloc+0x16f/0x340 mm/slub.c:3867
+ sk_prot_alloc+0x58/0x210 net/core/sock.c:2073
+ sk_alloc+0x38/0x370 net/core/sock.c:2132
+ unix_create1+0xb4/0x7f0
+ unix_create+0x14e/0x200 net/unix/af_unix.c:1047
+ __sock_create+0x48f/0x920 net/socket.c:1571
+ sock_create net/socket.c:1622 [inline]
+ __sys_socketpair+0x33d/0x720 net/socket.c:1773
+ __do_sys_socketpair net/socket.c:1822 [inline]
+ __se_sys_socketpair net/socket.c:1819 [inline]
+ __x64_sys_socketpair+0x9b/0xb0 net/socket.c:1819
+ do_syscall_64+0xf9/0x240
+ entry_SYSCALL_64_after_hwframe+0x6f/0x77
+
+Freed by task 23:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ kasan_save_free_info+0x4e/0x60 mm/kasan/generic.c:640
+ poison_slab_object+0xa6/0xe0 mm/kasan/common.c:241
+ __kasan_slab_free+0x34/0x70 mm/kasan/common.c:257
+ kasan_slab_free include/linux/kasan.h:184 [inline]
+ slab_free_hook mm/slub.c:2121 [inline]
+ slab_free mm/slub.c:4299 [inline]
+ kmem_cache_free+0x102/0x2a0 mm/slub.c:4363
+ sk_prot_free net/core/sock.c:2113 [inline]
+ __sk_destruct+0x470/0x5f0 net/core/sock.c:2207
+ sock_put include/net/sock.h:1961 [inline]
+ unix_release_sock+0x903/0xd20 net/unix/af_unix.c:649
+ unix_release+0x91/0xc0 net/unix/af_unix.c:1062
+ __sock_release net/socket.c:659 [inline]
+ sock_close+0xbc/0x240 net/socket.c:1421
+ __fput+0x429/0x8a0 fs/file_table.c:376
+ delayed_fput+0x59/0x80 fs/file_table.c:399
+ process_one_work kernel/workqueue.c:2633 [inline]
+ process_scheduled_works+0x913/0x1420 kernel/workqueue.c:2706
+ worker_thread+0xa5f/0x1000 kernel/workqueue.c:2787
+ kthread+0x2ef/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1b/0x30 arch/x86/entry/entry_64.S:242
+
+The buggy address belongs to the object at ffff8880237e3000
+ which belongs to the cache UNIX-STREAM of size 1920
+The buggy address is located 1600 bytes inside of
+ freed 1920-byte region [ffff8880237e3000, ffff8880237e3780)
+
+The buggy address belongs to the physical page:
+page:ffffea00008df800 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x237e0
+head:ffffea00008df800 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+flags: 0xfff00000000840(slab|head|node=0|zone=1|lastcpupid=0x7ff)
+page_type: 0xffffffff()
+raw: 00fff00000000840 ffff8880183aa280 dead000000000122 0000000000000000
+raw: 0000000000000000 0000000080100010 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), pid 5069, tgid 5069 (sftp-server), ts 69550911589, free_ts 69532294849
+ set_page_owner include/linux/page_owner.h:31 [inline]
+ post_alloc_hook+0x1ea/0x210 mm/page_alloc.c:1533
+ prep_new_page mm/page_alloc.c:1540 [inline]
+ get_page_from_freelist+0x33ea/0x3580 mm/page_alloc.c:3311
+ __alloc_pages+0x255/0x680 mm/page_alloc.c:4567
+ __alloc_pages_node include/linux/gfp.h:238 [inline]
+ alloc_pages_node include/linux/gfp.h:261 [inline]
+ alloc_slab_page+0x5f/0x160 mm/slub.c:2190
+ allocate_slab mm/slub.c:2354 [inline]
+ new_slab+0x84/0x2f0 mm/slub.c:2407
+ ___slab_alloc+0xd17/0x13e0 mm/slub.c:3540
+ __slab_alloc mm/slub.c:3625 [inline]
+ __slab_alloc_node mm/slub.c:3678 [inline]
+ slab_alloc_node mm/slub.c:3850 [inline]
+ kmem_cache_alloc+0x24d/0x340 mm/slub.c:3867
+ sk_prot_alloc+0x58/0x210 net/core/sock.c:2073
+ sk_alloc+0x38/0x370 net/core/sock.c:2132
+ unix_create1+0xb4/0x7f0
+ unix_stream_connect+0x348/0x1110 net/unix/af_unix.c:1511
+ __sys_connect_file net/socket.c:2048 [inline]
+ __sys_connect+0x2df/0x310 net/socket.c:2065
+ __do_sys_connect net/socket.c:2075 [inline]
+ __se_sys_connect net/socket.c:2072 [inline]
+ __x64_sys_connect+0x7a/0x90 net/socket.c:2072
+ do_syscall_64+0xf9/0x240
+ entry_SYSCALL_64_after_hwframe+0x6f/0x77
+page last free pid 5069 tgid 5069 stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1140 [inline]
+ free_unref_page_prepare+0x968/0xa90 mm/page_alloc.c:2346
+ free_unref_page+0x37/0x3f0 mm/page_alloc.c:2486
+ discard_slab mm/slub.c:2453 [inline]
+ __put_partials+0xeb/0x130 mm/slub.c:2922
+ put_cpu_partial+0x17b/0x250 mm/slub.c:2997
+ __slab_free+0x302/0x410 mm/slub.c:4166
+ qlink_free mm/kasan/quarantine.c:160 [inline]
+ qlist_free_all+0x6d/0xd0 mm/kasan/quarantine.c:176
+ kasan_quarantine_reduce+0x14f/0x170 mm/kasan/quarantine.c:283
+ __kasan_slab_alloc+0x23/0x80 mm/kasan/common.c:324
+ kasan_slab_alloc include/linux/kasan.h:201 [inline]
+ slab_post_alloc_hook mm/slub.c:3813 [inline]
+ slab_alloc_node mm/slub.c:3860 [inline]
+ kmem_cache_alloc+0x16f/0x340 mm/slub.c:3867
+ vm_area_alloc+0x24/0x1d0 kernel/fork.c:465
+ mmap_region+0xbd8/0x1fa0 mm/mmap.c:2806
+ do_mmap+0x7ae/0xe60 mm/mmap.c:1379
+ vm_mmap_pgoff+0x1e2/0x420 mm/util.c:556
+ ksys_mmap_pgoff+0x503/0x6e0 mm/mmap.c:1425
+ do_syscall_64+0xf9/0x240
+ entry_SYSCALL_64_after_hwframe+0x6f/0x77
+
+Memory state around the buggy address:
+ ffff8880237e3500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff8880237e3580: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>ffff8880237e3600: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                                           ^
+ ffff8880237e3680: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff8880237e3700: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
+
+
 ---
- net/core/rtnetlink.c | 59 ++++++++++++++------------------------------
- 1 file changed, 19 insertions(+), 40 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 31f433950c8dc953bcb65cc0469f7df962314b87..68a224bbf1dd6118526329782362a4bfc192d6b1 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -2188,25 +2188,20 @@ static int rtnl_valid_dump_ifinfo_req(const struct nlmsghdr *nlh,
- 
- static int rtnl_dump_ifinfo(struct sk_buff *skb, struct netlink_callback *cb)
- {
-+	const struct rtnl_link_ops *kind_ops = NULL;
- 	struct netlink_ext_ack *extack = cb->extack;
- 	const struct nlmsghdr *nlh = cb->nlh;
- 	struct net *net = sock_net(skb->sk);
--	struct net *tgt_net = net;
--	int h, s_h;
--	int idx = 0, s_idx;
--	struct net_device *dev;
--	struct hlist_head *head;
-+	unsigned long ifindex = cb->args[0];
-+	unsigned int flags = NLM_F_MULTI;
- 	struct nlattr *tb[IFLA_MAX+1];
-+	struct net *tgt_net = net;
- 	u32 ext_filter_mask = 0;
--	const struct rtnl_link_ops *kind_ops = NULL;
--	unsigned int flags = NLM_F_MULTI;
-+	struct net_device *dev;
- 	int master_idx = 0;
- 	int netnsid = -1;
- 	int err, i;
- 
--	s_h = cb->args[0];
--	s_idx = cb->args[1];
--
- 	err = rtnl_valid_dump_ifinfo_req(nlh, cb->strict_check, tb, extack);
- 	if (err < 0) {
- 		if (cb->strict_check)
-@@ -2250,42 +2245,26 @@ static int rtnl_dump_ifinfo(struct sk_buff *skb, struct netlink_callback *cb)
- 		flags |= NLM_F_DUMP_FILTERED;
- 
- walk_entries:
--	for (h = s_h; h < NETDEV_HASHENTRIES; h++, s_idx = 0) {
--		idx = 0;
--		head = &tgt_net->dev_index_head[h];
--		hlist_for_each_entry(dev, head, index_hlist) {
--			if (link_dump_filtered(dev, master_idx, kind_ops))
--				goto cont;
--			if (idx < s_idx)
--				goto cont;
--			err = rtnl_fill_ifinfo(skb, dev, net,
--					       RTM_NEWLINK,
--					       NETLINK_CB(cb->skb).portid,
--					       nlh->nlmsg_seq, 0, flags,
--					       ext_filter_mask, 0, NULL, 0,
--					       netnsid, GFP_KERNEL);
--
--			if (err < 0) {
--				if (likely(skb->len))
--					goto out;
--
--				goto out_err;
--			}
--cont:
--			idx++;
--		}
--	}
--out:
- 	err = skb->len;
--out_err:
--	cb->args[1] = idx;
--	cb->args[0] = h;
-+	for_each_netdev_dump(tgt_net, dev, ifindex) {
-+		if (link_dump_filtered(dev, master_idx, kind_ops))
-+			continue;
-+		err = rtnl_fill_ifinfo(skb, dev, net, RTM_NEWLINK,
-+				       NETLINK_CB(cb->skb).portid,
-+				       nlh->nlmsg_seq, 0, flags,
-+				       ext_filter_mask, 0, NULL, 0,
-+				       netnsid, GFP_KERNEL);
-+
-+		if (err < 0)
-+			break;
-+		cb->args[0] = ifindex + 1;
-+	}
- 	cb->seq = tgt_net->dev_base_seq;
- 	nl_dump_check_consistent(cb, nlmsg_hdr(skb));
- 	if (netnsid >= 0)
- 		put_net(tgt_net);
- 
--	return err;
-+	return skb->len ?: err;
- }
- 
- int rtnl_nla_parse_ifinfomsg(struct nlattr **tb, const struct nlattr *nla_peer,
--- 
-2.43.0.687.g38aa6559b0-goog
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
