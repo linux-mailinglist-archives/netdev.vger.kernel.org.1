@@ -1,155 +1,147 @@
-Return-Path: <netdev+bounces-70445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D01AE84F001
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 06:48:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06B4F84F01E
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 07:11:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0C6D1C24688
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 05:48:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACBCE288B35
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 06:11:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0FF656B88;
-	Fri,  9 Feb 2024 05:48:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E2556B9C;
+	Fri,  9 Feb 2024 06:11:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b="Xmlafq33"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aAgyyMWb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBAEF56B87
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 05:48:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B7C57306
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 06:11:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707457725; cv=none; b=C2BSK3W19alG5Ti9xAOg4Hh3USrPP4DQ/+ZJO/Yn007PnqdNrUb38UJL/KnI+fLc4vYS1TLSpghkVm90XJgycHmKdNyubcAb7xI4t8SWUqButN30keun9acm6KGnAQ+dAPq+97eSpkmYvvNY4M7ikCK8b6+XnOsXUUStiVldS6M=
+	t=1707459093; cv=none; b=kjmoaIhcGW3bd/QyVh2XQkqJh0MFwZnYZphWHMvh6VSC0iATJQ6hQ6jrXV69Z53bBFApGT8ffBGO0vHcu/pzTOelVRllgxNZ5/Qor5i/LlLSJO0zgrIIcRiZYF4hVwprxhmXYJZpUm2L6eoXdfWx+BEG82B69L4ZvN12+g/6pns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707457725; c=relaxed/simple;
-	bh=nmD3BwatGhYAlv4NhN2ZIYh92q6PNgmm207o5l1juhI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ja4m25GRFHbqiyLQM0ilI3dtykRyOUYW1HafgXH8eYu77buxfBZlNUtO5PzXDOSGNIab9DgBnkixW6IkovhoimyivAopjKu2AfjQ14I+KW5gEo+Yiol/SfP9EKjPSEtMnciIjGMJS8hjrFc36vn7L8T3p74Nv90qSKoD/6EkQrY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev; spf=pass smtp.mailfrom=tuxon.dev; dkim=pass (2048-bit key) header.d=tuxon.dev header.i=@tuxon.dev header.b=Xmlafq33; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=tuxon.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tuxon.dev
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-41061f0a243so3039695e9.0
-        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 21:48:43 -0800 (PST)
+	s=arc-20240116; t=1707459093; c=relaxed/simple;
+	bh=ynUzPpAGylPTJLOrR9TVvlQRT3GJrcyzUzLgoh61uHo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q482Aklv099qJNkoQROfMK+6/IO6aj4TS0c07IiNwkDS+2o4fZDQq0b2Uh9BYhbex8h9BXkExTusQStMCF/dh6XevlJse8Hln+t20kv59yQSocmPPYujRsng2AYgIL17kWPyuHF2cmcNRfxDUoNNgtWDr4kPBqKfT548e3MupAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aAgyyMWb; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1d746ce7d13so5006605ad.0
+        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 22:11:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tuxon.dev; s=google; t=1707457722; x=1708062522; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NxSyZICm/I5GO8I9p/NPQ1lnFZnR704Xte4TLK0i60g=;
-        b=Xmlafq33YUb/YT8weqfjltgBZZVULw3HqtsvvVxDC5j4JVPoqC1q4GS7o/Oqy8v0Yd
-         uxy9cpPpllAnun8rx9Rb32+54pfGSQJVMWiDpvtXSqXQb2VgmBEog4JCmrFHPGVsE4DN
-         RRKBIO3o0AvNuDQ7o3LYFZYHtLWnRaQpYGiEVUF0r77P2zF/XpXW1mxNBrTPFQL+PilE
-         eY03O5Dxuq/o7VT+IaywEEYwlkSef8Y+C2GqqwQSbVsUNwVgc+adV1LCtjeXEDrsI7Xp
-         1upIy+uRi7idAmNU97alSBh/gLpeM3D0YkWDumwiv1+BxdtOowcVoYOJByxlXWUGXyfW
-         94Bg==
+        d=gmail.com; s=20230601; t=1707459091; x=1708063891; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=w69FvwPxJEmTE4Nu5S/qqkjkkefb5ZX1gIWH2ZAd6AU=;
+        b=aAgyyMWbMqYX1XfWwHEjLZCqENtzUDXdCoPjdAimWt+IDDY5B2nQmfCzS0kuqlYnD9
+         22fwP/z1O82zuB0YMv4in7/fUZza6W9+0DgbJJ212lXoPJMPsJ1kPqGg6/G8ik8B//dq
+         goOnwpAJ9xYBpDMnQ88R6M1CeOZn+2+BolqbomJcRppxKTGNea0oHeBgWBDuJlvveKrA
+         4s+ygKJYbWQReluVOl6l1BLtdBziP1E1116R+xG456lzs6XKTweWeM929tGAOkIAg26w
+         NLsFOOCKtE/ZFwqqDtRHXLxZKgZbRSKY1Qg/ayz3JeJSPpti5azp3YkmRUAraADYKjCN
+         c5Bw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707457722; x=1708062522;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NxSyZICm/I5GO8I9p/NPQ1lnFZnR704Xte4TLK0i60g=;
-        b=UM8xkiUaSTJUqL+aokN4kg13JKL7O6t97mlMzpbbwARCFrE6h4LMQchHz4nn4SmKfv
-         x+PFipV5g1j0oLR+7/G0qO/6nDl1USioVEnIzUzBVQexC8v9ZHZ5Fi8jQpEVSLEIixcW
-         dddW+ILzDPn/zDX3PLAxkrNEzfU3PPOg7bv+o53DAD8LTZk/KIPFFojWDnjWtbNQcWlE
-         5sgFfBEthCqT5idNih5DxC6bas0729SPuVRuUen5QvkGAIBx7vInmCQXUY6Lite0AjZ0
-         gKKgMWkeo5eUx675SfAQmGaNJKT+2IKVsNtmow9OyyEhDZi3MhoAmZoT1BDqiYrVJ+sZ
-         nq4w==
-X-Gm-Message-State: AOJu0Yx/KgxtmMhdtqirhCkbdTJcz9f9FgnZJoV8B/D8VDOvY7LJW9Z8
-	ggg0QY4SY2SqXsxrT3XsSNXNtXaqa0+pLUQ+stCQ4B06a76jkGjADGIyXghz1vA=
-X-Google-Smtp-Source: AGHT+IGYS5H+2CjG8e6jjJum1vd6pG6x4LD1FMRK/cR4j9shs0jwQvPBVgwlnij9m2MjjRWGrY3K7A==
-X-Received: by 2002:a05:600c:3d07:b0:40f:d34d:d4ea with SMTP id bh7-20020a05600c3d0700b0040fd34dd4eamr478127wmb.31.1707457721860;
-        Thu, 08 Feb 2024 21:48:41 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXtIS/aziom1k321wH/A41qtyDt1Byh9r1PFigPhj3XzdDU7dowCNjNpPCmR25NYAhwJ+Sm4r03jsSWazNajD2LKuS1irGUEHOyUyLJC7pQ/xsJ6L6vQPzHGAFAhhxQf0aLBUqLMEFQ4TyT9chaghAnfe5iCKfN5hwhQArRmd6m3ezITg6w/sfnUY5KVANbVbxLB8WV060t5cVs4mHL7D6xTCpF1m0fYDoKTxvfI2IWMK7Ud17waxvZ2NHArYpT71edj/gCUcBbvmwEbRs0/DH5YOhdPQhFu9K96fbdN5QxdP0pm0iYlSqJ6rHarUp02GbOuCNx0ad7Nfg=
-Received: from [192.168.50.4] ([82.78.167.124])
-        by smtp.gmail.com with ESMTPSA id bh6-20020a05600c3d0600b004103400259fsm1425125wmb.29.2024.02.08.21.48.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 08 Feb 2024 21:48:41 -0800 (PST)
-Message-ID: <13956279-3ab1-4eb8-b361-a0c79135cb56@tuxon.dev>
-Date: Fri, 9 Feb 2024 07:48:38 +0200
+        d=1e100.net; s=20230601; t=1707459091; x=1708063891;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=w69FvwPxJEmTE4Nu5S/qqkjkkefb5ZX1gIWH2ZAd6AU=;
+        b=J6OKMrKQIA64LeXKd7qfFIJUmCpALDUT/35aY4TiMVCi5T5ClWWTPTbqP0JyfKi0J4
+         zADUhRwJnpi/rmqKJHbAZbVHC6PRTetjzBW8aPKzxtgjpWEZ/LL+3LdM44UrrZ1mcnIx
+         7iF0sSeSx+okVYbP5wXIXlHusnJXdw6IAtiChxN07SlXnJ7mGT0VkNqOA1LncJNIwo/J
+         O0HUM+gg9zL488OHMUueL3zXxG0PMYJQ4W/4paCI+PA+9ukOrwm3O/5Bv9+wKIk5d+fK
+         OvMSr5AxKmC2f7c0al1xzA4VwZxF4Q87IEJLSE/9l8DoMU2guQ9mKYjSI6F0ocU3aTkG
+         +o1g==
+X-Gm-Message-State: AOJu0Yy8V/a0uWGSAPg1A6dhML3NVQxpkChaU7bU58QPixsPiuv1B0jE
+	JvqVkTcVjraSt2l3y8jvGK+TKShJNrPp6jvhTZqKULILpJf3h17vZTkxrkNA2Zo=
+X-Google-Smtp-Source: AGHT+IGSmQFQJZvypTr+dLZJ9+yhr19NLuqkqAKcJiGC7Lmnwj0okZcUm9ROLLrecI2vxVhrbZofiQ==
+X-Received: by 2002:a17:902:6bca:b0:1d9:2086:fe5f with SMTP id m10-20020a1709026bca00b001d92086fe5fmr629282plt.47.1707459090802;
+        Thu, 08 Feb 2024 22:11:30 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWuKIOfbMMkj0lZWQyf2Mwva6njeppA67MLa36Vt4oaK+x3iYDgKMZSvZVjr9HXuRa0A8VegKiXEmne7zoxd62bd5qVOyxGV3FhSy9h0LYnRmZiw7ga1Gy1uPjqgUz55aThRIfDeDiMJ74OEo6OozGxNzxQJ11rULqifSCVLm8vy0t0y6gWlmeNZ0ANVzQaNXQ+/17imhCLgbnqzYVd5lnSxytkgvxaDQthDS7EBm4WUeeIgDJ1CgzLMiae47m1gOGZjE7frwE=
+Received: from petra.lan ([2607:fa18:9ffd:1:3fa5:2e62:9e44:c48d])
+        by smtp.gmail.com with ESMTPSA id je3-20020a170903264300b001d93765f38dsm740843plb.228.2024.02.08.22.11.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Feb 2024 22:11:30 -0800 (PST)
+From: Alex Henrie <alexhenrie24@gmail.com>
+To: netdev@vger.kernel.org,
+	dan@danm.net,
+	bagasdotme@gmail.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	jikos@kernel.org
+Cc: Alex Henrie <alexhenrie24@gmail.com>
+Subject: [PATCH net-next 1/3] net: ipv6/addrconf: ensure that regen_advance is at least 2 seconds
+Date: Thu,  8 Feb 2024 23:10:26 -0700
+Message-ID: <20240209061035.3757-1-alexhenrie24@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/5] net: ravb: Get rid of the temporary variable
- irq
-Content-Language: en-US
-To: Sergey Shtylyov <s.shtylyov@omp.ru>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
- linux-kernel@vger.kernel.org,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-References: <20240207120733.1746920-1-claudiu.beznea.uj@bp.renesas.com>
- <20240207120733.1746920-2-claudiu.beznea.uj@bp.renesas.com>
- <c284aab3-faf0-969c-7256-5bc72afe7e3e@omp.ru>
-From: claudiu beznea <claudiu.beznea@tuxon.dev>
-In-Reply-To: <c284aab3-faf0-969c-7256-5bc72afe7e3e@omp.ru>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+RFC 8981 defines REGEN_ADVANCE as follows:
 
+REGEN_ADVANCE = 2 + (TEMP_IDGEN_RETRIES * DupAddrDetectTransmits * RetransTimer / 1000)
 
-On 08.02.2024 22:43, Sergey Shtylyov wrote:
-> On 2/7/24 3:07 PM, Claudiu wrote:
-> 
->> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
->>
->> The 4th argument of ravb_setup_irq() is used to save the IRQ number that
->> will be further used by the driver code. Not all ravb_setup_irqs() calls
->> need to save the IRQ number. The previous code used to pass a dummy
->> variable as the 4th argument in case the IRQ is not needed for further
->> usage. That is not necessary as the code from ravb_setup_irq() can detect
->> by itself if the IRQ needs to be saved. Thus, get rid of the code that is
->> not needed.
->>
->> Reported-by: Sergey Shtylyov <s.shtylyov@omp.ru>
->> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> [...]
-> 
->> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
->> index 9521cd054274..e235342e0827 100644
->> --- a/drivers/net/ethernet/renesas/ravb_main.c
->> +++ b/drivers/net/ethernet/renesas/ravb_main.c
->> @@ -2611,17 +2611,20 @@ static int ravb_setup_irq(struct ravb_private *priv, const char *irq_name,
->>  		if (!dev_name)
->>  			return -ENOMEM;
->>  
->> -		*irq = platform_get_irq_byname(pdev, irq_name);
->> +		error = platform_get_irq_byname(pdev, irq_name);
->>  		flags = 0;
->>  	} else {
->>  		dev_name = ndev->name;
->> -		*irq = platform_get_irq(pdev, 0);
->> +		error = platform_get_irq(pdev, 0);
->>  		flags = IRQF_SHARED;
->>  	}
->> -	if (*irq < 0)
->> -		return *irq;
->> +	if (error < 0)
->> +		return error;
->>  
->> -	error = devm_request_irq(dev, *irq, handler, flags, dev_name, ndev);
->> +	if (irq)
->> +		*irq = error;
->> +
->> +	error = devm_request_irq(dev, error, handler, flags, dev_name, ndev);
->>  	if (error)
->>  		netdev_err(ndev, "cannot request IRQ %s\n", dev_name);
->>  
-> 
->    Thanks for addressing my IRC comment! Tho the naming seems awful. :-)
->    I'd suggest to add a local variable (named e.g, irq_num) and use it to
+Thus, allowing it to be less than 2 seconds is technically a protocol
+violation.
 
-I tried to avoid that...
+Link: https://datatracker.ietf.org/doc/html/rfc8981#name-defined-protocol-parameters
+Signed-off-by: Alex Henrie <alexhenrie24@gmail.com>
+---
+ net/ipv6/addrconf.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
-> store the result of platform_get_irq[_byname]().
-> 
-> [...]
-> 
-> MBR, Sergey
+diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+index d63f5d063f07..99a3ab6ec9d2 100644
+--- a/net/ipv6/addrconf.c
++++ b/net/ipv6/addrconf.c
+@@ -1331,6 +1331,13 @@ static void ipv6_del_addr(struct inet6_ifaddr *ifp)
+ 	in6_ifa_put(ifp);
+ }
+ 
++static unsigned long ipv6_get_regen_advance(struct inet6_dev *idev)
++{
++	return 2 + idev->cnf.regen_max_retry *
++			idev->cnf.dad_transmits *
++			max(NEIGH_VAR(idev->nd_parms, RETRANS_TIME), HZ/100) / HZ;
++}
++
+ static int ipv6_create_tempaddr(struct inet6_ifaddr *ifp, bool block)
+ {
+ 	struct inet6_dev *idev = ifp->idev;
+@@ -1372,9 +1379,7 @@ static int ipv6_create_tempaddr(struct inet6_ifaddr *ifp, bool block)
+ 
+ 	age = (now - ifp->tstamp) / HZ;
+ 
+-	regen_advance = idev->cnf.regen_max_retry *
+-			idev->cnf.dad_transmits *
+-			max(NEIGH_VAR(idev->nd_parms, RETRANS_TIME), HZ/100) / HZ;
++	regen_advance = ipv6_get_regen_advance(idev);
+ 
+ 	/* recalculate max_desync_factor each time and update
+ 	 * idev->desync_factor if it's larger
+@@ -4577,9 +4582,7 @@ static void addrconf_verify_rtnl(struct net *net)
+ 			    !ifp->regen_count && ifp->ifpub) {
+ 				/* This is a non-regenerated temporary addr. */
+ 
+-				unsigned long regen_advance = ifp->idev->cnf.regen_max_retry *
+-					ifp->idev->cnf.dad_transmits *
+-					max(NEIGH_VAR(ifp->idev->nd_parms, RETRANS_TIME), HZ/100) / HZ;
++				unsigned long regen_advance = ipv6_get_regen_advance(ifp->idev);
+ 
+ 				if (age + regen_advance >= ifp->prefered_lft) {
+ 					struct inet6_ifaddr *ifpub = ifp->ifpub;
+-- 
+2.43.0
+
 
