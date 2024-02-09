@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-70594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B01D084FAD6
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 18:16:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D7B984FAE1
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 18:19:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2E201C266B7
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 17:16:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 807831C23134
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 17:19:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD8A7BAF7;
-	Fri,  9 Feb 2024 17:15:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C34097BB07;
+	Fri,  9 Feb 2024 17:19:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JFZ9nEEa"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LHznyKEG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 276AF7BAF4
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 17:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A4457BB02;
+	Fri,  9 Feb 2024 17:19:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707498958; cv=none; b=krlatVi5KaE15wPTfv/iQJ2N2dIioieMBDb6jko6LNCIzxOthPA5+X0BXG6u1aSCMiKtcTt2KeBgWqr0P7KVtvCRUCDNuf2n+z2qz3pnJQ0IpU0RFxZkirseVy9fo7h9ccDt6JKOdBZe7YcLPNNMKbe6wU9gMFRAW0IfkkhjA4E=
+	t=1707499159; cv=none; b=bKuWRekmQVJ4pAlVMpNE5kbvuQoTUMblm/Fbx1SEjFjgeIWPMrxA7GJOtS48flIBqpVg4ONvAHYAQM8odYntbTFU7EI1sUavJueMSBWCM96HYCMSr/k+K5WLDgauoA8eJB8e407FtgAyArOUcW66+tqFPpqirGKfNTzJuq14hKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707498958; c=relaxed/simple;
-	bh=nfyUo80qI42Kcan7DmQ6iEXtdTmcAtNUkBQEY7xI2Vg=;
+	s=arc-20240116; t=1707499159; c=relaxed/simple;
+	bh=5chEcUoZy69N+Njxway//+D9Qq97cnHEhm7OTKP1+z4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qB6l1Q865ZUt5LsqL+6N5ReNUMPi7yDc0Nzo4fPlaJDB+sJzCy9nRMhl2Vg6zaVwhrxD8D7EMYMYat64hT/0NGycq4TaFunc60h9+yupBTlrBIz7Hdga/Zy8jW/2r4wZQk2Lccg27itOgTxWiyQ1lNsuayrOzAEk5K2P5oH0+co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JFZ9nEEa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDE0CC433C7;
-	Fri,  9 Feb 2024 17:15:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707498957;
-	bh=nfyUo80qI42Kcan7DmQ6iEXtdTmcAtNUkBQEY7xI2Vg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JFZ9nEEa7/vc3DgDI7gGEPMvxf6uRPwb6I3veepiuIjuIJs5soHpeZh1DzI+ERHWw
-	 fsPOqWq1wNsGQyCfAEyDY6+9RWO9Bnwco/D+GD7I9zlYj6me2/hFIqSAFoLxMWGFoA
-	 uSBQ4h5SPmRjoQfTtNpTQg/WBVmYrsr1xpTfTr1i8I2dcwiCoGtA1W0dxeZm1+8ZVz
-	 sP9iLzcXqcOy9AgyoLxrVJcgwrQR0w7wAHaKXTElsjUdG5ZUeZlxTIHM1GvE+aLqvo
-	 TX98gUw5rolrE5BRRIxYV2W7yerfR3UwSkjTtTvHguI4gmRekYm13cBzWU/F8XKT1u
-	 xT4uCqTpoK/7w==
-Date: Fri, 9 Feb 2024 17:15:53 +0000
-From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Naman Gulati <namangulati@google.com>,
-	Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>,
-	eric.dumazet@gmail.com
-Subject: Re: [PATCH net 3/3] net-device: move lstats in net_device_read_txrx
-Message-ID: <20240209171553.GE1533412@kernel.org>
-References: <20240208144323.1248887-1-edumazet@google.com>
- <20240208144323.1248887-4-edumazet@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VZRwM9QXziM55KyrVvGaxtBb3Pl3yfnYJcWt1AYTWc5WFxlXDGBbUw2uPNYj0W2yIkRqnLgIGuati1b3yPQWMX7Q446lc1vvFueuJYSdFlmJpIcmgOSLy5EnigIOZFyaoU+8SVHWh+YRoz1Y1nGxHMOXwO6cQuKc3lhH2msIuw0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LHznyKEG; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=mCTkf7Uhk05htdUngOFotI43lknoNa0E5lP/jBopk84=; b=LHznyKEGKRt7UxP+B/ChINmYVD
+	fZWLUuYEyPS5FhCXMRw/ImIQBWn503zlvLefjzwSgOG+QwOlAnW06F8p38bPX+ksKWjDOi9ORuN+3
+	LWP4qJOtgpJ10JjchxgOVW4PEHkw4jZY/a4xnYq7ss0K3AJ62uOBJUjcntUZYILHyJaA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rYUWo-007P7U-3P; Fri, 09 Feb 2024 18:19:06 +0100
+Date: Fri, 9 Feb 2024 18:19:06 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jon Maxwell <jmaxwell37@gmail.com>
+Cc: jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next v2] intel: make module parameters readable in sys
+ filesystem
+Message-ID: <135d4123-29f5-46dd-b06e-d5a66bd7f598@lunn.ch>
+References: <20240208221802.131087-1-jmaxwell37@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,20 +61,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240208144323.1248887-4-edumazet@google.com>
+In-Reply-To: <20240208221802.131087-1-jmaxwell37@gmail.com>
 
-On Thu, Feb 08, 2024 at 02:43:23PM +0000, Eric Dumazet wrote:
-> dev->lstats is notably used from loopback ndo_start_xmit()
-> and other virtual drivers.
-> 
-> Per cpu stats updates are dirtying per-cpu data,
-> but the pointer itself is read-only.
-> 
-> Fixes: 43a71cd66b9c ("net-device: reorganize net_device fast path variables")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Coco Li <lixiaoyan@google.com>
-> Cc: Simon Horman <horms@kernel.org>
+On Fri, Feb 09, 2024 at 09:18:02AM +1100, Jon Maxwell wrote:
+> v2: Remove the "debug" module parameter as per Andrew Lunns suggestion.
+>     It's not really needed as ethtool msglvl can control that.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+It is normal to places comments like the above under the ---. In its
+current place, it will be part of the commit message. Under the --- it
+gets dropped when the patch is applied.
 
+    Andrew
+
+---
+pw-bot: cr
 
