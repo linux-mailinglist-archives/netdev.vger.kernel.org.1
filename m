@@ -1,407 +1,120 @@
-Return-Path: <netdev+bounces-70484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62C8784F33A
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 11:20:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AB7684F35D
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 11:25:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BBE21B225B1
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 10:20:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0269E1F22A3F
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 10:25:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FC4369956;
-	Fri,  9 Feb 2024 10:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CAB469949;
+	Fri,  9 Feb 2024 10:25:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jj86UR6d"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SIvcvpwf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8C46994F
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 10:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9390F6994D
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 10:25:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707474032; cv=none; b=B6tZ/EzHq9UfbgWiXqPAtcaXrqSoiJ8ry1LSfVxi7g2CSWuR5GZVFqu6wLWtUIewEs3pyroG1PcgpKaUutLD57uDuPxphzZQPUlhc6nlMhen7qCZnRQC9DfYYPnlDtBwEMurj1sMUTv1eLYQ06uV+/4ndHXYYTC/p/2iY2XSkPM=
+	t=1707474306; cv=none; b=K1oKfomJQ71tVFypesHjeCgxjzOGbHSq7GVlDIddBI/pL7w83KaBkqZaClIsCxMaQF5zAaW1aZdunEUK0yOiqsR2VVcrX9Mxw5p7o4i+6WM3yxxYTAMwCaTUlNOyCIca1JiVXmUUHuSM70ssJg2URQ6ydXq7n/lqT2dKQ5dS+g0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707474032; c=relaxed/simple;
-	bh=saEmO9S3DHhlfkyKeGlo0ODMTh53fQmjaB6eGxB1IRQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dpgXiA8l80jtQ1ktHZhOByttXLvv3xfwCqYlSciD2SMc2HLfCgBy4TiYmk2IlY2OcVVoD1nTlqkkMqbhj1oqjtrAzDkV/gN5QNKyvIJgW6Ew2EVt4rWDaKzb9vgdpxDshN12Wu4vtNsYUCfwU/nm2ATuEerr9GEJ+9mjUNPMxpk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jj86UR6d; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707474030; x=1739010030;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=saEmO9S3DHhlfkyKeGlo0ODMTh53fQmjaB6eGxB1IRQ=;
-  b=jj86UR6dT2j6qBm1FjgsQXggvccHRCfNnk++D0GLAWXHQ5RZBvw6tIdg
-   boRmnIcaCL4Ty4eL2PaWc2WZsEi1s++blQnBa0oOMiqLh8THQhZ4X63r0
-   2m7X0n2J5l07H/yOlsWddzUloEt8RVaQ51nw8GfDOjG6GQoEAgKSg4+09
-   wFrWoz51TWyt9kzBmeGj/WqhG/G38cEyR+dUY3ZVei1L5z04Zihst1cmJ
-   1cwXA+tRNAo9q5n2wRKxpbIVf5S+uKsNL5JsGgU5ZPRL+6Xg/T1tivMUv
-   lZSNR6BLTeayzeeX4WfUh9bQ0So9g3khiZUHGLazE+Upmx/vAFxKxZjs2
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10978"; a="4382889"
-X-IronPort-AV: E=Sophos;i="6.05,256,1701158400"; 
-   d="scan'208";a="4382889"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2024 02:18:59 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,256,1701158400"; 
-   d="scan'208";a="32692022"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa002.jf.intel.com with ESMTP; 09 Feb 2024 02:18:57 -0800
-Received: from lplachno-mobl.ger.corp.intel.com (lplachno-mobl.ger.corp.intel.com [10.246.2.62])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 544D327BAA;
-	Fri,  9 Feb 2024 10:18:54 +0000 (GMT)
-From: Lukasz Plachno <lukasz.plachno@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	brett.creeley@amd.com,
-	horms@kernel.org,
-	pmenzel@molgen.mpg.de,
-	aleksander.lobakin@intel.com,
-	Jakub Buchocki <jakubx.buchocki@intel.com>,
-	Mateusz Pacuszka <mateuszx.pacuszka@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Lukasz Plachno <lukasz.plachno@intel.com>
-Subject: [PATCH iwl-next v6 2/2] ice: Implement 'flow-type ether' rules
-Date: Fri,  9 Feb 2024 11:18:23 +0100
-Message-Id: <20240209101823.27922-3-lukasz.plachno@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240209101823.27922-1-lukasz.plachno@intel.com>
-References: <20240209101823.27922-1-lukasz.plachno@intel.com>
+	s=arc-20240116; t=1707474306; c=relaxed/simple;
+	bh=B5/BTwBMB0HuMS8m/9S9EeEIASkWudV/EHDng9uf0pA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JOblISqJgKm0BC/QuvagNk0a643lJEUN2dVT9G3/43u7OJR8IM4wzPkS1QpNDVepIFDG/mTdbI9sZH/HQ1WJVVhOLOA8n97ZgT+HEOU8P34CuE6Fkinqe/3T592a1iFDMAqCNaHUPK5U15CWltm3TYHAnbnsF3HpsuPCKDFFyuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SIvcvpwf; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1707474303;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=MEsuYP1VU1bP5NDuOHlb7q81k+CG3K51b7MgvcCauaw=;
+	b=SIvcvpwfnRqN/PzDX2zvKd+0oGfoyPbIuXK0C+ikQSRbNUBbYUowwH4URE9sY+XfrGqZ/k
+	LKp1NDGuECJiwRHbotxEqBLcVSjTHILv6jEVl7ZFi5rimzVp+et5p7pezLDBfAsQlKU+Zq
+	4woXxft+E/gG1pgpumLclhKasxSNadQ=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-505-ttrpd-0qP1GPH94luv7dMA-1; Fri, 09 Feb 2024 05:24:59 -0500
+X-MC-Unique: ttrpd-0qP1GPH94luv7dMA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 576B085A58B;
+	Fri,  9 Feb 2024 10:24:59 +0000 (UTC)
+Received: from renaissance-vector.redhat.com (unknown [10.39.194.214])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D0647112132A;
+	Fri,  9 Feb 2024 10:24:57 +0000 (UTC)
+From: Andrea Claudi <aclaudi@redhat.com>
+To: netdev@vger.kernel.org
+Cc: stephen@networkplumber.org,
+	dsahern@gmail.com,
+	sgallagh@redhat.com
+Subject: [PATCH] iproute2: fix build failure on ppc64le
+Date: Fri,  9 Feb 2024 11:24:47 +0100
+Message-ID: <d13ef7c00b60a50a5e8ddbb7ff138399689d3483.1707474099.git.aclaudi@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
 
-From: Jakub Buchocki <jakubx.buchocki@intel.com>
+ppc64le build fails with error on ifstat.c when
+-Wincompatible-pointer-types is enabled:
 
-Add support for 'flow-type ether' Flow Director rules via ethtool.
+ifstat.c: In function ‘dump_raw_db’:
+ifstat.c:323:44: error: initialization of ‘long long unsigned int *’ from incompatible pointer type ‘__u64 *’ {aka ‘long unsigned int *’} [-Wincompatible-pointer-types]
+  323 |                 unsigned long long *vals = n->val;
 
-Create packet segment info for filter configuration based on ethtool
-command parameters. Reuse infrastructure already created for
-ipv4 and ipv6 flows to convert packet segment into
-extraction sequence, which is later used to program the filter
-inside Flow Director block of the Rx pipeline.
+Several other warnings are produced when -Wformat= is set, for example:
 
-Rules not containing masks are processed by the Flow Director,
-and support the following set of input parameters in all combinations:
-src, dst, proto, vlan-etype, vlan, action.
+ss.c:3244:34: warning: format ‘%llu’ expects argument of type ‘long long unsigned int’, but argument 2 has type ‘__u64’ {aka ‘long unsigned int’} [-Wformat=]
+ 3244 |                 out(" rcv_nxt:%llu", s->mptcpi_rcv_nxt);
+      |                               ~~~^   ~~~~~~~~~~~~~~~~~
+      |                                  |    |
+      |                                  |    __u64 {aka long unsigned int}
+      |                                  long long unsigned int
+      |                               %lu
 
-It is possible to specify address mask in ethtool parameters but only
-00:00:00:00:00 and FF:FF:FF:FF:FF are valid.
-The same applies to proto, vlan-etype and vlan masks:
-only 0x0000 and 0xffff masks are valid.
+This happens because __u64 is defined as long unsigned on ppc64le.  As
+pointed out by Florian Weimar, we should use -D__SANE_USERSPACE_TYPES__
+if we really want to use long long unsigned in iproute2.
 
-Testing:
-  (DUT) iperf3 -s
-  (DUT) ethtool -U ens785f0np0 flow-type ether dst <ens785f0np0 mac> \
-        action 10
-  (DUT) watch 'ethtool -S ens785f0np0 | grep rx_queue'
-  (LP)  iperf3 -c ${DUT_IP}
+This fix the build failure and all the warnings without any change on
+the code itself.
 
-  Counters increase only for:
-    'rx_queue_10_packets'
-    'rx_queue_10_bytes'
-
-Signed-off-by: Jakub Buchocki <jakubx.buchocki@intel.com>
-Co-developed-by: Mateusz Pacuszka <mateuszx.pacuszka@intel.com>
-Signed-off-by: Mateusz Pacuszka <mateuszx.pacuszka@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Lukasz Plachno <lukasz.plachno@intel.com>
+Suggested-by: Florian Weimer <fweimer@redhat.com>
+Signed-off-by: Andrea Claudi <aclaudi@redhat.com>
 ---
- .../net/ethernet/intel/ice/ice_ethtool_fdir.c | 130 +++++++++++++++++-
- drivers/net/ethernet/intel/ice/ice_fdir.c     |  27 ++++
- drivers/net/ethernet/intel/ice/ice_fdir.h     |   5 +
- drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
- 4 files changed, 162 insertions(+), 1 deletion(-)
+ Makefile | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-index 9a1a04f5f146..6963e0da6518 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-@@ -41,6 +41,8 @@ static struct in6_addr zero_ipv6_addr_mask = {
- static int ice_fltr_to_ethtool_flow(enum ice_fltr_ptype flow)
- {
- 	switch (flow) {
-+	case ICE_FLTR_PTYPE_NONF_ETH:
-+		return ETHER_FLOW;
- 	case ICE_FLTR_PTYPE_NONF_IPV4_TCP:
- 		return TCP_V4_FLOW;
- 	case ICE_FLTR_PTYPE_NONF_IPV4_UDP:
-@@ -72,6 +74,8 @@ static int ice_fltr_to_ethtool_flow(enum ice_fltr_ptype flow)
- static enum ice_fltr_ptype ice_ethtool_flow_to_fltr(int eth)
- {
- 	switch (eth) {
-+	case ETHER_FLOW:
-+		return ICE_FLTR_PTYPE_NONF_ETH;
- 	case TCP_V4_FLOW:
- 		return ICE_FLTR_PTYPE_NONF_IPV4_TCP;
- 	case UDP_V4_FLOW:
-@@ -137,6 +141,10 @@ int ice_get_ethtool_fdir_entry(struct ice_hw *hw, struct ethtool_rxnfc *cmd)
- 	memset(&fsp->m_ext, 0, sizeof(fsp->m_ext));
- 
- 	switch (fsp->flow_type) {
-+	case ETHER_FLOW:
-+		fsp->h_u.ether_spec = rule->eth;
-+		fsp->m_u.ether_spec = rule->eth_mask;
-+		break;
- 	case IPV4_USER_FLOW:
- 		fsp->h_u.usr_ip4_spec.ip_ver = ETH_RX_NFC_IP4;
- 		fsp->h_u.usr_ip4_spec.proto = 0;
-@@ -1193,6 +1201,112 @@ ice_set_fdir_ip6_usr_seg(struct ice_flow_seg_info *seg,
- 	return 0;
- }
- 
-+/**
-+ * ice_fdir_vlan_valid - validate VLAN data for Flow Director rule
-+ * @fsp: pointer to ethtool Rx flow specification
-+ *
-+ * Return: true if vlan data is valid, false otherwise
-+ */
-+static bool ice_fdir_vlan_valid(struct ethtool_rx_flow_spec *fsp)
-+{
-+	if (fsp->m_ext.vlan_etype && !eth_type_vlan(fsp->h_ext.vlan_etype))
-+		return false;
-+
-+	if (fsp->m_ext.vlan_tci &&
-+	    ntohs(fsp->h_ext.vlan_tci) >= VLAN_N_VID)
-+		return false;
-+
-+	return true;
-+}
-+
-+/**
-+ * ice_set_ether_flow_seg
-+ * @dev: network interface device structure
-+ * @seg: flow segment for programming
-+ * @eth_spec: mask data from ethtool
-+ *
-+ * Return: 0 on success and errno in case of error.
-+ */
-+static int ice_set_ether_flow_seg(struct device *dev,
-+				  struct ice_flow_seg_info *seg,
-+				  struct ethhdr *eth_spec)
-+{
-+	ICE_FLOW_SET_HDRS(seg, ICE_FLOW_SEG_HDR_ETH);
-+
-+	/* empty rules are not valid */
-+	if (is_zero_ether_addr(eth_spec->h_source) &&
-+	    is_zero_ether_addr(eth_spec->h_dest) &&
-+	    !eth_spec->h_proto)
-+		return -EINVAL;
-+
-+	/* Ethertype */
-+	if (eth_spec->h_proto == htons(0xFFFF)) {
-+		ice_flow_set_fld(seg, ICE_FLOW_FIELD_IDX_ETH_TYPE,
-+				 ICE_FLOW_FLD_OFF_INVAL,
-+				 ICE_FLOW_FLD_OFF_INVAL,
-+				 ICE_FLOW_FLD_OFF_INVAL, false);
-+	} else if (eth_spec->h_proto) {
-+		dev_warn(dev, "Only 0x0000 or 0xffff proto mask is allowed for flow-type ether");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	/* Source MAC address */
-+	if (is_broadcast_ether_addr(eth_spec->h_source))
-+		ice_flow_set_fld(seg, ICE_FLOW_FIELD_IDX_ETH_SA,
-+				 ICE_FLOW_FLD_OFF_INVAL, ICE_FLOW_FLD_OFF_INVAL,
-+				 ICE_FLOW_FLD_OFF_INVAL, false);
-+	else if (!is_zero_ether_addr(eth_spec->h_source))
-+		goto err_mask;
-+
-+	/* Destination MAC address */
-+	if (is_broadcast_ether_addr(eth_spec->h_dest))
-+		ice_flow_set_fld(seg, ICE_FLOW_FIELD_IDX_ETH_DA,
-+				 ICE_FLOW_FLD_OFF_INVAL, ICE_FLOW_FLD_OFF_INVAL,
-+				 ICE_FLOW_FLD_OFF_INVAL, false);
-+	else if (!is_zero_ether_addr(eth_spec->h_dest))
-+		goto err_mask;
-+
-+	return 0;
-+
-+err_mask:
-+	dev_warn(dev, "Only 00:00:00:00:00:00 or ff:ff:ff:ff:ff:ff MAC address mask is allowed for flow-type ether");
-+	return -EOPNOTSUPP;
-+}
-+
-+/**
-+ * ice_set_fdir_vlan_seg
-+ * @seg: flow segment for programming
-+ * @ext_masks: masks for additional RX flow fields
-+ */
-+static int
-+ice_set_fdir_vlan_seg(struct ice_flow_seg_info *seg,
-+		      struct ethtool_flow_ext *ext_masks)
-+{
-+	ICE_FLOW_SET_HDRS(seg, ICE_FLOW_SEG_HDR_VLAN);
-+
-+	if (ext_masks->vlan_etype) {
-+		if (ext_masks->vlan_etype != htons(0xFFFF))
-+			return -EOPNOTSUPP;
-+
-+		ice_flow_set_fld(seg, ICE_FLOW_FIELD_IDX_S_VLAN,
-+				 ICE_FLOW_FLD_OFF_INVAL,
-+				 ICE_FLOW_FLD_OFF_INVAL,
-+				 ICE_FLOW_FLD_OFF_INVAL, false);
-+	}
-+
-+	if (ext_masks->vlan_tci) {
-+		if (ext_masks->vlan_tci != htons(0xFFFF))
-+			return -EOPNOTSUPP;
-+
-+		ice_flow_set_fld(seg, ICE_FLOW_FIELD_IDX_C_VLAN,
-+				 ICE_FLOW_FLD_OFF_INVAL,
-+				 ICE_FLOW_FLD_OFF_INVAL,
-+				 ICE_FLOW_FLD_OFF_INVAL, false);
-+	}
-+
-+	return 0;
-+}
-+
- /**
-  * ice_cfg_fdir_xtrct_seq - Configure extraction sequence for the given filter
-  * @pf: PF structure
-@@ -1209,7 +1323,7 @@ ice_cfg_fdir_xtrct_seq(struct ice_pf *pf, struct ethtool_rx_flow_spec *fsp,
- 	struct device *dev = ice_pf_to_dev(pf);
- 	enum ice_fltr_ptype fltr_idx;
- 	struct ice_hw *hw = &pf->hw;
--	bool perfect_filter;
-+	bool perfect_filter = false;
- 	int ret;
- 
- 	seg = devm_kzalloc(dev, sizeof(*seg), GFP_KERNEL);
-@@ -1262,6 +1376,16 @@ ice_cfg_fdir_xtrct_seq(struct ice_pf *pf, struct ethtool_rx_flow_spec *fsp,
- 		ret = ice_set_fdir_ip6_usr_seg(seg, &fsp->m_u.usr_ip6_spec,
- 					       &perfect_filter);
- 		break;
-+	case ETHER_FLOW:
-+		ret = ice_set_ether_flow_seg(dev, seg, &fsp->m_u.ether_spec);
-+		if (!ret && (fsp->m_ext.vlan_etype || fsp->m_ext.vlan_tci)) {
-+			if (!ice_fdir_vlan_valid(fsp)) {
-+				ret = -EINVAL;
-+				break;
-+			}
-+			ret = ice_set_fdir_vlan_seg(seg, &fsp->m_ext);
-+		}
-+		break;
- 	default:
- 		ret = -EINVAL;
- 	}
-@@ -1823,6 +1947,10 @@ ice_set_fdir_input_set(struct ice_vsi *vsi, struct ethtool_rx_flow_spec *fsp,
- 		input->mask.v6.tc = fsp->m_u.usr_ip6_spec.tclass;
- 		input->mask.v6.proto = fsp->m_u.usr_ip6_spec.l4_proto;
- 		break;
-+	case ETHER_FLOW:
-+		input->eth = fsp->h_u.ether_spec;
-+		input->eth_mask = fsp->m_u.ether_spec;
-+		break;
- 	default:
- 		/* not doing un-parsed flow types */
- 		return -EINVAL;
-diff --git a/drivers/net/ethernet/intel/ice/ice_fdir.c b/drivers/net/ethernet/intel/ice/ice_fdir.c
-index 1f7b26f38818..ec8a84b80a73 100644
---- a/drivers/net/ethernet/intel/ice/ice_fdir.c
-+++ b/drivers/net/ethernet/intel/ice/ice_fdir.c
-@@ -4,6 +4,8 @@
- #include "ice_common.h"
- 
- /* These are training packet headers used to program flow director filters. */
-+static const u8 ice_fdir_eth_pkt[22] = {0};
-+
- static const u8 ice_fdir_tcpv4_pkt[] = {
- 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
- 	0x00, 0x00, 0x00, 0x00, 0x08, 0x00, 0x45, 0x00,
-@@ -416,6 +418,11 @@ static const u8 ice_fdir_ip6_tun_pkt[] = {
- 
- /* Flow Director no-op training packet table */
- static const struct ice_fdir_base_pkt ice_fdir_pkt[] = {
-+	{
-+		ICE_FLTR_PTYPE_NONF_ETH,
-+		sizeof(ice_fdir_eth_pkt), ice_fdir_eth_pkt,
-+		sizeof(ice_fdir_eth_pkt), ice_fdir_eth_pkt,
-+	},
- 	{
- 		ICE_FLTR_PTYPE_NONF_IPV4_TCP,
- 		sizeof(ice_fdir_tcpv4_pkt), ice_fdir_tcpv4_pkt,
-@@ -914,6 +921,22 @@ ice_fdir_get_gen_prgm_pkt(struct ice_hw *hw, struct ice_fdir_fltr *input,
- 	 * perspective. The input from user is from Rx filter perspective.
- 	 */
- 	switch (flow) {
-+	case ICE_FLTR_PTYPE_NONF_ETH:
-+		ice_pkt_insert_mac_addr(loc, input->eth.h_dest);
-+		ice_pkt_insert_mac_addr(loc + ETH_ALEN, input->eth.h_source);
-+		if (input->ext_data.vlan_tag ||
-+		    input->ext_data.vlan_type) {
-+			ice_pkt_insert_u16(loc, ICE_ETH_TYPE_F_OFFSET,
-+					   input->ext_data.vlan_type);
-+			ice_pkt_insert_u16(loc, ICE_ETH_VLAN_TCI_OFFSET,
-+					   input->ext_data.vlan_tag);
-+			ice_pkt_insert_u16(loc, ICE_ETH_TYPE_VLAN_OFFSET,
-+					   input->eth.h_proto);
-+		} else {
-+			ice_pkt_insert_u16(loc, ICE_ETH_TYPE_F_OFFSET,
-+					   input->eth.h_proto);
-+		}
-+		break;
- 	case ICE_FLTR_PTYPE_NONF_IPV4_TCP:
- 		ice_pkt_insert_u32(loc, ICE_IPV4_DST_ADDR_OFFSET,
- 				   input->ip.v4.src_ip);
-@@ -1201,6 +1224,10 @@ ice_fdir_comp_rules(struct ice_fdir_fltr *a,  struct ice_fdir_fltr *b)
- 	 * same flow_type.
- 	 */
- 	switch (flow_type) {
-+	case ICE_FLTR_PTYPE_NONF_ETH:
-+		if (!memcmp(&a->eth, &b->eth, sizeof(a->eth)))
-+			return true;
-+		break;
- 	case ICE_FLTR_PTYPE_NONF_IPV4_TCP:
- 	case ICE_FLTR_PTYPE_NONF_IPV4_UDP:
- 	case ICE_FLTR_PTYPE_NONF_IPV4_SCTP:
-diff --git a/drivers/net/ethernet/intel/ice/ice_fdir.h b/drivers/net/ethernet/intel/ice/ice_fdir.h
-index 1b9b84490689..021ecbac7848 100644
---- a/drivers/net/ethernet/intel/ice/ice_fdir.h
-+++ b/drivers/net/ethernet/intel/ice/ice_fdir.h
-@@ -8,6 +8,9 @@
- #define ICE_FDIR_MAX_RAW_PKT_SIZE	(512 + ICE_FDIR_TUN_PKT_OFF)
- 
- /* macros for offsets into packets for flow director programming */
-+#define ICE_ETH_TYPE_F_OFFSET		12
-+#define ICE_ETH_VLAN_TCI_OFFSET		14
-+#define ICE_ETH_TYPE_VLAN_OFFSET	16
- #define ICE_IPV4_SRC_ADDR_OFFSET	26
- #define ICE_IPV4_DST_ADDR_OFFSET	30
- #define ICE_IPV4_TCP_SRC_PORT_OFFSET	34
-@@ -159,6 +162,8 @@ struct ice_fdir_fltr {
- 	struct list_head fltr_node;
- 	enum ice_fltr_ptype flow_type;
- 
-+	struct ethhdr eth, eth_mask;
-+
- 	union {
- 		struct ice_fdir_v4 v4;
- 		struct ice_fdir_v6 v6;
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index 6df7c4487ad0..391e48d2bb92 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -203,6 +203,7 @@ struct ice_phy_info {
- enum ice_fltr_ptype {
- 	/* NONE - used for undef/error */
- 	ICE_FLTR_PTYPE_NONF_NONE = 0,
-+	ICE_FLTR_PTYPE_NONF_ETH,
- 	ICE_FLTR_PTYPE_NONF_IPV4_UDP,
- 	ICE_FLTR_PTYPE_NONF_IPV4_TCP,
- 	ICE_FLTR_PTYPE_NONF_IPV4_SCTP,
+diff --git a/Makefile b/Makefile
+index 8024d45e..3b9daede 100644
+--- a/Makefile
++++ b/Makefile
+@@ -60,7 +60,7 @@ CC := gcc
+ HOSTCC ?= $(CC)
+ DEFINES += -D_GNU_SOURCE
+ # Turn on transparent support for LFS
+-DEFINES += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
++DEFINES += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE -D__SANE_USERSPACE_TYPES__
+ CCOPTS = -O2 -pipe
+ WFLAGS := -Wall -Wstrict-prototypes  -Wmissing-prototypes
+ WFLAGS += -Wmissing-declarations -Wold-style-definition -Wformat=2
 -- 
-2.34.1
+2.43.0
 
 
