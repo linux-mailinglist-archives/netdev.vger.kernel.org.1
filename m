@@ -1,138 +1,112 @@
-Return-Path: <netdev+bounces-70514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AE4884F5AE
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 14:18:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF4B684F5B1
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 14:19:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3D82288651
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 13:18:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6955EB20B21
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 13:19:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D23B381AB;
-	Fri,  9 Feb 2024 13:18:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1225137716;
+	Fri,  9 Feb 2024 13:19:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="nPzgIgFk"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="O8OiZyFe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81EC637716
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 13:18:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7344C37160
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 13:19:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707484682; cv=none; b=Kl8nY4nOH971QhMnSxYeSL+Q14WxyCBPWvbvKKDtFrfIGz56cbkisd5lOnH0ktIAvnMPM7nO49iHbFaGvSUY3352bXCnQoa/KqdtJ2JthT2C4XAiAJYLW4IizR1cXaxP2W7M1N3NXXxqmyBS1KawBahfTXYorTHxV6+7EKM18Ww=
+	t=1707484762; cv=none; b=ZyWv2wZBR3bciB9JsHZ/bqNl/RF6JeLD2BnzFskWhl8dyk3Jvxgn9pcqVAZ0cGXFqHYu1vTlUyiIvcdNTde5KsKj0ft/YkvSK2a6gnUAJHYo2/O5LgNXfGjYayu+cl/xxYrbzKPkzf3X+8c+tH3Qv+HiVk1UKM7VoAPZNsbi0Kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707484682; c=relaxed/simple;
-	bh=Mim8vD8gJESe/0fUDuSiNMYfNHsNLNW6PUf+sKUsmmc=;
+	s=arc-20240116; t=1707484762; c=relaxed/simple;
+	bh=H0Ihgqg6vcooY6HsSUddyRQvt/glr76kGUtcEmebLvw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=li91wp4d3fZMf0NiQn5c1OhHJEAzhMPN9sniDPcgz6YkOtbyyl5euN9a3v9TA2TcOxhxOWSigrqOdvEjrF0nQU7qkWnsUxXobYVOv3FAwchyh7d0YPn4gR/yARK2cFLLrnzlnB/A7S6iGRUUX0OivwCGaqY/LhVeEWCMhUlTszY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=nPzgIgFk; arc=none smtp.client-ip=209.85.128.180
+	 To:Cc:Content-Type; b=YaNw12SDZiwTJHNjRRG+A3/gea9jt8Ra1do6gaILhJHM5/+loBSSiZdLmFWe00CmP6D7BYQ5TzFD0rPeudXoKQJveciW62OLRrccGHK57OMxrZJDeqr1i6gsMmXQdbRf5o4WOuf9cyTwyzJRmlTnfvdLcxGmBWhPMOs8y2AoSqU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=O8OiZyFe; arc=none smtp.client-ip=209.85.128.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-6049416cd38so8118727b3.2
-        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 05:18:00 -0800 (PST)
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-604b23fc6a7so10479997b3.0
+        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 05:19:19 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1707484679; x=1708089479; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1707484758; x=1708089558; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Mim8vD8gJESe/0fUDuSiNMYfNHsNLNW6PUf+sKUsmmc=;
-        b=nPzgIgFkObO0MOc3p2guR2EGNA9uycENx1/ttXnVcyTdBOkE1NsDiggiF2+2EurKYC
-         FjhpT3X5sBPZAKv490e4/WlIkddhjRJWKA6ZVEHpjvQfbgIAnj2RIu4TF3pT90p3SlHs
-         KlpPGaUcVu9RzQROoissIYYaIiXshhuybTbQz87t1oJYWcOnQWrqnQAT6t00doVPNv5M
-         /L4JsmCNgV9SZtj3eVFf2lWsA24lFwLbu/uIUpoD5yUuS/5tAMZWMsmVmjlolZ3xZx15
-         WycMnoG8b4XUyfhvan71FD1IHkx+kvL9wwOqqUbc4X235Q1JIn6Fu02aX7TKHlGHxetL
-         6IkQ==
+        bh=H0Ihgqg6vcooY6HsSUddyRQvt/glr76kGUtcEmebLvw=;
+        b=O8OiZyFePScKt86hTEL1JwkigXacBxrfnGWw2jyuBykB5K+Ijph0TlUc0bkr1AHqtP
+         XtEMSS8igprPEaRn43fJmOv3GicsLLvQG/0ilLRKHukLk/VzJDJdGOjjwCV7VmZ4vBsM
+         MQ/yiWn/omfJ5OC5MSZU8B4fSxYMd0lgONXsiNPpU3Z5SvvUshz1/pKO4/yFsCt1sQki
+         VRGZWI/woSvN4lC0yLxdBFcW4UJsr+Wngbo52S18w0k6QxwM+x8JuVUe1rd+Zcbd2Nfn
+         qu4CvZiayR1QRXLR43NLdWVwT6L3p23cx6tGzgxUfMPptWw0ug+x92+ZECDgOZl7OgXJ
+         lkVg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707484679; x=1708089479;
+        d=1e100.net; s=20230601; t=1707484758; x=1708089558;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Mim8vD8gJESe/0fUDuSiNMYfNHsNLNW6PUf+sKUsmmc=;
-        b=qByCKsuTu/ipFWqcPueTz+GZLAXD1nOOEL657PkgNAtXOniVpatRnkdUl9G8PTTcWJ
-         txUltw5o0lK2JZIJGihOpHDXaZReMH2S7V8yaQrkgQ/YbklrmL2RcrZ8IWnBD/4PpyhD
-         Ssig7Z8yY7PBfOhNK0k5tgWsn88il3BPh7WStjbdfparp0fNKTZqUcMyKnJ+/z8wbBw6
-         9+MxZ5y4Vueszkg/jA5ldW2B9Mtb6CgyVypt5T2zhvOemylc5nhjTeWSF1AiIJKM6ixZ
-         WrMeX2DULd2lR0cmC3VV5ePwkWqNaK4W/Dt1JkYSgZzp85K4M80hEpMAOrLN/6sDz6yg
-         yViQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWdkCYv4ySgr+otchs/mA0ZRQmQ7MvYChiISarnFhb+zImas14rega5t8ACJPBAd4aQrINd/1W4EXP6XROX8Dqw10b7D9V/
-X-Gm-Message-State: AOJu0YzfNRImrUvpYjpF+0ldNTbFU65tHXGtN/uSemGa10IkdhhJhywM
-	TJnVvT1z6MD+8+kbrCD6mxfBMRtYThb6PqPtGtDcKfBq9GIBDsagaILAGIeDnCMId4C+SKa6Yli
-	EVN+xy0GFyN6gQ9FeEYttZ2xEOuXRZGEgT7Zw4Q==
-X-Google-Smtp-Source: AGHT+IFHT66k1WhwsagbjF5zSBn7DbWunprn10+GW30Mc1Txx10f+fBBGhs8Ga0o7pdvWU8CUBQ9Ep34Dd1f1e8Om98=
-X-Received: by 2002:a0d:d696:0:b0:5ff:4e43:8430 with SMTP id
- y144-20020a0dd696000000b005ff4e438430mr1356875ywd.1.1707484679550; Fri, 09
- Feb 2024 05:17:59 -0800 (PST)
+        bh=H0Ihgqg6vcooY6HsSUddyRQvt/glr76kGUtcEmebLvw=;
+        b=D4EK1L8Kr4T5ZYioAakY9ckbTU9esgfV7E0OQGb0bbUHTgwcUdnYXXGgoXZckTMasp
+         +qjrVmvnLwDXuf8bxTKKNtvi5Eg1v1zMtHvrQvOJISKdSQ4cHYjjiZ6uuzh46h2+TYw0
+         Jsz2/UaNBX3hS8HFMiFSao6j9eJw7Kv7QjWyKAiwYi3F5xGqXAhjOPtVmOXsdcvo8tZx
+         k/vqdnQhzpD0reQCa1XnF8t2TKZylYQwZVm3JevMOASC4Rv7bW1czH9D2ReeSFL1O/Z8
+         uOm4jzi4RtEUAuBjHJ5FBEdhrDlrLqs9zS+HhQ0/jwmkLM5WNSBAmAqcvCC9q+IfQUkQ
+         QCcw==
+X-Forwarded-Encrypted: i=1; AJvYcCWvsdai++LUdITWFqXE3BJCfT1kjRkFmaT3ci8bFamsxxO3IkXtYCeTdJ/kry5CWMgGZZbbZJzz3z680X2dyY9CdY/WF/UF
+X-Gm-Message-State: AOJu0Yx7m3siL35jdRDPsW51ht6A8VU6KyQfuz+cBZ5zAXBYtp5ZemLz
+	8v9TwInSSWhTVh38ugIdrnA/BibI268b2sxT8dvNFJaK82M28SbXnxuBXiA0rDE3XJbvG1SzFvN
+	5TCD1TFYPoYjXm1iWf9OCsSLLsjZgQSSDEfKXRg==
+X-Google-Smtp-Source: AGHT+IEWhMRKZpz6jQmO2xCeK+S38BvufNYeEIVPEoIMMs+4gr8K9BTZepoNwlEret+dAQs1S4dLcRcaZ3Sb4QQc/5k=
+X-Received: by 2002:a81:6f03:0:b0:604:91b1:5401 with SMTP id
+ k3-20020a816f03000000b0060491b15401mr1403138ywc.38.1707484758481; Fri, 09 Feb
+ 2024 05:19:18 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240209-realtek_reverse-v6-0-0662f8cbc7b5@gmail.com>
-In-Reply-To: <20240209-realtek_reverse-v6-0-0662f8cbc7b5@gmail.com>
+References: <20240209-realtek_reverse-v6-0-0662f8cbc7b5@gmail.com> <20240209-realtek_reverse-v6-3-0662f8cbc7b5@gmail.com>
+In-Reply-To: <20240209-realtek_reverse-v6-3-0662f8cbc7b5@gmail.com>
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Fri, 9 Feb 2024 14:17:48 +0100
-Message-ID: <CACRpkdbw+mJsGb=6iu6f+mGoi+vouu6TPztaD5SyuG+n8Staew@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 00/11] net: dsa: realtek: variants to drivers,
- interfaces to a common module
+Date: Fri, 9 Feb 2024 14:19:07 +0100
+Message-ID: <CACRpkdYaEAcv_au0VbJtGJtxGxNAOMrd9+5oVyR2ybb3NSJCAA@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 03/11] net: dsa: realtek: convert variants
+ into real drivers
 To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
 	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
 	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
 	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, 
-	Florian Fainelli <florian.fainelli@broadcom.com>
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Fri, Feb 9, 2024 at 6:04=E2=80=AFAM Luiz Angelo Daros de Luca
 <luizluca@gmail.com> wrote:
 
-> The current driver consists of two interface modules (SMI and MDIO) and
-> two family/variant modules (RTL8365MB and RTL8366RB). The SMI and MDIO
-> modules serve as the platform and MDIO drivers, respectively, calling
-> functions from the variant modules. In this setup, one interface module
-> can be loaded independently of the other, but both variants must be
-> loaded (if not disabled at build time) for any type of interface. This
-> approach doesn't scale well, especially with the addition of more switch
-> variants (e.g., RTL8366B), leading to loaded but unused modules.
-> Additionally, this also seems upside down, as the specific driver code
-> normally depends on the more generic functions and not the other way
-> around.
+> Previously, the interface modules realtek-smi and realtek-mdio served as
+> a platform and an MDIO driver, respectively. Each interface module
+> redundantly specified the same compatible strings for both variants and
+> referenced symbols from the variants.
 >
-> Each variant module was converted into real drivers, serving as both a
-> platform driver (for switches connected using the SMI interface) and an
-> MDIO driver (for MDIO-connected switches). The relationship between the
-> variant and interface modules is reversed, with the variant module now
-> calling both interface functions (if not disabled at build time). While
-> in most devices only one interface is likely used, the interface code is
-> significantly smaller than a variant module, consuming fewer resources
-> than the previous code. With variant modules now functioning as real
-> drivers, compatible strings are published only in a single variant
-> module, preventing conflicts.
+> Now, each variant module has been transformed into a unified driver
+> serving both as a platform and an MDIO driver. This modification
+> reverses the relationship between the interface and variant modules,
+> with the variant module now utilizing symbols from the interface
+> modules.
 >
-> The patch series introduces a new common module for functions shared by
-> both variants. This module also absorbs the two previous interface
-> modules, as they would always be loaded anyway.
->
-> The series relocates the user MII driver from realtek-smi to rtl83xx. It
-> is now used by MDIO-connected switches instead of the generic DSA
-> driver. There's a change in how this driver locates the MDIO node. It
-> now only searches for a child node named "mdio".
->
-> The dsa_switch in realtek_priv->ds is now embedded in the struct. It is
-> always in use and avoids dynamic memory allocation.
->
-> Testing has been performed with an RTL8367S (rtl8365mb) using MDIO
-> interface and an RTL8366RB (rtl8366) with SMI interface.
+> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
-Tested on my RTL8366RB on a D-Link DIR-685 as well, works like a
-charm:
-Tested-by: Linus Walleij <linus.walleij@linaro.org>
+The code looks good, easy to read and it works, so:
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
 Yours,
 Linus Walleij
