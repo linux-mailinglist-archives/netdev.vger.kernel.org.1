@@ -1,89 +1,83 @@
-Return-Path: <netdev+bounces-70448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CF1084F020
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 07:11:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49C1984F021
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 07:12:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 98416B2227C
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 06:11:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB7241F22FAF
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 06:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D90157323;
-	Fri,  9 Feb 2024 06:11:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C487F56B87;
+	Fri,  9 Feb 2024 06:12:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jJ4nmx7g"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JTqUJyzL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB78957310
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 06:11:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632E657308
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 06:12:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707459095; cv=none; b=P7pEPOF4IE8OdWkKWJt560s//GQKkOPQ4M7EXKm9/QjQTW9DaF8kem+8aSjeykyx9ejSI8p1v5Sta8GpTtZeXCdAgckN5fbakWe6qyx+Cr9TCRZZzgFahbImGqJLfH6AfZ6UWWu/+yY5n73Q8PA0EoZIx7bpJynYlua0dhcXMeo=
+	t=1707459147; cv=none; b=XP0+qDo/XNiyX90jZHxFkS8pEj5/SOnvlxCi+b8xhFbTO1lzXhhdZc6WWFZX3ZGVXOi6DH8ck3iT5hLK50gnvTHv9rITfkc40NrWdLybq69HlNIO1LIDv7bCtn4sUch5nDTYWVs52/7BDAEBglmg+wkp4Z8+7SnrX8qGr+X4wYU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707459095; c=relaxed/simple;
-	bh=dZG0QNi7SRRemjy+9xsvodF2DVs27fYnCafIVrknPc8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=e4sMlt0UcNlZimzVfqaryAH0ttCRnhYM649cCAUCOqWNTsez4QRbo3O17ilc0zhNRh+Njc1HnyEvchtYFLfwcXJ+G56cPS3JLw+Thsuebh+DBEIkLa1NXRytCFoJE4q9xN9v52gSer76DtKgPSHnikN1et4rz49Dox7QT8e1Fjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jJ4nmx7g; arc=none smtp.client-ip=209.85.214.175
+	s=arc-20240116; t=1707459147; c=relaxed/simple;
+	bh=ByPOuBXxZueNIY2WwJa12O35L+g4saZim753xv8FeyA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iPyAJgcdG2mDQj2LIzzk1k8kl4otdc1bXKdMX9BEBB96fO/a8X6PN7SKu64oBWRUvPt+QWIuOiiyAnezYqZEotDASD8UTqQYPRFxx2JfjP1TuoSq44veyCRDHyUmlisWje/Y4zXDBug3A0lXBrIctObguDSQ7qBJEmRff/vVMPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JTqUJyzL; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-1d70b0e521eso4556105ad.1
-        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 22:11:33 -0800 (PST)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1d7881b1843so5392475ad.3
+        for <netdev@vger.kernel.org>; Thu, 08 Feb 2024 22:12:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707459093; x=1708063893; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sM+bOrDz8l8mOQF3TbcRWuLzYmI3ryKTQszVG53QEDc=;
-        b=jJ4nmx7gcHhTkrQ+Uy9cYd06+Kw5r5+WFZ9+K12RsZGc0PpUPghVVkPaCKIrr+FHM8
-         bfXt3EEhQWGm7g0O/bMDkX+CVq0pGvUyESkhnmjFLo324AnxjaLQBMtAuLEcee7GErfj
-         rTuFjYxjxhuGcRnIl69yHY9jwWqyMKJBv3Fk0VXc+aa+GdNCimic348pw+XMFtkACPnT
-         vNjxBgx+KrvyrdgqPc6bC3hkqjtE5Z6kT441JhMYHQCx2a7hoXrgq7M+B4fRY0ntXY/N
-         yYCwORKMqaARI7T3709+oxjTYDm/hlepWM69qQyG+flCuGxVPZxD3chUqNAc7fsKoRkC
-         nigA==
+        d=gmail.com; s=20230601; t=1707459145; x=1708063945; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5MWvnrhKCarN9IchyY3TV/zfkt+BJdbLxKPHf4mNYsw=;
+        b=JTqUJyzL+FRltPf6KTImRHLe+92XqNjDSXrhlhZroGLtrkfoM3oNGK2/RkDyLZ7VOG
+         8BfChWgyRDSa/LZ09ibqo4CmtJ0x5gjc0XS6/bloDKXPk8oc9t9vnOgrtELLuaBFkyF+
+         BvprdkPWJGLm44EeOkSBdakivNburBdNSM1DnHdE/bC9JCTFuWDoNVqMXMIm6BA7xLV3
+         +KEAMzn/9f5yupymZwvK1MZAkne3fnI/GAP3JaZs+J3EyXk0NKUdD6lpy644TjFsd7/F
+         ZNurHtX66dbPgRrlpTLllR159usR7oejGNj0tuQxj+9Akqe3d+cLsmCMq8lS0V0Kym2x
+         FA1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707459093; x=1708063893;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sM+bOrDz8l8mOQF3TbcRWuLzYmI3ryKTQszVG53QEDc=;
-        b=XPFoMVuHDrLkwLa+dET1OCJYe/Cu43EcZQ47a+rV81dMACK8ChpMN3e87Wng4jGway
-         ZUeyYayQxFIvXDGFo2IHw4oyzxc8hSonG4rNLVnEcxveITB3Jc+F9lai/6BwHQg/2J1P
-         gYdMRsqlpv4VGY9wBcsvMMZzK63p2byzpnFMDcXlEMpWKO1EAbzDFY4YLZQzEXgXXheZ
-         vvZ/OAhgKgc8CgivGqfe8YjEJTYITfacsX+mBc1LWy7ETTCxzqwTOl13rx1qZVoZE5Ca
-         cWBVlfdr/wBuVovCrAT8cdBwMMmDpYMF9R5Tv8ON/REbCee3/NLVmZghP5c9gUgHOG5r
-         AWlA==
-X-Gm-Message-State: AOJu0YxMqNx7ymtZMxO7I7Mme/Wxuh4ti7ePt+OMnZd8FGB9y4/dRRIP
-	85/nVObn5jWeTxj/QNVk+Dt4AIWHJIWZIYt86gVnBrkL5WPNdT7Rq0G0tv+v4o0=
-X-Google-Smtp-Source: AGHT+IGk9n3ZvfHCVpqVhZQz+azEG+pdSAVhPjmJoWF7AFiJF3vfcOT2y9h4GcQCVYjqGUXmlO1xgw==
-X-Received: by 2002:a17:902:c408:b0:1d9:aa2d:db69 with SMTP id k8-20020a170902c40800b001d9aa2ddb69mr693411plk.19.1707459092683;
-        Thu, 08 Feb 2024 22:11:32 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWTkF0V2G9TkUSEkVvoBl9Zu3f78b18MfHPYpxLY/eD54jS9su/W3bVh5eoZK4aS6DJMwv42D/ozi5GQDf/3MC3Llg95xkY4NE7TMhPR4spSeE+Pazp1jmoQH/OrEOcEp/4E5j1n2TXeajVYywRWtOWxlOlRaM/wYfI2QAecRWUeavHPt5naQKBiZxfaDEaMIwTxWFoz6FeAKMIRlPhvjuwbk8BAH1wlRA/boCstTdtd9yc7VOFrUrbfd5pGCrl2At9hnkFKZ0=
-Received: from petra.lan ([2607:fa18:9ffd:1:3fa5:2e62:9e44:c48d])
-        by smtp.gmail.com with ESMTPSA id je3-20020a170903264300b001d93765f38dsm740843plb.228.2024.02.08.22.11.31
+        d=1e100.net; s=20230601; t=1707459145; x=1708063945;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5MWvnrhKCarN9IchyY3TV/zfkt+BJdbLxKPHf4mNYsw=;
+        b=lJicavvYR64qEOZrL+kY1xjz85KsfZeOVS0V1kt1jI21GGfeHSChqB6wxQfkDF5YBJ
+         6rryPaXe1DnV52yUifobJ8Sgv1tg8J+aquAdiDfH1sPa+CIL1mnBxl7D1aaWex+zaPys
+         1mVGnPzvgRaSfEAjR9Q8xUlOevlBw/1arn4xj2GBC03YGqy5zPWIKCm5tIcbbRwGVOr9
+         B0PBjnVONHI+Aim5MMHTPD4uvGDLVkdJHvCS/qWMCW8nmgmRacK4nxF+XJwiM4pln98w
+         eDAMkO17wGXlHxcxq+XXYn6PK4MdcL4wWd8Cgd+nTnCZPHRt0FQq/QcFMekrMuCzyrHP
+         wSLA==
+X-Gm-Message-State: AOJu0YxmxhyPyDf3VBvJtN6Vkzx+pvYcZ4LxQv3kijvCVOrIfv313pzL
+	00oinDsmhHx2SpuL1bJ5mUe6mO87u8YHceJ1L+GpM7I/RBhb62R7
+X-Google-Smtp-Source: AGHT+IG/bMl4v7GKbooQsWeCJwTBhPZkEdX+XW34XYdFTPQjA8Y5Flcy3khazb4sQWOLToZXRhT88g==
+X-Received: by 2002:a17:902:cecb:b0:1d8:fb17:a1fe with SMTP id d11-20020a170902cecb00b001d8fb17a1femr732185plg.48.1707459144970;
+        Thu, 08 Feb 2024 22:12:24 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWILrwhNUOrdjWMaARGUTy1zlfcfVbPE+zwIGTVHywxjqgnXZnzb6ve//9esga9mGC9Gp0MRya5T04aF+ZdkvQJ3o904QGkzG1U2/LoR1uIIJMz3pckow7AemtkigFnX7zheo4a18U1T79cMgWsdLfF0Ji3G0XyXdM+NHQ/1o5yhLIHMrQHYmxYSFMbKY0kXYAGIrpn/4LYadpMuV7Cli2QWkfRl895OmsRxFBTyQo=
+Received: from KERNELXING-MB0.tencent.com ([14.108.141.58])
+        by smtp.gmail.com with ESMTPSA id s9-20020a170903320900b001d9620e9ac9sm746321plh.170.2024.02.08.22.12.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Feb 2024 22:11:32 -0800 (PST)
-From: Alex Henrie <alexhenrie24@gmail.com>
-To: netdev@vger.kernel.org,
-	dan@danm.net,
-	bagasdotme@gmail.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
+        Thu, 08 Feb 2024 22:12:24 -0800 (PST)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	jikos@kernel.org
-Cc: Alex Henrie <alexhenrie24@gmail.com>
-Subject: [PATCH net-next 3/3] net: ipv6/addrconf: clamp preferred_lft to the minimum required
-Date: Thu,  8 Feb 2024 23:10:28 -0700
-Message-ID: <20240209061035.3757-3-alexhenrie24@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240209061035.3757-1-alexhenrie24@gmail.com>
-References: <20240209061035.3757-1-alexhenrie24@gmail.com>
+	dsahern@kernel.org
+Cc: netdev@vger.kernel.org,
+	kerneljasonxing@gmail.com,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH v2 net-next 0/2] add more drop reasons in tcp receive path
+Date: Fri,  9 Feb 2024 14:12:11 +0800
+Message-Id: <20240209061213.72152-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,118 +86,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If the preferred lifetime was less than the minimum required lifetime,
-ipv6_create_tempaddr would error out without creating any new address.
-On my machine and network, this error happened immediately with the
-preferred lifetime set to 5 seconds or less, after a few minutes with
-the preferred lifetime set to 6 seconds, and not at all with the
-preferred lifetime set to 7 seconds. During my investigation, I found a
-Stack Exchange post from another person who seems to have had the same
-problem: They stopped getting new addresses if they lowered the
-preferred lifetime below 3 seconds, and they didn't really know why.
+From: Jason Xing <kernelxing@tencent.com>
 
-The preferred lifetime is a preference, not a hard requirement. The
-kernel does not strictly forbid new connections on a deprecated address,
-nor does it guarantee that the address will be disposed of the instant
-its total valid lifetime expires. So rather than disable IPv6 privacy
-extensions altogether if the minimum required lifetime swells above the
-preferred lifetime, it is more in keeping with the user's intent to
-increase the temporary address's lifetime to the minimum necessary for
-the current network conditions.
+When I was debugging the reason about why the skb should be dropped in
+syn cookie mode, I found out that this NOT_SPECIFIED reason is too
+general. Thus I decided to refine it.
 
-With these fixes, setting the preferred lifetime to 5 or 6 seconds "just
-works" because the extra fraction of a second is practically
-unnoticeable. It's even possible to reduce the time before deprecation
-to 1 or 2 seconds by setting /proc/sys/net/ipv6/conf/*/regen_min_advance
-and /proc/sys/net/ipv6/conf/*/dad_transmits to 0. I realize that that is
-a pretty niche use case, but I know at least one person who would gladly
-sacrifice performance and convenience to be sure that they are getting
-the maximum possible level of privacy.
+v2:
+Link: https://lore.kernel.org/all/20240204104601.55760-1-kerneljasonxing@gmail.com/
+1. change the title of 2/2 patch.
+2. fix some warnings checkpatch tool showed before.
+3. use return value instead of adding more parameters suggested by Eric.
 
-Link: https://serverfault.com/a/1031168/310447
-Signed-off-by: Alex Henrie <alexhenrie24@gmail.com>
----
- net/ipv6/addrconf.c | 43 ++++++++++++++++++++++++++++++++++---------
- 1 file changed, 34 insertions(+), 9 deletions(-)
+Jason Xing (2):
+  tcp: add more DROP REASONs in cookie check
+  tcp: add more DROP REASONs in receive process
 
-diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-index 0b78ffc101ef..8d3023e54822 100644
---- a/net/ipv6/addrconf.c
-+++ b/net/ipv6/addrconf.c
-@@ -1347,6 +1347,7 @@ static int ipv6_create_tempaddr(struct inet6_ifaddr *ifp, bool block)
- 	unsigned long regen_advance;
- 	unsigned long now = jiffies;
- 	s32 cnf_temp_preferred_lft;
-+	u32 if_public_preferred_lft;
- 	struct inet6_ifaddr *ift;
- 	struct ifa6_config cfg;
- 	long max_desync_factor;
-@@ -1401,11 +1402,13 @@ static int ipv6_create_tempaddr(struct inet6_ifaddr *ifp, bool block)
- 		}
- 	}
- 
-+	if_public_preferred_lft = ifp->prefered_lft;
-+
- 	memset(&cfg, 0, sizeof(cfg));
- 	cfg.valid_lft = min_t(__u32, ifp->valid_lft,
- 			      idev->cnf.temp_valid_lft + age);
- 	cfg.preferred_lft = cnf_temp_preferred_lft + age - idev->desync_factor;
--	cfg.preferred_lft = min_t(__u32, ifp->prefered_lft, cfg.preferred_lft);
-+	cfg.preferred_lft = min_t(__u32, if_public_preferred_lft, cfg.preferred_lft);
- 	cfg.preferred_lft = min_t(__u32, cfg.valid_lft, cfg.preferred_lft);
- 
- 	cfg.plen = ifp->prefix_len;
-@@ -1414,19 +1417,41 @@ static int ipv6_create_tempaddr(struct inet6_ifaddr *ifp, bool block)
- 
- 	write_unlock_bh(&idev->lock);
- 
--	/* A temporary address is created only if this calculated Preferred
--	 * Lifetime is greater than REGEN_ADVANCE time units.  In particular,
--	 * an implementation must not create a temporary address with a zero
--	 * Preferred Lifetime.
-+	/* From RFC 4941:
-+	 *
-+	 *     A temporary address is created only if this calculated Preferred
-+	 *     Lifetime is greater than REGEN_ADVANCE time units.  In
-+	 *     particular, an implementation must not create a temporary address
-+	 *     with a zero Preferred Lifetime.
-+	 *
-+	 *     ...
-+	 *
-+	 *     When creating a temporary address, the lifetime values MUST be
-+	 *     derived from the corresponding prefix as follows:
-+	 *
-+	 *     ...
-+	 *
-+	 *     *  Its Preferred Lifetime is the lower of the Preferred Lifetime
-+	 *        of the public address or TEMP_PREFERRED_LIFETIME -
-+	 *        DESYNC_FACTOR.
-+	 *
-+	 * To comply with the RFC's requirements, clamp the preferred lifetime
-+	 * to a minimum of regen_advance, unless that would exceed valid_lft or
-+	 * ifp->prefered_lft.
-+	 *
- 	 * Use age calculation as in addrconf_verify to avoid unnecessary
- 	 * temporary addresses being generated.
- 	 */
- 	age = (now - tmp_tstamp + ADDRCONF_TIMER_FUZZ_MINUS) / HZ;
- 	if (cfg.preferred_lft <= regen_advance + age) {
--		in6_ifa_put(ifp);
--		in6_dev_put(idev);
--		ret = -1;
--		goto out;
-+		cfg.preferred_lft = regen_advance + age + 1;
-+		if (cfg.preferred_lft > cfg.valid_lft ||
-+		    cfg.preferred_lft > if_public_preferred_lft) {
-+			in6_ifa_put(ifp);
-+			in6_dev_put(idev);
-+			ret = -1;
-+			goto out;
-+		}
- 	}
- 
- 	cfg.ifa_flags = IFA_F_TEMPORARY;
+ include/net/dropreason-core.h | 23 ++++++++++++++++++++++-
+ include/net/tcp.h             |  4 ++--
+ net/ipv4/syncookies.c         | 20 ++++++++++++++++----
+ net/ipv4/tcp_input.c          | 26 +++++++++++++++++---------
+ net/ipv4/tcp_ipv4.c           | 21 +++++++++++++--------
+ net/ipv4/tcp_minisocks.c      | 10 +++++-----
+ net/ipv6/tcp_ipv6.c           | 19 ++++++++++++-------
+ 7 files changed, 87 insertions(+), 36 deletions(-)
+
 -- 
-2.43.0
+2.37.3
 
 
