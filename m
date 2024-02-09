@@ -1,123 +1,85 @@
-Return-Path: <netdev+bounces-70539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3221884F71B
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 15:19:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB16684F685
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 15:07:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C441A1F216B4
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 14:19:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2FB68B23065
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 14:07:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53C2379DD0;
-	Fri,  9 Feb 2024 14:14:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B6BD65BA9;
+	Fri,  9 Feb 2024 14:07:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2M86y8nA"
 X-Original-To: netdev@vger.kernel.org
-Received: from cloudserver094114.home.pl (cloudserver094114.home.pl [79.96.170.134])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C024669959;
-	Fri,  9 Feb 2024 14:14:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.96.170.134
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08075A11D;
+	Fri,  9 Feb 2024 14:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707488091; cv=none; b=saeXv8eYp4QfB4WM3ambCmT7TqXNXdpj7XlocLKZwjp1b3mQ9/TBqu+6/XtMKG4Wh2/DJfGEE52enrRLk8VdkMIpgkgFSHSqZUIJYLglPCaZpdpDve12Tyl9daelGcTFkRxyoTV5hDPiNCmUYpMm5vtFBNYdJnEC7j/uDkxiEFc=
+	t=1707487650; cv=none; b=PUGyYem6ElmsSkEIrihZRUz71Ct259vVAU7d25pDqo95zZ57fHxL/eED3ew2TvNwE8npZ8dCEYxCbXbpSdGTE6lBbcjRYNjZiBoWGSrl+7T/av/zeI/I7yQvYgBf+WcCMS2JFkpiYy7Gr1BAzklhpw55f6DJnhkjk7dNqOhJd0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707488091; c=relaxed/simple;
-	bh=8RyrzeKlVNhzQRM5WE8ThMfxfRzaAZCqRSMjBI1at8Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pg8zNufB1QAbIP8t3Ntq5jRYlDXhUlc/4AJ1JiL/MQu9gHBSLckC3rYe9W9SIOBnmBM5NDp4qFO1tgsbQ8DN+zntMSCcKDSfLegOQ7fY7sa5zu+xqEtGq1dbNE3c2BH/2KMEpbkN13ao24aH9Ssl4nYwGIL35dpX7LBjo69o1X8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rjwysocki.net; spf=pass smtp.mailfrom=rjwysocki.net; arc=none smtp.client-ip=79.96.170.134
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=rjwysocki.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rjwysocki.net
-Received: from localhost (127.0.0.1) (HELO v370.home.net.pl)
- by /usr/run/smtp (/usr/run/postfix/private/idea_relay_lmtp) via UNIX with SMTP (IdeaSmtpServer 5.4.0)
- id 51079e6e3f905612; Fri, 9 Feb 2024 15:14:46 +0100
-Received: from kreacher.localnet (unknown [195.136.19.94])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by cloudserver094114.home.pl (Postfix) with ESMTPSA id 281B1669C4D;
-	Fri,  9 Feb 2024 15:14:46 +0100 (CET)
-From: "Rafael J. Wysocki" <rjw@rjwysocki.net>
-To: Linux PM <linux-pm@vger.kernel.org>
-Cc: Lukasz Luba <lukasz.luba@arm.com>, LKML <linux-kernel@vger.kernel.org>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>,
- Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
- Zhang Rui <rui.zhang@intel.com>, netdev@vger.kernel.org,
- Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
- Miri Korenblit <miriam.rachel.korenblit@intel.com>,
- linux-wireless@vger.kernel.org, Shawn Guo <shawnguo@kernel.org>,
- Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>
-Subject:
- [PATCH v1 3/9] thermal: core: Drop the .set_trip_hyst() thermal zone
- operation
-Date: Fri, 09 Feb 2024 15:06:59 +0100
-Message-ID: <1907326.CQOukoFCf9@kreacher>
-In-Reply-To: <3232442.5fSG56mABF@kreacher>
-References: <3232442.5fSG56mABF@kreacher>
+	s=arc-20240116; t=1707487650; c=relaxed/simple;
+	bh=THGZeA2cURz+kUfLbIdxHc71uWdwiQg2aIRuESQaCUk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xk/zqPR6CjiCEgEjpHXplG5luNM3khArybRvQHe/aafW7xagsDHUDWuMinBXcAV7zlgunR+l/lw+xHCnK7Uug7O2DB/5a69X6Z3Ai+Xj9+69wFltBY299Ic0zPd5ILjaP1mcSOTm30HhWQMjoPlXRGwvgmN4zLol0Z1JtfzWkVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2M86y8nA; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=tdosNxThGv2416wmdrJFMsCGK//KPgRIuMFHO9IZ7+k=; b=2M86y8nAqZ5mKueNq4M6Be7gSF
+	ymAWRGbYmZsT3+SAHNuQKumsZDhOKlv+2fxHNtYNwZk788pbvxoo+veywFM7kyljm97RNLEXk8PHk
+	i/b1a2dO0i8nPSvNnzMc0oQe0nt7KhV09w7Ryi3CQA/vYL+jOpqGxniegsf3GszyRSLM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rYRXE-007OAp-Ic; Fri, 09 Feb 2024 15:07:20 +0100
+Date: Fri, 9 Feb 2024 15:07:20 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Catalin Popescu <catalin.popescu@leica-geosystems.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, afd@ti.com, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bsp-development.geo@leica-geosystems.com, m.felsch@pengutronix.de
+Subject: Re: [PATCH v3 2/2] net: phy: dp83826: support TX data voltage tuning
+Message-ID: <00691961-d516-4338-b7e8-203625e561ee@lunn.ch>
+References: <20240209123628.2113971-1-catalin.popescu@leica-geosystems.com>
+ <20240209123628.2113971-2-catalin.popescu@leica-geosystems.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="UTF-8"
-X-CLIENT-IP: 195.136.19.94
-X-CLIENT-HOSTNAME: 195.136.19.94
-X-VADE-SPAMSTATE: clean
-X-VADE-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvledrtdeigdeitdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfjqffogffrnfdpggftiffpkfenuceurghilhhouhhtmecuudehtdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkjghfggfgtgesthfuredttddtjeenucfhrhhomhepfdftrghfrggvlhculfdrucghhihsohgtkhhifdcuoehrjhifsehrjhifhihsohgtkhhirdhnvghtqeenucggtffrrghtthgvrhhnpedvffeuiedtgfdvtddugeeujedtffetteegfeekffdvfedttddtuefhgeefvdejhfenucfkphepudelhedrudefiedrudelrdelgeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeduleehrddufeeirdduledrleegpdhhvghlohepkhhrvggrtghhvghrrdhlohgtrghlnhgvthdpmhgrihhlfhhrohhmpedftfgrfhgrvghlucflrdcuhgihshhotghkihdfuceorhhjfiesrhhjfiihshhotghkihdrnhgvtheqpdhnsggprhgtphhtthhopeduiedprhgtphhtthhopehlihhnuhigqdhpmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehluhhkrghsiidrlhhusggrsegrrhhmrdgtohhmpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepuggrnhhivghlrdhlvgiitggrnhhosehlihhnrghrohdrohhrghdprhgtphhtthhopehsthgr
- nhhishhlrgifrdhgrhhushiikhgrsehlihhnuhigrdhinhhtvghlrdgtohhmpdhrtghpthhtohepshhrihhnihhvrghsrdhprghnughruhhvrggurgeslhhinhhugidrihhnthgvlhdrtghomh
-X-DCC--Metrics: v370.home.net.pl 1024; Body=16 Fuz1=16 Fuz2=16
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240209123628.2113971-2-catalin.popescu@leica-geosystems.com>
 
-From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+On Fri, Feb 09, 2024 at 01:36:28PM +0100, Catalin Popescu wrote:
+> DP83826 offers the possibility to tune the voltage of logical
+> levels of the MLT-3 encoded TX data. This is especially interesting
+> when the TX data path is lossy and we want to increase the voltage
+> levels to compensate the loss.
 
-None of the users of the thermal core provides a .set_trip_hyst()
-thermal zone operation, so drop that callback from struct
-thermal_zone_device_ops and update trip_point_hyst_store()
-accordingly.
+Maybe i'm being nit-picky....
 
-No functional impact.
+"TX data path is lossy" should probably be "TX data path as far as the
+RJ46 socket is lossy". 802.3 probably defines the voltage at that
+point. If you tune it so the voltage is too high at that point, you
+are breaking the standard. So you can use this to adjust for losses in
+your coupling and cable run to the front panel. You should not be
+using this for range extension by cranking up the voltages. Yes, you
+might be able to, but we should not be encouraging it.
 
-Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
----
- drivers/thermal/thermal_sysfs.c |    6 ------
- include/linux/thermal.h         |    1 -
- 2 files changed, 7 deletions(-)
-
-Index: linux-pm/drivers/thermal/thermal_sysfs.c
-===================================================================
---- linux-pm.orig/drivers/thermal/thermal_sysfs.c
-+++ linux-pm/drivers/thermal/thermal_sysfs.c
-@@ -184,12 +184,6 @@ trip_point_hyst_store(struct device *dev
- 	}
- 
- 	if (hyst != trip->hysteresis) {
--		if (tz->ops->set_trip_hyst) {
--			ret = tz->ops->set_trip_hyst(tz, trip_id, hyst);
--			if (ret)
--				goto unlock;
--		}
--
- 		trip->hysteresis = hyst;
- 
- 		thermal_zone_trip_updated(tz, trip);
-Index: linux-pm/include/linux/thermal.h
-===================================================================
---- linux-pm.orig/include/linux/thermal.h
-+++ linux-pm/include/linux/thermal.h
-@@ -90,7 +90,6 @@ struct thermal_zone_device_ops {
- 	int (*change_mode) (struct thermal_zone_device *,
- 		enum thermal_device_mode);
- 	int (*set_trip_temp) (struct thermal_zone_device *, int, int);
--	int (*set_trip_hyst) (struct thermal_zone_device *, int, int);
- 	int (*get_crit_temp) (struct thermal_zone_device *, int *);
- 	int (*set_emul_temp) (struct thermal_zone_device *, int);
- 	int (*get_trend) (struct thermal_zone_device *,
-
-
-
+      Andrew
 
