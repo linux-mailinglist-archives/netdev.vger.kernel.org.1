@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-70413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E9AE84EF04
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 03:50:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39ED584EF05
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 03:50:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48E6C1F21E7E
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6844D1C261A1
 	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 02:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E66915D4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C4717FF;
 	Fri,  9 Feb 2024 02:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TSTEHBQi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ISgSmNu7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62A214A33;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6513C4A39;
 	Fri,  9 Feb 2024 02:50:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707447027; cv=none; b=csCtVQ2nYd9Ozzihmkl40GGzc1XuhGl46O6C7F5BXFqWR9OWqCGfPpCLV2GpuK8G0ebhdnCzqaS3G0wn1VOd2DEC5n8DwBscrK/pCvxVN38MFo+V1dwjC9YF9m3UsB69XQ2Rt266wpQCEXwkZSeghq+tIjoCGI6Dwf4Egf6alZs=
+	t=1707447027; cv=none; b=F4m+9Yg7KA5vT6Sh4mKLqdN72U5HfS3XmXfmZcvGQd7hwF7RpWAeJvHMgwZwZ2pCXWl82tQAwPblHJIjdk7FeWBVOtEgsOGjbMoog28xk4WW5Q8Bqrdjnr+pB3t8MhF15+Nw/IKPAha+k6X6tB1rOCcRdsdtF7OuQqSi/rKpl8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707447027; c=relaxed/simple;
-	bh=XAtSgvJCPmP+Dns8cYbiou/MdVl6ZjmIQyC1c3QqZKI=;
+	bh=Io57ZbX4TIh2WM8fozHkyciEnZkx2vuUJX8marjq220=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=pNyvNDznLizVigo6nfASASJGCJNWk/7ITTIyCCsb2fskPp5NORAYe+e4+fDzSoQWntlwzO5I77WfDg11oHidfCs1z4TD/wS+Y4wXLGuAFdW97XdAYIpFem1QpygKLZT97+/hyg0dfMXZglOVZd+doD4raNsHx+/Gqtno3lKq5dU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TSTEHBQi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D2D48C43390;
+	 In-Reply-To:To:Cc; b=tJKTBukQeYg+daCef+ptdl5DZ6kyapkcRoVs2PR5ICUd1R8NZf+cp5nhUDj975xJ91/2Ndes0NNJQs/GvCE/q+lIo8lavIr8AfFumHnHKG6NG9qMnBHt8lj2wee9cdsGt2LrZbxrVmPPRWAothxjlZDac3RKVhSRJ3sab08vpIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ISgSmNu7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id ED373C43394;
 	Fri,  9 Feb 2024 02:50:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707447026;
-	bh=XAtSgvJCPmP+Dns8cYbiou/MdVl6ZjmIQyC1c3QqZKI=;
+	s=k20201202; t=1707447027;
+	bh=Io57ZbX4TIh2WM8fozHkyciEnZkx2vuUJX8marjq220=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TSTEHBQic0dz6zXJXeW+yETnM9EtYiX4tVtFJSkVFL4zssRaKrub7iM4SiaWeGVBF
-	 rynxGJRR9RUE0TeDFwmMiGHcQbDLeaD0BHjN1r1gUPaRNSFJoqd7JjpWMGv2kUVljS
-	 wYzbpOsDW9JQgQMJyhjiCWYXc8uXoR6JwqfA4hBKt19I0hzejvW12rmn1N0aW1VgkL
-	 RFGoMW2hwNm+uGby8SRlGJonsQ5mGWBDhvmVTbmabtboO58QrQmJKxmjpzxMpuM2NS
-	 2aQ9G229CBX5j+VQaehO23tJkzMN+jNt/wLwZPqIYEuJZbQZGh0/JDfx/jUG92hpoW
-	 SefwrcReLsvaw==
+	b=ISgSmNu7bmN3lxt7jNewzTzJdvVgKQoz5JXHvV0TorqiRGxDOwSjQUAbFfY4dpUDg
+	 yjzEBUSY4/WdLHY1Gw8kiBQcR+0lg9xVdo26fLb6lFbYBq1zMdSjAveCjwKiPBjufr
+	 t19oY8MI+TFFVJoXBK/cOdIbkZM3V3b0mZRusyiPuqFNf4oKVUJQDkqTTPSA/psqZZ
+	 9w3Vcuri1zX109ut8/P5Jlr93CbZR2cLvQ9dz6sfxAXaFMiAY54CC+r5lu4oOs5Zfr
+	 d4OgE+q+KCIlS+3QZd2ij96dhiQsyqdH0c++7Y1MbUi2CFDauHz4ngG+n/fgetjTE6
+	 b6cUeu09ivAuA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B8DBAC395F1;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CA6F4C395FD;
 	Fri,  9 Feb 2024 02:50:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,36 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] devlink: Fix command annotation documentation
+Subject: Re: [PATCH net v2] bonding: do not report NETDEV_XDP_ACT_XSK_ZEROCOPY
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170744702674.13594.683989807642475006.git-patchwork-notify@kernel.org>
+ <170744702682.13594.15329078929458071578.git-patchwork-notify@kernel.org>
 Date: Fri, 09 Feb 2024 02:50:26 +0000
-References: <20240206161717.466653-1-parav@nvidia.com>
-In-Reply-To: <20240206161717.466653-1-parav@nvidia.com>
-To: Parav Pandit <parav@nvidia.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, corbet@lwn.net, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, jiri@nvidia.com
+References: <20240207084737.20890-1-magnus.karlsson@gmail.com>
+In-Reply-To: <20240207084737.20890-1-magnus.karlsson@gmail.com>
+To: Magnus Karlsson <magnus.karlsson@gmail.com>
+Cc: magnus.karlsson@intel.com, bjorn@kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, netdev@vger.kernel.org, maciej.fijalkowski@intel.com,
+ kuba@kernel.org, toke@redhat.com, pabeni@redhat.com, davem@davemloft.net,
+ j.vosburgh@gmail.com, andy@greyhouse.net, hawk@kernel.org,
+ john.fastabend@gmail.com, edumazet@google.com, lorenzo@kernel.org,
+ bpf@vger.kernel.org, prbatra.mail@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 6 Feb 2024 18:17:17 +0200 you wrote:
-> Command example string is not read as command.
-> Fix command annotation.
+On Wed,  7 Feb 2024 09:47:36 +0100 you wrote:
+> From: Magnus Karlsson <magnus.karlsson@intel.com>
 > 
-> Fixes: a8ce7b26a51e ("devlink: Expose port function commands to control migratable")
-> Signed-off-by: Parav Pandit <parav@nvidia.com>
-> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+> Do not report the XDP capability NETDEV_XDP_ACT_XSK_ZEROCOPY as the
+> bonding driver does not support XDP and AF_XDP in zero-copy mode even
+> if the real NIC drivers do.
+> 
+> Note that the driver used to report everything as supported before a
+> device was bonded. Instead of just masking out the zero-copy support
+> from this, have the driver report that no XDP feature is supported
+> until a real device is bonded. This seems to be more truthful as it is
+> the real drivers that decide what XDP features are supported.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] devlink: Fix command annotation documentation
-    https://git.kernel.org/netdev/net/c/4ab18af47a2c
+  - [net,v2] bonding: do not report NETDEV_XDP_ACT_XSK_ZEROCOPY
+    https://git.kernel.org/netdev/net/c/9b0ed890ac2a
 
 You are awesome, thank you!
 -- 
