@@ -1,227 +1,254 @@
-Return-Path: <netdev+bounces-70544-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FC4E84F7B4
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 15:39:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C554084F7D4
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 15:43:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5A131F227BE
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 14:39:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D2511F25479
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 14:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A07A6EB58;
-	Fri,  9 Feb 2024 14:37:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21C0C69E0E;
+	Fri,  9 Feb 2024 14:43:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dQJdh4j5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dodLnal6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499A96EB4A;
-	Fri,  9 Feb 2024 14:37:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E52503F9FD;
+	Fri,  9 Feb 2024 14:43:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707489469; cv=none; b=p1NyQXwNTZ6KqtVY282gQ3TrN+w7hXqwgtWFgtFvUIzzkYo+3oJlVk5chLLvNiQKh1eoukk44JItCTxCG9tu9QwaJBKTq5ZjJuQpNuK0dtcyiNBXuwAFkseKexrkMsNizVGPF5O/jJT0aA+sNTVPDyeE3vDnNrsxEMyjSs6/ock=
+	t=1707489833; cv=none; b=YrTwCq2XtWFlUCTKEetJgLAnDK6Euy3EJgCybQvP5X65+42tPe9fAtASpObLo9WHVRCDCv3a8eD72gn0Z48nRpPUbGPiXFtxTlAK9Ygj8JZapgZYhgjK23iyeudGnBGCiHOLssZ02EhZNO3ZUBtppas2kppGQOwenaOUsYm7rwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707489469; c=relaxed/simple;
-	bh=8yJ/tmDXR4RZPdenfUZjzryKPR24G4VB9nfSLxysEYM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ropz4PYIm6hR8opQA0V0/EGG/JKrBZr/YIktMAcbxhJ2iM/+WRoPxUGsfiq1r4E6qqZUacEE20GWcmkB56l7cAnkb7exQh88kPXtEdZwy81svlAW0lltkkzpijSu3Btpjc0jml4f8+gDnteBEbF5HKtqoK6FLF6bsclrX/9E74s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dQJdh4j5; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2d066b532f0so14429341fa.1;
-        Fri, 09 Feb 2024 06:37:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707489465; x=1708094265; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y2q5FAm9/EenLzzRVkbIiynIYd7YyHOUHU8wwmN+aQI=;
-        b=dQJdh4j5Dwjd24z22HQ4go/EfjXa9dbA2CbaSfJENO0CkNvnN7/kkGjI1BUZeIr0Zf
-         FFuofUV92NqGaas5ujnia8OrYL5un6muAKNQgn3LwT+ClxeoM7v545cG11yYey7Ebzo0
-         6JJg1sizSxrByvLcbAIbYKEF6La9shUQGeXoS3/WZ+GZ7o28hdoOLGMlXmt5e72oAHNZ
-         egTj4wGa1GzK5TN6u4hWTKMHAgFnD1WxhkCy3PP/4LXSwmH1Myyv42lJbtSFsRRMp8aI
-         a8LMVnXwTqV+Jz9cvaQ8BREkKSz7wV2ZXJVrYJdMmu2I5rJ5pm1/wRv+2Mx4JIKBu9Jy
-         GTdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707489465; x=1708094265;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y2q5FAm9/EenLzzRVkbIiynIYd7YyHOUHU8wwmN+aQI=;
-        b=qVddDch+3ExF+dPEVuheID1duzbuKQ2PWnLu4wL3IHnIEXXgAtLDziy9fpSA2wpEBe
-         0aoJgvP43/plUyydR6mV469ze4nal1eHekVmLB1cQByCHOzsWY1S92+0HWoGVFBZTFs3
-         rqhacSCgWxiCQMHKDCjwvLHkLUt3K8ovGwKgX+IA8DC3nxeQiv7mkcQfOyfHajl7XLSa
-         J117QflbQqWAtXhCgoBfOiuAW/kW3egaF5RodX00LRNRFe05oXrxAqgJ6uKrbB82zl80
-         EAxM/qKDeUBWf/6fm6UWYQiuKir9crS96zOY0DXW6BkVQsoGgo6aDB7TCqsrXYjSOMHh
-         hm/g==
-X-Gm-Message-State: AOJu0YwfrRKCY0rqCLT8rBC2RqaPQqWOBif0wvzmTIw3zl19qozi/IEX
-	MpTarFhZWFc/QwQ8YObdZSy4uwQPuKcO09mynR5n1/Kl+YhfPu/RPTradrD/q8nxOToI63LD0qn
-	lDM5J3Fj+rKb+tYC0h0IlB4SAtQM=
-X-Google-Smtp-Source: AGHT+IE9V3dWwIf2os07sed0l9BJcm+dMUBuo7/9Jje0cFJ0Ur5sVtyhZORapmbWhQYxOk1lZvwBaxj3o1jZaUGi49Y=
-X-Received: by 2002:a2e:a4c6:0:b0:2d0:b750:514c with SMTP id
- p6-20020a2ea4c6000000b002d0b750514cmr1484382ljm.9.1707489465133; Fri, 09 Feb
- 2024 06:37:45 -0800 (PST)
+	s=arc-20240116; t=1707489833; c=relaxed/simple;
+	bh=KmmKjKyNVxZ2zfv9PoMRLGWQZNpQOaUBoweL3NKHvQI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PLL9v28gQCh8lTJgzvjfRd6yzaqVbM/kI7zqq5CMCvon6dTiJ9topN8FNJ+MVB7xUZVIufB67ftxiesuiVU0YmCRtuXp/H2rrQvliHL7wkStTaG1up96CKyiqdubK6aSDpCPzp5EZrmPGU7Lv811kAdoCfoZ8ZlxcAApwDJtL3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dodLnal6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C863CC433C7;
+	Fri,  9 Feb 2024 14:43:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707489832;
+	bh=KmmKjKyNVxZ2zfv9PoMRLGWQZNpQOaUBoweL3NKHvQI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dodLnal6ogcyPZ8QKbpJwzkd0EKmrFdRjxra6Z9xIMmt98VWzrZYsePnEGgbFl2NB
+	 k3As2Qi+0TTp0wXkSKeAoJBCh73YJyv1D+GtKntz13QPToJ2r61W10bosALVTJHC9G
+	 RU/UEK5nQmVWgixyJcTc1njUoTpab1kyvynsQspB02YFwTfN5Pfmb6reEmRTdRErET
+	 bt3KCCCuXFhNE6c0gvDB2LystI1n0Bl/IsZ7cvRTQKv6qEk+lAcnA4lgHMvYJblo5g
+	 UFxQhCCYEN2yNTpqPx5GNCugovL3CLN9FoPPYru0mGJKRr93y9Lqrxd/jCGUnSTnFZ
+	 oXCRPsX8ZGjuQ==
+Date: Fri, 9 Feb 2024 14:43:49 +0000
+From: Rob Herring <robh@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Russ Weight <russ.weight@linux.dev>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	Mark Brown <broonie@kernel.org>,
+	Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, devicetree@vger.kernel.org,
+	Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v3 10/17] dt-bindings: net: pse-pd: Add another
+ way of describing several PSE PIs
+Message-ID: <20240209144349.GA3678044-robh@kernel.org>
+References: <20240208-feature_poe-v3-0-531d2674469e@bootlin.com>
+ <20240208-feature_poe-v3-10-531d2674469e@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0000000000007cea730610e083e8@google.com> <216c95d9-db1f-487a-bf3d-17a496422485@v0yd.nl>
- <CABBYNZKPaMLK5+HnsRWR9jwpdZWvbbai6p9XbePhMYdKSYUPPg@mail.gmail.com>
-In-Reply-To: <CABBYNZKPaMLK5+HnsRWR9jwpdZWvbbai6p9XbePhMYdKSYUPPg@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 9 Feb 2024 09:37:32 -0500
-Message-ID: <CABBYNZKe+ncj9psXEuX9W2RG6GtgnFbX9Gy+H_LnPX4bND6hoA@mail.gmail.com>
-Subject: Re: [syzbot] [bluetooth?] KASAN: slab-use-after-free Write in __hci_acl_create_connection_sync
-To: =?UTF-8?Q?Jonas_Dre=C3=9Fler?= <verdre@v0yd.nl>
-Cc: syzbot <syzbot+3f0a39be7a2035700868@syzkaller.appspotmail.com>, 
-	davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com, 
-	kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, luiz.von.dentz@intel.com, marcel@holtmann.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240208-feature_poe-v3-10-531d2674469e@bootlin.com>
 
-Hi Jonas,
+On Thu, Feb 08, 2024 at 02:08:47PM +0100, Kory Maincent wrote:
+> Before hand we set "#pse-cell" to 1 to define a PSE controller with
 
-On Fri, Feb 9, 2024 at 8:36=E2=80=AFAM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Jonas,
->
-> On Fri, Feb 9, 2024 at 7:37=E2=80=AFAM Jonas Dre=C3=9Fler <verdre@v0yd.nl=
-> wrote:
-> >
-> > Hi everyone!
-> >
-> > On 08.02.24 16:32, syzbot wrote:
-> > > syzbot has bisected this issue to:
-> > >
-> > > commit 456561ba8e495e9320c1f304bf1cd3d1043cbe7b
-> > > Author: Jonas Dre=C3=9Fler <verdre@v0yd.nl>
-> > > Date:   Tue Feb 6 11:08:13 2024 +0000
-> > >
-> > >      Bluetooth: hci_conn: Only do ACL connections sequentially
-> > >
-> > > bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D154f85=
-50180000
-> > > start commit:   b1d3a0e70c38 Add linux-next specific files for 202402=
-08
-> > > git tree:       linux-next
-> > > final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D174f85=
-50180000
-> > > console output: https://syzkaller.appspot.com/x/log.txt?x=3D134f85501=
-80000
-> > > kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dbb693ba19=
-5662a06
-> > > dashboard link: https://syzkaller.appspot.com/bug?extid=3D3f0a39be7a2=
-035700868
-> > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D11d9514=
-7e80000
-> > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D107c2d8fe=
-80000
-> > >
-> > > Reported-by: syzbot+3f0a39be7a2035700868@syzkaller.appspotmail.com
-> > > Fixes: 456561ba8e49 ("Bluetooth: hci_conn: Only do ACL connections se=
-quentially")
-> > >
-> > > For information about bisection process see: https://goo.gl/tpsmEJ#bi=
-section
-> >
-> > Hmm, looking at the backtraces, I think the issue that the introduction=
- of the
-> > sequential connect has introduced another async case: In hci_connect_ac=
-l(), when
-> > we call hci_acl_create_connection_sync(), the conn state no longer imme=
-diately
-> > gets set to BT_CONNECT, but remains in BT_OPEN or BT_CLOSED until the h=
-ci_sync
-> > queue actually executes __hci_acl_create_connection_sync().
->
-> Need to double check but I think we do set BT_CONNECT in case of LE
-> when it is queued so which shall prevent it to be queued multiple
-> times.
->
-> > This means that now hci_connect_acl() is happy to do multiple
-> > hci_acl_create_connection_sync calls, and the hci_sync machinery will h=
-appily
-> > execute them right after each other. Then the newly introduced hci_abor=
-t_conn_sync()
-> > in __hci_acl_create_connection_sync() calls hci_conn_del() and frees th=
-e conn
-> > object, so the second time we enter __hci_acl_create_connection_sync(),
-> > things blow up.
-> >
-> > It looks to me like in theory the hci_connect_le_sync() logic is prone =
-to a
-> > similar issue, but in practice that's prohibited because in hci_connect=
-_le_sync()
-> > we lookup whether the conn object still exists and bail out if it doesn=
-'t.
-> >
-> > Even for LE though I think we can queue multiple hci_connect_le_sync() =
-calls
-> > and those will happily send HCI_OP_LE_CREATE_CONN no matter what the co=
-nnection
-> > state actually is?
-> >
-> > So assuming this analysis is correct, what do we do to fix this? It see=
-ms to me
-> > that
-> >
-> > 1) we want a BT_CONNECT_QUEUED state for connections, so that the state
-> > machine covers this additional stage that we have for ACL and LE connec=
-tions now.
->
-> BT_CONNECT already indicates that connection procedure is in progress.
->
-> > 2) the conn object can still disappear while the __hci_acl_create_conne=
-ction_sync()
-> > is queued, so we need something like the "if conn doesn't exist anymore=
-, bail out"
-> > check from hci_connect_le_sync() in __hci_acl_create_connection_sync(),=
- too.
->
-> Btw, I'd probably clean up the connect function and create something
-> like hci_connect/hci_connect_sync which takes care of the details
-> internally like it was done to abort.
->
-> > That said, the current check in hci_connect_le_sync() that's using the =
-connection
-> > handle to lookup the conn does not seem great, aren't these handles re-=
-used
-> > after connections are torn down?
->
-> Well we could perhaps do a lookup by pointer to see if the connection
-> hasn't been removed in the meantime, that said to force a clash on the
-> handles it need to happen in between abort, which frees the handle,
-> and connect, anyway the real culprit here is that we should be able to
-> abort the cmd_sync callback like we do in LE:
->
-> https://github.com/bluez/bluetooth-next/blob/master/net/bluetooth/hci_con=
-n.c#L2943
->
-> That way we stop the connect callback to run and don't have to worry
-> about handle re-use.
+#pse-cells
 
-https://patchwork.kernel.org/project/bluetooth/patch/20240209141612.3554051=
--1-luiz.dentz@gmail.com/
+> several PIs (Power Interface). The drawback of this was that we could not
+> have any information on the PI except its number.
 
->
-> > Cheers,
-> > Jonas
->
->
->
-> --
-> Luiz Augusto von Dentz
+Then increase it to what you need. The whole point of #foo-cells is that 
+it is variable depending on what the provider needs. 
 
+> Add support for pse_pis and pse_pi node to be able to have more information
+> on the PI like the number of pairset used and the pairset pinout.
 
+Please explain the problem you are trying to solve, not your solution. I 
+don't understand what the problem is to provide any useful suggestions 
+on the design.
 
---=20
-Luiz Augusto von Dentz
+> 
+> Sponsored-by: Dent Project <dentproject@linuxfoundation.org>
+
+Is this a recognized tag? First I've seen it.
+
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
+> 
+> Changes in v3:
+> - New patch
+> ---
+>  .../bindings/net/pse-pd/pse-controller.yaml        | 101 ++++++++++++++++++++-
+>  1 file changed, 98 insertions(+), 3 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml b/Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml
+> index 2d382faca0e6..dd5fb53e527a 100644
+> --- a/Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml
+> +++ b/Documentation/devicetree/bindings/net/pse-pd/pse-controller.yaml
+> @@ -13,6 +13,7 @@ description: Binding for the Power Sourcing Equipment (PSE) as defined in the
+>  
+>  maintainers:
+>    - Oleksij Rempel <o.rempel@pengutronix.de>
+> +  - Kory Maincent <kory.maincent@bootlin.com>
+>  
+>  properties:
+>    $nodename:
+> @@ -22,11 +23,105 @@ properties:
+>      description:
+>        Used to uniquely identify a PSE instance within an IC. Will be
+>        0 on PSE nodes with only a single output and at least 1 on nodes
+> -      controlling several outputs.
+> +      controlling several outputs which are not described in the pse_pis
+> +      subnode. This property is deprecated, please use pse_pis instead.
+>      enum: [0, 1]
+>  
+> -required:
+> -  - "#pse-cells"
+> +  pse_pis:
+> +    $ref: "#/$defs/pse_pis"
+> +
+> +$defs:
+
+$defs is for when you need multiple copies of the same thing. I don't 
+see that here.
+
+> +  pse_pis:
+> +    type: object
+> +    description:
+> +      Kind of a matrix to identify the concordance between a PSE Power
+> +      Interface and one or two (PoE4) physical ports.
+> +
+> +    properties:
+> +      "#address-cells":
+> +        const: 1
+> +
+> +      "#size-cells":
+> +        const: 0
+> +
+> +    patternProperties:
+> +      "^pse_pi@[0-9]+$":
+
+Unit-addresses are hex.
+
+> +        $ref: "#/$defs/pse_pi"
+> +
+> +    required:
+> +      - "#address-cells"
+> +      - "#size-cells"
+> +
+> +  pse_pi:
+> +    description:
+> +      PSE PI device for power delivery via pairsets, compliant with IEEE
+> +      802.3-2022, Section 145.2.4. Each pairset comprises a positive and a
+> +      negative VPSE pair, adhering to the pinout configurations detailed in
+> +      the standard.
+> +    type: object
+> +    properties:
+> +      reg:
+> +        maxItems: 1
+
+As you are defining the addressing here, you need to define what the 
+"addresses" are.
+
+> +
+> +      "#pse-cells":
+> +        const: 0
+> +
+> +      pairset-names:
+> +        description:
+> +          Names of the pairsets as per IEEE 802.3-2022, Section 145.2.4. Valid
+> +          values are "alternative-a" and "alternative-b". Each name should
+> +          correspond to a phandle in the 'pairset' property pointing to the
+> +          power supply for that pairset.
+> +        $ref: /schemas/types.yaml#/definitions/string-array
+> +        minItems: 1
+> +        maxItems: 2
+> +        items:
+> +          - enum:
+> +            - "alternative-a"
+> +            - "alternative-b"
+
+This leaves the 2nd entry undefined. You need the dictionary form of 
+'items' rather than a list. IOW, Drop the '-' under items.
+
+> +
+> +      pairsets:
+> +        description:
+> +          List of phandles, each pointing to the power supply for the
+> +          corresponding pairset named in 'pairset-names'. This property aligns
+> +          with IEEE 802.3-2022, Section 33.2.3 and 145.2.4.
+> +          PSE Pinout Alternatives (as per IEEE 802.3-2022 Table 145–3)
+> +          | Conductor | Alternative A (MDI-X) | Alternative A (MDI) | Alternative B(X) | Alternative B(S) |
+> +          |-----------|-----------------------|---------------------|------------------|------------------|
+> +          | 1         | Negative VPSE         | Positive VPSE       | —                | —                |
+> +          | 2         | Negative VPSE         | Positive VPSE       | —                | —                |
+> +          | 3         | Positive VPSE         | Negative VPSE       | —                | —                |
+> +          | 4         | —                     | —                   | Negative VPSE    | Positive VPSE    |
+> +          | 5         | —                     | —                   | Negative VPSE    | Positive VPSE    |
+> +          | 6         | Positive VPSE         | Negative VPSE       | —                | —                |
+> +          | 7         | —                     | —                   | Positive VPSE    | Negative VPSE    |
+> +          | 8         | —                     | —                   | Positive VPSE    | Negative VPSE    |
+> +        $ref: /schemas/types.yaml#/definitions/phandle-array
+> +        minItems: 1
+> +        maxItems: 2
+> +
+> +    required:
+> +      - reg
+> +      - "#pse-cells"
+> +      - pairset-names
+> +      - pairsets
+> +
+> +allOf:
+> +  - if:
+> +      required:
+> +        - "#pse-cells"
+> +    then:
+> +      not:
+> +        required:
+> +          - pse-pis
+> +
+> +  - if:
+> +      required:
+> +        - pse-pis
+> +    then:
+> +      not:
+> +        required:
+> +          - "#pse-cells"
+>  
+>  additionalProperties: true
+>  
+> 
+> -- 
+> 2.25.1
+> 
 
