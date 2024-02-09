@@ -1,100 +1,83 @@
-Return-Path: <netdev+bounces-70414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39ED584EF05
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 03:50:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81CAD84EF09
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 03:51:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6844D1C261A1
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 02:50:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DC1328CB73
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 02:51:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C4717FF;
-	Fri,  9 Feb 2024 02:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B996715CB;
+	Fri,  9 Feb 2024 02:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ISgSmNu7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VkKAThUJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6513C4A39;
-	Fri,  9 Feb 2024 02:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E714C6F;
+	Fri,  9 Feb 2024 02:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707447027; cv=none; b=F4m+9Yg7KA5vT6Sh4mKLqdN72U5HfS3XmXfmZcvGQd7hwF7RpWAeJvHMgwZwZ2pCXWl82tQAwPblHJIjdk7FeWBVOtEgsOGjbMoog28xk4WW5Q8Bqrdjnr+pB3t8MhF15+Nw/IKPAha+k6X6tB1rOCcRdsdtF7OuQqSi/rKpl8k=
+	t=1707447092; cv=none; b=riTfFbA2lbvt653HMYBk4es+uyZji4nYUk+HzMyoRB7bYoLZFsEbwuPWHN81l7e5eWkjXQhlR72HAlTdfSvr59SWq1wAQHkh4yUkSWjeH8AuLFzDxuTu2HD9KAkCWTRUViw544043Y378DpSMblY3u2f37EuO47TUUs0h4TBw7M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707447027; c=relaxed/simple;
-	bh=Io57ZbX4TIh2WM8fozHkyciEnZkx2vuUJX8marjq220=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tJKTBukQeYg+daCef+ptdl5DZ6kyapkcRoVs2PR5ICUd1R8NZf+cp5nhUDj975xJ91/2Ndes0NNJQs/GvCE/q+lIo8lavIr8AfFumHnHKG6NG9qMnBHt8lj2wee9cdsGt2LrZbxrVmPPRWAothxjlZDac3RKVhSRJ3sab08vpIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ISgSmNu7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id ED373C43394;
-	Fri,  9 Feb 2024 02:50:26 +0000 (UTC)
+	s=arc-20240116; t=1707447092; c=relaxed/simple;
+	bh=kAs+fQHGu51PFltWzHgpULib2IZu/SWvcdqHx+ctRi4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=FNHzknpdfkZhoGiEfHuHQ0//4PzFpiw8mSq3Y3bzK9OmWdkx0CLn5YLCDPc2cJpxo0A9hKkTKNxuJKD5w7PxnY8/1MrFZwYKPsTdEPawkICss1zOiaKoaDvPYHPBLSGgy51smhHcbHK1YjUuBlt4WCSwXST7ZsD/ttwAKUcORVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VkKAThUJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6E043C433C7;
+	Fri,  9 Feb 2024 02:51:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707447027;
-	bh=Io57ZbX4TIh2WM8fozHkyciEnZkx2vuUJX8marjq220=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ISgSmNu7bmN3lxt7jNewzTzJdvVgKQoz5JXHvV0TorqiRGxDOwSjQUAbFfY4dpUDg
-	 yjzEBUSY4/WdLHY1Gw8kiBQcR+0lg9xVdo26fLb6lFbYBq1zMdSjAveCjwKiPBjufr
-	 t19oY8MI+TFFVJoXBK/cOdIbkZM3V3b0mZRusyiPuqFNf4oKVUJQDkqTTPSA/psqZZ
-	 9w3Vcuri1zX109ut8/P5Jlr93CbZR2cLvQ9dz6sfxAXaFMiAY54CC+r5lu4oOs5Zfr
-	 d4OgE+q+KCIlS+3QZd2ij96dhiQsyqdH0c++7Y1MbUi2CFDauHz4ngG+n/fgetjTE6
-	 b6cUeu09ivAuA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CA6F4C395FD;
-	Fri,  9 Feb 2024 02:50:26 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1707447092;
+	bh=kAs+fQHGu51PFltWzHgpULib2IZu/SWvcdqHx+ctRi4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VkKAThUJPgAn/VpLn68mJ1jmRfOfpL2F/NMYsZLwveU/Ds7TIXz0S+huIjMgsKj8A
+	 kCdvchSRbv0YXJQZarBpYe7+h6Gf4hxvls/uYG22CBcPPUEDpFmPkcI49DNQl1jFga
+	 Zi8IV9wWLUrzdDkdJKeznXUHki/036+Nb2nAzD1fpn23QGJEWFrKt3CWPkOLGgUTFi
+	 kBjOVpCPOSANhxJSBonJj6o+djU+L9wgaKoAOh4qOb22Ik1HkSjaOOy0tgrmRQFwTl
+	 Stvfw3Hdf6u+es0cnMdEauzKbJpcUJRg9FI3kbCMm6NLRuV1z/LHjFSQgdQ7HqaKpp
+	 IZtCReopNio5g==
+Date: Thu, 8 Feb 2024 18:51:30 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sai Krishna <saikrishnag@marvell.com>
+Cc: <richardcochran@gmail.com>, <horms@kernel.org>,
+ <vinicius.gomes@intel.com>, <vadim.fedorenko@linux.dev>,
+ <davem@davemloft.net>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <sgoutham@marvell.com>,
+ <gakula@marvell.com>, <lcherian@marvell.com>, <hkelam@marvell.com>,
+ <sbhatta@marvell.com>, Naveen Mamindlapalli <naveenm@marvell.com>
+Subject: Re: [net-next PATCH v2] octeontx2: Add PTP clock driver for Octeon
+ PTM clock.
+Message-ID: <20240208185130.23509cb3@kernel.org>
+In-Reply-To: <20240206181009.1143910-1-saikrishnag@marvell.com>
+References: <20240206181009.1143910-1-saikrishnag@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] bonding: do not report NETDEV_XDP_ACT_XSK_ZEROCOPY
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170744702682.13594.15329078929458071578.git-patchwork-notify@kernel.org>
-Date: Fri, 09 Feb 2024 02:50:26 +0000
-References: <20240207084737.20890-1-magnus.karlsson@gmail.com>
-In-Reply-To: <20240207084737.20890-1-magnus.karlsson@gmail.com>
-To: Magnus Karlsson <magnus.karlsson@gmail.com>
-Cc: magnus.karlsson@intel.com, bjorn@kernel.org, ast@kernel.org,
- daniel@iogearbox.net, netdev@vger.kernel.org, maciej.fijalkowski@intel.com,
- kuba@kernel.org, toke@redhat.com, pabeni@redhat.com, davem@davemloft.net,
- j.vosburgh@gmail.com, andy@greyhouse.net, hawk@kernel.org,
- john.fastabend@gmail.com, edumazet@google.com, lorenzo@kernel.org,
- bpf@vger.kernel.org, prbatra.mail@gmail.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 6 Feb 2024 23:40:09 +0530 Sai Krishna wrote:
+> The PCIe PTM(Precision time measurement) protocol provides precise
+> coordination of events across multiple components like PCIe host
+> clock, PCIe EP PHC local clocks of PCIe devices. This patch adds
+> support for ptp clock based PTM clock. We can use this PTP device
+> to sync the PTM time with CLOCK_REALTIME or other PTP PHC
+> devices using phc2sys.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+A bit of an odd driver, somewhat similar to what Amazon described.
+You register a PTP clock but there's no PTP involved. Also you call
+pci_get_device() instead of binding to a proper bus.
 
-On Wed,  7 Feb 2024 09:47:36 +0100 you wrote:
-> From: Magnus Karlsson <magnus.karlsson@intel.com>
-> 
-> Do not report the XDP capability NETDEV_XDP_ACT_XSK_ZEROCOPY as the
-> bonding driver does not support XDP and AF_XDP in zero-copy mode even
-> if the real NIC drivers do.
-> 
-> Note that the driver used to report everything as supported before a
-> device was bonded. Instead of just masking out the zero-copy support
-> from this, have the driver report that no XDP feature is supported
-> until a real device is bonded. This seems to be more truthful as it is
-> the real drivers that decide what XDP features are supported.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v2] bonding: do not report NETDEV_XDP_ACT_XSK_ZEROCOPY
-    https://git.kernel.org/netdev/net/c/9b0ed890ac2a
-
-You are awesome, thank you!
+Please repost this, add linux-pci and the PCI maintainers to the CC.
+It'd be great to get their acks (in addition to Richard's).
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
