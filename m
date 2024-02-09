@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-70621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBDE084FCE0
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 20:31:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C57F84FD09
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 20:40:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4DF52B241B9
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 19:30:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D62E1C26632
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 19:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B8BD84A45;
-	Fri,  9 Feb 2024 19:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9554584A42;
+	Fri,  9 Feb 2024 19:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KelTs+iV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DySIMKje"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314CB82867;
-	Fri,  9 Feb 2024 19:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA2B84A36;
+	Fri,  9 Feb 2024 19:40:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707507028; cv=none; b=GQfzJC1s+ThC7zKi0UWlvInvcu3Oq9JPPp8r0GMcSI8Qj5IUTiLgJyl4AIsrW7i1CeX0GeL/xcZAD10jidg5JeLqxotEYMSYGQFpse3jMqYyvjK54/nnfYS+eJgP8xyZoTJ1ydDVxnFmx7IPAQ0oZ6LS+91fBsf8Ns6uCDocVPU=
+	t=1707507630; cv=none; b=CNVED13qYSfhn46/2EvPHn4ouDhADxQInPauj8BOgg2PSnsIEsclQpedRO3oRR6oUSkSp6Z8XoasL8rW0IAC0Q+1Nvu+S9XS4MOm0KMJKozYlddqNug2DVWQPtJRJgoBeMiRZS0F1XPkphot97hUwkQ+SazEYau4iOtvOye0I6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707507028; c=relaxed/simple;
-	bh=eXbUW+uiJDPt3EYlQ/sZ/nO0bB1DOBphU9kLXEXuTPw=;
+	s=arc-20240116; t=1707507630; c=relaxed/simple;
+	bh=YFBErYR8n1RTcVHqtX1w3DmIoFdAkulnJD5claaxj2s=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZPzPFZmim3oaVz26SZxPVsMz9q4hUyAd5yrakNM1fSpBldERyXdffHrKDvh0MBI0YQytYOgGieRbdjchuwwdj8c4mv3Mlrc0lot+UGHFe99rjeBv8fM708bhOEXaD59p4mVUuprT2tQBnfV2dZHcgyMdUAn76ntEJkcPPBuOjCU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KelTs+iV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id F2E87C43390;
-	Fri,  9 Feb 2024 19:30:27 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=YnDvnAibs7RukhExte4/rWDtFvAIMkBJ1Uge1kxEj4JqfytcBZ+hAGN9Z96weuBJpBQ4Z1nD3Vx8Snfy7g902H0TTeqVsudetSe8ZdECVd3oA8To8SRQz8UD5N/5FukcKSczIV+pWt/11a87VEN10l/o7lJ6CZXFmvq/9Bs5zBs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DySIMKje; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id F305BC43394;
+	Fri,  9 Feb 2024 19:40:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707507028;
-	bh=eXbUW+uiJDPt3EYlQ/sZ/nO0bB1DOBphU9kLXEXuTPw=;
+	s=k20201202; t=1707507630;
+	bh=YFBErYR8n1RTcVHqtX1w3DmIoFdAkulnJD5claaxj2s=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KelTs+iVPViojOF6thdMBJhnb9PM9cV3H/uHallhT9wTxfXOahCo10Y7hKNOSgqkc
-	 xCt+wHYsCmUtPfWpHUyOfK7VILB4GoTMww6W2YBEdRvXOssZRrsWoEOKbztODRdJc8
-	 dhDU4VScSep4/VE8ijCb9o44sD+ynzG1cMgE+EWsSxPdMIHZOGWuohqYhY7zYv7+Sb
-	 rmxbe/lMk5qTxxbsOwOmptrZrE/e1Pr3saZkZFYEUYiiY4+x1MUluY7R/OH6/CUGaj
-	 Rc6NiPL/SmVEs1ofnyZbrc7WglLJSIqNuyTadrccT70zfzxZQFFy1uL36PKLHMrQp4
-	 oHJ+sQHyDo1Nw==
+	b=DySIMKjeeLyzgu5l3v1LLLCTUpqa/v3AhF+bY8+osHhNmyYfmsOdA+fIaRW+LO0I7
+	 Tda/VJNIGA/A1gYm3Nq82wG1t6M6U/U3aPwgXLwKqUL6AC5q4b+oOF1FQwKdUgdTxA
+	 PQ2OsTyBvj51mp0FLz7RvxNY1Ike+XhqIchNHVydzlh2tV8W/SfSCjGb03m8xsXCTk
+	 LbzgY3DV5/TXs5nzq1nSKFvJIJxwPWZT8yZa4WDRDn9UK0ZYzy5ur46nndxgI02QMa
+	 JQv8YYKQCyfLtwuSJ50WvwNIw14rmzxxsnzxHBPPRfskL7Ej+E57k0V5ojcve2ahpe
+	 GDabfye8wJiDw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D9FE7C41677;
-	Fri,  9 Feb 2024 19:30:27 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D85C7D8C98B;
+	Fri,  9 Feb 2024 19:40:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests: forwarding: Add missing multicast routing
- config entries
+Subject: Re: [PATCH net v2] selftests: net: Fix bridge backup port test flakiness
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170750702787.24922.16288763737309895104.git-patchwork-notify@kernel.org>
-Date: Fri, 09 Feb 2024 19:30:27 +0000
-References: <20240208165538.1303021-1-idosch@nvidia.com>
-In-Reply-To: <20240208165538.1303021-1-idosch@nvidia.com>
+ <170750762988.32352.8965829570129199791.git-patchwork-notify@kernel.org>
+Date: Fri, 09 Feb 2024 19:40:29 +0000
+References: <20240208123110.1063930-1-idosch@nvidia.com>
+In-Reply-To: <20240208123110.1063930-1-idosch@nvidia.com>
 To: Ido Schimmel <idosch@nvidia.com>
 Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
  davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
- shuah@kernel.org, petrm@nvidia.com
+ razor@blackwall.org, shuah@kernel.org, petrm@nvidia.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 8 Feb 2024 18:55:38 +0200 you wrote:
-> The two tests that make use of multicast routig (router.sh and
-> router_multicast.sh) are currently failing in the netdev CI because the
-> kernel is missing multicast routing support.
+On Thu, 8 Feb 2024 14:31:10 +0200 you wrote:
+> The test toggles the carrier of a bridge port in order to test the
+> bridge backup port feature.
 > 
-> Fix by adding the required config entries.
-> 
-> Fixes: 6d4efada3b82 ("selftests: forwarding: Add multicast routing test")
-> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> Due to the linkwatch delayed work the carrier change is not always
+> reflected fast enough to the bridge driver and packets are not forwarded
+> as the test expects, resulting in failures [1].
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] selftests: forwarding: Add missing multicast routing config entries
-    https://git.kernel.org/netdev/net-next/c/f0ddf15f0a74
+  - [net,v2] selftests: net: Fix bridge backup port test flakiness
+    https://git.kernel.org/netdev/net/c/38ee0cb2a2e2
 
 You are awesome, thank you!
 -- 
