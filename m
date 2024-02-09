@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-70632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67CE584FDA8
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:35:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F078C84FDAA
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:35:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 089D31F27A29
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 20:35:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56F23B29531
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 20:35:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79509D282;
-	Fri,  9 Feb 2024 20:34:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC32C6125;
+	Fri,  9 Feb 2024 20:35:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="QjU4C7En"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Zcl97idd"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D91B653A9
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 20:34:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613E06139
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 20:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707510899; cv=none; b=gHkJQp3W334jHp80dMuzG3uAg1k0PXHkTQwrC4cbAyGep5vouRQAQ1F9u+Cu2xUOVX7TtG6JkRetZkFrXS7Qa/HFHJ6U7KQe7qGgrRetQIcfdgNoTc3SgsILoEcKQhP7Rn1+ZB6UXJQ382++dGUCfoHNHhghfIslRuUnHuJsrb0=
+	t=1707510900; cv=none; b=qJw2chgjALyCjZ3iYuwJbkdWx2O1PSuqLpjjeMfsmHObG6I2jkfNQRVJlBeaGJ0GHR0tfDP4lG5LboKLXB6TKWSpXpRVmZxA0tp9vmlSp5LI/JtSeJOnllOSFIpaqnWGjej43hsNziAy4OfHsni5kAebjaKydXjRI1cBPVGMZac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707510899; c=relaxed/simple;
-	bh=cdKCPvWGrytWQoOq781ZjgIyFr8yfYYxG9X79PNEWeg=;
+	s=arc-20240116; t=1707510900; c=relaxed/simple;
+	bh=2QdaKw6HNYgE90+Lcuxa1iCBKePEDBnvblv2L3k5W4s=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=SIPDpSy1x+tURep9iSE2WETBy5AgHnOT6uOyOCR8vFHNNE1hbpq1GfYoe/v+SfadjurHd8ZKqNPNfYosXUR9aQrFqgrOpX1rNZTv1Yx6LXDUMelJcPcWtl1NUXJbSm1flrS/dpMuVVmIq3o1iBBdJJK13AdxUwlIi5+OpZLiMbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=QjU4C7En; arc=none smtp.client-ip=209.85.219.201
+	 To:Cc:Content-Type; b=PYtuYTMpP9JS+C9xY5oGiuWbEeuUXEn4b2R44u1/ooSPHOwy/97dtteiJvG1JSO8u0Sj9K2liMYE/wLjOy0m4XbNJ2zZotZv5S9/jEiHlDODV+DNZldurVEtrJ+wSaarG66Vl+ZrV62xo/vth0jOeayQOuLZ6lAF9MRNtc/GBaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Zcl97idd; arc=none smtp.client-ip=209.85.219.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc6b5d1899eso3236424276.0
-        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 12:34:57 -0800 (PST)
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-dc748365ba9so2128103276.2
+        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 12:34:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1707510897; x=1708115697; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1707510898; x=1708115698; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mAGRx1rPz5nsaCJ+gWH3UX9hC0FJNWT4gFXf5sNBQg0=;
-        b=QjU4C7EnRHL61AKYJlR+Ez3gy3w+TDTOyHPuf/ZlAZf+9igiynFXjid+Q1L5dcEcFN
-         NsdMAnAhXjnp/uM/LAg6o+nuiImjm3XlBxd6Oyz6Jr4YuwFrfLwGZyAyl81TxfmEDjss
-         mWZdxblTVz9CkyqE388HpzasXIrI/XtP4iET/8GyxsELU7HLTHYrCFwGBOibUfdpobT6
-         7ldvvKXsSULeINKDlP0jVIas2oQwSaQBtMHbiNyYgRqZpwekrfuvCwirJYPZ5SUcr1M9
-         FdAjwOGQ7WEK/RxidIAtF0gphxrm5/1L8ajnzhyIRcNRWmSlOr1QD1vEdr7bhjD53DMH
-         X2Gw==
+        bh=l76Myz5QVY8zfVBScuI9w2fWj5vlY//uceSC7wdESko=;
+        b=Zcl97iddyesYiRVtd+mJcJcv2bA2jozDfzaB3tm0eg+hEomwmVvgwEKWp+IWMiZjXU
+         0IIz6eHlbgHUfEU6BX0HF0RbW1jDNBGwaY88O5oWFOR/u2/6yVbYOBbhYnkbcXIhTVN6
+         9w9ljAJkhZSVIX1zmqitTjvcXxCKzHHYpByjQG7ASxQDdW1C+j2hVNlLtwL41bgGBqVR
+         ME8z02FbY2oBr3rQtq6WB/fnwjt5fgc8Jzf3oLf9fCjB+BGbWcBSkiOwOa1l7MgJ0gN5
+         cUwsqiK2TNftZbg5+1QgFh2JucneOlKAROk019pljhoSWbjp3m4eW2RZCK3j6g3DTcpx
+         IQRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707510897; x=1708115697;
+        d=1e100.net; s=20230601; t=1707510898; x=1708115698;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mAGRx1rPz5nsaCJ+gWH3UX9hC0FJNWT4gFXf5sNBQg0=;
-        b=m2SM2FW9IrXxN5TBcdtSuMVspawxJ+CEE/R5dhasMyCJxQuDukuLKk203fy5iVGMbw
-         YM4q3iLmmMIWe1HRdjDmNJ+fLZdpxV1urQmnNcOj+iO29Q70P0KOa6mTThK+WZRKu0Ng
-         /+qMXDucuUPuD9UZYG2IoWg0KZ8na1a1/j5OXk1y0ovOVHzk8R+Ly97tSuI/BtWHSdyM
-         iuMrosFHR/21cXVDFJmh9TsW4TaNhNPQIOZbRTjZV5FgHlRHakF13oTlzRt0dNCUnECF
-         J+Zd9EK0DB50ZkMgBLz44QXzrSx4hLJcWxDn+YfydasGyv0yV6n4Kr+Ovx45cu+qrH6S
-         OajA==
-X-Gm-Message-State: AOJu0YxfkM9SUgXbVLCSdfzbItPjLEAnAtcWwO/o4iWEGbBS7QbN7pJj
-	skgD7pQN3pDCukm3A/pOxh93qpDwi5CN+YKUgZuuueFu8v2vhGV9cXEgFHlwz68zglirM8zOTh/
-	dKI9toY8HKw==
-X-Google-Smtp-Source: AGHT+IED1RpSvNx9oMA2mwYUkIxirgTL9ys8SW3lLj+ohq/tRBhaDG+NkrrKslDby64X267jnyEOCh2OH/T4WQ==
+        bh=l76Myz5QVY8zfVBScuI9w2fWj5vlY//uceSC7wdESko=;
+        b=I6gC7Jt7IT/nNaZDlZYrLantixl/OdxZ+daI19LI2+K1ZHnCDRKSin2GRvs/Cv9ui+
+         aRDx1TOQrk2aTLb2JdYDJ962rtFxtF3jbGjyLPxIrwX/p7szrue2E4v1jr1h4n9z1Ci3
+         wnZWEvycCyVojIL2iYPttKD0GXHG6MdxiJwnuiSJfBjB0X9uZwkobCOwugAC9cyezKfL
+         wMiibNlqYGiXwr7oDqnNDfrQaThA3tagmxzI6tdZK5nU+hxzO1Wf+61P1mjWwe8vxACo
+         i1Pt8JcbobRTuFO1V70O2bK8C9GqPt/IDqAtxi4IYtSum6eCTPsrcf7ZsvvljhWT70rL
+         9GyQ==
+X-Gm-Message-State: AOJu0Yyo3s2OqmOIbUiVJT2lIh1fdGGXV5AM6hQTQsuVkTIhcX9Dcvpp
+	1W63bMPhQfG6j7tA7dG9EJFynZvWgUixNPcTXKkBjgfBr+JRlC1zGUYO/ihtFBDIlA1WjeUdW7L
+	16gvU2v1Yng==
+X-Google-Smtp-Source: AGHT+IECMVMPg0jHOny2/0rUmajxLCcETUMxDOjir4Lz9T5fTISoYyVGbqzWT76sIDFxeW5EIPafLDxnsW+9Ow==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:ae03:0:b0:dc7:463a:46d2 with SMTP id
- a3-20020a25ae03000000b00dc7463a46d2mr416556ybj.0.1707510896823; Fri, 09 Feb
- 2024 12:34:56 -0800 (PST)
-Date: Fri,  9 Feb 2024 20:34:16 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:1547:b0:dbe:32b0:9250 with SMTP
+ id r7-20020a056902154700b00dbe32b09250mr9156ybu.0.1707510898420; Fri, 09 Feb
+ 2024 12:34:58 -0800 (PST)
+Date: Fri,  9 Feb 2024 20:34:17 +0000
 In-Reply-To: <20240209203428.307351-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20240209203428.307351-1-edumazet@google.com>
 X-Mailer: git-send-email 2.43.0.687.g38aa6559b0-goog
-Message-ID: <20240209203428.307351-2-edumazet@google.com>
-Subject: [PATCH v3 net-next 01/13] net: annotate data-races around dev->name_assign_type
+Message-ID: <20240209203428.307351-3-edumazet@google.com>
+Subject: [PATCH v3 net-next 02/13] ip_tunnel: annotate data-races around t->parms.link
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -82,70 +82,106 @@ Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-name_assign_type_show() runs locklessly, we should annotate
-accesses to dev->name_assign_type.
-
-Alternative would be to grab devnet_rename_sem semaphore
-from name_assign_type_show(), but this would not bring
-more accuracy.
+t->parms.link is read locklessly, annotate these reads
+and opposite writes accordingly.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/core/dev.c       | 6 +++---
- net/core/net-sysfs.c | 4 ++--
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ net/ipv4/ip_tunnel.c | 27 +++++++++++++--------------
+ 1 file changed, 13 insertions(+), 14 deletions(-)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 31f2c97d19903a7b4ce92292dd53486c0043cd1b..7bba4a47231726d666348539538ae94eb248fc3a 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -1220,13 +1220,13 @@ int dev_change_name(struct net_device *dev, const char *newname)
- 			    dev->flags & IFF_UP ? " (while UP)" : "");
+diff --git a/net/ipv4/ip_tunnel.c b/net/ipv4/ip_tunnel.c
+index 00da0b80320fb514bca58de7cd13894ab49a2ca6..248eb2d9829b31f89b7700460e317bf88bf325d9 100644
+--- a/net/ipv4/ip_tunnel.c
++++ b/net/ipv4/ip_tunnel.c
+@@ -102,10 +102,9 @@ struct ip_tunnel *ip_tunnel_lookup(struct ip_tunnel_net *itn,
+ 		if (!ip_tunnel_key_match(&t->parms, flags, key))
+ 			continue;
  
- 	old_assign_type = dev->name_assign_type;
--	dev->name_assign_type = NET_NAME_RENAMED;
-+	WRITE_ONCE(dev->name_assign_type, NET_NAME_RENAMED);
- 
- rollback:
- 	ret = device_rename(&dev->dev, dev->name);
- 	if (ret) {
- 		memcpy(dev->name, oldname, IFNAMSIZ);
--		dev->name_assign_type = old_assign_type;
-+		WRITE_ONCE(dev->name_assign_type, old_assign_type);
- 		up_write(&devnet_rename_sem);
- 		return ret;
+-		if (t->parms.link == link)
++		if (READ_ONCE(t->parms.link) == link)
+ 			return t;
+-		else
+-			cand = t;
++		cand = t;
  	}
-@@ -1255,7 +1255,7 @@ int dev_change_name(struct net_device *dev, const char *newname)
- 			down_write(&devnet_rename_sem);
- 			memcpy(dev->name, oldname, IFNAMSIZ);
- 			memcpy(oldname, newname, IFNAMSIZ);
--			dev->name_assign_type = old_assign_type;
-+			WRITE_ONCE(dev->name_assign_type, old_assign_type);
- 			old_assign_type = NET_NAME_RENAMED;
- 			goto rollback;
- 		} else {
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index a09d507c5b03d24a829bf7af0b7cf1e6a0bdb65a..f4c2b82674951bbeefd880ca22c54e6a32c9f988 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -125,7 +125,7 @@ static DEVICE_ATTR_RO(iflink);
  
- static ssize_t format_name_assign_type(const struct net_device *dev, char *buf)
+ 	hlist_for_each_entry_rcu(t, head, hash_node) {
+@@ -117,9 +116,9 @@ struct ip_tunnel *ip_tunnel_lookup(struct ip_tunnel_net *itn,
+ 		if (!ip_tunnel_key_match(&t->parms, flags, key))
+ 			continue;
+ 
+-		if (t->parms.link == link)
++		if (READ_ONCE(t->parms.link) == link)
+ 			return t;
+-		else if (!cand)
++		if (!cand)
+ 			cand = t;
+ 	}
+ 
+@@ -137,9 +136,9 @@ struct ip_tunnel *ip_tunnel_lookup(struct ip_tunnel_net *itn,
+ 		if (!ip_tunnel_key_match(&t->parms, flags, key))
+ 			continue;
+ 
+-		if (t->parms.link == link)
++		if (READ_ONCE(t->parms.link) == link)
+ 			return t;
+-		else if (!cand)
++		if (!cand)
+ 			cand = t;
+ 	}
+ 
+@@ -150,9 +149,9 @@ struct ip_tunnel *ip_tunnel_lookup(struct ip_tunnel_net *itn,
+ 		    !(t->dev->flags & IFF_UP))
+ 			continue;
+ 
+-		if (t->parms.link == link)
++		if (READ_ONCE(t->parms.link) == link)
+ 			return t;
+-		else if (!cand)
++		if (!cand)
+ 			cand = t;
+ 	}
+ 
+@@ -221,7 +220,7 @@ static struct ip_tunnel *ip_tunnel_find(struct ip_tunnel_net *itn,
+ 	hlist_for_each_entry_rcu(t, head, hash_node) {
+ 		if (local == t->parms.iph.saddr &&
+ 		    remote == t->parms.iph.daddr &&
+-		    link == t->parms.link &&
++		    link == READ_ONCE(t->parms.link) &&
+ 		    type == t->dev->type &&
+ 		    ip_tunnel_key_match(&t->parms, flags, key))
+ 			break;
+@@ -747,7 +746,7 @@ void ip_tunnel_xmit(struct sk_buff *skb, struct net_device *dev,
+ 
+ 	ip_tunnel_init_flow(&fl4, protocol, dst, tnl_params->saddr,
+ 			    tunnel->parms.o_key, RT_TOS(tos),
+-			    dev_net(dev), tunnel->parms.link,
++			    dev_net(dev), READ_ONCE(tunnel->parms.link),
+ 			    tunnel->fwmark, skb_get_hash(skb), 0);
+ 
+ 	if (ip_tunnel_encap(skb, &tunnel->encap, &protocol, &fl4) < 0)
+@@ -867,7 +866,7 @@ static void ip_tunnel_update(struct ip_tunnel_net *itn,
+ 	if (t->parms.link != p->link || t->fwmark != fwmark) {
+ 		int mtu;
+ 
+-		t->parms.link = p->link;
++		WRITE_ONCE(t->parms.link, p->link);
+ 		t->fwmark = fwmark;
+ 		mtu = ip_tunnel_bind_dev(dev);
+ 		if (set_mtu)
+@@ -1057,9 +1056,9 @@ EXPORT_SYMBOL(ip_tunnel_get_link_net);
+ 
+ int ip_tunnel_get_iflink(const struct net_device *dev)
  {
--	return sysfs_emit(buf, fmt_dec, dev->name_assign_type);
-+	return sysfs_emit(buf, fmt_dec, READ_ONCE(dev->name_assign_type));
+-	struct ip_tunnel *tunnel = netdev_priv(dev);
++	const struct ip_tunnel *tunnel = netdev_priv(dev);
+ 
+-	return tunnel->parms.link;
++	return READ_ONCE(tunnel->parms.link);
  }
+ EXPORT_SYMBOL(ip_tunnel_get_iflink);
  
- static ssize_t name_assign_type_show(struct device *dev,
-@@ -135,7 +135,7 @@ static ssize_t name_assign_type_show(struct device *dev,
- 	struct net_device *ndev = to_net_dev(dev);
- 	ssize_t ret = -EINVAL;
- 
--	if (ndev->name_assign_type != NET_NAME_UNKNOWN)
-+	if (READ_ONCE(ndev->name_assign_type) != NET_NAME_UNKNOWN)
- 		ret = netdev_show(dev, attr, buf, format_name_assign_type);
- 
- 	return ret;
 -- 
 2.43.0.687.g38aa6559b0-goog
 
