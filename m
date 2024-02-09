@@ -1,114 +1,126 @@
-Return-Path: <netdev+bounces-70680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 489FC84FF81
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 23:14:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45D5984FFC2
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 23:22:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06D58285967
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 22:14:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9387B2B3BE
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 22:22:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56B8210EE;
-	Fri,  9 Feb 2024 22:14:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68AE53613A;
+	Fri,  9 Feb 2024 22:20:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mxgKSziy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WLNTGQUC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 587F2364A0
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 22:14:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB0F28DDE;
+	Fri,  9 Feb 2024 22:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707516872; cv=none; b=uaLOa9FMFZsAT5u5kuOczN1IMsNPKUoIjiHccfgDkWxq5y+F2pCT2TQKqaGTGVZ/rfZ3/uGdnlDrJIeBihYrMpIIzSs7N7Yic9bWgriPmXDtguJlG5QED+hLUYtn7v2k/IyqZtV/z9NWGnxnpQvdw3vHS5zdS6dOFZumfJwMtac=
+	t=1707517229; cv=none; b=E/abT1B7iD7CLoI7KLvUEyHMUrJg18u+m5XcaR1hJgymwD85s7cZD7IOJrldJE1ejSqeAVgBS3x07v8G+rF2jNDaW8ZCvQqqYnIPuZV4SvqAoqh6gw1uEf1S4XPu0q9Xs7k9U5MUnly6ddea0K7U+GF0l9qQqYSyzb7qHzTQxac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707516872; c=relaxed/simple;
-	bh=FFYOyAs/sdR6PzLDoTFBTgOUpDvSB9setQ8Iw4vmg/8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JkFNAOy/1d3KVtRFmsZTuBcgSx+OrcIhAPBM667sqo77kUdtPQtFKzOfD9T8SzhXI2LS5AWk/V6Y2s40S5vX0cEoUMnhBAoQowFr1OrGw9c8YiiH9EsTZQXXGihfTsr6fiujzvyNtmFiSBNHXq1hEXttzGGRTGbfZLKBPSwoprI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mxgKSziy; arc=none smtp.client-ip=209.85.166.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-7c01af010bcso50863539f.0
-        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 14:14:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707516870; x=1708121670; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+fj6b9ZLz/vrQiQA6+bpst5j9mewX/grdzyYScKR194=;
-        b=mxgKSziyYJjm8ciCyTxvu5Bz9YV1pZ/A1QHAubmQDhsBt4Ohmi26+3SYs+ry36HRGO
-         QbsafQ5k3+aJkra75q6Y/wsS98oMBqx/39sSXeAaeYWUDkX6Okxj6Cv3GlMZJpwT/Dr0
-         hY2lE879no7J2oG4Iew9GPIuziwrljvdbPwTIHAP8LKuUrQOSKJqAGPDy3SvC0ARj0Td
-         iGshzLGQU3bm9E+t7Hpi7zL+w+j2bs658cCf8zD5ohU07S6tU83S38WwvYEjbuY3gboM
-         qaqaJb6rnQaoxUiy7TP0a0xVZmOZpHtQ84ddqwG2ztERFdVsKZCIzpDjav4NupUGbz8b
-         2HFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707516870; x=1708121670;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+fj6b9ZLz/vrQiQA6+bpst5j9mewX/grdzyYScKR194=;
-        b=Ok653eT/0jH/5qkkCAv4CO3RAeJvIRDS3TcCfE4g3KHv9aLWqQq3echM/Kj2G74Ii1
-         0+Tzp4FQtjJt9+zA8OnoRkvHIJZ+RIXLSnIAarxf1oywMafEecHb4MmWt7BMVLbI5LyH
-         c5WYrgYP+jhLRzF4DLjkTJs56BZNLISZgfPUtzMmaCiCiezNQta5JCGmtRfbjHZ+rZQ7
-         ATrHkhWcm7Tcb7gHQxIU1MimdsDisUqwpzhGk0jv2Y0hUkDwXrOKrwkQisIOYgroWWvX
-         Zm7/1L5sEF0MaZTt2A+EwFPNJsjDCPuZ7lUEE3pHEGHQeXk+KKr8sMiRnPjTpmfYAdlw
-         dh4A==
-X-Gm-Message-State: AOJu0Yz1SIyQSn1km7XfnM4bGm6RUmMdZs1AxFHrjzcoQENIBMBPBT+i
-	bpYEu5HLhimpo7rpZ5OFKhXa2CdNr9K92FfK3R8dK0lZO6dlnvTyOOZkTJ22
-X-Google-Smtp-Source: AGHT+IHNljSSSjKvjIOZ54wtdXO+8cXDtf6HTIJpc8IPTVUfgNyYY2GawuymNi81rGYtDeyT5MFgPQ==
-X-Received: by 2002:a6b:580e:0:b0:7c4:868:e04c with SMTP id m14-20020a6b580e000000b007c40868e04cmr825302iob.3.1707516870342;
-        Fri, 09 Feb 2024 14:14:30 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUX+lHcMhXLpNyK2KAdZarmsefSCNNao9RWMNk43hmygWd2PluILSu0PfOKXtjekmIGNwtyEdRfhj84PMfreWvtu2JdzYMmOBvt0T6ArWqQJXc9S+iPzbg=
-Received: from ?IPV6:2601:282:1e82:2350:6861:b3e:ad91:5e21? ([2601:282:1e82:2350:6861:b3e:ad91:5e21])
-        by smtp.googlemail.com with ESMTPSA id u19-20020a5ec013000000b007c040fe363dsm72367iol.29.2024.02.09.14.14.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 09 Feb 2024 14:14:29 -0800 (PST)
-Message-ID: <3730d7e4-058f-421f-8ecf-a9475440ef58@gmail.com>
-Date: Fri, 9 Feb 2024 15:14:28 -0700
+	s=arc-20240116; t=1707517229; c=relaxed/simple;
+	bh=zmD09Cf5Gxel7PFPTF/XTQTKu02LpKzT3/K6xp9h1qA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=nhRyfzlNB/kKz0/lKYl8M+TnlZMGDf/l0GWSi5x2wLKz/L4UhJTVkZ8c2OwiJVwe/9d5A8cuNbYoHl4JT0GekUF74LKB7+gyYHzfUEDcIIRwsje63GMovLmB319idgE42BirpZN2Ug1kaYPq4BdRBU8ZpDiICzjLFMZVjHD2VZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WLNTGQUC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BF14DC43390;
+	Fri,  9 Feb 2024 22:20:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707517228;
+	bh=zmD09Cf5Gxel7PFPTF/XTQTKu02LpKzT3/K6xp9h1qA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=WLNTGQUC8epHIrd8rB1EWFjpleFM5hcoEKMOGR9092xvOF2/MnWqrjZQx6a6qkXb4
+	 nrRKa6VpSWPFyR4JvzFfeZECzi7Smp/1aqcZ34xGIaqdAm4UtDERqAsurCe2J83XlD
+	 012GEDwrPvh34jf9slAIyrf/6Aj9wM1m+5X5JgFV7ufeLUeVCs089wXtZsraJzDMET
+	 Qw3Mo2wRzDwXwsfoj6gw28sHXc0qW4A+Co8p3IrufoVOfeoTpToi6spj5YYi7rv2bF
+	 9Kb2/LKZW9lfj0Y06AJYDZ9kxqNHHSY8x3UX76Or6OO4tHmWfXdFyiIzUis+UOVk+n
+	 /u3Ha0oOsePxA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A5A53C395F1;
+	Fri,  9 Feb 2024 22:20:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] iproute2: fix build failure on ppc64le
-Content-Language: en-US
-To: Stephen Hemminger <stephen@networkplumber.org>,
- Andrea Claudi <aclaudi@redhat.com>
-Cc: netdev@vger.kernel.org, sgallagh@redhat.com
-References: <d13ef7c00b60a50a5e8ddbb7ff138399689d3483.1707474099.git.aclaudi@redhat.com>
- <20240209083533.1246ddcc@hermes.local>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <20240209083533.1246ddcc@hermes.local>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3 0/9] net: Fix MODULE_DESCRIPTION() for net (p5)
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170751722867.20266.7249381801250857706.git-patchwork-notify@kernel.org>
+Date: Fri, 09 Feb 2024 22:20:28 +0000
+References: <20240208164244.3818498-1-leitao@debian.org>
+In-Reply-To: <20240208164244.3818498-1-leitao@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ horms@kernel.org, andrew@lunn.ch, f.fainelli@gmail.com, jhs@mojatatu.com
 
-On 2/9/24 9:35 AM, Stephen Hemminger wrote:
-> On Fri,  9 Feb 2024 11:24:47 +0100
-> Andrea Claudi <aclaudi@redhat.com> wrote:
-> 
->> ss.c:3244:34: warning: format ‘%llu’ expects argument of type ‘long long unsigned int’, but argument 2 has type ‘__u64’ {aka ‘long unsigned int’} [-Wformat=]
->>  3244 |                 out(" rcv_nxt:%llu", s->mptcpi_rcv_nxt);
->>       |                               ~~~^   ~~~~~~~~~~~~~~~~~
->>       |                                  |    |
->>       |                                  |    __u64 {aka long unsigned int}
->>       |                                  long long unsigned int
->>       |                               %lu
->>
->> This happens because __u64 is defined as long unsigned on ppc64le.  As
->> pointed out by Florian Weimar, we should use -D__SANE_USERSPACE_TYPES__
->> if we really want to use long long unsigned in iproute2.
-> 
-> Ok, this looks good.
-> Another way to fix would be to use the macros defined in inttypes.h
-> 
-> 		out(" rcv_nxt:"PRIu64, s->mptcpi_rcv_nxt);
-> 
+Hello:
 
-since the uapi is __u64, I think this is the better approach.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu,  8 Feb 2024 08:42:35 -0800 you wrote:
+> There are hundreds of network modules that misses MODULE_DESCRIPTION(),
+> causing a warning when compiling with W=1. Example:
+> 
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_cmp.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_nbyte.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_u32.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_meta.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_text.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/sched/em_canid.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/ip_tunnel.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/ipip.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/ip_gre.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/udp_tunnel.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/ip_vti.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/ah4.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/esp4.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/xfrm4_tunnel.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv4/tunnel4.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/xfrm/xfrm_algo.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/xfrm/xfrm_user.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv6/ah6.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv6/esp6.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv6/xfrm6_tunnel.o
+> 	WARNING: modpost: missing MODULE_DESCRIPTION() in net/ipv6/tunnel6.o
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v3,1/9] net: fill in MODULE_DESCRIPTION()s for xfrm
+    https://git.kernel.org/netdev/net/c/2599bb5e0c74
+  - [net,v3,2/9] net: fill in MODULE_DESCRIPTION()s for mpoa
+    https://git.kernel.org/netdev/net/c/f73f55b0fcff
+  - [net,v3,3/9] net: fill in MODULE_DESCRIPTION()s for af_key
+    https://git.kernel.org/netdev/net/c/6e2cf0eb6926
+  - [net,v3,4/9] net: fill in MODULE_DESCRIPTION()s for 6LoWPAN
+    https://git.kernel.org/netdev/net/c/2898f3075e6a
+  - [net,v3,5/9] net: fill in MODULE_DESCRIPTION()s for ipv6 modules
+    https://git.kernel.org/netdev/net/c/92ab08eb63bb
+  - [net,v3,6/9] net: fill in MODULE_DESCRIPTION()s for ipv4 modules
+    https://git.kernel.org/netdev/net/c/b058a5d25d92
+  - [net,v3,7/9] net: fill in MODULE_DESCRIPTION()s for net/sched
+    https://git.kernel.org/netdev/net/c/a46c31bf2744
+  - [net,v3,8/9] net: fill in MODULE_DESCRIPTION()s for ipvtap
+    https://git.kernel.org/netdev/net/c/830bd88cc151
+  - [net,v3,9/9] net: fill in MODULE_DESCRIPTION()s for dsa_loop_bdinfo
+    https://git.kernel.org/netdev/net/c/6034e059f5d3
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
