@@ -1,165 +1,191 @@
-Return-Path: <netdev+bounces-70578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D565D84F9F5
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 17:49:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 295D484F9F7
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 17:49:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 909F028A6DD
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 16:49:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DFF61C2769B
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 16:49:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DBE47BB0E;
-	Fri,  9 Feb 2024 16:44:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 334F67FBBC;
+	Fri,  9 Feb 2024 16:45:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AfYOOMZP"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ehkFeSbN"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 434FE7B3D9
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 16:44:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72A2A7BAF6
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 16:45:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707497067; cv=none; b=saAAK+CNoB1wMnuytmWjuKwFEEPixFXseyNthX0LTokVwfFnJSUMa97SAusnm6ED4G70o2mS8vRVnz679IbZuXD+wkkMfhM+uQK4gH408MXnw0D5cuaaeZsoSANxEdjhFy8raaNtiXzMiVYoIpcriUsFwnC06bo3Cj1fQL+BxxQ=
+	t=1707497136; cv=none; b=I6ytRo3nLCS+xZhsUvlwIt0fEIdmu84b73ENfjeIjQRVMKFNuU/8RElNf33AI7gIsmqsRKDZPGDVO0xpLvgCiDT/DXD7gdq/6QyF926VeoHXddNsb4SA1lMU5WWjkTtFnm//v/tJa9luT6lbUmbBVl+GdjXS7lB5p8L5qFDZUKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707497067; c=relaxed/simple;
-	bh=VqosT3yYW+lBjgM8Ul3Vsp9pX35Tuke2OKN2acExoc8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hX0ERT59tALTF58UfRIStw8XFDhZbZVSWvriIbORXOg3eWbO/48+Hk2pOfXaAXzBCEf8BgiKH0beAqT80nu8Q/uprAh6ChGgXXJQPMiHkU0Lic9a53vPc0KkVKlJx/DGjnR9zSmHdZyY7/0d5DVgqkcaiGUo5xDKBIbJs0W8Teg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AfYOOMZP; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1707497136; c=relaxed/simple;
+	bh=fOr7xFvfM4rd/02JsZAgF/8VCH/+1220k69orXmDPo8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=iyfH9mFrqFkA77tfaEyKj3ilmjMAV/GRowLG+MSZ6JRp+Q92uwPE2R5Ib10E6lY+3TqQRW4584AyPPHz4B8NHKq69wTo6lNu/cY82qsKpqB/NmTxbE1tNOhWD6JhGUP1e6ryv2muYpmFc7CginhlSMxhcgUZ6mlmALuNPBkpzF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ehkFeSbN; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1707497064;
+	s=mimecast20190719; t=1707497133;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=k3HiufRFOq7vi28Eqly0vEDaDdHwR8LxB2v5P2jtSCw=;
-	b=AfYOOMZPHxpGnSmXTBvIJwRcCClBkbj6fKIUx5B4EueZZ/IOAH9GViT4WT0bUtUEHzjZW/
-	Ga+bfDQqA9g0SCpopRPipfzvE/hF5OyaZ7pm0ciba6qdYr0QyufuM9FaTQMRAt7OxhfTni
-	ffAIcKh8YFGvY4+PCdVtuumUsJbz1T8=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=y8IUz/WHM9+M3AF6O/llN6R76VK+QIIm7K5QCYPk/1Y=;
+	b=ehkFeSbNgxEfFcdWcxJEMq3Cw9lVMPLjwjH/HL4bQ+3IFmpTDoZULa6pkzOHHD2jcsTSg+
+	WRcpgCBrI+Zfa/UVe66wWjd4W4m7lbQyZ1Sai8duTOgj9gJ/VvrbUKRPEvpmpr0ooA1MY1
+	0d+8n23Az74oGsgSD3moKp5odiyvnGk=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-88-H_1APEzWNeOGL6_l3YlurQ-1; Fri, 09 Feb 2024 11:44:22 -0500
-X-MC-Unique: H_1APEzWNeOGL6_l3YlurQ-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-785ac13ab8dso149478285a.0
-        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 08:44:22 -0800 (PST)
+ us-mta-460-PcO5oKZFMYiB-qjEbOHWQg-1; Fri, 09 Feb 2024 11:45:31 -0500
+X-MC-Unique: PcO5oKZFMYiB-qjEbOHWQg-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-3377bf95b77so94071f8f.0
+        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 08:45:31 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707497062; x=1708101862;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k3HiufRFOq7vi28Eqly0vEDaDdHwR8LxB2v5P2jtSCw=;
-        b=Drp7DaIcclvCaBudJrS+50CbMOm0jBMawG5yQYQiN/ILTPTLjRdcK5oTknzuz+m0K+
-         VjIM7afqpLUh/MLIAn3KJFt6QKtDbM5HTTINKGZWpVW4U1nddQKqiJmFibtKEGPQdOH9
-         JDzJtcDPx72DxrF/fQlmFTglV2CK/DjgRgHDaXvZdBj0pwcLhojKzsi6wjsPqdIpzz3D
-         3OJja2V0Vtlg4i6BCvo8bWOeDxEA1Xp9oH1pS/7Xuec5w7m8BaTOTMsxp9u2pUmbuQfl
-         7e2iUn8uLFQpVK8HMzPJP84/0UUEz4lzaHqWURPoBaqx4XoF+780ySWEQ6yw5F6MMxrq
-         rnPw==
-X-Forwarded-Encrypted: i=1; AJvYcCXdic/YnbJroya8o5GzuOa4daFzfKMwpskwj8GPCLIGyPvx39VEFS0zlpN1rL3ieAGkPUmpnJBOr9bbWy7oJvoPuXmlmlwx
-X-Gm-Message-State: AOJu0Yxe0FCuwPWVxbJKjI2JlqVjrqnSFiCjNSOGpbKq64LG6kYI2bmu
-	5XHht4jaqb77fapZNrakCmnGxdozgiUcuM20BpBys6U03RuKRGNlSswe//CjrpCkFNtGoxrLIPj
-	6gT2AWz5cM7a9FMdAlWJO1PW6nJiqE3Q6oYkPY2LQlo9naeZdGOkzgg==
-X-Received: by 2002:a05:620a:40d1:b0:785:bf37:38f with SMTP id g17-20020a05620a40d100b00785bf37038fmr657042qko.11.1707497061981;
-        Fri, 09 Feb 2024 08:44:21 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IENVlA0qg0+4v3P91wiIIxEpOzL+466GK2dg+eDP2qJSP6DtjO3gdikAce6wgZD8KW4lb3G3w==
-X-Received: by 2002:a05:620a:40d1:b0:785:bf37:38f with SMTP id g17-20020a05620a40d100b00785bf37038fmr657021qko.11.1707497061667;
-        Fri, 09 Feb 2024 08:44:21 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXIu8tS+YN+nAnwmSQTK3nqYx/bNMiFOQfgHipM2vrWJG2F/T3h8FvYmc9sp26zQKA8kRWeXTlFjy5PqWMMMB06Le4B1D3VrK7uk+jvefd3gRc6JwN/cXMo8ya359E9TOHld3SBT8QDePHqAfKIglTQJi/kTdIx/ptsgS57YRqRlcs8BE3OlYDYt+M31mvj0MWKqkkB2oPw/VmwDRTT1aq2+px67RQ+GB8oxTa0jyVOaBe1pP4pldi/EU7s74bsCzmagbrXRPLyj5dcSPaelYmCRC6lN5zZ25atB9oYuPWOCkC6C9HLRV7cuLgf3sPLEqeTV581C7U/H9CentaZ23iF6Fe4pnJQOEA8LnTdwv1mK6ZQZ7Vi+vJbTjxpvJpQXUBsyrSiMIsclgOubE7AnvCcMdKWNkgz63/OZLHAk8l3faG5vQBBXzXcXrYIBn5NXjvqFIZs/hVxQPwWnHradKVH2xQ=
-Received: from fedora ([2600:1700:1ff0:d0e0::37])
-        by smtp.gmail.com with ESMTPSA id x25-20020a05620a099900b00783f77b968fsm843857qkx.109.2024.02.09.08.44.20
+        d=1e100.net; s=20230601; t=1707497130; x=1708101930;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=y8IUz/WHM9+M3AF6O/llN6R76VK+QIIm7K5QCYPk/1Y=;
+        b=ctH1tIbHQSo1N/EtmXoRdMy5eU052rWcKrxsNPjoo2IEB9UN8BczPf2kUA93F2Si14
+         f4gOKCr+RPejs6oCALOfOW8R1UTExyJLeyU7tAvW8c+dtkDoCMjn/mkgyoIqXWSq1Rx8
+         ig8vm8k/N74HqjrT97S7uZHpB6gOp5DObsugKtYAHNPK2jnu/mrkPsCeP2nDjUqFRgoT
+         MSHJPzY3hu94M3lB5+6xxTPqKLuPvFhIWdkWTqDVa6RAGCBMPx9PqhsDox4kwxJ0EjSL
+         7P+4SXIYLUUhG9Ms5snUD5W957w54YEl9Pe4jZnmxO3oVabyyY5Za8YRs5qdvKg/bVvx
+         gWEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUriH5pxAMmQ5JB4wUG9V33TOhu9AxBMNtQRjZRrsIs1jeW9w2D+Mg+ghvZRvmUU6vnSv8sbXXkYMpAdXliL1q3G/1dhpDO
+X-Gm-Message-State: AOJu0Yw3RqwuE9f0pNIMYlIeK6OGrjHQb7S1fGuUKaRKlUded9jEz7Bf
+	ggToVqc6F0osgRmCg2y0ZVZmXKoUNMmAQIWWRJCi/sRMepXdA0TN2D0/iY+aV7nlQThXeKY14xj
+	hBLze7TcDYkfJKvwnH/SfH7UNr2+/2q1cmygiLxztCbcmxpFpT3fBxg==
+X-Received: by 2002:a05:6000:3cb:b0:33b:49da:5f27 with SMTP id b11-20020a05600003cb00b0033b49da5f27mr1832834wrg.1.1707497130733;
+        Fri, 09 Feb 2024 08:45:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEEvCJJlndPkjei3/7GOG8/YYBOrqkwvyHOuioq8DS51khP1dKywMY+YGkDvQK2oK2nI/HnSA==
+X-Received: by 2002:a05:6000:3cb:b0:33b:49da:5f27 with SMTP id b11-20020a05600003cb00b0033b49da5f27mr1832814wrg.1.1707497130393;
+        Fri, 09 Feb 2024 08:45:30 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUJmo3n564UEjJfDhs0TCLa5VkqFjuqGV/4K5bOmdklnoc0C7kKlv3gHLVEDT7FSzgvWdFt0C8j9ciO8OIAn0KJJNqbQcCvtc2T05N2G2qOKIQXEKNgkGMOElDrfeQ0oA4SZYFeOS9dlwdFf2J3XuRAMbKU3CtvoG3dZgxJCjE10MVtVDDDFo2Q3QILseSRAcH0JrbrzAhBUNOrTlOhCgStyClGe4O/wFmWkgntVRyzHvBSBsoWumYLSg==
+Received: from gerbillo.redhat.com (146-241-228-88.dyn.eolo.it. [146.241.228.88])
+        by smtp.gmail.com with ESMTPSA id bk14-20020a0560001d8e00b0033b11e91c0bsm2236407wrb.81.2024.02.09.08.45.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Feb 2024 08:44:21 -0800 (PST)
-Date: Fri, 9 Feb 2024 10:44:19 -0600
-From: Andrew Halaney <ahalaney@redhat.com>
-To: Abhishek Chauhan <quic_abchauha@quicinc.com>
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Jeff Johnson <quic_jjohnson@quicinc.com>, kernel@quicinc.com
-Subject: Re: [PATCH net-next v4] net: stmmac: dwmac-qcom-ethqos: Enable TBS
- on all queues but 0
-Message-ID: <xtwaz7cma6tc42hwslpp3j5htxhsefkmgjntciihphhhkislk7@dy6kr4qfs7mf>
-References: <20240208231145.2732931-1-quic_abchauha@quicinc.com>
+        Fri, 09 Feb 2024 08:45:29 -0800 (PST)
+Message-ID: <ee9d2e224d063dc66070b060f716219c976759cd.camel@redhat.com>
+Subject: Re: [PATCH net] selftests: net: wait for receiver startup in
+ so_txtime.sh
+From: Paolo Abeni <pabeni@redhat.com>
+To: Willem de Bruijn <willemb@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>, Shuah Khan
+ <shuah@kernel.org>, Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ linux-kselftest@vger.kernel.org,  netdev@vger.kernel.org
+Date: Fri, 09 Feb 2024 17:45:28 +0100
+In-Reply-To: <5b768c89eb2992c22ca7016de9f90ff7d4eecd5f.camel@redhat.com>
+References: 
+	<53a7e56424756ef35434bc15a90b256bcf724651.1707407012.git.pabeni@redhat.com>
+	 <5b768c89eb2992c22ca7016de9f90ff7d4eecd5f.camel@redhat.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.3 (3.50.3-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240208231145.2732931-1-quic_abchauha@quicinc.com>
 
-On Thu, Feb 08, 2024 at 03:11:45PM -0800, Abhishek Chauhan wrote:
-> TSO and TBS cannot co-exist. TBS requires special descriptor to be
-> allocated at bootup. Initialising Tx queues at probe to support
-> TSO and TBS can help in allocating those resources at bootup.
-> 
-> TX queues with TBS can support etf qdisc hw offload.
-> 
-> This is similar to the patch raised by NXP
-> commit 3b12ec8f618e ("net: stmmac: dwmac-imx: set TSO/TBS TX queues default settings")
-> 
-> Tested-by: Andrew Halaney <ahalaney@redhat.com> # sa8775p-ride
-> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
+On Fri, 2024-02-09 at 15:51 +0100, Paolo Abeni wrote:
+> On Thu, 2024-02-08 at 16:45 +0100, Paolo Abeni wrote:
+> > The mentioned test is failing in slow environments:
+> >=20
+> >   # SO_TXTIME ipv4 clock monotonic
+> >   # ./so_txtime: recv: timeout: Resource temporarily unavailable
+> >   not ok 1 selftests: net: so_txtime.sh # exit=3D1
+> >=20
+> > The receiver is started in background and the sender could end-up
+> > transmitting the packet before the receiver is ready, so that the
+> > later recv times out.
+> >=20
+> > Address the issue explcitly waiting for the socket being bound to
+> > the relevant port.
+> >=20
+> > Fixes: af5136f95045 ("selftests/net: SO_TXTIME with ETF and FQ")
+> > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> > ---
+> > Note that to really cope with slow env the mentioned self-tests also
+> > need net-next commit c41dfb0dfbec ("selftests/net: ignore timing
+> > errors in so_txtime if KSFT_MACHINE_SLOW"), so this could be applied to
+> > net-next, too
+>=20
+> Oops... CI is saying the above is not enough...
+>=20
+> > @@ -65,6 +70,7 @@ do_test() {
+> > =20
+> >  	local readonly START=3D"$(date +%s%N --date=3D"+ 0.1 seconds")"
+> >  	ip netns exec "${NS2}" "${BIN}" -"${IP}" -c "${CLOCK}" -t "${START}" =
+-S "${SADDR}" -D "${DADDR}" "${RXARGS}" -r &
+> > +	wait_local_port_listen "${NS2}" 8000 "${PROTO}"
+> >  	ip netns exec "${NS1}" "${BIN}" -"${IP}" -c "${CLOCK}" -t "${START}" =
+-S "${SADDR}" -D "${DADDR}" "${TXARGS}"
+>=20
+> The binary explicitly waits up to $START time, and that conflicts with
+> the wait_local_port_listen, something different is needed. Apparently I
+> was just "lucky" during my local testing.
 
-Reviewed-by: Andrew Halaney <ahalaney@redhat.com>
+I experimented a few different solutions and so far the only option
+that gave some positive result is increasing start delay and the etf
+delta by an order of magnitude, see below.
 
-> ---
-> Changes since v3:
-> - The change is Tested-by Andrew Halaney <ahalaney@redhat.com>
->   on Qualcomm Ride platform
-> - Change log is removed from the commit text
-> 
-> Changes since v2:
-> - Fixed the styling of comment in the dwmac-qcom-ethqos.c
-> - Followed the upstream format to give other glue
->   driver references to solve the same problem
-> - Appended  the subject with net-next
-> - Discussion of why this patch is required is discussed in
-> https://lore.kernel.org/netdev/c2497eef-1041-4cd0-8220-42622c8902f4@quicinc.com/
-> 
-> Changes since v1:
-> - Subject is changed as per upstream guidelines
-> - Added a reference of a similar change done by NXP in
->   body of the commit message
-> 
->  drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> index 31631e3f89d0..2691a250a5a7 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-> @@ -728,7 +728,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
->  	struct stmmac_resources stmmac_res;
->  	struct device *dev = &pdev->dev;
->  	struct qcom_ethqos *ethqos;
-> -	int ret;
-> +	int ret, i;
->  
->  	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
->  	if (ret)
-> @@ -822,6 +822,10 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
->  		plat_dat->serdes_powerdown  = qcom_ethqos_serdes_powerdown;
->  	}
->  
-> +	/* Enable TSO on queue0 and enable TBS on rest of the queues */
-> +	for (i = 1; i < plat_dat->tx_queues_to_use; i++)
-> +		plat_dat->tx_queues_cfg[i].tbs_en = 1;
-> +
->  	return devm_stmmac_pltfr_probe(pdev, plat_dat, &stmmac_res);
->  }
->  
-> -- 
-> 2.25.1
-> 
+But I'm pretty sure that even with that there will be sporadic failures
+in slow enough environments.
+
+When the host-induced jitter/delay is high enough, packets are dropped
+and there are functional failures. I'm wondering if we should skip this
+test entirely when KSFT_MACHINE_SLOW=3Dyes.
+
+Do you see any other options?
+
+Paolo
+
+---
+diff --git a/tools/testing/selftests/net/so_txtime.sh b/tools/testing/selft=
+ests/net/so_txtime.sh
+index 3f06f4d286a9..6445580f0a66 100755
+--- a/tools/testing/selftests/net/so_txtime.sh
++++ b/tools/testing/selftests/net/so_txtime.sh
+@@ -63,7 +63,9 @@ do_test() {
+ 		exit 1
+ 	fi
+=20
+-	local readonly START=3D"$(date +%s%N --date=3D"+ 0.1 seconds")"
++	local delta=3D0.1
++	[ -n "${KSFT_MACHINE_SLOW}" ] && delta=3D1
++	local readonly START=3D"$(date +%s%N --date=3D"+ ${delta} seconds")"
+ 	ip netns exec "${NS2}" "${BIN}" -"${IP}" -c "${CLOCK}" -t "${START}" -S "=
+${SADDR}" -D "${DADDR}" "${RXARGS}" -r &
+ 	ip netns exec "${NS1}" "${BIN}" -"${IP}" -c "${CLOCK}" -t "${START}" -S "=
+${SADDR}" -D "${DADDR}" "${TXARGS}"
+ 	wait "$!"
+@@ -76,7 +78,9 @@ do_test 6 mono a,10 a,10
+ do_test 4 mono a,10,b,20 a,10,b,20
+ do_test 6 mono a,20,b,10 b,20,a,20
+=20
+-if ip netns exec "${NS1}" tc qdisc replace dev "${DEV}" root etf clockid C=
+LOCK_TAI delta 400000; then
++delta=3D400000
++[ -n "${KSFT_MACHINE_SLOW}" ] && delta=3D$((delta*10))
++if ip netns exec "${NS1}" tc qdisc replace dev "${DEV}" root etf clockid C=
+LOCK_TAI delta "${delta}"; then
+ 	! do_test 4 tai a,-1 a,-1
+ 	! do_test 6 tai a,0 a,0
+ 	do_test 6 tai a,10 a,10
 
 
