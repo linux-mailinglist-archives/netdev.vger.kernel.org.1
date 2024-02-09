@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-70426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCD5E84EF48
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 04:12:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DB8284EF38
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 04:11:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 687782830CC
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 03:12:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 405671C25B6E
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 03:11:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BE6B12B76;
-	Fri,  9 Feb 2024 03:11:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA2C34C83;
+	Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lQh1FNhJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BcBxr1Dt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034574C92;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C13154C6D;
 	Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707448269; cv=none; b=RVVD4MTLxU0nGVmz43qa3q/4dJIVOLxZfBe+YVjnflVb9mjOGzVfxe7M6u5mfyFfxzdYify02GfwJLMiUF/+yHgriDRx9GTnE9IbpLQSatyJ0X9j2mEHKjvO2wGgxi7TCfSitdMA7VZ967RgnEEN+r+nMrOPlUTp3cR/nixHS0s=
+	t=1707448268; cv=none; b=Xn2i3CjErDVLlj9lyxt2m5bMh9CRqN854v66WbJWtRFFJACi5utUzQv8LbHM37qSbodh+m7lwx49D9YjRFfxZ2QmNiigD/+sC4jJvwbQ515XtjHTr2GTYMviCHM+t+Pfq5f9BsRsqGbe89TAIvK+aiTKyA1aYIP7H++ieRirUpE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707448269; c=relaxed/simple;
-	bh=FUmi3UXZdl0m8BCeA4JszAk2qUkSpIO4EAqIdRWeN+c=;
+	s=arc-20240116; t=1707448268; c=relaxed/simple;
+	bh=nzoZEQhlUlFStvBk+M+EZikQknFSlDDltaxD1XSibWY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=fpwSyOFMFiFF7HNIYIJEMuLYloPz/4zmEk+k6pKQ8eY+omAW6IVJs1Wc2eFOBZ4uHwwqg3WGvnKt8yBlMblkdhOCLsulGH1sYHf8T0a44G/DChK6GZwp9DI5/MupUM8X1nq4rap1cPaWLtnGJsjxWYlqQCJqi07IOj7NV/gHDZ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lQh1FNhJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 83134C4166B;
+	 In-Reply-To:To:Cc; b=FvtvgMJYpisJkmG2wc37ss0fsN9WAOz23sEr0aUZStsQ52EUWsFLkVDRQGXpAJcTdZyGGo5Vc2ll73u1NxN7CQGtqkTFdvmYa0gUGiGomhqiIw6MxolZ6itN6Wudevf+YtMTFCfLDxMYsCWKW2/HQ38NOLN4i98Jda0PemDG0PM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BcBxr1Dt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 3C3D0C43394;
 	Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707448268;
-	bh=FUmi3UXZdl0m8BCeA4JszAk2qUkSpIO4EAqIdRWeN+c=;
+	bh=nzoZEQhlUlFStvBk+M+EZikQknFSlDDltaxD1XSibWY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=lQh1FNhJnbthcpvsB5Ez3ycypln3bV/qMo98iJOhLXiQxFM9SOXVMBA9D950FI1ES
-	 SyRgUAgqErUXcMAABfFzimthwYWTcqwqI7qVPMCIfO6G3Umz6Ey8T7JickLLUh0prS
-	 nqo2TbYhEDxXuWgvgrwW86tTv5ejXix9d7Y/zDV9KQGeTaqZU5v5gDE8lXSmU4yOJt
-	 wbS7PbIq0/euR7meqcaK0jZ21z7rF3z69NYd3u9shyhjl3sUpRJ9wZ5VKa6bijIiVR
-	 W/YDhJqb7AipUbsuNniZ03MI+wE1H0chWLhlD5o897uFdRImWaj5Oly26rN6qIaC/a
-	 5MPyORgfedzgg==
+	b=BcBxr1DtEOW8uYPcKM6M593Mn3Hl+xiP7u/VwV0CglAt+i8SdPtHtxauL3iOKLGtG
+	 XRsS71km5JmEmxtGWtxH20NRS29yOBpCzESUin2o16mFYFsWKVO3FdLvLVrO91RYAQ
+	 /ouXQyil0+xB7SLRVVomfU6MSfHHAEgsAOOWwUvNwXqhcq/5IDXeFE6ZOBcrk42W5T
+	 nF1IOEJ4DFPjY5OAo/TBk1WuHfUUVSeK/uIW4zczSUECb8ToCHGezRAl9acQCIo3aL
+	 HYGkXeuVKNX005QB3vVWzfJexoAbSEekMZc0BXK66DEJf+nd3eNDbJfojTAhBiNI0/
+	 cf/Okr+Kq5L+Q==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 708B8D8C96E;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 26240C395F1;
 	Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,39 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH][next] netxen_nic: remove redundant assignment to variable
- capability
+Subject: Re: [PATCH v5 net-next 0/2] Add HW checksum offload support for RZ/G2L
+ GbEthernet IP
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170744826845.23533.8151257630099768804.git-patchwork-notify@kernel.org>
+ <170744826815.23533.13639002551479410283.git-patchwork-notify@kernel.org>
 Date: Fri, 09 Feb 2024 03:11:08 +0000
-References: <20240206115049.1879389-1-colin.i.king@gmail.com>
-In-Reply-To: <20240206115049.1879389-1-colin.i.king@gmail.com>
-To: Colin Ian King <colin.i.king@gmail.com>
-Cc: manishc@marvell.com, rahulv@marvell.com, GR-Linux-NIC-Dev@marvell.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
- linux-kernel@vger.kernel.org
+References: <20240207092838.160627-1-biju.das.jz@bp.renesas.com>
+In-Reply-To: <20240207092838.160627-1-biju.das.jz@bp.renesas.com>
+To: Biju Das <biju.das.jz@bp.renesas.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, s.shtylyov@omp.ru, claudiu.beznea.uj@bp.renesas.com,
+ yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com,
+ nikita.yoush@cogentembedded.com, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, geert+renesas@glider.be,
+ prabhakar.mahadev-lad.rj@bp.renesas.com, biju.das.au@gmail.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  6 Feb 2024 11:50:49 +0000 you wrote:
-> The variable capability is being assigned a value that is never
-> read and is being re-assigned later. The assignment is redundant and
-> can be removed. Also remove empty line before assignment to capability.
+On Wed,  7 Feb 2024 09:28:36 +0000 you wrote:
+> This patch series aims to add HW checksum offload supported by TOE module
+> found on the RZ/G2L Gb ethernet IP.
 > 
-> Cleans up clang scan build warning:
-> drivers/net/ethernet/qlogic/netxen/netxen_nic_init.c:1189:2: warning:
-> Value stored to 'capability' is never read [deadcode.DeadStores]
+> TOE has hardware support for calculating IP header and TCP/UDP/ICMP
+> checksum for both IPv4 and IPv6.
+> 
+> For Rx, the 4-byte result of checksum calculation is attached to the
+> Ethernet frames.First 2-bytes is result of IPv4 header checksum and next
+> 2-bytes is TCP/UDP/ICMP checksum.
 > 
 > [...]
 
 Here is the summary with links:
-  - [next] netxen_nic: remove redundant assignment to variable capability
-    https://git.kernel.org/netdev/net-next/c/a6c15d7ff29c
+  - [v5,net-next,1/2] ravb: Add Rx checksum offload support for GbEth
+    https://git.kernel.org/netdev/net-next/c/c2da9408579d
+  - [v5,net-next,2/2] ravb: Add Tx checksum offload support for GbEth
+    https://git.kernel.org/netdev/net-next/c/6c8e2803ef36
 
 You are awesome, thank you!
 -- 
