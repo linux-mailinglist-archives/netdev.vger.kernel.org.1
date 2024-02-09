@@ -1,169 +1,111 @@
-Return-Path: <netdev+bounces-70655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D43EF84FE15
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 22:01:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68AD884FE89
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 22:19:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12D2A1C22F4A
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:01:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AF151C22ECE
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:19:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 217B115AF1;
-	Fri,  9 Feb 2024 21:01:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C86C2E647;
+	Fri,  9 Feb 2024 21:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="XtZKTBm/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-oa1-f48.google.com (mail-oa1-f48.google.com [209.85.160.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F33538A;
-	Fri,  9 Feb 2024 21:01:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60DE216439
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 21:11:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707512474; cv=none; b=FUZyAtIkxgFg0M5mtzEdHbRFTuZKcwtAT200WX25Z/fdcHVoMtMGaTTE7xNWmE3TAtN9Ubbk/WGBoQxZKnp3qckfcK4MgzORXxLbjbWpVpzv6juogYLAEnkczRKqqCmkI/DVYPd9VvPRjMFRxmD7Rnlj1bsqY1jiHX/6TUdaHLE=
+	t=1707513085; cv=none; b=DJCyUC5K1gkxKpc3gqD7Bv0O0aL/nszhzHhqkWNdaVlmcZxIIyMQs4/RF9ddEAin3KlOfWl+PfTlOU57SOv4A4hydosE8LJ1kwU3vIJPVqdvdaWx6WeIUGaKhM9C1gxHuo5ojIjxnKuuwQcxa+DVQy7JV/SWaKyZQmjr8Ip/cjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707512474; c=relaxed/simple;
-	bh=ZlCWjyEbCdYaq94XTypns1HHxFSL+MANCGm2IE1pLOk=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=dam8aA1nWJBt6fzC1ro0dORN6Q+uO/qtiAhqJHYgMg072h039Bwy9TbSWkzx5h/gz/NwxDsGkKx0KaCLZVld8cjxEuvXBeTHVknneod9JBO/XJZXiAFlkiCmAXu7SZ76gIoDy4TqvHiu2GelPIkDFgiCq1xImh9MoWp7/F5fZoU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.73.169) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 10 Feb
- 2024 00:00:54 +0300
-Subject: Re: [PATCH net-next v2 5/5] net: ravb: Add runtime PM support
-To: Claudiu <claudiu.beznea@tuxon.dev>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
-CC: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>
-References: <20240209170459.4143861-1-claudiu.beznea.uj@bp.renesas.com>
- <20240209170459.4143861-6-claudiu.beznea.uj@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <3808dee0-b623-b870-7d96-94cc5fc12350@omp.ru>
-Date: Sat, 10 Feb 2024 00:00:54 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1707513085; c=relaxed/simple;
+	bh=XUcH1UxLCxfIwyJ9CRFC+7ICqDqroCA5cgXdrikWaRY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=h76YW2gzhQoZa0rmJlo+Hpci4enM6TOW+lze4j3xOLpzR8Psfdnme0THO6j+iX31aGlJ6EfXRW4BagVU8TtcWihWoHPf5JxzInxB6g76dFrf88xhCc6vg3Ppi5oZXs1G5ISJo716hxF9Lf+LXiD76FyFeDvpXY4gNvqUWgA4fdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=XtZKTBm/; arc=none smtp.client-ip=209.85.160.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-2046b2cd2d3so954421fac.0
+        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 13:11:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1707513082; x=1708117882; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l6TgcwAbgsmLtLyu5Ofw1Dd466E2FrR34L8AWToaH3s=;
+        b=XtZKTBm/Z7iEq+KpASrtQOEc3Q/EOxUyJs3Saw4h4NpnJHItCkXPFXdzi42DcvTBOH
+         pZsN5nbUAfuruNVx5GoXepMIIpCgQd5EtvbfkLPXVgLMTAWr4fcsl8aQsugCV/RNr6yT
+         05dc8nvQ2Q2l5xw9tK2KQpaAMJnGpHhZLwSbFHtVEfr3GdGlNcF+h2cvtP5cfmNlnO5Y
+         lhNS3pwhZkHBH7FB7EnFbuAkYlwCIFs5TUuDV2GsBAxYkhEsbMetRNY0Tqc71aqPVbP6
+         f40Ngtv1zmY7+0cqn25V7DUarhE1wWW0rpHpregX2WOsar1dGkdgOBoLkcAMKjpX34eU
+         UTHg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707513082; x=1708117882;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=l6TgcwAbgsmLtLyu5Ofw1Dd466E2FrR34L8AWToaH3s=;
+        b=YhrdSNQKRxB5QtWGWWKhzwnw981XgRgAm6Lioxa54XQl1jyPA7vlgOMrdnb1aWSurR
+         YhI3nD3dIwj38Ntg8JMFLJWOM2bhxhnzD40S2IHhyug33j45N6T68WYx1QJOtXt+e9ib
+         vlhq3BpXutw9/+egYBgpz/V4B00DPEQVJl4gSMj7JyKTASOX1c9BT4+9yWuIlsyN6dtO
+         bRkD+pydQOHRlhqZZN2mR5BfaLb3SBjOMdfrrbDa2USGBYGaUTxwoQBREKyOeYAPah44
+         mXkSiyfpkzIunbPeCtyNXhpEgDimS2vq2DrmpVBVZ7WucYduLIvqFkIepeUQxChVAOOm
+         jt4A==
+X-Gm-Message-State: AOJu0YyVqxySuVHX8hQ+wRRcBGZ0AXix22j3XGUdOXlset7I91uYlnJl
+	5fx9NQks29GEGlVUYDoTBkQOqXOY9DETlNvNeyeqgh6NTMAsAu7n/QbZx8Aqznw=
+X-Google-Smtp-Source: AGHT+IGl3bcIXf9vxhkEqrznfhES+9b4LRsM6WT2DoAnggZow6RhmartJWmHnoEjEXctYwPR1K8p3A==
+X-Received: by 2002:a05:6870:b250:b0:219:b163:70d8 with SMTP id b16-20020a056870b25000b00219b16370d8mr552722oam.6.1707513082402;
+        Fri, 09 Feb 2024 13:11:22 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCXm3qqN7nurWgs9IaVrQ6JuoBgeVnXrUdVl39H6TG/U/U9XfNjgLSUynl36AntPvANxVhyPrAcht2SAT/qsUR1SWgM32c8saU0lm4578MElg9Mym2NaaOkFMFEtPMYsZxnZEKrVAKX3QLkDwEML4umP3Bq2P9v5yRwOIR1TXTjKj8gGHXbNWWctV9sKk6p4ZYW4gQ3y8FMeEpx3CkGvGa7KZxnpcVOVi2bUFH4q/x49qRl68MfMvnjk0uewdY0rCov92fBPwa7O3yypCTDysSJrWPuN0TmvB+hBqyDByVBJa6bylcoR7qjqdw27s7AU3GXCoURVufP5e5XaNUAqetK7A9CMOUFM5ksHcT56zwg/HOuaWGFmS6S1ES7OJXlQNMV8cKFlhO55G1XY0RppWhk2pLTJjlIVwv2iNZ1oFt3KEOCr3FnwQpXyeV83sdY0eXvLCZQk++lC6wzubsY0QzZBsQ8wUirg1IHvWNzht7zrvyy+POKQvf0RR+dTCnKG5r8FIpzanAory9C60cbXIMryjFS5e863M+S0Q5qxEX7t2g4Kst3xz/0jBfpu7nmUaiMK/za6cXUtXuaLedTjoNju0mvpixm/mGZ/T9s=
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id e21-20020a631e15000000b005d8e280c879sm2240643pge.84.2024.02.09.13.11.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Feb 2024 13:11:22 -0800 (PST)
+Date: Fri, 9 Feb 2024 13:11:19 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
+ <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
+ Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
+ <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, bpf@vger.kernel.org
+ (open list:BPF [GENERAL] (Safe Dynamic Programs and Tools)),
+ linux-kernel@vger.kernel.org (open list)
+Subject: Re: [PATCH net-next v2] net/sched: actions report errors with
+ extack
+Message-ID: <20240209131119.6399c91b@hermes.local>
+In-Reply-To: <20240208182731.682985dd@kernel.org>
+References: <20240205185537.216873-1-stephen@networkplumber.org>
+	<20240208182731.682985dd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240209170459.4143861-6-claudiu.beznea.uj@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/09/2024 20:49:20
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 183341 [Feb 09 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.169 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.73.169 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.169
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/09/2024 20:54:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/9/2024 5:38:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 2/9/24 8:04 PM, Claudiu wrote:
+On Thu, 8 Feb 2024 18:27:31 -0800
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-> From: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
+> > -	if (!tb[TCA_ACT_BPF_PARMS])
+> > +	if (NL_REQ_ATTR_CHECK(extack, nla, tb, TCA_ACT_BPF_PARMS)) {
+> > +		NL_SET_ERR_MSG(extack, "Missing required attribute");  
 > 
-> Add runtime PM support for the ravb driver. As the driver is used by
-> different IP variants, with different behaviors, to be able to have the
-> runtime PM support available for all devices, the preparatory commits
-> moved all the resources parsing and allocations in the driver's probe
-> function and kept the settings for ravb_open(). This is due to the fact
-> that on some IP variants-platforms tuples disabling/enabling the clocks
-> will switch the IP to the reset operation mode where registers' content is
+> Please fix the userspace to support missing attr parsing instead.
 
-   This pesky "registers' content" somehow evaded me -- should be "register
-contents" as well...
-
-> lost and reconfiguration needs to be done. For this the rabv_open()
-> function enables the clocks, switches the IP to configuration mode, applies
-> all the registers settings and switches the IP to the operational mode. At
-> the end of ravb_open() IP is ready to send/receive data.
-> 
-> In ravb_close() necessary reverts are done (compared with ravb_open()), the
-> IP is switched to reset mode and clocks are disabled.
-> 
-> The ethtool APIs or IOCTLs that might execute while the interface is down
-> are either cached (and applied in ravb_open()) or rejected (as at that time
-> the IP is in reset mode). Keeping the IP in the reset mode also increases
-> the power saved (according to the hardware manual).
-> 
-> Signed-off-by: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>
-> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-[...]
-
-> diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-> index f4be08f0198d..5bbfdfeef8a9 100644
-> --- a/drivers/net/ethernet/renesas/ravb_main.c
-> +++ b/drivers/net/ethernet/renesas/ravb_main.c
-> @@ -1939,16 +1939,21 @@ static int ravb_open(struct net_device *ndev)
->  {
->  	struct ravb_private *priv = netdev_priv(ndev);
->  	const struct ravb_hw_info *info = priv->info;
-> +	struct device *dev = &priv->pdev->dev;
->  	int error;
->  
->  	napi_enable(&priv->napi[RAVB_BE]);
->  	if (info->nc_queues)
->  		napi_enable(&priv->napi[RAVB_NC]);
->  
-> +	error = pm_runtime_resume_and_get(dev);
-> +	if (error < 0)
-> +		goto out_napi_off;
-
-   Well, s/error/ret/ -- it would fit better here...
-
-[...]
-> @@ -3066,6 +3089,12 @@ static void ravb_remove(struct platform_device *pdev)
->  	struct net_device *ndev = platform_get_drvdata(pdev);
->  	struct ravb_private *priv = netdev_priv(ndev);
->  	const struct ravb_hw_info *info = priv->info;
-> +	struct device *dev = &priv->pdev->dev;
-> +	int error;
-> +
-> +	error = pm_runtime_resume_and_get(dev);
-> +	if (error < 0)
-> +		return;
-
-   Again, s/erorr/ret/ in this case.
-
-[...]
-
-MBR, Sergey
+I was just addressing the error handling. This keeps the same impact as
+before, i.e no userspace API change.
 
