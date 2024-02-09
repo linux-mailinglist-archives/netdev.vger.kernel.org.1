@@ -1,120 +1,168 @@
-Return-Path: <netdev+bounces-70402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61F1984EE2A
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 01:03:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00D1D84EE95
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 02:26:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 941261C217C2
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 00:03:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83D6D28853B
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 01:26:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEBAF5224;
-	Fri,  9 Feb 2024 00:02:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BBAC139E;
+	Fri,  9 Feb 2024 01:26:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="KUCVSNlY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="grvM6Ulx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE6F4C98;
-	Fri,  9 Feb 2024 00:02:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA579139B
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 01:26:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707436966; cv=none; b=AoJ8qbQPVcMWzuV3WDxasyCImuueLL0CzC6fsZWZqOdFRRpbwKrET4LY1DLs/be880unAwK8R4Qh/mK0sBsGdodJOlbxPuc7f2UmA1/WkMtV55HDWvOMDID74Dz+bpFtHAKdi1cdY6ufJBX0Ix+H1UGoS/bM++048jbUP/x3rA0=
+	t=1707441994; cv=none; b=ISrAXj7uOA/KQUuYAeTo0ijtpOPopMyRK5zZ2/DWg8NNBPy6tCzKO0u1zN7pEiZ5jRudEeAZiHDEjTRPpPefoZXqtvFYIrcf1eXf56w5IdO6t55+5qUvGKVtJpZA7gEaeZbAPQOVqylSkT4drLGjthIhI6XBHEP9wXA+hk9EXVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707436966; c=relaxed/simple;
-	bh=LkOLHY+o+udSpmGULxHUmPKRpvZuIshUcc2fP9oCCrI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=bt2TlGyzk5h0i01mHYn/DireCVpTnOqKo97xUjUiI+zuV4mQAuDkeqUZoMo7taJq7OfjeX6jVXDITwREpk8gPd0tLIYgbr0VCEeVm8W95wAD3jwMfZTbnmySBrO90upqms/CtSWZgZbNdqxFHqIhf0QzQrb6457rR4bs8J5PO+k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=KUCVSNlY; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 418NFdp3020989;
-	Fri, 9 Feb 2024 00:02:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=MqLMn6LQbwP7IL1EM9H4WRHLW1o/0KkA3yYJBHsfiIo=; b=KU
-	CVSNlYom3Nz0XELJoV8z9RWY9g3yr4zZJW+UZ3LBN6hACc5UjgJknXBCZRypR/Jk
-	U+3IAhayB4gShwjXRN6U3ga1A5yBeNT+hEcd2b/niB0lfYpe2WXQ987Y+PSIF8Ca
-	XdE7cOhHsCmmzCPpzAic7Bg/1zNv4Mqsp/DO5ts5t0Neq17rD2RTwfDHQhIR4jCT
-	kOrQdIJRKHN5wd/2Tv5mloznH8Zzk6DFvIJ7xuvmr1nJ5ca7MfHxoCITVI4iheeQ
-	KLqWuwY2lWcBKF0No+uk6qYtLvOjeoYW62EmKCp/hV5S3Qco0KKPCB2Ibxs7pSVn
-	jSsEyA8qOZij3mnUbt2w==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3w4sudjda5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 09 Feb 2024 00:02:26 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 41902P8J012556
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 9 Feb 2024 00:02:25 GMT
-Received: from [10.110.97.178] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 8 Feb
- 2024 16:02:21 -0800
-Message-ID: <79ae310b-5536-49a3-b3f7-3e4cd2328632@quicinc.com>
-Date: Thu, 8 Feb 2024 16:02:21 -0800
+	s=arc-20240116; t=1707441994; c=relaxed/simple;
+	bh=umzRWk2GQ5G4E97Rimjurx/eN1UyYYiJ408/lBWUFnc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Nf8IXA+YvvY87GO1iWE4DxNZp0fEdj8UViJp7HTkzJi2FlXagHy/7ASHS3/OVZp/8QUco+ViXedWY3j8+hnhTyI7VofZqSigPoLkuykaNZwV/kRDFS3PWbgvZbj0gShvgHB5rF1jqnKxbFbswbGURuf4NCgMJ8HI9QZ9NvqaVUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=grvM6Ulx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07C73C433C7;
+	Fri,  9 Feb 2024 01:26:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707441994;
+	bh=umzRWk2GQ5G4E97Rimjurx/eN1UyYYiJ408/lBWUFnc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=grvM6UlxR2biUrFowxGHnGKVMq79waDBR/3kPMLjyNEPjg5KYmHUsIwqVWOldbgAZ
+	 8VaynVEgSQVz3BZfIbX8W0Ez0cFyISCiiXNuBg+lumqJoYaWCwAKHmmv/At0C/FeDK
+	 CQndJedsZ7kvgTA8Ahgbvnl5leD1YhzSZHRKGtw9y0O12sJcVMiFH+oC61vIpD5ei6
+	 2j3g3Hl+meyWxeCZxmhgD2ii2OuH1OCvAbimbpTq9rT1Ph2AVsrUQqyP7c4HqO2QUZ
+	 d+n2iQgOrhxBk8SyQdjVQH8WFEDKTSnLuCetKYTIaJodGxR61qTBUS2D6k39Jc1bbp
+	 TkTjcJZOKkdnQ==
+Date: Thu, 8 Feb 2024 17:26:33 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: William Tu <witu@nvidia.com>, Jacob Keller <jacob.e.keller@intel.com>,
+ bodong@nvidia.com, jiri@nvidia.com, netdev@vger.kernel.org,
+ saeedm@nvidia.com, "aleksander.lobakin@intel.com"
+ <aleksander.lobakin@intel.com>
+Subject: Re: [RFC PATCH v3 net-next] Documentation: devlink: Add devlink-sd
+Message-ID: <20240208172633.010b1c3f@kernel.org>
+In-Reply-To: <Zbyd8Fbj8_WHP4WI@nanopsycho>
+References: <20240131110649.100bfe98@kernel.org>
+	<6fd1620d-d665-40f5-b67b-7a5447a71e1b@nvidia.com>
+	<20240131124545.2616bdb6@kernel.org>
+	<2444399e-f25f-4157-b5d0-447450a95ef9@nvidia.com>
+	<777fdb4a-f8f3-4ddb-896a-21b5048c07da@intel.com>
+	<20240131143009.756cc25c@kernel.org>
+	<dc9f44a8-857b-498a-8b8c-3445e4749366@nvidia.com>
+	<20240131151726.1ddb9bc9@kernel.org>
+	<Zbtu5alCZ-Exr2WU@nanopsycho>
+	<20240201200041.241fd4c1@kernel.org>
+	<Zbyd8Fbj8_WHP4WI@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4] net: stmmac: dwmac-qcom-ethqos: Enable TBS on
- all queues but 0
-Content-Language: en-US
-To: Abhishek Chauhan <quic_abchauha@quicinc.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Jose Abreu <joabreu@synopsys.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        Andrew Halaney <ahalaney@redhat.com>
-CC: <kernel@quicinc.com>
-References: <20240208231145.2732931-1-quic_abchauha@quicinc.com>
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-In-Reply-To: <20240208231145.2732931-1-quic_abchauha@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: iGEwXLVeaYe23bKPdYAeNiPm84VMjsqR
-X-Proofpoint-ORIG-GUID: iGEwXLVeaYe23bKPdYAeNiPm84VMjsqR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-02-08_12,2024-02-08_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
- lowpriorityscore=0 spamscore=0 mlxscore=0 bulkscore=0 phishscore=0
- mlxlogscore=504 clxscore=1015 priorityscore=1501 adultscore=0
- malwarescore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2401310000 definitions=main-2402080138
 
-On 2/8/2024 3:11 PM, Abhishek Chauhan wrote:
-> TSO and TBS cannot co-exist. TBS requires special descriptor to be
-> allocated at bootup. Initialising Tx queues at probe to support
-> TSO and TBS can help in allocating those resources at bootup.
+On Fri, 2 Feb 2024 08:46:56 +0100 Jiri Pirko wrote:
+> Fri, Feb 02, 2024 at 05:00:41AM CET, kuba@kernel.org wrote:
+> >On Thu, 1 Feb 2024 11:13:57 +0100 Jiri Pirko wrote:  
+> >> Wait a sec.  
+> >
+> >No, you wait a sec ;) Why do you think this belongs to devlink?
+> >Two months ago you were complaining bitterly when people were
+> >considering using devlink rate to control per-queue shapers.
+> >And now it's fine to add queues as a concept to devlink?  
 > 
-> TX queues with TBS can support etf qdisc hw offload.
-> 
-> This is similar to the patch raised by NXP
-> commit 3b12ec8f618e ("net: stmmac: dwmac-imx: set TSO/TBS TX queues default settings")
-> 
-> Tested-by: Andrew Halaney <ahalaney@redhat.com> # sa8775p-ride
-> Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
-Reviewed-by: Jeff Johnson <quic_jjohnson@quicinc.com>
+> Do you have a better suggestion how to model common pool object for
+> multiple netdevices? This is the reason why devlink was introduced to
+> provide a platform for common/shared things for a device that contains
+> multiple netdevs/ports/whatever. But I may be missing something here,
+> for sure.
 
+devlink just seems like the lowest common denominator, but the moment
+we start talking about multi-PF devices it also gets wobbly :(
+I think it's better to focus on the object, without scoping it to some
+ancestor which may not be sufficient tomorrow (meaning its own family
+or a new object in netdev like page pool).
+
+> >> With this API, user can configure sharing of the descriptors.
+> >> So there would be a pool (or multiple pools) of descriptors and the
+> >> descriptors could be used by many queues/representors.
+> >> 
+> >> So in the example above, for 1k representors you have only 1k
+> >> descriptors.
+> >> 
+> >> The infra allows great flexibility in terms of configuring multiple
+> >> pools of different sizes and assigning queues from representors to
+> >> different pools. So you can have multiple "classes" of representors.
+> >> For example the ones you expect heavy trafic could have a separate pool,
+> >> the rest can share another pool together, etc.  
+> >
+> >Well, it does not extend naturally to the design described in that blog
+> >post. There I only care about a netdev level pool, but every queue can
+> >bind multiple pools.
+> >
+> >It also does not cater naturally to a very interesting application
+> >of such tech to lightweight container interfaces, macvlan-offload style.
+> >As I said at the beginning, why is the pool a devlink thing if the only
+> >objects that connect to it are netdevs?  
+> 
+> Okay. Let's model it differently, no problem. I find devlink device
+> as a good fit for object to contain shared things like pools.
+> But perhaps there could be something else. Something new?
+
+We need something new for more advanced memory providers, anyway.
+The huge page example I posted a year ago needs something to get
+a huge page from CMA and slice it up for the page pools to draw from.
+That's very similar, also not really bound to a netdev. I don't think
+the cross-netdev aspect is the most important aspect of this problem.
+
+> >Another netdev thing where this will be awkward is page pool
+> >integration. It lives in netdev genl, are we going to add devlink pool
+> >reference to indicate which pool a pp is feeding?  
+> 
+> Page pool is per-netdev, isn't it? It could be extended to be bound per
+> devlink-pool as you suggest. It is a bit awkward, I agree.
+> 
+> So instead of devlink, should be add the descriptor-pool object into
+> netdev genl and make possible for multiple netdevs to use it there?
+> I would still miss the namespace of the pool, as it naturally aligns
+> with devlink device. IDK :/
+
+Maybe the first thing to iron out is the life cycle. Right now we
+throw all configuration requests at the driver which ends really badly
+for those of us who deal with heterogeneous environments. Applications
+which try to do advanced stuff like pinning and XDP break because of
+all the behavior differences between drivers. So I don't think we
+should expose configuration of unstable objects (those which user
+doesn't create explicitly - queues, irqs, page pools etc) to the driver.
+The driver should get or read the config from the core when the object
+is created.
+
+This gets back to the proposed descriptor pool because there's a
+chicken and an egg problem between creating the representors and
+creating the descriptor pool, right? Either:
+ - create reprs first with individual queues, reconfigure them to bind
+   them to a pool
+ - create pool first bind the reprs which don't exist to them,
+   assuming the driver somehow maintains the mapping, pretty weird
+   to configure objects which don't exist
+ - create pool first, add an extra knob elsewhere (*cough* "shared-descs
+   enable") which produces somewhat loosely defined reasonable behavior
+
+Because this is a general problem (again, any queue config needs it)
+I think we'll need to create some sort of a rule engine in netdev :(
+Instead of configuring a page pool you'd add a configuration rule
+which can match on netdev and queue id and gives any related page pool
+some parameters. NAPI is another example of something user can't
+reasonably configure directly. And if we create such a rule engine 
+it should probably be shared...
 
