@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-70428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19D0E84EF49
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 04:12:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B55A684EF46
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 04:12:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CE67B25DA1
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 03:12:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7230E282EA3
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 03:12:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599A9125D5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3F0FC1F;
 	Fri,  9 Feb 2024 03:11:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ixgVlk4p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="owzg2Kyx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175EE5227;
-	Fri,  9 Feb 2024 03:11:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE274C89
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707448269; cv=none; b=ik7S2gKX0e5dgxPS/71biQfHQfilmfBjvutzn+YAedwieQNMBn00a34x8BoPlWNqiuPoY5xd3tjpmM2M08/gkWgop65Xw8KBhb9otv1bIYAZ/cSRfDj8q665KFjtSowshjFdADZqyGNwmg9i2MU6OdyDW2vzNj+jPCwUFcISevI=
+	t=1707448269; cv=none; b=Rx8XFlSG2WCsntr5zWpqC1u+jItXH/oOO/OrBama63PjYkSUdQ98SoOz7cfqG+Ofo+m7dmozXQ4YtppaUCLpyOFLejZnKjasYW4BcttDx3GGjfi9vBNJQeJlAb9Gbff1eXvOySR3YEAWZejaUG8BX12Va//rcAViHTeF5xO1/r4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707448269; c=relaxed/simple;
-	bh=MImnYCullCb2OJJMdGIL1zNVsFYJtY2dXlgKHUn3xOU=;
+	bh=lT0I80QY3rs6zZ7HcW4gmXsd4KHsOPj25IWYh4LuWy8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=F3ZMQ/QlslgDZ/AqIAs/cfSWsrVUtQoWwxAupiJUqg1KfmIBgyYVk9ntoIFjZmBkXByejit/nLKKb2bM/ssv4s3kicT50J8LetYETrmmBKxwlqTeMMhb2niJhlxEQ0thVn/aQlvhBqrusJGm0VIumBu3TM7azYWfUj38d8aEAwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ixgVlk4p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8C397C4167E;
+	 In-Reply-To:To:Cc; b=aayAtLxyizmn/3al2hcbnBXF7/F9hJlx7yzGpBUgRfCGWeQVq+WW4BOgc+hNBLCjALcjOEVSIAZyjlBa7l1eAR5sPKhDisaxWKEtF/R0CzAw75Z3qtUGpJL4GaCwqRR4d0gErE6pkSdxITHnCZJNhJY220Z5+9sZIz0c313nYq8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=owzg2Kyx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7DA74C4166D;
 	Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707448268;
-	bh=MImnYCullCb2OJJMdGIL1zNVsFYJtY2dXlgKHUn3xOU=;
+	bh=lT0I80QY3rs6zZ7HcW4gmXsd4KHsOPj25IWYh4LuWy8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ixgVlk4pB7dXF0Sso2D2+1H1xMARajI0aoLoEus3pECf7eoFk6a0xnE/0PXm4qKc2
-	 PcIZhioO0K2dM9vB+IjiaCcNK2E8VEluxnw3WcK17AQaF4J+45zq6gZ87B5ydaKEcT
-	 NdxsCyreM06oFYooEW0IRdChmbG+CmZ6WxNwU9RgIv7SbMAhh0099eL1PuercoK14l
-	 WN/aUOc9B/cHyntco9u9LwbLNMZxdK3TWqWDTK4bQRN2MBhEX0iGrlSiXnbq+YjsbG
-	 7ubSGyrgle8PEtXLUJiNTMuTYd0FITvANn5BifI2JP0qGjLaKa9G11cs1Mys9npdzJ
-	 A1Xhzeiqx0Irw==
+	b=owzg2KyxvWqdwii12ziuQlkMqnES/AG9O6/F5eL6j0O8lkL/cIce3tYXcScFRVFKF
+	 wECia00yXqj9JfY+r70YTi0GmXZvQ9bMwP3c8YWMsfLrbMhI5zwVXf4CJ+/j+X8RmB
+	 BQSOQ0PvBBxK6SUq1u5jy2snCCV7rCxfdIWlWH1PHFePdyop9eJkoquf7AttCU5vky
+	 glL7d63nouy7stEaPJhj8mWhD90zV35rQsZAEhVonohn2Knuotp+OP2rLArCqpk6E2
+	 849PTU6NQ/XzUPmMUobwpzSdUnTy0WZvn18hSs5kQuFaR8N64e0f3T7NP67S8lNPzj
+	 s7u7Pz/36wJdw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7A1D0E2F312;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 689F9D8C978;
 	Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,35 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v6] ptp: ocp: add Adva timecard support
+Subject: Re: [PATCH net-next] net-procfs: use xarray iterator to implement
+ /proc/net/dev
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170744826849.23533.2455688708391144333.git-patchwork-notify@kernel.org>
+ <170744826842.23533.13519089196625957262.git-patchwork-notify@kernel.org>
 Date: Fri, 09 Feb 2024 03:11:08 +0000
-References: <20240205153046.3642-1-maimon.sagi@gmail.com>
-In-Reply-To: <20240205153046.3642-1-maimon.sagi@gmail.com>
-To: Sagi Maimon <maimon.sagi@gmail.com>
-Cc: richardcochran@gmail.com, jonathan.lemon@gmail.com, vadfed@fb.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org
+References: <20240207165318.3814525-1-edumazet@google.com>
+In-Reply-To: <20240207165318.3814525-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  5 Feb 2024 17:30:46 +0200 you wrote:
-> Adding support for the Adva timecard.
-> The card uses different drivers to provide access to the
-> firmware SPI flash (Altera based).
-> Other parts of the code are the same and could be reused.
+On Wed,  7 Feb 2024 16:53:18 +0000 you wrote:
+> In commit 759ab1edb56c ("net: store netdevs in an xarray")
+> Jakub added net->dev_by_index to map ifindex to netdevices.
 > 
-> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
+> We can get rid of the old hash table (net->dev_index_head),
+> one patch at a time, if performance is acceptable.
+> 
+> This patch removes unpleasant code to something more readable.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v6] ptp: ocp: add Adva timecard support
-    https://git.kernel.org/netdev/net-next/c/ef61f5528fca
+  - [net-next] net-procfs: use xarray iterator to implement /proc/net/dev
+    https://git.kernel.org/netdev/net-next/c/0e0939c0adf9
 
 You are awesome, thank you!
 -- 
