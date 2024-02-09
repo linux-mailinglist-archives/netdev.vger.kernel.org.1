@@ -1,170 +1,100 @@
-Return-Path: <netdev+bounces-70572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A459584F999
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 17:27:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A75B984F9A7
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 17:33:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34B001F24496
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 16:27:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1F069B20D52
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 16:33:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 739F276C66;
-	Fri,  9 Feb 2024 16:27:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94A605339E;
+	Fri,  9 Feb 2024 16:33:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OgLiL6t/"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="WqaW+4sp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B9457AE50;
-	Fri,  9 Feb 2024 16:27:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1515364D6
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 16:33:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707496067; cv=none; b=ibUazD6fmwwuW8DSnzL5GUM3ncA/0r380aom4JCkH+XiM6ouejsoz7cF98FDJGegGs5oVKbHDDrdsnA3RDB/fSEfyu5hdyZBP8MfYOmzwrzr/+1+wuCuTKO9up/kzD6CVrjgrSSO+kkhFLA+p8OOaYDhqVIfjX2SHyLWNglxUKY=
+	t=1707496414; cv=none; b=f9f4tzhRqmsBSqb2kHBW39pjr+bhR2CyfQ8foJDwhw1Kdr0oXvkrymd9ZqiP3DBPTBLY8wXqdV/F/klFahwOcSYGBqQJWovV8G0S2c8BjmFoo4vhWITmkibyR1XnvbSUNOYpqyGWe91DtpebWV0H6rBVH3wIyt7tneXaqY/LYkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707496067; c=relaxed/simple;
-	bh=4DH6uSiz75VZ5wu8uWaWlKg6/VzeFejpqv+LEayXYbQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NQtTQBUFD+o2lIScuwEdoE6z37YuHtrIEiUshFpJeaMPsFmh8sz4k9X+Qy4ctvgbp+hBo+8oNXIzoDWIc3CYCGe+YgEGQ7zMA8L/peaZuDK2gvFr+VOyk/uV2MBWPRowDEtY74fBfK2r67Wne1JKJbXi7b8i2EzE7bGyAsr7MEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OgLiL6t/; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707496065; x=1739032065;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=4DH6uSiz75VZ5wu8uWaWlKg6/VzeFejpqv+LEayXYbQ=;
-  b=OgLiL6t/H2gFoHq3PfA4AWaOs2CfJdNFCl+eChhIv6H27ZynJgATZorL
-   Xa8WLR1QoAwkiTyX4SsS7A94ftRPhM6sWJx9ppRNSfB4rfSFX4aGWghHw
-   UqulWKCEuNgset/FrXIQwXErSYIWvO81ub5DtM1qehUXWVQ1GqUYFP+lD
-   HQQ4am44KGQsTenY0eZCzDXipWkPXit/go7XgSUiTzC5KJqxE0WGONTUg
-   7SrGz3XipsQFQdq0fu3ZukTyjJBHXPF6Sb0hwmxiT4FW0l5mYgfk8V9nR
-   O1l1/8OPOelg8XXQ+I5FvLItImRM+LWRiDGfCnFKVSEZbWTZvbmObj9Ub
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10979"; a="1355034"
-X-IronPort-AV: E=Sophos;i="6.05,257,1701158400"; 
-   d="scan'208";a="1355034"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2024 08:27:44 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10979"; a="825178698"
-X-IronPort-AV: E=Sophos;i="6.05,257,1701158400"; 
-   d="scan'208";a="825178698"
-Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.43.96])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2024 08:27:40 -0800
-Date: Fri, 9 Feb 2024 17:27:37 +0100
-From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
-To: "Rafael J. Wysocki" <rafael@kernel.org>
-Cc: "Rafael J. Wysocki" <rjw@rjwysocki.net>,
-	Linux PM <linux-pm@vger.kernel.org>,
-	Miri Korenblit <miriam.rachel.korenblit@intel.com>,
-	Lukasz Luba <lukasz.luba@arm.com>,
-	LKML <linux-kernel@vger.kernel.org>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
-	Zhang Rui <rui.zhang@intel.com>, netdev@vger.kernel.org,
-	Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	linux-wireless@vger.kernel.org, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Manaf Meethalavalappu Pallikunhi <quic_manafm@quicinc.com>
-Subject: Re: [PATCH v1 6/9] iwlwifi: mvm: Set THERMAL_TRIP_WRITABLE_TEMP
- directly
-Message-ID: <ZcZSeVjuYuL4mGCT@linux.intel.com>
-References: <3232442.5fSG56mABF@kreacher>
- <3757041.MHq7AAxBmi@kreacher>
- <ZcY7jyyFJq1yfOCj@linux.intel.com>
- <CAJZ5v0gZ1tpNmdkvRLA6-ydnhKPKgsM_FCwrW+q1=5ZiD=vbWA@mail.gmail.com>
+	s=arc-20240116; t=1707496414; c=relaxed/simple;
+	bh=bSjT20LSUIvhaQfymo78eewB7ruv4I7fuHPIMglPpAs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=diCHd8H6Z0XmD8+RATe42wyrb1ro0kIChQEBHHR2sgT37ucGwr/khh9UHAk56mTQEkVmqLEMIOnw7gzbzsV5Sj+jQ+ZLGV3szXWes8UZ/yNFRoS/JJkfqgiYFGW+ugHaLt3D6sUfa5unJxpjj55EQ2YhkiSWzMzcLuawWLZvdnE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=WqaW+4sp; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1d944e8f367so9398115ad.0
+        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 08:33:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1707496412; x=1708101212; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=luf6+bc/gBu6qOni8/G8YdZLsoiqZFA+MfSeAt/UVp8=;
+        b=WqaW+4sp+MnHwhna7SY4e/i3DZNcA6OmdAeAzl81n+9QAcjo7fNJxOvUewuWvAG7xi
+         ofZiF8MM5+6APyZd0pQv+OxHzNI8D1C1NFqnTz5Q0dPfXWyTn5SzHhJOv5wbFz7VkZCA
+         r6WKBC9nMINvDbK/HoapTiGei2ZS/Xn8KZeylThaHqbXjtAGCUum9e8d1FIOAc3ltADc
+         sIOwnssBE3MvnI8PqPvVPYLVyws/ijiO/ctoAcqIJtWdQuyw9oFc83g08GqKsQk9FCOS
+         NbyChNEYFke7Fb4XYtFRle2U/Ep0KgmqzkMcyyS5J1mzNWKePwIVOXuWP0nvWq+GBdhe
+         NNkw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707496412; x=1708101212;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=luf6+bc/gBu6qOni8/G8YdZLsoiqZFA+MfSeAt/UVp8=;
+        b=wjizFx/N7zFbjdjRBahH5WqEGofgDfSwnKqOtZDgobEqjLlS+uwAObQr30aHdiYLeo
+         Ge4P65C9VxFDxavSPOhA9TStqVlmJoMMAPMgoX+SnucgpNlwUqd2z7bn10NA6CavLEKK
+         3v90BUFdt4doQGSN4JXlQ0g9zWK91IT1NaGRXw5/D9yh8x1+vJeCZVaZGN/OENHl/o84
+         IwwuVazybr3xmAsR4hzhGt/mHfB3UpKzbSGRs0xKbSh4YsskoUj+AfT+CrAZqy0M3b3s
+         EdMba2bo2c0iG84fsAPYGEMa+TqE9F3hU1tczscl6SJ3UTJvZSBuJypB+zwHLMcODB8c
+         bybw==
+X-Gm-Message-State: AOJu0YzRMhz197GeWklD4apAaTb6+Izu6LGYVEtKEqTdhc+N6OI5h86T
+	8aDKfV6azSXCHfJyRJuoIcdbODUzKxypgFyY4og7BNRttLjnP/EpwD8/hYyEAY8=
+X-Google-Smtp-Source: AGHT+IHLNl11ZwDIytn3ZftnkWCWvB4fj/JKad846Nhw0fBJfput77zQN4cd6P7ASkdGcVQGpyxATA==
+X-Received: by 2002:a17:902:e74d:b0:1d9:4d3f:cbf8 with SMTP id p13-20020a170902e74d00b001d94d3fcbf8mr2174735plf.22.1707496411984;
+        Fri, 09 Feb 2024 08:33:31 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUVGRH0BPBYjq1gkZN6KnE4Fw/H1j36Gq0xEEfx2ddugb7f9gBn7DXaecV20TChPQm/pZJRRkzT11/N2CqBtiXHl/XpePazYYoKNR30ipQ3TjWrGYT0YxvsGA==
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id kt4-20020a170903088400b001d91849f274sm1703050plb.134.2024.02.09.08.33.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Feb 2024 08:33:31 -0800 (PST)
+Date: Fri, 9 Feb 2024 08:33:30 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Denis Kirjanov <kirjanov@gmail.com>
+Cc: dsahern@kernel.org, netdev@vger.kernel.org, Denis Kirjanov
+ <dkirjanov@suse.de>
+Subject: Re: [PATCH iproute2 1/2] lib: utils: introduce scnprintf
+Message-ID: <20240209083330.391a773e@hermes.local>
+In-Reply-To: <20240209093619.2553-1-dkirjanov@suse.de>
+References: <20240209093619.2553-1-dkirjanov@suse.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJZ5v0gZ1tpNmdkvRLA6-ydnhKPKgsM_FCwrW+q1=5ZiD=vbWA@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 09, 2024 at 05:15:41PM +0100, Rafael J. Wysocki wrote:
-> On Fri, Feb 9, 2024 at 3:50 PM Stanislaw Gruszka
-> <stanislaw.gruszka@linux.intel.com> wrote:
-> >
-> > On Fri, Feb 09, 2024 at 03:10:24PM +0100, Rafael J. Wysocki wrote:
-> > > From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> > >
-> > > It is now possible to flag trip points with THERMAL_TRIP_WRITABLE_TEMP
-> > > to allow their temperature to be set from user space via sysfs instead
-> > > of using a nonzero writable trips mask during thermal zone registration,
-> > > so make the iwlwifi code do that.
-> > >
-> > > No intentional functional impact.
-> > >
-> > > Note that this change is requisite for dropping the mask argument from
-> > > thermal_zone_device_register_with_trips() going forward.
-> > >
-> > > Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
-> > > ---
-> > >
-> > > This patch obviously depends on
-> > >
-> > > https://patchwork.kernel.org/project/linux-pm/patch/8346768.T7Z3S40VBb@kreacher/
-> > >
-> > > which has been queued up for 6.9 already.
-> > >
-> > > ---
-> > >  drivers/net/wireless/intel/iwlwifi/mvm/tt.c |    6 ++----
-> > >  1 file changed, 2 insertions(+), 4 deletions(-)
-> > >
-> > > Index: linux-pm/drivers/net/wireless/intel/iwlwifi/mvm/tt.c
-> > > ===================================================================
-> > > --- linux-pm.orig/drivers/net/wireless/intel/iwlwifi/mvm/tt.c
-> > > +++ linux-pm/drivers/net/wireless/intel/iwlwifi/mvm/tt.c
-> > > @@ -667,9 +667,6 @@ static  struct thermal_zone_device_ops t
-> > >       .set_trip_temp = iwl_mvm_tzone_set_trip_temp,
-> > >  };
-> > >
-> > > -/* make all trips writable */
-> > > -#define IWL_WRITABLE_TRIPS_MSK (BIT(IWL_MAX_DTS_TRIPS) - 1)
-> > > -
-> > >  static void iwl_mvm_thermal_zone_register(struct iwl_mvm *mvm)
-> > >  {
-> > >       int i, ret;
-> > > @@ -692,11 +689,12 @@ static void iwl_mvm_thermal_zone_registe
-> > >       for (i = 0 ; i < IWL_MAX_DTS_TRIPS; i++) {
-> > >               mvm->tz_device.trips[i].temperature = THERMAL_TEMP_INVALID;
-> > >               mvm->tz_device.trips[i].type = THERMAL_TRIP_PASSIVE;
-> > > +             mvm->tz_device.trips[i].type = THERMAL_TRIP_WRITABLE_TEMP;
-> >
-> >                 mvm->tz_device.trips[i].flags = THERMAL_TRIP_WRITABLE_TEMP;
-> >
-> > Consider using diffrent prefix for constants to diffrenciate flags and types.
+On Fri,  9 Feb 2024 04:36:18 -0500
+Denis Kirjanov <kirjanov@gmail.com> wrote:
+
+> The function is similar to the standard snprintf but
+> returns the number of characters actually written to @buf
+> argument excluding the trailing '\0'
 > 
-> Well, I can use THERMAL_TRIP_FLAG_RW_TEMP or similar, but is it really
-> so confusing?
+> Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
+> ---
 
-It's not, it was just suggestion, if you don't want to, don't do it.
-
-Regards
-Stanislaw
-
-> I'm wondering what others think.
-> 
-> > >       }
-> > >       mvm->tz_device.tzone = thermal_zone_device_register_with_trips(name,
-> > >                                                       mvm->tz_device.trips,
-> > >                                                       IWL_MAX_DTS_TRIPS,
-> > > -                                                     IWL_WRITABLE_TRIPS_MSK,
-> > > +                                                     0,
-> > >                                                       mvm, &tzone_ops,
-> > >                                                       NULL, 0, 0);
-> > >       if (IS_ERR(mvm->tz_device.tzone)) {
-> > >
-> > >
-> > >
-> >
-> 
+I don't understand, why not use snprintf in ifstat?
+None of the cases in patch 2 care about the return value length.
 
