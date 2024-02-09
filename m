@@ -1,199 +1,150 @@
-Return-Path: <netdev+bounces-70492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4636F84F399
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 11:39:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 477F884F3B5
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 11:47:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9EF8BB210F0
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 10:39:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D23811F2A158
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 10:47:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B9621EB23;
-	Fri,  9 Feb 2024 10:39:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC2D524B2F;
+	Fri,  9 Feb 2024 10:46:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YOJa1aQA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AHtWmmjy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC2A71DA44;
-	Fri,  9 Feb 2024 10:39:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3525286B2
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 10:46:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707475189; cv=none; b=sSpZQ3dsqmcD8KAwzZNkEj2yCNXNE5BeCkUv3SSEBXvSwEEKyllU9Ja9YscRt+gbwP7Dy0IuHskB2frZvege60kGOgMOkvMMVIGNd+Akeg9DcjIsIV8PYGmuUx6sTyUJg6t//uIGE9geYLy0xSRt4oGqDrTCzJE0Omn+FO96ZOQ=
+	t=1707475605; cv=none; b=UYKiy+g2zq9fSz37ZCWNx9V88w8/xCCH0aMf4jTkE5JYpAqx6GvtorS595A1aWW6g61T0eF6e3iwis2TSzoZnr93KCKFPTxZ+jOWl4UgURZa5OLjflz8QZxaYavlzl4Ueca8j5Hr+duMgGq7XJEihWLqGsV0glqSAlZxdeDnpDs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707475189; c=relaxed/simple;
-	bh=6JSed9WghJtQfys5PKUQxL5lBNUCn4xxXb2Iqm1mn0Y=;
+	s=arc-20240116; t=1707475605; c=relaxed/simple;
+	bh=4ScdQDkhQmFgtdXjZ+Wf2ylfDmGGNzxYdvZM2HRHZjk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=X2A6kkmgezydPEOmJ5TBzs5cjlOY3g3EZQ9Fjqqxi/KSPJePH2geI3pT4QonmpeWlmItT3Kjx6UmId9M/1d/rXfpZ942eR30JcVTN7zw5LjOXO9LjV17TIh8OxNYbe1Y4+QTEu+IdOVZlB3/fN9eiTTEgCwUQ7V9MZGWehNxXvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YOJa1aQA; arc=none smtp.client-ip=209.85.218.45
+	 To:Cc:Content-Type; b=pasBQr5pV8DKFvYUb8f1UOljTvBPVjlLtCY49p2X0RvOgKTSHfCWWUNZqprmxjhPcBz4IEJWfHUmoxQMpw1WZwHfuNYn4tmtYGSlCFujRqJqDeEzXnz9QsxPKpwfE/CNHeMeLO7gNOAwy+9DXlXmUCEf/iReEbPSF3zmJOc5b5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AHtWmmjy; arc=none smtp.client-ip=209.85.208.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a389ea940f1so89231466b.3;
-        Fri, 09 Feb 2024 02:39:47 -0800 (PST)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-55f0b2c79cdso1353630a12.3
+        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 02:46:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1707475186; x=1708079986; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1707475602; x=1708080402; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Lo4dnUNSo3H3+Ts+jrQPCY8fwThOM1DvpZ/VFX/5iBk=;
-        b=YOJa1aQAmMdJfA0wT/0UDwonGW0fHgz66AGGMbmghvi+dEZXf4xUnA1ERhb/vrmCzI
-         OXcgauZ/flmUyxoYqzO3VClN3w2lN/hiEHplkT+rJ40r3bOrS7qfw9h8SMT0wNmwzvIJ
-         aL+W0oHjcjcx6jrhmBRuCL0V3E+lfYmrlDCBTwOiKGcjovLIvd7F/0G9CQ3+n3Ppn3f9
-         97v1AplY+nCgKcXZa5aJukudwN4f6pOw+2J9TBldX+6z35Dsu/gamtCvSCBa7W6XvIRi
-         DXKu5zny8Ez8+I/2UVfUHqNQKPm3d05ndxJr7mbYXksDL5LgBZF4+Tsb96Nf+0hWJ0sA
-         jbug==
+        bh=M19XqpmmmEIhaJkkCewuMc7S2cm+jMIk0BczRPFBNq0=;
+        b=AHtWmmjyTN95/Q9okI8ZgQsbcNOhlMSkw+4pflVQ2BQBd/xTpFcqJN9My8rkfpX8hk
+         /zANsxYywu5MeBIM5zt89T6H+B6ojsYu7JSJ9vivWAn8mW5MmRpfaHJu4/nvBziX9AYF
+         LMipWJN4HaZduivgn+6uKpKpbbDNtm+N/evDpF+CzgBgLXkKEFezfgAYikOEPRDoV4/3
+         F7kRiAnBvagQ2atP/mDAs2EV4jTK+dQerzzDWvgm7XMCg+Pou/oeWWTfryaiCQ3bAYlv
+         xKhbWvf+xX+eEgVM+E5xlVQznQJO/VnZ6OTxLjRwKRSGjbYdpEfgzBLX9+7gprRAn1K2
+         gtfg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707475186; x=1708079986;
+        d=1e100.net; s=20230601; t=1707475602; x=1708080402;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Lo4dnUNSo3H3+Ts+jrQPCY8fwThOM1DvpZ/VFX/5iBk=;
-        b=XbVEHI+DTOlCSRJczSituEo2R350+lqmISqCdlQIb1xJij8CYcm/zFDFsFzDKkfco+
-         CkMsiRELeJg9gJ7qQ2otYoPlgPVINtl1SupyklupXs7hnSC58wsy0mnb0DFPrmEx8w4a
-         9w0vnN+M3T7trXijYciYxmhOZaUoc6ELBwAMQsBNOWw/a8bZP3ERN7o7gnWN1/NUEG9g
-         jbetFQMiTcpjNXtpPzj50nxSwg4Sbp/8krnC7R1PjEzPKuG5B7p5pPmmi69N5e5n8nT1
-         8yOpUXY1wsb8HCZvBf73hwTuY8GlZT9NNivv3qFXTnB5zjvXzlJ0lEpOmceH3UXjhb10
-         fV9w==
-X-Forwarded-Encrypted: i=1; AJvYcCUhoTyZ5sjuJJf6WDEkIWW4ufL/gw+NHsWVBUvBKSIlGrpeYvGbHWAQjMdhnWXMfySlCfWlqKaAI6s1Ul57tRJs0oyNas3zokoGZmbF4aFaUVwMaF/h3Z/lbTHQd+eT/FlnF6bFszq2s9o+wJW7dUNxEp2QhDSVeW/3
-X-Gm-Message-State: AOJu0YxCkCBz5FBwZfpa5NCseNtFHYK4fm+5LokCWVstpwMtvA3BU7zz
-	v0zDeRkGsMRLRWU2pcVIrCK8ByS1W1QezFXFr86CiuKJh0z9oUmvWT6Mh76LWuFvObGIwpr5Af+
-	RGdjWLbBetAwzamTTCjptLkL/vcY=
-X-Google-Smtp-Source: AGHT+IFUK5AxhGByklr28zTpKRrQt9q1kxLKqg64jZ/i/mBwJE44NAngtOYMahNnaMPpzwR1AIyeJ8ulHoCfGKfp1bs=
-X-Received: by 2002:a17:906:3b0b:b0:a3b:e8b7:9ff0 with SMTP id
- g11-20020a1709063b0b00b00a3be8b79ff0mr960923ejf.67.1707475185671; Fri, 09 Feb
- 2024 02:39:45 -0800 (PST)
+        bh=M19XqpmmmEIhaJkkCewuMc7S2cm+jMIk0BczRPFBNq0=;
+        b=AEebenfqLzoWYwWCKuH0xPZTKPkPV4zEgsz/Pit3yAUevtvfqtd8c0qIoRajIOfvMV
+         8qrxM8c0hg7s3VTNXqNAvtQ3NvFC4x9WNJQsKX1N9iMCsw51RPHLT1Wu2T1R9CBra5bL
+         /qiEA2XHL4X+FmSnKMCqi9EFX5qIlWzDU9xt9S7MZUkrg6AC4TPGJ9pXgrCfcR1veyCu
+         KXIoCQYRuhLKP2gL/1tEq91kJVcP/tTtTQP5ThhKH1Zr70MP/LPvoNB/uA5tQLhTuoJD
+         1FTmSaHMu4uRcwpjSMCHho7DCtBoBwf0evOLE+96aSnPB4SsfHg/WcRQB05Bq0vYX97N
+         icsQ==
+X-Gm-Message-State: AOJu0Ywj4+aoiD+wwYZCvU/w/u2+vTZ5m2iwunDRRenDpw5HjDdrS7Lf
+	OBb+s8+z/QHkU3oEKtsjWWnqj2fvKGJgnqVijSu++alco+ektpTu1sSD7PsIXs7G2uD8GPF0ImI
+	unjpHb1/dxmiOsnj6wNtsL4NNleY=
+X-Google-Smtp-Source: AGHT+IGril9qrawkxky+j5uIPpM0kj3BDfiEPZCglOyo5tL5AWs7/z8Ge8dGM5+uHQCWA7braaMERZbtcCxCToTqAM0=
+X-Received: by 2002:aa7:d495:0:b0:560:e51e:bea0 with SMTP id
+ b21-20020aa7d495000000b00560e51ebea0mr789603edr.40.1707475602038; Fri, 09 Feb
+ 2024 02:46:42 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240202121151.65710-1-liangchen.linux@gmail.com>
- <c8d59e75-d0bb-4a03-9ef4-d6de65fa9356@kernel.org> <CAKhg4tJFpG5nUNdeEbXFLonKkFUP0QCh8A9CpwU5OvtnBuz4Sw@mail.gmail.com>
- <5297dad6499f6d00f7229e8cf2c08e0eacb67e0c.camel@redhat.com>
- <CAKhg4tLbF8SfYD4dU9U9Nhii4FY2dftjPKYz-Emrn-CRwo10mg@mail.gmail.com> <73c242b43513bde04eebb4eb581deb189443c26b.camel@redhat.com>
-In-Reply-To: <73c242b43513bde04eebb4eb581deb189443c26b.camel@redhat.com>
-From: Liang Chen <liangchen.linux@gmail.com>
-Date: Fri, 9 Feb 2024 18:39:33 +0800
-Message-ID: <CAKhg4tJPjcShkw4-FHFkKOcgzHK27A5pMu9FP7OWj4qJUX1ApA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5] virtio_net: Support RX hash XDP hint
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>, mst@redhat.com, jasowang@redhat.com, 
-	xuanzhuo@linux.alibaba.com, hengqi@linux.alibaba.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org, 
-	bpf@vger.kernel.org, john.fastabend@gmail.com, daniel@iogearbox.net, 
-	ast@kernel.org
+References: <20240209061213.72152-3-kerneljasonxing@gmail.com> <20240209091454.32323-1-kuniyu@amazon.com>
+In-Reply-To: <20240209091454.32323-1-kuniyu@amazon.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 9 Feb 2024 18:46:05 +0800
+Message-ID: <CAL+tcoDoUXfVHSkVjMfsb=vGJ30Fa=ucakWHOVhhPNVRpV6m2w@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 2/2] tcp: add more DROP REASONs in receive process
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kernelxing@tencent.com, kuba@kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 7, 2024 at 10:27=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
+On Fri, Feb 9, 2024 at 5:15=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.com=
+> wrote:
 >
-> On Wed, 2024-02-07 at 10:54 +0800, Liang Chen wrote:
-> > On Tue, Feb 6, 2024 at 6:44=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> =
-wrote:
-> > >
-> > > On Sat, 2024-02-03 at 10:56 +0800, Liang Chen wrote:
-> > > > On Sat, Feb 3, 2024 at 12:20=E2=80=AFAM Jesper Dangaard Brouer <haw=
-k@kernel.org> wrote:
-> > > > > On 02/02/2024 13.11, Liang Chen wrote:
-> > > [...]
-> > > > > > @@ -1033,6 +1039,16 @@ static void put_xdp_frags(struct xdp_buf=
-f *xdp)
-> > > > > >       }
-> > > > > >   }
-> > > > > >
-> > > > > > +static void virtnet_xdp_save_rx_hash(struct virtnet_xdp_buff *=
-virtnet_xdp,
-> > > > > > +                                  struct net_device *dev,
-> > > > > > +                                  struct virtio_net_hdr_v1_has=
-h *hdr_hash)
-> > > > > > +{
-> > > > > > +     if (dev->features & NETIF_F_RXHASH) {
-> > > > > > +             virtnet_xdp->hash_value =3D hdr_hash->hash_value;
-> > > > > > +             virtnet_xdp->hash_report =3D hdr_hash->hash_repor=
-t;
-> > > > > > +     }
-> > > > > > +}
-> > > > > > +
-> > > > >
-> > > > > Would it be possible to store a pointer to hdr_hash in virtnet_xd=
-p_buff,
-> > > > > with the purpose of delaying extracting this, until and only if X=
-DP
-> > > > > bpf_prog calls the kfunc?
-> > > > >
-> > > >
-> > > > That seems to be the way v1 works,
-> > > > https://lore.kernel.org/all/20240122102256.261374-1-liangchen.linux=
-@gmail.com/
-> > > > . But it was pointed out that the inline header may be overwritten =
-by
-> > > > the xdp prog, so the hash is copied out to maintain its integrity.
-> > >
-> > > Why? isn't XDP supposed to get write access only to the pkt
-> > > contents/buffer?
-> > >
+> From: Jason Xing <kerneljasonxing@gmail.com>
+> Date: Fri,  9 Feb 2024 14:12:13 +0800
+> > From: Jason Xing <kernelxing@tencent.com>
 > >
-> > Normally, an XDP program accesses only the packet data. However,
-> > there's also an XDP RX Metadata area, referenced by the data_meta
-> > pointer. This pointer can be adjusted with bpf_xdp_adjust_meta to
-> > point somewhere ahead of the data buffer, thereby granting the XDP
-> > program access to the virtio header located immediately before the
+> > As the title said, add more reasons to narrow down the range about
+> > why the skb should be dropped.
+> >
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > ---
+> >  include/net/dropreason-core.h | 11 ++++++++++-
+> >  include/net/tcp.h             |  4 ++--
+> >  net/ipv4/tcp_input.c          | 26 +++++++++++++++++---------
+> >  net/ipv4/tcp_ipv4.c           | 19 ++++++++++++-------
+> >  net/ipv4/tcp_minisocks.c      | 10 +++++-----
+> >  net/ipv6/tcp_ipv6.c           | 19 ++++++++++++-------
+> >  6 files changed, 58 insertions(+), 31 deletions(-)
+> >
+> > diff --git a/include/net/dropreason-core.h b/include/net/dropreason-cor=
+e.h
+> > index efbc5dfd9e84..9a7643be9d07 100644
+> > --- a/include/net/dropreason-core.h
+> > +++ b/include/net/dropreason-core.h
+> > @@ -31,6 +31,8 @@
+> >       FN(TCP_AOFAILURE)               \
+> >       FN(SOCKET_BACKLOG)              \
+> >       FN(TCP_FLAGS)                   \
+> > +     FN(TCP_CONNREQNOTACCEPTABLE)    \
+> > +     FN(TCP_ABORTONDATA)             \
+> >       FN(TCP_ZEROWINDOW)              \
+> >       FN(TCP_OLD_DATA)                \
+> >       FN(TCP_OVERWINDOW)              \
+> [...]
+> > @@ -6654,7 +6657,7 @@ int tcp_rcv_state_process(struct sock *sk, struct=
+ sk_buff *skb)
+> >                       rcu_read_unlock();
+> >
+> >                       if (!acceptable)
+> > -                             return 1;
+> > +                             return SKB_DROP_REASON_TCP_CONNREQNOTACCE=
+PTABLE;
 >
-> AFAICS bpf_xdp_adjust_meta() does not allow moving the meta_data before
-> xdp->data_hard_start:
->
-> https://elixir.bootlin.com/linux/latest/source/net/core/filter.c#L4210
->
-> and virtio net set such field after the virtio_net_hdr:
->
-> https://elixir.bootlin.com/linux/latest/source/drivers/net/virtio_net.c#L=
-1218
-> https://elixir.bootlin.com/linux/latest/source/drivers/net/virtio_net.c#L=
-1420
->
-> I don't see how the virtio hdr could be touched? Possibly even more
-> important: if such thing is possible, I think is should be somewhat
-> denied (for the same reason an H/W nic should prevent XDP from
-> modifying its own buffer descriptor).
+> This sounds a bit ambiguous, and I think it can be more specific
+> if tcp_conn_request() returns the drop reason and we change the
+> acceptable evaluation.
 
-Thank you for highlighting this concern. The header layout differs
-slightly between small and mergeable mode. Taking 'mergeable mode' as
-an example, after calling xdp_prepare_buff the layout of xdp_buff
-would be as depicted in the diagram below,
+Sure, are you suggesting adding more reasons into .conn_request
+callback functions, like tcp_v4_conn_request(), right?
 
-                      buf
-                       |
-                       v
-        +--------------+--------------+-------------+
-        | xdp headroom | virtio header| packet      |
-        | (256 bytes)  | (20 bytes)   | content     |
-        +--------------+--------------+-------------+
-        ^                             ^
-        |                             |
- data_hard_start                    data
-                                  data_meta
-
-If 'bpf_xdp_adjust_meta' repositions the 'data_meta' pointer a little
-towards 'data_hard_start', it would point to the inline header, thus
-potentially allowing the XDP program to access the inline header.
-
-We will take a closer look on how to prevent the inline header from
-being altered, possibly by borrowing some ideas from other
-xdp_metadata_ops implementation.
-
+If you don't mind, I can do it next time because it involves more
+effort which could be put into a seperate patch or patchset.
 
 Thanks,
-Liang
+Jason
 
 >
-> Cheers,
+>   acceptable =3D icsk->icsk_af_ops->conn_request(sk, skb) >=3D 0;
 >
-> Paolo
 >
+> >                       consume_skb(skb);
+> >                       return 0;
+> >               }
 
