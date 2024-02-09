@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-70652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5430184FE0C
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 22:00:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C32D84FE0E
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 22:00:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84B531C2265C
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:00:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 485651C22588
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 21:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7829414F6C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8022F16410;
 	Fri,  9 Feb 2024 21:00:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K8KBC5c1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LLDuZ9Xs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 547CD12E4B
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 21:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5476612B79;
+	Fri,  9 Feb 2024 21:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707512431; cv=none; b=tAkdRtu1iT+42g/Ap0RCNGUNvZQunOmXhYMo5czoSv890+YKWRDxUf8134FmH8lQL204Jo4Ej/ckqYJXx9aAlciLyEKvqri5yeMwxR4xwB8CzYm2DZfWO9DxGPgzQkOS8J/HmtOB1W87uLvmImwD1peZsyS8GwWIQLIDPa9JkB0=
+	t=1707512431; cv=none; b=X+BRQYbkcNtpJTTBjUvQ5OvhjoX4UzqV2FKhouY0OryNAPOR4aByOwTMEvSS5lt0/Wc6C5eNhULHZSK2PqUdZmsiHKsutFVwFEh7pCsdmz1Mfdl5+lL/uEKcZivFUKoxl5CIPmvgbaFnxNEzEqmPmAdJL8TQBEW05Xk6DTjEHhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1707512431; c=relaxed/simple;
-	bh=ENTW3CPdgzrV63Alzh3y5gLDvRK4aJEdIegUtq8UDkA=;
+	bh=SI2LJmBeBomZH+OUYEwj+ZAkonco7EuXhYvfIKHbf90=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QWkiX6wckKSnZCTNLoMWBsWMvl/4evSPGjJN01VDkVyyTCeb/Krg3JJfzIbH4RCyl8a8OR2kFQK1IlixleBTS8JsgXEt02PwxNuXIHO0WPjs9kvEFDaYeXpLAc2yuKRs+SVIuHei7aLUcTRHkgU27mZX52a8Z2T1qogm4ABfFuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K8KBC5c1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C8731C43609;
+	 In-Reply-To:To:Cc; b=k46DdGdFXlk/SNIQkj5rPS7AazbH0UKtonkN1+g5Ys3NoHq5/7ZNMZTprqZqF33C8CgNa4Y5psA3FVDFdDB/XsAnlD/wYNewTY5oqMYwL3CVi0ZbCDzlNX5F12n7mp0JgO67CtOdKIItn/ihh5mB++cCHamaLfzR498FLs9GJPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LLDuZ9Xs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BF107C43601;
 	Fri,  9 Feb 2024 21:00:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707512430;
-	bh=ENTW3CPdgzrV63Alzh3y5gLDvRK4aJEdIegUtq8UDkA=;
+	bh=SI2LJmBeBomZH+OUYEwj+ZAkonco7EuXhYvfIKHbf90=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=K8KBC5c1iBE7UgJMthyU24xzNmoHlYOy9Vr7Hlj8O1UOyy0TjyT3tVxFlGI9cuJci
-	 SEcG+ftPZIcKmVMfyLiiUr1QN9QQgaogucvrtKGEhRb/Ysy1ercy4bgYDjCejdzWLT
-	 +8Wr978R/Ql2OUyJq++xSF+SX5nMtpqoE5Hf81CCDTi2K8hDwkK/A6r3SRNAGjxNYR
-	 KkAprItuUQjkjnY+bn6Cl9l+L4m8AiAAG6Rjf6fAMTBEHSLN1Aus8xBij77my7TdzW
-	 ieoubM6A/3ryxyjymv0tDOgRjFZdOfaxZ5Iz0CeG3fyeg+d8ygf2NjeSbaTSMKKHDe
-	 pJoNOBLV7sBHQ==
+	b=LLDuZ9XsJqlr8oKREYKhgWOfaKLxGNq6rpEVZjyeTw1xiZi2Z2W+3SLJQ5NbEEudb
+	 Gl3Q370iTZvgmE+FbhPOBcFtESL3llqg/4RodOZWYg4xuVAeIYf67oh5YsgXBVN93U
+	 hImhFWzD0/8Kr1VgofBKV63Sk+GA1iOkkbZUYNWlQVoHe8f+S1R+wsArLBXfg+8HmR
+	 bzft5ya+KtJUGn6I/wx4NbkCcmxiACnd83U7PIrghWWe51n90VFvtj2H8vfr8yF/3d
+	 zYWQ6Yc1clcDXpf8Rb+hzY7y7PlcTLZeoN9j8qauTlb6Do+CRdrxovcI/9AChZ7QaL
+	 Z72bJKUpwuz0g==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B5A67E2F312;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AE03EC395F1;
 	Fri,  9 Feb 2024 21:00:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,35 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] r8169: improve checking for valid LED modes
+Subject: Re: [PATCH net-next] selftests: net: include forwarding lib
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170751243074.9207.12684045279811090986.git-patchwork-notify@kernel.org>
+ <170751243070.9207.408296797179580703.git-patchwork-notify@kernel.org>
 Date: Fri, 09 Feb 2024 21:00:30 +0000
-References: <8876a9f4-7a2d-48c3-8eae-0d834f5c27c5@gmail.com>
-In-Reply-To: <8876a9f4-7a2d-48c3-8eae-0d834f5c27c5@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: nic_swsd@realtek.com, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, davem@davemloft.net, netdev@vger.kernel.org
+References: <f7b1e9d468224cbc136d304362315499fe39848f.1707298927.git.pabeni@redhat.com>
+In-Reply-To: <f7b1e9d468224cbc136d304362315499fe39848f.1707298927.git.pabeni@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, shuah@kernel.org, linux-kselftest@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 7 Feb 2024 08:16:40 +0100 you wrote:
-> After 3a2746320403 ("leds: trigger: netdev: Display only supported link
-> speed attribute") the check for valid link modes can be simplified.
-> In addition factor it out, so that it can be re-used by the upcoming
-> LED support for RTL8125.
+On Wed,  7 Feb 2024 10:42:45 +0100 you wrote:
+> The altnames test uses the forwarding/lib.sh and that dependency
+> currently causes failures when running the test after install:
 > 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+>   make -C tools/testing/selftests/ TARGETS=net install
+>   ./tools/testing/selftests/kselftest_install/run_kselftest.sh \
+>       -t net:altnames.sh
+>   # ...
+>   # ./altnames.sh: line 8: ./forwarding/lib.sh: No such file or directory
+>   # RTNETLINK answers: Operation not permitted
+>   # ./altnames.sh: line 73: tests_run: command not found
+>   # ./altnames.sh: line 65: pre_cleanup: command not found
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] r8169: improve checking for valid LED modes
-    https://git.kernel.org/netdev/net-next/c/4c49b6824a60
+  - [net-next] selftests: net: include forwarding lib
+    https://git.kernel.org/netdev/net-next/c/876e32473d1d
 
 You are awesome, thank you!
 -- 
