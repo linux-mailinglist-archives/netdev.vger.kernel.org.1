@@ -1,219 +1,130 @@
-Return-Path: <netdev+bounces-70463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EDB484F1FD
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 10:11:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3233D84F217
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 10:15:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EA63286DA7
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 09:11:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED108288EF7
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 09:15:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC815664C0;
-	Fri,  9 Feb 2024 09:11:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18E78664C5;
+	Fri,  9 Feb 2024 09:15:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="mWh7XVdf"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="fMNYIIv1"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C27D865BDE
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 09:11:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9315E664C9
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 09:15:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707469903; cv=none; b=bY4jVa6ZKySp1E0ZQBnG/oYBtIYH8l3escahqD3oPvRuKdm0jZoYCAyIZ9088Q1/FcR6hpvLGGzF9U6pD4+XfU++jvH2bU67+cNVAPpjTMRsiOaOhHFLjNFTbCPQrzYwmU76O88iimAohbRL09vP9PKWDFN7lfC2I15RSFdhrvY=
+	t=1707470113; cv=none; b=bgDmHDPZuqT+Z0wkuCXH5Q5tmezrBeGC96dVgnRu0lnehsUeZsc1yFFBbvl4tp7Sm+b3bsznrGWC0OsmuhT4iDpphWe3r7kkahTMf5F9wkXV5c2yVn94qDq/RRv3yciaUjJFVb9IHCNpkHEi1EKmZCK6BvSE64XTKEAdbIf3ulE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707469903; c=relaxed/simple;
-	bh=AA3p4zJPboFgc+xN0CpVJoaA5JvD/uRaeqnIYTv3cEw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=fLzC9TWFmPs/F5mTfPiy2gMhnBcGMWb5vnAOzgDFsCAxIFHEcEseVZzzb72wSMZrCxOFaxqWHWlAJyGy3Ya00v8ZLybvu7ybbESE0FGKDcLVmMxb6pnq7q63JEhN7gl78DeMK0l/D18lO+C6Hfuy8B8ZOTw7LFgFZU+Xv236MbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=mWh7XVdf; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 7D8AFA0EB0;
-	Fri,  9 Feb 2024 10:11:31 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:from:from:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=mail; bh=5U65dZd4MpITNFzt6UeYg42kS8hKyr3vO9pGLMgIPco=; b=
-	mWh7XVdfMjF+71Ghk+J80iJWrh21sCTkgJ4soTkEeNc4JS8iiy3xtKDuyFwcbevT
-	H0ddfFQ/EhA0lSN09GbKSgEROzUfU/qk1B6RZS1IOTX2WiDtQiJTTg4SrYsY86ea
-	OVU8d/YPn7KchT3fVxVFskD4ltOCoJodwvZkxKkuDlczgnbOMsHCVKPlo3++UKfa
-	gHAdpD7dpGHPvZb3Yscx2BZ/jZ6gO1Al4ywg9JK9yQ9PNJP+iLsSthSpwcdDH/1d
-	h6TcnEU1D/Vi/7wWkRejRKpBnjJ4IiZd4Xgb4WND6Jlpo/m0upMRtyJ730eMZlMx
-	sXFSwntulwQFu9WLE2QIgAATm9QwKt0PmhzcA2JjVoabAOx5GJErUEknHYXyJukO
-	F2BrrENCyjDqStCzbQOIUzurdszr6wmGPqpafRkO5TfmqlvC3l9gKnavO5ghHK1j
-	1yVuiHIyRvD6+x6IiTG0CQoxvJXbLAnVNHQxr9QULO2d3qWjQe3TGxSO+qMGfmqc
-	GQFcPq7uC+9hwhHFr52VMdi9SrUtdlxuij7J/0JUplhrZMAJz4XlHXdmWxpCtlzc
-	OLW/VVdGCucPVOnhYxIxhGbSUWH5MqTslS1VzDU2FZzFIPON2/lIr+X4PCdXYkuq
-	c3EbSikahRM/wn+XO7HClKWrt+Vglw5wUB1rK4pwYxc=
-From: =?UTF-8?q?Cs=C3=B3k=C3=A1s=20Bence?= <csokas.bence@prolan.hu>
-To: <netdev@vger.kernel.org>
-CC: Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Francesco Dolcini
-	<francesco.dolcini@toradex.com>, Andrew Lunn <andrew@lunn.ch>, "Marc
- Kleine-Budde" <mkl@pengutronix.de>, =?UTF-8?q?Cs=C3=B3k=C3=A1s=20Bence?=
-	<csokas.bence@prolan.hu>
-Subject: [PATCH v2] net: fec: Refactor: #define magic constants
-Date: Fri, 9 Feb 2024 10:11:01 +0100
-Message-ID: <20240209091100.5341-1-csokas.bence@prolan.hu>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1707470113; c=relaxed/simple;
+	bh=QmJdIY6CrasyOGjGr1qXOw2HghGmUgcTKzC3xVgq4s4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NmYZ2G+5l02K96QnOoWRPjciL6gbW39prLaEjnaPm1lvavKIrMOaAGJkIWxv9snSpF9LVS4wzrI+w6lQMT8DRXJr0C5L7djPaJpfHfI3jZLDp/IOuzjgnRdF3qeVqwg9cbtpmD1CBTWg7ENNH5802curol+4gLdpf8gKmr5N0Vo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=fMNYIIv1; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1707470111; x=1739006111;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=rMPuv/CqcO67JbqI2KVvdTSBCPVXrSHPH+lfqBmF/bQ=;
+  b=fMNYIIv10drJiA5g9PWbtK9sg9Lsc15p4j/mMcIRPYYwawJcrmRLend9
+   0ALFXeGDcPAftxRALo6JYdgxy1RQFDvPwA59kA0NNPky9Fysn9CGXtTQG
+   ziiC2umdVJ9ddT/h2c9tQtQ6hmVTIODoeqUmpH+Ad79YH4EPAJyb70H82
+   g=;
+X-IronPort-AV: E=Sophos;i="6.05,256,1701129600"; 
+   d="scan'208";a="633192675"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2024 09:15:08 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:37062]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.20.35:2525] with esmtp (Farcaster)
+ id 6af78892-2f50-4bf6-b776-538463434db2; Fri, 9 Feb 2024 09:15:07 +0000 (UTC)
+X-Farcaster-Flow-ID: 6af78892-2f50-4bf6-b776-538463434db2
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 9 Feb 2024 09:15:06 +0000
+Received: from 88665a182662.ant.amazon.com (10.106.101.39) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.40;
+ Fri, 9 Feb 2024 09:15:03 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kerneljasonxing@gmail.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kernelxing@tencent.com>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <kuniyu@amazon.com>
+Subject: Re: [PATCH v2 net-next 2/2] tcp: add more DROP REASONs in receive process
+Date: Fri, 9 Feb 2024 01:14:54 -0800
+Message-ID: <20240209091454.32323-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240209061213.72152-3-kerneljasonxing@gmail.com>
+References: <20240209061213.72152-3-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1707469890;VERSION=7967;MC=2819195385;ID=625947;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
-X-ESET-Antispam: OK
-X-EsetResult: clean, is OK
-X-EsetId: 37303A29916D3B55617362
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D037UWC004.ant.amazon.com (10.13.139.254) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Add defines for bits of ECR, RCR control registers, TX watermark etc.
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri,  9 Feb 2024 14:12:13 +0800
+> From: Jason Xing <kernelxing@tencent.com>
+> 
+> As the title said, add more reasons to narrow down the range about
+> why the skb should be dropped.
+> 
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> ---
+>  include/net/dropreason-core.h | 11 ++++++++++-
+>  include/net/tcp.h             |  4 ++--
+>  net/ipv4/tcp_input.c          | 26 +++++++++++++++++---------
+>  net/ipv4/tcp_ipv4.c           | 19 ++++++++++++-------
+>  net/ipv4/tcp_minisocks.c      | 10 +++++-----
+>  net/ipv6/tcp_ipv6.c           | 19 ++++++++++++-------
+>  6 files changed, 58 insertions(+), 31 deletions(-)
+> 
+> diff --git a/include/net/dropreason-core.h b/include/net/dropreason-core.h
+> index efbc5dfd9e84..9a7643be9d07 100644
+> --- a/include/net/dropreason-core.h
+> +++ b/include/net/dropreason-core.h
+> @@ -31,6 +31,8 @@
+>  	FN(TCP_AOFAILURE)		\
+>  	FN(SOCKET_BACKLOG)		\
+>  	FN(TCP_FLAGS)			\
+> +	FN(TCP_CONNREQNOTACCEPTABLE)	\
+> +	FN(TCP_ABORTONDATA)		\
+>  	FN(TCP_ZEROWINDOW)		\
+>  	FN(TCP_OLD_DATA)		\
+>  	FN(TCP_OVERWINDOW)		\
+[...]
+> @@ -6654,7 +6657,7 @@ int tcp_rcv_state_process(struct sock *sk, struct sk_buff *skb)
+>  			rcu_read_unlock();
+>  
+>  			if (!acceptable)
+> -				return 1;
+> +				return SKB_DROP_REASON_TCP_CONNREQNOTACCEPTABLE;
 
-Signed-off-by: Csókás Bence <csokas.bence@prolan.hu>
----
- drivers/net/ethernet/freescale/fec_main.c | 50 +++++++++++++++--------
- 1 file changed, 33 insertions(+), 17 deletions(-)
+This sounds a bit ambiguous, and I think it can be more specific
+if tcp_conn_request() returns the drop reason and we change the
+acceptable evaluation.
 
-diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
-index 63707e065141..a16220eff9b3 100644
---- a/drivers/net/ethernet/freescale/fec_main.c
-+++ b/drivers/net/ethernet/freescale/fec_main.c
-@@ -85,8 +85,6 @@ static int fec_enet_xdp_tx_xmit(struct fec_enet_private *fep,
- 
- static const u16 fec_enet_vlan_pri_to_queue[8] = {0, 0, 1, 1, 1, 2, 2, 2};
- 
--/* Pause frame feild and FIFO threshold */
--#define FEC_ENET_FCE	(1 << 5)
- #define FEC_ENET_RSEM_V	0x84
- #define FEC_ENET_RSFL_V	16
- #define FEC_ENET_RAEM_V	0x8
-@@ -240,8 +238,8 @@ MODULE_PARM_DESC(macaddr, "FEC Ethernet MAC address");
- #define PKT_MINBUF_SIZE		64
- 
- /* FEC receive acceleration */
--#define FEC_RACC_IPDIS		(1 << 1)
--#define FEC_RACC_PRODIS		(1 << 2)
-+#define FEC_RACC_IPDIS		BIT(1)
-+#define FEC_RACC_PRODIS		BIT(2)
- #define FEC_RACC_SHIFT16	BIT(7)
- #define FEC_RACC_OPTIONS	(FEC_RACC_IPDIS | FEC_RACC_PRODIS)
- 
-@@ -273,8 +271,23 @@ MODULE_PARM_DESC(macaddr, "FEC Ethernet MAC address");
- #define FEC_MMFR_TA		(2 << 16)
- #define FEC_MMFR_DATA(v)	(v & 0xffff)
- /* FEC ECR bits definition */
--#define FEC_ECR_MAGICEN		(1 << 2)
--#define FEC_ECR_SLEEP		(1 << 3)
-+#define FEC_ECR_RESET           BIT(0)
-+#define FEC_ECR_ETHEREN         BIT(1)
-+#define FEC_ECR_MAGICEN         BIT(2)
-+#define FEC_ECR_SLEEP           BIT(3)
-+#define FEC_ECR_EN1588          BIT(4)
-+#define FEC_ECR_BYTESWP         BIT(8)
-+/* FEC RCR bits definition */
-+#define FEC_RCR_LOOP            BIT(0)
-+#define FEC_RCR_HALFDPX         BIT(1)
-+#define FEC_RCR_MII             BIT(2)
-+#define FEC_RCR_PROMISC         BIT(3)
-+#define FEC_RCR_BC_REJ          BIT(4)
-+#define FEC_RCR_FLOWCTL         BIT(5)
-+#define FEC_RCR_RMII            BIT(8)
-+#define FEC_RCR_10BASET         BIT(9)
-+/* TX WMARK bits */
-+#define FEC_TXWMRK_STRFWD       BIT(8)
- 
- #define FEC_MII_TIMEOUT		30000 /* us */
- 
-@@ -1137,18 +1150,18 @@ fec_restart(struct net_device *ndev)
- 		    fep->phy_interface == PHY_INTERFACE_MODE_RGMII_TXID)
- 			rcntl |= (1 << 6);
- 		else if (fep->phy_interface == PHY_INTERFACE_MODE_RMII)
--			rcntl |= (1 << 8);
-+			rcntl |= FEC_RCR_RMII;
- 		else
--			rcntl &= ~(1 << 8);
-+			rcntl &= ~FEC_RCR_RMII;
- 
- 		/* 1G, 100M or 10M */
- 		if (ndev->phydev) {
- 			if (ndev->phydev->speed == SPEED_1000)
- 				ecntl |= (1 << 5);
- 			else if (ndev->phydev->speed == SPEED_100)
--				rcntl &= ~(1 << 9);
-+				rcntl &= ~FEC_RCR_10BASET;
- 			else
--				rcntl |= (1 << 9);
-+				rcntl |= FEC_RCR_10BASET;
- 		}
- 	} else {
- #ifdef FEC_MIIGSK_ENR
-@@ -1181,7 +1194,7 @@ fec_restart(struct net_device *ndev)
- 	if ((fep->pause_flag & FEC_PAUSE_FLAG_ENABLE) ||
- 	    ((fep->pause_flag & FEC_PAUSE_FLAG_AUTONEG) &&
- 	     ndev->phydev && ndev->phydev->pause)) {
--		rcntl |= FEC_ENET_FCE;
-+		rcntl |= FEC_RCR_FLOWCTL;
- 
- 		/* set FIFO threshold parameter to reduce overrun */
- 		writel(FEC_ENET_RSEM_V, fep->hwp + FEC_R_FIFO_RSEM);
-@@ -1192,7 +1205,7 @@ fec_restart(struct net_device *ndev)
- 		/* OPD */
- 		writel(FEC_ENET_OPD_V, fep->hwp + FEC_OPD);
- 	} else {
--		rcntl &= ~FEC_ENET_FCE;
-+		rcntl &= ~FEC_RCR_FLOWCTL;
- 	}
- #endif /* !defined(CONFIG_M5272) */
- 
-@@ -1207,13 +1220,13 @@ fec_restart(struct net_device *ndev)
- 
- 	if (fep->quirks & FEC_QUIRK_ENET_MAC) {
- 		/* enable ENET endian swap */
--		ecntl |= (1 << 8);
-+		ecntl |= FEC_ECR_BYTESWP;
- 		/* enable ENET store and forward mode */
--		writel(1 << 8, fep->hwp + FEC_X_WMRK);
-+		writel(FEC_TXWMRK_STRFWD, fep->hwp + FEC_X_WMRK);
- 	}
- 
- 	if (fep->bufdesc_ex)
--		ecntl |= (1 << 4);
-+		ecntl |= FEC_ECR_EN1588;
- 
- 	if (fep->quirks & FEC_QUIRK_DELAYED_CLKS_SUPPORT &&
- 	    fep->rgmii_txc_dly)
-@@ -1312,7 +1325,8 @@ static void
- fec_stop(struct net_device *ndev)
- {
- 	struct fec_enet_private *fep = netdev_priv(ndev);
--	u32 rmii_mode = readl(fep->hwp + FEC_R_CNTRL) & (1 << 8);
-+	u32 rmii_mode = readl(fep->hwp + FEC_R_CNTRL) & FEC_RCR_RMII;
-+	u32 ecntl = 0;
- 	u32 val;
- 
- 	/* We cannot expect a graceful transmit stop without link !!! */
-@@ -1345,9 +1359,11 @@ fec_stop(struct net_device *ndev)
- 	/* We have to keep ENET enabled to have MII interrupt stay working */
- 	if (fep->quirks & FEC_QUIRK_ENET_MAC &&
- 		!(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
--		writel(2, fep->hwp + FEC_ECNTRL);
-+		ecntl |= FEC_ECR_ETHEREN;
- 		writel(rmii_mode, fep->hwp + FEC_R_CNTRL);
- 	}
-+
-+	writel(ecntl, fep->hwp + FEC_ECNTRL);
- }
- 
- 
--- 
-2.25.1
+  acceptable = icsk->icsk_af_ops->conn_request(sk, skb) >= 0;
 
 
+>  			consume_skb(skb);
+>  			return 0;
+>  		}
 
