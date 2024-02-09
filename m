@@ -1,109 +1,93 @@
-Return-Path: <netdev+bounces-70488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0458784F36C
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 11:30:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EC6884F380
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 11:34:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36D5B1C20F18
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 10:30:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DEA4BB2115C
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 10:34:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98044689;
-	Fri,  9 Feb 2024 10:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D829712E4C;
+	Fri,  9 Feb 2024 10:34:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aRdr605U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OWMkJEvF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 926FA3FEC;
-	Fri,  9 Feb 2024 10:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B343E8C1A
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 10:34:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707474631; cv=none; b=aQgsoH+kySuRE4SBuxOrDhx+5E5CCXEKp0vrk6fpVsicxvVKElJrbp41mwZ7D5dXx5HJ20BuYCSAdiZ5ZZpJQSN2cBDQOwHV1QFnojby0bi6gXpZqY7QAFNcW1+QRApGcBTrPAbY0G9m+ChIWI5yjDtw8z/D8VFsoIxQs5EK7nM=
+	t=1707474865; cv=none; b=Zrf/Wa5G70mAWKf7ccXUSclvgLdWGWz1u0PlAgCqj/cUUSUcm/GJ2hkhSqacNcBKNF78dV09DPX5ytmcivW/rDqf8fB5acNX4hstbqboptdWEmfMJvFoe8yKmB40dl2Em2DLD9GHxVfxrndzx317n16XnxKCZvGlLAbScAqo13k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707474631; c=relaxed/simple;
-	bh=/XwFJi0uafiU4ftdmEiDaktNHhjpeW1zE9XAas5IOKk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=LzvxEJKt9n5bMsZ7fXKcDuvnTKY/o/QV9weCJGPN8/Abhc8PM5WlHP/icY7cGPDwlAzdMb8WcqDmKhHWDwok8settgFcBTmEjcx0anT6Yh0ukvUb69LUfjhwAiTiS4II9uqu3jfrqPzSwjBwwr1eQUzodAYGF+xuaFvKkYZVbuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aRdr605U; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 61F82C43390;
-	Fri,  9 Feb 2024 10:30:30 +0000 (UTC)
+	s=arc-20240116; t=1707474865; c=relaxed/simple;
+	bh=/ip+PIOjx5aTnWVaExLgigrHBVUJrumlV+cWrEQb8pw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EOtyBqMqvkUqCgXKjjEtkHiiTEfOmq2eO7V5VKi1Ba9LPG6iHulKSsjPwdYlhvCtoQvF8AEEtw7QVEOWiY7Uv38Rn5cEVLu9Sc0or110i6lLNkv7EySaZRKTUnT0pMvsJHYIpWmcZDJBJMs2RKcgoJ1nMVlXLKcCmi4CLMWKs7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OWMkJEvF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0922C433C7;
+	Fri,  9 Feb 2024 10:34:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707474630;
-	bh=/XwFJi0uafiU4ftdmEiDaktNHhjpeW1zE9XAas5IOKk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=aRdr605UI7cEn7UbE4arY3Y9L3jbN5TMojbFwuRo/iiJQt4iEt8ySa+EHKWgLOp9b
-	 4ganBiL9V4mLyTTaEbRHMeMFYN3VSrg84qlNgPQwJsiAe9+NEMOFDQMW78FWPn0phL
-	 7x2lEWd/rFPfYPWHPunKN7dro+hnGqLJc0IFOD1PGUKzqAO91AHnoLdUmiIZqlIsYx
-	 zc0IWDT0c1eFFxudoLOcfTbsvJ03jZ9PnvPf7PlCR1O0UHwFf/uHjBvenTxVaQdYWS
-	 WNxPLLZYy5LWtuvZ/oPgllzOoL/d8l8M38UeLDMfMNL1op7KUD5xngGFB8dyQ8PETW
-	 5+cGXihHNUSiw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 49E7CC41677;
-	Fri,  9 Feb 2024 10:30:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1707474864;
+	bh=/ip+PIOjx5aTnWVaExLgigrHBVUJrumlV+cWrEQb8pw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OWMkJEvFO51+vQQBv733lcOiUqHYEYNlPL27MGRa5/8y7E8TUFNSq5jwr/7ETs+sk
+	 UtKpJ9KvDwRQsRWXtmZs5AQlGyJ/3Uf35WCXb1ekKgacUqC1Fh+NgfV+DMrH6LCqS8
+	 d9g0pn/N4NRCILbbEkA53b6VFMdMvf9esrCivA03d1ou+whWEwy7gIdsaL4XAOGvid
+	 xzFRmVgKSJJjCAWNtB32ISQCpFGzaTke0Ne50PebYqsgSPC2fndKJIhjo9T8K2tYWt
+	 17oxT5qR6WQLSmbaeZ5sPydtzUyW20uHv3SfcyG9wa0ozLNkBACPG09NYS4Dos3OV2
+	 nWvfWktOOrlvQ==
+Date: Fri, 9 Feb 2024 10:34:20 +0000
+From: Simon Horman <horms@kernel.org>
+To: Alan Brady <alan.brady@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	Emil Tantilov <emil.s.tantilov@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH 1/1 iwl-net] idpf: disable local BH when scheduling napi
+ for marker packets
+Message-ID: <20240209103420.GD1516992@kernel.org>
+References: <20240208004243.1762223-1-alan.brady@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/8] netconsole: Add userdata append support
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170747463029.16032.4812565371511263051.git-patchwork-notify@kernel.org>
-Date: Fri, 09 Feb 2024 10:30:30 +0000
-References: <20240204232744.91315-1-thepacketgeek@gmail.com>
-In-Reply-To: <20240204232744.91315-1-thepacketgeek@gmail.com>
-To: Matthew Wood <thepacketgeek@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- leitao@debian.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240208004243.1762223-1-alan.brady@intel.com>
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Sun,  4 Feb 2024 15:27:31 -0800 you wrote:
-> Add the ability to add custom userdata to every outbound netconsole message
-> as a collection of key/value pairs, allowing users to add metadata to every
-> netconsole message which can be used for  for tagging, filtering, and
-> aggregating log messages.
+On Wed, Feb 07, 2024 at 04:42:43PM -0800, Alan Brady wrote:
+> From: Emil Tantilov <emil.s.tantilov@intel.com>
 > 
-> In a previous patch series the ability to prepend the uname release was
-> added towards the goals above. This patch series builds on that
-> idea to allow any userdata, keyed by a user provided name, to be
-> included in netconsole messages.
+> Fix softirq's not being handled during napi_schedule() call when
+> receiving marker packets for queue disable by disabling local bottom
+> half.
 > 
-> [...]
+> The issue can be seen on ifdown:
+> NOHZ tick-stop error: Non-RCU local softirq work is pending, handler #08!!!
+> 
+> Using ftrace to catch the failing scenario:
+> ifconfig   [003] d.... 22739.830624: softirq_raise: vec=3 [action=NET_RX]
+> <idle>-0   [003] ..s.. 22739.831357: softirq_entry: vec=3 [action=NET_RX]
+> 
+> No interrupt and CPU is idle.
+> 
+> After the patch, with BH locks:
+> ifconfig   [003] d.... 22993.928336: softirq_raise: vec=3 [action=NET_RX]
+> ifconfig   [003] ..s1. 22993.928337: softirq_entry: vec=3 [action=NET_RX]
+> 
+> Fixes: c2d548cad150 ("idpf: add TX splitq napi poll support")
+> Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
+> Signed-off-by: Alan Brady <alan.brady@intel.com>
 
-Here is the summary with links:
-  - [net-next,v3,1/8] net: netconsole: cleanup formatting lints
-    https://git.kernel.org/netdev/net-next/c/602ad3b4dd57
-  - [net-next,v3,2/8] net: netconsole: move netconsole_target config_item to config_group
-    https://git.kernel.org/netdev/net-next/c/bd9c69a36efd
-  - [net-next,v3,3/8] net: netconsole: move newline trimming to function
-    https://git.kernel.org/netdev/net-next/c/ae001dc67907
-  - [net-next,v3,4/8] net: netconsole: add docs for appending netconsole user data
-    https://git.kernel.org/netdev/net-next/c/aa7b608d69ea
-  - [net-next,v3,5/8] net: netconsole: add a userdata config_group member to netconsole_target
-    https://git.kernel.org/netdev/net-next/c/8a6d5fec6c7f
-  - [net-next,v3,6/8] net: netconsole: cache userdata formatted string in netconsole_target
-    https://git.kernel.org/netdev/net-next/c/df03f830d099
-  - [net-next,v3,7/8] net: netconsole: append userdata to netconsole messages
-    https://git.kernel.org/netdev/net-next/c/b4ab4f2c0ff5
-  - [net-next,v3,8/8] net: netconsole: append userdata to fragmented netconsole messages
-    https://git.kernel.org/netdev/net-next/c/1ec9daf95093
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
