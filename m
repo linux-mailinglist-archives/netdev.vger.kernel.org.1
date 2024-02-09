@@ -1,58 +1,57 @@
-Return-Path: <netdev+bounces-70597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0213084FAF3
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 18:22:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CE9D84FAFE
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 18:27:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC9F728BDC7
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 17:22:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE679283D9B
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 17:27:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1C7F7BB0D;
-	Fri,  9 Feb 2024 17:22:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E46DB7BAF5;
+	Fri,  9 Feb 2024 17:27:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="T24otnsd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GD6mT/AY"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7CC333CF1;
-	Fri,  9 Feb 2024 17:22:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0FFD76414
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 17:27:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707499328; cv=none; b=YAZz51+mrUPIxljQEXjL8rqMKLev/KN263JspJf7i2a7x+sFVxw2RTPBbb2zcdWvjDYNGAKcFDzKp0M/AVZdbFpCwtnj3bOgQ5gYgAbIJvqzpnLyB59BEZ8rq1drAOlVWBmarn5JxQlJdtL6xVOWE70iZByWlur0MTsFkWHtiXU=
+	t=1707499633; cv=none; b=WkZMngrEKeoBOTUvIZKN5IYcAFKVEoBndIniFeYETjRerDD53rc0ChOhujp4W15b/m0MsQBcxt/9PICe7vYFN+Hlkl81IGw8hCX9oZZ6E3mUB4RLhAe1jg5WLyawXh8zSkCXLFSkitByoEe/w4OAAYspwS68YCKfmjttFTImtxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707499328; c=relaxed/simple;
-	bh=GvNaJK5ljpQbOqfI0p5J6r8yHDGpxvTZoHYkkpCZC8A=;
+	s=arc-20240116; t=1707499633; c=relaxed/simple;
+	bh=fJ6NONlFF7HHwdpssZytfNNj+QKkFtEm5uaVaeAR3HY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NKEuD1uI8nZAxR4CIoo3OPpLzWIq47kfjENBPq9YhnxXf33eCIKLmYriA7owI1p+o7OxiiYFTART/KC40FMRQwie5mvCKMpfTUa9ESz+4e2l8cc+da5MKqlzo+aUxZstopHL52py8JQs3Hn4x+QWi2iIcn/RZtBNR0Xzr96V14s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=T24otnsd; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=sVp7UY52Y4b7t6Q3ujXsKkcnNhultIY8iO3JnmoDB6k=; b=T24otnsdeZimqkppbPjzeRuwLQ
-	0OXKfjSyLMecnMUs4BohqhYh/x/Obuy5XfvUF4+gLyM0vywr/AybBFB3KPxWlong2Qhxw5oNPWzHe
-	NHExnE2gbJkVouSX4M/+MiGRqmY22OL3vPMihIQehzgjCKB1GrdqwLedKD99RVCcbcNE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rYUZf-007P8o-7b; Fri, 09 Feb 2024 18:22:03 +0100
-Date: Fri, 9 Feb 2024 18:22:03 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	edumazet@google.com, Florian Fainelli <f.fainelli@gmail.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	horms@kernel.org
-Subject: Re: [PATCH net] net: sysfs: Fix /sys/class/net/<iface> path for
- statistics
-Message-ID: <b448862e-591f-42ac-81e5-b4a37bc5bac5@lunn.ch>
-References: <20240209095520.252555-1-leitao@debian.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=id3jMk36+wmmgMQq5YmSNXMBKx4+VoBwf41Gg8vEFWe5r+rSSF2Pf52RifAYhP8bid2DqIIVPMA623MIwMXM2T6fYaDDYwitR4N5LLSsqn1kBjWccLymBncLcgJJIXDP4SXjc/5sP++Ujsgi7h5HM5mBtjyqfIy7wsNshJ8isXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GD6mT/AY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97822C433C7;
+	Fri,  9 Feb 2024 17:27:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1707499633;
+	bh=fJ6NONlFF7HHwdpssZytfNNj+QKkFtEm5uaVaeAR3HY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GD6mT/AYXR6MPkeJBHTv/5fMb5ykQN1CQTj+B8bHPSyueMiEuEfXScMtueL+bKB7n
+	 jfXOQbu6yTBSfPAtMkcRyLinZQgLmjDPhmgJpAmHPAxL5GdTQIUs4aN5UPgCYIvF9l
+	 Hta1EWpr/9saahDd2nc70OAxsC13uMK2XA8jqdaEIENf+esSRx/Cj6UU9G+kekJc5X
+	 kgiLUI85cmj7kGIsBa35KN9O/o7LXl8gdHxtqWd89vQXaNLmXAlm3CNFOsLRh57sL9
+	 qHeyUvOiAyNHTNIYPxFsxqxWwHkSZcH5y2ZT8/ddpyLNC/qoh2Mg7930gjhBami9Qb
+	 ji4U/gjMELF4Q==
+Date: Fri, 9 Feb 2024 17:25:39 +0000
+From: Simon Horman <horms@kernel.org>
+To: Wojciech Drewek <wojciech.drewek@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	jiri@resnulli.us, przemyslaw.kitszel@intel.com,
+	vadim.fedorenko@linux.dev, paul.m.stillwell.jr@intel.com,
+	bcreeley@amd.com
+Subject: Re: [PATCH iwl-next v5 2/2] ice: Fix debugfs with devlink reload
+Message-ID: <20240209172539.GG1533412@kernel.org>
+References: <20240205130357.106665-1-wojciech.drewek@intel.com>
+ <20240205130357.106665-3-wojciech.drewek@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,19 +60,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240209095520.252555-1-leitao@debian.org>
+In-Reply-To: <20240205130357.106665-3-wojciech.drewek@intel.com>
 
-On Fri, Feb 09, 2024 at 01:55:18AM -0800, Breno Leitao wrote:
-> The Documentation/ABI/testing/sysfs-class-net-statistics documentation
-> is pointing to the wrong path for the interface.  Documentation is
-> pointing to /sys/class/<iface>, instead of /sys/class/net/<iface>.
+On Mon, Feb 05, 2024 at 02:03:57PM +0100, Wojciech Drewek wrote:
+> During devlink reload it is needed to remove debugfs entries
+> correlated with only one PF. ice_debugfs_exit() removes all
+> entries created by ice driver so we can't use it.
 > 
-> Fix it by adding the `net/` directory before the interface.
+> Introduce ice_debugfs_pf_deinit() in order to release PF's
+> debugfs entries. Move ice_debugfs_exit() call to ice_module_exit(),
+> it makes more sense since ice_debugfs_init() is called in
+> ice_module_init() and not in ice_probe().
 > 
-> Fixes: 6044f9700645 ("net: sysfs: document /sys/class/net/statistics/*")
-> Signed-off-by: Breno Leitao <leitao@debian.org>
+> Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-    Andrew
 
