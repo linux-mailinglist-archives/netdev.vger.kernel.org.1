@@ -1,129 +1,113 @@
-Return-Path: <netdev+bounces-70532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 505CD84F6D5
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 15:13:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2356584F606
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 14:31:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43C781C21D69
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 14:13:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B49CC1F22DBF
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 13:31:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E3986BB50;
-	Fri,  9 Feb 2024 14:11:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A1793C680;
+	Fri,  9 Feb 2024 13:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=internet.ru header.i=@internet.ru header.b="FaKIjbR2";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=internet.ru header.i=@internet.ru header.b="Av2ay1qn"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="opTZal+3"
 X-Original-To: netdev@vger.kernel.org
-Received: from fallback22.i.mail.ru (fallback22.i.mail.ru [79.137.243.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8A1C69DF4;
-	Fri,  9 Feb 2024 14:11:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.137.243.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88A4381DF
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 13:30:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707487918; cv=none; b=ZvqES60GKw2B2v5LHVWzs8QYAUgkmjqkvsmkMrD7XaGvwHW9A1y31MdJ4X9ar5evuRyOl+BVmV4DTWNcnCL9Uz0bkRAd4bUtKzH4pXB2yFXF9nXHNbKGq7rsiHeQVGWu/c70xr3IL5tcRcdt+W7plTMwMiey2q4zoyXIgtjs94w=
+	t=1707485427; cv=none; b=gw2hQWHxIRWm3l7T70WCh3mPH01DLxda4nNCwPqCEdW0YIVeReKQXLn6TNUCb60YSOqTAMyMLE7aoE6omfxzMOrTcjWNu4Vxm5/vKyRh2uEMinyRn5kNf3pmJE+55FlmY66i7ivG9J/sr2yGnZnuEtn16+ALVm2pFatF7I/FBlY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707487918; c=relaxed/simple;
-	bh=m5QrSPeQfcWhb09oi6JBmIJ9tAlZ4VzlYKSWguAW0Q4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HsqQGEHLUaorX6g4W0ZcH8Hf8Cei0bP/bjHYyST3BcqfRnrZ8iwv/yx+GnpTem7Z7Cz+kD3NqY2OAoQmRrxOyhO1A4yLujRYKId9I7MG4nbE1QVWW23PcxFo6WC0QDldy+w+8Si32qep0WBkP6spc3vCGIIN3AiAtX6tCL7RxXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=internet.ru; spf=pass smtp.mailfrom=internet.ru; dkim=pass (2048-bit key) header.d=internet.ru header.i=@internet.ru header.b=FaKIjbR2; dkim=pass (2048-bit key) header.d=internet.ru header.i=@internet.ru header.b=Av2ay1qn; arc=none smtp.client-ip=79.137.243.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=internet.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=internet.ru
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=internet.ru; s=mail4;
-	h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:Cc:To:From:From:Subject:Content-Type:Content-Transfer-Encoding:To:Cc; bh=tGm1xHoSALIuckOtkwQfzR+mYVuPULCOH52yQLjIngA=;
-	t=1707487915;x=1707577915; 
-	b=FaKIjbR2BB+h9Vt4rL1uN6qUF/lIdWx269CPpNRrEyEjH2D0HDgnBqeMdSqGah4/taH9sj2NbsWgSyeQCQ/TbAYF2yziS1V95m3lBlVk0qv7SX16UtOJKYkltNFjz2IhOUAkfX09CpGxE7P7NrnDYnmqbR3VZWdaeKRo+TFML30R/x+Oq0izwUEhvPZsACPmQRhAnBUGI/TQbPMyX37yy0L/AV2keSgcfv7AKDZNvlu20OzOoziyit8UW5C7UMaEBstGiWQ5wgtfi+4Zk1toa6aeA5pUIukmVgg9/DxRlDN54YjupfGzLGhU9b00FNyKFmh438jh3m6zf+tKIYDJVA==;
-Received: from [10.12.4.28] (port=55320 helo=smtp52.i.mail.ru)
-	by fallback22.i.mail.ru with esmtp (envelope-from <max@internet.ru>)
-	id 1rYQst-00DShM-SE; Fri, 09 Feb 2024 16:25:40 +0300
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=internet.ru
-	; s=mail4; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:Subject:
-	Cc:To:From:From:Sender:Reply-To:To:Cc:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive:
-	X-Cloud-Ids:Disposition-Notification-To;
-	bh=tGm1xHoSALIuckOtkwQfzR+mYVuPULCOH52yQLjIngA=; t=1707485139; x=1707575139; 
-	b=Av2ay1qndN9MV0EqToYfmS3FaEWYq59ZXjK8A9XoE9dVssc3L2F9AUF0np3QbyIcPoECROozvlp
-	4kdNAxJjvDPUDpr/eoZbfPjd6Go/eZ4ASLQ4KrJSPpRjvgPcT1TSKiGJL/vyss4Q/0vlgOL5WXj2k
-	Qsbpu0ZeBAn1wEiPAHhXWdvtlZFdO5dTSm3OzjBfnlFQnyf12YROzxUNZvu4GcNzYk+abZbrfj/1U
-	7opkgBB+T0hjZem7rXbD24Iv0ER1sn3fzE3uQsd5iAAzIEY5pfeUQw4Xh5LNB4lnRqhoin62Qj91M
-	F4L8TZnCrCSZDOcxZwyt3Os9v1GmrxPbb6lw==;
-Received: by smtp52.i.mail.ru with esmtpa (envelope-from <max@internet.ru>)
-	id 1rYQsb-00000003PQy-2OCY; Fri, 09 Feb 2024 16:25:21 +0300
-From: Maxim Galaganov <max@internet.ru>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Maxim Galaganov <max@internet.ru>,
-	Matthieu Baerts <matttbe@kernel.org>
-Cc: Linux Kernel Functional Testing <lkft@linaro.org>,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] selftests: net: ip_local_port_range: define IPPROTO_MPTCP
-Date: Fri,  9 Feb 2024 16:25:11 +0300
-Message-ID: <20240209132512.254520-1-max@internet.ru>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1707485427; c=relaxed/simple;
+	bh=8sIFxxTA+kFZT7SMBIXRaEJWo4dhzYR5M12NFQkTaLM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UMVgTZcZbf8ROlIKmYWklhxxZBoQUQkXJc6Mv+b00wS0eiXUWaWxIgvavNIxExBqZHRtcv9SWHtj6oZ0VHuG8j5mtH+IUELaA9G8Msr09c0g1nIeh+Bczjxhwf+/VY8c1znQfNCifyu7jxPMzafi6z45q3AW+uAasTRQALG+39w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=opTZal+3; arc=none smtp.client-ip=209.85.128.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-6002317a427so9248377b3.2
+        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 05:30:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1707485424; x=1708090224; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8sIFxxTA+kFZT7SMBIXRaEJWo4dhzYR5M12NFQkTaLM=;
+        b=opTZal+3GWton4PbVJOzkJLfu8s2Xz0QtWxMPN9DSLEEPLBJUlxg9I6Ox7ksXM2tnN
+         QhZxGO5cvR2KO8+TYF+zwQlKPHQH8d6brgrJDkBfwYxt7r3UEQQjG4xL2JQ8fei9lYiI
+         FCJuC7F4XkDLCGuTeb6mh3UbSABBh2O6xuzTf43ncToKgo5Xp7OL4A/ja3uUGZPTxjT7
+         pmeHuhdSjTgJ8P/QqZWkarrBgovkT8dpJr8mAnHlylemZ34vQ1NVPQIgMCp0mm8o0B5i
+         HL2wIWS8fAzKi1ECOToHZlByWmEcvoboaz+1EqmNqQ1THw2E3eLPSLzItDovHsCesF39
+         f85A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707485424; x=1708090224;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8sIFxxTA+kFZT7SMBIXRaEJWo4dhzYR5M12NFQkTaLM=;
+        b=fdenCV7htRw8GM1nU38Cyiv/TmWw26Z8veJ8LMmCcqn8DgrWaHnmIFP15fR7MqWLoZ
+         pEozY3sOdEZL60db/OtgKruzUwWnYe6TuNPpa0NH0oP18m0/OsrbuRBkqJn0JuLy6dnp
+         xKPemuoUuNFnDzsAnLOFJ2ZxCbwA1qtJxbqvzDNeFT2pOxkHUWGDae1725ksTPiC+/xb
+         RCJhNwUaikVZ7HdLnWm6XgxmAV6lpRtwjTG9QpojkJjLarPXxlkJznaPbPHCew9UC24G
+         wH5OdonjpVooxxgLTEVmba6qOe7KJEy2/eM+UU9lFeAkvBVSmtYCb0HNqQM88fljfESn
+         9dMw==
+X-Gm-Message-State: AOJu0YwA2Ww4iDMW4z/TI9BEabj7RFta7/XDdQrAlOj5PSr8u7TTuywQ
+	WJZllkQVZW7ArvVUGa5Mmlvj6uT2yra2H+Oh26CS8ttFF+WD2ECER9+aARTXuqJoOGBBHqNsJ2T
+	uWI0RZwLfUXg9ZDRkl+G5muPhUMLr4WK1Ht/VAQ==
+X-Google-Smtp-Source: AGHT+IHZCQ+5vaXpkmSIUlfItwQ9qMjUfRrkgkps5uTRejECLhETkBx+m8+gijhHiaD5kznd/7S8AjDjJU6Ow1aTtaE=
+X-Received: by 2002:a0d:d8d4:0:b0:604:9427:e169 with SMTP id
+ a203-20020a0dd8d4000000b006049427e169mr1481315ywe.27.1707485424747; Fri, 09
+ Feb 2024 05:30:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Mailru-Src: smtp
-X-7564579A: 646B95376F6C166E
-X-77F55803: 4F1203BC0FB41BD91FEFD63CE1B09916316E0C418293B113AB9044BC056ED5D000894C459B0CD1B96F2DCF2EB9516F7EA6157006EE19D6B17A5657F235AA3BC3D19983833F01B5B9B92CE970A8DCB349
-X-7FA49CB5: FF5795518A3D127A4AD6D5ED66289B5278DA827A17800CE7AD2F2D6F6013FF7FC2099A533E45F2D0395957E7521B51C2CFCAF695D4D8E9FCEA1F7E6F0F101C6778DA827A17800CE75C385DEB91CEC222EA1F7E6F0F101C6723150C8DA25C47586E58E00D9D99D84E1BDDB23E98D2D38B73AB1701401CD871467D157E8F25F1AADBC39DB49C565281320118AE8804E2271DF9E95F17B0083B26EA987F6312C9ECB28585415E75ADA9C26CFBAC0749D213D2E47CDBA5A96583C09775C1D3CA48CFA7AC412AE061D850117882F4460429724CE54428C33FAD30A8DF7F3B2552694AC26CFBAC0749D213D2E47CDBA5A9658378DA827A17800CE74601F13E4625331C9FA2833FD35BB23DF004C90652538430302FCEF25BFAB3454AD6D5ED66289B5278DA827A17800CE7B069F7EBDE4CC8E27B076A6E789B0E97A8DF7F3B2552694AD5FFEEA1DED7F25D49FD398EE364050F4B6963042765DA4BAD7EC71F1DB88427C4224003CC836476E2F48590F00D11D6E2021AF6380DFAD1A18204E546F3947C2FFDA4F57982C5F42E808ACE2090B5E1725E5C173C3A84C3C5EA940A35A165FF2DBA43225CD8A89FD2A95C73FD1EFF45156CCFE7AF13BCA4B5C8C57E37DE458BEDA766A37F9254B7
-X-C1DE0DAB: 0D63561A33F958A57063E2B8E6039BB35002B1117B3ED696C2290E273ED22A6FCCE9A60C8CB01D7C823CB91A9FED034534781492E4B8EEAD81B3E0F64AD3EF57C79554A2A72441328621D336A7BC284946AD531847A6065AED8438A78DFE0A9EBDAD6C7F3747799A
-X-C8649E89: 1C3962B70DF3F0ADE00A9FD3E00BEEDF77DD89D51EBB7742D3581295AF09D3DF87807E0823442EA2ED31085941D9CD0AF7F820E7B07EA4CF3B4699ED58432B14E6B2F4E3FD3F2A99C7823ACAE87B23FED2D4102B8A317CD1B94BA8791A304480766A7423F6D95CBEE5CEFE7B9F5A6687BBF9CF5BE62D93E11E4B4B0579F44D0242BF32D1DA1046D202C26D483E81D6BEA5ED0C00A4B096A39697699CFF2E0C50CC2E138FFB4ACBED
-X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojt6itc0777ZrnQJgvwi+sbA==
-X-Mailru-Sender: 4A46F6E6BB1A04662A3B81E17F92FA496F2DCF2EB9516F7EA6157006EE19D6B19D9319118D6564F7AF8E75F3432433F792BBD60AF8093D9D3DDE9B364B0DF289325BD006FD28D9A0A3EAC56F6A374A440D4ABDE8C577C2ED
-X-Mras: Ok
-X-7564579A: 646B95376F6C166E
-X-77F55803: 6242723A09DB00B46EA299E95BC82A782CFFFEF9892CBE786A78F94A7442A9D4049FFFDB7839CE9E2038077D049FFA75D1CD41B6E85E9CE99090A86D6500F52B17C480687FFA3F3B
-X-7FA49CB5: 0D63561A33F958A5C0A701A6ECEC674582086D814B21B76BE4CA3DA7BC45C3AFCACD7DF95DA8FC8BD5E8D9A59859A8B64071617579528AACCC7F00164DA146DAFE8445B8C89999728AA50765F7900637785F28B24E3E349D389733CBF5DBD5E9C8A9BA7A39EFB766F5D81C698A659EA7CC7F00164DA146DA9985D098DBDEAEC89B873608BE13BC28F6B57BC7E6449061A352F6E88A58FB86F5D81C698A659EA775ECD9A6C639B01B78DA827A17800CE7E55904F49B65B757731C566533BA786AA5CC5B56E945C8DA
-X-87b9d050: 1
-X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojt6itc0777Zq39vCcElGA7w==
-X-Mailru-MI: 8000000000000800
-X-Mras: Ok
+References: <20240208-realtek-bindings-fixup-v1-1-b1cf7f7e9eed@linaro.org> <0c47da33-3f50-4b31-87bb-3aefb01c0e47@linaro.org>
+In-Reply-To: <0c47da33-3f50-4b31-87bb-3aefb01c0e47@linaro.org>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 9 Feb 2024 14:30:13 +0100
+Message-ID: <CACRpkdbfYnUDq3a+Q+nDgUdYZEg_vFSEvkS9S6axypkt52giTQ@mail.gmail.com>
+Subject: Re: [PATCH] dt-bindings: net: realtek: Use proper node names
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Older glibc's netinet/in.h may leave IPPROTO_MPTCP undefined when
-building ip_local_port_range.c, that leads to "error: use of undeclared
-identifier 'IPPROTO_MPTCP'".
+On Fri, Feb 9, 2024 at 8:47=E2=80=AFAM Krzysztof Kozlowski
+<krzysztof.kozlowski@linaro.org> wrote:
+> On 08/02/2024 23:40, Linus Walleij wrote:
 
-Define IPPROTO_MPTCP in such cases, just like in other MPTCP selftests.
+> > Replace:
+> > - switch with ethernet-switch
+> > - ports with ethernet-ports
+> > - port with ethernet-port
+>
+> Would be nice to see answer "why" (because it is preferred naming
+> style), because what is visible from the diff.
 
-Fixes: 122db5e3634b ("selftests/net: add MPTCP coverage for IP_LOCAL_PORT_RANGE")
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-Closes: https://lore.kernel.org/netdev/CA+G9fYvGO5q4o_Td_kyQgYieXWKw6ktMa-Q0sBu6S-0y3w2aEQ@mail.gmail.com/
-Signed-off-by: Maxim Galaganov <max@internet.ru>
----
- tools/testing/selftests/net/ip_local_port_range.c | 4 ++++
- 1 file changed, 4 insertions(+)
+I guess we eventually want to get to a place where we fix all DTS files
+so that we can simply disallow switch/port/ports without ethernet-* prefix
+so they become easier to read (you immediately know which kind of
+switch/port etc it is).
 
-diff --git a/tools/testing/selftests/net/ip_local_port_range.c b/tools/testing/selftests/net/ip_local_port_range.c
-index 0f217a1cc837..6ebd58869a63 100644
---- a/tools/testing/selftests/net/ip_local_port_range.c
-+++ b/tools/testing/selftests/net/ip_local_port_range.c
-@@ -16,6 +16,10 @@
- #define IP_LOCAL_PORT_RANGE 51
- #endif
- 
-+#ifndef IPPROTO_MPTCP
-+#define IPPROTO_MPTCP 262
-+#endif
-+
- static __u32 pack_port_range(__u16 lo, __u16 hi)
- {
- 	return (hi << 16) | (lo << 0);
--- 
-2.43.0
+At least that is my "why", also yours?
 
+I can add this to the commit message.
+
+Yours,
+Linus Walleij
 
