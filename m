@@ -1,110 +1,133 @@
-Return-Path: <netdev+bounces-70499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F320684F49D
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 12:27:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17FF084F49F
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 12:28:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 77E07B2C1B6
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 11:27:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B39381F2BF04
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 11:28:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 481FC28DD2;
-	Fri,  9 Feb 2024 11:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662C828DC1;
+	Fri,  9 Feb 2024 11:28:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YQxUnoPL"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="2DJRdChK"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7D028E39;
-	Fri,  9 Feb 2024 11:27:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B1720311
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 11:28:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707478027; cv=none; b=ctMejorSyO1VENQlaZIJZ4Vb24pSP84TA49+NudF7gEpDgheE4M1GmQfudJ3VNWuFUoxeqxHCyyo/e1EACTTapFrH2U3p4bOUt0sZIohTTdRoLtTmh+RD1J4Cb1lmeavIeNqmTeM5YT6tOqosmqRu7wU1swWC50tGwJf1lSlCgY=
+	t=1707478095; cv=none; b=Zt8gV5e6MaO35ABgv0VvlGwQeF6j4iSCJEhSVmexFJbDRhmbwQvmAPmX+ISMfCa1BdnrtpqtHwTbcFs4F6G11BK0qtOQPwJmnZLm40Jpz6clOHChYN6QUch5GR4aqg2hSC1FUutGbcPpPP8sD2CfPklJmUl7F+BuCjwTuernyug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707478027; c=relaxed/simple;
-	bh=H3QtjLwENwH8j+2p8WMYSIrO+kI06uFriFXVO86tD48=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u5nB/63JipPz0O7NnI8hfmfKwiM2Ep1+5CQttYe/J2BBagMY0G6XJ2zxUt6wQPwba8QZcgB+AXRHfCyBv7lTMzNfKegxJGbDm85kShYCsBdbE05/NBFvbDreZ5QVr8ojdLRVHwBFSO8pnT+0zIfSbdVScHErcAaSMZ/Aad9gbes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YQxUnoPL; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7E592E0002;
-	Fri,  9 Feb 2024 11:26:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1707478016;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kFiS6VysoE7c/fqD7Ci3p1ZOaIvulrackj6IyqZIj7M=;
-	b=YQxUnoPLZbf61T6Hc3+0+zgk9tnnExf29QPsrobouKvFY2ThlX7f2MBeeG5htyeQryaWK0
-	hLwcQFrVL+D/XGU6oUg4Mrsz3TapZK/PIQMRvRNbm/uoKoFNoCAmkMHV2mBbFv/WW0ECgP
-	Gl31Nuk58fim8XzfklTMZIiNKih+Ke0C0DAS2JQC1pa+yif839xbgaaT2CqQqPuDHd2n5f
-	mCZoVQJz77xkM4/T7c7BXR0FaZGH83G+8itymgUIHHT20+iUZdkPK+o1VKUL1QJfqt5Fsp
-	rtezFmYWg1ij2jJMk00U0ak5cxuY0QEQn7aAeLRhyHr8cIjcbCLtuAwZKTeYlw==
-Date: Fri, 9 Feb 2024 12:26:53 +0100
-From: =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Oleksij Rempel <o.rempel@pengutronix.de>, Mark Brown <broonie@kernel.org>,
- Frank Rowand <frowand.list@gmail.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v3 16/17] dt-bindings: net: pse-pd: Add
- bindings for TPS23881 PSE controller
-Message-ID: <20240209122653.7483f12d@kmaincent-XPS-13-7390>
-In-Reply-To: <20240208-feature_poe-v3-16-531d2674469e@bootlin.com>
-References: <20240208-feature_poe-v3-0-531d2674469e@bootlin.com>
-	<20240208-feature_poe-v3-16-531d2674469e@bootlin.com>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1707478095; c=relaxed/simple;
+	bh=jsV6Q05spsARdsUx7PsdcGfeqOSWG910k6O0rdcZ654=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PjUbtbVgL9+IrN9CC0RQvF64oHvPjFG6RNzUQ93fvkDfhe+ZxF9vXhb8VbzhK7WnAXrrbkVmazAg9GTcr3v2QnNbJuwqJmFoICFWsGc/BtLwUc+4+JV4wQNjOUVMQk1gAUngzoxafOnMjuZru8MKGsJm7Ab7pVH4cnYasZ72uuQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=2DJRdChK; arc=none smtp.client-ip=209.85.219.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-dc7510bcf22so414755276.1
+        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 03:28:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1707478092; x=1708082892; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2JmAGAlNOBwAkXycDteKiYx3YFg5zFvHxTBJjlrAv40=;
+        b=2DJRdChKlZfacTKCGlwSD+33InIWw3ToYHezqiXs6jh2bFpFvYTsW/HxD9r95E81u7
+         WcYmJCGmcFPklX7xFzjLmTddas8oUOrClhPdvWaMP0kNVobV25yls/7OAqruV3P5AHhE
+         tm1BILU2HGLcGSs2S4E5U3+CQG5E2sVAkVN0sUj+2cRHo2B3168NjLtMKHipta3UiHBg
+         /zRfyprJxQHwUdgKzG8xKcrKik7audk18XDdGB4CQ785G/XI2Unyyt33NcAmdhi9ata2
+         JsDdldj9sU9uAWEn8hpA5OZcMCqjwYREF0rM35Duk2DUd+VCcyqEWqeodCYLcuu0QTgV
+         RBIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707478092; x=1708082892;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2JmAGAlNOBwAkXycDteKiYx3YFg5zFvHxTBJjlrAv40=;
+        b=JCC0yjH/LpaGMsh2Qznzt/rpcacMHZrlAdSNbVnvOVMDQnPkl1KYcVyOYWt9h+oyc/
+         aI01pXaQnAP8js5YACNDb8YoQStRA11DgZum6dtpRXliq8z+5wvgMdVYq+ca5iSee09r
+         KXkH42D761YTmnibMr7p1XC+jKs5cAD4gc7zKckY4LNxXXMONJu3sd2zyCn26LnFntcV
+         bQcwYlUOg1yENOZ7D0Mw1QZ0qtfQfPKMoRROF7kRlPIy0gnZ8eqeY+2M+ldHDxCIhSCI
+         +Wm142TTiOA0Dl3QoblpaqqDhwlooq1kB4pLhfHb2kk4IsV+V8JNIEiHKZcZu2WsT5rP
+         vZJQ==
+X-Gm-Message-State: AOJu0YxV6UGP4UQTORN1PNdl/NaYSPAD+J8bgbkjg3PHL4v2VADg5XdY
+	0N40uNqqgN++3w9JQf9CEr6JRcQ1VVxZbzF8dfDjggVMsL7SjB25lN0a3SZD5DeTqS75Jmjw1x2
+	3j6WXaAlNtjaXfgSaujM9ouBPA7g8RjA2TZSW
+X-Google-Smtp-Source: AGHT+IE0YxluIiUicDHA/Qtsu2ESEdM6yJT+8F8FJrZZ9tgDULzmF84M9tp0cmMi16YkCcqjsGVj00xm1L6K5FWEGOo=
+X-Received: by 2002:a05:6902:2501:b0:dc6:c32f:6126 with SMTP id
+ dt1-20020a056902250100b00dc6c32f6126mr1237214ybb.22.1707478092336; Fri, 09
+ Feb 2024 03:28:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20240207222902.1469398-1-victor@mojatatu.com>
+In-Reply-To: <20240207222902.1469398-1-victor@mojatatu.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Fri, 9 Feb 2024 06:28:01 -0500
+Message-ID: <CAM0EoM=mMtB4zFmrmhUx7UJW+JT-jSoTozWRVNgc1JOJ8-D+pw@mail.gmail.com>
+Subject: Re: [PATCH net v2] net/sched: act_mirred: Don't zero blockid when net
+ device is being deleted
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, kernel@mojatatu.com, pctammela@mojatatu.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
 
-On Thu, 08 Feb 2024 14:08:53 +0100
-Kory Maincent <kory.maincent@bootlin.com> wrote:
+On Wed, Feb 7, 2024 at 5:29=E2=80=AFPM Victor Nogueira <victor@mojatatu.com=
+> wrote:
+>
+> While testing tdc with parallel tests for mirred to block we caught an
+> intermittent bug. The blockid was being zeroed out when a net device
+> was deleted and, thus, giving us an incorrect blockid value whenever
+> we tried to dump the mirred action. Since we don't increment the block
+> refcount in the control path (and only use the ID), we don't need to
+> zero the blockid field whenever a net device is going down.
+>
+> Fixes: 42f39036cda8 ("net/sched: act_mirred: Allow mirred to block")
+> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
 
-> Add the TPS23881 I2C Power Sourcing Equipment controller device tree
-> bindings documentation.
->=20
-> Sponsored-by: Dent Project <dentproject@linuxfoundation.org>
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
->=20
+Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+
+cheers,
+jamal
+
 > ---
-> Change in v3:
-> - New patch.
-> ---
->  .../bindings/net/pse-pd/ti,tps2388x.yaml           | 112
-> +++++++++++++++++++++ 1 file changed, 112 insertions(+)
->=20
-> diff --git a/Documentation/devicetree/bindings/net/pse-pd/ti,tps2388x.yaml
-> b/Documentation/devicetree/bindings/net/pse-pd/ti,tps2388x.yaml new file =
-mode
-
-Oops forgot to rename this binding to ti,tps23881.yaml, sorry will do in ne=
-xt
-version.
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+> v1 -> v2:
+> - Reword commit message to emphasise the bug is caused when a net
+>   device is being deleted
+> - Reword subject to emphasise the bug is caused when a net device is
+>   being deleted. Original patch subject was:
+>   "net/sched: act_mirred: Don't zero blockid when netns is going down"
+>
+>  net/sched/act_mirred.c | 2 --
+>  1 file changed, 2 deletions(-)
+>
+> diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+> index 93a96e9d8d90..6f4bb1c8ce7b 100644
+> --- a/net/sched/act_mirred.c
+> +++ b/net/sched/act_mirred.c
+> @@ -533,8 +533,6 @@ static int mirred_device_event(struct notifier_block =
+*unused,
+>                                  * net_device are already rcu protected.
+>                                  */
+>                                 RCU_INIT_POINTER(m->tcfm_dev, NULL);
+> -                       } else if (m->tcfm_blockid) {
+> -                               m->tcfm_blockid =3D 0;
+>                         }
+>                         spin_unlock_bh(&m->tcf_lock);
+>                 }
+> --
+> 2.34.1
+>
 
