@@ -1,119 +1,119 @@
-Return-Path: <netdev+bounces-70687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C73C885003A
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 23:58:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A35808500A2
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 00:15:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DEC51F2493B
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 22:58:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D612A1C21311
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 23:15:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DFA836120;
-	Fri,  9 Feb 2024 22:58:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h1Ijr/+G"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00368374F7;
+	Fri,  9 Feb 2024 23:15:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from davidv.dev (mail.davidv.dev [78.46.233.60])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76FD429D1C;
-	Fri,  9 Feb 2024 22:58:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE26374DE
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 23:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.46.233.60
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707519511; cv=none; b=XdCHPHFDwEHPxnumRuczdVbCJP/Sb2zFUMsLHy+ctR6iG0OVH2AVp0yPq1++PkMWrc5ucM45YwbfHbD1/QnKuY1/y1NUGg/2aW9u+0tmcT+E1L23OGUQNZtE9ca5Uw7Xta6MmnI0S+LxZmTL/ntxTsZQjqWkP7zF/Xp1688iCRg=
+	t=1707520552; cv=none; b=V1cMUOUD/dG1s70xOOMmHqQ0DePZ5MniQxdpFpEVCiQWdBlpeV/mnATpI6IYZKkQvQ3PyAotzyXYJPC6NrFoGHlIIoJg4gi2IgdxDj7pzC6dxZ8TfhsBjy1eI1PRkjeVKaGpKCtiVwsqJeZBvtosVVPntjnM8kSuGf7zR/jsL70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707519511; c=relaxed/simple;
-	bh=M4wRQhJT3T7Q4Gek0ve4RZyq3rxj5DGP5SkKF3gO0NQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bWH4iaoOCuFLigHbZ9R/7Tc+EJ9GUdTHM9+02qtaRoEJCT8ShygEoG6Y3FzC5NP25qPAYiHvZDvIX2X6z15aQH8HuNgyU2UWdKoR9suXpExT//QpNcVLwePymjt443A2QXewSogCHAggkNqkZzTDTp5FHSd7tHb20mDDLzzDwKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h1Ijr/+G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7B80C433C7;
-	Fri,  9 Feb 2024 22:58:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707519510;
-	bh=M4wRQhJT3T7Q4Gek0ve4RZyq3rxj5DGP5SkKF3gO0NQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=h1Ijr/+GiV6aCqCrOpsXzxZbI5duN01e1sYF9UuFwmIBsoouyhTMmHV3dlICDgb+9
-	 OYscbS4ttfOA0EH795hCEK52216HLbQ4hISCThXwZnwM9TBLVE5TDs0DqTJybH63Gm
-	 3JBAfR4VHCk1GDPawaE5wEP79hdBEdi3qTiz8ZEpZ2akg5pojTLpG/qvV9oYnNlio1
-	 70DOR9HUkgErPciEodND8Cdw4P6f6ENT7ilvMme9/tBIzGpQ1R67j4zSXLC69suGAV
-	 6Ro4yaa2EQBbXgmrj6K54TzcFtqH8VTZF2AqSfCWdCfJ1AwZ2rPzMvfjVDuvF147Bk
-	 8UMmZhZwU0vng==
-Date: Fri, 9 Feb 2024 14:58:28 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Ahern <dsahern@kernel.org>
-Cc: Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Leon Romanovsky
- <leonro@nvidia.com>, Jason Gunthorpe <jgg@nvidia.com>, Jiri Pirko
- <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>, Itay Avraham
- <itayavr@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, Aron Silverton
- <aron.silverton@oracle.com>, Christoph Hellwig <hch@infradead.org>,
- andrew.gospodarek@broadcom.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
-Message-ID: <20240209145828.30e1d000@kernel.org>
-In-Reply-To: <2bdc5510-801a-4601-87a3-56eb941d661a@kernel.org>
-References: <20240207072435.14182-1-saeed@kernel.org>
-	<20240207070342.21ad3e51@kernel.org>
-	<ZcRgp76yWcDfEbMy@x130>
-	<20240208181555.22d35b61@kernel.org>
-	<2bdc5510-801a-4601-87a3-56eb941d661a@kernel.org>
+	s=arc-20240116; t=1707520552; c=relaxed/simple;
+	bh=xEYmqoe0JpXF+8LCEEn18mFm7SSFoDzDPkuEOR2M26Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Bngff5n4E6oNTAnHQdDXN16NcoAi6tILcWo/xliaierNd8ZBxhV0X/U5PGSJcJvLsK91Zo2SQHxlprf1hqhUmwuVgxN7QWHkQgwZGQdQwWs10ZKkoI/Ceja9n2kjQWBrDOidysZR3kYJ66ezwpEFPZRfnpU21z/RFqVP3wemG5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidv.dev; spf=pass smtp.mailfrom=davidv.dev; arc=none smtp.client-ip=78.46.233.60
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidv.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=davidv.dev
+Received: from [192.168.2.131]
+	by mail.davidv.dev (chasquid) with ESMTPSA
+	tls TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+	(over submission+TLS, TLS-1.2, envelope from "david@davidv.dev")
+	; Sat, 10 Feb 2024 00:15:43 +0100
+Message-ID: <ee37f457-3d2d-4c18-b22f-dfb315b3c078@davidv.dev>
+Date: Sat, 10 Feb 2024 00:15:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/2] net: make driver settling time configurable
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski <kuba@kernel.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, "David S. Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Paul E. McKenney" <paulmck@kernel.org>, Randy Dunlap
+ <rdunlap@infradead.org>, Xiongwei Song <xiongwei.song@windriver.com>,
+ "open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+ open list <linux-kernel@vger.kernel.org>,
+ "open list:NETWORKING [IPv4/IPv6]" <netdev@vger.kernel.org>
+References: <20240208093722.246930-1-david@davidv.dev>
+ <20240208095358.251381-1-david@davidv.dev>
+ <20240209135944.265953be@kernel.org>
+ <7485f0b2-93fe-4c82-95e8-5b0e10f9fa7a@lunn.ch>
+From: David <david@davidv.dev>
+In-Reply-To: <7485f0b2-93fe-4c82-95e8-5b0e10f9fa7a@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Fri, 9 Feb 2024 15:42:16 -0700 David Ahern wrote:
-> On 2/8/24 7:15 PM, Jakub Kicinski wrote:
-> >> I was in the room and I am in support of David's idea, I like it a lot,
-> >> but I don't believe we have any concrete proposal, and we don't have any
-> >> use case for it in netdev for now, our use case for this is currently RDMA
-> >> and HPC specific.
-> >>
-> >> Also siimilar to devlink we will be the first to jump in and implement
-> >> the new API once defined, but this doesn't mean I need to throw away the  
-> > 
-> > I'm not asking to throw it away. The question is only whether you get
-> > to push it upstream and skirt subsystem rules by posting a "misc" driver
-> > without even CCing the maintainers on v1 :|  
-> 
-> Can you define what you mean by 'skirt subsystem rules'? That's a new
-> one to me.
 
-I mean that Saeed is well aware that direct FW <> user space interfaces
-are not allowed in netdev, so he posted this "misc" driver without
-CCing us, knowing we'd nack it.
+On 2/9/24 23:11, Andrew Lunn wrote:
+> On Fri, Feb 09, 2024 at 01:59:44PM -0800, Jakub Kicinski wrote:
+>> On Thu,  8 Feb 2024 10:52:29 +0100 David Ventura wrote:
+>>> During IP auto configuration, some drivers apparently need to wait a
+>>> certain length of time to settle; as this is not true for all drivers,
+>>> make this length of time configurable.
+>> Please CC folks who gave you feedback, Andrew's is missing.
+Thanks for the feedback, still learning this workflow
+>>
+>> Andrew, what do you think about just removing the wait?
+>> Or decreasing it to 1ms?
+>> It feels a little wasteful to be adding uAPI for something
+>> which as you said is likely papering over ancient bugs. We'll
+>> fix the bugs which are still around and the uAPI will stay
+>> forever :(
+> My guess is, the broken drivers are doing setup stuff after they call
+> netdev_register().
+>
+> Reducing it to 1ms will probably continue to hide such bugs. So we
+> could just go with that, and probably not see any regressions. Or we
+> can decide we really do want to know about broken drivers, and just
+> remove the delay.
+>
+> Either way, we don't need a new uAPI.
 
-Maybe the baseline question is whether major subsystems are allowed to
-set their own rules. I think they should as historically we have a very
-broad range of, eh, openness in different fields. Networking is pretty
-open because of the necessary interoperability.
+Would it make sense to move this to a build-time configuration flag?
 
-> BTW, there is already a broadcom driver under drivers/misc that seems to
-> have a lot of overlap capability wise to this driver. Perhaps a Broadcom
-> person could chime in.
+I do not have a gut-feeling for which behaviors should be configurable
 
-I'm not aware. Or do you mean bcm-vk? That's a video encoder.
+at build vs run time.
 
-> >> Thanks, I appreciate your honesty, but I must disagree with your Nack, we
-> >> provided enough argument for why we believe this approach is the right
-> >> way to go, it is clear from the responses on V3 and from the LWN article
-> >> that we have the community support for this open source project.  
-> > 
-> > Why don't you repost it to netdev and see how many acks you get?
-> > I'm not the only netdev maintainer.  
-> 
-> I'll go out on that limb and say I would have no problem ACK'ing the
-> driver. It's been proven time and time again that these kinds of
-> debugging facilities are needed for these kinds of complex,
-> multifunction devices.
+> David, is 1ms too long for you? If we do take the delay out, you are
+> going to receive some of the flack from regression reports.
 
-Can we have bare minimum of honesty and stop pretending that his is
-primarily about debug :|
+I've used this patch to experiment with different values, and the sleep time
+
+behaves as described in Documentation/timers/timers-howto.rst, that is, a
+
+call of `msleep(1)` usually delays boot time by 12~13 ms in my tests.
+
+On top of this, I'm running this specific example on a no-smp systemm, 
+where I
+
+do not believe the `msleep` achieves anything (but I'm a kernel newbie 
+so please
+
+correct me if I'm wrong).
+
+>
+>        Andrew
+>
 
