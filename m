@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-70421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DB8284EF38
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 04:11:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19D0E84EF49
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 04:12:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 405671C25B6E
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 03:11:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4CE67B25DA1
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 03:12:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA2C34C83;
-	Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599A9125D5;
+	Fri,  9 Feb 2024 03:11:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BcBxr1Dt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ixgVlk4p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C13154C6D;
-	Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 175EE5227;
+	Fri,  9 Feb 2024 03:11:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707448268; cv=none; b=Xn2i3CjErDVLlj9lyxt2m5bMh9CRqN854v66WbJWtRFFJACi5utUzQv8LbHM37qSbodh+m7lwx49D9YjRFfxZ2QmNiigD/+sC4jJvwbQ515XtjHTr2GTYMviCHM+t+Pfq5f9BsRsqGbe89TAIvK+aiTKyA1aYIP7H++ieRirUpE=
+	t=1707448269; cv=none; b=ik7S2gKX0e5dgxPS/71biQfHQfilmfBjvutzn+YAedwieQNMBn00a34x8BoPlWNqiuPoY5xd3tjpmM2M08/gkWgop65Xw8KBhb9otv1bIYAZ/cSRfDj8q665KFjtSowshjFdADZqyGNwmg9i2MU6OdyDW2vzNj+jPCwUFcISevI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707448268; c=relaxed/simple;
-	bh=nzoZEQhlUlFStvBk+M+EZikQknFSlDDltaxD1XSibWY=;
+	s=arc-20240116; t=1707448269; c=relaxed/simple;
+	bh=MImnYCullCb2OJJMdGIL1zNVsFYJtY2dXlgKHUn3xOU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FvtvgMJYpisJkmG2wc37ss0fsN9WAOz23sEr0aUZStsQ52EUWsFLkVDRQGXpAJcTdZyGGo5Vc2ll73u1NxN7CQGtqkTFdvmYa0gUGiGomhqiIw6MxolZ6itN6Wudevf+YtMTFCfLDxMYsCWKW2/HQ38NOLN4i98Jda0PemDG0PM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BcBxr1Dt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3C3D0C43394;
+	 In-Reply-To:To:Cc; b=F3ZMQ/QlslgDZ/AqIAs/cfSWsrVUtQoWwxAupiJUqg1KfmIBgyYVk9ntoIFjZmBkXByejit/nLKKb2bM/ssv4s3kicT50J8LetYETrmmBKxwlqTeMMhb2niJhlxEQ0thVn/aQlvhBqrusJGm0VIumBu3TM7azYWfUj38d8aEAwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ixgVlk4p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8C397C4167E;
 	Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1707448268;
-	bh=nzoZEQhlUlFStvBk+M+EZikQknFSlDDltaxD1XSibWY=;
+	bh=MImnYCullCb2OJJMdGIL1zNVsFYJtY2dXlgKHUn3xOU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BcBxr1DtEOW8uYPcKM6M593Mn3Hl+xiP7u/VwV0CglAt+i8SdPtHtxauL3iOKLGtG
-	 XRsS71km5JmEmxtGWtxH20NRS29yOBpCzESUin2o16mFYFsWKVO3FdLvLVrO91RYAQ
-	 /ouXQyil0+xB7SLRVVomfU6MSfHHAEgsAOOWwUvNwXqhcq/5IDXeFE6ZOBcrk42W5T
-	 nF1IOEJ4DFPjY5OAo/TBk1WuHfUUVSeK/uIW4zczSUECb8ToCHGezRAl9acQCIo3aL
-	 HYGkXeuVKNX005QB3vVWzfJexoAbSEekMZc0BXK66DEJf+nd3eNDbJfojTAhBiNI0/
-	 cf/Okr+Kq5L+Q==
+	b=ixgVlk4pB7dXF0Sso2D2+1H1xMARajI0aoLoEus3pECf7eoFk6a0xnE/0PXm4qKc2
+	 PcIZhioO0K2dM9vB+IjiaCcNK2E8VEluxnw3WcK17AQaF4J+45zq6gZ87B5ydaKEcT
+	 NdxsCyreM06oFYooEW0IRdChmbG+CmZ6WxNwU9RgIv7SbMAhh0099eL1PuercoK14l
+	 WN/aUOc9B/cHyntco9u9LwbLNMZxdK3TWqWDTK4bQRN2MBhEX0iGrlSiXnbq+YjsbG
+	 7ubSGyrgle8PEtXLUJiNTMuTYd0FITvANn5BifI2JP0qGjLaKa9G11cs1Mys9npdzJ
+	 A1Xhzeiqx0Irw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 26240C395F1;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7A1D0E2F312;
 	Fri,  9 Feb 2024 03:11:08 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,45 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v5 net-next 0/2] Add HW checksum offload support for RZ/G2L
- GbEthernet IP
+Subject: Re: [PATCH net-next v6] ptp: ocp: add Adva timecard support
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170744826815.23533.13639002551479410283.git-patchwork-notify@kernel.org>
+ <170744826849.23533.2455688708391144333.git-patchwork-notify@kernel.org>
 Date: Fri, 09 Feb 2024 03:11:08 +0000
-References: <20240207092838.160627-1-biju.das.jz@bp.renesas.com>
-In-Reply-To: <20240207092838.160627-1-biju.das.jz@bp.renesas.com>
-To: Biju Das <biju.das.jz@bp.renesas.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, s.shtylyov@omp.ru, claudiu.beznea.uj@bp.renesas.com,
- yoshihiro.shimoda.uh@renesas.com, wsa+renesas@sang-engineering.com,
- nikita.yoush@cogentembedded.com, netdev@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org, geert+renesas@glider.be,
- prabhakar.mahadev-lad.rj@bp.renesas.com, biju.das.au@gmail.com
+References: <20240205153046.3642-1-maimon.sagi@gmail.com>
+In-Reply-To: <20240205153046.3642-1-maimon.sagi@gmail.com>
+To: Sagi Maimon <maimon.sagi@gmail.com>
+Cc: richardcochran@gmail.com, jonathan.lemon@gmail.com, vadfed@fb.com,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kuba@kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  7 Feb 2024 09:28:36 +0000 you wrote:
-> This patch series aims to add HW checksum offload supported by TOE module
-> found on the RZ/G2L Gb ethernet IP.
+On Mon,  5 Feb 2024 17:30:46 +0200 you wrote:
+> Adding support for the Adva timecard.
+> The card uses different drivers to provide access to the
+> firmware SPI flash (Altera based).
+> Other parts of the code are the same and could be reused.
 > 
-> TOE has hardware support for calculating IP header and TCP/UDP/ICMP
-> checksum for both IPv4 and IPv6.
-> 
-> For Rx, the 4-byte result of checksum calculation is attached to the
-> Ethernet frames.First 2-bytes is result of IPv4 header checksum and next
-> 2-bytes is TCP/UDP/ICMP checksum.
+> Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v5,net-next,1/2] ravb: Add Rx checksum offload support for GbEth
-    https://git.kernel.org/netdev/net-next/c/c2da9408579d
-  - [v5,net-next,2/2] ravb: Add Tx checksum offload support for GbEth
-    https://git.kernel.org/netdev/net-next/c/6c8e2803ef36
+  - [net-next,v6] ptp: ocp: add Adva timecard support
+    https://git.kernel.org/netdev/net-next/c/ef61f5528fca
 
 You are awesome, thank you!
 -- 
