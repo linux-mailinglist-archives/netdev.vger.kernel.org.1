@@ -1,96 +1,86 @@
-Return-Path: <netdev+bounces-70581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7937684FA38
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 17:54:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB2F484FA74
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 18:02:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A7D5B23C44
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 16:54:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45C441F21447
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 17:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B423F823B4;
-	Fri,  9 Feb 2024 16:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B80536DD18;
+	Fri,  9 Feb 2024 17:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="L1FRB6q8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fn1NBWl0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C4E81AD4
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 16:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94CDE364D2
+	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 17:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707497430; cv=none; b=g2vElO8GT+qpqSn9WK/5G0d/8b78PcxAZbkdoa5QPXpateFjj3IU1LznIMecatO3gM0JayVbl4T7ZLZk6cEaNMUHhwyg45mut0/Fsg7bTBOUqQvXguYMAF+iuTcJUXE5z7eYSb+IpARFvZE/ZYrgNodZ0F9pjUGM1jD1SCuG010=
+	t=1707498121; cv=none; b=huuiMMi8Tw/61kv6KHioW4oNLqw1wvO1BuYx0jPVzjvebMHBhgu5yB3tl/+LFrrOnzFg7K/mrWHGhy7FWAD3ccWvFBDHHq7ZmazrC9s0JdES2ocAWWcopZReEAtuQ1mGxUbS6OM1jq2rLaa1UY9cSSkB87+gIUFTVGkDom7UMak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707497430; c=relaxed/simple;
-	bh=eQcd4DW4LQiVRlyQ7jth4nU9sqQRE5Hw0qJ2KYeHBHA=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=S3XVtcLNhppteHmb0oDwlh8vfWbvRYyq+zPBF+KkcQZpHYUEWClwxzxvjmB280l4qhRHSVXXwR87lBZkclxz+2Mp+uESkvxj1ZP1iRHKXvYiw/efU7xtP6q0EjnCXSNTR26CIJ96kwU0xPWQSxiQGwyHKKrsth5zhNA6XJ5+jhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=L1FRB6q8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3076BC433F1;
-	Fri,  9 Feb 2024 16:50:30 +0000 (UTC)
+	s=arc-20240116; t=1707498121; c=relaxed/simple;
+	bh=qhbgSvAgxPjP/9ZwtR46TunoUtvWH6BA76JdIbxr7k0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LsofqhJchPu9ggsDhnT2fkZ2ugWN/90qlqdQ0pHJOBMfdWcoVdeOrFGzrHGnccXkeXDpNju2Un47IBAVj4z3ut5iyYTo4+R1jxobgHd91qKQTGFYnGbnQoO1zdfWmMNVjKCLCuGZifdN/NhSnkcOYMhf+8PUjCJDHF+HE07dq2I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fn1NBWl0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FAFDC433F1;
+	Fri,  9 Feb 2024 17:01:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707497430;
-	bh=eQcd4DW4LQiVRlyQ7jth4nU9sqQRE5Hw0qJ2KYeHBHA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=L1FRB6q8R8j3jC2k3B+yCxghLppjUTJGOhF59SKO+NPKIem9d6XPPVDdkUAYP8fXq
-	 pKneVEdxr0URUCz0V3SnCXy7SgtTFTx2bFgFUdDPOh6i5s827O9uni0ZAzHYSgvNae
-	 GvKwAA2lOFaR05rKisjl+zomtYKMBO1TBH6wl8E8ylx/fE74heMTqpmq/QQmfxd8ns
-	 zm2iinh1nuynY1RH6BRMXC+bOzguKdAyecFvExCyn8f1CBs43hAADMDxgyIVsq5UZY
-	 wQqkkyDuLkKAAvVmEtinKHXE9WX9vmzE4li4abL3PJwo1XznQiUM682l06jY/iACPr
-	 mDOul3jNCrw0g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 15F32D8C970;
-	Fri,  9 Feb 2024 16:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1707498121;
+	bh=qhbgSvAgxPjP/9ZwtR46TunoUtvWH6BA76JdIbxr7k0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Fn1NBWl0V5uL6nOT8L+D3b7lp5CfAJ2taUHdg1oqVpEH2vM7MMWsgLa+CzDVGSMj5
+	 bmew4w+hpYcn3hoD4z9D1Q52KEeLlNZbIatKDtSJo5CWlfH3vp/nxqjYmtXu4/jegi
+	 s6sVQZZV/vq7IDV/iXe8crwbud262KbZSfEz/3VDauA7ycJaDYKVZ/QvVCJaOAbOl8
+	 sDqC26HWaWA9PoYeJR0gchNqer4LF703NmFfhf7HzvvafccflVfBMpXL10v+PudrjN
+	 +T+K3LtZnQhyl3V92qYUoYp/kiEqzQfz0YLVnFvqhLxu9Z/M1cwRBmCNSaegRUdJm3
+	 mjJywghtoFMsQ==
+Date: Fri, 9 Feb 2024 17:00:26 +0000
+From: Simon Horman <horms@kernel.org>
+To: Lukasz Plachno <lukasz.plachno@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	brett.creeley@amd.com, pmenzel@molgen.mpg.de,
+	aleksander.lobakin@intel.com,
+	Jakub Buchocki <jakubx.buchocki@intel.com>,
+	Mateusz Pacuszka <mateuszx.pacuszka@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [PATCH iwl-next v6 2/2] ice: Implement 'flow-type ether' rules
+Message-ID: <20240209170026.GB1533412@kernel.org>
+References: <20240209101823.27922-1-lukasz.plachno@intel.com>
+ <20240209101823.27922-3-lukasz.plachno@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2 1/3] ctrl: Fix fd leak in ctrl_listen()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170749743008.28784.542691478266400859.git-patchwork-notify@kernel.org>
-Date: Fri, 09 Feb 2024 16:50:30 +0000
-References: <20240208172647.324168-1-stephen@networkplumber.org>
-In-Reply-To: <20240208172647.324168-1-stephen@networkplumber.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, maks.mishinfz@gmail.com, maks.mishinFZ@gmail.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240209101823.27922-3-lukasz.plachno@intel.com>
 
-Hello:
+On Fri, Feb 09, 2024 at 11:18:23AM +0100, Lukasz Plachno wrote:
 
-This series was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+...
 
-On Thu,  8 Feb 2024 09:26:27 -0800 you wrote:
-> From: Maks Mishin <maks.mishinfz@gmail.com>
-> 
-> Use the same pattern for handling rtnl_listen() errors that
-> is used across other iproute2 commands. All other commands
-> exit with status of 2 if rtnl_listen fails.
-> 
-> Reported-off-by: Maks Mishin <maks.mishinFZ@gmail.com>
-> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
-> 
-> [...]
+> diff --git a/drivers/net/ethernet/intel/ice/ice_fdir.c b/drivers/net/ethernet/intel/ice/ice_fdir.c
+> index 1f7b26f38818..ec8a84b80a73 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_fdir.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_fdir.c
+> @@ -4,6 +4,8 @@
+>  #include "ice_common.h"
+>  
+>  /* These are training packet headers used to program flow director filters. */
+> +static const u8 ice_fdir_eth_pkt[22] = {0};
+> +
 
-Here is the summary with links:
-  - [iproute2,1/3] ctrl: Fix fd leak in ctrl_listen()
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=f4dc6a784f6e
-  - [iproute2,2/3] ip: detect errors in netconf monitor mode
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=00e8a64dac3b
-  - [iproute2,3/3] ip: detect rtnl_listen errors while monitoring netns
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=8f340a075138
+I think it was agreed to drop the "{0}" in the review of v5 as it is
+unnecessary.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+...
 
