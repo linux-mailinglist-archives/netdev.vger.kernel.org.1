@@ -1,100 +1,163 @@
-Return-Path: <netdev+bounces-70457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B73FC84F169
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 09:36:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E77B284F1A2
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 09:51:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E38361C21FB2
-	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 08:36:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B0D81F21D69
+	for <lists+netdev@lfdr.de>; Fri,  9 Feb 2024 08:51:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1398F65BC9;
-	Fri,  9 Feb 2024 08:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01720664A9;
+	Fri,  9 Feb 2024 08:50:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="hwRfnVRm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB5265BC2
-	for <netdev@vger.kernel.org>; Fri,  9 Feb 2024 08:36:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67A6426AD3;
+	Fri,  9 Feb 2024 08:50:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707467786; cv=none; b=C53dmJBEemukcMjRBMdobQbD67tm8K9EcFbsBo35qy2tSpcKqv1z/FoMpS28FDCqC/mOgUukwkl6fcr5GtNHt5l/d7mCOYhbAx4gxwyUq+KUUxQ7gI0uC6eVX8dQH6Qi6RXm5ID4mx6aLGXLIT/q3xGYhzmJ8aVcjAWf9rn6NvU=
+	t=1707468653; cv=none; b=kmGmAju1P64rPQtOhs4nSO7rihMvzmwtPpLVU+evCh/vP/LveXJ+snoyT4w1VT2t01YN5HoBfENGcnk4iwBqaX5G9yyKofLukyw2pGFCJZwpZQupHKffS2i4IbHtilTVY+AcJ6kIfqAqvFJQ0cSrMavp2qmIyZ8OYcY17PJHchk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707467786; c=relaxed/simple;
-	bh=Zck6MFVSsVoeJrJI9g41GzXMVLesXH2u0cKmmnlZ1JI=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=nYNp2eRnmqDmwN6rvBYfDwste59G5b12q6R8CRx5aExwD39HTbA5jFHVp4JQHmkdHzTdFZfXckVR906x1zSV11dYZFpdvEG9n792oiFUd0r4nE4paYE4lc+DANPvhmzL/xz1GwP/pHj3GZsPD93jQBaUzvuHuECDFbmB2nCFdG0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-363c88eff5aso5532075ab.1
-        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 00:36:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707467783; x=1708072583;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=24Yrgnnur9ND4ExOfD7XjN9zPiPpVt+LDVK8jBNwB24=;
-        b=tTco9eXn+WuTxqUmoAPj/SbHbivCVgQI1nWf5GRlnU8z5Uuo7pD3SC8B72oKtSS7n3
-         UV0mggMT5Xnd+gP9IX050noiGOIZG74N1KQd3vO5WaZDTbzX466vrfl3vV9s4ALI/cgN
-         vlJlcQUfz0MSHs7q3Ntq8bZeliLmDdeuS1rWT9NdwyrPc/MjCbEq09UfjqgWHzfgge7k
-         vvhWrSUJmuSmTmk1jDgHePcTnnXanx5ENUyE3qYH+6kbtAFdfxRkmNFpt1nddKLRWPNP
-         FwlUZav0IJhR65vM9wuYD+IwACwsr3w7o03fibIgyrvVKyDGS0LPD9sh3+VxdBraP+SU
-         QFiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUeFi0R5os1JJCwfCDOMhgpRgmi1antrmJUIus5I8uyroSf8AeLFzDD1ebNteXingoI7F3VHu1y1mPh9pBVhSUUSzeejNY/
-X-Gm-Message-State: AOJu0YzGo2qMzaV9U12eY7Iy1UeIJIZfzvfhzCh5cf1zQ2qspGVZmeng
-	hayJ3Tk5WiX5TyrdMFbfBBIhDSwDAWiJUf57O1c1J2xFn/ZOC8vjZQ/Go+TrFPnpzdJHjZLwM5p
-	mOTuTUiDfeEsDAcfBXcps/m+G0Lj8m3th84fCichAvtZk5BVew9b+P18=
-X-Google-Smtp-Source: AGHT+IHBJbYxhXRQMd9Rfmr15cbvFKFPUBuW/TZQdWNmRozZQaLQJqA9PD+aJwrcavFgPhXueA01XHrWSDiqo/QuAICTYy1825Nx
+	s=arc-20240116; t=1707468653; c=relaxed/simple;
+	bh=IfoIUexxlQySeGMhV5Z1O09ANYkQ0dV1gMA3OgD7BfU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iXAB7lrXm2KR6QEXwAbaIdszD91IKp90oNbObUwM0myJzjTyymhMJCdVJnQFuhKWM8nocNyzFYjYk88uiTrIz0AwHvDggNnaJjEL1robT+crhVwsguJ8Y4NGK4XjNe0W1joTqal6wbXNPYc67I0P3uETCnxzPEZi68iGZRMPKgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=hwRfnVRm; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 4197tcJ7005284;
+	Fri, 9 Feb 2024 08:50:37 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=qcppdkim1; bh=6ESa758
+	O9GnnugI6OMevXdY4QAErNX5ZAA2GAjz0VS0=; b=hwRfnVRmbAS6YRIbAiNMVAO
+	CbYyknyNoP1UETs+dp/J9Kiq6UwIVn96NLXGYEL8GMSmUKr7V50lZvNyc17R4586
+	EaCfuuX/WS7fvPhkeZM4s+pN/aw+ITlZCphkhra0UhV7FYDY05CJtXZkqrS23oRt
+	TbLi9Ur3b/kaKNi6n7Yzzd8NKK1kse+p5eNb7JtmHF8JpI7aea4QKTgiwmjWZeCc
+	ntx4Pj+GBMfHy7aBRNTunz7yIQO7SU+ypRNCXA746zoDMScF8xSZzq3sn/sNe8Wc
+	maQiynvrSgm5mNCHgUI5q6GBoWzf1/k7kYk/+W+4aCfte874fOJXalcl0kagWgA=
+	=
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3w5ef1rd3k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 09 Feb 2024 08:50:37 +0000 (GMT)
+Received: from nalasex01b.na.qualcomm.com (nalasex01b.na.qualcomm.com [10.47.209.197])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 4198oask029750
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 9 Feb 2024 08:50:36 GMT
+Received: from hu-jsuraj-hyd.qualcomm.com (10.80.80.8) by
+ nalasex01b.na.qualcomm.com (10.47.209.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.40; Fri, 9 Feb 2024 00:50:26 -0800
+From: Suraj Jaiswal <quic_jsuraj@quicinc.com>
+To: <quic_jsuraj@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
+        Bhupesh Sharma
+	<bhupesh.sharma@linaro.org>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson
+	<andersson@kernel.org>,
+        Konrad Dybcio <konrad.dybcio@linaro.org>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+        "Krzysztof
+ Kozlowski" <krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Alexandre Torgue <alexandre.torgue@foss.st.com>,
+        "Jose
+ Abreu" <joabreu@synopsys.com>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>, <netdev@vger.kernel.org>,
+        <linux-arm-msm@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        Prasad Sodagudi
+	<psodagud@quicinc.com>,
+        Andrew Halaney <ahalaney@redhat.com>, Rob Herring
+	<robh@kernel.org>
+CC: <kernel@quicinc.com>
+Subject: [PATCH net-next  v13 0/2] Ethernet common fault IRQ support
+Date: Fri, 9 Feb 2024 14:20:10 +0530
+Message-ID: <cover.1707467850.git.quic_jsuraj@quicinc.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a07:b0:363:ca65:7d12 with SMTP id
- s7-20020a056e021a0700b00363ca657d12mr58589ild.6.1707467783730; Fri, 09 Feb
- 2024 00:36:23 -0800 (PST)
-Date: Fri, 09 Feb 2024 00:36:23 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b700a70610eed280@google.com>
-Subject: [syzbot] Monthly netfilter report (Feb 2024)
-From: syzbot <syzbot+list54bd6dcf58b0a6cd42fd@syzkaller.appspotmail.com>
-To: fw@strlen.de, kadlec@netfilter.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, pablo@netfilter.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01b.na.qualcomm.com (10.47.209.197)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: vly8mvkYUDMdMtT3HGRIA-641V9REBon
+X-Proofpoint-ORIG-GUID: vly8mvkYUDMdMtT3HGRIA-641V9REBon
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-02-09_06,2024-02-08_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0
+ lowpriorityscore=0 spamscore=0 mlxscore=0 phishscore=0 priorityscore=1501
+ malwarescore=0 suspectscore=0 clxscore=1011 bulkscore=0 mlxlogscore=981
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2401310000 definitions=main-2402090062
 
-Hello netfilter maintainers/developers,
+Changes since v13:
+- Update correct sender email
 
-This is a 31-day syzbot report for the netfilter subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/netfilter
+Changes since v12:
+- Update correct sender email
 
-During the period, 2 new issues were detected and 1 were fixed.
-In total, 7 issues are still open and 158 have been fixed so far.
+Changes since v11:
+- Update debug message print
 
-Some of the still happening issues:
+Changes since v10:
+- Update commit message
 
-Ref Crashes Repro Title
-<1> 47      Yes   INFO: rcu detected stall in gc_worker (3)
-                  https://syzkaller.appspot.com/bug?extid=eec403943a2a2455adaa
-<2> 38      Yes   INFO: rcu detected stall in worker_thread (9)
-                  https://syzkaller.appspot.com/bug?extid=225bfad78b079744fd5e
-<3> 29      Yes   WARNING: suspicious RCU usage in hash_netportnet6_destroy
-                  https://syzkaller.appspot.com/bug?extid=bcd44ebc3cd2db18f26c
+Changes since v9:
+- prevent race condition of safety IRQ handling
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Changes since v8:
+- Use shared IRQ for sfty
+- update error message
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+Changes since v7:
+- Add support of common sfty irq on stmmac_request_irq_multi_msi.
+- Remove uncecessary blank line.
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+Changes since v6:
+- use name sfty_irq instead of safety_common_irq.
 
-You may send multiple commands in a single email message.
+Changes since v5:
+- Add description of ECC, DPP, FSM
+
+Changes since v4:
+- Fix DT_CHECKER warning
+- use name safety for the IRQ.
+
+Suraj Jaiswal (2):
+  dt-bindings: net: qcom,ethqos: add binding doc for safety IRQ for
+    sa8775p
+  net: stmmac: Add driver support for common safety IRQ
+
+ .../devicetree/bindings/net/qcom,ethqos.yaml  |  9 ++--
+ .../devicetree/bindings/net/snps,dwmac.yaml   |  6 ++-
+ drivers/net/ethernet/stmicro/stmmac/common.h  |  1 +
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  3 ++
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 41 ++++++++++++++++++-
+ .../ethernet/stmicro/stmmac/stmmac_platform.c |  8 ++++
+ 6 files changed, 61 insertions(+), 7 deletions(-)
+
+-- 
+2.25.1
+
 
