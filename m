@@ -1,75 +1,78 @@
-Return-Path: <netdev+bounces-70751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E115B850404
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 11:49:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66B3B850409
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 11:51:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C1C31F23EE4
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 10:49:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9933D1C21E7F
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 10:51:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99CAC364B7;
-	Sat, 10 Feb 2024 10:48:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71631364B8;
+	Sat, 10 Feb 2024 10:51:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZuND8qsX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d1o0evzF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5131D684
-	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 10:48:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 005492AF08;
+	Sat, 10 Feb 2024 10:50:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707562139; cv=none; b=TCdRUu6kaNM6K9RP93jmSbBJqwUnDFIWHqxPDzi7e4bLp2o5j0hcaE9XrMfjSqlOH0h9UYPqIO7I/19Ds3aZ1Qx8Zzgllm0xNwDlQl2xwziiSJVQ0gBzPFc5gVJy8f+nP6IoY78nR5uTNp/+g+tvidfwNeDewc8NFX87JciNj2A=
+	t=1707562260; cv=none; b=n4GnV1j8Jhm1ZvCI1YS74UX/m14CebMQ3UesWhyRBMrmgaVjS1YieOa3iUJJaZOmwsmFQ6NSfq0xq9pE2wXWrudBzM17FaHRLsbEF9hwnZmgvz8Kjzv8ZE4HUfETOmbIRAbPIHTwJO4SxEF8JRpVsCINq43yaIOQpj8o31KcJu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707562139; c=relaxed/simple;
-	bh=cK6BUBE+KcUOObi6eZQQ6/x8Kp9qpahf/9Ka06C0Hh0=;
+	s=arc-20240116; t=1707562260; c=relaxed/simple;
+	bh=FRX+d1XTODjUPjXDlUm/SKxlxDdNuhJFSD+LgNoSP/4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A3QVqLVqZ7HJkENJR3bBZ5DN55DQD2wnuicAsijQ6Rxh22KiWn7IN3apOI09Rzi3r/kj1OeSfStW7v78PAvhQn55/6Da6J5/3NNt4f8Bvg7u9RRvjZfuh6DSEeNFctSZQVDEdY8Z8KiFfVfohSNlszOM29H8muYEGYY0n7pyq2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZuND8qsX; arc=none smtp.client-ip=192.198.163.7
+	 Content-Type:Content-Disposition:In-Reply-To; b=fQ38SUX4Eygmpsnjisbrl0XKaAkC93E/88YDVrt/a8rvG8/CddU0WREDi1Y74Y7Kpqw1esNvSmhU774dx5TO1ApNQ9Ebf80w/4MpcuiuCAYPppvdYdU6P8lWkVaMvaM/lq/bnQHWjYUVMHLin5X2WSH/cjmuwhshNEBGwcCWAmE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d1o0evzF; arc=none smtp.client-ip=192.198.163.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707562138; x=1739098138;
+  t=1707562259; x=1739098259;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=cK6BUBE+KcUOObi6eZQQ6/x8Kp9qpahf/9Ka06C0Hh0=;
-  b=ZuND8qsXL3XnRGLhgIEX9AHJknXvpg371LDEVfGxUTatYDQO1Unv+gP5
-   KtnPf+mOYp37tBap8Jb7Jp5A9aneALTz1OYzZcCUfUMfHatOjyrEWHn9Z
-   EP4ApvQYz+Te8b24zkUcb1j2/iGW2gQis7w48SmxkuVNF9Kv7Dlq+F9Oq
-   w/Q92akxfWal4RxDwxqI6d8OMRxE/Mkh9BpRebI3og7Ze/zgIJtB56vwa
-   QWK+Sbwy0tenjDZOtrM48mZlJ+d86ra9wtnoqdJLScKs8L3PHWOfpz4Em
-   vqvrE93duwvO2Ij7TGhzdcqtFgxWc2yGTmC/FcDZNmm7z8m7ehoxK1sDB
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10979"; a="27007489"
+  bh=FRX+d1XTODjUPjXDlUm/SKxlxDdNuhJFSD+LgNoSP/4=;
+  b=d1o0evzFrm/5h4d5EDbYuZ5zdX/Pl4zTgb0upycz+yP8DE4+p7LlB5/h
+   3uVaGf7TXIiQ7P4iCjDkAll2HzPfNim37sWmutgqjgNMlPLmACbUPysd4
+   6AEiqZ2/tc1WiX0b1aOQE4liPeytEeSUSHYMvrad3Z8QmiwwgtutHyLHg
+   oAdbW5oIQBK0xbI0+p2ieEjLL7KxrQlgVulH4znTQSx3XV4eMTZo0b0yf
+   UKbFYVCPoT2NUQqFWF8B83M0znsykjOQXS4i7a32GzyRdc0lMOdpBpt36
+   MOctomEDUizQQ0ClZbO7Wdp7icdChVZ8gziBHokkhQ6lqB8z7Mw3ZUyEI
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10979"; a="12199900"
 X-IronPort-AV: E=Sophos;i="6.05,259,1701158400"; 
-   d="scan'208";a="27007489"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2024 02:48:57 -0800
+   d="scan'208";a="12199900"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2024 02:50:58 -0800
 X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10979"; a="934648080"
 X-IronPort-AV: E=Sophos;i="6.05,259,1701158400"; 
-   d="scan'208";a="6796404"
+   d="scan'208";a="934648080"
 Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.62.138])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2024 02:48:54 -0800
-Date: Sat, 10 Feb 2024 11:48:51 +0100
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2024 02:50:54 -0800
+Date: Sat, 10 Feb 2024 11:50:52 +0100
 From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
 To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+Cc: linux-pm@vger.kernel.org, "Rafael J. Wysocki" <rafael@kernel.org>,
+	Srinivas Pandruvada <srinivas.pandruvada@linux.intel.com>,
+	Ricardo Neri <ricardo.neri-calderon@linux.intel.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>,
 	Johannes Berg <johannes@sipsolutions.net>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Sasha Neftin <sasha.neftin@intel.com>,
-	Dima Ruinskiy <dima.ruinskiy@intel.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"Rafael J . Wysocki " <rafael@kernel.org>
-Subject: Re: [PATCH] net: avoid net core runtime resume for most drivers
-Message-ID: <ZcdUk5c0M7bTUOSv@linux.intel.com>
-References: <20240207095111.1593146-1-stanislaw.gruszka@linux.intel.com>
- <20240209124536.75599e91@kernel.org>
+	Florian Westphal <fw@strlen.de>, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 2/3] thermal: netlink: Add genetlink bind/unbind
+ notifications
+Message-ID: <ZcdVDEX5u982Qyes@linux.intel.com>
+References: <20240209120625.1775017-1-stanislaw.gruszka@linux.intel.com>
+ <20240209120625.1775017-3-stanislaw.gruszka@linux.intel.com>
+ <20240209102858.51b06efc@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,30 +81,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240209124536.75599e91@kernel.org>
+In-Reply-To: <20240209102858.51b06efc@kernel.org>
 
-On Fri, Feb 09, 2024 at 12:45:36PM -0800, Jakub Kicinski wrote:
-> On Wed,  7 Feb 2024 10:51:11 +0100 Stanislaw Gruszka wrote:
-> > Introducing runtime resume before ndo_open and ethtool ops by commits:
-> > 
-> > d43c65b05b84 ("ethtool: runtime-resume netdev parent in ethnl_ops_begin")
-> > bd869245a3dc ("net: core: try to runtime-resume detached device in __dev_open")
+On Fri, Feb 09, 2024 at 10:28:58AM -0800, Jakub Kicinski wrote:
+> On Fri,  9 Feb 2024 13:06:24 +0100 Stanislaw Gruszka wrote:
+> > @@ -48,6 +64,15 @@ static inline int thermal_notify_tz_create(const struct thermal_zone_device *tz)
+> >  	return 0;
+> >  }
+> >  
+> > +int thermal_genl_register_notifier(struct notifier_block *nb)
+> > +{
+> > +	return 0;
+> > +}
+> > +
+> > +int thermal_genl_unregister_notifier(struct notifier_block *nb)
+> > +{
+> > +	return 0;
+> > +}
 > 
-> We should revisit whether core should try to help drivers with PM
-> or not once the Intel drivers are fixed. Taking the global networking
-> lock from device resume routine is inexcusable.
+> static inline :)
 
-Ok, we need get rid of it in igc (and fix broken assertion in igb).
-
-> I really don't want to
-> make precedents for adjusting the core because driver code is poor
-> quality :(
-
-I see this rather as removal of special core adjustment added
-by above commits. It's only needed for r8169. For all others
-it is just pure harm. It could be done without the priv flag,
-but then r8169 probably would need changes.
-
+Going to fix this in next respin.
+ 
 Regards
 Stanislaw
+> 
 
