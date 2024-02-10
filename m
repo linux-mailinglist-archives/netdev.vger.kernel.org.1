@@ -1,88 +1,159 @@
-Return-Path: <netdev+bounces-70777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8D4F8505CB
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 18:50:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7B3E8505F4
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 19:21:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A01B1F24E7D
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 17:50:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3EB36B22E9F
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 18:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB99F5D478;
-	Sat, 10 Feb 2024 17:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B85D5C8E3;
+	Sat, 10 Feb 2024 18:20:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JO/Va7Jq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LzovAZFL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C84F05D468
-	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 17:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870D05EE61
+	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 18:20:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707587427; cv=none; b=PUpWQjcDwUrJ8SIykKgYPPTSQSWMKLRHrbU2gJcvoik/j9KvZPdjFhGJHx9Ao47rjbF8Gw27T1f4cb9YQYVQNawJUN28dxkh8gziaKf4S1qV+pMQKR2ZA/pDRgS4NGksMUBDhHuOqEiGyRUudpptOrzr/CecB+w06gmjEfW9HvQ=
+	t=1707589256; cv=none; b=ED+371X6C/9PUnWk7OXTwt3QvKYlD8JEECr8LAz//qDA7qVDloIIEVZq2hOKV4MwB8Ka+mzBrKXeKxphdkcx/OyfwDsB/38Hn27rp2bBIyVbB9Vz3Mu7LP7jNcBgYQ55fqzKTT9TD1jgnLmmfUyxmhR/h03QodsyQHo2lcS/Oyc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707587427; c=relaxed/simple;
-	bh=DHGLSL3CQJIdRpDLztqJgC7Ue0voMjHRKtRM3MIamvo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=nP8hsZ52xLRGtrvCObploY+w2vZMc4e/fC1NWqWoMdKUQ/hxjy4noqAgOY2Fumzh9eN3dhMIac4FKFLhkWvaf3ZHjkqAWaYA8SEAFT7VZQXBJ0jZcJFALUsre5HOJD+nc+WVmdOC+YxsN3oc0r4Fodlme4LU0fZ2SZJ8Ff0SQIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JO/Va7Jq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 520E6C43394;
-	Sat, 10 Feb 2024 17:50:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707587427;
-	bh=DHGLSL3CQJIdRpDLztqJgC7Ue0voMjHRKtRM3MIamvo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=JO/Va7JqoDY8u/BeS7BAa06izZYUo2DLnxqb/CmMKNvYY/CBss2UrIr6yhPsgaGY0
-	 JM6I6u8VDKKnHMMw0jyqpHgN6R5tAzuJB6JGanX0GuaF3IYbCkyj7RAqOeQDwUlQc7
-	 GG6mDZhboDqLBn4b396a4qb6Oni45+paKK9KzjSLUmFJbr9XqCBY4zzB+wbGsYoXmj
-	 iR2BTBe0f/Zgm1ByEJQat6b8urpJScgyUXK24YZwDw3ALMqV9Bxrz01NzEu6wJj/TP
-	 vdBh/1RqKs+1iQrjCCGdOfO4cu4R9sPZ76kEs/JP4U2Ug0B/rtRhwIvZck2vJHj1ea
-	 JTf4JWxluJeKg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 38664D8C98B;
-	Sat, 10 Feb 2024 17:50:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1707589256; c=relaxed/simple;
+	bh=8GZzRk5xeM6x3+8tNiKdRlaycacYhtiviwWTOkYi98A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EuFPTBlIQt6ioxms8PMZwjHqzz6uYln1VTOK+g26kz+o9P2U6W4xg0zkLsVffKIGRxUtlYt0kC2YLEdzrwaUusM37lc76AuCnSSAQnu7dnX35tSJVIxoZDd+0cJO0xKn8czYjzmm+NQSuwqdz9sq4+xI3yaa2b2qEWfIFzH59Dg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LzovAZFL; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d89f0ab02bso84065ad.1
+        for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 10:20:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1707589254; x=1708194054; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eM006jnqNS27XuEOTjcgkm/RwDZ/M1MwHFHZhtbdXGU=;
+        b=LzovAZFLOhg4Kfxc8Mu4rNketxYLOaiTEZNFOeA/7QqzkzKldPuyFVLwQYpgJzSVvq
+         916FiCSNbv1BKPXv6V30aUR039HurXNN4TYNzfI2CG8+DhmPpjf5GwfutZgKR6lW8epL
+         1ohbeUSTvLz3uds4k5hR9VDJziftHbnF18DOXoAro/pG14YJZPAX+2oacJcabK17EXub
+         sBp2i0HXeLpKcep4XbkMePDLqrZfOI4Z5ttRIs156qV7w7reuMK1+rKBRYilGaWFXk4x
+         OMzVc3doukrf3BHSfTzsAlAD9icKL7unhdnHpcNfG5cNgkrdwpPEe0khPMCsF3CbQVD6
+         9f6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707589254; x=1708194054;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eM006jnqNS27XuEOTjcgkm/RwDZ/M1MwHFHZhtbdXGU=;
+        b=TDIhXkHUE0Mm/QpF17exJIp5dq60Axyg6C1X12staG142KoRfVlEanyoPbYwVG5QFh
+         NrvPaLuuoPZAT6vWnvva6HKfZ4ZxKk1SAif3Y2MjpgGOUxSa1ixg1tnrYga6/zKPKDty
+         /M61vhgK3GLWPZ2yII56HJHPYu6v9BGzqyZGQ0HLF4iKgcu0LXEoqK6nj1lAXTjuJ6Wh
+         QYL8+gJZA4ZS2WHio7+rU7aGpBTtITvd/5OX7IJ9or2RjYzqO8o4I4KuCKIC2HKmMqIj
+         iM/E1ZRVVdBPqUkh45DSx8rie4O61IteL4lRG0oCRbmhVHnnsg0VCxEoSJhzg+Hdcf3x
+         GF8w==
+X-Forwarded-Encrypted: i=1; AJvYcCV3PYFWkrEwlm8vtuXYy1/qgHIvzYVDl+AigQN+FInve2IscEi0hK8LnvtvKh9E0InKud6qbii1e1yDWA587Mrg3hh1hO0x
+X-Gm-Message-State: AOJu0YzampbGlkKGhzt/fsVKQSZNxtRYmBWGyZfvxz+bwnU8Nop1eCSs
+	rt1uGgywtRg9aXwhhqlMpyJu9ymFF6QrjlsebaBWW8xjScLM8ILDZrBJWxvHR49gJDjcwsHhnX/
+	DnAuX/waFaBYFgDSU/r7ACpyU+M4wFjlVrGDXckVsdw0A8BVgRIJJ
+X-Google-Smtp-Source: AGHT+IFn7VS0qUFcuTAoirS2l2uHvveeU/0a+FF/US7LvcwIJrfLKB4uRaqoY6MiHCwKDFll3QKuRX/y6TmKUXIR9j8=
+X-Received: by 2002:a17:903:6cd:b0:1d8:ffbe:82d0 with SMTP id
+ kj13-20020a17090306cd00b001d8ffbe82d0mr97706plb.12.1707589253533; Sat, 10 Feb
+ 2024 10:20:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2] tc: Support json option in tc-fw.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170758742722.9212.7117414751285405568.git-patchwork-notify@kernel.org>
-Date: Sat, 10 Feb 2024 17:50:27 +0000
-References: <0106018d8e3feccb-51048e17-d81c-4a1b-97cb-bc3809ad3eca-000000@ap-northeast-1.amazonses.com>
-In-Reply-To: <0106018d8e3feccb-51048e17-d81c-4a1b-97cb-bc3809ad3eca-000000@ap-northeast-1.amazonses.com>
-To: Takanori Hirano <me@hrntknr.net>
-Cc: netdev@vger.kernel.org, stephen@networkplumber.org
+References: <20240205104049.48900-1-christianshewitt@gmail.com>
+In-Reply-To: <20240205104049.48900-1-christianshewitt@gmail.com>
+From: Grant Grundler <grundler@google.com>
+Date: Sat, 10 Feb 2024 10:20:39 -0800
+Message-ID: <CANEJEGuVPfdteBfY_LyQ+D=t4HGHLvDut-Vj2xFjRM4e8kgh=Q@mail.gmail.com>
+Subject: Re: [PATCH 1/2] net: asix: add 0b95:1790 to AX88179A device list
+To: Christian Hewitt <christianshewitt@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Grant Grundler <grundler@chromium.org>, linux-usb@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
-
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
-
-On Fri, 9 Feb 2024 14:22:50 +0000 you wrote:
-> Fix json corruption when using the "-json" option in cases where tc-fw is set.
-> 
-> Signed-off-by: Takanori Hirano <me@hrntknr.net>
+On Mon, Feb 5, 2024 at 2:40=E2=80=AFAM Christian Hewitt
+<christianshewitt@gmail.com> wrote:
+>
+> Add a generic AX88179A entry for the 0b95:1790 device id:
+>
+> kernel: usb 2-1: New USB device found, idVendor=3D0b95, idProduct=3D1790,=
+ bcdDevice=3D 2.00
+> kernel: usb 2-1: New USB device strings: Mfr=3D1, Product=3D2, SerialNumb=
+er=3D3
+> kernel: usb 2-1: Product: AX88179A
+> kernel: usb 2-1: Manufacturer: ASIX
+> kernel: usb 2-1: SerialNumber: 00D24DC0
+> kernel: asix 2-1:1.0 (unnamed net_device) (uninitialized): Failed to read=
+ reg index 0x0000: -32
+> kernel: asix: probe of 2-1:1.0 failed with error -32
+> kernel: ax88179_178a 2-1:1.0 (unnamed net_device) (uninitialized): Failed=
+ to read reg index 0x0040: -32
+> kernel: ax88179_178a 2-1:1.0 eth1: register 'ax88179_178a' at usb-0000:01=
+:00.0-1, ASIX AX88179 USB 3.0 Gigabit Ethernet, 20:7b:d2:d2:4d:c0
+>
+> Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
 > ---
->  tc/f_fw.c | 22 +++++++++++++++-------
->  1 file changed, 15 insertions(+), 7 deletions(-)
+> The change is tested by a LibreELEC (distro) user who reports the NIC to =
+be working
+> fine (and logs support this) but the "Failed to read reg index 0x0000: -3=
+2" errors
+> suggest ax88178_info might not be the correct choice. I'm not a serious c=
+oder so I
+> need to "ask the audience" for suggestions on what more might be needed?
+>
+>  drivers/net/usb/asix_devices.c | 4 ++++
+>  1 file changed, 4 insertions(+)
+>
+> diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_device=
+s.c
+> index f7cff58fe044..9a7b1136cd98 100644
+> --- a/drivers/net/usb/asix_devices.c
+> +++ b/drivers/net/usb/asix_devices.c
+> @@ -1506,6 +1506,10 @@ static const struct usb_device_id        products =
+[] =3D {
+>         // ASIX AX88178 10/100/1000
+>         USB_DEVICE (0x0b95, 0x1780),
+>         .driver_info =3D (unsigned long) &ax88178_info,
+> +}, {
+> +       // ASIX AX88179A 10/100/1000
+> +       USB_DEVICE(0x0b95, 0x1790),
+> +       .driver_info =3D (unsigned long)&ax88178_info,
+>  }, {
 
-Here is the summary with links:
-  - [iproute2] tc: Support json option in tc-fw.
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=49a8b895adb4
+Hi Christian!
+Seems like there are two problems here:
+1) The USB output is telling you this device is a AX88179A : the
+changes most likely should be in ax88179_178a.c using the
+ax881798_info:
+   https://elixir.bootlin.com/linux/latest/source/drivers/net/usb/ax88179_1=
+78a.c#L1690
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+2) What Andrew Lunn said. I'll add the asix driver should not be
+probing (or claiming) this device - or at least be quiet about it when
+it does.
 
+Thanks for looking into this!
 
+cheers,
+grant
+
+>         // Logitec LAN-GTJ/U2A
+>         USB_DEVICE (0x0789, 0x0160),
+> --
+> 2.34.1
+>
 
