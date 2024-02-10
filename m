@@ -1,484 +1,183 @@
-Return-Path: <netdev+bounces-70725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2A7685021A
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 03:10:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3234385021C
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 03:10:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 37E3CB22692
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 02:10:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D7BAB1F24EE4
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 02:10:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A5A64414;
-	Sat, 10 Feb 2024 02:10:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="c0uVfu/K"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31259442D;
+	Sat, 10 Feb 2024 02:10:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EFE34405
-	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 02:10:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5895B2F5E;
+	Sat, 10 Feb 2024 02:10:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707531011; cv=none; b=DrgjL9UBaNvv8tz6FfB/Opz5ZDWt6a+VZX7vQqtMYjxiHL3RafGPGqHJpxN8Rc4wugrWOwGsinIbpxmEUcJZWHaIT4ENsH1kmorzW9tldnUGA+4LmV/4NWOMZ+yQqvA9/1xaO9qy8pPGCLsLvP5EE1HxqC4z+/i0OvpioNG0Na4=
+	t=1707531040; cv=none; b=kK/C76xSDP+flF0cUS/DruQ4rkKYdvuhUMk87CJXfv8s4V9YnbDbUa5RV2FlCfk4C/FSyY/11xb62kawO+SC79MkZE5qIlkZY9vcF7Dx5+ZFhF8EW/ueCUBvOTOgrN0j7Hjp4N+4+B4wLTrQgQJl9nWILgbGMfW4JOn+O7njHC4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707531011; c=relaxed/simple;
-	bh=fLgeJ7EXIuki7yDq2VZpQSWedocXdbs1uC+OWXjr+BA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LVU9GFvjMrVgyjKpw7LAn/E+bG7H7SgmC+EjJG5D14fhY5704w4hzH4pUJjizLMtflAG5cHgnXFitqEdGciE4bVxzQOji3itAsoSrsU1qPzIn1cpPxui9nBOEGTwJne1kMNNl9vlAJ1ER8uUgJNqHzUDprXWDKMzewKvntLvHs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=c0uVfu/K; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1707531009; x=1739067009;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=fLgeJ7EXIuki7yDq2VZpQSWedocXdbs1uC+OWXjr+BA=;
-  b=c0uVfu/Kn1PLGoDuGjRUNsZKb8THSijjJoqOB3LKCBm7HFM4FbFvC+tb
-   OkBHWfjD5+Vo5Tz7+xIZUwZb7oBAtl91bTzR1cCL6AVc4MCdeJyz2gX3q
-   pI2X85sCje190nPEBV5rLeKQGD04gdXfFyF72d4OujyAlfqA5hM95ztBq
-   N+lUb+Z+IEnodbKcSA2amWYyxsb4RKQwqYOQjtrYUaTHUe7C9lDMr45ch
-   S44Sw41B2X9Xq96uHZ4jTUS8sVeVjwNGVf7TRnrz3KUKoeLNPQ8/TuJkC
-   IQaX4sTGCj+q5saMBL691E+1VxNUcSD4ZQ1EXwb9gTuOgtCaGbDDuaM4j
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10979"; a="12913550"
-X-IronPort-AV: E=Sophos;i="6.05,258,1701158400"; 
-   d="scan'208";a="12913550"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2024 18:10:08 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.05,258,1701158400"; 
-   d="scan'208";a="6739958"
-Received: from jbrandeb-coyote30.jf.intel.com ([10.166.29.19])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2024 18:10:07 -0800
-From: Jesse Brandeburg <jesse.brandeburg@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	netdev@vger.kernel.org,
-	Ariel Elior <aelior@marvell.com>,
-	Sudarsana Kalluru <skalluru@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Raju Rangoju <rajur@chelsio.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Jay Vosburgh <jay.vosburgh@canonical.com>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Maxim Georgiev <glipus@gmail.com>,
-	Emeel Hakim <ehakim@nvidia.com>,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: [PATCH RFC net-next v1] net: rework FCOE and RFS ops
-Date: Fri,  9 Feb 2024 18:09:57 -0800
-Message-Id: <20240210021000.2011419-1-jesse.brandeburg@intel.com>
-X-Mailer: git-send-email 2.39.3
+	s=arc-20240116; t=1707531040; c=relaxed/simple;
+	bh=HDOgeXlUHEgM9vTjTQLsfbk5p5B3FO4OXr8K1LaBoc4=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=pO3bPkVRqPLy5k1bSuu7ydpp6Zlj60S3WVb8dVauciPSxTR3ima9iclpeZADX0pDgPWNhyCk5/GV7vBcK71TkftNsEiQwet8Rapim825uOsnPnPK452xCirVeJbSqcYitmLT1NHktv3eXH27Ls0+JbbLQR5c2fr9jg8hxtmyut4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1rYcoq-0001TQ-1c;
+	Sat, 10 Feb 2024 02:10:16 +0000
+Date: Sat, 10 Feb 2024 02:10:08 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Bc-bocun Chen <bc-bocun.chen@mediatek.com>,
+	Steven Liu <steven.liu@mediatek.com>,
+	John Crispin <john@phrozen.org>,
+	Chunfeng Yun <chunfeng.yun@mediatek.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v3 1/2] dt-bindings: phy: mediatek,mt7988-xfi-tphy: add new
+ bindings
+Message-ID: <745f8b46f676e94c1a396df8c46aefe0e8b4771c.1707530671.git.daniel@makrotopia.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-[ Sent as RFC to gauge whether this is better than what we have ]
+Add bindings for the MediaTek XFI Ethernet SerDes T-PHY found in the
+MediaTek MT7988 SoC which can operate at various interfaces modes:
 
-As demonstrated with the macros in include/linux/pm.h, from commit
-1a3c7bb08826 ("PM: core: Add new *_PM_OPS macros, deprecate old ones"),
-the networking layer can benefit from some of the same logic to remove
-ifdef CONFIG_FOO blocks from code and move the complicated management of
-=y and =m variants causing "unused function" warnings from the
-developer, and put them into the header file.
+via USXGMII PCS:
+ * USXGMII
+ * 10GBase-R
+ * 5GBase-R
 
-This adds several new helpers for drivers to use instead of ifdefs
-SET_FCOE_OPS()
-SET_FCOE_GET_WWN_OPS()
-SET_RFS_ACCEL_OPS()
+via LynxI SGMII PCS:
+ * 2500Base-X
+ * 1000Base-X
+ * Cisco SGMII (MAC side)
 
-And the idea is that you can get rid of #ifdef CONFIG_BLAH around the
-declarations of these functions that are only called from an ops
-pointer, and you can declare the population of the ops members with the
-new macros which avoid filling in values when the ifdef is not enabled.
-
-NOTE:
-There is a bunch of code in ixgbe under IXGBE_FCOE defines which is only
-defined when CONFIG_FCOE is defined, but I didn't want to fix hundreds
-of those so just left most of them.
-
-Signed-off-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
+Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
 ---
- .../net/ethernet/broadcom/bnx2x/bnx2x_cmn.c   |  2 --
- .../net/ethernet/broadcom/bnx2x/bnx2x_cmn.h   |  2 --
- .../net/ethernet/broadcom/bnx2x/bnx2x_main.c  |  5 +--
- .../net/ethernet/chelsio/cxgb4/cxgb4_main.c   |  4 +--
- drivers/net/ethernet/intel/ice/ice_arfs.h     |  8 -----
- drivers/net/ethernet/intel/ice/ice_main.c     |  4 +--
- drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  7 ----
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 21 +++++-------
- .../net/ethernet/intel/ixgbe/ixgbe_sriov.c    |  8 ++---
- include/linux/netdevice.h                     | 34 +++++++++++++++++--
- net/8021q/vlan_dev.c                          | 18 +++-------
- 11 files changed, 49 insertions(+), 64 deletions(-)
+v3: Add reference to MediaTek-internal "pextp" name, better explain reset as
+    well as 10GBase-R tuning work-around.
+v2: unify filename and compatible as requested
 
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
-index e9c1e1bb5580..0300e40c7ca6 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.c
-@@ -4860,7 +4860,6 @@ int bnx2x_get_link_cfg_idx(struct bnx2x *bp)
- 	return LINK_CONFIG_IDX(sel_phy_idx);
- }
- 
--#ifdef NETDEV_FCOE_WWNN
- int bnx2x_fcoe_get_wwn(struct net_device *dev, u64 *wwn, int type)
- {
- 	struct bnx2x *bp = netdev_priv(dev);
-@@ -4882,7 +4881,6 @@ int bnx2x_fcoe_get_wwn(struct net_device *dev, u64 *wwn, int type)
- 
- 	return 0;
- }
--#endif
- 
- /* called with rtnl_lock */
- int bnx2x_change_mtu(struct net_device *dev, int new_mtu)
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
-index d8b1824c334d..afcef4a4d680 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_cmn.h
-@@ -594,7 +594,6 @@ void bnx2x_free_mem_bp(struct bnx2x *bp);
-  */
- int bnx2x_change_mtu(struct net_device *dev, int new_mtu);
- 
--#ifdef NETDEV_FCOE_WWNN
- /**
-  * bnx2x_fcoe_get_wwn - return the requested WWN value for this port
-  *
-@@ -604,7 +603,6 @@ int bnx2x_change_mtu(struct net_device *dev, int new_mtu);
-  *
-  */
- int bnx2x_fcoe_get_wwn(struct net_device *dev, u64 *wwn, int type);
--#endif
- 
- netdev_features_t bnx2x_fix_features(struct net_device *dev,
- 				     netdev_features_t features);
-diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-index 0d8e61c63c7c..e2795a6047b8 100644
---- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-+++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_main.c
-@@ -13030,10 +13030,7 @@ static const struct net_device_ops bnx2x_netdev_ops = {
- 	.ndo_get_vf_config	= bnx2x_get_vf_config,
- 	.ndo_set_vf_spoofchk	= bnx2x_set_vf_spoofchk,
- #endif
--#ifdef NETDEV_FCOE_WWNN
--	.ndo_fcoe_get_wwn	= bnx2x_fcoe_get_wwn,
--#endif
--
-+	SET_FCOE_GET_WWN_OPS(bnx2x_fcoe_get_wwn)
- 	.ndo_get_phys_port_id	= bnx2x_get_phys_port_id,
- 	.ndo_set_vf_link_state	= bnx2x_set_vf_link_state,
- 	.ndo_features_check	= bnx2x_features_check,
-diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-index 2eb33a727bba..48dd7c89374d 100644
---- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-+++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_main.c
-@@ -3877,8 +3877,8 @@ static const struct net_device_ops cxgb4_netdev_ops = {
- 	.ndo_poll_controller  = cxgb_netpoll,
- #endif
- #ifdef CONFIG_CHELSIO_T4_FCOE
--	.ndo_fcoe_enable      = cxgb_fcoe_enable,
--	.ndo_fcoe_disable     = cxgb_fcoe_disable,
-+	SET_FCOE_OPS(cxgb_fcoe_enable, cxgb_fcoe_disable,
-+		     NULL, NULL, NULL, NULL)
- #endif /* CONFIG_CHELSIO_T4_FCOE */
- 	.ndo_set_tx_maxrate   = cxgb_set_tx_maxrate,
- 	.ndo_setup_tc         = cxgb_setup_tc,
-diff --git a/drivers/net/ethernet/intel/ice/ice_arfs.h b/drivers/net/ethernet/intel/ice/ice_arfs.h
-index 9669ad9bf7b5..e09fff33fcdd 100644
---- a/drivers/net/ethernet/intel/ice/ice_arfs.h
-+++ b/drivers/net/ethernet/intel/ice/ice_arfs.h
-@@ -67,14 +67,6 @@ static inline int ice_set_cpu_rx_rmap(struct ice_vsi __always_unused *vsi)
- 	return 0;
- }
- 
--static inline int
--ice_rx_flow_steer(struct net_device __always_unused *netdev,
--		  const struct sk_buff __always_unused *skb,
--		  u16 __always_unused rxq_idx, u32 __always_unused flow_id)
--{
--	return -EOPNOTSUPP;
--}
--
- static inline bool
- ice_is_arfs_using_perfect_flow(struct ice_hw __always_unused *hw,
- 			       enum ice_fltr_ptype __always_unused flow_type)
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index dd4a9bc0dfdc..970bf53b4823 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -9516,11 +9516,9 @@ static const struct net_device_ops ice_netdev_ops = {
- 	.ndo_bridge_setlink = ice_bridge_setlink,
- 	.ndo_fdb_add = ice_fdb_add,
- 	.ndo_fdb_del = ice_fdb_del,
--#ifdef CONFIG_RFS_ACCEL
--	.ndo_rx_flow_steer = ice_rx_flow_steer,
--#endif
- 	.ndo_tx_timeout = ice_tx_timeout,
- 	.ndo_bpf = ice_xdp,
- 	.ndo_xdp_xmit = ice_xdp_xmit,
- 	.ndo_xsk_wakeup = ice_xsk_wakeup,
-+	SET_RFS_ACCEL_OPS(ice_rx_flow_steer)
- };
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-index b6f0376e42f4..1459dced175e 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-@@ -406,10 +406,7 @@ enum ixgbe_ring_f_enum {
- 	RING_F_VMDQ,  /* SR-IOV uses the same ring feature */
- 	RING_F_RSS,
- 	RING_F_FDIR,
--#ifdef IXGBE_FCOE
- 	RING_F_FCOE,
--#endif /* IXGBE_FCOE */
--
- 	RING_F_ARRAY_SIZE      /* must be last in enum set */
- };
- 
-@@ -567,10 +564,8 @@ static inline u16 ixgbe_desc_unused(struct ixgbe_ring *ring)
- 	(&(((struct ixgbe_adv_tx_context_desc *)((R)->desc))[i]))
- 
- #define IXGBE_MAX_JUMBO_FRAME_SIZE	9728 /* Maximum Supported Size 9.5KB */
--#ifdef IXGBE_FCOE
- /* Use 3K as the baby jumbo frame size for FCoE */
- #define IXGBE_FCOE_JUMBO_FRAME_SIZE       3072
--#endif /* IXGBE_FCOE */
- 
- #define OTHER_VECTOR 1
- #define NON_Q_VECTORS (OTHER_VECTOR)
-@@ -980,7 +975,6 @@ void ixgbe_do_reset(struct net_device *netdev);
- void ixgbe_sysfs_exit(struct ixgbe_adapter *adapter);
- int ixgbe_sysfs_init(struct ixgbe_adapter *adapter);
- #endif /* CONFIG_IXGBE_HWMON */
--#ifdef IXGBE_FCOE
- void ixgbe_configure_fcoe(struct ixgbe_adapter *adapter);
- int ixgbe_fso(struct ixgbe_ring *tx_ring, struct ixgbe_tx_buffer *first,
- 	      u8 *hdr_len);
-@@ -999,7 +993,6 @@ int ixgbe_fcoe_get_wwn(struct net_device *netdev, u64 *wwn, int type);
- int ixgbe_fcoe_get_hbainfo(struct net_device *netdev,
- 			   struct netdev_fcoe_hbainfo *info);
- u8 ixgbe_fcoe_get_tc(struct ixgbe_adapter *adapter);
--#endif /* IXGBE_FCOE */
- #ifdef CONFIG_DEBUG_FS
- void ixgbe_dbg_adapter_init(struct ixgbe_adapter *adapter);
- void ixgbe_dbg_adapter_exit(struct ixgbe_adapter *adapter);
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index bd541527c8c7..8c9265a04dc6 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -10416,14 +10416,11 @@ static const struct net_device_ops ixgbe_netdev_ops = {
- 	.ndo_setup_tc		= __ixgbe_setup_tc,
- #ifdef IXGBE_FCOE
- 	.ndo_select_queue	= ixgbe_select_queue,
--	.ndo_fcoe_ddp_setup = ixgbe_fcoe_ddp_get,
--	.ndo_fcoe_ddp_target = ixgbe_fcoe_ddp_target,
--	.ndo_fcoe_ddp_done = ixgbe_fcoe_ddp_put,
--	.ndo_fcoe_enable = ixgbe_fcoe_enable,
--	.ndo_fcoe_disable = ixgbe_fcoe_disable,
--	.ndo_fcoe_get_wwn = ixgbe_fcoe_get_wwn,
--	.ndo_fcoe_get_hbainfo = ixgbe_fcoe_get_hbainfo,
- #endif /* IXGBE_FCOE */
-+	SET_FCOE_OPS(ixgbe_fcoe_enable, ixgbe_fcoe_disable,
-+		     ixgbe_fcoe_ddp_target, ixgbe_fcoe_ddp_get,
-+		     ixgbe_fcoe_ddp_put, ixgbe_fcoe_get_hbainfo)
-+	SET_FCOE_GET_WWN_OPS(ixgbe_fcoe_get_wwn)
- 	.ndo_set_features = ixgbe_set_features,
- 	.ndo_fix_features = ixgbe_fix_features,
- 	.ndo_fdb_add		= ixgbe_ndo_fdb_add,
-@@ -10761,9 +10758,6 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	u8 part_str[IXGBE_PBANUM_LENGTH];
- 	int i, err, expected_gts;
- 	bool disable_dev = false;
--#ifdef IXGBE_FCOE
--	u16 device_caps;
--#endif
- 	u32 eec;
- 
- 	/* Catch broken hardware that put the wrong VF device ID in
-@@ -11012,9 +11006,10 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 		netdev->dcbnl_ops = &ixgbe_dcbnl_ops;
- #endif
- 
--#ifdef IXGBE_FCOE
--	if (adapter->flags & IXGBE_FLAG_FCOE_CAPABLE) {
-+	if (IS_ENABLED(CONFIG_FCOE) &&
-+	    adapter->flags & IXGBE_FLAG_FCOE_CAPABLE) {
- 		unsigned int fcoe_l;
-+		u16 device_caps;
- 
- 		if (hw->mac.ops.get_device_caps) {
- 			hw->mac.ops.get_device_caps(hw, &device_caps);
-@@ -11033,7 +11028,7 @@ static int ixgbe_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 					 NETIF_F_FCOE_CRC |
- 					 NETIF_F_FCOE_MTU;
- 	}
--#endif /* IXGBE_FCOE */
+ .../phy/mediatek,mt7988-xfi-tphy.yaml         | 80 +++++++++++++++++++
+ 1 file changed, 80 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/phy/mediatek,mt7988-xfi-tphy.yaml
+
+diff --git a/Documentation/devicetree/bindings/phy/mediatek,mt7988-xfi-tphy.yaml b/Documentation/devicetree/bindings/phy/mediatek,mt7988-xfi-tphy.yaml
+new file mode 100644
+index 0000000000000..c0ab444f9c687
+--- /dev/null
++++ b/Documentation/devicetree/bindings/phy/mediatek,mt7988-xfi-tphy.yaml
+@@ -0,0 +1,80 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/phy/mediatek,mt7988-xfi-tphy.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
- 	if (adapter->flags2 & IXGBE_FLAG2_RSC_CAPABLE)
- 		netdev->hw_features |= NETIF_F_LRO;
- 	if (adapter->flags2 & IXGBE_FLAG2_RSC_ENABLED)
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-index 7299a830f6e4..683a68a43bd2 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_sriov.c
-@@ -494,12 +494,10 @@ static int ixgbe_set_vf_lpe(struct ixgbe_adapter *adapter, u32 max_frame, u32 vf
- 		u32 reg_offset, vf_shift, vfre;
- 		s32 err = 0;
- 
--#ifdef CONFIG_FCOE
--		if (dev->features & NETIF_F_FCOE_MTU)
-+		if (IS_ENABLED(CONFIG_FCOE) && dev->features & NETIF_F_FCOE_MTU)
- 			pf_max_frame = max_t(int, pf_max_frame,
- 					     IXGBE_FCOE_JUMBO_FRAME_SIZE);
- 
--#endif /* CONFIG_FCOE */
- 		switch (adapter->vfinfo[vf].vf_api) {
- 		case ixgbe_mbox_api_11:
- 		case ixgbe_mbox_api_12:
-@@ -856,11 +854,9 @@ static void ixgbe_set_vf_rx_tx(struct ixgbe_adapter *adapter, int vf)
- 		struct net_device *dev = adapter->netdev;
- 		int pf_max_frame = dev->mtu + ETH_HLEN;
- 
--#if IS_ENABLED(CONFIG_FCOE)
--		if (dev->features & NETIF_F_FCOE_MTU)
-+		if (IS_ENABLED(CONFIG_FCOE) && dev->features & NETIF_F_FCOE_MTU)
- 			pf_max_frame = max_t(int, pf_max_frame,
- 					     IXGBE_FCOE_JUMBO_FRAME_SIZE);
--#endif /* CONFIG_FCOE */
- 
- 		if (pf_max_frame > ETH_FRAME_LEN)
- 			reg_req_rx = reg_cur_rx & ~(1 << vf_shift);
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 118c40258d07..22ae80271e57 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -869,7 +869,6 @@ struct netdev_tc_txq {
- 	u16 offset;
- };
- 
--#if defined(CONFIG_FCOE) || defined(CONFIG_FCOE_MODULE)
- /*
-  * This structure is to hold information about the device
-  * configured to run FCoE protocol stack.
-@@ -884,7 +883,6 @@ struct netdev_fcoe_hbainfo {
- 	char	model[256];
- 	char	model_description[256];
- };
--#endif
- 
- #define MAX_PHYS_ITEM_ID_LEN 32
- 
-@@ -1549,9 +1547,9 @@ struct net_device_ops {
- 							struct netdev_fcoe_hbainfo *hbainfo);
- #endif
- 
--#if IS_ENABLED(CONFIG_LIBFCOE)
- #define NETDEV_FCOE_WWNN 0
- #define NETDEV_FCOE_WWPN 1
-+#if IS_ENABLED(CONFIG_LIBFCOE)
- 	int			(*ndo_fcoe_get_wwn)(struct net_device *dev,
- 						    u64 *wwn, int type);
- #endif
-@@ -1681,6 +1679,36 @@ struct net_device_ops {
- 						    struct netlink_ext_ack *extack);
- };
- 
-+#define rfs_accel_ptr(_ptr) PTR_IF(IS_ENABLED(CONFIG_RFS_ACCEL), (_ptr))
++title: MediaTek MT7988 XFI T-PHY
 +
-+#if IS_ENABLED(CONFIG_RFS_ACCEL)
-+#define SET_RFS_ACCEL_OPS(flow_fn) \
-+	.ndo_rx_flow_steer = rfs_accel_ptr(flow_fn),
-+#else
-+#define SET_RFS_ACCEL_OPS(flow_fn)
-+#endif
++maintainers:
++  - Daniel Golle <daniel@makrotopia.org>
 +
-+#define fcoe_ptr(_ptr) PTR_IF(IS_ENABLED(CONFIG_FCOE), (_ptr))
-+#if IS_ENABLED(CONFIG_FCOE)
-+#define SET_FCOE_OPS(enable_fn, disable_fn, ddp_target_fn, ddp_setup_fn, ddp_done_fn, get_hbainfo_fn) \
-+	.ndo_fcoe_enable = fcoe_ptr(enable_fn), \
-+	.ndo_fcoe_disable = fcoe_ptr(disable_fn), \
-+	.ndo_fcoe_ddp_target = fcoe_ptr(ddp_target_fn), \
-+	.ndo_fcoe_ddp_setup = fcoe_ptr(ddp_setup_fn), \
-+	.ndo_fcoe_ddp_done = fcoe_ptr(ddp_done_fn), \
-+	.ndo_fcoe_get_hbainfo = fcoe_ptr(get_hbainfo_fn),
-+#else
-+#define SET_FCOE_OPS(enable_fn, disable_fn, ddp_setup_fn, ddp_done_fn, ddp_target_fn, get_hbainfo_fn)
-+#endif /* CONFIG_FCOE */
++description:
++  The MediaTek XFI SerDes T-PHY provides the physical SerDes lanes
++  used by the (10G/5G) USXGMII PCS and (1G/2.5G) LynxI PCS found in
++  MediaTek's 10G-capabale MT7988 SoC.
++  In MediaTek's SDK sources, this unit is referred to as "pextp".
 +
-+#define fcoe_wwn_ptr(_ptr) PTR_IF(IS_ENABLED(CONFIG_LIBFCOE), (_ptr))
-+#if IS_ENABLED(CONFIG_LIBFCOE)
-+#define SET_FCOE_GET_WWN_OPS(get_wwn_fn) \
-+	.ndo_fcoe_get_wwn = fcoe_wwn_ptr(get_wwn_fn),
-+#else
-+#define SET_FCOE_GET_WWN_OPS(get_wwn_fn)
-+#endif /* CONFIG_LIBFCOE */
++properties:
++  compatible:
++    const: mediatek,mt7988-xfi-tphy
 +
- /**
-  * enum netdev_priv_flags - &struct net_device priv_flags
-  *
-diff --git a/net/8021q/vlan_dev.c b/net/8021q/vlan_dev.c
-index 407b2335f091..7b5cb64a839a 100644
---- a/net/8021q/vlan_dev.c
-+++ b/net/8021q/vlan_dev.c
-@@ -411,7 +411,6 @@ static int vlan_dev_neigh_setup(struct net_device *dev, struct neigh_parms *pa)
- 	return err;
- }
- 
--#if IS_ENABLED(CONFIG_FCOE)
- static int vlan_dev_fcoe_ddp_setup(struct net_device *dev, u16 xid,
- 				   struct scatterlist *sgl, unsigned int sgc)
- {
-@@ -471,9 +470,7 @@ static int vlan_dev_fcoe_ddp_target(struct net_device *dev, u16 xid,
- 
- 	return rc;
- }
--#endif
- 
--#ifdef NETDEV_FCOE_WWNN
- static int vlan_dev_fcoe_get_wwn(struct net_device *dev, u64 *wwn, int type)
- {
- 	struct net_device *real_dev = vlan_dev_priv(dev)->real_dev;
-@@ -484,7 +481,6 @@ static int vlan_dev_fcoe_get_wwn(struct net_device *dev, u64 *wwn, int type)
- 		rc = ops->ndo_fcoe_get_wwn(real_dev, wwn, type);
- 	return rc;
- }
--#endif
- 
- static void vlan_dev_change_rx_flags(struct net_device *dev, int change)
- {
-@@ -1065,16 +1061,10 @@ static const struct net_device_ops vlan_netdev_ops = {
- 	.ndo_eth_ioctl		= vlan_dev_ioctl,
- 	.ndo_neigh_setup	= vlan_dev_neigh_setup,
- 	.ndo_get_stats64	= vlan_dev_get_stats64,
--#if IS_ENABLED(CONFIG_FCOE)
--	.ndo_fcoe_ddp_setup	= vlan_dev_fcoe_ddp_setup,
--	.ndo_fcoe_ddp_done	= vlan_dev_fcoe_ddp_done,
--	.ndo_fcoe_enable	= vlan_dev_fcoe_enable,
--	.ndo_fcoe_disable	= vlan_dev_fcoe_disable,
--	.ndo_fcoe_ddp_target	= vlan_dev_fcoe_ddp_target,
--#endif
--#ifdef NETDEV_FCOE_WWNN
--	.ndo_fcoe_get_wwn	= vlan_dev_fcoe_get_wwn,
--#endif
-+	SET_FCOE_OPS(vlan_dev_fcoe_enable, vlan_dev_fcoe_disable,
-+		     vlan_dev_fcoe_ddp_target, vlan_dev_fcoe_ddp_setup,
-+		     vlan_dev_fcoe_ddp_done, NULL)
-+	SET_FCOE_GET_WWN_OPS(vlan_dev_fcoe_get_wwn)
- #ifdef CONFIG_NET_POLL_CONTROLLER
- 	.ndo_poll_controller	= vlan_dev_poll_controller,
- 	.ndo_netpoll_setup	= vlan_dev_netpoll_setup,
++  reg:
++    maxItems: 1
++
++  clocks:
++    items:
++      - description: XFI PHY clock
++      - description: XFI register clock
++
++  clock-names:
++    items:
++      - const: xfipll
++      - const: topxtal
++
++  resets:
++    items:
++      - description: Reset controller corresponding to the phy instance.
++
++  mediatek,usxgmii-performance-errata:
++    $ref: /schemas/types.yaml#/definitions/flag
++    description:
++      One instance of the T-PHY on MT7988 suffers from a performance
++      problem in 10GBase-R mode which needs a work-around in the driver.
++      This flag enables a work-around ajusting an analog phy setting and
++      is required for XFI Port0 of the MT7988 SoC to be in compliance with
++      the SFP specification.
++
++  "#phy-cells":
++    const: 0
++
++required:
++  - compatible
++  - reg
++  - clocks
++  - clock-names
++  - resets
++  - "#phy-cells"
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/clock/mediatek,mt7988-clk.h>
++    soc {
++      #address-cells = <2>;
++      #size-cells = <2>;
++
++      phy@11f20000 {
++        compatible = "mediatek,mt7988-xfi-tphy";
++        reg = <0 0x11f20000 0 0x10000>;
++        clocks = <&xfi_pll CLK_XFIPLL_PLL_EN>,
++                 <&topckgen CLK_TOP_XFI_PHY_0_XTAL_SEL>;
++        clock-names = "xfipll", "topxtal";
++        resets = <&watchdog 14>;
++        mediatek,usxgmii-performance-errata;
++        #phy-cells = <0>;
++      };
++    };
++
++...
 -- 
-2.39.3
-
+2.43.0
 
