@@ -1,126 +1,225 @@
-Return-Path: <netdev+bounces-70729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C948F85023D
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 03:46:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D39585027B
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 04:48:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C9D51F2589F
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 02:46:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E9E91C237CD
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 03:47:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34EDF442D;
-	Sat, 10 Feb 2024 02:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B27254C90;
+	Sat, 10 Feb 2024 03:47:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="FsV23qRh"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="nf82ab/H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from omta038.useast.a.cloudfilter.net (omta038.useast.a.cloudfilter.net [44.202.169.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5A62F22
-	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 02:46:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 597D9522F
+	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 03:47:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707533162; cv=none; b=H8AVVWa/L1SRneNiM1jE72sG5W80LB36Fe3HvQTfEp9YamKmVwlDZv/Grz8U2h0S2lEXTFfh6HjT9OO2A+nlx80WK3TNcTsTs2S5JO/Jw8cEKpkddVu45YCGnRJ3uiht0H9X5R/6JaqJRwdg0VVIRvTOb5DHEoB36DXFb0XBHwQ=
+	t=1707536874; cv=none; b=O0S9gZDsoRmzZ+v5PGa3+bIV1u38iDC5BWF5rWG/7drTj8/WjSqHxXghMIvqUUv9076aKnuy9uAP0yE/Sfwtt+uIQbeBCQlObjulRtJ1lauBucbI5z4wTrNSFrl3HNv8mQ0cYlsZ7MfsKLc+vhz/h8a7g6gw58vUlMdn5PgGqro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707533162; c=relaxed/simple;
-	bh=fvcxdwhch+UgCOqtnEyZPh1ECKl5d5IgD43prRrJsXE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=piW/hq2WCLepNN22oDWpAdCaZO/6p/0KOl4umxXCErgXyNFVBma/wfkDuMFMQrBVtmaGhbsaJfN1rlP//e7zBDyOSNKruqhdfU/MlpZOtR6IQHjtMITUM19CXvwZZ9vuC8VU+MiHsI4BnXALjk8YtztgWzYR4ttQNY15vHicC98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=FsV23qRh; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1d7858a469aso12020215ad.2
-        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 18:46:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1707533160; x=1708137960; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=juvAKGT5CeRrHs5S/LFrLMDdPScLSP5NQP+Ax181rF0=;
-        b=FsV23qRhe5NqfIAPYtjRTgh5nDJf2nmCSeZ9e6MTvkdNvQL2XXHld8zP+U4UsM8E1L
-         qTqO/zRwefc78kJB7t1Vws7Juk9BcfPS+TQuLHGo4CdFEMtYT9EXmFxfwjsmDeOQ99zJ
-         YmgHXcRp0CUKO9RAIMFPmdXLx1bP8iCx4IJjVbNdqdorUNFFHQVbtmGzL+gv6eT7VJIn
-         gcAaDtws+OhMjCJ6JF3UPfXSupgXKDUX501bGbCjXOKJ41/tc2sLEMCMm3xM/Yyggbtj
-         yvp682EFc2LfEC6XolT/H38hICo6OhwkIDLTl77YGH7Sh+Yg3BDoeoKZzefEMf2hCq6E
-         WsVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707533160; x=1708137960;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=juvAKGT5CeRrHs5S/LFrLMDdPScLSP5NQP+Ax181rF0=;
-        b=ZLwDDviuBakoSZZhQlwvOZMzqZ5klOTO/+mMSdVlNwJHJw++mBdyzhcsfHErVPNjzK
-         t8pGKDPEjfrD+Kf6Ka7QQ0WDbqpKahOZ6sP0r8nXHE1OJRe69b5a9FomumgsAYH62MC+
-         YVpGNC35M+YCKm78Ib4k5v33K4OqPnjENzbAsBKlUUyZqSgqgxAvuV5Oq/SxvbYi+q8f
-         WswFHx05TM+LFExRGQcupUyiysI+DfSRvS8QMz2L8PSLufP438ozQb5ufOIL37N0knLU
-         MuSJNYaBQDIIX7Y4gRuQWYSsFG4PLDpNN9iLEGDdZTm3mB31bhK5/vQy4gzkNKWcAd/n
-         dCGg==
-X-Gm-Message-State: AOJu0YxcfIO9wQhWQU0nNZNvVWGQ7aPVHvSrkXjVHqwotH1fyqnXnV+D
-	dRI/QPFqJEYW0iLUF+heYEZ3qbKR7KMOlEBvNGRKBhfndHmKGsuWcTAH/I0rI+wI7Nz96pdejTX
-	S
-X-Google-Smtp-Source: AGHT+IHEDqbAC4lmL3ZpUXSCN9GdkEM2l7fe8xTltkLkxmu1UR60/e25RS/zMOOX5wfJlxuteXW2tw==
-X-Received: by 2002:a17:902:ec8f:b0:1da:e86:3d9e with SMTP id x15-20020a170902ec8f00b001da0e863d9emr1412208plg.43.1707533159777;
-        Fri, 09 Feb 2024 18:45:59 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUMhzRkPJU68x71VCI0cCzTS1iGPROvorEHI8y/T4VEsPqoWKRiyLc6jpPnVnKyR0zJXFEBaQnHeIE9zBh6zGXKxKyy+69dAWbHc0cnlF/TixP9rdrhlkWGVbNYTmzwM8fPlu9XTnBpdXUyqMKn3yTL6Rsutw05p5yMUO5nqD1NE31MbFZvloHyWGYSV1eJJVaMWJ2keeytwpKYeVaELobWX4mCrvEtYg//ovV0TKLVKwXW7JhD3Tx4+WaLMube7ba5D8oQGgw83DyJ8YXup0gXBaT92tcI0eNYel3yhLEXra2BvSwFKyGdEJ48enl3MzyOclUYmQr1sL3m8FyrEm8q8rLyPEjIy+uHll/0f0hse679uE3lxbRm3BP676KdKumQKhN3ISg6shx/pXVo63coSaXdfB9bti21OvyKuV/uhofsNXW5tac4rbv/lticgt4p+dalE9KXCG3XGt2a5rTwLptPsnyG+3nsvILh9cGGbTQZYElnQdeGHU/SzhqwIloQYcRKUR0cqO54hwxFz1nBRZx+OVdWweRwpzKCKYsfSHi1DphxVSx4LeLATF3KML1avYiiqwq+Dx1TeVhwXMGLdZa4EXGE+V64Stk=
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id a1-20020a170902ee8100b001d94c709738sm2149523pld.217.2024.02.09.18.45.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 09 Feb 2024 18:45:59 -0800 (PST)
-Date: Fri, 9 Feb 2024 18:45:56 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, Daniel
- Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
- <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, KP
- Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Jamal Hadi Salim
- <jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
- <jiri@resnulli.us>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, bpf@vger.kernel.org
- (open list:BPF [GENERAL] (Safe Dynamic Programs and Tools)),
- linux-kernel@vger.kernel.org (open list)
-Subject: Re: [PATCH net-next v2] net/sched: actions report errors with
- extack
-Message-ID: <20240209184556.00cde1a2@hermes.local>
-In-Reply-To: <20240209183133.1cc0a4f5@kernel.org>
-References: <20240205185537.216873-1-stephen@networkplumber.org>
-	<20240208182731.682985dd@kernel.org>
-	<20240209131119.6399c91b@hermes.local>
-	<20240209134112.4795eb19@kernel.org>
-	<20240209155830.448c2215@hermes.local>
-	<20240209183133.1cc0a4f5@kernel.org>
+	s=arc-20240116; t=1707536874; c=relaxed/simple;
+	bh=DJJEW7LwZJzt13k40aZ5YP9MC+QrfxIXMspjA9NlxBw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=noCc2Gw/vnGqP/lIjZFWZEj5pE7LU5JN6zLTQHMfq2lFync7gn3mC8ui69mCM4lkwFKIY4TelGdulP9NNvuQ+1pf8mZrq5DvdiwFEx+24pv0KcJ277D0z+bXxyxpUarqaYSjfHINWNb6EM01nc+p8ToKu3QK5XE3MkUisl/Rzb8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=nf82ab/H; arc=none smtp.client-ip=44.202.169.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-5009a.ext.cloudfilter.net ([10.0.29.176])
+	by cmsmtp with ESMTPS
+	id YdGVrRDvQ9gG6YeLGr6xpu; Sat, 10 Feb 2024 03:47:50 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id YeLFrC8Vye76AYeLFruHof; Sat, 10 Feb 2024 03:47:49 +0000
+X-Authority-Analysis: v=2.4 cv=WIzcXWsR c=1 sm=1 tr=0 ts=65c6f1e5
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=VhncohosazJxI00KdYJ/5A==:17
+ a=IkcTkHD0fZMA:10 a=k7vzHIieQBIA:10 a=wYkD_t78qR0A:10 a=VwQbUJbxAAAA:8
+ a=QyXUC8HyAAAA:8 a=MhnL__LWAAAA:8 a=pGLkceISAAAA:8 a=vaJtXVxTAAAA:8
+ a=cm27Pg_UAAAA:8 a=VQoFvWr1TuYTowxckCsA:9 a=QEXdDO2ut3YA:10
+ a=AjGcO6oz07-iQ99wixmX:22 a=DArMNfZabhNmbrQIurc0:22 a=xmb-EsYY8bH0VWELuYED:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=pXHTcn/aJQT+pG0+DyZQLt/S325fM/XgyAnSIueU0jM=; b=nf82ab/HT3PxDSv0uH1Gb9Us6r
+	W/yF5yq6ZhVU0rMVz2IdnrH8brNxWaqoFxBwlhqahAlTgnUSvERMNF9GoOMtt3718KthqCKhJiQR/
+	Yo7bmuQykAZu4OP0+c52dPFs4ub/7McLCM5nD0mausOhI9W/WpYxMsMQcm0Kiihclv0tLrWusfS+1
+	ILsDuWZbTU3vV0jitx8azgQ06AAgxDsRE4JpsKEGG2tD+r40TfaW/wWj9fzARLm76YSeflHzCUW9i
+	DIWI7xygoESAkNUYeOJbbtcknao2fIgHPv8OpOqTkGSXtBBR/5d3m2ZETHXndj5iJF2++FniTQ7RW
+	yLP+MeaQ==;
+Received: from [201.172.172.225] (port=48392 helo=[192.168.15.10])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96.2)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1rYeLD-0031L3-0e;
+	Fri, 09 Feb 2024 21:47:47 -0600
+Message-ID: <bb815cbf-c019-4328-9857-b53cba2dbdd4@embeddedor.com>
+Date: Fri, 9 Feb 2024 21:47:44 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] stddef: Allow attributes to be used when creating
+ flex arrays
+Content-Language: en-US
+To: Kees Cook <keescook@chromium.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: "Gustavo A . R . Silva" <gustavoars@kernel.org>,
+ Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+ Dan Williams <dan.j.williams@intel.com>, Keith Packard <keithp@keithp.com>,
+ Miguel Ojeda <ojeda@kernel.org>, Alexey Dobriyan <adobriyan@gmail.com>,
+ Dmitry Antipov <dmantipov@yandex.ru>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Nathan Chancellor <nathan@kernel.org>,
+ kernel test robot <lkp@intel.com>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <20240210011452.work.985-kees@kernel.org>
+ <20240210011643.1706285-1-keescook@chromium.org>
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <20240210011643.1706285-1-keescook@chromium.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 201.172.172.225
+X-Source-L: No
+X-Exim-ID: 1rYeLD-0031L3-0e
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.15.10]) [201.172.172.225]:48392
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 2
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfIEmI36K+Q6841puPE78h5Q+4AoL/UObgyeaJ1wv+9Dkb6WruRblGXW2GqHogXoym51/py++r6oPx3vj5exJ1cKucExZYZch/QUu6xsguHksIcOwUVdH
+ 0F2sGqU2EWKeeVlJJ45DPovNPE78OXjkq/eFfq+ILMn4z5yLpufeC8CbaPtChR1zUM89M7h9AKM7aqJAjFgZEI3qKVXNvENtlps=
 
-On Fri, 9 Feb 2024 18:31:33 -0800
-Jakub Kicinski <kuba@kernel.org> wrote:
 
-> On Fri, 9 Feb 2024 15:58:30 -0800 Stephen Hemminger wrote:
-> > > I mean that NL_REQ_ATTR_CHECK() should be more than enough by itself.
-> > > We have full TC specs in YAML now, we can hack up a script to generate
-> > > reverse parsing tables for iproute2 even if you don't want to go full
-> > > YNL.    
-> > 
-> > Ok, then will take the err msg across all places using NL_REQ_ATTR_CHECK?  
+
+On 2/9/24 19:16, Kees Cook wrote:
+> With the coming support for the __counted_by struct member attribute, we
+> will need a way to add such annotations to the places where
+> DECLARE_FLEX_ARRAY() is used. Introduce DECLARE_FLEX_ARRAY_ATTR() which
+> takes a third argument: the attributes to apply to the flexible array.
 > 
-> Take _out_ ? That'd be great, yup.
+> Cc: Gustavo A. R. Silva <gustavoars@kernel.org>
+> Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+> Cc: Dan Williams <dan.j.williams@intel.com>
+> Cc: Keith Packard <keithp@keithp.com>
+> Cc: Miguel Ojeda <ojeda@kernel.org>
+> Cc: Alexey Dobriyan <adobriyan@gmail.com>
+> Cc: Dmitry Antipov <dmantipov@yandex.ru>
+> Signed-off-by: Kees Cook <keescook@chromium.org>
 
+Nice!
 
-I don't think that is actually a good idea because new kernel needs to still
-report errors to older userspace iproute2.
+Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 
-This is kind of academic hair splitting, iproute2 doesn't send these kind
-of missing part messages. It is more from test suites, or from custom
-user programs; found this when looking at DPDK device driver that was
-sending its own netlink.
+Thanks
+-- 
+Gustavo
+
+> ---
+>   include/linux/stddef.h      | 16 ++++++++++++++--
+>   include/uapi/linux/stddef.h | 25 +++++++++++++++++++------
+>   2 files changed, 33 insertions(+), 8 deletions(-)
+> 
+> diff --git a/include/linux/stddef.h b/include/linux/stddef.h
+> index 929d67710cc5..eb51f6727ecf 100644
+> --- a/include/linux/stddef.h
+> +++ b/include/linux/stddef.h
+> @@ -81,8 +81,20 @@ enum {
+>   	__struct_group(TAG, NAME, /* no attrs */, MEMBERS)
+>   
+>   /**
+> - * DECLARE_FLEX_ARRAY() - Declare a flexible array usable in a union
+> + * DECLARE_FLEX_ARRAY_ATTR() - Declare a flexible array usable in a union
+> + * @TYPE: The type of each flexible array element
+> + * @NAME: The name of the flexible array member
+> + * @ATTRS: The list of member attributes to apply
+>    *
+> + * In order to have a flexible array member in a union or alone in a
+> + * struct, it needs to be wrapped in an anonymous struct with at least 1
+> + * named member, but that member can be empty.
+> + */
+> +#define DECLARE_FLEX_ARRAY_ATTR(TYPE, NAME, ATTRS) \
+> +	__DECLARE_FLEX_ARRAY_ATTR(TYPE, NAME, ATTRS)
+> +
+> +/**
+> + * DECLARE_FLEX_ARRAY() - Declare a flexible array usable in a union
+>    * @TYPE: The type of each flexible array element
+>    * @NAME: The name of the flexible array member
+>    *
+> @@ -91,6 +103,6 @@ enum {
+>    * named member, but that member can be empty.
+>    */
+>   #define DECLARE_FLEX_ARRAY(TYPE, NAME) \
+> -	__DECLARE_FLEX_ARRAY(TYPE, NAME)
+> +	DECLARE_FLEX_ARRAY_ATTR(TYPE, NAME, /* no attributes */)
+>   
+>   #endif
+> diff --git a/include/uapi/linux/stddef.h b/include/uapi/linux/stddef.h
+> index 2ec6f35cda32..5499c08ad011 100644
+> --- a/include/uapi/linux/stddef.h
+> +++ b/include/uapi/linux/stddef.h
+> @@ -31,24 +31,37 @@
+>   
+>   #ifdef __cplusplus
+>   /* sizeof(struct{}) is 1 in C++, not 0, can't use C version of the macro. */
+> -#define __DECLARE_FLEX_ARRAY(T, member)	\
+> -	T member[0]
+> +#define __DECLARE_FLEX_ARRAY_ATTR(TYPE, NAME, ATTRS)	\
+> +	TYPE NAME[0] ATTRS
+> +#define __DECLARE_FLEX_ARRAY(TYPE, NAME)		\
+> +	__DECLARE_FLEX_ARRAY_ATTR(TYPE, NAME, /* no attributes */)
+>   #else
+>   /**
+> - * __DECLARE_FLEX_ARRAY() - Declare a flexible array usable in a union
+> - *
+> + * __DECLARE_FLEX_ARRAY_ATTR() - Declare a flexible array usable in a union
+>    * @TYPE: The type of each flexible array element
+>    * @NAME: The name of the flexible array member
+> + * @ATTRS: The list of member attributes to apply
+>    *
+>    * In order to have a flexible array member in a union or alone in a
+>    * struct, it needs to be wrapped in an anonymous struct with at least 1
+>    * named member, but that member can be empty.
+>    */
+> -#define __DECLARE_FLEX_ARRAY(TYPE, NAME)	\
+> +#define __DECLARE_FLEX_ARRAY_ATTR(TYPE, NAME, ATTRS)	\
+>   	struct { \
+>   		struct { } __empty_ ## NAME; \
+> -		TYPE NAME[]; \
+> +		TYPE NAME[] ATTRS; \
+>   	}
+> +/**
+> + * __DECLARE_FLEX_ARRAY() - Declare a flexible array usable in a union
+> + * @TYPE: The type of each flexible array element
+> + * @NAME: The name of the flexible array member
+> + *
+> + * In order to have a flexible array member in a union or alone in a
+> + * struct, it needs to be wrapped in an anonymous struct with at least 1
+> + * named member, but that member can be empty.
+> + */
+> +#define __DECLARE_FLEX_ARRAY(TYPE, NAME)	\
+> +	__DECLARE_FLEX_ARRAY_ATTR(TYPE, NAME, /* no attributes */)
+>   #endif
+>   
+>   #ifndef __counted_by
 
