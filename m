@@ -1,49 +1,76 @@
-Return-Path: <netdev+bounces-70728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57A2785022B
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 03:31:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C948F85023D
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 03:46:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 103FD1F2589F
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 02:31:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C9D51F2589F
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 02:46:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FC3D1370;
-	Sat, 10 Feb 2024 02:31:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34EDF442D;
+	Sat, 10 Feb 2024 02:46:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M/YR1G1J"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="FsV23qRh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63B53366;
-	Sat, 10 Feb 2024 02:31:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D5A62F22
+	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 02:46:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707532295; cv=none; b=SAXYSpcQrDnT8h3Il5/338AsZZB8owruBm82ainZDu3Ax/OKAXUHpPVJ/6J48vPSZShO50pX78FmNC0u2O6KAqb6nOf1ROMe+3qfMxOZKuEdQ4cLRkECqZZQUD3sXLiuFiclRkAgJXfuHqZS8b2q79sdPwNKvnSV/notPBfc1LM=
+	t=1707533162; cv=none; b=H8AVVWa/L1SRneNiM1jE72sG5W80LB36Fe3HvQTfEp9YamKmVwlDZv/Grz8U2h0S2lEXTFfh6HjT9OO2A+nlx80WK3TNcTsTs2S5JO/Jw8cEKpkddVu45YCGnRJ3uiht0H9X5R/6JaqJRwdg0VVIRvTOb5DHEoB36DXFb0XBHwQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707532295; c=relaxed/simple;
-	bh=B/lPdAa1QyFMInjxuzXc0hyX6ToSI4+D9MPkWAYQwJM=;
+	s=arc-20240116; t=1707533162; c=relaxed/simple;
+	bh=fvcxdwhch+UgCOqtnEyZPh1ECKl5d5IgD43prRrJsXE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t01m+6w6qlDGzQP9y4uaKX/a/mX49i5oq1/h39dfYLLhupulQMS4DIGuZGg7SRDfkzUJXWtPkRD0uiKniyeAQAQLceB2teLPGzDKHzUBBy1mYZ4t3DmF2h4i64jzikSUPQ0WwcqHG1jPm9PVNgi56jeACe5x7WPOXWn7/RbZ+3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M/YR1G1J; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1560CC433C7;
-	Sat, 10 Feb 2024 02:31:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1707532294;
-	bh=B/lPdAa1QyFMInjxuzXc0hyX6ToSI4+D9MPkWAYQwJM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=M/YR1G1JhQNchuMT85aCDkvw/7jZKmYefBcYPekoAhbBOfX6SnHlrZG7QEpnu0ySp
-	 DlJR7K39SIvfFezJPZBHPntZPJ7km0spsMO8ojn/XIa5RkXSFlSF01YKxonfJolth/
-	 bEgPbvei5/kGsNu8Mng9ezwSawM8v0p+ku5ykD+1RB+sF5JAe/HUJWbbqVZIyU0Pne
-	 z4yaWFOJk+tyNPvMMnsL2uP14+7jHyBdCX6gVGEP4E6WYvNDgR4twFkjpjE8SKXM77
-	 555p1xOBzlflcx1v32UHJr4Lt4xgyysM3PV8nRHvw4LYyRHHzefqKx2UnQYlV/qlzA
-	 sznvme/24Q9DQ==
-Date: Fri, 9 Feb 2024 18:31:33 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
+	 MIME-Version:Content-Type; b=piW/hq2WCLepNN22oDWpAdCaZO/6p/0KOl4umxXCErgXyNFVBma/wfkDuMFMQrBVtmaGhbsaJfN1rlP//e7zBDyOSNKruqhdfU/MlpZOtR6IQHjtMITUM19CXvwZZ9vuC8VU+MiHsI4BnXALjk8YtztgWzYR4ttQNY15vHicC98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=FsV23qRh; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1d7858a469aso12020215ad.2
+        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 18:46:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1707533160; x=1708137960; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=juvAKGT5CeRrHs5S/LFrLMDdPScLSP5NQP+Ax181rF0=;
+        b=FsV23qRhe5NqfIAPYtjRTgh5nDJf2nmCSeZ9e6MTvkdNvQL2XXHld8zP+U4UsM8E1L
+         qTqO/zRwefc78kJB7t1Vws7Juk9BcfPS+TQuLHGo4CdFEMtYT9EXmFxfwjsmDeOQ99zJ
+         YmgHXcRp0CUKO9RAIMFPmdXLx1bP8iCx4IJjVbNdqdorUNFFHQVbtmGzL+gv6eT7VJIn
+         gcAaDtws+OhMjCJ6JF3UPfXSupgXKDUX501bGbCjXOKJ41/tc2sLEMCMm3xM/Yyggbtj
+         yvp682EFc2LfEC6XolT/H38hICo6OhwkIDLTl77YGH7Sh+Yg3BDoeoKZzefEMf2hCq6E
+         WsVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707533160; x=1708137960;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=juvAKGT5CeRrHs5S/LFrLMDdPScLSP5NQP+Ax181rF0=;
+        b=ZLwDDviuBakoSZZhQlwvOZMzqZ5klOTO/+mMSdVlNwJHJw++mBdyzhcsfHErVPNjzK
+         t8pGKDPEjfrD+Kf6Ka7QQ0WDbqpKahOZ6sP0r8nXHE1OJRe69b5a9FomumgsAYH62MC+
+         YVpGNC35M+YCKm78Ib4k5v33K4OqPnjENzbAsBKlUUyZqSgqgxAvuV5Oq/SxvbYi+q8f
+         WswFHx05TM+LFExRGQcupUyiysI+DfSRvS8QMz2L8PSLufP438ozQb5ufOIL37N0knLU
+         MuSJNYaBQDIIX7Y4gRuQWYSsFG4PLDpNN9iLEGDdZTm3mB31bhK5/vQy4gzkNKWcAd/n
+         dCGg==
+X-Gm-Message-State: AOJu0YxcfIO9wQhWQU0nNZNvVWGQ7aPVHvSrkXjVHqwotH1fyqnXnV+D
+	dRI/QPFqJEYW0iLUF+heYEZ3qbKR7KMOlEBvNGRKBhfndHmKGsuWcTAH/I0rI+wI7Nz96pdejTX
+	S
+X-Google-Smtp-Source: AGHT+IHEDqbAC4lmL3ZpUXSCN9GdkEM2l7fe8xTltkLkxmu1UR60/e25RS/zMOOX5wfJlxuteXW2tw==
+X-Received: by 2002:a17:902:ec8f:b0:1da:e86:3d9e with SMTP id x15-20020a170902ec8f00b001da0e863d9emr1412208plg.43.1707533159777;
+        Fri, 09 Feb 2024 18:45:59 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUMhzRkPJU68x71VCI0cCzTS1iGPROvorEHI8y/T4VEsPqoWKRiyLc6jpPnVnKyR0zJXFEBaQnHeIE9zBh6zGXKxKyy+69dAWbHc0cnlF/TixP9rdrhlkWGVbNYTmzwM8fPlu9XTnBpdXUyqMKn3yTL6Rsutw05p5yMUO5nqD1NE31MbFZvloHyWGYSV1eJJVaMWJ2keeytwpKYeVaELobWX4mCrvEtYg//ovV0TKLVKwXW7JhD3Tx4+WaLMube7ba5D8oQGgw83DyJ8YXup0gXBaT92tcI0eNYel3yhLEXra2BvSwFKyGdEJ48enl3MzyOclUYmQr1sL3m8FyrEm8q8rLyPEjIy+uHll/0f0hse679uE3lxbRm3BP676KdKumQKhN3ISg6shx/pXVo63coSaXdfB9bti21OvyKuV/uhofsNXW5tac4rbv/lticgt4p+dalE9KXCG3XGt2a5rTwLptPsnyG+3nsvILh9cGGbTQZYElnQdeGHU/SzhqwIloQYcRKUR0cqO54hwxFz1nBRZx+OVdWweRwpzKCKYsfSHi1DphxVSx4LeLATF3KML1avYiiqwq+Dx1TeVhwXMGLdZa4EXGE+V64Stk=
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id a1-20020a170902ee8100b001d94c709738sm2149523pld.217.2024.02.09.18.45.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 09 Feb 2024 18:45:59 -0800 (PST)
+Date: Fri, 9 Feb 2024 18:45:56 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Jakub Kicinski <kuba@kernel.org>
 Cc: netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, Daniel
  Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
  Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
@@ -58,13 +85,14 @@ Cc: netdev@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, Daniel
  linux-kernel@vger.kernel.org (open list)
 Subject: Re: [PATCH net-next v2] net/sched: actions report errors with
  extack
-Message-ID: <20240209183133.1cc0a4f5@kernel.org>
-In-Reply-To: <20240209155830.448c2215@hermes.local>
+Message-ID: <20240209184556.00cde1a2@hermes.local>
+In-Reply-To: <20240209183133.1cc0a4f5@kernel.org>
 References: <20240205185537.216873-1-stephen@networkplumber.org>
 	<20240208182731.682985dd@kernel.org>
 	<20240209131119.6399c91b@hermes.local>
 	<20240209134112.4795eb19@kernel.org>
 	<20240209155830.448c2215@hermes.local>
+	<20240209183133.1cc0a4f5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,18 +102,25 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 9 Feb 2024 15:58:30 -0800 Stephen Hemminger wrote:
-> > I mean that NL_REQ_ATTR_CHECK() should be more than enough by itself.
-> > We have full TC specs in YAML now, we can hack up a script to generate
-> > reverse parsing tables for iproute2 even if you don't want to go full
-> > YNL.  
+On Fri, 9 Feb 2024 18:31:33 -0800
+Jakub Kicinski <kuba@kernel.org> wrote:
+
+> On Fri, 9 Feb 2024 15:58:30 -0800 Stephen Hemminger wrote:
+> > > I mean that NL_REQ_ATTR_CHECK() should be more than enough by itself.
+> > > We have full TC specs in YAML now, we can hack up a script to generate
+> > > reverse parsing tables for iproute2 even if you don't want to go full
+> > > YNL.    
+> > 
+> > Ok, then will take the err msg across all places using NL_REQ_ATTR_CHECK?  
 > 
-> Ok, then will take the err msg across all places using NL_REQ_ATTR_CHECK?
+> Take _out_ ? That'd be great, yup.
 
-Take _out_ ? That'd be great, yup.
 
-> Would prefer not to add the complexity of reverse parsing tables, that gets ugly fast.
+I don't think that is actually a good idea because new kernel needs to still
+report errors to older userspace iproute2.
 
-"reverse" is probably to strong. It's just a parse which parses 
-the request instead of the response. ethtool CLI does it, too.
+This is kind of academic hair splitting, iproute2 doesn't send these kind
+of missing part messages. It is more from test suites, or from custom
+user programs; found this when looking at DPDK device driver that was
+sending its own netlink.
 
