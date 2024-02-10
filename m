@@ -1,89 +1,150 @@
-Return-Path: <netdev+bounces-70697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68D36850104
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 01:17:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BACD285010E
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 01:20:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E84D9B2653C
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 00:17:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 230861F29DCF
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 00:20:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EF0337A;
-	Sat, 10 Feb 2024 00:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4624365;
+	Sat, 10 Feb 2024 00:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="AWWJJoRg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2059.outbound.protection.outlook.com [40.107.243.59])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80E80163
-	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 00:17:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707524226; cv=none; b=jnA7AYLYQ4904aaKoYTaXnb+Q7PvYl8SjRkfZmRwU4wU7ZF8K7y6nz/Sme0nktz+9VA/E7Xq8VOzTMZGAtvgeuJEcqjkAHH0Y7R6QkP8YIAd3ljduBSTZrdZPd8L82DwFiQb8WLc6f/t+925nd2PHRAmXVIQFoArneeU2D81WFs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707524226; c=relaxed/simple;
-	bh=4ge+/WmzvR0J9ejhrGXr1W+09OnA2O5Y9YuwoewWnzY=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=DKJZv6ZQ4Hp3wQbaijL2LKZ6t7n+8SfpMCjjkZg3d35RPHyB4EQAJTqFT4fNX0NjLT/dnhcgolR7fPO3hHxwvyNBw4uP0OmfzHqsL6IJB/au38lMoQMaq2o5uxC15M6sO/PDkKuQFwEqcv6brlGJ300XRSDO4eQLMoP6B/xEHms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-363d6348a07so11855175ab.3
-        for <netdev@vger.kernel.org>; Fri, 09 Feb 2024 16:17:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707524223; x=1708129023;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rH7XWE+1Uesz6zBrfYb5Ze0RvaWDz5N+5wCoQa9ttkk=;
-        b=d7TeAtEHuruXvd0HfrQ7jj0/J6CIIb9mJRkq3aEAUr+NvXRCa2dV22/z34yyhUp6JO
-         2UXhE3yF6ej1o8Lfy4L2tGafo5iWcQw+l0f+j9E0Co0coukV/rnWZIZ8cl4epmp8Fuql
-         ivYP3K9C3e1AKAYYHna1sJuHbYixHw3694b44F62JBOvNwQ2tBZJhkAUL5KZ6FIOLqHy
-         TkqMIJeYnKZSSKqjv/+XCUesmzHRXlDI0BzdxbGEudk1pFbki3WRU2jTaViqTKlsOoCJ
-         GrzL4QmW+f/3n/f6sHw9dMeuQLO4Pxd51vYT08TQzejvxdcdEvfWTKaRQKuRC5ErSMu+
-         4qXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW9v5DAf5KhU//zLfuaIJTHb68Ch5PXYEZy6AaRqyp8rFuiEr2SXgEaIDYRsbuUXQfz/oEPmd3d9xvJJL4/ZWoM9ESSkRRU
-X-Gm-Message-State: AOJu0YwBmkvqn/WPUXv5WRVOv0nnjpDkCSTu19sHNGfxt0tJlfpqcxpI
-	EXJ+fUbIHnC2sXBqBSYrQglvgIC/dMBUdtC14SlooLD4PwvSlmBnM21A+qUe4eMBodDQwVDEPhB
-	vd6QW+Ro2hX8+8Z/sMsivVUGkACShuWHBedRdkX1ow7fAgoWw2eWDuvU=
-X-Google-Smtp-Source: AGHT+IHaSCpSBmrGWfp4RAWRiVgNaUBDrl+UwAAOt5yahbYipkZfIVgzW/xl8ZNcd1Dq2szhLGEgZjca74TYQxXTUaIL35YpvPpK
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 261DAA47
+	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 00:20:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.59
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707524448; cv=fail; b=p+GKsIVIGWdvxOr/55F6eb/6vi6iBacwI5VwA9PrBVtZhIlV0COJNKmdzZTPIr2UDuWKPd6v1QNAtO69i1bE0qhfHFcG8knbSxOI3lSfMhau+Ib1ss/JLPypZyaK618/2vKfwWBf+huXqnZCjLFKjpgq9Luw79dYugElJB+UQTw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707524448; c=relaxed/simple;
+	bh=FUFH61FptUlC16y/qz8BmM5WJQSJw65Rp9T7s9yQBvM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sYeZnTdiw8cX3pLNm7B6/eR5aq7LYEPqUPR/Vynia1lzRFCukjt+zVevoFXIJjpNVtQ5O2Sxg6htsVO6C+jalpqtEXHG5wfMTuNh/wd7814S6aqgbOD3/A73voYJMn6unO1lf8MBsDH+/2l/GA0MzaqDM6ZnhZVIFAYNULJ5LKY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=AWWJJoRg; arc=fail smtp.client-ip=40.107.243.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gcCopwsxkh3+eCM7jhKWt4w/rhF3TKMjJvo5Y/lsusc4weg8uIbM2mFR6Js2XYU4byyMQjzKSnUuzYkiHXw5PL8dotEYtnId0cpTvPlfXN01W+8j4LYkPP0js4TuIVhH49l6PTNQiuCOjbYMQ5xLbGeYmLFU2B8bvqCSYlf8fmvEbPMu9Sbq2xJuXs9tUHMASqJXlbTZYaXVPtGk0TWe0xY06i2FlYR1wm68GEDDAQQRCO9jNfYUyd1p9dp14UO2MNys5DIs8OMN6AWNtad5BWAs2+6lcsA4pMu0g1Yv7j4NvXXPjeA2fWElczwA779vtgmcpQxMymKlzLf87Irk7g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NQXrwlw5PO/A+g8rryfuLLGs7rCtEUnAs3D2gk0T7HQ=;
+ b=GsJ+nBEkhcj+z5AQuwKWQ0PmgT2m7LIvWSyD7q7pmw0MtKVIqGUSBtVg3aBj1XxLVbQbzRxNDd/59xzhxkhIVCpX1RzBbXDXSCn+rCEFbXT20HDANHvg5kizud996tHs7XtqIAM/10WIe7eJsN6T9d3H6PIzpVA7mqZUbb7m4r4TBIcmtXRqLgX6y1gTc6dobms+5boVwcZ1Uwtip194Yqz5KywHkDEcqpCVBY6fKUS6L6x0QI3lYa5HAwCJggHUlGM2R8B2Vuz/lx+Jh/U/4XtNYrFuDnXky9ict4KFbLW+k6/aQ+r2XkfoHEtDg0mUZ3PCY7zm59NbWbx45yqwxg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NQXrwlw5PO/A+g8rryfuLLGs7rCtEUnAs3D2gk0T7HQ=;
+ b=AWWJJoRgmP6jKXn/BGMKnLsC83icZHJAZP5mM66cHo9YuqBhBX2YNuD+zwa6XwR+2IhcLQigdcqKSL38FXLzlmwHNfithjGteKB+7B9vh8u4zf1l2kcuYSwc2rKEWFUPFDONfjt6Nh+i95YeEcGrVH6zHpXUOo+SNTLdSW1+rLE=
+Received: from MW2PR16CA0069.namprd16.prod.outlook.com (2603:10b6:907:1::46)
+ by CYYPR12MB8939.namprd12.prod.outlook.com (2603:10b6:930:b8::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7270.17; Sat, 10 Feb
+ 2024 00:20:44 +0000
+Received: from CO1PEPF000044F7.namprd21.prod.outlook.com
+ (2603:10b6:907:1:cafe::13) by MW2PR16CA0069.outlook.office365.com
+ (2603:10b6:907:1::46) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7249.38 via Frontend
+ Transport; Sat, 10 Feb 2024 00:20:44 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1PEPF000044F7.mail.protection.outlook.com (10.167.241.197) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7316.0 via Frontend Transport; Sat, 10 Feb 2024 00:20:44 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Fri, 9 Feb
+ 2024 18:20:42 -0600
+From: Shannon Nelson <shannon.nelson@amd.com>
+To: <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<edumazet@google.com>, <pabeni@redhat.com>
+CC: <brett.creeley@amd.com>, <drivers@pensando.io>, Shannon Nelson
+	<shannon.nelson@amd.com>
+Subject: [PATCH net] pds_core: no health-thread in VF path
+Date: Fri, 9 Feb 2024 16:20:02 -0800
+Message-ID: <20240210002002.49483-1-shannon.nelson@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1bc7:b0:363:e134:a158 with SMTP id
- x7-20020a056e021bc700b00363e134a158mr36517ilv.5.1707524223738; Fri, 09 Feb
- 2024 16:17:03 -0800 (PST)
-Date: Fri, 09 Feb 2024 16:17:03 -0800
-In-Reply-To: <20240209204745.89949-1-kuniyu@amazon.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000cd2b640610fbf6f1@google.com>
-Subject: Re: [syzbot] [net?] INFO: task hung in unix_dgram_sendmsg
-From: syzbot <syzbot+4fa4a2d1f5a5ee06f006@syzkaller.appspotmail.com>
-To: asml.silence@gmail.com, axboe@kernel.dk, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, kuniyu@amazon.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F7:EE_|CYYPR12MB8939:EE_
+X-MS-Office365-Filtering-Correlation-Id: ae956a2a-bc5f-411f-f1a0-08dc29ce1f1f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	bnWF1+OWVZGzFcNpMfXlV9DET166zgaGgdKT1ooG+EW7gMQkqOVRtxoSfhjPbRv8ID6/dU2C/vtHqqQN/QzzlUKEv3aujTa5b0WH7uvmjHZxPm5haMA3HCSrWEzHMPpz9IncuC8GftqOzPX3hkJfzHc5O3mQ5QIGUgkD4BIhC3Ch/FrZ22eUhyZIBSIDMT7sfKhfM6CCE5pdlLdZz7nrTDPmwvVs0mJMQLwyR6Tx0irLWQ8tUx23SWoCMtjqlAyGLb3wLR8kqJvVypS6lo4DfsUaA0K/ljzE/qO4O/Xseoj0vwQDs7QwKF9VPxWz6g5FflA3+3Hk/OIQVj8mou/nG71wsRPTQGw0VbFb/FzQxaF+TBXs4Zl5Fe7E/Ycn+7EK+S6xml9bCG5N8PNz4kj52u7fyrDaZxLP0WcRx0sSyymFE6XgNkxl5ui6eXLoiDM268M56WSQtGWh2ZI5XywA3cGGfhyasU2isjZBNxG0bybSVlld76bdAgdBvWtbuVzYtYKhAfaLbkbfQjgqi4VVayI1ssRVqcUl6c3OU6fBw/YIrdGrc1BjYgqkvk7UBfR3qk5Hydak/fthieEenIoxAJ8bt+UG40MxBGfyw+mw584=
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(4636009)(136003)(376002)(346002)(396003)(39860400002)(230922051799003)(82310400011)(451199024)(1800799012)(64100799003)(186009)(46966006)(40470700004)(36840700001)(70586007)(41300700001)(2906002)(6666004)(44832011)(5660300002)(356005)(8936002)(4326008)(316002)(8676002)(36756003)(54906003)(110136005)(82740400003)(81166007)(86362001)(70206006)(2616005)(478600001)(1076003)(426003)(336012)(26005)(16526019);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Feb 2024 00:20:44.0394
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ae956a2a-bc5f-411f-f1a0-08dc29ce1f1f
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000044F7.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8939
 
-Hello,
+The VFs don't run the health thread, so don't try to
+stop or restart the non-existent timer or work item.
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+Fixes: d9407ff11809 ("pds_core: Prevent health thread from running during reset/remove")
+Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+---
+ drivers/net/ethernet/amd/pds_core/main.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
-Reported-and-tested-by: syzbot+4fa4a2d1f5a5ee06f006@syzkaller.appspotmail.com
+diff --git a/drivers/net/ethernet/amd/pds_core/main.c b/drivers/net/ethernet/amd/pds_core/main.c
+index cdbf053b5376..0050c5894563 100644
+--- a/drivers/net/ethernet/amd/pds_core/main.c
++++ b/drivers/net/ethernet/amd/pds_core/main.c
+@@ -451,6 +451,9 @@ static void pdsc_remove(struct pci_dev *pdev)
+ 
+ static void pdsc_stop_health_thread(struct pdsc *pdsc)
+ {
++	if (pdsc->pdev->is_virtfn)
++		return;
++
+ 	timer_shutdown_sync(&pdsc->wdtimer);
+ 	if (pdsc->health_work.func)
+ 		cancel_work_sync(&pdsc->health_work);
+@@ -458,6 +461,9 @@ static void pdsc_stop_health_thread(struct pdsc *pdsc)
+ 
+ static void pdsc_restart_health_thread(struct pdsc *pdsc)
+ {
++	if (pdsc->pdev->is_virtfn)
++		return;
++
+ 	timer_setup(&pdsc->wdtimer, pdsc_wdtimer_cb, 0);
+ 	mod_timer(&pdsc->wdtimer, jiffies + 1);
+ }
+-- 
+2.17.1
 
-Tested on:
-
-commit:         1279f9d9 af_unix: Call kfree_skb() for dead unix_(sk)-..
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git
-console output: https://syzkaller.appspot.com/x/log.txt?x=15c46df4180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=878fbcf532b1a170
-dashboard link: https://syzkaller.appspot.com/bug?extid=4fa4a2d1f5a5ee06f006
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=16376320180000
-
-Note: testing is done by a robot and is best-effort only.
 
