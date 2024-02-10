@@ -1,141 +1,109 @@
-Return-Path: <netdev+bounces-70775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A40C88505AF
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 18:21:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F1F7C8505BD
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 18:33:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44F1C28140B
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 17:21:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0326286698
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 17:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070875CDD8;
-	Sat, 10 Feb 2024 17:21:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CC925C5E4;
+	Sat, 10 Feb 2024 17:32:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="ErSf6bi7"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="px1gTzKP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A13951016
-	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 17:21:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B274D2B9C8
+	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 17:32:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707585670; cv=none; b=X/5Smk8y6u9wYwsrg5nUkWEgXa56OASei70edUhh4eX+QVOKoF+bTP3JXCw3pgPqX+xOEs99OBrVCWvuM0zy3oc8ldl0FLNtMAUjrRNmAZHEoBTHO+PsUjw38imfty7lku0d/QSL70+OS8tXrDdv1ouaZKYulekIor8l0JgYOYg=
+	t=1707586377; cv=none; b=kQedW277v7D/qt3j9pVs+TmdEtiAtey/+MCHKefAtYw2mhw/FtwaI8wxZMa+ulYjXSfat6sIunolUytFzIUTjSAHTPAhXUBlv0LKyl6rPlJSDkobxKt1szUMsMIRfVG9TBzQ82MIiyrbMBBF9ntLQQmXeLdtxrV5DdQSkmTZ6WI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707585670; c=relaxed/simple;
-	bh=nBtRQQSzo00f5BF7zrXZ9Ub/bVow0BWKpXCj6ryZCiU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PePCk+mtOTy3k1TloGeFx/wdMLqAaWdSv8BX0GD+MWXxxX8NvF3sKd5UcxYADPM2xDPJeFOHkDylOlGEHG55+SZjIBhlLHUYGC3KyuG3O1+wOAMO3Fsj2yacWsGmaeLScmDqoMV+idrn22v2n9JgKnFfVMFuGMFAf0HtcINmYio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=ErSf6bi7; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1707586377; c=relaxed/simple;
+	bh=Ft/kF1XFJG4L6tqb2cGgxOlkxE5XppO9tRl0yW6hTBQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZZb4Qpzj/2wr5BMHBZ8lw5CLmo+HJeN+Zke65zoTk/zCyYljbyS8gREpzNbCJfk5M9i9x8nN6AUga2IcruZnZnZD81G1fzNPgu2OR8y6oqKWLRADvlpX2G8c+LBySpyNTFy1HUqjrvzlQ0e6UMUCH0v/CHMn34rqBo/P17ebL98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=px1gTzKP; arc=none smtp.client-ip=209.85.214.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1d7431e702dso18296395ad.1
-        for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 09:21:09 -0800 (PST)
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-1d7431e702dso18340395ad.1
+        for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 09:32:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1707585668; x=1708190468; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iLI+V2nx7lYoAzjEUyR4toE1LpLIFSiv93zWRg3jk80=;
-        b=ErSf6bi7d5rXYZ59NXv3H+yvFohb9cTJgo5sKnrXwdGP2k4NsfGoHmARlcgnTCtZFg
-         1Cx/M5UqBnwcquePRCmJZWtRbS/xHLwNKUMF31lsE0dlV4V5K0mrMmRbedH5BssSgB5O
-         dsAImndNQfSAV6dMTlLg5/jyGQUF4KVzUEnzP31/HxLfJjalYwiPTc1C/oRFuWnnpbWh
-         CUCo34t9UVF+E7yKRkdYMH6i4LJY9dMC8/SLLZ1J/fXMhWuWk9747w3vhNbshv5iJOqQ
-         VH6q+qsmBZ2LnPXgOY3+LJN/oBsRx12JuZEz754OOERoU2dc4Zbrgm9s+f0uPv9D7JM7
-         3j7w==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1707586375; x=1708191175; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=+v86qqp0lEEksWL1ght3ykc8tuG064EdCXrDkVYK20Y=;
+        b=px1gTzKPjluStu9ulHuJpolUZ/4Bqe3bGbCGI/V29OemcxaTezI8YVwLupcExqPzqn
+         UOeTQTOHkHEInYoFzfSnW31fbbFPBzuxyO45ebUCJ8Pm7HCEzHaY7TP6kP7OvsB3U0Z7
+         HOQEJxAkFyuNwJqhLBESv1azyaqDlgVbpIdSvoK4XaCkWZcZOckUFQ1EyxEnudnR0gQL
+         SjWZkPOZtOmQQzvBhcZpFcjRw/z+qjKLwrXMDMrhcQYkmAdTlXgdNRVYM6vBXxSlcFQa
+         Ki9Cqq9tNMegrELw8IAfjXCCND+PHWFtvJf0uUvVv7A6DFc4kIaDi1UCE+mzcCeNn5j2
+         OBQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1707585668; x=1708190468;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iLI+V2nx7lYoAzjEUyR4toE1LpLIFSiv93zWRg3jk80=;
-        b=o8rKD47lTv+jZ1uLeSg1uVz71TYaeCqkNgM5bV4x6DM7a1HEiu9GW+67hpMptlxR5z
-         RKQzlsZUHUz+Z3vTmS2p9v9+LhnG+RnWrUzhdAmNbLw/V9rUcOH7VhWr2NAComqu4hil
-         bQmTTjjvzz+FG85CFWiDaVJFUPhjFOTtuUbDRwvvbTPUaouECUzhCKKl/IFTQDO3hZZl
-         OcfBzrdhKzjIRB1QypeLWPcuLW1ZGiSAXArhACtU0eMofXOCXRB50sTiv0g2EZ0Gyp8b
-         zlf5yKftw1Ki/berdTeJ1rSgq0wjhkDiVkhG83osgQkJC4aTHwamqxg7dSDbumGkbLWJ
-         VDOw==
-X-Gm-Message-State: AOJu0YzWYU8X97TkauFrJgWSWy/ABAB3mGrFAw3DiOo01bHNVQ1yYYs3
-	IOEH8TKNv4iTW4Q22x3GHCQ7jGRBu4NjfAHNoKOtoxOL6CrSkY61odpN6bobT0CbjxrsMZ9mbm5
-	M
-X-Google-Smtp-Source: AGHT+IFvpiKrSTrwIovBiT5E5H44Axlh1ZA0u5O3lSzTgmUBWQ2c6n/qIAOBLGApLdhHqgE4sr4sLw==
-X-Received: by 2002:a17:902:690b:b0:1d8:d1f5:e7a with SMTP id j11-20020a170902690b00b001d8d1f50e7amr2557976plk.52.1707585668608;
-        Sat, 10 Feb 2024 09:21:08 -0800 (PST)
+        d=1e100.net; s=20230601; t=1707586375; x=1708191175;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+v86qqp0lEEksWL1ght3ykc8tuG064EdCXrDkVYK20Y=;
+        b=GTc/qlzJn5xjAjnBuuqcWHBKPuWa7K8dDgtRsH5cuy4iiWj8kKIIGjZ9KvHMRoRI0J
+         iJ9wPg3PeVyx94eH3P5uxxoSCdmHthh7pzIje6BgJrgElPCLUfmb1Yn+2LpaX8DgV4cU
+         jxjrhyM97Q0mOeq3A29nBLlPDrD2HV/19921ZgGW/EH25XOnLcEwpgqX07wISnGx4ln3
+         S4Ll1iYkSKhTsK2cL3l5nMVFEmt+gwmXXq2UebP06T45N3+/mj6/BmN6/o0XsJHZ9L2j
+         TvfPIDlL9eiyAeilj6ozGaq1DAuR26GIBTwyT3lqqLGFVYCYr4ZUDOQ03QMWqSBbwoRQ
+         DVeg==
+X-Gm-Message-State: AOJu0YwCXmYUGGKzmxw6EIKtPMPZbdgYFHI0Lf/y/7nAbaI/e2ERFyrR
+	W5Lw2I05m4s8l0xSWWl4S+r0b1DHdIxU9M2uT2QJoGifsPAJDEsqwpAGZOymklONp0meqZe9Oqx
+	h
+X-Google-Smtp-Source: AGHT+IHtEY9dhRenZd3PvTzixE7mUA0qBhRz+JaBmNznudBPUoKrVZCgmYcMa6xTBtrpO1SqH8eiQw==
+X-Received: by 2002:a17:903:44a:b0:1d9:6cb5:a812 with SMTP id iw10-20020a170903044a00b001d96cb5a812mr2335470plb.24.1707586375041;
+        Sat, 10 Feb 2024 09:32:55 -0800 (PST)
 Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id s8-20020a170902ea0800b001d932f1b92bsm3191183plg.289.2024.02.10.09.21.08
+        by smtp.gmail.com with ESMTPSA id i11-20020a17090332cb00b001d9cfb9af20sm3252357plr.70.2024.02.10.09.32.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 10 Feb 2024 09:21:08 -0800 (PST)
-Date: Sat, 10 Feb 2024 09:21:07 -0800
+        Sat, 10 Feb 2024 09:32:54 -0800 (PST)
 From: Stephen Hemminger <stephen@networkplumber.org>
-To: Takanori Hirano <me@hrntknr.net>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH iproute2 v2] tc: Add support json option in filter.
-Message-ID: <20240210092107.53598a13@hermes.local>
-In-Reply-To: <0106018d927d04ff-efbd5d4b-b32f-4b39-a184-a28939608096-000000@ap-northeast-1.amazonses.com>
-References: <20240209083743.2bd1a90d@hermes.local>
-	<0106018d927d04ff-efbd5d4b-b32f-4b39-a184-a28939608096-000000@ap-northeast-1.amazonses.com>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH iproute2-next] netlink: display information from missing type extack
+Date: Sat, 10 Feb 2024 09:32:31 -0800
+Message-ID: <20240210173244.6681-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Sat, 10 Feb 2024 10:08:03 +0000
-Takanori Hirano <me@hrntknr.net> wrote:
+The kernel will now send missing type information in error response.
+Print it if present.
 
->  	if (tb[TCA_FLOW_MODE]) {
->  		__u32 mode = rta_getattr_u32(tb[TCA_FLOW_MODE]);
->  
->  		switch (mode) {
->  		case FLOW_MODE_MAP:
-> -			fprintf(f, "map ");
-> +			open_json_object("map");
-> +			print_string(PRINT_FP, NULL, "map ", NULL);
->  			break;
->  		case FLOW_MODE_HASH:
-> -			fprintf(f, "hash ");
-> +			open_json_object("hash");
-> +			print_string(PRINT_FP, NULL, "hash ", NULL);
->  			break;
->  		}
->  	}
+Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
+---
+ lib/libnetlink.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
-Since this is two values for mode, in my version it looks like
- 
-+static const char *flow_mode2str(__u32 mode)
-+{
-+	static char buf[128];
-+
-+	switch (mode) {
-+	case FLOW_MODE_MAP:
-+		return "map";
-+	case FLOW_MODE_HASH:
-+		return "hash";
-+	default:
-+		snprintf(buf, sizeof(buf), "%#x", mode);
-+		return buf;
-+	}
-+}
-+
-
- 
- 	if (tb[TCA_FLOW_MODE]) {
- 		__u32 mode = rta_getattr_u32(tb[TCA_FLOW_MODE]);
- 
--		switch (mode) {
--		case FLOW_MODE_MAP:
--			fprintf(f, "map ");
--			break;
--		case FLOW_MODE_HASH:
--			fprintf(f, "hash ");
--			break;
--		}
-+		print_string(PRINT_ANY, "mode", "%s ", flow_mode2str(mode));
+diff --git a/lib/libnetlink.c b/lib/libnetlink.c
+index 016482294276..e2b284e6998c 100644
+--- a/lib/libnetlink.c
++++ b/lib/libnetlink.c
+@@ -111,6 +111,10 @@ int nl_dump_ext_ack(const struct nlmsghdr *nlh, nl_ext_ack_fn_t errfn)
+ 			err_nlh = &err->msg;
  	}
  
++	if (tb[NLMSGERR_ATTR_MISS_TYPE])
++		fprintf(stderr, "Missing required attribute type %u\n",
++			mnl_attr_get_u32(tb[NLMSGERR_ATTR_MISS_TYPE]));
++
+ 	if (errfn)
+ 		return errfn(msg, off, err_nlh);
+ 
+-- 
+2.43.0
+
 
