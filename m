@@ -1,113 +1,96 @@
-Return-Path: <netdev+bounces-70773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A69E850596
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 18:11:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 256948505A8
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 18:19:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B0CBB24990
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 17:11:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB99A1F25436
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 17:19:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90F035CDDA;
-	Sat, 10 Feb 2024 17:11:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D3015CDE2;
+	Sat, 10 Feb 2024 17:18:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="wxwZj/EJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8666D41A82;
-	Sat, 10 Feb 2024 17:11:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801B65C8E8
+	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 17:18:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707585067; cv=none; b=S2dfCeLOX+PqTpIuzOeGBVUWKydK1MKetrhSD1ZC4nA/D8bEnm2C5XyoRFmfwKtc/DcvwzXEt5NEwV5llCMpGR3dnA1gn4N6n5WDqN1H7d91xblgMe8+bBhUn7qGqwC5sp0ssuo0u44BlY90y0ePyLs37xkl2sQtcZk0cEzyqqk=
+	t=1707585534; cv=none; b=fuViIXRqhcR7He8Jg4O3E1DVyOcHl086n9V0Jcso194cSX663AFBcA9oLCCzcFskARAN0nnUYMFR2OKx2ANKNtZ2VMulqB9NdjbhrIx5SByJs9FRzLEr0twTvSXiUEh/TG2CIAgKF6EFqEEn4UlXHCQpvdsn6theW4FrvoZuLuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707585067; c=relaxed/simple;
-	bh=XJ8u9w16pVF5eU4Vn8N3gBf9AK0ZZkv3wuT7fLJUbMU=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Gc1i2bP2Jq09qbdczKcDKfSyjYgtUjtocB81C0icKv8ba8Lvg3IPGOGCX0Gj3NJ7jW9GOek9o8zGzhKHmgPl9vNv8at2Yj4HItjcrzeziv6e3j+eyC2F+/bJpt2iLPRefoNmOi3INerpnGE+cOgIxugFoOSKmQv+Ti1HrfcQWYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (31.173.86.126) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 10 Feb
- 2024 20:10:55 +0300
-Subject: Re: [RFC PATCH net-next v2 5/7] net: ravb: Align poll function with
- NAPI docs
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
-	<wsa+renesas@sang-engineering.com>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240206091909.3191-1-paul.barker.ct@bp.renesas.com>
- <20240206091909.3191-6-paul.barker.ct@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <0692fd9f-d25f-70e7-d309-d19e804edcc9@omp.ru>
-Date: Sat, 10 Feb 2024 20:10:54 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1707585534; c=relaxed/simple;
+	bh=YHVg5c1fop9V9/tlRVi6Q+MmZLkdquDYXCZon/zLaq0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SNHOd0ZB42sGqOSlwM0P98nyMlsFspCatrKR1R4ka5q3QoE4vTXTEs7pr0Yd0z/dYiEiTn4PdKaKYsYlv3cbF+LGUe7OZ+MQAVXS7tbNegcIEOoZgQEMW1Jx6ycWe16x82NF8G95hl0s1zQjUKlpdWVOJ/y2OX2EiiKA3VdzflU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=wxwZj/EJ; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-5d8df34835aso1483312a12.0
+        for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 09:18:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1707585531; x=1708190331; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Dqo5z7wPlVcN8hVdZJTdSH+25F7F/NafO/e+3YnXVpE=;
+        b=wxwZj/EJcrVYo0KusC+AuIYj5dnf50GAvNp+mSMD1BXSlcaE6z1ULNoQ1rnindkEJX
+         fr/wyU0QGrWX/tooAz3cAUT20N6YFWR3XafVQKhxgJX7WLIG+lbFQe9wazzoran7tq29
+         K0xYvTD2pUQn81PDTzt2HtoIx1GI2zi3QJZxTKHKPCukPU7d9uJWFwpItaFeD/itYeDd
+         PPFHasVE8PbGOJg5/kgK8N6iVanqKRaXPPvspccMKzUDb2ZOLt5wdpCY3wmeKw3htB20
+         eu+St9alcljOXyO6ZtI9b+nGO1D5W0jhE4UVpnBOfn9HBPz19QHUcZsnGlYjpwRNP1pC
+         VrrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1707585531; x=1708190331;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Dqo5z7wPlVcN8hVdZJTdSH+25F7F/NafO/e+3YnXVpE=;
+        b=Rbv7FXVGQrpN8N7BHAYVksa9JRh5dImjVeWY4ym01/qQS2hX52b04e4MTcmdIEu/rf
+         Pk4bd9MoDtRkOZwXNXI6rONaXs+TzqPxDoAdo/9stzbjCnWTtIlIyigzGrUINEzCTwot
+         oXEbMq7Szr9FJSCCCFOPpdUKykPl3Bp5qDF1LNY/tsSRH3XTmAod6uzjJiVhAEndb31j
+         rotZUG+uKYiZInseB1IbgQRoUYKIe4eOQon7hQ3SewMmFtTVr0LvVP9MkbKIHhjCI110
+         Vt7CNHXohSPh0zH4FgHhtJ/5vwyRF8wzqzrguSdQN4DDq6ssUKmanGRC3IbZFmuNwCfx
+         SxTQ==
+X-Gm-Message-State: AOJu0Yy4eugsbRJ08gd2PJqqXZLTcptr08gko8VHQJ+nfAkX1lx0OGj6
+	pJXIv7Cue1Q9QQTkDxrDB3Mqhg/+SygTp0CA1SJcaxypmuO572FGQuxppwEaSWn+vOGi/q06Ffp
+	l
+X-Google-Smtp-Source: AGHT+IE1tm7k8WVYQ2t5Q9PZ9jVGH3jkj42pTzxmASE6HScvnuszPppb9UiRYrKTGdcAQMQnlw7etg==
+X-Received: by 2002:a17:90a:e643:b0:295:f706:add5 with SMTP id ep3-20020a17090ae64300b00295f706add5mr2959169pjb.24.1707585531622;
+        Sat, 10 Feb 2024 09:18:51 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id gp8-20020a17090adf0800b00296b62d9793sm3743312pjb.3.2024.02.10.09.18.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 10 Feb 2024 09:18:51 -0800 (PST)
+Date: Sat, 10 Feb 2024 09:18:49 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Takanori Hirano <me@hrntknr.net>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2 v2] tc: Add support json option in filter.
+Message-ID: <20240210091849.77f9c634@hermes.local>
+In-Reply-To: <0106018d927d04ff-efbd5d4b-b32f-4b39-a184-a28939608096-000000@ap-northeast-1.amazonses.com>
+References: <20240209083743.2bd1a90d@hermes.local>
+	<0106018d927d04ff-efbd5d4b-b32f-4b39-a184-a28939608096-000000@ap-northeast-1.amazonses.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240206091909.3191-6-paul.barker.ct@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch02.omp.ru (10.188.4.13) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/10/2024 16:56:17
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 183344 [Feb 10 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.86.126 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.86.126 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	omp.ru:7.1.1;127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.86.126
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/10/2024 17:00:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/10/2024 2:13:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On 2/6/24 12:19 PM, Paul Barker wrote:
+On Sat, 10 Feb 2024 10:08:03 +0000
+Takanori Hirano <me@hrntknr.net> wrote:
 
-> Call napi_complete_done() in accordance with the documentation in
-> `Documentation/networking/napi.rst`.
-> 
-> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+>  	if (tb[TCA_CGROUP_POLICE]) {
+> -		fprintf(f, "\n");
+> +		print_string(PRINT_FP, NULL, "\n", NULL)
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-
-[...]
-
-MBR, Sergey
+This should probably just be print_nl()
 
