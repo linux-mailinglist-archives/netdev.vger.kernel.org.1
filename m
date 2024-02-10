@@ -1,321 +1,107 @@
-Return-Path: <netdev+bounces-70750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0E918503CB
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 11:08:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E115B850404
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 11:49:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 564EAB22FEC
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 10:08:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C1C31F23EE4
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 10:49:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F40136102;
-	Sat, 10 Feb 2024 10:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99CAC364B7;
+	Sat, 10 Feb 2024 10:48:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hrntknr.net header.i=@hrntknr.net header.b="rFHSD/HV";
-	dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b="o4HBeNZC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZuND8qsX"
 X-Original-To: netdev@vger.kernel.org
-Received: from e234-5.smtp-out.ap-northeast-1.amazonses.com (e234-5.smtp-out.ap-northeast-1.amazonses.com [23.251.234.5])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE1FE36AE0
-	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 10:08:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=23.251.234.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5131D684
+	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 10:48:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707559687; cv=none; b=kmA1ztp5VKWHGYTEYmxUeSRiNa/T0pDqjb4A4jwECCoEFp50BQbbCHAlzXs13v8UP5V+Lvl5FFZianmvWaAnZJuqPTzbXk6z7qsQCtcXJWYeEFxF+v7vbo7NZQzJquZGWYWZEVN9oq+0r/+sFpwaIOZiYeC0JSv4xIAVTTkeF8E=
+	t=1707562139; cv=none; b=TCdRUu6kaNM6K9RP93jmSbBJqwUnDFIWHqxPDzi7e4bLp2o5j0hcaE9XrMfjSqlOH0h9UYPqIO7I/19Ds3aZ1Qx8Zzgllm0xNwDlQl2xwziiSJVQ0gBzPFc5gVJy8f+nP6IoY78nR5uTNp/+g+tvidfwNeDewc8NFX87JciNj2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707559687; c=relaxed/simple;
-	bh=/uYN3GyZy8gTWAYlxGA6RCTkOWu+2l0PSJMHg9X5I/0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BC8C8QvWcHvecbDpLr5AwZpHu5vZEhvHVPz8EXlqG3KXcQdGu/pUYNIvE7545Isk4IxBF6IJ85b3RhKM36D8pdWzNxkUQdZ4QFu92OkiYmwmo8a5xJWVKUkiovrDhFP0pKE/K8jRF8eRfTWC0QF+A420d7qRGvEjUHBvm/eyGOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hrntknr.net; spf=pass smtp.mailfrom=ap-northeast-1.amazonses.com; dkim=pass (2048-bit key) header.d=hrntknr.net header.i=@hrntknr.net header.b=rFHSD/HV; dkim=pass (1024-bit key) header.d=amazonses.com header.i=@amazonses.com header.b=o4HBeNZC; arc=none smtp.client-ip=23.251.234.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hrntknr.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ap-northeast-1.amazonses.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-	s=otpfqkfjftndw3gmuo745xikcugpdsgy; d=hrntknr.net; t=1707559683;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding;
-	bh=/uYN3GyZy8gTWAYlxGA6RCTkOWu+2l0PSJMHg9X5I/0=;
-	b=rFHSD/HVIts3YCPH5oZr8xxvm/PpWbGDjqKaOggfZJsNzjAa02qogzsm2qSJ+VkV
-	EC9jZdoAFFaOsWc4NPSlFFycler2hZRV0TusQi5RvpaZjGXWt4QAIiHMdZ8Zh2BBZ/P
-	gnDX0oUnEAT3qx/fAXuU+UuGLuRYOPCZqWGP6tmxm+3Eg2if8t4DQRpwy9C+U5HcDIR
-	nLvEskna8x4XTPNThKOnS7jbL7+jQynqjJ8UepQFpvVWXR3pH9pwzq1ISwz1hXif295
-	Zj45NeMAGejr5mv75bVEXLgm0O6xvlX4IeAk+Fu4kFgR43bn57ae6YFwSMH4VHvrMWU
-	hG4R/TmgHw==
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/simple;
-	s=zh4gjftm6etwoq6afzugpky45synznly; d=amazonses.com; t=1707559683;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:MIME-Version:Content-Transfer-Encoding:Feedback-ID;
-	bh=/uYN3GyZy8gTWAYlxGA6RCTkOWu+2l0PSJMHg9X5I/0=;
-	b=o4HBeNZCQc6SqKuvVU9ZSdgOzti+cE9aYmkLQlyOZc4PV9VvHtPMeAxr/oLzLqTC
-	7yvXdST7GTgz4SDgqE3ffjucCmhk/GKDIVVrZ8uMTvo+9Ozhw8/w1UxjaBqi5mIsZki
-	SsZzLX66yOshq/AkdhKC/HsZgSl0wTRO92wCZp08=
-From: Takanori Hirano <me@hrntknr.net>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org, Takanori Hirano <me@hrntknr.net>
-Subject: [PATCH iproute2 v2] tc: Add support json option in filter.
-Date: Sat, 10 Feb 2024 10:08:03 +0000
-Message-ID: <0106018d927d04ff-efbd5d4b-b32f-4b39-a184-a28939608096-000000@ap-northeast-1.amazonses.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240209083743.2bd1a90d@hermes.local>
-References: <20240209083743.2bd1a90d@hermes.local>
+	s=arc-20240116; t=1707562139; c=relaxed/simple;
+	bh=cK6BUBE+KcUOObi6eZQQ6/x8Kp9qpahf/9Ka06C0Hh0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A3QVqLVqZ7HJkENJR3bBZ5DN55DQD2wnuicAsijQ6Rxh22KiWn7IN3apOI09Rzi3r/kj1OeSfStW7v78PAvhQn55/6Da6J5/3NNt4f8Bvg7u9RRvjZfuh6DSEeNFctSZQVDEdY8Z8KiFfVfohSNlszOM29H8muYEGYY0n7pyq2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZuND8qsX; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1707562138; x=1739098138;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=cK6BUBE+KcUOObi6eZQQ6/x8Kp9qpahf/9Ka06C0Hh0=;
+  b=ZuND8qsXL3XnRGLhgIEX9AHJknXvpg371LDEVfGxUTatYDQO1Unv+gP5
+   KtnPf+mOYp37tBap8Jb7Jp5A9aneALTz1OYzZcCUfUMfHatOjyrEWHn9Z
+   EP4ApvQYz+Te8b24zkUcb1j2/iGW2gQis7w48SmxkuVNF9Kv7Dlq+F9Oq
+   w/Q92akxfWal4RxDwxqI6d8OMRxE/Mkh9BpRebI3og7Ze/zgIJtB56vwa
+   QWK+Sbwy0tenjDZOtrM48mZlJ+d86ra9wtnoqdJLScKs8L3PHWOfpz4Em
+   vqvrE93duwvO2Ij7TGhzdcqtFgxWc2yGTmC/FcDZNmm7z8m7ehoxK1sDB
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10979"; a="27007489"
+X-IronPort-AV: E=Sophos;i="6.05,259,1701158400"; 
+   d="scan'208";a="27007489"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2024 02:48:57 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.05,259,1701158400"; 
+   d="scan'208";a="6796404"
+Received: from sgruszka-mobl.ger.corp.intel.com (HELO localhost) ([10.252.62.138])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2024 02:48:54 -0800
+Date: Sat, 10 Feb 2024 11:48:51 +0100
+From: Stanislaw Gruszka <stanislaw.gruszka@linux.intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Sasha Neftin <sasha.neftin@intel.com>,
+	Dima Ruinskiy <dima.ruinskiy@intel.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"Rafael J . Wysocki " <rafael@kernel.org>
+Subject: Re: [PATCH] net: avoid net core runtime resume for most drivers
+Message-ID: <ZcdUk5c0M7bTUOSv@linux.intel.com>
+References: <20240207095111.1593146-1-stanislaw.gruszka@linux.intel.com>
+ <20240209124536.75599e91@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Feedback-ID: 1.ap-northeast-1.rx1zlehJXIhTBJXf7/H1gLdwyBf0eKXp6+AKci1nnIg=:AmazonSES
-X-SES-Outgoing: 2024.02.10-23.251.234.5
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240209124536.75599e91@kernel.org>
 
-Add support for "-json" output in tc-fw, tc-cgroup, tc-flow, and tc-route.
+On Fri, Feb 09, 2024 at 12:45:36PM -0800, Jakub Kicinski wrote:
+> On Wed,  7 Feb 2024 10:51:11 +0100 Stanislaw Gruszka wrote:
+> > Introducing runtime resume before ndo_open and ethtool ops by commits:
+> > 
+> > d43c65b05b84 ("ethtool: runtime-resume netdev parent in ethnl_ops_begin")
+> > bd869245a3dc ("net: core: try to runtime-resume detached device in __dev_open")
+> 
+> We should revisit whether core should try to help drivers with PM
+> or not once the Intel drivers are fixed. Taking the global networking
+> lock from device resume routine is inexcusable.
 
-Signed-off-by: Takanori Hirano <me@hrntknr.net>
----
-Changes in v2:
-- Fix terminology, in f_fw, handle -> fw
-- Add json option support for tc-cgroup, tc-flow, and tc-route
----
- tc/f_cgroup.c |  4 ++--
- tc/f_flow.c   | 51 ++++++++++++++++++++++++++++++---------------------
- tc/f_fw.c     | 22 +++++++++++++++-------
- tc/f_route.c  | 38 ++++++++++++++++++++++++++++++--------
- 4 files changed, 77 insertions(+), 38 deletions(-)
+Ok, we need get rid of it in igc (and fix broken assertion in igb).
 
-diff --git a/tc/f_cgroup.c b/tc/f_cgroup.c
-index a4fc03d1..0b69db6d 100644
---- a/tc/f_cgroup.c
-+++ b/tc/f_cgroup.c
-@@ -86,13 +86,13 @@ static int cgroup_print_opt(struct filter_util *qu, FILE *f,
- 	parse_rtattr_nested(tb, TCA_CGROUP_MAX, opt);
- 
- 	if (handle)
--		fprintf(f, "handle 0x%x ", handle);
-+		print_0xhex(PRINT_ANY, "handle", "handle %#llx ", handle);
- 
- 	if (tb[TCA_CGROUP_EMATCHES])
- 		print_ematch(f, tb[TCA_CGROUP_EMATCHES]);
- 
- 	if (tb[TCA_CGROUP_POLICE]) {
--		fprintf(f, "\n");
-+		print_string(PRINT_FP, NULL, "\n", NULL);
- 		tc_print_police(f, tb[TCA_CGROUP_POLICE]);
- 	}
- 
-diff --git a/tc/f_flow.c b/tc/f_flow.c
-index 2445aaef..1c9a636d 100644
---- a/tc/f_flow.c
-+++ b/tc/f_flow.c
-@@ -272,33 +272,37 @@ static int flow_print_opt(struct filter_util *fu, FILE *f, struct rtattr *opt,
- 
- 	parse_rtattr_nested(tb, TCA_FLOW_MAX, opt);
- 
--	fprintf(f, "handle 0x%x ", handle);
-+	print_0xhex(PRINT_ANY, "handle", "handle %#llx ", handle);
- 
- 	if (tb[TCA_FLOW_MODE]) {
- 		__u32 mode = rta_getattr_u32(tb[TCA_FLOW_MODE]);
- 
- 		switch (mode) {
- 		case FLOW_MODE_MAP:
--			fprintf(f, "map ");
-+			open_json_object("map");
-+			print_string(PRINT_FP, NULL, "map ", NULL);
- 			break;
- 		case FLOW_MODE_HASH:
--			fprintf(f, "hash ");
-+			open_json_object("hash");
-+			print_string(PRINT_FP, NULL, "hash ", NULL);
- 			break;
- 		}
- 	}
- 
- 	if (tb[TCA_FLOW_KEYS]) {
- 		__u32 keymask = rta_getattr_u32(tb[TCA_FLOW_KEYS]);
--		char *sep = "";
-+		char *sep = " ";
- 
--		fprintf(f, "keys ");
-+		open_json_array(PRINT_ANY, "keys");
- 		for (i = 0; i <= FLOW_KEY_MAX; i++) {
- 			if (keymask & (1 << i)) {
--				fprintf(f, "%s%s", sep, flow_keys[i]);
-+				print_string(PRINT_FP, NULL, "%s", sep);
-+				print_string(PRINT_ANY, NULL, "%s",
-+					     flow_keys[i]);
- 				sep = ",";
- 			}
- 		}
--		fprintf(f, " ");
-+		close_json_array(PRINT_ANY, " ");
- 	}
- 
- 	if (tb[TCA_FLOW_MASK])
-@@ -311,39 +315,44 @@ static int flow_print_opt(struct filter_util *fu, FILE *f, struct rtattr *opt,
- 		__u32 xor = mask & val;
- 
- 		if (mask != ~0)
--			fprintf(f, "and 0x%.8x ", mask);
-+			print_0xhex(PRINT_ANY, "and", "and 0x%.8x ", mask);
- 		if (xor != 0)
--			fprintf(f, "xor 0x%.8x ", xor);
-+			print_0xhex(PRINT_ANY, "xor", "xor 0x%.8x ", xor);
- 		if (or != 0)
--			fprintf(f, "or 0x%.8x ", or);
-+			print_0xhex(PRINT_ANY, "or", "or 0x%.8x ", or);
- 	}
- 
- 	if (tb[TCA_FLOW_RSHIFT])
--		fprintf(f, "rshift %u ",
--			rta_getattr_u32(tb[TCA_FLOW_RSHIFT]));
-+		print_uint(PRINT_ANY, "rshift", "rshift %u ",
-+			   rta_getattr_u32(tb[TCA_FLOW_RSHIFT]));
- 	if (tb[TCA_FLOW_ADDEND])
--		fprintf(f, "addend 0x%x ",
--			rta_getattr_u32(tb[TCA_FLOW_ADDEND]));
-+		print_0xhex(PRINT_ANY, "addend", "addend 0x%x ",
-+			    rta_getattr_u32(tb[TCA_FLOW_ADDEND]));
- 
- 	if (tb[TCA_FLOW_DIVISOR])
--		fprintf(f, "divisor %u ",
--			rta_getattr_u32(tb[TCA_FLOW_DIVISOR]));
-+		print_uint(PRINT_ANY, "divisor", "divisor %u ",
-+			   rta_getattr_u32(tb[TCA_FLOW_DIVISOR]));
- 	if (tb[TCA_FLOW_BASECLASS])
--		fprintf(f, "baseclass %s ",
--			sprint_tc_classid(rta_getattr_u32(tb[TCA_FLOW_BASECLASS]), b1));
-+		print_string(PRINT_ANY, "baseclass", "baseclass %s ",
-+			     sprint_tc_classid(
-+				     rta_getattr_u32(tb[TCA_FLOW_BASECLASS]),
-+				     b1));
- 
- 	if (tb[TCA_FLOW_PERTURB])
--		fprintf(f, "perturb %usec ",
--			rta_getattr_u32(tb[TCA_FLOW_PERTURB]));
-+		print_uint(PRINT_ANY, "perturb", "perturb %usec ",
-+			   rta_getattr_u32(tb[TCA_FLOW_PERTURB]));
- 
- 	if (tb[TCA_FLOW_EMATCHES])
- 		print_ematch(f, tb[TCA_FLOW_EMATCHES]);
- 	if (tb[TCA_FLOW_POLICE])
- 		tc_print_police(f, tb[TCA_FLOW_POLICE]);
- 	if (tb[TCA_FLOW_ACT]) {
--		fprintf(f, "\n");
-+		print_string(PRINT_FP, NULL, "\n", NULL);
- 		tc_print_action(f, tb[TCA_FLOW_ACT], 0);
- 	}
-+	if (tb[TCA_FLOW_MODE]) {
-+		close_json_object();
-+	}
- 	return 0;
- }
- 
-diff --git a/tc/f_fw.c b/tc/f_fw.c
-index 38bec492..1af6b6a7 100644
---- a/tc/f_fw.c
-+++ b/tc/f_fw.c
-@@ -124,18 +124,25 @@ static int fw_print_opt(struct filter_util *qu, FILE *f, struct rtattr *opt, __u
- 	if (handle || tb[TCA_FW_MASK]) {
- 		__u32 mark = 0, mask = 0;
- 
-+		open_json_object("fw");
- 		if (handle)
- 			mark = handle;
- 		if (tb[TCA_FW_MASK] &&
--		    (mask = rta_getattr_u32(tb[TCA_FW_MASK])) != 0xFFFFFFFF)
--			fprintf(f, "handle 0x%x/0x%x ", mark, mask);
--		else
--			fprintf(f, "handle 0x%x ", handle);
-+		    (mask = rta_getattr_u32(tb[TCA_FW_MASK])) != 0xFFFFFFFF) {
-+			print_0xhex(PRINT_ANY, "mark", "handle 0x%x", mark);
-+			print_0xhex(PRINT_ANY, "mask", "/0x%x ", mask);
-+		} else {
-+			print_0xhex(PRINT_ANY, "mark", "handle 0x%x ", mark);
-+			print_0xhex(PRINT_JSON, "mask", NULL, 0xFFFFFFFF);
-+		}
-+		close_json_object();
- 	}
- 
- 	if (tb[TCA_FW_CLASSID]) {
- 		SPRINT_BUF(b1);
--		fprintf(f, "classid %s ", sprint_tc_classid(rta_getattr_u32(tb[TCA_FW_CLASSID]), b1));
-+		print_string(PRINT_ANY, "classid", "classid %s ",
-+			     sprint_tc_classid(
-+				     rta_getattr_u32(tb[TCA_FW_CLASSID]), b1));
- 	}
- 
- 	if (tb[TCA_FW_POLICE])
-@@ -143,11 +150,12 @@ static int fw_print_opt(struct filter_util *qu, FILE *f, struct rtattr *opt, __u
- 	if (tb[TCA_FW_INDEV]) {
- 		struct rtattr *idev = tb[TCA_FW_INDEV];
- 
--		fprintf(f, "input dev %s ", rta_getattr_str(idev));
-+		print_string(PRINT_ANY, "indev", "input dev %s ",
-+			     rta_getattr_str(idev));
- 	}
- 
- 	if (tb[TCA_FW_ACT]) {
--		fprintf(f, "\n");
-+		print_string(PRINT_FP, NULL, "\n", "");
- 		tc_print_action(f, tb[TCA_FW_ACT], 0);
- 	}
- 	return 0;
-diff --git a/tc/f_route.c b/tc/f_route.c
-index e92c7985..21ca7f75 100644
---- a/tc/f_route.c
-+++ b/tc/f_route.c
-@@ -146,20 +146,42 @@ static int route_print_opt(struct filter_util *qu, FILE *f, struct rtattr *opt,
- 	parse_rtattr_nested(tb, TCA_ROUTE4_MAX, opt);
- 
- 	if (handle)
--		fprintf(f, "fh 0x%08x ", handle);
-+		print_0xhex(PRINT_ANY, "fh", "fh 0x%08x ", handle);
- 	if (handle&0x7F00)
--		fprintf(f, "order %d ", (handle>>8)&0x7F);
-+		print_uint(PRINT_ANY, "order", "order %d ",
-+			   (handle >> 8) & 0x7F);
- 
- 	if (tb[TCA_ROUTE4_CLASSID]) {
- 		SPRINT_BUF(b1);
--		fprintf(f, "flowid %s ", sprint_tc_classid(rta_getattr_u32(tb[TCA_ROUTE4_CLASSID]), b1));
-+		print_string(PRINT_ANY, "flowid", "flowid %s ",
-+			     sprint_tc_classid(
-+				     rta_getattr_u32(tb[TCA_ROUTE4_CLASSID]),
-+				     b1));
-+	}
-+	if (tb[TCA_ROUTE4_TO]) {
-+		open_json_object("to");
-+		print_string(
-+			PRINT_ANY, "name", "to %s ",
-+			rtnl_rtrealm_n2a(rta_getattr_u32(tb[TCA_ROUTE4_TO]), b1,
-+					 sizeof(b1)));
-+		print_uint(PRINT_JSON, "id", NULL,
-+			   rta_getattr_u32(tb[TCA_ROUTE4_TO]));
-+		close_json_object();
-+	}
-+	if (tb[TCA_ROUTE4_FROM]) {
-+		open_json_object("from");
-+		print_string(
-+			PRINT_ANY, "name", "from %s ",
-+			rtnl_rtrealm_n2a(rta_getattr_u32(tb[TCA_ROUTE4_FROM]),
-+					 b1, sizeof(b1)));
-+		print_uint(PRINT_JSON, "id", NULL,
-+			   rta_getattr_u32(tb[TCA_ROUTE4_FROM]));
-+		close_json_object();
- 	}
--	if (tb[TCA_ROUTE4_TO])
--		fprintf(f, "to %s ", rtnl_rtrealm_n2a(rta_getattr_u32(tb[TCA_ROUTE4_TO]), b1, sizeof(b1)));
--	if (tb[TCA_ROUTE4_FROM])
--		fprintf(f, "from %s ", rtnl_rtrealm_n2a(rta_getattr_u32(tb[TCA_ROUTE4_FROM]), b1, sizeof(b1)));
- 	if (tb[TCA_ROUTE4_IIF])
--		fprintf(f, "fromif %s", ll_index_to_name(rta_getattr_u32(tb[TCA_ROUTE4_IIF])));
-+		print_string(
-+			PRINT_ANY, "fromif", "fromif %s",
-+			ll_index_to_name(rta_getattr_u32(tb[TCA_ROUTE4_IIF])));
- 	if (tb[TCA_ROUTE4_POLICE])
- 		tc_print_police(f, tb[TCA_ROUTE4_POLICE]);
- 	if (tb[TCA_ROUTE4_ACT])
--- 
-2.34.1
+> I really don't want to
+> make precedents for adjusting the core because driver code is poor
+> quality :(
 
+I see this rather as removal of special core adjustment added
+by above commits. It's only needed for r8169. For all others
+it is just pure harm. It could be done without the priv flag,
+but then r8169 probably would need changes.
+
+Regards
+Stanislaw
 
