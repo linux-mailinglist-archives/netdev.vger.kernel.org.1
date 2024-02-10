@@ -1,146 +1,86 @@
-Return-Path: <netdev+bounces-70743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58DB685038C
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 09:48:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAF5085039A
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 10:09:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D02BB23B00
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 08:48:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A81271C22521
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 09:09:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A7F02E3E3;
-	Sat, 10 Feb 2024 08:48:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="UWDvjfmG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C48136117;
+	Sat, 10 Feb 2024 09:09:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-of-o54.zoho.com (sender4-of-o54.zoho.com [136.143.188.54])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95C628DA4
-	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 08:48:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.54
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707554912; cv=pass; b=i6fGS6VsjZS7u4F1R44nB42T+XdFPd10qMwFEqfDGDekl89nhKgnNNeQFNjNrVTuoUbEqA3EbnO1QOyyd9TyJOZUM4tloL436TJWI+e+JMeLImlIrVilOilmr53crFlRQto4GIIi1iA6hG5WMIMzo7FIHk0mHVzfbnM8OIlb7gc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707554912; c=relaxed/simple;
-	bh=sSPXNwE5vTLSN5n6ZcnolmzrMMV7FnNR2dLXEMv6gg4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EoOdevRTLT4SiElOjknRdYvBd/gW0R7dIVawBpshXHPuiLB2PtxYtdhe8ZyHgM6QlccE9hDn5XOG4pGHXqz7j7yvjp5kHZQ9jSiq0dm5Jd8Q0DZdDf7vThKDb7lZuyIk+6LHnNemW9nM4JxN8GXF9thx3z/JmeEBvKi1qto0NY8=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=UWDvjfmG; arc=pass smtp.client-ip=136.143.188.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=machnikowski.net
-ARC-Seal: i=1; a=rsa-sha256; t=1707554897; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=i6W0MmvanaC2Jyh+325xlBwyu5R+amv7n2gNlFh7gP1tu9vdKhwvOQop8/2jzswBkoBW9sjs/U/u2mDVRFCt95exioz733mD12UnwUSnwKDZBn13G94l+Y6Czng1PBXKgoGbFXmORXG3Mv7yNAvcdzoDfBuIqH5UrgPChMA2Rh4=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1707554897; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=vFQ6lKj6Y4ynk5FepbItJh5TgyG0vklA30HtEpS9sIE=; 
-	b=TYDbUrKpv/QAAaojl41OrO2uNy4HPIIf40/QqwoZZQGSXlrmdWsVRWp/7h6DHkYBZLf/rPiYMpJZ27lG4P2ZrZKKUOlEsj9T3smpaIt/9Yg8mdtQNr0OiVVrU0ZrI3wpALoks0IFoHwm5W5hRnNnmVXv+Vvv3I/IQbQFLUmPu+Q=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=machnikowski.net;
-	spf=pass  smtp.mailfrom=maciek@machnikowski.net;
-	dmarc=pass header.from=<maciek@machnikowski.net>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1707554897;
-	s=zoho; d=machnikowski.net; i=maciek@machnikowski.net;
-	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:To:To:Cc:Cc:References:From:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=vFQ6lKj6Y4ynk5FepbItJh5TgyG0vklA30HtEpS9sIE=;
-	b=UWDvjfmG8ZumH1l3ZnKfrHAkMj/cR8eG4AQoCJa6p/H/Eyf3DpYrmMiymrB2eoI9
-	DtQoLJ/OCRNxmDhGTyW3ScA5PdHkODkh+CDzCPyMAAlb8zvzIGHB7f2X0RSHNq4rCqy
-	dc5IzcYIKAAdwGe8AwGq4epiZJ/M4Taa5oXxI21xTo1dSzOO0C3R0x/rFVtzLsydIGn
-	dWeiDdVpbX2hdF3zF8kc7GupKNLJlpOaQ2JYLezmqElALAhBB4hV9+mJ8e0kx7FvhsN
-	rp6g8PmXchDqIWD8/LnakQ1qLRHLjU0oUdzbim9mKtHYNbqvTnWS3f+bwjMQTpxPjYS
-	mJveMkw8kA==
-Received: from [192.168.1.225] (83.8.237.114.ipv4.supernova.orange.pl [83.8.237.114]) by mx.zohomail.com
-	with SMTPS id 1707554892566167.19528057587877; Sat, 10 Feb 2024 00:48:12 -0800 (PST)
-Message-ID: <01747e34-c655-4dbf-bda9-544f4e3f8ebd@machnikowski.net>
-Date: Sat, 10 Feb 2024 09:48:09 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0E9223DB
+	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 09:09:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707556144; cv=none; b=anFB70SjPRbY8Xzb42WgN1n/9J5I70xfzwtuZq7NbLVaH+B1nsWhpy9hZAPGQa1K2tVp1QBJVsSgXxdyWtQQKCYXeewJtNYQ4wDxub98WBdLE9DMvUSfXbVkcZoQ7LaD9OXdGlzgJr+0dAqqmf9WmMerZt3w/1NNX7B6YlZoScc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707556144; c=relaxed/simple;
+	bh=7PyyzTH9XD86vkFMZ8BKcwz84s/cj9zsdH9oDqkrUNU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 In-Reply-To:Content-Type:Content-Disposition; b=ZPyKvZF9OKJ8Hrlw91edaAWOh+GnahmLR85ecn2aug8MeHwFZwBHzUZypHgTnja68ku3oOvsU5kS3QseB/beyJ02QN1P+WyWA9Qb/4EGFC0mEvIdVKkrtALfdIuaoqJLOx1PHnloDXyBDgcYpHWphvcEc0hAeUQWeaPQhhOEdZ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-141-VI09oHxDNyiC8kcScBWfdw-1; Sat, 10 Feb 2024 04:02:26 -0500
+X-MC-Unique: VI09oHxDNyiC8kcScBWfdw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 07FC71021F64;
+	Sat, 10 Feb 2024 09:02:10 +0000 (UTC)
+Received: from hog (unknown [10.39.192.50])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id AFC2A1C14B0C;
+	Sat, 10 Feb 2024 09:02:08 +0000 (UTC)
+Date: Sat, 10 Feb 2024 10:02:07 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, vadim.fedorenko@linux.dev, borisp@nvidia.com,
+	john.fastabend@gmail.com, horms@kernel.org
+Subject: Re: [PATCH net 7/7] net: tls: fix returned read length with async
+ decrypt
+Message-ID: <Zcc7jydL2xIYFrQW@hog>
+References: <20240207011824.2609030-1-kuba@kernel.org>
+ <20240207011824.2609030-8-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 3/3] netdevsim: add selftest for forwarding
- skb between connected ports
-To: David Wei <dw@davidwei.uk>, Jakub Kicinski <kuba@kernel.org>,
- Jiri Pirko <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>,
- netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-References: <20240210003240.847392-1-dw@davidwei.uk>
- <20240210003240.847392-4-dw@davidwei.uk>
-Content-Language: en-US
-From: Maciek Machnikowski <maciek@machnikowski.net>
-In-Reply-To: <20240210003240.847392-4-dw@davidwei.uk>
+In-Reply-To: <20240207011824.2609030-8-kuba@kernel.org>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+2024-02-06, 17:18:24 -0800, Jakub Kicinski wrote:
+> We double count async, non-zc rx data. The previous fix was
+> lucky because if we fully zc async_copy_bytes is 0 so we add 0.
+> Decrypted already has all the bytes we handled, in all cases.
+> We don't have to adjust anything, delete the erroneous line.
 
-On 10/02/2024 01:32, David Wei wrote:
-> +###
-> +### Code start
-> +###
-> +
-> +modprobe netdevsim
-> +
-> +# linking
-> +
-> +echo $NSIM_DEV_1_ID > $NSIM_DEV_SYS_NEW
-> +echo $NSIM_DEV_2_ID > $NSIM_DEV_SYS_NEW
-> +
-> +setup_ns
-> +
-> +NSIM_DEV_1_FD=$((RANDOM % 1024))
-> +exec {NSIM_DEV_1_FD}</var/run/netns/nssv
-> +NSIM_DEV_1_IFIDX=$(ip netns exec nssv cat /sys/class/net/$NSIM_DEV_1_NAME/ifindex)
-> +
-> +NSIM_DEV_2_FD=$((RANDOM % 1024))
-> +exec {NSIM_DEV_2_FD}</var/run/netns/nscl
-> +NSIM_DEV_2_IFIDX=$(ip netns exec nscl cat /sys/class/net/$NSIM_DEV_2_NAME/ifindex)
-> +
-> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:2000" > $NSIM_DEV_SYS_LINK 2>/dev/null
-> +if [ $? -eq 0 ]; then
-> +	echo "linking with non-existent netdevsim should fail"
-> +	exit 1
-> +fi
-> +
-> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX 2000:$NSIM_DEV_2_IFIDX" > $NSIM_DEV_SYS_LINK 2>/dev/null
-> +if [ $? -eq 0 ]; then
-> +	echo "linking with non-existent netnsid should fail"
-> +	exit 1
-> +fi
-> +
-> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX" > $NSIM_DEV_SYS_LINK 2>/dev/null
-> +if [ $? -eq 0 ]; then
-> +	echo "linking with self should fail"
-> +	exit 1
-> +fi
-> +
-> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:$NSIM_DEV_2_IFIDX" > $NSIM_DEV_SYS_LINK
-> +if [ $? -ne 0 ]; then
-> +	echo "linking netdevsim1 with netdevsim2 should succeed"
-> +	exit 1
-> +fi
-> +
-> +# argument error checking
-> +
-> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:a" > $NSIM_DEV_SYS_LINK 2>/dev/null
-> +if [ $? -eq 0 ]; then
-> +	echo "invalid arg should fail"
-> +	exit 1
-> +fi
-> +
-> +# send/recv packets
-> +
-> +socat_check || exit 4
+I had an adjustment there which I thought was necessary, but I can't
+remember why, so let's go with this.
 
-This check will cause the script to exit without cleaning up the devices
-and namespaces. Move it to the top, or cleanup on error
+Possibly had to do with partial async cases, since I also played with
+a hack to only go async for every other request (or every N requests).
 
-Thanks,
-Maciek
+--=20
+Sabrina
+
 
