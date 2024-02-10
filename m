@@ -1,146 +1,157 @@
-Return-Path: <netdev+bounces-70780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-70781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CDEF78505FF
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 19:42:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF449850605
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 19:54:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A298285EC9
-	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 18:42:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42627B20B21
+	for <lists+netdev@lfdr.de>; Sat, 10 Feb 2024 18:54:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE3585DF24;
-	Sat, 10 Feb 2024 18:42:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A6075F471;
+	Sat, 10 Feb 2024 18:54:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b="CyDMWDDp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from sender4-of-o54.zoho.com (sender4-of-o54.zoho.com [136.143.188.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DF861E484;
-	Sat, 10 Feb 2024 18:42:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1707590563; cv=none; b=GHmKOmuAKa2bU6SjxKZi5BOZuJcdrzdzAtuqAunfgSzslkmi8kKFcWvywQ5lwBz2iGFBDw0vVwKahYG+gUu1jVeQVKJj+0TgH8hb2vVeuwg4llok6DKcz2CwaF0Vb9azkEUSiarFk/ekTmM4m/W4gmy375EGmyxlq+nNsTCrPoA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1707590563; c=relaxed/simple;
-	bh=X9SV1tC7rjZhp8FTyywbWyvX4t8GzqLyBGr/yf6plqU=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=FJFHslUvne8cab4X5bsRFccVPobpaOITHsnOCeO79Ak29t12vonfPUFXQshQSId7sbrE13Hr0Bfvr4vvDRHwvN+2rslXG1WPKJw4YcJ4oggwCxaO8Yk+2uL0jddejyqcRvpE4Fc5nOBcAp5Kq4zqm9vLN5TjCo2tlQQRqFIboic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (31.173.86.126) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 10 Feb
- 2024 21:42:28 +0300
-Subject: Re: [RFC PATCH net-next v2 6/7] net: ravb: Enable SW IRQ Coalescing
- for GbEth
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, "David S . Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>, Wolfram Sang
-	<wsa+renesas@sang-engineering.com>, <netdev@vger.kernel.org>,
-	<linux-renesas-soc@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240206091909.3191-1-paul.barker.ct@bp.renesas.com>
- <20240206091909.3191-7-paul.barker.ct@bp.renesas.com>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <2251fe66-11b7-2f30-c905-7bc1b9a57dab@omp.ru>
-Date: Sat, 10 Feb 2024 21:42:28 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69D455C8FB
+	for <netdev@vger.kernel.org>; Sat, 10 Feb 2024 18:54:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1707591264; cv=pass; b=OkVq1liNla1mher7/bAtuC3krno3ePAfnzuJWw1qoAFk0VZfZY2E3vTJe3nIh1JBP8no/yL/UHkz8vyeoOVeRA7CfIkyCzsKRbFXYy6AePGijHl6ynlxbBJU/B1gtkS+8vyo6VgEAxgoCqx1Rew/SSeNxx6IIhQLZwluiaclOTs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1707591264; c=relaxed/simple;
+	bh=d+FMo6j9dQ/8zp04YQMoD+ZBMyp5fAERXRkpMLGk/sk=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=OmTv2TUk691CO8Sh82qxpPBFEwCTGboZK2v6liC2DTndHJHhrrBkPqfMLwr0+y2A/2/ROIq465hyWa45owQHw8medG1XdQNuSL9YTvF19rcDFomKjgxX9m6yWW9eIx3V+Cbg65TYB38Gjl9QmVDCm/2Lx7vhWHh8GFSZdlKlXwU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net; spf=pass smtp.mailfrom=machnikowski.net; dkim=pass (2048-bit key) header.d=machnikowski.net header.i=maciek@machnikowski.net header.b=CyDMWDDp; arc=pass smtp.client-ip=136.143.188.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=machnikowski.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=machnikowski.net
+ARC-Seal: i=1; a=rsa-sha256; t=1707591253; cv=none; 
+	d=zohomail.com; s=zohoarc; 
+	b=IsrJGEeFziZQJ/V2O5JJMuqhQ9I0sh+bNhKPQ9gepXoxpDii7bkkR6TjaULZq/j+1GRgk37QJN48qS+dHgcrF/SOy80iAH/Mlr1IJkQSpa5xmROgTw0rP14NBiA8xhy+vO7zw7Z3IwF7YLPFGS1ywHs1Da9iZeW9SnLmgC0nt3M=
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
+	t=1707591253; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:In-Reply-To:MIME-Version:Message-ID:References:Subject:Subject:To:To:Message-Id:Reply-To; 
+	bh=OBOp4m+nZZtkNcYzFH6PExZdaMFghNe3hJr5UWThAFo=; 
+	b=Dfr/WqQVoGW9matLOgCt0MCBFKWy+2Wjsp7zvsLzCrNMulPxea5faO1IbkcYBTKTcAnoB0Dh2u39JOQleaQHztyyHBk9oYAkv4OdAIKw3jNyjQE70HuCSRKveTDwnKJOOv3nxImZ/0UHXLhvZtHckjO21kXoGlkDX0oUK+a4mng=
+ARC-Authentication-Results: i=1; mx.zohomail.com;
+	dkim=pass  header.i=machnikowski.net;
+	spf=pass  smtp.mailfrom=maciek@machnikowski.net;
+	dmarc=pass header.from=<maciek@machnikowski.net>
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1707591253;
+	s=zoho; d=machnikowski.net; i=maciek@machnikowski.net;
+	h=Message-ID:Date:Date:MIME-Version:Subject:Subject:From:From:To:To:Cc:Cc:References:In-Reply-To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
+	bh=OBOp4m+nZZtkNcYzFH6PExZdaMFghNe3hJr5UWThAFo=;
+	b=CyDMWDDpM8DQVjXudVbBXL2plcldzjxSIdy/6MXldRS5qNUudsTECGk4kqn9lScc
+	LrtSEy2kb3zGoQ2r4JmHRzM+jB1a7lDRZiH5Q5T5+XNjnw+g57gSPjVE1y3Gg6lUqfD
+	5fkMwqN4JL7t8Ua5W96l5fXZd1E0HjnBM1ndiKeuvajQYmp9onrpoT9ftAhg+PfDRd7
+	Q58eZ8WcDdnTDn6GPHkHLrwuPUCxjRUnXOo4p2IldMhtqhxIRqLzpIyAE12Lo95FEl1
+	KmLhOR/62mnWINv6/yLKWCsreUa9vWuYUn5oOirH3NJiFXjdDlDjWyAOzJazeMQi9eD
+	uRnUzK3MTA==
+Received: from [192.168.1.225] (83.8.237.114.ipv4.supernova.orange.pl [83.8.237.114]) by mx.zohomail.com
+	with SMTPS id 1707591243488292.8013708728265; Sat, 10 Feb 2024 10:54:03 -0800 (PST)
+Message-ID: <b3fc2f7f-4bd4-4b87-a55b-4dd7d6072ee9@machnikowski.net>
+Date: Sat, 10 Feb 2024 19:53:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240206091909.3191-7-paul.barker.ct@bp.renesas.com>
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v9 3/3] netdevsim: add selftest for forwarding
+ skb between connected ports
 Content-Language: en-US
+From: Maciek Machnikowski <maciek@machnikowski.net>
+To: David Wei <dw@davidwei.uk>, Jakub Kicinski <kuba@kernel.org>,
+ Jiri Pirko <jiri@resnulli.us>, Sabrina Dubroca <sd@queasysnail.net>,
+ netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+References: <20240210003240.847392-1-dw@davidwei.uk>
+ <20240210003240.847392-4-dw@davidwei.uk>
+ <01747e34-c655-4dbf-bda9-544f4e3f8ebd@machnikowski.net>
+In-Reply-To: <01747e34-c655-4dbf-bda9-544f4e3f8ebd@machnikowski.net>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch02.omp.ru (10.188.4.13) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 02/10/2024 18:29:50
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 183344 [Feb 10 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 7 0.3.7 6d6bf5bd8eea7373134f756a2fd73e9456bb7d1a
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.86.126 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 31.173.86.126 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 31.173.86.126
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 02/10/2024 18:35:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 2/10/2024 2:13:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+X-ZohoMailClient: External
 
-On 2/6/24 12:19 PM, Paul Barker wrote:
 
-> Software IRQ Coalescing is required to improve network stack performance
-> in the RZ/G2L SoC family and the RZ/G3S SoC, i.e. the SoCs which use the
-> GbEth IP.
+
+On 10/02/2024 09:48, Maciek Machnikowski wrote:
 > 
-> For the RZ/G2L, network throughput is comparable before and after this
-> change. CPU usage during TCP RX testing dropped by 6.5% and during UDP
-> RX testing dropped by 10%.
+> On 10/02/2024 01:32, David Wei wrote:
+>> +###
+>> +### Code start
+>> +###
+>> +
+>> +modprobe netdevsim
+>> +
+>> +# linking
+>> +
+>> +echo $NSIM_DEV_1_ID > $NSIM_DEV_SYS_NEW
+>> +echo $NSIM_DEV_2_ID > $NSIM_DEV_SYS_NEW
+>> +
+>> +setup_ns
+>> +
+>> +NSIM_DEV_1_FD=$((RANDOM % 1024))
+>> +exec {NSIM_DEV_1_FD}</var/run/netns/nssv
+>> +NSIM_DEV_1_IFIDX=$(ip netns exec nssv cat /sys/class/net/$NSIM_DEV_1_NAME/ifindex)
+>> +
+>> +NSIM_DEV_2_FD=$((RANDOM % 1024))
+>> +exec {NSIM_DEV_2_FD}</var/run/netns/nscl
+>> +NSIM_DEV_2_IFIDX=$(ip netns exec nscl cat /sys/class/net/$NSIM_DEV_2_NAME/ifindex)
+Can we change these to:
+NSIM_DEV_1_FD=$((256+(RANDOM % 256)))
+NSIM_DEV_2_FD=$((512+(RANDOM % 256)))
+
+to prevent a 1/1024 chance of drawing the same indexes?
+
+>> +
+>> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:2000" > $NSIM_DEV_SYS_LINK 2>/dev/null
+>> +if [ $? -eq 0 ]; then
+>> +	echo "linking with non-existent netdevsim should fail"
+>> +	exit 1
+>> +fi
+>> +
+>> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX 2000:$NSIM_DEV_2_IFIDX" > $NSIM_DEV_SYS_LINK 2>/dev/null
+>> +if [ $? -eq 0 ]; then
+>> +	echo "linking with non-existent netnsid should fail"
+>> +	exit 1
+>> +fi
+>> +
+>> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX" > $NSIM_DEV_SYS_LINK 2>/dev/null
+>> +if [ $? -eq 0 ]; then
+>> +	echo "linking with self should fail"
+>> +	exit 1
+>> +fi
+>> +
+>> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:$NSIM_DEV_2_IFIDX" > $NSIM_DEV_SYS_LINK
+>> +if [ $? -ne 0 ]; then
+>> +	echo "linking netdevsim1 with netdevsim2 should succeed"
+>> +	exit 1
+>> +fi
+>> +
+>> +# argument error checking
+>> +
+>> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:a" > $NSIM_DEV_SYS_LINK 2>/dev/null
+>> +if [ $? -eq 0 ]; then
+>> +	echo "invalid arg should fail"
+>> +	exit 1
+>> +fi
+>> +
+>> +# send/recv packets
+>> +
+>> +socat_check || exit 4
 > 
-> For the RZ/G2UL, network throughput is greatly increased by this change
-> (results obtained with iperf3):
->   * TCP TX: 2.9% more throughput
->   * TCP RX: 1.1% more throughput
->   * UDP TX: similar throughput
->   * UDP RX: 41500% more throughput
-
-   Wow! 8-)
-
-> For the RZ/G3S we see improvements in network throughput similar to the
-> RZ/G2UL.
+> This check will cause the script to exit without cleaning up the devices
+> and namespaces. Move it to the top, or cleanup on error
 > 
-> The improvement of UDP RX bandwidth for the single core SoCs (RZ/G2UL &
-> RZ/G3S) is particularly critical.
+> Thanks,
+> Maciek
 > 
-> Signed-off-by: Paul Barker <paul.barker.ct@bp.renesas.com>
-[...]
-
-> diff --git a/drivers/net/ethernet/renesas/ravb.h b/drivers/net/ethernet/renesas/ravb.h
-> index 55a7a08aabef..ca7a66759e35 100644
-> --- a/drivers/net/ethernet/renesas/ravb.h
-> +++ b/drivers/net/ethernet/renesas/ravb.h
-> @@ -1078,6 +1078,7 @@ struct ravb_hw_info {
->  	unsigned nc_queues:1;		/* AVB-DMAC has RX and TX NC queues */
->  	unsigned magic_pkt:1;		/* E-MAC supports magic packet detection */
->  	unsigned half_duplex:1;		/* E-MAC supports half duplex mode */
-> +	unsigned needs_irq_coalesce:1;	/* Requires SW IRQ Coalescing to achieve best performance */
-
-   Is this really a hardware feature?
-   Also, s/Requires SW/Needs software/ and s/to achieve best performance//,
-please...
-
-[...]
-
-MBR, Sergey
 
